@@ -32,7 +32,8 @@ All five of you should see the same numbers from `check_premise.py`:
 That last pair matters most. Disabling preview collapses the predictive policy
 onto the reactive one exactly, which means whatever gap exists is attributable
 to preview information and nothing else. Preview advantage: reactive cuts damage
-33.9 %, predictive 47.2 % — **13.4 points**.
+33.8 %, predictive 47.2 % — **13.4 points**. Those come from the printed damage
+column; the script prints no percentage of its own.
 
 > **THESE NUMBERS CHANGED AGAIN ON 8 SEPTEMBER, AND THIS TIME BECAUSE THE
 > SIMULATION WAS THE WRONG ENGINE.** `plant.Geometry` defaulted to a generic
@@ -42,7 +43,8 @@ to preview information and nothing else. Preview advantage: reactive cuts damage
 > the eleven validation rows — ran a 1998 cc four-cylinder. Torque was 33 % low.
 >
 > Phase B was not affected: `predict()` and `map_from_airflow()` always used the
-> B58, so the load residual (now 2.3 %) stands.
+> B58, so the load residual (now 1.4 % with k derived, 2.8 % fitted) stands.
+> What that residual does and does not measure: mistake 12 in `CLAUDE.md`.
 >
 > Every earlier set of premise numbers is void — 527/357/199, and 52.7/29.9/27.8
 > alike. Anything in a document dated before 8 September that did not come out of
@@ -116,8 +118,14 @@ implies **31.2 kPa**, which is the textbook value.
 only under boost, when the throttle is open and the two are the same thing.
 
 On the same eleven operating points: using that channel gives 75.3 % air-mass
-error and a 17.2 % load residual. Using `map_from_airflow()` gives **2.3 %**
-over the seventeen pooled points that survive the window checks.
+error and a 17.2 % load residual. Using `map_from_airflow()` gives **1.4 %**
+over the 22 pooled points that survive the window checks, with the normalisation
+constant derived rather than fitted (2.8 % with the old fitted constant).
+
+> **Read mistake 12 in `CLAUDE.md` before quoting that 1.4 %.** Once the constant
+> is derived, intake temperature, volumetric efficiency and residual fraction all
+> cancel out of the comparison, so the number compares two ECU channels rather
+> than testing the cycle model.
 
 `compare_log.py` inverts the air mass by default. `--map-from-log` exists only to
 reproduce the failure for the report.
@@ -125,7 +133,7 @@ reproduce the failure for the report.
 ### 3. Peak power is not a prediction of this model
 
 Manifold pressure is an **input**. `plant.boost_ceiling_kpa` now bounds it to
-what the car was observed to do — refitted 8 September on 30 534 quasi-steady
+what the car was observed to do — refitted 8 September on 43 853 quasi-steady
 samples — and `SupervisoryTunerEnv.MAP_CEIL_KPA` is the measured 250 kPa rather
 than the round 240 that used to sit there. But an operating line is not a
 compressor map: no efficiency islands, no speed lines, because the car has no
@@ -133,11 +141,12 @@ turbo speed sensor and no pre-intercooler temperature. Full-load points remain
 outside the validated envelope. Say so rather than tuning towards a number.
 
 **Two further things you must state.** The MAF channel saturates at exactly
-1020 kg/h on four drives, so the envelope above 0.303 kg/s corrected flow is
+1020 kg/h on five drives, so the envelope above 0.303 kg/s corrected flow is
 unmeasured, not merely sparse. And above 200 g/s the air-mass inversion and the
-logged boost channel disagree by 28 % — 297 kPa against 233 kPa — because
-`volumetric_efficiency()` is fitted at part load and the pre-throttle
-temperature sensor lags during a pull. The inversion is right at part load and
+logged boost channel disagree by 28 % — 295 kPa against 231 kPa — because the
+channel feeding the inversion its charge temperature reads compressor-outlet
+air, not post-cooler air. Use 40 °C instead and the inversion returns 233 kPa
+against the logged 231. See mistake 13. The inversion is right at part load and
 wrong under boost.
 
 ### 4. The turbine time constant
@@ -182,9 +191,9 @@ reward is only safe relative to the dynamics it scores.
 
 ### 6. The MAF channel saturates, and it does not say so
 
-`Air mass flow` tops out at exactly **1020.0 kg/h** — the same number on four
-separate drives, 192 samples — while `Air mass flow participating in
-combustion` reaches 1233 kg/h on those same samples. A pinned sample
+`Air mass flow` tops out at exactly **1020.0 kg/h** — the same number on five
+separate drives, 517 samples — while `Air mass flow participating in
+combustion` reads higher on those same samples, median ratio 1.095. A pinned sample
 under-reports air, so anything inverted from it is biased at the very top of
 the envelope. `build_dataset.py` flags them as `maf_pinned` and excludes them
 from `stable`; they are not repaired by substituting the other channel, because
@@ -255,7 +264,7 @@ the fitted line into boost — extrapolated, it puts the baseline at +21° at
 |---|---|---|---|
 | engine | 2.0 L I4 | 2.0 L I4 | **3.0 L I6** |
 | baseline damage | 527.2 | 51.4 | **829.2** |
-| reactive damage reduction | −32 % | −42 % | **−33.9 %** |
+| reactive damage reduction | −32 % | −42 % | **−33.8 %** |
 | predictive damage reduction | −62 % | −46 % | **−47.2 %** |
 | **preview advantage** | 30 points | 4 points | **13.4 points** |
 

@@ -238,16 +238,21 @@ at 182 °C. The model was right and the test was absurd.
 
 It is now a hard sustained climb: 3000 rpm, 140 kPa, stoichiometric, 108 kW,
 7.6 g/s of fuel, at 25 m/s with the fan at full duty. Two anchors put it there —
-it is the load `thermal.py`'s own worked example uses, and it sits above the
-hardest sustained load ever recorded on the car. That ceiling is **6.5 g/s**,
-the highest 60-second mean fuel flow across all seven drives (on `670063b2`),
-with the averaging window sized from each drive's own sample rate.
+it is the load `thermal.py`'s own worked example uses, and it was chosen to sit
+above the hardest sustained load then recorded on the car.
+
+> **That second anchor no longer holds, and the thesis should say so.** The
+> ceiling was read as 6.5 g/s across seven drives (on `670063b2`). Over the
+> current eight drives `verify_docs.py` recomputes it as **8.7 g/s**, so the
+> 7.6 g/s condition now sits *below* the hardest recorded sustained load rather
+> than above it. The first anchor stands and the printed rows are unaffected;
+> the argument for the condition is what changed.
 
 ---
 
 ## D. The compressor operating envelope — refitted 8 September
 
-Fitted to **30 534 quasi-steady samples**. An operating line, not a compressor map.
+Fitted to **43 853 quasi-steady samples**. An operating line, not a compressor map.
 
 Measured 95th-percentile pressure ratio per corrected-flow bin:
 
@@ -276,20 +281,29 @@ than the round 240 that used to sit there.
 
 ## E. Stated limits — put these in Chapter 3 verbatim
 
-1. **The MAF channel saturates at 1020 kg/h.** Exactly 1020.0 on four separate
-   drives, 192 samples, while the combustion-air channel reaches 1233 kg/h on
-   the same samples. Pinned samples are flagged (`maf_pinned`) and excluded from
+1. **The MAF channel saturates at 1020 kg/h.** Exactly 1020.0 on five separate
+   drives, 517 samples, while the combustion-air channel reads higher on the
+   same samples (median ratio 1.095).  <!-- RETIRED-OK -->
+   *(This item said "four separate drives, 192 samples" and a 1.163 ratio until
+   10 September; both were the counts before the eighth drive.)* Pinned samples are flagged (`maf_pinned`) and excluded from
    everything fitted on air mass. **The envelope above 0.303 kg/s corrected flow
    is unmeasured, not merely sparse.** 517 samples across five drives.
 
-2. **The two manifold-pressure estimates diverge under boost.** Below 80 kPa the
-   air-mass inversion and the logged boost channel agree inside the 4.4 %
-   residual. Above 200 g/s: inverted 297 kPa against a logged 233 kPa, a 28 %
-   gap. `volumetric_efficiency()` is fitted at part load and understates
-   breathing under boost, where the intake-to-exhaust pressure ratio scavenges
-   the cylinder; and the pre-throttle temperature sensor reads 120–160 °C during
-   a pull and appears to lag. Both make the inversion over-predict. A stock B58
-   runs about 1.3 bar gauge, which is the logged figure. **The inversion is right
+2. **The two manifold-pressure estimates diverge under boost, and the cause is
+   now identified.** Above 200 g/s: inverted 295 kPa against a logged 231 kPa.
+   Re-run the inversion with a plausible post-cooler charge temperature and it
+   lands on the logged figure — 241 kPa at 50 °C, 233 kPa at 40 °C. The
+   `Intake air temperature before throttle valve` channel reads compressor-outlet
+   air, because the B58's charge cooler sits inside the intake manifold
+   downstream of the throttle. **The gap is the temperature, not the breathing
+   model.** A stock B58 runs about 1.3 bar gauge, which is the logged figure.
+   <!-- RETIRED-OK -->
+   *(This item claimed until 10 September that below 80 kPa the inversion and the
+   logged boost channel "agree inside the 4.4 % residual". They do not: both
+   pressure channels are pre-throttle and read 93–125 kPa at the 22 steady points
+   against an inverted 31–82, off by 44–52 %. No script prints a 4.4 % agreement.)*
+
+   **The inversion is right
    at part load and wrong under boost.**
 
 3. **Peak power is not a prediction.** Manifold pressure is an input.
@@ -310,11 +324,13 @@ than the round 240 that used to sit there.
    reproduces the logged oil trace, but everything it says about oil on a
    sustained climb rests on the network's structure, not on measurement.
 
-7. **Two drives contribute no samples.** The manifest lists seven drives and
-   113.0 minutes, but `3f64372e` (0.7 min) and `f51686d7` (0.8 min) are too
-   short to contain a warm running window, so `master_samples.csv` covers five
-   drives. Say "seven drives, 113 minutes, of which five carry usable samples"
-   rather than implying all seven were analysed.
+7. **Two drives contribute no samples, and a third contributes no points.** The
+   manifest lists **eight drives and 168.1 minutes**, but `3f64372e` (0.7 min)
+   and `f51686d7` (0.8 min) are too short to contain a warm running window, so
+   `master_samples.csv` covers **six** drives. `fb988991` carries samples but
+   loses every window to the span and gap checks, so it contributes zero
+   operating points. Say **"eight drives, 168.1 minutes, six carrying samples,
+   22 operating points"** rather than implying all eight were analysed.
 
 8. **The radiator-outlet channel is missing on `fb988991`.** It was added to the
    recording set after that drive. Thermal work uses the other four.

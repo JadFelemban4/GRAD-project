@@ -293,14 +293,38 @@ reduction 33.9 → **33.8 %**. The claim that the inversion and the logged boost
 channel agree inside 4.4 % below 80 kPa was removed; both pressure channels are
 pre-throttle and disagree by 44–52 % at the steady points.
 
-### Still open
+### Also corrected, in the second pass
 
-- `validation_table.md` still tells Chapter 3 to say seven drives and 113
-  minutes, still quotes a 6.5 g/s sustained-load ceiling where the data gives
-  8.7, and still cites 30 534 samples.
-- `README.md` still carries the 2.3 % residual in two places.
-- `engine_env.py`'s module docstring still carries the seven-drive enrichment
-  correlations, while its own `base_lambda()` docstring below has the current ones.
-- `compare_log.py --map-from-log` scores zero rows on `data/master_points.csv`
-  and still exits 0.
-- The B58 cooler layout rests on vendor documentation, not a BMW service source.
+`validation_table.md` section E now says eight drives and 168.1 minutes, and its
+MAF and manifold-pressure items carry the current counts. Its thermal test
+condition keeps the 7.6 g/s figure but now states plainly that the 6.5 g/s
+anchor behind it no longer holds, because the recomputed ceiling is 8.7 g/s and
+the condition therefore sits below the hardest recorded load rather than above
+it. `README.md` moved off the 2.3 % residual in both places. The module
+docstring of `engine_env.py` and two comments in `build_dataset.py` moved off
+the seven-drive correlations and the 1.163 ratio; both are comments, and
+`test_reward.py` and `build_dataset.py` were re-run to prove it. The regenerated
+`data/` files are byte-identical to what was there before.
+
+### Still open — these need a decision, not a correction
+
+- **`compare_log.py --map-from-log` scores zero rows** on
+  `data/master_points.csv`: the alias table has no entry for the manifold
+  pressure channel under the short schema, so every row is dropped, the table
+  prints empty, and the script still exits 0. `CLAUDE.md` says this mode exists
+  to reproduce the pre-throttle failure for the thesis; it cannot, on the
+  canonical dataset. Fail-open, the same shape as mistake 9.
+- **`compare_log.py` tells the reader to look at volumetric efficiency** when
+  the load residual is large. That quantity cancels, so the residual cannot grow
+  for that reason. The advice is unreachable.
+- **`validate.py` still prints that there is no compressor flow ceiling**,
+  although `plant.boost_ceiling_kpa` exists and bounds the model.
+- **`check_map.py` schedules lambda by load**, which mistake 4 identifies as the
+  wrong variable. The effect is at most one degree per cell and no cell becomes
+  `knk`, so no published figure changes.
+- **The B58 cooler layout rests on vendor documentation**, not a BMW service
+  source. Get the primary source before the thesis leans on it. The measured
+  numbers behind mistake 13 stand either way.
+- **Nothing asserts the 1.4 % itself.** `verify_docs.py` checks the constant,
+  the derived value and the excluded alternative, but not the residual, so that
+  figure can drift without the checker noticing.

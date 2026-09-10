@@ -168,8 +168,9 @@ def derive(d):
 
     # THE MAF CHANNEL SATURATES. "Air mass flow" tops out at exactly 1020.0 kg/h
     # on five separate drives -- 3aca2ec1, 670063b2, 683640a0, cb67b01f and
-    # 7475b5d7 -- 517 samples in all. That is a sensor range limit, not a coincidence: the same
-    # samples show "Air mass flow participating in combustion" reaching 1233 kg/h.
+    # 7475b5d7 -- 517 samples in all. That is a sensor range limit, not a
+    # coincidence: on the same samples "Air mass flow participating in
+    # combustion" reads higher, median ratio 1.095.
     #
     # A pinned sample reports less air than the engine is actually breathing, so
     # it corrupts anything fitted on air mass: manifold pressure inverted from it
@@ -178,8 +179,9 @@ def derive(d):
     # is exactly where the fit is most exposed.
     #
     # They are flagged, not repaired. The combustion-air channel is the ECU's
-    # modelled trapped charge, a different quantity (median ratio 1.163 where
-    # both are valid), and splicing two definitions into one series would put a
+    # modelled trapped charge, a different quantity (median ratio 1.095 over the
+    # 517 pinned samples; 1.163 before the eighth drive), and splicing two
+    # definitions into one series would put a
     # step in the middle of the curve. Everything fitted on air mass uses
     # `stable`, which excludes them; `maf_pinned` is kept so the thesis can say
     # how much of the envelope is unmeasured and why.

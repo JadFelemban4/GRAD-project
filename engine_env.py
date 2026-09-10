@@ -26,14 +26,19 @@ class BaselineECU:
     CALIBRATED AGAINST THE REAL CAR — spark 7 Sep 2026, lambda 8 Sep 2026
     ---------------------------------------------------------------------
     The spark map comes from a 41.8-minute log (3aca2ec1-20260907_072817). The
-    lambda strategy comes from 113 minutes pooled across seven drives, because
+    lambda strategy comes from 168.1 minutes pooled across eight drives, because
     the single-drive version of it was wrong twice. Two things changed from the
     original guessed calibration, and both matter:
 
-    1. ENRICHMENT IS THERMAL, NOT LOAD-BASED. Across 113 minutes, lambda has no
-       correlation with manifold pressure (+0.02). It correlates with engine
-       speed (-0.60) and with how long the engine has been held at high load
-       (-0.38). The car runs stoichiometric through the first seconds of a pull
+    (These figures read 113 minutes / seven drives / +0.02 / -0.60 / -0.38 until
+    10 September -- the counts from before 7475b5d7 arrived. base_lambda()'s own
+    docstring below has carried the current ones all along, and verify_docs.py
+    asserts them and passes. Mistake 11 in CLAUDE.md, one level up again.)
+
+    1. ENRICHMENT IS THERMAL, NOT LOAD-BASED. Across 168.1 minutes, lambda has
+       no correlation with manifold pressure (-0.05). It correlates with engine
+       speed (-0.56), with air mass flow (-0.49), and with how long the engine
+       has been held at high load (-0.47). The car runs stoichiometric through the first seconds of a pull
        at any boost, and never enriches below about 3300 rpm however long the
        boost is held. See base_lambda() for the measured table and the history
        of getting this wrong three times.
