@@ -181,7 +181,7 @@ error it cannot fix with spark and lambda alone**, and the tracking constraint i
 violated from the first step for reasons unrelated to the policy.
 
 `MAP_CEIL_KPA = 250.0` — measured, not guessed: the highest pressure ratio
-observed across 30 534 quasi-steady samples is 2.516 against a 99.3 kPa inlet.
+observed across 43 853 quasi-steady samples is 2.52 against a 99.3 kPa inlet.
 
 ### The damage model
 

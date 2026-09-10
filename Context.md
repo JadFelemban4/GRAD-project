@@ -77,14 +77,30 @@ reads 13.49 against an ambient of 14.23; real manifold pressure at idle must be
 about a third of ambient.
 
 - Using it as the model's load input → **75 % air-mass error**
-- Inverting the air-mass channel → **2.8 %**
+- Inverting the air-mass channel → **1.4 %** load residual with `k` derived,
+  2.8 % with `k` fitted
+
+**Read mistake 12 in `CLAUDE.md` before quoting that 1.4 %.** It is the ECU's
+filling channel compared with the ECU's own air-mass channel; the cycle model
+cancels out of it entirely.
+
+### 1b. The temperature channel is not what it says either
+
+`Intake air temperature before throttle valve, measured` reads compressor-outlet
+air, not charge temperature — the B58's cooler sits inside the manifold,
+downstream of the throttle. It reaches 163 °C under boost, which no working
+cooler would pass to the cylinders. The model uses it as charge temperature, and
+that alone explains the 28 % boost pressure gap. See mistake 13.
+
+**Two of this car's channels have now been misread the same way. Check the third
+before trusting it.**
 
 **Always use `plant.map_from_airflow()`.** `compare_log.py --map-from-log` exists
 only to reproduce the failure for the thesis.
 
 ### 2. Enrichment follows engine speed and dwell, not load
 
-At 118 seconds above 230 kPa, the correlation between λ and manifold pressure is
+At 198 seconds above 230 kPa, the correlation between λ and manifold pressure is
 **−0.05 — none**. What correlates:
 
 | variable | correlation with λ |
@@ -151,7 +167,8 @@ Three different claims, routinely conflated. Keep them apart.
 | Claim | Evidence | Coverage |
 |---|---|---|
 | the cycle model matches published engine physics | `validate.py`, 8 of 11 inside band | generic, not this car |
-| the cycle model matches **this car** | `compare_log.py`, 2.8 % over 22 points | **31–82 kPa only** |
+| the cycle model matches **this car** | *no such evidence exists at part load* — `compare_log.py`'s residual cancels the model, mistake 12 | **nothing at part load** |
+| the ECU's channels are read correctly | `compare_log.py`, 1.4 % over 22 points, k derived | **31–82 kPa only** |
 | the thermal network matches this car | `thermal.py` driven over whole logs | oil ≤ 107 °C only |
 
 **Vehicle validation covers 31–82 kPa.** Steady points need steady driving, and
@@ -178,7 +195,7 @@ points"** — and say which of the three you mean.
 ## Reporting discipline
 
 1. **Never quote a number a script does not print.**
-2. **Report the condition with the number.** "2.8 % load residual over 22
+2. **Report the condition with the number.** "1.4 % load residual over 22
    points, 31–82 kPa" — not "the model is accurate."
 3. **Report the threshold with every preview figure.**
 4. **Run `verify_docs.py` before quoting anything into the thesis.** It exists

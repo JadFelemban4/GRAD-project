@@ -1,7 +1,15 @@
-# CHECKPOINT.md — state as of 9 September 2026
+# CHECKPOINT.md — state as of 10 September 2026
 
 A snapshot: what is proven, what was run today, what is open. Regenerate the
 numbers rather than trusting this file if it is more than a week old.
+
+> **10 September, v16 and its audit.** The load constant `k` is now derived
+> rather than fitted, and the residual reads 1.4 % with zero free parameters.
+> An audit of that change found it measures no part of the plant, and that the
+> intake temperature channel reads compressor-outlet air. See the section at the
+> bottom of this file, `AUDIT_2026-09-10.md`, and mistakes 12 and 13 in
+> `CLAUDE.md`. The repository is now on GitHub at `JadFelemban4/GRAD-project`,
+> private.
 
 ---
 
@@ -10,7 +18,7 @@ numbers rather than trusting this file if it is more than a week old.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 2.8 % load residual, 22 pooled points, 168.1 min |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived, 2.8 % with k fitted, 22 pooled points, 168.1 min. Read mistake 12 before quoting either |
 | C · get an agent to learn | **next.** `train.py` exists and runs; nothing trained yet |
 | D · baselines and the ablation | not started. **This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -31,10 +39,10 @@ Every script in the repo was executed end to end. **All seven passed.**
 | 1 | `plant.py` | ✅ four sweeps; torque 431–514 Nm across the boosted sweep |
 | 2 | `validate.py` | ✅ **8 of 11** inside band; τ_turb 48.0 s; 2997.5 cc |
 | 3 | `check_premise.py` | ✅ **829.2 · 548.6 · 437.6 · 548.6** |
-| 4 | `verify_docs.py` | ✅ **all 22 figures match** |
+| 4 | `verify_docs.py` | ✅ **all 22 figures match** (v16 raised this to 26 checks) |
 | 5 | `test_reward.py` | ✅ **4 of 4** |
 | 6 | `build_dataset.py` | ✅ 168.1 min, 8 drives, 22 points |
-| 7 | `compare_log.py` | ✅ **2.8 % load residual, PASS** |
+| 7 | `compare_log.py` | ✅ **2.8 % load residual, PASS** (v16: 1.4 % with k derived) |
 | 8 | `generality_test.py` | ✅ H2 table reproduced: 16.5 / 18.0 / 26.0 pts |
 
 Nothing in the repository is stale. Every published figure regenerates.
@@ -51,7 +59,7 @@ Protection trigger **1123 K (850 °C)** — the knee of the turbine damage term.
 | predictive, **preview disabled** | 4175 | **548.6** | 859 | 123 |
 
 **The ablation held again.** Preview-disabled lands on reactive across *all four*
-reported quantities, not just damage. Reactive cuts damage 33.9 %, predictive
+reported quantities, not just damage. Reactive cuts damage 33.8 %, predictive
 47.2 % — **13.4 points**.
 
 The cost is legible and worth quoting: predictive burns **139 g more fuel than
@@ -122,6 +130,10 @@ guard**. The remaining seven confine theirs to comments and docstrings.
 
 ### 3. `CLAUDE.md` carried a stale drive count
 
+<!-- RETIRED-OK -->
+The old sentence is quoted below deliberately, as the record of what was
+corrected. `verify_docs.py` needs the marker above to know that.
+
 It said "seven drives, 113 minutes, five carrying samples." The data says **eight
 drives, 168.1 minutes, six carrying samples**.
 
@@ -185,8 +197,9 @@ preview figure.
 - **The radiator is not identifiable on this car**, and the channel census proves
   it: every water-pump and fan-actual channel is all-zero. A constrained fit
   gives R² = 0.157 with a negative ram coefficient. Stop trying.
-- **Oil above 103 °C is extrapolation.** The hottest oil anywhere in the logs is
-  107 °C.
+- **Oil above 107 °C is extrapolation.** That is the hottest oil anywhere in the
+  logs, on `7475b5d7`; 111 °C after the filter. This line said 103 °C until
+  10 September, which was the figure before the eighth drive arrived.
 - **Steady points are steady for fast quantities only.** The 60 s window is fully
   settled for air, lambda, spark and manifold pressure, and reaches just **71 %**
   of a turbine thermal step (τ = 48 s). Never validate a thermal quantity at a
@@ -217,3 +230,77 @@ preview figure.
 > from.
 
 Full detail: [handoff.md](handoff.md).
+
+---
+
+## Session of 9–10 September 2026 — v16, and an audit of it
+
+### What was run
+
+`engine-supervisor-v16.zip` was unpacked over the working copy. All 38 archive
+files are byte-identical to the archive. All six checks were run in order.
+
+| script | result |
+|---|---|
+| `check_premise.py` | 829.2 · 548.6 · 437.6 · 548.6 at 1123 K; rows 2 and 4 equal to the last float bit |
+| `verify_docs.py` | failed at 25 of 26, now fixed and back to **26 of 26** |
+| `test_reward.py` | 4 of 4, neutral −0.00438, starver −0.28044 |
+| `check_map.py` | 85 of 85 adjacent pairs monotonic, 6 unreachable, 0 `knk` |
+| `validate.py` | 8 of 11 inside band, τ_turb 48.0 s, 2997.5 cc |
+| `compare_log.py` | derived 1.4 %, fitted 2.8 % |
+
+**The preview identity was checked below the printed decimals.** A probe compared
+the reactive and preview-disabled rollouts at full float precision. All seven
+returned fields are bit-identical: fuel `4175.220663624409`, damage
+`548.6498477371352`, peak turbine `858.6302607939912`, knock `0`.
+
+### Why `verify_docs.py` had failed
+
+Not v16's fault. The archive holds 38 files and does not contain the six
+documents written on 9 September, so unzipping left them behind unchanged while
+everything else moved to v16. Three of them still carried retired figures.
+Running the checker inside a clean extraction of the archive alone passed 26 of
+26 all along.
+
+Fixed on 10 September: `Context.md` and `DATA-MODEL.md` had a live seven-drive
+dwell figure corrected to 198 s, and the historical quotation in this file was
+marked `RETIRED-OK`, which is what the checker requires for a deliberate mention.
+
+### What the audit found
+
+Two entries were added to the mistake log in `CLAUDE.md`.
+
+- **Mistake 12 — the load residual tests no part of the plant.** Because
+  `map_from_airflow()` inverts the exact relation `run_cycle()` uses, volumetric
+  efficiency, residual fraction and intake temperature all cancel out of the
+  comparison. The 1.4 % is the ECU's filling channel against its own air-mass
+  channel. Forcing volumetric efficiency to 0.5 leaves the residual at 1.3740 %.
+  There is no part-load test of the breathing model anywhere in the repository.
+- **Mistake 13 — the intake temperature channel reads compressor-outlet air.**
+  The B58's charge cooler sits inside the intake manifold, downstream of the
+  throttle, so the "before throttle valve" sensor is before the cooler. Using a
+  plausible post-cooler temperature in the inversion lands on the logged boost
+  pressure: 233 kPa at 40 °C against a logged 231, where the sensor value gives
+  295. The 28 % boost gap is the temperature, not the breathing model.
+
+### Stale figures corrected the same day
+
+Oil extrapolation 103 → **107 °C**. Enrichment v4 fitted on seven → **eight**
+drives. MAF ceiling 192 samples on four → **517 on five** drives. Compressor fit
+30 534 → **43 853** quasi-steady samples. Vehicle validation 31–79 → **31–82 kPa**.
+Load residual 2.3 % over 17 points → **1.4 % and 2.8 % over 22**. Reactive damage
+reduction 33.9 → **33.8 %**. The claim that the inversion and the logged boost
+channel agree inside 4.4 % below 80 kPa was removed; both pressure channels are
+pre-throttle and disagree by 44–52 % at the steady points.
+
+### Still open
+
+- `validation_table.md` still tells Chapter 3 to say seven drives and 113
+  minutes, still quotes a 6.5 g/s sustained-load ceiling where the data gives
+  8.7, and still cites 30 534 samples.
+- `README.md` still carries the 2.3 % residual in two places.
+- `engine_env.py`'s module docstring still carries the seven-drive enrichment
+  correlations, while its own `base_lambda()` docstring below has the current ones.
+- `compare_log.py --map-from-log` scores zero rows on `data/master_points.csv`
+  and still exits 0.
+- The B58 cooler layout rests on vendor documentation, not a BMW service source.

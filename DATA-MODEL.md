@@ -18,7 +18,7 @@ data/master_samples.csv 46707 rows per-sample rows with derived physics
         |
         |  compare_log.py data/master_points.csv
         v
-2.8 % load residual, PASS
+1.4 % load residual, PASS  (k derived; 2.8 % with k fitted)
 ```
 
 Regenerating is always safe and always the right move. The outputs are the union
@@ -90,7 +90,7 @@ running window. They are reconnaissance logs — see `logs/CHANNEL_CENSUS.md`.
 ## `data/master_points.csv` — 22 steady operating points
 
 34 columns. **This is the input to `compare_log.py`** and the evidence behind the
-2.8 % residual.
+1.4 % residual. What that residual does and does not measure: mistake 12.
 
 ### Measured, straight off the car
 
@@ -132,7 +132,10 @@ A window is now rejected unless its span is within **±20 %** of `WINDOW_S = 60 
 the check is auditable rather than asserted.
 
 Effect: 20 points became 17, `fb988991` contributed none, and the pooled residual
-fell from 4.4 % to 2.3 %.
+fell from 4.4 % to 2.3 %. <!-- RETIRED-OK -->
+*(Those are the figures of the moment the checks were added. The eighth drive
+then took the set to 22 points, where the residual reads 2.8 % fitted and 1.4 %
+derived. The paragraph is kept as the record of what the window checks did.)*
 
 > **Be honest about that.** Part of the improvement is the removal of the worst
 > drive. The exclusion rule is legitimate only because it was written from a
@@ -178,7 +181,8 @@ the limit rather than hide it.
 
 > They are **not repaired** by substituting `Air mass flow participating in
 > combustion`. That is the ECU's modelled trapped charge — a different quantity,
-> median ratio 1.163 — and splicing two definitions puts a step in the curve.
+> median ratio **1.095** over the 517 pinned samples — and splicing two
+> definitions puts a step in the curve. (It read 1.163 on seven drives.)
 
 **`stable`** additionally requires the air and boost signals to be quiet. 43 853
 quasi-steady samples sit behind the compressor fit; the highest pressure ratio
@@ -190,11 +194,11 @@ observed is **2.52**.
 
 | calibration | fitted from | sample support |
 |---|---|---|
-| `BaselineECU` enrichment (v4) | seven drives | 422 / 168 / 465 samples in the three rpm bands above 200 kPa |
+| `BaselineECU` enrichment (v4) | eight drives | 422 / 168 / 465 samples in the three rpm bands above 200 kPa |
 | `BaselineECU` spark, below ~90 kPa | 11 measured steady points | residual RMS 1.66° |
 | `BaselineECU` spark, above ~90 kPa | **the plant's own Douaud-Eyzat knock limit** | not a fit |
 | `thermal.ua_block_oil = 800 W/K` | 80 min of oil and coolant, 3 drives | median gap −1.2 K, p95 +5.4 K |
-| `MAP_CEIL_KPA = 250` | 30 534 quasi-steady samples | max pressure ratio 2.516 |
+| `MAP_CEIL_KPA = 250` | 43 853 quasi-steady samples | max pressure ratio 2.52 |
 | radiator `ua_rad_*` | **nothing — not identifiable** | R² = 0.157, negative ram coefficient |
 
 ### The enrichment fit has been wrong three times
@@ -204,9 +208,9 @@ observed is **2.52**.
 | v1, guessed | enriches from 120 kPa | far too early |
 | v2, one 42-min drive | never enriches | only 4 s of high-load data |
 | v3, two drives | stoichiometric to 230 kPa, then 0.85 | right effect, **wrong variable** |
-| **v4, seven drives** | function of engine speed and sustained dwell | **current** |
+| **v4, eight drives** | function of engine speed and sustained dwell | **current** |
 
-v3 was fitted to **17 seconds** above 230 kPa. At 118 seconds the correlation
+v3 was fitted to **17 seconds** above 230 kPa. At 198 seconds the correlation
 between λ and manifold pressure is **−0.05 — none at all**.
 
 > **Two lessons, both cheap to relearn expensively: one drive is not evidence,
@@ -232,7 +236,7 @@ Then check, in this order — each of these prints:
 3. **Did any window get rejected for span or a logger gap?** A drive that loses
    every window that way was logged with too many channels selected.
 4. **Which compressor flow bins are still empty?**
-5. **Does the load residual stay near 2.8 %?** A jump means the drive covers a
+5. **Does the load residual stay near 1.4 %?** A jump means the drive covers a
    region the model has not seen — information, not failure.
 6. **Did the new drive push any channel to a flat maximum?** A flat maximum
    repeated across drives is a saturated sensor.

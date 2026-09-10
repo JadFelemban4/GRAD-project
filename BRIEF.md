@@ -60,7 +60,7 @@ viva.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 2.8 % load residual, 22 pooled points |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (2.8 % fitted), 22 pooled points. Read mistake 12 before quoting it |
 | C · get an agent to learn | **next.** `train.py` exists, nothing trained yet |
 | D · baselines and the ablation | not started. **This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -83,11 +83,11 @@ Do not quote a number that a script does not print.
 | 8 of 11 inside band | `python validate.py` |
 | 4 of 4 checks pass | `python test_reward.py` |
 | 168.1 min, 8 drives, 22 points | `python build_dataset.py "logs/raw/*.csv"` |
-| 2.8 % load residual, PASS | `python compare_log.py data/master_points.csv` |
+| 1.4 % load residual, PASS, k derived | `python compare_log.py data/master_points.csv` |
 | all 22 figures match | `python verify_docs.py` |
 | 16.5 → 18.0 → 26.0 pts | `python generality_test.py` |
 
-Preview advantage: reactive cuts damage 33.9 %, predictive 47.2 % —
+Preview advantage: reactive cuts damage 33.8 %, predictive 47.2 % —
 **13.4 points**, measured against a **1123 K** turbine protection limit.
 
 **Always report the threshold with the preview figure.** A preview advantage

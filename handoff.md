@@ -117,7 +117,7 @@ and interquartile range over five seeds.
 3. **After changing the reward, the env, the plant, OR the scenario** — re-run
    `test_reward.py` and paste the output into the commit message. A reward is
    only safe relative to the dynamics it scores.
-4. **Report numbers with their condition attached.** "2.8 % load residual over 22
+4. **Report numbers with their condition attached.** "1.4 % load residual over 22
    points, 31–82 kPa" — not "the model is accurate."
 5. **Report the protection threshold with every preview figure.** A preview
    advantage quoted without the limit it was measured against is not a result.
@@ -142,7 +142,7 @@ Then check, in order — each of these prints:
 3. Did any window get rejected for span or a logger gap? A drive that loses every
    window that way was logged with too many channels selected.
 4. Which compressor flow bins are still empty?
-5. Does the load residual stay near 2.8 %? A jump means the drive covers a region
+5. Does the load residual stay near 1.4 %? A jump means the drive covers a region
    the model has not seen — information, not failure.
 
 If the drive changes a calibration, **check how many samples support it and check
