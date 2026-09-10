@@ -1,0 +1,12 @@
+# Phase A-D. Python 3.11 or newer.
+numpy>=1.26
+scipy>=1.11
+gymnasium>=0.29
+pandas>=2.0
+
+# Phase C onward, when you start training. Uncomment then.
+# stable-baselines3[extra]>=2.2
+# torch>=2.1
+
+# Optional, for plots.
+matplotlib>=3.8
