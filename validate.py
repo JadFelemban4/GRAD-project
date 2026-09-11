@@ -97,12 +97,26 @@ def _step_response(key, horizon_s, dt=0.25):
     right, the test was absurd.
 
     The condition is now a hard sustained climb — 3000 rpm, 140 kPa,
-    stoichiometric, 108 kW, 7.6 g/s of fuel. Two independent anchors put it in
-    the right place: it is the load `thermal.py`'s own worked example uses, and
-    it sits above the hardest sustained load actually recorded on the car. That
-    ceiling is 6.5 g/s -- the highest 60-second mean fuel flow across all seven
-    drives, on 670063b2, with the averaging window sized from each drive's own
-    sample rate rather than a fixed sample count.
+    stoichiometric, 108 kW, 7.6 g/s of fuel. One anchor holds it there: it is
+    the load `thermal.py`'s own worked example uses.
+
+    THE SECOND ANCHOR NO LONGER HOLDS, AND SAY SO RATHER THAN QUIETLY KEEPING
+    IT.  RETIRED-OK: the ceiling quoted in the next sentence is the superseded
+    one, kept because the point of the paragraph is that it moved.
+    This docstring used to add that the condition "sits above the hardest
+    sustained load actually recorded on the car", on a ceiling of 6.5 g/s
+    measured over the seven drives that existed then. On the shipped eight
+    drives, 168.1 minutes, the hardest 60-second mean fuel flow is **8.7 g/s**,
+    on 7475b5d7 -- the averaging window sized from each drive's own sample rate
+    rather than a fixed sample count. The test condition is therefore BELOW what
+    the car has actually done for a minute, not above it, by about 13 %.
+
+    Nothing here is changed to chase that: the condition is still the one the
+    published bands describe, and the time constants it reports are a property
+    of the network rather than of the load. But a tau measured at 7.6 g/s is not
+    evidence about 8.7 g/s, and the thesis should quote the condition with the
+    figure — "48.0 s at 3000 rpm, 140 kPa, 108 kW" — rather than implying the
+    test bounds the vehicle.
 
     The published bands describe this condition. Match the condition to the
     band, not the band to the model.
