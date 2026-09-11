@@ -352,11 +352,11 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 
 
 # ---------------------------------------------------------------------------
-# Compressor boost ceiling — measured, 7 September 2026
+# Compressor boost ceiling — measured, refit dated 8 September 2026
 # ---------------------------------------------------------------------------
 # This is NOT a compressor map. It is the OPERATING CEILING: the highest
 # pressure ratio the vehicle was observed to reach at a given corrected mass
-# flow, across 13,764 quasi-steady samples from both 7 Sep drives.
+# flow, across 43 853 quasi-steady samples over 168.1 minutes and eight drives.
 #
 # The difference matters. A compressor map shows what the compressor CAN do,
 # bounded by surge and choke, with efficiency islands and shaft-speed lines.
@@ -368,8 +368,14 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 # manifold pressure was an unbounded input, so it would produce whatever power
 # the commanded boost implied. This bounds it to what the vehicle actually does.
 #
-# REFITTED 8 September 2026, after the mid-load drive (cb67b01f) filled the gap.
-# 28273 quasi-steady samples over 113 minutes and seven drives.
+# REFITTED 8 September 2026, after the mid-load drive (cb67b01f) filled the
+# empty middle. The shipped constants stand on the quasi-steady set named above,
+# whose size verify_docs.py checks against the shipped data on every run — so if
+# this comment and the data ever part company again, the run says so.
+#
+# RETIRED-OK: the FIRST version of this curve stood on 13 764 samples from the
+# two 7 September drives alone. That is why its middle was empty and its shape
+# was wrong. It is void, and none of the numbers below come from it.
 #
 # Measured envelope (95th percentile of pressure ratio per flow bin, n >= 15):
 #     0.021 kg/s -> 1.175      0.194 kg/s -> 2.219
@@ -420,6 +426,80 @@ def boost_ceiling_kpa(mdot_air_gps, t_inlet_k=298.0, p_inlet_kpa=99.3):
     m = corrected_flow(mdot_air_gps, t_inlet_k, p_inlet_kpa)
     pr = 1.0 + BOOST_CEIL_A * m / (1.0 + BOOST_CEIL_B * m)
     return float(p_inlet_kpa * min(pr, 2.6))       # 2.6 = observed peak plus margin
+
+
+def charge_temperature(t_amb_k, t_block_k=None) -> float:
+    """Temperature of the air actually trapped in the cylinder, in K.
+
+    THE ONE DEFINITION. Import this everywhere. Do not inline the formula and
+    do not substitute a logged channel -- see below for what that cost.
+
+    WHY THIS EXISTS (10 September 2026)
+    -----------------------------------
+    `build_dataset.py` and `compare_log.py` used to feed the logged channel
+    `Intake air temperature before throttle valve` straight into
+    map_from_airflow() as the charge temperature, because
+    logs/CHANNEL_SET_FINAL.md labelled it "post-intercooler".
+
+    THAT LABEL WAS WRONG. The channel reads 149 C under boost, and peaks at
+    163 C. No working water-to-air charge cooler, with its circuit sitting near
+    ambient, delivers 149 C air to the ports. What it matches instead is a
+    COMPRESSOR OUTLET: at pressure ratio 2.3 and 70 % efficiency from 40 C
+    inlet air, isentropic compression gives 160 C. The B58 carries its charge
+    cooler INSIDE the intake manifold, downstream of the throttle body, so
+    "before throttle valve" is before the cooler.
+
+    The car settles it, at a gate chosen so that the two populations describe
+    the same operating region. THE GATE IS 200 kPa AND IT IS NOT ARBITRARY: the
+    logged side keeps `Boost pressure` above 15 psi gauge, and
+    (15 + 14.23) * 6.894757 = 201.5 kPa absolute, so gating the model side at
+    200 kPa matches the logged population BY CONSTRUCTION. Gate the model at
+    180 instead and it admits samples 20 kPa below anything the logged set
+    contains, which drags the model median down and flatters the gap.
+
+    At the matched gate: 587 boosted, MAF-unpinned model samples against 887
+    logged readings of the vehicle's own `Boost pressure` channel, whose median
+    is 226 kPa absolute.
+
+        charge temperature used              | inverted MAP | gap vs the car
+        the raw sensor (107 C median)        | 279.5 kPa    | +23.7 %
+        charge_temperature(), THIS FUNCTION  | 232.7 kPa    | +3.0 %
+        ambient + 8 K (45 C median)          | 227.5 kPa    | +0.7 %
+
+    CLAUDE.md used to blame that 23.7 % on the breathing model -- fitted at part
+    load, said to understate breathing under boost. IT IS NOT THE BREATHING
+    MODEL. It is the temperature. `volumetric_efficiency()` is cleared by this
+    correction, not convicted by it -- and note exactly what that leaves: there
+    is NO part-load test of it against this car, because both logged pressure
+    channels sit upstream of the throttle and there is nothing to compare a
+    modelled manifold pressure against.
+
+    WHY NOT `ambient + 8 K`, WHICH SCORES +0.7 %
+    --------------------------------------------
+    Because that is a knob tuned to hit the target, and this project has
+    already been burned by exactly that move once this week -- see CLAUDE.md
+    mistake 12. The formula below was written independently for the Gymnasium
+    environment, months before this question came up, and was never touched to
+    make this number agree. It carries NO parameter fitted to the boost
+    channel.
+
+    Be honest about how thin that contrast is. At the matched gate `ambient +
+    8 K` scores +0.7 %, not the +0.0 % a looser gate reported, and +0.7 %
+    against +3.0 % is a smaller margin than the rhetoric wants. The rejection
+    stands anyway, on the same ground: a 3.0 % gap from a model with no
+    parameter fitted to the boost channel says more than a closer gap from one
+    tuned against it. Report +3.0 %; do not tune it away.
+
+    LIMIT, STATE IT IN CHAPTER 3. There is no measured charge-temperature
+    channel on this car: `Temperature after the intercooler` exists in the
+    census and reads all-zero on every sample. This is a MODEL of the charge
+    temperature, anchored to ambient, not a measurement. The +3.0 % gap over
+    587 boosted samples above 200 kPa is the evidence for it and the whole of
+    the evidence for it.
+    """
+    if t_block_k is None:
+        return t_amb_k + 12.0
+    return t_amb_k + 12.0 + 0.06 * (t_block_k - t_amb_k)
 
 
 def map_from_airflow(mdot_air_gps, rpm, iat_k, geo=None) -> float:

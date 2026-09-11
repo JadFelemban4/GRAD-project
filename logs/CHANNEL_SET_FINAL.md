@@ -41,7 +41,7 @@ All confirmed live on 8 September. Units are as the export writes them.
 | 4 | `Air mass flow` | **kg/h** | the load input, via `map_from_airflow()`. Saturates at 1020 |
 | 5 | `Mass flow through throttle valve bank 1` | kg/h | cross-check on #4 |
 | 6 | `Relative air filling` | % | BMW's own load figure — what `compare_log.py` scores against |
-| 7 | `Intake air temperature before throttle valve, measured` | °C | charge temperature. Post-intercooler, runs 57–163 °C |
+| 7 | `Intake air temperature before throttle valve, measured` | °C | **COMPRESSOR OUTLET, not charge temperature.** Runs 57–163 °C; the B58's cooler is inside the manifold, downstream of the throttle. Do NOT feed it to `map_from_airflow` — see CLAUDE.md mistake 13. Useful as the compressor's hot side. |
 | 8 | `Air mass flow participating in combustion` | kg/h | ECU's modelled trapped charge. Does **not** saturate at 1020 |
 | 9 | `Coolant temperature` | °C | block node, engine-out |
 | 10 | `Engine radiator outlet temperature (coolant)` | °C | radiator cold side |
@@ -118,7 +118,7 @@ model in `engine_env.py` be checked against the real thing instead of assumed.
 
 Everything in the dataset is either cruising or a short pull. **No drive has yet
 overwhelmed the cooling system**, which is why the radiator is unidentifiable
-and why the model's oil behaviour above 103 °C is extrapolation.
+and why the model's oil behaviour above 107 °C is extrapolation.
 
 Note what the census adds to this: it is not only that the coolant stays in
 band. The **fan setpoint sits between 28 and 31 % for an entire drive** and

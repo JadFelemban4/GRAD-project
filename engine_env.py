@@ -11,13 +11,20 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 
-from plant import Operating, run_cycle, b58
+from plant import Operating, run_cycle, b58, charge_temperature
 from thermal import ThermalNetwork
 
 # The one engine in this project. Passed EXPLICITLY to every run_cycle call
 # below -- relying on the default is what let this environment simulate a
 # 2.0 L four-cylinder for three weeks. See plant.py's module docstring.
 GEO = b58()
+
+# The charge temperature is IMPORTED, not re-typed. Both branches of it used to
+# sit inline in reset() and step() as literal arithmetic; plant.charge_temperature
+# is the one definition, and a formula that exists in two files drifts in one of
+# them. The imported values are identical to what was inlined -- this was a
+# de-duplication, not a recalibration, and test_reward.py reports the same
+# neutral score before and after.
 
 # ------------------------------------------------------------------ baseline
 class BaselineECU:
@@ -26,22 +33,20 @@ class BaselineECU:
     CALIBRATED AGAINST THE REAL CAR — spark 7 Sep 2026, lambda 8 Sep 2026
     ---------------------------------------------------------------------
     The spark map comes from a 41.8-minute log (3aca2ec1-20260907_072817). The
-    lambda strategy comes from 168.1 minutes pooled across eight drives, because
-    the single-drive version of it was wrong twice. Two things changed from the
-    original guessed calibration, and both matter:
+    lambda strategy comes from 168.1 minutes pooled across eight drives, six of
+    which carry usable samples, because the single-drive version of it was wrong
+    twice. Two things changed from the original guessed calibration, and both
+    matter:
 
-    (These figures read 113 minutes / seven drives / +0.02 / -0.60 / -0.38 until
-    10 September -- the counts from before 7475b5d7 arrived. base_lambda()'s own
-    docstring below has carried the current ones all along, and verify_docs.py
-    asserts them and passes. Mistake 11 in CLAUDE.md, one level up again.)
-
-    1. ENRICHMENT IS THERMAL, NOT LOAD-BASED. Across 168.1 minutes, lambda has
-       no correlation with manifold pressure (-0.05). It correlates with engine
-       speed (-0.56), with air mass flow (-0.49), and with how long the engine
-       has been held at high load (-0.47). The car runs stoichiometric through the first seconds of a pull
-       at any boost, and never enriches below about 3300 rpm however long the
-       boost is held. See base_lambda() for the measured table and the history
-       of getting this wrong three times.
+    1. ENRICHMENT IS THERMAL, NOT LOAD-BASED. Over the 1055 samples above
+       ENR_LOAD, manifold pressure carries almost nothing about lambda, and the
+       little it does carry has the WRONG SIGN for a load table -- +0.23, which
+       says more boost goes with a LEANER mixture. What lambda tracks instead is
+       engine speed (-0.56), air mass flow (-0.49), and how long the engine has
+       been held at high load (-0.47). The car runs stoichiometric through the
+       first seconds of a pull at any boost, and never enriches below about
+       3300 rpm however long the boost is held. See base_lambda() for the
+       measured table and the history of getting this wrong three times.
 
        Set enrichment_map=True to restore the original guessed map for
        before/after work. Do not do that for the Phase D baseline.
@@ -107,11 +112,28 @@ class BaselineECU:
         return float(np.clip(min(fitted, self.knock_limited_spark(rpm, map_kpa)),
                              self.SPARK_MIN, self.SPARK_MAX))
 
-    # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on 113 minutes across seven
-    # drives, re-checked the same afternoon against the full 168.1 minutes over
-    # eight. The structure held and no refit was needed; see base_lambda().
+    # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on the dataset as it stood that
+    # morning, re-checked the same afternoon against the full 168.1 minutes over
+    # eight drives. The structure held and no refit was needed; see base_lambda().
     # Load gates the timer; SPEED and DWELL set the depth.
-    ENR_LOAD   = 200.0    # kPa; above this the high-load timer runs
+    # 200.0 until 10 September. The gate is expressed in MANIFOLD PRESSURE, and
+    # manifold pressure changed definition when the charge temperature was
+    # corrected (plant.charge_temperature). The dataset's MAP had been inverted
+    # with the compressor-outlet sensor and was inflated; THIS environment always
+    # computed its own MAP from the modelled charge temperature, so the two were
+    # on DIFFERENT SCALES the whole time and the gate fired at a physically
+    # higher load here than the calibration data intended.
+    #
+    # 180 kPa on the corrected scale selects exactly the population that 200 kPa
+    # selected on the old one -- 1055 samples -- and every fitted figure below
+    # reproduces to the decimal: n = 422 / 168 / 465 by speed band, corr with
+    # engine speed -0.56, with air mass -0.49, with dwell -0.47. Nothing was
+    # refitted. Only the units the gate is written in were corrected.
+    #
+    # LESSON: a threshold written in a DERIVED quantity silently moves when that
+    # quantity's definition changes. Gating on air mass flow, which is measured
+    # and did not change, would have been immune. Consider that for v5.
+    ENR_LOAD   = 180.0    # kPa; above this the high-load timer runs
     ENR_RPM_LO = 3300.0   # rpm; below this the engine stays stoichiometric
     ENR_RPM_HI = 5200.0   # rpm; full speed authority
     ENR_DWELL_LO = 2.0    # s of sustained high load before enrichment starts
@@ -126,28 +148,42 @@ class BaselineECU:
 
         v1 (guessed)      enriched from 120 kPa down to 0.82.   too early.
         v2 (7 Sep, a.m.)  lambda 1.00 everywhere.               never enriches.
-        v3 (7 Sep, p.m.)  stoichiometric to 230 kPa, then 0.85. right effect,
-                          WRONG VARIABLE.
+        v3 (7 Sep, p.m.)  stoichiometric to 207 kPa, then 0.85. right effect,
+                          WRONG VARIABLE.  (207 is that breakpoint restated on
+                          the corrected charge-temperature pressure scale; it
+                          was written as 230 on the old one.)
         v4 (this)         function of engine speed and sustained dwell.
 
-        v3 was fitted to seventeen seconds above 230 kPa. The two 8 September
-        drives took that to 198 seconds, and with the larger sample manifold
-        pressure turns out to carry no information about lambda at all.
+        v3 was fitted to seventeen seconds at high load. The two 8 September
+        drives took that to 178 seconds, and with the larger sample manifold
+        pressure turns out to carry almost nothing about lambda -- and what it
+        does carry has the WRONG SIGN for a load table (+0.23: more boost, LEANER).
 
-        All figures below are over the 1055 samples ABOVE 200 kPa -- the same
-        gate ENR_LOAD uses, so the model and its evidence share a threshold:
+        All figures below are over the 1055 samples ABOVE 180 kPa -- the same
+        gate ENR_LOAD uses, so the model and its evidence share a threshold.
+        180 kPa on the corrected charge-temperature scale selects EXACTLY the
+        1055 samples that 200 kPa selected on the old one, so the population
+        behind every figure here is unchanged and nothing was refitted; only the
+        units the gate is written in were corrected. See ENR_LOAD above.
 
             corr(lambda, engine speed)              -0.56
             corr(lambda, air mass flow)             -0.49
-            corr(lambda, dwell above 200 kPa)       -0.47
-            corr(lambda, MANIFOLD PRESSURE)         -0.05   <-- nothing
+            corr(lambda, dwell above 180 kPa)       -0.47
+            corr(lambda, MANIFOLD PRESSURE)         +0.23   <-- POSITIVE
+
+        Read that last row carefully. It is not merely weak, it is the WRONG WAY
+        ROUND for a load table: on these 1055 samples more boost goes with a
+        LEANER mixture, not a richer one. A load-gated enrichment map would be
+        fitting against the sign of its own evidence.
 
         RE-CHECKED 8 Sep (afternoon) on a 55-minute drive that added 73 % more
         high-load samples. The structure held and the dwell correlation
-        STRENGTHENED from -0.38 to -0.47, which is the variable this model is
-        built on. Manifold pressure stayed at nothing. No refit was needed.
+        STRENGTHENED to -0.47 -- the smaller sample had been understating the
+        very variable this model is built on, so the correction made the case
+        for v4 stronger, not weaker. Manifold pressure stayed weak and, on the
+        corrected scale, wrong-signed. No refit was needed.
 
-        Median lambda, pooled, above 200 kPa:
+        Median lambda, pooled, above 180 kPa:
 
             rpm \\ dwell     0-4 s    4-8 s    8+ s      n
             1000-3500 rpm     0.99     0.99    0.98    422
@@ -167,7 +203,7 @@ class BaselineECU:
         agent's advantage look larger than it is for the wrong reason.
 
         REMAINING LIMITATION. The true schedule uses measured turbine-inlet
-        temperature, which this vehicle does not expose. Dwell above 200 kPa is
+        temperature, which this vehicle does not expose. Dwell above 180 kPa is
         a proxy for it. State the proxy in Chapter 3.
 
         Model against the enlarged table: at 5500 rpm and 12 s dwell it gives
@@ -346,12 +382,12 @@ class SupervisoryTunerEnv(gym.Env):
         return dict(torque=r.torque_nm, mdot_fuel=r.mdot_fuel_gps,
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
 
-    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 30534
-    # quasi-steady samples from seven drives -- with the saturated MAF samples
-    # excluded -- the highest compressor pressure ratio the car reached is 2.516,
-    # which against a 99.3 kPa inlet is 250 kPa absolute. This replaces the 240
-    # that used to sit here as a round number. See plant.boost_ceiling_kpa for
-    # the flow-dependent version of the same envelope.
+    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 43 853
+    # quasi-steady samples from eight drives -- with the saturated MAF samples
+    # excluded -- the highest pressure ratio the car reached is 2.52, which
+    # against a 99.3 kPa inlet is 250 kPa absolute. This replaces the 240 that
+    # used to sit here as a round number. See plant.boost_ceiling_kpa for the
+    # flow-dependent version of the same envelope.
     MAP_CEIL_KPA = 250.0
 
     def _map_for(self, torque_req, rpm, boost_trim):
@@ -450,7 +486,7 @@ class SupervisoryTunerEnv(gym.Env):
         self.v = float(self.cycle["v_mps"][0])
         self.rpm, self.map_kpa, self.tps = 900.0, 40.0, 0.0
         self.spark, self.lam = 20.0, 1.0
-        self.iat_k = t_amb + 12.0
+        self.iat_k = charge_temperature(t_amb)
         self.torque_req, self.aggression = 0.0, 0.0
         self.ep = dict(fuel=0.0, fuel_base=0.0, damage=0.0, damage_base=0.0,
                        knock_events=0, torque_viol=0.0, egt_viol=0.0, steps=0)
@@ -470,7 +506,7 @@ class SupervisoryTunerEnv(gym.Env):
         grade = float(c["grade"][self.k])
         self.torque_req, self.rpm = self.veh.demand(self.v, accel, grade)
         self.aggression = float(np.clip(abs(accel) / 2.5, 0.0, 1.0))
-        self.iat_k = c["t_amb"] + 12.0 + 0.06 * (self.thermal.t_block - c["t_amb"])
+        self.iat_k = charge_temperature(c["t_amb"], self.thermal.t_block)
 
         # --- baseline controller (runs in parallel, defines the reference) ---
         sp_b, lam_b, fan_b = self.ecu.step(self.rpm, self._map_for(self.torque_req, self.rpm, 0.0),

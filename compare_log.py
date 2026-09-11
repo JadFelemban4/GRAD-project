@@ -23,7 +23,7 @@ import math
 
 import numpy as np
 
-from plant import predict, map_from_airflow
+from plant import predict, map_from_airflow, charge_temperature
 
 # Logged air mass flow is in kg/h on this export. 1 kg/h = 0.2778 g/s.
 AIRFLOW_KGH_TO_GPS = 1000.0 / 3600.0
@@ -42,6 +42,7 @@ ALIASES = {
     "Engine speed": "rpm",
     "Intake air temperature before throttle valve, measured": "iat_pre",
     "Coolant temperature": "ect",
+    "Ambient temperature": "t_amb",
     "Lambda actual value": "lam",
     "Actual ignition angle": "spark",
     "Air mass flow": "air_kgh",
@@ -95,6 +96,7 @@ def main():
         rpm = f(r, "Engine speed")
         iat_c = f(r, "Intake air temperature before throttle valve, measured")
         ect_c = f(r, "Coolant temperature")
+        amb_c = f(r, "Ambient temperature")
         lam = f(r, "Lambda actual value", 1.0)
         spark = f(r, "Actual ignition angle", 20.0)
         air_raw = f(r, "Air mass flow")
@@ -103,8 +105,13 @@ def main():
         if not math.isfinite(rpm) or rpm < 500:
             continue
         air_meas = air_raw if a.airflow_gps else air_raw * AIRFLOW_KGH_TO_GPS
-        iat_k = (iat_c if math.isfinite(iat_c) else 40.0) + 273.15
         ect_k = (ect_c if math.isfinite(ect_c) else 90.0) + 273.15
+        # `iat_c` here is the PRE-THROTTLE sensor, which is a compressor outlet,
+        # not the charge. Model the charge temperature instead -- one definition,
+        # shared with engine_env and build_dataset. plant.charge_temperature()
+        # carries the evidence.
+        t_amb_k = (amb_c if math.isfinite(amb_c) else 25.0) + 273.15
+        iat_k = charge_temperature(t_amb_k, ect_k)
         if not math.isfinite(lam) or lam <= 0:
             lam = 1.0
 
@@ -180,14 +187,29 @@ def main():
         #
         # WHY THIS IS EVIDENCE AND NOT NUMEROLOGY. The reference temperature is
         # the one thing we had to assume. Had BMW normalised to 20 C, the same
-        # arithmetic would give 289.4 / T_in ~ 0.840, which the fit rules out at
-        # 0.784. The data picks the reference state on its own; a fudge factor
-        # would have matched either. Report that, not just the residual.
+        # arithmetic would give 289.4 / T_in ~ 0.890 over these points, which
+        # the fit rules out at 0.837 -- a 6.3 % separation, several times the
+        # residual either constant leaves behind. The data picks the reference
+        # state on its own; a fudge factor would have matched either. Report
+        # that, not just the residual.
         #
-        # LIMIT, STATE IT. k now varies point to point with the intake
-        # temperature sensor -- the PRE-THROTTLE one, which lags under boost
-        # (see CLAUDE.md). Every point here is 31-82 kPa, where it tracks. Do
-        # not carry this form into the boosted region without re-checking.
+        # AND REPORT THE DIRECTION HONESTLY. Over the 22 points, 30-74 kPa, the
+        # FITTED k scores 1.1 % and the DERIVED k scores 1.4 %. Dropping the
+        # free parameter makes the residual RISE, which is what one free
+        # parameter is supposed to do. The derived form is not the more accurate
+        # one; it is the more falsifiable one -- nothing in it was tuned, and it
+        # is blind-sensitive to displacement, where the fitted form is not.
+        # Force the geometry to the old 2.0 L inline-four and the derived
+        # residual goes to 48.1 % while the fitted one still reports 1.1 %,
+        # because the fit absorbs the wrong engine into the constant. That is
+        # the argument for the derived form. Accuracy is not.
+        #
+        # LIMIT, STATE IT. T_in here is the MODELLED charge temperature from
+        # plant.charge_temperature, not a logged channel -- this car has no live
+        # post-intercooler sensor. Every point here is 30-74 kPa. What actually
+        # stops this being extended into boost is the MAF ceiling at 1020 kg/h
+        # and the logger's round-robin sampling, NOT sensor lag: T_in cancels
+        # out of the derived form entirely (see below).
         DIN_REF = 100.0 * 273.15 / 101.3          # = 269.64, K
         k_pred = DIN_REF / t_in
         mape_pred = float(np.mean(100.0 * np.abs(k_pred * mod - meas) / meas))
