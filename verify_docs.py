@@ -304,7 +304,14 @@ def dwell_column(S, thr=180.0):
 RETIRED = [
     # --- dataset size, before the eighth drive -----------------------------
     (r"seven drives|drives,\s*113|\b113(?:\.0)?\s*min",
-     "dataset size before 7475b5d7", "eight drives, 168.1 minutes, six carrying"),
+     "dataset size before 7475b5d7", "nine drives, 175.5 minutes, six carrying"),
+    # Added 14 September, after pull01. The sweep that renamed eight -> nine
+    # missed five lines and nothing was guarding the old total, so the same
+    # figure could have come back a fourth time. Match 168.1 only: "eight
+    # drives" on its own is still TRUE of the enrichment map and the
+    # compressor fit, because pull01 contributes zero samples to either.
+    (r"\b168\.1\b", "dataset size before pull01, the ninth drive",
+     "175.5 minutes over nine drives, six carrying samples"),
     (r"five carry|five carrying", "drives carrying samples, before 7475b5d7", "six"),
     (r"seventeen pooled|\b17 pooled", "the 17-point dataset", "22 pooled points"),
     # --- enrichment, before the eighth drive and before the temp correction --

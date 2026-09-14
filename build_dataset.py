@@ -233,7 +233,7 @@ def steady_points(d):
     before this check existed and on the seven drives that existed then. They
     are what motivated the rule, not a description of the shipped dataset. With
     the check in place, the worst gap inside any surviving window across all
-    eight drives is 0.45 s.
+    nine drives is 0.45 s.
 
         3aca2ec1   windows spanned 42.8 - 68.7 s
         cb67b01f   windows spanned 65.6 - 65.8 s

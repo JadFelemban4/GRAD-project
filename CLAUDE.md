@@ -456,6 +456,42 @@ Two rules follow, and neither is optional:
 Run `verify_docs.py` immediately after unpacking any release. It is now the
 thing that would have caught this on the day it shipped.
 
+**14 September: a third recurrence, and it names the two holes the checker
+still has.** `pull01` took the manifest from eight drives and 168.1 minutes to
+**nine and 175.5**. Seventeen lines were swept to the new figure. **Five were
+not**, and they escaped by two different routes, both worth knowing:
+
+- **Three escaped the regex**, because the patterns are anchored. The
+  dataset-size pattern needs the words *pooled*, *dataset*, *manifest* or a
+  drive count within thirty characters of the figure, so
+  `REFERENCES.md`'s "168.1 minutes of OBD-II logs from our own car" and
+  `CHECKPOINT.md`'s "30–74 kPa, 168.1 min." matched nothing. An anchored
+  pattern is the right trade — a loose one reported the thermal fit's "three
+  drives (80 minutes)" as a wrong total — but it means **a figure written in
+  an unusual sentence is invisible to the checker.**
+- **Two escaped inside a `RETIRED-OK` paragraph.** The marker exempts its
+  whole paragraph, and in `validate.py` and `build_dataset.py` a **live**
+  claim about the current dataset sat in the same paragraph as the retired
+  figure the marker was there for. The exemption is a blunt instrument: it
+  cannot tell the historical sentence from the current one beside it.
+
+**And nothing in `RETIRED` was guarding 168.1 at all** — the seven-drive entry
+still named "eight drives, 168.1 minutes" as the value to use instead, so the
+list was pointing at a figure that had itself been superseded. A retired-value
+list has to be swept when the value that replaced it moves on.
+
+Fixed: the five lines carry the current figure, the seven-drive entry points
+at nine drives, and `168.1` is now a retired pattern in its own right. The
+pattern deliberately does **not** match "eight drives" on its own, because
+the enrichment map and the compressor fit genuinely rest on eight drives of
+samples: `pull01` adds 7.5 minutes and **zero** samples, so every figure fitted
+to samples is unchanged and those sentences are still true.
+
+**The rule that comes out of three recurrences:** when a figure changes,
+grep the whole tree for the OLD value yourself and read every hit, then add
+it to `RETIRED`. Do not trust a green run to prove the sweep was complete —
+a green run proves only that the patterns that exist found nothing.
+
 ### 12. A residual that could not see the thing it was said to validate
 
 <!-- RETIRED-OK: this section is the record of what changed. -->

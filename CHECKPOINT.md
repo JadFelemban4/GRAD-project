@@ -1,4 +1,4 @@
-# CHECKPOINT.md — state as of 11 September 2026
+# CHECKPOINT.md — state as of 14 September 2026
 
 **What this file is for:** a dated snapshot of where the work stands and what was
 verified when. `CLAUDE.md` is the permanent handoff and the mistake log — the
@@ -21,6 +21,15 @@ file if it is more than a week old.
 > document was swept against the data. See the 11 September section at the
 > bottom of this file.
 
+> **14 September, the citation pass, the live app and a ninth drive.**
+> `REFERENCES.md` now records, row by row, which of `validate.py`'s eleven
+> bands have a source and which do not — **seven do not**. `app/` runs the
+> same physics alongside the car. `pull01` takes the manifest to **nine
+> drives, 175.5 minutes** and adds zero samples by design. Two findings
+> change what the model may claim: the B58 has **no thermostat**, and the
+> compression ratio depends on an engine version nobody has recorded. See the
+> last section of this file.
+
 ---
 
 ## Phase status
@@ -28,7 +37,7 @@ file if it is more than a week old.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.829, zero free parameters), 1.1 % with k fitted (0.837, one). 22 pooled points, 30–74 kPa, 168.1 min. Read mistake 12 before quoting either |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.829, zero free parameters), 1.1 % with k fitted (0.837, one). 22 pooled points, 30–74 kPa, 175.5 min. Read mistake 12 before quoting either |
 | C · get an agent to learn | **next.** `train.py` exists and runs; nothing trained yet |
 | D · baselines and the ablation | not started. **This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -432,3 +441,148 @@ checks it.** The division of labour is stated at the top of this file —
 `CLAUDE.md` is the permanent handoff and mistake log, this file is a dated
 snapshot. What belongs in the first should not be restated in the second, which
 is how five duplicates came to exist in the first place.
+
+---
+
+## Session of 14 September 2026 — the citation pass, and a merge
+
+Two pieces of work met in one merge commit. They were done independently and
+they are reported separately here, because only one of them was verified by the
+person writing this section.
+
+### What the citation pass was for
+
+`validate.py` scores the model against eleven "published bands". Until this day
+the repository cited **one** source for all eleven: the word "Heywood" in a code
+comment, with no edition and no page. An examiner asking *"where does 115–140 °C
+come from?"* had no answer.
+
+`REFERENCES.md` replaces that. It is written for a reader who is not an
+internal-combustion specialist — every term carries a plain-English gloss — and
+it sorts every number in the project into four kinds: measured by us, general
+engine physics, specific to the B58, or assumed. It is tracked by
+`verify_docs.py`, so the figures it quotes from our own logs cannot drift.
+
+### What was promoted, and on what evidence
+
+Sources were opened, not remembered. Each row carries the page, column or
+paragraph the claim was read from.
+
+| what | status now | where it was read |
+|---|---|---|
+| Bosch relative air charge | **CONFIRMED** | US 6,588,261 B1, col. 3 l. 55 – col. 4 l. 2: *"rl = ma/m_norm … under the standard conditions: Tn=273 K, Pn=1013 hPa"* |
+| Bore 82.0, stroke 94.6, displacement | **CONFIRMED** | Toyota Australia spec table GTP-009045 p. 1; BMW Canada Z4 2020MY guide p. 2; BMW 3 Series 05/2015 p. 7 |
+| Row 2, MFB50 at MBT 8–10° | **CONFIRMED** as the common rule | Zhu, Haskara & Winkelman, IEEE TCST 15(3) 2007, p. 417 |
+| Row 7, turbine τ 40–120 s | **PARTIAL** | Burke et al., IJHFF 52 (2015) §5.3 — housing heat flow settles from ~7 kW to ~3.6 kW within three minutes, bounding τ above at roughly 45–60 s |
+
+Two corrections fell out of re-checking the six records the file already called
+CONFIRMED: the Wiebe book's publisher is **Verlag Technik** (no catalogue that
+could be opened shows the "VEB" prefix the file carried), and Chen & Flynn's SAE
+650733 is titled *"Development of a Single Cylinder Compression Ignition Research
+Engine"* — a paper about building a research engine, whose abstract never
+mentions friction. **That the FMEP correlation in `plant.py` comes from a page of
+it has not been checked.**
+
+### What was searched for and not found — this is the useful half
+
+- **Row 3, best BSFC 235–260 g/kWh.** No source states it. Heywood gives
+  **270 g/kWh**, above the band; a 2018 SwRI/EPA turbocharged GDI engine measures
+  **233**, below it. Our 241.2 sits between them. The band was **not** widened to
+  swallow the evidence; it is labelled engineering judgement and bracketed.
+- **Row 4, knock-limited spark 8–14°.** Nothing admissible, which is what the
+  task expected. Douaud & Eyzat supply the knock *model*, not this band. Drop the
+  row or relabel it an internal consistency check.
+- **Rows 5, 6, 8, 9 and 11.** No source states a part-load exhaust-temperature
+  range, a sustained-load oil band, or either time constant.
+
+Seven of eleven bands therefore remain unsourced. **Say so in Chapter 3.**
+
+### Two findings that change what the model may claim
+
+**The B58 has no thermostat.** BMW's own training document (ST1505, information
+status April 2015, §4.2) states that the conventional thermostat *"is replaced by
+a so-called heat management module"* — a motor-driven rotary valve positioned by
+the engine computer from the coolant and cylinder-head temperatures, with no wax
+element and no published opening temperature. `thermal.py`'s `t_stat_open` = 88 °C
+is therefore a **modelling equivalent** identified from the car's own coolant
+channel (regulated 88–97 °C in every log), and must never be cited to BMW. It is
+also a **third** reason the radiator is unidentifiable from the logs: the
+radiator branch opening is a commanded valve angle, not a function of coolant
+temperature, so even a coolant-flow signal would not close the heat equation
+without the valve position.
+
+**The compression ratio follows the engine version, not the model year.**
+Manufacturer sheets on both sides print 10.2:1 beside the engine code
+**B58B30O1** — the 285 kW / 382 hp engine, which is what `plant.py` models. But
+Toyota UK's own technical specifications of Feb 2021, June 2022 and Feb 2024
+print **11.0:1** for the 250 kW / 340 PS GR Supra 3.0 sold in Europe. **Nobody
+has recorded which version this car is.** The rated output on its registration or
+compliance plate settles it in one look; if it is the 250 kW car, the knock model
+is running the wrong compression ratio. Third-party specification aggregators
+splice the North American "382 hp" with the European "11.0:1" — such a listing is
+two markets stitched together, not a manufacturer figure.
+
+### Mistake 11 recurred a third time, and named two holes in the checker
+
+<!-- RETIRED-OK: section -->
+This subsection names the superseded figure throughout, because the figure is
+what was corrected. The current dataset is nine drives and 175.5 minutes.
+
+`pull01` took the manifest from eight drives and 168.1 minutes to nine and
+175.5. Seventeen lines were swept. **Five were not**, by two different routes:
+
+- **Three escaped the regex.** The dataset-size pattern requires *pooled*,
+  *dataset*, *manifest* or a drive count within thirty characters of the figure,
+  so `REFERENCES.md`'s "168.1 minutes of OBD-II logs from our own car" matched
+  nothing. The anchoring is the right trade — a looser pattern misreported the
+  thermal fit's "three drives (80 minutes)" as a wrong total — but it means a
+  figure in an unusual sentence is invisible.
+- **Two escaped inside a `RETIRED-OK` paragraph.** The marker exempts its whole
+  paragraph, and a live claim about the current dataset shared a paragraph with
+  the retired figure the marker was there for.
+
+**And nothing in `RETIRED` was guarding 168.1 at all** — the seven-drive entry
+still named "eight drives, 168.1 minutes" as the value to use instead, so the
+list pointed at a figure that had itself been superseded.
+
+All five are corrected, the seven-drive entry points at nine drives, and `168.1`
+is now a retired pattern in its own right. It deliberately does not match "eight
+drives" alone: the enrichment map and the compressor fit genuinely rest on eight
+drives of samples, because `pull01` contributes **zero** samples.
+
+### Verification on the merged tree — every script re-run
+
+| script | result |
+|---|---|
+| `check_premise.py` | **829.2 · 548.6 · 437.6 · 548.6**, trigger 1123 K; rows 2 and 4 identical |
+| `validate.py` | **8 of 11** inside band; every model value unchanged |
+| `test_reward.py` | **4 of 4** pass; neutral −0.00438, starver −0.28044 |
+| `compare_log.py` | **PASS** — 1.4 % residual, derived k 0.829 |
+| `check_map.py` | 6 cells above the compressor ceiling, **0** reachable fail-open cells |
+| `verify_docs.py` | **all 33 checks pass**; 29 retired figures guarded, 51 historical mentions marked |
+| `app/test_replay.py` | **36 of 36** pass, including the read-only and no-raw-data-on-disk assertions |
+
+The citation pass changed no code logic and no numeric value: the compiled
+bytecode and every numeric constant of `thermal.py` and `validate.py` are
+identical to the commit before it. Only `test_reward.py`'s unseeded
+random-policy line moves run to run, and it is printed under the heading
+"FOR INFORMATION, NOT A PASS/FAIL".
+
+### Not verified by the author of this section
+
+`app/` and the ninth drive came from the other half of the merge. `app/test_replay.py`
+was run here and passes 36 of 36, but the app's design, its estimator and its
+alert thresholds were not reviewed. `CLAUDE.md` describes it; read that before
+changing it.
+
+### Still open after this session
+
+1. **Which engine version the car is.** Two minutes with the registration.
+   Decides whether the compression ratio is right.
+2. **Row 7's actual time constant.** Burke 2014, *J. Eng. Gas Turbines Power*
+   136(10) 101511, should carry the turbine-node capacitance and conductances,
+   giving a published C/UA to set against our 48.0 s and 6000 J/K.
+3. **The MTZ article** (Landerl et al., *MTZ worldwide* 76(10) 2015, pp. 22–29),
+   the only BMW-authored document on this engine. Library access. It may settle
+   row 3 and replace the grey training document used for the thermostat finding.
+4. **Phase C.** Still the next real step, and nothing has been trained yet.

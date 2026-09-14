@@ -25,7 +25,7 @@ follow everything else.
 
 | kind | what it means | can it be checked? |
 |---|---|---|
-| **1. We measured it** | It came out of 168.1 minutes of OBD-II logs from our own car | Yes — re-run the script |
+| **1. We measured it** | It came out of 175.5 minutes of OBD-II logs from our own car | Yes — re-run the script |
 | **2. General engine physics** | True of any petrol engine, from textbooks and papers | Yes — open the book |
 | **3. Specific to the B58** | Only BMW or Toyota can tell you; it is a fact about this engine, not about engines in general | Only with factory documentation |
 | **4. We assumed it** | A reasonable engineering estimate nobody has verified | **No.** Must be declared as an assumption |

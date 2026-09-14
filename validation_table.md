@@ -299,7 +299,7 @@ with the fan at full duty — 108 kW, and 7.6 g/s of fuel. It is the load
 **One of its two anchors has gone, and Chapter 3 must not keep claiming it.** The
 condition was also chosen because it sat above the hardest load the car had ever
 been recorded holding. That ceiling is now **8.7 g/s** — the highest 60-second
-mean fuel flow anywhere in the eight drives, on `7475b5d7`, with the averaging
+mean fuel flow anywhere in the dataset's own samples, on `7475b5d7`, with the
 window sized from each drive's own sample rate — so the test's 7.6 g/s now sits
 *below* it. The condition was deliberately **not** raised to chase the log: it is
 anchored to `thermal.py`'s worked example, and moving it to clear a measured
