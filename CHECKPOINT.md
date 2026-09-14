@@ -51,7 +51,7 @@ Every script in the repo was executed end to end. **All eight passed.**
 | 3 | `check_premise.py` | ✅ **829.2 · 548.6 · 437.6 · 548.6** |
 | 4 | `verify_docs.py` | ✅ every published figure matched. Run it and read the total it prints |
 | 5 | `test_reward.py` | ✅ **4 of 4** |
-| 6 | `build_dataset.py` | ✅ 168.1 min, 8 drives, 22 points |
+| 6 | `build_dataset.py` | ✅ 175.5 min, 9 drives, 22 points |
 | 7 | `compare_log.py` | ✅ **PASS** — 1.4 % load residual with k derived, 1.1 % with k fitted |
 | 8 | `generality_test.py` | ✅ H2 table reproduced: 16.5 / 18.0 / 26.0 pts |
 
@@ -382,7 +382,7 @@ outlet — mistake 13 in `CLAUDE.md` — and the inversion now uses
 
 | quantity | value after v17 |
 |---|---|
-| operating-point span | **30–74 kPa**, 22 points, 168.1 min over 8 drives |
+| operating-point span | **30–74 kPa**, 22 points, 175.5 min over 9 drives |
 | load residual, k **derived** 0.829 | **1.4 %**, zero free parameters |
 | load residual, k **fitted** 0.837 | **1.1 %**, one free parameter |
 | a 20 °C reference state would need | k = 0.890 — the fit excludes it |

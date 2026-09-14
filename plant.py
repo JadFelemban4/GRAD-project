@@ -352,11 +352,11 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 
 
 # ---------------------------------------------------------------------------
-# Compressor boost ceiling — measured, 7 September 2026
+# Compressor boost ceiling — measured, refit dated 8 September 2026
 # ---------------------------------------------------------------------------
 # This is NOT a compressor map. It is the OPERATING CEILING: the highest
 # pressure ratio the vehicle was observed to reach at a given corrected mass
-# flow, across 13,764 quasi-steady samples from both 7 Sep drives.
+# flow, across 43 853 quasi-steady samples over 175.5 minutes and nine drives.
 #
 # The difference matters. A compressor map shows what the compressor CAN do,
 # bounded by surge and choke, with efficiency islands and shaft-speed lines.
@@ -368,8 +368,14 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 # manifold pressure was an unbounded input, so it would produce whatever power
 # the commanded boost implied. This bounds it to what the vehicle actually does.
 #
-# REFITTED 8 September 2026, after the mid-load drive (cb67b01f) filled the gap.
-# 28273 quasi-steady samples over 113 minutes and seven drives.
+# REFITTED 8 September 2026, after the mid-load drive (cb67b01f) filled the
+# empty middle. The shipped constants stand on the quasi-steady set named above,
+# whose size verify_docs.py checks against the shipped data on every run — so if
+# this comment and the data ever part company again, the run says so.
+#
+# RETIRED-OK: the FIRST version of this curve stood on 13 764 samples from the
+# two 7 September drives alone. That is why its middle was empty and its shape
+# was wrong. It is void, and none of the numbers below come from it.
 #
 # Measured envelope (95th percentile of pressure ratio per flow bin, n >= 15):
 #     0.021 kg/s -> 1.175      0.194 kg/s -> 2.219
@@ -443,35 +449,53 @@ def charge_temperature(t_amb_k, t_block_k=None) -> float:
     cooler INSIDE the intake manifold, downstream of the throttle body, so
     "before throttle valve" is before the cooler.
 
-    The car settles it. Inverting the airflow at 633 boosted, MAF-unpinned
-    samples and comparing against 887 boosted readings of the vehicle's own
-    `Boost pressure` channel (median 226 kPa absolute):
+    The car settles it, at a gate chosen so that the two populations describe
+    the same operating region. THE GATE IS 200 kPa AND IT IS NOT ARBITRARY: the
+    logged side keeps `Boost pressure` above 15 psi gauge, and
+    (15 + 14.23) * 6.894757 = 201.5 kPa absolute, so gating the model side at
+    200 kPa matches the logged population BY CONSTRUCTION. Gate the model at
+    180 instead and it admits samples 20 kPa below anything the logged set
+    contains, which drags the model median down and flatters the gap.
 
-        charge temperature used        inverted MAP     gap vs the car
-        the raw sensor (107 C median)      277 kPa           +22.6 %
-        THIS FUNCTION (52 C median)        233 kPa            +3.0 %
-        ambient + 8 K (45 C median)        226 kPa            +0.0 %
+    At the matched gate: 587 boosted, MAF-unpinned model samples against 887
+    logged readings of the vehicle's own `Boost pressure` channel, whose median
+    is 226 kPa absolute.
 
-    CLAUDE.md used to blame that 22.6 % on volumetric_efficiency() being fitted
-    at part load and understating breathing under boost. IT IS NOT THE
-    BREATHING MODEL. It is the temperature. `volumetric_efficiency()` is
-    exonerated by this correction, not convicted by it.
+        charge temperature used              | inverted MAP | gap vs the car
+        the raw sensor (107 C median)        | 279.5 kPa    | +23.7 %
+        charge_temperature(), THIS FUNCTION  | 232.7 kPa    | +3.0 %
+        ambient + 8 K (45 C median)          | 227.5 kPa    | +0.7 %
 
-    WHY NOT `ambient + 8 K`, WHICH SCORES 0.0 %
-    -------------------------------------------
+    CLAUDE.md used to blame that 23.7 % on the breathing model -- fitted at part
+    load, said to understate breathing under boost. IT IS NOT THE BREATHING
+    MODEL. It is the temperature. `volumetric_efficiency()` is cleared by this
+    correction, not convicted by it -- and note exactly what that leaves: there
+    is NO part-load test of it against this car, because both logged pressure
+    channels sit upstream of the throttle and there is nothing to compare a
+    modelled manifold pressure against.
+
+    WHY NOT `ambient + 8 K`, WHICH SCORES +0.7 %
+    --------------------------------------------
     Because that is a knob tuned to hit the target, and this project has
     already been burned by exactly that move once this week -- see CLAUDE.md
     mistake 12. The formula below was written independently for the Gymnasium
     environment, months before this question came up, and was never touched to
     make this number agree. It carries NO parameter fitted to the boost
-    channel. A 3.0 % residual from an independent model is worth more than
-    0.0 % from a fitted one, and the 3.0 % is reported, not tuned away.
+    channel.
+
+    Be honest about how thin that contrast is. At the matched gate `ambient +
+    8 K` scores +0.7 %, not the +0.0 % a looser gate reported, and +0.7 %
+    against +3.0 % is a smaller margin than the rhetoric wants. The rejection
+    stands anyway, on the same ground: a 3.0 % gap from a model with no
+    parameter fitted to the boost channel says more than a closer gap from one
+    tuned against it. Report +3.0 %; do not tune it away.
 
     LIMIT, STATE IT IN CHAPTER 3. There is no measured charge-temperature
     channel on this car: `Temperature after the intercooler` exists in the
     census and reads all-zero on every sample. This is a MODEL of the charge
-    temperature, anchored to ambient, not a measurement. The 3.0 % is the
-    evidence for it and the whole of the evidence for it.
+    temperature, anchored to ambient, not a measurement. The +3.0 % gap over
+    587 boosted samples above 200 kPa is the evidence for it and the whole of
+    the evidence for it.
     """
     if t_block_k is None:
         return t_amb_k + 12.0

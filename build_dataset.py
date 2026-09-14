@@ -24,7 +24,10 @@ DERIVED COLUMNS, AND WHY THEY ARE NOT JUST COPIED FROM THE LOG
                  The channel named "intake manifold absolute pressure" on this
                  vehicle is a pre-throttle sensor: it never drops below ~92 kPa,
                  even at idle where physics demands about 31. Using it gives 75%
-                 error; inverting air mass gives 1.3%.
+                 air-mass error; inverting air mass leaves a 1.4 % load residual
+                 over the 22 pooled points, 30-74 kPa (1.1 % if the DIN constant
+                 is fitted rather than derived). Read what that residual does
+                 and does not test in compare_log.py before quoting it.
   corr_flow      compressor-corrected mass flow, kg/s. Inlet conditions are
                  AMBIENT, not the post-intercooler intake temperature.
   press_ratio    compressor pressure ratio, (ambient + boost) / ambient.
@@ -86,16 +89,18 @@ CH = {
 }
 
 # WINDOW_S = 60 s, and the choice is now justified by the drives rather than
-# assumed. Checked 8 September against the DRIVE_1 card, which asked for
-# three-minute holds:
+# assumed. Re-measured 11 September on the shipped nine drives, 175.5 minutes,
+# six of which carry usable samples, against the DRIVE_1 card, which asked for
+# three-minute holds. Count the windows this function returns with WINDOW_S set
+# each way:
 #
-#     22 steady holds of 60 s or more across the seven drives
-#      6 steady holds of 180 s or more
-#     median hold 55-130 s depending on the drive
+#     59 windows survive the span and gap checks at 60 s, and dedupe to the
+#        22 distinct operating points in data/master_points.csv
+#      9 windows survive at 180 s
 #
-# Asking for 180 s would throw away three quarters of the dataset. Public roads
-# do not grant three uninterrupted minutes on demand, and that is a road
-# limitation, not a driving mistake.
+# Asking for 180 s would throw away five windows in six. Public roads do not
+# grant three uninterrupted minutes on demand, and that is a road limitation,
+# not a driving mistake.
 #
 # WHAT A 60 s WINDOW DOES NOT SETTLE. Everything this dataset is actually
 # fitted on -- air mass, lambda, spark, manifold pressure -- responds in
@@ -156,9 +161,18 @@ def derive(d):
     # CHARGE TEMPERATURE IS MODELLED, NOT LOGGED. This used to be
     # `d["iat_pre"] + 273.15`, the pre-throttle sensor -- which turned out to be
     # a COMPRESSOR OUTLET reading up to 163 C, not the charge. Feeding it here
-    # inflated every inverted manifold pressure: +22.6 % under boost against the
-    # car's own boost channel, and about +8 % at part load. See
-    # plant.charge_temperature() for the evidence and the limit.
+    # inflated every inverted manifold pressure, because the inversion is linear
+    # in charge temperature: +23.7 % under boost against the car's own boost
+    # channel (587 model samples above 200 kPa against 887 logged readings,
+    # median 226 kPa), and +6 % at part load -- the median of T_sensor/T_charge
+    # over the 36 564 warm samples between 30 and 74 kPa is 1.060, and over the
+    # 22 pooled operating points it is 1.057.
+    #
+    # RETIRED-OK: this comment read "about +8 %" for the part-load figure until
+    # 11 September. Recomputed from the shipped data it is +6 %, so the number
+    # was corrected rather than kept; the boosted figure was likewise +22.6 %
+    # and is +23.7 %. See plant.charge_temperature() for the evidence and the
+    # limit.
     t_amb_k = np.where(np.isfinite(d["t_amb"]), d["t_amb"], 25.0) + 273.15
     t_blk_k = np.where(np.isfinite(d["ect"]), d["ect"], 90.0) + 273.15
     iat_k = charge_temperature(t_amb_k, t_blk_k)
@@ -190,8 +204,10 @@ def derive(d):
     # is exactly where the fit is most exposed.
     #
     # They are flagged, not repaired. The combustion-air channel is the ECU's
-    # modelled trapped charge, a different quantity (median ratio 1.095 where
-    # both are valid), and splicing two definitions into one series would put a
+    # modelled trapped charge, a different quantity (median ratio 1.095 over the
+    # 517 pinned samples -- and 1.025 over all 47 839 samples where both
+    # channels are valid, which is the point: the two definitions do not differ
+    # by a constant), and splicing two definitions into one series would put a
     # step in the middle of the curve. Everything fitted on air mass uses
     # `stable`, which excludes them; `maf_pinned` is kept so the thesis can say
     # how much of the envelope is unmeasured and why.
@@ -211,8 +227,13 @@ def steady_points(d):
     THE WINDOW IS SIZED IN SAMPLES BUT MUST BE CHECKED IN SECONDS.
 
     `w` comes from the drive's AVERAGE sample rate, so on a drive whose rate is
-    not constant a "60 second window" is nothing of the sort. Measured on the
-    seven drives before this check existed:
+    not constant a "60 second window" is nothing of the sort.
+
+    RETIRED-OK -- the three lines that follow are a historical record, measured
+    before this check existed and on the seven drives that existed then. They
+    are what motivated the rule, not a description of the shipped dataset. With
+    the check in place, the worst gap inside any surviving window across all
+    eight drives is 0.45 s.
 
         3aca2ec1   windows spanned 42.8 - 68.7 s
         cb67b01f   windows spanned 65.6 - 65.8 s

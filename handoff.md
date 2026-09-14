@@ -14,7 +14,7 @@ regenerates, every published figure was re-verified against the shipped data on
 **11 September 2026**, and nothing is secretly broken. What is missing is not
 correctness — it is Phase D.
 
-**Where the numbers stand today.** 168.1 minutes over eight drives, six of them
+**Where the numbers stand today.** 175.5 minutes over nine drives, six of them
 carrying samples, **22 distinct operating points spanning 30–74 kPa**. The load
 residual is **1.4 % with the DIN constant derived** (k = 0.829, zero free
 parameters) and **1.1 % with it fitted** (k = 0.837, one). Note the direction:
@@ -72,7 +72,7 @@ reproduce, the number here is stale and the script is right.
 | `python validate.py` | **8 of 11** quantities inside the published band; displacement 2997.5 cc; turbine τ **48.0 s** |
 | `python compare_log.py data/master_points.csv` | fitted k 0.837 → **1.1 %**; derived k 0.829 → **1.4 %**, PASS; a 20 °C reference would give 0.890, which the fit excludes |
 | `python check_map.py` | spark falls with load in every row and rises with speed in every column; **6 cells `--`** (above the compressor ceiling), **0 `knk`** |
-| `python build_dataset.py "logs/raw/*.csv"` | 168.1 min, 8 drives, 22 operating points |
+| `python build_dataset.py "logs/raw/*.csv"` | 175.5 min, 9 drives, 22 operating points |
 | `python verify_docs.py` | recomputes the published figures, scans every tracked document for retired ones, and prints its own total. Every check must pass. **Do not memorise the count** — it moves each time a figure is added |
 
 `validate.py` being 8 of 11 is expected, not a failure: the three outside are the
