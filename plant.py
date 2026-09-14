@@ -449,7 +449,7 @@ def charge_temperature(t_amb_k, t_block_k=None) -> float:
 
         charge temperature used        inverted MAP     gap vs the car
         the raw sensor (107 C median)      277 kPa           +22.6 %
-        THIS FUNCTION (52 C median)        231 kPa            +2.3 %
+        THIS FUNCTION (52 C median)        233 kPa            +3.0 %
         ambient + 8 K (45 C median)        226 kPa            +0.0 %
 
     CLAUDE.md used to blame that 22.6 % on volumetric_efficiency() being fitted
@@ -464,13 +464,13 @@ def charge_temperature(t_amb_k, t_block_k=None) -> float:
     mistake 12. The formula below was written independently for the Gymnasium
     environment, months before this question came up, and was never touched to
     make this number agree. It carries NO parameter fitted to the boost
-    channel. A 2.3 % residual from an independent model is worth more than
-    0.0 % from a fitted one, and the 2.3 % is reported, not tuned away.
+    channel. A 3.0 % residual from an independent model is worth more than
+    0.0 % from a fitted one, and the 3.0 % is reported, not tuned away.
 
     LIMIT, STATE IT IN CHAPTER 3. There is no measured charge-temperature
     channel on this car: `Temperature after the intercooler` exists in the
     census and reads all-zero on every sample. This is a MODEL of the charge
-    temperature, anchored to ambient, not a measurement. The 2.3 % is the
+    temperature, anchored to ambient, not a measurement. The 3.0 % is the
     evidence for it and the whole of the evidence for it.
     """
     if t_block_k is None:

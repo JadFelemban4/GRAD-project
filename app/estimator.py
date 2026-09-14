@@ -22,25 +22,58 @@ against 175 minutes of logs from this car:
 
 So the app inherits the validation. It also inherits the LIMITS: 8 of 11
 published bands, three documented misses, and a load residual that was only
-ever checked at 30-74 kPa. Do not let the app imply more confidence than the
-simulator earned.
+ever checked at 30-74 kPa -- and that residual, per CLAUDE.md mistake 12, does
+not test the breathing model at all. Do not let the app imply more confidence
+than the simulator earned.
 
 THREE THINGS THIS FILE IS HONEST ABOUT
 --------------------------------------
-1. WARM START. The thermal network integrates from an initial condition. When
-   the app is launched mid-drive we do not know the turbine temperature. We
-   seed from coolant temperature and report LOW CONFIDENCE until roughly three
-   turbine time constants have passed (~145 s). Anything shown before that is
-   a guess converging on an answer.
+1. WARM START, AND WHY IT IS NOW A MEASURED BOUND RATHER THAN A TIMER.
+
+   The thermal network integrates from an initial condition. When the app is
+   launched mid-drive we do not know the turbine temperature.
+
+   This file used to seed a guess and declare the guess forgotten after a fixed
+   145 s, quoted as three turbine time constants at tau = 48 s. That timer is
+   wrong at light load, and the error is not small. The turbine node's time
+   constant is c_turb / (ua_gas_turb * mdot_exh + ua_turb_amb), so it depends
+   on exhaust flow:
+
+       sustained climb, ~112 g/s exhaust    UA 119 W/K    tau  50 s
+       cruise,           ~24 g/s exhaust    UA  40 W/K    tau 151 s
+       idle,              ~8 g/s exhaust    UA  25 W/K    tau 239 s
+
+   48 s is the LOADED time constant. Sit in traffic and the seed is still
+   nearly intact after 145 s. A fixed timer would have declared the estimate
+   trustworthy while it was still mostly the seed.
+
+   So the seed is no longer declared forgotten -- it is MEASURED to be
+   forgotten. Three copies of the thermal network are integrated with identical
+   inputs, differing only in where they started:
+
+       nominal   what we report
+       low       turbine seeded at AMBIENT
+       high      turbine seeded at the model's own EGT for this sample
+
+   Those two are not guesses at a plausible range. They are a bound. The
+   housing is heated by the exhaust gas and loses heat to ambient, so at the
+   instant we connect its temperature MUST lie between the two, whatever the
+   car was doing before we arrived. `seed_band_k` is the width of that bound,
+   and it shrinks at whatever rate the actual driving allows. When it is narrow
+   the estimate has forgotten where it started, and that is a fact about the
+   integration rather than a claim about the clock.
 
 2. THE CAR DOES NOT REPORT EVERYTHING WE NEED. Spark advance and lambda are
-   logged on this car, but a generic vehicle may not have them. Where a channel
-   is missing we fall back to what the BASELINE ECU would command, and mark the
-   estimate as modelled rather than measured. Every output carries that flag.
+   logged on this car, but a generic vehicle may not have them, and a real
+   adapter loses channels mid-drive. Where a channel is missing we fall back to
+   what the BASELINE ECU would command, or to a stated default, and mark the
+   estimate as modelled rather than measured. `State.modelled` lists every one,
+   every sample.
 
 3. IT IS NOT A MEASUREMENT. `t_turb_c` is the output of a model whose heat
    capacity is an ASSUMED number (see REFERENCES.md section 4). It is the best
-   estimate available on a car with no such sensor. It is not a reading.
+   estimate available on a car with no such sensor. It is not a reading, and
+   nothing in the UI may present it as one.
 """
 from __future__ import annotations
 
@@ -57,9 +90,39 @@ from engine_env import BaselineECU                                      # noqa: 
 
 GEO = b58()
 
-# Three turbine time constants. tau = 48 s measured, so the thermal state has
-# forgotten its initial condition to within 5 % after this long.
+# Reference only, and no longer used to decide anything. Three turbine time
+# constants at the LOADED tau of 48 s. Kept because the documents quote it and
+# because it is a useful order of magnitude; see note 1 above for why the
+# decision is made from `seed_band_k` instead.
 WARMUP_S = 145.0
+
+# The seed is considered forgotten when the bound on it is narrower than this.
+#
+# WHY 25 K. The thermal alert fires on the turbine reaching 850 C, and its
+# warning path projects the current trend 30 s ahead at rates of order 1-4 K/s
+# -- that is 30 to 120 K of lead. A residual seed uncertainty of 25 K is small
+# against the lead the alert is built on, so once the band is inside 25 K the
+# alert is deciding on the trend rather than on where we happened to start.
+# Above it, thermal alerts stay suppressed.
+SEED_SETTLED_K = 25.0
+
+# The measured oil-minus-coolant gap, used to bracket the oil seed the same way
+# ambient and EGT bracket the turbine. From thermal.ThermalParams: median
+# -1.2 K, p95 +5.4 K, max +12.0 K over the drives carrying both channels.
+OIL_SEED_LO_K = -5.0
+OIL_SEED_HI_K = +12.0
+
+# Integration hygiene. The stream is not periodic: the adapter answers when it
+# answers (7.5 s per channel at 26 channels, 1.45 s at 7 -- mistake 13b), and
+# Bluetooth drops happen.
+MAX_SUBSTEP_S = 1.0      # integrate long gaps in pieces, not one huge step
+GAP_RESEED_S = 120.0     # longer than this and the state is no longer ours
+
+# Defaults used when the car does not report something. Every one of these
+# appends to State.modelled, so nothing below is ever silently assumed.
+DEFAULT_ECT_C = 90.0     # a warm B58 sits at 88-97 C on every drive logged
+DEFAULT_AMB_C = 30.0
+DEFAULT_V_KMH = 0.0
 
 
 @dataclass
@@ -68,8 +131,9 @@ class Sample:
 
     The reader fills what the vehicle actually reports. Everything downstream
     must cope with holes, because a real OBD-II stream is full of them: the
-    adapter polls one channel at a time (see CLAUDE.md mistake 8 and 13b), so
-    at any instant most channels are a few hundred milliseconds stale.
+    adapter polls one channel at a time (see CLAUDE.md mistake 13b), so at any
+    instant most channels are a few hundred milliseconds to several seconds
+    stale, and any of them may be missing entirely.
     """
     t: float                       # seconds since the stream started
     rpm: float | None = None
@@ -94,8 +158,8 @@ class State:
     """What the estimator believes right now."""
     t: float = 0.0
     ok: bool = False               # enough data to say anything at all
-    warming_up: bool = True        # thermal state has not forgotten its seed
-    confidence: float = 0.0        # 0..1, how much to trust the thermal numbers
+    warming_up: bool = True        # the seed has not been forgotten yet
+    confidence: float = 0.0        # 0..1, how much of the seed is forgotten
 
     # measured, passed through
     rpm: float = float("nan")
@@ -112,57 +176,119 @@ class State:
 
     # VIRTUAL SENSORS -- no gauge in the car shows these
     t_turb_c: float = float("nan")
+    t_turb_lo_c: float = float("nan")  # bound: turbine seeded at ambient
+    t_turb_hi_c: float = float("nan")  # bound: turbine seeded at EGT
+    seed_band_k: float = float("nan")  # hi - lo. the honest error bar
     t_oil_est_c: float = float("nan")
+    t_oil_lo_c: float = float("nan")
+    t_oil_hi_c: float = float("nan")
     t_block_c: float = float("nan")
     damage_rate: float = 0.0           # per second, same model as check_premise
     damage_total: float = 0.0
 
     # provenance: which inputs were measured vs assumed
     modelled: list = field(default_factory=list)
+    stream_gap_s: float = 0.0          # gap before this sample, if any
+    reseeds: int = 0                   # times the stream was lost and restarted
 
     def as_dict(self):
-        d = {k: (None if isinstance(v, float) and math.isnan(v) else v)
-             for k, v in self.__dict__.items()}
-        return d
+        return {k: (None if isinstance(v, float) and math.isnan(v) else v)
+                for k, v in self.__dict__.items()}
 
 
 class Estimator:
     """Runs the validated physics alongside the car, one sample at a time."""
 
-    def __init__(self, t_amb_c: float = 30.0):
+    def __init__(self, t_amb_c: float = DEFAULT_AMB_C):
         self.tn = ThermalNetwork()
+        self.tn_lo = ThermalNetwork()
+        self.tn_hi = ThermalNetwork()
         self.ecu = BaselineECU()
         self.t_amb_k = t_amb_c + 273.15
         self.state = State()
+        self.damage_total = 0.0
+        self.reseeds = 0
         self._t_last = None
         self._t_start = None
         self._seeded = False
-        self.knock_flag = False
+        self._band0 = None          # band width at the seed, for confidence
 
     # -- warm start ------------------------------------------------------
-    def _seed(self, s: Sample):
-        """Set the thermal state from what we can see at the first good sample.
+    def _steady_turb_k(self, egt_k: float, exh_gps: float) -> float:
+        """The turbine temperature this operating point settles at.
+
+        The housing node has one inlet and one outlet, so its steady state is
+        just the balance of the two:
+
+            ua_gas * (T_gas - T)  =  ua_amb * (T - T_ambient)
+
+        There is no new physics and no new parameter here -- both conductances
+        are the ones thermal.ThermalParams already carries, and this is the
+        fixed point of the very equation ThermalNetwork.step integrates.
+        """
+        p = self.tn.p
+        ua_gas = p.ua_gas_turb * max(exh_gps, 0.5)
+        ua_amb = p.ua_turb_amb
+        return (ua_gas * egt_k + ua_amb * self.t_amb_k) / (ua_gas + ua_amb)
+
+    def _seed(self, s: Sample, ect_k: float, egt_k: float, exh_gps: float):
+        """Set the thermal state, and BOUND it, at the first good sample.
 
         The block is at coolant temperature -- that one we actually measure.
-        The oil we assume equals coolant, which is true within a few kelvin at
-        steady state (measured median gap -1.2 K over three drives) but wrong
-        during a warm-up. The turbine we seed at a cruise-ish 500 C because we
-        have nothing at all to go on.
 
-        This is why `warming_up` exists. Do not present turbine temperature to
-        anyone during the first ~145 s as though it were known.
+        The oil is bracketed by the measured oil-minus-coolant gap: -5 K to
+        +12 K around coolant (thermal.ThermalParams records median -1.2 K,
+        p95 +5.4 K, max +12.0 K). That gap is a steady-state figure, so the
+        bracket is honest during a warm-up and merely wide.
+
+        The turbine is bracketed by the two things that can set it. The housing
+        is heated only by exhaust gas and cooled only to ambient, so under
+        steady operation it lies between them. Seeding one copy at each end and
+        integrating both gives a bound that tightens itself at whatever rate
+        the driving allows.
+
+        THE NOMINAL SEED IS NOW THE STEADY STATE, NOT 500 C. This file used to
+        seed the turbine at "a cruise-ish 500 C because we have nothing at all
+        to go on", which was not true: we can see engine speed, air mass and
+        coolant, so we can see the operating point, and the operating point has
+        a settled turbine temperature. Connect while the car is cruising -- the
+        usual case -- and the housing really is near that value, so the seed
+        starts close instead of starting at a round number. It is then clamped
+        into the bracket, so the reported value can never sit outside its own
+        error bar.
+
+        LIMIT, AND IT IS REAL. The bracket bounds the seed under STEADY
+        operation. Connect within a few tens of seconds of lifting off a hard
+        pull and the housing can be hotter than the gas now flowing through it,
+        because the gas cooled first -- so the upper bound will be too low and
+        the band will be narrower than the truth deserves. There is no channel
+        on this car that would catch that, and the app does not pretend to. A
+        cold start has the opposite and happier property: coolant, ambient and
+        exhaust are all low together, so the bracket is narrow from the first
+        sample and the estimate is trustworthy almost immediately.
         """
-        ect = s.ect_c if s.ect_c is not None else 90.0
-        self.tn.t_block = ect + 273.15
-        self.tn.t_oil = ect + 273.15
-        self.tn.t_turb = 773.0
-        if s.t_amb_c is not None:
-            self.t_amb_k = s.t_amb_c + 273.15
+        for tn in (self.tn, self.tn_lo, self.tn_hi):
+            tn.t_block = ect_k
+        self.tn.t_oil = ect_k
+        self.tn_lo.t_oil = ect_k + OIL_SEED_LO_K
+        self.tn_hi.t_oil = ect_k + OIL_SEED_HI_K
+
+        lo = min(self.t_amb_k, egt_k)
+        hi = max(self.t_amb_k, egt_k)
+        self.tn_lo.t_turb = lo
+        self.tn_hi.t_turb = hi
+        # Clamped so the reported estimate is always inside the band it ships
+        # with. If the clamp ever binds, the bracket is what to trust.
+        self.tn.t_turb = min(hi, max(lo, self._steady_turb_k(egt_k, exh_gps)))
+        self._band0 = max(1.0, hi - lo)
         self._seeded = True
+
+    def _reseed_reason(self, dt_raw: float) -> bool:
+        """A gap long enough that the integration no longer describes this car."""
+        return dt_raw > GAP_RESEED_S
 
     # -- main entry ------------------------------------------------------
     def update(self, s: Sample) -> State:
-        st = State(t=s.t)
         modelled = []
 
         if s.rpm is None or s.rpm < 400 or s.air_kgh is None or s.air_kgh <= 0:
@@ -172,30 +298,40 @@ class Estimator:
             self.state.ok = False
             return self.state
 
-        if not self._seeded:
-            self._seed(s)
-            self._t_start = s.t
+        # --- inputs, with every fallback declared --------------------------
+        if s.ect_c is None:
+            ect_c = DEFAULT_ECT_C
+            modelled.append("coolant")
+        else:
+            ect_c = s.ect_c
+        ect_k = ect_c + 273.15
 
-        if s.t_amb_c is not None:
+        if s.t_amb_c is None:
+            modelled.append("ambient")
+        else:
             self.t_amb_k = s.t_amb_c + 273.15
 
-        dt = 0.0 if self._t_last is None else max(0.0, min(2.0, s.t - self._t_last))
-        self._t_last = s.t
+        if s.v_kmh is None:
+            v_mps = DEFAULT_V_KMH / 3.6
+            modelled.append("vehicle speed")
+        else:
+            v_mps = s.v_kmh / 3.6
 
         air_gps = s.air_kgh * (1000.0 / 3600.0)
-        ect_k = (s.ect_c if s.ect_c is not None else 90.0) + 273.15
-        if s.ect_c is None:
-            modelled.append("coolant")
 
         # --- charge temperature: MODELLED, never the pre-throttle sensor ---
-        # mistake 13: `iat_pre` is a compressor outlet with a ~10 s lag. Using
-        # it here inflated manifold pressure by 23 % under boost.
+        # mistake 13: `iat_pre` is a compressor outlet with a ~10 s lag
+        # (confirmed on pull01, mistake 13b). Using it here inflated manifold
+        # pressure by 23 % under boost.
         t_charge_k = charge_temperature(self.t_amb_k, ect_k)
 
         # --- manifold pressure: inverted from MEASURED air mass ------------
-        # mistake 2: never use the logged "manifold pressure" channel.
+        # mistake 2: never use the logged "manifold pressure" channel, and
+        # never the "boost pressure" channel either -- both sit before the
+        # throttle on this car. See alerts.py.
         map_kpa = map_from_airflow(air_gps, s.rpm, t_charge_k, geo=GEO)
         if not math.isfinite(map_kpa) or map_kpa < 15:
+            self.state.t = s.t
             self.state.ok = False
             return self.state
 
@@ -213,25 +349,50 @@ class Estimator:
 
         out = predict(rpm=s.rpm, map_kpa=map_kpa, iat_k=t_charge_k, ect_k=ect_k,
                       spark_btdc=spark, lam=lam, geo=GEO)
+        egt_k = out["egt_c"] + 273.15
 
-        # --- integrate the thermal network ---------------------------------
-        if dt > 0:
-            fan = 1.0 if self.tn.t_block > 373.0 else 0.0
-            self.tn.step(dt, out["mdot_fuel_gps"], out["mdot_fuel_gps"] * 15.0,
-                         out["egt_c"] + 273.15, self.t_amb_k,
-                         (s.v_kmh or 0.0) / 3.6, fan)
+        # --- seeding, and recovery from a lost stream ----------------------
+        dt_raw = 0.0 if self._t_last is None else max(0.0, s.t - self._t_last)
+        if self._seeded and self._reseed_reason(dt_raw):
+            # We were away longer than the state can survive. Say so and start
+            # again rather than pretending the integration held.
+            self._seeded = False
+            self.reseeds += 1
+        fuel = out["mdot_fuel_gps"]
+        exh = fuel * 15.0
+        if not self._seeded:
+            self._seed(s, ect_k, egt_k, exh)
+            self._t_start = s.t
+            dt_raw = 0.0
+        self._t_last = s.t
+
+        # --- integrate all three networks with identical inputs ------------
+        # Long gaps are integrated in pieces. A single 8 s Euler step on a 50 s
+        # time constant is not the same differential equation.
+        remaining = min(dt_raw, GAP_RESEED_S)
+        while remaining > 1e-9:
+            step = min(MAX_SUBSTEP_S, remaining)
+            for tn in (self.tn, self.tn_lo, self.tn_hi):
+                fan = 1.0 if tn.t_block > 373.0 else 0.0
+                tn.step(step, fuel, exh, egt_k, self.t_amb_k, v_mps, fan)
+            remaining -= step
+
+        # The bound can only ever narrow; clamp so numerical noise cannot make
+        # it appear to reopen.
+        lo = min(self.tn_lo.t_turb, self.tn_hi.t_turb)
+        hi = max(self.tn_lo.t_turb, self.tn_hi.t_turb)
+        band = hi - lo
+        warming = band > SEED_SETTLED_K
 
         # --- damage: the SAME model check_premise.py scores with -----------
         d_rate = (math.exp((self.tn.t_turb - 1123.0) / 45.0)
                   + 0.4 * math.exp((self.tn.t_oil - 408.0) / 12.0))
-        self.state.damage_total += d_rate * dt
+        self.damage_total += d_rate * min(dt_raw, GAP_RESEED_S)
 
-        elapsed = s.t - (self._t_start or s.t)
-        warming = elapsed < WARMUP_S
-
+        st = State(t=s.t)
         st.ok = True
         st.warming_up = warming
-        st.confidence = min(1.0, elapsed / WARMUP_S)
+        st.confidence = max(0.0, min(1.0, 1.0 - band / (self._band0 or 1.0)))
         st.rpm, st.air_gps = s.rpm, air_gps
         st.ect_c = s.ect_c if s.ect_c is not None else float("nan")
         st.v_kmh = s.v_kmh if s.v_kmh is not None else float("nan")
@@ -241,10 +402,17 @@ class Estimator:
         st.egt_c = out["egt_c"]
         st.knock_integral = out["knock_integral"]
         st.t_turb_c = self.tn.t_turb - 273.15
+        st.t_turb_lo_c = lo - 273.15
+        st.t_turb_hi_c = hi - 273.15
+        st.seed_band_k = band
         st.t_oil_est_c = self.tn.t_oil - 273.15
+        st.t_oil_lo_c = min(self.tn_lo.t_oil, self.tn_hi.t_oil) - 273.15
+        st.t_oil_hi_c = max(self.tn_lo.t_oil, self.tn_hi.t_oil) - 273.15
         st.t_block_c = self.tn.t_block - 273.15
         st.damage_rate = d_rate
-        st.damage_total = self.state.damage_total
+        st.damage_total = self.damage_total
         st.modelled = modelled
+        st.stream_gap_s = dt_raw
+        st.reseeds = self.reseeds
         self.state = st
         return st

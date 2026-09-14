@@ -190,7 +190,7 @@ def derive(d):
     # is exactly where the fit is most exposed.
     #
     # They are flagged, not repaired. The combustion-air channel is the ECU's
-    # modelled trapped charge, a different quantity (median ratio 1.163 where
+    # modelled trapped charge, a different quantity (median ratio 1.095 where
     # both are valid), and splicing two definitions into one series would put a
     # step in the middle of the curve. Everything fitted on air mass uses
     # `stable`, which excludes them; `maf_pinned` is kept so the thesis can say

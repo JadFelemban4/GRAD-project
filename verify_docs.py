@@ -96,6 +96,17 @@ RETIRED = [
      "829.2 / 548.6 / 437.6 / 548.6"),
     (r"\b39\.5 s\b", "turbine tau from the 4-cylinder", "48.0 s"),
     (r"n_cyl\s*=\s*4\b", "the 2.0 L inline-four geometry", "n_cyl = 6 (B58)"),
+
+    # --- added 14 Sep 2026. ALL THREE OF THESE HAD ALREADY BEEN CORRECTED
+    # ONCE, in v17, and came back in the v19 archive. Nothing was guarding
+    # them, which is the entire argument for this list: a correction that is
+    # not asserted somewhere is a correction with a short half-life.
+    (r"reactive cuts damage 33\.9|[-−]33\.9 %", "33.9 %, which the printed "
+     "damage figures do not support at any rounding (1 - 548.6/829.2 = 33.84)",
+     "33.8 %"),
+    (r"four\s*\n?separate drives, 192 samples", "MAF-ceiling count from 7 drives",
+     "five separate drives, 517 samples -- the figure verify_docs itself asserts"),
+    (r"median ratio 1\.163", "combustion-air ratio from 7 drives", "1.095"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to

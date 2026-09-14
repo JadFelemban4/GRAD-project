@@ -32,7 +32,7 @@ All five of you should see the same numbers from `check_premise.py`:
 That last pair matters most. Disabling preview collapses the predictive policy
 onto the reactive one exactly, which means whatever gap exists is attributable
 to preview information and nothing else. Preview advantage: reactive cuts damage
-33.9 %, predictive 47.2 % — **13.4 points**.
+33.8 %, predictive 47.2 % — **13.4 points**.
 
 > **THESE NUMBERS CHANGED AGAIN ON 8 SEPTEMBER, AND THIS TIME BECAUSE THE
 > SIMULATION WAS THE WRONG ENGINE.** `plant.Geometry` defaulted to a generic
@@ -69,6 +69,44 @@ to preview information and nothing else. Preview advantage: reactive cuts damage
 | `verify_docs.py` | **Checks the documents against the data.** Twenty-five published figures recomputed, plus a check that no document still quotes a **retired** one. Run it before quoting anything. | all |
 | `DOCUMENT_STATUS.md` | Which team PDFs still quote void numbers. Read before handing one to the supervisor. | all |
 | `logs/CHANNEL_CENSUS.md` | All 656 channels this car offers, live vs dead, from the two reconnaissance logs. Settles what can and cannot be measured. | B |
+| `app/` | **The live supervisor.** Runs the plant and the thermal network alongside the car in real time and estimates what it has no sensor for. See below. | — |
+
+---
+
+## The live app
+
+```bash
+python -m app.server --replay logs/raw/7475b5d7-20260908_142743.csv --speed 8
+python -m app.server --live                  # needs `pip install obd`
+```
+
+Then `http://localhost:8000` — the dashboard, `/driver` for the one-number
+driving screen, `/review` for what was marked on past drives.
+
+**Develop in replay. You do not need the car.** The 175 minutes in `logs/raw/`
+are enough for five people to work against the same drives at once.
+
+The point of it is `app/estimator.py`: this car cannot report turbine
+temperature, so the app runs the validated physics next to the live stream and
+estimates it. Everything else is supporting cast. Because it reuses
+`plant.predict`, `plant.map_from_airflow`, `plant.charge_temperature` and
+`thermal.ThermalNetwork` unchanged, it **inherits Phase B's validation and
+Phase B's limits** — 8 of 11 bands, three documented misses, 30–74 kPa. It must
+not imply more confidence than that, and `t_turb_c` is a model output with an
+assumed heat capacity, never a reading.
+
+Three rules, and `app/test_replay.py` asserts all of them:
+
+| rule | what it means |
+|---|---|
+| **read-only, permanently** | no write to the vehicle, ever. No mode 08, no bus writes. Suggesting an ECU parameter as text is a different product from applying one, and they must never share a code path. |
+| **raw data never reaches disk** | the stream is memory → websocket → gone. Only what the model *marks* is persisted, to `app/review_log.jsonl`. |
+| **the channel budget is the design constraint** | the adapter polls one channel per round trip, so the link's rate divides by the channel count: 26 channels → 7.5 s each, 7 → 1.45 s. Six channels are live because the estimator cannot work without them. A seventh costs every other channel ~14 %. |
+
+```bash
+python -m app.test_replay          # fast, pins pull01 + both product rules
+python -m app.test_replay --full   # adds the whole 7475b5d7 replay
+```
 
 ---
 
@@ -258,7 +296,7 @@ the fitted line into boost — extrapolated, it puts the baseline at +21° at
 |---|---|---|---|
 | engine | 2.0 L I4 | 2.0 L I4 | **3.0 L I6** |
 | baseline damage | 527.2 | 51.4 | **829.2** |
-| reactive damage reduction | −32 % | −42 % | **−33.9 %** |
+| reactive damage reduction | −32 % | −42 % | **−33.8 %** |
 | predictive damage reduction | −62 % | −46 % | **−47.2 %** |
 | **preview advantage** | 30 points | 4 points | **13.4 points** |
 

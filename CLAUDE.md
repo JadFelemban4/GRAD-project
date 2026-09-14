@@ -77,7 +77,7 @@ CSVs — its summary header printed a Greek lambda, which cp1252 cannot encode, 
 the run failed loudly on data that was already correct. Header is ASCII now. If
 any script ever does this again, the character is the bug, not the data.
 
-Preview advantage: reactive cuts damage 33.9 %, predictive 47.2 % — **13.4
+Preview advantage: reactive cuts damage 33.8 %, predictive 47.2 % — **13.4
 points**.
 
 **The strongest single fact in the project:** disabling preview collapses the
@@ -206,8 +206,8 @@ two pieces: the fit below ~90 kPa, and the plant's own knock limit above it.
 
 ### 7. A channel can hit its range limit and keep reporting
 
-`Air mass flow` tops out at exactly **1020.0 kg/h** — the same number on four
-separate drives, 192 samples. That is a sensor ceiling, and on the same samples
+`Air mass flow` tops out at exactly **1020.0 kg/h** — the same number on five
+separate drives, 517 samples. That is a sensor ceiling, and on the same samples
 `Air mass flow participating in combustion` reads up to 1233 kg/h.
 
 A pinned sample under-reports air, so the manifold pressure inverted from it
@@ -216,7 +216,7 @@ exactly at the top of the envelope, where the fit is most exposed.
 `build_dataset.py` flags them (`maf_pinned`) and excludes them from `stable`.
 
 They are **not repaired** by substituting the combustion-air channel: that is
-the ECU's modelled trapped charge, a different quantity (median ratio 1.163),
+the ECU's modelled trapped charge, a different quantity (median ratio 1.095),
 and splicing two definitions puts a step in the middle of the curve.
 
 **Before fitting anything, check whether the channel saturated.** A flat maximum
@@ -637,7 +637,22 @@ logs/CHANNEL_CENSUS.md      All 656 channels the car offers, live vs dead.
 logs/raw/*.csv        Raw BimmerLink exports. Never edit these.
 data/*.csv            Generated. Never edit by hand — re-run build_dataset.py.
 validation_table.md   Chapter 3's evidence. Regenerate after touching the plant.
+
+app/                  THE LIVE SUPERVISOR. Runs this same physics alongside
+                      the car in real time and estimates what it cannot report.
+  estimator.py        The virtual sensor. Read its docstring before touching it.
+  reader.py           OBD-II, or replay of the logs above. Channel budget here.
+  alerts.py           thermal / mismatch / novel. The ONLY file that writes.
+  server.py           localhost. /, /driver, /review.
+  static/*.html       dashboard, driver mode, review view.
+  test_replay.py      Replay-driven regression checks. Run after any app change.
+  review_log.jsonl    Generated, gitignored. Marked events only, never raw data.
 ```
+
+**Two rules the app adds, and they are structural, not stylistic.** It never
+transmits to the vehicle (the hard constraint above, in code), and it never
+writes raw car data to disk — only what the model marks. `test_replay.py`
+asserts both, so breaking either fails a check rather than going unnoticed.
 
 ---
 

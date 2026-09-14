@@ -18,6 +18,9 @@
   .src{color:var(--dim);font-size:12px}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);display:inline-block}
   .dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  nav{margin-left:auto;display:flex;gap:16px}
+  nav a{color:var(--acc);text-decoration:none;font-size:12px}
+  nav a:hover{text-decoration:underline}
   main{padding:18px;display:grid;gap:18px;
        grid-template-columns:repeat(auto-fit,minmax(290px,1fr));max-width:1400px}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
@@ -26,15 +29,25 @@
   .hero{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
   .hero b{font-size:42px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1}
   .hero span{color:var(--dim);font-size:13px}
-  .bar{height:6px;border-radius:3px;background:#21262d;overflow:hidden;margin:12px 0 6px}
+  /* warm-up: a RANGE, never a single figure. See estimator.py note 1. */
+  .hero.unknown b{font-size:27px;color:var(--watch);letter-spacing:-.5px}
+  .bar{height:6px;border-radius:3px;background:#21262d;overflow:hidden;margin:12px 0 6px;
+       position:relative}
   .bar>i{display:block;height:100%;background:var(--ok);transition:width .3s,background .3s}
+  .bar>u{position:absolute;top:0;height:100%;background:rgba(210,153,34,.35);
+         border-left:1px solid var(--watch);border-right:1px solid var(--watch)}
   .grid{display:grid;grid-template-columns:1fr auto;gap:7px 14px;font-variant-numeric:tabular-nums}
   .grid .k{color:var(--dim)}
   .note{font-size:12px;color:var(--dim);margin-top:12px;padding-top:12px;
         border-top:1px solid var(--line)}
+  .warnbox{border:1px solid var(--watch);background:rgba(210,153,34,.09);
+           border-radius:8px;padding:10px 12px;margin:12px 0 0;font-size:12.5px;
+           color:#f0d58c}
+  .warnbox b{color:var(--watch)}
   .badge{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:20px;
          border:1px solid var(--line);color:var(--dim);margin-right:5px}
   .badge.warm{border-color:var(--watch);color:var(--watch)}
+  .badge.bad{border-color:var(--crit);color:var(--crit)}
   ul.alerts{list-style:none;margin:0;padding:0;max-height:340px;overflow:auto}
   ul.alerts li{border-left:3px solid var(--line);padding:9px 12px;margin-bottom:9px;
                background:#11161d;border-radius:0 7px 7px 0}
@@ -45,6 +58,7 @@
   .who{font-size:10.5px;color:var(--dim);margin-top:5px;text-transform:uppercase;
        letter-spacing:.06em}
   .empty{color:var(--dim);font-size:13px;padding:8px 0}
+  .chans{display:flex;flex-wrap:wrap;gap:6px}
   footer{padding:14px 18px;color:var(--dim);font-size:11.5px;
          border-top:1px solid var(--line);max-width:1400px}
 </style>
@@ -54,24 +68,36 @@
   <h1>Engine Supervisor</h1>
   <span class="dot" id="dot"></span>
   <span class="src" id="src">connecting…</span>
+  <nav>
+    <a href="/driver">driver mode</a>
+    <a href="/review">review past drives</a>
+  </nav>
 </header>
 
 <main>
   <section class="panel">
-    <h2>Turbine housing — estimated</h2>
-    <div class="hero"><b id="turb">—</b><span>°C</span></div>
-    <div class="bar"><i id="turbbar" style="width:0%"></i></div>
+    <h2>Turbine housing — model estimate, not a reading</h2>
+    <div class="hero" id="turbhero"><b id="turb">—</b><span id="turbunit">°C</span></div>
+    <div class="bar"><i id="turbbar" style="width:0%"></i><u id="turbband" hidden></u></div>
     <div class="grid">
-      <span class="k">damage threshold</span><span>850 °C</span>
+      <span class="k">damage threshold</span><span id="limit">—</span>
       <span class="k">trend</span><span id="rate">—</span>
       <span class="k">estimated oil</span><span id="oil">—</span>
       <span class="k">coolant (measured)</span><span id="ect">—</span>
     </div>
+    <div class="warnbox" id="warmbox" hidden>
+      <b>Not yet known.</b> The model started from an assumed turbine
+      temperature and is still forgetting it. The range above is the whole
+      span the housing could be in — it narrows as the engine runs.
+      <span id="warmdetail"></span>
+    </div>
     <div class="note">
       <span class="badge" id="conf">confidence —</span>
       <span class="badge warm" id="warm" hidden>warming up</span>
-      No sensor in this car reports turbine temperature. This is a model
-      estimate, not a reading.
+      <span class="badge bad" id="reseed" hidden></span>
+      No sensor in this car reports turbine temperature. This is the output of a
+      model whose heat capacity is an assumed number, run alongside the car. It
+      is the best estimate available and it is not a measurement.
     </div>
   </section>
 
@@ -88,6 +114,19 @@
       <span class="k">vehicle speed</span><span id="spd">—</span>
     </div>
     <div class="note" id="modelled">All inputs measured.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Link</h2>
+    <div class="grid">
+      <span class="k">mode</span><span id="lmode">—</span>
+      <span class="k">samples</span><span id="lsamples">—</span>
+      <span class="k">reconnects</span><span id="lrecon">—</span>
+    </div>
+    <div class="note">
+      <div class="chans" id="chans"></div>
+      <div id="lerr" style="margin-top:8px"></div>
+    </div>
   </section>
 
   <section class="panel" style="grid-column:1/-1">
@@ -108,18 +147,70 @@ const $ = id => document.getElementById(id);
 const f = (v, d=0, suf="") => (v===null||v===undefined||Number.isNaN(v))
         ? "—" : Number(v).toFixed(d) + suf;
 let lastTurb = null, lastT = null;
+// Thresholds are served in meta.limits so this page keeps no copy of
+// its own -- see server.LIMITS.
+let LIMIT = 850, WARN_AT = 780, SETTLED_K = 25;
+
+function paintTurbine(s){
+  const hero = $("turbhero"), warming = !!s.warming_up, known = s.t_turb_c !== null;
+  // While the seed has not been forgotten we show the BAND, not a figure.
+  // A single number here would be read as a measurement; a range cannot be.
+  if (warming && known){
+    hero.classList.add("unknown");
+    $("turb").textContent = `${f(s.t_turb_lo_c,0)} – ${f(s.t_turb_hi_c,0)}`;
+    $("turbunit").textContent = "°C  (range)";
+    $("warmbox").hidden = false;
+    $("warmdetail").textContent =
+      ` Currently ${f(s.seed_band_k,0)} K wide; it is treated as known below ${SETTLED_K} K.`;
+  } else {
+    hero.classList.remove("unknown");
+    $("turb").textContent = f(s.t_turb_c, 0);
+    $("turbunit").textContent = "°C";
+    $("warmbox").hidden = true;
+  }
+
+  const pct = v => Math.max(0, Math.min(100, ((v ?? 0) / 950) * 100));
+  const bar = $("turbbar");
+  bar.style.width = pct(s.t_turb_c) + "%";
+  bar.style.background = (s.t_turb_c ?? 0) >= LIMIT ? "var(--crit)"
+                       : (s.t_turb_c ?? 0) >= WARN_AT ? "var(--warn)" : "var(--ok)";
+  const band = $("turbband");
+  if (warming && s.t_turb_lo_c !== null && s.t_turb_hi_c !== null){
+    band.hidden = false;
+    band.style.left  = pct(s.t_turb_lo_c) + "%";
+    band.style.width = Math.max(1, pct(s.t_turb_hi_c) - pct(s.t_turb_lo_c)) + "%";
+  } else band.hidden = true;
+}
+
+function paintLink(m){
+  const r = m.reader || {};
+  $("lmode").textContent = m.mode ?? "—";
+  $("lsamples").textContent = r.samples ?? "—";
+  $("lrecon").textContent = r.reconnects ?? "—";
+  const box = $("chans");
+  box.textContent = "";
+  for (const [name, c] of Object.entries(r.channels || {})){
+    const b = document.createElement("span");
+    b.className = "badge" + (c.retired ? " bad" : "");
+    b.textContent = name + (c.retired ? " · absent" : ` · ${c.ok}`);
+    box.appendChild(b);
+  }
+  const err = m.error || r.last_error;
+  $("lerr").textContent = err ? ("link: " + err) : "";
+  $("lerr").style.color = err ? "var(--crit)" : "";
+}
 
 function paint(p){
   const s = p.state || {}, m = p.meta || {};
+  if (m.limits?.turb_c){
+    LIMIT = m.limits.turb_c; WARN_AT = LIMIT - 70;
+    SETTLED_K = m.limits.seed_settled_k ?? SETTLED_K;
+    $("limit").textContent = LIMIT.toFixed(0) + " °C";
+  }
   $("src").textContent = `${m.source ?? "—"} · ${m.mode ?? "—"}`;
   $("dot").className = s.ok ? "dot on" : "dot";
 
-  $("turb").textContent = f(s.t_turb_c, 0);
-  const pct = Math.max(0, Math.min(100, ((s.t_turb_c ?? 0) / 950) * 100));
-  const bar = $("turbbar");
-  bar.style.width = pct + "%";
-  bar.style.background = (s.t_turb_c ?? 0) >= 850 ? "var(--crit)"
-                       : (s.t_turb_c ?? 0) >= 780 ? "var(--warn)" : "var(--ok)";
+  paintTurbine(s);
 
   if (lastTurb !== null && s.t && s.t > lastT){
     const r = (s.t_turb_c - lastTurb) / (s.t - lastT);
@@ -127,10 +218,15 @@ function paint(p){
   }
   if (s.t_turb_c !== null && s.t !== null){ lastTurb = s.t_turb_c; lastT = s.t; }
 
-  $("oil").textContent = f(s.t_oil_est_c, 0, " °C");
+  $("oil").textContent = s.warming_up && s.t_oil_lo_c !== null
+      ? `${f(s.t_oil_lo_c,0)} – ${f(s.t_oil_hi_c,0)} °C`
+      : f(s.t_oil_est_c, 0, " °C");
   $("ect").textContent = f(s.ect_c, 0, " °C");
-  $("conf").textContent = "confidence " + f((s.confidence ?? 0) * 100, 0, "%");
+  $("conf").textContent = "seed forgotten " + f((s.confidence ?? 0) * 100, 0, "%");
   $("warm").hidden = !s.warming_up;
+  $("reseed").hidden = !(s.reseeds > 0);
+  if (s.reseeds > 0)
+    $("reseed").textContent = `stream lost ${s.reseeds}× — estimate restarted`;
 
   $("rpm").textContent = f(s.rpm, 0, " rpm");
   $("air").textContent = f(s.air_gps, 1, " g/s");
@@ -145,6 +241,8 @@ function paint(p){
   $("modelled").textContent = mod.length
     ? "Modelled, not measured: " + mod.join(", ") + ". The car does not report these."
     : "All inputs measured.";
+
+  paintLink(m);
 
   for (const a of (p.alerts || [])){
     $("none").hidden = true;
