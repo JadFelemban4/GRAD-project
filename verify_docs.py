@@ -74,10 +74,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # reader or an examiner actually meets. Code files are included because their
 # docstrings publish figures too -- base_lambda()'s table and
 # charge_temperature()'s evidence table are both cited in the thesis.
+# REFERENCES.md is tracked so that the figures it quotes from our own logs
+# (its section 5) cannot drift from the data any more than the others can.
 TRACKED_DOCS = [
     "CLAUDE.md",
     "README.md",
     "validation_table.md",
+    "REFERENCES.md",
     "CHECKPOINT.md",
     "handoff.md",
     "logs/CHANNEL_SET_FINAL.md",

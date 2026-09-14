@@ -41,19 +41,27 @@ did not come out of `compare_log.py` should be regenerated.
 
 ## A. Against published figures — `validate.py`
 
-| Quantity | Model | Published band | Status |
-|---|---|---|---|
-| Displacement | 2997.5 cc | 2990–3000 | inside |
-| MFB50 at MBT (2500 rpm, 60 kPa) | 8.5° aTDC | 8–10 | inside |
-| Best BSFC, knock-feasible, λ=1 | 241.2 g/kWh | 235–260 | inside |
-| Knock-limited spark (3000 rpm, 200 kPa) | 11.0° BTDC | 8–14 | inside |
-| EGT, cruise band, minimum | 714.5 °C | 600–750 | inside |
-| EGT, cruise band, maximum | 777.3 °C | 600–750 | **outside** |
-| Turbine housing time constant | 48.0 s | 40–120 | inside |
-| Oil temperature, sustained climb | 110.2 °C | 115–140 | **outside** |
-| Oil time constant | 16.0 s | 20–400 | **outside** |
-| Coolant, thermostat-regulated | 94.5 °C | 88–108 | inside |
-| Coolant apparent time constant | 9.5 s | 1–600 | inside |
+| Quantity | Model | Published band | Status | Source |
+|---|---|---|---|---|
+| Displacement | 2997.5 cc | 2990–3000 | inside | REFERENCES.md §3 row 1 |
+| MFB50 at MBT (2500 rpm, 60 kPa) | 8.5° aTDC | 8–10 | inside | REFERENCES.md §3 row 2 |
+| Best BSFC, knock-feasible, λ=1 | 241.2 g/kWh | 235–260 | inside | REFERENCES.md §3 row 3 |
+| Knock-limited spark (3000 rpm, 200 kPa) | 11.0° BTDC | 8–14 | inside | REFERENCES.md §3 row 4 |
+| EGT, cruise band, minimum | 714.5 °C | 600–750 | inside | REFERENCES.md §3 row 5 |
+| EGT, cruise band, maximum | 777.3 °C | 600–750 | **outside** | REFERENCES.md §3 row 6 |
+| Turbine housing time constant | 48.0 s | 40–120 | inside | REFERENCES.md §3 row 7 |
+| Oil temperature, sustained climb | 110.2 °C | 115–140 | **outside** | REFERENCES.md §3 row 8 |
+| Oil time constant | 16.0 s | 20–400 | **outside** | REFERENCES.md §3 row 9 |
+| Coolant, thermostat-regulated | 94.5 °C | 88–108 | inside | REFERENCES.md §3 row 10 |
+| Coolant apparent time constant | 9.5 s | 1–600 | inside | REFERENCES.md §3 row 11 |
+
+The **Source** column points at the row of `REFERENCES.md` section 3 that
+records where each band comes from, what kind of claim it is (general engine
+physics, or a fact specific to the B58 that only BMW or Toyota can supply),
+and whether anyone has actually opened that source. CONFIRMED or UNVERIFIED
+is recorded there and only there, so the two files cannot disagree. A band
+whose row is still UNVERIFIED is an engineering-judgement band and must be
+described as one in Chapter 3.
 
 **8 of 11 inside**, down from a claimed 10 of 11 on the wrong engine. Report the
 three misses with their reasons; each is informative.

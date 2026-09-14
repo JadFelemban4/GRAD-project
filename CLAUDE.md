@@ -10,7 +10,7 @@ If you are a human, read it too. It is shorter than the handbook.
 
 ## What this project is
 
-A BSc graduation project, five students, King Abdulaziz University, Jeddah.
+A BSc graduation project, five students, University of Jeddah, Jeddah.
 
 **The claim.** Not "a predictive controller for engines" — that is commercially
 solved and academically crowded. The claim is a **criterion for when preview
@@ -660,6 +660,47 @@ still reporting. **Treat every channel name as a hypothesis.**
   9 September — the seven-drive
   version, in which that cell held only 29 samples and read 0.94 by chance.
   `base_lambda()`'s docstring had the corrected cell all along.)*
+- **The eleven validation bands are engineering-judgement bands, not sourced
+  ones.** `validate.py` scores the model against eleven "published" ranges,
+  and until 12 September the only citation behind any of them was the word
+  "Heywood" in a code comment. `REFERENCES.md` now records, row by row, which
+  bands have been checked against an opened source and which have not, and
+  sorts them into general engine physics (a textbook settles them), facts
+  specific to the B58 (only BMW or Toyota documentation can), and one band
+  with no support at all: the knock-limited spark, row 4. Until a row is
+  marked CONFIRMED there, describe its band in the thesis as engineering
+  judgement. Never promote a row from memory; open the source and write down
+  the page.
+- **`c_turb` = 6000 J/K is ASSUMED, not measured, and it sets τ.** The
+  turbine-housing heat capacity (how much heat it takes to warm the housing
+  by one degree) divided by its heat-transfer coefficient (how fast heat gets
+  in and out) is the housing's time constant τ, and τ is the denominator of
+  H/τ, the project's whole claim. `generality_test.py` sweeps `c_turb` from
+  800 to 60 000 J/K, a factor of 75, on purpose: the claim is about the RATIO
+  H/τ, not about one engine's heat capacity, so if preview value collapses
+  onto one curve across that sweep the exact value of `c_turb` does not
+  matter. State this explicitly in Chapter 3. Unstated, it reads as an
+  unexamined assumption; stated, it is the reason the experiment is designed
+  the way it is. See `REFERENCES.md` section 4.
+- **The B58 has no thermostat, so the 88 °C in `thermal.py` is a modelling
+  equivalent.** BMW's own B58 training document (ST1505, 2015, section 4.2)
+  says the conventional thermostat "is replaced by a so-called heat management
+  module": a motor-driven rotary valve positioned by the engine computer from
+  the coolant and cylinder-head temperatures, with no wax element and no
+  published opening temperature. `t_stat_open` = 88 °C is identified from the
+  car's own coolant channel (regulated 88–97 °C in every log) and cannot be
+  cited to BMW. It is also a third reason the radiator cannot be identified
+  from the logs: the radiator branch opening is a commanded valve angle, not a
+  function of coolant temperature. See `REFERENCES.md` section 2.
+- **The compression ratio follows the engine version, not the model year.**
+  Manufacturer sheets on both the BMW and Toyota sides print 10.2:1 next to
+  the engine code B58B30O1 (the 285 kW / 382 hp engine), which is what the
+  plant uses. But Toyota UK's own sheets print 11.0:1 for the 250 kW / 340 PS
+  GR Supra 3.0 sold in Europe through at least 2024. **Nobody has yet
+  recorded which version this car is.** One look at its rated output on the
+  registration or compliance plate settles it; if it is the 250 kW car the
+  knock model is running the wrong compression ratio. `REFERENCES.md`
+  section 2.
 
 ---
 
@@ -685,6 +726,8 @@ train.py              SAC training. One seed per person, overnight.
 generality_test.py    The H/τ experiment. H1, H2, H2b.
 README.md             The public-facing summary. Tracked by verify_docs.py.
 CLAUDE.md             This file. The handoff and the mistake log.
+REFERENCES.md         Where every number we did not measure comes from. Written
+                      for a non-specialist. Read before quoting a published band.
 DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
 logs/CHANNEL_SET_FINAL.md   What is recorded, what to add, and why.
 logs/CHANNEL_CENSUS.md      All 656 channels the car offers, live vs dead.

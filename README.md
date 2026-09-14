@@ -57,7 +57,7 @@ to preview information and nothing else. Preview advantage: reactive cuts damage
 | File | What it is | Phase |
 |---|---|---|
 | `plant.py` | 0-D single-zone SI cycle model. `Geometry()` **is** the B58B30O1 inline-six from the 2023 GR Supra — 2997.5 cc; `b58()` is an alias for it. Wiebe burn, Woschni heat transfer, Chen-Flynn friction, Douaud-Eyzat knock integral. One cycle ≈ 4.6 ms. | B |
-| `thermal.py` | 3-node lumped-capacitance network — block/coolant, oil, turbine housing — with a thermostat. | B |
+| `thermal.py` | 3-node lumped-capacitance network — block/coolant, oil, turbine housing — with a stand-in thermostat (the real B58 uses a heat-management valve; see REFERENCES.md section 2). | B |
 | `validate.py` | **Regenerates the validation table.** Eleven quantities against published bands. Currently 8 of 11 inside; the three misses are explained in validation_table.md. | B |
 | `extract_steady.py` | Finds steady operating points in a BimmerLink CSV and **de-duplicates** them. | B |
 | `compare_log.py` | Runs the plant at those points and scores the error. | B |
@@ -69,6 +69,7 @@ to preview information and nothing else. Preview advantage: reactive cuts damage
 | `build_dataset.py` | **All drives into one master dataset.** Run it whenever a new CSV arrives. | B |
 | `generality_test.py` | The H/τ experiment. H1, H2, and H2b. | F |
 | `verify_docs.py` | **Checks the documents against the data.** Every published figure recomputed from the shipped data, plus a check that no document still quotes a **retired** one. It prints its own total — read that rather than quoting a count from here. Run it before quoting anything. | all |
+| `REFERENCES.md` | **Where every number we did not measure comes from.** Written for a non-specialist. Marks each published band and each thermal parameter CONFIRMED, UNVERIFIED, MEASURED or ASSUMED. Read before quoting a published band. | all |
 | `DOCUMENT_STATUS.md` | Which team PDFs still quote void numbers. Read before handing one to the supervisor. | all |
 | `logs/CHANNEL_CENSUS.md` | All 656 channels this car offers, live vs dead, from the two reconnaissance logs. Settles what can and cannot be measured. | B |
 
