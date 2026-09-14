@@ -33,11 +33,22 @@ to the supervisor without knowing what is stale.
 | `What_To_Do_In_Order.pdf` | old premise numbers |
 | `Slide_By_Slide_Team_Brief.pdf` | old premise numbers |
 | `Project_Vocabulary.pdf` | one worked example uses a 2.0 L engine |
+| `Novelty_Statement.pdf` | Claim 1 says 62 % vs 32 % damage reduction (void — the four-cylinder; now **47.2 % vs 33.8 %** at the 1123 K trigger); Claim 2 says the sweep moved the advantage 7.6 → 49.9 points (void — now **16.5 → 26.0 points** over H/τ 4.47 → 0.60 at the fixed 1123 K limit) |
 
 Checked and **clean**: `Roles_And_Lessons.pdf`, `Team_Working_Model.pdf`,
-`Roadmap_Two_Plants.pdf`, `Novelty_Statement.pdf`, `Logging_Channel_Reference.pdf`,
+`Roadmap_Two_Plants.pdf`, `Logging_Channel_Reference.pdf`,
 `Preview_Worth_Proposal.pdf` and its team variant, `Project_Proposal_5.pptx`,
 `موجز_المشروع_للفريق.pdf`.
+
+**`Novelty_Statement.pdf` moved out of that list on 13 September 2026.** The
+8 September pass searched for the premise triplet and the engine displacement,
+and neither of its two void figures is one of those. It was never re-checked
+against the rest of the void list.
+
+**`verify_docs.py` cannot see any of this.** It globs `*.md` and `*.py` only,
+and `DOC/` is untracked, so every figure in these PDFs is outside the checker's
+reach. All 33 checks pass with 62 % / 32 % / 7.6 / 49.9 still shipping in
+`DOC/Novelty_Statement.pdf`. A green run says nothing about a PDF.
 
 ---
 
