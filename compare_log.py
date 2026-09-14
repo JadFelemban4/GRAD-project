@@ -187,22 +187,9 @@ def main():
         #
         # WHY THIS IS EVIDENCE AND NOT NUMEROLOGY. The reference temperature is
         # the one thing we had to assume. Had BMW normalised to 20 C, the same
-        # arithmetic would give 289.4 / T_in ~ 0.890 over these points, which
-        # the fit rules out at 0.837 -- a 6.3 % separation, several times the
-        # residual either constant leaves behind. The data picks the reference
-        # state on its own; a fudge factor would have matched either. Report
-        # that, not just the residual.
-        #
-        # AND REPORT THE DIRECTION HONESTLY. Over the 22 points, 30-74 kPa, the
-        # FITTED k scores 1.1 % and the DERIVED k scores 1.4 %. Dropping the
-        # free parameter makes the residual RISE, which is what one free
-        # parameter is supposed to do. The derived form is not the more accurate
-        # one; it is the more falsifiable one -- nothing in it was tuned, and it
-        # is blind-sensitive to displacement, where the fitted form is not.
-        # Force the geometry to the old 2.0 L inline-four and the derived
-        # residual goes to 48.1 % while the fitted one still reports 1.1 %,
-        # because the fit absorbs the wrong engine into the constant. That is
-        # the argument for the derived form. Accuracy is not.
+        # arithmetic would give 289.4 / T_in ~ 0.840, which the fit rules out at
+        # 0.784. The data picks the reference state on its own; a fudge factor
+        # would have matched either. Report that, not just the residual.
         #
         # LIMIT, STATE IT. T_in here is the MODELLED charge temperature from
         # plant.charge_temperature, not a logged channel -- this car has no live

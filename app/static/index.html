@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Engine Supervisor — live</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --line:#262d38; --ink:#e6edf3; --dim:#8b949e;
+    --ok:#3fb950; --watch:#d29922; --warn:#db6d28; --crit:#f85149; --acc:#58a6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+         padding:14px 18px;border-bottom:1px solid var(--line)}
+  h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.2px}
+  .src{color:var(--dim);font-size:12px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);display:inline-block}
+  .dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  main{padding:18px;display:grid;gap:18px;
+       grid-template-columns:repeat(auto-fit,minmax(290px,1fr));max-width:1400px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .panel h2{font-size:11px;letter-spacing:.10em;text-transform:uppercase;
+            color:var(--dim);margin:0 0 12px;font-weight:600}
+  .hero{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .hero b{font-size:42px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1}
+  .hero span{color:var(--dim);font-size:13px}
+  .bar{height:6px;border-radius:3px;background:#21262d;overflow:hidden;margin:12px 0 6px}
+  .bar>i{display:block;height:100%;background:var(--ok);transition:width .3s,background .3s}
+  .grid{display:grid;grid-template-columns:1fr auto;gap:7px 14px;font-variant-numeric:tabular-nums}
+  .grid .k{color:var(--dim)}
+  .note{font-size:12px;color:var(--dim);margin-top:12px;padding-top:12px;
+        border-top:1px solid var(--line)}
+  .badge{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:20px;
+         border:1px solid var(--line);color:var(--dim);margin-right:5px}
+  .badge.warm{border-color:var(--watch);color:var(--watch)}
+  ul.alerts{list-style:none;margin:0;padding:0;max-height:340px;overflow:auto}
+  ul.alerts li{border-left:3px solid var(--line);padding:9px 12px;margin-bottom:9px;
+               background:#11161d;border-radius:0 7px 7px 0}
+  li.critical{border-left-color:var(--crit)} li.warn{border-left-color:var(--warn)}
+  li.watch{border-left-color:var(--watch)}  li.info{border-left-color:var(--acc)}
+  .atitle{font-weight:600;margin-bottom:3px}
+  .advice{font-size:12.5px;color:#c9d1d9}
+  .who{font-size:10.5px;color:var(--dim);margin-top:5px;text-transform:uppercase;
+       letter-spacing:.06em}
+  .empty{color:var(--dim);font-size:13px;padding:8px 0}
+  footer{padding:14px 18px;color:var(--dim);font-size:11.5px;
+         border-top:1px solid var(--line);max-width:1400px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Engine Supervisor</h1>
+  <span class="dot" id="dot"></span>
+  <span class="src" id="src">connecting…</span>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Turbine housing — estimated</h2>
+    <div class="hero"><b id="turb">—</b><span>°C</span></div>
+    <div class="bar"><i id="turbbar" style="width:0%"></i></div>
+    <div class="grid">
+      <span class="k">damage threshold</span><span>850 °C</span>
+      <span class="k">trend</span><span id="rate">—</span>
+      <span class="k">estimated oil</span><span id="oil">—</span>
+      <span class="k">coolant (measured)</span><span id="ect">—</span>
+    </div>
+    <div class="note">
+      <span class="badge" id="conf">confidence —</span>
+      <span class="badge warm" id="warm" hidden>warming up</span>
+      No sensor in this car reports turbine temperature. This is a model
+      estimate, not a reading.
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Engine state</h2>
+    <div class="grid">
+      <span class="k">engine speed</span><span id="rpm">—</span>
+      <span class="k">air mass</span><span id="air">—</span>
+      <span class="k">manifold pressure</span><span id="map">—</span>
+      <span class="k">charge temp (modelled)</span><span id="chg">—</span>
+      <span class="k">torque</span><span id="trq">—</span>
+      <span class="k">exhaust gas temp</span><span id="egt">—</span>
+      <span class="k">knock integral</span><span id="ki">—</span>
+      <span class="k">vehicle speed</span><span id="spd">—</span>
+    </div>
+    <div class="note" id="modelled">All inputs measured.</div>
+  </section>
+
+  <section class="panel" style="grid-column:1/-1">
+    <h2>Marked events</h2>
+    <ul class="alerts" id="list"></ul>
+    <div class="empty" id="none">Nothing marked yet.</div>
+  </section>
+</main>
+
+<footer>
+  Raw engine data is streamed in memory and never written to disk. Only marked
+  events are saved, for later review. This application reads the OBD-II port and
+  never transmits to the vehicle.
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const f = (v, d=0, suf="") => (v===null||v===undefined||Number.isNaN(v))
+        ? "—" : Number(v).toFixed(d) + suf;
+let lastTurb = null, lastT = null;
+
+function paint(p){
+  const s = p.state || {}, m = p.meta || {};
+  $("src").textContent = `${m.source ?? "—"} · ${m.mode ?? "—"}`;
+  $("dot").className = s.ok ? "dot on" : "dot";
+
+  $("turb").textContent = f(s.t_turb_c, 0);
+  const pct = Math.max(0, Math.min(100, ((s.t_turb_c ?? 0) / 950) * 100));
+  const bar = $("turbbar");
+  bar.style.width = pct + "%";
+  bar.style.background = (s.t_turb_c ?? 0) >= 850 ? "var(--crit)"
+                       : (s.t_turb_c ?? 0) >= 780 ? "var(--warn)" : "var(--ok)";
+
+  if (lastTurb !== null && s.t && s.t > lastT){
+    const r = (s.t_turb_c - lastTurb) / (s.t - lastT);
+    $("rate").textContent = (r>=0?"+":"") + r.toFixed(1) + " K/s";
+  }
+  if (s.t_turb_c !== null && s.t !== null){ lastTurb = s.t_turb_c; lastT = s.t; }
+
+  $("oil").textContent = f(s.t_oil_est_c, 0, " °C");
+  $("ect").textContent = f(s.ect_c, 0, " °C");
+  $("conf").textContent = "confidence " + f((s.confidence ?? 0) * 100, 0, "%");
+  $("warm").hidden = !s.warming_up;
+
+  $("rpm").textContent = f(s.rpm, 0, " rpm");
+  $("air").textContent = f(s.air_gps, 1, " g/s");
+  $("map").textContent = f(s.map_kpa, 0, " kPa");
+  $("chg").textContent = f(s.t_charge_c, 0, " °C");
+  $("trq").textContent = f(s.torque_nm, 0, " Nm");
+  $("egt").textContent = f(s.egt_c, 0, " °C");
+  $("ki").textContent  = f(s.knock_integral, 2);
+  $("spd").textContent = f(s.v_kmh, 0, " km/h");
+
+  const mod = s.modelled || [];
+  $("modelled").textContent = mod.length
+    ? "Modelled, not measured: " + mod.join(", ") + ". The car does not report these."
+    : "All inputs measured.";
+
+  for (const a of (p.alerts || [])){
+    $("none").hidden = true;
+    const li = document.createElement("li");
+    li.className = a.severity;
+    li.innerHTML = `<div class="atitle"></div><div class="advice"></div>
+                    <div class="who"></div>`;
+    li.querySelector(".atitle").textContent = a.title;
+    li.querySelector(".advice").textContent = a.advice;
+    li.querySelector(".who").textContent = `${a.kind} · for the ${a.audience}`;
+    $("list").prepend(li);
+    while ($("list").children.length > 60) $("list").lastChild.remove();
+  }
+}
+
+function connect(){
+  const ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onmessage = e => { try { paint(JSON.parse(e.data)); } catch(_){} };
+  ws.onclose = () => { $("dot").className = "dot"; setTimeout(connect, 1200); };
+}
+connect();
+</script>
+</body>
+</html>

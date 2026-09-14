@@ -10,3 +10,8 @@ pandas>=2.0
 
 # Optional, for plots.
 matplotlib>=3.8
+
+# --- live app (app/) ---
+fastapi>=0.110
+uvicorn>=0.27
+obd>=0.7            # LIVE MODE ONLY. Replay mode needs neither of these.
