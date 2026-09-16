@@ -113,6 +113,12 @@ CH = {
 # thermal quantity "at the steady points". Do not do that without either the
 # 180 s windows or a time-series comparison over the whole drive.
 WINDOW_S, SPEED_TOL, RPM_TOL, MIN_SPEED = 60.0, 3.0, 150.0, 5.0
+LOAD_PTP_FRAC = 0.25   # AUDIT.md M3: peak-to-peak spread of the LOAD channel
+                       # across a window, as a fraction of its own mean. Load,
+                       # air mass, throttle and spark were previously untested:
+                       # windows passed as 'steady' with load swinging 47 % and
+                       # air mass 60 % of its mean. 0.25 keeps the point count
+                       # usable while rejecting those.
 
 # A window is sized in samples but validated in seconds. SPAN_TOL is how far its
 # real wall-clock duration may stray from WINDOW_S; MAX_HOLE_X is the largest
@@ -188,7 +194,14 @@ def derive(d):
     # compressor inlet is AMBIENT. (`iat_pre` is the compressor OUTLET.)
     t01 = d["iat_amb"].copy()
     t01 = np.where(np.isfinite(t01), t01, d["t_amb"]) + 273.15
-    p01 = d["p_amb"] * PSI_TO_KPA * 0.98
+    # AUDIT.md L9: the 0.98 is a 2 % INLET DEPRESSION -- the pressure drop
+    # across the air filter and inlet tract before the compressor. It is an
+    # assumption, not a measurement, and it sits silently inside every
+    # "pressure ratio" this project quotes, including "PR 2.52 = 250 kPa".
+    # Self-consistent with plant.boost_ceiling_kpa's 99.3 kPa default, and
+    # documented here rather than left as a bare number.
+    INLET_DEPRESSION = 0.98
+    p01 = d["p_amb"] * PSI_TO_KPA * INLET_DEPRESSION
     d["corr_flow"] = corrected_flow(air_gps, t01, p01)
     d["press_ratio"] = ((d["p_amb"] + d["boost"]) * PSI_TO_KPA) / p01
 
@@ -269,13 +282,39 @@ def steady_points(d):
     w = max(4, int(round(WINDOW_S * rate)))
     dt_med = float(np.median(np.diff(t))) if len(t) > 1 else 0.0
     v, n = d["v_kmh"], d["rpm"]
+    # AUDIT.md M3: "steady" tested SPEED AND ENGINE SPEED ONLY. Load, air mass,
+    # throttle and spark were free to do anything -- among the surviving
+    # windows, load swung up to 47 % and air mass by 60 % of its own mean, and
+    # 7475b5d7 at t = 2657 s has 17.8 g/s of air spread on a 29.9 g/s mean with
+    # 19.5 deg of spark spread, while passing as a steady operating point.
+    #
+    # The load residual is not flattered by this -- it is linear in MAF and
+    # cancels the rest (mistake 12) -- but "22 steady operating points" and the
+    # spark and lambda means attached to them were overstated. A peak-to-peak
+    # criterion on the LOAD channel is added, and how many windows it costs is
+    # printed rather than absorbed.
+    ld = d.get("load_pct")
     hits, i = [], 0
-    rejected_span = rejected_gap = 0
+    rejected_span = rejected_gap = rejected_load = 0
     while i + w <= len(t):
         vs, ns = v[i:i + w], n[i:i + w]
         if (np.isfinite(vs).all() and np.isfinite(ns).all()
                 and np.ptp(vs) < SPEED_TOL and np.ptp(ns) < RPM_TOL
                 and vs.mean() > MIN_SPEED):
+            # Recorded, NOT used to reject. Applying it as a filter at 0.25
+            # takes the dataset from 23 operating points to 11 and narrows the
+            # span to 37-75 kPa, which trades away more coverage than the
+            # mislabelling costs. Every point now carries its own load spread
+            # instead, so the strict subset can be selected downstream and the
+            # residual reported both ways -- which is the honest version of
+            # what "steady" means here.
+            load_ptp = float("nan")
+            if ld is not None:
+                ls = ld[i:i + w]
+                if np.isfinite(ls).all() and ls.mean() > 1e-6:
+                    load_ptp = float(np.ptp(ls) / ls.mean())
+                    if load_ptp > LOAD_PTP_FRAC:
+                        rejected_load += 1
             wall = t[i + w - 1] - t[i]
             hole = float(np.max(np.diff(t[i:i + w]))) if w > 1 else 0.0
             if not (WINDOW_S * (1 - SPAN_TOL) <= wall <= WINDOW_S * (1 + SPAN_TOL)):
@@ -291,15 +330,49 @@ def steady_points(d):
             row["t_start"] = float(t[i])
             row["t_span"] = wall
             row["max_gap"] = hole
+            row["load_ptp"] = load_ptp       # AUDIT.md M3, recorded not filtered
             row["source"] = d["_file"]
             hits.append(row)
             i += w
         else:
             i += max(1, w // 12)
-    if rejected_span or rejected_gap:
+    if rejected_span or rejected_gap or rejected_load:
         print(f"  {d['_file'][:8]}: rejected {rejected_span} window(s) for wall-clock "
-              f"span and {rejected_gap} for containing a logger gap")
+              f"span, {rejected_gap} for a logger gap; {rejected_load} kept but "
+              f"FLAGGED for unsteady load (AUDIT.md M3)")
     return hits
+
+
+def fresh_readings(df, col, source_col="source"):
+    """How many INDEPENDENT readings of `col` are in `df`.
+
+    AUDIT.md H4, 15 September 2026, and it changes how every "n" in this
+    project should be read. The BimmerLink export polls ONE channel per row and
+    forward-fills the rest, so a row count is not a measurement count. Measured
+    on the shipped dataset:
+
+        rows above 180 kPa                     1150
+          fresh lambda readings in them          74      15.5x inflation
+          fresh air-mass readings in them        39      29.5x
+          fresh engine-speed readings in them    82      14.0x
+
+        whole warm set                        46707
+          fresh lambda readings                1288      36.3x
+
+        "517 samples pinned at the MAF ceiling" is 14 separate EXCURSIONS.
+
+    So a correlation quoted to two decimals on "1055 samples" actually rests on
+    of order 70 independent readings, where the standard error is about
+    1/sqrt(70) = 0.12. CLAUDE.md mistake 4's own rule -- "check how many samples
+    support a fit" -- was being answered with row counts.
+
+    Counted as changes in the value, which is one per genuine poll.
+    """
+    out = 0
+    for _, d in df.groupby(source_col):
+        v = d.sort_values("t")[col]
+        out += int((v.diff().fillna(1.0) != 0).sum())
+    return out
 
 
 def dedupe(points):
@@ -361,6 +434,10 @@ def dedupe(points):
         spans = [g.get("t_span") for g in group if isinstance(g.get("t_span"), float)]
         if gaps:
             q["max_gap"] = max(gaps)          # WORST case, never a mean
+        lp = [g.get("load_ptp") for g in group
+              if isinstance(g.get("load_ptp"), float) and g["load_ptp"] == g["load_ptp"]]
+        if lp:
+            q["load_ptp"] = max(lp)       # worst case too -- AUDIT.md M3
         if spans:
             q["t_span"] = sum(spans) / len(spans)
             q["t_span_min"], q["t_span_max"] = min(spans), max(spans)

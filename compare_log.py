@@ -160,6 +160,27 @@ def main():
         print(f"  MAPE {mape:.1f} %   target < {TARGETS['mdot_air_gps'][0]:.0f} %   "
               f"{'PASS' if mape < TARGETS['mdot_air_gps'][0] else 'FAIL'}")
 
+    # AUDIT.md M3. Say what "steady" actually covers, before quoting a
+    # residual computed on it. These windows are steady in ROAD SPEED and
+    # ENGINE SPEED; load was never tested, and it is not steady at all.
+    try:
+        import pandas as _pd
+        _P = _pd.read_csv(a.points)
+        _lp = _P["load_ptp"].dropna() if "load_ptp" in _P.columns else []
+        if len(_lp):
+            print("")
+            print("WHAT 'STEADY' COVERS  (AUDIT.md M3)")
+            print(f"  load peak-to-peak per window, as a fraction of its own mean:")
+            print(f"    median {_lp.median():.2f}   max {_lp.max():.2f}")
+            print(f"  points whose load held within 25 %: {int((_lp <= 0.25).sum())} of {len(_P)}")
+            print("  Steady in ROAD SPEED and ENGINE SPEED only. The residual below")
+            print("  survives that because it is linear in the MAF channel and cancels")
+            print("  the rest (mistake 12) -- a reason to distrust the LABEL, not the")
+            print("  number. Do not call these 'steady operating points' without")
+            print("  saying steady in what.")
+    except Exception:
+        pass
+
     print("\nLOAD (relative air filling)")
     if len(load_pairs) < 3:
         # AUDIT.md M14: this printed and exited 0, so a mode that scored

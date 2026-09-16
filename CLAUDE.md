@@ -245,12 +245,31 @@ you, and the flattery shows up as a large headline number.**
 | v4, from eight drives | function of engine speed and sustained dwell | current |
 
 v3 was fitted to 17 seconds at high load. The two 8 September drives took that
-to **184 seconds above 207 kPa**, and at that sample size the correlation
-between lambda and manifold pressure is **+0.23** — weak, and pointing the
-WRONG WAY for a load table: higher manifold pressure goes with *leaner*
-mixture, not richer. What correlates is engine speed (−0.56), air mass flow
-(−0.49), and how long the engine has been held above the 180 kPa enrichment
-gate (−0.47), over the 1055 samples above 180 kPa.
+to **184 seconds above 207 kPa**. Over the 1055 rows above 180 kPa the
+correlations are: engine speed **−0.56**, air mass flow **−0.49**, dwell above
+the 180 kPa gate **−0.41**, and manifold pressure **+0.23**.
+
+**READ THOSE WITH THEIR ERROR BARS, WHICH THIS FILE USED NOT TO GIVE.**
+AUDIT.md H4: 1055 is a count of FORWARD-FILLED ROWS. The exporter polls one
+channel per row, so those 1055 rows contain about **39 independent air-mass
+readings and 74 lambda readings** — a 15–30× inflation. The standard error on a
+correlation at that sample size is about **±0.17**.
+
+Two things follow, and the second is a correction to this entry's own argument:
+
+- **The v4 conclusion still stands.** −0.56 and −0.49 are three standard errors
+  from zero. Engine speed and air mass really do carry the signal.
+- **The "+0.23 points the WRONG WAY" argument does NOT stand**, and it used to
+  be stated here as though it did. +0.23 is 1.4 σ — indistinguishable from zero,
+  and the reviewer's decimation across poll phases put it anywhere between
+  −0.01 and +0.34. The honest statement is that **manifold pressure carries no
+  detectable signal**, which is still enough to reject a load table. It is not
+  evidence that load points the other way.
+
+<!-- RETIRED-OK -->
+*(The dwell figure was **−0.47** until 16 September, computed on a dwell axis
+built from row counts over an assumed 4.6 Hz when the drives log at 4.34–6.63 Hz.
+Summed from the timestamps it is −0.41. AUDIT.md H3.)*
 
 <!-- RETIRED-OK -->
 Both pressures in that paragraph are on the **corrected** scale of mistake 13.
@@ -1076,6 +1095,48 @@ once the warm filter has run.**
   knock model is running the wrong compression ratio. `REFERENCES.md`
   section 2.
 
+
+### THE KNOCK MODEL IS NOT VALIDATED AGAINST THIS CAR, AND THE DATA SAYS SO
+
+Added 16 September 2026, from AUDIT.md H5. This is a negative result and it is
+worth more than most of the positive ones.
+
+The car publishes its own knock response: `Target ignition angle from torque
+intervention` minus `Actual ignition angle` is the retard the ECU is applying.
+Replaying `7475b5d7` through the app -- which feeds the car's MEASURED spark and
+lambda into `predict()` -- gives a model knock integral to compare against it,
+sample for sample. Over 13 592 paired samples:
+
+| | model knock integral | car's own retard |
+|---|---|---|
+| median | 0.464 | 0.00 deg |
+| p95 | 0.732 | 6.75 deg |
+| max | 3.446 | 44.25 deg |
+| active | KI > 0.85 on **1.6 %** | retard > 1 deg on **25.5 %** |
+
+**Correlation between them: −0.149.** Where the model says the engine is
+knocking, the car's median retard is 0 deg. Where the model says it is not, the
+car's median retard is also 0 deg. **The two have no detectable relationship.**
+
+**What that costs, stated rather than hidden:**
+
+- `validate.py`'s knock-limited-spark row (11 deg at 3000 rpm / 200 kPa) is
+  inside a band that REFERENCES.md already marks unsourced, and it is now also
+  unsupported by the car's own behaviour. It still counts toward "8 of 11".
+- `BaselineECU.knock_limited_spark` and the `40·max(0, KI − 0.85)²` term in the
+  damage function rest on the same model.
+- `check_map.py`'s entire knock-limited surface is model-internal.
+
+**Do not quote a knock-limited spark or a knock damage term as calibrated.** One
+of three things is wrong and the data here cannot say which: the Douaud-Eyzat
+integral is mis-tuned for this engine, the modelled charge temperature or
+inverted pressure are off under boost, or `Actual ignition angle` is not the
+final commanded angle. Settling it needs a deliberate drive, not another
+re-analysis of these logs.
+
+**Why this did not show up before:** the premise numbers never exercised the
+knock term, because the baseline was over-retarded by the scheduling error of
+AUDIT.md C2 and sat at KI 0.3-0.4. Fixing C2 is what made the term live.
 
 ### Limits the LIVE APP adds, and they are the simulator's limits plus three
 

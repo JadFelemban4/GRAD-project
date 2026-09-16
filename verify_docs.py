@@ -745,6 +745,19 @@ def main():
             ("map_kpa", +0.23, [r"MANIFOLD PRESSURE\)\s*" + NUM,
                                 r"corr\(.{0,18}MAP.{0,6}\)\s*(?:is\s*)?" + NUM,
                                 r"manifold\s+pressure is\s*\*{0,2}" + NUM]))
+    # AUDIT.md H4: report the INDEPENDENT reading count beside the row count,
+    # because a correlation quoted to two decimals on 1150 forward-filled rows
+    # actually rests on of order 70 readings.
+    from build_dataset import fresh_readings
+    _n_rows = len(v)
+    _n_fresh = min(fresh_readings(h, "lam"), fresh_readings(h, "air_gps"))
+    import math as _math
+    _se = 1.0 / _math.sqrt(max(_n_fresh - 3, 1))
+    print(f"  note   these correlations rest on {_n_rows} forward-filled rows but "
+          f"only ~{_n_fresh} independent readings")
+    print(f"         standard error is about {_se:.2f}, so do NOT read them to two "
+          f"decimals (AUDIT.md H4)")
+
     for col, claim, pats in CORR:
         figure(f"corr(lambda, {col})",
                round(float(np.corrcoef(v[col], v.lam)[0, 1]), 2), claim, 0.02,

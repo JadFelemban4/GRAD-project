@@ -83,8 +83,8 @@ returns `p_reactive`'s vector every step. Measured: `blinded − reactive =
 | **H1** discretisation not converged at `dtheta = 0.5°` | **FIXED** | convergence study run; `plant.DTHETA_DEG` **0.5 → 0.25**, and `validate.test_convergence()` now fails if halving the step moves a headline more than its quoted precision |
 | **H2** checker cannot see simulation-derived figures | **FIXED** | `validate.rows()` exposes the validation rows as data and `verify_docs.check_simulation()` asserts them. The auditor's own drift test now FAILS as it should — "8 of 11" changed in README is caught. `presentation/index.html` is tracked too |
 | **H3** dwell computed at an assumed 4.6 Hz | **FIXED** | dwell now summed from timestamps. corr(λ,dwell) **−0.47 → −0.41**; "seconds above 207 kPa" **178 → 184** |
-| **H4** "n samples" are forward-filled rows | **OPEN** | needs independent-reading counts beside every row count |
-| **H5** knock integral says the car detonates continuously | **OPEN** | needs a validation row against the measured retard channel |
+| **H4** "n samples" are forward-filled rows | **FIXED** | `build_dataset.fresh_readings()` counts genuine polls; `verify_docs` prints the effective n and standard error beside every correlation. The 1055 rows above 180 kPa hold **~39 independent air-mass and 74 lambda readings** — SE **±0.17** |
+| **H5** knock integral says the car detonates continuously | **MEASURED, NOT FIXABLE HERE** | the model's KI and the car's own retard correlate at **−0.149** over 13 592 paired samples. Documented as a limitation in CLAUDE.md; settling it needs a deliberate drive |
 | **H6** `train.py` cannot resume | **FIXED** | loads the newest `ckpt_*_steps.zip`, passes `reset_num_timesteps=False` and the remaining budget |
 | **H7** de-duplication is order-dependent | **FIXED** | windows sorted before merging: **23 points, identical in 8 orderings**. `max_gap` now carries the worst case, exposing the true **0.481 s** the average hid; 9 points that pool more than one drive are labelled `n_sources` instead of silently taking the first drive's name |
 | **H8** app's modelled lambda can never enrich | **FIXED** | fallbacks run through `BaselineECU.step`; λ reaches 0.81 after a sustained pull |
@@ -143,7 +143,8 @@ prose scan for those two would mostly catch the documents being right.
 | **M12** generality_test: wrong damage fn, τ, runs at import | **FIXED** | τ from the episode's own exhaust flow; `main()` guard; "grew 0.7x" now says SHRANK |
 | **M13** neutral quoted as a requirement | **FIXED** | documents quote the ±0.05 band; the random policy is seeded so its "for information" line stops moving |
 | **M14** `--map-from-log` scored zero rows and exited 0 | **FIXED** | the missing alias is added, so it reproduces mistake 2 properly (**110.4 %** against 1.3 %), and it now exits non-zero when it scores nothing |
-| M3, M4, M5, M6, M15, M16 | **OPEN** | see `AUDIT.md` |
+| **M3** "steady" windows are steady in speed and rpm only | **FIXED** | every point carries `load_ptp`, and `compare_log.py` prints it: **median load spread 0.52, max 1.25, and only 2 of 23 points hold within 25 %**. Recorded rather than filtered — filtering at 0.25 costs 23 points → 11 and narrows the span to 37–75 kPa, which trades away more coverage than the mislabelling costs |
+| M4, M5, M6, M15, M16 | **OPEN** | see `AUDIT.md` |
 
 ---
 
@@ -163,7 +164,37 @@ ceiling — it reports one · `L14` the baseline's charge temperature is compute
 from its **own** block node, so the baseline-relative reference no longer moves
 with the agent's cooling.
 
-**Open:** L8, L9, L10, L12.
+`L9` the 0.98 in `press_ratio` is now a named `INLET_DEPRESSION` constant with
+its assumption stated · `L10` the coolant row is relabelled "regulation
+response (NOT a free time constant)" · `L12` `check_map.lam_for` documents why
+it still schedules by load and why no published cell changes.
+
+**Open:** L8 only.
+
+### H4 — what the row counts actually rest on
+
+| population | rows | independent readings | inflation |
+|---|---|---|---|
+| above 180 kPa | 1150 | 74 lambda, 39 air mass | 15–30× |
+| whole warm set | 46 707 | 1288 lambda | 36× |
+| "517 pinned at the MAF ceiling" | 517 | **14 excursions** | 37× |
+
+**Consequence, and it corrects this project's own reasoning.** A correlation on
+~39 independent readings has a standard error near **±0.17**. So −0.56 and −0.49
+are real (3 σ), but mistake 4's claim that **+0.23 "points the WRONG WAY"** is
+1.4 σ — indistinguishable from zero. CLAUDE.md now says manifold pressure
+carries *no detectable signal*, which still rejects a load table but is not
+evidence that load points the other way.
+
+### M3 — "steady" was steady in two channels out of five
+
+Load, air mass, throttle and spark were never tested. Measured: the median
+window's load swings **52 % of its own mean**, the worst **125 %**, and only
+**2 of 23** points hold within 25 %. The residual survives that only because it
+is linear in the MAF channel and cancels the rest (mistake 12) — which is a
+reason to distrust the *label*, not the number. `compare_log.py` prints this
+above the residual now, so the phrase "steady operating points" cannot be quoted
+without the qualifier.
 
 ---
 

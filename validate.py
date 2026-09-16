@@ -183,7 +183,14 @@ def check_time_constants():
     b0, bf, tau_b = _step_response("block", 5000)
     out.append(_row("Coolant, thermostat-regulated", bf, "C", 88, 108,
                     "REFERENCES.md sec. 3 row 10"))
-    out.append(_row("Coolant apparent time constant", tau_b, "s", 1, 600,
+    # AUDIT.md L10: this row is labelled a "time constant" but measures the
+    # time to cover 63 % of a 4.5 K change from a WARM start, with the stand-in
+    # thermostat actively regulating -- against a band of 1-600 s that almost
+    # nothing could fail. It counts toward "8 of 11" and should not be read as
+    # evidence about the cooling system. Relabelled rather than dropped, so the
+    # count stays comparable with earlier versions of the table.
+    out.append(_row("Coolant regulation response (NOT a free time constant)",
+                    tau_b, "s", 1, 600,
                     "REFERENCES.md sec. 3 row 11 (band too wide to assert much)"))
     return out, dict(turb=(t0, tf, tau_t), oil=(o0, of_, tau_o), block=(b0, bf, tau_b))
 
