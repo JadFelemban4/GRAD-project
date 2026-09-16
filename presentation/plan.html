@@ -1,0 +1,1537 @@
+<title>إعادة قصّ الخطة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ===================================================================
+   إعادة قصّ الخطة — same calibration-console identity as index.html
+   light = a printed calibration sheet · dark = the instrument screen
+   ember = the live plan · slate-dashed = the retired plan
+   Both editions live in the page; only one is shown.
+   =================================================================== */
+
+:root {
+  --bg:        #EDEEF0;
+  --surface:   #FFFFFF;
+  --surface-2: #E2E5E8;
+  --line:      #CBD1D5;
+  --grid:      #DFE3E6;
+  --text:      #13181B;
+  --muted:     #59646A;
+  --ember:     #A85F08;
+  --ember-deep:#8A3B08;
+  --cool:      #0C7770;
+  --crit:      #AE3325;
+  --ok-bg:     rgba(12,119,112,.10);
+  --warn-bg:   rgba(168,95,8,.12);
+  --crit-bg:   rgba(174,51,37,.10);
+  --void-bg:   rgba(89,100,106,.07);
+  --shadow:    0 1px 2px rgba(19,24,27,.07), 0 8px 24px -16px rgba(19,24,27,.30);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #0E1215;
+    --surface:   #161B1F;
+    --surface-2: #1E252A;
+    --line:      #2D363C;
+    --grid:      #212A30;
+    --text:      #E9E7E2;
+    --muted:     #8D989E;
+    --ember:     #F0A340;
+    --ember-deep:#E8752B;
+    --cool:      #3BBDB2;
+    --crit:      #E8604C;
+    --ok-bg:     rgba(59,189,178,.12);
+    --warn-bg:   rgba(240,163,64,.13);
+    --crit-bg:   rgba(232,96,76,.12);
+    --void-bg:   rgba(141,152,158,.08);
+    --shadow:    0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #0E1215;
+  --surface:   #161B1F;
+  --surface-2: #1E252A;
+  --line:      #2D363C;
+  --grid:      #212A30;
+  --text:      #E9E7E2;
+  --muted:     #8D989E;
+  --ember:     #F0A340;
+  --ember-deep:#E8752B;
+  --cool:      #3BBDB2;
+  --crit:      #E8604C;
+  --ok-bg:     rgba(59,189,178,.12);
+  --warn-bg:   rgba(240,163,64,.13);
+  --crit-bg:   rgba(232,96,76,.12);
+  --void-bg:   rgba(141,152,158,.08);
+  --shadow:    0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+body {
+  direction: rtl;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding-block: 0 5rem;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+/* --------------------------------------------------- the two editions */
+body[data-lang="ar"] [data-lang="en"],
+body[data-lang="en"] [data-lang="ar"] { display: none; }
+body[data-lang="en"] { direction: ltr; font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; line-height: 1.7; }
+body[data-lang="en"] h1, body[data-lang="en"] h2,
+body[data-lang="en"] h3, body[data-lang="en"] h4 { font-family: "Readex Pro", "IBM Plex Sans", system-ui, sans-serif; }
+[data-lang="ar"] { direction: rtl; }
+[data-lang="en"] { direction: ltr; }
+
+::selection { background: var(--ember); color: var(--bg); }
+:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; border-radius: 3px; }
+
+h1, h2, h3, h4 {
+  font-family: "Readex Pro", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  text-wrap: balance; margin: 0; font-weight: 600; line-height: 1.3;
+}
+h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); font-weight: 700; letter-spacing: -.015em; }
+h2 { font-size: clamp(1.45rem, 4vw, 2.05rem); letter-spacing: -.01em; }
+h3 { font-size: clamp(1.05rem, 2.6vw, 1.22rem); }
+h4 { font-size: .98rem; font-weight: 600; }
+p  { margin: 0; }
+
+.mono, code, .num {
+  font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+  font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate;
+}
+code { background: var(--surface-2); padding: .12em .42em; border-radius: 3px; font-size: .88em; }
+
+.eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: .7rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ember); font-weight: 500; display: block;
+}
+
+/* ------------------------------------------------------------ frame */
+.wrap { max-width: 68rem; margin-inline: auto; }
+
+.topbar {
+  position: sticky; inset-block-start: 0; z-index: 40;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-block-end: 1px solid var(--line);
+  margin-inline: calc(clamp(1rem, 4vw, 2.5rem) * -1);
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+.topbar-in { max-width: 68rem; margin-inline: auto; display: flex; align-items: center;
+             gap: .75rem; padding-block: .6rem; overflow-x: auto; scrollbar-width: thin; }
+.navset { display: contents; }
+.topbar a {
+  color: var(--muted); text-decoration: none; white-space: nowrap;
+  font-size: .82rem; padding: .25rem .55rem; border-radius: 4px;
+}
+.topbar a:hover { color: var(--text); background: var(--surface-2); }
+.topbar .brand { color: var(--ember); font-weight: 600; font-size: .82rem;
+                 white-space: nowrap; padding-inline-end: .4rem; border-inline-end: 1px solid var(--line); }
+.btns { margin-inline-start: auto; display: flex; gap: .4rem; }
+.bar-btn {
+  background: var(--surface); color: var(--muted);
+  border: 1px solid var(--line); border-radius: 5px; cursor: pointer;
+  font-family: inherit; font-size: .78rem; padding: .25rem .6rem; white-space: nowrap;
+}
+.bar-btn:hover { color: var(--text); border-color: var(--ember); }
+#langToggle { color: var(--ember); border-color: color-mix(in srgb, var(--ember) 45%, var(--line)); }
+
+section { padding-block: clamp(2.5rem, 6vw, 4rem); border-block-end: 1px solid var(--line); }
+section.last { border-block-end: none; }
+.sec-head { display: flex; flex-direction: column; gap: .45rem; margin-block-end: 1.75rem; }
+.sec-head p { color: var(--muted); max-width: 64ch; }
+
+/* ------------------------------------------------------------- hero */
+.hero { padding-block: clamp(3rem, 8vw, 4.5rem) clamp(2.5rem, 6vw, 3.5rem); border-block-end: 1px solid var(--line); }
+.hero h1 { margin-block: .6rem 1rem; }
+.hero .lede { font-size: clamp(1.05rem, 2.5vw, 1.2rem); color: var(--muted); max-width: 62ch; }
+.hero .date { color: var(--muted); font-size: .85rem; margin-block-start: 1.25rem; max-width: 64ch; }
+
+.now {
+  margin-block-start: 2rem; background: var(--surface); border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--ember); border-radius: 6px;
+  padding: 1.1rem 1.25rem; box-shadow: var(--shadow); display: flex;
+  flex-wrap: wrap; align-items: baseline; gap: .4rem 1rem;
+}
+.now .lbl { font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .14em;
+            text-transform: uppercase; color: var(--ember); }
+.now .cmd { font-family: "IBM Plex Mono", monospace; font-size: .92rem; direction: ltr;
+            unicode-bidi: isolate; font-weight: 500; }
+.now .note { color: var(--muted); font-size: .85rem; }
+
+/* ------------------------------------------------------------ cards */
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1.15rem 1.2rem; display: flex; flex-direction: column; gap: .5rem;
+}
+.card h4 { color: var(--ember); }
+.card p { font-size: .92rem; color: var(--muted); }
+.card .big { font-family: "IBM Plex Mono", monospace; font-size: 1.6rem; font-weight: 600;
+             color: var(--text); direction: ltr; unicode-bidi: isolate; line-height: 1.2; }
+
+/* --------------------------------------------------------- why list */
+.why { display: flex; flex-direction: column; gap: .9rem; }
+.why-item {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1rem 1.15rem; display: grid; grid-template-columns: 2.6rem 1fr; gap: .2rem .9rem;
+}
+.why-item .tag {
+  grid-row: 1 / span 2; font-family: "IBM Plex Mono", monospace; font-size: .72rem;
+  color: var(--ember); border: 1px solid var(--ember); border-radius: 4px;
+  height: 1.7rem; display: grid; place-items: center; margin-block-start: .25rem;
+}
+.why-item h4 { margin: 0; }
+.why-item p { color: var(--muted); font-size: .93rem; }
+@media (max-width: 520px) {
+  .why-item { grid-template-columns: 1fr; }
+  .why-item .tag { grid-row: auto; width: 2.6rem; }
+}
+
+/* ---------------------------------------------------------- the diff */
+.diff { display: flex; flex-direction: column; gap: .75rem; }
+.diff-head {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
+  font-family: "IBM Plex Mono", monospace; font-size: .72rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); padding-inline: .2rem;
+}
+.diff-head span:last-child { color: var(--ember); }
+.diff-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.diff-row .topic {
+  grid-column: 1 / -1; font-weight: 600; font-size: .95rem;
+  padding-block-start: .35rem; color: var(--text);
+}
+.old, .new { border-radius: 6px; padding: .85rem 1rem; font-size: .92rem; }
+.old { background: var(--void-bg); border: 1px dashed var(--line); color: var(--muted); }
+.new { background: var(--surface); border: 1px solid var(--line); border-inline-start: 3px solid var(--ember); }
+.old .k, .new .k {
+  display: block; font-family: "IBM Plex Mono", monospace; font-size: .68rem;
+  letter-spacing: .1em; text-transform: uppercase; margin-block-end: .3rem;
+}
+.old .k { color: var(--muted); }
+.new .k { color: var(--ember); }
+@media (max-width: 680px) {
+  .diff-head { grid-template-columns: 1fr; }
+  .diff-head span:first-child { display: none; }
+  .diff-row { grid-template-columns: 1fr; }
+}
+
+.void-note {
+  background: var(--crit-bg); border: 1px solid color-mix(in srgb, var(--crit) 35%, transparent);
+  border-radius: 6px; padding: .9rem 1.1rem; font-size: .9rem; margin-block-end: 1.5rem;
+}
+.void-note b { color: var(--crit); }
+.void-note a { color: var(--ember); }
+
+/* ------------------------------------------------------------ tracks */
+.tracks { display: flex; flex-direction: column; gap: 1rem; }
+.track {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1.25rem 1.35rem; display: flex; flex-direction: column; gap: .8rem;
+}
+.track-top { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+.track-n {
+  font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: .8rem;
+  color: var(--bg); background: var(--ember); border-radius: 4px; padding: .1rem .5rem;
+}
+.track-time { margin-inline-start: auto; font-family: "IBM Plex Mono", monospace;
+              font-size: .8rem; color: var(--muted); direction: ltr; unicode-bidi: isolate; }
+.track ul { margin: 0; padding-inline-start: 1.1rem; display: flex; flex-direction: column; gap: .35rem; }
+.track li { font-size: .93rem; }
+.track li::marker { color: var(--ember); }
+.gate {
+  background: var(--ok-bg); border-inline-start: 3px solid var(--cool);
+  border-radius: 4px; padding: .6rem .85rem; font-size: .88rem;
+}
+.gate b { color: var(--cool); }
+.fallback { font-size: .86rem; color: var(--muted); }
+.fallback b { color: var(--text); }
+.badge-new {
+  font-family: "IBM Plex Mono", monospace; font-size: .66rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--cool); border: 1px solid var(--cool);
+  border-radius: 3px; padding: .05rem .4rem; white-space: nowrap;
+}
+.later-head { margin-block: 2.5rem 1.25rem; }
+
+/* ------------------------------------------------------------ figure */
+.figbox {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1.1rem; overflow-x: auto; direction: ltr;
+}
+.figbox svg { display: block; min-width: 40rem; width: 100%; height: auto; }
+.figcap { color: var(--muted); font-size: .88rem; margin-block-start: .9rem; max-width: 70ch; }
+
+/* ------------------------------------------------------------- table */
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; min-width: 34rem; }
+th, td { text-align: start; padding: .6rem .85rem; border-block-end: 1px solid var(--grid); }
+th { font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .1em;
+     text-transform: uppercase; color: var(--muted); font-weight: 500; }
+tbody tr:last-child td { border-block-end: none; }
+td.n { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums;
+       direction: ltr; unicode-bidi: isolate; }
+
+/* -------------------------------------------------------- do-now list */
+.steps { display: flex; flex-direction: column; gap: .6rem; counter-reset: s; }
+.step {
+  display: grid; grid-template-columns: 1.8rem 1fr auto; gap: .2rem .8rem; align-items: baseline;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: .85rem 1rem;
+}
+.step::before {
+  counter-increment: s; content: counter(s);
+  font-family: "IBM Plex Mono", monospace; font-size: .85rem; color: var(--ember); font-weight: 600;
+}
+.step .what { font-size: .95rem; }
+.step .what .sub { display: block; color: var(--muted); font-size: .85rem; }
+.step .dur { font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: var(--muted);
+             direction: ltr; unicode-bidi: isolate; white-space: nowrap; }
+@media (max-width: 560px) {
+  .step { grid-template-columns: 1.8rem 1fr; }
+  .step .dur { grid-column: 2; }
+}
+
+/* -------------------------------------------------------------- rules */
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .75rem; }
+.rule {
+  background: var(--crit-bg); border: 1px solid color-mix(in srgb, var(--crit) 28%, transparent);
+  border-radius: 6px; padding: .9rem 1rem; font-size: .9rem;
+}
+.rule b { color: var(--crit); display: block; margin-block-end: .2rem; }
+
+.cutlist { display: flex; flex-direction: column; gap: .5rem; }
+.cut { display: grid; grid-template-columns: 3.2rem 1fr; gap: .8rem; align-items: baseline;
+       border-block-end: 1px solid var(--grid); padding-block: .6rem; }
+.cut:last-child { border-block-end: none; }
+.cut .ord { font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: var(--ember); }
+.cut .txt { font-size: .93rem; }
+.cut .txt span { color: var(--muted); display: block; font-size: .87rem; }
+
+footer { padding-block: 2.5rem; color: var(--muted); font-size: .86rem; }
+footer p { max-width: 70ch; }
+footer a { color: var(--ember); }
+</style>
+
+<nav class="topbar">
+  <div class="topbar-in">
+    <span class="brand" data-lang="ar">إعادة قصّ الخطة</span>
+    <span class="brand" data-lang="en">Re-cutting the plan</span>
+
+    <span class="navset" data-lang="ar">
+      <a href="#why">ليش تغيّرت</a>
+      <a href="#diff">القديم ↔ الجديد</a>
+      <a href="#plan">الخطة</a>
+      <a href="#htau">محور H/τ</a>
+      <a href="#now">هذا الأسبوع</a>
+      <a href="#fixed">الثوابت</a>
+      <a href="#numbers">الأرقام</a>
+    </span>
+    <span class="navset" data-lang="en">
+      <a href="#why-en">why it moved</a>
+      <a href="#diff-en">old ↔ new</a>
+      <a href="#plan-en">the plan</a>
+      <a href="#htau-en">the H/τ axis</a>
+      <a href="#now-en">this week</a>
+      <a href="#fixed-en">fixed</a>
+      <a href="#numbers-en">numbers</a>
+    </span>
+
+    <span class="btns">
+      <button class="bar-btn" id="langToggle" type="button">English</button>
+      <button class="bar-btn" id="themeToggle" type="button">الوضع الداكن</button>
+    </span>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ================================================================== -->
+<!-- ==========================  ARABIC  ============================== -->
+<!-- ================================================================== -->
+<div data-lang="ar">
+
+  <header class="hero">
+    <span class="eyebrow">محرك تحت الرقابة · 14 سبتمبر 2026</span>
+    <h1>الوجهة لم تتغيّر. الترتيب تغيّر.</h1>
+    <p class="lede">
+      الخطة القديمة كُتبت وهي تصدّق أربعة أشياء لم تعد صحيحة. المساهمة نفسها
+      — معيار <span class="mono">H/τ</span> — باقية كما هي، والبوابة التي نعبر
+      منها إلى مشروع ناجح لا تزال Phase D. ما تغيّر هو ماذا يثبت ماذا،
+      وأيّ عمل يسبق أيّ عمل.
+    </p>
+    <div class="now">
+      <span class="lbl">الحركة التالية · الآن</span>
+      <span class="cmd">pip install "stable-baselines3[extra]"</span>
+      <span class="note">دقيقتان. هي الشيء الوحيد الذي يعطّل كل ما بعده — ولم تُنفَّذ بعد.</span>
+    </div>
+    <p class="date">
+      مبنيّة على قراءة كاملة للمستودع: <span class="mono">CLAUDE.md</span> ·
+      <span class="mono">CHECKPOINT.md</span> · <span class="mono">handoff.md</span> ·
+      <span class="mono">REFERENCES.md</span> · <span class="mono">generality_test.py</span> ·
+      <span class="mono">app/</span> ·
+      و ملفَّي الخطة القديمة <span class="mono">Roadmap_Two_Plants.pdf</span> و
+      <span class="mono">What_To_Do_In_Order.pdf</span>.
+    </p>
+  </header>
+
+  <section id="tldr">
+    <div class="sec-head">
+      <span class="eyebrow">الخلاصة</span>
+      <h2>ثلاث جُمَل، وبعدها التفاصيل</h2>
+    </div>
+    <div class="grid3">
+      <div class="card">
+        <h4>ما لم يتغيّر</h4>
+        <p class="big">H / τ</p>
+        <p>
+          السؤال، والادعاء القابل للدحض، وبوابة النجاح Phase D: محاكٍ مُصادَق +
+          وكيل يتفوّق على خطَّي أساس + ablation يعزل الـpreview. كل هذا كما هو.
+        </p>
+      </div>
+      <div class="card">
+        <h4>ما انكسر في الخطة القديمة</h4>
+        <p class="big">4 افتراضات</p>
+        <p>
+          «الرصيد 1.4% يثبت المحاكي»، «المحرك لا يتجاوز H/τ ≈ 0.6»،
+          «إحدى عشرة نطاقًا منشورة»، و«7.6 → 49.9 نقطة». كلها سقطت أو تغيّر معناها.
+        </p>
+      </div>
+      <div class="card">
+        <h4>ما أُضيف</h4>
+        <p class="big">مساران جديدان</p>
+        <p>
+          كنس أفق الرؤية <span class="mono">H</span> نفسه (لا τ فقط)، وإصلاح الأدلة
+          بعد تدقيق المصادر. وقرار واحد مؤجَّل: ماذا نفعل بالتطبيق الحي في
+          <span class="mono">app/</span>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="sec-head">
+      <span class="eyebrow">السبب</span>
+      <h2>خمسة أشياء تحرّكت تحت الخطة</h2>
+      <p>كل واحد منها موثّق في المستودع بدليل، لا برأي. الأرقام هنا يطبعها سكربت.</p>
+    </div>
+    <div class="why">
+
+      <div class="why-item">
+        <span class="tag">12</span>
+        <h4>الرصيد الذي سمّيناه «مصادقة» لا يرى النموذج الذي يُفترض أن يصادقه</h4>
+        <p>
+          <span class="mono">map_from_airflow()</span> يعكس نفس العلاقة التي يستخدمها
+          <span class="mono">run_cycle()</span>، فتُختصر الكفاءة الحجمية ونسبة الغاز المتبقّي
+          ودرجة حرارة الشحنة من المعادلة كلها. أُجبرت <span class="mono">eta_v</span> على
+          <span class="mono">0.50</span> ثم <span class="mono">1.20</span> فلم يتحرّك الرصيد عن
+          <span class="mono">1.374 %</span>. احذف نموذج التنفّس بالكامل: الرقم نفسه.
+          الرصيد فحص اتساق بين قناتين في ECU — وهذا يكسب ثلاثة أشياء حقيقية، لكن
+          «المحاكي يطابق السيارة» ليس واحدًا منها.
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">13</span>
+        <h4>قناة حرارة الشحنة كانت مخرج الضاغط</h4>
+        <p>
+          <span class="mono">Intake air temperature before throttle valve</span> تقرأ
+          <span class="mono">149 °C</span> تحت الشحن. مبرّد B58 داخل مجمّع السحب، بعد الخانق،
+          فـ«قبل الخانق» يعني قبل المبرّد. التصحيح نقل نطاق نقاط التشغيل إلى
+          <span class="mono">30–74 kPa</span> وبوابة الإثراء إلى <span class="mono">180 kPa</span>،
+          وقرّب العكس تحت الشحن من <span class="mono">+23.7 %</span> إلى
+          <span class="mono">+3.0 %</span> مقابل قناة الـboost في السيارة نفسها.
+          <b>نموذج التنفّس بُرِّئ، لم يُدَن.</b>
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">14/9</span>
+        <h4>سبعة من أحد عشر نطاقًا «منشورًا» لا مصدر لها</h4>
+        <p>
+          تدقيق المصادر فتح المراجع صفًّا صفًّا: اثنان مؤكَّدان بصفحة، واحد جزئي،
+          واحد مقيس من سجلّاتنا، و<b>سبعة بلا مصدر</b> — منها الصف 4، شرارة حدّ الطرق،
+          الذي فشل بحث متعمَّد في إسناده. الخطة القديمة تعامل «8 من 11» كدليل مصرفيّ.
+          في الرسالة تُوصف الصفوف غير المُسنَدة بأنها أحكام هندسية، وتُقال كذلك صراحة.
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">app</span>
+        <h4>تطبيق حيّ كامل ظهر، وليس في أيّ وثيقة خطة</h4>
+        <p>
+          <span class="mono">app/</span> يشغّل نفس الفيزياء بجانب السيارة في الوقت الحقيقي
+          ويقدّر ما لا تبلّغ عنه: حرارة التوربين، هامش الطرق، الضرر المتراكم.
+          قراءة فقط، لا يكتب بيانات خام على القرص، و<span class="mono">36/36</span> اختبار تمرّ.
+          هذا أقوى عرض يمكن تقديمه في مناقشة بكالوريوس — وأسرع طريق لابتلاع
+          Phase D إن تُرك ينمو. يحتاج قرارًا مكتوبًا، لا إهمالًا.
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">τ</span>
+        <h4>الرقم الذي باع فكرة «نبتتين» للمشرف صار باطلًا</h4>
+        <p>
+          خارطة الطريق تبرّر البطارية بأن كنس ثابت الزمن حرّك أفضلية الـpreview من
+          <span class="mono">7.6</span> إلى <span class="mono">49.9</span> نقطة — وهذان
+          الرقمان قيسا على المحرك الرباعي الخطأ. القيم الحيّة اليوم عند حدّ
+          <span class="mono">1123 K</span> هي <span class="mono">16.5 → 18.0 → 26.0</span> نقطة.
+          الاتجاه نفسه، والحجم سُبْع ما كان. المبرّر يُعاد كتابته بالأرقام الحيّة.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="diff">
+    <div class="sec-head">
+      <span class="eyebrow">المقارنة</span>
+      <h2>الخطة القديمة ↔ الخطة الجديدة</h2>
+      <p>عشرة صفوف. العمود الباهت تاريخ، لا ادّعاء.</p>
+    </div>
+
+    <div class="void-note">
+      <b>تحذير قبل القراءة:</b> كل رقم في العمود الباهت مذكور لأنه
+      <b>بَطَل</b>، لا لأنه صحيح. تحديدًا: <span class="mono">2.8 %</span> ·
+      <span class="mono">31–82 kPa</span> · <span class="mono">168.1 min</span> ·
+      <span class="mono">8 drives</span> · <span class="mono">7.6 → 49.9 pts</span> ·
+      <span class="mono">62 % / 32 %</span> · <span class="mono">1.5 h</span>.
+      لا يُنقل أيٌّ منها إلى وثيقة أو شريحة. القيم الحيّة في
+      <a href="#numbers">جدول الأرقام</a>.
+    </div>
+
+    <div class="diff">
+      <div class="diff-head"><span>الخطة القديمة — سبتمبر، قبل التدقيق</span><span>الخطة الجديدة — 14 سبتمبر</span></div>
+
+      <div class="diff-row">
+        <div class="topic">المساهمة والسؤال</div>
+        <div class="old"><span class="k">قديم</span>معيار H/τ: متى يستحقّ شراء معلومة استباقية.</div>
+        <div class="new"><span class="k">جديد</span>بلا تغيير. هذه هي النقطة التي لا تُمَسّ.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">لماذا البطارية؟</div>
+        <div class="old"><span class="k">قديم</span>لأن المحرك «لا يصل إلا إلى H/τ ≈ 0.6»، فالبطارية هي الأداة التي تمدّ المحور مرتبتين.</div>
+        <div class="new"><span class="k">جديد</span><b>المدى لم يعد السبب.</b> كنس <span class="mono">c_turb</span> يعطي المحرك وحده <span class="mono">0.06 → 4.47</span>، وهو يبتلع مدى البطارية المتوقَّع <span class="mono">0.03 → 3.20</span>. البطارية تبقى — لكن من أجل <b>التعميم</b>: هل تنطبق نبتتان مختلفتان فيزيائيًا على منحنى واحد.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">كيف يُكنَس المحور</div>
+        <div class="old"><span class="k">قديم</span>بتغيير τ (السعة الحرارية) — محور واحد.</div>
+        <div class="new"><span class="k">جديد</span>محوران: τ كما هو، <b>و H نفسه</b> عبر جعل <span class="mono">PREVIEW_S</span> معاملًا. H هو ما يشتريه المهندس فعلًا؛ وطريقان مستقلان عبر نفس المحور = اختبار انطباق قبل وجود النبتة الثانية.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">عتبة الحماية في تجربة F</div>
+        <div class="old"><span class="k">قديم</span>المئين 80 من أثر السياسة غير المحميّة، لكل تهيئة.</div>
+        <div class="new"><span class="k">جديد</span><span class="mono">1123 K</span> ثابتة — ركبة دالة الضرر — مستوردة من <span class="mono">engine_env.TURB_PROTECT_K</span>. قاعدة المئين تنهار على سيناريو التسلّق المستمر: ثلاثة صفوف تتشبّع عند 100 % للسياستين.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">«المحاكي يطابق السيارة»</div>
+        <div class="old"><span class="k">قديم</span>Phase B مرّت برصيد حمل <span class="mono">2.8 %</span> على 22 نقطة. البوابة مغلقة، لا تُعاد.</div>
+        <div class="new"><span class="k">جديد</span>الرصيد <span class="mono">1.4 %</span> مشتقّ بصفر معاملات (و<span class="mono">1.1 %</span> بمعامل واحد) — ولا يختبر نموذج التنفّس إطلاقًا. الاختبار الحقيقي الوحيد تحت الشحن: <span class="mono">+3.0 %</span> مقابل قناة السيارة. <b>عند الحمل الجزئي لا يوجد اختبار</b> — تُكتب كحدّ، لا تُصلَح بهدوء.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">النطاقات المنشورة</div>
+        <div class="old"><span class="k">قديم</span>«8 من 11 داخل النطاق المنشور» — دليل مصرفيّ.</div>
+        <div class="new"><span class="k">جديد</span>8 من 11 كما هي، لكن <b>7 من الـ11 بلا مصدر</b>. الصف 4 يُسقَط أو يُعاد تسميته فحص اتساق داخلي. لا تُرقَّى استشهادة من الذاكرة أبدًا.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">تجميد بروتوكول التقييم</div>
+        <div class="old"><span class="k">قديم</span>الخطوة D1، بعد انتهاء Phase C.</div>
+        <div class="new"><span class="k">جديد</span><b>الآن</b>، بينما التدريب يعمل ليلًا. تكلفتها 30 دقيقة، وفعلها قبل ظهور أيّ نتيجة يلغي الإغراء من أصله بدل مقاومته.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">التطبيق الحي</div>
+        <div class="old"><span class="k">قديم</span>غير موجود في أيّ وثيقة خطة.</div>
+        <div class="new"><span class="k">جديد</span>مسار خامس: <b>عرض المناقشة + فصل قصير</b>، وميزاته مُجمَّدة اليوم. يرث مصادقة Phase B ويرث حدودها؛ لا يُسمح له بادّعاء ثقة أكثر مما كسبه المحاكي.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">الرقم الذي يُقنِع المشرف</div>
+        <div class="old"><span class="k">قديم</span>«الأفضلية تحرّكت 7.6 → 49.9 نقطة، تأرجح ×7» — مقيس على محرك رباعي خطأ.</div>
+        <div class="new"><span class="k">جديد</span><span class="mono">16.5 → 18.0 → 26.0</span> نقطة عند <span class="mono">1123 K</span>، مع الهوية: تعطيل الـpreview يُسقِط السياسة الاستباقية على التفاعلية <b>حتى العشرية</b> — <span class="mono">548.6</span> مقابل <span class="mono">548.6</span>.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">الزمن والبوابات</div>
+        <div class="old"><span class="k">قديم</span>32 أسبوعًا بتقويم: C في 7–10، D في 11–14، E في 15–18، F في 19–24. والتدريب «1.5 ساعة».</div>
+        <div class="new"><span class="k">جديد</span>بوابات بالدليل لا بالتاريخ. القيد الحقيقي ساعات معالج: <span class="mono">4.6 h</span> للبذرة × 10 تشغيلات = <span class="mono">46 h</span>، موزَّعة على خمسة أجهزة × ليلتين. هذا ما يحدّد متى تُفتح D، لا التقويم.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head">
+      <span class="eyebrow">الخطة الجديدة</span>
+      <h2>خمسة مسارات، بهذا الترتيب</h2>
+      <p>
+        المسار 1 وحده متسلسل زمنيًا لأنه ينتظر أجهزة. الأربعة الباقية تعمل
+        بالتوازي معه — وهذا هو مكسب إعادة القصّ كله.
+      </p>
+    </div>
+
+    <div class="tracks">
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">01</span>
+          <h3>التدريب — المعطِّل الوحيد</h3>
+          <span class="track-time">ليلتان · 46 ساعة معالج</span>
+        </div>
+        <ul>
+          <li>ثبّت <span class="mono">stable-baselines3</span> وأزل التعليق عن سطريه في <span class="mono">requirements.txt</span>.</li>
+          <li>الليلة: <span class="mono">python train.py --steps 50000 --seed 0</span>. النتيجة ستكون سيئة، وهذا هو المطلوب.</li>
+          <li>ثم عشر تشغيلات: خمس بذور × (مع preview / بدونه). <b>بذرة لكل شخص، يُتّفق عليها قبل أن يبدأ أحد.</b></li>
+          <li>شغّل <span class="mono">test_reward.py</span> قبل تصديق أيّ منحنى: أربع من أربع، والمحايد <span class="mono">−0.00438</span>.</li>
+        </ul>
+        <p class="gate"><b>البوابة:</b> عشرة مجلدات تشغيل، كل واحد فيه checkpoint ومنحنى يرتفع لا يستوي. الوكلاء ليسوا مطالَبين بأن يكونوا جيدين بعد.</p>
+        <p class="fallback"><b>إن لم يتقارب:</b> اخفض <span class="mono">--lr 1e-4</span> أولًا، ثم قصّر الحلقة. <b>لا تعدّل المكافأة</b> — هكذا عاد الاختراق في المرة الثانية.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">02</span>
+          <h3>جمّد العشرين حلقة الآن <span class="badge-new">أُعيد ترتيبه</span></h3>
+          <span class="track-time">30 دقيقة</span>
+        </div>
+        <ul>
+          <li>عشرون حلقة تُختار مرة واحدة: البذور، الميول، درجات الحرارة المحيطة، أوزان التفضيل.</li>
+          <li>تُكتب في ملف، تُرفَع بـcommit تقول رسالته إنها مجمَّدة، وتُعامَل كقراءة فقط.</li>
+          <li>تُنفَّذ <b>بينما</b> تشغيلات المسار 1 تعمل ليلًا — لا بعدها.</li>
+        </ul>
+        <p class="gate"><b>البوابة:</b> العشرون في version control قبل أن يرى أحد أيّ نتيجة.</p>
+        <p class="fallback"><b>لماذا قُدِّمت:</b> تغيير مجموعة الاختبار بعد رؤية النتائج هو الخطأ الوحيد الذي لا يتعافى منه هذا المشروع. اختيارها الآن يحذف الإغراء بدل أن يطلب مقاومته، والممتحن سيسأل متى اختِيرت.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">03</span>
+          <h3>اكنس <span class="mono">H</span> نفسه، لا τ فقط <span class="badge-new">جديد</span></h3>
+          <span class="track-time">نصف يوم كود · ساعة تشغيل</span>
+        </div>
+        <ul>
+          <li>حاليًا <span class="mono">PREVIEW_S = (2, 5, 15, 30)</span> ثابتة، والسياسات تقرأ الخانتين الأخيرتين. اجعلها معاملًا.</li>
+          <li>اكنس H عند τ ثابت: <span class="mono">2 / 5 / 15 / 30 / 60 / 120 s</span>، بنفس السياسات الثلاث المكتوبة يدويًا.</li>
+          <li>ارسم المجموعتين معًا: نقاط «τ متغيّر، H ثابت» ونقاط «H متغيّر، τ ثابت» على نفس محور H/τ.</li>
+        </ul>
+        <p class="gate"><b>البوابة:</b> جدول H عند <span class="mono">c_turb = 6000</span> وآخر عند <span class="mono">800</span>، ورأي مكتوب في سؤال واحد: هل ينطبق الطريقان؟</p>
+        <p class="fallback"><b>لماذا يستحق:</b> الاعتراض الأقوى على الشكل الحالي أنك حرّكت معاملًا في نموذجك، لا المعلومة. H هو المعلومة. وإن انطبق الطريقان فأنت تملك اختبار انهيار على نبتة واحدة — تأمين كامل على Phase F قبل كتابة سطر من <span class="mono">battery.py</span>.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">04</span>
+          <h3>إصلاح الأدلة</h3>
+          <span class="track-time">يوم موزَّع</span>
+        </div>
+        <ul>
+          <li><b>دقيقتان تحسم نسبة الانضغاط:</b> اقرأ القدرة المقنَّنة من لوحة السيارة. <span class="mono">285 kW</span> تعني <span class="mono">10.2:1</span>، و<span class="mono">250 kW</span> تعني <span class="mono">11.0:1</span> — وعندها نموذج الطرق يعمل بنسبة خاطئة.</li>
+          <li>الصف 4 (شرارة حدّ الطرق): أسقطه من جدول المصادقة أو أعد تسميته فحص اتساق داخلي.</li>
+          <li>اكتب في فصل الحدود، بلا تجميل: <b>لا يوجد اختبار للتنفّس عند الحمل الجزئي</b>، لأن قناتَي الضغط في السيارة كلتاهما قبل الخانق.</li>
+          <li>اعتمد <span class="mono">1123 K</span> عتبةً في كل مكان، واذكرها مع كل رقم preview.</li>
+        </ul>
+        <p class="gate"><b>البوابة:</b> كل صفّ في <span class="mono">validation_table.md</span> يحمل عمود مصدر يشير إلى <span class="mono">REFERENCES.md</span>، وكل صفّ غير مُسنَد موصوف بأنه حكم هندسي.</p>
+        <p class="fallback"><b>ملاحظة تشغيلية:</b> عند تغيير أيّ رقم، ابحث بنفسك في الشجرة عن القيمة القديمة واقرأ كل نتيجة. تشغيل أخضر لـ<span class="mono">verify_docs.py</span> يثبت فقط أن الأنماط الموجودة لم تجد شيئًا — أفلتت خمسة أسطر بهذه الطريقة في 14 سبتمبر.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">05</span>
+          <h3>قرِّر ما هو التطبيق الحي، وجمّده <span class="badge-new">جديد</span></h3>
+          <span class="track-time">اجتماع واحد</span>
+        </div>
+        <ul>
+          <li>الوضع الحالي: قراءة فقط، لا يخزّن بيانات خام، ثلاثة أنواع إنذار مفصولة بجمهورها، <span class="mono">36/36</span> اختبار تمرّ.</li>
+          <li><b>التوصية:</b> يبقى عرضًا للمناقشة + فصلًا قصيرًا يشرح المقدِّر الافتراضي — وتُجمَّد ميزاته اليوم.</li>
+          <li>يُكتب في وثيقة أنه لا يدّعي ثقة أكثر من المحاكي: 8 من 11، وثلاثة إخفاقات موثّقة، ورصيد مقيس عند <span class="mono">30–74 kPa</span> فقط.</li>
+        </ul>
+        <p class="gate"><b>البوابة:</b> سطر واحد مكتوب يقول ما هو التطبيق وما ليس هو، وقائمة ميزات مغلقة.</p>
+        <p class="fallback"><b>الخطر الحقيقي:</b> ليس أن يفشل، بل أن ينجح ويأكل الأسابيع التي تخصّ Phase D. هو رفع للسقف، والأرضية لم تُصبَّ بعد.</p>
+      </article>
+
+    </div>
+
+    <div class="sec-head later-head">
+      <span class="eyebrow">بعد بوابة D فقط</span>
+      <h3>ما يُؤجَّل عمدًا</h3>
+    </div>
+    <div class="grid3">
+      <div class="card">
+        <h4>البطارية — بمواصفة أرخص</h4>
+        <p>
+          نفس عقد <span class="mono">predict()</span>. أسقط زوج RC إن قاومك، واحتفظ بحدّ
+          Arrhenius — هو الجزء الحامل. مهمّتها الآن التعميم لا المدى، فنقطة أو
+          نقطتان على المنحنى تكفيان لاختبار الانطباق.
+        </p>
+      </div>
+      <div class="card">
+        <h4>جدول Phase D</h4>
+        <p>
+          ثلاثة خطوط أساس، عشرون حلقة مجمّدة، وسيط ومدى ربيعي على خمس بذور،
+          والـablation جنبًا إلى جنب. صفّ واحد وفقرة تحته. هذه هي الأرضية.
+        </p>
+      </div>
+      <div class="card">
+        <h4>الكتابة</h4>
+        <p>
+          فصل الحدود يُكتب <b>قبل</b> فصل النتائج. مكتوبًا أخيرًا يقرأ كاعتذار،
+          ومكتوبًا أولًا يقرأ كسيطرة على المادة.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="htau">
+    <div class="sec-head">
+      <span class="eyebrow">الحجّة التي تغيّرت</span>
+      <h2>ماذا يصل المحرك فعلًا على محور H/τ</h2>
+      <p>
+        السبب الذي بيع به قرار «نبتتين» كان أن المحرك محبوس تحت 0.6.
+        الكنس الموجود في <span class="mono">generality_test.py</span> يقول غير ذلك.
+      </p>
+    </div>
+
+    <div class="figbox">
+      <svg viewBox="0 0 760 300" role="img" aria-label="محور H على τ لوغاريتمي يقارن ما افترضته الخطة القديمة بما يصله المحرك فعلًا وبمدى البطارية المتوقع">
+        <line x1="60"  y1="40" x2="60"  y2="238" stroke="var(--grid)" stroke-width="1"></line>
+        <line x1="280" y1="40" x2="280" y2="238" stroke="var(--grid)" stroke-width="1"></line>
+        <line x1="500" y1="40" x2="500" y2="238" stroke="var(--grid)" stroke-width="1"></line>
+        <line x1="720" y1="40" x2="720" y2="238" stroke="var(--grid)" stroke-width="1"></line>
+
+        <text x="60" y="58" fill="var(--muted)" font-size="12" font-family="IBM Plex Sans Arabic, sans-serif">الخطة القديمة: «المحرك يقف عند 0.6»</text>
+        <line x1="60" y1="76" x2="451" y2="76" stroke="var(--muted)" stroke-width="7"
+              stroke-dasharray="5 4" stroke-linecap="butt" opacity=".55"></line>
+        <circle cx="451" cy="76" r="4.5" fill="var(--bg)" stroke="var(--muted)" stroke-width="2"></circle>
+
+        <text x="60" y="112" fill="var(--ember)" font-size="12" font-family="IBM Plex Sans Arabic, sans-serif">المحرك وحده، بكنس السعة الحرارية c_turb</text>
+        <line x1="231" y1="132" x2="643" y2="132" stroke="var(--ember)" stroke-width="7" stroke-linecap="round"></line>
+        <circle cx="231" cy="132" r="4.5" fill="var(--bg)" stroke="var(--ember)" stroke-width="2"></circle>
+        <circle cx="346" cy="132" r="4.5" fill="var(--bg)" stroke="var(--ember)" stroke-width="2"></circle>
+        <circle cx="451" cy="132" r="5" fill="var(--ember)"></circle>
+        <circle cx="534" cy="132" r="5" fill="var(--ember)"></circle>
+        <circle cx="643" cy="132" r="5" fill="var(--ember)"></circle>
+        <text x="451" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">26.0</text>
+        <text x="534" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">18.0</text>
+        <text x="643" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">16.5</text>
+        <text x="288" y="152" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans Arabic, sans-serif">القيد لا يُلزم هنا</text>
+
+        <text x="60" y="188" fill="var(--cool)" font-size="12" font-family="IBM Plex Sans Arabic, sans-serif">البطارية المتوقَّعة — لم تُبنَ بعد</text>
+        <line x1="165" y1="206" x2="611" y2="206" stroke="var(--cool)" stroke-width="7"
+              stroke-dasharray="2 5" stroke-linecap="round"></line>
+        <circle cx="165" cy="206" r="4.5" fill="var(--bg)" stroke="var(--cool)" stroke-width="2"></circle>
+        <circle cx="611" cy="206" r="4.5" fill="var(--bg)" stroke="var(--cool)" stroke-width="2"></circle>
+
+        <line x1="60" y1="238" x2="720" y2="238" stroke="var(--line)" stroke-width="1.5"></line>
+        <g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--muted)" text-anchor="middle">
+          <text x="60"  y="256">0.01</text>
+          <text x="280" y="256">0.1</text>
+          <text x="500" y="256">1</text>
+          <text x="720" y="256">10</text>
+        </g>
+        <text x="390" y="282" fill="var(--text)" font-size="12.5" text-anchor="middle" font-family="IBM Plex Sans Arabic, sans-serif">H / τ  ·  مقياس لوغاريتمي</text>
+      </svg>
+    </div>
+    <p class="figcap">
+      الأرقام فوق النقاط الممتلئة هي أفضلية الـpreview بالنقاط، من جدول H2 الثابت
+      عند <span class="mono">1123 K</span>: <span class="mono">26.0</span> عند
+      <span class="mono">H/τ = 0.60</span>، و<span class="mono">18.0</span> عند
+      <span class="mono">1.43</span>، و<span class="mono">16.5</span> عند
+      <span class="mono">4.47</span>. النقطتان المجوّفتان على اليسار
+      (<span class="mono">0.20</span> و<span class="mono">0.06</span>) لا تنتجان رقمًا:
+      الجسم صار ثقيلًا إلى حدّ أن الحرارة لا تبلغ الحدّ أصلًا، فلا قيد يُنتهَك.
+      مدى البطارية المرسوم مأخوذ من مواصفة خارطة الطريق نفسها
+      (τ ≈ 9–38 دقيقة، وأفق من 30 ثانية إلى 60 دقيقة).
+    </p>
+
+    <div class="grid3" style="margin-block-start:1.75rem">
+      <div class="card">
+        <h4>ما يعنيه هذا للبطارية</h4>
+        <p>
+          لا تُلغى — لكنها لم تعد «الأداة التي تجعل المعيار قابلًا للاختبار».
+          صارت النبتة الثانية التي تختبر هل ينطبق المنحنى عبر فيزياء مختلفة.
+          وهذا يسمح بمواصفة أرخص وموضع لاحق في الترتيب.
+        </p>
+      </div>
+      <div class="card">
+        <h4>ما يعنيه للاعتراض المتوقَّع</h4>
+        <p>
+          «أنت حرّكت معاملًا في نموذجك، لا المعلومة.» الردّ ليس كلامًا:
+          اكنس <span class="mono">H</span> أيضًا، وأرِ أن الطريقين يعطيان نفس المنحنى.
+          هذا هو المسار 3.
+        </p>
+      </div>
+      <div class="card">
+        <h4>ما يعنيه للبديل إذا ضاق الوقت</h4>
+        <p>
+          البديل القديم كان «ادّعاء تعميم أضعف». البديل الجديد أقوى:
+          معيار مُظهَر على نبتة واحدة عبر <b>طريقين مستقلين</b> خلال المحور —
+          وهذا أمتن من نبتة ثانية مبنية على عجل.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="now">
+    <div class="sec-head">
+      <span class="eyebrow">ابدأ هنا</span>
+      <h2>هذا الأسبوع — خمسة أفعال</h2>
+      <p>الأول والثاني ينجزان في أقل من خمس دقائق مجتمعين.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="what">
+          <code>pip install "stable-baselines3[extra]"</code>
+          <span class="sub">وأزل التعليق عن السطرين تحت «Phase C onward» في <span class="mono">requirements.txt</span>. كل ما بعد سطور الاستيراد في <span class="mono">train.py</span> لم يُنفَّذ قط.</span>
+        </div>
+        <div class="dur">2 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          اقرأ القدرة المقنَّنة من لوحة السيارة
+          <span class="sub">‏285 kW أم 250 kW. تحسم نسبة الانضغاط 10.2:1 مقابل 11.0:1، وهي مدخل في نموذج الطرق.</span>
+        </div>
+        <div class="dur">2 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          وزّع البذور الخمس بالاسم قبل أن يبدأ أحد
+          <span class="sub">وإلا انتهيتم بثلاث نسخ من البذرة 0. اطلب موافقة صاحب الجهاز — كل تشغيلة تحجز جهازًا ليلة.</span>
+        </div>
+        <div class="dur">10 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          جمّد العشرين حلقة، وارفعها بـcommit
+          <span class="sub">البذور والميول ودرجات الحرارة وأوزان التفضيل. رسالة الcommit تقول إنها مجمَّدة.</span>
+        </div>
+        <div class="dur">30 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          شغّل أول تدريب الليلة: <code>python train.py --steps 50000 --seed 0</code>
+          <span class="sub">‏4.6 ساعة. نقاط الحفظ كل 10000 خطوة، وإعادة تشغيل البذرة نفسها تكمل من نقطة الحفظ. توقّع نتيجة سيئة.</span>
+        </div>
+        <div class="dur">4.6 h</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fixed">
+    <div class="sec-head">
+      <span class="eyebrow">الثوابت</span>
+      <h2>ما لا تمسّه إعادة القصّ</h2>
+      <p>هذه ليست تفضيلات. كل واحدة منها قابلة لإسقاط المشروع بمفردها.</p>
+    </div>
+    <div class="rules">
+      <div class="rule"><b>لا كتابة إلى ECU السيارة أبدًا</b>تسجيل OBD-II للقراءة فقط. إن بدت مهمة تتطلّب الكتابة، فهي المهمة الخطأ — قُل ذلك بدل إيجاد طريقة.</div>
+      <div class="rule"><b>لا تغيّر مجموعة الاختبار بعد رؤية نتيجة</b>الخطأ الوحيد الذي لا يتعافى منه المشروع. لهذا قُدِّم تجميدها إلى الآن.</div>
+      <div class="rule"><b>لا تعدّل <span class="mono">data/</span> أو <span class="mono">logs/raw/</span> يدويًا</b>الأولى تُولَّد، والثانية قياسات.</div>
+      <div class="rule"><b>لا تقتبس رقمًا لا يطبعه سكربت</b>شغّل <span class="mono">verify_docs.py</span> أولًا — واقرأ المجموع الذي يطبعه هو، لا رقمًا محفوظًا.</div>
+      <div class="rule"><b>لا تُمرَّر هندسة افتراضية للنبتة</b>مرّر <span class="mono">geo=GEO</span> صراحة. هذه كلّفت ثلاثة أسابيع مرة واحدة.</div>
+      <div class="rule"><b>لا تُرقَّ استشهادة من الذاكرة</b>افتح المصدر واكتب الصفحة. إن بحثت وفشلت، سجّل ذلك — استشهادة ملفّقة أسوأ من ناقصة لأن لا سكربت يمسكها.</div>
+    </div>
+  </section>
+
+  <section id="numbers">
+    <div class="sec-head">
+      <span class="eyebrow">المرجع</span>
+      <h2>الأرقام الحيّة، وأيّ سكربت يطبعها</h2>
+      <p>إن اختلف هذا الجدول مع سكربت، فالسكربت هو الصحيح.</p>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead>
+          <tr><th>الكمية</th><th>القيمة اليوم</th><th>يطبعها</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>الضرر: أساس · تفاعلي · استباقي · مُعمّى</td><td class="n">829.2 · 548.6 · 437.6 · 548.6</td><td class="n">check_premise.py</td></tr>
+          <tr><td>خفض الضرر، وأفضلية الـpreview</td><td class="n">33.8 % · 47.2 % · 13.4 pts</td><td class="n">check_premise.py</td></tr>
+          <tr><td>عتبة الحماية</td><td class="n">1123 K (850 °C)</td><td class="n">engine_env.TURB_PROTECT_K</td></tr>
+          <tr><td>رصيد الحمل، k مشتقّ 0.829 · صفر معاملات</td><td class="n">1.4 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>رصيد الحمل، k مُلائَم 0.837 · معامل واحد</td><td class="n">1.1 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>البيانات: مدة · قيادات · نقاط تشغيل · مدى</td><td class="n">175.5 min · 9 · 22 · 30–74 kPa</td><td class="n">build_dataset.py</td></tr>
+          <tr><td>جدول المصادقة</td><td class="n">8 / 11 داخل النطاق</td><td class="n">validate.py</td></tr>
+          <tr><td>النطاقات ذات المصدر المفتوح</td><td class="n">2 مؤكَّد · 1 جزئي · 7 بلا مصدر</td><td class="n">REFERENCES.md</td></tr>
+          <tr><td>بوابة المكافأة: المحايد · المجوِّع</td><td class="n">−0.00438 · −0.28044</td><td class="n">test_reward.py</td></tr>
+          <tr><td>ثابت زمن التوربين (خطوة · C/UA)</td><td class="n">48.0 s · 50.3 s</td><td class="n">validate.py</td></tr>
+          <tr><td>أفضلية الـpreview عبر H/τ ‏4.47 → 0.60</td><td class="n">16.5 → 18.0 → 26.0 pts</td><td class="n">generality_test.py</td></tr>
+          <tr><td>العكس تحت الشحن مقابل قناة السيارة</td><td class="n">+3.0 % (الخام: +23.7 %)</td><td class="n">CLAUDE.md · خطأ 13</td></tr>
+          <tr><td>اختبارات التطبيق الحي</td><td class="n">36 / 36</td><td class="n">app/test_replay.py</td></tr>
+          <tr><td>تكلفة Phase C</td><td class="n">4.6 h × 10 = 46 h</td><td class="n">handoff.md</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="cut" class="last">
+    <div class="sec-head">
+      <span class="eyebrow">إن تأخّرنا</span>
+      <h2>ترتيب القصّ، مُعاد ترتيبه</h2>
+      <p>يُقرَّر الآن وببرود، حتى يصير الشهر السيئ رسالةً أصغر لا أزمة.</p>
+    </div>
+    <div class="cutlist">
+      <div class="cut"><span class="ord">1</span><span class="txt">سطح Pareto وتكييف التفضيلات<span>يسقط شكل المقايضة. RQ1 و RQ2 و RQ3 تنجو كاملة. بلا تغيير عن الخطة القديمة.</span></span></div>
+      <div class="cut"><span class="ord">2</span><span class="txt">مرجع MPC<span>يسقط الجواب التجريبي على «هل التعلّم ضروري». يُجاب تحليليًا ويُعلَن حدًّا.</span></span></div>
+      <div class="cut"><span class="ord">3</span><span class="txt">النماذج البديلة (surrogates) والتدريب عليها<span>يسقط RQ3. تدريب مباشر على النبتة، أبطأ بلا خسارة في الصحّة.</span></span></div>
+      <div class="cut"><span class="ord">4</span><span class="txt">البطارية — <b>صعدت في الترتيب</b><span>كانت الخامسة، صارت الرابعة. السبب: كنس H (المسار 3) صار يحمل التعميم الذي كانت تحمله وحدها. ما ينجو: معيار على نبتة واحدة عبر طريقين مستقلّين.</span></span></div>
+      <div class="cut"><span class="ord">5</span><span class="txt">الوكيل المتعلَّم — <b>نزل في الترتيب</b><span>كان الرابع. لا يُقصّ قبل البطارية بعد اليوم، لأنه نصف بوابة D، والبوابة هي الأرضية. النتيجة اليدوية تبقى التأمين.</span></span></div>
+      <div class="cut"><span class="ord">أبدًا</span><span class="txt">حملة السيارة، وقاعدة «لا كتابة إلى ECU»<span>الأولى هي ما يجعل المشروع على سيارة حقيقية، والثانية شرط وجوده.</span></span></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      هذه الصفحة وصف لخطة، لا مصدر للأرقام. مصدر الأرقام هو السكربتات:
+      <span class="mono">check_premise.py</span> · <span class="mono">validate.py</span> ·
+      <span class="mono">compare_log.py</span> · <span class="mono">test_reward.py</span> ·
+      <span class="mono">generality_test.py</span> · <span class="mono">verify_docs.py</span>.
+      وعند الاختلاف بين أيّ وثيقة وسكربت، السكربت هو الصحيح.
+      الشرح الكامل للمشروع في <a href="index.html">index.html</a>.
+    </p>
+  </footer>
+
+</div>
+
+<!-- ================================================================== -->
+<!-- ==========================  ENGLISH  ============================= -->
+<!-- ================================================================== -->
+<div data-lang="en">
+
+  <header class="hero">
+    <span class="eyebrow">engine under supervision · 14 september 2026</span>
+    <h1>The destination has not moved. The order has.</h1>
+    <p class="lede">
+      The old plan was written believing four things that are no longer true. The
+      contribution itself — the <span class="mono">H/τ</span> criterion — is untouched,
+      and the gate that makes this a passing project is still Phase D. What changed is
+      which evidence proves what, and which work has to come before which.
+    </p>
+    <div class="now">
+      <span class="lbl">next move · now</span>
+      <span class="cmd">pip install "stable-baselines3[extra]"</span>
+      <span class="note">Two minutes. It is the only thing blocking everything after it — and it has not been done.</span>
+    </div>
+    <p class="date">
+      Written after reading the repository end to end: <span class="mono">CLAUDE.md</span> ·
+      <span class="mono">CHECKPOINT.md</span> · <span class="mono">handoff.md</span> ·
+      <span class="mono">REFERENCES.md</span> · <span class="mono">generality_test.py</span> ·
+      <span class="mono">app/</span> · and the two planning documents,
+      <span class="mono">Roadmap_Two_Plants.pdf</span> and
+      <span class="mono">What_To_Do_In_Order.pdf</span>.
+    </p>
+  </header>
+
+  <section id="tldr-en">
+    <div class="sec-head">
+      <span class="eyebrow">the short version</span>
+      <h2>Three sentences, then the detail</h2>
+    </div>
+    <div class="grid3">
+      <div class="card">
+        <h4>What did not change</h4>
+        <p class="big">H / τ</p>
+        <p>
+          The question, the falsifiable claim, and the passing gate: a validated
+          simulator, an agent beating two baselines, and an ablation isolating preview.
+          All of it stands.
+        </p>
+      </div>
+      <div class="card">
+        <h4>What broke underneath the old plan</h4>
+        <p class="big">4 assumptions</p>
+        <p>
+          "the load residual proves the simulator", "the engine cannot pass H/τ ≈ 0.6",
+          "eleven published bands", and "7.6 → 49.9 points". Each one either fell or
+          changed meaning.
+        </p>
+      </div>
+      <div class="card">
+        <h4>What was added</h4>
+        <p class="big">2 new tracks</p>
+        <p>
+          Sweep the preview horizon <span class="mono">H</span> itself, not only τ — and
+          repair the evidence after the citation pass. Plus one decision nobody has made:
+          what the live app in <span class="mono">app/</span> is for.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="why-en">
+    <div class="sec-head">
+      <span class="eyebrow">why</span>
+      <h2>Five things moved under the plan</h2>
+      <p>Each one is recorded in the repository with evidence, not opinion. Every figure here is printed by a script.</p>
+    </div>
+    <div class="why">
+
+      <div class="why-item">
+        <span class="tag">12</span>
+        <h4>The residual we called validation cannot see the model it was said to validate</h4>
+        <p>
+          <span class="mono">map_from_airflow()</span> inverts the same relation
+          <span class="mono">run_cycle()</span> uses, so volumetric efficiency, residual
+          fraction and charge temperature all cancel out of the comparison. Forcing
+          <span class="mono">eta_v</span> to <span class="mono">0.50</span>, then to
+          <span class="mono">1.20</span>, leaves the residual at
+          <span class="mono">1.374 %</span>. Delete the breathing model entirely and the
+          number does not move. It is a consistency check between two ECU channels — which
+          earns three real things, but "the simulator matches the car" is not one of them.
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">13</span>
+        <h4>The charge-temperature channel was a compressor outlet</h4>
+        <p>
+          <span class="mono">Intake air temperature before throttle valve</span> reads
+          <span class="mono">149 °C</span> under boost. The B58 carries its cooler inside
+          the intake manifold, downstream of the throttle, so "before throttle" is before
+          the cooler. Correcting it moved the operating-point span to
+          <span class="mono">30–74 kPa</span> and the enrichment gate to
+          <span class="mono">180 kPa</span>, and brought the boosted inversion from
+          <span class="mono">+23.7 %</span> to <span class="mono">+3.0 %</span> against the
+          car's own boost channel. <b>The breathing model was cleared, not convicted.</b>
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">14/9</span>
+        <h4>Seven of the eleven "published" bands have no source</h4>
+        <p>
+          The citation pass opened the sources row by row: two confirmed to a page, one
+          partial, one measured from our own logs, and <b>seven with no source at all</b> —
+          including row 4, the knock-limited spark, which a deliberate search failed to
+          support. The old plan treats "8 of 11" as banked evidence. In the thesis, an
+          unsourced row is an engineering-judgement band, and it says so.
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">app</span>
+        <h4>A complete live application appeared, and it is in no planning document</h4>
+        <p>
+          <span class="mono">app/</span> runs the same physics alongside the car in real
+          time and estimates what the car cannot report: turbine temperature, knock margin,
+          accumulated damage. Read-only, no raw data written to disk,
+          <span class="mono">36/36</span> tests passing. It is the strongest demonstration
+          available in a BSc defence — and the fastest way to eat Phase D if it is left to
+          grow. It needs a written decision, not neglect.
+        </p>
+      </div>
+
+      <div class="why-item">
+        <span class="tag">τ</span>
+        <h4>The number that sold the two-plant decision is void</h4>
+        <p>
+          The roadmap justifies the battery by a sweep that moved the preview advantage from
+          <span class="mono">7.6</span> to <span class="mono">49.9</span> points — both
+          measured on the wrong four-cylinder engine. Today, at the
+          <span class="mono">1123 K</span> limit, the live figures are
+          <span class="mono">16.5 → 18.0 → 26.0</span> points. Same direction, one seventh
+          the size. Rewrite the argument with the live numbers and tell the supervisor.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="diff-en">
+    <div class="sec-head">
+      <span class="eyebrow">the comparison</span>
+      <h2>Old plan ↔ new plan</h2>
+      <p>Ten rows. The faded column is history, not a claim.</p>
+    </div>
+
+    <div class="void-note">
+      <b>Read this first:</b> every figure in the faded column appears because it is
+      <b>void</b>, not because it is correct. Specifically:
+      <span class="mono">2.8 %</span> · <span class="mono">31–82 kPa</span> ·
+      <span class="mono">168.1 min</span> · <span class="mono">8 drives</span> ·
+      <span class="mono">7.6 → 49.9 pts</span> · <span class="mono">62 % / 32 %</span> ·
+      <span class="mono">1.5 h</span>. None of them goes into a document or a slide. The
+      live values are in <a href="#numbers-en">the numbers table</a>.
+    </div>
+
+    <div class="diff">
+      <div class="diff-head"><span>old plan — september, before the audits</span><span>new plan — 14 september</span></div>
+
+      <div class="diff-row">
+        <div class="topic">The contribution and the question</div>
+        <div class="old"><span class="k">old</span>The H/τ criterion: when preview information is worth acquiring at all.</div>
+        <div class="new"><span class="k">new</span>Unchanged. This is the part nothing is allowed to touch.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">Why the battery?</div>
+        <div class="old"><span class="k">old</span>Because the engine "can only reach H/τ ≈ 0.6", so the battery is the instrument that extends the axis by two orders of magnitude.</div>
+        <div class="new"><span class="k">new</span><b>Range is no longer the reason.</b> Sweeping <span class="mono">c_turb</span> gives the engine alone <span class="mono">0.06 → 4.47</span>, which swallows the battery's expected <span class="mono">0.03 → 3.20</span>. The battery stays — but for <b>generality</b>: do two physically different plants fall on one curve.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">How the axis gets swept</div>
+        <div class="old"><span class="k">old</span>By changing τ (the heat capacity) — one axis.</div>
+        <div class="new"><span class="k">new</span>Two axes: τ as before, <b>and H itself</b>, by making <span class="mono">PREVIEW_S</span> a parameter. H is what an engineer actually buys, and two independent routes through the same axis is a collapse test before a second plant exists.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">The protection threshold in Phase F</div>
+        <div class="old"><span class="k">old</span>The 80th percentile of the unprotected policy's own trace, per configuration.</div>
+        <div class="new"><span class="k">new</span>A fixed <span class="mono">1123 K</span> — the knee of the damage term — imported from <span class="mono">engine_env.TURB_PROTECT_K</span>. The percentile rule collapses on a sustained climb: three rows saturate at 100 % for both policies.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">"The simulator matches the car"</div>
+        <div class="old"><span class="k">old</span>Phase B passed on a <span class="mono">2.8 %</span> load residual over 22 points. Gate closed, do not reopen.</div>
+        <div class="new"><span class="k">new</span><span class="mono">1.4 %</span> derived with zero free parameters (<span class="mono">1.1 %</span> with one) — and it tests no part of the breathing model. The only real test is under boost: <span class="mono">+3.0 %</span> against the car's own channel. <b>At part load there is no test at all</b> — state it as a limitation rather than fixing it quietly.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">The published bands</div>
+        <div class="old"><span class="k">old</span>"8 of 11 inside the published band" — banked evidence.</div>
+        <div class="new"><span class="k">new</span>Still 8 of 11, but <b>7 of the 11 have no source</b>. Row 4 is dropped or relabelled an internal consistency check. Never promote a citation from memory.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">Freezing the evaluation protocol</div>
+        <div class="old"><span class="k">old</span>Step D1, after Phase C finishes.</div>
+        <div class="new"><span class="k">new</span><b>Now</b>, while the training runs overnight. It costs 30 minutes, and doing it before any result exists removes the temptation instead of asking anyone to resist it.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">The live application</div>
+        <div class="old"><span class="k">old</span>Absent from every planning document.</div>
+        <div class="new"><span class="k">new</span>A fifth track: <b>the defence demonstration plus a short chapter</b>, with its feature set frozen today. It inherits Phase B's validation and Phase B's limits; it is not allowed to imply more confidence than the simulator earned.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">The number that convinces the supervisor</div>
+        <div class="old"><span class="k">old</span>"The advantage moved 7.6 → 49.9 points, a 7× swing" — measured on the wrong engine.</div>
+        <div class="new"><span class="k">new</span><span class="mono">16.5 → 18.0 → 26.0</span> points at <span class="mono">1123 K</span>, carried by the identity: disabling preview collapses the predictive policy onto the reactive one <b>to the decimal</b> — <span class="mono">548.6</span> against <span class="mono">548.6</span>.</div>
+      </div>
+
+      <div class="diff-row">
+        <div class="topic">Time and gates</div>
+        <div class="old"><span class="k">old</span>32 calendar weeks: C in 7–10, D in 11–14, E in 15–18, F in 19–24. And training at "1.5 hours".</div>
+        <div class="new"><span class="k">new</span>Gates by evidence, not by date. The real constraint is CPU hours: <span class="mono">4.6 h</span> per seed × 10 runs = <span class="mono">46 h</span>, across five machines over two nights. That is what decides when D opens, not the calendar.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="plan-en">
+    <div class="sec-head">
+      <span class="eyebrow">the new plan</span>
+      <h2>Five tracks, in this order</h2>
+      <p>
+        Only track 1 is sequential, because it waits on machines. The other four run
+        alongside it — and that is the whole gain from re-cutting the plan.
+      </p>
+    </div>
+
+    <div class="tracks">
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">01</span>
+          <h3>Training — the only blocker</h3>
+          <span class="track-time">2 nights · 46 CPU-hours</span>
+        </div>
+        <ul>
+          <li>Install <span class="mono">stable-baselines3</span> and uncomment its two lines in <span class="mono">requirements.txt</span>.</li>
+          <li>Tonight: <span class="mono">python train.py --steps 50000 --seed 0</span>. The result will be poor, and that is the point.</li>
+          <li>Then ten runs: five seeds × (preview / no-preview). <b>One seed per person, agreed before anyone starts.</b></li>
+          <li>Run <span class="mono">test_reward.py</span> before believing any curve: four of four, neutral at <span class="mono">−0.00438</span>.</li>
+        </ul>
+        <p class="gate"><b>Gate:</b> ten run directories, each with a checkpoint and a learning curve that rises rather than going sideways. The agents do not have to be good yet.</p>
+        <p class="fallback"><b>If it will not converge:</b> lower <span class="mono">--lr 1e-4</span> first, then shorten the episode. <b>Do not edit the reward</b> — that is how the hack came back the second time.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">02</span>
+          <h3>Freeze the twenty episodes now <span class="badge-new">re-ordered</span></h3>
+          <span class="track-time">30 minutes</span>
+        </div>
+        <ul>
+          <li>Twenty episodes chosen once: seeds, grades, ambient temperatures, preference weights.</li>
+          <li>Written into a file, committed with a message saying they are frozen, then treated as read-only.</li>
+          <li>Done <b>while</b> track 1's runs are going overnight — not after them.</li>
+        </ul>
+        <p class="gate"><b>Gate:</b> the twenty are in version control before anyone has seen a result.</p>
+        <p class="fallback"><b>Why it moved earlier:</b> changing the test set after seeing results is the one mistake this project cannot recover from. Choosing now deletes the temptation instead of requiring resistance to it — and an examiner will ask when it was chosen.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">03</span>
+          <h3>Sweep <span class="mono">H</span> itself, not only τ <span class="badge-new">new</span></h3>
+          <span class="track-time">half a day of code · one hour of runs</span>
+        </div>
+        <ul>
+          <li>Today <span class="mono">PREVIEW_S = (2, 5, 15, 30)</span> is fixed and the policies read the last two entries. Make it a parameter.</li>
+          <li>Sweep H at fixed τ: <span class="mono">2 / 5 / 15 / 30 / 60 / 120 s</span>, using the same three hand-written policies.</li>
+          <li>Plot both sets together: "τ varied, H fixed" points and "H varied, τ fixed" points on the same H/τ axis.</li>
+        </ul>
+        <p class="gate"><b>Gate:</b> an H table at <span class="mono">c_turb = 6000</span> and another at <span class="mono">800</span>, plus a written answer to one question: do the two routes overlap?</p>
+        <p class="fallback"><b>Why it is worth it:</b> the strongest objection to the current figure is that you varied a parameter of your own model, not the information. H <em>is</em> the information. And if the two routes overlap you hold a collapse test on a single plant — full insurance on Phase F before a line of <span class="mono">battery.py</span> is written.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">04</span>
+          <h3>Repair the evidence</h3>
+          <span class="track-time">one day, spread out</span>
+        </div>
+        <ul>
+          <li><b>Two minutes settles the compression ratio:</b> read the rated output off the car's plate. <span class="mono">285 kW</span> means <span class="mono">10.2:1</span>; <span class="mono">250 kW</span> means <span class="mono">11.0:1</span> — and then the knock model is running the wrong ratio.</li>
+          <li>Row 4 (knock-limited spark): drop it from the validation table or relabel it an internal consistency check.</li>
+          <li>Write it plainly in the limitations: <b>there is no part-load test of the breathing model</b>, because both logged pressure channels sit before the throttle.</li>
+          <li>Adopt <span class="mono">1123 K</span> as the threshold everywhere, and quote it with every preview figure.</li>
+        </ul>
+        <p class="gate"><b>Gate:</b> every row of <span class="mono">validation_table.md</span> carries a source column pointing at <span class="mono">REFERENCES.md</span>, and every unsourced row is described as engineering judgement.</p>
+        <p class="fallback"><b>Working note:</b> when a figure changes, grep the tree for the old value yourself and read every hit. A green <span class="mono">verify_docs.py</span> proves only that the patterns which exist found nothing — five lines escaped that way on 14 September.</p>
+      </article>
+
+      <article class="track">
+        <div class="track-top">
+          <span class="track-n">05</span>
+          <h3>Decide what the live app is, and freeze it <span class="badge-new">new</span></h3>
+          <span class="track-time">one meeting</span>
+        </div>
+        <ul>
+          <li>Where it stands: read-only, no raw data stored, three alert types separated by audience, <span class="mono">36/36</span> tests passing.</li>
+          <li><b>Recommendation:</b> keep it as the defence demonstration plus a short chapter on the virtual sensor — and freeze its feature set today.</li>
+          <li>Write down that it claims no more confidence than the simulator: 8 of 11, three documented misses, and a residual measured only at <span class="mono">30–74 kPa</span>.</li>
+        </ul>
+        <p class="gate"><b>Gate:</b> one written line saying what the app is and what it is not, and a closed feature list.</p>
+        <p class="fallback"><b>The real risk:</b> not that it fails, but that it succeeds and eats the weeks that belong to Phase D. It raises the ceiling; the floor has not been poured yet.</p>
+      </article>
+
+    </div>
+
+    <div class="sec-head later-head">
+      <span class="eyebrow">after gate D only</span>
+      <h3>What is deliberately deferred</h3>
+    </div>
+    <div class="grid3">
+      <div class="card">
+        <h4>The battery — at a cheaper spec</h4>
+        <p>
+          The same <span class="mono">predict()</span> contract. Drop the RC pair if it
+          fights you and keep the Arrhenius term — that is the load-bearing part. Its job
+          is generality now, not range, so one or two points on the curve are enough to
+          test the collapse.
+        </p>
+      </div>
+      <div class="card">
+        <h4>The Phase D table</h4>
+        <p>
+          Three baselines, twenty frozen episodes, median and interquartile range over
+          five seeds, and the ablation side by side. One table, one paragraph under it.
+          That is the floor.
+        </p>
+      </div>
+      <div class="card">
+        <h4>The writing</h4>
+        <p>
+          The limitations chapter is written <b>before</b> the results chapter. Written
+          last it reads as an apology; written first it reads as control of the material.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="htau-en">
+    <div class="sec-head">
+      <span class="eyebrow">the argument that changed</span>
+      <h2>What the engine actually reaches on the H/τ axis</h2>
+      <p>
+        The two-plant decision was sold on the engine being stuck below 0.6. The sweep
+        already sitting in <span class="mono">generality_test.py</span> says otherwise.
+      </p>
+    </div>
+
+    <div class="figbox">
+      <svg viewBox="0 0 760 300" role="img" aria-label="A logarithmic H over tau axis comparing what the old plan assumed, what the engine actually spans, and the battery's expected range">
+        <line x1="60"  y1="40" x2="60"  y2="238" stroke="var(--grid)" stroke-width="1"></line>
+        <line x1="280" y1="40" x2="280" y2="238" stroke="var(--grid)" stroke-width="1"></line>
+        <line x1="500" y1="40" x2="500" y2="238" stroke="var(--grid)" stroke-width="1"></line>
+        <line x1="720" y1="40" x2="720" y2="238" stroke="var(--grid)" stroke-width="1"></line>
+
+        <text x="60" y="58" fill="var(--muted)" font-size="12" font-family="IBM Plex Sans, sans-serif">old plan: "the engine stops at 0.6"</text>
+        <line x1="60" y1="76" x2="451" y2="76" stroke="var(--muted)" stroke-width="7"
+              stroke-dasharray="5 4" stroke-linecap="butt" opacity=".55"></line>
+        <circle cx="451" cy="76" r="4.5" fill="var(--bg)" stroke="var(--muted)" stroke-width="2"></circle>
+
+        <text x="60" y="112" fill="var(--ember)" font-size="12" font-family="IBM Plex Sans, sans-serif">the engine alone, sweeping the turbine heat capacity c_turb</text>
+        <line x1="231" y1="132" x2="643" y2="132" stroke="var(--ember)" stroke-width="7" stroke-linecap="round"></line>
+        <circle cx="231" cy="132" r="4.5" fill="var(--bg)" stroke="var(--ember)" stroke-width="2"></circle>
+        <circle cx="346" cy="132" r="4.5" fill="var(--bg)" stroke="var(--ember)" stroke-width="2"></circle>
+        <circle cx="451" cy="132" r="5" fill="var(--ember)"></circle>
+        <circle cx="534" cy="132" r="5" fill="var(--ember)"></circle>
+        <circle cx="643" cy="132" r="5" fill="var(--ember)"></circle>
+        <text x="451" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">26.0</text>
+        <text x="534" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">18.0</text>
+        <text x="643" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">16.5</text>
+        <text x="288" y="152" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans, sans-serif">constraint never binds here</text>
+
+        <text x="60" y="188" fill="var(--cool)" font-size="12" font-family="IBM Plex Sans, sans-serif">the battery's expected range — not built yet</text>
+        <line x1="165" y1="206" x2="611" y2="206" stroke="var(--cool)" stroke-width="7"
+              stroke-dasharray="2 5" stroke-linecap="round"></line>
+        <circle cx="165" cy="206" r="4.5" fill="var(--bg)" stroke="var(--cool)" stroke-width="2"></circle>
+        <circle cx="611" cy="206" r="4.5" fill="var(--bg)" stroke="var(--cool)" stroke-width="2"></circle>
+
+        <line x1="60" y1="238" x2="720" y2="238" stroke="var(--line)" stroke-width="1.5"></line>
+        <g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--muted)" text-anchor="middle">
+          <text x="60"  y="256">0.01</text>
+          <text x="280" y="256">0.1</text>
+          <text x="500" y="256">1</text>
+          <text x="720" y="256">10</text>
+        </g>
+        <text x="390" y="282" fill="var(--text)" font-size="12.5" text-anchor="middle" font-family="IBM Plex Sans, sans-serif">H / τ  ·  logarithmic</text>
+      </svg>
+    </div>
+    <p class="figcap">
+      The figures above the filled dots are the preview edge in points, from the
+      fixed-limit H2 table at <span class="mono">1123 K</span>:
+      <span class="mono">26.0</span> at <span class="mono">H/τ = 0.60</span>,
+      <span class="mono">18.0</span> at <span class="mono">1.43</span>, and
+      <span class="mono">16.5</span> at <span class="mono">4.47</span>. The two hollow dots
+      on the left (<span class="mono">0.20</span> and <span class="mono">0.06</span>) yield
+      no figure: the component is massive enough that the temperature never reaches the
+      limit, so there is no constraint to violate. The battery band is drawn from the
+      roadmap's own spec (τ ≈ 9–38 min, horizons from 30 s to 60 min).
+    </p>
+
+    <div class="grid3" style="margin-block-start:1.75rem">
+      <div class="card">
+        <h4>What this means for the battery</h4>
+        <p>
+          It is not cancelled — but it is no longer "the instrument that makes the
+          criterion testable". It is the second plant that tests whether the curve holds
+          across different physics. That allows a cheaper spec and a later slot.
+        </p>
+      </div>
+      <div class="card">
+        <h4>What it means for the expected objection</h4>
+        <p>
+          "You varied a parameter of your model, not the information." The answer is not
+          words: sweep <span class="mono">H</span> as well and show that both routes give
+          the same curve. That is track 3.
+        </p>
+      </div>
+      <div class="card">
+        <h4>What it means for the fallback</h4>
+        <p>
+          The old fallback was "a weaker generality claim". The new one is stronger: a
+          criterion demonstrated on one plant through <b>two independent routes</b> along
+          the axis — sturdier than a second plant built in a hurry.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="now-en">
+    <div class="sec-head">
+      <span class="eyebrow">start here</span>
+      <h2>This week — five actions</h2>
+      <p>The first two take under five minutes together.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="what">
+          <code>pip install "stable-baselines3[extra]"</code>
+          <span class="sub">Then uncomment the two lines under "Phase C onward" in <span class="mono">requirements.txt</span>. Nothing past the import block in <span class="mono">train.py</span> has ever been executed.</span>
+        </div>
+        <div class="dur">2 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          Read the rated output off the car's plate
+          <span class="sub">285 kW or 250 kW. It settles 10.2:1 against 11.0:1, and the compression ratio is an input to the knock model.</span>
+        </div>
+        <div class="dur">2 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          Assign the five seeds by name before anyone starts
+          <span class="sub">Otherwise you end up with three copies of seed 0. Get the owner's go-ahead too — each run occupies a machine for a night.</span>
+        </div>
+        <div class="dur">10 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          Freeze the twenty episodes and commit them
+          <span class="sub">Seeds, grades, ambient temperatures, preference weights. The commit message says they are frozen.</span>
+        </div>
+        <div class="dur">30 min</div>
+      </div>
+      <div class="step">
+        <div class="what">
+          Start the first training tonight: <code>python train.py --steps 50000 --seed 0</code>
+          <span class="sub">4.6 hours. Checkpoints every 10,000 steps, and re-running the same seed resumes from its checkpoint. Expect a poor result.</span>
+        </div>
+        <div class="dur">4.6 h</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fixed-en">
+    <div class="sec-head">
+      <span class="eyebrow">fixed</span>
+      <h2>What re-cutting the plan does not touch</h2>
+      <p>These are not preferences. Each one can sink the project on its own.</p>
+    </div>
+    <div class="rules">
+      <div class="rule"><b>Never write to the vehicle's ECU</b>Read-only OBD-II logging. If a task seems to require writing, it is the wrong task — say so rather than finding a way.</div>
+      <div class="rule"><b>Never change the test set after seeing a result</b>The one mistake this project cannot recover from. That is why freezing it moved to now.</div>
+      <div class="rule"><b>Never hand-edit <span class="mono">data/</span> or <span class="mono">logs/raw/</span></b>The first is generated; the second is measurement.</div>
+      <div class="rule"><b>Never quote a number no script prints</b>Run <span class="mono">verify_docs.py</span> first — and read the total it prints, not one remembered from a document.</div>
+      <div class="rule"><b>Never rely on a default plant geometry</b>Pass <span class="mono">geo=GEO</span> explicitly. This cost three weeks once.</div>
+      <div class="rule"><b>Never promote a citation from memory</b>Open the source and write down the page. If you looked and failed, record that — a fabricated citation is worse than a missing one, because no script can catch it.</div>
+    </div>
+  </section>
+
+  <section id="numbers-en">
+    <div class="sec-head">
+      <span class="eyebrow">reference</span>
+      <h2>The live numbers, and which script prints each</h2>
+      <p>Where this table disagrees with a script, the script is right.</p>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead>
+          <tr><th>quantity</th><th>value today</th><th>printed by</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Damage: baseline · reactive · predictive · blinded</td><td class="n">829.2 · 548.6 · 437.6 · 548.6</td><td class="n">check_premise.py</td></tr>
+          <tr><td>Damage reduction, and the preview edge</td><td class="n">33.8 % · 47.2 % · 13.4 pts</td><td class="n">check_premise.py</td></tr>
+          <tr><td>Protection trigger</td><td class="n">1123 K (850 °C)</td><td class="n">engine_env.TURB_PROTECT_K</td></tr>
+          <tr><td>Load residual, k derived 0.829 · zero free parameters</td><td class="n">1.4 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>Load residual, k fitted 0.837 · one parameter</td><td class="n">1.1 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>Dataset: minutes · drives · operating points · span</td><td class="n">175.5 min · 9 · 22 · 30–74 kPa</td><td class="n">build_dataset.py</td></tr>
+          <tr><td>Validation table</td><td class="n">8 / 11 inside band</td><td class="n">validate.py</td></tr>
+          <tr><td>Bands with an opened source</td><td class="n">2 confirmed · 1 partial · 7 none</td><td class="n">REFERENCES.md</td></tr>
+          <tr><td>Reward gate: neutral · starver</td><td class="n">−0.00438 · −0.28044</td><td class="n">test_reward.py</td></tr>
+          <tr><td>Turbine time constant (step · C/UA)</td><td class="n">48.0 s · 50.3 s</td><td class="n">validate.py</td></tr>
+          <tr><td>Preview edge across H/τ 4.47 → 0.60</td><td class="n">16.5 → 18.0 → 26.0 pts</td><td class="n">generality_test.py</td></tr>
+          <tr><td>Boosted inversion against the car's channel</td><td class="n">+3.0 % (raw sensor: +23.7 %)</td><td class="n">CLAUDE.md · mistake 13</td></tr>
+          <tr><td>Live app tests</td><td class="n">36 / 36</td><td class="n">app/test_replay.py</td></tr>
+          <tr><td>Phase C cost</td><td class="n">4.6 h × 10 = 46 h</td><td class="n">handoff.md</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="cut-en" class="last">
+    <div class="sec-head">
+      <span class="eyebrow">if we fall behind</span>
+      <h2>The cut order, re-ordered</h2>
+      <p>Decided now and in cold blood, so a bad month becomes a smaller thesis rather than a panic.</p>
+    </div>
+    <div class="cutlist">
+      <div class="cut"><span class="ord">1st</span><span class="txt">Pareto front and preference conditioning<span>Lose the trade-off figure. RQ1, RQ2 and RQ3 all survive intact. Unchanged from the old plan.</span></span></div>
+      <div class="cut"><span class="ord">2nd</span><span class="txt">The MPC oracle<span>Lose the empirical answer to "is learning necessary". Answer it analytically and flag it as a limitation.</span></span></div>
+      <div class="cut"><span class="ord">3rd</span><span class="txt">Surrogate ensembles → train on the plant directly<span>Lose RQ3. Slower training, no loss of validity.</span></span></div>
+      <div class="cut"><span class="ord">4th</span><span class="txt">The battery — <b>moved up the cut list</b><span>It was 5th; it is now 4th. The reason: sweeping H (track 3) now carries the generality argument the battery used to carry alone. What survives: a criterion on one plant through two independent routes.</span></span></div>
+      <div class="cut"><span class="ord">5th</span><span class="txt">The learned agent — <b>moved down</b><span>It was 4th. It is no longer cut before the battery, because it is half of gate D, and gate D is the floor. The hand-policy result stays as the insurance.</span></span></div>
+      <div class="cut"><span class="ord">never</span><span class="txt">The vehicle campaign, and the no-writing-to-the-ECU rule<span>The first is what makes this a real-vehicle project; the second is a condition of its existence.</span></span></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      This page describes a plan; it is not a source for numbers. The scripts are:
+      <span class="mono">check_premise.py</span> · <span class="mono">validate.py</span> ·
+      <span class="mono">compare_log.py</span> · <span class="mono">test_reward.py</span> ·
+      <span class="mono">generality_test.py</span> · <span class="mono">verify_docs.py</span>.
+      Where any document and a script disagree, the script is right. The full explanation
+      of the project itself is in <a href="index.html">index.html</a>.
+    </p>
+  </footer>
+
+</div>
+
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var body = document.body;
+  var themeBtn = document.getElementById('themeToggle');
+  var langBtn = document.getElementById('langToggle');
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+  /* ---------------------------------------------------------- theme */
+  function themeNow() {
+    var s = root.getAttribute('data-theme');
+    if (s) return s;
+    return mq.matches ? 'dark' : 'light';
+  }
+  function themeLabel() {
+    var dark = themeNow() === 'dark';
+    themeBtn.textContent = LANG === 'ar'
+      ? (dark ? 'الوضع الفاتح' : 'الوضع الداكن')
+      : (dark ? 'Light' : 'Dark');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  try {
+    var st = localStorage.getItem('es-theme');
+    if (st === 'dark' || st === 'light') root.setAttribute('data-theme', st);
+  } catch (e) {}
+
+  themeBtn.addEventListener('click', function () {
+    var next = themeNow() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('es-theme', next); } catch (e) {}
+    themeLabel();
+  });
+
+  /* ----------------------------------------------------------- lang */
+  var LANG = 'ar';
+  try {
+    var sl = localStorage.getItem('es-lang');
+    if (sl === 'ar' || sl === 'en') LANG = sl;
+  } catch (e) {}
+
+  function applyLang(l, scroll) {
+    LANG = l;
+    body.setAttribute('data-lang', l);
+    body.setAttribute('lang', l);
+    body.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+    langBtn.textContent = l === 'ar' ? 'English' : 'العربية';
+    langBtn.setAttribute('aria-label', l === 'ar' ? 'Switch to English' : 'التبديل إلى العربية');
+    try { localStorage.setItem('es-lang', l); } catch (e) {}
+    themeLabel();
+    if (scroll) window.scrollTo(0, 0);
+  }
+
+  langBtn.addEventListener('click', function () {
+    applyLang(LANG === 'ar' ? 'en' : 'ar', true);
+  });
+
+  applyLang(LANG, false);
+})();
+</script>
