@@ -50,7 +50,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary result only, from hand-written policies |
 | G · writing | not started |
-| **APP · the live supervisor** | **working, tested, and not on the critical path.** `app/` runs this same physics beside the car in real time and estimates turbine temperature, which the vehicle has no sensor for. 46 of 46 replay checks pass. It is a SECOND DELIVERABLE, not a substitute for Phase D — see below |
+| **APP · the live supervisor** | **runs, and has six known bugs.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its own suite passes 46 of 46 — and the 14 September audit found six defects in it anyway, one of them feeding the driver-facing alerts. **Read `AUDIT.md`, and the audit section below, before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
 
 **Where the app sits, and what it must not be allowed to become.** The app is
 the demonstrable, showable half of this project and it will be the first thing
@@ -506,6 +506,42 @@ Two rules follow, and neither is optional:
 
 Run `verify_docs.py` immediately after unpacking any release. It is now the
 thing that would have caught this on the day it shipped.
+
+**14 September: a third recurrence, and it names the two holes the checker
+still has.** `pull01` took the manifest from eight drives and 168.1 minutes to
+**nine and 175.5**. Seventeen lines were swept to the new figure. **Five were
+not**, and they escaped by two different routes, both worth knowing:
+
+- **Three escaped the regex**, because the patterns are anchored. The
+  dataset-size pattern needs the words *pooled*, *dataset*, *manifest* or a
+  drive count within thirty characters of the figure, so
+  `REFERENCES.md`'s "168.1 minutes of OBD-II logs from our own car" and
+  `CHECKPOINT.md`'s "30–74 kPa, 168.1 min." matched nothing. An anchored
+  pattern is the right trade — a loose one reported the thermal fit's "three
+  drives (80 minutes)" as a wrong total — but it means **a figure written in
+  an unusual sentence is invisible to the checker.**
+- **Two escaped inside a `RETIRED-OK` paragraph.** The marker exempts its
+  whole paragraph, and in `validate.py` and `build_dataset.py` a **live**
+  claim about the current dataset sat in the same paragraph as the retired
+  figure the marker was there for. The exemption is a blunt instrument: it
+  cannot tell the historical sentence from the current one beside it.
+
+**And nothing in `RETIRED` was guarding 168.1 at all** — the seven-drive entry
+still named "eight drives, 168.1 minutes" as the value to use instead, so the
+list was pointing at a figure that had itself been superseded. A retired-value
+list has to be swept when the value that replaced it moves on.
+
+Fixed: the five lines carry the current figure, the seven-drive entry points
+at nine drives, and `168.1` is now a retired pattern in its own right. The
+pattern deliberately does **not** match "eight drives" on its own, because
+the enrichment map and the compressor fit genuinely rest on eight drives of
+samples: `pull01` adds 7.5 minutes and **zero** samples, so every figure fitted
+to samples is unchanged and those sentences are still true.
+
+**The rule that comes out of three recurrences:** when a figure changes,
+grep the whole tree for the OLD value yourself and read every hit, then add
+it to `RETIRED`. Do not trust a green run to prove the sweep was complete —
+a green run proves only that the patterns that exist found nothing.
 
 ### 12. A residual that could not see the thing it was said to validate
 
@@ -1051,6 +1087,43 @@ limitation above applies to it word for word. It adds these:
 - **The alert counts are not evidence.** 13 thermal / 0 mismatch / 19 novel on
   `7475b5d7` is a property of thresholds this project chose, pinned so that a
   regression is visible. It is not a measurement of the car.
+
+### THE 14 SEPTEMBER AUDIT FOUND SIX BUGS IN `app/`, AND THE APP'S OWN TESTS PASS ANYWAY
+
+`AUDIT.md` is a full technical review of this branch. **Read it before quoting
+anything the app prints.** It is the most important document added this week and
+it disagrees with the confident tone of the section above.
+
+Six of its findings are against `app/`, and the app's own suite reports 46 of 46
+while every one of them is live. That is the point worth internalising: **a test
+suite pins the behaviour it was written to pin, and cannot see a defect nobody
+thought to look for.** The same lesson as mistake 11, one more level down.
+
+| id | what | why it matters |
+|---|---|---|
+| **H8** | the modelled-lambda fallback can never enrich — `base_lambda` is called without `dwell_s`, so λ = 1.00 always | the modelled EGT runs **80–110 K hot** under a sustained pull, and that feeds the DRIVER-FACING thermal alerts. This is the worst of the six |
+| **M11** | the block node free-runs although coolant is measured every sample | drifts **14 K** from the sensor on `7475b5d7`, and the oil node inherits it |
+| **M10** | the thermal warning projects the trend LINEARLY 30 s ahead | the housing is a first-order node with τ 27–51 s, so it reaches 61–75 % of that. Five of ten warns on `7475b5d7` project to the limit but fall **20–110 K short** of it in the model's own dynamics. "Threshold in about N s" is a quantitative claim the model contradicts |
+| **M9** | one missed barometric reading retires the mismatch detector for the session | `_last_poll` is advanced before the query rather than after, so a single NO DATA silences the detector 7–15 s later |
+| **M8** | BimmerLink's placeholder zeros are parsed as measurements | the first rows of every log read coolant 0, so the seed can start the block at 273 K |
+| **M7** | nothing in the test suite imports `app/server.py` | "36 of 36 pass" therefore says nothing about whether the product starts |
+
+**None of these is fixed as of 16 September.** They are recorded here so that
+nobody quotes the app's numbers as though the suite passing meant the app was
+right. The fixes are small and named in `AUDIT.md`; what is not small is the
+consequence for the pinned figures, because H8, M8 and M11 all move the
+estimated temperatures, and therefore the alert counts in
+`app/test_replay.py`'s expectations.
+
+**When they are fixed, re-measure and say what moved.** Do not quietly update
+the expected values — the whole reason they are pinned is so that a change is
+visible and has to be explained.
+
+**Three of the audit's CRITICAL findings are about the simulator, not the app,
+and they matter more than anything in this section** — in particular C3, which
+argues the 13.4-point preview advantage is protection depth and that the
+ablation identity is guaranteed by construction. That goes to the project's
+central claim. It is not addressed here and it is not addressed anywhere yet.
 ---
 
 ## Repository layout
@@ -1078,6 +1151,9 @@ CLAUDE.md             This file. The handoff and the mistake log.
 REFERENCES.md         Where every number we did not measure comes from. Written
                       for a non-specialist. Read before quoting a published band.
 DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
+AUDIT.md              Full technical review, 14 Sep. THREE CRITICAL findings
+                      against the headline claim and six against app/.
+                      Read it before quoting any number in this file.
 logs/CHANNEL_SET_FINAL.md   What is recorded, what to add, and why.
 logs/CHANNEL_CENSUS.md      All 656 channels the car offers, live vs dead.
 logs/raw/*.csv        Raw BimmerLink exports. Never edit these.

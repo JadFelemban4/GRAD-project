@@ -107,7 +107,9 @@ If the app is added to the briefing later, two things have to come with it:
    on `7475b5d7` is a property of thresholds we chose, pinned so a regression is
    visible. A slide that presents them as findings about the car is wrong.
 
+<!-- RETIRED-OK -->
 The dataset behind this page also moved: **nine drives, 175.5 minutes**, up from
-eight and 168.1, because `pull01` arrived. It contributes zero samples and zero
+eight and 168.1, because `pull01` arrived. (The superseded pair is named on
+purpose, so anyone holding an older caption can recognise it.) It contributes zero samples and zero
 operating points by design, so no figure on this page changed — but the drive
 count in any caption did.

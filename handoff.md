@@ -9,6 +9,10 @@ it is meant to go out of date. This file holds no history and makes no argument,
 so it should never become a third source of truth. **Where any of the three
 disagree, the scripts win: run the command and read what it prints.**
 
+`REFERENCES.md` sits beside those three and answers a different question: where
+every number we did **not** measure comes from. Read it before calling any band
+in `validate.py` "published" — seven of the eleven still have no source.
+
 You are taking over a project that works. Everything in the repository
 regenerates, every published figure was re-verified against the shipped data on
 **16 September 2026**, and nothing is secretly broken. What is missing is not
@@ -88,6 +92,14 @@ cruise-band EGT maximum and the two oil figures, and `validation_table.md` says
 why. Everything the model says about hot oil is extrapolation: **107 °C** is the
 hottest oil anywhere in the logs (`7475b5d7`), and the published band starts
 above it.
+
+**And read what "published band" means before you defend one.** A citation pass
+on 14 September opened the sources row by row. Two of the eleven bands are now
+sourced to a page, one is partial, one is measured from our own logs, and
+**seven have no source at all** — including the knock-limited spark, which a
+deliberate search failed to support. `REFERENCES.md` section 3 gives the status
+of each row and `validation_table.md` carries a `source` column pointing at it.
+In the thesis, call an unsourced row an engineering-judgement band and say so.
 
 ---
 
@@ -182,6 +194,9 @@ and interquartile range over five seeds.
 | Feed the raw intake-air-temperature channel in as charge temperature | `Intake air temperature before throttle valve` is a **compressor outlet** — the B58 carries its cooler inside the manifold. Use `plant.charge_temperature()` |
 | Rely on a default plant geometry | Pass `geo=GEO` explicitly. This cost three weeks once |
 | Change the test set after seeing results | Unrecoverable |
+| Call a validation band "published" without checking `REFERENCES.md` | Seven of the eleven have no source. Quoting one as published is the kind of claim an examiner can dismantle in a sentence |
+| Cite the 88 °C thermostat to BMW | The B58 has no thermostat. It is a heat-management valve, and 88 °C is our own stand-in, identified from the logs |
+
 | **Add a write path to `app/`, in any form** | The read-only rule is structural, not stylistic. A future version may SUGGEST an ECU parameter as text on a screen; applying it is a different product and must never share a code path. `app/test_replay.py` asserts that no write path exists |
 | **Write raw samples to disk from `app/`** | The stream is memory → websocket → gone. Only what the model *marks* is persisted, to `app/review_log.jsonl`. A test asserts a whole replay creates exactly one file |
 | Add a seventh live channel without justifying it | The adapter polls one channel per round trip, so every addition costs every other channel ~14 % of its rate. Put the reason in the channel's `why` field |
@@ -218,6 +233,14 @@ every enrichment figure reproduces without a refit.
 6. **Before calling a residual a validation, perturb the thing it supposedly
    validates and check the number moves.** It takes one run, and the load
    residual failed that test (mistake 12).
+7. **Never promote a citation from memory — yours or a model's.** Open the
+   source, write down the page, and if you looked and failed, record that
+   instead. A fabricated citation is worse than a missing one because no
+   script can catch it. `REFERENCES.md` is where that record lives.
+8. **When a figure changes, grep the tree for the OLD value yourself and read
+   every hit.** A green `verify_docs.py` proves only that the patterns which
+   exist found nothing. Three sweeps in a row have left figures behind
+   (mistake 11); the third time, five of them.
 
 ---
 
@@ -284,6 +307,8 @@ threshold with every figure taken from it.
 |---|---|
 | the rules, the traps, **the sixteen mistakes already made** | [CLAUDE.md](CLAUDE.md) |
 | what was verified, and on what date | [CHECKPOINT.md](CHECKPOINT.md) |
+| **where every number we did not measure comes from**, and which bands are actually sourced | [REFERENCES.md](REFERENCES.md) |
+| the live supervisor that runs beside the car | [app/](app/) — described in [CLAUDE.md](CLAUDE.md) |
 | the project in prose, for a reader outside the team | [README.md](README.md) |
 | Chapter 3's evidence | [validation_table.md](validation_table.md) |
 | which team PDFs still carry void numbers | [DOCUMENT_STATUS.md](DOCUMENT_STATUS.md) |

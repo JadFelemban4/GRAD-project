@@ -125,10 +125,10 @@ def _step_response(key, horizon_s, dt=0.25):
     one, kept because the point of the paragraph is that it moved.
     This docstring used to add that the condition "sits above the hardest
     sustained load actually recorded on the car", on a ceiling of 6.5 g/s
-    measured over the seven drives that existed then. On the shipped eight
-    drives, 168.1 minutes, the hardest 60-second mean fuel flow is **8.7 g/s**,
-    on 7475b5d7 -- the averaging window sized from each drive's own sample rate
-    rather than a fixed sample count. The test condition is therefore BELOW what
+    measured over the seven drives that existed then. Across the dataset's own
+    samples -- nine drives, 175.5 minutes, six carrying samples -- the hardest
+    60-second mean fuel flow is **8.7 g/s**, on 7475b5d7, the averaging window
+    sized from each drive's own rate. The test condition is therefore BELOW what
     the car has actually done for a minute, not above it, by about 13 %.
 
     Nothing here is changed to chase that: the condition is still the one the
