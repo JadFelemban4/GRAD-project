@@ -47,16 +47,45 @@ LOG_FAST = os.path.join(ROOT, "logs", "raw", "pull01-20260913_093527.csv")
 LOG_FULL = os.path.join(ROOT, "logs", "raw", "7475b5d7-20260908_142743.csv")
 
 # ---------------------------------------------------------------------------
-# Measured 14 September 2026 on the pipeline as shipped. Regenerate with
-# --print if a justified change moves them, and say why in the commit.
+# Measured on the pipeline as shipped. Regenerate with --print if a justified
+# change moves them, and say why HERE as well as in the commit.
+#
+# MOVED 16 SEPTEMBER, by the AUDIT.md fixes. Three numbers changed and each has
+# a cause that was traced before the expectation was touched:
+#
+#   pull01 peak turbine  593.7 -> 601.4 C   (+7.7 K)
+#       The modelled fallbacks now run through `BaselineECU.step` instead of
+#       `base_spark`/`base_lambda` alone (H8, M2). That applies the ECU's IAT
+#       COMPENSATION, which `base_spark` omits: -3.3 deg of spark at this
+#       drive's charge temperature, worth +18 C of EGT at the hardest sample
+#       (5832 rpm, 204 kPa). Enrichment pulls the other way -- -111 C at full
+#       dwell -- but pull01's pulls are short, so the retard dominates. The
+#       old figure was not "cooler", it was modelling less of the ECU.
+#
+#   pull01 thermal   0 -> 1      downstream of the above: a hotter estimate
+#                                crosses the warn condition once.
+#
+#   7475b5d7 thermal 13 -> 15    +1 oil warning that used to be UNREACHABLE
+#                                (L2: the oil branch was skipped whenever the
+#                                turbine branch was in cooldown), and +1
+#                                turbine warning, because the projection is now
+#                                the node's own first-order curve rather than a
+#                                tangent (M10). 14 of the 15 are cases where
+#                                the steady state at that operating point is
+#                                genuinely at or above 850 C.
+#
+# 7475b5d7's PEAK is unchanged at 884.9 C, which is the check that the
+# estimator's physics did not move: that drive reports spark and lambda, so the
+# fallback path never runs on it, and the turbine node does not depend on the
+# block node that M11 pinned.
 # ---------------------------------------------------------------------------
 EXPECT_FAST = {           # pull01, 7 channels, 1.45 s per channel
     "rows": 2193, "estimated": 2186,
-    "peak_turb_c": 593.7, "thermal": 0, "mismatch": 0, "novel": 4,
+    "peak_turb_c": 601.4, "thermal": 1, "mismatch": 0, "novel": 4,
 }
 EXPECT_FULL = {           # 7475b5d7, 26 channels, 7.5 s per channel
     "rows": 14340, "estimated": 14278,
-    "peak_turb_c": 884.9, "thermal": 13, "mismatch": 0, "novel": 19,
+    "peak_turb_c": 884.9, "thermal": 15, "mismatch": 0, "novel": 19,
 }
 
 checks: list[tuple[str, bool, str]] = []
@@ -204,7 +233,11 @@ def test_live_reader_degrades():
     fake = _FakeObd(drop_at=40)
     sys.modules["obd"] = fake.module
     try:
-        r = LiveReader(port="fake")
+        # optional=True on purpose: this is the path where a PID the car
+        # refuses can be retired, and retirement is what gives its share of
+        # the link back. The SHIPPED default is optional=False -- see the
+        # separate check below (AUDIT.md L5).
+        r = LiveReader(port="fake", optional=True)
         got = []
         for s in r:
             got.append(s)
@@ -232,6 +265,135 @@ def test_live_reader_degrades():
           len(unsupported) == 2,
           f"retired {unsupported}; each after {MAX_MISSES} misses")
     check("live: the link never raised out of the reader", True)
+
+    # AUDIT.md L5: live mode used to default to polling the optional set, which
+    # spends a round trip per cycle on oil temperature and intake temperature
+    # that nothing consumes -- while the budget note claims six channels.
+    sys.modules["obd"] = _FakeObd().module
+    try:
+        lean = LiveReader(port="fake")
+        polled = [c.field for c in lean.channels if c.obd]
+    finally:
+        sys.modules.pop("obd", None)
+    check("L5: live mode polls only what something reads",
+          set(polled) <= {"rpm", "air_kgh", "ect_c", "t_amb_c", "v_kmh",
+                          "p_amb_psi"},
+          f"polls {sorted(polled)}")
+
+
+def test_server_imports():
+    """The product must at least start. AUDIT.md M7.
+
+    Nothing in this suite imported `app.server`, so "36 of 36 pass" said
+    nothing about whether the app runs -- and on the reviewer's machine it did
+    not, because an old fastapi was installed against a new pydantic. A suite
+    that cannot fail on "the server will not import" is not testing the product.
+    """
+    try:
+        import app.server as srv
+    except Exception as e:
+        check("M7: app.server imports", False, f"{type(e).__name__}: {e}")
+        return
+    paths = {r.path for r in srv.app.routes if hasattr(r, "path")}
+    check("M7: app.server imports and serves its three pages",
+          {"/", "/driver", "/review"} <= paths, f"{len(paths)} routes")
+    import engine_env
+    check("M7: served limits match engine_env",
+          abs(srv.LIMITS["turb_c"] - (engine_env.TURB_PROTECT_K - 273.15)) < 0.05,
+          f"turb_c {srv.LIMITS['turb_c']}")
+
+
+def test_enrichment_fallback():
+    """The modelled lambda must actually enrich. AUDIT.md H8.
+
+    `base_lambda` was being called without `dwell_s`, so the v4 model's dwell
+    term was always zero and the fallback was stuck at lambda 1.00 -- which
+    runs the modelled EGT 80-110 K hot under a sustained pull and feeds the
+    driver's thermal alerts. The fallback now runs through `BaselineECU.step`,
+    which keeps the timer.
+    """
+    est = Estimator()
+    t, last = 0.0, None
+    for _ in range(40):                       # 20 s at 5500 rpm, high load
+        last = est.update(Sample(t=t, rpm=5500, air_kgh=900.0, ect_c=95.0,
+                                 t_amb_c=35.0, v_kmh=160.0))
+        t += 0.5
+    lam = est.ecu.base_lambda(5500, last.map_kpa, est.ecu.hot_dwell)
+    check("H8: the modelled lambda reaches 0.81 after a sustained pull",
+          lam < 0.85, f"lambda {lam:.3f} at dwell {est.ecu.hot_dwell:.1f} s")
+    check("H8: the estimator marks it modelled", "lambda" in last.modelled)
+
+
+def test_placeholder_zeros():
+    """Leading zeros in an export are placeholders, not readings. AUDIT.md M8."""
+    r = ReplayReader(os.path.join(ROOT, "logs", "raw",
+                                  "3f64372e-20260907_070041.csv"), speed=0)
+    got = list(r)
+    check("M8: leading coolant zeros are not read as 0 C",
+          got[0].ect_c is None, f"first ect_c = {got[0].ect_c}")
+    first = next((x for x in got if x.ect_c is not None), None)
+    check("M8: the first real coolant reading is physical",
+          first is not None and 0.0 < first.ect_c < 150.0,
+          f"{first.ect_c if first else None} C")
+    check("M8: an impossible ambient pressure is rejected",
+          got[0].p_amb_psi is None)
+
+
+def test_block_is_pinned_to_measurement():
+    """The block node must follow the sensor, not free-run. AUDIT.md M11."""
+    est = Estimator()
+    t = 0.0
+    for _ in range(200):
+        st = est.update(Sample(t=t, rpm=3000, air_kgh=400.0, ect_c=93.0,
+                               t_amb_c=35.0, v_kmh=110.0))
+        t += 1.0
+    check("M11: the modelled block equals the measured coolant",
+          abs(st.t_block_c - 93.0) < 0.01, f"{st.t_block_c:.2f} C vs 93.00 C")
+    check("M11: the drift it would have had is reported",
+          st.block_residual_k == st.block_residual_k,   # not NaN
+          f"block_residual_k = {st.block_residual_k:+.1f} K")
+
+
+def test_projection_uses_the_model():
+    """The warning must project the node, not a tangent. AUDIT.md M10."""
+    est = Estimator()
+    t = 0.0
+    for _ in range(60):
+        st = est.update(Sample(t=t, rpm=4000, air_kgh=700.0, ect_c=95.0,
+                               t_amb_c=35.0, v_kmh=140.0))
+        t += 1.0
+    check("M10: the estimator publishes where the turbine is heading",
+          st.t_turb_ss_c == st.t_turb_ss_c and st.tau_turb_s > 0,
+          f"heading for {st.t_turb_ss_c:.0f} C, tau {st.tau_turb_s:.0f} s")
+    # A node already at its steady state cannot climb, whatever its recent rate.
+    check("M10: a settled node is projected as settled",
+          abs(st.t_turb_c - st.t_turb_ss_c) < 25.0,
+          f"now {st.t_turb_c:.0f} C, steady {st.t_turb_ss_c:.0f} C")
+
+    # THE CORE OF M10. Warm the housing hard, then drop to a load whose steady
+    # state is below the limit. The node is still hot and still falling slowly,
+    # so a LINEAR projection of a brief upward wobble could clear 850 C -- but
+    # the node cannot get there at this load, and no time-to-threshold may be
+    # quoted for a threshold that is unreachable.
+    est2, al = Estimator(), AlertEngine(
+        review_path=os.path.join(tempfile.gettempdir(), "m10.jsonl"))
+    t, warned_unreachable = 0.0, 0
+    for i in range(400):
+        hard = i < 200
+        st2 = est2.update(Sample(t=t, rpm=5000 if hard else 1500,
+                                 air_kgh=900.0 if hard else 60.0,
+                                 ect_c=95.0, t_amb_c=35.0, v_kmh=140.0))
+        t += 1.0
+        if not st2.ok:
+            continue
+        for a in al.check(st2, Sample(t=t)):
+            if (a.kind == "thermal" and a.severity == "warn"
+                    and "threshold in" in a.title
+                    and (a.evidence.get("heading_for_c") or 0) < 850.0):
+                warned_unreachable += 1
+    check("M10: no time-to-threshold when the limit is unreachable",
+          warned_unreachable == 0,
+          f"{warned_unreachable} such warnings")
 
 
 def test_missing_channels(tmp):
@@ -450,11 +612,20 @@ def main():
         print("\nreader")
         test_reader_tolerance(tmp)
         test_live_reader_degrades()
+        test_placeholder_zeros()
+
+        print("\nproduct starts")
+        test_server_imports()
 
         print("\nreplay: pull01 (7 channels, the fast regression)")
         fast = replay(LOG_FAST, os.path.join(tmp, "fast.jsonl"))
         compare("pull01", fast, EXPECT_FAST)
         test_missing_channels(tmp)
+
+        print("\nmodelled fallbacks")
+        test_enrichment_fallback()
+        test_block_is_pinned_to_measurement()
+        test_projection_uses_the_model()
 
         print("\nwarm start")
         test_warm_start(fast)

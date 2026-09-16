@@ -5,7 +5,9 @@ check_premise.py. Writes nothing into the repository.
 """
 import json, sys, os
 import numpy as np
-sys.path.insert(0, r"C:\Users\endof\OneDrive\Documents\engine-supervisor")
+# AUDIT.md L11: was a hard-coded absolute path from one
+# machine, so these scripts ran for exactly one person.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K
 import check_premise as cp

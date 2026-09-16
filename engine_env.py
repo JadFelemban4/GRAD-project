@@ -11,7 +11,8 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 
-from plant import Operating, run_cycle, b58, charge_temperature
+from plant import (Operating, run_cycle, b58, boost_ceiling_kpa,
+                   charge_temperature, EXH_BACKPRESSURE_RATIO)
 from thermal import ThermalNetwork
 
 # The one engine in this project. Passed EXPLICITLY to every run_cycle call
@@ -155,7 +156,7 @@ class BaselineECU:
         v4 (this)         function of engine speed and sustained dwell.
 
         v3 was fitted to seventeen seconds at high load. The two 8 September
-        drives took that to 178 seconds, and with the larger sample manifold
+        drives took that to 184 seconds, and with the larger sample manifold
         pressure turns out to carry almost nothing about lambda -- and what it
         does carry has the WRONG SIGN for a load table (+0.23: more boost, LEANER).
 
@@ -168,7 +169,7 @@ class BaselineECU:
 
             corr(lambda, engine speed)              -0.56
             corr(lambda, air mass flow)             -0.49
-            corr(lambda, dwell above 180 kPa)       -0.47
+            corr(lambda, dwell above 180 kPa)       -0.41
             corr(lambda, MANIFOLD PRESSURE)         +0.23   <-- POSITIVE
 
         Read that last row carefully. It is not merely weak, it is the WRONG WAY
@@ -336,6 +337,27 @@ TRACK_HINGE = 25.0
 #
 # If you change the damage model, change this with it. They are the same number.
 TURB_PROTECT_K = 1123.0
+OIL_PROTECT_K = 408.0      # the oil knee in the same damage model
+
+# The damage model itself, in ONE place.
+#
+# AUDIT.md L1/M2, 15 September 2026: this formula was typed out in three files
+# -- here with literals beside a constant that claimed to be "the same number",
+# in app/estimator.py WITHOUT the knock term while its docstring said it was
+# "the SAME model check_premise.py scores with", and its oil knee again in
+# app/alerts.py. Three copies of a formula are three chances to disagree, and
+# two of them already did.
+#
+# knock_integral is optional because the app cannot always form it the way the
+# environment does; omitting it scores thermal damage only, and the caller is
+# expected to know that is what it asked for.
+def damage_rate(t_turb_k, t_oil_k, knock_integral=None):
+    """Damage per second at these node temperatures. The ONE definition."""
+    d = (np.exp((t_turb_k - TURB_PROTECT_K) / 45.0)
+         + 0.4 * np.exp((t_oil_k - OIL_PROTECT_K) / 12.0))
+    if knock_integral is not None:
+        d += 40.0 * max(0.0, knock_integral - 0.85) ** 2
+    return float(d)
 
 ACT_LO = np.array([-8.0, -0.15, -40.0, 0.0, 0.3], dtype=np.float32)
 ACT_HI = np.array([+4.0, +0.06, +15.0, 1.0, 1.0], dtype=np.float32)
@@ -376,10 +398,16 @@ class SupervisoryTunerEnv(gym.Env):
         """One engine evaluation. Physics plant, or surrogate if supplied."""
         if self.engine is not None:
             return self.engine.predict(rpm, map_kpa, iat_k, ect_k, spark, lam)
+        # AUDIT.md M2: the backpressure ratio was 1.12 here and 1.15 in
+        # plant.py, which predict(), compare_log.py and the app all use. Two
+        # constants for one physical quantity, worth 6 C of EGT at the climb
+        # point. Imported now, so there is one.
         r = run_cycle(Operating(rpm=rpm, map_kpa=map_kpa, iat_k=iat_k, ect_k=ect_k,
                                 spark_btdc=spark, lam=lam,
-                                p_exh_kpa=max(105.0, map_kpa * 1.12)), geo=GEO)
+                                p_exh_kpa=max(105.0, map_kpa * EXH_BACKPRESSURE_RATIO)),
+                      geo=GEO)
         return dict(torque=r.torque_nm, mdot_fuel=r.mdot_fuel_gps,
+                    mdot_air=r.mdot_air_gps,      # for the compressor ceiling, M1
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
 
     # Hard ceiling on manifold pressure, MEASURED not guessed. Across 43 853
@@ -414,8 +442,16 @@ class SupervisoryTunerEnv(gym.Env):
             out = self._evaluate(rpm, mp, iat_k, ect_k, spark, lam)
             err = torque_req - out["torque"]
             state["i"] = float(np.clip(state.get("i", 0.0) + 0.05 * err, -60.0, 60.0))
-            mp = float(np.clip(mp + 0.35 * err + state["i"] * 0.02,
-                               25.0, min(self.MAP_CEIL_KPA, 200.0 + boost_trim)))
+            # AUDIT.md M1. This clamped at `min(MAP_CEIL_KPA, 200 + trim)`,
+            # i.e. 160-215 kPa, while README said `plant.boost_ceiling_kpa`
+            # bounds the pressure and MAP_CEIL_KPA is the measured 250. The
+            # flow-dependent ceiling was never called by the environment at
+            # all -- only by check_map.py. It is applied here now, so a heavier
+            # scenario or a trained agent with +15 boost trim meets the ceiling
+            # the compressor actually has instead of an undocumented 215 kPa.
+            ceil = min(self.MAP_CEIL_KPA,
+                       boost_ceiling_kpa(out["mdot_air"], iat_k) + boost_trim)
+            mp = float(np.clip(mp + 0.35 * err + state["i"] * 0.02, 25.0, ceil))
         state["map"] = mp
         return out, mp
 
@@ -485,6 +521,7 @@ class SupervisoryTunerEnv(gym.Env):
         self.knock_flag_base = False
         self.v = float(self.cycle["v_mps"][0])
         self.rpm, self.map_kpa, self.tps = 900.0, 40.0, 0.0
+        self.map_b_prev = 40.0        # lagged baseline load for ecu.step -- C2
         self.spark, self.lam = 20.0, 1.0
         self.iat_k = charge_temperature(t_amb)
         self.torque_req, self.aggression = 0.0, 0.0
@@ -507,14 +544,33 @@ class SupervisoryTunerEnv(gym.Env):
         self.torque_req, self.rpm = self.veh.demand(self.v, accel, grade)
         self.aggression = float(np.clip(abs(accel) / 2.5, 0.0, 1.0))
         self.iat_k = charge_temperature(c["t_amb"], self.thermal.t_block)
+        # AUDIT.md L14: the baseline's charge temperature used to be the AGENT's
+        # -- computed from the agent's block node and handed to both -- so the
+        # "baseline-relative" reference moved with the agent's own fan and pump.
+        # 1.5 K with the old cooling-disabled neutral; unbounded with a trained
+        # agent. The baseline now gets its own.
+        iat_b = charge_temperature(c["t_amb"], self.thermal_base.t_block)
 
         # --- baseline controller (runs in parallel, defines the reference) ---
-        sp_b, lam_b, fan_b = self.ecu.step(self.rpm, self._map_for(self.torque_req, self.rpm, 0.0),
-                                           self.iat_k, self.thermal_base.t_block,
+        #
+        # AUDIT.md C2: the ECU used to be scheduled on `_map_for(...)`, an
+        # OPEN-LOOP FEED-FORWARD GUESS at the manifold pressure. On the standard
+        # climb that guess is 224 kPa while the tracking loop actually settles
+        # at 175 kPa, so the spark map, the IAT compensation and the enrichment
+        # DWELL TIMER were all evaluated at a load the engine was not at -- the
+        # ECU commanded knock-limited spark for a phantom 224 kPa and ran the
+        # dwell timer above ENR_LOAD while the engine sat below it.
+        #
+        # A real ECU measures load and then looks spark up, so the schedule now
+        # uses the pressure the baseline loop actually produced on the previous
+        # step. One step of lag at dt = 1 s is what a real one has.
+        sp_b, lam_b, fan_b = self.ecu.step(self.rpm, self.map_b_prev,
+                                           iat_b, self.thermal_base.t_block,
                                            self.knock_flag_base, self.dt)
-        base, map_b = self._track_torque(self.torque_req, self.rpm, self.iat_k,
+        base, map_b = self._track_torque(self.torque_req, self.rpm, iat_b,
                                          self.thermal_base.t_block, sp_b, lam_b,
                                          0.0, self.pi_base)
+        self.map_b_prev = map_b
         self.knock_flag_base = base["ki"] > 1.0
         self.thermal_base.step(self.dt, base["mdot_fuel"], base["mdot_fuel"] * 15.0,
                                base["egt_k"], c["t_amb"], self.v, fan_b)
@@ -534,12 +590,8 @@ class SupervisoryTunerEnv(gym.Env):
                           out["egt_k"], c["t_amb"], self.v, act[3], act[4])
 
         # --- damage rates ---------------------------------------------------
-        def damage(tn, ki):
-            d = np.exp((tn.t_turb - 1123.0) / 45.0) + 0.4 * np.exp((tn.t_oil - 408.0) / 12.0)
-            return float(d + 40.0 * max(0.0, ki - 0.85) ** 2)
-
-        d_a = damage(self.thermal, out["ki"])
-        d_b = damage(self.thermal_base, base["ki"])
+        d_a = damage_rate(self.thermal.t_turb, self.thermal.t_oil, out["ki"])
+        d_b = damage_rate(self.thermal_base.t_turb, self.thermal_base.t_oil, base["ki"])
 
         # --- reward: every term baseline-relative and dimensionless ---------
         eps = 1e-6

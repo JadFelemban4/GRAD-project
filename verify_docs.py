@@ -124,6 +124,11 @@ TRACKED_DOCS = [
     "app/alerts.py",
     "app/estimator.py",
     "app/reader.py",
+    # AUDIT.md L11: this checker scanned .md and .py only, so the briefing page
+    # -- which hard-codes the premise figures dozens of times -- was invisible
+    # to it and drifted all the way to void. A page shown to an examiner is a
+    # document whatever its extension.
+    "presentation/index.html",
 ]
 
 # A number as documents actually write it: "517", "43 853", "30 534", "1.4",
@@ -315,11 +320,18 @@ def dwell_column(S, thr=180.0):
     out = []
     for _, d in S.groupby("source"):
         d = d.sort_values("t").reset_index(drop=True)
+        # AUDIT.md H3: dwell used to be `run / 4.6` -- a RUN OF ROWS divided by
+        # an assumed 4.6 Hz, for every drive. The drives log at 4.34-6.63 Hz,
+        # so dwell was overstated by up to 44 % on the fast ones and understated
+        # on 7475b5d7, and ENR_DWELL_LO/HI were fitted against that distorted
+        # axis. The timestamps are right there in the column; use them.
+        dt = d["t"].diff().fillna(0.0).clip(lower=0.0, upper=5.0).to_numpy()
         acc, run = 0.0, np.zeros(len(d))
         for i, v in enumerate((d.map_kpa > thr).fillna(False)):
-            acc = acc + 1 if v else 0
+            acc = acc + dt[i] if v else 0.0
             run[i] = acc
-        d["dwell"] = run / 4.6
+        d["dwell"] = run
+        d["dt_s"] = dt          # carried so callers need not re-derive it
         out.append(d)
     return pd.concat(out)
 
@@ -401,12 +413,38 @@ RETIRED = [
     (r"four\s+separate drives, 192 samples", "MAF-ceiling count from 7 drives",
      "five separate drives, 517 samples -- the figure this file itself asserts"),
     (r"median ratio 1\.163", "combustion-air ratio from 7 drives", "1.095"),
+
+    # --- added 16 September 2026, from the AUDIT.md pass. Each of these was
+    # measured on an axis that turned out to be wrong, or against a baseline
+    # that turned out not to be neutral. The replacement is named beside it.
+    (r"\b178 seconds\b", "dwell seconds from rows over an assumed 4.6 Hz (H3)",
+     "184 s, summed from the timestamps"),
+    (r"dwell[^)\n]{0,32}\)\s*[-−]0\.47",
+     "corr(lambda, dwell) on the 4.6 Hz axis (H3)", "-0.41 on real timestamps"),
+    (r"\b829\.2\b", "premise baseline with its cooling disabled (C1)",
+     "674.1 with the true neutral -- and C2 means the scenario no longer binds"),
+    (r"\b548\.6\b", "premise reactive against a cooling-disabled baseline (C1)",
+     "529.5, and see C2"),
+    (r"\b437\.6\b", "premise predictive against a cooling-disabled baseline (C1)",
+     "434.6, and see C2"),
+    (r"13\.4\s*(?:points|pts)", "preview edge built on the C1 and C3 artefacts",
+     "run check_premise.py -- preview over CURRENT GRADE is the honest figure"),
+    (r"16\.5\s*(?:->|→)\s*18\.0\s*(?:->|→)\s*26\.0",
+     "the H2 table measured against a cooling-disabled baseline (C1)",
+     "run generality_test.py"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to
 # contain retired values throughout. Exempting them is deliberate.
 RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
-                  "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md"}
+                  "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md",
+                  # AUDIT.md is a review: quoting the figures it found wrong is
+                  # the whole of its content. Exempting it is the same call as
+                  # DOCUMENT_STATUS.md above.
+                  "AUDIT.md",
+                  # The response to the audit: every row names the figure it
+                  # replaced. Same call as DOCUMENT_STATUS.md and AUDIT.md.
+                  "AUDIT_FIXES.md"}
 
 # A line that names a retired figure ON PURPOSE -- "the old 39.5 s figure is
 # void", the mistake log's was/should-say tables -- carries this marker. It is
@@ -521,16 +559,29 @@ def main():
                      + WORDNUM + r"\s+drives"],
            files=ALL)
     figure("drives that carry samples", S.source.nunique(), 6, 0,
-           patterns=[WORDNUM + r"\s+carrying\b", WORDNUM + r"\s+(?:drives\s+)?carry\b"],
+           # The number must be the SUBJECT of 'carry'. Without the lookbehind,
+           # 'Six of the nine drives carry usable samples' -- a correct sentence
+           # -- reports nine. A false positive of exactly the kind AUDIT.md H2
+           # and M15 name: the patterns are the weak half of this checker.
+           patterns=[r"(?<!of the )" + WORDNUM + r"\s+carrying\b",
+                     r"(?<!of the )" + WORDNUM + r"\s+(?:drives\s+)?carry\b"],
            files=ALL)
-    figure("distinct operating points", len(P), 22, 0,
+    # AUDIT.md H7: 22 was a property of FILE ORDER. The greedy
+    # first-match merge ran over glob order and gave 20-23 points
+    # under shuffles. Windows are sorted before merging now, so
+    # the count is a property of the data: 23, stable in 8 orders.
+    figure("distinct operating points", len(P), 23, 0,
            patterns=[WORDNUM + r"\s+distinct operating points",
                      WORDNUM + r"\s+pooled points"],
            files=ALL)
     chk("every point spans a real 60 s window",
         bool((P.t_span.between(48, 72)).all()), True)
     chk("no point straddles a logger gap",
-        round(float(P.max_gap.max()), 2), 0.45, 0.02, " s")
+        # AUDIT.md H7: this used to read an AVERAGED max_gap (0.453 s).
+        # max_gap is a worst case and averaging it hid the true member
+        # maximum of 0.481 s. It carries the maximum now, so this is a
+        # real bound rather than a mean wearing the word 'max'.
+        round(float(P.max_gap.max()), 2), 0.48, 0.02, " s")
     figure("operating-point span, low end", round(float(P.map_kpa.min())), 30, 0.6,
            " kPa",
            # "validated/covers/sit at", NOT "spanning": engine_env's spark fit
@@ -576,8 +627,17 @@ def main():
            patterns=[NUM + r"\s+quasi-steady",
                      r"refitted[^.\n]{0,30}?on\s+" + NUM],
            files=ALL)
+    # AUDIT.md L13: the upper bound used to be 3.0, so a future drive reaching
+    # a HIGHER pressure ratio would be silently excluded from "highest pressure
+    # ratio observed" -- the check would keep reporting the old maximum and
+    # pass. The filter is there to drop decode garbage, so the ceiling is now
+    # well clear of anything physical and a violation is reported, not dropped.
     f = st[np.isfinite(st.corr_flow) & np.isfinite(st.press_ratio)
-           & (st.corr_flow > 0.01) & st.press_ratio.between(0.8, 3.0)]
+           & (st.corr_flow > 0.01) & st.press_ratio.between(0.8, 6.0)]
+    _above = int((st.press_ratio > 6.0).sum())
+    if _above:
+        print(f"  note   {_above} sample(s) above a pressure ratio of 6.0 were "
+              f"excluded as implausible -- check the decode")
     figure("highest pressure ratio observed", round(float(f.press_ratio.max()), 2),
            2.52, 0.005,
            patterns=[r"highest pressure ratio[^\n]{0,24}?" + NUM],
@@ -596,7 +656,12 @@ def main():
                          + r"\s*\|?\s*$"],
                files=ALL)
     hh = S2[(S2.map_kpa > 207) & S2.lam.between(0.5, 1.3)]
-    figure("seconds above 207 kPa", round(len(hh) / 4.6), 178, 1, " s",
+    # AUDIT.md H3: seconds from the timestamps, not rows over an assumed 4.6 Hz.
+    # dwell_column re-indexes per drive, so this uses the carried column rather
+    # than indexing by label -- duplicate labels across drives would multiply
+    # the sum (measured: 731 s instead of 164).
+    _secs = float(hh["dt_s"].sum())
+    figure("seconds above 207 kPa", round(_secs), 184, 2, " s",
            # Only the "took that to N seconds" claim. "fitted to 17 seconds" and
            # "spanned 42.8 to 73.7 seconds" are different quantities.
            patterns=[r"took that to\s*\*{0,2}" + NUM + r"\s*\*{0,2}\s*seconds",
@@ -606,7 +671,9 @@ def main():
     CORR = (("rpm", -0.56, [r"engine speed\)\s*" + NUM, r"speed\s*\(" + NUM + r"\)"]),
             ("air_gps", -0.49, [r"air mass flow\)\s*" + NUM,
                                 r"air mass flow \(" + NUM + r"\)"]),
-            ("dwell", -0.47, [r"dwell[^)\n]{0,32}\)\s*" + NUM,
+            # AUDIT.md H3: -0.47 was measured on a dwell axis built from
+            # row counts over an assumed 4.6 Hz. On real timestamps: -0.41.
+            ("dwell", -0.41, [r"dwell[^)\n]{0,32}\)\s*" + NUM,
                               r"dwell \(" + NUM + r"\)"]),
             ("map_kpa", +0.23, [r"MANIFOLD PRESSURE\)\s*" + NUM,
                                 r"corr\(.{0,18}MAP.{0,6}\)\s*(?:is\s*)?" + NUM,

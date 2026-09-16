@@ -28,6 +28,8 @@ Checkpoints are written every 10,000 steps, so a closed laptop costs you minutes
 rather than the whole run. Re-running the same seed resumes from its checkpoint.
 """
 import argparse
+import glob
+import re
 import os
 import time
 
@@ -92,9 +94,23 @@ def main():
     env = build_env(not a.no_preview, a.seed, a.duration)
 
     ckpt_path = os.path.join(outdir, "checkpoint.zip")
-    if os.path.exists(ckpt_path):
-        print(f"resuming from {ckpt_path}")
-        model = SAC.load(ckpt_path, env=env)
+
+    # AUDIT.md H6. The periodic callback writes `ckpt_<n>_steps.zip` every
+    # 10 000 steps; this used to look ONLY for `checkpoint.zip`, which is
+    # written once, after learn() returns. So a laptop closed at hour 3 of a
+    # 4.6-hour run had nothing the script would load -- exactly the case the
+    # docstring promised to cover. And on the one path where checkpoint.zip did
+    # exist (a finished run) it restarted the step count from zero and trained
+    # a second full run.
+    periodic = sorted(glob.glob(os.path.join(outdir, "ckpt_*_steps.zip")),
+                      key=lambda f: int(re.search(r"ckpt_(\d+)_steps", f).group(1)))
+    resume_from = periodic[-1] if periodic else (ckpt_path if os.path.exists(ckpt_path) else None)
+    done_steps = 0
+    if resume_from:
+        m = re.search(r"ckpt_(\d+)_steps", resume_from)
+        done_steps = int(m.group(1)) if m else 0
+        print(f"resuming from {resume_from} at {done_steps} steps")
+        model = SAC.load(resume_from, env=env)
     else:
         model = SAC("MlpPolicy", env, seed=a.seed, learning_rate=a.lr,
                     verbose=1, tensorboard_log=None)
@@ -103,7 +119,13 @@ def main():
                             name_prefix="ckpt", verbose=0)
 
     t0 = time.time()
-    model.learn(total_timesteps=a.steps, callback=cb, progress_bar=False)
+    remaining = max(0, a.steps - done_steps)
+    if remaining == 0:
+        print(f"already at {done_steps} of {a.steps} steps; nothing to do")
+    # reset_num_timesteps=False so the resumed run CONTINUES the schedule
+    # rather than starting a second one (AUDIT.md H6).
+    model.learn(total_timesteps=remaining, callback=cb, progress_bar=False,
+                reset_num_timesteps=(resume_from is None))
     mins = (time.time() - t0) / 60
 
     model.save(os.path.join(outdir, "final"))

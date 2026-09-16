@@ -1,7 +1,9 @@
 """Dump real plant sweeps for the explainer site. Read-only."""
 import json, sys, os
 import numpy as np
-sys.path.insert(0, r"C:\Users\endof\OneDrive\Documents\engine-supervisor")
+# AUDIT.md L11: was a hard-coded absolute path from one
+# machine, so these scripts ran for exactly one person.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from plant import predict, b58, run_cycle, Operating
 
 GEO = b58()

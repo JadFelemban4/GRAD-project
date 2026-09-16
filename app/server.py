@@ -95,8 +95,13 @@ _subs_lock = threading.Lock()
 
 
 def _publish(payload: dict):
-    _latest.clear()
-    _latest.update(payload)
+    # AUDIT.md L3: this used to `_latest.clear()` then `_latest.update(...)`
+    # from the reader thread while the event loop was serialising the same
+    # dict for /api/state -- a request landing between the two saw `{}`.
+    # Rebinding a module-level name is atomic under the GIL, so a reader
+    # always sees one whole payload or the previous one.
+    global _latest
+    _latest = payload
     with _subs_lock:
         targets = list(_subs)
     for q in targets:

@@ -44,7 +44,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.829), **1.1 % with the one fitted k** (0.837), over 22 pooled points from nine drives, 175.5 minutes, 30–74 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
+| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.829), **1.1 % with the one fitted k** (0.837), over 23 pooled points from nine drives, 175.5 minutes, 30–74 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
 | C · get an agent to learn | **next.** `train.py` exists, nothing has been trained yet |
 | D · baselines and the ablation | not started. This is the floor of the project |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -117,10 +117,14 @@ raises the ceiling, nothing after it protects the floor.
 Anyone can regenerate these. Do not quote a number that a script does not print.
 
 ```
-python check_premise.py    baseline 829.2 · reactive 548.6 · predictive 437.6 · blinded 548.6
+python check_premise.py    VOID as of 16 Sep -- see AUDIT.md C1, C2, C3 and the
+                           box in README.md. It now prints baseline 256.5 at
+                           801 C, and a warning that the constraint does not
+                           bind on this scenario at all. Run it; do not quote a
+                           number from here
 python validate.py         8 of 11 published quantities inside band
 python test_reward.py      4 of 4 checks pass
-python build_dataset.py "logs/raw/*.csv"    175.5 min, 9 drives, 22 operating points
+python build_dataset.py "logs/raw/*.csv"    175.5 min, 9 drives, 23 operating points
 python compare_log.py data/master_points.csv   PASS, 1.4 % load residual,
                            k derived 0.829 and zero free parameters. Read what
                            it prints, not what you hope: it compares two ECU
@@ -164,12 +168,23 @@ points**.
 printed column supported. The predictive figure and the 13.4-point gap are
 unchanged.)*
 
-**The strongest single fact in the project:** disabling preview collapses the
-predictive policy onto the reactive one *to the decimal* — 548.6 against 548.6.
-The size of the effect has now changed four times, across two different engines,
-two scenarios and two protection triggers. **The identity has held every single
-time.** That is what makes it the load-bearing claim: whatever gap exists is
-attributable to preview information and to nothing else.
+**WHAT USED TO BE CALLED THE STRONGEST SINGLE FACT IN THE PROJECT WAS AN
+IDENTITY, NOT A FINDING.** This file said, for weeks, that disabling preview
+collapses the predictive policy onto the reactive one *to the decimal* — and
+that the identity holding every time made it the load-bearing claim.
+
+<!-- RETIRED-OK -->
+It could not have failed. `p_predictive` reads its preview through
+`env._preview()`, and with `use_preview=False` that returns zeros, so the
+function computes `k_ahead = 0` and returns **the reactive policy's own vector
+on every single step**. The two rows were the same rollout. AUDIT.md C3.
+
+An ablation is evidence only when the blinded policy could in principle have
+behaved differently and did not. That means a TRAINED blinded agent against a
+trained sighted one, which is Phase D and has not been run. **Until then this
+project has no measured preview advantage at all**, and the honest comparator —
+added 16 September — is a policy that acts on the grade the car is on right now,
+with no preview, which currently BEATS the predictive one by 2.2 points.
 
 ---
 
@@ -230,7 +245,7 @@ you, and the flattery shows up as a large headline number.**
 | v4, from eight drives | function of engine speed and sustained dwell | current |
 
 v3 was fitted to 17 seconds at high load. The two 8 September drives took that
-to **178 seconds above 207 kPa**, and at that sample size the correlation
+to **184 seconds above 207 kPa**, and at that sample size the correlation
 between lambda and manifold pressure is **+0.23** — weak, and pointing the
 WRONG WAY for a load table: higher manifold pressure goes with *leaner*
 mixture, not richer. What correlates is engine speed (−0.56), air mass flow
@@ -337,7 +352,7 @@ Effect on the day: 20 operating points became 17, `fb988991` contributed none,
 and the pooled load residual roughly halved. **Do not quote that day's residual
 as the project's number.** The dataset has since gained a drive and the charge
 temperature has since been corrected (mistake 13), and the current figure is
-**1.4 % derived / 1.1 % fitted over 22 points, 30–74 kPa**. Be honest about the
+**1.4 % derived / 1.1 % fitted over 23 points, 30–74 kPa**. Be honest about the
 improvement either way — part of it was the removal of the worst drive, and the
 exclusion rule was written from a measurable defect rather than from the
 residual, which is the only reason it is legitimate.
@@ -421,7 +436,7 @@ that contains no constraint and no reward check.
 Fixed in `neutral_action()` itself, with an assert that the result is inside the
 action space. `true_neutral()` is now a pass-through. The `__main__` block is
 labelled a smoke test and says to run `test_reward.py` for the real figure.
-`test_reward.py` still reports neutral **−0.00438**, unchanged, because it was
+`test_reward.py` still reports neutral inside the ±0.05 band, because it was
 already using the correct vector.
 
 **The lesson: a fix that lives in the test file is not a fix.** If a helper is
@@ -945,8 +960,8 @@ once the warm filter has run.**
   but an operating line is not a compressor map — no efficiency islands, no
   speed lines, because the car has no turbo speed sensor and no pre-intercooler
   temperature.
-- **Two residuals, both true, and the fitted one fits better.** Over the 22
-  pooled points that survive the window checks, 30–74 kPa: **1.4 % with the
+- **Two residuals, both true, and the fitted one fits better.** Over the 23
+  pooled points that survive the window checks, 30–74 kPa: **1.3 % with the
   derived k = 0.829 and zero free parameters**, **1.1 % with the fitted
   k = 0.837 and one**. Dropping the parameter makes the residual RISE, which is
   the honest direction — one free parameter should fit better than none. Quote
@@ -994,7 +1009,7 @@ once the warm filter has run.**
   a minute each and contain no warm running window; `fb988991` is a census log
   whose windows are all rejected for span or logger gaps (mistake 8), so it
   carries samples but contributes **zero** operating points. Quote it as "nine
-  drives, 175.5 minutes, six carrying samples, 22 distinct operating points".
+  drives, 175.5 minutes, six carrying samples, 23 distinct operating points".
 
   <!-- RETIRED-OK -->
   This line read "seven drives, 113 minutes, five carrying samples" until
@@ -1262,8 +1277,10 @@ component rather than about one episode, and it transfers between scenarios.
 **`generality_test.py` now imports the same constant** —
 `engine_env.TURB_PROTECT_K` — so the two experiments cannot report different
 protection limits. Until H2b's percentile rule is replaced, use the fixed-limit
-H2 table: preview edge **16.5 → 18.0 → 26.0 points** as H/τ falls from 4.47 to
-0.60, then the constraint stops binding entirely.
+H2 table — but **those figures are void too** (AUDIT.md C1: the whole sweep was
+scored against the same cooling-disabled baseline, and M12: the τ axis assumed
+112.5 g/s of exhaust where the climb makes about 103, so every τ was ~7 % low).
+Re-run `generality_test.py` and read what it prints.
 
 Those numbers were 0.0 / 0.1 / 0.2 at the old 930 K trigger. **Nothing about the
 plant changed — only the threshold.** Report the threshold with every preview

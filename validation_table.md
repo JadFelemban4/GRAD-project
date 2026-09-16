@@ -121,7 +121,7 @@ The old 39.5 s figure came from the four-cylinder.
 ## B. Against the vehicle — `compare_log.py`
 
 Source: **nine drives, 175.5 minutes**, 3.52–6.63 Hz, 2023 GR Supra B58B30O1.
-`build_dataset.py` finds **22 distinct operating points**, 30–74 kPa manifold
+`build_dataset.py` finds **23 distinct operating points**, 30–74 kPa manifold
 pressure, with the charge temperature modelled rather than read from the
 pre-throttle sensor — see section E, limit 2, for why that sensor cannot be used.
 
@@ -145,7 +145,7 @@ points the modelled charge temperature runs 48–57 °C, 52 °C mean, so the con
 this expression produces averages 0.829 against a fitted 0.837.
 
 **Report the direction honestly: dropping the free parameter makes the residual
-RISE.** The fitted k scores **1.1 %** over the 22 points and the derived form
+RISE.** The fitted k scores **1.1 %** over the 23 points and the derived form
 scores **1.4 %**, both at 30–74 kPa. That is what one free parameter is for.
 Any earlier version of this table that described the derived form as the more
 *accurate* one had the argument backwards, and an examiner will spot it in one
@@ -205,7 +205,7 @@ which is the second half of the lesson above.
 Points were removed by two rules, each written from a measurable defect rather
 than from a residual. **Say so in Chapter 3** — an exclusion rule justified after
 seeing the answer is worthless, and an examiner will ask. The current figure is
-**1.4 % derived over 22 points, 30–74 kPa**; the residuals quoted below are the
+**1.4 % derived over 23 points, 30–74 kPa**; the residuals quoted below are the
 ones each rule was scored against when it was introduced.
 
 <!-- RETIRED-OK: section -->
@@ -234,7 +234,7 @@ every water-pump channel it offers reads zero.
 
 A window is now rejected unless its wall-clock span is within 20 % of 60 s and
 it contains no gap longer than four median sample intervals. Every surviving
-point records `t_span` (58.7–68.7 s) and `max_gap` (≤ 0.45 s), so the check is
+point records `t_span` (58.7–68.7 s) and `max_gap` (≤ 0.48 s), so the check is
 auditable. `fb988991` contributes nothing.
 
 **Be honest about the improvement**: part of it is the removal of the worst
@@ -438,7 +438,7 @@ than the round 240 that used to sit there.
    six, but every one of its windows is rejected for span or a logger gap
    (section B), so it carries samples and contributes **zero** operating points.
    Quote it as "nine drives, 175.5 minutes, six carrying samples,
-   22 distinct operating points" rather than implying all eight were analysed.
+   23 distinct operating points" rather than implying all eight were analysed.
 
 8. **The radiator-outlet channel is missing on `fb988991`.** It was added to the
    recording set after that drive. Thermal work uses the other four.

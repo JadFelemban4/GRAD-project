@@ -25,7 +25,7 @@ is the first thing anyone will ask to see. It still does not advance Phase D. If
 you have an hour, spend it below, not on the app.
 
 **Where the numbers stand today.** 175.5 minutes over nine drives, six of them
-carrying samples, **22 distinct operating points spanning 30–74 kPa**. The load
+carrying samples, **23 distinct operating points spanning 30–74 kPa**. The load
 residual is **1.4 % with the DIN constant derived** (k = 0.829, zero free
 parameters) and **1.1 % with it fitted** (k = 0.837, one). Note the direction:
 dropping the fitted parameter makes the residual **rise**, 1.1 → 1.4 %. Say that
@@ -37,36 +37,51 @@ model and therefore cannot validate it.
 
 ## Do this first, before anything else
 
+<!-- RETIRED-OK: section -->
+
 ```bash
 python check_premise.py
 ```
 
-A few minutes — four full rollouts. It prints the protection trigger, then one
-row per policy.
-The damage column is the one that matters:
+A few minutes — five full rollouts. It prints the protection trigger, then one
+row per policy, then a warning you must read.
+
+**THE FOUR NUMBERS THIS FILE USED TO TELL YOU TO EXPECT ARE VOID.** They were
+829.2 / 548.6 / 437.6 / 548.6, and the 15 September audit found three reasons
+not to trust them — the baseline had its cooling switched off, the baseline ECU
+was scheduled on a load the engine was not at, and the reactive comparator
+protected less hard rather than merely later. See the box in
+[README.md](README.md), and `AUDIT.md` findings C1, C2 and C3.
+
+What it prints now:
 
 ```
-protection trigger: 1123 K (850 C) = the knee of the turbine damage term
-
 policy                             fuel g    damage  peak turb C  peak oil C
 ----------------------------------------------------------------------------
-baseline ECU (neutral trims)         4091     829.2          879         128
-reactive protection                  4175     548.6          859         123
-predictive protection                4314     437.6          852         109
-predictive, preview disabled         4175     548.6          859         123
+baseline ECU (true neutral)          3617     256.5          801         105
+reactive protection                  3617     256.5          801         105
+current-grade protection             3833     226.6          781         106
+predictive protection                3838     232.2          781         106
+predictive, preview disabled         3617     256.5          801         105
 ----------------------------------------------------------------------------
 ```
 
-Against the baseline's 829.2, reactive cuts damage **33.8 %** and predictive
-**47.2 %** — a preview edge of **13.4 points**, at the 1123 K limit. The script
-does not print those percentages; they come from the damage column.
+**Read the warning underneath it.** The baseline peaks at 801 °C against an
+850 °C trigger, so the constraint does not bind, the reactive policy never acts,
+and its row is the baseline row. Nothing in that table is a measurement of
+preview value until the scenario is re-chosen — from a real grade or a published
+duty cycle, and never by turning a knob until the gap looks good.
 
-If those four damage figures appear, the environment works and you can trust
-everything else in the repo. If they do not, stop and find out why before
-writing any code.
+The row worth looking at is **current-grade protection**: no preview at all,
+only the gradient the car is on right now, and it beats the predictive policy by
+2.2 points. If that survives a properly binding scenario, it is a result about
+H/τ rather than a disappointment.
 
-> The last pair is the point. **548.6 against 548.6** — disabling preview
-> collapses the predictive policy onto the reactive one exactly.
+> The old "548.6 against 548.6" identity was never evidence. With
+> `use_preview=False` the preview term is literally zero, so the predictive
+> policy returns the reactive policy's vector on every step — the identity
+> could not have failed. The real ablation needs a TRAINED blinded agent, and
+> that is Phase D.
 
 ---
 
@@ -77,12 +92,12 @@ reproduce, the number here is stale and the script is right.
 
 | command | what it prints today |
 |---|---|
-| `python check_premise.py` | damage 829.2 · 548.6 · 437.6 · 548.6 — rows 2 and 4 identical; trigger 1123 K |
-| `python test_reward.py` | 4 of 4 checks pass; neutral scores **−0.00438** |
+| `python check_premise.py` | **the constraint does not bind on the current scenario** — baseline 256.5 at 801 °C, trigger 1123 K. Read the warning it prints. AUDIT.md C1/C2/C3 |
+| `python test_reward.py` | 4 of 4 checks pass; neutral scores **inside ±0.05** (currently −0.00888). The exact value is one preference draw and moves with the reset seed — AUDIT.md M13 |
 | `python validate.py` | **8 of 11** quantities inside the published band; displacement 2997.5 cc; turbine τ **48.0 s** |
 | `python compare_log.py data/master_points.csv` | fitted k 0.837 → **1.1 %**; derived k 0.829 → **1.4 %**, PASS; a 20 °C reference would give 0.890, which the fit excludes |
 | `python check_map.py` | spark falls with load in every row and rises with speed in every column; **6 cells `--`** (above the compressor ceiling), **0 `knk`** |
-| `python build_dataset.py "logs/raw/*.csv"` | 175.5 min, 9 drives, 22 operating points |
+| `python build_dataset.py "logs/raw/*.csv"` | 175.5 min, 9 drives, 23 operating points |
 | `python verify_docs.py` | recomputes the published figures, scans every tracked document for retired ones, and prints its own total. Every check must pass. **Do not memorise the count** — it moves each time a figure is added |
 | `python -m app.test_replay` | **36 of 36**. Add `--full` for **46 of 46**, which replays the whole of `7475b5d7`: 14278 of 14340 samples estimated, peak estimated turbine **884.9 °C**, **13 thermal · 0 mismatch · 19 novel** |
 | `python -m app.server --replay logs/raw/7475b5d7-20260908_142743.csv --speed 8` | serves `http://localhost:8000` — dashboard, `/driver`, `/review`. **No car needed** |
@@ -151,7 +166,7 @@ re-running the same seed resumes from its checkpoint.
 python test_reward.py
 ```
 
-All four checks must pass, and neutral must score **−0.00438**. A training curve
+All four checks must pass, and neutral must score **inside ±0.05** — that is the criterion the check applies. The exact figure depends on the reset seed (−0.0027 to −0.0089 across seeds 0–3), so do not treat one value as a requirement. A training curve
 computed against a broken reward is worse than no curve, because it looks like
 progress. The reward has carried a live hack twice (mistake 5), and the second
 time it came back only because the plant changed underneath it.

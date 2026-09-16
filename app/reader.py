@@ -221,9 +221,46 @@ class ReaderStatus:
                              for k, v in self.health.items()}}
 
 
-def _f(row, name):
+# Physically impossible readings, per field. A value outside these is a
+# placeholder or a decode error, not a measurement.
+#
+# AUDIT.md M8, 15 September 2026: BimmerLink writes 0 for every channel until
+# its first poll, so the opening rows of every export read coolant 0, ambient 0
+# and ambient pressure 0. Those reached the estimator as REAL readings -- on
+# 3f64372e coolant is 0 for the first 14 rows and ambient pressure for 17 --
+# and the engine passes the rpm/air gate before they arrive, so the thermal
+# state was being seeded with a block at 273 K.
+#
+# A guard on the physics catches it without needing to know the logger's
+# habits: this engine cannot be at -273 C, and ambient pressure cannot be zero
+# at any altitude a car reaches.
+# Channels whose LEADING run of exact zeros is a placeholder rather than a
+# reading. Restricted on purpose: a vehicle speed of 0 at the start of a log is
+# a real measurement of a stationary car, and an air mass of 0 is a real
+# measurement of a stopped engine. A coolant or ambient TEMPERATURE of exactly
+# 0.000, before that channel has ever reported anything else, is not.
+ZERO_IS_PLACEHOLDER = ("ect_c", "oil_c", "t_amb_c", "iat_pre_c", "p_amb_psi")
+
+PLAUSIBLE = {
+    "ect_c":     (-40.0, 150.0),
+    "oil_c":     (-40.0, 200.0),
+    "t_amb_c":   (-50.0, 70.0),
+    "iat_pre_c": (-50.0, 250.0),
+    "p_amb_psi": (7.0, 16.5),     # 7 psi is ~5500 m; 16.5 is a deep mine
+    "rpm":       (0.0, 9000.0),
+    "air_kgh":   (0.0, 2000.0),
+    "v_kmh":     (0.0, 350.0),
+    "lam":       (0.4, 1.8),
+    "spark_deg": (-40.0, 60.0),
+}
+
+
+def _f(row, name, field=None):
     """One CSV cell to a float, or None. Never raises: a log is a measurement
-    and a malformed cell is a fact about the logger, not a reason to stop."""
+    and a malformed cell is a fact about the logger, not a reason to stop.
+
+    When `field` is given, the value is also range-checked -- see PLAUSIBLE.
+    """
     v = row.get(name, "")
     if v is None:
         return None
@@ -235,7 +272,13 @@ def _f(row, name):
         x = float(v)
     except (TypeError, ValueError):
         return None
-    return None if x != x else x
+    if x != x:
+        return None
+    if field is not None:
+        lo, hi = PLAUSIBLE.get(field, (-float("inf"), float("inf")))
+        if not (lo <= x <= hi):
+            return None
+    return x
 
 
 class ReplayReader:
@@ -266,6 +309,20 @@ class ReplayReader:
         # like pull01 has most of them missing, and that is the normal case.
         cols = set(self.rows[0].keys())
         self.present = {c.field for c in ALL_CHANNELS if c.csv in cols}
+        # AUDIT.md M8: index of the first row on which each placeholder-prone
+        # channel reports something other than exactly zero. Everything before
+        # it is the logger filling the column before the ECU has answered.
+        self._first_real = {}
+        for c in ALL_CHANNELS:
+            if c.field not in ZERO_IS_PLACEHOLDER or c.csv not in cols:
+                continue
+            idx = 0
+            for i, row in enumerate(self.rows):
+                v = _f(row, c.csv)
+                if v is not None and v != 0.0:
+                    idx = i
+                    break
+            self._first_real[c.field] = idx
         self.status = ReaderStatus(
             mode="replay", source=self.name, connected=True,
             health={c.field: ChannelHealth(retired=c.csv not in cols)
@@ -276,7 +333,7 @@ class ReplayReader:
             t0 = None
             t_prev = None
             wall0 = time.monotonic()
-            for row in self.rows:
+            for row_i, row in enumerate(self.rows):
                 t = _f(row, "Time")
                 if t is None:
                     self.skipped_rows += 1
@@ -296,7 +353,9 @@ class ReplayReader:
                         time.sleep(min(gap, 1.0))
                 vals = {}
                 for c in ALL_CHANNELS:
-                    v = _f(row, c.csv)
+                    v = _f(row, c.csv, c.field)
+                    if v == 0.0 and row_i < self._first_real.get(c.field, 0):
+                        v = None            # placeholder, not a reading
                     h = self.status.health[c.field]
                     if v is None:
                         if c.csv in row:
@@ -334,7 +393,7 @@ class LiveReader:
     development needs no adapter library installed.
     """
 
-    def __init__(self, port: str | None = None, optional: bool = True):
+    def __init__(self, port: str | None = None, optional: bool = False):
         try:
             import obd
         except ImportError:
@@ -466,13 +525,20 @@ class LiveReader:
                         if c.field in held:
                             setattr(s, c.field, held[c.field])
                         continue
-                    self._last_poll[c.field] = now
                     v = self._query(c.obd)
                     if v is None:
+                        # AUDIT.md M9: `_last_poll` used to be advanced HERE,
+                        # before the query, so a single NO DATA on a slow
+                        # channel meant it was not re-asked for its whole
+                        # period. Barometric carries min_period_s = 30, and
+                        # boost is derived from it, so one transient miss
+                        # silenced the mismatch detector for the session. A
+                        # miss now does not count as a poll.
                         h.note_miss()
                         if c.field in held:
                             setattr(s, c.field, held[c.field])
                         continue
+                    self._last_poll[c.field] = now
                     h.note_ok(s.t)
                     v = c.scale(v)
                     held[c.field] = v
@@ -512,7 +578,14 @@ class LiveReader:
         else:
             held["_intake_kpa"] = intake_kpa
         if s.p_amb_psi is None:
-            h.note_miss()
+            # AUDIT.md M9. Boost is DERIVED from barometric, so a missing
+            # barometric reading is not evidence that boost is unsupported --
+            # it is evidence about barometric. Counting a boost miss here
+            # retired the channel, and with it the mismatch detector, after
+            # five cycles of a transient that had nothing to do with it. Only
+            # barometric being retired outright is a real reason to give up.
+            if self.status.health["p_amb_psi"].retired:
+                h.note_miss()
             return
         h.note_ok(s.t)
         s.boost_psi = intake_kpa * KPA_PER_PSI_INV - s.p_amb_psi

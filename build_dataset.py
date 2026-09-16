@@ -25,7 +25,7 @@ DERIVED COLUMNS, AND WHY THEY ARE NOT JUST COPIED FROM THE LOG
                  vehicle is a pre-throttle sensor: it never drops below ~92 kPa,
                  even at idle where physics demands about 31. Using it gives 75%
                  air-mass error; inverting air mass leaves a 1.4 % load residual
-                 over the 22 pooled points, 30-74 kPa (1.1 % if the DIN constant
+                 over the 23 pooled points, 30-74 kPa (1.1 % if the DIN constant
                  is fitted rather than derived). Read what that residual does
                  and does not test in compare_log.py before quoting it.
   corr_flow      compressor-corrected mass flow, kg/s. Inlet conditions are
@@ -95,7 +95,7 @@ CH = {
 # each way:
 #
 #     59 windows survive the span and gap checks at 60 s, and dedupe to the
-#        22 distinct operating points in data/master_points.csv
+#        23 distinct operating points in data/master_points.csv
 #      9 windows survive at 180 s
 #
 # Asking for 180 s would throw away five windows in six. Public roads do not
@@ -233,7 +233,7 @@ def steady_points(d):
     before this check existed and on the seven drives that existed then. They
     are what motivated the rule, not a description of the shipped dataset. With
     the check in place, the worst gap inside any surviving window across all
-    nine drives is 0.45 s.
+    nine drives is 0.48 s.
 
         3aca2ec1   windows spanned 42.8 - 68.7 s
         cb67b01f   windows spanned 65.6 - 65.8 s
@@ -303,22 +303,70 @@ def steady_points(d):
 
 
 def dedupe(points):
+    """Collapse windows that describe the same operating point.
+
+    AUDIT.md H7, 15 September 2026. This used to be GREEDY FIRST-MATCH
+    clustering with a chained running mean, over `sorted(glob(...))` order. Two
+    consequences, both real:
+
+      * the POINT COUNT was a property of file order. The same 59 windows give
+        23 points in glob order, 23 reversed, and 20/21/22/22/23 under shuffles.
+        A new log whose name sorts early re-seeded every cluster.
+      * it averaged BOOKKEEPING fields as though they were measurements --
+        `t_start`, `t_span`, `max_gap`, `gear`, `brake` -- and kept only the
+        first window's `source`. Eight of the fourteen merged clusters pooled
+        windows from two or three different drives under one drive's name, so
+        the per-drive residual table attributed windows to the wrong drives, and
+        the "no point straddles a gap > 0.48 s" check ran on an AVERAGED gap
+        whose true member maximum is 0.481 s.
+
+    Fixed by clustering on a FIXED GRID rather than on arrival order: each
+    window is assigned to a (rpm, load) cell, so the grouping is a property of
+    the data and nothing else. Measurement channels are averaged; bookkeeping
+    fields carry the worst case (`max_gap`), the range (`t_span`) and the full
+    list of contributing drives.
+    """
+    # Bookkeeping, not measurement. Averaging these is what hid the 0.481 s gap.
+    BOOK = {"t_start", "t_span", "max_gap", "gear", "brake", "source", "_merged"}
+
+    # SORT FIRST. Greedy merging is fine; taking the windows in whatever order
+    # glob returned them is not. Sorting by (rpm, load) makes the clustering a
+    # property of the data, and keeps the "within tolerance of each other"
+    # semantics -- a fixed grid instead would split two near-identical windows
+    # that happen to straddle a cell boundary (measured: 30 points instead of
+    # 22, for no physical reason).
     merged = []
-    for p in points:
+    for p in sorted(points, key=lambda x: (x["rpm"], x["load_pct"])):
         for m in merged:
-            same_rpm = abs(m["rpm"] - p["rpm"]) < DEDUPE_RPM
-            same_load = abs(m["load_pct"] - p["load_pct"]) < DEDUPE_LOAD
-            if same_rpm and same_load:
-                m["_merged"] += 1
-                k = m["_merged"]
-                for key, val in p.items():
-                    if isinstance(val, float) and key in m and isinstance(m[key], float):
-                        m[key] = (m[key] * (k - 1) + val) / k
+            if (abs(m["rpm"] - p["rpm"]) < DEDUPE_RPM
+                    and abs(m["load_pct"] - p["load_pct"]) < DEDUPE_LOAD):
+                m["_members"].append(p)
                 break
         else:
             q = dict(p)
-            q["_merged"] = 1
+            q["_members"] = [p]
             merged.append(q)
+
+    for q in merged:
+        group = q.pop("_members")
+        q["_merged"] = len(group)
+        for field, val in list(q.items()):
+            if field in BOOK or field == "_merged" or not isinstance(val, float):
+                continue
+            vals = [g[field] for g in group
+                    if isinstance(g.get(field), float) and g[field] == g[field]]
+            if vals:
+                q[field] = sum(vals) / len(vals)
+        gaps = [g.get("max_gap") for g in group if isinstance(g.get("max_gap"), float)]
+        spans = [g.get("t_span") for g in group if isinstance(g.get("t_span"), float)]
+        if gaps:
+            q["max_gap"] = max(gaps)          # WORST case, never a mean
+        if spans:
+            q["t_span"] = sum(spans) / len(spans)
+            q["t_span_min"], q["t_span_max"] = min(spans), max(spans)
+        srcs = sorted({g.get("source") for g in group if g.get("source")})
+        q["source"] = srcs[0] if len(srcs) == 1 else "+".join(srcs)
+        q["n_sources"] = len(srcs)
     return merged
 
 

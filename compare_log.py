@@ -40,6 +40,11 @@ TARGETS = {           # channel -> (tolerance, unit)
 # The master dataset uses the short ones, so look under either.
 ALIASES = {
     "Engine speed": "rpm",
+    # AUDIT.md M14: without this alias, --map-from-log -- the mode that exists
+    # only to REPRODUCE mistake 2 for the thesis -- found no pressure column
+    # under the short schema, scored zero rows, printed an empty table and
+    # exited 0. Fail-open, which is the shape of mistake 9.
+    "Intake manifold absolute pressure": "map_raw",
     "Intake air temperature before throttle valve, measured": "iat_pre",
     "Coolant temperature": "ect",
     "Ambient temperature": "t_amb",
@@ -157,7 +162,11 @@ def main():
 
     print("\nLOAD (relative air filling)")
     if len(load_pairs) < 3:
-        print("  too few points")
+        # AUDIT.md M14: this printed and exited 0, so a mode that scored
+        # NOTHING looked like a mode that passed -- mistake 9's failure
+        # shape, where a check that fails open still prints a result.
+        print(f"  too few points ({len(load_pairs)} scored) -- NOT A PASS")
+        raise SystemExit(2)
     else:
         meas = np.array([m for m, _, _ in load_pairs])
         mod = np.array([x for _, x, _ in load_pairs])

@@ -51,17 +51,28 @@ python presentation/dump_sweeps.py    # plant.predict() spark and lambda sweeps
 are packed into `data.js`. Both write only to their own output; neither touches `data/`
 or `logs/raw/`.
 
-The traces behind the race widget are the real thing: four full 720 s rollouts whose
-summary reproduces the published premise numbers exactly —
-**829.2 · 548.6 · 437.6 · 548.6**, with the blinded run byte-identical to the reactive one.
-
-Everything else on the page was checked against the repository before it shipped:
-
-```
-python verify_docs.py         # all checks pass, 230 figure mentions agree
-python generality_test.py     # H2 confirms 16.5 -> 18.0 -> 26.0
-python check_premise.py       # 829.2 / 548.6 / 437.6 / 548.6
-```
+> ## ⚠️ THE PAGE IS OUT OF DATE AND MUST NOT BE SHOWN AS IT STANDS
+>
+> <!-- RETIRED-OK: section -->
+> `index.html` hard-codes the premise figures **24 times** (829.2), **70 times**
+> (548.6) and **16 times** (437.6), plus the 13.4-point preview edge and the
+> H2 table. **Every one of them is void** as of 16 September 2026 — see the box
+> at the top of [README.md](../README.md) and `AUDIT.md` findings C1, C2 and C3.
+>
+> In short: the baseline those figures were measured against had its cooling
+> switched off, the baseline ECU was scheduled on a load the engine was not at,
+> and the "blinded run is byte-identical to the reactive one" claim this file
+> used to make as evidence is an identity that could not have failed.
+>
+> **The corrected script reports that the constraint does not bind at all** on
+> this scenario: the baseline peaks at 801 °C against an 850 °C trigger.
+>
+> Regenerate `data.js` from the two dump scripts and rewrite every figure before
+> this page is shown to anyone outside the team. Until then it is a record of
+> what we believed in September, not a briefing.
+>
+> `verify_docs.py` scans `.md` and `.py` only, so **it cannot see `index.html`**
+> and did not catch this (AUDIT.md L11). That gap is why the page drifted.
 
 <!-- RETIRED-OK -->
 The page was also scanned for every figure this project has **retired** — 2.8 %,

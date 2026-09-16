@@ -106,7 +106,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from plant import map_from_airflow, charge_temperature, predict, b58   # noqa: E402
 from thermal import ThermalNetwork                                      # noqa: E402
-from engine_env import BaselineECU                                      # noqa: E402
+from engine_env import BaselineECU, damage_rate                         # noqa: E402
 
 GEO = b58()
 
@@ -199,10 +199,16 @@ class State:
     t_turb_lo_c: float = float("nan")  # bound: turbine seeded at ambient
     t_turb_hi_c: float = float("nan")  # bound: turbine seeded at EGT
     seed_band_k: float = float("nan")  # hi - lo. the honest error bar
+    # Where the turbine is HEADED at the current operating point, and how fast.
+    # The housing is a first-order node, so these two make the model's own
+    # projection exact for constant inputs -- see AUDIT.md M10.
+    t_turb_ss_c: float = float("nan")   # steady state at this operating point
+    tau_turb_s: float = float("nan")    # c_turb / (ua_gas*mdot_exh + ua_amb)
     t_oil_est_c: float = float("nan")
     t_oil_lo_c: float = float("nan")
     t_oil_hi_c: float = float("nan")
     t_block_c: float = float("nan")
+    block_residual_k: float = float("nan")  # modelled block minus measured coolant
     damage_rate: float = 0.0           # per second, same model as check_premise
     damage_total: float = 0.0
 
@@ -232,6 +238,8 @@ class Estimator:
         self._t_start = None
         self._seeded = False
         self._band0 = None          # band width at the seed, for confidence
+        self._knock_observed = False
+        self.block_residual_k = float("nan")   # modelled block minus measured
 
     # -- warm start ------------------------------------------------------
     def _steady_turb_k(self, egt_k: float, exh_gps: float) -> float:
@@ -250,6 +258,20 @@ class Estimator:
         ua_gas = p.ua_gas_turb * max(exh_gps, 0.5)
         ua_amb = p.ua_turb_amb
         return (ua_gas * egt_k + ua_amb * self.t_amb_k) / (ua_gas + ua_amb)
+
+    def _tau_turb_s(self, exh_gps: float) -> float:
+        """Time constant of the turbine node at this exhaust flow, in seconds.
+
+        AUDIT.md M10. This is the number that makes a linear projection wrong:
+        the housing cannot keep climbing at its current rate, it decays towards
+        `_steady_turb_k` with this time constant, so a 30 s linear extrapolation
+        overshoots by a third or more. It ranges from about 27 s at full flow to
+        240 s at idle, which is also why the warm-up bound is measured rather
+        than timed (mistake 15).
+        """
+        p = self.tn.p
+        ua = p.ua_gas_turb * max(exh_gps, 0.5) + p.ua_turb_amb
+        return p.c_turb / max(ua, 1e-9)
 
     def _seed(self, s: Sample, ect_k: float, egt_k: float, exh_gps: float):
         """Set the thermal state, and BOUND it, at the first good sample.
@@ -303,6 +325,15 @@ class Estimator:
         self._band0 = max(1.0, hi - lo)
         self._seeded = True
 
+    def _blank(self, t: float) -> State:
+        """A State that says only "no estimate", carrying nothing stale."""
+        st = State(t=t)
+        st.ok = False
+        st.reseeds = self.reseeds
+        st.damage_total = self.damage_total
+        self.state = st
+        return st
+
     def _reseed_reason(self, dt_raw: float) -> bool:
         """A gap long enough that the integration no longer describes this car."""
         return dt_raw > GAP_RESEED_S
@@ -313,10 +344,14 @@ class Estimator:
 
         if s.rpm is None or s.rpm < 400 or s.air_kgh is None or s.air_kgh <= 0:
             # Engine off, cranking, or the air channel has not arrived yet.
-            # Hold the previous thermal state rather than integrating garbage.
-            self.state.t = s.t
-            self.state.ok = False
-            return self.state
+            # Hold the thermal state -- integrating garbage is worse -- but do
+            # NOT hand back the last full State with ok flipped to False.
+            #
+            # AUDIT.md L4: that is what this used to do, and index.html paints
+            # every field regardless of `ok`, so the dashboard went on showing
+            # the last good turbine temperature, torque and EGT as though they
+            # were current. A blank State cannot be misread that way.
+            return self._blank(s.t)
 
         # --- inputs, with every fallback declared --------------------------
         if s.ect_c is None:
@@ -351,25 +386,46 @@ class Estimator:
         # throttle on this car. See alerts.py.
         map_kpa = map_from_airflow(air_gps, s.rpm, t_charge_k, geo=GEO)
         if not math.isfinite(map_kpa) or map_kpa < 15:
-            self.state.t = s.t
-            self.state.ok = False
-            return self.state
+            return self._blank(s.t)
 
         # --- spark and lambda: measured if the car reports them ------------
+        #
+        # AUDIT.md H8, 15 September 2026. This used to call `base_lambda(rpm,
+        # map_kpa)` with no dwell argument, so the v4 enrichment model's dwell
+        # term was ALWAYS ZERO and the modelled lambda was ALWAYS 1.00 -- the
+        # fallback could not enrich under any condition. Enrichment on this
+        # engine is component protection (mistake 4), so switching it off makes
+        # the modelled EGT run 80-110 K hot under a sustained pull, and that
+        # feeds the DRIVER-FACING thermal alerts.
+        #
+        # The fix is not to pass dwell here but to stop re-implementing the ECU:
+        # `BaselineECU.step` already keeps the dwell timer, the knock retard and
+        # the IAT compensation, and it is the same object the environment uses.
+        # It is stepped EVERY sample, whether or not we need its outputs, so its
+        # timers are correct the moment a measured channel drops out mid-drive.
+        dt_ecu = 0.0 if self._t_last is None else max(0.0, min(GAP_RESEED_S,
+                                                               s.t - self._t_last))
+        ecu_spark, ecu_lam, ecu_fan = self.ecu.step(
+            s.rpm, map_kpa, t_charge_k, ect_k,
+            knock_observed=self._knock_observed, dt=dt_ecu)
+
         if s.spark_deg is not None:
             spark = s.spark_deg
         else:
-            spark = self.ecu.base_spark(s.rpm, map_kpa)
+            spark = ecu_spark
             modelled.append("spark")
         if s.lam is not None and 0.5 < s.lam < 1.5:
             lam = s.lam
         else:
-            lam = self.ecu.base_lambda(s.rpm, map_kpa)
+            lam = ecu_lam
             modelled.append("lambda")
 
         out = predict(rpm=s.rpm, map_kpa=map_kpa, iat_k=t_charge_k, ect_k=ect_k,
                       spark_btdc=spark, lam=lam, geo=GEO)
         egt_k = out["egt_c"] + 273.15
+        # Fed to the NEXT ecu.step so its retard integrator behaves as the
+        # environment's does. 0.85 is the knee the damage term uses.
+        self._knock_observed = out["knock_integral"] > 0.85
 
         # --- seeding, and recovery from a lost stream ----------------------
         dt_raw = 0.0 if self._t_last is None else max(0.0, s.t - self._t_last)
@@ -393,9 +449,29 @@ class Estimator:
         while remaining > 1e-9:
             step = min(MAX_SUBSTEP_S, remaining)
             for tn in (self.tn, self.tn_lo, self.tn_hi):
-                fan = 1.0 if tn.t_block > 373.0 else 0.0
-                tn.step(step, fuel, exh, egt_k, self.t_amb_k, v_mps, fan)
+                tn.step(step, fuel, exh, egt_k, self.t_amb_k, v_mps, ecu_fan)
             remaining -= step
+
+        # --- the block is MEASURED, so stop integrating a guess at it -------
+        #
+        # AUDIT.md M11, 15 September 2026. The block node was free-running from
+        # its seed for the whole drive even though coolant arrives every sample.
+        # That is the least defensible node to integrate: the radiator group is
+        # explicitly UNIDENTIFIABLE on this car (thermal.py), so its conductances
+        # are reasoned values, and the oil node is coupled to the block and
+        # inherits whatever the block does. Measured on 7475b5d7 it drifted 14 K
+        # from the sensor.
+        #
+        # When coolant is present it is simply assigned. The drift that WOULD
+        # have accumulated is kept as `block_residual_k` -- a free self-check on
+        # the cooling model, and the only place in the app where a modelled
+        # quantity can be scored against a measured one every sample.
+        if s.ect_c is not None:
+            self.block_residual_k = self.tn.t_block - ect_k
+            for tn in (self.tn, self.tn_lo, self.tn_hi):
+                tn.t_block = ect_k
+        else:
+            self.block_residual_k = float("nan")
 
         # The bound can only ever narrow; clamp so numerical noise cannot make
         # it appear to reopen.
@@ -404,9 +480,12 @@ class Estimator:
         band = hi - lo
         warming = band > SEED_SETTLED_K
 
-        # --- damage: the SAME model check_premise.py scores with -----------
-        d_rate = (math.exp((self.tn.t_turb - 1123.0) / 45.0)
-                  + 0.4 * math.exp((self.tn.t_oil - 408.0) / 12.0))
+        # --- damage: the SAME model, imported, not retyped ------------------
+        # AUDIT.md L1/M2: this formula used to be re-typed here WITHOUT the
+        # knock term, under a docstring claiming it was the same model
+        # check_premise.py scores with. It is now imported, and the knock term
+        # is passed, so the claim is true.
+        d_rate = damage_rate(self.tn.t_turb, self.tn.t_oil, out["knock_integral"])
         self.damage_total += d_rate * min(dt_raw, GAP_RESEED_S)
 
         st = State(t=s.t)
@@ -425,10 +504,13 @@ class Estimator:
         st.t_turb_lo_c = lo - 273.15
         st.t_turb_hi_c = hi - 273.15
         st.seed_band_k = band
+        st.t_turb_ss_c = self._steady_turb_k(egt_k, exh) - 273.15
+        st.tau_turb_s = self._tau_turb_s(exh)
         st.t_oil_est_c = self.tn.t_oil - 273.15
         st.t_oil_lo_c = min(self.tn_lo.t_oil, self.tn_hi.t_oil) - 273.15
         st.t_oil_hi_c = max(self.tn_lo.t_oil, self.tn_hi.t_oil) - 273.15
         st.t_block_c = self.tn.t_block - 273.15
+        st.block_residual_k = self.block_residual_k
         st.damage_rate = d_rate
         st.damage_total = self.damage_total
         st.modelled = modelled

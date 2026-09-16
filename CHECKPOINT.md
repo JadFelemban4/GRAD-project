@@ -45,7 +45,7 @@ file if it is more than a week old.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.829, zero free parameters), 1.1 % with k fitted (0.837, one). 22 pooled points, 30–74 kPa, 175.5 min logged. Read mistake 12 before quoting either |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.829, zero free parameters), 1.1 % with k fitted (0.837, one). 23 pooled points, 30–74 kPa, 175.5 min logged. Read mistake 12 before quoting either |
 | C · get an agent to learn | **next.** `train.py` exists and runs; nothing trained yet |
 | D · baselines and the ablation | not started. **This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -60,6 +60,8 @@ file if it is more than a week old.
 
 ## Full verification run — 9 September 2026
 
+<!-- RETIRED-OK: section -->
+
 Every script in the repo was executed end to end. **All eight passed.**
 
 | # | Script | Result |
@@ -69,13 +71,15 @@ Every script in the repo was executed end to end. **All eight passed.**
 | 3 | `check_premise.py` | ✅ **829.2 · 548.6 · 437.6 · 548.6** |
 | 4 | `verify_docs.py` | ✅ every published figure matched. Run it and read the total it prints |
 | 5 | `test_reward.py` | ✅ **4 of 4** |
-| 6 | `build_dataset.py` | ✅ 175.5 min, 9 drives, 22 points |
+| 6 | `build_dataset.py` | ✅ 175.5 min, 9 drives, 23 points |
 | 7 | `compare_log.py` | ✅ **PASS** — 1.4 % load residual with k derived, 1.1 % with k fitted |
 | 8 | `generality_test.py` | ✅ H2 table reproduced: 16.5 / 18.0 / 26.0 pts |
 
 Nothing in the repository is stale. Every published figure regenerates.
 
 ### The premise check, in full
+
+<!-- RETIRED-OK: section -->
 
 Protection trigger **1123 K (850 °C)** — the knee of the turbine damage term.
 
@@ -176,6 +180,8 @@ one of its windows survives the span and gap checks, so it contributes zero
 
 ### 1. Phase F's H2b threshold rule does not survive the correct engine
 
+<!-- RETIRED-OK: section -->
+
 H2b sets the constraint at the 80th percentile of the unprotected trace, which
 assumes the temperature spends a *minority* of the episode near its peak. The
 standard scenario is a sustained climb — nine of its twelve minutes at the top —
@@ -273,6 +279,8 @@ Full detail: [handoff.md](handoff.md).
 
 ### What was run
 
+<!-- RETIRED-OK: section -->
+
 `engine-supervisor-v16.zip` was unpacked over the working copy. All 38 archive
 files are byte-identical to the archive. All six checks were run in order.
 
@@ -343,7 +351,7 @@ pre-throttle and disagree by 44–52 % at the steady points.
 
 **Current values, 11 September.** The charge-temperature correction moved the
 point span again: it is **30–74 kPa** now, not 31–82. And the fitted residual is
-**1.1 %** against the derived **1.4 %**, over the same 22 points — dropping the
+**1.1 %** against the derived **1.4 %**, over the same 23 points — dropping the
 fitted parameter makes the residual rise, not fall.
 
 ### Also corrected, in the second pass
@@ -393,6 +401,8 @@ byte-identical to what was there before.
 
 ### What shipped: the charge-temperature correction
 
+<!-- RETIRED-OK: section -->
+
 `build_dataset.py` and `compare_log.py` no longer feed the pre-throttle intake
 temperature channel into `map_from_airflow()`. That channel is a compressor
 outlet — mistake 13 in `CLAUDE.md` — and the inversion now uses
@@ -400,7 +410,7 @@ outlet — mistake 13 in `CLAUDE.md` — and the inversion now uses
 
 | quantity | value after v17 |
 |---|---|
-| operating-point span | **30–74 kPa**, 22 points, 175.5 min over 9 drives |
+| operating-point span | **30–74 kPa**, 23 points, 175.5 min over 9 drives |
 | load residual, k **derived** 0.829 | **1.4 %**, zero free parameters |
 | load residual, k **fitted** 0.837 | **1.1 %**, one free parameter |
 | a 20 °C reference state would need | k = 0.890 — the fit excludes it |
@@ -560,6 +570,8 @@ drives" alone: the enrichment map and the compressor fit genuinely rest on eight
 drives of samples, because `pull01` contributes **zero** samples.
 
 ### Verification on the merged tree — every script re-run
+
+<!-- RETIRED-OK: section -->
 
 | script | result |
 |---|---|

@@ -147,7 +147,9 @@ problem and is not where the fix went.
      boost 6.00 s, engine speed 6.00 s; ambient pressure 18.0 s). A window that
      spans a refresh interval necessarily contains readings from more than one
      poll cycle, which is the minimum that can tell a standing offset from
-     skew. Sweeping that span requirement over all nine drives:
+     skew. Sweeping that span requirement over all nine drives, at the SHIPPED
+     30 s window (AUDIT.md L6 -- this table was captioned 20 s in error; the
+     numbers were always the 30 s configuration and are unchanged):
 
          span >=  0 s   n=89 windows   worst |median|  34.5 %
          span >=  4 s   n=74           worst           16.6 %
@@ -177,9 +179,9 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from engine_env import TURB_PROTECT_K   # noqa: E402  the SAME 1123 K
-
-OIL_PROTECT_K = 408.0          # the oil knee in the damage model
+# AUDIT.md L1: both protection limits are imported, not re-typed. 408.0 used to
+# be a literal here and a second literal in engine_env's damage function.
+from engine_env import TURB_PROTECT_K, OIL_PROTECT_K   # noqa: E402
 LEAD_S = 30.0                  # how far ahead we project the thermal trend
 
 # -- mismatch gates. See the long note in the module docstring. --------------
@@ -202,11 +204,11 @@ MISMATCH_MIN_SPAN_S = 6.0      # = the measured channel refresh interval
 #     the error of a pressure inversion.
 #
 #   * measured directly, the model's own error ON THIS COMPARISON is close to
-#     15 %. Under the three gates above, across all nine drives, the windowed
-#     median of the disagreement on a car with nothing wrong with it reaches
-#     13.6 % (worst window, 7475b5d7; per-drive worst 13.6 / 9.2 / 7.0 %). A
-#     15 % threshold sits 1.4 points above the worst healthy reading, which is
-#     no margin at all.
+#     15 %. Under the three gates above, across all nine drives, the 30 s
+#     windowed median of the disagreement on a car with nothing wrong with it
+#     reaches 13.6 % over 45 qualifying windows (p50 5.0 %, p95 9.2 %). A 15 %
+#     threshold sits 1.4 points above the worst healthy reading, which is no
+#     margin at all.
 #
 # 25 % is above every value nine healthy drives produced, with an 11-point
 # margin, and still far below what a boost leak large enough to matter shows.
@@ -218,7 +220,12 @@ MISMATCH_MIN_SPAN_S = 6.0      # = the measured channel refresh interval
 # buys margin for the drives where the worst healthy window sits at 13.6 %.
 MISMATCH_PCT = 25.0
 
-VALID_MAP_LO, VALID_MAP_HI = 30.0, 74.0   # where the model was validated
+# The two regions where the inversion HAS evidence, and they are not the same
+# kind. 30-74 kPa is the span of the 22 steady operating points; above 200 kPa
+# is where the inverted pressure was compared against the car's own boost
+# channel and agreed to +3.0 % (mistake 13). Between them there is neither.
+VALID_MAP_LO, VALID_MAP_HI = 30.0, 74.0   # the steady operating points
+BOOST_CHECKED_KPA = 200.0                 # mistake 13's comparison threshold
 
 SEV = {"info": 0, "watch": 1, "warn": 2, "critical": 3}
 
@@ -284,54 +291,100 @@ class AlertEngine:
         return a
 
     # -- 1. THERMAL: for the driver, right now ----------------------------
-    def _thermal(self, st):
+    def _thermal(self, st) -> list:
+        """Every thermal condition, evaluated. Returns a list, possibly empty.
+
+        AUDIT.md L2: this used to `return self._fire(...)` from the turbine
+        branch, and `_fire` returns None while a cooldown is running -- so
+        whenever the turbine was at or near its limit, the OIL check below it
+        was skipped entirely. The branch that mattered most silenced the one
+        underneath it.
+
+        AUDIT.md M10 is the bigger fix and it is about honesty rather than
+        coverage. The projection used to be linear: `T + rate x 30 s`. The
+        housing is a FIRST-ORDER node heading for the steady state its current
+        operating point implies, with a time constant of 27-240 s, so it
+        reaches only 61-75 % of that straight line. On 7475b5d7 five of the ten
+        warnings projected to within 5 K of the limit while the model's own
+        dynamics put them 20-110 K short of it -- and "threshold in about N s"
+        is a quantitative claim to a driver.
+
+        The projection is now the analytic solution of the node the app is
+        already integrating:
+
+            T(dt) = T_ss + (T - T_ss) * exp(-dt / tau)
+
+        which is exact for constant inputs, and it carries a consequence worth
+        having: **if T_ss is below the limit, the turbine cannot reach the limit
+        at this operating point, however fast it is climbing right now.** No
+        time-to-threshold is quoted in that case, because there is not one.
+        """
+        out = []
         if not st.ok or st.warming_up:
-            # Never alarm on a seeded guess. `warming_up` is now the measured
-            # width of the seed bound, not a timer -- see estimator.py note 1.
-            return None
+            # Never alarm on a seeded guess. `warming_up` is the measured width
+            # of the seed bound, not a timer -- see estimator.py note 1.
+            return out
         self._hist.append((st.t, st.t_turb_c, st.t_oil_est_c))
         while self._hist and st.t - self._hist[0][0] > 20.0:
             self._hist.popleft()
         if len(self._hist) < 5:
-            return None
+            return out
 
         t0, turb0, _ = self._hist[0]
         span = st.t - t0
         if span < 5.0:
-            return None
-        rate = (st.t_turb_c - turb0) / span          # K/s
-        projected = st.t_turb_c + rate * LEAD_S
+            return out
+        rate = (st.t_turb_c - turb0) / span          # K/s, for display only
         limit_c = TURB_PROTECT_K - 273.15            # 850 C
+
+        # the model's own projection, not a straight line
+        ss, tau = st.t_turb_ss_c, st.tau_turb_s
+        if math.isfinite(ss) and math.isfinite(tau) and tau > 0:
+            projected = ss + (st.t_turb_c - ss) * math.exp(-LEAD_S / tau)
+            reachable = ss >= limit_c
+        else:                                    # no dynamics: fall back, and say so
+            projected = st.t_turb_c + rate * LEAD_S
+            reachable = projected >= limit_c
 
         ev = {"t_turb_c": round(st.t_turb_c, 1), "rate_k_s": round(rate, 2),
               "projected_c": round(projected, 1), "limit_c": round(limit_c, 1),
+              "heading_for_c": round(ss, 1) if math.isfinite(ss) else None,
+              "tau_s": round(tau, 1) if math.isfinite(tau) else None,
               "seed_band_k": round(st.seed_band_k, 1),
               "confidence": round(st.confidence, 2)}
 
         if st.t_turb_c >= limit_c:
-            return self._fire(Alert(
+            a = self._fire(Alert(
                 "thermal", "critical", st.t,
                 f"Turbine {st.t_turb_c:.0f} C - above the {limit_c:.0f} C damage threshold",
                 "Ease off now. Damage accumulates exponentially above this point.",
                 "driver", ev))
-        if projected >= limit_c and rate > 0.5:
-            secs = max(1.0, (limit_c - st.t_turb_c) / rate)
-            return self._fire(Alert(
+            if a:
+                out.append(a)
+        elif reachable and projected >= limit_c and rate > 0.5:
+            # Time to the limit along the first-order curve, not the tangent.
+            secs = -tau * math.log(max(1e-6, (limit_c - ss) / (st.t_turb_c - ss)))                 if ss > limit_c and st.t_turb_c < ss else LEAD_S
+            a = self._fire(Alert(
                 "thermal", "warn", st.t,
                 f"Turbine {st.t_turb_c:.0f} C, rising {rate:.1f} K/s - "
-                f"threshold in about {secs:.0f} s",
+                f"threshold in about {secs:.0f} s at this load",
                 "Lift slightly or change up. Backing off now avoids the heat entirely.",
                 "driver", ev))
+            if a:
+                out.append(a)
+
         oil_limit = OIL_PROTECT_K - 273.15
         if st.t_oil_est_c >= oil_limit:
-            return self._fire(Alert(
+            a = self._fire(Alert(
                 "thermal", "warn", st.t,
                 f"Oil {st.t_oil_est_c:.0f} C - at the protection threshold",
                 "Reduce sustained load. Oil cools far more slowly than it heats.",
                 "driver", {"t_oil_c": round(st.t_oil_est_c, 1),
                            "limit_c": round(oil_limit, 1),
                            "seed_band_k": round(st.seed_band_k, 1)}))
-        return None
+            if a:
+                out.append(a)
+        return out
 
     # -- 2. MISMATCH: for a mechanic, afterwards ---------------------------
     def _mismatch(self, st, s):
@@ -408,25 +461,45 @@ class AlertEngine:
 
     # -- 3. NOVEL: for us, a confidence flag -------------------------------
     def _novel(self, st):
+        """Flag the region where the INVERSION has the least support.
+
+        AUDIT.md L7. This used to say "outside the validated range" of
+        30-74 kPa, which is the span of the 22 steady operating points behind
+        the LOAD RESIDUAL -- and mistake 12 established that the load residual
+        cancels the breathing model and therefore validates nothing about the
+        pressure inversion this app depends on. So the flag was naming the
+        wrong evidence: it called the boosted region "extrapolation" when the
+        boosted region is the ONE place the inversion was actually checked
+        against an independent channel (+3.0 %, mistake 13).
+
+        The honest statement is narrower. Between the steady-point span and the
+        boost-checked region there is a band with neither kind of evidence, and
+        that is what this now flags.
+        """
         if not st.ok:
             return None
         if VALID_MAP_LO <= st.map_kpa <= VALID_MAP_HI:
             return None
+        if st.map_kpa >= BOOST_CHECKED_KPA:
+            return None          # checked against the car's own boost channel
         where = "above" if st.map_kpa > VALID_MAP_HI else "below"
         return self._fire(Alert(
             "novel", "info", st.t,
-            f"Operating {where} the validated range ({st.map_kpa:.0f} kPa)",
-            "Estimates here are extrapolation. Treat the turbine temperature as "
-            "indicative, not quantitative.",
+            f"Operating between the evidence bands ({st.map_kpa:.0f} kPa, "
+            f"{where} the steady points)",
+            "Neither the steady operating points nor the boost comparison "
+            "covers this region. Treat the turbine temperature as indicative, "
+            "not quantitative.",
             "engineer",
             {"map_kpa": round(st.map_kpa, 1),
-             "validated_range_kpa": [VALID_MAP_LO, VALID_MAP_HI]}),
+             "steady_point_range_kpa": [VALID_MAP_LO, VALID_MAP_HI],
+             "boost_checked_above_kpa": BOOST_CHECKED_KPA}),
             cooldown=120.0)
 
     # -- entry point -------------------------------------------------------
     def check(self, st, s) -> list:
-        out = []
-        for a in (self._thermal(st), self._mismatch(st, s), self._novel(st)):
+        out = list(self._thermal(st))
+        for a in (self._mismatch(st, s), self._novel(st)):
             if a is not None:
                 out.append(a)
         return out

@@ -28,6 +28,8 @@ Python 3.11 or newer.
 
 ## Run these five, in this order, on day one
 
+<!-- RETIRED-OK: section -->
+
 ```
 python plant.py            #  ~30 s   spark, lambda and IAT sweeps
 python validate.py         #  ~4 min  regenerates the validation table
@@ -36,13 +38,62 @@ python verify_docs.py      #  ~20 s   confirms the documents still match the dat
 python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 ```
 
-All five of you should see the same numbers from `check_premise.py`:
-**baseline 829.2 · reactive 548.6 · predictive 437.6 · preview-disabled 548.6.**
-
-That last pair matters most. Disabling preview collapses the predictive policy
-onto the reactive one exactly, which means whatever gap exists is attributable
-to preview information and nothing else. Preview advantage: reactive cuts damage
-33.8 %, predictive 47.2 % — **13.4 points**.
+> ### ⚠️ THE PREMISE NUMBERS ARE VOID AS OF 16 SEPTEMBER 2026
+>
+> The 15 September audit (`AUDIT.md`) found three defects in how they were
+> produced. **Do not quote 829.2 / 548.6 / 437.6, the 33.8 % / 47.2 % pair, or
+> the 13.4-point preview advantage.** Run `check_premise.py` and read what it
+> prints, including the warning at the bottom.
+>
+> **C1 — the baseline had its cooling switched off.** `check_premise.py` and
+> `generality_test.py` each defined their own "neutral" as all five actions at
+> zero. Actions 3 and 4 are not trims, they are absolute duties: zero means the
+> radiator fan OFF and the coolant pump at its 0.3 floor, and the pump term came
+> out at −1.857, outside the action space the environment declares.
+> `engine_env.neutral_action()` exists to fix exactly this (mistake 10) and
+> neither file called it. Every preview figure was therefore measured against a
+> crippled baseline, while the protecting policies turned the pump back to 1.0
+> whenever they acted — so part of their "protection" was cooling the baseline
+> row never had.
+>
+> **C2 — the baseline ECU was scheduled on a load the engine was not at.** It
+> looked spark and enrichment up at an open-loop *guess* of 224 kPa while the
+> tracking loop actually settled at 175 kPa, commanding knock-limited spark for
+> a phantom load and cooking the turbine with about ten degrees of retard that
+> the engine never called for. **The 879 °C turbine peak this file used to quote
+> was that scheduling error, not the engine.**
+>
+> **C3 — the reactive comparator protected less hard, not just later.** It
+> saturated at k = 0.36 while the predictive policy held k ≥ 0.55, so the gap
+> between them was partly depth and only partly timing.
+>
+> **And the ablation identity was never evidence.** With `use_preview=False` the
+> preview term is literally zero, so the predictive policy *returns the reactive
+> policy's vector on every step*. "548.6 = 548.6 to the decimal" could not have
+> come out any other way. It becomes a real ablation only when a TRAINED blinded
+> agent is raced against a trained sighted one — which is Phase D.
+>
+> **What the corrected script prints now**, with the true neutral, equal
+> protection depth, and the ECU scheduled on the pressure the engine runs at:
+>
+> | policy | damage | peak turbine |
+> |---|---|---|
+> | baseline ECU (true neutral) | 256.5 | 801 °C |
+> | reactive protection | 256.5 | 801 °C |
+> | current-grade protection | 226.6 | 781 °C |
+> | predictive protection | 232.2 | 781 °C |
+>
+> **The constraint no longer binds.** The baseline peaks at 801 °C against an
+> 850 °C trigger, so the reactive policy never acts and its row *is* the
+> baseline row. On this scenario preview is worth **−2.2 points** against a
+> policy that merely knows the grade it is on right now — information any car
+> has from a nose-down accelerometer, and the comparator the audit asked for.
+>
+> **This is not a failure, but it is not yet a result either.** The scenario has
+> to be re-chosen so the trigger is reached for a physical reason, and it must
+> be chosen from something external — a real grade, a published towing cycle, a
+> measured ambient — and never by turning a knob until the gap looks good. That
+> would be mistake 12 happening to Phase D.
 
 > **THESE NUMBERS CHANGED AGAIN ON 8 SEPTEMBER, AND THIS TIME BECAUSE THE
 > SIMULATION WAS THE WRONG ENGINE.** `plant.Geometry` defaulted to a generic
@@ -52,7 +103,7 @@ to preview information and nothing else. Preview advantage: reactive cuts damage
 > the eleven validation rows — ran a 1998 cc four-cylinder. Torque was 33 % low.
 >
 > Phase B was not affected: `predict()` and `map_from_airflow()` always used the
-> B58, so the load residual stands: **1.4 %** over the 22 pooled points,
+> B58, so the load residual stands: **1.4 %** over the 23 pooled points,
 > 30–74 kPa, with zero fitted parameters (**1.1 %** if k is fitted instead).
 > Read section 2 below before quoting it — it tests less than its name suggests.
 >
@@ -170,7 +221,7 @@ only under boost, when the throttle is open and the two are the same thing.
 Feeding that channel to the model as its load input was measured at about
 **75 % air-mass error**, on the eleven-point set that predated the master
 dataset. Inverting the air mass channel instead gives a load residual of
-**1.4 %** over the 22 pooled points, 30–74 kPa. `compare_log.py` inverts the
+**1.4 %** over the 23 pooled points, 30–74 kPa. `compare_log.py` inverts the
 air mass by default; `--map-from-log` exists only to reproduce the failure, and
 it now needs `extract_steady.py`'s schema, because the master point file no
 longer carries the logged pressure column.
@@ -280,6 +331,8 @@ maximum repeated across drives is the tell.
 
 ## The headline numbers moved, and why
 
+<!-- RETIRED-OK: section -->
+
 `BaselineECU` was guessed. It is now calibrated against 175.5 minutes of the
 real car, pooled across eight drives. Two things were wrong, and the
 second one was distorting every result.
@@ -296,7 +349,7 @@ cost of fitting to too little data.
 | **v4, from eight drives** | **function of engine speed and sustained dwell** | **current** |
 
 v2 came from four seconds above 100 % load. v3 came from seventeen. The two
-8 September drives took that to **178 seconds above 207 kPa**, and at that
+8 September drives took that to **184 seconds above 207 kPa**, and at that
 sample size the correlation between lambda and manifold pressure is **+0.23**
 — weak, and with the wrong sign for a load table: more boost goes with a
 *leaner* mixture. What correlates is engine speed (-0.56), air mass flow
@@ -376,6 +429,8 @@ about the component rather than about one episode. **If you change the damage
 model, change the trigger with it.**
 
 ## The Phase F protocol changed
+
+<!-- RETIRED-OK: section -->
 
 `generality_test.py` now prints three tables. H2b is the one to use.
 
