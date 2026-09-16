@@ -156,7 +156,35 @@ class CycleResult:
     f_res: float = float('nan')          # residual gas fraction
 
 
-def run_cycle(op: Operating, geo: Geometry = None, dtheta: float = 0.5) -> CycleResult:
+# Crank-angle step for the cycle integration, in degrees.
+#
+# CHOSEN BY A CONVERGENCE STUDY, 16 September 2026 (AUDIT.md H1). It was 0.5
+# deg, with no study behind it, and the model is NOT converged there. The
+# integration is explicit Euler, so the error is first order and halves with
+# the step -- measured against a 0.0625 deg reference:
+#
+#   dtheta   torque err   EGT err   knock-integral err
+#   1.0      -1.0 to -3.9 %   -30 to -44 K   -4.0 to -4.5 %
+#   0.5      -0.5 to -1.8 %   -14 to -21 K   -1.9 to -2.5 %   <- was shipped
+#   0.25     -0.2 to -0.8 %    -6 to  -9 K   -0.8 to -1.1 %   <- shipped now
+#   0.125    -0.1 to -0.3 %    -2 to  -3 K   -0.3 to -0.4 %
+#
+# 0.25 halves the error for double the cost (9 ms a cycle against 5). It is not
+# converged either, and that is the point of publishing the table: THE RESIDUAL
+# DISCRETISATION ERROR IS ABOUT 7 K OF EGT AND 0.25 % OF TORQUE, and it belongs
+# beside any figure quoted to finer precision than that.
+#
+# Every EGT the model reports is therefore ~7 K LOW, which pushes the cruise-band
+# EGT row of validate.py further outside its band rather than closer to it. That
+# is the honest direction and it is why the step was not left alone.
+#
+# test_convergence() in validate.py fails if halving the step moves a headline
+# by more than the precision that headline is quoted to.
+DTHETA_DEG = 0.25
+
+
+def run_cycle(op: Operating, geo: Geometry = None,
+              dtheta: float = DTHETA_DEG) -> CycleResult:
     geo = geo or Geometry()
 
     # ---------------- charge preparation ----------------

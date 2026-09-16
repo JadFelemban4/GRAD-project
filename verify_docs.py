@@ -454,6 +454,73 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
 RETIRED_OK = "RETIRED-OK"
 
 
+def check_simulation(here):
+    """Figures the SIMULATOR produces, checked against the documents.
+
+    AUDIT.md H2, and it is the most useful thing in this file that was missing.
+    Every `figure()` above recomputes a DATASET statistic from data/*.csv. Not
+    one of them could see a simulation-derived number, so the checker printed
+    green while the headline drifted. The reviewer demonstrated it by editing a
+    scratch copy of the documents:
+
+        README: 548.6 -> 561.2, 437.6 -> 402.9, 13.4 -> 19.1 points  -> all pass
+        validation_table: tau 48.0 -> 61.0 s, "8 of 11" -> "10 of 11" -> all pass
+        README: residual 1.4 % -> 2.9 %                              -> all pass
+
+    Three sentences a thesis rests on, any of which could have been wrong by a
+    factor, and nothing in the repository would have said so.
+
+    This runs validate.py's own rows and compares them against the documents.
+    The premise rollout is NOT run here -- it takes minutes and the figures it
+    produces are currently VOID anyway (C1/C2/C3), so they live in RETIRED
+    instead, which is the stronger check while they have no replacement.
+    """
+    import validate as V
+
+    print("\nSIMULATION FIGURES  (AUDIT.md H2 -- these were unchecked entirely)")
+    rows = V.rows() if hasattr(V, "rows") else None
+    if rows is None:
+        print("  note   validate.py exposes no importable row list; skipped")
+        return
+
+    inside = sum(1 for r in rows if r.get("inside"))
+    figure("validate.py rows inside the published band", inside, 8, 0,
+           patterns=[r"\b" + NUM + r"\s*\*{0,2}\s*of\s+\*{0,2}\s*11\b"],
+           files=ALL)
+
+    by_name = {r["name"]: r for r in rows}
+
+    # ONLY "N of 11" is scanned in the prose. The other simulation figures are
+    # asserted as VALUES and deliberately not pattern-matched, because every
+    # pattern loose enough to catch a drifted one also flags a legitimate
+    # sentence:
+    #
+    #   turbine tau 48 s   -- collides with oil 16 s, coolant 9.5 s, the IAT
+    #                         sensor lag 10 s, the C/UA derivation 50.3 s and
+    #                         the published band 40-120 s
+    #   displacement       -- collides with mistake 1's historical 1998 cc and
+    #                         "2.0 L inline-four", with the band's 2990, and
+    #                         with "2.997 L" in a citation
+    #
+    # That is the trade AUDIT.md H2 and M15 name, and the honest answer here is
+    # that a value assertion catches the drift that matters (the MODEL moving)
+    # while a prose scan would mostly catch the documents being correct.
+    for name, label, expect, tol in (
+        ("Turbine housing time constant", "turbine time constant", 48.0, 1.0),
+        ("Displacement", "displacement", 2997.5, 1.0),
+    ):
+        r = by_name.get(name)
+        if r is not None:
+            chk(label, round(float(r["model"]), 1), expect, tol)
+
+    # The crank-angle step is now a studied number; assert it has not been
+    # quietly rounded back to something convenient.
+    from plant import DTHETA_DEG
+    chk("crank-angle step is the studied one", DTHETA_DEG, 0.25, 0.0)
+    chk("cycle model converges when the step is halved",
+        bool(V.test_convergence()), True)
+
+
 def check_retired(here):
     """Fail if any document still quotes a figure this project has retired."""
     print("\nRETIRED FIGURES  (mistake 11 -- the old value must not survive)")
@@ -772,6 +839,12 @@ def main():
     figure("ENR_LOAD, the enrichment gate", 180.0, 180.0, 0.0, " kPa",
            patterns=[r"ENR_LOAD\s*=\s*" + NUM], files=ENV)
 
+    # check_simulation() must run BEFORE report_documents(), or its
+    # DOC_FAILURES are appended after the report has already been
+    # printed and its RESULTS entry recorded -- computed, then thrown
+    # away. Found by re-running the auditor's own drift test and
+    # watching it pass with the drift injected.
+    check_simulation(here)
     report_documents()
     check_retired(here)
 

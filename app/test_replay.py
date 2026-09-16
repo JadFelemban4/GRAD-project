@@ -79,13 +79,21 @@ LOG_FULL = os.path.join(ROOT, "logs", "raw", "7475b5d7-20260908_142743.csv")
 # fallback path never runs on it, and the turbine node does not depend on the
 # block node that M11 pinned.
 # ---------------------------------------------------------------------------
+#
+# MOVED AGAIN 16 SEPTEMBER by the H1 fix. `plant.DTHETA_DEG` went 0.5 -> 0.25
+# after a convergence study found the cycle integration was not converged: at
+# 0.5 deg every EGT the model reports is 14-21 K LOW. The app's turbine estimate
+# is driven by that EGT, so both peaks rise by about the same amount:
+#     pull01    601.4 -> 608.0 C      7475b5d7  884.9 -> 890.6 C
+# No alert count moves. The residual discretisation error at 0.25 deg is ~7 K,
+# which is why these are pinned to 0.5 K and not finer.
 EXPECT_FAST = {           # pull01, 7 channels, 1.45 s per channel
     "rows": 2193, "estimated": 2186,
-    "peak_turb_c": 601.4, "thermal": 1, "mismatch": 0, "novel": 4,
+    "peak_turb_c": 608.0, "thermal": 1, "mismatch": 0, "novel": 4,
 }
 EXPECT_FULL = {           # 7475b5d7, 26 channels, 7.5 s per channel
     "rows": 14340, "estimated": 14278,
-    "peak_turb_c": 884.9, "thermal": 15, "mismatch": 0, "novel": 19,
+    "peak_turb_c": 890.6, "thermal": 15, "mismatch": 0, "novel": 19,
 }
 
 checks: list[tuple[str, bool, str]] = []

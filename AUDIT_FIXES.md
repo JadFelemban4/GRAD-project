@@ -26,8 +26,10 @@ in another document disagrees with a script.
 | `compare_log.py --map-from-log` | empty table, exit 0 | **110.4 % residual** — it reproduces mistake 2 again |
 | `verify_docs.py` | 33 of 33, 256 mentions, 22 files | **33 of 33, 274 mentions, 23 files** (now scans `presentation/index.html`) |
 | `python -m app.test_replay` | 46 of 46 | **49 of 49** (three new regressions) |
-| `app` replay, `7475b5d7` | peak 884.9 °C, 13 thermal | **peak 884.9 °C, 15 thermal** |
-| `app` replay, `pull01` | peak 593.7 °C, 0 thermal | **peak 601.4 °C, 1 thermal** |
+| `app` replay, `7475b5d7` | peak 884.9 °C, 13 thermal | **peak 890.6 °C, 15 thermal** |
+| `app` replay, `pull01` | peak 593.7 °C, 0 thermal | **peak 608.0 °C, 1 thermal** |
+| `validate.py` EGT cruise max | 777.3 °C | **787.7 °C** — further outside, honestly |
+| `plant.DTHETA_DEG` | 0.5° (unstudied) | **0.25°**, with the study in the docstring |
 | `import generality_test` | ~9 minutes (ran at import) | **0.19 s** |
 
 ---
@@ -78,8 +80,8 @@ returns `p_reactive`'s vector every step. Measured: `blinded − reactive =
 
 | id | status | what changed |
 |---|---|---|
-| **H1** discretisation not converged at `dtheta = 0.5°` | **OPEN** | measured, not yet changed — see below |
-| **H2** checker cannot see simulation-derived figures | **PARTLY** | `presentation/index.html` now tracked; premise/H2 figures added to `RETIRED`. The positive assertions (829.2 etc. as *live* values) are still not `figure()`-checked |
+| **H1** discretisation not converged at `dtheta = 0.5°` | **FIXED** | convergence study run; `plant.DTHETA_DEG` **0.5 → 0.25**, and `validate.test_convergence()` now fails if halving the step moves a headline more than its quoted precision |
+| **H2** checker cannot see simulation-derived figures | **FIXED** | `validate.rows()` exposes the validation rows as data and `verify_docs.check_simulation()` asserts them. The auditor's own drift test now FAILS as it should — "8 of 11" changed in README is caught. `presentation/index.html` is tracked too |
 | **H3** dwell computed at an assumed 4.6 Hz | **FIXED** | dwell now summed from timestamps. corr(λ,dwell) **−0.47 → −0.41**; "seconds above 207 kPa" **178 → 184** |
 | **H4** "n samples" are forward-filled rows | **OPEN** | needs independent-reading counts beside every row count |
 | **H5** knock integral says the car detonates continuously | **OPEN** | needs a validation row against the measured retard channel |
@@ -87,12 +89,43 @@ returns `p_reactive`'s vector every step. Measured: `blinded − reactive =
 | **H7** de-duplication is order-dependent | **FIXED** | windows sorted before merging: **23 points, identical in 8 orderings**. `max_gap` now carries the worst case, exposing the true **0.481 s** the average hid; 9 points that pool more than one drive are labelled `n_sources` instead of silently taking the first drive's name |
 | **H8** app's modelled lambda can never enrich | **FIXED** | fallbacks run through `BaselineECU.step`; λ reaches 0.81 after a sustained pull |
 
-### H1, measured but not yet acted on
-The audit reports EGT moving 10–19 °C and the premise edge 13.4 → 10.6 points
-between `dtheta` 0.5° and 0.25°/0.1°. **Not changed here**, because picking a new
-`dtheta` re-derives every published figure at once and that decision — and the
-cost, the model is ~5× slower at 0.1° — belongs to the team. It is the largest
-single open item.
+### H1 — the convergence study, and what it moved
+
+Measured against a 0.0625° reference. The integration is explicit Euler, so the
+error is first order and halves with the step, which is exactly what it does:
+
+| `dtheta` | torque error | EGT error | knock-integral error | cost |
+|---|---|---|---|---|
+| 1.0° | −1.0 to −3.9 % | −30 to −44 K | −4.0 to −4.5 % | 2 ms |
+| **0.5°** *(was shipped)* | −0.5 to −1.8 % | **−14 to −21 K** | −1.9 to −2.5 % | 5 ms |
+| **0.25°** *(shipped now)* | −0.2 to −0.8 % | −6 to −9 K | −0.8 to −1.1 % | 9 ms |
+| 0.125° | −0.1 to −0.3 % | −2 to −3 K | −0.3 to −0.4 % | 19 ms |
+
+0.25° halves the error for double the cost. **It is not converged either**, and
+that is why the table is published: the residual is about **7 K of EGT and
+0.25 % of torque**, and no figure should be quoted finer than that.
+
+**What moved.** Every EGT rises ~8 K, so the cruise-band EGT maximum goes
+777.3 → **787.7 °C** — *further outside its band*, which is the honest
+direction. `validate.py` stays 8 of 11. The premise baseline moves 256.5 →
+**294.2** and its peak turbine 801 → **812 °C**, still below the 850 °C trigger,
+so **no conclusion changes**. The app's turbine estimates rise with the EGT:
+`pull01` 601.4 → **608.0 °C**, `7475b5d7` 884.9 → **890.6 °C**, with no alert
+count moving.
+
+### H2 — what closing it actually took
+Three attempts, and the first two *passed while the drift was injected*:
+
+1. patterns too tight — "8 of 11" is written bold, plain and in table cells;
+2. **`check_simulation()` was called AFTER `report_documents()`**, so its
+   findings were computed and then thrown away. Found only by re-running the
+   auditor's drift test and watching it pass;
+3. patterns too loose — turbine τ collided with the oil, coolant and IAT-sensor
+   constants, displacement with mistake 1's historical 1998 cc.
+
+Settled on: scan **"N of 11"** in prose (unambiguous), and assert turbine τ and
+displacement as **values only**. A value assertion catches the model moving; a
+prose scan for those two would mostly catch the documents being right.
 
 ---
 

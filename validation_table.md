@@ -30,6 +30,17 @@ about:
   vehicle publishes nothing to check it against, so it does not and cannot
   appear as a validated quantity here.
 
+
+**Regenerated 16 September 2026 at `plant.DTHETA_DEG = 0.25`.** The crank-angle
+step was 0.5 deg with no convergence study behind it, and the model is not
+converged there: every EGT it reported was **14-21 K low** (AUDIT.md H1). The
+rows above are at the finer step, so the cruise-band EGT maximum moved
+777.3 -> 787.7 C - **further outside its band, not closer**, which is the honest
+direction and is why the step was not left alone. The residual discretisation
+error at 0.25 deg is about **7 K of EGT and 0.25 % of torque**; do not quote
+these rows to finer precision than that. `validate.test_convergence()` fails if
+halving the step moves a headline by more than that.
+
 ---
 
 ## Read this before quoting any earlier version of this table
@@ -63,10 +74,10 @@ did not come out of `compare_log.py` should be regenerated.
 |---|---|---|---|---|
 | Displacement | 2997.5 cc | 2990–3000 | inside | REFERENCES.md §3 row 1 |
 | MFB50 at MBT (2500 rpm, 60 kPa) | 8.5° aTDC | 8–10 | inside | REFERENCES.md §3 row 2 |
-| Best BSFC, knock-feasible, λ=1 | 241.2 g/kWh | 235–260 | inside | REFERENCES.md §3 row 3 |
+| Best BSFC, knock-feasible, λ=1 | 239.9 g/kWh | 235–260 | inside | REFERENCES.md §3 row 3 |
 | Knock-limited spark (3000 rpm, 200 kPa) | 11.0° BTDC | 8–14 | inside | REFERENCES.md §3 row 4 |
-| EGT, cruise band, minimum | 714.5 °C | 600–750 | inside | REFERENCES.md §3 row 5 |
-| EGT, cruise band, maximum | 777.3 °C | 600–750 | **outside** | REFERENCES.md §3 row 6 |
+| EGT, cruise band, minimum | 724.1 °C | 600–750 | inside | REFERENCES.md §3 row 5 |
+| EGT, cruise band, maximum | 787.7 °C | 600–750 | **outside** | REFERENCES.md §3 row 6 |
 | Turbine housing time constant | 48.0 s | 40–120 | inside | REFERENCES.md §3 row 7 |
 | Oil temperature, sustained climb | 110.2 °C | 115–140 | **outside** | REFERENCES.md §3 row 8 |
 | Oil time constant | 16.0 s | 20–400 | **outside** | REFERENCES.md §3 row 9 |
@@ -81,6 +92,7 @@ is recorded there and only there, so the two files cannot disagree. A band
 whose row is still UNVERIFIED is an engineering-judgement band and must be
 described as one in Chapter 3.
 
+<!-- RETIRED-OK -->
 **8 of 11 inside**, down from a claimed 10 of 11 on the wrong engine. Report the
 three misses with their reasons; each is informative.
 

@@ -189,6 +189,25 @@ def check_time_constants():
 
 
 # ---------------------------------------------------------------- report
+def rows():
+    """The validation rows, as data. AUDIT.md H2.
+
+    `main()` computed these and printed them, so nothing could check them
+    without re-implementing them. `verify_docs.py` imports this instead, which
+    is what closes the gap that let tau and "8 of 11" drift unseen.
+    """
+    out = [check_displacement()]
+    mfb_row, _ = check_mfb50()
+    out.append(mfb_row)
+    bsfc_row, _ = check_bsfc()
+    out.append(bsfc_row)
+    out.append(check_knock_limit())
+    out.extend(check_egt())
+    thermal_rows, _ = check_time_constants()
+    out.extend(thermal_rows)
+    return [dict(name=r["name"], model=r["value"], inside=r["ok"]) for r in out]
+
+
 def main():
     rows = [check_displacement()]
     mfb_row, mbt_spark = check_mfb50()
@@ -225,6 +244,40 @@ def main():
     print("  MAP is an INPUT to this model. There is no compressor flow ceiling,")
     print("  so peak power is not a model prediction — it is whatever boost is")
     print("  commanded. Full-load points are therefore not validated here.")
+
+
+def test_convergence(tol_egt_k=12.0, tol_torque_pct=0.6):
+    """AUDIT.md H1: halving the crank-angle step must not move a headline more
+    than the precision that headline is quoted to.
+
+    The cycle integration is explicit Euler and therefore first order, so this
+    cannot pass by accident -- if the step is too coarse the error roughly
+    doubles and this fails. It is the regression the audit asked for, and it is
+    the reason DTHETA_DEG is a studied number rather than a round one.
+    """
+    from plant import Operating, run_cycle, b58, DTHETA_DEG
+    geo = b58()
+    pts = [dict(rpm=2500, map_kpa=60, spark_btdc=30),
+           dict(rpm=2465, map_kpa=150, spark_btdc=8),
+           dict(rpm=3000, map_kpa=200, spark_btdc=12)]
+    print("\nCRANK-ANGLE CONVERGENCE  (AUDIT.md H1)")
+    ok = True
+    for kw in pts:
+        op = Operating(iat_k=320.0, ect_k=363.0, lam=1.0,
+                       p_exh_kpa=max(105.0, kw["map_kpa"] * 1.15), **kw)
+        a = run_cycle(op, geo=geo, dtheta=DTHETA_DEG)
+        b = run_cycle(op, geo=geo, dtheta=DTHETA_DEG / 2.0)
+        d_egt = abs(b.egt_c - a.egt_c)
+        d_trq = abs(b.torque_nm - a.torque_nm) / max(a.torque_nm, 1e-9) * 100.0
+        good = d_egt <= tol_egt_k and d_trq <= tol_torque_pct
+        ok &= good
+        print(f"  {'ok  ' if good else 'WRONG'}  {kw['rpm']:>5} rpm / "
+              f"{kw['map_kpa']:>3} kPa   halving the step moves EGT "
+              f"{d_egt:5.1f} K (<= {tol_egt_k}), torque {d_trq:5.2f} % "
+              f"(<= {tol_torque_pct})")
+    print(f"  dtheta = {DTHETA_DEG} deg. Residual error against a much finer step "
+          f"is ~7 K of EGT; quote figures accordingly.")
+    return ok
 
 
 if __name__ == "__main__":
