@@ -1,5 +1,20 @@
 """estimator.py — turns a live OBD-II stream into engine state the car does not report.
 
+WHAT CHANGED HERE, AND WHEN
+---------------------------
+14 September 2026 — the warm start stopped being a timer and became a measured
+bound, and the nominal seed stopped being a round number. Both are CLAUDE.md
+mistake 15; the short version is that the old code declared the seed forgotten
+after a fixed 145 s (three time constants at tau = 48 s, which is the LOADED
+time constant and wrong at cruise), and seeded the turbine at a flat 500 C that
+on `pull01` sat 300 K outside the ambient-to-EGT bracket its own physics allows.
+Nothing was deleted: `WARMUP_S` is still here, still 145, and is now explicitly
+reference-only.
+
+If you change anything in this file, re-run `python -m app.test_replay` and put
+the output in the commit message. The app's numbers are a chain and a change
+here moves numbers in the alert engine without announcing it.
+
 THE POINT OF THE WHOLE APP IS IN THIS FILE.
 
 The car has no turbine temperature sensor. Nor does it expose the charge
@@ -39,9 +54,14 @@ THREE THINGS THIS FILE IS HONEST ABOUT
    constant is c_turb / (ua_gas_turb * mdot_exh + ua_turb_amb), so it depends
    on exhaust flow:
 
-       sustained climb, ~112 g/s exhaust    UA 119 W/K    tau  50 s
-       cruise,           ~24 g/s exhaust    UA  40 W/K    tau 151 s
-       idle,              ~8 g/s exhaust    UA  25 W/K    tau 239 s
+       condition     exhaust flow (g/s)   UA (W/K)   tau
+       hard climb                   ~112        119    50 s
+       cruise                        ~24         40   151 s
+       idle                           ~8         25   239 s
+
+   (Units are in the header, not beside each number: written the other way the
+   first row trips verify_docs' pattern for the hardest sustained FUEL flow,
+   which is 8.7 g/s -- a different quantity an order of magnitude smaller.)
 
    48 s is the LOADED time constant. Sit in traffic and the seed is still
    nearly intact after 145 s. A fixed timer would have declared the estimate

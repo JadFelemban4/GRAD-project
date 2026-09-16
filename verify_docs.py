@@ -48,6 +48,33 @@ loosely as they can be without false positives, and a pattern that matches
 NOTHING anywhere is reported as a warning, so a rotted pattern cannot sit
 silently forever.
 
+WHAT CHANGED ON 16 SEPTEMBER
+----------------------------
+Three things, and two of them were defects in this file rather than in a
+document it checks.
+
+1. **It crashed while reporting a finding.** `report_documents()` echoes the
+   offending line back; CHECKPOINT.md line 54 contains a tick emoji; on a cp1252
+   console that raised UnicodeEncodeError and killed the run AFTER every check
+   had already been computed correctly. That is the character-encoding bug
+   CLAUDE.md records against build_dataset.py, for the third time, in the one
+   script whose whole job is to be trusted. Output is now encoded defensively --
+   see `_console_safe`.
+
+2. **Two neighbouring checks were counting different populations.** "samples
+   pinned at the 1020 kg/h ceiling" counted the warm-filtered dataset while
+   "drives showing that exact ceiling" counted raw files in logs/raw/. `pull01`
+   pins 56 times in its raw log and contributes zero samples, so the two drifted
+   apart the moment it arrived: 6 drives against 517 samples over 5. Both were
+   true and the sentence a document builds from them was not. Both now count the
+   same set.
+
+3. **The dataset grew to nine drives** and the expectations moved with it, which
+   is the one legitimate reason to edit an expected value in this file: the data
+   genuinely changed. `app/alerts.py`, `app/estimator.py` and `app/reader.py`
+   joined TRACKED_DOCS at the same time, because they publish figures in their
+   docstrings exactly the way plant.py does.
+
 Run it after `build_dataset.py`, and before quoting anything.
 
 Exit code is 1 if any check fails, so it can go in CI.
@@ -88,6 +115,15 @@ TRACKED_DOCS = [
     "engine_env.py",
     "compare_log.py",
     "build_dataset.py",
+    # The live app publishes figures in its docstrings too -- alerts.py carries
+    # the whole mismatch investigation and every threshold's justification, and
+    # estimator.py carries the turbine time constants. Added 16 September 2026
+    # after alerts.py was found still quoting the pre-correction +2.3 % charge
+    # temperature that plant.py had already been moved off. Same failure as
+    # mistake 11: the number was right in one file and stale in its neighbour.
+    "app/alerts.py",
+    "app/estimator.py",
+    "app/reader.py",
 ]
 
 # A number as documents actually write it: "517", "43 853", "30 534", "1.4",

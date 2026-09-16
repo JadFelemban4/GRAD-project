@@ -98,3 +98,29 @@ Send me the CSV. I check three things and tell you:
 
 Then Drive 2 gets designed from what Drive 1 actually shows.
 **Do not plan drives 2–8 yet.**
+
+---
+
+## Forward note, 16 September 2026 — this card is history, and here is what came after
+
+Nothing above is edited; it is the record of what Drive 1 asked and answered.
+Eight more drives have been logged since, and the dataset now reads **nine
+drives, 175.5 minutes, six carrying usable samples, 22 operating points**.
+
+Three things this card could not have known:
+
+- **The charge temperature was also mislabelled**, the same way the pressure
+  channel was. `Intake air temperature before throttle valve` is a *compressor
+  outlet* with a ~10 s lag, not a charge temperature — confirmed on `pull01`,
+  the ninth drive, at a correlation of +0.95 once the lag is modelled. That
+  moved the operating points to **30–74 kPa**. CLAUDE.md mistakes 13 and 13b.
+- **The load residual does not test the breathing model.** It reads 1.4 % with
+  zero fitted parameters, and the algebra cancels volumetric efficiency,
+  residual fraction and temperature out of it entirely. CLAUDE.md mistake 12.
+- **There is now a live app** that runs the same physics against the car in
+  real time. The pressure lesson on this card is what makes its fault detector
+  work at all: it compares inverted against logged pressure **only at wide-open
+  throttle**, because below that the two sit on opposite sides of the throttle
+  plate. CLAUDE.md mistake 14.
+
+**Do not re-drive this card.** Its questions are closed.

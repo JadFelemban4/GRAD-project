@@ -80,3 +80,25 @@ four-cylinder. The copies have been synchronised with this repository.
 
 **The repository under `build/engine-supervisor/` is canonical.** If you find a
 `.py` file outside it, check it against the one in here before running it.
+
+---
+
+## Added 16 September 2026 — what the app does and does not change here
+
+The live supervisor in `app/` publishes no figure that belongs in a team PDF, so
+**no document listed above becomes more or less void because of it.** Two things
+are worth recording anyway, because both will otherwise be discovered late:
+
+- **If a slide shows a screenshot of the app, it is showing a MODELLED turbine
+  temperature.** The caption has to say so. `c_turb` is an ASSUMED number
+  (REFERENCES.md section 4) and the vehicle publishes nothing to check it
+  against. A dashboard reading is the most convincing-looking number in the
+  whole project and the least directly evidenced.
+- **The dataset is now nine drives, 175.5 minutes**, not eight and 168.1. Any
+  PDF quoting the old pair is stale in one more place. The three drive counts
+  are not interchangeable — nine logged, six carrying samples, eight behind the
+  fitted calibrations — so check which one a slide actually means before
+  correcting it.
+
+`verify_docs.py` scans the repository's markdown and Python, **not the PDFs**.
+That gap is the entire reason this file exists, and the app does not narrow it.

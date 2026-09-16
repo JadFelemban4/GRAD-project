@@ -1,5 +1,14 @@
 """alerts.py — the three kinds of irregular state, and what to do about each.
 
+WHAT CHANGED HERE, AND WHEN
+---------------------------
+14 September 2026 — the mismatch detector was rebuilt. It was comparing two
+sides of the throttle plate and firing on 95.7 % of a normal drive; the long
+note further down records the whole investigation, and CLAUDE.md mistake 14 is
+the summary. The threshold also moved, 15 % -> 25 %, for a measured reason that
+is written beside the constant. Nothing was removed: the three alert types, their
+audiences and the 1123 K / 408 K limits are unchanged.
+
 THIS IS THE ONLY FILE THAT WRITES TO DISK.
 
 Raw car data is never stored (see reader.py). What gets persisted is what the
@@ -86,7 +95,7 @@ it is the same 44-52 % that CLAUDE.md's limitations section already records for
 the 22 steady points. The comparison is only valid where the throttle is not
 restricting -- that is, at wide-open throttle under real boost, which is
 exactly the condition mistake 13 used when it validated the inversion against
-this same channel and got +2.3 %.
+this same channel and got +3.0 %.
 
 Three gates follow from that, and they are the fix. The threshold was not the
 problem and is not where the fix went.
@@ -101,7 +110,7 @@ problem and is not where the fix went.
 
      1.8 is where the median stops moving and the tail is mostly gone. Under
      that gate the four drives that reach boost agree with the model at a
-     median of +7.7 / +6.8 / +3.6 / +1.2 %, consistent with the +2.3 % that
+     median of +7.7 / +6.8 / +3.6 / +1.2 %, consistent with the +3.0 % that
      plant.charge_temperature() records for this comparison.
 
   2. MAF NOT SATURATED. `Air mass flow` pins at exactly 1020.0 kg/h and keeps

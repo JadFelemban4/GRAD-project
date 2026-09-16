@@ -1,4 +1,4 @@
-# CHECKPOINT.md — state as of 11 September 2026
+# CHECKPOINT.md — state as of 16 September 2026
 
 **What this file is for:** a dated snapshot of where the work stands and what was
 verified when. `CLAUDE.md` is the permanent handoff and the mistake log — the
@@ -21,6 +21,14 @@ file if it is more than a week old.
 > document was swept against the data. See the 11 September section at the
 > bottom of this file.
 
+> **13–16 September, v19, the ninth drive and the live app.** `pull01` joined
+> `logs/raw/`, taking the manifest to **nine drives, 175.5 minutes** — it
+> contributes zero samples and zero operating points by design, so no
+> calibration figure moved. `app/`, the live supervisor, was imported and then
+> hardened; two defects in it are now **mistakes 14 and 15** in `CLAUDE.md`, and
+> a third, **mistake 16**, is about the release archive that carried it. See the
+> section at the bottom of this file.
+
 ---
 
 ## Phase status
@@ -28,12 +36,13 @@ file if it is more than a week old.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.829, zero free parameters), 1.1 % with k fitted (0.837, one). 22 pooled points, 30–74 kPa, 168.1 min. Read mistake 12 before quoting either |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.829, zero free parameters), 1.1 % with k fitted (0.837, one). 22 pooled points, 30–74 kPa, 175.5 min logged. Read mistake 12 before quoting either |
 | C · get an agent to learn | **next.** `train.py` exists and runs; nothing trained yet |
 | D · baselines and the ablation | not started. **This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary only, from hand-written policies |
 | G · writing | not started |
+| **APP · live supervisor** | **working and tested, 46 of 46 replay checks.** `app/` runs this same physics beside the car and estimates turbine temperature. A SECOND deliverable — it does not advance D, and D is the passing bar |
 
 **Phase D is the passing bar.** Validated simulator + agent beating two baselines
 + an ablation isolating preview. Do not start E or F until D produces a table.
@@ -432,3 +441,100 @@ checks it.** The division of labour is stated at the top of this file —
 `CLAUDE.md` is the permanent handoff and mistake log, this file is a dated
 snapshot. What belongs in the first should not be restated in the second, which
 is how five duplicates came to exist in the first place.
+
+---
+
+## Session of 13–16 September 2026 — v19, the live app, and a merge that went backwards
+
+### What arrived
+
+| thing | what it is |
+|---|---|
+| `logs/raw/pull01-20260913_093527.csv` | the **ninth** drive. Purpose-built, 7 channels, to settle mistake 13. Contributes **zero samples, zero operating points** — no coolant channel, so the warm filter excludes it |
+| `app/` | the live supervisor: reader, estimator, alert engine, server, three pages |
+| `DOC/`, `presentation/`, `REFERENCES.md` | from the branch, in parallel — the document reorganisation and the provenance file |
+
+### The dataset now reads three different drive counts, and all three are right
+
+| population | count | used for |
+|---|---|---|
+| manifest | **9** drives, 175.5 min | "how much have we logged" |
+| carrying usable samples | **6** | anything computed from `master_samples` |
+| behind the fitted calibrations | **8** | enrichment, spark — `pull01` is not in them |
+
+`verify_docs.py` asserts the first two separately. Quoting the wrong one is now
+the easiest available mistake.
+
+### What was verified, on the merged tree
+
+| # | Script | Result |
+|---|---|---|
+| 1 | `verify_docs.py` | ✅ **All 33 checks pass**, 228 figure mentions scanned across 22 tracked files |
+| 2 | `validate.py` | ✅ **8 of 11** inside band — unchanged |
+| 3 | `test_reward.py` | ✅ **4 of 4**; neutral −0.00438, unchanged |
+| 4 | `python -m app.test_replay --full` | ✅ **46 of 46** |
+
+`check_premise.py`, `build_dataset.py`, `compare_log.py` and `generality_test.py`
+were not re-run this session: nothing under them changed, and `verify_docs.py`
+recomputes their published figures from the shipped data and agrees. Re-run them
+before a release rather than trusting this line.
+
+### The app's own numbers, pinned so a regression is visible
+
+Replaying `7475b5d7` end to end:
+
+| quantity | value |
+|---|---|
+| samples estimated | **14278 of 14340** (99.7 % of samples with the engine running) |
+| peak estimated turbine | **884.9 °C** — a MODEL OUTPUT, not a reading |
+| alerts | **13 thermal · 0 mismatch · 19 novel** |
+| seed forgotten after | **461 s** — not the 145 s the code used to assume |
+
+And on `pull01`, the fast regression: 2186 of 2193 estimated, peak **593.7 °C**,
+4 novel, seed forgotten at 172 s.
+
+**None of these is evidence about the car.** The turbine figure is a model
+output with an assumed heat capacity and the alert counts are a property of
+thresholds we chose. They are pinned so that a change to the pipeline shows up,
+which is a different job from being a result.
+
+### Three defects found and fixed — the detail is in CLAUDE.md mistakes 14–16
+
+1. **The mismatch detector was measuring the throttle.** 55 alerts on
+   `7475b5d7` looked like an over-sensitive threshold; the firing condition was
+   actually true for **95.7 % of the drive** at a median of −52 %, because
+   `Boost pressure` is a pre-throttle channel. Fixed with three validity gates,
+   not a threshold change: **55 → 0**. The threshold did move, 15 % → 25 %, for
+   a separate and measured reason.
+2. **The app reported a turbine temperature its own physics called impossible.**
+   The 500 °C seed sat outside the ambient-to-EGT bracket — on `pull01`, 300 K
+   outside it. The fixed 145 s warm-up timer also used τ = 48 s, which is the
+   *loaded* time constant; at cruise it is 151 s and at idle 239 s.
+3. **The v19 archive was an older snapshot of everything except `app/`.**
+   Unzipping it over the branch would have reverted a fortnight of document
+   work, including three figures that had already been corrected once. They are
+   now guarded by `verify_docs.RETIRED`.
+
+### Two defects in `verify_docs.py` itself, both fixed here
+
+- **It crashed while reporting.** The new document scanner echoes the offending
+  line back; line 54 of this file contains a tick emoji; on a cp1252 console
+  that raised `UnicodeEncodeError` and killed the run **after every check had
+  already computed correctly**. Third occurrence of the character-encoding bug
+  in this repository, and the worst place for it.
+- **Its MAF-ceiling drive count and its MAF-ceiling sample count were counting
+  different populations** — raw files against the warm-filtered dataset. Adding
+  `pull01`, which pins 56 times in its raw log, pushed them apart: 6 drives
+  against 517 samples over 5. Both halves now count the same set.
+
+### What this session did NOT do
+
+- **No training run.** Phase C is still where it was, and Phase D is still the
+  floor of the project. The app is a second deliverable and it is not on that
+  path — see the backlog at the end of `CLAUDE.md`'s plan section.
+- **No live-car test.** Everything about the app is replay. The first item in
+  its backlog is one drive with `--live`, and it is the only item that can find
+  something replay cannot.
+- **No fault has ever been shown to the mismatch detector.** Nothing in nine
+  drives is broken, so every number behind it is a false-positive rate, not a
+  detection rate. Say that in the thesis rather than implying validation.

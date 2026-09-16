@@ -1,5 +1,16 @@
 """reader.py — gets data off the car, or replays a log as though it were live.
 
+WHAT CHANGED HERE, AND WHEN
+---------------------------
+14 September 2026 — hardened for a real adapter, and the channel list became a
+table that carries its own justification. Before this, `LIVE_PIDS` declared
+`boost_psi` but `LiveReader` never polled it, so the mismatch detector was dead
+code on the car; unsupported PIDs were asked for forever; a dropped link was not
+counted; and every channel was polled at the same rate whether it moved on a
+timescale of milliseconds or minutes. `LIVE_PIDS`, `OPTIONAL_PIDS` and
+`CSV_ALIASES` are all still exported, built from the table, because other code
+and the tests read them.
+
 RAW DATA IS NEVER WRITTEN TO DISK.
 
 The stream is a live mirror of the ECU's own dashboard: it exists in memory,

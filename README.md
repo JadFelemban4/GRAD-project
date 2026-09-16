@@ -15,15 +15,25 @@ pip install -r requirements.txt
 
 Python 3.11 or newer.
 
+> **Updated 16 September 2026.** Two things arrived since the last pass. The
+> dataset is now **nine drives, 175.5 minutes** (`pull01`, which contributes
+> zero samples by design, so no calibration figure moved). And `app/` exists —
+> a live supervisor that runs this same physics beside the car and estimates
+> turbine temperature, which the vehicle has no sensor for. **It is a second
+> deliverable and it is not the missing piece: Phase D still is.** Three new
+> entries in `CLAUDE.md`'s mistake log — 14, 15 and 16 — came out of building
+> and merging it.
+
 ---
 
-## Run these four, in this order, on day one
+## Run these five, in this order, on day one
 
 ```
 python plant.py            #  ~30 s   spark, lambda and IAT sweeps
 python validate.py         #  ~4 min  regenerates the validation table
 python check_premise.py    #  ~90 s   the result the whole project rests on
 python verify_docs.py      #  ~20 s   confirms the documents still match the data
+python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 ```
 
 All five of you should see the same numbers from `check_premise.py`:

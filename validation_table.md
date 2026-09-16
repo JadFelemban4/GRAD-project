@@ -12,6 +12,24 @@ python compare_log.py data/master_points.csv
 Last regenerated: 11 September 2026, **after the charge-temperature correction**
 (and, before it, the engine-geometry correction).
 
+**Re-checked 16 September 2026 and UNCHANGED.** `validate.py` still returns
+**8 of 11** inside band with identical values, so nothing in this table has been
+rewritten. Two things happened around it that a reader will otherwise wonder
+about:
+
+- **The dataset grew to nine drives, 175.5 minutes**, because `pull01` arrived.
+  It contributes **zero samples and zero operating points** — no coolant
+  channel, so the warm-sample filter excludes it — so not one figure here moves.
+  Note the three drive counts are different and all correct: **nine** logged,
+  **six** carrying samples, **eight** behind the fitted calibrations. This table
+  is built on the sample set, not the manifest.
+- **A live app now exists** (`app/`) that runs this same plant and thermal
+  network against a real-time stream. It **inherits this table, misses and all**,
+  and adds no evidence to it. Its estimated turbine temperature is a model
+  output resting on an ASSUMED heat capacity (REFERENCES.md section 4) and the
+  vehicle publishes nothing to check it against, so it does not and cannot
+  appear as a validated quantity here.
+
 ---
 
 ## Read this before quoting any earlier version of this table

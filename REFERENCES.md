@@ -25,7 +25,7 @@ follow everything else.
 
 | kind | what it means | can it be checked? |
 |---|---|---|
-| **1. We measured it** | It came out of 168.1 minutes of OBD-II logs from our own car | Yes — re-run the script |
+| **1. We measured it** | It came out of 175.5 minutes of OBD-II logs from our own car | Yes — re-run the script |
 | **2. General engine physics** | True of any petrol engine, from textbooks and papers | Yes — open the book |
 | **3. Specific to the B58** | Only BMW or Toyota can tell you; it is a fact about this engine, not about engines in general | Only with factory documentation |
 | **4. We assumed it** | A reasonable engineering estimate nobody has verified | **No.** Must be declared as an assumption |
@@ -214,6 +214,58 @@ in this section against the shipped data, so they cannot drift.
 - the round-robin logging discovery — the logger records one channel per row
 - the coolant regulation band, 88–97 °C in every log (section 2)
 
+
+---
+
+## 5b. The live app's own numbers — added 16 September 2026
+
+`app/` runs the same plant and the same thermal network beside the car in real
+time, so **every number in sections 1–5 applies to it unchanged, including every
+UNVERIFIED and ASSUMED one.** It introduces no new physics. It does introduce
+five numbers of its own, and they divide into two kinds that must not be
+confused.
+
+### Measured on our own logs (kind 1)
+
+| number | what it is | where it came from |
+|---|---|---|
+| **1020.0 kg/h** | the air-mass sensor ceiling the app refuses to trust | 573 pinned samples across 6 of the 9 raw logs; 517 across 5 after the warm filter. Already in section 5 |
+| **6.0 s** | the channel refresh interval on a 26-channel log, which sets how long a detection window must span | measured directly on `7475b5d7`: air mass 6.00 s, boost 6.00 s, engine speed 6.00 s, ambient pressure 18.0 s |
+| **7.5 s / 1.45 s** | per-channel rate at 26 and 7 channels — the whole justification for keeping the live set to six | `7475b5d7` against `pull01`, CLAUDE.md mistake 13b |
+| **13.6 %** | the worst windowed disagreement between inverted and measured pressure on a car with nothing wrong with it — the evidence behind the 25 % fault threshold | 45 gated windows across all nine drives, CLAUDE.md mistake 14 |
+
+### Chosen by us, and defensible but not measured (kind 4)
+
+| number | what it is | why this value, and what would change it |
+|---|---|---|
+| **PR ≥ 1.8** | the pressure ratio above which the app believes the throttle is not restricting, so the comparison is valid | the median disagreement stops moving there (+6.5 %) and the tail is mostly gone. 1.7 and 2.0 give 17.5 % and 9.6 % of samples over threshold against 14.1 %. **A judgement call on a continuum, not a measured boundary** |
+| **25 %** | the disagreement the app calls a fault | 11 points above the worst healthy window measured (13.6 %). The margin is chosen; the 13.6 % is not |
+| **25 K** | the seed-uncertainty width below which the app stops calling the estimate unknown | the thermal alert projects 30 s ahead at 1–4 K/s, i.e. 30–120 K of lead, so 25 K is small against the lead the alert is built on. **Reasoned from the alert's own design, not measured** |
+
+### The one that matters most, and it is ASSUMED
+
+The app's headline output is an estimated turbine housing temperature. Its time
+constant, and therefore everything the app says about how fast the housing is
+heating, rests on **`c_turb = 6000 J/K`** — which section 4 marks **ASSUMED**,
+and which is the same constant that sets the τ in this project's central H/τ
+ratio.
+
+**Say this in the thesis in one sentence, beside the screenshot.** *The app
+displays a modelled temperature, not a measurement; the model's heat capacity is
+an engineering estimate, and the vehicle publishes no turbine temperature
+against which it could be checked.* A number on a dashboard reads as a
+measurement to everyone who did not write it, and that is precisely the
+impression this file exists to prevent.
+
+### What the app is NOT evidence for
+
+- **It has never been shown a fault.** Nothing in nine drives is broken, so
+  every figure behind the mismatch detector is a FALSE-POSITIVE rate. None of
+  them is a detection rate, and the difference is the whole of the claim.
+- **It has never run against the car.** Every number above is from replay.
+- **Its alert counts are not measurements of the vehicle.** 13 thermal / 0
+  mismatch / 19 novel on `7475b5d7` is a property of thresholds we chose. They
+  are pinned so a regression is visible, which is a different job.
 ---
 
 ## 6. What to do with this file

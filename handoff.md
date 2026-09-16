@@ -3,7 +3,7 @@
 **What this file is for.** This is the entry point, and only that: what to run
 first, what to do next, what not to touch. It is deliberately the shortest of the
 three. `CLAUDE.md` is the permanent handoff and the mistake log — the rules, the
-traps, and the thirteen things already gone wrong; read it before you change
+traps, and the sixteen things already gone wrong; read it before you change
 anything. `CHECKPOINT.md` is a dated snapshot of what was verified and when, and
 it is meant to go out of date. This file holds no history and makes no argument,
 so it should never become a third source of truth. **Where any of the three
@@ -11,8 +11,14 @@ disagree, the scripts win: run the command and read what it prints.**
 
 You are taking over a project that works. Everything in the repository
 regenerates, every published figure was re-verified against the shipped data on
-**11 September 2026**, and nothing is secretly broken. What is missing is not
+**16 September 2026**, and nothing is secretly broken. What is missing is not
 correctness — it is Phase D.
+
+**There is now a second deliverable, `app/`, and it is NOT the missing piece.**
+It runs this same physics beside the car in real time and estimates turbine
+temperature, which the vehicle has no sensor for. It works, it is tested, and it
+is the first thing anyone will ask to see. It still does not advance Phase D. If
+you have an hour, spend it below, not on the app.
 
 **Where the numbers stand today.** 175.5 minutes over nine drives, six of them
 carrying samples, **22 distinct operating points spanning 30–74 kPa**. The load
@@ -74,6 +80,8 @@ reproduce, the number here is stale and the script is right.
 | `python check_map.py` | spark falls with load in every row and rises with speed in every column; **6 cells `--`** (above the compressor ceiling), **0 `knk`** |
 | `python build_dataset.py "logs/raw/*.csv"` | 175.5 min, 9 drives, 22 operating points |
 | `python verify_docs.py` | recomputes the published figures, scans every tracked document for retired ones, and prints its own total. Every check must pass. **Do not memorise the count** — it moves each time a figure is added |
+| `python -m app.test_replay` | **36 of 36**. Add `--full` for **46 of 46**, which replays the whole of `7475b5d7`: 14278 of 14340 samples estimated, peak estimated turbine **884.9 °C**, **13 thermal · 0 mismatch · 19 novel** |
+| `python -m app.server --replay logs/raw/7475b5d7-20260908_142743.csv --speed 8` | serves `http://localhost:8000` — dashboard, `/driver`, `/review`. **No car needed** |
 
 `validate.py` being 8 of 11 is expected, not a failure: the three outside are the
 cruise-band EGT maximum and the two oil figures, and `validation_table.md` says
@@ -174,6 +182,11 @@ and interquartile range over five seeds.
 | Feed the raw intake-air-temperature channel in as charge temperature | `Intake air temperature before throttle valve` is a **compressor outlet** — the B58 carries its cooler inside the manifold. Use `plant.charge_temperature()` |
 | Rely on a default plant geometry | Pass `geo=GEO` explicitly. This cost three weeks once |
 | Change the test set after seeing results | Unrecoverable |
+| **Add a write path to `app/`, in any form** | The read-only rule is structural, not stylistic. A future version may SUGGEST an ECU parameter as text on a screen; applying it is a different product and must never share a code path. `app/test_replay.py` asserts that no write path exists |
+| **Write raw samples to disk from `app/`** | The stream is memory → websocket → gone. Only what the model *marks* is persisted, to `app/review_log.jsonl`. A test asserts a whole replay creates exactly one file |
+| Add a seventh live channel without justifying it | The adapter polls one channel per round trip, so every addition costs every other channel ~14 % of its rate. Put the reason in the channel's `why` field |
+| Lower an `app/` threshold to quiet a demo | A threshold changes for a measurement, and the measurement goes in the docstring. See mistake 14 |
+| **Unzip a release archive over the tree** | The v19 archive was older than the branch for everything except `app/` and would have reverted a fortnight of work. Diff first, take only what is new. Mistake 16 |
 
 On that charge-temperature row, the car settles it. Over 587 boosted model
 samples against 887 logged readings of the vehicle's own boost channel (median
@@ -269,13 +282,17 @@ threshold with every figure taken from it.
 
 | You need | File |
 |---|---|
-| the rules, the traps, **the thirteen mistakes already made** | [CLAUDE.md](CLAUDE.md) |
+| the rules, the traps, **the sixteen mistakes already made** | [CLAUDE.md](CLAUDE.md) |
 | what was verified, and on what date | [CHECKPOINT.md](CHECKPOINT.md) |
 | the project in prose, for a reader outside the team | [README.md](README.md) |
 | Chapter 3's evidence | [validation_table.md](validation_table.md) |
 | which team PDFs still carry void numbers | [DOCUMENT_STATUS.md](DOCUMENT_STATUS.md) |
 | what the car can and cannot measure, all 656 channels | [logs/CHANNEL_CENSUS.md](logs/CHANNEL_CENSUS.md) |
 | what is recorded on a real drive, and why | [logs/CHANNEL_SET_FINAL.md](logs/CHANNEL_SET_FINAL.md) |
+| which numbers are measured, assumed or unsourced | [REFERENCES.md](REFERENCES.md) |
+| **the live app, and why it estimates what it estimates** | [app/estimator.py](app/estimator.py) — read its docstring first |
+| the app's channel budget, and why the set is six | [app/reader.py](app/reader.py) |
+| the three alert types and every threshold's measurement | [app/alerts.py](app/alerts.py) |
 
 There is no `BRIEF.md`, `Context.md`, `ARCHITECTURE.md` or `DATA-MODEL.md` in
 this repository. If you find one of those linked anywhere, the link is dead —

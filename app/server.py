@@ -1,5 +1,14 @@
 """server.py — the local host. Streams live engine state to anything that connects.
 
+WHAT CHANGED HERE, AND WHEN
+---------------------------
+14 September 2026 — one websocket queue became one queue PER CONNECTION. The
+single shared queue had each socket consuming the payloads the others needed, so
+two browsers each saw roughly half the stream. Added since: /driver and /review,
+the /api/status and /api/review endpoints, a reader thread that reports its own
+death instead of leaving the UI showing stale state as live, and meta.limits, so
+that no page carries its own copy of a threshold.
+
     python -m app.server --replay logs/raw/7475b5d7-20260908_142743.csv
     python -m app.server --replay logs/raw/pull01-20260913_093527.csv --speed 8
     python -m app.server --live

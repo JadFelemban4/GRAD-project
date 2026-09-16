@@ -87,3 +87,27 @@ the honest options are:
    `data.js`; the widgets pick the new data up with no code change.
 
 **If this page disagrees with a script, the script is right.**
+
+---
+
+## Added 16 September 2026 — the live app is not in this page
+
+`app/` now exists: the live supervisor that runs the plant and the thermal
+network beside the car and estimates turbine temperature. **Nothing on this
+briefing page covers it**, and nothing on this page is wrong because of it — the
+figures here are Phase B and the premise check, and neither moved.
+
+If the app is added to the briefing later, two things have to come with it:
+
+1. **The turbine temperature it shows is a MODEL OUTPUT, not a reading.** Its
+   heat capacity is an ASSUMED number (REFERENCES.md section 4) and the vehicle
+   publishes no channel to check it against. A screenshot without that caption
+   is the most misleading artefact this project could produce.
+2. **Its alert counts are not measurements.** 13 thermal / 0 mismatch / 19 novel
+   on `7475b5d7` is a property of thresholds we chose, pinned so a regression is
+   visible. A slide that presents them as findings about the car is wrong.
+
+The dataset behind this page also moved: **nine drives, 175.5 minutes**, up from
+eight and 168.1, because `pull01` arrived. It contributes zero samples and zero
+operating points by design, so no figure on this page changed — but the drive
+count in any caption did.
