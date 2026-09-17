@@ -144,7 +144,11 @@ prose scan for those two would mostly catch the documents being right.
 | **M13** neutral quoted as a requirement | **FIXED** | documents quote the ±0.05 band; the random policy is seeded so its "for information" line stops moving |
 | **M14** `--map-from-log` scored zero rows and exited 0 | **FIXED** | the missing alias is added, so it reproduces mistake 2 properly (**110.4 %** against 1.3 %), and it now exits non-zero when it scores nothing |
 | **M3** "steady" windows are steady in speed and rpm only | **FIXED** | every point carries `load_ptp`, and `compare_log.py` prints it: **median load spread 0.52, max 1.25, and only 2 of 23 points hold within 25 %**. Recorded rather than filtered — filtering at 0.25 costs 23 points → 11 and narrows the span to 37–75 kPa, which trades away more coverage than the mislabelling costs |
-| M4, M5, M6, M15, M16 | **OPEN** | see `AUDIT.md` |
+| **M4** the `stable` flag does not implement its criterion | **FIXED (and the finding is bigger)** | `stable_rate` computes the rate between genuine READINGS alongside the gradient flag. They agree almost exactly — **93.9 % vs 92.7 %** — so the gradient artefact is real but is NOT what makes the flag unselective. The thresholds are: 40 g/s/s and 0.6 bar/s admit nearly everything a road drive does. "43 853 quasi-steady samples" means "warm rows not mid-transient", a much weaker claim |
+| **M5** the envelope exists in two disagreeing versions, no script produces it | **FIXED** | new `fit_envelope.py` regenerates it from the shipped data with the method stated, and prints **independent readings beside every bin** |
+| **M6** published figures no shipped script prints | **PARTLY** | the envelope now has one (`fit_envelope.py`). The thermal-fit RMSE table, the spark fit, the knock-limit fit and the retard filter still have none |
+| **M16** per-step terms scale with `dt` | **FIXED** | `SLEW` and the smoothness penalty are per SECOND now. The environment runs at dt 1.0 / 2.0 / 0.2, so the reachable actuator movement per second differed **fivefold** between the hand-written policies and the agent meant to beat them |
+| M15 | **OPEN** | a document sweep; `verify_docs` now catches most of what it named |
 
 ---
 
@@ -169,7 +173,26 @@ its assumption stated · `L10` the coolant row is relabelled "regulation
 response (NOT a free time constant)" · `L12` `check_map.lam_for` documents why
 it still schedules by load and why no published cell changes.
 
-**Open:** L8 only.
+**Open:** L8 only (compressor inlet temperature defined differently across
+drives — `Intake air temperature` where present, `Ambient temperature`
+elsewhere, 8–12 K apart, worth ~1.5–2 % on corrected flow).
+
+### M5 — the envelope's top rests on four readings
+
+`fit_envelope.py` reproduces the table and adds the column that matters:
+
+| flow kg/s | PR p95 | rows | independent readings |
+|---|---|---|---|
+| 0.015 | 1.159 | 24 060 | 1120 |
+| 0.195 | 2.440 | 124 | 13 |
+| 0.285 | **2.515** | 53 | **4** |
+| 0.315 | 2.473 | 47 | 5 |
+
+**"PR 2.52" — the ceiling `plant.boost_ceiling_kpa` is built on, which every
+boost claim inherits — is four measurements.** The envelope is densely
+determined where it does not matter and barely determined where it does. Also
+settles the 0.303-vs-0.314 discrepancy: same quantity, two filters; the highest
+`stable` corrected flow is **0.314 kg/s**.
 
 ### H4 — what the row counts actually rest on
 

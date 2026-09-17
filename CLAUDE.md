@@ -990,9 +990,28 @@ once the warm filter has run.**
 - **Vehicle validation covers 30–74 kPa only.** Steady points need steady
   driving, and steady driving is light-load driving. The boosted region is
   validated against published correlations.
-- **The compressor envelope is unmeasured above 0.303 kg/s corrected**, because
+- **The compressor envelope is unmeasured above 0.314 kg/s corrected**, because
   that is where the MAF channel saturates. The 0.18–0.27 kg/s hole is filled;
   0.33–0.36 is still empty and no drive can fill it with this sensor.
+  *(0.303 and 0.314 appear in different sections of `validation_table.md` for
+  the same quantity under two different filters — AUDIT.md M5. `fit_envelope.py`
+  prints the figure with the filter that produced it.)*
+- **THE TOP OF THE ENVELOPE RESTS ON FOUR TO FIVE INDEPENDENT READINGS.** This
+  is the sharpest consequence of AUDIT.md H4 and it was invisible while the
+  table quoted row counts. `python fit_envelope.py` prints both:
+
+  | flow kg/s | PR p95 | rows | **independent readings** |
+  |---|---|---|---|
+  | 0.225 | 2.415 | 36 | **5** |
+  | 0.255 | 2.342 | 40 | **5** |
+  | 0.285 | 2.515 | 53 | **4** |
+  | 0.315 | 2.473 | 47 | **5** |
+
+  **"PR 2.52", the number `plant.boost_ceiling_kpa` is built on and every boost
+  claim inherits, is four measurements.** The low-flow bins are genuinely dense
+  (1120 readings in the first), so the envelope is well determined where it does
+  not matter and barely determined where it does. Say so in Chapter 3, and do
+  not quote the top bins to three significant figures.
 - **Turbine τ.** `C/UA` gives 50.3 s; the step response on the correct engine
   gives 48.0 s, inside the published band. <!-- RETIRED-OK -->
   The old 39.5 s figure came from the four-cylinder and is void.

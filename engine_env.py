@@ -533,7 +533,15 @@ class SupervisoryTunerEnv(gym.Env):
         c = self.cycle
         n = len(c["v_mps"])
         raw = self._rescale(np.asarray(action, dtype=np.float32))
-        act = np.clip(raw, self.prev_act - SLEW, self.prev_act + SLEW)
+        # AUDIT.md M16: SLEW is a per-SECOND rate, so it must scale with dt.
+        # It used to be applied per STEP, and this environment runs at dt = 1.0
+        # (check_premise), 2.0 (generality_test) and 0.2 (train.py) -- so the
+        # reachable actuator movement per second differed FIVEFOLD between the
+        # hand-written policies and the agent that is meant to beat them. A
+        # trained agent's reward landscape was not the one those policies were
+        # scored on.
+        slew = SLEW * self.dt
+        act = np.clip(raw, self.prev_act - slew, self.prev_act + slew)
         act = np.clip(act, ACT_LO, ACT_HI)
 
         # --- driver demand -------------------------------------------------
@@ -601,9 +609,13 @@ class SupervisoryTunerEnv(gym.Env):
         e_track = abs(self.torque_req - out["torque"]) / t_ref
         r_resp = -(e_track + TRACK_HINGE * max(0.0, e_track - TRACK_TOL))
 
+        # AUDIT.md M16: the smoothness penalty is a cost per second of jerky
+        # actuation, so it is divided by dt -- charged per step it was five
+        # times cheaper at dt = 0.2 than at dt = 1.0, for the same physical
+        # rate of movement.
         smooth = float(np.sum(((act - self.prev_act) / (ACT_HI - ACT_LO)) ** 2))
         reward = (self.w[1] * r_fuel + self.w[2] * r_life + self.w[0] * r_resp
-                  - self.beta * out.get("unc", 0.0) - 0.05 * smooth)
+                  - self.beta * out.get("unc", 0.0) - 0.05 * smooth / max(self.dt, 1e-6))
 
         # --- constraint costs ------------------------------------------------
         c_torque = max(0.0, abs(self.torque_req - out["torque"]) / t_ref - 0.03)

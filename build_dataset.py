@@ -226,11 +226,53 @@ def derive(d):
     # how much of the envelope is unmeasured and why.
     d["maf_pinned"] = d["air_kgh"] >= 1019.9
 
+    # AUDIT.md M4: this flag does NOT mean what its name and docstring say, and
+    # the reason is the forward fill. np.gradient over a staircase is zero
+    # everywhere except the two rows beside each genuine update, so the flag
+    # rejects only those: 93.9 % of warm rows come out "quasi-steady"
+    # (43 853 of 46 707; 2 337 rejected). "43 853 quasi-steady samples" is
+    # therefore a count of ROWS that are not adjacent to an update -- which is
+    # nearly the opposite of what a steadiness filter is for.
+    #
+    # The rate between SUCCESSIVE READINGS is what the docstring describes, so
+    # that is computed too and carried as `stable_rate`. It is not swapped in
+    # as the definition of `stable`, because every published envelope figure is
+    # built on the existing flag and changing it silently would move them all
+    # with no note anywhere. Both are in the file; say which one you used.
+    #
+    # MEASURED, and it is the more useful finding: the two agree almost exactly
+    # -- 93.9 % of rows against 92.7 %. So the gradient artefact is real but it
+    # is NOT what makes this flag unselective. The thresholds are: 40 g/s per
+    # second of air and 0.6 bar per second of boost admit nearly everything a
+    # road drive does. Neither flag is a steadiness filter in any useful sense,
+    # and "43 853 quasi-steady samples" should be read as "warm rows that are
+    # not mid-transient", which is a much weaker claim.
     dt = np.gradient(d["t"])
     with np.errstate(invalid="ignore", divide="ignore"):
         d_air = np.abs(np.gradient(d["air_kgh"]) / dt)
         d_bst = np.abs(np.gradient(d["boost"]) / dt)
+
+        # rate per second between genuine readings of each channel
+        def _reading_rate(col):
+            v = d[col]
+            chg = np.r_[True, np.diff(v) != 0]
+            idx = np.flatnonzero(chg)
+            rate = np.full(len(v), np.nan)
+            if len(idx) > 1:
+                dv = np.diff(v[idx])
+                dtt = np.diff(d["t"][idx])
+                r = np.abs(dv / np.where(dtt > 0, dtt, np.nan))
+                for j, i0 in enumerate(idx[1:]):
+                    rate[i0:] = r[j]
+            return rate
+        r_air = _reading_rate("air_kgh")
+        r_bst = _reading_rate("boost")
     d["stable"] = (d_air < 40) & (d_bst < 0.6) & (~d["maf_pinned"])
+    # AUDIT.md M4: the same criterion on READING-to-READING rates. Carried, not
+    # substituted -- see the note above.
+    d["stable_rate"] = ((np.nan_to_num(r_air, nan=0.0) < 40)
+                        & (np.nan_to_num(r_bst, nan=0.0) < 0.6)
+                        & (~d["maf_pinned"]))
     return d
 
 
@@ -515,6 +557,7 @@ def main():
                 "corr_flow": round(float(d["corr_flow"][i]), 5),
                 "press_ratio": round(float(d["press_ratio"][i]), 4),
                 "stable": int(bool(d["stable"][i])),
+                "stable_rate": int(bool(d["stable_rate"][i])),   # AUDIT.md M4
                 "maf_pinned": int(bool(d["maf_pinned"][i])),
             })
 
