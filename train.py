@@ -10,19 +10,36 @@ Trains a SAC agent on the engine environment and saves everything Phase D needs.
 
 HOW LONG THIS TAKES — read before you start
 --------------------------------------------
-The environment runs at about 21 steps per second on a laptop, because every
-step evaluates the combustion model several times. Add SAC's own gradient
-updates and the real figure is roughly half that.
+MEASURED 17 September 2026, by timing 2000 SAC steps with gradient updates
+already running (200 warm-up steps first, past learning_starts):
 
-      50,000 steps   ~1.5 hours
-     300,000 steps   ~8 hours
+      OMP_NUM_THREADS=1   19.19 steps/s   ->  50k steps = 0.72 h
+      OMP_NUM_THREADS=6   18.14 steps/s   ->  50k steps = 0.77 h
 
-Phase D needs FIVE seeds of each of two configurations. Run sequentially that is
-over three days of wall-clock time. Do not do that.
+      50,000 steps   ~45 minutes
+     300,000 steps   ~4.5 hours
 
-    There are five of you. Each person runs one seed, on their own laptop,
-    overnight. Two nights covers both configurations. Agree who takes which
-    seed BEFORE anyone starts, or you will end up with three copies of seed 0.
+TWO THINGS THAT SURPRISED US, AND BOTH CORRECT THIS FILE'S OWN OLD ADVICE.
+
+**Thread count does not matter.** One thread is marginally FASTER than six --
+the policy network is tiny, so threading overhead exceeds the gain. Any
+"on one CPU core" qualifier attached to these figures is meaningless.
+
+**SAC's gradient updates are nearly free.** The environment alone runs at
+19.5 steps/s and the full training loop at 19.2, so the updates cost about 2 %.
+The docstring used to say they "bring the training loop down to 3.0 steps/s" --
+a 6.4x error that made Phase D look like a week of overnights. Each env step
+runs six engine cycles at ~9 ms; a gradient step on this network is ~1 ms. The
+combustion model dominates completely and nothing else is close.
+
+Caveat on the measurement: 2000 steps, no episode boundary crossed (an episode
+is 4500 steps at dt = 0.2). Re-time it if you change `plant.DTHETA_DEG`, which
+is what actually sets the cost -- halving it roughly doubles the run.
+
+Phase D needs FIVE seeds of each of two configurations: ten runs, about
+**7.5 hours total**. One evening on one machine, or under an hour if the five
+of you run one seed each. Agree who takes which seed BEFORE anyone starts, or
+you will end up with three copies of seed 0.
 
 Checkpoints are written every 10,000 steps, so a closed laptop costs you minutes
 rather than the whole run. Re-running the same seed resumes from its checkpoint.
@@ -76,16 +93,21 @@ def main():
     print(f"configuration : {'BLINDED (no preview)' if a.no_preview else 'sighted'}")
     print(f"seed          : {a.seed}")
     print(f"steps         : {a.steps:,}")
-    # MEASURED, not guessed. The old formula assumed 10.75 effective steps/s and
-    # under-estimated by 3.6x. Timed on 8 September on one CPU core, after the
-    # engine-geometry correction: the environment alone runs at 19.5 steps/s,
-    # and SAC's gradient updates bring the training loop down to 3.0 steps/s.
-    # 3200 steps took 18 minutes; 50000 steps takes about 4.6 hours.
+    # MEASURED 17 September 2026 -- see the docstring for the full table.
+    # 2000 SAC steps with gradient updates running: 19.19 steps/s at one thread,
+    # 18.14 at six. Threads do not matter and the gradient updates cost ~2 %;
+    # the combustion model is the whole cost.
     #
-    # Re-measure if you change the plant or move to a GPU. An estimate that is
-    # wrong by a factor of four is how five people plan an evening around a run
-    # that is still going at breakfast.
-    STEPS_PER_S = 3.0
+    # This was 3.0 until 17 September, quoted as "measured on one CPU core" and
+    # wrong by 6.4x. It made 50k steps look like 4.6 hours instead of 45 minutes
+    # and turned Phase D into "five overnights, twice" in every document that
+    # repeated it. THE ERROR WAS IN THE FIGURE, NOT IN THE HARDWARE -- do not
+    # re-introduce a per-machine qualifier to explain it away.
+    #
+    # Re-measure if you change plant.DTHETA_DEG, which is what actually sets the
+    # cost, or move to a GPU. An estimate wrong by a factor of six is how five
+    # people plan two weeks around work that fits in an evening.
+    STEPS_PER_S = 19.2
     mins_est = a.steps / STEPS_PER_S / 60
     print(f"estimate      : about {mins_est:.0f} minutes "
           f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on CPU")

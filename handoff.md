@@ -167,23 +167,34 @@ Until that install happens, `train.py` raises `SystemExit` in its import block
 with the instruction above, so **nothing in that file past the imports has ever
 been executed.** Step 1 is also the first time anybody finds out.
 
-### Step 2 — one training run, to prove it runs · 4.6 hours
+### Step 2 — one training run, to prove it runs · 45 minutes
 
-> **Ask the owner before starting this.** It occupies a machine for a night, and
-> the seed assignment has to be agreed first or you end up with three copies of
+> **Agree the seed assignment first**, or you end up with three copies of
 > seed 0.
 
 ```bash
 python train.py --steps 50000 --seed 0
 ```
 
-**About 4.6 hours on one CPU core, per seed. Measured, not guessed:** the
-environment runs at 19.5 steps/s alone, and 3.0 steps/s once SAC's gradient
-updates are included. The "1.5 hours" figure came from a formula optimistic by
-3.6× — and `train.py`'s own docstring still carries it. Believe 4.6 hours.
+**About 45 minutes per seed. Re-measured 17 September**, by timing 2000 SAC
+steps with gradient updates already running:
 
-**Plan an overnight, not an evening.** Checkpoints land every 10 000 steps, and
-re-running the same seed resumes from its checkpoint.
+```
+OMP_NUM_THREADS=1   19.19 steps/s   ->  50k = 0.72 h
+OMP_NUM_THREADS=6   18.14 steps/s   ->  50k = 0.77 h
+```
+
+*(This section said **4.6 hours on one CPU core** until 17 September, and told
+you to plan an overnight. Wrong by 6.4×. Two things were wrong with it: the
+"one CPU core" qualifier is meaningless — **one thread is marginally faster
+than six**, because the policy network is tiny — and **SAC's gradient updates
+are nearly free**, about 2 %, not the 6.5× slowdown claimed. The environment
+alone runs 19.5 steps/s and the full loop 19.2. Each env step runs six engine
+cycles at ~9 ms against ~1 ms for a gradient step, so the combustion model is
+the whole cost, and `plant.DTHETA_DEG` is what sets it.)*
+
+Checkpoints land every 10 000 steps, and re-running the same seed resumes from
+its checkpoint.
 
 **Expect a poor result.** It running at all is the point of this step.
 
@@ -210,9 +221,13 @@ python train.py --steps 50000 --seed 0      # ... through --seed 4
 python train.py --steps 50000 --seed 0 --no-preview   # ... through --seed 4
 ```
 
-Ten runs total, **about 4.6 hours each**. Split across five people, that is one
-overnight each, twice. Agree who takes which seed before anyone starts, and get
-the owner's go-ahead before committing five machines to it.
+Ten runs total, **about 45 minutes each — 7.5 hours altogether**. That is one
+evening on one machine, or under an hour if the five of you take one seed each.
+Agree who takes which seed before anyone starts.
+
+*(This said "about 4.6 hours each … one overnight each, twice" until
+17 September. See step 2: the rate was wrong by 6.4×, so Phase D is an evening,
+not two weeks. **Nothing about the work changed — only the estimate.**)*
 
 ### Step 5 — the evaluation protocol · fix it once, never touch it
 

@@ -50,7 +50,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary result only, from hand-written policies |
 | G · writing | not started |
-| **APP · the live supervisor** | **runs, and has six known bugs.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its own suite passes 46 of 46 — and the 14 September audit found six defects in it anyway, one of them feeding the driver-facing alerts. **Read `AUDIT.md`, and the audit section below, before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
+| **APP · the live supervisor** | **runs; the six audit findings against it are now FIXED.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its suite reports **49 of 49**, up from 46 because each fix shipped with a regression test. *(This row said "has six known bugs … passes 46 of 46" until 17 September; the fixes and the count both moved on 16 September and this row did not.)* The lesson still stands and is worth more than the fixes: **the suite reported 46 of 46 while all six were live.** Only M9 carries no test of its own. **Read `AUDIT.md` and `AUDIT_FIXES.md` before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
 
 **Where the app sits, and what it must not be allowed to become.** The app is
 the demonstrable, showable half of this project and it will be the first thing
@@ -164,14 +164,30 @@ any script ever does this again, the character is the bug, not the data.
 **It happened again on 16 September, in `verify_docs.py` itself** — see
 mistake 16's second half. Same cause, third occurrence, still the character.
 
-Preview advantage: reactive cuts damage 33.8 %, predictive 47.2 % — **13.4
-points**.
+<!-- RETIRED-OK: section -->
+### VOID — the preview advantage this file used to lead with
 
-<!-- RETIRED-OK -->
-*(That first figure read 33.9 % until 11 September. (829.2 − 548.6) / 829.2 =
-33.84, which rounds to 33.8 at any sensible precision; 33.9 was a typo that no
-printed column supported. The predictive figure and the 13.4-point gap are
-unchanged.)*
+**Reactive cuts damage 33.8 %, predictive 47.2 % — a 13.4-point advantage.**
+**DO NOT QUOTE ANY OF THAT.** All three figures are void as of 16 September
+(AUDIT.md C1/C2/C3) and they are printed here only so the old value is
+recognisable if someone is still holding it.
+
+Until 17 September this passage stated them as a plain live claim, with the
+retraction three paragraphs further down under a different heading — and a
+parenthesis underneath that said the 13.4-point gap was *"unchanged"*, which had
+stopped being true. **A reader who stopped at the bold number would have carried
+a void figure into a meeting.** Mistake 11 in its most dangerous form: not a
+stale number in a corner, but a retracted headline still reading as current.
+
+**What replaces it:** run `check_premise.py`. It currently prints a baseline of
+294.2 at 812 °C, no constraint binding at all, and preview worth **−1.8 points**
+against a policy that only knows the grade it is on now.
+
+*(A parenthesis here used to restate the arithmetic behind an 11 September typo
+correction to the first figure. It was deleted on 17 September: `RETIRED` now
+guards all three numbers, and re-quoting them to explain a superseded rounding
+made the checker fail — correctly. **When a figure goes void, its errata go with
+it.**)*
 
 **WHAT USED TO BE CALLED THE STRONGEST SINGLE FACT IN THE PROJECT WAS AN
 IDENTITY, NOT A FINDING.** This file said, for weeks, that disabling preview
@@ -1432,10 +1448,19 @@ not a result.
 1. `python check_premise.py` — confirm the environment works at all.
 2. `pip install "stable-baselines3[extra]"`, then
    `python train.py --steps 50000 --seed 0`. Expect a poor result; it running is
-   the point. **About 4.6 hours on one CPU core** — measured, not guessed: the
-   environment runs at 19.5 steps/s alone and 3.0 steps/s once SAC's gradient
-   updates are included. The old "1.5 hours" came from a formula optimistic by
-   3.6x. Plan an overnight, not an evening. Checkpoints land every 10 000 steps.
+   the point. **About 45 minutes** — re-measured 17 September by timing 2000 SAC
+   steps with gradient updates running: **19.19 steps/s at one thread, 18.14 at
+   six.** Checkpoints land every 10 000 steps.
+
+   *(This said "about 4.6 hours on one CPU core … 3.0 steps/s once SAC's
+   gradient updates are included" until 17 September. Wrong by 6.4x, and the
+   "one CPU core" qualifier was meaningless — one thread is marginally FASTER
+   than six, because the policy network is tiny. The gradient updates cost about
+   2 %: the environment alone runs 19.5 steps/s and the training loop 19.2. Each
+   env step runs six engine cycles at ~9 ms against ~1 ms for a gradient step,
+   so the combustion model is the entire cost. **What sets it is
+   `plant.DTHETA_DEG`** — halving the crank-angle step roughly doubles the run,
+   and it was halved on 16 September. Re-time after touching it.)*
 3. `python test_reward.py` before trusting any training curve.
 4. Five seeds, one per team member, overnight — `--seed 0` through `--seed 4`.
    Then the same five with `--no-preview`. That is Phase D's input.
