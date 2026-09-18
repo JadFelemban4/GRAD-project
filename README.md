@@ -76,18 +76,38 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 > **What the corrected script prints now**, with the true neutral, equal
 > protection depth, and the ECU scheduled on the pressure the engine runs at:
 >
-> | policy | damage | peak turbine |
-> |---|---|---|
-> | baseline ECU (true neutral) | 256.5 | 801 °C |
-> | reactive protection | 256.5 | 801 °C |
-> | current-grade protection | 226.6 | 781 °C |
-> | predictive protection | 232.2 | 781 °C |
+> | policy | fuel g | damage | peak turbine |
+> |---|---|---|---|
+> | baseline ECU (true neutral) | 3620 | 294.2 | 812 °C |
+> | reactive protection | 3620 | 294.2 | 812 °C |
+> | current-grade protection | 3837 | 252.3 | 793 °C |
+> | predictive protection | 3841 | 257.7 | 793 °C |
+> | predictive, preview disabled | 3620 | 294.2 | 812 °C |
 >
-> **The constraint no longer binds.** The baseline peaks at 801 °C against an
+> *(This table read 256.5 / 801 °C and −2.2 points until 17 September. Those
+> were the figures BEFORE the H1 crank-angle correction took
+> `plant.DTHETA_DEG` from 0.5° to 0.25°; `AUDIT_FIXES.md` records the move
+> 256.5 → 294.2 and 801 → 812 °C in its own H1 section. The code moved, this
+> box did not. Mistake 11, one more time.)*
+>
+> **The constraint no longer binds.** The baseline peaks at 812 °C against an
 > 850 °C trigger, so the reactive policy never acts and its row *is* the
-> baseline row. On this scenario preview is worth **−2.2 points** against a
+> baseline row. On this scenario preview is worth **−1.8 points** against a
 > policy that merely knows the grade it is on right now — information any car
 > has from a nose-down accelerometer, and the comparator the audit asked for.
+>
+> **And the scenario is milder than the car's own driving, which is measured
+> over every drive.** Replaying all nine through `app/`: `7475b5d7` peaks at
+> **890.6 °C — 41 K ABOVE the trigger — for 36 s of its 55.1 minutes**, and no
+> other drive gets within 69 K of it (`670063b2` 780.3 °C is next). Across
+> **172.6 replayed minutes the housing is above the limit for 36 seconds:
+> 0.351 % of the time.** The synthetic climb reaches 812 °C and misses by 38 K,
+> so **a real drive on this car is 78 K hotter than the scenario built to stress
+> it.** That is the sharpest argument for re-choosing the scenario from measured
+> driving rather than from a chosen grade — and the 0.351 % is itself a figure
+> about how much preview could be worth on this vehicle, which is what H/τ is
+> for. Neither number describes a sustained-climb duty cycle, because no logged
+> drive is one.
 >
 > **This is not a failure, but it is not yet a result either.** The scenario has
 > to be re-chosen so the trigger is reached for a physical reason, and it must

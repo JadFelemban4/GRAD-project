@@ -58,15 +58,19 @@ What it prints now:
 ```
 policy                             fuel g    damage  peak turb C  peak oil C
 ----------------------------------------------------------------------------
-baseline ECU (true neutral)          3617     256.5          801         105
-reactive protection                  3617     256.5          801         105
-current-grade protection             3833     226.6          781         106
-predictive protection                3838     232.2          781         106
-predictive, preview disabled         3617     256.5          801         105
+baseline ECU (true neutral)          3620     294.2          812         105
+reactive protection                  3620     294.2          812         105
+current-grade protection             3837     252.3          793         106
+predictive protection                3841     257.7          793         106
+predictive, preview disabled         3620     294.2          812         105
 ----------------------------------------------------------------------------
 ```
 
-**Read the warning underneath it.** The baseline peaks at 801 °C against an
+*(This block held 256.5 / 801 °C / 2.2 points until 17 September — the figures
+from before the H1 crank-angle correction took `plant.DTHETA_DEG` to 0.25°.
+`AUDIT_FIXES.md` H1 records the move; this file did not follow it.)*
+
+**Read the warning underneath it.** The baseline peaks at 812 °C against an
 850 °C trigger, so the constraint does not bind, the reactive policy never acts,
 and its row is the baseline row. Nothing in that table is a measurement of
 preview value until the scenario is re-chosen — from a real grade or a published
@@ -74,8 +78,34 @@ duty cycle, and never by turning a knob until the gap looks good.
 
 The row worth looking at is **current-grade protection**: no preview at all,
 only the gradient the car is on right now, and it beats the predictive policy by
-2.2 points. If that survives a properly binding scenario, it is a result about
-H/τ rather than a disappointment.
+**1.8 points**. If that survives a properly binding scenario, it is a result
+about H/τ rather than a disappointment.
+
+**Where to get a binding scenario, measured 17 September over all nine drives.**
+Replay them through `app/` and read the peak estimated turbine housing against
+the 850 °C trigger:
+
+```
+7475b5d7   55.1 min   890.6 C   +40.8   36 s above
+670063b2    7.3 min   780.3 C   -69.5    0
+cb67b01f   21.6 min   728.0 C  -121.9    0
+3aca2ec1   41.7 min   676.1 C  -173.7    0
+683640a0   24.0 min   664.1 C  -185.7    0
+pull01      7.4 min   608.0 C  -241.8    0
+fb988991   14.7 min   607.9 C  -242.0    0
+3f64372e    0.7 min   340.1 C  -509.8    0
+f51686d7        -- no estimate
+                                        ----
+total     172.6 min                      36 s  =  0.351 %
+```
+
+**One drive of nine binds, for 36 seconds in 172.6 minutes.** It clears the
+limit by 41 K while the synthetic climb misses by 38, so the car's own driving
+is 78 K hotter than the scenario written to stress it. **The scenario is what is
+wrong, not the trigger.**
+
+Reproduce it: replay each log through `app.estimator.Estimator` and count
+samples with `t_turb_c` above `engine_env.TURB_PROTECT_K - 273.15`.
 
 > The old "548.6 against 548.6" identity was never evidence. With
 > `use_preview=False` the preview term is literally zero, so the predictive
@@ -92,14 +122,14 @@ reproduce, the number here is stale and the script is right.
 
 | command | what it prints today |
 |---|---|
-| `python check_premise.py` | **the constraint does not bind on the current scenario** — baseline 256.5 at 801 °C, trigger 1123 K. Read the warning it prints. AUDIT.md C1/C2/C3 |
+| `python check_premise.py` | **the constraint does not bind on the current scenario** — baseline 294.2 at 812 °C, trigger 1123 K. Read the warning it prints. AUDIT.md C1/C2/C3 |
 | `python test_reward.py` | 4 of 4 checks pass; neutral scores **inside ±0.05** (currently −0.00888). The exact value is one preference draw and moves with the reset seed — AUDIT.md M13 |
 | `python validate.py` | **8 of 11** quantities inside the published band; displacement 2997.5 cc; turbine τ **48.0 s** |
 | `python compare_log.py data/master_points.csv` | fitted k 0.837 → **1.1 %**; derived k 0.829 → **1.4 %**, PASS; a 20 °C reference would give 0.890, which the fit excludes |
 | `python check_map.py` | spark falls with load in every row and rises with speed in every column; **6 cells `--`** (above the compressor ceiling), **0 `knk`** |
 | `python build_dataset.py "logs/raw/*.csv"` | 175.5 min, 9 drives, 23 operating points |
 | `python verify_docs.py` | recomputes the published figures, scans every tracked document for retired ones, and prints its own total. Every check must pass. **Do not memorise the count** — it moves each time a figure is added |
-| `python -m app.test_replay` | **36 of 36**. Add `--full` for **46 of 46**, which replays the whole of `7475b5d7`: 14278 of 14340 samples estimated, peak estimated turbine **884.9 °C**, **13 thermal · 0 mismatch · 19 novel** |
+| `python -m app.test_replay` | **49 of 49** (was 36/46 before the audit fixes added three regressions). Replays `7475b5d7`: peak estimated turbine **890.6 °C**. That peak rose from 884.9 with the H1 crank-angle correction, not with any app change |
 | `python -m app.server --replay logs/raw/7475b5d7-20260908_142743.csv --speed 8` | serves `http://localhost:8000` — dashboard, `/driver`, `/review`. **No car needed** |
 
 `validate.py` being 8 of 11 is expected, not a failure: the three outside are the

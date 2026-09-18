@@ -118,10 +118,13 @@ Anyone can regenerate these. Do not quote a number that a script does not print.
 
 ```
 python check_premise.py    VOID as of 16 Sep -- see AUDIT.md C1, C2, C3 and the
-                           box in README.md. It now prints baseline 256.5 at
-                           801 C, and a warning that the constraint does not
+                           box in README.md. It now prints baseline 294.2 at
+                           812 C, and a warning that the constraint does not
                            bind on this scenario at all. Run it; do not quote a
-                           number from here
+                           number from here. (This line said 256.5 at 801 C
+                           until 17 Sep -- the pre-H1 figures, superseded when
+                           DTHETA_DEG went 0.5 -> 0.25. AUDIT_FIXES.md H1
+                           records the move and this line did not follow it.)
 python validate.py         8 of 11 published quantities inside band
 python test_reward.py      4 of 4 checks pass
 python build_dataset.py "logs/raw/*.csv"    175.5 min, 9 drives, 23 operating points
@@ -139,11 +142,13 @@ python verify_docs.py      recomputes the published figures from the shipped
                            figure is added
 python check_map.py        spark falls with load in every row, rises with speed
                            in every column; 6 cells above the compressor ceiling
-python -m app.test_replay  36 of 36 fast checks. Add --full for 46 of 46,
-                           which replays the whole of 7475b5d7 and pins the
-                           app's own numbers: 14278 of 14340 samples estimated,
-                           peak estimated turbine 884.9 C, 13 thermal / 0
-                           mismatch / 19 novel alerts
+python -m app.test_replay  49 of 49. It replays 7475b5d7 and pins the app's own
+                           numbers: peak estimated turbine 890.6 C. (This read
+                           "36 of 36, --full for 46 of 46, peak 884.9 C" until
+                           17 Sep. The audit fixes added three regressions and
+                           the H1 crank-angle correction lifted the peak; both
+                           are recorded in AUDIT_FIXES.md and neither reached
+                           this block.)
 ```
 
 **Two of those app figures are not measurements and must never be quoted as
@@ -184,7 +189,44 @@ behaved differently and did not. That means a TRAINED blinded agent against a
 trained sighted one, which is Phase D and has not been run. **Until then this
 project has no measured preview advantage at all**, and the honest comparator —
 added 16 September — is a policy that acts on the grade the car is on right now,
-with no preview, which currently BEATS the predictive one by 2.2 points.
+with no preview, which currently BEATS the predictive one by **1.8 points**
+(252.3 against 257.7 damage; it read 2.2 until 17 September, on the pre-H1
+crank-angle step).
+
+**And the scenario is the thing to fix, not the threshold — measured
+17 September over EVERY drive.** Replaying all nine through `app/` and reading
+the peak estimated turbine housing against the 1123 K trigger:
+
+| drive | minutes | peak C | vs trigger | seconds above |
+|---|---|---|---|---|
+| `7475b5d7` | 55.1 | **890.6** | **+40.8** | **36** |
+| `670063b2` | 7.3 | 780.3 | −69.5 | 0 |
+| `cb67b01f` | 21.6 | 728.0 | −121.9 | 0 |
+| `3aca2ec1` | 41.7 | 676.1 | −173.7 | 0 |
+| `683640a0` | 24.0 | 664.1 | −185.7 | 0 |
+| `pull01` | 7.4 | 608.0 | −241.8 | 0 |
+| `fb988991` | 14.7 | 607.9 | −242.0 | 0 |
+| `3f64372e` | 0.7 | 340.1 | −509.8 | 0 |
+| `f51686d7` | — | no estimate | — | — |
+| **total** | **172.6** | | | **36 s = 0.351 %** |
+
+**ONE drive of nine reaches the limit, for 36 seconds in 172.6 minutes.** The
+synthetic climb reaches 812 C and misses by 38 K, so **the car's own driving
+gets 78 K hotter than the scenario written to stress it.**
+
+Two conclusions, and they pull in opposite directions — state both:
+
+- **The scenario is too mild, not the trigger too high.** Rebuild it from
+  measured driving. Do NOT lower the limit: 1123 K is already 80 K more
+  conservative than the 930 C pre-turbine enrichment limit REFERENCES.md cites
+  (Conway et al., SAE 2018-01-1423, p. 10), and moving it is turning the one
+  knob the audit named.
+- **0.351 % is itself a result about H/tau, and it belongs in the thesis.** On
+  this vehicle, in this driving, the protected component is near its limit a
+  third of one percent of the time. That is a statement about how much preview
+  could be worth HERE, and it is exactly the kind of answer the criterion exists
+  to give. It is not a measurement of the sustained-climb duty cycle the project
+  targets, because no logged drive is one — say which of the two you mean.
 
 ---
 
@@ -1203,16 +1245,32 @@ thought to look for.** The same lesson as mistake 11, one more level down.
 | **M8** | BimmerLink's placeholder zeros are parsed as measurements | the first rows of every log read coolant 0, so the seed can start the block at 273 K |
 | **M7** | nothing in the test suite imports `app/server.py` | "36 of 36 pass" therefore says nothing about whether the product starts |
 
-**None of these is fixed as of 16 September.** They are recorded here so that
-nobody quotes the app's numbers as though the suite passing meant the app was
-right. The fixes are small and named in `AUDIT.md`; what is not small is the
-consequence for the pinned figures, because H8, M8 and M11 all move the
-estimated temperatures, and therefore the alert counts in
-`app/test_replay.py`'s expectations.
+**ALL SIX ARE NOW FIXED**, and `AUDIT_FIXES.md` carries a row per finding
+saying what moved. This paragraph said "none of these is fixed as of
+16 September" until 17 September, which was already untrue when it was written:
+the fixes landed in the same pass that produced `AUDIT_FIXES.md`. Mistake 11 for
+the fifth time — the code moved and the prose did not.
 
-**When they are fixed, re-measure and say what moved.** Do not quietly update
-the expected values — the whole reason they are pinned is so that a change is
-visible and has to be explained.
+Verified by running the suite, not by reading the response document: it reports
+**49 of 49** (three new regressions over the old 46), and five of the six carry a
+test named after the finding — `H8: the modelled lambda reaches 0.81 after a
+sustained pull`, `M11: the modelled block equals the measured coolant`,
+`M10: no time-to-threshold when the limit is unreachable`, `M8: leading coolant
+zeros are not read as 0 C`, `M7: app.server imports and serves its three pages`.
+**M9 is the exception**: it is fixed in `app/reader.py` (the comments at `:530`
+and `:581` name it) but carries no test of its own, so it is the one of the six
+that could silently regress.
+
+**What moved, and it is small:** `7475b5d7`'s peak estimated turbine is
+**890.6 °C** against the 884.9 °C this file quotes above, and `pull01` reads
+**608.0 °C** against 593.7. Both rises are the H1 crank-angle correction, not
+the app fixes — see `AUDIT_FIXES.md`. The 884.9 and 593.7 figures in the section
+above are therefore superseded.
+
+**The lesson the section title still carries is the one worth keeping:** the
+suite reported 46 of 46 while all six defects were live. **A test suite pins the
+behaviour it was written to pin.** Every fix above ships with a regression test
+that would have failed before it, which is the only reason the count went up.
 
 **Three of the audit's CRITICAL findings are about the simulator, not the app,
 and they matter more than anything in this section** — in particular C3, which

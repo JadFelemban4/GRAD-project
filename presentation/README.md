@@ -22,7 +22,7 @@ Published copy (private, share from the page's own share menu):
 | 04 · our contribution | H/τ, why dimensionless, why a second plant, the three claims |
 | 05 · what sets us apart | the head-to-head, the premise table, the ablation, the objections |
 | 06 · where we are | phases A–G, the evidence banked, the limitations, the next five steps |
-| 07 · thirteen mistakes | the mistake log from `CLAUDE.md`, one line of lesson each |
+| 07 · the mistake log | `CLAUDE.md`'s mistakes, one line of lesson each. **The page shows thirteen; the log now holds sixteen** — 14, 15 and 16 are not on the page |
 | 08 · glossary | 70 terms, searchable, the ★ ones marked as viva material |
 | A · run it yourself | the five commands and the numbers they must print |
 | B · teach-backs | who teaches what, and the four questions we will actually be asked |
@@ -65,14 +65,24 @@ or `logs/raw/`.
 > used to make as evidence is an identity that could not have failed.
 >
 > **The corrected script reports that the constraint does not bind at all** on
-> this scenario: the baseline peaks at 801 °C against an 850 °C trigger.
+> this scenario: the baseline peaks at **812 °C** against an 850 °C trigger.
+> *(801 °C until 17 September — that was the figure before the H1 crank-angle
+> correction moved `plant.DTHETA_DEG` to 0.25°. `AUDIT_FIXES.md` records the
+> move 801 → 812; this file did not follow it.)*
 >
 > Regenerate `data.js` from the two dump scripts and rewrite every figure before
 > this page is shown to anyone outside the team. Until then it is a record of
 > what we believed in September, not a briefing.
 >
-> `verify_docs.py` scans `.md` and `.py` only, so **it cannot see `index.html`**
-> and did not catch this (AUDIT.md L11). That gap is why the page drifted.
+> **THE CHECKER HOLE IS NARROWER THAN THIS FILE USED TO SAY, AND STILL OPEN.**
+> `index.html` was added to `verify_docs.TRACKED_DOCS` (AUDIT.md L11), so the
+> FIGURE scan does read it. But `check_retired()` builds its own file list from
+> `glob("**/*.md")` plus the root `*.py`, and `index.html` is neither — so the
+> RETIRED scan never opens it. Measured 17 September: the retired scan opens
+> **25 files and `presentation/index.html` is not one of them**, while 77 of its
+> lines would fire six retired patterns and it carries no `RETIRED-OK` marker.
+> **Two scans, two file lists, and only one of them was fixed.** Until the lists
+> are shared, a green run says nothing about this page.
 
 <!-- RETIRED-OK -->
 The page was also scanned for every figure this project has **retired** — 2.8 %,

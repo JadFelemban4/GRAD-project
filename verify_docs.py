@@ -432,6 +432,23 @@ RETIRED = [
     (r"16\.5\s*(?:->|→)\s*18\.0\s*(?:->|→)\s*26\.0",
      "the H2 table measured against a cooling-disabled baseline (C1)",
      "run generality_test.py"),
+
+    # --- added 17 September 2026. NOT a figure -- the university's name.
+    # CLAUDE.md line 13 read "King Abdulaziz University, Jeddah" until commit
+    # d57f3da (14 Sep), where it was corrected to "University of Jeddah" INSIDE
+    # a commit whose subject was "docs: add REFERENCES.md" -- so the change is
+    # invisible from the log, and any copy taken from `main` before the
+    # 17 September merge still carries the wrong name. The two are genuinely
+    # confusable: the University of Jeddah was split out of King Abdulaziz
+    # University in 2014. Confirmed with the team on 17 September: it is the
+    # University of Jeddah.
+    #
+    # This guard covers the tracked .md and .py files only. It CANNOT see
+    # DOC/*.docx, DOC/*.pdf or presentation/index.html -- all three were checked
+    # by hand on 17 September and none carries a university name at all, which
+    # is its own open question if the submission template requires one.
+    (r"King\s+Abdul\s*[aA]ziz", "the wrong university, corrected in d57f3da",
+     "University of Jeddah / جامعة جدة"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to
