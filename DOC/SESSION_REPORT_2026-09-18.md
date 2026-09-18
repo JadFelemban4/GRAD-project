@@ -387,12 +387,70 @@ wrong engine (mistake 1) and the reward hack (mistake 5). Same shape every time.
 
 ---
 
-# Part 12 · Phase C ran, and Phase D has its first point
+# Part 12 · Phase C ran — the project trained something for the first time
 
-`train.py` got past its import guard **for the first time**: 50 000 steps,
-seed 0, sighted and blinded, **63 minutes each**.
+Until this session `train.py` had **never executed past its import guard**. It
+has now run twice, to completion:
 
-## 12.1 · Why `evaluate.py` had to exist first
+```bash
+python train.py --steps 50000 --seed 0                # sighted
+python train.py --steps 50000 --seed 0 --no-preview    # blinded
+```
+
+**63 minutes each.** Identical in every respect except one: with `--no-preview`,
+`env._preview()` returns zeros instead of the grade at +2 / +5 / +15 / +30 s, so
+four of the twenty-three observation slots carry no road ahead.
+
+What the run reported at the end, sighted:
+
+```
+ep_len_mean     4.5e+03        actor_loss     -13.7
+episodes        8              critic_loss     0.0109
+fps             13             ent_coef        0.0069
+total_timesteps 35992          n_updates       35891
+```
+
+Nothing diverged: the critic loss is small and stable, the entropy coefficient
+annealed on its own from SAC's automatic tuning, and every step produced a finite
+reward. **Five checkpoints per run** landed at 10k / 20k / 30k / 40k / 50k, so a
+closed laptop costs minutes rather than the run — which is the fix `AUDIT.md` H6
+asked for and it is now exercised rather than assumed.
+
+**`fps 13` is the number to plan with, not the 19.2 of Part 4.** That probe ran
+2000 steps on an otherwise idle machine; a full run alongside anything else gives
+13. **Eight remaining runs at 63 min ≈ 8.4 hours.**
+
+## 12.1 · THE TRAINING CURVES POINT THE WRONG WAY — read this before trusting one
+
+Both runs, episode returns in order:
+
+| | ep 0–4 | ep 5–10 | first 5 | last 5 |
+|---|---|---|---|---|
+| **sighted** | −177.2 · −439.1 · −506.4 · −100.8 · **+643.6** | −191.5 · −97.3 · +277.4 · +297.7 · −52.5 · +93.3 | −115.99 | **+103.71** |
+| **blinded** | −179.8 · −457.7 · −403.8 · −177.7 · **+610.2** | −122.8 · −26.0 · +353.9 · +353.1 · +87.8 · +189.8 | −121.76 | **+191.71** |
+
+`train.py` prints "the curve improved" for both. **And by that measure the
+BLINDED agent looks nearly twice as good — +191.71 against +103.71.**
+
+**The evaluation says the opposite**: sighted 194.7 damage against blinded 261.4,
+a **+11.7 point** advantage the other way.
+
+So the training curve does not merely fail to prove learning — **on this pair it
+actively inverts the ranking.** Two reasons, both structural:
+
+- **`reset()` redraws the preference vector every episode**, so each row is scored
+  with a different ruler. Eleven rows spanning **−506.4 to +643.6**, with the
+  single best episode of each run sitting in the FIRST five, is the weight draw.
+- **A blinded agent sees four fewer live inputs**, so its observation is less
+  varied and its returns cluster differently. That is a property of the input,
+  not of the policy's quality.
+
+**This is the concrete argument for the protocol**, and it is better than the
+abstract one: if the team had read the curves and stopped, the conclusion would
+have been *"preview makes it worse"* — the exact opposite of what twenty fixed
+episodes show.
+
+## 12.2 · Why `evaluate.py` had to exist first
 
 **Training-curve returns are not comparable to each other.** `reset()` redraws the
 preference vector every episode, so each row is scored with a different ruler.
@@ -413,7 +471,7 @@ So: **twenty frozen episodes**, `(seed, weights)` written as literals, pinned
 after `reset()`, identical for every policy. A difference between two rows is
 then a difference between the **policies**.
 
-## 12.2 · The table
+## 12.3 · The table
 
 | policy | damage med | IQR | worst | fuel med | peak °C |
 |---|---|---|---|---|---|
@@ -428,7 +486,7 @@ agent over current-grade:  +36.3 points
 SIGHTED over BLINDED:      +11.7 points     (66.0 % against 54.4 %)
 ```
 
-## 12.3 · Five limits on the +11.7
+## 12.4 · Five limits on the +11.7
 
 1. **n = 1 against n = 1.** The protocol wants five seeds each.
 2. **The worst episode reverses it:** blinded **336.9** against sighted **378.8**.
@@ -439,7 +497,7 @@ SIGHTED over BLINDED:      +11.7 points     (66.0 % against 54.4 %)
    the same episode twenty times. **The protocol compares policies; it does not
    test robustness.**
 
-## 12.4 · This reverses the hand-written result, and that is the finding
+## 12.5 · This reverses the hand-written result, and that is the finding
 
 Earlier the same day, preview lost on **five scenarios** with hand-written
 policies, between −0.1 and −2.3 points. With trained agents it **wins by 11.7**.
