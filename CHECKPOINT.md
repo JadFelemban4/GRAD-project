@@ -705,3 +705,90 @@ which is a different job from being a result.
 - **No fault has ever been shown to the mismatch detector.** Nothing in nine
   drives is broken, so every number behind it is a false-positive rate, not a
   detection rate. Say that in the thesis rather than implying validation.
+
+---
+
+## Session of 17 September 2026 — the merge, and a sweep behind the audit fixes
+
+**No code behaviour changed.** One constant moved (`train.py`'s printed
+estimate) and one guard was added. Everything else is documents.
+
+### What arrived
+
+`main` was **behind both branches** and carried no commit they lacked.
+`JMF-2340550` held everything but one commit; `JMF-new-plan` added `aca526d`,
+which only creates `ABSTRACT.md`, `CONTROL_SCOPE.md`, three `DOC/Abstract_*.docx`
+and `presentation/plan.html`. Fast-forward, then merge: **zero conflicts**.
+
+### What was verified, on the merged tree
+
+Every script run, output read, nothing taken from a document:
+
+| script | result |
+|---|---|
+| `verify_docs.py` | **38 of 38**, 311 figure mentions, 25 files |
+| `test_reward.py` | **4 of 4**; neutral −0.00870, starver −0.49080 |
+| `python -m app.test_replay` | **49 of 49** |
+| `compare_log.py` | PASS, 1.3 % derived / 1.1 % fitted over 23 points |
+| `check_premise.py` | baseline **294.2 at 812 °C**, constraint does not bind |
+| `train.py --steps 3000` | ran; SAC trains |
+
+### Six stale figures found and swept
+
+All the same failure: the 16 September audit fixes moved the code and no
+document followed. **Mistake 11 for the fifth time.**
+
+| where | said | prints |
+|---|---|---|
+| CLAUDE.md, README.md, handoff.md | 256.5 · 801 °C · 2.2 pts | **294.2 · 812 °C · 1.8 pts** |
+| CLAUDE.md, handoff.md | 36 of 36 / 46 of 46, peak 884.9 °C | **49 of 49**, peak **890.6 °C** |
+| CLAUDE.md phase table + app section | "six known bugs", "none fixed" | **all six fixed** |
+| presentation/README.md | 801 °C, "thirteen mistakes" | 812 °C, sixteen |
+
+### Two measurements taken this session
+
+**Every drive replayed against the protection trigger.** One of nine binds:
+`7475b5d7` peaks at 890.6 °C, **41 K above**, for **36 s of 172.6 replayed
+minutes — 0.351 %**. The synthetic climb reaches 812 °C and misses by 38 K, so
+**the car's own driving is 78 K hotter than the scenario written to stress it.**
+The scenario is what is wrong, not the trigger.
+
+**The training rate, re-timed.** `STEPS_PER_S` was 3.0, quoted as "4.6 hours on
+one CPU core". Measured over 2000 SAC steps with updates running: **19.19
+steps/s at one thread, 18.14 at six.** Both halves of the old claim were wrong
+and neither is a hardware difference — one thread is marginally FASTER than six,
+and the gradient updates cost ~2 %, not 6.5×. **Phase D is ~7.5 hours, one
+evening, not "five overnights twice".** `plant.DTHETA_DEG` is what sets the
+cost; it was halved on 16 September.
+
+### Two holes left open on purpose
+
+<!-- RETIRED-OK: naming the void figures IS the finding -->
+- **`presentation/index.html`** still hard-codes 829.2 ×24, 548.6 ×70,
+  437.6 ×16. Fixing it means regenerating the page, not editing a document.
+- **`check_retired()` never opens it.** It builds its own list from
+  `glob("**/*.md")` plus the root `*.py`, while `TRACKED_DOCS` — used by the
+  FIGURE scan — does include the page. **Two scans, two file lists, and only one
+  was fixed** when AUDIT.md L11 was closed. Measured: the retired scan opens
+  25 files; 77 lines of that page would fire six retired patterns.
+
+### One guard added, and it is not a figure
+
+<!-- RETIRED-OK: the retired string is the subject of this paragraph -->
+`King Abdulaziz` joins `RETIRED`. CLAUDE.md line 13 carried the wrong university
+until `d57f3da` — inside a commit about `REFERENCES.md`, so the change is
+invisible from the log. Confirmed with the team: **University of Jeddah**.
+Verified by planting the string and watching the run fail. `DOC/*.docx`,
+`DOC/*.pdf` and `presentation/index.html` were checked by hand; **none carries a
+university name at all**, which is open if the submission template needs one.
+
+### What this session did NOT do
+
+- **No Phase D.** Nothing trained beyond a 3000-step smoke run.
+- **No scenario chosen.** That is the one blocker, and it is a team decision:
+  pick it from something physical, never by turning a knob until the gap looks
+  good.
+<!-- RETIRED-OK: the figures named here are the ones the run rejected -->
+- **`verify_docs.py` caught the author mid-edit**, correctly, when explaining
+  the void headline re-quoted 829.2 and 548.6. The errata came out with the
+  figure. **When a number goes void, its corrections go with it.**
