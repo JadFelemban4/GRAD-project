@@ -266,6 +266,74 @@ Two conclusions, and they pull in opposite directions — state both:
   to give. It is not a measurement of the sustained-climb duty cycle the project
   targets, because no logged drive is one — say which of the two you mean.
 
+#### The published towing standard was tried, and it does NOT bind. 18 September
+
+This file and README both name "a published towing cycle" as a legitimate source
+for the new scenario. **It was looked up, implemented and measured, and it is the
+wrong standard for this vehicle.** Recorded so nobody spends the afternoon again.
+
+`SAE J2807` FEB2016 section 4.3.5, read off the standard's own PDF rather than a
+summary: Arizona SR 68, **18.3 km (11.4 miles)**, grade **0–7 %** (Figure 2, GPS
+data 11/2004), minimum speed **64.4 km/h (40 mph)**, minimum ambient **37.8 °C
+(100 °F)**, air conditioning at maximum. Run with `Vehicle.mass` swept, neutral
+policy:
+
+| trailer kg | peak turbine C | vs trigger | peak torque Nm |
+|---|---|---|---|
+| 0 | 432.4 | −417.5 | 140 |
+| 1000 | 587.0 | −262.9 | 224 |
+| **2000** | **756.3** | **−93.5** | **308** |
+
+**Two tonnes of trailer is still 94 K short**, and extrapolating puts the
+crossing near four tonnes behind a 1520 kg sports car. Do not pursue it.
+
+**WHY IT FAILS IS WORTH MORE THAN THE FAILURE, and it redirects the search.**
+Compare the last row with the standard climb: 308 Nm → 756 °C against 297 Nm →
+812 °C. **Nearly the same torque, 56 K apart.** The turbine node is heated by
+`ua_gas_turb · mdot_exh · (egt − t_turb)`, so **the housing is heated by EXHAUST
+FLOW, not by torque.** J2807 is a truck standard run at truck speeds: 40 mph puts
+the engine at low speed and low airflow, so a heavily loaded engine grinding
+slowly uphill produces a *cool* turbine.
+
+**WHAT MOVES IT IS ROAD POWER — and a first reading of this measurement said
+"speed, not grade", which the next sweep refuted within the hour.** Both axes
+work. Neutral policy, 42 °C, 12 min:
+
+| grade | km/h | peak turbine C | vs trigger |
+|---|---|---|---|
+| 12 % | 90 | 756.0 | −93.8 |
+| 12 % | 110 | 812.3 | −37.6 |
+| **12 %** | **130** | **899.4** | **+49.5** |
+| **12 %** | **150** | **942.6** | **+92.7** |
+| 7 % | 130 | 758.8 | −91.0 |
+| 7 % | 150 | 820.4 | −29.5 |
+| **16 %** | **110** | **906.2** | **+56.3** |
+| 4 % | 150 | 708.5 | −141.4 |
+
+**Three combinations bind, and the boundary is near 12 % at ~120 km/h.** The two
+cleanest rows are the argument: 12 % at 130 km/h and 16 % at 110 km/h demand
+**88.7 and 88.5 kW** of road power and reach **899 and 906 °C** — different
+grade, different speed, same power, same temperature. **Do not promote that to a
+law:** 12 % at 90 km/h (54.7 kW → 756 °C) is HOTTER than 4 % at 150 km/h
+(60.4 kW → 709 °C), because the slower row sits at 2018 rpm against 2790 and so
+runs a higher load per cycle and a hotter EGT. Flow and EGT both enter
+`ua_gas_turb·ṁ_exh·(EGT − T_turb)`, and only the measurement settles a case.
+
+That is why J2807 fails: 40 mph at 0–7 %, even behind two tonnes, is a modest
+road power however much torque the trailer asks for.
+
+**Two cautions from doing this.** The web summaries of J2807 report "11.4" as a
+PERCENT GRADE; it is the LENGTH IN MILES, and only opening the standard settled
+it. And the first sweep's "peak torque" column was measuring the launch
+transient from rest, not the climb, which is why two different rows showed the
+same number — it was deleted rather than explained.
+
+<!-- RETIRED-OK -->
+*(One caveat, stated rather than buried: the J2807 runs above used the standard's
+37.8 °C, while the project scenario uses 42 °C. The gap is not the ambient — the
+turbine is gas-heated and barely sees it — but the comparison is not
+temperature-matched and should not be quoted as though it were.)*
+
 ---
 
 ## Sixteen mistakes already made. Do not remake them.

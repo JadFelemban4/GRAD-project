@@ -8,8 +8,12 @@ updated: 2026-09-18
 
 ## What I am responsible for
 
-The repository and the GitHub account it lives on (`JadFelemban4`). The car the
-nine drives were logged from is the one I drive.
+The repository and the GitHub account it lives on (`JadFelemban4`).
+
+**The Supra is a teammate's car, not mine.** I drive a GAC Emzoom 2024, the trim
+below Sport. Corrected here on 18 September — this file said the logged car was
+mine, which I never said; it was assumed. Ask rather than assume who owns what,
+because it decides who can schedule a drive.
 
 ## What to assume I know — and what not to
 
