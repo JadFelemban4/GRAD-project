@@ -30,7 +30,7 @@ statistics, academic writing — **unrecorded**. Ask rather than assume.
 
 ## How to explain things to me
 
-*Unrecorded.* `DOC/SESSION_2026-09-18_for_Ghassan.md` was written on the
+*Unrecorded.* `DOC/SESSION_REPORT_2026-09-18.md` was written on the
 assumption that a dense technical brief with tables suits you, because that is
 what an engine-literate reader who knows the project can use. If that is wrong,
 say so there and it changes.
@@ -42,7 +42,7 @@ say so there and it changes.
 ## Open questions addressed to me
 
 From the 18–19 September session, all four in
-`DOC/SESSION_2026-09-18_for_Ghassan.md` §10:
+`DOC/SESSION_REPORT_2026-09-18.md` §17:
 
 1. The gear rule uses a flat torque ceiling on an rpm-dependent quantity. What
    is the right shape, and is a 25 % torque reserve sensible for this box?
