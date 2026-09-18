@@ -792,3 +792,96 @@ university name at all**, which is open if the submission template needs one.
 - **`verify_docs.py` caught the author mid-edit**, correctly, when explaining
   the void headline re-quoted 829.2 and 548.6. The errata came out with the
   figure. **When a number goes void, its corrections go with it.**
+
+---
+
+## Session of 18-19 September 2026 — the scenario, a gearbox defect, and the first ablation
+
+**The project has a measured preview advantage for the first time.** It is one
+seed against one seed and it is not quotable yet. Everything below was run, not
+argued; the output of each command is in `results/`.
+
+### The scenario is chosen and LOCKED
+
+`make_grade_climb` defaults move **v_kmh 110 -> 130**. Decided before any
+training run existed, from an envelope measured beforehand (eight grade/speed
+pairs, in CLAUDE.md), and it does not move again. Four conditions hold together
+for the first time in this project:
+
+| | |
+|---|---|
+| constraint binds | 857 C against an 850 C trigger |
+| torque trackable | 316 Nm demanded, **0.0 %** shortfall |
+| reward gate | 4 of 4, neutral **+0.00048** |
+| protection works | current-grade cuts damage **29.7 %** |
+
+**The published towing standard was tried first and rejected by measurement.**
+`SAE J2807` Davis Dam does not bind even behind a two-tonne trailer — 756.3 C,
+94 K short. A truck standard at truck speeds asks a modest road power however
+much torque the trailer adds.
+
+### The gate caught a gearbox defect — mistake 17
+
+`test_reward.py` FAILED on the new scenario: neutral scored **-0.124** against a
++/-0.05 band. The baseline demanded **381 Nm and delivered 359**, short 5.7 % on
+**519 of 519** climb samples. `Vehicle.gear_for` selected on road speed alone, so
+at the 115 km/h rung **the model upshifted into top gear halfway up a 12 %
+grade**. A 4 % step in road speed moved the torque demand 23 %.
+
+Fixed with a load term and a 25 % torque reserve. **Every operating point the
+environment had already been used at keeps its gear**, so the old scenario is
+bit-identical. Cost: peak turbine 899.4 -> 857.0 C, so the scenario binds by 7 K
+instead of 49.
+
+**Third defect in this project that was invisible until the load became real**,
+after the wrong engine and the reward hack. Same shape every time.
+
+### Phase C ran. Phase D has its protocol and its first point.
+
+`train.py` executed past its import guard **for the first time**: 50 000 steps,
+seed 0, sighted and blinded, **63 minutes each** — not the 45 min a 2000-step
+probe predicted, so quote 63.
+
+`evaluate.py` is new: **twenty frozen episodes**, weights pinned as literals, the
+same for every policy. It exists because training-curve returns are NOT
+comparable — the preference vector is redrawn every episode, and seed 0 ranged
+from -506.4 to +643.6 over eleven episodes with its best in the FIRST five.
+
+| policy | damage med | IQR | worst | fuel med |
+|---|---|---|---|---|
+| baseline ECU | 572.8 | 0.0 | 572.8 | 4528 |
+| reactive | 540.9 | 0.0 | 540.9 | 4552 |
+| current-grade | 402.6 | 0.0 | 402.6 | 4796 |
+| **agent, sighted** | **194.7** | 35.6 | 378.8 | 5337 |
+| **agent, blinded** | **261.4** | 19.9 | 336.9 | 5008 |
+
+**SIGHTED over BLINDED: +11.7 points.** Sighted cuts 66.0 %, blinded 54.4 %.
+
+### This reverses the hand-written result, and that is the finding
+
+Earlier the same day, preview was measured with HAND-WRITTEN policies across
+five scenarios — constant grade and four rolling periods — and **lost in every
+one**, between -0.1 and -2.3 points. The cause is one line: `p_predictive` takes
+`max(preview[+15 s], preview[+30 s])`, so on a road that keeps climbing it
+protects continuously, including through easy sections.
+
+**AUDIT.md C3 said hand-written policies cannot answer this. They now
+demonstrably cannot: the two verdicts differ by 12 points.**
+
+### Four limits on the +11.7, all of them stated
+
+1. **n = 1 against n = 1.** The protocol wants five seeds each.
+2. **The worst episode reverses it** — blinded 336.9 against sighted 378.8.
+3. **The sighted agent burns 6.6 % more fuel**, 5337 against 5008 g.
+4. **The twenty episodes vary the preference weights only**, not the road or the
+   ambient — which is why every hand-written policy shows IQR 0.0. The protocol
+   compares policies; it does not test robustness.
+
+### What this session did NOT do
+
+- **No five-seed result.** Eight runs remain, 63 min each, about 8.4 hours.
+- **No second plant.** `battery.py` still does not exist, and with one plant the
+  H/tau claim cannot be tested at all — only a curve, never an overlap.
+- **The 115-125 km/h band still over-asks**, because the gear rule uses a flat
+  torque ceiling on an rpm-dependent quantity. Not tuned away: lowering it would
+  have moved 16 % at 110 km/h, the team's third scenario.

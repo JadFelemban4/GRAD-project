@@ -1,0 +1,21 @@
+PHASE D EVALUATION -- 20 FIXED EPISODES, frozen 18 Sep 2026
+scenario: 12 % at 130 km/h, 42 C, 720 s, dt 1.0
+trigger:  850 C
+
+policy                        damage med      IQR    worst  fuel med   peak C
+-----------------------------------------------------------------------------
+baseline ECU                       572.8      0.0    572.8      4528      857
+reactive                           540.9      0.0    540.9      4552      852
+current-grade                      402.6      0.0    402.6      4796      834
+agent runs/sighted_seed0           194.7     35.6    378.8      5337      835
+agent (blind) runs/blind_seed0       261.4     19.9    336.9      5008      825
+-----------------------------------------------------------------------------
+  reactive                   cuts median damage   5.6 %
+  current-grade              cuts median damage  29.7 %
+  agent runs/sighted_seed0   cuts median damage  66.0 %
+  agent (blind) runs/blind_seed0 cuts median damage  54.4 %
+
+  AGENT over CURRENT-GRADE: +36.3 points
+  SIGHTED over BLINDED:     +11.7 points   <- THE ABLATION. This is the project's result.
+
+[exited with code 0]
