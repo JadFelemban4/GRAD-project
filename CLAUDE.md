@@ -266,6 +266,70 @@ Two conclusions, and they pull in opposite directions — state both:
   to give. It is not a measurement of the sustained-climb duty cycle the project
   targets, because no logged drive is one — say which of the two you mean.
 
+#### 17. THE GEARBOX UPSHIFTED MID-CLIMB, AND ONLY A HARDER SCENARIO COULD SHOW IT
+
+Found 18 September, by the reward gate refusing to pass. **This is the third
+defect in this project that was invisible until the load became real**, after the
+wrong engine (mistake 1) and the reward hack (mistake 5), and it has the same
+shape: a simplification that is harmless at part load and wrong exactly where the
+project does its work.
+
+**What happened.** The scenario moved to 12 % at 130 km/h and `test_reward.py`
+failed its first check: the neutral action -- which by construction reproduces
+the baseline ECU -- scored **-0.124** against a +/-0.05 band. The script's own
+advice is to raise the tracking weight. **That advice was written for a different
+failure and following it would have made this one worse.**
+
+**The real cause, measured on the shipped trace.** Over the whole climb the
+baseline demanded **381 Nm and delivered 359** -- short by **5.7 %, on 519 of
+519 samples**, just past `TRACK_TOL` = 5 %, so the hinge fired every single step.
+The baseline could not hold the demand. No reward weight fixes a scenario asking
+for torque the vehicle cannot make.
+
+**Why it could not.** `Vehicle.gear_for` selected on ROAD SPEED ALONE:
+
+| km/h | gear | demand Nm | shortfall |
+|---|---|---|---|
+| 110 | 5th (0.82) | 297 | 0.0 % |
+| **115** | **6th (0.68)** | **364** | **7.8 %** |
+
+**A 4 % step in road speed moved the torque demand 23 %.** That is the ratio
+dropping at the 115 km/h rung of a fixed speed ladder: **the model upshifted into
+top gear halfway up a 12 % grade**, which no automatic transmission does, and
+then asked the engine for the whole hill at 2137 rpm.
+
+**The fix is a load term, and it is guarded against being a convenience.**
+`gear_for` now takes the tractive force and hands back a gear while the required
+torque exceeds `SHIFT_LOAD` x `PEAK_TORQUE_NM` -- a 25 % torque reserve, declared
+ASSUMED -- subject to the lower gear not hitting the limiter. **Every operating
+point the environment had already been used at keeps the gear it had**: 110 km/h
+flat, 110 at 12 %, 110 at 16 %, 90 flat and 50 km/h town are all unchanged, so
+the old scenario is bit-identical. Only 130 and 150 km/h on the 12 % grade
+downshift, 381 Nm -> 316 Nm at 2913 rpm.
+
+**What it cost, stated rather than buried.** The peak turbine at 130 km/h falls
+**899.4 -> 857.0 C** -- the downshift raises rpm and lowers load per cycle, so
+the EGT drops. The scenario still binds, by **7 K instead of 49**, and protection
+still does real work: current-grade cuts damage **29.7 %**. The gate passes at
+**+0.00048**. But the starver's margin narrowed from -2.16 to -0.10, because an
+engine that meets its demand easily makes refusing to work a smaller crime --
+**that is the number to watch first if a trained agent turns lazy.**
+
+**A KNOWN LIMIT OF THE FIX, because it is a flat ceiling on an rpm-dependent
+quantity.** 500 Nm is peak torque, not torque at every speed, so 115-125 km/h
+still over-ask: they sit at 364-375 Nm, under the ceiling, while the engine
+cannot deliver that at 2137 rpm. Those speeds are not scenarios and the ceiling
+was NOT lowered to smooth the table -- doing so would have moved 16 % at 110 km/h,
+which is the team's third scenario. Fixing it properly needs an rpm-dependent
+torque limit, which is a larger change.
+
+**The lesson, and it is mistake 5's written down one level out:** a reward is
+only safe relative to the dynamics it scores, and **a plant simplification is
+only safe relative to the operating points it has been used at.** Both go stale
+the moment the scenario gets harder. Run `test_reward.py` after a scenario
+change, read WHICH check failed, and diagnose it before taking the advice the
+failure prints.
+
 #### A ROLLING ROAD MAKES PREVIEW WORSE, NOT BETTER. 18 September
 
 Once the scenario binds, the obvious next question is whether preview was losing
@@ -379,7 +443,7 @@ temperature-matched and should not be quoted as though it were.)*
 
 ---
 
-## Sixteen mistakes already made. Do not remake them.
+## Seventeen mistakes already made. Do not remake them.
 
 ### 1. THE SIMULATION WAS THE WRONG ENGINE FOR THREE WEEKS
 

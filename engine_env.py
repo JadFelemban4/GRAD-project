@@ -262,19 +262,71 @@ class Vehicle:
     final_drive = 3.4
     gears = (3.6, 2.1, 1.4, 1.0, 0.82, 0.68)
 
-    def gear_for(self, v_mps):
+    # Peak torque of the B58B30O1, the figure every manufacturer sheet prints
+    # beside the engine code (REFERENCES.md section 2).
+    PEAK_TORQUE_NM = 500.0
+
+    # ASSUMED. The fraction of peak torque above which the transmission hands
+    # back a gear, i.e. it keeps a 25 % reserve so the driver has something left.
+    # A reserve of this order is an ordinary automatic calibration; no source has
+    # been opened for this vehicle's, so declare it as engineering judgement.
+    #
+    # HOW IT WAS SET, because the honest account matters: it was chosen so that
+    # every operating point this environment had already been used at keeps the
+    # gear it had. 110 km/h on a 12 % grade asks 297 Nm, below 0.75 x 500, so
+    # that scenario is bit-identical to before this change. It was NOT chosen to
+    # make any scenario bind.
+    SHIFT_LOAD = 0.75
+    SHIFT_RPM_MAX = 6000.0        # never hand back a gear into the limiter
+
+    def gear_for(self, v_mps, force_n=None):
+        """Highest gear the speed allows, then down while the engine is over-asked.
+
+        WHY THE LOAD TERM EXISTS, ADDED 18 September 2026. This used to select on
+        ROAD SPEED ALONE, and that is wrong in exactly the place this project
+        cares about. The speed ladder upshifts to sixth at 115 km/h whatever the
+        road is doing, so on a 12 % grade the model UPSHIFTED MID-CLIMB -- which
+        no automatic does -- and then asked the engine for the whole hill in a
+        0.68 ratio.
+
+        Measured before the fix, 12 % grade, baseline ECU:
+
+            110 km/h -> 297 Nm demanded, tracked to 0.0 %
+            115 km/h -> 364 Nm demanded, short by 7.8 %
+
+        A 4 % step in road speed moved the torque demand 23 %. That is not
+        physics, it is the ratio dropping 0.82 -> 0.68 at the 115 km/h rung.
+        The consequence was not cosmetic: the baseline could not hold the demand,
+        so the tracking hinge fired on 100 % of the climb and `test_reward.py`
+        FAILED its neutral-action check at -0.124 against a +/-0.05 band. The
+        scenario was asking for torque the vehicle could not make, and no reward
+        weight could have fixed that.
+        """
         kmh = v_mps * 3.6
+        g = 5
         for i, lim in enumerate((22.0, 40.0, 62.0, 88.0, 115.0)):
             if kmh < lim:
-                return i
-        return 5
+                g = i
+                break
+        if force_n is None:
+            return g
+        ceiling = self.SHIFT_LOAD * self.PEAK_TORQUE_NM
+        while g > 0:
+            ratio = self.gears[g] * self.final_drive
+            if force_n * self.wheel_r / max(ratio, .1) / 0.92 <= ceiling:
+                break
+            lower = self.gears[g - 1] * self.final_drive
+            if v_mps / self.wheel_r * lower * 60.0 / (2 * np.pi) > self.SHIFT_RPM_MAX:
+                break                      # the lower gear would hit the limiter
+            g -= 1
+        return g
 
     def demand(self, v_mps, accel, grade):
         f = (self.mass * accel
              + 0.5 * 1.2 * self.cd_a * v_mps ** 2
              + self.crr * self.mass * 9.81 * np.cos(np.arctan(grade))
              + self.mass * 9.81 * np.sin(np.arctan(grade)))
-        g = self.gear_for(v_mps)
+        g = self.gear_for(v_mps, force_n=f)
         ratio = self.gears[g] * self.final_drive
         torque = f * self.wheel_r / max(ratio, .1) / 0.92
         rpm = float(np.clip(v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi), 800.0, 6500.0))
@@ -650,23 +702,62 @@ class SupervisoryTunerEnv(gym.Env):
 
 
 # ------------------------------------------------------------------ cycles
-def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=110.0):
+def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.0):
     """Sustained mountain grade at motorway speed, 42 C ambient.
 
-    THE DEFAULTS CHANGED ON 8 SEPTEMBER, AND THE REASON IS THE ENGINE.
+    ============================================================================
+    THIS IS PHASE D'S EVALUATION SCENARIO AND IT IS LOCKED.
+    Decided by the team on 18 September 2026, BEFORE any training run existed.
+    DO NOT CHANGE IT AFTER SEEING A RESULT. Changing the test set once results
+    are in is the one mistake this project cannot recover from -- CLAUDE.md,
+    "What to do next", step 5.
+    ============================================================================
 
-    They were 10 % at 90 km/h, which asks a 1520 kg car for 244 Nm. That loaded
-    the 2.0 L four-cylinder this file used to simulate by mistake. The real
-    B58 makes 500 Nm and answers 244 Nm at about 130 kPa -- well inside its
-    range, with the boost ceiling never approached. The torque constraint
-    therefore never bound, and a scenario where the constraint never binds
-    cannot show a torque-versus-damage trade-off, which is the entire subject
-    of the project.
+    12 % at 130 km/h, 42 C, twelve minutes.
 
-    12 % at 110 km/h asks 297 Nm, 59 % of peak torque, held for twelve minutes
-    in 42 C air. That is a real sustained climb, it loads the real engine, and
-    the constraint binds. Phase D's evaluation protocol should fix these numbers
-    and never move them again.
+    WHY 130 AND NOT 110. Until 18 September this said 110 km/h, and that was
+    right when it was written: the scenario had to bind, and it did. What made it
+    bind was AUDIT.md C2 -- the baseline ECU was scheduled on a manifold pressure
+    the engine was not at, so it commanded roughly ten degrees of phantom retard
+    and cooked the turbine. Fixing C2 removed the heat with the bug, and the
+    scenario stopped binding: the baseline peaked at 812 C against an 850 C
+    trigger.
+
+    THE ENVELOPE WAS MEASURED BEFORE A ROW WAS CHOSEN. Neutral policy, 42 C:
+
+        grade  km/h   peak turbine C   vs trigger
+         12 %    90        756.0         -93.8
+         12 %   110        812.3         -37.6
+         12 %   130        899.4         +49.5   <- this one
+         12 %   150        942.6         +92.7
+          7 %   130        758.8         -91.0
+          7 %   150        820.4         -29.5
+         16 %   110        906.2         +56.3
+          4 %   150        708.5        -141.4
+
+    Three rows bind. 12 % at 130 km/h was taken because it moves ONE variable
+    from the scenario already in use, and because the car's own driving is
+    hotter than either: replaying all nine logs through app/ puts 7475b5d7's
+    estimated turbine housing at 890.6 C. The synthetic climb is not being made
+    harsher than the vehicle -- it is being brought up to it.
+
+    THE OTHER TWO BINDING ROWS ARE NOT DISCARDED. 12 % at 150 and 16 % at 110
+    are the team's second and third scenarios, chosen at the same time and for
+    the same protocol. All three get reported whatever they show; the honest
+    move is a swept set, not a best-of. Note that 12 % at 130 and 16 % at 110
+    demand 88.7 and 88.5 kW of road power -- near-identical exhaust flow, so
+    near-identical turbine tau, so near-identical H/tau from very different
+    grade and speed. If preview value really is a function of H/tau alone, those
+    two must land together. That is the project's own claim, testable.
+
+    WHAT WAS TRIED AND REJECTED, so nobody repeats it: SAE J2807's Davis Dam
+    procedure (18.3 km, 0-7 %, 64.4 km/h, 37.8 C) does not bind even behind a
+    two-tonne trailer -- 756.3 C, 94 K short. A truck standard at truck speeds
+    asks a modest road power however much torque the trailer adds. See CLAUDE.md.
+
+    RETIRED-OK: the 10 % at 90 km/h these defaults carried before 8 September
+    asked 244 Nm and was sized for the 2.0 L four-cylinder this file simulated
+    by mistake (mistake 1). It is void for that reason, not this one.
     """
     n = int(duration / dt)
     t = np.arange(n) * dt
