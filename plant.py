@@ -555,28 +555,34 @@ def map_from_airflow(mdot_air_gps, rpm, iat_k, geo=None) -> float:
 
 
 if __name__ == "__main__":
+    # Mistake 1: NEVER let a call site take the default geometry, even now that
+    # the default is the right engine. These four sweeps used to rely on it,
+    # which is the exact shape of the bug that ran a 1998 cc four-cylinder for
+    # three weeks. One name, passed explicitly, everywhere.
+    geo = b58()
+
     print("=== A. Naturally aspirated cruise, 2500 rpm, 60 kPa, lambda 1.0 ===")
     for spark in [10, 15, 20, 25, 30, 35, 40]:
-        r = run_cycle(Operating(rpm=2500, map_kpa=60, spark_btdc=spark, lam=1.0))
+        r = run_cycle(Operating(rpm=2500, map_kpa=60, spark_btdc=spark, lam=1.0), geo=geo)
         print(f"  spark {spark:3d} BTDC | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| MFB50 {r.mfb50_deg:5.1f} | EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f}")
 
     print("\n=== B. Full load boosted, 3000 rpm, 200 kPa, lambda 0.85 ===")
     for spark in [4, 8, 12, 16, 20, 24]:
-        r = run_cycle(Operating(rpm=3000, map_kpa=200, spark_btdc=spark, lam=0.85, p_exh_kpa=230))
+        r = run_cycle(Operating(rpm=3000, map_kpa=200, spark_btdc=spark, lam=0.85, p_exh_kpa=230), geo=geo)
         print(f"  spark {spark:3d} BTDC | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| Pmax {r.p_max_bar:5.1f} bar | EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f} "
               f"| Pknock {r.knock_prob:.2f}")
 
     print("\n=== C. Lambda sweep at 3000 rpm, 180 kPa, 14 BTDC ===")
     for lam in [0.75, 0.80, 0.85, 0.90, 1.00, 1.10, 1.20]:
-        r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=14, lam=lam, p_exh_kpa=210))
+        r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=14, lam=lam, p_exh_kpa=210), geo=geo)
         print(f"  lambda {lam:4.2f} | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f}")
 
     print("\n=== D. IAT sensitivity, 3000 rpm, 180 kPa, 16 BTDC, lambda 0.88 ===")
     for iat_c in [15, 25, 35, 45, 55]:
         r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=16, lam=0.88,
-                                iat_k=273.15 + iat_c, p_exh_kpa=210))
+                                iat_k=273.15 + iat_c, p_exh_kpa=210), geo=geo)
         print(f"  IAT {iat_c:3d} C | T {r.torque_nm:6.1f} Nm | EGT {r.egt_c:5.0f} C "
               f"| KI {r.knock_integral:5.2f} | Pknock {r.knock_prob:.2f}")

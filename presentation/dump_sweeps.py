@@ -4,7 +4,7 @@ import numpy as np
 # AUDIT.md L11: was a hard-coded absolute path from one
 # machine, so these scripts ran for exactly one person.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from plant import predict, b58, run_cycle, Operating
+from plant import predict, b58, run_cycle, Operating, DTHETA_DEG
 
 GEO = b58()
 out = {}
@@ -40,7 +40,11 @@ traces = {}
 for label, sp in [("retarded", 4.0), ("mbt_ish", 18.0), ("knocking", 32.0)]:
     op = Operating(rpm=3000, map_kpa=200, iat_k=333, ect_k=363,
                    spark_btdc=sp, lam=1.0, p_exh_kpa=max(105.0, 200*P.EXH_BACKPRESSURE_RATIO))
-    r = run_cycle(op, geo=GEO, dtheta=0.5)
+    # Was dtheta=0.5, pinned here while the rest of the project moved to
+    # plant.DTHETA_DEG = 0.25 (AUDIT.md H1). A hardcoded step means this
+    # page was drawn from a cycle model 14-21 K colder in EGT than the one
+    # every other script runs. Follow the project default.
+    r = run_cycle(op, geo=GEO, dtheta=DTHETA_DEG)
     traces[label] = dict(spark=sp, ki=round(r.knock_integral,3),
                          torque=round(r.torque_nm,1), pmax=round(r.p_max_bar,1),
                          mfb50=round(r.mfb50_deg,2))
