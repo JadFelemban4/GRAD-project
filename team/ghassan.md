@@ -42,7 +42,7 @@ say so there and it changes.
 ## Open questions addressed to me
 
 From the 18–19 September session, all four in
-`DOC/SESSION_2026-09-18_for_Ghassan.md` §9:
+`DOC/SESSION_2026-09-18_for_Ghassan.md` §10:
 
 1. The gear rule uses a flat torque ceiling on an rpm-dependent quantity. What
    is the right shape, and is a 25 % torque reserve sensible for this box?

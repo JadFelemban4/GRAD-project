@@ -255,7 +255,72 @@ episodes in `evaluate.EPISODES`.
 
 ---
 
-## 9 · What I want from you specifically
+## 9 · Exactly what changed in the repository
+
+Nine commits, all on **`JMF-2340550-sep17`**. `JMF-new-plan` and `main` were not
+touched. Diff base is `5ef1aa2`, the merge that brought the two branches
+together — so `git diff 5ef1aa2..HEAD` is this session and nothing else.
+
+### Code — 361 lines added, 38 removed, four files
+
+| file | what |
+|---|---|
+| **`engine_env.py`** | `Vehicle.gear_for(v_mps)` → `gear_for(v_mps, force_n=None)`: the load-aware downshift. New constants `PEAK_TORQUE_NM = 500.0`, `SHIFT_LOAD = 0.75`, `SHIFT_RPM_MAX = 6000.0`. `demand()` now computes tractive force first and passes it in. And `make_grade_climb(..., v_kmh=110.0)` → **`v_kmh=130.0`**, the locked scenario, with the envelope table in its docstring. |
+| **`evaluate.py`** | **NEW, 193 lines.** Phase D's protocol. `EPISODES` is twenty `(seed, weights)` literals; `run_episode()` pins the weights after `reset()`; `main()` scores the three hand-written policies plus any SAC models passed as arguments and prints median / IQR / worst. |
+| **`train.py`** | `STEPS_PER_S 3.0 → 19.2`, printed-estimate only, nothing about training behaviour. Docstring carries the measured table — 19.19 steps/s at one thread, 18.14 at six, so thread count does not matter and SAC's gradient updates cost ~2 %, not the 6.5× the old figure implied. |
+| **`verify_docs.py`** | One `RETIRED` pattern added: `King Abdul[aA]ziz`. CLAUDE.md line 13 carried the wrong university until `d57f3da`, inside a commit about REFERENCES.md, so the change is invisible from the log. Guard verified by planting the string and watching the run fail. |
+
+**Nothing in `plant.py` or `thermal.py` moved**, so `validate.py` and the
+validation table are untouched — the 8-of-11 row is the same as before this
+session.
+
+### New directories
+
+| path | what |
+|---|---|
+| **`team/`** | One profile per person, matched by `git config user.email`. `README.md` explains it, `_TEMPLATE.md` is what you copy, `jad.md` and `ghassan.md` exist — **yours is a stub with almost everything marked "unrecorded"**, because guessing someone's background steers every explanation they get afterwards. `CLAUDE.md` now opens by telling the assistant to read it first. |
+| **`results/`** | `runs/` is gitignored, so the evidence lives here: `phase_d_seed0.txt` is the evaluation table exactly as printed, and the two `curve_*.csv` are the learning curves — with a README saying why the curves prove nothing. |
+
+### Documents
+
+`CLAUDE.md` (+350 lines) gains **mistake 17**, the towing-standard rejection, the
+rolling-road sweep, the scenario envelope, and a `VOID` heading over the old
+preview figures that were still reading as a live claim near the top of the file.
+`CHECKPOINT.md` (+180) gains two dated session entries. `README.md`, `handoff.md`
+and `presentation/README.md` were swept for six stale figures the 16 September
+audit fixes had left behind — `256.5 → 294.2`, `801 → 812 °C`, `2.2 → 1.8`
+points, `46 of 46 → 49 of 49`, peak `884.9 → 890.6 °C`, and the line claiming the
+app's six audit findings were unfixed when all six are.
+
+### The commits, newest first
+
+```
+67e9c17  docs: session brief for Ghassan, and a stub profile for him
+a68715f  phase D: the evaluation protocol, and the first measured preview advantage
+1df41a2  env: the gearbox upshifted mid-climb, and the scenario is now locked
+5923e29  docs: a rolling road makes preview WORSE, and why Phase D is the only route
+9f41082  docs: the published towing standard does not bind, and what does
+517fc53  team: one profile per person, matched by git config user.email
+b087a45  docs: CHECKPOINT entry for the 17 September session
+6fff693  docs: the training-time figure was wrong by 6.4x
+12a4de8  docs: sweep the documents behind the audit fixes, and guard the university
+```
+
+**Every commit message carries the command output that justifies it.** If a
+figure here disagrees with a script, the script is right — run it.
+
+### If you only read one diff
+
+```bash
+git show 1df41a2 -- engine_env.py
+```
+
+That is the gearbox fix and the locked scenario, and it is the only change in
+this session that alters what the simulator does.
+
+---
+
+## 10 · What I want from you specifically
 
 1. **The gear rule.** A flat ceiling on an rpm-dependent quantity is wrong. What
    is the right shape, and is a 25 % torque reserve sensible for a box like this?
