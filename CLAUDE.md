@@ -266,6 +266,49 @@ Two conclusions, and they pull in opposite directions — state both:
   to give. It is not a measurement of the sustained-climb duty cycle the project
   targets, because no logged drive is one — say which of the two you mean.
 
+#### A ROLLING ROAD MAKES PREVIEW WORSE, NOT BETTER. 18 September
+
+Once the scenario binds, the obvious next question is whether preview was losing
+because the road has only ONE change in it -- flat for three minutes, then a
+constant grade, so 30 s of lookahead buys a single head start in 720 s. Tested by
+alternating the grade about the same 12 % mean at the same 130 km/h, sweeping only
+how fast it alternates. Neither bound is chosen for effect: 2 % is the policies'
+own deadband (`grade_now > 0.02`) and 16 % is engine headroom, 471 Nm of 500.
+
+| road period | baseline | grade-now | predictive | preview edge |
+|---|---|---|---|---|
+| constant | 1402.0 | 697.3 | 705.7 | −0.6 pts |
+| 60 s | 1395.4 | 992.9 | 1025.4 | **−2.3 pts** |
+| 120 s | 937.6 | 655.1 | 674.0 | −2.0 pts |
+| 240 s | 754.5 | 502.3 | 514.0 | −1.5 pts |
+| 480 s | 791.9 | 473.5 | 478.2 | −0.6 pts |
+
+**The faster the road varies, the WORSE preview does.** The hypothesis was the
+opposite and it is refuted.
+
+**THE MECHANISM IS ONE LINE, AND IT IS THE POLICY, NOT THE INFORMATION.**
+`check_premise.p_predictive` takes `max(preview[+15 s], preview[+30 s])`, so on a
+road that keeps climbing again there is always a steep section in view and the
+policy protects almost continuously -- including through the easy sections, where
+protection costs and buys nothing. It is a driver who brakes for a red light
+half a kilometre early. **Preview is not what loses here; using preview as a
+worst-case-ahead maximum is.**
+
+**FIRST ATTEMPT AT THIS SWEEP WAS BLIND, and the failure is worth more than the
+row it produced.** It alternated 8 % ↔ 16 %, and both policies normalise grade as
+`clip(grade/0.08, 0, 1)` -- 8 % gives 1.0 and 16 % gives 1.0 after the clip. The
+road varied and NEITHER POLICY COULD SEE IT. Every row printed −0.1 points, which
+looked like a finding and was zero information. AUDIT.md C3's lesson one level
+down: a test that cannot see cannot measure, exactly as a test that cannot fail
+cannot confirm.
+
+**What this settles, and it is the useful part.** Five scenarios, three
+hand-written policies, and preview loses in all of them -- by a margin that moves
+with a formatting choice inside one policy. **The question "is preview worth
+acquiring" cannot be answered by hand-written policies at all.** That is
+AUDIT.md C3's own sentence, now measured rather than argued, and it means Phase D
+is not one route to the result. It is the only one.
+
 #### The published towing standard was tried, and it does NOT bind. 18 September
 
 This file and README both name "a published towing cycle" as a legitimate source
