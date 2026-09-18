@@ -8,6 +8,28 @@ If you are a human, read it too. It is shorter than the handbook.
 
 ---
 
+## Before anything else: find out who you are talking to
+
+Five people share this repository and they do not share a background. **Read
+`team/` first.** Run
+
+```bash
+git config user.email
+```
+
+and open the profile in `team/` whose `email:` line matches. It says what to
+assume that person knows, what not to assume, and how they take an explanation
+in. If no profile matches, ask once, then carry on without one — and say that
+you are working without one.
+
+**This is not a courtesy.** One of the five is comfortable with engines and lost
+in reinforcement learning; another is the reverse. An explanation pitched at the
+wrong person is a wasted message in both directions, and the profiles exist
+because guessing has already gone wrong. `team/README.md` says how to add
+yourself; `team/_TEMPLATE.md` is the starting point.
+
+---
+
 ## What this project is
 
 A BSc graduation project, five students, University of Jeddah, Jeddah.
@@ -1323,6 +1345,10 @@ DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
 AUDIT.md              Full technical review, 14 Sep. THREE CRITICAL findings
                       against the headline claim and six against app/.
                       Read it before quoting any number in this file.
+team/                 ONE PROFILE PER PERSON. Read the one matching
+                      `git config user.email` before explaining anything.
+  README.md           how the matching works and how to add yourself.
+  _TEMPLATE.md        copy this.
 logs/CHANNEL_SET_FINAL.md   What is recorded, what to add, and why.
 logs/CHANNEL_CENSUS.md      All 656 channels the car offers, live vs dead.
 logs/raw/*.csv        Raw BimmerLink exports. Never edit these.
