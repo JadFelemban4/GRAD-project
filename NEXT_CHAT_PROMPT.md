@@ -89,7 +89,8 @@ DO THESE, IN THIS ORDER
 6. REPORT THREE ROWS, NOT TWO: sighted, blinded, and current-grade — a
    no-preview comparator that reads the gradient the car is on right now. It has
    beaten the predictive policy on every hand-written comparison so far
-   (-1.2 points at last measurement). If the trained agent cannot beat it
+   (-0.4 points on the loaded scenario, the closest to level it has been). If
+   the trained agent cannot beat it
    either, THAT IS A RESULT about H/tau, not a failure, and it should be
    reported as one.
 
@@ -97,7 +98,7 @@ HOUSE RULES THAT ARE NOT NEGOTIABLE
 
 - Run verify_docs.py before quoting any number. It recomputes the published
   figures from the shipped data, opens every tracked .md and .py, and fails
-  naming file and line. It is at 38 checks / 311 figure mentions.
+  naming file and line. It is at 38 checks / 313 figure mentions.
 - Never edit verify_docs.py's expected values to make a check pass. The only
   legitimate reason to change one is that the DATA genuinely changed.
 - Never edit logs/raw/ or data/ by hand. Regenerate with build_dataset.py.
