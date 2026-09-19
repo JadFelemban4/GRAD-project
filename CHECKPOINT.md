@@ -885,3 +885,93 @@ demonstrably cannot: the two verdicts differ by 12 points.**
 - **The 115-125 km/h band still over-asks**, because the gear rule uses a flat
   torque ceiling on an rpm-dependent quantity. Not tuned away: lowering it would
   have moved 16 % at 110 km/h, the team's third scenario.
+
+---
+
+## Session of 19 September 2026 — the branches merged, and the gearbox is the car's
+
+**The two working branches are one again.** `JMF-2340550` (Ghassan: the real
+gearbox, the tenth drive, mistake 18) merged into the `sep17` line (mistake 17,
+the locked scenario, `evaluate.py`, Phase D's first ablation). Two conflicts,
+both in the gearbox, both resolved toward the measured side.
+
+### What the merge took from each
+
+| from `sep17` | from `JMF-2340550` |
+|---|---|
+| mistake 17 — the load-aware downshift | **the real ZF 8HP51**, eight published ratios on 3.150 |
+| the locked 12 % / 130 km/h scenario | mistake 18 — `Actual gear` clamps at 6 |
+| `evaluate.py` and its twenty frozen episodes | the tenth drive, +119.5 min |
+| Phase D's first ablation, +11.7 points | the runtime 3 L verification |
+
+**Ghassan carried mistake 17's `SHIFT_LOAD` into the eight-speed deliberately**,
+so the merge resolved to ONE rule rather than a conflict. Without it the taller
+top gear (2.016 overall against 2.312) would have reintroduced the mid-climb
+upshift that 17 was written to stop.
+
+### The gearbox is validated against the car, not just cited
+
+Toyota publishes the 8HP51 set. **The car confirms it.** Reproduced independently
+from `data/master_samples.csv` during the merge: **80 898 moving samples, 85.1 %
+within 4 %** of one of the eight published overall ratios (Ghassan reports 86.7 %
+on 79 105 — a sample-filter difference, same result).
+
+It also **excludes the alternative**: the 6MT top gear is 2.927 overall, the
+8AT 8th is 2.016, and the car measures **1.993** in top-gear cruise. That is
+1.1 % from the automatic and 32 % from the manual — the car's own data says it is
+the eight-speed.
+
+### The locked scenario survived, and it survived BY LUCK
+
+| | peak turbine | vs trigger |
+|---|---|---|
+| 110 km/h, real gearbox | 840 °C | **−10 K** |
+| 130 km/h, invented gearbox | 857 °C | +7 K |
+| **130 km/h, real gearbox** | **884 °C** | **+34 K** |
+
+130 was chosen because it was the only speed that bound **on a gearbox that did
+not exist**. On the real one it binds by 34 K instead of 7 — a better scenario
+than the one that was picked. **Recorded in `make_grade_climb`'s docstring as an
+accident, not as foresight.**
+
+### And the mechanism is load per cycle, for the third time
+
+The first explanation offered was "the real box holds a lower gear, more rpm,
+more exhaust flow". **Measured, it is backwards:**
+
+```
+invented 6-speed   5th, overall 2.788   2913 rpm   316 Nm
+real ZF 8HP51      7th, overall 2.589   2706 rpm   340 Nm
+```
+
+The real box is **taller** here, so the engine turns **slower** and each cycle
+carries **more** load. Road power is identical — 96.4 kW at the wheels either
+way. All the gearbox changes is how that power splits between torque and rpm,
+and the higher load per cycle is worth **27 K of turbine housing**.
+
+**Same mechanism as `12 % @ 90` running hotter than `4 % @ 150`, and the same one
+that makes SAE J2807's slow heavy climb produce a cool turbine.** Three times now
+the answer has been load per cycle rather than flow.
+
+### Verified on the merged tree
+
+```
+verify_docs.py    All 38 checks pass, 311 figure mentions
+test_reward.py    4 of 4; neutral -0.00038, starver -0.90349
+check_premise.py  baseline 959.8 at 884 C; current-grade cuts 34.0 %;
+                  preview over current grade -0.4 points
+```
+
+**`test_reward`'s starver margin recovered from −0.10 to −0.90.** The real
+gearbox gives the engine room, so refusing to make torque is a clear crime
+again — the number flagged on 18 September as the first to watch.
+
+### What this session did NOT do, and it is the blocker
+
+**No training run exists on this tree.** Two runs were on the invented gearbox
+at 130 km/h; Ghassan's ten were on the real gearbox at 110 km/h without
+`evaluate.py`. **All twelve are on trees that no longer exist**, and the 110 km/h
+scenario does not bind at all — an agent trained there had nothing to learn about
+protection.
+
+Phase D restarts from zero on this tree: ten runs, seeds 0–4 sighted and blinded.

@@ -831,6 +831,26 @@ def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.
     not a justification. If the gearbox is ever corrected again, RE-MEASURE THE
     ENVELOPE before assuming this row still holds.
 
+    WHY THE REAL GEARBOX RUNS HOTTER, because the obvious reading is backwards.
+    The first explanation offered was "the real box holds a lower gear, so more
+    rpm, so more exhaust flow". Measured, it is the other way round:
+
+        invented 6-speed   5th, overall 2.788   2913 rpm   316 Nm
+        real ZF 8HP51      7th, overall 2.589   2706 rpm   340 Nm
+                                                 v lower    ^ higher
+
+    The real box is TALLER here, so the engine turns SLOWER and each cycle
+    carries MORE load. Road power is identical either way -- same grade, same
+    speed, same mass, 96.4 kW at the wheels -- and all the gearbox changes is
+    how that power is split between torque and rpm.
+
+    **Higher load per cycle means more fuel per cycle, a hotter charge and a
+    hotter exhaust**, and that is worth 27 K of turbine housing. It is the same
+    mechanism as `12 % @ 90 km/h` running hotter than `4 % @ 150 km/h` on less
+    road power, and the same one that makes SAE J2807's slow heavy climb produce
+    a cool turbine. **Three times in this project the answer has been load per
+    cycle rather than flow.** Reach for that first.
+
     WHY 130 AND NOT 110. Until 18 September this said 110 km/h, and that was
     right when it was written: the scenario had to bind, and it did. What made it
     bind was AUDIT.md C2 -- the baseline ECU was scheduled on a manifold pressure
