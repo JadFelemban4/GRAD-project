@@ -379,13 +379,18 @@ the model.
 
 ## 8.2 · What elevation is worth, on the simulator
 
-| speed | grade | peak turbine | verdict |
-|---|---|---|---|
-| 90 km/h | 0 % | **335.4 °C** | flat — nothing to protect |
-| 90 km/h | 6 % | 540.6 °C | still nothing |
-| 90 km/h | 12 % | 717.0 °C | still nothing |
-| 110 km/h | 12 % | 839.7 °C | 10.2 K short |
-| **130 km/h** | **12 %** | **884.0 °C** | **binds, 66.3 % of the episode** |
+| speed | 0 % grade | 6 % | 12 % | 16 % |
+|---|---|---|---|---|
+| 90 km/h | 335.4 °C | 540.6 | 717.0 | 831.5 |
+| 110 km/h | 406.1 | 617.9 | 839.7 | **871.2 — binds, 62.9 %** |
+| **130 km/h** | 472.9 | 760.4 | **884.0 — binds, 66.3 %** | 902.9 — binds, 70.1 % |
+
+Peak turbine temperature over a 900 s episode, baseline ECU, 42 °C ambient.
+**Three of the twelve combinations bind**, so 12 % at 130 km/h is not a uniquely
+tuned point — it is one of several that reach the trigger, and it is the one the
+team locked on 18 September before any of this was measured. Note how steeply
+the flat-road column falls away: at 0 % grade the turbine never passes 473 °C at
+any speed this car does on a motorway.
 
 ## 8.3 · The scenario now defaults to 12 % at 130 km/h
 

@@ -56,7 +56,17 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 > exercise the thermal model's hot region. The duty cycle is wrong, not the
 > model.** A flat road at 90 km/h leaves the turbine at 335 °C against an
 > 850 °C trigger; 6 % of grade gets it to 541 °C; it takes 12 % at 130 km/h to
-> reach the knee.
+> reach the knee. The full sweep, peak turbine over a 900 s episode:
+>
+> | speed | 0 % grade | 6 % | 12 % | 16 % |
+> |---|---|---|---|---|
+> | 90 km/h | 335.4 °C | 540.6 | 717.0 | 831.5 |
+> | 110 km/h | 406.1 | 617.9 | 839.7 | **871.2 — binds** |
+> | **130 km/h** | 472.9 | 760.4 | **884.0 — binds** | 902.9 — binds |
+>
+> **Three of twelve combinations bind**, so the locked 12 % / 130 km/h is not a
+> uniquely tuned point. And at 0 % grade the turbine never passes 473 °C at any
+> motorway speed — which is the whole argument for putting elevation in.
 >
 > **What the loaded scenario now shows** (`check_premise.py`, hand-written
 > policies, and read AUDIT.md C1/C3 before quoting any of it):
