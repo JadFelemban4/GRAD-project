@@ -98,7 +98,13 @@ def main():
 
     r_neutral, n1 = roll(lambda e, o: neutral, dur)
     r_starve, n2 = roll(lambda e, o: torque_starver(), dur)
-    r_random, n3 = roll(lambda e, o: e.action_space.sample(), dur)
+    # AUDIT.md M13: `action_space.sample()` was unseeded, so this "for
+    # information" figure moved between runs (-0.08782, -0.08293, -0.09590 on
+    # three consecutive runs here). Seeded, so it is at least reproducible.
+    _rng = np.random.default_rng(0)
+    r_random, n3 = roll(
+        lambda e, o: _rng.uniform(-1.0, 1.0, e.action_space.shape).astype(np.float32),
+        dur)
     d_prev, _ = obs_differs_without_preview(dur)
 
     checks = [

@@ -1,8 +1,10 @@
 # Phase A-D. Python 3.11 or newer.
 numpy>=1.26
-scipy>=1.11
 gymnasium>=0.29
 pandas>=2.0
+# scipy was listed here until 16 September and is imported by nothing in the
+# repository (AUDIT.md M7). Removed rather than left as a 40 MB install that
+# a reader assumes something depends on.
 
 # Phase C onward, when you start training. Uncomment then.
 # stable-baselines3[extra]>=2.2
@@ -10,3 +12,8 @@ pandas>=2.0
 
 # Optional, for plots.
 matplotlib>=3.8
+
+# --- live app (app/) ---
+fastapi>=0.110
+uvicorn>=0.27
+obd>=0.7            # LIVE MODE ONLY. Replay mode needs neither of these.

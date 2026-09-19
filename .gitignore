@@ -2,3 +2,6 @@
 __pycache__/
 runs/
 *.zip
+
+# the app writes exactly one file, and it is per-drive, not source
+app/review_log.jsonl

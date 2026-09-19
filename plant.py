@@ -156,7 +156,35 @@ class CycleResult:
     f_res: float = float('nan')          # residual gas fraction
 
 
-def run_cycle(op: Operating, geo: Geometry = None, dtheta: float = 0.5) -> CycleResult:
+# Crank-angle step for the cycle integration, in degrees.
+#
+# CHOSEN BY A CONVERGENCE STUDY, 16 September 2026 (AUDIT.md H1). It was 0.5
+# deg, with no study behind it, and the model is NOT converged there. The
+# integration is explicit Euler, so the error is first order and halves with
+# the step -- measured against a 0.0625 deg reference:
+#
+#   dtheta   torque err   EGT err   knock-integral err
+#   1.0      -1.0 to -3.9 %   -30 to -44 K   -4.0 to -4.5 %
+#   0.5      -0.5 to -1.8 %   -14 to -21 K   -1.9 to -2.5 %   <- was shipped
+#   0.25     -0.2 to -0.8 %    -6 to  -9 K   -0.8 to -1.1 %   <- shipped now
+#   0.125    -0.1 to -0.3 %    -2 to  -3 K   -0.3 to -0.4 %
+#
+# 0.25 halves the error for double the cost (9 ms a cycle against 5). It is not
+# converged either, and that is the point of publishing the table: THE RESIDUAL
+# DISCRETISATION ERROR IS ABOUT 7 K OF EGT AND 0.25 % OF TORQUE, and it belongs
+# beside any figure quoted to finer precision than that.
+#
+# Every EGT the model reports is therefore ~7 K LOW, which pushes the cruise-band
+# EGT row of validate.py further outside its band rather than closer to it. That
+# is the honest direction and it is why the step was not left alone.
+#
+# test_convergence() in validate.py fails if halving the step moves a headline
+# by more than the precision that headline is quoted to.
+DTHETA_DEG = 0.25
+
+
+def run_cycle(op: Operating, geo: Geometry = None,
+              dtheta: float = DTHETA_DEG) -> CycleResult:
     geo = geo or Geometry()
 
     # ---------------- charge preparation ----------------
@@ -352,11 +380,11 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 
 
 # ---------------------------------------------------------------------------
-# Compressor boost ceiling — measured, 7 September 2026
+# Compressor boost ceiling — measured, refit dated 8 September 2026
 # ---------------------------------------------------------------------------
 # This is NOT a compressor map. It is the OPERATING CEILING: the highest
 # pressure ratio the vehicle was observed to reach at a given corrected mass
-# flow, across 13,764 quasi-steady samples from both 7 Sep drives.
+# flow, across 74 013 quasi-steady samples over 295.0 minutes and ten drives.
 #
 # The difference matters. A compressor map shows what the compressor CAN do,
 # bounded by surge and choke, with efficiency islands and shaft-speed lines.
@@ -368,8 +396,14 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 # manifold pressure was an unbounded input, so it would produce whatever power
 # the commanded boost implied. This bounds it to what the vehicle actually does.
 #
-# REFITTED 8 September 2026, after the mid-load drive (cb67b01f) filled the gap.
-# 28273 quasi-steady samples over 113 minutes and seven drives.
+# REFITTED 8 September 2026, after the mid-load drive (cb67b01f) filled the
+# empty middle. The shipped constants stand on the quasi-steady set named above,
+# whose size verify_docs.py checks against the shipped data on every run — so if
+# this comment and the data ever part company again, the run says so.
+#
+# RETIRED-OK: the FIRST version of this curve stood on 13 764 samples from the
+# two 7 September drives alone. That is why its middle was empty and its shape
+# was wrong. It is void, and none of the numbers below come from it.
 #
 # Measured envelope (95th percentile of pressure ratio per flow bin, n >= 15):
 #     0.021 kg/s -> 1.175      0.194 kg/s -> 2.219
@@ -422,6 +456,80 @@ def boost_ceiling_kpa(mdot_air_gps, t_inlet_k=298.0, p_inlet_kpa=99.3):
     return float(p_inlet_kpa * min(pr, 2.6))       # 2.6 = observed peak plus margin
 
 
+def charge_temperature(t_amb_k, t_block_k=None) -> float:
+    """Temperature of the air actually trapped in the cylinder, in K.
+
+    THE ONE DEFINITION. Import this everywhere. Do not inline the formula and
+    do not substitute a logged channel -- see below for what that cost.
+
+    WHY THIS EXISTS (10 September 2026)
+    -----------------------------------
+    `build_dataset.py` and `compare_log.py` used to feed the logged channel
+    `Intake air temperature before throttle valve` straight into
+    map_from_airflow() as the charge temperature, because
+    logs/CHANNEL_SET_FINAL.md labelled it "post-intercooler".
+
+    THAT LABEL WAS WRONG. The channel reads 149 C under boost, and peaks at
+    163 C. No working water-to-air charge cooler, with its circuit sitting near
+    ambient, delivers 149 C air to the ports. What it matches instead is a
+    COMPRESSOR OUTLET: at pressure ratio 2.3 and 70 % efficiency from 40 C
+    inlet air, isentropic compression gives 160 C. The B58 carries its charge
+    cooler INSIDE the intake manifold, downstream of the throttle body, so
+    "before throttle valve" is before the cooler.
+
+    The car settles it, at a gate chosen so that the two populations describe
+    the same operating region. THE GATE IS 200 kPa AND IT IS NOT ARBITRARY: the
+    logged side keeps `Boost pressure` above 15 psi gauge, and
+    (15 + 14.23) * 6.894757 = 201.5 kPa absolute, so gating the model side at
+    200 kPa matches the logged population BY CONSTRUCTION. Gate the model at
+    180 instead and it admits samples 20 kPa below anything the logged set
+    contains, which drags the model median down and flatters the gap.
+
+    At the matched gate: 587 boosted, MAF-unpinned model samples against 887
+    logged readings of the vehicle's own `Boost pressure` channel, whose median
+    is 226 kPa absolute.
+
+        charge temperature used              | inverted MAP | gap vs the car
+        the raw sensor (117 C median)        | 279.5 kPa    | +23.7 %
+        charge_temperature(), THIS FUNCTION  | 232.7 kPa    | +1.9 %
+        ambient + 8 K (45 C median)          | 227.5 kPa    | +0.7 %
+
+    CLAUDE.md used to blame that 23.7 % on the breathing model -- fitted at part
+    load, said to understate breathing under boost. IT IS NOT THE BREATHING
+    MODEL. It is the temperature. `volumetric_efficiency()` is cleared by this
+    correction, not convicted by it -- and note exactly what that leaves: there
+    is NO part-load test of it against this car, because both logged pressure
+    channels sit upstream of the throttle and there is nothing to compare a
+    modelled manifold pressure against.
+
+    WHY NOT `ambient + 8 K`, WHICH SCORES +0.7 %
+    --------------------------------------------
+    Because that is a knob tuned to hit the target, and this project has
+    already been burned by exactly that move once this week -- see CLAUDE.md
+    mistake 12. The formula below was written independently for the Gymnasium
+    environment, months before this question came up, and was never touched to
+    make this number agree. It carries NO parameter fitted to the boost
+    channel.
+
+    Be honest about how thin that contrast is. At the matched gate `ambient +
+    8 K` scores +0.7 %, not the +0.0 % a looser gate reported, and +0.7 %
+    against +1.9 % is a smaller margin than the rhetoric wants. The rejection
+    stands anyway, on the same ground: a 3.0 % gap from a model with no
+    parameter fitted to the boost channel says more than a closer gap from one
+    tuned against it. Report +1.9 %; do not tune it away.
+
+    LIMIT, STATE IT IN CHAPTER 3. There is no measured charge-temperature
+    channel on this car: `Temperature after the intercooler` exists in the
+    census and reads all-zero on every sample. This is a MODEL of the charge
+    temperature, anchored to ambient, not a measurement. The +1.9 % gap over
+    587 boosted samples above 200 kPa is the evidence for it and the whole of
+    the evidence for it.
+    """
+    if t_block_k is None:
+        return t_amb_k + 12.0
+    return t_amb_k + 12.0 + 0.06 * (t_block_k - t_amb_k)
+
+
 def map_from_airflow(mdot_air_gps, rpm, iat_k, geo=None) -> float:
     """Invert the speed-density relation: given a MEASURED air mass flow, return
     the manifold pressure the model needs.
@@ -447,28 +555,34 @@ def map_from_airflow(mdot_air_gps, rpm, iat_k, geo=None) -> float:
 
 
 if __name__ == "__main__":
+    # Mistake 1: NEVER let a call site take the default geometry, even now that
+    # the default is the right engine. These four sweeps used to rely on it,
+    # which is the exact shape of the bug that ran a 1998 cc four-cylinder for
+    # three weeks. One name, passed explicitly, everywhere.
+    geo = b58()
+
     print("=== A. Naturally aspirated cruise, 2500 rpm, 60 kPa, lambda 1.0 ===")
     for spark in [10, 15, 20, 25, 30, 35, 40]:
-        r = run_cycle(Operating(rpm=2500, map_kpa=60, spark_btdc=spark, lam=1.0))
+        r = run_cycle(Operating(rpm=2500, map_kpa=60, spark_btdc=spark, lam=1.0), geo=geo)
         print(f"  spark {spark:3d} BTDC | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| MFB50 {r.mfb50_deg:5.1f} | EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f}")
 
     print("\n=== B. Full load boosted, 3000 rpm, 200 kPa, lambda 0.85 ===")
     for spark in [4, 8, 12, 16, 20, 24]:
-        r = run_cycle(Operating(rpm=3000, map_kpa=200, spark_btdc=spark, lam=0.85, p_exh_kpa=230))
+        r = run_cycle(Operating(rpm=3000, map_kpa=200, spark_btdc=spark, lam=0.85, p_exh_kpa=230), geo=geo)
         print(f"  spark {spark:3d} BTDC | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| Pmax {r.p_max_bar:5.1f} bar | EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f} "
               f"| Pknock {r.knock_prob:.2f}")
 
     print("\n=== C. Lambda sweep at 3000 rpm, 180 kPa, 14 BTDC ===")
     for lam in [0.75, 0.80, 0.85, 0.90, 1.00, 1.10, 1.20]:
-        r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=14, lam=lam, p_exh_kpa=210))
+        r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=14, lam=lam, p_exh_kpa=210), geo=geo)
         print(f"  lambda {lam:4.2f} | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f}")
 
     print("\n=== D. IAT sensitivity, 3000 rpm, 180 kPa, 16 BTDC, lambda 0.88 ===")
     for iat_c in [15, 25, 35, 45, 55]:
         r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=16, lam=0.88,
-                                iat_k=273.15 + iat_c, p_exh_kpa=210))
+                                iat_k=273.15 + iat_c, p_exh_kpa=210), geo=geo)
         print(f"  IAT {iat_c:3d} C | T {r.torque_nm:6.1f} Nm | EGT {r.egt_c:5.0f} C "
               f"| KI {r.knock_integral:5.2f} | Pknock {r.knock_prob:.2f}")

@@ -41,7 +41,7 @@ All confirmed live on 8 September. Units are as the export writes them.
 | 4 | `Air mass flow` | **kg/h** | the load input, via `map_from_airflow()`. Saturates at 1020 |
 | 5 | `Mass flow through throttle valve bank 1` | kg/h | cross-check on #4 |
 | 6 | `Relative air filling` | % | BMW's own load figure — what `compare_log.py` scores against |
-| 7 | `Intake air temperature before throttle valve, measured` | °C | charge temperature. Post-intercooler, runs 57–163 °C |
+| 7 | `Intake air temperature before throttle valve, measured` | °C | **COMPRESSOR OUTLET, not charge temperature.** Runs 57–163 °C; the B58's cooler is inside the manifold, downstream of the throttle. Do NOT feed it to `map_from_airflow` — see CLAUDE.md mistake 13. Useful as the compressor's hot side. |
 | 8 | `Air mass flow participating in combustion` | kg/h | ECU's modelled trapped charge. Does **not** saturate at 1020 |
 | 9 | `Coolant temperature` | °C | block node, engine-out |
 | 10 | `Engine radiator outlet temperature (coolant)` | °C | radiator cold side |
@@ -118,7 +118,7 @@ model in `engine_env.py` be checked against the real thing instead of assumed.
 
 Everything in the dataset is either cruising or a short pull. **No drive has yet
 overwhelmed the cooling system**, which is why the radiator is unidentifiable
-and why the model's oil behaviour above 103 °C is extrapolation.
+and why the model's oil behaviour above 117 °C is extrapolation.
 
 Note what the census adds to this: it is not only that the coolant stays in
 band. The **fan setpoint sits between 28 and 31 % for an entire drive** and
@@ -142,3 +142,48 @@ not the same as measuring them. Say which it is.
 a deliberate attempt to overheat the engine.** If the coolant gauge moves off
 its normal position, or any warning appears, end the drive. The point is to
 reach the top of the regulated band, not to exceed it.
+
+---
+
+## Added 16 September 2026 — the LIVE APP records a different, smaller set
+
+This file is about what to log for CALIBRATION, where more channels is better
+and the session is offline. `app/` has the opposite problem: it runs against the
+car in real time, and **the adapter polls one channel per round trip, so the
+link's total rate divides by the number of channels asked for.** Measured on
+this vehicle (CLAUDE.md mistake 13b):
+
+| channels requested | per-channel interval |
+|---|---|
+| 26 (the calibration set) | **7.5 s** |
+| 7 (`pull01`) | **1.45 s** |
+
+**5.2× faster per channel, from asking for fewer of them.** The thermal state
+the app watches moves on a 48 s time constant under load, so ~1.5 s per channel
+is comfortable and 7.5 s is not.
+
+`app/reader.py` therefore declares **six** live channels, and no more:
+
+| field | channel here | why the app cannot work without it |
+|---|---|---|
+| `rpm` | #1 `Engine speed` | every cycle the model runs is indexed on it |
+| `air_kgh` | #4 `Air mass flow` | the ONE load input — manifold pressure is inverted from it |
+| `ect_c` | #9 `Coolant temperature` | the thermal network's measured node, and the warm-start seed |
+| `t_amb_c` | #13 `Ambient temperature` | boundary condition for every heat flow. Polled every 10 s — it barely moves |
+| `v_kmh` | #14 `Vehicle speed` | radiator ram air |
+| `boost_psi` | #3 `Boost pressure` | the ONLY consumer is the mismatch detector, which gates itself to wide-open throttle *because* this channel is pre-throttle |
+
+Everything else is optional and the estimator **models it and says so**. Each
+channel in that file carries a `why` string and a `min_period_s`, and both are
+enforced: `app/test_replay.py` fails if a live channel has no justification, and
+slow channels are polled slowly so they stop eating the budget.
+
+**Adding a seventh live channel costs every other channel about 14 % of its
+rate.** If you add one, put the reason in its `why` field, not in a commit
+message.
+
+Note the asymmetry worth stating in the thesis: **the same vehicle supports two
+opposite logging strategies, and choosing between them is a real engineering
+decision rather than a preference.** Census once with everything; record a small
+set for real drives; record a smaller set still for anything that has to keep up
+in real time.

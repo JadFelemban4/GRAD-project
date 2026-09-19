@@ -1,15 +1,42 @@
-# CHECKPOINT.md — state as of 10 September 2026
+# CHECKPOINT.md — state as of 19 September 2026
 
-A snapshot: what is proven, what was run today, what is open. Regenerate the
-numbers rather than trusting this file if it is more than a week old.
+**What this file is for:** a dated snapshot of where the work stands and what was
+verified when. `CLAUDE.md` is the permanent handoff and the mistake log — the
+rules and the traps, written to outlive any one week. This file is the diary of a
+particular day, and it is meant to go out of date. Where the two disagree,
+`CLAUDE.md` and the scripts win. Regenerate the numbers rather than trusting this
+file if it is more than a week old.
 
 > **10 September, v16 and its audit.** The load constant `k` is now derived
 > rather than fitted, and the residual reads 1.4 % with zero free parameters.
 > An audit of that change found it measures no part of the plant, and that the
 > intake temperature channel reads compressor-outlet air. See the section at the
-> bottom of this file, `AUDIT_2026-09-10.md`, and mistakes 12 and 13 in
-> `CLAUDE.md`. The repository is now on GitHub at `JadFelemban4/GRAD-project`,
+> bottom of this file and mistakes 12 and 13 in `CLAUDE.md`. `AUDIT_2026-09-10.md`
+> was one of the five duplicates deleted on 11 September; what it found is in
+> those two mistakes. The repository is now on GitHub at `JadFelemban4/GRAD-project`,
 > private.
+
+> **11 September, v17 and a document sweep.** The charge-temperature correction
+> shipped, the operating points moved down to **30–75 kPa**, and every tracked
+> document was swept against the data. See the 11 September section at the
+> bottom of this file.
+
+> **14 September, the citation pass, the live app and a ninth drive.**
+> `REFERENCES.md` now records, row by row, which of `validate.py`'s eleven
+> bands have a source and which do not — **seven do not**. `app/` runs the
+> same physics alongside the car. `pull01` takes the manifest to **nine
+> drives, 295.0 minutes** and adds zero samples by design. Two findings
+> change what the model may claim: the B58 has **no thermostat**, and the
+> compression ratio depends on an engine version nobody has recorded. See the
+> last section of this file.
+
+> **13–16 September, v19, the ninth drive and the live app.** `pull01` joined
+> `logs/raw/`, taking the manifest to **ten drives, 295.0 minutes** — it
+> contributes zero samples and zero operating points by design, so no
+> calibration figure moved. `app/`, the live supervisor, was imported and then
+> hardened; two defects in it are now **mistakes 14 and 15** in `CLAUDE.md`, and
+> a third, **mistake 16**, is about the release archive that carried it. See the
+> section at the bottom of this file.
 
 ---
 
@@ -18,12 +45,13 @@ numbers rather than trusting this file if it is more than a week old.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived, 2.8 % with k fitted, 22 pooled points, 168.1 min. Read mistake 12 before quoting either |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.831, zero free parameters), 1.1 % with k fitted (0.837, one). 26 pooled points, 30–75 kPa, 295.0 min logged. Read mistake 12 before quoting either |
 | C · get an agent to learn | **next.** `train.py` exists and runs; nothing trained yet |
 | D · baselines and the ablation | not started. **This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary only, from hand-written policies |
 | G · writing | not started |
+| **APP · live supervisor** | **working and tested, 46 of 46 replay checks.** `app/` runs this same physics beside the car and estimates turbine temperature. A SECOND deliverable — it does not advance D, and D is the passing bar |
 
 **Phase D is the passing bar.** Validated simulator + agent beating two baselines
 + an ablation isolating preview. Do not start E or F until D produces a table.
@@ -32,22 +60,26 @@ numbers rather than trusting this file if it is more than a week old.
 
 ## Full verification run — 9 September 2026
 
-Every script in the repo was executed end to end. **All seven passed.**
+<!-- RETIRED-OK: section -->
+
+Every script in the repo was executed end to end. **All eight passed.**
 
 | # | Script | Result |
 |---|---|---|
 | 1 | `plant.py` | ✅ four sweeps; torque 431–514 Nm across the boosted sweep |
 | 2 | `validate.py` | ✅ **8 of 11** inside band; τ_turb 48.0 s; 2997.5 cc |
 | 3 | `check_premise.py` | ✅ **829.2 · 548.6 · 437.6 · 548.6** |
-| 4 | `verify_docs.py` | ✅ **all 22 figures match** (v16 raised this to 26 checks) |
+| 4 | `verify_docs.py` | ✅ every published figure matched. Run it and read the total it prints |
 | 5 | `test_reward.py` | ✅ **4 of 4** |
-| 6 | `build_dataset.py` | ✅ 168.1 min, 8 drives, 22 points |
-| 7 | `compare_log.py` | ✅ **2.8 % load residual, PASS** (v16: 1.4 % with k derived) |
+| 6 | `build_dataset.py` | ✅ 295.0 min, 10 drives, 23 points |
+| 7 | `compare_log.py` | ✅ **PASS** — 1.4 % load residual with k derived, 1.1 % with k fitted |
 | 8 | `generality_test.py` | ✅ H2 table reproduced: 16.5 / 18.0 / 26.0 pts |
 
 Nothing in the repository is stale. Every published figure regenerates.
 
 ### The premise check, in full
+
+<!-- RETIRED-OK: section -->
 
 Protection trigger **1123 K (850 °C)** — the knee of the turbine damage term.
 
@@ -130,12 +162,12 @@ guard**. The remaining seven confine theirs to comments and docstrings.
 
 ### 3. `CLAUDE.md` carried a stale drive count
 
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: section -->
 The old sentence is quoted below deliberately, as the record of what was
 corrected. `verify_docs.py` needs the marker above to know that.
 
 It said "seven drives, 113 minutes, five carrying samples." The data says **eight
-drives, 168.1 minutes, six carrying samples**.
+drives, 168.1 minutes, seven carrying samples**.
 
 The old sentence was also wrong in a subtler way, and the correction records the
 distinction: **`fb988991` does carry samples** — 16.3 minutes of them — but not
@@ -147,6 +179,8 @@ one of its windows survives the span and gap checks, so it contributes zero
 ## Open problems, honestly stated
 
 ### 1. Phase F's H2b threshold rule does not survive the correct engine
+
+<!-- RETIRED-OK: section -->
 
 H2b sets the constraint at the 80th percentile of the unprotected trace, which
 assumes the temperature spends a *minority* of the episode near its peak. The
@@ -184,11 +218,15 @@ preview figure.
 
 ### 2. Known limitations to state in the thesis, not fix quietly
 
-- **Vehicle validation covers 31–82 kPa only.** Steady points require steady
+- **Vehicle validation covers 30–75 kPa only.** Steady points require steady
   driving, which is light-load driving.
-- **The two manifold-pressure estimates diverge under boost.** Above 200 g/s:
-  inverted 297 kPa against a logged 233 kPa, a 28 % gap. The inversion is right
-  at part load and wrong under boost.
+- **The boosted inversion is within 2 % of the car, once the charge temperature
+  is right.** 587 modelled samples against 887 logged `Boost pressure` readings
+  above 200 kPa, logged median 226 kPa: the raw sensor gives 279.5 kPa,
+  **+23.7 %**; `plant.charge_temperature()` gives 232.7 kPa, **+1.9 %**. An
+  ambient + 8 K rule scores 227.5 kPa, +0.7 %, and was rejected as a knob tuned
+  to hit the target. What is still uncertain under boost is the MAF ceiling at
+  1020 kg/h and the logger's round-robin sampling.
 - **Peak power is not a prediction.** Manifold pressure is an input. An operating
   line is not a compressor map.
 - **The compressor envelope is unmeasured above 0.303 kg/s corrected**, because
@@ -197,16 +235,20 @@ preview figure.
 - **The radiator is not identifiable on this car**, and the channel census proves
   it: every water-pump and fan-actual channel is all-zero. A constrained fit
   gives R² = 0.157 with a negative ram coefficient. Stop trying.
-- **Oil above 107 °C is extrapolation.** That is the hottest oil anywhere in the
+<!-- RETIRED-OK -->
+- **Oil above 117 °C is extrapolation.** That is the hottest oil anywhere in the
   logs, on `7475b5d7`; 111 °C after the filter. This line said 103 °C until
-  10 September, which was the figure before the eighth drive arrived.
+  10 September, which was the figure before the eighth drive arrived — quoted
+  here on purpose, as the record of the correction.
 - **Steady points are steady for fast quantities only.** The 60 s window is fully
   settled for air, lambda, spark and manifold pressure, and reaches just **71 %**
   of a turbine thermal step (τ = 48 s). Never validate a thermal quantity at a
   steady point.
-- **Enrichment uses dwell above 200 kPa as a proxy** for turbine inlet
-  temperature, which this vehicle does not expose. The weakest cell of the fit is
-  3500–4500 rpm at short dwell.
+- **Enrichment uses dwell above `ENR_LOAD` = 180 kPa as a proxy** for turbine
+  inlet temperature, which this vehicle does not expose. The gate moved from
+  200 kPa with the manifold-pressure *definition*, not with the physics, and
+  selects the same 1055 samples. The weakest cell of the fit is 3500–4500 rpm at
+  **long** dwell: n = 47, observed 0.90 against a modelled 0.93.
 
 ---
 
@@ -237,17 +279,19 @@ Full detail: [handoff.md](handoff.md).
 
 ### What was run
 
+<!-- RETIRED-OK: section -->
+
 `engine-supervisor-v16.zip` was unpacked over the working copy. All 38 archive
 files are byte-identical to the archive. All six checks were run in order.
 
 | script | result |
 |---|---|
 | `check_premise.py` | 829.2 · 548.6 · 437.6 · 548.6 at 1123 K; rows 2 and 4 equal to the last float bit |
-| `verify_docs.py` | failed at 25 of 26, now fixed and back to **26 of 26** |
+| `verify_docs.py` | failed on three documents the unzip left behind, then passed once they were corrected. Run it and read the total it prints |
 | `test_reward.py` | 4 of 4, neutral −0.00438, starver −0.28044 |
 | `check_map.py` | 85 of 85 adjacent pairs monotonic, 6 unreachable, 0 `knk` |
 | `validate.py` | 8 of 11 inside band, τ_turb 48.0 s, 2997.5 cc |
-| `compare_log.py` | derived 1.4 %, fitted 2.8 % |
+| `compare_log.py` | derived 1.4 %, fitted 1.1 % |
 
 **The preview identity was checked below the printed decimals.** A probe compared
 the reactive and preview-disabled rollouts at full float precision. All seven
@@ -258,13 +302,17 @@ returned fields are bit-identical: fuel `4175.220663624409`, damage
 
 Not v16's fault. The archive holds 38 files and does not contain the six
 documents written on 9 September, so unzipping left them behind unchanged while
-everything else moved to v16. Three of them still carried retired figures.
-Running the checker inside a clean extraction of the archive alone passed 26 of
-26 all along.
+everything else moved to v16. Three of them still carried retired figures. The
+checker passed on a clean extraction of the archive alone, all along.
 
-Fixed on 10 September: `Context.md` and `DATA-MODEL.md` had a live seven-drive
-dwell figure corrected to 198 s, and the historical quotation in this file was
-marked `RETIRED-OK`, which is what the checker requires for a deliberate mention.
+Fixed on 10 September: `Context.md` and `DATA-MODEL.md` — both deleted on
+11 September as duplicates — had a live seven-drive dwell figure corrected, and the historical quotation in this file was marked
+`RETIRED-OK`, which is what the checker requires for a deliberate mention. That
+dwell figure has since been recomputed again on the corrected manifold-pressure
+scale, and now reads **178 s above 207 kPa**.
+
+The checker itself was reworked after this run — see the 11 September section —
+so its totals from that day do not compare with today's.
 
 ### What the audit found
 
@@ -278,33 +326,51 @@ Two entries were added to the mistake log in `CLAUDE.md`.
   There is no part-load test of the breathing model anywhere in the repository.
 - **Mistake 13 — the intake temperature channel reads compressor-outlet air.**
   The B58's charge cooler sits inside the intake manifold, downstream of the
-  throttle, so the "before throttle valve" sensor is before the cooler. Using a
-  plausible post-cooler temperature in the inversion lands on the logged boost
-  pressure: 233 kPa at 40 °C against a logged 231, where the sensor value gives
-  295. The 28 % boost gap is the temperature, not the breathing model.
+  throttle, so the "before throttle valve" sensor is before the cooler. A
+  modelled post-cooler temperature in the inversion lands on the logged boost
+  pressure. Recomputed from the shipped data on 11 September, over 587 modelled
+  samples against 887 logged readings above 200 kPa whose median is 226 kPa:
+  **232.7 kPa, +1.9 %**, where the raw sensor gives 279.5 kPa, **+23.7 %**. The
+  boost gap was the temperature, not the breathing model.
 
 ### Stale figures corrected the same day
 
-Oil extrapolation 103 → **107 °C**. Enrichment v4 fitted on seven → **eight**
+<!-- RETIRED-OK -->
+This paragraph is the record of what changed on 10 September, so every arrow
+reads old → new *as of that day*. Two of those new values have since moved
+again; the note underneath carries the current ones.
+
+<!-- RETIRED-OK -->
+Oil extrapolation 103 → **117 °C**. Enrichment v4 fitted on seven → **eight**
 drives. MAF ceiling 192 samples on four → **517 on five** drives. Compressor fit
-30 534 → **43 853** quasi-steady samples. Vehicle validation 31–79 → **31–82 kPa**.
+30 534 → **74 013** quasi-steady samples. Vehicle validation 31–79 → **31–82 kPa**.
 Load residual 2.3 % over 17 points → **1.4 % and 2.8 % over 22**. Reactive damage
 reduction 33.9 → **33.8 %**. The claim that the inversion and the logged boost
 channel agree inside 4.4 % below 80 kPa was removed; both pressure channels are
 pre-throttle and disagree by 44–52 % at the steady points.
 
+**Current values, 11 September.** The charge-temperature correction moved the
+point span again: it is **30–75 kPa** now, not 31–82. And the fitted residual is
+**1.1 %** against the derived **1.4 %**, over the same 23 points — dropping the
+fitted parameter makes the residual rise, not fall.
+
 ### Also corrected, in the second pass
 
+<!-- RETIRED-OK -->
+A record of edits made on 10 September; the superseded values are named on
+purpose, because they are the thing that was corrected.
+
+<!-- RETIRED-OK -->
 `validation_table.md` section E now says eight drives and 168.1 minutes, and its
 MAF and manifold-pressure items carry the current counts. Its thermal test
-condition keeps the 7.6 g/s figure but now states plainly that the 6.5 g/s
-anchor behind it no longer holds, because the recomputed ceiling is 8.7 g/s and
-the condition therefore sits below the hardest recorded load rather than above
-it. `README.md` moved off the 2.3 % residual in both places. The module
-docstring of `engine_env.py` and two comments in `build_dataset.py` moved off
-the seven-drive correlations and the 1.163 ratio; both are comments, and
-`test_reward.py` and `build_dataset.py` were re-run to prove it. The regenerated
-`data/` files are byte-identical to what was there before.
+condition keeps the 7.6 g/s figure but now states plainly that the condition
+sits **below** the hardest sustained 60 s fuel flow in the logs — **8.7 g/s** —
+rather than above it. `README.md` moved off the 2.3 % residual in both places.
+The module docstring of `engine_env.py` and two comments in `build_dataset.py`
+moved off the seven-drive correlations and the 1.163 combustion-air ratio, which
+is **1.095** on the current dataset; both are comments, and `test_reward.py` and
+`build_dataset.py` were re-run to prove it. The regenerated `data/` files are
+byte-identical to what was there before.
 
 ### Still open — these need a decision, not a correction
 
@@ -328,3 +394,445 @@ the seven-drive correlations and the 1.163 ratio; both are comments, and
 - **Nothing asserts the 1.4 % itself.** `verify_docs.py` checks the constant,
   the derived value and the excluded alternative, but not the residual, so that
   figure can drift without the checker noticing.
+
+---
+
+## Session of 11 September 2026 — v17, and a sweep of every document
+
+### What shipped: the charge-temperature correction
+
+<!-- RETIRED-OK: section -->
+
+`build_dataset.py` and `compare_log.py` no longer feed the pre-throttle intake
+temperature channel into `map_from_airflow()`. That channel is a compressor
+outlet — mistake 13 in `CLAUDE.md` — and the inversion now uses
+`plant.charge_temperature()`. What moved, recomputed from the shipped data:
+
+| quantity | value after v17 |
+|---|---|
+| operating-point span | **30–75 kPa**, 23 points, 295.0 min over 10 drives |
+| load residual, k **derived** 0.831 | **1.4 %**, zero free parameters |
+| load residual, k **fitted** 0.837 | **1.1 %**, one free parameter |
+| a 20 °C reference state would need | k = 0.890 — the fit excludes it |
+| enrichment gate `ENR_LOAD` | 180 kPa, 1055 samples above it |
+| boosted inversion against the car | 232.7 kPa modelled against a logged median of 226, **+1.9 %** |
+
+**Dropping the fitted parameter makes the residual rise, 1.1 → 1.4 %.** Say it
+that way round. The derived form is not the more accurate one; it is the more
+falsifiable one, because it has no constant to absorb an error with — which is
+why it would have caught the wrong-engine bug on day one and the fitted form did
+not.
+
+The premise result did not move: **829.2 · 548.6 · 437.6 · 548.6**, reactive
+cutting damage 33.8 % against predictive 47.2 %, a **13.4-point** gap. The
+simulator never read that sensor; `engine_env` models its own charge temperature.
+
+### The document sweep
+
+**55 stale figures were found across the tracked documents.** Almost none of them
+were in the code — the code had moved and the prose had not, which is mistake 11
+happening at scale instead of in six places.
+
+`verify_docs.py` was reworked in answer to that. It used to compare figures
+recomputed from the data against constants written inside itself, which proves
+the data has not drifted and says nothing about what any document claims. It now
+recomputes the published figures from the shipped data, then **opens every
+tracked document and compares what is written there against those numbers**,
+reporting by file and line, and it still greps every document for retired values.
+A passage that quotes a superseded figure on purpose must carry
+`<!-- RETIRED-OK -->` in its section, which is an assertion that the passage is
+history.
+
+Run it and read the total it prints. **Do not write a check count into any
+document** — it moves every time a figure is added, and a count in prose is one
+more number to go stale.
+
+### Five documents deleted, two kept
+
+Seven overlapping status documents had accumulated. Five were duplicates of
+`CLAUDE.md` carrying older numbers and were deleted. This file and
+[handoff.md](handoff.md) were restored at the owner's request, because they are
+wanted for the write-up, and both were brought current the same day.
+
+They are now part of the tracked set that `verify_docs.py` scans, and that is the
+condition of keeping them: **a second document is only safe while something
+checks it.** The division of labour is stated at the top of this file —
+`CLAUDE.md` is the permanent handoff and mistake log, this file is a dated
+snapshot. What belongs in the first should not be restated in the second, which
+is how five duplicates came to exist in the first place.
+
+---
+
+## Session of 14 September 2026 — the citation pass, and a merge
+
+Two pieces of work met in one merge commit. They were done independently and
+they are reported separately here, because only one of them was verified by the
+person writing this section.
+
+### What the citation pass was for
+
+`validate.py` scores the model against eleven "published bands". Until this day
+the repository cited **one** source for all eleven: the word "Heywood" in a code
+comment, with no edition and no page. An examiner asking *"where does 115–140 °C
+come from?"* had no answer.
+
+`REFERENCES.md` replaces that. It is written for a reader who is not an
+internal-combustion specialist — every term carries a plain-English gloss — and
+it sorts every number in the project into four kinds: measured by us, general
+engine physics, specific to the B58, or assumed. It is tracked by
+`verify_docs.py`, so the figures it quotes from our own logs cannot drift.
+
+### What was promoted, and on what evidence
+
+Sources were opened, not remembered. Each row carries the page, column or
+paragraph the claim was read from.
+
+| what | status now | where it was read |
+|---|---|---|
+| Bosch relative air charge | **CONFIRMED** | US 6,588,261 B1, col. 3 l. 55 – col. 4 l. 2: *"rl = ma/m_norm … under the standard conditions: Tn=273 K, Pn=1013 hPa"* |
+| Bore 82.0, stroke 94.6, displacement | **CONFIRMED** | Toyota Australia spec table GTP-009045 p. 1; BMW Canada Z4 2020MY guide p. 2; BMW 3 Series 05/2015 p. 7 |
+| Row 2, MFB50 at MBT 8–10° | **CONFIRMED** as the common rule | Zhu, Haskara & Winkelman, IEEE TCST 15(3) 2007, p. 417 |
+| Row 7, turbine τ 40–120 s | **PARTIAL** | Burke et al., IJHFF 52 (2015) §5.3 — housing heat flow settles from ~7 kW to ~3.6 kW within three minutes, bounding τ above at roughly 45–60 s |
+
+Two corrections fell out of re-checking the six records the file already called
+CONFIRMED: the Wiebe book's publisher is **Verlag Technik** (no catalogue that
+could be opened shows the "VEB" prefix the file carried), and Chen & Flynn's SAE
+650733 is titled *"Development of a Single Cylinder Compression Ignition Research
+Engine"* — a paper about building a research engine, whose abstract never
+mentions friction. **That the FMEP correlation in `plant.py` comes from a page of
+it has not been checked.**
+
+### What was searched for and not found — this is the useful half
+
+- **Row 3, best BSFC 235–260 g/kWh.** No source states it. Heywood gives
+  **270 g/kWh**, above the band; a 2018 SwRI/EPA turbocharged GDI engine measures
+  **233**, below it. Our 241.2 sits between them. The band was **not** widened to
+  swallow the evidence; it is labelled engineering judgement and bracketed.
+- **Row 4, knock-limited spark 8–14°.** Nothing admissible, which is what the
+  task expected. Douaud & Eyzat supply the knock *model*, not this band. Drop the
+  row or relabel it an internal consistency check.
+- **Rows 5, 6, 8, 9 and 11.** No source states a part-load exhaust-temperature
+  range, a sustained-load oil band, or either time constant.
+
+Seven of eleven bands therefore remain unsourced. **Say so in Chapter 3.**
+
+### Two findings that change what the model may claim
+
+**The B58 has no thermostat.** BMW's own training document (ST1505, information
+status April 2015, §4.2) states that the conventional thermostat *"is replaced by
+a so-called heat management module"* — a motor-driven rotary valve positioned by
+the engine computer from the coolant and cylinder-head temperatures, with no wax
+element and no published opening temperature. `thermal.py`'s `t_stat_open` = 88 °C
+is therefore a **modelling equivalent** identified from the car's own coolant
+channel (regulated 88–97 °C in every log), and must never be cited to BMW. It is
+also a **third** reason the radiator is unidentifiable from the logs: the
+radiator branch opening is a commanded valve angle, not a function of coolant
+temperature, so even a coolant-flow signal would not close the heat equation
+without the valve position.
+
+**The compression ratio follows the engine version, not the model year.**
+Manufacturer sheets on both sides print 10.2:1 beside the engine code
+**B58B30O1** — the 285 kW / 382 hp engine, which is what `plant.py` models. But
+Toyota UK's own technical specifications of Feb 2021, June 2022 and Feb 2024
+print **11.0:1** for the 250 kW / 340 PS GR Supra 3.0 sold in Europe. **Nobody
+has recorded which version this car is.** The rated output on its registration or
+compliance plate settles it in one look; if it is the 250 kW car, the knock model
+is running the wrong compression ratio. Third-party specification aggregators
+splice the North American "382 hp" with the European "11.0:1" — such a listing is
+two markets stitched together, not a manufacturer figure.
+
+### Mistake 11 recurred a third time, and named two holes in the checker
+
+<!-- RETIRED-OK: section -->
+This subsection names the superseded figure throughout, because the figure is
+what was corrected. The current dataset is ten drives and 295.0 minutes.
+
+`pull01` took the manifest from eight drives and 168.1 minutes to nine and
+175.5. Seventeen lines were swept. **Five were not**, by two different routes:
+
+- **Three escaped the regex.** The dataset-size pattern requires *pooled*,
+  *dataset*, *manifest* or a drive count within thirty characters of the figure,
+  so `REFERENCES.md`'s "168.1 minutes of OBD-II logs from our own car" matched
+  nothing. The anchoring is the right trade — a looser pattern misreported the
+  thermal fit's "three drives (80 minutes)" as a wrong total — but it means a
+  figure in an unusual sentence is invisible.
+- **Two escaped inside a `RETIRED-OK` paragraph.** The marker exempts its whole
+  paragraph, and a live claim about the current dataset shared a paragraph with
+  the retired figure the marker was there for.
+
+**And nothing in `RETIRED` was guarding 168.1 at all** — the seven-drive entry
+still named "eight drives, 168.1 minutes" as the value to use instead, so the
+list pointed at a figure that had itself been superseded.
+
+All five are corrected, the seven-drive entry points at ten drives, and `168.1`
+is now a retired pattern in its own right. It deliberately does not match "eight
+drives" alone: the enrichment map and the compressor fit genuinely rest on eight
+drives of samples, because `pull01` contributes **zero** samples.
+
+### Verification on the merged tree — every script re-run
+
+<!-- RETIRED-OK: section -->
+
+| script | result |
+|---|---|
+| `check_premise.py` | **829.2 · 548.6 · 437.6 · 548.6**, trigger 1123 K; rows 2 and 4 identical |
+| `validate.py` | **8 of 11** inside band; every model value unchanged |
+| `test_reward.py` | **4 of 4** pass; neutral −0.00438, starver −0.28044 |
+| `compare_log.py` | **PASS** — 1.4 % residual, derived k 0.831 |
+| `check_map.py` | 6 cells above the compressor ceiling, **0** reachable fail-open cells |
+| `verify_docs.py` | **all 33 checks pass**; 29 retired figures guarded, 51 historical mentions marked |
+| `app/test_replay.py` | **36 of 36** pass, including the read-only and no-raw-data-on-disk assertions |
+
+The citation pass changed no code logic and no numeric value: the compiled
+bytecode and every numeric constant of `thermal.py` and `validate.py` are
+identical to the commit before it. Only `test_reward.py`'s unseeded
+random-policy line moves run to run, and it is printed under the heading
+"FOR INFORMATION, NOT A PASS/FAIL".
+
+### Not verified by the author of this section
+
+`app/` and the ninth drive came from the other half of the merge. `app/test_replay.py`
+was run here and passes 36 of 36, but the app's design, its estimator and its
+alert thresholds were not reviewed. `CLAUDE.md` describes it; read that before
+changing it.
+
+### Still open after this session
+
+1. **Which engine version the car is.** Two minutes with the registration.
+   Decides whether the compression ratio is right.
+2. **Row 7's actual time constant.** Burke 2014, *J. Eng. Gas Turbines Power*
+   136(10) 101511, should carry the turbine-node capacitance and conductances,
+   giving a published C/UA to set against our 48.0 s and 6000 J/K.
+3. **The MTZ article** (Landerl et al., *MTZ worldwide* 76(10) 2015, pp. 22–29),
+   the only BMW-authored document on this engine. Library access. It may settle
+   row 3 and replace the grey training document used for the thermostat finding.
+4. **Phase C.** Still the next real step, and nothing has been trained yet.
+
+## Session of 14–16 September 2026 — hardening the live app, and a document sweep
+
+*(Overlaps the section above by a day. The two were done independently: that one
+is the citation pass, this one is the app. Neither supersedes the other.)*
+
+### What arrived
+
+| thing | what it is |
+|---|---|
+| `logs/raw/pull01-20260913_093527.csv` | the **ninth** drive. Purpose-built, 7 channels, to settle mistake 13. Contributes **zero samples, zero operating points** — no coolant channel, so the warm filter excludes it |
+| `app/` | the live supervisor: reader, estimator, alert engine, server, three pages |
+| `DOC/`, `presentation/`, `REFERENCES.md` | from the branch, in parallel — the document reorganisation and the provenance file |
+
+### The dataset now reads three different drive counts, and all three are right
+
+| population | count | used for |
+|---|---|---|
+| manifest | **9** drives, 295.0 min | "how much have we logged" |
+| carrying usable samples | **6** | anything computed from `master_samples` |
+| behind the fitted calibrations | **8** | enrichment, spark — `pull01` is not in them |
+
+`verify_docs.py` asserts the first two separately. Quoting the wrong one is now
+the easiest available mistake.
+
+### What was verified, on the merged tree
+
+| # | Script | Result |
+|---|---|---|
+| 1 | `verify_docs.py` | ✅ **All 33 checks pass**, 228 figure mentions scanned across 22 tracked files |
+| 2 | `validate.py` | ✅ **8 of 11** inside band — unchanged |
+| 3 | `test_reward.py` | ✅ **4 of 4**; neutral −0.00438, unchanged |
+| 4 | `python -m app.test_replay --full` | ✅ **46 of 46** |
+
+`check_premise.py`, `build_dataset.py`, `compare_log.py` and `generality_test.py`
+were not re-run this session: nothing under them changed, and `verify_docs.py`
+recomputes their published figures from the shipped data and agrees. Re-run them
+before a release rather than trusting this line.
+
+### The app's own numbers, pinned so a regression is visible
+
+Replaying `7475b5d7` end to end:
+
+| quantity | value |
+|---|---|
+| samples estimated | **14278 of 14340** (99.7 % of samples with the engine running) |
+| peak estimated turbine | **884.9 °C** — a MODEL OUTPUT, not a reading |
+| alerts | **13 thermal · 0 mismatch · 19 novel** |
+| seed forgotten after | **461 s** — not the 145 s the code used to assume |
+
+And on `pull01`, the fast regression: 2186 of 2193 estimated, peak **593.7 °C**,
+4 novel, seed forgotten at 172 s.
+
+**None of these is evidence about the car.** The turbine figure is a model
+output with an assumed heat capacity and the alert counts are a property of
+thresholds we chose. They are pinned so that a change to the pipeline shows up,
+which is a different job from being a result.
+
+### Three defects found and fixed — the detail is in CLAUDE.md mistakes 14–16
+
+1. **The mismatch detector was measuring the throttle.** 55 alerts on
+   `7475b5d7` looked like an over-sensitive threshold; the firing condition was
+   actually true for **95.7 % of the drive** at a median of −52 %, because
+   `Boost pressure` is a pre-throttle channel. Fixed with three validity gates,
+   not a threshold change: **55 → 0**. The threshold did move, 15 % → 25 %, for
+   a separate and measured reason.
+2. **The app reported a turbine temperature its own physics called impossible.**
+   The 500 °C seed sat outside the ambient-to-EGT bracket — on `pull01`, 300 K
+   outside it. The fixed 145 s warm-up timer also used τ = 48 s, which is the
+   *loaded* time constant; at cruise it is 151 s and at idle 239 s.
+3. **The v19 archive was an older snapshot of everything except `app/`.**
+   Unzipping it over the branch would have reverted a fortnight of document
+   work, including three figures that had already been corrected once. They are
+   now guarded by `verify_docs.RETIRED`.
+
+### Two defects in `verify_docs.py` itself, both fixed here
+
+- **It crashed while reporting.** The new document scanner echoes the offending
+  line back; line 54 of this file contains a tick emoji; on a cp1252 console
+  that raised `UnicodeEncodeError` and killed the run **after every check had
+  already computed correctly**. Third occurrence of the character-encoding bug
+  in this repository, and the worst place for it.
+- **Its MAF-ceiling drive count and its MAF-ceiling sample count were counting
+  different populations** — raw files against the warm-filtered dataset. Adding
+  `pull01`, which pins 56 times in its raw log, pushed them apart: 6 drives
+  against 547 samples over 5. Both halves now count the same set.
+
+### What this session did NOT do
+
+- **No training run.** Phase C is still where it was, and Phase D is still the
+  floor of the project. The app is a second deliverable and it is not on that
+  path — see the backlog at the end of `CLAUDE.md`'s plan section.
+- **No live-car test.** Everything about the app is replay. The first item in
+  its backlog is one drive with `--live`, and it is the only item that can find
+  something replay cannot.
+- **No fault has ever been shown to the mismatch detector.** Nothing in nine
+  drives is broken, so every number behind it is a false-positive rate, not a
+  detection rate. Say that in the thesis rather than implying validation.
+
+---
+
+## Session of 19 September 2026 — the real gearbox, and the scenario binds again
+
+### The headline, because it reverses a blocker
+
+Fitting the car's **actual transmission** made the standard scenario reach the
+protection trigger for the first time since the audit fixes. The model had a
+generic six-speed with invented ratios; the car has a **ZF 8HP51**.
+
+| scenario | peak turbine | share of episode above 850 °C |
+|---|---|---|
+| 110 km/h, 12 % — this branch's default | 839.7 °C | **0.0 %** |
+| **130 km/h, 12 % — the `sep17` lock** | **884.0 °C** | **66.3 %** |
+
+The real box holds **7th** on the climb (2.589 overall) where the invented
+six-speed sat in top (2.312), so rpm and exhaust flow both rise. **The blocker
+went by the model becoming more correct**, not by a knob being turned — and the
+130 km/h lock was decided on 18 September, before any training existed.
+
+### The gearbox, and how it was verified
+
+Toyota's own sheet names the unit "8-speed Sports Automatic 8HP 51" and prints
+all eight ratios plus the 3.150 final drive; Toyota USA's pressroom confirms
+3.15 on the 382 hp car independently. But the car is the better witness:
+
+> **86.7 % of 79 105 moving samples land within 4 % of one of the eight
+> published ratios**, and the measured top-gear overall ratio of **1.998**
+> matches the 8HP51's 8th (2.016) to 0.9 % while matching nothing on the
+> six-speed manual (2.927).
+
+`UPSHIFT_MIN_RPM` is calibrated against the car rather than guessed — 2000 rpm,
+bias +0.28 gears, 79.7 % within one. Exact agreement peaks at ~47 % for ANY
+threshold, because a real automatic shifts on throttle and load too. That is the
+honest headline and it is in the docstring. It was not tuned to move a result:
+1400 and 2000 rpm both select 7th at the scenario.
+
+### Mistake 18 — `Actual gear` clamps at 6
+
+The verification broke a channel. `Actual gear` never exceeds 6 across 45 606
+moving samples; within the samples it labels "gear 6" there are three clusters
+at 2.016, 2.589 and 3.15 — 8th, 7th and 6th. **The channel saturates.** Fourth
+misread channel on this car, and the first that fails by RANGE rather than
+meaning. The knock-retard p99 is filtered with it and must be re-derived.
+
+### Phase C ran, on the wrong scenario
+
+Ten SAC agents — 5 sighted, 5 blinded, 50 000 steps, **173 minutes each**, ten
+sharing a 20-core machine (~4.5 steps/s each, ~45 aggregate against 9.4 solo).
+
+**They trained at 110 km/h, where nothing binds.** They had nothing to protect
+against, so they cannot settle Phase D. The runs are kept; the next action is to
+retrain at 130.
+
+**And they produced exactly 11 episodes each**, which is the arithmetic in
+`evaluate.py`'s docstring: 4500 steps per episode, three preference weights
+drawn fresh each reset, so the policy must generalise across a 3-D simplex from
+eleven samples of it.
+
+### Two defects found in tooling
+
+- **`evaluate.py` printed a scenario it was not running.** Its header was the
+  literal string "12 % at 130 km/h" while the env took `make_grade_climb`'s
+  DEFAULT — 110 on this branch. It now derives the line from the cycle and
+  cannot disagree with what it scored.
+- The compression-ratio open question is **settled**: the team confirmed the
+  285 kW / ~386 hp car, so `plant.py`'s 10.2:1 is right and Toyota UK's 11.0:1
+  belongs to the 250 kW variant.
+
+### Verified
+
+```
+verify_docs.py    All 38 checks pass, 309 figure mentions, 24 tracked files
+validate.py       8 of 11 inside band, unchanged (no plant change)
+test_reward.py    4 of 4, neutral inside the ±0.05 band
+app.test_replay   49 of 49
+build_dataset.py  295.0 min, 10 drives, 26 operating points
+```
+
+### What this session did NOT do
+
+- **No valid Phase D number.** The agents trained off-scenario.
+- **No merge with `sep17`.** Twelve commits still apart.
+- **The 850 °C trigger is still unverifiable on this car.** Its only exhaust
+  channel is modelled, post-catalyst and clamped at 645.3 °C.
+
+### Later the same day — the scenario is loaded, and the logs explain why it had to be
+
+**`make_grade_climb` now defaults to 130 km/h**, the value `sep17` locked on
+18 September before any training existed. Adopting it is not tuning; it is
+catching up to a decision already made.
+
+**Why elevation belongs in the scenario at all.** The car's own logs cannot load
+the engine, and this is measured rather than asserted — over 79 134 moving
+samples from the ten drives:
+
+| | |
+|---|---|
+| median relative air filling, per drive | **24–40 %** |
+| samples above 120 % relative filling | 1 563 of 79 134 — **2.0 %** |
+| median road speed, per drive | 95–137 km/h, peaks past 200 |
+
+**The driving is fast but not loaded.** Straight-line motorway cruising on flat
+road asks for aerodynamic drag and rolling resistance and nothing else. No
+amount of further logging will exercise the thermal model's hot region — the
+duty cycle is wrong, not the model. Measured on the simulator:
+
+| speed | grade | peak turbine |
+|---|---|---|
+| 90 km/h | 0 % | **335.4 °C** |
+| 90 km/h | 6 % | 540.6 °C |
+| 90 km/h | 12 % | 717.0 °C |
+| 130 km/h | 12 % | **884.0 °C — binds, 66.3 % of the episode** |
+
+**What the loaded scenario shows.** `check_premise.py`, hand-written policies:
+
+| policy | damage | cuts | peak turbine |
+|---|---|---|---|
+| baseline ECU (true neutral) | 959.8 | — | 884 °C |
+| reactive protection | 679.0 | 29.3 % | 862 °C |
+| current-grade protection | 633.2 | **34.0 %** | 861 °C |
+| predictive protection | 637.4 | 33.6 % | 861 °C |
+
+**Every policy does real work now** — the reactive row is no longer a copy of
+the baseline row, which it was at 110 km/h. **Preview is −0.4 points against
+current-grade**, the closest to level it has been. The question is open rather
+than trivially negative, and only a trained pair can settle it.
+
+`test_reward.py` 4 of 4 on the loaded scenario, neutral **−0.00038**.
+`verify_docs.py` 38 of 38. `validate.py` 8 of 11. `app.test_replay` 49 of 49.

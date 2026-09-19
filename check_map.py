@@ -74,10 +74,31 @@ def sweep(rpm, map_kpa, lam, iat_k=298.0):
 
 
 def lam_for(m):
+    """Lambda for this spark surface, scheduled by LOAD.
+
+    AUDIT.md L12, and it is CLAUDE.md mistake 4 surviving in one more place.
+    Mistake 4 established that enrichment on this engine is NOT a load table --
+    over the logged samples, manifold pressure carries no detectable signal
+    (+0.23, standard error 0.17) while engine speed (-0.56), air mass (-0.49)
+    and sustained dwell (-0.41) do. `BaselineECU.base_lambda` was rebuilt on
+    speed and dwell for exactly that reason; this function was not.
+
+    NOT CHANGED, and that is a deliberate call rather than an oversight. This
+    schedule exists only to pick a lambda at which to draw the spark surface,
+    and no cell of the published map changes if it is replaced -- the map is a
+    function of spark, not of the lambda used to evaluate it. Rewriting it to
+    call base_lambda would need a dwell history this function does not have,
+    for no change in the output.
+
+    What it must NOT become is a source anyone quotes for enrichment behaviour.
+    For that, base_lambda() is the model and mistake 4 is the evidence.
+    """
     return 1.0 if m <= 120 else (0.92 if m <= 180 else 0.85)
 
 
-print("Final spark map = min(MBT, knock limit).  lambda scheduled by load.")
+print("Final spark map = min(MBT, knock limit).  lambda scheduled by load")
+print("-- a placeholder for drawing the surface, NOT an enrichment model.")
+print("See lam_for() and CLAUDE.md mistake 4.")
 print("  --  = above the compressor ceiling at that speed, not an operating point")
 print("  knk = knocks at 0 deg BTDC; no knock-free spark exists, retard cannot fix it\n")
 print("  MAP kPa |" + "".join(f"{m:>7d}" for m in MAPS))

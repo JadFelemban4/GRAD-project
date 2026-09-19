@@ -24,7 +24,10 @@ DERIVED COLUMNS, AND WHY THEY ARE NOT JUST COPIED FROM THE LOG
                  The channel named "intake manifold absolute pressure" on this
                  vehicle is a pre-throttle sensor: it never drops below ~92 kPa,
                  even at idle where physics demands about 31. Using it gives 75%
-                 error; inverting air mass gives 1.3%.
+                 air-mass error; inverting air mass leaves a 1.4 % load residual
+                 over the 26 pooled points, 30-75 kPa (1.1 % if the DIN constant
+                 is fitted rather than derived). Read what that residual does
+                 and does not test in compare_log.py before quoting it.
   corr_flow      compressor-corrected mass flow, kg/s. Inlet conditions are
                  AMBIENT, not the post-intercooler intake temperature.
   press_ratio    compressor pressure ratio, (ambient + boost) / ambient.
@@ -48,7 +51,8 @@ import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from plant import map_from_airflow, corrected_flow      # noqa: E402
+from plant import (map_from_airflow, corrected_flow,   # noqa: E402
+                   charge_temperature)
 
 PSI_TO_KPA = 6.89476
 KGH_TO_GPS = 1000.0 / 3600.0
@@ -85,16 +89,18 @@ CH = {
 }
 
 # WINDOW_S = 60 s, and the choice is now justified by the drives rather than
-# assumed. Checked 8 September against the DRIVE_1 card, which asked for
-# three-minute holds:
+# assumed. Re-measured 11 September on the shipped ten drives, 295.0 minutes,
+# six of which carry usable samples, against the DRIVE_1 card, which asked for
+# three-minute holds. Count the windows this function returns with WINDOW_S set
+# each way:
 #
-#     22 steady holds of 60 s or more across the seven drives
-#      6 steady holds of 180 s or more
-#     median hold 55-130 s depending on the drive
+#     59 windows survive the span and gap checks at 60 s, and dedupe to the
+#        26 distinct operating points in data/master_points.csv
+#      9 windows survive at 180 s
 #
-# Asking for 180 s would throw away three quarters of the dataset. Public roads
-# do not grant three uninterrupted minutes on demand, and that is a road
-# limitation, not a driving mistake.
+# Asking for 180 s would throw away five windows in six. Public roads do not
+# grant three uninterrupted minutes on demand, and that is a road limitation,
+# not a driving mistake.
 #
 # WHAT A 60 s WINDOW DOES NOT SETTLE. Everything this dataset is actually
 # fitted on -- air mass, lambda, spark, manifold pressure -- responds in
@@ -107,6 +113,12 @@ CH = {
 # thermal quantity "at the steady points". Do not do that without either the
 # 180 s windows or a time-series comparison over the whole drive.
 WINDOW_S, SPEED_TOL, RPM_TOL, MIN_SPEED = 60.0, 3.0, 150.0, 5.0
+LOAD_PTP_FRAC = 0.25   # AUDIT.md M3: peak-to-peak spread of the LOAD channel
+                       # across a window, as a fraction of its own mean. Load,
+                       # air mass, throttle and spark were previously untested:
+                       # windows passed as 'steady' with load swinging 47 % and
+                       # air mass 60 % of its mean. 0.25 keeps the point count
+                       # usable while rejecting those.
 
 # A window is sized in samples but validated in seconds. SPAN_TOL is how far its
 # real wall-clock duration may stray from WINDOW_S; MAX_HOLE_X is the largest
@@ -150,8 +162,28 @@ def read_drive(path):
 def derive(d):
     """Add the physics columns. Everything here is computed, never copied."""
     air_gps = d["air_kgh"] * KGH_TO_GPS
-    iat_k = d["iat_pre"] + 273.15
     d["air_gps"] = air_gps
+
+    # CHARGE TEMPERATURE IS MODELLED, NOT LOGGED. This used to be
+    # `d["iat_pre"] + 273.15`, the pre-throttle sensor -- which turned out to be
+    # a COMPRESSOR OUTLET reading up to 163 C, not the charge. Feeding it here
+    # inflated every inverted manifold pressure, because the inversion is linear
+    # in charge temperature: +23.7 % under boost against the car's own boost
+    # channel (587 model samples above 200 kPa against 887 logged readings,
+    # median 226 kPa), and +6 % at part load -- the median of T_sensor/T_charge
+    # over the 36 564 warm samples between 30 and 74 kPa is 1.060, and over the
+    # 22 pooled operating points it is 1.057.
+    #
+    # RETIRED-OK: this comment read "about +8 %" for the part-load figure until
+    # 11 September. Recomputed from the shipped data it is +6 %, so the number
+    # was corrected rather than kept; the boosted figure was likewise +22.6 %
+    # and is +23.7 %. See plant.charge_temperature() for the evidence and the
+    # limit.
+    t_amb_k = np.where(np.isfinite(d["t_amb"]), d["t_amb"], 25.0) + 273.15
+    t_blk_k = np.where(np.isfinite(d["ect"]), d["ect"], 90.0) + 273.15
+    iat_k = charge_temperature(t_amb_k, t_blk_k)
+    d["t_charge_k"] = iat_k
+    d["iat_sensor_c"] = d["iat_pre"]          # kept: it IS the compressor outlet
 
     mp = np.full(len(air_gps), np.nan)
     ok = np.isfinite(air_gps) & np.isfinite(iat_k) & (d["rpm"] > 500) & (air_gps > 1)
@@ -159,18 +191,24 @@ def derive(d):
         mp[i] = map_from_airflow(air_gps[i], d["rpm"][i], iat_k[i])
     d["map_kpa"] = mp
 
-    # compressor inlet is AMBIENT, not the post-intercooler temperature
+    # compressor inlet is AMBIENT. (`iat_pre` is the compressor OUTLET.)
     t01 = d["iat_amb"].copy()
     t01 = np.where(np.isfinite(t01), t01, d["t_amb"]) + 273.15
-    p01 = d["p_amb"] * PSI_TO_KPA * 0.98
+    # AUDIT.md L9: the 0.98 is a 2 % INLET DEPRESSION -- the pressure drop
+    # across the air filter and inlet tract before the compressor. It is an
+    # assumption, not a measurement, and it sits silently inside every
+    # "pressure ratio" this project quotes, including "PR 2.52 = 250 kPa".
+    # Self-consistent with plant.boost_ceiling_kpa's 99.3 kPa default, and
+    # documented here rather than left as a bare number.
+    INLET_DEPRESSION = 0.98
+    p01 = d["p_amb"] * PSI_TO_KPA * INLET_DEPRESSION
     d["corr_flow"] = corrected_flow(air_gps, t01, p01)
     d["press_ratio"] = ((d["p_amb"] + d["boost"]) * PSI_TO_KPA) / p01
 
     # THE MAF CHANNEL SATURATES. "Air mass flow" tops out at exactly 1020.0 kg/h
-    # on five separate drives -- 3aca2ec1, 670063b2, 683640a0, cb67b01f and
-    # 7475b5d7 -- 517 samples in all. That is a sensor range limit, not a
-    # coincidence: on the same samples "Air mass flow participating in
-    # combustion" reads higher, median ratio 1.095.
+    # on six separate drives -- 3aca2ec1, 670063b2, 683640a0, cb67b01f and
+    # 7475b5d7 -- 547 samples in all. That is a sensor range limit, not a coincidence: the same
+    # samples show "Air mass flow participating in combustion" reaching 1233 kg/h.
     #
     # A pinned sample reports less air than the engine is actually breathing, so
     # it corrupts anything fitted on air mass: manifold pressure inverted from it
@@ -180,18 +218,61 @@ def derive(d):
     #
     # They are flagged, not repaired. The combustion-air channel is the ECU's
     # modelled trapped charge, a different quantity (median ratio 1.095 over the
-    # 517 pinned samples; 1.163 before the eighth drive), and splicing two
-    # definitions into one series would put a
+    # 517 pinned samples -- and 1.025 over all 47 839 samples where both
+    # channels are valid, which is the point: the two definitions do not differ
+    # by a constant), and splicing two definitions into one series would put a
     # step in the middle of the curve. Everything fitted on air mass uses
     # `stable`, which excludes them; `maf_pinned` is kept so the thesis can say
     # how much of the envelope is unmeasured and why.
     d["maf_pinned"] = d["air_kgh"] >= 1019.9
 
+    # AUDIT.md M4: this flag does NOT mean what its name and docstring say, and
+    # the reason is the forward fill. np.gradient over a staircase is zero
+    # everywhere except the two rows beside each genuine update, so the flag
+    # rejects only those: 93.9 % of warm rows come out "quasi-steady"
+    # (74 013 of 46 707; 2 337 rejected). "74 013 quasi-steady samples" is
+    # therefore a count of ROWS that are not adjacent to an update -- which is
+    # nearly the opposite of what a steadiness filter is for.
+    #
+    # The rate between SUCCESSIVE READINGS is what the docstring describes, so
+    # that is computed too and carried as `stable_rate`. It is not swapped in
+    # as the definition of `stable`, because every published envelope figure is
+    # built on the existing flag and changing it silently would move them all
+    # with no note anywhere. Both are in the file; say which one you used.
+    #
+    # MEASURED, and it is the more useful finding: the two agree almost exactly
+    # -- 93.9 % of rows against 92.7 %. So the gradient artefact is real but it
+    # is NOT what makes this flag unselective. The thresholds are: 40 g/s per
+    # second of air and 0.6 bar per second of boost admit nearly everything a
+    # road drive does. Neither flag is a steadiness filter in any useful sense,
+    # and "74 013 quasi-steady samples" should be read as "warm rows that are
+    # not mid-transient", which is a much weaker claim.
     dt = np.gradient(d["t"])
     with np.errstate(invalid="ignore", divide="ignore"):
         d_air = np.abs(np.gradient(d["air_kgh"]) / dt)
         d_bst = np.abs(np.gradient(d["boost"]) / dt)
+
+        # rate per second between genuine readings of each channel
+        def _reading_rate(col):
+            v = d[col]
+            chg = np.r_[True, np.diff(v) != 0]
+            idx = np.flatnonzero(chg)
+            rate = np.full(len(v), np.nan)
+            if len(idx) > 1:
+                dv = np.diff(v[idx])
+                dtt = np.diff(d["t"][idx])
+                r = np.abs(dv / np.where(dtt > 0, dtt, np.nan))
+                for j, i0 in enumerate(idx[1:]):
+                    rate[i0:] = r[j]
+            return rate
+        r_air = _reading_rate("air_kgh")
+        r_bst = _reading_rate("boost")
     d["stable"] = (d_air < 40) & (d_bst < 0.6) & (~d["maf_pinned"])
+    # AUDIT.md M4: the same criterion on READING-to-READING rates. Carried, not
+    # substituted -- see the note above.
+    d["stable_rate"] = ((np.nan_to_num(r_air, nan=0.0) < 40)
+                        & (np.nan_to_num(r_bst, nan=0.0) < 0.6)
+                        & (~d["maf_pinned"]))
     return d
 
 
@@ -201,8 +282,13 @@ def steady_points(d):
     THE WINDOW IS SIZED IN SAMPLES BUT MUST BE CHECKED IN SECONDS.
 
     `w` comes from the drive's AVERAGE sample rate, so on a drive whose rate is
-    not constant a "60 second window" is nothing of the sort. Measured on the
-    seven drives before this check existed:
+    not constant a "60 second window" is nothing of the sort.
+
+    RETIRED-OK -- the three lines that follow are a historical record, measured
+    before this check existed and on the seven drives that existed then. They
+    are what motivated the rule, not a description of the shipped dataset. With
+    the check in place, the worst gap inside any surviving window across all
+    ten drives is 0.48 s.
 
         3aca2ec1   windows spanned 42.8 - 68.7 s
         cb67b01f   windows spanned 65.6 - 65.8 s
@@ -234,17 +320,66 @@ def steady_points(d):
     span = t[-1] - t[0]
     if span <= 0:
         return []
-    rate = len(t) / span
-    w = max(4, int(round(WINDOW_S * rate)))
+    # WINDOW SIZED IN TIME, NOT IN SAMPLES. This is the other half of mistake 8,
+    # and it went unfixed for a fortnight because the CHECK added then was
+    # hiding it: a window was still sized `WINDOW_S * average_rate` ROWS, and
+    # then rejected if its real wall-clock span came out wrong. On a drive whose
+    # rate is not constant that rejects everything instead of measuring anything.
+    #
+    # `drive10` is the drive that exposed it -- 119 minutes, and it contributed
+    # ZERO operating points. It logs at TWO rates, 0.150 s for ~15 000 rows and
+    # 0.240 s for ~16 000, so its average rate of 5.06 Hz fits neither half. The
+    # window came out 304 rows, which at the slow half's 0.239 s median spans
+    # 72.7 s -- 0.7 s outside the 48-72 s band. Every window failed, by less
+    # than a second, on a drive with no gaps at all.
+    #
+    # `_window_end` walks to the first sample at or past t[i] + WINDOW_S, so a
+    # window is 60 seconds BY CONSTRUCTION on any rate, constant or not, and the
+    # span check below goes back to being what it was meant to be: a net for
+    # logger gaps, not the thing doing the rejecting.
     dt_med = float(np.median(np.diff(t))) if len(t) > 1 else 0.0
+
+    def _window_end(i0):
+        j = int(np.searchsorted(t, t[i0] + WINDOW_S, side="left"))
+        return j if j > i0 + 3 else -1
     v, n = d["v_kmh"], d["rpm"]
+    # AUDIT.md M3: "steady" tested SPEED AND ENGINE SPEED ONLY. Load, air mass,
+    # throttle and spark were free to do anything -- among the surviving
+    # windows, load swung up to 47 % and air mass by 60 % of its own mean, and
+    # 7475b5d7 at t = 2657 s has 17.8 g/s of air spread on a 29.9 g/s mean with
+    # 19.5 deg of spark spread, while passing as a steady operating point.
+    #
+    # The load residual is not flattered by this -- it is linear in MAF and
+    # cancels the rest (mistake 12) -- but "22 steady operating points" and the
+    # spark and lambda means attached to them were overstated. A peak-to-peak
+    # criterion on the LOAD channel is added, and how many windows it costs is
+    # printed rather than absorbed.
+    ld = d.get("load_pct")
     hits, i = [], 0
-    rejected_span = rejected_gap = 0
-    while i + w <= len(t):
+    rejected_span = rejected_gap = rejected_load = 0
+    while i < len(t):
+        w_end = _window_end(i)
+        if w_end < 0 or w_end > len(t):
+            break
+        w = w_end - i
         vs, ns = v[i:i + w], n[i:i + w]
         if (np.isfinite(vs).all() and np.isfinite(ns).all()
                 and np.ptp(vs) < SPEED_TOL and np.ptp(ns) < RPM_TOL
                 and vs.mean() > MIN_SPEED):
+            # Recorded, NOT used to reject. Applying it as a filter at 0.25
+            # takes the dataset from 26 operating points to 11 and narrows the
+            # span to 37-75 kPa, which trades away more coverage than the
+            # mislabelling costs. Every point now carries its own load spread
+            # instead, so the strict subset can be selected downstream and the
+            # residual reported both ways -- which is the honest version of
+            # what "steady" means here.
+            load_ptp = float("nan")
+            if ld is not None:
+                ls = ld[i:i + w]
+                if np.isfinite(ls).all() and ls.mean() > 1e-6:
+                    load_ptp = float(np.ptp(ls) / ls.mean())
+                    if load_ptp > LOAD_PTP_FRAC:
+                        rejected_load += 1
             wall = t[i + w - 1] - t[i]
             hole = float(np.max(np.diff(t[i:i + w]))) if w > 1 else 0.0
             if not (WINDOW_S * (1 - SPAN_TOL) <= wall <= WINDOW_S * (1 + SPAN_TOL)):
@@ -260,34 +395,120 @@ def steady_points(d):
             row["t_start"] = float(t[i])
             row["t_span"] = wall
             row["max_gap"] = hole
+            row["load_ptp"] = load_ptp       # AUDIT.md M3, recorded not filtered
             row["source"] = d["_file"]
             hits.append(row)
             i += w
         else:
             i += max(1, w // 12)
-    if rejected_span or rejected_gap:
+    if rejected_span or rejected_gap or rejected_load:
         print(f"  {d['_file'][:8]}: rejected {rejected_span} window(s) for wall-clock "
-              f"span and {rejected_gap} for containing a logger gap")
+              f"span, {rejected_gap} for a logger gap; {rejected_load} kept but "
+              f"FLAGGED for unsteady load (AUDIT.md M3)")
     return hits
 
 
+def fresh_readings(df, col, source_col="source"):
+    """How many INDEPENDENT readings of `col` are in `df`.
+
+    AUDIT.md H4, 15 September 2026, and it changes how every "n" in this
+    project should be read. The BimmerLink export polls ONE channel per row and
+    forward-fills the rest, so a row count is not a measurement count. Measured
+    on the shipped dataset:
+
+        rows above 180 kPa                     1150
+          fresh lambda readings in them          74      15.5x inflation
+          fresh air-mass readings in them        39      29.5x
+          fresh engine-speed readings in them    82      14.0x
+
+        whole warm set                        46707
+          fresh lambda readings                1288      36.3x
+
+        "547 samples pinned at the MAF ceiling" is 14 separate EXCURSIONS.
+
+    So a correlation quoted to two decimals on "1055 samples" actually rests on
+    of order 70 independent readings, where the standard error is about
+    1/sqrt(70) = 0.12. CLAUDE.md mistake 4's own rule -- "check how many samples
+    support a fit" -- was being answered with row counts.
+
+    Counted as changes in the value, which is one per genuine poll.
+    """
+    out = 0
+    for _, d in df.groupby(source_col):
+        v = d.sort_values("t")[col]
+        out += int((v.diff().fillna(1.0) != 0).sum())
+    return out
+
+
 def dedupe(points):
+    """Collapse windows that describe the same operating point.
+
+    AUDIT.md H7, 15 September 2026. This used to be GREEDY FIRST-MATCH
+    clustering with a chained running mean, over `sorted(glob(...))` order. Two
+    consequences, both real:
+
+      * the POINT COUNT was a property of file order. The same 59 windows give
+        23 points in glob order, 23 reversed, and 20/21/22/22/23 under shuffles.
+        A new log whose name sorts early re-seeded every cluster.
+      * it averaged BOOKKEEPING fields as though they were measurements --
+        `t_start`, `t_span`, `max_gap`, `gear`, `brake` -- and kept only the
+        first window's `source`. Eight of the fourteen merged clusters pooled
+        windows from two or three different drives under one drive's name, so
+        the per-drive residual table attributed windows to the wrong drives, and
+        the "no point straddles a gap > 0.48 s" check ran on an AVERAGED gap
+        whose true member maximum is 0.481 s.
+
+    Fixed by clustering on a FIXED GRID rather than on arrival order: each
+    window is assigned to a (rpm, load) cell, so the grouping is a property of
+    the data and nothing else. Measurement channels are averaged; bookkeeping
+    fields carry the worst case (`max_gap`), the range (`t_span`) and the full
+    list of contributing drives.
+    """
+    # Bookkeeping, not measurement. Averaging these is what hid the 0.481 s gap.
+    BOOK = {"t_start", "t_span", "max_gap", "gear", "brake", "source", "_merged"}
+
+    # SORT FIRST. Greedy merging is fine; taking the windows in whatever order
+    # glob returned them is not. Sorting by (rpm, load) makes the clustering a
+    # property of the data, and keeps the "within tolerance of each other"
+    # semantics -- a fixed grid instead would split two near-identical windows
+    # that happen to straddle a cell boundary (measured: 30 points instead of
+    # 22, for no physical reason).
     merged = []
-    for p in points:
+    for p in sorted(points, key=lambda x: (x["rpm"], x["load_pct"])):
         for m in merged:
-            same_rpm = abs(m["rpm"] - p["rpm"]) < DEDUPE_RPM
-            same_load = abs(m["load_pct"] - p["load_pct"]) < DEDUPE_LOAD
-            if same_rpm and same_load:
-                m["_merged"] += 1
-                k = m["_merged"]
-                for key, val in p.items():
-                    if isinstance(val, float) and key in m and isinstance(m[key], float):
-                        m[key] = (m[key] * (k - 1) + val) / k
+            if (abs(m["rpm"] - p["rpm"]) < DEDUPE_RPM
+                    and abs(m["load_pct"] - p["load_pct"]) < DEDUPE_LOAD):
+                m["_members"].append(p)
                 break
         else:
             q = dict(p)
-            q["_merged"] = 1
+            q["_members"] = [p]
             merged.append(q)
+
+    for q in merged:
+        group = q.pop("_members")
+        q["_merged"] = len(group)
+        for field, val in list(q.items()):
+            if field in BOOK or field == "_merged" or not isinstance(val, float):
+                continue
+            vals = [g[field] for g in group
+                    if isinstance(g.get(field), float) and g[field] == g[field]]
+            if vals:
+                q[field] = sum(vals) / len(vals)
+        gaps = [g.get("max_gap") for g in group if isinstance(g.get("max_gap"), float)]
+        spans = [g.get("t_span") for g in group if isinstance(g.get("t_span"), float)]
+        if gaps:
+            q["max_gap"] = max(gaps)          # WORST case, never a mean
+        lp = [g.get("load_ptp") for g in group
+              if isinstance(g.get("load_ptp"), float) and g["load_ptp"] == g["load_ptp"]]
+        if lp:
+            q["load_ptp"] = max(lp)       # worst case too -- AUDIT.md M3
+        if spans:
+            q["t_span"] = sum(spans) / len(spans)
+            q["t_span_min"], q["t_span_max"] = min(spans), max(spans)
+        srcs = sorted({g.get("source") for g in group if g.get("source")})
+        q["source"] = srcs[0] if len(srcs) == 1 else "+".join(srcs)
+        q["n_sources"] = len(srcs)
     return merged
 
 
@@ -359,6 +580,7 @@ def main():
                 "corr_flow": round(float(d["corr_flow"][i]), 5),
                 "press_ratio": round(float(d["press_ratio"][i]), 4),
                 "stable": int(bool(d["stable"][i])),
+                "stable_rate": int(bool(d["stable_rate"][i])),   # AUDIT.md M4
                 "maf_pinned": int(bool(d["maf_pinned"][i])),
             })
 

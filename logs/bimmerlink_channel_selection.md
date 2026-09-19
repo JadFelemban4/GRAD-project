@@ -10,6 +10,14 @@
 >    pre-throttle sensor** and using it as load gives 75 % air-mass error.
 >
 > Kept unedited below as the record of what was planned and why.
+>
+> **Forward note, 16 September 2026.** A third selection now exists and it is
+> smaller than both: `app/reader.py` runs against the car in real time and asks
+> for **six** channels, because the adapter polls one per round trip and the
+> link's rate divides by the number requested — 26 channels give 7.5 s each,
+> 7 give 1.45 s. Three sets, three purposes: census with everything once,
+> record ~21 for calibration drives, poll 6 for anything that must keep up
+> live. See `logs/CHANNEL_SET_FINAL.md`.
 
 # BimmerLink channel selection — exact names from your 2026-09-06 log
 
