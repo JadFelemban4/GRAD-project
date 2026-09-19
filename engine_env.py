@@ -269,26 +269,163 @@ class BaselineECU:
 
 # ------------------------------------------------------------------ vehicle
 class Vehicle:
+    """The A90 GR Supra 3.0 driveline.
+
+    THE GEARBOX IS THE REAL ONE, 19 September 2026. It was a generic six-speed
+    with invented ratios (3.6 / 2.1 / 1.4 / 1.0 / 0.82 / 0.68) on a 3.4 final
+    drive -- no source, and not the transmission in the car. The car has a
+    **ZF 8HP51, an eight-speed torque-converter automatic**, and Toyota publishes
+    the whole ratio set beside the engine it is bolted to.
+
+    WHERE EACH NUMBER COMES FROM, because this project does not accept a figure
+    without one (REFERENCES.md):
+
+      ratios, final drive   Toyota's own technical specification sheet, which
+                            names the unit "8-speed Sports Automatic 8HP 51" and
+                            prints all eight ratios plus reverse 3.712 and the
+                            3.150 final drive.
+                            media.toyota.co.uk .../220605M-GR-Supra-Tech-Spec.pdf
+      final drive, again    Toyota USA's pressroom gives 3.15 for the automatic
+                            on the 382 hp car, which is THIS car (285 kW,
+                            confirmed by the team 19 Sep). The UK sheet above is
+                            the 250 kW European variant, so two Toyota documents
+                            for two different power outputs agree, and the final
+                            drive is not variant-sensitive.
+                            pressroom.toyota.com/vehicle/2025-toyota-gr-supra/
+
+    WHAT ZF PUBLISHES, AND WHAT IT DOES NOT. ZF's own product page gives the 8HP
+    family a torque range of 220-1000 Nm and a ratio spread of 7.0, and a weight
+    of 87 kg for the mid-size 8HP70. It publishes NO per-gear ratios for the
+    8HP51 and no weight for it.
+
+      * The spread here is 5.250 / 0.640 = 8.20, NOT 7.0. ZF's 7.0 is a family
+        figure and must not be cited for this ratio set.
+      * "~560 Nm torque capacity" and "~77 kg" are widely repeated and are NOT
+        on ZF's page. They are carried UNVERIFIED in REFERENCES.md. The engine
+        makes 500 Nm, so the margin over a stated 560 Nm is thin and worth a
+        sentence in the thesis -- but not while the 560 has no source.
+
+    THE CONVERTER IS MODELLED AS LOCKED, 1:1, AND THAT IS A DECISION.
+    It is a torque-CONVERTER automatic, so below lock-up it multiplies torque and
+    slips. Neither Toyota nor ZF publishes a stall ratio, a K-factor or a lock-up
+    schedule, so any converter curve here would be an invented parameter of
+    exactly the kind mistake 12 warns about. The scenarios this environment runs
+    are steady high-speed climbs where a real 8HP is locked, so a locked
+    converter is both the right approximation and the honest one. Say "converter
+    assumed locked" wherever the gearbox is described; do not let a reader think
+    the slip is modelled.
+    """
     mass = 1520.0
     cd_a = 0.66
     crr = 0.011
     wheel_r = 0.33
-    final_drive = 3.4
-    gears = (3.6, 2.1, 1.4, 1.0, 0.82, 0.68)
 
-    def gear_for(self, v_mps):
-        kmh = v_mps * 3.6
-        for i, lim in enumerate((22.0, 40.0, 62.0, 88.0, 115.0)):
-            if kmh < lim:
-                return i
-        return 5
+    # ZF 8HP51, from Toyota's own sheet. Reverse 3.712 is published too and is
+    # not carried here because this environment never reverses.
+    final_drive = 3.150
+    gears = (5.250, 3.360, 2.172, 1.720, 1.316, 1.000, 0.822, 0.640)
+
+    # Peak torque of the B58B30O1, the figure every manufacturer sheet prints
+    # beside the engine code (REFERENCES.md section 2).
+    PEAK_TORQUE_NM = 500.0
+
+    # ASSUMED. The fraction of peak torque above which the transmission hands
+    # back a gear -- a 25 % reserve, which is an ordinary automatic calibration.
+    # No source has been opened for this vehicle's, so it is engineering
+    # judgement and is declared as such.
+    SHIFT_LOAD = 0.75
+    SHIFT_RPM_MAX = 6000.0        # never hand back a gear into the limiter
+
+    # Lowest engine speed an upshift may leave the engine at.
+    #
+    # MEASURED AGAINST THE CAR, 19 September 2026, and it began as an assumption.
+    # Toyota and ZF publish the ratios but nothing about WHEN the box changes
+    # gear, so the schedule is the one part of this gearbox with no published
+    # source. Rather than invent a speed ladder -- which is what the old
+    # six-speed had, and it is what put the model in top gear halfway up a 12 %
+    # grade -- the thresholds are DERIVED from this one number and the published
+    # ratios: upshift only when the next gear would still turn at least this
+    # fast.
+    #
+    # The car settles the value. Its own rpm and road speed give the overall
+    # ratio it is actually running, sample by sample, and 86.7 % of 79 105
+    # moving samples land within 4 % of one of the eight published ratios --
+    # which is the evidence the ratio set above is right. Sweeping this constant
+    # against the gear so inferred:
+    #
+    #     rpm    exact gear    within one    mean (model - car)
+    #     1400      47.0 %        60.9 %          +1.18
+    #     1800      30.0 %        74.9 %          +0.59
+    #     2000      28.2 %        79.7 %          +0.28   <- shipped
+    #     2100      24.1 %        74.3 %          -0.06
+    #
+    # 2000 rpm is where the model stops sitting a gear too high. EXACT agreement
+    # peaks at only ~47 % for ANY threshold, and that is the honest headline: a
+    # speed-only schedule cannot reproduce a real automatic, which shifts on
+    # throttle and load as well. Quote "within one gear, 79.7 %" and say what it
+    # is -- a coarse model of the shift logic, on a gearbox whose RATIOS are
+    # exact.
+    #
+    # IT WAS NOT TUNED TO MOVE A RESULT, and that is checkable: at the scenario
+    # this environment runs -- 130 km/h on a 12 % grade -- 1400 and 2000 rpm
+    # both select 7th, 2706 rpm, 340 Nm. They differ only at light load.
+    UPSHIFT_MIN_RPM = 2000.0
+
+    def _upshift_speeds(self):
+        """Road speed (m/s) at which each upshift becomes allowed.
+
+        Derived from UPSHIFT_MIN_RPM and the PUBLISHED ratios, so the schedule
+        follows the gearbox instead of being a second invented table beside it.
+        """
+        out = []
+        for g in self.gears[1:]:
+            ratio = g * self.final_drive
+            out.append(self.UPSHIFT_MIN_RPM * (2 * np.pi / 60.0) * self.wheel_r / ratio)
+        return out
+
+    def gear_for(self, v_mps, force_n=None):
+        """Highest gear the speed allows, then down while the engine is over-asked.
+
+        WHY THE LOAD TERM EXISTS. Selecting on ROAD SPEED ALONE is wrong in
+        exactly the place this project cares about: a speed ladder upshifts
+        whatever the road is doing, so on a sustained grade the model upshifts
+        MID-CLIMB -- which no automatic does -- and then asks the engine for the
+        whole hill in the tallest ratio it has. On the old six-speed that was
+        measured as a 23 % jump in torque demand across a 4 % step in road speed,
+        and it made `test_reward.py` fail its neutral-action check at -0.124.
+
+        That failure is recorded as mistake 17 on the `sep17` branch, which fixed
+        it for the six-speed. THE SAME GUARD IS CARRIED HERE DELIBERATELY: this
+        branch does not have that commit, and shipping an eight-speed with a bare
+        speed ladder would reintroduce the same defect with a TALLER top gear
+        (0.640 x 3.150 = 2.016 overall, against the old 0.68 x 3.4 = 2.312).
+        Fixing a gearbox by making it more wrong is not an option. When the
+        branches merge, this rule and mistake 17's are the same rule.
+        """
+        ups = self._upshift_speeds()
+        g = 0
+        for i, v_up in enumerate(ups):
+            if v_mps >= v_up:
+                g = i + 1
+        if force_n is None:
+            return g
+        ceiling = self.SHIFT_LOAD * self.PEAK_TORQUE_NM
+        while g > 0:
+            ratio = self.gears[g] * self.final_drive
+            if force_n * self.wheel_r / max(ratio, .1) / 0.92 <= ceiling:
+                break
+            lower = self.gears[g - 1] * self.final_drive
+            if v_mps / self.wheel_r * lower * 60.0 / (2 * np.pi) > self.SHIFT_RPM_MAX:
+                break
+            g -= 1
+        return g
 
     def demand(self, v_mps, accel, grade):
         f = (self.mass * accel
              + 0.5 * 1.2 * self.cd_a * v_mps ** 2
              + self.crr * self.mass * 9.81 * np.cos(np.arctan(grade))
              + self.mass * 9.81 * np.sin(np.arctan(grade)))
-        g = self.gear_for(v_mps)
+        g = self.gear_for(v_mps, force_n=f)
         ratio = self.gears[g] * self.final_drive
         torque = f * self.wheel_r / max(ratio, .1) / 0.92
         rpm = float(np.clip(v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi), 800.0, 6500.0))

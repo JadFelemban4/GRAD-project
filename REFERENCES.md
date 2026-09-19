@@ -105,6 +105,91 @@ recorded about its own car.
 > it may be cited; the official alternative is the BMW-authored MTZ article in
 > section 7, which nobody has opened past its abstract.
 
+
+---
+
+## 2b. The gearbox — ZF 8HP51 (added 19 September 2026)
+
+The vehicle model ran a **generic six-speed with invented ratios** until today
+(3.6 / 2.1 / 1.4 / 1.0 / 0.82 / 0.68 on a 3.4 final drive). No source, and not
+the transmission in the car. It is now the real one.
+
+### CONFIRMED — Toyota publishes the whole ratio set
+
+| gear | ratio | | gear | ratio |
+|---|---|---|---|---|
+| 1st | 5.250 | | 5th | 1.316 |
+| 2nd | 3.360 | | 6th | 1.000 |
+| 3rd | 2.172 | | 7th | 0.822 |
+| 4th | 1.720 | | 8th | 0.640 |
+| reverse | 3.712 | | **final drive** | **3.150** |
+
+Toyota's own technical specification sheet names the unit **"8-speed Sports
+Automatic 8HP 51"** and prints all of the above:
+[media.toyota.co.uk](https://media.toyota.co.uk/wp-content/uploads/sites/5/pdf/220605M-GR-Supra-Tech-Spec.pdf)
+— **CONFIRMED**, opened 19 September 2026.
+
+**The final drive is confirmed twice, on two different power outputs.** That
+sheet is the 250 kW / 11.0:1 European car; Toyota USA's pressroom gives 3.15 for
+the automatic on the **382 hp** car, which is this one:
+[pressroom.toyota.com](https://pressroom.toyota.com/vehicle/2025-toyota-gr-supra/)
+— **CONFIRMED**. So the final drive is not variant-sensitive and the open
+question in section 2 about which car this is does not reach the driveline.
+
+### CONFIRMED BY OUR OWN CAR — and this is the stronger evidence
+
+The ratios are not merely cited, they are **measured**. Engine speed and road
+speed give the overall ratio the car is actually running, sample by sample:
+
+> **86.7 % of 79 105 moving samples land within 4 % of one of the eight
+> published ratios**, and the inferred gears cluster at every one of them
+> (8th: 32 376 samples, 7th: 7 309, 6th: 8 189, 5th: 9 182, 4th: 7 551,
+> 3rd: 3 598).
+
+A spec sheet says what the car should have. This says what it has.
+
+**It also excludes the alternative.** Toyota offered the 3.0 with a six-speed
+manual, whose top gear is 0.846 x 3.46 = **2.927** overall. The car's measured
+top-gear ratio is **1.998**, which matches the 8HP51's 8th (2.016) to 0.9 % and
+matches nothing on the manual. The car is the automatic.
+
+### UNVERIFIED — two figures in circulation that ZF does not publish
+
+| figure | status |
+|---|---|
+| torque capacity **~560 Nm** | **UNVERIFIED.** ZF's product page gives the 8HP FAMILY a range of 220–1000 Nm and no per-variant figure. 560 is widely repeated with no primary source found. |
+| weight **~77 kg** | **UNVERIFIED.** ZF publishes **87 kg**, and for the **8HP70**, not the 8HP51. |
+| ratio spread **7.0** | **DO NOT CITE FOR THIS SET.** ZF publishes 7.0 for the family; 5.250 / 0.640 = **8.20**. The spread quoted by ZF is not the spread of the ratios Toyota prints. |
+
+The 560 Nm figure is worth chasing because it is interesting if true: the engine
+makes 500 Nm, so a stock car sits at ~89 % of the gearbox's rated limit and any
+tune passes it. **That is a good sentence for the thesis and a bad one to write
+without a source.** ZF product literature for the 8HP51 specifically, or a BMW
+or Toyota service document, would settle it.
+[zf.com](https://www.zf.com/products/en/cars/products_64238.html)
+
+### ASSUMED — the shift schedule, and only the schedule
+
+Neither Toyota nor ZF publishes when the box changes gear. Two parameters carry
+that, both declared in `engine_env.Vehicle`:
+
+- **`UPSHIFT_MIN_RPM` = 2000** — calibrated against the car's own inferred gear,
+  not guessed. A speed-only schedule tops out at **~47 % exact-gear agreement**
+  for any threshold, because a real automatic shifts on throttle and load too;
+  2000 rpm is where the model stops sitting a gear high (bias +0.28, **79.7 %
+  within one gear**). Quote "within one gear", and say it is a coarse model of
+  the shift logic on a gearbox whose ratios are exact.
+- **`SHIFT_LOAD` = 0.75** — a 25 % torque reserve before handing back a gear.
+  Ordinary automatic calibration; no source opened for this vehicle's.
+
+### ASSUMED — the torque converter is modelled as LOCKED
+
+It is a torque-**converter** automatic, so below lock-up it multiplies torque and
+slips. ZF and Toyota publish no stall ratio, no K-factor and no lock-up
+schedule, so any converter curve would be an invented parameter. The scenarios
+this environment runs are steady high-speed climbs where a real 8HP is locked,
+so a 1:1 locked converter is both the right approximation and the honest one.
+**Say "converter assumed locked" wherever the gearbox is described.**
 ---
 
 ## 3. The eleven validation bands — status after the 14 September pass

@@ -188,7 +188,12 @@ with no preview, which currently BEATS the predictive one by 2.2 points.
 
 ---
 
-## Sixteen mistakes already made. Do not remake them.
+## Eighteen mistakes already made. Do not remake them.
+
+*(**17 is not in this file.** It is the gearbox upshifting mid-climb, and it
+lives on the `JMF-2340550-sep17` branch, which this one has not merged yet.
+The numbering is kept so the two agree when they do. Mistake 18's fix carries
+17's guard deliberately — see `engine_env.Vehicle.gear_for`.)*
 
 ### 1. THE SIMULATION WAS THE WRONG ENGINE FOR THREE WEEKS
 
@@ -960,6 +965,61 @@ sentence built from them was not.** Both halves now count the same population.
 For the record: **573 pinned samples across 7 of the 10 raw logs; 517 across 5
 once the warm filter has run.**
 
+
+### 18. `Actual gear` CLAMPS AT 6 ON AN EIGHT-SPEED — a fourth misread channel
+
+Found 19 September 2026, while fitting the real gearbox. It is mistakes 2, 7 and
+13 in one channel: a name that is not what it says, **and** a range limit that
+keeps reporting past it.
+
+The vehicle model ran a generic six-speed with invented ratios until today. The
+car has a **ZF 8HP51**, an eight-speed torque-converter automatic, and Toyota
+publishes every ratio (REFERENCES.md section 2b). Fitting it raised an obvious
+check: the logs carry `Actual gear`, so compare.
+
+**`Actual gear` never exceeds 6, on any drive.** Across 45 606 moving samples
+from eight drives it reports 1 to 6 and nothing above. Taken at face value that
+says the car is the six-speed manual.
+
+**It is not.** Engine speed and road speed give the overall ratio the car is
+actually running, and within the samples the channel labels "gear 6" there are
+**three sharp clusters**:
+
+| overall ratio | samples | what it is |
+|---|---|---|
+| ~2.016 | 19 290 (59.3 %) | **8th** (0.640 x 3.150) |
+| ~2.589 | 5 406 (16.6 %) | **7th** (0.822 x 3.150) |
+| ~3.15 | 4 833 (14.9 %) | 6th (1.000 x 3.150) |
+
+The channel reports the true gear for 1st to 6th and then **saturates**, calling
+7th and 8th "6" as well. Three quarters of the samples it labels top gear are
+not in top gear.
+
+**What it would have cost.** Anything scheduled on that channel — a gear-aware
+filter, a shift-transient exclusion, a per-gear table — silently pools three
+ratios spanning 2.016 to 3.15, a **56 % spread**, under one label. The knock
+retard figure in the limitations section is filtered "to steady gear" using it.
+That filter still works, because it only asks whether the gear CHANGED, and a
+clamped channel still changes at every shift below 6th; but it cannot see a 6-7
+or 7-8 shift at all, so the figure includes shift transients it was meant to
+remove. **Re-derive it from the inferred gear before quoting the p99 again.**
+
+**The fix is not to repair the channel but to stop needing it.** Overall ratio
+from rpm and road speed recovers the true gear directly, and it validates the
+ratio set at the same time: **86.7 % of 79 105 moving samples land within 4 % of
+one of the eight published ratios.** That is a better measurement than the
+channel would have been even if it worked.
+
+**Fourth channel on this car that is not what its name says**, after the
+pre-throttle pressure sold as manifold pressure, the MAF that saturates while
+still reporting, and the compressor outlet sold as charge temperature. The rule
+from mistake 13 now has four instances behind it: **treat every channel name as
+a hypothesis, and check the range as well as the meaning.**
+
+*(The tell was available without any of this analysis: the car is an
+eight-speed and the channel's maximum is 6. A channel whose maximum equals a
+round number that is ALSO a plausible count is the easiest kind of saturation to
+miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
 ---
 
 ## Known limitations to state in the thesis, not fix quietly
@@ -1116,15 +1176,24 @@ once the warm filter has run.**
   cited to BMW. It is also a third reason the radiator cannot be identified
   from the logs: the radiator branch opening is a commanded valve angle, not a
   function of coolant temperature. See `REFERENCES.md` section 2.
-- **The compression ratio follows the engine version, not the model year.**
-  Manufacturer sheets on both the BMW and Toyota sides print 10.2:1 next to
-  the engine code B58B30O1 (the 285 kW / 382 hp engine), which is what the
-  plant uses. But Toyota UK's own sheets print 11.0:1 for the 250 kW / 340 PS
-  GR Supra 3.0 sold in Europe through at least 2024. **Nobody has yet
-  recorded which version this car is.** One look at its rated output on the
-  registration or compliance plate settles it; if it is the 250 kW car the
-  knock model is running the wrong compression ratio. `REFERENCES.md`
-  section 2.
+- **The compression ratio question is SETTLED: this is the 285 kW car, so
+  10.2:1 is right.** Confirmed by the team on 19 September 2026 — the car is the
+  285 kW / ~386 hp B58B30O1, which is the engine every manufacturer sheet prints
+  10.2:1 beside, and which is what `plant.py` runs. The 11.0:1 that Toyota UK's
+  sheets print belongs to the **250 kW / 340 PS** European variant and does not
+  apply here.
+
+  <!-- RETIRED-OK -->
+  This entry read "Nobody has yet recorded which version this car is" until
+  19 September, and warned that if it were the 250 kW car the knock model would
+  be running the wrong compression ratio. It is not, and the knock model's
+  compression ratio is correct. **That does not rescue the knock model** — see
+  the section below: its integral still has no detectable relationship with the
+  car's own retard, and now that the compression ratio is excluded as the
+  explanation, the remaining candidates are the Douaud-Eyzat tuning, the charge
+  temperature or pressure under boost, or the assumption that `Actual ignition
+  angle` is the final commanded angle. **Excluding a suspect is progress; it is
+  not a fix.**
 
 
 ### THE KNOCK MODEL IS NOT VALIDATED AGAINST THIS CAR, AND THE DATA SAYS SO
