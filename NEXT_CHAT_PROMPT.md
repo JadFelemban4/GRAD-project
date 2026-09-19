@@ -27,6 +27,25 @@ Ten SAC agents were trained on 19 September — 5 sighted, 5 blinded, 50k steps,
 protect against, so they cannot settle Phase D. They are in runs/ and are kept as
 a record, not as a result.
 
+The scenario now DEFAULTS to 12 % at 130 km/h and the constraint binds. With
+load, every hand-written policy does real work:
+
+    baseline ECU (true neutral)   damage 959.8   peak 884 C
+    reactive protection                  679.0   cuts 29.3 %
+    current-grade protection             633.2   cuts 34.0 %
+    predictive protection                637.4   cuts 33.6 %
+
+    preview over current-grade: -0.4 points -- the closest to level it has been
+
+WHY ELEVATION IS IN THE SCENARIO, and it is not a modelling convenience: the
+car's own logs CANNOT load the engine. Median relative air filling is 24-40 %
+per drive and only 2.0 % of 79 134 moving samples exceed 120 %. The driving is
+fast -- median 95-137 km/h -- but it is straight-line flat-road cruising, which
+asks for drag and rolling resistance and nothing else. Flat road at 90 km/h
+leaves the turbine at 335 C against an 850 C trigger; 12 % at 130 km/h reaches
+884 C. NO AMOUNT OF FURTHER LOGGING WILL FIX THAT -- the duty cycle is wrong,
+not the model.
+
 DO THESE, IN THIS ORDER
 
 1. MERGE origin/JMF-2340550-sep17 into JMF-2340550. They are twelve commits
@@ -41,8 +60,11 @@ DO THESE, IN THIS ORDER
    the six-speed, this branch carried it into the eight-speed deliberately. Keep
    the eight-speed and sep17's constants.
 
-2. ADOPT THE LOCKED SCENARIO HERE: make_grade_climb(..., v_kmh=130.0). Do not
-   treat this as a tuning decision — it was locked before results existed.
+2. (ALREADY DONE on 19 September — verify it survived the merge.)
+   make_grade_climb now DEFAULTS to 12 % at 130 km/h. sep17 locked that on
+   18 September before any training existed, so adopting it was catching up to
+   a decision, not tuning one. Confirm after merging that the default is still
+   130 and that its docstring is intact.
 
 3. RETRAIN AT 130. Ten runs, 5 seeds each way:
        python train.py --steps 50000 --seed 0..4

@@ -39,44 +39,60 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
-## Current state — 19 September 2026 (the real gearbox, and the scenario finally binds)
+## Current state — 19 September 2026 (the real gearbox, and the scenario is loaded)
 
-> ### THE BLOCKER IS GONE, AND THE GEARBOX IS WHY
+> ### THE SCENARIO IS LOCKED AT 12 % / 130 km/h, AND IT BINDS
 >
-> The standard scenario has not bound the protection trigger since the
-> 16 September audit fixes. It does now. Fitting the car's real transmission —
-> a **ZF 8HP51**, eight speeds, where the model had an invented six-speed —
-> holds 7th on the climb instead of top gear, so rpm and exhaust flow rise:
+> `make_grade_climb` now defaults to **130 km/h** (it was 110 on this branch).
+> That is the value `sep17` locked on 18 September, **before any training run
+> existed**, so adopting it is not tuning.
 >
-> | scenario | peak turbine | share of episode above 850 C |
-> |---|---|---|
-> | 110 km/h, 12 % — this branch's default | 839.7 C | **0.0 %** |
-> | **130 km/h, 12 % — the scenario `sep17` locked** | **884.0 C** | **66.3 %** |
+> **Why elevation has to be in the scenario at all: the car's own logs cannot
+> load the engine.** Over 79 134 moving samples from the ten drives, median
+> relative air filling per drive is **24–40 %**, and only **2.0 %** of samples
+> exceed 120 %. The driving is fast — median 95–137 km/h, peaks past 200 — but
+> it is straight-line motorway cruising on flat road, which asks for drag and
+> rolling resistance and nothing else. **No amount of further logging will
+> exercise the thermal model's hot region. The duty cycle is wrong, not the
+> model.** A flat road at 90 km/h leaves the turbine at 335 °C against an
+> 850 °C trigger; 6 % of grade gets it to 541 °C; it takes 12 % at 130 km/h to
+> reach the knee.
 >
-> **It bound by the model becoming more correct, not by a knob being turned.**
-> The 130 km/h lock was decided on 18 September BEFORE any training existed.
+> **What the loaded scenario now shows** (`check_premise.py`, hand-written
+> policies, and read AUDIT.md C1/C3 before quoting any of it):
 >
-> **THE NEXT ACTION IS TO RETRAIN AT 130 km/h.** Ten agents were trained on
-> 19 September at 110, where nothing binds, so they trained with nothing to
-> protect against. Those runs are in `runs/` and they cannot settle Phase D.
-> 173 min per run, ten runs, one machine-night.
+> | policy | damage | cuts | peak turbine |
+> |---|---|---|---|
+> | baseline ECU (true neutral) | 959.8 | — | **884 °C** |
+> | reactive protection | 679.0 | 29.3 % | 862 °C |
+> | current-grade protection | 633.2 | **34.0 %** | 861 °C |
+> | predictive protection | 637.4 | 33.6 % | 861 °C |
+>
+> **Every policy now does real work** — the reactive row is no longer the
+> baseline row. **Preview is worth −0.4 points against current-grade**, which is
+> the closest to level it has ever been. The question is finally open rather
+> than trivially negative, and only a TRAINED pair can settle it.
+>
+> **THE NEXT ACTION IS TO RETRAIN AT 130 km/h.** The ten agents trained on
+> 19 September trained at 110, where nothing binds; they are kept as a record,
+> not a result. 173 min per run, ten runs, one machine-night.
 
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 1.4 % load residual, zero fitted parameters, over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. Read mistake 12 before quoting it |
-| C · get an agent to learn | **ran for the first time on this branch.** Ten SAC agents, 50 k steps, 173 min each — **on the wrong scenario**. Retrain at 130 km/h |
-| D · baselines and the ablation | **protocol exists** (`evaluate.py`, twenty frozen episodes, from `sep17`). No valid result yet on this branch |
+| B · match the simulator to the car | **passed** — 1.4 % load residual, zero fitted parameters, 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. Read mistake 12 before quoting it |
+| C · get an agent to learn | **ran.** Ten SAC agents, 50 k steps, 173 min each — **on the unloaded 110 km/h scenario**. Retrain at 130 |
+| D · baselines and the ablation | **protocol exists** (`evaluate.py`, twenty frozen episodes). No valid result yet |
 | E · battery plant | not started |
-| F · the H/τ sweep | not measurable while the scenario is in flux |
+| F · the H/τ sweep | measurable again now the scenario binds, but not before D |
 | G · writing | not started |
 | APP · the live supervisor | works, 49 of 49 replay checks. A SECOND deliverable — it does not advance D |
 
-**Where this branch sits relative to `sep17`.** `origin/JMF-2340550-sep17` holds
-twelve commits this branch does not — mistake 17, the locked scenario, the first
-Phase D point. This branch holds the tenth drive, the runtime 3 L verification,
-the ZF 8HP51 and mistake 18. **They must be merged before Phase D is reported.**
-`evaluate.py` has been cherry-picked across already.
+**Where this branch sits relative to `sep17`.** Twelve commits apart.
+`sep17` has mistake 17 and Phase D's first point; this branch has the tenth
+drive, the runtime 3 L verification, the ZF 8HP51, mistake 18 and the loaded
+scenario. **Merge before reporting Phase D.** `evaluate.py` is cherry-picked
+across already.
 
 **Where the app sits, and what it must not be allowed to become.** The app is
 the demonstrable, showable half of this project and it will be the first thing

@@ -801,11 +801,55 @@ class SupervisoryTunerEnv(gym.Env):
 
 
 # ------------------------------------------------------------------ cycles
-def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=110.0):
+def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.0):
     """Sustained mountain grade at motorway speed, 42 C ambient.
 
-    THE DEFAULTS CHANGED ON 8 SEPTEMBER, AND THE REASON IS THE ENGINE.
+    ========================================================================
+    THIS IS PHASE D'S EVALUATION SCENARIO AND IT IS LOCKED.
+    12 % at 130 km/h, 42 C. Decided by the team on 18 September 2026 on the
+    `sep17` branch, BEFORE any training run existed, and adopted here on
+    19 September. DO NOT CHANGE IT AFTER SEEING A RESULT -- that is the one
+    mistake this project cannot recover from.
+    ========================================================================
 
+    WHY ELEVATION IS IN THE SCENARIO AT ALL, and it is not a modelling
+    convenience. THE CAR'S OWN LOGS CANNOT LOAD THE ENGINE. Measured over
+    79 134 moving samples from the ten drives:
+
+        median relative air filling, per drive     24 - 40 %
+        samples above 120 % relative filling       1 563  (2.0 %)
+
+    The driving is FAST -- median 95 to 137 km/h, peaks past 200 -- but it is
+    straight-line motorway cruising on flat road, and a flat road at constant
+    speed asks for aerodynamic drag and rolling resistance and nothing else.
+    That is why the car never gets hot, and it is why no amount of further
+    logging will exercise the thermal model's hot region: the duty cycle is
+    wrong, not the model.
+
+    A 12 % grade is what supplies the missing load. At 130 km/h it asks the
+    engine for roughly 340 Nm continuously, which is 68 % of the B58's 500 Nm
+    and enough to hold the turbine above its damage knee.
+
+    v_kmh WAS 110 ON THIS BRANCH UNTIL 19 SEPTEMBER, AND 110 DOES NOT BIND.
+    Measured with the real ZF 8HP51 gearbox:
+
+        110 km/h, 12 %    peak turbine 839.7 C     0.0 % of the episode above 850 C
+        130 km/h, 12 %    peak turbine 884.0 C    66.3 % above 850 C
+
+    At 110 the baseline never reaches the trigger, so the protecting policies
+    have nothing to protect against and a preview advantage measured there is
+    noise. Ten agents were trained at 110 on 19 September before this was
+    noticed; those runs are kept as a record and are not a Phase D result.
+
+    THE GEARBOX IS WHY IT BINDS NOW. The model carried a generic six-speed with
+    invented ratios until 19 September; the car has a ZF 8HP51. The real box
+    holds 7th on the climb (2.589 overall) where the invented one sat in top
+    (2.312), so rpm and exhaust flow both rise. The scenario began binding
+    because the MODEL BECAME MORE CORRECT, not because anything was tuned to
+    make it bind -- and that distinction is the whole reason this docstring is
+    this long.
+
+    THE DEFAULTS CHANGED ON 8 SEPTEMBER TOO, AND THE REASON WAS THE ENGINE.
     They were 10 % at 90 km/h, which asks a 1520 kg car for 244 Nm. That loaded
     the 2.0 L four-cylinder this file used to simulate by mistake. The real
     B58 makes 500 Nm and answers 244 Nm at about 130 kPa -- well inside its

@@ -791,3 +791,48 @@ build_dataset.py  295.0 min, 10 drives, 26 operating points
 - **No merge with `sep17`.** Twelve commits still apart.
 - **The 850 °C trigger is still unverifiable on this car.** Its only exhaust
   channel is modelled, post-catalyst and clamped at 645.3 °C.
+
+### Later the same day — the scenario is loaded, and the logs explain why it had to be
+
+**`make_grade_climb` now defaults to 130 km/h**, the value `sep17` locked on
+18 September before any training existed. Adopting it is not tuning; it is
+catching up to a decision already made.
+
+**Why elevation belongs in the scenario at all.** The car's own logs cannot load
+the engine, and this is measured rather than asserted — over 79 134 moving
+samples from the ten drives:
+
+| | |
+|---|---|
+| median relative air filling, per drive | **24–40 %** |
+| samples above 120 % relative filling | 1 563 of 79 134 — **2.0 %** |
+| median road speed, per drive | 95–137 km/h, peaks past 200 |
+
+**The driving is fast but not loaded.** Straight-line motorway cruising on flat
+road asks for aerodynamic drag and rolling resistance and nothing else. No
+amount of further logging will exercise the thermal model's hot region — the
+duty cycle is wrong, not the model. Measured on the simulator:
+
+| speed | grade | peak turbine |
+|---|---|---|
+| 90 km/h | 0 % | **335.4 °C** |
+| 90 km/h | 6 % | 540.6 °C |
+| 90 km/h | 12 % | 717.0 °C |
+| 130 km/h | 12 % | **884.0 °C — binds, 66.3 % of the episode** |
+
+**What the loaded scenario shows.** `check_premise.py`, hand-written policies:
+
+| policy | damage | cuts | peak turbine |
+|---|---|---|---|
+| baseline ECU (true neutral) | 959.8 | — | 884 °C |
+| reactive protection | 679.0 | 29.3 % | 862 °C |
+| current-grade protection | 633.2 | **34.0 %** | 861 °C |
+| predictive protection | 637.4 | 33.6 % | 861 °C |
+
+**Every policy does real work now** — the reactive row is no longer a copy of
+the baseline row, which it was at 110 km/h. **Preview is −0.4 points against
+current-grade**, the closest to level it has been. The question is open rather
+than trivially negative, and only a trained pair can settle it.
+
+`test_reward.py` 4 of 4 on the loaded scenario, neutral **−0.00038**.
+`verify_docs.py` 38 of 38. `validate.py` 8 of 11. `app.test_replay` 49 of 49.

@@ -18,7 +18,8 @@ merged — see Part 0, it matters. `git log 926b6f5..HEAD` is this session.
 | **The compression-ratio question is settled.** | The car is the 285 kW / ~386 hp B58B30O1, so `plant.py`'s 10.2:1 is right. |
 | **Phase C ran — ten agents trained.** | 5 sighted, 5 blinded, 50 k steps, **173 min each**. And **11 episodes each**, exactly as the arithmetic predicted. |
 | **The scenario blocker is GONE — because of the gearbox.** | At the locked **130 km/h** the real ZF 8HP51 reaches **884.0 °C** and spends **66.3 % of the episode above the trigger**. At 110 it never binds. |
-| **But the agents trained at the wrong speed.** | This branch's default is 110 km/h, which does not bind. **They trained with nothing to protect against.** Retrain at 130. |
+| **But the agents trained at the wrong speed.** | This branch's default was 110 km/h, which does not bind. **They trained with nothing to protect against.** Retrain at 130. |
+| **The scenario is now loaded, and locked.** | Default is 12 % at **130 km/h**. With load every policy does real work, and **preview is −0.4 pts against current-grade** — the closest to level it has been. |
 | **"I can't reach that temperature" — investigated.** | The 850 °C trigger sits inside the 825–925 °C band production ECUs use. But **nothing on this car can check it**, and that is now written down. |
 
 > **Correction, made while writing this.** The scenario figures below are at
@@ -355,3 +356,61 @@ gearbox. It is beginning to look like a result rather than a defect.
    policies were scored in.
 5. **Merge `sep17`.** This branch cannot score Phase D without `evaluate.py` and
    its twenty locked episodes.
+
+---
+
+# Part 8 · The scenario is loaded now, and the logs are why it had to be
+
+Added after the training runs finished.
+
+## 8.1 · The car's own logs cannot load the engine — measured
+
+| | |
+|---|---|
+| median relative air filling, per drive | **24–40 %** |
+| samples above 120 % relative filling | **1 563 of 79 134 — 2.0 %** |
+| median road speed, per drive | 95–137 km/h, peaks past 200 |
+
+**The driving is fast but not loaded.** Straight-line motorway cruising on flat
+road asks for aerodynamic drag and rolling resistance and nothing else. **No
+further logging will exercise the thermal model's hot region** — and that is the
+real answer to "I can't reach that temperature". The duty cycle is wrong, not
+the model.
+
+## 8.2 · What elevation is worth, on the simulator
+
+| speed | grade | peak turbine | verdict |
+|---|---|---|---|
+| 90 km/h | 0 % | **335.4 °C** | flat — nothing to protect |
+| 90 km/h | 6 % | 540.6 °C | still nothing |
+| 90 km/h | 12 % | 717.0 °C | still nothing |
+| 110 km/h | 12 % | 839.7 °C | 10.2 K short |
+| **130 km/h** | **12 %** | **884.0 °C** | **binds, 66.3 % of the episode** |
+
+## 8.3 · The scenario now defaults to 12 % at 130 km/h
+
+`sep17` locked that on 18 September, **before any training existed**, so
+adopting it here is catching up to a decision already made rather than tuning
+one. `make_grade_climb`'s docstring carries the whole argument, including the
+110 km/h figures it replaces.
+
+## 8.4 · With load, every policy does real work
+
+`check_premise.py`, hand-written policies, read AUDIT.md C1/C3 before quoting:
+
+| policy | damage | cuts | peak turbine |
+|---|---|---|---|
+| baseline ECU (true neutral) | 959.8 | — | 884 °C |
+| reactive protection | 679.0 | 29.3 % | 862 °C |
+| current-grade protection | 633.2 | **34.0 %** | 861 °C |
+| predictive protection | 637.4 | 33.6 % | 861 °C |
+
+**The reactive row is no longer a copy of the baseline row.** At 110 km/h it was
+— the policy never acted because the trigger was never reached. **Preview is
+−0.4 points against current-grade**, the closest to level it has ever been.
+
+That is the healthiest state this experiment has been in: everything is doing
+work, and the preview question is genuinely open. **Only a trained pair can
+settle it, and that is the next run.**
+
+`test_reward.py` 4 of 4 on the loaded scenario, neutral −0.00038.

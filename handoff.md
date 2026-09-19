@@ -43,6 +43,16 @@ model and therefore cannot validate it.
 > **884.0 °C** and spends **66.3 %** of the episode above the 850 °C trigger.
 > At this branch's 110 km/h default it never binds at all.
 >
+> **The scenario now defaults to 130 km/h** — `sep17`'s lock, adopted here on
+> 19 September. At 110 the baseline never reached the trigger; at 130 it spends
+> 66.3 % of the episode above it and every protecting policy does real work
+> (reactive cuts damage 29.3 %, current-grade 34.0 %, predictive 33.6 %).
+>
+> **Why elevation is in the scenario:** the car's own logs cannot load the
+> engine. Median relative filling is 24–40 % per drive and only 2.0 % of
+> samples exceed 120 %. Flat road at 90 km/h leaves the turbine at 335 °C
+> against an 850 °C trigger. **The duty cycle is wrong, not the model.**
+>
 > **Ten agents were trained on 19 September at 110 km/h — the wrong speed.**
 > They had nothing to protect against. The runs are in `runs/`; they cannot
 > settle Phase D. **Retrain at 130.**
