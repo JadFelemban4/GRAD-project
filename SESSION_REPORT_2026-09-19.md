@@ -16,7 +16,9 @@ merged — see Part 0, it matters. `git log 926b6f5..HEAD` is this session.
 | **The gearbox is the real one.** | ZF 8HP51, eight speeds, Toyota's published ratios — and **the car's own logs confirm them to 0.9 %**. |
 | **A fourth channel is not what its name says.** | `Actual gear` **clamps at 6** on an eight-speed. Three quarters of what it calls top gear is 7th or 8th. |
 | **The compression-ratio question is settled.** | The car is the 285 kW / ~386 hp B58B30O1, so `plant.py`'s 10.2:1 is right. |
-| **Phase C is running.** | Ten SAC runs in flight — 5 sighted, 5 blinded, 50 k steps each. |
+| **Phase C ran — ten agents trained.** | 5 sighted, 5 blinded, 50 k steps, **173 min each**. And **11 episodes each**, exactly as the arithmetic predicted. |
+| **The scenario blocker is GONE — because of the gearbox.** | At the locked **130 km/h** the real ZF 8HP51 reaches **884.0 °C** and spends **66.3 % of the episode above the trigger**. At 110 it never binds. |
+| **But the agents trained at the wrong speed.** | This branch's default is 110 km/h, which does not bind. **They trained with nothing to protect against.** Retrain at 130. |
 | **"I can't reach that temperature" — investigated.** | The 850 °C trigger sits inside the 825–925 °C band production ECUs use. But **nothing on this car can check it**, and that is now written down. |
 
 > **Correction, made while writing this.** The scenario figures below are at
@@ -218,7 +220,7 @@ includes transients it was meant to remove. **Re-derive before quoting it.**
 
 ---
 
-# Part 4 · Phase C — ten runs in flight
+# Part 4 · Phase C — ten agents trained, and why they cannot settle Phase D
 
 ```bash
 python train.py --steps 50000 --seed 0..4            # sighted
@@ -231,7 +233,36 @@ minutes, so **under 3.3 steps/s per run** and roughly **4 hours** for all ten.
 Aggregate throughput is ~33 steps/s against 9.4 solo, so running them together
 is the right call on this machine.
 
-**Results are not in this report.** They land in `runs/` and go in the next one.
+**All ten finished: 173 minutes each, 11 episodes each.** First checkpoint at
+06:34:55 from a 05:58 launch, i.e. 10 000 steps in 37 min ~= 4.5 steps/s per run
+while ten shared the machine. Aggregate ~45 steps/s against 9.4 solo, so running
+them together was the right call.
+
+## 4.0 · THE RESULT CANNOT SETTLE PHASE D, AND HERE IS WHY
+
+The scenario they trained on **does not bind**. This branch's `make_grade_climb`
+defaults to **110 km/h**, where the baseline peaks at 839.7 °C against an 850 °C
+trigger and spends **0.0 %** of the episode above it.
+
+**So the agents trained with nothing to protect against.** Whatever they learned,
+it was not protection, and a preview advantage measured on it would be noise.
+
+The fix is already known and is not a tuning decision: `sep17` locked the
+scenario at **130 km/h** on 18 September, before any training existed. With the
+real ZF 8HP51 that scenario now **binds hard**:
+
+| scenario | peak turbine | above the trigger |
+|---|---|---|
+| 110 km/h, 12 % (what they trained on) | 839.7 °C | **0.0 %** |
+| **130 km/h, 12 % (the locked one)** | **884.0 °C** | **66.3 %** |
+
+**The gearbox is what did that.** The invented six-speed sat in a 2.312 overall
+ratio; the real box holds 7th at 2.589, so rpm and exhaust flow both rise. The
+scenario blocker this project has carried since the audit is gone — and it went
+by the model becoming more correct, not by a knob being turned.
+
+**Next action is unambiguous: retrain at 130 km/h.** 173 min per run, ten runs,
+one machine-night.
 
 ## 4.1 · The budget is too small, and here is the arithmetic
 

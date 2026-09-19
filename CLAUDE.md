@@ -39,18 +39,44 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
-## Current state — 16 September 2026 (after v19, the live app, and its hardening)
+## Current state — 19 September 2026 (the real gearbox, and the scenario finally binds)
+
+> ### THE BLOCKER IS GONE, AND THE GEARBOX IS WHY
+>
+> The standard scenario has not bound the protection trigger since the
+> 16 September audit fixes. It does now. Fitting the car's real transmission —
+> a **ZF 8HP51**, eight speeds, where the model had an invented six-speed —
+> holds 7th on the climb instead of top gear, so rpm and exhaust flow rise:
+>
+> | scenario | peak turbine | share of episode above 850 C |
+> |---|---|---|
+> | 110 km/h, 12 % — this branch's default | 839.7 C | **0.0 %** |
+> | **130 km/h, 12 % — the scenario `sep17` locked** | **884.0 C** | **66.3 %** |
+>
+> **It bound by the model becoming more correct, not by a knob being turned.**
+> The 130 km/h lock was decided on 18 September BEFORE any training existed.
+>
+> **THE NEXT ACTION IS TO RETRAIN AT 130 km/h.** Ten agents were trained on
+> 19 September at 110, where nothing binds, so they trained with nothing to
+> protect against. Those runs are in `runs/` and they cannot settle Phase D.
+> 173 min per run, ten runs, one machine-night.
 
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.837), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
-| C · get an agent to learn | **next.** `train.py` exists, nothing has been trained yet |
-| D · baselines and the ablation | not started. This is the floor of the project |
-| E · battery plant | not started. `battery.py` does not exist |
-| F · the H/τ sweep | preliminary result only, from hand-written policies |
+| B · match the simulator to the car | **passed** — 1.4 % load residual, zero fitted parameters, over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. Read mistake 12 before quoting it |
+| C · get an agent to learn | **ran for the first time on this branch.** Ten SAC agents, 50 k steps, 173 min each — **on the wrong scenario**. Retrain at 130 km/h |
+| D · baselines and the ablation | **protocol exists** (`evaluate.py`, twenty frozen episodes, from `sep17`). No valid result yet on this branch |
+| E · battery plant | not started |
+| F · the H/τ sweep | not measurable while the scenario is in flux |
 | G · writing | not started |
-| **APP · the live supervisor** | **runs, and has six known bugs.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its own suite passes 46 of 46 — and the 14 September audit found six defects in it anyway, one of them feeding the driver-facing alerts. **Read `AUDIT.md`, and the audit section below, before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
+| APP · the live supervisor | works, 49 of 49 replay checks. A SECOND deliverable — it does not advance D |
+
+**Where this branch sits relative to `sep17`.** `origin/JMF-2340550-sep17` holds
+twelve commits this branch does not — mistake 17, the locked scenario, the first
+Phase D point. This branch holds the tenth drive, the runtime 3 L verification,
+the ZF 8HP51 and mistake 18. **They must be merged before Phase D is reported.**
+`evaluate.py` has been cherry-picked across already.
 
 **Where the app sits, and what it must not be allowed to become.** The app is
 the demonstrable, showable half of this project and it will be the first thing
@@ -1452,20 +1478,31 @@ not a result.
 
 ## What to do next, in order
 
-1. `python check_premise.py` — confirm the environment works at all.
-2. `pip install "stable-baselines3[extra]"`, then
-   `python train.py --steps 50000 --seed 0`. Expect a poor result; it running is
-   the point. **About 4.6 hours on one CPU core** — measured, not guessed: the
-   environment runs at 19.5 steps/s alone and 3.0 steps/s once SAC's gradient
-   updates are included. The old "1.5 hours" came from a formula optimistic by
-   3.6x. Plan an overnight, not an evening. Checkpoints land every 10 000 steps.
-3. `python test_reward.py` before trusting any training curve.
-4. Five seeds, one per team member, overnight — `--seed 0` through `--seed 4`.
-   Then the same five with `--no-preview`. That is Phase D's input.
-5. Phase D: three baselines, one fixed evaluation protocol of 20 episodes,
-   median and interquartile range over five seeds. **Once the 20 episodes are
-   fixed they never change.** Changing the test set after seeing results is the
-   one mistake this project cannot recover from.
+**Read this first: the scenario changed on 19 September and it now BINDS.**
+Everything below assumes the 130 km/h lock. See the current-state box at the top.
+
+1. **Merge `origin/JMF-2340550-sep17`.** Twelve commits, including mistake 17 and
+   Phase D's first point. Nothing below is reportable until the branches are one.
+2. **Adopt the locked scenario here**: `make_grade_climb(..., v_kmh=130.0)`.
+   It was decided 18 September before any training existed; adopting it is not
+   tuning. At 110 the trigger is never reached and the agent has nothing to learn.
+3. **Retrain at 130.** `python train.py --steps 50000 --seed 0..4`, then the same
+   five with `--no-preview`. **173 minutes per run** measured on a 20-core
+   machine with ten sharing it; run them together, it is ~5x better than serial.
+4. **Raise the step budget, or say why you did not.** The episode is 4500 steps,
+   so 50 000 steps is **ELEVEN episodes**, and the observation carries three
+   preference weights drawn fresh each reset — the policy must generalise across
+   a 3-D simplex from eleven samples of it. `evaluate.py`'s docstring records the
+   consequence measured on `sep17`: eleven episodes ranged −506 to +644, and
+   first-five-versus-last-five is the weight draw, not learning.
+5. **Score with `evaluate.py` and nothing else.** Twenty frozen episodes, median
+   and IQR. **The twenty never change.** Changing the test set after seeing a
+   result is the one mistake this project cannot recover from.
+6. **Report three rows, not two.** Sighted, blinded, AND the current-grade
+   policy — a no-preview comparator that reads the gradient the car is on now.
+   It has beaten the predictive policy on every hand-written comparison so far.
+   If the trained agent cannot beat it either, that is a RESULT about H/τ, not a
+   failure.
 
 Do not start Phase E or F until D produces a table.
 

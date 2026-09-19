@@ -35,6 +35,21 @@ model and therefore cannot validate it.
 
 ---
 
+> ## ⚠️ READ THIS BEFORE ANYTHING ELSE — 19 September 2026
+>
+> **The scenario binds again**, for the first time since the audit fixes. The
+> model's gearbox was a generic six-speed with invented ratios; the car has a
+> **ZF 8HP51**. With the real one, the locked 130 km/h scenario reaches
+> **884.0 °C** and spends **66.3 %** of the episode above the 850 °C trigger.
+> At this branch's 110 km/h default it never binds at all.
+>
+> **Ten agents were trained on 19 September at 110 km/h — the wrong speed.**
+> They had nothing to protect against. The runs are in `runs/`; they cannot
+> settle Phase D. **Retrain at 130.**
+>
+> **Merge `origin/JMF-2340550-sep17` first.** Twelve commits apart, including
+> mistake 17 and Phase D's first point.
+
 ## Do this first, before anything else
 
 <!-- RETIRED-OK: section -->

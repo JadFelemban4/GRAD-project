@@ -1,4 +1,4 @@
-# CHECKPOINT.md — state as of 16 September 2026
+# CHECKPOINT.md — state as of 19 September 2026
 
 **What this file is for:** a dated snapshot of where the work stands and what was
 verified when. `CLAUDE.md` is the permanent handoff and the mistake log — the
@@ -705,3 +705,89 @@ which is a different job from being a result.
 - **No fault has ever been shown to the mismatch detector.** Nothing in nine
   drives is broken, so every number behind it is a false-positive rate, not a
   detection rate. Say that in the thesis rather than implying validation.
+
+---
+
+## Session of 19 September 2026 — the real gearbox, and the scenario binds again
+
+### The headline, because it reverses a blocker
+
+Fitting the car's **actual transmission** made the standard scenario reach the
+protection trigger for the first time since the audit fixes. The model had a
+generic six-speed with invented ratios; the car has a **ZF 8HP51**.
+
+| scenario | peak turbine | share of episode above 850 °C |
+|---|---|---|
+| 110 km/h, 12 % — this branch's default | 839.7 °C | **0.0 %** |
+| **130 km/h, 12 % — the `sep17` lock** | **884.0 °C** | **66.3 %** |
+
+The real box holds **7th** on the climb (2.589 overall) where the invented
+six-speed sat in top (2.312), so rpm and exhaust flow both rise. **The blocker
+went by the model becoming more correct**, not by a knob being turned — and the
+130 km/h lock was decided on 18 September, before any training existed.
+
+### The gearbox, and how it was verified
+
+Toyota's own sheet names the unit "8-speed Sports Automatic 8HP 51" and prints
+all eight ratios plus the 3.150 final drive; Toyota USA's pressroom confirms
+3.15 on the 382 hp car independently. But the car is the better witness:
+
+> **86.7 % of 79 105 moving samples land within 4 % of one of the eight
+> published ratios**, and the measured top-gear overall ratio of **1.998**
+> matches the 8HP51's 8th (2.016) to 0.9 % while matching nothing on the
+> six-speed manual (2.927).
+
+`UPSHIFT_MIN_RPM` is calibrated against the car rather than guessed — 2000 rpm,
+bias +0.28 gears, 79.7 % within one. Exact agreement peaks at ~47 % for ANY
+threshold, because a real automatic shifts on throttle and load too. That is the
+honest headline and it is in the docstring. It was not tuned to move a result:
+1400 and 2000 rpm both select 7th at the scenario.
+
+### Mistake 18 — `Actual gear` clamps at 6
+
+The verification broke a channel. `Actual gear` never exceeds 6 across 45 606
+moving samples; within the samples it labels "gear 6" there are three clusters
+at 2.016, 2.589 and 3.15 — 8th, 7th and 6th. **The channel saturates.** Fourth
+misread channel on this car, and the first that fails by RANGE rather than
+meaning. The knock-retard p99 is filtered with it and must be re-derived.
+
+### Phase C ran, on the wrong scenario
+
+Ten SAC agents — 5 sighted, 5 blinded, 50 000 steps, **173 minutes each**, ten
+sharing a 20-core machine (~4.5 steps/s each, ~45 aggregate against 9.4 solo).
+
+**They trained at 110 km/h, where nothing binds.** They had nothing to protect
+against, so they cannot settle Phase D. The runs are kept; the next action is to
+retrain at 130.
+
+**And they produced exactly 11 episodes each**, which is the arithmetic in
+`evaluate.py`'s docstring: 4500 steps per episode, three preference weights
+drawn fresh each reset, so the policy must generalise across a 3-D simplex from
+eleven samples of it.
+
+### Two defects found in tooling
+
+- **`evaluate.py` printed a scenario it was not running.** Its header was the
+  literal string "12 % at 130 km/h" while the env took `make_grade_climb`'s
+  DEFAULT — 110 on this branch. It now derives the line from the cycle and
+  cannot disagree with what it scored.
+- The compression-ratio open question is **settled**: the team confirmed the
+  285 kW / ~386 hp car, so `plant.py`'s 10.2:1 is right and Toyota UK's 11.0:1
+  belongs to the 250 kW variant.
+
+### Verified
+
+```
+verify_docs.py    All 38 checks pass, 309 figure mentions, 24 tracked files
+validate.py       8 of 11 inside band, unchanged (no plant change)
+test_reward.py    4 of 4, neutral inside the ±0.05 band
+app.test_replay   49 of 49
+build_dataset.py  295.0 min, 10 drives, 26 operating points
+```
+
+### What this session did NOT do
+
+- **No valid Phase D number.** The agents trained off-scenario.
+- **No merge with `sep17`.** Twelve commits still apart.
+- **The 850 °C trigger is still unverifiable on this car.** Its only exhaust
+  channel is modelled, post-catalyst and clamped at 645.3 °C.
