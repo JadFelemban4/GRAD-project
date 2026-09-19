@@ -44,7 +44,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.829), **1.1 % with the one fitted k** (0.837), over 23 pooled points from nine drives, 175.5 minutes, 30–74 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
+| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.837), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
 | C · get an agent to learn | **next.** `train.py` exists, nothing has been trained yet |
 | D · baselines and the ablation | not started. This is the floor of the project |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -67,8 +67,8 @@ outside the notebook it was fitted in.
 
 **What changed since 11 September.**
 
-- **The ninth drive.** `pull01` arrived and the dataset reads **nine drives,
-  175.5 minutes**. It contributes **zero samples and zero operating points** by
+- **The ninth drive.** `pull01` arrived and the dataset reads **ten drives,
+  295.0 minutes**. It contributes **zero samples and zero operating points** by
   design — no coolant channel, so the warm filter excludes it. Every calibration
   figure is unchanged. *Read the manifest/sample distinction below before
   quoting a drive count.*
@@ -81,12 +81,12 @@ different numbers and every one of them is correct:
 
 | what | count | what it means |
 |---|---|---|
-| drives in the manifest | **9**, 175.5 min | everything ever logged, `pull01` included |
+| drives in the manifest | **9**, 295.0 min | everything ever logged, `pull01` included |
 | drives carrying usable samples | **6** | survive the warm-sample filter |
 | drives behind the fitted calibrations | **8** | the set the enrichment and spark fits were built on |
 
 `verify_docs.py` asserts the first two separately for exactly this reason. A
-sentence that says "nine drives" about a *fit* is wrong, and so is one that says
+sentence that says "ten drives" about a *fit* is wrong, and so is one that says
 "eight drives" about the *logs*. Say which population you mean.
 
 **What changed since 8 September.** Two more mistakes are logged and the
@@ -124,9 +124,9 @@ python check_premise.py    VOID as of 16 Sep -- see AUDIT.md C1, C2, C3 and the
                            number from here
 python validate.py         8 of 11 published quantities inside band
 python test_reward.py      4 of 4 checks pass
-python build_dataset.py "logs/raw/*.csv"    175.5 min, 9 drives, 23 operating points
+python build_dataset.py "logs/raw/*.csv"    295.0 min, 10 drives, 26 operating points
 python compare_log.py data/master_points.csv   PASS, 1.4 % load residual,
-                           k derived 0.829 and zero free parameters. Read what
+                           k derived 0.831 and zero free parameters. Read what
                            it prints, not what you hope: it compares two ECU
                            channels through the displacement and three defined
                            constants, and it does NOT measure the breathing
@@ -245,9 +245,9 @@ you, and the flattery shows up as a large headline number.**
 | v4, from eight drives | function of engine speed and sustained dwell | current |
 
 v3 was fitted to 17 seconds at high load. The two 8 September drives took that
-to **184 seconds above 207 kPa**. Over the 1055 rows above 180 kPa the
-correlations are: engine speed **−0.56**, air mass flow **−0.49**, dwell above
-the 180 kPa gate **−0.41**, and manifold pressure **+0.23**.
+to **208 seconds above 207 kPa**. Over the 1055 rows above 180 kPa the
+correlations are: engine speed **−0.47**, air mass flow **−0.41**, dwell above
+the 180 kPa gate **−0.44**, and manifold pressure **+0.11**.
 
 **READ THOSE WITH THEIR ERROR BARS, WHICH THIS FILE USED NOT TO GIVE.**
 AUDIT.md H4: 1055 is a count of FORWARD-FILLED ROWS. The exporter polls one
@@ -330,8 +330,8 @@ two pieces: the fit below ~90 kPa, and the plant's own knock limit above it.
 
 ### 7. A channel can hit its range limit and keep reporting
 
-`Air mass flow` tops out at exactly **1020.0 kg/h** — the same number on five
-separate drives, **517 samples**. That is a sensor ceiling, and on the same
+`Air mass flow` tops out at exactly **1020.0 kg/h** — the same number on six
+separate drives, **547 samples**. That is a sensor ceiling, and on the same
 samples `Air mass flow participating in combustion` reads up to 1233 kg/h.
 
 A pinned sample under-reports air, so the manifold pressure inverted from it
@@ -371,7 +371,7 @@ Effect on the day: 20 operating points became 17, `fb988991` contributed none,
 and the pooled load residual roughly halved. **Do not quote that day's residual
 as the project's number.** The dataset has since gained a drive and the charge
 temperature has since been corrected (mistake 13), and the current figure is
-**1.4 % derived / 1.1 % fitted over 23 points, 30–74 kPa**. Be honest about the
+**1.4 % derived / 1.1 % fitted over 26 points, 30–75 kPa**. Be honest about the
 improvement either way — part of it was the removal of the worst drive, and the
 exclusion rule was written from a measurable defect rather than from the
 residual, which is the only reason it is legitimate.
@@ -474,8 +474,8 @@ documents were not, in six places:
 |---|---|---|
 | CLAUDE.md mistake 4, README | 118 s above 230 kPa | **198 s** |
 | CLAUDE.md mistake 4, README | corr(λ, MAP) **+0.02** | **−0.05** |
-| CLAUDE.md mistake 4, README | −0.60 / −0.52 / −0.38 | **−0.56 / −0.49 / −0.47** |
-| README enrichment table | n = 353 / 80 / 176 | **422 / 168 / 465** |
+| CLAUDE.md mistake 4, README | −0.60 / −0.52 / −0.38 | **−0.47 / −0.41 / −0.44** |
+| README enrichment table | n = 353 / 80 / 176 | **441 / 235 / 665** |
 | CLAUDE.md limitations | seven drives, 113 min, five carrying | **eight, 168.1, six** |
 | CLAUDE.md limitations | weakest cell: short dwell, n=29, 0.94 vs 1.00 | **long dwell, n=47, 0.90 vs 0.93** |
 
@@ -550,7 +550,7 @@ not**, and they escaped by two different routes, both worth knowing:
   dataset-size pattern needs the words *pooled*, *dataset*, *manifest* or a
   drive count within thirty characters of the figure, so
   `REFERENCES.md`'s "168.1 minutes of OBD-II logs from our own car" and
-  `CHECKPOINT.md`'s "30–74 kPa, 168.1 min." matched nothing. An anchored
+  `CHECKPOINT.md`'s "30–75 kPa, 168.1 min." matched nothing. An anchored
   pattern is the right trade — a loose one reported the thermal fit's "three
   drives (80 minutes)" as a wrong total — but it means **a figure written in
   an unusual sentence is invisible to the checker.**
@@ -566,7 +566,7 @@ list was pointing at a figure that had itself been superseded. A retired-value
 list has to be swept when the value that replaced it moves on.
 
 Fixed: the five lines carry the current figure, the seven-drive entry points
-at nine drives, and `168.1` is now a retired pattern in its own right. The
+at ten drives, and `168.1` is now a retired pattern in its own right. The
 pattern deliberately does **not** match "eight drives" on its own, because
 the enrichment map and the compressor fit genuinely rest on eight drives of
 samples: `pull01` adds 7.5 minutes and **zero** samples, so every figure fitted
@@ -652,8 +652,8 @@ boosted readings of the vehicle's own `Boost pressure` channel (median
 
 | charge temperature used | inverted MAP | gap |
 |---|---|---|
-| the raw sensor (107 °C median) | 279.5 kPa | **+23.7 %** |
-| `plant.charge_temperature()` (52 °C median) | 232.7 kPa | **+3.0 %** |
+| the raw sensor (117 °C median) | 279.5 kPa | **+23.7 %** |
+| `plant.charge_temperature()` (52 °C median) | 232.7 kPa | **+1.9 %** |
 | ambient + 8 K (45 °C median) | 227.5 kPa | +0.7 % |
 
 **The >200 kPa gate on the model side is not arbitrary, and say so wherever
@@ -669,11 +669,11 @@ pressure channels on this car sit before the throttle.
 `ambient + 8 K` scores +0.7 % and was **rejected**: it is a knob tuned to hit
 the target, which is mistake 12 all over again. The shipped formula was written
 independently for the Gymnasium environment months earlier and carries no
-parameter fitted to the boost channel. 3.0 % from an independent model beats
+parameter fitted to the boost channel. 1.9 % from an independent model beats
 0.7 % from a fitted one.
 
-**What it changed.** Operating points 31–82 kPa → **30–74 kPa**. Fitted k 0.784
-→ 0.837, derived 0.783 → 0.829. `ENR_LOAD` 200 → 180 kPa, because the gate is
+**What it changed.** Operating points 31–82 kPa → **30–75 kPa**. Fitted k 0.784
+→ 0.837, derived 0.783 → 0.831. `ENR_LOAD` 200 → 180 kPa, because the gate is
 written in manifold pressure and manifold pressure changed definition — 180 on
 the new scale selects exactly the 1055 samples that 200 selected on the old one,
 and every enrichment figure reproduces to the decimal without a refit.
@@ -793,9 +793,9 @@ for the 22 steady points. **It was never a fault and it was never news.**
 
 1. **Wide-open throttle only**, expressed as a pressure ratio so it needs no
    extra channel and no extra budget: `logged / ambient >= 1.8`. Pooled over all
-   nine drives, MAF-unpinned, the disagreement at that gate has a median of
+   ten drives, MAF-unpinned, the disagreement at that gate has a median of
    **+6.5 %**, and per drive **+7.7 / +6.8 / +3.6 / +1.2 %** — consistent with
-   the **+3.0 %** that `plant.charge_temperature()` already records for this
+   the **+1.9 %** that `plant.charge_temperature()` already records for this
    same comparison under boost.
 2. **MAF not pinned** at its 1020 kg/h ceiling (mistake 7).
 3. **Persistence counted in DISTINCT READINGS**, over a window spanning at least
@@ -953,18 +953,18 @@ defensively.
 
 **And a third defect in the same scanner, from the same merge.** Its check
 "drives showing that exact ceiling" counted raw files in `logs/raw/`, while the
-"517 samples" check sitting beside it counted the warm-filtered dataset. `pull01`
+"547 samples" check sitting beside it counted the warm-filtered dataset. `pull01`
 hits the 1020 kg/h ceiling 56 times in its raw log, so the drive count became 6
 while the sample count stayed 517 across 5. **Both numbers were true and the
 sentence built from them was not.** Both halves now count the same population.
-For the record: **573 pinned samples across 6 of the 9 raw logs; 517 across 5
+For the record: **573 pinned samples across 7 of the 10 raw logs; 517 across 5
 once the warm filter has run.**
 
 ---
 
 ## Known limitations to state in the thesis, not fix quietly
 
-- **The boosted inversion is now within 3 % of the car, and the old 28 % gap
+- **The boosted inversion is now within 2 % of the car, and the old 28 % gap
   was the charge temperature, not the breathing model.** See mistake 13. What
   remains uncertain under boost is the MAF ceiling at 1020 kg/h and the logger's
   round-robin sampling, which pairs air mass with pressure taken seconds apart.
@@ -979,15 +979,15 @@ once the warm filter has run.**
   but an operating line is not a compressor map — no efficiency islands, no
   speed lines, because the car has no turbo speed sensor and no pre-intercooler
   temperature.
-- **Two residuals, both true, and the fitted one fits better.** Over the 23
-  pooled points that survive the window checks, 30–74 kPa: **1.3 % with the
-  derived k = 0.829 and zero free parameters**, **1.1 % with the fitted
+- **Two residuals, both true, and the fitted one fits better.** Over the 26
+  pooled points that survive the window checks, 30–75 kPa: **1.3 % with the
+  derived k = 0.831 and zero free parameters**, **1.1 % with the fitted
   k = 0.837 and one**. Dropping the parameter makes the residual RISE, which is
   the honest direction — one free parameter should fit better than none. Quote
   the derived 1.4 % and say that it costs nothing; quote the fitted 1.1 % only
   next to the parameter it spends. And read mistake 12 first: neither number
   tests the breathing model.
-- **Vehicle validation covers 30–74 kPa only.** Steady points need steady
+- **Vehicle validation covers 30–75 kPa only.** Steady points need steady
   driving, and steady driving is light-load driving. The boosted region is
   validated against published correlations.
 - **The compressor envelope is unmeasured above 0.314 kg/s corrected**, because
@@ -1039,15 +1039,27 @@ once the warm filter has run.**
   ΔT = Q/ṁ — both terms rise with road speed, so ΔT carries almost no
   information about UA. Assuming constant flow is not a mild approximation here.
   Stop trying; state it as a limitation.
-- **Oil above 107 °C is extrapolation.** That is the hottest oil anywhere in the
-  logs (`7475b5d7`); the after-filter channel `oil_filt_c` reaches 111 °C on the
-  same drive. Everything the model says about oil on a sustained climb rests on
-  the network's structure, not on measurement.
+- **THE OIL BAND IS NOW SUPPORTED BY OUR OWN CAR, AND THE MODEL MISSES IT LOW.**
+  This is the most valuable thing `drive10` delivered (18 September, 119.5 min).
+  <!-- RETIRED-OK -->
+  The hottest oil in the logs was 107 °C across the first nine drives, which
+  sat *below* the published 115–140 °C band — so the band was unverifiable from
+  our own data and `validate.py`'s miss could not be interpreted. `drive10`
+  reaches **117 °C**, with **1320 rows above 110 °C and 60 above 115 °C**.
+
+  That changes what the miss means. The band's lower end is now inside our own
+  measurement, and the model's **110.2 °C is confirmed about 7 K too cool on a
+  sustained climb** rather than merely disagreeing with an unsourced number.
+  Say it that way in the thesis: the miss is real, it is measured, and it points
+  at the thermal network's oil path (`ua_block_oil`, the only MEASURED parameter
+  in `thermal.py`) rather than at the band.
+
+  Above 117 °C is still extrapolation.
 - **Eight drives, six with usable samples.** `3f64372e` and `f51686d7` are under
   a minute each and contain no warm running window; `fb988991` is a census log
   whose windows are all rejected for span or logger gaps (mistake 8), so it
-  carries samples but contributes **zero** operating points. Quote it as "nine
-  drives, 175.5 minutes, six carrying samples, 23 distinct operating points".
+  carries samples but contributes **zero** operating points. Quote it as "ten
+  drives, 295.0 minutes, seven carrying samples, 26 distinct operating points".
 
   <!-- RETIRED-OK -->
   This line read "seven drives, 113 minutes, five carrying samples" until
@@ -1064,8 +1076,8 @@ once the warm filter has run.**
   temperature, which this vehicle does not expose. (`ENR_LOAD` = 180 kPa on the
   corrected charge-temperature scale of mistake 13.) The weakest cell of the fit
   is 3500–4500 rpm at **long** dwell — observed 0.90 against a modelled 0.93,
-  and that speed band is the thinnest of the three at n = 168 samples above the
-  gate, against 422 and 465. Every one of the nine cells is within 0.027 of
+  and that speed band is the thinnest of the three at n = 235 samples above the
+  gate, against 441 and 665. Every one of the nine cells is within 0.027 of
   measurement.
   <!-- RETIRED-OK -->
   *(This line read "short dwell, n=29, observed 0.94, model 1.00" until
@@ -1292,7 +1304,7 @@ asserts both, so breaking either fails a check rather than going unnoticed.
 - Change one thing, re-run, write down what happened. Two changes at once and
   you no longer know which one did it.
 - Report numbers with the condition attached. "1.4 % load residual over 22
-  points, 30–74 kPa" — not "the model is accurate".
+  points, 30–75 kPa" — not "the model is accurate".
 - **After changing anything under `app/`, re-run `python -m app.test_replay`
   and paste the output into the commit message.** The app's numbers are a chain
   — reader, estimator, alert engine — and a change anywhere moves numbers
@@ -1305,7 +1317,7 @@ asserts both, so breaking either fails a check rather than going unnoticed.
   take only what is genuinely new. See mistake 16 — the v19 archive would have
   reverted a fortnight of document work, and it carried one file nobody else
   had.
-- **Say which drive population you mean.** Nine in the manifest, six carrying
+- **Say which drive population you mean.** Ten in the manifest, seven carrying
   samples, eight behind the fitted calibrations. All three are correct and they
   are not interchangeable.
 
@@ -1405,7 +1417,7 @@ interesting.
    warm-start band settle in the time the model says. **This is the only item
    that can find something replay cannot**, and it needs a driver and an hour.
 2. **A mismatch case with a known fault.** The detector has never seen a real
-   boost leak. Nothing in nine drives is faulty, so every number in mistake 14
+   boost leak. Nothing in ten drives is faulty, so every number in mistake 14
    is a FALSE-POSITIVE rate and none of them is a detection rate. Inducing a
    leak safely is not obviously possible on a borrowed car; if it is not, say so
    in the thesis rather than implying the detector is validated.

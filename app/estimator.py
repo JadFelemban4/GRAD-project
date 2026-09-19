@@ -27,7 +27,7 @@ physics model alongside the car in real time. That is what this does.
 WHAT IT REUSES, AND WHY THAT MATTERS
 ------------------------------------
 Nothing here is new physics. Every model it calls was validated in Phase B
-against 175 minutes of logs from this car:
+against 295 minutes of logs from this car:
 
     plant.map_from_airflow      manifold pressure from measured air mass
     plant.charge_temperature    the ONE definition of charge temperature
@@ -37,7 +37,7 @@ against 175 minutes of logs from this car:
 
 So the app inherits the validation. It also inherits the LIMITS: 8 of 11
 published bands, three documented misses, and a load residual that was only
-ever checked at 30-74 kPa -- and that residual, per CLAUDE.md mistake 12, does
+ever checked at 30-75 kPa -- and that residual, per CLAUDE.md mistake 12, does
 not test the breathing model at all. Do not let the app imply more confidence
 than the simulator earned.
 

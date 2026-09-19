@@ -384,7 +384,7 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 # ---------------------------------------------------------------------------
 # This is NOT a compressor map. It is the OPERATING CEILING: the highest
 # pressure ratio the vehicle was observed to reach at a given corrected mass
-# flow, across 43 853 quasi-steady samples over 175.5 minutes and nine drives.
+# flow, across 74 013 quasi-steady samples over 295.0 minutes and ten drives.
 #
 # The difference matters. A compressor map shows what the compressor CAN do,
 # bounded by surge and choke, with efficiency islands and shaft-speed lines.
@@ -490,8 +490,8 @@ def charge_temperature(t_amb_k, t_block_k=None) -> float:
     is 226 kPa absolute.
 
         charge temperature used              | inverted MAP | gap vs the car
-        the raw sensor (107 C median)        | 279.5 kPa    | +23.7 %
-        charge_temperature(), THIS FUNCTION  | 232.7 kPa    | +3.0 %
+        the raw sensor (117 C median)        | 279.5 kPa    | +23.7 %
+        charge_temperature(), THIS FUNCTION  | 232.7 kPa    | +1.9 %
         ambient + 8 K (45 C median)          | 227.5 kPa    | +0.7 %
 
     CLAUDE.md used to blame that 23.7 % on the breathing model -- fitted at part
@@ -513,15 +513,15 @@ def charge_temperature(t_amb_k, t_block_k=None) -> float:
 
     Be honest about how thin that contrast is. At the matched gate `ambient +
     8 K` scores +0.7 %, not the +0.0 % a looser gate reported, and +0.7 %
-    against +3.0 % is a smaller margin than the rhetoric wants. The rejection
+    against +1.9 % is a smaller margin than the rhetoric wants. The rejection
     stands anyway, on the same ground: a 3.0 % gap from a model with no
     parameter fitted to the boost channel says more than a closer gap from one
-    tuned against it. Report +3.0 %; do not tune it away.
+    tuned against it. Report +1.9 %; do not tune it away.
 
     LIMIT, STATE IT IN CHAPTER 3. There is no measured charge-temperature
     channel on this car: `Temperature after the intercooler` exists in the
     census and reads all-zero on every sample. This is a MODEL of the charge
-    temperature, anchored to ambient, not a measurement. The +3.0 % gap over
+    temperature, anchored to ambient, not a measurement. The +1.9 % gap over
     587 boosted samples above 200 kPa is the evidence for it and the whole of
     the evidence for it.
     """

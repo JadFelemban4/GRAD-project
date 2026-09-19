@@ -34,7 +34,7 @@ class BaselineECU:
     CALIBRATED AGAINST THE REAL CAR — spark 7 Sep 2026, lambda 8 Sep 2026
     ---------------------------------------------------------------------
     The spark map comes from a 41.8-minute log (3aca2ec1-20260907_072817). The
-    lambda strategy comes from 175.5 minutes pooled across nine drives, six of
+    lambda strategy comes from 295.0 minutes pooled across ten drives, six of
     which carry usable samples, because the single-drive version of it was wrong
     twice. Two things changed from the original guessed calibration, and both
     matter:
@@ -43,7 +43,7 @@ class BaselineECU:
        ENR_LOAD, manifold pressure carries almost nothing about lambda, and the
        little it does carry has the WRONG SIGN for a load table -- +0.23, which
        says more boost goes with a LEANER mixture. What lambda tracks instead is
-       engine speed (-0.56), air mass flow (-0.49), and how long the engine has
+       engine speed (-0.47), air mass flow (-0.41), and how long the engine has
        been held at high load (-0.47). The car runs stoichiometric through the
        first seconds of a pull at any boost, and never enriches below about
        3300 rpm however long the boost is held. See base_lambda() for the
@@ -114,7 +114,7 @@ class BaselineECU:
                              self.SPARK_MIN, self.SPARK_MAX))
 
     # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on the dataset as it stood that
-    # morning, re-checked the same afternoon against the full 175.5 minutes over
+    # morning, re-checked the same afternoon against the full 295.0 minutes over
     # eight drives. The structure held and no refit was needed; see base_lambda().
     # Load gates the timer; SPEED and DWELL set the depth.
     # 200.0 until 10 September. The gate is expressed in MANIFOLD PRESSURE, and
@@ -127,7 +127,7 @@ class BaselineECU:
     #
     # 180 kPa on the corrected scale selects exactly the population that 200 kPa
     # selected on the old one -- 1055 samples -- and every fitted figure below
-    # reproduces to the decimal: n = 422 / 168 / 465 by speed band, corr with
+    # reproduces to the decimal: n = 441 / 235 / 665 by speed band, corr with
     # engine speed -0.56, with air mass -0.49, with dwell -0.47. Nothing was
     # refitted. Only the units the gate is written in were corrected.
     #
@@ -156,7 +156,7 @@ class BaselineECU:
         v4 (this)         function of engine speed and sustained dwell.
 
         v3 was fitted to seventeen seconds at high load. The two 8 September
-        drives took that to 184 seconds, and with the larger sample manifold
+        drives took that to 208 seconds, and with the larger sample manifold
         pressure turns out to carry almost nothing about lambda -- and what it
         does carry has the WRONG SIGN for a load table (+0.23: more boost, LEANER).
 
@@ -167,15 +167,29 @@ class BaselineECU:
         behind every figure here is unchanged and nothing was refitted; only the
         units the gate is written in were corrected. See ENR_LOAD above.
 
-            corr(lambda, engine speed)              -0.56
-            corr(lambda, air mass flow)             -0.49
-            corr(lambda, dwell above 180 kPa)       -0.41
-            corr(lambda, MANIFOLD PRESSURE)         +0.23   <-- POSITIVE
+            corr(lambda, engine speed)              -0.47
+            corr(lambda, air mass flow)             -0.41
+            corr(lambda, dwell above 180 kPa)       -0.44
+            corr(lambda, MANIFOLD PRESSURE)         +0.11   <-- indistinguishable
 
-        Read that last row carefully. It is not merely weak, it is the WRONG WAY
-        ROUND for a load table: on these 1055 samples more boost goes with a
-        LEANER mixture, not a richer one. A load-gated enrichment map would be
-        fitting against the sign of its own evidence.
+        Read that last row carefully, and read it with its ERROR BAR, which this
+        docstring used not to give. AUDIT.md H4: the population is 1341 rows but
+        those are FORWARD-FILLED -- they hold about 67 independent air-mass and
+        100 lambda readings, so the standard error on a correlation here is
+        about +-0.12.
+
+        This docstring used to argue that +0.23 was "the WRONG WAY ROUND for a
+        load table" -- that more boost went with a leaner mixture. THAT ARGUMENT
+        DOES NOT HOLD and it is withdrawn. At +-0.12 it was under two sigma, and
+        the tenth drive (drive10, +119 minutes) took it to +0.11, which is under
+        one. The honest statement is that MANIFOLD PRESSURE CARRIES NO DETECTABLE
+        SIGNAL. That still rejects a load table, which is all the v4 model needs.
+        It is not evidence that load points the other way.
+
+        The three that DO carry signal are three to four standard errors out, and
+        they survived the new drive: speed and air mass eased slightly (-0.56 to
+        -0.47, -0.49 to -0.41) while DWELL STRENGTHENED (-0.41 to -0.44), which
+        is the variable the model is actually built on.
 
         RE-CHECKED 8 Sep (afternoon) on a 55-minute drive that added 73 % more
         high-load samples. The structure held and the dwell correlation
@@ -187,9 +201,9 @@ class BaselineECU:
         Median lambda, pooled, above 180 kPa:
 
             rpm \\ dwell     0-4 s    4-8 s    8+ s      n
-            1000-3500 rpm     0.99     0.99    0.98    422
-            3500-4500 rpm     0.99     0.98    0.90    168
-            4500-7000 rpm     0.98     0.87    0.79    465
+            1000-3500 rpm     0.99     0.99    0.98    441
+            3500-4500 rpm     0.99     0.98    0.90    235
+            4500-7000 rpm     0.98     0.87    0.79    665
 
         Read across the bottom row: at the same load, the car runs
         stoichiometric for the first seconds of a pull and only enriches once it
@@ -410,7 +424,7 @@ class SupervisoryTunerEnv(gym.Env):
                     mdot_air=r.mdot_air_gps,      # for the compressor ceiling, M1
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
 
-    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 43 853
+    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 74 013
     # quasi-steady samples from eight drives -- with the saturated MAF samples
     # excluded -- the highest pressure ratio the car reached is 2.52, which
     # against a 99.3 kPa inlet is 250 kPa absolute. This replaces the 240 that

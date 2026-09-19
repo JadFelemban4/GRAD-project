@@ -22,7 +22,7 @@ in another document disagrees with a script.
 | `test_reward.py` | 4 of 4, neutral −0.00438 | **4 of 4, neutral −0.00888** (quote the ±0.05 band, not the digits — M13) |
 | `generality_test.py` | H2 table 16.5 → 18.0 → 26.0 pts | **the baseline never exceeds the limit — H1 and H2 are not measurable on this scenario** |
 | `build_dataset.py` | 22 operating points | **23**, and stable across 8 orderings (was 20–23) |
-| `compare_log.py` | 1.4 % derived | **1.3 % derived, 1.1 % fitted** over 23 points |
+| `compare_log.py` | 1.4 % derived | **1.3 % derived, 1.1 % fitted** over 26 points |
 | `compare_log.py --map-from-log` | empty table, exit 0 | **110.4 % residual** — it reproduces mistake 2 again |
 | `verify_docs.py` | 33 of 33, 256 mentions, 22 files | **33 of 33, 274 mentions, 23 files** (now scans `presentation/index.html`) |
 | `python -m app.test_replay` | 46 of 46 | **49 of 49** (three new regressions) |
@@ -144,7 +144,7 @@ prose scan for those two would mostly catch the documents being right.
 | **M13** neutral quoted as a requirement | **FIXED** | documents quote the ±0.05 band; the random policy is seeded so its "for information" line stops moving |
 | **M14** `--map-from-log` scored zero rows and exited 0 | **FIXED** | the missing alias is added, so it reproduces mistake 2 properly (**110.4 %** against 1.3 %), and it now exits non-zero when it scores nothing |
 | **M3** "steady" windows are steady in speed and rpm only | **FIXED** | every point carries `load_ptp`, and `compare_log.py` prints it: **median load spread 0.52, max 1.25, and only 2 of 23 points hold within 25 %**. Recorded rather than filtered — filtering at 0.25 costs 23 points → 11 and narrows the span to 37–75 kPa, which trades away more coverage than the mislabelling costs |
-| **M4** the `stable` flag does not implement its criterion | **FIXED (and the finding is bigger)** | `stable_rate` computes the rate between genuine READINGS alongside the gradient flag. They agree almost exactly — **93.9 % vs 92.7 %** — so the gradient artefact is real but is NOT what makes the flag unselective. The thresholds are: 40 g/s/s and 0.6 bar/s admit nearly everything a road drive does. "43 853 quasi-steady samples" means "warm rows not mid-transient", a much weaker claim |
+| **M4** the `stable` flag does not implement its criterion | **FIXED (and the finding is bigger)** | `stable_rate` computes the rate between genuine READINGS alongside the gradient flag. They agree almost exactly — **93.9 % vs 92.7 %** — so the gradient artefact is real but is NOT what makes the flag unselective. The thresholds are: 40 g/s/s and 0.6 bar/s admit nearly everything a road drive does. "74 013 quasi-steady samples" means "warm rows not mid-transient", a much weaker claim |
 | **M5** the envelope exists in two disagreeing versions, no script produces it | **FIXED** | new `fit_envelope.py` regenerates it from the shipped data with the method stated, and prints **independent readings beside every bin** |
 | **M6** published figures no shipped script prints | **PARTLY** | the envelope now has one (`fit_envelope.py`). The thermal-fit RMSE table, the spark fit, the knock-limit fit and the retard filter still have none |
 | **M16** per-step terms scale with `dt` | **FIXED** | `SLEW` and the smoothness penalty are per SECOND now. The environment runs at dt 1.0 / 2.0 / 0.2, so the reachable actuator movement per second differed **fivefold** between the hand-written policies and the agent meant to beat them |
@@ -259,3 +259,80 @@ never runs on it.
 A suite pins the behaviour it was written to pin. That is mistake 11 one level
 further down, and it is the reason every fix above ships with a regression test
 that would have failed before it.
+
+---
+
+## 18 September — the tenth drive, and the bug it exposed
+
+`drive10-20260918_233912.csv`: **119.5 minutes, 10 channels**, the longest single
+drive the project has. It took the dataset from 175.5 to **295.0 minutes**, a
+68 % increase in one file.
+
+### It found a bug before it found anything else
+
+**It contributed ZERO operating points on arrival** — 119 minutes, nothing. The
+cause is **mistake 8, still half-unfixed for a fortnight.**
+
+`steady_points()` sized its window as `WINDOW_S x average_rate` ROWS, then
+rejected the window if its real wall-clock span came out wrong. The check added
+after mistake 8 caught the symptom; the SIZING was never fixed. `drive10` logs
+at **two rates** — 0.150 s for ~15 000 rows and 0.240 s for ~16 000 — so its
+average of 5.06 Hz fits neither half. The window came out 304 rows, which at the
+slow half's 0.239 s median spans **72.7 s**, i.e. **0.7 s outside** the 48–72 s
+band. Every window failed, by less than a second, on a drive with **no logger
+gaps at all**.
+
+Windows are now sized in TIME (`_window_end` walks to `t[i] + WINDOW_S`), so a
+window is 60 s by construction at any rate, and the span check goes back to
+being a net for logger gaps rather than the thing doing the rejecting.
+
+**It recovered points on EVERY drive, not just the new one:**
+
+| drive | points before | after |
+|---|---|---|
+| 3aca2ec1 | 17 | **21** |
+| 7475b5d7 | 26 | **30** |
+| cb67b01f | 3 | **5** |
+| **drive10** | **0** | **7** |
+| total | 23 | **26** |
+
+### What the drive bought
+
+| | before | after |
+|---|---|---|
+| dataset | 175.5 min, 9 drives | **295.0 min, 10 drives**, 7 carrying samples |
+| operating points | 23 | **26**, span 30–**75** kPa |
+| load residual | 1.4 % derived / 1.1 % fitted | **unchanged at 1.4 / 1.1** over 26 points |
+| quasi-steady samples | 43 853 | **74 013** |
+| hottest oil measured | 107 °C | **117 °C** |
+| charge-temp model vs boost channel | +3.0 % | **+1.9 %** |
+| corr(lambda, MAP) | +0.23 | **+0.11** |
+
+**The oil finding is the most valuable.** The band is 115–140 °C and our own car
+had only ever reached 107, so the band was unverifiable and `validate.py`'s miss
+uninterpretable. `drive10` reaches 117 °C (1320 rows above 110, 60 above 115), so
+the band's lower end is now inside our own measurement and the model's 110.2 °C
+is confirmed **~7 K too cool** rather than merely disagreeing with an unsourced
+number.
+
+**The charge-temperature model got better on more data**, +3.0 % → **+1.9 %**
+against the car's own boost channel, over 762 model samples and 1097 logged
+readings. A model that improves when the dataset grows was not fitted to it.
+
+**corr(lambda, MAP) fell from +0.23 to +0.11**, which retires the last of
+mistake 4's over-claim: AUDIT.md H4 had already shown +0.23 was 1.4 sigma and
+not evidence of a "wrong way round" effect; at +0.11 it is under one. The
+docstring in `engine_env.base_lambda` that made that argument is corrected.
+Dwell STRENGTHENED, −0.41 → **−0.44**, which is the variable the model uses.
+
+### What it could NOT buy, and why — two missing channels
+
+| wanted | channel needed | present? |
+|---|---|---|
+| the compressor envelope | `Ambient pressure` | **NO** — `corr_flow` and `press_ratio` are NaN for all 36 277 samples, so the drive adds **nothing** to the envelope. Its top bins still rest on 4–5 readings |
+| the knock question (H5) | `Target ignition angle from torque intervention` | **NO** — it has `Actual ignition angle` only, and the retard is the difference of the two |
+
+**Ask for those two channels on the next drive.** They are the difference
+between 119 minutes that moved six figures and 119 minutes that would also have
+settled the biggest open question in the audit.
+

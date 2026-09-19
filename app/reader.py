@@ -27,7 +27,7 @@ TWO MODES, AND REPLAY IS THE IMPORTANT ONE
 ------------------------------------------
     replay  -- feed one of our own CSV logs through at real speed or faster.
                No car, no adapter, no driving. Five people can develop against
-               the same 175 minutes of real data simultaneously.
+               the same 295 minutes of real data simultaneously.
     live    -- an ELM327 adapter over Bluetooth/WiFi/USB.
 
 Build and test everything in replay. Touch the car only to confirm.

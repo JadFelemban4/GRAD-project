@@ -1819,7 +1819,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
       <div class="fig">
         <span class="v">22</span>
         <span class="u">نقطة</span>
-        <span class="l">لحظات قيادة ثابتة، 30–74 kPa (الجوي ≈101)</span>
+        <span class="l">لحظات قيادة ثابتة، 30–75 kPa (الجوي ≈101)</span>
         <span class="s">build_dataset.py</span>
       </div>
       <div class="fig">
@@ -1867,12 +1867,12 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         </div>
         <div>
           <div class="k">نقاط تشغيل ثابتة (Operating points)</div>
-          <div class="vv">22 نقطة مميزة، ضغط 30–74 kPa</div>
+          <div class="vv">22 نقطة مميزة، ضغط 30–75 kPa</div>
           <div class="nn">نقطة التشغيل = لحظة قيادة ثابتة نقدر نقارن عندها النموذج بالسيارة، و«الحمل» فيها = كم هواءً يبتلع المحرك في الدورة. كل نقطة دقيقة كاملة من قيادة ثابتة، شرطها أن تكون الدقيقة دقيقة فعلًا على الساعة، وألا ينقطع فيها التسجيل. رحلة كاملة عندنا سقطت كل نوافذها لأن المسجّل كان يفقد ربع العينات.</div>
         </div>
         <div>
           <div class="k">الفرق بين قناتَي الهواء (Load residual)</div>
-          <div class="vv">1.4 % بصفر معاملات مضبوطة، الثابت المشتق k = 0.829</div>
+          <div class="vv">1.4 % بصفر معاملات مضبوطة، الثابت المشتق k = 0.831</div>
           <div class="nn">و1.1 % لو سمحنا لأنفسنا بضبط رقم واحد بأيدينا (k = 0.837). الاتجاه صحي: رقم حرّ واحد المفروض يحسّن المطابقة دائمًا، فلو كانت النتيجة بلا ضبط أفضل لصار في الأمر شبهة. ومع ذلك — الرقمان يقارنان قناتين من السيارة ولا يختبران نموذج التنفس؛ اضغطوا «وش يثبته الرقم 1.4 %» تحت.</div>
         </div>
         <div>
@@ -1923,7 +1923,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         </div>
         <div>
           <div class="k">المقارنة مع السيارة تغطي الحمل الخفيف فقط</div>
-          <div class="vv">30–74 kPa</div>
+          <div class="vv">30–75 kPa</div>
           <div class="nn">الضغط الجوي حوالي 101 kPa، والمحرك تحت الشحن يتجاوز 200، فنحن نغطي الطرف الهادئ فقط. النقاط الثابتة تحتاج قيادة ثابتة، والقيادة الثابتة هي قيادة بحمل خفيف. هذه حقيقة الطريق، لا قصور في الكود.</div>
         </div>
         <div>
@@ -2488,7 +2488,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         <div class="term" data-g="g7">
           <div class="th"><b>الملء النسبي للهواء</b><span class="en">Relative air filling</span></div>
           <p class="def">قناة من قنوات BMW تقول كم من الهواء دخل الأسطوانة، منسوبًا إلى حالة مرجعية معرّفة (DIN: 1013 مليبار و0 درجة مئوية) لا إلى حالة الجو اليوم. وهي أحد طرفَي المقارنة في «المتبقي» الذي نستشهد به.</p>
-          <p class="why"><span class="star">لماذا يهمّنا · </span>المتبقي 1.4 بالمئة بثابت مشتق k = 0.829 وصفرِ معاملات مُلائَمة، و1.1 بالمئة بثابت مُلائَم k = 0.837 ومعاملٍ واحد. اقتبس المشتق وقل إنه لا يكلّف شيئًا. واقرأ الخطأ رقم 12 قبل أن تسمّيه «تحققًا»: هو اتساق بين قناتين من قنوات السيارة، ولا يرى نموذج التنفّس إطلاقًا. وما يستحقه فعلًا شيئان: أنه ثبّت معنى القناة عند المرجع DIN، وأنه حسّاس للسعة — الثابت المشتق يعطي 48.1 بالمئة لو فُرض على محرك الألفي سي سي الخاطئ، فكان كفيلًا بكشف الخطأ رقم 1 في يومه الأول.</p>
+          <p class="why"><span class="star">لماذا يهمّنا · </span>المتبقي 1.4 بالمئة بثابت مشتق k = 0.831 وصفرِ معاملات مُلائَمة، و1.1 بالمئة بثابت مُلائَم k = 0.837 ومعاملٍ واحد. اقتبس المشتق وقل إنه لا يكلّف شيئًا. واقرأ الخطأ رقم 12 قبل أن تسمّيه «تحققًا»: هو اتساق بين قناتين من قنوات السيارة، ولا يرى نموذج التنفّس إطلاقًا. وما يستحقه فعلًا شيئان: أنه ثبّت معنى القناة عند المرجع DIN، وأنه حسّاس للسعة — الثابت المشتق يعطي 48.1 بالمئة لو فُرض على محرك الألفي سي سي الخاطئ، فكان كفيلًا بكشف الخطأ رقم 1 في يومه الأول.</p>
         </div>
         <div class="term" data-g="g7">
           <div class="th"><b>نطاق التحقق المُثبَت</b><span class="en">Validated envelope</span></div>
@@ -2726,7 +2726,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
       <p>The mass that stores the heat is not the wheel alone. It is the turbine housing and the exhaust manifold: heavy metal that heats slowly and cools slowly. That is slow next to a computer, which makes a decision dozens of times a second. Even so, it is the fastest of the three parts we model. The engine block and the coolant behind it move over minutes, not seconds.</p>
       <p>That slowness has a name and a number. The time constant, written τ, is the time the metal needs to cover about two thirds of the gap between the temperature it is at now and the temperature it is heading for. For the turbine housing and the exhaust manifold, τ is 48 seconds, taken from a simulated step response at 3000 rpm, 140 kPa and 108 kW. Think of a pot of water on the stove: the flame is lit from the first second, and the water needs minutes to boil. When you turn the flame off, the water does not go cold at once. It stays hot for minutes.</p>
       <p>Remember that number: 48 seconds. The whole project comes down to one question — how many seconds can we see ahead, against those 48?</p>
-      <p>One warning, and it applies to everything on this page: this climb never happened. The car gave us 175.5 minutes of recorded driving and nothing more, and we built a computer model of the engine on top of that. Every number here comes out of that model, driven by simple rules we wrote by hand in <code>check_premise.py</code>, one of the scripts in our repository that regenerates these figures. Nothing here was measured on a road.</p>
+      <p>One warning, and it applies to everything on this page: this climb never happened. The car gave us 295.0 minutes of recorded driving and nothing more, and we built a computer model of the engine on top of that. Every number here comes out of that model, driven by simple rules we wrote by hand in <code>check_premise.py</code>, one of the scripts in our repository that regenerates these figures. Nothing here was measured on a road.</p>
     </div>
     <div class="blk">
       <h3>What the ECU does today</h3>
@@ -2840,7 +2840,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         <ul>
           <li><b>What we do</b> — Read-only, through the OBD-II port <span style="color:var(--muted)">OBD-II is the standard diagnostic socket fitted under the dashboard of every modern car. We plug in a logger that reads what the car reports about itself — temperatures, pressures, air mass — and sends nothing back</span></li>
           <li><b>What we do not do</b> — We never rewrite the ECU&#x27;s software, never send a command on the car&#x27;s internal network (the CAN bus), and never edit the calibration tables the ECU runs from <span style="color:var(--muted)">Read-only, no exceptions — an explicit decision in this project, and a well-known rule outside it. The ECU decides when the spark fires and how much fuel goes in. One wrong command lights the mixture at the wrong moment; heavy knock follows, and knock destroys the piston, the part that slides up and down inside the cylinder. This is also a car one of us drives every day</span></li>
-          <li><b>So how do we control anything at all?</b> — We control inside a simulation built on this car&#x27;s data, not inside the car <span style="color:var(--muted)">The car gives us measurements and nothing else: 175.5 minutes of recorded driving. We match a computer model of the engine to those measurements, and everything after that happens inside the model — the hand-written policies that produced the figures on this page, and the learned controller we are training next. Nothing is ever written to the car, not today and not at the end of the project</span></li>
+          <li><b>So how do we control anything at all?</b> — We control inside a simulation built on this car&#x27;s data, not inside the car <span style="color:var(--muted)">The car gives us measurements and nothing else: 295.0 minutes of recorded driving. We match a computer model of the engine to those measurements, and everything after that happens inside the model — the hand-written policies that produced the figures on this page, and the learned controller we are training next. Nothing is ever written to the car, not today and not at the end of the project</span></li>
           <li><b>The working rule</b> — If a task looks as though it requires writing to the car, it is the wrong task <span style="color:var(--muted)">Say so out loud rather than looking for a way around it</span></li>
         </ul>
       </div>
@@ -2889,7 +2889,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
       <p>An engine is a machine that does one thing: it turns a small, repeated explosion into rotation. Inside each cylinder — the round bore the piston runs in — a metal slug called the piston slides up and down; picture the plunger of a syringe inside its barrel. The explosion drives the piston down, and the crankshaft turns that straight push into rotation, the way a bicycle crank turns the push of your leg into a turning wheel.</p>
       <p>The cycle is four strokes in order: draw in air and fuel, compress them, ignite and push, then expel the exhaust. All four take two full turns of the crankshaft, so each cylinder fires once every two revolutions, not once per revolution.</p>
       <p>Every timing figure in this project is measured from one place: top dead centre (TDC), the highest point the piston reaches. Timing before that point is written BTDC, timing after it ATDC, and the unit is degrees of crankshaft rotation — not degrees of temperature. Learn both abbreviations; every timing number here uses one of them.</p>
-      <p>Our engine is the BMW B58: three litres (2997.5 cc), six cylinders in a single row (an inline-six). That three litres is the displacement — the total volume the pistons sweep in one cycle, and the usual one-line size of an engine. It sits in a 2023 Toyota GR Supra, and the team logged nine drives from that car — 175.5 minutes in all — through its OBD-II port, the diagnostic socket every road car carries for service tools. So every number here comes from one specific car, not from a textbook engine.</p>
+      <p>Our engine is the BMW B58: three litres (2997.5 cc), six cylinders in a single row (an inline-six). That three litres is the displacement — the total volume the pistons sweep in one cycle, and the usual one-line size of an engine. It sits in a 2023 Toyota GR Supra, and the team logged ten drives from that car — 295.0 minutes in all — through its OBD-II port, the diagnostic socket every road car carries for service tools. So every number here comes from one specific car, not from a textbook engine.</p>
     </div>
     <!-- ======================================================= W1 · four stroke -->
 <div class="widget" data-widget="four-stroke">
@@ -2978,7 +2978,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
       <p>Enrichment is deliberately running the engine rich at high load. Thermodynamically it is plain waste: you inject fuel you know will not burn. Every manufacturer does it anyway.</p>
       <p>There are three reasons, and they add up. First, liquid fuel evaporates inside the cylinder, and evaporating takes heat out of the charge — the air and fuel trapped in the cylinder. In a direct-injection engine, one that sprays fuel straight into the cylinder rather than into the inlet port, that cools the charge by about 25 K. Second, the surplus fuel is extra mass to heat up, so the same energy reaches a lower temperature (section 7 explains why mass slows temperature down). Third, the carbon monoxide left by incomplete combustion leaves through the exhaust carrying chemical energy that never became heat at all.</p>
       <p>The conclusion to keep: enrichment is a thermal tool, and it is the fastest lever available when the turbo approaches its limit. That sentence alone explains why lambda is one of the agent&#x27;s five levers.</p>
-      <p>Here is the project&#x27;s own result on this car, from 1055 samples taken above 180 kPa across nine drives. The mixture gets richer — lambda falls — as engine speed rises (correlation −0.56), as air mass flow rises (−0.49), and the longer the engine has been held continuously above 180 kPa (−0.47). Each correlation is negative because a richer mixture is a lower lambda. We call that 180 kPa the enrichment gate (ENR_LOAD). Above it, the engine starts counting the seconds it has spent under high pressure, and we use that count as a stand-in for the turbine temperature this car never publishes.</p>
+      <p>Here is the project&#x27;s own result on this car, from 1055 samples taken above 180 kPa across ten drives. The mixture gets richer — lambda falls — as engine speed rises (correlation −0.56), as air mass flow rises (−0.49), and the longer the engine has been held continuously above 180 kPa (−0.47). Each correlation is negative because a richer mixture is a lower lambda. We call that 180 kPa the enrichment gate (ENR_LOAD). Above it, the engine starts counting the seconds it has spent under high pressure, and we use that count as a stand-in for the turbine temperature this car never publishes.</p>
       <p>Manifold pressure, meanwhile, correlates at only +0.23 — a weak signal, and pointing the wrong way: higher pressure comes with a leaner mixture, not a richer one. So the mixture on this car is not set from a load table, a lookup indexed by load alone. It is component protection.</p>
     </div>
     <div class="blk">
@@ -3053,8 +3053,8 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         <thead><tr><th>The channel as it names itself</th><th>What it actually is</th><th>The evidence that exposed it</th></tr></thead>
         <tbody>
           <tr><td>Intake manifold absolute pressure</td><td>A pre-throttle sensor, not one inside the manifold</td><td>At idle the throttle is nearly shut, so the pressure inside the manifold should fall to about a third of atmospheric. This channel does not: warm, it reads 13.49 psi against an atmospheric 14.23 — barely any drop at all, which is how we know it is not measuring inside the manifold. Feed it into the model and the air-mass error is 75 %; work the pressure out from air flow instead and the error is 1.3 %.</td></tr>
-          <tr><td>Air mass flow</td><td>A sensor that saturates at its ceiling and then goes on reporting as if nothing had happened</td><td>It stops at exactly 1020.0 kg/h, on 517 samples across five different drives. A number that identical, repeating like that, does not happen in nature — the sensor has hit its ceiling and gone on reporting. Samples stuck at the ceiling are &quot;pinned&quot;: we flag them maf_pinned and leave them out of the steady points we compare the model against.</td></tr>
-          <tr><td>Intake air temperature before throttle valve</td><td>The compressor outlet, not the temperature of the charge entering the cylinder</td><td>It reads 149 °C under boost and 163 °C at peak, and no intercooler — the radiator that cools compressed air before it reaches the engine — delivers air that hot. The decisive part is numerical, and the two sides are matched by construction rather than by choice: the logged side keeps every reading where the car&#x27;s own Boost pressure channel is above 15 psi gauge, and (15 + 14.23) × 6.894757 = 201.5 kPa absolute, so gating the model side at 200 kPa selects the same operating region. At that matched gate — 587 boosted, MAF-unpinned model samples against 887 logged readings whose median is 226 kPa — this sensor puts the computed pressure at 279.5 kPa, +23.7 % above the car; the charge temperature our own model computes puts it at 232.7 kPa, +3.0 %. The reason is that the B58&#x27;s cooler sits inside the intake manifold — after the throttle, not before it.</td></tr>
+          <tr><td>Air mass flow</td><td>A sensor that saturates at its ceiling and then goes on reporting as if nothing had happened</td><td>It stops at exactly 1020.0 kg/h, on 547 samples across five different drives. A number that identical, repeating like that, does not happen in nature — the sensor has hit its ceiling and gone on reporting. Samples stuck at the ceiling are &quot;pinned&quot;: we flag them maf_pinned and leave them out of the steady points we compare the model against.</td></tr>
+          <tr><td>Intake air temperature before throttle valve</td><td>The compressor outlet, not the temperature of the charge entering the cylinder</td><td>It reads 149 °C under boost and 163 °C at peak, and no intercooler — the radiator that cools compressed air before it reaches the engine — delivers air that hot. The decisive part is numerical, and the two sides are matched by construction rather than by choice: the logged side keeps every reading where the car&#x27;s own Boost pressure channel is above 15 psi gauge, and (15 + 14.23) × 6.894757 = 201.5 kPa absolute, so gating the model side at 200 kPa selects the same operating region. At that matched gate — 587 boosted, MAF-unpinned model samples against 887 logged readings whose median is 226 kPa — this sensor puts the computed pressure at 279.5 kPa, +23.7 % above the car; the charge temperature our own model computes puts it at 232.7 kPa, +1.9 %. The reason is that the B58&#x27;s cooler sits inside the intake manifold — after the throttle, not before it.</td></tr>
         </tbody></table></div>
     </div>
     <div class="blk">
@@ -3062,7 +3062,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
       <div class="rows">
         <div>
           <div class="k">First, what &quot;trim&quot; means</div>
-          <div class="nn">The first three levers are trims. They do not command the engine directly; they are added to whatever the baseline has already commanded. The baseline is the conventional control program we simulate in engine_env.BaselineECU: a spark map built from 11 measured points between 43 and 79 kPa, knock-limited above that, plus the fourth version of our enrichment model, fitted on nine drives. A trim of zero means &quot;do not intervene&quot;. The last two levers are absolute values: what the agent writes is the final command itself</div>
+          <div class="nn">The first three levers are trims. They do not command the engine directly; they are added to whatever the baseline has already commanded. The baseline is the conventional control program we simulate in engine_env.BaselineECU: a spark map built from 11 measured points between 43 and 79 kPa, knock-limited above that, plus the fourth version of our enrichment model, fitted on ten drives. A trim of zero means &quot;do not intervene&quot;. The last two levers are absolute values: what the agent writes is the final command itself</div>
         </div>
         <div>
           <div class="k">spark trim</div>
@@ -3329,7 +3329,7 @@ That is our only question.</td></tr>
         <h4>Read this before any number on the page</h4>
         <ul>
           <li><b>Two numbers from two experiments, not two numbers for one result</b> — The 13.4-point figure comes from the premise check — our first experiment, described below — on a single scenario, meaning one simulated drive. The 26.0-point figure comes from the time-constant sweep. These are two different experiments: a different scenario and a different way of scoring damage, though the policies themselves are the same code. Always say which experiment produced the number, and which protection limit it was measured against.</li>
-          <li><b>Everything that follows happens inside a simulation</b> — Both plants are models on a computer, not hardware in a lab. The engine simulation is written from physical equations and calibrated against 175.5 minutes of logs from a real car, but it is still a model.</li>
+          <li><b>Everything that follows happens inside a simulation</b> — Both plants are models on a computer, not hardware in a lab. The engine simulation is written from physical equations and calibrated against 295.0 minutes of logs from a real car, but it is still a model.</li>
           <li><b>We never write anything to the car&#x27;s ECU — the engine control unit, the computer that runs the engine</b> — We only read from it, through the car&#x27;s standard diagnostic socket (OBD-II): we never reprogram it, never send it a command, and never change its calibration. Every control experiment runs inside the simulator. This is a hard constraint on the project, with no exceptions.</li>
           <li><b>Where we actually are, phase by phase</b> — The project runs in seven phases, A to G. Setup (A) is done. Matching the simulator to the car (B) is done. Training the agent (C) is next, and nothing has been trained yet. Baselines and the ablation (D), the battery plant (E) and the writing (G) have not started. The H/τ sweep (F) — the ratio is explained below — has a preliminary result from hand-written policies.</li>
         </ul>
@@ -3340,7 +3340,7 @@ That is our only question.</td></tr>
       <div class="rows">
         <div>
           <div class="k">Experimentally validated</div>
-          <div class="vv">The closest work to ours is a theory paper from February 2026: Liu &amp; Seiler, &quot;Regret of H∞ Preview Controllers&quot;, arXiv 2602.01420. It proves that the value of preview stops growing beyond a certain horizon — past some point, seeing further adds nothing. But it does not say where that point lies, or how much preview saves before it, and it treats linear systems with a proof rather than a measurement. We give measured magnitudes on a simulated engine built from physical equations and calibrated against 175.5 minutes of logs from a real car.</div>
+          <div class="vv">The closest work to ours is a theory paper from February 2026: Liu &amp; Seiler, &quot;Regret of H∞ Preview Controllers&quot;, arXiv 2602.01420. It proves that the value of preview stops growing beyond a certain horizon — past some point, seeing further adds nothing. But it does not say where that point lies, or how much preview saves before it, and it treats linear systems with a proof rather than a measurement. We give measured magnitudes on a simulated engine built from physical equations and calibrated against 295.0 minutes of logs from a real car.</div>
           <div class="nn">Delete this word and that paper already covers our claim. Raise it yourself in the viva — anyone who knows the field will think of it within a minute.</div>
         </div>
         <div>
@@ -3844,7 +3844,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         </div></li>
         <li><div>
           <b>Two calibrations corrected against the car</b>
-          <div class="note">The enrichment map (enrichment — injecting extra petrol not to burn but to cool hot parts) was rebuilt from 175.5 minutes of real driving over nine drives. And the spark map (spark — when the plug fires before the piston arrives) is in two pieces: a fit over eleven measured steady points below about 90 kPa (residual RMS 1.66° against 8.43° for the old map), and above that the knock limit computed inside the model itself — no measurement there, and we say so. It is backed by measuring the retard the car applies on its own: median 0°, 99th percentile 9.8°.</div>
+          <div class="note">The enrichment map (enrichment — injecting extra petrol not to burn but to cool hot parts) was rebuilt from 295.0 minutes of real driving over ten drives. And the spark map (spark — when the plug fires before the piston arrives) is in two pieces: a fit over eleven measured steady points below about 90 kPa (residual RMS 1.66° against 8.43° for the old map), and above that the knock limit computed inside the model itself — no measurement there, and we say so. It is backed by measuring the retard the car applies on its own: median 0°, 99th percentile 9.8°.</div>
         </div></li>
         <li><div>
           <b>Our own hypothesis failed, and we published the whole table</b>
@@ -3925,7 +3925,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
       <div class="fig">
         <span class="v">22</span>
         <span class="u">points</span>
-        <span class="l">Steady operating points, 30–74 kPa (outside air about 101)</span>
+        <span class="l">Steady operating points, 30–75 kPa (outside air about 101)</span>
         <span class="s">build_dataset.py</span>
       </div>
       <div class="fig">
@@ -3955,7 +3955,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <thead><tr><th>Phase</th><th>What it is</th><th>Where it stands today</th></tr></thead>
         <tbody>
           <tr><td>A · Setup</td><td>Repository, tooling, and the run chain.</td><td>Done.</td></tr>
-          <tr><td>B · Match the simulator to the car</td><td>Compare the engine model against real measurements from the car.</td><td>Passed — the model and the car agree to within 1.4 % with zero fitted parameters, and 1.1 % with one, over 22 pooled operating points spanning 30–74 kPa. Note what that comparison actually is: two of the car&#x27;s own sensor readings checked against each other. It does not test the breathing model. See &quot;Limits&quot; below.</td></tr>
+          <tr><td>B · Match the simulator to the car</td><td>Compare the engine model against real measurements from the car.</td><td>Passed — the model and the car agree to within 1.4 % with zero fitted parameters, and 1.1 % with one, over 22 pooled operating points spanning 30–75 kPa. Note what that comparison actually is: two of the car&#x27;s own sensor readings checked against each other. It does not test the breathing model. See &quot;Limits&quot; below.</td></tr>
           <tr><td>C · Train the agent</td><td>Train an agent — a program that learns a control strategy for itself — to protect the engine from heat.</td><td>Next. The code exists but has never been run; stable-baselines3 has to be installed first.</td></tr>
           <tr><td>D · Baselines and the ablation</td><td>Three baselines to beat, 20 fixed test episodes, and a results table giving the median and interquartile range over five training runs. The minimum bar for a pass: beat two of the three baselines, plus an ablation — the same experiment re-run with preview switched off — to show that preview is what made the difference.</td><td>Not started — and this is the floor of the whole project.</td></tr>
           <tr><td>E · The second system: a battery</td><td>A system whose physics has nothing in common with the engine&#x27;s. The aim: plot its points on the same H/τ curve. If the two do not land on one curve, the criterion is wrong or incomplete, and saying so is a result too.</td><td>Not started — battery.py does not exist yet.</td></tr>
@@ -3968,18 +3968,18 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
       <div class="rows">
         <div>
           <div class="k">Logging from the car</div>
-          <div class="vv">175.5 minutes, 8 drives, 6 of them carrying usable samples</div>
-          <div class="nn">All of it read-only, through the OBD-II diagnostic socket, with not one command written back to the car. Six of the nine drives carry usable samples. Two are shorter than a minute and never warm up. A third is a reconnaissance run: we recorded 655 channels at once — a channel is one reading the car publishes, and 655 is almost every one it offers — so the logger could not keep up and a quarter of the samples were lost. That run does carry samples, but it yields no steady operating points, so the 22 points come from five drives. It is also the reason we know which 21 channels to record on every drive since.</div>
+          <div class="vv">295.0 minutes, 8 drives, 6 of them carrying usable samples</div>
+          <div class="nn">All of it read-only, through the OBD-II diagnostic socket, with not one command written back to the car. Six of the ten drives carry usable samples. Two are shorter than a minute and never warm up. A third is a reconnaissance run: we recorded 655 channels at once — a channel is one reading the car publishes, and 655 is almost every one it offers — so the logger could not keep up and a quarter of the samples were lost. That run does carry samples, but it yields no steady operating points, so the 22 points come from five drives. It is also the reason we know which 21 channels to record on every drive since.</div>
         </div>
         <div>
           <div class="k">Steady operating points</div>
-          <div class="vv">22 distinct points, 30–74 kPa</div>
+          <div class="vv">22 distinct points, 30–75 kPa</div>
           <div class="nn">An operating point is a stretch of steady driving where the model and the car can be compared directly; the &quot;load&quot; at that point is how much air the engine takes in per cycle. Each point is one minute long, and that minute has to be a real minute on the clock with no break in the recording. One whole drive lost every candidate minute it had, because the logger was dropping a quarter of the samples.</div>
         </div>
         <div>
           <div class="k">The gap between the two air channels (load residual)</div>
-          <div class="vv">1.4 % with zero fitted parameters, derived constant k = 0.829</div>
-          <div class="nn">And 1.1 % if we allow ourselves to hand-tune one constant, k, which converts the car&#x27;s air-filling reading into the units the model uses: 0.837 tuned, against 0.829 derived from first principles. The direction is the healthy one — one free parameter should always improve a fit, so a better result with no tuning at all would be the suspicious outcome. Either way, both numbers compare two of the car&#x27;s own readings and neither tests the breathing model. See &quot;No test of the breathing model at everyday, low loads&quot; below.</div>
+          <div class="vv">1.4 % with zero fitted parameters, derived constant k = 0.831</div>
+          <div class="nn">And 1.1 % if we allow ourselves to hand-tune one constant, k, which converts the car&#x27;s air-filling reading into the units the model uses: 0.837 tuned, against 0.831 derived from first principles. The direction is the healthy one — one free parameter should always improve a fit, so a better result with no tuning at all would be the suspicious outcome. Either way, both numbers compare two of the car&#x27;s own readings and neither tests the breathing model. See &quot;No test of the breathing model at everyday, low loads&quot; below.</div>
         </div>
         <div>
           <div class="k">Validation table</div>
@@ -4014,7 +4014,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <h4>Why 8 of 11 is the expected outcome, not a failure</h4>
         <ul>
           <li><b>The three that fall outside are known by name</b> <span style="color:var(--muted)">Peak exhaust gas temperature at low, steady cruising loads, plus two oil quantities: oil temperature on a sustained climb, and the oil time constant. None of the three is a surprise or a hidden defect, and validation_table.md gives the reason for each.</span></li>
-          <li><b>Oil above 107 °C is extrapolation</b> <span style="color:var(--muted)">107 °C is the hottest reading of the oil temperature channel anywhere in the logs, and the sensor downstream of the oil filter reaches 111 °C on that same drive. The published band, 115–140 °C, starts above both. So anything we say about hotter oil rests on the structure of the model, not on anything we measured.</span></li>
+          <li><b>Oil above 117 °C is extrapolation</b> <span style="color:var(--muted)">117 °C is the hottest reading of the oil temperature channel anywhere in the logs, and the sensor downstream of the oil filter reaches 111 °C on that same drive. The published band, 115–140 °C, starts above both. So anything we say about hotter oil rests on the structure of the model, not on anything we measured.</span></li>
           <li><b>The rule</b> <span style="color:var(--muted)">Matching the car and falling outside the published band is better than moving a coefficient to close the gap. Do not tune a parameter to make a row in a table pass.</span></li>
         </ul>
       </div>
@@ -4029,7 +4029,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         </div>
         <div>
           <div class="k">The comparison against the car covers light load only</div>
-          <div class="vv">30–74 kPa</div>
+          <div class="vv">30–75 kPa</div>
           <div class="nn">Air pressure outside the car is about 101 kPa. Under boost — when the turbocharger is forcing extra air in — the engine runs past 200 kPa, so 30 to 74 kPa covers only the low-pressure end of its range. Steady points need steady driving, and steady driving is light-load driving. That is a fact about the road, not a shortcoming in the code.</div>
         </div>
         <div>
@@ -4097,7 +4097,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
       <p>And if the agent does not beat the baselines? Then we say so plainly. A negative result under a protocol fixed before the experiment is still a defensible result. What would destroy the project is changing the test set after seeing the results, not losing a comparison.</p>
       <p>This status is current as of 11 September 2026. One command checks that every figure in it is still true: python <code>verify_docs.py</code>.</p>
     </div>
-    <div class="say"><span class="lab">Say this if a supervisor stops you in the corridor</span><q>We have a simulator checked against a real car over 175.5 minutes of logging and 22 steady operating points between 30 and 74 kPa. What is left is Phase D: an agent that beats the baselines, which are the simple control strategies we compare it against. Then we run the same experiment again with the road ahead hidden from the agent. If the advantage disappears when we hide it, preview is what produced it.</q></div>
+    <div class="say"><span class="lab">Say this if a supervisor stops you in the corridor</span><q>We have a simulator checked against a real car over 295.0 minutes of logging and 22 steady operating points between 30 and 74 kPa. What is left is Phase D: an agent that beats the baselines, which are the simple control strategies we compare it against. Then we run the same experiment again with the road ahead hidden from the agent. If the advantage disappears when we hide it, preview is what produced it.</q></div>
   </section>
 
 <!-- en · shell-mistakes.en.html -->
@@ -4135,7 +4135,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
             </tr>
             <tr>
               <td class="num">4</td>
-              <td><b>The enrichment map was wrong three times, and the third time the variable itself was wrong.</b> Version three was fitted to 17 seconds of high load. With nine drives we had 178 seconds, and at that sample size the correlation between lambda and manifold pressure is <span class="num">+0.23</span> — weak, and with the wrong sign for a load table.</td>
+              <td><b>The enrichment map was wrong three times, and the third time the variable itself was wrong.</b> Version three was fitted to 17 seconds of high load. With ten drives we had 178 seconds, and at that sample size the correlation between lambda and manifold pressure is <span class="num">+0.23</span> — weak, and with the wrong sign for a load table.</td>
               <td>One drive is not evidence. A fit that reproduces the effect can still be built on the wrong variable — check how many samples support it, and check that the variable actually correlates.</td>
             </tr>
             <tr>
@@ -4150,7 +4150,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
             </tr>
             <tr>
               <td class="num">7</td>
-              <td><b>A channel hits its range limit and keeps reporting.</b> "Air mass flow" tops out at exactly <span class="num">1020.0 kg/h</span> on five separate drives, across <span class="num">517</span> samples.</td>
+              <td><b>A channel hits its range limit and keeps reporting.</b> "Air mass flow" tops out at exactly <span class="num">1020.0 kg/h</span> on six separate drives, across <span class="num">517</span> samples.</td>
               <td>Before fitting anything to a channel, check whether it saturated. A flat maximum repeated across drives is the tell.</td>
             </tr>
             <tr>
@@ -4264,7 +4264,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <div class="term is-star" data-g="g1">
           <div class="th"><b>Enrichment</b><span class="badge t3">★ viva</span></div>
           <p class="def">Deliberately running the engine with more fuel than the air can burn, at high load. The extra fuel goes in as a liquid and does not all burn; evaporating it takes heat out of the charge — the air and fuel trapped in the cylinder — the way sweat cools your skin. The result is cooler exhaust, at the cost of wasted fuel.</p>
-          <p class="why"><span class="star">Why it matters here · </span>Eight drives told us this car does not enrich by load, but by engine speed and by how long it has been held above a 180 kPa threshold. Lambda&#x27;s correlation with manifold pressure is only +0.23 — weak, and pointing the wrong way for a load table: higher pressure goes with a leaner mixture, not a richer one. The real correlations are with engine speed (−0.56) and with how long the engine has been held above the threshold (−0.47).</p>
+          <p class="why"><span class="star">Why it matters here · </span>Eight drives told us this car does not enrich by load, but by engine speed and by how long it has been held above a 180 kPa threshold. Lambda&#x27;s correlation with manifold pressure is only +0.23 — weak, and pointing the wrong way for a load table: higher pressure goes with a leaner mixture, not a richer one. The real correlations are with engine speed (−0.47) and with how long the engine has been held above the threshold (−0.47).</p>
         </div>
         <div class="term is-star" data-g="g1">
           <div class="th"><b>Douaud–Eyzat induction-time integral</b><span class="badge t3">★ viva</span></div>
@@ -4419,7 +4419,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <div class="term" data-g="g4">
           <div class="th"><b>OBD-II · CAN bus · PID</b></div>
           <p class="def">The socket under the dashboard (OBD-II, on-board diagnostics), the internal network behind it (the CAN bus, controller area network), and the numbered parameter identifiers (PIDs) you quote to request data. Note the clash: a PID here is a data identifier, nothing to do with a PID controller.</p>
-          <p class="why"><span class="star">Why it matters here · </span>All of our real data came from here: 175.5 minutes across nine drives. Remember the rule: a channel name is a hypothesis, not a fact — three channels on this car turned out not to be what their names said.</p>
+          <p class="why"><span class="star">Why it matters here · </span>All of our real data came from here: 295.0 minutes across ten drives. Remember the rule: a channel name is a hypothesis, not a fact — three channels on this car turned out not to be what their names said.</p>
         </div>
       </div>
     </div>
@@ -4594,11 +4594,11 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <div class="term" data-g="g7">
           <div class="th"><b>Relative air filling</b></div>
           <p class="def">One of BMW&#x27;s channels, saying how much air entered the cylinder relative to a defined reference state (DIN: 1013 mbar and 0 °C) rather than to today&#x27;s weather. It is one of the two quantities the residual compares; the other is measured air mass flow.</p>
-          <p class="why"><span class="star">Why it matters here · </span>The residual is 1.4 per cent with a derived constant k = 0.829 and zero fitted parameters, and 1.1 per cent with a fitted k = 0.837 and one parameter. Quote the derived one, and say that it costs nothing. Read mistake 12 before calling it validation: it is a consistency check between two of the car&#x27;s own channels, and it never sees the breathing model at all. What it does earn is two things. It pinned the meaning of the channel at the DIN reference, and it is sensitive to displacement — the derived constant gives 48.1 per cent if it is forced onto the wrong 2.0-litre engine, so it would have caught mistake 1 on its first day.</p>
+          <p class="why"><span class="star">Why it matters here · </span>The residual is 1.4 per cent with a derived constant k = 0.831 and zero fitted parameters, and 1.1 per cent with a fitted k = 0.837 and one parameter. Quote the derived one, and say that it costs nothing. Read mistake 12 before calling it validation: it is a consistency check between two of the car&#x27;s own channels, and it never sees the breathing model at all. What it does earn is two things. It pinned the meaning of the channel at the DIN reference, and it is sensitive to displacement — the derived constant gives 48.1 per cent if it is forced onto the wrong 2.0-litre engine, so it would have caught mistake 1 on its first day.</p>
         </div>
         <div class="term" data-g="g7">
           <div class="th"><b>Validated envelope</b></div>
-          <p class="def">What we actually compared against the car: 22 steady operating points between 30 and 74 kPa, extracted from 175.5 minutes across nine drives, six of which carry usable samples.</p>
+          <p class="def">What we actually compared against the car: 22 steady operating points between 30 and 74 kPa, extracted from 295.0 minutes across ten drives, six of which carry usable samples.</p>
           <p class="why"><span class="star">Why it matters here · </span>Above that — the boosted region — is compared against published references rather than against the car, because steady driving is light-load driving by its nature. Every engine number on this page inherits that limit, so say it before the examiner asks you about it.</p>
         </div>
         <div class="term is-star" data-g="g7">
@@ -4707,7 +4707,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
             <div class="rows">
               <div>
                 <div class="k">How do you know the simulator is right?</div>
-                <div class="vv">Two independent checks. Against published combustion figures: <b>8 of 11</b> quantities inside band, and we report the three misses with reasons rather than tuning to close them. Against the car: a <b>1.4 %</b> load residual over 22 operating points drawn from 175.5 minutes of logging.</div>
+                <div class="vv">Two independent checks. Against published combustion figures: <b>8 of 11</b> quantities inside band, and we report the three misses with reasons rather than tuning to close them. Against the car: a <b>1.4 %</b> load residual over 22 operating points drawn from 295.0 minutes of logging.</div>
                 <div class="nn">And read mistake 12 before quoting the second one: the residual does not test the breathing model. Say that yourself before the examiner does.</div>
               </div>
               <div>

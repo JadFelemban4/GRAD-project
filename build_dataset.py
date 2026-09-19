@@ -25,7 +25,7 @@ DERIVED COLUMNS, AND WHY THEY ARE NOT JUST COPIED FROM THE LOG
                  vehicle is a pre-throttle sensor: it never drops below ~92 kPa,
                  even at idle where physics demands about 31. Using it gives 75%
                  air-mass error; inverting air mass leaves a 1.4 % load residual
-                 over the 23 pooled points, 30-74 kPa (1.1 % if the DIN constant
+                 over the 26 pooled points, 30-75 kPa (1.1 % if the DIN constant
                  is fitted rather than derived). Read what that residual does
                  and does not test in compare_log.py before quoting it.
   corr_flow      compressor-corrected mass flow, kg/s. Inlet conditions are
@@ -89,13 +89,13 @@ CH = {
 }
 
 # WINDOW_S = 60 s, and the choice is now justified by the drives rather than
-# assumed. Re-measured 11 September on the shipped nine drives, 175.5 minutes,
+# assumed. Re-measured 11 September on the shipped ten drives, 295.0 minutes,
 # six of which carry usable samples, against the DRIVE_1 card, which asked for
 # three-minute holds. Count the windows this function returns with WINDOW_S set
 # each way:
 #
 #     59 windows survive the span and gap checks at 60 s, and dedupe to the
-#        23 distinct operating points in data/master_points.csv
+#        26 distinct operating points in data/master_points.csv
 #      9 windows survive at 180 s
 #
 # Asking for 180 s would throw away five windows in six. Public roads do not
@@ -206,8 +206,8 @@ def derive(d):
     d["press_ratio"] = ((d["p_amb"] + d["boost"]) * PSI_TO_KPA) / p01
 
     # THE MAF CHANNEL SATURATES. "Air mass flow" tops out at exactly 1020.0 kg/h
-    # on five separate drives -- 3aca2ec1, 670063b2, 683640a0, cb67b01f and
-    # 7475b5d7 -- 517 samples in all. That is a sensor range limit, not a coincidence: the same
+    # on six separate drives -- 3aca2ec1, 670063b2, 683640a0, cb67b01f and
+    # 7475b5d7 -- 547 samples in all. That is a sensor range limit, not a coincidence: the same
     # samples show "Air mass flow participating in combustion" reaching 1233 kg/h.
     #
     # A pinned sample reports less air than the engine is actually breathing, so
@@ -230,7 +230,7 @@ def derive(d):
     # the reason is the forward fill. np.gradient over a staircase is zero
     # everywhere except the two rows beside each genuine update, so the flag
     # rejects only those: 93.9 % of warm rows come out "quasi-steady"
-    # (43 853 of 46 707; 2 337 rejected). "43 853 quasi-steady samples" is
+    # (74 013 of 46 707; 2 337 rejected). "74 013 quasi-steady samples" is
     # therefore a count of ROWS that are not adjacent to an update -- which is
     # nearly the opposite of what a steadiness filter is for.
     #
@@ -245,7 +245,7 @@ def derive(d):
     # is NOT what makes this flag unselective. The thresholds are: 40 g/s per
     # second of air and 0.6 bar per second of boost admit nearly everything a
     # road drive does. Neither flag is a steadiness filter in any useful sense,
-    # and "43 853 quasi-steady samples" should be read as "warm rows that are
+    # and "74 013 quasi-steady samples" should be read as "warm rows that are
     # not mid-transient", which is a much weaker claim.
     dt = np.gradient(d["t"])
     with np.errstate(invalid="ignore", divide="ignore"):
@@ -288,7 +288,7 @@ def steady_points(d):
     before this check existed and on the seven drives that existed then. They
     are what motivated the rule, not a description of the shipped dataset. With
     the check in place, the worst gap inside any surviving window across all
-    nine drives is 0.48 s.
+    ten drives is 0.48 s.
 
         3aca2ec1   windows spanned 42.8 - 68.7 s
         cb67b01f   windows spanned 65.6 - 65.8 s
@@ -320,9 +320,28 @@ def steady_points(d):
     span = t[-1] - t[0]
     if span <= 0:
         return []
-    rate = len(t) / span
-    w = max(4, int(round(WINDOW_S * rate)))
+    # WINDOW SIZED IN TIME, NOT IN SAMPLES. This is the other half of mistake 8,
+    # and it went unfixed for a fortnight because the CHECK added then was
+    # hiding it: a window was still sized `WINDOW_S * average_rate` ROWS, and
+    # then rejected if its real wall-clock span came out wrong. On a drive whose
+    # rate is not constant that rejects everything instead of measuring anything.
+    #
+    # `drive10` is the drive that exposed it -- 119 minutes, and it contributed
+    # ZERO operating points. It logs at TWO rates, 0.150 s for ~15 000 rows and
+    # 0.240 s for ~16 000, so its average rate of 5.06 Hz fits neither half. The
+    # window came out 304 rows, which at the slow half's 0.239 s median spans
+    # 72.7 s -- 0.7 s outside the 48-72 s band. Every window failed, by less
+    # than a second, on a drive with no gaps at all.
+    #
+    # `_window_end` walks to the first sample at or past t[i] + WINDOW_S, so a
+    # window is 60 seconds BY CONSTRUCTION on any rate, constant or not, and the
+    # span check below goes back to being what it was meant to be: a net for
+    # logger gaps, not the thing doing the rejecting.
     dt_med = float(np.median(np.diff(t))) if len(t) > 1 else 0.0
+
+    def _window_end(i0):
+        j = int(np.searchsorted(t, t[i0] + WINDOW_S, side="left"))
+        return j if j > i0 + 3 else -1
     v, n = d["v_kmh"], d["rpm"]
     # AUDIT.md M3: "steady" tested SPEED AND ENGINE SPEED ONLY. Load, air mass,
     # throttle and spark were free to do anything -- among the surviving
@@ -338,13 +357,17 @@ def steady_points(d):
     ld = d.get("load_pct")
     hits, i = [], 0
     rejected_span = rejected_gap = rejected_load = 0
-    while i + w <= len(t):
+    while i < len(t):
+        w_end = _window_end(i)
+        if w_end < 0 or w_end > len(t):
+            break
+        w = w_end - i
         vs, ns = v[i:i + w], n[i:i + w]
         if (np.isfinite(vs).all() and np.isfinite(ns).all()
                 and np.ptp(vs) < SPEED_TOL and np.ptp(ns) < RPM_TOL
                 and vs.mean() > MIN_SPEED):
             # Recorded, NOT used to reject. Applying it as a filter at 0.25
-            # takes the dataset from 23 operating points to 11 and narrows the
+            # takes the dataset from 26 operating points to 11 and narrows the
             # span to 37-75 kPa, which trades away more coverage than the
             # mislabelling costs. Every point now carries its own load spread
             # instead, so the strict subset can be selected downstream and the
@@ -401,7 +424,7 @@ def fresh_readings(df, col, source_col="source"):
         whole warm set                        46707
           fresh lambda readings                1288      36.3x
 
-        "517 samples pinned at the MAF ceiling" is 14 separate EXCURSIONS.
+        "547 samples pinned at the MAF ceiling" is 14 separate EXCURSIONS.
 
     So a correlation quoted to two decimals on "1055 samples" actually rests on
     of order 70 independent readings, where the standard error is about

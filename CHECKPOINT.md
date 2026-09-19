@@ -17,7 +17,7 @@ file if it is more than a week old.
 > private.
 
 > **11 September, v17 and a document sweep.** The charge-temperature correction
-> shipped, the operating points moved down to **30–74 kPa**, and every tracked
+> shipped, the operating points moved down to **30–75 kPa**, and every tracked
 > document was swept against the data. See the 11 September section at the
 > bottom of this file.
 
@@ -25,13 +25,13 @@ file if it is more than a week old.
 > `REFERENCES.md` now records, row by row, which of `validate.py`'s eleven
 > bands have a source and which do not — **seven do not**. `app/` runs the
 > same physics alongside the car. `pull01` takes the manifest to **nine
-> drives, 175.5 minutes** and adds zero samples by design. Two findings
+> drives, 295.0 minutes** and adds zero samples by design. Two findings
 > change what the model may claim: the B58 has **no thermostat**, and the
 > compression ratio depends on an engine version nobody has recorded. See the
 > last section of this file.
 
 > **13–16 September, v19, the ninth drive and the live app.** `pull01` joined
-> `logs/raw/`, taking the manifest to **nine drives, 175.5 minutes** — it
+> `logs/raw/`, taking the manifest to **ten drives, 295.0 minutes** — it
 > contributes zero samples and zero operating points by design, so no
 > calibration figure moved. `app/`, the live supervisor, was imported and then
 > hardened; two defects in it are now **mistakes 14 and 15** in `CLAUDE.md`, and
@@ -45,7 +45,7 @@ file if it is more than a week old.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.829, zero free parameters), 1.1 % with k fitted (0.837, one). 23 pooled points, 30–74 kPa, 175.5 min logged. Read mistake 12 before quoting either |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.831, zero free parameters), 1.1 % with k fitted (0.837, one). 26 pooled points, 30–75 kPa, 295.0 min logged. Read mistake 12 before quoting either |
 | C · get an agent to learn | **next.** `train.py` exists and runs; nothing trained yet |
 | D · baselines and the ablation | not started. **This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -71,7 +71,7 @@ Every script in the repo was executed end to end. **All eight passed.**
 | 3 | `check_premise.py` | ✅ **829.2 · 548.6 · 437.6 · 548.6** |
 | 4 | `verify_docs.py` | ✅ every published figure matched. Run it and read the total it prints |
 | 5 | `test_reward.py` | ✅ **4 of 4** |
-| 6 | `build_dataset.py` | ✅ 175.5 min, 9 drives, 23 points |
+| 6 | `build_dataset.py` | ✅ 295.0 min, 10 drives, 23 points |
 | 7 | `compare_log.py` | ✅ **PASS** — 1.4 % load residual with k derived, 1.1 % with k fitted |
 | 8 | `generality_test.py` | ✅ H2 table reproduced: 16.5 / 18.0 / 26.0 pts |
 
@@ -167,7 +167,7 @@ The old sentence is quoted below deliberately, as the record of what was
 corrected. `verify_docs.py` needs the marker above to know that.
 
 It said "seven drives, 113 minutes, five carrying samples." The data says **eight
-drives, 168.1 minutes, six carrying samples**.
+drives, 168.1 minutes, seven carrying samples**.
 
 The old sentence was also wrong in a subtler way, and the correction records the
 distinction: **`fb988991` does carry samples** — 16.3 minutes of them — but not
@@ -218,12 +218,12 @@ preview figure.
 
 ### 2. Known limitations to state in the thesis, not fix quietly
 
-- **Vehicle validation covers 30–74 kPa only.** Steady points require steady
+- **Vehicle validation covers 30–75 kPa only.** Steady points require steady
   driving, which is light-load driving.
-- **The boosted inversion is within 3 % of the car, once the charge temperature
+- **The boosted inversion is within 2 % of the car, once the charge temperature
   is right.** 587 modelled samples against 887 logged `Boost pressure` readings
   above 200 kPa, logged median 226 kPa: the raw sensor gives 279.5 kPa,
-  **+23.7 %**; `plant.charge_temperature()` gives 232.7 kPa, **+3.0 %**. An
+  **+23.7 %**; `plant.charge_temperature()` gives 232.7 kPa, **+1.9 %**. An
   ambient + 8 K rule scores 227.5 kPa, +0.7 %, and was rejected as a knob tuned
   to hit the target. What is still uncertain under boost is the MAF ceiling at
   1020 kg/h and the logger's round-robin sampling.
@@ -236,7 +236,7 @@ preview figure.
   it: every water-pump and fan-actual channel is all-zero. A constrained fit
   gives R² = 0.157 with a negative ram coefficient. Stop trying.
 <!-- RETIRED-OK -->
-- **Oil above 107 °C is extrapolation.** That is the hottest oil anywhere in the
+- **Oil above 117 °C is extrapolation.** That is the hottest oil anywhere in the
   logs, on `7475b5d7`; 111 °C after the filter. This line said 103 °C until
   10 September, which was the figure before the eighth drive arrived — quoted
   here on purpose, as the record of the correction.
@@ -330,7 +330,7 @@ Two entries were added to the mistake log in `CLAUDE.md`.
   modelled post-cooler temperature in the inversion lands on the logged boost
   pressure. Recomputed from the shipped data on 11 September, over 587 modelled
   samples against 887 logged readings above 200 kPa whose median is 226 kPa:
-  **232.7 kPa, +3.0 %**, where the raw sensor gives 279.5 kPa, **+23.7 %**. The
+  **232.7 kPa, +1.9 %**, where the raw sensor gives 279.5 kPa, **+23.7 %**. The
   boost gap was the temperature, not the breathing model.
 
 ### Stale figures corrected the same day
@@ -341,16 +341,16 @@ reads old → new *as of that day*. Two of those new values have since moved
 again; the note underneath carries the current ones.
 
 <!-- RETIRED-OK -->
-Oil extrapolation 103 → **107 °C**. Enrichment v4 fitted on seven → **eight**
+Oil extrapolation 103 → **117 °C**. Enrichment v4 fitted on seven → **eight**
 drives. MAF ceiling 192 samples on four → **517 on five** drives. Compressor fit
-30 534 → **43 853** quasi-steady samples. Vehicle validation 31–79 → **31–82 kPa**.
+30 534 → **74 013** quasi-steady samples. Vehicle validation 31–79 → **31–82 kPa**.
 Load residual 2.3 % over 17 points → **1.4 % and 2.8 % over 22**. Reactive damage
 reduction 33.9 → **33.8 %**. The claim that the inversion and the logged boost
 channel agree inside 4.4 % below 80 kPa was removed; both pressure channels are
 pre-throttle and disagree by 44–52 % at the steady points.
 
 **Current values, 11 September.** The charge-temperature correction moved the
-point span again: it is **30–74 kPa** now, not 31–82. And the fitted residual is
+point span again: it is **30–75 kPa** now, not 31–82. And the fitted residual is
 **1.1 %** against the derived **1.4 %**, over the same 23 points — dropping the
 fitted parameter makes the residual rise, not fall.
 
@@ -410,12 +410,12 @@ outlet — mistake 13 in `CLAUDE.md` — and the inversion now uses
 
 | quantity | value after v17 |
 |---|---|
-| operating-point span | **30–74 kPa**, 23 points, 175.5 min over 9 drives |
-| load residual, k **derived** 0.829 | **1.4 %**, zero free parameters |
+| operating-point span | **30–75 kPa**, 23 points, 295.0 min over 10 drives |
+| load residual, k **derived** 0.831 | **1.4 %**, zero free parameters |
 | load residual, k **fitted** 0.837 | **1.1 %**, one free parameter |
 | a 20 °C reference state would need | k = 0.890 — the fit excludes it |
 | enrichment gate `ENR_LOAD` | 180 kPa, 1055 samples above it |
-| boosted inversion against the car | 232.7 kPa modelled against a logged median of 226, **+3.0 %** |
+| boosted inversion against the car | 232.7 kPa modelled against a logged median of 226, **+1.9 %** |
 
 **Dropping the fitted parameter makes the residual rise, 1.1 → 1.4 %.** Say it
 that way round. The derived form is not the more accurate one; it is the more
@@ -545,7 +545,7 @@ two markets stitched together, not a manufacturer figure.
 
 <!-- RETIRED-OK: section -->
 This subsection names the superseded figure throughout, because the figure is
-what was corrected. The current dataset is nine drives and 175.5 minutes.
+what was corrected. The current dataset is ten drives and 295.0 minutes.
 
 `pull01` took the manifest from eight drives and 168.1 minutes to nine and
 175.5. Seventeen lines were swept. **Five were not**, by two different routes:
@@ -564,7 +564,7 @@ what was corrected. The current dataset is nine drives and 175.5 minutes.
 still named "eight drives, 168.1 minutes" as the value to use instead, so the
 list pointed at a figure that had itself been superseded.
 
-All five are corrected, the seven-drive entry points at nine drives, and `168.1`
+All five are corrected, the seven-drive entry points at ten drives, and `168.1`
 is now a retired pattern in its own right. It deliberately does not match "eight
 drives" alone: the enrichment map and the compressor fit genuinely rest on eight
 drives of samples, because `pull01` contributes **zero** samples.
@@ -578,7 +578,7 @@ drives of samples, because `pull01` contributes **zero** samples.
 | `check_premise.py` | **829.2 · 548.6 · 437.6 · 548.6**, trigger 1123 K; rows 2 and 4 identical |
 | `validate.py` | **8 of 11** inside band; every model value unchanged |
 | `test_reward.py` | **4 of 4** pass; neutral −0.00438, starver −0.28044 |
-| `compare_log.py` | **PASS** — 1.4 % residual, derived k 0.829 |
+| `compare_log.py` | **PASS** — 1.4 % residual, derived k 0.831 |
 | `check_map.py` | 6 cells above the compressor ceiling, **0** reachable fail-open cells |
 | `verify_docs.py` | **all 33 checks pass**; 29 retired figures guarded, 51 historical mentions marked |
 | `app/test_replay.py` | **36 of 36** pass, including the read-only and no-raw-data-on-disk assertions |
@@ -625,7 +625,7 @@ is the citation pass, this one is the app. Neither supersedes the other.)*
 
 | population | count | used for |
 |---|---|---|
-| manifest | **9** drives, 175.5 min | "how much have we logged" |
+| manifest | **9** drives, 295.0 min | "how much have we logged" |
 | carrying usable samples | **6** | anything computed from `master_samples` |
 | behind the fitted calibrations | **8** | enrichment, spark — `pull01` is not in them |
 
@@ -692,7 +692,7 @@ which is a different job from being a result.
 - **Its MAF-ceiling drive count and its MAF-ceiling sample count were counting
   different populations** — raw files against the warm-filtered dataset. Adding
   `pull01`, which pins 56 times in its raw log, pushed them apart: 6 drives
-  against 517 samples over 5. Both halves now count the same set.
+  against 547 samples over 5. Both halves now count the same set.
 
 ### What this session did NOT do
 

@@ -31,7 +31,7 @@ THE THREE TYPES ARE GENUINELY DIFFERENT, AND THEY HAVE DIFFERENT AUDIENCES
                like this, and none of them needs the driver's attention at
                110 km/h.
 
-  NOVEL     the engine is somewhere our 175 minutes of data never went.
+  NOVEL     the engine is somewhere our 295 minutes of data never went.
             -> US. It means the estimate is extrapolating and should be trusted
                less. It is a confidence flag, not a fault.
 
@@ -47,7 +47,7 @@ changed, the measurement that changed it is recorded beside it.
               constant check_premise.py scores with -- deliberately the same
               number, imported from one place.
   408 K       the oil term's knee in the same damage model.
-  30-74 kPa   the manifold pressure range the model was actually validated at
+  30-75 kPa   the manifold pressure range the model was actually validated at
               (CLAUDE.md mistake 13 moved it there from 31-82 kPa). Outside it
               we are extrapolating and say so.
 
@@ -95,13 +95,13 @@ it is the same 44-52 % that CLAUDE.md's limitations section already records for
 the 22 steady points. The comparison is only valid where the throttle is not
 restricting -- that is, at wide-open throttle under real boost, which is
 exactly the condition mistake 13 used when it validated the inversion against
-this same channel and got +3.0 %.
+this same channel and got +1.9 %.
 
 Three gates follow from that, and they are the fix. The threshold was not the
 problem and is not where the fix went.
 
   1. WIDE-OPEN THROTTLE ONLY, expressed as a pressure ratio so it needs no
-     extra channel. Pooled over all nine drives, MAF-unpinned:
+     extra channel. Pooled over all ten drives, MAF-unpinned:
 
          PR >= 1.5   n=919   median +6.4 %   33.6 % over 15 %
          PR >= 1.7   n=696   median +6.5 %   17.5 %
@@ -110,7 +110,7 @@ problem and is not where the fix went.
 
      1.8 is where the median stops moving and the tail is mostly gone. Under
      that gate the four drives that reach boost agree with the model at a
-     median of +7.7 / +6.8 / +3.6 / +1.2 %, consistent with the +3.0 % that
+     median of +7.7 / +6.8 / +3.6 / +1.2 %, consistent with the +1.9 % that
      plant.charge_temperature() records for this comparison.
 
   2. MAF NOT SATURATED. `Air mass flow` pins at exactly 1020.0 kg/h and keeps
@@ -147,7 +147,7 @@ problem and is not where the fix went.
      boost 6.00 s, engine speed 6.00 s; ambient pressure 18.0 s). A window that
      spans a refresh interval necessarily contains readings from more than one
      poll cycle, which is the minimum that can tell a standing offset from
-     skew. Sweeping that span requirement over all nine drives, at the SHIPPED
+     skew. Sweeping that span requirement over all ten drives, at the SHIPPED
      30 s window (AUDIT.md L6 -- this table was captioned 20 s in error; the
      numbers were always the 30 s configuration and are unchanged):
 
@@ -204,7 +204,7 @@ MISMATCH_MIN_SPAN_S = 6.0      # = the measured channel refresh interval
 #     the error of a pressure inversion.
 #
 #   * measured directly, the model's own error ON THIS COMPARISON is close to
-#     15 %. Under the three gates above, across all nine drives, the 30 s
+#     15 %. Under the three gates above, across all ten drives, the 30 s
 #     windowed median of the disagreement on a car with nothing wrong with it
 #     reaches 13.6 % over 45 qualifying windows (p50 5.0 %, p95 9.2 %). A 15 %
 #     threshold sits 1.4 points above the worst healthy reading, which is no
@@ -221,9 +221,9 @@ MISMATCH_MIN_SPAN_S = 6.0      # = the measured channel refresh interval
 MISMATCH_PCT = 25.0
 
 # The two regions where the inversion HAS evidence, and they are not the same
-# kind. 30-74 kPa is the span of the 22 steady operating points; above 200 kPa
+# kind. 30-75 kPa is the span of the 22 steady operating points; above 200 kPa
 # is where the inverted pressure was compared against the car's own boost
-# channel and agreed to +3.0 % (mistake 13). Between them there is neither.
+# channel and agreed to +1.9 % (mistake 13). Between them there is neither.
 VALID_MAP_LO, VALID_MAP_HI = 30.0, 74.0   # the steady operating points
 BOOST_CHECKED_KPA = 200.0                 # mistake 13's comparison threshold
 
@@ -464,13 +464,13 @@ class AlertEngine:
         """Flag the region where the INVERSION has the least support.
 
         AUDIT.md L7. This used to say "outside the validated range" of
-        30-74 kPa, which is the span of the 22 steady operating points behind
+        30-75 kPa, which is the span of the 22 steady operating points behind
         the LOAD RESIDUAL -- and mistake 12 established that the load residual
         cancels the breathing model and therefore validates nothing about the
         pressure inversion this app depends on. So the flag was naming the
         wrong evidence: it called the boosted region "extrapolation" when the
         boosted region is the ONE place the inversion was actually checked
-        against an independent channel (+3.0 %, mistake 13).
+        against an independent channel (+1.9 %, mistake 13).
 
         The honest statement is narrower. Between the steady-point span and the
         boost-checked region there is a band with neither kind of evidence, and
