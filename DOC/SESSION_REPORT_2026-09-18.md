@@ -208,10 +208,42 @@ together in Phase D: near-identical exhaust flow means near-identical turbine τ
 **That is a free test of the project's own claim.**
 
 **But one row breaks a pure-power reading:** `12 % @ 90` (54.7 kW → 756 °C) is
-*hotter* than `4 % @ 150` (60.4 kW → 709 °C). The slower row sits at 2018 rpm
-against 2790, so it runs a higher load per cycle and a hotter EGT, and
-`ua_gas_turb · ṁ_exh · (EGT − T_turb)` carries both terms. **Not promoted to a
-law; the exception is recorded beside it.**
+*hotter* than `4 % @ 150` (60.4 kW → 709 °C). Less power, more heat.
+
+**Ghassan's reading of it was the right one — less load, more air — and measuring
+it made the answer sharper than either of us expected.** Both cases probed deep
+in the climb, neutral policy:
+
+| case | rpm | MAP kPa | EGT °C | turbine °C |
+|---|---|---|---|---|
+| `12 % @ 90` | 2017 | **151.1** | **956** | 751.5 |
+| `4 % @ 150` | 2788 | **109.0** | **892** | 706.9 |
+
+**The exhaust flow is the same to within a few percent.** Speed-density says flow
+scales as `MAP × rpm`: 151.1 × 2017 = 304 769 against 109.0 × 2788 = 303 892, a
+ratio of **1.003**, and the volumetric-efficiency curve adds only about 4 % in
+the faster row's favour.
+
+**So flow is not the differentiator at all — the entire gap is EGT.** Manifold
+pressure is the load per cycle made concrete: 151 kPa against 109 means more fuel
+burnt per cycle, a hotter charge at blowdown, and **956 °C of exhaust against
+892**. The same amount of gas passes through the housing; it is **64 K hotter**.
+
+The turbine gap is **44.6 K** against that 64 K of EGT, so the faster row's small
+flow advantage does push back — it just does not come close to cancelling the
+temperature.
+
+**AND THIS IS THE SAME MECHANISM THAT KILLED THE TOWING STANDARD, seen from the
+other side.** J2807 behind two tonnes reaches **756.3 °C**; `12 % @ 90` with no
+trailer at all reaches **756.0 °C**. The same temperature, because both are
+**high load per cycle at low engine speed**: plenty of torque, hot exhaust,
+and not enough gas moving to carry that heat into the housing.
+
+**Two results in this report, one mechanism.** The turbine is heated by
+`ua_gas_turb · ṁ_exh · (EGT − T_turb)`, and on a road car you can trade along
+that product in either direction. Still not promoted to a law — two probed points
+are two probed points — but the exception now has numbers behind it rather than
+an argument.
 
 ---
 

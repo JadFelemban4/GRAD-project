@@ -46,7 +46,14 @@ From the 18–19 September session, all four in
 
 1. The gear rule uses a flat torque ceiling on an rpm-dependent quantity. What
    is the right shape, and is a 25 % torque reserve sensible for this box?
-2. `12 % @ 90 km/h` runs hotter than `4 % @ 150 km/h` on less road power. Is the
-   rpm / load-per-cycle reading enough?
+2. ~~`12 % @ 90 km/h` runs hotter than `4 % @ 150 km/h` on less road power.~~
+   **ANSWERED BY GHASSAN, 19 September.** He read it as *less load, more air*,
+   which was right and sharper than the rpm explanation in the draft. Measuring
+   it settled it: the two cases carry the SAME exhaust flow to within a few
+   percent (MAP x rpm = 304 769 against 303 892), so flow is not the
+   differentiator at all -- the whole 44.6 K gap is EGT, 956 C against 892,
+   because 151 kPa of manifold pressure burns more fuel per cycle than 109.
+   And it is the same mechanism that killed SAE J2807: high load per cycle at
+   low engine speed. Written up in the report's section 6.2.
 3. The 115–125 km/h band is still over-asked, deliberately not tuned away.
 4. Should the twenty evaluation episodes vary ambient and grade, or weights only?
