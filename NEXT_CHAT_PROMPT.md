@@ -46,6 +46,27 @@ leaves the turbine at 335 C against an 850 C trigger; 12 % at 130 km/h reaches
 884 C. NO AMOUNT OF FURTHER LOGGING WILL FIX THAT -- the duty cycle is wrong,
 not the model.
 
+A FIRST TRAINED ABLATION EXISTS, and it is NOT the result. Scored with
+evaluate.py, seed 0 both ways, at 110 km/h (see results/phase_d_seed0_110kmh.txt):
+
+    baseline ECU      462.7      reactive  462.7 (identical -- never acts)
+    current-grade     374.5      cuts 19.1 %
+    agent sighted     301.9      cuts 34.8 %
+    agent blinded     307.6      cuts 33.5 %
+
+    AGENT over CURRENT-GRADE  +15.7 points
+    SIGHTED over BLINDED       +1.2 points
+
+TRAINING REVERSED THE SIGN. Hand-written, the predictive policy LOST to
+current-grade by 0.4 points; the trained agent beats it by 15.7. That is
+AUDIT.md C3 measured -- hand-written policies cannot settle this.
+
+But it is not Phase D's number: it ran at 110 km/h where nothing binds, it is
+ONE seed, and the +1.2 gap is far smaller than the within-policy IQRs of 25.6
+and 29.9. sep17 measured +11.7 at 130 km/h on the six-speed; that is a different
+scenario AND a different gearbox, so the two are not comparable. The retrain at
+130 on the merged tree is what makes them one measurement.
+
 DO THESE, IN THIS ORDER
 
 1. MERGE origin/JMF-2340550-sep17 into JMF-2340550. They are twelve commits

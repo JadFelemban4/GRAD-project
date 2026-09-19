@@ -419,3 +419,55 @@ work, and the preview question is genuinely open. **Only a trained pair can
 settle it, and that is the next run.**
 
 `test_reward.py` 4 of 4 on the loaded scenario, neutral −0.00038.
+
+---
+
+# Part 9 · The first trained ablation — and why it is not yet the result
+
+Scored with `evaluate.py`, twenty frozen episodes, seed 0 both ways. Saved in
+full at `results/phase_d_seed0_110kmh.txt`.
+
+| policy | damage med | IQR | worst | fuel med | peak °C |
+|---|---|---|---|---|---|
+| baseline ECU | 462.7 | 0.0 | 462.7 | 3739 | 840 |
+| reactive | **462.7** | 0.0 | 462.7 | 3739 | 840 |
+| current-grade | 374.5 | 0.0 | 374.5 | 3959 | 819 |
+| **agent, sighted** | **301.9** | 25.6 | 328.3 | 3657 | 809 |
+| agent, blinded | 307.6 | 29.9 | 364.2 | 3692 | 817 |
+
+    current-grade   cuts median damage  19.1 %
+    agent sighted   cuts median damage  34.8 %
+    agent blinded   cuts median damage  33.5 %
+
+    AGENT over CURRENT-GRADE  +15.7 points
+    SIGHTED over BLINDED       +1.2 points
+
+## 9.1 · What it genuinely shows
+
+**Training reverses the sign of the hand-written verdict.** With hand-written
+policies the predictive one LOST to current-grade by 0.4 points. The TRAINED
+agent beats current-grade by **15.7**. That is `AUDIT.md` C3's argument
+measured rather than argued: hand-written policies cannot settle this question,
+and on this scenario they gave the opposite answer.
+
+## 9.2 · Four reasons it is not Phase D's number
+
+1. **It ran at 110 km/h, where nothing binds.** The baseline peaks at 840 °C
+   against an 850 °C trigger and spends 0.0 % of the episode above it — which is
+   why `reactive` is bit-identical to `baseline`, it never acts.
+2. **The header in that file says 130 km/h and is WRONG.** `evaluate.py` printed
+   the scenario as a hardcoded string while the env took `make_grade_climb`'s
+   default. The file is kept with the wrong header as the evidence; the line is
+   derived from the cycle now and cannot lie.
+3. **One seed, and the gap is smaller than the spread.** +1.2 points against
+   within-policy IQRs of 25.6 and 29.9. Not distinguishable from zero.
+4. **Eleven episodes of training**, for a policy conditioned on three preference
+   weights drawn fresh every reset.
+
+## 9.3 · What to compare it against later
+
+`sep17` measured **+11.7 points** sighted over blinded, one seed, at 130 km/h on
+the six-speed. This branch measures **+1.2**, one seed, at 110 km/h on the
+ZF 8HP51. **Two different scenarios and two different gearboxes — the numbers
+are not comparable**, and neither is quotable. The retrain at 130 on the merged
+tree is what makes them one measurement.
