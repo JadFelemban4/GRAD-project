@@ -159,6 +159,15 @@ someone's background steers every explanation they get afterwards.
 
 ## 6.1 · All nine drives replayed against the trigger
 
+<!-- RETIRED-OK: section -->
+> **Superseded 19 September, and the whole of this section is dated.** A TENTH
+> drive arrived afterwards: `drive10`, Jeddah to Taif and back, 119.4 minutes
+> of real mountain driving. It peaks at **797.6 °C and spends ZERO seconds
+> above the trigger**, so the numerator below does not move and only the
+> denominator does — **36 s of 292.0 minutes, 0.206 %**, over ten drives.
+> The closing claim of this section, that no logged drive is a sustained
+> climb, is **retracted**: one is, and it does not bind. See CLAUDE.md.
+
 | drive | minutes | peak turbine °C | vs trigger | seconds above |
 |---|---|---|---|---|
 | `7475b5d7` | 55.1 | **890.6** | **+40.8** | **36** |

@@ -246,10 +246,54 @@ the peak estimated turbine housing against the 1123 K trigger:
 | `fb988991` | 14.7 | 607.9 | −242.0 | 0 |
 | `3f64372e` | 0.7 | 340.1 | −509.8 | 0 |
 | `f51686d7` | — | no estimate | — | — |
-| **total** | **172.6** | | | **36 s = 0.351 %** |
+| **`drive10` — TAIF** | **119.4** | **797.6** | **−52.4** | **0** |
+| **total** | **292.0** | | | **36 s = 0.206 %** |
 
-**ONE drive of nine reaches the limit, for 36 seconds in 172.6 minutes.** The
-synthetic climb reaches 812 C and misses by 38 K, so **the car's own driving
+**ONE drive of ten reaches the limit, for 36 seconds in 292.0 minutes.**
+
+**THE TAIF ROW IS THE IMPORTANT ONE AND IT WAS ADDED 19 SEPTEMBER.** `drive10`
+is a real mountain drive — Jeddah to Taif and back, two hours — and it is the
+drive this project had been saying it did not have. The ambient channel proves
+the altitude without a barometer: **31.5 °C at the start, 20.5 °C at minute 50,
+34.5 °C at the end.** Sea level, up, and back down.
+
+**It does not bind. It does not come close. 797.6 °C, 52 K short, zero seconds
+above the trigger in 119.4 minutes.**
+
+And the driver was not gentle. Measured off the same replay:
+
+| | |
+|---|---|
+| above 140 km/h | 15 s |
+| above 160 km/h | **5 s** |
+| peak speed | 167 km/h |
+| turbine median at 160+ km/h | **667.8 °C** |
+| **where the peak actually happened** | **137 km/h at 5792 rpm, minute 13.5** |
+
+**The hottest moment of the Taif drive was an acceleration, not the climb and
+not the top speed** — a low gear at high rpm, held briefly. Every one of those
+bursts is short, and the housing has a ~50 s time constant, so none of them
+lands. The 160 km/h stretch lasted five seconds and ran *cooler* than the
+peak.
+
+**This is load-per-cycle and road power for the fourth time**, after
+`12 % @ 90` beating `4 % @ 150`, SAE J2807's slow heavy climb, and the real
+gearbox running hotter than the invented one. A mountain road taken at 59 to
+90 km/h asks 40–50 kW; the locked scenario asks **88.7 kW for twelve
+uninterrupted minutes**. Altitude does not heat a turbine. Sustained power
+does.
+
+**What this settles, and it is worth more than the row.** The obvious objection
+to the locked scenario — that 12 % at 130 km/h is contrived — now has a
+measured answer: **the hardest real climb we have recorded is 86 K cooler than
+it.** The scenario is deliberately above real driving, and that is a stated
+design choice rather than an accident.
+
+*(The synthetic climb figure quoted in the next paragraph, 812 C, is the
+pre-gearbox one. On the real ZF 8HP51 the same scenario reaches 884 C. See the
+19 September checkpoint.)* <!-- RETIRED-OK -->
+
+The synthetic climb reaches 812 C and misses by 38 K, so **the car's own driving
 gets 78 K hotter than the scenario written to stress it.**
 
 Two conclusions, and they pull in opposite directions — state both:
@@ -259,12 +303,25 @@ Two conclusions, and they pull in opposite directions — state both:
   conservative than the 930 C pre-turbine enrichment limit REFERENCES.md cites
   (Conway et al., SAE 2018-01-1423, p. 10), and moving it is turning the one
   knob the audit named.
-- **0.351 % is itself a result about H/tau, and it belongs in the thesis.** On
+- **0.206 % is itself a result about H/tau, and it belongs in the thesis.** On
   this vehicle, in this driving, the protected component is near its limit a
-  third of one percent of the time. That is a statement about how much preview
+  fifth of one percent of the time. That is a statement about how much preview
   could be worth HERE, and it is exactly the kind of answer the criterion exists
-  to give. It is not a measurement of the sustained-climb duty cycle the project
-  targets, because no logged drive is one — say which of the two you mean.
+  to give.
+
+  **The caveat that used to close this bullet is now RETRACTED, and the
+  retraction is a stronger result than the caveat.** It read: *"it is not a
+  measurement of the sustained-climb duty cycle the project targets, because
+  no logged drive is one."* Since 19 September one is — `drive10`, the Taif
+  run, two hours of real mountain driving. **It reaches 797.6 °C and spends
+  zero seconds above the trigger.** So the sentence to write in the thesis is
+  no longer "we have no sustained climb"; it is **"we have one, and it does
+  not bind"** — which is a measurement rather than a gap.
+
+  <!-- RETIRED-OK: naming the superseded pair IS the sentence -->
+  Adding it moved the figure from 0.351 % over 172.6 minutes to **0.206 % over
+  292.0 minutes**, because the numerator did not move at all: Taif contributed
+  119.4 minutes and **not one second** above the limit.
 
 #### 17. THE GEARBOX UPSHIFTED MID-CLIMB, AND ONLY A HARDER SCENARIO COULD SHOW IT
 
@@ -725,6 +782,35 @@ already using the correct vector.
 **The lesson: a fix that lives in the test file is not a fix.** If a helper is
 wrong, correct the helper. Everything downstream of it inherits the bug, and
 the next person to call it will not have read the test's docstring.
+
+**19 September: the fix was right and the SENTENCE EXPLAINING IT was backwards.**
+The corrected `neutral_action()` carried a caveat saying the baseline's fan
+"holds 1.0 once the engine is hot, which is the part of the episode the
+constraint binds in — exactly neutral during the climb, slightly over-cooled
+during the first three minutes of flat running." Measured on the locked
+scenario over the 720 s episode:
+
+| fan duty | whole episode | during the climb |
+|---|---|---|
+| 0.0 | 26.8 % | 2.6 % |
+| 0.4 | 73.2 % | **97.4 %** |
+| 1.0 | **0.0 %** | **0.0 %** |
+
+**The baseline fan never reaches 1.0 at all**, because coolant peaks at 94.2 °C
+here and the 1.0 rung needs 98.9 °C. So the action is over-cooled *during the
+climb* — the exact window the caveat claimed it was neutral in — and neutral
+during the flat running it claimed was over-cooled. **Both halves inverted.**
+
+**The constant was NOT changed, and that is deliberate.** The fan acts on the
+coolant loop (700 W/K of a 1925 W/K peak UA) while the turbine housing is
+gas-heated, so the protected component barely sees it; `test_reward.py`
+measures the whole effect and neutral still scores −0.00038 against a ±0.05
+band. Moving a constant inside a locked scenario to make a docstring true would
+be tuning for prose. **The sentence was what was wrong, so the sentence is what
+changed.**
+
+Mistake 11's shape, inside mistake 10's own function: the code was right, the
+number was right, and nothing was checking the prose beside them.
 
 ### 11. The seven-drive figures survived in the prose after the data moved on
 
@@ -1334,14 +1420,46 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
 - **Turbine τ.** `C/UA` gives 50.3 s; the step response on the correct engine
   gives 48.0 s, inside the published band. <!-- RETIRED-OK -->
   The old 39.5 s figure came from the four-cylinder and is void.
-- **The knock retard is now measured, and the baseline's cap is right.**
+- **The knock retard is measured, the baseline's cap is the right order, and
+  THE PUBLISHED p99 IS UNDER RE-DERIVATION — do not quote it.**
   `Target ignition angle from torque intervention` minus `Actual ignition angle`
-  gives the retard the ECU is applying. Filtered to steady gear (shifts and
-  torque cuts removed, 10 896 samples): median 0°, **p99 9.8°**, retarding more
-  than 1° for 22 % of the time and more than 3° for 11 %. `BaselineECU` caps its
-  knock retard at 12°, which is now confirmed as the right order and slightly
-  conservative rather than a strawman. **Do not use the raw channel difference**
-  — unfiltered it reaches 45°, which is a gearshift torque cut, not knock.
+  gives the retard the ECU is applying. The figure this section used to state
+  as settled was: steady gear (shifts and torque cuts removed, 10 896 samples),
+  median 0°, **p99 9.8°**, more than 1° for 22 % of the time and more than 3°
+  for 11 %. <!-- RETIRED-OK -->
+
+  **Mistake 18 ordered it re-derived and 19 September did the work.** That
+  filter used `Actual gear`, which clamps at 6, so it cannot see a 6→7 or 7→8
+  shift and left those transients in. Re-derived from the gear INFERRED from
+  rpm and road speed, over `data/master_samples.csv`, retard in [−5°, 45°],
+  moving samples only:
+
+  | gear filter | n | p95 | p99 | >1° | >3° |
+  |---|---|---|---|---|---|
+  | none | 15 780 | 13.50 | 21.75 | 27.4 % | 17.2 % |
+  | steady CHANNEL gear | 15 654 | 12.75 | 21.75 | 27.3 % | 17.1 % |
+  | **steady INFERRED gear** | **13 329** | **9.75** | **18.00** | **25.5 %** | **15.3 %** |
+
+  The correction removes 2 325 further samples — the 6→7 and 7→8 shifts the
+  clamped channel is blind to — and it is **not cosmetic**: p95 falls 12.75 →
+  9.75 and p99 falls 21.75 → 18.00.
+
+  **But this does not replace 9.8, because the shipped figure cannot be
+  reproduced.** Neither its p99 nor its n = 10 896 comes out of the shipped
+  data under a gear-steadiness filter alone, so the torque-cut half of the
+  original filter is doing work that is not written down anywhere. Until
+  whoever wrote it re-runs it with that filter stated, **the row has no
+  quotable p99.**
+
+  *(One hypothesis worth a single check and no more: the re-derived **p95** is
+  **9.75**, which rounds to the 9.8 published as a **p99**. That would make the
+  original a mislabelled percentile rather than a wrong filter. It is a
+  coincidence, not a finding — do not write it down as one.)*
+
+  What survives unchanged: `BaselineECU` caps its knock retard at 12°, which is
+  the right order and slightly conservative rather than a strawman, on every
+  filter above. **Do not use the raw channel difference** — unfiltered it
+  reaches 45°, which is a gearshift torque cut, not knock.
 - **The radiator is not identifiable ON THIS CAR, and the census proves it.**
   Every water-pump channel the vehicle offers is all-zero, so there is no
   coolant-flow signal and `Q = ṁ·cp·ΔT` cannot be formed. `Actual value of
@@ -1403,6 +1521,30 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   9 September — the seven-drive
   version, in which that cell held only 29 samples and read 0.94 by chance.
   `base_lambda()`'s docstring had the corrected cell all along.)*
+- **AND ON THE LOCKED SCENARIO THE BASELINE NEVER ENRICHES AT ALL.** Measured
+  19 September 2026, neutral policy, 12 % at 130 km/h, 42 °C, 720 s:
+  **λ = 1.000 on every single step of the episode.** This is not a defect and
+  it is not the gate: the climb sits at **2706 rpm** (7th gear), and
+  `base_lambda` returns 1.000 there at **any** load and **any** dwell —
+  178 kPa or 220 kPa, 0 s or 30 s, all 1.000. The first enrichment appears at
+  3600 rpm. That is the map being faithful to the car, which mistake 4 records
+  as not enriching below about 3300 rpm however long boost is held.
+
+  **Say this in Chapter 4, because it changes what the ablation measures.**
+  Enrichment is one of the four protection levers and one of the five actions
+  the agent controls (action 1, λ trim, down to −0.15 → λ 0.85). On this
+  scenario **the production-representative baseline does not use it and the
+  agent can**, so part of any margin the agent shows is a lever the ECU would
+  not have pulled here — not anticipation. The ablation is sighted-against-
+  blinded and both agents hold that same lever, so it does not corrupt the
+  preview comparison; it does inflate every "cuts damage N %" figure quoted
+  against the baseline.
+
+  The other protection paths ARE live on this scenario and were checked the
+  same run: thermostat open 0.20 → 0.70 and never shut (~100 kW rejected),
+  cooling fan on its 0.4 rung for 97.4 % of the climb, coolant pump at 1.0,
+  charge cooler taking 42 °C ambient to 56.9 °C, knock retard peaking at 3.2°
+  and active 3.8 % of the time.
 - **The eleven validation bands are engineering-judgement bands, not sourced
   ones.** `validate.py` scores the model against eleven "published" ranges,
   and until 12 September the only citation behind any of them was the word
@@ -1702,6 +1844,59 @@ against actually correlates.** See mistakes 3 and 6.
 ---
 
 ## Open, and honest about it
+
+### THE AGENT IS SCORED IN A DISCRETISATION IT DID NOT LEARN IN. Measured 19 Sep
+
+`dt` is not consistent across this project and never has been. Ghassan logged it
+as an open question on 19 September; this measures it.
+
+```
+train.py         dt = 0.2   duration 900 s   ->  4500 steps per episode
+evaluate.py      dt = 1.0   duration 720 s   ->   720 steps per episode
+check_premise    dt = 1.0
+generality_test  dt = 2.0
+```
+
+**The preview horizon is NOT the problem** — `_preview()` computes
+`int(h / self.dt)`, so the 2/5/15/30 s horizons are the same wall-clock
+horizons at every `dt`. That was checked first, because H is the numerator of
+this project's central ratio.
+
+**The damage integral IS.** Hand-written policies, locked scenario, 720 s,
+identical seed and weights, the only difference being the step:
+
+| policy | dt = 1.0 | dt = 0.2 | cuts vs baseline |
+|---|---|---|---|
+| baseline ECU | 959.8 | 900.9 | — |
+| current-grade | 633.2 | 567.8 | **34.0 % → 37.0 %** |
+| reactive | 679.0 | 622.5 | **29.3 % → 30.9 %** |
+
+Peak turbine is **dt-invariant** — 884.0 °C at both steps, 860.5 for
+current-grade at both — and fuel moves 0.2 %. The physics is not in question.
+The accumulated damage is, and so is everything computed from it.
+
+**The sharpest form: the GAP between two fixed policies moves from 4.8 to 6.1
+points, 1.3 points, on the step size alone.** Every preview effect this project
+has measured with hand-written policies is between 0.4 and 2.3 points.
+**`dt` sits inside the signal, not underneath it.**
+
+The cause is one loop. `_track_torque`'s PI accumulates per STEP with no `dt` in
+it, so it advances five times per second at 0.2 and once at 1.0. This is the
+same defect AUDIT.md M16 fixed for `SLEW`, in the loop M16 did not touch.
+
+**What this does and does not do to the ablation.** Both the sighted and the
+blinded agent train at 0.2 and are scored at 1.0, so the handicap is shared and
+is not a bias by construction. Whether it is SYMMETRIC is unmeasured, and there
+is a reason to doubt it: a policy whose entire value is timing may lose more to
+a coarser step than one with no preview at all. **Quote no ablation figure
+without this paragraph beside it**, and note that the hand-written comparators
+are unaffected — they have no `dt`, they are functions of the current state.
+
+Three ways out, and the choice is the team's, not the next session's: train at
+1.0 to match the protocol; score at 0.2 to match the training; or leave it and
+state it as a limitation. The third is legitimate and is the only one that
+costs nothing, but it has to be written down rather than discovered by an
+examiner.
 
 **Phase F's H2b threshold rule does not survive the correct engine.** It sets
 the constraint at the 80th percentile of the unprotected trace, which assumes

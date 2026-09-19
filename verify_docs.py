@@ -403,6 +403,17 @@ RETIRED = [
      "run it and read the printed total"),
     (r"n_cyl\s*=\s*4\b", "the 2.0 L inline-four geometry", "n_cyl = 6 (B58)"),
 
+    # --- added 19 Sep 2026, when the TAIF drive entered the replay table.
+    # drive10 is Jeddah -> Taif -> Jeddah, 119.4 min, and it contributes ZERO
+    # seconds above the trigger, so the numerator did not move and only the
+    # denominator did: 36 s of 172.6 min -> 36 s of 292.0 min. Both halves are
+    # guarded, because the 14 September lesson was that a retired total comes
+    # back through whichever half nothing is watching.
+    (r"\b172\.6\b", "replayed minutes before drive10, the Taif climb",
+     "292.0 replayed minutes over ten drives"),
+    (r"0\.351\s*%", "fraction of replayed time above the trigger, before Taif",
+     "0.206 %"),
+
     # --- added 14 Sep 2026. ALL THREE OF THESE HAD ALREADY BEEN CORRECTED
     # ONCE, in v17, and came back in the v19 release archive. Nothing was
     # guarding them, which is the entire argument for this list: a correction

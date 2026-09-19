@@ -747,6 +747,8 @@ document followed. **Mistake 11 for the fifth time.**
 
 ### Two measurements taken this session
 
+<!-- RETIRED-OK: this is a dated record of what was measured that day; the
+     tenth drive (Taif) took the total to 292.0 min and 0.206 % on 19 Sep -->
 **Every drive replayed against the protection trigger.** One of nine binds:
 `7475b5d7` peaks at 890.6 °C, **41 K above**, for **36 s of 172.6 replayed
 minutes — 0.351 %**. The synthetic climb reaches 812 °C and misses by 38 K, so
@@ -975,3 +977,125 @@ scenario does not bind at all — an agent trained there had nothing to learn ab
 protection.
 
 Phase D restarts from zero on this tree: ten runs, seeds 0–4 sighted and blinded.
+
+---
+
+## Session of 19 September 2026, later — Phase D was NOT started, and four checks were run instead
+
+**Phase D was requested, then stood down before any run was launched.** Nothing
+was trained. `runs/` is untouched. What follows is verification work on the
+merged tree, done in its place.
+
+### Verified on this tree, independently
+
+```
+verify_docs.py    All 38 checks pass, 311 figure mentions, 15 tracked files
+test_reward.py    4 of 4; neutral -0.00038, starver -0.90349
+```
+
+Both match what the merge reported, so the tree is the tree.
+
+### 1 · The gearbox is the real one, reproduced rather than read
+
+`Vehicle.gears` carries eight ratios on a 3.150 final drive, and **all eight are
+reachable**: 8th on the flat at 130 km/h, 7th on the 12 % grade at the same
+speed, 2706 rpm and 340 Nm.
+
+Ghassan's channel finding was re-derived from `data/master_samples.csv` without
+reference to his figures — overall ratio straight from rpm and road speed:
+
+| | |
+|---|---|
+| moving samples | 80 898 |
+| within 4 % of a published ratio | **85.1 %** |
+| maximum value of `Actual gear` | **6.0**, on every drive |
+
+Inside the samples the channel calls "gear 6": **60.2 % are really 8th, 17.4 %
+really 7th, 15.5 % really 6th.** Top-gear cruise measures **1.997** overall
+against the 8HP51's 2.016 (0.9 %) and the 6MT's 2.927 (32 %).
+
+Mistake 18 stands in every particular. *(85.1 % on 80 898 here against
+Ghassan's 86.7 % on 79 105 — the sample-filter difference this file already
+records.)*
+
+### 2 · Every cooling path is live on the locked scenario EXCEPT enrichment
+
+Instrumented over a full neutral-policy episode:
+
+| path | state | measured |
+|---|---|---|
+| thermostat / radiator | live | open 0.20 → 0.70, never shut, ~100 kW rejected |
+| cooling fan | live | 0.4 rung for 97.4 % of the climb, never 1.0 |
+| coolant pump | live | baseline at 1.0 |
+| charge cooler | live | 42 °C ambient → 56.9 °C charge |
+| knock retard | live | peak 3.2°, active 3.8 % |
+| **enrichment** | **never fires** | **λ = 1.000 on every step** |
+
+**And the enrichment is off structurally, not by accident.** The climb sits at
+2706 rpm, and `base_lambda` returns 1.000 there at any load and any dwell —
+178 or 220 kPa, 0 or 30 s. First enrichment appears at 3600 rpm. That is the
+map being faithful to the car (mistake 4: no enrichment below ~3300 rpm however
+long boost is held).
+
+Consequence for Phase D, now in CLAUDE.md's limitations: the baseline does not
+use one of the four protection levers here and the agent can, so every "cuts
+damage N %" figure against the baseline is inflated by a lever, not by
+anticipation. The sighted-vs-blinded ablation is unaffected — both agents hold
+the same lever.
+
+### 3 · `dt` is inside the signal, not underneath it
+
+Ghassan's open question 4, measured. Hand-written policies, locked scenario,
+720 s, same seed and weights, only the step changed:
+
+| policy | dt = 1.0 | dt = 0.2 | cuts vs baseline |
+|---|---|---|---|
+| baseline ECU | 959.8 | 900.9 | — |
+| current-grade | 633.2 | 567.8 | 34.0 % → **37.0 %** |
+| reactive | 679.0 | 622.5 | 29.3 % → **30.9 %** |
+
+Peak turbine is **dt-invariant** (884.0 °C at both) and fuel moves 0.2 %, so the
+physics is sound. The damage integral is not. **The gap between two fixed
+policies moves 4.8 → 6.1 points on the step alone**, against preview effects of
+0.4–2.3 points from hand-written policies.
+
+`train.py` runs 0.2, `evaluate.py` runs 1.0, so **a trained agent is scored in a
+discretisation it did not learn in**. The cause is `_track_torque`'s PI, which
+accumulates per step with no `dt` — the defect AUDIT.md M16 fixed for `SLEW`, in
+the loop M16 left alone. The preview horizon is clean: `_preview()` uses
+`int(h / dt)`, so H is wall-clock at every step size.
+
+Shared by both agents, so not a bias by construction; **symmetry unmeasured**.
+
+### 4 · Mistake 18's outstanding order, carried out
+
+Mistake 18 ends "re-derive it from the inferred gear before quoting the p99
+again". Done:
+
+| gear filter | n | p95 | p99 |
+|---|---|---|---|
+| steady CHANNEL gear | 15 654 | 12.75 | 21.75 |
+| **steady INFERRED gear** | **13 329** | **9.75** | **18.00** |
+
+Not cosmetic. **But it does not replace the published 9.8**, because neither
+that figure nor its n = 10 896 reproduces from the shipped data under a
+gear filter alone — the torque-cut half of the original filter is undocumented.
+The row now carries no quotable p99 until its author re-runs it.
+
+### One documentation defect found and fixed
+
+`neutral_action()`'s fan caveat was inverted in both halves — see the
+19 September addition to mistake 10. The constant was deliberately NOT changed;
+the sentence was.
+
+### What this session did NOT do
+
+- **No training, no Phase D, no five-seed result.** Ten runs still outstanding.
+- **`runs/sighted_seed0` and `runs/blind_seed0` are still there**, from the
+  invented gearbox, both at 50 000 steps. `train.py` resumes from the newest
+  `ckpt_*_steps.zip`, so `--seed 0` on this tree would print "already at 50000
+  of 50000 steps", train nothing, and write a `final.zip` holding an agent from
+  a gearbox that no longer exists. **Move them aside before Phase D starts.**
+- **The step budget is still undecided** — 50 000 steps is eleven episodes for a
+  weight-conditioned policy, and Ghassan asked for a decision before the five
+  seeds are treated as Phase D's input.

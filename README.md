@@ -97,17 +97,29 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 > has from a nose-down accelerometer, and the comparator the audit asked for.
 >
 > **And the scenario is milder than the car's own driving, which is measured
-> over every drive.** Replaying all nine through `app/`: `7475b5d7` peaks at
+> over every drive.** Replaying all ten through `app/`: `7475b5d7` peaks at
 > **890.6 °C — 41 K ABOVE the trigger — for 36 s of its 55.1 minutes**, and no
 > other drive gets within 69 K of it (`670063b2` 780.3 °C is next). Across
-> **172.6 replayed minutes the housing is above the limit for 36 seconds:
-> 0.351 % of the time.** The synthetic climb reaches 812 °C and misses by 38 K,
+> **292.0 replayed minutes the housing is above the limit for 36 seconds:
+> 0.206 % of the time.** The synthetic climb reaches 812 °C and misses by 38 K,
 > so **a real drive on this car is 78 K hotter than the scenario built to stress
 > it.** That is the sharpest argument for re-choosing the scenario from measured
-> driving rather than from a chosen grade — and the 0.351 % is itself a figure
+> driving rather than from a chosen grade — and the 0.206 % is itself a figure
 > about how much preview could be worth on this vehicle, which is what H/τ is
-> for. Neither number describes a sustained-climb duty cycle, because no logged
-> drive is one.
+> for.
+>
+> **A SUSTAINED MOUNTAIN CLIMB IS NOW IN THE SET, AND IT DOES NOT BIND.** This
+> passage used to close "neither number describes a sustained-climb duty cycle,
+> because no logged drive is one." One is, since 19 September: `drive10` is
+> Jeddah to Taif and back, two hours, with the ambient channel falling 31.5 →
+> 20.5 °C and recovering to 34.5 °C. It peaks at **797.6 °C, 52 K short, zero
+> seconds above the trigger** — and that is with the driver reaching 167 km/h.
+> The reason is road power, not altitude: the hottest moment of the whole drive
+> is a brief acceleration at **137 km/h and 5792 rpm**, and a housing with a
+> ~50 s time constant does not respond to bursts. The locked scenario holds
+> **88.7 kW for twelve uninterrupted minutes**; the Taif climb asks roughly half
+> that. **The hardest real climb we have recorded is 86 K cooler than the
+> scenario**, which answers the objection that the scenario is contrived.
 >
 > **This is not a failure, but it is not yet a result either.** The scenario has
 > to be re-chosen so the trigger is reached for a physical reason, and it must

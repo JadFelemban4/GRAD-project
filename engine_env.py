@@ -592,6 +592,36 @@ class SupervisoryTunerEnv(gym.Env):
         for _ in range(3):                       # 3 inner iterations is plenty
             out = self._evaluate(rpm, mp, iat_k, ect_k, spark, lam)
             err = torque_req - out["torque"]
+            # THIS LOOP IS PER STEP, NOT PER SECOND, AND dt IS NOT CONSISTENT
+            # ACROSS THE PROJECT. There is no `dt` in the three lines below, so
+            # at dt = 0.2 the integrator advances five times per second and at
+            # dt = 1.0 once. train.py runs 0.2, evaluate.py and check_premise
+            # run 1.0, generality_test runs 2.0 -- so a trained agent is scored
+            # in a discretisation it did not learn in.
+            #
+            # MEASURED 19 September 2026, hand-written policies, locked
+            # scenario, 720 s, same seed and weights. Peak turbine is
+            # dt-INVARIANT (884.0 C at both) and fuel moves 0.2 %, but the
+            # DAMAGE INTEGRAL does not:
+            #
+            #     policy          dt=1.0    dt=0.2    cuts vs baseline
+            #     baseline         959.8     900.9      --
+            #     current-grade    633.2     567.8     34.0 %  ->  37.0 %
+            #     reactive         679.0     622.5     29.3 %  ->  30.9 %
+            #
+            # The GAP between two fixed policies moves 4.8 -> 6.1 points, i.e.
+            # 1.3 points, on the discretisation alone. The preview effects this
+            # project measures with hand-written policies are 0.4-2.3 points,
+            # so dt sits INSIDE the signal rather than under it.
+            #
+            # This is not a bias between the sighted and blinded agents -- both
+            # train at 0.2 and are scored at 1.0, so the handicap is shared.
+            # Whether it is SYMMETRIC is unmeasured: a policy whose whole point
+            # is timing may be more sensitive to the step than one without
+            # preview. Do not quote the ablation without this sentence.
+            #
+            # AUDIT.md M16 fixed exactly this shape for SLEW (per step -> per
+            # second). This loop is the one that was left.
             state["i"] = float(np.clip(state.get("i", 0.0) + 0.05 * err, -60.0, 60.0))
             # AUDIT.md M1. This clamped at `min(MAP_CEIL_KPA, 200 + trim)`,
             # i.e. 160-215 kPa, while README said `plant.boost_ceiling_kpa`
@@ -941,10 +971,33 @@ def neutral_action():
 
     CAVEAT, STATE IT RATHER THAN HIDE IT. The baseline's fan is SCHEDULED on
     coolant temperature (off / 0.4 / 1.0 -- see BaselineECU.step), so no single
-    constant action reproduces it over a whole episode. 1.0 is the value it
-    holds once the engine is hot, which is the part of the episode the
-    constraint binds in. Exactly neutral during the climb, slightly
-    over-cooled during the first three minutes of flat running.
+    constant action reproduces it over a whole episode.
+
+    AND THE CAVEAT USED TO BE BACKWARDS. It said 1.0 "is the value it holds
+    once the engine is hot", so this action was "exactly neutral during the
+    climb, slightly over-cooled during the first three minutes of flat
+    running". MEASURED on the locked scenario, 19 September 2026, over the
+    720 s episode:
+
+        fan duty        whole episode      during the climb
+        0.0                 26.8 %              2.6 %
+        0.4                 73.2 %             97.4 %
+        1.0                  0.0 %              0.0 %
+
+    The baseline fan NEVER reaches 1.0, because coolant peaks at 94.2 C on
+    this scenario and the 1.0 rung needs 98.9 C. So this action is over-cooled
+    during the CLIMB -- 1.0 against the baseline's 0.4, for 97.4 % of it --
+    which is the opposite of what was written, and it is over-cooled in
+    exactly the part of the episode the constraint binds in.
+
+    WHY IT IS LEFT AT 1.0 ANYWAY, rather than tuned to 0.4. The fan acts on the
+    COOLANT loop (p.ua_rad_fan, 700 W/K of a 1925 W/K peak UA), and the turbine
+    housing is gas-heated -- ua_gas_turb * mdot_exh * (egt - t_turb) -- so the
+    protected component barely sees it. test_reward.py measures the whole
+    effect and neutral still scores -0.00038 against a +/-0.05 band. Changing
+    the constant to chase a docstring would move a locked scenario for a
+    reason no measurement supports. THE NUMBER WAS RIGHT AND THE SENTENCE WAS
+    WRONG; the sentence is what changed.
     """
     a = 2.0 * (0.0 - ACT_LO) / (ACT_HI - ACT_LO) - 1.0
     a[3] = 2.0 * (1.0 - ACT_LO[3]) / (ACT_HI[3] - ACT_LO[3]) - 1.0     # fan  1.0

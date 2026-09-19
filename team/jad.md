@@ -33,6 +33,25 @@ need a fresh example to connect the pieces.
 
 ## How to explain things to me
 
+**Use the `/i-have-adhd` skill. This is a standing preference, not a one-off.**
+Added 19 September 2026. If you are an AI assistant with that skill available,
+invoke it at the start and keep it on — it stays active until "stop adhd mode".
+Everything in this section is what that skill enforces anyway; the skill just
+makes it automatic instead of depending on you remembering.
+
+    https://github.com/ayghri/i-have-adhd
+
+**Version matters, and here is why.** Rule 9 changed on 10 September 2026
+(v0.2.0 → v0.3.0). The old wording let the assistant DROP list items past five.
+The new one is explicit that the cap is **presentation only** — keep everything,
+show five at a time, never omit a relevant item when completeness matters.
+
+**On this project the old wording was a hazard.** The whole culture here is
+"state every limitation, report against yourself" (see the tone note at the
+bottom of CLAUDE.md). A rule that silently discards the sixth item is how a
+caveat goes missing, which is mistake 11's shape. **If the installed copy still
+says "Five items ranked beats ten unranked", it is the old one — update it.**
+
 - **One small idea per message**, then one question to check I followed. Not a
   lecture with a quiz at the end.
 - **Familiar example first, then the project.** If I do not get it, **change the

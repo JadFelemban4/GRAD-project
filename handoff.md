@@ -95,14 +95,24 @@ pull01      7.4 min   608.0 C  -241.8    0
 fb988991   14.7 min   607.9 C  -242.0    0
 3f64372e    0.7 min   340.1 C  -509.8    0
 f51686d7        -- no estimate
+drive10   119.4 min   797.6 C   -52.4    0      <- TAIF, a real mountain climb
                                         ----
-total     172.6 min                      36 s  =  0.351 %
+total     292.0 min                      36 s  =  0.206 %
 ```
 
-**One drive of nine binds, for 36 seconds in 172.6 minutes.** It clears the
+**One drive of ten binds, for 36 seconds in 292.0 minutes.** It clears the
 limit by 41 K while the synthetic climb misses by 38, so the car's own driving
 is 78 K hotter than the scenario written to stress it. **The scenario is what is
 wrong, not the trigger.**
+
+**And the mountain drive does NOT bind, which is the 19 September addition.**
+`drive10` is Jeddah to Taif and back — two hours, ambient falling 31.5 to
+20.5 °C and recovering, driver reaching 167 km/h. It peaks at **797.6 °C with
+zero seconds above the trigger**. The hottest moment is a brief acceleration at
+137 km/h and 5792 rpm, not the climb and not the top speed: the housing's ~50 s
+time constant ignores bursts, and the 160 km/h stretch lasted five seconds.
+**Road power, not altitude** — the locked scenario holds 88.7 kW for twelve
+minutes, the Taif climb asks about half that.
 
 Reproduce it: replay each log through `app.estimator.Estimator` and count
 samples with `t_turb_c` above `engine_env.TURB_PROTECT_K - 273.15`.
