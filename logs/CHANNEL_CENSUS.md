@@ -174,3 +174,32 @@ If the car is ever updated, or a different vehicle is used:
 
 The two recordings that produced this census cost one short drive and answered
 questions that are still being answered two days later.
+
+---
+
+## Added 16 September 2026 — what the census made possible, and one channel it settled
+
+Two forward notes for anyone re-reading this file.
+
+**`pull01` used the census to answer one question and nothing else.** It was
+logged on 13 September with **seven channels** chosen from this list, and it
+confirmed the round-robin rule to the decimal: **26 channels give 7.5 s per
+channel, 7 give 1.45 s — 5.2× faster from asking for less.** At that resolution
+`Intake air temperature before throttle valve` fits a compressor outlet with a
+**10 s thermal lag** at a correlation of **+0.95**, against +0.35 on the same
+test at 26 channels. The hypothesis had been right all along and the earlier
+sampling was simply too slow to see it. See CLAUDE.md mistake 13b.
+
+It contributes **zero samples and zero operating points** to the dataset, by
+design — no coolant channel, so the warm filter excludes it. **A purpose-built
+drive answers one question and cannot contaminate a calibration it was not
+designed for.** That is the strongest argument in this repository for small
+channel sets, and it is an argument about validity, not just about rate.
+
+**The live app makes the budget a hard runtime constraint, not a preference.**
+`app/reader.py` runs against the car in real time and declares **six** live
+channels — engine speed, air mass, coolant, ambient temperature, vehicle speed
+and boost — because the estimator cannot work without them. Every entry carries
+a written justification and a minimum polling period, both enforced by a test.
+The channels marked "live but not worth the bandwidth" below are exactly the
+ones it refuses. See `logs/CHANNEL_SET_FINAL.md` for the mapping.

@@ -9,6 +9,24 @@ Nodes:
   block   - iron/aluminium structure + coolant, the slow node (minutes)
   oil     - sump and galleries, coupled to the block (minutes)
   turbine - turbo housing and exhaust manifold, the fast node (tens of seconds)
+
+PARAMETER PROVENANCE. Read REFERENCES.md section 4 before quoting any number
+below. Every field of ThermalParams carries one of three labels:
+
+  MEASURED        fitted to this car's own logs. Only ua_block_oil qualifies.
+  ASSUMED         an engineering estimate nobody has verified. Declare it as
+                  such in the thesis; never present it as a literature value.
+  UNIDENTIFIABLE  cannot be determined from any drive this car can produce
+                  (the radiator group). Left at reasoned values on purpose.
+
+Two kinds of number appear. C is a heat capacity: how much heat it takes to
+warm that lump by one degree, in J/K. UA is a heat-transfer rate: how fast
+heat moves in or out of it, in W/K. Their ratio C/UA is the lump's time
+constant, the time it takes to cover 63 % of a step change in temperature,
+and for the turbine node that ratio is the tau in H/tau, the project's
+central quantity. c_turb is therefore ASSUMED and load-bearing at once;
+generality_test.py sweeps it from 800 to 60 000 J/K for exactly that reason,
+because the claim is about the ratio, not about one engine's heat capacity.
 """
 
 import numpy as np
@@ -17,9 +35,10 @@ from dataclasses import dataclass
 
 @dataclass
 class ThermalParams:
-    c_block: float = 105_000.0     # J/K, structure + coolant
-    c_oil: float = 12_000.0        # J/K
-    c_turb: float = 6_000.0        # J/K, manifold + turbine housing
+    c_block: float = 105_000.0     # ASSUMED   J/K, structure + coolant (metal mass x specific heat)
+    c_oil: float = 12_000.0        # ASSUMED   J/K, sump volume x oil properties
+    c_turb: float = 6_000.0        # ASSUMED   J/K, manifold + turbine housing. LOAD-BEARING: sets
+                                   #           tau and so H/tau; swept 800-60 000 in generality_test.py
 
     # The oil cooler is an oil-to-coolant exchanger, so oil temperature is tied to
     # coolant temperature, not to ambient. Heat leaving the oil enters the block.
@@ -60,11 +79,12 @@ class ThermalParams:
     #
     # Not cosmetic: oil is a protected component in the H/tau sweep, and this
     # moves its time constant from 25 s to 16 s. Re-run generality_test.py.
-    ua_block_oil: float = 800.0    # W/K, oil cooler + conduction
-    ua_block_amb: float = 45.0     # W/K, convection off the block itself
-    ua_oil_amb: float = 60.0       # W/K, sump surface only
-    ua_turb_amb: float = 18.0      # W/K
-    ua_gas_turb: float = 0.90      # W/K per (g/s) of exhaust flow
+    ua_block_oil: float = 800.0    # MEASURED  W/K, oil cooler + conduction. The ONLY measured
+                                   #           parameter in this file; the fit is the table above
+    ua_block_amb: float = 45.0     # ASSUMED   W/K, convection off the block itself
+    ua_oil_amb: float = 60.0       # ASSUMED   W/K, sump surface only
+    ua_turb_amb: float = 18.0      # ASSUMED   W/K
+    ua_gas_turb: float = 0.90      # ASSUMED   W/K per (g/s) of exhaust flow
 
     # NOT IDENTIFIABLE FROM THE LOGS, AND LEFT ALONE ON PURPOSE.
     # The thermostat is regulating for 88-99 % of every drive recorded so far
@@ -78,15 +98,21 @@ class ThermalParams:
     # sustained climb in traffic, high ambient, fan at full duty, coolant pushed
     # above the thermostat's fully-open point. That is a specific drive to plan,
     # not something a normal log contains.
-    ua_rad_min: float = 300.0      # W/K, fan off, stationary
-    ua_rad_ram: float = 60.0       # W/K per (m/s) of vehicle speed
-    ua_rad_fan: float = 700.0      # W/K, fan at 100 %
+    ua_rad_min: float = 300.0      # UNIDENTIFIABLE  W/K, fan off, stationary
+    ua_rad_ram: float = 60.0       # UNIDENTIFIABLE  W/K per (m/s) of vehicle speed
+    ua_rad_fan: float = 700.0      # UNIDENTIFIABLE  W/K, fan at 100 %
 
-    t_stat_open: float = 361.0     # K, thermostat cracks open (88 C)
-    t_stat_span: float = 9.0       # K, fully open 9 K later
+    t_stat_open: float = 361.0     # ASSUMED   K, the model's stand-in thermostat cracks open (88 C).
+                                   #           MODELLING EQUIVALENT: the real B58 has no thermostat but a
+                                   #           DME-driven rotary valve ("heat management module", BMW
+                                   #           training document ST1505, 2015). 88 C is identified from
+                                   #           the logged coolant channel; never cite it to BMW.
+                                   #           REFERENCES.md section 2.
+    t_stat_span: float = 9.0       # ASSUMED   K, fully open 9 K later
 
-    frac_fuel_to_coolant: float = 0.26
-    frac_fuel_to_oil: float = 0.050
+    frac_fuel_to_coolant: float = 0.26   # ASSUMED   fraction of fuel energy reaching the coolant;
+                                         #           near the textbook energy split, not sourced to a page
+    frac_fuel_to_oil: float = 0.050      # ASSUMED   same, for the oil
 
 
 class ThermalNetwork:

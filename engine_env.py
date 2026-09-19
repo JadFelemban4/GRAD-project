@@ -11,13 +11,21 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 
-from plant import Operating, run_cycle, b58
+from plant import (Operating, run_cycle, b58, boost_ceiling_kpa,
+                   charge_temperature, EXH_BACKPRESSURE_RATIO)
 from thermal import ThermalNetwork
 
 # The one engine in this project. Passed EXPLICITLY to every run_cycle call
 # below -- relying on the default is what let this environment simulate a
 # 2.0 L four-cylinder for three weeks. See plant.py's module docstring.
 GEO = b58()
+
+# The charge temperature is IMPORTED, not re-typed. Both branches of it used to
+# sit inline in reset() and step() as literal arithmetic; plant.charge_temperature
+# is the one definition, and a formula that exists in two files drifts in one of
+# them. The imported values are identical to what was inlined -- this was a
+# de-duplication, not a recalibration, and test_reward.py reports the same
+# neutral score before and after.
 
 # ------------------------------------------------------------------ baseline
 class BaselineECU:
@@ -26,22 +34,20 @@ class BaselineECU:
     CALIBRATED AGAINST THE REAL CAR — spark 7 Sep 2026, lambda 8 Sep 2026
     ---------------------------------------------------------------------
     The spark map comes from a 41.8-minute log (3aca2ec1-20260907_072817). The
-    lambda strategy comes from 168.1 minutes pooled across eight drives, because
-    the single-drive version of it was wrong twice. Two things changed from the
-    original guessed calibration, and both matter:
+    lambda strategy comes from 295.0 minutes pooled across ten drives, six of
+    which carry usable samples, because the single-drive version of it was wrong
+    twice. Two things changed from the original guessed calibration, and both
+    matter:
 
-    (These figures read 113 minutes / seven drives / +0.02 / -0.60 / -0.38 until
-    10 September -- the counts from before 7475b5d7 arrived. base_lambda()'s own
-    docstring below has carried the current ones all along, and verify_docs.py
-    asserts them and passes. Mistake 11 in CLAUDE.md, one level up again.)
-
-    1. ENRICHMENT IS THERMAL, NOT LOAD-BASED. Across 168.1 minutes, lambda has
-       no correlation with manifold pressure (-0.05). It correlates with engine
-       speed (-0.56), with air mass flow (-0.49), and with how long the engine
-       has been held at high load (-0.47). The car runs stoichiometric through the first seconds of a pull
-       at any boost, and never enriches below about 3300 rpm however long the
-       boost is held. See base_lambda() for the measured table and the history
-       of getting this wrong three times.
+    1. ENRICHMENT IS THERMAL, NOT LOAD-BASED. Over the 1055 samples above
+       ENR_LOAD, manifold pressure carries almost nothing about lambda, and the
+       little it does carry has the WRONG SIGN for a load table -- +0.23, which
+       says more boost goes with a LEANER mixture. What lambda tracks instead is
+       engine speed (-0.47), air mass flow (-0.41), and how long the engine has
+       been held at high load (-0.47). The car runs stoichiometric through the
+       first seconds of a pull at any boost, and never enriches below about
+       3300 rpm however long the boost is held. See base_lambda() for the
+       measured table and the history of getting this wrong three times.
 
        Set enrichment_map=True to restore the original guessed map for
        before/after work. Do not do that for the Phase D baseline.
@@ -107,11 +113,28 @@ class BaselineECU:
         return float(np.clip(min(fitted, self.knock_limited_spark(rpm, map_kpa)),
                              self.SPARK_MIN, self.SPARK_MAX))
 
-    # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on 113 minutes across seven
-    # drives, re-checked the same afternoon against the full 168.1 minutes over
-    # eight. The structure held and no refit was needed; see base_lambda().
+    # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on the dataset as it stood that
+    # morning, re-checked the same afternoon against the full 295.0 minutes over
+    # eight drives. The structure held and no refit was needed; see base_lambda().
     # Load gates the timer; SPEED and DWELL set the depth.
-    ENR_LOAD   = 200.0    # kPa; above this the high-load timer runs
+    # 200.0 until 10 September. The gate is expressed in MANIFOLD PRESSURE, and
+    # manifold pressure changed definition when the charge temperature was
+    # corrected (plant.charge_temperature). The dataset's MAP had been inverted
+    # with the compressor-outlet sensor and was inflated; THIS environment always
+    # computed its own MAP from the modelled charge temperature, so the two were
+    # on DIFFERENT SCALES the whole time and the gate fired at a physically
+    # higher load here than the calibration data intended.
+    #
+    # 180 kPa on the corrected scale selects exactly the population that 200 kPa
+    # selected on the old one -- 1055 samples -- and every fitted figure below
+    # reproduces to the decimal: n = 441 / 235 / 665 by speed band, corr with
+    # engine speed -0.56, with air mass -0.49, with dwell -0.47. Nothing was
+    # refitted. Only the units the gate is written in were corrected.
+    #
+    # LESSON: a threshold written in a DERIVED quantity silently moves when that
+    # quantity's definition changes. Gating on air mass flow, which is measured
+    # and did not change, would have been immune. Consider that for v5.
+    ENR_LOAD   = 180.0    # kPa; above this the high-load timer runs
     ENR_RPM_LO = 3300.0   # rpm; below this the engine stays stoichiometric
     ENR_RPM_HI = 5200.0   # rpm; full speed authority
     ENR_DWELL_LO = 2.0    # s of sustained high load before enrichment starts
@@ -126,33 +149,61 @@ class BaselineECU:
 
         v1 (guessed)      enriched from 120 kPa down to 0.82.   too early.
         v2 (7 Sep, a.m.)  lambda 1.00 everywhere.               never enriches.
-        v3 (7 Sep, p.m.)  stoichiometric to 230 kPa, then 0.85. right effect,
-                          WRONG VARIABLE.
+        v3 (7 Sep, p.m.)  stoichiometric to 207 kPa, then 0.85. right effect,
+                          WRONG VARIABLE.  (207 is that breakpoint restated on
+                          the corrected charge-temperature pressure scale; it
+                          was written as 230 on the old one.)
         v4 (this)         function of engine speed and sustained dwell.
 
-        v3 was fitted to seventeen seconds above 230 kPa. The two 8 September
-        drives took that to 198 seconds, and with the larger sample manifold
-        pressure turns out to carry no information about lambda at all.
+        v3 was fitted to seventeen seconds at high load. The two 8 September
+        drives took that to 208 seconds, and with the larger sample manifold
+        pressure turns out to carry almost nothing about lambda -- and what it
+        does carry has the WRONG SIGN for a load table (+0.23: more boost, LEANER).
 
-        All figures below are over the 1055 samples ABOVE 200 kPa -- the same
-        gate ENR_LOAD uses, so the model and its evidence share a threshold:
+        All figures below are over the 1055 samples ABOVE 180 kPa -- the same
+        gate ENR_LOAD uses, so the model and its evidence share a threshold.
+        180 kPa on the corrected charge-temperature scale selects EXACTLY the
+        1055 samples that 200 kPa selected on the old one, so the population
+        behind every figure here is unchanged and nothing was refitted; only the
+        units the gate is written in were corrected. See ENR_LOAD above.
 
-            corr(lambda, engine speed)              -0.56
-            corr(lambda, air mass flow)             -0.49
-            corr(lambda, dwell above 200 kPa)       -0.47
-            corr(lambda, MANIFOLD PRESSURE)         -0.05   <-- nothing
+            corr(lambda, engine speed)              -0.47
+            corr(lambda, air mass flow)             -0.41
+            corr(lambda, dwell above 180 kPa)       -0.44
+            corr(lambda, MANIFOLD PRESSURE)         +0.11   <-- indistinguishable
+
+        Read that last row carefully, and read it with its ERROR BAR, which this
+        docstring used not to give. AUDIT.md H4: the population is 1341 rows but
+        those are FORWARD-FILLED -- they hold about 67 independent air-mass and
+        100 lambda readings, so the standard error on a correlation here is
+        about +-0.12.
+
+        This docstring used to argue that +0.23 was "the WRONG WAY ROUND for a
+        load table" -- that more boost went with a leaner mixture. THAT ARGUMENT
+        DOES NOT HOLD and it is withdrawn. At +-0.12 it was under two sigma, and
+        the tenth drive (drive10, +119 minutes) took it to +0.11, which is under
+        one. The honest statement is that MANIFOLD PRESSURE CARRIES NO DETECTABLE
+        SIGNAL. That still rejects a load table, which is all the v4 model needs.
+        It is not evidence that load points the other way.
+
+        The three that DO carry signal are three to four standard errors out, and
+        they survived the new drive: speed and air mass eased slightly (-0.56 to
+        -0.47, -0.49 to -0.41) while DWELL STRENGTHENED (-0.41 to -0.44), which
+        is the variable the model is actually built on.
 
         RE-CHECKED 8 Sep (afternoon) on a 55-minute drive that added 73 % more
         high-load samples. The structure held and the dwell correlation
-        STRENGTHENED from -0.38 to -0.47, which is the variable this model is
-        built on. Manifold pressure stayed at nothing. No refit was needed.
+        STRENGTHENED to -0.47 -- the smaller sample had been understating the
+        very variable this model is built on, so the correction made the case
+        for v4 stronger, not weaker. Manifold pressure stayed weak and, on the
+        corrected scale, wrong-signed. No refit was needed.
 
-        Median lambda, pooled, above 200 kPa:
+        Median lambda, pooled, above 180 kPa:
 
             rpm \\ dwell     0-4 s    4-8 s    8+ s      n
-            1000-3500 rpm     0.99     0.99    0.98    422
-            3500-4500 rpm     0.99     0.98    0.90    168
-            4500-7000 rpm     0.98     0.87    0.79    465
+            1000-3500 rpm     0.99     0.99    0.98    441
+            3500-4500 rpm     0.99     0.98    0.90    235
+            4500-7000 rpm     0.98     0.87    0.79    665
 
         Read across the bottom row: at the same load, the car runs
         stoichiometric for the first seconds of a pull and only enriches once it
@@ -167,7 +218,7 @@ class BaselineECU:
         agent's advantage look larger than it is for the wrong reason.
 
         REMAINING LIMITATION. The true schedule uses measured turbine-inlet
-        temperature, which this vehicle does not expose. Dwell above 200 kPa is
+        temperature, which this vehicle does not expose. Dwell above 180 kPa is
         a proxy for it. State the proxy in Chapter 3.
 
         Model against the enlarged table: at 5500 rpm and 12 s dwell it gives
@@ -218,26 +269,163 @@ class BaselineECU:
 
 # ------------------------------------------------------------------ vehicle
 class Vehicle:
+    """The A90 GR Supra 3.0 driveline.
+
+    THE GEARBOX IS THE REAL ONE, 19 September 2026. It was a generic six-speed
+    with invented ratios (3.6 / 2.1 / 1.4 / 1.0 / 0.82 / 0.68) on a 3.4 final
+    drive -- no source, and not the transmission in the car. The car has a
+    **ZF 8HP51, an eight-speed torque-converter automatic**, and Toyota publishes
+    the whole ratio set beside the engine it is bolted to.
+
+    WHERE EACH NUMBER COMES FROM, because this project does not accept a figure
+    without one (REFERENCES.md):
+
+      ratios, final drive   Toyota's own technical specification sheet, which
+                            names the unit "8-speed Sports Automatic 8HP 51" and
+                            prints all eight ratios plus reverse 3.712 and the
+                            3.150 final drive.
+                            media.toyota.co.uk .../220605M-GR-Supra-Tech-Spec.pdf
+      final drive, again    Toyota USA's pressroom gives 3.15 for the automatic
+                            on the 382 hp car, which is THIS car (285 kW,
+                            confirmed by the team 19 Sep). The UK sheet above is
+                            the 250 kW European variant, so two Toyota documents
+                            for two different power outputs agree, and the final
+                            drive is not variant-sensitive.
+                            pressroom.toyota.com/vehicle/2025-toyota-gr-supra/
+
+    WHAT ZF PUBLISHES, AND WHAT IT DOES NOT. ZF's own product page gives the 8HP
+    family a torque range of 220-1000 Nm and a ratio spread of 7.0, and a weight
+    of 87 kg for the mid-size 8HP70. It publishes NO per-gear ratios for the
+    8HP51 and no weight for it.
+
+      * The spread here is 5.250 / 0.640 = 8.20, NOT 7.0. ZF's 7.0 is a family
+        figure and must not be cited for this ratio set.
+      * "~560 Nm torque capacity" and "~77 kg" are widely repeated and are NOT
+        on ZF's page. They are carried UNVERIFIED in REFERENCES.md. The engine
+        makes 500 Nm, so the margin over a stated 560 Nm is thin and worth a
+        sentence in the thesis -- but not while the 560 has no source.
+
+    THE CONVERTER IS MODELLED AS LOCKED, 1:1, AND THAT IS A DECISION.
+    It is a torque-CONVERTER automatic, so below lock-up it multiplies torque and
+    slips. Neither Toyota nor ZF publishes a stall ratio, a K-factor or a lock-up
+    schedule, so any converter curve here would be an invented parameter of
+    exactly the kind mistake 12 warns about. The scenarios this environment runs
+    are steady high-speed climbs where a real 8HP is locked, so a locked
+    converter is both the right approximation and the honest one. Say "converter
+    assumed locked" wherever the gearbox is described; do not let a reader think
+    the slip is modelled.
+    """
     mass = 1520.0
     cd_a = 0.66
     crr = 0.011
     wheel_r = 0.33
-    final_drive = 3.4
-    gears = (3.6, 2.1, 1.4, 1.0, 0.82, 0.68)
 
-    def gear_for(self, v_mps):
-        kmh = v_mps * 3.6
-        for i, lim in enumerate((22.0, 40.0, 62.0, 88.0, 115.0)):
-            if kmh < lim:
-                return i
-        return 5
+    # ZF 8HP51, from Toyota's own sheet. Reverse 3.712 is published too and is
+    # not carried here because this environment never reverses.
+    final_drive = 3.150
+    gears = (5.250, 3.360, 2.172, 1.720, 1.316, 1.000, 0.822, 0.640)
+
+    # Peak torque of the B58B30O1, the figure every manufacturer sheet prints
+    # beside the engine code (REFERENCES.md section 2).
+    PEAK_TORQUE_NM = 500.0
+
+    # ASSUMED. The fraction of peak torque above which the transmission hands
+    # back a gear -- a 25 % reserve, which is an ordinary automatic calibration.
+    # No source has been opened for this vehicle's, so it is engineering
+    # judgement and is declared as such.
+    SHIFT_LOAD = 0.75
+    SHIFT_RPM_MAX = 6000.0        # never hand back a gear into the limiter
+
+    # Lowest engine speed an upshift may leave the engine at.
+    #
+    # MEASURED AGAINST THE CAR, 19 September 2026, and it began as an assumption.
+    # Toyota and ZF publish the ratios but nothing about WHEN the box changes
+    # gear, so the schedule is the one part of this gearbox with no published
+    # source. Rather than invent a speed ladder -- which is what the old
+    # six-speed had, and it is what put the model in top gear halfway up a 12 %
+    # grade -- the thresholds are DERIVED from this one number and the published
+    # ratios: upshift only when the next gear would still turn at least this
+    # fast.
+    #
+    # The car settles the value. Its own rpm and road speed give the overall
+    # ratio it is actually running, sample by sample, and 86.7 % of 79 105
+    # moving samples land within 4 % of one of the eight published ratios --
+    # which is the evidence the ratio set above is right. Sweeping this constant
+    # against the gear so inferred:
+    #
+    #     rpm    exact gear    within one    mean (model - car)
+    #     1400      47.0 %        60.9 %          +1.18
+    #     1800      30.0 %        74.9 %          +0.59
+    #     2000      28.2 %        79.7 %          +0.28   <- shipped
+    #     2100      24.1 %        74.3 %          -0.06
+    #
+    # 2000 rpm is where the model stops sitting a gear too high. EXACT agreement
+    # peaks at only ~47 % for ANY threshold, and that is the honest headline: a
+    # speed-only schedule cannot reproduce a real automatic, which shifts on
+    # throttle and load as well. Quote "within one gear, 79.7 %" and say what it
+    # is -- a coarse model of the shift logic, on a gearbox whose RATIOS are
+    # exact.
+    #
+    # IT WAS NOT TUNED TO MOVE A RESULT, and that is checkable: at the scenario
+    # this environment runs -- 130 km/h on a 12 % grade -- 1400 and 2000 rpm
+    # both select 7th, 2706 rpm, 340 Nm. They differ only at light load.
+    UPSHIFT_MIN_RPM = 2000.0
+
+    def _upshift_speeds(self):
+        """Road speed (m/s) at which each upshift becomes allowed.
+
+        Derived from UPSHIFT_MIN_RPM and the PUBLISHED ratios, so the schedule
+        follows the gearbox instead of being a second invented table beside it.
+        """
+        out = []
+        for g in self.gears[1:]:
+            ratio = g * self.final_drive
+            out.append(self.UPSHIFT_MIN_RPM * (2 * np.pi / 60.0) * self.wheel_r / ratio)
+        return out
+
+    def gear_for(self, v_mps, force_n=None):
+        """Highest gear the speed allows, then down while the engine is over-asked.
+
+        WHY THE LOAD TERM EXISTS. Selecting on ROAD SPEED ALONE is wrong in
+        exactly the place this project cares about: a speed ladder upshifts
+        whatever the road is doing, so on a sustained grade the model upshifts
+        MID-CLIMB -- which no automatic does -- and then asks the engine for the
+        whole hill in the tallest ratio it has. On the old six-speed that was
+        measured as a 23 % jump in torque demand across a 4 % step in road speed,
+        and it made `test_reward.py` fail its neutral-action check at -0.124.
+
+        That failure is recorded as mistake 17 on the `sep17` branch, which fixed
+        it for the six-speed. THE SAME GUARD IS CARRIED HERE DELIBERATELY: this
+        branch does not have that commit, and shipping an eight-speed with a bare
+        speed ladder would reintroduce the same defect with a TALLER top gear
+        (0.640 x 3.150 = 2.016 overall, against the old 0.68 x 3.4 = 2.312).
+        Fixing a gearbox by making it more wrong is not an option. When the
+        branches merge, this rule and mistake 17's are the same rule.
+        """
+        ups = self._upshift_speeds()
+        g = 0
+        for i, v_up in enumerate(ups):
+            if v_mps >= v_up:
+                g = i + 1
+        if force_n is None:
+            return g
+        ceiling = self.SHIFT_LOAD * self.PEAK_TORQUE_NM
+        while g > 0:
+            ratio = self.gears[g] * self.final_drive
+            if force_n * self.wheel_r / max(ratio, .1) / 0.92 <= ceiling:
+                break
+            lower = self.gears[g - 1] * self.final_drive
+            if v_mps / self.wheel_r * lower * 60.0 / (2 * np.pi) > self.SHIFT_RPM_MAX:
+                break
+            g -= 1
+        return g
 
     def demand(self, v_mps, accel, grade):
         f = (self.mass * accel
              + 0.5 * 1.2 * self.cd_a * v_mps ** 2
              + self.crr * self.mass * 9.81 * np.cos(np.arctan(grade))
              + self.mass * 9.81 * np.sin(np.arctan(grade)))
-        g = self.gear_for(v_mps)
+        g = self.gear_for(v_mps, force_n=f)
         ratio = self.gears[g] * self.final_drive
         torque = f * self.wheel_r / max(ratio, .1) / 0.92
         rpm = float(np.clip(v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi), 800.0, 6500.0))
@@ -300,6 +488,27 @@ TRACK_HINGE = 25.0
 #
 # If you change the damage model, change this with it. They are the same number.
 TURB_PROTECT_K = 1123.0
+OIL_PROTECT_K = 408.0      # the oil knee in the same damage model
+
+# The damage model itself, in ONE place.
+#
+# AUDIT.md L1/M2, 15 September 2026: this formula was typed out in three files
+# -- here with literals beside a constant that claimed to be "the same number",
+# in app/estimator.py WITHOUT the knock term while its docstring said it was
+# "the SAME model check_premise.py scores with", and its oil knee again in
+# app/alerts.py. Three copies of a formula are three chances to disagree, and
+# two of them already did.
+#
+# knock_integral is optional because the app cannot always form it the way the
+# environment does; omitting it scores thermal damage only, and the caller is
+# expected to know that is what it asked for.
+def damage_rate(t_turb_k, t_oil_k, knock_integral=None):
+    """Damage per second at these node temperatures. The ONE definition."""
+    d = (np.exp((t_turb_k - TURB_PROTECT_K) / 45.0)
+         + 0.4 * np.exp((t_oil_k - OIL_PROTECT_K) / 12.0))
+    if knock_integral is not None:
+        d += 40.0 * max(0.0, knock_integral - 0.85) ** 2
+    return float(d)
 
 ACT_LO = np.array([-8.0, -0.15, -40.0, 0.0, 0.3], dtype=np.float32)
 ACT_HI = np.array([+4.0, +0.06, +15.0, 1.0, 1.0], dtype=np.float32)
@@ -340,18 +549,24 @@ class SupervisoryTunerEnv(gym.Env):
         """One engine evaluation. Physics plant, or surrogate if supplied."""
         if self.engine is not None:
             return self.engine.predict(rpm, map_kpa, iat_k, ect_k, spark, lam)
+        # AUDIT.md M2: the backpressure ratio was 1.12 here and 1.15 in
+        # plant.py, which predict(), compare_log.py and the app all use. Two
+        # constants for one physical quantity, worth 6 C of EGT at the climb
+        # point. Imported now, so there is one.
         r = run_cycle(Operating(rpm=rpm, map_kpa=map_kpa, iat_k=iat_k, ect_k=ect_k,
                                 spark_btdc=spark, lam=lam,
-                                p_exh_kpa=max(105.0, map_kpa * 1.12)), geo=GEO)
+                                p_exh_kpa=max(105.0, map_kpa * EXH_BACKPRESSURE_RATIO)),
+                      geo=GEO)
         return dict(torque=r.torque_nm, mdot_fuel=r.mdot_fuel_gps,
+                    mdot_air=r.mdot_air_gps,      # for the compressor ceiling, M1
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
 
-    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 30534
-    # quasi-steady samples from seven drives -- with the saturated MAF samples
-    # excluded -- the highest compressor pressure ratio the car reached is 2.516,
-    # which against a 99.3 kPa inlet is 250 kPa absolute. This replaces the 240
-    # that used to sit here as a round number. See plant.boost_ceiling_kpa for
-    # the flow-dependent version of the same envelope.
+    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 74 013
+    # quasi-steady samples from eight drives -- with the saturated MAF samples
+    # excluded -- the highest pressure ratio the car reached is 2.52, which
+    # against a 99.3 kPa inlet is 250 kPa absolute. This replaces the 240 that
+    # used to sit here as a round number. See plant.boost_ceiling_kpa for the
+    # flow-dependent version of the same envelope.
     MAP_CEIL_KPA = 250.0
 
     def _map_for(self, torque_req, rpm, boost_trim):
@@ -378,8 +593,16 @@ class SupervisoryTunerEnv(gym.Env):
             out = self._evaluate(rpm, mp, iat_k, ect_k, spark, lam)
             err = torque_req - out["torque"]
             state["i"] = float(np.clip(state.get("i", 0.0) + 0.05 * err, -60.0, 60.0))
-            mp = float(np.clip(mp + 0.35 * err + state["i"] * 0.02,
-                               25.0, min(self.MAP_CEIL_KPA, 200.0 + boost_trim)))
+            # AUDIT.md M1. This clamped at `min(MAP_CEIL_KPA, 200 + trim)`,
+            # i.e. 160-215 kPa, while README said `plant.boost_ceiling_kpa`
+            # bounds the pressure and MAP_CEIL_KPA is the measured 250. The
+            # flow-dependent ceiling was never called by the environment at
+            # all -- only by check_map.py. It is applied here now, so a heavier
+            # scenario or a trained agent with +15 boost trim meets the ceiling
+            # the compressor actually has instead of an undocumented 215 kPa.
+            ceil = min(self.MAP_CEIL_KPA,
+                       boost_ceiling_kpa(out["mdot_air"], iat_k) + boost_trim)
+            mp = float(np.clip(mp + 0.35 * err + state["i"] * 0.02, 25.0, ceil))
         state["map"] = mp
         return out, mp
 
@@ -449,8 +672,9 @@ class SupervisoryTunerEnv(gym.Env):
         self.knock_flag_base = False
         self.v = float(self.cycle["v_mps"][0])
         self.rpm, self.map_kpa, self.tps = 900.0, 40.0, 0.0
+        self.map_b_prev = 40.0        # lagged baseline load for ecu.step -- C2
         self.spark, self.lam = 20.0, 1.0
-        self.iat_k = t_amb + 12.0
+        self.iat_k = charge_temperature(t_amb)
         self.torque_req, self.aggression = 0.0, 0.0
         self.ep = dict(fuel=0.0, fuel_base=0.0, damage=0.0, damage_base=0.0,
                        knock_events=0, torque_viol=0.0, egt_viol=0.0, steps=0)
@@ -460,7 +684,15 @@ class SupervisoryTunerEnv(gym.Env):
         c = self.cycle
         n = len(c["v_mps"])
         raw = self._rescale(np.asarray(action, dtype=np.float32))
-        act = np.clip(raw, self.prev_act - SLEW, self.prev_act + SLEW)
+        # AUDIT.md M16: SLEW is a per-SECOND rate, so it must scale with dt.
+        # It used to be applied per STEP, and this environment runs at dt = 1.0
+        # (check_premise), 2.0 (generality_test) and 0.2 (train.py) -- so the
+        # reachable actuator movement per second differed FIVEFOLD between the
+        # hand-written policies and the agent that is meant to beat them. A
+        # trained agent's reward landscape was not the one those policies were
+        # scored on.
+        slew = SLEW * self.dt
+        act = np.clip(raw, self.prev_act - slew, self.prev_act + slew)
         act = np.clip(act, ACT_LO, ACT_HI)
 
         # --- driver demand -------------------------------------------------
@@ -470,15 +702,34 @@ class SupervisoryTunerEnv(gym.Env):
         grade = float(c["grade"][self.k])
         self.torque_req, self.rpm = self.veh.demand(self.v, accel, grade)
         self.aggression = float(np.clip(abs(accel) / 2.5, 0.0, 1.0))
-        self.iat_k = c["t_amb"] + 12.0 + 0.06 * (self.thermal.t_block - c["t_amb"])
+        self.iat_k = charge_temperature(c["t_amb"], self.thermal.t_block)
+        # AUDIT.md L14: the baseline's charge temperature used to be the AGENT's
+        # -- computed from the agent's block node and handed to both -- so the
+        # "baseline-relative" reference moved with the agent's own fan and pump.
+        # 1.5 K with the old cooling-disabled neutral; unbounded with a trained
+        # agent. The baseline now gets its own.
+        iat_b = charge_temperature(c["t_amb"], self.thermal_base.t_block)
 
         # --- baseline controller (runs in parallel, defines the reference) ---
-        sp_b, lam_b, fan_b = self.ecu.step(self.rpm, self._map_for(self.torque_req, self.rpm, 0.0),
-                                           self.iat_k, self.thermal_base.t_block,
+        #
+        # AUDIT.md C2: the ECU used to be scheduled on `_map_for(...)`, an
+        # OPEN-LOOP FEED-FORWARD GUESS at the manifold pressure. On the standard
+        # climb that guess is 224 kPa while the tracking loop actually settles
+        # at 175 kPa, so the spark map, the IAT compensation and the enrichment
+        # DWELL TIMER were all evaluated at a load the engine was not at -- the
+        # ECU commanded knock-limited spark for a phantom 224 kPa and ran the
+        # dwell timer above ENR_LOAD while the engine sat below it.
+        #
+        # A real ECU measures load and then looks spark up, so the schedule now
+        # uses the pressure the baseline loop actually produced on the previous
+        # step. One step of lag at dt = 1 s is what a real one has.
+        sp_b, lam_b, fan_b = self.ecu.step(self.rpm, self.map_b_prev,
+                                           iat_b, self.thermal_base.t_block,
                                            self.knock_flag_base, self.dt)
-        base, map_b = self._track_torque(self.torque_req, self.rpm, self.iat_k,
+        base, map_b = self._track_torque(self.torque_req, self.rpm, iat_b,
                                          self.thermal_base.t_block, sp_b, lam_b,
                                          0.0, self.pi_base)
+        self.map_b_prev = map_b
         self.knock_flag_base = base["ki"] > 1.0
         self.thermal_base.step(self.dt, base["mdot_fuel"], base["mdot_fuel"] * 15.0,
                                base["egt_k"], c["t_amb"], self.v, fan_b)
@@ -498,12 +749,8 @@ class SupervisoryTunerEnv(gym.Env):
                           out["egt_k"], c["t_amb"], self.v, act[3], act[4])
 
         # --- damage rates ---------------------------------------------------
-        def damage(tn, ki):
-            d = np.exp((tn.t_turb - 1123.0) / 45.0) + 0.4 * np.exp((tn.t_oil - 408.0) / 12.0)
-            return float(d + 40.0 * max(0.0, ki - 0.85) ** 2)
-
-        d_a = damage(self.thermal, out["ki"])
-        d_b = damage(self.thermal_base, base["ki"])
+        d_a = damage_rate(self.thermal.t_turb, self.thermal.t_oil, out["ki"])
+        d_b = damage_rate(self.thermal_base.t_turb, self.thermal_base.t_oil, base["ki"])
 
         # --- reward: every term baseline-relative and dimensionless ---------
         eps = 1e-6
@@ -513,9 +760,13 @@ class SupervisoryTunerEnv(gym.Env):
         e_track = abs(self.torque_req - out["torque"]) / t_ref
         r_resp = -(e_track + TRACK_HINGE * max(0.0, e_track - TRACK_TOL))
 
+        # AUDIT.md M16: the smoothness penalty is a cost per second of jerky
+        # actuation, so it is divided by dt -- charged per step it was five
+        # times cheaper at dt = 0.2 than at dt = 1.0, for the same physical
+        # rate of movement.
         smooth = float(np.sum(((act - self.prev_act) / (ACT_HI - ACT_LO)) ** 2))
         reward = (self.w[1] * r_fuel + self.w[2] * r_life + self.w[0] * r_resp
-                  - self.beta * out.get("unc", 0.0) - 0.05 * smooth)
+                  - self.beta * out.get("unc", 0.0) - 0.05 * smooth / max(self.dt, 1e-6))
 
         # --- constraint costs ------------------------------------------------
         c_torque = max(0.0, abs(self.torque_req - out["torque"]) / t_ref - 0.03)

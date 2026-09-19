@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Engine Supervisor — review</title>
+<style>
+  /* REVIEW VIEW.
+     What was marked on past drives, for a mechanic or an owner reading
+     afterwards. Nobody is driving while this page is open, so unlike
+     /driver it is allowed to be dense, and it should be: the mechanic's
+     question is "what happened, when, on what evidence, and what was the
+     car told to do about it".
+
+     This page reads app/review_log.jsonl -- the only file the product
+     writes. It contains marked events and nothing else. There is no raw
+     stream to show here because none was ever stored. */
+  :root{
+    --bg:#0e1116; --panel:#161b22; --line:#262d38; --ink:#e6edf3; --dim:#8b949e;
+    --ok:#3fb950; --watch:#d29922; --warn:#db6d28; --crit:#f85149; --acc:#58a6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+         padding:14px 18px;border-bottom:1px solid var(--line)}
+  h1{font-size:15px;margin:0;font-weight:650}
+  nav{margin-left:auto;display:flex;gap:16px}
+  nav a{color:var(--acc);text-decoration:none;font-size:12px}
+  main{padding:18px;max-width:1100px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .filters button{font:inherit;font-size:12px;padding:6px 13px;border-radius:20px;
+      border:1px solid var(--line);background:var(--panel);color:var(--dim);cursor:pointer}
+  .filters button.on{color:var(--ink);border-color:var(--acc)}
+  .sess{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+        margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;
+         cursor:pointer;border-bottom:1px solid transparent}
+  .sess.open .shead{border-bottom-color:var(--line)}
+  .shead b{font-size:14px;font-weight:650}
+  .shead .when{color:var(--dim);font-size:12px}
+  .pill{font-size:10.5px;padding:2px 9px;border-radius:20px;border:1px solid var(--line);
+        color:var(--dim)}
+  .pill.thermal{border-color:var(--warn);color:var(--warn)}
+  .pill.mismatch{border-color:var(--watch);color:var(--watch)}
+  .pill.novel{border-color:var(--acc);color:var(--acc)}
+  .chev{margin-left:auto;color:var(--dim);font-size:12px}
+  .body{display:none;padding:6px 16px 16px}
+  .sess.open .body{display:block}
+  .ev{border-left:3px solid var(--line);padding:11px 14px;margin:11px 0;
+      background:#11161d;border-radius:0 8px 8px 0}
+  .ev.critical{border-left-color:var(--crit)} .ev.warn{border-left-color:var(--warn)}
+  .ev.watch{border-left-color:var(--watch)}   .ev.info{border-left-color:var(--acc)}
+  .ev .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .ev .t{font-variant-numeric:tabular-nums;color:var(--dim);font-size:12px;
+         min-width:8ch}
+  .ev .title{font-weight:600}
+  .ev .advice{font-size:13px;color:#c9d1d9;margin-top:5px}
+  .ev .who{font-size:10.5px;color:var(--dim);margin-top:6px;text-transform:uppercase;
+           letter-spacing:.06em}
+  table.evid{margin-top:9px;border-collapse:collapse;font-size:12px;
+             font-variant-numeric:tabular-nums}
+  table.evid td{padding:2px 14px 2px 0;color:var(--dim)}
+  table.evid td.v{color:var(--ink)}
+  .empty{color:var(--dim);padding:26px 0}
+  footer{padding:14px 18px;color:var(--dim);font-size:11.5px;
+         border-top:1px solid var(--line);max-width:1100px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Marked events — past drives</h1>
+  <nav><a href="/">live dashboard</a><a href="/driver">driver mode</a></nav>
+</header>
+
+<main>
+  <div class="filters" id="filters">
+    <button data-k="all" class="on">everything</button>
+    <button data-k="thermal">thermal · driver</button>
+    <button data-k="mismatch">mismatch · mechanic</button>
+    <button data-k="novel">novel · engineer</button>
+  </div>
+  <div id="out"><div class="empty">Loading…</div></div>
+</main>
+
+<footer>
+  These are the events the model marked. The raw engine data they were derived
+  from was never written to disk, so it is not here and cannot be recovered.
+  Turbine and oil temperatures in the evidence are model estimates, not sensor
+  readings.
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const EV_LABEL = {
+  thermal:  "for the driver, at the time",
+  mismatch: "for a mechanic — diagnostic, not an emergency",
+  novel:    "for the engineers — the estimate was extrapolating here"
+};
+let DATA = {sessions: []}, filter = "all";
+
+const mmss = t => {
+  if (t === null || t === undefined) return "—";
+  const s = Math.max(0, Math.round(t));
+  return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+};
+const wall = w => { try { return new Date(w).toLocaleString(); } catch(_) { return w || "—"; } };
+
+function evidenceTable(ev){
+  const t = document.createElement("table");
+  t.className = "evid";
+  for (const [k, v] of Object.entries(ev || {})){
+    const tr = t.insertRow();
+    tr.insertCell().textContent = k.replace(/_/g, " ");
+    const c = tr.insertCell(); c.className = "v";
+    c.textContent = Array.isArray(v) ? v.join(" – ") : String(v);
+  }
+  return t;
+}
+
+function render(){
+  const out = $("out");
+  out.textContent = "";
+  const sessions = DATA.sessions || [];
+  if (!sessions.length){
+    out.innerHTML = `<div class="empty">Nothing has been marked yet. Run a drive
+      (or a replay) and any thermal, mismatch or novel event will appear here.</div>`;
+    return;
+  }
+  let shown = 0;
+  sessions.forEach((s, i) => {
+    const events = (s.events || []).filter(e => filter === "all" || e.kind === filter);
+    if (!events.length) return;
+    shown++;
+    const el = document.createElement("section");
+    el.className = "sess" + (i === 0 ? " open" : "");
+    const head = document.createElement("div");
+    head.className = "shead";
+    const b = document.createElement("b"); b.textContent = s.source || "unknown source";
+    head.appendChild(b);
+    const when = document.createElement("span");
+    when.className = "when"; when.textContent = wall(s.first_wall);
+    head.appendChild(when);
+    for (const k of ["thermal","mismatch","novel"]){
+      if (!s.counts?.[k]) continue;
+      const p = document.createElement("span");
+      p.className = "pill " + k; p.textContent = `${s.counts[k]} ${k}`;
+      head.appendChild(p);
+    }
+    const chev = document.createElement("span");
+    chev.className = "chev"; chev.textContent = `${events.length} shown`;
+    head.appendChild(chev);
+    head.onclick = () => el.classList.toggle("open");
+    el.appendChild(head);
+
+    const body = document.createElement("div");
+    body.className = "body";
+    for (const e of events){
+      const d = document.createElement("div");
+      d.className = "ev " + (e.severity || "info");
+      const top = document.createElement("div"); top.className = "top";
+      const t = document.createElement("span");
+      t.className = "t"; t.textContent = mmss(e.t) + " in";
+      const ti = document.createElement("span");
+      ti.className = "title"; ti.textContent = e.title || "(no title)";
+      top.appendChild(t); top.appendChild(ti);
+      d.appendChild(top);
+      const ad = document.createElement("div");
+      ad.className = "advice"; ad.textContent = "Advised: " + (e.advice || "—");
+      d.appendChild(ad);
+      d.appendChild(evidenceTable(e.evidence));
+      const who = document.createElement("div");
+      who.className = "who";
+      who.textContent = `${e.kind} · ${EV_LABEL[e.kind] || e.audience || ""}`;
+      d.appendChild(who);
+      body.appendChild(d);
+    }
+    el.appendChild(body);
+    out.appendChild(el);
+  });
+  if (!shown)
+    out.innerHTML = `<div class="empty">No ${filter} events were marked on any drive.</div>`;
+  if (DATA.unreadable_lines)
+    out.insertAdjacentHTML("beforeend",
+      `<div class="empty">${DATA.unreadable_lines} line(s) in the review file could
+       not be parsed and were skipped.</div>`);
+}
+
+for (const b of $("filters").querySelectorAll("button")){
+  b.onclick = () => {
+    $("filters").querySelectorAll("button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    filter = b.dataset.k;
+    render();
+  };
+}
+
+fetch("/api/review").then(r => r.json()).then(d => { DATA = d; render(); })
+  .catch(() => { $("out").innerHTML =
+      `<div class="empty">Could not read the review file.</div>`; });
+</script>
+</body>
+</html>

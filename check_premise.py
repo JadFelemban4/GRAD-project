@@ -6,9 +6,28 @@ something to find. If it does not, no amount of SAC tuning will help.
 """
 import numpy as np
 from engine_env import (SupervisoryTunerEnv, make_grade_climb, ACT_LO, ACT_HI,
-                        TURB_PROTECT_K)
+                        TURB_PROTECT_K, neutral_action)
 
-NEUTRAL = (2.0 * (0.0 - ACT_LO) / (ACT_HI - ACT_LO) - 1.0).astype(np.float32)
+# AUDIT.md C1, 15 September 2026. This file used to define its own
+#
+#     NEUTRAL = 2*(0 - ACT_LO)/(ACT_HI - ACT_LO) - 1
+#
+# which maps ALL FIVE actions to "zero" -- and actions 3 and 4 are not trims,
+# they are absolute duties. Zero means the COOLING FAN OFF and the coolant pump
+# at its 0.3 floor, and the pump term came out at -1.857, outside the action
+# space the env declares. `engine_env.neutral_action()` was written to fix
+# exactly this (mistake 10) and this file never called it.
+#
+# So every preview figure in the repository was measured against a baseline
+# with its cooling switched off, while the protection policies switched the
+# pump back to 1.0 whenever they acted -- crediting them with cooling the
+# baseline row never had. Import the one definition instead.
+NEUTRAL = neutral_action()
+
+# The fan and pump duties a protecting policy may command. Never BELOW neutral:
+# a policy that "protects" by cooling less than the baseline is not protecting.
+NEUTRAL_FAN = float(ACT_LO[3] + (NEUTRAL[3] + 1.0) * 0.5 * (ACT_HI[3] - ACT_LO[3]))
+NEUTRAL_PUMP = float(ACT_LO[4] + (NEUTRAL[4] + 1.0) * 0.5 * (ACT_HI[4] - ACT_LO[4]))
 
 # Protection trigger, in kelvin of turbine housing temperature.
 #
@@ -67,45 +86,134 @@ def rollout(policy, use_preview=True, seed=0, w=None):
                 knock=s["knock_events"])
 
 
+def _protect(k):
+    """The protection action at depth k. ONE lever set, used by every policy.
+
+    AUDIT.md C1: the fan and pump are clamped at their NEUTRAL values from
+    below. They used to be commanded as `k` and `1.0`, so at small k a
+    "protecting" policy ran LESS cooling than the baseline.
+    """
+    if k <= 0:
+        return NEUTRAL
+    fan = max(NEUTRAL_FAN, k)
+    pump = max(NEUTRAL_PUMP, 1.0)
+    return to_norm([0.0, -0.10 * k, -18.0 * k, fan, pump])
+
+
 def p_neutral(env, obs):
     return NEUTRAL
 
 
 def p_reactive(env, obs):
-    """Acts only on the turbine temperature it can already measure."""
+    """Acts only on the turbine temperature it can already measure.
+
+    AUDIT.md C3. This used to saturate at k = 0.36 while `p_predictive` held
+    k >= 0.55, so the two policies differed in HOW HARD THEY PROTECTED as well
+    as in when -- and the headline gap was being read as a preview effect. The
+    depth is now the same on both, so the only remaining difference is timing,
+    which is what the experiment is supposed to be about.
+    """
     over = env.thermal.t_turb - TRIGGER_K
     if over <= 0:
         return NEUTRAL
-    k = float(np.clip(over / 25.0, 0.0, 1.0))
-    return to_norm([0.0, -0.10 * k, -18.0 * k, k, 1.0])
+    return _protect(float(np.clip(over / 25.0, 0.0, 1.0)))
+
+
+def p_grade_now(env, obs):
+    """A THIRD baseline: acts on the grade it is on RIGHT NOW, with no preview.
+
+    AUDIT.md C3 asked for this and it is the most useful row in the table.
+    A policy that keys on the current road gradient -- information every car
+    already has from a nose-down accelerometer -- lands within 0.1 points of
+    the predictive policy. That is the honest comparator for "is PREVIEW worth
+    acquiring", because it is what you get without buying any.
+    """
+    grade_now = float(env.cycle["grade"][min(env.k, len(env.cycle["grade"]) - 1)])
+    over = env.thermal.t_turb - TRIGGER_K
+    k_now = float(np.clip(over / 25.0, 0.0, 1.0))
+    k_grade = float(np.clip(grade_now / 0.08, 0.0, 1.0)) if grade_now > 0.02 else 0.0
+    return _protect(max(k_now, 0.55 * k_grade))
 
 
 def p_predictive(env, obs):
-    """Same levers, but triggered by the +15 s and +30 s gradient preview."""
+    """Same levers and the same depth, triggered by the +15 s / +30 s preview."""
     ahead = max(env._preview()[2], env._preview()[3])
     over = env.thermal.t_turb - TRIGGER_K
     k_now = float(np.clip(over / 25.0, 0.0, 1.0))
     k_ahead = float(np.clip(ahead / 0.08, 0.0, 1.0)) if ahead > 0.02 else 0.0
-    k = max(k_now, 0.55 * k_ahead)
-    if k <= 0:
-        return NEUTRAL
-    return to_norm([0.0, -0.10 * k, -18.0 * k, k, 1.0])
+    return _protect(max(k_now, 0.55 * k_ahead))
 
 
 if __name__ == "__main__":
     print(f"protection trigger: {TRIGGER_K:.0f} K ({TRIGGER_K - 273.15:.0f} C) "
           f"= the knee of the turbine damage term\n")
-    rows = [("baseline ECU (neutral trims)", p_neutral, True),
+    rows = [("baseline ECU (true neutral)", p_neutral, True),
             ("reactive protection", p_reactive, True),
+            ("current-grade protection", p_grade_now, True),
             ("predictive protection", p_predictive, True),
             ("predictive, preview disabled", p_predictive, False)]
     print(f"{'policy':<32}{'fuel g':>9}{'damage':>10}{'peak turb C':>13}{'peak oil C':>12}")
     print("-" * 76)
-    base = None
+    out = {}
     for name, pol, prev in rows:
         r = rollout(pol, use_preview=prev)
-        if base is None:
-            base = r
+        out[name] = r
         print(f"{name:<32}{r['fuel']:>9.0f}{r['damage']:>10.1f}"
               f"{r['peak_turb']:>13.0f}{r['peak_oil']:>12.0f}")
     print("-" * 76)
+
+    b = out["baseline ECU (true neutral)"]["damage"]
+    for name in ("reactive protection", "current-grade protection",
+                 "predictive protection"):
+        d = out[name]["damage"]
+        print(f"  {name:<30} cuts damage {100.0 * (1.0 - d / b):5.1f} %")
+    gap = (100.0 * (1.0 - out["predictive protection"]["damage"] / b)
+           - 100.0 * (1.0 - out["reactive protection"]["damage"] / b))
+    grade_gap = (100.0 * (1.0 - out["predictive protection"]["damage"] / b)
+                 - 100.0 * (1.0 - out["current-grade protection"]["damage"] / b))
+    print(f"\n  preview over reactive      {gap:+5.1f} points")
+    print(f"  preview over current grade {grade_gap:+5.1f} points   <- THE HONEST ONE")
+
+    # AUDIT.md C2. Say it loudly rather than letting a reader infer it from a
+    # small number: if the baseline never reaches the trigger, this experiment
+    # is not measuring protection at all.
+    peak_b = out["baseline ECU (true neutral)"]["peak_turb"]
+    if peak_b < TRIGGER_K - 273.15:
+        print(f"""
+  *** THE CONSTRAINT DOES NOT BIND ON THIS SCENARIO ***
+  The baseline peaks at {peak_b:.0f} C against a {TRIGGER_K - 273.15:.0f} C trigger, so the reactive
+  policy never acts and its row is the baseline row. Until the scenario is
+  re-chosen so the trigger is reached FOR A PHYSICAL REASON, no number in this
+  table is a measurement of preview value.
+
+  It used to bind, and it bound for the wrong reason: the baseline ECU was
+  scheduled on an open-loop guess at manifold pressure -- 224 kPa where the
+  engine actually ran 175 -- so it commanded knock-limited spark for a load it
+  was not at and cooked the turbine with ~10 degrees of phantom retard. The
+  879 C peak the documents quote was that error, not the engine.
+
+  CHOOSE THE NEW SCENARIO FROM SOMETHING PHYSICAL -- a real grade, a published
+  towing duty cycle, a measured ambient -- and NOT by turning a knob until the
+  gap looks good. That is mistake 12 waiting to happen to Phase D.""")
+
+    print("""
+READ THIS BEFORE QUOTING ANY OF IT.  (AUDIT.md C1 and C3)
+
+1. These policies are HAND-WRITTEN, not trained. They say the environment
+   rewards anticipation; they do not say how much an agent would gain.
+
+2. The three protecting rows now use the SAME protection DEPTH, so the only
+   difference between reactive and predictive is TIMING. Until 16 September
+   the reactive policy saturated at k = 0.36 while predictive held k >= 0.55,
+   and the gap between them was partly just protecting harder.
+
+3. "Predictive, preview disabled" equals "reactive" BY CONSTRUCTION, not as a
+   finding. With use_preview=False the preview term is literally zero, so
+   p_predictive returns p_reactive's vector on every step. The identity CANNOT
+   fail and it is not evidence. It becomes a real ablation only when a TRAINED
+   blinded agent is compared with a trained sighted one -- that is Phase D.
+
+4. The row that matters is CURRENT-GRADE PROTECTION. It uses no preview at all,
+   only the gradient the car is on now, which any vehicle can measure. If
+   preview beats it by little, then preview is not worth acquiring HERE -- and
+   that is a result about this operating point, which is what H/tau is for.""")

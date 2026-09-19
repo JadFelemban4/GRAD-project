@@ -33,11 +33,22 @@ to the supervisor without knowing what is stale.
 | `What_To_Do_In_Order.pdf` | old premise numbers |
 | `Slide_By_Slide_Team_Brief.pdf` | old premise numbers |
 | `Project_Vocabulary.pdf` | one worked example uses a 2.0 L engine |
+| `Novelty_Statement.pdf` | Claim 1 says 62 % vs 32 % damage reduction (void — the four-cylinder; now **47.2 % vs 33.8 %** at the 1123 K trigger); Claim 2 says the sweep moved the advantage 7.6 → 49.9 points (void — now **16.5 → 26.0 points** over H/τ 4.47 → 0.60 at the fixed 1123 K limit) |
 
 Checked and **clean**: `Roles_And_Lessons.pdf`, `Team_Working_Model.pdf`,
-`Roadmap_Two_Plants.pdf`, `Novelty_Statement.pdf`, `Logging_Channel_Reference.pdf`,
+`Roadmap_Two_Plants.pdf`, `Logging_Channel_Reference.pdf`,
 `Preview_Worth_Proposal.pdf` and its team variant, `Project_Proposal_5.pptx`,
 `موجز_المشروع_للفريق.pdf`.
+
+**`Novelty_Statement.pdf` moved out of that list on 13 September 2026.** The
+8 September pass searched for the premise triplet and the engine displacement,
+and neither of its two void figures is one of those. It was never re-checked
+against the rest of the void list.
+
+**`verify_docs.py` cannot see any of this.** It globs `*.md` and `*.py` only,
+and `DOC/` is untracked, so every figure in these PDFs is outside the checker's
+reach. All 33 checks pass with 62 % / 32 % / 7.6 / 49.9 still shipping in
+`DOC/Novelty_Statement.pdf`. A green run says nothing about a PDF.
 
 ---
 
@@ -69,3 +80,25 @@ four-cylinder. The copies have been synchronised with this repository.
 
 **The repository under `build/engine-supervisor/` is canonical.** If you find a
 `.py` file outside it, check it against the one in here before running it.
+
+---
+
+## Added 16 September 2026 — what the app does and does not change here
+
+The live supervisor in `app/` publishes no figure that belongs in a team PDF, so
+**no document listed above becomes more or less void because of it.** Two things
+are worth recording anyway, because both will otherwise be discovered late:
+
+- **If a slide shows a screenshot of the app, it is showing a MODELLED turbine
+  temperature.** The caption has to say so. `c_turb` is an ASSUMED number
+  (REFERENCES.md section 4) and the vehicle publishes nothing to check it
+  against. A dashboard reading is the most convincing-looking number in the
+  whole project and the least directly evidenced.
+- **The dataset is now nine drives, 175.5 minutes**, not eight and 168.1. Any
+  PDF quoting the old pair is stale in one more place. The three drive counts
+  are not interchangeable — nine logged, six carrying samples, eight behind the
+  fitted calibrations — so check which one a slide actually means before
+  correcting it.
+
+`verify_docs.py` scans the repository's markdown and Python, **not the PDFs**.
+That gap is the entire reason this file exists, and the app does not narrow it.
