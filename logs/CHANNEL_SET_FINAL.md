@@ -118,7 +118,7 @@ model in `engine_env.py` be checked against the real thing instead of assumed.
 
 Everything in the dataset is either cruising or a short pull. **No drive has yet
 overwhelmed the cooling system**, which is why the radiator is unidentifiable
-and why the model's oil behaviour above 107 °C is extrapolation.
+and why the model's oil behaviour above 117 °C is extrapolation.
 
 Note what the census adds to this: it is not only that the coolant stays in
 band. The **fan setpoint sits between 28 and 31 % for an entire drive** and

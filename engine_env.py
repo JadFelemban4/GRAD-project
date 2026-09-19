@@ -34,7 +34,7 @@ class BaselineECU:
     CALIBRATED AGAINST THE REAL CAR — spark 7 Sep 2026, lambda 8 Sep 2026
     ---------------------------------------------------------------------
     The spark map comes from a 41.8-minute log (3aca2ec1-20260907_072817). The
-    lambda strategy comes from 175.5 minutes pooled across nine drives, six of
+    lambda strategy comes from 295.0 minutes pooled across ten drives, six of
     which carry usable samples, because the single-drive version of it was wrong
     twice. Two things changed from the original guessed calibration, and both
     matter:
@@ -43,7 +43,7 @@ class BaselineECU:
        ENR_LOAD, manifold pressure carries almost nothing about lambda, and the
        little it does carry has the WRONG SIGN for a load table -- +0.23, which
        says more boost goes with a LEANER mixture. What lambda tracks instead is
-       engine speed (-0.56), air mass flow (-0.49), and how long the engine has
+       engine speed (-0.47), air mass flow (-0.41), and how long the engine has
        been held at high load (-0.47). The car runs stoichiometric through the
        first seconds of a pull at any boost, and never enriches below about
        3300 rpm however long the boost is held. See base_lambda() for the
@@ -114,7 +114,7 @@ class BaselineECU:
                              self.SPARK_MIN, self.SPARK_MAX))
 
     # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on the dataset as it stood that
-    # morning, re-checked the same afternoon against the full 175.5 minutes over
+    # morning, re-checked the same afternoon against the full 295.0 minutes over
     # eight drives. The structure held and no refit was needed; see base_lambda().
     # Load gates the timer; SPEED and DWELL set the depth.
     # 200.0 until 10 September. The gate is expressed in MANIFOLD PRESSURE, and
@@ -127,7 +127,7 @@ class BaselineECU:
     #
     # 180 kPa on the corrected scale selects exactly the population that 200 kPa
     # selected on the old one -- 1055 samples -- and every fitted figure below
-    # reproduces to the decimal: n = 422 / 168 / 465 by speed band, corr with
+    # reproduces to the decimal: n = 441 / 235 / 665 by speed band, corr with
     # engine speed -0.56, with air mass -0.49, with dwell -0.47. Nothing was
     # refitted. Only the units the gate is written in were corrected.
     #
@@ -156,7 +156,7 @@ class BaselineECU:
         v4 (this)         function of engine speed and sustained dwell.
 
         v3 was fitted to seventeen seconds at high load. The two 8 September
-        drives took that to 184 seconds, and with the larger sample manifold
+        drives took that to 208 seconds, and with the larger sample manifold
         pressure turns out to carry almost nothing about lambda -- and what it
         does carry has the WRONG SIGN for a load table (+0.23: more boost, LEANER).
 
@@ -167,15 +167,29 @@ class BaselineECU:
         behind every figure here is unchanged and nothing was refitted; only the
         units the gate is written in were corrected. See ENR_LOAD above.
 
-            corr(lambda, engine speed)              -0.56
-            corr(lambda, air mass flow)             -0.49
-            corr(lambda, dwell above 180 kPa)       -0.41
-            corr(lambda, MANIFOLD PRESSURE)         +0.23   <-- POSITIVE
+            corr(lambda, engine speed)              -0.47
+            corr(lambda, air mass flow)             -0.41
+            corr(lambda, dwell above 180 kPa)       -0.44
+            corr(lambda, MANIFOLD PRESSURE)         +0.11   <-- indistinguishable
 
-        Read that last row carefully. It is not merely weak, it is the WRONG WAY
-        ROUND for a load table: on these 1055 samples more boost goes with a
-        LEANER mixture, not a richer one. A load-gated enrichment map would be
-        fitting against the sign of its own evidence.
+        Read that last row carefully, and read it with its ERROR BAR, which this
+        docstring used not to give. AUDIT.md H4: the population is 1341 rows but
+        those are FORWARD-FILLED -- they hold about 67 independent air-mass and
+        100 lambda readings, so the standard error on a correlation here is
+        about +-0.12.
+
+        This docstring used to argue that +0.23 was "the WRONG WAY ROUND for a
+        load table" -- that more boost went with a leaner mixture. THAT ARGUMENT
+        DOES NOT HOLD and it is withdrawn. At +-0.12 it was under two sigma, and
+        the tenth drive (drive10, +119 minutes) took it to +0.11, which is under
+        one. The honest statement is that MANIFOLD PRESSURE CARRIES NO DETECTABLE
+        SIGNAL. That still rejects a load table, which is all the v4 model needs.
+        It is not evidence that load points the other way.
+
+        The three that DO carry signal are three to four standard errors out, and
+        they survived the new drive: speed and air mass eased slightly (-0.56 to
+        -0.47, -0.49 to -0.41) while DWELL STRENGTHENED (-0.41 to -0.44), which
+        is the variable the model is actually built on.
 
         RE-CHECKED 8 Sep (afternoon) on a 55-minute drive that added 73 % more
         high-load samples. The structure held and the dwell correlation
@@ -187,9 +201,9 @@ class BaselineECU:
         Median lambda, pooled, above 180 kPa:
 
             rpm \\ dwell     0-4 s    4-8 s    8+ s      n
-            1000-3500 rpm     0.99     0.99    0.98    422
-            3500-4500 rpm     0.99     0.98    0.90    168
-            4500-7000 rpm     0.98     0.87    0.79    465
+            1000-3500 rpm     0.99     0.99    0.98    441
+            3500-4500 rpm     0.99     0.98    0.90    235
+            4500-7000 rpm     0.98     0.87    0.79    665
 
         Read across the bottom row: at the same load, the car runs
         stoichiometric for the first seconds of a pull and only enriches once it
@@ -255,59 +269,144 @@ class BaselineECU:
 
 # ------------------------------------------------------------------ vehicle
 class Vehicle:
+    """The A90 GR Supra 3.0 driveline.
+
+    THE GEARBOX IS THE REAL ONE, 19 September 2026. It was a generic six-speed
+    with invented ratios (3.6 / 2.1 / 1.4 / 1.0 / 0.82 / 0.68) on a 3.4 final
+    drive -- no source, and not the transmission in the car. The car has a
+    **ZF 8HP51, an eight-speed torque-converter automatic**, and Toyota publishes
+    the whole ratio set beside the engine it is bolted to.
+
+    WHERE EACH NUMBER COMES FROM, because this project does not accept a figure
+    without one (REFERENCES.md):
+
+      ratios, final drive   Toyota's own technical specification sheet, which
+                            names the unit "8-speed Sports Automatic 8HP 51" and
+                            prints all eight ratios plus reverse 3.712 and the
+                            3.150 final drive.
+                            media.toyota.co.uk .../220605M-GR-Supra-Tech-Spec.pdf
+      final drive, again    Toyota USA's pressroom gives 3.15 for the automatic
+                            on the 382 hp car, which is THIS car (285 kW,
+                            confirmed by the team 19 Sep). The UK sheet above is
+                            the 250 kW European variant, so two Toyota documents
+                            for two different power outputs agree, and the final
+                            drive is not variant-sensitive.
+                            pressroom.toyota.com/vehicle/2025-toyota-gr-supra/
+
+    WHAT ZF PUBLISHES, AND WHAT IT DOES NOT. ZF's own product page gives the 8HP
+    family a torque range of 220-1000 Nm and a ratio spread of 7.0, and a weight
+    of 87 kg for the mid-size 8HP70. It publishes NO per-gear ratios for the
+    8HP51 and no weight for it.
+
+      * The spread here is 5.250 / 0.640 = 8.20, NOT 7.0. ZF's 7.0 is a family
+        figure and must not be cited for this ratio set.
+      * "~560 Nm torque capacity" and "~77 kg" are widely repeated and are NOT
+        on ZF's page. They are carried UNVERIFIED in REFERENCES.md. The engine
+        makes 500 Nm, so the margin over a stated 560 Nm is thin and worth a
+        sentence in the thesis -- but not while the 560 has no source.
+
+    THE CONVERTER IS MODELLED AS LOCKED, 1:1, AND THAT IS A DECISION.
+    It is a torque-CONVERTER automatic, so below lock-up it multiplies torque and
+    slips. Neither Toyota nor ZF publishes a stall ratio, a K-factor or a lock-up
+    schedule, so any converter curve here would be an invented parameter of
+    exactly the kind mistake 12 warns about. The scenarios this environment runs
+    are steady high-speed climbs where a real 8HP is locked, so a locked
+    converter is both the right approximation and the honest one. Say "converter
+    assumed locked" wherever the gearbox is described; do not let a reader think
+    the slip is modelled.
+    """
     mass = 1520.0
     cd_a = 0.66
     crr = 0.011
     wheel_r = 0.33
-    final_drive = 3.4
-    gears = (3.6, 2.1, 1.4, 1.0, 0.82, 0.68)
+
+    # ZF 8HP51, from Toyota's own sheet. Reverse 3.712 is published too and is
+    # not carried here because this environment never reverses.
+    final_drive = 3.150
+    gears = (5.250, 3.360, 2.172, 1.720, 1.316, 1.000, 0.822, 0.640)
 
     # Peak torque of the B58B30O1, the figure every manufacturer sheet prints
     # beside the engine code (REFERENCES.md section 2).
     PEAK_TORQUE_NM = 500.0
 
     # ASSUMED. The fraction of peak torque above which the transmission hands
-    # back a gear, i.e. it keeps a 25 % reserve so the driver has something left.
-    # A reserve of this order is an ordinary automatic calibration; no source has
-    # been opened for this vehicle's, so declare it as engineering judgement.
-    #
-    # HOW IT WAS SET, because the honest account matters: it was chosen so that
-    # every operating point this environment had already been used at keeps the
-    # gear it had. 110 km/h on a 12 % grade asks 297 Nm, below 0.75 x 500, so
-    # that scenario is bit-identical to before this change. It was NOT chosen to
-    # make any scenario bind.
+    # back a gear -- a 25 % reserve, which is an ordinary automatic calibration.
+    # No source has been opened for this vehicle's, so it is engineering
+    # judgement and is declared as such.
     SHIFT_LOAD = 0.75
     SHIFT_RPM_MAX = 6000.0        # never hand back a gear into the limiter
+
+    # Lowest engine speed an upshift may leave the engine at.
+    #
+    # MEASURED AGAINST THE CAR, 19 September 2026, and it began as an assumption.
+    # Toyota and ZF publish the ratios but nothing about WHEN the box changes
+    # gear, so the schedule is the one part of this gearbox with no published
+    # source. Rather than invent a speed ladder -- which is what the old
+    # six-speed had, and it is what put the model in top gear halfway up a 12 %
+    # grade -- the thresholds are DERIVED from this one number and the published
+    # ratios: upshift only when the next gear would still turn at least this
+    # fast.
+    #
+    # The car settles the value. Its own rpm and road speed give the overall
+    # ratio it is actually running, sample by sample, and 86.7 % of 79 105
+    # moving samples land within 4 % of one of the eight published ratios --
+    # which is the evidence the ratio set above is right. Sweeping this constant
+    # against the gear so inferred:
+    #
+    #     rpm    exact gear    within one    mean (model - car)
+    #     1400      47.0 %        60.9 %          +1.18
+    #     1800      30.0 %        74.9 %          +0.59
+    #     2000      28.2 %        79.7 %          +0.28   <- shipped
+    #     2100      24.1 %        74.3 %          -0.06
+    #
+    # 2000 rpm is where the model stops sitting a gear too high. EXACT agreement
+    # peaks at only ~47 % for ANY threshold, and that is the honest headline: a
+    # speed-only schedule cannot reproduce a real automatic, which shifts on
+    # throttle and load as well. Quote "within one gear, 79.7 %" and say what it
+    # is -- a coarse model of the shift logic, on a gearbox whose RATIOS are
+    # exact.
+    #
+    # IT WAS NOT TUNED TO MOVE A RESULT, and that is checkable: at the scenario
+    # this environment runs -- 130 km/h on a 12 % grade -- 1400 and 2000 rpm
+    # both select 7th, 2706 rpm, 340 Nm. They differ only at light load.
+    UPSHIFT_MIN_RPM = 2000.0
+
+    def _upshift_speeds(self):
+        """Road speed (m/s) at which each upshift becomes allowed.
+
+        Derived from UPSHIFT_MIN_RPM and the PUBLISHED ratios, so the schedule
+        follows the gearbox instead of being a second invented table beside it.
+        """
+        out = []
+        for g in self.gears[1:]:
+            ratio = g * self.final_drive
+            out.append(self.UPSHIFT_MIN_RPM * (2 * np.pi / 60.0) * self.wheel_r / ratio)
+        return out
 
     def gear_for(self, v_mps, force_n=None):
         """Highest gear the speed allows, then down while the engine is over-asked.
 
-        WHY THE LOAD TERM EXISTS, ADDED 18 September 2026. This used to select on
-        ROAD SPEED ALONE, and that is wrong in exactly the place this project
-        cares about. The speed ladder upshifts to sixth at 115 km/h whatever the
-        road is doing, so on a 12 % grade the model UPSHIFTED MID-CLIMB -- which
-        no automatic does -- and then asked the engine for the whole hill in a
-        0.68 ratio.
+        WHY THE LOAD TERM EXISTS. Selecting on ROAD SPEED ALONE is wrong in
+        exactly the place this project cares about: a speed ladder upshifts
+        whatever the road is doing, so on a sustained grade the model upshifts
+        MID-CLIMB -- which no automatic does -- and then asks the engine for the
+        whole hill in the tallest ratio it has. On the old six-speed that was
+        measured as a 23 % jump in torque demand across a 4 % step in road speed,
+        and it made `test_reward.py` fail its neutral-action check at -0.124.
 
-        Measured before the fix, 12 % grade, baseline ECU:
-
-            110 km/h -> 297 Nm demanded, tracked to 0.0 %
-            115 km/h -> 364 Nm demanded, short by 7.8 %
-
-        A 4 % step in road speed moved the torque demand 23 %. That is not
-        physics, it is the ratio dropping 0.82 -> 0.68 at the 115 km/h rung.
-        The consequence was not cosmetic: the baseline could not hold the demand,
-        so the tracking hinge fired on 100 % of the climb and `test_reward.py`
-        FAILED its neutral-action check at -0.124 against a +/-0.05 band. The
-        scenario was asking for torque the vehicle could not make, and no reward
-        weight could have fixed that.
+        That failure is recorded as mistake 17 on the `sep17` branch, which fixed
+        it for the six-speed. THE SAME GUARD IS CARRIED HERE DELIBERATELY: this
+        branch does not have that commit, and shipping an eight-speed with a bare
+        speed ladder would reintroduce the same defect with a TALLER top gear
+        (0.640 x 3.150 = 2.016 overall, against the old 0.68 x 3.4 = 2.312).
+        Fixing a gearbox by making it more wrong is not an option. When the
+        branches merge, this rule and mistake 17's are the same rule.
         """
-        kmh = v_mps * 3.6
-        g = 5
-        for i, lim in enumerate((22.0, 40.0, 62.0, 88.0, 115.0)):
-            if kmh < lim:
-                g = i
-                break
+        ups = self._upshift_speeds()
+        g = 0
+        for i, v_up in enumerate(ups):
+            if v_mps >= v_up:
+                g = i + 1
         if force_n is None:
             return g
         ceiling = self.SHIFT_LOAD * self.PEAK_TORQUE_NM
@@ -462,7 +561,7 @@ class SupervisoryTunerEnv(gym.Env):
                     mdot_air=r.mdot_air_gps,      # for the compressor ceiling, M1
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
 
-    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 43 853
+    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 74 013
     # quasi-steady samples from eight drives -- with the saturated MAF samples
     # excluded -- the highest pressure ratio the car reached is 2.52, which
     # against a 99.3 kPa inlet is 250 kPa absolute. This replaces the 240 that
@@ -714,6 +813,23 @@ def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.
     ============================================================================
 
     12 % at 130 km/h, 42 C, twelve minutes.
+
+    ==> AND IT WAS CHOSEN ON THE WRONG GEARBOX. SAY SO. <==
+    The envelope below was measured with an INVENTED six-speed -- 3.6 / 2.1 /
+    1.4 / 1.0 / 0.82 / 0.68 on a 3.4 final drive, no source, not the
+    transmission in the car. Mistake 18 replaced it with the real ZF 8HP51 on
+    19 September, and this row was re-measured on the merged tree:
+
+        110 km/h, real gearbox      840 C   10 K SHORT of the trigger
+        130 km/h, invented gearbox  857 C    7 K over
+        130 km/h, real gearbox      884 C   34 K over   <- current
+
+    **The choice survived the correction, and it survived by luck.** 130 km/h
+    was picked because it was the only speed that bound on a gearbox that did
+    not exist; on the real one it binds by 34 K instead of 7, which is a better
+    scenario than the one that was chosen. That is a happy accident and it is
+    not a justification. If the gearbox is ever corrected again, RE-MEASURE THE
+    ENVELOPE before assuming this row still holds.
 
     WHY 130 AND NOT 110. Until 18 September this said 110 km/h, and that was
     right when it was written: the scenario had to bind, and it did. What made it

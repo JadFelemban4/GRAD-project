@@ -24,9 +24,9 @@ temperature, which the vehicle has no sensor for. It works, it is tested, and it
 is the first thing anyone will ask to see. It still does not advance Phase D. If
 you have an hour, spend it below, not on the app.
 
-**Where the numbers stand today.** 175.5 minutes over nine drives, six of them
-carrying samples, **23 distinct operating points spanning 30–74 kPa**. The load
-residual is **1.4 % with the DIN constant derived** (k = 0.829, zero free
+**Where the numbers stand today.** 295.0 minutes over ten drives, six of them
+carrying samples, **26 distinct operating points spanning 30–75 kPa**. The load
+residual is **1.4 % with the DIN constant derived** (k = 0.831, zero free
 parameters) and **1.1 % with it fitted** (k = 0.837, one). Note the direction:
 dropping the fitted parameter makes the residual **rise**, 1.1 → 1.4 %. Say that
 out loud rather than quoting only the derived figure — and read mistake 12 in
@@ -125,16 +125,16 @@ reproduce, the number here is stale and the script is right.
 | `python check_premise.py` | **the constraint does not bind on the current scenario** — baseline 294.2 at 812 °C, trigger 1123 K. Read the warning it prints. AUDIT.md C1/C2/C3 |
 | `python test_reward.py` | 4 of 4 checks pass; neutral scores **inside ±0.05** (currently −0.00888). The exact value is one preference draw and moves with the reset seed — AUDIT.md M13 |
 | `python validate.py` | **8 of 11** quantities inside the published band; displacement 2997.5 cc; turbine τ **48.0 s** |
-| `python compare_log.py data/master_points.csv` | fitted k 0.837 → **1.1 %**; derived k 0.829 → **1.4 %**, PASS; a 20 °C reference would give 0.890, which the fit excludes |
+| `python compare_log.py data/master_points.csv` | fitted k 0.837 → **1.1 %**; derived k 0.831 → **1.4 %**, PASS; a 20 °C reference would give 0.890, which the fit excludes |
 | `python check_map.py` | spark falls with load in every row and rises with speed in every column; **6 cells `--`** (above the compressor ceiling), **0 `knk`** |
-| `python build_dataset.py "logs/raw/*.csv"` | 175.5 min, 9 drives, 23 operating points |
+| `python build_dataset.py "logs/raw/*.csv"` | 295.0 min, 10 drives, 26 operating points |
 | `python verify_docs.py` | recomputes the published figures, scans every tracked document for retired ones, and prints its own total. Every check must pass. **Do not memorise the count** — it moves each time a figure is added |
 | `python -m app.test_replay` | **49 of 49** (was 36/46 before the audit fixes added three regressions). Replays `7475b5d7`: peak estimated turbine **890.6 °C**. That peak rose from 884.9 with the H1 crank-angle correction, not with any app change |
 | `python -m app.server --replay logs/raw/7475b5d7-20260908_142743.csv --speed 8` | serves `http://localhost:8000` — dashboard, `/driver`, `/review`. **No car needed** |
 
 `validate.py` being 8 of 11 is expected, not a failure: the three outside are the
 cruise-band EGT maximum and the two oil figures, and `validation_table.md` says
-why. Everything the model says about hot oil is extrapolation: **107 °C** is the
+why. Everything the model says about hot oil is extrapolation: **117 °C** is the
 hottest oil anywhere in the logs (`7475b5d7`), and the published band starts
 above it.
 
@@ -266,7 +266,7 @@ and interquartile range over five seeds.
 On that charge-temperature row, the car settles it. Over 587 boosted model
 samples against 887 logged readings of the vehicle's own boost channel (median
 **226 kPa**): the raw sensor inverts to 279.5 kPa, **+23.7 %**; the shipped
-`charge_temperature()` gives 232.7 kPa, **+3.0 %**. An `ambient + 8 K` knob
+`charge_temperature()` gives 232.7 kPa, **+1.9 %**. An `ambient + 8 K` knob
 scores 227.5 kPa, +0.7 %, and was rejected for being tuned to the target.
 
 One constant to watch while reading older prose: **`ENR_LOAD` is 180 kPa, not
@@ -287,7 +287,7 @@ every enrichment figure reproduces without a refit.
    `test_reward.py` and paste the output into the commit message. A reward is
    only safe relative to the dynamics it scores.
 4. **Report numbers with their condition attached.** "1.4 % load residual over 22
-   points, 30–74 kPa" — not "the model is accurate."
+   points, 30–75 kPa" — not "the model is accurate."
 5. **Report the protection threshold with every preview figure.** A preview
    advantage quoted without the limit it was measured against is not a result.
 6. **Before calling a residual a validation, perturb the thing it supposedly
@@ -330,7 +330,7 @@ Then check, in order — each of these prints:
 If the drive changes a calibration, **check how many samples support it and check
 that the variable you fitted against actually correlates.** The enrichment map
 has been wrong three times, most recently in its variable: λ correlates with
-engine speed (−0.56), air mass flow (−0.49) and dwell above the gate (−0.47),
+engine speed (−0.47), air mass flow (−0.41) and dwell above the gate (−0.47),
 and only **+0.23** with manifold pressure — weak, and pointing the wrong way for
 a load table.
 

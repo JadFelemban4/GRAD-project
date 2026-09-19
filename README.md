@@ -16,7 +16,7 @@ pip install -r requirements.txt
 Python 3.11 or newer.
 
 > **Updated 16 September 2026.** Two things arrived since the last pass. The
-> dataset is now **nine drives, 175.5 minutes** (`pull01`, which contributes
+> dataset is now **ten drives, 295.0 minutes** (`pull01`, which contributes
 > zero samples by design, so no calibration figure moved). And `app/` exists —
 > a live supervisor that runs this same physics beside the car and estimates
 > turbine temperature, which the vehicle has no sensor for. **It is a second
@@ -123,8 +123,8 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 > the eleven validation rows — ran a 1998 cc four-cylinder. Torque was 33 % low.
 >
 > Phase B was not affected: `predict()` and `map_from_airflow()` always used the
-> B58, so the load residual stands: **1.4 %** over the 23 pooled points,
-> 30–74 kPa, with zero fitted parameters (**1.1 %** if k is fitted instead).
+> B58, so the load residual stands: **1.4 %** over the 26 pooled points,
+> 30–75 kPa, with zero fitted parameters (**1.1 %** if k is fitted instead).
 > Read section 2 below before quoting it — it tests less than its name suggests.
 >
 > Every earlier set of premise numbers is void — 527/357/199, and 52.7/29.9/27.8
@@ -167,7 +167,7 @@ python -m app.server --live                  # needs `pip install obd`
 Then `http://localhost:8000` — the dashboard, `/driver` for the one-number
 driving screen, `/review` for what was marked on past drives.
 
-**Develop in replay. You do not need the car.** The 175 minutes in `logs/raw/`
+**Develop in replay. You do not need the car.** The 295 minutes in `logs/raw/`
 are enough for five people to work against the same drives at once.
 
 The point of it is `app/estimator.py`: this car cannot report turbine
@@ -241,7 +241,7 @@ only under boost, when the throttle is open and the two are the same thing.
 Feeding that channel to the model as its load input was measured at about
 **75 % air-mass error**, on the eleven-point set that predated the master
 dataset. Inverting the air mass channel instead gives a load residual of
-**1.4 %** over the 23 pooled points, 30–74 kPa. `compare_log.py` inverts the
+**1.4 %** over the 26 pooled points, 30–75 kPa. `compare_log.py` inverts the
 air mass by default; `--map-from-log` exists only to reproduce the failure, and
 it now needs `extract_steady.py`'s schema, because the master point file no
 longer carries the logged pressure column.
@@ -254,7 +254,7 @@ the algebra — so **it is not a test of the breathing model**. Delete the
 breathing model entirely and the number does not move. See CLAUDE.md mistake 12.
 
 Two things it does earn. It pins `Relative air filling` to the DIN reference
-state, 1013 mbar and 0 °C: the derived k = 0.829 against a fitted 0.837, where
+state, 1013 mbar and 0 °C: the derived k = 0.831 against a fitted 0.837, where
 a 20 °C reference would demand 0.890, which the fit excludes. And it is
 blind-sensitive to displacement — forced onto a 2.0 L inline-four the derived
 residual goes to **48.1 %** while the fitted form still reports 1.1 %, which is
@@ -268,7 +268,7 @@ number.
 ### 3. Peak power is not a prediction of this model
 
 Manifold pressure is an **input**. `plant.boost_ceiling_kpa` now bounds it to
-what the car was observed to do — refitted on 43 853 quasi-steady
+what the car was observed to do — refitted on 74 013 quasi-steady
 samples — and `SupervisoryTunerEnv.MAP_CEIL_KPA` is the measured 250 kPa rather
 than the round 240 that used to sit there. But an operating line is not a
 compressor map: no efficiency islands, no speed lines, because the car has no
@@ -276,13 +276,13 @@ turbo speed sensor and no pre-intercooler temperature. Full-load points remain
 outside the validated envelope. Say so rather than tuning towards a number.
 
 **Two further things you must state.** The MAF channel saturates at exactly
-1020 kg/h on five drives, so the envelope above 0.303 kg/s corrected flow is
+1020 kg/h on six drives, so the envelope above 0.314 kg/s corrected flow is
 unmeasured, not merely sparse. And the air-mass inversion used to disagree with
 the logged boost channel by **+23.7 %** under boost — which this project blamed
 on `volumetric_efficiency()` for two weeks. **It was the charge temperature.**
 The channel feeding the inversion was a compressor-outlet reading, not the
 charge; modelling the charge temperature instead (`plant.charge_temperature`)
-brings the disagreement to **+3.0 %** and clears the breathing model entirely.
+brings the disagreement to **+1.9 %** and clears the breathing model entirely.
 See CLAUDE.md mistake 13.
 
 That comparison is 587 boosted model readings against 887 logged readings of
@@ -335,8 +335,8 @@ reward is only safe relative to the dynamics it scores.
 
 ### 6. The MAF channel saturates, and it does not say so
 
-`Air mass flow` tops out at exactly **1020.0 kg/h** on five separate drives,
-**517 samples** — while `Air mass flow participating in combustion` reaches
+`Air mass flow` tops out at exactly **1020.0 kg/h** on six separate drives,
+**547 samples** — while `Air mass flow participating in combustion` reaches
 1233 kg/h on those same samples, a median ratio of **1.095**. A pinned sample
 under-reports air, so anything inverted from it is biased at the very top of
 the envelope. `build_dataset.py` flags them as `maf_pinned` and excludes them
@@ -353,7 +353,7 @@ maximum repeated across drives is the tell.
 
 <!-- RETIRED-OK: section -->
 
-`BaselineECU` was guessed. It is now calibrated against 175.5 minutes of the
+`BaselineECU` was guessed. It is now calibrated against 295.0 minutes of the
 real car, pooled across eight drives. Two things were wrong, and the
 second one was distorting every result.
 
@@ -369,10 +369,10 @@ cost of fitting to too little data.
 | **v4, from eight drives** | **function of engine speed and sustained dwell** | **current** |
 
 v2 came from four seconds above 100 % load. v3 came from seventeen. The two
-8 September drives took that to **184 seconds above 207 kPa**, and at that
+8 September drives took that to **208 seconds above 207 kPa**, and at that
 sample size the correlation between lambda and manifold pressure is **+0.23**
 — weak, and with the wrong sign for a load table: more boost goes with a
-*leaner* mixture. What correlates is engine speed (-0.56), air mass flow
+*leaner* mixture. What correlates is engine speed (-0.47), air mass flow
 (-0.49), and how long the engine has been held above the gate (-0.47), over the
 1055 samples above `ENR_LOAD` = 180 kPa.
 

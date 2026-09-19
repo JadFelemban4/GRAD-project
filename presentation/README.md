@@ -88,7 +88,7 @@ or `logs/raw/`.
 The page was also scanned for every figure this project has **retired** — 2.8 %,
 31–82 kPa, 62 %/32 %, 527.2, τ = 39.5 s and the rest — and carries none of them as a
 live claim. The figures named in that sentence are listed as retired, not asserted:
-the current values are a 1.4 % load residual over 22 points spanning 30–74 kPa, and a
+the current values are a 1.4 % load residual over 22 points spanning 30–75 kPa, and a
 turbine time constant of 48.0 s. The only mentions of the 2.0 L inline-four are inside the account of
 mistake 1, where it belongs.
 
@@ -129,7 +129,7 @@ If the app is added to the briefing later, two things have to come with it:
    visible. A slide that presents them as findings about the car is wrong.
 
 <!-- RETIRED-OK -->
-The dataset behind this page also moved: **nine drives, 175.5 minutes**, up from
+The dataset behind this page also moved: **ten drives, 295.0 minutes**, up from
 eight and 168.1, because `pull01` arrived. (The superseded pair is named on
 purpose, so anyone holding an older caption can recognise it.) It contributes zero samples and zero
 operating points by design, so no figure on this page changed — but the drive

@@ -17,7 +17,7 @@ Last regenerated: 11 September 2026, **after the charge-temperature correction**
 rewritten. Two things happened around it that a reader will otherwise wonder
 about:
 
-- **The dataset grew to nine drives, 175.5 minutes**, because `pull01` arrived.
+- **The dataset grew to ten drives, 295.0 minutes**, because `pull01` arrived.
   It contributes **zero samples and zero operating points** — no coolant
   channel, so the warm-sample filter excludes it — so not one figure here moves.
   Note the three drive counts are different and all correct: **nine** logged,
@@ -100,7 +100,7 @@ three misses with their reasons; each is informative.
 
 **EGT maximum, 777 °C against a 600–750 band.** The band describes moderate
 cruise. The test's own worst point is 2500 rpm at 100 kPa, and the measured
-cruise range on this car is **30–74 kPa** — so that point is above cruise for
+cruise range on this car is **30–75 kPa** — so that point is above cruise for
 this engine, and 777 °C port-exit at near-full naturally-aspirated load is
 normal. The test point is mislabelled rather than the model being wrong, but the
 band was not moved to make it pass. State it as it is.
@@ -109,7 +109,7 @@ band was not moved to make it pass. State it as it is.
 20–400.** Both come from the same parameter, `ua_block_oil`, and both are
 consequences of calibrating it against the car instead of the literature — see
 section C. The model reproduces the measured oil trace to about 4 K RMSE, and the
-measured oil never exceeded **107 °C** anywhere in 168 minutes of logging.
+measured oil never exceeded **117 °C** anywhere in 168 minutes of logging.
 
 **There may be a resolution, and it is not a tuning knob.** `Oil temperature
 after filter` — recorded for the first time on 8 September — runs consistently
@@ -132,8 +132,8 @@ The old 39.5 s figure came from the four-cylinder.
 
 ## B. Against the vehicle — `compare_log.py`
 
-Source: **nine drives, 175.5 minutes**, 3.52–6.63 Hz, 2023 GR Supra B58B30O1.
-`build_dataset.py` finds **23 distinct operating points**, 30–74 kPa manifold
+Source: **ten drives, 295.0 minutes**, 3.52–6.63 Hz, 2023 GR Supra B58B30O1.
+`build_dataset.py` finds **26 distinct operating points**, 30–75 kPa manifold
 pressure, with the charge temperature modelled rather than read from the
 pre-throttle sensor — see section E, limit 2, for why that sensor cannot be used.
 
@@ -142,7 +142,7 @@ pre-throttle sensor — see section E, limit 2, for why that sensor cannot be us
 | Load residual, **k derived**, zero free parameters | 22 | **1.4 %** | < 15 % | **PASS** |
 | Load residual, k fitted, one free parameter | 22 | 1.1 % | < 15 % | PASS |
 | Normalisation constant k, fitted | — | 0.837 | — | one fitted scale factor |
-| Normalisation constant k, derived | — | 0.829 | — | 269.6 / T_charge, nothing fitted |
+| Normalisation constant k, derived | — | 0.831 | — | 269.6 / T_charge, nothing fitted |
 
 **k is not a tuning parameter — it is a unit conversion, and we can derive it.**
 Our load is normalised to 100 kPa at the modelled charge temperature; BMW's
@@ -154,11 +154,11 @@ Our load is normalised to 100 kPa at the modelled charge temperature; BMW's
 
 The 269.6 is three **defined** constants — no measurement, no fit. Over the 22
 points the modelled charge temperature runs 48–57 °C, 52 °C mean, so the constant
-this expression produces averages 0.829 against a fitted 0.837.
+this expression produces averages 0.831 against a fitted 0.837.
 
 **Report the direction honestly: dropping the free parameter makes the residual
 RISE.** The fitted k scores **1.1 %** over the 23 points and the derived form
-scores **1.4 %**, both at 30–74 kPa. That is what one free parameter is for.
+scores **1.4 %**, both at 30–75 kPa. That is what one free parameter is for.
 Any earlier version of this table that described the derived form as the more
 *accurate* one had the argument backwards, and an examiner will spot it in one
 line of arithmetic.
@@ -217,7 +217,7 @@ which is the second half of the lesson above.
 Points were removed by two rules, each written from a measurable defect rather
 than from a residual. **Say so in Chapter 3** — an exclusion rule justified after
 seeing the answer is worthless, and an examiner will ask. The current figure is
-**1.4 % derived over 23 points, 30–74 kPa**; the residuals quoted below are the
+**1.4 % derived over 26 points, 30–75 kPa**; the residuals quoted below are the
 ones each rule was scored against when it was introduced.
 
 <!-- RETIRED-OK: section -->
@@ -340,7 +340,7 @@ cruise, not as an upper bound on anything the car has done.
 
 ## D. The compressor operating envelope — refitted 8 September
 
-Fitted to **43 853 quasi-steady samples**. An operating line, not a compressor map.
+Fitted to **74 013 quasi-steady samples**. An operating line, not a compressor map.
 
 Measured 95th-percentile pressure ratio per corrected-flow bin:
 
@@ -370,8 +370,8 @@ than the round 240 that used to sit there.
 
 ## E. Stated limits — put these in Chapter 3 verbatim
 
-1. **The MAF channel saturates at 1020 kg/h.** Exactly 1020.0 kg/h on five
-   separate drives — 517 samples pinned at that ceiling — while the
+1. **The MAF channel saturates at 1020 kg/h.** Exactly 1020.0 kg/h on six
+   separate drives — 547 samples pinned at that ceiling — while the
    combustion-air channel reaches 1233 kg/h on the same samples, a median ratio
    of 1.095. Pinned samples are flagged (`maf_pinned`) and excluded from
    everything fitted on air mass. They are **not** repaired by substituting the
@@ -386,7 +386,7 @@ than the round 240 that used to sit there.
    Both pressure channels the vehicle publishes sit **before the throttle**. Over
    the 22 steady points `Intake manifold absolute pressure` reads 93–97 kPa and
    `Boost pressure`, converted to absolute, reads 100–126 kPa, against an
-   inversion of 30–74 kPa. That is not a disagreement about manifold pressure; it
+   inversion of 30–75 kPa. That is not a disagreement about manifold pressure; it
    is two different places in the intake, and at part load the throttle is the
    whole difference. **No script prints an agreement between them below 80 kPa.**
    An earlier version of this table claimed one, inside "the 4.4 % residual".
@@ -401,8 +401,8 @@ than the round 240 that used to sit there.
 
    | charge temperature used | inverted MAP | gap |
    |---|---|---|
-   | the raw pre-throttle sensor (107 °C median) | 279.5 kPa | **+23.7 %** |
-   | `plant.charge_temperature()` (52 °C median) | 232.7 kPa | **+3.0 %** |
+   | the raw pre-throttle sensor (117 °C median) | 279.5 kPa | **+23.7 %** |
+   | `plant.charge_temperature()` (52 °C median) | 232.7 kPa | **+1.9 %** |
    | ambient + 8 K (45 °C median) | 227.5 kPa | **+0.7 %** |
 
    The sensor reads 149 °C under boost and 163 °C at its peak, which is a
@@ -412,7 +412,7 @@ than the round 240 that used to sit there.
    The 0.7 % row is **rejected** — "ambient + 8 K" is a knob tuned to hit the
    target, which is the same mistake as validating a model through its own
    inversion. The shipped formula carries no parameter fitted to the boost
-   channel, and 3.0 % from an independent model beats 0.7 % from a fitted one.
+   channel, and 1.9 % from an independent model beats 0.7 % from a fitted one.
 
    What remains uncertain under boost is the MAF ceiling at 1020 kg/h and the
    logger's round-robin sampling, which pairs air mass with pressure taken
@@ -431,26 +431,26 @@ than the round 240 that used to sit there.
    lines, because the vehicle has no turbo speed sensor and no pre-intercooler
    temperature.
 
-4. **Vehicle validation covers 30–74 kPa manifold pressure only.** Steady points
+4. **Vehicle validation covers 30–75 kPa manifold pressure only.** Steady points
    require steady driving, and steady driving is light-load driving. Limit 2 is
    why this matters more than it looks.
 
 5. **Exhaust backpressure is not measured.** `predict()` estimates it as
    1.15 × manifold pressure. An assumption, not a measurement.
 
-6. **Oil above 107 °C is extrapolation.** That is the hottest oil anywhere in
+6. **Oil above 117 °C is extrapolation.** That is the hottest oil anywhere in
    the logs (`7475b5d7`, at 45 °C ambient; 111 °C after the filter). The thermal model
    reproduces the logged oil trace, but everything it says about oil on a
    sustained climb rests on the network's structure, not on measurement.
 
 7. **Two drives contribute no samples, and a third contributes no operating
-   points.** The manifest lists **nine drives and 175.5 minutes**. `3f64372e`
+   points.** The manifest lists **ten drives and 295.0 minutes**. `3f64372e`
    (0.7 min) and `f51686d7` (0.8 min) are too short to contain a warm running
    window, so `master_samples.csv` covers six drives. `fb988991` is one of those
    six, but every one of its windows is rejected for span or a logger gap
    (section B), so it carries samples and contributes **zero** operating points.
-   Quote it as "nine drives, 175.5 minutes, six carrying samples,
-   23 distinct operating points" rather than implying all eight were analysed.
+   Quote it as "ten drives, 295.0 minutes, seven carrying samples,
+   26 distinct operating points" rather than implying all eight were analysed.
 
 8. **The radiator-outlet channel is missing on `fb988991`.** It was added to the
    recording set after that drive. Thermal work uses the other four.

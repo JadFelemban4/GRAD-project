@@ -384,7 +384,7 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 # ---------------------------------------------------------------------------
 # This is NOT a compressor map. It is the OPERATING CEILING: the highest
 # pressure ratio the vehicle was observed to reach at a given corrected mass
-# flow, across 43 853 quasi-steady samples over 175.5 minutes and nine drives.
+# flow, across 74 013 quasi-steady samples over 295.0 minutes and ten drives.
 #
 # The difference matters. A compressor map shows what the compressor CAN do,
 # bounded by surge and choke, with efficiency islands and shaft-speed lines.
@@ -490,8 +490,8 @@ def charge_temperature(t_amb_k, t_block_k=None) -> float:
     is 226 kPa absolute.
 
         charge temperature used              | inverted MAP | gap vs the car
-        the raw sensor (107 C median)        | 279.5 kPa    | +23.7 %
-        charge_temperature(), THIS FUNCTION  | 232.7 kPa    | +3.0 %
+        the raw sensor (117 C median)        | 279.5 kPa    | +23.7 %
+        charge_temperature(), THIS FUNCTION  | 232.7 kPa    | +1.9 %
         ambient + 8 K (45 C median)          | 227.5 kPa    | +0.7 %
 
     CLAUDE.md used to blame that 23.7 % on the breathing model -- fitted at part
@@ -513,15 +513,15 @@ def charge_temperature(t_amb_k, t_block_k=None) -> float:
 
     Be honest about how thin that contrast is. At the matched gate `ambient +
     8 K` scores +0.7 %, not the +0.0 % a looser gate reported, and +0.7 %
-    against +3.0 % is a smaller margin than the rhetoric wants. The rejection
+    against +1.9 % is a smaller margin than the rhetoric wants. The rejection
     stands anyway, on the same ground: a 3.0 % gap from a model with no
     parameter fitted to the boost channel says more than a closer gap from one
-    tuned against it. Report +3.0 %; do not tune it away.
+    tuned against it. Report +1.9 %; do not tune it away.
 
     LIMIT, STATE IT IN CHAPTER 3. There is no measured charge-temperature
     channel on this car: `Temperature after the intercooler` exists in the
     census and reads all-zero on every sample. This is a MODEL of the charge
-    temperature, anchored to ambient, not a measurement. The +3.0 % gap over
+    temperature, anchored to ambient, not a measurement. The +1.9 % gap over
     587 boosted samples above 200 kPa is the evidence for it and the whole of
     the evidence for it.
     """
@@ -555,28 +555,34 @@ def map_from_airflow(mdot_air_gps, rpm, iat_k, geo=None) -> float:
 
 
 if __name__ == "__main__":
+    # Mistake 1: NEVER let a call site take the default geometry, even now that
+    # the default is the right engine. These four sweeps used to rely on it,
+    # which is the exact shape of the bug that ran a 1998 cc four-cylinder for
+    # three weeks. One name, passed explicitly, everywhere.
+    geo = b58()
+
     print("=== A. Naturally aspirated cruise, 2500 rpm, 60 kPa, lambda 1.0 ===")
     for spark in [10, 15, 20, 25, 30, 35, 40]:
-        r = run_cycle(Operating(rpm=2500, map_kpa=60, spark_btdc=spark, lam=1.0))
+        r = run_cycle(Operating(rpm=2500, map_kpa=60, spark_btdc=spark, lam=1.0), geo=geo)
         print(f"  spark {spark:3d} BTDC | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| MFB50 {r.mfb50_deg:5.1f} | EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f}")
 
     print("\n=== B. Full load boosted, 3000 rpm, 200 kPa, lambda 0.85 ===")
     for spark in [4, 8, 12, 16, 20, 24]:
-        r = run_cycle(Operating(rpm=3000, map_kpa=200, spark_btdc=spark, lam=0.85, p_exh_kpa=230))
+        r = run_cycle(Operating(rpm=3000, map_kpa=200, spark_btdc=spark, lam=0.85, p_exh_kpa=230), geo=geo)
         print(f"  spark {spark:3d} BTDC | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| Pmax {r.p_max_bar:5.1f} bar | EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f} "
               f"| Pknock {r.knock_prob:.2f}")
 
     print("\n=== C. Lambda sweep at 3000 rpm, 180 kPa, 14 BTDC ===")
     for lam in [0.75, 0.80, 0.85, 0.90, 1.00, 1.10, 1.20]:
-        r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=14, lam=lam, p_exh_kpa=210))
+        r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=14, lam=lam, p_exh_kpa=210), geo=geo)
         print(f"  lambda {lam:4.2f} | T {r.torque_nm:6.1f} Nm | BSFC {r.bsfc_gpkwh:6.1f} "
               f"| EGT {r.egt_c:5.0f} C | KI {r.knock_integral:5.2f}")
 
     print("\n=== D. IAT sensitivity, 3000 rpm, 180 kPa, 16 BTDC, lambda 0.88 ===")
     for iat_c in [15, 25, 35, 45, 55]:
         r = run_cycle(Operating(rpm=3000, map_kpa=180, spark_btdc=16, lam=0.88,
-                                iat_k=273.15 + iat_c, p_exh_kpa=210))
+                                iat_k=273.15 + iat_c, p_exh_kpa=210), geo=geo)
         print(f"  IAT {iat_c:3d} C | T {r.torque_nm:6.1f} Nm | EGT {r.egt_c:5.0f} C "
               f"| KI {r.knock_integral:5.2f} | Pknock {r.knock_prob:.2f}")

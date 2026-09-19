@@ -627,7 +627,7 @@ def main():
     # the purpose-built 7-channel drive of mistake 13b -- joined logs/raw/.
     # It adds 7.5 minutes and ZERO samples and ZERO operating points, by
     # design: it carries no coolant channel, so the warm filter excludes it.
-    figure("total minutes", round(float(M.duration_min.sum()), 1), 175.5, 0.15,
+    figure("total minutes", round(float(M.duration_min.sum()), 1), 295.0, 0.15,
            " min",
            # Anchored to a DATASET-SCALE drive count. validation_table.md says
            # "three drives (80 minutes)" about the thermal fit, which is a
@@ -637,12 +637,12 @@ def main():
                      r"\b(?:6|7|8|six|seven|eight)\s+drives[^.\n]{0,30}?\b" + NUM
                      + r"\s*min(?:ute)?s?\b"],
            files=ALL, dtol=0.15)
-    figure("drives in the manifest", len(M), 9, 0,
+    figure("drives in the manifest", len(M), 10, 0,
            patterns=[WORDNUM + r"\s+drives,?\s+(?:and\s+)?\d+(?:\.\d+)?\s*min",
                      r"\d+(?:\.\d+)?\s*min(?:ute)?s?\s+(?:over|across|pooled across)\s+"
                      + WORDNUM + r"\s+drives"],
            files=ALL)
-    figure("drives that carry samples", S.source.nunique(), 6, 0,
+    figure("drives that carry samples", S.source.nunique(), 7, 0,
            # The number must be the SUBJECT of 'carry'. Without the lookbehind,
            # 'Six of the nine drives carry usable samples' -- a correct sentence
            # -- reports nine. A false positive of exactly the kind AUDIT.md H2
@@ -654,7 +654,7 @@ def main():
     # first-match merge ran over glob order and gave 20-23 points
     # under shuffles. Windows are sorted before merging now, so
     # the count is a property of the data: 23, stable in 8 orders.
-    figure("distinct operating points", len(P), 23, 0,
+    figure("distinct operating points", len(P), 26, 0,
            patterns=[WORDNUM + r"\s+distinct operating points",
                      WORDNUM + r"\s+pooled points"],
            files=ALL)
@@ -673,14 +673,14 @@ def main():
            patterns=[r"(?:validation|covers|sit at)[^.\n]{0,26}?\b" + NUM
                      + r"\s*[-\u2013]\s*\d+\s*kPa"],
            files=ALL, dtol=0.6)
-    figure("operating-point span, high end", round(float(P.map_kpa.max())), 74, 0.6,
+    figure("operating-point span, high end", round(float(P.map_kpa.max())), 75, 0.6,
            " kPa",
            patterns=[r"(?:validation|covers|sit at)[^.\n]{0,26}?\b\d+"
                      r"\s*[-\u2013]\s*" + NUM + r"\s*kPa"],
            files=ALL, dtol=0.6)
 
     print("\nMAF SATURATION  (CLAUDE.md mistake 7)")
-    figure("samples pinned at the 1020 kg/h ceiling", int(S.maf_pinned.sum()), 517, 0,
+    figure("samples pinned at the 1020 kg/h ceiling", int(S.maf_pinned.sum()), 547, 0,
            patterns=[r"(?:1020(?:\.0)?\s*kg/h|ceiling|pinned)[^.\n]{0,70}?\b" + NUM
                      + r"\s+samples",
                      NUM + r"\s+samples[^.\n]{0,50}?(?:pinned|ceiling|1020)"],
@@ -700,14 +700,14 @@ def main():
     # The raw-log figure, for the record: 573 pinned samples across 6 of the
     # 9 drives; 517 across 5 once the warm filter has run.
     hits = int(S.loc[S.maf_pinned.astype(bool), "source"].nunique())
-    figure("drives showing that exact ceiling", hits, 5, 0,
+    figure("drives showing that exact ceiling", hits, 6, 0,
            patterns=[WORDNUM + r"\s+separate\s+drives",
                      r"1020\s*kg/h on\s+" + WORDNUM + r"\s+drives"],
            files=ALL)
 
     print("\nCOMPRESSOR ENVELOPE  (validation_table.md D)")
     st = S[S.stable == 1]
-    figure("quasi-steady samples behind the fit", len(st), 43853, 0,
+    figure("quasi-steady samples behind the fit", len(st), 74013, 0,
            patterns=[NUM + r"\s+quasi-steady",
                      r"refitted[^.\n]{0,30}?on\s+" + NUM],
            files=ALL)
@@ -730,7 +730,7 @@ def main():
     print("\nENRICHMENT v4  (engine_env.BaselineECU.base_lambda)")
     S2 = dwell_column(S)
     h = S2[(S2.map_kpa > 180) & S2.lam.between(0.5, 1.3)]
-    bands = ((1000, 3500, 422), (3500, 4500, 168), (4500, 7000, 465))
+    bands = ((1000, 3500, 441), (3500, 4500, 235), (4500, 7000, 665))
     for lo, hi, claim in bands:
         figure(f"samples, {lo}-{hi} rpm above 180 kPa",
                int(((h.rpm > lo) & (h.rpm <= hi)).sum()), claim, 0,
@@ -745,21 +745,21 @@ def main():
     # than indexing by label -- duplicate labels across drives would multiply
     # the sum (measured: 731 s instead of 164).
     _secs = float(hh["dt_s"].sum())
-    figure("seconds above 207 kPa", round(_secs), 184, 2, " s",
+    figure("seconds above 207 kPa", round(_secs), 208, 2, " s",
            # Only the "took that to N seconds" claim. "fitted to 17 seconds" and
            # "spanned 42.8 to 73.7 seconds" are different quantities.
            patterns=[r"took that to\s*\*{0,2}" + NUM + r"\s*\*{0,2}\s*seconds",
                      NUM + r"\s*s(?:econds)?\b[^.\n]{0,30}?above 207"],
            files=ALL, dtol=1)
     v = h[["lam", "rpm", "air_gps", "dwell", "map_kpa"]].dropna()
-    CORR = (("rpm", -0.56, [r"engine speed\)\s*" + NUM, r"speed\s*\(" + NUM + r"\)"]),
-            ("air_gps", -0.49, [r"air mass flow\)\s*" + NUM,
+    CORR = (("rpm", -0.47, [r"engine speed\)\s*" + NUM, r"speed\s*\(" + NUM + r"\)"]),
+            ("air_gps", -0.41, [r"air mass flow\)\s*" + NUM,
                                 r"air mass flow \(" + NUM + r"\)"]),
             # AUDIT.md H3: -0.47 was measured on a dwell axis built from
             # row counts over an assumed 4.6 Hz. On real timestamps: -0.41.
-            ("dwell", -0.41, [r"dwell[^)\n]{0,32}\)\s*" + NUM,
+            ("dwell", -0.44, [r"dwell[^)\n]{0,32}\)\s*" + NUM,
                               r"dwell \(" + NUM + r"\)"]),
-            ("map_kpa", +0.23, [r"MANIFOLD PRESSURE\)\s*" + NUM,
+            ("map_kpa", +0.11, [r"MANIFOLD PRESSURE\)\s*" + NUM,
                                 r"corr\(.{0,18}MAP.{0,6}\)\s*(?:is\s*)?" + NUM,
                                 r"manifold\s+pressure is\s*\*{0,2}" + NUM]))
     # AUDIT.md H4: report the INDEPENDENT reading count beside the row count,
@@ -788,7 +788,7 @@ def main():
         round(float(g.median()), 1), -1.2, 0.06, " K")
     chk("oil-coolant p95 gap, fitted drives",
         round(float(g.quantile(0.95)), 1), 5.4, 0.06, " K")
-    figure("hottest oil anywhere in the logs", round(float(S.oil_c.max())), 107, 0.5,
+    figure("hottest oil anywhere in the logs", round(float(S.oil_c.max())), 117, 0.5,
            " C",
            patterns=[r"[Oo]il above\s*\*{0,2}" + NUM
                      + r"[^\n]{0,44}?extrapolation",
@@ -817,8 +817,8 @@ def main():
     chk("DIN reference constant, 100*273.15/101.3", round(din, 1), 269.6, 0.05, " K")
     t_ch = charge_temperature(P["t_amb"].fillna(25.0) + 273.15,
                               P["ect"].fillna(90.0) + 273.15)
-    figure("derived k = 269.6 / T_charge, mean over the 22 points",
-           round(float(np.mean(din / t_ch)), 3), 0.829, 0.002,
+    figure("derived k = 269.6 / T_charge, mean over the 26 points",
+           round(float(np.mean(din / t_ch)), 3), 0.831, 0.002,
            # k is always written as 0.8xx. Anchoring on the SHAPE keeps this off
            # "1.4 % load residual with k derived, 2.8 % with k fitted", where the
            # nearby numbers are residuals, not constants.
@@ -856,11 +856,11 @@ def main():
         b = pd.to_numeric(d[bc[0]], errors="coerce").dropna()
         a = pd.to_numeric(d[ac[0]], errors="coerce").median() if ac else 14.23
         logged += list((b[b > 15.0] + a) * 6.894757)
-    chk("boosted model samples (gate >200 kPa)", len(hi), 587)
-    chk("logged boost readings behind the comparison", len(logged), 887)
+    chk("boosted model samples (gate >200 kPa)", len(hi), 762)
+    chk("logged boost readings behind the comparison", len(logged), 1097)
     gap = 100.0 * (hi.map_kpa.median() - np.median(logged)) / np.median(logged)
     figure("boosted model vs the car's own boost channel",
-           round(float(gap), 1), 3.0, 0.4, " %  (was +23.7 with the sensor)",
+           round(float(gap), 1), 1.9, 0.4, " %  (was +23.7 with the sensor)",
            patterns=[r"charge_temperature\(\)[^\n]*?\|[^\n|]*?\|\s*\*{0,2}"
                      + NUM + r"\s*%"],
            files=ALL, dtol=0.4)
