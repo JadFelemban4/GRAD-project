@@ -85,9 +85,9 @@ TRAPS THIS AUDIT MEASURED — do not rediscover them
   - generality_test.py still scores against the reactive comparator C3 retired,
     on a 520 s episode at dt 2.0 with its own damage(scale=25.0). Add
     p_grade_now and share one scenario before running it for the thesis.
-  - presentation/index.html, plan.html and data.js still ship 829.2 / 548.6 /
-    437.6 / 13.4 as live figures. presentation/README.md says so; nothing
-    enforces it.
+  - presentation/index.html, plan.html and data.js still ship the void premise
+    set as live figures -- the four numbers README.md's own box says never to
+    quote. presentation/README.md records it; nothing enforces it.
   - Merging origin/JMF-2340550 as it stands brings a SECOND file labelled "the
     project's result", a docstring whose gearbox mechanism this branch measured
     as backwards, and a handoff banner that is false on the merged tree. See
