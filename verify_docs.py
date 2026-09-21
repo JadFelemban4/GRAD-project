@@ -472,7 +472,17 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   "AUDIT.md",
                   # The response to the audit: every row names the figure it
                   # replaced. Same call as DOCUMENT_STATUS.md and AUDIT.md.
-                  "AUDIT_FIXES.md"}
+                  "AUDIT_FIXES.md",
+                  # The SECOND audit, 21 September 2026. Same call again: it
+                  # quotes the void premise set dozens of times because naming
+                  # what the presentation still ships IS its finding C2-3.
+                  # Note what this exemption costs, because AUDIT2.md's own
+                  # finding M2-7 is about exactly this blunt instrument: the
+                  # file is now unguarded in full, so a LIVE wrong figure in it
+                  # would pass. It is a report, not a source of truth, and
+                  # nothing should ever be quoted from it without running the
+                  # script it cites.
+                  "AUDIT2.md"}
 
 # A line that names a retired figure ON PURPOSE -- "the old 39.5 s figure is
 # void", the mistake log's was/should-say tables -- carries this marker. It is

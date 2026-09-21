@@ -1099,3 +1099,113 @@ the sentence was.
 - **The step budget is still undecided** — 50 000 steps is eleven episodes for a
   weight-conditioned policy, and Ghassan asked for a decision before the five
   seeds are treated as Phase D's input.
+
+---
+
+## Session of 20-21 September 2026 — the SECOND audit, and the Phase D result does not reproduce
+
+**Nothing in the repository was changed by the audit itself.** It ran read-only:
+every historical tree was exported with `git archive`, every rebuild went to a
+scratch directory outside the repo, and `train.py` was exercised only on a copy
+of `runs/`. The only file this session adds is `AUDIT2.md`, plus this entry.
+
+**`AUDIT2.md` is the report: 1041 lines, 50 new findings** (3 CRITICAL, 12 HIGH,
+16 MEDIUM, 13 LOW, 4 NITPICK), IDs `C2-n` / `H2-n` / `M2-n` / `L2-n` / `N2-n` so
+they never collide with `AUDIT.md`. 34 are CONFIRMED by execution here, 16 are
+PLAUSIBLE on one agent's output and are labelled as such.
+
+### The headline: neither Phase D file is a result, and this branch's does not reproduce
+
+`python evaluate.py runs/sighted_seed0 runs/blind_seed0` on HEAD, 76 min,
+same two trained agents as `results/phase_d_seed0.txt`:
+
+| row | the shipped file | re-run on HEAD |
+|---|---|---|
+| baseline damage / peak | 572.8 / 857 C | **959.8 / 884 C** |
+| sighted median (IQR, worst) | 194.7 (35.6, 378.8) | 279.3 (9.6, 360.6) |
+| blinded median (IQR, worst) | 261.4 (19.9, 336.9) | 351.1 (31.8, 435.0) |
+| **sighted over blinded** | **+11.7** | **+7.5** |
+
+**Why:** the SB3 archives decode to 130 km/h at **2913 rpm**, which is the
+invented six-speed in 5th after mistake 17's load-aware downshift. The ZF landed
+at `27e720c`, seven hours after `a68715f` committed the result. The +7.5 is not
+a Phase D point either -- it scores agents on a plant they never saw.
+
+**Isolated on three exported trees, one neutral episode each, 720 s at dt 1.0:**
+
+```
+six-speed (a68715f)   110 km/h  damage 294.2  peak 812.3 C
+six-speed (a68715f)   130 km/h  damage 572.8  peak 857.0 C
+ZF 8HP51  (f6b46e9)   110 km/h  damage 462.7  peak 839.7 C
+ZF 8HP51  (HEAD)      130 km/h  damage 959.8  peak 884.0 C
+```
+
+Every published baseline row is on that grid. Speed is worth -44.3 K and the
+gearbox +27.4 K; they add to the observed gap within 0.4 K, so nothing else in
+the 209-line `engine_env.py` divergence moves the baseline.
+
+### Three things the tree says that the scripts contradict
+
+| document | says | prints today |
+|---|---|---|
+| `CLAUDE.md`, `README.md`, `handoff.md` | baseline 294.2 at 812 C, "the constraint does not bind" | 959.8 at 884 C, binds by **34 K** |
+| the four abstracts, `CONTROL_SCOPE.md` | 175.5 min, nine drives, 22 points, 30-74 kPa | 295.0, ten, 26, 30-75 |
+| `CLAUDE.md:1664`, `CHECKPOINT.md:657` | 13 thermal alerts on `7475b5d7` | **15** |
+
+### The guard is blind to the figures that decide the project
+
+16 deliberate drifts injected into a `git archive` copy; 4 CAUGHT, 12 MISSED.
+Caught: `8 of 11`, `ten drives`, `DTHETA_DEG`, `derived k`. **Missed:** the load
+residual, the app's peak turbine, every Phase D figure, the premise table, the
+scenario docstring, **`make_grade_climb`'s default `v_kmh` 130 -> 120**, and
+**`TURB_PROTECT_K` 1123 -> 1100**. `check_retired` globs `**/*.md` plus root
+`*.py` only, so `presentation/index.html`, `plan.html` and `data.js` -- which
+<!-- RETIRED-OK: naming the void set the deck still ships IS the finding -->
+carry 829.2 / 548.6 / 437.6 / 13.4 on more than a hundred lines -- are outside it.
+
+### M16 is not fixed, and the mechanism is not the one recorded
+
+Same policy, seed and weights; only the step changed:
+
+| policy | dt 0.2 | dt 1.0 | dt 2.0 |
+|---|---|---|---|
+| baseline | 900.9 | 959.8 | 1034.9 |
+| current-grade | 567.8 | 633.2 | 723.2 |
+| **cuts vs baseline** | **37.0 %** | **34.0 %** | **30.1 %** |
+
+Splitting the baseline integral by term: turbine 862.26 -> 858.87 (-0.4 %), oil
+unchanged, **knock 69.33 -> 13.85**. So **94 % of the dt shift is one step**: a
+knock spike of 66.3 damage/s at t = 181 s, where the grade steps 0 -> 12 %,
+charged for one step whatever the step is. `_track_torque`'s PI is per-step, but
+its effect lives inside the remaining 0.4 %. The dt paragraph in `CLAUDE.md`
+names the wrong loop.
+
+### Verified as still holding, by execution
+
+C1, C2 (ECU on the lagged baseline MAP; retard peak 3.2 deg, 3.3 % of steps),
+C3, H1, H3, H4, H7 (`master_points.csv` byte-identical in two input orders), H8,
+M5, M7, M8, M10, M11. **Incomplete here:** M16, H6 (resume blanks `curve.csv`
+and re-saves `final.zip` on a no-op), M2/M12 (`generality_test` still scores with
+its own `damage(scale=25.0)` against the retired reactive comparator), M3, H2,
+L11, M15.
+
+### The scenario: locked in its parameters, not in its experiment
+
+Git supports the envelope-before-choice account (`9f41082`, 18 Sep 17:26, three
+hours before the first run). It cannot settle "decided by the team", and the
+sighted run's SB3 `start_time` is **26 s before** the lock commit `1df41a2` --
+the run demonstrably used the new code, but no artefact records an uncommitted
+tree. The plant under the locked scenario was then replaced and the result kept.
+
+**What protects the project, and it is measured:** preview LOSES on this row
+under every hand-written policy (-0.6, -2.3, -0.4), so the row cannot have been
+chosen to favour the claim. Say that in the defence.
+
+### What this session did NOT do
+
+- **No fix was applied.** Every finding in `AUDIT2.md` is described, none is
+  implemented. The repository is exactly as it was apart from the report.
+- **No training.** `runs/` still holds the two six-speed agents, untouched.
+- **Four of nine audit parts ran on the orchestrator rather than on agents**,
+  because the account's usage limit killed two full workflow runs; the coverage
+  and what could not be verified are listed in the report's confidence ledger.
