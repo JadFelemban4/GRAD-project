@@ -88,24 +88,48 @@ def main():
     ap.add_argument("--prove-buffer", action="store_true",
                     help="train one seed with both buffer sizes and compare "
                          "every network weight, then exit")
+    ap.add_argument("--evaluate", action="store_true",
+                    help="score the trained pairs instead of training: one "
+                         "evaluate.py per seed, under the same memory cap")
     a = ap.parse_args()
 
     if a.prove_buffer:
         return subprocess.call([sys.executable, "prove_buffer.py"], cwd=HERE)
 
     jobs, done = [], []
-    for s in a.seeds:
-        for blind in (False, True):
-            tag = f"{'blind' if blind else 'sighted'}_seed{s}"
-            if a.skip_done and os.path.exists(
-                    os.path.join(HERE, a.out, tag, "final.zip")):
+    if a.evaluate:
+        # ONE evaluate.py PER SEED, not one for all of them. Each writes its
+        # own results/phase_d_seed<N>.txt with its own fingerprint block, so a
+        # seed can be re-run without touching the others and a result file is
+        # never a summary of runs it cannot name.
+        #
+        # This re-scores the three hand-written policies once per seed, which
+        # is redundant -- they do not depend on the agent. It is left redundant
+        # on purpose: collapsing them would mean editing the evaluation
+        # protocol after preregistering it, to save an hour of CPU.
+        os.makedirs(os.path.join(HERE, "results"), exist_ok=True)
+        for s in a.seeds:
+            tag = f"eval_seed{s}"
+            res = os.path.join("results", f"phase_d_seed{s}.txt")
+            if a.skip_done and os.path.exists(os.path.join(HERE, res)):
                 done.append(tag)
                 continue
-            argv = [sys.executable, "train.py", "--steps", str(a.steps),
-                    "--seed", str(s), "--out", a.out]
-            if blind:
-                argv.append("--no-preview")
-            jobs.append((tag, argv))
+            jobs.append((tag, [sys.executable, "evaluate.py", "--out", res,
+                               os.path.join(a.out, f"sighted_seed{s}"),
+                               os.path.join(a.out, f"blind_seed{s}")]))
+    else:
+        for s in a.seeds:
+            for blind in (False, True):
+                tag = f"{'blind' if blind else 'sighted'}_seed{s}"
+                if a.skip_done and os.path.exists(
+                        os.path.join(HERE, a.out, tag, "final.zip")):
+                    done.append(tag)
+                    continue
+                argv = [sys.executable, "train.py", "--steps", str(a.steps),
+                        "--seed", str(s), "--out", a.out]
+                if blind:
+                    argv.append("--no-preview")
+                jobs.append((tag, argv))
 
     free = _free_gb()
     # MEASURED, NOT ESTIMATED -- and the difference cost two launches.
