@@ -1,6 +1,11 @@
 .venv/
 __pycache__/
 runs/
+# Renamed 21 Sep 2026: the two agents in here were trained on the invented
+# six-speed gearbox that 27e720c replaced. Moved aside so `train.py --seed 0`
+# cannot resume into them and overwrite the only record of results/
+# phase_d_seed0.txt. See AUDIT2.md C2-1.
+runs_sixspeed_18sep/
 *.zip
 
 # the app writes exactly one file, and it is per-drive, not source

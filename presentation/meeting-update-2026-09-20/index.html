@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>تحديث المشروع منذ اجتماع 13 سبتمبر</title>
+  <style>
+    :root {
+      --bg: #070b0d;
+      --surface: #0d1418;
+      --ink: #f4f0e8;
+      --muted: #9ba9ae;
+      --line: rgba(231, 239, 238, 0.16);
+      --line-strong: rgba(231, 239, 238, 0.34);
+      --heat: #ff6a2a;
+      --heat-soft: #ffb36b;
+      --cool: #67d5cf;
+      --danger: #ff4d40;
+      --ok: #7cdda2;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+      --ease: cubic-bezier(.2, .8, .2, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 12% 18%, rgba(103, 213, 207, 0.08), transparent 26%),
+        radial-gradient(circle at 87% 72%, rgba(255, 106, 42, 0.1), transparent 30%),
+        var(--bg);
+    }
+
+    button { font: inherit; }
+
+    .deck {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      isolation: isolate;
+    }
+
+    .deck::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      opacity: 0.42;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(18px, 2.2vh, 30px);
+      padding: clamp(32px, 5.2vw, 86px) clamp(34px, 7vw, 120px) clamp(78px, 10vh, 104px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-5vw) scale(0.985);
+      transition:
+        opacity 480ms var(--ease),
+        transform 620ms var(--ease),
+        visibility 0s linear 620ms;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0) scale(1);
+      transition-delay: 0s;
+      z-index: 2;
+    }
+
+    .slide.exiting {
+      transform: translateX(5vw) scale(0.985);
+    }
+
+    .slide-kicker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--cool);
+      font-size: clamp(12px, 1vw, 17px);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .slide-kicker::before {
+      content: "";
+      width: 42px;
+      height: 2px;
+      background: currentColor;
+    }
+
+    h1,
+    h2,
+    p { margin: 0; }
+
+    h1 {
+      max-width: 1020px;
+      font-size: clamp(44px, 6.4vw, 105px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+      text-wrap: balance;
+    }
+
+    h2 {
+      max-width: 1100px;
+      font-size: clamp(34px, 4.4vw, 70px);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      max-width: 850px;
+      color: var(--muted);
+      font-size: clamp(18px, 1.7vw, 28px);
+      line-height: 1.75;
+    }
+
+    .heat { color: var(--heat-soft); }
+    .cool { color: var(--cool); }
+    .danger { color: var(--danger); }
+    .ok { color: var(--ok); }
+    .muted { color: var(--muted); }
+
+    .latin,
+    .number {
+      direction: ltr;
+      unicode-bidi: isolate;
+      display: inline-block;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .number {
+      color: var(--ink);
+      font-weight: 800;
+      letter-spacing: -0.055em;
+    }
+
+    .slide-body {
+      min-height: 0;
+      align-self: center;
+    }
+
+    .slide-footer {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      color: var(--muted);
+      font-size: clamp(12px, 0.9vw, 15px);
+    }
+
+    .source-note {
+      max-width: 72ch;
+      line-height: 1.5;
+    }
+
+    .deck-mark {
+      direction: ltr;
+      unicode-bidi: isolate;
+      letter-spacing: 0.11em;
+      color: rgba(244, 240, 232, 0.42);
+    }
+
+    /* Cover */
+    .cover-layout {
+      height: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(230px, 0.34fr);
+      align-items: center;
+      gap: clamp(30px, 7vw, 120px);
+    }
+
+    .cover-copy {
+      display: grid;
+      gap: 28px;
+    }
+
+    .date-axis {
+      position: relative;
+      align-self: stretch;
+      display: grid;
+      align-content: center;
+      gap: 90px;
+      border-inline-start: 1px solid var(--line-strong);
+      padding-inline-start: 36px;
+    }
+
+    .date-axis::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: -5px;
+      top: 31%;
+      width: 9px;
+      height: 38%;
+      border-radius: 9px;
+      background: linear-gradient(var(--cool), var(--heat));
+      box-shadow: 0 0 24px rgba(103, 213, 207, 0.36), 0 0 32px rgba(255, 106, 42, 0.3);
+    }
+
+    .date-point strong {
+      display: block;
+      direction: ltr;
+      color: var(--ink);
+      font-size: clamp(28px, 3vw, 48px);
+      font-weight: 800;
+    }
+
+    .date-point span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    /* Audit slide */
+    .audit-list {
+      display: grid;
+      gap: clamp(10px, 1.35vh, 18px);
+      border-top: 1px solid var(--line-strong);
+    }
+
+    .audit-row {
+      display: grid;
+      grid-template-columns: 62px minmax(170px, 0.72fr) minmax(0, 1.7fr);
+      align-items: center;
+      gap: 26px;
+      min-height: clamp(76px, 10vh, 112px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .audit-index {
+      direction: ltr;
+      color: var(--heat);
+      font-size: clamp(24px, 2.5vw, 40px);
+      font-weight: 800;
+    }
+
+    .audit-name {
+      font-size: clamp(19px, 1.55vw, 27px);
+      font-weight: 800;
+    }
+
+    .audit-detail {
+      color: var(--muted);
+      font-size: clamp(15px, 1.18vw, 20px);
+      line-height: 1.6;
+    }
+
+    /* Corrections slide */
+    .correction-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.8fr);
+      gap: clamp(36px, 6vw, 100px);
+      align-items: center;
+    }
+
+    .transmission-compare {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--line-strong);
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 26px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .compare-label {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .compare-value {
+      font-size: clamp(19px, 1.6vw, 28px);
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .systems {
+      border-inline-start: 1px solid var(--line-strong);
+      padding-inline-start: clamp(26px, 3vw, 48px);
+    }
+
+    .systems-title {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .system-line {
+      display: grid;
+      grid-template-columns: 14px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: clamp(15px, 1.15vw, 19px);
+    }
+
+    .system-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 14px rgba(124, 221, 162, 0.65);
+    }
+
+    .system-dot.off {
+      background: var(--heat);
+      box-shadow: 0 0 14px rgba(255, 106, 42, 0.55);
+    }
+
+    .system-state { color: var(--muted); }
+
+    /* Exposure slide */
+    .exposure-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.35fr);
+      gap: clamp(50px, 8vw, 130px);
+      align-items: center;
+    }
+
+    .hero-stat .number {
+      display: block;
+      color: var(--heat-soft);
+      font-size: clamp(76px, 11vw, 178px);
+      line-height: 0.88;
+    }
+
+    .hero-stat .unit {
+      display: block;
+      margin-top: 18px;
+      font-size: clamp(22px, 2.2vw, 36px);
+      font-weight: 800;
+    }
+
+    .hero-stat .context {
+      display: block;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: clamp(15px, 1.1vw, 19px);
+      line-height: 1.6;
+    }
+
+    .timeline-wrap { display: grid; gap: 20px; }
+
+    .timeline {
+      position: relative;
+      height: 22px;
+      overflow: visible;
+      border-radius: 99px;
+      background: rgba(244, 240, 232, 0.1);
+      box-shadow: inset 0 0 0 1px rgba(244, 240, 232, 0.08);
+    }
+
+    .timeline-hot {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
+      width: max(0.206%, 4px);
+      border-radius: 99px;
+      background: var(--danger);
+      box-shadow: 0 0 18px rgba(255, 77, 64, 0.72);
+    }
+
+    .timeline-pin {
+      position: absolute;
+      inset-inline-end: 0;
+      bottom: 40px;
+      width: 130px;
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 800;
+      text-align: start;
+    }
+
+    .timeline-pin::after {
+      content: "";
+      position: absolute;
+      inset-inline-end: 0;
+      top: 28px;
+      width: 1px;
+      height: 44px;
+      background: var(--danger);
+    }
+
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      direction: ltr;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .fact-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: end;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: clamp(15px, 1.15vw, 19px);
+    }
+
+    .fact-line strong {
+      direction: ltr;
+      unicode-bidi: isolate;
+      color: var(--ink);
+      font-size: clamp(22px, 2vw, 34px);
+    }
+
+    /* Taif slide */
+    .taif-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
+      gap: clamp(40px, 7vw, 110px);
+      align-items: center;
+    }
+
+    .taif-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-block: 1px solid var(--line-strong);
+    }
+
+    .taif-stat {
+      padding: clamp(24px, 3vw, 48px) 18px;
+      border-inline-start: 1px solid var(--line);
+    }
+
+    .taif-stat:last-child { border-inline-start: 0; }
+
+    .taif-stat strong {
+      display: block;
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-size: clamp(38px, 4.8vw, 76px);
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .taif-stat span {
+      display: block;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: clamp(14px, 1.05vw, 18px);
+      line-height: 1.45;
+    }
+
+    .taif-reading {
+      display: grid;
+      gap: 24px;
+      border-inline-start: 3px solid var(--cool);
+      padding-inline-start: 30px;
+    }
+
+    .taif-reading strong {
+      font-size: clamp(24px, 2.6vw, 42px);
+      line-height: 1.35;
+    }
+
+    .taif-reading p {
+      color: var(--muted);
+      font-size: clamp(16px, 1.2vw, 21px);
+      line-height: 1.7;
+    }
+
+    /* Options slide */
+    .option-list {
+      display: grid;
+      border-top: 1px solid var(--line-strong);
+    }
+
+    .option-row {
+      display: grid;
+      grid-template-columns: minmax(190px, 0.75fr) minmax(0, 1.8fr) minmax(120px, 0.46fr);
+      align-items: center;
+      gap: 28px;
+      min-height: clamp(80px, 10.5vh, 116px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .option-name {
+      font-size: clamp(18px, 1.55vw, 27px);
+      font-weight: 800;
+    }
+
+    .option-result {
+      color: var(--muted);
+      font-size: clamp(15px, 1.15vw, 20px);
+      line-height: 1.55;
+    }
+
+    .option-status {
+      justify-self: end;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .option-status.selected { color: var(--ok); }
+
+    /* Scenario slide */
+    .scenario-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+      gap: clamp(50px, 8vw, 130px);
+      align-items: center;
+    }
+
+    .scenario-specs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 1px solid var(--line-strong);
+      border-inline-start: 1px solid var(--line);
+    }
+
+    .scenario-spec {
+      min-height: clamp(130px, 17vh, 190px);
+      display: grid;
+      align-content: center;
+      gap: 9px;
+      padding: 24px 30px;
+      border-inline-end: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .scenario-spec strong {
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-size: clamp(44px, 5.2vw, 82px);
+      line-height: 1;
+      letter-spacing: -0.055em;
+    }
+
+    .scenario-spec span {
+      color: var(--muted);
+      font-size: clamp(14px, 1vw, 18px);
+    }
+
+    .thermal-scale {
+      position: relative;
+      height: clamp(330px, 50vh, 520px);
+      width: 190px;
+      margin-inline: auto;
+    }
+
+    .thermal-track {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 76px;
+      width: 28px;
+      border-radius: 30px;
+      background: linear-gradient(to top, #1c4d58 0%, var(--cool) 35%, #f2c14e 62%, var(--heat) 82%, var(--danger) 100%);
+      box-shadow: 0 0 40px rgba(255, 106, 42, 0.18);
+    }
+
+    .thermal-marker {
+      position: absolute;
+      inset-inline: 0;
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      align-items: center;
+      direction: ltr;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .thermal-marker::after {
+      content: "";
+      height: 2px;
+      background: currentColor;
+    }
+
+    .thermal-marker.threshold { bottom: 57%; color: var(--heat-soft); }
+    .thermal-marker.peak { bottom: 74%; color: var(--danger); }
+
+    .thermal-callout {
+      position: absolute;
+      inset-inline-end: 0;
+      bottom: 73%;
+      transform: translateY(45%);
+      width: 82px;
+      direction: rtl;
+      color: var(--danger);
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 800;
+    }
+
+    /* Conclusion slide */
+    .conclusion-layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1.28fr);
+      gap: clamp(50px, 8vw, 130px);
+      align-items: center;
+    }
+
+    .edge-value {
+      padding-inline-start: 10px;
+    }
+
+    .edge-value strong {
+      display: block;
+      direction: ltr;
+      unicode-bidi: isolate;
+      color: var(--heat-soft);
+      font-size: clamp(86px, 11vw, 180px);
+      line-height: 0.85;
+      letter-spacing: -0.07em;
+    }
+
+    .edge-value span {
+      display: block;
+      margin-top: 20px;
+      font-size: clamp(21px, 2vw, 34px);
+      font-weight: 800;
+    }
+
+    .conclusion-copy {
+      display: grid;
+      gap: 26px;
+      border-inline-start: 1px solid var(--line-strong);
+      padding-inline-start: clamp(28px, 4vw, 66px);
+    }
+
+    .conclusion-copy p {
+      font-size: clamp(18px, 1.55vw, 27px);
+      line-height: 1.65;
+    }
+
+    .constraint-note {
+      color: var(--muted);
+      font-size: clamp(14px, 1.05vw, 18px) !important;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+    }
+
+    /* Viva detail */
+    .viva-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 0;
+      padding: 8px 0;
+      background: transparent;
+      color: var(--cool);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .viva-toggle::after {
+      content: "+";
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      transition: transform 220ms var(--ease);
+    }
+
+    .viva-toggle[aria-expanded="true"]::after { transform: rotate(45deg); }
+
+    .viva-note {
+      position: fixed;
+      z-index: 30;
+      inset-inline: clamp(28px, 7vw, 120px);
+      bottom: 88px;
+      max-height: min(43vh, 380px);
+      overflow: auto;
+      padding: clamp(22px, 2.8vw, 38px);
+      border: 1px solid var(--line-strong);
+      background: rgba(9, 15, 18, 0.97);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(24px);
+      transition: opacity 240ms var(--ease), transform 240ms var(--ease), visibility 0s linear 240ms;
+    }
+
+    .viva-note.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      transition-delay: 0s;
+    }
+
+    .viva-note strong {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--cool);
+      font-size: 16px;
+    }
+
+    .viva-note p {
+      max-width: 95ch;
+      color: var(--ink);
+      font-size: clamp(15px, 1.1vw, 19px);
+      line-height: 1.7;
+    }
+
+    /* Global controls */
+    .controls {
+      position: fixed;
+      z-index: 50;
+      inset-inline: clamp(20px, 3vw, 52px);
+      bottom: 22px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 20px;
+      direction: ltr;
+    }
+
+    .nav-buttons,
+    .utility-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .control-button {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: rgba(13, 20, 24, 0.74);
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .control-button:hover,
+    .control-button:focus-visible {
+      border-color: var(--cool);
+      background: rgba(103, 213, 207, 0.1);
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .control-button:disabled {
+      opacity: 0.28;
+      cursor: default;
+      transform: none;
+    }
+
+    .progress-shell {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .progress-track {
+      height: 2px;
+      background: var(--line);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 12.5%;
+      background: linear-gradient(90deg, var(--cool), var(--heat));
+      transition: width 420ms var(--ease);
+    }
+
+    .counter {
+      min-width: 52px;
+      color: var(--muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .slide-dots {
+      position: fixed;
+      z-index: 45;
+      top: 50%;
+      inset-inline-start: 24px;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 11px;
+    }
+
+    .slide-dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(244, 240, 232, 0.22);
+      cursor: pointer;
+      transition: background 180ms ease, transform 180ms ease;
+    }
+
+    .slide-dot.active {
+      background: var(--heat);
+      transform: scale(1.55);
+    }
+
+    .help-panel {
+      position: fixed;
+      z-index: 60;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(3, 6, 8, 0.72);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 200ms ease, visibility 0s linear 200ms;
+    }
+
+    .help-panel.open {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+
+    .help-card {
+      width: min(560px, calc(100vw - 48px));
+      padding: 34px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .help-card h3 { margin: 0 0 24px; font-size: 25px; }
+    .help-card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 14px 24px; }
+    .help-card dt { direction: ltr; color: var(--cool); font-weight: 800; }
+    .help-card dd { margin: 0; color: var(--muted); }
+
+    @media (max-width: 900px) {
+      .slide {
+        overflow-y: auto;
+        padding: 30px 32px 86px;
+      }
+
+      .cover-layout,
+      .correction-layout,
+      .exposure-layout,
+      .taif-layout,
+      .scenario-layout,
+      .conclusion-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .date-axis { display: none; }
+      .systems,
+      .conclusion-copy,
+      .taif-reading { border-inline-start: 0; padding-inline-start: 0; }
+      .audit-row { grid-template-columns: 44px 1fr; gap: 14px; padding: 16px 0; }
+      .audit-detail { grid-column: 2; }
+      .option-row { grid-template-columns: 1fr auto; padding: 18px 0; }
+      .option-result { grid-column: 1 / -1; }
+      .thermal-scale { height: 330px; }
+      .slide-dots { display: none; }
+    }
+
+    @media (max-height: 720px) and (min-width: 901px) {
+      .slide { padding-top: 26px; padding-bottom: 70px; }
+      .audit-row,
+      .option-row { min-height: 70px; }
+      .scenario-spec { min-height: 105px; }
+      .thermal-scale { height: 310px; }
+      .slide-footer { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      html,
+      body { overflow: visible; background: #fff; color: #111; }
+      .deck { height: auto; }
+      .slide {
+        position: relative;
+        width: 13.333in;
+        height: 7.5in;
+        break-after: page;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        background: #0a1013;
+        color: var(--ink);
+      }
+      .controls,
+      .slide-dots,
+      .help-panel,
+      .viva-note { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-live="polite">
+    <section class="slide active" data-title="التحديث" aria-hidden="false">
+      <div class="slide-kicker">اجتماع المتابعة</div>
+      <div class="slide-body cover-layout">
+        <div class="cover-copy">
+          <h1>ما تغيّر منذ اجتماع <span class="heat number">13/09</span></h1>
+          <p class="lede">مراجعة صريحة للأرقام السابقة، وما كشفته بيانات السيارة، وكيف أصبح سيناريو الاختبار أكثر واقعية.</p>
+        </div>
+        <div class="date-axis" aria-label="الفترة الزمنية للعرض">
+          <div class="date-point">
+            <strong>13 SEP</strong>
+            <span>آخر اجتماع</span>
+          </div>
+          <div class="date-point">
+            <strong>20 SEP</strong>
+            <span>الوضع الحالي</span>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <span class="source-note">تحديث أسبوعي لمشروع معيار قيمة المعلومات المستقبلية <span class="latin">H/τ</span></span>
+        <span class="deck-mark">GRAD PROJECT</span>
+      </footer>
+    </section>
+
+    <section class="slide" data-title="الأرقام القديمة" aria-hidden="true">
+      <div>
+        <div class="slide-kicker">01 · مراجعة النتائج</div>
+        <h2>لماذا سحبنا الأرقام القديمة</h2>
+      </div>
+      <div class="slide-body audit-list">
+        <div class="audit-row">
+          <span class="audit-index">01</span>
+          <strong class="audit-name">تبريد المقارنة</strong>
+          <span class="audit-detail">مروحة الرديتر كانت مطفأة، ومضخة سائل التبريد عند الحد الأدنى <span class="number">30%</span>.</span>
+        </div>
+        <div class="audit-row">
+          <span class="audit-index">02</span>
+          <strong class="audit-name">حمل غير فعلي</strong>
+          <span class="audit-detail">خريطة الشرارة استخدمت <span class="number">224 kPa</span> بينما ضغط التشغيل الفعلي كان قريباً من <span class="number">175 kPa</span>.</span>
+        </div>
+        <div class="audit-row">
+          <span class="audit-index">03</span>
+          <strong class="audit-name">مقارنة غير متساوية</strong>
+          <span class="audit-detail">المتحكم الاستباقي كان يحمي بقوة أكبر، لذلك الفرق لم يكن بسبب التوقيت وحده.</span>
+        </div>
+        <div class="audit-row">
+          <span class="audit-index">04</span>
+          <strong class="audit-name">ناقل حركة افتراضي</strong>
+          <span class="audit-detail">النموذج استخدم ست سرعات غير موثقة، وقاعدة تغيير تعتمد على السرعة فقط.</span>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <button class="viva-toggle" type="button" aria-expanded="false">إذا سأل الدكتور عن «الأشياء الثلاثة»</button>
+        <span class="deck-mark">AUDIT</span>
+      </footer>
+      <aside class="viva-note" aria-hidden="true">
+        <strong>الصياغة الدقيقة</strong>
+        <p>لم تكن ثلاثة أجزاء من المحاكاة متوقفة بالكامل. الخطأ الفيزيائي الأقرب لهذه العبارة هو أن مروحة الرديتر كانت مطفأة ومضخة التبريد عند 30% في مسار المقارنة. خطأ ناقل الحركة منفصل، كما أن جدولة الشرارة على ضغط غير فعلي ومقارنة عمق حماية مختلف أفسدا تفسير الأرقام.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-title="التصحيحات" aria-hidden="true">
+      <div>
+        <div class="slide-kicker">02 · النموذج الحالي</div>
+        <h2>ما الذي صححناه فعلياً</h2>
+      </div>
+      <div class="slide-body correction-layout">
+        <div class="transmission-compare">
+          <div class="compare-row">
+            <span class="compare-label">قبل</span>
+            <strong class="compare-value"><span class="number">6</span> سرعات افتراضية وتغيير غيار يعتمد على السرعة فقط</strong>
+          </div>
+          <div class="compare-row">
+            <span class="compare-label">الآن</span>
+            <strong class="compare-value"><span class="latin cool">ZF 8HP51</span> الحقيقي، مع احتياطي عزم وقاعدة تغيير تراعي الحمل</strong>
+          </div>
+          <div class="compare-row">
+            <span class="compare-label">على الصعود</span>
+            <strong class="compare-value">الغيار السابع، <span class="number">2706 rpm</span>، وعزم <span class="number">340 Nm</span></strong>
+          </div>
+        </div>
+        <div class="systems">
+          <div class="systems-title">مسارات الحماية في السيناريو الحالي</div>
+          <div class="system-line"><span class="system-dot"></span><span>الثرموستات والرديتر</span><span class="system-state">يعملان</span></div>
+          <div class="system-line"><span class="system-dot"></span><span>مروحة التبريد</span><span class="system-state number">0.4</span></div>
+          <div class="system-line"><span class="system-dot"></span><span>مضخة التبريد</span><span class="system-state number">1.0</span></div>
+          <div class="system-line"><span class="system-dot"></span><span>مبرد هواء الشحن</span><span class="system-state">يعمل</span></div>
+          <div class="system-line"><span class="system-dot off"></span><span>إثراء الوقود الأساسي</span><span class="system-state number">λ = 1.000</span></div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <button class="viva-toggle" type="button" aria-expanded="false">لماذا الإثراء لا يعمل؟</button>
+        <span class="deck-mark">MODEL CORRECTION</span>
+      </footer>
+      <aside class="viva-note" aria-hidden="true">
+        <strong>الإثراء غير فعال، لكنه ليس عطلاً</strong>
+        <p>الصعود يعمل عند 2706 rpm، وخريطة السيارة تبقى عند λ = 1.000 في هذا المجال حتى مع الحمل العالي. أول إثراء يظهر قرب 3600 rpm. لذلك نحافظ على هذا السلوك لأنه يمثل بيانات السيارة، ونذكره كحد عند المقارنة مع خط الأساس.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-title="البيانات الواقعية" aria-hidden="true">
+      <div>
+        <div class="slide-kicker">03 · تغطية البيانات</div>
+        <h2><span class="number heat">36</span> ثانية فقط فوق العتبة</h2>
+      </div>
+      <div class="slide-body exposure-layout">
+        <div class="hero-stat">
+          <strong class="number">0.206%</strong>
+          <span class="unit">من زمن القيادة القابل للتقدير</span>
+          <span class="context">هذا يصف ندرة الحالة الحرارية في قيادتنا، ولا يثبت وحده قيمة المشاهدة المسبقة.</span>
+        </div>
+        <div class="timeline-wrap">
+          <div class="timeline" aria-label="36 ثانية من 292 دقيقة فوق عتبة الحماية">
+            <div class="timeline-hot"></div>
+            <div class="timeline-pin">36 ثانية</div>
+          </div>
+          <div class="timeline-labels"><span>0 min</span><span>292.0 min</span></div>
+          <div class="fact-line"><span>إجمالي التسجيلات</span><strong>295.0 min</strong></div>
+          <div class="fact-line"><span>القابل لإعادة التشغيل الحراري</span><strong>292.0 min</strong></div>
+          <div class="fact-line"><span>أعلى تقدير لحرارة غلاف التوربين</span><strong>890.6°C</strong></div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <button class="viva-toggle" type="button" aria-expanded="false">تفصيل مهم عن القياس</button>
+        <span class="deck-mark">REAL DATA</span>
+      </footer>
+      <aside class="viva-note" aria-hidden="true">
+        <strong>890.6°C قيمة نموذجية وليست قراءة حساس</strong>
+        <p>السيارة لا توفر حساساً لحرارة غلاف التوربين. التطبيق يعيد تشغيل بيانات OBD-II داخل النموذج الحراري ويقدر الحرارة. لذلك نقول «درجة حرارة مقدرة» ولا نقدمها كقياس مباشر من السيارة.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-title="رحلة الطائف" aria-hidden="true">
+      <div>
+        <div class="slide-kicker">04 · اختبار جبلي حقيقي</div>
+        <h2>رحلة الطائف لم تصل إلى العتبة</h2>
+      </div>
+      <div class="slide-body taif-layout">
+        <div class="taif-stats">
+          <div class="taif-stat">
+            <strong>119.4</strong>
+            <span>دقيقة قيادة</span>
+          </div>
+          <div class="taif-stat">
+            <strong class="cool">797.6°C</strong>
+            <span>أعلى حرارة مقدرة</span>
+          </div>
+          <div class="taif-stat">
+            <strong class="heat">0 s</strong>
+            <span>فوق عتبة 850°C</span>
+          </div>
+        </div>
+        <div class="taif-reading">
+          <strong>الصعود وحده لا يصنع الحالة الحرارية المطلوبة</strong>
+          <p>رحلة جبلية طويلة بقيت أقل من العتبة بحوالي <span class="number">52°C</span>. الذي يحرك حرارة التوربين هو قدرة طريق مرتفعة ومستمرة، وليس الارتفاع أو دفعات السرعة القصيرة.</p>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <button class="viva-toggle" type="button" aria-expanded="false">ماذا استفدنا من الرحلة؟</button>
+        <span class="deck-mark">TAIF DRIVE</span>
+      </footer>
+      <aside class="viva-note" aria-hidden="true">
+        <strong>الرحلة مفيدة رغم أنها لم تصل للعتبة</strong>
+        <p>أثبتت وجود حالة صعود جبلي حقيقية داخل البيانات، وأظهرت أن أصعب صعود سجلناه أبرد بنحو 86°C من السيناريو الاصطناعي الحالي. أعلى حرارة حدثت خلال تسارع قصير عند 137 كم/س و5792 rpm، وليس أثناء أعلى سرعة. الزمن الحراري لغلاف التوربين قريب من 50 ثانية، ولذلك لا يستجيب بالكامل للدفعات القصيرة.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-title="اختيار السيناريو" aria-hidden="true">
+      <div>
+        <div class="slide-kicker">05 · البدائل التي اختبرناها</div>
+        <h2>كيف اخترنا حالة الضغط الجديدة</h2>
+      </div>
+      <div class="slide-body option-list">
+        <div class="option-row">
+          <strong class="option-name">الطائف</strong>
+          <span class="option-result">صعود حقيقي طويل، لكنه بقي عند <span class="number">797.6°C</span> ولم يصل للعتبة.</span>
+          <span class="option-status">دليل واقعي</span>
+        </div>
+        <div class="option-row">
+          <strong class="option-name">بيانات حلبة</strong>
+          <span class="option-result">لم نجد مجموعة بيانات مناسبة تحتوي القنوات التي يحتاجها نموذجنا.</span>
+          <span class="option-status">غير متاحة</span>
+        </div>
+        <div class="option-row">
+          <strong class="option-name"><span class="latin">SAE J2807</span></strong>
+          <span class="option-result">محاكاة <span class="latin">Davis Dam</span> مع مقطورة طنين وصلت إلى <span class="number">756.3°C</span> فقط، أقل من العتبة بنحو <span class="number">94°C</span>.</span>
+          <span class="option-status">لا يضغط المحرك</span>
+        </div>
+        <div class="option-row">
+          <strong class="option-name">صعود مضبوط</strong>
+          <span class="option-result">ميل وسرعة وحرارة جو معلنة، مع حمل مستمر يسمح باختبار الحماية عند العتبة.</span>
+          <span class="option-status selected">الخيار الحالي</span>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <button class="viva-toggle" type="button" aria-expanded="false">لماذا لم نستخدم معيار SAE؟</button>
+        <span class="deck-mark">SCENARIO SELECTION</span>
+      </footer>
+      <aside class="viva-note" aria-hidden="true">
+        <strong>سبب الاستبعاد هو النتيجة الحرارية</strong>
+        <p>المشكلة ليست فقط أن المعيار موجه لتقييم القطر. اختبرنا مسار Davis Dam داخل المحاكاة، وحتى مع مقطورة طنين بقيت حرارة التوربين المقدرة عند 756.3°C. السرعة المتواضعة تعني قدرة طريق أقل، لذلك لم يوفر المعيار الحالة الحرارية التي يحتاجها سؤالنا.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-title="السيناريو المقفل" aria-hidden="true">
+      <div>
+        <div class="slide-kicker">06 · سيناريو الاختبار</div>
+        <h2>السيناريو الحالي يدخل المجال الحراري المطلوب</h2>
+      </div>
+      <div class="slide-body scenario-layout">
+        <div class="scenario-specs">
+          <div class="scenario-spec"><strong>12%</strong><span>ميل الطريق</span></div>
+          <div class="scenario-spec"><strong>130</strong><span>كم/س</span></div>
+          <div class="scenario-spec"><strong>42°C</strong><span>حرارة الجو</span></div>
+          <div class="scenario-spec"><strong>12 min</strong><span>صعود مستمر</span></div>
+        </div>
+        <div class="thermal-scale" aria-label="درجة الحرارة المقدرة مقارنة بالعتبة">
+          <div class="thermal-track"></div>
+          <div class="thermal-marker threshold"><span>850°C</span></div>
+          <div class="thermal-marker peak"><span>884°C</span></div>
+          <div class="thermal-callout">أعلى من العتبة بنحو 34°C</div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <button class="viva-toggle" type="button" aria-expanded="false">كيف نستخدم البيانات مع السيناريو؟</button>
+        <span class="deck-mark">LOCKED SCENARIO</span>
+      </footer>
+      <aside class="viva-note" aria-hidden="true">
+        <strong>لا نخلط رحلة الطائف رقمياً مع الصعود الاصطناعي</strong>
+        <p>التسجيلات الواقعية تساعد في معايرة النموذج وفحص سلوكه ضمن المجال الذي قادته السيارة فعلاً. السيناريو الاصطناعي اختبار ضغط منفصل بشروط معلنة. بعد تركيب ناقل ZF 8HP51 الحقيقي وصل السيناريو إلى قرابة 884°C، بينما عتبة الحماية 850°C.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-title="الخلاصة" aria-hidden="true">
+      <div>
+        <div class="slide-kicker">07 · الوضع الحالي</div>
+        <h2>فائدة الـ<span class="latin">Preview</span> لم تثبت بعد</h2>
+      </div>
+      <div class="slide-body conclusion-layout">
+        <div class="edge-value">
+          <strong>−0.4</strong>
+          <span>نقطة في المقارنة اليدوية الحالية</span>
+        </div>
+        <div class="conclusion-copy">
+          <p>النتيجة قريبة جداً من الصفر، لكنها <span class="heat">سالبة</span>. لذلك لا نصفها كتحسن موجب.</p>
+          <p>الإنجاز هذا الأسبوع هو تصحيح بيئة الاختبار والوصول إلى حالة حرارية تصل فعلاً إلى العتبة.</p>
+          <p class="constraint-note">يوجد قيد تقني مفتوح: تغيير الخطوة الزمنية يحرك الفارق بين سياسات ثابتة بنحو <span class="number">1.3</span> نقطة، وهو أكبر من إشارة الـ<span class="latin">Preview</span> الحالية. لذلك نؤجل أي استنتاج نهائي.</p>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <button class="viva-toggle" type="button" aria-expanded="false">الجملة التي نختم بها</button>
+        <span class="deck-mark">CURRENT POSITION</span>
+      </footer>
+      <aside class="viva-note" aria-hidden="true">
+        <strong>خلاصة مقترحة للدكتور</strong>
+        <p>صححنا أخطاء كانت ترفع الحرارة وتضخم فرق الحماية، وراجعنا كامل البيانات الواقعية، ثم اخترنا سيناريو ضغط يصل للعتبة بسبب فيزيائي واضح. ما زلنا لا نملك دليلاً نهائياً على فائدة المشاهدة المسبقة، لكن أصبح الاختبار نفسه صالحاً لقياسها بصورة عادلة.</p>
+      </aside>
+    </section>
+
+    <nav class="controls" aria-label="أدوات العرض">
+      <div class="nav-buttons">
+        <button class="control-button" type="button" data-action="prev" aria-label="الشريحة السابقة">←</button>
+        <button class="control-button" type="button" data-action="next" aria-label="الشريحة التالية">→</button>
+      </div>
+      <div class="progress-shell">
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill"></div></div>
+        <span class="counter" aria-label="رقم الشريحة">01 / 08</span>
+      </div>
+      <div class="utility-buttons">
+        <button class="control-button" type="button" data-action="fullscreen" aria-label="ملء الشاشة">⛶</button>
+        <button class="control-button" type="button" data-action="help" aria-label="اختصارات العرض">?</button>
+      </div>
+    </nav>
+
+    <nav class="slide-dots" aria-label="الانتقال المباشر بين الشرائح"></nav>
+
+    <div class="help-panel" aria-hidden="true">
+      <div class="help-card" role="dialog" aria-modal="true" aria-label="اختصارات العرض">
+        <h3>اختصارات العرض</h3>
+        <dl>
+          <dt>→ / Space</dt><dd>الشريحة التالية</dd>
+          <dt>←</dt><dd>الشريحة السابقة</dd>
+          <dt>F</dt><dd>ملء الشاشة</dd>
+          <dt>Esc</dt><dd>إغلاق التفاصيل أو المساعدة</dd>
+          <dt>Home / End</dt><dd>أول أو آخر شريحة</dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const dotsHost = document.querySelector('.slide-dots');
+      const progress = document.querySelector('.progress-fill');
+      const counter = document.querySelector('.counter');
+      const prevButton = document.querySelector('[data-action="prev"]');
+      const nextButton = document.querySelector('[data-action="next"]');
+      const fullscreenButton = document.querySelector('[data-action="fullscreen"]');
+      const helpButton = document.querySelector('[data-action="help"]');
+      const helpPanel = document.querySelector('.help-panel');
+      let current = 0;
+      let touchStartX = 0;
+
+      const pad = (value) => String(value).padStart(2, '0');
+
+      function closeNotes() {
+        document.querySelectorAll('.viva-note.open').forEach((note) => {
+          note.classList.remove('open');
+          note.setAttribute('aria-hidden', 'true');
+          const toggle = note.parentElement.querySelector('.viva-toggle');
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      function render(index, pushHash = true) {
+        const next = Math.max(0, Math.min(slides.length - 1, index));
+        if (next === current && slides[next].classList.contains('active')) return;
+        closeNotes();
+
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('active', i === next);
+          slide.classList.toggle('exiting', i < next);
+          slide.setAttribute('aria-hidden', i === next ? 'false' : 'true');
+        });
+
+        current = next;
+        [...dotsHost.children].forEach((dot, i) => {
+          dot.classList.toggle('active', i === current);
+          dot.setAttribute('aria-current', i === current ? 'true' : 'false');
+        });
+
+        progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+        counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
+        prevButton.disabled = current === 0;
+        nextButton.disabled = current === slides.length - 1;
+        document.title = `${slides[current].dataset.title} · تحديث المشروع`;
+        if (pushHash) history.replaceState(null, '', `#${current + 1}`);
+      }
+
+      function go(delta) { render(current + delta); }
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen();
+        }
+      }
+
+      slides.forEach((slide, index) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'slide-dot';
+        dot.setAttribute('aria-label', `الشريحة ${index + 1}: ${slide.dataset.title}`);
+        dot.addEventListener('click', () => render(index));
+        dotsHost.appendChild(dot);
+      });
+
+      document.querySelectorAll('.viva-toggle').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          const note = toggle.closest('.slide').querySelector('.viva-note');
+          const willOpen = !note.classList.contains('open');
+          closeNotes();
+          note.classList.toggle('open', willOpen);
+          note.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
+          toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+      });
+
+      prevButton.addEventListener('click', () => go(-1));
+      nextButton.addEventListener('click', () => go(1));
+      fullscreenButton.addEventListener('click', toggleFullscreen);
+      helpButton.addEventListener('click', () => {
+        helpPanel.classList.toggle('open');
+        helpPanel.setAttribute('aria-hidden', helpPanel.classList.contains('open') ? 'false' : 'true');
+      });
+      helpPanel.addEventListener('click', (event) => {
+        if (event.target === helpPanel) {
+          helpPanel.classList.remove('open');
+          helpPanel.setAttribute('aria-hidden', 'true');
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeNotes();
+          helpPanel.classList.remove('open');
+          helpPanel.setAttribute('aria-hidden', 'true');
+          return;
+        }
+        if (helpPanel.classList.contains('open')) return;
+        if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') {
+          event.preventDefault();
+          go(1);
+        } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          go(-1);
+        } else if (event.key === 'Home') {
+          render(0);
+        } else if (event.key === 'End') {
+          render(slides.length - 1);
+        } else if (event.key.toLowerCase() === 'f') {
+          toggleFullscreen();
+        } else if (event.key === '?') {
+          helpButton.click();
+        }
+      });
+
+      document.addEventListener('touchstart', (event) => {
+        touchStartX = event.changedTouches[0].clientX;
+      }, { passive: true });
+      document.addEventListener('touchend', (event) => {
+        const distance = event.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(distance) > 55) go(distance < 0 ? 1 : -1);
+      }, { passive: true });
+
+      window.addEventListener('hashchange', () => {
+        const index = Number(location.hash.slice(1)) - 1;
+        if (Number.isInteger(index)) render(index, false);
+      });
+
+      const initial = Number(location.hash.slice(1)) - 1;
+      current = -1;
+      render(Number.isInteger(initial) && initial >= 0 ? initial : 0, false);
+    })();
+  </script>
+</body>
+</html>

@@ -1,5 +1,35 @@
 # ABSTRACT.md — the three abstracts, mirrored from `DOC/`
 
+> ## ⚠️ THIS FILE IS A MIRROR OF DOCUMENTS THAT NO LONGER EXIST. 21 September 2026
+>
+> **Two of the three were deleted and the third was rewritten.** What was handed
+> to the supervisor is `DOC/Abstract_EN.docx` and `DOC/Abstract_EN.pdf`, and
+> nothing else. `DOC/Abstract_AR.docx` and `DOC/Abstract_Simplified.docx` were
+> deleted on purpose; sections 2 and 3 below are their last text and are history
+> now, not deliverables.
+>
+> **Every dataset figure below is superseded**, including the "figures used
+> here, and only these" box in the next paragraph. The submitted English
+> abstract carries the current set and this mirror does not:
+>
+> | | this file | the submitted `.docx` and the shipped data |
+> |---|---|---|
+> | minutes | 175.5 | **295.0** |
+> | drives | nine | **ten** |
+> | operating points | 22 | **26** |
+> | span | 30–74 kPa | **30–75 kPa** |
+>
+> **One claim below is wrong about the code, not just out of date.** Sections 1,
+> 2 and 4 say preview is isolated "by re-evaluating the identical trained policy
+> with its preview channel disabled". That is the construction `AUDIT.md` C3
+> voided — it cannot fail and it is not evidence. `evaluate.py` trains and
+> scores a *second* agent, which is the defensible design. The submitted
+> abstract still carries the old wording.
+>
+> Regenerating this file from the surviving `.docx` is step 3 of the plan in
+> `NEXT_SESSION_2026-09-21.md`. Until then, read the `.docx`, not this.
+> See `AUDIT2.md` findings H2-1 and H2-6.
+
 **The three `DOC/Abstract_*.docx` files are what gets handed in. This file is a
 generated mirror of them**, kept so the text is readable and diffable in the
 repository. If the two ever disagree, the `.docx` files win — regenerate this
