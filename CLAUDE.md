@@ -814,7 +814,7 @@ number was right, and nothing was checking the prose beside them.
 
 ### 11. The seven-drive figures survived in the prose after the data moved on
 
-<!-- RETIRED-OK: this whole section is the record of what changed. -->
+<!-- RETIRED-OK: section 113, 168.1, 5, 7, 8, 30534 -- this whole entry is the record of what changed. -->
 
 `7475b5d7` arrived on 8 September and took the dataset from 113 minutes over
 seven drives to **168.1 minutes over eight**. The code was updated. The
@@ -929,7 +929,7 @@ a green run proves only that the patterns that exist found nothing.
 
 ### 12. A residual that could not see the thing it was said to validate
 
-<!-- RETIRED-OK: this section is the record of what changed. -->
+<!-- RETIRED-OK: section -- this entry is the record of what changed. -->
 
 `compare_log.py` reported a load residual and the documents called it "the
 simulator matches the car". **It never tested the simulator.**
@@ -984,7 +984,7 @@ discovery.
 
 ### 13. The charge temperature was a compressor outlet
 
-<!-- RETIRED-OK: this section is the record of what changed. -->
+<!-- RETIRED-OK: section -- this entry is the record of what changed. -->
 
 `logs/CHANNEL_SET_FINAL.md` labelled `Intake air temperature before throttle
 valve` as "charge temperature. Post-intercooler", and `build_dataset.py` and
@@ -1262,7 +1262,7 @@ is invisible until something checks.
 
 ### 16. A RELEASE ARCHIVE TRIED TO DRAG THE TREE BACKWARDS
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 113, 7 -->
 *(This entry quotes the retired figures on purpose — naming them IS the
 entry. The marker above is what tells `verify_docs.py` so, and it is the
 same mechanism mistake 13 uses for the same reason.)*
@@ -1478,7 +1478,7 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   Stop trying; state it as a limitation.
 - **THE OIL BAND IS NOW SUPPORTED BY OUR OWN CAR, AND THE MODEL MISSES IT LOW.**
   This is the most valuable thing `drive10` delivered (18 September, 119.5 min).
-  <!-- RETIRED-OK -->
+  <!-- RETIRED-OK: 107 -->
   The hottest oil in the logs was 107 °C across the first nine drives, which
   sat *below* the published 115–140 °C band — so the band was unverifiable from
   our own data and `validate.py`'s miss could not be interpreted. `drive10`
@@ -1498,7 +1498,7 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   carries samples but contributes **zero** operating points. Quote it as "ten
   drives, 295.0 minutes, seven carrying samples, 26 distinct operating points".
 
-  <!-- RETIRED-OK -->
+  <!-- RETIRED-OK: 113, 5, 7 -->
   This line read "seven drives, 113 minutes, five carrying samples" until
   9 September. It was written before `7475b5d7` arrived and simply never
   updated, while the current-state table at the top of this file, `verify_docs.py`

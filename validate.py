@@ -121,7 +121,7 @@ def _step_response(key, horizon_s, dt=0.25):
     the load `thermal.py`'s own worked example uses.
 
     THE SECOND ANCHOR NO LONGER HOLDS, AND SAY SO RATHER THAN QUIETLY KEEPING
-    IT.  RETIRED-OK: the ceiling quoted in the next sentence is the superseded
+    IT.  RETIRED-OK: 6.5, 7 -- the ceiling quoted in the next sentence is the
     one, kept because the point of the paragraph is that it moved.
     This docstring used to add that the condition "sits above the hardest
     sustained load actually recorded on the car", on a ceiling of 6.5 g/s

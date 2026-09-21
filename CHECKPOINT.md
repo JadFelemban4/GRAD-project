@@ -162,7 +162,7 @@ guard**. The remaining seven confine theirs to comments and docstrings.
 
 ### 3. `CLAUDE.md` carried a stale drive count
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 113, 7 -->
 The old sentence is quoted below deliberately, as the record of what was
 corrected. `verify_docs.py` needs the marker above to know that.
 
@@ -340,7 +340,7 @@ This paragraph is the record of what changed on 10 September, so every arrow
 reads old → new *as of that day*. Two of those new values have since moved
 again; the note underneath carries the current ones.
 
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: 192, 31, 82 -->
 Oil extrapolation 103 → **117 °C**. Enrichment v4 fitted on seven → **eight**
 drives. MAF ceiling 192 samples on four → **517 on five** drives. Compressor fit
 30 534 → **74 013** quasi-steady samples. Vehicle validation 31–79 → **31–82 kPa**.
@@ -543,7 +543,7 @@ two markets stitched together, not a manufacturer figure.
 
 ### Mistake 11 recurred a third time, and named two holes in the checker
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 168.1, 8 -->
 This subsection names the superseded figure throughout, because the figure is
 what was corrected. The current dataset is ten drives and 295.0 minutes.
 
@@ -1209,3 +1209,126 @@ chosen to favour the claim. Say that in the defence.
 - **Four of nine audit parts ran on the orchestrator rather than on agents**,
   because the account's usage limit killed two full workflow runs; the coverage
   and what could not be verified are listed in the report's confidence ledger.
+
+## Session of 21 September 2026 — results get a fingerprint, and the guard gets the figures that decide the project
+
+The second audit's fixes 1 and 2. Fix 3, the document sweep, is NOT done and is
+still the next session's work — see the ledger below, which is how much of it is
+outstanding, counted.
+
+### Fix 1 — every trained result now records the plant that produced it
+
+<!-- RETIRED-OK: 11.7 -- naming the void figure IS the finding -->
+`AUDIT2.md` C2-1: `results/phase_d_seed0.txt` says +11.7 points and was produced
+on an invented six-speed gearbox that commit `27e720c` replaced seven hours
+later. Nothing in `runs/` recorded which gearbox. The header that was supposed to
+say was a hardcoded string, **byte-identical on both plants**.
+
+New `fingerprint.py` builds a block from the LIVE objects:
+
+| field | what it is | fatal? |
+|---|---|---|
+| `plant_sha` | SHA-256 over the bytes of `plant.py` + `thermal.py` + `engine_env.py` | yes |
+| `gears`, `final_drive` | the transmission | yes |
+| `dtheta_deg` | the crank-angle integration step | yes |
+| `turb_protect_k`, `oil_protect_k` | the protection triggers | yes |
+| `scenario` | grade / v_kmh / t_amb, from `inspect.signature` | yes |
+| `episodes_sha` | a hash of the twenty frozen evaluation episodes | yes |
+| `git_head`, `git_dirty`, `python`, `train_dt`, `eval_dt` … | context | no |
+
+**The plant SHA outranks the git commit deliberately.** The audit measured that
+the 18 September sighted run started **26 seconds before** the commit that locked
+the scenario, from an uncommitted working tree — so `git rev-parse HEAD`
+describes a tree that run did not use. It is recorded, and it is advisory.
+
+**`dt` is advisory too, and that is not an oversight.** Training builds its
+environment at dt 0.2 over 900 s; `evaluate.py` scores at 1.0 over 720 s. The
+asymmetry is real, deliberate on both sides, and an open problem (H2-2). Making
+it fatal would refuse every legitimate evaluation this project performs, so it is
+printed side by side with the finding named instead.
+
+What changed where:
+
+- `train.py` writes `runs/<tag>/meta.json` before the first step, and on resume
+  **refuses** a missing or mismatched fingerprint (`--force-plant-mismatch`
+  overrides and says so in the output).
+- `train.py` **appends** to `curve.csv` instead of overwriting it (H2-3: a re-run
+  of a finished agent blanked a twelve-episode curve to its header), and a re-run
+  with nothing left to do now returns **before** `model.learn` and `model.save`
+  instead of silently rewriting the only copy of a trained agent.
+- `evaluate.py` builds its scenario line from `inspect.signature(make_grade_climb)`,
+  prints the fingerprint block, writes the whole report to `--out`, and refuses a
+  model whose `meta.json` disagrees.
+
+Six paths were exercised rather than argued: a fresh run, a no-op re-run, a
+resume that appends, a refused plant mismatch, a refused missing `meta.json`, and
+a clean match.
+
+### Fix 2 — the guard now sees the figures that decide the experiment
+
+`AUDIT2.md` C2-2 measured that fourteen realistic drifts were injected into a
+copy of the tree and **twelve went through green**, including
+`make_grade_climb(v_kmh=)` 130 → 120 and `TURB_PROTECT_K` 1123 → 1100. Either one
+re-bases every damage figure in the repository while every document goes on
+saying 130 km/h and 850 °C.
+
+`check_scenario()` asserts, from the live objects: the four `make_grade_climb`
+defaults, both protection triggers, the eight ZF ratios and the final drive,
+`evaluate.DT` / `DURATION`, a hash of `EPISODES`, `check_premise`'s baseline
+damage and peak (a real 34-second rollout, identical to the script's own first
+row), both of `compare_log`'s residuals and its fitted k (by running it and
+reading what it prints), and `app/test_replay`'s pinned peak and alert counts.
+
+Three structural changes came with it:
+
+- **ONE file list for both scans**, from `git ls-files`, so a file that is in the
+  repository cannot be outside the checker by accident. It reaches every tracked
+  `.py`, `.html`, `.js` and `.txt` now, with HTML tags stripped per line. The
+  retired scan went from 35 files to 52.
+- **`RETIRED-OK` is figure-specific** (H2-6). A marker names the figures it
+<!-- RETIRED-OK: 168.1, 113 -- the marker syntax being quoted, not a claim -->
+  excuses: `<!-- RETIRED-OK: 168.1, 113 -->`. A marker that names none can excuse
+  the RETIRED scan only — it can no longer switch off the comparison against live
+  data. The per-file exempted count is printed every run.
+- **A mention is not a marker.** Five passages in this repository *discuss* the
+  mechanism in backticks, and every one of them was switching the checker off for
+  its own paragraph — including one whose next sentence states a live and wrong
+  dwell figure. An occurrence inside an inline code span is now ignored.
+
+### The known-stale ledger, and why the run is green with rot outstanding
+
+Turning the guard on over the whole repository surfaced roughly two hundred and
+fifty stale figures in one run. **Every one is already a written finding** in
+`AUDIT2.md` with fix 3 scheduled against it.
+
+Leaving the checker red was rejected: a checker that is red for a week is a
+checker nobody reads, and this project's house rule is to run it before quoting
+any number. Exempting the files was rejected too — that is the blunt instrument
+H2-6 is about, one level up.
+
+So they are **counted**. `KNOWN_STALE` carries one row per (file, figure) with
+the audit finding, the exact count, and **the exact stale values**. A row that
+grows is new rot and fails. A row that shrinks fails too, so the ledger has to be
+swept in the same commit as the documents. A row whose *values* move fails — a
+count alone cannot see a stale line being edited into a differently stale one,
+<!-- RETIRED-OK: 294.2, 812 -- naming the stale pair IS the example -->
+which is how `CLAUDE.md`'s "294.2 at 812 °C" could have had its 812 changed
+unnoticed.
+
+**Read the ledger total as the size of fix 3.** It is printed every run.
+
+### The acceptance test is in the repository
+
+`drift_test.py` re-runs AUDIT2 Part 4a's injected drifts against the current
+tree, each in its own copy of the tracked file set, and reports CAUGHT or MISSED
+per row. It is the file that makes fix 2's claim checkable instead of asserted,
+and it is the reason `verify_docs.py` may not simply be trusted when it prints
+green.
+
+### What this session did NOT do
+
+- **Fix 3 is not started.** The document sweep is the next session's work and the
+  ledger is its inventory.
+- **No training, and no Phase D.** `runs_sixspeed_18sep/` is untouched.
+- **`presentation/` is untouched.** Its void premise figures are ledgered under
+  C2-3, not fixed; the deck still must not be shown.

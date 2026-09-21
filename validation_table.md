@@ -92,7 +92,7 @@ is recorded there and only there, so the two files cannot disagree. A band
 whose row is still UNVERIFIED is an engineering-judgement band and must be
 described as one in Chapter 3.
 
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: 10 -->
 **8 of 11 inside**, down from a claimed 10 of 11 on the wrong engine. Report the
 three misses with their reasons; each is informative.
 
@@ -202,7 +202,7 @@ number moves.** It takes one run.
 
 #### What the 10 September charge-temperature correction changed here
 
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: 31, 82, 0.784, 0.783, 2.8 -->
 Until 10 September this section reported the points as 31–82 kPa, k fitted 0.784,
 k derived 0.783, and a residual of 2.8 % fitted against 1.4 % derived. Those
 figures were computed with the pre-throttle temperature sensor standing in for

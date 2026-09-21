@@ -3,6 +3,38 @@
     python evaluate.py                          the hand-written policies only
     python evaluate.py runs/sighted_seed0        add one trained agent
     python evaluate.py runs/sighted_seed0 runs/blind_seed0    sighted vs blinded
+    python evaluate.py --out results/phase_d_seed0.txt runs/... runs/...
+
+EVERY RESULT CARRIES THE PLANT THAT PRODUCED IT   (AUDIT2.md C2-1)
+------------------------------------------------------------------
+This file used to print its scenario as a hardcoded sentence:
+
+    print(f"scenario: 12 % at 130 km/h, 42 C, {DURATION:.0f} s, dt {DT}")
+
+RETIRED-OK: 572.8, 857 -- the six-speed figures this paragraph exists to retire
+That sentence was true, and it was **byte-identical on two different plants**.
+On 18 September two agents were trained on an invented six-speed gearbox and
+scored here at +11.7 points; on 19 September commit `27e720c` replaced the
+gearbox with the car's real ZF 8HP51; the result file was kept. The same
+command on the corrected plant prints +7.5, with every row moved -- baseline
+damage 572.8 -> 959.8, peak 857 -> 884 C -- and the +11.7 cannot be regenerated
+from this tree at all, because the `engine_env.py` it needs no longer exists
+here.
+
+So the scenario line is now built from `inspect.signature(make_grade_climb)`
+rather than typed, and a full fingerprint block (gear ratios, final drive,
+crank-angle step, protection trigger, scenario tuple, a hash of the twenty
+frozen episodes, the SHA of the three physics files) is printed, written into
+the result file, and CHECKED against each model's `runs/<tag>/meta.json`.
+
+**A model whose fingerprint disagrees is refused.** Not warned about -- refused,
+with the disagreeing fields named. `--force-plant-mismatch` overrides it and
+stamps the mismatch into the result file in full, because the only thing worse
+than refusing is producing a number whose provenance is a footnote.
+
+A model with no `meta.json` is refused too. That is the pre-fingerprint case --
+`runs_sixspeed_18sep/` is exactly it -- and "we do not know which plant this
+agent saw" is the finding, not an inconvenience.
 
 ================================================================================
 THE TWENTY EPISODES ARE FROZEN. DO NOT EDIT `EPISODES`.
@@ -51,10 +83,14 @@ vehicle gets for free from a nose-down accelerometer. Beating `baseline` proves
 supervision helps; only beating `current-grade` proves the PREVIEW helped. See
 AUDIT.md C3.
 """
-import sys
+import argparse
+import inspect
+import os
+
 import numpy as np
 
 import check_premise as C
+import fingerprint as FP
 from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K
 
 DT = 1.0
@@ -121,30 +157,134 @@ def summarise(rows, key):
     return med, q3 - q1, v.max(), v.min()
 
 
+def scenario_line():
+    """The scenario sentence, READ FROM THE CYCLE FUNCTION rather than typed.
+
+    AUDIT2.md C2-1 and H2-10. The literal this replaces was identical on the
+    six-speed and on the ZF, which is why `results/phase_d_seed0.txt` cannot be
+    told apart from a run on a plant that no longer exists. A sentence built
+    from `inspect.signature` changes when the experiment changes.
+    """
+    d = inspect.signature(make_grade_climb).parameters
+    grade = float(d["grade"].default)
+    v = float(d["v_kmh"].default)
+    t_amb = float(d["t_amb"].default)
+    return (f"scenario: {100 * grade:.0f} % at {v:.0f} km/h, "
+            f"{t_amb - 273.15:.0f} C, {DURATION:.0f} s, dt {DT}")
+
+
+def check_model_fingerprint(path, live, force):
+    """Refuse a model whose `meta.json` describes a different plant.
+
+    Returns the lines to record in the result file: empty when the model
+    matches, a full account of the disagreement when `force` let it through.
+    """
+    meta_path = os.path.join(path.rstrip("/\\"), "meta.json")
+    stored = FP.read(meta_path)
+
+    if stored is None:
+        msg = (f"\n{path} has no meta.json.\n"
+               "It predates the plant fingerprint (AUDIT2.md C2-1), so nothing "
+               "records which\nplant it was trained on -- and this project has "
+               "already shipped one result\nthat was produced on a gearbox "
+               "replaced seven hours later. Retrain it with\nthe current "
+               "train.py, or pass --force-plant-mismatch and expect to defend "
+               "the\nnumber without provenance.")
+        if not force:
+            raise SystemExit(msg)
+        print(msg)
+        return [f"!! {path}: NO meta.json -- plant unknown, --force-plant-mismatch used"]
+
+    bad = FP.compare(stored, live)
+    if not bad:
+        # The dt asymmetry is legitimate and permanent (train 0.2, score 1.0),
+        # so it is reported rather than refused -- but it is reported EVERY
+        # time, because CLAUDE.md records it as an open problem and AUDIT2.md
+        # H2-2 measures the headline percentage moving 37.0 -> 30.1 % on the
+        # step alone. A reader of a result file should not have to know that.
+        t_dt = stored.get("train_dt")
+        if t_dt is not None and abs(float(t_dt) - DT) > 1e-9:
+            return [f"note {os.path.basename(path.rstrip('/'))}: trained at "
+                    f"dt {float(t_dt):g}, scored at dt {DT:g} "
+                    f"(known, unresolved -- AUDIT2.md H2-2)"]
+        return []
+
+    lines = [f"!! {path}: PLANT MISMATCH"]
+    for k, was, now in bad:
+        lines.append(f"     {k:<18} model {was!r}  live {now!r}")
+    if not force:
+        # Printed HERE only on the refusing path, because that path raises
+        # before main() gets the chance. When --force lets the run continue,
+        # main() prints these same lines through say(), which also captures
+        # them for --out -- printing in both places showed the block twice.
+        print("\n".join(lines))
+        raise SystemExit(
+            f"\nREFUSING to evaluate {path}: it was trained on a different "
+            "plant.\nScoring it here would produce a number that belongs to "
+            "neither -- which is\nexactly what results/phase_d_seed0.txt is "
+            "(AUDIT2.md C2-1). Retrain on this\ntree, or pass "
+            "--force-plant-mismatch and quote the mismatch beside the number.")
+    lines.append("     --force-plant-mismatch was given; the rows below are "
+                 "NOT a Phase D result.")
+    return lines
+
+
 def main():
+    ap = argparse.ArgumentParser(description="Phase D evaluation protocol.")
+    ap.add_argument("models", nargs="*",
+                    help="runs/<tag> directories; 'blind' in the name means "
+                         "the preview channel was zeroed during training")
+    ap.add_argument("--out", default=None,
+                    help="also write the whole report, fingerprint block "
+                         "included, to this file")
+    ap.add_argument("--force-plant-mismatch", action="store_true",
+                    help="evaluate a model whose meta.json disagrees with this "
+                         "tree, or has none. The mismatch is stamped into the "
+                         "output; it is never silent.")
+    a = ap.parse_args()
+
+    # Everything printed is also captured, so the result file and the terminal
+    # cannot disagree -- the failure mode that let a result file carry a
+    # scenario header its own run did not have.
+    captured = []
+
+    def say(*parts):
+        line = " ".join(str(p) for p in parts)
+        print(line)
+        captured.append(line)
+
+    live = FP.plant_fingerprint(eval_dt=DT, eval_duration=DURATION)
+
     policies = [
         ("baseline ECU",  C.p_neutral,     True),
         ("reactive",      C.p_reactive,    True),
         ("current-grade", C.p_grade_now,   True),
     ]
 
-    for path in sys.argv[1:]:
+    provenance = []
+    for path in a.models:
         try:
             from stable_baselines3 import SAC
         except ImportError:
             raise SystemExit('stable-baselines3 is not installed.\n'
                              '    pip install "stable-baselines3[extra]"')
+        provenance += check_model_fingerprint(path, live, a.force_plant_mismatch)
         blind = "blind" in path
         model = SAC.load(path.rstrip("/\\") + "/final")
         policies.append((("agent (blind)" if blind else "agent") + " " + path,
                          agent_policy(model), not blind))
 
-    print(f"PHASE D EVALUATION -- {len(EPISODES)} FIXED EPISODES, frozen 18 Sep 2026")
-    print(f"scenario: 12 % at 130 km/h, 42 C, {DURATION:.0f} s, dt {DT}")
-    print(f"trigger:  {TURB_PROTECT_K - 273.15:.0f} C\n")
-    print(f"{'policy':<28}{'damage med':>12}{'IQR':>9}{'worst':>9}"
-          f"{'fuel med':>10}{'peak C':>9}")
-    print("-" * 77)
+    say(f"PHASE D EVALUATION -- {len(EPISODES)} FIXED EPISODES, frozen 18 Sep 2026")
+    say(scenario_line())
+    say(f"trigger:  {TURB_PROTECT_K - 273.15:.0f} C")
+    say("")
+    say(FP.format_block(live, "PLANT FINGERPRINT (this run)"))
+    for line in provenance:
+        say(line)
+    say("")
+    say(f"{'policy':<28}{'damage med':>12}{'IQR':>9}{'worst':>9}"
+        f"{'fuel med':>10}{'peak C':>9}")
+    say("-" * 77)
 
     out = {}
     for name, pol, prev in policies:
@@ -153,40 +293,53 @@ def main():
         dm, di, dw, _ = summarise(rows, "damage")
         fm, _, _, _ = summarise(rows, "fuel")
         pk = max(r["peak_turb"] for r in rows)
-        print(f"{name:<28}{dm:>12.1f}{di:>9.1f}{dw:>9.1f}{fm:>10.0f}{pk:>9.0f}")
+        say(f"{name:<28}{dm:>12.1f}{di:>9.1f}{dw:>9.1f}{fm:>10.0f}{pk:>9.0f}")
 
-    print("-" * 77)
+    say("-" * 77)
     base = np.median([r["damage"] for r in out["baseline ECU"]])
     for name in out:
         if name == "baseline ECU":
             continue
         med = np.median([r["damage"] for r in out[name]])
-        print(f"  {name:<26} cuts median damage {100*(1-med/base):5.1f} %")
+        say(f"  {name:<26} cuts median damage {100*(1-med/base):5.1f} %")
 
     grade = next((n for n in out if n.startswith("current-grade")), None)
     agent = next((n for n in out if n.startswith("agent ") and "blind" not in n), None)
     blind = next((n for n in out if "blind" in n), None)
 
-    print()
+    say("")
     if agent and grade:
-        a = np.median([r["damage"] for r in out[agent]])
+        am = np.median([r["damage"] for r in out[agent]])
         g = np.median([r["damage"] for r in out[grade]])
-        edge = 100*(1-a/base) - 100*(1-g/base)
-        print(f"  AGENT over CURRENT-GRADE: {edge:+.1f} points")
+        edge = 100*(1-am/base) - 100*(1-g/base)
+        say(f"  AGENT over CURRENT-GRADE: {edge:+.1f} points")
     if agent and blind:
-        a = np.median([r["damage"] for r in out[agent]])
+        am = np.median([r["damage"] for r in out[agent]])
         b = np.median([r["damage"] for r in out[blind]])
-        print(f"  SIGHTED over BLINDED:     {100*(1-a/base) - 100*(1-b/base):+.1f} points"
-              "   <- THE ABLATION. This is the project's result.")
+        say(f"  SIGHTED over BLINDED:     {100*(1-am/base) - 100*(1-b/base):+.1f}"
+            " points   <- THE ABLATION")
+        # AUDIT2.md C2-1. This line used to end "This is the project's result",
+        # unconditionally, printed under a number produced on a plant the
+        # repository had already replaced. The fingerprint block above is what
+        # makes the claim checkable, so the claim now says so.
+        say("  It is the project's result only if the fingerprint block above is "
+            "the plant\n  every figure beside it was measured on. That is now "
+            "checkable -- check it.")
     elif agent:
-        print("  No blinded agent supplied, so THERE IS NO ABLATION YET. Train one\n"
-              "  with --no-preview and pass it as the second argument. Until then\n"
-              "  nothing here separates preview from the rest of the policy.")
+        say("  No blinded agent supplied, so THERE IS NO ABLATION YET. Train one\n"
+            "  with --no-preview and pass it as the second argument. Until then\n"
+            "  nothing here separates preview from the rest of the policy.")
     else:
-        print("  Hand-written policies only. AUDIT.md C3: these say the environment\n"
-              "  rewards anticipation; they do NOT say what an agent would gain, and\n"
-              "  five scenarios have now shown preview losing to current-grade with\n"
-              "  policies a human wrote. Only a trained pair settles it.")
+        say("  Hand-written policies only. AUDIT.md C3: these say the environment\n"
+            "  rewards anticipation; they do NOT say what an agent would gain, and\n"
+            "  five scenarios have now shown preview losing to current-grade with\n"
+            "  policies a human wrote. Only a trained pair settles it.")
+
+    if a.out:
+        os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+        with open(a.out, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(captured) + "\n")
+        print(f"\nwritten to {a.out}")
 
 
 if __name__ == "__main__":

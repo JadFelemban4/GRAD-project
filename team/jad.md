@@ -94,7 +94,7 @@ the battery specifics.
 
 ## Anything else
 
-<!-- RETIRED-OK: naming the void figure IS the warning -->
+<!-- RETIRED-OK: 548.6, 168.1, 8 -- naming the void figure IS the warning -->
 **My interview prep sheet is out of date and I nearly presented from it.** It
 calls `548.6 = 548.6` the project's strongest fairness evidence. The
 15 September audit proved that identity is guaranteed by construction and is

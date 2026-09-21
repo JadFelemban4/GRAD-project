@@ -363,7 +363,7 @@ maximum repeated across drives is the tell.
 
 ## The headline numbers moved, and why
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 527.2, 51.4, 26.9, 2.13, 1.38, 8.43, 244, 930 -- the version history of the headline; every figure named here is one it moved AWAY from -->
 
 `BaselineECU` was guessed. It is now calibrated against 295.0 minutes of the
 real car, pooled across eight drives. Two things were wrong, and the

@@ -95,6 +95,8 @@ RESULTS = []
 DOC_FAILURES = []
 DOC_UNMATCHED = []
 DOC_HITS = 0
+EXEMPTED = {}          # rel path -> how many lines a RETIRED-OK marker covered
+BARE_MARKERS = {}      # rel path -> markers that name no figure at all
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # Documents whose numbers must agree with the data. These are the files a
@@ -130,6 +132,108 @@ TRACKED_DOCS = [
     # document whatever its extension.
     "presentation/index.html",
 ]
+
+# ---------------------------------------------------------------------------
+# ONE FILE LIST FOR BOTH SCANS   (AUDIT2.md C2-2, C2-3, M2-7d)
+# ---------------------------------------------------------------------------
+# Until 21 September there were two, and they disagreed:
+#
+#   the figure scan   read the 15 hand-maintained names in TRACKED_DOCS above
+#   the retired scan  globbed **/*.md plus ROOT-LEVEL *.py, non-recursively
+#
+# So `app/alerts.py`, `app/estimator.py`, `app/reader.py` and
+# `presentation/index.html` were figure-scanned and retired-UNscanned, while
+# `presentation/plan.html`, `presentation/data.js`, `app/server.py` and
+# everything under `results/`, `DOC/` and `team/` were in neither. The audit
+# measured the cost: the deck a supervisor is shown carries the void premise
+# set on more than a hundred lines and the checker printed green over it.
+#
+# One list now, built from `git ls-files` so that a file which is IN THE
+# REPOSITORY cannot be outside the checker by accident. That is the property
+# the two hand-maintained lists could not have.
+#
+# What is deliberately excluded, and why each one:
+#   data/, logs/raw/   measurements. Every figure in this project appears
+#                      somewhere in a timestamp column; scanning them turns
+#                      every check into noise. `build_dataset.py` guards these.
+#   *.csv, *.json      generated. Regenerate, do not edit -- and sweeps.json is
+#                      a numeric dump where every retired figure occurs by
+#                      coincidence.
+#   binaries           .docx/.pdf/.pptx cannot be grepped. DOCUMENT_STATUS.md
+#                      records which of them carry void numbers; that is the
+#                      only handle this checker has on them and it is a real
+#                      coverage limit, so say it in the thesis.
+SCAN_EXT = (".md", ".py", ".html", ".js", ".txt")
+SCAN_SKIP_DIRS = ("data/", "logs/raw/", "runs/", "runs_sixspeed_18sep/",
+                  ".venv/", "node_modules/")
+_FILE_CACHE = {}
+
+
+def tracked_files(here):
+    """Every file either scan reads, as repo-relative paths, sorted.
+
+    From `git ls-files` when there is a checkout, because "tracked by git" is
+    the definition a reader assumes and a hand-kept list cannot hold. Falls
+    back to a glob so the checker still runs from an unpacked archive -- which
+    is the exact situation CLAUDE.md mistake 16 says to run it in.
+    """
+    if "files" in _FILE_CACHE:
+        return _FILE_CACHE["files"]
+    out = []
+    try:
+        import subprocess
+        r = subprocess.run(["git", "ls-files"], cwd=here, capture_output=True,
+                           text=True, timeout=20)
+        if r.returncode == 0 and r.stdout.strip():
+            out = r.stdout.splitlines()
+    except (OSError, subprocess.SubprocessError):
+        out = []
+    if not out:
+        for ext in SCAN_EXT:
+            out += [os.path.relpath(p, here).replace("\\", "/")
+                    for p in glob.glob(os.path.join(here, "**", "*" + ext),
+                                       recursive=True)]
+    keep = sorted({
+        f.replace("\\", "/") for f in out
+        if f.endswith(SCAN_EXT)
+        and not f.replace("\\", "/").startswith(SCAN_SKIP_DIRS)
+    })
+    _FILE_CACHE["files"] = keep
+    return keep
+
+
+_TAG = re.compile(r"<[^>\n]*>")
+_ENTITY = {"&nbsp;": " ", "&amp;": "&", "&lt;": "<", "&gt;": ">",
+           "&quot;": '"', "&#39;": "'", "&deg;": "deg", "&minus;": "-",
+           "&ndash;": "-", "&mdash;": "--", "&times;": "x"}
+
+
+def read_lines(path):
+    """A file's lines as the SCANNER should see them, one entry per real line.
+
+    HTML and JS are stripped of tags and entities, so that
+    `<td><strong>548.6</strong></td>` reads as a number in prose. AUDIT2.md
+    M2-7b: `presentation/index.html` was inside the figure scan and only 8 of
+    25 figures could reach it, because every pattern in this file is anchored
+    to words and the words were on the other side of a tag.
+
+    Stripping is per line and never joins lines, so a reported line number is
+    still the line number in the file the reader will open.
+    """
+    try:
+        with open(path, encoding="utf-8") as fh:
+            block = fh.read().splitlines()
+    except (OSError, UnicodeDecodeError):
+        return [], []
+    if not path.endswith((".html", ".js")):
+        return block, block
+    clean = []
+    for line in block:
+        s = _TAG.sub(" ", line)
+        for k, v in _ENTITY.items():
+            s = s.replace(k, v)
+        clean.append(s)
+    return block, clean
 
 # A number as documents actually write it: "517", "43 853", "30 534", "1.4",
 # "-0.56", "+0.23". Thousands may be separated by a space or a non-breaking
@@ -171,6 +275,34 @@ def chk(label, got, claim, tol=0.0, unit=""):
     print(f"  {mark}  {label:50s} data {got!r:>10}   docs {claim!r}{unit}")
 
 
+_FIGTOKEN = re.compile(r"[-+]?\d+(?:\.\d+)?%?")
+
+
+def _marker_figures(annotation):
+    """The figures a RETIRED-OK marker names, as a set of number strings.
+
+    AUDIT2.md H2-6. A marker used to exempt its whole paragraph -- or its whole
+    SECTION -- from EVERY check, including the comparison against the live data.
+    Measured: 267 of README.md's 522 lines, 251 of CHECKPOINT.md's 1101. An
+    "8 of 11 -> 9 of 11" edit inside an exempt paragraph passed; the same edit
+    one line outside it failed.
+
+    So the marker now carries the figures it is excusing:
+
+        <!-- RETIRED-OK: 168.1, 113 -->   excuses ONLY those two numbers, in
+                                          this paragraph, in both scans.
+        <!-- RETIRED-OK: section 829.2 -->  the same, to the end of the section.
+
+    A marker that names NO figure keeps its old paragraph or section scope, but
+    only over the RETIRED scan -- the historical-record case it was written for.
+    It can no longer switch off the comparison against the data, because that
+    comparison is about what is TRUE TODAY and no marker should be able to
+    silence it. Bare markers are counted and printed per file so the remaining
+    blunt instrument is visible rather than invisible.
+    """
+    return {t.rstrip("%") for t in _FIGTOKEN.findall(annotation)}
+
+
 def _historical_lines(block, is_md):
     """1-based line numbers a RETIRED-OK marker legitimately covers.
 
@@ -199,12 +331,29 @@ def _historical_lines(block, is_md):
     In Python the paragraph form covers the marker's line and the eight after
     it, which is the length of a comment block in this repo.
     """
-    covered = set()
+    covered = {}
     for i, line in enumerate(block):
         if RETIRED_OK not in line:
             continue
-        after = line.split(RETIRED_OK, 1)[1][:24].lower()
-        whole_section = "section" in after
+        # A MENTION IS NOT A MARKER. Five passages in this repository discuss
+        # the mechanism -- "a passage must carry `<!-- RETIRED-OK -->`", "the
+        # marker exempts its whole paragraph" -- and every one of them was
+        # switching the checker off for the paragraph it appeared in, including
+        # one whose next sentence states a live and wrong dwell figure. An
+        # occurrence inside an inline code span (an odd number of backticks
+        # before it) is prose about the marker, not a marker.
+        if line[:line.index(RETIRED_OK)].count("`") % 2:
+            continue
+        annotation = line.split(RETIRED_OK, 1)[1]
+        annotation = annotation.split("-->")[0].lstrip(": \t")
+        # AUDIT2.md H2-6: the section form used to trigger on the SUBSTRING
+        # "section" anywhere in the first 24 characters, so a marker whose
+        # explanation happened to use the word took the whole section with it.
+        # It is a word now, and it has to be one of the comma-separated tokens.
+        tokens = [t.strip().lower() for t in re.split(r"[,;]", annotation)]
+        whole_section = any(t == "section" or t.startswith("section ")
+                            or t.startswith("section:") for t in tokens)
+        figures = _marker_figures(annotation)
         j = i
         if whole_section and is_md:
             j = i + 1
@@ -219,18 +368,41 @@ def _historical_lines(block, is_md):
         else:
             j = min(len(block) - 1, i + 8)
         for k in range(i, j + 1):
-            covered.add(k + 1)
+            prev = covered.get(k + 1)
+            covered[k + 1] = figures if prev is None else (prev | figures)
     return covered
 
 
-def _paragraph_is_historical(block, n, is_md):
-    """True if line n sits inside a passage marked as a historical record.
+def _num_token(value):
+    """A number as a marker would write it: '1.4', '168.1', '11', '-0.47'."""
+    if isinstance(value, float) and value == int(value):
+        return str(int(value))
+    return f"{value:g}" if isinstance(value, float) else str(value)
+
+
+def _paragraph_is_historical(block, n, is_md, figure=None, rel=None):
+    """True if line n is inside a passage marked historical FOR THIS FIGURE.
 
     Recomputed per call rather than cached: caching on id(block) looked cheap
     and is wrong, because CPython reuses an id once the old list is collected,
     so one file's exemptions could silently answer for another's.
+
+    `figure` is the value the scanner found written on the line. When the
+    marker names figures, only a matching one is excused. When it names none,
+    the exemption applies only where `figure is None` -- the RETIRED scan --
+    and never to the comparison against the live data. See `_marker_figures`.
     """
-    return n in _historical_lines(block, is_md)
+    covered = _historical_lines(block, is_md)
+    if n not in covered:
+        return False
+    named = covered[n]
+    if not named:
+        if rel is not None:
+            BARE_MARKERS[rel] = BARE_MARKERS.get(rel, 0) + 1
+        return figure is None
+    if figure is None:
+        return True
+    return _num_token(figure) in named or str(figure) in named
 
 
 def scan_documents(label, value, patterns, files, tol):
@@ -242,12 +414,19 @@ def scan_documents(label, value, patterns, files, tol):
     """
     global DOC_HITS
     hits = 0
+    # PER-PATTERN, not per-figure. The module docstring promises that "a
+    # pattern that matches NOTHING anywhere is reported as a warning, so a
+    # rotted pattern cannot sit silently forever" -- and the counter only
+    # checked the TOTAL across a figure's patterns, so one living pattern hid
+    # any number of dead ones beside it. Found the hard way: a \b in the
+    # novel-alert pattern was written as a literal backspace character and the
+    # figure still reported hits, from its sibling.
+    per_pattern = [0] * len(patterns)
     for rel in files:
         path = os.path.join(HERE, rel)
         if not os.path.exists(path):
             continue
-        with open(path, encoding="utf-8") as fh:
-            block = fh.read().splitlines()
+        raw, block = read_lines(path)
         is_md = path.endswith(".md")
         for n, line in enumerate(block, 1):
             # Documents wrap. The MAF sentence that went wrong -- "1020.0
@@ -261,7 +440,7 @@ def scan_documents(label, value, patterns, files, tol):
             # the joined window only when the line alone says nothing.
             nxt = block[n] if n < len(block) else ""
             window = line + " " + nxt.strip()
-            for pat in patterns:
+            for _pi, pat in enumerate(patterns):
                 found = list(re.finditer(pat, line))
                 used_window = False
                 if not found:
@@ -272,14 +451,21 @@ def scan_documents(label, value, patterns, files, tol):
                     if got is None:
                         continue
                     hits += 1
+                    per_pattern[_pi] += 1
                     DOC_HITS += 1
                     # Report the line the NUMBER is written on. When the match
                     # came from the joined window and the capture starts past
                     # the end of the first line, the figure is on the second.
                     lineno = n + 1 if (used_window and m.start(1) >= len(line)) else n
-                    src = block[lineno - 1] if lineno <= len(block) else line
+                    src = raw[lineno - 1] if lineno <= len(raw) else line
                     if abs(got - value) > tol:
-                        if _paragraph_is_historical(block, lineno, is_md):
+                        # Figure-specific: a marker has to NAME this number to
+                        # excuse it (AUDIT2.md H2-6).
+                        if _paragraph_is_historical(block, lineno, is_md,
+                                                    figure=got, rel=rel):
+                            EXEMPTED[rel] = EXEMPTED.get(rel, 0) + 1
+                            continue
+                        if _known_stale(rel, label, (rel, lineno, label, round(got, 4)), value=got):
                             continue
                         # A wrapped claim is still seen twice, once from each of
                         # its lines. Report it once.
@@ -290,6 +476,83 @@ def scan_documents(label, value, patterns, files, tol):
                             (rel, lineno, label, got, value, src.strip()[:100]))
     if hits == 0:
         DOC_UNMATCHED.append(label)
+    elif len(patterns) > 1:
+        for _pi, _n in enumerate(per_pattern):
+            if _n == 0:
+                DOC_UNMATCHED.append(f"{label}  [pattern {_pi + 1} of "
+                                     f"{len(patterns)} matched nothing]")
+    return hits
+
+
+def scan_allowed(label, allowed, patterns, files, tol=0.05):
+    """Fail if a document states a value for `label` that is not in `allowed`.
+
+    For a figure that legitimately has MORE THAN ONE correct value. The app's
+    peak estimated turbine is the case that forced it: `app/test_replay.py`
+    pins 890.6 C for `7475b5d7` and 608.0 C for `pull01`, both are written the
+    same way ("peak estimated turbine 890.6 C"), and no pattern separates them
+    -- so a single-valued check reports every correct mention of one of them as
+    a drift away from the other.
+
+    The claim this makes is the right one anyway: **any estimated-turbine peak
+    a document quotes must be one of the two the suite pins.** A drift to 895.1
+    fails, and so does the superseded 593.7, which is what should happen.
+    """
+    global DOC_HITS
+    hits = 0
+    # PER-PATTERN, not per-figure. The module docstring promises that "a
+    # pattern that matches NOTHING anywhere is reported as a warning, so a
+    # rotted pattern cannot sit silently forever" -- and the counter only
+    # checked the TOTAL across a figure's patterns, so one living pattern hid
+    # any number of dead ones beside it. Found the hard way: a \b in the
+    # novel-alert pattern was written as a literal backspace character and the
+    # figure still reported hits, from its sibling.
+    per_pattern = [0] * len(patterns)
+    for rel in files:
+        path = os.path.join(HERE, rel)
+        if not os.path.exists(path):
+            continue
+        raw, block = read_lines(path)
+        is_md = path.endswith(".md")
+        for n, line in enumerate(block, 1):
+            nxt = block[n] if n < len(block) else ""
+            window = line + " " + nxt.strip()
+            for _pi, pat in enumerate(patterns):
+                found = list(re.finditer(pat, line))
+                used_window = False
+                if not found:
+                    found = list(re.finditer(pat, window))
+                    used_window = True
+                for m in found:
+                    got = as_number(m.group(1))
+                    if got is None:
+                        continue
+                    hits += 1
+                    per_pattern[_pi] += 1
+                    DOC_HITS += 1
+                    lineno = n + 1 if (used_window and m.start(1) >= len(line)) else n
+                    if any(abs(got - a) <= tol for a in allowed):
+                        continue
+                    if _paragraph_is_historical(block, lineno, is_md,
+                                                figure=got, rel=rel):
+                        EXEMPTED[rel] = EXEMPTED.get(rel, 0) + 1
+                        continue
+                    if _known_stale(rel, label, (rel, lineno, label, round(got, 4)), value=got):
+                        continue
+                    src = raw[lineno - 1] if lineno <= len(raw) else line
+                    if any(r[0] == rel and r[2] == label and r[3] == got
+                           and abs(r[1] - lineno) <= 1 for r in DOC_FAILURES):
+                        continue
+                    DOC_FAILURES.append(
+                        (rel, lineno, label, got,
+                         " or ".join(str(a) for a in allowed), src.strip()[:100]))
+    if hits == 0:
+        DOC_UNMATCHED.append(label)
+    elif len(patterns) > 1:
+        for _pi, _n in enumerate(per_pattern):
+            if _n == 0:
+                DOC_UNMATCHED.append(f"{label}  [pattern {_pi + 1} of "
+                                     f"{len(patterns)} matched nothing]")
     return hits
 
 
@@ -460,10 +723,67 @@ RETIRED = [
     # is its own open question if the submission template requires one.
     (r"King\s+Abdul\s*[aA]ziz", "the wrong university, corrected in d57f3da",
      "University of Jeddah / جامعة جدة"),
+
+    # --- added 21 September 2026, from AUDIT2.md C2-1. THIS ONE GUARDS A CLAIM
+    # SHAPE, NOT A VALUE, and that is the whole point of it.
+    #
+    # `results/phase_d_seed0.txt` says "SIGHTED over BLINDED: +11.7 points <-
+    # THE ABLATION. This is the project's result." Those agents were trained on
+    # an invented six-speed gearbox that commit 27e720c replaced seven hours
+    # later; re-scored on this tree the same pair gives +7.5, and the +11.7
+    # cannot be regenerated here at all because the engine_env.py it needs no
+    # longer exists. The audit's verdict on which of the two is the result is
+    # "Neither."
+    #
+    # Retiring the NUMBER 11.7 would let 13.7 through -- and the auditor's own
+    # drift test did exactly that edit. So the pattern matches ANY sighted-over-
+    # blinded margin quoted in points. There is no correct value for it on this
+    # tree, and the honest guard is one that says so rather than one that
+    # blesses whatever number replaces the void one.
+    (r"(?i)sighted\s+over\s+blinded[^\n]{0,26}?[-−+]?\d+\.\d+\s*(?:points|pts)",
+     "a sighted-over-blinded ablation margin",
+     "NOTHING -- no Phase D ablation figure is quotable on this tree "
+     "(AUDIT2.md C2-1). Retrain both agents on the current plant first"),
+    (r"(?i)(?:sighted|with preview)[^\n]{0,34}?blind(?:ed)?[^\n]{0,26}?"
+     r"[-−+]?\d+\.\d+\s*(?:points|pts)",
+     "a sighted-versus-blinded ablation margin",
+     "NOTHING -- see AUDIT2.md C2-1; the pair must be retrained on this plant"),
+    # The same claim with the number in the middle: "sighted +11.7 points over
+    # blinded", which is how results/README.md writes it.
+    (r"(?i)sighted[^\n]{0,20}?[-−+]?\d+\.\d+\s*(?:points|pts)[^\n]{0,20}?"
+     r"over\s+blind",
+     "a sighted-over-blinded ablation margin, number in the middle",
+     "NOTHING -- see AUDIT2.md C2-1"),
+    # AND THE VALUE ITSELF, beside the shape. The shape pattern above cannot
+    # tell +11.7 from +13.7 -- it is written not to -- so on its own it counts
+    # a mention rather than watching it. This one matches only the void figure,
+    # so editing 11.7 to anything else makes its count DROP, which the
+    # known-stale ledger reports as a change. Shape catches a new claim; value
+    # catches an old claim being quietly rewritten. Both are needed.
+    #
+    # `points|pts` is required: CLAUDE.md mistake 13b carries a live and correct
+    # "+11.7 K" heat-soak offset that must not be touched.
+    (r"[-−+]?11\.7\s*(?:points|pts|-point)",
+     "the void +11.7 Phase D ablation margin (C2-1)",
+     "NOTHING -- it was produced on a gearbox this branch replaced seven hours "
+     "later, and re-scoring the same pair here gives a different number that is "
+     "not a result either"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to
 # contain retired values throughout. Exempting them is deliberate.
+#
+# AUDIT2.md C2-2 moved the figure scan onto the same file list as the retired
+# scan, so this set now governs BOTH. That is the right reading of what it has
+# always meant: a review or a changelog quotes the figure it found wrong, and
+# a checker that flags it is flagging the finding rather than the fault.
+# AUDIT2.md M2-4 says so explicitly about `AUDIT_FIXES.md` -- "do NOT add the
+# whole file to TRACKED_DOCS; split the live table into its own tracked file".
+#
+# THE COST IS REAL AND IS STATED WHERE THE AUDIT STATES IT: a file in here is
+# unguarded in full, so a LIVE wrong figure inside one passes. None of them is
+# a source of truth and nothing should be quoted from one without running the
+# script it cites.
 RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md",
                   # AUDIT.md is a review: quoting the figures it found wrong is
@@ -482,7 +802,13 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   # would pass. It is a report, not a source of truth, and
                   # nothing should ever be quoted from it without running the
                   # script it cites.
-                  "AUDIT2.md"}
+                  "AUDIT2.md",
+                  # The acceptance test for this file. Its whole content is
+                  # pairs of (correct figure, deliberately wrong figure) to
+                  # inject -- "959.8 at 884 C" beside "959.8 at 870 C" -- so a
+                  # scanner reading it finds the wrong half of every pair and
+                  # reports the test as the fault. Same call as AUDIT.md.
+                  "drift_test.py"}
 
 # A line that names a retired figure ON PURPOSE -- "the old 39.5 s figure is
 # void", the mistake log's was/should-say tables -- carries this marker. It is
@@ -490,6 +816,199 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
 # a live claim, and the point of this check is that nothing gets skipped by
 # accident. If you add the marker, you are asserting the line is history.
 RETIRED_OK = "RETIRED-OK"
+
+# ---------------------------------------------------------------------------
+# THE KNOWN-STALE LEDGER   (AUDIT2.md H2-1, H2-4, C2-3 -- fix 3, not yet done)
+# ---------------------------------------------------------------------------
+# Turning the guard on over the whole repository surfaced roughly two hundred
+# and fifty stale figures in one run. Every one of them is ALREADY a written
+# finding in AUDIT2.md with a fix scheduled: the document sweep (its fix 3).
+#
+# Three things could have been done with them and two are wrong.
+#
+#   1. Leave the checker red. A checker that is red for a week is a checker
+#      nobody reads, and this project's house rule is to run it before quoting
+#      any number. Red-by-default destroys the only signal it has.
+#   2. Exempt the files. That is the blunt instrument AUDIT2.md H2-6 is about,
+#      one level up, and it is how `presentation/index.html` drifted to void
+#      while sitting inside the figure scan.
+#   3. Count them. This.
+#
+# Each row is (file-or-prefix, figure label, AUDIT2 finding, exact count). The
+# hits are reported under KNOWN with the finding id beside them, and the COUNT
+# IS ASSERTED. One more occurrence fails -- the rot cannot grow. One fewer
+# fails too, and that is deliberate: when the sweep lands, the ledger row has
+# to be lowered in the same commit, which is the 14 September lesson ("a
+# retired-value list has to be swept when the value that replaced it moves
+# on") applied to the ledger itself.
+#
+# A row here is a DEBT with a named creditor. It is not an exemption: nothing
+# is hidden, the count is printed every run, and the total is printed at the
+# end so that "how much document rot is outstanding" is one number instead of
+# an afternoon's grepping.
+KNOWN_STALE = [
+    # --- figure-scan rot: the exact stale VALUES, so a stale line
+    #     cannot be edited into a differently stale one unnoticed.
+    ("ABSTRACT.md", "drives in the manifest", "H2-1", (9.0,)),
+    ("ABSTRACT.md", "quasi-steady samples behind the fit", "H2-1", (22.0,)),
+    ("ABSTRACT.md", "total minutes", "H2-1", (175.5,)),
+    ("CHECKPOINT.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
+    ("CHECKPOINT.md", "check_premise baseline damage", "H2-4", (294.2, 294.2, 829.2, 900.9)),
+    ("CHECKPOINT.md", "check_premise baseline peak turbine", "H2-4", (812.0, 812.0)),
+    ("CHECKPOINT.md", "drives in the manifest", "H2-1", (8.0,)),
+    ("CHECKPOINT.md", "drives that carry samples", "H2-1/H2-7", (5.0, 5.0)),
+    ("CHECKPOINT.md", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
+    ("CHECKPOINT.md", "load residual, k DERIVED, zero free parameters", "M2-1", (1.3,)),
+    ("CHECKPOINT.md", "seconds above 207 kPa", "M2-3", (178.0,)),
+    ("CHECKPOINT.md", "total minutes", "H2-1", (168.1, 175.5)),
+    ("CLAUDE.md", "app peak estimated turbine (either pinned drive)", "H2-4", (593.7,)),
+    ("CLAUDE.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
+    ("CLAUDE.md", "check_premise baseline damage", "H2-4", (256.5, 294.2, 294.2, 900.9)),
+    ("CLAUDE.md", "check_premise baseline peak turbine", "H2-4", (812.0, 812.0)),
+    ("CLAUDE.md", "fitted k, as compare_log prints it", "H2-1", (0.784, 0.837, 0.837)),
+    ("CLAUDE.md", "fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)", "H2-1", (0.351,)),
+    ("CLAUDE.md", "load residual, k DERIVED, zero free parameters", "M2-1", (1.3,)),
+    ("CONTROL_SCOPE.md", "distinct operating points", "H2-1", (22.0,)),
+    ("CONTROL_SCOPE.md", "drives in the manifest", "H2-1", (9.0,)),
+    ("CONTROL_SCOPE.md", "operating-point span, high end", "H2-1", (74.0,)),
+    ("CONTROL_SCOPE.md", "total minutes", "H2-1", (175.5,)),
+    ("DOC/SESSION_REPORT_2026-09-18.md", "check_premise baseline damage", "H2-4", (294.2,)),
+    ("DOC/SESSION_REPORT_2026-09-18.md", "check_premise baseline peak turbine", "H2-4", (812.0,)),
+    ("DOC/SESSION_REPORT_2026-09-18.md", "fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)", "H2-1", (0.351,)),
+    ("DOC/SESSION_REPORT_2026-09-18.md", "load residual, k DERIVED, zero free parameters", "M2-1", (1.3,)),
+    ("README.md", "check_premise baseline damage", "H2-4", (294.2,)),
+    ("README.md", "check_premise baseline peak turbine", "H2-4", (812.0,)),
+    ("README.md", "corr(lambda, air_gps)", "M2-3", (-0.49,)),
+    ("README.md", "corr(lambda, map_kpa)", "M2-3", (0.23,)),
+    ("README.md", "samples, 1000-3500 rpm above 180 kPa", "M2-3", (422.0,)),
+    ("README.md", "samples, 3500-4500 rpm above 180 kPa", "M2-3", (168.0,)),
+    ("README.md", "samples, 4500-7000 rpm above 180 kPa", "M2-3", (465.0,)),
+    ("README.md", "scenario speed, make_grade_climb(v_kmh=)", "C2-3", (110.0,)),
+    ("REFERENCES.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
+    ("SESSION_REPORT_2026-09-19.md", "check_premise baseline damage", "H2-4", (414.4, 414.4, 839.7)),
+    ("SESSION_REPORT_2026-09-19.md", "check_premise baseline peak turbine", "H2-4", (840.0,)),
+    ("check_map.py", "corr(lambda, dwell)", "M2-3", (-0.41,)),
+    ("check_map.py", "corr(lambda, rpm)", "M2-3", (-0.56,)),
+    ("handoff.md", "check_premise baseline damage", "H2-4", (294.2, 294.2)),
+    ("handoff.md", "check_premise baseline peak turbine", "H2-4", (812.0,)),
+    ("handoff.md", "fitted k, as compare_log prints it", "H2-1", (0.837, 0.837)),
+    ("presentation/README.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
+    ("presentation/index.html", "corr(lambda, map_kpa)", "M2-3", (0.23,)),
+    ("presentation/index.html", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
+    ("presentation/index.html", "samples pinned at the 1020 kg/h ceiling", "M2-2", (517.0,)),
+    ("presentation/index.html", "scenario speed, make_grade_climb(v_kmh=)", "C2-3", (110.0,)),
+    ("presentation/index.html", "total minutes", "H2-1", (175.5,)),
+    ("presentation/plan.html", "derived k = 269.6 / T_charge, mean over the 26 points", "M2-1", (0.829,)),
+    ("presentation/plan.html", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
+    ("presentation/plan.html", "total minutes", "H2-1", (168.1, 168.1, 175.5, 175.5)),
+    ("results/phase_d_seed0.txt", "check_premise baseline damage", "H2-4", (572.8,)),
+    ("thermal.py", "hottest oil anywhere in the logs", "M2-1", (107.0,)),
+    ("validate.py", "drives in the manifest", "H2-1", (9.0,)),
+    ("validate.py", "drives that carry samples", "H2-1/H2-7", (6.0,)),
+    ("validate.py", "total minutes", "H2-1", (175.5,)),
+    ("validation_table.md", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
+    # --- retired-scan rot: a COUNT, because the pattern is the value.
+    ("CHECKPOINT.md", "a sighted-over-blinded ablation margin", "C2-1", 1),
+    ("CHECKPOINT.md", "a sighted-versus-blinded ablation margin", "C2-1", 1),
+    ("CHECKPOINT.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 2),
+    ("DOC/SESSION_REPORT_2026-09-18.md", "a sighted-over-blinded ablation margin", "C2-1", 1),
+    ("DOC/SESSION_REPORT_2026-09-18.md", "a sighted-versus-blinded ablation margin", "C2-1", 2),
+    ("DOC/SESSION_REPORT_2026-09-18.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 2),
+    ("app/alerts.py", "the point span with the sensor as charge temp", "H2-1", 1),
+    ("presentation/data.js", "premise baseline with its cooling disabled (C1)", "C2-3", 2),
+    ("presentation/data.js", "premise predictive against a cooling-disabled baseline (C1)", "C2-3", 1),
+    ("presentation/data.js", "premise reactive against a cooling-disabled baseline (C1)", "C2-3", 1),
+    ("presentation/index.html", "dwell seconds from rows over an assumed 4.6 Hz (H3)", "C2-3", 1),
+    ("presentation/index.html", "premise baseline with its cooling disabled (C1)", "C2-3", 18),
+    ("presentation/index.html", "premise predictive against a cooling-disabled baseline (C1)", "C2-3", 15),
+    ("presentation/index.html", "premise reactive against a cooling-disabled baseline (C1)", "C2-3", 37),
+    ("presentation/index.html", "preview edge built on the C1 and C3 artefacts", "C2-3", 2),
+    ("presentation/index.html", "the H2 table measured against a cooling-disabled baseline (C1)", "C2-3", 4),
+    ("presentation/plan.html", "dataset size before pull01, the ninth drive", "C2-3", 2),
+    ("presentation/plan.html", "load residual before the correction", "C2-3", 4),
+    ("presentation/plan.html", "premise baseline with its cooling disabled (C1)", "C2-3", 2),
+    ("presentation/plan.html", "premise predictive against a cooling-disabled baseline (C1)", "C2-3", 2),
+    ("presentation/plan.html", "premise reactive against a cooling-disabled baseline (C1)", "C2-3", 4),
+    ("presentation/plan.html", "preview edge built on the C1 and C3 artefacts", "C2-3", 2),
+    ("presentation/plan.html", "the H2 table measured against a cooling-disabled baseline (C1)", "C2-3", 6),
+    ("presentation/plan.html", "the point span with the sensor as charge temp", "C2-3", 2),
+    ("results/README.md", "a sighted-over-blinded ablation margin, number in the middle", "C2-1", 1),
+    ("results/README.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 1),
+    ("results/phase_d_seed0.txt", "a sighted-over-blinded ablation margin", "C2-1", 1),
+    ("results/phase_d_seed0.txt", "a sighted-versus-blinded ablation margin", "C2-1", 1),
+    ("results/phase_d_seed0.txt", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 1),
+]
+
+
+
+
+_STALE_SEEN = {}
+
+
+_STALE_KEYS = set()
+_STALE_VALUES = {}
+
+
+def _known_stale(rel, label, key=None, value=None):
+    """True if (file, figure) is a ledgered, already-reported staleness.
+
+    `key` identifies the MENTION, so that one claim is counted once however
+    many patterns match it. Two patterns routinely hit the same figure on the
+    same line, and a claim that wraps is seen once from each of its two lines --
+    the same reason `scan_documents` de-duplicates its own failures. Counting
+    calls instead of mentions made every ledger row read double.
+
+    `value` is what the document actually said. IT IS RECORDED AND COMPARED,
+    because a count alone cannot see a stale line CHANGE. CLAUDE.md says the
+    premise baseline is "294.2 at 812 C"; both numbers are wrong and ledgered;
+    edit the 812 to 799 and the count does not move. A quarantine that watches
+    only how MANY wrong figures a file has is a quarantine a new wrong figure
+    can hide inside -- which is mistake 11's shape one more level down.
+    """
+    for row in KNOWN_STALE:
+        pref, lab, _finding, _spec = row
+        if lab == label and (rel == pref or rel.startswith(pref)):
+            if key is not None:
+                if key in _STALE_KEYS:
+                    return True
+                _STALE_KEYS.add(key)
+            _STALE_SEEN[(pref, lab)] = _STALE_SEEN.get((pref, lab), 0) + 1
+            if value is not None:
+                _STALE_VALUES.setdefault((pref, lab), []).append(round(value, 4))
+            return True
+    return False
+
+
+def report_known_stale():
+    """Print the ledger and fail if any row's count OR values have moved."""
+    if not KNOWN_STALE:
+        return
+    print("\nKNOWN STALE  (already-reported rot; AUDIT2.md fix 3 sweeps it)")
+    bad = 0
+    total = 0
+    for pref, lab, finding, spec in KNOWN_STALE:
+        got = _STALE_SEEN.get((pref, lab), 0)
+        total += got
+        want = len(spec) if isinstance(spec, (tuple, list)) else spec
+        seen = sorted(_STALE_VALUES.get((pref, lab), []))
+        mismatch = None
+        if got != want:
+            mismatch = f"count {got}, ledger says {want}"
+        elif isinstance(spec, (tuple, list)) and seen != sorted(spec):
+            mismatch = f"values {seen}, ledger says {sorted(spec)}"
+        if mismatch is None:
+            print(f"  known  {pref:<34} {lab:<34} {got:>4}  ({finding})")
+            continue
+        bad += 1
+        print(f"  WRONG  {pref:<34} {lab:<34} {got:>4}  {mismatch} ({finding})")
+    if bad:
+        print("  A row that GREW, or whose values moved, is NEW rot: fix the "
+              "document.")
+        print("  A row that SHRANK means the sweep landed: lower it here in the "
+              "same commit.")
+    RESULTS.append(not bad)
+    print(f"  {total} stale figure mentions outstanding across "
+          f"{len(KNOWN_STALE)} ledger rows")
 
 
 def check_simulation(here):
@@ -559,34 +1078,416 @@ def check_simulation(here):
         bool(V.test_convergence()), True)
 
 
+def check_scenario(here):
+    """The constants that DECIDE the experiment, and the figures they produce.
+
+    AUDIT2.md C2-2, and it is the finding this whole file exists to have caught
+    and did not. Until 21 September the only `engine_env` constant asserted
+    anywhere was `ENR_LOAD`. The auditor injected fourteen realistic drifts into
+    a copy of the tree and twelve went through green, including these two:
+
+        make_grade_climb(v_kmh=130.0) -> 120.0      the Phase D scenario
+        TURB_PROTECT_K = 1123.0       -> 1100.0     the protection trigger
+
+    Either one re-bases every damage figure, every peak and every "cuts N %" in
+    the repository, while every document goes on saying 130 km/h and 850 C. That
+    is not hypothetical: `results/phase_d_seed0.txt` says +11.7 points and was
+    produced on a gearbox this branch replaced seven hours later, and nothing
+    failed. CLAUDE.md's own rule is that "a preview advantage quoted without the
+    limit it was measured against is not a result" -- so the limit has to be a
+    checked number, not a remembered one.
+
+    WHAT IS ASSERTED HERE AND WHAT IS NOT. Everything below is read from the
+    LIVE object at the moment of the call -- `inspect.signature`, the class
+    attribute, the module constant, the script's own printed output. Nothing is
+    compared against a second copy of itself. Where a figure cannot be
+    recomputed cheaply it is said so in the label rather than quietly pinned.
+    """
+    import inspect
+    import subprocess
+
+    import engine_env as E
+    import evaluate as V
+    from app import test_replay as TR
+
+    print("\nTHE EXPERIMENT'S OWN CONSTANTS  (AUDIT2.md C2-2)")
+
+    # ---- the locked scenario, read from the function that defines it -------
+    sig = inspect.signature(E.make_grade_climb).parameters
+    grade = float(sig["grade"].default)
+    v_kmh = float(sig["v_kmh"].default)
+    t_amb = float(sig["t_amb"].default)
+
+    # "12 % at 130 km/h" and "12 % / 130 km/h" are how every document writes it.
+    # Anchored to the grade on the left so a bare speed elsewhere cannot match.
+    # THE AMBIENT IS PART OF THE ANCHOR, and it has to be. "12 % at 90 km/h"
+    # is a real and correct row of the grade-by-speed sweep that CHOSE this
+    # scenario (CLAUDE.md, 18 September), so a pattern keyed on the grade alone
+    # reports the sweep that justifies the row as a drift away from it. The
+    # scenario is written as a triple -- "12 % at 130 km/h, 42 C" / "12 % grade
+    # at 110 km/h in 42 C air" -- and the sweep rows never carry the ambient.
+    #
+    # EACH OF THOSE IS ANCHORED ON THE OTHER AXIS'S CORRECT VALUE, so a document
+    # that drifts BOTH -- "16 % at 110 km/h, 42 C", which is a real row of the
+    # sweep that chose the scenario and so the likeliest way to miscopy it --
+    # matches neither. The third pattern below keys on the words only the
+    # locked scenario carries and validates the speed with the grade free.
+    _AMB = r"\s*km/h[,\s]+(?:in\s+)?4[0-9]\s*°?\s*C"
+    V_PAT = [r"12\s*%\s*(?:grade\s*)?(?:at|/)\s*\*{0,2}" + NUM + r"\s*\*{0,2}" + _AMB,
+             r"(?:locked|standard|evaluation|Phase D)[^.\n]{0,40}?scenario"
+             r"[^.\n]{0,30}?\d+\s*%[^.\n]{0,12}?(?:at|/)\s*\*{0,2}" + NUM
+             + r"\s*\*{0,2}\s*km/h"]
+    G_PAT = [NUM + r"\s*%\s*(?:grade\s*)?(?:at|/)\s*\*{0,2}130\s*\*{0,2}" + _AMB]
+    figure("scenario speed, make_grade_climb(v_kmh=)", v_kmh, 130.0, 0.0, " km/h",
+           patterns=V_PAT, files=ALL, dtol=0.5)
+    figure("scenario grade, make_grade_climb(grade=)", round(100 * grade, 1), 12.0,
+           0.0, " %", patterns=G_PAT, files=ALL, dtol=0.5)
+    # 42 C and 315 K collide with far too much prose to scan for -- the ambient
+    # appears in the thermal fit, the J2807 table and every drive card. Asserted
+    # as a VALUE only, and that is the assertion that matters: a changed default
+    # is what re-bases the experiment.
+    chk("scenario ambient, make_grade_climb(t_amb=)", t_amb, 315.0, 0.0, " K")
+    chk("training episode length, make_grade_climb(duration=)",
+        float(sig["duration"].default), 900.0, 0.0, " s")
+    chk("training step, make_grade_climb(dt=)", float(sig["dt"].default), 0.2, 0.0, " s")
+
+    # ---- the protection trigger -------------------------------------------
+    # A VALUE ASSERTION, and it says so instead of dressing up as a document
+    # scan. This used to pass `patterns=[TURB_PROTECT_K = NUM]` over `ENV`,
+    # which is `["engine_env.py"]` -- the module the value had been read from
+    # two lines earlier. The "document" it scanned was the assignment statement
+    # that produced the number, so the comparison was 1123.0 against 1123.0 and
+    # could not fail, and DOC_UNMATCHED could never fire for it either. The
+    # Celsius form below is the one that actually asks the documents.
+    chk("TURB_PROTECT_K, the damage knee", float(E.TURB_PROTECT_K), 1123.0, 0.0, " K")
+    chk("OIL_PROTECT_K", float(E.OIL_PROTECT_K), 408.0, 0.0, " K")
+    figure("the trigger in Celsius, as the documents write it",
+           round(float(E.TURB_PROTECT_K) - 273.15), 850, 0.0, " C",
+           # ANCHORED HARD ON PURPOSE. A 26-character window around the word
+           # "trigger" also captures the neighbouring number in "the 850 C
+           # trigger sits inside the 825-925 C band" -- a correct sentence --
+           # and, through the wrapped-line window, an unrelated EGT band row.
+           # One pattern, not two: the "trigger of/is/at N C" form matched
+           # nothing anywhere, and the new per-pattern rot warning said so.
+           patterns=[r"\b" + NUM + r"\s*°?\s*C\s+(?:trigger|protection limit)\b"],
+           files=ALL, dtol=0.6)
+
+    # ---- the gearbox -------------------------------------------------------
+    # AUDIT2.md C2-1: the six-speed that produced +11.7 differed from the ZF in
+    # nothing a document could see. The ratios are a VALUE assertion because a
+    # prose pattern loose enough to find a ratio table also finds every other
+    # decimal in the repository; the value is what actually moved.
+    chk("Vehicle.gears, the ZF 8HP51 ratio set",
+        [round(float(g), 3) for g in E.Vehicle.gears],
+        [5.25, 3.36, 2.172, 1.72, 1.316, 1.0, 0.822, 0.64])
+    # Same tautology as TURB_PROTECT_K above: `final_drive = 3.150` is the line
+    # the value came from. A value assertion, honestly labelled.
+    chk("Vehicle.final_drive", float(E.Vehicle.final_drive), 3.150, 0.0)
+    chk("the gearbox has eight forward ratios", len(E.Vehicle.gears), 8)
+
+    # ---- the evaluation protocol ------------------------------------------
+    chk("evaluate.DT", float(V.DT), 1.0, 0.0, " s")
+    chk("evaluate.DURATION", float(V.DURATION), 720.0, 0.0, " s")
+    chk("evaluate.EPISODES, the frozen set", len(V.EPISODES), 20)
+    # The hash is the guard the file's own docstring asks for: "THE TWENTY
+    # EPISODES ARE FROZEN. DO NOT EDIT EPISODES." Nothing enforced that. A
+    # single weight changing in the fourteenth tuple moves every median in
+    # Phase D and leaves no trace anywhere else.
+    #
+    # YES, THIS IS A CONSTANT COMPARED AGAINST ITSELF, which is the failure this
+    # file's docstring is named after -- so say why it is the right shape here
+    # and not an exception being smuggled in. Every other check recomputes a
+    # figure from the shipped data, because the data is the authority and the
+    # document is the copy. A FROZEN SET HAS NO SUCH AUTHORITY: its whole
+    # content is "these twenty pairs, unchanged since 18 September 2026". There
+    # is nothing to recompute it from, and the literal below IS the record that
+    # it has not moved. The test to apply is the one this project uses for
+    # everything else -- could this check fail? It can, on any edit to any of
+    # the sixty numbers, which is precisely the event it exists to stop.
+    import fingerprint as FP
+    chk("evaluate.EPISODES hash (frozen 18 Sep 2026)",
+        FP.episodes_sha(), "05a598a574268b20")
+
+    # ---- the BASELINE ROW of check_premise.py, RUN, not remembered ---------
+    #
+    # SAY WHAT IS AND IS NOT COVERED. This runs ONE of the script's five
+    # policies. `check_premise.py` prints a five-row table and three "cuts
+    # damage N %" lines; two of those ten numbers are asserted here and the
+    # eight produced by the reactive, current-grade and predictive rows are
+    # NOT -- change `_protect`'s spark trim and every protecting row moves
+    # while this stays green.
+    #
+    # The baseline row is the one chosen because it is the row the binding
+    # question turns on, and because it is what the three entry-point documents
+    # get wrong today (H2-4). Asserting the other three costs about 190 s more.
+    # Until that is spent, the honest label is "the baseline row", which is why
+    # it is written that way below rather than as "what check_premise prints".
+    # AUDIT2.md H2-4: CLAUDE.md, README.md and handoff.md all tell a reader the
+    # constraint does NOT bind and the baseline is 294.2 at 812 C. On this tree
+    # the script prints 959.8 at 884 C and the constraint binds by 34 K. The
+    # binding question is the one the whole experiment turns on, and it was the
+    # one figure in the repository with no check of any kind on it.
+    #
+    # This costs about 35 seconds, which is most of this script's runtime. It is
+    # one 720 s episode of the neutral policy -- the same rollout check_premise
+    # runs first -- and it is worth the wait for the reason above.
+    import time as _time
+    import check_premise as CP
+    _t0 = _time.time()
+    r = CP.rollout(CP.p_neutral)
+    print(f"  note   one neutral premise rollout, {_time.time() - _t0:.0f} s")
+    figure("check_premise baseline damage", round(float(r["damage"]), 1), 959.8, 0.3,
+           # THREE DIGITS AND ONE DECIMAL. Every damage figure this project has
+           # ever published is written that way (959.8, 572.8, 294.2, 414.4),
+           # and a bare NUM after the word "baseline" reads the 1.0 out of
+           # "coolant pump | baseline at 1.0" and "the baseline fan never
+           # reaches 1.0".
+           # THREE FORMS, because this project writes results three ways and the
+           # prose form alone was blind to two of them. `[^.\n|]` stops dead at
+           # a markdown pipe, so `| baseline ECU (true neutral) | 3620 | 294.2 |
+           # 812 C |` -- the void table in the PUBLIC README -- matched nothing;
+           # and a pasted console block puts more than 26 characters of padding
+           # between the word and the number.
+           patterns=[r"baseline[^.\n|]{0,26}?\b(\d{3}\.\d)\b",
+                     r"\b(\d{3}\.\d)\s+at\s+\d{3}\s*°?\s*C",
+                     r"^[>\s]*\|[^|\n]*baseline[^|\n]*\|[^|\n]*\|\s*\*{0,2}"
+                     r"(\d{3}\.\d)\s*\*{0,2}\s*\|",
+                     r"^[>\s]*baseline[^|\n]{0,40}?\s(\d{3}\.\d)\s"],
+           files=ALL, dtol=0.3)
+    figure("check_premise baseline peak turbine",
+           round(float(r["peak_turb"])), 884, 0.6, " C",
+           # ANY "baseline <damage> at <peak> C" sentence, not just one that
+           # already carries the right damage. CLAUDE.md says "baseline 294.2 at
+           # 812 C" -- both halves wrong -- and a pattern anchored on 959.8
+           # cannot see the 812 at all, so the peak could drift again inside an
+           # already-wrong line without anything moving.
+           patterns=[r"baseline[^.\n|]{0,26}?\d{3}\.\d\s*(?:at|/|\|)\s*\*{0,2}"
+                     + NUM + r"\s*\*{0,2}\s*°?\s*C",
+                     r"\b(?:959\.8|960)\b[^.\n|]{0,14}?(?:at|/|\|)\s*\*{0,2}" + NUM
+                     + r"\s*\*{0,2}\s*°?\s*C",
+                     # the pipe-table form, as the README writes it
+                     r"^[>\s]*\|[^|\n]*baseline[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*\*{0,2}"
+                     + NUM + r"\s*\*{0,2}\s*°?\s*C\s*\*{0,2}\s*\|"],
+           files=ALL, dtol=0.6)
+    binds = float(r["peak_turb"]) > float(E.TURB_PROTECT_K) - 273.15
+    chk("the constraint BINDS on the locked scenario", binds, True)
+
+    # ---- Phase B's headline residual, read off compare_log's own output ----
+    # AUDIT2.md M2-1 and drift row 4: "1.4 % with zero fitted parameters" is the
+    # sentence Phase B rests on and nothing asserted it. Rather than duplicate
+    # the arithmetic here -- which would be a checker checking itself -- run the
+    # script and read what it prints, which is the project's own rule.
+    rc, text, err = None, "", ""
+    try:
+        out = subprocess.run([sys.executable, "compare_log.py",
+                              "data/master_points.csv"], cwd=here,
+                             capture_output=True, text=True, timeout=300,
+                             encoding="utf-8", errors="replace")
+        rc, text, err = out.returncode, out.stdout, out.stderr
+    except (OSError, subprocess.SubprocessError) as exc:
+        err = str(exc)
+    # THE EXIT CODE IS PART OF THE READING. compare_log.py prints the residual
+    # block two thirds of the way through its output and can die in any of the
+    # twenty lines after it -- including `raise SystemExit(2)` on its own
+    # "too few points, NOT A PASS" path. Reading only stdout would then find
+    # both regexes on already-printed text and report three green checks for a
+    # script that failed. That is mistake 9's shape: a check that fails open
+    # still prints a number.
+    chk("compare_log.py exited 0", rc, 0)
+    if rc != 0:
+        print(f"  note   compare_log.py returned {rc}; "
+              f"stderr tail: {_console_safe(err.strip()[-160:]) or '(empty)'}")
+    m_fit = re.search(r"FITTED\s+k\s*=\s*([\d.]+)\s+residual MAPE\s+([\d.]+)", text)
+    m_der = re.search(r"DERIVED[^\n]*?residual MAPE\s+([\d.]+)", text)
+    if m_fit and m_der:
+        figure("load residual, k DERIVED, zero free parameters",
+               float(m_der.group(1)), 1.4, 0.05, " %",
+               # ONE pattern, on ONE line. The "derived ... residual ... N %"
+               # form matched compare_log.py's own explanation of what this
+               # residual does on the WRONG engine (48.1 %) -- which is the
+               # subject of that paragraph and of CLAUDE.md mistake 12.
+               patterns=[r"\b" + NUM + r"\s*%\s*(?:with\s+)?(?:the\s+)?"
+                         r"(?:derived|zero fitted|with zero)"],
+               files=ALL, dtol=0.05)
+        # BOTH OF THESE SCAN THE DOCUMENTS NOW, and they did not on the first
+        # pass -- they were `chk`s, so the value was read out of compare_log and
+        # compared with a literal here, and no document was ever consulted.
+        # AUDIT2.md M2-1 names exactly this: the script prints 0.839 and the
+        # fitted k is written 0.837 in eleven places. Reading the script and
+        # then not asking the documents is half of this file's job.
+        figure("load residual, k FITTED, one free parameter",
+               float(m_fit.group(2)), 1.1, 0.05, " %",
+               patterns=[r"\b" + NUM + r"\s*%\s*(?:with\s+)?(?:the\s+)?"
+                         r"(?:one fitted|fitted k|with the one)"],
+               files=ALL, dtol=0.05)
+        figure("fitted k, as compare_log prints it", float(m_fit.group(1)),
+               0.839, 0.001,
+               # The window must not step over the word "derived": CLAUDE.md
+               # writes both constants in one sentence -- "1.4 % with zero
+               # FITTED parameters (DERIVED k = 0.831), 1.1 % with the one
+               # fitted k (0.837)" -- and a plain window reads the derived
+               # constant as the fitted one.
+               patterns=[r"[Ff]itted(?:(?!derived)[^\n]){0,26}?k"
+                         r"(?:(?!derived)[^\n]){0,14}?\b(0\.\d{3})\b",
+                         r"k,?\s*fitted[^\n]{0,22}?\b(0\.\d{3})\b"],
+               files=ALL, dtol=0.001)
+    else:
+        chk("compare_log.py printed its residual block", False, True)
+
+    # ---- the live app's pinned regression numbers --------------------------
+    # AUDIT2.md C2-2. `app/test_replay.py` is the only place these exist, and
+    # CLAUDE.md quotes the peak in three sentences that nothing compares against
+    # it. They are NOT measurements -- the peak is a model output whose heat
+    # capacity is assumed, and the alert counts are a property of thresholds
+    # this project chose. They are pinned so a regression is visible, and the
+    # documents that repeat them have to move when the pin does.
+    chk("app peak 7475b5d7 (MODEL OUTPUT; a pin, not a run of the suite)",
+        float(TR.EXPECT_FULL["peak_turb_c"]), 890.6, 0.0, " C")
+    chk("app peak pull01 (MODEL OUTPUT; a pin, not a run of the suite)",
+        float(TR.EXPECT_FAST["peak_turb_c"]), 608.0, 0.0, " C")
+    # The two drives' peaks are written identically, so the documents are
+    # checked against BOTH pinned values at once -- see scan_allowed(). The word
+    # TURBINE has to be in the sentence: `7475b5d7` is also the drive behind the
+    # 45 C ambient, the 111 C oil peak and the 55-minute duration, and
+    # "estimated turbine ... 850 C" is the trigger, not a peak.
+    scan_allowed("app peak estimated turbine (either pinned drive)",
+                 [float(TR.EXPECT_FULL["peak_turb_c"]),
+                  float(TR.EXPECT_FAST["peak_turb_c"])],
+                 [r"(?:peak\s+)?estimated turbine[^.\n|]{0,30}?\*{0,2}" + NUM
+                  + r"\s*\*{0,2}\s*\u00b0?\s*C\b(?!\s*trigger)",
+                  r"7475b5d7[^.\n|]{0,34}?turbine[^.\n|]{0,26}?\*{0,2}" + NUM
+                  + r"\s*\*{0,2}\s*\u00b0?\s*C\b(?!\s*trigger)"],
+                 ALL)
+
+    # THE TRIO IS THE ANCHOR. Documents always write these three together --
+    # "13 thermal / 0 mismatch / 19 novel" -- and a bare "N thermal" also reads
+    # pull01's 1 thermal and 4 novel, which are correct figures for that drive.
+    figure("app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)",
+           int(TR.EXPECT_FULL["thermal"]), 15, 0,
+           patterns=[r"\b" + NUM + r"\s+thermal\s*[/\u00b7]\s*\d+\s+mismatch"],
+           files=ALL)
+    # The third leg of the trio. The comment above says "documents always write
+    # these three together" and then only two of the three were ever captured:
+    # the thermal pattern swallowed the mismatch count as bare context and the
+    # novel pattern used it as a literal anchor, so a document could say
+    # "15 thermal / 3 mismatch / 19 novel" and pass.
+    figure("app mismatch alerts on 7475b5d7", int(TR.EXPECT_FULL["mismatch"]), 0,
+           patterns=[r"thermal\s*[/·]\s*" + NUM + r"\s+mismatch\b"],
+           files=ALL)
+    figure("app novel-operating-point alerts on 7475b5d7",
+           int(TR.EXPECT_FULL["novel"]), 19, 0,
+           patterns=[r"mismatch\s*[/·]\s*" + NUM + r"\s+novel\b"], files=ALL)
+
+    # ---- the replay coverage figure ----------------------------------------
+    # 36 seconds above the trigger in 292.0 replayed minutes. Both inputs are
+    # pinned prose from CLAUDE.md's ten-drive replay table, NOT recomputed here
+    # -- replaying ten drives takes an hour. So this asserts the ARITHMETIC and
+    # the documents' agreement with it, and says so rather than implying more.
+    #
+    # THE THIRD DECIMAL IS NOT DETERMINED BY THOSE INPUTS, and the tolerance
+    # says so instead of hiding it. 36 / (292.0 x 60) is 0.2055 %, which rounds
+    # to 0.205; the documents say 0.206, which is what 36 s over 291.4 minutes
+    # gives. Both are consistent with prose rounded to one decimal minute, so
+    # pinning either to three decimals would be false precision -- the check is
+    # sized to catch a drift (0.206 -> 0.306 was one of the audit's injected
+    # ones) and not to adjudicate the last digit.
+    figure("fraction of replayed time above the trigger "
+           "(36 s / 292.0 min, both pinned prose; last digit undetermined)",
+           round(100.0 * 36.0 / (292.0 * 60.0), 3), 0.205, 0.002, " %",
+           # "N % of ... trigger" reached across a wrapped line into a grade
+           # table and into "80 % of the run". Require the claim's own words.
+           # The capture requires a DECIMAL POINT. This figure is always written
+           # to three places (0.206 %, 0.351 %); an integer percentage in the
+           # same sentence is a grade or a duty cycle, and "12 % maximum for
+           # 80 % of the run" was being read as a drifted 0.205.
+           # FIVE FORMS, because the three written first matched none of the
+           # three places CLAUDE.md actually states this figure, and the
+           # acceptance test reported the row MISSED. The repository writes it
+           # as a table cell ("36 s = 0.206 %"), as a sentence opener ("0.206 %
+           # is itself a result about H/tau") and as a comparison ("0.351 % over
+           # 172.6 minutes to 0.206 % over 292.0 minutes").
+           # Three forms, kept because each one matches somewhere. Two more were
+           # written and deleted the same hour: "N % above the trigger" and
+           # "N % of replayed" match nothing in this repository, and the
+           # per-pattern rot warning is what said so.
+           patterns=[r"above the (?:trigger|limit)[^.\n]{0,26}?\b(\d+\.\d+)\s*%",
+                     r"\b\d+\s*s\s*=\s*\*{0,2}(\d+\.\d+)\s*\*{0,2}\s*%",
+                     r"\*{0,2}(\d+\.\d+)\s*%\*{0,2}\s+over\s+\d+\.\d+\s*(?:min|replayed)"],
+           files=ALL, dtol=0.002)
+
+
 def check_retired(here):
-    """Fail if any document still quotes a figure this project has retired."""
+    """Fail if any document still quotes a figure this project has retired.
+
+    AUDIT2.md C2-3 and M2-7d: this used to glob `**/*.md` plus ROOT-LEVEL
+    `*.py`, so `app/*.py`, every `.html` and `presentation/*.js` were outside
+    it -- which is why the examiner-facing deck could carry the void premise
+    set on a hundred lines under a green run. It reads `tracked_files()` now,
+    the same list the figure scan reads.
+    """
     print("\nRETIRED FIGURES  (mistake 11 -- the old value must not survive)")
-    docs = [p for p in glob.glob(os.path.join(here, "**", "*.md"), recursive=True)
-            if os.path.basename(p) not in RETIRED_EXEMPT]
-    docs += [p for p in glob.glob(os.path.join(here, "*.py"))
-             if os.path.basename(p) != os.path.basename(__file__)]
+    docs = [f for f in tracked_files(here)
+            if os.path.basename(f) not in RETIRED_EXEMPT
+            and os.path.basename(f) != os.path.basename(__file__)]
 
     found, n_marked = [], 0
-    for path in sorted(docs):
-        with open(path, encoding="utf-8") as fh:
-            block = fh.read().splitlines()
+    for rel in docs:
+        path = os.path.join(here, rel)
+        raw, block = read_lines(path)
         is_md = path.endswith(".md")
         for n, line in enumerate(block, 1):
             for pat, was, now in RETIRED:
                 if re.search(pat, line):
-                    if _paragraph_is_historical(block, n, is_md):
+                    if _paragraph_is_historical(block, n, is_md, rel=rel):
                         n_marked += 1
+                        EXEMPTED[rel] = EXEMPTED.get(rel, 0) + 1
+                    elif _known_stale(rel, was, (rel, n, was)):
+                        pass
                     else:
-                        found.append((os.path.relpath(path, here), n, was, now))
+                        found.append((rel, n, was, now))
 
     for rel, n, was, now in found:
         print(f"  WRONG  {rel}:{n}  still quotes {was}  -> should be {now}")
     RESULTS.append(not found)
-    if not found:
+    if found:
+        # AUDIT2.md M2-7e: every document drift used to collapse into the
+        # single line "1 of 38 checks failed", so a run that found one stale
+        # figure and a run that found ninety read identically.
+        by_file = {}
+        for rel, _n, _was, _now in found:
+            by_file[rel] = by_file.get(rel, 0) + 1
+        print(f"  {len(found)} live retired-figure mention(s) in "
+              f"{len(by_file)} file(s): "
+              + ", ".join(f"{k} x{v}" for k, v in sorted(by_file.items())))
+    else:
         print(f"  ok     none of the {len(RETIRED)} retired figures appear as a "
               f"live claim in {len(docs)} tracked files")
         print(f"         ({n_marked} historical mentions marked {RETIRED_OK})")
+
+
+def report_exemptions():
+    """Print how much of each file a RETIRED-OK marker switched off.
+
+    AUDIT2.md H2-6 asked for exactly this line and it is the point of the whole
+    mechanism: an exemption nobody can see is indistinguishable from a check
+    that does not exist. The measured figures that prompted it were README.md
+    267 lines of 522 and CHECKPOINT.md 251 of 1101 -- half the public README,
+    exempted by a marker whose scope nobody had counted.
+    """
+    if not EXEMPTED and not BARE_MARKERS:
+        return
+    print("\nEXEMPTIONS  (what RETIRED-OK switched off, and where)")
+    for rel in sorted(set(EXEMPTED) | set(BARE_MARKERS)):
+        n_fig = EXEMPTED.get(rel, 0)
+        n_bare = BARE_MARKERS.get(rel, 0)
+        print(f"  note   {rel:<44} {n_fig:>4} mention(s) excused"
+              + (f", {n_bare} by a marker naming no figure" if n_bare else ""))
+    total_bare = sum(BARE_MARKERS.values())
+    if total_bare:
+        print(f"  A marker that names no figure can only excuse the RETIRED scan, "
+              f"never the\n  comparison against live data (H2-6). {total_bare} "
+              f"such mention(s) this run; annotate\n  them "
+              f"'{RETIRED_OK}: <figures>' as they are touched.")
 
 
 def _console_safe(text):
@@ -620,7 +1521,7 @@ def report_documents():
         print(_console_safe(f"         | {line}"))
     RESULTS.append(not DOC_FAILURES)
     if not DOC_FAILURES:
-        print(f"  ok     {DOC_HITS} figure mentions across {len(TRACKED_DOCS)} "
+        print(f"  ok     {DOC_HITS} figure mentions across {len(ALL)} "
               f"tracked files all agree with the data")
     if DOC_UNMATCHED:
         print(f"  note   {len(DOC_UNMATCHED)} pattern(s) matched nothing anywhere "
@@ -633,7 +1534,14 @@ def report_documents():
 # below reads as a specification rather than as path handling.
 MD = ["CLAUDE.md", "README.md", "validation_table.md"]
 MD_CH = MD + ["logs/CHANNEL_SET_FINAL.md"]
-ALL = TRACKED_DOCS
+# AUDIT2.md C2-2: `ALL` was the 15-name TRACKED_DOCS list. It is now every
+# tracked document, so `ABSTRACT.md`, `CONTROL_SCOPE.md`, `results/`, `DOC/`,
+# `team/`, `presentation/plan.html` and `presentation/data.js` -- each of which
+# the audit found carrying a wrong figure -- are inside the scan by default
+# rather than by somebody remembering to add them.
+ALL = [f for f in tracked_files(HERE)
+       if os.path.basename(f) not in RETIRED_EXEMPT
+       and os.path.basename(f) != os.path.basename(__file__)]
 ENV = ["engine_env.py"]
 
 
@@ -653,10 +1561,25 @@ def main():
            # Anchored to a DATASET-SCALE drive count. validation_table.md says
            # "three drives (80 minutes)" about the thermal fit, which is a
            # different quantity; a looser pattern reports it as a wrong total.
-           patterns=[NUM + r"\s*min(?:ute)?s?\b[^.\n]{0,30}?"
-                     r"(?:pooled|dataset|manifest|\b(?:6|7|8|six|seven|eight)\b\s*drives)",
-                     r"\b(?:6|7|8|six|seven|eight)\s+drives[^.\n]{0,30}?\b" + NUM
-                     + r"\s*min(?:ute)?s?\b"],
+           # `(?<!adds )` because CLAUDE.md's "`pull01` adds 7.5 minutes and zero
+           # samples" wraps onto the line below "...rest on eight drives of
+           # samples:", and the joined window then reads 7.5 as the pooled
+           # total. It is a CORRECT sentence about one drive's contribution.
+           # THE DRIVE ALTERNATION INCLUDES THE CURRENT COUNT, and until
+           # 21 September it did not. It ran `6|7|8|six|seven|eight`, written
+           # when eight was the total, so every one of CLAUDE.md's five LIVE
+           # "295.0 minutes ... ten drives" sentences matched nothing and the
+           # figure the whole dataset rests on was unguarded in the file that
+           # matters most. AUDIT2.md M2-7(a); it was also one of two rows the
+           # acceptance test still reported MISSED.
+           #
+           # Keep the old numbers in the alternation: a sentence that says
+           # "eight drives, 295.0 minutes" is wrong in a way worth catching.
+           patterns=[r"(?<!adds )" + NUM + r"\s*min(?:ute)?s?\b[^.\n]{0,30}?"
+                     r"(?:pooled|dataset|manifest|"
+                     r"\b(?:6|7|8|9|10|six|seven|eight|nine|ten)\b\s*drives)",
+                     r"\b(?:6|7|8|9|10|six|seven|eight|nine|ten)\s+drives"
+                     r"[^.\n]{0,30}?(?<!adds )\b" + NUM + r"\s*min(?:ute)?s?\b"],
            files=ALL, dtol=0.15)
     figure("drives in the manifest", len(M), 10, 0,
            patterns=[WORDNUM + r"\s+drives,?\s+(?:and\s+)?\d+(?:\.\d+)?\s*min",
@@ -896,8 +1819,11 @@ def main():
     # away. Found by re-running the auditor's own drift test and
     # watching it pass with the drift injected.
     check_simulation(here)
+    check_scenario(here)
     report_documents()
     check_retired(here)
+    report_known_stale()
+    report_exemptions()
 
     bad = RESULTS.count(False)
     print("\n" + "=" * 72)

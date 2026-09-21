@@ -74,10 +74,11 @@ LOG_FULL = os.path.join(ROOT, "logs", "raw", "7475b5d7-20260908_142743.csv")
 #                                the steady state at that operating point is
 #                                genuinely at or above 850 C.
 #
+# RETIRED-OK: 884.9 -- the audit-fix figure, superseded by H1 eleven lines down
 # 7475b5d7's PEAK is unchanged at 884.9 C, which is the check that the
 # estimator's physics did not move: that drive reports spark and lambda, so the
 # fallback path never runs on it, and the turbine node does not depend on the
-# block node that M11 pinned.
+# block node that M11 pinned.  (It is 890.6 C since the crank-angle fix below.)
 # ---------------------------------------------------------------------------
 #
 # MOVED AGAIN 16 SEPTEMBER by the H1 fix. `plant.DTHETA_DEG` went 0.5 -> 0.25
