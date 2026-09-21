@@ -1,0 +1,699 @@
+==============================================================================
+FULL VERIFICATION RUN
+==============================================================================
+date          2026-09-21
+commit        8bb7342dd97f543e11136e97e7b56752f2c441b8
+working tree  DIRTY -- see below
+              M .gitignore
+               M app/estimator.py
+               M app/server.py
+               M app/static/index.html
+              ?? app/package-lock.json
+              ?? app/package.json
+              ?? app/replay.py
+              ?? app/static/sim/
+              ?? app/static/simulation.html
+              ?? app/test_simulation.py
+              ?? app/vendor.mjs
+              ?? docs/
+              ?? full_run.py
+python        3.12.10
+
+Every block records its EXIT CODE. A block with a non-zero code is not a
+source of figures, whatever it printed before it stopped.
+
+
+==============================================================================
+[1/10]  build_dataset.py — regenerates data/ from logs/raw/
+         $ python build_dataset.py logs/raw/*.csv
+         read for: minutes, drives, operating points, the span, pinned samples
+==============================================================================
+EXIT CODE 0   (3 s)
+
+  3aca2ec1: rejected 0 window(s) for wall-clock span, 0 for a logger gap; 10 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  670063b2: rejected 46 window(s) for wall-clock span, 0 for a logger gap; 3 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  683640a0: rejected 0 window(s) for wall-clock span, 0 for a logger gap; 8 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  7475b5d7: rejected 0 window(s) for wall-clock span, 0 for a logger gap; 22 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  cb67b01f: rejected 41 window(s) for wall-clock span, 0 for a logger gap; 5 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  drive10-: rejected 46 window(s) for wall-clock span, 0 for a logger gap; 7 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  fb988991: rejected 22 window(s) for wall-clock span, 116 for a logger gap; 57 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  dropped 2 window(s) with fuel cut (negative spark, or lambda outside 0.70-1.10)
+
+MASTER DATASET  (2026-09-21 16:19)
+
+  manifest.csv               10 rows
+  master_points.csv          26 rows
+  master_samples.csv      82984 rows
+
+drive                                           min     Hz   ch   pts  maxMAP  minlam
+------------------------------------------------------------------------------------
+3aca2ec1-20260907_072817.csv                   41.8   4.74   19    21   250.0    0.86
+3f64372e-20260907_070041.csv                    0.7   6.59   19     0    80.0    0.98
+670063b2-20260907_142018.csv                    7.3   6.63   19     4   286.0    0.79
+683640a0-20260907_070212.csv                   24.4   6.61   19     9   215.0    0.88
+7475b5d7-20260908_142743.csv                   55.1   4.34   25    30   273.0    0.78
+cb67b01f-20260908_084142.csv                   21.6   4.56   21     5   315.0    0.82
+drive10-20260918_233912.csv                   119.5   5.06   10     7   235.0    0.79
+f51686d7-20260906_154426.csv                    0.8   4.59   25     0            0.98
+fb988991-20260906_143515.csv                   16.3   3.52   24     0   103.0     0.9
+pull01-20260913_093527.csv                      7.5   4.90    7     0   233.0        
+------------------------------------------------------------------------------------
+TOTAL                                         295.0 min across 10 drives, 26 distinct operating points
+
+operating points span 30 - 75 kPa manifold pressure
+compressor flow bins still EMPTY (kg/s): 0.33-0.36
+
+==============================================================================
+[2/10]  compare_log.py — model against the car at the steady points
+         $ python compare_log.py data/master_points.csv
+         read for: both load residuals and both values of k
+==============================================================================
+EXIT CODE 0   (1 s)
+
+26 operating points from data/master_points.csv
+load input: inverted from measured air mass flow
+
+   rpm  MAP kPa  air meas  air model   err %  load meas  load model   err %   EGT C     KI
+------------------------------------------------------------------------------------------
+  1549     54.1      17.6       17.6     0.0       37.8        42.3    12.0     604   0.52
+  1552     40.1      12.7       12.7     0.0       26.1        30.5    16.9     516   0.34
+  1553     50.1      16.0       16.0     0.0       32.7        38.8    18.6     575   0.51
+  1707     49.9      18.0       18.0     0.0       33.4        38.9    16.4     611   0.49
+  1879     42.0      16.2       16.2    -0.0       27.3        32.4    18.7     590   0.40
+  1878     53.4      21.1       21.1     0.0       35.2        42.4    20.5     649   0.58
+  1876     61.3      24.6       24.6     0.0       41.1        49.6    20.7     687   0.64
+  1879     73.1      29.9       29.9     0.0       48.8        60.3    23.4     735   0.61
+  2039     45.3      19.2       19.2     0.0       29.6        35.3    19.2     635   0.46
+  2039     58.2      25.5       25.5     0.0       39.2        47.1    20.0     699   0.61
+  2040     67.4      30.2       30.2     0.0       46.3        55.6    20.1     736   0.60
+  2260     65.9      33.0       33.0     0.0       45.8        54.7    19.4     759   0.56
+  2274     75.0      38.4       38.4     0.0       52.5        63.1    20.3     795   0.49
+  2439     30.4      15.9       15.9    -0.0       20.4        24.1    18.0     628   0.18
+  2443     39.7      20.7       20.7    -0.0       26.6        31.4    18.3     671   0.37
+  2582     35.9      20.0       20.0     0.0       24.4        28.6    17.5     674   0.30
+  2615     44.4      25.1       25.1    -0.0       30.2        35.4    17.2     712   0.43
+  2614     60.5      35.8       35.8     0.0       42.6        50.5    18.7     778   0.53
+  2615     52.5      30.5       30.5     0.0       36.4        43.0    18.1     749   0.49
+  2882     62.1      40.7       40.7     0.0       44.1        52.5    19.2     807   0.50
+  2918     61.1      40.9       40.9     0.0       43.7        51.6    18.2     808   0.49
+  2931     33.1      21.2       21.2     0.0       22.6        26.8    18.4     708   0.24
+  2935     49.3      32.1       32.1     0.0       34.1        40.4    18.7     765   0.47
+  3178     44.2      30.1       30.1     0.0       29.9        36.0    20.4     761   0.44
+  4184     46.9      43.5       43.5     0.0       32.4        38.6    19.1     853   0.32
+  5053     45.3      49.3       49.3     0.0       30.2        36.1    19.6     895   0.23
+------------------------------------------------------------------------------------------
+
+AIR MASS FLOW
+  NOT AN INDEPENDENT CHECK IN THIS MODE. Manifold pressure was derived
+  FROM the measured air mass, so the model reproduces it by construction
+  and the error is zero for arithmetic reasons, not physical ones.
+  Re-run with --map-from-log once the parked-idle test has settled the
+  pressure units; only then is this comparison meaningful.
+
+WHAT 'STEADY' COVERS  (AUDIT.md M3)
+  load peak-to-peak per window, as a fraction of its own mean:
+    median 0.53   max 1.36
+  points whose load held within 25 %: 5 of 26
+  Steady in ROAD SPEED and ENGINE SPEED only. The residual below
+  survives that because it is linear in the MAF channel and cancels
+  the rest (mistake 12) -- a reason to distrust the LABEL, not the
+  number. Do not call these 'steady operating points' without
+  saying steady in what.
+
+LOAD (relative air filling)
+  intake temperature over these points: 51 C mean, 47-57 C
+
+  FITTED     k = 0.839            residual MAPE 1.1 %   (1 free parameter)
+  DERIVED    k = 269.6 / T_in     residual MAPE 1.4 %   (0 free parameters)
+             mean of the derived k over these points = 0.831
+
+  The derived constant agrees with the fitted one to 1.0 %, which is the real result:
+  k is BMW's DIN normalisation (1013 mbar, 0 C), not a parameter we tuned.
+  A 20 C reference would give k = 0.891 -- the fit excludes it.
+
+  HEADLINE: residual MAPE 1.4 %   target < 15 %   PASS   (zero fitted parameters)
+  raw MAPE without any normalisation: 18.8 % (expected to be large — different reference state, not a model error)
+
+NOT VALIDATED BY THIS SCRIPT
+  Coolant and oil temperature are OUTPUTS of thermal.py, not of the cycle model
+  -- run_cycle takes coolant temperature as an INPUT. Validate those separately
+  by driving thermal.py over the whole log as a time series. Different exercise,
+  different subsection of Chapter 3.
+
+  Exhaust backpressure is not measured on this vehicle. predict() estimates it
+  as 1.15 x manifold pressure. State that as an assumption.
+
+  The boosted, knock-limited, enriched region is not reachable from a steady
+  drive. Validate it against published correlations and say so.
+
+==============================================================================
+[3/10]  validate.py — eleven quantities against published bands
+         $ python validate.py
+         read for: N of 11 inside, and which three miss
+==============================================================================
+EXIT CODE 0   (7 s)
+
+====================================================================================================
+PLANT VALIDATION TABLE — regenerated from code
+====================================================================================================
+quantity                                                    model      published   status
+----------------------------------------------------------------------------------------------------
+Displacement                                               2997.5      2990-3000   inside
+MFB50 at MBT (2500 rpm, 60 kPa)                               8.5           8-10   inside
+Best BSFC (knock-feasible, lambda 1)                        239.9        235-260   inside
+Knock-limited spark (3000 rpm, 200 kPa)                      11.0           8-14   inside
+EGT, cruise band (min)                                      724.1        600-750   inside
+EGT, cruise band (max)                                      787.7        600-750   OUTSIDE
+Turbine housing time constant                                48.0         40-120   inside
+Oil temperature, sustained climb                            110.2        115-140   OUTSIDE
+Oil time constant                                            16.0         20-400   OUTSIDE
+Coolant, thermostat-regulated                                94.5         88-108   inside
+Coolant regulation response (NOT a free time constant)        9.5          1-600   inside
+----------------------------------------------------------------------------------------------------
+8 of 11 quantities inside the published band
+
+Conditions behind the headline numbers
+  MBT spark at 2500 rpm / 60 kPa   : 32 deg BTDC
+  Best BSFC found at               : 4000 rpm, 140 kPa, 24 deg BTDC
+  turb   step   229.8 ->   791.2 C   tau =   48.0 s
+  oil    step    85.2 ->   110.2 C   tau =   16.0 s
+  block  step    90.0 ->    94.5 C   tau =    9.5 s
+
+Known limitation, state it in Chapter 3
+  MAP is an INPUT to this model. There is no compressor flow ceiling,
+  so peak power is not a model prediction — it is whatever boost is
+  commanded. Full-load points are therefore not validated here.
+
+==============================================================================
+[4/10]  check_map.py — MBT and knock-limited spark surfaces
+         $ python check_map.py
+         read for: monotonicity in both directions; unreachable cells marked --
+==============================================================================
+EXIT CODE 0   (20 s)
+
+Final spark map = min(MBT, knock limit).  lambda scheduled by load
+-- a placeholder for drawing the surface, NOT an enrichment model.
+See lam_for() and CLAUDE.md mistake 4.
+  --  = above the compressor ceiling at that speed, not an operating point
+  knk = knocks at 0 deg BTDC; no knock-free spark exists, retard cannot fix it
+
+  MAP kPa |     40     60     80    100    140    180    220
+  -----------------------------------------------------------
+   1200   |     27     22     15     10      3     --     --
+   1600   |     30     28     20     15      7     --     --
+   2000   |     32     30     24     18     11      5     --
+   2500   |     34     32     28     22     14      9     --
+   3000   |     36     34     32     26     17     12      9
+   4000   |     40     38     36     33     23     18     15
+   5000   |     43     41     39     39     30     24     21
+   6000   |     45     44     42     41     37     30     27
+
+  6 cells above the compressor ceiling, 0 reachable cells with no knock-free spark.
+
+Spot checks at the final map:
+   2000 rpm   60 kPa  spark   30 (MBT-limited)  T  120.1 Nm  BSFC  276.6  EGT  678 C  Pmax  33.7 bar  MFB50   9.0
+   2500 rpm  100 kPa  spark   22 (knock-limited)  T  246.3 Nm  BSFC  241.9  EGT  797 C  Pmax  48.9 bar  MFB50  16.0
+   3000 rpm  180 kPa  spark   12 (knock-limited)  T  443.3 Nm  BSFC  276.5  EGT  896 C  Pmax  70.9 bar  MFB50  23.5
+   5000 rpm  220 kPa  spark   21 (knock-limited)  T  529.0 Nm  BSFC  304.2  EGT  890 C  Pmax  93.1 bar  MFB50  19.8
+
+==============================================================================
+[5/10]  fit_envelope.py — the compressor envelope
+         $ python fit_envelope.py
+         read for: the top bins and how many INDEPENDENT readings each rests on
+==============================================================================
+EXIT CODE 0   (0 s)
+
+Compressor envelope, 95th percentile pressure ratio per 0.03 kg/s bin
+stable & not MAF-pinned, bins with >= 15 rows
+
+ flow kg/s   PR p95    rows  readings
+-------------------------------------
+     0.015    1.159   24060      1120
+     0.045    1.312   14759       809
+     0.075    1.582    1040        68
+     0.105    1.933     166        15
+     0.135    2.283     249        22
+     0.165    2.353     142        15
+     0.195    2.440     124        13
+     0.225    2.415      36         5
+     0.255    2.342      40         5
+     0.285    2.515      53         4
+     0.315    2.473      47         5
+-------------------------------------
+
+PR = 1 + A * flow**B     A = 4.6641   B = 0.7963   RMS = 0.2077
+highest bin: 0.315 kg/s at PR 2.473
+highest stable corrected flow anywhere: 0.314 kg/s
+
+Quote the bin table with its READINGS column, not just its rows (AUDIT.md H4),
+and quote the highest-flow figure with the filter that produced it -- "0.303"
+and "0.314" in the documents are the same quantity under two different filters.
+
+==============================================================================
+[6/10]  test_reward.py — the reward gate
+         $ python test_reward.py
+         read for: neutral near zero, the starver punished
+==============================================================================
+EXIT CODE 0   (271 s)
+
+episode length : 300 s   (grade starts at 180 s)
+neutral action : [0.333 0.429 0.455 1.    1.   ]
+
+check                                           result   detail
+------------------------------------------------------------------------------------------------
+neutral action scores about zero                  PASS   mean reward -0.00038   (want |r| < 0.05)
+refusing torque is punished                       PASS   starver -0.90349  vs  neutral -0.00038
+disabling preview changes the observation         PASS   max |delta obs| = 1.44
+rewards are finite                                PASS   1499, 1499, 1499 steps
+------------------------------------------------------------------------------------------------
+
+FOR INFORMATION, NOT A PASS/FAIL: random policy scores -0.04744
+
+All checks pass. The reward is safe to train against.
+
+==============================================================================
+[7/10]  check_premise.py — the premise table, five policies
+         $ python check_premise.py
+         read for: THE BASELINE ROW AND WHETHER THE CONSTRAINT BINDS. This is the block CLAUDE.md, README.md and handoff.md currently contradict
+==============================================================================
+EXIT CODE 0   (153 s)
+
+protection trigger: 1123 K (850 C) = the knee of the turbine damage term
+
+policy                             fuel g    damage  peak turb C  peak oil C
+----------------------------------------------------------------------------
+baseline ECU (true neutral)          4664     959.8          884         110
+reactive protection                  4843     679.0          862         111
+current-grade protection             4936     633.2          861         112
+predictive protection                4941     637.4          861         112
+predictive, preview disabled         4843     679.0          862         111
+----------------------------------------------------------------------------
+  reactive protection            cuts damage  29.3 %
+  current-grade protection       cuts damage  34.0 %
+  predictive protection          cuts damage  33.6 %
+
+  preview over reactive       +4.3 points
+  preview over current grade  -0.4 points   <- THE HONEST ONE
+
+READ THIS BEFORE QUOTING ANY OF IT.  (AUDIT.md C1 and C3)
+
+1. These policies are HAND-WRITTEN, not trained. They say the environment
+   rewards anticipation; they do not say how much an agent would gain.
+
+2. The three protecting rows now use the SAME protection DEPTH, so the only
+   difference between reactive and predictive is TIMING. Until 16 September
+   the reactive policy saturated at k = 0.36 while predictive held k >= 0.55,
+   and the gap between them was partly just protecting harder.
+
+3. "Predictive, preview disabled" equals "reactive" BY CONSTRUCTION, not as a
+   finding. With use_preview=False the preview term is literally zero, so
+   p_predictive returns p_reactive's vector on every step. The identity CANNOT
+   fail and it is not evidence. It becomes a real ablation only when a TRAINED
+   blinded agent is compared with a trained sighted one -- that is Phase D.
+
+4. The row that matters is CURRENT-GRADE PROTECTION. It uses no preview at all,
+   only the gradient the car is on now, which any vehicle can measure. If
+   preview beats it by little, then preview is not worth acquiring HERE -- and
+   that is a result about this operating point, which is what H/tau is for.
+
+==============================================================================
+[8/10]  app.test_replay --full — the live supervisor, both drives
+         $ python -m app.test_replay --full
+         read for: N of N, and the two pinned peaks
+==============================================================================
+EXIT CODE 0   (169 s)
+
+
+reader
+  PASS  reader: survives malformed rows   5 usable, 2 skipped
+  PASS  reader: skips bad timestamps and backwards time   skipped 2
+  PASS  reader: empty and NaN cells become None
+  PASS  reader: 'NO DATA' becomes None
+  PASS  reader: absent columns are marked absent, not invented
+  PASS  estimator: survives the same rows
+  PASS  live: yields samples through a dropped connection   25 samples
+  PASS  live: reconnected after the drop   1 reconnects, 2 connects
+  PASS  live: supported channels keep answering
+  PASS  live: MAF converted to kg/h   432.0 kg/h
+  PASS  live: boost derived from intake minus barometric   11.75 psi
+  PASS  live: PIDs the car refuses are RETIRED, not asked forever   retired ['oil_c', 'lam']; each after 5 misses
+  PASS  live: the link never raised out of the reader
+  PASS  L5: live mode polls only what something reads   polls ['air_kgh', 'ect_c', 'p_amb_psi', 'rpm', 't_amb_c', 'v_kmh']
+  PASS  M8: leading coolant zeros are not read as 0 C   first ect_c = None
+  PASS  M8: the first real coolant reading is physical   41.96 C
+  PASS  M8: an impossible ambient pressure is rejected
+
+product starts
+  PASS  M7: app.server imports and serves its three pages   16 routes
+  PASS  M7: served limits match engine_env   turb_c 849.9
+
+replay: pull01 (7 channels, the fast regression)
+  PASS  pull01: rows   got 2193, expected 2193
+  PASS  pull01: estimated   got 2186, expected 2186
+  PASS  pull01: peak_turb_c   got 608.0, expected 608.0
+  PASS  pull01: thermal   got 1, expected 1
+  PASS  pull01: mismatch   got 0, expected 0
+  PASS  pull01: novel   got 4, expected 4
+  PASS  estimator: names every modelled input   modelled: ['ambient', 'coolant', 'lambda', 'spark', 'vehicle speed']
+
+modelled fallbacks
+  PASS  H8: the modelled lambda reaches 0.81 after a sustained pull   lambda 0.810 at dwell 19.5 s
+  PASS  H8: the estimator marks it modelled
+  PASS  M11: the modelled block equals the measured coolant   93.00 C vs 93.00 C
+  PASS  M11: the drift it would have had is reported   block_residual_k = +0.2 K
+  PASS  M10: the estimator publishes where the turbine is heading   heading for 912 C, tau 29 s
+  PASS  M10: a settled node is projected as settled   now 918 C, steady 912 C
+  PASS  M10: no time-to-threshold when the limit is unreachable   0 such warnings
+
+warm start
+  PASS  warm start: nominal never leaves the band   0 samples outside
+  PASS  warm start: the band never widens on a continuous stream   0 widenings
+  PASS  warm start: no thermal alert fires while warming up
+  PASS  warm start: the band does settle   settled at t=173 s
+  PASS  warm start: settles later at light load than under load   light load 584.0 s vs loaded 105.0 s
+
+mismatch detector
+  PASS  mismatch: silent at part throttle   0 fired
+  PASS  mismatch: part-throttle samples never reach the window   0 gated
+  PASS  mismatch: a pinned MAF never reaches the window   0 gated
+  PASS  mismatch: forward-filled repeats count as ONE reading   500 samples -> 1 readings
+  PASS  mismatch: a persistent full-throttle disagreement still fires   1 fired, 60 readings
+
+product rules
+  PASS  READ-ONLY: no write path to the vehicle exists in app/   checked 5 patterns
+  PASS  NO RAW ON DISK: a replay creates exactly one file   created ['review_log.jsonl']
+  PASS  NO RAW ON DISK: records carry only marked-event fields   5 records
+  PASS  NO RAW ON DISK: far fewer records than samples   5 records against 2194 rows
+  PASS  channel budget: every live channel carries a reason   6 channels
+  PASS  channel budget: the live set is still six   6 channels
+
+replay: 7475b5d7 (26 channels, the quoted drive)
+  PASS  7475b5d7: rows   got 14340, expected 14340
+  PASS  7475b5d7: estimated   got 14278, expected 14278
+  PASS  7475b5d7: peak_turb_c   got 890.6, expected 890.6
+  PASS  7475b5d7: thermal   got 15, expected 15
+  PASS  7475b5d7: mismatch   got 0, expected 0
+  PASS  7475b5d7: novel   got 19, expected 19
+  PASS  warm start: nominal never leaves the band   0 samples outside
+  PASS  warm start: the band never widens on a continuous stream   0 widenings
+  PASS  warm start: no thermal alert fires while warming up
+  PASS  warm start: the band does settle   settled at t=462 s
+
+59 of 59 checks pass
+
+==============================================================================
+[9/10]  verify_docs.py — the guard
+         $ python verify_docs.py
+         read for: the check total, and the known-stale ledger, which is the size of fix 3
+==============================================================================
+EXIT CODE 0   (45 s)
+
+
+DATASET SIZE  (CLAUDE.md, validation_table.md B)
+  ok    total minutes                                      data      295.0   docs 295.0 min
+  ok    drives in the manifest                             data         10   docs 10
+  ok    drives that carry samples                          data          7   docs 7
+  ok    distinct operating points                          data         26   docs 26
+  ok    every point spans a real 60 s window               data       True   docs True
+  ok    no point straddles a logger gap                    data       0.48   docs 0.48 s
+  ok    operating-point span, low end                      data         30   docs 30 kPa
+  ok    operating-point span, high end                     data         75   docs 75 kPa
+
+MAF SATURATION  (CLAUDE.md mistake 7)
+  ok    samples pinned at the 1020 kg/h ceiling            data        547   docs 547
+  ok    drives showing that exact ceiling                  data          6   docs 6
+
+COMPRESSOR ENVELOPE  (validation_table.md D)
+  ok    quasi-steady samples behind the fit                data      74013   docs 74013
+  ok    highest pressure ratio observed                    data       2.52   docs 2.52
+
+ENRICHMENT v4  (engine_env.BaselineECU.base_lambda)
+  ok    samples, 1000-3500 rpm above 180 kPa               data        441   docs 441
+  ok    samples, 3500-4500 rpm above 180 kPa               data        235   docs 235
+  ok    samples, 4500-7000 rpm above 180 kPa               data        665   docs 665
+  ok    seconds above 207 kPa                              data        208   docs 208 s
+  note   these correlations rest on 1341 forward-filled rows but only ~67 independent readings
+         standard error is about 0.12, so do NOT read them to two decimals (AUDIT.md H4)
+  ok    corr(lambda, rpm)                                  data      -0.47   docs -0.47
+  ok    corr(lambda, air_gps)                              data      -0.41   docs -0.41
+  ok    corr(lambda, dwell)                                data      -0.44   docs -0.44
+  ok    corr(lambda, map_kpa)                              data       0.11   docs 0.11
+
+THERMAL CALIBRATION  (thermal.py, validation_table.md C)
+  ok    oil-coolant median gap, fitted drives              data       -1.2   docs -1.2 K
+  ok    oil-coolant p95 gap, fitted drives                 data        5.4   docs 5.4 K
+  ok    hottest oil anywhere in the logs                   data        117   docs 117 C
+  ok    hardest sustained 60 s fuel flow                   data        8.7   docs 8.7 g/s
+
+LOAD NORMALISATION  (compare_log.py, validation_table.md)
+  ok    DIN reference constant, 100*273.15/101.3           data      269.6   docs 269.6 K
+  ok    derived k = 269.6 / T_charge, mean over the 26 points data      0.831   docs 0.831
+  ok    the 20 C reference the fit excludes                data      0.891   docs 0.89
+
+CHARGE TEMPERATURE  (plant.charge_temperature -- the 10 Sep correction)
+  ok    boosted model samples (gate >200 kPa)              data        762   docs 762
+  ok    logged boost readings behind the comparison        data       1097   docs 1097
+  ok    boosted model vs the car's own boost channel       data        1.9   docs 1.9 %  (was +23.7 with the sensor)
+
+BASELINE ECU CONSTANTS  (engine_env.py)
+  ok    ENR_LOAD, the enrichment gate                      data      180.0   docs 180.0 kPa
+
+SIMULATION FIGURES  (AUDIT.md H2 -- these were unchecked entirely)
+  ok    validate.py rows inside the published band         data          8   docs 8
+  ok    turbine time constant                              data       48.0   docs 48.0
+  ok    displacement                                       data     2997.5   docs 2997.5
+  ok    crank-angle step is the studied one                data       0.25   docs 0.25
+
+CRANK-ANGLE CONVERGENCE  (AUDIT.md H1)
+  ok     2500 rpm /  60 kPa   halving the step moves EGT   5.9 K (<= 12.0), torque  0.53 % (<= 0.6)
+  ok     2465 rpm / 150 kPa   halving the step moves EGT   4.0 K (<= 12.0), torque  0.14 % (<= 0.6)
+  ok     3000 rpm / 200 kPa   halving the step moves EGT   4.7 K (<= 12.0), torque  0.17 % (<= 0.6)
+  dtheta = 0.25 deg. Residual error against a much finer step is ~7 K of EGT; quote figures accordingly.
+  ok    cycle model converges when the step is halved      data       True   docs True
+
+THE EXPERIMENT'S OWN CONSTANTS  (AUDIT2.md C2-2)
+  ok    scenario speed, make_grade_climb(v_kmh=)           data      130.0   docs 130.0 km/h
+  ok    scenario grade, make_grade_climb(grade=)           data       12.0   docs 12.0 %
+  ok    scenario ambient, make_grade_climb(t_amb=)         data      315.0   docs 315.0 K
+  ok    training episode length, make_grade_climb(duration=) data      900.0   docs 900.0 s
+  ok    training step, make_grade_climb(dt=)               data        0.2   docs 0.2 s
+  ok    TURB_PROTECT_K, the damage knee                    data     1123.0   docs 1123.0 K
+  ok    OIL_PROTECT_K                                      data      408.0   docs 408.0 K
+  ok    the trigger in Celsius, as the documents write it  data        850   docs 850 C
+  ok    Vehicle.gears, the ZF 8HP51 ratio set              data [5.25, 3.36, 2.172, 1.72, 1.316, 1.0, 0.822, 0.64]   docs [5.25, 3.36, 2.172, 1.72, 1.316, 1.0, 0.822, 0.64]
+  ok    Vehicle.final_drive                                data       3.15   docs 3.15
+  ok    the gearbox has eight forward ratios               data          8   docs 8
+  ok    evaluate.DT                                        data        1.0   docs 1.0 s
+  ok    evaluate.DURATION                                  data      720.0   docs 720.0 s
+  ok    evaluate.EPISODES, the frozen set                  data         20   docs 20
+  ok    evaluate.EPISODES hash (frozen 18 Sep 2026)        data '05a598a574268b20'   docs '05a598a574268b20'
+  note   one neutral premise rollout, 31 s
+  ok    check_premise baseline damage                      data      959.8   docs 959.8
+  ok    check_premise baseline peak turbine                data        884   docs 884 C
+  ok    the constraint BINDS on the locked scenario        data       True   docs True
+  ok    compare_log.py exited 0                            data          0   docs 0
+  ok    load residual, k DERIVED, zero free parameters     data        1.4   docs 1.4 %
+  ok    load residual, k FITTED, one free parameter        data        1.1   docs 1.1 %
+  ok    fitted k, as compare_log prints it                 data      0.839   docs 0.839
+  ok    app peak 7475b5d7 (MODEL OUTPUT; a pin, not a run of the suite) data      890.6   docs 890.6 C
+  ok    app peak pull01 (MODEL OUTPUT; a pin, not a run of the suite) data      608.0   docs 608.0 C
+  ok    app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE) data         15   docs 15
+  ok    app mismatch alerts on 7475b5d7                    data          0   docs 0
+  ok    app novel-operating-point alerts on 7475b5d7       data         19   docs 19
+  ok    fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined) data      0.205   docs 0.205 %
+
+DOCUMENTS vs DATA  (every figure above, as the documents state it)
+  ok     625 figure mentions across 53 tracked files all agree with the data
+  note   1 pattern(s) matched nothing anywhere -- check the regex has not rotted:
+           - corr(lambda, map_kpa)  [pattern 2 of 3 matched nothing]
+
+RETIRED FIGURES  (mistake 11 -- the old value must not survive)
+  ok     none of the 43 retired figures appear as a live claim in 53 tracked files
+         (139 historical mentions marked RETIRED-OK)
+
+KNOWN STALE  (already-reported rot; AUDIT2.md fix 3 sweeps it)
+  known  ABSTRACT.md                        drives in the manifest                1  (H2-1)
+  known  ABSTRACT.md                        quasi-steady samples behind the fit    1  (H2-1)
+  known  ABSTRACT.md                        total minutes                         1  (H2-1)
+  known  CHECKPOINT.md                      app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
+  known  CHECKPOINT.md                      check_premise baseline damage         4  (H2-4)
+  known  CHECKPOINT.md                      check_premise baseline peak turbine    2  (H2-4)
+  known  CHECKPOINT.md                      drives in the manifest                1  (H2-1)
+  known  CHECKPOINT.md                      drives that carry samples             2  (H2-1/H2-7)
+  known  CHECKPOINT.md                      fitted k, as compare_log prints it    1  (H2-1)
+  known  CHECKPOINT.md                      load residual, k DERIVED, zero free parameters    1  (M2-1)
+  known  CHECKPOINT.md                      seconds above 207 kPa                 1  (M2-3)
+  known  CHECKPOINT.md                      total minutes                         2  (H2-1)
+  known  CLAUDE.md                          app peak estimated turbine (either pinned drive)    1  (H2-4)
+  known  CLAUDE.md                          app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
+  known  CLAUDE.md                          check_premise baseline damage         4  (H2-4)
+  known  CLAUDE.md                          check_premise baseline peak turbine    2  (H2-4)
+  known  CLAUDE.md                          fitted k, as compare_log prints it    3  (H2-1)
+  known  CLAUDE.md                          fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)    1  (H2-1)
+  known  CLAUDE.md                          load residual, k DERIVED, zero free parameters    1  (M2-1)
+  known  CONTROL_SCOPE.md                   distinct operating points             1  (H2-1)
+  known  CONTROL_SCOPE.md                   drives in the manifest                1  (H2-1)
+  known  CONTROL_SCOPE.md                   operating-point span, high end        1  (H2-1)
+  known  CONTROL_SCOPE.md                   total minutes                         1  (H2-1)
+  known  DOC/SESSION_REPORT_2026-09-18.md   check_premise baseline damage         1  (H2-4)
+  known  DOC/SESSION_REPORT_2026-09-18.md   check_premise baseline peak turbine    1  (H2-4)
+  known  DOC/SESSION_REPORT_2026-09-18.md   fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)    1  (H2-1)
+  known  DOC/SESSION_REPORT_2026-09-18.md   load residual, k DERIVED, zero free parameters    1  (M2-1)
+  known  README.md                          check_premise baseline damage         1  (H2-4)
+  known  README.md                          check_premise baseline peak turbine    1  (H2-4)
+  known  README.md                          corr(lambda, air_gps)                 1  (M2-3)
+  known  README.md                          corr(lambda, map_kpa)                 1  (M2-3)
+  known  README.md                          samples, 1000-3500 rpm above 180 kPa    1  (M2-3)
+  known  README.md                          samples, 3500-4500 rpm above 180 kPa    1  (M2-3)
+  known  README.md                          samples, 4500-7000 rpm above 180 kPa    1  (M2-3)
+  known  README.md                          scenario speed, make_grade_climb(v_kmh=)    1  (C2-3)
+  known  REFERENCES.md                      app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
+  known  SESSION_REPORT_2026-09-19.md       check_premise baseline damage         3  (H2-4)
+  known  SESSION_REPORT_2026-09-19.md       check_premise baseline peak turbine    1  (H2-4)
+  known  check_map.py                       corr(lambda, dwell)                   1  (M2-3)
+  known  check_map.py                       corr(lambda, rpm)                     1  (M2-3)
+  known  handoff.md                         check_premise baseline damage         2  (H2-4)
+  known  handoff.md                         check_premise baseline peak turbine    1  (H2-4)
+  known  handoff.md                         fitted k, as compare_log prints it    2  (H2-1)
+  known  presentation/README.md             app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
+  known  presentation/index.html            corr(lambda, map_kpa)                 1  (M2-3)
+  known  presentation/index.html            fitted k, as compare_log prints it    1  (H2-1)
+  known  presentation/index.html            samples pinned at the 1020 kg/h ceiling    1  (M2-2)
+  known  presentation/index.html            scenario speed, make_grade_climb(v_kmh=)    1  (C2-3)
+  known  presentation/index.html            total minutes                         1  (H2-1)
+  known  presentation/plan.html             derived k = 269.6 / T_charge, mean over the 26 points    1  (M2-1)
+  known  presentation/plan.html             fitted k, as compare_log prints it    1  (H2-1)
+  known  presentation/plan.html             total minutes                         4  (H2-1)
+  known  results/phase_d_seed0.txt          check_premise baseline damage         1  (H2-4)
+  known  thermal.py                         hottest oil anywhere in the logs      1  (M2-1)
+  known  validate.py                        drives in the manifest                1  (H2-1)
+  known  validate.py                        drives that carry samples             1  (H2-1/H2-7)
+  known  validate.py                        total minutes                         1  (H2-1)
+  known  validation_table.md                fitted k, as compare_log prints it    1  (H2-1)
+  known  CHECKPOINT.md                      a sighted-over-blinded ablation margin    1  (C2-1)
+  known  CHECKPOINT.md                      a sighted-versus-blinded ablation margin    1  (C2-1)
+  known  CHECKPOINT.md                      the void +11.7 Phase D ablation margin (C2-1)    2  (C2-1)
+  known  DOC/SESSION_REPORT_2026-09-18.md   a sighted-over-blinded ablation margin    1  (C2-1)
+  known  DOC/SESSION_REPORT_2026-09-18.md   a sighted-versus-blinded ablation margin    2  (C2-1)
+  known  DOC/SESSION_REPORT_2026-09-18.md   the void +11.7 Phase D ablation margin (C2-1)    2  (C2-1)
+  known  app/alerts.py                      the point span with the sensor as charge temp    1  (H2-1)
+  known  presentation/data.js               premise baseline with its cooling disabled (C1)    2  (C2-3)
+  known  presentation/data.js               premise predictive against a cooling-disabled baseline (C1)    1  (C2-3)
+  known  presentation/data.js               premise reactive against a cooling-disabled baseline (C1)    1  (C2-3)
+  known  presentation/index.html            dwell seconds from rows over an assumed 4.6 Hz (H3)    1  (C2-3)
+  known  presentation/index.html            premise baseline with its cooling disabled (C1)   18  (C2-3)
+  known  presentation/index.html            premise predictive against a cooling-disabled baseline (C1)   15  (C2-3)
+  known  presentation/index.html            premise reactive against a cooling-disabled baseline (C1)   37  (C2-3)
+  known  presentation/index.html            preview edge built on the C1 and C3 artefacts    2  (C2-3)
+  known  presentation/index.html            the H2 table measured against a cooling-disabled baseline (C1)    4  (C2-3)
+  known  presentation/plan.html             dataset size before pull01, the ninth drive    2  (C2-3)
+  known  presentation/plan.html             load residual before the correction    4  (C2-3)
+  known  presentation/plan.html             premise baseline with its cooling disabled (C1)    2  (C2-3)
+  known  presentation/plan.html             premise predictive against a cooling-disabled baseline (C1)    2  (C2-3)
+  known  presentation/plan.html             premise reactive against a cooling-disabled baseline (C1)    4  (C2-3)
+  known  presentation/plan.html             preview edge built on the C1 and C3 artefacts    2  (C2-3)
+  known  presentation/plan.html             the H2 table measured against a cooling-disabled baseline (C1)    6  (C2-3)
+  known  presentation/plan.html             the point span with the sensor as charge temp    2  (C2-3)
+  known  results/README.md                  a sighted-over-blinded ablation margin, number in the middle    1  (C2-1)
+  known  results/README.md                  the void +11.7 Phase D ablation margin (C2-1)    1  (C2-1)
+  known  results/phase_d_seed0.txt          a sighted-over-blinded ablation margin    1  (C2-1)
+  known  results/phase_d_seed0.txt          a sighted-versus-blinded ablation margin    1  (C2-1)
+  known  results/phase_d_seed0.txt          the void +11.7 Phase D ablation margin (C2-1)    1  (C2-1)
+  197 stale figure mentions outstanding across 87 ledger rows
+
+EXEMPTIONS  (what RETIRED-OK switched off, and where)
+  note   CHECKPOINT.md                                  70 mention(s) excused, 38 by a marker naming no figure
+  note   CLAUDE.md                                      75 mention(s) excused, 17 by a marker naming no figure
+  note   DOC/SESSION_REPORT_2026-09-18.md                9 mention(s) excused, 11 by a marker naming no figure
+  note   README.md                                       9 mention(s) excused, 8 by a marker naming no figure
+  note   build_dataset.py                                1 mention(s) excused, 1 by a marker naming no figure
+  note   evaluate.py                                     2 mention(s) excused
+  note   fingerprint.py                                  1 mention(s) excused
+  note   handoff.md                                      4 mention(s) excused, 5 by a marker naming no figure
+  note   presentation/README.md                          7 mention(s) excused, 7 by a marker naming no figure
+  note   team/jad.md                                     6 mention(s) excused
+  note   train.py                                        1 mention(s) excused
+  note   validate.py                                     2 mention(s) excused
+  note   validation_table.md                            13 mention(s) excused, 2 by a marker naming no figure
+  A marker that names no figure can only excuse the RETIRED scan, never the
+  comparison against live data (H2-6). 89 such mention(s) this run; annotate
+  them 'RETIRED-OK: <figures>' as they are touched.
+
+========================================================================
+All 67 checks pass (625 figure mentions scanned in the documents).
+
+==============================================================================
+[10/10]  drift_test.py — the guard's own acceptance test
+         $ python drift_test.py
+         read for: N of 16 drifts CAUGHT
+==============================================================================
+EXIT CODE 0   (757 s)
+
+  row  1  was CAUGHT               now CAUGHT  | README.md "8 of 11" -> "9 of 11"
+          [2 edit(s)] WRONG  README.md:154
+  row  2  was CAUGHT               now CAUGHT  | README.md "ten drives, 295.0 minutes" -> "nine drives"
+          [1 edit(s)] WRONG  README.md:19
+  row  3  was CAUGHT               now CAUGHT  | plant.DTHETA_DEG 0.25 -> 0.5
+          [1 edit(s)] WRONG  crank-angle step is the studied one                data        0.5   docs 0.25
+  row  4  was MISSED               now CAUGHT  | CLAUDE.md load residual "1.4 % with zero fitted parameters" -> 1.7 %
+          [1 edit(s)] WRONG  CLAUDE.md                          load residual, k DERIVED, zero free parameters    2  count 2, ledger says 1 (M
+  row  5  was MISSED               now CAUGHT  | CLAUDE.md "295.0 min" (current-state table) -> 299.0
+          [3 edit(s)] WRONG  CLAUDE.md:69
+  row  6  was MISSED               now CAUGHT  | CLAUDE.md app peak 890.6 -> 895.1
+          [3 edit(s)] WRONG  CLAUDE.md                          app peak estimated turbine (either pinned drive)    3  count 3, ledger says 1 
+  row  7  was MISSED               now CAUGHT  | results/README.md and CHECKPOINT.md "+11.7" -> "+13.7"
+          [1 edit(s)] WRONG  results/README.md                  the void +11.7 Phase D ablation margin (C2-1)    0  count 0, ledger says 1 (C2
+  row  8  was MISSED               now CAUGHT  | engine_env.py docstring "12 % at 130 km/h" -> 120 km/h
+          [1 edit(s)] WRONG  engine_env.py:845
+  row  9  was MISSED               now CAUGHT  | engine_env.py DEFAULT v_kmh=130.0 -> 120.0
+          [1 edit(s)] WRONG  scenario speed, make_grade_climb(v_kmh=)           data      120.0   docs 130.0 km/h
+  row 10  was MISSED               now CAUGHT  | engine_env.py TURB_PROTECT_K 1123 -> 1100
+          [1 edit(s)] WRONG  TURB_PROTECT_K, the damage knee                    data     1100.0   docs 1123.0 K
+  row 11  was MISSED               now CAUGHT  | CHECKPOINT.md "959.8 at 884 C" -> 870 C
+          [2 edit(s)] WRONG  CHECKPOINT.md                      check_premise baseline peak turbine    4  count 4, ledger says 2 (H2-4)
+  row 12  was MISSED               now CAUGHT  | CLAUDE.md "0.206 %" -> 0.306 %
+          [3 edit(s)] WRONG  CLAUDE.md                          fraction of replayed time above the trigger (36 s / 292.0 min, both pinned pro
+  row 13  was MISSED               now CAUGHT  | CLAUDE.md "294.2 at 812" -> 799
+          [1 edit(s)] WRONG  CLAUDE.md                          check_premise baseline peak turbine    2  values [799.0, 812.0], ledger says [
+  row 14  was CAUGHT               now CAUGHT  | CLAUDE.md "derived k = 0.831" -> 0.851
+          [2 edit(s)] WRONG  CLAUDE.md:69
+  row 15  was not in the audit table now CAUGHT  | evaluate.EPISODES: one weight changed in the frozen set
+          [1 edit(s)] WRONG  evaluate.EPISODES hash (frozen 18 Sep 2026)        data '91a6780110b28f9a'   docs '05a598a574268b20'
+  row 16  was not in the audit table now CAUGHT  | Vehicle.gears: top gear 0.640 -> 0.680 (the invented six-speed's)
+          [1 edit(s)] WRONG  Vehicle.gears, the ZF 8HP51 ratio set              data [5.25, 3.36, 2.172, 1.72, 1.316, 1.0, 0.822, 0.68]   docs
+
+==============================================================================
+16 of 16 drifts CAUGHT
+
+==============================================================================
+[extra]  evaluate.py against the six-speed agents — expected to REFUSE
+         $ python evaluate.py runs_sixspeed_18sep/sighted_seed0 runs_sixspeed_18sep/blind_seed0
+         read for: exit 1 and a named plant mismatch is the CORRECT outcome here
+==============================================================================
+EXIT CODE 1   (2 s)   -- non-zero is the PASS here
+
+
+runs_sixspeed_18sep/sighted_seed0 has no meta.json.
+It predates the plant fingerprint (AUDIT2.md C2-1), so nothing records which
+plant it was trained on -- and this project has already shipped one result
+that was produced on a gearbox replaced seven hours later. Retrain it with
+the current train.py, or pass --force-plant-mismatch and expect to defend the
+number without provenance.
+
+==============================================================================
+SUMMARY — exit code per script
+==============================================================================
+     0        3 s   build_dataset.py
+     0        1 s   compare_log.py
+     0        7 s   validate.py
+     0       20 s   check_map.py
+     0        0 s   fit_envelope.py
+     0      271 s   test_reward.py
+     0      153 s   check_premise.py
+     0      169 s   app.test_replay --full
+     0       45 s   verify_docs.py
+     0      757 s   drift_test.py
+     1        2 s   evaluate.py refusal (non-zero expected)
+
+A figure not printed above is a figure no script produces. Do not write
+one into a document from memory -- that is what fix 3 is repairing.
