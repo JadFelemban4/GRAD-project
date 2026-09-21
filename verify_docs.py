@@ -808,7 +808,15 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   # inject -- "959.8 at 884 C" beside "959.8 at 870 C" -- so a
                   # scanner reading it finds the wrong half of every pair and
                   # reports the test as the fault. Same call as AUDIT.md.
-                  "drift_test.py"}
+                  "drift_test.py",
+                  # The transcript of a full run. It is a RECORDING of other
+                  # programs' output -- including this checker's own ledger
+                  # lines and drift_test.py's deliberately wrong injections
+                  # ("8 of 11" -> "9 of 11") -- so scanning it reports the
+                  # recording as a claim. Regenerate it with full_run.py; never
+                  # quote a figure from it that the block above it did not
+                  # print.
+                  "FULL_RUN.txt"}
 
 # A line that names a retired figure ON PURPOSE -- "the old 39.5 s figure is
 # void", the mistake log's was/should-say tables -- carries this marker. It is

@@ -96,6 +96,18 @@ except ImportError:
     )
 
 
+def buffer_size(a):
+    """How many transitions the replay buffer holds.
+
+    `--buffer` if given, otherwise the run's own length, floored at 10 000 so a
+    very short smoke run still has somewhere to sample from, and capped at
+    SB3's default so this can only ever ask for LESS memory than before.
+    """
+    if a.buffer is not None:
+        return int(a.buffer)
+    return int(min(1_000_000, max(10_000, a.steps)))
+
+
 def build_env(use_preview, seed, duration):
     env = SupervisoryTunerEnv(make_grade_climb(duration=duration),
                               use_preview=use_preview, seed=seed)
@@ -113,6 +125,10 @@ def main():
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
     ap.add_argument("--out", default="runs")
+    ap.add_argument("--buffer", type=int, default=None,
+                    help="SAC replay buffer size. Default: sized to the run, "
+                         "because a buffer bigger than --steps can never fill "
+                         "and costs memory for nothing. See the docstring.")
     ap.add_argument("--force-plant-mismatch", action="store_true",
                     help="resume into a run whose meta.json describes a "
                          "DIFFERENT plant. Almost never what you want: the "
@@ -266,8 +282,23 @@ def main():
         FP.write(meta_path, live)
         print(FP.format_block(live, "PLANT FINGERPRINT (written to meta.json)"))
         print()
+        # SIZE THE REPLAY BUFFER TO THE RUN. SB3's default is 1 000 000
+        # transitions, which for a 50 000-step run is a buffer that can never
+        # be more than 5 % full -- and it is allocated in full at construction:
+        # (1000000, 1, 23) float32 is 87.7 MB for the observations alone, about
+        # 200 MB per run once actions, rewards and next-observations are added.
+        #
+        # Sixteen of those in parallel is 3.2 GB of buffers nothing will ever
+        # write to, and on 21 September it is what made 13 of 16 Phase D runs
+        # die with numpy MemoryError while 3 survived.
+        #
+        # THIS CANNOT CHANGE WHAT IS LEARNED, and that is not an assumption --
+        # `run_phase_d.py --prove-buffer` trains the same seed both ways and
+        # compares every network weight. A buffer only affects behaviour when
+        # it EVICTS, and neither size evicts when the run is shorter than the
+        # smaller of the two.
         model = SAC("MlpPolicy", env, seed=a.seed, learning_rate=a.lr,
-                    verbose=1, tensorboard_log=None)
+                    buffer_size=buffer_size(a), verbose=1, tensorboard_log=None)
 
     cb = CheckpointCallback(save_freq=10_000, save_path=outdir,
                             name_prefix="ckpt", verbose=0)

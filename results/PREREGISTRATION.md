@@ -122,6 +122,68 @@ separate processes rather than one after another.
   baseline ECU proves supervision helps; only beating `current-grade` says
   anything about preview.
 
+## 6a. Run log — failures and re-runs, recorded as section 6 requires
+
+**21 September 2026, first launch: 13 of 16 runs died of MemoryError.**
+
+`run_phase_d.py` started all sixteen at once. SB3's default replay buffer is
+1 000 000 transitions and is allocated in full at construction — about 200 MB
+per run — so sixteen parallel runs asked for 3.2 GB of buffer on top of their
+own process memory, on a machine already at 62 % of 31 GB. Thirteen raised
+`numpy MemoryError` inside `SAC.__init__`, before a single training step.
+
+| | |
+|---|---|
+| completed | `sighted_seed1`, `blind_seed1`, `sighted_seed7` |
+| failed | the other thirteen, all in `SAC.__init__` |
+| cause | machine memory, not the environment, the reward or the plant |
+
+**Fix:** the buffer is sized to the run — a buffer larger than `--steps` can
+never fill. 50 000 steps needs 50 000 slots, which is 10 MB instead of 200.
+
+**Why this does not make the thirteen incomparable with the three.** A replay
+buffer changes behaviour only when it EVICTS, and neither size evicts when the
+run is shorter than the smaller buffer. That is an argument, so it was checked:
+the same seed was trained both ways and every network parameter compared —
+**32 tensors, 368 398 values, largest difference 0.000e+00.** Identical. The
+three completed runs stand and the thirteen are re-run **with their original
+seeds**, as section 6 requires.
+
+Re-run the proof at any time with:
+
+```bash
+python run_phase_d.py --prove-buffer
+```
+
+**21 September, second launch: 8 of 13 died again, of the same shortage by a
+different route.** With the buffer fixed the `numpy MemoryError` was gone, but
+nine concurrent runs still exhausted memory and torch raised `RuntimeError: bad
+allocation` inside its forward pass. Five completed.
+
+The cause was a guess. The concurrency cap had been computed from an ESTIMATE
+of 0.9 GB per run. One process was then actually watched:
+
+```
+peak RSS of ONE train.py process: 1522 MB
+```
+
+**1.5 GB, not 0.9 — the estimate was 70 % low**, which is the whole margin
+between a cap that works and one that does not. `run_phase_d.py` now carries
+the measured figure, and checks free memory again *before each launch* rather
+than trusting a number computed once at the start.
+
+This is the session's own lesson arriving twice: the first launch guessed
+nothing and counted cores, the second guessed the wrong number, and only the
+measurement settled it.
+
+**Completed by the end of the second launch:** seeds 1, 2, 3 and 7, both arms —
+four complete pairs.
+
+**No seed was changed, added or dropped because of any of this.** Every failure
+was mechanical, every one happened in the first minute before an agent had
+learned anything, and no evaluation had been run when they were fixed. Seeds 0,
+4, 5 and 6 were re-launched under their original numbers.
+
 ## 7. Stopping rule
 
 Sixteen runs, then stop. **No seed is added after any result is seen.** If the
