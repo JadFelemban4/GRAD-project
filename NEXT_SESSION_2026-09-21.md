@@ -26,12 +26,12 @@ the real ZF 8HP51 seven hours later. Re-running the same two agents on HEAD
 gives +7.5, and that is not a result either, because they are scored on a plant
 they never saw. Do not quote either number.
 
-BEFORE ANY TRAINING — two minutes, and it protects irreplaceable data
-  runs/ is gitignored and holds the only copies of the two trained agents.
-  `train.py --seed 0` resumes from the newest checkpoint inside it and
-  overwrites final.zip and curve.csv. Rename it first:
-      mv runs runs_sixspeed_18sep
-  Then `train.py` starts clean and the old agents survive as a record.
+ALREADY DONE — do not undo it
+  runs/ was renamed to runs_sixspeed_18sep/ on 21 September. It holds the only
+  copies of the two six-speed agents, it is gitignored, and `train.py --seed 0`
+  would have resumed into it and overwritten the only record behind
+  results/phase_d_seed0.txt. `train.py` now starts clean. Leave the old
+  directory where it is until Phase D has produced a replacement.
 
 WHAT TO DO, IN ORDER
 
@@ -58,16 +58,24 @@ WHAT TO DO, IN ORDER
    marked MISSED must become CAUGHT.
 
 3. SWEEP THE DOCUMENTS FROM A FRESH RUN (H2-1, H2-4, H2-8) — one day.
-   Run the eight scripts, capture the output, and rewrite from it: the four
-   abstracts, CONTROL_SCOPE.md, CLAUDE.md's numbers block, README.md's box,
-   handoff.md's table, results/README.md, presentation/README.md.
+   Run the eight scripts, capture the output, and rewrite from it:
+   CONTROL_SCOPE.md, CLAUDE.md's numbers block, README.md's box, handoff.md's
+   table, results/README.md, presentation/README.md, and ABSTRACT.md, which
+   currently carries a banner instead of a rewrite.
    The four figures that are wrong everywhere:
        175.5 min -> 295.0      nine drives -> ten
        22 points -> 26         30-74 kPa  -> 30-75
-   And the ablation sentence in every abstract describes the design AUDIT.md C3
-   voided ("re-evaluating the identical trained policy with its preview channel
-   disabled"). evaluate.py trains and scores a SECOND agent. Say that instead.
    Do this AFTER step 2 so the sweep is checked rather than trusted.
+
+   THE ABSTRACTS ARE A SPECIAL CASE AND ARE NO LONGER FOUR. On 21 September the
+   Arabic and simplified versions were deleted and DOC/Abstract_EN.docx plus
+   DOC/Abstract_EN.pdf were SUBMITTED TO THE SUPERVISOR. Its dataset figures are
+   correct. One sentence in it is not: it says preview is isolated "by
+   re-evaluating that policy blind", which is the construction AUDIT.md C3
+   voided -- it cannot fail and it is not evidence. evaluate.py trains and
+   scores a SECOND agent, which is the defensible design. Raise the wording
+   with the supervisor; do not silently re-submit. ABSTRACT.md's banner says
+   the same thing.
 
 4. THEN PHASE D, retrained on the current plant.
    Ten runs, five seeds each way, 63 min each. Before seed 1 runs, commit
