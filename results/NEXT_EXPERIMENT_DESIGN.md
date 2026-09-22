@@ -206,3 +206,30 @@ we measured stresses the turbine enough to need protecting.*
   exactly as Phase D's were — randomised across episodes, fixed across policies
 - eight seeds per arm, C1 budget first; the statistic, test and alpha as
   Phase D, **plus the minimum effect of interest, which must be set this time**
+
+## ADDENDUM, 22 September 2026 — the fine sweep found a deeper notch, and it still binds
+
+The table above sampled grade every 0.5 % and named **14.0 % at +12.7 K** the
+weakest. Training draws grade from a CONTINUOUS range, and the peak is a
+sawtooth, so a notch between two grid points could be deeper than either.
+`check_random_road.py` swept 12–16 % at 0.05 % and the notch region
+(13.60–14.10 %) at 0.01 %, at the worst-case start (300 s, the shortest climb in
+a 720 s episode), neutral policy, dt 1.0:
+
+| | grade | peak | margin | seconds above |
+|---|---|---|---|---|
+| the 0.5 % grid's weakest | 14.00 % | 862.6 °C | +12.7 K | 263 |
+| **the real minimum** | **13.73 %** | **856.8 °C** | **+6.9 K** | **233** |
+
+**121 of 121 grades bind**, so option B stands. But the true margin at the
+notch is half what the design record said, and it sits between the grid points
+the decision was made on. The lesson is the one this record already states for
+the grade range as a whole: measure a continuous draw continuously before
+training on it.
+
+The same run checked the rest of what Phase D2 needs, and all of it passes: the
+road changes between resets; the blind arm's observations are identical on
+every road until its climb arrives (first difference at 150 s for a 150 s climb,
+against 120 s for the sighted arm); all twenty frozen episodes bind (weakest
+13.99 %, +12.5 K); and the peak at 13.73 % is identical at dt 0.2 and dt 1.0
+(856.8 °C). Output in `results/PREREGISTRATION_D2.md` section 10.

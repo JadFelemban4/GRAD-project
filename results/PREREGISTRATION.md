@@ -5,10 +5,18 @@ Committed before seed 0 of either arm started. That ordering is the whole point
 of this file: a hypothesis declared after the numbers are in is not a
 hypothesis, it is a description.
 
-> **Status:** two lines are marked **TEAM DECISION** and are not filled in.
-> They must be settled, and this file re-committed, **before `evaluate.py` is
-> run** — not merely before the thesis is written. Setting a threshold after
-> seeing where the result landed is the same failure as changing the test set.
+> **Status:** two lines were marked **TEAM DECISION**. They had to be settled,
+> and this file re-committed, **before `evaluate.py` is run** — not merely
+> before the thesis is written. Setting a threshold after seeing where the
+> result landed is the same failure as changing the test set.
+>
+> **That rule was broken for one of the two lines, and it is stated here
+> rather than tidied away.** The seed count (eight) was accepted before any
+> agent trained. **The minimum effect of interest was not set until
+> 22 September 2026 — after Phase D's result had been seen.** See section 5
+> for what that does and does not touch. In short: it cannot move the verdict,
+> because the primary test never uses it; it can only label the null, and that
+> label is marked post-hoc wherever it is printed.
 
 ---
 
@@ -103,9 +111,53 @@ separate processes rather than one after another.
 - **α = 0.05, one-sided.** One-sided because the pre-registered direction is
   "preview helps"; a significant result in the *other* direction is reported as
   what it is — preview costing damage — and not converted into a two-sided win.
-- **Minimum effect of interest:** **TEAM DECISION — NOT YET SET.** See the
-  banner at the top. The number belongs here because without it a null result
-  cannot be told apart from an underpowered one.
+- **Minimum effect of interest: 50 damage units — SET 22 SEPTEMBER 2026, AFTER
+  THIS EXPERIMENT'S RESULT WAS KNOWN.** Set by the team (Jad), for Phase D2's
+  preregistration (`results/PREREGISTRATION_D2.md`), and recorded here to close
+  this line. About 5 % of baseline damage (959.8), four times the largest known
+  measurement artefact (the dt effect, 12.5 units), and about 15 % of what
+  supervision alone buys (326.6).
+
+  **What the late setting cannot touch.** The primary test — the sign test on
+  "preview helps" — never uses the MEI, so Phase D's verdict is exactly what it
+  was: **not significant, p = 0.3633.** No threshold chosen afterwards can move
+  that.
+
+  **What it can touch, and how that is kept honest.** With an MEI a null can be
+  classified: "preview's effect is shown to be below 50" versus "the experiment
+  cannot tell". `analyse_phase_d2.py` applies that rule to Phase D and prints
+  **INCONCLUSIVE** (4 of 8 seeds below 50, sign p = 0.6367) — labelled
+  *"MEI set AFTER this result"* every time. It is a reading, not a finding, and
+  it must not be quoted as though it had been preregistered.
+
+  **Was 50 chosen to flatter Phase D?** That is the question to ask of any late
+  threshold, so it was computed rather than asserted — and the first answer
+  written here was WRONG. It said "every MEI from 10 to 400 classifies Phase D
+  INCONCLUSIVE". Computed, Phase D's post-hoc label DOES depend on the MEI:
+
+  | MEI | seeds below it | sign p | permutation p | label |
+  |---|---|---|---|---|
+  | 10 – 87.1 | 4 – 6 of 8 | ≥ 0.0625 | ≥ 0.1328 | INCONCLUSIVE |
+  | 87.2 – 387 | 7 of 8 | 0.0352 | 0.1289 → 0.0078 | SMALLER THAN THE MEI (sign); **permutation disagrees below ~150** |
+  | ≥ 388 | 8 of 8 | 0.0039 | 0.0039 | SMALLER THAN THE MEI |
+
+  So the 96-unit option the team was also offered would have labelled Phase D
+  "smaller than the MEI" by the primary test, with the sensitivity test
+  disagreeing. **50 gives the weaker label, not the stronger one.** Phase D's
+  classification was not shown to the team when the choice was made; the choice
+  rested on the artefact floor and the size of supervision
+  (`power_analysis.py`), and on the number becoming the D2 threshold, where it
+  IS preregistered. Recorded here so a reader does not have to take that on
+  trust — the table is what `analyse_phase_d2.py`'s functions compute.
+
+  **And the reason the line mattered is now measured, not argued.**
+  `power_analysis.py`: at Phase D's spread, eight seeds have **power 0.10**
+  against an effect of 50, and reach 80 % power only against **~269 units** —
+  28 % of baseline damage, close to the whole benefit of supervision. So
+  Phase D's null is consistent with preview being worth nothing and equally
+  consistent with it being worth 100 units. That is a fifth thing to set beside
+  the four live explanations in limit 7: **the experiment was underpowered by
+  design.**
 
 ## 6. Everything reported, whatever it says
 
@@ -398,5 +450,5 @@ filed under this preregistration without the mismatch being printed in it.
 |---|---|
 | written | 21 September 2026 |
 | commit this file was committed in | *(filled by the commit that adds it)* |
-| minimum effect set by | **TEAM DECISION — OUTSTANDING** |
-| seeds agreed by | **TEAM DECISION — eight proposed above; say so if it is five** |
+| minimum effect set by | **the team (Jad), 22 September 2026 — 50 damage units. AFTER the result; see section 5** |
+| seeds agreed by | **the team — eight, accepted before any agent trained** (`CHECKPOINT.md`, session close 21–22 September) |
