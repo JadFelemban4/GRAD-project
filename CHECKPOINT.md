@@ -1520,3 +1520,31 @@ And 50.3 s was C/UA at the condemned 112.5 g/s. Corrected in `CLAUDE.md`.
   and it is false for a constant-flow test. It is `AUDIT2.md` fix-3 work.
 - **The climb has not been randomised.** That is the next experiment, and it
   needs its own preregistration.
+
+
+## 22 September 2026, later still — the randomised-climb range was measured, and half of it fails
+
+The team accepted a design for the next experiment — randomise the climb's start
+between 120 and 300 s and its grade between 8 % and 16 % — and before anything
+was built, the grade range was measured.
+
+| grade | peak | vs trigger | binds? |
+|---|---|---|---|
+| 8 % | 848.9 °C | −1.0 K | **no** |
+| 10 % | 826.6 °C | −23.3 K | **no** |
+| 12 % | 884.0 °C | +34.2 K | yes |
+| 14 % | 862.6 °C | +12.7 K | yes |
+| 16 % | 902.9 °C | +53.0 K | yes |
+
+Neutral policy, 130 km/h, 720 s, dt 1.0. The start time does not move the peak:
+12 % at 120 s and at 300 s both reach 884.0 °C.
+
+**Grades of 8 % and 10 % never reach the trigger**, so an episode drawn there
+carries no protection signal and dilutes the rest. **And peak temperature is not
+monotonic in grade** — 10 % is cooler than 8 %, 14 % cooler than 12 % — because
+the gearbox downshifts under load and a lower load per cycle means a cooler
+exhaust.
+
+Recommended in its place: randomise the start time only, grade fixed at 12 %.
+The options and the reasoning are in `results/NEXT_EXPERIMENT_DESIGN.md`. The
+decision is open and belongs in the next preregistration, before training.

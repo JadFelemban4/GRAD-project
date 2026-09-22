@@ -90,11 +90,21 @@ WHAT TO DO, IN ORDER
    Four explanations for the null are live and it separates none
    (PREREGISTRATION limit 7).
 
-   The fix is cheap: make_grade_climb() draws the climb's start time and grade
-   per episode, from ranges written into the preregistration BEFORE training.
-   Then the preview channel is the only route to knowing when the hill comes.
-   Run it at C1 first (about an hour) -- if the arms separate, the design was
-   the problem; if they still do not, C4 is the next thing to try.
+   The fix is cheap: make_grade_climb() draws the climb per episode, from
+   ranges written into the preregistration BEFORE training. Then the preview
+   channel is the only route to knowing when the hill comes. Run it at C1 first
+   (about an hour) -- if the arms separate, the design was the problem; if they
+   still do not, C4 is the next thing to try.
+
+   READ results/NEXT_EXPERIMENT_DESIGN.md FIRST. It holds a MEASUREMENT that
+   rules out the range first accepted (120-300 s, 8-16 %): grades of 8 % and
+   10 % NEVER REACH THE TRIGGER, so a third of those episodes would carry no
+   signal. The start time is free -- 120 s and 300 s both bind at 884.0 C.
+   Recommended: OPTION A, randomise the START TIME only (120-300 s) with the
+   grade fixed at 12 %. One variable, and every episode measured to bind.
+
+   Also recorded there: peak temperature is NOT monotonic in grade (10 % runs
+   cooler than 8 %, 14 % cooler than 12 %) because the gearbox downshifts.
 
    It is a SECOND experiment: its own preregistration, and both get reported.
 
