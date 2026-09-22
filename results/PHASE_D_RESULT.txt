@@ -1,5 +1,5 @@
 ==============================================================================
-PHASE D â€” the preregistered test
+PHASE D — the preregistered test
 results/PREREGISTRATION.md, committed before any agent was trained
 ==============================================================================
 
@@ -24,6 +24,11 @@ paired differences (blind - sighted), n = 8
   alpha                            0.05
 
   RESULT: NOT SIGNIFICANT at alpha 0.05.
+  These are C1 agents: 50 000 steps, 11 training episodes each,
+  which train.py itself calls 'the first bad run'. So the claim
+  is 'with agents trained to the C1 budget, preview does not
+  separate from seed noise' -- NOT 'preview does not help'.
+  See results/PREREGISTRATION.md limit 6.
 
   Minimum effect of interest: STILL UNSET (TEAM DECISION).
   Until it is set, a null result cannot be told apart from an

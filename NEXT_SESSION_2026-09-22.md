@@ -34,6 +34,13 @@ are two different claims; only the first was the hypothesis.
 
     python analyse_phase_d.py     reproduces all of it in seconds
 
+AND THE BUDGET BELONGS WITH THE NULL. Every agent is a C1 agent -- 50 000
+steps, which train.py itself calls "the first bad run", 11 training episodes.
+A null from an undertrained agent and a null from a converged one are different
+claims and 11 episodes cannot separate them. Write "with agents trained to the
+C1 budget, preview does not separate from seed noise", NOT "preview does not
+help". results/PREREGISTRATION.md limit 6.
+
 WHAT TO DO, IN ORDER
 
 1. SET THE MINIMUM EFFECT OF INTEREST. TEAM DECISION, and it blocks the
@@ -69,9 +76,17 @@ WHAT TO DO, IN ORDER
         supervisor understates the dataset by 40 %.
 
 3. WRITE THE PHASE D CHAPTER. The null is the result. Say both findings, keep
-   them separate, and quote the limits from PREREGISTRATION section 8 -- they
-   were declared before the numbers, which is what makes them limits rather
-   than excuses.
+   them separate, and quote the limits from PREREGISTRATION section 8 -- five
+   of the six were declared before the numbers, which is what makes them limits
+   rather than excuses. Limit 6, the C1 training budget, was added AFTER the
+   result and says so; it is the one that bears hardest on the null and it was
+   missing, which is worth saying plainly rather than back-dating.
+
+4. DECIDE WHETHER TO RUN C4 -- the same sixteen at 300 000 steps, about six
+   hours here. It is the experiment that would separate "preview does not pay
+   off" from "the agents never learned to use it", and it is the single most
+   valuable thing left. It is a SECOND experiment: write its preregistration
+   first, do not extend this one, and report both whichever way it goes.
 
 DO NOT
   - Do not add seeds. PREREGISTRATION section 7: sixteen runs, then stop.

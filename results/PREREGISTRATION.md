@@ -218,6 +218,46 @@ These are declared now so they cannot be discovered later as excuses.
    duty cycle; the two external candidates tried (SAE J2807, the Taif drive) do
    not reach the trigger and that is disclosed.
 
+6. **THE AGENTS ARE TRAINED FOR 50 000 STEPS, WHICH THIS PROJECT'S OWN CODE
+   CALLS "THE FIRST BAD RUN" — and of the six limits here this is the one that
+   bears hardest on a null.** Added 22 September, after the result, because it
+   was missing and the result cannot be read honestly without it.
+
+   `train.py`'s usage block defines the two budgets:
+
+   ```
+   python train.py --steps 50000  --seed 0   # C1: the first bad run
+   python train.py --steps 300000 --seed 0   # C4: a real run
+   ```
+
+   Every agent behind the table above is a **C1** agent. At 4 500 steps per
+   episode that is **11 training episodes** — and `evaluate.py`'s own docstring
+   already warns that eleven episodes of this environment span −506 to +644
+   purely on the weight draw.
+
+   **A null has two readings and eleven episodes cannot separate them:**
+
+   | reading | what it would mean |
+   |---|---|
+   | preview genuinely does not pay off here | a result about H/τ, which is the project's claim |
+   | the agents never learned to exploit preview | a limit of the experiment, not of the phenomenon |
+
+   The second is live: preview is a timing cue, not a crude signal, and timing
+   is plausibly the last thing a policy learns. **Do not write "preview does not
+   help on this plant" without this paragraph beside it.** The defensible
+   sentence is narrower: *with agents trained to this project's C1 budget,
+   preview does not separate from seed noise.*
+
+   What would settle it, and it is the obvious next experiment: the same
+   sixteen runs at `--steps 300000` (C4). On this machine that is about six
+   hours at the measured concurrency. **It is a SECOND experiment and needs its
+   own preregistration** — section 7 forbids extending this one — and both get
+   reported whichever way it goes.
+
+   All sixteen curves did improve (first five versus last five, 16 of 16), so
+   the agents learned *something*. That is C1's criterion and not evidence of
+   convergence; `train.py` prints the same caveat under its own curve summary.
+
 ## 9. How to run it
 
 ```bash

@@ -85,6 +85,15 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 > specifically is what cannot be shown.** Do not let the first be read as
 > evidence for the second — that conflation is `AUDIT.md` C3.
 >
+> **AND SAY THE TRAINING BUDGET IN THE SAME BREATH AS THE NULL.** These are
+> **C1** agents — 50 000 steps, which `train.py` calls "the first bad run",
+> 11 training episodes each. A null from an undertrained agent and a null from a
+> converged one are different claims, and 11 episodes cannot tell them apart.
+> The defensible sentence is *with agents trained to the C1 budget, preview does
+> not separate from seed noise* — not *preview does not help*. Settling it means
+> the same sixteen runs at 300 000 steps, which is a SECOND experiment with its
+> own preregistration. `results/PREREGISTRATION.md` limit 6.
+>
 > Reproduce in seconds: `python analyse_phase_d.py`.
 > The full account is `CHECKPOINT.md`, entry of 21–22 September.
 
@@ -92,7 +101,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.837), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
-| C · get an agent to learn | **done.** Sixteen agents trained on the ZF plant, 50 000 steps each, seeds 0–7 both arms. Every one carries a `meta.json` plant fingerprint. *(This row said "**next**, nothing has been trained yet" until 22 September.)* |
+| C · get an agent to learn | **C1 done, C4 NOT done.** Sixteen agents trained on the ZF plant, seeds 0–7 both arms, each carrying a `meta.json` plant fingerprint. All sixteen curves improve. But **50 000 steps is what `train.py` itself calls "C1: the first bad run"** — 11 training episodes — against **300 000 for "C4: a real run"**. *(This row said "**next**, nothing has been trained yet" until 22 September, then briefly said "done", which was too generous: C1 is not C4 and the difference is load-bearing for Phase D's null — see `PREREGISTRATION.md` limit 6.)* |
 | D · baselines and the ablation | **done, and the answer is a NULL.** Preview not significant (p = 0.36 sign, p = 0.49 permutation); the agent beats `current-grade` by +29 to +34 points on five of eight seeds. Preregistered before training. **One line outstanding: the minimum effect of interest is still TEAM DECISION**, and until it is set a null cannot be told apart from an underpowered study. *(This row said "not started. This is the floor of the project" until 22 September — the floor is now in.)* |
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary result only, from hand-written policies |

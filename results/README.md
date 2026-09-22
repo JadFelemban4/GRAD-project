@@ -57,6 +57,32 @@ This agrees with everything measured before it: the hand-written policies put
 preview at **−0.4 points** against current-grade, and five scenarios gave the
 same sign.
 
+### The training budget, which belongs beside the null and not under it
+
+Every agent above is a **C1** agent. `train.py`'s own usage block:
+
+```
+python train.py --steps 50000  --seed 0   # C1: the first bad run
+python train.py --steps 300000 --seed 0   # C4: a real run
+```
+
+50 000 steps at 4 500 steps per episode is **11 training episodes**. A null has
+two readings and eleven episodes cannot separate them: preview may genuinely not
+pay off here, or the agents may never have learned to exploit it. Preview is a
+timing cue, and timing is plausibly the last thing a policy learns.
+
+**So the defensible sentence is narrower than "preview does not help":**
+
+> With agents trained to this project's C1 budget, preview does not separate
+> from seed noise.
+
+All sixteen curves do improve (first five versus last five, 16 of 16), which is
+C1's criterion and is not evidence of convergence. Settling it means the same
+sixteen runs at 300 000 steps — **a SECOND experiment, with its own
+preregistration**, because section 7 forbids extending this one.
+
+`PREREGISTRATION.md` limit 6.
+
 ### Outstanding before this is written up
 
 **The minimum effect of interest is not set** — `PREREGISTRATION.md` section 5,

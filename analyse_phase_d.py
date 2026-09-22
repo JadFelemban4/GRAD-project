@@ -153,6 +153,16 @@ def main():
         print(f"  RESULT: preview helps. Both tests reject at alpha {ALPHA}.")
     else:
         print(f"  RESULT: NOT SIGNIFICANT at alpha {ALPHA}.")
+        # THE TRAINING BUDGET BELONGS NEXT TO A NULL, NOT IN A FOOTNOTE.
+        # 50 000 steps is what train.py calls "C1: the first bad run" -- 11
+        # episodes. A null from an undertrained agent and a null from a
+        # converged one are different claims, and this experiment cannot tell
+        # them apart. Printed here so it travels with the number.
+        print("  These are C1 agents: 50 000 steps, 11 training episodes each,")
+        print("  which train.py itself calls 'the first bad run'. So the claim")
+        print("  is 'with agents trained to the C1 budget, preview does not")
+        print("  separate from seed noise' -- NOT 'preview does not help'.")
+        print("  See results/PREREGISTRATION.md limit 6.")
         if mean < 0:
             print("  And the mean difference is NEGATIVE: the sighted agents")
             print("  took MORE damage than the blinded ones. Report that as")
