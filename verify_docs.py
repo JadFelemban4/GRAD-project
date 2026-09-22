@@ -740,20 +740,29 @@ RETIRED = [
     # blinded margin quoted in points. There is no correct value for it on this
     # tree, and the honest guard is one that says so rather than one that
     # blesses whatever number replaces the void one.
-    (r"(?i)sighted\s+over\s+blinded[^\n]{0,26}?[-−+]?\d+\.\d+\s*(?:points|pts)",
-     "a sighted-over-blinded ablation margin",
-     "NOTHING -- no Phase D ablation figure is quotable on this tree "
-     "(AUDIT2.md C2-1). Retrain both agents on the current plant first"),
-    (r"(?i)(?:sighted|with preview)[^\n]{0,34}?blind(?:ed)?[^\n]{0,26}?"
-     r"[-−+]?\d+\.\d+\s*(?:points|pts)",
-     "a sighted-versus-blinded ablation margin",
-     "NOTHING -- see AUDIT2.md C2-1; the pair must be retrained on this plant"),
-    # The same claim with the number in the middle: "sighted +11.7 points over
-    # blinded", which is how results/README.md writes it.
-    (r"(?i)sighted[^\n]{0,20}?[-−+]?\d+\.\d+\s*(?:points|pts)[^\n]{0,20}?"
-     r"over\s+blind",
-     "a sighted-over-blinded ablation margin, number in the middle",
-     "NOTHING -- see AUDIT2.md C2-1"),
+    # --- THREE SHAPE PATTERNS WERE HERE AND WERE REMOVED ON 22 SEPTEMBER,
+    # because the condition they guarded has been MET.
+    #
+    # They matched ANY sighted-over-blinded margin quoted in points, on the
+    # ground that no such figure was quotable on this tree: the only pair that
+    # existed had been trained on a gearbox the branch had replaced. Their own
+    # replacement text said so -- "Retrain both agents on the current plant
+    # first."
+    #
+    # That was done. Sixteen agents, eight seeds per arm, trained on the ZF
+    # plant under results/PREREGISTRATION.md, which was committed before any of
+    # them started. `results/phase_d_seed*.txt` now print a sighted-over-blinded
+    # margin that IS quotable, and the shape patterns flagged all eight of them.
+    #
+    # A guard whose stated precondition has been satisfied and which then fires
+    # on the work that satisfied it is not protecting anything -- it is the
+    # 14 September lesson ("a retired-value list has to be swept when the value
+    # that replaced it moves on") arriving on a rule written the day before.
+    #
+    # The VALUE pattern below stays, because 11.7 is still void whatever else
+    # is now true, and it is what makes the audit's own drift row -- editing
+    # +11.7 to +13.7 -- fail: that pattern's count drops, and the known-stale
+    # ledger reports a row that shrank.
     # AND THE VALUE ITSELF, beside the shape. The shape pattern above cannot
     # tell +11.7 from +13.7 -- it is written not to -- so on its own it counts
     # a mention rather than watching it. This one matches only the void figure,
@@ -923,11 +932,7 @@ KNOWN_STALE = [
     ("validate.py", "total minutes", "H2-1", (175.5,)),
     ("validation_table.md", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
     # --- retired-scan rot: a COUNT, because the pattern is the value.
-    ("CHECKPOINT.md", "a sighted-over-blinded ablation margin", "C2-1", 1),
-    ("CHECKPOINT.md", "a sighted-versus-blinded ablation margin", "C2-1", 1),
     ("CHECKPOINT.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 2),
-    ("DOC/SESSION_REPORT_2026-09-18.md", "a sighted-over-blinded ablation margin", "C2-1", 1),
-    ("DOC/SESSION_REPORT_2026-09-18.md", "a sighted-versus-blinded ablation margin", "C2-1", 2),
     ("DOC/SESSION_REPORT_2026-09-18.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 2),
     ("app/alerts.py", "the point span with the sensor as charge temp", "H2-1", 1),
     ("presentation/data.js", "premise baseline with its cooling disabled (C1)", "C2-3", 2),
@@ -947,11 +952,10 @@ KNOWN_STALE = [
     ("presentation/plan.html", "preview edge built on the C1 and C3 artefacts", "C2-3", 2),
     ("presentation/plan.html", "the H2 table measured against a cooling-disabled baseline (C1)", "C2-3", 6),
     ("presentation/plan.html", "the point span with the sensor as charge temp", "C2-3", 2),
-    ("results/README.md", "a sighted-over-blinded ablation margin, number in the middle", "C2-1", 1),
     ("results/README.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 1),
-    ("results/phase_d_seed0.txt", "a sighted-over-blinded ablation margin", "C2-1", 1),
-    ("results/phase_d_seed0.txt", "a sighted-versus-blinded ablation margin", "C2-1", 1),
 ]
+
+
 
 
 
