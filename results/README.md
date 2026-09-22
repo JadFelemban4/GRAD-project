@@ -83,6 +83,48 @@ preregistration**, because section 7 forbids extending this one.
 
 `PREREGISTRATION.md` limit 6.
 
+### THE BLINDED ARM IS NOT BLIND — the most serious limit on this result
+
+Found 22 September and **verified directly**:
+
+```
+road identical across 3 resets with different seeds : True
+distinct grade values in the road                   : [0.0, 0.12]
+step location                                        : t = 180 s
+blind agent, flat phase: obs[7] over 900 steps      : 900 distinct values
+```
+
+The road is **the same hill at the same second** in every training episode and
+every evaluation episode. The blind agent sees zeros where the preview should
+be, but its thermal state takes a distinct value at every step — so it has a
+clock, on a road it can memorise.
+
+**So this experiment compared an explicit preview channel with an implicit one,
+not foresight with none.** If both arms learned where the hill is, a null is
+what should come out, and it says nothing about whether foresight is worth
+acquiring. Whether the blind agents actually did this is unmeasured — with 11
+training episodes they may not have — and that is the problem: **four
+explanations for the null are live, and this experiment separates none of
+them.** `PREREGISTRATION.md` limit 7 lists them.
+
+**The fix is cheap and comes before C4:** randomise the climb's start time and
+grade per episode. Then no memorisation tells the blind agent when the hill
+arrives, and the preview channel is the only route to knowing — which is what an
+ablation of preview has to mean.
+
+**This does not touch the +29 to +34 point finding.** That compares the agent
+with a hand-written policy, and learning the road is a legitimate thing for a
+supervisor to do. It is a finding about learned supervision on this road.
+
+### Do not rescue the null with H/τ
+
+Phase D sits at H/τ ≈ 0.23 (while the preview can first act, on the flat) to
+0.62 (on the climb). It is tempting to say "that is below where preview matters,
+so the null fits the theory". **It does not.** The project's only H/τ curve —
+void, but the only one — puts the largest preview value near 0.6, which is where
+Phase D sits. The reading was drafted, checked and refuted on 22 September.
+`PREREGISTRATION.md` limit 8 says why in full.
+
 ### Outstanding before this is written up
 
 **The minimum effect of interest is not set** — `PREREGISTRATION.md` section 5,

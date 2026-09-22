@@ -1438,3 +1438,85 @@ legitimate agents would now be refused.** That is why `plant_sha` is fatal and
 was trained on"*.
 
 `results/void/` keeps the +11.7 file with a README saying why it is void.
+
+
+## 22 September 2026, later — a claim was drafted, checked, and REFUTED; and the ablation has a design flaw
+
+**Recorded in full because the refuted claim is the one the next person will
+draft, and because the check found something much worse than the error it was
+looking for.**
+
+### The claim, which is wrong
+
+Asked "would adding GPS make a difference?", the answer given in chat was:
+
+> The preview IS the GPS. The agent sees at most 30 s ahead; the turbine takes
+> 48 s; so H/τ = 0.62, below the region near 1 where the theory says preview
+> matters. **So the null is consistent with the project's own theory.**
+
+That was about to be written into `CLAUDE.md` as a reframing of the result. It
+was checked first by four independent read-only agents, each told to REFUTE it,
+and then re-checked directly. **It is wrong in four places:**
+
+| said | truth |
+|---|---|
+| H/τ = 0.62 | 0.23 while the preview can first act (flat, τ = 129 s), 0.62 on the climb (τ = 48 s). τ spans 40–239 s over one episode |
+| "the region near 1" | invented. "Near 1" appears nowhere in the repo |
+| "consistent with the theory" | the OPPOSITE. The project's only H/τ curve (void) puts the LARGEST preview value near 0.6, where Phase D sits |
+| a real GPS is strictly worse | worse in accuracy, far BETTER in reach — it sees the whole route |
+
+A second wrong figure was also given in chat — "τ is 54.2 s, not 48" — built on
+an exhaust flow of 103 g/s taken from a code comment. The climb's measured τ is
+48.4 s.
+
+**None of it reached a file.** That was checked. The lesson is the one this
+repository keeps relearning: a claim that makes the result look better is the
+one to verify hardest, and verifying it BEFORE writing is what kept it out.
+
+### What the check found instead, and it matters more
+
+**1. THE BLINDED ARM IS NOT BLIND.** Verified directly, not relayed:
+
+```
+road identical across 3 resets with different seeds : True
+distinct grade values in the road                   : [0.0, 0.12]
+step location                                        : t = 180 s
+blind agent, flat phase: obs[7] over 900 steps      : 900 distinct values
+```
+
+The road never changes between episodes, and the blind agent's thermal state is
+a clock. So Phase D compared an explicit preview channel with an implicit one on
+a memorisable road — not foresight with none. **Four explanations for the null
+are now live and the experiment separates none of them** (`PREREGISTRATION.md`
+limit 7). The decisive fix is cheap: **randomise the climb per episode.**
+
+**2. The H/τ axis is broken.** `generality_test.py:81` reads
+`info.get("mdot")`; the environment never emits that key; so
+`_exhaust_of_climb()` returns 0 samples and the script falls back to the assumed
+112.5 g/s every run. The `AUDIT.md` M12 fix does not work. Verified by calling
+it.
+
+**3. `CLAUDE.md`'s τ line presented one method as two.** "C/UA gives 50.3 s;
+the step response gives 48.0 s" — but `validate.py` holds the flow constant, so
+the step response IS C/UA; swept over nine parameter cells they agree to 0.13 s.
+And 50.3 s was C/UA at the condemned 112.5 g/s. Corrected in `CLAUDE.md`.
+
+### Where each finding now lives
+
+| finding | file |
+|---|---|
+| the blinded arm is not blind | `results/PREREGISTRATION.md` limit 7, `CLAUDE.md` result box, `results/README.md`, **printed by `analyse_phase_d.py`** |
+| the correct H/τ position, and why the rescue is wrong | `results/PREREGISTRATION.md` limit 8, `CLAUDE.md`, `results/README.md` |
+| the broken mdot / M12 axis | `results/PREREGISTRATION.md` limit 8, this entry, the next-session prompt |
+| the τ line corrected | `CLAUDE.md`, Known limitations |
+
+### Not done, and stated
+
+- **`generality_test.py` is not fixed.** The bug is documented with its line and
+  cause; fixing it moves figures that are void anyway (C1, H2-5), so it waits
+  for the session that re-runs the H/τ sweep properly.
+- **`README.md`'s explanation of the 48.0 / 50.3 gap is still there** —
+  "the gas-side coefficient rises with flow, so the node is not first-order" —
+  and it is false for a constant-flow test. It is `AUDIT2.md` fix-3 work.
+- **The climb has not been randomised.** That is the next experiment, and it
+  needs its own preregistration.

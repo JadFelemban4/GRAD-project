@@ -1,5 +1,5 @@
 ==============================================================================
-PHASE D — the preregistered test
+PHASE D â€” the preregistered test
 results/PREREGISTRATION.md, committed before any agent was trained
 ==============================================================================
 
@@ -29,6 +29,15 @@ paired differences (blind - sighted), n = 8
   is 'with agents trained to the C1 budget, preview does not
   separate from seed noise' -- NOT 'preview does not help'.
   See results/PREREGISTRATION.md limit 6.
+
+  AND THE BLINDED ARM IS NOT BLIND. The road is the same hill at
+  the same second in every episode, and the blind agent's thermal
+  state takes a distinct value at every step -- a clock on a road
+  it can memorise. So this compares an explicit preview channel
+  with an implicit one, not foresight with none. Four explanations
+  for the null are live and this experiment separates none of them.
+  Randomise the climb per episode before reading anything into it.
+  See results/PREREGISTRATION.md limits 7 and 8.
 
   Minimum effect of interest: STILL UNSET (TEAM DECISION).
   Until it is set, a null result cannot be told apart from an

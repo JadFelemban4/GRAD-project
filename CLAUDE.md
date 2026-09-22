@@ -94,6 +94,24 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 > the same sixteen runs at 300 000 steps, which is a SECOND experiment with its
 > own preregistration. `results/PREREGISTRATION.md` limit 6.
 >
+> **AND THE BLINDED ARM IS NOT BLIND — the most serious limit, found 22 Sep and
+> verified directly.** The road is the same hill at the same second (t = 180 s)
+> in every training and evaluation episode, and the blind agent's thermal state
+> takes a distinct value at every step, so it is a clock on a road it can
+> memorise. **Phase D therefore compared an explicit preview channel with an
+> implicit one — not foresight with none.** Whether the blind agents used it is
+> unmeasured, and that is the point: four explanations for the null are live and
+> this experiment separates none. **The cheap decisive fix, before C4:**
+> randomise the climb's start time and grade per episode, so that the preview
+> channel is the only route to knowing when the hill comes.
+> `results/PREREGISTRATION.md` limits 7 and 8.
+>
+> **Do not rescue the null with H/τ.** Phase D sits at H/τ ≈ 0.23–0.62 depending
+> on the phase, and the project's only H/τ curve (void) puts the LARGEST preview
+> value near 0.6 — so on the repository's own numbers the null is in tension
+> with the theory, not consistent with it. That reading was drafted, checked and
+> refuted on 22 September; limit 8 records why.
+>
 > Reproduce in seconds: `python analyse_phase_d.py`.
 > The full account is `CHECKPOINT.md`, entry of 21–22 September.
 
@@ -1494,8 +1512,29 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   (1120 readings in the first), so the envelope is well determined where it does
   not matter and barely determined where it does. Say so in Chapter 3, and do
   not quote the top bins to three significant figures.
-- **Turbine τ.** `C/UA` gives 50.3 s; the step response on the correct engine
-  gives 48.0 s, inside the published band. <!-- RETIRED-OK -->
+- **Turbine τ is 48.0 s on the climb, and it is ONE measurement, not two.**
+  `validate.py` prints 48.0 s, inside the published 40–120 s band.
+
+  This line used to say "`C/UA` gives 50.3 s; the step response gives 48.0 s",
+  presenting two methods that nearly agree. **They are the same method.** The
+  turbine node is decoupled from the block and oil (`thermal.py`), and
+  `validate.py` holds fuel flow, exhaust flow and EGT CONSTANT for the whole
+  step, so the response is an exact first-order exponential whose time constant
+  IS `C/UA`. Perturbed in mistake 12's style — `c_turb` and `ua_gas_turb` each
+  swept over three values — the step-response τ tracks analytic `C/UA` to within
+  0.13 s in all nine cells. **The step response cannot corroborate C/UA; it
+  recomputes it.** And the 50.3 s was `C/UA` at an exhaust flow of 112.5 g/s,
+  the assumed constant `AUDIT.md` M12 condemned.
+
+  **τ is also not one number.** Over the locked episode it runs from 40 to 239 s,
+  a factor of six, because UA rises with exhaust flow: 48 s on the climb, 129 s
+  on the flat approach. `app/estimator.py`'s table (50 s loaded, 151 s cruise,
+  239 s idle) says the same. Quote τ with its operating point, always — that is
+  mistake 15. And `c_turb = 6000 J/K` is ASSUMED, so every τ is an assumed
+  number to within that constant.
+
+  Corrected 22 September; see `results/PREREGISTRATION.md` limit 8.
+  <!-- RETIRED-OK: 50.3, 39.5 -- the superseded figures, named so they are recognised -->
   The old 39.5 s figure came from the four-cylinder and is void.
 - **The knock retard is measured, the baseline's cap is the right order, and
   THE PUBLISHED p99 IS UNDER RE-DERIVATION — do not quote it.**

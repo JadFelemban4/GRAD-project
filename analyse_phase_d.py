@@ -163,6 +163,21 @@ def main():
         print("  is 'with agents trained to the C1 budget, preview does not")
         print("  separate from seed noise' -- NOT 'preview does not help'.")
         print("  See results/PREREGISTRATION.md limit 6.")
+        # AND THE BLINDED ARM IS NOT BLIND -- the most serious limit, and a
+        # design flaw rather than an execution one. The road is identical in
+        # every episode and the blind agent's thermal state is a clock, so it
+        # can memorise where the hill is with no preview channel at all.
+        # Verified 22 September; PREREGISTRATION limit 7. Printed here so it
+        # travels with the p-value instead of living in a file.
+        print()
+        print("  AND THE BLINDED ARM IS NOT BLIND. The road is the same hill at")
+        print("  the same second in every episode, and the blind agent's thermal")
+        print("  state takes a distinct value at every step -- a clock on a road")
+        print("  it can memorise. So this compares an explicit preview channel")
+        print("  with an implicit one, not foresight with none. Four explanations")
+        print("  for the null are live and this experiment separates none of them.")
+        print("  Randomise the climb per episode before reading anything into it.")
+        print("  See results/PREREGISTRATION.md limits 7 and 8.")
         if mean < 0:
             print("  And the mean difference is NEGATIVE: the sighted agents")
             print("  took MORE damage than the blinded ones. Report that as")

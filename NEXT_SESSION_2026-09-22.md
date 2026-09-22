@@ -82,11 +82,35 @@ WHAT TO DO, IN ORDER
    result and says so; it is the one that bears hardest on the null and it was
    missing, which is worth saying plainly rather than back-dating.
 
-4. DECIDE WHETHER TO RUN C4 -- the same sixteen at 300 000 steps, about six
-   hours here. It is the experiment that would separate "preview does not pay
-   off" from "the agents never learned to use it", and it is the single most
-   valuable thing left. It is a SECOND experiment: write its preregistration
-   first, do not extend this one, and report both whichever way it goes.
+4. RANDOMISE THE CLIMB -- THIS NOW OUTRANKS C4. Found 22 September, and
+   verified: THE BLINDED ARM IS NOT BLIND. The road is the same hill at the same
+   second (t = 180 s) in every episode, and the blind agent's thermal state
+   takes a distinct value at every step, so it has a clock on a road it can
+   memorise. Phase D compared an explicit preview channel with an implicit one.
+   Four explanations for the null are live and it separates none
+   (PREREGISTRATION limit 7).
+
+   The fix is cheap: make_grade_climb() draws the climb's start time and grade
+   per episode, from ranges written into the preregistration BEFORE training.
+   Then the preview channel is the only route to knowing when the hill comes.
+   Run it at C1 first (about an hour) -- if the arms separate, the design was
+   the problem; if they still do not, C4 is the next thing to try.
+
+   It is a SECOND experiment: its own preregistration, and both get reported.
+
+5. C4 -- the same sixteen at 300 000 steps, about six hours. Only after 4, and
+   only on the randomised road: on the fixed road C4 would be confounded by the
+   same memorisation.
+
+6. FIX generality_test.py BEFORE QUOTING ANY H/tau AXIS. Line 81 reads
+   info.get("mdot"), which the environment never emits, so the script always
+   falls back to the assumed 112.5 g/s -- the AUDIT.md M12 fix does not work.
+   Verified 22 Sep: _exhaust_of_climb() returns 0 samples.
+
+DO NOT RESCUE THE NULL WITH H/tau. "H/tau is below 1, so the null fits the
+theory" was drafted on 22 Sep, checked, and refuted: "near 1" is nowhere in the
+repo, and the project's only H/tau curve puts the LARGEST preview value near
+0.6, which is where Phase D sits. PREREGISTRATION limit 8.
 
 DO NOT
   - Do not add seeds. PREREGISTRATION section 7: sixteen runs, then stop.
@@ -99,6 +123,15 @@ DO NOT
   - Do not read "the agent beats current-grade" as "preview helps". That
     conflation is AUDIT.md C3.
   - Do not write to the vehicle's ECU. Read-only OBD-II only.
+
+A MACHINE TRAP ON JAD'S PC, found 22 Sep. If `python` resolves to the project's
+.venv (`which python` -> .venv/Scripts/python), Windows Application Control
+blocks a pandas DLL inside it and verify_docs.py dies with "ImportError: DLL
+load failed ... An Application Control policy has blocked this file". THAT IS
+NOT A DOCUMENT FAILURE, and its exit code 1 must not be read as one. Every run
+this session used the system interpreter:
+    /c/Users/admin/AppData/Local/Programs/Python/Python312/python.exe
+Check `which python` before trusting an exit code.
 
 HOUSE RULES
   - Run `python verify_docs.py ; echo $?` and READ THE EXIT CODE in its own

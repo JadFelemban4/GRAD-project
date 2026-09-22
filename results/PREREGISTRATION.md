@@ -258,6 +258,119 @@ These are declared now so they cannot be discovered later as excuses.
    the agents learned *something*. That is C1's criterion and not evidence of
    convergence; `train.py` prints the same caveat under its own curve summary.
 
+7. **THE BLINDED ARM IS NOT BLIND. This is the most serious limit on the null,
+   and it is a flaw in the ablation's design, not in its execution.** Added
+   22 September, after the result, and marked so for the same reason as limit 6.
+   Found by an adversarial check of a different claim (see `CHECKPOINT.md`,
+   22 September) and then **verified directly**, not relayed:
+
+   ```
+   road identical across 3 resets with different seeds : True
+   distinct grade values in the road                   : [0.0, 0.12]
+   step location                                        : t = 180 s
+   blind agent, flat phase: obs[7] over 900 steps      : 900 distinct values
+   preview channels                                     : [0.0, 0.0, 0.0, 0.0]
+   ```
+
+   **The road never changes.** `make_grade_climb()` builds one cycle — flat for
+   three minutes, then 12 % from t = 180 s — and `reset()` never rebuilds it;
+   only the preference weights are redrawn. Every training episode and every one
+   of the twenty evaluation episodes is the same hill at the same second.
+
+   **And the blinded agent can tell what second it is.** Its preview channels
+   are zeros, but its thermal state is not: the turbine reading alone takes 900
+   distinct values in the 900 steps before the climb. On a fixed road, "the
+   turbine has reached this temperature" is a clock, and a clock plus a
+   memorised road is an unlimited preview obtained with no preview channel at
+   all.
+
+   **So Phase D did not compare "30 s of foresight" against "no foresight".** It
+   compared *an explicit preview channel* against *an implicit clock on a road
+   the agent can memorise*. If both arms learned where the hill is, the null is
+   exactly what should come out — and it says nothing about whether foresight is
+   worth acquiring.
+
+   **Whether the blind agents actually exploited this is UNMEASURED.** With 11
+   training episodes (limit 6) they may not have. That is the point: this
+   experiment cannot tell. **Four explanations for the null are live and it
+   separates none of them:**
+
+   | | explanation |
+   |---|---|
+   | (i) | preview genuinely buys little at this configuration |
+   | (ii) | the agents are undertrained — C1, 11 episodes (limit 6) |
+   | (iii) | the preview carries almost nothing: one 0 → 0.12 step in 900 s |
+   | (iv) | the blinded arm is not blind — a fixed road plus a thermal clock |
+
+   **The fix is cheap and decisive, and it comes before C4:** randomise the climb
+   per episode — its start time, and its grade — so that no amount of
+   memorisation tells the blind agent when the hill arrives. Then, and only then,
+   the only route to anticipating it is the preview channel, which is what an
+   ablation of preview has to mean. It is a SECOND experiment with its own
+   preregistration.
+
+   **What this does NOT touch:** the SEPARATE finding that the trained agent
+   beats `current-grade` by +29 to +34 points. That compares the agent with a
+   hand-written policy, not sighted with blind, and memorising the road is a
+   legitimate thing for a supervisor to learn. It is a claim about learned
+   supervision on this road, and it should be written as exactly that.
+
+8. **WHERE PHASE D SITS ON H/τ — and a tempting reading of it that is WRONG.**
+   Added 22 September. Recorded in full because the wrong reading was drafted,
+   checked, and refuted, and the next person will draft it again.
+
+   **The measured position, with its conditions:**
+
+   | quantity | value | condition |
+   |---|---|---|
+   | longest preview horizon H | 30 s | `engine_env.PREVIEW_S = (2, 5, 15, 30)` |
+   | turbine τ on the climb | 48 s | neutral policy, locked scenario |
+   | turbine τ on the flat approach | 129 s | same run — τ is set by exhaust flow |
+   | **H/τ while preview can first act** | **≈ 0.23** | t = 150–180 s, on the flat |
+   | **H/τ once the climb is under way** | **≈ 0.62** | on the climb |
+
+   **τ is not one number.** Over the locked episode it spans 40–239 s, a factor
+   of six, because it is `c_turb / UA` and UA rises with exhaust flow. Quoting a
+   single τ is mistake 15, which is about exactly that. And `c_turb = 6000 J/K`
+   is ASSUMED (`REFERENCES.md` section 4), so every τ and every H/τ here is an
+   assumed number to within that constant. Do not quote H/τ to two decimals.
+
+   **THE WRONG READING — do not write it.** It runs: *"H/τ is below 1, preview
+   is predicted to matter near 1, so the null is CONSISTENT with the project's
+   theory."* Three things are wrong with it:
+
+   1. **"Near 1" appears nowhere in this repository.** The theory says preview
+      matters where H and τ are "comparable" (`CLAUDE.md`, "What this project
+      is") and never locates that band numerically.
+   2. **The only numbers the project ever produced say the opposite.** The H2
+      sweep in `README.md` puts the LARGEST preview edge at H/τ ≈ 0.6 — which is
+      where Phase D sits. On the repository's own curve the null is in
+      **tension** with the theory, not consistent with it. That curve is void
+      (`AUDIT.md` C1, M12), so it cannot refute anything either — but it rules
+      out using the theory as a rescue.
+   3. **It is unfalsifiable.** A rule that turns any null into a confirmation
+      without measuring where the point sits on a curve is `AUDIT.md` C3's error
+      pointed the other way.
+
+   **The defensible sentence:** *Phase D measured one configuration, at H/τ
+   between about 0.23 and 0.62 depending on the phase. The project has no valid
+   H/τ curve to place it on, and four explanations for the null are live
+   (limit 7).*
+
+   **And the H/τ axis itself is currently broken.** `generality_test.py` line 81
+   reads `info.get("mdot")`, but the environment never puts `mdot` in `info`, so
+   `_exhaust_of_climb()` returns nothing and line 197 falls back to the assumed
+   112.5 g/s on every run. The `AUDIT.md` M12 fix — "the flow is measured from the
+   baseline trajectory instead" — does not work. Verified 22 September by calling
+   the function: 0 samples. **Fix it before quoting any H/τ axis from that
+   script.**
+
+   **What a preview horizon longer than 30 s would buy is untested.** A real map
+   is worse than this simulation in accuracy and far better in reach: it sees the
+   whole route, not 30 s. Lengthening `PREVIEW_S` is a legitimate experiment —
+   but on a fixed road it would be confounded by limit 7 exactly as this one is,
+   so it belongs AFTER the climb is randomised, not before.
+
 ## 9. How to run it
 
 ```bash
