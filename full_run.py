@@ -79,6 +79,19 @@ STEPS = [
     ("drift_test.py — the guard's own acceptance test",
      ["drift_test.py"], True,
      "N of 16 drifts CAUGHT"),
+    # Added 22 September 2026 with Phase D2. Each prints figures that
+    # results/PREREGISTRATION_D2.md quotes, so each belongs in the transcript
+    # the documents are swept from.
+    ("power_analysis.py — what effect size eight seeds can detect",
+     ["power_analysis.py"], False,
+     "power against the MEI (50 units) and the effect with 80 % power"),
+    ("check_random_road.py — does every D2 road bind; is the blind arm blind",
+     ["check_random_road.py"], True,
+     "A False, B 150/120, C 0 of 121 non-binding, D 0 of 20, PASS"),
+    ("analyse_phase_d2.py — the D2 preregistered test, both experiments",
+     ["analyse_phase_d2.py"], False,
+     "the D2 cell (PREVIEW HELPS / SMALLER THAN THE MEI / INCONCLUSIVE) "
+     "beside Phase D's"),
 ]
 
 # Run last and separately: it is a DEMONSTRATION of a refusal, not a measurement.
