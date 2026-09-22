@@ -219,6 +219,16 @@ would over-launch, because a just-started run has not yet allocated its
 1.5 GB — the failure that killed runs in Phase D's first two launches. It is
 left alone during the run and recorded here instead.
 
+**22 September, 23:58 — the seeds 1–7 launcher was stopped and replaced, for
+throughput. Again no run was interrupted.** Seeds 0, 1 and 2 (both arms) had
+finished cleanly — each `trained in 71 min | 11 episodes`. The `--jobs 4`
+launcher would have run seeds 5–7 in a last wave using two of four slots, ending
+near 03:25. It (pid 44236) was stopped alone; the four seed 3–4 runs it had
+started were left running untouched; seeds 5–7 were started under a new
+`run_phase_d.py --road random --seeds 5 6 7 --jobs 6`. Ten runs then trained
+concurrently. Same commands, same seeds, same commit, same `runs_d2/`; nothing
+evaluated. Recorded in `runs_d2/LAUNCH.txt`.
+
 ## 7. Stopping rule
 
 Sixteen runs, then stop. **No seed is added after any result is seen.** More
