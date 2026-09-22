@@ -1548,3 +1548,32 @@ exhaust.
 Recommended in its place: randomise the start time only, grade fixed at 12 %.
 The options and the reasoning are in `results/NEXT_EXPERIMENT_DESIGN.md`. The
 decision is open and belongs in the next preregistration, before training.
+
+
+## 22 September 2026, last — the next experiment's design is DECIDED, and it is B
+
+The team chose option B over the recommended A: randomise both the climb's start
+time (120–300 s) and its grade (12–16 %). **Jad's principle: "our goal is not the
+highest result, our goal is to be realistic."** Recorded in
+`results/NEXT_EXPERIMENT_DESIGN.md` as a design principle, because it will decide
+future choices the same way.
+
+The reasoning beat the recommendation. A was chosen for ease of interpretation;
+B tests the preview a real map provides (when AND how steep), and because the
+comparison is paired, the gearbox's non-monotonic peak hits both arms equally —
+so A's advantage was overstated.
+
+B's one risk was measured away before the decision was recorded: **all nine
+grades from 12 % to 16 % in 0.5 % steps bind**, weakest 14.0 % at +12.7 K. The
+peak is a sawtooth — up to 920.8 °C at 13.5 %, down 58 K at 14 % where the box
+changes gear, up again.
+
+**What "realistic" cannot mean, and it is recorded rather than glossed:** the
+road can vary like a real one, but it cannot be as gentle as a real one. The Taif
+mountain drive peaks 52 K below the trigger, real driving sits above the limit
+0.206 % of the time, and 8 % and 10 % grades do not bind. Realistic severity and
+a binding constraint are mutually exclusive on this car.
+
+**The whole next step is planned as ONE session** (`NEXT_SESSION_2026-09-22.md`),
+at the team's request. It fits because training and evaluation run in the
+background for ~6 hours while the document sweep runs in the foreground.

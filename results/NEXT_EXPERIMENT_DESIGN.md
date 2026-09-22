@@ -113,8 +113,96 @@ training and two and a half of evaluation on this machine.
 B is the natural second step if A separates and the question becomes "does
 preview also help with how hard, not only when".
 
-## Decision
+## Decision — OPTION B, taken 22 September 2026
 
-**Open.** The team accepted C on 22 September before the measurement above
-existed; A is recommended in its place. The chosen option, and its ranges, go
-into the next preregistration **before** training — not into this file.
+**Randomise the climb's start time over 120–300 s and its grade over 12–16 %,
+per episode.** Decided by the team (Jad), overriding the recommendation of A
+above, and the reasoning is better than the recommendation was.
+
+### The principle the decision rests on
+
+> **"Our goal is not the highest result. Our goal is to be realistic."**
+> — Jad, 22 September 2026
+
+Recorded because it is a design principle, not a preference, and it will decide
+future choices the same way: when a cleaner experiment and a more faithful one
+disagree, this project takes the faithful one.
+
+### Why B is right, and where A's case was weaker than it looked
+
+1. **B tests a richer preview, which is the real one.** Under A the preview
+   tells the sighted agent only *when* the hill comes. Under B it says *when* and
+   *how steep* — which is what a map or GPS actually tells a driver. "Is preview
+   worth acquiring" is a question about the real thing, so B is the more
+   faithful test of the project's claim.
+2. **Under B the blind agent is blind to both** — neither timing nor severity
+   can be memorised. That is exactly limit 7's fix, fully applied.
+3. **A's main advantage was ease of interpretation, and it was overstated.** The
+   objection was that the gearbox makes peak non-monotonic in grade. But the
+   comparison is PAIRED: sighted and blind face the identical episodes, so the
+   sawtooth hits both arms equally and does not bias the difference between
+   them.
+4. **"Change one variable" is a debugging rule**, for finding which change
+   caused an effect. It is not a rule for designing an experiment, where testing
+   the right condition matters more than testing a minimal one.
+5. **B's one real risk is now measured away** — see below.
+
+### The measurement that makes B safe: every grade in 12–16 % binds
+
+Neutral policy, 130 km/h, 720 s, dt 1.0, trigger 850 °C:
+
+| grade | peak | margin | seconds above |
+|---|---|---|---|
+| 12.0 % | 884.0 °C | +34.2 K | 417 |
+| 12.5 % | 896.9 °C | +47.1 K | 435 |
+| 13.0 % | 909.2 °C | +59.4 K | 447 |
+| 13.5 % | 920.8 °C | +70.9 K | 457 |
+| **14.0 %** | **862.6 °C** | **+12.7 K** | 380 |
+| 14.5 % | 873.1 °C | +23.2 K | 410 |
+| 15.0 % | 883.3 °C | +33.4 K | 428 |
+| 15.5 % | 893.2 °C | +43.4 K | 441 |
+| 16.0 % | 902.9 °C | +53.0 K | 451 |
+
+**Nine of nine bind.** The weakest is 14.0 % at +12.7 K. The sawtooth is the
+gearbox: the peak climbs from 12 % to 13.5 %, drops 58 K between 13.5 % and
+14 % where the box hands back a gear, then climbs again. **Grade is not a
+"hotter" knob, and any figure in the write-up that bins results by grade has to
+say so.**
+
+The start time does not move the peak (12 % at 120 s and at 300 s both reach
+884.0 °C), because the climb lasts at least 420 s — about nine climb time
+constants — and reaches steady state whenever it starts.
+
+### THE ONE THING "REALISTIC" CANNOT MEAN HERE, and it must be said
+
+B is realistic in its **variability**: real roads change, and a driver does not
+know what is coming. It is **not** realistic in its **severity**, and nothing
+that tests protection can be.
+
+- Grades of 12–16 % at 130 km/h are steeper than any road this project has
+  driven. The Taif run — two hours of real mountain road — peaks at 797.6 °C,
+  **52 K short of the trigger**, and never binds.
+- Across 292.0 replayed minutes of the car's own driving, the turbine is above
+  the limit for 36 seconds: **0.206 % of the time.**
+- Grades of 8 % and 10 %, the realistic end, do not bind at all (measured above).
+
+**So realistic severity and a binding constraint are mutually exclusive on this
+car.** A climb gentle enough to be typical is too gentle to need protection, and
+an experiment about protection has to use one that isn't. That is a stated
+design choice, as `CLAUDE.md` already records for the locked scenario — and it is
+also a finding: on this vehicle, in real driving, preview has very little to
+protect against.
+
+The thesis sentence: *the climb varies like a real road, in when it comes and
+how steep it is, but it is steeper than any road we measured — because no road
+we measured stresses the turbine enough to need protecting.*
+
+### What goes into the preregistration
+
+- start time: uniform on [120, 300] s, drawn per episode
+- grade: uniform on [12, 16] %, drawn per episode
+- speed 130 km/h, ambient 42 °C, everything else as Phase D
+- the draw is seeded per episode, so the twenty evaluation episodes are frozen
+  exactly as Phase D's were — randomised across episodes, fixed across policies
+- eight seeds per arm, C1 budget first; the statistic, test and alpha as
+  Phase D, **plus the minimum effect of interest, which must be set this time**

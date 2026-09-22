@@ -41,81 +41,83 @@ claims and 11 episodes cannot separate them. Write "with agents trained to the
 C1 budget, preview does not separate from seed noise", NOT "preview does not
 help". results/PREREGISTRATION.md limit 6.
 
-WHAT TO DO, IN ORDER
+WHAT TO DO -- ALL OF IT IN ONE SESSION. That is the team's decision, 22 Sep.
 
-1. SET THE MINIMUM EFFECT OF INTEREST. TEAM DECISION, and it blocks the
-   write-up, not the experiment. `results/PREREGISTRATION.md` section 5 says
-   "TEAM DECISION — NOT YET SET". Until it is set, "preview does not help"
-   cannot be told apart from "the experiment was too small to see it", and an
-   examiner will ask which one you are claiming. Pick it from the measured
-   seed-to-seed standard deviation, write the reasoning beside it, commit.
-   `analyse_phase_d.py` prints a warning while it is unset.
+IT FITS BECAUSE THE SLOW PART RUNS IN THE BACKGROUND. Training and evaluation
+are ~6 hours of CPU but need no attention once launched; the document sweep is
+the foreground work and happens WHILE they run. Wall-clock is set by the
+compute, not by the sum of the list. About 6-7 hours, one sitting.
 
-2. FIX 3 — SWEEP THE DOCUMENTS. About a day. It is the last of AUDIT2's top
-   three and everything is prepared for it:
-     - `python verify_docs.py` prints a KNOWN STALE ledger, ~195 mentions over
-       ~85 rows, each with the file, the figure, the exact count, the exact
-       stale values and the AUDIT2 finding. THAT LEDGER IS THE WORK LIST.
-     - `FULL_RUN.txt` is a transcript of every script run in one pass on
-       21 September, each block opening with its exit code. Rewrite from it,
-       not from memory. Regenerate with `python full_run.py`.
-     - When a file is swept, LOWER ITS LEDGER ROW IN THE SAME COMMIT. The
-       checker fails if a row shrinks, on purpose.
-   Priority order, by who reads the file:
-     <!-- RETIRED-OK: 829.2, 548.6, 437.6, 13.4, 294.2, 812 -- naming the void
-          figures IS the work list -->
-     a. presentation/  — 116 mentions, and it is what an examiner is shown. It
-        ships the void premise set (829.2 / 548.6 / 437.6 / 13.4) on more than
-        a hundred lines with no warning.
-     b. CLAUDE.md, README.md, handoff.md — 26 mentions. They say the constraint
-        "no longer binds" and quote 294.2 at 812 C. The script prints 959.8 at
-        884 C and the constraint BINDS by 34 K. This is the sharpest one: it is
-        not a stale number, it is the opposite of the truth on the question the
-        whole experiment turns on.
-     c. ABSTRACT.md, CONTROL_SCOPE.md — 7 mentions. The abstract handed to the
-        supervisor understates the dataset by 40 %.
+  PHASE 1 -- DECIDE AND LOCK   (foreground, ~40 min, BLOCKS everything after)
 
-3. WRITE THE PHASE D CHAPTER. The null is the result. Say both findings, keep
-   them separate, and quote the limits from PREREGISTRATION section 8 -- five
-   of the six were declared before the numbers, which is what makes them limits
-   rather than excuses. Limit 6, the C1 training budget, was added AFTER the
-   result and says so; it is the one that bears hardest on the null and it was
-   missing, which is worth saying plainly rather than back-dating.
+  1. SET THE MINIMUM EFFECT OF INTEREST. TEAM DECISION. It goes into the new
+     preregistration and also closes PREREGISTRATION.md section 5 for Phase D.
+     Without it neither experiment can be written up: a null cannot be told
+     apart from an underpowered study.
 
-4. RANDOMISE THE CLIMB -- THIS NOW OUTRANKS C4. Found 22 September, and
-   verified: THE BLINDED ARM IS NOT BLIND. The road is the same hill at the same
-   second (t = 180 s) in every episode, and the blind agent's thermal state
-   takes a distinct value at every step, so it has a clock on a road it can
-   memorise. Phase D compared an explicit preview channel with an implicit one.
-   Four explanations for the null are live and it separates none
-   (PREREGISTRATION limit 7).
+  2. WRITE AND COMMIT THE NEW PREREGISTRATION, BEFORE ANY TRAINING.
+     The design is DECIDED -- results/NEXT_EXPERIMENT_DESIGN.md, "Decision":
+         OPTION B. Start time uniform on [120, 300] s, grade uniform on
+         [12, 16] %, drawn per episode, seeded so the twenty evaluation
+         episodes are frozen. 130 km/h, 42 C. Eight seeds per arm, C1 budget.
+     Nine of nine grades in 12-16 % are MEASURED to bind (weakest: 14 % at
+     +12.7 K). The team's principle, recorded there: "our goal is not the
+     highest result, our goal is to be realistic."
+     Copy the statistic, test and alpha from PREREGISTRATION.md. Commit it.
+     Check with `git log` that the commit exists before step 4.
 
-   The fix is cheap: make_grade_climb() draws the climb per episode, from
-   ranges written into the preregistration BEFORE training. Then the preview
-   channel is the only route to knowing when the hill comes. Run it at C1 first
-   (about an hour) -- if the arms separate, the design was the problem; if they
-   still do not, C4 is the next thing to try.
+  3. IMPLEMENT THE RANDOMISED ROAD. make_grade_climb() takes a per-episode
+     draw of start and grade; reset() rebuilds the cycle from it. Then:
+       - test_reward.py MUST still pass -- a changed scenario is a changed
+         reward surface (CLAUDE.md mistakes 5 and 17). Paste its output into
+         the commit.
+       - verify the road now differs between resets: the check that found
+         limit 7 printed "road identical across 3 resets: True". It must
+         print False.
+       - verify every drawn episode binds: peak > 850 C.
+       - evaluate.EPISODES is FROZEN for Phase D. The new experiment needs its
+         OWN frozen set that also freezes the road draw. Do not edit the old one.
+       - fingerprint.py hashes the make_grade_climb defaults; the new scenario
+         is a new plant fingerprint by design. That is correct -- it stops a
+         Phase D agent being scored on the new road.
 
-   READ results/NEXT_EXPERIMENT_DESIGN.md FIRST. It holds a MEASUREMENT that
-   rules out the range first accepted (120-300 s, 8-16 %): grades of 8 % and
-   10 % NEVER REACH THE TRIGGER, so a third of those episodes would carry no
-   signal. The start time is free -- 120 s and 300 s both bind at 884.0 C.
-   Recommended: OPTION A, randomise the START TIME only (120-300 s) with the
-   grade fixed at 12 %. One variable, and every episode measured to bind.
+  PHASE 2 -- LAUNCH, THEN SWEEP WHILE IT RUNS   (~6 h wall-clock)
 
-   Also recorded there: peak temperature is NOT monotonic in grade (10 % runs
-   cooler than 8 %, 14 % cooler than 12 %) because the gearbox downshifts.
+  4. LAUNCH TRAINING, then evaluation, in the background.
+         python run_phase_d.py              (adapt the tag so runs do not
+         python run_phase_d.py --evaluate    overwrite Phase D's in runs/)
+     Memory-capped by measurement; ~5-6 concurrent on this machine. Expect
+     ~3.5 h training and ~2.5 h evaluation. KEEP PHASE D's runs/ INTACT --
+     they are the first experiment's evidence.
 
-   It is a SECOND experiment: its own preregistration, and both get reported.
+     <!-- RETIRED-OK: 829.2, 548.6, 437.6, 13.4 -- naming the void set IS the task -->
+  5. WHILE IT RUNS -- SWEEP presentation/. 116 stale mentions, and it is what an
+     examiner is shown: the void premise set (829.2 / 548.6 / 437.6 / 13.4) on
+     more than a hundred lines. `verify_docs.py`'s KNOWN STALE ledger lists every
+     one with its file and count. Rewrite from FULL_RUN.txt, not memory. Lower
+     each ledger row in the same commit that sweeps its file.
 
-5. C4 -- the same sixteen at 300 000 steps, about six hours. Only after 4, and
-   only on the randomised road: on the fixed road C4 would be confounded by the
-   same memorisation.
+  6. WHILE IT RUNS -- SWEEP THE REST. CLAUDE.md / README.md / handoff.md first
+     (they still say the constraint does not bind; it binds by 34 K), then
+     ABSTRACT.md and CONTROL_SCOPE.md, then the internal files.
 
-6. FIX generality_test.py BEFORE QUOTING ANY H/tau AXIS. Line 81 reads
-   info.get("mdot"), which the environment never emits, so the script always
-   falls back to the assumed 112.5 g/s -- the AUDIT.md M12 fix does not work.
-   Verified 22 Sep: _exhaust_of_climb() returns 0 samples.
+  7. FIX generality_test.py line 81 -- info.get("mdot") is a key the env never
+     emits, so the H/tau axis silently uses the assumed 112.5 g/s. Small, and
+     it is the axis of the project's central experiment.
+
+  PHASE 3 -- READ THE RESULT   (foreground, ~30 min, after 4 finishes)
+
+  8. Run the preregistered test on the new experiment, exactly as
+     analyse_phase_d.py does for Phase D -- and report BOTH experiments, whatever
+     they say. If the arms separate, the fixed road was hiding the effect. If
+     they still do not, the design flaw is ruled out and the next suspect is the
+     training budget (C4).
+
+  9. Write it into CLAUDE.md, CHECKPOINT.md and results/ BEFORE ending the
+     session. Not in chat. Point at the file.
+
+  NOT THIS SESSION: C4 (300 000 steps), and the Phase D chapter. Both depend on
+  the result of step 8.
 
 DO NOT RESCUE THE NULL WITH H/tau. "H/tau is below 1, so the null fits the
 theory" was drafted on 22 Sep, checked, and refuted: "near 1" is nowhere in the
