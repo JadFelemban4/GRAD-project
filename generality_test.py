@@ -71,16 +71,37 @@ def _exhaust_of_climb(seed=0):
 
     AUDIT.md M12. Used to set the tau axis from the scenario rather than from
     an assumed constant.
+
+    FIXED 22 September 2026 -- THE M12 FIX NEVER WORKED UNTIL THIS. This read
+    `info.get("mdot")`, and `SupervisoryTunerEnv.step` has never put an "mdot"
+    key in `info`. So every sample was None, `vals` stayed empty, this returned
+    [], and the caller fell back to the assumed 112.5 g/s on EVERY run -- the
+    exact constant M12 condemned, now wearing a comment that said it had been
+    replaced. Found by calling the function (`PREREGISTRATION.md` limit 8):
+    0 samples.
+
+    It now reads the fuel flow from the environment's own episode accumulator,
+    `env.ep["fuel"] += mdot_fuel * dt`, differenced per step. That is the same
+    `out["mdot_fuel"]` the thermal network is handed as `mdot_fuel * 15.0`, so
+    the flow on this axis is the flow the turbine node actually saw.
+
+    WHY NOT ADD THE KEY TO `info` INSTEAD, which would be the cleaner API.
+    Because `fingerprint.py` hashes `engine_env.py`'s CODE, and adding a key to
+    that dict literal would move `plant_sha` and make `evaluate.py` refuse all
+    sixteen Phase D agents -- for a change no engine can feel. The fix belongs
+    in the file that had the bug.
     """
     env = SupervisoryTunerEnv(make_grade_climb(duration=720.0, dt=2.0), dt=2.0,
                               seed=seed, use_preview=True)
     env.reset(seed=seed)
     vals = []
+    prev = env.ep["fuel"]
     while True:
         _, _, term, trunc, info = env.step(NEUTRAL)
-        f = info.get("mdot")
-        if f:
-            vals.append(f * 15.0)
+        f = (env.ep["fuel"] - prev) / env.dt          # g/s of fuel, this step
+        prev = env.ep["fuel"]
+        if f > 0.0:
+            vals.append(f * 15.0)                     # exhaust = fuel x 15
         if term or trunc:
             break
     vals = sorted(vals)
@@ -188,13 +209,34 @@ def main():
     print("Preview horizon is fixed at 30 s. Turbine heat capacity is swept, which")
     print("changes the thermal time constant tau = C / UA.\n")
 
-    # AUDIT.md M12: this assumed 112.5 g/s of exhaust. The standard climb produces
-    # about 103 g/s, so every tau in the tables below was ~7 % low and every H/tau
-    # ~7 % high (50.3 s / 0.60 became 54.0 s / 0.56). The flow is measured from the
-    # baseline trajectory instead, so the axis of this experiment is the episode's
-    # own physics rather than a constant typed in beside it.
+    # AUDIT.md M12: this assumed 112.5 g/s of exhaust. The flow is measured from
+    # the baseline trajectory instead, so the axis of this experiment is the
+    # episode's own physics rather than a constant typed in beside it.
+    #
+    # MEASURED 22 September 2026, once _exhaust_of_climb() actually returned
+    # samples (it returned none until then -- see its docstring):
+    #
+    #     loaded half of the current climb (12 %, 130 km/h, ZF 8HP51)  118.1 g/s
+    #     tau = c_turb / UA at that flow                                48.3 s
+    #     tau at the assumed 112.5 g/s                                  50.3 s
+    #
+    # So on THIS scenario the assumed constant made tau about 4 % HIGH. This
+    # comment used to say the climb produces "about 103 g/s, so every tau was ~7 %
+    # low" -- a figure from before the scenario moved to 130 km/h and the gearbox
+    # to the real ZF, never re-measured, and pointing the wrong way today. 48.3 s
+    # agrees with the climb's step-response tau (48.4 s, CHECKPOINT.md 22 Sep) and
+    # with validate.py's 48.0 s, which is the cross-check that the axis now reads
+    # the right quantity. RETIRED-OK: 103, 54.0, 0.56 -- named so they are recognised.
     _P = ThermalParams()
-    EXH_GPS = float(np.mean(_EXH_SAMPLES)) if (_EXH_SAMPLES := _exhaust_of_climb()) else 112.5
+    _EXH_SAMPLES = _exhaust_of_climb()
+    if not _EXH_SAMPLES:
+        # Refuse rather than fall back. A silent fallback to 112.5 is what hid
+        # the broken key for weeks; an axis that cannot be measured should stop
+        # the run, not print a table on an assumed constant.
+        raise SystemExit("generality_test: no exhaust-flow samples from the "
+                         "climb -- the tau axis cannot be measured. Not falling "
+                         "back to 112.5 g/s (AUDIT.md M12).")
+    EXH_GPS = float(np.mean(_EXH_SAMPLES))
     UA = _P.ua_gas_turb * EXH_GPS + _P.ua_turb_amb
     print(f"tau axis uses the climb's own mean exhaust flow: {EXH_GPS:.1f} g/s "
           f"(was an assumed 112.5)")
