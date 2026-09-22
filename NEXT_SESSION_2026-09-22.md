@@ -1,7 +1,7 @@
 # Prompt for the next session — written 22 September 2026, after Phase D produced a null
 
 Paste the block below into a fresh Claude Code session. Accurate as of commit
-`a3a048e` on `JMF-2340550-sep17`. If a number here disagrees with a script,
+`4510f33` on `JMF-2340550-sep17`, the close of the 21-22 September session. If a number here disagrees with a script,
 **the script is right** — run it.
 
 ---
@@ -11,10 +11,12 @@ You are picking up a BSc graduation project the day after Phase D produced a
 result. The result is a NULL and that is not a failure.
 
 Branch: JMF-2340550-sep17. Confirm with `git rev-parse --abbrev-ref HEAD`.
-Last commit should be a3a048e or later.
+Last commit should be 4510f33 or later.
 
 READ FIRST, IN THIS ORDER
-  CHECKPOINT.md      last entry, 21-22 Sep, is the whole of what happened.
+  CHECKPOINT.md      the LAST entry, "SESSION CLOSE, 21-22 September", is the
+                     index: what was done, what was found, who decided what,
+                     and what is open. Start there.
   results/PREREGISTRATION.md   the experiment's rules, committed before any
                      agent was trained. Section 5 has an UNSET line.
   CLAUDE.md          the mistake log. Read `team/` first and match
@@ -130,8 +132,11 @@ DO NOT
     More seeds is a SECOND experiment with its own preregistration, and both
     get reported.
   - Do not switch to a two-sided test because the one-sided one failed.
+    <!-- RETIRED-OK: 11.7 -- naming the void figure IS the warning -->
   - Do not quote +11.7 or +7.5. Both are void; `results/void/README.md` says
-    why, and verify_docs.py fails on any sighted-over-blinded margin.
+    why, and verify_docs.py fails on "11.7 points" anywhere. (It no longer fails
+    on ANY sighted-over-blinded margin: that shape guard was removed on 22 Sep
+    because Phase D's legitimate results now print one. Commit a32f6e4.)
   - Do not read "the agent beats current-grade" as "preview helps". That
     conflation is AUDIT.md C3.
   - Do not write to the vehicle's ECU. Read-only OBD-II only.

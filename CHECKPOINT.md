@@ -1577,3 +1577,59 @@ a binding constraint are mutually exclusive on this car.
 **The whole next step is planned as ONE session** (`NEXT_SESSION_2026-09-22.md`),
 at the team's request. It fits because training and evaluation run in the
 background for ~6 hours while the document sweep runs in the foreground.
+
+
+## SESSION CLOSE, 21–22 September 2026 — the index to everything above
+
+Eleven commits, `8bb7342` … `4510f33`, on `JMF-2340550-sep17`. The entries
+above are the detail; this is where to start.
+
+### What the session set out to do, and did
+
+| task | state | where |
+|---|---|---|
+| `AUDIT2.md` fix 1 — every result records the plant that produced it | **done** | `fingerprint.py`, `train.py`, `evaluate.py` |
+| `AUDIT2.md` fix 2 — the guard sees the figures that decide the project | **done**, 16 of 16 drifts caught | `verify_docs.py`, `drift_test.py` |
+| Phase D, preregistered and run | **done — a NULL** | `results/PREREGISTRATION.md`, `analyse_phase_d.py` |
+| `AUDIT2.md` fix 3 — the document sweep | **NOT done** — inventoried | `verify_docs.py` KNOWN STALE ledger, ~187 mentions |
+
+### What was found that nobody asked for
+
+| finding | where it lives |
+|---|---|
+| the fingerprint must hash CODE, not bytes, or the doc sweep invalidates every agent; and must normalise CRLF, or five people on five machines cannot compare results | `fingerprint.py` docstring |
+| a fresh-start train into a directory holding `final.zip` stamped a new certificate on an old agent — C2-1 with provenance attached | `train.py`; reproduced, then refused |
+| 13 of 16 then 8 of 13 runs died of memory: cores say how many runs can progress, memory how many can START; an estimate was 70 % low | `run_phase_d.py`, `PREREGISTRATION.md` §6a |
+| the replay-buffer size changes nothing learned — proven, 368 398 weights, max difference 0 | `prove_buffer.py` |
+| the agents are C1 ("the first bad run"), 11 episodes — the null must carry that | `PREREGISTRATION.md` limit 6; printed by `analyse_phase_d.py` |
+| **the blinded arm is not blind** — fixed road plus a thermal clock | `PREREGISTRATION.md` limit 7; printed by `analyse_phase_d.py` |
+| "the null fits the H/τ theory" — drafted, checked, **refuted** | `PREREGISTRATION.md` limit 8 |
+| `generality_test.py` line 81 reads a key the env never emits; the M12 fix never worked | `PREREGISTRATION.md` limit 8 |
+| CLAUDE.md's two τ measurements were one method | `CLAUDE.md`, Known limitations |
+| 8 % and 10 % grades never bind; peak is a sawtooth in grade because of the gearbox | `results/NEXT_EXPERIMENT_DESIGN.md` |
+
+### Decisions taken, by whom
+
+| decision | by | recorded in |
+|---|---|---|
+| eight seeds per arm, not five | proposed, accepted | `PREREGISTRATION.md` §4 |
+| the next experiment is option B — start 120–300 s, grade 12–16 % | **Jad**, overriding the recommendation | `results/NEXT_EXPERIMENT_DESIGN.md` |
+| "our goal is not the highest result, our goal is to be realistic" | **Jad** | same file |
+| the whole next step is one session | **Jad** | `NEXT_SESSION_2026-09-22.md` |
+
+### Open, and the next session's to close
+
+1. **The minimum effect of interest** — TEAM DECISION, blocks both write-ups.
+2. **The randomised-climb experiment** — designed, measured, not built.
+3. **The document sweep** — `presentation/` first, 116 mentions.
+4. **`generality_test.py` line 81.**
+
+### Two process failures in this session, stated
+
+- **A commit claimed a green `verify_docs.py` run that had failed**, because the
+  check was chained `grep && git commit` — exactly the trap the brief named. The
+  commit was amended; every run since reads `$?` into its own variable.
+- **A wrong claim was given in chat as a reframing of the result** — the H/τ
+  rescue. It was verified before being written and never reached a file, but it
+  was said. The rule now in force: every finding goes into a tracked file before
+  the turn ends, and a claim that flatters the result is the one to check hardest.
