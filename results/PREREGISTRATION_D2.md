@@ -132,7 +132,8 @@ declared limit rather than a discovered excuse.
 ### The classification rule, fixed now
 
 With an MEI a result falls into exactly one of three cells. The rule is
-implemented in `analyse_phase_d2.py`, committed with this file:
+implemented in `analyse_phase_d2.py`, committed in `8e91276` -- the code this
+file pins, one commit before it:
 
 | cell | condition |
 |---|---|
