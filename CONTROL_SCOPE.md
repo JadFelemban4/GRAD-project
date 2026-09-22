@@ -190,11 +190,31 @@ version of this conversation that survives.
 
 ## 6. Before anyone shows this to anyone — the honest current state
 
-**Do not say "in simulation everything works" yet.** As of 16 September:
+**Do not say "in simulation everything works" yet.** As of 22 September:
 
-1. **Nothing has been trained.** `train.py` has never run past its import guard.
-   Phase C is the next step, and Phase D — the agent beating two baselines with a
-   preview ablation — has not started. It is the project's passing floor.
+<!-- RETIRED-OK: section -- item 1 quotes what this list said before Phase D -->
+
+1. **Phase D HAS run, and it returned a null.** Sixteen agents, eight seeds per
+   arm, trained on the corrected ZF plant under `results/PREREGISTRATION.md`,
+   committed before any of them started. **Preview cannot be shown to help:**
+   5 of 8 seeds positive, mean +4.8 damage units, sign test p = 0.3633,
+   permutation p = 0.4922, not significant at α = 0.05. The seed spread swamps
+   the effect — seed 3 says +387, seed 5 says −288.
+
+   **Separately and positively:** the trained agent beats the `current-grade`
+   comparator by +29 to +34 points on five of eight seeds. **Learned
+   supervision works; preview specifically is what cannot be shown.** Two
+   different claims — do not merge them.
+
+   One line is still open: the minimum effect of interest
+   (`PREREGISTRATION.md` section 5, TEAM DECISION). Until it is set, a null
+   cannot be told apart from an underpowered study.
+
+   *(Until 22 September this item read "**Nothing has been trained.**
+   `train.py` has never run past its import guard. Phase C is the next step,
+   and Phase D … has not started." `AUDIT2.md` H2-8 flagged it as already
+   stale; it is now the opposite of the truth, and the section that predicted
+   it "goes stale fastest" was right.)*
 2. **The simulation headline figures are under correction.** [AUDIT.md](AUDIT.md),
    15 September, found the premise numbers reproduce exactly but are mislabelled:
    the baseline row runs with its cooling disabled, the baseline ECU is scheduled

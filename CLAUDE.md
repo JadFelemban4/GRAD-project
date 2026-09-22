@@ -61,14 +61,39 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
-## Current state — 16 September 2026 (after v19, the live app, and its hardening)
+## Current state — 22 September 2026 (after Phase D, which returned a NULL)
+
+> **PHASE D HAS RUN AND THE PROJECT HAS ITS RESULT. It is a null, and a null is
+> a result.** Sixteen agents — eight seeds per arm, sighted and blinded — were
+> trained on the corrected ZF plant under `results/PREREGISTRATION.md`, which
+> was committed **before any of them started**.
+>
+> ```
+> positive (preview helped) : 5 of 8        mean difference : +4.8 damage units
+> exact one-sided sign test   p = 0.3633
+> exact paired permutation    p = 0.4922     alpha 0.05 -> NOT SIGNIFICANT
+> ```
+>
+> **Preview cannot be shown to help.** The seed-to-seed spread is tens of times
+> the effect: seed 3 says preview saves 387 damage units, seed 5 says it costs
+> 288. A mean of +4.8 across that is noise — and separating a result from a
+> coincidence is the entire reason eight seeds were run rather than one.
+>
+> **SEPARATELY, AND IT IS A DIFFERENT CLAIM:** the trained agent beats the
+> `current-grade` comparator by **+29 to +34 points** on five of eight seeds and
+> is positive on seven of eight. **Learned supervision works; PREVIEW
+> specifically is what cannot be shown.** Do not let the first be read as
+> evidence for the second — that conflation is `AUDIT.md` C3.
+>
+> Reproduce in seconds: `python analyse_phase_d.py`.
+> The full account is `CHECKPOINT.md`, entry of 21–22 September.
 
 | Phase | Status |
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.837), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
-| C · get an agent to learn | **next.** `train.py` exists, nothing has been trained yet |
-| D · baselines and the ablation | not started. This is the floor of the project |
+| C · get an agent to learn | **done.** Sixteen agents trained on the ZF plant, 50 000 steps each, seeds 0–7 both arms. Every one carries a `meta.json` plant fingerprint. *(This row said "**next**, nothing has been trained yet" until 22 September.)* |
+| D · baselines and the ablation | **done, and the answer is a NULL.** Preview not significant (p = 0.36 sign, p = 0.49 permutation); the agent beats `current-grade` by +29 to +34 points on five of eight seeds. Preregistered before training. **One line outstanding: the minimum effect of interest is still TEAM DECISION**, and until it is set a null cannot be told apart from an underpowered study. *(This row said "not started. This is the floor of the project" until 22 September — the floor is now in.)* |
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary result only, from hand-written policies |
 | G · writing | not started |
@@ -77,9 +102,14 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 **Where the app sits, and what it must not be allowed to become.** The app is
 the demonstrable, showable half of this project and it will be the first thing
 anyone asks to see. It is still not the claim. The claim is the H/τ criterion,
-and the claim is proved in Phase D. **If the app is finished and Phase D is
-not, the project has a nice screen and no result.** Treat time spent on `app/`
-past the point where it works as time taken from D.
+and the claim is TESTED in Phase D. **Phase D has now run, and it did not prove
+the claim — it returned a null on preview (p = 0.3633).** That is still the
+project's result; what it is not is a confirmation. The rule that got us there
+is worth keeping for E, F and G: treat time spent on `app/` past the point where
+it works as time taken from the claim. *(This paragraph read "the claim is
+proved in Phase D … if the app is finished and Phase D is not, the project has a
+nice screen and no result" until 22 September. Note the verb: **tested**, not
+proved. A phase that can only confirm is not an experiment.)*
 
 What the app does earn, and it is worth saying plainly in the thesis: it is the
 same validated plant, running forward in real time against a live stream rather
@@ -129,16 +159,39 @@ documents have been swept behind them.
   closing note of mistake 11.
 
 **What "passing project" means here:** validated simulator + agent beating two
-baselines + an ablation isolating preview. That is Phase D. Everything after it
-raises the ceiling, nothing after it protects the floor.
+baselines + an ablation isolating preview. That is Phase D, **and Phase D is
+in.** The floor is down, with a SPLIT VERDICT that must be reported as two
+claims and never as one:
+
+- the agent **does** beat the comparators — **+29 to +34 points** over
+  `current-grade` on five of eight seeds, positive on seven of eight;
+- the ablation isolating preview is **NOT SIGNIFICANT** (p = 0.3633 sign,
+  p = 0.4922 permutation).
+
+Everything after it raises the ceiling, nothing after it protects the floor.
 
 ---
 
 ## The numbers that matter
 
 Anyone can regenerate these. Do not quote a number that a script does not print.
+**`python full_run.py` runs every one of them in a single pass and writes
+`FULL_RUN.txt` with each block's EXIT CODE. Sweep documents from that file, not
+from this list** — a list goes stale, a transcript is dated.
 
 ```
+python analyse_phase_d.py  THE PROJECT'S RESULT. 5 of 8 seeds positive, mean
+                           +4.8 damage units, exact one-sided sign p = 0.3633,
+                           exact paired permutation p = 0.4922 -> NOT
+                           SIGNIFICANT at alpha 0.05. Also prints the agent's
+                           +29 to +34 points over current-grade, which is a
+                           DIFFERENT claim -- see the box at the top of this file
+python drift_test.py       16 of 16 injected drifts CAUGHT. The guard's own
+                           acceptance test; every row AUDIT2 Part 4a marked
+                           MISSED is now caught
+python full_run.py         every script below, one pass, exit codes -> FULL_RUN.txt
+python -m app.test_simulation   15 of 15. The replay lab. SEPARATE from
+                           app.test_replay -- run both after touching app/
 python check_premise.py    VOID as of 16 Sep -- see AUDIT.md C1, C2, C3 and the
                            box in README.md. It now prints baseline 294.2 at
                            812 C, and a warning that the constraint does not
@@ -224,8 +277,23 @@ on every single step**. The two rows were the same rollout. AUDIT.md C3.
 
 An ablation is evidence only when the blinded policy could in principle have
 behaved differently and did not. That means a TRAINED blinded agent against a
-trained sighted one, which is Phase D and has not been run. **Until then this
-project has no measured preview advantage at all**, and the honest comparator —
+trained sighted one, which is Phase D.
+
+> **PHASE D HAS NOW BEEN RUN, 21–22 September 2026, and it settles this
+> paragraph.** Eight trained blinded agents against eight trained sighted ones,
+> paired by seed, preregistered before any of them started. **Preview is not
+> significant:** 5 of 8 positive, mean +4.8 damage units, sign test p = 0.3633,
+> permutation p = 0.4922. The blinded policies COULD have behaved differently —
+> they were trained blind, not zeroed at evaluation — and across eight pairs the
+> difference does not separate from seed noise. That is a real ablation and a
+> real answer. See `results/PREREGISTRATION.md` and `analyse_phase_d.py`.
+>
+> *(This paragraph ended "**Until then this project has no measured preview
+> advantage at all**" until 22 September. It is now measured, and the measured
+> value is "not distinguishable from zero", which is a different statement from
+> "unmeasured".)*
+
+The honest comparator —
 added 16 September — is a policy that acts on the grade the car is on right now,
 with no preview, which currently BEATS the predictive one by **1.8 points**
 (252.3 against 257.7 damage; it read 2.2 until 17 September, on the pre-H1
@@ -1716,7 +1784,18 @@ that would have failed before it, which is the only reason the count went up.
 and they matter more than anything in this section** — in particular C3, which
 argues the 13.4-point preview advantage is protection depth and that the
 ablation identity is guaranteed by construction. That goes to the project's
-central claim. It is not addressed here and it is not addressed anywhere yet.
+central claim.
+
+**C3 IS NOW ADDRESSED, and the answer is a null.** C3's demand was precisely a
+trained blinded agent raced against a trained sighted one, and that ran on
+21–22 September: eight paired seeds, preregistered before any agent started.
+**Preview is not significant** — 5 of 8 positive, mean +4.8 damage units, sign
+test p = 0.3633, permutation p = 0.4922. The blinded agents were trained blind
+rather than zeroed at evaluation, so the comparison could have failed, and
+across eight pairs it did not separate from seed noise.
+
+C1 and C2 remain where they were. *(This paragraph ended "it is not addressed
+here and it is not addressed anywhere yet" until 22 September.)*
 ---
 
 ## Repository layout
@@ -1737,7 +1816,30 @@ verify_docs.py        Recomputes the published figures from the shipped data,
                       finds written there against those figures, and against a
                       list of retired ones. Fails naming file and line. Run it
                       before quoting anything. Never edit its expected values.
-train.py              SAC training. One seed per person, overnight.
+train.py              SAC training. Writes runs/<tag>/meta.json — the plant
+                      fingerprint — before the first step, and refuses a resume
+                      whose plant disagrees.
+evaluate.py           The twenty frozen episodes. Prints the fingerprint from
+                      the LIVE objects, writes it into the result file, and
+                      REFUSES a model whose meta.json differs.
+fingerprint.py        What plant produced this result. The fatal hash is over
+                      the CODE with docstrings stripped, so the document sweep
+                      cannot invalidate a trained agent; read its docstring
+                      before touching it.
+run_phase_d.py        Launches the sixteen runs, and the eight evaluations,
+                      capped by MEASURED free memory. Cores say how many runs
+                      can make progress; memory says how many can START.
+analyse_phase_d.py    The preregistered statistic and nothing else. Does not
+                      drop a seed, add a seed, or switch tails.
+prove_buffer.py       Proves the replay-buffer size changes nothing learned.
+drift_test.py         The guard's own acceptance test: inject AUDIT2 Part 4a's
+                      drifts and check each is CAUGHT. Currently 16 of 16.
+full_run.py           Every script that prints a published figure, in one pass,
+                      each block opening with its EXIT CODE -> FULL_RUN.txt.
+                      Sweep the documents from that, not from memory.
+results/PREREGISTRATION.md  Phase D's rules, committed before any agent trained.
+results/void/         Result files that are NOT results, with a README saying
+                      why. The +11.7 file lives here.
 generality_test.py    The H/τ experiment. H1, H2, H2b.
 README.md             The public-facing summary. Tracked by verify_docs.py.
 CLAUDE.md             This file. The handoff and the mistake log.
@@ -1925,6 +2027,38 @@ not a result.
 ---
 
 ## What to do next, in order
+
+> **THIS LIST WAS THE ROUTE TO PHASE D AND PHASE D IS DONE.** Steps 1–5 below
+> were followed on 21–22 September and are kept as the record of how, not as
+> instructions. **The live list is now:**
+>
+> 1. **Set the minimum effect of interest.** `results/PREREGISTRATION.md`
+>    section 5 says TEAM DECISION — NOT YET SET. It blocks the write-up, not the
+>    experiment: until it is set, "preview does not help" cannot be told apart
+>    from "the experiment was too small to see it", and that is the first thing
+>    an examiner will ask.
+> 2. **Sweep the documents — `AUDIT2.md` fix 3, about a day.** `verify_docs.py`
+>    prints a KNOWN STALE ledger, ~187 mentions over ~78 rows, each with the
+>    file, the figure, the exact count and the finding it belongs to. **That
+>    ledger is the work list.** Rewrite from `FULL_RUN.txt`, a transcript of
+>    every script run in one pass with its exit code — not from memory. Lower a
+>    ledger row in the same commit that sweeps its file; the checker fails if a
+>    row shrinks, on purpose. Priority by who reads the file: `presentation/`
+>    (116 mentions, and it is what an examiner is shown), then `CLAUDE.md` /
+>    `README.md` / `handoff.md` (26, and they state the OPPOSITE of the truth on
+>    whether the constraint binds), then `ABSTRACT.md` / `CONTROL_SCOPE.md` (7).
+> 3. **Write the Phase D chapter.** Both findings, kept separate, with the
+>    limits from `PREREGISTRATION.md` section 8 — declared before the numbers,
+>    which is what makes them limits rather than excuses.
+>
+> **DO NOT add seeds.** `PREREGISTRATION.md` section 7: sixteen runs, then stop.
+> Adding seeds now, having seen the result, destroys the preregistration. More
+> seeds is a SECOND experiment with its own preregistration, and both get
+> reported. Do not switch to a two-sided test because the one-sided one failed.
+
+<!-- RETIRED-OK: section -- the route that was taken, kept as the record -->
+
+**How Phase D was actually run, for the record:**
 
 1. `python check_premise.py` — confirm the environment works at all.
 2. `pip install "stable-baselines3[extra]"`, then

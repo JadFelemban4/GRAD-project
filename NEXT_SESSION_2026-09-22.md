@@ -55,6 +55,8 @@ WHAT TO DO, IN ORDER
      - When a file is swept, LOWER ITS LEDGER ROW IN THE SAME COMMIT. The
        checker fails if a row shrinks, on purpose.
    Priority order, by who reads the file:
+     <!-- RETIRED-OK: 829.2, 548.6, 437.6, 13.4, 294.2, 812 -- naming the void
+          figures IS the work list -->
      a. presentation/  — 116 mentions, and it is what an examiner is shown. It
         ships the void premise set (829.2 / 548.6 / 437.6 / 13.4) on more than
         a hundred lines with no warning.

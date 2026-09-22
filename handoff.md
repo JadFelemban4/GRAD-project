@@ -70,6 +70,27 @@ predictive, preview disabled         3620     294.2          812         105
 from before the H1 crank-angle correction took `plant.DTHETA_DEG` to 0.25°.
 `AUDIT_FIXES.md` H1 records the move; this file did not follow it.)*
 
+> ### THIS TABLE AND THE THREE PARAGRAPHS BELOW IT ARE SUPERSEDED — 22 Sep 2026
+>
+> **The constraint BINDS.** `check_premise.py` prints baseline **959.8 at
+> 884 °C** against an 850 °C trigger — it binds by **34 K**, and the "does not
+> bind" sentence below is the opposite of what the script says. The table itself
+> is the six-speed run at 110 km/h; the scenario has been 12 % at 130 km/h since
+> `1df41a2`.
+>
+> **And the question the paragraphs below defer has been answered.** Phase D ran
+> on 21–22 September: sixteen agents, eight paired seeds, preregistered before
+> any of them started. **Preview is not significant** (5 of 8 positive, mean
+> +4.8, sign test p = 0.3633, permutation p = 0.4922). Separately, the trained
+> agent beats `current-grade` by **+29 to +34 points** on five of eight seeds —
+> learned supervision works, preview specifically does not separate.
+>
+> Run `python analyse_phase_d.py`. Read `CHECKPOINT.md`, 21–22 September.
+> This block is kept, unswept, because it is one of the ~187 mentions the
+> `verify_docs.py` ledger inventories for `AUDIT2.md` fix 3.
+
+<!-- RETIRED-OK: section -- superseded block, kept for the fix-3 sweep -->
+
 **Read the warning underneath it.** The baseline peaks at 812 °C against an
 850 °C trigger, so the constraint does not bind, the reactive policy never acts,
 and its row is the baseline row. Nothing in that table is a measurement of
@@ -404,6 +425,18 @@ the 1123 K limit. Every one of those was a real measurement of a different
 system.
 
 **The number is not the result. The ablation is.**
+
+> **REFUTED TWICE — do not defend this.** The identity cannot fail: with
+> `use_preview=False` the preview vector is zeros, so `p_predictive` returns
+> `p_reactive`'s action on every step and the two rows are one rollout
+> (`AUDIT.md` C3). And the real ablation ran on 21–22 September — eight trained
+> blinded agents against eight trained sighted ones, preregistered — and
+> **preview is not significant**: 5 of 8 positive, mean +4.8, p = 0.3633.
+>
+> The defensible sentence is: *we built an ablation that could fail, ran it
+> eight times, and it did not separate.* `python analyse_phase_d.py`.
+
+<!-- RETIRED-OK: section -- the refuted claim, kept so it is recognisable -->
 
 Preview-disabled has landed on reactive **to the decimal, every single time**.
 Whatever the gap is, it is attributable to preview information and to nothing

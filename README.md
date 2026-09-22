@@ -15,12 +15,37 @@ pip install -r requirements.txt
 
 Python 3.11 or newer.
 
+> **PHASE D HAS RUN, 22 September 2026, AND THE RESULT IS A NULL.**
+> Sixteen agents — eight seeds per arm, sighted and blinded — trained on the
+> corrected ZF plant under `results/PREREGISTRATION.md`, which was committed
+> **before any of them started**.
+>
+> ```
+> positive (preview helped) : 5 of 8     mean difference : +4.8 damage units
+> exact one-sided sign test   p = 0.3633
+> exact paired permutation    p = 0.4922   alpha 0.05 -> NOT SIGNIFICANT
+> ```
+>
+> **Preview cannot be shown to help.** Seed 3 says it saves 387 damage units;
+> seed 5 says it costs 288. The spread between seeds is tens of times the
+> effect, and that is precisely why eight were run instead of one.
+>
+> **A second and separate finding, which is positive:** the trained agent beats
+> the `current-grade` comparator by **+29 to +34 points** on five of eight
+> seeds. **Learned supervision works; PREVIEW specifically is what cannot be
+> shown.** Two claims, not one.
+>
+> `python analyse_phase_d.py` reproduces every number above.
+> Full account: `CHECKPOINT.md`, 21–22 September. Still open: the minimum
+> effect of interest, `results/PREREGISTRATION.md` section 5.
+
 > **Updated 16 September 2026.** Two things arrived since the last pass. The
 > dataset is now **ten drives, 295.0 minutes** (`pull01`, which contributes
 > zero samples by design, so no calibration figure moved). And `app/` exists —
 > a live supervisor that runs this same physics beside the car and estimates
 > turbine temperature, which the vehicle has no sensor for. **It is a second
-> deliverable and it is not the missing piece: Phase D still is.** Three new
+> deliverable and it is not the missing piece: Phase D still is.** *(Phase D
+> ran on 21-22 September and returned a null -- see the box above this one.)* Three new
 > entries in `CLAUDE.md`'s mistake log — 14, 15 and 16 — came out of building
 > and merging it.
 
@@ -446,6 +471,33 @@ without effort — the constraint never bound, so there was no trade-off to stud
 preview advantage has now been 30 points, 4 points and 13.4 points. Every one of
 those was a real measurement of a different system. The number is not the
 result; the *ablation* is.
+
+> ### DO NOT TAKE THE NEXT PARAGRAPH INTO A VIVA. It is refuted twice over.
+>
+> It says preview-disabled landing on reactive "to the decimal, every single
+> time" makes any gap "attributable to preview and nothing else", and calls that
+> the sentence to defend.
+>
+> **It could not have come out any other way.** With `use_preview=False` the
+> preview vector is zeros, so `p_predictive` computes `k_ahead = 0` and returns
+> `p_reactive`'s own action on every step. The two rows are the same rollout.
+> An identity that cannot fail is not evidence — `AUDIT.md` C3, 15 September.
+>
+> **And the real ablation has now been run, and it disagrees.** Phase D,
+> 21–22 September: eight trained blinded agents against eight trained sighted
+> ones, paired by seed, preregistered before any of them started. **Preview is
+> not significant** — 5 of 8 positive, mean +4.8 damage units, sign test
+> p = 0.3633, permutation p = 0.4922. Seed 3 says +387, seed 5 says −288.
+>
+> **The sentence to defend in the viva is the opposite one:** *we built the
+> ablation that could fail, ran it eight times, and it did not separate.*
+> Separately, and worth defending on its own: the trained agent beats the
+> `current-grade` comparator by **+29 to +34 points** on five of eight seeds, so
+> learned supervision works even though preview specifically does not.
+>
+> `python analyse_phase_d.py`.
+
+<!-- RETIRED-OK: section -- the refuted viva claim, kept so it is recognisable -->
 
 And the ablation has held exactly every single time — preview-disabled lands on
 reactive to the decimal, across two engines, two scenarios and two protection
