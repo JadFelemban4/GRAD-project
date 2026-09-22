@@ -83,7 +83,7 @@ recorded about its own car.
 | **Displacement** — total swept volume of all six cylinders | 2997.5 cc | Toyota Australia, *GR Supra Mechanical Specifications*, document GTP-009045, version July 2025, p. 1, block ENGINE: "Displacement (cm³) 2998". BMW, *The new BMW 3 Series Sedan / Touring, Specifications*, 05/2015, p. 7 (340i): "Effective capacity cc 2998". Toyota Motor Corporation global newsroom, 28 Nov 2024, release 41894560, specification table: "Displacement [liters] 2.997". Our 2997.5 is π/4 × 82.0² × 94.6 × 6 and sits between the two published roundings; say so rather than treating either as a discrepancy | **CONFIRMED** |
 | **Bore** — cylinder diameter | 82.0 mm | Identical in every manufacturer document opened: Toyota Australia GTP-009045 p. 1 "Bore (mm) 82"; BMW Canada, *BMW Z4 2020MY Product Guide*, p. 2, "Motor data", Z4 M40i column: "Bore, mm 82"; BMW 3 Series 05/2015 p. 7 "Stroke/bore mm 94.6/82.0"; Toyota global newsroom 28 Nov 2024 "Bore x stroke [mm] 82.0 x 94.6"; Toyota UK technical specifications (Feb 2021 ref. 210223M, June 2022 ref. 220605M, Feb 2024) p. 1 "Bore x stroke (mm) 82 x 94.6" | **CONFIRMED** |
 | **Stroke** — how far the piston travels | 94.6 mm | Same documents and pages as the bore | **CONFIRMED** |
-| **Compression ratio** — how much the piston squeezes the air before ignition | 10.2:1 | **The engine code B58B30O1 goes with 10.2:1 in four manufacturer documents:** BMW Canada Z4 2020MY Product Guide p. 2 ("Engine type B58B30O1 … Compression rate, :1 10.2 … 285 kW / 382 bHP at 5800–6500 rpm"); Toyota Australia GTP-009045 p. 1 ("Engine model code B58B30O1 … Compression ratio 10.2:1 … 285 kW @ 5800–6500"); BMW, *M340i xDrive Specifications*, 10/2019, p. 1 ("2998 … 94.6/82.0 … Compression ratio :1 10.2 … 275/374 kW/hp"); Toyota Canada press release, Toronto, 14 Feb 2020, *Toyota GR Supra Races Into 2021 with More Power…*: "A new piston design reduces the engine's compression ratio from 11:1 to 10.2:1" as output rose from 335 hp to 382 hp. Toyota Canada, 28 Apr 2022, *…Enhanced Drive Dynamics for 2023*: the 2023 GR Supra 3.0 is the 382 hp car. **But the ratio follows the engine version, not the model year:** the 340 PS / 250 kW GR Supra 3.0 sold in the UK and Europe is printed at **11.0:1** on Toyota UK's own specification sheets of Feb 2021, June 2022 and Feb 2024 (p. 1: "Compression ratio 10.2:1 11.0:1", the first figure being the 2.0-litre), and every 2015–2021 BMW sheet for the original B58 (code B58B30M0 on the 2018 US 5 Series sheet) prints 11.0:1 | **CONFIRMED that B58B30O1 = 10.2:1. OPEN: which version our car is.** Settle it from the car's rated output on its registration, compliance plate or dealer paperwork: 285 kW (382 hp / 387 PS) means 10.2:1; 250 kW (340 PS / 335 bhp) means 11.0:1. Our logs cannot tell the two apart on their own. If it is the 250 kW car, the project's value is wrong and the knock prediction must be re-run |
+| **Compression ratio** — how much the piston squeezes the air before ignition | 10.2:1 | **The engine code B58B30O1 goes with 10.2:1 in four manufacturer documents:** BMW Canada Z4 2020MY Product Guide p. 2 ("Engine type B58B30O1 … Compression rate, :1 10.2 … 285 kW / 382 bHP at 5800–6500 rpm"); Toyota Australia GTP-009045 p. 1 ("Engine model code B58B30O1 … Compression ratio 10.2:1 … 285 kW @ 5800–6500"); BMW, *M340i xDrive Specifications*, 10/2019, p. 1 ("2998 … 94.6/82.0 … Compression ratio :1 10.2 … 275/374 kW/hp"); Toyota Canada press release, Toronto, 14 Feb 2020, *Toyota GR Supra Races Into 2021 with More Power…*: "A new piston design reduces the engine's compression ratio from 11:1 to 10.2:1" as output rose from 335 hp to 382 hp. Toyota Canada, 28 Apr 2022, *…Enhanced Drive Dynamics for 2023*: the 2023 GR Supra 3.0 is the 382 hp car. **But the ratio follows the engine version, not the model year:** the 340 PS / 250 kW GR Supra 3.0 sold in the UK and Europe is printed at **11.0:1** on Toyota UK's own specification sheets of Feb 2021, June 2022 and Feb 2024 (p. 1: "Compression ratio 10.2:1 11.0:1", the first figure being the 2.0-litre), and every 2015–2021 BMW sheet for the original B58 (code B58B30M0 on the 2018 US 5 Series sheet) prints 11.0:1 | **CONFIRMED that B58B30O1 = 10.2:1. SETTLED 19 September 2026: our car is the 285 kW B58B30O1, so 10.2:1 is right** — confirmed by the team and recorded in `CLAUDE.md` (known limitations, the compression-ratio entry). The 11.0:1 belongs to the 250 kW (340 PS / 335 bhp) European car and does not apply. Our logs cannot tell the two apart on their own, and no registration or compliance-plate line is written here yet; adding one would put a document behind the team's confirmation. (This cell read OPEN until 22 September.) |
 | **Thermostat opening temperature** — the valve that lets coolant reach the radiator | 88 °C | **The B58 has no thermostat.** BMW Group University Technical Training, *Technical training. Product information. B58 Engine*, course ST1505, information status April 2015, section 4.2 p. 38: *"The conventional thermostat in the B58 engine is replaced by a so-called heat management module."* Section 4.2 p. 39: *"In contrast to a map controlled thermostat with expansion element, there is no direct, physical connection to the coolant temperature"* — the module is a motor-driven rotary valve positioned by the engine computer from the coolant temperature and a cylinder-head metal temperature. No opening temperature is printed anywhere in its cooling chapter. (Unofficial copy on archive.org; page numbers taken from the OCR text and to be checked against the PDF) | **MODELLING EQUIVALENT.** Our 88 °C is the point at which `thermal.py`'s stand-in thermostat cracks, identified from the car's own coolant channel. It must not be cited to BMW |
 | **Coolant operating band** | 88–108 °C | BMW publishes no setpoint. ST1505 section 4.2.2 pp. 43–45 lists five control phases (cold start, warm-up, operating temperature, transfer, maximum cooling) with no temperature for any of them. Our logs sit at 88–97 °C throughout | **MEASURED (ours)** for the lower part; the 108 °C upper edge is engineering judgement and is not observed in any log |
 | **Oil operating band, sustained load** | 115–140 °C | Searched SAE, MTZ, patents and handbooks; nothing admissible states a sustained-load oil band for this or any modern engine. ST1505 section 4.1 p. 37 confirms only the structure: *"the engine oil as well as the transmission fluid are cooled using coolant"* through an oil/coolant heat exchanger in the filter module, which is what our `ua_block_oil` term models. **Our model gives 110.2 °C and we report this as a MISS** | **UNVERIFIED.** The only numbers found were on owner forums, which cannot be cited |
@@ -133,8 +133,9 @@ Automatic 8HP 51"** and prints all of the above:
 sheet is the 250 kW / 11.0:1 European car; Toyota USA's pressroom gives 3.15 for
 the automatic on the **382 hp** car, which is this one:
 [pressroom.toyota.com](https://pressroom.toyota.com/vehicle/2025-toyota-gr-supra/)
-— **CONFIRMED**. So the final drive is not variant-sensitive and the open
-question in section 2 about which car this is does not reach the driveline.
+— **CONFIRMED**. So the final drive is not variant-sensitive, and the question in section 2
+about which car this is — settled 19 September, the 285 kW car — would not have
+reached the driveline either way.
 
 ### CONFIRMED BY OUR OWN CAR — and this is the stronger evidence
 
@@ -212,7 +213,7 @@ needs BMW-specific data.
 | 4 | Knock-limited spark | How far the spark can be advanced at high load before detonation starts | 8–14° | **B58-ish** | **UNVERIFIED — expected, and confirmed by searching** | SAE knock-limit papers, MIT and MTU theses and knock-model papers were searched; not one admissible page states a knock-limited spark value near 3000 rpm and 200 kPa. Douaud & Eyzat gives the knock *model*, not this band. **Weakest of the eleven.** Drop the row from the thesis, or keep it labelled as an internal consistency check |
 | 5 | EGT cruise, min | Exhaust gas temperature at steady cruise | 600–750 °C | general | **UNVERIFIED** | No opened source states a part-load cruise range. Heywood presents port-exit temperature against load and speed in Fig. 6-22 (Sec. 6.5), but the numbers are in the figure, which nobody has opened; his chapter 11 remarks that a conventional engine's manifold temperature "is not sufficient" for thermal-reactor oxidation at about 600–700 °C, which leans against the band. The only measured figures found are full-load protection limits on a modern turbo GDI: 900 °C at the exhaust port, 930 °C pre-turbine (Conway et al. 2018, p. 10). State which temperature the band means: thermocouple readings sit roughly 100 K below mass-averaged port temperature (Heywood, Sec. 6.5) or about 20 K below the time-averaged value (Caton 1982, abstract) |
 | 6 | EGT cruise, max | as above | 600–750 °C | general | **UNVERIFIED** | as above |
-| 7 | **Turbine housing time constant** | How long the turbocharger takes to heat up — technically, to reach 63 % of the way to its final temperature after a step change in load | 40–120 s | **B58** | **PARTIAL** | Burke, Vagg, Chalet & Chesse 2015, section 5.3: after a load step on a 2.2-litre diesel with a variable-geometry turbocharger, the gas-to-housing heat flow "peaks at the beginning of the transient (in this case at around 7kW) before slowly falling to a value of around 3.6kW three minutes later. This spike in heat flow is accounted for by the accumulation of heat in the turbine housing as it warms up"; their protocol holds each step three minutes because "this allows for the system to stabilise". Settling within about three minutes bounds the housing time constant from above at roughly 45–60 s, consistent with our 48.0 s and inside the band. **What it does not do:** it reports no time constant, supports neither the 40 s floor nor the 120 s ceiling, and is a diesel turbocharger, not a B58. **No opened source publishes a turbine-housing heat capacity in J/K**, so `c_turb` cannot be cross-checked; see section 4 |
+| 7 | **Turbine housing time constant** | How long the turbocharger takes to heat up — technically, to reach 63 % of the way to its final temperature after a step change in load | 40–120 s | **B58** | **PARTIAL** | Burke, Vagg, Chalet & Chesse 2015, section 5.3: after a load step on a 2.2-litre diesel with a variable-geometry turbocharger, the gas-to-housing heat flow "peaks at the beginning of the transient (in this case at around 7kW) before slowly falling to a value of around 3.6kW three minutes later. This spike in heat flow is accounted for by the accumulation of heat in the turbine housing as it warms up"; their protocol holds each step three minutes because "this allows for the system to stabilise". Settling within about three minutes bounds the housing time constant from above at roughly 45–60 s, consistent with our 48.0 s on the climb and inside the band. **What it does not do:** it reports no time constant, supports neither the 40 s floor nor the 120 s ceiling, and is a diesel turbocharger, not a B58. **No opened source publishes a turbine-housing heat capacity in J/K**, so `c_turb` cannot be cross-checked; see section 4 |
 | 8 | Oil temperature, sustained climb | how hot the oil gets on a long hard climb | 115–140 °C | **B58** | **UNVERIFIED** | section 2, oil row |
 | 9 | Oil time constant | how long the oil takes to heat up | 20–400 s | **B58** | **UNVERIFIED** | Jarrier et al. 2000 (abstract): oil temperature "lags behind the water one" — supports the ordering in `thermal.py`, gives no number |
 | 10 | Coolant, thermostat-regulated | steady coolant temperature once warm | 88–108 °C | **B58** | **MEASURED (ours)** | 88–97 °C in every log; BMW publishes no band (section 2). Our model's 94.5 °C is a comparison against our own data, not against a published figure |
@@ -226,8 +227,8 @@ constant of the part being protected. **τ for the turbine is row 7.**
 If that band is wrong, every point on the H/τ curve sits in the wrong place.
 No other row can move the headline result. It is now PARTIAL: the one measured
 load-step transient that could be opened settles within three minutes, which is
-consistent with our 48 s, but nobody has published the housing time constant
-itself. The two documents most likely to contain it are listed first in
+consistent with our 48 s on the climb, but nobody has published the housing time
+constant itself. The two documents most likely to contain it are listed first in
 section 7.
 
 ### Why row 4 is the weakest
@@ -285,17 +286,23 @@ assumption. Stated, it is the reason the experiment is designed the way it is.
 All from 295.0 minutes over ten drives of our own logs (seven carrying usable
 samples), all regenerated by a script anyone can run. **This is the strongest
 tier in the project.** `verify_docs.py` opens this file and checks the figures
-in this section against the shipped data, so they cannot drift.
+in this section that its patterns can read against the shipped data. That is
+not all of them — figures here have gone stale without a failure before — so
+re-run the script that prints a figure before quoting it.
 
 - 26 distinct operating points; vehicle validation covers 30–75 kPa manifold
   pressure only
 - the spark map fit — 11 points, residual RMS 1.66°
-- enrichment v4 — 1055 samples above 180 kPa, correlations −0.47 / −0.41 / −0.44
+- enrichment v4 — 1341 forward-filled rows above 180 kPa (only about 67
+  independent readings), correlations −0.47 / −0.41 / −0.44
 - the compressor envelope, and the 1020 kg/h air-flow sensor ceiling, pinned on
   547 samples across six separate drives
-- knock retard, 99th percentile 9.8°, from 10 896 filtered samples
+- knock retard, measured from the car's own ignition channels — but **no p99
+  is quotable at present**: the figure this list used to carry cannot be
+  reproduced from the shipped data and is being re-derived (`CLAUDE.md`,
+  limitations)
 - the oil–coolant heat transfer (800 W/K, section 4)
-- charge temperature — within 3.0 % of the car's own boost sensor
+- charge temperature — within 1.9 % of the car's own boost sensor
 - the round-robin logging discovery — the logger records one channel per row
 - the coolant regulation band, 88–97 °C in every log (section 2)
 
@@ -314,10 +321,10 @@ confused.
 
 | number | what it is | where it came from |
 |---|---|---|
-| **1020.0 kg/h** | the air-mass sensor ceiling the app refuses to trust | 573 pinned samples across 7 of the 10 raw logs; 517 across 5 after the warm filter. Already in section 5 |
+| **1020.0 kg/h** | the air-mass sensor ceiling the app refuses to trust | 547 samples pinned there across six separate drives, once the warm filter has run — the population `verify_docs.py` checks. The raw logs hold more; `AUDIT2.md` M2-2 has that count. Already in section 5 |
 | **6.0 s** | the channel refresh interval on a 26-channel log, which sets how long a detection window must span | measured directly on `7475b5d7`: air mass 6.00 s, boost 6.00 s, engine speed 6.00 s, ambient pressure 18.0 s |
 | **7.5 s / 1.45 s** | per-channel rate at 26 and 7 channels — the whole justification for keeping the live set to six | `7475b5d7` against `pull01`, CLAUDE.md mistake 13b |
-| **13.6 %** | the worst windowed disagreement between inverted and measured pressure on a car with nothing wrong with it — the evidence behind the 25 % fault threshold | 45 gated windows across all ten drives, CLAUDE.md mistake 14 |
+| **13.6 %** | the worst windowed disagreement between inverted and measured pressure on a car with nothing wrong with it — the evidence behind the 25 % fault threshold | 45 gated windows across the nine drives logged when it was measured (14 September, before drive10 arrived; not re-run since), CLAUDE.md mistake 14 |
 
 ### Chosen by us, and defensible but not measured (kind 4)
 
@@ -348,15 +355,17 @@ impression this file exists to prevent.
   every figure behind the mismatch detector is a FALSE-POSITIVE rate. None of
   them is a detection rate, and the difference is the whole of the claim.
 - **It has never run against the car.** Every number above is from replay.
-- **Its alert counts are not measurements of the vehicle.** 13 thermal / 0
+- **Its alert counts are not measurements of the vehicle.** 15 thermal / 0
   mismatch / 19 novel on `7475b5d7` is a property of thresholds we chose. They
   are pinned so a regression is visible, which is a different job.
 ---
 
 ## 6. What to do with this file
 
-1. **Settle which engine version the car is** (section 2, compression ratio).
-   One line on the registration or compliance plate does it.
+1. **Engine version — settled 19 September 2026** (section 2, compression
+   ratio): the 285 kW car, confirmed by the team and recorded in `CLAUDE.md`.
+   What remains is to write the registration or compliance-plate line into
+   section 2, so the fact has a document behind it.
 2. **Row 7 next**: open Burke 2014 (section 7, first item) for the housing heat
    capacity, and Burke et al. 2015 for the temperature traces behind the
    three-minute settling.
@@ -516,8 +525,10 @@ session's scratch directory, not in the repository.
 
 ### Still open, in order of value
 
-1. **Which engine version the car is** — one look at the registration or
-   compliance plate. Decides whether 10.2:1 is right (section 2).
+1. **The registration or compliance-plate line for the engine version.** The
+   version itself is settled — the 285 kW car, so 10.2:1, confirmed by the team
+   on 19 September 2026 and recorded in `CLAUDE.md` (section 2) — but no
+   document is cited for it here yet.
 2. **Burke 2014**, *J. Eng. Gas Turbines Power* 136(10) 101511: the turbine-node
    capacitance and conductances, hence a published C/UA to set against our
    48.0 s and 6000 J/K (row 7, section 4).

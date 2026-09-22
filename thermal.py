@@ -48,8 +48,11 @@ class ThermalParams:
     # under load, which this car never does.
     #
     #     measured oil minus coolant   median -1.2 K,  p95 +5.4 K,  max +12.0 K
-    #     (pooled over the three drives used for the fit; -1.0 K / +5.5 K over
-    #      all five drives that carry both channels)
+    #     (pooled over the three drives used for the fit)
+    #
+    # RETIRED-OK: 1.0, 5.5, 5 -- history as of 10 Sep, before drive10, and not
+    # re-derived since: -1.0 K / +5.5 K over all five drives that then carried
+    # both channels.
     #
     # Sweeping the coupling against the logs:
     #
@@ -66,11 +69,17 @@ class ThermalParams:
     #
     # WHAT THIS VALUE DOES NOT COVER. At 800 W/K a sustained hard climb settles
     # the oil at 110 C, about 5 K under the 115-140 C band published for
-    # sustained load. That band describes a harder duty cycle than any drive
-    # recorded here -- the hottest oil in 168 minutes of logs is 107 C, on
-    # 7475b5d7, which also peaked at 111 C after the filter. The value is set by
-    # the measurement and the band is reported as a miss; do not raise the number
-    # to close a gap the data does not support.
+    # sustained load. The hottest oil anywhere in the logs is 117 C, on drive10
+    # (the Taif drive), so the band's lower end is now inside our own
+    # measurement rather than above it -- see CLAUDE.md, known limitations,
+    # "the oil band is now supported by our own car". The value is still set
+    # by the measured oil-coolant gap in the table above and the miss is
+    # reported, not tuned away; changing it needs a refit, not a nudge to
+    # close the gap.
+    # RETIRED-OK: 107, 168 -- the pre-drive10 record, kept as history:
+    # this comment used to say the band described a harder duty cycle than any
+    # drive recorded, because the hottest oil in 168 minutes of logs was 107 C,
+    # on 7475b5d7 (111 C after the filter).
     #
     # NOTE: `Oil temperature after filter` runs +6.8 K hotter than `Oil
     # temperature` at oil above 100 C. If the published band refers to that

@@ -118,7 +118,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.837), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
+| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.839), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
 | C · get an agent to learn | **C1 done, C4 NOT done.** Sixteen agents trained on the ZF plant, seeds 0–7 both arms, each carrying a `meta.json` plant fingerprint. All sixteen curves improve. But **50 000 steps is what `train.py` itself calls "C1: the first bad run"** — 11 training episodes — against **300 000 for "C4: a real run"**. *(This row said "**next**, nothing has been trained yet" until 22 September, then briefly said "done", which was too generous: C1 is not C4 and the difference is load-bearing for Phase D's null — see `PREREGISTRATION.md` limit 6.)* |
 | D · baselines and the ablation | **done, and the answer is a NULL.** Preview not significant (p = 0.36 sign, p = 0.49 permutation); the agent beats `current-grade` by +29 to +34 points on five of eight seeds. Preregistered before training. **One line outstanding: the minimum effect of interest is still TEAM DECISION**, and until it is set a null cannot be told apart from an underpowered study. *(This row said "not started. This is the floor of the project" until 22 September — the floor is now in.)* |
 | E · battery plant | not started. `battery.py` does not exist |
@@ -160,8 +160,8 @@ different numbers and every one of them is correct:
 
 | what | count | what it means |
 |---|---|---|
-| drives in the manifest | **9**, 295.0 min | everything ever logged, `pull01` included |
-| drives carrying usable samples | **6** | survive the warm-sample filter |
+| drives in the manifest | **10**, 295.0 min | everything ever logged, `pull01` included |
+| drives carrying usable samples | **7** | survive the warm-sample filter |
 | drives behind the fitted calibrations | **8** | the set the enrichment and spark fits were built on |
 
 `verify_docs.py` asserts the first two separately for exactly this reason. A
@@ -219,14 +219,13 @@ python drift_test.py       16 of 16 injected drifts CAUGHT. The guard's own
 python full_run.py         every script below, one pass, exit codes -> FULL_RUN.txt
 python -m app.test_simulation   15 of 15. The replay lab. SEPARATE from
                            app.test_replay -- run both after touching app/
-python check_premise.py    VOID as of 16 Sep -- see AUDIT.md C1, C2, C3 and the
-                           box in README.md. It now prints baseline 294.2 at
-                           812 C, and a warning that the constraint does not
-                           bind on this scenario at all. Run it; do not quote a
-                           number from here. (This line said 256.5 at 801 C
-                           until 17 Sep -- the pre-H1 figures, superseded when
-                           DTHETA_DEG went 0.5 -> 0.25. AUDIT_FIXES.md H1
-                           records the move and this line did not follow it.)
+python check_premise.py    its pre-16-Sep figures are VOID -- see AUDIT.md C1,
+                           C2, C3 and the box in README.md. It now prints
+                           baseline 959.8 at 884 C: the constraint BINDS,
+                           ~34 K over the 850 C trigger, and hand-written
+                           preview loses to current-grade by 0.4 points. Run
+                           it; do not quote a number from here. (Its history
+                           is in the paragraph under this block.)
 python validate.py         8 of 11 published quantities inside band
 python test_reward.py      4 of 4 checks pass
 python build_dataset.py "logs/raw/*.csv"    295.0 min, 10 drives, 26 operating points
@@ -252,6 +251,13 @@ python -m app.test_replay  49 of 49. It replays 7475b5d7 and pins the app's own
                            are recorded in AUDIT_FIXES.md and neither reached
                            this block.)
 ```
+
+<!-- RETIRED-OK: 256.5, 801 -->
+*(The `check_premise.py` line above said 256.5 at 801 C until 17 Sep -- the
+pre-H1 figures, superseded when DTHETA_DEG went 0.5 -> 0.25. AUDIT_FIXES.md H1
+records the move and that line did not follow it. Until 22 Sep it then quoted a
+baseline that did not bind at all; the scenario had moved on and the line again
+did not follow.)*
 
 **Two of those app figures are not measurements and must never be quoted as
 though they were.** The peak turbine temperature is a MODEL OUTPUT whose heat
@@ -282,8 +288,9 @@ a void figure into a meeting.** Mistake 11 in its most dangerous form: not a
 stale number in a corner, but a retracted headline still reading as current.
 
 **What replaces it:** run `check_premise.py`. It currently prints a baseline of
-294.2 at 812 °C, no constraint binding at all, and preview worth **−1.8 points**
-against a policy that only knows the grade it is on now.
+959.8 at 884 °C, the constraint binding by ~34 K against the 850 °C trigger, and
+preview worth **−0.4 points** against a policy that only knows the grade it is on
+now.
 
 *(A parenthesis here used to restate the arithmetic behind an 11 September typo
 correction to the first figure. It was deleted on 17 September: `RETIRED` now
@@ -320,14 +327,18 @@ trained sighted one, which is Phase D.
 > value is "not distinguishable from zero", which is a different statement from
 > "unmeasured".)*
 
+<!-- RETIRED-OK: 1.8, 252.3, 257.7, 2.2 -->
 The honest comparator —
 added 16 September — is a policy that acts on the grade the car is on right now,
-with no preview, which currently BEATS the predictive one by **1.8 points**
-(252.3 against 257.7 damage; it read 2.2 until 17 September, on the pre-H1
-crank-angle step).
+with no preview, which currently BEATS the predictive one by **0.4 points**
+(633.2 against 637.4 damage; it read 1.8 points, 252.3 against 257.7, until
+22 September, and 2.2 until 17 September, on the pre-H1 crank-angle step).
 
 **And the scenario is the thing to fix, not the threshold — measured
-17 September over EVERY drive.** Replaying all nine through `app/` and reading
+17 September over EVERY drive.** *(17 Sep conclusion, since done: the scenario
+was rebuilt at 12 % / 130 km/h on the ZF 8HP51 and now binds by ~34 K, peak
+884 C against the 850 C trigger. The do-not-lower-the-limit half still stands.)*
+Replaying all nine through `app/` and reading
 the peak estimated turbine housing against the 1123 K trigger:
 
 | drive | minutes | peak C | vs trigger | seconds above |
@@ -386,15 +397,18 @@ design choice rather than an accident.
 
 *(The synthetic climb figure quoted in the next paragraph, 812 C, is the
 pre-gearbox one. On the real ZF 8HP51 the same scenario reaches 884 C. See the
-19 September checkpoint.)* <!-- RETIRED-OK -->
+19 September checkpoint.)* <!-- RETIRED-OK: 812 -->
 
+<!-- RETIRED-OK: 812, 38, 78 -->
 The synthetic climb reaches 812 C and misses by 38 K, so **the car's own driving
 gets 78 K hotter than the scenario written to stress it.**
 
 Two conclusions, and they pull in opposite directions — state both:
 
-- **The scenario is too mild, not the trigger too high.** Rebuild it from
-  measured driving. Do NOT lower the limit: 1123 K is already 80 K more
+- *(17 Sep, pre-gearbox. Since done: the scenario was rebuilt at 12 % /
+  130 km/h and binds by ~34 K, peak 884 C against 850 C. The Do-NOT-lower-the-
+  limit half still stands.)* **The scenario is too mild, not the trigger too
+  high.** Rebuild it from measured driving. Do NOT lower the limit: 1123 K is already 80 K more
   conservative than the 930 C pre-turbine enrichment limit REFERENCES.md cites
   (Conway et al., SAE 2018-01-1423, p. 10), and moving it is turning the one
   knob the audit named.
@@ -413,7 +427,7 @@ Two conclusions, and they pull in opposite directions — state both:
   no longer "we have no sustained climb"; it is **"we have one, and it does
   not bind"** — which is a measurement rather than a gap.
 
-  <!-- RETIRED-OK: naming the superseded pair IS the sentence -->
+  <!-- RETIRED-OK: 0.351, 172.6 -- naming the superseded pair IS the sentence -->
   Adding it moved the figure from 0.351 % over 172.6 minutes to **0.206 % over
   292.0 minutes**, because the numerator did not move at all: Taif contributed
   119.4 minutes and **not one second** above the limit.
@@ -1091,9 +1105,12 @@ is a compressor outlet: PR 2.3 at 70 % efficiency from 40 °C gives 160 °C. The
 B58 carries its cooler INSIDE the intake manifold, downstream of the throttle
 body, so "before throttle valve" is before the cooler.
 
+<!-- RETIRED-OK: 587, 887 -->
 The car settles it. **587** boosted MAF-unpinned model samples against **887**
 boosted readings of the vehicle's own `Boost pressure` channel (median
-226 kPa):
+226 kPa) — the 10 September counts. *(With the drives since added, the same
+comparison rests on 762 model samples against 1097 logged readings, and the
+shipped formula's gap is still +1.9 % — `verify_docs.py`, CHARGE TEMPERATURE.)*
 
 | charge temperature used | inverted MAP | gap |
 |---|---|---|
@@ -1117,14 +1134,18 @@ independently for the Gymnasium environment months earlier and carries no
 parameter fitted to the boost channel. 1.9 % from an independent model beats
 0.7 % from a fitted one.
 
+<!-- RETIRED-OK: 0.784, 0.837, 0.783 -->
 **What it changed.** Operating points 31–82 kPa → **30–75 kPa**. Fitted k 0.784
 → 0.837, derived 0.783 → 0.831. `ENR_LOAD` 200 → 180 kPa, because the gate is
 written in manifold pressure and manifold pressure changed definition — 180 on
 the new scale selects exactly the 1055 samples that 200 selected on the old one,
-and every enrichment figure reproduces to the decimal without a refit.
+and every enrichment figure reproduces to the decimal without a refit. *(The
+fitted k has since moved on to 0.839; `compare_log.py data/master_points.csv`
+prints the current value.)*
 
 **What it did NOT change.** The premise result — 829.2 / 548.6 / 437.6 / 548.6 —
-is identical, because the simulator never used the sensor; `engine_env` always
+*(all four since VOID, AUDIT.md C1/C3; the point here is only that the sensor
+change did not move them)* is identical, because the simulator never used the sensor; `engine_env` always
 modelled its own charge temperature. The load residual is also identical at
 1.4 %, because T cancels (mistake 12). **The residual could not see the very
 error being fixed.**
@@ -1238,7 +1259,10 @@ for the 22 steady points. **It was never a fault and it was never news.**
 
 1. **Wide-open throttle only**, expressed as a pressure ratio so it needs no
    extra channel and no extra budget: `logged / ambient >= 1.8`. Pooled over all
-   ten drives, MAF-unpinned, the disagreement at that gate has a median of
+   nine drives of 14 September, MAF-unpinned *(this read "ten" from 19 Sep:
+   commit `6e40cd8` forward-updated the count when drive10 arrived without
+   re-running the measurement — mistake 11's shape; drive10 is not in these
+   figures)*, the disagreement at that gate has a median of
    **+6.5 %**, and per drive **+7.7 / +6.8 / +3.6 / +1.2 %** — consistent with
    the **+1.9 %** that `plant.charge_temperature()` already records for this
    same comparison under boost.
@@ -1336,6 +1360,7 @@ point of the very equation `ThermalNetwork.step` integrates, so no new
 parameter — clamped into the bracket so **the reported value can never sit
 outside its own error bar**.
 
+<!-- RETIRED-OK: 593.7, 673.5, 885.2, 884.9 -->
 **What it cost, and be honest about it in the thesis.** `pull01`'s peak
 estimated turbine reads **593.7 °C** where the old code said 673.5 °C, because
 that drive is short and its peak falls inside the warm-up. `7475b5d7` moved
@@ -1396,14 +1421,17 @@ reporting is worse than one that stays quiet, because the traceback looks like a
 data problem and hides the real finding underneath it.** Output is now encoded
 defensively.
 
+<!-- RETIRED-OK: 517 -->
 **And a third defect in the same scanner, from the same merge.** Its check
 "drives showing that exact ceiling" counted raw files in `logs/raw/`, while the
 "547 samples" check sitting beside it counted the warm-filtered dataset. `pull01`
 hits the 1020 kg/h ceiling 56 times in its raw log, so the drive count became 6
 while the sample count stayed 517 across 5. **Both numbers were true and the
 sentence built from them was not.** Both halves now count the same population.
-For the record: **573 pinned samples across 7 of the 10 raw logs; 517 across 5
-once the warm filter has run.**
+For the record, as written on 16 September (commit `4905498`): **573 pinned samples across 7 of the 10 raw
+logs; 517 across 5 once the warm filter has run.** *(Since superseded for the
+warm-filtered population: `verify_docs.py` now computes 547 samples across 6
+drives.)*
 
 
 ### 18. `Actual gear` CLAMPS AT 6 ON AN EIGHT-SPEED — a fourth misread channel
@@ -1480,9 +1508,9 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   speed lines, because the car has no turbo speed sensor and no pre-intercooler
   temperature.
 - **Two residuals, both true, and the fitted one fits better.** Over the 26
-  pooled points that survive the window checks, 30–75 kPa: **1.3 % with the
+  pooled points that survive the window checks, 30–75 kPa: **1.4 % with the
   derived k = 0.831 and zero free parameters**, **1.1 % with the fitted
-  k = 0.837 and one**. Dropping the parameter makes the residual RISE, which is
+  k = 0.839 and one**. Dropping the parameter makes the residual RISE, which is
   the honest direction — one free parameter should fit better than none. Quote
   the derived 1.4 % and say that it costs nothing; quote the fitted 1.1 % only
   next to the parameter it spends. And read mistake 12 first: neither number
@@ -1608,7 +1636,7 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   in `thermal.py`) rather than at the band.
 
   Above 117 °C is still extrapolation.
-- **Eight drives, six with usable samples.** `3f64372e` and `f51686d7` are under
+- **Ten drives in the manifest, seven with usable samples.** `3f64372e` and `f51686d7` are under
   a minute each and contain no warm running window; `fb988991` is a census log
   whose windows are all rejected for span or logger gaps (mistake 8), so it
   carries samples but contributes **zero** operating points. Quote it as "ten
@@ -1777,7 +1805,7 @@ limitation above applies to it word for word. It adds these:
   leak on a car that is never driven hard will not be found by it.** That is a
   coverage limit, not a bug, and it is the honest consequence of the only
   pressure channels this vehicle publishes being pre-throttle.
-- **The alert counts are not evidence.** 13 thermal / 0 mismatch / 19 novel on
+- **The alert counts are not evidence.** 15 thermal / 0 mismatch / 19 novel on
   `7475b5d7` is a property of thresholds this project chose, pinned so that a
   regression is visible. It is not a measurement of the car.
 
@@ -2015,6 +2043,7 @@ this project's central ratio.
 **The damage integral IS.** Hand-written policies, locked scenario, 720 s,
 identical seed and weights, the only difference being the step:
 
+<!-- RETIRED-OK: 900.9 -->
 | policy | dt = 1.0 | dt = 0.2 | cuts vs baseline |
 |---|---|---|---|
 | baseline ECU | 959.8 | 900.9 | — |

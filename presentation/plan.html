@@ -375,6 +375,19 @@ footer a { color: var(--ember); }
       منها إلى مشروع ناجح لا تزال Phase D. ما تغيّر هو ماذا يثبت ماذا،
       وأيّ عمل يسبق أيّ عمل.
     </p>
+    <div class="void-note">
+      <b>سجلّ تاريخي — اقرأ هذا أولًا.</b> هذه الخطة كُتبت في 14 سبتمبر، قبل Phase D.
+      نُفِّذت Phase D في 21–22 سبتمبر ونتيجتها <b>صفرية</b>: مع وكلاء مدرَّبين بميزانية
+      C1 ‏(50 000 خطوة)، لا ينفصل الـpreview عن ضجيج البذور — 5 من 8 بذور موجبة،
+      اختبار الإشارة <span class="mono">p = 0.3633</span>، والتبديل <span class="mono">p = 0.4922</span>.
+      والذراع المُعمّاة لم تكن معمّاة فعلًا: الطريق نفسه في كل حلقة، وحالته الحرارية ساعة،
+      فكان بوسع الوكيل أن يحفظ موعد التلّ (<span class="mono">results/PREREGISTRATION.md</span>، الحدّ 7).
+      خطوات هذه الصفحة وتقديرات أزمنتها سجلّ لما كان يُعتقد يومها، لا تعليمات.
+      تنبيه: بعض الأرقام داخل الخطوات والأسباب — بوابة المكافأة، وعدد الاختبارات، والعكس تحت الشحن —
+      حُدِّثت إلى قيمها الحالية في 22 سبتمبر، أمّا تقديرات الأزمنة فلم تُحدَّث وتبقى تاريخًا.
+      الأرقام الحالية في <span class="mono">CLAUDE.md</span> و<span class="mono">FULL_RUN.txt</span>،
+      و<a href="#numbers">جدول الأرقام</a> أدناه حُدِّث في 22 سبتمبر.
+    </div>
     <div class="now">
       <span class="lbl">الحركة التالية · الآن</span>
       <span class="cmd">pip install "stable-baselines3[extra]"</span>
@@ -453,9 +466,9 @@ footer a { color: var(--ember); }
           <span class="mono">Intake air temperature before throttle valve</span> تقرأ
           <span class="mono">149 °C</span> تحت الشحن. مبرّد B58 داخل مجمّع السحب، بعد الخانق،
           فـ«قبل الخانق» يعني قبل المبرّد. التصحيح نقل نطاق نقاط التشغيل إلى
-          <span class="mono">30–74 kPa</span> وبوابة الإثراء إلى <span class="mono">180 kPa</span>،
+          <span class="mono">30–75 kPa</span> وبوابة الإثراء إلى <span class="mono">180 kPa</span>،
           وقرّب العكس تحت الشحن من <span class="mono">+23.7 %</span> إلى
-          <span class="mono">+3.0 %</span> مقابل قناة الـboost في السيارة نفسها.
+          <span class="mono">+1.9 %</span> مقابل قناة الـboost في السيارة نفسها.
           <b>نموذج التنفّس بُرِّئ، لم يُدَن.</b>
         </p>
       </div>
@@ -477,7 +490,7 @@ footer a { color: var(--ember); }
         <p>
           <span class="mono">app/</span> يشغّل نفس الفيزياء بجانب السيارة في الوقت الحقيقي
           ويقدّر ما لا تبلّغ عنه: حرارة التوربين، هامش الطرق، الضرر المتراكم.
-          قراءة فقط، لا يكتب بيانات خام على القرص، و<span class="mono">36/36</span> اختبار تمرّ.
+          قراءة فقط، لا يكتب بيانات خام على القرص، و<span class="mono">49/49</span> اختبار تمرّ.
           هذا أقوى عرض يمكن تقديمه في مناقشة بكالوريوس — وأسرع طريق لابتلاع
           Phase D إن تُرك ينمو. يحتاج قرارًا مكتوبًا، لا إهمالًا.
         </p>
@@ -489,9 +502,10 @@ footer a { color: var(--ember); }
         <p>
           خارطة الطريق تبرّر البطارية بأن كنس ثابت الزمن حرّك أفضلية الـpreview من
           <span class="mono">7.6</span> إلى <span class="mono">49.9</span> نقطة — وهذان
-          الرقمان قيسا على المحرك الرباعي الخطأ. القيم الحيّة اليوم عند حدّ
-          <span class="mono">1123 K</span> هي <span class="mono">16.5 → 18.0 → 26.0</span> نقطة.
-          الاتجاه نفسه، والحجم سُبْع ما كان. المبرّر يُعاد كتابته بالأرقام الحيّة.
+          الرقمان قيسا على المحرك الرباعي الخطأ. والجدول الذي حلّ محلّهما عند حدّ
+          <span class="mono">1123 K</span> — جدول H2 من <span class="mono">generality_test.py</span> —
+          باطل هو أيضًا (<span class="mono">AUDIT.md</span> ‏C1 وM12 وH2-5). لا رقم حيًّا هنا بعد:
+          شغّل السكربت من جديد واقرأ ما يطبعه، ولا يُكتب المبرّر إلا من تشغيل حيّ.
         </p>
       </div>
 
@@ -505,7 +519,7 @@ footer a { color: var(--ember); }
       <p>عشرة صفوف. العمود الباهت تاريخ، لا ادّعاء.</p>
     </div>
 
-    <div class="void-note">
+    <div class="void-note"><!-- verify_docs > RETIRED-OK: 2.8, 31, 82, 168.1, 8, 7.6, 49.9 -->
       <b>تحذير قبل القراءة:</b> كل رقم في العمود الباهت مذكور لأنه
       <b>بَطَل</b>، لا لأنه صحيح. تحديدًا: <span class="mono">2.8 %</span> ·
       <span class="mono">31–82 kPa</span> · <span class="mono">168.1 min</span> ·
@@ -542,10 +556,10 @@ footer a { color: var(--ember); }
         <div class="new"><span class="k">جديد</span><span class="mono">1123 K</span> ثابتة — ركبة دالة الضرر — مستوردة من <span class="mono">engine_env.TURB_PROTECT_K</span>. قاعدة المئين تنهار على سيناريو التسلّق المستمر: ثلاثة صفوف تتشبّع عند 100 % للسياستين.</div>
       </div>
 
-      <div class="diff-row">
+      <div class="diff-row"><!-- verify_docs > RETIRED-OK: 2.8, 22 -->
         <div class="topic">«المحاكي يطابق السيارة»</div>
         <div class="old"><span class="k">قديم</span>Phase B مرّت برصيد حمل <span class="mono">2.8 %</span> على 22 نقطة. البوابة مغلقة، لا تُعاد.</div>
-        <div class="new"><span class="k">جديد</span>الرصيد <span class="mono">1.4 %</span> مشتقّ بصفر معاملات (و<span class="mono">1.1 %</span> بمعامل واحد) — ولا يختبر نموذج التنفّس إطلاقًا. الاختبار الحقيقي الوحيد تحت الشحن: <span class="mono">+3.0 %</span> مقابل قناة السيارة. <b>عند الحمل الجزئي لا يوجد اختبار</b> — تُكتب كحدّ، لا تُصلَح بهدوء.</div>
+        <div class="new"><span class="k">جديد</span>الرصيد <span class="mono">1.4 %</span> مشتقّ بصفر معاملات (و<span class="mono">1.1 %</span> بمعامل واحد) — ولا يختبر نموذج التنفّس إطلاقًا. الاختبار الحقيقي الوحيد تحت الشحن: <span class="mono">+1.9 %</span> مقابل قناة السيارة. <b>عند الحمل الجزئي لا يوجد اختبار</b> — تُكتب كحدّ، لا تُصلَح بهدوء.</div>
       </div>
 
       <div class="diff-row">
@@ -569,7 +583,7 @@ footer a { color: var(--ember); }
       <div class="diff-row">
         <div class="topic">الرقم الذي يُقنِع المشرف</div>
         <div class="old"><span class="k">قديم</span>«الأفضلية تحرّكت 7.6 → 49.9 نقطة، تأرجح ×7» — مقيس على محرك رباعي خطأ.</div>
-        <div class="new"><span class="k">جديد</span><span class="mono">16.5 → 18.0 → 26.0</span> نقطة عند <span class="mono">1123 K</span>، مع الهوية: تعطيل الـpreview يُسقِط السياسة الاستباقية على التفاعلية <b>حتى العشرية</b> — <span class="mono">548.6</span> مقابل <span class="mono">548.6</span>.</div>
+        <div class="new"><span class="k">جديد</span><i>صُحِّح في 22 سبتمبر:</i> <b>لا رقم يُقنِع بعد.</b> جدول H2 عند <span class="mono">1123 K</span> باطل (<span class="mono">AUDIT.md</span> ‏C1 وM12 وH2-5)، والهوية «تعطيل الـpreview يُسقِط الاستباقية على التفاعلية» مضمونة بالبناء (C3)، فلا تُعدّ دليلًا. القياس الوحيد للـpreview هو Phase D: مع وكلاء بميزانية C1 لا ينفصل عن ضجيج البذور (<span class="mono">p = 0.3633</span>)، والذراع المُعمّاة لم تكن معمّاة فعلًا (<span class="mono">PREREGISTRATION.md</span>، الحدّ 7).</div>
       </div>
 
       <div class="diff-row">
@@ -603,7 +617,7 @@ footer a { color: var(--ember); }
           <li>ثبّت <span class="mono">stable-baselines3</span> وأزل التعليق عن سطريه في <span class="mono">requirements.txt</span>.</li>
           <li>الليلة: <span class="mono">python train.py --steps 50000 --seed 0</span>. النتيجة ستكون سيئة، وهذا هو المطلوب.</li>
           <li>ثم عشر تشغيلات: خمس بذور × (مع preview / بدونه). <b>بذرة لكل شخص، يُتّفق عليها قبل أن يبدأ أحد.</b></li>
-          <li>شغّل <span class="mono">test_reward.py</span> قبل تصديق أيّ منحنى: أربع من أربع، والمحايد <span class="mono">−0.00438</span>.</li>
+          <li>شغّل <span class="mono">test_reward.py</span> قبل تصديق أيّ منحنى: أربع من أربع، والمحايد <span class="mono">−0.00038</span>.</li>
         </ul>
         <p class="gate"><b>البوابة:</b> عشرة مجلدات تشغيل، كل واحد فيه checkpoint ومنحنى يرتفع لا يستوي. الوكلاء ليسوا مطالَبين بأن يكونوا جيدين بعد.</p>
         <p class="fallback"><b>إن لم يتقارب:</b> اخفض <span class="mono">--lr 1e-4</span> أولًا، ثم قصّر الحلقة. <b>لا تعدّل المكافأة</b> — هكذا عاد الاختراق في المرة الثانية.</p>
@@ -662,9 +676,9 @@ footer a { color: var(--ember); }
           <span class="track-time">اجتماع واحد</span>
         </div>
         <ul>
-          <li>الوضع الحالي: قراءة فقط، لا يخزّن بيانات خام، ثلاثة أنواع إنذار مفصولة بجمهورها، <span class="mono">36/36</span> اختبار تمرّ.</li>
+          <li>الوضع الحالي: قراءة فقط، لا يخزّن بيانات خام، ثلاثة أنواع إنذار مفصولة بجمهورها، <span class="mono">49/49</span> اختبار تمرّ.</li>
           <li><b>التوصية:</b> يبقى عرضًا للمناقشة + فصلًا قصيرًا يشرح المقدِّر الافتراضي — وتُجمَّد ميزاته اليوم.</li>
-          <li>يُكتب في وثيقة أنه لا يدّعي ثقة أكثر من المحاكي: 8 من 11، وثلاثة إخفاقات موثّقة، ورصيد مقيس عند <span class="mono">30–74 kPa</span> فقط.</li>
+          <li>يُكتب في وثيقة أنه لا يدّعي ثقة أكثر من المحاكي: 8 من 11، وثلاثة إخفاقات موثّقة، ورصيد مقيس عند <span class="mono">30–75 kPa</span> فقط.</li>
         </ul>
         <p class="gate"><b>البوابة:</b> سطر واحد مكتوب يقول ما هو التطبيق وما ليس هو، وقائمة ميزات مغلقة.</p>
         <p class="fallback"><b>الخطر الحقيقي:</b> ليس أن يفشل، بل أن ينجح ويأكل الأسابيع التي تخصّ Phase D. هو رفع للسقف، والأرضية لم تُصبَّ بعد.</p>
@@ -731,10 +745,8 @@ footer a { color: var(--ember); }
         <circle cx="451" cy="132" r="5" fill="var(--ember)"></circle>
         <circle cx="534" cy="132" r="5" fill="var(--ember)"></circle>
         <circle cx="643" cy="132" r="5" fill="var(--ember)"></circle>
-        <text x="451" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">26.0</text>
-        <text x="534" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">18.0</text>
-        <text x="643" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">16.5</text>
-        <text x="288" y="152" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans Arabic, sans-serif">القيد لا يُلزم هنا</text>
+        <text x="547" y="122" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans Arabic, sans-serif">أرقام الأفضلية هنا باطلة — جدول H2</text>
+        <text x="288" y="152" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans Arabic, sans-serif">لا رقم في الكنس الباطل</text>
 
         <text x="60" y="188" fill="var(--cool)" font-size="12" font-family="IBM Plex Sans Arabic, sans-serif">البطارية المتوقَّعة — لم تُبنَ بعد</text>
         <line x1="165" y1="206" x2="611" y2="206" stroke="var(--cool)" stroke-width="7"
@@ -753,13 +765,15 @@ footer a { color: var(--ember); }
       </svg>
     </div>
     <p class="figcap">
-      الأرقام فوق النقاط الممتلئة هي أفضلية الـpreview بالنقاط، من جدول H2 الثابت
-      عند <span class="mono">1123 K</span>: <span class="mono">26.0</span> عند
-      <span class="mono">H/τ = 0.60</span>، و<span class="mono">18.0</span> عند
-      <span class="mono">1.43</span>، و<span class="mono">16.5</span> عند
-      <span class="mono">4.47</span>. النقطتان المجوّفتان على اليسار
-      (<span class="mono">0.20</span> و<span class="mono">0.06</span>) لا تنتجان رقمًا:
-      الجسم صار ثقيلًا إلى حدّ أن الحرارة لا تبلغ الحدّ أصلًا، فلا قيد يُنتهَك.
+      النقاط الممتلئة هي مواضع كنس <span class="mono">c_turb</span> على المحور
+      (<span class="mono">H/τ = 0.60</span> و<span class="mono">1.43</span> و<span class="mono">4.47</span>).
+      نسخة 14 سبتمبر كتبت فوقها أفضلية الـpreview من جدول H2 الثابت عند
+      <span class="mono">1123 K</span>، وذلك الجدول باطل (<span class="mono">AUDIT.md</span> ‏C1 وM12 وH2-5)
+      فحُذفت أرقامه؛ شغّل <span class="mono">generality_test.py</span> واقرأ ما يطبعه. النقطتان المجوّفتان على اليسار
+      (<span class="mono">0.20</span> و<span class="mono">0.06</span>) لم تنتجا رقمًا في كنس
+      14 سبتمبر الباطل نفسه، لأن الحرارة لم تبلغ الحدّ هناك على السيناريو القديم. هذا تاريخ لا نتيجة:
+      على سيناريو اليوم (130 كم/س) لم يُعَد قياس هاتين النقطتين، فلا يُقال إن القيد لا يُلزم عندهما —
+      أعد تشغيل <span class="mono">generality_test.py</span> قبل تكرار ذلك.
       مدى البطارية المرسوم مأخوذ من مواصفة خارطة الطريق نفسها
       (τ ≈ 9–38 دقيقة، وأفق من 30 ثانية إلى 60 دقيقة).
     </p>
@@ -865,20 +879,23 @@ footer a { color: var(--ember); }
           <tr><th>الكمية</th><th>القيمة اليوم</th><th>يطبعها</th></tr>
         </thead>
         <tbody>
-          <tr><td>الضرر: أساس · تفاعلي · استباقي · مُعمّى</td><td class="n">829.2 · 548.6 · 437.6 · 548.6</td><td class="n">check_premise.py</td></tr>
-          <tr><td>خفض الضرر، وأفضلية الـpreview</td><td class="n">33.8 % · 47.2 % · 13.4 pts</td><td class="n">check_premise.py</td></tr>
+          <tr><td>النتيجة — Phase D: المُعمّى ناقص المُبصِر، ثماني بذور</td><td class="n">5 من 8 موجبة · المتوسط +4.8 · p = 0.3633 (الإشارة) · 0.4922 (التبديل) — غير دالّ، بميزانية C1، والذراع المُعمّاة ليست معمّاة فعلًا (PREREGISTRATION.md، الحدّ 7)</td><td class="n">analyse_phase_d.py</td></tr>
+          <tr><td>ادّعاء منفصل: الوكيل فوق سياسة الميل الحالي — إشراف، لا preview</td><td class="n">+29 إلى +34 نقطة على 5 من 8 بذور</td><td class="n">analyse_phase_d.py</td></tr>
+          <tr><td>الضرر، سياسات يدوية: أساس · تفاعلي · الميل الحالي · استباقي</td><td class="n">959.8 · 679.0 · 633.2 · 637.4</td><td class="n">check_premise.py</td></tr>
+          <tr><td>خفض الضرر: تفاعلي · الميل الحالي · استباقي</td><td class="n">29.3 % · 34.0 % · 33.6 %</td><td class="n">check_premise.py</td></tr>
+          <tr><td>الـpreview فوق الميل الحالي (المقارنة الصادقة)؛ الاستباقي بلا preview يساوي التفاعلي بالبناء (C3)</td><td class="n">−0.4 نقطة</td><td class="n">check_premise.py</td></tr>
           <tr><td>عتبة الحماية</td><td class="n">1123 K (850 °C)</td><td class="n">engine_env.TURB_PROTECT_K</td></tr>
-          <tr><td>رصيد الحمل، k مشتقّ 0.829 · صفر معاملات</td><td class="n">1.4 %</td><td class="n">compare_log.py</td></tr>
-          <tr><td>رصيد الحمل، k مُلائَم 0.837 · معامل واحد</td><td class="n">1.1 %</td><td class="n">compare_log.py</td></tr>
-          <tr><td>البيانات: مدة · قيادات · نقاط تشغيل · مدى</td><td class="n">175.5 min · 9 · 22 · 30–74 kPa</td><td class="n">build_dataset.py</td></tr>
+          <tr><td>رصيد الحمل، k مشتقّ 0.831 · صفر معاملات</td><td class="n">1.4 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>رصيد الحمل، k مُلائَم 0.839 · معامل واحد</td><td class="n">1.1 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>البيانات: مدة · قيادات في السجلّ · نقاط تشغيل · مدى</td><td class="n">295.0 min · 10 · 26 · 30–75 kPa</td><td class="n">build_dataset.py</td></tr>
           <tr><td>جدول المصادقة</td><td class="n">8 / 11 داخل النطاق</td><td class="n">validate.py</td></tr>
           <tr><td>النطاقات ذات المصدر المفتوح</td><td class="n">2 مؤكَّد · 1 جزئي · 7 بلا مصدر</td><td class="n">REFERENCES.md</td></tr>
-          <tr><td>بوابة المكافأة: المحايد · المجوِّع</td><td class="n">−0.00438 · −0.28044</td><td class="n">test_reward.py</td></tr>
-          <tr><td>ثابت زمن التوربين (خطوة · C/UA)</td><td class="n">48.0 s · 50.3 s</td><td class="n">validate.py</td></tr>
-          <tr><td>أفضلية الـpreview عبر H/τ ‏4.47 → 0.60</td><td class="n">16.5 → 18.0 → 26.0 pts</td><td class="n">generality_test.py</td></tr>
-          <tr><td>العكس تحت الشحن مقابل قناة السيارة</td><td class="n">+3.0 % (الخام: +23.7 %)</td><td class="n">CLAUDE.md · خطأ 13</td></tr>
-          <tr><td>اختبارات التطبيق الحي</td><td class="n">36 / 36</td><td class="n">app/test_replay.py</td></tr>
-          <tr><td>تكلفة Phase C</td><td class="n">4.6 h × 10 = 46 h</td><td class="n">handoff.md</td></tr>
+          <tr><td>بوابة المكافأة: المحايد · المجوِّع</td><td class="n">−0.00038 · −0.90349</td><td class="n">test_reward.py</td></tr>
+          <tr><td>ثابت زمن التوربين، على التسلّق (يمتدّ 40–239 s خلال الحلقة)</td><td class="n">48.0 s</td><td class="n">validate.py</td></tr>
+          <tr><td>أفضلية الـpreview عبر H/τ (جدول H2)</td><td class="n">باطل — AUDIT.md C1 وM12 وH2-5؛ أعد التشغيل واقرأ</td><td class="n">generality_test.py</td></tr>
+          <tr><td>العكس تحت الشحن مقابل قناة السيارة</td><td class="n">+1.9 % (الخام: +23.7 %)</td><td class="n">CLAUDE.md · خطأ 13</td></tr>
+          <tr><td>اختبارات التطبيق الحي</td><td class="n">49 / 49 (بـ--full ‏59 / 59)</td><td class="n">app/test_replay.py</td></tr>
+          <tr><td>تدريب Phase D (منجز)</td><td class="n">16 وكيلًا × 50 000 خطوة — ميزانية C1</td><td class="n">results/PREREGISTRATION.md</td></tr>
         </tbody>
       </table>
     </div>
@@ -927,6 +944,22 @@ footer a { color: var(--ember); }
       and the gate that makes this a passing project is still Phase D. What changed is
       which evidence proves what, and which work has to come before which.
     </p>
+    <div class="void-note">
+      <b>Historical record — read this first.</b> This plan was written on 14 September,
+      before Phase D. Phase D ran on 21–22 September and returned a <b>null</b>: with agents
+      trained to the C1 budget (50 000 steps), preview does not separate from seed noise —
+      5 of 8 seeds positive, sign test <span class="mono">p = 0.3633</span>, permutation
+      <span class="mono">p = 0.4922</span>. And the blinded arm was not truly blind: the road
+      was the same in every episode and its thermal state works as a clock, so the agent
+      could memorise when the hill comes (<span class="mono">results/PREREGISTRATION.md</span>,
+      limit 7). The steps and time estimates on this page record
+      what was believed then; they are not instructions. Note: some in-line figures in the
+      steps and reasons — the reward gate, the test count, the boosted inversion — were
+      updated to current values on 22 September; the time estimates were not, and remain
+      history. Current figures are in
+      <span class="mono">CLAUDE.md</span> and <span class="mono">FULL_RUN.txt</span>, and
+      <a href="#numbers-en">the numbers table</a> below was brought up to date on 22 September.
+    </div>
     <div class="now">
       <span class="lbl">next move · now</span>
       <span class="cmd">pip install "stable-baselines3[extra]"</span>
@@ -1009,9 +1042,9 @@ footer a { color: var(--ember); }
           <span class="mono">149 °C</span> under boost. The B58 carries its cooler inside
           the intake manifold, downstream of the throttle, so "before throttle" is before
           the cooler. Correcting it moved the operating-point span to
-          <span class="mono">30–74 kPa</span> and the enrichment gate to
+          <span class="mono">30–75 kPa</span> and the enrichment gate to
           <span class="mono">180 kPa</span>, and brought the boosted inversion from
-          <span class="mono">+23.7 %</span> to <span class="mono">+3.0 %</span> against the
+          <span class="mono">+23.7 %</span> to <span class="mono">+1.9 %</span> against the
           car's own boost channel. <b>The breathing model was cleared, not convicted.</b>
         </p>
       </div>
@@ -1035,7 +1068,7 @@ footer a { color: var(--ember); }
           <span class="mono">app/</span> runs the same physics alongside the car in real
           time and estimates what the car cannot report: turbine temperature, knock margin,
           accumulated damage. Read-only, no raw data written to disk,
-          <span class="mono">36/36</span> tests passing. It is the strongest demonstration
+          <span class="mono">49/49</span> tests passing. It is the strongest demonstration
           available in a BSc defence — and the fastest way to eat Phase D if it is left to
           grow. It needs a written decision, not neglect.
         </p>
@@ -1047,10 +1080,11 @@ footer a { color: var(--ember); }
         <p>
           The roadmap justifies the battery by a sweep that moved the preview advantage from
           <span class="mono">7.6</span> to <span class="mono">49.9</span> points — both
-          measured on the wrong four-cylinder engine. Today, at the
-          <span class="mono">1123 K</span> limit, the live figures are
-          <span class="mono">16.5 → 18.0 → 26.0</span> points. Same direction, one seventh
-          the size. Rewrite the argument with the live numbers and tell the supervisor.
+          measured on the wrong four-cylinder engine. The table that replaced them at the
+          <span class="mono">1123 K</span> limit — the H2 table from
+          <span class="mono">generality_test.py</span> — is void too (<span class="mono">AUDIT.md</span>
+          C1, M12, H2-5). There is no live figure here yet: re-run the script, read what it
+          prints, and rewrite the argument only from a live run.
         </p>
       </div>
 
@@ -1064,7 +1098,7 @@ footer a { color: var(--ember); }
       <p>Ten rows. The faded column is history, not a claim.</p>
     </div>
 
-    <div class="void-note">
+    <div class="void-note"><!-- verify_docs > RETIRED-OK: 2.8, 31, 82, 168.1, 8, 7.6, 49.9 -->
       <b>Read this first:</b> every figure in the faded column appears because it is
       <b>void</b>, not because it is correct. Specifically:
       <span class="mono">2.8 %</span> · <span class="mono">31–82 kPa</span> ·
@@ -1101,10 +1135,10 @@ footer a { color: var(--ember); }
         <div class="new"><span class="k">new</span>A fixed <span class="mono">1123 K</span> — the knee of the damage term — imported from <span class="mono">engine_env.TURB_PROTECT_K</span>. The percentile rule collapses on a sustained climb: three rows saturate at 100 % for both policies.</div>
       </div>
 
-      <div class="diff-row">
+      <div class="diff-row"><!-- verify_docs > RETIRED-OK: 2.8, 22 -->
         <div class="topic">"The simulator matches the car"</div>
         <div class="old"><span class="k">old</span>Phase B passed on a <span class="mono">2.8 %</span> load residual over 22 points. Gate closed, do not reopen.</div>
-        <div class="new"><span class="k">new</span><span class="mono">1.4 %</span> derived with zero free parameters (<span class="mono">1.1 %</span> with one) — and it tests no part of the breathing model. The only real test is under boost: <span class="mono">+3.0 %</span> against the car's own channel. <b>At part load there is no test at all</b> — state it as a limitation rather than fixing it quietly.</div>
+        <div class="new"><span class="k">new</span><span class="mono">1.4 %</span> derived with zero free parameters (<span class="mono">1.1 %</span> with one) — and it tests no part of the breathing model. The only real test is under boost: <span class="mono">+1.9 %</span> against the car's own channel. <b>At part load there is no test at all</b> — state it as a limitation rather than fixing it quietly.</div>
       </div>
 
       <div class="diff-row">
@@ -1128,7 +1162,7 @@ footer a { color: var(--ember); }
       <div class="diff-row">
         <div class="topic">The number that convinces the supervisor</div>
         <div class="old"><span class="k">old</span>"The advantage moved 7.6 → 49.9 points, a 7× swing" — measured on the wrong engine.</div>
-        <div class="new"><span class="k">new</span><span class="mono">16.5 → 18.0 → 26.0</span> points at <span class="mono">1123 K</span>, carried by the identity: disabling preview collapses the predictive policy onto the reactive one <b>to the decimal</b> — <span class="mono">548.6</span> against <span class="mono">548.6</span>.</div>
+        <div class="new"><span class="k">new</span><i>Corrected 22 September:</i> <b>no number convinces yet.</b> The H2 table at <span class="mono">1123 K</span> is void (<span class="mono">AUDIT.md</span> C1, M12, H2-5), and the identity — disabling preview collapses the predictive policy onto the reactive one — holds by construction (C3), so it is not evidence. The only measurement of preview is Phase D: with agents trained to the C1 budget, preview does not separate from seed noise (<span class="mono">p = 0.3633</span>), and the blinded arm was not truly blind (<span class="mono">PREREGISTRATION.md</span> limit 7).</div>
       </div>
 
       <div class="diff-row">
@@ -1162,7 +1196,7 @@ footer a { color: var(--ember); }
           <li>Install <span class="mono">stable-baselines3</span> and uncomment its two lines in <span class="mono">requirements.txt</span>.</li>
           <li>Tonight: <span class="mono">python train.py --steps 50000 --seed 0</span>. The result will be poor, and that is the point.</li>
           <li>Then ten runs: five seeds × (preview / no-preview). <b>One seed per person, agreed before anyone starts.</b></li>
-          <li>Run <span class="mono">test_reward.py</span> before believing any curve: four of four, neutral at <span class="mono">−0.00438</span>.</li>
+          <li>Run <span class="mono">test_reward.py</span> before believing any curve: four of four, neutral at <span class="mono">−0.00038</span>.</li>
         </ul>
         <p class="gate"><b>Gate:</b> ten run directories, each with a checkpoint and a learning curve that rises rather than going sideways. The agents do not have to be good yet.</p>
         <p class="fallback"><b>If it will not converge:</b> lower <span class="mono">--lr 1e-4</span> first, then shorten the episode. <b>Do not edit the reward</b> — that is how the hack came back the second time.</p>
@@ -1221,9 +1255,9 @@ footer a { color: var(--ember); }
           <span class="track-time">one meeting</span>
         </div>
         <ul>
-          <li>Where it stands: read-only, no raw data stored, three alert types separated by audience, <span class="mono">36/36</span> tests passing.</li>
+          <li>Where it stands: read-only, no raw data stored, three alert types separated by audience, <span class="mono">49/49</span> tests passing.</li>
           <li><b>Recommendation:</b> keep it as the defence demonstration plus a short chapter on the virtual sensor — and freeze its feature set today.</li>
-          <li>Write down that it claims no more confidence than the simulator: 8 of 11, three documented misses, and a residual measured only at <span class="mono">30–74 kPa</span>.</li>
+          <li>Write down that it claims no more confidence than the simulator: 8 of 11, three documented misses, and a residual measured only at <span class="mono">30–75 kPa</span>.</li>
         </ul>
         <p class="gate"><b>Gate:</b> one written line saying what the app is and what it is not, and a closed feature list.</p>
         <p class="fallback"><b>The real risk:</b> not that it fails, but that it succeeds and eats the weeks that belong to Phase D. It raises the ceiling; the floor has not been poured yet.</p>
@@ -1292,10 +1326,8 @@ footer a { color: var(--ember); }
         <circle cx="451" cy="132" r="5" fill="var(--ember)"></circle>
         <circle cx="534" cy="132" r="5" fill="var(--ember)"></circle>
         <circle cx="643" cy="132" r="5" fill="var(--ember)"></circle>
-        <text x="451" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">26.0</text>
-        <text x="534" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">18.0</text>
-        <text x="643" y="122" fill="var(--text)" font-size="11.5" text-anchor="middle" font-family="IBM Plex Mono, monospace">16.5</text>
-        <text x="288" y="152" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans, sans-serif">constraint never binds here</text>
+        <text x="547" y="122" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans, sans-serif">preview edges here are void — H2 table</text>
+        <text x="288" y="152" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="IBM Plex Sans, sans-serif">no figure on the void sweep</text>
 
         <text x="60" y="188" fill="var(--cool)" font-size="12" font-family="IBM Plex Sans, sans-serif">the battery's expected range — not built yet</text>
         <line x1="165" y1="206" x2="611" y2="206" stroke="var(--cool)" stroke-width="7"
@@ -1314,14 +1346,18 @@ footer a { color: var(--ember); }
       </svg>
     </div>
     <p class="figcap">
-      The figures above the filled dots are the preview edge in points, from the
-      fixed-limit H2 table at <span class="mono">1123 K</span>:
-      <span class="mono">26.0</span> at <span class="mono">H/τ = 0.60</span>,
-      <span class="mono">18.0</span> at <span class="mono">1.43</span>, and
-      <span class="mono">16.5</span> at <span class="mono">4.47</span>. The two hollow dots
-      on the left (<span class="mono">0.20</span> and <span class="mono">0.06</span>) yield
-      no figure: the component is massive enough that the temperature never reaches the
-      limit, so there is no constraint to violate. The battery band is drawn from the
+      The filled dots mark where the <span class="mono">c_turb</span> sweep sits on the axis
+      (<span class="mono">H/τ = 0.60</span>, <span class="mono">1.43</span> and
+      <span class="mono">4.47</span>). The 14 September version printed the preview edge
+      above them, from the fixed-limit H2 table at <span class="mono">1123 K</span>; that table
+      is void (<span class="mono">AUDIT.md</span> C1, M12, H2-5), so its figures were removed —
+      run <span class="mono">generality_test.py</span> and read what it prints. On that same
+      14 September sweep, now void, the two hollow dots on the left
+      (<span class="mono">0.20</span> and <span class="mono">0.06</span>) produced no figure,
+      because the temperature never reached the limit on the old scenario. That is history,
+      not a result: those points have not been re-measured on today's 130 km/h scenario, so
+      do not claim the constraint fails to bind there — re-run
+      <span class="mono">generality_test.py</span> before repeating it. The battery band is drawn from the
       roadmap's own spec (τ ≈ 9–38 min, horizons from 30 s to 60 min).
     </p>
 
@@ -1426,20 +1462,23 @@ footer a { color: var(--ember); }
           <tr><th>quantity</th><th>value today</th><th>printed by</th></tr>
         </thead>
         <tbody>
-          <tr><td>Damage: baseline · reactive · predictive · blinded</td><td class="n">829.2 · 548.6 · 437.6 · 548.6</td><td class="n">check_premise.py</td></tr>
-          <tr><td>Damage reduction, and the preview edge</td><td class="n">33.8 % · 47.2 % · 13.4 pts</td><td class="n">check_premise.py</td></tr>
+          <tr><td>THE RESULT — Phase D: blinded minus sighted, eight seeds</td><td class="n">5 of 8 positive · mean +4.8 · p = 0.3633 (sign) · 0.4922 (permutation) — not significant, C1 budget, blinded arm not truly blind (PREREGISTRATION.md limit 7)</td><td class="n">analyse_phase_d.py</td></tr>
+          <tr><td>A separate claim: the agent over current-grade — supervision, not preview</td><td class="n">+29 to +34 points on 5 of 8 seeds</td><td class="n">analyse_phase_d.py</td></tr>
+          <tr><td>Damage, hand-written policies: baseline · reactive · current-grade · predictive</td><td class="n">959.8 · 679.0 · 633.2 · 637.4</td><td class="n">check_premise.py</td></tr>
+          <tr><td>Damage reduction: reactive · current-grade · predictive</td><td class="n">29.3 % · 34.0 % · 33.6 %</td><td class="n">check_premise.py</td></tr>
+          <tr><td>Preview over current grade (the honest one); predictive with preview off equals reactive by construction (C3)</td><td class="n">−0.4 points</td><td class="n">check_premise.py</td></tr>
           <tr><td>Protection trigger</td><td class="n">1123 K (850 °C)</td><td class="n">engine_env.TURB_PROTECT_K</td></tr>
-          <tr><td>Load residual, k derived 0.829 · zero free parameters</td><td class="n">1.4 %</td><td class="n">compare_log.py</td></tr>
-          <tr><td>Load residual, k fitted 0.837 · one parameter</td><td class="n">1.1 %</td><td class="n">compare_log.py</td></tr>
-          <tr><td>Dataset: minutes · drives · operating points · span</td><td class="n">175.5 min · 9 · 22 · 30–74 kPa</td><td class="n">build_dataset.py</td></tr>
+          <tr><td>Load residual, k derived 0.831 · zero free parameters</td><td class="n">1.4 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>Load residual, k fitted 0.839 · one parameter</td><td class="n">1.1 %</td><td class="n">compare_log.py</td></tr>
+          <tr><td>Dataset: minutes · drives in the manifest · operating points · span</td><td class="n">295.0 min · 10 · 26 · 30–75 kPa</td><td class="n">build_dataset.py</td></tr>
           <tr><td>Validation table</td><td class="n">8 / 11 inside band</td><td class="n">validate.py</td></tr>
           <tr><td>Bands with an opened source</td><td class="n">2 confirmed · 1 partial · 7 none</td><td class="n">REFERENCES.md</td></tr>
-          <tr><td>Reward gate: neutral · starver</td><td class="n">−0.00438 · −0.28044</td><td class="n">test_reward.py</td></tr>
-          <tr><td>Turbine time constant (step · C/UA)</td><td class="n">48.0 s · 50.3 s</td><td class="n">validate.py</td></tr>
-          <tr><td>Preview edge across H/τ 4.47 → 0.60</td><td class="n">16.5 → 18.0 → 26.0 pts</td><td class="n">generality_test.py</td></tr>
-          <tr><td>Boosted inversion against the car's channel</td><td class="n">+3.0 % (raw sensor: +23.7 %)</td><td class="n">CLAUDE.md · mistake 13</td></tr>
-          <tr><td>Live app tests</td><td class="n">36 / 36</td><td class="n">app/test_replay.py</td></tr>
-          <tr><td>Phase C cost</td><td class="n">4.6 h × 10 = 46 h</td><td class="n">handoff.md</td></tr>
+          <tr><td>Reward gate: neutral · starver</td><td class="n">−0.00038 · −0.90349</td><td class="n">test_reward.py</td></tr>
+          <tr><td>Turbine time constant, on the climb (spans 40–239 s over an episode)</td><td class="n">48.0 s</td><td class="n">validate.py</td></tr>
+          <tr><td>Preview edge across H/τ (the H2 table)</td><td class="n">void — AUDIT.md C1, M12, H2-5; re-run and read</td><td class="n">generality_test.py</td></tr>
+          <tr><td>Boosted inversion against the car's channel</td><td class="n">+1.9 % (raw sensor: +23.7 %)</td><td class="n">CLAUDE.md · mistake 13</td></tr>
+          <tr><td>Live app tests</td><td class="n">49 / 49 (--full 59 / 59)</td><td class="n">app/test_replay.py</td></tr>
+          <tr><td>Phase D training (done)</td><td class="n">16 agents × 50 000 steps — the C1 budget</td><td class="n">results/PREREGISTRATION.md</td></tr>
         </tbody>
       </table>
     </div>

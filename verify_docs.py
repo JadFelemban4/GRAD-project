@@ -203,6 +203,13 @@ def tracked_files(here):
 
 
 _TAG = re.compile(r"<[^>\n]*>")
+# A RETIRED-OK marker written as an HTML comment. `_TAG` strips `<!-- ... -->`
+# along with every other tag, so until 22 September 2026 EVERY marker in
+# `presentation/*.html` was invisible to both scans -- decorative, not
+# functional -- while the deck's own authors were told to use them. Found
+# during the fix-3 sweep. The comment's content is kept as plain text, ending
+# in " --> " so `_historical_lines` still finds where the annotation stops.
+_MARKER_COMMENT = re.compile(r"<!--\s*(RETIRED-OK\b.*?)\s*-->")
 _ENTITY = {"&nbsp;": " ", "&amp;": "&", "&lt;": "<", "&gt;": ">",
            "&quot;": '"', "&#39;": "'", "&deg;": "deg", "&minus;": "-",
            "&ndash;": "-", "&mdash;": "--", "&times;": "x"}
@@ -229,7 +236,8 @@ def read_lines(path):
         return block, block
     clean = []
     for line in block:
-        s = _TAG.sub(" ", line)
+        s = _MARKER_COMMENT.sub(lambda m: " " + m.group(1) + " --> ", line)
+        s = _TAG.sub(" ", s)
         for k, v in _ENTITY.items():
             s = s.replace(k, v)
         clean.append(s)
@@ -346,6 +354,17 @@ def _historical_lines(block, is_md):
             continue
         annotation = line.split(RETIRED_OK, 1)[1]
         annotation = annotation.split("-->")[0].lstrip(": \t")
+        # THE FIGURES ARE THE LIST, NOT THE EXPLANATION. Markers here are
+        # written "RETIRED-OK: 900.9 -- the baseline at dt 0.2, not the
+        # protocol step of dt 1.0", and `_marker_figures` used to pull EVERY
+        # number out of that whole string -- so the marker also excused 0.2
+        # and 1.0 in its scope, figures nobody meant to retire. Found by the
+        # 22 September sweep review ("RETIRED-OK: 0.837, 46 -- figures of
+        # 16 September" excused 16). The list ends at the first spaced
+        # double dash, em dash or en dash; the explanation after it names
+        # nothing. A marker whose figures are all IN the explanation is now,
+        # correctly, a bare marker.
+        annotation = re.split(r"\s(?:--|\u2014|\u2013)\s", annotation + " ", maxsplit=1)[0]
         # AUDIT2.md H2-6: the section form used to trigger on the SUBSTRING
         # "section" anywhere in the first 24 characters, so a marker whose
         # explanation happened to use the word took the whole section with it.
@@ -871,89 +890,20 @@ RETIRED_OK = "RETIRED-OK"
 # is hidden, the count is printed every run, and the total is printed at the
 # end so that "how much document rot is outstanding" is one number instead of
 # an afternoon's grepping.
-KNOWN_STALE = [
-    # --- figure-scan rot: the exact stale VALUES, so a stale line
-    #     cannot be edited into a differently stale one unnoticed.
-    ("ABSTRACT.md", "drives in the manifest", "H2-1", (9.0,)),
-    ("ABSTRACT.md", "quasi-steady samples behind the fit", "H2-1", (22.0,)),
-    ("ABSTRACT.md", "total minutes", "H2-1", (175.5,)),
-    ("CHECKPOINT.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
-    ("CHECKPOINT.md", "check_premise baseline damage", "H2-4", (294.2, 294.2, 829.2, 900.9)),
-    ("CHECKPOINT.md", "check_premise baseline peak turbine", "H2-4", (812.0, 812.0)),
-    ("CHECKPOINT.md", "drives in the manifest", "H2-1", (8.0,)),
-    ("CHECKPOINT.md", "drives that carry samples", "H2-1/H2-7", (5.0, 5.0)),
-    ("CHECKPOINT.md", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
-    ("CHECKPOINT.md", "load residual, k DERIVED, zero free parameters", "M2-1", (1.3,)),
-    ("CHECKPOINT.md", "seconds above 207 kPa", "M2-3", (178.0,)),
-    ("CHECKPOINT.md", "total minutes", "H2-1", (168.1, 175.5)),
-    ("CLAUDE.md", "app peak estimated turbine (either pinned drive)", "H2-4", (593.7,)),
-    ("CLAUDE.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
-    ("CLAUDE.md", "check_premise baseline damage", "H2-4", (256.5, 294.2, 294.2, 900.9)),
-    ("CLAUDE.md", "check_premise baseline peak turbine", "H2-4", (812.0, 812.0)),
-    ("CLAUDE.md", "fitted k, as compare_log prints it", "H2-1", (0.784, 0.837, 0.837)),
-    ("CLAUDE.md", "fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)", "H2-1", (0.351,)),
-    ("CLAUDE.md", "load residual, k DERIVED, zero free parameters", "M2-1", (1.3,)),
-    ("CONTROL_SCOPE.md", "distinct operating points", "H2-1", (22.0,)),
-    ("CONTROL_SCOPE.md", "drives in the manifest", "H2-1", (9.0,)),
-    ("CONTROL_SCOPE.md", "operating-point span, high end", "H2-1", (74.0,)),
-    ("CONTROL_SCOPE.md", "total minutes", "H2-1", (175.5,)),
-    ("DOC/SESSION_REPORT_2026-09-18.md", "check_premise baseline damage", "H2-4", (294.2,)),
-    ("DOC/SESSION_REPORT_2026-09-18.md", "check_premise baseline peak turbine", "H2-4", (812.0,)),
-    ("DOC/SESSION_REPORT_2026-09-18.md", "fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)", "H2-1", (0.351,)),
-    ("DOC/SESSION_REPORT_2026-09-18.md", "load residual, k DERIVED, zero free parameters", "M2-1", (1.3,)),
-    ("README.md", "check_premise baseline damage", "H2-4", (294.2,)),
-    ("README.md", "check_premise baseline peak turbine", "H2-4", (812.0,)),
-    ("README.md", "corr(lambda, air_gps)", "M2-3", (-0.49,)),
-    ("README.md", "corr(lambda, map_kpa)", "M2-3", (0.23,)),
-    ("README.md", "samples, 1000-3500 rpm above 180 kPa", "M2-3", (422.0,)),
-    ("README.md", "samples, 3500-4500 rpm above 180 kPa", "M2-3", (168.0,)),
-    ("README.md", "samples, 4500-7000 rpm above 180 kPa", "M2-3", (465.0,)),
-    ("README.md", "scenario speed, make_grade_climb(v_kmh=)", "C2-3", (110.0,)),
-    ("REFERENCES.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
-    ("SESSION_REPORT_2026-09-19.md", "check_premise baseline damage", "H2-4", (414.4, 414.4, 839.7)),
-    ("SESSION_REPORT_2026-09-19.md", "check_premise baseline peak turbine", "H2-4", (840.0,)),
-    ("check_map.py", "corr(lambda, dwell)", "M2-3", (-0.41,)),
-    ("check_map.py", "corr(lambda, rpm)", "M2-3", (-0.56,)),
-    ("handoff.md", "check_premise baseline damage", "H2-4", (294.2, 294.2)),
-    ("handoff.md", "check_premise baseline peak turbine", "H2-4", (812.0,)),
-    ("handoff.md", "fitted k, as compare_log prints it", "H2-1", (0.837, 0.837)),
-    ("presentation/README.md", "app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)", "H2-4", (13.0,)),
-    ("presentation/index.html", "corr(lambda, map_kpa)", "M2-3", (0.23,)),
-    ("presentation/index.html", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
-    ("presentation/index.html", "samples pinned at the 1020 kg/h ceiling", "M2-2", (517.0,)),
-    ("presentation/index.html", "scenario speed, make_grade_climb(v_kmh=)", "C2-3", (110.0,)),
-    ("presentation/index.html", "total minutes", "H2-1", (175.5,)),
-    ("presentation/plan.html", "derived k = 269.6 / T_charge, mean over the 26 points", "M2-1", (0.829,)),
-    ("presentation/plan.html", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
-    ("presentation/plan.html", "total minutes", "H2-1", (168.1, 168.1, 175.5, 175.5)),
-    ("thermal.py", "hottest oil anywhere in the logs", "M2-1", (107.0,)),
-    ("validate.py", "drives in the manifest", "H2-1", (9.0,)),
-    ("validate.py", "drives that carry samples", "H2-1/H2-7", (6.0,)),
-    ("validate.py", "total minutes", "H2-1", (175.5,)),
-    ("validation_table.md", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
-    # --- retired-scan rot: a COUNT, because the pattern is the value.
-    ("CHECKPOINT.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 2),
-    ("DOC/SESSION_REPORT_2026-09-18.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 2),
-    ("app/alerts.py", "the point span with the sensor as charge temp", "H2-1", 1),
-    ("presentation/data.js", "premise baseline with its cooling disabled (C1)", "C2-3", 2),
-    ("presentation/data.js", "premise predictive against a cooling-disabled baseline (C1)", "C2-3", 1),
-    ("presentation/data.js", "premise reactive against a cooling-disabled baseline (C1)", "C2-3", 1),
-    ("presentation/index.html", "dwell seconds from rows over an assumed 4.6 Hz (H3)", "C2-3", 1),
-    ("presentation/index.html", "premise baseline with its cooling disabled (C1)", "C2-3", 18),
-    ("presentation/index.html", "premise predictive against a cooling-disabled baseline (C1)", "C2-3", 15),
-    ("presentation/index.html", "premise reactive against a cooling-disabled baseline (C1)", "C2-3", 37),
-    ("presentation/index.html", "preview edge built on the C1 and C3 artefacts", "C2-3", 2),
-    ("presentation/index.html", "the H2 table measured against a cooling-disabled baseline (C1)", "C2-3", 4),
-    ("presentation/plan.html", "dataset size before pull01, the ninth drive", "C2-3", 2),
-    ("presentation/plan.html", "load residual before the correction", "C2-3", 4),
-    ("presentation/plan.html", "premise baseline with its cooling disabled (C1)", "C2-3", 2),
-    ("presentation/plan.html", "premise predictive against a cooling-disabled baseline (C1)", "C2-3", 2),
-    ("presentation/plan.html", "premise reactive against a cooling-disabled baseline (C1)", "C2-3", 4),
-    ("presentation/plan.html", "preview edge built on the C1 and C3 artefacts", "C2-3", 2),
-    ("presentation/plan.html", "the H2 table measured against a cooling-disabled baseline (C1)", "C2-3", 6),
-    ("presentation/plan.html", "the point span with the sensor as charge temp", "C2-3", 2),
-    ("results/README.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 1),
-]
+# SWEPT 22 September 2026 -- AUDIT2.md fix 3. Every one of the 78 rows that
+# stood here (187 stale mentions across 19 files) reached ZERO in one sweep:
+# live claims corrected to the figures this file computes, dated history kept
+# and marked with figure-naming RETIRED-OK markers, presentation/data.js
+# regenerated by presentation/dump_traces.py rather than edited. Seven file
+# units, each swept and then adversarially reviewed against the same truth
+# sheet; 13 blockers found by review were fixed before this ledger was lowered.
+#
+# THE LEDGER IS NOW EMPTY AND SHOULD STAY EMPTY. An empty list means nothing
+# is excused as known rot: a stale figure anywhere now fails the DOCUMENTS vs
+# DATA or RETIRED check outright. If a future sweep has to be staged again,
+# re-add rows with exact counts -- never to silence a failure nobody has
+# written down as a finding.
+KNOWN_STALE = []
 
 
 
@@ -996,6 +946,55 @@ def _known_stale(rel, label, key=None, value=None):
                 _STALE_VALUES.setdefault((pref, lab), []).append(round(value, 4))
             return True
     return False
+
+
+# ---------------------------------------------------------------------------
+# PINNED HISTORY   (22 September 2026 -- what the empty ledger used to catch)
+# ---------------------------------------------------------------------------
+# The KNOWN_STALE ledger counted every mention of the void +11.7 Phase D margin
+# in the files that record it, and that COUNT is what made drift_test.py row 7
+# CAUGHT: turn "+11.7" into "+13.7" and the count fell. Sweeping the ledger to
+# zero removed that protection by accident -- drift_test went 16/16 -> 14/16.
+#
+# A marker cannot replace it: the drift rewrites the figure INSIDE the marker
+# too, so the marker simply names the new number. What is being protected is
+# the historical record itself -- the void figure, quoted as history, must stay
+# the figure it was. So its TEXT mentions (marker annotations excluded) are
+# pinned, per file, by exact count. A deliberate change to that history
+# updates the pin in the same commit; an accidental one fails here.
+#
+# (pattern, what it is, {file: exact count of text mentions})
+PINNED_HISTORY = [
+    (r"(?<![\d.])11\.7(?!\d)(?!\s*K\b)",
+     "the void +11.7 Phase D margin (C2-1) -- not the +11.7 K sensor offset",
+     {"results/README.md": 2, "CHECKPOINT.md": 7,
+      "DOC/SESSION_REPORT_2026-09-18.md": 7, "CLAUDE.md": 1}),
+]
+_MARKER_TEXT = re.compile(r"RETIRED-OK[^\n]*?(?:-->|\*/|$)")
+
+
+def check_pinned_history(here):
+    """Fail if a pinned historical figure's text mentions changed in number."""
+    print("\nPINNED HISTORY  (void figures quoted as history must stay the figure they were)")
+    bad = 0
+    for pat, what, want in PINNED_HISTORY:
+        for rel, n_want in sorted(want.items()):
+            path = os.path.join(here, rel)
+            try:
+                lines = open(path, encoding="utf-8").read().splitlines()
+            except OSError:
+                lines = []
+            got = sum(len(re.findall(pat, _MARKER_TEXT.sub(" ", ln))) for ln in lines)
+            if got == n_want:
+                print(f"  ok     {rel:<34} {what[:44]:<44} {got:>3}")
+            else:
+                bad += 1
+                print(f"  WRONG  {rel:<34} {what[:44]:<44} {got:>3}  pinned at {n_want}")
+    if bad:
+        print("  A pinned count moved: a quoted void figure was edited into a")
+        print("  different number, or a mention was added or removed. If that was")
+        print("  deliberate, update PINNED_HISTORY in the same commit.")
+    RESULTS.append(not bad)
 
 
 def report_known_stale():
@@ -1843,6 +1842,7 @@ def main():
     check_scenario(here)
     report_documents()
     check_retired(here)
+    check_pinned_history(here)
     report_known_stale()
     report_exemptions()
 

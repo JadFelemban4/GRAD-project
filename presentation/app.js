@@ -748,9 +748,14 @@
       if (blinded) {
         eq.hidden = false;
         eq.querySelector('[data-eq]').textContent = EN(a, 1) + '  =  ' + EN(b, 1);
+        // AUDIT.md C3. This note used to read "Identical. The whole gap was
+        // preview information and nothing else." -- the void reading. The two
+        // traces are equal BY CONSTRUCTION: with preview off, p_predictive
+        // returns p_reactive's vector on every step, so the identity cannot
+        // fail and is not evidence. Corrected 22 Sep 2026 in the doc sweep.
         eq.querySelector('[data-eq-note]').textContent = Math.abs(a - b) < 0.05
-          ? tv('مطابق. الفرق كله كان من الرؤية المسبقة ولا شي غيرها.',
-               'Identical. The whole gap was preview information and nothing else.')
+          ? tv('مطابق، لكن بالبناء لا كاكتشاف: بدون رؤية مسبقة ترجع الاستباقية فعل التفاعلية نفسه في كل خطوة، فالتطابق لا يمكن أن يفشل وليس دليلاً (AUDIT C3). الاختبار الحقيقي هو المرحلة D بوكلاء مدرَّبين، وبميزانية C1 لم تنفصل الرؤية عن ضجيج البذور.',
+               'Identical, by construction, not as a finding: with preview off the predictive policy returns the reactive action on every step, so this cannot fail and proves nothing (AUDIT.md C3). The real ablation is Phase D, with trained agents: at the C1 budget, preview does not separate from seed noise.')
           : tv('يتقاربان…', 'converging…');
       } else { eq.hidden = true; }
       f.redraw();

@@ -1,5 +1,13 @@
 # Session report — 19 September 2026
 
+<!-- RETIRED-OK: 414.4, 840, 110 -- the banner names the superseded figures -->
+> **HISTORICAL RECORD -- superseded.** This is what was measured and believed on
+> 19 September 2026, on the `JMF-2340550` branch, left as written. Current values
+> are in `CLAUDE.md` and `FULL_RUN.txt`; quote from those, never from here. In
+> particular its premise baseline (414.4 at 840 °C, "does not bind") was measured
+> at 110 km/h, before this branch was merged with the scenario locked at
+> 130 km/h. On the locked scenario the constraint binds.
+
 **Audience:** the team. It assumes you know the project. Everything is in the
 order it happened, including the two things that were wrong on the first attempt
 and the one question the internet could not answer.
@@ -269,6 +277,7 @@ the gearbox, every figure sorted into CONFIRMED / UNVERIFIED / ASSUMED.
 
 ## Verified on this tree
 
+<!-- RETIRED-OK: 414.4, 840 -- the premise baseline of that day, superseded -->
 ```
 verify_docs.py         All 38 checks pass, 311 figure mentions, 24 tracked files
 validate.py            8 of 11 inside band, unchanged
@@ -285,6 +294,7 @@ the only change to what the simulator does.
 
 # Part 6 · What moved, and what it means
 
+<!-- RETIRED-OK: 294.2, 414.4, 812, 840, 38, 10.2, 1.8, 1.2 -- the before/after of that day, both superseded -->
 | | before | after |
 |---|---|---|
 | premise baseline damage | 294.2 | **414.4** |
@@ -297,6 +307,7 @@ six-speed sat in 6th at 2416. Higher rpm, more exhaust flow, hotter turbine. The
 scenario is now **10 K from binding** — closer than any change this project has
 made, and it got there by being more correct rather than by being tuned.
 
+<!-- RETIRED-OK: 839.7, 10.2 -->
 Measured directly: over the 4500-step episode the baseline peaks at
 **839.7 °C** and spends **0.0 %** of the episode above the trigger, with the
 grade at its 12 % maximum for 80 % of the run. The margin is 10.2 K.

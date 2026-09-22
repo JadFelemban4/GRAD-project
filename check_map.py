@@ -79,9 +79,11 @@ def lam_for(m):
     AUDIT.md L12, and it is CLAUDE.md mistake 4 surviving in one more place.
     Mistake 4 established that enrichment on this engine is NOT a load table --
     over the logged samples, manifold pressure carries no detectable signal
-    (+0.23, standard error 0.17) while engine speed (-0.56), air mass (-0.49)
-    and sustained dwell (-0.41) do. `BaselineECU.base_lambda` was rebuilt on
-    speed and dwell for exactly that reason; this function was not.
+    (+0.11, standard error about 0.12) while engine speed (-0.47), air mass
+    (-0.41) and sustained dwell (-0.44) do -- as `verify_docs.py` recomputes
+    them from the shipped data; do not read them to two decimals (AUDIT.md H4).
+    `BaselineECU.base_lambda` was rebuilt on speed and dwell for exactly that
+    reason; this function was not.
 
     NOT CHANGED, and that is a deliberate call rather than an oversight. This
     schedule exists only to pick a lambda at which to draw the spark surface,

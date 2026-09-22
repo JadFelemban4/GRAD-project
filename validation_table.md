@@ -9,20 +9,32 @@ python compare_log.py data/master_points.csv
 
 **Do not edit `plant.py` or `thermal.py` without re-running both and updating this file.**
 
-Last regenerated: 11 September 2026, **after the charge-temperature correction**
-(and, before it, the engine-geometry correction).
+Last regenerated: **22 September 2026, section B from a fresh run of
+`compare_log.py data/master_points.csv`** — 26 operating points; fitted k 0.839
+with a 1.1 % residual; derived k 0.831 with 1.4 %;
+the 20 °C reference gives 0.891. Section A's rows were checked against
+`validate.py`'s block in `FULL_RUN.txt` (21 September, exit 0) and are
+unchanged. The dataset today is **ten drives, 295.0 minutes** in the
+manifest, **seven** of them carrying samples and **eight** behind the fitted
+calibrations; `drive10`, the Taif drive, is the one that added samples after
+16 September, and the 117 °C hottest-oil figure below is its. Before that:
+11 September 2026, **after the charge-temperature correction** (and, before it,
+the engine-geometry correction).
 
 **Re-checked 16 September 2026 and UNCHANGED.** `validate.py` still returns
 **8 of 11** inside band with identical values, so nothing in this table has been
 rewritten. Two things happened around it that a reader will otherwise wonder
 about:
 
-- **The dataset grew to ten drives, 295.0 minutes**, because `pull01` arrived.
+- <!-- RETIRED-OK: 175.5, 9, 6 -->
+  **The dataset grew to nine drives, 175.5 minutes**, because `pull01` arrived.
   It contributes **zero samples and zero operating points** — no coolant
   channel, so the warm-sample filter excludes it — so not one figure here moves.
   Note the three drive counts are different and all correct: **nine** logged,
   **six** carrying samples, **eight** behind the fitted calibrations. This table
-  is built on the sample set, not the manifest.
+  is built on the sample set, not the manifest. *(As written on 16 September,
+  before `drive10`; superseded — the current counts are in the "Last
+  regenerated" note above.)*
 - **A live app now exists** (`app/`) that runs this same plant and thermal
   network against a real-time stream. It **inherits this table, misses and all**,
   and adds no evidence to it. Its estimated turbine temperature is a model
@@ -98,20 +110,30 @@ three misses with their reasons; each is informative.
 
 ### The three misses
 
-**EGT maximum, 777 °C against a 600–750 band.** The band describes moderate
+**EGT maximum, 787.7 °C against a 600–750 band.** The band describes moderate
 cruise. The test's own worst point is 2500 rpm at 100 kPa, and the measured
 cruise range on this car is **30–75 kPa** — so that point is above cruise for
-this engine, and 777 °C port-exit at near-full naturally-aspirated load is
-normal. The test point is mislabelled rather than the model being wrong, but the
-band was not moved to make it pass. State it as it is.
+this engine, and 787.7 °C port-exit at near-full naturally-aspirated load is
+normal. The test point is mislabelled rather than the model being wrong, but
+the band was not moved to make it pass. State it as it is.
+<!-- RETIRED-OK: 777 -->
+(This paragraph said 777 °C until 22 September — the 0.5° crank-angle figure,
+superseded by the 16 September regeneration above.)
 
 **Oil temperature, 110.2 °C against a 115–140 band, and oil τ 16.0 s against
 20–400.** Both come from the same parameter, `ua_block_oil`, and both are
 consequences of calibrating it against the car instead of the literature — see
-section C. The model reproduces the measured oil trace to about 4 K RMSE, and the
-measured oil never exceeded **117 °C** anywhere in 168 minutes of logging.
+section C. The model reproduces the measured oil trace to about 4 K RMSE. The
+hottest measured oil anywhere in 295.0 minutes of logging is **117 °C**, on
+`drive10` (the Taif drive) — inside the band's lower end, so since that drive
+the band is no longer above everything the car has done (CLAUDE.md, known
+limitations, "the oil band is now supported by our own car").
+<!-- RETIRED-OK: 107, 168 -->
+Until `drive10` this sentence said the hottest was 107 °C, in 168 minutes of
+logs, and the argument below was written then.
 
-**There may be a resolution, and it is not a tuning knob.** `Oil temperature
+*(Written before `drive10`, 18 September; see CLAUDE.md, known limitations, for
+the current reading.)* **There may be a resolution, and it is not a tuning knob.** `Oil temperature
 after filter` — recorded for the first time on 8 September — runs consistently
 hotter than the `Oil temperature` channel the model is calibrated against:
 +11.0 K median over a whole drive, and **+6.8 K at oil above 100 °C**, which is
@@ -119,14 +141,22 @@ the regime the published band describes. Model 110.2 °C plus 6.8 K is 117 °C,
 inside 115–140. If the published figure refers to a hotter point in the oil
 circuit, the two numbers were never measuring the same place.
 
-This is **not applied anywhere** and the row is still reported as a miss.
+*(Written before `drive10`, 18 September; see CLAUDE.md, known limitations, for
+the current reading.)* This is **not applied anywhere** and the row is still reported as a miss.
 Confirm it with a sustained high-load drive recording both channels first.
 **Matching the car and missing the band is the better failure**; do not raise the
 coupling to close a gap the data does not support.
 
-Note the turbine constant now sits inside its band at 48.0 s, near the `C/UA`
-analytic value of 50.3 s. <!-- RETIRED-OK -->
-The old 39.5 s figure came from the four-cylinder.
+Note the turbine constant now sits inside its band at 48.0 s on the climb. That
+step response is `C/UA` recomputed at this condition, not an independent check
+of it, and τ is not one number: it spans 40–239 s over an episode as exhaust
+flow changes, so quote it with its operating point. `c_turb` is ASSUMED, so
+every τ is assumed to within that constant.
+<!-- RETIRED-OK: 50.3, 39.5 -->
+This line used to set 48.0 s beside a `C/UA` "analytic value" of 50.3 s as
+though two methods agreed; that was `C/UA` at an assumed exhaust flow (AUDIT.md
+M12), corrected 22 September (CLAUDE.md, known limitations). The old 39.5 s
+figure came from the four-cylinder.
 
 ---
 
@@ -139,9 +169,9 @@ pre-throttle sensor — see section E, limit 2, for why that sensor cannot be us
 
 | Comparison | Points | Result | Target | Status |
 |---|---|---|---|---|
-| Load residual, **k derived**, zero free parameters | 22 | **1.4 %** | < 15 % | **PASS** |
-| Load residual, k fitted, one free parameter | 22 | 1.1 % | < 15 % | PASS |
-| Normalisation constant k, fitted | — | 0.837 | — | one fitted scale factor |
+| Load residual, **k derived**, zero free parameters | 26 | **1.4 %** | < 15 % | **PASS** |
+| Load residual, k fitted, one free parameter | 26 | 1.1 % | < 15 % | PASS |
+| Normalisation constant k, fitted | — | 0.839 | — | one fitted scale factor |
 | Normalisation constant k, derived | — | 0.831 | — | 269.6 / T_charge, nothing fitted |
 
 **k is not a tuning parameter — it is a unit conversion, and we can derive it.**
@@ -152,37 +182,43 @@ Our load is normalised to 100 kPa at the modelled charge temperature; BMW's
     k = (100 / T_ch) ÷ (101.3 / 273.15) = (100 × 273.15 / 101.3) / T_ch
       = 269.6 / T_ch
 
-The 269.6 is three **defined** constants — no measurement, no fit. Over the 22
-points the modelled charge temperature runs 48–57 °C, 52 °C mean, so the constant
-this expression produces averages 0.831 against a fitted 0.837.
+The 269.6 is three **defined** constants — no measurement, no fit. Over the 26
+points the modelled charge temperature runs 47–57 °C, 51 °C mean, so the constant
+this expression produces averages 0.831 against a fitted 0.839.
 
 **Report the direction honestly: dropping the free parameter makes the residual
-RISE.** The fitted k scores **1.1 %** over the 23 points and the derived form
+RISE.** The fitted k scores **1.1 %** over the 26 points and the derived form
 scores **1.4 %**, both at 30–75 kPa. That is what one free parameter is for.
 Any earlier version of this table that described the derived form as the more
 *accurate* one had the argument backwards, and an examiner will spot it in one
 line of arithmetic.
 
+<!-- RETIRED-OK: 48.1, 22 -->
 **The argument for the derived form is falsifiability, not accuracy.** Nothing in
 it was tuned, and unlike the fitted form it is blind-sensitive to the engine.
 Force the geometry back to the old 2.0 L inline-four and the derived residual goes
 to **48.1 %**, while the fitted residual still reports **1.1 %** — the fit absorbs
-the wrong engine into its constant and returns a clean number either way. Had the
+the wrong engine into its constant and returns a clean number either way. (The
+48.1 % was measured on the earlier 22-point set and has not been re-derived over
+today's 26; `compare_log.py` does not print it.) Had the
 derived form been in place in August it would have caught the geometry error on
 day one. That is the case for reporting it as the headline.
 
 **Why the reference state is evidence rather than numerology.** The reference
 temperature was the one thing we assumed. Had BMW normalised to 20 °C, the same
-arithmetic gives **0.890** over these points, which the fitted 0.837 excludes
-outright — a 6.3 % separation, several times the residual either constant leaves
-behind. The data selects the reference state on its own; an arbitrary fudge factor
+arithmetic gives **0.891** over these points, which the fitted 0.839 excludes
+outright — a 6.2 % separation (0.891 / 0.839), several times the residual either
+constant leaves behind. The data selects the reference state on its own; an arbitrary fudge factor
 would have accommodated either. Bosch defines the DIN state, so cite them rather
 than claiming a discovery, and write it as *consistent with a 0 °C reference to
 within 1.4 %, and excludes 20 °C* — not as "0.1 % agreement".
 
-Per-drive, with the derived constant: `3aca2ec1` 1.6 % (10 points),
-`683640a0` 0.9 % (5), `7475b5d7` 1.3 % (5), `cb67b01f` 1.8 % (2). Unaffected by
-the geometry correction — this path always used the B58.
+<!-- RETIRED-OK: 1.6, 10, 0.9, 5, 1.3, 1.8, 2, 22 -->
+Per-drive, with the derived constant, **on the earlier 22-point set** (these
+sum to 22, not today's 26; `compare_log.py` does not print a per-drive
+breakdown, so re-derive before quoting): `3aca2ec1` 1.6 % (10 points),
+`683640a0` 0.9 % (5), `7475b5d7` 1.3 % (5), `cb67b01f` 1.8 % (2). Unaffected
+by the geometry correction — this path always used the B58.
 
 **Limit, and it is the one that matters.** This residual is computed through an
 inversion of the same relation `run_cycle()` uses, so **it cannot test the
@@ -192,9 +228,13 @@ breathing model.** `map_from_airflow()` inverts `load ≈ eta_v·(1−f_res)·ma
         ==>  load_model = ṁ·R·T / (V·rpm/120)        eta_v and f_res CANCEL
         ==>  k·load_model = 269.6·ṁ·R / (V·rpm/120)  T cancels too
 
-Measured, not argued: force the charge temperature to a flat 300 K and the derived
+<!-- RETIRED-OK: 1.3738, 22 -->
+Measured, not argued, **on the earlier 22-point set, not re-derived over today's
+26**: force the charge temperature to a flat 300 K and the derived
 residual is **1.3738 %** against 1.3738 % as shipped — identical to four decimal
-places. What the number *does* earn is the meaning of BMW's `Relative air filling`
+places. Those two figures are the 22-point values; today's shipped derived
+residual is the 1.4 % above, and `compare_log.py` prints it to one decimal only.
+What the number *does* earn is the meaning of BMW's `Relative air filling`
 channel (the DIN reference state, which was a guess before), zero fitted
 parameters, and the displacement sensitivity above. **Before quoting any residual
 as validation, perturb the parameter it supposedly validates and check that the
@@ -202,7 +242,7 @@ number moves.** It takes one run.
 
 #### What the 10 September charge-temperature correction changed here
 
-<!-- RETIRED-OK: 31, 82, 0.784, 0.783, 2.8 -->
+<!-- RETIRED-OK: 31, 82, 0.784, 0.783, 2.8, 22 -->
 Until 10 September this section reported the points as 31–82 kPa, k fitted 0.784,
 k derived 0.783, and a residual of 2.8 % fitted against 1.4 % derived. Those
 figures were computed with the pre-throttle temperature sensor standing in for
@@ -294,10 +334,16 @@ as a time series over three drives (80 minutes) against logged coolant and oil.
 `ua_block_oil = 450 W/K` let the oil float 80 K above the block under load. The
 car does not do that:
 
+<!-- RETIRED-OK: 6, 0.6, 6.1, 15.4 -->
 | measured oil − coolant | median | p95 | max |
 |---|---|---|---|
 | three drives used for the fit | −1.2 K | +5.4 K | +12.0 K |
-| all six drives carrying both channels | −0.6 K | +6.1 K | +15.4 K |
+| all six drives carrying both channels, 11 September | −0.6 K | +6.1 K | +15.4 K |
+
+The second row is as computed on 11 September, **before `drive10`**, and it has
+not been re-derived since `drive10` joined the sample set; do not quote it as
+current. The first row is the fit's own population, and it is the one
+`verify_docs.py` re-checks.
 
 Sweeping the coupling: 450 W/K gives a p95 gap of 8.6 K, 800 gives 5.6 K, 6000
 gives 1.0 K. Oil RMSE keeps falling all the way to 6000, but that criterion is
@@ -383,12 +429,15 @@ than the round 240 that used to sit there.
 2. **There is no logged manifold pressure on this car to compare against, and
    the boosted gap was the charge temperature — not the breathing model.**
 
+   <!-- RETIRED-OK: 22, 93, 97, 100, 126 -->
    Both pressure channels the vehicle publishes sit **before the throttle**. Over
-   the 22 steady points `Intake manifold absolute pressure` reads 93–97 kPa and
-   `Boost pressure`, converted to absolute, reads 100–126 kPa, against an
-   inversion of 30–75 kPa. That is not a disagreement about manifold pressure; it
-   is two different places in the intake, and at part load the throttle is the
-   whole difference. **No script prints an agreement between them below 80 kPa.**
+   the 22 steady points of the earlier set (not re-derived over today's 26)
+   `Intake manifold absolute pressure` reads 93–97 kPa and `Boost pressure`,
+   converted to absolute, reads 100–126 kPa. The inversion, over today's
+   26 points, spans 30–75 kPa. That is not a disagreement about manifold
+   pressure; it is two different places in the intake, and at part load the
+   throttle is the whole difference. **No script prints an agreement between
+   them below 80 kPa.**
    An earlier version of this table claimed one, inside "the 4.4 % residual".
    There was never any such comparison to run.
 
@@ -439,18 +488,23 @@ than the round 240 that used to sit there.
    1.15 × manifold pressure. An assumption, not a measurement.
 
 6. **Oil above 117 °C is extrapolation.** That is the hottest oil anywhere in
-   the logs (`7475b5d7`, at 45 °C ambient; 111 °C after the filter). The thermal model
-   reproduces the logged oil trace, but everything it says about oil on a
-   sustained climb rests on the network's structure, not on measurement.
+   the logs, on `drive10`, the Taif drive. The thermal model reproduces the
+   logged oil trace, but everything it says about oil on a sustained climb
+   rests on the network's structure, not on measurement.
+   <!-- RETIRED-OK: 107, 111, 45 -->
+   (Before `drive10` this limit read 107 °C, on `7475b5d7` at 45 °C ambient,
+   111 °C after the filter.)
 
-7. **Two drives contribute no samples, and a third contributes no operating
+7. **Three drives contribute no samples, and a fourth contributes no operating
    points.** The manifest lists **ten drives and 295.0 minutes**. `3f64372e`
    (0.7 min) and `f51686d7` (0.8 min) are too short to contain a warm running
-   window, so `master_samples.csv` covers six drives. `fb988991` is one of those
-   six, but every one of its windows is rejected for span or a logger gap
-   (section B), so it carries samples and contributes **zero** operating points.
-   Quote it as "ten drives, 295.0 minutes, seven carrying samples,
-   26 distinct operating points" rather than implying all eight were analysed.
+   window, and `pull01` carries no coolant channel, so the warm-sample filter
+   excludes it; `master_samples.csv` therefore covers seven of the ten.
+   `fb988991` is one of those seven, but every one of its windows is rejected
+   for span or a logger gap (section B), so it carries samples and contributes
+   **zero** operating points. Quote it as "ten drives, 295.0 minutes, seven carrying
+   samples, 26 distinct operating points" rather than implying all ten were
+   analysed.
 
 8. **The radiator-outlet channel is missing on `fb988991`.** It was added to the
    recording set after that drive. Thermal work uses the other four.
@@ -460,7 +514,8 @@ than the round 240 that used to sit there.
    but only 6 of 180 s — public roads do not grant three uninterrupted minutes
    on demand. Air mass, lambda, spark and manifold pressure settle in
    milliseconds and are fully converged. The **turbine housing is not**: at a
-   measured τ of 48 s, a 60 s window reaches only **71 %** of a thermal step.
+   modelled τ of 48 s on the climb (`c_turb` ASSUMED), a 60 s window reaches
+   only **71 %** of a thermal step.
    Nothing in the current validation depends on this, because `compare_log.py`
    scores air and load. It would matter immediately if anyone validated a
    thermal quantity "at the steady points" — use a time-series comparison over

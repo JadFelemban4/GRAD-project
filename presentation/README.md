@@ -22,7 +22,7 @@ Published copy (private, share from the page's own share menu):
 | 04 · our contribution | H/τ, why dimensionless, why a second plant, the three claims |
 | 05 · what sets us apart | the head-to-head, the premise table, the ablation, the objections |
 | 06 · where we are | phases A–G, the evidence banked, the limitations, the next five steps |
-| 07 · the mistake log | `CLAUDE.md`'s mistakes, one line of lesson each. **The page shows thirteen; the log now holds sixteen** — 14, 15 and 16 are not on the page |
+| 07 · the mistake log | `CLAUDE.md`'s mistakes, one line of lesson each. **The page says eighteen and tabulates the first thirteen** (`CLAUDE.md`'s heading, plus the 13b addendum); its kicker names 13b and 14 to 18 and points to `CLAUDE.md` for them |
 | 08 · glossary | 70 terms, searchable, the ★ ones marked as viva material |
 | A · run it yourself | the five commands and the numbers they must print |
 | B · teach-backs | who teaches what, and the four questions we will actually be asked |
@@ -51,44 +51,60 @@ python presentation/dump_sweeps.py    # plant.predict() spark and lambda sweeps
 are packed into `data.js`. Both write only to their own output; neither touches `data/`
 or `logs/raw/`.
 
-> ## ⚠️ THE PAGE IS OUT OF DATE AND MUST NOT BE SHOWN AS IT STANDS
+> ## ⚠️ THE PAGE WAS OUT OF DATE UNTIL 22 SEPTEMBER — CHECK IT BEFORE SHOWING IT
 >
-> <!-- RETIRED-OK: section -->
-> `index.html` hard-codes the premise figures **24 times** (829.2), **70 times**
-> (548.6) and **16 times** (437.6), plus the 13.4-point preview edge and the
-> H2 table. **Every one of them is void** as of 16 September 2026 — see the box
-> at the top of [README.md](../README.md) and `AUDIT.md` findings C1, C2 and C3.
+> <!-- RETIRED-OK: 829.2, 548.6, 437.6, 13.4 -->
+> Until the 22 September sweep, `index.html` hard-coded the premise figures
+> **24 times** (829.2), **70 times** (548.6) and **16 times** (437.6), plus the
+> 13.4-point preview edge and the H2 table. **Every one of them is void** as of
+> 16 September 2026 — see the box at the top of [README.md](../README.md) and
+> `AUDIT.md` findings C1, C2 and C3. Grepped after that sweep, `index.html`
+> carries 829.2, 548.6 and 437.6 **zero times** and no longer states the
+> 13.4-point edge as a claim; the H2 table and the H1 curvature table survive
+> only as a record, captioned void, under markers that name their figures.
 >
 > In short: the baseline those figures were measured against had its cooling
 > switched off, the baseline ECU was scheduled on a load the engine was not at,
 > and the "blinded run is byte-identical to the reactive one" claim this file
 > used to make as evidence is an identity that could not have failed.
 >
-> **The corrected script reports that the constraint does not bind at all** on
-> this scenario: the baseline peaks at **812 °C** against an 850 °C trigger.
-> *(801 °C until 17 September — that was the figure before the H1 crank-angle
-> correction moved `plant.DTHETA_DEG` to 0.25°. `AUDIT_FIXES.md` records the
-> move 801 → 812; this file did not follow it.)*
+> **The constraint now binds.** On the locked scenario — 12 % at 130 km/h,
+> 42 °C — `check_premise.py` prints a baseline of **959.8** damage units peaking
+> at **884 °C** against the 850 °C trigger. Against the honest comparator, the
+> policy that acts on the grade the car is on now, hand-written preview
+> **loses by 0.4 points**. And the project's result is not from this script at
+> all: it is Phase D (`python analyse_phase_d.py`), a **null** — with agents
+> trained to the C1 budget, preview does not separate from seed noise
+> (p = 0.3633 sign, p = 0.4922 permutation) — and its blinded arm was not
+> blind (one fixed road plus a thermal clock, `results/PREREGISTRATION.md`
+> limit 7), which Phase D2 exists to remove.
+> <!-- RETIRED-OK: 801, 812, 110 -->
+> *(Until 22 September this box said the constraint did not bind at all: the
+> baseline peaked at 801 °C, then 812 °C after the H1 crank-angle correction,
+> on the old 110 km/h scenario. That stopped being true when the scenario moved
+> to 130 km/h on 18 September; the box was not corrected until the 22 September
+> sweep. See `CLAUDE.md`.)*
 >
-> Regenerate `data.js` from the two dump scripts and rewrite every figure before
-> this page is shown to anyone outside the team. Until then it is a record of
-> what we believed in September, not a briefing.
+> In `data.js`, the traces were regenerated with `dump_traces.py` on
+> 22 September; the sweeps were re-embedded from `sweeps.json`, which
+> `dump_sweeps.py` wrote on 18 September and whose plant code has not changed
+> since (docstrings only). So the widgets draw the current plant. The figures
+> hard-coded in `index.html` itself were swept separately on 22 September. Run
+> `verify_docs.py` and read its result for that file before this page is shown
+> to anyone outside the team, and note that its mistake log still stops at 13.
 >
-> **THE CHECKER HOLE IS NARROWER THAN THIS FILE USED TO SAY, AND STILL OPEN.**
-> `index.html` was added to `verify_docs.TRACKED_DOCS` (AUDIT.md L11), so the
-> FIGURE scan does read it. But `check_retired()` builds its own file list from
-> `glob("**/*.md")` plus the root `*.py`, and `index.html` is neither — so the
-> RETIRED scan never opens it. Measured 17 September: the retired scan opens
-> **25 files and `presentation/index.html` is not one of them**, while 77 of its
-> lines would fire six retired patterns and it carries no `RETIRED-OK` marker.
-> **Two scans, two file lists, and only one of them was fixed.** Until the lists
-> are shared, a green run says nothing about this page.
+> **THE CHECKER HOLE IS CLOSED.** Until 17 September `check_retired()` built its
+> own file list from `glob("**/*.md")` plus the root `*.py`, so the RETIRED scan
+> never opened `index.html` — measured that day, it opened 25 files and this page
+> was not one of them, while 77 of its lines would have fired six retired
+> patterns. Since AUDIT2 M2-7d it reads `tracked_files()`, the same list as the
+> figure scan, so `index.html`, `plan.html` and `data.js` are all checked.
 
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: 2.8, 31, 82, 62, 32, 527.2, 39.5 -->
 The page was also scanned for every figure this project has **retired** — 2.8 %,
 31–82 kPa, 62 %/32 %, 527.2, τ = 39.5 s and the rest — and carries none of them as a
 live claim. The figures named in that sentence are listed as retired, not asserted:
-the current values are a 1.4 % load residual over 22 points spanning 30–75 kPa, and a
+the current values are a 1.4 % load residual over 26 points spanning 30–75 kPa, and a
 turbine time constant of 48.0 s. The only mentions of the 2.0 L inline-four are inside the account of
 mistake 1, where it belongs.
 
@@ -116,7 +132,10 @@ the honest options are:
 `app/` now exists: the live supervisor that runs the plant and the thermal
 network beside the car and estimates turbine temperature. **Nothing on this
 briefing page covers it**, and nothing on this page is wrong because of it — the
-figures here are Phase B and the premise check, and neither moved.
+figures here are Phase B and the premise check, and as of 16 September neither
+had moved. *(Both moved afterwards: the premise check was voided by `AUDIT.md` that
+same day and later re-run on the rebuilt scenario, and the dataset grew with
+`drive10` — see the box above and the next paragraph.)*
 
 If the app is added to the briefing later, two things have to come with it:
 
@@ -124,13 +143,14 @@ If the app is added to the briefing later, two things have to come with it:
    heat capacity is an ASSUMED number (REFERENCES.md section 4) and the vehicle
    publishes no channel to check it against. A screenshot without that caption
    is the most misleading artefact this project could produce.
-2. **Its alert counts are not measurements.** 13 thermal / 0 mismatch / 19 novel
+2. **Its alert counts are not measurements.** 15 thermal / 0 mismatch / 19 novel
    on `7475b5d7` is a property of thresholds we chose, pinned so a regression is
    visible. A slide that presents them as findings about the car is wrong.
 
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: 168.1 -->
 The dataset behind this page also moved: **ten drives, 295.0 minutes**, up from
-eight and 168.1, because `pull01` arrived. (The superseded pair is named on
-purpose, so anyone holding an older caption can recognise it.) It contributes zero samples and zero
-operating points by design, so no figure on this page changed — but the drive
-count in any caption did.
+eight and 168.1 before `pull01` and the Taif drive `drive10` arrived. (The
+superseded pair is named on purpose, so anyone holding an older caption can
+recognise it.) `pull01` contributes zero samples and zero operating points by
+design; `drive10` took the operating points to 26 over 30–75 kPa. Any caption
+quoting the dataset has to follow.

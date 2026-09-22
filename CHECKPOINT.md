@@ -21,27 +21,44 @@ file if it is more than a week old.
 > document was swept against the data. See the 11 September section at the
 > bottom of this file.
 
+<!-- RETIRED-OK: 175.5, 9 -- the manifest as it stood that day -->
 > **14 September, the citation pass, the live app and a ninth drive.**
 > `REFERENCES.md` now records, row by row, which of `validate.py`'s eleven
 > bands have a source and which do not — **seven do not**. `app/` runs the
 > same physics alongside the car. `pull01` takes the manifest to **nine
-> drives, 295.0 minutes** and adds zero samples by design. Two findings
+> drives, 175.5 minutes** and adds zero samples by design. Two findings
 > change what the model may claim: the B58 has **no thermostat**, and the
 > compression ratio depends on an engine version nobody has recorded. See the
 > last section of this file.
 
+<!-- RETIRED-OK: 175.5, 9 -- the manifest as it stood that day -->
 > **13–16 September, v19, the ninth drive and the live app.** `pull01` joined
-> `logs/raw/`, taking the manifest to **ten drives, 295.0 minutes** — it
+> `logs/raw/`, taking the manifest to **nine drives, 175.5 minutes** — it
 > contributes zero samples and zero operating points by design, so no
 > calibration figure moved. `app/`, the live supervisor, was imported and then
 > hardened; two defects in it are now **mistakes 14 and 15** in `CLAUDE.md`, and
 > a third, **mistake 16**, is about the release archive that carried it. See the
 > section at the bottom of this file.
 
+*(Note added 22 September 2026: the two boxes above give the manifest as it
+stood on their own dates. An earlier document sweep had overwritten them with
+the later total — in the first box a pairing that was never true on any date;
+the figures of the day are restored. `drive10` later took the manifest to ten drives, 295.0
+minutes — see `CLAUDE.md`.)*
+
 ---
 
 ## Phase status
 
+<!-- RETIRED-OK: 0.837 -->
+*(Written 16 September 2026. Row B was updated on 19 September (commit
+`6e40cd8`, the tenth drive) to 295.0 min, 26 points and derived k 0.831, and
+its fitted k 0.837 was not; the other rows are as they stood on 16 September.
+Agents have since been trained to the C1 budget and Phase D has run and
+returned a null, with a blinded arm that was not blind — `CLAUDE.md` carries
+the current table.)*
+
+<!-- RETIRED-OK: 0.837, 46 -- figures of that day, superseded; see FULL_RUN.txt -->
 | Phase | Status |
 |---|---|
 | A · setup | done |
@@ -60,7 +77,7 @@ file if it is more than a week old.
 
 ## Full verification run — 9 September 2026
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 829.2, 548.6, 437.6, 23, 16.5, 18.0, 26.0 -->
 
 Every script in the repo was executed end to end. **All eight passed.**
 
@@ -79,7 +96,7 @@ Nothing in the repository is stale. Every published figure regenerates.
 
 ### The premise check, in full
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 829.2, 548.6, 437.6, 33.8, 47.2, 13.4, 879 -->
 
 Protection trigger **1123 K (850 °C)** — the knee of the turbine damage term.
 
@@ -162,7 +179,7 @@ guard**. The remaining seven confine theirs to comments and docstrings.
 
 ### 3. `CLAUDE.md` carried a stale drive count
 
-<!-- RETIRED-OK: section 113, 7 -->
+<!-- RETIRED-OK: section 113, 7, 5, 8, 168.1 -->
 The old sentence is quoted below deliberately, as the record of what was
 corrected. `verify_docs.py` needs the marker above to know that.
 
@@ -180,7 +197,7 @@ one of its windows survives the span and gap checks, so it contributes zero
 
 ### 1. Phase F's H2b threshold rule does not survive the correct engine
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 16.5, 18.0, 26.0 -->
 
 H2b sets the constraint at the 80th percentile of the unprotected trace, which
 assumes the temperature spends a *minority* of the episode near its peak. The
@@ -235,7 +252,7 @@ preview figure.
 - **The radiator is not identifiable on this car**, and the channel census proves
   it: every water-pump and fan-actual channel is all-zero. A constrained fit
   gives R² = 0.157 with a negative ram coefficient. Stop trying.
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: 103 -->
 - **Oil above 117 °C is extrapolation.** That is the hottest oil anywhere in the
   logs, on `7475b5d7`; 111 °C after the filter. This line said 103 °C until
   10 September, which was the figure before the eighth drive arrived — quoted
@@ -279,7 +296,7 @@ Full detail: [handoff.md](handoff.md).
 
 ### What was run
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 829.2, 548.6, 437.6 -->
 
 `engine-supervisor-v16.zip` was unpacked over the working copy. All 38 archive
 files are byte-identical to the archive. All six checks were run in order.
@@ -305,6 +322,7 @@ documents written on 9 September, so unzipping left them behind unchanged while
 everything else moved to v16. Three of them still carried retired figures. The
 checker passed on a clean extraction of the archive alone, all along.
 
+<!-- RETIRED-OK: 178 -- the dwell figure of that day, superseded; see FULL_RUN.txt -->
 Fixed on 10 September: `Context.md` and `DATA-MODEL.md` — both deleted on
 11 September as duplicates — had a live seven-drive dwell figure corrected, and the historical quotation in this file was marked
 `RETIRED-OK`, which is what the checker requires for a deliberate mention. That
@@ -340,7 +358,7 @@ This paragraph is the record of what changed on 10 September, so every arrow
 reads old → new *as of that day*. Two of those new values have since moved
 again; the note underneath carries the current ones.
 
-<!-- RETIRED-OK: 192, 31, 82 -->
+<!-- RETIRED-OK: 192, 31, 82, 517, 5, 33.8, 33.9, 22, 2.8, 2.3, 17, 79, 103 -->
 Oil extrapolation 103 → **117 °C**. Enrichment v4 fitted on seven → **eight**
 drives. MAF ceiling 192 samples on four → **517 on five** drives. Compressor fit
 30 534 → **74 013** quasi-steady samples. Vehicle validation 31–79 → **31–82 kPa**.
@@ -360,7 +378,7 @@ fitted parameter makes the residual rise, not fall.
 A record of edits made on 10 September; the superseded values are named on
 purpose, because they are the thing that was corrected.
 
-<!-- RETIRED-OK -->
+<!-- RETIRED-OK: 8, 168.1, 1.163, 2.3 -->
 `validation_table.md` section E now says eight drives and 168.1 minutes, and its
 MAF and manifold-pressure items carry the current counts. Its thermal test
 condition keeps the 7.6 g/s figure but now states plainly that the condition
@@ -401,7 +419,7 @@ byte-identical to what was there before.
 
 ### What shipped: the charge-temperature correction
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 0.837, 23, 829.2, 548.6, 437.6, 33.8, 47.2, 13.4 -->
 
 `build_dataset.py` and `compare_log.py` no longer feed the pre-throttle intake
 temperature channel into `map_from_airflow()`. That channel is a compressor
@@ -543,7 +561,7 @@ two markets stitched together, not a manufacturer figure.
 
 ### Mistake 11 recurred a third time, and named two holes in the checker
 
-<!-- RETIRED-OK: section 168.1, 8 -->
+<!-- RETIRED-OK: section 168.1, 8, 175.5, 9 -->
 This subsection names the superseded figure throughout, because the figure is
 what was corrected. The current dataset is ten drives and 295.0 minutes.
 
@@ -571,7 +589,7 @@ drives of samples, because `pull01` contributes **zero** samples.
 
 ### Verification on the merged tree — every script re-run
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 829.2, 548.6, 437.6, 36 -->
 
 | script | result |
 |---|---|
@@ -650,6 +668,7 @@ before a release rather than trusting this line.
 
 Replaying `7475b5d7` end to end:
 
+<!-- RETIRED-OK: 884.9, 13 -- the app pins of that session, superseded; see FULL_RUN.txt -->
 | quantity | value |
 |---|---|
 | samples estimated | **14278 of 14340** (99.7 % of samples with the engine running) |
@@ -657,6 +676,7 @@ Replaying `7475b5d7` end to end:
 | alerts | **13 thermal · 0 mismatch · 19 novel** |
 | seed forgotten after | **461 s** — not the 145 s the code used to assume |
 
+<!-- RETIRED-OK: 593.7 -->
 And on `pull01`, the fast regression: 2186 of 2193 estimated, peak **593.7 °C**,
 4 novel, seed forgotten at 172 s.
 
@@ -724,6 +744,7 @@ and `presentation/plan.html`. Fast-forward, then merge: **zero conflicts**.
 
 Every script run, output read, nothing taken from a document:
 
+<!-- RETIRED-OK: 1.3, 23, 294.2, 812 -- the run of that session, superseded; see FULL_RUN.txt -->
 | script | result |
 |---|---|
 | `verify_docs.py` | **38 of 38**, 311 figure mentions, 25 files |
@@ -738,6 +759,7 @@ Every script run, output read, nothing taken from a document:
 All the same failure: the 16 September audit fixes moved the code and no
 document followed. **Mistake 11 for the fifth time.**
 
+<!-- RETIRED-OK: 256.5, 801, 2.2, 294.2, 812, 1.8, 884.9, 36, 46 -->
 | where | said | prints |
 |---|---|---|
 | CLAUDE.md, README.md, handoff.md | 256.5 · 801 °C · 2.2 pts | **294.2 · 812 °C · 1.8 pts** |
@@ -747,7 +769,7 @@ document followed. **Mistake 11 for the fifth time.**
 
 ### Two measurements taken this session
 
-<!-- RETIRED-OK: this is a dated record of what was measured that day; the
+<!-- RETIRED-OK: 0.351, 172.6, 812 -- a dated record of what was measured that day; the
      tenth drive (Taif) took the total to 292.0 min and 0.206 % on 19 Sep -->
 **Every drive replayed against the protection trigger.** One of nine binds:
 `7475b5d7` peaks at 890.6 °C, **41 K above**, for **36 s of 172.6 replayed
@@ -765,7 +787,7 @@ cost; it was halved on 16 September.
 
 ### Two holes left open on purpose
 
-<!-- RETIRED-OK: naming the void figures IS the finding -->
+<!-- RETIRED-OK: 829.2, 548.6, 437.6 -- naming the void figures IS the finding -->
 - **`presentation/index.html`** still hard-codes 829.2 ×24, 548.6 ×70,
   437.6 ×16. Fixing it means regenerating the page, not editing a document.
 - **`check_retired()` never opens it.** It builds its own list from
@@ -790,7 +812,7 @@ university name at all**, which is open if the submission template needs one.
 - **No scenario chosen.** That is the one blocker, and it is a team decision:
   pick it from something physical, never by turning a knob until the gap looks
   good.
-<!-- RETIRED-OK: the figures named here are the ones the run rejected -->
+<!-- RETIRED-OK: 829.2, 548.6 -- the figures named here are the ones the run rejected -->
 - **`verify_docs.py` caught the author mid-edit**, correctly, when explaining
   the void headline re-quoted 829.2 and 548.6. The errata came out with the
   figure. **When a number goes void, its corrections go with it.**
@@ -798,6 +820,14 @@ university name at all**, which is open if the submission template needs one.
 ---
 
 ## Session of 18-19 September 2026 — the scenario, a gearbox defect, and the first ablation
+
+<!-- RETIRED-OK: 11.7 -- naming the void figure IS this note -->
+*(Note added 22 September 2026, the entry itself left as written: the +11.7
+points below is VOID. Both agents were trained on the invented six-speed
+gearbox that `27e720c` replaced seven hours later -- see `results/void/README.md`.
+Phase D's result, from sixteen agents on the real gearbox trained to the C1
+budget (50 000 steps), is the null in the 21-22 September entry: preview does
+not separate from seed noise.)*
 
 **The project has a measured preview advantage for the first time.** It is one
 seed against one seed and it is not quotable yet. Everything below was run, not
@@ -857,6 +887,7 @@ from -506.4 to +643.6 over eleven episodes with its best in the FIRST five.
 | **agent, sighted** | **194.7** | 35.6 | 378.8 | 5337 |
 | **agent, blinded** | **261.4** | 19.9 | 336.9 | 5008 |
 
+<!-- RETIRED-OK: 11.7, 66.0, 54.4 -- void, see results/void/README.md -->
 **SIGHTED over BLINDED: +11.7 points.** Sighted cuts 66.0 %, blinded 54.4 %.
 
 ### This reverses the hand-written result, and that is the finding
@@ -870,6 +901,7 @@ protects continuously, including through easy sections.
 **AUDIT.md C3 said hand-written policies cannot answer this. They now
 demonstrably cannot: the two verdicts differ by 12 points.**
 
+<!-- RETIRED-OK: 11.7 -- void, see results/void/README.md -->
 ### Four limits on the +11.7, all of them stated
 
 1. **n = 1 against n = 1.** The protocol wants five seeds each.
@@ -899,6 +931,7 @@ both in the gearbox, both resolved toward the measured side.
 
 ### What the merge took from each
 
+<!-- RETIRED-OK: 11.7 -- void, see results/void/README.md -->
 | from `sep17` | from `JMF-2340550` |
 |---|---|
 | mistake 17 — the load-aware downshift | **the real ZF 8HP51**, eight published ratios on 3.150 |
@@ -1048,6 +1081,7 @@ the same lever.
 Ghassan's open question 4, measured. Hand-written policies, locked scenario,
 720 s, same seed and weights, only the step changed:
 
+<!-- RETIRED-OK: 900.9 -- the baseline at the finer training step, not the protocol step -->
 | policy | dt = 1.0 | dt = 0.2 | cuts vs baseline |
 |---|---|---|---|
 | baseline ECU | 959.8 | 900.9 | — |
@@ -1119,6 +1153,7 @@ PLAUSIBLE on one agent's output and are labelled as such.
 `python evaluate.py runs/sighted_seed0 runs/blind_seed0` on HEAD, 76 min,
 same two trained agents as `results/phase_d_seed0.txt`:
 
+<!-- RETIRED-OK: 11.7, 7.5, 572.8, 857 -- the void pair, named as the finding -->
 | row | the shipped file | re-run on HEAD |
 |---|---|---|
 | baseline damage / peak | 572.8 / 857 C | **959.8 / 884 C** |
@@ -1126,6 +1161,7 @@ same two trained agents as `results/phase_d_seed0.txt`:
 | blinded median (IQR, worst) | 261.4 (19.9, 336.9) | 351.1 (31.8, 435.0) |
 | **sighted over blinded** | **+11.7** | **+7.5** |
 
+<!-- RETIRED-OK: 11.7, 7.5 -->
 **Why:** the SB3 archives decode to 130 km/h at **2913 rpm**, which is the
 invented six-speed in 5th after mistake 17's load-aware downshift. The ZF landed
 at `27e720c`, seven hours after `a68715f` committed the result. The +7.5 is not
@@ -1133,6 +1169,7 @@ a Phase D point either -- it scores agents on a plant they never saw.
 
 **Isolated on three exported trees, one neutral episode each, 720 s at dt 1.0:**
 
+<!-- RETIRED-OK: 294.2, 812.3, 812, 572.8, 857.0, 462.7, 839.7 -- measurements on superseded trees, named as the finding -->
 ```
 six-speed (a68715f)   110 km/h  damage 294.2  peak 812.3 C
 six-speed (a68715f)   130 km/h  damage 572.8  peak 857.0 C
@@ -1146,6 +1183,7 @@ the 209-line `engine_env.py` divergence moves the baseline.
 
 ### Three things the tree says that the scripts contradict
 
+<!-- RETIRED-OK: 294.2, 812, 175.5, 9, 22, 74, 13 -- the stale figures this table names are its subject -->
 | document | says | prints today |
 |---|---|---|
 | `CLAUDE.md`, `README.md`, `handoff.md` | baseline 294.2 at 812 C, "the constraint does not bind" | 959.8 at 884 C, binds by **34 K** |
@@ -1160,13 +1198,14 @@ residual, the app's peak turbine, every Phase D figure, the premise table, the
 scenario docstring, **`make_grade_climb`'s default `v_kmh` 130 -> 120**, and
 **`TURB_PROTECT_K` 1123 -> 1100**. `check_retired` globs `**/*.md` plus root
 `*.py` only, so `presentation/index.html`, `plan.html` and `data.js` -- which
-<!-- RETIRED-OK: naming the void set the deck still ships IS the finding -->
+<!-- RETIRED-OK: 829.2, 548.6, 437.6, 13.4 -- naming the void set the deck still ships IS the finding -->
 carry 829.2 / 548.6 / 437.6 / 13.4 on more than a hundred lines -- are outside it.
 
 ### M16 is not fixed, and the mechanism is not the one recorded
 
 Same policy, seed and weights; only the step changed:
 
+<!-- RETIRED-OK: 900.9 -- the baseline at the finer training step, not the protocol step -->
 | policy | dt 0.2 | dt 1.0 | dt 2.0 |
 |---|---|---|---|
 | baseline | 900.9 | 959.8 | 1034.9 |
@@ -1437,6 +1476,7 @@ legitimate agents would now be refused.** That is why `plant_sha` is fatal and
 `runs_sixspeed_18sep/` with *"no meta.json ... nothing records which plant it
 was trained on"*.
 
+<!-- RETIRED-OK: 11.7 -->
 `results/void/` keeps the +11.7 file with a README saying why it is void.
 
 

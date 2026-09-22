@@ -53,8 +53,12 @@ DRIFTS = [
      "CHECKPOINT.md", "959.8 at 884 C", "959.8 at 870 C", "MISSED"),
     (12, 'CLAUDE.md "0.206 %" -> 0.306 %',
      "CLAUDE.md", "0.206 %", "0.306 %", "MISSED"),
-    (13, 'CLAUDE.md "294.2 at 812" -> 799',
-     "CLAUDE.md", "294.2 at 812 °C", "294.2 at 799 °C", "MISSED"),
+    # Anchor moved 22 September 2026. It drifted "294.2 at 812 °C", which the
+    # fix-3 sweep corrected to the live premise figure, so the row reported
+    # ERROR (anchor not found) rather than testing anything. It now drifts the
+    # CURRENT premise peak in CLAUDE.md, which is the same protection.
+    (13, 'CLAUDE.md premise "959.8 at 884 °C" -> 870 (was "294.2 at 812")',
+     "CLAUDE.md", "959.8 at 884 °C", "959.8 at 870 °C", "MISSED"),
     (14, 'CLAUDE.md "derived k = 0.831" -> 0.851',
      "CLAUDE.md", "derived k = 0.831", "derived k = 0.851", "CAUGHT"),
     # Two more of the audit's own structural worries, added here because the

@@ -112,6 +112,11 @@ grade per episode. Then no memorisation tells the blind agent when the hill
 arrives, and the preview channel is the only route to knowing — which is what an
 ablation of preview has to mean.
 
+**That fix is now Phase D2,** preregistered in `PREREGISTRATION_D2.md` before
+any D2 agent trained: the climb's start time (120–300 s) and grade (12–16 %)
+drawn per episode, with a minimum effect of interest of 50 damage units set in
+advance. Training launched on 22 September. **No D2 result exists yet.**
+
 **This does not touch the +29 to +34 point finding.** That compares the agent
 with a hand-written policy, and learning the road is a legitimate thing for a
 supervisor to do. It is a finding about learned supervision on this road.
@@ -125,19 +130,27 @@ void, but the only one — puts the largest preview value near 0.6, which is whe
 Phase D sits. The reading was drafted, checked and refuted on 22 September.
 `PREREGISTRATION.md` limit 8 says why in full.
 
-### Outstanding before this is written up
+### The minimum effect of interest — set late, and the experiment is underpowered
 
-**The minimum effect of interest is not set** — `PREREGISTRATION.md` section 5,
-marked TEAM DECISION. Until it is, "preview does not help" cannot be
-distinguished from "the experiment was too small to see it", and that is the
-first question an examiner will ask. `analyse_phase_d.py` prints a warning
-while it is unset.
+**It was set on 22 September 2026, at 50 damage units — AFTER this result was
+known.** `PREREGISTRATION.md` section 5 says so plainly. It cannot move the
+verdict above, because the sign test never uses it; it can only label the null,
+and that label is marked post-hoc wherever it is printed.
+
+**The power analysis matters more.** `power_analysis.py`: at Phase D's spread,
+eight seeds have **power 0.10** against an effect of 50, and reach 80 % power
+only against **~269 units**. So this null — from C1-budget agents, which is a
+separate limit above — cannot tell "preview is worth
+nothing" from "the experiment was too small to see it", and that is the first
+question an examiner will ask.
 
 ## The files
 
 | file | what it is |
 |---|---|
 | `PREREGISTRATION.md` | the rules, committed before any agent trained. Section 6a logs two failed launches and their causes |
+| `PREREGISTRATION_D2.md` | Phase D2's rules — the same ablation on a randomised climb — committed before any D2 agent trained. No D2 result yet |
+| `NEXT_EXPERIMENT_DESIGN.md` | the design record D2's preregistration was written from. Not itself a preregistration |
 | `phase_d_seed0.txt` … `seed7.txt` | one evaluation per seed, each opening with the **plant fingerprint** of the tree that produced it |
 | `PHASE_D_RESULT.txt` | the output of `analyse_phase_d.py`, captured |
 | `curve_*.csv` | learning curves |
@@ -156,13 +169,13 @@ a model whose plant disagrees with the tree it is run on**. That is why these
 files can be trusted to belong to the plant quoted beside them — and it is the
 thing the file now in `void/` could not do.
 
-<!-- RETIRED-OK: 11.7 -- naming the void figure IS this section -->
 ## What this file used to say
 
+<!-- RETIRED-OK: section 11.7, 7.5 -- quoting the void figures IS this section; void/README.md says why they are void -->
 It led with *"phase_d_seed0.txt — THE FIRST MEASURED PREVIEW ADVANTAGE"* and
 *"sighted +11.7 points over blinded, from a proper ablation"*.
 
 That pair was trained on an invented six-speed gearbox which commit `27e720c`
-replaced **seven hours before the file was written up**, and nothing in the file
+replaced **seven hours after the file was committed** (`a68715f`), and nothing in the file
 recorded it. See `void/README.md`. **Do not quote +11.7, or the +7.5 that
 re-scoring the same pair produced.** Neither is a result.

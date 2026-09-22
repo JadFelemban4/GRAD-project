@@ -1,7 +1,7 @@
 # Engine Supervisor — Phase A–F code
 
 > **Opening this in Claude Code?** Read `CLAUDE.md` first — it carries the
-> project's claim, its current state, and the thirteen mistakes already made.
+> project's claim, its current state, and the mistakes already made.
 
 Working code for the validated parts of the project. Every number quoted in the
 handbook is this code's actual output, and `validate.py` regenerates the ones
@@ -35,9 +35,22 @@ Python 3.11 or newer.
 > seeds. **Learned supervision works; PREVIEW specifically is what cannot be
 > shown.** Two claims, not one.
 >
+> **Say the training budget in the same breath as the null.** These are C1
+> agents — 50 000 steps, 11 training episodes each. The defensible sentence is
+> *with agents trained to the C1 budget, preview does not separate from seed
+> noise* — never *preview does not help*. Two more limits travel with it. The
+> blinded arm was not blind: one fixed road plus a thermal clock, so a blind
+> agent could memorise when the hill comes (`results/PREREGISTRATION.md`
+> limit 7). And at Phase D's spread eight seeds have power 0.10 against the
+> minimum effect of interest, 50 damage units — set on 22 September, after the
+> result was known; the sign test never uses it, so the verdict stands.
+>
+> **Phase D2** runs the same ablation on a randomised climb, so that the blind
+> arm is truly blind. It was preregistered (`results/PREREGISTRATION_D2.md`)
+> before any D2 agent trained. **No D2 result exists yet.**
+>
 > `python analyse_phase_d.py` reproduces every number above.
-> Full account: `CHECKPOINT.md`, 21–22 September. Still open: the minimum
-> effect of interest, `results/PREREGISTRATION.md` section 5.
+> Full account: `CHECKPOINT.md`, 21–22 September.
 
 > **Updated 16 September 2026.** Two things arrived since the last pass. The
 > dataset is now **ten drives, 295.0 minutes** (`pull01`, which contributes
@@ -53,13 +66,13 @@ Python 3.11 or newer.
 
 ## Run these five, in this order, on day one
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 829.2, 548.6, 437.6, 33.8, 47.2, 13.4 -->
 
 ```
 python plant.py            #  ~30 s   spark, lambda and IAT sweeps
-python validate.py         #  ~4 min  regenerates the validation table
-python check_premise.py    #  ~90 s   the result the whole project rests on
-python verify_docs.py      #  ~20 s   confirms the documents still match the data
+python validate.py         #  ~10 s   regenerates the validation table
+python check_premise.py    #  ~3 min  the hand-written premise table (NOT the result)
+python verify_docs.py      #  ~1 min  confirms the documents still match the data
 python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 ```
 
@@ -98,40 +111,47 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 > come out any other way. It becomes a real ablation only when a TRAINED blinded
 > agent is raced against a trained sighted one — which is Phase D.
 >
-> **What the corrected script prints now**, with the true neutral, equal
-> protection depth, and the ECU scheduled on the pressure the engine runs at:
+> **What the script prints today** (`check_premise.py`, `FULL_RUN.txt`
+> 21 September; the locked scenario, 12 % at 130 km/h in 42 °C air on the ZF
+> 8HP51 gearbox), with the true neutral, equal protection depth, and the ECU
+> scheduled on the pressure the engine runs at:
 >
 > | policy | fuel g | damage | peak turbine |
 > |---|---|---|---|
-> | baseline ECU (true neutral) | 3620 | 294.2 | 812 °C |
-> | reactive protection | 3620 | 294.2 | 812 °C |
-> | current-grade protection | 3837 | 252.3 | 793 °C |
-> | predictive protection | 3841 | 257.7 | 793 °C |
-> | predictive, preview disabled | 3620 | 294.2 | 812 °C |
+> | baseline ECU (true neutral) | 4664 | 959.8 | 884 °C |
+> | reactive protection | 4843 | 679.0 | 862 °C |
+> | current-grade protection | 4936 | 633.2 | 861 °C |
+> | predictive protection | 4941 | 637.4 | 861 °C |
+> | predictive, preview disabled | 4843 | 679.0 | 862 °C |
 >
-> *(This table read 256.5 / 801 °C and −2.2 points until 17 September. Those
-> were the figures BEFORE the H1 crank-angle correction took
-> `plant.DTHETA_DEG` from 0.5° to 0.25°; `AUDIT_FIXES.md` records the move
-> 256.5 → 294.2 and 801 → 812 °C in its own H1 section. The code moved, this
-> box did not. Mistake 11, one more time.)*
->
-> **The constraint no longer binds.** The baseline peaks at 812 °C against an
-> 850 °C trigger, so the reactive policy never acts and its row *is* the
-> baseline row. On this scenario preview is worth **−1.8 points** against a
-> policy that merely knows the grade it is on right now — information any car
-> has from a nose-down accelerometer, and the comparator the audit asked for.
->
-> **And the scenario is milder than the car's own driving, which is measured
-> over every drive.** Replaying all ten through `app/`: `7475b5d7` peaks at
-> **890.6 °C — 41 K ABOVE the trigger — for 36 s of its 55.1 minutes**, and no
-> other drive gets within 69 K of it (`670063b2` 780.3 °C is next). Across
-> **292.0 replayed minutes the housing is above the limit for 36 seconds:
-> 0.206 % of the time.** The synthetic climb reaches 812 °C and misses by 38 K,
-> so **a real drive on this car is 78 K hotter than the scenario built to stress
-> it.** That is the sharpest argument for re-choosing the scenario from measured
-> driving rather than from a chosen grade — and the 0.206 % is itself a figure
-> about how much preview could be worth on this vehicle, which is what H/τ is
-> for.
+> **The constraint binds.** The baseline, 959.8 at 884 °C, crosses the 850 °C
+> trigger by about 34 K, so every protecting policy acts: reactive cuts damage
+> 29.3 %, current-grade 34.0 %, predictive 33.6 %. Preview gains **+4.3 points**
+> over reactive, but against a policy that merely knows the grade it is on
+> right now — information any car has from a nose-down accelerometer, and the
+> comparator the audit asked for — it **loses by 0.4 points**. These are
+> hand-written policies. The trained answer is Phase D, in the box at the top
+> of this file.
+
+> <!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 38, 78 -->
+> *(This table read 256.5 / 801 °C and −2.2 points until 17 September — the
+> figures from before the H1 crank-angle correction took `plant.DTHETA_DEG`
+> from 0.5° to 0.25°, a move `AUDIT_FIXES.md` records in its own H1 section. It
+> then read baseline 294.2 at 812 °C until 22 September, with the constraint
+> not binding and preview at −1.8 points against current-grade: the run from
+> before the scenario moved to 12 % at 130 km/h on the real ZF 8HP51 gearbox.
+> On that run the synthetic climb missed the trigger by 38 K and a real drive
+> on this car was 78 K hotter than the scenario built to stress it, which is
+> the argument for re-choosing the scenario. The code moved and this box did
+> not, twice. Mistake 11.)*
+
+> **The replay, over every drive.** Replaying all ten through `app/`:
+> `7475b5d7` peaks at **890.6 °C — 41 K ABOVE the trigger — for 36 s of its
+> 55.1 minutes**, and no other drive gets within 69 K of it (`670063b2`
+> 780.3 °C is next). Across **292.0 replayed minutes the housing is above the
+> limit for 36 seconds: 0.206 % of the time.** Those peaks are MODEL OUTPUTS —
+> the car has no turbine sensor — and the 0.206 % is itself a figure about how
+> much preview could be worth on this vehicle, which is what H/τ is for.
 >
 > **A SUSTAINED MOUNTAIN CLIMB IS NOW IN THE SET, AND IT DOES NOT BIND.** This
 > passage used to close "neither number describes a sustained-climb duty cycle,
@@ -146,11 +166,18 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 > that. **The hardest real climb we have recorded is 86 K cooler than the
 > scenario**, which answers the objection that the scenario is contrived.
 >
-> **This is not a failure, but it is not yet a result either.** The scenario has
-> to be re-chosen so the trigger is reached for a physical reason, and it must
-> be chosen from something external — a real grade, a published towing cycle, a
-> measured ambient — and never by turning a knob until the gap looks good. That
-> would be mistake 12 happening to Phase D.
+> **The scenario now binds — and say how it came to, because it was luck.**
+> This passage used to say the scenario still had to be re-chosen so that the
+> trigger is reached for a physical reason. That is not what happened. 130 km/h
+> was picked because it was the only speed that bound on the invented six-speed
+> gearbox, which this car does not have. On the real ZF 8HP51 the same 12 % at
+> 130 km/h in 42 °C air peaks at 884 °C and binds by about 34 K — by luck, not
+> by design (`CHECKPOINT.md`, "The locked scenario survived, and it survived BY
+> LUCK"; `make_grade_climb`'s docstring records it as an accident, not as
+> foresight). The trigger did not move. The rule stands for the NEXT scenario:
+> choose it from something external — a real grade, a published towing cycle,
+> a measured ambient — and never by turning a knob until the gap looks good.
+> That would be mistake 12 happening to Phase D.
 
 > **THESE NUMBERS CHANGED AGAIN ON 8 SEPTEMBER, AND THIS TIME BECAUSE THE
 > SIMULATION WAS THE WRONG ENGINE.** `plant.Geometry` defaulted to a generic
@@ -183,7 +210,8 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 | `engine_env.py` | Gymnasium environment. Baseline ECU, vehicle model, inner PI torque loop, baseline-relative reward, preview ablation switch. | C |
 | `test_reward.py` | **The Phase C sanity checks.** Run before trusting any training curve. | C |
 | `check_premise.py` | Races a reactive against a predictive hand-written policy. Run before writing any RL code. | C |
-| `train.py` | **Trains a SAC agent.** One seed per person, overnight — see its docstring for why. | C |
+| `train.py` | **Trains a SAC agent.** A C1 run (50 000 steps) is about 45 minutes per seed run on its own — measured, see its docstring; Phase D's runs took 59–75 minutes each with several running at once (Phase D's run logs). | C |
+| `analyse_phase_d.py` | **The project's result.** The preregistered Phase D statistic, and nothing else. | D |
 | `build_dataset.py` | **All drives into one master dataset.** Run it whenever a new CSV arrives. | B |
 | `generality_test.py` | The H/τ experiment. H1, H2, and H2b. | F |
 | `verify_docs.py` | **Checks the documents against the data.** Every published figure recomputed from the shipped data, plus a check that no document still quotes a **retired** one. It prints its own total — read that rather than quoting a count from here. Run it before quoting anything. | all |
@@ -291,8 +319,8 @@ the algebra — so **it is not a test of the breathing model**. Delete the
 breathing model entirely and the number does not move. See CLAUDE.md mistake 12.
 
 Two things it does earn. It pins `Relative air filling` to the DIN reference
-state, 1013 mbar and 0 °C: the derived k = 0.831 against a fitted 0.837, where
-a 20 °C reference would demand 0.890, which the fit excludes. And it is
+state, 1013 mbar and 0 °C: the derived k = 0.831 against a fitted 0.839, where
+a 20 °C reference would demand 0.891, which the fit excludes. And it is
 blind-sensitive to displacement — forced onto a 2.0 L inline-four the derived
 residual goes to **48.1 %** while the fitted form still reports 1.1 %, which is
 why the fitted form could never have caught the wrong-engine mistake.
@@ -322,22 +350,40 @@ charge; modelling the charge temperature instead (`plant.charge_temperature`)
 brings the disagreement to **+1.9 %** and clears the breathing model entirely.
 See CLAUDE.md mistake 13.
 
-That comparison is 587 boosted model readings against 887 logged readings of
-the car's own `Boost pressure` channel, whose median is 226 kPa. The model side
+That comparison is 762 boosted model readings against 1097 logged readings of
+the car's own `Boost pressure` channel — the counts `verify_docs.py` asserts on
+the current dataset. The model side
 is gated above 200 kPa on purpose, not by taste: the logged side filters at
 15 psi gauge, and (15 + 14.23) × 6.894757 = 201.5 kPa absolute, so a 200 kPa
-gate selects the same operating region by construction. `ambient + 8 K` would
-score 0.7 % and is rejected — it is a knob tuned to the target, and the shipped
+gate selects the same operating region by construction. `ambient + 8 K`
+scored 0.7 % when the correction was made on 10 September, on the smaller
+dataset of the time, and is rejected — it is a knob tuned to the target, and the shipped
 formula carries no parameter fitted to the boost channel.
 
 ### 4. The turbine time constant
 
-`C/UA` gives **50.3 s**. Stepping the load and reading 63.2 % off the response —
-which is what Phase F step F1 tells you to do — gives **48.0 s** on the correct
-engine, inside the 40–120 s published band. They differ slightly because the
-gas-side heat transfer coefficient rises with exhaust flow, so the node is not a
-pure first-order system. <!-- RETIRED-OK -->
-The old **39.5 s** figure was the four-cylinder's and is void.
+Stepping the load and reading 63.2 % off the response — which is what Phase F
+step F1 tells you to do — gives **48.0 s** on the climb, inside the 40–120 s
+published band. **That is ONE measurement, not two.** The turbine node is
+decoupled from the block and oil, and `validate.py` holds fuel flow, exhaust
+flow and EGT constant through the step, so the response is an exact
+first-order exponential whose time constant IS `C/UA`. The step response
+recomputes `C/UA`; it cannot corroborate it.
+
+**τ is not one number.** Over the locked episode it runs from 40 to 239 s,
+because UA rises with exhaust flow — 48.0 s on the climb, far longer at cruise
+and idle. Quote τ with its operating point, always. And the housing's heat
+capacity is ASSUMED (REFERENCES.md section 4), so every τ is an assumed number
+to within that constant.
+
+<!-- RETIRED-OK: 50.3, 39.5 -- the superseded figures, named so they are recognised -->
+*(This section used to set a `C/UA` of 50.3 s beside the 48.0 s as two methods
+that nearly agree, and explained the gap as the gas-side heat transfer
+coefficient rising with exhaust flow, "so the node is not a pure first-order
+system". Under `validate.py`'s constant-flow step that explanation cannot
+apply: the 50.3 s was `C/UA` at an assumed exhaust flow that `AUDIT.md` M12
+condemned. Corrected 22 September; see `CLAUDE.md`, Known limitations.)* The
+old **39.5 s** figure was the four-cylinder's and is void.
 
 ### 5. The reward hack is closed — after being reopened by the engine fix
 
@@ -364,8 +410,11 @@ sized so that **no achievable damage saving pays for a sustained torque shortfal
 beyond 10 %**. That sentence belongs in Chapter 4: it is why the Phase D numbers
 mean what they claim.
 
-`test_reward.py` now passes all four checks: neutral −0.004, starver **−0.280**,
-preview ablation live, all finite.
+<!-- RETIRED-OK: 0.004, 0.280 -- what the gate printed when the hinge landed -->
+`test_reward.py` passes all four checks today (`FULL_RUN.txt`, 21 September):
+neutral −0.00038, starver **−0.90349**, preview ablation live, all finite. When
+the hinge landed it printed neutral −0.004 and starver −0.280; the scenario
+and the gearbox have both moved since, which is why the next sentence exists.
 
 **Run it after any change to the plant or the scenario, not just the reward.** A
 reward is only safe relative to the dynamics it scores.
@@ -390,8 +439,9 @@ maximum repeated across drives is the tell.
 
 <!-- RETIRED-OK: section 527.2, 51.4, 26.9, 2.13, 1.38, 8.43, 244, 930 -- the version history of the headline; every figure named here is one it moved AWAY from -->
 
-`BaselineECU` was guessed. It is now calibrated against 295.0 minutes of the
-real car, pooled across eight drives. Two things were wrong, and the
+`BaselineECU` was guessed. It is now calibrated against the real car: its
+enrichment and spark fits were built on eight drives of the ten in the
+manifest (295.0 minutes in all). Two things were wrong, and the
 second one was distorting every result.
 
 **Its enrichment map has been wrong three times, and the third time it was the
@@ -406,12 +456,21 @@ cost of fitting to too little data.
 | **v4, from eight drives** | **function of engine speed and sustained dwell** | **current** |
 
 v2 came from four seconds above 100 % load. v3 came from seventeen. The two
-8 September drives took that to **208 seconds above 207 kPa**, and at that
-sample size the correlation between lambda and manifold pressure is **+0.23**
-— weak, and with the wrong sign for a load table: more boost goes with a
-*leaner* mixture. What correlates is engine speed (-0.47), air mass flow
-(-0.49), and how long the engine has been held above the gate (-0.47), over the
-1055 samples above `ENR_LOAD` = 180 kPa.
+8 September drives took that to **208 seconds above 207 kPa**. Over the 1341
+rows above `ENR_LOAD` = 180 kPa, what correlates with lambda is engine speed
+(-0.47), air mass flow (-0.41), and how long the engine has been held above the
+gate (-0.44) — and the correlation between lambda and manifold pressure is
+**+0.11**, indistinguishable from zero. Read all four with their error bar:
+the 1341 rows are forward-filled and hold only about 67 independent readings,
+so the standard error is about 0.12. Manifold pressure carries no detectable
+signal, which is enough to reject a load table; it is not evidence that load
+points the other way.
+
+<!-- RETIRED-OK: 0.23, -0.49, 1055 -->
+*(This paragraph read +0.23, "with the wrong sign for a load table: more boost
+goes with a leaner mixture", air mass flow at -0.49, and 1055 samples, until
+22 September. At a standard error near 0.12 the wrong-sign argument never
+held, and it is withdrawn — CLAUDE.md mistake 4.)*
 
 (The gate reads 180 kPa, not 200, because manifold pressure changed definition
 with the charge-temperature correction. On the corrected scale 180 kPa selects
@@ -422,9 +481,9 @@ Median lambda, pooled, above 180 kPa:
 
 | rpm / dwell | 0-4 s | 4-8 s | 8+ s | n |
 |---|---|---|---|---|
-| 1000-3500 rpm | 0.99 | 0.99 | 0.98 | 422 |
-| 3500-4500 rpm | 0.99 | 0.98 | 0.90 | 168 |
-| 4500-7000 rpm | 0.98 | 0.87 | 0.79 | 465 |
+| 1000-3500 rpm | 0.99 | 0.99 | 0.98 | 441 |
+| 3500-4500 rpm | 0.99 | 0.98 | 0.90 | 235 |
+| 4500-7000 rpm | 0.98 | 0.87 | 0.79 | 665 |
 
 Read the bottom row across: at the same load the car runs stoichiometric for
 the first seconds of a pull and enriches only once it has been up there a
@@ -437,7 +496,7 @@ reason.
 The remaining limitation: dwell above the 180 kPa gate stands in for turbine
 inlet temperature, which this car does not expose. The weakest cell of the fit
 is 3500–4500 rpm at long dwell — observed 0.90 against a modelled 0.93, on the
-168 samples in that band. Say both in Chapter 3.
+235 samples in that band. Say both in Chapter 3.
 
 **Its spark map was not knock-limited.** At 3000 rpm and 140 kPa the old baseline
 commanded 26.9° BTDC, giving a knock integral of **2.13**. Production engines sit
@@ -462,15 +521,29 @@ the fitted line into boost — extrapolated, it puts the baseline at +21° at
 | predictive damage reduction | −62 % | −46 % | **−47.2 %** |
 | **preview advantage** | 30 points | 4 points | **13.4 points** |
 
-Baseline damage is larger now because the scenario finally loads the engine: a
-12 % grade at 110 km/h in 42 °C air asks 297 Nm, and the turbine reaches 879 °C.
-The old 10 % / 90 km/h scenario asked 244 Nm, which the real engine supplies
-without effort — the constraint never bound, so there was no trade-off to study.
+**The v3 column is VOID** (`AUDIT.md` C1 and C3). It was measured against a
+baseline with its cooling switched off, and its preview edge rests on an
+ablation identity that could not fail. It stays in this table only as the
+record of how the headline moved. What `check_premise.py` prints today is in
+the box near the top of this file: baseline 959.8 at 884 °C, and hand-written
+preview −0.4 points against current-grade.
 
+<!-- RETIRED-OK: 110, 297, 879, 244 -->
+Baseline damage was larger in v3 because the scenario finally loaded the
+engine: a 12 % grade at 110 km/h in 42 °C air asked 297 Nm, and the turbine
+reached 879 °C — a peak `AUDIT.md` C2 later traced to the baseline's
+scheduling error, not to the engine. The old 10 % / 90 km/h scenario asked
+244 Nm, which the real engine supplies without effort — the constraint never
+bound, so there was no trade-off to study. The locked scenario is now 12 % at
+130 km/h, and it binds.
+
+<!-- RETIRED-OK: 13.4 -->
 **Read that last row carefully, and read the whole row, not the number.** The
-preview advantage has now been 30 points, 4 points and 13.4 points. Every one of
-those was a real measurement of a different system. The number is not the
-result; the *ablation* is.
+preview advantage has now been 30 points, 4 points and 13.4 points (void —
+`AUDIT.md` C1: measured against a baseline with its cooling switched off; and
+the identity it leaned on could not fail, C3). The first two were real
+measurements of different systems; the 13.4 was not a measurement of preview
+at all. The number is not the result; the *ablation* is.
 
 > ### DO NOT TAKE THE NEXT PARAGRAPH INTO A VIVA. It is refuted twice over.
 >
@@ -493,19 +566,21 @@ result; the *ablation* is.
 > ablation that could fail, ran it eight times, and it did not separate.*
 > Separately, and worth defending on its own: the trained agent beats the
 > `current-grade` comparator by **+29 to +34 points** on five of eight seeds, so
-> learned supervision works even though preview specifically does not.
+> learned supervision works even though preview specifically does not separate
+> from seed noise at the C1 budget.
 >
 > `python analyse_phase_d.py`.
 
-<!-- RETIRED-OK: section -- the refuted viva claim, kept so it is recognisable -->
+<!-- RETIRED-OK: section 930, 1152, 0.3 -- the refuted viva claim and the old trigger, kept so they are recognisable -->
 
-And the ablation has held exactly every single time — preview-disabled lands on
+*The refuted paragraph, as it stood — quoted so it is recognisable, not to be defended:*
+*"And the ablation has held exactly every single time — preview-disabled lands on
 reactive to the decimal, across two engines, two scenarios and two protection
 triggers. Whatever the gap is, it is attributable to preview and nothing else.
-That is the sentence to defend in the viva.
+That is the sentence to defend in the viva."*
 
 One caveat to carry into Phase D. The protection trigger in `check_premise.py`
-used to be a hard-coded 930 K, and on the correct engine the turbine reaches
+used to be a hard-coded 930 K, and on the correct engine the turbine reached
 1152 K, so both policies saturated and the gap collapsed to 0.3 points for
 reasons that had nothing to do with preview. It is now anchored to the damage
 model — 1123 K, the knee of `exp((t_turb − 1123)/45)` — which is a statement
@@ -514,9 +589,18 @@ model, change the trigger with it.**
 
 ## The Phase F protocol changed
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 16.5, 18.0, 26.0, 50.3, 57.0, 9.7 -->
 
-`generality_test.py` now prints three tables. H2b is the one to use.
+> **EVERY PREVIEW FIGURE IN THIS SECTION IS VOID** (`AUDIT.md` C1 and M12).
+> The whole sweep was scored against the same cooling-disabled baseline as the
+> premise table, and its τ axis assumed an exhaust flow the climb does not
+> make. Re-run `generality_test.py` and read what it prints; the tables below
+> are kept only so the old values are recognisable. **And do not use H/τ to
+> rescue Phase D's null** — that reading was drafted and refuted
+> (`results/PREREGISTRATION.md` limit 8).
+
+`generality_test.py` prints three tables. H2b was, when this section was
+written, the one it told you to use; it no longer is — see below.
 
 With a fixed constraint threshold, the two largest thermal masses never get hot
 enough to violate it, so two of the five sweep points return nothing. H2b sets
@@ -524,11 +608,13 @@ the threshold per configuration to the 80th percentile of the *unprotected*
 policy's own temperature trace, so every configuration spends the same fraction
 of the drive in violation and every row yields a data point.
 
-That change also makes the result more interesting. The preview advantage is
-**peaked, not monotonic** — near zero at H/τ ≈ 4 where a reactive policy already
-copes, largest around H/τ ≈ 0.6, decaying again as H/τ → 0.06 where the horizon
-is far too short to matter. A peak is a stronger claim than a slope, and it is
-exactly what the physical argument predicts.
+*Historical, and void with the tables:* that change was read at the time as
+making the result more interesting — the void sweep showed a preview advantage
+**peaked, not monotonic**, near zero at H/τ ≈ 4, largest around H/τ ≈ 0.6,
+decaying again as H/τ → 0.06 — and the section called a peak a stronger claim
+than a slope and exactly what the physical argument predicts. **That reading
+rests on the void table and is withdrawn**, and it is not to be used to explain
+Phase D's null (the box above; `results/PREREGISTRATION.md` limit 8).
 
 **H2b's threshold rule does not survive the correct engine, and this is the
 open Phase F problem.** The p80 rule assumes the temperature spends a minority of
@@ -540,7 +626,8 @@ now saturate at 100 % for both policies.
 model instead of to a percentile. **`generality_test.py` now imports the same
 constant** — `engine_env.TURB_PROTECT_K = 1123 K`, the knee of the turbine damage
 term — so the two experiments cannot report different protection limits. Until
-H2b's percentile rule is replaced, the fixed-limit **H2** table is the one to use:
+H2b's percentile rule is replaced, the fixed-limit **H2** table was the one to
+use — and it is void too, per the box at the top of this section:
 
 | C_turb J/K | τ s | H/τ | reactive | predictive | preview edge |
 |---|---|---|---|---|---|
@@ -549,9 +636,10 @@ H2b's percentile rule is replaced, the fixed-limit **H2** table is the one to us
 | 6000 | 50.3 | 0.60 | 73.2 % | 99.1 % | **26.0 pts** |
 | 18000 | 150.9 | 0.20 | — | — | never exceeds the limit |
 
-Preview edge rises as τ grows — 16.5 → 18.0 → 26.0 points as H/τ falls from 4.47
-to 0.60 — and then the component becomes so massive that the constraint stops
-binding at all. That is the direction the physical argument predicts.
+In that void table, preview edge rose as τ grew — 16.5 → 18.0 → 26.0 points as
+H/τ fell from 4.47 to 0.60 — and then the component became so massive that the
+constraint stopped binding at all. It was read as the direction the physical
+argument predicts; that reading is void with the table.
 
 **These numbers moved a long way when the trigger was unified**, from
 0.0/0.1/0.2 points at the old 930 K to 16.5/18.0/26.0 at 1123 K. Nothing about
@@ -559,7 +647,7 @@ the plant changed; the threshold did. Say so in the methods, and report the
 threshold with every figure. A preview advantage quoted without the limit it was
 measured against is not a result.
 
-H2b, for the record, is peaked rather than monotone: 0.0 points for the three
+H2b, for the record, was peaked rather than monotone: 0.0 points for the three
 lightest masses (all saturated at 100 %), **57.0 points** at H/τ = 0.20, and 9.7
 points at H/τ = 0.06. The saturation is the protocol flaw above, not physics.
 

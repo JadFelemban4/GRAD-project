@@ -1,5 +1,14 @@
 # Session report — 18–19 September 2026
 
+<!-- RETIRED-OK: 11.7 -- the banner names the void figure -->
+> **HISTORICAL RECORD -- superseded.** This is what was measured and believed on
+> 18-19 September 2026, left as written. Current values are in `CLAUDE.md` and
+> `FULL_RUN.txt`; quote from those, never from here. In particular the Phase D
+> point below (sighted over blinded, +11.7 points) is **VOID** -- both agents
+> were trained on the invented six-speed gearbox, see `results/void/README.md` --
+> and Phase D's actual result, with agents trained to the C1 budget, is a null:
+> preview does not separate from seed noise (`results/README.md`).
+
 **Audience:** the team. It assumes you know the project and that at least one of
 you knows engines, so there is no H/τ primer and no tour of the cycle model.
 Everything is in the order it happened, including the four things that were
@@ -12,6 +21,7 @@ were not touched. `git diff 5ef1aa2..HEAD` is this session and nothing else.
 
 ## Headline
 
+<!-- RETIRED-OK: 11.7 -- void, see the banner -->
 | | |
 |---|---|
 | **The scenario blocker is gone.** | Locked at 12 % / 130 km/h, chosen from a measured envelope before any training existed. |
@@ -34,6 +44,7 @@ Dependencies installed (`torch` 2.14.0, `stable-baselines3` 2.9.0, `pandas`
 3.0.5, `gymnasium` 1.3.0, plus `fastapi`/`obd` for the app), then every script
 run on the merged tree:
 
+<!-- RETIRED-OK: 1.3, 23, 294.2, 812 -- the run of that session, superseded; see FULL_RUN.txt -->
 | script | result |
 |---|---|
 | `verify_docs.py` | 38 of 38, 311 figure mentions |
@@ -50,6 +61,7 @@ run on the merged tree:
 The 16 September audit fixes moved the code and no document followed. **Mistake
 11 for the fifth time.**
 
+<!-- RETIRED-OK: 256.5, 801, 2.2, 294.2, 812, 1.8, 884.9, 36, 46 -->
 | where | said | the script prints |
 |---|---|---|
 | CLAUDE.md, README.md, handoff.md | 256.5 · 801 °C · 2.2 pts | **294.2 · 812 °C · 1.8 pts** |
@@ -57,7 +69,7 @@ The 16 September audit fixes moved the code and no document followed. **Mistake
 | CLAUDE.md phase table + app section | "six known bugs", "none of these is fixed" | **all six are fixed** |
 | presentation/README.md | 801 °C, "thirteen mistakes" | 812 °C, **sixteen** |
 
-<!-- RETIRED-OK: quoting the void headline IS the finding -->
+<!-- RETIRED-OK: 33.8, 47.2, 13.4 -- quoting the void headline IS the finding -->
 **The most dangerous one was not in that table.** `CLAUDE.md` stated *"reactive
 cuts damage 33.8 %, predictive 47.2 % — 13.4 points"* as a plain sentence near
 the top of the file, with the retraction three paragraphs down under a different
@@ -66,7 +78,7 @@ heading — and a parenthesis underneath asserting the 13.4-point gap was
 number would have carried a void figure into a meeting.** It is now a `VOID`
 heading that says what to run instead.
 
-<!-- RETIRED-OK: the figures named are the ones the run rejected -->
+<!-- RETIRED-OK: 829.2, 548.6 -- the figures named are the ones the run rejected -->
 **`verify_docs.py` caught the author mid-edit**, correctly: explaining the void
 figure re-quoted 829.2 and 548.6, and the run failed naming `CLAUDE.md:187`. The
 errata came out with the figure. **When a number goes void, its corrections go
@@ -159,7 +171,7 @@ someone's background steers every explanation they get afterwards.
 
 ## 6.1 · All nine drives replayed against the trigger
 
-<!-- RETIRED-OK: section -->
+<!-- RETIRED-OK: section 0.351, 172.6, 812 -->
 > **Superseded 19 September, and the whole of this section is dated.** A TENTH
 > drive arrived afterwards: `drive10`, Jeddah to Taif and back, 119.4 minutes
 > of real mountain driving. It peaks at **797.6 °C and spends ZERO seconds
@@ -197,6 +209,7 @@ cycle the project targets, because no logged drive is one. Say which you mean.
 
 Neutral policy, 42 °C, 12 minutes:
 
+<!-- RETIRED-OK: 812.3, 812, 899.4 -- six-speed measurements of that day -->
 | grade | km/h | peak turbine °C | vs trigger |
 |---|---|---|---|
 | 12 % | 90 | 756.0 | −93.8 |
@@ -275,6 +288,7 @@ miles.** Only opening the standard settled it.
 **Two tonnes behind a 1520 kg sports car and still 94 K short.** Extrapolating
 puts the crossing near four tonnes.
 
+<!-- RETIRED-OK: 812 -->
 **Why it fails is worth more than the failure.** Compare the last row with the
 standard climb: 308 Nm → 756 °C against 297 Nm → 812 °C. **Nearly the same
 torque, 56 K apart.** J2807 is a truck standard at truck speeds: 40 mph puts the
@@ -430,6 +444,10 @@ wrong engine (mistake 1) and the reward hack (mistake 5). Same shape every time.
 
 # Part 12 · Phase C ran — the project trained something for the first time
 
+<!-- RETIRED-OK: 11.7 -- naming the void figure IS this note -->
+*(The +11.7 points this Part reports is VOID -- see the banner at the top and
+`results/void/README.md`. The Part is left as written.)*
+
 Until this session `train.py` had **never executed past its import guard**. It
 has now run twice, to completion:
 
@@ -473,6 +491,7 @@ Both runs, episode returns in order:
 `train.py` prints "the curve improved" for both. **And by that measure the
 BLINDED agent looks nearly twice as good — +191.71 against +103.71.**
 
+<!-- RETIRED-OK: 11.7, 194.7, 261.4 -- void, see the banner -->
 **The evaluation says the opposite**: sighted 194.7 damage against blinded 261.4,
 a **+11.7 point** advantage the other way.
 
@@ -522,11 +541,13 @@ then a difference between the **policies**.
 | **agent, sighted** | **194.7** | 35.6 | 378.8 | 5337 | 835 |
 | **agent, blinded** | **261.4** | 19.9 | 336.9 | 5008 | 825 |
 
+<!-- RETIRED-OK: 11.7, 66.0, 54.4, 36.3 -- void, see the banner -->
 ```
 agent over current-grade:  +36.3 points
 SIGHTED over BLINDED:      +11.7 points     (66.0 % against 54.4 %)
 ```
 
+<!-- RETIRED-OK: 11.7 -- void, see the banner -->
 ## 12.4 · Five limits on the +11.7
 
 1. **n = 1 against n = 1.** The protocol wants five seeds each.
@@ -540,6 +561,7 @@ SIGHTED over BLINDED:      +11.7 points     (66.0 % against 54.4 %)
 
 ## 12.5 · This reverses the hand-written result, and that is the finding
 
+<!-- RETIRED-OK: 11.7 -- void, see the banner -->
 Earlier the same day, preview lost on **five scenarios** with hand-written
 policies, between −0.1 and −2.3 points. With trained agents it **wins by 11.7**.
 

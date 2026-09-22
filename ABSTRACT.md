@@ -1,55 +1,96 @@
-# ABSTRACT.md — the three abstracts, mirrored from `DOC/`
+# ABSTRACT.md — the submitted abstract, mirrored from `DOC/`
 
-> ## ⚠️ THIS FILE IS A MIRROR OF DOCUMENTS THAT NO LONGER EXIST. 21 September 2026
+> ## Status, 22 September 2026
 >
-> **Two of the three were deleted and the third was rewritten.** What was handed
-> to the supervisor is `DOC/Abstract_EN.docx` and `DOC/Abstract_EN.pdf`, and
-> nothing else. `DOC/Abstract_AR.docx` and `DOC/Abstract_Simplified.docx` were
-> deleted on purpose; sections 2 and 3 below are their last text and are history
-> now, not deliverables.
+> **One abstract was handed in, and section 1 is its text.** What went to the
+> supervisor on 21 September is `DOC/Abstract_EN.docx` and `DOC/Abstract_EN.pdf`,
+> and nothing else. Section 1 below was regenerated from that `.docx` on
+> 22 September 2026 — the abstract body only; the cover page with the team's
+> names and university numbers is left out. If the two ever disagree, the
+> `.docx` wins: regenerate section 1 rather than editing it by hand.
 >
-> **Every dataset figure below is superseded**, including the "figures used
-> here, and only these" box in the next paragraph. The submitted English
-> abstract carries the current set and this mirror does not:
+> **Everything after section 1 is history or a draft, and says which:**
 >
-> | | this file | the submitted `.docx` and the shipped data |
+> - **section 1b** — the English abstract as this file mirrored it on
+>   16 September, before the `.docx` was rebuilt on its cover-page template.
+>   History.
+> - **sections 2 and 3** — the last text of `DOC/Abstract_AR.docx` and
+>   `DOC/Abstract_Simplified.docx`, deleted on purpose on 21 September. History,
+>   not deliverables.
+> - **section 4** — a short cut for a word limit, never in the submitted `.docx`.
+>   A live draft: its dataset figures and its ablation sentence were brought up
+>   to date on 22 September.
+>
+> The history sections carry the retired dataset. The submitted abstract, the
+> draft and the shipped data do not:
+>
+> <!-- RETIRED-OK: 175.5, 22, 74, 9 -->
+> | | sections 1b, 2 and 3 | section 1 (submitted), section 4, and the shipped data |
 > |---|---|---|
 > | minutes | 175.5 | **295.0** |
-> | drives | nine | **ten** |
+> | drives | nine | **ten** (section 1 names no drive count) |
 > | operating points | 22 | **26** |
 > | span | 30–74 kPa | **30–75 kPa** |
+
+> **One sentence in the submitted abstract is wrong about the code, not just
+> out of date.** Section 1 says preview is isolated "by re-evaluating that policy
+> blind"; sections 1b and 2 say "the identical trained policy with its preview
+> channel disabled". That is the construction `AUDIT.md` C3 voided — it cannot
+> fail and it is not evidence. `evaluate.py` scores a *second* agent, trained
+> with its preview channel zeroed, which is the defensible design and the one
+> Phase D ran. Raise the wording with the supervisor rather than silently
+> re-submitting (`NEXT_SESSION_2026-09-21.md`, step 3). See `AUDIT2.md` findings
+> H2-1 and H2-6.
 >
-> **One claim below is wrong about the code, not just out of date.** Sections 1,
-> 2 and 4 say preview is isolated "by re-evaluating the identical trained policy
-> with its preview channel disabled". That is the construction `AUDIT.md` C3
-> voided — it cannot fail and it is not evidence. `evaluate.py` trains and
-> scores a *second* agent, which is the defensible design. The submitted
-> abstract still carries the old wording.
->
-> Regenerating this file from the surviving `.docx` is step 3 of the plan in
-> `NEXT_SESSION_2026-09-21.md`. Until then, read the `.docx`, not this.
-> See `AUDIT2.md` findings H2-1 and H2-6.
+> **The submitted abstract also predates the project's result.** It was written
+> before Phase D ran and describes the agent in the future tense. Phase D has
+> since returned a null on preview — with agents trained to the C1 budget,
+> preview does not separate from seed noise, and the blinded arm was not
+> blind (`results/PREREGISTRATION.md` limit 7) — and, as a separate claim, the
+> trained agent beats the `current-grade` comparator. Neither is in the
+> submitted text; `CLAUDE.md` carries both.
 
-**The three `DOC/Abstract_*.docx` files are what gets handed in. This file is a
-generated mirror of them**, kept so the text is readable and diffable in the
-repository. If the two ever disagree, the `.docx` files win — regenerate this
-file rather than editing it by hand.
-
-Last regenerated 16 September 2026, after the control-scope paragraph was added
-to all three. See [CONTROL_SCOPE.md](CONTROL_SCOPE.md) for why that paragraph
-exists and what it commits the project to.
-
-**Figures used here, and only these:** nine drives, 175.5 minutes, 22 operating
-points, 30–74 kPa, 1.4 % load residual with zero fitted parameters.
-**No simulation-derived figure is quoted** — no premise numbers, no preview-edge
-points — because [AUDIT.md](AUDIT.md), 15 September, has those under correction.
-Do not add them to these documents until that audit closes.
+**Figures in the submitted abstract (section 1), and only these:** 295.0
+minutes of logs, 26 operating points, 30–75 kPa, 1.4 % load residual with zero
+fitted parameters. **No simulation-derived figure is quoted** — no premise
+numbers, no preview-edge points: the pre-audit premise figures are void
+([AUDIT.md](AUDIT.md) C1–C3), and the abstract was written before Phase D ran.
+See [CONTROL_SCOPE.md](CONTROL_SCOPE.md) for why the read-only boundary is
+stated the way it is.
 
 ---
 
-## 1 · Standard academic version — `DOC/Abstract_EN.docx`
+## 1 · As submitted — `DOC/Abstract_EN.docx`
+
+*Regenerated from the `.docx` on 22 September 2026: abstract body only, cover
+page omitted. The `.docx` wins if the two ever disagree.*
+
+### When is preview worth acquiring? A dimensionless criterion, H/τ, for predictive thermal protection
+
+A turbocharged engine protects its turbine housing only after damage begins: the control unit retards ignition once knock appears and enriches the mixture once exhaust gas is already too hot. Reinforcement learning could act earlier, given preview, meaning advance knowledge of the road gradient ahead.
+
+Preview-based control is well established in automotive thermal management, yet preview is never free: it must be bought with mapping, connectivity, additional sensing and computation. The literature reports its benefit case by case and plant by plant, with no criterion that transfers between systems. An engineer deciding whether to acquire preview before building anything therefore has nothing general to consult.
+
+This project proposes and tests a criterion governed by one dimensionless ratio: H/τ, the preview horizon divided by the thermal time constant of the protected part. If it holds, preview value falls on one curve in H/τ for any plant.
+
+Completed pilot work calibrates a zero-dimensional cycle model and a three-node thermal network on 295.0 minutes of read-only OBD-II logging from the team's car; over 26 steady points, 30–75 kPa, modelled load matches the car to 1.4% with no fitted parameters. A deep reinforcement-learning agent (Soft Actor-Critic) will be trained and evaluated against a production baseline and a reactive policy under a fixed protocol, isolating preview by re-evaluating that policy blind. A battery plant tests transfer; non-overlap is a result.
+
+The result is a design chart: knowing a component's time constant and the horizon available, an engineer can decide whether preview is worth buying. Manufacturers and researchers benefit. The physics runs live as a read-only supervisor estimating what the car cannot measure – protection before the damage, not after.
+
+**Application field:** Automotive powertrain – engine thermal management, component protection, and on-board virtual sensing from read-only OBD-II data.
+
+**AI area:** Deep reinforcement learning (Soft Actor-Critic) and preview-based predictive control.
+
+**Keywords:** preview control; preview horizon; thermal time constant; dimensionless criterion; reinforcement learning; engine thermal protection; virtual sensing; OBD-II validation.
+
+---
+
+## 1b · The English abstract as mirrored on 16 September — history
 
 ### When is preview worth acquiring? A dimensionless criterion, H/τ, tested on two plants
+
+<!-- RETIRED-OK: section 175.5, 22, 74, 9 -- the retired dataset, kept as history -->
+*Superseded by section 1. Kept so the text is not lost; never hand it in.*
 
 Preview-based control, which acts on a disturbance before that disturbance arrives, is well established in automotive thermal management. What is not established is when preview is worth acquiring at all. It costs sensing, mapping, connectivity and computation, and the literature reports its benefit case by case, with no criterion that transfers between systems.
 
@@ -65,9 +106,11 @@ Control and observation are deliberately separated, and the separation is stated
 
 ---
 
-## 2 · Arabic version — `DOC/Abstract_AR.docx`
+## 2 · Arabic version — `DOC/Abstract_AR.docx`, deleted 21 September — history
 
 ### متى يستحقّ الاستباق أن يُكتسب؟ معيار عديم الأبعاد، H/τ، مختبرًا على نظامين
+
+<!-- RETIRED-OK: section 175.5, 22, 74, 9 -- the retired dataset, kept as history -->
 
 يُعدّ التحكّم الاستباقي (preview control)، أي التحكّم الذي يتصرّف بناءً على معلومة عن اضطراب قادم قبل وصوله فعليًا، أسلوبًا راسخًا في الإدارة الحرارية للمركبات. لكن ما لم يُحسم بعد هو: متى تستحقّ هذه المعلومة الاستباقية أن تُكتسب أصلًا؟ فالمعلومة الاستباقية لها كلفة حقيقية — استشعار، وخرائط، واتصال، وحساب — والأدبيات تُبلّغ عن فائدتها حالةً بحالة، دون معيار قابل للانتقال بين الأنظمة.
 
@@ -83,9 +126,11 @@ Control and observation are deliberately separated, and the separation is stated
 
 ---
 
-## 3 · Simplified version — `DOC/Abstract_Simplified.docx`
+## 3 · Simplified version — `DOC/Abstract_Simplified.docx`, deleted 21 September — history
 
 ### 3a · English
+
+<!-- RETIRED-OK: section 175.5, 22, 74, 9 -- the retired dataset, kept as history -->
 
 **The one-line version:** we are working out when it is worth knowing what is coming.
 
@@ -118,6 +163,8 @@ The number that matters is **H divided by τ** . Not H on its own, not τ on its
 **العربية**
 
 ### 3b · Arabic — العربية
+
+<!-- RETIRED-OK: section 175.5, 22, 74, 9 -- the retired dataset, kept as history -->
 
 **السطر الواحد:** نحن نحدّد متى يستحقّ أن تعرف ما هو قادم.
 
@@ -154,5 +201,16 @@ The number that matters is **H divided by τ** . Not H on its own, not τ on its
 **NOT in the current `.docx`.** It was in the 16 September version of
 `Abstract_EN.docx` and was dropped when the document was rebuilt on its cover-page
 template. Kept here so the work is not lost; paste it back if a limit is set.
+**Brought up to date on 22 September** so that pasting it back cannot
+reintroduce the retired dataset or the voided ablation design: the dataset
+figures are the shipped ones, and the ablation sentence says what `evaluate.py`
+does, on the per-episode randomised road that Phase D2 uses
+(`results/PREREGISTRATION_D2.md`). The 16 September wording is in git history.
+It still states no result. **Before pasting it back, note that the one ablation
+run so far does not meet that description:** Phase D's road was fixed, so its
+blinded arm was not blind (`results/PREREGISTRATION.md` limit 7), and its agents
+were trained only to the C1 budget — 50 000 steps, 11 training episodes. With
+agents trained to the C1 budget, preview did not separate from seed noise; that
+is not the same claim as *preview does not help*. `CLAUDE.md` carries both.
 
-Preview-based control acts on a disturbance before it arrives, and is well established in automotive thermal management. What is not established is when the preview is worth acquiring at all, given that sensing, mapping and connectivity all cost something. This project proposes a criterion governed by one dimensionless ratio, **H/τ** : the available preview horizon divided by the thermal time constant of the protected component. The hypothesis is that preview value collapses onto a single curve against H/τ regardless of the plant, and it is tested on two dissimilar plants — a turbocharged spark-ignition engine and an electric-vehicle battery pack. The engine plant is a zero-dimensional cycle model coupled to a three-node thermal network, calibrated against 175.5 minutes of read-only OBD-II logs from the team's own vehicle over nine drives; across 22 quasi-steady operating points at 30–74 kPa it agrees with the vehicle to 1.4 % with no fitted parameters. A reinforcement-learning supervisor is evaluated against a production-style controller and a reactive policy, and the contribution of preview is isolated by re-evaluating the same trained policy with its preview channel disabled. The project delivers the criterion as a design chart, the validated simulation and ablation table behind it, and a real-time application that runs the same physics alongside the car as a virtual sensor for turbine-housing temperature, knock margin and accumulated thermal damage, warning the driver and logging what it marks for a mechanic. The vehicle interface is strictly read-only throughout: the application issues no write commands and has no code path to the vehicle bus.
+Preview-based control acts on a disturbance before it arrives, and is well established in automotive thermal management. What is not established is when the preview is worth acquiring at all, given that sensing, mapping and connectivity all cost something. This project proposes a criterion governed by one dimensionless ratio, **H/τ** : the available preview horizon divided by the thermal time constant of the protected component. The hypothesis is that preview value collapses onto a single curve against H/τ regardless of the plant, and it is to be tested on two dissimilar plants — a turbocharged spark-ignition engine and an electric-vehicle battery pack, the second not yet built. The engine plant is a zero-dimensional cycle model coupled to a three-node thermal network, calibrated against read-only OBD-II logs from the team's own vehicle — 295.0 minutes over ten drives, seven of them carrying usable samples; across 26 pooled quasi-steady operating points at 30–75 kPa it agrees with the vehicle to 1.4 % with no fitted parameters. A reinforcement-learning supervisor is evaluated against a production-style controller and a reactive policy, and the contribution of preview is to be isolated by training a second agent identically with its preview channel zeroed, on a road whose climb is randomised per episode so that the blinded agent cannot infer when it comes, and comparing the two under the same fixed protocol. The project delivers the criterion as a design chart, the validated simulation and ablation table behind it, and a real-time application that runs the same physics alongside the car as a virtual sensor for turbine-housing temperature, knock margin and accumulated thermal damage, warning the driver and logging what it marks for a mechanic. The vehicle interface is strictly read-only throughout: the application issues no write commands and has no code path to the vehicle bus.
