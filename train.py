@@ -8,6 +8,22 @@ Trains a SAC agent on the engine environment and saves everything Phase D needs.
     python train.py --steps 300000 --seed 0                # C4: a real run
     python train.py --steps 300000 --seed 0 --no-preview   # the blinded baseline
 
+    python train.py --steps 50000 --seed 0 --road random   # PHASE D2: a new climb
+                                                           # every episode; writes
+                                                           # to runs_d2/, never runs/
+
+PHASE D2 -- `--road random`
+---------------------------
+Phase D's road never changed, so its blinded arm could learn when the hill
+comes from a thermal clock (`results/PREREGISTRATION.md` limit 7). With
+`--road random` every episode draws its own climb -- start uniform on
+[120, 300] s, grade uniform on [12, 16] % -- through `random_road.RandomClimb`,
+seeded from `--seed`. The environment itself is untouched, which is why the
+sixteen Phase D agents still pass their fingerprint check; the D2 fingerprint
+differs from Phase D's in `scenario` and `episodes_sha`, so neither experiment's
+agent can be scored under the other's protocol. The rules are
+`results/PREREGISTRATION_D2.md`, committed before the first D2 run.
+
 HOW LONG THIS TAKES — read before you start
 --------------------------------------------
 MEASURED 17 September 2026, by timing 2000 SAC steps with gradient updates
@@ -81,6 +97,7 @@ import time
 import numpy as np
 
 import fingerprint as FP
+import random_road as RR
 from engine_env import SupervisoryTunerEnv, make_grade_climb
 
 try:
@@ -108,9 +125,17 @@ def buffer_size(a):
     return int(min(1_000_000, max(10_000, a.steps)))
 
 
-def build_env(use_preview, seed, duration):
+def build_env(use_preview, seed, duration, road="fixed"):
+    """The training environment. `road="random"` is Phase D2.
+
+    The random-road wrapper sits INSIDE Monitor, so Monitor's episode returns
+    are the returns of the drawn roads, and `env.unwrapped` still reaches the
+    SupervisoryTunerEnv for `dt` and the fingerprint.
+    """
     env = SupervisoryTunerEnv(make_grade_climb(duration=duration),
                               use_preview=use_preview, seed=seed)
+    if road == "random":
+        env = RR.RandomClimb(env, seed=seed, duration=duration)
     return Monitor(env)
 
 
@@ -124,7 +149,14 @@ def main():
                     help="episode length in seconds; 900 is the standard scenario")
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
-    ap.add_argument("--out", default="runs")
+    ap.add_argument("--out", default=None,
+                    help="default runs/ for the fixed road, runs_d2/ for "
+                         "--road random -- so a D2 run can never land in a "
+                         "Phase D directory by omission")
+    ap.add_argument("--road", choices=("fixed", "random"), default="fixed",
+                    help="'fixed' is Phase D's climb (12 %% from 180 s, "
+                         "unchanged). 'random' is Phase D2: a new climb every "
+                         "episode, start 120-300 s, grade 12-16 %%.")
     ap.add_argument("--buffer", type=int, default=None,
                     help="SAC replay buffer size. Default: sized to the run, "
                          "because a buffer bigger than --steps can never fill "
@@ -135,12 +167,18 @@ def main():
                          "resulting agent has seen two physical systems and "
                          "belongs to neither. See AUDIT2.md C2-1.")
     a = ap.parse_args()
+    if a.out is None:
+        a.out = "runs_d2" if a.road == "random" else "runs"
+    protocol = "d2" if a.road == "random" else "phase-d"
 
     tag = f"{'blind' if a.no_preview else 'sighted'}_seed{a.seed}"
     outdir = os.path.join(a.out, tag)
     os.makedirs(outdir, exist_ok=True)
 
     print(f"configuration : {'BLINDED (no preview)' if a.no_preview else 'sighted'}")
+    print(f"road          : {a.road}"
+          + ("   (Phase D2: start 120-300 s, grade 12-16 %, per episode)"
+             if a.road == "random" else "   (Phase D: 12 % from 180 s)"))
     print(f"seed          : {a.seed}")
     print(f"steps         : {a.steps:,}")
     # MEASURED 17 September 2026 -- see the docstring for the full table.
@@ -163,7 +201,7 @@ def main():
           f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on CPU")
     print(f"output        : {outdir}/\n")
 
-    env = build_env(not a.no_preview, a.seed, a.duration)
+    env = build_env(not a.no_preview, a.seed, a.duration, a.road)
 
     ckpt_path = os.path.join(outdir, "checkpoint.zip")
 
@@ -184,7 +222,8 @@ def main():
     # file for which fields are fatal and why the plant SHA outranks the git
     # commit.
     meta_path = os.path.join(outdir, "meta.json")
-    live = FP.plant_fingerprint(train_dt=float(env.unwrapped.dt),
+    live = FP.plant_fingerprint(protocol=protocol,
+                                train_dt=float(env.unwrapped.dt),
                                 train_duration=a.duration,
                                 steps_requested=a.steps, seed=a.seed,
                                 use_preview=not a.no_preview, tag=tag)

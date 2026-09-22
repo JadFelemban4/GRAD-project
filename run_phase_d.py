@@ -75,8 +75,17 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, nargs="*", default=list(range(8)))
     ap.add_argument("--steps", type=int, default=50_000)
-    ap.add_argument("--out", default="runs")
-    ap.add_argument("--logs", default="runs/_logs")
+    ap.add_argument("--road", choices=("fixed", "random"), default="fixed",
+                    help="'fixed' is Phase D. 'random' is Phase D2 "
+                         "(results/PREREGISTRATION_D2.md): trains with "
+                         "--road random into runs_d2/, evaluates with "
+                         "--protocol d2 into results/d2_seed<N>.txt. Phase D's "
+                         "runs/ and results/phase_d_seed<N>.txt are never "
+                         "touched by a D2 launch.")
+    ap.add_argument("--out", default=None,
+                    help="default runs/ (fixed) or runs_d2/ (random)")
+    ap.add_argument("--logs", default=None,
+                    help="default <out>/_logs")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--skip-done", action="store_true",
                     help="leave a run alone if runs/<tag>/final.zip exists. "
@@ -92,6 +101,12 @@ def main():
                     help="score the trained pairs instead of training: one "
                          "evaluate.py per seed, under the same memory cap")
     a = ap.parse_args()
+    d2 = a.road == "random"
+    if a.out is None:
+        a.out = "runs_d2" if d2 else "runs"
+    if a.logs is None:
+        a.logs = os.path.join(a.out, "_logs")
+    res_prefix = "d2" if d2 else "phase_d"
 
     if a.prove_buffer:
         return subprocess.call([sys.executable, "prove_buffer.py"], cwd=HERE)
@@ -110,13 +125,15 @@ def main():
         os.makedirs(os.path.join(HERE, "results"), exist_ok=True)
         for s in a.seeds:
             tag = f"eval_seed{s}"
-            res = os.path.join("results", f"phase_d_seed{s}.txt")
+            res = os.path.join("results", f"{res_prefix}_seed{s}.txt")
             if a.skip_done and os.path.exists(os.path.join(HERE, res)):
                 done.append(tag)
                 continue
-            jobs.append((tag, [sys.executable, "evaluate.py", "--out", res,
-                               os.path.join(a.out, f"sighted_seed{s}"),
-                               os.path.join(a.out, f"blind_seed{s}")]))
+            argv = [sys.executable, "evaluate.py", "--out", res,
+                    "--protocol", "d2" if d2 else "phase-d",
+                    os.path.join(a.out, f"sighted_seed{s}"),
+                    os.path.join(a.out, f"blind_seed{s}")]
+            jobs.append((tag, argv))
     else:
         for s in a.seeds:
             for blind in (False, True):
@@ -126,7 +143,7 @@ def main():
                     done.append(tag)
                     continue
                 argv = [sys.executable, "train.py", "--steps", str(a.steps),
-                        "--seed", str(s), "--out", a.out]
+                        "--seed", str(s), "--out", a.out, "--road", a.road]
                 if blind:
                     argv.append("--no-preview")
                 jobs.append((tag, argv))
@@ -208,12 +225,15 @@ def main():
         # and the failure is recorded. It is not replaced by a different seed
         # and it is not quietly dropped.
         print("failed: " + ", ".join(failed))
+        pre = "PREREGISTRATION_D2.md" if d2 else "PREREGISTRATION.md"
         print("Re-run each with the SAME seed and record the failure in "
-              "results/PREREGISTRATION.md -- section 6.")
+              f"results/{pre} -- section 6.")
         return 1
-    print("\nnext, per seed:")
-    print("  python evaluate.py --out results/phase_d_seed<N>.txt \\")
-    print("      runs/sighted_seed<N> runs/blind_seed<N>")
+    if a.evaluate:
+        print(f"\nnext: python {'analyse_phase_d2.py' if d2 else 'analyse_phase_d.py'}")
+    else:
+        print(f"\nnext: python run_phase_d.py --evaluate"
+              + (" --road random" if d2 else ""))
     return 0
 
 

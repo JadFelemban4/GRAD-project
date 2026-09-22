@@ -187,22 +187,50 @@ def _git(*args):
         return None
 
 
-def episodes_sha():
-    """A hash of `evaluate.EPISODES`, the twenty frozen (seed, weights) pairs.
+def _episode_set(protocol):
+    """The frozen evaluation set a protocol is scored on."""
+    import evaluate
+    if protocol == "phase-d":
+        return evaluate.EPISODES
+    if protocol == "d2":
+        return evaluate.EPISODES_D2
+    raise ValueError(f"unknown protocol {protocol!r}; expected 'phase-d' or 'd2'")
+
+
+def episodes_sha(protocol="phase-d"):
+    """A hash of the protocol's frozen episode set.
+
+    Phase D: `evaluate.EPISODES`, twenty (seed, weights) pairs -- UNCHANGED, so
+    every Phase D `meta.json` still matches. Phase D2: `evaluate.EPISODES_D2`,
+    the same twenty plus a pinned (start, grade) road each.
 
     Imported lazily. `evaluate` imports `check_premise`, which imports
     `engine_env`, and `train.py` should not pay for that import graph twice.
     """
-    import evaluate
-    return hashlib.sha256(repr(evaluate.EPISODES).encode()).hexdigest()[:16]
+    return hashlib.sha256(repr(_episode_set(protocol)).encode()).hexdigest()[:16]
 
 
-def plant_fingerprint(**advisory):
+def plant_fingerprint(protocol="phase-d", **advisory):
     """The block, built from the LIVE objects. Never from a literal.
 
     Every value here is read out of the imported module at the moment of the
     call, which is the point: a fingerprint typed as a constant would drift the
     same way the header string did.
+
+    `protocol` selects the experiment, and it changes two FATAL fields:
+
+        phase-d   scenario = make_grade_climb's (grade, v_kmh, t_amb) defaults
+                  episodes_sha = evaluate.EPISODES
+                  -- byte-for-byte what this function returned before Phase D2
+                  existed, so the sixteen Phase D agents still match.
+        d2        scenario = random_road.spec(): the two ranges, speed,
+                  ambient and a hash of random_road.py's own code
+                  episodes_sha = evaluate.EPISODES_D2
+
+    So a Phase D agent scored under D2, or the reverse, is REFUSED on
+    `scenario` -- which is correct: neither number would belong to either
+    experiment. `plant_sha` is shared and does not move, because Phase D2 is
+    built as a wrapper and `engine_env.py` is untouched (see random_road.py).
     """
     import inspect
 
@@ -210,8 +238,14 @@ def plant_fingerprint(**advisory):
     import evaluate as V
     from plant import DTHETA_DEG
 
-    sig = inspect.signature(E.make_grade_climb).parameters
-    scenario = {k: float(sig[k].default) for k in ("grade", "v_kmh", "t_amb")}
+    if protocol == "phase-d":
+        sig = inspect.signature(E.make_grade_climb).parameters
+        scenario = {k: float(sig[k].default) for k in ("grade", "v_kmh", "t_amb")}
+    elif protocol == "d2":
+        import random_road as RR
+        scenario = RR.spec()
+    else:
+        raise ValueError(f"unknown protocol {protocol!r}; expected 'phase-d' or 'd2'")
 
     dirty = _git("status", "--porcelain")
     dirty_plant = sorted(
@@ -234,7 +268,7 @@ def plant_fingerprint(**advisory):
         "turb_protect_k": float(E.TURB_PROTECT_K),
         "oil_protect_k": float(E.OIL_PROTECT_K),
         "scenario": scenario,
-        "episodes_sha": episodes_sha(),
+        "episodes_sha": episodes_sha(protocol),
         # --- advisory --------------------------------------------------------
         "git_head": _git("rev-parse", "HEAD"),
         # None, not False, when git could not be asked. `bool(None)` is False,
@@ -245,7 +279,7 @@ def plant_fingerprint(**advisory):
         "git_dirty_plant_files": None if dirty is None else dirty_plant,
         "eval_dt": float(V.DT),
         "eval_duration": float(V.DURATION),
-        "n_episodes": len(V.EPISODES),
+        "n_episodes": len(_episode_set(protocol)),
         "python": platform.python_version(),
     }
     fp.update(advisory)

@@ -91,6 +91,7 @@ import numpy as np
 
 import check_premise as C
 import fingerprint as FP
+import random_road as RR
 from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K
 
 DT = 1.0
@@ -121,12 +122,69 @@ EPISODES = (
     (1019, (0.592214, 0.097373, 0.310413)),
 )
 
+# ==============================================================================
+# PHASE D2 -- THE RANDOMISED CLIMB. A SECOND FROZEN SET, AND IT IS FROZEN TOO.
+# Committed 22 September 2026, BEFORE any Phase D2 agent was trained, under
+# results/PREREGISTRATION_D2.md. Same rule as EPISODES above: do not edit it
+# after a result exists. A different set is a different protocol.
+#
+# (episode seed, weights, climb start in s, climb grade)
+#
+# THE SEEDS AND WEIGHTS ARE PHASE D's TWENTY, UNCHANGED, so the only thing that
+# differs between Phase D's episode k and this one is the ROAD. The roads are a
+# Latin hypercube over [120, 300] s x [12, 16] %, drawn once from
+# numpy default_rng(20260922) by random_road.frozen_episodes(), which
+# `python random_road.py` re-runs and checks against this literal. Two of them
+# (13.988 % and 14.029 %) sit just past the gearbox shift and carry the
+# thinnest margins of the twenty, +12.5 and +13.3 K (check_random_road.py, D).
+# The sweep's deepest point, 13.73 % at +6.9 K, falls between strata and no
+# frozen episode lands on it -- stated so nobody reads the set as covering it.
+# All twenty bind.
+# ==============================================================================
+EPISODES_D2 = (
+    (1000, (0.690154, 0.012829, 0.297017), 141.05, 0.13314),
+    (1001, (0.682741, 0.181419, 0.135840), 281.95, 0.15025),
+    (1002, (0.690313, 0.060454, 0.249233), 181.29, 0.12717),
+    (1003, (0.484162, 0.022753, 0.493085), 153.75, 0.15438),
+    (1004, (0.583678, 0.036390, 0.379932), 282.64, 0.12237),
+    (1005, (0.529443, 0.168930, 0.301627), 128.45, 0.15393),
+    (1006, (0.690245, 0.057769, 0.251987), 247.53, 0.15802),
+    (1007, (0.590381, 0.320322, 0.089297), 262.02, 0.15729),
+    (1008, (0.699723, 0.046890, 0.253387), 228.71, 0.14029),
+    (1009, (0.506395, 0.277739, 0.215866), 296.25, 0.14849),
+    (1010, (0.538101, 0.136805, 0.325095), 163.40, 0.14227),
+    (1011, (0.552078, 0.178668, 0.269254), 204.50, 0.14478),
+    (1012, (0.540735, 0.424900, 0.034366), 199.65, 0.13988),
+    (1013, (0.592943, 0.187398, 0.219659), 238.26, 0.14640),
+    (1014, (0.685668, 0.285069, 0.029263), 137.66, 0.13012),
+    (1015, (0.571092, 0.379759, 0.049149), 217.89, 0.12963),
+    (1016, (0.654867, 0.283297, 0.061836), 226.65, 0.12016),
+    (1017, (0.508297, 0.185553, 0.306150), 271.29, 0.13459),
+    (1018, (0.673297, 0.013299, 0.313404), 187.71, 0.12567),
+    (1019, (0.592214, 0.097373, 0.310413), 167.38, 0.13651),
+)
 
-def run_episode(policy, seed, weights, use_preview=True):
+PROTOCOLS = {
+    # name: (episode set, header, result-file prefix)
+    "phase-d": (EPISODES, "PHASE D EVALUATION", "phase_d"),
+    "d2": (EPISODES_D2, "PHASE D2 EVALUATION (randomised climb)", "d2"),
+}
+
+
+def run_episode(policy, seed, weights, use_preview=True, road=None):
     """One episode with the weights PINNED after reset, so every policy sees
-    the same ruler on the same episode."""
-    env = SupervisoryTunerEnv(make_grade_climb(duration=DURATION, dt=DT),
-                              dt=DT, seed=seed, use_preview=use_preview)
+    the same ruler on the same episode.
+
+    `road` is None for Phase D's fixed climb, or a (start_s, grade) pair for a
+    Phase D2 episode -- in which case the cycle is built by random_road.climb,
+    the same function training draws through, so there is one definition of a
+    D2 road and not two.
+    """
+    if road is None:
+        cycle = make_grade_climb(duration=DURATION, dt=DT)
+    else:
+        cycle = RR.climb(road[0], road[1], duration=DURATION, dt=DT)
+    env = SupervisoryTunerEnv(cycle, dt=DT, seed=seed, use_preview=use_preview)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)   # override the fresh draw
     obs = env._obs()
@@ -157,14 +215,21 @@ def summarise(rows, key):
     return med, q3 - q1, v.max(), v.min()
 
 
-def scenario_line():
+def scenario_line(protocol="phase-d"):
     """The scenario sentence, READ FROM THE CYCLE FUNCTION rather than typed.
 
     AUDIT2.md C2-1 and H2-10. The literal this replaces was identical on the
     six-speed and on the ZF, which is why `results/phase_d_seed0.txt` cannot be
     told apart from a run on a plant that no longer exists. A sentence built
     from `inspect.signature` changes when the experiment changes.
+
+    For Phase D2 it is built from `random_road.RANGES` for the same reason.
     """
+    if protocol == "d2":
+        (s0, s1), (g0, g1) = RR.RANGES["start_s"], RR.RANGES["grade"]
+        return (f"scenario: climb from {s0:.0f}-{s1:.0f} s at {100 * g0:.0f}-"
+                f"{100 * g1:.0f} %, per episode, {RR.V_KMH:.0f} km/h, "
+                f"{RR.T_AMB_K - 273.15:.0f} C, {DURATION:.0f} s, dt {DT}")
     d = inspect.signature(make_grade_climb).parameters
     grade = float(d["grade"].default)
     v = float(d["v_kmh"].default)
@@ -241,7 +306,13 @@ def main():
                     help="evaluate a model whose meta.json disagrees with this "
                          "tree, or has none. The mismatch is stamped into the "
                          "output; it is never silent.")
+    ap.add_argument("--protocol", choices=sorted(PROTOCOLS), default="phase-d",
+                    help="which frozen episode set: 'phase-d' (the fixed climb, "
+                         "the default and unchanged) or 'd2' (the randomised "
+                         "climb). Each has its own fingerprint, so an agent "
+                         "trained under one is refused by the other.")
     a = ap.parse_args()
+    episodes, header, _ = PROTOCOLS[a.protocol]
 
     # Everything printed is also captured, so the result file and the terminal
     # cannot disagree -- the failure mode that let a result file carry a
@@ -253,7 +324,8 @@ def main():
         print(line)
         captured.append(line)
 
-    live = FP.plant_fingerprint(eval_dt=DT, eval_duration=DURATION)
+    live = FP.plant_fingerprint(protocol=a.protocol, eval_dt=DT,
+                                eval_duration=DURATION)
 
     policies = [
         ("baseline ECU",  C.p_neutral,     True),
@@ -274,8 +346,9 @@ def main():
         policies.append((("agent (blind)" if blind else "agent") + " " + path,
                          agent_policy(model), not blind))
 
-    say(f"PHASE D EVALUATION -- {len(EPISODES)} FIXED EPISODES, frozen 18 Sep 2026")
-    say(scenario_line())
+    frozen = "18 Sep 2026" if a.protocol == "phase-d" else "22 Sep 2026"
+    say(f"{header} -- {len(episodes)} FIXED EPISODES, frozen {frozen}")
+    say(scenario_line(a.protocol))
     say(f"trigger:  {TURB_PROTECT_K - 273.15:.0f} C")
     say("")
     say(FP.format_block(live, "PLANT FINGERPRINT (this run)"))
@@ -288,7 +361,11 @@ def main():
 
     out = {}
     for name, pol, prev in policies:
-        rows = [run_episode(pol, s, w, prev) for s, w in EPISODES]
+        if a.protocol == "phase-d":
+            rows = [run_episode(pol, s, w, prev) for s, w in episodes]
+        else:
+            rows = [run_episode(pol, s, w, prev, road=(st, g))
+                    for s, w, st, g in episodes]
         out[name] = rows
         dm, di, dw, _ = summarise(rows, "damage")
         fm, _, _, _ = summarise(rows, "fuel")
