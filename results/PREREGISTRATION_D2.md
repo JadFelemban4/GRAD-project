@@ -187,6 +187,38 @@ As `PREREGISTRATION.md` section 6, without exception:
 
 *(Empty at commit. Filled if any run fails, as section 6 requires.)*
 
+**22 September 2026, 22:35 — launched, and the launcher's concurrency was
+pinned at ONE by a transient. No run was lost, restarted or re-seeded.**
+
+`run_phase_d.py --road random` was started at 22:35:53 from commit `99bd3fe`.
+At that moment a game on the same machine was holding 6.3 GB, free memory was
+~5.9 GB, and the launcher computed its cap as
+`max(1, int((free − 5.0 reserve) / 1.5 per run))` = **1**. The cap is computed
+ONCE, at launch; the in-loop check can only hold runs back, never raise the
+cap. So when the game closed and free memory returned to 12.8 GB, the launcher
+kept running one job at a time — sixteen runs in sequence, about eighteen hours.
+
+What was done, at 22:43, with `sighted_seed0` about eight minutes into training:
+
+| | |
+|---|---|
+| the launcher (pid 38508) | stopped, **alone** — `taskkill` without `/T` |
+| `sighted_seed0` (pid 27760) | **left running, untouched**; it was never interrupted |
+| `blind_seed0` | started directly with `train.py --road random --no-preview --seed 0` |
+| seeds 1–7, both arms | a new `run_phase_d.py --road random --seeds 1 … 7 --jobs 4` |
+
+Every run is still the preregistered command with its original seed, into
+`runs_d2/`, on the same commit; nothing had been evaluated. The record of the
+stop and relaunch is `runs_d2/LAUNCH.txt`.
+
+**A launcher defect this exposed, not fixed mid-experiment:** a cap computed
+once from free memory is hostage to whatever else the machine is doing at the
+instant of launch. The measured `PEAK_GB` and the in-loop hold are correct; the
+one-shot cap is the gap. Fixing it naively (re-computing the cap each loop)
+would over-launch, because a just-started run has not yet allocated its
+1.5 GB — the failure that killed runs in Phase D's first two launches. It is
+left alone during the run and recorded here instead.
+
 ## 7. Stopping rule
 
 Sixteen runs, then stop. **No seed is added after any result is seen.** More
