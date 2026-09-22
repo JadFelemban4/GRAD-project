@@ -216,6 +216,16 @@ python analyse_phase_d.py  THE PROJECT'S RESULT. 5 of 8 seeds positive, mean
 python drift_test.py       16 of 16 injected drifts CAUGHT. The guard's own
                            acceptance test; every row AUDIT2 Part 4a marked
                            MISSED is now caught
+python power_analysis.py   At Phase D's spread (sd 214.4) eight seeds have power
+                           0.10 against the minimum effect of interest (50
+                           damage units) and reach 80 % only near 269. Read it
+                           before calling any null "no effect"
+python check_random_road.py  D2's gates: 0 of 121 grades fail to bind (weakest
+                           13.73 % at +6.9 K), 0 of 20 frozen episodes, and the
+                           blind arm's observations identical on every road
+                           until its climb arrives
+python analyse_phase_d2.py D2's result beside Phase D's, each classified by the
+                           MEI rule
 python full_run.py         every script below, one pass, exit codes -> FULL_RUN.txt
 python -m app.test_simulation   15 of 15. The replay lab. SEPARATE from
                            app.test_replay -- run both after touching app/
@@ -1935,6 +1945,18 @@ run_phase_d.py        Launches the sixteen runs, and the eight evaluations,
                       can make progress; memory says how many can START.
 analyse_phase_d.py    The preregistered statistic and nothing else. Does not
                       drop a seed, add a seed, or switch tails.
+analyse_phase_d2.py   Phase D2's preregistered test -- Phase D's statistic,
+                      IMPORTED not copied, plus the three-cell MEI rule (PREVIEW
+                      HELPS / SMALLER THAN THE MEI / INCONCLUSIVE). Prints both
+                      experiments side by side, Phase D's labelled post-hoc.
+power_analysis.py     What effect size eight seeds can detect, from Phase D's
+                      measured spread. Nothing re-measured; the arithmetic is
+                      the contribution.
+random_road.py        Phase D2's randomised climb, as a WRAPPER. engine_env.py
+                      is untouched on purpose -- editing it would move
+                      plant_sha and lock out all sixteen Phase D agents.
+check_random_road.py  Does every D2 road bind, and is the blind arm blind.
+                      Run before training; about 38 minutes.
 prove_buffer.py       Proves the replay-buffer size changes nothing learned.
 drift_test.py         The guard's own acceptance test: inject AUDIT2 Part 4a's
                       drifts and check each is CAUGHT. Currently 16 of 16.
@@ -1942,6 +1964,10 @@ full_run.py           Every script that prints a published figure, in one pass,
                       each block opening with its EXIT CODE -> FULL_RUN.txt.
                       Sweep the documents from that, not from memory.
 results/PREREGISTRATION.md  Phase D's rules, committed before any agent trained.
+results/PREREGISTRATION_D2.md  Phase D2's rules, committed before any D2 agent
+                      trained -- MEI set, power declared, ten limits, run log.
+results/NEXT_EXPERIMENT_DESIGN.md  Why the climb is randomised the way it is.
+runs_d2/              Phase D2's trained agents. Gitignored, like runs/.
 results/void/         Result files that are NOT results, with a README saying
                       why. The +11.7 file lives here.
 generality_test.py    The H/τ experiment. H1, H2, H2b.
