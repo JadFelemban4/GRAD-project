@@ -1036,6 +1036,34 @@ grep the whole tree for the OLD value yourself and read every hit, then add
 it to `RETIRED`. Do not trust a green run to prove the sweep was complete —
 a green run proves only that the patterns that exist found nothing.
 
+<!-- RETIRED-OK: 11.7 -->
+**22 September: the fourth recurrence, and it was in the GUARD, found by the
+guard's own acceptance test.** `AUDIT2.md` fix 3 swept the KNOWN STALE ledger
+from 187 mentions to zero (commit `3f4627d`), and emptying it was right. But
+`drift_test.py` then fell from **16 of 16 to 14 of 16**, and one of the two was
+a real hole: the ledger had been counting the void `+11.7` margin in the files
+that quote it, and that COUNT was the only thing catching an edit of `+11.7`
+into `+13.7`. Nobody had written that down. **A protection that exists only as
+a side effect of another mechanism disappears when that mechanism is retired.**
+It is now an explicit check, `PINNED_HISTORY`, and the test is back at 16 of 16.
+
+The same sweep found two more holes in the guard that had been there since
+fix 2, both worth knowing when you write a marker:
+
+- **HTML-comment markers were invisible.** The tag stripper deleted
+  `<!-- RETIRED-OK ... -->` with every other tag, so every marker in
+  `presentation/*.html` was decorative. They survive stripping now.
+- **A marker's explanation was read as figures.** `RETIRED-OK: 900.9 -- the
+  baseline at dt 0.2, not the protocol step of dt 1.0` also excused 0.2 and
+  1.0 in its scope. Figures now come from the list before the first ` -- `.
+
+And one forward-update of exactly this entry's shape: commit `6e40cd8` changed
+"all nine drives" to "all ten drives" in mistake 14 and `app/alerts.py` when
+drive10 arrived, **without re-running the measurement** the sentence described.
+Restored. **After retiring or reworking anything in the guard, run
+`drift_test.py` before committing** — it is the only thing that checks the
+checker.
+
 ### 12. A residual that could not see the thing it was said to validate
 
 <!-- RETIRED-OK: section -- this entry is the record of what changed. -->
