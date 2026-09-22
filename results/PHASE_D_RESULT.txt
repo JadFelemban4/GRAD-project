@@ -1,0 +1,40 @@
+==============================================================================
+PHASE D — the preregistered test
+results/PREREGISTRATION.md, committed before any agent was trained
+==============================================================================
+
+ seed   baseline  curr-grade   sighted   blinded  blind-sighted
+------------------------------------------------------------------------------
+    0      959.8       633.2     340.5     350.3           +9.8
+    1      959.8       633.2     354.0     348.2           -5.8
+    2      959.8       633.2     308.2     376.8          +68.6
+    3      959.8       633.2     302.5     689.7         +387.2
+    4      959.8       633.2     639.5     367.8         -271.7
+    5      959.8       633.2     525.7     237.5         -288.2
+    6      959.8       633.2     498.5     549.5          +51.0
+    7      959.8       633.2     331.5     418.6          +87.1
+------------------------------------------------------------------------------
+
+paired differences (blind - sighted), n = 8
+  positive (preview helped) : 5 of 8
+  mean difference           : +4.8 damage units
+
+  exact one-sided sign test        p = 0.3633
+  exact paired permutation test    p = 0.4922   (sensitivity)
+  alpha                            0.05
+
+  RESULT: NOT SIGNIFICANT at alpha 0.05.
+
+  Minimum effect of interest: STILL UNSET (TEAM DECISION).
+  Until it is set, a null result cannot be told apart from an
+  underpowered one. Set it in results/PREREGISTRATION.md.
+
+  Preview must beat CURRENT-GRADE, not the baseline ECU. Per seed:
+    seed 0: agent over current-grade  +30.5 points
+    seed 1: agent over current-grade  +29.1 points
+    seed 2: agent over current-grade  +33.9 points
+    seed 3: agent over current-grade  +34.5 points
+    seed 4: agent over current-grade   -0.7 points
+    seed 5: agent over current-grade  +11.2 points
+    seed 6: agent over current-grade  +14.0 points
+    seed 7: agent over current-grade  +31.4 points

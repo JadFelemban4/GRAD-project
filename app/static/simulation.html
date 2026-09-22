@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f3ed">
+  <title data-i18n="page.title">مختبر الرحلة — GRAD</title>
+  <link rel="stylesheet" href="/static/sim/style.css">
+  <script>
+    // Applied before first paint so a dark-mode reader never sees a cream flash.
+    // Wrapped because localStorage throws in private mode; the media query and
+    // the stylesheet default cover it either way.
+    try {
+      var s = localStorage.getItem('grad.sim.theme');
+      if (s === 'dark' || s === 'light') document.documentElement.dataset.theme = s;
+      var l = localStorage.getItem('grad.sim.lang');
+      if (l === 'en' || l === 'ar') {
+        document.documentElement.lang = l;
+        document.documentElement.dir = l === 'en' ? 'ltr' : 'rtl';
+      }
+    } catch (e) { /* no stored preference is not an error */ }
+  </script>
+  <script type="importmap">{"imports":{"three":"/static/vendor/three/three.module.js","three/addons/":"/static/vendor/three/addons/"}}</script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></symbol>
+    <symbol id="i-focus" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-11v2"/></symbol>
+    <symbol id="i-road" viewBox="0 0 24 24"><path d="m6 3-3 18M18 3l3 18M12 3v4m0 3v4m0 3v4"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m10 5 7 7-7 7M4 12h13"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.5 1.5m11.2 11.2 1.5 1.5M19.1 4.9l-1.5 1.5M6.4 17.6l-1.5 1.5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></symbol>
+  </svg>
+  <header class="topbar">
+    <a href="/simulation" class="brand" data-i18n-aria="brand.aria" aria-label="مختبر GRAD"><span class="brand-mark">G<span>╱</span></span><div><strong dir="ltr">GRAD<span class="brand-point">.</span></strong><small data-i18n="brand.tagline">مختبر الأنظمة الهندسية</small></div></a>
+    <nav data-i18n-aria="nav.aria" aria-label="التنقل الرئيسي"><a class="active" href="/simulation" data-i18n="nav.simulation">مختبر الرحلة</a><a href="/" data-i18n="nav.monitor">المراقبة</a><a href="/review" data-i18n="nav.review">مراجعة التنبيهات</a></nav>
+    <div class="topbar-tools">
+      <button id="theme-toggle" type="button" data-i18n-title="theme.to_dark" data-i18n-aria="theme.aria" aria-label="تبديل الوضع الليلي" title="الوضع الليلي"><svg><use href="#i-moon"/></svg></button>
+      <button id="lang-toggle" type="button" data-i18n-title="lang.switch_to_english" data-i18n-aria="lang.aria" aria-label="تغيير اللغة" title="English"><span dir="ltr">EN</span></button>
+      <span class="readonly"><span></span><span data-i18n="readonly.badge">قراءة فقط من السيارة</span></span>
+    </div>
+  </header>
+  <main>
+    <section class="page-intro">
+      <div><p class="eyebrow"><span class="small-rule"></span><span data-i18n="intro.eyebrow">المحرك · الطريق · الزمن</span></p><h1><span data-i18n="intro.heading">كل رحلة، من الداخل</span><span>.</span></h1><p class="intro-note" data-i18n="intro.note">استكشف حركة السيارة وحالتها الحرارية، لحظة بلحظة.</p></div>
+      <div class="trip-control"><label for="trip" data-i18n="trip.label">الرحلة المسجّلة</label><div class="select-wrap"><select id="trip" aria-describedby="trip-meta"><option data-i18n="trip.loading_option">جارٍ قراءة الرحلات…</option></select></div><span id="trip-meta" data-i18n="trip.meta_default">بيانات محلية · دون اتصال بالسيارة</span></div>
+    </section>
+    <div id="error" class="error" role="alert" hidden></div>
+    <section class="lab-layout" data-i18n-aria="layout.aria" aria-label="عرض الرحلة والمؤشرات">
+      <article class="world-panel">
+        <div class="scene-heading"><div><span class="mode-badge" data-i18n="scene.mode_badge">إعادة تشغيل</span><span class="scene-title" dir="ltr">TOYOTA GR SUPRA <span>/ B58</span></span></div><span class="terrain-label" data-i18n="scene.terrain_label">طريق توضيحي · ليس مسار GPS</span></div>
+        <div id="world" class="world" role="img" data-i18n-aria="scene.world_aria" aria-label="مجسم ثلاثي الأبعاد لسيارة سوبرا على طريق توضيحي، اسحب لتدوير المشهد"></div>
+        <div class="horizon-card"><span class="mini-label"><i class="preview-dot"></i><span data-i18n="preview.label">مدى الاستباق البصري</span><select id="horizon" data-i18n-aria="preview.horizon_aria" aria-label="أفق الاستباق H بالثواني"></select></span><div><strong dir="ltr"><span id="h-value">—</span> <small>s</small></strong><span class="h-divider"></span><strong dir="ltr"><span id="h-distance">—</span> <small>m</small></strong></div><div class="ratio-row"><span><span data-i18n="ratio.tau_label">τ التيربو</span> <i class="source-dot estimated" data-i18n-title="dot.estimated_title" title="مقدّرة من النموذج"></i></span><b id="tau-value" dir="ltr">—</b><span class="ratio-gap"></span><span data-i18n="ratio.h_tau_label">H/τ</span><b id="h-tau" dir="ltr">—</b></div><span class="ratio-caveat" data-i18n="ratio.caveat">τ من النموذج، وسعته الحرارية c_turb مفترَضة لا مقيسة</span><span id="h-coverage" data-i18n="preview.no_controller">لا يعني تشغيل متحكم استباقي</span></div>
+        <div class="scene-tools" data-i18n-aria="camera.aria" aria-label="الكاميرا"><button id="follow" aria-pressed="true" data-i18n-title="camera.follow" title="تتبع السيارة"><svg><use href="#i-focus"/></svg><span data-i18n="camera.follow">تتبع السيارة</span></button><span class="tool-divider"></span><button id="zoom-in" data-i18n-aria="camera.zoom_in" aria-label="تقريب">+</button><button id="zoom-out" data-i18n-aria="camera.zoom_out" aria-label="إبعاد">−</button><button id="camera-reset" data-i18n-aria="camera.reset" data-i18n-title="camera.reset" aria-label="إعادة ضبط الكاميرا" title="إعادة ضبط الكاميرا"><svg><use href="#i-reset"/></svg></button></div>
+        <div class="road-caption"><span><i></i><span data-i18n="road.level">مستوي</span></span><span data-i18n="road.uphill">↗ صعود</span><span data-i18n="road.downhill">↘ نزول</span><span id="lap-note"></span><small data-i18n="road.decorative">شكل توضيحي لا يدخل في الحسابات</small></div>
+        <div id="loading" class="loading-card" role="status" aria-live="polite"><span class="loading-indicator"></span><div><strong id="load-title" data-i18n="load.title">تجهيز مختبر الرحلة</strong><p id="load-detail" data-i18n="load.detail_boot">تحميل محرك العرض…</p><progress id="load-progress" max="1" value="0"></progress></div></div>
+      </article>
+      <aside class="telemetry-panel">
+        <div class="panel-heading"><h2 data-i18n="telemetry.heading">حالة السيارة</h2><span class="sample-tag" id="sample-status" data-i18n="sample.waiting">بانتظار البيانات</span></div>
+        <div class="speed-row"><div><span class="metric-label"><span data-i18n="metric.speed">السرعة</span> <i class="source-dot recorded" data-i18n-title="dot.recorded_title" title="مسجّلة"></i></span><div class="speed-value" dir="ltr"><strong id="speed">—</strong><span>km/h</span></div></div><div class="rpm-box"><span class="metric-label"><span data-i18n="metric.rpm">دورات المحرك</span> <i class="source-dot recorded" data-i18n-title="dot.recorded_title" title="مسجّلة"></i></span><strong id="rpm" dir="ltr">—</strong><small>RPM</small></div></div>
+        <div class="rpm-track" aria-hidden="true"><i id="rpm-bar"></i></div>
+        <div class="gear-header"><span><span data-i18n="gear.header">ناقل الحركة</span> <b id="gearbox-name" dir="ltr">ZF 8HP51</b></span><span id="gear-source" class="source-label" data-i18n="source.unavailable">غير متاح</span></div>
+        <div class="gears" id="gears" dir="ltr" role="list" data-i18n-aria="gear.strip_aria" aria-label="الغيارات الأمامية"></div>
+        <p id="gear-note" class="gear-note" data-i18n="gear.note_default">الغيارات المسجّلة أو المقدّرة فقط؛ دون تحكم يدوي.</p>
+        <div class="thermal-heading"><h2 data-i18n="engine.heading">داخل المحرك</h2><span data-i18n="engine.subheading">رسم مبسّط</span></div>
+        <div id="engine" class="engine-view" role="img" data-i18n-aria="engine.aria" aria-label="رسم ثلاثي الأبعاد مبسط لمحرك بست أسطوانات وتيربو ونظام تبريد"></div>
+        <div class="engine-key"><span><i class="block-key"></i><span data-i18n="key.block">المحرك</span></span><span><i class="turbine-key"></i><span data-i18n="key.turbine">التيربو</span></span><span><i class="coolant-key"></i><span data-i18n="key.coolant">التبريد</span></span></div>
+        <dl class="thermal-readings">
+          <div><dt><span data-i18n="thermal.turbine">غلاف التيربو</span> <i class="source-dot estimated" data-i18n-title="dot.estimated_title"></i><span id="limit-badge" class="limit-badge" hidden></span></dt><dd><b id="turbine">—</b><small>°C</small></dd></div>
+          <div><dt><span data-i18n="thermal.coolant">سائل التبريد</span> <i id="coolant-dot" class="source-dot unavailable"></i></dt><dd><b id="coolant">—</b><small>°C</small></dd></div>
+          <div><dt><span data-i18n="thermal.oil">الزيت</span> <i id="oil-dot" class="source-dot unavailable"></i></dt><dd><b id="oil">—</b><small>°C</small></dd></div>
+        </dl>
+        <div id="seed-note" class="seed-note" data-i18n="seed.model_output">حرارة التيربو تقدير من النموذج، وليست قراءة حساس.</div>
+      </aside>
+    </section>
+    <section class="transport" data-i18n-aria="transport.aria" aria-label="التحكم في إعادة التشغيل">
+      <div class="transport-buttons"><button id="play" class="play-button" disabled data-i18n-aria="transport.play_aria" aria-label="تشغيل الرحلة"><svg><use href="#i-play"/></svg><span data-i18n="transport.play">تشغيل</span></button><button id="restart" class="icon-button" disabled data-i18n-aria="transport.restart_aria" aria-label="إعادة الرحلة من البداية"><svg><use href="#i-reset"/></svg></button></div>
+      <div class="timeline-block"><div class="time-labels"><span><b id="current-time" dir="ltr">00:00</b><span class="time-separator"> / </span><span id="duration" dir="ltr">00:00</span></span><span id="time-context" data-i18n="time.context">ساعة العرض مستقلة عن حساب المحاكاة</span></div><div class="seek-wrap"><div id="limit-bands" aria-hidden="true"></div><div id="shift-markers" aria-hidden="true"></div><input id="seek" type="range" min="0" max="1" value="0" step="0.01" disabled data-i18n-aria="transport.seek_aria" aria-label="موضع إعادة تشغيل الرحلة"></div></div>
+      <div class="rate-control"><label for="rate" data-i18n="rate.label">سرعة العرض</label><select id="rate" data-i18n-aria="rate.aria" aria-label="سرعة العرض"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option><option value="16">16×</option></select></div>
+    </section>
+    <section class="analysis-grid">
+      <article class="chart-panel"><div class="panel-heading"><h2 data-i18n="chart.drive.heading">إيقاع الرحلة</h2><div class="chart-legend"><span><i class="speed-line"></i><span data-i18n="chart.legend.speed">السرعة</span></span><span><i class="rpm-line"></i><span data-i18n="chart.legend.rpm">RPM</span></span></div></div><div id="drive-chart" class="chart" role="img" data-i18n-aria="chart.drive.aria" aria-label="رسم السرعة ودورات المحرك عبر زمن الرحلة"></div><div class="chart-footer"><span data-i18n="chart.drive.footer">نفس العينة، نفس اللحظة</span><span id="sample-time" dir="ltr">t = — s</span></div></article>
+      <article class="chart-panel"><div class="panel-heading"><h2 data-i18n="chart.thermal.heading">الأثر الحراري</h2><div class="chart-legend"><span><i class="turbine-line"></i><span data-i18n="chart.legend.turbine">التيربو</span></span><span><i class="oil-line"></i><span data-i18n="chart.legend.oil">الزيت</span></span><span><i class="limit-line"></i><span data-i18n="limit.legend">عتبة التيربو</span></span></div></div><div id="thermal-chart" class="chart" role="img" data-i18n-aria="chart.thermal.aria" aria-label="رسم درجات حرارة التيربو والزيت عبر زمن الرحلة"></div><div class="chart-footer"><span data-i18n="chart.thermal.footer">القراءات والتقديرات موضّحة بالمصدر</span><span>°C</span></div><p id="limit-summary" class="limit-summary"></p><p id="limit-caption" class="limit-caption"></p></article>
+      <article class="details-panel"><div class="panel-heading"><h2 data-i18n="operation.heading">بيانات التشغيل</h2><svg class="muted-icon"><use href="#i-road"/></svg></div><dl class="operation-readings"><div><dt data-i18n="operation.grade">ميل الطريق الفعلي</dt><dd><b id="grade" data-i18n="value.unavailable">غير متاح</b><small>%</small></dd></div><div><dt><span data-i18n="operation.fuel">تدفق الوقود</span> <i class="source-dot estimated" data-i18n-title="dot.estimated_title"></i></dt><dd><b id="fuel">—</b><small>g/s</small></dd></div><div><dt><span data-i18n="operation.torque">العزم المقدّر</span> <i class="source-dot estimated" data-i18n-title="dot.estimated_title"></i></dt><dd><b id="torque">—</b><small>N·m</small></dd></div><div><dt><span data-i18n="operation.map">ضغط مجمّع السحب</span> <i class="source-dot estimated" data-i18n-title="dot.estimated_title"></i></dt><dd><b id="map">—</b><small>kPa</small></dd></div><div><dt><span data-i18n="operation.distance">المسافة المحسوبة</span> <i id="distance-dot" class="source-dot recorded"></i></dt><dd><b id="distance">—</b><small>km</small></dd></div></dl></article>
+    </section>
+    <section class="provenance-bar"><div class="source-legend"><span><i class="source-dot recorded"></i><span data-i18n="legend.recorded">مسجّلة</span></span><span><i class="source-dot estimated"></i><span data-i18n="legend.estimated">مقدّرة</span></span><span><i class="source-dot unavailable"></i><span data-i18n="legend.unavailable">غير متاحة</span></span></div><span data-i18n="provenance.no_comparison">لا توجد مقارنة متحكمات معتمدة في هذا العرض.</span><button id="details-toggle" aria-expanded="false" aria-controls="method-details"><svg><use href="#i-info"/></svg><span data-i18n="details.toggle">مصادر البيانات وحدود النموذج</span></button></section>
+    <section id="method-details" class="method-details" hidden>
+      <div><h2 data-i18n="method.reading.heading">كيف تُقرأ هذه الواجهة؟</h2><p data-i18n="method.reading.p1">تأتي السرعة وRPM من سجل السيارة. قنوات OBD تُحدَّث في أوقات مختلفة، لذا لا يمثّل كل صف قياسات حساسات متزامنة تمامًا. علامات التبديل تحدد تغيّر الغيار بين عينتين، ولا تدّعي توقيت التعشيق الميكانيكي الدقيق.</p><p data-i18n="method.reading.p2">عند صلاحية قناة الغيار نستخدم القراءة. إذا تشبّعت عند السادس نستدل على الغيار من نسبة RPM إلى السرعة ونسب ZF الحالية. عند الانزلاق أو عدم وضوح المطابقة يظهر «غير محسوم». افتراض المحوّل المقفل يخص التقدير، لا يثبت حالة محوّل السيارة.</p><p id="gear-method"></p></div>
+      <div><h2 data-i18n="method.scene.heading">المشهد والحرارة</h2><p data-i18n="method.scene.p1">الطريق حلقة توضيحية بمقياس عرض، بلا إحداثيات جغرافية. صعوده ونزوله لا يغيّران الحمل المسجّل ولا درجات الحرارة. مدى الاستباق هو المسافة المحسوبة من السرعات القادمة في التسجيل، ويُقصَر عند نهاية البيانات أو انقطاعها.</p><p data-i18n="method.scene.p2">H هو أفق الاستباق المختار، وτ ثابت الزمن الحراري لغلاف التيربو كما يحسبه النموذج عند نقطة التشغيل الحالية. τ ليس رقمًا ثابتًا: مقامه يتضمن تدفق العادم، فيقصر تحت الحمل ويطول عند الثبات. النسبة H/τ معروضة كقراءة لحظية من هذه الرحلة، وليست نتيجة تجربة ولا دليلًا على قيمة الاستباق.</p><p data-i18n="method.scene.p3">ألوان التيربو والمحرّك تتبع عقد النموذج الحراري. لون المشعّ والأنابيب يمثل سائل التبريد؛ ليست لهما درجات حرارة معدنية مستقلة. نطاق البداية يبين أثر عدم معرفة الحالة الحرارية الأولية، وليس هامش دقة شاملًا للنموذج.</p><p data-i18n="method.scene.p4">الفيزياء تُحسب في Python بتوقيت التسجيل الأصلي. التقديم والتأخير وتسريع العرض تختار من النتائج نفسها. لا اتصال بالسيارة في وضع المختبر ولا حفظ لبيانات الرحلة على القرص.</p></div>
+      <div class="fingerprint"><h2 data-i18n="method.fingerprint.heading">بصمة البيانات والحساب</h2><pre id="fingerprint" data-i18n="fingerprint.waiting">بانتظار حساب الرحلة.</pre></div>
+    </section>
+    <footer><span dir="ltr" data-i18n="footer.brand">GRAD / ENGINEERING REPLAY LAB</span><span data-i18n="footer.note">مشروع تخرّج · محرك B58 · عرض علمي استكشافي</span><span dir="ltr" data-i18n="footer.index">01 — REPLAY</span></footer>
+  </main>
+  <noscript><p data-i18n="noscript">يحتاج المختبر إلى JavaScript لعرض بيانات الرحلة والمشهد ثلاثي الأبعاد.</p></noscript>
+  <script type="module" src="/static/sim/main.mjs"></script>
+</body>
+</html>

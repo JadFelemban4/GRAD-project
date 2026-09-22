@@ -55,8 +55,9 @@ from queue import Queue, Empty, Full
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect      # noqa: E402
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException  # noqa: E402
 from fastapi.responses import HTMLResponse, JSONResponse         # noqa: E402
+from fastapi.staticfiles import StaticFiles                      # noqa: E402
 
 from app.estimator import Estimator, SEED_SETTLED_K              # noqa: E402
 from app.alerts import (AlertEngine, TURB_PROTECT_K, OIL_PROTECT_K,  # noqa: E402
@@ -77,6 +78,7 @@ LIMITS = {
     "mismatch_pct": MISMATCH_PCT,
 }
 app = FastAPI(title="Engine Supervisor — live")
+app.mount('/static', StaticFiles(directory=os.path.join(HERE, 'static')), name='static')
 # Set here as well as in main() so that /api/review still works if this module
 # is served by an external ASGI runner that never calls main().
 app.state.review_path = os.path.join(HERE, "review_log.jsonl")
@@ -159,6 +161,32 @@ def index():
 def driver():
     """Driver mode. One number, one colour, audio for thermal alerts only."""
     return _page("driver.html")
+
+
+@app.get('/simulation', response_class=HTMLResponse)
+def simulation():
+    """Local 3D replay lab. No live reader or ECU control is started here."""
+    return _page('simulation.html')
+
+
+@app.get('/api/replay/trips')
+def replay_trips():
+    from app.replay import trip_catalog, vehicle_metadata, PREVIEW_S
+    return JSONResponse(dict(trips=trip_catalog(), vehicle=vehicle_metadata(),
+                             preview_s=list(PREVIEW_S), limits=LIMITS))
+
+
+@app.get('/api/replay/trips/{trip_id}')
+def replay_trip(trip_id: str, preempt: bool = False):
+    # preempt=1 marks the first request after a person picked this drive, and
+    # only that may cancel a build already running. Polls must not, or two
+    # tabs on two recordings cancel each other forever.
+    from app.replay import store
+    try:
+        data = store.request(trip_id, preempt=preempt)
+    except KeyError:
+        raise HTTPException(status_code=404, detail='Unknown recording')
+    return JSONResponse(data, headers={'Cache-Control': 'no-store'})
 
 
 @app.get("/review", response_class=HTMLResponse)
@@ -257,6 +285,7 @@ def main():
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--replay", metavar="CSV", help="replay one of our logs")
     g.add_argument("--live", action="store_true", help="read the car")
+    g.add_argument('--simulation', action='store_true', help='3D replay lab; no vehicle connection')
     ap.add_argument("--speed", type=float, default=1.0,
                     help="replay speed multiplier (0 = as fast as possible)")
     ap.add_argument("--loop", action="store_true",
@@ -265,6 +294,13 @@ def main():
     ap.add_argument("--http-port", type=int, default=8000)
     ap.add_argument("--review", default=os.path.join(HERE, "review_log.jsonl"))
     a = ap.parse_args()
+
+    if a.simulation:
+        print(f'  3D replay lab: http://localhost:{a.http_port}/simulation')
+        print('  Local recordings only. No vehicle connection. In-memory replay cache.')
+        import uvicorn
+        uvicorn.run(app, host='127.0.0.1', port=a.http_port, log_level='warning')
+        return
 
     if a.replay:
         reader = ReplayReader(a.replay, speed=a.speed, loop=a.loop)

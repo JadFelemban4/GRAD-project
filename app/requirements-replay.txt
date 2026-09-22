@@ -1,0 +1,19 @@
+# The 3D replay lab (/simulation) only. Install this, not requirements.txt,
+# if you just want to open recorded drives on your own machine.
+#
+# Deliberately EXCLUDES obd>=0.7, which the root requirements.txt carries for
+# live mode. obd pulls in pyserial and expects an adapter; the replay lab never
+# opens a serial port and never connects to a vehicle.
+#
+#   python -m pip install -r app/requirements-replay.txt
+#
+# numpy is required because the lab runs the project's own plant and thermal
+# model over each recording -- the physics is Python, not JavaScript.
+#
+# gymnasium looks unrelated and is NOT optional: app/estimator.py imports
+# BaselineECU and damage_rate from engine_env, and engine_env imports gymnasium
+# at module level. Dropping it makes `python -m app.server` fail on import.
+numpy>=1.26
+gymnasium>=0.29
+fastapi>=0.110
+uvicorn>=0.27

@@ -818,6 +818,14 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   # print.
                   "FULL_RUN.txt"}
 
+# Exempt by DIRECTORY, where a basename rule would be wrong. `results/void/`
+# holds result files this project has declared void, beside a README whose
+# whole content is why they are void -- so every figure in it is a quotation of
+# something retired, on purpose. Exempting it by basename is not available:
+# one of the files is called README.md, and that would exempt every README in
+# the repository.
+RETIRED_EXEMPT_DIRS = ("results/void/",)
+
 # A line that names a retired figure ON PURPOSE -- "the old 39.5 s figure is
 # void", the mistake log's was/should-say tables -- carries this marker. It is
 # deliberately explicit: an automatic rule would eventually skip a line that IS
@@ -909,7 +917,6 @@ KNOWN_STALE = [
     ("presentation/plan.html", "derived k = 269.6 / T_charge, mean over the 26 points", "M2-1", (0.829,)),
     ("presentation/plan.html", "fitted k, as compare_log prints it", "H2-1", (0.837,)),
     ("presentation/plan.html", "total minutes", "H2-1", (168.1, 168.1, 175.5, 175.5)),
-    ("results/phase_d_seed0.txt", "check_premise baseline damage", "H2-4", (572.8,)),
     ("thermal.py", "hottest oil anywhere in the logs", "M2-1", (107.0,)),
     ("validate.py", "drives in the manifest", "H2-1", (9.0,)),
     ("validate.py", "drives that carry samples", "H2-1/H2-7", (6.0,)),
@@ -944,8 +951,8 @@ KNOWN_STALE = [
     ("results/README.md", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 1),
     ("results/phase_d_seed0.txt", "a sighted-over-blinded ablation margin", "C2-1", 1),
     ("results/phase_d_seed0.txt", "a sighted-versus-blinded ablation margin", "C2-1", 1),
-    ("results/phase_d_seed0.txt", "the void +11.7 Phase D ablation margin (C2-1)", "C2-1", 1),
 ]
+
 
 
 
@@ -1436,6 +1443,7 @@ def check_retired(here):
     print("\nRETIRED FIGURES  (mistake 11 -- the old value must not survive)")
     docs = [f for f in tracked_files(here)
             if os.path.basename(f) not in RETIRED_EXEMPT
+            and not f.startswith(RETIRED_EXEMPT_DIRS)
             and os.path.basename(f) != os.path.basename(__file__)]
 
     found, n_marked = [], 0
@@ -1549,6 +1557,7 @@ MD_CH = MD + ["logs/CHANNEL_SET_FINAL.md"]
 # rather than by somebody remembering to add them.
 ALL = [f for f in tracked_files(HERE)
        if os.path.basename(f) not in RETIRED_EXEMPT
+       and not f.startswith(RETIRED_EXEMPT_DIRS)
        and os.path.basename(f) != os.path.basename(__file__)]
 ENV = ["engine_env.py"]
 

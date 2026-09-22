@@ -10,3 +10,5 @@ runs_sixspeed_18sep/
 
 # the app writes exactly one file, and it is per-drive, not source
 app/review_log.jsonl
+app/node_modules/
+app/static/vendor/

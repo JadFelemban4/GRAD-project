@@ -20,23 +20,23 @@ trigger:  850 C
   plant_text_sha           1db9acf0be408e74
   python                   3.12.10
 --------------------------------------------------------------
-note sighted_seed0: trained at dt 0.2, scored at dt 1 (known, unresolved -- AUDIT2.md H2-2)
-note blind_seed0: trained at dt 0.2, scored at dt 1 (known, unresolved -- AUDIT2.md H2-2)
+note sighted_seed2: trained at dt 0.2, scored at dt 1 (known, unresolved -- AUDIT2.md H2-2)
+note blind_seed2: trained at dt 0.2, scored at dt 1 (known, unresolved -- AUDIT2.md H2-2)
 
 policy                        damage med      IQR    worst  fuel med   peak C
 -----------------------------------------------------------------------------
 baseline ECU                       959.8      0.0    959.8      4664      884
 reactive                           679.0      0.0    679.0      4843      862
 current-grade                      633.2      0.0    633.2      4936      861
-agent runs\sighted_seed0           340.5     21.1    519.6      5079      851
-agent (blind) runs\blind_seed0       350.3     89.5    603.7      5461      853
+agent runs\sighted_seed2           308.2     61.7    335.0      4969      824
+agent (blind) runs\blind_seed2       376.8      4.8    422.7      5335      833
 -----------------------------------------------------------------------------
   reactive                   cuts median damage  29.3 %
   current-grade              cuts median damage  34.0 %
-  agent runs\sighted_seed0   cuts median damage  64.5 %
-  agent (blind) runs\blind_seed0 cuts median damage  63.5 %
+  agent runs\sighted_seed2   cuts median damage  67.9 %
+  agent (blind) runs\blind_seed2 cuts median damage  60.7 %
 
-  AGENT over CURRENT-GRADE: +30.5 points
-  SIGHTED over BLINDED:     +1.0 points   <- THE ABLATION
+  AGENT over CURRENT-GRADE: +33.9 points
+  SIGHTED over BLINDED:     +7.1 points   <- THE ABLATION
   It is the project's result only if the fingerprint block above is the plant
   every figure beside it was measured on. That is now checkable -- check it.

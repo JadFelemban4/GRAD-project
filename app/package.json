@@ -1,0 +1,10 @@
+{
+  "name": "grad-replay-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "vendor": "node vendor.mjs",
+    "test": "node --test static/sim/*.test.mjs"
+  },
+  "dependencies": { "three": "0.180.0" }
+}

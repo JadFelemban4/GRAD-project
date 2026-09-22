@@ -191,6 +191,7 @@ class State:
     map_kpa: float = float("nan")      # inverted from measured air mass
     t_charge_c: float = float("nan")   # modelled, not the pre-throttle sensor
     torque_nm: float = float("nan")
+    fuel_gps: float = float("nan")    # existing plant output, g/s; model estimate
     egt_c: float = float("nan")
     knock_integral: float = float("nan")
 
@@ -498,6 +499,7 @@ class Estimator:
         st.map_kpa = map_kpa
         st.t_charge_c = t_charge_k - 273.15
         st.torque_nm = out["torque_nm"]
+        st.fuel_gps = out["mdot_fuel_gps"]
         st.egt_c = out["egt_c"]
         st.knock_integral = out["knock_integral"]
         st.t_turb_c = self.tn.t_turb - 273.15

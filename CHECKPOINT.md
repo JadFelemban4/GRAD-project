@@ -1332,3 +1332,109 @@ green.
 - **No training, and no Phase D.** `runs_sixspeed_18sep/` is untouched.
 - **`presentation/` is untouched.** Its void premise figures are ledgered under
   C2-3, not fixed; the deck still must not be shown.
+
+
+## Session of 21-22 September 2026 - Phase D has a result, and the result is a null
+
+Fixes 1 and 2 from `AUDIT2.md`, then the whole of Phase D end to end. Fix 3,
+the document sweep, is still NOT done; the known-stale ledger `verify_docs.py`
+prints is its inventory, counted.
+
+### THE RESULT
+
+Sixteen agents, eight seeds per arm, trained on the ZF plant under
+`results/PREREGISTRATION.md`, which was committed **before any of them
+started**. `python analyse_phase_d.py`:
+
+| seed | baseline | curr-grade | sighted | blinded | blind - sighted |
+|---|---|---|---|---|---|
+| 0 | 959.8 | 633.2 | 340.5 | 350.3 | +9.8 |
+| 1 | 959.8 | 633.2 | 354.0 | 348.2 | -5.8 |
+| 2 | 959.8 | 633.2 | 308.2 | 376.8 | +68.6 |
+| 3 | 959.8 | 633.2 | 302.5 | 689.7 | **+387.2** |
+| 4 | 959.8 | 633.2 | 639.5 | 367.8 | **-271.7** |
+| 5 | 959.8 | 633.2 | 525.7 | 237.5 | **-288.2** |
+| 6 | 959.8 | 633.2 | 498.5 | 549.5 | +51.0 |
+| 7 | 959.8 | 633.2 | 331.5 | 418.6 | +87.1 |
+
+```
+positive (preview helped) : 5 of 8
+mean difference           : +4.8 damage units
+exact one-sided sign test        p = 0.3633
+exact paired permutation test    p = 0.4922
+alpha 0.05  ->  NOT SIGNIFICANT
+```
+
+**Preview cannot be shown to help.** The seed-to-seed spread is tens of times
+the effect: seed 3 says preview saves 387 damage units, seed 5 says it costs
+288. The mean of +4.8 is noise.
+
+**AND THAT IS WHAT THE EIGHT SEEDS WERE FOR.** Train seed 3 alone and the
+answer is "+387, preview works", and it would have been written up. The seeds
+are the only thing separating a result from a coincidence.
+
+### The second finding, which is positive and is NOT the same claim
+
+The trained agent beats `current-grade` by **+29 to +34 points** on five of
+eight seeds, and is positive on seven of eight.
+
+**Learned supervision works. PREVIEW specifically is what cannot be shown.**
+Two separate claims, and only the second was preregistered as the hypothesis.
+Say both in the thesis, and do not let the first be read as evidence for the
+second -- that conflation is what `AUDIT.md` C3 was about.
+
+This agrees with everything before it: the hand-written policies put preview at
+**-0.4 points**, and five scenarios gave the same sign. The trained pair now
+agrees with them.
+
+### Still outstanding before this is written up
+
+**The minimum effect of interest is not set** (`PREREGISTRATION.md` section 5,
+TEAM DECISION). Until it is, "preview does not help" cannot be told apart from
+"our experiment was too small to see it". That distinction is the difference
+between a null result and no result.
+
+### What it took to get there, because it is a lesson about machines
+
+Phase D's first two launches lost **21 of 29 runs to memory**, in the first
+minute, twice.
+
+| launch | lost | cause | how it was settled |
+|---|---|---|---|
+| 1 | 13 of 16 | a 1 000 000-transition replay buffer x16 | counted CORES, never checked memory |
+| 2 | 8 of 13 | concurrency cap from an ESTIMATE of 0.9 GB/run | guessed a number |
+| 3 | 0 of 8 | - | MEASURED: 1522 MB per process |
+
+The estimate was 70 % low, which is exactly the margin between a cap that works
+and one that does not. **Cores tell you how many runs can make PROGRESS; memory
+tells you how many can START.**
+
+Sizing the buffer to the run could have changed what was learned, and three
+runs had already finished on the old setting, so it was proven rather than
+assumed: same seed both ways, **32 tensors, 368 398 values, largest difference
+0.000e+00**. `python prove_buffer.py` re-runs it.
+
+No seed was changed, added or dropped. Every failure was mechanical, happened
+before any agent had learned anything, and is recorded in `PREREGISTRATION.md`
+section 6a as section 6 requires.
+
+### The fingerprint earned its keep, on a real case
+
+Across the sixteen `meta.json` files:
+
+```
+plant_sha   ONE value, identical for all sixteen
+git_head    TWO values, e429715 and f3da0b9
+```
+
+Some runs started before the memory-fix commit and some after, so the commit
+hash genuinely differs -- and the physics files did not change, so the plant
+hash does not. Had the fatal comparison been on the commit, **thirteen
+legitimate agents would now be refused.** That is why `plant_sha` is fatal and
+`git_head` is advisory, decided hours before the case arose.
+
+`evaluate.py` accepted all sixteen and refused the six-speed pair in
+`runs_sixspeed_18sep/` with *"no meta.json ... nothing records which plant it
+was trained on"*.
+
+`results/void/` keeps the +11.7 file with a README saying why it is void.
