@@ -392,6 +392,23 @@ python run_phase_d.py --road random --steps 300000 --out runs_c4 --dry-run   EXI
   hours end at 03:00, and a restart after that would stop every live run. By
   section 6 that is a crash, re-run from scratch per seed.
 
+**23 September, 17:00 — first identity check: 10 of 10 IDENTICAL.**
+
+```
+python check_c4_start.py   EXIT 0
+preregistration committed in 79568e2
+sighted/blind seed 0-4: meta ok, budget ok, 10k =        (ten rows)
+seeds 5-7: not started
+IDENTITY compared 10 identical 10
+```
+
+Every first-wave run's 10 000-step checkpoint holds the same weights as its
+D2 twin's, to the last bit, and every certificate passes, including the git
+ancestry check (each run's `git_head` descends from `79568e2`). The pace:
+10 000 steps in about 17 minutes per run with ten running, so the first wave
+is expected to finish around 01:00–01:30 on 24 September and the second
+around 07:00.
+
 ## 7. Stopping rule
 
 Sixteen runs, then stop. **No seed is added after any C4 result is seen**, and
