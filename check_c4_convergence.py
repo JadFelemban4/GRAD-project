@@ -39,7 +39,10 @@ between checkpoints is a change in the AGENT.
 
   settled     the agent's median damage over the practice set moves by no more
               than SETTLE_BAND across the three points (max minus min)
-  converged   at least MIN_SETTLED of the 8 agents in EACH arm are settled
+  pair settled  the seed's paired difference (blind minus sighted median
+              damage) moves by no more than SETTLE_BAND across the three points
+  converged   at least MIN_SETTLED of the 8 agents in EACH arm are settled,
+              AND at least MIN_PAIRS_SETTLED of the 8 seed pairs are settled
 
 SETTLE_BAND is half the minimum effect of interest. An agent whose damage is
 still moving by more than that over its last 100 000 steps is changing at a
@@ -48,12 +51,21 @@ is PER ARM because the objection it answers is specific: "the sighted agents
 had not yet learned to use the preview". An experiment in which one arm
 settled and the other did not is not converged, whatever the total.
 
-WHAT THE RULE ALLOWS AT THE PAIR LEVEL, stated because the review of the draft
-preregistration found it: settling is judged per agent, and the test is on the
-per-seed PAIR. Two settled agents moving 25 units in opposite directions move
-their pair by 50, the whole MEI; and 6 of 8 per arm lets the four unsettled
-agents sit in four different seeds. The paired movement is therefore printed
-beside the verdict, as a description. The rule itself is the team's choice.
+THE PAIR CONDITION, added by the team (Jad) on 23 September 2026, after the
+review of the draft preregistration and after the calibration below. The
+per-agent rule alone judges settling per agent while the test is on the
+per-seed PAIR: two settled agents moving 25 units in opposite directions move
+their pair by 50, the whole MEI, and 6 of 8 per arm lets four unsettled agents
+sit in four different seeds. So the pair itself must settle too, in 7 of 8
+seeds -- the same one-dissenter tolerance the sign test has at eight seeds.
+
+THE CALIBRATION (`--calibrate`, `results/c4_convergence_calibration.txt`,
+Phase D2's agents, practice set only): ONE gradient step moves an agent's
+median damage by a median 1.5 units (max 7.9) and a seed pair's difference by
+a median 4.1 (max 8.5) -- well inside the 25-unit band, so the rule is not
+decided by optimiser noise. And between 30 000 and 50 000 steps D2's C1 agents
+moved a median 118.2 units (max 489.8), with 1 of 16 inside the band -- so the
+rule does tell an agent that is still learning from one that is not.
 
 THE PRACTICE SET IS NOT THE TEST SET. `evaluate.EPISODES_D2` is the frozen test
 set and nothing here touches it: judging convergence on it would be looking at
@@ -87,6 +99,7 @@ MEI = 50.0                        # analyse_phase_d2.MEI; --selftest checks it
 SETTLE_BAND = MEI / 2             # 25 damage units
 CHECKPOINTS = (200_000, 250_000, 300_000)
 MIN_SETTLED = 6                   # of 8, in EACH arm
+MIN_PAIRS_SETTLED = 7             # of 8 seed pairs -- added 23 Sep, see docstring
 C4_STEPS = 300_000
 
 PRACTICE_SEED = 20260923
@@ -338,7 +351,8 @@ def main():
         f"{len(PRACTICE)} episodes, NOT the test set")
     say(f"settled: median damage moves <= {SETTLE_BAND:.0f} units across "
         f"{', '.join(f'{c:,}' for c in CHECKPOINTS)} steps")
-    say(f"converged: >= {MIN_SETTLED} of 8 settled in EACH arm")
+    say(f"converged: >= {MIN_SETTLED} of 8 settled in EACH arm, AND >= "
+        f"{MIN_PAIRS_SETTLED} of 8 seed pairs settled")
     say("")
     # A C4 checkpoint must belong to a fresh 300 000-step run whose buffer
     # never evicts -- the same four numbers analyse_c4.certify and
@@ -366,17 +380,21 @@ def main():
             + f"{res[(tag, C4_STEPS)][1]:>12.2f}{trs:>30}")
     say("-" * 106)
     say(f"settled: sighted {settled['sighted']} of 8, blind {settled['blind']} of 8")
-    # DESCRIPTIVE, not the rule: the same movement on the quantity the test is
-    # about, the per-seed paired difference -- see the docstring.
-    moves_pair = []
+    # THE PAIR CONDITION -- the same movement on the quantity the test is
+    # about, the per-seed paired difference (see the docstring).
+    moves_pair, pairs_ok = [], 0
     for s in range(8):
         p = [res[(f"blind_seed{s}", c)][0] - res[(f"sighted_seed{s}", c)][0]
              for c in CHECKPOINTS]
-        moves_pair.append(f"s{s} {max(p) - min(p):.1f}")
-    say("paired difference (blind - sighted), max - min over the three points, "
-        "DESCRIPTIVE:")
+        mv = max(p) - min(p)
+        pairs_ok += mv <= SETTLE_BAND
+        moves_pair.append(f"s{s} {mv:.1f}{'' if mv <= SETTLE_BAND else '!'}")
+    say("paired difference (blind - sighted), max - min over the three points "
+        "('!' = not settled):")
     say("  " + "  ".join(moves_pair))
-    conv = all(settled[arm] >= MIN_SETTLED for arm in settled)
+    say(f"settled pairs: {pairs_ok} of 8")
+    conv = (all(settled[arm] >= MIN_SETTLED for arm in settled)
+            and pairs_ok >= MIN_PAIRS_SETTLED)
     if bad_budget:
         say("")
         for t, s, b in bad_budget:
@@ -393,7 +411,8 @@ def main():
     # The line analyse_c4.py parses. Keep its shape.
     say(f"VERDICT {'CONVERGED' if conv else 'NOT-CONVERGED'} "
         f"sighted {settled['sighted']}/8 blind {settled['blind']}/8 "
-        f"band {SETTLE_BAND:.0f} need {MIN_SETTLED} runs {runs_name}"
+        f"pairs {pairs_ok}/8 band {SETTLE_BAND:.0f} need {MIN_SETTLED} "
+        f"and {MIN_PAIRS_SETTLED} runs {runs_name}"
         + (" BUDGET-MISMATCH" if bad_budget else ""))
     say(f"({(time.time() - t0) / 60:.1f} min)")
     write_out(a.out, lines)
