@@ -106,12 +106,16 @@ same sign.
 
 ### The training budget, which belongs beside the null and not under it
 
-Every agent above is a **C1** agent. `train.py`'s own usage block:
+Every agent above is a **C1** agent. `train.py`'s usage block said, at the time:
 
 ```
 python train.py --steps 50000  --seed 0   # C1: the first bad run
 python train.py --steps 300000 --seed 0   # C4: a real run
 ```
+
+*(The second line is now refused as written: with the default `--out` it would
+resume a Phase D agent. C4 is `--steps 300000 --road random --out runs_c4`, and
+its rules are `PREREGISTRATION_C4.md`. Corrected 23 September 2026.)*
 
 50 000 steps at 4 500 steps per episode is **11 training episodes**. A null has
 two readings and eleven episodes cannot separate them: preview may genuinely not

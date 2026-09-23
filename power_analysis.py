@@ -48,12 +48,21 @@ WHAT THE SPREAD IS, AND WHAT IT IS NOT
 --------------------------------------
 The 214 is **seed-to-seed training variance**, not episode noise. Each seed's
 number is already a median over the twenty frozen episodes, so averaging more
-episodes does not shrink it. Only two things do: training the agents to
-convergence, so that different seeds land in the same place (`--steps 300000`,
-the C4 budget of `PREREGISTRATION.md` limit 6), or running more seeds.
+episodes does not shrink it. Running more seeds does not shrink it either --
+it shrinks the uncertainty in its MEAN, which is what power needs. Training the
+agents longer (`--steps 300000`, the C4 budget of `PREREGISTRATION.md`
+limit 6) MIGHT shrink it, if different seeds converge to the same place -- or
+might not, if they converge to different ones. That is a hypothesis, and C4 is
+where it is checked (`results/PREREGISTRATION_C4.md` limit 1).
 
-Randomising the climb does NOT shrink it. That fix removes a confound
-(limit 7); it does not make training less noisy.
+This paragraph said, until 23 September 2026, "Randomising the climb does NOT
+shrink it." **Phase D2 measured the opposite: randomising the climb, and
+changing nothing else, took the spread from 214.4 to 98.8.** The prediction was
+written into `PREREGISTRATION_D2.md` section 5a before the run and failed, and
+`report_d2()` below prints the failure. The sentence was left standing in this
+docstring after the function beside it had refuted it -- mistake 11's shape --
+and the same confidence was being placed in "convergence shrinks it". Neither
+is known until measured.
 
 A NOTE ON THE NORMAL APPROXIMATION
 ----------------------------------
@@ -283,9 +292,10 @@ def main():
     print(f"  {d80:.0f} damage units ({100 * d80 / BASELINE_DAMAGE:.0f} % of baseline damage).")
     print("  Any minimum effect of interest the team would actually care about")
     print("  is far below that, so the experiment is UNDERPOWERED BY DESIGN and")
-    print("  its null must be reported as such. Fixing it means the C4 budget")
-    print("  (convergence shrinks the spread) or many more seeds -- not more")
-    print("  evaluation episodes, which do not touch seed-to-seed variance.")
+    print("  its null must be reported as such. Fixing it means many more seeds,")
+    print("  or the C4 budget IF convergence shrinks the spread (a hypothesis C4")
+    print("  checks, not a fact) -- not more evaluation episodes, which do not")
+    print("  touch seed-to-seed variance.")
     print("=" * 78)
     return 0
 

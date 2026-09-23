@@ -265,7 +265,10 @@ cycles at ~9 ms against ~1 ms for a gradient step, so the combustion model is
 the whole cost, and `plant.DTHETA_DEG` is what sets it.)*
 
 Checkpoints land every 10 000 steps, and re-running the same seed resumes from
-its checkpoint.
+its checkpoint -- at the SAME `--steps` only, and not for C4, whose runs are
+started with `--no-resume` and re-run a crash from scratch
+(`results/PREREGISTRATION_C4.md` section 6). A different `--steps` is refused:
+see `train.py`, "A RESUME IS NOT A LONGER RUN".
 
 **Expect a poor result.** It running at all is the point of this step.
 

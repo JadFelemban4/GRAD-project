@@ -1987,6 +1987,15 @@ analyse_phase_d2.py   Phase D2's preregistered test -- Phase D's statistic,
                       IMPORTED not copied, plus the three-cell MEI rule (PREVIEW
                       HELPS / SMALLER THAN THE MEI / INCONCLUSIVE). Prints both
                       experiments side by side, Phase D's labelled post-hoc.
+analyse_c4.py         C4's preregistered test -- D2's statistic, IMPORTED, plus
+                      a certificate first: it refuses any agent that is not a
+                      fresh 300 000-step run, read from the ZIP (fingerprint.
+                      model_budget), because meta.json cannot tell C4 from D2.
+check_c4_convergence.py  Had the C4 agents settled? Checkpoints 200k/250k/300k
+                      on ten PRACTICE episodes, never the test set. The rule
+                      was set by the team before any C4 agent trained.
+check_c4_start.py     Run ~15 and ~80 min into C4: certificates, budgets, and
+                      whether each C4 run retraces its D2 twin bit for bit.
 power_analysis.py     What effect size eight seeds can detect, from Phase D's
                       measured spread. Nothing re-measured; the arithmetic is
                       the contribution.
@@ -2005,7 +2014,14 @@ results/PREREGISTRATION.md  Phase D's rules, committed before any agent trained.
 results/PREREGISTRATION_D2.md  Phase D2's rules, committed before any D2 agent
                       trained -- MEI set, power declared, ten limits, run log.
 results/NEXT_EXPERIMENT_DESIGN.md  Why the climb is randomised the way it is.
+results/PREREGISTRATION_C4.md  C4's rules -- D2's design at 300 000 steps, one
+                      variable at a time -- committed before any C4 agent
+                      trained: convergence rule, crash rule, six readings.
 runs_d2/              Phase D2's trained agents. Gitignored, like runs/.
+runs_c4/              C4's trained agents. Gitignored. A NEW budget always
+                      gets its own directory: train.py refuses to resume a run
+                      whose --steps differs (see its "A RESUME IS NOT A LONGER
+                      RUN"), and run_phase_d.py never relaunches over final.zip.
 results/void/         Result files that are NOT results, with a README saying
                       why. The +11.7 file lives here.
 generality_test.py    The H/τ experiment. H1, H2, H2b.

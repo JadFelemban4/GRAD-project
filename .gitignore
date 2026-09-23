@@ -2,6 +2,9 @@
 __pycache__/
 runs/
 runs_d2/
+# C4 -- D2's design at 300 000 steps (results/PREREGISTRATION_C4.md). The agents
+# live only on the machine that trained them, like runs/ and runs_d2/.
+runs_c4/
 # Renamed 21 Sep 2026: the two agents in here were trained on the invented
 # six-speed gearbox that 27e720c replaced. Moved aside so `train.py --seed 0`
 # cannot resume into them and overwrite the only record of results/

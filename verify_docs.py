@@ -1262,8 +1262,12 @@ def check_scenario(here):
     # document that talks about the locked scenario; these files do not, so
     # they are taken out of THESE TWO figures only, by name. Every other check
     # still reads them.
+    # C4 (23 September 2026) is scored on the same D2 episodes, so its result
+    # files carry the same 1118.0 baseline row -- scoped out here BEFORE the
+    # first one exists, rather than after it has produced eight false
+    # contradictions.
     PREMISE_FILES = [f for f in ALL
-                     if not re.match(r"results/d2_seed\d+\.txt$", f)]
+                     if not re.match(r"results/(d2|c4)_seed\d+\.txt$", f)]
     print(f"  note   one neutral premise rollout, {_time.time() - _t0:.0f} s")
     figure("check_premise baseline damage", round(float(r["damage"]), 1), 959.8, 0.3,
            # THREE DIGITS AND ONE DECIMAL. Every damage figure this project has

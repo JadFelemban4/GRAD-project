@@ -339,6 +339,146 @@ def write(path, fp):
     return path
 
 
+def model_budget(zip_path):
+    """How long a saved agent was ACTUALLY trained, read out of the zip itself.
+
+    Added 23 September 2026 for C4. The fingerprint above cannot tell a C4
+    agent from a Phase D2 agent: same plant, same scenario, same episodes. The
+    only field that differs is `steps_requested`, which is ADVISORY and lives
+    in `meta.json` -- a file a resume never rewrites. So a D2 agent resumed to
+    300 000 steps would carry a 50 000-step certificate, and a C4 result could
+    be computed on an agent that is not a C4 agent with nothing to say so.
+
+    stable-baselines3 writes its own counters into the zip's `data` member,
+    and those are written by the training loop, not by us:
+
+        num_timesteps            steps actually taken
+        total_timesteps          what the LAST learn() call was asked for
+        num_timesteps_at_start   0 for a fresh run; the resume point otherwise
+        buffer_size              the replay buffer the run held -- a resume
+                                 restores the OLD size, so a 50 000-step run
+                                 resumed to 300 000 still says 50 000
+        sha                      the first 16 hex of SHA-256 over the zip's
+                                 bytes, so a result file can name exactly
+                                 which artefact it scored
+
+    Read with `zipfile` and `json` only: no stable-baselines3 import, no torch,
+    no device. Returns None if the file is absent or is not an SB3 zip.
+    """
+    import zipfile
+    try:
+        with zipfile.ZipFile(zip_path) as z:
+            data = json.loads(z.read("data"))
+        with open(zip_path, "rb") as fh:
+            sha = hashlib.sha256(fh.read()).hexdigest()[:16]
+    except (OSError, KeyError, ValueError, zipfile.BadZipFile):
+        return None
+
+    def num(k):
+        v = data.get(k)
+        return int(v) if isinstance(v, (int, float)) else None
+
+    return {
+        "num_timesteps": num("num_timesteps"),
+        "total_timesteps": num("_total_timesteps"),
+        "num_timesteps_at_start": num("_num_timesteps_at_start"),
+        "buffer_size": num("buffer_size"),
+        "sha": sha,
+    }
+
+
+RUNNING = "RUNNING"
+
+
+def pid_alive(pid):
+    """True if a process with this pid exists. It is never signalled.
+
+    NOT `os.kill(pid, 0)` on Windows: there `os.kill` with any signal other
+    than the two console events calls TerminateProcess, so the POSIX idiom for
+    "is it alive?" would kill the training run it was asking about. The
+    Windows branch opens the process for query only and reads its exit code
+    (259, STILL_ACTIVE, while it runs). A recycled pid reads as alive -- the
+    safe direction, since the caller then leaves the directory alone.
+    """
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return False
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        k32.OpenProcess.restype = wintypes.HANDLE
+        k32.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+        k32.GetExitCodeProcess.argtypes = (wintypes.HANDLE,
+                                           ctypes.POINTER(wintypes.DWORD))
+        k32.CloseHandle.argtypes = (wintypes.HANDLE,)
+        h = k32.OpenProcess(0x1000, False, pid)   # QUERY_LIMITED_INFORMATION
+        if not h:
+            return False
+        code = wintypes.DWORD()
+        ok = k32.GetExitCodeProcess(h, ctypes.byref(code))
+        k32.CloseHandle(h)
+        return bool(ok) and code.value == 259
+    try:
+        os.kill(pid, 0)          # POSIX: signal 0 tests existence, sends nothing
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def running_pid(run_dir):
+    """The pid of the process training `run_dir` right now, or None.
+
+    Added 23 September 2026 after the C4 review. A run that is still training
+    and a run that crashed look identical on disk -- checkpoints, no
+    final.zip -- and the launcher's crash rule moved the one it meant to
+    restart. `train.py` now writes `<run_dir>/RUNNING` with its pid while it
+    trains and removes it when it finishes; a crash leaves the file behind
+    with a pid that is no longer alive.
+    """
+    try:
+        with open(os.path.join(run_dir, RUNNING), encoding="utf-8") as fh:
+            pid = int(json.load(fh)["pid"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    return pid if pid_alive(pid) else None
+
+
+def claim_running(run_dir):
+    """Mark `run_dir` as being trained by this process."""
+    import time
+    os.makedirs(run_dir, exist_ok=True)
+    with open(os.path.join(run_dir, RUNNING), "w", encoding="utf-8") as fh:
+        json.dump({"pid": os.getpid(),
+                   "started": time.strftime("%Y-%m-%dT%H:%M:%S%z")}, fh)
+
+
+def release_running(run_dir):
+    """Remove the mark, only if it is this process's own."""
+    p = os.path.join(run_dir, RUNNING)
+    try:
+        with open(p, encoding="utf-8") as fh:
+            mine = int(json.load(fh)["pid"]) == os.getpid()
+        if mine:
+            os.remove(p)
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+
+
+def format_budget(b):
+    """One line for a result file. Parsed back by `analyse_c4.py`."""
+    if b is None:
+        return "budget unreadable"
+    return (f"trained {b['num_timesteps']} steps of {b['total_timesteps']} "
+            f"requested, from step {b['num_timesteps_at_start']}, "
+            f"buffer {b['buffer_size']}, zip sha {b['sha']}")
+
+
 def read(path):
     """Read a fingerprint, or None if it is absent or unreadable.
 

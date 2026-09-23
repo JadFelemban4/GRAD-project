@@ -3,7 +3,8 @@
     python evaluate.py                          the hand-written policies only
     python evaluate.py runs/sighted_seed0        add one trained agent
     python evaluate.py runs/sighted_seed0 runs/blind_seed0    sighted vs blinded
-    python evaluate.py --out results/phase_d_seed0.txt runs/... runs/...
+    python evaluate.py --out results/<new file>.txt runs/... runs/...
+                                               (an existing --out is refused)
 
 EVERY RESULT CARRIES THE PLANT THAT PRODUCED IT   (AUDIT2.md C2-1)
 ------------------------------------------------------------------
@@ -311,8 +312,23 @@ def main():
                          "the default and unchanged) or 'd2' (the randomised "
                          "climb). Each has its own fingerprint, so an agent "
                          "trained under one is refused by the other.")
+    ap.add_argument("--overwrite", action="store_true",
+                    help="replace an existing --out file. Without it an "
+                         "existing file is refused: results/*.txt are "
+                         "committed evidence, and the guard belongs in the "
+                         "writer, not only in run_phase_d.py.")
+    ap.add_argument("--label", default=None,
+                    help="title the report by EXPERIMENT rather than by "
+                         "protocol. C4 is scored on D2's protocol, and without "
+                         "this its result files would open 'PHASE D2 "
+                         "EVALUATION'. run_phase_d.py passes it for any "
+                         "non-default result prefix.")
     a = ap.parse_args()
     episodes, header, _ = PROTOCOLS[a.protocol]
+    if a.out and os.path.exists(a.out) and not a.overwrite:
+        raise SystemExit(f"\n{a.out} exists. Result files are evidence and are "
+                         "not overwritten by default --\nscore into a new file, "
+                         "or pass --overwrite and say why in the commit.")
 
     # Everything printed is also captured, so the result file and the terminal
     # cannot disagree -- the failure mode that let a result file carry a
@@ -341,13 +357,26 @@ def main():
             raise SystemExit('stable-baselines3 is not installed.\n'
                              '    pip install "stable-baselines3[extra]"')
         provenance += check_model_fingerprint(path, live, a.force_plant_mismatch)
+        # HOW LONG THIS AGENT WAS TRAINED, from the zip. The fingerprint cannot
+        # tell a C4 agent from a Phase D2 one -- same plant, scenario and
+        # episodes -- and meta.json's steps_requested is advisory and is not
+        # rewritten by a resume. The zip's own counters are written by the
+        # training loop, and its hash names exactly which artefact was scored.
+        # `analyse_c4.py` reads this line back.
+        mdir = path.rstrip("/\\")
+        provenance.append(f"model {mdir}: "
+                          f"{FP.format_budget(FP.model_budget(mdir + '/final.zip'))}")
         blind = "blind" in path
         model = SAC.load(path.rstrip("/\\") + "/final")
         policies.append((("agent (blind)" if blind else "agent") + " " + path,
                          agent_policy(model), not blind))
 
     frozen = "18 Sep 2026" if a.protocol == "phase-d" else "22 Sep 2026"
-    say(f"{header} -- {len(episodes)} FIXED EPISODES, frozen {frozen}")
+    if a.label:
+        say(f"{a.label} -- scored on the '{a.protocol}' protocol, "
+            f"{len(episodes)} FIXED EPISODES, frozen {frozen}")
+    else:
+        say(f"{header} -- {len(episodes)} FIXED EPISODES, frozen {frozen}")
     say(scenario_line(a.protocol))
     say(f"trigger:  {TURB_PROTECT_K - 273.15:.0f} C")
     say("")
