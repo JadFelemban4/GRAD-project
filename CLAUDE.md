@@ -86,9 +86,10 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 > - **Supervision, the separate claim:** the sighted agent beats `current-grade`
 >   on 8 of 8 seeds (+2.3 to +28.8 points), and so does every BLIND agent — the
 >   gain over the hand-written comparator does not need the preview channel.
-> - **Limit 10 before quoting any D2 damage figure:** five agents burn less fuel
->   than the baseline ECU. `python check_d2_tracking.py` measures whether that is
->   torque refusal. Read it first.
+> - **Limit 10, checked:** five agents burn less fuel than the baseline ECU, and
+>   `python check_d2_tracking.py` shows none of them is refusing torque (0 of 16
+>   track more than one point worse than the baseline). D2's damage figures read
+>   as protection.
 > - Phase D's null is ALSO INCONCLUSIVE under the MEI rule — labelled post-hoc,
 >   because its MEI was set after its result.
 >
@@ -2200,10 +2201,7 @@ not a result.
 > and both are INCONCLUSIVE at the C1 budget. Everything in the older list below
 > is done (the MEI is set; the document sweep landed in `3f4627d`).
 >
-> 1. **Read `python check_d2_tracking.py` before quoting any D2 damage figure**
->    (`PREREGISTRATION_D2.md` limit 10). It says whether the five agents that
->    burn less fuel than the baseline ECU are refusing torque.
-> 2. **Choose the next experiment — TEAM DECISION, and it gets its own
+> 1. **Choose the next experiment — TEAM DECISION, and it gets its own
 >    preregistration before anything trains.** The two candidates, measured:
 >    - **C4 — the training budget.** D2's design at 300 000 steps: about six
 >      times D2's training, so roughly 16 hours on this machine. It tests
@@ -2213,7 +2211,7 @@ not a result.
 >      units needs about 42 seeds per arm (`power_analysis.py`) — about five
 >      times D2's compute. It answers the power question without touching the
 >      budget question.
-> 3. **Write the ablation chapter — Phase D AND Phase D2.** Both findings kept
+> 2. **Write the ablation chapter — Phase D AND Phase D2.** Both findings kept
 >    separate (preview is INCONCLUSIVE; supervision beats `current-grade` on
 >    8 of 8 D2 seeds, blind agents included), each with the limits its
 >    preregistration declared before the numbers, and the failed spread

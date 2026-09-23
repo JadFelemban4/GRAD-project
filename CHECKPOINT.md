@@ -1673,3 +1673,110 @@ above are the detail; this is where to start.
   rescue. It was verified before being written and never reached a file, but it
   was said. The rule now in force: every finding goes into a tracked file before
   the turn ends, and a claim that flatters the result is the one to check hardest.
+
+
+## Session of 22–23 September 2026 — Phase D2: the minimum effect set, the climb randomised, the documents swept
+
+Commits `190be60` … (see `git log`), on `JMF-2340550-sep17`. Run from
+`NEXT_SESSION_2026-09-22.md`, all of it in one session, as the team decided.
+
+### The result
+
+**Phase D2 is INCONCLUSIVE, and so — under the same rule, labelled post-hoc — is
+Phase D.** The blind arm is now verifiably blind, and preview still does not
+separate from seed noise.
+
+```
+python analyse_phase_d2.py
+                     Phase D (post-hoc MEI)      Phase D2 (preregistered)
+blinded arm          not blind                   blind -- checked
+positive             5 of 8                      4 of 8
+mean (blind-sighted) +4.8                        +6.4 damage units
+preview helps        sign p 0.3633               sign p 0.6367
+below the MEI (50)   sign p 0.6367               sign p 0.1445  (6 of 8 under 50)
+sd of differences    214.4                       98.8
+cell                 INCONCLUSIVE                INCONCLUSIVE
+```
+
+- **Removing the memorisable road did not pull the arms apart.** Limit 7's
+  design flaw is not what hid a preview effect. Left standing: preview buys
+  little at this configuration, or C1 agents cannot learn to use it.
+- **The spread prediction FAILED.** The preregistration said randomising the
+  climb was "not expected" to shrink the seed spread; it fell to 46 % of Phase D's.
+  At D2's spread eight seeds have power 0.24 against 50 units; 80 % needs about
+  42 seeds per arm.
+- **Supervision, separately:** the sighted agent beats `current-grade` on 8 of 8
+  seeds (+2.3 to +28.8 points), and every blind agent does too.
+- **Limit 10, torque delivery:** `check_d2_tracking.py` — **no agent refuses torque.** 0 of 16 track torque
+  more than one point worse than the baseline ECU; every median is within 0.05
+  points of it. The five agents that burn less fuel than the baseline are not
+  buying it with torque. Worst single episodes do show tracking error — blind
+  seed 3 10.47 %, blind seed 5 5.33 %, current-grade 4.39 % — as episodes, not
+  as typical behaviour. Its damage column reproduces `evaluate.py`'s medians to
+  the decimal: the D2 evaluation is reproducible. So the D2 damage figures can
+  be read as protection.
+
+The full account is `results/PREREGISTRATION_D2.md` section 11; the captured
+output is `results/PHASE_D2_RESULT.txt`.
+
+### What the session set out to do, and did
+
+| step | state | where |
+|---|---|---|
+| 1 · minimum effect of interest | **set: 50 damage units** — by Jad, after being shown the power analysis | `results/PREREGISTRATION_D2.md` §5; `results/PREREGISTRATION.md` §5 (closed, marked post-hoc) |
+| 2 · preregistration | **committed `d8d05e2` before any D2 agent trained**, pinned to code `8e91276` | `results/PREREGISTRATION_D2.md` |
+| 3 · the randomised road | **built as a wrapper**; both gates pass | `random_road.py`, `check_random_road.py`, `test_reward.py --road random` |
+| 4 · train and evaluate | **16 runs, 8 evaluations** — see the run log | `runs_d2/`, `results/d2_seed*.txt`, prereg §6a |
+| 5–6 · the document sweep | **187 stale mentions → 0**; ledger emptied; guard 16/16 | commit `3f4627d` |
+| 7 · `generality_test.py` line 81 | **fixed**: the axis measures 118.1 g/s (was an assumed 112.5), τ 48.3 s | commit `b6b4ff5` |
+| 8 · the preregistered test | **INCONCLUSIVE** (4 of 8, sign p = 0.6367); Phase D beside it, also INCONCLUSIVE post-hoc — commit `52514f1` | `analyse_phase_d2.py` |
+| 9 · write it into the files | this entry; `CLAUDE.md`; `results/` | — |
+
+### What was found that nobody asked for
+
+| finding | where it lives |
+|---|---|
+| **Phase D was underpowered by design.** At its measured spread (sd 214.4), eight seeds have power 0.10 against 50 units and reach 80 % only near 269 — 28 % of baseline damage. Its null is as consistent with preview worth 100 units as with nothing | `power_analysis.py`; `PREREGISTRATION.md` §5 |
+| more seeds is not monotonically better for a sign test: ten need 9 of 10, stricter than eight's 7 of 8 | `power_analysis.py` |
+| **the flattery check on the late MEI was first written WRONG** ("every MEI gives INCONCLUSIVE"); computed, Phase D's label flips at MEI ≥ 87.2. 50 gives the weaker label | `PREREGISTRATION.md` §5 |
+| editing `engine_env.py` would have moved `plant_sha` and locked out all sixteen Phase D agents — so D2 is a wrapper and the environment is byte-identical | `random_road.py` docstring; `fingerprint.py` |
+| **the gearbox notch is at 13.73 % (+6.9 K), not 14.0 % (+12.7 K)** — between the design grid's points. All 121 grades still bind | `NEXT_EXPERIMENT_DESIGN.md` addendum |
+| the blind arm is now blind, measured: identical observations on every road until its climb arrives (150 s), sighted diverges 30 s earlier (120 s) | `check_random_road.py` B |
+| **at 16 % the reward barely punishes torque refusal** — the starver clears the gate by 0.006. Not retuned; declared | `PREREGISTRATION_D2.md` limit 10 |
+| the launcher computes its concurrency cap ONCE — a game holding 6.3 GB at launch pinned it at 1, which would have run all sixteen in sequence (~18 h). Relaunched twice, no run interrupted | `PREREGISTRATION_D2.md` §6a |
+| `verify_docs.py`'s premise pattern read the interquartile range on D2's baseline row as a contradiction of the premise figure, because it cannot read four-digit damage (1118.0). Scoped the two premise figures away from the D2 result files, by name | `verify_docs.py` |
+| `generality_test.py`'s "103 g/s, τ 7 % low" comment pointed the wrong way on today's scenario: measured 118.1 g/s, τ 48.3 s, agreeing with the step response | `generality_test.py` |
+| **commit `6e40cd8` changed "nine drives" to "ten" without re-measuring**, in mistake 14 and `app/alerts.py` | `CLAUDE.md` mistake 11 addendum |
+| **HTML-comment markers were invisible to the guard**, and marker explanations were read as figures | `verify_docs.py`; `CLAUDE.md` mistake 11 addendum |
+| **emptying the ledger silently removed the only catch for an edit of +11.7** — drift_test 16 → 14; restored as `PINNED_HISTORY` | `verify_docs.py`; `CLAUDE.md` mistake 11 addendum |
+| the deck argued the void result on ~70 lines, and its race widget printed the C3 claim as a conclusion | commit `3f4627d` |
+
+### Decisions taken, by whom
+
+| decision | by | recorded in |
+|---|---|---|
+| the minimum effect of interest is 50 damage units | **Jad** | `PREREGISTRATION_D2.md` §5 |
+| run D2 as planned — eight seeds, C1 — knowing it has power 0.10, and declare it | **Jad** | `PREREGISTRATION_D2.md` §4, §5a |
+| D2 as a wrapper, `engine_env.py` untouched | proposed, adopted | `random_road.py` |
+| the fix-3 guard findings go into mistake 11 as an addendum, not a new mistake 19 | proposed | `CLAUDE.md` |
+
+### Process failures in this session, stated
+
+- **Three numbers were written before they were checked**, and each was caught
+  before it was committed: "every MEI from 10 to 400 gives INCONCLUSIVE" (false
+  above 87.2); "18 blockers across 21 files" (13 and 19); and a round-2 agent's
+  "as of 14 September" (the sentence is from 16 September, commit `4905498`).
+  The rule from the last session held: check the claim before it lands.
+- Elapsed time was misjudged once (eight minutes read as forty-five) while
+  deciding whether a run was stalled. No consequence; the timestamps settled it.
+
+### Open, and the next session's to close
+
+1. **The next experiment — TEAM DECISION.** C4 (D2's design at 300 000 steps,
+   ~16 hours) tests the budget; ~42 seeds per arm at C1 (~5× D2's compute) tests
+   power. Either needs its own preregistration first. `CLAUDE.md`, live list.
+2. **The ablation chapter** — Phase D and D2, both findings kept separate, the
+   failed spread prediction stated.
+3. **Small, recorded:** `app/alerts.py` `VALID_MAP_HI` 74 in code against the
+   30–75 kPa span; the deck tabulates 13 of 18 mistakes; `run_phase_d.py`'s
+   one-shot concurrency cap.

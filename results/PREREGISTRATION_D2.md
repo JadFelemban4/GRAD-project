@@ -433,9 +433,13 @@ No run was re-run, added or dropped. `python analyse_phase_d2.py`:
 baseline ECU's fuel on these episodes (seed 0 blind; seeds 2 and 5, both arms),
 which is the shape the lever limit 10 named would take. `check_d2_tracking.py`
 measures each agent's torque delivery against the baseline's on the same
-episodes; its result is recorded in `CHECKPOINT.md`'s entry for this session
-and in `results/README.md`. **No D2 damage figure is to be quoted as
-protection until that check is read.**
+episodes. **Read, 23 September: no agent refuses torque.** 0 of 16 track torque
+more than one point worse than the baseline ECU (every median within 0.05
+points); fuel below the baseline is not bought with torque. Worst single
+episodes: blind seed 3 at 10.47 %, blind seed 5 at 5.33 %, current-grade at
+4.39 % — episodes, not typical behaviour. Its damage column reproduces
+`evaluate.py`'s medians to the decimal. The D2 damage figures can be read as
+protection.
 
 ---
 

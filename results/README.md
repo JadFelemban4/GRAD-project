@@ -36,9 +36,10 @@ identical on every road until its climb arrives.
   agent beats `current-grade` on 8 of 8 seeds (+2.3 to +28.8 points), and so
   does every blind agent — the gain over the hand-written comparator does not
   need the preview channel.
-- **Before quoting any D2 damage figure as protection,** read
-  `check_d2_tracking.py` (`PREREGISTRATION_D2.md` limit 10): five agents burn
-  less fuel than the baseline ECU, which is what refusing torque would look like.
+- **Torque delivery, checked (`check_d2_tracking.py`, limit 10):** five agents
+  burn less fuel than the baseline ECU, which is what refusing torque would look
+  like — and none of them is refusing it. 0 of 16 track torque more than one
+  point worse than the baseline. The D2 damage figures read as protection.
 
 Full account, with every limit: `PREREGISTRATION_D2.md` section 11.
 

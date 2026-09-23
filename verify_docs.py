@@ -967,7 +967,7 @@ def _known_stale(rel, label, key=None, value=None):
 PINNED_HISTORY = [
     (r"(?<![\d.])11\.7(?!\d)(?!\s*K\b)",
      "the void +11.7 Phase D margin (C2-1) -- not the +11.7 K sensor offset",
-     {"results/README.md": 2, "CHECKPOINT.md": 7,
+     {"results/README.md": 2, "CHECKPOINT.md": 8,
       "DOC/SESSION_REPORT_2026-09-18.md": 7, "CLAUDE.md": 3}),
 ]
 _MARKER_TEXT = re.compile(r"RETIRED-OK[^\n]*?(?:-->|\*/|$)")
