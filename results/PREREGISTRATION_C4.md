@@ -366,6 +366,32 @@ As `PREREGISTRATION_D2.md` section 6, without exception, plus the crash rule:
 *(Empty at commit. Filled during the run, as section 6 requires; its first
 entry is the dry-run of section 9, step 0.)*
 
+**23 September 2026, 16:42 +03:00 — launched from `79568e2`, the commit that
+added this file, on a clean tree.** Section 9, step 0, immediately before:
+
+```
+python run_phase_d.py --road random --steps 300000 --out runs_c4 --dry-run   EXIT 0
+16 runs, 300,000 steps each to launch
+  tree     clean at 79568e2
+  12 cores, 21.3 GB free  ->  10 at a time
+```
+
+- The launcher was started at 16:42:50 as a process of its own (through
+  Windows WMI, not as a child of the Claude session), so that closing the
+  session or the editor cannot stop the experiment. Its output is
+  `runs_c4/launcher_train.log`; its launches are in `runs_c4/LAUNCH.txt`.
+- First wave: **10 runs**, seeds 0–4, both arms. Seeds 5–7 queued (6 runs),
+  started as first-wave runs finish.
+- Every first-wave `meta.json`, read a minute after launch: `steps_requested`
+  300 000, `git_dirty` False, `git_head` 79568e2, `resume_allowed` False, a
+  live `RUNNING` mark. No 6a entry was written until all ten existed.
+- **Peak memory per run: 1519 MB**, measured on all ten — the launcher's
+  `PEAK_GB` of 1.5 still holds with a 300 000-slot buffer. 8.1 GB free with
+  the ten running.
+- Known exposure, stated: Windows Update was not confirmed paused. Its active
+  hours end at 03:00, and a restart after that would stop every live run. By
+  section 6 that is a crash, re-run from scratch per seed.
+
 ## 7. Stopping rule
 
 Sixteen runs, then stop. **No seed is added after any C4 result is seen**, and

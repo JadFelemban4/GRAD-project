@@ -2213,6 +2213,19 @@ not a result.
 
 ## What to do next, in order
 
+> **C4 IS PREREGISTERED AND RUNNING — 23 September 2026, 16:42.**
+> `results/PREREGISTRATION_C4.md`, committed `79568e2` before any C4 agent
+> trained, pinning the code at `a1af19a`. Sixteen runs of D2's design at
+> 300 000 steps into `runs_c4/`, ten at a time, launcher detached from the
+> session. The three traps that could have destroyed Phase D's and D2's
+> agents are closed (`f987049`; `train.py` "A RESUME IS NOT A LONGER RUN").
+> **While it runs:** `python check_c4_start.py` (identity with D2, certificates);
+> a crash is re-run FROM SCRATCH with `--seeds <k> --restart-crashed`, never
+> resumed; **do not edit tracked files while a wave is starting** -- the
+> launcher holds its queue while the tree is dirty. The order after training is
+> section 9 of the preregistration: identity + convergence committed, THEN
+> evaluate, THEN tracking, THEN `python analyse_c4.py`.
+
 > **THE LIVE LIST — 23 September 2026, after Phase D2.** Both ablations are in
 > and both are INCONCLUSIVE at the C1 budget. Everything in the older list below
 > is done (the MEI is set; the document sweep landed in `3f4627d`).

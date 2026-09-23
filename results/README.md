@@ -1,4 +1,17 @@
-# `results/` — Phase D and Phase D2
+# `results/` — Phase D, Phase D2 and C4
+
+## C4 — D2's design at 300 000 steps: PREREGISTERED, RUNNING (23 September 2026)
+
+`PREREGISTRATION_C4.md`, committed `79568e2` before any C4 agent trained. C4
+changes ONE variable from D2 — the training budget, 50 000 → 300 000 steps —
+by the team's rule: one variable at a time. What each outcome will mean is
+declared in its section 2a; convergence is judged by a rule fixed in 5b and
+calibrated on D2's agents (`c4_convergence_calibration.txt`); section 5c
+tests whether the budget changed preview's effect. **No C4 result exists yet.**
+
+```bash
+python analyse_c4.py            # after training -- see PREREGISTRATION_C4.md section 9
+```
 
 ## Phase D2 — the same ablation, with a blind arm that is blind: INCONCLUSIVE
 
