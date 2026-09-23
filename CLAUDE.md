@@ -61,7 +61,42 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
-## Current state — 22 September 2026 (after Phase D, which returned a NULL)
+## Current state — 23 September 2026 (after Phase D2, which is INCONCLUSIVE)
+
+> **PHASE D2 HAS RUN, AND IT REMOVES PHASE D'S WORST LIMIT WITHOUT CHANGING THE
+> ANSWER.** Phase D's blinded arm could memorise one fixed road (limit 7 below).
+> D2 re-ran the same ablation on a **randomised climb** — start 120–300 s, grade
+> 12–16 %, drawn per episode — under `results/PREREGISTRATION_D2.md`, committed
+> before any D2 agent trained, with the **minimum effect of interest set in
+> advance at 50 damage units** (Jad, 22 Sep). `check_random_road.py` verified the
+> blind arm is blind: identical observations on every road until its climb comes.
+>
+> ```
+> Phase D2   positive 4 of 8   mean +6.4   sign p = 0.6367   perm p = 0.4688
+>            below the MEI: sign p = 0.1445 (6 of 8 seeds under 50)   -> INCONCLUSIVE
+>            sd of the paired differences 98.8   (Phase D: 214.4)
+> ```
+>
+> - **Removing the memorisable road did not pull the arms apart**, so the design
+>   flaw is not what hid a preview effect. Left: preview buys little here, or C1
+>   agents cannot learn to use it. **INCONCLUSIVE, not "preview does not help"**:
+>   eight seeds have power 0.24 against 50 units (`python power_analysis.py`).
+> - **The spread halved, and the preregistration predicted it would not.** Say so.
+>   It means 80 % power against 50 units now needs ~42 seeds per arm, not 186.
+> - **Supervision, the separate claim:** the sighted agent beats `current-grade`
+>   on 8 of 8 seeds (+2.3 to +28.8 points), and so does every BLIND agent — the
+>   gain over the hand-written comparator does not need the preview channel.
+> - **Limit 10 before quoting any D2 damage figure:** five agents burn less fuel
+>   than the baseline ECU. `python check_d2_tracking.py` measures whether that is
+>   torque refusal. Read it first.
+> - Phase D's null is ALSO INCONCLUSIVE under the MEI rule — labelled post-hoc,
+>   because its MEI was set after its result.
+>
+> Reproduce: `python analyse_phase_d2.py` (both experiments, side by side). The
+> full account: `results/PREREGISTRATION_D2.md` section 11, and `CHECKPOINT.md`,
+> session of 22–23 September.
+
+### Phase D, 21–22 September — the box below is Phase D's own, kept as written
 
 > **PHASE D HAS RUN AND THE PROJECT HAS ITS RESULT. It is a null, and a null is
 > a result.** Sixteen agents — eight seeds per arm, sighted and blinded — were
@@ -115,12 +150,14 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 > Reproduce in seconds: `python analyse_phase_d.py`.
 > The full account is `CHECKPOINT.md`, entry of 21–22 September.
 
+### Where every phase stands — current, 23 September
+
 | Phase | Status |
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.839), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
 | C · get an agent to learn | **C1 done, C4 NOT done.** Sixteen agents trained on the ZF plant, seeds 0–7 both arms, each carrying a `meta.json` plant fingerprint. All sixteen curves improve. But **50 000 steps is what `train.py` itself calls "C1: the first bad run"** — 11 training episodes — against **300 000 for "C4: a real run"**. *(This row said "**next**, nothing has been trained yet" until 22 September, then briefly said "done", which was too generous: C1 is not C4 and the difference is load-bearing for Phase D's null — see `PREREGISTRATION.md` limit 6.)* |
-| D · baselines and the ablation | **done, and the answer is a NULL.** Preview not significant (p = 0.36 sign, p = 0.49 permutation); the agent beats `current-grade` by +29 to +34 points on five of eight seeds. Preregistered before training. **One line outstanding: the minimum effect of interest is still TEAM DECISION**, and until it is set a null cannot be told apart from an underpowered study. *(This row said "not started. This is the floor of the project" until 22 September — the floor is now in.)* |
+| D · baselines and the ablation | **done, twice, and both are INCONCLUSIVE.** Phase D: preview not significant (p = 0.36 sign, p = 0.49 permutation); the agent beats `current-grade` by +29 to +34 points on five of eight seeds. **Phase D2** (randomised climb, blind arm verified blind, MEI 50 set in advance): p = 0.6367 sign, 4 of 8 seeds, INCONCLUSIVE; supervision beats `current-grade` on 8 of 8. The minimum effect of interest is SET: 50 damage units (22 Sep; after Phase D's result, before D2's). *(This row said "not started. This is the floor of the project" until 22 September — the floor is now in.)* |
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary result only, from hand-written policies |
 | G · writing | not started |
@@ -2158,6 +2195,37 @@ not a result.
 ---
 
 ## What to do next, in order
+
+> **THE LIVE LIST — 23 September 2026, after Phase D2.** Both ablations are in
+> and both are INCONCLUSIVE at the C1 budget. Everything in the older list below
+> is done (the MEI is set; the document sweep landed in `3f4627d`).
+>
+> 1. **Read `python check_d2_tracking.py` before quoting any D2 damage figure**
+>    (`PREREGISTRATION_D2.md` limit 10). It says whether the five agents that
+>    burn less fuel than the baseline ECU are refusing torque.
+> 2. **Choose the next experiment — TEAM DECISION, and it gets its own
+>    preregistration before anything trains.** The two candidates, measured:
+>    - **C4 — the training budget.** D2's design at 300 000 steps: about six
+>      times D2's training, so roughly 16 hours on this machine. It tests
+>      explanation (ii) directly. Whether convergence shrinks the spread is a
+>      prediction to CHECK, not assume — the last spread prediction was wrong.
+>    - **More seeds at C1.** At D2's measured spread, 80 % power against 50
+>      units needs about 42 seeds per arm (`power_analysis.py`) — about five
+>      times D2's compute. It answers the power question without touching the
+>      budget question.
+> 3. **Write the ablation chapter — Phase D AND Phase D2.** Both findings kept
+>    separate (preview is INCONCLUSIVE; supervision beats `current-grade` on
+>    8 of 8 D2 seeds, blind agents included), each with the limits its
+>    preregistration declared before the numbers, and the failed spread
+>    prediction stated plainly.
+>
+> Smaller, and recorded rather than urgent: `app/alerts.py`'s `VALID_MAP_HI` is
+> 74 kPa in code against the 30–75 kPa span (an app threshold moves only for a
+> measurement); the deck tabulates 13 of the 18 mistakes; `run_phase_d.py`
+> computes its concurrency cap once, so a transient at launch pins it
+> (`PREREGISTRATION_D2.md` §6a).
+>
+> **DO NOT add seeds to D2** — its section 7, same rule as Phase D.
 
 > **THIS LIST WAS THE ROUTE TO PHASE D AND PHASE D IS DONE.** Steps 1–5 below
 > were followed on 21–22 September and are kept as the record of how, not as

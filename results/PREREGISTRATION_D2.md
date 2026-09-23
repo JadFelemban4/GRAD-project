@@ -371,6 +371,74 @@ agents' fuel or tracking figures look unlike Phase D's.
 
 ---
 
+## 11. Outcome — ADDED 23 September 2026, AFTER THE RESULT
+
+Everything above this line was committed before any D2 agent trained
+(`d8d05e2`, `99bd3fe`) except the run log in section 6a, which records
+operations and no results. This section is the result, and it is marked as
+coming after, the same way `PREREGISTRATION.md` marks its post-result limits.
+
+**All sixteen runs trained cleanly** — 11 episodes each, 71–81 minutes — and all
+eight evaluations were accepted by the fingerprint (`scenario` random-climb,
+episodes `1c5d49852290d27c`, `plant_sha` `b5a3069f32a83754`, `git_dirty` False).
+No run was re-run, added or dropped. `python analyse_phase_d2.py`:
+
+| seed | baseline | current-grade | sighted | blinded | blind − sighted |
+|---|---|---|---|---|---|
+| 0 | 1118.0 | 653.5 | 353.5 | 575.2 | +221.7 |
+| 1 | 1118.0 | 653.5 | 485.7 | 411.3 | −74.4 |
+| 2 | 1118.0 | 653.5 | 627.8 | 624.1 | −3.7 |
+| 3 | 1118.0 | 653.5 | 331.4 | 332.3 | +0.9 |
+| 4 | 1118.0 | 653.5 | 357.3 | 407.8 | +50.5 |
+| 5 | 1118.0 | 653.5 | 587.1 | 520.0 | −67.1 |
+| 6 | 1118.0 | 653.5 | 442.8 | 359.9 | −82.9 |
+| 7 | 1118.0 | 653.5 | 400.6 | 406.8 | +6.2 |
+
+| | |
+|---|---|
+| positive (preview helped) | **4 of 8** |
+| mean difference | **+6.4 damage units** |
+| H1 preview helps — sign / permutation | **p = 0.6367 / 0.4688** |
+| H1 effect below the MEI (50) — sign / permutation | **p = 0.1445 / 0.1250** (6 of 8 seeds below 50) |
+| **cell** | **INCONCLUSIVE** |
+
+**What that says, in the order section 2 declared it would be read:**
+
+1. **The arms still do not separate, with a blinded arm that is now verifiably
+   blind.** Explanation (iv) of `PREREGISTRATION.md` limit 7 — that a thermal
+   clock on a memorised road let the blind agents anticipate — is therefore not
+   what kept Phase D's arms together: removing it did not pull them apart. The
+   remaining candidates are (i) preview genuinely buys little here and (ii) the
+   C1 budget. **This is still not "preview does not help"**: the cell is
+   INCONCLUSIVE, and section 5a predicted it.
+2. **The prediction about the spread FAILED.** Section 5a said randomising the
+   climb was "not expected" to shrink the seed-to-seed spread. It fell from
+   **214.4 to 98.8** — to 46 % of Phase D's. The cause is not established; one
+   untested candidate is that Phase D's largest swings came from blind agents
+   that did or did not memorise the fixed road. At D2's spread, eight seeds have
+   power **0.24** against the MEI (it was 0.10), and 80 % power needs about
+   **42 seeds per arm** (`python power_analysis.py`, the D2 section). Those
+   numbers plan the next experiment; they do not change this one.
+3. **Learned supervision, the SEPARATE claim, is cleaner than in Phase D.** The
+   sighted agent beats `current-grade` on **8 of 8 seeds, by +2.3 to +28.8
+   points**; and **every blind agent beats it too** (blinded damage 332–624
+   against current-grade's 653.5). So what the agents gain over the hand-written
+   comparator does not depend on the preview channel. That is the C3 separation
+   measured, not argued.
+4. **Baseline damage is higher on D2's roads** — 1118.0 against Phase D's
+   959.8 — because the grades run to 16 %. Compare cuts-versus-baseline across
+   the two experiments only with that beside them.
+
+**Limit 10 — torque delivery.** Five of the sixteen agents median BELOW the
+baseline ECU's fuel on these episodes (seed 0 blind; seeds 2 and 5, both arms),
+which is the shape the lever limit 10 named would take. `check_d2_tracking.py`
+measures each agent's torque delivery against the baseline's on the same
+episodes; its result is recorded in `CHECKPOINT.md`'s entry for this session
+and in `results/README.md`. **No D2 damage figure is to be quoted as
+protection until that check is read.**
+
+---
+
 ## Signed off
 
 | | |

@@ -1253,6 +1253,17 @@ def check_scenario(here):
     import check_premise as CP
     _t0 = _time.time()
     r = CP.rollout(CP.p_neutral)
+    # THE PREMISE FIGURES DESCRIBE THE LOCKED SCENARIO, and Phase D2's result
+    # files record a DIFFERENT one -- a randomised 12-16 % climb, on which the
+    # baseline ECU's median damage is 1118.0, not 959.8. The "baseline <3 digits
+    # .1 digit>" pattern cannot read 1118.0 (four digits) and so landed on the
+    # next number on that row -- the IQR, 715.9 -- and reported eight false
+    # contradictions on 23 September 2026. The pattern is right for every
+    # document that talks about the locked scenario; these files do not, so
+    # they are taken out of THESE TWO figures only, by name. Every other check
+    # still reads them.
+    PREMISE_FILES = [f for f in ALL
+                     if not re.match(r"results/d2_seed\d+\.txt$", f)]
     print(f"  note   one neutral premise rollout, {_time.time() - _t0:.0f} s")
     figure("check_premise baseline damage", round(float(r["damage"]), 1), 959.8, 0.3,
            # THREE DIGITS AND ONE DECIMAL. Every damage figure this project has
@@ -1271,7 +1282,7 @@ def check_scenario(here):
                      r"^[>\s]*\|[^|\n]*baseline[^|\n]*\|[^|\n]*\|\s*\*{0,2}"
                      r"(\d{3}\.\d)\s*\*{0,2}\s*\|",
                      r"^[>\s]*baseline[^|\n]{0,40}?\s(\d{3}\.\d)\s"],
-           files=ALL, dtol=0.3)
+           files=PREMISE_FILES, dtol=0.3)
     figure("check_premise baseline peak turbine",
            round(float(r["peak_turb"])), 884, 0.6, " C",
            # ANY "baseline <damage> at <peak> C" sentence, not just one that
@@ -1286,7 +1297,7 @@ def check_scenario(here):
                      # the pipe-table form, as the README writes it
                      r"^[>\s]*\|[^|\n]*baseline[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*\*{0,2}"
                      + NUM + r"\s*\*{0,2}\s*°?\s*C\s*\*{0,2}\s*\|"],
-           files=ALL, dtol=0.6)
+           files=PREMISE_FILES, dtol=0.6)
     binds = float(r["peak_turb"]) > float(E.TURB_PROTECT_K) - 273.15
     chk("the constraint BINDS on the locked scenario", binds, True)
 

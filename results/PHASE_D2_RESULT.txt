@@ -1,0 +1,101 @@
+==============================================================================
+PHASE D2 -- the preregistered test, randomised climb
+results/PREREGISTRATION_D2.md, committed before any D2 agent was trained
+==============================================================================
+
+ seed   baseline  curr-grade   sighted   blinded  blind-sighted
+------------------------------------------------------------------------------
+    0     1118.0       653.5     353.5     575.2         +221.7
+    1     1118.0       653.5     485.7     411.3          -74.4
+    2     1118.0       653.5     627.8     624.1           -3.7
+    3     1118.0       653.5     331.4     332.3           +0.9
+    4     1118.0       653.5     357.3     407.8          +50.5
+    5     1118.0       653.5     587.1     520.0          -67.1
+    6     1118.0       653.5     442.8     359.9          -82.9
+    7     1118.0       653.5     400.6     406.8           +6.2
+------------------------------------------------------------------------------
+paired differences (blind - sighted), n = 8
+  positive (preview helped) : 4 of 8
+  mean difference           : +6.4 damage units
+  sd of the differences     : 98.8 damage units   (Phase D: 214.4 -- power_analysis.py)
+
+  H1: preview helps (difference > 0)
+    exact one-sided sign test        p = 0.6367
+    exact paired permutation test    p = 0.4688   (sensitivity)
+  H1: the effect is smaller than the MEI (50 units)
+    exact one-sided sign test        p = 0.1445   (6 of 8 seeds below 50)
+    exact paired permutation test    p = 0.1250   (sensitivity)
+  alpha 0.05, one-sided, both questions
+
+  RESULT: INCONCLUSIVE
+  This experiment cannot tell 'no effect' from 'an effect the team
+  would care about'. It is a statement about the experiment's
+  size, not a statement that preview does nothing.
+  power_analysis.py predicted this cell BEFORE this experiment
+  ran, from Phase D's measured spread.
+
+==============================================================================
+PHASE D, REPORTED BESIDE IT -- the preregistration requires both
+==============================================================================
+
+ seed   baseline  curr-grade   sighted   blinded  blind-sighted
+------------------------------------------------------------------------------
+    0      959.8       633.2     340.5     350.3           +9.8
+    1      959.8       633.2     354.0     348.2           -5.8
+    2      959.8       633.2     308.2     376.8          +68.6
+    3      959.8       633.2     302.5     689.7         +387.2
+    4      959.8       633.2     639.5     367.8         -271.7
+    5      959.8       633.2     525.7     237.5         -288.2
+    6      959.8       633.2     498.5     549.5          +51.0
+    7      959.8       633.2     331.5     418.6          +87.1
+------------------------------------------------------------------------------
+paired differences (blind - sighted), n = 8
+  positive (preview helped) : 5 of 8
+  mean difference           : +4.8 damage units
+  sd of the differences     : 214.4 damage units   (Phase D: 214.4 -- power_analysis.py)
+
+  H1: preview helps (difference > 0)
+    exact one-sided sign test        p = 0.3633
+    exact paired permutation test    p = 0.4922   (sensitivity)
+  H1: the effect is smaller than the MEI (50 units)
+    exact one-sided sign test        p = 0.6367   (4 of 8 seeds below 50)
+    exact paired permutation test    p = 0.2578   (sensitivity)
+  alpha 0.05, one-sided, both questions
+
+  RESULT: INCONCLUSIVE   [MEI set AFTER this result -- see below]
+  This experiment cannot tell 'no effect' from 'an effect the team
+  would care about'. It is a statement about the experiment's
+  size, not a statement that preview does nothing.
+  power_analysis.py explains it -- but was written after this
+  result, so it is an explanation, not a prediction.
+
+  Phase D's primary test is unaffected: its verdict was 'not
+  significant' and still is. The MEI was set on 22 September,
+  AFTER Phase D's result was known, so Phase D's classification
+  under the MEI rule is a POST-HOC reading and is labelled so.
+  results/PREREGISTRATION.md section 5 records the ordering.
+
+==============================================================================
+THE TWO EXPERIMENTS, ONE LINE EACH
+==============================================================================
+  Phase D   fixed climb       blinded arm NOT blind (limit 7)   INCONCLUSIVE
+  Phase D2  randomised climb  blinded arm blind (checked, B)    INCONCLUSIVE
+  (B = check_random_road.py part B: before its climb arrives, the
+  blind agent's observations are identical on every road.)
+
+  Both are C1 agents -- 50 000 steps, 11 training episodes each,
+  which train.py calls 'the first bad run'. A null from either says
+  'with agents trained to the C1 budget', never 'preview does not
+  help'. The next suspect after the design flaw is the budget (C4).
+
+  Preview must beat CURRENT-GRADE, not the baseline ECU. Per D2 seed:
+    seed 0: agent over current-grade  +26.8 points
+    seed 1: agent over current-grade  +15.0 points
+    seed 2: agent over current-grade   +2.3 points
+    seed 3: agent over current-grade  +28.8 points
+    seed 4: agent over current-grade  +26.5 points
+    seed 5: agent over current-grade   +5.9 points
+    seed 6: agent over current-grade  +18.8 points
+    seed 7: agent over current-grade  +22.6 points
+  That is learned SUPERVISION, a separate claim from preview
+  (AUDIT.md C3). Do not read one as evidence for the other.

@@ -1,4 +1,50 @@
-# `results/` — Phase D
+# `results/` — Phase D and Phase D2
+
+## Phase D2 — the same ablation, with a blind arm that is blind: INCONCLUSIVE
+
+```bash
+python analyse_phase_d2.py      # D2's preregistered test, Phase D beside it
+```
+
+Phase D's null had a design flaw: its blinded arm could memorise one fixed road
+(`PREREGISTRATION.md` limit 7). **Phase D2 re-ran the ablation on a randomised
+climb** — start 120–300 s, grade 12–16 %, drawn per episode — under
+`PREREGISTRATION_D2.md`, committed before any D2 agent trained, with the
+minimum effect of interest set in advance at **50 damage units**.
+`check_random_road.py` verified the blind arm is blind: its observations are
+identical on every road until its climb arrives.
+
+| | Phase D | **Phase D2** |
+|---|---|---|
+| blinded arm | not blind (a memorisable road) | **blind — checked** |
+| seeds where preview helped | 5 of 8 | **4 of 8** |
+| mean effect (blind − sighted) | +4.8 | **+6.4** damage units |
+| preview helps — sign p | 0.3633 | **0.6367** |
+| effect below the MEI — sign p | 0.6367 (post-hoc) | **0.1445** (6 of 8 below 50) |
+| sd of the paired differences | 214.4 | **98.8** |
+| **cell** | INCONCLUSIVE (post-hoc) | **INCONCLUSIVE** |
+
+- **Removing the memorisable road did not pull the arms apart.** The design
+  flaw is not what hid a preview effect in Phase D. What remains: preview buys
+  little at this configuration, or C1 agents (50 000 steps, 11 episodes) cannot
+  learn to use it. **INCONCLUSIVE is not "preview does not help"** — at eight
+  seeds this experiment has power 0.24 against 50 units.
+- **The spread halved, against the preregistered prediction.** `power_analysis.py`
+  prints what that buys: 80 % power against 50 units now needs about 42 seeds
+  per arm, down from 186. That plans the next experiment.
+- **Supervision, a separate claim, is cleaner than in Phase D:** the sighted
+  agent beats `current-grade` on 8 of 8 seeds (+2.3 to +28.8 points), and so
+  does every blind agent — the gain over the hand-written comparator does not
+  need the preview channel.
+- **Before quoting any D2 damage figure as protection,** read
+  `check_d2_tracking.py` (`PREREGISTRATION_D2.md` limit 10): five agents burn
+  less fuel than the baseline ECU, which is what refusing torque would look like.
+
+Full account, with every limit: `PREREGISTRATION_D2.md` section 11.
+
+---
+
+# Phase D
 
 **Phase D has run. The result is a NULL, and a null is a result.**
 
@@ -149,7 +195,8 @@ question an examiner will ask.
 | file | what it is |
 |---|---|
 | `PREREGISTRATION.md` | the rules, committed before any agent trained. Section 6a logs two failed launches and their causes |
-| `PREREGISTRATION_D2.md` | Phase D2's rules — the same ablation on a randomised climb — committed before any D2 agent trained. No D2 result yet |
+| `PREREGISTRATION_D2.md` | Phase D2's rules — the same ablation on a randomised climb — committed before any D2 agent trained. Its section 11 is the outcome, marked as added after the result |
+| `d2_seed0.txt` … `seed7.txt` | one D2 evaluation per seed, each with the D2 plant fingerprint (`scenario` random-climb, episodes `1c5d49852290d27c`) |
 | `NEXT_EXPERIMENT_DESIGN.md` | the design record D2's preregistration was written from. Not itself a preregistration |
 | `phase_d_seed0.txt` … `seed7.txt` | one evaluation per seed, each opening with the **plant fingerprint** of the tree that produced it |
 | `PHASE_D_RESULT.txt` | the output of `analyse_phase_d.py`, captured |
@@ -162,6 +209,19 @@ question an examiner will ask.
 python run_phase_d.py                 # 16 runs, memory-capped, ~1 h
 python run_phase_d.py --evaluate      # 8 evaluations, ~2.5 h
 python analyse_phase_d.py             # the preregistered test
+```
+
+Phase D2, the same launcher with the road randomised (into `runs_d2/`, never
+`runs/`; `runs_d2/LAUNCH.txt` and `PREREGISTRATION_D2.md` §6a log two
+relaunches, neither of which interrupted a run):
+
+```bash
+python check_random_road.py                  # gate: every road binds, blind arm blind
+python test_reward.py --road random          # gate: the reward on the D2 corners
+python run_phase_d.py --road random          # 16 runs
+python run_phase_d.py --road random --evaluate
+python analyse_phase_d2.py                   # the preregistered test, both experiments
+python check_d2_tracking.py                  # limit 10: torque delivery per agent
 ```
 
 `evaluate.py` writes the plant fingerprint into every result file and **refuses

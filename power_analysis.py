@@ -274,6 +274,8 @@ def main():
               f"{100 * mei / BASELINE_DAMAGE:4.1f} % of baseline): "
               f"power at 8 seeds {pw:.2f}; {tail}")
 
+    report_d2(unit)
+
     print("\nTHE SENTENCE THIS SCRIPT EXISTS TO MAKE SAYABLE")
     d80 = delta_for_power(0.80, sd, SEEDS)
     print(f"  With eight seeds and the seed-to-seed spread Phase D measured,")
@@ -286,6 +288,47 @@ def main():
     print("  evaluation episodes, which do not touch seed-to-seed variance.")
     print("=" * 78)
     return 0
+
+
+def report_d2(unit):
+    """Phase D2's measured spread, and the prediction it checks.
+
+    Added 23 September 2026, after D2's result. `PREREGISTRATION_D2.md`
+    section 5a predicted, before the run, that the seed-to-seed spread would
+    NOT shrink when the climb was randomised -- "randomising the climb is not
+    expected to either". This section is where that prediction is checked, and
+    it FAILED: the spread roughly halved. Read from the result files, not
+    typed, so it cannot drift from what analyse_phase_d2.py tests.
+    """
+    try:
+        from analyse_phase_d2 import load
+        rows, _ = load("d2")
+    except Exception:            # noqa: BLE001 -- the section is optional
+        rows = []
+    print("\nPHASE D2, MEASURED -- the pre-run prediction about the spread, checked")
+    if len(rows) < 2:
+        print("  no complete results/d2_seed*.txt yet")
+        return
+    diffs = [r[2] for r in rows]
+    sd = stdev(diffs)
+    base = sd_d = stdev(PHASE_D_DIFFS)
+    print(f"  paired differences (blind - sighted), n = {len(diffs)}")
+    print(f"    {'  '.join(f'{d:+.1f}' for d in diffs)}")
+    print(f"  mean {mean(diffs):+.1f}   sd {sd:.1f}   (Phase D: sd {base:.1f})")
+    print(f"  PREDICTED before the run: the spread would not shrink.")
+    print(f"  MEASURED: it fell to {100 * sd / sd_d:.0f} % of Phase D's. The prediction was wrong.")
+    print("  Why is not established. One candidate, NOT tested: Phase D's largest")
+    print("  swings came from blind agents that did or did not memorise the fixed")
+    print("  road, and randomising the road removed that source of variance.")
+    print(f"\n  at D2's spread, against the MEI (50 units):")
+    print(f"    power at 8 seeds                  {power(50.0, sd, 8):.2f}"
+          f"   (Phase D's spread: {power(50.0, sd_d, 8):.2f})")
+    d80 = delta_for_power(0.80, sd, 8)
+    print(f"    effect with 80 % power, 8 seeds   {d80:.0f} units ({d80 / unit:.1f} pts)")
+    need = seeds_for(50.0, sd)
+    print(f"    seeds per arm for 80 % power      {need if need else 'over 400'}")
+    print("    (these plan the NEXT experiment; they change nothing about D2's")
+    print("    preregistered result, which stands as analyse_phase_d2.py prints it)")
 
 
 if __name__ == "__main__":
