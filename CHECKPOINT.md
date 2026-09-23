@@ -1793,3 +1793,83 @@ output is `results/PHASE_D2_RESULT.txt`.
 3. **Small, recorded:** `app/alerts.py` `VALID_MAP_HI` 74 in code against the
    30–75 kPa span; the deck tabulates 13 of 18 mistakes; `run_phase_d.py`'s
    one-shot concurrency cap.
+
+## Session of 23 September 2026 — C4: the traps closed, preregistered, running
+
+Commits `f987049` … `87ee394` on `JMF-2340550-sep17`, run from
+`NEXT_SESSION_2026-09-23.md`. **C4 is TRAINING at the time of this entry** —
+launched 16:42, sixteen runs, ten at a time; no C4 result exists.
+
+### The state in one paragraph
+
+C4 is Phase D2's design at 300 000 steps per run — ONE variable changed, the
+training budget, by Jad's rule (one at a time; more seeds only later, never
+both). It was preregistered in `results/PREREGISTRATION_C4.md` (`79568e2`)
+before any of its sixteen agents trained, pinning the code at `a1af19a`. At
+17:00 all ten first-wave runs were **bit-identical to their D2 twins at
+10 000 steps** (`check_c4_start.py`, 10 of 10) — C4 is, so far, D2's agents
+trained longer.
+
+### What the session set out to do, and did
+
+| step | state | where |
+|---|---|---|
+| 1 · disarm the three traps | **done, and hardened twice by review** — see below | `f987049`; `train.py` "A RESUME IS NOT A LONGER RUN"; `run_phase_d.py` docstring |
+| 2 · preregister C4 before training | **done** — `79568e2`, after two adversarial reviews and a calibration | `results/PREREGISTRATION_C4.md` |
+| 3 · launch | **running** since 16:42 from a clean tree; launcher detached from the session (WMI) | section 6a; `runs_c4/launcher_train.log` |
+| 4 · the ablation chapter | **drafted and reviewed** | `thesis/CHAPTER4_ABLATION_DRAFT.md` (`87ee394`) |
+| 5 · the C4 test | **waiting on training** — expected ~07:00 on 24 Sep | `PREREGISTRATION_C4.md` section 9 |
+
+### What was found that nobody asked for
+
+| finding | where it lives |
+|---|---|
+| **a finished run with only `checkpoint.zip` left resumed "at 0 steps" and trained over itself** — the step count came from the file NAME. Older than C4; closed by reading it from the zip | `train.py`; `fingerprint.model_budget` |
+| **the first crash-rule fix would have moved LIVE runs** — a live run and a crashed one look identical on disk. Closed with a `RUNNING` mark, a 30-min quiet check and a required `--seeds` | `fingerprint.running_pid`; `run_phase_d.py` |
+| `--steps 300000` with a forgotten `--out` would have extended D2 with new seeds, which its pinned analysis globs in; `runs/` and `runs_d2/` are now CLOSED | `train.py`, `run_phase_d.py` |
+| the draft preregistration read a C4 separation as proof the budget mattered; D2 was INCONCLUSIVE, not a shown absence. A paired budget-change test was added (5c) | `PREREGISTRATION_C4.md` 2a, 5c |
+| the convergence rule's noise floor, measured: one gradient step moves an agent's practice damage by max 7.9 units, a pair by max 8.5 — against a 25-unit band. D2's C1 agents moved a median 118.2 between 30k and 50k (15 of 16 beyond the band) | `results/c4_convergence_calibration.txt` |
+| a fresh 300 000-step run on today's tree reproduces D2's agent bit for bit at 10 000 steps — then confirmed for all ten first-wave runs | `PREREGISTRATION_C4.md` 3a, 6a |
+| `power_analysis.py` still said randomising the climb does NOT shrink the spread, after D2 measured that it did; and asserted convergence would | `power_analysis.py` docstring |
+| **the IQR / worst-episode columns weaken the supervision claim**: on the worst episode 5 of 8 sighted agents in each experiment are worse than `current-grade`'s worst; in D2 the sighted agent has the wider IQR in 6 of 8 seeds | `thesis/CHAPTER4_ABLATION_DRAFT.md` 4.5, 4.7 |
+| per-run peak memory is 1519 MB with a 300 000-slot buffer — `PEAK_GB` 1.5 holds | `PREREGISTRATION_C4.md` 6a |
+
+### Decisions taken, by whom
+
+| decision | by | recorded in |
+|---|---|---|
+| convergence judged at checkpoints 200k/250k/300k on ten practice episodes, 25-unit band, 6 of 8 per arm — over the learning curve alone, or all sixteen | **Jad** | `PREREGISTRATION_C4.md` 5b |
+| **add the pair condition** (7 of 8 seed pairs settled), after the calibration | **Jad** | same |
+| push to `JMF-2340550-sep17` for the whole session | **Jad** | — |
+| launcher started as its own process, so closing the session cannot stop C4 | proposed, done | 6a |
+
+### Process failures in this session, stated
+
+- **Elapsed time misjudged twice** — "calibration ends ~15:00", then
+  "~15:20"; it ended ~15:42, and the launch was at 16:42. No consequence; the
+  clocks were checked before any time was written into the run log.
+- **A shell heredoc turned `\n` escapes into real newlines** in one patch to
+  `check_d2_tracking.py`; caught by a parse check before anything ran, and
+  repaired with a script.
+- **The trap fix as first written had two holes** (live runs moved; the
+  `checkpoint.zip` resume). Both were found by the review, not by the author —
+  which is why the review ran before the commit.
+
+### Open, and the next session's to close
+
+1. **While C4 trains:** `python check_c4_start.py` after the second wave
+   reaches 50 000 steps. A crash is re-run FROM SCRATCH with
+   `--seeds <k> --restart-crashed`, never resumed. **Do not edit tracked files
+   while a wave is starting** — the launcher holds its queue while the tree is
+   dirty. Windows Update was not confirmed paused.
+2. **After training — `PREREGISTRATION_C4.md` section 9, in this order:**
+   `check_c4_start.py --out results/c4_identity.txt` and
+   `check_c4_convergence.py`, COMMITTED; then
+   `run_phase_d.py --road random --out runs_c4 --evaluate --jobs 8`; then
+   `check_d2_tracking.py runs_c4 --out results/c4_tracking.txt`; then
+   `python analyse_c4.py`. Write the result into `PREREGISTRATION_C4.md`
+   section 11, `CLAUDE.md`, `results/README.md` and Chapter 4.10.
+3. **Small, recorded:** `app/alerts.py` `VALID_MAP_HI` 74 in code against the
+   30–75 kPa span; the deck tabulates 13 of 18 mistakes; capture
+   `check_d2_tracking.py --out results/d2_tracking.txt` once the machine is free,
+   so Chapter 4 cites a file rather than a record.
