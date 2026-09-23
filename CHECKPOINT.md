@@ -1759,6 +1759,8 @@ output is `results/PHASE_D2_RESULT.txt`.
 | run D2 as planned — eight seeds, C1 — knowing it has power 0.10, and declare it | **Jad** | `PREREGISTRATION_D2.md` §4, §5a |
 | D2 as a wrapper, `engine_env.py` untouched | proposed, adopted | `random_road.py` |
 | the fix-3 guard findings go into mistake 11 as an addendum, not a new mistake 19 | proposed | `CLAUDE.md` |
+| **the next experiment is C4 — D2's design at 300 000 steps — and it runs in a NEW session** | **Jad**, 23 Sep | this entry; `CLAUDE.md` live list; `NEXT_SESSION_2026-09-23.md` |
+| **one variable at a time: C4 first, more seeds only after, never both at once** — in Jad's words, «ولا كذا ما نعرف مين السبب، فنسويهم واحد واحد عشان نقدر نحدد» | **Jad**, 23 Sep | same |
 
 ### Process failures in this session, stated
 
@@ -1772,9 +1774,20 @@ output is `results/PHASE_D2_RESULT.txt`.
 
 ### Open, and the next session's to close
 
-1. **The next experiment — TEAM DECISION.** C4 (D2's design at 300 000 steps,
-   ~16 hours) tests the budget; ~42 seeds per arm at C1 (~5× D2's compute) tests
-   power. Either needs its own preregistration first. `CLAUDE.md`, live list.
+1. **C4 — DECIDED (Jad, 23 Sep), for the next session.** D2's design, eight
+   seeds per arm, 300 000 steps (~66 training climbs per agent against C1's 11),
+   ~16 hours of training in the background. Its own preregistration first.
+   More seeds comes AFTER C4, and only if C4 leaves the question open — one
+   variable at a time. `NEXT_SESSION_2026-09-23.md`.
+   **Its first task is to disarm three traps, verified at close by a
+   read-only review of that prompt:** `train.py` resumes any run directory
+   whose FATAL fingerprint matches, and `steps` is only advisory — so a
+   300 000-step launch into `runs_d2/` or `runs/` would resume and overwrite
+   the D2 or Phase D agents, and the launcher truncates their training logs
+   at launch; `--evaluate` hard-codes the `d2` result prefix; and
+   `check_d2_tracking.py` hard-codes `runs_d2/`. **Both agent directories are
+   backed up** (23 Sep, 184 and 189 files, spot-checked byte-identical) at
+   `graduation project/GRAD-agent-backups/2026-09-23/`, outside the repo.
 2. **The ablation chapter** — Phase D and D2, both findings kept separate, the
    failed spread prediction stated.
 3. **Small, recorded:** `app/alerts.py` `VALID_MAP_HI` 74 in code against the

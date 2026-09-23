@@ -2201,8 +2201,11 @@ not a result.
 > and both are INCONCLUSIVE at the C1 budget. Everything in the older list below
 > is done (the MEI is set; the document sweep landed in `3f4627d`).
 >
-> 1. **Choose the next experiment — TEAM DECISION, and it gets its own
->    preregistration before anything trains.** The two candidates, measured:
+> 1. **The next experiment is C4 — DECIDED by Jad, 23 September, for a new
+>    session — and it gets its own preregistration before anything trains.**
+>    **One variable at a time:** C4 first; more seeds only after C4 and only if
+>    it leaves the question open; never both at once, because a change in the
+>    result could then not be attributed. The two candidates, as measured:
 >    - **C4 — the training budget.** D2's design at 300 000 steps: about six
 >      times D2's training, so roughly 16 hours on this machine. It tests
 >      explanation (ii) directly. Whether convergence shrinks the spread is a
