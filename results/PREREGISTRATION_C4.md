@@ -409,6 +409,31 @@ ancestry check (each run's `git_head` descends from `79568e2`). The pace:
 is expected to finish around 01:00–01:30 on 24 September and the second
 around 07:00.
 
+**24 September, 01:49 — the first wave finished cleanly, and all 80
+checkpoint pairs are IDENTICAL to D2's.**
+
+- First wave: 10 of 10 runs exited 0, each after 443–483 minutes
+  (`runs_c4/launcher_train.log`). No crash, no re-run.
+- Second wave: seeds 5–7, both arms, started between 00:05 and 00:45 as
+  first-wave runs finished; all six passed 50 000 steps by 01:48.
+- The launcher held its queue three times on 23 September while this file,
+  `thesis/` and `CHECKPOINT.md` were being edited, and resumed after each
+  commit, as designed (section 6). No run was waiting to start at those
+  moments, so nothing was delayed.
+
+```
+python check_c4_start.py   EXIT 0   (01:49, 24 Sep)
+all sixteen runs: meta ok, budget ok, 10k = 20k = 30k = 40k = 50k =
+IDENTITY compared 80 identical 80
+```
+
+**Every C4 run retraced its D2 twin bit for bit through D2's whole budget.**
+Up to 50 000 steps C4's agents ARE D2's agents; beyond it they are D2's
+agents trained longer, with the budget the only variable (section 3a). The
+final pass, `check_c4_start.py --out results/c4_identity.txt`, is still run
+after training, as section 9 requires, so that it also certifies every later
+checkpoint's budget.
+
 ## 7. Stopping rule
 
 Sixteen runs, then stop. **No seed is added after any C4 result is seen**, and
