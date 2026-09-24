@@ -61,7 +61,40 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
-## Current state — 23 September 2026 (after Phase D2, which is INCONCLUSIVE)
+## Current state — 24 September 2026 (after C4)
+
+> **C4 HAS RUN. BY THE PRIMARY TEST PREVIEW'S EFFECT IS BELOW THE MINIMUM OF
+> INTEREST — ON A MARGIN ONE SEED WIDE, WITH THE SENSITIVITY TEST DISAGREEING,
+> AND WITH AGENTS THAT HAD NOT CONVERGED.** C4 is D2's design at 300 000 steps,
+> one variable changed; every C4 agent retraced its D2 twin bit for bit through
+> 50 000 steps (80 of 80). Preregistered in `results/PREREGISTRATION_C4.md`
+> (`79568e2`) before any C4 agent trained.
+>
+> ```
+> python analyse_c4.py     3 of 8 positive   mean +30.2   median -1.3   sd 139.9
+>   below the MEI: sign p 0.0352 (7 of 8)   permutation p 0.3867  <- disagree
+>   cell SMALLER THAN THE MEI   convergence NOT-CONVERGED   5c p 0.6367
+> ```
+>
+> - **The sentence that may be said** (C4 section 2a, fixed before training):
+>   *"Preview's effect is below the MEI at 300 000 steps: (i) is supported AT
+>   THIS BUDGET. The agents were still changing, so (ii) is not ruled out."*
+>   (i) reads "with one grade step per episode". Never "preview does not help".
+> - **It hangs on one seed:** seed 0 carries +360.6 (its blinded agent got worse
+>   with training). Most seeds show no benefit, one shows a large one.
+> - **Supervision, separately:** beats `current-grade` on the median (8 of 8
+>   sighted, 7 of 8 blinded), not on the worst episode.
+> - **Next is a TEAM DECISION** — a longer budget or more (NEW) seeds, one at a
+>   time. `NEXT_SESSION_2026-09-24.md` carries both with their costs;
+>   `python power_analysis.py`, the C4 section, prints the power figures.
+> - `runs/`, `runs_d2/` and `runs_c4/` are CLOSED experiments; the tools refuse
+>   new work in them. `runs_c4/` is backed up outside the repo
+>   (`GRAD-agent-backups/2026-09-24/runs_c4`, 587 files, sha-checked).
+>
+> Full account: `PREREGISTRATION_C4.md` section 11. The D2 box below is D2's own,
+> kept as written.
+
+### Phase D2, 22–23 September — the box below is D2's own, kept as written
 
 > **PHASE D2 HAS RUN, AND IT REMOVES PHASE D'S WORST LIMIT WITHOUT CHANGING THE
 > ANSWER.** Phase D's blinded arm could memorise one fixed road (limit 7 below).
@@ -157,11 +190,11 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.839), over 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. Thermal network calibrated; knock retard measured |
-| C · get an agent to learn | **C1 done, C4 NOT done.** Sixteen agents trained on the ZF plant, seeds 0–7 both arms, each carrying a `meta.json` plant fingerprint. All sixteen curves improve. But **50 000 steps is what `train.py` itself calls "C1: the first bad run"** — 11 training episodes — against **300 000 for "C4: a real run"**. *(This row said "**next**, nothing has been trained yet" until 22 September, then briefly said "done", which was too generous: C1 is not C4 and the difference is load-bearing for Phase D's null — see `PREREGISTRATION.md` limit 6.)* |
-| D · baselines and the ablation | **done, twice, and both are INCONCLUSIVE.** Phase D: preview not significant (p = 0.36 sign, p = 0.49 permutation); the agent beats `current-grade` by +29 to +34 points on five of eight seeds. **Phase D2** (randomised climb, blind arm verified blind, MEI 50 set in advance): p = 0.6367 sign, 4 of 8 seeds, INCONCLUSIVE; supervision beats `current-grade` on 8 of 8. The minimum effect of interest is SET: 50 damage units (22 Sep; after Phase D's result, before D2's). *(This row said "not started. This is the floor of the project" until 22 September — the floor is now in.)* |
+| C · get an agent to learn | **C1 done; C4 done 24 September** — sixteen agents at 300 000 steps, 66 episodes each, NOT converged by C4's preregistered rule (`PREREGISTRATION_C4.md` 5b). *(This row said "C1 done, C4 NOT done" until 24 September.)* The C1 agents: Sixteen agents trained on the ZF plant, seeds 0–7 both arms, each carrying a `meta.json` plant fingerprint. All sixteen curves improve. But **50 000 steps is what `train.py` itself calls "C1: the first bad run"** — 11 training episodes — against **300 000 for "C4: a real run"**. *(This row said "**next**, nothing has been trained yet" until 22 September, then briefly said "done", which was too generous: C1 is not C4 and the difference is load-bearing for Phase D's null — see `PREREGISTRATION.md` limit 6.)* |
+| D · baselines and the ablation | **done three times.** C4 (300 000 steps): SMALLER THAN THE MEI by the primary sign test (p 0.0352), the permutation test disagreeing (0.3867), agents not converged — see the box at the top. Before it, **twice INCONCLUSIVE:** Phase D: preview not significant (p = 0.36 sign, p = 0.49 permutation); the agent beats `current-grade` by +29 to +34 points on five of eight seeds. **Phase D2** (randomised climb, blind arm verified blind, MEI 50 set in advance): p = 0.6367 sign, 4 of 8 seeds, INCONCLUSIVE; supervision beats `current-grade` on 8 of 8. The minimum effect of interest is SET: 50 damage units (22 Sep; after Phase D's result, before D2's). *(This row said "not started. This is the floor of the project" until 22 September — the floor is now in.)* |
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary result only, from hand-written policies |
-| G · writing | not started |
+| G · writing | **started** — `thesis/CHAPTER4_ABLATION_DRAFT.md`, the ablation chapter, drafted and reviewed 23 September; its C4 paragraphs (4.10) were added after the review |
 | **APP · the live supervisor** | **runs; the six audit findings against it are now FIXED.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its suite reports **49 of 49**, up from 46 because each fix shipped with a regression test. *(This row said "has six known bugs … passes 46 of 46" until 17 September; the fixes and the count both moved on 16 September and this row did not.)* The lesson still stands and is worth more than the fixes: **the suite reported 46 of 46 while all six were live.** Only M9 carries no test of its own. **Read `AUDIT.md` and `AUDIT_FIXES.md` before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
 
 **Where the app sits, and what it must not be allowed to become.** The app is
@@ -262,6 +295,10 @@ python check_random_road.py  D2's gates: 0 of 121 grades fail to bind (weakest
                            13.73 % at +6.9 K), 0 of 20 frozen episodes, and the
                            blind arm's observations identical on every road
                            until its climb arrives
+python analyse_c4.py       C4's preregistered test, D2 and Phase D beside it:
+                           3 of 8, below-MEI sign p 0.0352 / permutation
+                           0.3867 (disagree), SMALLER THAN THE MEI, NOT
+                           CONVERGED. Captured in results/C4_RESULT.txt
 python analyse_phase_d2.py D2's result beside Phase D's, each classified by the
                            MEI rule
 python full_run.py         every script below, one pass, exit codes -> FULL_RUN.txt
@@ -2246,6 +2283,9 @@ not a result.
 > have destroyed Phase D's and D2's agents are closed (`f987049`; `train.py`
 > "A RESUME IS NOT A LONGER RUN").
 
+> *(SUPERSEDED 24 September — C4 has run; see the box above and the top of this
+> file. Kept as the record of the decision that led to it.)*
+>
 > **THE LIVE LIST — 23 September 2026, after Phase D2.** Both ablations are in
 > and both are INCONCLUSIVE at the C1 budget. Everything in the older list below
 > is done (the MEI is set; the document sweep landed in `3f4627d`).

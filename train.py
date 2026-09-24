@@ -151,7 +151,8 @@ except ImportError:
 
 # Experiments whose preregistrations say "sixteen runs, then stop". Nothing new
 # is trained into their directories -- see "CLOSED EXPERIMENTS" in main().
-CLOSED = {"runs": "Phase D", "runs_d2": "Phase D2"}
+CLOSED = {"runs": "Phase D", "runs_d2": "Phase D2",
+          "runs_c4": "C4"}           # closed 24 Sep 2026, after its result
 
 
 def buffer_size(a):
@@ -227,7 +228,9 @@ def main():
     outdir = os.path.join(a.out, tag)
     # No directory is created until every refusal below has had its say: a
     # refused call must leave nothing behind, not even an empty folder.
-    closed = CLOSED.get(os.path.basename(os.path.normpath(a.out)))
+    # .lower(): on Windows runs_C4 IS runs_c4, and the review found the
+    # capitalised spelling walked past the guard.
+    closed = CLOSED.get(os.path.basename(os.path.normpath(a.out)).lower())
 
     # ONE PROCESS PER DIRECTORY. Two train.py calls on the same tag -- a
     # duplicated --seeds, a relaunch while a run was still going -- would both
@@ -294,7 +297,7 @@ def main():
         raise SystemExit(
             f"\nREFUSING: {a.out}/ is {closed}'s, a closed experiment, and "
             f"{tag} is not one of its runs.\nA new seed or a new budget is a "
-            "new experiment: give it its own --out, e.g. --out runs_c4.")
+            "new experiment: give it its own --out, e.g. --out runs_c5.")
     if closed and a.extend:
         raise SystemExit(
             f"\nREFUSING: --extend inside {a.out}/ would change one of "
@@ -394,7 +397,7 @@ def main():
                 "possibly the only copy of a trained agent -- is\n"
                 "overwritten.\n\n"
                 "  A NEW budget:      use a fresh --out directory, e.g. "
-                "--out runs_c4"
+                "--out runs_c5"
                 + ("" if closed else
                    "\n  continue THIS run: pass --extend, and say so beside "
                    "every number it produces"))

@@ -1919,3 +1919,34 @@ budget-change test (5c)                                       p 0.6367 -- not sh
 **What next:** a longer budget (the agents were still changing) or more seeds
 (the result hangs on one seed) — one variable at a time, with its own
 preregistration. `C4_RESULT.txt` and section 11 are what to decide from.
+
+### SESSION CLOSE, 23–24 September 2026 — the index
+
+Commits `f987049` … on `JMF-2340550-sep17`, all pushed. Run from
+`NEXT_SESSION_2026-09-23.md`; the next session's prompt is
+`NEXT_SESSION_2026-09-24.md`.
+
+| step of the plan | outcome |
+|---|---|
+| 1 · disarm the traps | done; the review found two holes in the first fix, both closed |
+| 2 · preregister C4 before training | `79568e2` |
+| 3 · train | 16 of 16, 882 min, no failure; 80 of 80 identical to D2 through 50 000 steps |
+| 4 · the ablation chapter | `thesis/CHAPTER4_ABLATION_DRAFT.md`, reviewed; 4.10 updated after C4 |
+| 5 · the C4 test | SMALLER THAN THE MEI (sign p 0.0352), permutation disagreeing (0.3867), NOT-CONVERGED |
+
+Found at close, and fixed before it — mostly by the review of the next
+session's prompt, which found the documents around it lagging:
+
+| what | fixed |
+|---|---|
+| `CLAUDE.md`'s TOP still said "C4 NOT done", the live list still said "the next experiment is C4", and G · writing said "not started" | a "Current state — 24 September (after C4)" box at the top; phase rows C, D, G; the 23 Sep live list marked superseded; `analyse_c4.py` in the numbers block |
+| `README.md` said "No D2 result exists yet" a day after D2's result | D2 and C4 results, with the correction dated |
+| the presentation said "C4 not done" and "no D2 result yet" in eleven places across both languages | all corrected (`grep` for the pending phrases now finds none) |
+| `runs_c4/` had no backup — the only copies | `GRAD-agent-backups/2026-09-24/runs_c4`, 587 files, all sixteen `final.zip` sha-checked |
+| `runs_c4/` could still take new seeds; `runs_C4` walked past every closed-experiment guard (NTFS is case-insensitive) | `runs_c4` / `c4` added to all three CLOSED tables, compared case-insensitively; tested |
+| the planning figures for the next experiment (power 0.15; ~80 seeds per arm; ~11 without seed 0) were printed by no script | `power_analysis.py` gains a C4 section that prints them, with the sensitivity labelled planning-only |
+| the prompt's option B would have retrained seeds 0-7 — C4 itself, bit for bit | the prompt now says NEW seeds only, reported beside C4, never pooled |
+
+**Open:** the next experiment — a longer budget or more seeds, one at a time —
+is Jad's and the team's decision; `NEXT_SESSION_2026-09-24.md` carries both
+options with their measured costs.

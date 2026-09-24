@@ -52,8 +52,11 @@ episodes does not shrink it. Running more seeds does not shrink it either --
 it shrinks the uncertainty in its MEAN, which is what power needs. Training the
 agents longer (`--steps 300000`, the C4 budget of `PREREGISTRATION.md`
 limit 6) MIGHT shrink it, if different seeds converge to the same place -- or
-might not, if they converge to different ones. That is a hypothesis, and C4 is
-where it is checked (`results/PREREGISTRATION_C4.md` limit 1).
+might not, if they converge to different ones. That was a hypothesis, and C4
+checked it (24 September 2026): at 300 000 steps the spread was 139.9 against
+D2's 98.8 -- it did not shrink, and one seed sets most of it. `report_c4()`
+prints the figures, and C4's agents had not converged by its own rule
+(`results/PREREGISTRATION_C4.md` sections 5b and 11).
 
 This paragraph said, until 23 September 2026, "Randomising the climb does NOT
 shrink it." **Phase D2 measured the opposite: randomising the climb, and
@@ -284,6 +287,7 @@ def main():
               f"power at 8 seeds {pw:.2f}; {tail}")
 
     report_d2(unit)
+    report_c4(unit)
 
     print("\nTHE SENTENCE THIS SCRIPT EXISTS TO MAKE SAYABLE")
     d80 = delta_for_power(0.80, sd, SEEDS)
@@ -339,6 +343,58 @@ def report_d2(unit):
     print(f"    seeds per arm for 80 % power      {need if need else 'over 400'}")
     print("    (these plan the NEXT experiment; they change nothing about D2's")
     print("    preregistered result, which stands as analyse_phase_d2.py prints it)")
+
+
+def report_c4(unit):
+    """C4's measured spread, for planning whatever comes after it.
+
+    Added 24 September 2026, after C4's result. C4's preregistration made NO
+    prediction about the spread (its section 5a), so nothing is checked here;
+    this section exists so the figures the next decision rests on are printed
+    by a script rather than typed into a prompt. Order of magnitude only --
+    see the normal-approximation note in the module docstring.
+    """
+    try:
+        from analyse_phase_d2 import load
+        rows, _ = load("c4")
+        d2_rows, _ = load("d2")
+    except Exception:            # noqa: BLE001 -- the section is optional
+        rows, d2_rows = [], []
+    print("\nC4, MEASURED -- the spread at 300 000 steps, for planning only")
+    if len(rows) < 2:
+        print("  no complete results/c4_seed*.txt yet")
+        return
+    diffs = [r[2] for r in rows]
+    sd = stdev(diffs)
+    d2_sd = stdev([r[2] for r in d2_rows]) if len(d2_rows) > 1 else float("nan")
+    print(f"  paired differences (blind - sighted), n = {len(diffs)}")
+    print(f"    {'  '.join(f'{d:+.1f}' for d in diffs)}")
+    print(f"  mean {mean(diffs):+.1f}   sd {sd:.1f}   (D2: sd {d2_sd:.1f}; "
+          f"Phase D: {stdev(PHASE_D_DIFFS):.1f}) -- no direction was predicted")
+    print(f"\n  at C4's spread, against the MEI (50 units):")
+    print(f"    power at 8 seeds                  {power(50.0, sd, 8):.2f}")
+    d80 = delta_for_power(0.80, sd, 8)
+    print(f"    effect with 80 % power, 8 seeds   {d80:.0f} units ({d80 / unit:.1f} pts)")
+    need = seeds_for(50.0, sd)
+    print(f"    seeds per arm for 80 % power      {need if need else 'over 400'}")
+    if need:
+        near = "  ".join(f"{n}: {power(50.0, sd, n):.2f}"
+                         for n in range(need, min(need + 5, 401)))
+        print(f"    power just above it (not monotonic): {near}")
+    # ONE SEED SETS THIS SPREAD, and the next experiment's size depends on
+    # whether it is typical. Printed as a SENSITIVITY for planning, never as a
+    # reason to drop the seed: C4's preregistration reports all eight.
+    big = max(range(len(diffs)), key=lambda i: abs(diffs[i]))
+    rest = [d for i, d in enumerate(diffs) if i != big]
+    sd_rest = stdev(rest)
+    need_rest = seeds_for(50.0, sd_rest)
+    print(f"\n  SENSITIVITY, planning only: the largest |difference| is seed "
+          f"{rows[big][0]} ({diffs[big]:+.1f}).")
+    print(f"    without it, sd {sd_rest:.1f} and seeds per arm for 80 % power "
+          f"{need_rest if need_rest else 'over 400'}")
+    print("    So the seeds a follow-up needs range from that to the figure above,")
+    print("    depending on whether that seed is typical -- which is what a seeds")
+    print("    experiment would find out. It is NEVER a reason to drop the seed.")
 
 
 if __name__ == "__main__":

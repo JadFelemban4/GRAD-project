@@ -45,9 +45,20 @@ Python 3.11 or newer.
 > minimum effect of interest, 50 damage units — set on 22 September, after the
 > result was known; the sign test never uses it, so the verdict stands.
 >
-> **Phase D2** runs the same ablation on a randomised climb, so that the blind
-> arm is truly blind. It was preregistered (`results/PREREGISTRATION_D2.md`)
-> before any D2 agent trained. **No D2 result exists yet.**
+> **Phase D2** ran the same ablation on a randomised climb, so that the blind
+> arm is truly blind, preregistered (`results/PREREGISTRATION_D2.md`) before
+> any D2 agent trained: **INCONCLUSIVE** (4 of 8 seeds, sign p = 0.6367).
+> *(This line said "No D2 result exists yet" until 24 September -- a day
+> after the result existed.)*
+>
+> **C4** ran D2's design at 300 000 steps -- one variable changed, the
+> training budget -- preregistered (`results/PREREGISTRATION_C4.md`) before
+> any C4 agent trained. Result, 24 September: **SMALLER THAN THE MEI** by the
+> primary sign test (7 of 8 seeds below 50, p = 0.0352), with the
+> permutation test disagreeing (p = 0.3867, one seed carrying +360.6) and
+> the agents **not converged**. The preregistered reading: preview's effect
+> is below the threshold at this budget; the agents were still changing, so
+> the budget is not ruled out as the explanation. `python analyse_c4.py`.
 >
 > `python analyse_phase_d.py` reproduces every number above.
 > Full account: `CHECKPOINT.md`, 21–22 September.

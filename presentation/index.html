@@ -1234,7 +1234,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
           <li><b>رقمان لتجربتين، لا رقمان لنتيجة واحدة</b> — ‏−0.4 نقطة مئوية من فحص المبدأ بسياسات مكتوبة يدويًا، وp = 0.3633 من المرحلة D بوكلاء مدرَّبين. تجربتان تختلفان في السياسات وفي طريقة الحكم. اذكر دائمًا أيّ تجربة أنتجت الرقم، ومع أي حد حماية قيس. ومسح H/τ القديم (جدول H2) لاغٍ، فلا تقتبس منه.</li>
           <li><b>كل ما يلي يجري داخل محاكاة</b> — المنظومتان نموذجان على حاسوب، لا عتاد في مختبر. محاكاة المحرك مكتوبة من معادلات فيزيائية ومعايَرة على 295.0 دقيقة من سجلات سيارة حقيقية، لكنها تبقى نموذجًا.</li>
           <li><b>لا نكتب شيئًا إلى وحدة تحكم السيارة</b> — نقرأ منها فقط عبر منفذ OBD-II: لا برمجة، ولا إرسال أوامر، ولا تعديل معايرة. كل تجربة تحكّم تجري داخل المحاكي. هذا قيد صلب في المشروع، بلا استثناء.</li>
-          <li><b>أين نحن فعلًا، مرحلة بمرحلة</b> — مطابقة المحاكي للسيارة (B) اكتملت. تدريب الوكيل (C) أُنجز بميزانية C1 فقط (50 000 خطوة)، والتشغيلة الحقيقية C4 لم تُنجز. خطوط الأساس واختبار الحذف (D) أُنجزا، والنتيجة صفرية على الاستباق. منظومة البطارية (E) لم تبدأ. ومسح H/τ (F) أولي بسياسات مكتوبة يدويًا، وجدوله القديم لاغٍ.</li>
+          <li><b>أين نحن فعلًا، مرحلة بمرحلة</b> — مطابقة المحاكي للسيارة (B) اكتملت. تدريب الوكيل (C) أُنجز بميزانية C1 (50 000 خطوة)، ثم بميزانية C4 (300 000 خطوة) في 24 سبتمبر. خطوط الأساس واختبار الحذف (D) أُنجزا، ثم أُعيدا على طريق عشوائي (D2)، وكلاهما غير حاسم. وC4: أثر الاستباق أصغر من الحدّ في الاختبار الأساسي، والاختبار الثاني لا يوافق، والوكلاء لم يستقرّوا. منظومة البطارية (E) لم تبدأ. ومسح H/τ (F) أولي بسياسات مكتوبة يدويًا، وجدوله القديم لاغٍ.</li>
         </ul>
       </div>
     </div>
@@ -1764,7 +1764,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         </div></li>
         <li><div>
           <b>ما لم يُنجز بعد، نقوله قبل أن يُسأل</b>
-          <div class="note">الوكلاء دُرّبوا بميزانية C1 فقط، والتشغيلة الحقيقية C4 لم تُنجز. والمرحلة D أُنجزت ونتيجتها على المعاينة صفرية، وحدودها مكتوبة قبل أرقامها في PREREGISTRATION.md. والمنظومة الثانية (البطارية) لم تُكتب: لا يوجد battery.py في المستودع.</div>
+          <div class="note">المرحلة D وD2 (ميزانية C1) غير حاسمتين، وحدودهما مكتوبة قبل أرقامهما. وC4 (300 000 خطوة، 24 سبتمبر): أثر المعاينة أصغر من الحدّ (50 وحدة) في الاختبار الأساسي، بفارق بذرة واحدة، والاختبار الثاني لا يوافق، والوكلاء لم يستقرّوا — PREREGISTRATION_C4.md القسم 11. والمنظومة الثانية (البطارية) لم تُكتب: لا يوجد battery.py في المستودع.</div>
         </div></li>
         <li><div>
           <b>البروتوكول الذي نقف عليه بديل، ونقول ذلك</b>
@@ -1816,7 +1816,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
       <span class="snum">٠٦</span>
       <div class="eyebrow">Where we are</div>
       <h2>وين وصلنا ووش الجاي</h2>
-      <p class="kicker">سبع مراحل · A وB منجزتان · C بميزانية C1 · أرضية النجاح (المرحلة D) انتهت بنتيجة صفرية على المعاينة — الحالة كما في 22 سبتمبر 2026</p>
+      <p class="kicker">سبع مراحل · A وB منجزتان · C بميزانية C1 · أرضية النجاح (المرحلة D) انتهت، ثم D2 وC4 — الحالة كما في 24 سبتمبر 2026</p>
       <p class="lede-line">المحاكي اتقارن بالسيارة في كل رقم قدرنا نقيسه، ونجح — وحدوده مكتوبة تحت. ودرّبنا ستة عشر وكيلًا (Agent) بميزانية C1، والمرحلة D — الأرضية — انتهت بحكم منقسم: الوكيل يتفوّق على المقارن، والمعاينة لم تثبت.</p>
     </header>
     <div class="figs">
@@ -1860,7 +1860,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         <tbody>
           <tr><td>A · التجهيز</td><td>إعداد المستودع والأدوات وسلسلة التشغيل</td><td>مكتملة</td></tr>
           <tr><td>B · مقارنة المحاكي بالسيارة</td><td>مقارنة نموذج المحرك بقياسات حقيقية من السيارة</td><td>نجحت — الفرق 1.4 % بصفر معاملات مضبوطة، و1.1 % بمعامل واحد. وانتبهوا: هذا الرقم يقارن قناتين من قنوات السيارة نفسها، ولا يختبر نموذج التنفس — التفصيل في «الحدود» تحت</td></tr>
-          <tr><td>C · تدريب الوكيل (Agent)</td><td>تدريب وكيل يتعلّم بنفسه كيف يحمي المحرك من الحرارة</td><td>C1 أُنجزت: ستة عشر وكيلًا، البذور 0–7 لكل ذراع، 50 000 خطوة لكل وكيل (11 حلقة تدريب). وC4 — التشغيلة الحقيقية — لم تُنجز</td></tr>
+          <tr><td>C · تدريب الوكيل (Agent)</td><td>تدريب وكيل يتعلّم بنفسه كيف يحمي المحرك من الحرارة</td><td>C1 أُنجزت: ستة عشر وكيلًا، البذور 0–7 لكل ذراع، 50 000 خطوة لكل وكيل (11 حلقة تدريب). وC4 أُنجزت في 24 سبتمبر: ستة عشر وكيلًا، 300 000 خطوة (66 حلقة)، ولم تستقرّ</td></tr>
           <tr><td>D · الخطوط المرجعية (Baselines) وتجربة العزل (Ablation)</td><td>ثماني بذور مبصرة وثماني معمّاة، مقرونة بالبذرة، وقواعد التحليل مسجَّلة مسبقًا قبل تدريب أي وكيل</td><td>أُنجزت، والجواب صفري: المعاينة غير دالّة (p = 0.3633 إشارة، 0.4922 تبديل). والوكيل يتفوّق على سياسة الميل الحالي بـ+29 إلى +34 نقطة في 5 من 8 بذور — ادّعاء منفصل</td></tr>
           <tr><td>E · المنظومة الثانية: بطارية</td><td>نظام فيزياؤه مختلفة تمامًا عن المحرك. الهدف: نرسم نقاطه على نفس منحنى H/τ — إذا ما انطبقت المنظومتان على منحنى واحد، فالمعيار خاطئ أو ناقص، وقول ذلك نتيجة أيضًا</td><td>لم تبدأ — ملف battery.py غير موجود أصلًا</td></tr>
           <tr><td>F · مسح النسبة H/τ</td><td>قياس قيمة الاستباق عند قيم مختلفة للنسبة</td><td>أولية فقط، من سياسات مكتوبة باليد — وجدول H2 الذي كان نتيجتها لاغٍ (قيس ضد خط أساس أُطفئ تبريده)، فيُعاد قبل أن يُقتبس منه شيء</td></tr>
@@ -1909,7 +1909,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
           <li><b>المعاينة: غير دالّة</b> <span style="color:var(--muted)">ستة عشر وكيلًا، ثماني بذور لكل ذراع، مبصر ومعمّى، بقواعد تحليل مسجَّلة قبل تدريب أي وكيل. 5 من 8 بذور موجبة، متوسط +4.8 وحدة ضرر، واختبار الإشارة الدقيق p = 0.3633 والتبديل p = 0.4922 — غير دالّ عند 0.05. تفاوت البذور أكبر من الأثر بعشرات المرات، ولهذا شغّلنا ثماني بذور لا واحدة.</span></li>
           <li><b>الإشراف المتعلَّم: يعمل — وهذا ادّعاء آخر</b> <span style="color:var(--muted)">الوكيل المدرَّب يتفوّق على سياسة الميل الحالي بـ+29 إلى +34 نقطة في 5 من 8 بذور، وموجب في 7 من 8. لا تقرأوه دليلًا على المعاينة؛ الخلط بين الاثنين هو AUDIT.md C3.</span></li>
           <li><b>الميزانية تُقال مع الصفر في النَّفَس نفسه</b> <span style="color:var(--muted)">هؤلاء وكلاء C1: 50 000 خطوة، 11 حلقة تدريب. قولوا «بوكلاء مدرَّبين بميزانية C1، المعاينة لا تنفصل عن ضجيج البذور» — لا «المعاينة لا تنفع». والتجربة ضعيفة القدرة: 0.10 أمام أثر 50 وحدة ضرر.</span></li>
-          <li><b>والذراع المعمّى لم يكن أعمى</b> <span style="color:var(--muted)">الطريق نفسه في كل حلقة، وحالة الحرارة ساعة يقرؤها الوكيل، فيستطيع أن يحفظ متى يأتي الصعود. المرحلة D قارنت معاينة صريحة بمعاينة ضمنية. والتصحيح هو المرحلة D2: الصعود نفسه بموعد وميل عشوائيين في كل حلقة، مسجَّلة مسبقًا، وتدريبها بدأ 22 سبتمبر — ولا نتيجة لها بعد.</span></li>
+          <li><b>والذراع المعمّى لم يكن أعمى</b> <span style="color:var(--muted)">الطريق نفسه في كل حلقة، وحالة الحرارة ساعة يقرؤها الوكيل، فيستطيع أن يحفظ متى يأتي الصعود. المرحلة D قارنت معاينة صريحة بمعاينة ضمنية. والتصحيح هو المرحلة D2: الصعود نفسه بموعد وميل عشوائيين في كل حلقة، مسجَّلة مسبقًا — ونتيجتها غير حاسمة (23 سبتمبر)، فالذراع الأعمى لم يكن ما يخفي أثرًا كبيرًا.</span></li>
           <li><b>ولا تُنقذوا الصفر بـH/τ</b> <span style="color:var(--muted)">قراءة «النسبة عندنا تحت الواحد، فالصفر يوافق النظرية» كُتبت وفُحصت ودُحضت (PREREGISTRATION.md الحدّ 8). وفحص المبدأ بالسياسات اليدوية لا يُنقذه أيضًا: المعاينة اليدوية تخسر أمام الميل الحالي بـ0.4 نقطة، ومطابقة 679.0 = 679.0 مضمونة بالبناء.</span></li>
         </ul>
       </div>
@@ -1974,8 +1974,8 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         </div></li>
         <li><div>
           <b>المرحلة D2 — الذراع المعمّى أعمى فعلًا</b>
-          <div class="note">التدريب بدأ 22 سبتمبر</div>
-          <div class="note">الاستئصال نفسه على صعود عشوائي: يبدأ بين 120 و300 ثانية، وميله بين 12 و16 % في كل حلقة، فتصير قناة المعاينة الطريق الوحيد لمعرفة متى يأتي التلّ. مسجَّلة مسبقًا في PREREGISTRATION_D2.md قبل تدريب أي وكيل، والحد الأدنى للأثر المعتبر 50 وحدة ضرر. لا نتيجة لها بعد، ولا نتوقّع واحدة هنا.</div>
+          <div class="note">انتهت 23 سبتمبر: غير حاسمة</div>
+          <div class="note">الاستئصال نفسه على صعود عشوائي: يبدأ بين 120 و300 ثانية، وميله بين 12 و16 % في كل حلقة، فتصير قناة المعاينة الطريق الوحيد لمعرفة متى يأتي التلّ. مسجَّلة مسبقًا في PREREGISTRATION_D2.md قبل تدريب أي وكيل، والحد الأدنى للأثر المعتبر 50 وحدة ضرر. النتيجة: غير حاسمة (4 من 8 بذور). ثم C4، نفس التصميم بتدريب أطول (300 000 خطوة): أثر المعاينة أصغر من الحدّ في الاختبار الأساسي، بفارق بذرة واحدة، والاختبار الثاني لا يوافق، والوكلاء لم يستقرّوا.</div>
         </div></li>
         <li><div>
           <b>كتابة فصل المرحلة D</b>
@@ -1998,7 +1998,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
     <div class="blk">
       <h3>الخلاصة في أربعة أسطر</h3>
       <p>أرضية المشروع — المرحلة D — صارت تحت أقدامنا. كل رقم أساسي هنا يطبعه أمر تشغيل واحد تقدرون تعيدونه بأنفسكم، وما لا يطبعه سكربت موثّق بمصدره في المستودع — مثل R² = 0.157 من محاولة المطابقة المسجّلة في logs/CHANNEL_CENSUS.md.</p>
-      <p>الباقي: المرحلة D2 على الصعود العشوائي، وكتابة فصل D بادّعاءيه المنفصلين.</p>
+      <p>الباقي: قرار الفريق في التجربة التالية (تدريب أطول أم بذور أكثر، واحد فقط)، وإكمال فصل الاستئصال بادّعاءيه المنفصلين.</p>
       <p>والمعاينة لم تتفوّق؟ نقولها كما هي. نتيجة صفرية مع بروتوكول ثُبّت قبل التجربة تبقى نتيجة يمكن الدفاع عنها؛ الذي يهدم المشروع هو تغيير مجموعة الاختبار أو إضافة بذور بعد رؤيتها، لا خسارة مقارنة.</p>
       <p>تاريخ هذه الحالة: 22 سبتمبر 2026، ويتحقق منه أمر واحد: python <code>verify_docs.py</code>.</p>
     </div>
@@ -2513,7 +2513,7 @@ ORNL (Maldonado et al. 2024)، NREL (Henry de Frahan et al. 2022)، ومسح ع�
         </div>
         <div class="term" data-g="g7">
           <div class="th"><b>ما هو مبنيّ وما هو مخطَّط</b><span class="en">Built vs planned</span></div>
-          <p class="def">المبنيّ اليوم: النموذج الفيزيائي، والشبكة الحرارية، وبيئة التدريب، وخط الأساس، وفحص الفرضية بسياسات مكتوبة باليد، وستة عشر وكيلًا مدرَّبًا بميزانية C1، والمرحلة D بنتيجتها الصفرية على الاستباق. والمخطَّط: التشغيلة الحقيقية C4، والمرحلة D2 على صعود عشوائي (بدأ تدريبها ولا نتيجة بعد)، والبطارية (E)، والنموذج البديل.</p>
+          <p class="def">المبنيّ اليوم: النموذج الفيزيائي، والشبكة الحرارية، وبيئة التدريب، وخط الأساس، وفحص الفرضية بسياسات مكتوبة باليد، وستة عشر وكيلًا مدرَّبًا بميزانية C1، والمرحلة D بنتيجتها الصفرية على الاستباق. والمرحلة D2 على صعود عشوائي (غير حاسمة)، والتشغيلة C4 بـ300 000 خطوة (أصغر من الحدّ بفارق بذرة واحدة، ولم تستقرّ). والمخطَّط: البطارية (E)، والنموذج البديل.</p>
           <p class="why"><span class="star">لماذا يهمّنا · </span>قل هذا صراحةً في أي عرض. كل فعل مضارع في هذه الصفحة عن الوكيل أو البطارية أو النموذج البديل هو خطة لا نتيجة، والخلط بينهما أسرع طريقة لخسارة ثقة الممتحن.</p>
         </div>
       </div>
@@ -3346,7 +3346,7 @@ That is our only question.</td></tr>
           <li><b>Two numbers from two experiments, not two numbers for one result</b> — The −0.4-point figure comes from the premise check — our first experiment, described below — with hand-written policies on a single scenario. The p = 0.3633 comes from Phase D, with trained agents. Different policies, a different way of judging. Always say which experiment produced the number, and which protection limit it was measured against. The old H/τ sweep (the H2 table) is void; quote nothing from it.</li>
           <li><b>Everything that follows happens inside a simulation</b> — Both plants are models on a computer, not hardware in a lab. The engine simulation is written from physical equations and calibrated against 295.0 minutes of logs from a real car, but it is still a model.</li>
           <li><b>We never write anything to the car&#x27;s ECU — the engine control unit, the computer that runs the engine</b> — We only read from it, through the car&#x27;s standard diagnostic socket (OBD-II): we never reprogram it, never send it a command, and never change its calibration. Every control experiment runs inside the simulator. This is a hard constraint on the project, with no exceptions.</li>
-          <li><b>Where we actually are, phase by phase</b> — The project runs in seven phases, A to G. Setup (A) is done. Matching the simulator to the car (B) is done. Training the agent (C) is done to the C1 budget only (50 000 steps); the real run, C4, is not. Baselines and the ablation (D) are done, and the answer on preview is a null. The battery plant (E) and the writing (G) have not started. The H/τ sweep (F) — the ratio is explained below — is preliminary, from hand-written policies, and its old table is void.</li>
+          <li><b>Where we actually are, phase by phase</b> — The project runs in seven phases, A to G. Setup (A) is done. Matching the simulator to the car (B) is done. Training the agent (C) is done to the C1 budget (50 000 steps) and, on 24 September, to C4 (300 000 steps). Baselines and the ablation (D) are done, and were re-run on a randomised road (D2); both are inconclusive. C4: by the primary test preview's effect is below the threshold, the sensitivity test disagreeing and the agents not converged. The battery plant (E) and the writing (G) have not started. The H/τ sweep (F) — the ratio is explained below — is preliminary, from hand-written policies, and its old table is void.</li>
         </ul>
       </div>
     </div>
@@ -3881,7 +3881,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         </div></li>
         <li><div>
           <b>What is not done yet, we say before being asked</b>
-          <div class="note">The agents are trained to the C1 budget only; the real run, C4, is not done. Phase D is done and its answer on preview is a null, with its limits written down in PREREGISTRATION.md before its numbers. And the second system (the battery) has not been written: there is no battery.py in the repository.</div>
+          <div class="note">Phase D and D2 (C1 budget) are inconclusive, with their limits written down before their numbers. C4 (300 000 steps, 24 September): by the primary test preview's effect is below the 50-unit threshold, one seed wide, the sensitivity test disagreeing and the agents not converged — PREREGISTRATION_C4.md section 11. And the second system (the battery) has not been written: there is no battery.py in the repository.</div>
         </div></li>
         <li><div>
           <b>The protocol we stand on is a fallback, and we say so</b>
@@ -3933,7 +3933,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
       <span class="snum">06</span>
       <div class="eyebrow">Where we are</div>
       <h2>Where we are, what&#x27;s next</h2>
-      <p class="kicker">Seven phases · A and B done · C to the C1 budget · Phase D, the floor we must clear, done — and a null on preview · 22 September 2026</p>
+      <p class="kicker">Seven phases · A and B done · C to the C1 budget · Phase D, the floor we must clear, done — then D2 and C4 · 24 September 2026</p>
       <p class="lede-line">The simulator was checked against the car on every quantity the car exposes, and it passed; its limits are below. We trained sixteen agents to the C1 budget, and Phase D — the floor — came back as a split verdict: the agent beats the comparator, and preview cannot be shown to help.</p>
     </header>
     <div class="figs">
@@ -3977,7 +3977,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <tbody>
           <tr><td>A · Setup</td><td>Repository, tooling, and the run chain.</td><td>Done.</td></tr>
           <tr><td>B · Match the simulator to the car</td><td>Compare the engine model against real measurements from the car.</td><td>Passed — the model and the car agree to within 1.4 % with zero fitted parameters, and 1.1 % with one, over 26 pooled operating points spanning 30–75 kPa. Note what that comparison actually is: two of the car&#x27;s own sensor readings checked against each other. It does not test the breathing model. See &quot;Limits&quot; below.</td></tr>
-          <tr><td>C · Train the agent</td><td>Train an agent — a program that learns a control strategy for itself — to protect the engine from heat.</td><td>C1 done: sixteen agents, seeds 0–7 in each arm, 50 000 steps each (11 training episodes). C4 — the real run — not done.</td></tr>
+          <tr><td>C · Train the agent</td><td>Train an agent — a program that learns a control strategy for itself — to protect the engine from heat.</td><td>C1 done: sixteen agents, seeds 0–7 in each arm, 50 000 steps each (11 training episodes). C4 done, 24 September: sixteen agents, 300 000 steps (66 episodes), not converged.</td></tr>
           <tr><td>D · Baselines and the ablation</td><td>Eight sighted seeds against eight blinded ones, paired by seed, with the analysis preregistered before any agent trained.</td><td>Done, and the answer is a null: preview is not significant (p = 0.3633 sign test, 0.4922 permutation). Separately, the agent beats current-grade by +29 to +34 points on five of eight seeds.</td></tr>
           <tr><td>E · The second system: a battery</td><td>A system whose physics has nothing in common with the engine&#x27;s. The aim: plot its points on the same H/τ curve. If the two do not land on one curve, the criterion is wrong or incomplete, and saying so is a result too.</td><td>Not started — battery.py does not exist yet.</td></tr>
           <tr><td>F · The H/τ sweep</td><td>Measure the value of preview at different values of the ratio.</td><td>Preliminary only, from control rules we wrote by hand — and the H2 table that was its result is void (scored against a baseline with its cooling disabled), so it is re-run before anything is quoted from it.</td></tr>
@@ -4026,7 +4026,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
           <li><b>Preview: not significant</b> <span style="color:var(--muted)">Sixteen agents, eight seeds per arm, sighted and blinded, with the analysis preregistered before any of them trained. 5 of 8 seeds positive, mean +4.8 damage units, exact one-sided sign test p = 0.3633, permutation p = 0.4922 — not significant at 0.05. The seed-to-seed spread is tens of times the effect, which is exactly why eight seeds were run rather than one.</span></li>
           <li><b>Learned supervision: it works — and that is a different claim</b> <span style="color:var(--muted)">The trained agent beats current-grade by +29 to +34 points on five of eight seeds, and is positive on seven of eight. Do not read it as evidence for preview; that conflation is AUDIT.md C3.</span></li>
           <li><b>Say the training budget in the same breath as the null</b> <span style="color:var(--muted)">These are C1 agents: 50 000 steps, 11 training episodes. Say &quot;with agents trained to the C1 budget, preview does not separate from seed noise&quot; — never &quot;preview does not help&quot;. And the study is underpowered: power 0.10 against an effect of 50 damage units.</span></li>
-          <li><b>And the blinded arm was not blind</b> <span style="color:var(--muted)">The same road in every episode, and a thermal state the agent reads like a clock, so it could memorise when the hill comes. Phase D compared explicit preview with implicit preview. The fix is Phase D2: the same climb with a randomised start and grade per episode, preregistered, training launched on 22 September — and no result yet.</span></li>
+          <li><b>And the blinded arm was not blind</b> <span style="color:var(--muted)">The same road in every episode, and a thermal state the agent reads like a clock, so it could memorise when the hill comes. Phase D compared explicit preview with implicit preview. The fix is Phase D2: the same climb with a randomised start and grade per episode, preregistered — and inconclusive (23 September), so the unblind arm was not hiding a large effect.</span></li>
           <li><b>Do not rescue the null with H/τ</b> <span style="color:var(--muted)">The reading &quot;our ratio is below one, so a null fits the theory&quot; was drafted, checked and refuted (PREREGISTRATION.md limit 8). Nor does the hand-written premise check rescue it: hand-written preview loses to current-grade by 0.4 points, and the 679.0 = 679.0 identity holds by construction.</span></li>
         </ul>
       </div>
@@ -4092,7 +4092,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <li><div>
           <b>Phase D2 — a blinded arm that is really blind</b>
           <div class="note">training launched 22 September</div>
-          <div class="note">The same ablation on a randomised climb: it starts between 120 and 300 seconds and its grade is between 12 and 16 % in every episode, so the preview channel is the only way to know when the hill comes. Preregistered in PREREGISTRATION_D2.md before any D2 agent trained, with a minimum effect of interest of 50 damage units. There is no D2 result yet, and this page does not predict one.</div>
+          <div class="note">The same ablation on a randomised climb: it starts between 120 and 300 seconds and its grade is between 12 and 16 % in every episode, so the preview channel is the only way to know when the hill comes. Preregistered in PREREGISTRATION_D2.md before any D2 agent trained, with a minimum effect of interest of 50 damage units. Result: inconclusive (4 of 8 seeds). Then C4, the same design trained longer (300 000 steps): by the primary test preview's effect is below the threshold, one seed wide, the sensitivity test disagreeing and the agents not converged.</div>
         </div></li>
         <li><div>
           <b>Write the Phase D chapter</b>
@@ -4115,7 +4115,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
     <div class="blk">
       <h3>The summary in four lines</h3>
       <p>The floor of the project — Phase D — is now in. Every headline figure here is printed by a single command anyone can re-run. The one thing no script prints is the R² of 0.157 from the radiator fitting attempt, and that is documented with its source in logs/CHANNEL_CENSUS.md.</p>
-      <p>What is left: Phase D2 on the randomised climb, and writing the Phase D chapter with its two separate claims.</p>
+      <p>What is left: the team's decision on the next experiment (a longer budget or more seeds, one at a time), and finishing the ablation chapter with its two separate claims.</p>
       <p>And preview did not win? Then we say so plainly. A null under a protocol fixed before the experiment is still a defensible result. What would destroy the project is changing the test set, or adding seeds, after seeing the results — not losing a comparison.</p>
       <p>This status is current as of 22 September 2026. One command checks that every figure in it is still true: python <code>verify_docs.py</code>.</p>
     </div>
@@ -4630,7 +4630,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         </div>
         <div class="term" data-g="g7">
           <div class="th"><b>Built vs planned</b></div>
-          <p class="def">Built today: the physical model, the thermal network, the training environment, the baseline, and the premise check with hand-written policies. Also built: sixteen agents trained to the C1 budget, and Phase D with its null on preview. Planned: the real training run C4, Phase D2 on a randomised climb (training launched, no result yet), the battery (E), and the surrogate model.</p>
+          <p class="def">Built today: the physical model, the thermal network, the training environment, the baseline, and the premise check with hand-written policies. Also built: sixteen agents trained to the C1 budget, and Phase D with its null on preview. Also run: Phase D2 on a randomised climb (inconclusive) and C4 at 300 000 steps (below the threshold by the primary test, one seed wide, not converged). Planned: the battery (E), and the surrogate model.</p>
           <p class="why"><span class="star">Why it matters here · </span>Say this out loud in any presentation. Every present tense on this page about the agent, the battery or the surrogate model is a plan, not a result, and confusing the two is the fastest way to lose an examiner&#x27;s trust.</p>
         </div>
       </div>

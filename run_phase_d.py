@@ -62,9 +62,10 @@ And what it now DOES:
     a second wave starts hours after the first, and each run records
     `git_dirty` from its own start. A preregistration that pins a commit
     means the commit, not the commit plus whatever was being edited;
-  * it refuses any new work in a CLOSED experiment -- `runs/`, `runs_d2/`, and
-    the `phase_d` / `d2` result prefixes -- because a new seed there would be
-    globbed into a pinned analysis as if it had always belonged;
+  * it refuses any new work in a CLOSED experiment -- `runs/`, `runs_d2/`,
+    `runs_c4/` (closed 24 September, after its result) and the `phase_d` /
+    `d2` / `c4` result prefixes -- because a new seed there would be globbed
+    into a pinned analysis as if it had always belonged;
   * it refuses when the directory's agents were trained for a different
     budget than `--steps` (the wrong-`--out` case) instead of skipping all
     sixteen and reporting success;
@@ -107,8 +108,9 @@ def result_prefix(out):
 # Experiments whose preregistrations say "sixteen runs, then stop" -- the same
 # set train.py refuses to add to. Their directories and result prefixes take no
 # new work: a new seed there would be globbed into a pinned analysis.
-CLOSED_OUT = {"runs": "Phase D", "runs_d2": "Phase D2"}
-CLOSED_PREFIX = {"phase_d": "Phase D", "d2": "Phase D2"}
+CLOSED_OUT = {"runs": "Phase D", "runs_d2": "Phase D2",
+              "runs_c4": "C4"}       # closed 24 Sep 2026, after its result
+CLOSED_PREFIX = {"phase_d": "Phase D", "d2": "Phase D2", "c4": "C4"}
 
 # A crashed run is moved aside only if nothing in it has changed for this long.
 # A live C4 run writes a checkpoint every 10 000 steps -- about 9-15 minutes --
@@ -244,7 +246,7 @@ def main():
                          "runs_c4/ and results/c4_* with --out runs_c4.")
     ap.add_argument("--out", default=None,
                     help="default runs/ (fixed) or runs_d2/ (random). A NEW "
-                         "experiment gets its own, e.g. runs_c4/")
+                         "experiment gets its own, e.g. runs_c5/")
     ap.add_argument("--logs", default=None,
                     help="default <out>/_logs")
     ap.add_argument("--prefix", default=None,
@@ -282,8 +284,10 @@ def main():
         a.logs = os.path.join(a.out, "_logs")
     res_prefix = a.prefix or result_prefix(a.out)
     default_prefix = "d2" if d2 else "phase_d"
-    closed = (CLOSED_OUT.get(os.path.basename(os.path.normpath(a.out)))
-              or CLOSED_PREFIX.get(res_prefix))
+    # .lower(): on Windows runs_C4 IS runs_c4 -- the review found the
+    # capitalised spelling walked past the guard.
+    closed = (CLOSED_OUT.get(os.path.basename(os.path.normpath(a.out)).lower())
+              or CLOSED_PREFIX.get(res_prefix.lower()))
 
     if a.prove_buffer:
         if a.dry_run:
@@ -416,7 +420,7 @@ def main():
         print(f"\nWRONG --out? {a.out}/ holds agents trained for a different "
               f"budget than --steps {a.steps:,}:\n  " + ", ".join(wrong_budget))
         print("A new budget is a new experiment with its own --out "
-              "(e.g. --out runs_c4). Nothing launched.")
+              "(e.g. --out runs_c5). Nothing launched.")
         return 1
     if closed and jobs:
         print(f"\nREFUSING: {a.out}/ and results/{res_prefix}_* belong to "
