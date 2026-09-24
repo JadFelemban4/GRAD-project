@@ -434,6 +434,31 @@ final pass, `check_c4_start.py --out results/c4_identity.txt`, is still run
 after training, as section 9 requires, so that it also certifies every later
 checkpoint's budget.
 
+**24 September, 07:25 — training finished: 16 of 16 runs exited 0, none
+failed, in 882 minutes.** Every run: 66 training episodes; its `final.zip`
+reads *trained 300000 steps of 300000 requested, from step 0, buffer 300000*.
+
+**Section 9, step 2 — before the test set is scored:**
+
+```
+python check_c4_start.py --out results/c4_identity.txt   EXIT 0   (07:28)
+    IDENTITY compared 80 identical 80; every later checkpoint's budget ok
+python check_c4_convergence.py                          EXIT 0   (56.5 min)
+    settled: sighted 2 of 8, blind 1 of 8
+    settled pairs: 1 of 8
+    VERDICT NOT-CONVERGED sighted 2/8 blind 1/8 pairs 1/8 band 25 need 6 and 7
+```
+
+**The verdict is NOT-CONVERGED, by a wide margin on both conditions.** Per
+agent, practice-set median damage moved between 8.2 and 200.2 units across
+200 000, 250 000 and 300 000 steps, against a band of 25 and a measured
+one-step noise floor of at most 7.9 (5b). The movement is not all
+improvement: several agents took MORE damage at 300 000 steps than at 200 000
+(blinded seed 0: 538.8, 589.5, 694.5). So by the preregistered rule these
+agents were still changing when training stopped — the verdict labels the
+result and repairs nothing (5b). Both files are committed before any C4 agent
+is scored on `EPISODES_D2`.
+
 ## 7. Stopping rule
 
 Sixteen runs, then stop. **No seed is added after any C4 result is seen**, and

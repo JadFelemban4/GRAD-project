@@ -1,0 +1,23 @@
+C4 START CHECK -- runs_c4/ against runs_d2/, 2026-09-24 07:28
+preregistration committed in 79568e2
+agent           meta     budget   identity with runs_d2/, per checkpoint
+------------------------------------------------------------------------------
+sighted_seed0   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed0     ok       ok       10k =  20k =  30k =  40k =  50k =
+sighted_seed1   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed1     ok       ok       10k =  20k =  30k =  40k =  50k =
+sighted_seed2   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed2     ok       ok       10k =  20k =  30k =  40k =  50k =
+sighted_seed3   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed3     ok       ok       10k =  20k =  30k =  40k =  50k =
+sighted_seed4   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed4     ok       ok       10k =  20k =  30k =  40k =  50k =
+sighted_seed5   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed5     ok       ok       10k =  20k =  30k =  40k =  50k =
+sighted_seed6   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed6     ok       ok       10k =  20k =  30k =  40k =  50k =
+sighted_seed7   ok       ok       10k =  20k =  30k =  40k =  50k =
+blind_seed7     ok       ok       10k =  20k =  30k =  40k =  50k =
+------------------------------------------------------------------------------
+IDENTITY compared 80 identical 80
+IDENTICAL so far: these C4 runs are retracing their D2 twins exactly.

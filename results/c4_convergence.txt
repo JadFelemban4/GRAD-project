@@ -1,0 +1,47 @@
+C4 CONVERGENCE -- results/PREREGISTRATION_C4.md section 5b
+agents from runs_c4/; practice set seed 20260923, 10 episodes, NOT the test set
+settled: median damage moves <= 25 units across 200,000, 250,000, 300,000 steps
+converged: >= 6 of 8 settled in EACH arm, AND >= 7 of 8 seed pairs settled
+
+agent              dmg@200k   dmg@250k   dmg@300k   moves  settled  return@300k        curve: slope/10 ep, se
+----------------------------------------------------------------------------------------------------------
+sighted_seed0         301.9      296.7      364.6    67.8  NO             47.06      -73.6 +/-   95.9 (66 ep)
+blind_seed0           538.8      589.5      694.5   155.6  NO             25.85      -81.0 +/-   63.9 (66 ep)
+sighted_seed1         374.2      408.3      425.6    51.4  NO             45.31      +16.4 +/-   63.3 (66 ep)
+blind_seed1           418.7      341.4      319.3    99.4  NO             39.31     +118.9 +/-   65.2 (66 ep)
+sighted_seed2         572.9      541.5      517.0    55.9  NO             42.01      +41.9 +/-   47.4 (66 ep)
+blind_seed2           525.7      539.6      553.4    27.8  NO             31.15      +53.7 +/-   56.2 (66 ep)
+sighted_seed3         340.3      343.4      335.3     8.2  yes            40.49     -122.9 +/-  118.0 (66 ep)
+blind_seed3           485.1      284.9      325.9   200.2  NO             44.91     -155.2 +/-  121.3 (66 ep)
+sighted_seed4         350.6      362.8      369.5    18.9  yes            45.88      -24.0 +/-   96.8 (66 ep)
+blind_seed4           333.4      332.2      357.9    25.6  NO             44.64      -23.7 +/-   94.3 (66 ep)
+sighted_seed5         470.4      466.3      416.5    53.9  NO             44.66      -43.5 +/-   49.3 (66 ep)
+blind_seed5           417.6      408.2      419.9    11.7  yes            43.01     -127.1 +/-   63.3 (66 ep)
+sighted_seed6         309.5      360.0      325.2    50.5  NO             45.34      -67.1 +/-  106.0 (66 ep)
+blind_seed6           405.3      338.6      349.2    66.7  NO             43.12      -51.8 +/-  108.4 (66 ep)
+sighted_seed7         380.5      312.6      359.5    67.9  NO             40.68       -3.2 +/-  101.8 (66 ep)
+blind_seed7           409.0      379.7      427.1    47.4  NO             40.21       -8.3 +/-  104.5 (66 ep)
+----------------------------------------------------------------------------------------------------------
+settled: sighted 2 of 8, blind 1 of 8
+paired difference (blind - sighted), max - min over the three points ('!' = not settled):
+  s0 92.9!  s1 150.8!  s2 83.7!  s3 203.4!  s4 19.0  s5 61.4!  s6 117.3!  s7 39.1!
+settled pairs: 1 of 8
+
+AGENT sighted_seed0 final.zip sha 20f0ae6a9c1564a9
+AGENT blind_seed0 final.zip sha 9ab8d2b29cbb9d06
+AGENT sighted_seed1 final.zip sha 0a748c7ec8a06538
+AGENT blind_seed1 final.zip sha f028e248ee8077d3
+AGENT sighted_seed2 final.zip sha 715dde293b07ed7b
+AGENT blind_seed2 final.zip sha c347fc06b1a4c7ba
+AGENT sighted_seed3 final.zip sha 5a18511a5a854dcc
+AGENT blind_seed3 final.zip sha 025819a8d558d092
+AGENT sighted_seed4 final.zip sha e86d703b10e769c9
+AGENT blind_seed4 final.zip sha d3979efee0e825c8
+AGENT sighted_seed5 final.zip sha 3466b26631d888ef
+AGENT blind_seed5 final.zip sha b6450a8e66a03d75
+AGENT sighted_seed6 final.zip sha d1dab3e32ba70c33
+AGENT blind_seed6 final.zip sha 952396a6de6738f9
+AGENT sighted_seed7 final.zip sha b75d3ab8374adf23
+AGENT blind_seed7 final.zip sha e0a2cc00d0d66052
+VERDICT NOT-CONVERGED sighted 2/8 blind 1/8 pairs 1/8 band 25 need 6 and 7 runs runs_c4
+(56.5 min)
