@@ -1,0 +1,44 @@
+C4 EVALUATION (agents from runs_c4/) -- scored on the 'd2' protocol, 20 FIXED EPISODES, frozen 22 Sep 2026
+scenario: climb from 120-300 s at 12-16 %, per episode, 130 km/h, 42 C, 720 s, dt 1.0
+trigger:  850 C
+
+--- PLANT FINGERPRINT (this run) ------------------------------
+  plant_sha                b5a3069f32a83754
+  gears                    5.25 3.36 2.172 1.72 1.316 1 0.822 0.64
+  final_drive              3.15
+  dtheta_deg               0.25
+  turb_protect_k           1123
+  oil_protect_k            408
+  scenario                 grade=0.12 0.16 protocol=random-climb road_sha=1a29dc46db24f233 start_s=120 300 t_amb=315 v_kmh=130
+  episodes_sha             1c5d49852290d27c
+  eval_dt                  1
+  eval_duration            720
+  git_dirty                False
+  git_dirty_plant_files    
+  git_head                 c5a5341548040f6940b1632c82793426df0dffe0
+  n_episodes               20
+  plant_text_sha           e37311f29851876c
+  python                   3.12.10
+--------------------------------------------------------------
+note sighted_seed1: trained at dt 0.2, scored at dt 1 (known, unresolved -- AUDIT2.md H2-2)
+model runs_c4\sighted_seed1: trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 0a748c7ec8a06538
+note blind_seed1: trained at dt 0.2, scored at dt 1 (known, unresolved -- AUDIT2.md H2-2)
+model runs_c4\blind_seed1: trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha f028e248ee8077d3
+
+policy                        damage med      IQR    worst  fuel med   peak C
+-----------------------------------------------------------------------------
+baseline ECU                      1118.0    715.9   2363.8      4818      924
+reactive                           667.8    214.5    919.8      5040      871
+current-grade                      653.5    295.5    907.0      5158      871
+agent runs_c4\sighted_seed1        490.2    263.7    900.0      4827      876
+agent (blind) runs_c4\blind_seed1       409.9    246.4    811.1      5161      875
+-----------------------------------------------------------------------------
+  reactive                   cuts median damage  40.3 %
+  current-grade              cuts median damage  41.5 %
+  agent runs_c4\sighted_seed1 cuts median damage  56.2 %
+  agent (blind) runs_c4\blind_seed1 cuts median damage  63.3 %
+
+  AGENT over CURRENT-GRADE: +14.6 points
+  SIGHTED over BLINDED:     -7.2 points   <- THE ABLATION
+  It is the project's result only if the fingerprint block above is the plant
+  every figure beside it was measured on. That is now checkable -- check it.
