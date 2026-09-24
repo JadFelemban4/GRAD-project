@@ -2213,18 +2213,38 @@ not a result.
 
 ## What to do next, in order
 
-> **C4 IS PREREGISTERED AND RUNNING — 23 September 2026, 16:42.**
-> `results/PREREGISTRATION_C4.md`, committed `79568e2` before any C4 agent
-> trained, pinning the code at `a1af19a`. Sixteen runs of D2's design at
-> 300 000 steps into `runs_c4/`, ten at a time, launcher detached from the
-> session. The three traps that could have destroyed Phase D's and D2's
-> agents are closed (`f987049`; `train.py` "A RESUME IS NOT A LONGER RUN").
-> **While it runs:** `python check_c4_start.py` (identity with D2, certificates);
-> a crash is re-run FROM SCRATCH with `--seeds <k> --restart-crashed`, never
-> resumed; **do not edit tracked files while a wave is starting** -- the
-> launcher holds its queue while the tree is dirty. The order after training is
-> section 9 of the preregistration: identity + convergence committed, THEN
-> evaluate, THEN tracking, THEN `python analyse_c4.py`.
+> **C4 HAS A RESULT — 24 September 2026. SMALLER THAN THE MEI by the primary
+> test, the sensitivity test DISAGREEING, and the agents NOT CONVERGED.**
+> D2's design at 300 000 steps, one variable changed (the budget),
+> preregistered in `results/PREREGISTRATION_C4.md` (`79568e2`) before any C4
+> agent trained.
+>
+> ```
+> python analyse_c4.py        (captured: results/C4_RESULT.txt)
+> positive 3 of 8   mean +30.2   median -1.3   sd 139.9
+> effect below the MEI (50): sign p = 0.0352 (7 of 8)   permutation p = 0.3867
+> cell SMALLER THAN THE MEI     convergence NOT-CONVERGED (2/8, 1/8, pairs 1/8)
+> budget-change test (5c): p = 0.6367 -- not shown
+> ```
+>
+> - **The preregistered reading, verbatim:** *"Preview's effect is below the
+>   MEI at 300 000 steps: (i) is supported AT THIS BUDGET. The agents were
+>   still changing, so (ii) is not ruled out."* Never "preview does not help".
+> - **It hangs on one seed.** 7 of 8 is the sign test's exact threshold; the
+>   permutation test disagrees because seed 0 carries +360.6 the other way
+>   (its blinded agent got WORSE with longer training). Both are reported; the
+>   sign test is primary; neither is chosen after the fact.
+> - **Every C4 agent retraced its D2 twin bit for bit through 50 000 steps**
+>   (80 of 80) — C4 is D2's agents trained longer. No agent refuses torque.
+> - **Supervision, separately:** sighted beats `current-grade` on the median in
+>   8 of 8 seeds, blinded in 7 of 8 — but on the worst episode 4 of 8 sighted
+>   and 5 of 8 blinded agents are worse than `current-grade`'s worst.
+> - **Next is the team's decision** — longer budget (the agents were still
+>   changing) or more seeds (the result hangs on one seed); one, not both.
+>
+> The full account: `PREREGISTRATION_C4.md` section 11. The traps that could
+> have destroyed Phase D's and D2's agents are closed (`f987049`; `train.py`
+> "A RESUME IS NOT A LONGER RUN").
 
 > **THE LIVE LIST — 23 September 2026, after Phase D2.** Both ablations are in
 > and both are INCONCLUSIVE at the C1 budget. Everything in the older list below

@@ -1,8 +1,8 @@
 # Chapter 4 — The preview ablation: Phase D and Phase D2
 
-**DRAFT, 23 September 2026.** Written while C4 trains, from the committed
+**DRAFT, 23–24 September 2026.** Written while C4 trained, from the committed
 result files and preregistrations only, and reviewed adversarially before its
-first commit. Every figure below is printed by a named script or stands in a
+first commit. Section 4.10 was updated with C4's result on 24 September. Every figure below is printed by a named script or stands in a
 committed file under `results/`, and is cited beside it; re-run the script
 before quoting a figure, because this draft will not move when the data does
 (`CLAUDE.md`, mistake 11).
@@ -419,26 +419,58 @@ run the budget first.
 **C4** is D2's design at **300 000 steps** per run (about 66 training climbs),
 preregistered in `results/PREREGISTRATION_C4.md` before any of its sixteen
 agents trained. One identity probe, stopped at 10 000 steps and never
-evaluated, ran before the commit and is disclosed there; its weights were
-bit-identical to its D2 twin's, and the first ten C4 runs matched their twins
-too at 10 000 steps (section 6a). If `check_c4_start.py` finds the same for all
-sixteen runs from 10 000 to 50 000 steps, C4 can be read as D2's agents at a
-later training age. For the same reason it is not an independent replication,
-and its p-value will be the third unadjusted look at this question on the same
-seeds (C4 limits 11 and 13). At D2's spread it has the same power, 0.24,
-against the MEI, and can separate the arms only if the effect is large or
-convergence shrinks the spread; an INCONCLUSIVE C4, even with converged agents,
-would leave (ii) undecided for effects near the MEI (C4 section 2a). It fixes
-its readings, its convergence rule and a paired test of whether the budget
-changed preview's effect in advance, and its result will be reported beside
-Phase D and D2, never pooled with them.
+evaluated, ran before the commit and is disclosed there. **Every C4 run
+retraced its D2 twin bit for bit through 50 000 steps** — 80 checkpoint pairs,
+all identical (`results/c4_identity.txt`) — so C4 is D2's agents at a later
+training age, and for the same reason not an independent replication (C4
+limit 11). It fixed in advance its readings, its convergence rule and a paired
+test of whether the budget changed preview's effect.
+
+**C4's result** (`python analyse_c4.py`, captured in `results/C4_RESULT.txt`;
+the full account is `PREREGISTRATION_C4.md` section 11):
+
+| | |
+|---|---|
+| seeds where preview helped | 3 of 8; mean +30.2, median −1.3, sd 139.9 |
+| effect below the MEI — sign / permutation | **p = 0.0352** (7 of 8 below 50) / **p = 0.3867 — the two disagree** |
+| preview helps — sign / permutation | p = 0.8555 / 0.4062 |
+| budget changed preview's effect (C4 section 5c) | p = 0.6367 (4 of 8 grew) — not shown |
+| **cell** | **SMALLER THAN THE MEI**, by the primary test |
+| **convergence** | **NOT-CONVERGED** — 2 of 8 sighted, 1 of 8 blinded, 1 of 8 pairs settled |
+
+The reading C4 declared in advance for this combination: *"Preview's effect is
+below the MEI at 300 000 steps: (i) is supported AT THIS BUDGET. The agents
+were still changing, so (ii) is not ruled out."* Two qualifications travel with
+it. **It hangs on one seed:** 7 of 8 is exactly the count the sign test needs,
+and the permutation test, which weighs magnitudes, does not reject, because in
+seed 0 the blinded agent took far more damage than the sighted one (+360.6).
+Most seeds show no benefit from preview; one shows a large one. **And the
+agents had not converged:** their practice-set damage was still moving by
+8.2–200.2 units over the last 100 000 steps, not always downward — seed 0's
+blinded agent grew worse with longer training. It is the third preregistered
+look at the question on these seeds, and every p-value is unadjusted.
+
+On learned supervision, C4 repeats D2's pattern: on the median the sighted
+agent beats `current-grade` in 8 of 8 seeds and the blinded agent in 7 of 8;
+on the worst episode, 4 of 8 sighted and 5 of 8 blinded agents are worse than
+`current-grade`'s worst. No C4 agent refuses torque
+(`results/c4_tracking.txt`).
+
+**Where the three experiments leave the question.** Across a fixed road, a
+randomised road and a six-fold budget, preview never separated from seed noise
+in the direction of helping; at 300 000 steps the primary test places its
+effect below the team's threshold, on a margin one seed wide, with agents that
+had not settled. What comes next — a longer budget or more seeds, one variable
+at a time — is the team's decision.
 
 ---
 
 *Draft notes, to remove before submission:* the tables are copied from
 `python analyse_phase_d2.py` and the committed result files (23 September
 2026) — regenerate them from a fresh run before the thesis is compiled; the
-torque figures should cite a captured output (`check_d2_tracking.py --out`)
-once the machine is free of C4; section 4.10 must be rewritten when C4's
-result exists; figure numbering and citations to Chapters 2–3 are not yet in
-place.
+D2 torque figures should cite a captured output (`check_d2_tracking.py --out
+results/d2_tracking.txt`) now that the machine is free of C4; section 4.10's
+C4 paragraphs were added after the result and were not part of the reviewed
+draft — review them before submission; C4 probably deserves its own section
+beside 4.3 and 4.5 rather than a closing one; figure numbering and citations
+to Chapters 2–3 are not yet in place.

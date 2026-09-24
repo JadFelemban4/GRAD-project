@@ -1,0 +1,84 @@
+==============================================================================
+C4 -- the preregistered test: Phase D2's design at 300 000 steps
+results/PREREGISTRATION_C4.md, committed before any C4 agent was trained
+==============================================================================
+
+  certified: 16 agents, each a fresh 300,000-step run on the pinned plant, road, episodes and protocol
+
+ seed   baseline  curr-grade   sighted   blinded  blind-sighted
+------------------------------------------------------------------------------
+    0     1118.0       653.5     359.9     720.5         +360.6
+    1     1118.0       653.5     490.2     409.9          -80.3
+    2     1118.0       653.5     602.2     524.4          -77.8
+    3     1118.0       653.5     336.1     349.5          +13.4
+    4     1118.0       653.5     332.8     371.0          +38.2
+    5     1118.0       653.5     442.6     442.3           -0.3
+    6     1118.0       653.5     357.6     347.6          -10.0
+    7     1118.0       653.5     365.5     363.1           -2.4
+------------------------------------------------------------------------------
+paired differences (blind - sighted), n = 8
+  positive (preview helped) : 3 of 8
+  mean difference           : +30.2 damage units
+  median difference         : -1.3   seeds at or above the MEI (50): 1 of 8   (descriptive)
+  sd of the differences     : 139.9   (D2: 98.8, Phase D: 214.4) -- no direction was predicted
+
+  H1: preview helps (difference > 0)
+    exact one-sided sign test        p = 0.8555
+    exact paired permutation test    p = 0.4062   (sensitivity)
+  H1: the effect is smaller than the MEI (50 units)
+    exact one-sided sign test        p = 0.0352   (7 of 8 seeds below 50)
+    exact paired permutation test    p = 0.3867   (sensitivity)
+  the other direction, preview COSTS damage: sign test p = 0.3633   (5 of 8 seeds)
+  alpha 0.05, one-sided
+  THE TWO TESTS DISAGREE on 'smaller than the MEI'. Both reported;
+  the sign test is primary.
+
+  SECTION 5c -- did preview's effect GROW from 50 000 to 300 000 steps?
+  per seed: (blind - sighted at C4) minus (blind - sighted at D2)
+    s0 +138.9  s1 -5.9  s2 -74.1  s3 +12.5  s4 -12.3  s5 +66.8  s6 +72.9  s7 -8.6
+    exact one-sided sign test        p = 0.6367   (4 of 8 grew)
+    exact paired permutation test    p = 0.2188   (sensitivity)
+
+  RESULT: SMALLER THAN THE MEI
+  This is the THIRD preregistered look at the preview question on these
+  seeds (Phase D sign p 0.3633, Phase D2 0.6367); every p here is
+  unadjusted, and the three are reported together.
+
+CONVERGENCE (PREREGISTRATION_C4.md section 5b)
+  NOT-CONVERGED sighted 2/8 blind 1/8 pairs 1/8 band 25 need 6 and 7 runs runs_c4
+
+THE READING, as declared before any C4 agent trained (section 2a):
+  Preview's effect is below the MEI at 300 000 steps: (i) is supported
+  AT THIS BUDGET. The agents were still changing, so (ii) is not ruled
+  out.
+
+==============================================================================
+THE THREE EXPERIMENTS, ONE LINE EACH -- beside, never pooled
+==============================================================================
+  Phase D   fixed climb, blind arm NOT blind, C1    5 of 8  mean   +4.8  sd 214.4  INCONCLUSIVE
+  Phase D2  random climb, blind checked, C1         4 of 8  mean   +6.4  sd  98.8  INCONCLUSIVE
+  C4        random climb, D2's design, 300 000 st.  3 of 8  mean  +30.2  sd 139.9  SMALLER THAN THE MEI
+  (Phase D's MEI cell is post-hoc: its MEI was set after its result.)
+
+  C4 minus D2 median damage, per seed and arm -- DESCRIPTIVE, no test.
+  Negative = the longer-trained agent took less damage.
+    seed 0: sighted    +6.4   blinded  +145.3
+    seed 1: sighted    +4.5   blinded    -1.4
+    seed 2: sighted   -25.6   blinded   -99.7
+    seed 3: sighted    +4.7   blinded   +17.2
+    seed 4: sighted   -24.5   blinded   -36.8
+    seed 5: sighted  -144.5   blinded   -77.7
+    seed 6: sighted   -85.2   blinded   -12.3
+    seed 7: sighted   -35.1   blinded   -43.7
+
+  Preview must beat CURRENT-GRADE, not the baseline ECU. Per C4 seed:
+    seed 0: sighted over current-grade  +26.3 points, blinded   -6.0
+    seed 1: sighted over current-grade  +14.6 points, blinded  +21.8
+    seed 2: sighted over current-grade   +4.6 points, blinded  +11.5
+    seed 3: sighted over current-grade  +28.4 points, blinded  +27.2
+    seed 4: sighted over current-grade  +28.7 points, blinded  +25.3
+    seed 5: sighted over current-grade  +18.9 points, blinded  +18.9
+    seed 6: sighted over current-grade  +26.5 points, blinded  +27.4
+    seed 7: sighted over current-grade  +25.8 points, blinded  +26.0
+  That is learned SUPERVISION, a separate claim from preview
+  (AUDIT.md C3). Do not read one as evidence for the other.

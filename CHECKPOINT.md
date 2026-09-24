@@ -1873,3 +1873,49 @@ trained longer.
    30–75 kPa span; the deck tabulates 13 of 18 mistakes; capture
    `check_d2_tracking.py --out results/d2_tracking.txt` once the machine is free,
    so Chapter 4 cites a file rather than a record.
+
+## 24 September 2026 — C4 has a result: SMALLER THAN THE MEI, not converged, and it hangs on one seed
+
+Commits `4bfece8` … on `JMF-2340550-sep17`. Training finished 07:25 (16 of 16,
+882 min, no failure); evaluated 08:26–09:47; torque checked by 10:25.
+
+### The result
+
+```
+python analyse_c4.py          (results/C4_RESULT.txt)
+                         Phase D (post-hoc)   Phase D2        C4
+positive                 5 of 8               4 of 8          3 of 8
+mean / sd                +4.8 / 214.4         +6.4 / 98.8     +30.2 / 139.9 (median -1.3)
+below the MEI  sign      0.6367               0.1445          0.0352 (7 of 8)
+               perm      0.2578               0.1250          0.3867  <- DISAGREES
+cell                     INCONCLUSIVE         INCONCLUSIVE    SMALLER THAN THE MEI
+convergence (C4 5b)                                           NOT-CONVERGED 2/8 1/8 pairs 1/8
+budget-change test (5c)                                       p 0.6367 -- not shown
+```
+
+- **The preregistered reading, verbatim:** *"Preview's effect is below the MEI
+  at 300 000 steps: (i) is supported AT THIS BUDGET. The agents were still
+  changing, so (ii) is not ruled out."*
+- **It hangs on one seed.** 7 of 8 is exactly the sign test's threshold; the
+  permutation test disagrees because seed 0 carries +360.6 — its blinded agent
+  got worse with longer training (practice damage 538.8 → 694.5; test damage
+  145.3 worse than at 50 000 steps). Described, not dropped.
+- **C4 is D2's agents trained longer:** 80 of 80 checkpoint pairs identical to
+  D2 through 50 000 steps (`results/c4_identity.txt`).
+- **Supervision, separately:** sighted beats `current-grade` on the median in
+  8 of 8, blinded in 7 of 8; on the worst episode 4 of 8 sighted and 5 of 8
+  blinded are worse than `current-grade`'s worst. No agent refuses torque
+  (`results/c4_tracking.txt`, 0 of 16).
+
+### Where it lives
+
+`results/PREREGISTRATION_C4.md` section 11 (the account) and 6a (the run log);
+`results/C4_RESULT.txt`; `results/c4_identity.txt`, `c4_convergence.txt`,
+`c4_tracking.txt`, `c4_seed0-7.txt`; `CLAUDE.md` (the box); `results/README.md`;
+`thesis/CHAPTER4_ABLATION_DRAFT.md` 4.10 (added after the reviewed draft).
+
+### Open — the team's decision
+
+**What next:** a longer budget (the agents were still changing) or more seeds
+(the result hangs on one seed) — one variable at a time, with its own
+preregistration. `C4_RESULT.txt` and section 11 are what to decide from.

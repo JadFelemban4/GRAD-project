@@ -1,17 +1,38 @@
 # `results/` — Phase D, Phase D2 and C4
 
-## C4 — D2's design at 300 000 steps: PREREGISTERED, RUNNING (23 September 2026)
+## C4 — D2's design at 300 000 steps: SMALLER THAN THE MEI, not converged (24 September 2026)
+
+```bash
+python analyse_c4.py            # C4's preregistered test, D2 and Phase D beside it
+```
 
 `PREREGISTRATION_C4.md`, committed `79568e2` before any C4 agent trained. C4
 changes ONE variable from D2 — the training budget, 50 000 → 300 000 steps —
-by the team's rule: one variable at a time. What each outcome will mean is
-declared in its section 2a; convergence is judged by a rule fixed in 5b and
-calibrated on D2's agents (`c4_convergence_calibration.txt`); section 5c
-tests whether the budget changed preview's effect. **No C4 result exists yet.**
+by the team's rule: one variable at a time. Every C4 agent retraced its D2
+twin bit for bit through 50 000 steps (`c4_identity.txt`, 80 of 80).
 
-```bash
-python analyse_c4.py            # after training -- see PREREGISTRATION_C4.md section 9
-```
+| | Phase D | Phase D2 | **C4** |
+|---|---|---|---|
+| budget | C1 | C1 | **300 000 steps** |
+| seeds where preview helped | 5 of 8 | 4 of 8 | **3 of 8** |
+| mean / sd of blind − sighted | +4.8 / 214.4 | +6.4 / 98.8 | **+30.2 / 139.9** (median −1.3) |
+| effect below the MEI — sign / permutation | 0.6367 / 0.2578 (post-hoc) | 0.1445 / 0.1250 | **0.0352 / 0.3867 — they disagree** |
+| **cell** | INCONCLUSIVE (post-hoc) | INCONCLUSIVE | **SMALLER THAN THE MEI** (primary test) |
+| convergence | — | — | **NOT-CONVERGED** (`c4_convergence.txt`) |
+
+- **The preregistered reading:** preview's effect is below the MEI at
+  300 000 steps — (i) is supported AT THIS BUDGET; the agents were still
+  changing, so (ii) is not ruled out.
+- **It hangs on one seed:** 7 of 8 is the sign test's exact threshold, and the
+  permutation test disagrees because seed 0 carries +360.6. Most seeds show no
+  benefit from preview; one shows a large one.
+- **The budget did not measurably change preview's effect** (5c, p = 0.6367).
+- **Supervision, separately:** the sighted agent beats `current-grade` on the
+  median in 8 of 8 seeds, the blinded agent in 7 of 8; on the worst episode it
+  does not. No agent refuses torque (`c4_tracking.txt`).
+
+The full account is `PREREGISTRATION_C4.md` section 11; the captured output is
+`C4_RESULT.txt`.
 
 ## Phase D2 — the same ablation, with a blind arm that is blind: INCONCLUSIVE
 

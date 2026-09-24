@@ -1,0 +1,48 @@
+==============================================================================
+runs_c4/ (on the D2 episodes) -- torque delivery and fuel, per agent (PREREGISTRATION_D2 limit 10)
+the twenty frozen D2 episodes, dt 1.0, 720 s; 18 policies, 10 in parallel
+agents from runs_c4/; each row's 'steps' is read from its own final.zip
+==============================================================================
+
+policy           tracking %  vs base  worst ep  fuel g  vs base   damage     steps
+----------------------------------------------------------------------------------
+baseline ECU           0.01    +0.00      0.01    4818    +0.0%   1118.0        --
+current-grade          0.01    +0.00      4.39    5158    +7.1%    653.5        --
+sighted_seed0          0.00    -0.01      0.02    5162    +7.2%    359.9   300,000
+blind_seed0            0.01    +0.00      1.64    4726    -1.9%    720.5   300,000
+sighted_seed1          0.02    +0.01      0.03    4827    +0.2%    490.2   300,000
+blind_seed1            0.01    +0.00      0.07    5161    +7.1%    409.9   300,000
+sighted_seed2          0.00    -0.00      0.03    4726    -1.9%    602.2   300,000
+blind_seed2            0.01    -0.00      0.14    4786    -0.6%    524.4   300,000
+sighted_seed3          0.01    +0.01      1.31    5264    +9.3%    336.1   300,000
+blind_seed3            0.01    +0.00      0.03    5225    +8.4%    349.5   300,000
+sighted_seed4          0.02    +0.01      6.68    5099    +5.8%    332.8   300,000
+blind_seed4            0.01    -0.00      2.33    4934    +2.4%    371.0   300,000
+sighted_seed5          0.01    +0.00      0.13    4862    +0.9%    442.6   300,000
+blind_seed5            0.01    +0.00      0.13    4840    +0.5%    442.3   300,000
+sighted_seed6          0.01    -0.00      0.09    5049    +4.8%    357.6   300,000
+blind_seed6            0.01    +0.00      0.11    5105    +6.0%    347.6   300,000
+sighted_seed7          0.01    -0.00      0.11    5157    +7.0%    365.5   300,000
+blind_seed7            0.02    +0.01      0.19    5294    +9.9%    363.1   300,000
+----------------------------------------------------------------------------------
+tracking % = median over episodes of the per-step torque error above
+3 % of the reference torque (engine_env's torque_viol / steps).
+
+agents whose median fuel is BELOW the baseline ECU's: 3 of 16  (blind_seed0, sighted_seed2, blind_seed2)
+agents tracking torque >1 point worse than the baseline: 0 of 16
+
+per seed, tracking % sighted minus blind (positive = sighted tracks worse):
+GAP seed0 -0.01
+GAP seed1 +0.01
+GAP seed2 -0.00
+GAP seed3 +0.00
+GAP seed4 +0.01
+GAP seed5 +0.00
+GAP seed6 -0.00
+GAP seed7 -0.01
+
+No agent tracks torque materially worse than the baseline ECU. Fuel
+below the baseline is then not torque refusal, and the damage figures
+can be read as protection.
+
+(37.0 min)

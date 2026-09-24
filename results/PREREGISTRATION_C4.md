@@ -581,10 +581,118 @@ python drift_test.py                         EXIT 0 -- 16 of 16 drifts CAUGHT
 The launch dry-run is not here: it can only report a clean tree once this
 file is committed, so it is the first entry of section 6a.
 
-## 11. Outcome
+## 11. Outcome — ADDED 24 September 2026, AFTER THE RESULT
 
-*(Empty at commit. Added after the result, marked as coming after, the way
-`PREREGISTRATION_D2.md` section 11 is.)*
+Everything above section 6a was committed before any of the sixteen C4 agents
+trained (`79568e2`); 6a records operations, and the identity and convergence
+records were committed before any C4 agent was scored (`c5a5341`). This
+section is the result, and it is marked as coming after.
+
+**All sixteen runs trained cleanly** — 882 minutes, no failure, no re-run, 66
+training episodes each, every one a fresh 300 000-step run — and every one
+retraced its D2 twin bit for bit through 50 000 steps (80 of 80,
+`results/c4_identity.txt`). No agent refuses torque (0 of 16,
+`results/c4_tracking.txt`), so the damage figures read as protection.
+`python analyse_c4.py`, captured in `results/C4_RESULT.txt`:
+
+| seed | baseline | current-grade | sighted | blinded | blind − sighted |
+|---|---|---|---|---|---|
+| 0 | 1118.0 | 653.5 | 359.9 | 720.5 | +360.6 |
+| 1 | 1118.0 | 653.5 | 490.2 | 409.9 | −80.3 |
+| 2 | 1118.0 | 653.5 | 602.2 | 524.4 | −77.8 |
+| 3 | 1118.0 | 653.5 | 336.1 | 349.5 | +13.4 |
+| 4 | 1118.0 | 653.5 | 332.8 | 371.0 | +38.2 |
+| 5 | 1118.0 | 653.5 | 442.6 | 442.3 | −0.3 |
+| 6 | 1118.0 | 653.5 | 357.6 | 347.6 | −10.0 |
+| 7 | 1118.0 | 653.5 | 365.5 | 363.1 | −2.4 |
+
+| | |
+|---|---|
+| positive (preview helped) | **3 of 8** |
+| mean / median difference | +30.2 / −1.3 damage units; 1 of 8 seeds at or above the MEI |
+| sd of the paired differences | 139.9 (D2 98.8, Phase D 214.4) |
+| H1 preview helps — sign / permutation | p = 0.8555 / 0.4062 |
+| **H1 effect below the MEI (50) — sign / permutation** | **p = 0.0352** (7 of 8 seeds below 50) / **p = 0.3867 — the two tests DISAGREE** |
+| preview costs damage — sign | p = 0.3633 (5 of 8), not significant |
+| section 5c, preview's effect grew from 50 000 steps — sign / permutation | p = 0.6367 (4 of 8) / 0.2188 |
+| **cell** | **SMALLER THAN THE MEI** — by the primary sign test |
+| **convergence (5b)** | **NOT-CONVERGED** — sighted 2/8, blind 1/8, pairs 1/8 |
+
+**The reading, as section 2a declared it before any C4 agent trained:**
+*"Preview's effect is below the MEI at 300 000 steps: (i) is supported AT THIS
+BUDGET. The agents were still changing, so (ii) is not ruled out."*
+
+**What that says, and what must travel with it:**
+
+1. **At 300 000 steps the typical seed shows no preview benefit.** Seven of
+   eight paired differences are below 50 damage units and five are below zero;
+   the median is −1.3. By the preregistered primary test that is a positive
+   finding that preview's effect is below the team's threshold at this budget —
+   explanation (i). It is the first of the three experiments whose cell is not
+   INCONCLUSIVE.
+2. **It rests on the sign test's threshold, and the sensitivity test does not
+   agree.** 7 of 8 is exactly the count the sign test needs at eight seeds; one
+   seed the other way and the cell would be INCONCLUSIVE. The permutation test,
+   which weighs magnitudes, does not reject (p = 0.3867), because one seed
+   carries a large effect the other way: in seed 0 the blinded agent took
+   720.5 against the sighted agent's 359.9, a difference of +360.6, and that
+   one value lifts the mean to +30.2. Section 5 fixed the rule for this before
+   the run: both are reported, the sign test is primary, and neither is chosen
+   after the fact. **So the result is: most seeds show no benefit from preview,
+   one shows a large one, and whether the average effect is below 50 is not
+   settled.**
+3. **The agents had not converged** (6a). Practice-set damage was still moving
+   by 8.2–200.2 units over the last 100 000 steps, and not only downward. Seed
+   0's blinded agent is the clearest case, described and not dropped: its
+   practice damage rose from 538.8 to 694.5 over those steps, and its test
+   damage (720.5) is 145.3 units worse than the same agent's at 50 000 steps.
+   Explanation (ii) is therefore not ruled out — more training could still move
+   these agents, in either direction.
+4. **The budget did not measurably change preview's effect** (section 5c):
+   4 of 8 seeds grew, p = 0.6367. Six times the training did not pull the arms
+   apart; it moved individual agents a great deal.
+5. **The spread did not shrink.** sd 139.9 against D2's 98.8; no direction was
+   predicted (5a), and none is claimed now.
+6. **This is the third preregistered look** at the question on these seeds;
+   every p here is unadjusted (limit 13). Phase D and D2 were INCONCLUSIVE.
+
+**Learned supervision, the separate claim, described and not tested:** the
+sighted agent beats `current-grade` on the median in **8 of 8** seeds (+4.6 to
++28.7 points) and the blinded agent in **7 of 8** (seed 0's blinded agent is
+6.0 points worse). On the worst episode, which both earlier preregistrations
+name as the test of a protection policy, 4 of 8 sighted and 5 of 8 blinded
+agents are worse than `current-grade`'s worst (907.0):
+
+| seed | sighted IQR | sighted worst | blinded IQR | blinded worst |
+|---|---|---|---|---|
+| 0 | 156.9 | 674.3 | 492.6 | 1453.7 |
+| 1 | 263.7 | 900.0 | 246.4 | 811.1 |
+| 2 | 350.9 | 1165.3 | 299.2 | 1598.4 |
+| 3 | 179.8 | 964.1 | 154.0 | 721.0 |
+| 4 | 164.0 | 868.4 | 151.6 | 816.6 |
+| 5 | 326.8 | 1399.8 | 251.8 | 984.8 |
+| 6 | 246.4 | 967.1 | 267.6 | 1018.3 |
+| 7 | 344.7 | 890.4 | 233.9 | 979.8 |
+
+(the production ECU: IQR 715.9, worst 2363.8; `current-grade`: IQR 295.5,
+worst 907.0.) Described, not tested: as in D2, the sighted agent has the wider
+IQR in 6 of 8 seeds.
+
+**Longer training, per agent — descriptive, no test:** against the same
+agent at 50 000 steps, 5 of 8 sighted and 6 of 8 blinded agents took less
+median damage at 300 000 steps; the largest moves were a 144.5-unit gain
+(sighted seed 5) and a 145.3-unit loss (blinded seed 0).
+
+**Torque (limit 10):** 0 of 16 agents track torque more than one point worse
+than the baseline ECU; every seed's sighted-minus-blind tracking gap is within
+0.01 points; 3 of 16 agents burn less fuel than the baseline, and none of them
+is refusing torque.
+
+**What comes next is the team's decision**, and section 2a names the two
+routes without choosing: the agents were still changing, which argues for a
+longer budget; and the result hangs on one seed, which argues for more seeds.
+By the team's rule it is one of the two, not both, with its own
+preregistration.
 
 ## 12. The review before commit
 
