@@ -271,8 +271,8 @@ class CatalogTests(unittest.TestCase):
     def test_names_never_become_paths(self):
         for runs, seed in (("..", 0), ("runs_c4/../runs", 0), ("runs_c4\\..\\runs", 0),
                            ("runs_c4\n", 0), ("C:/runs_c4", 0), ("runs_zz", 0),
-                           ("runs_c4", 99), ("runs_c4", -1), ("runs_c4", "0"),
-                           ("runs_c4", True)):
+                           ("runs_C4", 0), ("runs_c4", 99), ("runs_c4", -1),
+                           ("runs_c4", "0"), ("runs_c4", True)):
             with self.subTest(runs=runs, seed=seed):
                 with self.assertRaises(KeyError):
                     AC.find_pair(runs, seed)

@@ -33,7 +33,10 @@ from analyse_c4 import BUDGET
 from evaluate import DT, DURATION
 
 ROOT = Path(__file__).resolve().parent.parent
-RUNS_NAME = re.compile(r"^runs[A-Za-z0-9_]*$")
+# Lowercase only: NTFS is case-insensitive, so "runs_C4" would otherwise
+# resolve to the same directory as "runs_c4" while carrying no verdict --
+# the eight real C4 agents would come back ready with no C4 caveats attached.
+RUNS_NAME = re.compile(r"^runs[a-z0-9_]*$")
 AGENT_NAME = re.compile(r"^(sighted|blind)_seed(\d+)$")
 ARMS = ("sighted", "blind")
 
