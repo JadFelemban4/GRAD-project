@@ -78,9 +78,13 @@ function fmt(v, digits) {
   const n = num(v);
   return n === null ? EM_DASH : n.toFixed(digits);
 }
+// Thousands are grouped with U+202F, a narrow no-break space of bidi class CS.
+// A plain space is class WS: in the Arabic page each digit group then becomes
+// its own run and the line swaps them, so 300 000 is drawn "000 300" (UAX #9
+// W4 joins two numbers only across a single CS). agents-page-run.test.mjs.
 function fmtInt(v) {
   const n = num(v);
-  return n === null ? EM_DASH : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return n === null ? EM_DASH : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
 }
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const keyOf = q => `${q.runs}/${q.seed}/${q.ep}`;
@@ -227,6 +231,9 @@ function handle(status, body) {
     stop(() => t(currentLang, 'agents.load.error', { message }), { retry: compute });
     return false;
   }
+  // The server answered, so an earlier "server unavailable" (and its retry
+  // button) is no longer true; a retry resumes polling without «احسب».
+  if (state.error) showError(null);
   if (body.meta && body.road) applyMeta(body.meta, body.road);
   if (body.device) state.device = body.device;
   if (body.versions) state.versions = body.versions;
