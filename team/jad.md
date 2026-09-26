@@ -23,7 +23,7 @@ because it decides who can schedule a drive.
 | control theory | the ideas, not the mathematics |
 | reinforcement learning | the shape of it — agent, reward, baseline. Not the algorithm |
 | Python, git, the command line | I can run what I am given and read output |
-| statistics, uncertainty, error bars | not covered |
+| statistics, uncertainty, error bars | not covered as mathematics. **One idea landed on 26 September:** a paired test that counts votes (C4's sign test) rather than averaging |
 | academic writing | not covered |
 
 **Specifically do NOT assume I know:** the parts of an engine, just because I
@@ -81,6 +81,16 @@ why the second plant is a battery; reactive vs predictive; the four protection
 levers and that each one costs something; objective vs constraint; reward and
 baseline; the neutral action; the turbo layout — **the shaft carries rotation
 only**, no gas crosses it; the piston, roughly.
+
+26 September 2026: **what C4 found, and why it is not yet a verdict on
+preview** — explained back in my own words. Seven of eight seed pairs showed no
+worthwhile benefit from preview, but the agents had not finished learning, so
+undertraining is still a live explanation; if they finish learning and preview
+still makes no difference, the preview itself becomes the likely cause — on
+this road, one climb per ride (that last part was the correction I needed). It
+landed through one example — eight pairs of pots of kabsa, one pot in each pair
+with a new spice, tasted before the meat is cooked — after a five-part
+explanation of the same session had not.
 
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
