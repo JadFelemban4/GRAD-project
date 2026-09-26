@@ -239,6 +239,11 @@ unit-tested like `playback.test.mjs`.
    label `01 — REPLAY` opens the jev panel. **The unlock is forgotten on page
    reload** — nothing is stored in the browser — so a page opened in front of
    the committee shows no jev panel unless Jad opens it there.
+7. **Approach: a new page beside the replay lab, linked from it,** sharing its
+   parts (the car model, the playback clock, the Arabic strings). The existing
+   `/simulation` page and its tests are not touched. Reason given: the lab
+   works and passes its suites, and the agent page needs a different road
+   entirely — a straight ~26 km route instead of the 4.59 km loop.
 
 ## 13. Current tests, as run during this recon
 
