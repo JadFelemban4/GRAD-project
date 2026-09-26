@@ -205,7 +205,17 @@ widths (small, 7 px, on a phone). The canvas belongs to OrbitControls, and the
 heading and cards have `pointer-events:none`. A pure tap-counter module can be
 unit-tested like `playback.test.mjs`.
 
-## 12. Current tests, as run during this recon
+## 12. Jad's answers so far (brainstorming, 26 September)
+
+1. **Audience: both** — Jad himself, to see what each agent decided at each
+   moment, **and** the supervisor or examining committee, as a demonstration.
+   So every honesty label must survive being shown to someone who did not
+   write it.
+2. **Jad has a jev API key.** It must never be pasted into the chat or
+   committed; it goes in an environment variable or an untracked file, after
+   the `.gitignore` pattern exists (section 9).
+
+## 13. Current tests, as run during this recon
 
 `node --test "app/static/sim/*.test.mjs"`: 30 of 30. `python -m
 app.test_simulation`: 15 of 15. `app.test_replay` was not run. Re-run all three
