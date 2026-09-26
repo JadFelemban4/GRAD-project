@@ -219,6 +219,13 @@ unit-tested like `playback.test.mjs`.
    jev driving a whole episode as a third car is **deferred**, not dropped.
    Jad's own reading of the limit, correct: jev is a classification and
    decision system, so its answer is a choice among levels, not a number.
+4. **Compute every episode live; save no traces to disk.** Jad's reason: a
+   saved trace "feels like cheating — it would be like reading the results",
+   and he wants to see the decisions being made. (The small correction given:
+   a saved trace would hold the same decisions bit for bit, made earlier —
+   not results. The choice stands, and it is also the stronger one in front of
+   a committee.) Cost accepted: ~35 s of plant per agent episode on every
+   run. This keeps the replay lab's memory-only policy unchanged.
 
 ## 13. Current tests, as run during this recon
 
