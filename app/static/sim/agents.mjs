@@ -19,6 +19,7 @@ import { PlaybackClock, formatTime } from './playback.mjs';
 import {
   DT, PROFILE_VE, parseEpisodeQuery, appendFrames, createPlayState, playOrWait,
   pauseByUser, resumeIfStalled, settleDone, episodeAt, profilePoints, previewMarks, gradeRamp,
+  ACTIONS, M_PER_UNIT, createEpisodeRoad, gaugeFraction, commandPhysical, laneStoppedAt,
 } from './agent-view.mjs';
 
 const $ = id => document.getElementById(id);
@@ -33,6 +34,14 @@ const PROFILE_PAD = 24;
 const KM_STEP = 5;   // the profile's horizontal scale: a label every 5 km
 
 let currentLang = DEFAULT_LANG;
+
+// The chase view is loaded on demand (mountChase) and may never exist: when
+// Three.js or WebGL fails, every other surface of the page still renders.
+let chase = null;
+let chaseToken = 0;
+// The blind car's label, by protocol. M2 gives Phase D's blind car its own
+// ("may have memorised the road", PHASE_D_RESULT.txt:33-37) as one more row.
+const BLIND_LABEL = { d2: 'agents.car.blind', 'phase-d': 'agents.car.blind' };
 
 const state = {
   query: parseEpisodeQuery(window.location.search),
@@ -52,6 +61,7 @@ const state = {
   lastK: -2,
   drawnTime: -1,
   wasPlaying: false,
+  rows: [],        // the five action rows of the pause panel, built per meta
 };
 
 // ---------------------------------------------------------------- helpers
@@ -237,6 +247,7 @@ function handle(status, body) {
   if (body.meta && body.road) applyMeta(body.meta, body.road);
   if (body.device) state.device = body.device;
   if (body.versions) state.versions = body.versions;
+  renderDevice();
   // Only a slice that starts exactly where the held frames end is kept; a
   // stale or overlapping response changes nothing (agent-view.appendFrames).
   const accepted = appendFrames(state.frames, body);
@@ -281,6 +292,7 @@ function applyMeta(meta, road) {
   const more = $('verdict-more');
   if (more) more.open = !window.matchMedia?.('(max-width: 760px)').matches;
   drawProfile(road);
+  mountChase(road);
   renderAll();
 }
 
@@ -567,6 +579,236 @@ function syncPlayButton() {
   play.setAttribute('aria-label', t(currentLang, on ? 'transport.pause_aria' : 'transport.play_aria'));
 }
 
+// ---------------------------------------------------------------- chase view
+// Lane `lane` of a frame, or null. A lane that diverged is null from that
+// step on (design 3.2), so every read of a car goes through here.
+function carOf(frame, lane) {
+  return frame?.cars?.[lane] ?? null;
+}
+
+function laneColours() {
+  const css = getComputedStyle(document.documentElement);
+  // The fallbacks only matter if agents.css failed to load.
+  return {
+    sighted: css.getPropertyValue('--agent-sighted').trim() || '#2f6db0',
+    blind: css.getPropertyValue('--agent-blind').trim() || '#b5761c',
+  };
+}
+
+// Loaded by DYNAMIC import, never a static one: app/static/vendor/ is
+// gitignored and exists only after app\start-simulation.ps1, and a failed
+// static import of Three.js would take the whole module graph -- verdict,
+// badge, dt caption, profile, panel -- down with it.
+async function mountChase(road) {
+  const host = $('chase');
+  if (!host || !road) return;
+  chaseToken += 1;
+  const token = chaseToken;
+  chase?.dispose();
+  chase = null;
+  host.textContent = '';
+  try {
+    const { createChaseScene } = await import('./agent-scene.mjs');
+    if (token !== chaseToken) return;
+    chase = createChaseScene(host, createEpisodeRoad(road, M_PER_UNIT), laneColours());
+    chase.setTheme(document.documentElement.dataset.theme || 'light', laneColours());
+    draw(state.play.clock.time, true);
+  } catch (err) {
+    console.error(err);
+    if (token !== chaseToken) return;
+    chase = null;
+    host.textContent = '';
+    host.appendChild(el('p', 'webgl-error', t(currentLang, 'agents.scene.webgl_error')));
+  }
+}
+
+function renderLaneLabels() {
+  const m = state.meta;
+  setText($('lane-sighted-label'), m ? t(currentLang, 'agents.car.sighted') : '');
+  setText($('lane-blind-label'), m ? t(currentLang, BLIND_LABEL[m.protocol] || 'agents.car.blind') : '');
+}
+
+// ---------------------------------------------------------------- pause panel
+// The APPLIED action (env.prev_act after rescale, slew limit and bounds) in
+// its own unit: trims signed, duties as fractions.
+function fmtAction(i, v) {
+  const n = num(v);
+  if (n === null) return EM_DASH;
+  const key = ACTIONS[i].key;
+  const text = n.toFixed(ACTIONS[i].digits);
+  if (key === 'fan' || key === 'pump') return text;
+  return n > 0 ? `+${text}` : text.replace('-', '\u2212');
+}
+
+// Five rows, built once per meta and language: a bar from lo to hi, a tick at
+// the neutral value, one dot per car. renderActions only moves the dots.
+function buildActionRows() {
+  const host = $('actions');
+  state.rows = [];
+  if (!host) return;
+  host.textContent = '';
+  const act = state.meta?.act;
+  if (!act) return;
+  ACTIONS.forEach((action, i) => {
+    const duty = action.key === 'fan' || action.key === 'pump';
+    const row = el('div', 'action-row');
+    const head = el('div', 'action-head');
+    head.appendChild(el('span', 'action-label', t(currentLang, action.label)));
+    if (action.unit) {
+      const unit = el('span', 'action-unit', action.unit);
+      unit.dir = 'ltr';
+      head.appendChild(unit);
+    }
+    const gauge = el('div', 'gauge');
+    const tick = el('i', 'gauge-tick');
+    const neutral = gaugeFraction(act.neutral_phys[i], act.lo[i], act.hi[i]);
+    tick.style.left = `${((neutral ?? 0) * 100).toFixed(2)}%`;
+    gauge.appendChild(tick);
+    const dots = LANES.map(lane => {
+      const dot = el('i', `gauge-dot ${lane}`);
+      dot.hidden = true;
+      gauge.appendChild(dot);
+      return dot;
+    });
+    const ends = el('div', 'gauge-ends');
+    ends.append(el('span', '', fmtAction(i, act.lo[i])), el('span', '', fmtAction(i, act.hi[i])));
+    const note = el('p', 'tick-note', duty
+      ? t(currentLang, 'agents.action.tick_duty') : t(currentLang, 'agents.action.tick_trim'));
+    const values = el('div', 'action-values');
+    const cells = LANES.map(lane => {
+      const cell = el('div', `car-value ${lane}`);
+      const value = el('b', 'value', EM_DASH);
+      value.dir = 'ltr';
+      const held = el('small', 'held-line');
+      held.hidden = true;
+      const map = el('small', 'map-line');
+      map.hidden = true;
+      cell.append(el('i', 'lane-dot'), value, held, map);
+      values.appendChild(cell);
+      return { value, held, map };
+    });
+    row.append(head, gauge, ends, note, values);
+    host.appendChild(row);
+    state.rows.push({ dots, cells });
+  });
+}
+
+function renderActions(frame) {
+  const act = state.meta?.act;
+  if (!act) return;
+  state.rows.forEach((row, i) => {
+    row.cells.forEach((cell, j) => {
+      const car = carOf(frame, j);
+      const dot = row.dots[j];
+      if (!car) {
+        setText(cell.value, EM_DASH);
+        cell.held.hidden = true;
+        cell.map.hidden = true;
+        dot.hidden = true;
+        return;
+      }
+      const applied = car.act?.[i];
+      setText(cell.value, fmtAction(i, applied));
+      const f = gaugeFraction(applied, act.lo[i], act.hi[i]);
+      dot.hidden = f === null;
+      if (f !== null) dot.style.left = `${(f * 100).toFixed(2)}%`;
+      // The command appears only where the rate limit held it back, and only
+      // when both values exist: a diverged step sends five nulls for cmd and
+      // act with held all true (NaN != NaN), and there is nothing to show.
+      const command = Array.isArray(car.cmd) ? commandPhysical(car.cmd, act.lo, act.hi)[i] : null;
+      const held = Boolean(car.held?.[i]) && num(applied) !== null && num(command) !== null;
+      cell.held.hidden = !held;
+      if (held) setText(cell.held, t(currentLang, 'agents.action.held', { x: fmtAction(i, command) }));
+      // Row 2 offsets the CEILING of the agent's own pressure loop; its own
+      // manifold pressure is what shows whether that ceiling was reached.
+      cell.map.hidden = ACTIONS[i].key !== 'boost';
+      if (!cell.map.hidden) setText(cell.map, t(currentLang, 'agents.action.map', { map: fmt(car.map_kpa, 1) }));
+    });
+  });
+}
+
+// What each car was given: the sighted car's four horizons from meta.preview_s
+// (engine_env.PREVIEW_S), the blind car's real inputs -- zeros, read from the
+// frame rather than written here.
+function renderSeen(frame) {
+  const horizons = state.meta?.preview_s || [];
+  const sighted = carOf(frame, 0);
+  const blind = carOf(frame, 1);
+  setText($('seen-sighted'), sighted
+    ? horizons.map((h, i) => t(currentLang, 'agents.seen.item', { h, pct: fmt(sighted.preview_pct[i], 1) })).join(' · ')
+    : '');
+  const zeros = blind ? blind.preview_pct.map(v => (v === 0 ? '0' : fmt(v, 1))).join(' · ') : '';
+  setText($('seen-blind'), blind ? t(currentLang, 'agents.seen.blind', { zeros }) : '');
+}
+
+function renderReadings(frame) {
+  const limit = state.meta?.limits?.turb_c;
+  const outputs = [
+    { damage: $('damage-sighted'), turb: $('turb-sighted'), torque: $('torque-sighted') },
+    { damage: $('damage-blind'), turb: $('turb-blind'), torque: $('torque-blind') },
+  ];
+  outputs.forEach((out, j) => {
+    const car = carOf(frame, j);
+    setText(out.damage, car ? fmt(car.damage, 1) : EM_DASH);
+    setText(out.turb, car ? `${fmt(car.turb_c, 0)} °C / ${fmt(limit, 1)} °C` : EM_DASH);
+    setText(out.torque, car ? t(currentLang, 'agents.torque.label', {
+      delivered: fmt(car.torque_nm, 0), requested: fmt(car.torque_req_nm, 0),
+    }) : EM_DASH);
+  });
+}
+
+// CPU and CUDA give different episodes (recon section 2), so the device and
+// the versions are shown, and a non-CUDA run says so.
+function renderDevice() {
+  const line = $('device-line');
+  if (line) {
+    const v = state.versions || {};
+    const signature = `${state.device}|${v.torch}|${v.sb3}|${currentLang}`;
+    if (line.dataset.signature !== signature) {
+      line.dataset.signature = signature;
+      line.textContent = '';
+      if (state.device) {
+        line.appendChild(el('span', '', t(currentLang, 'agents.device.line', {
+          device: state.device, torch: v.torch || EM_DASH, sb3: v.sb3 || EM_DASH,
+        })));
+        if (!String(state.device).startsWith('cuda')) {
+          line.appendChild(el('strong', 'device-warning', t(currentLang, 'agents.device.warning')));
+        }
+      }
+    }
+  }
+  const time = state.meta?.fingerprint_taken;
+  setText($('fingerprint-taken'), time ? t(currentLang, 'agents.fingerprint_taken', { time }) : '');
+}
+
+function renderStopped() {
+  const node = $('lane-stopped');
+  if (!node) return;
+  const parts = LANE_LABEL.map((label, j) => {
+    const k = laneStoppedAt(state.frames, j);
+    return k === null ? null : `${t(currentLang, label)}: ${t(currentLang, 'agents.lane.stopped', { k })}`;
+  }).filter(Boolean);
+  node.hidden = !parts.length;
+  setText(node, parts.join(' · '));
+}
+
+// The decision applied from second k to k+1. Called only when k changes, so
+// it holds still while paused. Nothing here compares the two cars.
+function renderPanel(k) {
+  const frame = k >= 0 ? state.frames[k] || null : null;
+  const road = state.road;
+  setText($('pause-heading'), frame ? t(currentLang, 'agents.pause.heading', { k, k1: k + 1 }) : EM_DASH);
+  setText($('grade-now'), frame && road
+    ? t(currentLang, 'agents.pause.grade_now', { grade: fmt(road.grade_pct[k], 1) }) : '');
+  const w = state.meta?.episode?.weights;
+  setText($('weights-line'), w
+    ? t(currentLang, 'agents.pause.weights', { w0: fmt(w[0], 2), w1: fmt(w[1], 2), w2: fmt(w[2], 2) }) : '');
+  renderActions(frame);
+  renderSeen(frame);
+  renderReadings(frame);
+  renderStopped();
+}
+
 // ---------------------------------------------------------------- per frame
 function draw(time, force = false) {
   setText($('current-time'), formatTime(time));
@@ -574,8 +816,22 @@ function draw(time, force = false) {
   if (seek && document.activeElement !== seek) seek.value = String(time);
   if (!state.road) return;
   const at = episodeAt(state.frames, state.road, time);
-  moveProfile(at);
-  if (force || at.k !== state.lastK) state.lastK = at.k;
+  const sighted = carOf(at.frame, 0);
+  moveProfile(at, Boolean(sighted));
+  if (chase) {
+    // Four markers where the sighted car's horizons land, coloured by the
+    // grade it was given there. Both cars share one distance: the scenario
+    // imposes the speed.
+    const marks = sighted
+      ? previewMarks(state.road, at.k, state.meta.preview_s, DT)
+        .map((m, i) => ({ s_m: m.s_m, grade_pct: sighted.preview_pct[i] }))
+      : [];
+    chase.update({ distance_m: at.s_m, marks });
+  }
+  if (force || at.k !== state.lastK) {
+    state.lastK = at.k;
+    renderPanel(at.k);
+  }
 }
 
 function renderAll() {
@@ -587,6 +843,10 @@ function renderAll() {
   renderTimeline();
   renderLoad();
   renderError();
+  renderLaneLabels();
+  buildActionRows();
+  renderDevice();
+  setText($('chase')?.querySelector('.webgl-error'), t(currentLang, 'agents.scene.webgl_error'));
   syncPlayButton();
   draw(state.play.clock.time, true);
 }
@@ -596,6 +856,7 @@ function renderAll() {
 function applyTheme(name) {
   const theme = THEMES.includes(name) ? name : 'light';
   document.documentElement.dataset.theme = theme;
+  chase?.setTheme(theme, laneColours());
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
     meta.setAttribute('content',

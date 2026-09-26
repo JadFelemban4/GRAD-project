@@ -1101,6 +1101,49 @@ class PageTests(unittest.TestCase):
         for first in firsts:
             self.assertEqual(first.strip(), "currentLang", f"t() called with {first.strip()!r} as the language")
 
+    def test_chase_is_optional(self):
+        """Three.js is loaded on demand, so its failure cannot blank the page.
+
+        app/static/vendor/ is gitignored and exists only after
+        app/start-simulation.ps1 has run. One static import of agent-scene.mjs,
+        scene.mjs or 'three' anywhere in agents.mjs's static module graph would
+        take the verdict box, the SIMULATED badge, the dt caption, the profile
+        and the pause panel down with it when Three.js is missing.
+        """
+        import re
+        page = self.read("sim/agents.mjs")
+        self.assertTrue("import('./agent-scene.mjs')" in page, "the chase view must be loaded by dynamic import")
+        self.assertTrue("'agents.scene.webgl_error'" in page, "a failed chase view must say so in its place")
+        seen, todo = set(), ["agents.mjs"]
+        while todo:
+            name = todo.pop()
+            if name in seen:
+                continue
+            seen.add(name)
+            src = self.read(f"sim/{name}")
+            for spec in re.findall(r"^\s*import\b(?!\s*\()[^;]*?['\"]([^'\"]+)['\"]", src, flags=re.M):
+                self.assertFalse(spec == "three" or spec.startswith("three/"), f"{name} imports {spec} statically")
+                self.assertNotIn(spec, ("./agent-scene.mjs", "./scene.mjs"), f"{name} imports {spec} statically")
+                if spec.startswith("./"):
+                    todo.append(spec[2:])
+        self.assertTrue({"agent-view.mjs", "agents-strings.mjs", "i18n.mjs", "playback.mjs"} <= seen,
+                        f"the static graph scan found only {sorted(seen)}")
+
+    def test_every_car_is_read_through_carOf(self):
+        """A lane that diverged is null from that step on (design section 3.2).
+
+        Reading a car straight off frame.cars throws on the first null car and
+        the pause panel stops updating, so the page reads cars only through
+        carOf(), which returns null for a missing one.
+        """
+        import re
+        page = self.read("sim/agents.mjs")
+        hits = [m.start() for m in re.finditer(r"\.cars\b", page)]
+        self.assertEqual(len(hits), 1, "read a car only through carOf(frame, lane)")
+        head = page.rfind("function carOf(", 0, hits[0])
+        self.assertNotEqual(head, -1, "the one read of .cars must be inside carOf")
+        self.assertLess(hits[0] - head, 120, "the one read of .cars must be inside carOf")
+
 
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0]] + [a for a in sys.argv[1:] if a != "--full"], verbosity=2)
