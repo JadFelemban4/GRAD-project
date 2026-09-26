@@ -226,6 +226,15 @@ unit-tested like `playback.test.mjs`.
    not results. The choice stands, and it is also the stronger one in front of
    a committee.) Cost accepted: ~35 s of plant per agent episode on every
    run. This keeps the replay lab's memory-only policy unchanged.
+5. **jev sees the sighted agent's view:** the engine state now plus the road
+   ahead (the preview). Jad adds that the 30 s horizon may change in a future
+   experiment if the team decides it, for example after a longer training
+   budget. **Design consequence:** the page and the jev prompt read the
+   horizons from the code (`engine_env.PREVIEW_S`, and the observation the
+   agent was actually given), never from a constant of their own. Note for the
+   team, not for this page: changing `PREVIEW_S` inside `engine_env.py` moves
+   `plant_sha` and locks out all 48 existing agents everywhere; D2 avoided the
+   same trap by putting its road in a wrapper (`random_road.py`).
 
 ## 13. Current tests, as run during this recon
 
