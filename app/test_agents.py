@@ -379,7 +379,7 @@ class CatalogTests(unittest.TestCase):
             self.assertEqual(c["gloss"], AC.GLOSS[c["cell"]])
         gloss = AC.GLOSS["SMALLER THAN THE MEI"]
         for lang, one_seed in (("ar", "بذرة واحدة"), ("en", "one seed")):
-            for needle in ("50", "300 000", one_seed):
+            for needle in ("50", "300\u202f000", one_seed):
                 self.assertIn(needle, gloss[lang])
         self.assertIn("بذرة واحدة", AC.SHORT_VERDICT["c4"]["ar"])
         self.assertIn("one seed", AC.SHORT_VERDICT["c4"]["en"])
@@ -403,6 +403,16 @@ class CatalogTests(unittest.TestCase):
                                       for lang in ("ar", "en")})
         self.assertEqual([c["cell"] for c in v["cells"]], ["SMALLER THAN THE MEI"])
         self.assertEqual(AC.verdict("zz")["state"], "none")
+
+    def test_no_plain_space_inside_a_grouped_number(self):
+        for table_name, table in (("SHORT_VERDICT", AC.SHORT_VERDICT), ("GLOSS", AC.GLOSS)):
+            for key, langs in table.items():
+                for lang in ("ar", "en"):
+                    s = langs[lang]
+                    self.assertIsNone(
+                        re.search(r"\d \d{3}\b", s),
+                        f"{table_name}[{key!r}][{lang!r}] has a plain-space thousands "
+                        "separator")
 
     def test_live_fingerprint_is_cached(self):
         a = AC.live_fingerprint("d2")

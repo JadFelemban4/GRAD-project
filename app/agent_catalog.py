@@ -201,9 +201,9 @@ CELLS = {"c4": {"result": "SMALLER THAN THE MEI", "convergence": "NOT-CONVERGED"
 
 SHORT_VERDICT = {
     "c4": {
-        "ar": "أصغر من الحد الأدنى المهم (50 وحدة) عند 300 000 خطوة · بفارق بذرة واحدة "
-              "· الاختباران مختلفان · لم يستقر التدريب",
-        "en": "smaller than the MEI (50) at 300 000 steps · one seed wide "
+        "ar": "أصغر من الحد الأدنى المهم (50 وحدة) عند 300\u202f000 خطوة · بفارق بذرة واحدة "
+              "· الاختباران لا يتفقان · لم يستقر التدريب",
+        "en": "smaller than the MEI (50) at 300\u202f000 steps · one seed wide "
               "· the two tests disagree · not converged",
         "requires": ("result", "seeds", "disagree", "convergence"),
     },
@@ -211,11 +211,11 @@ SHORT_VERDICT = {
 
 GLOSS = {
     "SMALLER THAN THE MEI": {
-        "ar": "أثر الاستباق أقل من 50 وحدة ضرر، وهو حدّ اختاره الفريق مسبقاً، عند 300 000 "
+        "ar": "أثر الاستباق أقل من 50 وحدة ضرر، وهو حدّ اختاره الفريق مسبقاً، عند 300\u202f000 "
               "خطوة تدريب، على طريق فيه تغيّر واحد في الميل لكل حلقة. التدريب لم يستقر، "
               "والنتيجة معلّقة على بذرة واحدة: لو انقلبت بذرة واحدة لصارت غير حاسمة.",
         "en": "Preview's effect is below 50 damage units, a threshold the team set in advance, "
-              "at 300 000 training steps, on a road with one grade change per episode. "
+              "at 300\u202f000 training steps, on a road with one grade change per episode. "
               "Training had not settled, and the result hangs on one seed: if one seed "
               "flipped, it would be inconclusive.",
     },
