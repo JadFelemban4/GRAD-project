@@ -323,7 +323,7 @@ function disposeGraph(scene) {
   geometries.forEach(g => g.dispose());
   materials.forEach(m => m.dispose());
 }
-function stage(host, { extent, position, target, shadows = true }) {
+export function stage(host, { extent, position, target, shadows = true }) {
   const paint = createPainter();
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-extent, extent, extent, -extent, 0.1, 250);
@@ -450,7 +450,7 @@ function terrain(scene, paint) {
   floor.castShadow = false;
 }
 
-function ribbonGeometry(road, start, length, width, offset = 0, lift = 0.04, segments = 300) {
+export function ribbonGeometry(road, start, length, width, offset = 0, lift = 0.04, segments = 300) {
   const positions = new Float32Array((segments + 1) * 6);
   const indices = [];
   for (let i = 0; i <= segments; i++) {
@@ -577,7 +577,7 @@ function loft(parent, sections, material) {
   geometry.computeVertexNormals();
   return mesh(parent, geometry, material);
 }
-function supra(scene, paint) {
+export function supra(scene, paint) {
   const car = new THREE.Group();
   const body = paint.mat('carBody', { roughness: 0.32, metalness: 0.18, side: THREE.DoubleSide });
   const glass = paint.mat('carGlass', { roughness: 0.2, metalness: 0.32, side: THREE.DoubleSide });
