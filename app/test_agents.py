@@ -8,13 +8,19 @@ file too, so banned tokens are written as raw regexes, never as calls, and
 fixtures are made in temporary directories OUTSIDE the repository.
 """
 import json
+import os
 from pathlib import Path
+import shutil
 import sys
+import tempfile
+import threading
 import unittest
 from unittest import mock
 
 import numpy as np
 
+import fingerprint as FP
+from app import agent_catalog as AC
 from app import agent_trace as T
 from engine_env import (ACT_HI, ACT_LO, SLEW, SupervisoryTunerEnv, make_grade_climb,
                         neutral_action)
@@ -22,6 +28,11 @@ from evaluate import EPISODES, EPISODES_D2, agent_policy, run_episode
 
 ROOT = Path(__file__).resolve().parent.parent
 FULL = "--full" in sys.argv
+
+C4_SEEDS = range(8)
+HAVE_C4 = all((ROOT / "runs_c4" / f"{arm}_seed{k}" / "final.zip").is_file()
+              for arm in ("sighted", "blind") for k in C4_SEEDS)
+NO_C4 = "runs_c4/ is not on this machine: the catalog path is UNPROVEN here"
 
 
 class TraceTests(unittest.TestCase):
@@ -220,6 +231,243 @@ class ProofTests(unittest.TestCase):
         self.assertTrue(any_held, "the rate limit never held a command back: suspicious")
         for f in frames:
             json.dumps(f, allow_nan=False)
+
+
+def _fake_agent(root, runs, name, src_arm, drop=(), **meta_changes):
+    """A copy of runs_c4/<src_arm>_seed0 at root/runs/name, built with
+    shutil.copy and json.dump only. `drop` names files to leave out."""
+    src = ROOT / "runs_c4" / f"{src_arm}_seed0"
+    d = Path(root) / runs / name
+    d.mkdir(parents=True)
+    if "final.zip" not in drop:
+        shutil.copy(src / "final.zip", d / "final.zip")
+    if "meta.json" not in drop:
+        meta = json.loads((src / "meta.json").read_text(encoding="utf-8"))
+        meta.update(meta_changes)
+        with open(d / "meta.json", "w", encoding="utf-8") as fh:
+            json.dump(meta, fh)
+    return d
+
+
+def _fake_pair(root, runs, **meta_changes):
+    for arm in AC.ARMS:
+        _fake_agent(root, runs, f"{arm}_seed0", arm, **meta_changes)
+
+
+def _result_line(path_text, sha):
+    return (f"model {path_text}: trained 300000 steps of 300000 requested, "
+            f"from step 0, buffer 300000, zip sha {sha}\n")
+
+
+class CatalogTests(unittest.TestCase):
+    """Task 3: which agents may run, and what results/ says about them."""
+
+    def test_protocol_of(self):
+        self.assertEqual(AC.protocol_of({}), "phase-d")
+        self.assertEqual(AC.protocol_of({"scenario": {"grade": 0.12}}), "phase-d")
+        self.assertEqual(AC.protocol_of({"scenario": {"protocol": "random-climb"}}), "d2")
+        self.assertIsNone(AC.protocol_of({"scenario": {"protocol": "something-else"}}))
+
+    def test_names_never_become_paths(self):
+        for runs, seed in (("..", 0), ("runs_c4/../runs", 0), ("runs_c4\\..\\runs", 0),
+                           ("runs_c4\n", 0), ("C:/runs_c4", 0), ("runs_zz", 0),
+                           ("runs_c4", 99), ("runs_c4", -1), ("runs_c4", "0"),
+                           ("runs_c4", True)):
+            with self.subTest(runs=runs, seed=seed):
+                with self.assertRaises(KeyError):
+                    AC.find_pair(runs, seed)
+        for name in ("ckpt_1", "_logs", "sighted_seed", "Sighted_seed0",
+                     "sighted_seed0/../x", "blind_seed0\n"):
+            with self.subTest(name=name):
+                with self.assertRaises(KeyError):
+                    AC.read_agent("runs_c4", name)
+
+    @unittest.skipUnless(HAVE_C4, NO_C4)
+    def test_c4_pairs_are_the_scored_artefacts(self):
+        saved = os.environ.pop("GIT_OPTIONAL_LOCKS", None)
+        try:
+            pairs = [AC.find_pair("runs_c4", k) for k in C4_SEEDS]
+            self.assertEqual(os.environ.get("GIT_OPTIONAL_LOCKS"), "0",
+                             "live_fingerprint must set it before git status runs")
+        finally:
+            os.environ["GIT_OPTIONAL_LOCKS"] = saved if saved is not None else "0"
+        for k, pair in zip(C4_SEEDS, pairs):
+            with self.subTest(seed=k):
+                self.assertEqual((pair["prefix"], pair["experiment"], pair["protocol"]),
+                                 ("c4", "C4", "d2"))
+                self.assertTrue(pair["result_file"])
+                self.assertEqual([a["tag"] for a in pair["agents"]],
+                                 [f"sighted_seed{k}", f"blind_seed{k}"])
+                shas = AC.scored_shas("c4", k)
+                for a in pair["agents"]:
+                    self.assertEqual(a["status"], "ready", a["reason"])
+                    self.assertEqual(a["scored"], "match")
+                    self.assertEqual(a["zip_sha"], shas[a["arm"]])
+                    self.assertEqual(a["budget"]["num_timesteps"], 300000)
+                    self.assertEqual(a["train_dt"], 0.2)
+                    self.assertIn("zip sha " + a["zip_sha"], a["budget_line"])
+
+    def test_scored_shas_real_files(self):
+        self.assertIsNone(AC.scored_shas("zz", 0))
+        if (ROOT / "results" / "d2_seed0.txt").is_file():
+            self.assertEqual(AC.scored_shas("d2", 0), {"sighted": None, "blind": None})
+        got = AC.scored_shas("c4", 0)
+        self.assertEqual(got, {"sighted": "20f0ae6a9c1564a9", "blind": "9ab8d2b29cbb9d06"},
+                         "results/c4_seed0.txt:24,26 record these, with backslash paths")
+
+    @unittest.skipUnless(HAVE_C4, NO_C4)
+    def test_catalog_synthetic(self):
+        threads = threading.active_count()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.assertNotIn(str(ROOT.resolve()).lower(), str(root.resolve()).lower())
+            real = {arm: FP.model_budget(str(ROOT / "runs_c4" / f"{arm}_seed0" / "final.zip"))["sha"]
+                    for arm in AC.ARMS}
+
+            # a clean copy: runnable, no result file, no name recorded
+            _fake_pair(root, "runs_zz")
+            pair = AC.find_pair("runs_zz", 0, root)
+            self.assertEqual((pair["prefix"], pair["experiment"], pair["result_file"]),
+                             ("zz", "runs_zz (no name recorded)", False))
+            self.assertEqual([a["scored"] for a in pair["agents"]], ["not recorded"] * 2)
+            self.assertEqual(AC.verdict("zz", root)["state"], "none")
+            self.assertEqual(AC.verdict("zz", root)["short"], AC.NONE_TEXT)
+
+            # ckpt_*.zip, checkpoint.zip and _logs/ are ignored: only final.zip counts
+            (root / "runs_zz" / "_logs").mkdir()
+            shutil.copy(root / "runs_zz" / "sighted_seed0" / "final.zip",
+                        root / "runs_zz" / "sighted_seed0" / "ckpt_1000_steps.zip")
+            self.assertEqual(AC.find_pair("runs_zz", 0, root)["agents"][0]["status"], "ready")
+            with self.assertRaises(KeyError):
+                AC.read_agent("runs_zz", "_logs", root)
+
+            # a recorded sha: backslash paths (as evaluate wrote them) and forward slashes
+            (root / "results").mkdir()
+            res = root / "results" / "zz_seed0.txt"
+            with open(res, "w", encoding="utf-8") as fh:
+                fh.write(_result_line("runs_zz\\sighted_seed0", real["sighted"]))
+                fh.write(_result_line("runs_zz/blind_seed0", real["blind"]))
+            pair = AC.find_pair("runs_zz", 0, root)
+            self.assertTrue(pair["result_file"])
+            self.assertEqual([a["scored"] for a in pair["agents"]], ["match", "match"])
+            for sep in ("\\", "/"):
+                with self.subTest(separator=sep):
+                    with open(res, "w", encoding="utf-8") as fh:
+                        fh.write(_result_line(f"runs_zz{sep}sighted_seed0", "0123456789abcdef"))
+                    with self.assertRaises(AC.Refused) as cm:
+                        AC.find_pair("runs_zz", 0, root)
+                    text = " ".join(cm.exception.problems)
+                    self.assertIn("not the scored artefact", text)
+                    self.assertIn("0123456789abcdef", text)
+                    self.assertIn(real["sighted"], text)
+
+            # a plant that moved: incompatible, refused, never SystemExit
+            _fake_pair(root, "runs_zzplant")
+            meta_path = root / "runs_zzplant" / "sighted_seed0" / "meta.json"
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            meta["plant_sha"] = "0000000000000000"
+            with open(meta_path, "w", encoding="utf-8") as fh:
+                json.dump(meta, fh)
+            a = AC.read_agent("runs_zzplant", "sighted_seed0", root)
+            self.assertEqual(a["status"], "incompatible")
+            self.assertTrue(any(p.startswith("plant_sha: stored '0000000000000000' live")
+                                for p in a["problems"]), a["problems"])
+            with self.assertRaises(AC.Refused) as cm:
+                AC.find_pair("runs_zzplant", 0, root)
+            self.assertIn("plant_sha", " ".join(cm.exception.problems))
+
+            # no meta.json
+            _fake_agent(root, "runs_zzmeta", "sighted_seed0", "sighted", drop=("meta.json",))
+            a = AC.read_agent("runs_zzmeta", "sighted_seed0", root)
+            self.assertEqual((a["status"], a["reason"]),
+                             ("incompatible", "no meta.json: plant unknown (AUDIT2 C2-1)"))
+
+            # training now: RUNNING carries this test's own pid
+            d = _fake_agent(root, "runs_zztrain", "sighted_seed0", "sighted")
+            FP.claim_running(str(d))
+            try:
+                self.assertEqual(AC.read_agent("runs_zztrain", "sighted_seed0", root)["status"],
+                                 "training")
+            finally:
+                FP.release_running(str(d))
+            self.assertEqual(AC.read_agent("runs_zztrain", "sighted_seed0", root)["status"], "ready")
+
+            # no final.zip, even with checkpoints beside it
+            d = _fake_agent(root, "runs_zzzip", "blind_seed0", "blind", drop=("final.zip",))
+            shutil.copy(ROOT / "runs_c4" / "blind_seed0" / "final.zip", d / "checkpoint.zip")
+            shutil.copy(ROOT / "runs_c4" / "blind_seed0" / "final.zip", d / "ckpt_300000_steps.zip")
+            self.assertEqual(AC.read_agent("runs_zzzip", "blind_seed0", root)["status"], "incomplete")
+
+            # meta says sighted inside a blind_ directory
+            _fake_agent(root, "runs_zzarm", "blind_seed0", "blind", use_preview=True)
+            a = AC.read_agent("runs_zzarm", "blind_seed0", root)
+            self.assertEqual((a["status"], a["reason"]), (
+                "incompatible", "evaluate.py would have scored this agent as the other arm"))
+
+            # evaluate.py:369 decides the arm by "blind" in the PATH it was given
+            _fake_pair(root, "runs_zz_blind")
+            a = AC.read_agent("runs_zz_blind", "sighted_seed0", root)
+            self.assertEqual((a["status"], a["reason"]), (
+                "incompatible", "evaluate.py would have scored this agent as the other arm"))
+            with self.assertRaises(AC.Refused):
+                AC.find_pair("runs_zz_blind", 0, root)
+        self.assertEqual(threading.active_count(), threads, "the catalog started a thread")
+
+    def test_c4_verdict(self):
+        v = AC.verdict("c4")
+        self.assertEqual(v["state"], "found", v["missing"])
+        self.assertEqual(v["missing"], [])
+        by_key = {ln["key"]: ln for ln in v["lines"]}
+        self.assertEqual({k: ln["line"] for k, ln in by_key.items()},
+                         {"result": 42, "seeds": 29, "disagree": 33, "convergence": 48,
+                          "reading": 50, "explanations": 41, "one_seed": 633})
+        for a in AC.VERDICT_LINES["c4"]:
+            with self.subTest(anchor=a.key):
+                src = (ROOT / "results" / a.file).read_text(encoding="utf-8").splitlines()
+                ln = by_key[a.key]
+                self.assertEqual(ln["file"], a.file)
+                self.assertEqual(ln["text"], "\n".join(src[ln["line"] - 1:ln["line"] - 1 + a.n]))
+        self.assertIn("(7 of 8 seeds below 50)", by_key["seeds"]["text"])
+        self.assertIn("one\n   seed the other way and the cell would be INCONCLUSIVE",
+                      by_key["one_seed"]["text"])
+        self.assertEqual(v["short"], {k: AC.SHORT_VERDICT["c4"][k] for k in ("ar", "en")})
+        self.assertLessEqual(set(AC.SHORT_VERDICT["c4"]["requires"]),
+                             {a.key for a in AC.VERDICT_LINES["c4"]})
+        self.assertEqual([c["cell"] for c in v["cells"]], ["SMALLER THAN THE MEI", "NOT-CONVERGED"])
+        for c in v["cells"]:
+            self.assertEqual(c["gloss"], AC.GLOSS[c["cell"]])
+        gloss = AC.GLOSS["SMALLER THAN THE MEI"]
+        for lang, one_seed in (("ar", "بذرة واحدة"), ("en", "one seed")):
+            for needle in ("50", "300 000", one_seed):
+                self.assertIn(needle, gloss[lang])
+        self.assertIn("بذرة واحدة", AC.SHORT_VERDICT["c4"]["ar"])
+        self.assertIn("one seed", AC.SHORT_VERDICT["c4"]["en"])
+
+        # the same files copied out are found; one anchor removed turns the box to 'missing'
+        with tempfile.TemporaryDirectory() as tmp:
+            res = Path(tmp) / "results"
+            res.mkdir()
+            for f in ("C4_RESULT.txt", "PREREGISTRATION_C4.md"):
+                shutil.copy(ROOT / "results" / f, res / f)
+            self.assertEqual(AC.verdict("c4", tmp)["state"], "found")
+            lines = (res / "C4_RESULT.txt").read_text(encoding="utf-8").splitlines()
+            self.assertTrue(lines[47].lstrip().startswith("NOT-CONVERGED"))
+            del lines[47]
+            with open(res / "C4_RESULT.txt", "w", encoding="utf-8") as fh:
+                fh.write("\n".join(lines) + "\n")
+            v = AC.verdict("c4", tmp)
+        self.assertEqual(v["state"], "missing")
+        self.assertEqual(v["missing"], ["C4_RESULT.txt"])
+        self.assertEqual(v["short"], {lang: AC.MISSING_TEXT[lang].format(file="C4_RESULT.txt")
+                                      for lang in ("ar", "en")})
+        self.assertEqual([c["cell"] for c in v["cells"]], ["SMALLER THAN THE MEI"])
+        self.assertEqual(AC.verdict("zz")["state"], "none")
+
+    def test_live_fingerprint_is_cached(self):
+        a = AC.live_fingerprint("d2")
+        self.assertIs(AC.live_fingerprint("d2"), a)
+        self.assertRegex(AC.FINGERPRINT_TAKEN["d2"], r"^\d\d:\d\d$")
+        self.assertEqual(a["scenario"]["protocol"], "random-climb")
 
 
 if __name__ == "__main__":
