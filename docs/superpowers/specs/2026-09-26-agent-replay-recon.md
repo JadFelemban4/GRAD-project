@@ -235,6 +235,10 @@ unit-tested like `playback.test.mjs`.
    team, not for this page: changing `PREVIEW_S` inside `engine_env.py` moves
    `plant_sha` and locks out all 48 existing agents everywhere; D2 avoided the
    same trap by putting its road in a wrapper (`random_road.py`).
+6. **The hidden gesture:** ten taps within four seconds on the small footer
+   label `01 — REPLAY` opens the jev panel. **The unlock is forgotten on page
+   reload** — nothing is stored in the browser — so a page opened in front of
+   the committee shows no jev panel unless Jad opens it there.
 
 ## 13. Current tests, as run during this recon
 
