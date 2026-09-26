@@ -92,6 +92,13 @@ landed through one example — eight pairs of pots of kabsa, one pot in each pai
 with a new spice, tasted before the meat is cooked — after a five-part
 explanation of the same session had not.
 
+Same day, the preregistration, through the same kabsa frame: the rule of the
+judgement is written before the tasting. Asked what to say to a teammate who
+wants to change the rule after seeing the result, I answered that it is "a
+crime and a violation of our constitution" — **the preregistration is our
+constitution.** The one legitimate change: a new plan for a new experiment,
+written before it starts, with both results reported.
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing, BTDC/ATDC;
