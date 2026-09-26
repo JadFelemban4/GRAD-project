@@ -7,6 +7,7 @@ Run from the repository root. app/test_replay.py's test_read_only scans this
 file too, so banned tokens are written as raw regexes, never as calls, and
 fixtures are made in temporary directories OUTSIDE the repository.
 """
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -14,16 +15,19 @@ import shutil
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from unittest import mock
 
 import numpy as np
 
 import fingerprint as FP
+from app import agent_api as API
 from app import agent_catalog as AC
 from app import agent_trace as T
-from engine_env import (ACT_HI, ACT_LO, SLEW, SupervisoryTunerEnv, make_grade_climb,
-                        neutral_action)
+from check_premise import p_grade_now, p_neutral
+from engine_env import (ACT_HI, ACT_LO, OBS_DIM, PREVIEW_S, SLEW, SupervisoryTunerEnv,
+                        make_grade_climb, neutral_action)
 from evaluate import EPISODES, EPISODES_D2, agent_policy, run_episode
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -165,72 +169,6 @@ def _neutral(env, obs):
 
 def _nan_policy(env, obs):
     return np.full(5, np.nan, dtype=np.float32)
-
-
-class ProofTests(unittest.TestCase):
-    """Spec tests 1 and 2: the tracer IS evaluate.run_episode, on a real C4 pair.
-
-    `==` on whole result dicts, no tolerance. If it ever fails, find the cause;
-    the fallback is sequential lanes, never an epsilon.
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        paths = [str(ROOT / "runs_c4" / f"{arm}_seed0") + "/final" for arm in ("sighted", "blind")]
-        try:
-            from stable_baselines3 import SAC
-        except ImportError:
-            SAC = None
-        if SAC is None or not all(Path(p + ".zip").is_file() for p in paths):
-            print("\n  agent path UNPROVEN on this machine (no runs_c4/*_seed0/final.zip "
-                  "or no stable-baselines3)")
-            raise unittest.SkipTest("agent path UNPROVEN on this machine")
-        m_s, m_b = SAC.load(paths[0]), SAC.load(paths[1])     # no device: evaluate.py:370
-        cls.device = str(m_s.device)
-        cls.ep = T.episode("d2", 1)
-        seed, weights, start_s, grade = EPISODES_D2[0]
-        cls.frames = []
-        cls.got = T.run_lanes([(agent_policy(m_s), True), (agent_policy(m_b), False)], cls.ep,
-                              on_frame=lambda frame, seen: cls.frames.append(frame))
-        cls.want = [run_episode(agent_policy(m_s), seed, weights, True, road=(start_s, grade)),
-                    run_episode(agent_policy(m_b), seed, weights, False, road=(start_s, grade))]
-
-    def test_tracer_equals_run_episode(self):
-        print(f"\n  == proof on {self.device}: sighted damage {self.got[0]['damage']!r}, "
-              f"blind damage {self.got[1]['damage']!r}")
-        self.assertEqual(self.got, self.want)
-
-    def test_frames_are_the_episode(self):
-        frames, road = self.frames, T.route(T.build_cycle(self.ep))
-        self.assertEqual(len(frames), T.STEPS)
-        self.assertEqual([f["k"] for f in frames], list(range(T.STEPS)))
-        rescale = SupervisoryTunerEnv(T.build_cycle(self.ep), dt=T.DT)._rescale
-        any_held = False
-        for lane, result in enumerate(self.got):
-            cars = [f["cars"][lane] for f in frames]
-            self.assertEqual(cars[-1]["damage"], result["damage"])
-            self.assertEqual(max(c["turb_c"] for c in cars), result["peak_turb"])
-            prev = np.zeros(5, dtype=np.float32)
-            for k, car in enumerate(cars):
-                for key in ("act", "cmd", "preview_pct"):
-                    self.assertNotIn(None, car[key], f"lane {lane} k {k} {key}")
-                self.assertIsNotNone(car["map_kpa"])
-                raw = rescale(np.asarray(car["cmd"], dtype=np.float32))
-                want = np.clip(np.clip(raw, prev - SLEW * T.DT, prev + SLEW * T.DT), ACT_LO, ACT_HI)
-                act = np.asarray(car["act"], dtype=np.float32)
-                self.assertEqual(act.tolist(), want.tolist(), f"lane {lane} k {k}")
-                self.assertEqual(car["held"], (act != raw).tolist(), f"lane {lane} k {k}")
-                any_held = any_held or any(car["held"])
-                prev = act
-                for j, h in enumerate(T.PREVIEW_S):
-                    if lane == 0:
-                        g = road["grade_pct"][min(k + int(h / T.DT), T.STEPS)] / 100.0
-                        self.assertAlmostEqual(car["preview_pct"][j] / 100.0, g, delta=1e-6)
-                    else:
-                        self.assertEqual(car["preview_pct"][j], 0.0)
-        self.assertTrue(any_held, "the rate limit never held a command back: suspicious")
-        for f in frames:
-            json.dumps(f, allow_nan=False)
 
 
 def _fake_agent(root, runs, name, src_arm, drop=(), **meta_changes):
@@ -552,6 +490,292 @@ class LoaderTests(unittest.TestCase):
         self.assertEqual(json.loads(out.stdout.strip().splitlines()[-1]),
                          {"torch": False, "sb3": False,
                           "versions": {"torch": None, "sb3": None}})
+
+
+_SB3_HERE = importlib.util.find_spec("stable_baselines3") is not None
+_C4_PAIR0_HERE = _SB3_HERE and all(
+    (ROOT / "runs_c4" / f"{arm}_seed0" / "final.zip").is_file() for arm in ("sighted", "blind"))
+_RUNS_PAIR0_HERE = _SB3_HERE and all(
+    (ROOT / "runs" / f"{arm}_seed0" / "final.zip").is_file() for arm in ("sighted", "blind"))
+UNPROVEN_LINE = "agent path UNPROVEN on this machine"
+
+
+def _d2_episode_for(runs, seed, idx):
+    return T.episode("d2", idx)
+
+
+def _no_models(runs, seed):
+    return (p_neutral, p_grade_now)
+
+
+def _fake_tracer(n=5, gate=None, fail=None, obs=False):
+    """A stand-in for run_lanes: n paired frames, each held at `gate` if one
+    is given; `fail` is raised in place of frame 2."""
+    def tracer(lanes, ep, on_frame):
+        assert [use for _, use in lanes] == [True, False], "lane 0 sighted, lane 1 blind"
+        for k in range(n):
+            if gate is not None:
+                gate.wait(5)
+            if fail is not None and k == 2:
+                raise fail
+            seen = [np.full(OBS_DIM, k, np.float32), None] if obs else [None, None]
+            on_frame({"k": k, "cars": [None, None]}, seen)
+            time.sleep(0.01)
+        return [{"damage": 1.0}, {"damage": 2.0}]
+    return tracer
+
+
+def _wait_for(store, key, want, limit=10.0):
+    t0 = time.monotonic()
+    while True:
+        r = store.poll(key)
+        if r["status"] == want:
+            return r
+        if time.monotonic() - t0 > limit:
+            raise AssertionError(f"{key} never reached {want!r}; last {r['status']!r}")
+        time.sleep(0.02)
+
+
+def _builders():
+    return [t for t in threading.enumerate() if t.name == "agent-builder"]
+
+
+class StoreTests(unittest.TestCase):
+    """Spec test 9: one worker, streaming, cancellable only by preempt, keep = 2."""
+
+    K1, K2, K3 = ("runs_c4", 5, 1), ("runs_c4", 5, 2), ("runs_c4", 5, 3)
+
+    def store(self, **kw):
+        kw.setdefault("loader", _no_models)
+        kw.setdefault("tracer", _fake_tracer())
+        kw.setdefault("episode_for", _d2_episode_for)
+        return API.EpisodeStore(**kw)
+
+    def tearDown(self):
+        for t in _builders():
+            t.join(5)
+
+    def test_key_and_defaults(self):
+        self.assertEqual(API.key_str(self.K1), "runs_c4/5/1")
+        self.assertTrue(API.EpisodeStore().needs_sb3)
+        self.assertFalse(self.store().needs_sb3)
+        self.assertEqual(API.BUILD_FAILED.format(kind="SystemExit"), "build failed: SystemExit")
+
+    def test_loading_then_streaming_then_ready(self):
+        s = self.store(tracer=_fake_tracer(obs=True))
+        r = s.poll(self.K1, preempt=True)
+        self.assertEqual({k: r[k] for k in ("status", "progress", "steps", "since", "frames")},
+                         {"status": "loading", "progress": 0.0, "steps": T.STEPS, "since": 0,
+                          "frames": []})
+        r = _wait_for(s, self.K1, "ready")
+        self.assertEqual([f["k"] for f in r["frames"]], [0, 1, 2, 3, 4])
+        self.assertEqual(r["progress"], 1.0)
+        self.assertEqual(r["device"], "n/a")
+        self.assertEqual(set(r["versions"]), {"torch", "sb3"})
+        later = s.poll(self.K1, since=3)
+        self.assertEqual((later["since"], [f["k"] for f in later["frames"]]), (3, [3, 4]))
+        tr = s.trace(self.K1)
+        self.assertEqual(tr.key, self.K1)
+        self.assertEqual(tr.results, [{"damage": 1.0}, {"damage": 2.0}])
+        self.assertEqual(tr.obs[0].shape, (5, OBS_DIM))
+        self.assertEqual(tr.obs[0].dtype, np.float32)
+        self.assertEqual(tr.obs[1].shape, (0, OBS_DIM))
+        self.assertEqual(float(tr.obs[0][3][0]), 3.0)
+        for t in _builders():
+            t.join(5)
+        self.assertEqual(_builders(), [], "the agent-builder thread did not end")
+
+    def test_loading_is_answered_while_the_loader_is_slow(self):
+        def slow(runs, seed):
+            time.sleep(1.0)
+            return _no_models(runs, seed)
+        s = self.store(loader=slow)
+        s.poll(self.K1, preempt=True)
+        worst, seen = 0.0, []
+        for _ in range(15):
+            t0 = time.perf_counter()
+            r = s.poll(self.K1)
+            worst = max(worst, time.perf_counter() - t0)
+            seen.append(r["status"])
+            time.sleep(0.05)
+        self.assertLess(worst, 0.1, "poll blocked on the worker's lock")
+        self.assertEqual(set(seen), {"loading"})
+        r = _wait_for(s, self.K1, "building")
+        self.assertEqual(r["frames"][0]["k"], 0, "the first slice must start at frame 0")
+
+    def test_one_worker_and_polls_never_cancel(self):
+        gate = threading.Event()
+        s = self.store(tracer=_fake_tracer(gate=gate))
+        self.assertEqual(s.poll(self.K1)["status"], "loading")
+        for _ in range(3):
+            r = s.poll(self.K2)
+            self.assertEqual(r["status"], "busy")
+            self.assertEqual(r["active"], {"runs": "runs_c4", "seed": 5, "ep": 1})
+            self.assertEqual(r["frames"], [])
+        self.assertEqual(len(_builders()), 1)
+        gate.set()
+        _wait_for(s, self.K1, "ready")
+        self.assertIsNotNone(s.trace(self.K1), "a plain poll cancelled the build")
+
+    def test_preempt_cancels_and_keeps_nothing_partial(self):
+        gate = threading.Event()
+        s = self.store(tracer=_fake_tracer(gate=gate))
+        s.poll(self.K1)
+        self.assertEqual(s.poll(self.K1, preempt=True)["status"], "loading",
+                         "preempt on the key already building must not cancel it")
+        self.assertEqual(s.poll(self.K2, preempt=True)["status"], "busy")
+        gate.set()
+        r = _wait_for(s, self.K2, "ready")
+        self.assertEqual(len(r["frames"]), 5)
+        self.assertIsNone(s.trace(self.K1), "a cancelled trace was kept")
+
+    def test_keep_two_least_recently_used(self):
+        s = self.store()
+        for key in (self.K1, self.K2):
+            s.poll(key)
+            _wait_for(s, key, "ready")
+        s.poll(self.K1)                      # touch K1: K2 is now the oldest
+        s.poll(self.K3)
+        _wait_for(s, self.K3, "ready")
+        self.assertIsNotNone(s.trace(self.K1))
+        self.assertIsNone(s.trace(self.K2))
+        self.assertIsNotNone(s.trace(self.K3))
+
+    def test_error_is_reported_once_with_a_fixed_message(self):
+        calls = []
+
+        def once(lanes, ep, on_frame):
+            calls.append(1)
+            if len(calls) == 1:
+                raise ValueError(r"C:\secret\path must not reach the browser")
+            return _fake_tracer()(lanes, ep, on_frame)
+        s = self.store(tracer=once)
+        s.poll(self.K1)
+        r = _wait_for(s, self.K1, "error")
+        self.assertEqual(r["message"], "build failed: ValueError")
+        self.assertEqual(r["frames"], [])
+        self.assertEqual(s.poll(self.K1)["status"], "loading", "the error was not forgotten")
+        _wait_for(s, self.K1, "ready")
+
+    def test_system_exit_anywhere_becomes_an_error(self):
+        def refuses(runs, seed):
+            raise SystemExit("check_model_fingerprint refuses")
+
+        def bad_episode(runs, seed, idx):
+            raise AC.Refused(["blind_seed5: incompatible"])
+        for kw, kind in (({"tracer": _fake_tracer(fail=SystemExit(2))}, "SystemExit"),
+                         ({"loader": refuses}, "SystemExit"),
+                         ({"episode_for": bad_episode}, "Refused")):
+            with self.subTest(kind=kind, hook=sorted(kw)):
+                s = self.store(**kw)
+                s.poll(self.K1)
+                r = _wait_for(s, self.K1, "error")
+                self.assertEqual(r["message"], f"build failed: {kind}")
+                self.assertIsNone(s.trace(self.K1))
+
+
+def _build_through_store(store, key, limit=900.0):
+    """Poll the way the page does -- preempt once, then plain polls -- until ready."""
+    r = store.poll(key, preempt=True)
+    t0 = time.monotonic()
+    while r["status"] != "ready":
+        if r["status"] == "error":
+            raise AssertionError(r["message"])
+        if time.monotonic() - t0 > limit:
+            raise AssertionError(f"{key} not ready after {limit} s")
+        time.sleep(0.2)
+        r = store.poll(key)
+    return store.trace(key)
+
+
+class ProofTests(unittest.TestCase):
+    """Spec tests 1 and 2: the page's numbers are evaluate.run_episode's, computed
+    on the store's own agent-builder thread. Equality, never a tolerance."""
+
+    @classmethod
+    def setUpClass(cls):
+        seed, weights, start_s, grade = EPISODES_D2[0]
+        cls.key = ("runs_c4", 0, 1)
+        cls.threads = []
+
+        def tracer(lanes, ep, on_frame=None):
+            cls.threads.append(threading.current_thread().name)
+            return T.run_lanes(lanes, ep, on_frame)
+        if _C4_PAIR0_HERE:
+            from stable_baselines3 import SAC
+            m_s = SAC.load(str(ROOT / "runs_c4" / "sighted_seed0") + "/final")
+            m_b = SAC.load(str(ROOT / "runs_c4" / "blind_seed0") + "/final")
+            policies = (agent_policy(m_s), agent_policy(m_b))
+            store = API.EpisodeStore(loader=lambda runs, s: (m_s, m_b), tracer=tracer)
+        else:
+            print(f"\n    {UNPROVEN_LINE}: no runs_c4/ or no stable-baselines3 -- "
+                  f"p_neutral / p_grade_now run through the store instead", file=sys.stderr)
+            policies = (p_neutral, p_grade_now)
+            store = API.EpisodeStore(loader=_no_models, tracer=tracer,
+                                     episode_for=_d2_episode_for)
+        t0 = time.perf_counter()
+        cls.trace = _build_through_store(store, cls.key)
+        cls.build_s = time.perf_counter() - t0
+        cls.want = [run_episode(policies[0], seed, weights, True, road=(start_s, grade)),
+                    run_episode(policies[1], seed, weights, False, road=(start_s, grade))]
+        cls.road = T.route(T.build_cycle(T.episode("d2", 1)))
+
+    def test_tracer_equals_run_episode(self):
+        self.assertEqual(self.threads, ["agent-builder"])
+        self.assertEqual(self.trace.results, self.want)
+        label = "PROVEN" if _C4_PAIR0_HERE else UNPROVEN_LINE
+        print(f"\n    == proof {label}: device {self.trace.device}, "
+              f"torch {self.trace.versions['torch']}, sb3 {self.trace.versions['sb3']}, "
+              f"sighted damage {self.want[0]['damage']!r}, blind {self.want[1]['damage']!r}, "
+              f"built in {self.build_s:.0f} s", file=sys.stderr)
+
+    def test_frames_are_the_episode(self):
+        frames = self.trace.frames
+        self.assertEqual(len(frames), T.STEPS)
+        self.assertEqual([f["k"] for f in frames], list(range(T.STEPS)))
+        grade = self.road["grade_pct"]
+        prev = [np.zeros(5, np.float32), np.zeros(5, np.float32)]
+        any_held = [False, False]
+        for f in frames:
+            json.dumps(f, allow_nan=False)
+            for lane in (0, 1):
+                car = f["cars"][lane]
+                for field in ("act", "cmd", "preview_pct"):
+                    self.assertNotIn(None, car[field], f"frame {f['k']} lane {lane} {field}")
+                self.assertIsNotNone(car["map_kpa"])
+                cmd = np.asarray(car["cmd"], np.float32)
+                raw = ACT_LO + (np.clip(cmd, -1.0, 1.0) + 1.0) * 0.5 * (ACT_HI - ACT_LO)
+                slew = SLEW * T.DT
+                want = np.clip(np.clip(raw, prev[lane] - slew, prev[lane] + slew), ACT_LO, ACT_HI)
+                act = np.asarray(car["act"], np.float32)
+                self.assertTrue(np.array_equal(act, want), f"frame {f['k']} lane {lane}")
+                self.assertEqual(car["held"], [bool(h) for h in (act != raw)])
+                any_held[lane] = any_held[lane] or any(car["held"])
+                prev[lane] = act
+            for i, h in enumerate(PREVIEW_S):
+                j = min(f["k"] + int(h / T.DT), T.STEPS)
+                self.assertAlmostEqual(f["cars"][0]["preview_pct"][i] / 100, grade[j] / 100,
+                                       delta=1e-6)
+            self.assertEqual(f["cars"][1]["preview_pct"], [0.0, 0.0, 0.0, 0.0])
+        self.assertTrue(all(any_held))
+        for lane in (0, 1):
+            self.assertEqual(frames[-1]["cars"][lane]["damage"], self.trace.results[lane]["damage"])
+            self.assertEqual(max(f["cars"][lane]["turb_c"] for f in frames),
+                             self.trace.results[lane]["peak_turb"])
+            self.assertEqual(self.trace.obs[lane].shape, (T.STEPS, OBS_DIM))
+
+    @unittest.skipUnless(FULL, "--full only: the Phase D pair, about 2.5 min")
+    @unittest.skipUnless(_RUNS_PAIR0_HERE, "runs/ or stable-baselines3 missing: Phase D path UNPROVEN")
+    def test_phase_d_pair_full(self):
+        from stable_baselines3 import SAC
+        seed, weights = EPISODES[0]
+        store = API.EpisodeStore()               # the production loader and episode_for
+        got = _build_through_store(store, ("runs", 0, 1))
+        want = [run_episode(agent_policy(SAC.load(str(ROOT / "runs" / f"{arm}_seed0") + "/final")),
+                            seed, weights, arm == "sighted", road=None)
+                for arm in ("sighted", "blind")]
+        self.assertEqual(got.results, want)
+        print(f"\n    Phase D == proof PROVEN on {got.device}", file=sys.stderr)
 
 
 if __name__ == "__main__":
