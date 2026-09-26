@@ -654,7 +654,7 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 - The M1 page reads `?runs=runs_c4&seed=5&ep=1` into a read-only picker and still computes only on «احسب».
 - **Verify:**
   - the tests pass with the `==` proof shown;
-  - the lab suites (including `app.test_replay --full` at 49) and the node glob pass unchanged;
+  - the lab suites and the node glob pass unchanged (`app.test_replay` and `app.test_replay --full` count different checks; read both counts from the runs, never from this file);
   - with `app\start-simulation.ps1` running, the profile draws at once;
   - the first «احسب» shows «تحميل الشبكتين…» for about 5 s, and later builds move within about a second;
   - a pause shows ten applied actions in Arabic with row 2 as a ceiling offset beside `map_kpa`, the held flags, the preview markers, the blind zeros, the weights, the damage, and the C4 short line with its one-seed clause (also in the scene strip);
@@ -755,3 +755,4 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 | 26 Sep | §11 Q2 | **Approved:** the three `export` keywords in `scene.mjs`, the one `nav.agents` key in `i18n.mjs` and the one link in `simulation.html` — "lend the car" rather than copy it. Jad said he did not follow the explanation and approved anyway; the plain version given afterwards: the new page uses the same car drawing as the old one instead of drawing a new one. The lab suites are re-run to prove the old page unchanged. |
 | 26 Sep | §11 Q3 | **Approved: five choices per action**, one call with five `choice` questions, as §7 specifies. Jad's reason: "it is an experiment and something personal" — jev is a trial, not part of the thesis. |
 | 26 Sep | whole | **APPROVED** — banner changed. Next: the implementation plan (writing-plans). |
+| 26 Sep | plan | The M1 plan (`docs/superpowers/plans/2026-09-26-agent-replay-m1.md`) departs from this design in five small, checked places, and this file defers to it: (1) the device and the torch/SB3 versions travel as top-level fields of every poll, not inside `meta`, because they are known only after the worker loads the networks; (2) the car half-width is 1.486 units (the hub torus), so the plan's constant is 1.49 and the non-overlap test uses it; (3) the chase view (~200 m) cannot contain the 15 s and 30 s preview markers (~540 m and ~1080 m ahead at 130 km/h) — it shows the markers in range, and the profile carries all four; (4) the profile gets a km scale and its preview ticks use the grade ramp; (5) the server is started with the system interpreter directly, because `app\start-simulation.ps1` ends in a bare `python`. §10's line that quoted a `--full` count was wrong and now says to read both counts from the runs. |
