@@ -107,6 +107,14 @@ steady one "because our project is very sensitive" — the right instinct for
 protection. The correction I needed: the damage the project measures is heat
 damage to the turbo, not fire, and the agent runs only in the simulation.
 
+Same day, the pairing, after I asked "16 agents and 8 seeds?": sixteen agents
+are eight pairs, one sighted and one blind in each and identical otherwise; the
+seed is the pair's number, like one batch of meat per pair of pots. I knew why
+a PAIR is needed. Why EIGHT pairs needed a correction, and seed 0 in C4's own
+table was the example that did it: run alone, it would have said preview saves
+361 damage units, while the other seven said no. **Say "eight pairs" rather
+than "sixteen agents" or "eight seeds" when talking to me.**
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing, BTDC/ATDC;
