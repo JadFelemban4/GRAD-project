@@ -7,9 +7,10 @@ Two things live here and they share the same physics.
 | `/` and `/driver` | the live supervisor: the project's plant running beside the car | live OBD-II, **read-only** |
 | `/review` | what the supervisor marked during a drive | none |
 | `/simulation` | **the 3D replay lab** — recorded drives, rendered | **none, ever** |
+| `/agents` | **the agent replay page** — two trained agents on one simulated episode | **none, ever** |
 
-Everything below is about `/simulation`. For the supervisor read
-`CLAUDE.md` and `AUDIT.md` first.
+Everything below is about `/simulation`, except the section on opening
+`/agents`. For the supervisor read `CLAUDE.md` and `AUDIT.md` first.
 
 **The project never writes to the vehicle's ECU.** `app/test_replay.py`
 asserts that no write path exists and that no raw car data reaches the disk.
@@ -50,6 +51,27 @@ and the two-hour Taif drive takes several minutes. The progress bar is real.
 
 Picking a different drive **cancels** the one being computed, so a mis-click
 costs a second, not the whole build.
+
+### Opening the agents page, `/agents`
+
+The page exists only when the server runs with `--simulation`. Start it with
+the **system interpreter**, from the repository root:
+
+```powershell
+C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m app.server --simulation
+```
+
+Not with `app\start-simulation.ps1`: it ends in a bare `python`, which on
+this machine can resolve to a `.venv` without stable-baselines3 and torch,
+and the page's episode route then answers 503. Its 3D view uses the Three.js
+that script vendors; without it the rest of the page still works and says the
+3D view cannot be shown.
+
+Then open <http://localhost:8000/agents?runs=runs_c4&seed=5&ep=1> and press
+«احسب». Nothing is computed before that. The first episode takes about a
+minute and a quarter, and it streams: each second can be played as soon as
+it has been computed. Everything on the page is a simulation, and nothing is
+written to disk.
 
 ---
 
