@@ -347,7 +347,11 @@ ds_k = v_k·dt;  s = [0, cumsum(ds)];  x = [0, cumsum(ds·cos θ)];  z = [0, cum
   - **Phase D's blind car** instead reads «لا يرى الطريق أمامه، لكنه قد يحفظه: الطريق نفسه في كل حلقة» ("does not see the road ahead, but may have memorised it: the same road in every episode"), citing `PHASE_D_RESULT.txt:33-37`.
 - Colour tokens: `--agent-sighted` (blue) and `--agent-blind` (amber), defined in both themes and never red or green. The jev marker (M3) is a dashed warm-grey tick; there is no third car.
 
-**Preview.** One marker at each `PREVIEW_S` horizon, coloured by the grade read there, on a single-hue ramp from 0 to 16 %. There is no continuous band, because the agent saw four numbers, not a stretch of road.
+**Preview.** One marker at each `PREVIEW_S` horizon, coloured by the grade read there, on a single-hue ramp from 0 to 16 %: the profile's ticks and the chase view's posts use the same ramp. There is no continuous band, because the agent saw four numbers, not a stretch of road.
+
+- The profile always carries all four.
+- The chase view shows only the posts inside its view of about 200 m. At 130 km/h the 15 s and 30 s horizons lie about 540 m and 1080 m ahead, so after the launch it shows the 2 s and 5 s posts. In the first second, from rest, it also shows the 15 s post at the edge of the view (about 200 m ahead on episode 1); the 30 s horizon is then about 720 m ahead, so the chase view never holds all four.
+- *(Amended while building M1, 27 September: this paragraph did not say which view carries which markers, and the profile's ticks were drawn in the lane colour.)*
 
 **Overlay.** A thin strip inside the scene carries the **short verdict line** and «محاكاة» ("simulation"). A legend reads «السيارتان في المكان نفسه دائماً: السرعة يفرضها السيناريو، والوكيلان يختاران الحماية فقط» ("both cars are always at the same place: the scenario sets the speed, and the agents choose only the protection").
 
@@ -655,7 +659,8 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 - **Verify:**
   - the tests pass with the `==` proof shown;
   - the lab suites and the node glob pass unchanged (`app.test_replay` and `app.test_replay --full` count different checks; read both counts from the runs, never from this file);
-  - with `app\start-simulation.ps1` running, the profile draws at once;
+  - with the server started as `python -m app.server --simulation` on the system interpreter, the profile draws at once. `app\start-simulation.ps1` calls bare `python`, which resolves to the repository's `.venv`; that has FastAPI but neither stable-baselines3 nor torch, so `/api/agents/episode` would answer 503. Its banner also names only `/simulation`. M2, which touches the lab's entry points, can fix both;
+  - *(Amended while building M1, 27 September: this line read "with `app\start-simulation.ps1` running". The line above it was corrected when the plan was written (walkthrough log, 26 September); at M1 the two runs printed 49 of 49 for `app.test_replay` and 59 of 59 for `app.test_replay --full`.)*
   - the first «احسب» shows «تحميل الشبكتين…» for about 5 s, and later builds move within about a second;
   - a pause shows ten applied actions in Arabic with row 2 as a ceiling offset beside `map_kpa`, the held flags, the preview markers, the blind zeros, the weights, the damage, and the C4 short line with its one-seed clause (also in the scene strip);
   - it is checked at 1440 px and 390 px against the misreading table.
