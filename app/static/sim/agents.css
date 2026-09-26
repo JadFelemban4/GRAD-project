@@ -146,7 +146,11 @@ main.agents-main{padding:18px 16px 0}
 .gauge-dot{position:absolute;width:9px;height:9px;margin-left:-6px;border-radius:50%;border:1.5px solid var(--paper)}
 .gauge-dot.sighted{top:-1px;background:var(--agent-sighted)}
 .gauge-dot.blind{top:7px;background:var(--agent-blind)}
-.gauge-ends{display:flex;justify-content:space-between;margin:0 5px;font-size:8px;color:var(--muted-3);direction:ltr}
+.gauge-ends{position:relative;display:flex;justify-content:space-between;margin:0 5px;font-size:8px;color:var(--muted-3);direction:ltr}
+/* The "no change" label names the value at the zero tick, so it stands on it: agents.mjs
+   gives it the tick's own left %, and .gauge-ends has the gauge's side margins
+   and direction, so the same % is the same place in either page direction. */
+.tick-label{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;color:var(--muted-2)}
 .tick-note{margin:2px 0 5px;font-size:8px;line-height:1.6;color:var(--muted-2)}
 .action-values{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
 .car-value{display:flex;flex-wrap:wrap;align-items:center;gap:0 6px;min-width:0}

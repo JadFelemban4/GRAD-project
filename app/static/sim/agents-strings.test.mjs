@@ -15,6 +15,9 @@ const api = () => {
   assert.ok(mod, `agents-strings.mjs must load: ${loadError?.message}`);
   return mod;
 };
+// U+2011 NON-BREAKING HYPHEN, built from its code point so no editor can
+// silently turn it back into an ASCII hyphen in this file.
+const NB_HYPHEN = String.fromCodePoint(0x2011);
 
 test('scene.mjs lends stage, ribbonGeometry and supra, and only adds the keyword', () => {
   // Design section 2, edit 2 (approved, section 11 Q2). Read as text so this
@@ -80,9 +83,11 @@ test('the honesty captions survive in both languages', () => {
     'agents.scene.slope': { ar: [/الميل غير مضخّم/, /ليست بمقياسها/], en: [/not exaggerated/, /not to scale/] },
     'agents.action.boost': { ar: [/سقف/], en: [/ceiling/] },
     'agents.action.map': { ar: [/السقف نفسه/, /لا يُعرض/], en: [/ceiling itself/, /not shown/] },
-    'agents.action.tick_duty': { ar: [/المنمذَج/, /0 أو 0\.4 أو 1\.0/], en: [/modelled/, /0, 0\.4 or 1\.0/] },
+    'agents.action.tick_fan': { ar: [/المنمذَج/, /المروحة/, /0 أو 0\.4 أو 1\.0/], en: [/modelled/, /\bfan\b/, /0, 0\.4 or 1\.0/] },
+    'agents.action.tick_pump': { ar: [/المنمذَج/, /المضخة/, /1\.0 ثابتة/], en: [/modelled/, /\bpump\b/, /constant 1\.0/] },
     'agents.action.held': { ar: [/حد سرعة التغيير/], en: [/rate limit/] },
-    'agents.dt.caption': { ar: [/لم تُحلّ/, /H2-2/], en: [/unresolved/, /H2-2/] },
+    'agents.dt.caption': { ar: [/لم تُحلّ/, new RegExp(`H2${NB_HYPHEN}2`)], en: [/unresolved/, new RegExp(`H2${NB_HYPHEN}2`)] },
+    'agents.turbine.reading': { ar: [/°م \/ .*°م$/], en: [/°C \/ .*°C$/] },
     'agents.damage.caption': { ar: [/في هذه الحلقة فقط/], en: [/in this episode only/] },
     'agents.legend.same_place': { ar: [/في المكان نفسه/], en: [/same place/] },
     'agents.device.line': { ar: [/لا تسجّل الجهاز/], en: [/do not record the device/] },
@@ -108,6 +113,37 @@ test('no string says preview helps, and the engine computer is always the modell
       if (text.includes('حاسوب المحرك')) assert.ok(text.includes('المنمذَج'), `${key} names the engine computer without «المنمذَج»`);
     }
   }
+});
+
+// Rows 3 and 4 once shared one note that described the FAN's schedule. The
+// modelled computer schedules only the fan (engine_env.py:265); the pump runs
+// at thermal.py's default 1.0 throughout (engine_env.py:764-765). So each has
+// its own note, and neither names the other device.
+test('the fan and the pump each have their own note, and neither names the other', () => {
+  const { AGENT_STRINGS } = api();
+  for (const lang of LANGS) {
+    assert.ok(!Object.prototype.hasOwnProperty.call(AGENT_STRINGS[lang], 'agents.action.tick_duty'),
+      `${lang}: the shared duty note must be gone`);
+  }
+  assert.ok(!AGENT_STRINGS.ar['agents.action.tick_pump'].includes('المروحة'), 'the Arabic pump note names the fan');
+  assert.ok(!AGENT_STRINGS.ar['agents.action.tick_fan'].includes('المضخة'), 'the Arabic fan note names the pump');
+  assert.doesNotMatch(AGENT_STRINGS.en['agents.action.tick_pump'], /\bfan\b/, 'the English pump note names the fan');
+  assert.doesNotMatch(AGENT_STRINGS.en['agents.action.tick_fan'], /\bpump\b/, 'the English fan note names the pump');
+});
+
+// At 1440 px in Arabic the caption broke as "H2-" | "2)": an ASCII hyphen is a
+// line-break opportunity. U+2011 is not, and it must stay an escape in the
+// source (agents-strings.mjs), never a literal character.
+test('the dt caption\'s citation cannot break at its hyphen', () => {
+  const { AGENT_STRINGS } = api();
+  for (const lang of LANGS) {
+    const text = AGENT_STRINGS[lang]['agents.dt.caption'];
+    assert.ok(text.includes(`H2${NB_HYPHEN}2`), `${lang}: H2-2 must be written with U+2011`);
+    assert.ok(!text.includes('H2-2'), `${lang}: an ASCII hyphen lets the line break inside H2-2`);
+  }
+  const src = readFileSync(new URL('./agents-strings.mjs', import.meta.url), 'utf8');
+  assert.equal(src.split(NB_HYPHEN).length - 1, 0, 'a literal U+2011 in agents-strings.mjs: write the escape');
+  assert.equal(src.split('H2\\u20112').length - 1, 2, 'the escape H2\\u20112 must appear once per language');
 });
 
 test('every key fills the same {placeholders} in both languages', () => {

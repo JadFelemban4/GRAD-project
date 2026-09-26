@@ -292,7 +292,9 @@ function applyMeta(meta, road) {
   const more = $('verdict-more');
   if (more) more.open = !window.matchMedia?.('(max-width: 760px)').matches;
   drawProfile(road);
-  mountChase(road);
+  // Not awaited: the rest of the page must not wait for Three.js. An error
+  // after the scene exists is logged as itself (mountChase).
+  mountChase(road).catch(err => console.error(err));
   renderAll();
 }
 
@@ -599,6 +601,14 @@ function laneColours() {
 // gitignored and exists only after app\start-simulation.ps1, and a failed
 // static import of Three.js would take the whole module graph -- verdict,
 // badge, dt caption, profile, panel -- down with it.
+//
+// The try holds ONLY the import and createChaseScene, the two steps that fail
+// when Three.js or WebGL is missing, so only they show the WebGL message. A
+// scene that fails half-built disposes its own stage before it throws
+// (agent-scene.mjs), and the canvas it left in the host is cleared here. An
+// error after the scene exists -- in setTheme, or in the pause panel that
+// draw() renders -- is not a WebGL failure: it reaches applyMeta's catch and
+// the console as itself.
 async function mountChase(road) {
   const host = $('chase');
   if (!host || !road) return;
@@ -607,19 +617,21 @@ async function mountChase(road) {
   chase?.dispose();
   chase = null;
   host.textContent = '';
+  let created;
   try {
     const { createChaseScene } = await import('./agent-scene.mjs');
     if (token !== chaseToken) return;
-    chase = createChaseScene(host, createEpisodeRoad(road, M_PER_UNIT), laneColours());
-    chase.setTheme(document.documentElement.dataset.theme || 'light', laneColours());
-    draw(state.play.clock.time, true);
+    created = createChaseScene(host, createEpisodeRoad(road, M_PER_UNIT), laneColours());
   } catch (err) {
     console.error(err);
     if (token !== chaseToken) return;
-    chase = null;
     host.textContent = '';
     host.appendChild(el('p', 'webgl-error', t(currentLang, 'agents.scene.webgl_error')));
+    return;
   }
+  chase = created;
+  chase.setTheme(document.documentElement.dataset.theme || 'light', laneColours());
+  draw(state.play.clock.time, true);
 }
 
 function renderLaneLabels() {
@@ -639,6 +651,12 @@ function fmtAction(i, v) {
   if (key === 'fan' || key === 'pump') return text;
   return n > 0 ? `+${text}` : text.replace('-', '\u2212');
 }
+
+// The note under each duty row, by device. The modelled computer schedules the
+// fan (engine_env.py:265); the pump runs at thermal.py's default 1.0 throughout
+// (engine_env.py:764-765). The results' "baseline ECU" row runs both at a
+// constant 1.0 (evaluate.py:347).
+const DUTY_NOTE = { fan: 'agents.action.tick_fan', pump: 'agents.action.tick_pump' };
 
 // Five rows, built once per meta and language: a bar from lo to hi, a tick at
 // the neutral value, one dot per car. renderActions only moves the dots.
@@ -672,8 +690,17 @@ function buildActionRows() {
     });
     const ends = el('div', 'gauge-ends');
     ends.append(el('span', '', fmtAction(i, act.lo[i])), el('span', '', fmtAction(i, act.hi[i])));
-    const note = el('p', 'tick-note', duty
-      ? t(currentLang, 'agents.action.tick_duty') : t(currentLang, 'agents.action.tick_trim'));
+    // A trim's tick is at 0, and «بلا تعديل» names THAT value, so it stands on
+    // the tick: the same left % in a box with the gauge's own geometry
+    // (agents.css .gauge-ends). A duty row's tick is its end, 1.0, and its
+    // note is a sentence about its own device, under the bar.
+    let note = null;
+    if (duty) note = el('p', 'tick-note', t(currentLang, DUTY_NOTE[action.key]));
+    else {
+      const label = el('span', 'tick-label', t(currentLang, 'agents.action.tick_trim'));
+      label.style.left = tick.style.left;
+      ends.appendChild(label);
+    }
     const values = el('div', 'action-values');
     const cells = LANES.map(lane => {
       const cell = el('div', `car-value ${lane}`);
@@ -687,7 +714,7 @@ function buildActionRows() {
       values.appendChild(cell);
       return { value, held, map };
     });
-    row.append(head, gauge, ends, note, values);
+    row.append(head, gauge, ends, ...(note ? [note] : []), values);
     host.appendChild(row);
     state.rows.push({ dots, cells });
   });
@@ -741,6 +768,10 @@ function renderSeen(frame) {
   setText($('seen-blind'), blind ? t(currentLang, 'agents.seen.blind', { zeros }) : '');
 }
 
+// The limit arrives as 849.9 (TURB_PROTECT_K - 273.15, one decimal); the
+// results files and the documents say 850, so it is shown with none. The unit
+// is the language's own, «°م» in Arabic as on the badge, and an Arabic unit
+// needs a right-to-left box or the line reorders into "700 °م° 850 / م".
 function renderReadings(frame) {
   const limit = state.meta?.limits?.turb_c;
   const outputs = [
@@ -750,7 +781,10 @@ function renderReadings(frame) {
   outputs.forEach((out, j) => {
     const car = carOf(frame, j);
     setText(out.damage, car ? fmt(car.damage, 1) : EM_DASH);
-    setText(out.turb, car ? `${fmt(car.turb_c, 0)} °C / ${fmt(limit, 1)} °C` : EM_DASH);
+    if (out.turb) out.turb.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    setText(out.turb, car
+      ? t(currentLang, 'agents.turbine.reading', { turb: fmt(car.turb_c, 0), limit: fmt(limit, 0) })
+      : EM_DASH);
     setText(out.torque, car ? t(currentLang, 'agents.torque.label', {
       delivered: fmt(car.torque_nm, 0), requested: fmt(car.torque_req_nm, 0),
     }) : EM_DASH);

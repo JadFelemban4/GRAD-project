@@ -360,7 +360,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(v["missing"], [])
         by_key = {ln["key"]: ln for ln in v["lines"]}
         self.assertEqual({k: ln["line"] for k, ln in by_key.items()},
-                         {"result": 42, "seeds": 29, "disagree": 33, "convergence": 48,
+                         {"result": 42, "seeds": 28, "disagree": 33, "convergence": 48,
                           "reading": 50, "explanations": 41, "one_seed": 633})
         for a in AC.VERDICT_LINES["c4"]:
             with self.subTest(anchor=a.key):
@@ -368,9 +368,23 @@ class CatalogTests(unittest.TestCase):
                 ln = by_key[a.key]
                 self.assertEqual(ln["file"], a.file)
                 self.assertEqual(ln["text"], "\n".join(src[ln["line"] - 1:ln["line"] - 1 + a.n]))
-        self.assertIn("(7 of 8 seeds below 50)", by_key["seeds"]["text"])
-        self.assertIn("one\n   seed the other way and the cell would be INCONCLUSIVE",
-                      by_key["one_seed"]["text"])
+        # The sign test's p is never quoted without its heading, and never
+        # without the permutation test's p beside it (C4_RESULT.txt:28-30).
+        seeds = by_key["seeds"]["text"].splitlines()
+        self.assertEqual(len(seeds), 3)
+        self.assertEqual(seeds[0].strip(), "H1: the effect is smaller than the MEI (50 units)")
+        self.assertIn("(7 of 8 seeds below 50)", seeds[1])
+        self.assertIn("exact paired permutation test", seeds[2])
+        self.assertIn("p = 0.3867", seeds[2])
+        # Item 2 of PREREGISTRATION_C4.md section 11 is quoted WHOLE, through
+        # its closing caveat, never cut at "The permutation test," (:633-643).
+        one_seed = by_key["one_seed"]["text"]
+        self.assertIn("one\n   seed the other way and the cell would be INCONCLUSIVE", one_seed)
+        self.assertIn("does not reject (p = 0.3867)", one_seed)
+        self.assertTrue(one_seed.endswith("is not\n   settled.**"), one_seed[-60:])
+        prereg = (ROOT / "results" / "PREREGISTRATION_C4.md").read_text(encoding="utf-8").splitlines()
+        after = prereg[by_key["one_seed"]["line"] - 1 + len(one_seed.splitlines())]
+        self.assertTrue(after.startswith("3. "), f"the quote must end where item 3 begins: {after!r}")
         self.assertEqual(v["short"], {k: AC.SHORT_VERDICT["c4"][k] for k in ("ar", "en")})
         self.assertLessEqual(set(AC.SHORT_VERDICT["c4"]["requires"]),
                              {a.key for a in AC.VERDICT_LINES["c4"]})
@@ -521,9 +535,11 @@ def _no_models(runs, seed):
     return (p_neutral, p_grade_now)
 
 
-def _fake_tracer(n=5, gate=None, fail=None, obs=False):
+def _fake_tracer(n=5, gate=None, fail=None, obs=False, hold=None):
     """A stand-in for run_lanes: n paired frames, each held at `gate` if one
-    is given; `fail` is raised in place of frame 2."""
+    is given; `fail` is raised in place of frame 2; `hold`, an Event, holds
+    the build once frame 1 is out until it is set, so 'building' with frames
+    0 and 1 is a stable state rather than a window of a few milliseconds."""
     def tracer(lanes, ep, on_frame):
         assert [use for _, use in lanes] == [True, False], "lane 0 sighted, lane 1 blind"
         for k in range(n):
@@ -533,16 +549,19 @@ def _fake_tracer(n=5, gate=None, fail=None, obs=False):
                 raise fail
             seen = [np.full(OBS_DIM, k, np.float32), None] if obs else [None, None]
             on_frame({"k": k, "cars": [None, None]}, seen)
+            if hold is not None and k == 1:
+                hold.wait(5)
             time.sleep(0.01)
         return [{"damage": 1.0}, {"damage": 2.0}]
     return tracer
 
 
-def _wait_for(store, key, want, limit=10.0):
+def _wait_for(store, key, want, limit=10.0, frames=None):
+    """Poll until `want`, and (when `frames` is given) until that many frames are out."""
     t0 = time.monotonic()
     while True:
         r = store.poll(key)
-        if r["status"] == want:
+        if r["status"] == want and (frames is None or len(r["frames"]) == frames):
             return r
         if time.monotonic() - t0 > limit:
             raise AssertionError(f"{key} never reached {want!r}; last {r['status']!r}")
@@ -602,7 +621,8 @@ class StoreTests(unittest.TestCase):
         def slow(runs, seed):
             time.sleep(1.0)
             return _no_models(runs, seed)
-        s = self.store(loader=slow)
+        hold = threading.Event()
+        s = self.store(loader=slow, tracer=_fake_tracer(hold=hold))
         s.poll(self.K1, preempt=True)
         worst, seen = 0.0, []
         for _ in range(15):
@@ -613,8 +633,17 @@ class StoreTests(unittest.TestCase):
             time.sleep(0.05)
         self.assertLess(worst, 0.1, "poll blocked on the worker's lock")
         self.assertEqual(set(seen), {"loading"})
-        r = _wait_for(s, self.K1, "building")
-        self.assertEqual(r["frames"][0]["k"], 0, "the first slice must start at frame 0")
+        try:
+            # The tracer holds after frame 1, so 'building' cannot be missed.
+            r = _wait_for(s, self.K1, "building", frames=2)
+            self.assertEqual([f["k"] for f in r["frames"]], [0, 1],
+                             "the first slice must start at frame 0")
+            later = s.poll(self.K1, since=1)
+            self.assertEqual((later["status"], later["since"]), ("building", 1))
+            self.assertEqual(later["frames"][0]["k"], 1, "since=1 must start the slice at frame 1")
+        finally:
+            hold.set()
+        _wait_for(s, self.K1, "ready")
 
     def test_one_worker_and_polls_never_cancel(self):
         gate = threading.Event()

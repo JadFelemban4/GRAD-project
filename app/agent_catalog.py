@@ -186,13 +186,18 @@ Anchor = namedtuple("Anchor", "key file pattern n")
 VERDICT_LINES = {
     "c4": (
         Anchor("result", "C4_RESULT.txt", r"^\s*RESULT: SMALLER THAN THE MEI\s*$", 1),
-        Anchor("seeds", "C4_RESULT.txt", r"\(7 of 8 seeds below 50\)", 1),
+        # The heading and both tests under it: the sign test's p is never
+        # shown alone, and never without the permutation test's p.
+        Anchor("seeds", "C4_RESULT.txt",
+               r"^\s*H1: the effect is smaller than the MEI \(50 units\)\s*$", 3),
         Anchor("disagree", "C4_RESULT.txt", r"^\s*THE TWO TESTS DISAGREE", 2),
         Anchor("convergence", "C4_RESULT.txt", r"^\s*NOT-CONVERGED ", 1),
         Anchor("reading", "C4_RESULT.txt", r"^THE READING, as declared", 4),
         Anchor("explanations", "PREREGISTRATION_C4.md", r"^\| \(i\) \|", 3),
+        # Item 2 of section 11 WHOLE, through "...is not settled.**": a quote
+        # cut before its caveat reads as selective quoting.
         Anchor("one_seed", "PREREGISTRATION_C4.md",
-               r"^2\. \*\*It rests on the sign test's threshold", 3),
+               r"^2\. \*\*It rests on the sign test's threshold", 11),
     ),
 }
 

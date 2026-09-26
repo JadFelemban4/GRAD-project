@@ -54,7 +54,7 @@ export const AGENT_STRINGS = {
     // --- timeline
     'agents.time.computed': 'حُسب حتى {done} · تنتهي الحلقة عند {end}',
     'agents.time.waiting': 'ينتظر الحساب…',
-    'agents.dt.caption': 'تُعاد هنا بخطوة 1.0 ث، الخطوة التي قُيِّم بها الوكيلان؛ دُرِّبا بخطوة {train_dt} ث. مشكلة معروفة لم تُحلّ (AUDIT2.md H2-2)؛ لم يُقَس هل تؤثر في الوكيلين بالقدر نفسه',
+    'agents.dt.caption': 'تُعاد هنا بخطوة 1.0 ث، الخطوة التي قُيِّم بها الوكيلان؛ دُرِّبا بخطوة {train_dt} ث. مشكلة معروفة لم تُحلّ (AUDIT2.md H2\u20112)؛ لم يُقَس هل تؤثر في الوكيلين بالقدر نفسه',
     'agents.dt.same': 'تُعاد هنا بخطوة 1.0 ث، الخطوة التي قُيِّم بها الوكيلان ودُرِّبا بها',
     'agents.dt.not_recorded': 'تُعاد هنا بخطوة 1.0 ث، الخطوة التي قُيِّم بها الوكيلان؛ خطوة التدريب غير مسجّلة',
 
@@ -68,7 +68,8 @@ export const AGENT_STRINGS = {
     'agents.action.fan': 'مروحة التبريد',
     'agents.action.pump': 'مضخة سائل التبريد',
     'agents.action.tick_trim': 'بلا تعديل',
-    'agents.action.tick_duty': 'قيمة صف "حاسوب المحرك الأساسي" في النتائج (1.0 ثابتة)؛ الحاسوب المنمذَج نفسه يجدول المروحة 0 أو 0.4 أو 1.0 حسب حرارة سائل التبريد',
+    'agents.action.tick_fan': 'قيمة صف "حاسوب المحرك الأساسي" في النتائج (1.0 ثابتة)؛ الحاسوب المنمذَج نفسه يجدول المروحة 0 أو 0.4 أو 1.0 حسب حرارة سائل التبريد',
+    'agents.action.tick_pump': 'قيمة صف "حاسوب المحرك الأساسي" في النتائج (1.0 ثابتة)، وهي أيضاً ما يشغّل به الحاسوب المنمذَج المضخة طوال الوقت',
     'agents.action.held': 'أمر به {x}؛ قيّده حد سرعة التغيير',
     'agents.action.map': 'ضغط المشعب الآن {map} كيلوباسكال؛ السقف نفسه يُحسب داخل الحلقة ولا يُعرض',
     'agents.car.sighted': 'يرى الطريق أمامه',
@@ -77,6 +78,7 @@ export const AGENT_STRINGS = {
     'agents.seen.blind': 'لا يرى الطريق أمامه: مداخل الاستباق عنده {zeros}',
     'agents.damage.caption': 'وحدات ضرر، في هذه الحلقة فقط حتى هذه اللحظة',
     'agents.turbine.label': 'حرارة غلاف التيربو مقابل عتبة الحماية',
+    'agents.turbine.reading': '{turb} °م / {limit} °م',
     'agents.torque.label': 'العزم المُسلَّم {delivered} من {requested} نيوتن·م مطلوبة',
     'agents.device.line': 'التقييم المسجَّل حمّل الشبكة على الجهاز الافتراضي لـ SB3، وهو cuda على هذا الجهاز؛ ملفات النتائج لا تسجّل الجهاز. هذه الحلقة حُسبت على {device} \u200f(torch {torch}، SB3 {sb3})',
     'agents.device.warning': 'تنبيه: هذه الحلقة لم تُحسب على cuda، وحلقات المعالج تختلف عن حلقات cuda، فقد لا تطابق ما قُيِّم',
@@ -141,7 +143,7 @@ export const AGENT_STRINGS = {
     // --- timeline
     'agents.time.computed': 'Computed up to {done} · the episode ends at {end}',
     'agents.time.waiting': 'Waiting for the computation…',
-    'agents.dt.caption': 'Replayed here at a 1.0 s step, the step the agents were scored at; they were trained at {train_dt} s. A known, unresolved problem (AUDIT2.md H2-2); whether it affects both agents equally has not been measured',
+    'agents.dt.caption': 'Replayed here at a 1.0 s step, the step the agents were scored at; they were trained at {train_dt} s. A known, unresolved problem (AUDIT2.md H2\u20112); whether it affects both agents equally has not been measured',
     'agents.dt.same': 'Replayed here at a 1.0 s step, the step the agents were scored and trained at',
     'agents.dt.not_recorded': 'Replayed here at a 1.0 s step, the step the agents were scored at; the training step is not recorded',
 
@@ -155,7 +157,8 @@ export const AGENT_STRINGS = {
     'agents.action.fan': 'Cooling fan',
     'agents.action.pump': 'Coolant pump',
     'agents.action.tick_trim': 'No change',
-    'agents.action.tick_duty': "The value used by the results' 'baseline ECU' row (a constant 1.0); the modelled computer itself schedules the fan at 0, 0.4 or 1.0 by coolant temperature",
+    'agents.action.tick_fan': "The value used by the results' 'baseline ECU' row (a constant 1.0); the modelled computer itself schedules the fan at 0, 0.4 or 1.0 by coolant temperature",
+    'agents.action.tick_pump': "The value used by the results' 'baseline ECU' row (a constant 1.0), which is also what the modelled computer runs the pump at throughout",
     'agents.action.held': 'Commanded {x}; held back by the rate limit',
     'agents.action.map': 'Manifold pressure now {map} kPa; the ceiling itself is computed inside the loop and is not shown',
     'agents.car.sighted': 'Sees the road ahead',
@@ -164,6 +167,7 @@ export const AGENT_STRINGS = {
     'agents.seen.blind': 'Does not see the road ahead: its preview inputs were {zeros}',
     'agents.damage.caption': 'Damage units, in this episode only, up to this moment',
     'agents.turbine.label': 'Turbine housing temperature against the protection limit',
+    'agents.turbine.reading': '{turb} °C / {limit} °C',
     'agents.torque.label': 'Torque delivered {delivered} of {requested} N·m requested',
     'agents.device.line': "The recorded evaluation loaded the network on SB3's default device, which is cuda on this machine; the result files do not record the device. This episode was computed on {device} (torch {torch}, SB3 {sb3})",
     'agents.device.warning': 'Warning: this episode was not computed on cuda, and CPU episodes differ from CUDA ones, so it may not match what was scored',

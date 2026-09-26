@@ -158,3 +158,38 @@ test('dispose is final and idempotent', { skip: SKIP }, () => {
   chase.setTheme('dark');
   assert.equal(seen.renders, renders);
 });
+
+// On a 13 % grade the road behind the cars sinks below the grid's plane, and a
+// depth-tested grid drew its lines across the road and both lane tints. The
+// grid is a BACKDROP: opaque (so it is not sorted after the road), never
+// depth-tested, never writing depth, and first in the opaque pass, so the
+// road, the verge and the cars always paint over it.
+test('the grid is a backdrop: drawn first, never depth-tested, never sorted as transparent', { skip: SKIP }, () => {
+  const { chase, scene } = build();
+  const grid = scene.getObjectByName('grid');
+  assert.ok(grid, 'no grid');
+  assert.equal(grid.renderOrder, -1, 'the grid must draw before everything else');
+  assert.equal(grid.material.depthTest, false, 'a depth-tested grid draws over the road where the road sinks below it');
+  assert.equal(grid.material.depthWrite, false, 'the grid must leave the depth buffer to the road and the cars');
+  assert.equal(grid.material.transparent, false, 'a transparent grid is sorted AFTER the opaque road');
+  for (const name of ['verge', 'road', 'lane-sighted', 'lane-blind', 'centre-dashes']) {
+    assert.ok(scene.getObjectByName(name).renderOrder > grid.renderOrder, `${name} must draw after the grid`);
+  }
+  chase.setTheme('dark');
+  assert.equal(grid.material.transparent, false, 'setTheme must not make the grid transparent again');
+});
+
+// createChaseScene builds a WebGL stage before anything else. If a later step
+// throws, the page never receives the scene and cannot dispose it, so the
+// scene disposes its own stage before the error goes on to the page.
+test('a scene that fails half-built disposes its stage and rethrows', { skip: SKIP }, () => {
+  const fake = fakeStage();
+  const mat = fake.paint.mat;
+  fake.paint.mat = (key, extra) => {
+    if (key === 'roadLine') throw new Error('no road line');
+    return mat(key, extra);
+  };
+  assert.throws(() => api().createChaseScene({}, createEpisodeRoad(ROUTE), undefined, { makeStage: fake.make }),
+    /no road line/);
+  assert.equal(fake.seen.disposed, true, 'the half-built stage was left behind');
+});

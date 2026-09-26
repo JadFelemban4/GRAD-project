@@ -134,6 +134,32 @@ test('every reading in the pause panel carries its own label', () => {
   }
 });
 
+// «بلا تعديل» names the value at the zero tick, so it must stand ON the tick:
+// under the end of the bar it labelled +4.0 (Arabic) or −8.0 (English) as "no
+// change". agents.mjs gives the label the tick's own left %; these rules make
+// that percentage mean the same place: an absolutely placed label, centred on
+// its left edge, in a left-to-right box with the gauge's own side margins, in
+// either page direction.
+test('the zero-tick label is placed like the tick, in both page directions', () => {
+  const css = read(new URL('./agents.css', import.meta.url));
+  const rule = selector => {
+    const m = css.match(new RegExp(`(?:^|\\})${selector.replace(/\./g, '\\.')}\\{([^}]*)\\}`, 'm'));
+    assert.ok(m, `agents.css has no ${selector} rule`);
+    return m[1];
+  };
+  const margin = decl => (decl.match(/margin:([^;]+)/) || [])[1]?.trim().split(/\s+/);
+  const gauge = rule('.gauge');
+  const ends = rule('.gauge-ends');
+  const label = rule('.tick-label');
+  assert.match(gauge, /direction:ltr/);
+  assert.match(ends, /direction:ltr/, 'the label box must not flip with the page direction');
+  assert.match(ends, /position:relative/);
+  assert.equal(margin(ends)[1], margin(gauge)[1], 'the label box and the gauge must share their side margins');
+  assert.match(label, /position:absolute/);
+  assert.match(label, /translateX\(-50%\)/, 'the label must be centred on the tick');
+  assert.doesNotMatch(css, /html\[dir=ltr\][^{]*\.(?:gauge-ends|tick-label)/, 'no per-direction override of the label box');
+});
+
 test('the profile ticks and the chase posts share one ramp, in both themes', () => {
   const css = read(new URL('./agents.css', import.meta.url));
   const scene = read(new URL('./agent-scene.mjs', import.meta.url));

@@ -9,6 +9,30 @@
 // the rest of the pause panel stay out of the way.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { registerHooks } from 'node:module';
+
+// The page loads its chase view with import('./agent-scene.mjs'), which needs
+// Three.js and WebGL. In this process that one import resolves to a stand-in,
+// whose behaviour each test sets through globalThis.chaseFake. The chase view
+// is mounted only where a test puts a #chase node in the fake DOM.
+const FAKE_SCENE = `data:text/javascript,${encodeURIComponent(`
+export function createChaseScene() {
+  const fake = globalThis.chaseFake;
+  if (fake.fail) throw new Error(fake.fail);
+  const scene = { disposed: false, update() {}, setTheme() {}, dispose() { scene.disposed = true; } };
+  fake.scenes.push(scene);
+  if (fake.onCreate) fake.onCreate();
+  return scene;
+}`)}`;
+registerHooks({
+  resolve(specifier, context, next) {
+    if (specifier === './agent-scene.mjs' && String(context.parentURL).endsWith('/agents.mjs')) {
+      return { url: FAKE_SCENE, shortCircuit: true };
+    }
+    return next(specifier, context);
+  },
+});
+globalThis.chaseFake = { fail: null, scenes: [], onCreate: null };
 
 class FakeNode {
   constructor(tag) {
@@ -35,7 +59,8 @@ class FakeNode {
   querySelectorAll() { return []; }
 }
 
-const nodes = Object.fromEntries(['compute', 'error', 'pick-note', 'rise-caption', 'seek', 'actions', 'lane-stopped']
+const nodes = Object.fromEntries(['compute', 'error', 'pick-note', 'rise-caption', 'seek', 'actions', 'lane-stopped',
+  'lang-toggle', 'turb-sighted', 'turb-blind']
   .map(id => [id, new FakeNode('div')]));
 // Every node under `node` whose class list holds `name`.
 function byClass(node, name, out = []) {
@@ -83,6 +108,8 @@ const META = {
   runs: 'runs_c4', seed: 5, ep: 1, steps: 719, dt: 1, protocol: 'd2', agents: [AGENT, AGENT],
   preview_s: [2, 5, 15, 30],
   act: { lo: [-8, -0.15, -40, 0, 0.3], hi: [4, 0.06, 15, 1, 1], neutral_phys: [0, 0, 0, 1, 1] },
+  // agent_api.episode_meta sends round(TURB_PROTECT_K - 273.15, 1)
+  limits: { turb_c: 849.9 },
 };
 const ROAD = {
   rise_m: 2755, p_baro_kpa: 101.3, t_amb_c: 42, climb_start_s: null,
@@ -186,4 +213,121 @@ test('a diverged step and a stopped lane show a dash, never a held command', asy
   });
   assert.equal(nodes['lane-stopped'].hidden, false, 'the stop is said');
   assert.match(nodes['lane-stopped'].textContent, /\b2$/, 'at step 2, the first null car');
+});
+
+// The pause panel's five rows. The three trims have a tick at 0 and its label
+// «بلا تعديل» must stand on that tick, at the tick's own left %, in both
+// languages: under the end of the bar it read as +4.0 (Arabic) or −8.0
+// (English) being "no change". The fan and the pump rows each carry a note
+// about their own device (the pump's once described the fan's schedule).
+test('«بلا تعديل» sits on the zero tick of each trim row, and the fan and pump notes name their own device', async () => {
+  nodes.compute.click();
+  reply(await nextRequest(), { status: 'ready', since: 0, frames: [], steps: 719, meta: META, road: ROAD });
+  await settle();
+  const check = (lang, noChange, own, other) => {
+    const rows = byClass(nodes.actions, 'action-row');
+    assert.equal(rows.length, 5, `${lang}: five action rows`);
+    const ticks = rows.map(row => byClass(row, 'gauge-tick')[0].style.left);
+    // gaugeFraction(0, lo, hi): 8/12, 0.15/0.21 and 40/55 of the bar
+    assert.deepEqual(ticks.slice(0, 3), ['66.67%', '71.43%', '72.73%'], `${lang}: the zero ticks`);
+    rows.slice(0, 3).forEach((row, i) => {
+      const labels = byClass(row, 'tick-label');
+      assert.equal(labels.length, 1, `${lang} row ${i}: one label at the zero tick`);
+      assert.equal(labels[0].textContent, noChange, `${lang} row ${i}: the label's text`);
+      assert.equal(labels[0].style.left, ticks[i], `${lang} row ${i}: the label is not at the zero tick`);
+      assert.equal(byClass(row, 'tick-note').length, 0, `${lang} row ${i}: a trim row has no paragraph note`);
+    });
+    rows.slice(3).forEach((row, j) => {
+      assert.equal(byClass(row, 'tick-label').length, 0, `${lang} row ${3 + j}: a duty row has no zero label`);
+      const note = byClass(row, 'tick-note')[0]?.textContent || '';
+      assert.match(note, own[j], `${lang} row ${3 + j}: the note does not name its own device`);
+      assert.doesNotMatch(note, other[j], `${lang} row ${3 + j}: the note names the other device`);
+    });
+  };
+  check('ar', 'بلا تعديل', [/المروحة/, /المضخة/], [/المضخة/, /المروحة/]);
+  nodes['lang-toggle'].click();
+  try {
+    check('en', 'No change', [/\bfan\b/, /\bpump\b/], [/\bpump\b/, /\bfan\b/]);
+  } finally {
+    nodes['lang-toggle'].click();   // back to Arabic for the tests below
+  }
+});
+
+// The limit is TURB_PROTECT_K - 273.15 = 849.85, sent as 849.9; the results
+// files and the documents say 850, so it is shown with no decimals. The
+// Arabic readings write degrees Celsius «°م», as the badge and the profile do.
+test('the turbine limit reads 850, in °م in Arabic and °C in English', async () => {
+  nodes.compute.click();
+  const car = { cmd: [0, 0, 0, 1, 1], act: [0, 0, 0, 1, 1], held: [false, false, false, false, false],
+    preview_pct: [0, 0, 0, 0], map_kpa: 180, turb_c: 700.4, torque_nm: 300, torque_req_nm: 310, damage: 1.5 };
+  reply(await nextRequest(), { status: 'ready', since: 0, steps: 1, meta: META, road: ROAD,
+    frames: [{ k: 0, cars: [car, car] }] });
+  await settle();
+  seekTo(0.5);
+  for (const id of ['turb-sighted', 'turb-blind']) {
+    assert.equal(nodes[id].textContent, '700 °م / 850 °م', `#${id} in Arabic`);
+    assert.equal(nodes[id].dir, 'rtl', `#${id}: an Arabic unit inside a left-to-right box reorders the reading`);
+  }
+  nodes['lang-toggle'].click();
+  try {
+    for (const id of ['turb-sighted', 'turb-blind']) {
+      assert.equal(nodes[id].textContent, '700 °C / 850 °C', `#${id} in English`);
+      assert.equal(nodes[id].dir, 'ltr', `#${id} in English`);
+    }
+  } finally {
+    nodes['lang-toggle'].click();
+  }
+});
+
+// mountChase's try once wrapped setTheme and draw as well as the import and
+// createChaseScene, so an error in the pause panel was shown as "the 3D view
+// could not be shown" and the scene already built was left behind. Here the
+// panel's heading throws on the first read after the scene is created.
+test('an error after the chase scene is created is not shown as the WebGL message', async () => {
+  const logged = [];
+  const consoleError = console.error;
+  console.error = err => { logged.push(err); };
+  let armed = false;
+  const heading = new FakeNode('h3');
+  Object.defineProperty(heading, 'textContent', {
+    get() { if (armed) { armed = false; throw new Error('pause panel failed'); } return ''; },
+    set() {},
+  });
+  nodes['pause-heading'] = heading;
+  nodes.chase = new FakeNode('div');
+  globalThis.chaseFake.onCreate = () => { armed = true; };
+  try {
+    nodes.compute.click();
+    // A meta for another episode, so the page mounts a chase view for it.
+    reply(await nextRequest(), { status: 'ready', since: 0, frames: [], steps: 719, meta: { ...META, ep: 2 }, road: ROAD });
+    await settle();
+    assert.equal(globalThis.chaseFake.scenes.length, 1, 'the stand-in chase scene was created');
+    assert.equal(armed, false, 'the panel was never drawn after the scene was created');
+    assert.deepEqual(byClass(nodes.chase, 'webgl-error'), [], 'a pause-panel error was shown as the WebGL message');
+    assert.equal(globalThis.chaseFake.scenes[0].disposed, false, 'the scene that was built is still the page\'s');
+    assert.ok(logged.some(e => e?.message === 'pause panel failed'), 'the panel error is logged as itself');
+  } finally {
+    console.error = consoleError;
+    globalThis.chaseFake.onCreate = null;
+    delete nodes['pause-heading'];
+  }
+});
+
+test('a chase scene that cannot be created shows the WebGL message in its place', async () => {
+  const consoleError = console.error;
+  console.error = () => {};
+  globalThis.chaseFake.fail = 'no WebGL in this process';
+  try {
+    nodes.compute.click();
+    reply(await nextRequest(), { status: 'ready', since: 0, frames: [], steps: 719, meta: { ...META, ep: 3 }, road: ROAD });
+    await settle();
+    const shown = byClass(nodes.chase, 'webgl-error');
+    assert.equal(shown.length, 1, 'the chase view says it cannot draw');
+    assert.match(shown[0].textContent, /ثلاثي الأبعاد/);
+    assert.equal(globalThis.chaseFake.scenes[0].disposed, true, 'the previous episode\'s scene was disposed');
+  } finally {
+    console.error = consoleError;
+    globalThis.chaseFake.fail = null;
+    delete nodes.chase;
+  }
 });

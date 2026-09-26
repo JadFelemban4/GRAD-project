@@ -36,8 +36,11 @@ const DASH_LEN_M = 6;
 const POST_Z = ROAD_W / 2 - 0.15; // the sighted car's road edge, outside its car
 const POST_H = 1.4;
 const GRID_STEP = 2;              // 20 m
-// A horizontal reference under the cars, so a climb reads as a climb.
-const GRID = { light: 0xc8cbbd, dark: 0x3b4743 };
+// A horizontal reference under the cars, so a climb reads as a climb. It is a
+// BACKDROP, opaque and drawn first (see the grid below), so the colours are
+// the old 0.8-opacity lines already blended over --world-bg (#e7eddf light,
+// #171d1e dark): 0.8 x 0xc8cbbd + 0.2 x 0xe7eddf, and the same for dark.
+const GRID = { light: 0xced2c4, dark: 0x343f3c };
 // Preview posts: one hue (violet, neither red nor green, and apart from the
 // blue and amber lane colours), pale at a flat road and deep at 16 %. On the
 // dark theme it runs the other way, dim to bright, so steeper stays stronger.
@@ -76,6 +79,19 @@ function setColour(material, colour) {
 export function createChaseScene(host, episodeRoad, lanes = { sighted: '#2f6db0', blind: '#b7791f' }, options = {}) {
   const makeStage = options.makeStage ?? stage;
   const view = makeStage(host, { extent: EXTENT, position: CAMERA_POSITION, target: CAMERA_TARGET });
+  // A step below can throw after the stage (renderer, canvas, WebGL context)
+  // exists. The page then never receives a scene and cannot dispose it, so
+  // the stage is disposed here before the error goes on to the page.
+  try {
+    return buildChase(view, episodeRoad, lanes);
+  } catch (err) {
+    view.dispose();
+    throw err;
+  }
+}
+
+// Everything createChaseScene puts on its stage, and the scene's methods.
+function buildChase(view, episodeRoad, lanes) {
   const { scene, render, paint } = view;
   // stage() stops touch scrolling on its canvas (the lab has orbit controls).
   // This camera is fixed, so a phone must still scroll past the view.
@@ -164,14 +180,23 @@ export function createChaseScene(host, episodeRoad, lanes = { sighted: '#2f6db0'
 
   // ---- the grid: in the scene root, shifted by the fraction of a cell so its
   // lines stay put on the ground as the road slides.
+  //
+  // A BACKDROP. On a climb the road behind the cars sinks below the grid's
+  // plane, and a depth-tested grid drew its lines across the road and both
+  // lane tints. So it never tests or writes depth, it is opaque (a transparent
+  // grid is sorted AFTER the opaque road), and renderOrder -1 puts it first in
+  // the opaque pass: the road, the verge and the cars always paint over it.
   const gridPoints = [];
   for (let x = -40; x <= 60; x += GRID_STEP) gridPoints.push(x, 0, -20, x, 0, 20);
   for (let z = -20; z <= 20; z += GRID_STEP) gridPoints.push(-40, 0, z, 60, 0, z);
   const gridGeometry = new THREE.BufferGeometry();
   gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridPoints, 3));
-  const gridMaterial = new THREE.LineBasicMaterial({ color: GRID[theme] ?? GRID.light, transparent: true, opacity: 0.8 });
+  const gridMaterial = new THREE.LineBasicMaterial({
+    color: GRID[theme] ?? GRID.light, transparent: false, depthTest: false, depthWrite: false,
+  });
   const grid = new THREE.LineSegments(gridGeometry, gridMaterial);
   grid.name = 'grid';
+  grid.renderOrder = -1;
   scene.add(grid);
 
   // ---- the two cars: same s, same pitch, ±CAR_OFFSET across the road.
