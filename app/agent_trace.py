@@ -1,13 +1,18 @@
-"""One frozen test episode, and its road, for the agent replay page (/agents).
+"""One frozen test episode, stepped live, for the agent replay page (/agents).
 
-episode() and build_cycle() rebuild a scored episode exactly as
-evaluate.run_episode builds it (evaluate.py:175-202). route() turns that
-episode's cycle into road geometry for the page. jsonable() makes numpy values
-safe for JSON.
+run_lanes() mirrors evaluate.run_episode (evaluate.py:175-202) for several
+lanes at once, so that every number the page shows comes from the SAME steps
+the scored evaluation took. app/test_agents.py proves the mirror == to
+run_episode on whole result dicts; if that proof ever fails, the fix is to
+find the cause, never to add a tolerance.
 
 What this module never does:
 
-- it never writes: no file, no cache, no result;
+- it never writes: no file, no cache, no result; traces live in memory only;
+- it never edits engine_env: it reads env attributes after each step
+  (env.prev_act, env.map_kpa, env.ep) instead of adding a key to `info`,
+  because editing engine_env.py would move `plant_sha` and lock out every
+  trained agent;
 - route() never calls the plant and never writes into the cycle it reads:
   the road is drawn FROM the scenario and nothing it returns reaches an env.
 """
@@ -17,7 +22,7 @@ import numpy as np
 
 import random_road as RR
 from app.replay import finite
-from engine_env import PREVIEW_S, make_grade_climb
+from engine_env import PREVIEW_S, SupervisoryTunerEnv, make_grade_climb
 from evaluate import DT, DURATION, EPISODES, EPISODES_D2
 
 # An episode is 719 steps, not 720: engine_env.py truncates at k >= n - 1.
@@ -105,3 +110,79 @@ def route(cycle):
         "p_baro_kpa": float(cycle.get("p_baro", 101.3)),
         "t_amb_c": float(cycle["t_amb"]) - 273.15,
     })
+
+
+def _car(env, cmd, obs_in, info):
+    """One lane's step, read from the env AFTER the step; nothing is added to it.
+
+    `act` is env.prev_act: the APPLIED action, after rescaling, the slew limit
+    and the bounds (engine_env.py:724-726). `held` marks where that differs
+    from the network's command. `preview_pct` is decoded from the observation
+    the policy was actually given, so the blind car's zeros are its real ones.
+    """
+    cmd = np.asarray(cmd, dtype=np.float32)
+    act = np.array(env.prev_act, dtype=np.float32)
+    return {
+        "cmd": cmd,
+        "act": act,
+        "held": act != env._rescale(cmd),
+        "preview_pct": obs_in[PREVIEW] / GRADE_OBS_SCALE * 100.0,
+        "map_kpa": float(env.map_kpa),
+        "turb_c": info["t_turb"] - 273.15,
+        "oil_c": info["t_oil"] - 273.15,
+        "torque_nm": info["torque"],
+        "torque_req_nm": info["torque_req"],
+        "damage": float(env.ep["damage"]),
+    }
+
+
+def run_lanes(lanes, ep, on_frame=None):
+    """Step one frozen episode for N (policy, use_preview) lanes, interleaved.
+
+    A copy of evaluate.run_episode, step for step, for each lane: its own
+    cycle, its own env, reset once with the episode seed, the weights pinned
+    after the reset and the observation rebuilt, then step until terminated
+    or truncated. At step k lane 0 steps, then lane 1, and so on; then
+    on_frame(frame, seen) is called once, where seen[i] is a float32 copy of
+    the observation lane i's policy received (None once lane i has stopped).
+    A lane that terminates early stops; its later cars are None.
+
+    Returns one dict per lane with exactly run_episode's keys and values.
+    Lane order is the caller's; everywhere in this feature lane 0 is the
+    sighted agent and lane 1 the blind one.
+    """
+    state = []
+    for policy, use_preview in lanes:
+        cycle = build_cycle(ep)
+        env = SupervisoryTunerEnv(cycle, dt=DT, seed=ep["seed"], use_preview=use_preview)
+        obs, _ = env.reset(seed=ep["seed"])
+        env.w = np.asarray(ep["weights"], dtype=np.float32)   # override the fresh draw
+        obs = env._obs()
+        state.append({"policy": policy, "env": env, "obs": obs, "ret": 0.0,
+                      "peak": 0.0, "info": None, "done": False})
+    k = 0
+    while not all(s["done"] for s in state):
+        cars, seen = [], []
+        for s in state:
+            if s["done"]:
+                cars.append(None)
+                seen.append(None)
+                continue
+            env, obs_in = s["env"], s["obs"]
+            a = s["policy"](env, obs_in)
+            obs, r, term, trunc, info = env.step(a)
+            s["ret"] += r
+            s["peak"] = max(s["peak"], info["t_turb"])
+            s["obs"], s["info"], s["done"] = obs, info, bool(term or trunc)
+            cars.append(_car(env, a, obs_in, info))
+            seen.append(np.array(obs_in, dtype=np.float32, copy=True))
+        if on_frame is not None:
+            on_frame(jsonable({"k": k, "cars": cars}), seen)
+        k += 1
+    out = []
+    for s in state:
+        e = s["info"]["episode_summary"]
+        out.append(dict(ret=s["ret"], damage=e["damage"], fuel=e["fuel"],
+                        torque_viol=e["torque_viol"], peak_turb=s["peak"] - 273.15,
+                        knock=e["knock_events"]))
+    return out
