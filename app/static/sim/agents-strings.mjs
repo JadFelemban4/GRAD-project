@@ -101,6 +101,10 @@ export const AGENT_STRINGS = {
 
     // --- footer (M3 attaches the hidden gesture here; nothing in M1)
     'agents.footer.index': '02 — AGENTS',
+
+    // --- added by Task 9: the torque reading's label, the profile's km scale
+    'agents.torque.heading': 'العزم المُسلَّم مقابل المطلوب',
+    'agents.profile.km': '{km} كم',
   },
 
   en: {
@@ -184,6 +188,10 @@ export const AGENT_STRINGS = {
 
     // --- footer (M3 attaches the hidden gesture here; nothing in M1)
     'agents.footer.index': '02 — AGENTS',
+
+    // --- added by Task 9: the torque reading's label, the profile's km scale
+    'agents.torque.heading': 'Torque delivered against requested',
+    'agents.profile.km': '{km} km',
   },
 };
 

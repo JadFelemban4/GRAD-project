@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f3ed">
+  <title data-i18n="agents.page.title">الوكلاء على الطريق — GRAD</title>
+  <link rel="stylesheet" href="/static/sim/style.css">
+  <link rel="stylesheet" href="/static/sim/agents.css">
+  <script>
+    // The lab's own pre-paint block, unchanged: the same two keys, wrapped
+    // because localStorage throws in private mode. Nothing else is stored.
+    try {
+      var s = localStorage.getItem('grad.sim.theme');
+      if (s === 'dark' || s === 'light') document.documentElement.dataset.theme = s;
+      var l = localStorage.getItem('grad.sim.lang');
+      if (l === 'en' || l === 'ar') {
+        document.documentElement.lang = l;
+        document.documentElement.dir = l === 'en' ? 'ltr' : 'rtl';
+      }
+    } catch (e) { /* no stored preference is not an error */ }
+  </script>
+  <script type="importmap">{"imports":{"three":"/static/vendor/three/three.module.js","three/addons/":"/static/vendor/three/addons/"}}</script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.5 1.5m11.2 11.2 1.5 1.5M19.1 4.9l-1.5 1.5M6.4 17.6l-1.5 1.5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></symbol>
+  </svg>
+  <header class="topbar">
+    <a href="/simulation" class="brand" data-i18n-aria="brand.aria" aria-label="مختبر GRAD"><span class="brand-mark">G<span>╱</span></span><div><strong dir="ltr">GRAD<span class="brand-point">.</span></strong><small data-i18n="brand.tagline">مختبر الأنظمة الهندسية</small></div></a>
+    <nav data-i18n-aria="nav.aria" aria-label="التنقل الرئيسي"><a href="/simulation" data-i18n="nav.simulation">مختبر الرحلة</a><a class="active" href="/agents" aria-current="page" data-i18n="nav.agents">الوكلاء</a><a href="/" data-i18n="nav.monitor">المراقبة</a><a href="/review" data-i18n="nav.review">مراجعة التنبيهات</a></nav>
+    <div class="topbar-tools">
+      <button id="theme-toggle" type="button" data-i18n-title="theme.to_dark" data-i18n-aria="theme.aria" aria-label="تبديل الوضع الليلي" title="الوضع الليلي"><svg><use href="#i-moon"/></svg></button>
+      <button id="lang-toggle" type="button" data-i18n-title="lang.switch_to_english" data-i18n-aria="lang.aria" aria-label="تغيير اللغة" title="English"><span dir="ltr">EN</span></button>
+    </div>
+  </header>
+  <main class="agents-main">
+    <section class="page-intro agents-intro">
+      <div><p class="eyebrow"><span class="small-rule"></span><span data-i18n="intro.eyebrow">المحرك · الطريق · الزمن</span></p><h1><span data-i18n="agents.intro.heading">ماذا قرّر كل وكيل، ثانية بثانية</span><span>.</span></h1><p class="intro-note" data-i18n="agents.intro.note">حلقة اختبار مجمّدة واحدة لزوج واحد.</p></div>
+      <p id="sim-badge" class="sim-badge" role="note" data-i18n="agents.badge.short">محاكاة</p>
+    </section>
+    <div id="error" class="error" role="alert" hidden></div>
+    <section class="agents-layout">
+      <div class="agents-col agents-col-main">
+        <article class="chase-panel">
+          <div class="chase-view">
+            <div id="chase" class="chase" role="img" data-i18n-aria="agents.legend.same_place" aria-label="السيارتان في المكان نفسه دائماً"></div>
+            <div id="scene-strip" class="scene-strip"><span id="strip-verdict"></span><span class="strip-badge" data-i18n="agents.badge.short">محاكاة</span></div>
+            <div class="lane-labels"><span id="lane-sighted-label" class="lane-label sighted"></span><span id="lane-blind-label" class="lane-label blind"></span></div>
+            <p id="scene-prompt" class="scene-prompt" data-i18n="agents.prompt">اختر تجربة وزوجاً وحلقة ثم اضغط احسب</p>
+            <div id="loading" class="loading-card" role="status" aria-live="polite" hidden><span class="loading-indicator"></span><div><strong id="load-title"></strong><p id="load-detail" dir="ltr"></p><progress id="load-progress" max="1" value="0"></progress></div></div>
+          </div>
+          <div class="chase-captions"><span id="same-place-legend" data-i18n="agents.legend.same_place">السيارتان في المكان نفسه دائماً</span><span id="chase-caption" data-i18n="agents.scene.slope">الميل غير مضخّم · السيارة ليست بمقياسها</span></div>
+        </article>
+        <section class="transport agents-transport" data-i18n-aria="transport.aria" aria-label="التحكم في إعادة التشغيل">
+          <div class="transport-buttons"><button id="play" class="play-button" type="button" disabled data-i18n-aria="transport.play_aria" aria-label="تشغيل"><svg><use href="#i-play"/></svg><span data-i18n="transport.play">تشغيل</span></button><button id="restart" class="icon-button" type="button" disabled data-i18n-aria="transport.restart_aria" aria-label="إعادة من البداية"><svg><use href="#i-reset"/></svg></button></div>
+          <div class="timeline-block">
+            <div class="time-labels"><span><b id="current-time" dir="ltr">00:00</b><span class="time-separator"> / </span><span id="duration" dir="ltr">00:00</span></span><span id="computed-note" class="computed-note"></span></div>
+            <div class="seek-wrap"><div class="computed-track" aria-hidden="true"><i id="computed-fill"></i><i id="climb-tick" hidden></i></div><input id="seek" type="range" min="0" max="1" value="0" step="0.05" disabled data-i18n-aria="transport.seek_aria" aria-label="موضع إعادة التشغيل"></div>
+            <p id="dt-caption" class="dt-caption"></p>
+          </div>
+          <div class="rate-control"><label for="rate" data-i18n="rate.label">سرعة العرض</label><select id="rate" data-i18n-aria="rate.aria" aria-label="سرعة العرض"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option><option value="16">16×</option></select></div>
+        </section>
+        <article class="profile-panel">
+          <div id="profile" class="profile" role="img"></div>
+          <div class="profile-captions"><span id="profile-ve"></span><span id="rise-caption"></span></div>
+        </article>
+      </div>
+      <aside class="agents-col agents-col-side">
+        <section class="picker-panel">
+          <div class="pick-row"><label for="pick-experiment" data-i18n="agents.pick.experiment">التجربة</label><select id="pick-experiment" disabled></select></div>
+          <div class="pick-row"><label for="pick-pair" data-i18n="agents.pick.pair">الزوج</label><select id="pick-pair" disabled></select></div>
+          <div class="pick-row"><label for="pick-episode" data-i18n="agents.pick.episode">الحلقة</label><select id="pick-episode" disabled></select></div>
+          <div id="pick-note" class="pick-note"></div>
+          <button id="compute" class="play-button compute-button" type="button" disabled data-i18n-aria="agents.compute_aria" aria-label="احسب"><span data-i18n="agents.compute">احسب</span></button>
+        </section>
+        <section id="verdict" class="verdict-panel" data-state="waiting">
+          <h2 data-i18n="agents.verdict.heading">الحكم المسجَّل مسبقاً</h2>
+          <p id="verdict-short" class="verdict-short">—</p>
+          <ul id="verdict-cells" class="verdict-cells"></ul>
+          <details id="verdict-more"><summary>—</summary><div id="verdict-lines"></div></details>
+          <ul id="verdict-scored" class="verdict-scored"></ul>
+          <p id="illustration-note" class="illustration-note" data-i18n="agents.illustration">حلقة واحدة لزوج واحد مثال توضيحي، لا نتيجة.</p>
+        </section>
+        <section class="pause-panel">
+          <div class="panel-heading"><h2 id="pause-heading">—</h2><span id="grade-now" class="sample-tag"></span></div>
+          <p id="weights-line" class="weights-line"></p>
+          <div id="actions" class="actions"></div>
+          <p id="seen-sighted" class="seen sighted"></p>
+          <p id="seen-blind" class="seen blind"></p>
+          <dl class="car-readings">
+            <div><dt id="damage-caption" data-i18n="agents.damage.caption">وحدات ضرر، في هذه الحلقة فقط حتى هذه اللحظة</dt><dd><span class="sighted"><i class="lane-dot"></i><b id="damage-sighted" dir="ltr">—</b></span><span class="blind"><i class="lane-dot"></i><b id="damage-blind" dir="ltr">—</b></span></dd></div>
+            <div><dt data-i18n="agents.turbine.label">غلاف التيربو مقابل العتبة</dt><dd><span class="sighted"><i class="lane-dot"></i><b id="turb-sighted" dir="ltr">—</b></span><span class="blind"><i class="lane-dot"></i><b id="turb-blind" dir="ltr">—</b></span></dd></div>
+            <div><dt data-i18n="agents.torque.heading">العزم المُسلَّم مقابل المطلوب</dt><dd class="torque-row"><span class="sighted"><i class="lane-dot"></i><span id="torque-sighted">—</span></span><span class="blind"><i class="lane-dot"></i><span id="torque-blind">—</span></span></dd></div>
+          </dl>
+          <p id="model-caveat" class="seed-note" data-i18n="seed.model_output">حرارة التيربو تقدير من النموذج، وليست قراءة حساس.</p>
+          <p id="lane-stopped" class="lane-stopped" hidden></p>
+          <p id="device-line" class="device-line"></p>
+          <p id="fingerprint-taken" class="device-line"></p>
+        </section>
+      </aside>
+    </section>
+    <footer><span dir="ltr" data-i18n="footer.brand">GRAD / ENGINEERING REPLAY LAB</span><span data-i18n="footer.note">مشروع تخرّج · محرك B58 · عرض علمي استكشافي</span><span id="footer-index" class="footer-index" dir="ltr" data-i18n="agents.footer.index">02 — AGENTS</span></footer>
+  </main>
+  <noscript><p data-i18n="noscript">يحتاج المختبر إلى JavaScript.</p></noscript>
+  <script type="module" src="/static/sim/agents.mjs"></script>
+</body>
+</html>

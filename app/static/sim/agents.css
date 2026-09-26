@@ -1,0 +1,133 @@
+/* The agent replay page (/agents). Loaded AFTER the lab's style.css: the
+   tokens, the topbar, the transport and the loading card are the lab's own,
+   and only what this page adds lives here.
+
+   LANE COLOURS. Blue is the agent that sees the road ahead, amber the one that
+   does not. NEVER red or green: on this page those would read as a verdict on
+   the cars, and the page shows no winner. The three blocks below are the same
+   list three times, exactly like style.css's palette -- edit all three.
+   The two ramp tokens are agent-scene.mjs's RAMP (low and high), so the
+   profile's preview ticks and the chase view's posts share one scale;
+   agents-page.test.mjs pins that they agree. */
+:root{--agent-sighted:#2f6db0;--agent-blind:#b5761c;--agent-hatch:#d4d9cc;--agent-ramp-lo:#cfc4e8;--agent-ramp-hi:#4b2e83}
+:root[data-theme="dark"]{--agent-sighted:#72a9e6;--agent-blind:#e2a54c;--agent-hatch:#3a4345;--agent-ramp-lo:#4a3f66;--agent-ramp-hi:#d6c6ff}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--agent-sighted:#72a9e6;--agent-blind:#e2a54c;--agent-hatch:#3a4345;--agent-ramp-lo:#4a3f66;--agent-ramp-hi:#d6c6ff}}
+
+.agents-intro{align-items:flex-end}
+.sim-badge{max-width:560px;margin:0;padding:9px 12px;border:1px dashed var(--estimated);border-radius:9px;background:var(--estimated-bg);color:var(--estimated-ink);font-size:11px;line-height:1.75}
+
+/* >= 1100 px: main column (chase, timeline, profile) | side column (picker,
+   verdict, pause panel). The grid runs ltr and its children rtl, exactly as the
+   lab's .lab-layout does, so the side column sits at the reading start. */
+.agents-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:17px;direction:ltr;align-items:start;margin-bottom:17px}
+.agents-layout>*{direction:rtl;min-width:0}
+.agents-col{display:flex;flex-direction:column;gap:17px;min-width:0}
+html[dir=ltr] .agents-layout>*{direction:ltr}
+
+/* chase view */
+.chase-panel{background:var(--world-bg);border:1px solid var(--world-border);border-radius:15px;overflow:hidden}
+.chase-view{position:relative;aspect-ratio:16/9}
+.chase{position:absolute;inset:0;direction:ltr}
+.chase canvas{display:block;width:100%;height:100%}
+.chase .webgl-error{padding:16% 24px;margin:0;font-size:12px}
+.scene-strip{position:absolute;z-index:2;top:12px;inset-inline:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none}
+.scene-strip>span{background:var(--overlay-strong-bg);border:1px solid var(--overlay-border);border-radius:6px;padding:3px 9px;font-size:10px;line-height:1.6}
+#strip-verdict:empty{display:none}
+.strip-badge{font-weight:650;color:var(--estimated-ink)}
+.lane-labels{position:absolute;z-index:2;bottom:12px;inset-inline-start:12px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;pointer-events:none}
+.lane-label{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:6px;font-size:10px;background:var(--overlay-strong-bg);border:1px solid var(--overlay-border)}
+.lane-label:empty{display:none}
+.lane-label::before,.lane-dot{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.lane-label.sighted::before,.sighted>.lane-dot,.sighted .lane-dot{background:var(--agent-sighted)}
+.lane-label.blind::before,.blind>.lane-dot,.blind .lane-dot{background:var(--agent-blind)}
+.scene-prompt{position:absolute;z-index:2;inset:0;margin:auto;height:max-content;width:max-content;max-width:80%;text-align:center;padding:12px 16px;background:var(--overlay-strong-bg);border:1px solid var(--overlay-border);border-radius:10px;font-size:12px}
+.chase-view .loading-card{bottom:12px;left:12px;right:12px;margin-right:auto}
+.chase-captions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding:9px 14px;font-size:9px;color:var(--muted);border-top:1px solid var(--world-border)}
+#chase-caption{font-weight:600;color:var(--ink-2)}
+
+/* timeline: the computed part is filled, the rest hatched, the climb ticked */
+.agents-transport{margin:0}
+.computed-note{font-size:9px;color:var(--muted);direction:rtl}
+.computed-track{position:absolute;left:6px;right:6px;top:14px;height:3px;border-radius:2px;background:repeating-linear-gradient(135deg,var(--agent-hatch) 0 3px,transparent 3px 6px);pointer-events:none}
+#computed-fill{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:2px;background:var(--track-fill)}
+#climb-tick{position:absolute;top:-4px;width:2px;height:11px;margin-left:-1px;background:var(--estimated)}
+.dt-caption{margin:7px 0 0;font-size:9px;line-height:1.7;color:var(--muted);direction:rtl}
+.dt-caption:empty{display:none}
+html[dir=ltr] .computed-note,html[dir=ltr] .dt-caption{direction:ltr}
+
+/* whole-route profile. preserveAspectRatio "meet" keeps the stated x3 true on
+   screen: the SVG is never stretched along one axis only. */
+.profile-panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px 10px;box-shadow:var(--shadow)}
+.profile{position:relative;direction:ltr;min-height:40px}
+.profile svg{display:block;width:100%;height:auto;overflow:visible;stroke:none}
+.profile-ground{fill:var(--world-bg)}
+.profile-road{fill:none;stroke:var(--ink-2);stroke-width:1.6px;vector-effect:non-scaling-stroke}
+.profile-climb{stroke:var(--estimated);stroke-width:1px;stroke-dasharray:4 3;vector-effect:non-scaling-stroke}
+.profile-tick{stroke:var(--agent-ramp-hi);stroke-width:3px;vector-effect:non-scaling-stroke}
+.profile-km-tick{stroke:var(--muted-2);stroke-width:1px;vector-effect:non-scaling-stroke}
+.profile-axis{position:relative;height:14px;margin-top:2px}
+.profile-km{position:absolute;top:0;transform:translateX(-50%);font-size:8px;line-height:14px;color:var(--muted);white-space:nowrap;direction:rtl}
+.profile-km.start{transform:none}
+.profile-km.end{transform:translateX(-100%)}
+html[dir=ltr] .profile-km{direction:ltr}
+.profile-car{fill:var(--ink);stroke:var(--paper);stroke-width:2px;vector-effect:non-scaling-stroke}
+.profile-climb-label{position:absolute;top:0;direction:rtl;padding:0 6px 0 0;transform:translateX(-100%);font-size:9px;color:var(--estimated-ink);white-space:nowrap}
+.profile-climb-label.flip{padding:0 0 0 6px;transform:none}
+html[dir=ltr] .profile-climb-label{direction:ltr}
+.profile-captions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;margin-top:6px;font-size:9px;color:var(--muted)}
+#profile-ve{font-weight:600;color:var(--ink-2)}
+
+/* side column */
+.picker-panel,.verdict-panel,.pause-panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.pick-row{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;gap:10px;margin-bottom:8px}
+.pick-row label{font-size:10px;color:var(--muted)}
+.pick-row select{width:100%;min-width:0;background:var(--field-bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px}
+.pick-row select:disabled{opacity:1;cursor:default;color:var(--ink)}
+.pick-note{display:flex;flex-direction:column;gap:4px;margin:4px 0 12px;font-size:10px;line-height:1.7;color:var(--muted)}
+.pick-note:empty{display:none}
+.pick-note>span{display:flex;align-items:baseline;gap:6px}
+.compute-button{width:100%}
+#compute:disabled{cursor:not-allowed}
+
+.verdict-panel h2{margin-bottom:8px}
+.verdict-short{margin:0 0 8px;font-size:13px;font-weight:650;line-height:1.75}
+.verdict-panel[data-state="missing"] .verdict-short,.verdict-panel[data-state="none"] .verdict-short{color:var(--error-ink)}
+.verdict-cells{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:6px}
+.verdict-cells:empty{display:none}
+.verdict-cells li{display:flex;flex-direction:column;gap:2px;padding:7px 9px;background:var(--seed-bg);border-radius:6px}
+.verdict-cells .cell{font:600 10px/1.5 Consolas,monospace;letter-spacing:.4px;text-align:left}
+.verdict-cells .gloss{font-size:11px;line-height:1.8;color:var(--ink-2)}
+#verdict-more summary{cursor:pointer;font:10px/1.6 Consolas,monospace;color:var(--green-bright);direction:ltr;text-align:left}
+.quote{margin:8px 0 0;padding:8px 10px;border-left:2px solid var(--rule);background:var(--field-bg);border-radius:4px;direction:ltr}
+.quote pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:10px/1.65 Consolas,monospace;color:var(--code-ink);text-align:left}
+.quote figcaption{margin-top:4px;font:9px/1.5 Consolas,monospace;color:var(--muted);text-align:left}
+.verdict-scored{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:3px;font-size:10px;color:var(--muted)}
+.verdict-scored:empty{display:none}
+.verdict-scored li{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.verdict-scored code{font:9px Consolas,monospace;color:var(--code-ink)}
+.illustration-note{margin:10px 0 0;padding:8px 10px;border-radius:6px;background:var(--warn-bg);color:var(--warn-ink);font-size:11px;line-height:1.8}
+
+.error ul{margin:6px 0;padding-inline-start:18px;font:10px/1.6 Consolas,monospace}
+.retry-button{margin-inline-start:12px;border:1px solid currentColor;background:transparent;border-radius:6px;padding:3px 10px;font-size:11px;color:inherit}
+.footer-index{display:inline-flex;align-items:center;min-height:32px;min-width:32px;padding:0 8px}
+
+/* < 1100 px: one column, in reading order badge, picker, verdict, chase,
+   timeline, profile, pause panel. The two column wrappers dissolve so their
+   children can be ordered together. */
+@media(max-width:1099px){
+.agents-layout{display:flex;flex-direction:column;gap:12px}
+.agents-col{display:contents}
+.picker-panel{order:1}.verdict-panel{order:2}.chase-panel{order:3}.agents-transport{order:4}.profile-panel{order:5}.pause-panel{order:6}
+}
+/* < 760 px: phone. The lab hides its last nav link here; this page has four
+   and needs all of them, so the nav takes a row of its own instead. */
+@media(max-width:760px){
+.topbar{height:auto;flex-wrap:wrap;row-gap:0;padding:10px 16px 0}
+.topbar nav{order:3;width:100%;height:40px;gap:16px}
+.topbar nav a:last-child{display:flex}
+main.agents-main{padding:18px 16px 0}
+.agents-intro{align-items:stretch}
+.chase-view{aspect-ratio:4/3}
+.pick-row{grid-template-columns:1fr;gap:4px}
+.scene-strip>span{font-size:9px}
+}

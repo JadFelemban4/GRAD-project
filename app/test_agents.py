@@ -1032,5 +1032,75 @@ class NoNetworkTests(unittest.TestCase):
         self.assertEqual(found, [])
 
 
+class PageTests(unittest.TestCase):
+    """The /agents page can load every asset, id and module it names.
+
+    The lab was dead for a day once because main.mjs did not exist: both
+    suites passed, the route returned 200 and the browser 404'd one module
+    (app/test_simulation.py says so). These are the same checks for this page.
+    """
+
+    STATIC = ROOT / "app" / "static"
+
+    def read(self, rel):
+        path = self.STATIC / rel
+        self.assertTrue(path.is_file(), f"{rel} does not exist")
+        return path.read_text(encoding="utf-8")
+
+    def test_page_assets_ids(self):
+        import re
+        html = self.read("agents.html")
+        page = self.read("sim/agents.mjs")
+        for src in re.findall(r'<script[^>]+src="/static/([^"]+)"', html):
+            self.assertTrue((self.STATIC / src).is_file(), f"{src} is referenced by the page and does not exist")
+        for href in re.findall(r'<link[^>]+href="/static/([^"]+)"', html):
+            self.assertTrue((self.STATIC / href).is_file(), f"{href} is referenced by the page and does not exist")
+        mapped = re.findall(r'"(?:three|three/addons/)":\s*"/static/([^"]+)"', html)
+        self.assertEqual(len(mapped), 2, "agents.html must carry the lab's import map")
+        for target in mapped:
+            path = self.STATIC / target
+            self.assertTrue(path.is_file() or path.is_dir(),
+                            f"import map points at missing {target}: run app\\start-simulation.ps1 once to vendor Three.js")
+
+        ids = re.findall(r'\sid="([^"]+)"', html)
+        self.assertEqual(len(ids), len(set(ids)), "an id is declared twice in agents.html")
+        used = set(re.findall(r"\$\('([^']+)'\)", page))
+        self.assertTrue(used, "the id scan found nothing; the pattern has drifted")
+        self.assertFalse(used - set(ids), f"agents.mjs reads ids the page does not define: {sorted(used - set(ids))}")
+
+        for symbol in set(re.findall(r"'#(i-[a-z]+)'", page)):
+            self.assertIn(f'id="{symbol}"', html, f"#{symbol} is not in the icon library")
+
+        specs = (re.findall(r"from '(\./[^']+)'", page)
+                 + re.findall(r"^import '(\./[^']+)'", page, flags=re.M)
+                 + re.findall(r"import\('(\./[^']+)'\)", page))
+        self.assertTrue(specs, "the import scan found nothing; the pattern has drifted")
+        for spec in specs:
+            self.assertTrue((self.STATIC / "sim" / spec[2:]).is_file(), f"agents.mjs imports missing {spec}")
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from app.agent_api import install
+        app = FastAPI()
+        install(app)
+        with TestClient(app) as client:
+            response = client.get("/agents")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("/static/sim/agents.mjs", response.text)
+
+    def test_every_string_names_its_language(self):
+        """t() with any first argument but currentLang renders one language only.
+
+        app/test_simulation.py pins the same rule on main.mjs, where two bare
+        calls once left Arabic on screen in English mode.
+        """
+        import re
+        page = self.read("sim/agents.mjs")
+        firsts = re.findall(r"[^.\w]t\(\s*([^,)]*)", page)
+        self.assertTrue(firsts, "the t() scan found nothing; the pattern has drifted")
+        for first in firsts:
+            self.assertEqual(first.strip(), "currentLang", f"t() called with {first.strip()!r} as the language")
+
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0]] + [a for a in sys.argv[1:] if a != "--full"], verbosity=2)
