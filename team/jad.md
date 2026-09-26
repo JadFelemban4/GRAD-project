@@ -1,7 +1,7 @@
 ---
 name: Jad Felemban
 email: endo.felemban@gmail.com
-updated: 2026-09-18
+updated: 2026-09-26
 ---
 
 # Jad
@@ -54,6 +54,11 @@ says "Five items ranked beats ten unranked", it is the old one — update it.**
 
 - **One small idea per message**, then one question to check I followed. Not a
   lecture with a quiz at the end.
+- **Even when I send several points at once, answer ONE.** On 26 September
+  2026 I listed five points about a session I had missed and got back five
+  sections, each with its own example and a quiz at the end. I understood none
+  of it and said so. Take the point that matters most, give one example, ask
+  one question — and say that the other points come next, one at a time.
 - **Familiar example first, then the project.** If I do not get it, **change the
   example — do not repeat the definition.** Repeating has never worked.
 - **Arabic first.** Mixing Arabic, English and arrows in one line breaks the
