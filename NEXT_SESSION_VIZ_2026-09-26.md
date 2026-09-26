@@ -1,4 +1,4 @@
-# NEXT SESSION — the visual simulation: agents, grade, and a slot for "jev"
+# NEXT SESSION — the visual simulation: agents, grade, and jev as a hidden feature
 
 Written on 26 September 2026, at Jad's request, by the session that ran C4.
 Paste everything inside the fence into a fresh Claude Code session opened in
@@ -36,21 +36,66 @@ WHAT JAD ASKED FOR (his words, 26 September, translated):
     future ones.
  2. Add the road grade.
  3. Make the map adapt to the grade that actually exists in the experiments.
- 4. A place to add "jev" as an external add-on -- "honestly, I just want to
-    try the model".
+ 4. Add jev as an external add-on -- "honestly, I just want to try the
+    model" -- and make it a HIDDEN feature, switched on by a secret gesture
+    ("press ten times on some spot, or whatever the gesture is").
+ 5. On the timeline: "stop here, and see what the agents decided here and
+    what jev decided".
+ 6. "I press this option, and the agents play the plays they were trained on,
+    and jev does the same thing."
 
-Nobody in the previous session knew what "jev" is: no file and no transcript
-mentions it. ASK JAD FIRST, one short question in Arabic -- a 3D model file,
-an AI model, an electric-vehicle model, something else? Design that slot only
-after he answers. Whatever it is, it stays optional and OUTSIDE the physics:
-nothing it produces may feed plant.py, thermal.py or the environment.
+THE TIMELINE (items 5 and 6). For an agent episode, pausing at any moment shows
+what each agent decided there: its five actions, named from engine_env.py and
+labelled in Arabic, taken from the trace (the action actually applied at that
+step), plus -- for the sighted agent -- the road ahead it saw in its
+observation. Once jev is unlocked, a third column shows jev's decision for the
+same observation, and a mode lets jev drive the same episode as a third car.
+Ask Jad which of the two he wants first; they cost very different amounts
+(below).
+
+JEV -- what it is, from the vendor's own page, fetched 26 September 2026:
+https://typesafe.ai/blog/introducing-system-one-models-and-jev
+ - A hosted model from typesafe.ai: structured state in, TYPED decisions out,
+   with calibrated probabilities. Early access, from a waitlist. Console
+   https://console.typesafe.ai/ and docs https://docs.typesafe.ai/. The page
+   claims 70-500 ms per call, at most 255 choices, text and structured input
+   only (no images), input at $0.042 per million tokens and output free. It
+   does NOT state whether numeric outputs exist, nor the SDK or endpoints.
+   Read docs.typesafe.ai before designing, and treat every figure here as the
+   vendor's claim, not a measurement.
+ - FIRST QUESTION TO JAD: does he have early access and an API key? Without
+   one, the unlocked panel says so plainly and nothing else changes.
+ - The key lives in an environment variable or an untracked local file, is
+   read by the Python server only, never reaches the browser and is never
+   committed. Put the file in .gitignore BEFORE creating it.
+ - Send jev only SIMULATED episode state -- never logs/raw or anything derived
+   from the recordings, which are data from a teammate's car (team/jad.md:
+   the Supra is not Jad's). The page says the service runs in the USA. A call
+   happens only on an explicit user action.
+ - jev's decision must be expressed in the environment's own action space
+   (five actions, Box(-1, 1)). Two traps: actions 3 and 4 are ABSOLUTE duties
+   whose "do nothing" is engine_env.neutral_action(), not zero (CLAUDE.md,
+   mistake 10); and if jev returns choices rather than numbers, the
+   discretisation is a design decision -- state it on screen.
+ - When jev drives, it runs in the SAME simulation as the agents: the same
+   frozen episode, seed and weights, stepped through the same tracing runner.
+   Agree with Jad what jev sees; the sighted agent's observation, preview
+   included, is the natural choice. At 70-500 ms per call, a 720-step episode
+   is minutes of calls: measure it, show progress, cache in memory. One paused
+   moment is one call.
+ - jev is NOT part of the thesis experiment. Nothing it does goes into
+   results/, no statistic compares it with the agents, and the unlocked panel
+   says so -- with the vendor's name, where it runs, and that it is external.
+   Like everything else here, it never writes to the vehicle.
+ - The gesture hides the panel. Once open, the panel hides nothing about what
+   it is.
 
 START WITH DESIGN, NOT CODE. Brainstorm with Jad one question at a time, write
 the approved design to docs/superpowers/specs/, then a plan, then build. Make
 the first milestone small and visible -- for example ONE pair from C4 (the
 sighted and the blind agent of one seed) driving ONE frozen test episode side
 by side, on a road built from that episode's own grade. Discovery of every
-experiment comes after that works.
+experiment comes after that works, and jev after the agents work.
 
 HARD RULES -- each exists because breaking it destroys something:
  - Never write to the vehicle. Read-only, as the whole project.
