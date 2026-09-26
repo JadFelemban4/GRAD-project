@@ -14,7 +14,7 @@
 //
 // Arabic lines are from design sections 5 and 6
 // (docs/superpowers/specs/2026-09-26-agent-replay-design.md), verbatim where the
-// design gives them. ‏ is a right-to-left mark and ⁦...⁩ isolates a
+// design gives them. \u200f is a right-to-left mark and \u2066...\u2069 isolates a
 // left-to-right run (an address) inside an Arabic line.
 
 import { STRINGS } from './i18n.mjs';
@@ -32,7 +32,7 @@ export const AGENT_STRINGS = {
     'agents.pick.experiment': 'التجربة',
     'agents.pick.pair': 'الزوج',
     'agents.pick.episode': 'الحلقة',
-    'agents.pick.none': 'لم يُحدَّد زوج ولا حلقة. افتح الصفحة بعنوان مثل ⁦?runs=runs_c4&seed=5&ep=1⁩',
+    'agents.pick.none': 'لم يُحدَّد زوج ولا حلقة. افتح الصفحة بعنوان مثل \u2066?runs=runs_c4&seed=5&ep=1\u2069',
     'agents.pick.pair_option': 'بذرة {seed} · المُبصر والأعمى',
     'agents.pick.episode_option': 'حلقة {idx} · الصعود عند {start} ث · {grade}٪ · الأوزان: عزم {w0} / وقود {w1} / عمر المكوّنات {w2}',
     'agents.pick.budget': 'دُرِّب {budget} خطوة (من final.zip)',
@@ -78,7 +78,7 @@ export const AGENT_STRINGS = {
     'agents.damage.caption': 'وحدات ضرر، في هذه الحلقة فقط حتى هذه اللحظة',
     'agents.turbine.label': 'حرارة غلاف التيربو مقابل عتبة الحماية',
     'agents.torque.label': 'العزم المُسلَّم {delivered} من {requested} نيوتن·م مطلوبة',
-    'agents.device.line': 'التقييم المسجَّل حمّل الشبكة على الجهاز الافتراضي لـ SB3، وهو cuda على هذا الجهاز؛ ملفات النتائج لا تسجّل الجهاز. هذه الحلقة حُسبت على {device} ‏(torch {torch}، SB3 {sb3})',
+    'agents.device.line': 'التقييم المسجَّل حمّل الشبكة على الجهاز الافتراضي لـ SB3، وهو cuda على هذا الجهاز؛ ملفات النتائج لا تسجّل الجهاز. هذه الحلقة حُسبت على {device} \u200f(torch {torch}، SB3 {sb3})',
     'agents.device.warning': 'تنبيه: هذه الحلقة لم تُحسب على cuda، وحلقات المعالج تختلف عن حلقات cuda، فقد لا تطابق ما قُيِّم',
     'agents.fingerprint_taken': 'أُخذت بصمة المحاكي عند {time}؛ أعد تشغيل الخادم بعد تغيير أي ملف تدخل فيه البصمة',
 

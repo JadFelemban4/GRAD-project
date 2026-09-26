@@ -117,3 +117,15 @@ test('every key fills the same {placeholders} in both languages', () => {
     assert.deepEqual(slots(AGENT_STRINGS.ar[key]), slots(AGENT_STRINGS.en[key]), key);
   }
 });
+
+test('the bidi control characters in agents.pick.none and agents.device.line are pinned', () => {
+  // \u2066 (LRI) / \u2069 (PDI) isolate the LTR address inside the Arabic
+  // pick.none line, and \u200f (RLM) keeps the Arabic run after the {device}
+  // placeholder in device.line reading right-to-left. All three are invisible in an
+  // editor, so pin them here: a future edit that drops one silently would otherwise
+  // not be caught until the string mis-renders.
+  const { AGENT_STRINGS } = api();
+  assert.ok(AGENT_STRINGS.ar['agents.pick.none'].includes('\u2066'), 'agents.pick.none lost its LRI');
+  assert.ok(AGENT_STRINGS.ar['agents.pick.none'].includes('\u2069'), 'agents.pick.none lost its PDI');
+  assert.ok(AGENT_STRINGS.ar['agents.device.line'].includes('\u200f'), 'agents.device.line lost its RLM');
+});
