@@ -99,6 +99,14 @@ crime and a violation of our constitution" — **the preregistration is our
 constitution.** The one legitimate change: a new plan for a new experiment,
 written before it starts, with both results reported.
 
+Same day, the supervision claim: the agent beats the hand-written rule on the
+typical ride, not on the worst one. Two cooks, one of whom burns the dish at a
+wedding, did NOT land; two students did — one usually scores 90 but once scored
+40, the other usually 80 and never below 70. Asked which is better, I chose the
+steady one "because our project is very sensitive" — the right instinct for
+protection. The correction I needed: the damage the project measures is heat
+damage to the turbo, not fire, and the agent runs only in the simulation.
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing, BTDC/ATDC;
