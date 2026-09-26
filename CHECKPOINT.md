@@ -1941,7 +1941,7 @@ session's prompt, which found the documents around it lagging:
 |---|---|
 | `CLAUDE.md`'s TOP still said "C4 NOT done", the live list still said "the next experiment is C4", and G · writing said "not started" | a "Current state — 24 September (after C4)" box at the top; phase rows C, D, G; the 23 Sep live list marked superseded; `analyse_c4.py` in the numbers block |
 | `README.md` said "No D2 result exists yet" a day after D2's result | D2 and C4 results, with the correction dated |
-| the presentation said "C4 not done" and "no D2 result yet" in eleven places across both languages | all corrected (`grep` for the pending phrases now finds none) |
+| the presentation said "C4 not done" and "no D2 result yet" in seventeen places across both languages | all corrected (`grep` for the pending phrases now finds none). *(This row, and commit `5d75707`'s message, said "eleven" -- a miscount; the four passes made 6 + 8 + 2 + 1 = 17 edits. Corrected 26 September.)* |
 | `runs_c4/` had no backup — the only copies | `GRAD-agent-backups/2026-09-24/runs_c4`, 587 files, all sixteen `final.zip` sha-checked |
 | `runs_c4/` could still take new seeds; `runs_C4` walked past every closed-experiment guard (NTFS is case-insensitive) | `runs_c4` / `c4` added to all three CLOSED tables, compared case-insensitively; tested |
 | the planning figures for the next experiment (power 0.15; ~80 seeds per arm; ~11 without seed 0) were printed by no script | `power_analysis.py` gains a C4 section that prints them, with the sensitivity labelled planning-only |
