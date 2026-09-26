@@ -214,6 +214,11 @@ unit-tested like `playback.test.mjs`.
 2. **Jad has a jev API key.** It must never be pasted into the chat or
    committed; it goes in an environment variable or an untracked file, after
    the `.gitignore` pattern exists (section 9).
+3. **jev mode: the paused moment first.** Pause an agent episode, ask jev once
+   what it would decide there, show it beside the two agents' applied actions.
+   jev driving a whole episode as a third car is **deferred**, not dropped.
+   Jad's own reading of the limit, correct: jev is a classification and
+   decision system, so its answer is a choice among levels, not a number.
 
 ## 13. Current tests, as run during this recon
 
