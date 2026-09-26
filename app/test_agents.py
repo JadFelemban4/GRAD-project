@@ -470,5 +470,89 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(a["scenario"]["protocol"], "random-climb")
 
 
+class LoaderTests(unittest.TestCase):
+    """Spec test 1b: load_pair is evaluate.py:370's call, and loads the scored zip.
+
+    The == proof injects its own model objects, so without this test a loader
+    that picked a different file or a different device would pass unnoticed.
+    """
+
+    def test_loader_matches_evaluate(self):
+        import os
+        import fingerprint as FP
+        from app import agent_api as A
+        from app import agent_catalog as C
+        try:
+            import stable_baselines3
+            import torch
+            from stable_baselines3 import SAC
+        except ImportError:
+            print("\n  loader UNPROVEN on this machine (no stable-baselines3)")
+            self.skipTest("loader UNPROVEN on this machine")
+        if not all((ROOT / "runs_c4" / f"{arm}_seed0" / "final.zip").is_file() for arm in C.ARMS):
+            print("\n  loader UNPROVEN on this machine (no runs_c4/*_seed0/final.zip)")
+            self.skipTest("loader UNPROVEN on this machine")
+        recorded = {"sighted": "20f0ae6a9c1564a9", "blind": "9ab8d2b29cbb9d06"}
+        prev = os.getcwd()
+        os.chdir(ROOT)                      # evaluate.py's paths are relative to the repo
+        try:
+            got = A.load_pair("runs_c4", 0)
+            for arm, model, path in zip(C.ARMS, got, A.pair_paths("runs_c4", 0)):
+                with self.subTest(arm=arm):
+                    ref = SAC.load(f"runs_c4/{arm}_seed0".rstrip("/\\") + "/final")
+                    self.assertEqual(str(model.device), str(ref.device))
+                    mine, theirs = model.policy.state_dict(), ref.policy.state_dict()
+                    self.assertEqual(list(mine), list(theirs))
+                    for name in mine:
+                        self.assertTrue(torch.equal(mine[name], theirs[name]), name)
+                    sha = FP.model_budget(path + ".zip")["sha"]
+                    self.assertEqual(sha, FP.model_budget(f"runs_c4/{arm}_seed0/final.zip")["sha"])
+                    self.assertEqual(sha, C.scored_shas("c4", 0)[arm])
+                    self.assertEqual(sha, recorded[arm])
+        finally:
+            os.chdir(prev)
+        self.assertEqual(A.versions(), {"torch": torch.__version__,
+                                        "sb3": stable_baselines3.__version__})
+        print(f"\n  load_pair: device {got[0].device}, torch {torch.__version__}, "
+              f"SB3 {stable_baselines3.__version__}")
+
+    def test_as_policy_and_versions(self):
+        import os
+        import subprocess
+        import check_premise
+        from app import agent_api as A
+        self.assertIs(A.as_policy(check_premise.p_neutral), check_premise.p_neutral)
+
+        class FakeModel:
+            def predict(self, obs, deterministic=False):
+                self.asked = (obs, deterministic)
+                return np.full(5, 0.5, dtype=np.float32), None
+
+        fake, obs = FakeModel(), np.zeros(23, dtype=np.float32)
+        self.assertEqual(A.as_policy(fake)(None, obs).tolist(), [0.5] * 5)
+        self.assertIs(fake.asked[0], obs)
+        self.assertIs(fake.asked[1], True)
+        self.assertEqual(A.pair_paths("runs_c4", 5),
+                         (str(ROOT / "runs_c4" / "sighted_seed5") + "/final",
+                          str(ROOT / "runs_c4" / "blind_seed5") + "/final"))
+        for runs, seed in (("..", 0), ("runs_c4/../runs", 0), ("runs_c4\n", 0),
+                           ("c4", 0), ("runs_c4", -1), ("runs_c4", "0"), ("runs_c4", True)):
+            with self.subTest(runs=runs, seed=seed):
+                with self.assertRaises(KeyError):
+                    A.pair_paths(runs, seed)
+        code = ("import json, sys\n"
+                "import app.agent_api as A\n"
+                "print(json.dumps({'torch': 'torch' in sys.modules,"
+                " 'sb3': 'stable_baselines3' in sys.modules, 'versions': A.versions()}))\n")
+        out = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
+                             text=True, timeout=300,
+                             env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
+                                      GIT_OPTIONAL_LOCKS="0"))
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertEqual(json.loads(out.stdout.strip().splitlines()[-1]),
+                         {"torch": False, "sb3": False,
+                          "versions": {"torch": None, "sb3": None}})
+
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0]] + [a for a in sys.argv[1:] if a != "--full"], verbosity=2)
