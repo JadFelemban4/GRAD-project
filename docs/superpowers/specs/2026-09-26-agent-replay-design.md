@@ -770,3 +770,96 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 | 26 Sep | whole | **APPROVED** — banner changed. Next: the implementation plan (writing-plans). |
 | 26 Sep | plan | The M1 plan (`docs/superpowers/plans/2026-09-26-agent-replay-m1.md`) departs from this design in five small, checked places, and this file defers to it: (1) the device and the torch/SB3 versions travel as top-level fields of every poll, not inside `meta`, because they are known only after the worker loads the networks; (2) the car half-width is 1.486 units (the hub torus), so the plan's constant is 1.49 and the non-overlap test uses it; (3) the chase view (~200 m) cannot contain the 15 s and 30 s preview markers (~540 m and ~1080 m ahead at 130 km/h) — it shows the markers in range, and the profile carries all four; (4) the profile gets a km scale and its preview ticks use the grade ramp; (5) the server is started with the system interpreter directly, because `app\start-simulation.ps1` ends in a bare `python`. §10's line that quoted a `--full` count was wrong and now says to read both counts from the runs. |
 | 27 Sep | final review | **M1's whole-branch review: ready to hand to the student, with fixes.** No critical finding: the `==` proof holds, the store and the routes fail closed, nothing is written, and the verdict is quoted, never computed. The eight findings from the M1 walkthrough (Task 11): **F1 FIXED**: the grid drew across the road behind the cars on every climb; it is now a backdrop (opaque, no depth test or depth write, drawn first), pinned in `agent-scene.test.mjs`. **F2 LEFT FOR LATER**: the scored-artefact line's dot can wrap onto a line of its own; cosmetic, and the text beside it names the car. **F3 LEFT FOR LATER**: at 390 px the device line wraps between "SB3" and its version; phone width only, and the bidi is correct. **F4 FIXED**: the dt caption broke inside "H2-2" at 1440 px in Arabic; the hyphen is now U+2011, a non-breaking hyphen. **F5 FIXED**: the pump row carried the fan's note, which is false for the pump; each now has its own (§6). **F6 LEFT FOR LATER**: a cache hit ignores `preempt`, so an unwatched build keeps running; it costs only CPU and GPU time, a later «احسب» of an uncached episode still pre-empts it, and the M1 picker is read-only. **F7 FIXED**: «بلا تعديل» sat under the end of each trim bar, where it labelled +4.0 (Arabic) or −8.0 (English) as "no change"; it now stands on the zero tick. **F8 FIXED**: the quote of `PREREGISTRATION_C4.md` stopped at "The permutation test," just before its caveat; it now quotes item 2 whole (`:633-643`). Fixed in the same wave: the sign test's p is quoted under its heading with the permutation test's p (`C4_RESULT.txt:28-30`); the turbine limit reads 850, not 849.9, and the Arabic readings say «°م»; a pause-panel error is no longer shown as the WebGL message; the store test's 'building' wait is gated. **Rulings, not Jad's word:** the review asked for Jad's approval on F5 (the pump's own sentence) and F8 (quote the whole item, and start the sign-test quote at its heading). The fix wave's controller decided both instead, because each makes the page more faithful to the code and to `results/`; reversing either is one commit. **Task 10b's wording ruling**, also the controller's: «الاختباران مختلفان» ("the two tests are different") became «الاختباران لا يتفقان» ("the two tests disagree"), matching the English line; §4 now says the same. **Correction:** the milestone commit `e7030f0` says `/api/agents/episode answered 503` under the lab's launcher. That was not observed in that task; it is what the `.venv`'s package list implies (no torch, no stable-baselines3). The commit is history and is not rewritten. |
+
+---
+
+## Build record for M1 (27 September 2026): every ruling the controller made, and what was left for later
+
+M1 was built task by task (11 plan tasks plus one controller-added task, 10b), each by a fresh implementer and checked by a fresh reviewer, then one whole-branch review and one fix wave. The working ledger was scratch and has been deleted; this section is its permanent record, so that no decision taken on Jad's behalf lives only in a deleted file. Commits 3e66189..d22f889 on JMF-2340550-sep17.
+
+### Rulings (each with what it costs if wrong)
+
+1. Ruling: work in place on JMF-2340550-sep17, no git worktree — the == proof needs runs_c4/ and the page needs app/static/vendor/three, both gitignored and present only in this working tree; the branch is Jad's own, not main — cost if wrong: discarding the work means resetting this branch instead of deleting a worktree.
+2. Ruling: each task runs as one Workflow (implementer -> task reviewer -> up to 5 fix rounds, fresh fixer each round carrying the report file, rounds 4-5 on opus), not as resumed Agent calls — ultracode is on and workflow agents cannot be resumed; the skill allows a fresh implementer carrying brief + report + findings — cost if wrong: fix rounds 1-3 lose the implementer's live context and may take an extra round.
+3. Ruling: implementers on sonnet for transcription-heavy tasks (1, 3, 4, 7), opus for the rest (2, 5, 6, 8, 9, 10, 11); every reviewer on opus — memory: Fable subagents exhaust their quota; the plan carries complete code — cost if wrong: an extra fix round on a sonnet task.
+4. Ruling: the pre-flight table below is built from the plan skeleton's per-task files and interfaces plus targeted greps of the briefs, not from reading all 6 873 plan lines into the controller — the plan's critic already assembled all ten build tasks into a scratch copy and ran every suite (37 tests OK, proof PROVEN on cuda) — cost if wrong: a cross-task conflict in the page group (revised AFTER that assembly run) surfaces in review instead of here.
+5. Task 3: Ruling: the SMALLER THAN THE MEI gloss stays gated on the result anchor alone (plan-mandated, agent_catalog.py:209/270) — when any anchor is missing the verdict state is 'missing' and the box already says the verdict line was not found and not to read the agents without it — cost if wrong: a gloss claiming "not settled / one seed" could sit beside a results file that no longer says so, under a visible 'missing' warning.
+6. Task 3: Ruling: an unreadable final.zip stays 'ready' with 'budget unreadable' (plan-mandated, agent_catalog.py:115) — in M1 only C4 runs, whose recorded scored sha then differs and refuses the pair; a prefix with no result file fails at SAC.load as a store error reported once — revisit for M2 discovery — cost if wrong: a corrupt zip in a future runs_X shows as runnable until the build errors.
+7. Task 3: Ruling: find_pair runs on EVERY poll in Task 6's route (plan text, task-6 brief :431), hashing both zips each time — fail-closed on every request; the design asked for "before every build" — cost if wrong: tens of ms of CPU per 400 ms poll competing with the tracer; Task 11's timing will show it.
+8. Task 8: Ruling: parseEpisodeQuery accepts lowercase run names only (/^runs[a-z0-9_]*$/), departing from the brief — it must match agent_catalog.RUNS_NAME after Task 3's fix, or the picker would accept runs_C4 that the server 404s — cost if wrong: none found; the plan text still shows the old regex (carried to Task 9).
+9. Ruling: add Task 10b (controller-added, brief task-10b-brief.md) BEFORE Task 11 for Task 9's out-of-scope must-fix — the C4 verdict's "300 000" swaps to "000 300" in Arabic; Task 11 must verify the fixed verdict on screen — cost if wrong: one extra small task.
+10. Ruling: in the same Task 10b, SHORT_VERDICT c4 Arabic «الاختباران مختلفان» becomes «الاختباران لا يتفقان» (Task 3 minor) — the English says "disagree"; «مختلفان» reads "different" — cost if wrong: departs from the design's verbatim Arabic short line (spec §4), which Jad did not review word by word.
+11. Ruling: F5 — the pump row gets its own note (tick_pump: the results' constant 1.0, which is also what the modelled ECU runs the pump at throughout), not the fan's schedule — the shared note was false for the pump (engine_env.py:265 schedules only the fan; :764-765 leaves the pump at thermal.py's default 1.0) — cost if wrong: departs from the design's one text for rows 3 and 4, which Jad did not review word by word.
+12. Ruling: F8 — the PREREGISTRATION_C4.md item-2 quote extends to the whole item (633-643), ending on "whether the average effect is below 50 is not settled"; and the C4_RESULT.txt 'seeds' quote starts at its H1 heading (28-30) with the permutation p beside the sign p — a quote cut before its caveat, or a lone p-value, misleads a committee — cost if wrong: a longer verdict box than the design drew.
+13. Ruling: the reviewer asked for Jad's approval on F5 and F8; decided here instead under the skill's rulings-not-stalls rule, because both make the page MORE faithful to the code and to results/ and neither is irreversible — cost if wrong: Jad disagrees and the two strings are changed back in one commit.
+14. Ruling: the turbine limit is displayed rounded to 850 (the payload keeps 849.85) and Arabic readings use «°م» — the documents and results say 850; 849.9 invites a question with no answer — cost if wrong: none found.
+
+### Left for later (triaged by the final review as not blocking the handoff)
+
+- Task 1: minor (deferred): jsonable() on a 0-d ndarray raises a misleading TypeError (agent_trace.py:42; use jsonable(x.tolist())).
+- Task 1: minor (deferred): jsonable str(k) keys can collide silently (agent_trace.py:41).
+- Task 1: minor (deferred): route() does not assert len(v) == STEPS+1 (agent_trace.py:92).
+- Task 1: minor (deferred): no assertion that build_cycle returns a fresh cycle each call, nor array equality with RR.climb (test_agents.py:64).
+- Task 1: minor (deferred): report wrongly says np.asarray copies; the cycle is still not mutated (test pins byte identity).
+- Task 2: minor (deferred): on a diverged step held = [True]*5 while cmd/act are null (agent_trace.py:104) — CARRY to Task 10: never show the "held" line when values are null.
+- Task 2: minor (deferred): _car docstring says held compares to the network's command; it compares to _rescale(cmd) (agent_trace.py:92-93).
+- Task 2: minor (deferred): run_lanes results are raw floats (NaN on divergence) — CARRY to Task 5/6: pass results through jsonable before serving.
+- Task 2: minor (deferred): test_frames_are_the_episode does not check turb_c/oil_c/torque against info (test_agents.py:295-325).
+- Task 2: minor (deferred): proof skips (UNPROVEN) without runs_c4/SB3; suite still reads OK — reporting must read skips (test_agents.py:269-279).
+- Task 3: minor (deferred): commit 542988d pasted only the last line of app.test_replay (count present, transcript absent).
+- Task 3: minor (deferred): read_agent on a missing directory returns 'incompatible (no meta.json)' not KeyError (agent_catalog.py:82) — matters for M2 discovery.
+- Task 3: minor (deferred): test gaps — unknown protocol, cross-arm protocol mismatch, verdict() with results file absent; GIL_OPTIONAL_LOCKS assertion wording (test_agents.py:291).
+- Task 3: minor (deferred): comment at agent_catalog.py:102 says run_phase_d hands f"{runs}/{name}"; it is os.path.join (backslash on Windows).
+- Task 3: minor (deferred): Arabic «الاختباران مختلفان» reads "different", not "disagree" — prefer «الاختباران لا يتفقان» (agent_catalog.py:202).
+- Task 3: minor (deferred): MISSING_TEXT names only missing[0] (agent_catalog.py:265).
+- Task 3: minor (deferred): comment at agent_catalog.py:36-38 says "the eight real C4 agents" — there are sixteen agents, eight pairs (team/jad.md: say "eight pairs").
+- Task 4: minor (deferred): device assertion compares two 'auto' loads, so a CPU-only machine cannot catch a hard-coded device (test_agents.py:122; plan-mandated).
+- Task 4: minor (deferred): pair_paths duplicates find_pair's name/seed gate; they already differ on Path vs str (agent_api.py:46-49; plan-mandated).
+- Task 4: minor (deferred): pair_paths accepts a missing runs dir; relies on find_pair running first (agent_api.py:50).
+- Task 4: minor (deferred): docstring "which is cuda on this machine" describes one laptop (agent_api.py:57; plan-mandated).
+- Task 4: minor (deferred): local re-imports in the loader test (test_agents.py:101-104; plan-mandated).
+- Task 5: minor (deferred): StoreTests _wait_for 'building' has a ~50 ms window — timing-sensitive, may flake under load; a gated fake tracer would make it stable (test_agents.py:466). Its since-slicing assertion cannot fail with since=0.
+- Task 5: minor (deferred): untested — preempt during the loader aborts before the tracer; two networks on different devices -> 'build failed: RuntimeError' (agent_api.py:190-193).
+- Task 5: minor (deferred): a superseded build that then raises still records _errors[key]; the next preempting request is spent on the stale error (agent_api.py:207; ReplayStore has the same policy).
+- Task 5: minor (deferred): agent_catalog imported under two names (agent_api.py:21-22; plan-mandated).
+- Task 5: minor (deferred): a preempt after the last frame still caches the complete trace — harmless (agent_api.py:497-498).
+- Task 6: minor (deferred): exceptions other than KeyError/Refused (corrupt zip, git failure) reach FastAPI's default 500 without Cache-Control: no-store (agent_api.py:320-333).
+- Task 6: minor (deferred): find_pair on every poll re-hashes both zips (agent_api.py:320) — see the Task 3 ruling; Task 11 timing to confirm.
+- Task 6: minor (deferred): route comment "no path is ever built from a request" overstates; validated names are joined into a path (agent_api.py:195-199; plan text).
+- Task 6: minor (deferred): 1 <= int(ep) <= 20 hard-codes the table length (agent_api.py:313; plan-mandated).
+- Task 6: minor (deferred): neutral_phys re-types _rescale's formula without the clip (agent_api.py:250).
+- Task 6: minor (deferred): the no-write scan's self-test never shows the pathlib pattern firing (test_agents.py:493-499; plan-mandated).
+- Task 6: minor (deferred): the no-write snapshot watches runs_c4/*_seed0 only; route tests also read seed5 and runs_sixspeed_18sep (test_agents.py:426-428; plan-mandated).
+- Task 6: minor (deferred): preempt=true and 'since omitted still carries meta/road' untested.
+- Task 6: minor (deferred): commit 514798d message lacks the "Ran 33 tests" count line (tail -3 cut it).
+- Task 7: minor (deferred): the «المنمذَج» rule checks anywhere in the string, not adjacency (agents-strings.test.mjs:108; plan-mandated).
+- Task 7: minor (deferred): no test pins the exact 65-key set (agents-strings.test.mjs).
+- Task 7: minor (deferred): mergeStrings throws TypeError not its documented Error on a null table (agents-strings.mjs:224).
+- Task 7: minor (deferred): the bidi pin checks presence, not position (agents-strings.test.mjs:121-131).
+- Task 8: minor (deferred): camera pose, `grid`/`centre-dashes` names and dark-ramp direction not asserted (agent-scene.test.mjs:344-418).
+- Task 8: minor (deferred): a new THREE.Color per visible post per frame (agent-scene.mjs:179; plan-mandated).
+- Task 8: minor (deferred): lane colours duplicated as literals beside the --agent-* tokens (agent-scene.mjs:95; plan-mandated).
+- Task 8: minor (deferred): createEpisodeRoad does not check non-empty / equal-length arrays (agent-view.mjs:492-516).
+- Task 9: minor (deferred): starlette BlockingPortal DeprecationWarning printed by PageTests (test_page_assets_ids).
+- Task 9: minor (deferred): theme toggle tooltip reads "switch to dark" in dark mode after a language switch (same as the lab, main.mjs:590/600).
+- Task 9: minor (deferred): agents.mjs has little behavioural test coverage; the new agents-page-run.test.mjs fake DOM holds four ids only.
+- Task 9: minor (deferred): lane tokens never red/green, phone nav restore, <1100 px ordering untested (checked by inspection).
+- Task 9: minor (deferred): #profile role=img unnamed until a road arrives (agents.html:90).
+- Task 9: minor (deferred): pre-JS fallback text in agents.html differs from the string table (replaced at boot).
+- Task 9: minor (deferred): poll cadence is 400 ms + latency, not fixed; assertion messages in agents-page-run.test.mjs read backwards; retry button removed while focused -> focus falls to <body>.
+- Task 10: minor (deferred): renderStopped runs only when k changes; a lane that stops while paused mid-build is announced late (agents.mjs:566-592).
+- Task 10: minor (deferred): renderStopped uses LANE_LABEL[1] not BLIND_LABEL[protocol] — matters in M2 for Phase D (agents.mjs:569).
+- Task 10: minor (deferred): test_chase_is_optional does not follow `export ... from` (test_agents.py:689).
+- Task 10: minor (deferred): boost row shows "— kPa" on a diverged step (agents.mjs:507); fmtAction prints "−0.0" for tiny negatives (agents.mjs:416-423).
+- Task 10b: minor (deferred): commit f88d51a pastes only the test_replay summary line.
+- Task 10b: minor (deferred): the regex \d \d{3}\b misses a group running straight into Arabic letters (test_agents.py:411; drop \b or use (?!\d)).
+- Task 10b: minor (deferred): task-10b-report.md prose has literal U+202F where it meant the escape (report only).
+- Task 11: minor (deferred): design spec §4 (line ~286) and plan (line ~1312) still carry «الاختباران مختلفان» after Task 10b — prose drift (mistake 11 shape).
+- Task 11: minor (deferred): Starlette/anyio DeprecationWarnings also appear in the lab suite output (pre-existing).
+- Task 11: minor (deferred): milestone commit message says "/api/agents/episode answered 503" in past tense; not observed in this task.
+- Final re-review: agents-page-run.test.mjs imports registerHooks from node:module (Node >= 22.15); app/package.json pins no engines, so an older Node fails the whole file instead of skipping.
+- Final re-review: the test 'a chase scene that cannot be created...' reads the scene the previous test created; run alone it throws a TypeError (test-order coupling).
+- Final re-review: createChaseScene's catch calls view.dispose(); if dispose itself throws it masks the original build error.
+- Final re-review: at 1440 px the Arabic dt caption breaks between '(AUDIT2.md' and 'H2-2)' at the space; H2-2 itself no longer breaks (a no-break space or an isolate would keep the citation whole).
+- Final re-review: the M1 plan file still carries «مختلفان» and agents.action.tick_duty; M2 must copy from this spec, not from the plan.
+- Left for later by the final review's triage: F2 the scored-artefact dot wraps alone (agents.css:106); F3 the device line wraps inside '(torch ..., SB3 2.9.0)' at 390 px; F6 a cache hit ignores preempt, so an unwatched build keeps running (agent_api.py:157-161).
