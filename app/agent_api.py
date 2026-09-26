@@ -1,8 +1,8 @@
-"""The agent replay page's server side: the model loader and the episode store.
+"""The agent replay page's server side: the model loader, the episode store and
+the two routes.
 
-Imported only from the --simulation branch of app/server.py (install() is
-added in a later task), so --live and --replay never load agent code, SB3 or
-torch.
+Imported only from the --simulation branch of app/server.py, which calls
+install(app), so --live and --replay never load agent code, SB3 or torch.
 
 What this module never does: write to disk, train, evaluate, or call
 evaluate.check_model_fingerprint (it raises SystemExit). stable-baselines3 and
@@ -13,6 +13,9 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from dataclasses import dataclass
+import importlib.util
+from pathlib import Path
+import re
 import sys
 import threading
 
@@ -22,7 +25,8 @@ from app import agent_catalog
 from app import agent_catalog as C
 from app import agent_trace
 from app.replay import BuildCancelled
-from engine_env import OBS_DIM
+from engine_env import (ACT_HI, ACT_LO, OBS_DIM, OIL_PROTECT_K, PREVIEW_S, SLEW,
+                        TURB_PROTECT_K, neutral_action)
 from evaluate import agent_policy
 
 ROOT = C.ROOT
@@ -216,3 +220,114 @@ class EpisodeStore:
         finally:
             with self._lock:
                 self._active = None
+
+
+# ---- routes: added by install(app), and only under --simulation ------------
+#
+# app/server.py calls install(app) inside `if a.simulation:` in main(), so the
+# --live and --replay processes never import this module. Every route here is
+# a GET and answers with Cache-Control: no-store. A request names an episode
+# by three strings that must match fixed patterns before anything is looked up;
+# no path is ever built from a request.
+
+NO_STORE = {"Cache-Control": "no-store"}
+SEED_TEXT = re.compile(r"[0-9]{1,3}")
+EP_TEXT = re.compile(r"[0-9]{1,2}")
+SINCE_TEXT = re.compile(r"[0-9]{1,4}")
+STATIC = Path(__file__).resolve().parent / "static"
+_ROADS = {}
+
+
+def sb3_available():
+    """True when stable-baselines3 can be imported. Looked up, not imported."""
+    return importlib.util.find_spec("stable_baselines3") is not None
+
+
+def episode_meta(pair, ep, road, verdict):
+    """Everything the page needs once per episode, JSON-safe. The device and
+    the torch/SB3 versions are NOT here: they are known only after the worker
+    has loaded the networks, so they travel in every poll response instead."""
+    neutral_phys = ACT_LO + (neutral_action() + 1.0) * 0.5 * (ACT_HI - ACT_LO)
+    agents = pair["agents"]
+    return agent_trace.jsonable({
+        "experiment": pair["experiment"],
+        "runs": pair["runs"],
+        "prefix": pair["prefix"],
+        "protocol": pair["protocol"],
+        "seed": pair["seed"],
+        "ep": ep["idx"],
+        "episode": {"seed": ep["seed"], "weights": list(ep["weights"]),
+                    "climb_start_s": road["climb_start_s"],
+                    "grade": None if ep["road"] is None else ep["road"][1]},
+        "dt": agent_trace.DT,
+        "duration_s": agent_trace.DURATION,
+        "steps": agent_trace.STEPS,
+        "train_dt": {a["arm"]: a["train_dt"] for a in agents},
+        "agents": [{"tag": a["tag"], "arm": a["arm"], "budget_line": a["budget_line"],
+                    "zip_sha": a["zip_sha"], "scored": a["scored"]} for a in agents],
+        "result_file": pair["result_file"],
+        "preview_s": list(PREVIEW_S),
+        "act": {"lo": ACT_LO, "hi": ACT_HI, "slew": SLEW, "neutral_phys": neutral_phys},
+        "limits": {"turb_c": round(TURB_PROTECT_K - 273.15, 1),
+                   "oil_c": round(OIL_PROTECT_K - 273.15, 1)},
+        "scenario": {"v_kmh": max(road["speed_kmh"]), "t_amb_c": road["t_amb_c"],
+                     "p_baro_kpa": road["p_baro_kpa"]},
+        "verdict": verdict,
+        "fingerprint_taken": agent_catalog.FINGERPRINT_TAKEN.get(pair["protocol"]),
+    })
+
+
+def _road(ep):
+    """The episode's road, from the cycle arrays only (no plant), cached."""
+    key = (ep["protocol"], ep["idx"])
+    if key not in _ROADS:
+        _ROADS[key] = agent_trace.route(agent_trace.build_cycle(ep))
+    return _ROADS[key]
+
+
+def install(app, store=None):
+    """Add GET /agents and GET /api/agents/episode to `app`."""
+    from fastapi.responses import HTMLResponse, JSONResponse
+
+    store = store if store is not None else EpisodeStore()
+    app.state.agent_store = store
+
+    def answer(body, status=200):
+        return JSONResponse(body, status_code=status, headers=NO_STORE)
+
+    @app.get("/agents", response_class=HTMLResponse)
+    def agents_page():
+        """The agent replay page. Read-only; computes nothing until «احسب»."""
+        return HTMLResponse((STATIC / "agents.html").read_text(encoding="utf-8"),
+                            headers=NO_STORE)
+
+    @app.get("/api/agents/episode")
+    def agents_episode(runs: str = "", seed: str = "", ep: str = "",
+                       since: str = "0", preempt: str = ""):
+        """Start or poll one episode of one pair. since=0 also carries meta and road.
+
+        Every parameter is taken as text and checked here, so a malformed one
+        gets this route's own 404 with no-store rather than FastAPI's 422.
+        """
+        unknown = answer({"detail": "unknown episode"}, 404)
+        if (not agent_catalog.RUNS_NAME.fullmatch(runs) or not SEED_TEXT.fullmatch(seed)
+                or not EP_TEXT.fullmatch(ep) or not 1 <= int(ep) <= 20
+                or not SINCE_TEXT.fullmatch(since)):
+            return unknown
+        seed_n, idx, since_n = int(seed), int(ep), int(since)
+        preempt_on = preempt in ("1", "true")
+        try:
+            pair = agent_catalog.find_pair(runs, seed_n)
+            episode = agent_trace.episode(pair["protocol"], idx)
+        except KeyError:
+            return unknown
+        except agent_catalog.Refused as refused:
+            return answer({"status": "refused", "problems": refused.problems}, 409)
+        if store.needs_sb3 and not sb3_available():
+            return answer({"detail": "stable-baselines3 is not installed"}, 503)
+        out = store.poll((runs, seed_n, idx), since=since_n, preempt=preempt_on)
+        if since_n == 0:
+            road = _road(episode)
+            out["road"] = road
+            out["meta"] = episode_meta(pair, episode, road, agent_catalog.verdict(pair["prefix"]))
+        return answer(out)

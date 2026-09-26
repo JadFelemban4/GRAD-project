@@ -7,11 +7,14 @@ Run from the repository root. app/test_replay.py's test_read_only scans this
 file too, so banned tokens are written as raw regexes, never as calls, and
 fixtures are made in temporary directories OUTSIDE the repository.
 """
+import ast
 import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import threading
@@ -26,8 +29,8 @@ from app import agent_api as API
 from app import agent_catalog as AC
 from app import agent_trace as T
 from check_premise import p_grade_now, p_neutral
-from engine_env import (ACT_HI, ACT_LO, OBS_DIM, PREVIEW_S, SLEW, SupervisoryTunerEnv,
-                        make_grade_climb, neutral_action)
+from engine_env import (ACT_HI, ACT_LO, OBS_DIM, PREVIEW_S, SLEW, TURB_PROTECT_K,
+                        SupervisoryTunerEnv, make_grade_climb, neutral_action)
 from evaluate import EPISODES, EPISODES_D2, agent_policy, run_episode
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -776,6 +779,257 @@ class ProofTests(unittest.TestCase):
                 for arm in ("sighted", "blind")]
         self.assertEqual(got.results, want)
         print(f"\n    Phase D == proof PROVEN on {got.device}", file=sys.stderr)
+
+
+class _StubStore:
+    """Answers polls like EpisodeStore and records them; never starts a thread."""
+    needs_sb3 = False
+
+    def __init__(self):
+        self.calls = []
+
+    def poll(self, key, since=0, preempt=False):
+        self.calls.append((key, since, preempt))
+        frames = [{"k": k, "cars": [None, None]} for k in range(3)]
+        return {"status": "building", "progress": 3 / T.STEPS, "steps": T.STEPS,
+                "since": since, "frames": frames[since:], "device": "cuda:0",
+                "versions": {"torch": "t", "sb3": "s"}}
+
+
+META_KEYS = {"experiment", "runs", "prefix", "protocol", "seed", "ep", "episode", "dt",
+             "duration_s", "steps", "train_dt", "agents", "result_file", "preview_s", "act",
+             "limits", "scenario", "verdict", "fingerprint_taken"}
+EPISODE_URL = "/api/agents/episode?runs=runs_c4&seed=5&ep=1"
+
+
+def _client(store):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    app = FastAPI()
+    API.install(app, store=store)
+    return app, TestClient(app)
+
+
+class RouteTests(unittest.TestCase):
+    """Spec test 10 and the episode route's contract."""
+
+    def test_routes_only_under_simulation(self):
+        code = ("import json, sys, app.server as s\n"
+                "print(json.dumps({'mods': sorted(m for m in sys.modules if m.startswith('app.agent')),\n"
+                "  'paths': sorted(r.path for r in s.app.routes if hasattr(r, 'path')),\n"
+                "  'methods': sorted({m for r in s.app.routes for m in (getattr(r, 'methods', None) or ())})}))\n")
+        run = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
+                             text=True, timeout=180,
+                             env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertEqual(run.returncode, 0, run.stderr[-2000:])
+        got = json.loads(run.stdout.strip().splitlines()[-1])
+        self.assertEqual(got["mods"], [], "--live/--replay would import agent code")
+        self.assertFalse([p for p in got["paths"] if p.startswith(("/agents", "/api/agents"))])
+        self.assertLessEqual(set(got["methods"]), {"GET", "HEAD"})
+
+        tree = ast.parse((ROOT / "app" / "server.py").read_text(encoding="utf-8"))
+        calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
+                 and getattr(n.func, "id", getattr(n.func, "attr", None)) == "install"]
+        self.assertEqual(len(calls), 1, "install( must be called exactly once")
+        guarded = [n for n in ast.walk(tree) if isinstance(n, ast.If)
+                   and isinstance(n.test, ast.Attribute) and n.test.attr == "simulation"
+                   and getattr(n.test.value, "id", None) == "a"]
+        self.assertEqual(len(guarded), 1)
+        inside = [n for n in ast.walk(guarded[0]) if n in calls]
+        self.assertEqual(inside, calls, "install( must sit inside `if a.simulation:`")
+        top = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
+        self.assertFalse([n for n in top if "agent" in (getattr(n, "module", "") or "")],
+                         "server.py must not import agent code at module level")
+
+        app, client = _client(_StubStore())
+        paths = {r.path: r for r in app.routes if hasattr(r, "methods")}
+        self.assertLessEqual({"/agents", "/api/agents/episode"}, set(paths))
+        for p in ("/agents", "/api/agents/episode"):
+            self.assertEqual(set(paths[p].methods), {"GET"})
+        self.assertEqual(client.post(EPISODE_URL).status_code, 405)
+
+    @unittest.skipUnless(HAVE_C4, NO_C4)
+    def test_episode_route_contract(self):
+        stub = _StubStore()
+        _, client = _client(stub)
+        r = client.get(EPISODE_URL + "&since=0&preempt=1")
+        self.assertEqual(r.status_code, 200, r.text[:500])
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        body = r.json()
+        self.assertLessEqual({"status", "progress", "steps", "since", "frames", "device",
+                              "versions", "meta", "road"}, set(body))
+        self.assertEqual(stub.calls, [(("runs_c4", 5, 1), 0, True)])
+        meta = body["meta"]
+        self.assertEqual(set(meta), META_KEYS)
+        json.dumps(meta, allow_nan=False)
+        self.assertEqual((meta["experiment"], meta["runs"], meta["prefix"], meta["protocol"],
+                          meta["seed"], meta["ep"]), ("C4", "runs_c4", "c4", "d2", 5, 1))
+        seed, weights, start_s, grade = EPISODES_D2[0]
+        self.assertEqual(meta["episode"], {"seed": seed, "weights": list(weights),
+                                           "climb_start_s": 141.0, "grade": grade})
+        self.assertEqual((meta["dt"], meta["duration_s"], meta["steps"]), (1.0, 720.0, 719))
+        self.assertEqual(meta["train_dt"], {"sighted": 0.2, "blind": 0.2})
+        self.assertEqual([(a["tag"], a["arm"], a["scored"]) for a in meta["agents"]],
+                         [("sighted_seed5", "sighted", "match"), ("blind_seed5", "blind", "match")])
+        self.assertTrue(meta["result_file"])
+        self.assertEqual(meta["preview_s"], list(PREVIEW_S))
+        self.assertEqual(meta["act"]["neutral_phys"], [0.0, 0.0, 0.0, 1.0, 1.0])
+        self.assertEqual(meta["act"]["lo"], [float(x) for x in ACT_LO])
+        self.assertEqual(meta["limits"]["turb_c"], round(TURB_PROTECT_K - 273.15, 1))
+        self.assertEqual(meta["verdict"]["state"], "found")
+        self.assertEqual(meta["verdict"]["short"]["ar"], AC.SHORT_VERDICT["c4"]["ar"])
+        self.assertRegex(meta["fingerprint_taken"], r"^\d\d:\d\d$")
+        self.assertEqual(len(body["road"]["x_m"]), 720)
+        self.assertNotIn("device", meta)
+
+        later = client.get(EPISODE_URL + "&since=1").json()
+        self.assertNotIn("meta", later)
+        self.assertNotIn("road", later)
+        self.assertEqual([f["k"] for f in later["frames"]], [1, 2])
+        self.assertEqual(stub.calls[-1], (("runs_c4", 5, 1), 1, False))
+
+        n = len(stub.calls)
+        for q in ("runs=runs_c4&seed=5&ep=21", "runs=runs_c4&seed=5&ep=0",
+                  "runs=runs_c4&seed=abc&ep=1", "runs=runs_c4&seed=5abc&ep=1",
+                  "runs=runs_c4&seed=5&ep=1.5", "runs=..&seed=5&ep=1",
+                  "runs=runs_c4%2F..&seed=5&ep=1", "runs=runs_zz&seed=5&ep=1",
+                  "runs=runs_c4&seed=99&ep=1", "runs=runs_c4&seed=5&ep=1&since=abc",
+                  "runs=runs_c4&seed=5", ""):
+            with self.subTest(query=q):
+                r = client.get("/api/agents/episode?" + q)
+                self.assertEqual(r.status_code, 404)
+                self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(len(stub.calls), n, "a 404 must not reach the store")
+
+    @unittest.skipUnless((ROOT / "runs_sixspeed_18sep" / "sighted_seed0").is_dir(),
+                         "runs_sixspeed_18sep/ is not on this machine")
+    def test_refused_pair_is_409_and_never_polled(self):
+        stub = _StubStore()
+        _, client = _client(stub)
+        r = client.get("/api/agents/episode?runs=runs_sixspeed_18sep&seed=0&ep=1&preempt=1")
+        self.assertEqual(r.status_code, 409)
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(r.json()["status"], "refused")
+        self.assertIn("no meta.json", " ".join(r.json()["problems"]))
+        self.assertEqual(stub.calls, [])
+
+    @unittest.skipUnless(HAVE_C4, NO_C4)
+    def test_missing_sb3_is_503(self):
+        stub = _StubStore()
+        stub.needs_sb3 = True
+        _, client = _client(stub)
+        with mock.patch.object(API, "sb3_available", lambda: False):
+            r = client.get(EPISODE_URL + "&preempt=1")
+        self.assertEqual(r.status_code, 503)
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(stub.calls, [])
+        stub.needs_sb3 = False               # an injected loader needs no SB3
+        with mock.patch.object(API, "sb3_available", lambda: False):
+            self.assertEqual(client.get(EPISODE_URL).status_code, 200)
+
+
+# Spec test 11. The snapshot is taken before the first test of this module and
+# compared after the last, so it covers the whole suite, the proof included.
+_SNAPSHOT = {}
+
+
+def _snapshot():
+    tops = [ROOT / "results", ROOT / "app", ROOT / ".git" / "index"]
+    tops += sorted((ROOT / "runs_c4").glob("*_seed0"))
+    files = {}
+    for top in tops:
+        if top.is_file():
+            paths = [top]
+        elif top.is_dir():
+            paths = [p for p in top.rglob("*") if p.is_file()
+                     and not {"__pycache__", "node_modules"} & set(p.relative_to(top).parts)]
+        else:
+            continue
+        for p in paths:
+            st = p.stat()
+            files[p.relative_to(ROOT).as_posix()] = (st.st_size, st.st_mtime_ns)
+    status = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True,
+                            text=True, timeout=60,
+                            env=dict(os.environ, GIT_OPTIONAL_LOCKS="0")).stdout
+    return files, status
+
+
+def setUpModule():
+    _SNAPSHOT["before"] = _snapshot()
+
+
+def tearDownModule():
+    files, status = _snapshot()
+    before, before_status = _SNAPSHOT["before"]
+    changed = sorted(p for p in set(before) | set(files) if before.get(p) != files.get(p))
+    if changed or status != before_status:
+        raise AssertionError("the suite changed files on disk: "
+                             + ", ".join(changed[:20])
+                             + ("" if status == before_status else " (and git status moved)"))
+
+
+NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py")
+WRITE_PATTERNS = (
+    (r"\bopen\s*\([^)]*,\s*(mode\s*=\s*)?['\"][^'\"]*[wax+]", "write-mode open"),
+    (r"\.write\w*\s*\(", "write / write_text / write_bytes"),
+    (r"\bjson\.dump\s*\(", "json.dump"),
+    (r"\.save\w*\s*\(", "save"),
+    (r"\bos\.(remove|unlink|rename|replace|rmdir|mkdir|makedirs)\b", "os file operation"),
+    (r"\bshutil\b", "shutil"),
+    (r"\bmkdir\b", "mkdir"),
+    (r"\.(unlink|touch|rmdir)\s*\(", "pathlib file operation"),
+)
+
+
+def _code(path):
+    """Source without docstrings and comments, as test_replay's scan reads it."""
+    src = path.read_text(encoding="utf-8")
+    src = re.sub(r'""".*?"""', "", src, flags=re.S)
+    return re.sub(r"#.*", "", src)
+
+
+class NoWriteTests(unittest.TestCase):
+    """Spec test 11, static half: the new modules contain no way to write."""
+
+    def test_new_modules_cannot_write(self):
+        bad = []
+        for name in NEW_MODULES:
+            code = _code(ROOT / "app" / name)
+            for pattern, why in WRITE_PATTERNS:
+                for m in re.finditer(pattern, code):
+                    bad.append(f"{name}:{code[:m.start()].count(chr(10)) + 1} {why}")
+        self.assertEqual(bad, [])
+
+    def test_the_scan_can_fail(self):
+        probe = ('with open(p, "w") as f:\n    f.write_text(x)\njson.dump(o, f)\n'
+                 'model.save(p)\nos.remove(p)\nimport shutil\nPath(p).mkdir()\n')
+        hits = {why for pattern, why in WRITE_PATTERNS if re.search(pattern, probe)}
+        self.assertEqual(hits, {why for _, why in WRITE_PATTERNS} - {"pathlib file operation"})
+        self.assertFalse([w for p, w in WRITE_PATTERNS
+                          if re.search(p, 'open(p, encoding="utf-8")\njson.dumps(x)\ns.replace("a", "b")\n')])
+
+
+NET_ROOTS = {"urllib", "http", "socket", "requests", "httpx", "typesafe_sdk"}
+NET_ALLOWED = set()          # M3 allows exactly {"jev.py"}
+
+
+class NoNetworkTests(unittest.TestCase):
+    """Spec test 13: an AST import scan, so 'WebSocket' in server.py is not a hit."""
+
+    def test_no_network_imports_in_app(self):
+        found = []
+        for path in sorted((ROOT / "app").glob("*.py")):
+            if path.name.startswith("test_") or path.name in NET_ALLOWED:
+                continue
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if isinstance(node, ast.Import):
+                    roots = [a.name.split(".")[0] for a in node.names]
+                elif isinstance(node, ast.ImportFrom) and node.level == 0:
+                    roots = [(node.module or "").split(".")[0]]
+                else:
+                    continue
+                found += [f"{path.name}:{node.lineno} {r}" for r in roots if r in NET_ROOTS]
+        self.assertEqual(found, [])
 
 
 if __name__ == "__main__":

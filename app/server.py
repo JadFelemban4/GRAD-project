@@ -297,7 +297,10 @@ def main():
 
     if a.simulation:
         print(f'  3D replay lab: http://localhost:{a.http_port}/simulation')
+        print(f'  agent replay:  http://localhost:{a.http_port}/agents')
         print('  Local recordings only. No vehicle connection. In-memory replay cache.')
+        from app.agent_api import install
+        install(app)
         import uvicorn
         uvicorn.run(app, host='127.0.0.1', port=a.http_port, log_level='warning')
         return
