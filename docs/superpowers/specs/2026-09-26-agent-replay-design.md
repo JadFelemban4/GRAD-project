@@ -1,18 +1,13 @@
-> **STATUS: DRAFT — NOT YET APPROVED BY JAD.** Produced on 26 September 2026 by
-> a design workflow: three independent designs (minimal-first, the committee's
-> view, correctness and hard rules), a judge that chose the minimal one as the
-> base and named grafts, one synthesis, three adversarial reviewers (31 issues
-> raised: 6 major, 25 minor, 0 blockers) and one revision. It is being walked
-> through with Jad section by section in Arabic; each approval and change is
-> recorded in the log at the end of this file. **Do not build from it until
-> this banner says APPROVED.** Inputs: `2026-09-26-agent-replay-recon.md`
-> (Jad's decisions are its section 12).
-
-# Agent episodes beside the replay lab: design (revised)
-
-26 September 2026, branch `JMF-2340550-sep17`. This is a design only; nothing has been built. It draws on three documents: `NEXT_SESSION_VIZ_2026-09-26.md`, `docs/superpowers/specs/2026-09-26-agent-replay-recon.md` (cited below as "recon §n"; Jad's seven decisions are its §12) and the lab design of 21 September. I re-checked every line reference against the tree today. The figures marked "measured today" come from runs in the scratchpad.
-
----
+> **STATUS: APPROVED BY JAD, 26 September 2026** — through the three questions
+> of section 11 (he chose to answer only the decisions that are his, and to take
+> the rest as drafted and reviewed; see the walkthrough log at the end). Produced
+> the same day by a design workflow: three independent designs (minimal-first,
+> the committee's view, correctness and hard rules), a judge that chose the
+> minimal one as the base and named grafts, one synthesis, three adversarial
+> reviewers (31 issues raised: 6 major, 25 minor, 0 blockers) and one revision.
+> Inputs: `2026-09-26-agent-replay-recon.md` (Jad's seven decisions are its
+> section 12). The implementation plan is the next document; nothing is built
+> from this file directly.
 
 ## 1. Goal and non-goals
 
@@ -92,13 +87,13 @@ It applies to every frame field and to `meta.act` and the `road` arrays.
 
 - `playback.mjs`: `PlaybackClock` and `formatTime`. **`sampleAt` is not reused.** It searches on `frames[i].t` and reads `s_m`/`speed_kmh` (`playback.mjs:21-23`), which agent frames do not carry. `episodeAt` does the lookup.
 - `i18n.mjs`: `t`, `applyTranslations`, `resolveLang`, `STRINGS`, `missingKeys`.
-- `scene.mjs`: `stage`, `supra`, `ribbonGeometry`, subject to open question 2.
+- `scene.mjs`: `stage`, `supra`, `ribbonGeometry` (exported by edit 2 below; approved, §11 Q2).
 
 ### Edits to existing files: the complete list
 
 1. **`app/server.py`.** In `main()`'s `if a.simulation:` branch (`:298`): `from app.agent_api import install; install(app)`, plus one printed `/agents` URL. Module-level routes do not change, so `--live` and `--replay` never import agent code. In M3, the docstring sentence at `:43` is amended (§7).
-2. **`app/static/sim/scene.mjs`** (open question 2). Add `export` to `function stage` (`:326`), `function ribbonGeometry` (`:453`) and `function supra` (`:580`). This changes no behaviour, and the lab suites are re-run.
-3. **`app/static/sim/i18n.mjs`** (open question 2). Add one key, `nav.agents`, in both languages, for the link. Every other key lives in `agents-strings.mjs`.
+2. **`app/static/sim/scene.mjs`** (approved, §11 Q2). Add `export` to `function stage` (`:326`), `function ribbonGeometry` (`:453`) and `function supra` (`:580`). This changes no behaviour, and the lab suites are re-run.
+3. **`app/static/sim/i18n.mjs`** (approved, §11 Q2). Add one key, `nav.agents`, in both languages, for the link. Every other key lives in `agents-strings.mjs`.
 4. **`app/static/simulation.html:39`** (M2). Add one `<a href="/agents" data-i18n="nav.agents">`, inserted **after the first link, not at the end**. The lab's phone rule hides `.topbar nav a:last-child` below 760 px (`style.css:100`), so a link at the end would vanish on phones. This link is the only edit to the page, and it is needed because decision 7 says "linked from it". Under `--live` or `--replay` the link 404s, which is correct.
 5. **`.gitignore`** (M3, its own first commit, before any key exists): `.env`, `.env.*`, `*typesafe_key*`. This is a second line of defence only; the key never lives inside the repository (§7).
 
@@ -465,7 +460,7 @@ Row 2 therefore shows each car's `map_kpa` beside it: «ضغط المشعب ال
 
 **Gesture.** `tap-unlock.mjs` is a pure counter: 10 taps within 4000 ms returns `true`. Its state is a module variable, and it never touches `localStorage`, `sessionStorage`, IndexedDB or cookies.
 
-- It is attached to this page's own footer label (open question 1), with padding for a 32 px touch target.
+- It is attached to this page's own footer label, `02 — AGENTS` (approved, §11 Q1), with padding for a 32 px touch target. The lab's `01 — REPLAY` gets no handler.
 - Unlocking removes `hidden` from `#jev-panel` and only then calls `GET /api/agents/jev/status`. That returns `{configured, source, vendor, model, hosted}`, never the key.
 - The gesture hides the panel; it protects nothing.
 
@@ -655,7 +650,7 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
   3. `find_pair`, `scored_shas` and `verdict` for the C4 row, short line and gloss;
   4. `EpisodeStore`, the episode route and `install`;
   5. `agents-strings.mjs` and the page: profile, timeline with wait-at-edge, pause panel, verdict box, badge;
-  6. the `scene.mjs` exports (subject to open question 2) and the chase view.
+  6. the `scene.mjs` exports (approved, §11 Q2) and the chase view.
 - The M1 page reads `?runs=runs_c4&seed=5&ep=1` into a read-only picker and still computes only on «احسب».
 - **Verify:**
   - the tests pass with the `==` proof shown;
@@ -695,7 +690,7 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 
 ---
 
-## 11. Open questions for Jad
+## 11. Questions for Jad — all three answered 26 September (see the log)
 
 1. **Which label carries the gesture?** Decision 6 names `01 — REPLAY` (`i18n.mjs:61`, shown in `/simulation`'s footer). Decision 7 keeps that page untouched, and the jev panel must not share a page with recorded drives.
    - **Recommended:** this page's own footer label, `02 — AGENTS`, in the same place, with the same 10 taps in 4 s. The lab's label stays as it is and does nothing.
@@ -755,3 +750,8 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 | date | section | outcome |
 |---|---|---|
 | 26 Sep | — | draft saved; walkthrough not started |
+| 26 Sep | §1 | Jad asked how to open the page; the running `/simulation` lab was opened for him to picture it. He asked where the new changes were — none exist yet, by design. **He chose to answer only the three questions that need his decision (§11), then build**, rather than walk all seven sections. |
+| 26 Sep | §11 Q1 | **Approved:** the gesture lives on the new page's own footer label `02 — AGENTS`, ten taps within four seconds. The lab's `01 — REPLAY` stays as it is and does nothing. (Refines decision 6, which named the lab's label before the new page existed.) |
+| 26 Sep | §11 Q2 | **Approved:** the three `export` keywords in `scene.mjs`, the one `nav.agents` key in `i18n.mjs` and the one link in `simulation.html` — "lend the car" rather than copy it. Jad said he did not follow the explanation and approved anyway; the plain version given afterwards: the new page uses the same car drawing as the old one instead of drawing a new one. The lab suites are re-run to prove the old page unchanged. |
+| 26 Sep | §11 Q3 | **Approved: five choices per action**, one call with five `choice` questions, as §7 specifies. Jad's reason: "it is an experiment and something personal" — jev is a trial, not part of the thesis. |
+| 26 Sep | whole | **APPROVED** — banner changed. Next: the implementation plan (writing-plans). |
