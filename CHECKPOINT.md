@@ -1950,3 +1950,47 @@ session's prompt, which found the documents around it lagging:
 **Open:** the next experiment — a longer budget or more seeds, one at a time —
 is Jad's and the team's decision; `NEXT_SESSION_2026-09-24.md` carries both
 options with their measured costs.
+
+## 26–27 September 2026 — Jad briefed on C4, one idea at a time; the visual-simulation prompt; no experiment run
+
+Commits `18f5d66` `79eb8a0` `19fbca4` `7fff577` `46019f6` `6e435ba` `cc1418b`
+`b6b8149` on `JMF-2340550-sep17`, all pushed. Nothing trained, scored or
+re-analysed; no figure in `results/` moved.
+
+### What the session did
+
+| what | where it landed |
+|---|---|
+| Jad, back from being away, asked what the C4 session did. A five-part reply lost him; one idea per message, each with a familiar example and one question, got him through C4's result, the preregistration, typical-versus-worst ride and why eight pairs | `team/jad.md`, 26 September — what landed, which examples worked (kabsa pots; "our constitution"; two students; seed 0 alone), and a new rule: a multi-point question still gets a one-point answer |
+| the next-experiment options, one at a time: **A explained**, and Jad answered its check question correctly ("the training is incomplete"). **B and C not yet explained** | `NEXT_SESSION_2026-09-27.md` |
+| a prompt for the visual simulation (the replay lab): agents' experiments current and future, road grade, a map built from the experiments' own grade, and jev as a hidden feature | `NEXT_SESSION_VIZ_2026-09-26.md` |
+| "jev" identified from the page Jad sent: typesafe.ai's hosted "System One" model — structured state in, typed decisions out, early access by waitlist. Only the vendor's claims are recorded, labelled as claims | the same prompt, section JEV |
+| the C4 close's CHECKPOINT row and commit said the deck was fixed in "eleven" places; it was seventeen | corrected in place (`18f5d66`) |
+
+### Found, stated
+
+- `node --test app/static/sim/` **fails** on this machine's Node 24 (a bare
+  directory is read as a file); the quoted glob `"app/static/sim/*.test.mjs"`
+  ran 30 of 30 passing at the time, before the agent-replay session added its
+  own tests. The viz prompt uses the glob.
+- **Process failures:** the five-part explanation (Jad: "you complicated it");
+  and one reply went out in English despite the profile's "Arabic first" —
+  Jad had to ask for Arabic.
+
+### The other session, recorded not verified
+
+A separate session ran from `NEXT_SESSION_VIZ_2026-09-26.md` and committed
+**Agent replay M1** — 28 commits, the last at 02:52 on 27 September: one C4 pair
+driving one frozen episode side by side at `/agents`. Its record is
+`docs/superpowers/specs/2026-09-26-agent-replay-design.md` (rulings and deferred
+items at the end). `git diff --stat` from `b6b8149` shows it touched only `app/`
+and `docs/` — not `plant.py`, `thermal.py`, `engine_env.py`, `random_road.py`,
+`evaluate.py`, `train.py`, `fingerprint.py` or `run_phase_d.py`. **This session
+did not re-run its tests;** read its own commits for those.
+
+### Open
+
+- **The next experiment — A, B or C — is still the team's decision.** B and C
+  still need their one-at-a-time explanation to Jad.
+- **jev needs early access and an API key** that Jad may not have; the viz
+  prompt makes that the first question.
