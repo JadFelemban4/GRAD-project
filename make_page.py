@@ -95,17 +95,20 @@ def phase_d():
                        fuel_pct=_r(100 * (np.median(col(n, "fuel")) / base_f - 1), 2),
                        peak=_r(col(n, "peak_turb").max(), 1),
                        cut=_r(100 * (1 - me / base), 2)))
-    cut = {e["name"]: e["cut"] for e in ev}
-    seeds = [dict(seed=s, s=cut[f"sighted_seed{s}"], b=cut[f"blind_seed{s}"],
-                  d=_r(cut[f"sighted_seed{s}"] - cut[f"blind_seed{s}"], 2))
+    # Differences from the UNROUNDED cuts, so the page and results/*.txt agree
+    # to the last printed digit.
+    cut = {n.replace("runs/", ""): 100.0 * (1.0 - float(np.median(col(n, "damage"))) / base)
+           for n in order}
+    seeds = [dict(seed=s, s=_r(cut[f"sighted_seed{s}"], 2), b=_r(cut[f"blind_seed{s}"], 2),
+                  d=_r(cut[f"sighted_seed{s}"] - cut[f"blind_seed{s}"], 4))
              for s in range(5)]
     dd = np.array([x["d"] for x in seeds])
     sd = float(dd.std(ddof=1))
     half = 2.776 * sd / np.sqrt(len(dd))           # t(0.975, 4)
     from scipy import stats
     s_med = float(np.median([x["s"] for x in seeds]))
-    ablation = dict(seeds=seeds, mean=_r(dd.mean(), 2), median=_r(np.median(dd), 2),
-                    sd=_r(sd, 2), lo=_r(dd.mean() - half, 2), hi=_r(dd.mean() + half, 2),
+    ablation = dict(seeds=seeds, mean=_r(dd.mean(), 4), median=_r(np.median(dd), 4),
+                    sd=_r(sd, 4), lo=_r(dd.mean() - half, 4), hi=_r(dd.mean() + half, 4),
                     p_t=_r(stats.ttest_1samp(dd, 0.0).pvalue, 2),
                     p_w=_r(stats.wilcoxon(dd).pvalue, 2),
                     grade_cut=cut["current-grade"], predictive_cut=cut["predictive (hand)"],
