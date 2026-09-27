@@ -116,7 +116,7 @@ def phase_d():
     curves = []
     for f in sorted(glob.glob(os.path.join(HERE, "runs", "*", "curve.csv"))):
         tag = os.path.basename(os.path.dirname(f))
-        d = np.loadtxt(f, delimiter=",", skiprows=1)
+        d = np.loadtxt(f, delimiter=",", skiprows=1, usecols=(0, 1, 2))
         curves.append(dict(run=tag, blind=tag.startswith("blind"), ret=_r(d[:, 1], 1)))
 
     return dict(trace=trace, sweep=sweep, eval=ev, base_med=_r(base, 1),

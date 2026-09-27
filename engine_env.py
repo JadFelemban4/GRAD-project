@@ -336,6 +336,48 @@ class Vehicle:
     SHIFT_LOAD = 0.75
     SHIFT_RPM_MAX = 6000.0        # never hand back a gear into the limiter
 
+    # What the MODELLED engine can sustain at each speed, at the boost ceiling.
+    #
+    # MEASURED 27 September 2026 through this environment's own load loop --
+    # _track_torque with a 1000 Nm request, BaselineECU.step supplying spark and
+    # lambda with its knock feedback and enrichment timer live, charge air at the
+    # locked 42 C. Each entry is the worst torque over the settled window; the
+    # loop settles in two steps. Regenerate with measure_deliverable_torque() and
+    # test_reward.py checks the table still matches the plant.
+    #
+    # WHY THE SHIFT RULE NEEDS IT. SHIFT_LOAD assumes 75 % of PEAK torque is
+    # available in every gear. On the model it is not: at 130 km/h in 8th the
+    # engine turns 2107 rpm and sustains 333 Nm, while the rule only hands back
+    # a gear above 375 Nm. Requests between the two -- sustained grades of about
+    # 7.5-9.5 % at 130 km/h -- could not be met BY ANY POLICY. Found by training
+    # across varied roads: on those grades the baseline itself missed the torque
+    # request by up to 10 %, and the neutral policy scored -0.26 per step instead
+    # of zero. An agent trained there would be paid for covering the load loop's
+    # shortfall, not for protecting the turbine.
+    #
+    # WHY THE MODEL IS SHORT THERE. plant.boost_ceiling_kpa is the pressure ratio
+    # the car was OBSERVED to reach at each flow, and at low flow the car was
+    # never asked for boost -- ten drives of flat-road cruising. The real B58
+    # holds 500 Nm from well below 2000 rpm; this model cannot, and the gearbox
+    # now compensates the way a real automatic does when the pedal outruns the
+    # engine: it kicks down. The cost is stated rather than hidden -- in that
+    # band the model runs one gear lower and about 600 rpm faster than the real
+    # car would need to.
+    #
+    # THE LOCKED CLIMB IS UNCHANGED. 12 % at 130 km/h asks 340 Nm in 7th at
+    # 2706 rpm, where the engine sustains 384; it was already in 7th.
+    DELIVERABLE_TORQUE = (
+        (1000, 237), (1200, 254), (1400, 271), (1600, 288), (1800, 306), (2000, 323),
+        (2200, 341), (2400, 358), (2600, 375), (2800, 391), (3000, 407), (3200, 422),
+        (3400, 436), (3600, 449), (3800, 458), (4000, 466), (4200, 470), (4400, 472),
+        (4600, 470), (4800, 467), (5000, 459), (5200, 447), (5400, 446), (5600, 444),
+        (5800, 442), (6000, 440), (6200, 438), (6400, 435), (6600, 434))
+
+    def shift_ceiling_nm(self, rpm):
+        """Most torque this gear may be asked for before the box hands one back."""
+        r, t = zip(*self.DELIVERABLE_TORQUE)
+        return min(self.SHIFT_LOAD * self.PEAK_TORQUE_NM, float(np.interp(rpm, r, t)))
+
     # Lowest engine speed an upshift may leave the engine at.
     #
     # MEASURED AGAINST THE CAR, 19 September 2026, and it began as an assumption.
@@ -409,10 +451,10 @@ class Vehicle:
                 g = i + 1
         if force_n is None:
             return g
-        ceiling = self.SHIFT_LOAD * self.PEAK_TORQUE_NM
         while g > 0:
             ratio = self.gears[g] * self.final_drive
-            if force_n * self.wheel_r / max(ratio, .1) / 0.92 <= ceiling:
+            rpm_g = v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi)
+            if force_n * self.wheel_r / max(ratio, .1) / 0.92 <= self.shift_ceiling_nm(rpm_g):
                 break
             lower = self.gears[g - 1] * self.final_drive
             if v_mps / self.wheel_r * lower * 60.0 / (2 * np.pi) > self.SHIFT_RPM_MAX:
@@ -800,6 +842,30 @@ class SupervisoryTunerEnv(gym.Env):
         return self._obs(), float(reward), bool(terminated), bool(truncated), info
 
 
+def measure_deliverable_torque(rpms=None, t_amb=315.0, t_block=365.0, settle=30):
+    """Regenerate Vehicle.DELIVERABLE_TORQUE from the plant, as (rpm, Nm) pairs.
+
+    Runs the environment's own load loop at a 1000 Nm request so manifold
+    pressure pins at the boost ceiling, with BaselineECU.step supplying spark
+    and lambda -- knock feedback and enrichment dwell included -- and returns
+    the worst torque over the second half of the settled window.
+    """
+    rpms = list(rpms) if rpms is not None else list(range(1000, 6601, 200))
+    env = SupervisoryTunerEnv(make_grade_climb(duration=60.0, dt=1.0), dt=1.0, seed=0)
+    env.reset(seed=0)
+    iat = charge_temperature(t_amb, t_block)
+    out = []
+    for rpm in rpms:
+        ecu, state, mp_prev, knock, hist = BaselineECU(), {}, 150.0, False, []
+        for _ in range(settle):
+            sp, lam, _ = ecu.step(rpm, mp_prev, iat, t_block, knock, 1.0)
+            r, mp_prev = env._track_torque(1000.0, rpm, iat, t_block, sp, lam, 0.0, state)
+            knock = r["ki"] > 1.0
+            hist.append(r["torque"])
+        out.append((rpm, float(min(hist[settle // 2:]))))
+    return out
+
+
 # ------------------------------------------------------------------ cycles
 def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.0):
     """Sustained mountain grade at motorway speed, 42 C ambient.
@@ -870,6 +936,161 @@ def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.
     g = np.zeros(n)
     g[int(180 / dt):] = grade                    # 3 min flat, then the climb
     return dict(t=t, v_mps=v, grade=g, t_amb=t_amb, p_baro=101.3, humidity=0.012)
+
+
+# ------------------------------------------------------------------ terrain
+# TRAINING ROADS. evaluate.py never sees these; it scores on make_grade_climb's
+# locked climb and its twenty frozen episodes, which this section does not touch.
+#
+# WHY TRAINING NEEDS MORE THAN ONE ROAD. On one fixed climb the grade always
+# arrives at t = 180 s, so the road ahead is the same every episode and a policy
+# can learn the climb by heart. Preview is information about the road ahead;
+# on a road that never changes it carries almost none, and a sighted-versus-
+# blinded ablation trained that way measures memorisation rather than preview.
+# A varied road is what gives the preview channel something to say.
+#
+# WHAT VARIES AND WHAT DOES NOT. Only the elevation profile varies. Speed and
+# ambient stay at the locked values (130 km/h, 42 C) on purpose: the road ahead
+# is the thing preview is about, and varying speed would also move the load and
+# therefore tau, which is Phase F's axis rather than a nuisance to train over.
+#
+# THE LIMITS ARE MEASURED.
+#   Descents stop at -3 %. On a constant grade at 130 km/h the baseline follows
+#   the torque request to within 0.1 Nm down to -4 %, where it asks for 15 Nm.
+#   At -5 % the request turns NEGATIVE (-11.5 Nm); this model has no fuel cut
+#   and the engine cannot deliver negative torque, so the tracking penalty
+#   fires on every step for every policy alike and the neutral reward falls
+#   from -0.002 to -8.0 per step. -3 % keeps a 41 Nm request and a margin.
+#   Climbs run 4-14 %. From the speed-by-grade sweep at 130 km/h the baseline
+#   peaks at 760 C on 6 % and 884 C on 12 %, against the 850 C trigger, so the
+#   range spans roads where protection is wasted fuel and roads where it is
+#   needed. Both kinds have to be in training, or the agent never learns when
+#   NOT to protect.
+#
+# THE FAMILY WEIGHTS ARE A JUDGEMENT, NOT A MEASUREMENT, and are stated so.
+TERRAIN_GRADE_MIN = -0.03
+TERRAIN_GRADE_MAX = 0.14
+TERRAIN_FAMILIES = ("locked", "single", "rolling", "double", "flat")
+TERRAIN_WEIGHTS = (0.15, 0.30, 0.25, 0.20, 0.10)
+TERRAIN_FLAT_START_S = 30.0      # no grade while the car accelerates from rest
+
+
+def _smooth_steps(target, width):
+    """Turn a piecewise-constant grade into linear ramps `width` samples long.
+
+    A box filter applied to a step IS a linear ramp. Real roads change grade
+    over a vertical curve a few hundred metres long -- a few seconds at 130 km/h
+    -- not in one sample, and a step change in grade is a step change in torque
+    demand that no driver would ask for.
+    """
+    width = max(1, int(width))
+    if width == 1:
+        return target
+    pad = np.concatenate([np.full(width, target[0]), target, np.full(width, target[-1])])
+    out = np.convolve(pad, np.ones(width) / width, mode="same")
+    return out[width:-width]
+
+
+def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
+                 family=None, families=TERRAIN_FAMILIES, weights=TERRAIN_WEIGHTS):
+    """One random road for TRAINING, as a cycle dict make_grade_climb's shape.
+
+    Families, one drawn per episode:
+      locked   make_grade_climb itself, so training still contains the exact
+               road the protocol scores on (it was 100 % of training before)
+      single   flat, then one sustained climb of 4-14 % from 60-360 s, then
+               a crest onto a gentle descent or a flat
+      rolling  hills and dips of 40-150 s each, -3 % to +10 %
+      double   a climb, a recovery stretch, and a second climb -- the case
+               where anticipating the SECOND hill matters
+      flat     -1 % to +1 % throughout: protection here only costs fuel
+
+    Grade changes are ramped over 4-12 s. Also returns `family` and `elev_m`,
+    the elevation profile the grades integrate to.
+    """
+    if family is None:
+        family = str(rng.choice(families, p=np.asarray(weights) / np.sum(weights)))
+    n = int(duration / dt)
+    t = np.arange(n) * dt
+
+    if family == "locked":
+        c = make_grade_climb(duration=duration, dt=dt, t_amb=t_amb, v_kmh=v_kmh)
+    else:
+        u = rng.uniform
+        if family == "flat":
+            segs = [(duration, u(-0.01, 0.01))]
+        elif family == "single":
+            t0 = u(60.0, 360.0)
+            climb = u(180.0, max(200.0, duration - t0))
+            segs = [(t0, 0.0), (climb, u(0.04, 0.14)), (duration, u(-0.03, 0.01))]
+        elif family == "rolling":
+            segs, tt = [(TERRAIN_FLAT_START_S, 0.0)], TERRAIN_FLAT_START_S
+            while tt < duration:
+                seg = u(40.0, 150.0)
+                segs.append((seg, u(-0.03, 0.10)))
+                tt += seg
+        elif family == "double":
+            segs = [(u(40.0, 200.0), 0.0), (u(90.0, 240.0), u(0.06, 0.14)),
+                    (u(60.0, 180.0), u(-0.03, 0.02)), (duration, u(0.06, 0.14))]
+        else:
+            raise ValueError(f"unknown terrain family {family!r}")
+
+        target = np.empty(n)
+        i = 0
+        for seg_s, g in segs:
+            j = min(n, i + max(1, int(round(seg_s / dt))))
+            target[i:j] = g
+            i = j
+            if i >= n:
+                break
+        target[i:] = segs[-1][1]
+        g = _smooth_steps(target, u(4.0, 12.0) / dt)
+        g[:int(TERRAIN_FLAT_START_S / dt)] = 0.0
+        g = np.clip(g, TERRAIN_GRADE_MIN, TERRAIN_GRADE_MAX)
+
+        v = np.full(n, v_kmh / 3.6)
+        v[:int(20 / dt)] = np.linspace(0.0, v_kmh / 3.6, int(20 / dt))
+        c = dict(t=t, v_mps=v, grade=g, t_amb=t_amb, p_baro=101.3, humidity=0.012)
+
+    c["family"] = family
+    c["elev_m"] = np.cumsum(c["v_mps"] * dt * c["grade"])
+    return c
+
+
+class TerrainTrainingEnv(SupervisoryTunerEnv):
+    """SupervisoryTunerEnv on a new random road every episode. TRAINING ONLY.
+
+    The road comes from its own random stream, seeded separately from the
+    preference weights, so the two are independent draws. Pass
+    options={"family": "..."} to reset() to force one family.
+
+    Scoring stays on the locked climb: evaluate.py builds SupervisoryTunerEnv
+    on make_grade_climb directly and never constructs this class.
+    """
+
+    _TERRAIN_STREAM = 0x7E4A1   # separates the road stream from the weights stream
+
+    def __init__(self, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
+                 seed=None, families=TERRAIN_FAMILIES, weights=TERRAIN_WEIGHTS, **kw):
+        self.duration, self.v_kmh, self.t_amb = duration, v_kmh, t_amb
+        self.families, self.weights = tuple(families), tuple(weights)
+        self._road_rng = self._make_road_rng(seed)
+        self.road_log = []          # one family name per reset, for train.py's curve
+        super().__init__(make_grade_climb(duration=duration, dt=dt, t_amb=t_amb, v_kmh=v_kmh),
+                         dt=dt, seed=seed, **kw)
+
+    def _make_road_rng(self, seed):
+        return np.random.default_rng(None if seed is None else [int(seed), self._TERRAIN_STREAM])
+
+    def reset(self, *, seed=None, options=None):
+        if seed is not None:
+            self._road_rng = self._make_road_rng(seed)
+        self.cycle = make_terrain(self._road_rng, duration=self.duration, dt=self.dt,
+                                  v_kmh=self.v_kmh, t_amb=self.t_amb,
+                                  family=(options or {}).get("family"),
+                                  families=self.families, weights=self.weights)
+        self.road_log.append(self.cycle["family"])
+        return super().reset(seed=seed, options=options)
 
 
 # ---------------------------------------------------------------------------

@@ -4,25 +4,35 @@ Trains a SAC agent on the engine environment and saves everything Phase D needs.
 
     pip install "stable-baselines3[extra]"      # once; also uncomment it in requirements.txt
 
-    python train.py --steps 50000  --seed 0                # C1: the first bad run
-    python train.py --steps 300000 --seed 0                # C4: a real run
-    python train.py --steps 300000 --seed 0 --no-preview   # the blinded baseline
+    python train.py --steps 50000 --seed 0                 # sighted, a new road every episode
+    python train.py --steps 50000 --seed 0 --no-preview    # the blinded baseline
+    python train.py --steps 50000 --seed 0 --fixed-road    # the locked climb only, as before
+
+Output goes to runs/terrain_dt1/<tag>/, NOT runs/<tag>/ -- see --out below.
+
+WHAT CHANGED ON 27 SEPTEMBER, AND WHY
+-------------------------------------
+Two things, both before any Phase D training on the locked 130 km/h climb:
+
+  * dt = 1.0, passed explicitly. It was never passed, so every earlier run
+    trained at 0.2 s and was scored by evaluate.py at 1.0 s. See build_env.
+  * a new road every episode (engine_env.TerrainTrainingEnv). On one fixed
+    climb the road ahead never changes, so preview has nothing to say.
+    evaluate.py still scores on the locked climb alone.
 
 HOW LONG THIS TAKES — read before you start
 --------------------------------------------
-The environment runs at about 21 steps per second on a laptop, because every
-step evaluates the combustion model several times. Add SAC's own gradient
-updates and the real figure is roughly half that.
+MEASURED 27 September 2026 on the 20-core team machine: 13.7 steps/s for one
+run alone, with SAC's gradient updates running, on the varied roads at
+dt = 1.0. 50 000 steps is about an hour. Ten runs sharing the machine ran at
+about 4.5 steps/s each on 19 September, 173 min for the lot -- about five times
+better than running them one after another. Cap each at OMP_NUM_THREADS=1.
 
-      50,000 steps   ~1.5 hours
-     300,000 steps   ~8 hours
+      50,000 steps    ~1 h alone,   ~3 h with ten sharing a 20-core box
+     300,000 steps    ~6 h alone
 
-Phase D needs FIVE seeds of each of two configurations. Run sequentially that is
-over three days of wall-clock time. Do not do that.
-
-    There are five of you. Each person runs one seed, on their own laptop,
-    overnight. Two nights covers both configurations. Agree who takes which
-    seed BEFORE anyone starts, or you will end up with three copies of seed 0.
+Agree who takes which seed BEFORE anyone starts, or you will end up with three
+copies of seed 0.
 
 Checkpoints are written every 10,000 steps, so a closed laptop costs you minutes
 rather than the whole run. Re-running the same seed resumes from its checkpoint.
@@ -35,7 +45,7 @@ import time
 
 import numpy as np
 
-from engine_env import SupervisoryTunerEnv, make_grade_climb
+from engine_env import SupervisoryTunerEnv, TerrainTrainingEnv, make_grade_climb
 
 try:
     from stable_baselines3 import SAC
@@ -50,9 +60,30 @@ except ImportError:
     )
 
 
-def build_env(use_preview, seed, duration):
-    env = SupervisoryTunerEnv(make_grade_climb(duration=duration),
-                              use_preview=use_preview, seed=seed)
+def build_env(use_preview, seed, duration, dt=1.0, fixed_road=False):
+    """The training environment. dt is passed EXPLICITLY, on both halves.
+
+    Until 27 September this built SupervisoryTunerEnv(make_grade_climb(...))
+    with no dt at all, so both the cycle and the env took their 0.2 s default
+    while evaluate.py scores at 1.0 s. Since AUDIT.md M16 made the slew limit
+    SLEW * dt, the same network output moved each actuator five times further
+    per step at evaluation than it ever could in training: every agent trained
+    before that date was scored in a discretisation it had never seen.
+
+    dt = 1.0 matches the protocol, and it is also five times cheaper per
+    simulated second -- a step costs six combustion evaluations whatever dt is --
+    so the same step budget buys five times the episodes: 50 000 steps is 55
+    episodes of 900 s instead of 11.
+
+    By default every episode is a new road (engine_env.TerrainTrainingEnv).
+    --fixed-road trains on the locked climb alone, as every run before
+    27 September did.
+    """
+    if fixed_road:
+        env = SupervisoryTunerEnv(make_grade_climb(duration=duration, dt=dt), dt=dt,
+                                  use_preview=use_preview, seed=seed)
+    else:
+        env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
     return Monitor(env)
 
 
@@ -66,32 +97,43 @@ def main():
                     help="episode length in seconds; 900 is the standard scenario")
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
-    ap.add_argument("--out", default="runs")
+    ap.add_argument("--dt", type=float, default=1.0,
+                    help="step length in seconds; 1.0 is what evaluate.py scores at")
+    ap.add_argument("--fixed-road", action="store_true",
+                    help="train on the locked climb only, as runs before 27 Sep did")
+    # NOT "runs". train.py resumes from any checkpoint in its output folder, and
+    # runs/ holds the ten agents trained at 110 km/h and dt = 0.2 on 19 September.
+    # Pointing a new run there would silently CONTINUE one of those instead of
+    # starting fresh on the new roads.
+    ap.add_argument("--out", default=None,
+                    help="default runs/terrain_dt1, or runs/locked_dt1 with --fixed-road")
     a = ap.parse_args()
+    if a.out is None:
+        a.out = os.path.join("runs", ("locked" if a.fixed_road else "terrain")
+                             + f"_dt{a.dt:g}".replace(".", "p"))
 
     tag = f"{'blind' if a.no_preview else 'sighted'}_seed{a.seed}"
     outdir = os.path.join(a.out, tag)
     os.makedirs(outdir, exist_ok=True)
 
     print(f"configuration : {'BLINDED (no preview)' if a.no_preview else 'sighted'}")
+    print(f"roads         : {'the locked climb only' if a.fixed_road else 'a new road every episode'}")
+    print(f"step          : dt = {a.dt:g} s, {a.duration / a.dt:.0f} steps per episode, "
+          f"{a.steps / (a.duration / a.dt):.0f} episodes")
     print(f"seed          : {a.seed}")
     print(f"steps         : {a.steps:,}")
-    # MEASURED, not guessed. The old formula assumed 10.75 effective steps/s and
-    # under-estimated by 3.6x. Timed on 8 September on one CPU core, after the
-    # engine-geometry correction: the environment alone runs at 19.5 steps/s,
-    # and SAC's gradient updates bring the training loop down to 3.0 steps/s.
-    # 3200 steps took 18 minutes; 50000 steps takes about 4.6 hours.
-    #
-    # Re-measure if you change the plant or move to a GPU. An estimate that is
-    # wrong by a factor of four is how five people plan an evening around a run
-    # that is still going at breakfast.
-    STEPS_PER_S = 3.0
+    # MEASURED 27 September 2026, one run alone on the team machine, gradient
+    # updates running, varied roads at dt = 1.0: 13.7 steps/s. This read 3.0
+    # until then, a figure the sep17 branch had already shown was 6x too slow.
+    # Re-measure if you change the plant or move machines; with ten runs
+    # sharing one box, expect about a third of this each.
+    STEPS_PER_S = 13.7
     mins_est = a.steps / STEPS_PER_S / 60
     print(f"estimate      : about {mins_est:.0f} minutes "
           f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on CPU")
     print(f"output        : {outdir}/\n")
 
-    env = build_env(not a.no_preview, a.seed, a.duration)
+    env = build_env(not a.no_preview, a.seed, a.duration, a.dt, a.fixed_road)
 
     ckpt_path = os.path.join(outdir, "checkpoint.zip")
 
@@ -134,24 +176,31 @@ def main():
     # the learning curve — Monitor recorded every episode return
     rewards = np.array(env.get_episode_rewards(), dtype=float)
     lengths = np.array(env.get_episode_lengths(), dtype=float)
-    np.savetxt(os.path.join(outdir, "curve.csv"),
-               np.column_stack([np.arange(len(rewards)), rewards, lengths]),
-               delimiter=",", header="episode,return,length", comments="")
+    # The road each episode ran on. Returns from different roads are not on one
+    # scale -- a flat road has nothing to protect -- so the curve is only
+    # readable with the road beside it. road_log[i] is episode i's road; it has
+    # one entry more than there are finished episodes, because the last reset
+    # starts an episode that learn() never finishes.
+    log = list(getattr(env.unwrapped, "road_log", []))
+    roads = [log[i] if i < len(log) else ("locked" if a.fixed_road else "?")
+             for i in range(len(rewards))]
+    with open(os.path.join(outdir, "curve.csv"), "w") as fh:
+        fh.write("episode,return,length,road\n")
+        for i, (r, n) in enumerate(zip(rewards, lengths)):
+            fh.write(f"{i},{r:.6f},{n:.0f},{roads[i]}\n")
 
     print(f"\ntrained in {mins:.0f} min | {len(rewards)} episodes")
-    if len(rewards) >= 10:
-        first = float(np.mean(rewards[:5]))
-        last = float(np.mean(rewards[-5:]))
-        print(f"mean return: first 5 episodes {first:+.2f}  ->  last 5 {last:+.2f}")
-        if last <= first:
-            print("\n  The curve did not improve. Before changing anything else:")
-            print("    1. re-run test_reward.py — a broken reward trains normally and means nothing")
-            print("    2. if that passes, divide the learning rate by 3 (--lr 1e-4)")
-            print("    3. if it still will not learn, cut the action space: fix lambda")
-            print("       at nominal and let the agent control only spark and boost trim.")
-        else:
-            print("\n  The curve improved. 'Flat at the end and above zero' is the only")
-            print("  stopping criterion you need — if it is still climbing, train longer.")
+    # This used to compare the first five episode returns with the last five
+    # and call the curve improved. It cannot say that: every episode draws new
+    # preference weights, and now a new road, so consecutive returns are scored
+    # with different rulers. On 19 September eleven episodes ranged -506 to
+    # +644 and the largest was in the FIRST five (evaluate.py's docstring).
+    # Learning is judged on the frozen episodes and nowhere else.
+    print("\n  Episode returns vary with the road and the preference weights, so this")
+    print("  curve cannot show learning. Score the run with evaluate.py:")
+    print(f"      python evaluate.py {outdir}")
+    print("  If the agent does not beat the baseline there, re-run test_reward.py")
+    print("  before changing anything else -- a broken reward trains normally.")
 
     try:
         import matplotlib

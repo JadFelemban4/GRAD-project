@@ -237,7 +237,7 @@ def curves():
         blind = tag.startswith("blind")
         col = ORANGE if blind else BLUE
         lbl = "blinded (no preview)" if blind else "sighted (preview)"
-        d = np.loadtxt(f, delimiter=",", skiprows=1)
+        d = np.loadtxt(f, delimiter=",", skiprows=1, usecols=(0, 1, 2))
         ax.plot(d[:, 0], d[:, 1], color=col, lw=1.6, alpha=0.65, zorder=3,
                 marker="o", ms=4, label=None if lbl in seen else lbl)
         seen.add(lbl)

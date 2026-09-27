@@ -21,13 +21,28 @@ TWO THINGS THIS FILE EXISTS TO STOP YOU GETTING WRONG
    puts the grade at t = 180 s, so a 60 s episode never reaches it, nothing ever
    gets hot, and every policy scores about the same. Short-episode checks tell
    you nothing.
+
+THE TRAINING ROADS ARE CHECKED TOO (27 September 2026). A reward is only safe
+relative to the dynamics it scores (mistake 5), and train.py now trains across
+varied roads (engine_env.TerrainTrainingEnv) at dt = 1.0. The first sample of
+those roads found grades of about 9 % at 130 km/h where the baseline itself
+could not deliver the torque request and the neutral policy scored -0.26 per
+step. The gearbox fix is guarded here by a road sitting in that band, and every
+road family is checked for neutral-about-zero and a punished starver.
 """
 import argparse
+from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 
-from engine_env import (SupervisoryTunerEnv, make_grade_climb,
-                        neutral_action)
+from engine_env import (SupervisoryTunerEnv, TerrainTrainingEnv, Vehicle,
+                        make_grade_climb, measure_deliverable_torque,
+                        neutral_action, TRACK_TOL)
+
+# The grade the old shift rule could not serve at 130 km/h: 8th gear is asked
+# for 366 Nm, under the 375 Nm downshift threshold, where the modelled engine
+# sustains 333. With the deliverable-torque rule the box hands back 7th.
+BAND_GRADE = 0.093
 
 
 def true_neutral():
@@ -86,11 +101,41 @@ def obs_differs_without_preview(duration):
     return float(np.max(np.abs(seen[0] - seen[1]))), seen
 
 
+def road_roll(job):
+    """One road at dt = 1.0, the step train.py uses. Returns mean reward and the
+    p95 torque-tracking error, in the same units as the reward's tolerance band."""
+    kind, seed, policy, duration = job
+    act = true_neutral() if policy == "neutral" else torque_starver()
+    if kind == "band":
+        c = make_grade_climb(duration=duration, dt=1.0)
+        c["grade"][30:] = BAND_GRADE
+        env = SupervisoryTunerEnv(c, dt=1.0, seed=seed)
+        env.reset(seed=seed)
+    else:
+        env = TerrainTrainingEnv(duration=duration, dt=1.0, seed=seed)
+        env.reset(seed=seed, options={"family": kind})
+    rs, errs = [], []
+    while True:
+        _, r, term, trunc, info = env.step(act)
+        rs.append(r)
+        errs.append(abs(info["torque_req"] - info["torque"]) / max(info["torque_req"], 40.0))
+        if term or trunc:
+            break
+    return kind, policy, float(np.mean(rs)), float(np.percentile(errs, 95))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--duration", type=float, default=300.0)
     a = ap.parse_args()
     dur = a.duration
+
+    # The training-road rollouts are independent; run them while the rest runs.
+    roads = [("band", 0, "neutral", 300.0)] + [
+        (fam, 11, "neutral", 600.0) for fam in ("single", "rolling", "double", "flat")] + [
+        ("rolling", 11, "starver", 600.0)]
+    pool = ProcessPoolExecutor(max_workers=len(roads))
+    road_futs = [pool.submit(road_roll, j) for j in roads]
 
     neutral = true_neutral()
     print(f"episode length : {dur:.0f} s   (grade starts at 180 s)")
@@ -107,6 +152,19 @@ def main():
         dur)
     d_prev, _ = obs_differs_without_preview(dur)
 
+    # The shift rule's table must still describe the plant it was measured on.
+    probe = [1600, 2200, 2600, 3200, 4400]
+    table = dict(Vehicle.DELIVERABLE_TORQUE)
+    fresh = dict(measure_deliverable_torque(probe))
+    drift = max(abs(fresh[r] - table[r]) / table[r] for r in probe)
+
+    road = {(k, p): (r, e) for k, p, r, e in (f.result() for f in road_futs)}
+    pool.shutdown()
+    band_r, band_e = road[("band", "neutral")]
+    fams = ("single", "rolling", "double", "flat")
+    worst_fam = max(fams, key=lambda f: abs(road[(f, "neutral")][0]))
+    r_roll_n, r_roll_s = road[("rolling", "neutral")][0], road[("rolling", "starver")][0]
+
     checks = [
         ("neutral action scores about zero",
          abs(r_neutral) < 0.05,
@@ -121,6 +179,19 @@ def main():
         ("rewards are finite",
          all(np.isfinite(x) for x in (r_neutral, r_starve, r_random)),
          f"{n1}, {n2}, {n3} steps"),
+        ("gearbox table still matches the plant",
+         drift < 0.015,
+         f"worst drift {100 * drift:.2f} % at {len(probe)} speeds   (want < 1.5 %)"),
+        (f"baseline delivers torque on a {100 * BAND_GRADE:.1f} % grade",
+         band_e < TRACK_TOL and abs(band_r) < 0.05,
+         f"p95 tracking error {band_e:.3f}, neutral {band_r:+.5f}   (was 0.09 before)"),
+        ("neutral scores about zero on every training road",
+         all(abs(road[(f, "neutral")][0]) < 0.05 for f in fams),
+         f"worst {worst_fam} {road[(worst_fam, 'neutral')][0]:+.5f}   "
+         + "  ".join(f"{f} {road[(f, 'neutral')][1]:.3f}" for f in fams) + "  (p95 err)"),
+        ("refusing torque is punished on a training road",
+         r_roll_s < r_roll_n - 0.02,
+         f"starver {r_roll_s:+.5f}  vs  neutral {r_roll_n:+.5f}   (rolling hills)"),
     ]
 
     print(f"{'check':46s} {'result':>7}   detail")
