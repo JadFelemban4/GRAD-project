@@ -87,9 +87,20 @@ LOG_FULL = os.path.join(ROOT, "logs", "raw", "7475b5d7-20260908_142743.csv")
 #     pull01    601.4 -> 608.0 C      7475b5d7  884.9 -> 890.6 C
 # No alert count moves. The residual discretisation error at 0.25 deg is ~7 K,
 # which is why these are pinned to 0.5 K and not finer.
+# ---------------------------------------------------------------------------
+#
+# MOVED 27 SEPTEMBER by the spark-map refit (engine_env.BaselineECU.SPARK_A,
+# 26.18 -> 13.33). pull01 logs no spark, so the fallback path runs:
+#     pull01    608.0 -> 609.2 C      7475b5d7  890.6 C, unchanged
+# Under boost the knock limit still sets the fallback spark, unchanged. At part
+# load the refitted line now sets it -- it sat above the knock limit before and
+# was never used -- a few degrees less advanced, so the part-load EGT feeding
+# the turbine node runs slightly hotter between pulls. 7475b5d7 reports its own
+# spark and never takes the fallback, and its peak did not move: the estimator's
+# physics is unchanged. No alert count moves.
 EXPECT_FAST = {           # pull01, 7 channels, 1.45 s per channel
     "rows": 2193, "estimated": 2186,
-    "peak_turb_c": 608.0, "thermal": 1, "mismatch": 0, "novel": 4,
+    "peak_turb_c": 609.2, "thermal": 1, "mismatch": 0, "novel": 4,
 }
 EXPECT_FULL = {           # 7475b5d7, 26 channels, 7.5 s per channel
     "rows": 14340, "estimated": 14278,

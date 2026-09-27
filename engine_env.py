@@ -67,7 +67,41 @@ class BaselineECU:
     the agent has to work against.
     """
     # Fitted 2026-09-07 on 11 steady points, 1551-4185 rpm, 43-79 kPa.
-    SPARK_A = 26.18       # was 34.0
+    #
+    # SPARK_A REFITTED 27 September 2026 -- the offset only; B and C are the
+    # 7 September slopes, untouched. Two defects, one fix:
+    #
+    # 1. THE INPUT MOVED AND THE CONSTANT DID NOT. The map was fitted with
+    #    iat_compensation() reading the pre-throttle sensor. Mistake 13 showed
+    #    that sensor is a compressor outlet and switched the compensation to
+    #    plant.charge_temperature() -- 47-57 C at the steady points instead of
+    #    58-86 C, about 3 deg less retard -- but SPARK_A was never refitted.
+    #
+    # 2. THE FITTED LINE WAS NEVER IN USE. At 26.18 it sat a median 9.6 deg
+    #    ABOVE knock_limited_spark() at every one of the 26 pooled steady
+    #    points, so min() handed spark to the knock limit everywhere at part
+    #    load. The baseline's part-load spark was the model's Douaud-Eyzat
+    #    surface -- the knock model that has no detectable relationship with
+    #    the car's own retard -- plus compensation. Its apparent agreement with
+    #    the car was a coincidence of the two errors.
+    #
+    # Refitted on the 26 pooled points, 30-75 kPa, six drives, with the
+    # compensation on the modelled charge temperature (model_vs_data.py):
+    #
+    #                                  bias      RMS    line sets spark at
+    #     26.18, as the env ran it    +3.16 deg  4.00       0 of 26 points
+    #     13.33, refitted             -0.08 deg  2.51      25 of 26 points
+    #
+    # Leave-one-drive-out RMS 0.08-3.27 deg. Per-drive bias -1.92 to +0.79.
+    #
+    # WHY ONLY THE OFFSET. Refitting all three constants reaches RMS 2.29 deg,
+    # but its load slope comes out at 0.209 deg/kPa, and extended into boost
+    # that line falls BELOW the knock limit -- a median -10.8 deg above 180 kPa
+    # where the car runs 0 deg, and 3.8 deg at the locked climb where the knock limit
+    # gives 5.8. That is mistake 6: a part-load fit setting spark in boost. With
+    # the 7 September slopes the line stays above the knock limit throughout
+    # boost, so the climb is still knock-limited exactly as before.
+    SPARK_A = 13.33       # was 26.18 until 27 Sep; 34.0 before 7 Sep
     SPARK_B = 0.00695     # was 0.0028   per rpm
     SPARK_C = 0.1307      # was 0.155    per kPa above 40
     SPARK_MIN = -10.0     # was +2.0     measured minimum -9 deg at full load
