@@ -237,7 +237,12 @@ class BaselineECU:
             rpm \\ dwell     0-4 s    4-8 s    8+ s      n
             1000-3500 rpm     0.99     0.99    0.98    441
             3500-4500 rpm     0.99     0.98    0.90    235
-            4500-7000 rpm     0.98     0.87    0.79    665
+            4500-7000 rpm     0.98     0.83    0.79    665
+
+        Dwell in seconds from the TIMESTAMPS (verify_docs.dwell_column). One
+        cell read 0.87 here until 27 September: 4500-7000 rpm at 4-8 s had been
+        tabulated on the row-count dwell axis AUDIT.md H3 retired, and was never
+        regenerated after it. The other eight cells read the same on both axes.
 
         Read across the bottom row: at the same load, the car runs
         stoichiometric for the first seconds of a pull and only enriches once it
@@ -255,11 +260,17 @@ class BaselineECU:
         temperature, which this vehicle does not expose. Dwell above 180 kPa is
         a proxy for it. State the proxy in Chapter 3.
 
-        Model against the enlarged table: at 5500 rpm and 12 s dwell it gives
-        0.81 against a measured 0.79; at 4500-7000 rpm and 6 s it gives 0.89
-        against 0.87; below 3500 rpm it gives 1.00 against 0.98-0.99. The
-        weakest cell is 3500-4500 rpm at long dwell, where the model reads 0.93
-        against a measured 0.90.
+        Model against the table, every sample scored at its own speed and dwell
+        (model_vs_data.py): within 0.02 of the car in seven cells, 0.033 lean at
+        3500-4500 rpm and long dwell, and 0.076 LEAN at 4500-7000 rpm and 4-8 s,
+        where the car reads 0.83 and the model a median 0.906. The car enriches
+        sooner into a pull than ENR_DWELL_LO/HI say -- and those two constants
+        were fitted on the retired row-count axis, which overstated dwell on the
+        fast-logging drives. They are NOT refitted here: that cell holds 142
+        forward-filled rows, a few dozen independent readings at most
+        (AUDIT.md H4), which is too thin to move a calibration on. It barely
+        matters for Phase D: enrichment needs 180 kPa AND 3300 rpm, and the
+        locked climb runs 178 kPa at 2706 rpm, so it never enriches there.
         """
         if self.enrichment_map:            # v1, kept only for before/after work
             if map_kpa <= 120.0:

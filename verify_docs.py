@@ -432,6 +432,15 @@ RETIRED = [
     (r"16\.5\s*(?:->|→)\s*18\.0\s*(?:->|→)\s*26\.0",
      "the H2 table measured against a cooling-disabled baseline (C1)",
      "run generality_test.py"),
+    # --- added 27 September 2026. The enrichment cell table was never
+    # regenerated after AUDIT.md H3 moved dwell onto the timestamps, and the
+    # README copy of it was shielded by a section-wide RETIRED-OK. Both claims
+    # below were live in two documents.
+    (r"within 0\.027", "every enrichment cell within 0.027 (row-count dwell axis)",
+     "worst cell 0.076 lean, 4500-7000 rpm at 4-8 s (model_vs_data.py)"),
+    (r"4500\s*[-–]\s*7000[^\n]{0,24}?\b0\.98\b[^\n]{0,8}?\b0\.87\b",
+     "the 4500-7000 rpm, 4-8 s enrichment cell at 0.87 (row-count dwell axis)",
+     "0.83, dwell from the timestamps"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to

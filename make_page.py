@@ -153,12 +153,17 @@ def model_vs_car():
                          worst=_r(E["worst_abs"], 3), n=E["n"])
 
     Sp = R["spark"]
-    out["spark"] = dict(points=[[_r(p["meas"], 1), _r(p["at_fit"], 1), _r(p["as_run"], 1),
+    out["spark"] = dict(points=[[_r(p["meas"], 1), _r(p["before"], 1), _r(p["after"], 1),
                                  _r(p["rpm"], 0), _r(p["map_kpa"], 1)]
                                 for p in Sp["points"]],
-                        fit=dict((k, _r(v, 2)) for k, v in Sp["at_fit"].items()),
-                        run=dict((k, _r(v, 2)) for k, v in Sp["as_run"].items()),
+                        before=dict((k, _r(v, 2)) for k, v in Sp["before"].items()),
+                        after=dict((k, _r(v, 2)) for k, v in Sp["after"].items()),
+                        a_before=Sp["spark_a_before"], a_after=Sp["spark_a_after"],
                         n=len(Sp["points"]))
+
+    out["oil"] = {o["variant"].split()[0]: dict((k, _r(v, 1)) for k, v in o.items()
+                                                if k != "variant")
+                  for o in R.get("oil_sensitivity", [])}
 
     th = {}
     for key, name, step in (("drive10-20260918_233912.csv", "drive10", 3),
@@ -228,6 +233,29 @@ def model_vs_car():
     return out
 
 
+def training_roads():
+    """The roads train.py draws from, as check_roads.py drove them."""
+    path = os.path.join(RES, "training_roads.json")
+    if not os.path.exists(path):
+        raise SystemExit("results/training_roads.json missing -- run check_roads.py")
+    T = _load("training_roads.json")
+    pick = {}
+    for r in T["roads"]:
+        pick.setdefault(r["family"], r)
+    fams = ["locked", "single", "rolling", "double", "flat"]
+    count = {f: sum(r["family"] == f for r in T["roads"]) for f in fams}
+    return dict(examples=[dict(family=f, elev=pick[f]["elev_m"], grade=pick[f]["grade"],
+                               gmax=_r(100 * pick[f]["grade_max"], 1))
+                          for f in fams if f in pick],
+                roads=[dict(family=r["family"], peak=_r(r["peak_c"], 0),
+                            gmin=_r(100 * r["grade_min"], 1), gmax=_r(100 * r["grade_max"], 1),
+                            r=_r(r["neutral_r"], 4))
+                       for r in T["roads"]],
+                count=count, n=T["n"], binding=T["binding"],
+                worst_r=_r(T["worst_neutral_r"], 4), worst_err=_r(T["worst_p95_err"], 3),
+                tol=T["tolerance"], step_s=5)
+
+
 def meta():
     def git(*a):
         try:
@@ -278,7 +306,7 @@ def render(template, data):
 
 
 def main():
-    data = dict(meta=meta(), pd=phase_d(), mc=model_vs_car())
+    data = dict(meta=meta(), pd=phase_d(), mc=model_vs_car(), roads=training_roads())
     with open(os.path.join(PAGE, "template.html"), encoding="utf-8") as fh:
         tpl = fh.read()
     html = render(tpl, data)

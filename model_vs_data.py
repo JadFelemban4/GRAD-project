@@ -181,40 +181,54 @@ def enrichment(S):
 
 
 # ================================================================== spark
+# RETIRED-OK: the spark map's offset until 27 September, kept ONLY so the
+# comparison can draw what the environment commanded before the refit. See
+# engine_env.BaselineECU.SPARK_A for why it moved.
+SPARK_A_BEFORE = 26.18
+
+
 def spark(P):
     """Commanded part-load spark against logged spark at every operating point.
 
-    THREE VERSIONS, because they tell apart two things that look like one.
-    BaselineECU commands base_spark() PLUS iat_compensation(), and the map's
-    constants were fitted with the compensation fed by the PRE-THROTTLE sensor
-    -- before mistake 13 showed that sensor is a compressor outlet. The
-    environment now feeds the compensation plant.charge_temperature() instead,
-    which is right, but the map was not refitted after the input moved.
+    Both versions are what BaselineECU actually commands -- base_spark(), the
+    lesser of the fitted line and the knock limit, PLUS iat_compensation() on
+    the modelled charge temperature:
 
-      at_fit    compensation at the pre-throttle sensor: how the map was fitted
-      as_run    compensation at the modelled charge: what the simulator commands
-      base      base_spark() alone, no compensation: for reference only
+      before   SPARK_A as it stood until 27 September. The fitted line sat above
+               the knock limit at every point, so the knock limit set spark.
+      after    SPARK_A as shipped, refitted on these points.
+
+    `line` records whether the fitted line or the knock limit set the value.
     """
     from engine_env import BaselineECU
     from plant import charge_temperature
     ecu = BaselineECU()
+
+    def command(a, rpm, mp, comp):
+        line = a + ecu.SPARK_B * rpm - ecu.SPARK_C * (mp - 40.0)
+        kl = ecu.knock_limited_spark(rpm, mp)
+        v = float(np.clip(min(line, kl), ecu.SPARK_MIN, ecu.SPARK_MAX)) + comp
+        return v, bool(line <= kl)
+
     pts = []
     for _, r in P.iterrows():
-        if not (np.isfinite(r.spark) and np.isfinite(r.iat_pre)):
+        if not np.isfinite(r.spark):
             continue
         amb = (r.t_amb if np.isfinite(r.t_amb) else 25.0) + 273.15
         ect = (r.ect if np.isfinite(r.ect) else 90.0) + 273.15
-        base = ecu.base_spark(r.rpm, r.map_kpa)
-        pts.append(dict(rpm=r.rpm, map_kpa=r.map_kpa, meas=r.spark, base=base,
-                        as_run=base + ecu.iat_compensation(charge_temperature(amb, ect)),
-                        at_fit=base + ecu.iat_compensation(r.iat_pre + 273.15)))
+        comp = ecu.iat_compensation(charge_temperature(amb, ect))
+        before, line_b = command(SPARK_A_BEFORE, r.rpm, r.map_kpa, comp)
+        after, line_a = command(ecu.SPARK_A, r.rpm, r.map_kpa, comp)
+        pts.append(dict(rpm=r.rpm, map_kpa=r.map_kpa, meas=r.spark,
+                        before=before, after=after, line_before=line_b, line_after=line_a))
 
     def stats(key):
         e = np.array([p[key] - p["meas"] for p in pts])
         return dict(mean=float(e.mean()), mae=float(np.abs(e).mean()),
-                    rmse=float(np.sqrt((e ** 2).mean())))
-    return dict(points=pts, as_run=stats("as_run"), at_fit=stats("at_fit"),
-                base=stats("base"))
+                    rmse=float(np.sqrt((e ** 2).mean())),
+                    line_sets=int(sum(p["line_" + key] for p in pts)))
+    return dict(points=pts, before=stats("before"), after=stats("after"),
+                spark_a_before=SPARK_A_BEFORE, spark_a_after=ecu.SPARK_A)
 
 
 # ========================================== thermal replay, and knock (heavy)
@@ -287,6 +301,65 @@ def replay(source):
         out["v"].append(v * 3.6)
         out["egt"].append(o["egt_c"])
     return source, out
+
+
+OIL_VARIANTS = ("as shipped", "half fuel-to-oil share", "double oil capacity",
+                "block pinned to measured coolant")
+
+
+def oil_variant(variant, source="7475b5d7-20260908_142743.csv"):
+    """Which assumption drives the model's oil spikes on hard pulls?
+
+    The same free-running replay as replay(), with one thing changed at a time:
+    the ASSUMED share of fuel energy reaching the oil halved, the ASSUMED oil
+    heat capacity doubled, or the block node pinned to the measured coolant so
+    the unidentifiable radiator drops out. None of these is a proposed value --
+    it is a sensitivity test, and it says what a sustained-load drive would
+    have to measure.
+    """
+    from plant import predict, charge_temperature
+    from thermal import ThermalNetwork, ThermalParams
+    from engine_env import BaselineECU, GEO
+    p = ThermalParams()
+    if variant == "half fuel-to-oil share":
+        p.frac_fuel_to_oil *= 0.5
+    elif variant == "double oil capacity":
+        p.c_oil *= 2.0
+    S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
+    d = S[S.source == source].sort_values("t").reset_index(drop=True)
+    for col in ("ect_c", "oil_c", "t_amb"):
+        d.loc[d[col] == 0.0, col] = np.nan                     # AUDIT.md M8
+    t0 = d.t.iloc[0]
+    grid = np.arange(0.0, d.t.iloc[-1] - t0, 1.0)
+    d = d.iloc[np.clip(np.searchsorted(d.t.to_numpy() - t0, grid, side="right") - 1,
+                       0, len(d) - 1)].reset_index(drop=True)
+    tn, ecu = ThermalNetwork(p), BaselineECU()
+    tn.reset(t_amb=float(d.t_amb.dropna().iloc[0]) + 273.15, warm=True)
+    tn.t_block = float(d.ect_c.dropna().iloc[0]) + 273.15
+    tn.t_oil = float(d.oil_c.dropna().iloc[0]) + 273.15
+    oil_m, oil_c, gap = [], [], []
+    for _, r in d.iterrows():
+        if not (np.isfinite(r.rpm) and r.rpm > 400 and np.isfinite(r.map_kpa)):
+            continue
+        amb = (r.t_amb if np.isfinite(r.t_amb) else 30.0) + 273.15
+        if variant == "block pinned to measured coolant" and np.isfinite(r.ect_c):
+            tn.t_block = r.ect_c + 273.15
+        t_ch = charge_temperature(amb, tn.t_block)
+        _, lam_e, fan = ecu.step(r.rpm, r.map_kpa, t_ch, tn.t_block, False, 1.0)
+        lam = r.lam if np.isfinite(r.lam) and 0.5 < r.lam < 1.5 else lam_e
+        o = predict(rpm=r.rpm, map_kpa=r.map_kpa, iat_k=t_ch, ect_k=tn.t_block,
+                    spark_btdc=r.spark if np.isfinite(r.spark) else 20.0, lam=lam, geo=GEO)
+        f = o["mdot_fuel_gps"]
+        tn.step(1.0, f, f * 15.0, o["egt_c"] + 273.15, amb,
+                (r.v_kmh if np.isfinite(r.v_kmh) else 0.0) / 3.6, fan)
+        oil_m.append(tn.t_oil - 273.15)
+        oil_c.append(r.oil_c)
+        gap.append(tn.t_oil - tn.t_block)
+    om, oc = np.array(oil_m), np.array(oil_c, dtype=float)
+    ok = np.isfinite(oc)
+    return dict(variant=variant, peak_model=float(om.max()), peak_car=float(np.nanmax(oc)),
+                max_gap=float(np.max(gap)),
+                rmse=float(np.sqrt(np.mean((om[ok] - oc[ok]) ** 2))))
 
 
 def knock_all_samples():
@@ -403,6 +476,8 @@ def _heavy(job):
         return kind, load_residual()
     if kind == "literature":
         return kind, literature()
+    if kind == "oil":
+        return kind, oil_variant(arg)
     if kind == "duty":
         S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
         return kind, duty_cycle(S)
@@ -417,19 +492,22 @@ def main():
 
     jobs = [("replay", "drive10-20260918_233912.csv"),
             ("replay", "7475b5d7-20260908_142743.csv"),
-            ("knock", None), ("load", None), ("literature", None), ("duty", None)]
-    with ProcessPoolExecutor(max_workers=len(jobs)) as ex:
+            ("knock", None), ("load", None), ("literature", None), ("duty", None)] + [
+            ("oil", v) for v in OIL_VARIANTS]
+    with ProcessPoolExecutor(max_workers=min(10, len(jobs))) as ex:
         futs = [ex.submit(_heavy, j) for j in jobs]
         res["boost"] = boost_gap(S)
         res["enrichment"] = enrichment(S)
         res["spark"] = spark(P)
         res["gearbox"] = gearbox(S)
         res["envelope"] = envelope(S)
-        res["thermal"] = {}
+        res["thermal"], res["oil_sensitivity"] = {}, []
         for f in futs:
             kind, val = f.result()
             if kind == "replay":
                 res["thermal"][val[0]] = val[1]
+            elif kind == "oil":
+                res["oil_sensitivity"].append(val)
             else:
                 res[kind] = val
 
@@ -450,10 +528,11 @@ def main():
     print(f"  enrichment, worst cell |model - meas|   {E['worst_abs']:6.3f}       "
           "0.027 (on the retired row-count dwell axis, AUDIT.md H3)")
     Sp = res["spark"]
-    print(f"  spark, as fitted (sensor T), RMS        {Sp['at_fit']['rmse']:6.2f} deg   "
-          f"mean {Sp['at_fit']['mean']:+.2f}")
-    print(f"  spark, as the simulator runs it, RMS    {Sp['as_run']['rmse']:6.2f} deg   "
-          f"mean {Sp['as_run']['mean']:+.2f}   <- not refitted after mistake 13")
+    n_sp = len(Sp["points"])
+    print(f"  spark before the 27 Sep refit, RMS      {Sp['before']['rmse']:6.2f} deg   "
+          f"mean {Sp['before']['mean']:+.2f}   line sets {Sp['before']['line_sets']} of {n_sp}")
+    print(f"  spark as shipped, RMS                   {Sp['after']['rmse']:6.2f} deg   "
+          f"mean {Sp['after']['mean']:+.2f}   line sets {Sp['after']['line_sets']} of {n_sp}")
     print(f"  knock integral vs retard, correlation   {K['corr']:+6.3f}       -0.149")
     print(f"    paired samples                        {K['n']:6d}       13 592")
     print(f"  gearbox, samples within 4 % of a ratio  {res['gearbox']['within4_pct']:6.1f} %     86.7 %")
@@ -465,6 +544,9 @@ def main():
         print(f"  thermal, {src[:8]}  oil  model-meas median {np.median(om[ok_o] - oo[ok_o]):+6.1f} K"
               f"   max meas {np.nanmax(oo):.0f} C, max model {np.nanmax(om):.0f} C")
         print(f"                      coolant model-meas median {np.median(em[ok_e] - eo[ok_e]):+6.1f} K")
+    for o in res["oil_sensitivity"]:
+        print(f"  oil on 7475b5d7, {o['variant']:<34} peak {o['peak_model']:6.1f} C "
+              f"(car {o['peak_car']:.0f}), oil-block gap {o['max_gap']:5.1f} K, RMSE {o['rmse']:4.1f} K")
     D = res["duty"]
     print(f"  scenario operating point                {D['scenario_rpm']:.0f} rpm, {D['scenario_map']:.0f} kPa")
     print(f"  logged moving samples at or above it    {D['frac_logs_at_or_above_scenario']:6.2f} %")

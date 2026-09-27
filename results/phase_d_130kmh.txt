@@ -1,95 +1,74 @@
 PHASE D EVALUATION -- 20 FIXED EPISODES, frozen 18 Sep 2026
 scenario: 12 % at 130 km/h, 42 C, 720 s, dt 1.0
 trigger:  850 C
-run:      21 September 2026, all ten existing agents, parallel driver
-          over evaluate.EPISODES and evaluate.run_episode unchanged
+run:      27 September 2026, on the simulator AFTER the gearbox and spark
+          fixes (commits c6e9e03, 0d8e6ca); all ten existing agents,
+          evaluate.EPISODES and evaluate.run_episode unchanged behind a
+          parallel driver
 
 policy                    damage med     IQR    worst  fuel med  peak C   cuts %
 --------------------------------------------------------------------------------
-baseline ECU                   959.8     0.0    959.8      4664     884      0.0
-reactive                       679.0     0.0    679.0      4843     862     29.3
-current-grade                  633.2     0.0    633.2      4936     861     34.0
-predictive (hand)              637.4     0.0    637.4      4941     861     33.6
-sighted_seed0                  528.7    14.1    549.9      4566     852     44.9
-sighted_seed1                  503.7    15.5    549.9      4599     852     47.5
-sighted_seed2                  283.0    26.2    370.7      5429     826     70.5
-sighted_seed3                  392.5   112.2    546.3      5185     853     59.1
-sighted_seed4                  341.1    14.8    417.1      5125     830     64.5
-blind_seed0                    527.1    60.6    552.3      4578     852     45.1
-blind_seed1                    510.2    28.2    541.3      4549     852     46.8
-blind_seed2                    280.5    86.7    419.3      5100     832     70.8
-blind_seed3                    341.2    52.1    457.5      5275     842     64.4
-blind_seed4                    346.4    91.2    507.4      4737     852     63.9
+baseline ECU                   951.9     0.0    951.9      4664     884      0.0
+reactive                       671.1     0.0    671.1      4843     862     29.5
+current-grade                  624.5     0.0    624.5      4936     861     34.4
+predictive (hand)              628.4     0.0    628.4      4941     861     34.0
+sighted_seed0                  523.0    12.2    565.8      4566     852     45.1
+sighted_seed1                  504.0     9.7    545.2      4601     852     47.1
+sighted_seed2                  281.1    26.3    359.3      5429     826     70.5
+sighted_seed3                  378.1   116.7    543.9      5186     853     60.3
+sighted_seed4                  334.6    16.3    408.3      5124     830     64.8
+blind_seed0                    514.0    58.6    543.8      4581     852     46.0
+blind_seed1                    501.0    26.3    538.8      4549     853     47.4
+blind_seed2                    284.9    52.6    412.6      5100     833     70.1
+blind_seed3                    355.8    81.6    447.6      5284     842     62.6
+blind_seed4                    343.4   101.5    502.6      4735     852     63.9
 --------------------------------------------------------------------------------
 
 THE ABLATION, PAIRED BY SEED -- the only correct way to read it
 seed    sighted cut %  blinded cut %   difference
 -------------------------------------------------
-0                44.9           45.1         -0.2
-1                47.5           46.8         +0.7
-2                70.5           70.8         -0.3
-3                59.1           64.4         -5.3
-4                64.5           63.9         +0.5
+0                45.1           46.0         -1.0
+1                47.1           47.4         -0.3
+2                70.5           70.1         +0.4
+3                60.3           62.6         -2.3
+4                64.8           63.9         +0.9
 -------------------------------------------------
-median           59.1           63.9         -0.2
-mean             57.3           58.2         -0.9
-sd                                            2.5
+median           60.3           62.6         -0.3
+mean             57.5           58.0         -0.5
+sd                                            1.3
 
-paired t against zero : t = -0.81, p = 0.46  (n = 5)
-Wilcoxon signed-rank  : p = 1.00
-95 % CI on the mean   : -4.0 to +2.2 points -- it contains zero
+paired t against zero : t = -0.80, p = 0.47  (n = 5)
+Wilcoxon signed-rank  : p = 0.62
+95 % CI on the mean   : -2.0 to +1.1 points
 
-AGENT (sighted median 59.1 %) over CURRENT-GRADE (34.0 %) : +25.1 points
+AGENT (sighted median 60.3 %) over CURRENT-GRADE (34.4 %) : +25.9 points
 
 ================================================================================
 READ THIS BEFORE QUOTING ANY ROW ABOVE.
 
-1. THESE AGENTS ARE OUT OF DISTRIBUTION TWICE OVER, AND NEITHER IS SMALL.
-
-   They trained at 110 km/h, where the baseline peaks at 840 C against an
-   850 C trigger and spends 0.0 % of the episode above it. They had nothing
-   to protect against. They are scored here at 130 km/h, where the baseline
-   reaches 884 C and spends 66.3 % of the episode above the trigger.
-
-   And train.py never passes `dt`, so all ten trained at dt = 0.2 s while this
-   protocol runs dt = 1.0 s. Since AUDIT.md M16 made the slew limit
-   `SLEW * dt`, the same network output moves every actuator FIVE TIMES
-   FURTHER PER STEP here than it could during training. The smoothness penalty
-   is scaled by dt as well. This is the dt inconsistency the open-questions
-   list already flags, and it lands directly on the ablation.
+1. THESE AGENTS ARE OUT OF DISTRIBUTION THREE TIMES OVER. They trained at
+   110 km/h, where the constraint never binds; at dt = 0.2 s while this
+   protocol scores at 1.0 s (train.py never passed dt; since AUDIT.md M16 the
+   slew limit is SLEW * dt, so every actuator moves five times further per step
+   here); and on the one locked road, where preview has nothing to report.
+   The retrain fixes all three (train.py since 27 September).
 
    SO THIS IS NOT PHASE D'S ANSWER. It is what the existing runs are worth.
 
-2. WHAT IT NEVERTHELESS SETTLES, and it is the stronger half.
+2. WHAT IT NEVERTHELESS SETTLES. Every trained agent beats every hand-written
+   policy by a wide margin. Hand-written, preview LOSES to current-grade by
+   0.4 points; trained, the gap to current-grade is +25.9 points. AUDIT.md C3
+   argued hand-written policies cannot settle the preview question; they had
+   the wrong sign.
 
-   Every trained agent beats every hand-written policy by a wide margin --
-   44.9 to 70.5 % against current-grade's 34.0 %. AUDIT.md C3 argued that
-   hand-written policies cannot settle the preview question, and on the
-   hand-written table preview LOSES to current-grade by 0.4 points. Trained,
-   the gap to current-grade is +25.1 points. The hand-written comparison was
-   not merely imprecise, it had the wrong sign.
-
-3. WHAT IT DOES NOT SETTLE, AND THE DIRECTION IS WORTH NOTING.
-
-   Paired by seed, sighted minus blinded is -0.2, +0.7, -0.3, -5.3, +0.5.
-   Four of five seeds fall within +-0.7 points. The mean is -0.9 with a 95 %
-   interval of -4.0 to +2.2, and both the t-test and the signed-rank test are
-   far from significance at n = 5.
-
-   PREVIEW IS INDISTINGUISHABLE FROM ZERO HERE, and the point estimate is
-   NEGATIVE. In the damage-versus-fuel plane the sighted agent of seeds 2 and
-   4 reaches the same damage cut as its blinded twin while burning MORE fuel.
-
-   That is a result about H/tau and should be reported as one if it survives
-   the retrain -- not a failure.
+3. WHAT IT DOES NOT SETTLE. Paired by seed the ablation is indistinguishable
+   from zero, with a negative point estimate. If that survives the retrain it
+   is a result about H/tau, not a failure.
 
 4. THE HAND-WRITTEN ROWS HAVE ZERO IQR BY CONSTRUCTION. They do not read the
-   preference vector, so all twenty episodes are one rollout repeated. Only
-   the agents, which carry w in the observation, vary across the twenty. Do
-   not read their zero spread as stability.
+   preference vector, so all twenty episodes are one rollout repeated.
 
-5. TWO AGENTS BEAT THE BASELINE ON BOTH AXES. Seeds 0 and 1, sighted and
-   blinded alike, cut damage by about 45 % while burning 1.5 to 2.5 % LESS
-   fuel than the baseline. Every other protecting policy in the table, hand-
-   written or trained, pays for its damage cut in fuel.
+5. THIS FILE WAS FIRST WRITTEN ON 21 SEPTEMBER, before the gearbox and spark
+   fixes. Those moved the baseline median from 959.8 to 951.9; the ablation's
+   reading did not change.
 ================================================================================

@@ -350,11 +350,13 @@ cost of fitting to too little data.
 
 v2 came from four seconds above 100 % load. v3 came from seventeen. The two
 8 September drives took that to **208 seconds above 207 kPa**, and at that
-sample size the correlation between lambda and manifold pressure is **+0.23**
-— weak, and with the wrong sign for a load table: more boost goes with a
-*leaner* mixture. What correlates is engine speed (-0.47), air mass flow
-(-0.49), and how long the engine has been held above the gate (-0.47), over the
-1055 samples above `ENR_LOAD` = 180 kPa.
+sample size manifold pressure carries **no detectable signal** about lambda
+(+0.11 on the current data, inside its error bar -- AUDIT.md H4). What
+correlates is engine speed (-0.47), air mass flow (-0.41), and how long the
+engine has been held above the gate (-0.44), over the samples above
+`ENR_LOAD` = 180 kPa. *(Corrected 27 September: this paragraph had carried
++0.23 "with the wrong sign", -0.49 and -0.47, all superseded, and the argument
+from the sign was withdrawn in `base_lambda()` on 16 September.)*
 
 (The gate reads 180 kPa, not 200, because manifold pressure changed definition
 with the charge-temperature correction. On the corrected scale 180 kPa selects
@@ -365,9 +367,13 @@ Median lambda, pooled, above 180 kPa:
 
 | rpm / dwell | 0-4 s | 4-8 s | 8+ s | n |
 |---|---|---|---|---|
-| 1000-3500 rpm | 0.99 | 0.99 | 0.98 | 422 |
-| 3500-4500 rpm | 0.99 | 0.98 | 0.90 | 168 |
-| 4500-7000 rpm | 0.98 | 0.87 | 0.79 | 465 |
+| 1000-3500 rpm | 0.99 | 0.99 | 0.98 | 441 |
+| 3500-4500 rpm | 0.99 | 0.98 | 0.90 | 235 |
+| 4500-7000 rpm | 0.98 | 0.83 | 0.79 | 665 |
+
+Dwell counted in seconds from the timestamps. *(Until 27 September this table
+read 422 / 168 / 465 and 0.87 in the 4500-7000 rpm, 4-8 s cell: the counts
+predate drive10, and 0.87 was the row-count dwell axis AUDIT.md H3 retired.)*
 
 Read the bottom row across: at the same load the car runs stoichiometric for
 the first seconds of a pull and enriches only once it has been up there a
@@ -379,8 +385,8 @@ reason.
 
 The remaining limitation: dwell above the 180 kPa gate stands in for turbine
 inlet temperature, which this car does not expose. The weakest cell of the fit
-is 3500–4500 rpm at long dwell — observed 0.90 against a modelled 0.93, on the
-168 samples in that band. Say both in Chapter 3.
+is 4500–7000 rpm at 4–8 s dwell — observed 0.83 against a modelled 0.906, 0.076
+lean (`model_vs_data.py`). Say both in Chapter 3.
 
 **Its spark map was not knock-limited.** At 3000 rpm and 140 kPa the old baseline
 commanded 26.9° BTDC, giving a knock integral of **2.13**. Production engines sit

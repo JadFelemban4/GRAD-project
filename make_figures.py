@@ -550,21 +550,23 @@ def model_vs_data():
     _style(ax, "Part-load spark: commanded against logged",
            "car -- Actual ignition angle (deg BTDC)", "simulation (deg BTDC)")
     m = np.array([p["meas"] for p in Sp["points"]])
+    n = len(Sp["points"])
     _parity(ax, 10, 45)
-    ax.scatter(m, [p["at_fit"] for p in Sp["points"]], s=60, color=THIRD,
+    ax.scatter(m, [p["before"] for p in Sp["points"]], s=60, color=THIRD,
                edgecolor=SURFACE, lw=1.4, zorder=4,
-               label=f"as fitted, 7 Sep (IAT comp. on the sensor)   "
-                     f"RMS {Sp['at_fit']['rmse']:.1f}, bias {Sp['at_fit']['mean']:+.1f}")
-    ax.scatter(m, [p["as_run"] for p in Sp["points"]], s=60, color=SIM,
+               label=f"before the refit (SPARK_A {Sp['spark_a_before']:.2f})   "
+                     f"RMS {Sp['before']['rmse']:.1f}, bias {Sp['before']['mean']:+.1f}")
+    ax.scatter(m, [p["after"] for p in Sp["points"]], s=60, color=SIM,
                edgecolor=SURFACE, lw=1.4, zorder=5, marker="D",
-               label=f"as the simulator runs it (IAT comp. on the charge)   "
-                     f"RMS {Sp['as_run']['rmse']:.1f}, bias {Sp['as_run']['mean']:+.1f}")
+               label=f"as shipped (SPARK_A {Sp['spark_a_after']:.2f})   "
+                     f"RMS {Sp['after']['rmse']:.1f}, bias {Sp['after']['mean']:+.1f}")
     ax.legend(loc="upper left", frameon=False, fontsize=8.5, labelcolor=INK2)
     ax.text(0, -0.13,
-            "Mistake 13 moved the IAT compensation's input from the compressor-"
-            "outlet sensor\nto the modelled charge temperature. The map's "
-            "constants were not refitted, so the\nbaseline now runs about 3 deg "
-            "advanced of the car at part load.",
+            f"Before, the car-fitted line sat above the model's knock limit at "
+            f"{n - Sp['before']['line_sets']} of {n} points, so the\nunvalidated "
+            f"knock model set part-load spark. Refitted, the line sets it at "
+            f"{Sp['after']['line_sets']} of {n};\nthe knock limit still sets it "
+            "in boost, so the locked climb is unchanged.",
             transform=ax.transAxes, color=INK2, fontsize=8.5, va="top")
     _save(fig, "fig11_spark.png")
 
@@ -593,13 +595,24 @@ def model_vs_data():
         axes[0].legend(loc="lower left", bbox_to_anchor=(0.0, 1.0), ncol=2,
                        frameon=False, fontsize=9.5, labelcolor=INK2)
         axes[1].set_xlabel("minutes into the drive", color=INK2, fontsize=10)
-        cap = ("drive10 reaches 117 C of oil -- the only drive inside the published "
-               "115-140 C band -- and the model runs a few K cool of it, as "
-               "validate.py's climb row does."
-               if name == "drive10" else
-               "The oil spikes are the model's oil time constant: 16 s, against a "
-               "20-400 s band (validate.py). The real sump barely moves on a "
-               "230 km/h pull; the model's oil node chases it.")
+        OS = {o["variant"]: o for o in R.get("oil_sensitivity", [])}
+        if name == "drive10":
+            cap = ("drive10 reaches 117 C of oil -- the only drive inside the published "
+                   "115-140 C band -- and the model runs a few K cool of it, as "
+                   "validate.py's climb row does.")
+        elif OS:
+            cap = (f"The spikes come from the oil's own ASSUMED heat input: 5 % of fuel "
+                   f"energy drives the modelled oil up to "
+                   f"{OS['as shipped']['max_gap']:.0f} K above the block on a pull. "
+                   f"Halving that share cuts the peak to "
+                   f"{OS['half fuel-to-oil share']['peak_model']:.0f} C;\ndoubling the "
+                   f"oil's heat capacity only to "
+                   f"{OS['double oil capacity']['peak_model']:.0f} C; pinning the block "
+                   f"to the measured coolant to "
+                   f"{OS['block pinned to measured coolant']['peak_model']:.0f} C. "
+                   "Measuring it needs a sustained-load drive (logs/DRIVE_PLAN.md).")
+        else:
+            cap = "Run model_vs_data.py for the oil sensitivity."
         fig.suptitle(f"Thermal network driven over {name}, against the car's own "
                      "sensors", color=INK, fontsize=13, x=0.012, ha="left",
                      fontweight="bold")
@@ -746,6 +759,75 @@ def model_vs_data():
     _save(fig, "fig18_literature_bands.png")
 
 
+# ============================================================ TRAINING ROADS
+def training_roads():
+    """fig 19: one road of each family, and what the baseline does on each.
+
+    Reads results/training_roads.json, written by check_roads.py. Every road
+    there was driven by the untouched baseline ECU.
+    """
+    path = os.path.join(RES, "training_roads.json")
+    if not os.path.exists(path):
+        print("  (results/training_roads.json missing -- run check_roads.py)")
+        return
+    with open(path) as f:
+        T = json.load(f)
+    roads = T["roads"]
+    fams = ["locked", "single", "rolling", "double", "flat"]
+    cols = {"locked": INK2, "single": AQUA, "rolling": BLUE, "double": VIOLET, "flat": INK3}
+    pick = {}
+    for r in roads:
+        pick.setdefault(r["family"], r)
+
+    fig, (ax, ab) = plt.subplots(1, 2, figsize=(13.0, 5.2),
+                                 gridspec_kw=dict(width_ratios=(1.6, 1.0)))
+    # GRADE, not elevation: held at 130 km/h the locked 12 % climb would rise
+    # about 3 km in twelve minutes, which no real road does. Grade over time is
+    # what the engine and the preview channel actually see.
+    _style(ax, "One road of each kind, as grade over time", "time into episode (s)",
+           "road grade (%)")
+    ax.axhline(0, color=INK3, lw=0.9, ls="--", zorder=2)
+    for fam in fams:
+        if fam not in pick:
+            continue
+        e = 100.0 * np.array(pick[fam]["grade"])
+        t = np.arange(len(e)) * 5.0
+        ax.plot(t, e, color=cols[fam], lw=2.2, zorder=3,
+                ls=(0, (5, 3)) if fam == "locked" else "-", label=fam)
+        ax.annotate(fam, xy=(t[-1], e[-1]), xytext=(6, 0), textcoords="offset points",
+                    va="center", color=cols[fam], fontsize=9, fontweight="bold")
+    ax.set_xlim(0, 900 * 1.14)
+    ax.set_title(ax.get_title(loc="left"), color=INK, fontsize=12, loc="left", pad=30,
+                 fontweight="bold")
+    ax.legend(loc="lower left", bbox_to_anchor=(0.0, 1.0), ncol=5, frameon=False,
+              fontsize=9, labelcolor=INK2)
+
+    _style(ab, "What the baseline does on each road", "peak turbine housing (C)", None)
+    y = {f: i for i, f in enumerate(fams)}
+    rng = np.random.default_rng(0)
+    for r in roads:
+        yy = y[r["family"]] + rng.uniform(-0.18, 0.18)
+        ab.scatter([r["peak_c"]], [yy], s=46, color=cols[r["family"]], zorder=4,
+                   edgecolor=SURFACE, lw=1.2)
+    ab.axvline(TRIGGER_C, color=CRIT, lw=1.3, ls=(0, (5, 3)), zorder=2)
+    ab.text(TRIGGER_C - 14, len(fams) - 0.55, "850 C trigger", color=CRIT, fontsize=9,
+            ha="right")
+    ab.set_yticks(range(len(fams)), fams)
+    ab.invert_yaxis()
+    fig.suptitle(f"Training roads -- {T['binding']} of {T['n']} push the baseline past "
+                 "the trigger", color=INK, fontsize=13, x=0.012, ha="left",
+                 fontweight="bold")
+    fig.text(0.012, 0.005,
+             f"Every road is driven by the untouched baseline ECU (check_roads.py): "
+             f"worst neutral reward {T['worst_neutral_r']:+.4f}, worst p95 torque-"
+             f"tracking error {T['worst_p95_err']:.3f} against a {T['tolerance']} "
+             "band. Training sees roads that need protection and roads where it "
+             "only costs fuel. evaluate.py scores the locked climb alone.",
+             color=INK2, fontsize=9)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.94))
+    _save(fig, "fig19_training_roads.png")
+
+
 if __name__ == "__main__":
     print("writing figures to results/figures/")
     traces()
@@ -753,4 +835,5 @@ if __name__ == "__main__":
     curves()
     phase_d()
     model_vs_data()
+    training_roads()
     print("done")

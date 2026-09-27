@@ -30,10 +30,10 @@ a record, not as a result.
 The scenario now DEFAULTS to 12 % at 130 km/h and the constraint binds. With
 load, every hand-written policy does real work:
 
-    baseline ECU (true neutral)   damage 959.8   peak 884 C
-    reactive protection                  679.0   cuts 29.3 %
-    current-grade protection             633.2   cuts 34.0 %
-    predictive protection                637.4   cuts 33.6 %
+    baseline ECU (true neutral)   damage 951.9   peak 884 C
+    reactive protection                  671.1   cuts 29.5 %
+    current-grade protection             624.5   cuts 34.4 %
+    predictive protection                628.4   cuts 34.0 %
 
     preview over current-grade: -0.4 points -- the closest to level it has been
 
@@ -42,7 +42,7 @@ car's own logs CANNOT load the engine. Median relative air filling is 24-40 %
 per drive and only 2.0 % of 79 134 moving samples exceed 120 %. The driving is
 fast -- median 95-137 km/h -- but it is straight-line flat-road cruising, which
 asks for drag and rolling resistance and nothing else. Flat road at 90 km/h
-leaves the turbine at 335 C against an 850 C trigger; 12 % at 130 km/h reaches
+leaves the turbine at 349 C against an 850 C trigger; 12 % at 130 km/h reaches
 884 C. NO AMOUNT OF FURTHER LOGGING WILL FIX THAT -- the duty cycle is wrong,
 not the model.
 
@@ -87,21 +87,21 @@ DO THESE, IN THIS ORDER
    a decision, not tuning one. Confirm after merging that the default is still
    130 and that its docstring is intact.
 
-3. RETRAIN AT 130. Ten runs, 5 seeds each way:
+3. RETRAIN AT 130 -- READY SINCE 27 SEPTEMBER. Ten runs, 5 seeds each way:
+       python check_roads.py                               # must PASS first
        python train.py --steps 50000 --seed 0..4
        python train.py --steps 50000 --seed 0..4 --no-preview
-   Measured: 173 min per run with ten sharing a 20-core box (~4.5 steps/s each,
-   ~45 aggregate). Run them together — it is about 5x better than serially.
-   Cap each with OMP_NUM_THREADS=2 MKL_NUM_THREADS=2.
+   Every episode is a new road (TerrainTrainingEnv); scoring stays on the
+   locked climb. Output goes to runs/terrain_dt1/, NOT runs/ -- train.py
+   resumes any checkpoint in its folder, and runs/ holds the 110 km/h agents.
+   13.7 steps/s for one run alone; ten sharing a 20-core box took 173 min on
+   19 September. Cap each with OMP_NUM_THREADS=1.
 
-4. DECIDE THE STEP BUDGET BEFORE those runs count as Phase D's input. The
-   episode is 4500 steps, so 50 000 steps is ELEVEN episodes, and the
-   observation carries three preference weights drawn fresh at every reset — the
-   policy has to generalise across a 3-D simplex from eleven samples of it.
-   evaluate.py's docstring records what that did on sep17: eleven episodes
-   ranging -506 to +644, where first-five-vs-last-five is the weight draw and
-   not learning. Either raise the budget a lot, or fix w during training and
-   condition afterwards, and say which you chose and why.
+4. THE STEP BUDGET WAS DECIDED 27 SEPTEMBER: dt = 1.0. The episode is 900
+   steps, not 4500, so 50 000 steps is 55 episodes instead of eleven for the
+   same compute, and the agent trains in the step evaluate.py scores it in
+   (train.py never passed dt before). If the ablation is still inside its
+   noise, raise the steps; never change the twenty.
 
 5. SCORE ONLY WITH evaluate.py. Twenty frozen episodes, median and IQR. THE
    TWENTY NEVER CHANGE. Changing the test set after seeing a result is the one

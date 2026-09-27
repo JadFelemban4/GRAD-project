@@ -216,6 +216,7 @@ html{scroll-behavior:smooth}
       <a href="#summary">Summary</a>
       <a href="#phase-d">Phase D</a>
       <a href="#vs-car">Simulation vs car</a>
+      <a href="#drives">Drives</a>
       <a href="#caveats">Caveats</a>
     </nav>
   </div>
@@ -250,18 +251,20 @@ html{scroll-behavior:smooth}
     </div>
     <div class="stat">
       <span class="k">Simulation vs car</span>
-      <span class="v">3<small>of 11 agree</small></span>
-      <p>Three more agree within limits the comparison cannot see past, three disagree, one is a negative result and one region the car never reached.</p>
+      <span class="v">4<small>of 11 agree</small></span>
+      <p>Three more agree within limits the comparison cannot see past, two disagree, one is a negative result and one region the car never reached.</p>
     </div>
   </div>
 
   <div class="findings">
-    <h3>Found in this pass</h3>
+    <h3>Changed on 27 September</h3>
     <ol>
-      <li><b>The spark map was not refitted after mistake 13.</b> It was fitted with its IAT compensation reading the pre-throttle sensor; the simulator now feeds it the modelled charge temperature, so the baseline runs {{mc.spark.run.mean|+.1f}}° advanced of the car at part load.</li>
-      <li><b>The enrichment cell table is on the retired dwell axis.</b> CLAUDE.md's "every cell within 0.027" counts dwell in rows at an assumed 4.6 Hz. On real timestamps the worst cell is off by {{mc.enrich.worst|.3f}}.</li>
-      <li><b>The oil time constant shows up against the car.</b> On hard pulls the model's oil reaches {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C where the sump reads {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C.</li>
-      <li><b>The trained agents are scored in a different time step from the one they trained in.</b> <code>train.py</code> never passes <code>dt</code>, so they learned at 0.2 s; the protocol scores at 1.0 s.</li>
+      <li><b>Training now runs on a new road every episode.</b> Five kinds of road, from flat to two steep climbs, so the preview channel has something to report. Scoring stays on the locked climb. <a href="#f-roads">The roads</a></li>
+      <li><b>Those roads found a gearbox defect, now fixed.</b> In 8th at 130 km/h the model's engine sustains 333 Nm, but the box only downshifted above 375 Nm, so grades near 9 % could not be driven by any policy. It now kicks down when the engine falls short.</li>
+      <li><b>The car-fitted spark map was never in use, now fixed.</b> The model's knock limit sat below it at every steady point. Refitted, part-load spark goes from {{mc.spark.before.mean|+.1f}}° to {{mc.spark.after.mean|+.2f}}° against the car. <a href="#f-spark">Spark</a></li>
+      <li><b>One enrichment cell was on a retired axis.</b> The documents now say the worst cell is {{mc.enrich.worst|.3f}} lean, not 0.027. The constants are unchanged: the data behind that cell is too thin to refit on.</li>
+      <li><b>The oil spikes come from an assumed heat share, still open.</b> Halving it takes the pull peak from {{mc.oil.as.peak_model|.0f}} °C to {{mc.oil.half.peak_model|.0f}} °C. Measuring it needs a drive. <a href="#drives">What to drive</a></li>
+      <li><b>Training now uses the same 1.0 s step as scoring.</b> Every earlier agent learned at 0.2 s. The retrain gets 55 episodes where the old runs had 11.</li>
     </ol>
   </div>
 </section>
@@ -315,6 +318,17 @@ html{scroll-behavior:smooth}
     </div>
     <div class="chart" id="c-sweep"></div>
     <p class="cap">Peak turbine housing, baseline ECU, 900 s episodes. Outlined cells exceed 850 °C. The locked point was chosen on 18 September, before any training existed.</p>
+  </div>
+
+  <div class="fig" id="f-roads">
+    <div class="fig-head">
+      <h3>The roads the retrain will learn on</h3>
+      <p class="take">Every training episode is a new road; only scoring stays on the locked climb. On {{roads.binding}} of {{roads.n}} sampled roads the baseline passes the trigger, so the agent meets roads that need protection and roads where protecting only wastes fuel.</p>
+    </div>
+    <div class="legend" id="lg-roads"></div>
+    <div class="chart" id="c-roads"></div>
+    <div class="chart" id="c-roadpeaks"></div>
+    <p class="cap">Top: one sampled road of each kind, as the grade the car and the preview channel see. Bottom: the baseline's peak turbine temperature on each of the {{roads.n}} roads from <code>check_roads.py</code>. Held at 130 km/h, the locked 12 % climb would rise about 3 km in its twelve minutes; no real road does that. It stands for sustained heavy load in general, and the training roads inherit the same idealisation. Every road is one the baseline can drive: worst neutral reward {{roads.worst_r|+.4f}}, worst torque-tracking error {{roads.worst_err|.3f}} against a {{roads.tol}} band. Speed and air temperature stay at the locked 130 km/h and 42 °C, so the road ahead is the only thing that changes. Descents stop at −3 %: below about −4.5 % the car coasts and this model has no fuel cut.</p>
   </div>
 
   <div class="fig" id="f-eval">
@@ -392,7 +406,7 @@ html{scroll-behavior:smooth}
         <tr><td><a href="#f-load">Load, relative air filling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>{{mc.load.mape|.1f}} % over {{mc.load.n}} points, but blind to the breathing model</td></tr>
         <tr><td><a href="#f-boost">Manifold pressure under boost</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>median {{mc.boost.gap_sim|+.1f}} % against the car's boost channel</td></tr>
         <tr><td><a href="#f-enrich">Enrichment, λ</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>worst cell {{mc.enrich.worst|.3f}} lean; the documented 0.027 is on a retired axis</td></tr>
-        <tr><td><a href="#f-spark">Part-load spark</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>{{mc.spark.run.mean|+.1f}}° advanced as run; unbiased as fitted</td></tr>
+        <tr><td><a href="#f-spark">Part-load spark</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.spark.after.mean|+.2f}}° after the refit, was {{mc.spark.before.mean|+.1f}}°</td></tr>
         <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median</td></tr>
         <tr><td><a href="#f-th74">Oil on hard pulls</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>model {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C</td></tr>
         <tr><td><a href="#f-knock">Knock</a></td><td><span class="pill crit"><i>∅</i>negative</span></td><td>correlation {{mc.knock.corr|+.2f}} with the car's own retard</td></tr>
@@ -452,15 +466,15 @@ html{scroll-behavior:smooth}
 
   <div class="fig" id="f-spark">
     <div class="fig-head">
-      <div class="row"><h3>Part-load spark</h3><span class="pill serious"><i>✕</i>off</span></div>
-      <p class="take">As fitted on 7 September the map is unbiased ({{mc.spark.fit.mean|+.1f}}°, RMS {{mc.spark.fit.rmse|.1f}}°). As the simulator runs it today, it is {{mc.spark.run.mean|+.1f}}° advanced (RMS {{mc.spark.run.rmse|.1f}}°).</p>
+      <div class="row"><h3>Part-load spark</h3><span class="pill good"><i>✓</i>agrees</span></div>
+      <p class="take">Fixed on 27 September. The baseline's part-load spark sat {{mc.spark.before.mean|+.1f}}° advanced of the car (RMS {{mc.spark.before.rmse|.1f}}°); refitted, it sits {{mc.spark.after.mean|+.2f}}° (RMS {{mc.spark.after.rmse|.1f}}°).</p>
     </div>
     <div class="legend">
-      <span style="color:var(--third)"><i class="ld" style="background:currentColor"></i>as fitted: IAT compensation on the sensor</span>
-      <span style="color:var(--sim)"><i class="lds" style="background:currentColor"></i>as run: IAT compensation on the modelled charge</span>
+      <span style="color:var(--third)"><i class="ld" style="background:currentColor"></i>before the refit</span>
+      <span style="color:var(--sim)"><i class="lds" style="background:currentColor"></i>as shipped</span>
     </div>
     <div class="chart" id="c-spark"></div>
-    <p class="cap">{{mc.spark.n}} operating points, 30–75 kPa. Mistake 13 moved the compensation's input from the compressor-outlet sensor to the modelled charge temperature, which is right, but the map's constants were not refitted afterwards. Under boost the knock limit sets spark instead, so the climb is affected through the compensation only.</p>
+    <p class="cap">{{mc.spark.n}} operating points, 30–75 kPa. Before, the line fitted to the car sat above the model's knock limit at every point, so the unvalidated knock model was setting part-load spark. Now the fitted line sets it at {{mc.spark.after.line_sets}} of {{mc.spark.n}} points. Only the offset changed ({{mc.spark.a_before|.2f}} to {{mc.spark.a_after|.2f}}); the slopes stayed, so the knock limit still sets spark in boost and the locked climb is unchanged.</p>
   </div>
 
   <div class="fig" id="f-th10">
@@ -488,7 +502,7 @@ html{scroll-behavior:smooth}
     </div>
     <div class="chart" id="c-th74-oil"></div>
     <div class="chart" id="c-th74-ect"></div>
-    <p class="cap">This is <code>validate.py</code>'s oil time constant, {{mc.lit.8.value|.0f}} s against a 20–400 s band, seen against the car. The oil node is far too light, so it chases every pull.</p>
+    <p class="cap">The spikes come from the oil's own assumed heat input: 5 % of fuel energy pushes the modelled oil up to {{mc.oil.as.max_gap|.0f}} K above the block on a pull. Replaying the drive with one assumption changed at a time: halving that share takes the peak to {{mc.oil.half.peak_model|.0f}} °C, doubling the oil's heat capacity to {{mc.oil.double.peak_model|.0f}} °C, and pinning the block to the measured coolant to {{mc.oil.block.peak_model|.0f}} °C. Both oil parameters are assumed, and a sustained-load drive can measure them (<a href="#drives">drive 1</a>).</p>
   </div>
 
   <div class="fig" id="f-knock">
@@ -554,6 +568,72 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
+<!-- ================================================================= DRIVES -->
+<section id="drives">
+  <div class="sect-head">
+    <p class="eyebrow">Part 3 · for the car</p>
+    <h2>Drives we need</h2>
+    <p class="prose cap">Three drives, in order of value. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
+  </div>
+
+  <div class="fig">
+    <h3>Before every drive</h3>
+    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li>Select <b>only</b> the listed channels. Fewer channels are read more often: 7 refresh every 1.45 s, 26 every 7.5 s.</li>
+      <li>Always include <code>Coolant temperature</code>. Without it the whole drive is filtered out.</li>
+      <li>Warm the engine first, to a coolant temperature of 88 °C or more.</li>
+      <li>Start the log and wait 30 seconds before driving; the first rows are placeholder zeros.</li>
+      <li>Afterwards, copy the CSV into <code>logs/raw/</code> with a descriptive name and run <code>python new_drive.py</code> on it.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="fig-head">
+      <div class="row"><h3>1 · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable</span></div>
+      <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. This drive measures the oil node, the first sustained-load coolant data, and the hot idle.</p>
+    </div>
+    <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Oil temperature</code>, <code>Engine radiator outlet temperature (coolant)</code>, <code>Ambient temperature</code>.</p>
+    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li>The longest continuous climb within reach, such as an escarpment road up from the coast: 15–25 minutes without stopping.</li>
+      <li>In the afternoon, when it is hottest.</li>
+      <li>Start the log at the foot of the climb. Climb at a steady, legal speed in <b>D</b>.</li>
+      <li><b>At the top, park safely and leave the engine idling for 5 minutes</b> with the log running. Do not switch it off; this tests the model's thermostat against the car's heat-management valve.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="fig-head">
+      <h3>2 · Full-throttle roll-ons in a high gear, for low-rpm boost</h3>
+      <p class="take">The model can only make 333 Nm at 2100 rpm because the car was never asked for boost at low engine speed. This drive measures the real boost there, so the gearbox workaround can be retired.</p>
+    </div>
+    <p class="cap"><b>Channels (7):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Boost pressure</code>, <code>Ambient pressure</code>, <code>Throttle valve angle related to the lower stop</code>, <code>Coolant temperature</code>.</p>
+    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li>A straight, empty road with a limit of 120 km/h or more. Gearbox in <b>M</b>; hold the gear with the paddles.</li>
+      <li>From a steady speed, <b>floor it for 3–4 seconds and lift</b>, always before the limit: 6th from 70 km/h (about 1770 rpm), 7th from 90 km/h (about 1870 rpm), 8th from 100 km/h (about 1620 rpm).</li>
+      <li>Each three times, with a minute of steady cruising between pulls so the logger gets fresh readings.</li>
+      <li>If the box kicks down anyway, keep going. That is useful data too.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="fig-head">
+      <h3>3 · Loaded, steady-gear driving in the heat, for knock</h3>
+      <p class="take">The model's knock integral has no link to the car's retard (r = {{mc.knock.corr|+.2f}}). Reading retard cleanly needs both ignition angles sampled fast, with no gearshifts in the way.</p>
+    </div>
+    <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Actual ignition angle</code>, <code>Target ignition angle from torque intervention</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Ambient temperature</code>.</p>
+    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li>A second ascent of the same climb, in the afternoon heat, gearbox in <b>M</b>.</li>
+      <li>Pick a gear that keeps the engine at <b>2000–3500 rpm</b>: low speed and high load is where an engine knocks.</li>
+      <li>Hold <b>steady, firm throttle for 20–30 s</b>, with no gear change inside a segment. Aim for ten or more segments.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <h3>What no drive on this car can settle</h3>
+    <p class="cap"><b>The turbine temperature and the 850 °C trigger:</b> every pre-catalyst exhaust channel reads zero, so it needs a published source. <b>Enrichment at high rpm and long dwell:</b> needs seconds of full load at 5000+ rpm, which isn't legal on a road; it's a track-day job. <b>A real boost leak:</b> not something to induce on a borrowed car.</p>
+  </div>
+</section>
+
 <!-- ================================================================ CAVEATS -->
 <section id="caveats">
   <div class="sect-head">
@@ -561,10 +641,10 @@ html{scroll-behavior:smooth}
     <h2>What this page is not</h2>
   </div>
   <div class="caveats">
-    <div class="cav"><h3>Not Phase D's answer</h3><p>The ten agents trained at 110 km/h, where the constraint never binds, and at a 0.2 s step while the protocol scores at 1.0 s. They are out of distribution twice over. The retrain at 130 km/h and dt = 1.0 is what settles it.</p></div>
+    <div class="cav"><h3>Not Phase D's answer</h3><p>The ten agents trained at 110 km/h, where the constraint never binds, at a 0.2 s step, on one road. The retrain fixes all three: 130 km/h, dt = 1.0 and a new road every episode. That retrain is what settles it.</p></div>
     <div class="cav"><h3>Hand-written rows are one rollout</h3><p>They do not read the preference weights, so their zero spread is structural. It is not a sign of stability.</p></div>
     <div class="cav"><h3>Turbine temperature is modelled</h3><p>No sensor on this car reads it. Its heat capacity, <code>c_turb</code> = 6000 J/K, is assumed, and it sets τ, the denominator of the claim.</p></div>
-    <div class="cav"><h3>Three calibrations need attention</h3><p>The spark map needs a refit on the modelled charge temperature, the enrichment table needs regenerating on real timestamps, and the oil node needs more thermal mass. None of these has been changed.</p></div>
+    <div class="cav"><h3>One workaround, stated</h3><p>At low engine speed the model's boost ceiling is too low, because the car was never logged there. The gearbox compensates by kicking down, running about 600 rpm faster than the real car would. Drive 2 would retire it.</p></div>
   </div>
 
   <footer>
@@ -761,7 +841,7 @@ function crosshair(P, xs, series, xfmt) {
 }
 // Nearest point: the pointer only has to be closest, not on the dot.
 function nearest(P, pts, rowsOf, radius) {
-  const px = pts.map(p => [P.x(p.x), P.y(p.y)]);
+  const px = pts.map(p => p.px != null ? [p.px, p.py] : [P.x(p.x), P.y(p.y)]);
   const ring = S("circle", { r: 8, class: "ring", visibility: "hidden" }, P.top);
   const hit = S("rect", { x: P.m.l, y: P.m.t, width: P.pw, height: P.ph, class: "hit" }, P.top);
   const leave = () => { ring.setAttribute("visibility", "hidden"); hideTip(P.host); };
@@ -1009,6 +1089,51 @@ mount("c-curves", (host, w, h) => {
   ], v => `episode ${v}`);
 });
 
+
+// ------------------------------------------------------------ training roads
+const RD = D.roads;
+const FAMCOL = { locked: "var(--pd-base)", single: "var(--pd-grade)", rolling: "var(--pd-pred)",
+                 double: "var(--pd-sight)", flat: "var(--pd-react)" };
+(() => {
+  const lg = document.getElementById("lg-roads");
+  for (const e of RD.examples) {
+    const s = H("span", {}, lg);
+    s.style.color = FAMCOL[e.family];
+    H("i", { class: e.family === "locked" ? "lk dash" : "lk" }, s);
+    s.appendChild(document.createTextNode(e.family === "locked" ? "locked (the scored climb)" : e.family));
+  }
+})();
+mount("c-roads", (host, w, h) => {
+  const xs = RD.examples[0].grade.map((_, i) => i * RD.step_s);
+  const P = plot(host, { w, h, x: { d: [0, 900], label: "time into episode (s)" },
+    y: { d: [-4, 15], label: "road grade (%)" }, m: { l: 50 } });
+  hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
+  const ser = RD.examples.map(e => ({ name: e.family, ys: e.grade.map(g => g * 100),
+                                      c: FAMCOL[e.family], f: v => f(v, 1) + " %" }));
+  ser.forEach(s => line(P, xs, s.ys, { c: s.c, w: 2.2, dash: s.name === "locked" ? "6 4" : null }));
+  crosshair(P, xs, ser, v => `t = ${v} s`);
+});
+mount("c-roadpeaks", (host, w) => {
+  const fams = ["locked", "single", "rolling", "double", "flat"];
+  const rowH = 30, lw = 64, h = fams.length * rowH + 50;
+  const P = plot(host, { w, h, x: { d: [400, 950], label: "baseline peak turbine (°C)" },
+    y: { d: [1, 0], none: true }, m: { l: lw, t: 6, r: 12 } });
+  vline(P, 850, { c: "var(--crit)", label: "trigger", dy: 12 });
+  fams.forEach((fm, i) => T(P.svg, lw - 8, P.m.t + (i + 0.5) * rowH + 4, fm,
+                            { "text-anchor": "end", style: "fill:var(--ink-2)" }));
+  const pts = RD.roads.map((r, k) => {
+    const i = fams.indexOf(r.family);
+    const py = P.m.t + (i + 0.5) * rowH + (((k * 37) % 11) - 5) * 1.4;
+    const px = P.x(r.peak);
+    S("circle", { cx: px, cy: py, r: 4.5, style: `fill:${FAMCOL[r.family]};stroke:var(--surface);stroke-width:1.2` }, P.g);
+    return { px, py, r };
+  });
+  nearest(P, pts, q => ({ title: `${q.r.family} road`, rows: [
+    { c: FAMCOL[q.r.family], v: f(q.r.peak, 0) + " °C", k: "baseline peak" },
+    { v: `${f(q.r.gmin, 1)} to ${f(q.r.gmax, 1)} %`, k: "grade range" },
+    { v: f(q.r.r, 4, true), k: "neutral reward" }] }), 18);
+}, () => 0);
+
 // ================================================ PART 2: VS THE CAR
 const MC = D.mc;
 
@@ -1105,8 +1230,8 @@ mount("c-spark", (host, w) => {
   }
   nearest(P, pts, q => ({ title: `${f(q.p[3], 0)} rpm, ${f(q.p[4], 0)} kPa`, rows: [
     { c: "var(--car)", v: f(q.p[0], 1) + "°", k: "car" },
-    { c: "var(--third)", v: f(q.p[1], 1) + "°", k: "as fitted" },
-    { c: "var(--sim)", v: f(q.p[2], 1) + "°", k: "as run" }] }), 20);
+    { c: "var(--third)", v: f(q.p[1], 1) + "°", k: "before the refit" },
+    { c: "var(--sim)", v: f(q.p[2], 1) + "°", k: "as shipped" }] }), 20);
 }, w => Math.min(w, 480));
 
 function thermal(id, drive, key, label) {

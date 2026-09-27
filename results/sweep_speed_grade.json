@@ -2,84 +2,84 @@
  {
   "v_kmh": 90,
   "grade": 0,
-  "peak_c": 335.41964862473844,
+  "peak_c": 348.68811608243755,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 90,
   "grade": 6,
-  "peak_c": 540.5971120074967,
+  "peak_c": 540.6085702747597,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 90,
   "grade": 12,
-  "peak_c": 716.9977846466302,
+  "peak_c": 716.9983587380738,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 90,
   "grade": 16,
-  "peak_c": 831.5418731186165,
+  "peak_c": 831.5419419118851,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 110,
   "grade": 0,
-  "peak_c": 406.07120904540955,
+  "peak_c": 417.4331861285557,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 110,
   "grade": 6,
-  "peak_c": 617.8910225637817,
+  "peak_c": 617.894060763001,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 110,
   "grade": 12,
-  "peak_c": 839.6811336569184,
+  "peak_c": 839.6812055932443,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 110,
   "grade": 16,
-  "peak_c": 871.1973484184535,
-  "frac_above": 63.07007786429366,
+  "peak_c": 871.1974069658655,
+  "frac_above": 63.181312569521694,
   "binds": true
  },
  {
   "v_kmh": 130,
   "grade": 0,
-  "peak_c": 472.86732276082785,
+  "peak_c": 476.317463324145,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 130,
   "grade": 6,
-  "peak_c": 760.3850980537048,
+  "peak_c": 760.384620217795,
   "frac_above": 0.0,
   "binds": false
  },
  {
   "v_kmh": 130,
   "grade": 12,
-  "peak_c": 884.0113626142319,
+  "peak_c": 884.0098323311873,
   "frac_above": 66.40711902113459,
   "binds": true
  },
  {
   "v_kmh": 130,
   "grade": 16,
-  "peak_c": 902.8844513770292,
+  "peak_c": 902.8818739687202,
   "frac_above": 70.18909899888766,
   "binds": true
  }

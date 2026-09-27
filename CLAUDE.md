@@ -39,6 +39,34 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
+## Current state — 27 September 2026 (training roads, and two calibration fixes)
+
+> ### 27 SEPTEMBER: THE RETRAIN IS READY, ON VARIED ROADS AT dt = 1.0
+>
+> - **Training draws a new road every episode** (`engine_env.TerrainTrainingEnv`):
+>   the locked climb itself, single climbs of 4–14 %, rolling hills, double
+>   climbs and flat. On one fixed road preview has nothing to say. **Scoring is
+>   untouched** — `evaluate.py` still runs the locked climb and its twenty frozen
+>   episodes. `python check_roads.py` drives the baseline over 40 of them.
+> - **The roads found a gearbox defect.** In 8th at 130 km/h the model sustains
+>   333 Nm but the box only downshifted above 375 Nm, so grades near 9 % could
+>   not be driven by ANY policy (neutral reward −0.26). The box now kicks down
+>   when the engine falls short (`Vehicle.DELIVERABLE_TORQUE`). Stated cost: in
+>   that band the model runs a gear lower than the real car would need, because
+>   its boost ceiling is too low at low rpm — flat-road logs never asked for it.
+> - **The car-fitted spark map was never in use.** It sat above the model's own
+>   knock limit at all 26 steady points, so the unvalidated knock model set
+>   part-load spark. `SPARK_A` 26.18 → 13.33 (offset only): bias +3.16° → −0.08°.
+> - **train.py now passes dt = 1.0**, the step `evaluate.py` scores at. It never
+>   passed dt before: every earlier agent learned at 0.2 s. 50 000 steps is now
+>   55 episodes, not 11. Output goes to `runs/terrain_dt1/`.
+> - **Drives that would settle what the logs cannot:** `logs/DRIVE_PLAN.md`.
+> - Results and figures for all of it: `results/`, and the phone page built by
+>   `make_page.py`.
+>
+> Both fixes moved the locked climb's hand-written numbers a little (below);
+> **preview against current-grade stayed at −0.4 points.**
+
 ## Current state — 19 September 2026 (the real gearbox, and the scenario is loaded)
 
 > ### THE SCENARIO IS LOCKED AT 12 % / 130 km/h, AND IT BINDS
@@ -54,29 +82,35 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 > it is straight-line motorway cruising on flat road, which asks for drag and
 > rolling resistance and nothing else. **No amount of further logging will
 > exercise the thermal model's hot region. The duty cycle is wrong, not the
-> model.** A flat road at 90 km/h leaves the turbine at 335 °C against an
+> model.** A flat road at 90 km/h leaves the turbine at 349 °C against an
 > 850 °C trigger; 6 % of grade gets it to 541 °C; it takes 12 % at 130 km/h to
 > reach the knee. The full sweep, peak turbine over a 900 s episode:
 >
 > | speed | 0 % grade | 6 % | 12 % | 16 % |
 > |---|---|---|---|---|
-> | 90 km/h | 335.4 °C | 540.6 | 717.0 | 831.5 |
-> | 110 km/h | 406.1 | 617.9 | 839.7 | **871.2 — binds** |
-> | **130 km/h** | 472.9 | 760.4 | **884.0 — binds** | 902.9 — binds |
+> | 90 km/h | 348.7 °C | 540.6 | 717.0 | 831.5 |
+> | 110 km/h | 417.4 | 617.9 | 839.7 | **871.2 — binds** |
+> | **130 km/h** | 476.3 | 760.4 | **884.0 — binds** | 902.9 — binds |
+>
+> *(The 0 % column moved on 27 September — 335.4 / 406.1 / 472.9 until then —
+> because flat-road cruise now runs on the refitted part-load spark. Every
+> loaded cell is knock-limited and did not move.)* <!-- RETIRED-OK -->
 >
 > **Three of twelve combinations bind**, so the locked 12 % / 130 km/h is not a
-> uniquely tuned point. And at 0 % grade the turbine never passes 473 °C at any
+> uniquely tuned point. And at 0 % grade the turbine never passes 477 °C at any
 > motorway speed — which is the whole argument for putting elevation in.
 >
 > **What the loaded scenario now shows** (`check_premise.py`, hand-written
-> policies, and read AUDIT.md C1/C3 before quoting any of it):
+> policies, and read AUDIT.md C1/C3 before quoting any of it). Measured
+> 27 September, after the gearbox and spark fixes; it read 959.8 / 679.0 /
+> 633.2 / 637.4 before them. <!-- RETIRED-OK -->
 >
 > | policy | damage | cuts | peak turbine |
 > |---|---|---|---|
-> | baseline ECU (true neutral) | 959.8 | — | **884 °C** |
-> | reactive protection | 679.0 | 29.3 % | 862 °C |
-> | current-grade protection | 633.2 | **34.0 %** | 861 °C |
-> | predictive protection | 637.4 | 33.6 % | 861 °C |
+> | baseline ECU (true neutral) | 951.9 | — | **884 °C** |
+> | reactive protection | 671.1 | 29.5 % | 862 °C |
+> | current-grade protection | 624.5 | **34.4 %** | 861 °C |
+> | predictive protection | 628.4 | 34.0 % | 861 °C |
 >
 > **Every policy now does real work** — the reactive row is no longer the
 > baseline row. **Preview is worth −0.4 points against current-grade**, which is
@@ -169,13 +203,19 @@ raises the ceiling, nothing after it protects the floor.
 Anyone can regenerate these. Do not quote a number that a script does not print.
 
 ```
-python check_premise.py    VOID as of 16 Sep -- see AUDIT.md C1, C2, C3 and the
-                           box in README.md. It now prints baseline 256.5 at
-                           801 C, and a warning that the constraint does not
-                           bind on this scenario at all. Run it; do not quote a
-                           number from here
+python check_premise.py    the hand-written policies on the locked climb:
+                           baseline 951.9 at 884 C, current-grade cuts 34.4 %,
+                           preview -0.4 points against it. HAND-WRITTEN -- read
+                           AUDIT.md C1 and C3 before quoting any of it
 python validate.py         8 of 11 published quantities inside band
-python test_reward.py      4 of 4 checks pass
+python test_reward.py      8 of 8 checks pass, four of them on the TRAINING
+                           roads -- run it after any change to the reward, the
+                           plant, the gearbox or the roads
+python check_roads.py      drives the baseline over 40 training roads and fails
+                           if any is one the baseline cannot drive
+python model_vs_data.py    eleven comparisons of the simulator against the car,
+                           each printed beside the figure the documents quote
+python make_page.py        the phone-readable results page, results/page/
 python build_dataset.py "logs/raw/*.csv"    295.0 min, 10 drives, 26 operating points
 python compare_log.py data/master_points.csv   PASS, 1.4 % load residual,
                            k derived 0.831 and zero free parameters. Read what
@@ -191,11 +231,12 @@ python verify_docs.py      recomputes the published figures from the shipped
                            figure is added
 python check_map.py        spark falls with load in every row, rises with speed
                            in every column; 6 cells above the compressor ceiling
-python -m app.test_replay  36 of 36 fast checks. Add --full for 46 of 46,
+python -m app.test_replay  49 of 49 fast checks. Add --full for 59 of 59,
                            which replays the whole of 7475b5d7 and pins the
                            app's own numbers: 14278 of 14340 samples estimated,
-                           peak estimated turbine 884.9 C, 13 thermal / 0
-                           mismatch / 19 novel alerts
+                           peak estimated turbine 890.6 C, 15 thermal / 0
+                           mismatch / 19 novel alerts. The reason for every
+                           move of a pin is written beside it in the file
 ```
 
 **Two of those app figures are not measurements and must never be quoted as
@@ -1186,11 +1227,18 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   quantity at a steady point; drive `thermal.py` over the whole log instead.
 - **Enrichment uses dwell above the 180 kPa gate as a proxy** for turbine inlet
   temperature, which this vehicle does not expose. (`ENR_LOAD` = 180 kPa on the
-  corrected charge-temperature scale of mistake 13.) The weakest cell of the fit
-  is 3500–4500 rpm at **long** dwell — observed 0.90 against a modelled 0.93,
-  and that speed band is the thinnest of the three at n = 235 samples above the
-  gate, against 441 and 665. Every one of the nine cells is within 0.027 of
-  measurement.
+  corrected charge-temperature scale of mistake 13.) **The weakest cell is
+  4500–7000 rpm at 4–8 s dwell: the car reads 0.83, the model a median 0.906 —
+  0.076 lean.** Seven cells are within 0.02 and 3500–4500 rpm at long dwell is
+  0.033 lean (n = 235 in that speed band, against 441 and 665).
+  <!-- RETIRED-OK -->
+  *(Until 27 September this line said the weakest cell was 3500–4500 rpm at
+  long dwell and that every cell was within 0.027. The 4500–7000 rpm, 4–8 s cell
+  had been tabulated at 0.87 on the row-count dwell axis AUDIT.md H3 retired,
+  and was never regenerated. `ENR_DWELL_LO/HI` were fitted on that axis too and
+  are NOT refitted: the cell holds a few dozen independent readings at most.
+  It does not touch Phase D — the locked climb runs 178 kPa at 2706 rpm and
+  enrichment needs 180 kPa and 3300 rpm.)*
   <!-- RETIRED-OK -->
   *(This line read "short dwell, n=29, observed 0.94, model 1.00" until
   9 September — the seven-drive
@@ -1312,7 +1360,7 @@ limitation above applies to it word for word. It adds these:
   leak on a car that is never driven hard will not be found by it.** That is a
   coverage limit, not a bug, and it is the honest consequence of the only
   pressure channels this vehicle publishes being pre-throttle.
-- **The alert counts are not evidence.** 13 thermal / 0 mismatch / 19 novel on
+- **The alert counts are not evidence.** 15 thermal / 0 mismatch / 19 novel on
   `7475b5d7` is a property of thresholds this project chose, pinned so that a
   regression is visible. It is not a measurement of the car.
 
@@ -1359,7 +1407,16 @@ central claim. It is not addressed here and it is not addressed anywhere yet.
 ```
 plant.py              0-D cycle model. predict() is the shared interface.
 thermal.py            3-node lumped-capacitance thermal network.
-engine_env.py         Gymnasium env. BaselineECU lives here.
+engine_env.py         Gymnasium env. BaselineECU lives here. make_grade_climb is
+                      the LOCKED scoring road; make_terrain / TerrainTrainingEnv
+                      are the training roads, never used for scoring.
+check_roads.py        Drives the baseline over sampled training roads; fails if
+                      any is one the baseline cannot drive. Run before training.
+evaluate.py           Phase D's protocol. Twenty frozen episodes. Never edit them.
+model_vs_data.py      Eleven comparisons of the simulator against the car.
+make_figures.py       Thesis figures, results/figures/, from results/*.json.
+make_page.py          The phone-readable results page, results/page/index.html,
+                      from results/page/template.html. Numbers are tokens.
 validate.py           Regenerates the published-figure validation table.
 build_dataset.py      All drives -> data/manifest, master_points, master_samples.
 extract_steady.py     Steady points from one CSV (build_dataset supersedes it).
@@ -1372,7 +1429,8 @@ verify_docs.py        Recomputes the published figures from the shipped data,
                       finds written there against those figures, and against a
                       list of retired ones. Fails naming file and line. Run it
                       before quoting anything. Never edit its expected values.
-train.py              SAC training. One seed per person, overnight.
+train.py              SAC training, dt = 1.0, a new road every episode.
+                      Writes runs/terrain_dt1/ (runs/ is gitignored).
 generality_test.py    The H/τ experiment. H1, H2, H2b.
 README.md             The public-facing summary. Tracked by verify_docs.py.
 CLAUDE.md             This file. The handoff and the mistake log.
@@ -1384,6 +1442,8 @@ AUDIT.md              Full technical review, 14 Sep. THREE CRITICAL findings
                       Read it before quoting any number in this file.
 logs/CHANNEL_SET_FINAL.md   What is recorded, what to add, and why.
 logs/CHANNEL_CENSUS.md      All 656 channels the car offers, live vs dead.
+logs/DRIVE_PLAN.md          The three drives that would settle what the logs
+                            cannot: channels, and how to drive each one.
 logs/raw/*.csv        Raw BimmerLink exports. Never edit these.
 data/*.csv            Generated. Never edit by hand — re-run build_dataset.py.
 validation_table.md   Chapter 3's evidence. Regenerate after touching the plant.
@@ -1509,18 +1569,22 @@ Everything below assumes the 130 km/h lock. See the current-state box at the top
 
 1. **Merge `origin/JMF-2340550-sep17`.** Twelve commits, including mistake 17 and
    Phase D's first point. Nothing below is reportable until the branches are one.
-2. **Adopt the locked scenario here**: `make_grade_climb(..., v_kmh=130.0)`.
-   It was decided 18 September before any training existed; adopting it is not
-   tuning. At 110 the trigger is never reached and the agent has nothing to learn.
-3. **Retrain at 130.** `python train.py --steps 50000 --seed 0..4`, then the same
-   five with `--no-preview`. **173 minutes per run** measured on a 20-core
-   machine with ten sharing it; run them together, it is ~5x better than serial.
-4. **Raise the step budget, or say why you did not.** The episode is 4500 steps,
-   so 50 000 steps is **ELEVEN episodes**, and the observation carries three
-   preference weights drawn fresh each reset — the policy must generalise across
-   a 3-D simplex from eleven samples of it. `evaluate.py`'s docstring records the
-   consequence measured on `sep17`: eleven episodes ranged −506 to +644, and
-   first-five-versus-last-five is the weight draw, not learning.
+2. **Adopt the locked scenario here** — DONE 19 September:
+   `make_grade_climb(..., v_kmh=130.0)`. It was decided 18 September before any
+   training existed; adopting it is not tuning.
+3. **Retrain at 130, on varied roads, at dt = 1.0** — READY since 27 September.
+   `python train.py --steps 50000 --seed 0..4`, then the same five with
+   `--no-preview`. Every episode is a new road (`TerrainTrainingEnv`); scoring
+   stays on the locked climb. Output goes to `runs/terrain_dt1/`, deliberately
+   not `runs/`, where train.py would resume the 110 km/h agents. Run
+   `python check_roads.py` first; it must PASS. 13.7 steps/s for one run alone,
+   about 1 h for 50 000 steps; ten together took 173 min on 19 September.
+4. **The step budget: decided 27 September.** dt = 1.0 makes the episode 900
+   steps instead of 4500, so 50 000 steps is **55 episodes, not eleven**, for
+   the same compute — and the agent finally trains in the discretisation
+   `evaluate.py` scores it in (train.py never passed dt before, so every earlier
+   agent learned at 0.2 s and was scored at 1.0 s). If the ablation is still
+   inside its noise at 55 episodes, raise the steps; do not change the twenty.
 5. **Score with `evaluate.py` and nothing else.** Twenty frozen episodes, median
    and IQR. **The twenty never change.** Changing the test set after seeing a
    result is the one mistake this project cannot recover from.
