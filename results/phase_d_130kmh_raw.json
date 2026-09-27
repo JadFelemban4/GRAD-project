@@ -1,0 +1,2802 @@
+[
+ {
+  "ret": 0.3329681727627758,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 0
+ },
+ {
+  "ret": -0.3810642681492027,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 1
+ },
+ {
+  "ret": 0.11799316620454192,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 2
+ },
+ {
+  "ret": 1.501408234689734,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 3
+ },
+ {
+  "ret": 0.8540924579137936,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 4
+ },
+ {
+  "ret": 0.5778022977756336,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 5
+ },
+ {
+  "ret": 0.13046519704221282,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 6
+ },
+ {
+  "ret": -0.4614418170240242,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 7
+ },
+ {
+  "ret": 0.12353968480601907,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 8
+ },
+ {
+  "ret": 0.22451183272642083,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 9
+ },
+ {
+  "ret": 0.6711995608638972,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 10
+ },
+ {
+  "ret": 0.400744744882104,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 11
+ },
+ {
+  "ret": -0.63908293456916,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 12
+ },
+ {
+  "ret": 0.12086503379396163,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 13
+ },
+ {
+  "ret": -0.8641298621150781,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 14
+ },
+ {
+  "ret": -0.6149780327468761,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 15
+ },
+ {
+  "ret": -0.6747857960290276,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 16
+ },
+ {
+  "ret": 0.6276183661248069,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 17
+ },
+ {
+  "ret": 0.43012294138316065,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 18
+ },
+ {
+  "ret": 0.5297530468378682,
+  "damage": 959.7516085178449,
+  "fuel": 4663.522126953942,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 884.0113626142319,
+  "knock": 3,
+  "policy": "baseline ECU",
+  "episode": 19
+ },
+ {
+  "ret": 38.43986016311101,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 0
+ },
+ {
+  "ret": 13.037729518138804,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 1
+ },
+ {
+  "ret": 30.9594363294309,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 2
+ },
+ {
+  "ret": 64.73164963441377,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 3
+ },
+ {
+  "ret": 49.14324291876983,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 4
+ },
+ {
+  "ret": 35.716607864771504,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 5
+ },
+ {
+  "ret": 31.38928200591181,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 6
+ },
+ {
+  "ret": 3.7682808123718132,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 7
+ },
+ {
+  "ret": 31.811754702648614,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 8
+ },
+ {
+  "ret": 21.790799794769555,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 9
+ },
+ {
+  "ret": 39.577700508758426,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 10
+ },
+ {
+  "ret": 31.13165351470525,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 11
+ },
+ {
+  "ret": -5.899214351520641,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 12
+ },
+ {
+  "ret": 24.240234830058398,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 13
+ },
+ {
+  "ret": -3.5913941925318795,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 14
+ },
+ {
+  "ret": -2.933126969903242,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 15
+ },
+ {
+  "ret": 0.8498222209527739,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 16
+ },
+ {
+  "ret": 35.97166799826664,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 17
+ },
+ {
+  "ret": 40.64498277660459,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 18
+ },
+ {
+  "ret": 38.43831309120287,
+  "damage": 678.977187296307,
+  "fuel": 4842.686066468544,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 862.3795057621393,
+  "knock": 3,
+  "policy": "reactive",
+  "episode": 19
+ },
+ {
+  "ret": 49.13224142018589,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 0
+ },
+ {
+  "ret": 15.840167657588609,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 1
+ },
+ {
+  "ret": 39.34058818867197,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 2
+ },
+ {
+  "ret": 82.47703820971947,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 3
+ },
+ {
+  "ret": 62.58906166104134,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 4
+ },
+ {
+  "ret": 44.72992456681095,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 5
+ },
+ {
+  "ret": 39.90293185769406,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 6
+ },
+ {
+  "ret": 3.224480638280511,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 7
+ },
+ {
+  "ret": 40.50537152081961,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 8
+ },
+ {
+  "ret": 26.379824352421565,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 9
+ },
+ {
+  "ret": 49.82951407326618,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 10
+ },
+ {
+  "ret": 38.84578329617216,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 11
+ },
+ {
+  "ret": -9.689731906255474,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 12
+ },
+ {
+  "ret": 30.03727774627623,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 13
+ },
+ {
+  "ret": -5.913453405482869,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 14
+ },
+ {
+  "ret": -5.648708015563898,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 15
+ },
+ {
+  "ret": -0.2600245534995338,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 16
+ },
+ {
+  "ret": 44.953641447558766,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 17
+ },
+ {
+  "ret": 51.93109502509469,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 18
+ },
+ {
+  "ret": 48.61991555537679,
+  "damage": 633.1529421791523,
+  "fuel": 4935.831371938507,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.513589716897,
+  "knock": 3,
+  "policy": "current-grade",
+  "episode": 19
+ },
+ {
+  "ret": 49.01789817158715,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 0
+ },
+ {
+  "ret": 15.39052674442064,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 1
+ },
+ {
+  "ret": 39.13216305495007,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 2
+ },
+ {
+  "ret": 82.28490330834757,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 3
+ },
+ {
+  "ret": 62.39808002486825,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 4
+ },
+ {
+  "ret": 44.26167124812491,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 5
+ },
+ {
+  "ret": 39.69979404560581,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 6
+ },
+ {
+  "ret": 2.4742243146756664,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 7
+ },
+ {
+  "ret": 40.32641214696923,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 8
+ },
+ {
+  "ret": 25.690009741607355,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 9
+ },
+ {
+  "ret": 49.42719817935722,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 10
+ },
+ {
+  "ret": 38.36467648834514,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 11
+ },
+ {
+  "ret": -10.660699712454516,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 12
+ },
+ {
+  "ret": 29.550458017532947,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 13
+ },
+ {
+  "ret": -6.567123213571904,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 14
+ },
+ {
+  "ret": -6.521884425281314,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 15
+ },
+ {
+  "ret": -0.9188912978424923,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 16
+ },
+ {
+  "ret": 44.446561853954336,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 17
+ },
+ {
+  "ret": 51.81106211032602,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 18
+ },
+ {
+  "ret": 48.31081712586456,
+  "damage": 637.3790620493925,
+  "fuel": 4940.7674863325765,
+  "torque_viol": 0.058812973529321716,
+  "peak_turb": 860.5135349653323,
+  "knock": 3,
+  "policy": "predictive (hand)",
+  "episode": 19
+ },
+ {
+  "ret": 57.93108974263646,
+  "damage": 531.7827430080689,
+  "fuel": 4567.530693280494,
+  "torque_viol": 0.9490117286566113,
+  "peak_turb": 851.5454104911724,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 0
+ },
+ {
+  "ret": 31.237340998079162,
+  "damage": 527.4171081667865,
+  "fuel": 4572.973020442887,
+  "torque_viol": 0.07728106405354246,
+  "peak_turb": 851.7027880399029,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 1
+ },
+ {
+  "ret": 50.57812239985287,
+  "damage": 529.9715106782924,
+  "fuel": 4568.749820960631,
+  "torque_viol": 0.78326467027675,
+  "peak_turb": 851.5212110148947,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 2
+ },
+ {
+  "ret": 101.40862953071883,
+  "damage": 540.302286721697,
+  "fuel": 4564.624514574677,
+  "torque_viol": 1.679887451110294,
+  "peak_turb": 851.632729847618,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 3
+ },
+ {
+  "ret": 71.12843028812858,
+  "damage": 534.5168255927363,
+  "fuel": 4564.593261832736,
+  "torque_viol": 1.654499086347166,
+  "peak_turb": 851.5486877530699,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 4
+ },
+ {
+  "ret": 64.37685449751734,
+  "damage": 516.3237682667224,
+  "fuel": 4562.849537221727,
+  "torque_viol": 1.1073088388129104,
+  "peak_turb": 851.4291077749025,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 5
+ },
+ {
+  "ret": 49.69203490846121,
+  "damage": 531.4445290886995,
+  "fuel": 4567.998040304152,
+  "torque_viol": 0.7542967380455872,
+  "peak_turb": 851.5208599906385,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 6
+ },
+ {
+  "ret": 23.024302465782966,
+  "damage": 520.2468366589974,
+  "fuel": 4566.0449222129155,
+  "torque_viol": 0.08580272450323548,
+  "peak_turb": 851.2764163693759,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 7
+ },
+ {
+  "ret": 51.23345983568106,
+  "damage": 532.5502590439935,
+  "fuel": 4568.808368268994,
+  "torque_viol": 0.7475055637367292,
+  "peak_turb": 851.5308570279411,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 8
+ },
+ {
+  "ret": 49.06057535682339,
+  "damage": 504.3063007241667,
+  "fuel": 4568.543680987143,
+  "torque_viol": 0.5850815249692609,
+  "peak_turb": 851.3249628720608,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 9
+ },
+ {
+  "ret": 69.26340493367024,
+  "damage": 522.8586232569271,
+  "fuel": 4562.731191825712,
+  "torque_viol": 1.199607510850443,
+  "peak_turb": 851.4640762773716,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 10
+ },
+ {
+  "ret": 58.98593651052579,
+  "damage": 513.5831193368583,
+  "fuel": 4565.678300292808,
+  "torque_viol": 0.8148165430069273,
+  "peak_turb": 851.401541774862,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 11
+ },
+ {
+  "ret": 13.868336058512796,
+  "damage": 540.0950257794017,
+  "fuel": 4496.666938618209,
+  "torque_viol": 0.0029452098079092645,
+  "peak_turb": 852.3693371438816,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 12
+ },
+ {
+  "ret": 48.62229925646534,
+  "damage": 510.8720720597353,
+  "fuel": 4568.799930879047,
+  "torque_viol": 0.5665390797714268,
+  "peak_turb": 851.3827338166308,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 13
+ },
+ {
+  "ret": 7.485527701443061,
+  "damage": 549.8735887271788,
+  "fuel": 4502.396191571011,
+  "torque_viol": 0.01606729061647577,
+  "peak_turb": 851.8613144276811,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 14
+ },
+ {
+  "ret": 15.37215888837818,
+  "damage": 523.9306785301947,
+  "fuel": 4527.21327624183,
+  "torque_viol": 0.0029893989854244685,
+  "peak_turb": 850.9606683515013,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 15
+ },
+ {
+  "ret": 12.568046351982048,
+  "damage": 537.9633347970952,
+  "fuel": 4534.810723361886,
+  "torque_viol": 0.0018517675258969413,
+  "peak_turb": 851.6064073864226,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 16
+ },
+ {
+  "ret": 66.88079740027615,
+  "damage": 514.7737218538291,
+  "fuel": 4563.578859206624,
+  "torque_viol": 1.028955340769922,
+  "peak_turb": 851.4177884891177,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 17
+ },
+ {
+  "ret": 61.61627803056399,
+  "damage": 532.9297020975274,
+  "fuel": 4566.8813225771455,
+  "torque_viol": 1.0967269191858822,
+  "peak_turb": 851.5492303517475,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 18
+ },
+ {
+  "ret": 63.42822338806036,
+  "damage": 526.9309721731157,
+  "fuel": 4565.473453255586,
+  "torque_viol": 1.123807561813213,
+  "peak_turb": 851.4963709052714,
+  "knock": 1,
+  "policy": "runs/sighted_seed0",
+  "episode": 19
+ },
+ {
+  "ret": 59.69419282135641,
+  "damage": 504.60966768580687,
+  "fuel": 4595.339803008831,
+  "torque_viol": 0.05956600024950115,
+  "peak_turb": 851.6768366361918,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 0
+ },
+ {
+  "ret": 23.341271307930583,
+  "damage": 502.73833201103,
+  "fuel": 4606.183313218068,
+  "torque_viol": 0.15474668613425369,
+  "peak_turb": 851.4092189276604,
+  "knock": 2,
+  "policy": "runs/sighted_seed1",
+  "episode": 1
+ },
+ {
+  "ret": 46.94551552099438,
+  "damage": 501.87537141508443,
+  "fuel": 4602.418249391647,
+  "torque_viol": 0.057009551272916334,
+  "peak_turb": 851.5820191949011,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 2
+ },
+ {
+  "ret": 103.28339473012602,
+  "damage": 511.24413049093255,
+  "fuel": 4582.4761092546705,
+  "torque_viol": 0.6833954692933372,
+  "peak_turb": 851.6188816906032,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 3
+ },
+ {
+  "ret": 77.62445435735026,
+  "damage": 510.70650637437933,
+  "fuel": 4592.284613992301,
+  "torque_viol": 0.08669453097843449,
+  "peak_turb": 851.5365218710084,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 4
+ },
+ {
+  "ret": 56.14471507188864,
+  "damage": 493.35399022102354,
+  "fuel": 4603.785004856777,
+  "torque_viol": 0.18681569563668163,
+  "peak_turb": 851.3841108187731,
+  "knock": 2,
+  "policy": "runs/sighted_seed1",
+  "episode": 5
+ },
+ {
+  "ret": 47.76667285842268,
+  "damage": 493.3815326857121,
+  "fuel": 4599.351128022322,
+  "torque_viol": 0.055902107439376125,
+  "peak_turb": 851.5862125229661,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 6
+ },
+ {
+  "ret": 14.613454712205566,
+  "damage": 521.0806612702984,
+  "fuel": 4590.375966658258,
+  "torque_viol": 0.28930020049232735,
+  "peak_turb": 851.7687370224681,
+  "knock": 4,
+  "policy": "runs/sighted_seed1",
+  "episode": 7
+ },
+ {
+  "ret": 49.11271087946079,
+  "damage": 498.64081336149854,
+  "fuel": 4599.627478894218,
+  "torque_viol": 0.05779735697997666,
+  "peak_turb": 851.6172353195851,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 8
+ },
+ {
+  "ret": 37.77603829585132,
+  "damage": 510.83937361057144,
+  "fuel": 4598.338615579229,
+  "torque_viol": 0.4132329059710052,
+  "peak_turb": 851.378830132982,
+  "knock": 2,
+  "policy": "runs/sighted_seed1",
+  "episode": 9
+ },
+ {
+  "ret": 62.74857775028795,
+  "damage": 492.08548700950377,
+  "fuel": 4598.687214032994,
+  "torque_viol": 0.16474058997035484,
+  "peak_turb": 851.430566197872,
+  "knock": 2,
+  "policy": "runs/sighted_seed1",
+  "episode": 10
+ },
+ {
+  "ret": 49.59639068852994,
+  "damage": 497.9005469367045,
+  "fuel": 4601.713289288543,
+  "torque_viol": 0.27527815078888573,
+  "peak_turb": 851.3946961018863,
+  "knock": 2,
+  "policy": "runs/sighted_seed1",
+  "episode": 11
+ },
+ {
+  "ret": -135.2700934483437,
+  "damage": 515.7093933386514,
+  "fuel": 4407.359270155426,
+  "torque_viol": 14.920285509828263,
+  "peak_turb": 848.0113248855306,
+  "knock": 3,
+  "policy": "runs/sighted_seed1",
+  "episode": 12
+ },
+ {
+  "ret": 39.657951565415715,
+  "damage": 509.7093214066054,
+  "fuel": 4602.966208779861,
+  "torque_viol": 0.2578602790701295,
+  "peak_turb": 851.4062571440744,
+  "knock": 2,
+  "policy": "runs/sighted_seed1",
+  "episode": 13
+ },
+ {
+  "ret": 4.974464350845665,
+  "damage": 549.9389256165189,
+  "fuel": 4590.478051110266,
+  "torque_viol": 0.048346020182374036,
+  "peak_turb": 851.7804544527102,
+  "knock": 3,
+  "policy": "runs/sighted_seed1",
+  "episode": 14
+ },
+ {
+  "ret": 3.436051458120346,
+  "damage": 495.80106991332997,
+  "fuel": 4481.813779810264,
+  "torque_viol": 4.387057215370097,
+  "peak_turb": 848.3545208551537,
+  "knock": 4,
+  "policy": "runs/sighted_seed1",
+  "episode": 15
+ },
+ {
+  "ret": 11.667966835666448,
+  "damage": 520.6571291348578,
+  "fuel": 4588.26471757439,
+  "torque_viol": 0.09474591159109169,
+  "peak_turb": 851.5024912878797,
+  "knock": 3,
+  "policy": "runs/sighted_seed1",
+  "episode": 16
+ },
+ {
+  "ret": 57.29615669607301,
+  "damage": 494.4745002170085,
+  "fuel": 4601.189637673567,
+  "torque_viol": 0.3148648767143773,
+  "peak_turb": 851.4033218202991,
+  "knock": 2,
+  "policy": "runs/sighted_seed1",
+  "episode": 17
+ },
+ {
+  "ret": 63.16210333415074,
+  "damage": 507.08430740070946,
+  "fuel": 4595.250228051096,
+  "torque_viol": 0.05829977552757591,
+  "peak_turb": 851.6544077391751,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 18
+ },
+ {
+  "ret": 59.247454382496954,
+  "damage": 492.79567477051376,
+  "fuel": 4600.510492331227,
+  "torque_viol": 0.13871082057057604,
+  "peak_turb": 851.4850881670073,
+  "knock": 1,
+  "policy": "runs/sighted_seed1",
+  "episode": 19
+ },
+ {
+  "ret": 81.95963323261822,
+  "damage": 279.7304424021537,
+  "fuel": 5456.826105858493,
+  "torque_viol": 0.3466776370486177,
+  "peak_turb": 811.1586041383019,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 0
+ },
+ {
+  "ret": 13.955846575903706,
+  "damage": 295.3717980819819,
+  "fuel": 5359.119397258829,
+  "torque_viol": 0.6886282729125723,
+  "peak_turb": 811.3758043982112,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 1
+ },
+ {
+  "ret": 62.34295047388878,
+  "damage": 282.22010236565245,
+  "fuel": 5429.47139283246,
+  "torque_viol": 0.42295600695216073,
+  "peak_turb": 811.2022796188893,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 2
+ },
+ {
+  "ret": 136.5771853204351,
+  "damage": 280.726870394573,
+  "fuel": 5560.556737034837,
+  "torque_viol": 0.5325127221633823,
+  "peak_turb": 811.2974439363439,
+  "knock": 1,
+  "policy": "runs/sighted_seed2",
+  "episode": 3
+ },
+ {
+  "ret": 104.0867538593593,
+  "damage": 289.88390210427167,
+  "fuel": 5492.886061199913,
+  "torque_viol": 0.38015081394552314,
+  "peak_turb": 811.1936523238381,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 4
+ },
+ {
+  "ret": 67.67237081952044,
+  "damage": 283.2424800417405,
+  "fuel": 5431.6719351366755,
+  "torque_viol": 0.6355480168918757,
+  "peak_turb": 811.1754878422622,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 5
+ },
+ {
+  "ret": 63.55211441416759,
+  "damage": 282.79018461154476,
+  "fuel": 5431.499767904582,
+  "torque_viol": 0.40934761319639945,
+  "peak_turb": 811.2010533766066,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 6
+ },
+ {
+  "ret": -6.663222307339311,
+  "damage": 353.95207273118046,
+  "fuel": 4971.307120430872,
+  "torque_viol": 0.5167218892692221,
+  "peak_turb": 822.8138541005914,
+  "knock": 3,
+  "policy": "runs/sighted_seed2",
+  "episode": 7
+ },
+ {
+  "ret": 65.47217355901375,
+  "damage": 282.0001092578421,
+  "fuel": 5433.78416603337,
+  "torque_viol": 0.38708381669551334,
+  "peak_turb": 811.2154045725837,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 8
+ },
+ {
+  "ret": 31.201194693974685,
+  "damage": 282.2935730508482,
+  "fuel": 5266.525624438332,
+  "torque_viol": 1.5387606014220454,
+  "peak_turb": 808.2059220844734,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 9
+ },
+ {
+  "ret": 78.62558946351055,
+  "damage": 279.3162427976945,
+  "fuel": 5445.432692152969,
+  "torque_viol": 0.5295301904111566,
+  "peak_turb": 811.0624029584047,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 10
+ },
+ {
+  "ret": 55.71560679166578,
+  "damage": 289.361635310629,
+  "fuel": 5412.7956148947815,
+  "torque_viol": 0.7364935568563946,
+  "peak_turb": 811.3622262130556,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 11
+ },
+ {
+  "ret": -25.238171385251917,
+  "damage": 370.71034678804835,
+  "fuel": 4927.081243010064,
+  "torque_viol": 0.28069917936242555,
+  "peak_turb": 825.2598332990491,
+  "knock": 5,
+  "policy": "runs/sighted_seed2",
+  "episode": 12
+ },
+ {
+  "ret": 42.38892886892427,
+  "damage": 285.87368899224435,
+  "fuel": 5384.996485497291,
+  "torque_viol": 0.5725759902156697,
+  "peak_turb": 811.3735139966722,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 13
+ },
+ {
+  "ret": -21.66232413891703,
+  "damage": 349.7006321810206,
+  "fuel": 4977.804800759811,
+  "torque_viol": 0.4018326051466997,
+  "peak_turb": 822.4652148955112,
+  "knock": 3,
+  "policy": "runs/sighted_seed2",
+  "episode": 14
+ },
+ {
+  "ret": -17.70751177438069,
+  "damage": 369.03148473602926,
+  "fuel": 4919.1456475634,
+  "torque_viol": 0.328336562052696,
+  "peak_turb": 825.6137571626074,
+  "knock": 3,
+  "policy": "runs/sighted_seed2",
+  "episode": 15
+ },
+ {
+  "ret": -13.568436821456999,
+  "damage": 344.80180765749043,
+  "fuel": 5016.259000960374,
+  "torque_viol": 0.444002101912726,
+  "peak_turb": 820.7628128969342,
+  "knock": 3,
+  "policy": "runs/sighted_seed2",
+  "episode": 16
+ },
+ {
+  "ret": 68.83594233798794,
+  "damage": 281.8173124871376,
+  "fuel": 5428.067196623323,
+  "torque_viol": 0.6822587548449858,
+  "peak_turb": 811.1688840286985,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 17
+ },
+ {
+  "ret": 87.12040311528835,
+  "damage": 279.62832591354817,
+  "fuel": 5461.68045041,
+  "torque_viol": 0.3287633357768602,
+  "peak_turb": 811.138851241053,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 18
+ },
+ {
+  "ret": 78.37581293296535,
+  "damage": 277.7608943365725,
+  "fuel": 5446.499331716057,
+  "torque_viol": 0.4233333406645713,
+  "peak_turb": 811.0820841807446,
+  "knock": 2,
+  "policy": "runs/sighted_seed2",
+  "episode": 19
+ },
+ {
+  "ret": 76.05088289882406,
+  "damage": 367.9025491050577,
+  "fuel": 5233.964979690171,
+  "torque_viol": 0.3625149800811822,
+  "peak_turb": 817.8045290350032,
+  "knock": 4,
+  "policy": "runs/sighted_seed3",
+  "episode": 0
+ },
+ {
+  "ret": 20.447820141445845,
+  "damage": 398.1346224930055,
+  "fuel": 5100.4639311872925,
+  "torque_viol": 0.5186691976648764,
+  "peak_turb": 824.5793245351207,
+  "knock": 1,
+  "policy": "runs/sighted_seed3",
+  "episode": 1
+ },
+ {
+  "ret": 59.762351288984064,
+  "damage": 376.28882067690415,
+  "fuel": 5172.5457575696955,
+  "torque_viol": 0.39765178880748386,
+  "peak_turb": 821.1192617827463,
+  "knock": 3,
+  "policy": "runs/sighted_seed3",
+  "episode": 2
+ },
+ {
+  "ret": 155.7660388442455,
+  "damage": 298.437596797334,
+  "fuel": 5387.585853270659,
+  "torque_viol": 0.40219570336954,
+  "peak_turb": 811.7464095976128,
+  "knock": 2,
+  "policy": "runs/sighted_seed3",
+  "episode": 3
+ },
+ {
+  "ret": 110.1050565952537,
+  "damage": 326.3251165933651,
+  "fuel": 5345.936338416409,
+  "torque_viol": 0.3248484434379652,
+  "peak_turb": 812.9322771061312,
+  "knock": 3,
+  "policy": "runs/sighted_seed3",
+  "episode": 4
+ },
+ {
+  "ret": 66.63221386855002,
+  "damage": 390.95395094191304,
+  "fuel": 5226.895839053423,
+  "torque_viol": 0.38992545185835115,
+  "peak_turb": 826.7120348178399,
+  "knock": 2,
+  "policy": "runs/sighted_seed3",
+  "episode": 5
+ },
+ {
+  "ret": 60.63143204088556,
+  "damage": 380.1024100420456,
+  "fuel": 5174.221441548001,
+  "torque_viol": 0.3959240763242874,
+  "peak_turb": 821.0210447196786,
+  "knock": 3,
+  "policy": "runs/sighted_seed3",
+  "episode": 6
+ },
+ {
+  "ret": 16.209293661524498,
+  "damage": 503.321077803895,
+  "fuel": 4574.02142408877,
+  "torque_viol": 0.9376570717723943,
+  "peak_turb": 844.707114286976,
+  "knock": 1,
+  "policy": "runs/sighted_seed3",
+  "episode": 7
+ },
+ {
+  "ret": 61.14262941488414,
+  "damage": 376.7660490960157,
+  "fuel": 5175.877307576979,
+  "torque_viol": 0.39074915959679773,
+  "peak_turb": 820.6014314926578,
+  "knock": 3,
+  "policy": "runs/sighted_seed3",
+  "episode": 8
+ },
+ {
+  "ret": 23.08431680954527,
+  "damage": 484.02413261607285,
+  "fuel": 5318.622027496475,
+  "torque_viol": 0.4535178594761865,
+  "peak_turb": 844.0600157597308,
+  "knock": 2,
+  "policy": "runs/sighted_seed3",
+  "episode": 9
+ },
+ {
+  "ret": 76.78998156852322,
+  "damage": 393.2244005962744,
+  "fuel": 5250.806181979744,
+  "torque_viol": 0.37624267535879596,
+  "peak_turb": 823.4956905925784,
+  "knock": 2,
+  "policy": "runs/sighted_seed3",
+  "episode": 10
+ },
+ {
+  "ret": 58.24133175320458,
+  "damage": 400.0884566988193,
+  "fuel": 5194.009318216664,
+  "torque_viol": 0.3836143579495872,
+  "peak_turb": 827.8154129811825,
+  "knock": 2,
+  "policy": "runs/sighted_seed3",
+  "episode": 11
+ },
+ {
+  "ret": -58.97306345823927,
+  "damage": 534.8034498984327,
+  "fuel": 4443.694106276045,
+  "torque_viol": 6.785357984831125,
+  "peak_turb": 852.6841752558965,
+  "knock": 1,
+  "policy": "runs/sighted_seed3",
+  "episode": 12
+ },
+ {
+  "ret": 45.608004608773626,
+  "damage": 391.6785023544044,
+  "fuel": 5142.145624735877,
+  "torque_viol": 0.465254013559572,
+  "peak_turb": 826.6806829819151,
+  "knock": 2,
+  "policy": "runs/sighted_seed3",
+  "episode": 13
+ },
+ {
+  "ret": -32.021740228336284,
+  "damage": 546.2881468137066,
+  "fuel": 4505.051111374963,
+  "torque_viol": 3.325467115469416,
+  "peak_turb": 848.9677269228606,
+  "knock": 1,
+  "policy": "runs/sighted_seed3",
+  "episode": 14
+ },
+ {
+  "ret": -35.53694636271484,
+  "damage": 540.8436205113175,
+  "fuel": 4468.914258129683,
+  "torque_viol": 4.765521441666565,
+  "peak_turb": 851.8583644105864,
+  "knock": 1,
+  "policy": "runs/sighted_seed3",
+  "episode": 15
+ },
+ {
+  "ret": 0.017956744023649662,
+  "damage": 513.8808146071033,
+  "fuel": 4560.780443394423,
+  "torque_viol": 1.4887058035679719,
+  "peak_turb": 844.7016290006821,
+  "knock": 1,
+  "policy": "runs/sighted_seed3",
+  "episode": 16
+ },
+ {
+  "ret": 65.48286966222804,
+  "damage": 399.71005025987705,
+  "fuel": 5235.677458545217,
+  "torque_viol": 0.3883607097064016,
+  "peak_turb": 827.7636667214971,
+  "knock": 2,
+  "policy": "runs/sighted_seed3",
+  "episode": 17
+ },
+ {
+  "ret": 86.74126593710389,
+  "damage": 350.73923920953155,
+  "fuel": 5307.824032462512,
+  "torque_viol": 0.35700040517908666,
+  "peak_turb": 813.5137860250089,
+  "knock": 4,
+  "policy": "runs/sighted_seed3",
+  "episode": 18
+ },
+ {
+  "ret": 75.94333686598111,
+  "damage": 387.3119508638456,
+  "fuel": 5230.127428886895,
+  "torque_viol": 0.3748870979566651,
+  "peak_turb": 821.3474132707396,
+  "knock": 3,
+  "policy": "runs/sighted_seed3",
+  "episode": 19
+ },
+ {
+  "ret": 94.95728713204153,
+  "damage": 327.13305384284513,
+  "fuel": 5226.585312433048,
+  "torque_viol": 0.22658309167986945,
+  "peak_turb": 812.6856270226864,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 0
+ },
+ {
+  "ret": 14.472320209024474,
+  "damage": 343.70393272692485,
+  "fuel": 4912.785013105564,
+  "torque_viol": 1.5859902965997894,
+  "peak_turb": 821.5525451478471,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 1
+ },
+ {
+  "ret": 68.48148670140654,
+  "damage": 346.333932958828,
+  "fuel": 5132.805560056768,
+  "torque_viol": 0.6689818117257426,
+  "peak_turb": 814.7946140995103,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 2
+ },
+ {
+  "ret": 162.03464280627668,
+  "damage": 335.7372785940275,
+  "fuel": 5316.660846678914,
+  "torque_viol": 0.07047096682874568,
+  "peak_turb": 811.0651767741145,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 3
+ },
+ {
+  "ret": 121.92293752310798,
+  "damage": 335.70517835862927,
+  "fuel": 5262.223614596754,
+  "torque_viol": 0.16047706659038347,
+  "peak_turb": 811.9162063555706,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 4
+ },
+ {
+  "ret": 80.8617080154363,
+  "damage": 336.93733215717873,
+  "fuel": 5127.088926183188,
+  "torque_viol": 0.807318774218523,
+  "peak_turb": 814.4046645270085,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 5
+ },
+ {
+  "ret": 69.02951515698805,
+  "damage": 345.42795370496117,
+  "fuel": 5136.236269088812,
+  "torque_viol": 0.7068868868864308,
+  "peak_turb": 814.696580168063,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 6
+ },
+ {
+  "ret": 9.53741225990234,
+  "damage": 363.0125135392198,
+  "fuel": 4801.138313271732,
+  "torque_viol": 0.4717194856061693,
+  "peak_turb": 827.2411113202226,
+  "knock": 3,
+  "policy": "runs/sighted_seed4",
+  "episode": 7
+ },
+ {
+  "ret": 72.09955568239093,
+  "damage": 346.22770794676455,
+  "fuel": 5147.983171735445,
+  "torque_viol": 0.5822086105548326,
+  "peak_turb": 814.4589945765455,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 8
+ },
+ {
+  "ret": 45.0834121608641,
+  "damage": 331.1618895993373,
+  "fuel": 5012.549986751461,
+  "torque_viol": 1.1110442182795677,
+  "peak_turb": 817.353366701163,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 9
+ },
+ {
+  "ret": 92.07372490363196,
+  "damage": 338.5898186432148,
+  "fuel": 5159.3511508829415,
+  "torque_viol": 0.581964582884886,
+  "peak_turb": 813.7879582735724,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 10
+ },
+ {
+  "ret": 63.49281731666997,
+  "damage": 337.501067632819,
+  "fuel": 5091.270441979431,
+  "torque_viol": 1.3807887166827648,
+  "peak_turb": 815.1131519175232,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 11
+ },
+ {
+  "ret": -5.883921447210014,
+  "damage": 417.1314756425468,
+  "fuel": 4762.216029946671,
+  "torque_viol": 0.235348351031684,
+  "peak_turb": 830.3036342704503,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 12
+ },
+ {
+  "ret": 48.704701801761985,
+  "damage": 330.4884669885448,
+  "fuel": 5037.359766572512,
+  "torque_viol": 1.2128149987260448,
+  "peak_turb": 816.4987182329604,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 13
+ },
+ {
+  "ret": -18.164275305811316,
+  "damage": 382.32342627420337,
+  "fuel": 4775.808968885084,
+  "torque_viol": 1.2888802387093472,
+  "peak_turb": 828.769621691631,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 14
+ },
+ {
+  "ret": -2.1956550808390602,
+  "damage": 412.6976427741756,
+  "fuel": 4759.696283448414,
+  "torque_viol": 0.32273549498070037,
+  "peak_turb": 830.2771618233909,
+  "knock": 3,
+  "policy": "runs/sighted_seed4",
+  "episode": 15
+ },
+ {
+  "ret": -4.204030721695744,
+  "damage": 374.29880319429657,
+  "fuel": 4799.001888374995,
+  "torque_viol": 0.9577510526673654,
+  "peak_turb": 827.39609585252,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 16
+ },
+ {
+  "ret": 78.16805756033864,
+  "damage": 337.6993256038255,
+  "fuel": 5123.062318705325,
+  "torque_viol": 1.1142971018566314,
+  "peak_turb": 814.4419218202248,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 17
+ },
+ {
+  "ret": 101.10757559374906,
+  "damage": 330.2829822247416,
+  "fuel": 5237.8970840021375,
+  "torque_viol": 0.1702823527256576,
+  "peak_turb": 812.4385235308092,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 18
+ },
+ {
+  "ret": 91.57221732893959,
+  "damage": 344.3627345264773,
+  "fuel": 5163.693172672356,
+  "torque_viol": 0.3991264197598175,
+  "peak_turb": 813.7318326354638,
+  "knock": 2,
+  "policy": "runs/sighted_seed4",
+  "episode": 19
+ },
+ {
+  "ret": 44.9167255286593,
+  "damage": 522.3151791811467,
+  "fuel": 4589.493615826795,
+  "torque_viol": 2.0383843854780346,
+  "peak_turb": 851.6118033025278,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 0
+ },
+ {
+  "ret": -155.23550345248077,
+  "damage": 458.37765532908054,
+  "fuel": 4423.498622026283,
+  "torque_viol": 15.913997924423217,
+  "peak_turb": 842.8635189731984,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 1
+ },
+ {
+  "ret": 39.77918161288835,
+  "damage": 531.135826666412,
+  "fuel": 4580.089807114098,
+  "torque_viol": 1.6150284112937006,
+  "peak_turb": 851.9626193979867,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 2
+ },
+ {
+  "ret": 87.20468053338118,
+  "damage": 513.5385919970233,
+  "fuel": 4590.383610306662,
+  "torque_viol": 3.50635495838817,
+  "peak_turb": 851.207081792492,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 3
+ },
+ {
+  "ret": 64.83806855767034,
+  "damage": 530.6899734101887,
+  "fuel": 4591.5960149569,
+  "torque_viol": 2.404671914534326,
+  "peak_turb": 851.4047820604604,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 4
+ },
+ {
+  "ret": 57.24523945548572,
+  "damage": 551.5708064750219,
+  "fuel": 4578.7891730452375,
+  "torque_viol": 1.5517704946842952,
+  "peak_turb": 851.8142060533534,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 5
+ },
+ {
+  "ret": 40.84370991401374,
+  "damage": 530.2576816119844,
+  "fuel": 4580.662032885732,
+  "torque_viol": 1.5598878912446386,
+  "peak_turb": 851.9256471141979,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 6
+ },
+ {
+  "ret": -208.04539086017758,
+  "damage": 416.80076029103867,
+  "fuel": 4297.789782087027,
+  "torque_viol": 24.890978936706393,
+  "peak_turb": 837.0300029991098,
+  "knock": 1,
+  "policy": "runs/blind_seed0",
+  "episode": 7
+ },
+ {
+  "ret": 40.96903195825871,
+  "damage": 528.9365983697043,
+  "fuel": 4580.537338642183,
+  "torque_viol": 1.5516566461737473,
+  "peak_turb": 851.8852107774543,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 8
+ },
+ {
+  "ret": -44.43253327347338,
+  "damage": 456.3137048398147,
+  "fuel": 4448.055407641946,
+  "torque_viol": 12.863722096432769,
+  "peak_turb": 843.3994065939795,
+  "knock": 1,
+  "policy": "runs/blind_seed0",
+  "episode": 9
+ },
+ {
+  "ret": 53.3979516440304,
+  "damage": 538.3946971012598,
+  "fuel": 4596.278138294866,
+  "torque_viol": 2.331694690091,
+  "peak_turb": 851.6531708383508,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 10
+ },
+ {
+  "ret": 50.605176255689,
+  "damage": 530.052293658507,
+  "fuel": 4553.46979314449,
+  "torque_viol": 1.5713484353663152,
+  "peak_turb": 850.5433246433644,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 11
+ },
+ {
+  "ret": -89.54273724593259,
+  "damage": 552.2933402087588,
+  "fuel": 4432.146891651995,
+  "torque_viol": 12.596326115766649,
+  "peak_turb": 849.0597327168335,
+  "knock": 1,
+  "policy": "runs/blind_seed0",
+  "episode": 12
+ },
+ {
+  "ret": -31.702326510334387,
+  "damage": 472.8613734134003,
+  "fuel": 4475.534657840363,
+  "torque_viol": 10.65527801012197,
+  "peak_turb": 845.788486363965,
+  "knock": 1,
+  "policy": "runs/blind_seed0",
+  "episode": 13
+ },
+ {
+  "ret": -266.45912193728145,
+  "damage": 468.9621998468979,
+  "fuel": 4290.285933331814,
+  "torque_viol": 25.169109563039548,
+  "peak_turb": 841.1527434112846,
+  "knock": 1,
+  "policy": "runs/blind_seed0",
+  "episode": 14
+ },
+ {
+  "ret": -86.88237471703906,
+  "damage": 525.2479986329644,
+  "fuel": 4395.590055079928,
+  "torque_viol": 11.321371260406815,
+  "peak_turb": 846.0038646938868,
+  "knock": 1,
+  "policy": "runs/blind_seed0",
+  "episode": 15
+ },
+ {
+  "ret": -285.22445129347034,
+  "damage": 422.5689917184957,
+  "fuel": 4278.301041349151,
+  "torque_viol": 27.37545037269398,
+  "peak_turb": 836.511794716445,
+  "knock": 1,
+  "policy": "runs/blind_seed0",
+  "episode": 16
+ },
+ {
+  "ret": 57.53966577979736,
+  "damage": 552.1145497237426,
+  "fuel": 4577.144597998391,
+  "torque_viol": 1.7229816450397384,
+  "peak_turb": 851.791602891151,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 17
+ },
+ {
+  "ret": 50.456979393493384,
+  "damage": 523.9722309977161,
+  "fuel": 4594.6732671863865,
+  "torque_viol": 2.014126803894985,
+  "peak_turb": 851.5608682079097,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 18
+ },
+ {
+  "ret": 48.07742575742304,
+  "damage": 536.4047941857352,
+  "fuel": 4594.595921123841,
+  "torque_viol": 2.2856119264105854,
+  "peak_turb": 851.6888069006576,
+  "knock": 2,
+  "policy": "runs/blind_seed0",
+  "episode": 19
+ },
+ {
+  "ret": 65.1088301212294,
+  "damage": 489.48599628267374,
+  "fuel": 4553.098941096633,
+  "torque_viol": 0.024066883543334805,
+  "peak_turb": 851.6752859299671,
+  "knock": 2,
+  "policy": "runs/blind_seed1",
+  "episode": 0
+ },
+ {
+  "ret": 24.829984211040937,
+  "damage": 521.6215110103693,
+  "fuel": 4529.058786355011,
+  "torque_viol": 0.026779089723720055,
+  "peak_turb": 851.8260404169049,
+  "knock": 4,
+  "policy": "runs/blind_seed1",
+  "episode": 1
+ },
+ {
+  "ret": 52.11967881163582,
+  "damage": 494.90172269970066,
+  "fuel": 4551.412044993893,
+  "torque_viol": 0.025252651281571482,
+  "peak_turb": 851.6191486774893,
+  "knock": 2,
+  "policy": "runs/blind_seed1",
+  "episode": 2
+ },
+ {
+  "ret": 109.26780751580372,
+  "damage": 473.65550225811114,
+  "fuel": 4550.902870097516,
+  "torque_viol": 0.8131353976319037,
+  "peak_turb": 849.5974338071945,
+  "knock": 2,
+  "policy": "runs/blind_seed1",
+  "episode": 3
+ },
+ {
+  "ret": 86.14577208878472,
+  "damage": 492.2683422930899,
+  "fuel": 4581.5912758555405,
+  "torque_viol": 0.02671585601661109,
+  "peak_turb": 851.4264365115204,
+  "knock": 2,
+  "policy": "runs/blind_seed1",
+  "episode": 4
+ },
+ {
+  "ret": 65.09216625115369,
+  "damage": 514.8157591305087,
+  "fuel": 4569.571856941195,
+  "torque_viol": 0.22736773221863965,
+  "peak_turb": 851.2515853156127,
+  "knock": 3,
+  "policy": "runs/blind_seed1",
+  "episode": 5
+ },
+ {
+  "ret": 52.88912443444133,
+  "damage": 494.41234495689287,
+  "fuel": 4551.903678112777,
+  "torque_viol": 0.025245417312744357,
+  "peak_turb": 851.6214526998157,
+  "knock": 2,
+  "policy": "runs/blind_seed1",
+  "episode": 6
+ },
+ {
+  "ret": 18.901165006915107,
+  "damage": 541.3145585356768,
+  "fuel": 4511.144739269128,
+  "torque_viol": 0.022494384290185875,
+  "peak_turb": 851.8921602942081,
+  "knock": 5,
+  "policy": "runs/blind_seed1",
+  "episode": 7
+ },
+ {
+  "ret": 53.527766559040174,
+  "damage": 494.19690440162856,
+  "fuel": 4550.594503418783,
+  "torque_viol": 0.027136432479865816,
+  "peak_turb": 851.6736563670098,
+  "knock": 2,
+  "policy": "runs/blind_seed1",
+  "episode": 8
+ },
+ {
+  "ret": 43.606308313344925,
+  "damage": 536.8511655232028,
+  "fuel": 4530.384057946537,
+  "torque_viol": 0.1092644034057624,
+  "peak_turb": 851.0363804872806,
+  "knock": 5,
+  "policy": "runs/blind_seed1",
+  "episode": 9
+ },
+ {
+  "ret": 70.96590682526585,
+  "damage": 505.66615729773815,
+  "fuel": 4575.996071889523,
+  "torque_viol": 0.20012402937265727,
+  "peak_turb": 851.4002819344227,
+  "knock": 3,
+  "policy": "runs/blind_seed1",
+  "episode": 10
+ },
+ {
+  "ret": 56.39989736431744,
+  "damage": 518.825068212478,
+  "fuel": 4547.444206579832,
+  "torque_viol": 0.15658271249871786,
+  "peak_turb": 851.3698923498981,
+  "knock": 4,
+  "policy": "runs/blind_seed1",
+  "episode": 11
+ },
+ {
+  "ret": 5.171870580408722,
+  "damage": 516.6665488745751,
+  "fuel": 4442.2303615134,
+  "torque_viol": 1.0894140997998658,
+  "peak_turb": 849.7005700934054,
+  "knock": 5,
+  "policy": "runs/blind_seed1",
+  "episode": 12
+ },
+ {
+  "ret": 43.86484031381087,
+  "damage": 522.9811536451172,
+  "fuel": 4543.982395194621,
+  "torque_viol": 0.05426025735063373,
+  "peak_turb": 851.3947555967778,
+  "knock": 4,
+  "policy": "runs/blind_seed1",
+  "episode": 13
+ },
+ {
+  "ret": 7.810460784705356,
+  "damage": 518.5593648515438,
+  "fuel": 4508.747077271984,
+  "torque_viol": 0.026538130408163607,
+  "peak_turb": 851.1704553977105,
+  "knock": 5,
+  "policy": "runs/blind_seed1",
+  "episode": 14
+ },
+ {
+  "ret": 12.635542419040576,
+  "damage": 538.9912926499676,
+  "fuel": 4481.012392301614,
+  "torque_viol": 0.15555331495255253,
+  "peak_turb": 852.3417987274041,
+  "knock": 5,
+  "policy": "runs/blind_seed1",
+  "episode": 15
+ },
+ {
+  "ret": 13.838823687867261,
+  "damage": 533.2255773043704,
+  "fuel": 4500.400301339396,
+  "torque_viol": 0.02503609219774979,
+  "peak_turb": 852.2584731529138,
+  "knock": 5,
+  "policy": "runs/blind_seed1",
+  "episode": 16
+ },
+ {
+  "ret": 65.07289255887736,
+  "damage": 504.1926663412884,
+  "fuel": 4533.719453057047,
+  "torque_viol": 0.9093210157624587,
+  "peak_turb": 849.2049945849222,
+  "knock": 3,
+  "policy": "runs/blind_seed1",
+  "episode": 17
+ },
+ {
+  "ret": 69.31593560648616,
+  "damage": 488.55230787131507,
+  "fuel": 4555.613826759305,
+  "torque_viol": 0.023840066948124357,
+  "peak_turb": 851.5948570811416,
+  "knock": 2,
+  "policy": "runs/blind_seed1",
+  "episode": 18
+ },
+ {
+  "ret": 68.2531551795546,
+  "damage": 486.3354065543351,
+  "fuel": 4570.8544259099335,
+  "torque_viol": 0.03426739829843411,
+  "peak_turb": 851.0467463649389,
+  "knock": 3,
+  "policy": "runs/blind_seed1",
+  "episode": 19
+ },
+ {
+  "ret": 92.01408246645587,
+  "damage": 228.18931095202393,
+  "fuel": 5181.014361209335,
+  "torque_viol": 1.4948161564716789,
+  "peak_turb": 805.3617332601135,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 0
+ },
+ {
+  "ret": 24.22254317929037,
+  "damage": 315.8989950740092,
+  "fuel": 4927.628672489909,
+  "torque_viol": 0.5718399093627291,
+  "peak_turb": 822.6116335223711,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 1
+ },
+ {
+  "ret": 72.47529592760839,
+  "damage": 250.6306913154842,
+  "fuel": 5093.497156998611,
+  "torque_viol": 0.11323280418949323,
+  "peak_turb": 809.9446637193488,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 2
+ },
+ {
+  "ret": 160.29247643664712,
+  "damage": 291.49155703500327,
+  "fuel": 5305.255832144273,
+  "torque_viol": 0.04190317357969047,
+  "peak_turb": 805.6193452668869,
+  "knock": 2,
+  "policy": "runs/blind_seed2",
+  "episode": 3
+ },
+ {
+  "ret": 123.79558222205378,
+  "damage": 241.46292901868955,
+  "fuel": 5287.607304044902,
+  "torque_viol": 0.019295213406662556,
+  "peak_turb": 805.9565450780209,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 4
+ },
+ {
+  "ret": 88.33398618991487,
+  "damage": 270.8348558637583,
+  "fuel": 5161.368933776859,
+  "torque_viol": 0.0429314007962168,
+  "peak_turb": 812.7409700297197,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 5
+ },
+ {
+  "ret": 73.66307320958003,
+  "damage": 248.52882275821787,
+  "fuel": 5097.734034183264,
+  "torque_viol": 0.11394218404017604,
+  "peak_turb": 809.6007075337455,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 6
+ },
+ {
+  "ret": 4.53219244396314,
+  "damage": 390.5329776000693,
+  "fuel": 4788.894201920271,
+  "torque_viol": 1.15789205907708,
+  "peak_turb": 828.6870774239497,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 7
+ },
+ {
+  "ret": 74.33168466109782,
+  "damage": 244.26393783263143,
+  "fuel": 5102.411172316273,
+  "torque_viol": 0.1112721247538058,
+  "peak_turb": 808.8965364936063,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 8
+ },
+ {
+  "ret": 52.379159515723586,
+  "damage": 308.22975681982183,
+  "fuel": 4910.283285666253,
+  "torque_viol": 0.2945956039382874,
+  "peak_turb": 822.5343299227708,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 9
+ },
+ {
+  "ret": 97.99393934430555,
+  "damage": 248.4424573625115,
+  "fuel": 5190.240236613736,
+  "torque_viol": 0.1340541974557793,
+  "peak_turb": 809.3593966749708,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 10
+ },
+ {
+  "ret": 76.32374235033058,
+  "damage": 285.5518150102754,
+  "fuel": 5103.830320583438,
+  "torque_viol": 0.07887229816585647,
+  "peak_turb": 815.6362390714083,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 11
+ },
+ {
+  "ret": -20.84853579895571,
+  "damage": 418.23854501942117,
+  "fuel": 4718.033860924824,
+  "torque_viol": 2.4306528113394057,
+  "peak_turb": 832.43066139768,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 12
+ },
+ {
+  "ret": 58.06268573785201,
+  "damage": 299.86284901276457,
+  "fuel": 4999.967836667508,
+  "torque_viol": 0.16340053915695957,
+  "peak_turb": 819.0809793618863,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 13
+ },
+ {
+  "ret": -9.503406235016882,
+  "damage": 414.87398617949384,
+  "fuel": 4752.2144115279625,
+  "torque_viol": 0.9201572092444692,
+  "peak_turb": 831.4892300151402,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 14
+ },
+ {
+  "ret": -7.159317895304412,
+  "damage": 419.2762229747216,
+  "fuel": 4727.744458200735,
+  "torque_viol": 1.5248475803605122,
+  "peak_turb": 832.3934398057789,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 15
+ },
+ {
+  "ret": -3.2636924986727536,
+  "damage": 388.8799058548348,
+  "fuel": 4781.312076001273,
+  "torque_viol": 1.1428226583682624,
+  "peak_turb": 829.2732488052587,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 16
+ },
+ {
+  "ret": 89.00559520418756,
+  "damage": 275.3496761050302,
+  "fuel": 5170.0440897335075,
+  "torque_viol": 0.03969243232635679,
+  "peak_turb": 813.6004440899857,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 17
+ },
+ {
+  "ret": 98.630528893671,
+  "damage": 229.9650862744383,
+  "fuel": 5206.972045026678,
+  "torque_viol": 1.0683852115470451,
+  "peak_turb": 805.1507104646661,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 18
+ },
+ {
+  "ret": 94.45805357897189,
+  "damage": 241.08546788267975,
+  "fuel": 5180.934385324215,
+  "torque_viol": 0.04179175836832025,
+  "peak_turb": 808.3033461915364,
+  "knock": 1,
+  "policy": "runs/blind_seed2",
+  "episode": 19
+ },
+ {
+  "ret": -267.12275893520564,
+  "damage": 286.93701514884435,
+  "fuel": 5238.852018429681,
+  "torque_viol": 24.862739296379974,
+  "peak_turb": 809.113178417548,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 0
+ },
+ {
+  "ret": -145.00281181535684,
+  "damage": 367.1525034419688,
+  "fuel": 5206.645576881757,
+  "torque_viol": 13.319059450504165,
+  "peak_turb": 828.5151689600501,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 1
+ },
+ {
+  "ret": -99.80325026623905,
+  "damage": 337.04464399268744,
+  "fuel": 5490.146274044868,
+  "torque_viol": 13.412391962701998,
+  "peak_turb": 823.1693253038155,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 2
+ },
+ {
+  "ret": 95.61638793325983,
+  "damage": 322.50779185193255,
+  "fuel": 5263.582476366955,
+  "torque_viol": 8.74347336518233,
+  "peak_turb": 810.5242631033096,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 3
+ },
+ {
+  "ret": -26.05506030842662,
+  "damage": 357.18200151607556,
+  "fuel": 5364.768519651451,
+  "torque_viol": 13.271424163765685,
+  "peak_turb": 817.4930154534451,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 4
+ },
+ {
+  "ret": 0.36783815757371485,
+  "damage": 302.46722462773823,
+  "fuel": 5311.04954887869,
+  "torque_viol": 9.754573227768093,
+  "peak_turb": 812.8657129015788,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 5
+ },
+ {
+  "ret": -88.95819043274969,
+  "damage": 337.3113196990155,
+  "fuel": 5494.423519252086,
+  "torque_viol": 12.843098293328971,
+  "peak_turb": 822.7559254809952,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 6
+ },
+ {
+  "ret": 6.099210621905513,
+  "damage": 396.73002501270474,
+  "fuel": 4837.959963805918,
+  "torque_viol": 0.018235178353893378,
+  "peak_turb": 834.8230039441054,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 7
+ },
+ {
+  "ret": -75.40972043666989,
+  "damage": 338.86774203269874,
+  "fuel": 5497.766576446125,
+  "torque_viol": 12.093177964432641,
+  "peak_turb": 822.6168901876775,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 8
+ },
+ {
+  "ret": 49.44279225554783,
+  "damage": 371.2064044806194,
+  "fuel": 4855.8542016962265,
+  "torque_viol": 0.06300309048899842,
+  "peak_turb": 828.0322800532314,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 9
+ },
+ {
+  "ret": 8.548940989887342,
+  "damage": 350.81742571710174,
+  "fuel": 5397.389062524911,
+  "torque_viol": 9.652402493356352,
+  "peak_turb": 816.4264712194312,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 10
+ },
+ {
+  "ret": 26.914465599227697,
+  "damage": 300.35647266807405,
+  "fuel": 5288.59440849987,
+  "torque_viol": 6.611051622572913,
+  "peak_turb": 813.3589602342655,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 11
+ },
+ {
+  "ret": -11.726461331360042,
+  "damage": 444.97557635339666,
+  "fuel": 4778.050717945434,
+  "torque_viol": 0.0,
+  "peak_turb": 840.9526097528491,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 12
+ },
+ {
+  "ret": 45.86516177805606,
+  "damage": 343.62230316220837,
+  "fuel": 5088.476909795415,
+  "torque_viol": 0.043155303035107,
+  "peak_turb": 821.700959854932,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 13
+ },
+ {
+  "ret": -23.896084706066176,
+  "damage": 435.21252716390177,
+  "fuel": 5061.769142186718,
+  "torque_viol": 0.10236008163511098,
+  "peak_turb": 839.711845209349,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 14
+ },
+ {
+  "ret": -6.838545377366245,
+  "damage": 420.7783935165177,
+  "fuel": 4804.6051049330745,
+  "torque_viol": 0.0,
+  "peak_turb": 837.149227337277,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 15
+ },
+ {
+  "ret": -15.54100232780911,
+  "damage": 457.53943910149155,
+  "fuel": 5107.285283801007,
+  "torque_viol": 0.013655320816938703,
+  "peak_turb": 841.9213256040665,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 16
+ },
+ {
+  "ret": 36.2025956180878,
+  "damage": 317.20120689706937,
+  "fuel": 5286.433914503498,
+  "torque_viol": 6.972829934786666,
+  "peak_turb": 812.2562877165432,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 17
+ },
+ {
+  "ret": -149.81431492744014,
+  "damage": 330.15825690882633,
+  "fuel": 5343.011758476779,
+  "torque_viol": 18.04370580111979,
+  "peak_turb": 816.9826924482437,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 18
+ },
+ {
+  "ret": 16.658357015810907,
+  "damage": 326.47426461647945,
+  "fuel": 5430.742997700001,
+  "torque_viol": 8.574369787184198,
+  "peak_turb": 817.0796701063399,
+  "knock": 2,
+  "policy": "runs/blind_seed3",
+  "episode": 19
+ },
+ {
+  "ret": 94.3496964701917,
+  "damage": 290.4038578945233,
+  "fuel": 4854.3407491664,
+  "torque_viol": 0.049724891711615454,
+  "peak_turb": 823.018564861368,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 0
+ },
+ {
+  "ret": 36.65202009079985,
+  "damage": 388.9082664701075,
+  "fuel": 4641.287174523172,
+  "torque_viol": 0.05139142965695065,
+  "peak_turb": 836.7918708711867,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 1
+ },
+ {
+  "ret": 76.720173740061,
+  "damage": 327.7129117050566,
+  "fuel": 4798.167273547511,
+  "torque_viol": 0.0201096895270513,
+  "peak_turb": 825.9186577305464,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 2
+ },
+ {
+  "ret": 157.70314472523205,
+  "damage": 314.5835051331451,
+  "fuel": 4860.949131655349,
+  "torque_viol": 0.049506260683352524,
+  "peak_turb": 822.7452569898188,
+  "knock": 2,
+  "policy": "runs/blind_seed4",
+  "episode": 3
+ },
+ {
+  "ret": 120.75582499674056,
+  "damage": 314.0097130805055,
+  "fuel": 4845.8387282612775,
+  "torque_viol": 0.038293059184904416,
+  "peak_turb": 823.5011761839586,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 4
+ },
+ {
+  "ret": 92.19745255716043,
+  "damage": 342.9937399614752,
+  "fuel": 4740.9880937767075,
+  "torque_viol": 0.039805517445150734,
+  "peak_turb": 828.82495873287,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 5
+ },
+ {
+  "ret": 77.75743938540109,
+  "damage": 325.92964121134577,
+  "fuel": 4803.163588072392,
+  "torque_viol": 0.01864572370336519,
+  "peak_turb": 825.6623533081746,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 6
+ },
+ {
+  "ret": 24.148606559239852,
+  "damage": 469.1867984556625,
+  "fuel": 4519.61044330638,
+  "torque_viol": 0.06970372440818956,
+  "peak_turb": 847.6387557813138,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 7
+ },
+ {
+  "ret": 78.67932216869667,
+  "damage": 322.30729029307184,
+  "fuel": 4815.783268332963,
+  "torque_viol": 0.01524686023759593,
+  "peak_turb": 824.9997292928773,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 8
+ },
+ {
+  "ret": 60.23829968515929,
+  "damage": 400.4682774296376,
+  "fuel": 4612.1148187332665,
+  "torque_viol": 0.07523520038609731,
+  "peak_turb": 838.6418306105867,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 9
+ },
+ {
+  "ret": 100.64588521276119,
+  "damage": 335.1492140844601,
+  "fuel": 4772.871438917375,
+  "torque_viol": 0.03011996874120247,
+  "peak_turb": 827.1318138985051,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 10
+ },
+ {
+  "ret": 81.15117292056675,
+  "damage": 349.7959409043641,
+  "fuel": 4726.568061669758,
+  "torque_viol": 0.02044189576183307,
+  "peak_turb": 829.9409523803891,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 11
+ },
+ {
+  "ret": 12.471811866853386,
+  "damage": 507.3737626384478,
+  "fuel": 4485.496717901584,
+  "torque_viol": 0.11757114637537587,
+  "peak_turb": 851.9931091907468,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 12
+ },
+ {
+  "ret": 64.00327230100356,
+  "damage": 355.9780606400079,
+  "fuel": 4685.562744793899,
+  "torque_viol": 0.05509048883228257,
+  "peak_turb": 832.9276767988075,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 13
+ },
+ {
+  "ret": 8.253244870749768,
+  "damage": 479.60313861620205,
+  "fuel": 4516.9181113808845,
+  "torque_viol": 0.06533334844858164,
+  "peak_turb": 848.9920706962374,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 14
+ },
+ {
+  "ret": 16.172220568172634,
+  "damage": 495.2066107224,
+  "fuel": 4491.9585315588565,
+  "torque_viol": 0.08095748268309991,
+  "peak_turb": 850.6012178215295,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 15
+ },
+ {
+  "ret": 15.985216422996018,
+  "damage": 463.37747239451295,
+  "fuel": 4532.159926552186,
+  "torque_viol": 0.06376759996232524,
+  "peak_turb": 847.0456777455478,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 16
+ },
+ {
+  "ret": 92.96542297985434,
+  "damage": 350.1625765345707,
+  "fuel": 4732.382637084878,
+  "torque_viol": 0.026720657324298985,
+  "peak_turb": 829.5739487869065,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 17
+ },
+ {
+  "ret": 99.93319734884426,
+  "damage": 312.4692818886073,
+  "fuel": 4855.372298124314,
+  "torque_viol": 0.01652604057908988,
+  "peak_turb": 823.0271073100083,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 18
+ },
+ {
+  "ret": 96.03976322314702,
+  "damage": 332.64486222641176,
+  "fuel": 4802.530271281766,
+  "torque_viol": 0.020569733151072175,
+  "peak_turb": 825.6548349499197,
+  "knock": 1,
+  "policy": "runs/blind_seed4",
+  "episode": 19
+ }
+]

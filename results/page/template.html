@@ -1,0 +1,1271 @@
+<title>B58 Preview Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,600..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+
+  --bg:#f2f3f1; --surface:#fcfcfb; --ink:#15181b; --ink-2:#4b5157; --ink-3:#7c8388;
+  --rule:#dcdfdc; --grid:#e7e9e6; --band:#ebede9; --hover:#e4e7e3;
+
+  --car:#2a78d6; --sim:#eb6834; --third:#1baf7a;
+  --pd-base:#4b5157; --pd-react:#9aa0a4; --pd-grade:#1baf7a; --pd-pred:#eda100;
+  --pd-blind:#e87ba4; --pd-sight:#4a3aa7;
+
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --good-ink:#006300; --warn-ink:#7a5200; --serious-ink:#9a3d17; --crit-ink:#a82828; --none-ink:#5c6266;
+
+  --seq-lo:#e4eefb; --seq-hi:#0d366b; --seq-ink-lo:#15181b; --seq-ink-hi:#ffffff;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111315; --surface:#1a1a19; --ink:#f0f1ee; --ink-2:#c3c4bd; --ink-3:#8f9391;
+    --rule:#2d302f; --grid:#262928; --band:#202322; --hover:#2a2d2c;
+    --car:#3987e5; --sim:#d95926; --third:#199e70;
+    --pd-base:#c3c4bd; --pd-react:#7c817e; --pd-grade:#199e70; --pd-pred:#c98500;
+    --pd-blind:#d55181; --pd-sight:#9085e9;
+    --good-ink:#6fd66f; --warn-ink:#fab219; --serious-ink:#ef9571; --crit-ink:#f07a7a; --none-ink:#a4a9a6;
+    --seq-lo:#1c2735; --seq-hi:#a9ccf6; --seq-ink-lo:#f0f1ee; --seq-ink-hi:#0e1216;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111315; --surface:#1a1a19; --ink:#f0f1ee; --ink-2:#c3c4bd; --ink-3:#8f9391;
+  --rule:#2d302f; --grid:#262928; --band:#202322; --hover:#2a2d2c;
+  --car:#3987e5; --sim:#d95926; --third:#199e70;
+  --pd-base:#c3c4bd; --pd-react:#7c817e; --pd-grade:#199e70; --pd-pred:#c98500;
+  --pd-blind:#d55181; --pd-sight:#9085e9;
+  --good-ink:#6fd66f; --warn-ink:#fab219; --serious-ink:#ef9571; --crit-ink:#f07a7a; --none-ink:#a4a9a6;
+  --seq-lo:#1c2735; --seq-hi:#a9ccf6; --seq-ink-lo:#f0f1ee; --seq-ink-hi:#0e1216;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration-color:var(--ink-3);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+:focus-visible{outline:2px solid var(--car);outline-offset:2px;border-radius:3px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--band);padding:.05em .35em;border-radius:3px;white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+/* ------------------------------------------------------------ top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule)}
+.bar-in{max-width:960px;margin:0 auto;padding:0 16px;display:flex;gap:18px;align-items:center;height:48px}
+.bar-name{font:700 15px/1 var(--display);font-stretch:85%;letter-spacing:.01em;white-space:nowrap}
+.bar nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.bar nav::-webkit-scrollbar{display:none}
+.bar nav a{font:500 13px/1 var(--body);color:var(--ink-2);text-decoration:none;
+  padding:7px 10px;border-radius:999px;white-space:nowrap}
+.bar nav a:hover{background:var(--hover);color:var(--ink)}
+
+/* --------------------------------------------------------------- page */
+.wrap{max-width:960px;margin:0 auto;padding-inline:16px;padding-block:28px 64px}
+.prose{max-width:66ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,7vw,56px);font-weight:800;font-stretch:80%;line-height:.98;letter-spacing:-.01em}
+h2{font-size:clamp(24px,4.2vw,32px);font-weight:750;font-stretch:85%;line-height:1.1}
+h3{font-size:19px;font-weight:700;font-stretch:90%;line-height:1.25}
+.eyebrow{font:500 12px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+p{margin:0}
+.lede{font-size:17px;color:var(--ink-2);max-width:62ch}
+section{padding-block:40px 8px;scroll-margin-top:60px}
+section+section{border-top:1px solid var(--rule)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.sect-head{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+
+.meta{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0;font:13px/1.4 var(--mono);color:var(--ink-2)}
+.meta div{display:flex;gap:7px}
+.meta dt{color:var(--ink-3)}
+.meta dd{margin:0}
+
+/* ---------------------------------------------------------- headline */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin-top:28px}
+.stat{background:var(--surface);padding:18px 18px 16px;display:flex;flex-direction:column;gap:6px}
+.stat .k{font:500 12px/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.stat .v{font:800 40px/1 var(--display);font-stretch:80%;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:18px;font-weight:700;color:var(--ink-2);margin-left:3px}
+.stat p{font-size:13.5px;color:var(--ink-2);line-height:1.5}
+
+.findings{margin-top:22px;border-left:3px solid var(--serious);background:var(--surface);
+  border-radius:0 10px 10px 0;padding:16px 18px}
+.findings h3{font-size:16px;margin-bottom:8px}
+.findings ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--ink-2)}
+.findings b{color:var(--ink)}
+
+/* ------------------------------------------------------------- figure */
+.fig{background:var(--surface);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 18px 14px;margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.fig-head{display:flex;flex-direction:column;gap:6px}
+.fig-head .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.take{font-size:14.5px;color:var(--ink);max-width:70ch}
+.cap{font-size:13.5px;color:var(--ink-2);max-width:72ch;line-height:1.55}
+.cap+.cap{margin-top:-2px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.lk{display:inline-block;width:16px;height:0;border-top:2.5px solid currentColor}
+.lk.dash{border-top-style:dashed}
+.lr{display:inline-block;width:11px;height:11px;border-radius:2px}
+.ld{display:inline-block;width:10px;height:10px;border-radius:50%}
+.lds{display:inline-block;width:9px;height:9px;transform:rotate(45deg)}
+.lsq{display:inline-block;width:10px;height:10px}
+.lo{display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid currentColor}
+
+.chart{position:relative;width:100%;touch-action:pan-y}
+.chart svg{display:block;overflow:visible}
+.plot text{font-family:var(--mono);font-size:11px;fill:var(--ink-3)}
+.plot .alabel{font-family:var(--body);font-size:12px;fill:var(--ink-2)}
+.plot .lbl{font-family:var(--mono);font-size:11px;font-weight:500}
+.plot .grid line{stroke:var(--grid);stroke-width:1}
+.plot .axis{stroke:var(--rule);stroke-width:1}
+.plot .ln{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.plot .hit{fill:transparent;cursor:crosshair}
+.plot .hair{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3;pointer-events:none}
+.plot .hdot{stroke:var(--surface);stroke-width:2;pointer-events:none}
+.plot .mark{cursor:pointer}
+.plot .mark:hover,.plot .mark:focus{filter:brightness(1.12)}
+.plot .mark:focus{outline:none}
+.plot .mark:focus-visible{stroke:var(--ink);stroke-width:1.5}
+.plot .ring{fill:none;stroke:var(--ink);stroke-width:1.5;pointer-events:none}
+
+.tip{position:absolute;z-index:5;pointer-events:none;min-width:130px;max-width:260px;
+  background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+  box-shadow:0 6px 20px rgba(0,0,0,.14);padding:8px 10px;font-size:12.5px;line-height:1.45}
+.tip .tt{font:500 11.5px/1.3 var(--mono);color:var(--ink-3);margin-bottom:4px}
+.tip .tr{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.tip .tr b{font:600 13px/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.tip .tr .tl{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.tip .key{display:inline-block;width:12px;height:0;border-top:2.5px solid;flex:none}
+
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;padding:2px;gap:2px;background:var(--bg)}
+.seg button{font:500 12.5px/1 var(--body);color:var(--ink-2);background:none;border:0;
+  padding:6px 12px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--rule)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border:1px solid var(--rule);
+  border-radius:8px;background:var(--bg);min-width:150px}
+.chip b{font:700 22px/1.1 var(--display);font-stretch:85%;font-variant-numeric:tabular-nums}
+.chip span{font-size:12.5px;color:var(--ink-2)}
+
+/* ------------------------------------------------------------- status */
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 11.5px/1 var(--mono);
+  letter-spacing:.04em;text-transform:uppercase;padding:5px 9px 5px 7px;border-radius:999px;
+  border:1px solid currentColor;white-space:nowrap}
+.pill i{font-style:normal;font-size:12px;width:12px;text-align:center}
+.pill.good{color:var(--good-ink);background:color-mix(in srgb,var(--good) 10%,transparent)}
+.pill.warn{color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%,transparent)}
+.pill.serious{color:var(--serious-ink);background:color-mix(in srgb,var(--serious) 13%,transparent)}
+.pill.crit{color:var(--crit-ink);background:color-mix(in srgb,var(--crit) 11%,transparent)}
+.pill.none{color:var(--none-ink);background:color-mix(in srgb,var(--ink-3) 10%,transparent)}
+
+/* -------------------------------------------------------------- table */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:500 11.5px/1.3 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.score td:first-child{font-weight:500}
+.score td:nth-child(3){color:var(--ink-2)}
+.score tr:hover td{background:var(--hover)}
+.score a{text-decoration:none}
+.score a:hover{text-decoration:underline}
+
+details{border-top:1px solid var(--rule);padding-top:8px}
+summary{cursor:pointer;font:500 12.5px/1.4 var(--body);color:var(--ink-2);list-style:none;
+  display:inline-flex;align-items:center;gap:6px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+details[open] summary::before{transform:rotate(45deg)}
+details .tbl-wrap{margin-top:8px}
+
+.caveats{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:6px}
+.cav{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px}
+.cav h3{font-size:16px;margin-bottom:6px}
+.cav p{font-size:13.5px;color:var(--ink-2)}
+
+footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-3)}
+footer pre{font:12.5px/1.6 var(--mono);color:var(--ink-2);background:var(--surface);
+  border:1px solid var(--rule);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:10px 0 0}
+
+@media (max-width:560px){
+  body{font-size:14.5px}
+  .fig{padding:14px 12px 12px;border-radius:8px}
+  .stat .v{font-size:34px}
+  .bar-name{display:none}
+  th,td{padding:8px 7px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <span class="bar-name">B58 preview study</span>
+    <nav aria-label="Sections">
+      <a href="#summary">Summary</a>
+      <a href="#phase-d">Phase D</a>
+      <a href="#vs-car">Simulation vs car</a>
+      <a href="#caveats">Caveats</a>
+    </nav>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ================================================================ SUMMARY -->
+<section id="summary" style="padding-top:12px">
+  <div class="stack">
+    <p class="eyebrow">BMW B58B30O1 · 3.0 L inline-six · ZF 8HP51 · read-only OBD-II</p>
+    <h1>B58 preview study</h1>
+    <p class="lede">When is it worth knowing the road ahead? The project's claim is that the answer is set by one ratio, <b>H/τ</b>: how far ahead you can see, over how fast the protected part heats up. This page shows what the simulation says on the locked scenario, and every place the simulator can be laid beside the car's own logs.</p>
+    <dl class="meta">
+      <div><dt>branch</dt><dd>{{meta.branch}} @ {{meta.commit}}</dd></div>
+      <div><dt>logs</dt><dd>{{meta.drives}} drives, {{meta.minutes|.1f}} min</dd></div>
+      <div><dt>scenario</dt><dd>12 % grade, 130 km/h, 42 °C</dd></div>
+      <div><dt>built</dt><dd>{{meta.built}}</dd></div>
+    </dl>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="k">Training beats hand-written</span>
+      <span class="v">{{pd.ablation.agent_over_grade|+.1f}}<small>pts</small></span>
+      <p>The median trained agent cuts damage by {{pd.ablation.sighted_median|.1f}} %; the best hand-written policy, current-grade, cuts {{pd.ablation.grade_cut|.1f}} %.</p>
+    </div>
+    <div class="stat">
+      <span class="k">Preview, sighted minus blinded</span>
+      <span class="v">{{pd.ablation.mean|+.1f}}<small>pts</small></span>
+      <p>Mean over five paired seeds, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}. Indistinguishable from zero, on agents that are not yet Phase D's (see caveats).</p>
+    </div>
+    <div class="stat">
+      <span class="k">Simulation vs car</span>
+      <span class="v">3<small>of 11 agree</small></span>
+      <p>Three more agree within limits the comparison cannot see past, three disagree, one is a negative result and one region the car never reached.</p>
+    </div>
+  </div>
+
+  <div class="findings">
+    <h3>Found in this pass</h3>
+    <ol>
+      <li><b>The spark map was not refitted after mistake 13.</b> It was fitted with its IAT compensation reading the pre-throttle sensor; the simulator now feeds it the modelled charge temperature, so the baseline runs {{mc.spark.run.mean|+.1f}}° advanced of the car at part load.</li>
+      <li><b>The enrichment cell table is on the retired dwell axis.</b> CLAUDE.md's "every cell within 0.027" counts dwell in rows at an assumed 4.6 Hz. On real timestamps the worst cell is off by {{mc.enrich.worst|.3f}}.</li>
+      <li><b>The oil time constant shows up against the car.</b> On hard pulls the model's oil reaches {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C where the sump reads {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C.</li>
+      <li><b>The trained agents are scored in a different time step from the one they trained in.</b> <code>train.py</code> never passes <code>dt</code>, so they learned at 0.2 s; the protocol scores at 1.0 s.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================================================================ PHASE D -->
+<section id="phase-d">
+  <div class="sect-head">
+    <p class="eyebrow">Part 1 · the simulation</p>
+    <h2>Phase D on the locked scenario</h2>
+    <p class="prose cap">A 900 s motorway climb in 42 °C air: three minutes flat, then a 12 % grade at 130 km/h. The turbine housing is protected from 850 °C, the knee of the damage model <code>exp((T − 1123)/45)</code>. Every policy is scored on the same {{pd.n_episodes}} frozen episodes from <code>evaluate.py</code>.</p>
+  </div>
+
+  <div class="fig" id="f-trace">
+    <div class="fig-head">
+      <div class="row"><h3>Turbine housing temperature</h3>
+        <div class="seg" role="group" aria-label="Zoom">
+          <button type="button" id="z-all" aria-pressed="true">Whole episode</button>
+          <button type="button" id="z-top" aria-pressed="false">The top</button>
+        </div>
+      </div>
+      <p class="take">The baseline ECU settles at {{pd.trace.series.0.peak|.0f}} °C. Every protecting policy pulls it back towards the trigger, and all four sit within 25 K of each other at the top.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-base)"><i class="lk"></i>baseline ECU</span>
+      <span style="color:var(--pd-react)"><i class="lk"></i>reactive</span>
+      <span style="color:var(--pd-grade)"><i class="lk"></i>current-grade</span>
+      <span style="color:var(--pd-pred)"><i class="lk dash"></i>predictive (hand-written)</span>
+    </div>
+    <div class="chart" id="c-trace"></div>
+    <p class="cap">One rollout of each hand-written policy. The shaded span is the climb. Current-grade peaks at {{pd.trace.series.2.peak|.1f}} °C and predictive at {{pd.trace.series.3.peak|.1f}} °C: the curves lie on top of each other, which is why hand-written policies could never settle the preview question.</p>
+  </div>
+
+  <div class="fig" id="f-damage">
+    <div class="fig-head">
+      <h3>Cumulative damage</h3>
+      <p class="take">The whole cost is paid on the climb. The baseline ends at {{pd.trace.series.0.damage|.1f}}; current-grade at {{pd.trace.series.2.damage|.1f}}, predictive at {{pd.trace.series.3.damage|.1f}}.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-base)"><i class="lk"></i>baseline ECU</span>
+      <span style="color:var(--pd-react)"><i class="lk"></i>reactive</span>
+      <span style="color:var(--pd-grade)"><i class="lk"></i>current-grade</span>
+      <span style="color:var(--pd-pred)"><i class="lk dash"></i>predictive (hand-written)</span>
+    </div>
+    <div class="chart" id="c-damage"></div>
+  </div>
+
+  <div class="fig" id="f-sweep">
+    <div class="fig-head">
+      <h3>Why 12 % at 130 km/h</h3>
+      <p class="take">Only three of twelve speed and grade combinations push the baseline past the trigger. At 110 km/h and 12 % it peaks at {{pd.sweep.peak.1.2|.1f}} °C and never binds; at 130 km/h it reaches {{pd.sweep.peak.2.2|.1f}} °C.</p>
+    </div>
+    <div class="chart" id="c-sweep"></div>
+    <p class="cap">Peak turbine housing, baseline ECU, 900 s episodes. Outlined cells exceed 850 °C. The locked point was chosen on 18 September, before any training existed.</p>
+  </div>
+
+  <div class="fig" id="f-eval">
+    <div class="fig-head">
+      <h3>Every policy, twenty frozen episodes</h3>
+      <p class="take">All ten trained agents beat every hand-written policy. The two seeds that trained worst still cut more damage than the best hand-written one.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-base)"><i class="lr" style="background:currentColor"></i>hand-written</span>
+      <span style="color:var(--pd-sight)"><i class="lr" style="background:currentColor"></i>trained, sighted</span>
+      <span style="color:var(--pd-blind)"><i class="lr" style="background:currentColor"></i>trained, blinded</span>
+      <span><i class="lk" style="color:var(--ink-2)"></i>interquartile range</span>
+    </div>
+    <div class="chart" id="c-eval"></div>
+    <p class="cap">Median episode damage; lower is better. The hand-written rows have no spread because they ignore the preference weights, so all twenty episodes are one rollout. Only the agents read the weights and vary.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-eval"></div></details>
+  </div>
+
+  <div class="fig" id="f-abl">
+    <div class="fig-head">
+      <h3>The ablation, paired by seed</h3>
+      <p class="take">Sighted minus blinded: median {{pd.ablation.median|+.1f}}, mean {{pd.ablation.mean|+.1f}} points. {{pd.ablation.within}} of 5 seeds sit within ±0.75 points.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="lr" style="background:currentColor"></i>sighted (sees the grade 2–30 s ahead)</span>
+      <span style="color:var(--pd-blind)"><i class="lr" style="background:currentColor"></i>blinded (preview zeroed)</span>
+      <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade, no preview at all</span>
+    </div>
+    <div class="chart" id="c-abl"></div>
+    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = 5. If it survives the retrain, a preview advantage of zero on this scenario is a result about H/τ, not a failure.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-abl"></div></details>
+  </div>
+
+  <div class="fig" id="f-trade">
+    <div class="fig-head">
+      <h3>Damage against fuel</h3>
+      <p class="take">Protection is not free. Seeds 0 and 1 are the exception: they cut about 45 % of the damage while burning less fuel than the baseline.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="ld" style="background:currentColor"></i>trained, sighted</span>
+      <span style="color:var(--pd-blind)"><i class="ld" style="background:currentColor"></i>trained, blinded</span>
+      <span style="color:var(--ink-3)"><i class="lk"></i>tie joins a seed's pair</span>
+      <span style="color:var(--pd-base)"><i class="lsq" style="background:currentColor"></i>hand-written</span>
+    </div>
+    <div class="chart" id="c-trade"></div>
+    <p class="cap">A long tie would be a preview effect. The ties for seeds 2 and 4 run sideways: the sighted agent reaches the same damage cut as its blinded twin and burns more fuel doing it.</p>
+  </div>
+
+  <div class="fig" id="f-curves">
+    <div class="fig-head">
+      <h3>Every training run, eleven episodes each</h3>
+      <p class="take">50 000 steps against a 4 500-step episode is eleven points per run, with the preference weights redrawn at every reset.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="lk"></i>sighted</span>
+      <span style="color:var(--pd-blind)"><i class="lk"></i>blinded</span>
+    </div>
+    <div class="chart" id="c-curves"></div>
+    <p class="cap">Consecutive points are not scored with the same ruler, so a rising curve here is not evidence of learning. These runs trained at 110 km/h, where nothing binds.</p>
+  </div>
+</section>
+
+<!-- ============================================================ VS THE CAR -->
+<section id="vs-car">
+  <div class="sect-head">
+    <p class="eyebrow">Part 2 · the simulator against the car</p>
+    <h2>Where the model meets the logs</h2>
+    <p class="prose cap">{{meta.drives}} drives and {{meta.minutes|.1f}} minutes of BimmerLink exports, never written to the car. Blue is always the car, orange always the simulation. Each comparison says what it can see, because a residual computed through the model's own inversion cannot test that model (mistake 12).</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="score">
+      <thead><tr><th>Comparison</th><th>Status</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td><a href="#f-load">Load, relative air filling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>{{mc.load.mape|.1f}} % over {{mc.load.n}} points, but blind to the breathing model</td></tr>
+        <tr><td><a href="#f-boost">Manifold pressure under boost</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>median {{mc.boost.gap_sim|+.1f}} % against the car's boost channel</td></tr>
+        <tr><td><a href="#f-enrich">Enrichment, λ</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>worst cell {{mc.enrich.worst|.3f}} lean; the documented 0.027 is on a retired axis</td></tr>
+        <tr><td><a href="#f-spark">Part-load spark</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>{{mc.spark.run.mean|+.1f}}° advanced as run; unbiased as fitted</td></tr>
+        <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median</td></tr>
+        <tr><td><a href="#f-th74">Oil on hard pulls</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>model {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C</td></tr>
+        <tr><td><a href="#f-knock">Knock</a></td><td><span class="pill crit"><i>∅</i>negative</span></td><td>correlation {{mc.knock.corr|+.2f}} with the car's own retard</td></tr>
+        <tr><td><a href="#f-gear">Gearbox ratios</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.gear.within|.1f}} % of samples within 4 % of a published ratio</td></tr>
+        <tr><td><a href="#f-env">Compressor ceiling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>fitted to this data; the top rests on 4–5 readings per bin</td></tr>
+        <tr><td><a href="#f-duty">Operating region</a></td><td><span class="pill none"><i>○</i>not covered</span></td><td>{{mc.duty.frac|.1f}} % of logged samples reach the climb's load</td></tr>
+        <tr><td><a href="#f-lit">Published bands</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>{{mc.lit_ok}} of {{mc.lit_n}} inside; ranges, not car data</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="fig" id="f-load">
+    <div class="fig-head">
+      <div class="row"><h3>Load</h3><span class="pill warn"><i>◐</i>limited</span></div>
+      <p class="take">The model's relative air filling matches BMW's <code>Relative air filling</code> channel to {{mc.load.mape|.1f}} % over {{mc.load.n}} operating points, with zero fitted parameters.</p>
+    </div>
+    <div class="chips">
+      <div class="chip"><b>{{mc.load.mape|.1f}} %</b><span>on the real 3.0 L six</span></div>
+      <div class="chip"><b>{{mc.load.wrong|.1f}} %</b><span>the same check on the 2.0 L four of mistake 1</span></div>
+    </div>
+    <div class="legend">
+      <span style="color:var(--sim)"><i class="ld" style="background:currentColor"></i>operating point</span>
+      <span style="color:var(--ink-3)"><i class="lk dash"></i>perfect agreement</span>
+    </div>
+    <div class="chart" id="c-load"></div>
+    <p class="cap">What it can see: displacement. It would have caught the wrong-engine mistake on day one. What it cannot see: volumetric efficiency, residual fraction and charge temperature all cancel out of it. It checks two ECU channels against each other through three defined constants.</p>
+  </div>
+
+  <div class="fig" id="f-boost">
+    <div class="fig-head">
+      <div class="row"><h3>Manifold pressure under boost</h3><span class="pill good"><i>✓</i>agrees</span></div>
+      <p class="take">Inverted from measured air mass with the modelled charge temperature, the model's median sits {{mc.boost.gap_sim|+.1f}} % from the car's own <code>Boost pressure</code>. With the raw sensor it sat {{mc.boost.gap_raw|+.1f}} % high.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="lk"></i>car, boost channel</span>
+      <span style="color:var(--sim)"><i class="lk"></i>simulation, modelled charge temperature</span>
+      <span style="color:var(--third)"><i class="lk"></i>simulation, raw pre-throttle sensor</span>
+    </div>
+    <div class="chart" id="c-boost"></div>
+    <p class="cap">Share of samples at or below each pressure; the gap at 0.5 is the median gap. {{mc.boost.n_sim|,}} model samples above 200 kPa against {{mc.boost.n_car|,}} logged readings above 15 psi gauge, gates that select the same region by construction. The pre-throttle sensor is a compressor outlet (mistake 13).</p>
+  </div>
+
+  <div class="fig" id="f-enrich">
+    <div class="fig-head">
+      <div class="row"><h3>Enrichment</h3><span class="pill serious"><i>✕</i>off</span></div>
+      <p class="take">The model reproduces the shape: no enrichment below 3500 rpm, then richer with speed and with time at high load. It runs lean of the car in the 4500–7000 rpm, 4–8 s cell: {{mc.enrich.cells.7.sim|.3f}} against {{mc.enrich.cells.7.car|.3f}}.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="ld" style="background:currentColor"></i>car, median λ</span>
+      <span style="color:var(--sim)"><i class="lds" style="background:currentColor"></i>simulation, median λ</span>
+      <span style="color:var(--car)"><i class="lo"></i>car, on the retired row-count dwell axis</span>
+    </div>
+    <div class="chart" id="c-enrich"></div>
+    <p class="cap">{{mc.enrich.n|,}} samples above 180 kPa, each scored at its own speed and dwell. The documented 0.87 for the lean cell is the hollow circle: dwell counted in rows at an assumed 4.6 Hz, which AUDIT.md H3 retired. On real timestamps the car reads {{mc.enrich.cells.7.car|.2f}}.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-enrich"></div></details>
+  </div>
+
+  <div class="fig" id="f-spark">
+    <div class="fig-head">
+      <div class="row"><h3>Part-load spark</h3><span class="pill serious"><i>✕</i>off</span></div>
+      <p class="take">As fitted on 7 September the map is unbiased ({{mc.spark.fit.mean|+.1f}}°, RMS {{mc.spark.fit.rmse|.1f}}°). As the simulator runs it today, it is {{mc.spark.run.mean|+.1f}}° advanced (RMS {{mc.spark.run.rmse|.1f}}°).</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--third)"><i class="ld" style="background:currentColor"></i>as fitted: IAT compensation on the sensor</span>
+      <span style="color:var(--sim)"><i class="lds" style="background:currentColor"></i>as run: IAT compensation on the modelled charge</span>
+    </div>
+    <div class="chart" id="c-spark"></div>
+    <p class="cap">{{mc.spark.n}} operating points, 30–75 kPa. Mistake 13 moved the compensation's input from the compressor-outlet sensor to the modelled charge temperature, which is right, but the map's constants were not refitted afterwards. Under boost the knock limit sets spark instead, so the climb is affected through the compensation only.</p>
+  </div>
+
+  <div class="fig" id="f-th10">
+    <div class="fig-head">
+      <div class="row"><h3>Oil and coolant over a two-hour drive</h3><span class="pill good"><i>✓</i>agrees</span></div>
+      <p class="take"><code>thermal.py</code> driven free-running over drive10's operating points tracks both sensors to within a few kelvin: oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="lk"></i>car, sensor</span>
+      <span style="color:var(--sim)"><i class="lk"></i>simulation, thermal.py</span>
+    </div>
+    <div class="chart" id="c-th10-oil"></div>
+    <div class="chart" id="c-th10-ect"></div>
+    <p class="cap">drive10 is the only drive whose oil reaches the published 115–140 °C band: the car peaks at {{mc.thermal.drive10.oil_peak_car|.0f}} °C, the model at {{mc.thermal.drive10.oil_peak_sim|.0f}} °C. At the four-minute idle near minute 45 the model cools while the car holds 93 °C: its 88 °C thermostat stands in for the B58's heat-management valve.</p>
+  </div>
+
+  <div class="fig" id="f-th74">
+    <div class="fig-head">
+      <div class="row"><h3>Oil on hard pulls</h3><span class="pill serious"><i>✕</i>off</span></div>
+      <p class="take">On 7475b5d7's pulls to 230 km/h the model's oil spikes to {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C and falls back within a minute. The real sump barely moves and peaks at {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="lk"></i>car, sensor</span>
+      <span style="color:var(--sim)"><i class="lk"></i>simulation, thermal.py</span>
+    </div>
+    <div class="chart" id="c-th74-oil"></div>
+    <div class="chart" id="c-th74-ect"></div>
+    <p class="cap">This is <code>validate.py</code>'s oil time constant, {{mc.lit.8.value|.0f}} s against a 20–400 s band, seen against the car. The oil node is far too light, so it chases every pull.</p>
+  </div>
+
+  <div class="fig" id="f-knock">
+    <div class="fig-head">
+      <div class="row"><h3>Knock</h3><span class="pill crit"><i>∅</i>negative</span></div>
+      <p class="take">The model's knock integral carries no detectable information about the retard the car applies: correlation {{mc.knock.corr|+.3f}} over {{mc.knock.n|,}} paired samples.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="lr" style="background:currentColor"></i>car samples, darker = more</span>
+      <span style="color:var(--crit)"><i class="lk dash"></i>damage-term knee, KI 0.85</span>
+    </div>
+    <div class="chart" id="c-knock"></div>
+    <p class="cap">Where the model says knock (KI above 0.85) the car's median retard is {{mc.knock.med_rt_knock|.1f}}°; where it says none, {{mc.knock.med_rt_quiet|.1f}}°. Do not quote a knock-limited spark or knock damage term as calibrated. {{mc.knock.above20}} samples above 20° are gearshift torque cuts and sit off the top. Drive 7475b5d7, the only full drive logging the target ignition angle.</p>
+  </div>
+
+  <div class="fig" id="f-gear">
+    <div class="fig-head">
+      <div class="row"><h3>Gearbox</h3><span class="pill good"><i>✓</i>agrees</span></div>
+      <p class="take">The ratio the car actually ran, from engine speed and road speed, clusters on the published ZF 8HP51 ratios: {{mc.gear.within|.1f}} % of {{mc.gear.n|,}} moving samples within 4 %.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="lr" style="background:currentColor"></i>car, overall ratio</span>
+      <span style="color:var(--sim)"><i class="lk dash"></i>published gear × 3.150 final drive</span>
+    </div>
+    <div class="chart" id="c-gear"></div>
+    <p class="cap">The car's own <code>Actual gear</code> channel never reports above {{mc.gear.clamp|.0f}}: it clamps, and calls 7th and 8th "6" (mistake 18). The tallest spike is 8th gear at motorway speed.</p>
+  </div>
+
+  <div class="fig" id="f-env">
+    <div class="fig-head">
+      <div class="row"><h3>Compressor ceiling</h3><span class="pill warn"><i>◐</i>limited</span></div>
+      <p class="take">The simulator never lets boost exceed what the car was seen to reach at each flow. The highest pressure ratio logged is {{mc.env.pr_max|.2f}}.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="ld" style="background:currentColor"></i>car, quasi-steady sample</span>
+      <span style="color:var(--sim)"><i class="lk"></i>simulation, <code>boost_ceiling_kpa</code></span>
+    </div>
+    <div class="chart" id="c-env"></div>
+    <p class="cap">{{mc.env.shown|,}} of {{mc.env.n|,}} samples shown. It is an operating ceiling fitted to these data, not a compressor map, and its top rests on four to five independent readings per flow bin. Above 0.314 kg/s the air-mass sensor saturates.</p>
+  </div>
+
+  <div class="fig" id="f-duty">
+    <div class="fig-head">
+      <div class="row"><h3>Where the car was driven</h3><span class="pill none"><i>○</i>not covered</span></div>
+      <p class="take">Only {{mc.duty.frac|.1f}} % of {{mc.duty.n|,}} moving samples reach the climb's {{mc.duty.scen_map|.0f}} kPa. The car was driven fast on flat road, and a flat road asks for drag and rolling resistance and little else.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="lr" style="background:currentColor"></i>car samples, darker = more</span>
+      <span style="color:var(--sim)"><i class="lsq" style="background:currentColor;transform:rotate(45deg)"></i>simulation, the locked climb</span>
+    </div>
+    <div class="chart" id="c-duty"></div>
+    <p class="cap">Median relative air filling per drive is {{mc.duty.load_med_lo|.0f}}–{{mc.duty.load_med_hi|.0f}} %. This is why the scenario needs a grade, and why no amount of further flat-road logging validates the hot region.</p>
+  </div>
+
+  <div class="fig" id="f-lit">
+    <div class="fig-head">
+      <div class="row"><h3>Published bands</h3><span class="pill warn"><i>◐</i>limited</span></div>
+      <p class="take"><code>validate.py</code> puts {{mc.lit_ok}} of {{mc.lit_n}} model outputs inside their published ranges. The oil climb ({{mc.lit.7.value|.1f}} °C) now has car data behind its miss: drive10 reached {{mc.thermal.drive10.oil_peak_car|.0f}} °C.</p>
+    </div>
+    <div class="chart" id="c-lit"></div>
+    <p class="cap">These are ranges from the literature, not measurements from this car, and <code>REFERENCES.md</code> records which are sourced. Position 0 is the low edge of each band, 1 the high edge.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-lit"></div></details>
+  </div>
+</section>
+
+<!-- ================================================================ CAVEATS -->
+<section id="caveats">
+  <div class="sect-head">
+    <p class="eyebrow">Read before quoting</p>
+    <h2>What this page is not</h2>
+  </div>
+  <div class="caveats">
+    <div class="cav"><h3>Not Phase D's answer</h3><p>The ten agents trained at 110 km/h, where the constraint never binds, and at a 0.2 s step while the protocol scores at 1.0 s. They are out of distribution twice over. The retrain at 130 km/h and dt = 1.0 is what settles it.</p></div>
+    <div class="cav"><h3>Hand-written rows are one rollout</h3><p>They do not read the preference weights, so their zero spread is structural. It is not a sign of stability.</p></div>
+    <div class="cav"><h3>Turbine temperature is modelled</h3><p>No sensor on this car reads it. Its heat capacity, <code>c_turb</code> = 6000 J/K, is assumed, and it sets τ, the denominator of the claim.</p></div>
+    <div class="cav"><h3>Three calibrations need attention</h3><p>The spark map needs a refit on the modelled charge temperature, the enrichment table needs regenerating on real timestamps, and the oil node needs more thermal mass. None of these has been changed.</p></div>
+  </div>
+
+  <footer>
+    <p>Regenerate everything on this page from the repository:</p>
+<pre>python model_vs_data.py     # the comparisons against the car
+python make_figures.py      # thesis PNGs, results/figures/
+python make_page.py         # this page</pre>
+    <p style="margin-top:12px">Branch {{meta.branch}} at {{meta.commit}}. Every number in the text is filled from the same data as the charts.</p>
+  </footer>
+</section>
+</main>
+
+<script type="application/json" id="page-data">/*__DATA__*/null</script>
+<script>
+(() => {
+"use strict";
+const D = JSON.parse(document.getElementById("page-data").textContent);
+const NS = "http://www.w3.org/2000/svg";
+let UID = 0;
+
+// ------------------------------------------------------------ dom helpers
+function S(tag, a, p) {
+  const e = document.createElementNS(NS, tag);
+  if (a) for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]);
+  if (p) p.appendChild(e);
+  return e;
+}
+function T(p, x, y, str, a) {
+  const t = S("text", Object.assign({ x, y }, a || {}), p);
+  t.textContent = str;
+  return t;
+}
+function H(tag, a, p) {
+  const e = document.createElement(tag);
+  if (a) for (const k in a) {
+    if (k === "text") e.textContent = a[k]; else e.setAttribute(k, a[k]);
+  }
+  if (p) p.appendChild(e);
+  return e;
+}
+const fin = v => v != null && isFinite(v);
+const f = (v, d = 1, sign = false) => {
+  if (!fin(v)) return "–";
+  const s = (sign && v > 0 ? "+" : "") + v.toFixed(d);
+  return s.replace("-", "−");
+};
+const mix = t => `color-mix(in oklab, var(--seq-lo), var(--seq-hi) ${Math.round(Math.max(0, Math.min(1, t)) * 100)}%)`;
+
+// ----------------------------------------------------------------- scales
+function lin(d0, d1, r0, r1) {
+  const s = v => r0 + (v - d0) / (d1 - d0) * (r1 - r0);
+  s.inv = p => d0 + (p - r0) / (r1 - r0) * (d1 - d0);
+  return s;
+}
+function logs(d0, d1, r0, r1) {
+  const a = Math.log(d0), b = Math.log(d1);
+  const s = v => r0 + (Math.log(v) - a) / (b - a) * (r1 - r0);
+  s.inv = p => Math.exp(a + (p - r0) / (r1 - r0) * (b - a));
+  return s;
+}
+function ticks(lo, hi, n) {
+  const raw = (hi - lo) / Math.max(1, n);
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const e = raw / mag;
+  const step = (e >= 7.5 ? 10 : e >= 3.5 ? 5 : e >= 1.5 ? 2 : 1) * mag;
+  const out = [];
+  for (let v = Math.ceil(lo / step - 1e-9) * step; v <= hi + step * 1e-9; v += step)
+    out.push(+v.toFixed(10));
+  return out;
+}
+
+// ------------------------------------------------------------------- plot
+function plot(host, o) {
+  const W = o.w, Hh = o.h;
+  const m = Object.assign({ t: 12, r: 16, b: 42, l: 52 }, o.m || {});
+  const svg = S("svg", { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, class: "plot",
+                         role: "img", "aria-label": o.aria || "" }, host);
+  const x = (o.x.log ? logs : lin)(o.x.d[0], o.x.d[1], m.l, W - m.r);
+  const y = (o.y.log ? logs : lin)(o.y.d[0], o.y.d[1], Hh - m.b, m.t);
+  const grid = S("g", { class: "grid" }, svg);
+  const pw = W - m.l - m.r, ph = Hh - m.t - m.b;
+  if (!o.x.none) {
+    const xt = o.x.ticks || ticks(o.x.d[0], o.x.d[1], Math.max(2, Math.round(pw / 80)));
+    for (const v of xt) {
+      const px = x(v);
+      if (o.xgrid !== false) S("line", { x1: px, x2: px, y1: m.t, y2: Hh - m.b }, grid);
+      T(svg, px, Hh - m.b + 16, (o.x.fmt || String)(v), { "text-anchor": "middle" });
+    }
+  }
+  if (!o.y.none) {
+    const yt = o.y.ticks || ticks(o.y.d[0], o.y.d[1], Math.max(2, Math.round(ph / 48)));
+    for (const v of yt) {
+      const py = y(v);
+      S("line", { x1: m.l, x2: W - m.r, y1: py, y2: py }, grid);
+      T(svg, m.l - 7, py + 4, (o.y.fmt || String)(v), { "text-anchor": "end" });
+    }
+  }
+  S("line", { x1: m.l, x2: W - m.r, y1: Hh - m.b, y2: Hh - m.b, class: "axis" }, svg);
+  if (o.x.label) T(svg, m.l + pw / 2, Hh - 6, o.x.label, { class: "alabel", "text-anchor": "middle" });
+  if (o.y.label) {
+    const cy = m.t + ph / 2;
+    T(svg, 13, cy, o.y.label, { class: "alabel", "text-anchor": "middle", transform: `rotate(-90 13 ${cy})` });
+  }
+  const id = "clip" + (++UID);
+  S("rect", { x: m.l, y: m.t - 2, width: pw, height: ph + 4 }, S("clipPath", { id }, S("defs", {}, svg)));
+  const g = S("g", { "clip-path": `url(#${id})` }, svg);
+  const top = S("g", {}, svg);
+  return { svg, g, top, x, y, m, W, H: Hh, pw, ph, host };
+}
+function line(P, xs, ys, st) {
+  let d = "", pen = false;
+  for (let i = 0; i < xs.length; i++) {
+    if (!fin(ys[i]) || !fin(xs[i])) { pen = false; continue; }
+    d += (pen ? "L" : "M") + P.x(xs[i]).toFixed(1) + "," + P.y(ys[i]).toFixed(1);
+    pen = true;
+  }
+  return S("path", { d, class: "ln", style: `stroke:${st.c};stroke-width:${st.w || 2};` +
+    (st.dash ? `stroke-dasharray:${st.dash};` : "") + (st.op ? `opacity:${st.op};` : "") }, P.g);
+}
+function hline(P, v, st) {
+  const py = P.y(v);
+  S("line", { x1: P.m.l, x2: P.W - P.m.r, y1: py, y2: py,
+              style: `stroke:${st.c};stroke-width:${st.w || 1.3};stroke-dasharray:${st.dash || "5 4"}` }, P.g);
+  if (st.label) T(P.top, st.right ? P.W - P.m.r - 4 : P.m.l + 6, py + (st.below ? 14 : -6), st.label,
+                  { class: "lbl", style: `fill:${st.c}`, "text-anchor": st.right ? "end" : "start" });
+}
+function vline(P, v, st) {
+  const px = P.x(v);
+  S("line", { x1: px, x2: px, y1: P.m.t, y2: P.H - P.m.b,
+              style: `stroke:${st.c};stroke-width:${st.w || 1.3};stroke-dasharray:${st.dash || "5 4"}` }, P.g);
+  if (st.label) T(P.top, px + 5, P.m.t + (st.dy || 12), st.label,
+                  { class: "lbl", style: `fill:${st.c}` });
+}
+
+// -------------------------------------------------------------- tooltip
+function tip(host) {
+  let t = host.querySelector(":scope > .tip");
+  if (!t) { t = H("div", { class: "tip", role: "status" }, host); t.hidden = true; }
+  return t;
+}
+function showTip(host, px, py, title, rows) {
+  const t = tip(host);
+  t.replaceChildren();
+  if (title) H("div", { class: "tt", text: title }, t);
+  for (const r of rows) {
+    const row = H("div", { class: "tr" }, t);
+    const k = H("span", { class: "key" }, row);
+    k.style.borderColor = r.c || "transparent";
+    H("b", { text: r.v }, row);
+    if (r.k) H("span", { class: "tl", text: r.k }, row);
+  }
+  t.hidden = false;
+  const hw = host.clientWidth, tw = t.offsetWidth, th = t.offsetHeight;
+  let left = px + 14;
+  if (left + tw > hw) left = px - 14 - tw;
+  if (left < 0) left = Math.max(0, Math.min(hw - tw, px - tw / 2));
+  let top = py - th - 12;
+  if (top < 0) top = py + 16;
+  t.style.left = left + "px";
+  t.style.top = top + "px";
+}
+function hideTip(host) { const t = host.querySelector(":scope > .tip"); if (t) t.hidden = true; }
+function localXY(P, e) {
+  const r = P.svg.getBoundingClientRect();
+  return [e.clientX - r.left, e.clientY - r.top];
+}
+function onPointer(el, move, leave) {
+  el.addEventListener("pointermove", move);
+  el.addEventListener("pointerdown", move);
+  el.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") leave(); });
+}
+
+// Crosshair: snaps to the nearest x, lists every series at that x.
+function crosshair(P, xs, series, xfmt) {
+  const hair = S("line", { class: "hair", y1: P.m.t, y2: P.H - P.m.b, visibility: "hidden" }, P.top);
+  const dots = series.map(s => S("circle", { r: 4, class: "hdot", style: `fill:${s.c}`, visibility: "hidden" }, P.top));
+  const hit = S("rect", { x: P.m.l, y: P.m.t, width: P.pw, height: P.ph, class: "hit" }, P.top);
+  const leave = () => { hair.setAttribute("visibility", "hidden"); dots.forEach(d => d.setAttribute("visibility", "hidden")); hideTip(P.host); };
+  onPointer(hit, e => {
+    const [px, py] = localXY(P, e);
+    const xv = P.x.inv(px);
+    let lo = 0, hi = xs.length - 1;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (xs[mid] < xv) lo = mid; else hi = mid; }
+    const i = Math.abs(xs[lo] - xv) < Math.abs(xs[hi] - xv) ? lo : hi;
+    const X = P.x(xs[i]);
+    hair.setAttribute("x1", X); hair.setAttribute("x2", X); hair.setAttribute("visibility", "visible");
+    series.forEach((s, k) => {
+      const v = s.ys[i];
+      if (fin(v)) { dots[k].setAttribute("cx", X); dots[k].setAttribute("cy", P.y(v)); dots[k].setAttribute("visibility", "visible"); }
+      else dots[k].setAttribute("visibility", "hidden");
+    });
+    showTip(P.host, X, py, xfmt(xs[i]), series.map(s => ({ c: s.c, v: s.f(s.ys[i]), k: s.name })));
+  }, leave);
+}
+// Nearest point: the pointer only has to be closest, not on the dot.
+function nearest(P, pts, rowsOf, radius) {
+  const px = pts.map(p => [P.x(p.x), P.y(p.y)]);
+  const ring = S("circle", { r: 8, class: "ring", visibility: "hidden" }, P.top);
+  const hit = S("rect", { x: P.m.l, y: P.m.t, width: P.pw, height: P.ph, class: "hit" }, P.top);
+  const leave = () => { ring.setAttribute("visibility", "hidden"); hideTip(P.host); };
+  onPointer(hit, e => {
+    const [mx, my] = localXY(P, e);
+    let best = -1, bd = (radius || 32) ** 2;
+    for (let i = 0; i < px.length; i++) {
+      const d = (px[i][0] - mx) ** 2 + (px[i][1] - my) ** 2;
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best < 0) return leave();
+    ring.setAttribute("cx", px[best][0]); ring.setAttribute("cy", px[best][1]); ring.setAttribute("visibility", "visible");
+    const r = rowsOf(pts[best]);
+    showTip(P.host, px[best][0], px[best][1], r.title, r.rows);
+  }, leave);
+}
+// Per-mark hover and keyboard focus for bars and cells.
+function markTip(P, el, cx, cy, title, rows) {
+  el.setAttribute("tabindex", "0");
+  el.classList.add("mark");
+  const show = () => showTip(P.host, cx, cy, title, rows);
+  el.addEventListener("pointerenter", show);
+  el.addEventListener("pointerdown", show);
+  el.addEventListener("focus", show);
+  el.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") hideTip(P.host); });
+  el.addEventListener("blur", () => hideTip(P.host));
+}
+
+// ------------------------------------------------------------ mounting
+const charts = [];
+function mount(id, draw, hOf) {
+  const host = document.getElementById(id);
+  if (!host) return;
+  const c = { host, draw, hOf, w: 0 };
+  charts.push(c);
+  render(c);
+}
+function render(c, force) {
+  const w = Math.floor(c.host.clientWidth);
+  if (!w || (!force && w === c.w)) return;
+  c.w = w;
+  c.host.querySelectorAll(":scope > svg").forEach(s => s.remove());
+  hideTip(c.host);
+  const h = c.hOf ? c.hOf(w) : Math.round(Math.min(400, Math.max(250, w * 0.56)));
+  try { c.draw(c.host, w, h); } catch (err) { console.error(c.host.id, err); }
+}
+const ro = new ResizeObserver(() => charts.forEach(c => render(c)));
+document.addEventListener("pointerdown", e => {
+  if (!e.target.closest(".chart")) charts.forEach(c => hideTip(c.host));
+});
+
+// ====================================================== PART 1: PHASE D
+const PD = D.pd;
+const PCOL = {
+  "baseline ECU": "var(--pd-base)", "reactive": "var(--pd-react)",
+  "current-grade": "var(--pd-grade)", "predictive (hand)": "var(--pd-pred)"
+};
+const kindCol = e => e.kind === "sighted" ? "var(--pd-sight)" : e.kind === "blinded" ? "var(--pd-blind)"
+  : (PCOL[e.name] || "var(--pd-base)");
+const narrow = w => w < 520;
+// Row labels short enough for a phone's label column; tooltips keep the full name.
+const shortName = n => n.replace(/^sighted_seed(\d)$/, "sighted $1").replace(/^blind_seed(\d)$/, "blinded $1");
+// Place a label right of a point, or left of it when it would leave the plot.
+function sideLabel(P, x, y, str, style) {
+  const right = x + 14 + str.length * 6.8 < P.W - P.m.r;
+  return T(P.top, right ? x + 14 : x - 14, y, str,
+           { class: "lbl", "text-anchor": right ? "start" : "end", style });
+}
+
+let zoomTop = false;
+function drawTrace(host, w, h) {
+  const T0 = PD.trace;
+  const P = plot(host, { w, h,
+    x: { d: zoomTop ? [240, 720] : [0, 720], label: "time into episode (s)" },
+    y: { d: zoomTop ? [825, 895] : [200, 920], label: "turbine housing (°C)" },
+    m: { l: 50 } });
+  S("rect", { x: P.x(T0.climb_from), y: P.m.t, width: P.x(720) - P.x(T0.climb_from), height: P.ph,
+              style: "fill:var(--band)" }, P.g);
+  hline(P, 850, { c: "var(--crit)", label: "850 °C trigger", right: true, below: true });
+  if (!zoomTop) T(P.top, P.x(T0.climb_from) + 6, P.y(250), "12 % grade", { class: "lbl", style: "fill:var(--ink-3);font-style:italic" });
+  const ser = T0.series.map(s => ({ name: s.name, ys: s.turb, c: PCOL[s.name], f: v => f(v, 1) + " °C" }));
+  ser.forEach((s, i) => line(P, T0.t, s.ys, { c: s.c, w: 2.2, dash: i === 3 ? "6 4" : null }));
+  crosshair(P, T0.t, ser, v => `t = ${v.toFixed(0)} s`);
+}
+mount("c-trace", drawTrace);
+for (const [id, top] of [["z-all", false], ["z-top", true]]) {
+  document.getElementById(id).addEventListener("click", () => {
+    zoomTop = top;
+    document.getElementById("z-all").setAttribute("aria-pressed", String(!top));
+    document.getElementById("z-top").setAttribute("aria-pressed", String(top));
+    const c = charts.find(c => c.host.id === "c-trace");
+    render(c, true);
+  });
+}
+
+mount("c-damage", (host, w, h) => {
+  const T0 = PD.trace;
+  const ymax = Math.max(...T0.series.map(s => Math.max(...s.dmg.filter(fin))));
+  const P = plot(host, { w, h, x: { d: [0, 720], label: "time into episode (s)" },
+    y: { d: [0, Math.ceil(ymax / 100) * 100], label: "cumulative damage" }, m: { l: 50 } });
+  S("rect", { x: P.x(T0.climb_from), y: P.m.t, width: P.x(720) - P.x(T0.climb_from), height: P.ph,
+              style: "fill:var(--band)" }, P.g);
+  const ser = T0.series.map(s => ({ name: s.name, ys: s.dmg, c: PCOL[s.name], f: v => f(v, 1) }));
+  ser.forEach((s, i) => line(P, T0.t, s.ys, { c: s.c, w: 2.2, dash: i === 3 ? "6 4" : null }));
+  crosshair(P, T0.t, ser, v => `t = ${v.toFixed(0)} s`);
+});
+
+mount("c-sweep", (host, w) => {
+  const SW = PD.sweep;
+  const h = narrow(w) ? 230 : 260;
+  const m = { t: 8, r: 8, b: 42, l: 70 };
+  const svg = S("svg", { width: w, height: h, class: "plot", role: "img",
+                         "aria-label": "Peak turbine temperature by speed and grade" }, host);
+  const P = { svg, top: svg, host, W: w, H: h, m };
+  const cw = (w - m.l - m.r) / SW.grades.length, ch = (h - m.t - m.b) / SW.speeds.length;
+  SW.speeds.forEach((v, i) => {
+    const row = SW.speeds.length - 1 - i;
+    T(svg, m.l - 10, m.t + row * ch + ch / 2 + 4, v + " km/h", { "text-anchor": "end" });
+    SW.grades.forEach((g, j) => {
+      const val = SW.peak[i][j], t = (val - 300) / 650;
+      const x0 = m.l + j * cw, y0 = m.t + row * ch;
+      const r = S("rect", { x: x0 + 1, y: y0 + 1, width: cw - 2, height: ch - 2, rx: 3,
+                            style: `fill:${mix(t)}` + (val > 850 ? ";stroke:var(--crit);stroke-width:2.5" : "") }, svg);
+      T(svg, x0 + cw / 2, y0 + ch / 2 + 5, f(val, 0) + " °C", { "text-anchor": "middle",
+        style: `font-size:${narrow(w) ? 11.5 : 13}px;font-weight:${val > 850 ? 600 : 400};fill:var(${t > 0.55 ? "--seq-ink-hi" : "--seq-ink-lo"})` });
+      markTip(P, r, x0 + cw / 2, y0 + ch / 2, `${v} km/h, ${g} % grade`,
+        [{ v: f(val, 1) + " °C", k: "peak turbine" },
+         { v: f(SW.above[i][j], 1) + " %", k: "of episode above 850 °C" }]);
+    });
+  });
+  SW.grades.forEach((g, j) => T(svg, m.l + j * cw + cw / 2, h - m.b + 17, g + " %", { "text-anchor": "middle" }));
+  T(svg, m.l + (w - m.l - m.r) / 2, h - 6, "road gradient", { class: "alabel", "text-anchor": "middle" });
+}, () => 0);
+
+mount("c-eval", (host, w) => {
+  const E = PD.eval;
+  const rowH = 26;
+  const lw = narrow(w) ? 88 : 132;
+  const h = E.length * rowH + 50;
+  const xmax = Math.max(...E.map(e => e.q3)) * (narrow(w) ? 1.52 : 1.38);
+  const P = plot(host, { w, h, x: { d: [0, xmax], label: "median episode damage" },
+    y: { d: [E.length, 0], none: true }, m: { l: lw, t: 6, r: 10 } });
+  const y = i => P.m.t + (i + 0.5) * rowH;
+  vline(P, PD.base_med, { c: "var(--crit)" });
+  E.forEach((e, i) => {
+    const c = kindCol(e);
+    const label = narrow(w) ? shortName(e.name).replace(" (hand)", "") : shortName(e.name);
+    T(P.svg, lw - 8, y(i) + 4, label, { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    const bar = S("rect", { x: P.x(0), y: y(i) - 8, width: Math.max(1, P.x(e.med) - P.x(0)), height: 16,
+                            rx: 3, style: `fill:${c}` }, P.g);
+    if (e.q3 > e.q1) {
+      S("line", { x1: P.x(e.q1), x2: P.x(e.q3), y1: y(i), y2: y(i), style: "stroke:var(--ink);stroke-width:1.6" }, P.g);
+      for (const q of [e.q1, e.q3]) S("line", { x1: P.x(q), x2: P.x(q), y1: y(i) - 5, y2: y(i) + 5, style: "stroke:var(--ink);stroke-width:1.6" }, P.g);
+    }
+    T(P.top, P.x(Math.max(e.med, e.q3)) + 7, y(i) + 4,
+      narrow(w) ? `${f(e.cut, 1)} %` : `${f(e.med, 0)} · cuts ${f(e.cut, 1)} %`,
+      { class: "lbl", style: "fill:var(--ink)" });
+    markTip(P, bar, P.x(e.med), y(i), e.name, [
+      { c, v: f(e.med, 1), k: "median damage" },
+      { v: `${f(e.q1, 0)}–${f(e.q3, 0)}`, k: "interquartile range" },
+      { v: f(e.cut, 1) + " %", k: "cut vs baseline" },
+      { v: f(e.fuel_pct, 1, true) + " %", k: "fuel vs baseline" },
+      { v: f(e.peak, 0) + " °C", k: "hottest episode" }]);
+  });
+  T(P.top, P.x(PD.base_med) - 4, P.H - P.m.b - 6, "baseline", { class: "lbl", style: "fill:var(--crit)", "text-anchor": "end" });
+}, () => 0);
+
+mount("c-abl", (host, w) => {
+  const A = PD.ablation;
+  const grp = 58, h = A.seeds.length * grp + 50;
+  const lw = 58;
+  const xmax = Math.max(...A.seeds.map(s => Math.max(s.s, s.b))) * (narrow(w) ? 1.36 : 1.24);
+  const P = plot(host, { w, h, x: { d: [0, xmax], label: "damage cut vs baseline (%)" },
+    y: { d: [1, 0], none: true }, m: { l: lw, t: 8, r: 10 } });
+  vline(P, A.grade_cut, { c: "var(--pd-grade)", w: 2 });
+  A.seeds.forEach((s, i) => {
+    const y0 = P.m.t + i * grp + 8;
+    T(P.svg, lw - 8, y0 + 22, "seed " + s.seed, { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    [["s", "var(--pd-sight)", "sighted", 0], ["b", "var(--pd-blind)", "blinded", 20]].forEach(([k, c, nm, dy]) => {
+      const r = S("rect", { x: P.x(0), y: y0 + dy, width: P.x(s[k]) - P.x(0), height: 18, rx: 3, style: `fill:${c}` }, P.g);
+      markTip(P, r, P.x(s[k]), y0 + dy + 9, `seed ${s.seed}, ${nm}`,
+        [{ c, v: f(s[k], 1) + " %", k: "damage cut" }, { v: f(s.d, 1, true) + " pts", k: "sighted minus blinded" }]);
+    });
+    T(P.top, P.x(Math.max(s.s, s.b)) + 8, y0 + 23, f(s.d, 1, true) + " pts",
+      { class: "lbl", style: "fill:var(--ink);font-weight:600" });
+  });
+}, () => 0);
+
+mount("c-trade", (host, w, h) => {
+  const E = PD.eval;
+  const by = n => E.find(e => e.name === n);
+  const xs = E.map(e => e.fuel_pct), ys = E.map(e => e.cut);
+  const P = plot(host, { w, h,
+    x: { d: [Math.floor(Math.min(...xs) - 2), Math.ceil(Math.max(...xs) + 2)], label: "extra fuel vs baseline (%)" },
+    y: { d: [-6, 80], label: "damage cut vs baseline (%)" }, m: { l: 50 } });
+  vline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
+  hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
+  for (let s = 0; s < 5; s++) {
+    const a = by("sighted_seed" + s), b = by("blind_seed" + s);
+    S("line", { x1: P.x(a.fuel_pct), y1: P.y(a.cut), x2: P.x(b.fuel_pct), y2: P.y(b.cut),
+                style: "stroke:var(--ink-3);stroke-width:1.4" }, P.g);
+    const up = s === 1 || s === 2;
+    T(P.top, (P.x(a.fuel_pct) + P.x(b.fuel_pct)) / 2, (P.y(a.cut) + P.y(b.cut)) / 2 + (up ? -12 : 20),
+      "seed " + s, { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-2)" });
+  }
+  const pts = E.map(e => ({ x: e.fuel_pct, y: e.cut, e }));
+  for (const p of pts) {
+    const c = kindCol(p.e);
+    if (p.e.kind === "hand") S("rect", { x: P.x(p.x) - 6, y: P.y(p.y) - 6, width: 12, height: 12,
+                                         style: `fill:${c};stroke:var(--surface);stroke-width:2` }, P.g);
+    else S("circle", { cx: P.x(p.x), cy: P.y(p.y), r: 6.5, style: `fill:${c};stroke:var(--surface);stroke-width:2` }, P.g);
+  }
+  for (const n of ["baseline ECU", "reactive", "current-grade", "predictive (hand)"]) {
+    const e = by(n);
+    const dy = n === "current-grade" ? -12 : n === "predictive (hand)" ? 20 : 20;
+    const anchor = n === "current-grade" ? "end" : n === "predictive (hand)" ? "start" : "middle";
+    const dx = n === "current-grade" ? -4 : n === "predictive (hand)" ? 4 : 0;
+    T(P.top, P.x(e.fuel_pct) + dx, P.y(e.cut) + dy, n.replace(" (hand)", ""),
+      { class: "lbl", "text-anchor": anchor, style: `fill:${PCOL[n]}` });
+  }
+  nearest(P, pts, p => ({ title: p.e.name, rows: [
+    { c: kindCol(p.e), v: f(p.y, 1) + " %", k: "damage cut" },
+    { v: f(p.x, 1, true) + " %", k: "fuel vs baseline" }] }));
+});
+
+mount("c-curves", (host, w, h) => {
+  const C = PD.curves;
+  const all = C.flatMap(c => c.ret);
+  const P = plot(host, { w, h, x: { d: [0, 10], label: "training episode", ticks: [0, 2, 4, 6, 8, 10] },
+    y: { d: [Math.floor(Math.min(...all) / 100) * 100, Math.ceil(Math.max(...all) / 100) * 100], label: "episode return" },
+    m: { l: 50 } });
+  hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
+  const xs = C[0].ret.map((_, i) => i);
+  C.forEach(c => line(P, xs, c.ret, { c: c.blind ? "var(--pd-blind)" : "var(--pd-sight)", w: 1.7, op: 0.8 }));
+  // The tooltip gives the median of each group's five runs at that episode;
+  // ten rows would bury the phone screen.
+  const median = blind => xs.map(i => {
+    const v = C.filter(c => c.blind === blind).map(c => c.ret[i]).sort((a, b) => a - b);
+    return v[Math.floor(v.length / 2)];
+  });
+  const med = v => "median " + f(v, 0);
+  crosshair(P, xs, [
+    { name: "sighted, 5 runs", ys: median(false), c: "var(--pd-sight)", f: med },
+    { name: "blinded, 5 runs", ys: median(true), c: "var(--pd-blind)", f: med }
+  ], v => `episode ${v}`);
+});
+
+// ================================================ PART 2: VS THE CAR
+const MC = D.mc;
+
+mount("c-load", (host, w) => {
+  const L = MC.load;
+  const s = Math.min(w, 460), h = s;
+  const P = plot(host, { w: s, h, x: { d: [15, 60], label: "car, Relative air filling (%)" },
+    y: { d: [15, 60], label: "simulation (%)" }, m: { l: 50, b: 42 } });
+  S("line", { x1: P.x(15), y1: P.y(15), x2: P.x(60), y2: P.y(60), style: "stroke:var(--ink-3);stroke-dasharray:5 4" }, P.g);
+  const pts = L.points.map(p => ({ x: p[0], y: p[1], p }));
+  pts.forEach(p => S("circle", { cx: P.x(p.x), cy: P.y(p.y), r: 5.5, style: "fill:var(--sim);stroke:var(--surface);stroke-width:1.8" }, P.g));
+  nearest(P, pts, p => ({ title: `${f(p.p[2], 0)} rpm, ${f(p.p[3], 0)} kPa`, rows: [
+    { c: "var(--car)", v: f(p.x, 1) + " %", k: "car" },
+    { c: "var(--sim)", v: f(p.y, 1) + " %", k: "simulation" },
+    { v: f(100 * (p.y - p.x) / p.x, 1, true) + " %", k: "error" }] }));
+}, w => Math.min(w, 460));
+
+mount("c-boost", (host, w, h) => {
+  const B = MC.boost;
+  const P = plot(host, { w, h, x: { d: [195, 345], label: "manifold pressure (kPa absolute)" },
+    y: { d: [0, 1], label: "share at or below", fmt: v => v.toFixed(1) }, m: { l: 50 } });
+  hline(P, 0.5, { c: "var(--ink-3)", w: 1, dash: "3 3" });
+  const ser = [["car", B.car, "var(--car)", B.med_car, null],
+               ["simulation", B.sim, "var(--sim)", B.med_sim, B.gap_sim],
+               ["raw sensor", B.raw, "var(--third)", B.med_raw, B.gap_raw]];
+  for (const [nm, cd, c, med, gap] of ser) {
+    line(P, cd.map(p => p[0]), cd.map(p => p[1]), { c, w: 2.3 });
+    S("circle", { cx: P.x(med), cy: P.y(0.5), r: 5, style: `fill:${c};stroke:var(--surface);stroke-width:2` }, P.top);
+    T(P.top, P.x(med) + 7, P.y(0.5) + (gap == null ? 16 : -8),
+      f(med, 0) + (gap == null ? "" : `  ${f(gap, 1, true)} %`), { class: "lbl", style: `fill:${c};font-weight:600` });
+  }
+  const hair = S("line", { class: "hair", y1: P.m.t, y2: P.H - P.m.b, visibility: "hidden" }, P.top);
+  const hit = S("rect", { x: P.m.l, y: P.m.t, width: P.pw, height: P.ph, class: "hit" }, P.top);
+  const share = (cd, x) => {
+    if (x <= cd[0][0]) return 0;
+    for (let i = 1; i < cd.length; i++) if (cd[i][0] >= x) {
+      const [x0, y0] = cd[i - 1], [x1, y1] = cd[i];
+      return x1 === x0 ? y1 : y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+    }
+    return 1;
+  };
+  onPointer(hit, e => {
+    const [px, py] = localXY(P, e);
+    const xv = P.x.inv(px);
+    hair.setAttribute("x1", px); hair.setAttribute("x2", px); hair.setAttribute("visibility", "visible");
+    showTip(host, px, py, `at or below ${f(xv, 0)} kPa`,
+      ser.map(([nm, cd, c]) => ({ c, v: f(100 * share(cd, xv), 0) + " %", k: nm })));
+  }, () => { hair.setAttribute("visibility", "hidden"); hideTip(host); });
+});
+
+mount("c-enrich", (host, w) => {
+  const E = MC.enrich;
+  const rowH = 34, lw = narrow(w) ? 122 : 170;
+  const h = E.cells.length * rowH + 50;
+  const P = plot(host, { w, h, x: { d: [0.76, 1.04], label: "λ (lower is richer)", fmt: v => v.toFixed(2),
+    ticks: [0.8, 0.85, 0.9, 0.95, 1.0] }, y: { d: [1, 0], none: true }, m: { l: lw, t: 6, r: narrow(w) ? 54 : 110 } });
+  E.cells.forEach((c, i) => {
+    const y = P.m.t + (i + 0.5) * rowH;
+    const lab = narrow(w) ? `${c.rpm.replace("-", "–")} · ${c.dwell}` : `${c.rpm.replace("-", "–")} rpm, ${c.dwell}`;
+    T(P.svg, lw - 8, y + 4, lab, { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    S("line", { x1: P.x(c.car), x2: P.x(c.sim), y1: y, y2: y, style: "stroke:var(--grid);stroke-width:7;stroke-linecap:round" }, P.g);
+    if (Math.abs(c.old - c.car) > 0.005)
+      S("circle", { cx: P.x(c.old), cy: y, r: 6, style: "fill:none;stroke:var(--car);stroke-width:2" }, P.g);
+    S("circle", { cx: P.x(c.car), cy: y, r: 6, style: "fill:var(--car);stroke:var(--surface);stroke-width:1.6" }, P.g);
+    const dsz = 6.5;
+    S("rect", { x: P.x(c.sim) - dsz / 2, y: y - dsz / 2, width: dsz, height: dsz,
+                transform: `rotate(45 ${P.x(c.sim)} ${y})`, style: "fill:var(--sim);stroke:var(--surface);stroke-width:1.4" }, P.g);
+    const d = c.sim - c.car;
+    T(P.top, P.W - P.m.r + 8, y + 4, f(d, 3, true), { class: "lbl",
+      style: `fill:var(--ink);font-weight:${Math.abs(d) > 0.03 ? 700 : 400}` });
+    const hitr = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
+    markTip(P, hitr, P.x(Math.min(c.car, c.sim)), y, `${c.rpm} rpm, dwell ${c.dwell}`, [
+      { c: "var(--car)", v: f(c.car, 3), k: "car, median λ" },
+      { c: "var(--sim)", v: f(c.sim, 3), k: "simulation" },
+      { v: f(d, 3, true), k: "simulation minus car" },
+      { v: String(c.n), k: "samples" }]);
+  });
+}, () => 0);
+
+mount("c-spark", (host, w) => {
+  const Sp = MC.spark;
+  const s = Math.min(w, 480);
+  const P = plot(host, { w: s, h: s, x: { d: [10, 45], label: "car, Actual ignition angle (° BTDC)" },
+    y: { d: [10, 45], label: "simulation (° BTDC)" }, m: { l: 50 } });
+  S("line", { x1: P.x(10), y1: P.y(10), x2: P.x(45), y2: P.y(45), style: "stroke:var(--ink-3);stroke-dasharray:5 4" }, P.g);
+  const pts = [];
+  for (const p of Sp.points) {
+    S("circle", { cx: P.x(p[0]), cy: P.y(p[1]), r: 5, style: "fill:var(--third);stroke:var(--surface);stroke-width:1.6" }, P.g);
+    const X = P.x(p[0]), Y = P.y(p[2]), d = 6;
+    S("rect", { x: X - d / 2, y: Y - d / 2, width: d, height: d, transform: `rotate(45 ${X} ${Y})`,
+                style: "fill:var(--sim);stroke:var(--surface);stroke-width:1.4" }, P.g);
+    pts.push({ x: p[0], y: p[2], p });
+    pts.push({ x: p[0], y: p[1], p });
+  }
+  nearest(P, pts, q => ({ title: `${f(q.p[3], 0)} rpm, ${f(q.p[4], 0)} kPa`, rows: [
+    { c: "var(--car)", v: f(q.p[0], 1) + "°", k: "car" },
+    { c: "var(--third)", v: f(q.p[1], 1) + "°", k: "as fitted" },
+    { c: "var(--sim)", v: f(q.p[2], 1) + "°", k: "as run" }] }), 20);
+}, w => Math.min(w, 480));
+
+function thermal(id, drive, key, label) {
+  mount(id, (host, w) => {
+    const Th = MC.thermal[drive];
+    const car = Th[key + "_car"], sim = Th[key + "_sim"];
+    const vals = car.concat(sim).filter(fin);
+    const lo = Math.floor(Math.min(...vals) / 5) * 5, hi = Math.ceil(Math.max(...vals) / 5) * 5;
+    const h = narrow(w) ? 200 : 230;
+    const P = plot(host, { w, h, x: { d: [0, Math.ceil(Th.minutes / 10) * 10], label: "minutes into the drive" },
+      y: { d: [lo, hi], label }, m: { l: 50, b: 40 } });
+    line(P, Th.t, car, { c: "var(--car)", w: 2 });
+    line(P, Th.t, sim, { c: "var(--sim)", w: 1.5 });
+    crosshair(P, Th.t, [
+      { name: "car", ys: car, c: "var(--car)", f: v => f(v, 1) + " °C" },
+      { name: "simulation", ys: sim, c: "var(--sim)", f: v => f(v, 1) + " °C" }], v => `${v.toFixed(1)} min`);
+  }, () => 0);
+}
+thermal("c-th10-oil", "drive10", "oil", "oil (°C)");
+thermal("c-th10-ect", "drive10", "ect", "coolant (°C)");
+thermal("c-th74-oil", "7475b5d7", "oil", "oil (°C)");
+thermal("c-th74-ect", "7475b5d7", "ect", "coolant (°C)");
+
+function heat(host, w, h, o) {
+  const P = plot(host, { w, h, x: o.x, y: o.y, m: o.m, xgrid: false });
+  const maxc = Math.max(...o.cells.map(c => c[2]));
+  const lmax = Math.log10(maxc);
+  for (const c of o.cells) {
+    const x0 = P.x(c[0]), x1 = P.x(c[0] + o.dx), y0 = P.y(c[1] + o.dy), y1 = P.y(c[1]);
+    const r = S("rect", { x: Math.min(x0, x1), y: Math.min(y0, y1), width: Math.abs(x1 - x0) + 0.4,
+                          height: Math.abs(y1 - y0) + 0.4, style: `fill:${mix(0.12 + 0.88 * Math.log10(c[2]) / lmax)}` }, P.g);
+    r.addEventListener("pointerenter", () => showTip(host, (x0 + x1) / 2, Math.min(y0, y1), o.title(c), o.rows(c)));
+    r.addEventListener("pointerdown", () => showTip(host, (x0 + x1) / 2, Math.min(y0, y1), o.title(c), o.rows(c)));
+    r.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") hideTip(host); });
+  }
+  return P;
+}
+
+mount("c-knock", (host, w, h) => {
+  const K = MC.knock;
+  const P = heat(host, w, h, { cells: K.cells, dx: K.dx, dy: K.dy,
+    x: { d: [0, 1.64], label: "simulation, knock integral", fmt: v => v.toFixed(1) },
+    y: { d: [-2, 20], label: "car, retard applied (°)" }, m: { l: 50 },
+    title: c => `KI ${f(c[0], 2)}–${f(c[0] + K.dx, 2)}, retard ${f(c[1], 1)}–${f(c[1] + K.dy, 1)}°`,
+    rows: c => [{ c: "var(--car)", v: String(c[2]), k: "samples" }] });
+  vline(P, 0.85, { c: "var(--crit)", label: "knee", dy: 14 });
+  const bx = P.W - P.m.r - 8;
+  T(P.top, bx, P.m.t + 18, "r = " + f(K.corr, 3), { class: "lbl", "text-anchor": "end", style: "fill:var(--ink);font-size:14px;font-weight:600" });
+});
+
+mount("c-gear", (host, w, h) => {
+  const G = MC.gear;
+  const hmax = Math.max(...G.hist);
+  const P = plot(host, { w, h, x: { d: [1.8, 18], log: true, label: "overall ratio, engine speed / wheel speed",
+    ticks: [2, 3, 4, 5, 7, 10, 15] }, y: { d: [0, hmax * 1.12], label: "samples",
+    fmt: v => v >= 1000 ? (v / 1000) + "k" : v }, m: { l: 50, t: 22 } });
+  G.hist.forEach((n, i) => {
+    const a = G.edges[i], b = G.edges[i + 1];
+    if (!n || b < 1.8 || a > 18) return;
+    const r = S("rect", { x: P.x(Math.max(a, 1.8)), y: P.y(n), width: Math.max(0.8, P.x(b) - P.x(Math.max(a, 1.8)) - 0.3),
+                          height: P.y(0) - P.y(n), style: "fill:var(--car)" }, P.g);
+    const near = G.published.map((p, k) => [Math.abs(Math.log((a + b) / 2 / p)), k]).sort((u, v) => u[0] - v[0])[0][1];
+    r.addEventListener("pointerenter", () => showTip(host, P.x((a + b) / 2), P.y(n), `ratio ${f(a, 2)}–${f(b, 2)}`,
+      [{ c: "var(--car)", v: String(n), k: "samples" }, { v: `gear ${near + 1}`, k: `nearest, ${f(G.published[near], 3)}` }]));
+    r.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") hideTip(host); });
+  });
+  G.published.forEach((p, k) => {
+    if (p > 18) return;
+    const px = P.x(p);
+    S("line", { x1: px, x2: px, y1: P.m.t, y2: P.H - P.m.b, style: "stroke:var(--sim);stroke-width:1.4;stroke-dasharray:4 3" }, P.g);
+    T(P.top, px, P.m.t - 6, String(k + 1), { class: "lbl", "text-anchor": "middle", style: "fill:var(--sim);font-weight:600" });
+  });
+});
+
+mount("c-env", (host, w, h) => {
+  const V = MC.env;
+  const P = plot(host, { w, h, x: { d: [0, 0.36], label: "corrected mass flow (kg/s)", fmt: v => v.toFixed(2) },
+    y: { d: [0.95, 2.65], label: "pressure ratio", fmt: v => v.toFixed(1) }, m: { l: 50 } });
+  S("rect", { x: P.x(0.314), y: P.m.t, width: P.x(0.36) - P.x(0.314), height: P.ph, style: "fill:var(--band)" }, P.g);
+  T(P.top, P.x(0.337), P.H - P.m.b - 10, "MAF", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-3)" });
+  T(P.top, P.x(0.337), P.H - P.m.b - 24, "sensor", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-3)" });
+  for (const p of V.pts) S("circle", { cx: P.x(p[0]), cy: P.y(p[1]), r: 2.2, style: "fill:var(--car);opacity:.45" }, P.g);
+  const cx = V.curve.map(p => p[0]), cy = V.curve.map(p => p[1]);
+  line(P, cx, cy, { c: "var(--sim)", w: 2.6 });
+  crosshair(P, cx, [{ name: "ceiling", ys: cy, c: "var(--sim)", f: v => "PR " + f(v, 2) }], v => `${f(v, 3)} kg/s`);
+});
+
+mount("c-duty", (host, w, h) => {
+  const Dt = MC.duty;
+  const P = heat(host, w, h, { cells: Dt.cells, dx: Dt.drpm, dy: Dt.dmap,
+    x: { d: [600, 7000], label: "engine speed (rpm)", fmt: v => v >= 1000 ? (v / 1000) + "k" : v },
+    y: { d: [20, 260], label: "manifold pressure (kPa)" }, m: { l: 50 },
+    title: c => `${f(c[0], 0)}–${f(c[0] + Dt.drpm, 0)} rpm, ${f(c[1], 0)}–${f(c[1] + Dt.dmap, 0)} kPa`,
+    rows: c => [{ c: "var(--car)", v: String(c[2]), k: "samples" }] });
+  hline(P, Dt.scen_map, { c: "var(--sim)", w: 1.2 });
+  const X = P.x(Dt.scen_rpm), Y = P.y(Dt.scen_map), r = 9;
+  S("rect", { x: X - r / 1.4, y: Y - r / 1.4, width: r * 1.4, height: r * 1.4, transform: `rotate(45 ${X} ${Y})`,
+              style: "fill:var(--sim);stroke:var(--surface);stroke-width:2" }, P.top);
+  sideLabel(P, X, Y - 12, narrow(w) ? "the climb" : `the climb, ${f(Dt.scen_rpm, 0)} rpm · ${f(Dt.scen_map, 0)} kPa`,
+    "fill:var(--sim);font-weight:600");
+});
+
+mount("c-lit", (host, w) => {
+  const Lr = MC.lit;
+  const rowH = 34, lw = narrow(w) ? 128 : 250;
+  const SHORT = { "Displacement": "Displacement", "MFB50 at MBT (2500 rpm, 60 kPa)": "MFB50 at MBT",
+    "Best BSFC (knock-feasible, lambda 1)": "Best BSFC", "Knock-limited spark (3000 rpm, 200 kPa)": "Knock-limited spark",
+    "EGT, cruise band (min)": "EGT cruise, min", "EGT, cruise band (max)": "EGT cruise, max",
+    "Turbine housing time constant": "Turbine τ", "Oil temperature, sustained climb": "Oil, climb",
+    "Oil time constant": "Oil τ", "Coolant, thermostat-regulated": "Coolant",
+    "Coolant regulation response (NOT a free time constant)": "Coolant response" };
+  const h = Lr.length * rowH + 50;
+  const P = plot(host, { w, h, x: { d: [-0.7, 1.9], label: "position inside the band", ticks: [0, 0.5, 1],
+    fmt: v => v === 0 ? "low" : v === 1 ? "high" : "mid" }, y: { d: [1, 0], none: true },
+    m: { l: lw, t: 6, r: 10 } });
+  S("rect", { x: P.x(0), y: P.m.t, width: P.x(1) - P.x(0), height: P.ph, style: "fill:color-mix(in srgb,var(--car) 9%,transparent)" }, P.g);
+  Lr.forEach((r, i) => {
+    const y = P.m.t + (i + 0.5) * rowH;
+    const span = (r.hi - r.lo) || 1, pos = Math.max(-0.6, Math.min(1.8, (r.value - r.lo) / span));
+    const name = narrow(w) ? (SHORT[r.name] || r.name.slice(0, 18)) : r.name;
+    T(P.svg, lw - 8, y + 4, name, { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    const c = r.ok ? "var(--sim)" : "var(--crit)";
+    const dot = r.ok ? S("circle", { cx: P.x(pos), cy: y, r: 6, style: `fill:${c};stroke:var(--surface);stroke-width:1.6` }, P.g)
+      : S("path", { d: `M${P.x(pos) - 5},${y - 5}L${P.x(pos) + 5},${y + 5}M${P.x(pos) + 5},${y - 5}L${P.x(pos) - 5},${y + 5}`,
+                    style: `stroke:${c};stroke-width:2.6;stroke-linecap:round` }, P.g);
+    if (!narrow(w)) T(P.top, P.x(pos) + 11, y + 4, `${r.value} ${r.unit}`, { class: "lbl", style: `fill:${r.ok ? "var(--ink)" : "var(--crit-ink)"}` });
+    const hitr = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
+    markTip(P, hitr, P.x(pos), y, r.name, [
+      { c, v: `${r.value} ${r.unit}`, k: r.ok ? "inside" : "OUTSIDE" },
+      { v: `${r.lo}–${r.hi}`, k: "published band" }]);
+  });
+}, () => 0);
+
+// ----------------------------------------------------------- data tables
+function table(id, head, rows, numCols) {
+  const host = document.getElementById(id);
+  if (!host) return;
+  const t = H("table", {}, host);
+  const tr = H("tr", {}, H("thead", {}, t));
+  head.forEach((h, i) => H("th", { class: numCols.includes(i) ? "n" : "", text: h }, tr));
+  const tb = H("tbody", {}, t);
+  rows.forEach(r => {
+    const row = H("tr", {}, tb);
+    r.forEach((c, i) => H("td", { class: numCols.includes(i) ? "n" : "", text: c }, row));
+  });
+}
+table("t-eval", ["policy", "median", "IQR", "worst", "cut %", "fuel %", "peak °C"],
+  PD.eval.map(e => [e.name, f(e.med, 1), `${f(e.q1, 0)}–${f(e.q3, 0)}`, f(e.worst, 0), f(e.cut, 1),
+                    f(e.fuel_pct, 1, true), f(e.peak, 0)]), [1, 2, 3, 4, 5, 6]);
+table("t-abl", ["seed", "sighted cut %", "blinded cut %", "difference"],
+  PD.ablation.seeds.map(s => [String(s.seed), f(s.s, 1), f(s.b, 1), f(s.d, 1, true)])
+    .concat([["mean", "", "", f(PD.ablation.mean, 2, true)], ["95 % CI", "", "", `${f(PD.ablation.lo, 1, true)} to ${f(PD.ablation.hi, 1, true)}`]]),
+  [1, 2, 3]);
+table("t-enrich", ["rpm", "dwell", "n", "car λ", "sim λ", "sim − car", "car, rows axis"],
+  MC.enrich.cells.map(c => [c.rpm, c.dwell, String(c.n), f(c.car, 3), f(c.sim, 3), f(c.sim - c.car, 3, true), f(c.old, 3)]),
+  [2, 3, 4, 5, 6]);
+table("t-lit", ["quantity", "model", "band", "inside"],
+  MC.lit.map(r => [r.name, `${r.value} ${r.unit}`, `${r.lo}–${r.hi}`, r.ok ? "yes" : "no"]), [1, 2]);
+
+charts.forEach(c => ro.observe(c.host));
+})();
+</script>
