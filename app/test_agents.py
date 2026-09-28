@@ -2024,6 +2024,40 @@ class UserSettingTests(unittest.TestCase):
                                          {"APPDATA": str(ROOT)}), (None, None))
         self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "typesafe_key", {}), (None, None))
 
+    def test_a_file_as_windows_writes_it(self):
+        # Windows PowerShell 5.1 writes UTF-16 LE with a byte-order mark for `>` and
+        # Out-File, and UTF-8 with a mark under -Encoding utf8 (this machine's profile
+        # makes that its default); Notepad can write UTF-16 BE. Measured 28 Sep: a plain
+        # UTF-8 read kept the mark in the value and read the UTF-16 file as no file.
+        mark, key, home = chr(0xFEFF), "sentinel-key", r"C:\Some Folder\laya"
+        read = {
+            "utf8_mark": ((key + "\r\n").encode("utf-8-sig"), key),
+            "utf16le_mark": ((mark + key + "\r\n").encode("utf-16-le"), key),
+            "utf16be_mark": ((mark + key + "\r\n").encode("utf-16-be"), key),
+            "home_utf16le_mark": ((mark + home + "\r\n").encode("utf-16-le"), home),
+            "home_utf8_mark": ((home + "\r\n").encode("utf-8-sig"), home),
+        }
+        # UTF-16 with no mark reads as UTF-8 with a NUL after every letter, and UTF-32
+        # LE's mark begins with UTF-16 LE's: neither may become a value, and nor may a
+        # second line.
+        refused = {
+            "utf16le_no_mark": key.encode("utf-16-le"),
+            "utf32le_mark": (mark + key).encode("utf-32-le"),
+            "two_lines": (key + "\r\n" + key + "\r\n").encode("utf-8"),
+        }
+        with tempfile.TemporaryDirectory() as appdata:
+            folder = Path(appdata) / "grad-project"
+            folder.mkdir()
+            for name, (data, _) in read.items():
+                (folder / name).write_bytes(data)
+            for name, data in refused.items():
+                (folder / name).write_bytes(data)
+            env = {"APPDATA": appdata}
+            for name, (_, want) in read.items():
+                self.assertEqual(MQ.user_setting("M3_UNSET", name, env), (want, "file"), name)
+            for name in refused:
+                self.assertEqual(MQ.user_setting("M3_UNSET", name, env), (None, None), name)
+
 
 def _shape(x):
     """A JSON value's structure: every dict key, a list by its first item, 'value' for the rest."""

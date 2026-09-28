@@ -21,6 +21,7 @@ is ASCII (design C12).
 """
 from __future__ import annotations
 
+import codecs
 import math
 import os
 from pathlib import Path
@@ -198,6 +199,20 @@ def to_action(answers):
     return out
 
 
+def _file_text(path):
+    """A setting file's text, decoded as Windows tools write it.
+
+    Windows PowerShell 5.1 writes UTF-16 LE with a byte-order mark for `>` and
+    Out-File, and UTF-8 with a mark under -Encoding utf8; Notepad can write
+    UTF-16 BE. The mark is never part of the text. Measured 28 Sep: a plain
+    UTF-8 read kept the mark in the value, and read a UTF-16 file as no file.
+    """
+    raw = path.read_bytes()
+    if raw.startswith((codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)):
+        return raw.decode("utf-16")
+    return raw.decode("utf-8-sig")
+
+
 def user_setting(env_var, file_name, environ=None):
     """(value, 'env' | 'file'), or (None, None).
 
@@ -207,6 +222,11 @@ def user_setting(env_var, file_name, environ=None):
     travels in a zip or a copy (CLAUDE.md mistakes 11 and 16). A VALUE is
     never treated as a path: the server runs from the repository root, so a
     key resolved as a path would always land inside it.
+
+    The file is UTF-8 or UTF-16, with or without a byte-order mark
+    (_file_text), and its value is one line of printable text. A NUL (UTF-16
+    with no mark, or UTF-32 read as UTF-16) or a second line is refused,
+    because a key goes into an HTTP header and a folder is looked up as named.
     """
     env = os.environ if environ is None else environ
     value = (env.get(env_var) or "").strip()
@@ -219,7 +239,7 @@ def user_setting(env_var, file_name, environ=None):
     if path == REPO or REPO in path.parents:
         return None, None
     try:
-        text = path.read_text(encoding="utf-8").strip()
+        text = _file_text(path).strip()
     except (OSError, UnicodeDecodeError):
         return None, None
-    return (text, "file") if text else (None, None)
+    return (text, "file") if text and text.isprintable() else (None, None)
