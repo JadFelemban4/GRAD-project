@@ -29,9 +29,11 @@ import fingerprint as FP
 from app import agent_api as API
 from app import agent_catalog as AC
 from app import agent_trace as T
+from app import model_questions as MQ
 from check_premise import p_grade_now, p_neutral
-from engine_env import (ACT_HI, ACT_LO, OBS_DIM, PREVIEW_S, SLEW, TURB_PROTECT_K,
-                        SupervisoryTunerEnv, make_grade_climb, neutral_action)
+from engine_env import (ACT_HI, ACT_LO, OBS_DIM, OIL_PROTECT_K, PREVIEW_S, SLEW,
+                        TURB_PROTECT_K, SupervisoryTunerEnv, make_grade_climb,
+                        neutral_action)
 from evaluate import EPISODES, EPISODES_D2, agent_policy, run_episode
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -1637,7 +1639,7 @@ def tearDownModule():
                              + ("" if status == before_status else " (and git status moved)"))
 
 
-NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py")
+NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py", "model_questions.py")
 WRITE_PATTERNS = (
     (r"\bopen\s*\([^)]*,\s*(mode\s*=\s*)?['\"][^'\"]*[wax+]", "write-mode open"),
     (r"\.write\w*\s*\(", "write / write_text / write_bytes"),
@@ -1699,6 +1701,328 @@ class NoNetworkTests(unittest.TestCase):
                     continue
                 found += [f"{path.name}:{node.lineno} {r}" for r in roots if r in NET_ROOTS]
         self.assertEqual(found, [])
+
+
+# ---- M3: the one question both models are asked (app/model_questions.py) ----
+#
+# Spec tests 14 and 15. _obs_trace() is a real agent_api.Trace built without an
+# agent: D2 episode 1 stepped with neutral_action(), sighted and blind, exactly
+# as agent_trace.run_lanes builds, resets and pins its envs.
+
+_OBS_TRACES = {}
+
+
+def _obs_trace(n=8):
+    """A Trace for ('runs_c4', 5, 1) holding n real observation rows per lane; cached by n."""
+    if n not in _OBS_TRACES:
+        ep = T.episode("d2", 1)
+        lanes = []
+        for use_preview in (True, False):
+            env = SupervisoryTunerEnv(T.build_cycle(ep), dt=T.DT, seed=ep["seed"],
+                                      use_preview=use_preview)
+            env.reset(seed=ep["seed"])
+            env.w = np.asarray(ep["weights"], dtype=np.float32)
+            obs, rows = env._obs(), []
+            for _ in range(n):
+                rows.append(np.array(obs, dtype=np.float32, copy=True))
+                obs = env.step(neutral_action())[0]
+            lanes.append(np.stack(rows))
+        _OBS_TRACES[n] = API.Trace(("runs_c4", 5, 1),
+                                   [{"k": k, "cars": [None, None]} for k in range(n)],
+                                   [], lanes, "cpu", {})
+    return _OBS_TRACES[n]
+
+
+def _model_answer(pick=1):
+    """A model-shaped answer: KEYS[qid][pick] chosen with p 0.6, the probabilities
+    listed in REVERSED order, and the three fields to_action must drop."""
+    out = {}
+    for qid in MQ.IDS:
+        keys = list(MQ.KEYS[qid])
+        probs = {k: (0.6 if j == pick else 0.1) for j, k in enumerate(keys)}
+        out[qid] = {"choice": keys[pick], "probabilities": dict(reversed(list(probs.items()))),
+                    "confidence": 0.93, "answer_confidence": 0.6, "action": "ignored"}
+    return out
+
+
+def _with(qid, **change):
+    """_model_answer() with one question's fields changed (a value of None deletes it)."""
+    out = _model_answer()
+    for field, value in change.items():
+        if value is None:
+            del out[qid][field]
+        else:
+            out[qid][field] = value
+    return out
+
+
+def _with_p(value, qid="spark_trim", key="no change"):
+    """_model_answer() with one probability replaced."""
+    out = _model_answer()
+    out[qid]["probabilities"][key] = value
+    return out
+
+
+class QuestionTests(unittest.TestCase):
+    """Spec test 14: the five questions, their levels, and answers become actions."""
+
+    NEUTRAL_COL = (2, 2, 2, 4, 4)
+    NAMED = ((-8.0, -4.0, 0.0, 2.0, 4.0),
+             (-0.15, -0.075, 0.0, 0.03, 0.06),
+             (-40.0, -20.0, 0.0, 7.5, 15.0),
+             (0.0, 0.25, 0.5, 0.75, 1.0),
+             (0.3, 0.475, 0.65, 0.825, 1.0))
+
+    def test_levels_and_net(self):
+        neutral = np.asarray(API.page_constants()["act"]["neutral_phys"], dtype=np.float32)
+        env = SupervisoryTunerEnv(make_grade_climb(), dt=1.0)
+        for table in (MQ.LEVELS, MQ.NET):
+            self.assertEqual((table.dtype, table.shape), (np.float32, (5, 5)))
+        np.testing.assert_allclose(MQ.LEVELS, np.asarray(self.NAMED), atol=1e-6,
+                                   err_msg="a level is not the one its key names")
+        for i, qid in enumerate(MQ.IDS):
+            with self.subTest(action=qid):
+                row = MQ.LEVELS[i]
+                self.assertTrue(np.all(np.diff(row) > 0), row)
+                self.assertEqual((row[0], row[-1]), (ACT_LO[i], ACT_HI[i]))
+                j = self.NEUTRAL_COL[i]
+                self.assertEqual(row[j], neutral[i])
+                self.assertEqual(MQ.NET[i, j].tobytes(), neutral_action()[i].tobytes())
+        for j in range(5):
+            err = np.max(np.abs(env._rescale(MQ.NET[:, j]) - MQ.LEVELS[:, j]))
+            self.assertLessEqual(float(err), 1e-6, f"column {j}")
+        self.assertTrue(np.all((MQ.NET >= -1.0) & (MQ.NET <= 1.0)))
+
+    def test_questions_and_options(self):
+        for questions in (MQ.QUESTIONS, MQ.QUESTIONS_REVERSED):
+            self.assertEqual(tuple(questions), MQ.IDS)
+            for qid, q in questions.items():
+                with self.subTest(qid=qid):
+                    self.assertEqual(set(q), {"type", "instructions", "criteria"})
+                    self.assertEqual(q["type"], "choice", "a score question is never asked")
+                    self.assertIn("`task`", q["instructions"])
+                    self.assertEqual(len(q["criteria"]), 5)
+                    self.assertTrue(all(key.isascii() for key in q["criteria"]), "C12")
+        self.assertTrue(json.dumps(MQ.QUESTIONS, ensure_ascii=False).isascii())
+        self.assertIn("ceiling", MQ.QUESTIONS["boost_ceiling"]["instructions"])
+        for qid in MQ.IDS:
+            with self.subTest(qid=qid):
+                fwd, rev = MQ.QUESTIONS[qid], MQ.QUESTIONS_REVERSED[qid]
+                self.assertEqual(fwd["instructions"], MQ.INSTRUCTIONS[qid])
+                self.assertEqual(list(fwd["criteria"]), list(MQ.KEYS[qid]))
+                self.assertEqual(list(fwd["criteria"].values()), list(MQ.DESCRIPTIONS[qid]))
+                self.assertEqual(MQ.OPTIONS[qid], {key: j for j, key in enumerate(MQ.KEYS[qid])})
+                self.assertEqual(len(set(MQ.OPTIONS[qid].values())), 5)
+                self.assertEqual(rev["instructions"], fwd["instructions"])
+                self.assertEqual(list(rev["criteria"].items()),
+                                 list(reversed(list(fwd["criteria"].items()))))
+        self.assertIsNot(MQ.QUESTIONS_REVERSED, MQ.QUESTIONS)
+
+    def test_to_action(self):
+        got = MQ.to_action(_model_answer(pick=1))
+        self.assertEqual(tuple(got), MQ.IDS)
+        for i, qid in enumerate(MQ.IDS):
+            with self.subTest(qid=qid):
+                a = got[qid]
+                self.assertEqual(set(a), {"choice", "level_phys", "level_net", "probabilities",
+                                          "chosen_p", "options"})
+                self.assertEqual(a["choice"], MQ.KEYS[qid][1])
+                self.assertEqual(list(a["probabilities"]), list(MQ.KEYS[qid]), "KEYS order")
+                self.assertEqual(a["chosen_p"], a["probabilities"][a["choice"]])
+                self.assertEqual(a["chosen_p"], 0.6)
+                self.assertEqual(a["level_phys"], float(MQ.LEVELS[i, 1]))
+                self.assertEqual(a["level_net"], float(MQ.NET[i, 1]))
+                self.assertEqual(a["options"], [{"key": k, "level_phys": float(MQ.LEVELS[i, j])}
+                                                for j, k in enumerate(MQ.KEYS[qid])])
+        json.dumps(got, allow_nan=False)
+        extra = _model_answer(pick=1)
+        extra["drive_the_car"] = {"choice": "yes"}
+        self.assertEqual(MQ.to_action(extra), got, "an extra id is dropped")
+        whole = _model_answer()
+        whole["spark_trim"]["probabilities"] = {k: (1 if k == "retard 4 deg" else 0)
+                                                for k in MQ.KEYS["spark_trim"]}
+        self.assertEqual(MQ.to_action(whole)["spark_trim"]["chosen_p"], 1.0)
+
+        cases = {
+            "answers None": None,
+            "answers a list": [],
+            "an id missing": {k: v for k, v in _model_answer().items() if k != "cooling_fan"},
+            "an id not an object": {**_model_answer(), "cooling_fan": "fan 50 %"},
+            "a choice outside the options": _with("spark_trim", choice="retard 5 deg"),
+            "a choice that is not a string": _with("spark_trim", choice=1),
+            "no choice": _with("spark_trim", choice=None),
+            "no probabilities": _with("spark_trim", probabilities=None),
+            "probabilities a list": _with("spark_trim", probabilities=[0.2] * 5),
+            "a probability missing": _with("spark_trim", probabilities={
+                k: 0.25 for k in MQ.KEYS["spark_trim"] if k != "no change"}),
+            "an extra probability": _with("spark_trim", probabilities={
+                **{k: 0.2 for k in MQ.KEYS["spark_trim"]}, "retard 5 deg": 0.0}),
+            "NaN": _with_p(float("nan")),
+            "infinity": _with_p(float("inf")),
+            "above one": _with_p(1.5),
+            "below zero": _with_p(-0.1),
+            "a bool": _with_p(True),
+            "a string": _with_p("0.2"),
+            "null": _with_p(None),
+        }
+        for why, answers in cases.items():
+            with self.subTest(why=why):
+                with self.assertRaises(MQ.BadAnswer) as caught:
+                    MQ.to_action(answers)
+                self.assertNotIn("retard 5 deg", str(caught.exception),
+                                 "a BadAnswer carries no text from the answer")
+        self.assertTrue(issubclass(MQ.BadAnswer, ValueError))
+
+
+MODEL_MODULES = ("model_questions.py",)
+RECORDED_DRIVE = ("app.replay", "app.reader", "app.estimator")
+
+
+def _imports(source):
+    """Every module a source imports, dotted: `from app import x` counts as app.x."""
+    names = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            names.update(a.name for a in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            base = node.module or ""
+            if node.level:
+                base = "app" + ("." + base if base else "")
+            names.add(base)
+            names.update(f"{base}.{a.name}" for a in node.names)
+    return names
+
+
+def _recorded_drive(source):
+    """The RECORDED_DRIVE modules a source imports, or anything inside them."""
+    found = _imports(source)
+    return sorted(r for r in RECORDED_DRIVE
+                  if any(m == r or m.startswith(r + ".") for m in found))
+
+
+class StateTests(unittest.TestCase):
+    """Spec test 15: the state is the sighted agent's own observation, and nothing else."""
+
+    def test_decode_is_the_observation(self):
+        ep = T.episode("d2", 1)
+        env = SupervisoryTunerEnv(T.build_cycle(ep), dt=T.DT, seed=ep["seed"])
+        env.reset(seed=ep["seed"])
+        env.w = np.asarray(ep["weights"], dtype=np.float32)
+        checked = []
+        for k in range(201):
+            if k in (0, 1, 50, 150, 200):
+                got = MQ.decode(env._obs())
+                t, c = env.thermal.state(), env.cycle
+                want = {
+                    "engine_speed_rpm": (env.rpm, 1),
+                    "manifold_pressure_kPa": (env.map_kpa, 2),
+                    "throttle_fraction": (env.tps, 4),
+                    "spark_advance_deg_BTDC": (env.spark, 2),
+                    "lambda": (env.lam, 4),
+                    "engine_block_C": (t[0] - 273.15, 2),
+                    "oil_C": (t[1] - 273.15, 2),
+                    "turbine_housing_C": (t[2] - 273.15, 1),
+                    "charge_air_C": (env.iat_k - 273.15, 2),
+                    "ambient_C": (c["t_amb"] - 273.15, 2),
+                    "barometric_kPa": (c.get("p_baro", 101.3), 2),
+                    "humidity_kg_per_kg": (c.get("humidity", 0.01), 5),
+                    "road_speed_kmh": (env.v * 3.6, 2),
+                    "grade_now_percent": (c["grade"][env.k] * 100.0, 3),
+                    "torque_requested_Nm": (env.torque_req, 1),
+                    "driver_aggression_0_to_1": (env.aggression, 4),
+                }
+                for i, h in enumerate(PREVIEW_S):
+                    want[("grade_ahead_percent", f"in_{h:g}_s")] = (env._preview()[i] * 100.0, 3)
+                for i, name in enumerate(("deliver_torque", "save_fuel", "protect_components")):
+                    want[("priorities", name)] = (env.w[i], 4)
+                for name, (value, digits) in want.items():
+                    field = got[name[0]][name[1]] if isinstance(name, tuple) else got[name]
+                    with self.subTest(k=k, field=name):
+                        self.assertLessEqual(abs(field - float(value)), 10.0 ** -digits)
+                self.assertEqual(got["note"], MQ.NOTE)
+                json.dumps(got, allow_nan=False)
+                checked.append(k)
+            if k == 200:
+                break
+            env.step(neutral_action())
+        self.assertEqual(checked, [0, 1, 50, 150, 200])
+        for bad in (np.zeros(22, dtype=np.float32), np.zeros((1, 23), dtype=np.float32),
+                    np.full(23, np.nan, dtype=np.float32)):
+            with self.subTest(bad=bad.shape):
+                with self.assertRaises(ValueError):
+                    MQ.decode(bad)
+
+    def test_state_carries_the_task_and_refuses_browser_state(self):
+        trace = _obs_trace()
+        state = MQ.build_state(trace, 3)
+        self.assertEqual(state, {"engine": MQ.decode(trace.obs[0][3]), "task": MQ.TASK})
+        # At second 3 the two lanes still see the same road, so pin the lane directly.
+        other = API.Trace(trace.key, trace.frames, [],
+                          [trace.obs[0], np.zeros_like(trace.obs[1])], "cpu", {})
+        self.assertEqual(MQ.build_state(other, 3), state, "the SIGHTED lane's view, obs[0]")
+        self.assertIn(f"{TURB_PROTECT_K - 273.15:.0f} °C", MQ.TASK)
+        self.assertIn(f"{OIL_PROTECT_K - 273.15:.0f} °C", MQ.TASK)
+        engine = state["engine"]
+        self.assertEqual(list(engine["grade_ahead_percent"]), [f"in_{h:g}_s" for h in PREVIEW_S])
+        self.assertEqual(list(engine["priorities"]),
+                         ["deliver_torque", "save_fuel", "protect_components"])
+        for got, weight in zip(engine["priorities"].values(), T.episode("d2", 1)["weights"]):
+            self.assertAlmostEqual(got, weight, delta=1e-4)
+        json.dumps(state, allow_nan=False)
+        for bad in ({"obs": trace.obs}, list(trace.obs), None,
+                    type("Lookalike", (), {"obs": trace.obs})()):
+            with self.subTest(bad=type(bad).__name__):
+                with self.assertRaises(TypeError):
+                    MQ.build_state(bad, 3)
+
+    def test_no_recorded_drive_imports(self):
+        for name in MODEL_MODULES:
+            with self.subTest(module=name):
+                source = (ROOT / "app" / name).read_text(encoding="utf-8")
+                self.assertEqual(_recorded_drive(source), [])
+        probe = "from app import replay\nfrom app.reader import X\nimport app.estimator\n"
+        self.assertEqual(_recorded_drive(probe), ["app.estimator", "app.reader", "app.replay"],
+                         "the scan must be able to fail")
+
+
+class UserSettingTests(unittest.TestCase):
+    """model_questions.user_setting: the environment first, then a file OUTSIDE the repository."""
+
+    def test_env_wins_and_is_never_a_path(self):
+        self.assertEqual(Path.cwd().resolve(), ROOT, "run the suite from the repository root")
+        with tempfile.TemporaryDirectory() as appdata:
+            (Path(appdata) / "grad-project").mkdir()
+            (Path(appdata) / "grad-project" / "typesafe_key").write_text("filekey\n",
+                                                                         encoding="utf-8")
+            env = {"TYPESAFE_API_KEY": "sentinel-key", "APPDATA": appdata}
+            self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "typesafe_key", env),
+                             ("sentinel-key", "env"))
+        # a value is never resolved: one that names a repository file is still just a value
+        self.assertEqual(MQ.user_setting("X", "x", {"X": "app/server.py"}), ("app/server.py", "env"))
+        self.assertEqual(MQ.user_setting("X", "x", {"X": "  padded \n"}), ("padded", "env"))
+        self.assertEqual(MQ.user_setting("X", "x", {"X": "   "}), (None, None))
+        with mock.patch.dict(os.environ, {"GRAD_M3_SETTING_PROBE": "from-os-environ"}):
+            self.assertEqual(MQ.user_setting("GRAD_M3_SETTING_PROBE", "x"),
+                             ("from-os-environ", "env"))
+
+    def test_file_outside_is_read_and_a_file_inside_the_repository_is_refused(self):
+        with tempfile.TemporaryDirectory() as appdata:
+            self.assertNotIn(ROOT, Path(appdata).resolve().parents)
+            folder = Path(appdata) / "grad-project"
+            folder.mkdir()
+            (folder / "typesafe_key").write_text("filekey\n", encoding="utf-8")
+            (folder / "blank").write_text("  \n", encoding="utf-8")
+            env = {"APPDATA": appdata}
+            self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "typesafe_key", env),
+                             ("filekey", "file"))
+            self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "blank", env), (None, None))
+            self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "missing", env), (None, None))
+        # <ROOT>/grad-project/../app/server.py resolves to app/server.py, which exists and
+        # reads; only the repository check can refuse it.
+        self.assertTrue((ROOT / "app" / "server.py").is_file())
+        self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "../app/server.py",
+                                         {"APPDATA": str(ROOT)}), (None, None))
+        self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "typesafe_key", {}), (None, None))
 
 
 def _shape(x):
