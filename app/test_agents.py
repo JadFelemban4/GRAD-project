@@ -1426,12 +1426,27 @@ class RouteTests(unittest.TestCase):
         self.assertEqual(r.json(), {"detail": "catalog failed: OSError"})
         self.assertNotIn("secret", r.text)
 
-        # Raised INSIDE the real discover: a results file that is not UTF-8
-        # fails in analyse_phase_d.parse, reached through table_rows.
+    def test_catalog_failure_inside_discover_is_500_no_store(self):
+        """The same fixed text when the error is raised INSIDE the real
+        discover: a results file that is not UTF-8 fails in
+        analyse_phase_d.parse, reached through discover -> table_rows ->
+        analyse_phase_d2.load. discover walks a temporary root holding one
+        empty runs_d2/, so this runs on a clone where the gitignored runs*/
+        directories are absent; load still reads the repository's own
+        tracked results/d2_seed*.txt, which is what reaches parse."""
         import analyse_phase_d2
+        self.assertTrue(sorted((ROOT / "results").glob("d2_seed*.txt")),
+                        "no results/d2_seed*.txt: parse would never be reached")
+        real_discover = AC.discover
+        secret = r"C:\secret\runs_zz\sighted_seed0\meta.json"
         bad = UnicodeDecodeError("utf-8", bytes([0xFF]), 0, 1, secret)
-        with mock.patch.object(analyse_phase_d2, "parse", side_effect=bad):
-            r = client.get(CATALOG_URL)
+        _, client = _client(_StubStore())
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "runs_d2").mkdir()
+            with mock.patch.object(AC, "discover", lambda root=AC.ROOT: real_discover(tmp)), \
+                    mock.patch.object(analyse_phase_d2, "parse", side_effect=bad) as parse:
+                r = client.get(CATALOG_URL)
+        self.assertTrue(parse.called, "the error must come through the real discover chain")
         self.assertEqual(r.status_code, 500)
         self.assertEqual(r.headers.get("cache-control"), "no-store")
         self.assertEqual(r.json(), {"detail": "catalog failed: UnicodeDecodeError"})
