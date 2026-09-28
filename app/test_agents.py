@@ -21,6 +21,7 @@ import threading
 import time
 import unittest
 from unittest import mock
+import warnings
 
 import numpy as np
 
@@ -40,6 +41,11 @@ C4_SEEDS = range(8)
 HAVE_C4 = all((ROOT / "runs_c4" / f"{arm}_seed{k}" / "final.zip").is_file()
               for arm in ("sighted", "blind") for k in C4_SEEDS)
 NO_C4 = "runs_c4/ is not on this machine: the catalog path is UNPROVEN here"
+ALL_RUNS = ("runs", "runs_d2", "runs_c4")
+HAVE_ALL_RUNS = all((ROOT / d / f"{arm}_seed{k}" / "final.zip").is_file()
+                    for d in ALL_RUNS for arm in ("sighted", "blind") for k in range(8))
+NO_ALL_RUNS = ("runs/, runs_d2/ and runs_c4/ are not all complete on this machine: "
+               "the catalog is UNPROVEN here")
 
 
 class TraceTests(unittest.TestCase):
@@ -102,6 +108,26 @@ class TraceTests(unittest.TestCase):
         self.assertAlmostEqual(T.route(T.build_cycle(T.episode("d2", 5)))["rise_m"], 1917, delta=1)
         self.assertAlmostEqual(T.route(T.build_cycle(T.episode("d2", 6)))["rise_m"], 3247, delta=1)
         self.assertEqual(T.route(T.build_cycle(T.episode("phase-d", 1)))["climb_start_s"], 180.0)
+
+    def test_episode_row(self):
+        """The picker's row for one frozen episode, read from the road the env steps."""
+        want = {("d2", 1): (1000, 141.0, 0.13314),
+                # the table says 281.95; random_road.climb starts the grade at int(281.95)
+                ("d2", 2): (1001, 281.0, 0.15025),
+                ("phase-d", 1): (1000, 180.0, 0.12),
+                ("phase-d", 20): (1019, 180.0, 0.12)}
+        for (protocol, idx), (seed, climb, grade) in want.items():
+            with self.subTest(protocol=protocol, idx=idx):
+                ep = T.episode(protocol, idx)
+                row = T.episode_row(ep, T.route(T.build_cycle(ep)))
+                self.assertEqual(row, {"idx": idx, "seed": seed, "weights": list(ep["weights"]),
+                                       "climb_start_s": climb, "grade": grade})
+                json.dumps(row, allow_nan=False)
+        ep = T.episode("phase-d", 1)
+        cycle = T.build_cycle(ep)                      # a fresh cycle: nothing shared is touched
+        cycle["grade"] = np.zeros_like(cycle["grade"])
+        row = T.episode_row(ep, T.route(cycle))
+        self.assertEqual((row["climb_start_s"], row["grade"]), (None, None))
 
     def test_applied_not_commanded(self):
         frames = []
@@ -353,6 +379,194 @@ class CatalogTests(unittest.TestCase):
             with self.assertRaises(AC.Refused):
                 AC.find_pair("runs_zz_blind", 0, root)
         self.assertEqual(threading.active_count(), threads, "the catalog started a thread")
+
+    def test_table_rows_are_the_results_tables(self):
+        """Quoted from analyse_phase_d2.load, one decimal, exactly as each printed
+        table shows its blind-sighted column; never recomputed here."""
+        import analyse_phase_d2 as A2
+        printed = re.compile(r"^ +(\d+) +[\d.]+ +[\d.]+ +[\d.]+ +[\d.]+ +([+-]\d+\.\d)$", re.M)
+        for prefix, table in (("c4", "C4_RESULT.txt"), ("d2", "PHASE_D2_RESULT.txt"),
+                              ("phase_d", "PHASE_D_RESULT.txt")):
+            with self.subTest(prefix=prefix):
+                with warnings.catch_warnings():       # analyse_phase_d.parse leaves files to the GC
+                    warnings.simplefilter("ignore", ResourceWarning)
+                    rows, incomplete = A2.load(prefix)
+                got = AC.table_rows(prefix)
+                self.assertEqual(got, {"diffs": {s: round(d, 1) for s, _, d in rows},
+                                       "incomplete": [s for s, _ in incomplete]})
+                text = (ROOT / "results" / table).read_text(encoding="utf-8")
+                first_table = printed.findall(text)[:8]     # PHASE_D2_RESULT.txt prints two
+                self.assertEqual(got["diffs"], {int(s): float(d) for s, d in first_table})
+        self.assertEqual([AC.table_rows("c4")["diffs"][0], AC.table_rows("c4")["diffs"][5],
+                          AC.table_rows("d2")["diffs"][0], AC.table_rows("phase_d")["diffs"][3]],
+                         [360.6, -0.3, 221.7, 387.2])
+        self.assertEqual(AC.table_rows("zz"), {"diffs": {}, "incomplete": []})
+
+    @unittest.skipUnless(HAVE_C4, NO_C4)
+    def test_discover_synthetic(self):
+        """Spec test 7, the M2 part: what discover lists, what it ignores, and a
+        half pair listed with its missing arm rather than dropped."""
+        threads = threading.active_count()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fake_pair(root, "runs_zz")                                  # seed 0: a clean pair
+            _fake_agent(root, "runs_zz", "sighted_seed1", "sighted")     # seed 1: half a pair
+            (root / "runs_zz" / "_logs").mkdir()
+            (root / "runs_zz" / "sighted_seedX").mkdir()
+            meta = root / "runs_zz" / "sighted_seed0" / "meta.json"
+            shutil.copy(meta, root / "runs_zz" / "notes.txt")
+            (root / "runs_zzempty").mkdir()
+            (root / "Runs_zzupper").mkdir()       # Windows' glob ignores case; RUNS_NAME does not
+            shutil.copy(meta, root / "runs_zzfile")  # a FILE whose name RUNS_NAME accepts
+            cat = AC.discover(root)
+        self.assertEqual([e["runs"] for e in cat], ["runs_zz", "runs_zzempty"])
+        zz, empty = cat
+        self.assertEqual((zz["name"], zz["prefix"], zz["protocol"]),
+                         ("runs_zz (no name recorded)", "zz", "d2"))
+        self.assertEqual((zz["verdict"]["state"], zz["verdict"]["short"]), ("none", AC.NONE_TEXT))
+        self.assertEqual([p["seed"] for p in zz["pairs"]], [0, 1])
+        p0, p1 = zz["pairs"]
+        self.assertEqual({k: p0[k] for k in ("runnable", "reason", "problems", "protocol",
+                                             "result_file", "table_diff")},
+                         {"runnable": True, "reason": None, "problems": [], "protocol": "d2",
+                          "result_file": False, "table_diff": None})
+        self.assertEqual([(a["tag"], a["status"], a["scored"]) for a in p0["agents"]],
+                         [("sighted_seed0", "ready", "not recorded"),
+                          ("blind_seed0", "ready", "not recorded")])
+        for a in p0["agents"] + p1["agents"]:
+            self.assertEqual(set(a), set(AC.CATALOG_AGENT_KEYS))
+        missing = "blind_seed1: missing -- no such directory"
+        self.assertEqual((p1["runnable"], p1["reason"], p1["problems"], p1["protocol"]),
+                         (False, missing, [missing], None))
+        self.assertEqual([(a["status"], a["scored"]) for a in p1["agents"]],
+                         [("ready", None), ("missing", None)])
+        self.assertEqual((empty["pairs"], empty["protocol"], empty["verdict"]["state"]),
+                         ([], None, "none"))
+        json.dumps(T.jsonable(cat), allow_nan=False)
+        self.assertEqual(threading.active_count(), threads, "discover started a thread")
+
+    @unittest.skipUnless(HAVE_C4, NO_C4)
+    def test_refused_pairs_keep_every_problem(self):
+        """check_pair's dict on the sha path, and the catalog keeping EVERY problem
+        of a refused pair, both arms (ledger gap 3). An arm whose recorded sha
+        differs is 'mismatch': 'not recorded' beside 'records zip sha X' would
+        contradict the problem printed next to it."""
+        threads = threading.active_count()
+        real = {arm: FP.model_budget(str(ROOT / "runs_c4" / f"{arm}_seed0" / "final.zip"))["sha"]
+                for arm in AC.ARMS}
+        wrong = "0123456789abcdef"
+
+        def line(arm, k):
+            return (f"{arm}_seed{k}: not the scored artefact -- results/zz_seed{k}.txt "
+                    f"records zip sha {wrong}, final.zip is {real[arm]}")
+
+        # seed: (the sha results/ records for sighted, for blind); None = no line for that arm
+        recorded = {0: (wrong, None), 1: (wrong, wrong), 2: (wrong, real["blind"])}
+        problems = {0: [line("sighted", 0)], 1: [line("sighted", 1), line("blind", 1)],
+                    2: [line("sighted", 2)]}
+        scored = {0: ["mismatch", "not recorded"], 1: ["mismatch", "mismatch"],
+                  2: ["mismatch", "match"]}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "results").mkdir()
+            for k, shas in recorded.items():
+                for arm in AC.ARMS:
+                    _fake_agent(root, "runs_zz", f"{arm}_seed{k}", arm)
+                with open(root / "results" / f"zz_seed{k}.txt", "w", encoding="utf-8") as fh:
+                    for arm, sha in zip(AC.ARMS, shas):
+                        if sha is not None:
+                            fh.write(_result_line(f"runs_zz\\{arm}_seed{k}", sha))
+            for k in recorded:
+                with self.subTest(seed=k):
+                    pair = AC.check_pair("runs_zz", k, root)
+                    self.assertEqual({key: v for key, v in pair.items() if key != "agents"},
+                                     {"runs": "runs_zz", "seed": k, "prefix": "zz",
+                                      "experiment": "runs_zz (no name recorded)",
+                                      "protocol": "d2", "result_file": True,
+                                      "problems": problems[k]})
+                    self.assertEqual([(a["status"], a["scored"]) for a in pair["agents"]],
+                                     list(zip(["ready", "ready"], scored[k])))
+                    with self.assertRaises(AC.Refused) as cm:
+                        AC.find_pair("runs_zz", k, root)
+                    self.assertEqual(cm.exception.problems, problems[k])
+
+            # half a pair whose present arm is refused too: both arms' problems
+            _fake_agent(root, "runs_zz", "blind_seed3", "blind", drop=("meta.json",))
+            # a plant that moved under both arms: each arm's status line and its fields
+            _fake_pair(root, "runs_zzplant", plant_sha="0000000000000000")
+            plant = AC.check_pair("runs_zzplant", 0, root)["problems"]
+            cat = {e["runs"]: e for e in AC.discover(root)}
+        zz = cat["runs_zz"]
+        self.assertEqual([p["seed"] for p in zz["pairs"]], [0, 1, 2, 3])
+        self.assertIsNone(zz["protocol"], "no pair of runs_zz can run")
+        for p in zz["pairs"][:3]:
+            with self.subTest(catalog_seed=p["seed"]):
+                k = p["seed"]
+                self.assertEqual((p["runnable"], p["reason"], p["problems"], p["protocol"],
+                                  p["result_file"]),
+                                 (False, problems[k][0], problems[k], None, True))
+                self.assertEqual([a["scored"] for a in p["agents"]], scored[k])
+        half = zz["pairs"][3]
+        want = ["sighted_seed3: missing -- no such directory",
+                "blind_seed3: incompatible -- no meta.json: plant unknown (AUDIT2 C2-1)"]
+        self.assertEqual((half["runnable"], half["reason"], half["problems"], half["result_file"]),
+                         (False, want[0], want, False))
+        self.assertEqual([(a["status"], a["scored"]) for a in half["agents"]],
+                         [("missing", None), ("incompatible", None)])
+        pp = cat["runs_zzplant"]["pairs"][0]
+        self.assertEqual((pp["runnable"], pp["reason"], pp["problems"]), (False, plant[0], plant))
+        for arm in AC.ARMS:
+            self.assertIn(f"{arm}_seed0: incompatible -- plant mismatch: plant_sha", plant)
+            self.assertTrue(any(p.startswith(f"{arm}_seed0: plant_sha: stored '0000000000000000' live")
+                                for p in plant), plant)
+        json.dumps(T.jsonable(list(cat.values())), allow_nan=False)
+        self.assertEqual(threading.active_count(), threads, "the catalog started a thread")
+
+    def test_catalog_real_tree(self):
+        """Spec test 6: every experiment on this machine, as the page will list it."""
+        if not HAVE_ALL_RUNS:
+            print(f"\n    {NO_ALL_RUNS}", file=sys.stderr)
+            self.skipTest(NO_ALL_RUNS)
+        cat = AC.discover()
+        names = [e["runs"] for e in cat]
+        self.assertEqual(names, sorted(names))
+        self.assertLessEqual(set(ALL_RUNS), set(names))
+        by_runs = {e["runs"]: e for e in cat}
+        want = {"runs": ("Phase D", "phase_d", "phase-d", "trained 50000 steps", "not recorded"),
+                "runs_d2": ("Phase D2", "d2", "d2", "trained 50000 steps", "not recorded"),
+                "runs_c4": ("C4", "c4", "d2", "trained 300000 steps", "match")}
+        pairs = ready = 0
+        for runs, (name, prefix, protocol, budget, scored) in want.items():
+            with self.subTest(runs=runs):
+                e = by_runs[runs]
+                self.assertEqual((e["name"], e["prefix"], e["protocol"]), (name, prefix, protocol))
+                self.assertEqual(e["verdict"]["state"], "found", e["verdict"]["missing"])
+                self.assertEqual(e["verdict"]["short"],
+                                 {k: AC.SHORT_VERDICT[prefix][k] for k in ("ar", "en")})
+                self.assertEqual([p["seed"] for p in e["pairs"]], list(range(8)))
+                diffs = AC.table_rows(prefix)["diffs"]
+                for p in e["pairs"]:
+                    self.assertTrue(p["runnable"], p["problems"])
+                    self.assertEqual((p["reason"], p["problems"], p["protocol"], p["result_file"]),
+                                     (None, [], protocol, True))
+                    self.assertEqual(p["table_diff"], diffs[p["seed"]])
+                    for a in p["agents"]:
+                        self.assertEqual(a["status"], "ready", a["reason"])
+                        self.assertTrue(a["budget_line"].startswith(budget + " "), a["budget_line"])
+                        self.assertEqual((a["train_dt"], a["scored"]), (0.2, scored))
+                        ready += 1
+                    pairs += 1
+        self.assertEqual((pairs, ready), (24, 48))
+        six = by_runs.get("runs_sixspeed_18sep")
+        if six is not None:
+            self.assertEqual([p["seed"] for p in six["pairs"]], [0])
+            p = six["pairs"][0]
+            self.assertFalse(p["runnable"])
+            self.assertIn("no meta.json: plant unknown (AUDIT2 C2-1)", p["reason"])
+            self.assertEqual([a["status"] for a in p["agents"]], ["incompatible"] * 2)
+            self.assertEqual((p["protocol"], six["protocol"], six["verdict"]["state"]),
+                             (None, None, "none"))
+        json.dumps(T.jsonable(cat), allow_nan=False)
 
     def test_read_agent_refuses_a_directory_that_is_not_there(self):
         """M1 called a missing directory 'incompatible (no meta.json)'; discover

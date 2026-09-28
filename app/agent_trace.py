@@ -112,6 +112,27 @@ def route(cycle):
     })
 
 
+def episode_row(ep, road):
+    """The picker's row for one frozen episode, read from the road the env steps.
+
+    `road` is route(build_cycle(ep)). climb_start_s is route()'s: the first
+    step whose grade is above zero, 141.0 for D2 episode 1 although the table
+    says 141.05, because random_road.climb starts the grade at int(start_s /
+    dt). grade is the table's own value for a randomised climb, and for Phase
+    D's fixed road the grade at that step (0.12). Both are None on a road with
+    no climb. Pure; JSON-safe.
+    """
+    start = road["climb_start_s"]
+    if start is None:
+        grade = None
+    elif ep["road"] is not None:
+        grade = float(ep["road"][1])
+    else:
+        grade = road["grade_pct"][int(round(start / DT))] / 100.0
+    return {"idx": ep["idx"], "seed": ep["seed"], "weights": list(ep["weights"]),
+            "climb_start_s": start, "grade": grade}
+
+
 def _car(env, cmd, obs_in, info):
     """One lane's step, read from the env AFTER the step; nothing is added to it.
 

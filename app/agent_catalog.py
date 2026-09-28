@@ -26,6 +26,7 @@ from pathlib import Path
 import re
 import threading
 import time
+import warnings
 
 import fingerprint as FP
 import run_phase_d as RPD
@@ -155,6 +156,18 @@ def scored_shas(prefix, seed, root=ROOT):
     return out
 
 
+def _agent_problems(agent):
+    """One agent's lines in a pair's problem list: '<tag>: <status> --
+    <reason>', then '<tag>: <line>' for each of its own problems (a plant
+    mismatch's stored and live fields). [] for a ready agent. check_pair and
+    discover both build a pair's list from it, so every line of both arms
+    reaches the catalog in one format."""
+    if agent["status"] == "ready":
+        return []
+    return ([f"{agent['tag']}: {agent['status']} -- {agent['reason']}"]
+            + [f"{agent['tag']}: {p}" for p in agent["problems"]])
+
+
 def check_pair(runs, seed, root=ROOT):
     """The sighted and blind agent of one seed, checked, with the problems
     RETURNED rather than raised: the catalog lists a refused pair with its
@@ -163,7 +176,8 @@ def check_pair(runs, seed, root=ROOT):
     KeyError for a name that is malformed or an arm directory not on disk.
     Otherwise 'problems' is [] when the pair may run. 'protocol' is the arms'
     shared protocol once both are ready and agree, else None. Each agent
-    gains 'scored' ('match' or 'not recorded') once the sha check has run,
+    gains 'scored' once the sha check has run: 'match', 'mismatch' (results/
+    records a different sha; the pair is refused) or 'not recorded'. It is
     None when an earlier check refused the pair first.
     """
     if (not RUNS_NAME.fullmatch(str(runs)) or not isinstance(seed, int)
@@ -179,11 +193,7 @@ def check_pair(runs, seed, root=ROOT):
             "protocol": None,
             "result_file": (root / "results" / f"{prefix}_seed{seed}.txt").is_file(),
             "agents": agents, "problems": []}
-    problems = []
-    for a in agents:
-        if a["status"] != "ready":
-            problems.append(f"{a['tag']}: {a['status']} -- {a['reason']}")
-            problems.extend(f"{a['tag']}: {p}" for p in a["problems"])
+    problems = [line for a in agents for line in _agent_problems(a)]
     if problems:
         return dict(pair, problems=problems)
     if agents[0]["protocol"] != agents[1]["protocol"]:
@@ -192,10 +202,14 @@ def check_pair(runs, seed, root=ROOT):
     shas = scored_shas(prefix, seed, root)
     for a in agents:
         recorded = None if shas is None else shas[a["arm"]]
-        if recorded is not None and recorded != a["zip_sha"]:
+        if recorded is None:
+            a["scored"] = "not recorded"
+        elif recorded == a["zip_sha"]:
+            a["scored"] = "match"
+        else:
+            a["scored"] = "mismatch"
             problems.append(f"{a['tag']}: not the scored artefact -- results/{prefix}_seed{seed}.txt "
                             f"records zip sha {recorded}, final.zip is {a['zip_sha']}")
-        a["scored"] = "match" if recorded is not None and recorded == a["zip_sha"] else "not recorded"
     return dict(pair, protocol=agents[0]["protocol"], problems=problems)
 
 
@@ -360,3 +374,96 @@ def verdict(prefix, root=ROOT):
              for key, cell in CELLS.get(prefix, {}).items() if key in found]
     return {"state": "missing" if missing else "found", "lines": lines,
             "missing": missing, "short": short, "cells": cells}
+
+
+# ---- the catalog: every runs*/ experiment, every pair, for the picker --------
+# What the page may show of each agent. 'budget' (the whole dict) stays here.
+CATALOG_AGENT_KEYS = ("tag", "arm", "status", "reason", "problems", "budget_line",
+                      "train_dt", "zip_sha", "scored")
+
+
+def table_rows(prefix):
+    """{'diffs': {seed: blind - sighted}, 'incomplete': [seed]} for one prefix.
+
+    QUOTED from analyse_phase_d2.load(prefix), the analysis's own reader of
+    the repository's results/<prefix>_seed<k>.txt, and rounded to the one
+    decimal the printed tables show; nothing is recomputed here. An unknown
+    prefix gives both empty. Imported here, not at the top, so that importing
+    this module never loads the analysis scripts.
+
+    analyse_phase_d.parse reads with `for line in open(path)`, leaving each
+    file for CPython to close as soon as the loop ends; under unittest that
+    prints a ResourceWarning per result file. The script is not ours to edit,
+    so that one category is silenced for the call.
+    """
+    import analyse_phase_d2
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", ResourceWarning)
+        rows, incomplete = analyse_phase_d2.load(prefix)
+    return {"diffs": {int(seed): round(float(diff), 1) for seed, _, diff in rows},
+            "incomplete": [int(seed) for seed, _ in incomplete]}
+
+
+def _missing_agent(arm, seed):
+    """The half of a pair whose directory is not there, as the catalog lists it."""
+    return {"tag": f"{arm}_seed{seed}", "arm": arm, "status": "missing",
+            "reason": "no such directory", "problems": [], "budget_line": None,
+            "train_dt": None, "zip_sha": None, "scored": None}
+
+
+def discover(root=ROOT):
+    """Every experiment under `root` and every pair in it, for the picker.
+
+    Lists root/runs*/ directories whose name matches RUNS_NAME, sorted by
+    name, so a future runs_X appears with no code change; inside each, only
+    children that are directories matching AGENT_NAME (_logs, checkpoints and
+    files are ignored). EVERY seed is listed: a pair that cannot run carries
+    every one of its problems, both arms, and a seed with one arm missing
+    lists that arm as 'missing'. Never raises for an agent or a pair that
+    cannot run; reads only; starts no thread.
+    """
+    root = Path(root)
+    out = []
+    for d in sorted((p for p in root.glob("runs*") if p.is_dir() and RUNS_NAME.fullmatch(p.name)),
+                    key=lambda p: p.name):
+        runs = d.name
+        prefix = RPD.result_prefix(str(d))
+        diffs = table_rows(prefix)["diffs"]
+        seeds = set()
+        for child in d.iterdir():
+            m = AGENT_NAME.fullmatch(child.name)
+            if m is not None and child.is_dir():
+                seeds.add(int(m.group(2)))
+        pairs = []
+        for seed in sorted(seeds):
+            here = {arm: (d / f"{arm}_seed{seed}").is_dir() for arm in ARMS}
+            if all(here.values()):
+                pair = check_pair(runs, seed, root)
+            else:
+                agents = [dict(read_agent(runs, f"{arm}_seed{seed}", root), scored=None)
+                          if here[arm] else _missing_agent(arm, seed) for arm in ARMS]
+                pair = {"protocol": None,
+                        "result_file": (root / "results" / f"{prefix}_seed{seed}.txt").is_file(),
+                        "agents": agents,
+                        "problems": [line for a in agents for line in _agent_problems(a)]}
+            problems = pair["problems"]
+            pairs.append({
+                "seed": seed,
+                "runnable": not problems,
+                "reason": problems[0] if problems else None,
+                "problems": problems,
+                "protocol": None if problems else pair["protocol"],
+                "result_file": pair["result_file"],
+                "table_diff": diffs.get(seed),
+                "agents": [{k: a.get(k) for k in CATALOG_AGENT_KEYS} for a in pair["agents"]],
+            })
+        protocols = {p["protocol"] for p in pairs if p["runnable"]}
+        out.append({
+            "runs": runs,
+            "name": RPD.CLOSED_PREFIX.get(prefix) or f"{runs} (no name recorded)",
+            "prefix": prefix,
+            "protocol": protocols.pop() if len(protocols) == 1 else None,
+            "verdict": verdict(prefix, root),
+            "pairs": pairs,
+        })
+    return out
