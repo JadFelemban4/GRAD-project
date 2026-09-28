@@ -1,6 +1,7 @@
 # Agent replay, M3 — jev and Laya at the paused moment: design
 
-> **STATUS: DRAFT, 28 September 2026 — waiting on one question for Jad (§7.8, the pause panel's place).**
+> **STATUS: APPROVED BY JAD, 28 September 2026.** His last answer (§7.8, Q1): **move the pause panel under the
+> play bar and give it the one-line empty state** (option 1, recommended). Commit step 7 of §10 is therefore in.
 > Everything else here follows Jad's decisions of 28 September (the walkthrough log of
 > `2026-09-26-agent-replay-design.md`, rows "M3 revisit, Q1-Q3"): Laya is hidden WITH jev behind the same gesture;
 > one button per model, independent answers and errors; **Laya gets an automatic order check (§7.5b)**.
@@ -444,7 +445,7 @@ A disabled button shows its reason:
 - A response is dropped if `state.loadToken` moved while it was in flight, the same guard `poll()` uses.
 - **The true rule for jev's paid answers:** an answer is kept only while its episode is on screen. It is discarded if the episode changes while the call is in flight or at any time after it arrives, and on reload. Nothing is saved.
 
-### 7.8 Discoverability of the pause panel [new; needs Jad's word]
+### 7.8 Discoverability of the pause panel [new; DECIDED by Jad, 28 Sep: the recommended option 1]
 
 Jad did not find the pause panel (walkthrough, 28 Sep). Measured at 1440 × 900:
 
@@ -466,7 +467,7 @@ Both change what the committee sees, and neither moves an honesty surface.
 
 **The one-line alternative** is to stop auto-opening the verdict quotes on desktop. The panel would rise about 800 px, but the verbatim quotes would sit behind a click, which touches a verdict surface.
 
-If Jad declines both, M3 ships without them, and the models panel sits after the pause panel in the side column.
+**Decided (Jad, 28 Sep):** recommended option 1 — the move and the empty-state line are built (§10 step 7).
 
 ### 7.9 Errors
 
@@ -570,7 +571,7 @@ For Laya this would be cheap: it is deterministic and answers in about 34 ms war
 
 ## 10. M3: the two models at the paused moment (replaces §10 M3)
 
-**Before building:** Jad answers §7.11 Q1 and Q2. Step 7 depends on Q1, and one string depends on Q2. Nothing else waits for them.
+**Before building:** nothing waits. Q1 was answered (option 1, so step 7 is built) and Q2 was resolved by the order check (§7.5b).
 
 **Commits, in order:**
 
@@ -582,7 +583,7 @@ For Laya this would be cheap: it is deterministic and answers in about 34 ms war
    - If `-I` breaks Laya's `.venv`, drop `-I`, keep `-B` and `cwd=LAYA_HOME`, and say so in the commit.
 5. The four routes, and `install(app, store=None, jev_send=None, laya=None)`. In the same commit: the `server.py:43` sentence and the `agent_api.py` docstrings, with tests 10, 13 and 16 amended.
 6. The frontend: `tap-unlock.mjs`, `model-panel.mjs`, the strings, `#models-panel`, the CSS lines and the wiring (including the five `renderModels()` hooks in §7.7). With the node tests, the harness case and test 12.
-7. Only if Jad agreed in Q1: the pause-panel move and the empty-state line.
+7. The pause-panel move and the empty-state line (Jad agreed in Q1).
 
 **Verify:**
 
