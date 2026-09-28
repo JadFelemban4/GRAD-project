@@ -16,3 +16,12 @@ runs_sixspeed_18sep/
 app/review_log.jsonl
 app/node_modules/
 app/static/vendor/
+
+# Agent replay M3 (docs/superpowers/specs/2026-09-28-agent-replay-m3-design.md,
+# section 7.3 and section 10 step 1). A jev key lives only in the
+# TYPESAFE_API_KEY variable or in <APPDATA>/grad-project/typesafe_key, outside
+# the repository. These patterns are a second line of defence, added before
+# any key exists, so a copy made by mistake is never committed.
+.env
+.env.*
+*typesafe_key*
