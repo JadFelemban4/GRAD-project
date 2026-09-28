@@ -9,6 +9,7 @@ fixtures are made in temporary directories OUTSIDE the repository.
 """
 import ast
 import contextlib
+import http.client
 import importlib.util
 import io
 import json
@@ -25,7 +26,8 @@ import time
 import traceback
 import unittest
 from unittest import mock
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
+import urllib.request
 import warnings
 
 import numpy as np
@@ -2133,13 +2135,15 @@ class _Records(logging.Handler):
 
 class _JevCase(unittest.TestCase):
     """Makes the real network unreachable while a jev test runs: a test that
-    reached urlopen by mistake fails here, before any byte is sent."""
+    reached jev's opener (the one way _send sends) or urllib.request.urlopen by
+    mistake fails here, before any byte is sent."""
 
     def setUp(self):
-        guard = mock.patch.object(JEV.urllib.request, "urlopen", side_effect=AssertionError(
-            "a jev test reached urllib.request.urlopen: tests use a fake send only"))
-        guard.start()
-        self.addCleanup(guard.stop)
+        for owner, name in ((JEV._OPENER, "open"), (JEV.urllib.request, "urlopen")):
+            guard = mock.patch.object(owner, name, side_effect=AssertionError(
+                f"a jev test reached {name}(): tests use a fake send only"))
+            guard.start()
+            self.addCleanup(guard.stop)
 
 
 class JevTests(_JevCase):
@@ -2175,6 +2179,8 @@ class JevTests(_JevCase):
                 self.assertEqual((err.code, err.status), (code, None))
 
     def test_other_statuses_are_vendor_status_with_only_the_integer(self):
+        # 302 is a real reply too: jev's opener refuses every redirect
+        # (JevKeyTests.test_a_redirect_is_never_followed), so _send returns it.
         for status in (402, 500, 503, 302):
             with self.subTest(status=status):
                 err = self.ask_fails(_FakeSend(status=status, payload=b"sentinel-body no credit"))
@@ -2295,6 +2301,67 @@ class JevKeyTests(_JevCase):
             root.setLevel(level)
         logged = " ".join(f"{r.getMessage()} {r.exc_text or ''}" for r in handler.records)
         self.assertNotIn(SENTINEL_KEY, logged)
+
+    def test_a_redirect_is_never_followed(self):
+        # Measured 29 Sep, offline: urllib's default opener answers a 301, 302 or
+        # 303 to jev's POST with a GET to the Location, http:// included, and
+        # carries the Authorization header along: the key to another host, and a
+        # second request for one press. jev's opener refuses every redirect, so
+        # the reply stays HTTPError(code), which _send makes (code, b'') and ask
+        # vendor_status. No socket: http.client's connections are a recorder here.
+        sent = []
+
+        class Connection:
+            """http.client.HTTP(S)Connection's stand-in: records (host, method,
+            Authorization), then fails before any socket exists."""
+
+            def __init__(self, host, timeout=None, **kw):
+                self.host = host
+
+            def set_debuglevel(self, level):
+                pass
+
+            def request(self, method, url, body=None, headers=None, **kw):
+                sent.append((self.host, method, (headers or {}).get("Authorization")))
+                raise OSError("a test has no socket")
+
+            def close(self):
+                pass
+
+        def outcome(opener, code, location):
+            """(what `opener` makes of this reply to jev's POST, the requests it then sent)."""
+            sent.clear()
+            request = urllib.request.Request(JEV.URL, data=b"{}", method="POST",
+                                             headers={"Authorization": f"Bearer {SENTINEL_KEY}"})
+            request.timeout = JEV.TIMEOUT_S           # what OpenerDirector.open sets
+            fields = http.client.HTTPMessage()
+            fields["Location"] = location
+            with mock.patch.object(http.client, "HTTPConnection", Connection), \
+                    mock.patch.object(http.client, "HTTPSConnection", Connection):
+                try:    # the call urllib's HTTPErrorProcessor makes for a non-2xx reply
+                    opener.error("http", request, io.BytesIO(b""), code, "moved", fields)
+                except HTTPError as err:
+                    with err:
+                        return err.code, list(sent)
+                except URLError:
+                    return "followed", list(sent)
+            return "returned", list(sent)
+
+        away = "http://elsewhere.example/v1"
+        stdlib = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        self.assertEqual(outcome(stdlib, 302, away),
+                         ("followed", [("elsewhere.example", "GET", f"Bearer {SENTINEL_KEY}")]),
+                         "the recorder sees a followed redirect, as urllib's own opener makes one")
+        for code in (301, 302, 303, 307, 308):
+            with self.subTest(code=code):
+                self.assertEqual(outcome(JEV._OPENER, code, away), (code, []))
+        self.assertEqual(outcome(JEV._OPENER, 302, "http://[bad/v1"), (302, []),
+                         "a Location urllib cannot parse is still only the status")
+        tree = ast.parse(Path(JEV.__file__).read_text(encoding="utf-8"))
+        send = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_send")
+        calls = {ast.unparse(n.func) for n in ast.walk(send) if isinstance(n, ast.Call)}
+        self.assertIn("_OPENER.open", calls, "_send sends only through jev's opener")
+        self.assertNotIn("urllib.request.urlopen", calls)
 
     def test_a_key_no_header_can_carry_is_no_key(self):
         # Measured 29 Sep, offline (http.client putheader with no connection): a

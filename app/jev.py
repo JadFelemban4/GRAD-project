@@ -2,7 +2,8 @@
 second (agent replay M3, design section 7.4).
 
 One press is one paid call: a POST to URL with model MODEL, the state and the
-five questions from app.model_questions, a TIMEOUT_S timeout and no retry.
+five questions from app.model_questions, a TIMEOUT_S timeout, no retry and no
+redirect followed.
 The answer is shown, never applied, averaged, compared with the agents or
 saved.
 
@@ -71,14 +72,38 @@ def build_request(trace, step):
     return {"model": MODEL, "state": build_state(trace, step), "questions": QUESTIONS}
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Every redirect is refused, so it reaches ask() as its status.
+
+    Measured 29 Sep, offline: urllib's default opener answers a 301, 302 or 303
+    to this POST with a GET to the Location, http:// included, and carries the
+    Authorization header along: the key sent to another host, and two requests
+    for one press. Returning None here hands the reply to urllib's default error
+    handler, which raises HTTPError(code). Refusing before the Location is read
+    also means a Location urllib cannot parse raises no ValueError out of _send,
+    as it would if redirect_request refused instead.
+    """
+
+    def http_error_302(self, req, fp, code, msg, headers):
+        return None
+
+    http_error_301 = http_error_303 = http_error_307 = http_error_308 = http_error_302
+
+
+# build_opener keeps its other default handlers (proxy, HTTPS, the error
+# handlers) and leaves out its own redirect handler, which _NoRedirect subclasses.
+_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
 def _send(body, key, timeout=TIMEOUT_S):
-    """One HTTPS POST -> (status, payload). An HTTP error keeps its status only."""
+    """One HTTPS POST through _OPENER -> (status, payload). An HTTP error, a
+    refused redirect included, keeps its status only."""
     request = urllib.request.Request(
         URL, data=json.dumps(body).encode("utf-8"), method="POST",
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
                  "Accept": "application/json"})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        with _OPENER.open(request, timeout=timeout) as response:
             return response.status, response.read()
     except urllib.error.HTTPError as err:
         return err.code, b""
