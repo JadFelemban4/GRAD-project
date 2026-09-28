@@ -1994,3 +1994,67 @@ did not re-run its tests;** read its own commits for those.
   still need their one-at-a-time explanation to Jad.
 - **jev needs early access and an API key** that Jad may not have; the viz
   prompt makes that the first question.
+
+## 28 September 2026 — the team's profiles, "ask who you are", and two chart pages
+
+Commits `064aba6` `b146ba7` (already on GitHub: the other session's push of
+its M2 work carried them) and `29c78d5` `55d18db` `8c39617` `3b5ccd8` (not
+pushed yet), all on `JMF-2340550-sep17`. Nothing trained, scored or
+re-analysed; no figure in `results/` moved. This entry was written mid-session,
+after a usage limit had already cut the session off once, and is extended at
+close.
+
+### What the session did
+
+| Jad asked | what landed | where |
+|---|---|---|
+| profile files for the other four | stubs for Khaled, Abdulhadi and Mohammed: a name and a student number, every other section "Unrecorded"; the student number in the frontmatter of all five files and the template | `team/` (`064aba6`) |
+| "the first thing it does is ask who you are" | `CLAUDE.md` now opens by asking «مين معي؟» unless the person already said who they are. Matching `git config user.email` is retired: AUDIT2.md Part 6 had found two of the three identities in the history matching no file. A stub is said to be a stub and never filled from a guess; subagents skip the question | `CLAUDE.md`, `team/README.md` (`b146ba7`) |
+| "the charts comparing the simulation's results with our data" | five charts, each labelled with its kind of evidence: the gearbox and the boost pressure are independent checks, the compressor envelope and the enrichment map are fits, and the load residual is a consistency check (mistake 12). Every number is printed in `numbers.txt` | `plot_sim_vs_car.py`, `figures/sim_vs_car/` (`29c78d5`) |
+| "why not put it on a website" | the same page in the viewer's light or dark theme, safe on a phone, published privately at https://claude.ai/artifact/YWSKwwCEPAwg1oMXCVXTec | `figures/sim_vs_car/page.html` (`8c39617`) |
+| "add the agents' points and the seeds" | a second page: Phase D, D2 and C4, eight pairs each, every agent a dot, every verdict quoted by `app/agent_catalog.verdict()`, nothing computed. Published at https://claude.ai/artifact/6B2gRmzj4RT1ysLZoFNJMg; the two pages link to each other | `plot_agent_pairs.py`, `figures/agent_pairs/` (`3b5ccd8`) |
+
+### Found, stated
+
+- **The enrichment map misses the car by 0.076 in λ in one cell** once the
+  dwell axis is the corrected one (AUDIT.md H3). The documents said every cell
+  sat within 0.027. The full account, and why no experiment is touched, is in
+  `CLAUDE.md`'s limitations (`55d18db`).
+- **Mistake 13's "117 °C median" does not reproduce.** The 587 samples behind
+  its 279.5 kPa, which does reproduce, read 106.8 °C. Recorded under that
+  table in `CLAUDE.md`.
+- **matplotlib cannot be imported on Jad's machine.** Windows Application
+  Control blocks its `_image` DLL on the system Python as well as the `.venv`.
+  The charts are therefore plain SVG, turned into PNG and PDF by headless
+  Chrome.
+- **`verify_docs.py` has three false-positive traps for generated pages.**
+  Each was avoided in the output and none was fixed in the guard. First, a
+  line that begins with an rpm band and ends with a number is read as a row of
+  `base_lambda`'s sample-count table. Second, the retired load-residual
+  pattern has no leading boundary, so a live value ending in 2.3 or 2.8 with a
+  percent sign after it fails. Third, the premise-baseline pattern reads the
+  word "baseline" in a table header and takes the first three-digit figure on
+  the next row. Fixing them means editing the guard and re-running
+  `drift_test.py`.
+- **Correction to commit `3b5ccd8`'s message.** It counts the pairs at or above
+  the 50-unit minimum effect as "one in D2, one in C4, three in Phase D". The
+  pages are right and the message is not: four in Phase D (seeds 2, 3, 6 and 7),
+  two in D2 (seeds 0 and 4), one in C4 (seed 0). The commit is history and is
+  not rewritten.
+- **Another session built Agent replay M2 in the same working tree** during
+  this one (tasks 6 to 9) and pushed through task 6 (`a4a23a0`). Recorded, not
+  verified. Every commit of this session was made by explicit path, so neither
+  session's files entered the other's commits.
+
+### Open
+
+- `base_lambda()`'s docstring table still shows the old-axis median for the
+  high-speed, medium-dwell cell. Correcting a docstring is safe for the agents;
+  it is left for a moment when no build is running in the tree.
+- The four new profiles are stubs until their owners fill them in.
+- The next experiment (A, B or C) is still the team's decision, and B and C
+  still need their one-at-a-time explanation to Jad.
+- The installed `/i-have-adhd` skill is the old version: it still says "Five
+  items ranked beats ten unranked", which `team/jad.md` asks to have updated.
+  It is a synced skill, so the lasting update belongs in Jad's claude.ai
+  account.
