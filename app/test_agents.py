@@ -1648,7 +1648,7 @@ def tearDownModule():
 
 
 NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py", "model_questions.py",
-               "jev.py")
+               "jev.py", "laya_worker.py")
 WRITE_PATTERNS = (
     (r"\bopen\s*\([^)]*,\s*(mode\s*=\s*)?['\"][^'\"]*[wax+]", "write-mode open"),
     (r"\.write\w*\s*\(", "write / write_text / write_bytes"),
@@ -1690,9 +1690,10 @@ class NoWriteTests(unittest.TestCase):
 
 
 NET_ROOTS = {"urllib", "http", "socket", "requests", "httpx", "typesafe_sdk"}
-# M3 (design 7.4 and section 9 row 13): jev.py is the one module allowed network
-# imports. The scan still reads every app/*.py, the allowed ones included.
-NET_ALLOWED = {"jev.py": NET_ROOTS}
+# M3 (design 7.4, 7.5 and section 9 row 13): jev.py may import any network module;
+# laya_worker.py may import socket only, to refuse it. The scan still reads every
+# app/*.py, the allowed ones included.
+NET_ALLOWED = {"jev.py": NET_ROOTS, "laya_worker.py": {"socket"}}
 
 
 def _net_hits(name, source):
@@ -1713,6 +1714,11 @@ def _net_hits(name, source):
 
 class NoNetworkTests(unittest.TestCase):
     """Spec test 13: an AST import scan, so 'WebSocket' in server.py is not a hit."""
+
+    def test_the_scan_sees_urllib_in_the_worker(self):
+        """The worker is allowed socket, and nothing else in NET_ROOTS."""
+        self.assertEqual(_net_hits("laya_worker.py", "import urllib\n"), ["laya_worker.py:1 urllib"])
+        self.assertEqual(_net_hits("laya_worker.py", "import socket\n"), [])
 
     def test_no_network_imports_in_app(self):
         found = []
@@ -1900,7 +1906,7 @@ class QuestionTests(unittest.TestCase):
         self.assertTrue(issubclass(MQ.BadAnswer, ValueError))
 
 
-MODEL_MODULES = ("model_questions.py", "jev.py")
+MODEL_MODULES = ("model_questions.py", "jev.py", "laya_worker.py")
 RECORDED_DRIVE = ("app.replay", "app.reader", "app.estimator")
 
 
@@ -2425,6 +2431,103 @@ class JevKeyTests(_JevCase):
         with mock.patch.dict(os.environ, {"APPDATA": str(ROOT)}):
             os.environ.pop("TYPESAFE_API_KEY", None)
             self.assertEqual(JEV.load_key(), (None, None))
+
+
+# ---- M3: the Laya worker (spec tests 13 and 19, the worker's half) ---------
+
+WORKER_GUARDED = (("socket", "connect"), ("socket", "connect_ex"), ("socket", "sendto"),
+                  ("socket", "sendmsg"), ("module", "create_connection"),
+                  ("module", "getaddrinfo"), ("module", "gethostbyname"),
+                  ("module", "gethostbyname_ex"))
+
+
+def _worker_tree():
+    return ast.parse((ROOT / "app" / "laya_worker.py").read_text(encoding="utf-8"))
+
+
+def _import_roots(tree):
+    """(line, root) for every import anywhere in `tree`, functions included."""
+    out = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            out += [(node.lineno, a.name.split(".")[0]) for a in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            out.append((node.lineno, (node.module or "").split(".")[0]))
+    return out
+
+
+def _guard_loop(tree):
+    """(index in tree.body, node) of the module-level `for ... in GUARDED:` loop."""
+    for i, node in enumerate(tree.body):
+        if isinstance(node, ast.For) and getattr(node.iter, "id", None) == "GUARDED":
+            return i, node
+    raise AssertionError("laya_worker.py has no module-level loop over GUARDED")
+
+
+class WorkerStaticTests(unittest.TestCase):
+    """Spec test 19, the worker's half. The guard comes before torch and laya,
+    replaces only the entry points this platform has, and a relative model
+    folder is refused before either is imported."""
+
+    def test_the_guard_comes_first(self):
+        tree = _worker_tree()
+        assigned = [n for n in tree.body if isinstance(n, ast.Assign)
+                    and [getattr(t, "id", None) for t in n.targets] == ["GUARDED"]]
+        self.assertEqual(len(assigned), 1, "GUARDED must be assigned once, at module level")
+        self.assertEqual(ast.literal_eval(assigned[0].value), WORKER_GUARDED)
+        _, loop = _guard_loop(tree)
+        first = next(n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom)))
+        self.assertEqual([a.name for a in getattr(first, "names", [])], ["socket"],
+                         "`import socket` must be the worker's first import")
+        roots = _import_roots(tree)
+        heavy = [line for line, root in roots if root in ("torch", "laya")]
+        self.assertTrue(heavy, "the worker must import torch and laya")
+        self.assertLess(loop.lineno, min(heavy), "the guard must run before torch or laya is imported")
+        self.assertEqual([root for _, root in roots if root == "app"], [],
+                         "the worker imports nothing from the repository")
+        in_loop = {id(n) for n in ast.walk(loop)}
+        named = [n.lineno for n in ast.walk(tree) if isinstance(n, ast.Name)
+                 and n.id == "socket" and id(n) not in in_loop]
+        self.assertEqual(named, [], "socket may be named only inside the guard loop")
+        rebinds = [n.lineno for n in ast.walk(tree) if isinstance(n, ast.Assign)
+                   and any(ast.unparse(t) == "sys.stdout" for t in n.targets)]
+        laya_line = min(line for line, root in roots if root == "laya")
+        self.assertTrue(rebinds and min(rebinds) < laya_line,
+                        "sys.stdout must point at stderr before `import laya`")
+
+    def test_the_guard_leaves_missing_entry_points_missing(self):
+        """The guard block alone, run in a fresh interpreter: asyncio still
+        imports (a guard that ADDS socket.socket.sendmsg on Windows breaks it,
+        and torch with it), and a connection is refused and counted."""
+        tree = _worker_tree()
+        i, _ = _guard_loop(tree)
+        guard = ast.unparse(ast.Module(body=tree.body[:i + 1], type_ignores=[]))
+        probe = ("\nimport json as _json\nimport asyncio\n"
+                 "try:\n    socket.create_connection(('127.0.0.1', 9))\n    _refused = False\n"
+                 "except OSError:\n    _refused = True\n"
+                 "print(_json.dumps({'sendmsg': hasattr(socket.socket, 'sendmsg'),\n"
+                 "                   'refused': _refused, 'attempts': _NET['attempts']}))\n")
+        run = subprocess.run([sys.executable, "-I", "-c", guard + probe], capture_output=True,
+                             text=True, timeout=60)
+        self.assertEqual(run.returncode, 0, run.stderr[-2000:])
+        import socket
+        self.assertEqual(json.loads(run.stdout.strip().splitlines()[-1]),
+                         {"sendmsg": hasattr(socket.socket, "sendmsg"), "refused": True,
+                          "attempts": 1})
+
+    def test_a_relative_model_dir_is_refused_before_any_import(self):
+        tree = _worker_tree()
+        heavy = min(line for line, root in _import_roots(tree) if root in ("torch", "laya"))
+        refusal = [n.lineno for n in ast.walk(tree)
+                   if isinstance(n, ast.Constant) and n.value == "NotADirectoryError"]
+        self.assertTrue(refusal and max(refusal) < heavy,
+                        "the folder must be checked before torch or laya is imported")
+        run = subprocess.run([sys.executable, "-I", "-B", "-X", "utf8", "app/laya_worker.py",
+                              "models/multilingual"], cwd=ROOT, capture_output=True, text=True,
+                             timeout=60)
+        self.assertEqual(run.returncode, 1, run.stderr[-2000:])
+        self.assertEqual(json.loads(run.stdout.splitlines()[0]),
+                         {"ready": False, "error": "NotADirectoryError"})
 
 
 def _shape(x):
