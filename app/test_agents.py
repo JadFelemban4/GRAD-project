@@ -1235,6 +1235,8 @@ META_KEYS = {"experiment", "runs", "prefix", "protocol", "seed", "ep", "episode"
              "duration_s", "steps", "train_dt", "agents", "result_file", "preview_s", "act",
              "limits", "scenario", "verdict", "fingerprint_taken"}
 EPISODE_URL = "/api/agents/episode?runs=runs_c4&seed=5&ep=1"
+CATALOG_URL = "/api/agents/catalog"
+CATALOG_KEYS = {"experiments", "episodes", "preview_s", "act", "limits", "sb3"}
 
 
 def _client(store):
@@ -1276,12 +1278,15 @@ class RouteTests(unittest.TestCase):
         self.assertFalse([n for n in top if "agent" in (getattr(n, "module", "") or "")],
                          "server.py must not import agent code at module level")
 
+        from fastapi import FastAPI
         app, client = _client(_StubStore())
         paths = {r.path: r for r in app.routes if hasattr(r, "methods")}
-        self.assertLessEqual({"/agents", "/api/agents/episode"}, set(paths))
-        for p in ("/agents", "/api/agents/episode"):
-            self.assertEqual(set(paths[p].methods), {"GET"})
+        added = set(paths) - {r.path for r in FastAPI().routes}
+        self.assertEqual(added, {"/agents", "/api/agents/episode", "/api/agents/catalog"})
+        for p in sorted(added):
+            self.assertEqual(set(paths[p].methods), {"GET"}, p)
         self.assertEqual(client.post(EPISODE_URL).status_code, 405)
+        self.assertEqual(client.post(CATALOG_URL).status_code, 405)
 
     @unittest.skipUnless(HAVE_C4, NO_C4)
     def test_episode_route_contract(self):
@@ -1361,6 +1366,141 @@ class RouteTests(unittest.TestCase):
         stub.needs_sb3 = False               # an injected loader needs no SB3
         with mock.patch.object(API, "sb3_available", lambda: False):
             self.assertEqual(client.get(EPISODE_URL).status_code, 200)
+
+    def test_catalog_route_contract(self):
+        """GET /api/agents/catalog: every runs*/ directory, the 20 episodes of
+        each protocol read from the road the env steps, and the page's
+        constants -- JSON-safe, no-store, and never a poll of the store."""
+        stub = _StubStore()
+        _, client = _client(stub)
+        r = client.get(CATALOG_URL)
+        self.assertEqual(r.status_code, 200, r.text[:500])
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        body = r.json()
+        self.assertEqual(set(body), CATALOG_KEYS)
+        json.dumps(body, allow_nan=False)
+        self.assertEqual(stub.calls, [], "the catalog must not reach the store")
+
+        self.assertEqual(set(body["episodes"]), {"d2", "phase-d"})
+        for protocol, rows in body["episodes"].items():
+            with self.subTest(protocol=protocol):
+                self.assertEqual([row["idx"] for row in rows], list(range(1, 21)))
+                self.assertEqual([row["seed"] for row in rows],
+                                 [T.episode(protocol, i)["seed"] for i in range(1, 21)])
+                self.assertEqual({k for row in rows for k in row},
+                                 {"idx", "seed", "weights", "climb_start_s", "grade"})
+        for row in body["episodes"]["phase-d"]:
+            self.assertEqual((row["climb_start_s"], row["grade"]), (180.0, 0.12), row["idx"])
+        self.assertEqual(body["episodes"]["d2"][0],
+                         {"idx": 1, "seed": 1000, "weights": [0.690154, 0.012829, 0.297017],
+                          "climb_start_s": 141.0, "grade": 0.13314})
+        # the step at which the env's grade begins, not the table's 281.95
+        self.assertEqual(body["episodes"]["d2"][1]["climb_start_s"], 281.0)
+
+        self.assertEqual({k: body[k] for k in ("preview_s", "act", "limits")},
+                         API.page_constants())
+        self.assertEqual(body["preview_s"], list(PREVIEW_S))
+        self.assertEqual(body["act"]["neutral_phys"], [0.0, 0.0, 0.0, 1.0, 1.0])
+        self.assertEqual(body["act"]["lo"], [float(x) for x in ACT_LO])
+        self.assertEqual(body["limits"]["turb_c"], round(TURB_PROTECT_K - 273.15, 1))
+        self.assertEqual([e["runs"] for e in body["experiments"]],
+                         [e["runs"] for e in AC.discover()])
+
+        self.assertIs(body["sb3"], True, "a store with an injected loader needs no SB3")
+        stub.needs_sb3 = True
+        with mock.patch.object(AC, "discover", lambda root=AC.ROOT: []):
+            with mock.patch.object(API, "sb3_available", lambda: False):
+                self.assertIs(client.get(CATALOG_URL).json()["sb3"], False)
+            with mock.patch.object(API, "sb3_available", lambda: True):
+                self.assertIs(client.get(CATALOG_URL).json()["sb3"], True)
+
+    def test_catalog_failure_is_500_no_store(self):
+        """Anything unexpected is a fixed text naming the exception's class:
+        never str(exc), which can carry a path."""
+        _, client = _client(_StubStore())
+        secret = r"C:\secret\runs_zz\sighted_seed0\meta.json"
+        with mock.patch.object(AC, "discover", side_effect=OSError(secret)):
+            r = client.get(CATALOG_URL)
+        self.assertEqual(r.status_code, 500)
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(r.json(), {"detail": "catalog failed: OSError"})
+        self.assertNotIn("secret", r.text)
+
+        # Raised INSIDE the real discover: a results file that is not UTF-8
+        # fails in analyse_phase_d.parse, reached through table_rows.
+        import analyse_phase_d2
+        bad = UnicodeDecodeError("utf-8", bytes([0xFF]), 0, 1, secret)
+        with mock.patch.object(analyse_phase_d2, "parse", side_effect=bad):
+            r = client.get(CATALOG_URL)
+        self.assertEqual(r.status_code, 500)
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(r.json(), {"detail": "catalog failed: UnicodeDecodeError"})
+        self.assertNotIn("secret", r.text)
+
+    @unittest.skipUnless(HAVE_ALL_RUNS, NO_ALL_RUNS)
+    def test_episode_route_serves_phase_d_and_d2(self):
+        """Phase D and D2 pairs run through the same route as C4. Phase D's
+        episode reads its grade off the road the env steps: 0.12 at 180 s,
+        so the SIMULATED badge reads 12.0, not a dash."""
+        stub = _StubStore()
+        _, client = _client(stub)
+        seed, weights = EPISODES[0]
+        r = client.get("/api/agents/episode?runs=runs&seed=0&ep=1&since=0&preempt=1")
+        self.assertEqual(r.status_code, 200, r.text[:500])
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        body = r.json()
+        meta = body["meta"]
+        self.assertEqual(set(meta), META_KEYS)
+        json.dumps(meta, allow_nan=False)
+        self.assertEqual((meta["prefix"], meta["experiment"], meta["protocol"]),
+                         ("phase_d", "Phase D", "phase-d"))
+        self.assertEqual(meta["episode"], {"seed": seed, "weights": list(weights),
+                                           "climb_start_s": 180.0, "grade": 0.12})
+        self.assertEqual(body["road"]["climb_start_s"], 180.0)
+        self.assertEqual(meta["verdict"]["state"], "found", meta["verdict"]["missing"])
+        self.assertEqual(meta["verdict"]["short"],
+                         {k: AC.SHORT_VERDICT["phase_d"][k] for k in ("ar", "en")})
+        self.assertEqual([a["scored"] for a in meta["agents"]], ["not recorded"] * 2)
+        self.assertTrue(meta["result_file"])
+
+        seed, weights, start_s, grade = EPISODES_D2[6]
+        r = client.get("/api/agents/episode?runs=runs_d2&seed=3&ep=7&since=0&preempt=1")
+        self.assertEqual(r.status_code, 200, r.text[:500])
+        meta = r.json()["meta"]
+        self.assertEqual((meta["prefix"], meta["experiment"], meta["protocol"]),
+                         ("d2", "Phase D2", "d2"))
+        self.assertEqual(meta["episode"], {"seed": 1006, "weights": list(weights),
+                                           "climb_start_s": 247.0, "grade": grade})
+        self.assertEqual(grade, 0.15802)
+        self.assertEqual(stub.calls, [(("runs", 0, 1), 0, True), (("runs_d2", 3, 7), 0, True)])
+
+    def test_episode_route_unexpected_error_is_500_no_store(self):
+        """An exception the route did not expect is a 500 with a fixed text and
+        no-store (M1 left it to FastAPI's default 500, with no no-store). The
+        road and the meta are built BEFORE the store is polled, so a request
+        that fails never starts a build."""
+        secret = r"C:\secret\runs_c4\blind_seed5\final.zip"
+        pair = {"runs": "runs_c4", "seed": 5, "prefix": "c4", "experiment": "C4",
+                "protocol": "d2", "result_file": False, "agents": [], "problems": []}
+
+        def get(stub):
+            _, client = _client(stub)
+            return client.get(EPISODE_URL + "&since=0&preempt=1")
+        answered = []
+        stub = _StubStore()
+        with mock.patch.object(AC, "find_pair", side_effect=RuntimeError(secret)):
+            answered.append(("find_pair", get(stub), stub))
+        stub = _StubStore()
+        with mock.patch.object(AC, "find_pair", return_value=pair), \
+                mock.patch.object(API, "episode_meta", side_effect=RuntimeError(secret)):
+            answered.append(("episode_meta", get(stub), stub))
+        for name, r, stub in answered:
+            with self.subTest(fails=name):
+                self.assertEqual(r.status_code, 500)
+                self.assertEqual(r.headers.get("cache-control"), "no-store")
+                self.assertEqual(r.json(), {"detail": "server error: RuntimeError"})
+                self.assertNotIn("secret", r.text)
+                self.assertEqual(stub.calls, [], "a request that failed started a build")
 
 
 # Spec test 11. The snapshot is taken before the first test of this module and

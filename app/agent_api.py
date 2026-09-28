@@ -1,5 +1,5 @@
 """The agent replay page's server side: the model loader, the episode store and
-the two routes.
+the three routes.
 
 Imported only from the --simulation branch of app/server.py, which calls
 install(app), so --live and --replay never load agent code, SB3 or torch.
@@ -243,12 +243,32 @@ def sb3_available():
     return importlib.util.find_spec("stable_baselines3") is not None
 
 
+def page_constants():
+    """The preview horizons, the action space and the two protection limits,
+    JSON-safe: the same three fields in the catalog and in every episode's
+    meta, computed in one place. neutral_phys keeps M1's formula,
+    engine_env._rescale(neutral_action()) written out: 0 for the three trims,
+    1.0 for the fan and the pump."""
+    neutral_phys = ACT_LO + (neutral_action() + 1.0) * 0.5 * (ACT_HI - ACT_LO)
+    return agent_trace.jsonable({
+        "preview_s": list(PREVIEW_S),
+        "act": {"lo": ACT_LO, "hi": ACT_HI, "slew": SLEW, "neutral_phys": neutral_phys},
+        "limits": {"turb_c": round(TURB_PROTECT_K - 273.15, 1),
+                   "oil_c": round(OIL_PROTECT_K - 273.15, 1)},
+    })
+
+
 def episode_meta(pair, ep, road, verdict):
     """Everything the page needs once per episode, JSON-safe. The device and
     the torch/SB3 versions are NOT here: they are known only after the worker
-    has loaded the networks, so they travel in every poll response instead."""
-    neutral_phys = ACT_LO + (neutral_action() + 1.0) * 0.5 * (ACT_HI - ACT_LO)
+    has loaded the networks, so they travel in every poll response instead.
+
+    `episode` is the picker's own row (agent_trace.episode_row), read from the
+    road the env steps, so Phase D's grade is 0.12 rather than None; preview_s,
+    act and limits are page_constants(), the catalog's own."""
     agents = pair["agents"]
+    row = agent_trace.episode_row(ep, road)
+    consts = page_constants()
     return agent_trace.jsonable({
         "experiment": pair["experiment"],
         "runs": pair["runs"],
@@ -256,9 +276,7 @@ def episode_meta(pair, ep, road, verdict):
         "protocol": pair["protocol"],
         "seed": pair["seed"],
         "ep": ep["idx"],
-        "episode": {"seed": ep["seed"], "weights": list(ep["weights"]),
-                    "climb_start_s": road["climb_start_s"],
-                    "grade": None if ep["road"] is None else ep["road"][1]},
+        "episode": {k: row[k] for k in ("seed", "weights", "climb_start_s", "grade")},
         "dt": agent_trace.DT,
         "duration_s": agent_trace.DURATION,
         "steps": agent_trace.STEPS,
@@ -266,10 +284,9 @@ def episode_meta(pair, ep, road, verdict):
         "agents": [{"tag": a["tag"], "arm": a["arm"], "budget_line": a["budget_line"],
                     "zip_sha": a["zip_sha"], "scored": a["scored"]} for a in agents],
         "result_file": pair["result_file"],
-        "preview_s": list(PREVIEW_S),
-        "act": {"lo": ACT_LO, "hi": ACT_HI, "slew": SLEW, "neutral_phys": neutral_phys},
-        "limits": {"turb_c": round(TURB_PROTECT_K - 273.15, 1),
-                   "oil_c": round(OIL_PROTECT_K - 273.15, 1)},
+        "preview_s": consts["preview_s"],
+        "act": consts["act"],
+        "limits": consts["limits"],
         "scenario": {"v_kmh": max(road["speed_kmh"]), "t_amb_c": road["t_amb_c"],
                      "p_baro_kpa": road["p_baro_kpa"]},
         "verdict": verdict,
@@ -285,8 +302,34 @@ def _road(ep):
     return _ROADS[key]
 
 
+def catalog_episodes():
+    """The picker's row for every frozen episode of both protocols, each read
+    from the road the env steps (agent_trace.episode_row): Phase D's twenty
+    all climb 12 % at 180 s and differ only in their weights."""
+    out = {}
+    for protocol in ("d2", "phase-d"):
+        rows = []
+        for idx in range(1, len(agent_trace.PROTOCOL_EPISODES[protocol]) + 1):
+            ep = agent_trace.episode(protocol, idx)
+            rows.append(agent_trace.episode_row(ep, _road(ep)))
+        out[protocol] = rows
+    return out
+
+
+def catalog(root=ROOT, sb3=None):
+    """Everything the picker needs, JSON-safe: every runs*/ directory with its
+    pairs, their status and quoted table rows, and its quoted verdict
+    (agent_catalog.discover, read-only, no thread); the frozen episodes of
+    both protocols; the page's constants; and whether stable-baselines3 can
+    be imported (`sb3`, looked up unless the caller says). Computes nothing."""
+    body = {"experiments": agent_catalog.discover(root), "episodes": catalog_episodes()}
+    body.update(page_constants())
+    body["sb3"] = sb3_available() if sb3 is None else bool(sb3)
+    return agent_trace.jsonable(body)
+
+
 def install(app, store=None):
-    """Add GET /agents and GET /api/agents/episode to `app`."""
+    """Add GET /agents, GET /api/agents/catalog and GET /api/agents/episode to `app`."""
     from fastapi.responses import HTMLResponse, JSONResponse
 
     store = store if store is not None else EpisodeStore()
@@ -301,6 +344,15 @@ def install(app, store=None):
         return HTMLResponse((STATIC / "agents.html").read_text(encoding="utf-8"),
                             headers=NO_STORE)
 
+    @app.get("/api/agents/catalog")
+    def agents_catalog():
+        """Every experiment, pair and episode the picker offers. Read-only;
+        starts nothing. A failure is a fixed text, never str(exc)."""
+        try:
+            return answer(catalog(sb3=(not store.needs_sb3) or sb3_available()))
+        except Exception as exc:
+            return answer({"detail": f"catalog failed: {type(exc).__name__}"}, 500)
+
     @app.get("/api/agents/episode")
     def agents_episode(runs: str = "", seed: str = "", ep: str = "",
                        since: str = "0", preempt: str = ""):
@@ -308,6 +360,9 @@ def install(app, store=None):
 
         Every parameter is taken as text and checked here, so a malformed one
         gets this route's own 404 with no-store rather than FastAPI's 422.
+        Anything else unexpected is a 500 with a fixed text and no-store, never
+        str(exc). The road and the meta are built before the store is polled,
+        so a request that fails never starts a build.
         """
         unknown = answer({"detail": "unknown episode"}, 404)
         if (not agent_catalog.RUNS_NAME.fullmatch(runs) or not SEED_TEXT.fullmatch(seed)
@@ -317,17 +372,23 @@ def install(app, store=None):
         seed_n, idx, since_n = int(seed), int(ep), int(since)
         preempt_on = preempt in ("1", "true")
         try:
-            pair = agent_catalog.find_pair(runs, seed_n)
-            episode = agent_trace.episode(pair["protocol"], idx)
-        except KeyError:
-            return unknown
-        except agent_catalog.Refused as refused:
-            return answer({"status": "refused", "problems": refused.problems}, 409)
-        if store.needs_sb3 and not sb3_available():
-            return answer({"detail": "stable-baselines3 is not installed"}, 503)
-        out = store.poll((runs, seed_n, idx), since=since_n, preempt=preempt_on)
-        if since_n == 0:
-            road = _road(episode)
-            out["road"] = road
-            out["meta"] = episode_meta(pair, episode, road, agent_catalog.verdict(pair["prefix"]))
-        return answer(out)
+            try:
+                pair = agent_catalog.find_pair(runs, seed_n)
+                episode = agent_trace.episode(pair["protocol"], idx)
+            except KeyError:
+                return unknown
+            except agent_catalog.Refused as refused:
+                return answer({"status": "refused", "problems": refused.problems}, 409)
+            if store.needs_sb3 and not sb3_available():
+                return answer({"detail": "stable-baselines3 is not installed"}, 503)
+            first = {}
+            if since_n == 0:
+                road = _road(episode)
+                first = {"road": road,
+                         "meta": episode_meta(pair, episode, road,
+                                              agent_catalog.verdict(pair["prefix"]))}
+            out = store.poll((runs, seed_n, idx), since=since_n, preempt=preempt_on)
+            out.update(first)
+            return answer(out)
+        except Exception as exc:
+            return answer({"detail": f"server error: {type(exc).__name__}"}, 500)
