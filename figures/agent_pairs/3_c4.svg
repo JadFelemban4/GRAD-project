@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" width="1000" height="640" role="img" aria-label="C4: each of eight pairs as two dots, the sighted and the blind agent's median damage" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+<rect x="0" y="0" width="1000" height="640" fill="#fcfcfb" class="f-surface"/>
+<text x="56.0" y="42.0" font-size="20" fill="#0b0b0b" class="f-ink" text-anchor="start" font-weight="600">C4: Phase D2's design, trained to 300 000 steps</text>
+<text x="56.0" y="70.0" font-size="13.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">smaller than the MEI (50) at 300 000 steps · one seed wide · the two tests disagree · not converged</text>
+<rect x="56.00" y="86.00" width="169.98" height="23.00" rx="4" fill="#f0efec" class="f-tag" fill-opacity="1.0"/>
+<text x="65.0" y="102.0" font-size="11.5" fill="#0b0b0b" class="f-ink" text-anchor="start" font-weight="700">SMALLER THAN THE MEI</text>
+<text x="236.0" y="102.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">C4 budget, 300 000 training steps, not converged · 23-24 September 2026</text>
+<text x="56.0" y="542.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">A pair is two agents trained from the same seed, with the same code and budget; only the preview channel differs. Each dot is one agent's</text>
+<text x="56.0" y="558.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">median damage over the same 20 frozen test episodes (evaluate.py); lower is less damage. blind − sighted above zero means the blind agent</text>
+<text x="56.0" y="574.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">took more damage, so preview helped in that pair; bold marks a pair at or above the 50-unit minimum effect of interest. C4's agents are</text>
+<text x="56.0" y="590.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">Phase D2's agents trained longer, not a replication: every one retraced its D2 twin bit for bit through 50 000 steps. By the preregistered</text>
+<text x="56.0" y="606.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">rule they had not converged (results/C4_RESULT.txt). The unprotected baseline ECU scores 1118.0 here, off the top of the chart. Data:</text>
+<text x="56.0" y="622.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">results/c4_seed*.txt.</text>
+<circle cx="67.00" cy="142.00" r="4.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"></circle>
+<text x="86.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">the sighted agent: sees the road ahead</text>
+<circle cx="391.00" cy="142.00" r="4.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"></circle>
+<text x="410.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">the blind agent</text>
+<line x1="543.0" y1="142.0" x2="565.0" y2="142.0" stroke="#52514e" class="s-ink2" stroke-width="2.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="573.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">the current-grade rule</text>
+<line x1="100.0" y1="452.0" x2="850.0" y2="452.0" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="456.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">0</text>
+<line x1="100.0" y1="382.1" x2="850.0" y2="382.1" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="386.1" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">200</text>
+<line x1="100.0" y1="312.2" x2="850.0" y2="312.2" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="316.2" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">400</text>
+<line x1="100.0" y1="242.3" x2="850.0" y2="242.3" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="246.3" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">600</text>
+<line x1="100.0" y1="172.4" x2="850.0" y2="172.4" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="176.4" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">800</text>
+<text x="42.0" y="311.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400" transform="rotate(-90 42.0 311.0)">median damage, 20 test episodes</text>
+<line x1="100.0" y1="223.6" x2="850.0" y2="223.6" stroke="#52514e" class="s-ink2" stroke-width="1.3" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="858.0" y="227.6" font-size="11" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">current-grade 653.5</text>
+<line x1="888.0" y1="361.8" x2="888.0" y2="379.2" stroke="#0b0b0b" class="s-ink" stroke-width="2.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="883.0" y1="361.8" x2="893.0" y2="361.8" stroke="#0b0b0b" class="s-ink" stroke-width="1.5" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="883.0" y1="379.2" x2="893.0" y2="379.2" stroke="#0b0b0b" class="s-ink" stroke-width="1.5" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="898.0" y="371.8" font-size="11" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">50 units:</text>
+<text x="898.0" y="385.8" font-size="11" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">the smallest</text>
+<text x="898.0" y="399.8" font-size="11" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">effect of</text>
+<text x="898.0" y="413.8" font-size="11" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">interest</text>
+<line x1="139.9" y1="326.2" x2="153.9" y2="200.2" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="139.88" cy="326.23" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 0: sighted 359.9</title></circle>
+<circle cx="153.88" cy="200.21" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 0: blind 720.5</title></circle>
+<line x1="233.6" y1="280.7" x2="247.6" y2="308.8" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="233.62" cy="280.69" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 1: sighted 490.2</title></circle>
+<circle cx="247.62" cy="308.76" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 1: blind 409.9</title></circle>
+<line x1="327.4" y1="241.6" x2="341.4" y2="268.7" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="327.38" cy="241.56" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 2: sighted 602.2</title></circle>
+<circle cx="341.38" cy="268.74" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 2: blind 524.4</title></circle>
+<line x1="421.1" y1="334.5" x2="435.1" y2="329.9" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="421.12" cy="334.55" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 3: sighted 336.1</title></circle>
+<circle cx="435.12" cy="329.86" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 3: blind 349.5</title></circle>
+<line x1="514.9" y1="335.7" x2="528.9" y2="322.4" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="514.88" cy="335.70" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 4: sighted 332.8</title></circle>
+<circle cx="528.88" cy="322.35" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 4: blind 371.0</title></circle>
+<line x1="608.6" y1="297.3" x2="622.6" y2="297.4" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="608.62" cy="297.33" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 5: sighted 442.6</title></circle>
+<circle cx="622.62" cy="297.43" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 5: blind 442.3</title></circle>
+<line x1="702.4" y1="327.0" x2="716.4" y2="330.5" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="702.38" cy="327.03" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 6: sighted 357.6</title></circle>
+<circle cx="716.38" cy="330.53" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 6: blind 347.6</title></circle>
+<line x1="796.1" y1="324.3" x2="810.1" y2="325.1" stroke="#c3c2b7" class="s-axis" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="796.12" cy="324.27" r="6.0" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 7: sighted 365.5</title></circle>
+<circle cx="810.12" cy="325.11" r="6.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 7: blind 363.1</title></circle>
+<line x1="100.0" y1="452.0" x2="850.0" y2="452.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="146.9" y1="452.0" x2="146.9" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="146.9" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">0</text>
+<line x1="240.6" y1="452.0" x2="240.6" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="240.6" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">1</text>
+<line x1="334.4" y1="452.0" x2="334.4" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="334.4" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">2</text>
+<line x1="428.1" y1="452.0" x2="428.1" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="428.1" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">3</text>
+<line x1="521.9" y1="452.0" x2="521.9" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="521.9" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">4</text>
+<line x1="615.6" y1="452.0" x2="615.6" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="615.6" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">5</text>
+<line x1="709.4" y1="452.0" x2="709.4" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="709.4" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">6</text>
+<line x1="803.1" y1="452.0" x2="803.1" y2="457.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="803.1" y="472.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">7</text>
+<text x="475.0" y="492.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">pair, by its seed number</text>
+<text x="88.0" y="516.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">blind − sighted</text>
+<text x="146.9" y="516.0" font-size="12.5" fill="#0b0b0b" class="f-ink" text-anchor="middle" font-weight="700">+360.6</text>
+<text x="240.6" y="516.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">−80.3</text>
+<text x="334.4" y="516.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">−77.8</text>
+<text x="428.1" y="516.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">+13.4</text>
+<text x="521.9" y="516.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">+38.2</text>
+<text x="615.6" y="516.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">−0.3</text>
+<text x="709.4" y="516.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">−10.0</text>
+<text x="803.1" y="516.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">−2.4</text>
+</svg>

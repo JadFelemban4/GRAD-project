@@ -2098,6 +2098,16 @@ drift_test.py         The guard's own acceptance test: inject AUDIT2 Part 4a's
 full_run.py           Every script that prints a published figure, in one pass,
                       each block opening with its EXIT CODE -> FULL_RUN.txt.
                       Sweep the documents from that, not from memory.
+plot_sim_vs_car.py    The simulator against the car's logs: five charts, each
+                      labelled INDEPENDENT CHECK, FIT or CONSISTENCY CHECK, into
+                      figures/sim_vs_car/ (SVG, PNG, a printable PDF, a web
+                      page). SVG + headless Chrome, because Application Control
+                      blocks matplotlib on Jad's machine. The web page is
+                      published privately; its URL is in the docstring --
+                      update that page, never publish a second one.
+plot_agent_pairs.py   Phase D, D2 and C4 pair by pair: every agent a dot, every
+                      verdict quoted by app/agent_catalog.py, nothing computed.
+                      figures/agent_pairs/; its page is published the same way.
 results/PREREGISTRATION.md  Phase D's rules, committed before any agent trained.
 results/PREREGISTRATION_D2.md  Phase D2's rules, committed before any D2 agent
                       trained -- MEI set, power declared, ten limits, run log.

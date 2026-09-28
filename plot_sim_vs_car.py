@@ -776,6 +776,7 @@ NOT_CHARTED = [
 ]
 
 TITLE = "Simulator Against the Supra"
+SECOND_PAGE = "https://claude.ai/artifact/6B2gRmzj4RT1ysLZoFNJMg"     # plot_agent_pairs.py, published 28 Sep 2026
 ANCHOR = {"1_gear_ratios": "gears", "2_boost_pressure": "boost",
           "3_compressor_envelope": "envelope", "4_enrichment": "enrichment",
           "5_load_consistency": "load"}
@@ -864,6 +865,7 @@ th {{ color: var(--ink2); font-weight: 600; }}
 th:first-child, td:first-child {{ text-align: left; font-family: var(--font-body); }}
 code {{ font-family: var(--font-data); font-size: .92em; }}
 footer p {{ font-size: 13.5px; color: var(--muted); }}
+a {{ color: var(--model); }}
 a:focus-visible {{ outline: 2px solid var(--model); outline-offset: 2px; }}
 @media (max-width: 640px) {{
   .ladder li {{ grid-template-columns: minmax(0, 1fr); }}
@@ -915,7 +917,7 @@ def build_page(charts, meta, web):
         '<section class="cover">',
         "<header>",
         '<p class="meta">BSc graduation project, University of Jeddah · phase B, the simulator '
-        "against the car</p>",
+        f'against the car · <a href="{SECOND_PAGE}">the agents, pair by pair</a></p>',
         "<h1>The simulator against the Supra's logs</h1>",
         f'<p class="lede">{esc(lede)}</p>',
         f'<p class="meta">{esc(meta)}</p>',

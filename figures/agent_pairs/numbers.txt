@@ -1,0 +1,58 @@
+THE PREVIEW ABLATION, PAIR BY PAIR  (plot_agent_pairs.py)
+minimum effect of interest (analyse_phase_d2.MEI): 50 damage units
+
+PHASE D  (results/phase_d_seed*.txt, analyse_phase_d2.load)
+   seed  baseline  curr-grade   sighted     blind  blind-sighted
+      0     959.8       633.2     340.5     350.3           +9.8
+      1     959.8       633.2     354.0     348.2           -5.8
+      2     959.8       633.2     308.2     376.8          +68.6
+      3     959.8       633.2     302.5     689.7         +387.2
+      4     959.8       633.2     639.5     367.8         -271.7
+      5     959.8       633.2     525.7     237.5         -288.2
+      6     959.8       633.2     498.5     549.5          +51.0
+      7     959.8       633.2     331.5     418.6          +87.1
+   preregistered cell(s), quoted: NOT SIGNIFICANT, INCONCLUSIVE (post-hoc)
+   quoted  results/PHASE_D_RESULT.txt:26  (result)
+   quoted  results/PHASE_D_RESULT.txt:33  (not_blind)
+   quoted  results/PHASE_D2_RESULT.txt:65  (post_hoc)
+
+PHASE D2  (results/d2_seed*.txt, analyse_phase_d2.load)
+   seed  baseline  curr-grade   sighted     blind  blind-sighted
+      0    1118.0       653.5     353.5     575.2         +221.7
+      1    1118.0       653.5     485.7     411.3          -74.4
+      2    1118.0       653.5     627.8     624.1           -3.7
+      3    1118.0       653.5     331.4     332.3           +0.9
+      4    1118.0       653.5     357.3     407.8          +50.5
+      5    1118.0       653.5     587.1     520.0          -67.1
+      6    1118.0       653.5     442.8     359.9          -82.9
+      7    1118.0       653.5     400.6     406.8           +6.2
+   preregistered cell(s), quoted: INCONCLUSIVE
+   quoted  results/PHASE_D2_RESULT.txt:30  (result)
+   quoted  results/PHASE_D2_RESULT.txt:86  (c1)
+
+C4  (results/c4_seed*.txt, analyse_phase_d2.load)
+   seed  baseline  curr-grade   sighted     blind  blind-sighted
+      0    1118.0       653.5     359.9     720.5         +360.6
+      1    1118.0       653.5     490.2     409.9          -80.3
+      2    1118.0       653.5     602.2     524.4          -77.8
+      3    1118.0       653.5     336.1     349.5          +13.4
+      4    1118.0       653.5     332.8     371.0          +38.2
+      5    1118.0       653.5     442.6     442.3           -0.3
+      6    1118.0       653.5     357.6     347.6          -10.0
+      7    1118.0       653.5     365.5     363.1           -2.4
+   preregistered cell(s), quoted: SMALLER THAN THE MEI, NOT-CONVERGED
+   quoted  results/C4_RESULT.txt:42  (result)
+   quoted  results/C4_RESULT.txt:28  (seeds)
+   quoted  results/C4_RESULT.txt:33  (disagree)
+   quoted  results/C4_RESULT.txt:48  (convergence)
+   quoted  results/C4_RESULT.txt:50  (reading)
+   quoted  results/PREREGISTRATION_C4.md:41  (explanations)
+   quoted  results/PREREGISTRATION_C4.md:633  (one_seed)
+
+WRITTEN
+   figures/agent_pairs/index.html and page.html
+   figures/agent_pairs/1_phase_d.png   2000 x 1280 px
+   figures/agent_pairs/2_d2.png   2000 x 1280 px
+   figures/agent_pairs/3_c4.png   2000 x 1280 px
+   figures/agent_pairs/agent_pairs.pdf   printed from index.html
+   figures/agent_pairs/numbers.txt      (this output)
