@@ -100,6 +100,7 @@ reduction, and it drops peak oil by **19 °C** where reactive manages 5 °C.
 
 ### The validation table
 
+<!-- RETIRED-OK: dated record; best BSFC read 241.2 g/kWh until the converged cycle model, 239.9 since -->
 | Quantity | Model | Published | Status |
 |---|---|---|---|
 | Displacement | 2997.5 cc | 2990–3000 | inside |
@@ -504,6 +505,7 @@ it has not been checked.**
 
 ### What was searched for and not found — this is the useful half
 
+<!-- RETIRED-OK: dated record; best BSFC read 241.2 g/kWh until the converged cycle model, 239.9 since -->
 - **Row 3, best BSFC 235–260 g/kWh.** No source states it. Heywood gives
   **270 g/kWh**, above the band; a 2018 SwRI/EPA turbocharged GDI engine measures
   **233**, below it. Our 241.2 sits between them. The band was **not** widened to
@@ -634,6 +636,7 @@ the easiest available mistake.
 
 ### What was verified, on the merged tree
 
+<!-- RETIRED-OK: dated record; validate.py read 8 of 11 until rows 8-11 moved onto car data on 28 September -->
 | # | Script | Result |
 |---|---|---|
 | 1 | `verify_docs.py` | ✅ **All 33 checks pass**, 228 figure mentions scanned across 22 tracked files |
@@ -777,6 +780,7 @@ eleven samples of it.
 
 ### Verified
 
+<!-- RETIRED-OK: dated record; validate.py read 8 of 11 until rows 8-11 moved onto car data on 28 September -->
 ```
 verify_docs.py    All 38 checks pass, 309 figure mentions, 24 tracked files
 validate.py       8 of 11 inside band, unchanged (no plant change)
@@ -834,6 +838,7 @@ the baseline row, which it was at 110 km/h. **Preview is −0.4 points against
 current-grade**, the closest to level it has been. The question is open rather
 than trivially negative, and only a trained pair can settle it.
 
+<!-- RETIRED-OK: dated record; validate.py read 8 of 11 until rows 8-11 moved onto car data on 28 September -->
 `test_reward.py` 4 of 4 on the loaded scenario, neutral **−0.00038**.
 `verify_docs.py` 38 of 38. `validate.py` 8 of 11. `app.test_replay` 49 of 49.
 
@@ -849,10 +854,10 @@ Full account: `SESSION_REPORT_2026-09-28.md`. What was verified, and on what:
 | `test_reward.py` | 8 of 8 — four new checks on the training roads |
 | `check_roads.py` | PASS over 40 roads; 11 bind; worst neutral +0.004, worst p95 tracking 0.015 |
 | `check_premise.py` | baseline 951.9 at 884 °C; current-grade cuts 34.4 %, predictive 34.0 %; preview −0.4 |
-| `validate.py` | 8 of 11 (unchanged — no plant or thermal change) |
+| `validate.py` | 7 of 11 — rows 8–11 (oil, coolant) now scored against our own car; it read eight of eleven against literature bands |
 | `check_map.py` | 6 cells above the compressor ceiling, 0 without knock-free spark (unchanged) |
 | `python -m app.test_replay` | 49 of 49; `--full` 59 of 59; `pull01` pin 608.0 → 609.2 °C with its reason |
-| `model_vs_data.py` | eleven comparisons: 4 agree, 3 limited, 2 off, 1 untested, 1 not covered |
+| `model_vs_data.py` | eleven comparisons: 3 agree, 3 limited, 3 off, 1 untested, 1 not covered — drive10's oil and coolant moved to *off* once the replay was fed the car's measured fuel |
 | `evaluate.py`, ten existing agents | training +25.9 pts over current-grade; ablation mean −0.5, CI −2.0 to +1.1 |
 
 What changed in the simulator: the gearbox kicks down when the engine cannot
@@ -864,3 +869,25 @@ untouched.
 What was re-read without changing the model: the knock test rests on one
 reading per ~8 s and is untested; preview's −0.4 is entirely the knock term;
 the existing logs cannot calibrate the oil node. The retrain has not been run.
+
+### Later on 28 September — the car scores its own oil and coolant
+
+`validate.py` rows 8–11 (oil and coolant) moved off literature bands, three of
+which had no source, onto bands computed from our own drives. The replay is
+`car_thermal.py`, shared by `validate.py` and `model_vs_data.py`: free-running,
+seeded at the first real reading, fed measured fuel (air mass / 14.7 λ).
+
+| row | model | band, from our car | |
+|---|---|---|---|
+| 8 oil, drive10's hottest 10 min | 96.4 °C | 103–111 | outside |
+| 9 oil apparent time constant | 14.0 s | 70–100 | outside |
+| 10 coolant, synthetic climb | 94.5 °C | 83.5–95.6 | inside |
+| 11 coolant, drive10 | 88.4 °C | 91.8–94 | outside |
+
+**7 of 11**: 6 of 7 literature, 1 of 4 car. The car's oil τ implies
+c_oil ≈ 60 000–86 000 J/K against the assumed 12 000; `thermal.py` unchanged,
+because it moves the locked scenario. REFERENCES.md gained section 2c (GCC
+spec: no uprated cooling found; 95 vs 98 RON moves only the knock term) and
+section 3 now grades rows 8–11 as MEASURED (ours). Found by hand: REFERENCES
+still quoted the pre-H1 best BSFC (239.9 since); fixed and guarded in
+`verify_docs.RETIRED`. Verification on this tree is in the commit message.

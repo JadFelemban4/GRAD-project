@@ -251,8 +251,8 @@ html{scroll-behavior:smooth}
     </div>
     <div class="stat">
       <span class="k">Simulation vs car</span>
-      <span class="v">4<small>of 11 agree</small></span>
-      <p>Three more agree within limits the comparison cannot see past, two disagree, and two cannot be tested with the logs we have.</p>
+      <span class="v">3<small>of 11 agree</small></span>
+      <p>Three more agree within limits the comparison cannot see past, three disagree, and two cannot be tested with the logs we have.</p>
     </div>
   </div>
 
@@ -265,6 +265,8 @@ html{scroll-behavior:smooth}
       <li><b>Preview's −0.4 against current-grade is entirely the knock term.</b> That term is {{pd.split.knock_pct_base|.0f}}–{{pd.split.knock_pct_pred|.0f}} % of the damage. On turbine and oil damage alone, predictive and current-grade tie ({{pd.split.thermal_pred|.1f}} against {{pd.split.thermal_grade|.1f}}). <a href="#f-abl">The ablation</a></li>
       <li><b>The knock comparison could not have seen knock.</b> The drive behind it holds one reading of each ignition angle every {{mc.knock_s.every_s|.0f}} s, and a knock retard lasts a second or two. So the negative result is untested, not refuted. <a href="#f-knock">Knock</a></li>
       <li><b>The logs we have cannot calibrate the oil node.</b> A fit that fixes the hard pulls breaks drive10, the one drive in the published band. It needs sustained-load data. <a href="#drives">What to drive</a></li>
+      <li><b>The validation table now scores oil and coolant against the car,</b> not against unsourced ranges: {{mc.lit_ok}} of {{mc.lit_n}} inside, and {{mc.lit_c_ok}} of {{mc.lit_c_n}} of the car rows. The car's oil takes {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s to respond; the model's takes {{mc.lit.8.value|.0f}} s. <a href="#f-lit">The table</a></li>
+      <li><b>GCC specification and fuel, checked.</b> No admissible source shows uprated cooling on a GCC car, and on the model stronger cooling barely moves the turbine, which trades heat with exhaust and air. The manual asks for 95 RON minimum and 98 recommended; the model runs 95, and 98 moves only the knock term. Which fuel the car was logged on decides it. <code>REFERENCES.md</code> 2c</li>
       <li><b>Training uses the same 1.0 s step as scoring,</b> and the retrain gets 55 episodes where the old runs had 11.</li>
     </ol>
   </div>
@@ -408,13 +410,13 @@ html{scroll-behavior:smooth}
         <tr><td><a href="#f-boost">Manifold pressure under boost</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>median {{mc.boost.gap_sim|+.1f}} % against the car's boost channel</td></tr>
         <tr><td><a href="#f-enrich">Enrichment, λ</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>worst cell {{mc.enrich.worst|.3f}} lean; the documented 0.027 is on a retired axis</td></tr>
         <tr><td><a href="#f-spark">Part-load spark</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.spark.after.mean|+.2f}}° after the refit, was {{mc.spark.before.mean|+.1f}}°</td></tr>
-        <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median</td></tr>
+        <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>runs cool: oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median</td></tr>
         <tr><td><a href="#f-th74">Oil on hard pulls</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>model {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C</td></tr>
         <tr><td><a href="#f-knock">Knock</a></td><td><span class="pill none"><i>○</i>untested</span></td><td>correlation {{mc.knock.corr|+.2f}}, but on one reading every {{mc.knock_s.every_s|.0f}} s; drive C can test it</td></tr>
         <tr><td><a href="#f-gear">Gearbox ratios</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.gear.within|.1f}} % of samples within 4 % of a published ratio</td></tr>
         <tr><td><a href="#f-env">Compressor ceiling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>fitted to this data; the top rests on 4–5 readings per bin</td></tr>
         <tr><td><a href="#f-duty">Operating region</a></td><td><span class="pill none"><i>○</i>not covered</span></td><td>{{mc.duty.frac|.1f}} % of logged samples reach the climb's load</td></tr>
-        <tr><td><a href="#f-lit">Published bands</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>{{mc.lit_ok}} of {{mc.lit_n}} inside; ranges, not car data</td></tr>
+        <tr><td><a href="#f-lit">Validation table</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>{{mc.lit_ok}} of {{mc.lit_n}} inside: {{mc.lit_l_ok}} of {{mc.lit_l_n}} against literature, {{mc.lit_c_ok}} of {{mc.lit_c_n}} against our car</td></tr>
       </tbody>
     </table>
   </div>
@@ -480,8 +482,8 @@ html{scroll-behavior:smooth}
 
   <div class="fig" id="f-th10">
     <div class="fig-head">
-      <div class="row"><h3>Oil and coolant over a two-hour drive</h3><span class="pill good"><i>✓</i>agrees</span></div>
-      <p class="take"><code>thermal.py</code> driven free-running over drive10's operating points tracks both sensors to within a few kelvin: oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median.</p>
+      <div class="row"><h3>Oil and coolant over a two-hour drive</h3><span class="pill serious"><i>✕</i>off</span></div>
+      <p class="take"><code>thermal.py</code> driven free-running over drive10, fed the car's measured fuel, runs cool of both sensors: oil {{mc.thermal.drive10.oil_med|+.1f}} K and coolant {{mc.thermal.drive10.ect_med|+.1f}} K median. The validation table's rows 8 and 11 score exactly this drive and both miss.</p>
     </div>
     <div class="legend">
       <span style="color:var(--car)"><i class="lk"></i>car, sensor</span>
@@ -560,11 +562,16 @@ html{scroll-behavior:smooth}
 
   <div class="fig" id="f-lit">
     <div class="fig-head">
-      <div class="row"><h3>Published bands</h3><span class="pill warn"><i>◐</i>limited</span></div>
-      <p class="take"><code>validate.py</code> puts {{mc.lit_ok}} of {{mc.lit_n}} model outputs inside their published ranges. The oil climb ({{mc.lit.7.value|.1f}} °C) now has car data behind its miss: drive10 reached {{mc.thermal.drive10.oil_peak_car|.0f}} °C.</p>
+      <div class="row"><h3>The validation table</h3><span class="pill warn"><i>◐</i>limited</span></div>
+      <p class="take"><code>validate.py</code> puts {{mc.lit_ok}} of {{mc.lit_n}} model outputs inside their band. Rows 1–7 are things no sensor on this car can see, so their bands come from the literature ({{mc.lit_l_ok}} of {{mc.lit_l_n}} inside). Rows 8–11 are oil and coolant, which the car does log, so since 28 September their bands come from our own drives ({{mc.lit_c_ok}} of {{mc.lit_c_n}} inside).</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--ink-2)"><i class="ld" style="background:var(--sim)"></i>inside its band</span>
+      <span style="color:var(--crit-ink)"><i class="lk" style="color:var(--crit)"></i>outside, marked ✕</span>
+      <span style="color:var(--ink-2)">rows marked <b>· car</b> are scored against our logs</span>
     </div>
     <div class="chart" id="c-lit"></div>
-    <p class="cap">These are ranges from the literature, not measurements from this car, and <code>REFERENCES.md</code> records which are sourced. Position 0 is the low edge of each band, 1 the high edge.</p>
+    <p class="cap">The car rows say one thing: the oil node takes {{mc.lit.8.value|.0f}} s to follow a change where the car's oil takes {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s, and on drive10's hottest ten minutes it sits at {{mc.lit.7.value|.0f}} °C against the car's {{mc.lit.7.lo|.0f}}–{{mc.lit.7.hi|.0f}} °C. The car's own oil time constant sits inside the old literature range of 20–400 s, so that range was right and the model was not. <code>REFERENCES.md</code> section 3 grades every literature band. Position 0 is the low edge of each band, 1 the high edge.</p>
     <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-lit"></div></details>
   </div>
 </section>
@@ -1343,8 +1350,10 @@ mount("c-lit", (host, w) => {
     "Best BSFC (knock-feasible, lambda 1)": "Best BSFC", "Knock-limited spark (3000 rpm, 200 kPa)": "Knock-limited spark",
     "EGT, cruise band (min)": "EGT cruise, min", "EGT, cruise band (max)": "EGT cruise, max",
     "Turbine housing time constant": "Turbine τ", "Oil temperature, sustained climb": "Oil, climb",
-    "Oil time constant": "Oil τ", "Coolant, thermostat-regulated": "Coolant",
-    "Coolant regulation response (NOT a free time constant)": "Coolant response" };
+    "Oil, sustained load (drive10, hottest 10 min)": "Oil, sustained",
+    "Oil apparent time constant (identified)": "Oil τ",
+    "Coolant, regulated (synthetic climb)": "Coolant, climb",
+    "Coolant, whole drive (drive10, free-running)": "Coolant, drive10" };
   const h = Lr.length * rowH + 50;
   const P = plot(host, { w, h, x: { d: [-0.7, 1.9], label: "position inside the band", ticks: [0, 0.5, 1],
     fmt: v => v === 0 ? "low" : v === 1 ? "high" : "mid" }, y: { d: [1, 0], none: true },
@@ -1353,7 +1362,8 @@ mount("c-lit", (host, w) => {
   Lr.forEach((r, i) => {
     const y = P.m.t + (i + 0.5) * rowH;
     const span = (r.hi - r.lo) || 1, pos = Math.max(-0.6, Math.min(1.8, (r.value - r.lo) / span));
-    const name = narrow(w) ? (SHORT[r.name] || r.name.slice(0, 18)) : r.name;
+    const name = (narrow(w) ? (SHORT[r.name] || r.name.slice(0, 18)) : r.name)
+      + (r.basis === "our car" ? " · car" : "");
     T(P.svg, lw - 8, y + 4, name, { "text-anchor": "end", style: "fill:var(--ink-2)" });
     const c = r.ok ? "var(--sim)" : "var(--crit)";
     const dot = r.ok ? S("circle", { cx: P.x(pos), cy: y, r: 6, style: `fill:${c};stroke:var(--surface);stroke-width:1.6` }, P.g)
@@ -1363,7 +1373,7 @@ mount("c-lit", (host, w) => {
     const hitr = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
     markTip(P, hitr, P.x(pos), y, r.name, [
       { c, v: `${r.value} ${r.unit}`, k: r.ok ? "inside" : "OUTSIDE" },
-      { v: `${r.lo}–${r.hi}`, k: "published band" }]);
+      { v: `${r.lo}–${r.hi}`, k: r.basis === "our car" ? "band, from our car" : "band, from literature" }]);
   });
 }, () => 0);
 
@@ -1390,8 +1400,8 @@ table("t-abl", ["seed", "sighted cut %", "blinded cut %", "difference"],
 table("t-enrich", ["rpm", "dwell", "n", "car λ", "sim λ", "sim − car", "car, rows axis"],
   MC.enrich.cells.map(c => [c.rpm, c.dwell, String(c.n), f(c.car, 3), f(c.sim, 3), f(c.sim - c.car, 3, true), f(c.old, 3)]),
   [2, 3, 4, 5, 6]);
-table("t-lit", ["quantity", "model", "band", "inside"],
-  MC.lit.map(r => [r.name, `${r.value} ${r.unit}`, `${r.lo}–${r.hi}`, r.ok ? "yes" : "no"]), [1, 2]);
+table("t-lit", ["quantity", "model", "band", "band from", "inside"],
+  MC.lit.map(r => [r.name, `${r.value} ${r.unit}`, `${r.lo}–${r.hi}`, r.basis, r.ok ? "yes" : "no"]), [1, 2]);
 
 charts.forEach(c => ro.observe(c.host));
 })();

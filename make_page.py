@@ -273,9 +273,13 @@ def model_vs_car():
                      for k in ("shipped", "best")}
 
     out["lit"] = [dict(name=r["name"], value=_r(r["value"], 1), unit=r["unit"],
-                       lo=r["lo"], hi=r["hi"], ok=r["ok"]) for r in R["literature"]]
+                       lo=r["lo"], hi=r["hi"], ok=r["ok"], basis=r["basis"])
+                  for r in R["literature"]]
     out["lit_ok"] = sum(r["ok"] for r in R["literature"])
     out["lit_n"] = len(R["literature"])
+    for tag, basis in (("lit_l", "literature"), ("lit_c", "our car")):
+        rows_b = [r for r in R["literature"] if r["basis"] == basis]
+        out[tag + "_ok"], out[tag + "_n"] = sum(r["ok"] for r in rows_b), len(rows_b)
     return out
 
 

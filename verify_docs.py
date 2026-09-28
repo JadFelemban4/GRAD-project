@@ -441,6 +441,12 @@ RETIRED = [
     (r"4500\s*[-–]\s*7000[^\n]{0,24}?\b0\.98\b[^\n]{0,8}?\b0\.87\b",
      "the 4500-7000 rpm, 4-8 s enrichment cell at 0.87 (row-count dwell axis)",
      "0.83, dwell from the timestamps"),
+    # 28 September 2026. validate.py has printed 239.9 since the cycle model was
+    # converged (AUDIT.md H1), but REFERENCES.md section 3 row 3 still placed
+    # "our 241.2" between Heywood's 270 and Conway's 233. Found by hand while
+    # moving rows 8-11 onto car data; nothing was guarding it.
+    (r"\b241\.2\b", "best BSFC 241.2 g/kWh (before the converged cycle model)",
+     "239.9 g/kWh (validate.py row 3)"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to
@@ -493,9 +499,17 @@ def check_simulation(here):
         return
 
     inside = sum(1 for r in rows if r.get("inside"))
-    figure("validate.py rows inside the published band", inside, 8, 0,
+    # 8 until 28 September 2026, when rows 8-11 (oil and coolant) moved from
+    # literature bands onto bands computed from our own logs (validate.py
+    # check_against_car). The expected value changed because what the table
+    # MEASURES changed, not to make a check pass: against the car, the oil node
+    # is too slow to warm on sustained load and too fast overall, and the
+    # free-running coolant settles below the heat-management setpoint.
+    figure("validate.py rows inside their band", inside, 7, 0,
            patterns=[r"\b" + NUM + r"\s*\*{0,2}\s*of\s+\*{0,2}\s*11\b"],
            files=ALL)
+    car = [r for r in rows if r.get("basis") == "our car"]
+    chk("validate.py rows scored against our own car", len(car), 4, 0)
 
     by_name = {r["name"]: r for r in rows}
 

@@ -41,6 +41,49 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ## Current state — 28 September 2026 (the retrain is ready; three comparisons re-read)
 
+> ### LATER 28 SEPTEMBER: THE CAR NOW SCORES ITS OWN OIL AND COOLANT
+>
+> `validate.py` rows 8–11 are oil and coolant — quantities the car logs — and
+> three of their four bands had no source. **They are now scored against bands
+> computed from our own drives** (`validate.check_against_car`), through one
+> shared replay, **`car_thermal.py`**: `thermal.py` free-running over a logged
+> drive, fed the fuel the car actually burned (air mass / 14.7 λ, two measured
+> channels, so the fuel cut is in it). `model_vs_data.py` uses the same replay.
+>
+> | row | model | band, from our car | |
+> |---|---|---|---|
+> | 8 oil, drive10's hottest 10 min | 96.4 °C | 103–111 | outside |
+> | 9 oil apparent time constant | 14.0 s | 70–100 | outside |
+> | 10 coolant, synthetic climb | 94.5 °C | 83.5–95.6 | inside |
+> | 11 coolant, drive10 free-running | 88.4 °C | 91.8–94 | outside |
+>
+> **`validate.py` reads 7 of 11: 6 of 7 against literature, 1 of 4 against our
+> car.** It read eight of eleven against the old bands; `verify_docs.py`'s
+> expectation moved with that reason beside it. How each band is built:
+> `validation_table.md` section A.
+>
+> - **The oil node is four to seven times too light — or too tightly coupled.**
+>   The model's oil τ is c_oil / (ua_block_oil + ua_oil_amb) = 12 000 / 860 =
+>   14 s; the car's is 70–100 s on four drives. At the fitted 800 W/K that is
+>   c_oil ≈ 60 000–86 000 J/K, and the independent two-parameter fit lands on
+>   48 000. `ua_block_oil` was fitted with `frac_fuel_to_oil` assumed, so the
+>   ratio is what is known, not which term is wrong. **`thermal.py` is NOT
+>   changed**: it moves the locked scenario's oil damage. Decide before the
+>   retrain, with drive A.
+> - **drive10's oil and coolant moved from "agrees" to "off"** once the replay
+>   was fed measured fuel: −6.1 K and −4.7 K median (it read −4.4 / −4.0 on
+>   modelled fuel). The coolant drifts down at light load where the car's
+>   heat-management valve holds 92–94 °C.
+> - **GCC spec (REFERENCES.md 2c).** The 382 hp engine is confirmed; no
+>   admissible source shows uprated GCC cooling — do not write that it has any.
+>   50 % stronger radiator and fan moves the climb's turbine 884.0 → 883.5 °C.
+> - **Fuel.** The manual (team's report): 95 RON minimum, 98 recommended; the
+>   model runs 95. At 98 only the knock term moves (baseline 951.9 → 931.5);
+>   thermal-only preview stays +0.00. **Ask which fuel the car was logged on**
+>   before the retrain — a change means refitting the knock-limited spark.
+> - REFERENCES.md still quoted the best BSFC from before AUDIT.md H1; `validate.py` has
+>   printed 239.9 since. Fixed and guarded in `verify_docs.RETIRED`.
+
 > ### 28 SEPTEMBER: WHAT THE "OFF" AND "NEGATIVE" COMPARISONS ACTUALLY SAY
 >
 > Three measurements, none of which changed the model (`model_vs_data.py`):
@@ -59,7 +102,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 >   ways — total damage and thermal-only.
 > - **The logs we have cannot calibrate the oil node.** Fitting the two ASSUMED
 >   oil parameters on the three light-load calibration drives fixes the hard
->   pulls (134 → 102 °C, car 107) but breaks drive10, the only drive inside the
+>   pulls (134 → 104 °C, car 107) but breaks drive10, the only drive inside the
 >   published band (116 → 102 °C, car 117). The drives pull opposite ways; only
 >   sustained-load data (drive A) can decide. `thermal.py` is unchanged.
 >
@@ -243,7 +286,8 @@ python check_premise.py    the hand-written policies on the locked climb:
                            baseline 951.9 at 884 C, current-grade cuts 34.4 %,
                            preview -0.4 points against it. HAND-WRITTEN -- read
                            AUDIT.md C1 and C3 before quoting any of it
-python validate.py         8 of 11 published quantities inside band
+python validate.py         7 of 11 inside their band: 6 of 7 against literature,
+                           1 of 4 against our own car (rows 8-11, since 28 Sep)
 python test_reward.py      8 of 8 checks pass, four of them on the TRAINING
                            roads -- run it after any change to the reward, the
                            plant, the gearbox or the roads
@@ -1250,6 +1294,13 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   in `thermal.py`) rather than at the band.
 
   Above 117 °C is still extrapolation.
+
+  **28 September: the row is now scored like with like, and the pointer above
+  was wrong.** `validate.py` row 8 replays drive10 itself and compares the model
+  with the car over the car's hottest ten minutes: 96.4 °C against 103–111 °C.
+  Row 9 finds the car's oil time constant at 70–100 s against the model's 14 s.
+  That points at the RATIO c_oil / ua_block_oil, not at `ua_block_oil` alone —
+  which was fitted with the fuel-to-oil share assumed. See the 28 September box.
 - **Eight drives, six with usable samples.** `3f64372e` and `f51686d7` are under
   a minute each and contain no warm running window; `fb988991` is a census log
   whose windows are all rejected for span or logger gaps (mistake 8), so it
@@ -1364,7 +1415,7 @@ car's median retard is also 0 deg. **The two have no detectable relationship.**
 
 - `validate.py`'s knock-limited-spark row (11 deg at 3000 rpm / 200 kPa) is
   inside a band that REFERENCES.md already marks unsourced, and it is now also
-  unsupported by the car's own behaviour. It still counts toward "8 of 11".
+  unsupported by the car's own behaviour. It still counts toward the literature rows' 6 of 7.
 - `BaselineECU.knock_limited_spark` and the `40·max(0, KI − 0.85)²` term in the
   damage function rest on the same model.
 - `check_map.py`'s entire knock-limited surface is model-internal.
@@ -1655,7 +1706,11 @@ Everything below assumes the 130 km/h lock. See the current-state box at the top
    It has beaten the predictive policy on every hand-written comparison so far.
    If the trained agent cannot beat it either, that is a RESULT about H/τ, not a
    failure.
-7. **Report damage two ways until the knock model is tested** — total, and
+7. **Settle the octane before the retrain.** Ask which fuel the car was filled
+   with while it was logged (95 or 98 RON; the manual says 98 recommended). If
+   98, refit `BaselineECU.knock_limited_spark`, re-run `validate.py` and
+   `check_map.py` — a plant change, so before step 3. REFERENCES.md 2c.
+8. **Report damage two ways until the knock model is tested** — total, and
    turbine plus oil alone. The knock term is 6–12 % of damage and is ALL of the
    hand-written −0.4 (28 September). This is an extra column in the reporting,
    not a change to the reward, the training or the twenty episodes.
@@ -1671,12 +1726,13 @@ either drives A and B first, or retrain now and again after them.
 | comparison | status | what would improve it | touches the plant? |
 |---|---|---|---|
 | Knock | untested | Drive C: 6 channels, both ignition angles every ~1.25 s, held gear. Then re-run the comparison; if a relationship appears, retune Douaud-Eyzat to the car's retard onset | only if retuned |
-| Oil on hard pulls | off | Drive A (sustained climb + hot idle). Fit `frac_fuel_to_oil` and `c_oil` with the block pinned to measured coolant (`model_vs_data.oil_identification` does this) and re-check `ua_block_oil`'s p95-gap criterion jointly. The existing logs cannot: light-load drives and drive10 disagree | yes |
+| Oil on hard pulls | off | Drive A (sustained climb + hot idle). Fit `frac_fuel_to_oil` and `c_oil` with the block pinned to measured coolant (`model_vs_data.oil_identification` does this) and re-check `ua_block_oil`'s p95-gap criterion jointly. The existing logs cannot: light-load drives and drive10 disagree. **New constraint (28 Sep): the fit must also reproduce the car's 70–100 s oil time constant** (`validate.py` row 9), which the logs already give | yes |
+| Oil and coolant, long drive | off | Oil: as above. Coolant: the 88 °C stand-in thermostat lets the block drift down at light load where the car's valve holds 92–94 °C; a regulation point fitted to the car's warm coolant would move it — a plant change, so decide with the oil | yes |
 | Compressor ceiling | limited | Drive B (roll-ons in a held high gear from 1600–1900 rpm): the car's real low-flow boost. Refit `boost_ceiling_kpa` there and retire the gearbox kickdown workaround. The top above 0.314 kg/s stays out of reach — the MAF saturates | yes |
 | Load | limited | Nothing at part load: both pressure channels on this car are pre-throttle, so no part-load test of `eta_v` exists. At wide-open throttle the boost comparison IS an `eta_v` test (+1.9 %); drive B extends it down in rpm. Say so in Chapter 3 | no |
 | Enrichment | off | Refit `ENR_DWELL_LO/HI` on timestamps once there are more independent readings at 4500–7000 rpm — needs seconds of full load at high rpm, a track-day job. Irrelevant to Phase D: the climb never enriches | no (not for D) |
 | Operating region | not covered | Drive A gives sustained load at road speeds; the exact 130 km/h / 12 % point does not exist on any road and is sea-level air by construction | no |
-| Published bands | limited | Two of the three misses are the oil node (drive A). The EGT cruise band needs a source — library access, REFERENCES.md section 3 | via the oil node |
+| Validation table | limited | 7 of 11. Of the car rows, two misses are the oil node (drive A) and one the coolant regulation point. The literature miss, EGT cruise max, needs a source — library access, REFERENCES.md section 3 | via the oil node |
 
 **Where the app fits in that order: nowhere.** It is finished enough to demo and
 it is not on this path. If you have an hour, spend it on step 2, not on `app/`.

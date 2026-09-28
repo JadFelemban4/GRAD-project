@@ -9,9 +9,13 @@ python compare_log.py data/master_points.csv
 
 **Do not edit `plant.py` or `thermal.py` without re-running both and updating this file.**
 
-Last regenerated: 11 September 2026, **after the charge-temperature correction**
-(and, before it, the engine-geometry correction).
+Last regenerated: **28 September 2026 — rows 8–11 (oil and coolant) now scored
+against our own logs.** `validate.py` returns **7 of 11**: 6 of 7 against
+literature, 1 of 4 against the car. Section A says how each car band is built.
+Before that: 11 September, after the charge-temperature correction (and, before
+it, the engine-geometry correction).
 
+<!-- RETIRED-OK: dated record of the 16 September re-check -->
 **Re-checked 16 September 2026 and UNCHANGED.** `validate.py` still returns
 **8 of 11** inside band with identical values, so nothing in this table has been
 rewritten. Two things happened around it that a reader will otherwise wonder
@@ -68,61 +72,99 @@ did not come out of `compare_log.py` should be regenerated.
 
 ---
 
-## A. Against published figures — `validate.py`
+## A. The eleven rows — `validate.py`
 
-| Quantity | Model | Published band | Status | Source |
-|---|---|---|---|---|
-| Displacement | 2997.5 cc | 2990–3000 | inside | REFERENCES.md §3 row 1 |
-| MFB50 at MBT (2500 rpm, 60 kPa) | 8.5° aTDC | 8–10 | inside | REFERENCES.md §3 row 2 |
-| Best BSFC, knock-feasible, λ=1 | 239.9 g/kWh | 235–260 | inside | REFERENCES.md §3 row 3 |
-| Knock-limited spark (3000 rpm, 200 kPa) | 11.0° BTDC | 8–14 | inside | REFERENCES.md §3 row 4 |
-| EGT, cruise band, minimum | 724.1 °C | 600–750 | inside | REFERENCES.md §3 row 5 |
-| EGT, cruise band, maximum | 787.7 °C | 600–750 | **outside** | REFERENCES.md §3 row 6 |
-| Turbine housing time constant | 48.0 s | 40–120 | inside | REFERENCES.md §3 row 7 |
-| Oil temperature, sustained climb | 110.2 °C | 115–140 | **outside** | REFERENCES.md §3 row 8 |
-| Oil time constant | 16.0 s | 20–400 | **outside** | REFERENCES.md §3 row 9 |
-| Coolant, thermostat-regulated | 94.5 °C | 88–108 | inside | REFERENCES.md §3 row 10 |
-| Coolant apparent time constant | 9.5 s | 1–600 | inside | REFERENCES.md §3 row 11 |
+Rows 1–7 are quantities no channel on this car can see — cylinder pressure,
+brake efficiency, exhaust temperature, the turbine — so a published range is the
+only yardstick. **Rows 8–11 are oil and coolant, which the car does log, and
+since 28 September they are scored against bands computed from our own drives**
+(`validate.check_against_car`, replays in `car_thermal.py`).
 
-The **Source** column points at the row of `REFERENCES.md` section 3 that
-records where each band comes from, what kind of claim it is (general engine
-physics, or a fact specific to the B58 that only BMW or Toyota can supply),
-and whether anyone has actually opened that source. CONFIRMED or UNVERIFIED
-is recorded there and only there, so the two files cannot disagree. A band
-whose row is still UNVERIFIED is an engineering-judgement band and must be
-described as one in Chapter 3.
+| # | Quantity | Model | Band | Status | Basis |
+|---|---|---|---|---|---|
+| 1 | Displacement | 2997.5 cc | 2990–3000 | inside | literature — REFERENCES.md §3 row 1 |
+| 2 | MFB50 at MBT (2500 rpm, 60 kPa) | 8.5° aTDC | 8–10 | inside | literature — row 2 |
+| 3 | Best BSFC, knock-feasible, λ=1 | 239.9 g/kWh | 235–260 | inside | literature — row 3 |
+| 4 | Knock-limited spark (3000 rpm, 200 kPa) | 11.0° BTDC | 8–14 | inside | literature — row 4 |
+| 5 | EGT, cruise band, minimum | 724.1 °C | 600–750 | inside | literature — row 5 |
+| 6 | EGT, cruise band, maximum | 787.7 °C | 600–750 | **outside** | literature — row 6 |
+| 7 | Turbine housing time constant | 48.0 s | 40–120 | inside | literature — row 7 |
+| 8 | Oil, sustained load (drive10, hottest 10 min) | 96.4 °C | 103–111 | **outside** | **our car** — the car's interquartile range over that window |
+| 9 | Oil apparent time constant (identified) | 14.0 s | 70–100 | **outside** | **our car** — identified on 4 of 5 drives |
+| 10 | Coolant, regulated (synthetic climb) | 94.5 °C | 83.5–95.6 | inside | **our car** — warm coolant, 5th–95th percentile, all drives |
+| 11 | Coolant, whole drive (drive10, free-running) | 88.4 °C | 91.8–94 | **outside** | **our car** — the car's interquartile range over the drive |
 
-<!-- RETIRED-OK -->
-**8 of 11 inside**, down from a claimed 10 of 11 on the wrong engine. Report the
-three misses with their reasons; each is informative.
+**7 of 11 inside: 6 of 7 against literature, 1 of 4 against our own car.** The
+literature rows' sources and grades live in `REFERENCES.md` section 3 and only
+there; an UNVERIFIED band is an engineering-judgement band in Chapter 3.
 
-### The three misses
+### How rows 8–11 are scored
 
-**EGT maximum, 777 °C against a 600–750 band.** The band describes moderate
-cruise. The test's own worst point is 2500 rpm at 100 kPa, and the measured
-cruise range on this car is **30–75 kPa** — so that point is above cruise for
-this engine, and 777 °C port-exit at near-full naturally-aspirated load is
-normal. The test point is mislabelled rather than the model being wrong, but the
-band was not moved to make it pass. State it as it is.
+Each rule was fixed before the model was scored against it.
 
-**Oil temperature, 110.2 °C against a 115–140 band, and oil τ 16.0 s against
-20–400.** Both come from the same parameter, `ua_block_oil`, and both are
-consequences of calibrating it against the car instead of the literature — see
-section C. The model reproduces the measured oil trace to about 4 K RMSE, and the
-measured oil never exceeded **117 °C** anywhere in 168 minutes of logging.
+- **The replay.** `thermal.py` is driven over a logged drive on a 1 s grid,
+  **free-running** from a seed taken at the first real reading, with the fuel the
+  car burned formed from two measured channels, air mass over (14.7 × λ). No
+  combustion model is involved, so the replay captures the car's fuel cut on
+  overrun, and it runs in seconds.
+- **Row 8** uses drive10 — chosen because it is the only drive whose oil reaches
+  the published 115–140 °C band, the longest, and logged with ten channels so
+  oil is read every couple of seconds. The window is the 10 minutes where the
+  CAR's rolling-median oil is highest; the band is the car's interquartile range
+  there.
+- **Row 9** identifies an apparent first-order time constant by one method
+  (`car_thermal.identify_tau`) from the car's oil and from the model's, with the
+  block pinned to the measured coolant. The method was checked first: on the
+  model it recovers the analytic 14 s on every drive. A drive whose best fit
+  sits at the edge of the candidate grid did not excite the oil enough to say —
+  `3aca2ec1`, the steady cruise, is excluded that way. The band is the car's
+  range over the other four.
+- **Row 10** keeps the synthetic sustained climb and scores its settled coolant
+  against the car's own warm range, instead of a band whose upper half was
+  judgement.
+- **Row 11** replaces a "regulation response" row whose 1–600 s band almost
+  nothing could fail (AUDIT.md L10) with the whole of drive10 replayed.
 
-**There may be a resolution, and it is not a tuning knob.** `Oil temperature
-after filter` — recorded for the first time on 8 September — runs consistently
-hotter than the `Oil temperature` channel the model is calibrated against:
-+11.0 K median over a whole drive, and **+6.8 K at oil above 100 °C**, which is
-the regime the published band describes. Model 110.2 °C plus 6.8 K is 117 °C,
-inside 115–140. If the published figure refers to a hotter point in the oil
-circuit, the two numbers were never measuring the same place.
+### The misses
 
-This is **not applied anywhere** and the row is still reported as a miss.
-Confirm it with a sustained high-load drive recording both channels first.
-**Matching the car and missing the band is the better failure**; do not raise the
-coupling to close a gap the data does not support.
+**EGT maximum, 787.7 °C against a 600–750 band** (literature). The band
+describes moderate cruise. The test's own worst point is 2500 rpm at 100 kPa, and
+the measured cruise range on this car is **30–75 kPa** — so that point is above
+cruise for this engine, and ~790 °C port-exit at near-full naturally-aspirated
+load is normal. The test point is mislabelled rather than the model being wrong,
+but the band was not moved to make it pass.
+
+**Oil, rows 8 and 9 — measured, and they agree with each other.** The car's
+oil takes **70–100 s** to follow a change; the model's takes 14 s. And over
+drive10's hottest ten minutes the car's oil sat at 103–111 °C while the model's
+median was 96 °C. The node is too light and, on sustained load, too cool: its
+oil follows the block within seconds, where the car's sump carries far more
+heat. It is also what makes the model's oil spike on hard pulls (140 °C against
+the car's 107 on 7475b5d7). Fitting it is drive A in `logs/DRIVE_PLAN.md`: the
+logs we have pull the two assumed oil parameters opposite ways
+(`model_vs_data.py`).
+
+**Coolant over a whole drive, row 11.** Free-running, the model's coolant
+settles about 4 K below the car's. The car holds 92–94 °C through cruise and
+idle with its heat-management valve; the model's 88 °C thermostat stand-in lets
+the block drift down at light load. Row 10 passes because under sustained load
+the model's coolant (94.5 °C) sits inside the car's warm range. Both say the same
+thing: the regulation point is right under load and too low at light load.
+
+*(The literature bands these rows used to be scored against — 115–140 °C,
+20–400 s, 88–108 °C, 1–600 s — are kept in REFERENCES.md section 3. The car's
+own oil time constant, 70–100 s, sits inside the old 20–400 s band: the band was
+right, and the model was not.)*
+
+**A note on the two oil channels.** `Oil temperature after filter`, recorded
+since 8 September, runs hotter than the `Oil temperature` channel the model is
+compared with: +11.0 K median over a whole drive, and **+6.8 K at oil above
+100 °C**. Until 28 September this was offered as a possible reconciliation of the
+old literature miss — the synthetic climb's 110.2 °C plus 6.8 K is 117 °C, inside
+115–140. Row 8 now compares the model against the `Oil temperature` channel on
+the same drive, so the offset no longer bears on the table. It is not applied
+anywhere. **Matching the car and missing a band is the better failure**; do not
+raise the coupling to close a gap the data does not support.
 
 Note the turbine constant now sits inside its band at 48.0 s, near the `C/UA`
 analytic value of 50.3 s. <!-- RETIRED-OK -->

@@ -3983,7 +3983,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         </div>
         <div>
           <div class="k">Validation table</div>
-          <div class="vv">8 of 11 quantities inside the published band</div>
+          <div class="vv">7 of 11 quantities inside their band (6 of 7 against literature, 1 of 4 against our own car)</div>
           <div class="nn">The published band is the range the references and textbooks give for that quantity on an engine like ours. The table regenerates with one command: python validate.py</div>
         </div>
         <div>
@@ -4011,7 +4011,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
     </div>
     <div class="blk">
       <div class="call is-warn">
-        <h4>Why 8 of 11 is the expected outcome, not a failure</h4>
+        <h4>Why 7 of 11 is the expected outcome, not a failure</h4>
         <ul>
           <li><b>The three that fall outside are known by name</b> <span style="color:var(--muted)">Peak exhaust gas temperature at low, steady cruising loads, plus two oil quantities: oil temperature on a sustained climb, and the oil time constant. None of the three is a surprise or a hidden defect, and validation_table.md gives the reason for each.</span></li>
           <li><b>Oil above 117 °C is extrapolation</b> <span style="color:var(--muted)">117 °C is the hottest reading of the oil temperature channel anywhere in the logs, and the sensor downstream of the oil filter reaches 111 °C on that same drive. The published band, 115–140 °C, starts above both. So anything we say about hotter oil rests on the structure of the model, not on anything we measured.</span></li>
@@ -4651,7 +4651,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
           <li>
             <div>
               <b><code>python validate.py</code> · 4 minutes</b>
-              <div class="note">Regenerates the validation table. Expect <span class="num">8 of 11</span> quantities inside the published band — that is not a failure, and the three outside are explained in <code>validation_table.md</code>.</div>
+              <div class="note">Regenerates the validation table. Expect <span class="num">7 of 11</span> quantities inside their band — that is not a failure, and the three outside are explained in <code>validation_table.md</code>.</div>
             </div>
           </li>
           <li>
@@ -4707,7 +4707,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
             <div class="rows">
               <div>
                 <div class="k">How do you know the simulator is right?</div>
-                <div class="vv">Two independent checks. Against published combustion figures: <b>8 of 11</b> quantities inside band, and we report the three misses with reasons rather than tuning to close them. Against the car: a <b>1.4 %</b> load residual over 22 operating points drawn from 295.0 minutes of logging.</div>
+                <div class="vv">Two independent checks. Against published figures and our own oil and coolant logs: <b>7 of 11</b> quantities inside band, and we report the three misses with reasons rather than tuning to close them. Against the car: a <b>1.4 %</b> load residual over 22 operating points drawn from 295.0 minutes of logging.</div>
                 <div class="nn">And read mistake 12 before quoting the second one: the residual does not test the breathing model. Say that yourself before the examiner does.</div>
               </div>
               <div>

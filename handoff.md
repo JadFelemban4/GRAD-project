@@ -11,7 +11,8 @@ the scripts win: run the command and read what it prints.**
 
 `REFERENCES.md` sits beside those three and answers a different question: where
 every number we did **not** measure comes from. Read it before calling any band
-in `validate.py` "published" — most of the eleven still have no source.
+in `validate.py` "published": four of the seven literature bands still have no
+source, and rows 8–11 are not published bands at all — they come from our car.
 
 *(Rewritten 28 September 2026. The version before it told a newcomer to expect
 figures that had been void since 16 September, behind a section-wide exemption
@@ -26,10 +27,15 @@ C3 had already withdrawn.)*
 > committed: the locked scenario (12 % at 130 km/h, 42 °C, which binds), a new
 > road every training episode, and a 1.0 s step that matches the scoring.
 >
-> **Decide one thing first: calibrate before or after the retrain.** Two drives
-> in `logs/DRIVE_PLAN.md` (A and B) would change the plant — the oil node, the
-> boost ceiling at low rpm. A plant change after the retrain means retraining
-> again. It is about three hours of machine time either way.
+> **Decide two things first.**
+> 1. **Calibrate before or after the retrain.** Two drives in
+>    `logs/DRIVE_PLAN.md` (A and B) would change the plant — the oil node, the
+>    boost ceiling at low rpm. A plant change after the retrain means retraining
+>    again. It is about three hours of machine time either way.
+> 2. **The fuel.** The owner's manual says 95 RON minimum, 98 recommended; the
+>    model runs 95. Find out which the car was filled with while it was logged.
+>    98 moves only the knock term, but changing it is a plant change
+>    (REFERENCES.md section 2c).
 >
 > **Three things the latest pass found** (CLAUDE.md, current-state box):
 > - the knock comparison could not have seen knock — it rests on one reading
@@ -37,6 +43,15 @@ C3 had already withdrawn.)*
 > - preview's −0.4 against current-grade is entirely the knock term; on
 >   turbine and oil damage alone the two tie;
 > - the logs we have cannot calibrate the oil node — the drives disagree.
+>
+> **And later the same day** (CLAUDE.md, the first 28 September box):
+> - `validate.py` rows 8–11 (oil, coolant) are now scored against bands from
+>   our own drives, through `car_thermal.py`: **7 of 11**, 1 of 4 of the car rows;
+> - the car's oil takes **70–100 s** to follow a change and the model's takes
+>   **14 s** — the oil node is four to seven times too light, or too tightly
+>   coupled. `thermal.py` is unchanged;
+> - no source shows uprated cooling on a GCC car, and it would barely move the
+>   turbine anyway.
 >
 > **The ten agents in `runs/` are a record, not a result.** They trained at
 > 110 km/h (nothing binds), at dt = 0.2 s, on one road.
@@ -63,7 +78,7 @@ reproduce, the number here is stale and the script is right.
 | `python check_premise.py` | baseline **951.9** at **884 °C**; reactive 671.1 (cuts 29.5 %), current-grade 624.5 (34.4 %), predictive 628.4 (34.0 %); preview over current-grade **−0.4**. Hand-written — read AUDIT.md C1 and C3 first |
 | `python test_reward.py` | **8 of 8** pass. Neutral scores inside ±0.05 on the locked climb and on every training-road family; the gearbox's torque table still matches the plant |
 | `python check_roads.py` | **PASS** over 40 roads; 11 push the baseline past 850 °C; worst neutral reward about +0.004, worst p95 tracking error 0.015 against a 0.05 band |
-| `python validate.py` | **8 of 11** quantities inside the published band; displacement 2997.5 cc; turbine τ **48.0 s** |
+| `python validate.py` | **7 of 11** inside their band — 6 of 7 against literature, **1 of 4 against our own car** (rows 8–11, oil and coolant); displacement 2997.5 cc; turbine τ **48.0 s** |
 | `python compare_log.py data/master_points.csv` | fitted k 0.837 → **1.1 %**; derived k 0.831 → **1.4 %**, PASS. Mistake 12: it cannot see the breathing model |
 | `python check_map.py` | spark falls with load in every row and rises with speed in every column; **6 cells above the compressor ceiling**, 0 with no knock-free spark |
 | `python build_dataset.py "logs/raw/*.csv"` | 295.0 min, 10 drives, 26 operating points |
@@ -72,10 +87,13 @@ reproduce, the number here is stale and the script is right.
 | `python -m app.test_replay` | **49 of 49**. Add `--full` for **59 of 59**: 14278 of 14340 samples estimated, peak estimated turbine **890.6 °C**, **15 thermal · 0 mismatch · 19 novel** |
 | `python make_figures.py` / `python make_page.py` | the thesis figures in `results/figures/`, and the phone page `results/page/index.html` |
 
-`validate.py` being 8 of 11 is expected, not a failure: the three outside are the
-cruise-band EGT maximum and the two oil figures. The hottest oil in the logs is
-**117 °C on drive10**, inside the published 115–140 °C band, so the oil miss is
-now a measured one: the model runs a few kelvin cool on sustained load.
+`validate.py` being 7 of 11 is expected, not a failure. Against literature the one miss
+is the cruise-band EGT maximum. Rows 8–11 are scored against the car's own logs, and
+three miss: the model's oil is too cool on sustained load and warms 5–7 times too
+fast, and its free-running coolant settles below the car's heat-management setpoint.
+Over drive10's hottest ten minutes the car's oil sat at 103–111 °C and the model's
+at 96 °C; the car's oil peaked at **117 °C**. `validation_table.md` section A says
+how each band is built.
 
 ---
 

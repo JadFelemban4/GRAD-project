@@ -130,7 +130,7 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 |---|---|---|
 | `plant.py` | 0-D single-zone SI cycle model. `Geometry()` **is** the B58B30O1 inline-six from the 2023 GR Supra — 2997.5 cc; `b58()` is an alias for it. Wiebe burn, Woschni heat transfer, Chen-Flynn friction, Douaud-Eyzat knock integral. One cycle ≈ 4.6 ms. | B |
 | `thermal.py` | 3-node lumped-capacitance network — block/coolant, oil, turbine housing — with a stand-in thermostat (the real B58 uses a heat-management valve; see REFERENCES.md section 2). | B |
-| `validate.py` | **Regenerates the validation table.** Eleven quantities against published bands. Currently 8 of 11 inside; the three misses are explained in validation_table.md. | B |
+| `validate.py` | **Regenerates the validation table.** Eleven quantities: rows 1-7 against literature bands, rows 8-11 (oil and coolant) against bands computed from our own logs. Currently 7 of 11 inside; the misses are explained in validation_table.md. | B |
 | `extract_steady.py` | Finds steady operating points in a BimmerLink CSV and **de-duplicates** them. | B |
 | `compare_log.py` | Runs the plant at those points and scores the error. | B |
 | `check_map.py` | Derives MBT and knock-limited spark maps. Confirms the calibration surface has the right shape. | B |
@@ -166,7 +166,7 @@ temperature, so the app runs the validated physics next to the live stream and
 estimates it. Everything else is supporting cast. Because it reuses
 `plant.predict`, `plant.map_from_airflow`, `plant.charge_temperature` and
 `thermal.ThermalNetwork` unchanged, it **inherits Phase B's validation and
-Phase B's limits** — 8 of 11 bands, three documented misses, and a load range
+Phase B's limits** — 7 of 11 bands (the oil and coolant rows scored against the car itself), the misses documented, and a load range
 checked only where the steady points sit. It must not imply more confidence
 than that, and `t_turb_c` is a model output with an assumed heat capacity
 (REFERENCES.md section 4), never a reading.

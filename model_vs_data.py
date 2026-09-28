@@ -20,7 +20,8 @@ is asked of every comparison here before its result is quoted.
   enrichment    base_lambda against measured lambda, speed band x dwell.
   spark         the fitted part-load spark map against logged spark.
   thermal       thermal.py free-running over a whole drive against the
-                logged coolant and oil channels.
+                logged coolant and oil channels, fed the car's MEASURED fuel
+                (car_thermal.py -- the replay validate.py scores on).
   knock         the model knock integral against the car's own retard, and
                 how many genuine readings that retard rests on -- about one
                 per 8 s on a 26-channel drive, too few to see a knock event.
@@ -31,8 +32,9 @@ is asked of every comparison here before its result is quoted.
                 published ZF 8HP51 ratios (mistake 18).
   envelope      logged pressure ratio against plant.boost_ceiling_kpa.
   duty cycle    where the car was driven against where Phase D is scored.
-  literature    validate.py's rows against their bands. Published ranges, not
-                car data, and REFERENCES.md grades which are sourced.
+  validation    validate.py's eleven rows: 1-7 against published ranges
+                (REFERENCES.md grades which are sourced), 8-11 -- oil and
+                coolant -- against bands computed from our own logs.
 
 It reads data/master_samples.csv and data/master_points.csv and never writes
 to data/ or logs/raw/. Every number it prints is computed on this run.
@@ -238,74 +240,20 @@ def spark(P):
 
 # ========================================== thermal replay, and knock (heavy)
 def replay(source):
-    """Drive the plant and thermal.py over one logged drive, FREE-RUNNING.
+    """thermal.py driven FREE-RUNNING over one logged drive -- car_thermal's
+    replay, the same one validate.py scores rows 8 and 11 on.
 
-    Unlike the app's estimator, the block node is NOT reset to the measured
-    coolant: the point is to see what the thermal network does on its own when
-    fed the car's operating points. Seeded from the measured coolant and oil at
-    the first sample, per mistake 15 -- a seed outside the physics is worse
-    than none.
-
-    Inputs at 1 Hz: the round-robin logger refreshes each channel every few
-    seconds (mistake 13b), so finer steps add rows, not information.
+    Since 28 September the fuel is MEASURED (air / 14.7 lambda), not modelled:
+    it captures the car's fuel cut on overrun and keeps the results page and the
+    validation table on one replay. See car_thermal.py.
     """
-    from plant import predict, charge_temperature
-    from thermal import ThermalNetwork
-    from engine_env import BaselineECU, GEO
-    S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
-    d = S[S.source == source].sort_values("t").reset_index(drop=True)
-    t0 = d.t.iloc[0]
-    grid = np.arange(0.0, d.t.iloc[-1] - t0, 1.0)
-    idx = np.searchsorted(d.t.to_numpy() - t0, grid, side="right") - 1
-    d = d.iloc[np.clip(idx, 0, len(d) - 1)].reset_index(drop=True)
-    d["tr"] = grid
-
-    # AUDIT.md M8: BimmerLink writes exact zeros into a column until the ECU
-    # first answers for that channel. A coolant or oil of exactly 0 C on a warm
-    # engine is a placeholder, not a reading -- seeding from one starts the
-    # node 90 K cold and the first minutes of the comparison are the seed.
-    for col in ("ect_c", "oil_c", "t_amb"):
-        d.loc[d[col] == 0.0, col] = np.nan
-
-    def first_real(col, default):
-        v = d[col].dropna()
-        return float(v.iloc[0]) if len(v) else default
-
-    tn, ecu = ThermalNetwork(), BaselineECU()
-    amb = first_real("t_amb", 30.0) + 273.15
-    tn.reset(t_amb=amb, warm=True)
-    tn.t_block = first_real("ect_c", 90.0) + 273.15
-    tn.t_oil = first_real("oil_c", 90.0) + 273.15
-
-    out = dict(t=[], ect_meas=[], ect_model=[], oil_meas=[], oil_model=[],
-               ki=[], retard=[], rpm=[], v=[], egt=[])
-    for _, r in d.iterrows():
-        amb = (r.t_amb if np.isfinite(r.t_amb) else amb - 273.15) + 273.15
-        ect_k = (r.ect_c if np.isfinite(r.ect_c) else 90.0) + 273.15
-        if not (np.isfinite(r.rpm) and r.rpm > 400 and np.isfinite(r.map_kpa)):
-            continue
-        t_ch = charge_temperature(amb, tn.t_block)
-        _, lam_ecu, fan = ecu.step(r.rpm, r.map_kpa, t_ch, tn.t_block, False, 1.0)
-        lam = r.lam if np.isfinite(r.lam) and 0.5 < r.lam < 1.5 else lam_ecu
-        spk = r.spark if np.isfinite(r.spark) else 20.0
-        o = predict(rpm=r.rpm, map_kpa=r.map_kpa, iat_k=t_ch, ect_k=tn.t_block,
-                    spark_btdc=spk, lam=lam, geo=GEO)
-        fuel = o["mdot_fuel_gps"]
-        v = (r.v_kmh if np.isfinite(r.v_kmh) else 0.0) / 3.6
-        tn.step(1.0, fuel, fuel * 15.0, o["egt_c"] + 273.15, amb, v, fan)
-        out["t"].append(r.tr)
-        out["ect_meas"].append(r.ect_c)
-        out["ect_model"].append(tn.t_block - 273.15)
-        out["oil_meas"].append(r.oil_c)
-        out["oil_model"].append(tn.t_oil - 273.15)
-        out["ki"].append(o["knock_integral"])
-        rt = (r.spark_tgt - r.spark) if (np.isfinite(r.spark_tgt)
-                                         and np.isfinite(r.spark)) else np.nan
-        out["retard"].append(rt)
-        out["rpm"].append(r.rpm)
-        out["v"].append(v * 3.6)
-        out["egt"].append(o["egt_c"])
-    return source, out
+    import car_thermal as CT
+    r = CT.thermal_replay(source)
+    k = 273.15
+    return source, dict(t=r["t"].tolist(), ect_meas=(r["ect_car"] - k).tolist(),
+                        ect_model=(r["ect_model"] - k).tolist(),
+                        oil_meas=(r["oil_car"] - k).tolist(),
+                        oil_model=(r["oil_model"] - k).tolist())
 
 
 OIL_VARIANTS = ("as shipped", "half fuel-to-oil share", "double oil capacity",
@@ -322,48 +270,19 @@ def oil_variant(variant, source="7475b5d7-20260908_142743.csv"):
     it is a sensitivity test, and it says what a sustained-load drive would
     have to measure.
     """
-    from plant import predict, charge_temperature
-    from thermal import ThermalNetwork, ThermalParams
-    from engine_env import BaselineECU, GEO
+    import car_thermal as CT
+    from thermal import ThermalParams
     p = ThermalParams()
     if variant == "half fuel-to-oil share":
         p.frac_fuel_to_oil *= 0.5
     elif variant == "double oil capacity":
         p.c_oil *= 2.0
-    S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
-    d = S[S.source == source].sort_values("t").reset_index(drop=True)
-    for col in ("ect_c", "oil_c", "t_amb"):
-        d.loc[d[col] == 0.0, col] = np.nan                     # AUDIT.md M8
-    t0 = d.t.iloc[0]
-    grid = np.arange(0.0, d.t.iloc[-1] - t0, 1.0)
-    d = d.iloc[np.clip(np.searchsorted(d.t.to_numpy() - t0, grid, side="right") - 1,
-                       0, len(d) - 1)].reset_index(drop=True)
-    tn, ecu = ThermalNetwork(p), BaselineECU()
-    tn.reset(t_amb=float(d.t_amb.dropna().iloc[0]) + 273.15, warm=True)
-    tn.t_block = float(d.ect_c.dropna().iloc[0]) + 273.15
-    tn.t_oil = float(d.oil_c.dropna().iloc[0]) + 273.15
-    oil_m, oil_c, gap = [], [], []
-    for _, r in d.iterrows():
-        if not (np.isfinite(r.rpm) and r.rpm > 400 and np.isfinite(r.map_kpa)):
-            continue
-        amb = (r.t_amb if np.isfinite(r.t_amb) else 30.0) + 273.15
-        if variant == "block pinned to measured coolant" and np.isfinite(r.ect_c):
-            tn.t_block = r.ect_c + 273.15
-        t_ch = charge_temperature(amb, tn.t_block)
-        _, lam_e, fan = ecu.step(r.rpm, r.map_kpa, t_ch, tn.t_block, False, 1.0)
-        lam = r.lam if np.isfinite(r.lam) and 0.5 < r.lam < 1.5 else lam_e
-        o = predict(rpm=r.rpm, map_kpa=r.map_kpa, iat_k=t_ch, ect_k=tn.t_block,
-                    spark_btdc=r.spark if np.isfinite(r.spark) else 20.0, lam=lam, geo=GEO)
-        f = o["mdot_fuel_gps"]
-        tn.step(1.0, f, f * 15.0, o["egt_c"] + 273.15, amb,
-                (r.v_kmh if np.isfinite(r.v_kmh) else 0.0) / 3.6, fan)
-        oil_m.append(tn.t_oil - 273.15)
-        oil_c.append(r.oil_c)
-        gap.append(tn.t_oil - tn.t_block)
-    om, oc = np.array(oil_m), np.array(oil_c, dtype=float)
+    r = CT.thermal_replay(source, params=p,
+                          pin_block=(variant == "block pinned to measured coolant"))
+    om, oc = r["oil_model"] - 273.15, r["oil_car"] - 273.15
     ok = np.isfinite(oc)
     return dict(variant=variant, peak_model=float(om.max()), peak_car=float(np.nanmax(oc)),
-                max_gap=float(np.max(gap)),
+                max_gap=float(np.max(r["oil_model"] - r["ect_model"])),
                 rmse=float(np.sqrt(np.mean((om[ok] - oc[ok]) ** 2))))
 
 
@@ -406,35 +325,16 @@ OIL_HELD_OUT = ("7475b5d7-20260908_142743.csv", "drive10-20260918_233912.csv")
 
 
 def oil_inputs(source):
-    """Per-second fuel flow and boundary temperatures for the oil node alone.
-
-    The block is PINNED to the measured coolant, so the radiator -- which
-    thermal.py documents as unidentifiable from these logs -- drops out and the
-    oil node can be fitted on its own.
-    """
-    from plant import predict, charge_temperature
-    from engine_env import GEO
-    S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
-    d = S[S.source == source].sort_values("t").reset_index(drop=True)
-    for col in ("ect_c", "oil_c", "t_amb"):
-        d.loc[d[col] == 0.0, col] = np.nan                     # AUDIT.md M8
-    t0 = d.t.iloc[0]
-    grid = np.arange(0.0, d.t.iloc[-1] - t0, 1.0)
-    d = d.iloc[np.clip(np.searchsorted(d.t.to_numpy() - t0, grid, side="right") - 1,
-                       0, len(d) - 1)].reset_index(drop=True)
-    rows = []
-    for _, r in d.iterrows():
-        if not (np.isfinite(r.rpm) and r.rpm > 400 and np.isfinite(r.map_kpa)
-                and np.isfinite(r.ect_c)):
-            continue
-        amb = (r.t_amb if np.isfinite(r.t_amb) else 30.0) + 273.15
-        ect = r.ect_c + 273.15
-        lam = r.lam if np.isfinite(r.lam) and 0.5 < r.lam < 1.5 else 1.0
-        o = predict(rpm=r.rpm, map_kpa=r.map_kpa, iat_k=charge_temperature(amb, ect), ect_k=ect,
-                    spark_btdc=r.spark if np.isfinite(r.spark) else 20.0, lam=lam, geo=GEO)
-        rows.append((o["mdot_fuel_gps"], ect, amb,
-                     r.oil_c + 273.15 if np.isfinite(r.oil_c) else np.nan))
-    return source, np.array(rows)
+    """Per-second MEASURED fuel flow and boundary temperatures for the oil node
+    alone, the block pinned to the measured coolant (car_thermal.py)."""
+    import car_thermal as CT
+    d = CT.log_grid(source)
+    fuel = CT.measured_fuel_gps(d.air_gps.to_numpy(), d.lam.to_numpy(), d.rpm.to_numpy())
+    ect = d.ect_c.to_numpy() + 273.15
+    amb = d.t_amb.ffill().bfill().fillna(30.0).to_numpy() + 273.15
+    oil = d.oil_c.to_numpy() + 273.15
+    keep = np.isfinite(ect)
+    return source, np.column_stack([fuel, ect, amb, oil])[keep]
 
 
 def oil_identification(inputs):
@@ -573,17 +473,14 @@ def duty_cycle(S):
 
 # ============================================================= literature
 def literature():
+    """validate.py's eleven rows with their bands and basis: rows 1-7 against
+    literature, rows 8-11 against our own car (since 28 September)."""
     import validate
-    rows = []
-    for r in (validate.check_displacement(), validate.check_mfb50()[0],
-              validate.check_bsfc()[0], validate.check_knock_limit(),
-              *validate.check_egt(), *validate.check_time_constants()[0]):
-        rows.append(dict(name=r["name"], value=r["value"], unit=r["unit"],
-                         lo=r["lo"], hi=r["hi"], ok=bool(r["ok"])))
-    return rows
+    rows, _ = validate.full_rows()
+    return [dict(name=r["name"], value=r["value"], unit=r["unit"], lo=r["lo"], hi=r["hi"],
+                 ok=bool(r["ok"]), basis=r["basis"]) for r in rows]
 
 
-# ================================================================== main
 def _heavy(job):
     kind, arg = job
     if kind == "replay":
@@ -684,8 +581,11 @@ def main():
     D = res["duty"]
     print(f"  scenario operating point                {D['scenario_rpm']:.0f} rpm, {D['scenario_map']:.0f} kPa")
     print(f"  logged moving samples at or above it    {D['frac_logs_at_or_above_scenario']:6.2f} %")
-    print(f"  literature bands                        "
-          f"{sum(r['ok'] for r in res['literature'])} of {len(res['literature'])} inside")
+    Lr = res["literature"]
+    lit = [r for r in Lr if r["basis"] == "literature"]
+    car = [r for r in Lr if r["basis"] == "our car"]
+    print(f"  validate.py rows inside their band      {sum(r['ok'] for r in Lr)} of {len(Lr)}   "
+          f"(literature {sum(r['ok'] for r in lit)} of {len(lit)}, our car {sum(r['ok'] for r in car)} of {len(car)})")
 
 
 if __name__ == "__main__":

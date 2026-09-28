@@ -86,7 +86,7 @@ recorded about its own car.
 | **Compression ratio** — how much the piston squeezes the air before ignition | 10.2:1 | **The engine code B58B30O1 goes with 10.2:1 in four manufacturer documents:** BMW Canada Z4 2020MY Product Guide p. 2 ("Engine type B58B30O1 … Compression rate, :1 10.2 … 285 kW / 382 bHP at 5800–6500 rpm"); Toyota Australia GTP-009045 p. 1 ("Engine model code B58B30O1 … Compression ratio 10.2:1 … 285 kW @ 5800–6500"); BMW, *M340i xDrive Specifications*, 10/2019, p. 1 ("2998 … 94.6/82.0 … Compression ratio :1 10.2 … 275/374 kW/hp"); Toyota Canada press release, Toronto, 14 Feb 2020, *Toyota GR Supra Races Into 2021 with More Power…*: "A new piston design reduces the engine's compression ratio from 11:1 to 10.2:1" as output rose from 335 hp to 382 hp. Toyota Canada, 28 Apr 2022, *…Enhanced Drive Dynamics for 2023*: the 2023 GR Supra 3.0 is the 382 hp car. **But the ratio follows the engine version, not the model year:** the 340 PS / 250 kW GR Supra 3.0 sold in the UK and Europe is printed at **11.0:1** on Toyota UK's own specification sheets of Feb 2021, June 2022 and Feb 2024 (p. 1: "Compression ratio 10.2:1 11.0:1", the first figure being the 2.0-litre), and every 2015–2021 BMW sheet for the original B58 (code B58B30M0 on the 2018 US 5 Series sheet) prints 11.0:1 | **CONFIRMED that B58B30O1 = 10.2:1. OPEN: which version our car is.** Settle it from the car's rated output on its registration, compliance plate or dealer paperwork: 285 kW (382 hp / 387 PS) means 10.2:1; 250 kW (340 PS / 335 bhp) means 11.0:1. Our logs cannot tell the two apart on their own. If it is the 250 kW car, the project's value is wrong and the knock prediction must be re-run |
 | **Thermostat opening temperature** — the valve that lets coolant reach the radiator | 88 °C | **The B58 has no thermostat.** BMW Group University Technical Training, *Technical training. Product information. B58 Engine*, course ST1505, information status April 2015, section 4.2 p. 38: *"The conventional thermostat in the B58 engine is replaced by a so-called heat management module."* Section 4.2 p. 39: *"In contrast to a map controlled thermostat with expansion element, there is no direct, physical connection to the coolant temperature"* — the module is a motor-driven rotary valve positioned by the engine computer from the coolant temperature and a cylinder-head metal temperature. No opening temperature is printed anywhere in its cooling chapter. (Unofficial copy on archive.org; page numbers taken from the OCR text and to be checked against the PDF) | **MODELLING EQUIVALENT.** Our 88 °C is the point at which `thermal.py`'s stand-in thermostat cracks, identified from the car's own coolant channel. It must not be cited to BMW |
 | **Coolant operating band** | 88–108 °C | BMW publishes no setpoint. ST1505 section 4.2.2 pp. 43–45 lists five control phases (cold start, warm-up, operating temperature, transfer, maximum cooling) with no temperature for any of them. Our logs sit at 88–97 °C throughout | **MEASURED (ours)** for the lower part; the 108 °C upper edge is engineering judgement and is not observed in any log |
-| **Oil operating band, sustained load** | 115–140 °C | Searched SAE, MTZ, patents and handbooks; nothing admissible states a sustained-load oil band for this or any modern engine. ST1505 section 4.1 p. 37 confirms only the structure: *"the engine oil as well as the transmission fluid are cooled using coolant"* through an oil/coolant heat exchanger in the filter module, which is what our `ua_block_oil` term models. **Our model gives 110.2 °C and we report this as a MISS** | **UNVERIFIED.** The only numbers found were on owner forums, which cannot be cited |
+| **Oil operating band, sustained load** | 115–140 °C | Searched SAE, MTZ, patents and handbooks; nothing admissible states a sustained-load oil band for this or any modern engine. ST1505 section 4.1 p. 37 confirms only the structure: *"the engine oil as well as the transmission fluid are cooled using coolant"* through an oil/coolant heat exchanger in the filter module, which is what our `ua_block_oil` term models. **Since 28 September `validate.py` no longer scores against this band**: row 8 uses the car's own oil over drive10's hottest ten minutes, 103–111 °C (section 3). drive10's oil reached 117 °C, inside this band's low end; the model's synthetic climb settles at 110.2 °C | **UNVERIFIED** as a published band, and no longer needed. The only numbers found were on owner forums, which cannot be cited |
 
 > **Note on sources for this section.** Wikipedia's B58 article carries the bore,
 > stroke and displacement figures and they match our model exactly, but
@@ -190,16 +190,97 @@ schedule, so any converter curve would be an invented parameter. The scenarios
 this environment runs are steady high-speed climbs where a real 8HP is locked,
 so a 1:1 locked converter is both the right approximation and the honest one.
 **Say "converter assumed locked" wherever the gearbox is described.**
+
 ---
 
-## 3. The eleven validation bands — status after the 14 September pass
+## 2c. The GCC market specification, and the fuel (added 28 September 2026)
+
+**Our car is a GCC-specification GR Supra.** GCC cars are often said to carry
+hotter-climate cooling, so the question was whether the cooling, the oil
+parameters or the exhaust temperatures should differ from the model's.
+
+### CONFIRMED — the GCC car is the 382 hp engine
+
+Toyota Saudi Arabia (Abdul Latif Jameel), *Toyota Supra 2026 — full specs*,
+`toyota.com.sa/en/vehicles/passenger/supra/full-specs`, opened 28 Sep 2026:
+"Engine: 3.0L, In-line 6-Cylinders Turbo (Twin Scroll), 382 HP", Track Edition
+MT and AT. That is the 285 kW B58B30O1 whose compression ratio section 2 settles
+at 10.2:1 — the pairing `plant.py` runs. **Caveat:** the page is the 2026 model
+year; our car is a 2023. It supports the pairing; it does not document our car.
+
+### NOT FOUND — any market-specific cooling hardware
+
+**Searched 28 September and found nothing admissible.** The Toyota Saudi page
+lists no cooling, oil-cooler, radiator, fan or oil-capacity row at all. US
+dealer catalogues list the Supra radiator as 16400-WAA01 with other WAA
+variants in circulation, but every catalogue page refused an automated reader,
+so which market each variant belongs to was not established. BMW's "hot climate
+version" option (S823A: a larger radiator and a stronger fan) appears only on
+owner forums, which are not sources, and nothing ties it to a GCC Supra.
+**Do not write that the GCC car has uprated cooling.** If someone can open a
+Toyota parts catalogue by region (EPC: Europe / General / Middle East), compare
+the radiator, fan and oil-cooler part numbers — that would settle it.
+
+### Why it matters less than it sounds — MEASURED on the model
+
+- **The parameters that were fitted to the car already describe THIS car.**
+  `ua_block_oil` (the oil cooler), the 88 °C regulation point, the spark map and
+  the enrichment schedule all came from our own GCC car's logs. Whatever
+  cooling it has is in them.
+- **Stronger cooling barely moves the protected component.** Running the
+  locked climb with the radiator and fan 50 % stronger (the unidentifiable
+  `ua_rad_*` terms): turbine peak 884.0 → 883.5 °C, oil 109.9 → 108.3 °C,
+  coolant 93.4 → 91.8 °C, baseline damage −1.4 %. Doubling `c_oil` changes
+  nothing on a steady climb. The turbine housing trades heat with the exhaust
+  gas and the air, not the cooling system.
+- **EGT is not a cooling output.** It comes from combustion — spark, lambda,
+  load — and the spark and lambda calibrations are fitted to this car. No
+  channel on the car measures EGT before the catalyst.
+
+### The fuel — ASSUMED 95 RON, and it moves only the knock term
+
+`plant.Operating.octane` is **95 RON**. The team reports (28 Sep) that the
+owner's manual gives **95 RON as the minimum and 98 RON as recommended for
+optimal performance**. *(Record the manual's page here when it is next to hand;
+until then this is the team's report of it, not an opened citation.)*
+
+Measured on the locked climb, hand-written policies, only the octane changed:
+
+| fuel | baseline damage | knock term | turbine peak | preview over current-grade: total | thermal-only |
+|---|---|---|---|---|---|
+| 95 RON | 951.9 | 61.3 | 884 °C | −0.41 pts | +0.00 pts |
+| 98 RON | 931.5 | 41.2 | 884 °C | −0.31 pts | +0.00 pts |
+
+**The thermal result is fuel-independent.** At the climb the baseline is
+already knock-limited at 0.7° BTDC and its knock integral stays below the ECU's
+knock flag at 91, 95 and 98 RON alike, so EGT does not move (1027 °C). The knock
+damage term is what changes — and that term rests on the knock model this
+project has not yet been able to test (CLAUDE.md, 28 September).
+
+**Before changing the default:** the octane should be the fuel the car was
+actually filled with while it was logged, because the logged spark map already
+reflects it. Changing it also means refitting `BaselineECU.knock_limited_spark`
+(fitted at 95), re-running `validate.py` (the knock-limited-spark row) and
+`check_map.py`, and it is a plant change — so it goes in before the Phase D
+retrain, not after.
+
+---
+
+## 3. The eleven validation bands — status after the 28 September pass
 
 Every band `validate.py` scores against. Before 14 September none had been
-checked against a source. Now: rows 1 and 2 are CONFIRMED, row 7 is PARTIAL,
-row 10 is ours, and **seven rows (3, 4, 5, 6, 8, 9, 11) remain UNVERIFIED** and
-must be called engineering-judgement bands in Chapter 3. Two of those seven
-(rows 3 and 5–6) were searched hard and the opened sources point *away* from
-the band as written; that is recorded below rather than hidden.
+checked against a source. **On 28 September rows 8–11 — oil and coolant — stopped
+being literature bands at all.** The car logs both, so their bands are now
+computed from our own drives (`validate.check_against_car`, replays in
+`car_thermal.py`; how each band is built is in `validation_table.md` section A).
+That leaves the literature half as: rows 1 and 2 CONFIRMED, row 7 PARTIAL, and
+**four rows (3, 4, 5, 6) UNVERIFIED**, to be called engineering-judgement bands
+in Chapter 3. Two of those (rows 3 and 5–6) were searched hard and the opened
+sources point *away* from the band as written; that is recorded below rather
+than hidden.
+
+`validate.py` now prints **7 of 11**: 6 of 7 against literature, 1 of 4 against
+our own car.
 
 The "kind" column says whether a general textbook will do, or whether this
 needs BMW-specific data.
@@ -208,15 +289,23 @@ needs BMW-specific data.
 |---|---|---|---|---|---|---|
 | 1 | Displacement | engine size | 2990–3000 cc | **B58** | **CONFIRMED** | section 2 |
 | 2 | MFB50 at MBT | The crank angle by which half the fuel has burned, at the spark timing that makes the most torque. If burning finishes too early or too late you lose power | 8–10° after top-dead-centre | general | **CONFIRMED** (as the common rule; it is engine-dependent) | Zhu, Haskara & Winkelman 2007, p. 417: "between 8 and 10 [°] after TDC when MBT timing is achieved"; Heywood scan: "half the charge is burned at about 10° after TC" (a single value, not a band); Machado et al. 2015, abstract as rendered: the industry adopts 8°–10° for CA50. Caveat: Klimstra 1985 (abstract) puts the optimum at 7–8°, so the thesis should say "commonly 8–10°, engine-dependent" |
-| 3 | Best BSFC | Fuel used per unit of work done — the engine's best-case efficiency | 235–260 g/kWh | general | **UNVERIFIED** — opened sources bracket the band but none states it | Heywood scan, eq. 2.22 context: "For SI engines typical best values of brake specific fuel consumption are about 75 μg/J = 270 g/kW·h" — *above* the band. Conway et al. 2018, p. 5: "The best BSFC of 233 g/kWh (35.8% brake thermal efficiency or BTE) was achieved at 2500 rpm 12 bar BMEP" on a production-like 1.6 L turbo GDI calibration — *below* the band. Our 241.2 g/kWh sits between them. Do not change the band; state it as judgement bracketed by 233 and 270, or cite both. The B58's own fuel-consumption map is in the MTZ article of section 7, unopened |
+| 3 | Best BSFC | Fuel used per unit of work done — the engine's best-case efficiency | 235–260 g/kWh | general | **UNVERIFIED** — opened sources bracket the band but none states it | Heywood scan, eq. 2.22 context: "For SI engines typical best values of brake specific fuel consumption are about 75 μg/J = 270 g/kW·h" — *above* the band. Conway et al. 2018, p. 5: "The best BSFC of 233 g/kWh (35.8% brake thermal efficiency or BTE) was achieved at 2500 rpm 12 bar BMEP" on a production-like 1.6 L turbo GDI calibration — *below* the band. Our 239.9 g/kWh sits between them. Do not change the band; state it as judgement bracketed by 233 and 270, or cite both. The B58's own fuel-consumption map is in the MTZ article of section 7, unopened |
 | 4 | Knock-limited spark | How far the spark can be advanced at high load before detonation starts | 8–14° | **B58-ish** | **UNVERIFIED — expected, and confirmed by searching** | SAE knock-limit papers, MIT and MTU theses and knock-model papers were searched; not one admissible page states a knock-limited spark value near 3000 rpm and 200 kPa. Douaud & Eyzat gives the knock *model*, not this band. **Weakest of the eleven.** Drop the row from the thesis, or keep it labelled as an internal consistency check |
 | 5 | EGT cruise, min | Exhaust gas temperature at steady cruise | 600–750 °C | general | **UNVERIFIED** | No opened source states a part-load cruise range. Heywood presents port-exit temperature against load and speed in Fig. 6-22 (Sec. 6.5), but the numbers are in the figure, which nobody has opened; his chapter 11 remarks that a conventional engine's manifold temperature "is not sufficient" for thermal-reactor oxidation at about 600–700 °C, which leans against the band. The only measured figures found are full-load protection limits on a modern turbo GDI: 900 °C at the exhaust port, 930 °C pre-turbine (Conway et al. 2018, p. 10). State which temperature the band means: thermocouple readings sit roughly 100 K below mass-averaged port temperature (Heywood, Sec. 6.5) or about 20 K below the time-averaged value (Caton 1982, abstract) |
 | 6 | EGT cruise, max | as above | 600–750 °C | general | **UNVERIFIED** | as above |
 | 7 | **Turbine housing time constant** | How long the turbocharger takes to heat up — technically, to reach 63 % of the way to its final temperature after a step change in load | 40–120 s | **B58** | **PARTIAL** | Burke, Vagg, Chalet & Chesse 2015, section 5.3: after a load step on a 2.2-litre diesel with a variable-geometry turbocharger, the gas-to-housing heat flow "peaks at the beginning of the transient (in this case at around 7kW) before slowly falling to a value of around 3.6kW three minutes later. This spike in heat flow is accounted for by the accumulation of heat in the turbine housing as it warms up"; their protocol holds each step three minutes because "this allows for the system to stabilise". Settling within about three minutes bounds the housing time constant from above at roughly 45–60 s, consistent with our 48.0 s and inside the band. **What it does not do:** it reports no time constant, supports neither the 40 s floor nor the 120 s ceiling, and is a diesel turbocharger, not a B58. **No opened source publishes a turbine-housing heat capacity in J/K**, so `c_turb` cannot be cross-checked; see section 4 |
-| 8 | Oil temperature, sustained climb | how hot the oil gets on a long hard climb | 115–140 °C | **B58** | **UNVERIFIED** | section 2, oil row |
-| 9 | Oil time constant | how long the oil takes to heat up | 20–400 s | **B58** | **UNVERIFIED** | Jarrier et al. 2000 (abstract): oil temperature "lags behind the water one" — supports the ordering in `thermal.py`, gives no number |
-| 10 | Coolant, thermostat-regulated | steady coolant temperature once warm | 88–108 °C | **B58** | **MEASURED (ours)** | 88–97 °C in every log; BMW publishes no band (section 2). Our model's 94.5 °C is a comparison against our own data, not against a published figure |
-| 11 | Coolant apparent time constant | how long the coolant takes to respond | 1–600 s | **B58** | **UNVERIFIED** | The band is so wide it asserts almost nothing. A documented way to *measure* it instead was seen only in a search snippet (US 6,732,025 B2: time the decay to 36.8 % of the initial difference after shutdown) and was not confirmed on the page. Better: drive `thermal.py` over a whole log, as CLAUDE.md already says |
+| 8 | Oil, sustained load (drive10, hottest 10 min) | how hot the oil runs when the car is worked hard for ten minutes | 103–111 °C | **our car** | **MEASURED (ours)** | The car's interquartile range over the 10 minutes of drive10 where its rolling-median oil is highest. The model sits at 96.4 °C: **outside**. Replaces the 115–140 °C band, which no source supported (section 2, oil row) |
+| 9 | Oil apparent time constant (identified) | how long the oil takes to follow a change in load | 70–100 s | **our car** | **MEASURED (ours)** | One first-order fit (`car_thermal.identify_tau`) applied to the car's oil and to the model's; the car's range over the four drives that excite the oil enough to say. The model's is 14.0 s: **outside**. The old 20–400 s band contained the car's value — the band was right, and the model was not. Jarrier et al. 2000 (abstract) still supports the ordering, oil lagging coolant |
+| 10 | Coolant, regulated (synthetic climb) | steady coolant temperature once warm, under load | 83.5–95.6 °C | **our car** | **MEASURED (ours)** | Warm coolant on every drive, 5th–95th percentile. The model's settled 94.5 °C on the synthetic climb is inside. Was 88–108 °C, whose upper half was judgement |
+| 11 | Coolant, whole drive (drive10, free-running) | coolant temperature over two hours of real driving | 91.8–94 °C | **our car** | **MEASURED (ours)** | The car's interquartile range over drive10; the model, replayed free-running on the car's measured fuel, has a median of 88.4 °C: **outside**. Replaces a "regulation response" row with a 1–600 s band that almost nothing could fail (AUDIT.md L10) |
+
+<!-- RETIRED-OK: the literature bands rows 8-11 used until 28 September -->
+*Until 28 September rows 8–11 were: oil on a sustained climb 115–140 °C
+(UNVERIFIED), oil time constant 20–400 s (UNVERIFIED), coolant
+thermostat-regulated 88–108 °C (our logs, loosely), and coolant apparent time
+constant 1–600 s (UNVERIFIED). Scored that way `validate.py` read eight of
+eleven. The count went down because the new bands are narrower and they are
+the car's; that is the direction a stricter test should move it.*
 
 ### Why row 7 comes first
 
@@ -254,7 +343,7 @@ the **block** (slow, minutes), the **oil** (medium), and the **turbine housing**
 |---|---|---|---|
 | `ua_block_oil` | 800 W/K | how fast heat moves between oil and coolant | **WE MEASURED IT** — fitted to the oil-minus-coolant gap across three drives (median −1.2 K, p95 +5.4 K). Swept table in `thermal.py`. Cite our own logs. BMW's ST1505 confirms the structure (oil cooled by coolant through an exchanger in the filter module) but no number |
 | `c_block` | 105 000 J/K | heat capacity of the block + coolant | **ASSUMED** — metal mass × specific heat |
-| `c_oil` | 12 000 J/K | heat capacity of the oil | **ASSUMED** — sump volume × oil properties |
+| `c_oil` | 12 000 J/K | heat capacity of the oil | **ASSUMED — AND OUR OWN LOGS SAY IT IS FOUR TO SEVEN TIMES TOO LIGHT.** The model's oil time constant is c_oil / (ua_block_oil + ua_oil_amb) = 12 000 / 860 = 14 s, and `validate.py` row 9 identifies 14.0 s from the model's own replay, so the method reads it correctly. The car's is 70–100 s, which at the same 860 W/K means 60 000–86 000 J/K. Strictly the time constant fixes only the RATIO: the node is too light, or `ua_block_oil` is too high — and `ua_block_oil` was fitted to the oil-minus-coolant gap with `frac_fuel_to_oil` assumed, so it is not independent of this. Separately, fitting `c_oil` and `frac_fuel_to_oil` to three drives' oil traces lands on 48 000 J/K (`model_vs_data.py`, interior of a grid reaching 72 000). **Not changed**: it moves the locked scenario's oil damage, so it needs drive A of `logs/DRIVE_PLAN.md` and a decision before the retrain, not after |
 | **`c_turb`** | **6 000 J/K** | **heat capacity of the turbine housing** | **ASSUMED — AND IT IS LOAD-BEARING. See below.** No opened source publishes a housing heat capacity. Burke, Olmeda, Arnau & Reyes-Belmonte 2014 (abstract) report that the heat-transfer model's parameters move "housing temperatures by up to 80 °C" and that "errors in the thermal capacitance also lead to errors" in transient simulation — a citable statement that this is the sensitive, uncertain parameter |
 | `ua_gas_turb` | 0.90 W/K per g/s | how fast exhaust heats the turbine | **ASSUMED** |
 | `ua_block_amb` / `ua_oil_amb` / `ua_turb_amb` | 45 / 60 / 18 W/K | heat lost to the surrounding air | **ASSUMED** |

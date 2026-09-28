@@ -7,8 +7,8 @@ Copy everything inside the fence into a new Claude Code session opened in
 
 ```
 Continue the BMW B58 graduation project. Read CLAUDE.md first — it is the
-handoff and the mistake log, and its current-state boxes (28 and 27 September)
-are current. Then handoff.md (the short entry point) and
+handoff and the mistake log, and its current-state boxes (the two 28 September
+boxes and 27 September) are current. Then handoff.md (the short entry point) and
 SESSION_REPORT_2026-09-28.md (the last session in full).
 
 WHERE THINGS STAND
@@ -53,6 +53,22 @@ THREE FINDINGS FROM 28 SEPTEMBER (model_vs_data.py prints all three)
   - The existing logs CANNOT calibrate the oil node: fitting it on the light-
     load drives fixes the hard pulls but breaks drive10. Drive A decides.
 
+LATER ON 28 SEPTEMBER (uncommitted work is committed at the end of that session)
+  - validate.py rows 8-11 (oil, coolant) are scored against bands computed
+    from OUR OWN DRIVES, through car_thermal.py (thermal.py free-running over
+    a logged drive, fed measured fuel = air mass / 14.7 lambda). validate.py
+    now reads 7 of 11: 6 of 7 literature, 1 of 4 our car.
+  - The car's oil time constant is 70-100 s; the model's is 14 s
+    (= c_oil / (ua_block_oil + ua_oil_amb) = 12 000 / 860). The oil node is
+    4-7x too light, or too tightly coupled -- only the ratio is known.
+    thermal.py is NOT changed: it moves the locked scenario.
+  - drive10's oil and coolant now read -6.1 K / -4.7 K (off), not agrees.
+  - GCC spec: no admissible source for uprated cooling; 50 % stronger cooling
+    moves the climb's turbine 0.5 K. REFERENCES.md section 2c.
+  - FUEL: the manual says 95 RON minimum, 98 recommended; the model runs 95.
+    98 moves only the knock term. Nobody has said which fuel the car was
+    LOGGED on -- ask before the retrain.
+
 Altitude is NOT modelled: the scored climb rises 2 340 m in sea-level air.
 It is sustained load at sea level, not a mountain.
 
@@ -61,9 +77,14 @@ DO THESE, IN THIS ORDER
 1. Run verify_docs.py, test_reward.py (8 of 8) and check_roads.py (PASS) to
    confirm the tree is sound.
 
-2. ASK THE USER which order they want, then do it:
-     (a) retrain now on the current plant, and again after drives A/B; or
-     (b) wait for drives A and B (logs/DRIVE_PLAN.md), recalibrate, retrain.
+2. ASK THE USER two things, then act on the answers:
+     - which fuel the car was filled with while it was logged (95 or 98 RON),
+       and the manual's page. If 98: refit BaselineECU.knock_limited_spark,
+       re-run validate.py and check_map.py (REFERENCES.md 2c).
+     - which order: (a) retrain now on the current plant, and again after
+       drives A/B; or (b) wait for drives A and B (logs/DRIVE_PLAN.md),
+       recalibrate -- including the oil node against the car's 70-100 s
+       time constant -- then retrain.
    A plant change after the retrain means retraining again (~3 h each).
 
 3. RETRAIN (only with the user's go-ahead -- it occupies the machine):
@@ -84,9 +105,10 @@ DO THESE, IN THIS ORDER
 
 IF A NEW DRIVE CSV ARRIVES
    Follow logs/DRIVE_PLAN.md and CLAUDE.md's routine: new_drive.py, then
-   build_dataset.py, compare_log.py, model_vs_data.py. Drive A -> fit the oil
-   node with the block pinned to measured coolant
-   (model_vs_data.oil_identification), re-check ua_block_oil jointly. Drive B
+   build_dataset.py, compare_log.py, model_vs_data.py, validate.py. Drive A ->
+   fit the oil node with the block pinned to measured coolant
+   (model_vs_data.oil_identification), re-check ua_block_oil jointly, and
+   require the car's oil time constant (validate.py row 9) to come out too. Drive B
    -> refit boost_ceiling_kpa at low flow and retire the gearbox workaround.
    Drive C -> re-run the knock comparison on readings, not rows.
 
@@ -128,7 +150,8 @@ OPEN QUESTIONS WORTH YOUR ATTENTION
 |---|---|
 | `CLAUDE.md` | the handoff, the mistake log, the improvement plan. Current-state boxes at the top |
 | `handoff.md` | what to run first and what each command prints today |
-| `SESSION_REPORT_2026-09-28.md` | 21–28 September in full |
+| `SESSION_REPORT_2026-09-28.md` | 21–28 September in full, including the validation table's move onto car data (section 6) and the GCC / fuel check (section 7) |
+| `validation_table.md` section A | how each of the eleven rows is scored, and why rows 8–11 use our own drives |
 | `logs/DRIVE_PLAN.md` | the three drives still worth making, and how |
 | `results/phase_d_130kmh.txt` | the latest scoring of the existing agents, with its caveats |
 | `AUDIT.md` + `AUDIT_FIXES.md` | the 15 September review and what was done about it |

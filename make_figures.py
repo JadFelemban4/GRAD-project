@@ -598,8 +598,10 @@ def model_vs_data():
         OS = {o["variant"]: o for o in R.get("oil_sensitivity", [])}
         if name == "drive10":
             cap = ("drive10 reaches 117 C of oil -- the only drive inside the published "
-                   "115-140 C band -- and the model runs a few K cool of it, as "
-                   "validate.py's climb row does.")
+                   "115-140 C band. Fed the car's measured fuel, the model runs cool "
+                   "of both sensors;\nvalidate.py rows 8 and 11 score this drive "
+                   "and both miss. The coolant drifts down at light load where the "
+                   "car's heat-management valve holds 92-94 C.")
         elif OS:
             cap = (f"The spikes come from the oil's own ASSUMED heat input: 5 % of fuel "
                    f"energy drives the modelled oil up to "
@@ -616,8 +618,8 @@ def model_vs_data():
         fig.suptitle(f"Thermal network driven over {name}, against the car's own "
                      "sensors", color=INK, fontsize=13, x=0.012, ha="left",
                      fontweight="bold")
-        fig.text(0.012, 0.005, cap, color=INK2, fontsize=9)
-        fig.tight_layout(rect=(0, 0.03, 1, 0.95))
+        fig.text(0.012, 0.005, cap, color=INK2, fontsize=9, va="bottom")
+        fig.tight_layout(rect=(0, 0.06, 1, 0.95))
         _save(fig, f"{tag}_thermal_{name}.png")
 
     # ---------------- fig 14: knock ---------------------------------------
@@ -733,7 +735,7 @@ def model_vs_data():
     # ---------------- fig 18: literature bands ----------------------------
     Lr = R["literature"]
     fig, ax = plt.subplots(figsize=(11.0, 6.0))
-    _style(ax, "validate.py: eleven model outputs against published bands",
+    _style(ax, "validate.py: eleven model outputs against their bands",
            "position inside the band (0 = low edge, 1 = high edge)", None)
     y = np.arange(len(Lr))[::-1]
     ax.axvspan(0, 1, color="#eef3fb", zorder=1)
@@ -747,14 +749,16 @@ def model_vs_data():
                     xy=(np.clip(pos, -0.6, 1.6), yi), xytext=(10, 0),
                     textcoords="offset points", va="center", fontsize=8.5,
                     color=INK if r["ok"] else CRIT)
-    ax.set_yticks(y, [r["name"] for r in Lr])
+    ax.set_yticks(y, [r["name"] + ("  [our car]" if r.get("basis") == "our car"
+                                   else "") for r in Lr])
     ax.set_xlim(-0.7, 2.5)
     ax.axvline(0, color=INK3, lw=0.8)
     ax.axvline(1, color=INK3, lw=0.8)
-    ax.text(0, -0.13,
-            f"{sum(r['ok'] for r in Lr)} of {len(Lr)} inside. These are PUBLISHED "
-            "RANGES, not measurements from this car, and REFERENCES.md records "
-            "which of them are sourced.",
+    ax.text(0, -0.17,
+            f"{sum(r['ok'] for r in Lr)} of {len(Lr)} inside. Rows marked [our car] "
+            "are scored against bands computed from our own logs (oil and coolant);\n"
+            "the rest are PUBLISHED RANGES for quantities no channel on this car "
+            "can see, graded in REFERENCES.md section 3.",
             transform=ax.transAxes, color=INK2, fontsize=8.5)
     _save(fig, "fig18_literature_bands.png")
 

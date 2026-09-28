@@ -58,7 +58,10 @@ in the region the whole experiment runs in. This drive gives:
   fix them** (28 September, `model_vs_data.py`): fitted on the three light-load
   calibration drives they fix the pulls but take drive10 — the only drive in
   the published band — from 116 to 102 °C against the car's 117. The drives
-  disagree, and only sustained load can say which way;
+  disagree, and only sustained load can say which way. **One constraint the
+  logs do already give:** the car's oil takes 70–100 s to follow a change and
+  the model's takes 14 s (`validate.py` row 9), so whatever this drive fits
+  must reproduce that too;
 - the first **sustained-load coolant** data, and — if the climb is long and hot
   enough to push coolant past 100 °C — the **radiator**, which CLAUDE.md says
   can only be identified by a drive that overwhelms the cooling system;

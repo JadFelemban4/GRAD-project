@@ -165,80 +165,138 @@ def _step_response(key, horizon_s, dt=0.25):
 
 
 def check_time_constants():
-    """The five thermal rows. A time constant is the time a lump of metal (or
-    oil, or coolant) takes to cover 63 % of a step change in temperature.
-    Bands: REFERENCES.md section 3, rows 7-11, all B58-specific. Row 7, the
-    turbine housing, is the tau in H/tau and is the highest-priority row in
-    that file: if its band is wrong, every point on the H/tau curve moves.
+    """Row 7, the turbine housing: the tau in H/tau, and the highest-priority
+    row in REFERENCES.md section 3. No channel on the car measures the turbine,
+    so its band stays a literature band.
+
+    A time constant is the time a lump of metal (or oil, or coolant) takes to
+    cover 63 % of a step change in temperature. The synthetic climb's oil and
+    block steps are still computed, for the printout and for row 10.
     """
-    out = []
     t0, tf, tau_t = _step_response("turb", 1500)
-    out.append(_row("Turbine housing time constant", tau_t, "s", 40, 120,
-                    "REFERENCES.md sec. 3 row 7 (HIGHEST PRIORITY)"))
+    turbine = _row("Turbine housing time constant", tau_t, "s", 40, 120,
+                   "REFERENCES.md sec. 3 row 7 (HIGHEST PRIORITY)")
     o0, of_, tau_o = _step_response("oil", 5000)
-    out.append(_row("Oil temperature, sustained climb", of_, "C", 115, 140,
-                    "REFERENCES.md sec. 3 row 8"))
-    out.append(_row("Oil time constant", tau_o, "s", 20, 400,
-                    "REFERENCES.md sec. 3 row 9 (no tight published band)"))
     b0, bf, tau_b = _step_response("block", 5000)
-    out.append(_row("Coolant, thermostat-regulated", bf, "C", 88, 108,
-                    "REFERENCES.md sec. 3 row 10"))
-    # AUDIT.md L10: this row is labelled a "time constant" but measures the
-    # time to cover 63 % of a 4.5 K change from a WARM start, with the stand-in
-    # thermostat actively regulating -- against a band of 1-600 s that almost
-    # nothing could fail. It counts toward "8 of 11" and should not be read as
-    # evidence about the cooling system. Relabelled rather than dropped, so the
-    # count stays comparable with earlier versions of the table.
-    out.append(_row("Coolant regulation response (NOT a free time constant)",
-                    tau_b, "s", 1, 600,
-                    "REFERENCES.md sec. 3 row 11 (band too wide to assert much)"))
-    return out, dict(turb=(t0, tf, tau_t), oil=(o0, of_, tau_o), block=(b0, bf, tau_b))
+    return [turbine], dict(turb=(t0, tf, tau_t), oil=(o0, of_, tau_o), block=(b0, bf, tau_b))
+
+
+def check_against_car(block_climb_c):
+    """Rows 8-11: oil and coolant, SCORED AGAINST OUR OWN CAR. Since 28 Sep 2026.
+
+    WHY THESE FOUR MOVED OFF LITERATURE BANDS. Rows 1-7 are quantities no
+    channel on the car can see -- cylinder pressure, brake efficiency, exhaust
+    temperature, the turbine -- so a published range is the only yardstick.
+    Oil and coolant ARE logged. Until 28 September rows 8, 9 and 11 still
+    scored the model against ranges nobody could source (REFERENCES.md section
+    3), while the logs could do better; row 10's band was half ours and half
+    judgement. Every band below is now computed from the logs, by a rule fixed
+    before the model was scored against it:
+
+      8  oil, sustained load   drive10's hottest 10 minutes of oil, by the
+                               car's own rolling median; band = the car's
+                               interquartile range over that window; value =
+                               the model's median there, replayed free-running
+      9  oil time constant     identified by one method from the car's oil and
+                               from the model's (car_thermal.identify_tau);
+                               band = the car's range over the drives where the
+                               fit has an interior minimum
+     10  coolant, regulated    the synthetic climb's settled coolant; band =
+                               5th-95th percentile of the car's warm coolant
+                               over every drive, moving
+     11  coolant, whole drive  drive10 replayed free-running; band = the car's
+                               interquartile range over the whole drive
+
+    THE COUNT FELL FROM 8 OF 11 TO 7 OF 11, and that is the point of the change.
+    Against the car, the oil node is too fast and too cool on sustained load,
+    and the free-running coolant settles below the car's heat-management
+    setpoint. Against the old bands, row 11 passed on a 1-600 s range almost
+    nothing could fail. The replays are fed measured fuel and take seconds;
+    see car_thermal.py.
+    """
+    import car_thermal as CT
+
+    r = CT.thermal_replay(CT.SUSTAINED_DRIVE)
+    k = 273.15
+    sl = CT.hottest_window(r["oil_car"])
+    oq1, oq3 = np.nanpercentile(r["oil_car"][sl], [25, 75]) - k
+    oil_row = _row("Oil, sustained load (drive10, hottest 10 min)",
+                   float(np.median(r["oil_model"][sl]) - k), "C", round(oq1, 1), round(oq3, 1),
+                   "our car: drive10, car's IQR over its hottest 10 min")
+
+    taus = CT.oil_time_constants()
+    usable = [t for t in taus if t["identifiable"]]
+    tau_row = _row("Oil apparent time constant (identified)",
+                   float(np.median([t["tau_model"] for t in usable])), "s",
+                   min(t["tau_car"] for t in usable), max(t["tau_car"] for t in usable),
+                   f"our car: {len(usable)} of {len(taus)} drives identifiable")
+
+    S = CT.samples()
+    warm = S[(S.v_kmh > 5) & np.isfinite(S.ect_c) & (S.ect_c > 0)].ect_c
+    cool_row = _row("Coolant, regulated (synthetic climb)", float(block_climb_c), "C",
+                    round(float(warm.quantile(0.05)), 1), round(float(warm.quantile(0.95)), 1),
+                    "our car: warm coolant, 5th-95th percentile, all drives")
+
+    eq1, eq3 = np.nanpercentile(r["ect_car"], [25, 75]) - k
+    drive_row = _row("Coolant, whole drive (drive10, free-running)",
+                     float(np.median(r["ect_model"]) - k), "C", round(eq1, 1), round(eq3, 1),
+                     "our car: drive10, car's IQR over the whole drive")
+    return [oil_row, tau_row, cool_row, drive_row]
 
 
 # ---------------------------------------------------------------- report
+def full_rows():
+    """All eleven rows with their bands, sources and basis, plus the detail the
+    printout needs. Rows 1-7 are scored against literature; rows 8-11 against
+    our own car (check_against_car)."""
+    out = [check_displacement()]
+    mfb_row, mbt_spark = check_mfb50()
+    out.append(mfb_row)
+    bsfc_row, bsfc_where = check_bsfc()
+    out.append(bsfc_row)
+    out.append(check_knock_limit())
+    out.extend(check_egt())
+    thermal_rows, detail = check_time_constants()
+    out.extend(thermal_rows)
+    out.extend(check_against_car(detail["block"][1]))
+    for r in out:
+        r["basis"] = "our car" if r["source"].startswith("our car") else "literature"
+    return out, dict(mbt_spark=mbt_spark, bsfc_where=bsfc_where, detail=detail)
+
+
 def rows():
     """The validation rows, as data. AUDIT.md H2.
 
     `main()` computed these and printed them, so nothing could check them
     without re-implementing them. `verify_docs.py` imports this instead, which
-    is what closes the gap that let tau and "8 of 11" drift unseen.
+    is what closes the gap that let tau and "N of 11" drift unseen.
     """
-    out = [check_displacement()]
-    mfb_row, _ = check_mfb50()
-    out.append(mfb_row)
-    bsfc_row, _ = check_bsfc()
-    out.append(bsfc_row)
-    out.append(check_knock_limit())
-    out.extend(check_egt())
-    thermal_rows, _ = check_time_constants()
-    out.extend(thermal_rows)
-    return [dict(name=r["name"], model=r["value"], inside=r["ok"]) for r in out]
+    out, _ = full_rows()
+    return [dict(name=r["name"], model=r["value"], inside=r["ok"], basis=r["basis"])
+            for r in out]
 
 
 def main():
-    rows = [check_displacement()]
-    mfb_row, mbt_spark = check_mfb50()
-    rows.append(mfb_row)
-    bsfc_row, bsfc_where = check_bsfc()
-    rows.append(bsfc_row)
-    rows.append(check_knock_limit())
-    rows.extend(check_egt())
-    thermal_rows, detail = check_time_constants()
-    rows.extend(thermal_rows)
+    rows, extra = full_rows()
+    mbt_spark, bsfc_where, detail = extra["mbt_spark"], extra["bsfc_where"], extra["detail"]
 
     w = max(len(r["name"]) for r in rows)
-    print("=" * (w + 46))
-    print("PLANT VALIDATION TABLE — regenerated from code")
-    print("=" * (w + 46))
-    print(f"{'quantity'.ljust(w)}  {'model':>9}  {'published':>13}   status")
-    print("-" * (w + 46))
+    print("=" * (w + 60))
+    print("PLANT VALIDATION TABLE -- regenerated from code")
+    print("=" * (w + 60))
+    print(f"{'quantity'.ljust(w)}  {'model':>9}  {'band':>13}   {'status':<8}  basis")
+    print("-" * (w + 60))
     for r in rows:
         band = f"{r['lo']:g}-{r['hi']:g}"
         status = "inside" if r["ok"] else "OUTSIDE"
-        print(f"{r['name'].ljust(w)}  {r['value']:9.1f}  {band:>13}   {status}")
-    print("-" * (w + 46))
+        print(f"{r['name'].ljust(w)}  {r['value']:9.1f}  {band:>13}   {status:<8}  {r['basis']}")
+    print("-" * (w + 60))
     n_ok = sum(r["ok"] for r in rows)
-    print(f"{n_ok} of {len(rows)} quantities inside the published band")
+    lit = [r for r in rows if r["basis"] == "literature"]
+    car = [r for r in rows if r["basis"] == "our car"]
+    print(f"{n_ok} of {len(rows)} quantities inside their band")
+    print(f"  against literature: {sum(r['ok'] for r in lit)} of {len(lit)}    "
+          f"against our own car: {sum(r['ok'] for r in car)} of {len(car)}")
 
     print("\nConditions behind the headline numbers")
     print(f"  MBT spark at 2500 rpm / 60 kPa   : {mbt_spark} deg BTDC")
@@ -248,9 +306,12 @@ def main():
         print(f"  {k:6s} step {a:7.1f} -> {b:7.1f} C   tau = {t:6.1f} s")
 
     print("\nKnown limitation, state it in Chapter 3")
-    print("  MAP is an INPUT to this model. There is no compressor flow ceiling,")
-    print("  so peak power is not a model prediction — it is whatever boost is")
-    print("  commanded. Full-load points are therefore not validated here.")
+    print("  MAP is an INPUT to the cycle model. The environment bounds it with")
+    print("  plant.boost_ceiling_kpa, the ceiling the car was OBSERVED to reach --")
+    print("  an operating limit fitted to the logs, not a compressor map -- so peak")
+    print("  power is not a model prediction. Full-load points are not validated here.")
+    print("  Rows 8-11 are scored against our own car (car_thermal.py); rows 1-7")
+    print("  against literature, graded in REFERENCES.md section 3.")
 
 
 def test_convergence(tol_egt_k=12.0, tol_torque_pct=0.6):

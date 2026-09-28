@@ -35,8 +35,9 @@ against 295 minutes of logs from this car:
     thermal.ThermalNetwork      block / oil / turbine, calibrated
     engine_env.BaselineECU      what a production ECU would command here
 
-So the app inherits the validation. It also inherits the LIMITS: 8 of 11
-published bands, three documented misses, and a load residual that was only
+So the app inherits the validation. It also inherits the LIMITS: 7 of 11
+validation bands, four documented misses -- three of them oil and coolant,
+scored against this car's own logs -- and a load residual that was only
 ever checked at 30-75 kPa -- and that residual, per CLAUDE.md mistake 12, does
 not test the breathing model at all. Do not let the app imply more confidence
 than the simulator earned.
