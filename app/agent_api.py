@@ -126,9 +126,12 @@ class EpisodeStore:
     """One daemon 'agent-builder' worker, one pair at a time, keep = 2 finished.
 
     Any other key gets 'busy'; only preempt=True cancels, and only the first
-    request after «احسب» sends it. A cancelled or partial trace is never kept.
-    Errors -- SystemExit included -- are reported once as a fixed message,
-    never str(exc), then forgotten so the next poll can retry.
+    request after «احسب» sends it. A preempt cancels the build of any OTHER
+    key, whether its own key is answered from the cache, with an error or
+    'busy'; a preempt for the key already building never cancels it. A
+    cancelled or partial trace is never kept. Errors -- SystemExit included --
+    are reported once as a fixed message, never str(exc), then forgotten so
+    the next poll can retry; a superseded build's error is not reported.
     """
 
     def __init__(self, loader=load_pair, tracer=agent_trace.run_lanes, keep=2,
@@ -154,6 +157,11 @@ class EpisodeStore:
         since = max(0, int(since))
         base = {"steps": agent_trace.STEPS, "since": since}
         with self._lock:
+            # «احسب» for this key: whatever else is building is no longer
+            # wanted, even when this key is answered from the cache or with its
+            # error (M1 F6). The key already building is never cancelled.
+            if preempt and self._active is not None and self._active != key:
+                self._cancel.set()
             if key in self._cache:
                 self._cache.move_to_end(key)
                 tr = self._cache[key]
@@ -168,8 +176,6 @@ class EpisodeStore:
                             progress=n / agent_trace.STEPS, frames=self._frames[since:],
                             device=self._device, versions=self._versions)
             if self._active is not None:
-                if preempt:
-                    self._cancel.set()
                 runs, seed, idx = self._active
                 return dict(base, status="busy", progress=0.0, frames=[], device=None,
                             versions=None, active={"runs": runs, "seed": seed, "ep": idx})
@@ -216,7 +222,11 @@ class EpisodeStore:
             pass                     # superseded, not failed: nothing kept, nothing reported
         except (Exception, SystemExit) as exc:
             with self._lock:
-                self._errors[key] = BUILD_FAILED.format(kind=type(exc).__name__)
+                # Superseded by «احسب» for another episode, then failed: nobody
+                # is waiting for this error, and reporting it would spend this
+                # key's next «احسب» on a stale message.
+                if not cancel.is_set():
+                    self._errors[key] = BUILD_FAILED.format(kind=type(exc).__name__)
         finally:
             with self._lock:
                 self._active = None

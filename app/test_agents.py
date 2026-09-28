@@ -1067,6 +1067,81 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(len(r["frames"]), 5)
         self.assertIsNone(s.trace(self.K1), "a cancelled trace was kept")
 
+    def test_preempt_answered_from_the_cache_cancels_the_other_build(self):
+        """M1 F6: «احسب» for an episode answered from the cache, or with its
+        error, still stops the build nobody is watching any more. A plain poll
+        answered from the cache stops nothing."""
+        gate = threading.Event()
+        gated = _fake_tracer(gate=gate)
+        k4, k5 = ("runs_c4", 5, 4), ("runs_c4", 5, 5)
+
+        def tracer(lanes, ep, on_frame):
+            if ep["idx"] == 4:
+                raise ValueError("episode 4 always fails")
+            return gated(lanes, ep, on_frame)
+
+        def settle():                        # the worker has returned, not just published
+            for t in _builders():
+                t.join(5)
+        s = self.store(tracer=tracer)
+        gate.set()
+        s.poll(self.K2)
+        _wait_for(s, self.K2, "ready")
+        settle()
+
+        # a plain poll answered from the cache cancels nothing
+        gate.clear()
+        self.assertEqual(s.poll(self.K1, preempt=True)["status"], "loading")
+        self.assertEqual(s.poll(self.K2)["status"], "ready")
+        gate.set()
+        _wait_for(s, self.K1, "ready")
+        settle()
+
+        # «احسب» for a cached episode: answered from the cache, and K3 is cancelled
+        gate.clear()
+        self.assertEqual(s.poll(self.K3, preempt=True)["status"], "loading")
+        r = s.poll(self.K2, preempt=True)
+        self.assertEqual((r["status"], len(r["frames"])), ("ready", 5))
+        gate.set()
+        settle()
+        self.assertIsNone(s.trace(self.K3), "the build nobody watches ran on and was kept")
+        self.assertIsNotNone(s.trace(self.K2))
+
+        # «احسب» for an episode whose build failed: its error, and k5 is cancelled
+        self.assertEqual(s.poll(k4)["status"], "loading")
+        settle()
+        gate.clear()
+        self.assertEqual(s.poll(k5, preempt=True)["status"], "loading")
+        r = s.poll(k4, preempt=True)
+        self.assertEqual((r["status"], r["message"]), ("error", "build failed: ValueError"))
+        gate.set()
+        settle()
+        self.assertIsNone(s.trace(k5), "the build nobody watches ran on and was kept")
+
+    def test_a_superseded_build_that_fails_reports_nothing(self):
+        """A build cancelled by «احسب» for another episode that then raises is
+        not a failure anyone is waiting for: the next poll of its key starts
+        it again instead of spending «احسب» on a stale error. A build that was
+        not superseded still reports its failure, once."""
+        gate, entered = threading.Event(), threading.Event()
+
+        def fails_after_the_gate(lanes, ep, on_frame):
+            entered.set()
+            gate.wait(5)
+            raise ValueError(r"C:\secret\path must not reach the browser")
+        s = self.store(tracer=fails_after_the_gate)
+        self.assertEqual(s.poll(self.K1)["status"], "loading")
+        self.assertTrue(entered.wait(5), "the tracer never started")
+        self.assertEqual(s.poll(self.K2, preempt=True)["status"], "busy")
+        gate.set()
+        for t in _builders():
+            t.join(5)
+        self.assertEqual(s.poll(self.K1)["status"], "loading",
+                         "a superseded build's failure was reported")
+        r = _wait_for(s, self.K1, "error")
+        self.assertEqual(r["message"], "build failed: ValueError")
+        self.assertNotEqual(s.poll(self.K1)["status"], "error", "an error is reported once")
+
     def test_keep_two_least_recently_used(self):
         s = self.store()
         for key in (self.K1, self.K2):
