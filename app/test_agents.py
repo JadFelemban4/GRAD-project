@@ -8,8 +8,11 @@ file too, so banned tokens are written as raw regexes, never as calls, and
 fixtures are made in temporary directories OUTSIDE the repository.
 """
 import ast
+import contextlib
 import importlib.util
+import io
 import json
+import logging
 import os
 from pathlib import Path
 import re
@@ -19,8 +22,10 @@ import sys
 import tempfile
 import threading
 import time
+import traceback
 import unittest
 from unittest import mock
+from urllib.error import URLError
 import warnings
 
 import numpy as np
@@ -29,6 +34,7 @@ import fingerprint as FP
 from app import agent_api as API
 from app import agent_catalog as AC
 from app import agent_trace as T
+from app import jev as JEV
 from app import model_questions as MQ
 from check_premise import p_grade_now, p_neutral
 from engine_env import (ACT_HI, ACT_LO, OBS_DIM, OIL_PROTECT_K, PREVIEW_S, SLEW,
@@ -1639,7 +1645,8 @@ def tearDownModule():
                              + ("" if status == before_status else " (and git status moved)"))
 
 
-NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py", "model_questions.py")
+NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py", "model_questions.py",
+               "jev.py")
 WRITE_PATTERNS = (
     (r"\bopen\s*\([^)]*,\s*(mode\s*=\s*)?['\"][^'\"]*[wax+]", "write-mode open"),
     (r"\.write\w*\s*\(", "write / write_text / write_bytes"),
@@ -1681,7 +1688,25 @@ class NoWriteTests(unittest.TestCase):
 
 
 NET_ROOTS = {"urllib", "http", "socket", "requests", "httpx", "typesafe_sdk"}
-NET_ALLOWED = set()          # M3 allows exactly {"jev.py"}
+# M3 (design 7.4 and section 9 row 13): jev.py is the one module allowed network
+# imports. The scan still reads every app/*.py, the allowed ones included.
+NET_ALLOWED = {"jev.py": NET_ROOTS}
+
+
+def _net_hits(name, source):
+    """'name:line root' for each network import in `source` that NET_ALLOWED does not give `name`."""
+    allowed = NET_ALLOWED.get(name, set())
+    found = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            roots = [a.name.split(".")[0] for a in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.level == 0:
+            roots = [(node.module or "").split(".")[0]]
+        else:
+            continue
+        found += [f"{name}:{node.lineno} {r}" for r in roots
+                  if r in NET_ROOTS and r not in allowed]
+    return found
 
 
 class NoNetworkTests(unittest.TestCase):
@@ -1690,17 +1715,16 @@ class NoNetworkTests(unittest.TestCase):
     def test_no_network_imports_in_app(self):
         found = []
         for path in sorted((ROOT / "app").glob("*.py")):
-            if path.name.startswith("test_") or path.name in NET_ALLOWED:
-                continue
-            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
-                if isinstance(node, ast.Import):
-                    roots = [a.name.split(".")[0] for a in node.names]
-                elif isinstance(node, ast.ImportFrom) and node.level == 0:
-                    roots = [(node.module or "").split(".")[0]]
-                else:
-                    continue
-                found += [f"{path.name}:{node.lineno} {r}" for r in roots if r in NET_ROOTS]
+            if not path.name.startswith("test_"):
+                found += _net_hits(path.name, path.read_text(encoding="utf-8"))
         self.assertEqual(found, [])
+
+    def test_the_scan_still_reads_allowed_files(self):
+        self.assertEqual(_net_hits("jev.py", "import urllib.request\nimport http.client\n"), [])
+        self.assertEqual(_net_hits("agent_api.py", "import json\nfrom urllib import request\n"),
+                         ["agent_api.py:2 urllib"])
+        self.assertEqual(_net_hits("model_questions.py", "import socket\n"),
+                         ["model_questions.py:1 socket"])
 
 
 # ---- M3: the one question both models are asked (app/model_questions.py) ----
@@ -1874,7 +1898,7 @@ class QuestionTests(unittest.TestCase):
         self.assertTrue(issubclass(MQ.BadAnswer, ValueError))
 
 
-MODEL_MODULES = ("model_questions.py",)
+MODEL_MODULES = ("model_questions.py", "jev.py")
 RECORDED_DRIVE = ("app.replay", "app.reader", "app.estimator")
 
 
@@ -2057,6 +2081,283 @@ class UserSettingTests(unittest.TestCase):
                 self.assertEqual(MQ.user_setting("M3_UNSET", name, env), (want, "file"), name)
             for name in refused:
                 self.assertEqual(MQ.user_setting("M3_UNSET", name, env), (None, None), name)
+
+
+# ---- M3: jev (app/jev.py), always through a fake send ----------------------
+#
+# Spec test 17. NO TEST HERE CALLS jev._send OR OPENS A SOCKET: every ask()
+# gets a _FakeSend, and there is no key on this machine.
+
+SENTINEL_KEY = "sentinel-key-M3"
+
+
+@contextlib.contextmanager
+def _jev_key(key):
+    """os.environ holding this jev key (None: no key at all), with an APPDATA
+    that holds no key file, so the machine's own settings never leak in."""
+    with tempfile.TemporaryDirectory() as appdata, \
+            mock.patch.dict(os.environ, {"APPDATA": appdata}):
+        os.environ.pop("TYPESAFE_API_KEY", None)
+        if key is not None:
+            os.environ["TYPESAFE_API_KEY"] = key
+        yield
+
+
+class _FakeSend:
+    """jev._send's stand-in: records (body, key) per call, then returns
+    (status, payload) or raises `exc`."""
+
+    def __init__(self, status=200, payload=None, exc=None):
+        self.calls = []
+        self.status, self.exc = status, exc
+        self.payload = payload if payload is not None else json.dumps(
+            {"model": "jev-1.13.0", "answers": _model_answer()}).encode("utf-8")
+
+    def __call__(self, body, key, timeout=None):
+        self.calls.append((body, key))
+        if self.exc is not None:
+            raise self.exc
+        return self.status, self.payload
+
+
+class _Records(logging.Handler):
+    """Every root-logger record, kept in memory."""
+
+    def __init__(self):
+        super().__init__(logging.DEBUG)
+        self.records = []
+
+    def emit(self, record):
+        self.records.append(record)
+
+
+class _JevCase(unittest.TestCase):
+    """Makes the real network unreachable while a jev test runs: a test that
+    reached urlopen by mistake fails here, before any byte is sent."""
+
+    def setUp(self):
+        guard = mock.patch.object(JEV.urllib.request, "urlopen", side_effect=AssertionError(
+            "a jev test reached urllib.request.urlopen: tests use a fake send only"))
+        guard.start()
+        self.addCleanup(guard.stop)
+
+
+class JevTests(_JevCase):
+    """Spec test 17: one call per press, every failure a fixed code, nothing substituted."""
+
+    def ask_fails(self, send, **kw):
+        """The JevError ask() raises with a key present; asserts exactly one call."""
+        with _jev_key(SENTINEL_KEY):
+            with self.assertRaises(JEV.JevError) as caught:
+                JEV.ask(_obs_trace(), 3, send=send, **kw)
+        self.assertEqual(len(send.calls), 1, "one call per press, never a retry")
+        return caught.exception
+
+    def test_request_is_the_shared_question(self):
+        trace = _obs_trace()
+        body = JEV.build_request(trace, 3)
+        self.assertEqual(set(body), {"model", "state", "questions"})
+        self.assertEqual(body["model"], "jev-latest")
+        self.assertIs(body["questions"], MQ.QUESTIONS)
+        self.assertEqual(body["state"], MQ.build_state(trace, 3))
+        with _jev_key(SENTINEL_KEY):
+            self.assertNotIn(SENTINEL_KEY, json.dumps(JEV.build_request(trace, 3)))
+        self.assertEqual((JEV.URL, JEV.MODEL, JEV.TIMEOUT_S),
+                         ("https://api.typesafe.ai/v1/systemone", "jev-latest", 10.0))
+
+    def test_named_vendor_statuses(self):
+        want = {401: "key_rejected", 403: "vendor_refused", 422: "request_rejected",
+                429: "rate_limited", 529: "overloaded"}
+        self.assertEqual(JEV.STATUS_CODES, want)
+        for status, code in want.items():
+            with self.subTest(status=status):
+                err = self.ask_fails(_FakeSend(status=status, payload=b""))
+                self.assertEqual((err.code, err.status), (code, None))
+
+    def test_other_statuses_are_vendor_status_with_only_the_integer(self):
+        for status in (402, 500, 503, 302):
+            with self.subTest(status=status):
+                err = self.ask_fails(_FakeSend(status=status, payload=b"sentinel-body no credit"))
+                self.assertEqual((err.code, err.status), ("vendor_status", status))
+                self.assertIs(type(err.status), int)
+                self.assertEqual(err.args, ("vendor_status",))
+                seen = repr(err) + str(err) + json.dumps(vars(err))
+                self.assertNotIn("sentinel-body", seen)
+
+    def test_network_and_timeout(self):
+        for exc, code in ((URLError("down"), "network"), (ConnectionResetError(), "network"),
+                          (TimeoutError(), "timeout"), (URLError(TimeoutError()), "timeout")):
+            with self.subTest(exc=repr(exc)):
+                err = self.ask_fails(_FakeSend(exc=exc))
+                self.assertEqual((err.code, err.status), (code, None))
+
+    def test_malformed_answers_are_bad_answer(self):
+        def reply(answers):
+            return json.dumps({"model": "jev-1.13.0", "answers": answers}).encode("utf-8")
+
+        def one(qid, **change):
+            answers = _model_answer()
+            answers[qid].update(change)
+            return reply(answers)
+
+        payloads = {
+            "not JSON": b"not json",
+            "not UTF-8": bytes([0xFF, 0xFE]),
+            "a JSON list": b"[]",
+            "no answers": b"{}",
+            "empty answers": reply({}),
+            "a choice outside the options": one("spark_trim", choice="retard 5 deg"),
+            "a probability missing": one("spark_trim", probabilities={
+                k: 0.25 for k in MQ.KEYS["spark_trim"] if k != "no change"}),
+            "a NaN probability": one("lambda_trim", probabilities={
+                k: float("nan") for k in MQ.KEYS["lambda_trim"]}),
+            "a probability of 1.5": one("cooling_fan", probabilities={
+                k: 1.5 for k in MQ.KEYS["cooling_fan"]}),
+            "a probability of true": one("coolant_pump", probabilities={
+                k: True for k in MQ.KEYS["coolant_pump"]}),
+            "a score-shaped answer": reply({**_model_answer(), "boost_ceiling": {"score": 0.5}}),
+        }
+        for why, payload in payloads.items():
+            with self.subTest(why=why):
+                err = self.ask_fails(_FakeSend(payload=payload))
+                self.assertEqual((err.code, err.status), ("bad_answer", None))
+
+    def test_a_reply_the_parser_cannot_hold_is_bad_answer(self):
+        # Measured 29 Sep: a 400-digit integer makes to_action's isfinite raise
+        # OverflowError, and deep nesting makes json.loads raise RecursionError.
+        # Neither is a ValueError; both are the vendor's reply, so both are bad_answer.
+        huge = json.dumps({"model": "jev-1.13.0", "answers": _model_answer()}).replace(
+            "0.6", "1" + "0" * 400, 1).encode("utf-8")
+        payloads = {"a 400-digit probability": huge,
+                    "nesting 100 000 deep": b"[" * 100_000 + b"]" * 100_000}
+        for why, payload in payloads.items():
+            with self.subTest(why=why):
+                err = self.ask_fails(_FakeSend(payload=payload))
+                self.assertEqual((err.code, err.status), ("bad_answer", None))
+
+    def test_no_key_sends_nothing(self):
+        send = _FakeSend()
+        with _jev_key(None):
+            with self.assertRaises(JEV.JevError) as caught:
+                JEV.ask(_obs_trace(), 3, send=send)
+        self.assertEqual((caught.exception.code, caught.exception.status), ("no_key", None))
+        self.assertEqual(send.calls, [], "no key: nothing is sent")
+
+    def test_an_answer(self):
+        ticks = iter([1.0, 1.0873])
+        send = _FakeSend(payload=json.dumps({"model": "jev-1.13.0",
+                                             "answers": _model_answer(pick=2)}).encode("utf-8"))
+        with _jev_key(SENTINEL_KEY):
+            got = JEV.ask(_obs_trace(), 3, send=send, clock=lambda: next(ticks))
+        self.assertEqual(set(got), {"model_name", "ms", "answers", "sent"})
+        self.assertEqual(got["ms"], 87.3)
+        self.assertEqual(got["model_name"], "jev-1.13.0")
+        self.assertEqual(got["answers"], MQ.to_action(_model_answer(pick=2)))
+        self.assertEqual(got["sent"], JEV.build_request(_obs_trace(), 3))
+        self.assertEqual(send.calls, [(got["sent"], SENTINEL_KEY)], "the key goes to send only")
+        for name in ("x" * 65, 7, None):
+            with self.subTest(model=name):
+                send = _FakeSend(payload=json.dumps({"model": name,
+                                                     "answers": _model_answer()}).encode("utf-8"))
+                with _jev_key(SENTINEL_KEY):
+                    self.assertIsNone(JEV.ask(_obs_trace(), 3, send=send)["model_name"])
+
+
+class JevKeyTests(_JevCase):
+    """Spec test 17: the key is read on each call and appears only where send puts it."""
+
+    def test_the_key_never_leaks(self):
+        cases = {
+            "a network error naming the key": _FakeSend(exc=URLError(f"boom {SENTINEL_KEY}")),
+            "a reset naming the key": _FakeSend(exc=ConnectionResetError(f"reset {SENTINEL_KEY}")),
+            "a timeout naming the key": _FakeSend(exc=TimeoutError(f"slow {SENTINEL_KEY}")),
+            "a 401 echoing the key": _FakeSend(status=401, payload=SENTINEL_KEY.encode("utf-8")),
+            "an answer": _FakeSend(),
+        }
+        handler, root = _Records(), logging.getLogger()
+        level = root.level
+        root.addHandler(handler)
+        root.setLevel(logging.DEBUG)
+        try:
+            for why, send in cases.items():
+                with self.subTest(why=why), _jev_key(SENTINEL_KEY), \
+                        contextlib.redirect_stderr(io.StringIO()) as stderr:
+                    try:
+                        seen = json.dumps(JEV.ask(_obs_trace(), 3, send=send))
+                    except JEV.JevError as err:
+                        seen = (json.dumps(vars(err)) + repr(err)
+                                + "".join(traceback.format_exception(err)))
+                    self.assertEqual([key for _, key in send.calls], [SENTINEL_KEY])
+                    self.assertNotIn(SENTINEL_KEY, seen)
+                    self.assertNotIn(SENTINEL_KEY, stderr.getvalue())
+        finally:
+            root.removeHandler(handler)
+            root.setLevel(level)
+        logged = " ".join(f"{r.getMessage()} {r.exc_text or ''}" for r in handler.records)
+        self.assertNotIn(SENTINEL_KEY, logged)
+
+    def test_a_key_no_header_can_carry_is_no_key(self):
+        # Measured 29 Sep, offline (http.client putheader with no connection): a
+        # character outside latin-1, such as a pasted curly quote, raises a
+        # UnicodeEncodeError whose repr holds the whole header, key included; a line
+        # break raises a ValueError whose text holds it. Such a key is no key, as an
+        # unprintable key FILE already is (user_setting), and nothing is sent.
+        curly = SENTINEL_KEY + chr(0x2019)
+        for why, key in (("a curly quote", curly), ("a line break", "sentinel\nkey-M3"),
+                         ("a no-break space", "sentinel" + chr(0xA0) + "key-M3")):
+            with self.subTest(why=why):
+                send = _FakeSend()
+                with _jev_key(key):
+                    self.assertEqual(JEV.load_key(), (None, None))
+                    with self.assertRaises(JEV.JevError) as caught:
+                        JEV.ask(_obs_trace(), 3, send=send)
+                err = caught.exception
+                self.assertEqual((err.code, err.status, err.args), ("no_key", None, ("no_key",)))
+                self.assertEqual(send.calls, [], "nothing is sent")
+                seen = (json.dumps(vars(err)) + repr(err)
+                        + "".join(traceback.format_exception(err)))
+                self.assertNotIn("sentinel", seen)
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "grad-project").mkdir()
+            (Path(tmp) / "grad-project" / "typesafe_key").write_text(curly + "\n",
+                                                                     encoding="utf-8")
+            with mock.patch.dict(os.environ, {"APPDATA": tmp}):
+                os.environ.pop("TYPESAFE_API_KEY", None)
+                self.assertEqual(MQ.user_setting("TYPESAFE_API_KEY", "typesafe_key"),
+                                 (curly, "file"), "the file rule alone lets it through")
+                self.assertEqual(JEV.load_key(), (None, None))
+        # The rule is what the header can carry, not ASCII: a latin-1 letter is sent,
+        # and the vendor, not this module, judges the key.
+        with _jev_key(SENTINEL_KEY + chr(0xE9)):
+            self.assertEqual(JEV.load_key(), (SENTINEL_KEY + chr(0xE9), "env"))
+
+    def test_key_files_are_ignored(self):
+        env = dict(os.environ, GIT_OPTIONAL_LOCKS="0")
+        for path, want in ((".env", 0), (".env.local", 0), ("typesafe_key", 0),
+                           ("app/typesafe_key.txt", 0), ("app/jev.py", 1)):
+            with self.subTest(path=path):
+                run = subprocess.run(["git", "check-ignore", "-q", path], cwd=ROOT, env=env,
+                                     capture_output=True, timeout=60)
+                self.assertEqual(run.returncode, want)
+
+    def test_load_key_prefers_the_environment(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            appdata = Path(tmp).resolve()
+            (appdata / "grad-project").mkdir()
+            (appdata / "grad-project" / "typesafe_key").write_text("file-key\n", encoding="utf-8")
+            with mock.patch.dict(os.environ, {"APPDATA": str(appdata),
+                                              "TYPESAFE_API_KEY": "env-key"}):
+                self.assertEqual(JEV.load_key(), ("env-key", "env"))
+                os.environ["TYPESAFE_API_KEY"] = "env-key-2"
+                self.assertEqual(JEV.load_key(), ("env-key-2", "env"), "read on each call")
+                del os.environ["TYPESAFE_API_KEY"]
+                self.assertEqual(JEV.load_key(), ("file-key", "file"))
+                with mock.patch.object(MQ, "REPO", appdata):
+                    self.assertEqual(JEV.load_key(), (None, None),
+                                     "a key file inside the repository is refused")
+        with mock.patch.dict(os.environ, {"APPDATA": str(ROOT)}):
+            os.environ.pop("TYPESAFE_API_KEY", None)
+            self.assertEqual(JEV.load_key(), (None, None))
 
 
 def _shape(x):
