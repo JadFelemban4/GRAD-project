@@ -1,0 +1,1504 @@
+{
+ "act": {
+  "hi": [
+   4.0,
+   0.05999999865889549,
+   15.0,
+   1.0,
+   1.0
+  ],
+  "lo": [
+   -8.0,
+   -0.15000000596046448,
+   -40.0,
+   0.0,
+   0.30000001192092896
+  ],
+  "neutral_phys": [
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   1.0
+  ],
+  "slew": [
+   1.5,
+   0.029999999329447746,
+   10.0,
+   0.25,
+   0.20000000298023224
+  ]
+ },
+ "episodes": {
+  "d2": [
+   {
+    "climb_start_s": 141.0,
+    "grade": 0.13314,
+    "idx": 1,
+    "seed": 1000,
+    "weights": [
+     0.690154,
+     0.012829,
+     0.297017
+    ]
+   },
+   {
+    "climb_start_s": 281.0,
+    "grade": 0.15025,
+    "idx": 2,
+    "seed": 1001,
+    "weights": [
+     0.682741,
+     0.181419,
+     0.13584
+    ]
+   },
+   {
+    "climb_start_s": 181.0,
+    "grade": 0.12717,
+    "idx": 3,
+    "seed": 1002,
+    "weights": [
+     0.690313,
+     0.060454,
+     0.249233
+    ]
+   },
+   {
+    "climb_start_s": 153.0,
+    "grade": 0.15438,
+    "idx": 4,
+    "seed": 1003,
+    "weights": [
+     0.484162,
+     0.022753,
+     0.493085
+    ]
+   },
+   {
+    "climb_start_s": 282.0,
+    "grade": 0.12237,
+    "idx": 5,
+    "seed": 1004,
+    "weights": [
+     0.583678,
+     0.03639,
+     0.379932
+    ]
+   },
+   {
+    "climb_start_s": 128.0,
+    "grade": 0.15393,
+    "idx": 6,
+    "seed": 1005,
+    "weights": [
+     0.529443,
+     0.16893,
+     0.301627
+    ]
+   },
+   {
+    "climb_start_s": 247.0,
+    "grade": 0.15802,
+    "idx": 7,
+    "seed": 1006,
+    "weights": [
+     0.690245,
+     0.057769,
+     0.251987
+    ]
+   },
+   {
+    "climb_start_s": 262.0,
+    "grade": 0.15729,
+    "idx": 8,
+    "seed": 1007,
+    "weights": [
+     0.590381,
+     0.320322,
+     0.089297
+    ]
+   },
+   {
+    "climb_start_s": 228.0,
+    "grade": 0.14029,
+    "idx": 9,
+    "seed": 1008,
+    "weights": [
+     0.699723,
+     0.04689,
+     0.253387
+    ]
+   },
+   {
+    "climb_start_s": 296.0,
+    "grade": 0.14849,
+    "idx": 10,
+    "seed": 1009,
+    "weights": [
+     0.506395,
+     0.277739,
+     0.215866
+    ]
+   },
+   {
+    "climb_start_s": 163.0,
+    "grade": 0.14227,
+    "idx": 11,
+    "seed": 1010,
+    "weights": [
+     0.538101,
+     0.136805,
+     0.325095
+    ]
+   },
+   {
+    "climb_start_s": 204.0,
+    "grade": 0.14478,
+    "idx": 12,
+    "seed": 1011,
+    "weights": [
+     0.552078,
+     0.178668,
+     0.269254
+    ]
+   },
+   {
+    "climb_start_s": 199.0,
+    "grade": 0.13988,
+    "idx": 13,
+    "seed": 1012,
+    "weights": [
+     0.540735,
+     0.4249,
+     0.034366
+    ]
+   },
+   {
+    "climb_start_s": 238.0,
+    "grade": 0.1464,
+    "idx": 14,
+    "seed": 1013,
+    "weights": [
+     0.592943,
+     0.187398,
+     0.219659
+    ]
+   },
+   {
+    "climb_start_s": 137.0,
+    "grade": 0.13012,
+    "idx": 15,
+    "seed": 1014,
+    "weights": [
+     0.685668,
+     0.285069,
+     0.029263
+    ]
+   },
+   {
+    "climb_start_s": 217.0,
+    "grade": 0.12963,
+    "idx": 16,
+    "seed": 1015,
+    "weights": [
+     0.571092,
+     0.379759,
+     0.049149
+    ]
+   },
+   {
+    "climb_start_s": 226.0,
+    "grade": 0.12016,
+    "idx": 17,
+    "seed": 1016,
+    "weights": [
+     0.654867,
+     0.283297,
+     0.061836
+    ]
+   },
+   {
+    "climb_start_s": 271.0,
+    "grade": 0.13459,
+    "idx": 18,
+    "seed": 1017,
+    "weights": [
+     0.508297,
+     0.185553,
+     0.30615
+    ]
+   },
+   {
+    "climb_start_s": 187.0,
+    "grade": 0.12567,
+    "idx": 19,
+    "seed": 1018,
+    "weights": [
+     0.673297,
+     0.013299,
+     0.313404
+    ]
+   },
+   {
+    "climb_start_s": 167.0,
+    "grade": 0.13651,
+    "idx": 20,
+    "seed": 1019,
+    "weights": [
+     0.592214,
+     0.097373,
+     0.310413
+    ]
+   }
+  ],
+  "phase-d": [
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 1,
+    "seed": 1000,
+    "weights": [
+     0.690154,
+     0.012829,
+     0.297017
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 2,
+    "seed": 1001,
+    "weights": [
+     0.682741,
+     0.181419,
+     0.13584
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 3,
+    "seed": 1002,
+    "weights": [
+     0.690313,
+     0.060454,
+     0.249233
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 4,
+    "seed": 1003,
+    "weights": [
+     0.484162,
+     0.022753,
+     0.493085
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 5,
+    "seed": 1004,
+    "weights": [
+     0.583678,
+     0.03639,
+     0.379932
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 6,
+    "seed": 1005,
+    "weights": [
+     0.529443,
+     0.16893,
+     0.301627
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 7,
+    "seed": 1006,
+    "weights": [
+     0.690245,
+     0.057769,
+     0.251987
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 8,
+    "seed": 1007,
+    "weights": [
+     0.590381,
+     0.320322,
+     0.089297
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 9,
+    "seed": 1008,
+    "weights": [
+     0.699723,
+     0.04689,
+     0.253387
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 10,
+    "seed": 1009,
+    "weights": [
+     0.506395,
+     0.277739,
+     0.215866
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 11,
+    "seed": 1010,
+    "weights": [
+     0.538101,
+     0.136805,
+     0.325095
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 12,
+    "seed": 1011,
+    "weights": [
+     0.552078,
+     0.178668,
+     0.269254
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 13,
+    "seed": 1012,
+    "weights": [
+     0.540735,
+     0.4249,
+     0.034366
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 14,
+    "seed": 1013,
+    "weights": [
+     0.592943,
+     0.187398,
+     0.219659
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 15,
+    "seed": 1014,
+    "weights": [
+     0.685668,
+     0.285069,
+     0.029263
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 16,
+    "seed": 1015,
+    "weights": [
+     0.571092,
+     0.379759,
+     0.049149
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 17,
+    "seed": 1016,
+    "weights": [
+     0.654867,
+     0.283297,
+     0.061836
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 18,
+    "seed": 1017,
+    "weights": [
+     0.508297,
+     0.185553,
+     0.30615
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 19,
+    "seed": 1018,
+    "weights": [
+     0.673297,
+     0.013299,
+     0.313404
+    ]
+   },
+   {
+    "climb_start_s": 180.0,
+    "grade": 0.12,
+    "idx": 20,
+    "seed": 1019,
+    "weights": [
+     0.592214,
+     0.097373,
+     0.310413
+    ]
+   }
+  ]
+ },
+ "experiments": [
+  {
+   "name": "Phase D",
+   "pairs": [
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 58e3452007d9dc14",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed0",
+       "train_dt": 0.2,
+       "zip_sha": "58e3452007d9dc14"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 776423729a22144f",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed0",
+       "train_dt": 0.2,
+       "zip_sha": "776423729a22144f"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 0,
+     "table_diff": 9.8
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 1000000, zip sha 03abe6a2914dac51",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed1",
+       "train_dt": 0.2,
+       "zip_sha": "03abe6a2914dac51"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 1000000, zip sha 001d97bf98a93cd6",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed1",
+       "train_dt": 0.2,
+       "zip_sha": "001d97bf98a93cd6"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 1,
+     "table_diff": -5.8
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha fa4f23bfd572e04c",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed2",
+       "train_dt": 0.2,
+       "zip_sha": "fa4f23bfd572e04c"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha c4b1574e4adb71dd",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed2",
+       "train_dt": 0.2,
+       "zip_sha": "c4b1574e4adb71dd"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 2,
+     "table_diff": 68.6
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 7eb89c98b3de9b87",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed3",
+       "train_dt": 0.2,
+       "zip_sha": "7eb89c98b3de9b87"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha e1b165aa65452f58",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed3",
+       "train_dt": 0.2,
+       "zip_sha": "e1b165aa65452f58"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 3,
+     "table_diff": 387.2
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 5683a6338c82e652",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed4",
+       "train_dt": 0.2,
+       "zip_sha": "5683a6338c82e652"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 3107631f6ddc585c",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed4",
+       "train_dt": 0.2,
+       "zip_sha": "3107631f6ddc585c"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 4,
+     "table_diff": -271.7
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha f742fbc0dca599e5",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed5",
+       "train_dt": 0.2,
+       "zip_sha": "f742fbc0dca599e5"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha c9dcb2d1af396c40",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed5",
+       "train_dt": 0.2,
+       "zip_sha": "c9dcb2d1af396c40"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 5,
+     "table_diff": -288.2
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha c5ad7a145e796716",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed6",
+       "train_dt": 0.2,
+       "zip_sha": "c5ad7a145e796716"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 497f975e206b662a",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed6",
+       "train_dt": 0.2,
+       "zip_sha": "497f975e206b662a"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 6,
+     "table_diff": 51.0
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 1000000, zip sha fb881a6b3260b1a1",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed7",
+       "train_dt": 0.2,
+       "zip_sha": "fb881a6b3260b1a1"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 8b82872f373d6b8a",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed7",
+       "train_dt": 0.2,
+       "zip_sha": "8b82872f373d6b8a"
+      }
+     ],
+     "problems": [],
+     "protocol": "phase-d",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 7,
+     "table_diff": 87.1
+    }
+   ],
+   "prefix": "phase_d",
+   "protocol": "phase-d",
+   "runs": "runs",
+   "verdict": {
+    "cells": [
+     {
+      "cell": "NOT SIGNIFICANT",
+      "gloss": {
+       "ar": "\u063a\u064a\u0631 \u062f\u0627\u0644 \u0625\u062d\u0635\u0627\u0626\u064a\u0627\u064b\u060c \u0645\u0639 \u0648\u0643\u0644\u0627\u0621 \u0628\u0645\u064a\u0632\u0627\u0646\u064a\u0629 C1",
+       "en": "Not statistically significant, with agents at the C1 budget"
+      }
+     },
+     {
+      "cell": "INCONCLUSIVE (post-hoc)",
+      "gloss": {
+       "ar": "\u063a\u064a\u0631 \u062d\u0627\u0633\u0645\u060c \u0648\u0647\u064a \u0642\u0631\u0627\u0621\u0629 \u0644\u0627\u062d\u0642\u0629: \u0627\u0644\u062d\u062f \u0627\u0644\u0623\u062f\u0646\u0649 \u0627\u0644\u0645\u0647\u0645 (50 \u0648\u062d\u062f\u0629) \u062d\u064f\u062f\u0650\u0651\u062f \u0628\u0639\u062f \u0623\u0646 \u0639\u064f\u0631\u0641\u062a \u0646\u062a\u064a\u062c\u0629 Phase D\u060c \u0641\u0647\u0630\u0627 \u0627\u0644\u062a\u0635\u0646\u064a\u0641 \u0644\u0645 \u064a\u064f\u0633\u062c\u064e\u0651\u0644 \u0645\u0633\u0628\u0642\u0627\u064b. \u0627\u0644\u062a\u062c\u0631\u0628\u0629 \u0644\u0627 \u062a\u0645\u064a\u0651\u0632 \u0628\u064a\u0646 \"\u0644\u0627 \u0623\u062b\u0631\" \u0648\"\u0623\u062b\u0631 \u064a\u0647\u0645\u0651 \u0627\u0644\u0641\u0631\u064a\u0642\"",
+       "en": "Inconclusive, and a post-hoc reading: the MEI (50 units) was set after Phase D's result was known, so this classification was not preregistered. The experiment cannot tell \"no effect\" from \"an effect the team cares about\""
+      }
+     }
+    ],
+    "lines": [
+     {
+      "file": "PHASE_D_RESULT.txt",
+      "key": "result",
+      "line": 26,
+      "text": "  RESULT: NOT SIGNIFICANT at alpha 0.05.\n  These are C1 agents: 50 000 steps, 11 training episodes each,\n  which train.py itself calls 'the first bad run'. So the claim\n  is 'with agents trained to the C1 budget, preview does not\n  separate from seed noise' -- NOT 'preview does not help'.\n  See results/PREREGISTRATION.md limit 6."
+     },
+     {
+      "file": "PHASE_D_RESULT.txt",
+      "key": "not_blind",
+      "line": 33,
+      "text": "  AND THE BLINDED ARM IS NOT BLIND. The road is the same hill at\n  the same second in every episode, and the blind agent's thermal\n  state takes a distinct value at every step -- a clock on a road\n  it can memorise. So this compares an explicit preview channel\n  with an implicit one, not foresight with none. Four explanations\n  for the null are live and this experiment separates none of them.\n  Randomise the climb per episode before reading anything into it.\n  See results/PREREGISTRATION.md limits 7 and 8."
+     },
+     {
+      "file": "PHASE_D2_RESULT.txt",
+      "key": "post_hoc",
+      "line": 65,
+      "text": "  RESULT: INCONCLUSIVE   [MEI set AFTER this result -- see below]\n  This experiment cannot tell 'no effect' from 'an effect the team\n  would care about'. It is a statement about the experiment's\n  size, not a statement that preview does nothing.\n  power_analysis.py explains it -- but was written after this\n  result, so it is an explanation, not a prediction.\n\n  Phase D's primary test is unaffected: its verdict was 'not\n  significant' and still is. The MEI was set on 22 September,\n  AFTER Phase D's result was known, so Phase D's classification\n  under the MEI rule is a POST-HOC reading and is labelled so.\n  results/PREREGISTRATION.md section 5 records the ordering."
+     }
+    ],
+    "missing": [],
+    "short": {
+     "ar": "\u063a\u064a\u0631 \u062f\u0627\u0644 \u0625\u062d\u0635\u0627\u0626\u064a\u0627\u064b \u00b7 \u063a\u064a\u0631 \u062d\u0627\u0633\u0645 (\u0642\u0631\u0627\u0621\u0629 \u0644\u0627\u062d\u0642\u0629) \u00b7 \u0627\u0644\u0630\u0631\u0627\u0639 \"\u0627\u0644\u0639\u0645\u064a\u0627\u0621\" \u0644\u064a\u0633\u062a \u0639\u0645\u064a\u0627\u0621 \u00b7 \u0648\u0643\u0644\u0627\u0621 C1",
+     "en": "not significant \u00b7 inconclusive (post-hoc) \u00b7 the \"blind\" arm is not blind \u00b7 C1 agents"
+    },
+    "state": "found"
+   }
+  },
+  {
+   "name": "C4",
+   "pairs": [
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 20f0ae6a9c1564a9",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed0",
+       "train_dt": 0.2,
+       "zip_sha": "20f0ae6a9c1564a9"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 9ab8d2b29cbb9d06",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed0",
+       "train_dt": 0.2,
+       "zip_sha": "9ab8d2b29cbb9d06"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 0,
+     "table_diff": 360.6
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 0a748c7ec8a06538",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed1",
+       "train_dt": 0.2,
+       "zip_sha": "0a748c7ec8a06538"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha f028e248ee8077d3",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed1",
+       "train_dt": 0.2,
+       "zip_sha": "f028e248ee8077d3"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 1,
+     "table_diff": -80.3
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 715dde293b07ed7b",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed2",
+       "train_dt": 0.2,
+       "zip_sha": "715dde293b07ed7b"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha c347fc06b1a4c7ba",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed2",
+       "train_dt": 0.2,
+       "zip_sha": "c347fc06b1a4c7ba"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 2,
+     "table_diff": -77.8
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 5a18511a5a854dcc",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed3",
+       "train_dt": 0.2,
+       "zip_sha": "5a18511a5a854dcc"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 025819a8d558d092",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed3",
+       "train_dt": 0.2,
+       "zip_sha": "025819a8d558d092"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 3,
+     "table_diff": 13.4
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha e86d703b10e769c9",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed4",
+       "train_dt": 0.2,
+       "zip_sha": "e86d703b10e769c9"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha d3979efee0e825c8",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed4",
+       "train_dt": 0.2,
+       "zip_sha": "d3979efee0e825c8"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 4,
+     "table_diff": 38.2
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 3466b26631d888ef",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed5",
+       "train_dt": 0.2,
+       "zip_sha": "3466b26631d888ef"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha b6450a8e66a03d75",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed5",
+       "train_dt": 0.2,
+       "zip_sha": "b6450a8e66a03d75"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 5,
+     "table_diff": -0.3
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha d1dab3e32ba70c33",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed6",
+       "train_dt": 0.2,
+       "zip_sha": "d1dab3e32ba70c33"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 952396a6de6738f9",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed6",
+       "train_dt": 0.2,
+       "zip_sha": "952396a6de6738f9"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 6,
+     "table_diff": -10.0
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha b75d3ab8374adf23",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "sighted_seed7",
+       "train_dt": 0.2,
+       "zip_sha": "b75d3ab8374adf23"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha e0a2cc00d0d66052",
+       "problems": [],
+       "reason": null,
+       "scored": "match",
+       "status": "ready",
+       "tag": "blind_seed7",
+       "train_dt": 0.2,
+       "zip_sha": "e0a2cc00d0d66052"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 7,
+     "table_diff": -2.4
+    }
+   ],
+   "prefix": "c4",
+   "protocol": "d2",
+   "runs": "runs_c4",
+   "verdict": {
+    "cells": [
+     {
+      "cell": "SMALLER THAN THE MEI",
+      "gloss": {
+       "ar": "\u0623\u062b\u0631 \u0627\u0644\u0627\u0633\u062a\u0628\u0627\u0642 \u0623\u0642\u0644 \u0645\u0646 50 \u0648\u062d\u062f\u0629 \u0636\u0631\u0631\u060c \u0648\u0647\u0648 \u062d\u062f\u0651 \u0627\u062e\u062a\u0627\u0631\u0647 \u0627\u0644\u0641\u0631\u064a\u0642 \u0645\u0633\u0628\u0642\u0627\u064b\u060c \u0639\u0646\u062f 300\u202f000 \u062e\u0637\u0648\u0629 \u062a\u062f\u0631\u064a\u0628\u060c \u0639\u0644\u0649 \u0637\u0631\u064a\u0642 \u0641\u064a\u0647 \u062a\u063a\u064a\u0651\u0631 \u0648\u0627\u062d\u062f \u0641\u064a \u0627\u0644\u0645\u064a\u0644 \u0644\u0643\u0644 \u062d\u0644\u0642\u0629. \u0627\u0644\u062a\u062f\u0631\u064a\u0628 \u0644\u0645 \u064a\u0633\u062a\u0642\u0631\u060c \u0648\u0627\u0644\u0646\u062a\u064a\u062c\u0629 \u0645\u0639\u0644\u0651\u0642\u0629 \u0639\u0644\u0649 \u0628\u0630\u0631\u0629 \u0648\u0627\u062d\u062f\u0629: \u0644\u0648 \u0627\u0646\u0642\u0644\u0628\u062a \u0628\u0630\u0631\u0629 \u0648\u0627\u062d\u062f\u0629 \u0644\u0635\u0627\u0631\u062a \u063a\u064a\u0631 \u062d\u0627\u0633\u0645\u0629.",
+       "en": "Preview's effect is below 50 damage units, a threshold the team set in advance, at 300\u202f000 training steps, on a road with one grade change per episode. Training had not settled, and the result hangs on one seed: if one seed flipped, it would be inconclusive."
+      }
+     },
+     {
+      "cell": "NOT-CONVERGED",
+      "gloss": {
+       "ar": "\u0644\u0645 \u064a\u0633\u062a\u0642\u0631 \u0627\u0644\u062a\u062f\u0631\u064a\u0628",
+       "en": "Training had not settled"
+      }
+     }
+    ],
+    "lines": [
+     {
+      "file": "C4_RESULT.txt",
+      "key": "result",
+      "line": 42,
+      "text": "  RESULT: SMALLER THAN THE MEI"
+     },
+     {
+      "file": "C4_RESULT.txt",
+      "key": "seeds",
+      "line": 28,
+      "text": "  H1: the effect is smaller than the MEI (50 units)\n    exact one-sided sign test        p = 0.0352   (7 of 8 seeds below 50)\n    exact paired permutation test    p = 0.3867   (sensitivity)"
+     },
+     {
+      "file": "C4_RESULT.txt",
+      "key": "disagree",
+      "line": 33,
+      "text": "  THE TWO TESTS DISAGREE on 'smaller than the MEI'. Both reported;\n  the sign test is primary."
+     },
+     {
+      "file": "C4_RESULT.txt",
+      "key": "convergence",
+      "line": 48,
+      "text": "  NOT-CONVERGED sighted 2/8 blind 1/8 pairs 1/8 band 25 need 6 and 7 runs runs_c4"
+     },
+     {
+      "file": "C4_RESULT.txt",
+      "key": "reading",
+      "line": 50,
+      "text": "THE READING, as declared before any C4 agent trained (section 2a):\n  Preview's effect is below the MEI at 300 000 steps: (i) is supported\n  AT THIS BUDGET. The agents were still changing, so (ii) is not ruled\n  out."
+     },
+     {
+      "file": "PREREGISTRATION_C4.md",
+      "key": "explanations",
+      "line": 41,
+      "text": "| (i) | preview genuinely buys little at this configuration | tested jointly with (ii) \u2014 see 2a |\n| (ii) | **the agents are undertrained** \u2014 C1, 50 000 steps, 11 training episodes | **yes \u2014 this is the one thing C4 changes** |\n| (iii) | the preview carries little: one grade step per episode | a special case of (i) at this configuration. C4 inherits D2's road unchanged, so any (i) finding reads \"with one grade step per episode\" |"
+     },
+     {
+      "file": "PREREGISTRATION_C4.md",
+      "key": "one_seed",
+      "line": 633,
+      "text": "2. **It rests on the sign test's threshold, and the sensitivity test does not\n   agree.** 7 of 8 is exactly the count the sign test needs at eight seeds; one\n   seed the other way and the cell would be INCONCLUSIVE. The permutation test,\n   which weighs magnitudes, does not reject (p = 0.3867), because one seed\n   carries a large effect the other way: in seed 0 the blinded agent took\n   720.5 against the sighted agent's 359.9, a difference of +360.6, and that\n   one value lifts the mean to +30.2. Section 5 fixed the rule for this before\n   the run: both are reported, the sign test is primary, and neither is chosen\n   after the fact. **So the result is: most seeds show no benefit from preview,\n   one shows a large one, and whether the average effect is below 50 is not\n   settled.**"
+     }
+    ],
+    "missing": [],
+    "short": {
+     "ar": "\u0623\u0635\u063a\u0631 \u0645\u0646 \u0627\u0644\u062d\u062f \u0627\u0644\u0623\u062f\u0646\u0649 \u0627\u0644\u0645\u0647\u0645 (50 \u0648\u062d\u062f\u0629) \u0639\u0646\u062f 300\u202f000 \u062e\u0637\u0648\u0629 \u00b7 \u0628\u0641\u0627\u0631\u0642 \u0628\u0630\u0631\u0629 \u0648\u0627\u062d\u062f\u0629 \u00b7 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u0646 \u0644\u0627 \u064a\u062a\u0641\u0642\u0627\u0646 \u00b7 \u0644\u0645 \u064a\u0633\u062a\u0642\u0631 \u0627\u0644\u062a\u062f\u0631\u064a\u0628",
+     "en": "smaller than the MEI (50) at 300\u202f000 steps \u00b7 one seed wide \u00b7 the two tests disagree \u00b7 not converged"
+    },
+    "state": "found"
+   }
+  },
+  {
+   "name": "Phase D2",
+   "pairs": [
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha b4185e97545d6f6a",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed0",
+       "train_dt": 0.2,
+       "zip_sha": "b4185e97545d6f6a"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 3fc0ce73f98087b5",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed0",
+       "train_dt": 0.2,
+       "zip_sha": "3fc0ce73f98087b5"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 0,
+     "table_diff": 221.7
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 30beae3d971624da",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed1",
+       "train_dt": 0.2,
+       "zip_sha": "30beae3d971624da"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha b38a3ddf8f1a8b9b",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed1",
+       "train_dt": 0.2,
+       "zip_sha": "b38a3ddf8f1a8b9b"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 1,
+     "table_diff": -74.4
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 0939fcbb0f39f51c",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed2",
+       "train_dt": 0.2,
+       "zip_sha": "0939fcbb0f39f51c"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha a94bdf3b8eabd63f",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed2",
+       "train_dt": 0.2,
+       "zip_sha": "a94bdf3b8eabd63f"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 2,
+     "table_diff": -3.7
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 44fe1ca2af4a60f3",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed3",
+       "train_dt": 0.2,
+       "zip_sha": "44fe1ca2af4a60f3"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha b8b7ff6a86a09b47",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed3",
+       "train_dt": 0.2,
+       "zip_sha": "b8b7ff6a86a09b47"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 3,
+     "table_diff": 0.9
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha fcb7892e7c5bfacf",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed4",
+       "train_dt": 0.2,
+       "zip_sha": "fcb7892e7c5bfacf"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 4cf4f5712f43bba9",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed4",
+       "train_dt": 0.2,
+       "zip_sha": "4cf4f5712f43bba9"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 4,
+     "table_diff": 50.5
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha ba3c0d191371938b",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed5",
+       "train_dt": 0.2,
+       "zip_sha": "ba3c0d191371938b"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 7a88f5a4fd14610e",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed5",
+       "train_dt": 0.2,
+       "zip_sha": "7a88f5a4fd14610e"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 5,
+     "table_diff": -67.1
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha d0e3b4bacf970fb7",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed6",
+       "train_dt": 0.2,
+       "zip_sha": "d0e3b4bacf970fb7"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 4621acbdb7ad342b",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed6",
+       "train_dt": 0.2,
+       "zip_sha": "4621acbdb7ad342b"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 6,
+     "table_diff": -82.9
+    },
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 05c98c86f0568492",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "sighted_seed7",
+       "train_dt": 0.2,
+       "zip_sha": "05c98c86f0568492"
+      },
+      {
+       "arm": "blind",
+       "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha d644e735d2b4f6f0",
+       "problems": [],
+       "reason": null,
+       "scored": "not recorded",
+       "status": "ready",
+       "tag": "blind_seed7",
+       "train_dt": 0.2,
+       "zip_sha": "d644e735d2b4f6f0"
+      }
+     ],
+     "problems": [],
+     "protocol": "d2",
+     "reason": null,
+     "result_file": true,
+     "runnable": true,
+     "seed": 7,
+     "table_diff": 6.2
+    }
+   ],
+   "prefix": "d2",
+   "protocol": "d2",
+   "runs": "runs_d2",
+   "verdict": {
+    "cells": [
+     {
+      "cell": "INCONCLUSIVE",
+      "gloss": {
+       "ar": "\u063a\u064a\u0631 \u062d\u0627\u0633\u0645: \u0627\u0644\u062a\u062c\u0631\u0628\u0629 \u0644\u0627 \u062a\u0645\u064a\u0651\u0632 \u0628\u064a\u0646 \"\u0644\u0627 \u0623\u062b\u0631\" \u0648\"\u0623\u062b\u0631 \u064a\u0647\u0645\u0651 \u0627\u0644\u0641\u0631\u064a\u0642\"",
+       "en": "Inconclusive: the experiment cannot tell \"no effect\" from \"an effect the team cares about\""
+      }
+     }
+    ],
+    "lines": [
+     {
+      "file": "PHASE_D2_RESULT.txt",
+      "key": "result",
+      "line": 30,
+      "text": "  RESULT: INCONCLUSIVE\n  This experiment cannot tell 'no effect' from 'an effect the team\n  would care about'. It is a statement about the experiment's\n  size, not a statement that preview does nothing.\n  power_analysis.py predicted this cell BEFORE this experiment\n  ran, from Phase D's measured spread."
+     },
+     {
+      "file": "PHASE_D2_RESULT.txt",
+      "key": "c1",
+      "line": 86,
+      "text": "  Both are C1 agents -- 50 000 steps, 11 training episodes each,\n  which train.py calls 'the first bad run'. A null from either says\n  'with agents trained to the C1 budget', never 'preview does not\n  help'. The next suspect after the design flaw is the budget (C4)."
+     }
+    ],
+    "missing": [],
+    "short": {
+     "ar": "\u063a\u064a\u0631 \u062d\u0627\u0633\u0645 \u00b7 \u0648\u0643\u0644\u0627\u0621 C1 \u200f(50\u202f000 \u062e\u0637\u0648\u0629)",
+     "en": "inconclusive \u00b7 C1 agents, 50\u202f000 steps"
+    },
+    "state": "found"
+   }
+  },
+  {
+   "name": "runs_sixspeed_18sep (no name recorded)",
+   "pairs": [
+    {
+     "agents": [
+      {
+       "arm": "sighted",
+       "budget_line": null,
+       "problems": [],
+       "reason": "no meta.json: plant unknown (AUDIT2 C2-1)",
+       "scored": null,
+       "status": "incompatible",
+       "tag": "sighted_seed0",
+       "train_dt": null,
+       "zip_sha": null
+      },
+      {
+       "arm": "blind",
+       "budget_line": null,
+       "problems": [],
+       "reason": "no meta.json: plant unknown (AUDIT2 C2-1)",
+       "scored": null,
+       "status": "incompatible",
+       "tag": "blind_seed0",
+       "train_dt": null,
+       "zip_sha": null
+      }
+     ],
+     "problems": [
+      "sighted_seed0: incompatible -- no meta.json: plant unknown (AUDIT2 C2-1)",
+      "blind_seed0: incompatible -- no meta.json: plant unknown (AUDIT2 C2-1)"
+     ],
+     "protocol": null,
+     "reason": "sighted_seed0: incompatible -- no meta.json: plant unknown (AUDIT2 C2-1)",
+     "result_file": false,
+     "runnable": false,
+     "seed": 0,
+     "table_diff": null
+    }
+   ],
+   "prefix": "sixspeed_18sep",
+   "protocol": null,
+   "runs": "runs_sixspeed_18sep",
+   "verdict": {
+    "cells": [],
+    "lines": [],
+    "missing": [],
+    "short": {
+     "ar": "\u0644\u0627 \u064a\u0648\u062c\u062f \u062d\u0643\u0645 \u0645\u0633\u062c\u064e\u0651\u0644 \u0645\u0633\u0628\u0642\u0627\u064b \u0644\u0647\u0630\u0647 \u0627\u0644\u062a\u062c\u0631\u0628\u0629 \u0641\u064a results/. \u0645\u0627 \u062a\u0639\u0631\u0636\u0647 \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629 \u0644\u064a\u0633 \u0646\u062a\u064a\u062c\u0629.",
+     "en": "No preregistered verdict for this experiment in results/. Nothing on this page is a result."
+    },
+    "state": "none"
+   }
+  }
+ ],
+ "limits": {
+  "oil_c": 134.9,
+  "turb_c": 849.9
+ },
+ "preview_s": [
+  2.0,
+  5.0,
+  15.0,
+  30.0
+ ],
+ "sb3": true
+}

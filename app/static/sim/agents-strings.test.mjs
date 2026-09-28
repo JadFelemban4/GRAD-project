@@ -154,14 +154,85 @@ test('every key fills the same {placeholders} in both languages', () => {
   }
 });
 
-test('the bidi control characters in agents.pick.none and agents.device.line are pinned', () => {
-  // \u2066 (LRI) / \u2069 (PDI) isolate the LTR address inside the Arabic
-  // pick.none line, and \u200f (RLM) keeps the Arabic run after the {device}
-  // placeholder in device.line reading right-to-left. All three are invisible in an
-  // editor, so pin them here: a future edit that drops one silently would otherwise
-  // not be caught until the string mis-renders.
+// U+2066 / U+2069 isolate a left-to-right run, U+200F is a right-to-left mark,
+// U+2212 is the minus sign and U+202F the narrow no-break space. Each is
+// invisible or looks like an ASCII character in an editor, so this file builds
+// them from their code points, and the source of agents-strings.mjs must carry
+// them as escapes, never as literal characters.
+const LRI = String.fromCodePoint(0x2066);
+const PDI = String.fromCodePoint(0x2069);
+const RLM = String.fromCodePoint(0x200f);
+const MINUS = String.fromCodePoint(0x2212);
+const escapeText = hex => `${String.fromCharCode(92)}u${hex}`;
+
+test('the bidi control characters are pinned', () => {
+  // M2: the picker works from the nav link, so agents.pick.none names no
+  // address and carries no isolate any more. device.line keeps its RLM, which
+  // keeps the Arabic run after the {device} placeholder reading right-to-left.
   const { AGENT_STRINGS } = api();
-  assert.ok(AGENT_STRINGS.ar['agents.pick.none'].includes('\u2066'), 'agents.pick.none lost its LRI');
-  assert.ok(AGENT_STRINGS.ar['agents.pick.none'].includes('\u2069'), 'agents.pick.none lost its PDI');
-  assert.ok(AGENT_STRINGS.ar['agents.device.line'].includes('\u200f'), 'agents.device.line lost its RLM');
+  for (const lang of LANGS) {
+    const none = AGENT_STRINGS[lang]['agents.pick.none'];
+    assert.ok(!none.includes(LRI) && !none.includes(PDI), `${lang}: agents.pick.none still isolates an address`);
+    assert.ok(!none.includes('?runs='), `${lang}: agents.pick.none still tells the viewer to type an address`);
+  }
+  assert.ok(AGENT_STRINGS.ar['agents.device.line'].includes(RLM), 'agents.device.line lost its RLM');
+});
+
+test('the pair row\'s minus is U+2212, written as an escape', () => {
+  const { AGENT_STRINGS } = api();
+  for (const lang of LANGS) {
+    const row = AGENT_STRINGS[lang]['agents.pick.pair_row'];
+    assert.ok(row, `${lang}: agents.pick.pair_row is missing`);
+    assert.ok(row.includes(MINUS), `${lang}: the pair row must subtract with U+2212`);
+    assert.ok(!row.includes(' - '), `${lang}: an ASCII hyphen is not a minus sign`);
+  }
+  const src = readFileSync(new URL('./agents-strings.mjs', import.meta.url), 'utf8');
+  assert.equal(src.split(escapeText('2212')).length - 1, 2, 'the U+2212 escape must appear once per language');
+  for (const hex of ['2066', '2069', '200f', '2011', '2212', '202f']) {
+    assert.equal(src.split(String.fromCodePoint(parseInt(hex, 16))).length - 1, 0,
+      `a literal U+${hex} in agents-strings.mjs: write the escape`);
+  }
+});
+
+test('the M2 picker strings keep their clauses', () => {
+  const { AGENT_STRINGS } = api();
+  const mustSay = {
+    'agents.pick.none': { ar: [/لم يُختر شيء/, /اختر تجربة/, /احسب/], en: [/Nothing is selected/, /choose an experiment/, /Compute/] },
+    'agents.pick.pair_qualifier': {
+      ar: [/فرق وسيطَي 20 حلقة/, /طريقها وأوزانها/, /ليست هذه الحلقة/],
+      en: [/medians of 20 episodes/, /own road and weights/, /not this episode/],
+    },
+    'agents.pick.pair_qualifier_same_road': {
+      ar: [/فرق وسيطَي 20 حلقة/, /الطريق نفسه/, /ليست هذه الحلقة/],
+      en: [/medians of 20 episodes/, /same road/, /not this episode/],
+    },
+    'agents.pick.episode_option_same_road': { ar: [/الطريق نفسه/, /الأوزان/], en: [/same road/, /weights/] },
+    'agents.pick.same_road_note': { ar: [/الطريق نفسه/, /في الأوزان فقط/], en: [/same road/, /only in their weights/] },
+    'agents.pick.pair_refused': { ar: [/لا يمكن تشغيله/], en: [/cannot run/] },
+    'agents.pick.experiment_refused': { ar: [/لا يمكن تشغيل أي زوج/], en: [/no pair can run/] },
+    'agents.car.blind_phase_d': {
+      ar: [/^لا يرى الطريق أمامه/, /قد يحفظه/, /الطريق نفسه في كل حلقة/],
+      en: [/^Does not see the road ahead/, /memorised/, /same road in every episode/],
+    },
+    'agents.seen.blind_phase_d': { ar: [/^لا يرى الطريق أمامه/, /قد يحفظه/], en: [/^Does not see the road ahead/, /memorised/] },
+    'agents.load.stopping': { ar: [/يُوقَف/, /السابقة/], en: [/Stopping/, /previous/] },
+    // The catalog's third 'scored' value (Task 3): results/ records a different
+    // zip sha, so this is not the artefact that was scored and the pair is refused.
+    'agents.verdict.scored_mismatch': {
+      ar: [/ليس هذا هو الملف الذي قُيِّم/, /تختلف/, /لا يمكن تشغيل هذا الزوج/],
+      en: [/Not the scored artefact/, /differs/, /cannot run/],
+    },
+  };
+  for (const [key, langs] of Object.entries(mustSay)) {
+    for (const [lang, patterns] of Object.entries(langs)) {
+      assert.ok(AGENT_STRINGS[lang][key], `${key} missing in ${lang}`);
+      for (const p of patterns) assert.match(AGENT_STRINGS[lang][key], p, `${key} lost a clause in ${lang}`);
+    }
+  }
+  assert.notEqual(AGENT_STRINGS.ar['agents.pick.pair_qualifier'], AGENT_STRINGS.ar['agents.pick.pair_qualifier_same_road']);
+  for (const lang of LANGS) {
+    const seen = t(lang, 'agents.seen.blind_phase_d', { zeros: '0 · 0 · 0 · 0', cite: 'results/PHASE_D_RESULT.txt:33-40' });
+    assert.ok(seen.includes('0 · 0 · 0 · 0') && seen.includes('results/PHASE_D_RESULT.txt:33-40'), `${lang}: ${seen}`);
+    assert.doesNotMatch(seen, /[{][a-z0-9_]+[}]/i, `${lang}: an unfilled placeholder in ${seen}`);
+  }
 });

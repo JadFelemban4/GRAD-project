@@ -1701,6 +1701,15 @@ class NoNetworkTests(unittest.TestCase):
         self.assertEqual(found, [])
 
 
+def _shape(x):
+    """A JSON value's structure: every dict key, a list by its first item, 'value' for the rest."""
+    if isinstance(x, dict):
+        return {k: _shape(v) for k, v in x.items()}
+    if isinstance(x, list) and x:
+        return [_shape(x[0])]
+    return "value"
+
+
 class PageTests(unittest.TestCase):
     """The /agents page can load every asset, id and module it names.
 
@@ -1812,6 +1821,23 @@ class PageTests(unittest.TestCase):
         head = page.rfind("function carOf(", 0, hits[0])
         self.assertNotEqual(head, -1, "the one read of .cars must be inside carOf")
         self.assertLess(hits[0] - head, 120, "the one read of .cars must be inside carOf")
+
+    @unittest.skipUnless(HAVE_ALL_RUNS, NO_ALL_RUNS)
+    def test_catalog_fixture_has_the_server_shape(self):
+        """agent-picker.test.mjs drives the picker from a copy of the catalog.
+
+        The copy is sim/agent-catalog.fixture.json, generated from
+        agent_api.catalog and never edited by hand. If the served shape moves,
+        this fails before a node test can pass against a stale copy.
+        """
+        text = self.read("sim/agent-catalog.fixture.json")
+        self.assertTrue(text.isascii(), "the fixture must be written with ensure_ascii")
+        fixture = json.loads(text)
+        self.assertIs(fixture["sb3"], True, "the fixture pins sb3 true")
+        self.assertEqual(_shape(fixture), _shape(API.catalog()),
+                         "agent-catalog.fixture.json no longer has the catalog's shape: regenerate "
+                         "it with the command in the header of app/static/sim/agent-picker.test.mjs, "
+                         "then re-run node --test \"app/static/sim/*.test.mjs\"")
 
 
 if __name__ == "__main__":

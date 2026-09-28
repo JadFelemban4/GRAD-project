@@ -14,8 +14,10 @@
 //
 // Arabic lines are from design sections 5 and 6
 // (docs/superpowers/specs/2026-09-26-agent-replay-design.md), verbatim where the
-// design gives them. \u200f is a right-to-left mark and \u2066...\u2069 isolates a
-// left-to-right run (an address) inside an Arabic line.
+// design gives them. \u200f is a right-to-left mark; \u2066...\u2069 would isolate
+// a left-to-right run inside an Arabic line, which is how agent-picker.mjs
+// (formatDiff) writes a pair's table number. The pair row subtracts with U+2212,
+// written here as its escape; agents-strings.test.mjs pins every one of them.
 
 import { STRINGS } from './i18n.mjs';
 
@@ -28,11 +30,11 @@ export const AGENT_STRINGS = {
     'agents.badge': 'محاكاة: سيناريو إجهاد اصطناعي — تسلّق متواصل {grade}٪ عند {v} كم/س في {t} °م، أقسى من أي تسلّق مسجّل؛ لا يعني ذلك أنه أحرّ من كل لحظة في الرحلات المسجّلة',
     'agents.badge.short': 'محاكاة',
 
-    // --- picker (read-only in M1)
+    // --- picker
     'agents.pick.experiment': 'التجربة',
     'agents.pick.pair': 'الزوج',
     'agents.pick.episode': 'الحلقة',
-    'agents.pick.none': 'لم يُحدَّد زوج ولا حلقة. افتح الصفحة بعنوان مثل \u2066?runs=runs_c4&seed=5&ep=1\u2069',
+    'agents.pick.none': 'لم يُختر شيء بعد: اختر تجربة، ثم زوجاً، ثم حلقة، ثم اضغط احسب',
     'agents.pick.pair_option': 'بذرة {seed} · المُبصر والأعمى',
     'agents.pick.episode_option': 'حلقة {idx} · الصعود عند {start} ث · {grade}٪ · الأوزان: عزم {w0} / وقود {w1} / عمر المكوّنات {w2}',
     'agents.pick.budget': 'دُرِّب {budget} خطوة (من final.zip)',
@@ -107,6 +109,28 @@ export const AGENT_STRINGS = {
     // --- added by Task 9: the torque reading's label, the profile's km scale
     'agents.torque.heading': 'العزم المُسلَّم مقابل المطلوب',
     'agents.profile.km': '{km} كم',
+
+    // --- added in M2: the working picker (agent-picker.mjs), Phase D's blind
+    // car, the line shown while «احسب» stops another computation, and the
+    // catalog's third 'scored' value (results/ records a different zip sha)
+    'agents.pick.choose': 'اختر…',
+    'agents.pick.pair_row': 'بذرة {seed} · الأعمى \u2212 المُبصر {diff}',
+    'agents.pick.pair_no_row': 'بذرة {seed} · لا صف لهذه البذرة في جدول النتائج',
+    'agents.pick.pair_refused': 'بذرة {seed} · لا يمكن تشغيله: {reason}',
+    'agents.pick.experiment_refused': '{name} · لا يمكن تشغيل أي زوج: {reason}',
+    'agents.pick.experiment_empty': '{name} · لا يوجد فيه أي زوج',
+    'agents.pick.pair_qualifier': '(فرق وسيطَي 20 حلقة، لكلٍّ منها طريقها وأوزانها؛ ليست هذه الحلقة)',
+    'agents.pick.pair_qualifier_same_road': '(فرق وسيطَي 20 حلقة على الطريق نفسه بأوزان مختلفة؛ ليست هذه الحلقة)',
+    'agents.pick.episode_option_same_road': 'حلقة {idx} · الطريق نفسه · الأوزان: عزم {w0} / وقود {w1} / عمر المكوّنات {w2}',
+    'agents.pick.same_road_note': 'الطريق نفسه ({start} ث · {grade}٪)؛ تختلف الحلقات في الأوزان فقط',
+    'agents.pick.need_pair': 'اختر زوجاً',
+    'agents.pick.need_episode': 'اختر حلقة',
+    'agents.pick.catalog_loading': 'تحميل قائمة التجارب…',
+    'agents.pick.catalog_error': 'تعذّر تحميل قائمة التجارب: {message}',
+    'agents.car.blind_phase_d': 'لا يرى الطريق أمامه، لكنه قد يحفظه: الطريق نفسه في كل حلقة',
+    'agents.seen.blind_phase_d': 'لا يرى الطريق أمامه: مداخل الاستباق عنده {zeros}؛ لكنه قد يحفظه: الطريق نفسه في كل حلقة ({cite})',
+    'agents.load.stopping': 'يُوقَف حساب الحلقة السابقة ({runs} بذرة {seed} حلقة {ep})…',
+    'agents.verdict.scored_mismatch': 'ليس هذا هو الملف الذي قُيِّم: بصمة final.zip تختلف عمّا سجّلته النتائج، فلا يمكن تشغيل هذا الزوج',
   },
 
   en: {
@@ -117,11 +141,11 @@ export const AGENT_STRINGS = {
     'agents.badge': 'Simulation: a synthetic stress scenario, a sustained {grade} % climb at {v} km/h in {t} °C, harsher than any recorded climb; this does not mean it is hotter than every moment of the recorded drives',
     'agents.badge.short': 'Simulation',
 
-    // --- picker (read-only in M1)
+    // --- picker
     'agents.pick.experiment': 'Experiment',
     'agents.pick.pair': 'Pair',
     'agents.pick.episode': 'Episode',
-    'agents.pick.none': 'No pair or episode is selected. Open the page with an address such as ?runs=runs_c4&seed=5&ep=1',
+    'agents.pick.none': 'Nothing is selected yet: choose an experiment, then a pair, then an episode, then press Compute',
     'agents.pick.pair_option': 'Seed {seed} · sighted and blind',
     'agents.pick.episode_option': 'Episode {idx} · climb at {start} s · {grade} % · weights: torque {w0} / fuel {w1} / component life {w2}',
     'agents.pick.budget': 'trained {budget} steps (from final.zip)',
@@ -196,6 +220,28 @@ export const AGENT_STRINGS = {
     // --- added by Task 9: the torque reading's label, the profile's km scale
     'agents.torque.heading': 'Torque delivered against requested',
     'agents.profile.km': '{km} km',
+
+    // --- added in M2: the working picker (agent-picker.mjs), Phase D's blind
+    // car, the line shown while Compute stops another computation, and the
+    // catalog's third 'scored' value (results/ records a different zip sha)
+    'agents.pick.choose': 'Choose…',
+    'agents.pick.pair_row': 'Seed {seed} · blind \u2212 sighted {diff}',
+    'agents.pick.pair_no_row': 'Seed {seed} · no row for this seed in the results table',
+    'agents.pick.pair_refused': 'Seed {seed} · cannot run: {reason}',
+    'agents.pick.experiment_refused': '{name} · no pair can run: {reason}',
+    'agents.pick.experiment_empty': '{name} · holds no pair',
+    'agents.pick.pair_qualifier': '(difference of the medians of 20 episodes, each with its own road and weights; not this episode)',
+    'agents.pick.pair_qualifier_same_road': '(difference of the medians of 20 episodes on the same road with different weights; not this episode)',
+    'agents.pick.episode_option_same_road': 'Episode {idx} · the same road · weights: torque {w0} / fuel {w1} / component life {w2}',
+    'agents.pick.same_road_note': 'The same road ({start} s · {grade} %); the episodes differ only in their weights',
+    'agents.pick.need_pair': 'Choose a pair',
+    'agents.pick.need_episode': 'Choose an episode',
+    'agents.pick.catalog_loading': 'Loading the list of experiments…',
+    'agents.pick.catalog_error': 'The list of experiments could not be loaded: {message}',
+    'agents.car.blind_phase_d': 'Does not see the road ahead, but may have memorised it: the same road in every episode',
+    'agents.seen.blind_phase_d': 'Does not see the road ahead: its preview inputs were {zeros}; but it may have memorised it: the same road in every episode ({cite})',
+    'agents.load.stopping': 'Stopping the previous computation ({runs} seed {seed} episode {ep})…',
+    'agents.verdict.scored_mismatch': 'Not the scored artefact: the final.zip sha differs from the one the results recorded, so this pair cannot run',
   },
 };
 
