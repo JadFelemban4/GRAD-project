@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" width="1000" height="640" role="img" aria-label="The twenty frozen test roads by climb start and grade, the training box, and Phase D's one road" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+<rect x="0" y="0" width="1000" height="640" fill="#fcfcfb" class="f-surface"/>
+<text x="56.0" y="42.0" font-size="20" fill="#0b0b0b" class="f-ink" text-anchor="start" font-weight="600">The roads: when the climb starts, and how steep it is</text>
+<text x="56.0" y="70.0" font-size="13.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">20 frozen test roads for Phase D2 and C4 · training draws a new road every episode from the shaded box · Phase D had one road</text>
+<rect x="56.00" y="86.00" width="109.19" height="23.00" rx="4" fill="#f0efec" class="f-tag" fill-opacity="1.0"/>
+<text x="65.0" y="102.0" font-size="11.5" fill="#0b0b0b" class="f-ink" text-anchor="start" font-weight="700">THE TEST SET</text>
+<text x="175.2" y="102.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">frozen 22 September 2026, before any D2 agent trained (evaluate.EPISODES_D2)</text>
+<text x="56.0" y="574.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">Every road is flat until the climb starts, then holds one grade to the end of the episode, at 130 km/h in 42 °C air. Phase D trained and</text>
+<text x="56.0" y="590.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">scored on one road, the climb at 180 s every time, which is how its blind arm could learn when the hill comes (results/PREREGISTRATION.md</text>
+<text x="56.0" y="606.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">limit 7). Phase D2 and C4 train on a new road drawn from the box every episode and are scored on these twenty, each with its own preference</text>
+<text x="56.0" y="622.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">weights. Data: evaluate.py, random_road.py, engine_env.make_grade_climb().</text>
+<rect x="56.00" y="136.00" width="22.00" height="12.00" rx="2" fill="#2a78d6" class="f-model" fill-opacity="0.18"/>
+<text x="86.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">where training roads are drawn (D2, C4)</text>
+<circle cx="398.00" cy="142.00" r="4.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"></circle>
+<text x="417.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">a frozen test road (D2, C4)</text>
+<circle cx="645.00" cy="142.00" r="4.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"></circle>
+<text x="664.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">Phase D's only road</text>
+<line x1="100.0" y1="504.0" x2="960.0" y2="504.0" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="508.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">11</text>
+<line x1="100.0" y1="448.7" x2="960.0" y2="448.7" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="452.7" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">12</text>
+<line x1="100.0" y1="393.3" x2="960.0" y2="393.3" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="397.3" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">13</text>
+<line x1="100.0" y1="338.0" x2="960.0" y2="338.0" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="342.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">14</text>
+<line x1="100.0" y1="282.7" x2="960.0" y2="282.7" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="286.7" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">15</text>
+<line x1="100.0" y1="227.3" x2="960.0" y2="227.3" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="231.3" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">16</text>
+<line x1="100.0" y1="172.0" x2="960.0" y2="172.0" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="176.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">17</text>
+<text x="42.0" y="338.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400" transform="rotate(-90 42.0 338.0)">grade of the climb, %</text>
+<rect x="178.18" y="227.33" width="703.64" height="221.33" rx="0" fill="#2a78d6" class="f-model" fill-opacity="0.12"/>
+<circle cx="260.47" cy="375.96" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1000: climb at 141 s, grade 13.3</title></circle>
+<circle cx="811.26" cy="281.28" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1001: climb at 282 s, grade 15.0</title></circle>
+<circle cx="417.77" cy="408.99" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1002: climb at 181 s, grade 12.7</title></circle>
+<circle cx="310.11" cy="258.43" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1003: climb at 154 s, grade 15.4</title></circle>
+<circle cx="813.96" cy="435.55" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1004: climb at 283 s, grade 12.2</title></circle>
+<circle cx="211.21" cy="260.92" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1005: climb at 128 s, grade 15.4</title></circle>
+<circle cx="676.71" cy="238.29" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1006: climb at 248 s, grade 15.8</title></circle>
+<circle cx="733.35" cy="242.33" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1007: climb at 262 s, grade 15.7</title></circle>
+<circle cx="603.14" cy="336.40" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1008: climb at 229 s, grade 14.0</title></circle>
+<circle cx="867.16" cy="291.02" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1009: climb at 296 s, grade 14.8</title></circle>
+<circle cx="347.84" cy="325.44" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1010: climb at 163 s, grade 14.2</title></circle>
+<circle cx="508.50" cy="311.55" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1011: climb at 204 s, grade 14.5</title></circle>
+<circle cx="489.54" cy="338.66" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1012: climb at 200 s, grade 14.0</title></circle>
+<circle cx="640.47" cy="302.59" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1013: climb at 238 s, grade 14.6</title></circle>
+<circle cx="247.22" cy="392.67" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1014: climb at 138 s, grade 13.0</title></circle>
+<circle cx="560.84" cy="395.38" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1015: climb at 218 s, grade 13.0</title></circle>
+<circle cx="595.09" cy="447.78" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1016: climb at 227 s, grade 12.0</title></circle>
+<circle cx="769.59" cy="367.94" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1017: climb at 271 s, grade 13.5</title></circle>
+<circle cx="442.87" cy="417.29" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1018: climb at 188 s, grade 12.6</title></circle>
+<circle cx="363.39" cy="357.31" r="5.5" fill="#0b0b0b" stroke="#fcfcfb" class="f-ink s-surface" stroke-width="2"><title>test episode 1019: climb at 167 s, grade 13.7</title></circle>
+<circle cx="412.73" cy="448.67" r="7.0" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>Phase D: climb at 180 s, grade 12.0, every episode</title></circle>
+<text x="424.7" y="468.7" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">Phase D: the same road every episode</text>
+<line x1="100.0" y1="504.0" x2="960.0" y2="504.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="100.0" y1="504.0" x2="100.0" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="100.0" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">100</text>
+<line x1="178.2" y1="504.0" x2="178.2" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="178.2" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">120</text>
+<line x1="256.4" y1="504.0" x2="256.4" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="256.4" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">140</text>
+<line x1="334.5" y1="504.0" x2="334.5" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="334.5" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">160</text>
+<line x1="412.7" y1="504.0" x2="412.7" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="412.7" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">180</text>
+<line x1="490.9" y1="504.0" x2="490.9" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="490.9" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">200</text>
+<line x1="569.1" y1="504.0" x2="569.1" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="569.1" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">220</text>
+<line x1="647.3" y1="504.0" x2="647.3" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="647.3" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">240</text>
+<line x1="725.5" y1="504.0" x2="725.5" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="725.5" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">260</text>
+<line x1="803.6" y1="504.0" x2="803.6" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="803.6" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">280</text>
+<line x1="881.8" y1="504.0" x2="881.8" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="881.8" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">300</text>
+<line x1="960.0" y1="504.0" x2="960.0" y2="509.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="960.0" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">320</text>
+<text x="530.0" y="546.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">time the climb starts, s</text>
+</svg>

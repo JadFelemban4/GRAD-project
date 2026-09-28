@@ -1,0 +1,73 @@
+THIS BRANCH'S PREVIEW STUDY, ONE PAGE  (plot_study_page.py)
+
+ROADS  (evaluate.EPISODES_D2, random_road.RANGES, engine_env.make_grade_climb)
+   training draws: climb start 120-300 s, grade 12-16 per cent
+   frozen test episodes: 20
+     episode 1000: climb at  141.1 s, grade 13.31 per cent
+     episode 1001: climb at  281.9 s, grade 15.02 per cent
+     episode 1002: climb at  181.3 s, grade 12.72 per cent
+     episode 1003: climb at  153.8 s, grade 15.44 per cent
+     episode 1004: climb at  282.6 s, grade 12.24 per cent
+     episode 1005: climb at  128.4 s, grade 15.39 per cent
+     episode 1006: climb at  247.5 s, grade 15.80 per cent
+     episode 1007: climb at  262.0 s, grade 15.73 per cent
+     episode 1008: climb at  228.7 s, grade 14.03 per cent
+     episode 1009: climb at  296.2 s, grade 14.85 per cent
+     episode 1010: climb at  163.4 s, grade 14.23 per cent
+     episode 1011: climb at  204.5 s, grade 14.48 per cent
+     episode 1012: climb at  199.7 s, grade 13.99 per cent
+     episode 1013: climb at  238.3 s, grade 14.64 per cent
+     episode 1014: climb at  137.7 s, grade 13.01 per cent
+     episode 1015: climb at  217.9 s, grade 12.96 per cent
+     episode 1016: climb at  226.7 s, grade 12.02 per cent
+     episode 1017: climb at  271.3 s, grade 13.46 per cent
+     episode 1018: climb at  187.7 s, grade 12.57 per cent
+     episode 1019: climb at  167.4 s, grade 13.65 per cent
+   Phase D, every episode: climb at 180 s, grade 12.0 per cent
+
+C4: EVERY POLICY  (results/c4_seed*.txt policy tables)
+   row                      median  IQR width    worst  fuel g  peak C
+   unprotected ECU          1118.0      715.9   2363.8    4818     924
+   reactive                  667.8      214.5    919.8    5040     871
+   current-grade             653.5      295.5    907.0    5158     871
+   seed 0 - sighted          359.9      156.9    674.3    5162     868
+   seed 0 - blind            720.5      492.6   1453.7    4726     912
+   seed 1 - sighted          490.2      263.7    900.0    4827     876
+   seed 1 - blind            409.9      246.4    811.1    5161     875
+   seed 2 - sighted          602.2      350.9   1165.3    4726     890
+   seed 2 - blind            524.4      299.2   1598.4    4786     910
+   seed 3 - sighted          336.1      179.8    964.1    5264     876
+   seed 3 - blind            349.5      154.0    721.0    5225     863
+   seed 4 - sighted          332.8      164.0    868.4    5099     875
+   seed 4 - blind            371.0      151.6    816.6    4934     868
+   seed 5 - sighted          442.6      326.8   1399.8    4862     895
+   seed 5 - blind            442.3      251.8    984.8    4840     878
+   seed 6 - sighted          357.6      246.4    967.1    5049     878
+   seed 6 - blind            347.6      267.6   1018.3    5105     876
+   seed 7 - sighted          365.5      344.7    890.4    5157     866
+   seed 7 - blind            363.1      233.9    979.8    5294     874
+   median below current-grade's: sighted 8 of 8, blind 7 of 8
+   worst episode above current-grade's worst: sighted 4 of 8, blind 5 of 8
+
+PUBLISHED BANDS  (validate.py's own rows)
+   Displacement                                   2997.5   2990-3000   inside
+   MFB50 at MBT (2500 rpm, 60 kPa)                   8.5   8-10   inside
+   Best BSFC (knock-feasible, lambda 1)            239.9   235-260   inside
+   Knock-limited spark (3000 rpm, 200 kPa)          11.0   8-14   inside
+   EGT, cruise band (min)                          724.1   600-750   inside
+   EGT, cruise band (max)                          787.7   600-750   OUTSIDE
+   Turbine housing time constant                    48.0   40-120   inside
+   Oil temperature, sustained climb                110.2   115-140   OUTSIDE
+   Oil time constant                                16.0   20-400   OUTSIDE
+   Coolant, thermostat-regulated                    94.5   88-108   inside
+   Coolant regulation response (NOT a free time constant)      9.5   1-600   inside
+   8 of 11 inside
+
+DRIVES  (data/manifest.csv): 10 in the manifest, 295.0 min, 7 with samples in the dataset
+
+WRITTEN
+   figures/study/index.html and page.html
+   figures/study/1_roads.png   2000 x 1280 px
+   figures/study/2_policies_c4.png   2000 x 1280 px
+   figures/study/3_fuel_c4.png   2000 x 1280 px
+   figures/study/numbers.txt   (this output)

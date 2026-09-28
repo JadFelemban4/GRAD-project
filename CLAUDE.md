@@ -2108,6 +2108,10 @@ plot_sim_vs_car.py    The simulator against the car's logs: five charts, each
 plot_agent_pairs.py   Phase D, D2 and C4 pair by pair: every agent a dot, every
                       verdict quoted by app/agent_catalog.py, nothing computed.
                       figures/agent_pairs/; its page is published the same way.
+plot_study_page.py    The whole study on one page (summary, the ablations, every
+                      policy, fuel, the roads, the simulator against the car,
+                      the drives, the caveats), built from this branch's
+                      results/. figures/study/; published the same way.
 results/PREREGISTRATION.md  Phase D's rules, committed before any agent trained.
 results/PREREGISTRATION_D2.md  Phase D2's rules, committed before any D2 agent
                       trained -- MEI set, power declared, ten limits, run log.

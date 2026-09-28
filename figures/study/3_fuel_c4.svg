@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" width="1000" height="640" role="img" aria-label="C4: median damage against median fuel for every policy" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+<rect x="0" y="0" width="1000" height="640" fill="#fcfcfb" class="f-surface"/>
+<text x="56.0" y="42.0" font-size="20" fill="#0b0b0b" class="f-ink" text-anchor="start" font-weight="600">C4: damage against fuel, every policy</text>
+<text x="56.0" y="70.0" font-size="13.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">medians over the twenty frozen episodes · a line joins the two agents of a pair · lower is less damage, left is less fuel</text>
+<rect x="56.00" y="86.00" width="33.20" height="23.00" rx="4" fill="#f0efec" class="f-tag" fill-opacity="1.0"/>
+<text x="65.0" y="102.0" font-size="11.5" fill="#0b0b0b" class="f-ink" text-anchor="start" font-weight="700">C4</text>
+<text x="99.2" y="102.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">C4: 300 000 training steps, not converged, the random climb</text>
+<text x="56.0" y="590.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">Each point is a policy's median on both axes, so it is not one episode, and the two medians need not come from the same episode. Fuel is</text>
+<text x="56.0" y="606.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">what the engine burned over the episode, in grams; it is one of the three things the agents are asked to weigh. The unprotected ECU is the</text>
+<text x="56.0" y="622.0" font-size="11.3" fill="#898781" class="f-muted" text-anchor="start" font-weight="400">baseline ECU. Data: results/c4_seed*.txt.</text>
+<circle cx="67.00" cy="142.00" r="4.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"></circle>
+<text x="86.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">sighted agent</text>
+<circle cx="216.00" cy="142.00" r="4.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"></circle>
+<text x="235.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">blind agent</text>
+<circle cx="351.00" cy="142.00" r="4.5" fill="#52514e" stroke="#fcfcfb" class="f-ink2 s-surface" stroke-width="2"></circle>
+<text x="370.0" y="146.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">hand-written policy</text>
+<line x1="100.0" y1="520.0" x2="850.0" y2="520.0" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="524.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">0</text>
+<line x1="100.0" y1="450.5" x2="850.0" y2="450.5" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="454.5" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">250</text>
+<line x1="100.0" y1="381.0" x2="850.0" y2="381.0" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="385.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">500</text>
+<line x1="100.0" y1="311.6" x2="850.0" y2="311.6" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="315.6" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">750</text>
+<line x1="100.0" y1="242.1" x2="850.0" y2="242.1" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="246.1" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">1,000</text>
+<line x1="100.0" y1="172.6" x2="850.0" y2="172.6" stroke="#e1e0d9" class="s-grid" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="91.0" y="176.6" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="end" font-weight="400">1,250</text>
+<text x="42.0" y="346.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400" transform="rotate(-90 42.0 346.0)">median damage</text>
+<line x1="626.9" y1="420.0" x2="218.1" y2="319.8" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="312.8" y1="383.8" x2="625.9" y2="406.1" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="218.1" y1="352.6" x2="274.4" y2="374.3" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="722.5" y1="426.6" x2="685.9" y2="422.9" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="567.8" y1="427.5" x2="413.1" y2="416.9" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="345.6" y1="397.0" x2="325.0" y2="397.1" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="520.9" y1="420.6" x2="573.4" y2="423.4" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="622.2" y1="418.4" x2="750.6" y2="419.1" stroke="#c3c2b7" class="s-axis" stroke-width="1.6" stroke-opacity="1.0" stroke-linecap="round"/>
+<circle cx="626.88" cy="419.98" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 0 sighted: fuel 5162 g, damage 359.9</title></circle>
+<circle cx="218.12" cy="319.76" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 0 blind: fuel 4726 g, damage 720.5</title></circle>
+<circle cx="312.81" cy="383.76" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 1 sighted: fuel 4827 g, damage 490.2</title></circle>
+<circle cx="625.94" cy="406.08" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 1 blind: fuel 5161 g, damage 409.9</title></circle>
+<circle cx="218.12" cy="352.64" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 2 sighted: fuel 4726 g, damage 602.2</title></circle>
+<circle cx="274.38" cy="374.26" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 2 blind: fuel 4786 g, damage 524.4</title></circle>
+<circle cx="722.50" cy="426.59" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 3 sighted: fuel 5264 g, damage 336.1</title></circle>
+<circle cx="685.94" cy="422.87" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 3 blind: fuel 5225 g, damage 349.5</title></circle>
+<circle cx="567.81" cy="427.51" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 4 sighted: fuel 5099 g, damage 332.8</title></circle>
+<circle cx="413.12" cy="416.89" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 4 blind: fuel 4934 g, damage 371.0</title></circle>
+<circle cx="345.62" cy="396.99" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 5 sighted: fuel 4862 g, damage 442.6</title></circle>
+<circle cx="325.00" cy="397.08" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 5 blind: fuel 4840 g, damage 442.3</title></circle>
+<circle cx="520.94" cy="420.62" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 6 sighted: fuel 5049 g, damage 357.6</title></circle>
+<circle cx="573.44" cy="423.40" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 6 blind: fuel 5105 g, damage 347.6</title></circle>
+<circle cx="622.19" cy="418.42" r="5.5" fill="#2a78d6" stroke="#fcfcfb" class="f-model s-surface" stroke-width="2"><title>seed 7 sighted: fuel 5157 g, damage 365.5</title></circle>
+<circle cx="750.62" cy="419.09" r="5.5" fill="#eb6834" stroke="#fcfcfb" class="f-car s-surface" stroke-width="2"><title>seed 7 blind: fuel 5294 g, damage 363.1</title></circle>
+<circle cx="304.38" cy="209.29" r="6.0" fill="#52514e" stroke="#fcfcfb" class="f-ink2 s-surface" stroke-width="2"><title>unprotected ECU: fuel 4818 g, damage 1118.0</title></circle>
+<text x="314.4" y="213.3" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">unprotected ECU</text>
+<circle cx="512.50" cy="334.41" r="6.0" fill="#52514e" stroke="#fcfcfb" class="f-ink2 s-surface" stroke-width="2"><title>reactive: fuel 5040 g, damage 667.8</title></circle>
+<text x="522.5" y="338.4" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">reactive</text>
+<circle cx="623.12" cy="338.38" r="6.0" fill="#52514e" stroke="#fcfcfb" class="f-ink2 s-surface" stroke-width="2"><title>current-grade: fuel 5158 g, damage 653.5</title></circle>
+<text x="633.1" y="342.4" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="start" font-weight="400">current-grade</text>
+<line x1="100.0" y1="520.0" x2="850.0" y2="520.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<line x1="100.0" y1="520.0" x2="100.0" y2="525.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="100.0" y="540.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">4,600</text>
+<line x1="287.5" y1="520.0" x2="287.5" y2="525.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="287.5" y="540.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">4,800</text>
+<line x1="475.0" y1="520.0" x2="475.0" y2="525.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="475.0" y="540.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">5,000</text>
+<line x1="662.5" y1="520.0" x2="662.5" y2="525.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="662.5" y="540.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">5,200</text>
+<line x1="850.0" y1="520.0" x2="850.0" y2="525.0" stroke="#c3c2b7" class="s-axis" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round"/>
+<text x="850.0" y="540.0" font-size="11.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">5,400</text>
+<text x="475.0" y="562.0" font-size="12.5" fill="#52514e" class="f-ink2" text-anchor="middle" font-weight="400">median fuel over the episode, g</text>
+</svg>

@@ -2013,6 +2013,15 @@ close.
 | "the charts comparing the simulation's results with our data" | five charts, each labelled with its kind of evidence: the gearbox and the boost pressure are independent checks, the compressor envelope and the enrichment map are fits, and the load residual is a consistency check (mistake 12). Every number is printed in `numbers.txt` | `plot_sim_vs_car.py`, `figures/sim_vs_car/` (`29c78d5`) |
 | "why not put it on a website" | the same page in the viewer's light or dark theme, safe on a phone, published privately at https://claude.ai/artifact/YWSKwwCEPAwg1oMXCVXTec | `figures/sim_vs_car/page.html` (`8c39617`) |
 | "add the agents' points and the seeds" | a second page: Phase D, D2 and C4, eight pairs each, every agent a dot, every verdict quoted by `app/agent_catalog.verdict()`, nothing computed. Published at https://claude.ai/artifact/6B2gRmzj4RT1ysLZoFNJMg; the two pages link to each other | `plot_agent_pairs.py`, `figures/agent_pairs/` (`3b5ccd8`) |
+| "something like this, but with my data", pointing at a page built from another branch | the same kind of page from this branch: summary tiles, the three ablations, every C4 policy's typical and worst episode, damage against fuel, the roads, the simulator against the car with a status table, the drives, the caveats. Its counts reproduce `CLAUDE.md`'s: C4 medians below current-grade's for 8 of 8 sighted and 7 of 8 blind agents; worst episodes above current-grade's worst for 4 of 8 and 5 of 8; `validate.py` 8 of 11. Published at https://claude.ai/artifact/9fCJ1tYWQLj3qrUsaQ5yeW | `plot_study_page.py`, `figures/study/` |
+
+**The page Jad pointed at is not this branch's.** It says it was built from
+`JMF-2340550 @ 480711b`. That commit is in neither this repository nor on
+GitHub, where `JMF-2340550` stands at `7f6c7f1`. Its experiment is a different
+one: five seeds, scored in points, trained at 110 km/h, with code changes this
+branch does not have (a gearbox kick-down, a refitted spark map). Its numbers
+will not match this branch's, and should not be compared as if they measured
+the same thing.
 
 ### Found, stated
 
@@ -2052,6 +2061,10 @@ close.
   high-speed, medium-dwell cell. Correcting a docstring is safe for the agents;
   it is left for a moment when no build is running in the tree.
 - The four new profiles are stubs until their owners fill them in.
+- The study page's second stage, each needing new simulator runs: the turbine
+  temperature through an episode, why 12 % at 130 km/h, and the training
+  curves; and three comparisons with the car not yet computed on this branch
+  (part-load spark, oil over a whole drive, the knock replay).
 - The next experiment (A, B or C) is still the team's decision, and B and C
   still need their one-at-a-time explanation to Jad.
 - The installed `/i-have-adhd` skill is the old version: it still says "Five
