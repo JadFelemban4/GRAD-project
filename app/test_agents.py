@@ -18,6 +18,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -37,6 +38,7 @@ from app import agent_api as API
 from app import agent_catalog as AC
 from app import agent_trace as T
 from app import jev as JEV
+from app import laya_bridge as LB
 from app import model_questions as MQ
 from check_premise import p_grade_now, p_neutral
 from engine_env import (ACT_HI, ACT_LO, OBS_DIM, OIL_PROTECT_K, PREVIEW_S, SLEW,
@@ -1648,7 +1650,7 @@ def tearDownModule():
 
 
 NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py", "model_questions.py",
-               "jev.py", "laya_worker.py")
+               "jev.py", "laya_worker.py", "laya_bridge.py")
 WRITE_PATTERNS = (
     (r"\bopen\s*\([^)]*,\s*(mode\s*=\s*)?['\"][^'\"]*[wax+]", "write-mode open"),
     (r"\.write\w*\s*\(", "write / write_text / write_bytes"),
@@ -1906,7 +1908,7 @@ class QuestionTests(unittest.TestCase):
         self.assertTrue(issubclass(MQ.BadAnswer, ValueError))
 
 
-MODEL_MODULES = ("model_questions.py", "jev.py", "laya_worker.py")
+MODEL_MODULES = ("model_questions.py", "jev.py", "laya_worker.py", "laya_bridge.py")
 RECORDED_DRIVE = ("app.replay", "app.reader", "app.estimator")
 
 
@@ -2464,6 +2466,13 @@ def _guard_loop(tree):
     raise AssertionError("laya_worker.py has no module-level loop over GUARDED")
 
 
+def _guard_source():
+    """The worker's module-level code up to and including the guard loop, as source."""
+    tree = _worker_tree()
+    i, _ = _guard_loop(tree)
+    return ast.unparse(ast.Module(body=tree.body[:i + 1], type_ignores=[]))
+
+
 class WorkerStaticTests(unittest.TestCase):
     """Spec test 19, the worker's half. The guard comes before torch and laya,
     replaces only the entry points this platform has, and a relative model
@@ -2499,9 +2508,7 @@ class WorkerStaticTests(unittest.TestCase):
         """The guard block alone, run in a fresh interpreter: asyncio still
         imports (a guard that ADDS socket.socket.sendmsg on Windows breaks it,
         and torch with it), and a connection is refused and counted."""
-        tree = _worker_tree()
-        i, _ = _guard_loop(tree)
-        guard = ast.unparse(ast.Module(body=tree.body[:i + 1], type_ignores=[]))
+        guard = _guard_source()
         probe = ("\nimport json as _json\nimport asyncio\n"
                  "try:\n    socket.create_connection(('127.0.0.1', 9))\n    _refused = False\n"
                  "except OSError:\n    _refused = True\n"
@@ -2528,6 +2535,408 @@ class WorkerStaticTests(unittest.TestCase):
         self.assertEqual(run.returncode, 1, run.stderr[-2000:])
         self.assertEqual(json.loads(run.stdout.splitlines()[0]),
                          {"ready": False, "error": "NotADirectoryError"})
+
+    def test_a_socket_objects_own_methods_are_refused_and_counted(self):
+        """create_connection is not the only way out. The guard block alone, in
+        a fresh interpreter, refuses a socket object's own connect, connect_ex
+        and sendto, and counts one attempt for each. Unguarded, connect_ex would
+        return an error number and a UDP sendto would succeed, so neither would
+        raise; an unguarded connect would raise with no count."""
+        probe = ("\nimport json as _json\n"
+                 "_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n"
+                 "_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n"
+                 "_got = {}\n"
+                 "for _name, _call, _args in (('connect', _tcp.connect, (('127.0.0.1', 9),)),\n"
+                 "        ('connect_ex', _tcp.connect_ex, (('127.0.0.1', 9),)),\n"
+                 "        ('sendto', _udp.sendto, (b'x', ('127.0.0.1', 9)))):\n"
+                 "    _before = _NET['attempts']\n"
+                 "    try:\n"
+                 "        _call(*_args)\n"
+                 "        _got[_name] = 'not refused'\n"
+                 "    except OSError:\n"
+                 "        _got[_name] = _NET['attempts'] - _before\n"
+                 "_tcp.close()\n"
+                 "_udp.close()\n"
+                 "print(_json.dumps(_got))\n")
+        run = subprocess.run([sys.executable, "-I", "-B", "-c", _guard_source() + probe],
+                             capture_output=True, text=True, timeout=60)
+        self.assertEqual(run.returncode, 0, run.stderr[-2000:])
+        self.assertEqual(json.loads(run.stdout.strip().splitlines()[-1]),
+                         {"connect": 1, "connect_ex": 1, "sendto": 1})
+
+    def test_no_app_module_imports_the_worker(self):
+        """Importing laya_worker replaces socket entry points for the WHOLE
+        process, so no module in app/ may import it: the server only ever
+        starts it as another process, under Laya's own python."""
+        def names_worker(name):
+            parts = name.split(".")
+            return parts[0] == "laya_worker" or parts[:2] == ["app", "laya_worker"]
+
+        found = []
+        for path in sorted((ROOT / "app").glob("*.py")):
+            if path.name != "laya_worker.py":
+                found += [f"{path.name} {n}" for n in
+                          sorted(_imports(path.read_text(encoding="utf-8"))) if names_worker(n)]
+        self.assertEqual(found, [])
+        probe = "from app import laya_worker\nfrom .laya_worker import main\nimport laya_worker\n"
+        self.assertEqual(sorted(n for n in _imports(probe) if names_worker(n)),
+                         ["app.laya_worker", "app.laya_worker.main", "laya_worker"],
+                         "the scan must be able to fail")
+        self.assertEqual([m for m in ("app.laya_worker", "laya_worker") if m in sys.modules], [],
+                         "this process, which imports the server's modules, has the worker loaded")
+
+
+# ---- M3: the Laya bridge (spec tests 15 fairness, 18, 19 print scan, 20) ----
+#
+# The fake worker speaks the real worker's protocol. It is a string, run by
+# this interpreter with -I -c, so no file is added to app/ and test 11's
+# snapshot stays valid. Its mode is argv[1].
+
+FAKE_WORKER = r'''
+import json, os, sys, time
+mode = sys.argv[1]
+
+
+def send(obj):
+    print(json.dumps(obj), flush=True)
+
+
+if mode == "hang_start":
+    time.sleep(60)
+if mode == "exit_start":
+    sys.exit(3)
+if mode == "bad_ready":
+    send({"ready": False, "error": "ImportError"})
+    sys.exit(0)
+send({"ready": True, "device": "fake", "laya": "0.0.0", "load_s": 0.0,
+      "env": {k: os.environ.get(k) for k in ("TYPESAFE_API_KEY", "HF_TOKEN",
+                                            "HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE")}})
+for line in sys.stdin:
+    req = json.loads(line)
+    if mode == "hang_answer":
+        time.sleep(60)
+    if mode == "eof":
+        sys.exit(0)
+    rid = req["id"] + (100 if mode == "badid" else 0)
+    if mode in ("error", "value_error"):
+        send({"id": rid, "ok": False, "net_attempts": 0,
+              "error": "WeirdError" if mode == "error" else "ValueError"})
+        continue
+    answers = {}
+    for qid, q in req["questions"].items():
+        keys = list(q["criteria"])
+        pick = (keys[-1] if mode == "order" else "retard 5 deg" if mode == "bad_choice"
+                else sorted(keys)[0])
+        answers[qid] = {"choice": pick, "confidence": 0.5, "answer_confidence": 0.6,
+                        "probabilities": {k: (0.6 if k == pick else 0.1) for k in keys}}
+    send({"id": rid, "ok": True, "device": "fake", "ms": 1.0, "model": "fake-laya",
+          "answers": answers, "usage": {"input_tokens": 1, "output_tokens": 0},
+          "net_attempts": 1 if mode == "net" else 0})
+'''
+
+LAYA_KEYS = {"model_name", "laya", "device", "ms", "started_s", "answers", "answers_reversed",
+             "usage", "sent"}
+
+
+def _fake_bridge(mode, **kw):
+    """A LayaBridge whose worker is FAKE_WORKER in `mode`, run by this interpreter."""
+    return LB.LayaBridge(command=[sys.executable, "-I", "-c", FAKE_WORKER, mode], **kw)
+
+
+class _Spawned:
+    """Popen, recorded: every process a bridge starts goes through the real Popen."""
+
+    def __init__(self):
+        self.procs = []
+        self._popen = subprocess.Popen
+
+    def __call__(self, *args, **kwargs):
+        proc = self._popen(*args, **kwargs)
+        self.procs.append(proc)
+        return proc
+
+    def patch(self):
+        return mock.patch.object(LB.subprocess, "Popen", side_effect=self)
+
+
+def _tree_snapshot(root):
+    """{relative path: (size, mtime_ns)} for every file under root."""
+    out = {}
+    for p in root.rglob("*"):
+        if p.is_file():
+            st = p.stat()
+            out[p.relative_to(root).as_posix()] = (st.st_size, st.st_mtime_ns)
+    return out
+
+
+class BridgeTests(unittest.TestCase):
+    """Spec test 18: the bridge, against the fake worker. Nothing touches Laya."""
+
+    def ask_fails(self, bridge, code, kind=None):
+        with self.assertRaises(LB.LayaError) as caught:
+            bridge.ask(_obs_trace(5), 1)
+        self.assertEqual((caught.exception.code, caught.exception.kind), (code, kind))
+
+    def test_construction_reads_and_spawns_nothing(self):
+        refuse = AssertionError("the constructor must do no I/O")
+        with mock.patch.object(LB, "load_home", side_effect=refuse), \
+                mock.patch.object(LB, "user_setting", side_effect=refuse), \
+                mock.patch.object(LB.subprocess, "Popen", side_effect=refuse):
+            bridge = LB.LayaBridge()
+            fake = _fake_bridge("ok")
+        self.assertEqual((bridge.spawns, fake.spawns), (0, 0))
+        self.assertIsNone(bridge.ready)
+
+    def test_status_never_spawns(self):
+        spawned = _Spawned()
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            python = home / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+            python.parent.mkdir(parents=True)
+            python.write_text("", encoding="utf-8")
+            (home / "models" / "multilingual").mkdir(parents=True)
+            (home / "models" / "multilingual" / "rl_agent_config.json").write_text("{}", encoding="utf-8")
+            with spawned.patch(), mock.patch.dict(os.environ, {"LAYA_HOME": tmp}):
+                real, fake = LB.LayaBridge(), _fake_bridge("ok")
+                seen = [b.status() for b in (real, fake, real, fake, real, fake)]
+        self.assertEqual(spawned.procs, [])
+        self.assertEqual((real.spawns, fake.spawns), (0, 0))
+        self.assertEqual(seen[0], {"configured": True, "source": "env", "problem": None,
+                                   "worker": "stopped", "device": None, "laya": None})
+        self.assertEqual(seen[1], {"configured": True, "source": "command", "problem": None,
+                                   "worker": "stopped", "device": None, "laya": None})
+
+    def test_not_configured_and_inside_the_repository(self):
+        spawned = _Spawned()
+        with tempfile.TemporaryDirectory() as tmp, spawned.patch(), \
+                mock.patch.dict(os.environ, {"APPDATA": tmp}):
+            os.environ.pop("LAYA_HOME", None)
+            bridge = LB.LayaBridge()
+            self.assertEqual(bridge.status(), {"configured": False, "source": None,
+                                               "problem": "not_configured", "worker": "stopped",
+                                               "device": None, "laya": None})
+            self.ask_fails(bridge, "not_configured")
+            os.environ["LAYA_HOME"] = str(ROOT)
+            inside = LB.LayaBridge()
+            got = inside.status()
+            self.assertEqual((got["configured"], got["source"], got["problem"]),
+                             (True, "env", "not_found"))
+            self.ask_fails(inside, "not_found")
+        self.assertEqual((bridge.spawns, inside.spawns, spawned.procs), (0, 0, []))
+
+    def test_first_ask_spawns_and_the_second_reuses(self):
+        trace = _obs_trace(5)
+        bridge = _fake_bridge("ok")
+        self.addCleanup(bridge.close)
+        first, second = bridge.ask(trace, 3), bridge.ask(trace, 3)
+        self.assertEqual(bridge.spawns, 1)
+        self.assertEqual(set(first), LAYA_KEYS)
+        self.assertIsInstance(first["started_s"], float)
+        self.assertIsNone(second["started_s"])
+        self.assertEqual((first["model_name"], first["laya"], first["device"]),
+                         ("fake-laya", "0.0.0", "fake"))
+        self.assertEqual(first["usage"], [{"input_tokens": 1, "output_tokens": 0}] * 2)
+        self.assertEqual(first["answers"], first["answers_reversed"], "ok mode: every action held")
+        self.assertEqual(bridge.status()["worker"], "ready")
+
+        order = _fake_bridge("order")
+        self.addCleanup(order.close)
+        got = order.ask(trace, 3)
+        for qid in MQ.IDS:
+            with self.subTest(qid=qid):
+                self.assertEqual(got["answers"][qid]["choice"], MQ.KEYS[qid][-1])
+                self.assertEqual(got["answers_reversed"][qid]["choice"], MQ.KEYS[qid][0])
+
+    def test_start_timeout_kills_and_the_next_ask_respawns(self):
+        spawned = _Spawned()
+        with spawned.patch():
+            bridge = _fake_bridge("hang_start", start_timeout=1)
+            self.addCleanup(bridge.close)
+            self.ask_fails(bridge, "start_timeout")
+            self.assertIsNotNone(spawned.procs[0].poll(), "the hung worker was not killed")
+            got = bridge.status()
+            self.assertEqual((got["worker"], got["problem"]), ("failed", "start_timeout"))
+            self.ask_fails(bridge, "start_timeout")
+            self.assertEqual(bridge.spawns, 2)
+            for mode in ("exit_start", "bad_ready"):
+                with self.subTest(mode=mode):
+                    other = _fake_bridge(mode)
+                    self.addCleanup(other.close)
+                    self.ask_fails(other, "start_failed")
+                    self.assertIsNotNone(spawned.procs[-1].poll())
+                    got = other.status()
+                    self.assertEqual((got["worker"], got["problem"]), ("failed", "start_failed"))
+
+    def test_answer_timeout_kills_and_the_next_ask_respawns(self):
+        spawned = _Spawned()
+        with spawned.patch(), mock.patch.object(LB.atexit, "register") as register:
+            bridge = _fake_bridge("hang_answer", answer_timeout=1)
+            self.addCleanup(bridge.close)
+            self.ask_fails(bridge, "timeout")
+            self.assertIsNotNone(spawned.procs[0].poll(), "the hung worker was not killed")
+            self.assertEqual(bridge.status()["worker"], "stopped")
+            self.ask_fails(bridge, "timeout")
+            self.assertEqual(bridge.spawns, 2)
+        register.assert_called_once_with(bridge.close)
+
+    def test_worker_errors(self):
+        spawned = _Spawned()
+        with spawned.patch():
+            for mode, code, kind in (("error", "worker_error", "other"),
+                                     ("value_error", "worker_error", "ValueError"),
+                                     ("bad_choice", "bad_answer", None)):
+                with self.subTest(mode=mode):
+                    bridge = _fake_bridge(mode)
+                    self.addCleanup(bridge.close)
+                    self.ask_fails(bridge, code, kind)
+                    self.assertIsNone(spawned.procs[-1].poll(), f"{mode} must not kill the worker")
+                    self.assertEqual(bridge.status()["worker"], "ready")
+            for mode, code in (("eof", "worker_died"), ("badid", "bad_answer"),
+                               ("net", "network_attempt")):
+                with self.subTest(mode=mode):
+                    bridge = _fake_bridge(mode)
+                    self.addCleanup(bridge.close)
+                    self.ask_fails(bridge, code)
+                    self.assertIsNotNone(spawned.procs[-1].poll(), f"{mode} must kill the worker")
+                    self.assertEqual(bridge.status()["worker"], "stopped")
+
+    def test_close_ends_the_worker(self):
+        spawned = _Spawned()
+        with spawned.patch():
+            bridge = _fake_bridge("ok")
+            bridge.ask(_obs_trace(5), 1)
+        t0 = time.perf_counter()
+        bridge.close()
+        self.assertLess(time.perf_counter() - t0, 5.0)
+        self.assertIsNotNone(spawned.procs[0].returncode)
+        self.assertEqual(bridge.status()["worker"], "stopped")
+        bridge.close()
+
+    def test_a_killed_server_leaves_no_worker(self):
+        """A server that dies without close() -- Stop-Process, a crash: its end
+        of the worker's stdin closes with it, and the worker reads EOF and
+        exits. The worker writes to the server's own stderr, so that pipe
+        reaches EOF only when the worker has exited too."""
+        server = ("import sys\n"
+                  "import numpy as np\n"
+                  "from app import agent_api as API, laya_bridge as LB\n"
+                  "rows = np.zeros((1, 23), dtype=np.float32)\n"
+                  "bridge = LB.LayaBridge(command=[sys.executable, '-I', '-c', sys.argv[1], 'ok'])\n"
+                  "bridge.ask(API.Trace(('runs_c4', 5, 1), [], [], [rows, rows], 'cpu', {}), 0)\n"
+                  "print(bridge._proc.pid, flush=True)\n"
+                  "sys.stdin.read()\n")
+        proc = subprocess.Popen([sys.executable, "-c", server, FAKE_WORKER], cwd=ROOT,
+                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, text=True,
+                                env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        line = proc.stdout.readline().strip()
+        if not line.isdigit():
+            proc.kill()
+            self.fail("the stand-in server did not ask: " + proc.communicate(timeout=60)[1][-2000:])
+        proc.kill()
+        proc.wait(10)
+        t0 = time.perf_counter()
+        try:
+            proc.communicate(timeout=10)
+            outlived = False
+        except subprocess.TimeoutExpired:
+            os.kill(int(line), signal.SIGTERM)
+            outlived = True
+        self.assertFalse(outlived, "the worker outlived its server by 10 s")
+        self.assertLess(time.perf_counter() - t0, 5.0)
+
+    def test_the_worker_never_sees_the_key(self):
+        with mock.patch.dict(os.environ, {"TYPESAFE_API_KEY": SENTINEL_KEY,
+                                          "HF_TOKEN": "hf-sentinel"}):
+            bridge = _fake_bridge("ok")
+            self.addCleanup(bridge.close)
+            bridge.ask(_obs_trace(5), 1)
+            env = LB.worker_env("C:/x")
+        self.assertEqual(bridge.ready["env"], {"TYPESAFE_API_KEY": None, "HF_TOKEN": None,
+                                               "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"})
+        self.assertNotIn("TYPESAFE_API_KEY", env)
+        self.assertNotIn("HF_TOKEN", env)
+        self.assertEqual(Path(env["HF_HOME"]), Path("C:/x") / ".cache" / "huggingface")
+        self.assertEqual({k: env[k] for k in LB.OFFLINE}, LB.OFFLINE)
+
+
+class FairnessTests(unittest.TestCase):
+    """Spec test 15, fairness: both models get the same state and the same questions."""
+
+    def test_both_models_get_the_same_question(self):
+        trace = _obs_trace(5)
+        bridge = _fake_bridge("ok")
+        self.addCleanup(bridge.close)
+        sent = bridge.ask(trace, 3)["sent"]
+        body = JEV.build_request(trace, 3)
+        self.assertEqual(sent[0]["state"], body["state"])
+        self.assertEqual(sent[1]["state"], body["state"])
+        self.assertIs(body["questions"], MQ.QUESTIONS)
+        self.assertIs(sent[0]["questions"], MQ.QUESTIONS)
+        self.assertIs(sent[1]["questions"], MQ.QUESTIONS_REVERSED)
+
+
+class PrintScanTests(unittest.TestCase):
+    """Spec test 19 across app/: the lab's read-only scan cannot see
+    print(file=...), so this one does. Every such print outside the tests goes
+    to sys.stderr, except the worker's protocol stream and the bridge's pipe
+    into the worker, neither of which is a path to the vehicle."""
+
+    def test_only_two_prints_leave_stderr(self):
+        found = set()
+        for path in sorted((ROOT / "app").glob("*.py")):
+            if path.name.startswith("test_"):
+                continue
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if isinstance(node, ast.Call) and getattr(node.func, "id", None) == "print":
+                    found |= {(path.name, ast.unparse(k.value)) for k in node.keywords
+                              if k.arg == "file" and ast.unparse(k.value) != "sys.stderr"}
+        self.assertEqual(found, {("laya_worker.py", "proto"), ("laya_bridge.py", "proc.stdin")})
+
+    def test_the_bridge_imports_no_network_module(self):
+        source = (ROOT / "app" / "laya_bridge.py").read_text(encoding="utf-8")
+        self.assertEqual(_net_hits("laya_bridge.py", source), [])
+
+
+@unittest.skipUnless(FULL, "the real Laya runs only under --full")
+class LayaRealTests(unittest.TestCase):
+    """Spec test 20: the real worker on a real trace. LAYA_HOME comes from this
+    process's environment only, and nothing may change under it."""
+
+    def test_real_laya(self):
+        if not os.environ.get("LAYA_HOME"):
+            self.skipTest("LAYA_HOME is not set in this process, so the real Laya is UNPROVEN "
+                          "here: run LAYA_HOME=<Laya's folder> python -m app.test_agents --full")
+        home = Path(os.environ["LAYA_HOME"]).resolve()
+        before = _tree_snapshot(home)
+        trace = _obs_trace(200)
+        spawned = _Spawned()
+        with spawned.patch():
+            bridge = LB.LayaBridge()
+            try:
+                first = bridge.ask(trace, 190)
+                ready = dict(bridge.ready)
+                again = bridge.ask(trace, 190)
+            finally:
+                bridge.close()
+        self.assertIs(ready["ready"], True)
+        self.assertIn(ready["device"].split(":")[0], ("cuda", "cpu"))
+        self.assertEqual(bridge.spawns, 1)
+        self.assertIsInstance(first["started_s"], float)
+        self.assertIsNone(again["started_s"])
+        self.assertEqual(set(first["answers"]), set(MQ.IDS))
+        self.assertEqual((again["answers"], again["answers_reversed"]),
+                         (first["answers"], first["answers_reversed"]), "Laya is deterministic")
+        for usage in first["usage"] + again["usage"]:
+            self.assertLessEqual(usage["input_tokens"], 5 * 800)
+        self.assertEqual([p.poll() is not None for p in spawned.procs], [True])
+        self.assertEqual(_tree_snapshot(home), before, "something under LAYA_HOME changed")
+        held = {q: "held" if first["answers"][q]["choice"] == first["answers_reversed"][q]["choice"]
+                else "changed" for q in MQ.IDS}
+        print(f"\n    Laya: {ready['device']}, laya {ready['laya']}, first load "
+              f"{first['started_s']} s, both requests {first['ms']} ms then {again['ms']} ms, "
+              f"input tokens {first['usage'][0]['input_tokens']}; order check (an observation, "
+              f"not asserted): {held}", file=sys.stderr)
 
 
 def _shape(x):

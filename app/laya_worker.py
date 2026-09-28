@@ -19,8 +19,14 @@ attempt and raises OSError. Each reply carries the running count, and the
 bridge kills a worker whose count is not zero. An entry point the platform
 does not have is left absent: socket.socket has no sendmsg on Windows, and
 adding one sends asyncio down its Unix branch (os.sysconf), so `import torch`
-failed (measured 28 September). The count sees Python's socket API only; a
-native library that opens its own connection is not seen by it.
+failed (measured 28 September). The count sees Python's socket API only: a
+native library that opens its own connection is not seen by it. Nor is
+asyncio's proactor on Windows, which connects through the overlapped
+module's ConnectEx, so a connection an event loop makes to a numeric address
+calls no guarded entry point (measured 29 September on a loop built before
+the guard: refused by the OS, attempts 0). In this worker no loop can exist
+to do that: on Windows a loop's self-pipe is a loopback socketpair, which the
+guard refuses and counts, so no event loop can be built after it.
 """
 import socket
 
