@@ -116,6 +116,18 @@ table was the example that did it: run alone, it would have said preview saves
 361 damage units, while the other seven said no. **Say "eight pairs" rather
 than "sixteen agents" or "eight seeds" when talking to me.**
 
+28 September, after seeing all three experiments listed on the agent page and
+saying I was confused: **the difference between Phase D, D2 and C4**, through a
+speed bump on the road to the university and two drivers, one with eyes open and
+one with eyes closed. Phase D: the bump is in the same place every day, so the
+closed-eyes driver can memorise it (the "blind" arm was not really blind), short
+training. D2: the bump moves and changes height every day, so it cannot be
+memorised, same short training. C4: D2 with six times the training. Asked why
+the team re-ran Phase D with a moving bump, I answered "so the agent does not
+memorise" — right; the small addition I needed: it is the BLIND agent that must
+not memorise, so that seeing the road is the only difference left between the
+two.
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing, BTDC/ATDC;
