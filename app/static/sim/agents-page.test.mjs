@@ -116,6 +116,14 @@ test('the honesty lines are in the markup itself, not only written by script', (
     ['chase-caption', 'agents.scene.slope'],
     ['model-caveat', 'seed.model_output'],
     ['footer-index', 'agents.footer.index'],
+    // M3 (design 7.7): the models panel's honesty lines, in the markup like
+    // the others, so they are there the moment the panel is shown.
+    ['models-not-thesis', 'agents.models.not_thesis'],
+    ['models-claim', 'agents.models.claim'],
+    ['models-levels', 'agents.models.levels'],
+    ['model-jev-text', 'agents.models.jev.text'],
+    ['model-laya-text', 'agents.models.laya.text'],
+    ['model-laya-check', 'agents.models.laya.check'],
   ]) {
     const tag = html.match(new RegExp(`<[^>]*\\bid="${id}"[^>]*>`));
     assert.ok(tag, `#${id} is missing`);
@@ -168,4 +176,22 @@ test('the profile ticks and the chase posts share one ramp, in both themes', () 
   const tokens = [...css.matchAll(/--agent-ramp-(?:lo|hi):#([0-9a-f]{6})/g)].map(m => m[1]);
   assert.equal(tokens.length, 6, 'lo and hi in each of the three theme blocks');
   for (const hex of tokens) assert.ok(ramp[0].includes(`0x${hex}`), `#${hex} is not in agent-scene.mjs's RAMP`);
+});
+
+// M3 (design 7.2, the agents.css row). Below 1100 px .agents-layout is one
+// flex column with align-items:start, so a panel hugs the start edge unless it
+// stretches; the models panel comes after the pause panel there; its two
+// columns fold into one on a phone; and ten fast taps on the footer label
+// must not zoom the page.
+test('the models panel stretches, comes after the pause panel below 1100 px, and the footer label never zooms', () => {
+  const css = read(new URL('./agents.css', import.meta.url));
+  assert.match(css, /\.pause-panel,\.models-panel\{background:var\(--paper\)/, 'the models panel is a card like the pause panel');
+  assert.match(css, /(?:^|\})\.models-panel\{align-self:stretch\}/m);
+  const narrow = css.match(/@media\(max-width:1099px\)\{([\s\S]*?)\n\}/);
+  assert.ok(narrow, 'agents.css has no <1100 px block');
+  const order = name => Number((narrow[1].match(new RegExp(`\\.${name}\\{order:(\\d+)\\}`)) || [])[1]);
+  assert.equal(order('models-panel'), 7);
+  assert.ok(order('models-panel') > order('pause-panel'), 'the models panel follows the pause panel');
+  assert.match(css, /@media\(max-width:760px\)\{\s*\.models-columns\{grid-template-columns:1fr\}/);
+  assert.match(css, /(?:^|\})\.footer-index\{[^}]*touch-action:manipulation/m);
 });

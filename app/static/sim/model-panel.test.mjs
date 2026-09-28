@@ -197,6 +197,28 @@ test('failureOf: a known code keeps only its code, integer status and kind; anyt
   assert.deepEqual(failureOf(undefined, undefined), { code: 'server_down', status: null, kind: null });
 });
 
+// The server already maps any other worker kind to 'other' (app/laya_bridge.py
+// KINDS); the page does not rest on that. Whatever string arrives as `kind`,
+// only the four names the server can send are ever shown.
+test('failureOf: a kind is one of the four names the server can send, and any other string is other', () => {
+  for (const kind of ['ValueError', 'RuntimeError', 'OutOfMemoryError', 'other']) {
+    assert.equal(failureOf(502, { model: 'laya', code: 'worker_error', kind }).kind, kind);
+  }
+  for (const kind of ['OSError', 'valueerror', 'ValueError: bad', 'Traceback (most recent call last)',
+    'C:/Users/admin/secret', '', 'toString', '__proto__', 'constructor']) {
+    assert.equal(failureOf(502, { model: 'laya', code: 'worker_error', kind }).kind, 'other', JSON.stringify(kind));
+  }
+  for (const kind of [42, true, ['ValueError'], { name: 'ValueError' }, null, undefined]) {
+    assert.equal(failureOf(502, { model: 'laya', code: 'worker_error', kind }).kind, null, JSON.stringify(kind));
+  }
+  const odd = failureOf(502, { model: 'laya', code: 'worker_error', kind: 'OSError: C:/Users/admin/secret' });
+  for (const lang of LANGS) {
+    const text = errorText(odd.code, odd.status, lang, odd.kind);
+    assert.match(text, /\(other\)/);
+    assert.doesNotMatch(text, /OSError|secret/);
+  }
+});
+
 test('errorText: «لا جواب — code: sentence», credit named on vendor_status, nothing substituted', () => {
   const credit = failureOf(502, { model: 'jev', code: 'vendor_status', status: 402 });
   assert.equal(errorText(credit.code, credit.status, 'ar', credit.kind),

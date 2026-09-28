@@ -30,6 +30,10 @@ import {
   computeState, experimentOptions, experimentNote, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
   refusedPairs, scoredKey, blindLabelKey, notBlindCite,
 } from './agent-picker.mjs';
+import { createTapUnlock } from './tap-unlock.mjs';
+import {
+  MODELS, askState, createAnswers, rowView, failureOf, errorText, statusLine,
+} from './model-panel.mjs';
 
 const $ = id => document.getElementById(id);
 const POLL_MS = 400;
@@ -74,6 +78,20 @@ const state = {
   drawnTime: -1,
   wasPlaying: false,
   rows: [],        // the five action rows of the pause panel, built per meta
+};
+
+// M3: jev and Laya, behind ten taps on the footer label (design 7.7). The
+// unlock lives only in this module variable, so a reload forgets it; the
+// gesture hides the panel and protects nothing. Each model has its own
+// status, its own request in flight and its own answers, one per second of
+// the episode on screen, so a jev failure never touches Laya's column and the
+// reverse. Nothing here is saved, averaged, applied or compared with the
+// agents.
+const models = {
+  unlocked: false,
+  gesture: createTapUnlock({ taps: 10, windowMs: 4000 }),
+  jev: { status: null, statusFailure: null, inFlight: false, answers: createAnswers(), drawn: null },
+  laya: { status: null, statusFailure: null, inFlight: false, answers: createAnswers(), drawn: null },
 };
 
 // ---------------------------------------------------------------- helpers
@@ -197,6 +215,7 @@ function compute() {
   state.device = null;
   state.versions = null;
   state.lastK = -2;
+  for (const name of MODELS) models[name].answers.clear();
   showError(null);
   const prompt = $('scene-prompt');
   if (prompt) prompt.hidden = true;
@@ -457,6 +476,7 @@ function clearEpisode() {
   state.versions = null;
   state.lastK = -2;
   state.drawnTime = -1;
+  for (const name of MODELS) models[name].answers.clear();
   const profile = $('profile');
   if (profile) profile.textContent = '';
   state.profile = null;
@@ -1024,6 +1044,184 @@ function renderPanel(k) {
   renderSeen(frame);
   renderReadings(frame);
   renderStopped();
+  renderModels();
+}
+
+// ---------------------------------------------------------------- models (M3)
+// Every id is written out, so app/test_agents.py's id scan can see it; never
+// build one with a template literal.
+function modelNodes(name) {
+  return name === 'jev'
+    ? {
+      name: $('model-jev-name'), where: null, status: $('model-jev-status'), ask: $('ask-jev'),
+      reason: $('model-jev-reason'), latency: $('model-jev-latency'), error: $('model-jev-error'),
+      rows: $('model-jev-rows'), sent: $('model-jev-sent-body'),
+    }
+    : {
+      name: $('model-laya-name'), where: $('model-laya-where'), status: $('model-laya-status'), ask: $('ask-laya'),
+      reason: $('model-laya-reason'), latency: $('model-laya-latency'), error: $('model-laya-error'),
+      rows: $('model-laya-rows'), sent: $('model-laya-sent-body'),
+    };
+}
+
+// What askState (model-panel.mjs) decides from: playback stopped is the play
+// button showing play, the predicate syncPlayButton uses, which also holds at
+// the natural end of an episode, where userPaused stays false (design C10).
+function askView(name) {
+  return {
+    playing: state.play.clock.playing, waiting: isWaiting(), done: state.done,
+    frames: state.frames, inFlight: models[name].inFlight,
+  };
+}
+
+async function loadModelStatus(name) {
+  const m = models[name];
+  try {
+    const res = await fetch(`/api/agents/${name}/status`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    const body = await res.json().catch(() => null);
+    if (res.status === 200 && body) { m.status = body; m.statusFailure = null; } else m.statusFailure = failureOf(res.status, body);
+  } catch (err) {
+    m.statusFailure = failureOf(null, null);
+  }
+  renderModels();
+}
+
+// One press: the paused second of the episode on screen, and nothing else.
+// The key, the second and the load token are taken at press time; an answer
+// is kept only if no «احسب» or pick moved loadToken while it was in flight,
+// so a late answer (a paid one included) is never shown against another
+// episode. inFlight is reset however the request ends.
+async function askModel(name) {
+  const m = models[name];
+  const k = state.lastK;
+  const key = state.metaKey;
+  if (key === null || !askState(askView(name), k).enabled) return;
+  const token = state.loadToken;
+  m.inFlight = true;
+  renderModels();
+  let entry;
+  try {
+    const res = await fetch(`/api/agents/${name}`, {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ trace: key, step: k }),
+    });
+    const body = await res.json().catch(() => null);
+    entry = res.status === 200 && body && body.answers ? { body } : { failure: failureOf(res.status, body) };
+  } catch (err) {
+    entry = { failure: failureOf(null, null) };
+  }
+  m.inFlight = false;
+  if (token === state.loadToken) m.answers.put(key, k, entry);
+  // A Laya answer is itself proof that its worker is loaded, so the status
+  // line says so now rather than "loads on the first question" beside the
+  // answer. The re-fetch below stays the authority: a press may have started,
+  // stopped or failed the worker.
+  if (name === 'laya' && entry.body) {
+    m.status = {
+      ...(m.status || {}), configured: true, worker: 'ready', problem: null,
+      device: entry.body.device ?? null, laya: entry.body.laya ?? null,
+    };
+    m.statusFailure = null;
+  }
+  if (name === 'laya') loadModelStatus('laya').catch(err => console.error(err));
+  renderModels();
+}
+
+// One row per action, in ACTIONS order, with the pause panel's own labels and
+// units: what the two agents applied in this second (nothing subtracted), the
+// model's choice in physical and network units, five bars labelled with the
+// physical levels, the chosen option's probability, and, for Laya, the choice
+// with the options reversed and whether it held. Model levels are never drawn
+// on the agents' gauges.
+function renderModelRows(host, body, frame) {
+  host.textContent = '';
+  if (!body) return;
+  ACTIONS.forEach((action, i) => {
+    const v = rowView(body, i);
+    if (!v) return;
+    const row = el('div', 'model-row');
+    const head = el('div', 'action-head');
+    head.appendChild(el('span', 'action-label', t(currentLang, action.label)));
+    if (action.unit) {
+      const unit = el('span', 'action-unit', action.unit);
+      unit.dir = 'ltr';
+      head.appendChild(unit);
+    }
+    row.appendChild(head);
+    const ref = el('p', 'model-reference', t(currentLang, 'agents.models.reference'));
+    LANES.forEach((lane, j) => {
+      const car = carOf(frame, j);
+      const span = el('span', lane);
+      const value = el('b', '', fmtAction(i, car ? car.act?.[i] : null));
+      value.dir = 'ltr';
+      span.append(el('i', 'lane-dot'), value);
+      ref.appendChild(span);
+    });
+    row.appendChild(ref);
+    row.appendChild(el('p', 'model-choice',
+      t(currentLang, 'agents.models.choice', { level: fmtAction(i, v.level), net: fmt(v.net, 3) })));
+    const bars = el('div', 'model-bars');
+    for (const b of v.bars) {
+      const bar = el('div', b.chosen ? 'model-bar chosen' : 'model-bar');
+      const fill = el('i');
+      fill.style.width = `${(Math.max(0, Math.min(1, num(b.p) ?? 0)) * 100).toFixed(1)}%`;
+      bar.append(el('span', 'bar-label', fmtAction(i, b.level)), fill, el('span', 'bar-p', fmt(b.p, 2)));
+      bars.appendChild(bar);
+    }
+    row.appendChild(bars);
+    row.appendChild(el('p', 'model-chosen-p', t(currentLang, 'agents.models.chosen_p', { p: fmt(v.chosenP, 2) })));
+    if (v.reversed) {
+      const order = el('p', 'model-order');
+      order.append(el('span', '', t(currentLang, 'agents.models.reversed', { level: fmtAction(i, v.reversed.level) })),
+        el('b', v.verdict, t(currentLang, v.verdict === 'held' ? 'agents.models.held' : 'agents.models.changed')));
+      row.appendChild(order);
+    }
+    host.appendChild(row);
+  });
+}
+
+// Both columns, each from its own state only. Returns at once while locked,
+// so the locked page is M2's page.
+function renderModels() {
+  if (!models.unlocked) return;
+  const k = state.lastK;
+  const key = state.metaKey;
+  const frame = k >= 0 ? state.frames[k] || null : null;
+  for (const name of MODELS) {
+    const m = models[name];
+    const n = modelNodes(name);
+    const entry = key !== null && k >= 0 ? m.answers.get(key, k) : null;
+    const body = entry?.body ?? null;
+    const s = askState(askView(name), k);
+    if (n.ask) n.ask.disabled = !s.enabled;
+    setText(n.reason, s.enabled ? (entry ? '' : t(currentLang, 'agents.models.ask_this')) : t(currentLang, s.reason));
+    setText(n.status, statusLine(name, m.status, m.statusFailure, m.inFlight, currentLang));
+    if (name === 'jev') {
+      setText(n.name, t(currentLang, 'agents.models.jev.name', { model: body?.model_name || m.status?.model || EM_DASH }));
+      setText(n.latency, body ? t(currentLang, 'agents.models.jev.latency', { ms: fmt(body.ms, 0) }) : '');
+    } else {
+      const device = body?.device || m.status?.device || t(currentLang, 'agents.models.laya.device_unknown');
+      setText(n.name, t(currentLang, 'agents.models.laya.name', {
+        model: body?.model_name || EM_DASH, version: body?.laya || m.status?.laya || EM_DASH,
+      }));
+      setText(n.where, t(currentLang, 'agents.models.laya.where', { device }));
+      const first = body && num(body.started_s) !== null
+        ? ` · ${t(currentLang, 'agents.models.laya.first_load', { s: fmt(body.started_s, 1) })}` : '';
+      setText(n.latency, body
+        ? `${t(currentLang, 'agents.models.laya.latency', { ms: fmt(body.ms, 0), device: body.device || EM_DASH })}${first}`
+        : '');
+    }
+    const failure = entry?.failure ?? null;
+    if (n.error) n.error.hidden = !failure;
+    setText(n.error, failure ? errorText(failure.code, failure.status, currentLang, failure.kind) : '');
+    const drawnNow = [currentLang, key, k, entry];
+    if (n.rows && !(m.drawn && drawnNow.every((v, i) => v === m.drawn[i]))) {
+      m.drawn = drawnNow;
+      renderModelRows(n.rows, body, frame);
+    }
+    setText(n.sent, body ? JSON.stringify(body.sent, null, 2) : '');
+  }
 }
 
 // ---------------------------------------------------------------- per frame
@@ -1066,6 +1264,7 @@ function renderAll() {
   setText($('chase')?.querySelector('.webgl-error'), t(currentLang, 'agents.scene.webgl_error'));
   syncPlayButton();
   draw(state.play.clock.time, true);
+  renderModels();
 }
 
 // ---------------------------------------------------- theme and language
@@ -1107,7 +1306,7 @@ function loop(now) {
   const time = clock.tick(now);
   if (time !== state.drawnTime) { draw(time); state.drawnTime = time; }
   const on = clock.playing || isWaiting();
-  if (on !== state.wasPlaying) { state.wasPlaying = on; syncPlayButton(); renderTimeline(); }
+  if (on !== state.wasPlaying) { state.wasPlaying = on; syncPlayButton(); renderTimeline(); renderModels(); }
   requestAnimationFrame(loop);
 }
 
@@ -1118,6 +1317,7 @@ function start() {
     else playOrWait(state.play, state.frames.length * DT, state.done, now);
     syncPlayButton();
     renderTimeline();
+    renderModels();
   });
   $('restart')?.addEventListener('click', () => {
     const now = performance.now();
@@ -1126,6 +1326,7 @@ function start() {
     syncPlayButton();
     renderTimeline();
     draw(0, true);
+    renderModels();
   });
   $('seek')?.addEventListener('input', () => {
     const seek = $('seek');
@@ -1140,6 +1341,19 @@ function start() {
     state.play.clock.setRate(Number($('rate').value), performance.now());
   });
   $('compute')?.addEventListener('click', compute);
+  // Ten taps within four seconds on the footer label, and only there (the
+  // lab's 01 — REPLAY gets no handler). Each status is fetched on its own, so
+  // a failed one fills only its own column.
+  $('footer-index')?.addEventListener('click', () => {
+    if (models.unlocked || !models.gesture.tap(performance.now())) return;
+    models.unlocked = true;
+    const panel = $('models-panel');
+    if (panel) panel.hidden = false;
+    renderModels();
+    for (const name of MODELS) loadModelStatus(name).catch(err => console.error(err));
+  });
+  $('ask-jev')?.addEventListener('click', () => { askModel('jev').catch(err => console.error(err)); });
+  $('ask-laya')?.addEventListener('click', () => { askModel('laya').catch(err => console.error(err)); });
   $('pick-experiment')?.addEventListener('change', () => onPick('runs', $('pick-experiment')));
   $('pick-pair')?.addEventListener('change', () => onPick('seed', $('pick-pair')));
   $('pick-episode')?.addEventListener('change', () => onPick('ep', $('pick-episode')));

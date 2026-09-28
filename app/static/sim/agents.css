@@ -78,7 +78,7 @@ html[dir=ltr] .profile-climb-label{direction:ltr}
 #profile-ve{font-weight:600;color:var(--ink-2)}
 
 /* side column */
-.picker-panel,.verdict-panel,.pause-panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.picker-panel,.verdict-panel,.pause-panel,.models-panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
 .pick-row{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;gap:10px;margin-bottom:8px}
 .pick-row label{font-size:10px;color:var(--muted)}
 .pick-row select{width:100%;min-width:0;background:var(--field-bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px}
@@ -124,7 +124,7 @@ html[dir=ltr] .profile-climb-label{direction:ltr}
 
 .error ul{margin:6px 0;padding-inline-start:18px;font:10px/1.6 Consolas,monospace}
 .retry-button{margin-inline-start:12px;border:1px solid currentColor;background:transparent;border-radius:6px;padding:3px 10px;font-size:11px;color:inherit}
-.footer-index{display:inline-flex;align-items:center;min-height:32px;min-width:32px;padding:0 8px}
+.footer-index{display:inline-flex;align-items:center;min-height:32px;min-width:32px;padding:0 8px;touch-action:manipulation}
 
 /* < 1100 px: one column, in reading order badge, picker, verdict, chase,
    timeline, profile, pause panel. The two column wrappers dissolve so their
@@ -132,7 +132,7 @@ html[dir=ltr] .profile-climb-label{direction:ltr}
 @media(max-width:1099px){
 .agents-layout{display:flex;flex-direction:column;gap:12px}
 .agents-col{display:contents}
-.picker-panel{order:1}.verdict-panel{order:2}.chase-panel{order:3}.agents-transport{order:4}.profile-panel{order:5}.pause-panel{order:6}
+.picker-panel{order:1}.verdict-panel{order:2}.chase-panel{order:3}.agents-transport{order:4}.profile-panel{order:5}.pause-panel{order:6}.models-panel{order:7}
 }
 /* < 760 px: phone. The lab hides its last nav link here; this page has four
    and needs all of them, so the nav takes a row of its own instead. */
@@ -191,4 +191,47 @@ main.agents-main{padding:18px 16px 0}
 .device-warning{display:block;margin-top:4px;color:var(--warn-ink)}
 @media(max-width:760px){
 .action-values,.car-readings dd{grid-template-columns:1fr}
+}
+
+/* M3: the models panel (design 7.7), hidden until ten taps on the footer
+   label. One column per model, each with its own status, button, answer and
+   error. Nothing here is red or green: a model's choice is not a verdict, and
+   "held" or "changed with the order" describes the answer, not a score. It
+   stretches because below 1100 px .agents-layout is a flex column with
+   align-items:start, where a panel that hugs its content would leave the two
+   columns a sliver. */
+.models-panel{align-self:stretch}
+.models-note{margin:6px 0 0;font-size:10px;line-height:1.75;color:var(--ink-2)}
+.models-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.model-col{display:flex;flex-direction:column;gap:6px;min-width:0;padding-top:10px;border-top:1px solid var(--hairline)}
+.model-name{margin:0;font:600 11px/1.5 Consolas,monospace;overflow-wrap:anywhere}
+.model-where{margin:0;font-size:10px;line-height:1.7;color:var(--estimated-ink)}
+.model-where:empty{display:none}
+.model-text{margin:0;font-size:9px;line-height:1.75;color:var(--muted)}
+.model-status{margin:0;font-size:10px;line-height:1.7;color:var(--ink-2)}
+.model-ask{width:100%;min-width:0}
+.model-reason,.model-latency{margin:0;font-size:9px;line-height:1.7;color:var(--muted)}
+.model-reason:empty,.model-latency:empty{display:none}
+.model-error{margin:0;padding:6px 8px;border-radius:5px;background:var(--error-bg);color:var(--error-ink);font-size:10px;line-height:1.7}
+.model-rows:empty{display:none}
+.model-row{padding:8px 0;border-bottom:1px solid var(--hairline)}
+.model-reference{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;margin:4px 0 0;font-size:9px;color:var(--muted)}
+.model-reference>span{display:inline-flex;align-items:center;gap:4px}
+.model-reference b{font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.model-choice{margin:4px 0 0;font-size:11px;font-weight:600}
+.model-bars{display:flex;flex-direction:column;gap:2px;margin-top:4px;direction:ltr}
+.model-bar{display:grid;grid-template-columns:56px minmax(0,1fr) 30px;align-items:center;gap:6px;font-size:8px;color:var(--muted);font-variant-numeric:tabular-nums}
+.model-bar i{display:block;height:5px;min-width:1px;border-radius:2px;background:var(--muted-3)}
+.model-bar.chosen{color:var(--ink);font-weight:650}
+.model-bar.chosen i{background:var(--ink-2)}
+.model-chosen-p{margin:4px 0 0;font-size:9px;color:var(--ink-2)}
+.model-order{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:4px 0 0;font-size:9px;color:var(--muted)}
+.model-order .held,.model-order .changed{font-weight:650;color:var(--ink-2)}
+.model-order .changed{text-decoration:underline dotted}
+.model-footer{margin:4px 0 0;font-size:9px;line-height:1.7;color:var(--muted-2)}
+.model-sent{font-size:9px;color:var(--muted)}
+.model-sent summary{cursor:pointer}
+.model-sent pre{margin:4px 0 0;max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.6 Consolas,monospace;color:var(--code-ink);text-align:left}
+@media(max-width:760px){
+.models-columns{grid-template-columns:1fr}
 }

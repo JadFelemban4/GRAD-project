@@ -106,6 +106,41 @@
           <p id="device-line" class="device-line"></p>
           <p id="fingerprint-taken" class="device-line"></p>
         </section>
+        <section id="models-panel" class="models-panel" hidden>
+          <h2 data-i18n="agents.models.heading">اسأل نموذجاً لغوياً عن هذه الثانية</h2>
+          <p id="models-not-thesis" class="models-note" data-i18n="agents.models.not_thesis">ليس جزءاً من الرسالة ولا من أي نتيجة. لا يقارن أي رقم هنا النموذجين بالوكيلين، ولا يُحسب أي فرق.</p>
+          <p id="models-claim" class="models-note" data-i18n="agents.models.claim">الاحتمالات ادعاء النموذج نفسه، ولم تُختبر على هذه المهمة.</p>
+          <p id="models-levels" class="models-note" data-i18n="agents.models.levels">كل نموذج يختار واحداً من خمسة مستويات لكل إجراء: للتعديلات الثلاثة الحدّان و"بلا تعديل" ونقطتان في المنتصف؛ وللمروحة والمضخة خمس قيم متساوية التباعد. المعروض هو اختيار النموذج نفسه، ولا يُحسب منه متوسط.</p>
+          <div class="models-columns">
+            <article class="model-col jev">
+              <h3 id="model-jev-name" class="model-name" dir="ltr"></h3>
+              <p class="model-where" data-i18n="agents.models.jev.where">خدمة خارجية في الولايات المتحدة · كل ضغطة استدعاء مدفوع واحد</p>
+              <p id="model-jev-text" class="model-text" data-i18n="agents.models.jev.text">خدمة خارجية تعمل في الولايات المتحدة. ليست جزءاً من الرسالة ولا من أي نتيجة، ولا يقارنها أي رقم بالوكلاء. هذه الصفحة لا تحفظ شيئاً؛ لكن اتفاقية المورّد تسمح له بالاحتفاظ بما يُرسل لاستخراج بيانات القياس بلا حدّ زمني (MCA §4.1). تُرسَل إليه حالة هذه الحلقة المحاكاة فقط، لا بيانات السيارة المسجّلة. كل ضغطة استدعاء واحد مدفوع. اتفاقية المورّد تمنع تدريب أي نموذج على تقليد إجاباته. شروط موقع المورّد موجّهة لزوّار الولايات المتحدة؛ هل الاستخدام من السعودية مسموح؟ غير معروف. ويقول المورّد إن النموذج ضعيف في الدقة العددية.</p>
+              <p id="model-jev-status" class="model-status"></p>
+              <button id="ask-jev" class="play-button model-ask" type="button" disabled data-i18n="agents.models.jev.ask">اسأل jev عن هذه الثانية (استدعاء مدفوع واحد)</button>
+              <p id="model-jev-reason" class="model-reason"></p>
+              <p id="model-jev-latency" class="model-latency"></p>
+              <p id="model-jev-error" class="model-error" role="status" hidden></p>
+              <div id="model-jev-rows" class="model-rows"></div>
+              <p class="model-footer" data-i18n="agents.models.footer">هدف لثانية واحدة: لم يُطبَّق ولم يُقيَّد بحد سرعة التغيير</p>
+              <details class="model-sent"><summary data-i18n="agents.models.sent">ما الذي أُرسل</summary><pre id="model-jev-sent-body" dir="ltr"></pre></details>
+            </article>
+            <article class="model-col laya">
+              <h3 id="model-laya-name" class="model-name" dir="ltr"></h3>
+              <p id="model-laya-where" class="model-where"></p>
+              <p id="model-laya-text" class="model-text" data-i18n="agents.models.laya.text">يعمل على هذا الجهاز ولا يُرسل شيئاً خارجه. تجربة تشغيل، لا تقييم. يقول ملف لايا نفسه إن نتيجة مثال لا تعني أنه مناسب للتحكم بالمحرك (README_AR.md:31). رخصة Apache 2.0.</p>
+              <p id="model-laya-check" class="model-text" data-i18n="agents.models.laya.check">نسأل لايا مرتين، والخيارات بترتيبين متعاكسين. إذا تغيّر اختياره بتغيير الترتيب وحده، فذلك الاختيار لا يأتي من حالة المحرك.</p>
+              <p id="model-laya-status" class="model-status"></p>
+              <button id="ask-laya" class="play-button model-ask" type="button" disabled data-i18n="agents.models.laya.ask">اسأل لايا عن هذه الثانية (على هذا الجهاز)</button>
+              <p id="model-laya-reason" class="model-reason"></p>
+              <p id="model-laya-latency" class="model-latency"></p>
+              <p id="model-laya-error" class="model-error" role="status" hidden></p>
+              <div id="model-laya-rows" class="model-rows"></div>
+              <p class="model-footer" data-i18n="agents.models.footer">هدف لثانية واحدة: لم يُطبَّق ولم يُقيَّد بحد سرعة التغيير</p>
+              <details class="model-sent"><summary data-i18n="agents.models.sent">ما الذي أُرسل</summary><pre id="model-laya-sent-body" dir="ltr"></pre></details>
+            </article>
+          </div>
+        </section>
       </aside>
     </section>
     <footer><span dir="ltr" data-i18n="footer.brand">GRAD / ENGINEERING REPLAY LAB</span><span data-i18n="footer.note">مشروع تخرّج · محرك B58 · عرض علمي استكشافي</span><span id="footer-index" class="footer-index" dir="ltr" data-i18n="agents.footer.index">02 — AGENTS</span></footer>

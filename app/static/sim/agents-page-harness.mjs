@@ -99,10 +99,12 @@ export function installFakePage({ search = '', ids = [] } = {}) {
   globalThis.requestAnimationFrame = () => 0;
 
   // Each request waits until the test answers it, so the order is the test's.
+  // `init` is fetch's second argument as the page passed it (method, headers,
+  // body), so a test can read what a POST sent.
   const requests = [];
   let arrived = null;
-  globalThis.fetch = url => new Promise((resolve, reject) => {
-    requests.push({ url: String(url), resolve, reject });
+  globalThis.fetch = (url, init = {}) => new Promise((resolve, reject) => {
+    requests.push({ url: String(url), init, resolve, reject });
     if (arrived) { arrived(); arrived = null; }
   });
   // A request the page never sends fails the test after `ms` instead of

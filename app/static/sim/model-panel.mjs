@@ -103,20 +103,27 @@ export function rowView(answer, actionIndex) {
   };
 }
 
+// The kinds a worker_error can carry: app/laya_bridge.py KINDS and the
+// 'other' it sends for anything else. The page keeps the same four names, so
+// a kind is never text the server was not built to send.
+const WORKER_KINDS = Object.freeze(['ValueError', 'RuntimeError', 'OutOfMemoryError', 'other']);
+
 /**
  * What went wrong, from the HTTP status and the JSON body (either may be
  * missing). No status at all is a request that never reached the server:
  * 'server_down'. A body whose code is in ERROR_CODES keeps only that code, an
- * integer status and a string kind; anything else (FastAPI's own 500, a 422
+ * integer status and a kind: one of WORKER_KINDS, 'other' for any other
+ * string, null when there is none; anything else (FastAPI's own 500, a 422
  * {detail}, the server's server_error) is 'server_error' with the HTTP status.
  */
 export function failureOf(httpStatus, body) {
   if (httpStatus === null || httpStatus === undefined) return { code: 'server_down', status: null, kind: null };
   if (body && typeof body === 'object' && ERROR_CODES.includes(body.code)) {
+    const kind = typeof body.kind === 'string' ? body.kind : null;
     return {
       code: body.code,
       status: Number.isInteger(body.status) ? body.status : null,
-      kind: typeof body.kind === 'string' ? body.kind : null,
+      kind: kind === null || WORKER_KINDS.includes(kind) ? kind : 'other',
     };
   }
   return { code: 'server_error', status: httpStatus, kind: null };

@@ -3348,6 +3348,11 @@ class PageTests(unittest.TestCase):
         used = set(re.findall(r"\$\('([^']+)'\)", page))
         self.assertTrue(used, "the id scan found nothing; the pattern has drifted")
         self.assertFalse(used - set(ids), f"agents.mjs reads ids the page does not define: {sorted(used - set(ids))}")
+        # M3 (design 7.7): the models panel is static in the markup and hidden
+        # until the ten taps, so every id agents.mjs reads for it is one the
+        # check above can see.
+        self.assertTrue('<section id="models-panel" class="models-panel" hidden>' in html,
+                        "#models-panel must be written out in agents.html, and hidden")
 
         for symbol in set(re.findall(r"'#(i-[a-z]+)'", page)):
             self.assertIn(f'id="{symbol}"', html, f"#{symbol} is not in the icon library")
@@ -3358,6 +3363,9 @@ class PageTests(unittest.TestCase):
         self.assertTrue(specs, "the import scan found nothing; the pattern has drifted")
         for spec in specs:
             self.assertTrue((self.STATIC / "sim" / spec[2:]).is_file(), f"agents.mjs imports missing {spec}")
+        # M3: the gesture and the panel's pure logic (design 7.2), both static.
+        for spec in ("./tap-unlock.mjs", "./model-panel.mjs"):
+            self.assertIn(spec, specs, f"agents.mjs does not import {spec}")
 
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
@@ -3407,7 +3415,8 @@ class PageTests(unittest.TestCase):
                 self.assertNotIn(spec, ("./agent-scene.mjs", "./scene.mjs"), f"{name} imports {spec} statically")
                 if spec.startswith("./"):
                     todo.append(spec[2:])
-        self.assertTrue({"agent-view.mjs", "agents-strings.mjs", "i18n.mjs", "playback.mjs"} <= seen,
+        self.assertTrue({"agent-view.mjs", "agents-strings.mjs", "i18n.mjs", "playback.mjs",
+                         "tap-unlock.mjs", "model-panel.mjs"} <= seen,
                         f"the static graph scan found only {sorted(seen)}")
 
     def test_every_car_is_read_through_carOf(self):
