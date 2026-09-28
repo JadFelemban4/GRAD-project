@@ -413,20 +413,135 @@ class CatalogTests(unittest.TestCase):
             v = AC.verdict("c4", tmp)
         self.assertEqual(v["state"], "missing")
         self.assertEqual(v["missing"], ["C4_RESULT.txt"])
-        self.assertEqual(v["short"], {lang: AC.MISSING_TEXT[lang].format(file="C4_RESULT.txt")
+        self.assertEqual(v["short"], {lang: AC.MISSING_TEXT[lang].format(files="results/C4_RESULT.txt")
                                       for lang in ("ar", "en")})
         self.assertEqual([c["cell"] for c in v["cells"]], ["SMALLER THAN THE MEI"])
         self.assertEqual(AC.verdict("zz")["state"], "none")
 
+    def test_d2_and_phase_d_verdicts(self):
+        """Spec test 8, the M2 rows: each anchor where results/ has it, each quote
+        a WHOLE item -- the file's next line is blank (the M1 final review, F8)."""
+        want = {"d2": {"result": 30, "c1": 86},
+                "phase_d": {"result": 26, "not_blind": 33, "post_hoc": 65}}
+        texts = {}
+        for prefix, where in want.items():
+            with self.subTest(prefix=prefix):
+                v = AC.verdict(prefix)
+                self.assertEqual((v["state"], v["missing"]), ("found", []))
+                by_key = {ln["key"]: ln for ln in v["lines"]}
+                self.assertEqual({k: ln["line"] for k, ln in by_key.items()}, where)
+                for a in AC.VERDICT_LINES[prefix]:
+                    src = (ROOT / "results" / a.file).read_text(encoding="utf-8").splitlines()
+                    ln = by_key[a.key]
+                    self.assertEqual(ln["file"], a.file)
+                    self.assertEqual(ln["text"], "\n".join(src[ln["line"] - 1:ln["line"] - 1 + a.n]))
+                    self.assertEqual(src[ln["line"] - 1 + a.n].strip(), "",
+                                     f"{prefix}.{a.key} must quote its whole item")
+                    texts[prefix, a.key] = ln["text"]
+                self.assertEqual(v["short"], {k: AC.SHORT_VERDICT[prefix][k] for k in ("ar", "en")})
+                for c in v["cells"]:
+                    self.assertEqual(c["gloss"], AC.GLOSS[c["cell"]])
+        self.assertEqual([c["cell"] for c in AC.verdict("d2")["cells"]], ["INCONCLUSIVE"])
+        self.assertEqual([c["cell"] for c in AC.verdict("phase_d")["cells"]],
+                         ["NOT SIGNIFICANT", "INCONCLUSIVE (post-hoc)"])
+        # What each quote must carry, so that none is cut before its caveat.
+        self.assertTrue(texts["d2", "result"].endswith("from Phase D's measured spread."))
+        self.assertIn("never 'preview does not", texts["d2", "c1"])
+        self.assertIn("NOT 'preview does not help'", texts["phase_d", "result"])
+        self.assertTrue(texts["phase_d", "not_blind"].endswith("limits 7 and 8."))
+        self.assertIn("[MEI set AFTER this result", texts["phase_d", "post_hoc"])
+        self.assertIn("POST-HOC reading", texts["phase_d", "post_hoc"])
+        self.assertTrue(texts["phase_d", "post_hoc"].endswith("records the ordering."))
+        # The short lines keep their qualifiers, in both languages.
+        grouped = "50" + chr(0x202F) + "000"
+        for lang in ("ar", "en"):
+            self.assertIn(grouped, AC.SHORT_VERDICT["d2"][lang])
+            self.assertIn("C1", AC.SHORT_VERDICT["d2"][lang])
+            self.assertIn("C1", AC.SHORT_VERDICT["phase_d"][lang])
+        self.assertIn(chr(0x200F) + "(" + grouped, AC.SHORT_VERDICT["d2"]["ar"])
+        self.assertIn("ليست عمياء", AC.SHORT_VERDICT["phase_d"]["ar"])
+        self.assertIn("قراءة لاحقة", AC.SHORT_VERDICT["phase_d"]["ar"])
+        self.assertIn("post-hoc", AC.SHORT_VERDICT["phase_d"]["en"])
+        self.assertIn("not blind", AC.SHORT_VERDICT["phase_d"]["en"])
+        post_hoc = AC.GLOSS["INCONCLUSIVE (post-hoc)"]
+        self.assertIn("قراءة لاحقة", post_hoc["ar"])
+        self.assertIn("post-hoc", post_hoc["en"])
+
+    def test_verdict_when_an_anchor_or_a_file_is_gone(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            res = Path(tmp) / "results"
+            res.mkdir()
+            for f in ("PHASE_D_RESULT.txt", "PHASE_D2_RESULT.txt"):
+                shutil.copy(ROOT / "results" / f, res / f)
+            self.assertEqual([AC.verdict(p, tmp)["state"] for p in ("d2", "phase_d")],
+                             ["found", "found"])
+            lines = (res / "PHASE_D_RESULT.txt").read_text(encoding="utf-8").splitlines()
+            self.assertTrue(lines[32].lstrip().startswith("AND THE BLINDED ARM IS NOT BLIND."))
+            del lines[32]
+            with open(res / "PHASE_D_RESULT.txt", "w", encoding="utf-8") as fh:
+                fh.write("\n".join(lines) + "\n")
+            v, d2 = AC.verdict("phase_d", tmp), AC.verdict("d2", tmp)
+        self.assertEqual((v["state"], v["missing"]), ("missing", ["PHASE_D_RESULT.txt"]))
+        self.assertEqual(v["short"], {lang: AC.MISSING_TEXT[lang].format(
+            files="results/PHASE_D_RESULT.txt") for lang in ("ar", "en")})
+        self.assertEqual([ln["key"] for ln in v["lines"]], ["result", "post_hoc"])
+        self.assertEqual([c["cell"] for c in v["cells"]],
+                         ["NOT SIGNIFICANT", "INCONCLUSIVE (post-hoc)"])
+        self.assertEqual(d2["state"], "found")
+
+        # No results/ at all: every file is named, not only the first.
+        with tempfile.TemporaryDirectory() as tmp:
+            got = {p: AC.verdict(p, tmp) for p in ("phase_d", "d2", "c4")}
+        self.assertEqual(got["phase_d"]["missing"], ["PHASE_D2_RESULT.txt", "PHASE_D_RESULT.txt"])
+        self.assertEqual(got["phase_d"]["short"], {lang: AC.MISSING_TEXT[lang].format(
+            files="results/PHASE_D2_RESULT.txt · results/PHASE_D_RESULT.txt")
+            for lang in ("ar", "en")})
+        self.assertEqual(got["d2"]["missing"], ["PHASE_D2_RESULT.txt"])
+        self.assertEqual(got["c4"]["missing"], ["C4_RESULT.txt", "PREREGISTRATION_C4.md"])
+        for prefix, v in got.items():
+            with self.subTest(prefix=prefix):
+                self.assertEqual((v["state"], v["lines"], v["cells"]), ("missing", [], []))
+        none = AC.verdict("sixspeed_18sep")
+        self.assertEqual((none["state"], none["short"]), ("none", AC.NONE_TEXT))
+
+    def test_every_prefix_has_its_cells_glosses_and_short_line(self):
+        self.assertEqual(set(AC.VERDICT_LINES), {"c4", "d2", "phase_d"})
+        self.assertEqual(set(AC.CELLS), set(AC.VERDICT_LINES))
+        self.assertEqual(set(AC.SHORT_VERDICT), set(AC.VERDICT_LINES))
+        for prefix, anchors in AC.VERDICT_LINES.items():
+            with self.subTest(prefix=prefix):
+                keys = [a.key for a in anchors]
+                self.assertEqual(len(keys), len(set(keys)), "anchor keys must be unique")
+                self.assertLessEqual(set(AC.SHORT_VERDICT[prefix]["requires"]), set(keys))
+                self.assertLessEqual(set(AC.CELLS[prefix]), set(keys))
+                for cell in AC.CELLS[prefix].values():
+                    self.assertEqual(set(AC.GLOSS[cell]), {"ar", "en"}, cell)
+                    self.assertTrue(all(AC.GLOSS[cell].values()), cell)
+                # A pattern that matched two lines could quote the wrong one:
+                # 'RESULT: INCONCLUSIVE' alone is on PHASE_D2_RESULT.txt:30 AND :65.
+                for a in anchors:
+                    src = (ROOT / "results" / a.file).read_text(encoding="utf-8").splitlines()
+                    hits = [i + 1 for i, line in enumerate(src) if re.search(a.pattern, line)]
+                    self.assertEqual(len(hits), 1, f"{prefix}.{a.key} matches lines {hits}")
+
     def test_no_plain_space_inside_a_grouped_number(self):
+        # (?!\d), not \b: an Arabic letter is a word character, so \b misses a
+        # group that runs straight into Arabic text (M1 build record, Task 10b).
+        plain = r"\d \d{3}(?!\d)"
+        self.assertIsNotNone(re.search(plain, "300 000خطوة"), "the check itself must be able to fail")
         for table_name, table in (("SHORT_VERDICT", AC.SHORT_VERDICT), ("GLOSS", AC.GLOSS)):
             for key, langs in table.items():
                 for lang in ("ar", "en"):
                     s = langs[lang]
                     self.assertIsNone(
-                        re.search(r"\d \d{3}\b", s),
+                        re.search(plain, s),
                         f"{table_name}[{key!r}][{lang!r}] has a plain-space thousands "
                         "separator")
+        # The invisible characters are written as escapes in the source, never
+        # as themselves (the Write tool once turned escapes into characters).
+        src = Path(AC.__file__).read_text(encoding="utf-8")
+        for cp in (0x202F, 0x200F):
+            self.assertNotIn(chr(cp), src, f"agent_catalog.py carries a literal U+{cp:04X}")
 
     def test_live_fingerprint_is_cached(self):
         a = AC.live_fingerprint("d2")

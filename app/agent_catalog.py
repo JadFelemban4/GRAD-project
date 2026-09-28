@@ -15,8 +15,8 @@ Verdicts are QUOTED, never computed: each anchor is a pattern searched in a
 file under results/, returned with its line number so the page can cite it as
 results/<file>:<line>. The short line and the glosses are authored text, and
 the short line is shown only when every anchor it summarises was found.
-M1 carries the C4 row only; the tables are keyed by result prefix so M2 adds
-the d2 and phase_d rows without changing a signature.
+The tables carry the c4, d2 and phase_d rows, keyed by result prefix; a
+prefix with no row (a future runs_X) has the verdict state 'none'.
 """
 from __future__ import annotations
 
@@ -199,10 +199,32 @@ VERDICT_LINES = {
         Anchor("one_seed", "PREREGISTRATION_C4.md",
                r"^2\. \*\*It rests on the sign test's threshold", 11),
     ),
+    "d2": (
+        # :30-35 whole: the item ends on the prediction power_analysis.py made
+        # BEFORE the experiment ran. The pattern ends at the line's end, so the
+        # bracketed Phase D line (:65) can never be taken for it.
+        Anchor("result", "PHASE_D2_RESULT.txt", r"^\s*RESULT: INCONCLUSIVE\s*$", 6),
+        Anchor("c1", "PHASE_D2_RESULT.txt", r"^\s*Both are C1 agents", 4),
+    ),
+    "phase_d": (
+        Anchor("result", "PHASE_D_RESULT.txt",
+               r"^\s*RESULT: NOT SIGNIFICANT at alpha 0\.05\.\s*$", 6),
+        Anchor("not_blind", "PHASE_D_RESULT.txt", r"^\s*AND THE BLINDED ARM IS NOT BLIND\.", 8),
+        # Phase D under D2's MEI rule, :65-76 whole: the paragraph after the
+        # blank line (:72-76) is what says the reading is post-hoc.
+        Anchor("post_hoc", "PHASE_D2_RESULT.txt",
+               r"^\s*RESULT: INCONCLUSIVE\s+\[MEI set AFTER this result", 12),
+    ),
 }
 
-# The anchor key that carries each quoted cell, in display order.
-CELLS = {"c4": {"result": "SMALLER THAN THE MEI", "convergence": "NOT-CONVERGED"}}
+# The anchor key that carries each quoted cell, in display order. The cell
+# names are authored: 'INCONCLUSIVE (post-hoc)' is PHASE_D2_RESULT.txt:65,
+# whose own text is 'INCONCLUSIVE   [MEI set AFTER this result -- see below]'.
+CELLS = {
+    "c4": {"result": "SMALLER THAN THE MEI", "convergence": "NOT-CONVERGED"},
+    "d2": {"result": "INCONCLUSIVE"},
+    "phase_d": {"result": "NOT SIGNIFICANT", "post_hoc": "INCONCLUSIVE (post-hoc)"},
+}
 
 SHORT_VERDICT = {
     "c4": {
@@ -211,6 +233,16 @@ SHORT_VERDICT = {
         "en": "smaller than the MEI (50) at 300\u202f000 steps · one seed wide "
               "· the two tests disagree · not converged",
         "requires": ("result", "seeds", "disagree", "convergence"),
+    },
+    "d2": {
+        "ar": "غير حاسم · وكلاء C1 \u200f(50\u202f000 خطوة)",
+        "en": "inconclusive · C1 agents, 50\u202f000 steps",
+        "requires": ("result", "c1"),
+    },
+    "phase_d": {
+        "ar": 'غير دال إحصائياً · غير حاسم (قراءة لاحقة) · الذراع "العمياء" ليست عمياء · وكلاء C1',
+        "en": 'not significant · inconclusive (post-hoc) · the "blind" arm is not blind · C1 agents',
+        "requires": ("result", "not_blind", "post_hoc"),
     },
 }
 
@@ -225,11 +257,31 @@ GLOSS = {
               "flipped, it would be inconclusive.",
     },
     "NOT-CONVERGED": {"ar": "لم يستقر التدريب", "en": "Training had not settled"},
+    # PHASE_D2_RESULT.txt:31-33, in the team's words.
+    "INCONCLUSIVE": {
+        "ar": 'غير حاسم: التجربة لا تميّز بين "لا أثر" و"أثر يهمّ الفريق"',
+        "en": 'Inconclusive: the experiment cannot tell "no effect" from '
+              '"an effect the team cares about"',
+    },
+    "NOT SIGNIFICANT": {
+        "ar": "غير دال إحصائياً، مع وكلاء بميزانية C1",
+        "en": "Not statistically significant, with agents at the C1 budget",
+    },
+    # PHASE_D2_RESULT.txt:72-76: the MEI was set after Phase D's result.
+    "INCONCLUSIVE (post-hoc)": {
+        "ar": "غير حاسم، وهي قراءة لاحقة: الحد الأدنى المهم (50 وحدة) حُدِّد بعد أن عُرفت "
+              "نتيجة Phase D، فهذا التصنيف لم يُسجَّل مسبقاً. "
+              'التجربة لا تميّز بين "لا أثر" و"أثر يهمّ الفريق"',
+        "en": "Inconclusive, and a post-hoc reading: the MEI (50 units) was set after "
+              "Phase D's result was known, so this classification was not preregistered. "
+              'The experiment cannot tell "no effect" from "an effect the team cares about"',
+    },
 }
 
+# {files}: every missing file, as results/<file>, joined by ' · '.
 MISSING_TEXT = {
-    "ar": "لم يُعثر على سطر الحكم في results/{file}: لا تقرأ هؤلاء الوكلاء بدونه",
-    "en": "verdict line not found in results/{file}: do not read these agents without it",
+    "ar": "لم يُعثر على سطر الحكم في {files}: لا تقرأ هؤلاء الوكلاء بدونه",
+    "en": "verdict line not found in {files}: do not read these agents without it",
 }
 NONE_TEXT = {
     "ar": "لا يوجد حكم مسجَّل مسبقاً لهذه التجربة في results/. ما تعرضه هذه الصفحة ليس نتيجة.",
@@ -270,7 +322,8 @@ def verdict(prefix, root=ROOT):
     found = {line["key"] for line in lines}
     authored = SHORT_VERDICT.get(prefix)
     if missing:
-        short = {lang: MISSING_TEXT[lang].format(file=missing[0]) for lang in MISSING_TEXT}
+        files = " · ".join(f"results/{f}" for f in missing)
+        short = {lang: MISSING_TEXT[lang].format(files=files) for lang in MISSING_TEXT}
     elif authored is not None and set(authored["requires"]) <= found:
         short = {lang: authored[lang] for lang in ("ar", "en")}
     else:
