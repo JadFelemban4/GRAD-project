@@ -8,20 +8,41 @@ If you are a human, read it too. It is shorter than the handbook.
 
 ---
 
-## Before anything else: find out who you are talking to
+## Before anything else: ask who you are talking to
 
-Five people share this repository and they do not share a background. **Read
-`team/` first.** Run
+**Jad's rule, 28 September 2026: the first thing you do in every session is ask
+who you are talking to** — before reading further, before answering, before
+explaining anything. One short line, Arabic first:
 
-```bash
-git config user.email
+```
+مين معي؟
+Who am I talking to?
 ```
 
-and open the profile in `team/` whose `email:` line matches. It says what to
-assume that person knows, what not to assume, and how they take an explanation
-in. If no profile matches, ask once, then carry on without one — and say that
-you are working without one.
+If they already said who they are in their first message, that is the answer;
+do not ask again. Then open the file in `team/` whose `name:` matches — a first
+name or the student number is enough — and follow it for the whole session. It
+says what to assume that person knows, what not to assume, which language, and
+how they take an explanation in.
 
+- **Their file is still a stub** (it says STUB at the top): say so in one line,
+  and ask whether they want to fill it in now — the template's questions, one
+  per message. Never fill a section from a guess. Until it is filled, say that
+  you are working without a profile.
+- **No file matches:** carry on without a profile, say so, and point at
+  `team/_TEMPLATE.md`.
+- **You are a subagent:** skip this. You are not talking to a person, and the
+  session that launched you already asked.
+
+**Why ask, and not read `git config user.email`.** Until 28 September this
+section said to match `git config user.email` against each file's `email:`
+line. It failed, and `AUDIT2.md` Part 6 recorded how: Jad commits under two
+addresses and his file lists one, and Ghassan's file had no address at all, so
+two of the three identities in the history matched nothing. And an address
+names whoever set up that clone, not whoever is at the keyboard: anyone working
+on a teammate's machine would get the teammate's profile. Asking avoids both.
+
+Five people share this repository and they do not share a background.
 **This is not a courtesy.** One of the five is comfortable with engines and lost
 in reinforcement learning; another is the reverse. An explanation pitched at the
 wrong person is a wasted message in both directions, and the profiles exist
@@ -2070,8 +2091,8 @@ DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
 AUDIT.md              Full technical review, 14 Sep. THREE CRITICAL findings
                       against the headline claim and six against app/.
                       Read it before quoting any number in this file.
-team/                 ONE PROFILE PER PERSON. Read the one matching
-                      `git config user.email` before explaining anything.
+team/                 ONE PROFILE PER PERSON. Ask who you are talking to,
+                      then read theirs before explaining anything.
   README.md           how the matching works and how to add yourself.
   _TEMPLATE.md        copy this.
 logs/CHANNEL_SET_FINAL.md   What is recorded, what to add, and why.

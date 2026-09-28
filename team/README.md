@@ -12,17 +12,19 @@ how good you are.**
 
 ## How the assistant picks the right one
 
-At the start of a session it reads the email git is configured with:
+**It asks.** The first thing it does in a session is ask who it is talking to
+(`CLAUDE.md`, "Before anything else"), then opens the file here whose `name:`
+matches your answer — a first name or your student number is enough. If you say
+who you are in your first message, it will not ask again.
 
-```bash
-git config user.email
-```
+Until 28 September 2026 it read `git config user.email` instead and matched the
+`email:` line. That failed: `AUDIT2.md` Part 6 found that two of the three
+addresses in the history matched no file, and an address names whoever set up
+the clone, not whoever is typing. `email:` stays in the template as an optional
+field; nothing matches on it now.
 
-and opens the profile in this folder whose `email:` line matches. If none
-matches, it asks once and carries on without one.
-
-**That works because git config is per clone.** You set yours once, on your own
-machine, and it never has to be agreed with anyone:
+**Set your git identity anyway, for a different reason:** it is what `git log`
+credits your commits to. Set it once, on your own machine:
 
 ```bash
 git config user.name  "Your Name"
@@ -35,9 +37,14 @@ No `--global`, so it applies to this repository only.
 
 ## Adding yourself · about ten minutes
 
-1. `cp team/_TEMPLATE.md team/<yourname>.md`
-2. Fill it in. Write it for a stranger who will read it once and then act on it.
+1. If a file with your name is already here, it is a STUB someone else started
+   — fill that one. Otherwise `cp team/_TEMPLATE.md team/<yourname>.md`.
+2. Fill it in, starting with `name:` and `student_number:`. Write it for a
+   stranger who will read it once and then act on it.
 3. Commit it.
+
+Or let the assistant do it: tell it who you are at the start of a session, and
+it will ask you the template's questions, one at a time.
 
 **Write the awkward parts.** A profile that says "I understand everything" is a
 profile that gets you explanations you cannot use. The one thing that makes
