@@ -47,7 +47,7 @@ const C4 = CATALOG.experiments.find(e => e.runs === 'runs_c4');
 
 const h = installFakePage({
   search: '',
-  ids: ['compute', 'error', 'pick-experiment', 'pick-pair', 'pick-episode', 'pick-note', 'pick-pair-note',
+  ids: ['compute', 'error', 'pick-experiment', 'pick-experiment-note', 'pick-pair', 'pick-episode', 'pick-note', 'pick-pair-note',
     'pick-episode-note', 'pick-refused', 'verdict', 'verdict-short', 'verdict-cells', 'strip-verdict',
     'verdict-scored', 'scene-prompt', 'pause-heading', 'loading', 'load-title', 'lane-blind-label', 'seen-blind',
     'lane-stopped', 'lang-toggle', 'seek', 'sim-badge'],
@@ -120,6 +120,7 @@ test('from the nav link the page selects nothing, computes nothing, and says wha
   assert.equal(nodes['pick-note'].textContent, AR('agents.pick.none'));
   assert.equal(nodes['scene-prompt'].hidden, false);
   assert.equal(nodes['verdict-short'].textContent, '—', 'no verdict before an experiment is chosen');
+  assert.equal(nodes['pick-experiment-note'].textContent, '', 'and none under the experiment select');
   await wait(450);
   assert.equal(h.requests.length, 0, 'nothing computes');
   assert.deepEqual(h.history, [], 'the address is left as it was');
@@ -160,6 +161,7 @@ test('a verdict that is missing, or was never recorded, says so in the box, the 
   assert.equal(nodes['verdict-short'].textContent, MISSING.ar);
   assert.equal(nodes['strip-verdict'].textContent, MISSING.ar);
   assert.ok(experiment('runs_d2').text.endsWith(MISSING.ar), 'the experiment select says it too');
+  assert.equal(nodes['pick-experiment-note'].textContent, MISSING.ar, 'and under it, whole');
   assert.equal(nodes['verdict-cells'].children.length, 0, 'a cell is never guessed');
 
   h.change(nodes['pick-experiment'], 'runs_zz');
@@ -167,6 +169,7 @@ test('a verdict that is missing, or was never recorded, says so in the box, the 
   assert.equal(nodes['verdict-short'].textContent, NONE.ar);
   assert.equal(nodes['strip-verdict'].textContent, NONE.ar);
   assert.ok(experiment('runs_zz').text.endsWith(NONE.ar));
+  assert.equal(nodes['pick-experiment-note'].textContent, NONE.ar);
   assert.equal(nodes['verdict-cells'].children.length, 0);
   const pairs = options(nodes['pick-pair']);
   assert.equal(pairs.length, 3, 'the placeholder, the runnable pair and the refused one');
@@ -185,6 +188,17 @@ test('each choice fills the next select, keeps the address in sync and enables �
   assert.equal(nodes['pick-pair-note'].textContent, AR('agents.pick.pair_qualifier'));
   assert.equal(nodes['verdict-short'].textContent, C4.verdict.short.ar, 'the box reads the chosen experiment');
   assert.equal(nodes['strip-verdict'].textContent, C4.verdict.short.ar);
+  // A closed select can cut its option before the qualifiers (28 Sep, 390 px:
+  // «C4 · أصغر من الحد الأدنى المهم (50 وحدة) عند 300 000 خطوة» and nothing more),
+  // so the whole short line is said under it as well.
+  assert.equal(nodes['pick-experiment-note'].textContent, C4.verdict.short.ar, 'the whole short line under the select');
+  assert.match(nodes['pick-experiment-note'].textContent, /بفارق بذرة واحدة.*الاختباران لا يتفقان.*لم يستقر التدريب/);
+  nodes['lang-toggle'].click();
+  try {
+    assert.equal(nodes['pick-experiment-note'].textContent, C4.verdict.short.en, 'in the page\'s language');
+  } finally {
+    nodes['lang-toggle'].click();   // back to Arabic for the rest of this test and the tests below
+  }
   assert.equal(nodes.verdict.dataset.state, 'found');
   assert.equal(nodes['pick-episode'].disabled, true);
   assert.equal(nodes.compute.disabled, true);

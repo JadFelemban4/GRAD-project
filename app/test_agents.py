@@ -1838,8 +1838,15 @@ class PageTests(unittest.TestCase):
             self.assertIsNotNone(m, f"#{name} is missing")
             self.assertIn("disabled", m.group(1), f"#{name} must start disabled")
             self.assertEqual(m.group(2).strip(), "", f"#{name} must carry no option in the markup")
-        for name in ("pick-pair-note", "pick-episode-note"):
+        # The captions under the selects start empty; agents.mjs fills them.
+        # pick-experiment-note carries the chosen experiment's WHOLE short
+        # line, because a closed select can cut it before its qualifiers.
+        for name in ("pick-experiment-note", "pick-pair-note", "pick-episode-note"):
             self.assertTrue(f'<p id="{name}" class="pick-caption"></p>' in html, f"#{name} is missing")
+        rows = [html.find(f'id="{name}"') for name in
+                ("pick-experiment", "pick-experiment-note", "pick-pair", "pick-pair-note",
+                 "pick-episode", "pick-episode-note")]
+        self.assertEqual(rows, sorted(rows), "each caption must sit right under its own select")
         self.assertTrue('<details id="pick-refused" class="pick-refused" hidden></details>' in html,
                         "#pick-refused is missing, or not hidden and empty")
         page = self.read("sim/agents.mjs")

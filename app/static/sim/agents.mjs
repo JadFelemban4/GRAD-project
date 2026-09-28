@@ -27,7 +27,7 @@ import {
 } from './agent-view.mjs';
 import {
   NOTHING, parsePickerQuery, experimentOf, pairOf, resolveSelection, choose, selectionSearch,
-  computeState, experimentOptions, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
+  computeState, experimentOptions, experimentNote, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
   refusedPairs, scoredKey, blindLabelKey, notBlindCite,
 } from './agent-picker.mjs';
 
@@ -405,6 +405,9 @@ function renderPicker() {
   enable('pick-experiment', Boolean(catalog));
   enable('pick-pair', Boolean(experiment));
   enable('pick-episode', Boolean(pair));
+  // The closed select may cut the short line before its qualifiers (one seed
+  // wide, the tests disagree, not converged); the whole line stands under it.
+  setText($('pick-experiment-note'), experimentNote(experiment, currentLang));
   setText($('pick-pair-note'), pairQualifier(experiment, currentLang));
   setText($('pick-episode-note'), sameRoadNote(catalog, experiment, currentLang));
   const can = computeState(catalog, sel);

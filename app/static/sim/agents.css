@@ -83,9 +83,11 @@ html[dir=ltr] .profile-climb-label{direction:ltr}
 .pick-row label{font-size:10px;color:var(--muted)}
 .pick-row select{width:100%;min-width:0;background:var(--field-bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px}
 .pick-row select:disabled{opacity:.55;cursor:not-allowed}
-/* Under the pair row: "difference of the medians of 20 episodes ...; not
-   this episode". Under the episode row: Phase D's one road. Aligned with the
-   selects (the 72 px label column plus the 10 px gap). */
+/* Under the experiment row: its whole short verdict line, which the closed
+   select may cut before the qualifiers. Under the pair row: "difference of
+   the medians of 20 episodes ...; not this episode". Under the episode row:
+   Phase D's one road. Aligned with the selects (the 72 px label column plus
+   the 10 px gap). */
 .pick-caption{margin:-3px 0 9px;padding-inline-start:82px;font-size:9px;line-height:1.7;color:var(--muted)}
 .pick-caption:empty{display:none}
 .pick-reason{color:var(--ink-2)}

@@ -232,6 +232,19 @@ export function episodeOptions(catalog, pair, lang) {
 }
 
 /**
+ * The chosen experiment's WHOLE short verdict line, said under its select. A
+ * closed select shows only as much of its option as fits: on 28 Sep at 390 px
+ * the C4 option read "C4 · smaller than the MEI (50) at 300 000 steps" and
+ * nothing more, the clean negative the short line exists to prevent (design
+ * section 6, misreading table). The line is the server's own, found, missing
+ * or none alike, exactly as the verdict box prints it; '' when nothing is
+ * chosen or the verdict carries no short line.
+ */
+export function experimentNote(experiment, lang) {
+  return experiment?.verdict?.short?.[lang] || '';
+}
+
+/**
  * The qualifier under the pair select, by the experiment's protocol: the table
  * row is a difference of medians over twenty episodes, never this episode.
  * Phase D's says "the same road"; '' when the experiment has no protocol.

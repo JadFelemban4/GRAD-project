@@ -268,6 +268,31 @@ test('Phase D reads as one road, and its blind car keeps its caveat, cited where
   assert.doesNotMatch(t('ar', P.blindLabelKey('d2')), /قد يحفظه/);
 });
 
+// Design section 6 names the experiment select as a surface of "C4 is a clean
+// negative", but a CLOSED select shows only as much of its option as fits. On
+// 28 Sep at 390 px it read «C4 · أصغر من الحد الأدنى المهم (50 وحدة) عند 300 000
+// خطوة», the clean negative itself, and at 1440 px it stopped inside «بفارق بذرة
+// واحدة». So the chosen experiment's WHOLE short line is said under the select.
+test('the chosen experiment\'s whole short line is said under its select, every qualifier with it', () => {
+  const clauses = {
+    ar: ['بفارق بذرة واحدة', 'الاختباران لا يتفقان', 'لم يستقر التدريب'],
+    en: ['one seed wide', 'the two tests disagree', 'not converged'],
+  };
+  const empty = withRefusals().experiments.find(e => e.runs === 'runs_zzempty');
+  for (const lang of ['ar', 'en']) {
+    const c4 = P.experimentOf(CATALOG, 'runs_c4');
+    const note = P.experimentNote(c4, lang);
+    assert.equal(note, c4.verdict.short[lang], `${lang}: the line the verdict box prints, whole`);
+    for (const clause of clauses[lang]) assert.ok(note.includes(clause), `${lang}: «${clause}» not in ${note}`);
+    for (const runs of ['runs', 'runs_d2']) {
+      const e = P.experimentOf(CATALOG, runs);
+      assert.equal(P.experimentNote(e, lang), e.verdict.short[lang], `${lang}: ${runs}`);
+    }
+    assert.equal(P.experimentNote(null, lang), '', 'nothing chosen, nothing said');
+    assert.equal(P.experimentNote(empty, lang), '', 'no short line, so nothing is guessed');
+  }
+});
+
 test('the fixture is the server\'s catalog', () => {
   assert.deepEqual(CATALOG.experiments.map(e => [e.runs, e.pairs.length]),
     [['runs', 8], ['runs_c4', 8], ['runs_d2', 8], ['runs_sixspeed_18sep', 1]]);
