@@ -1252,6 +1252,12 @@ shipped formula's gap is still +1.9 % — `verify_docs.py`, CHARGE TEMPERATURE.)
 | `plant.charge_temperature()` (52 °C median) | 232.7 kPa | **+1.9 %** |
 | ambient + 8 K (45 °C median) | 227.5 kPa | +0.7 % |
 
+*(28 September: the 117 °C in the first row does not reproduce. The 587
+samples whose inversion gives the 279.5 kPa read 106.8 °C at the median, while
+the 279.5 kPa itself reproduces exactly (`plot_sim_vs_car.py`, chart 2). Which
+population the 117 °C describes is not recorded, so treat it as unverified.
+`plant.charge_temperature()`'s docstring carries the same row.)*
+
 **The >200 kPa gate on the model side is not arbitrary, and say so wherever
 this table appears.** The logged side filters on `Boost pressure` > 15 psi
 gauge, and (15 + 14.23) × 6.894757 = **201.5 kPa absolute**, so a 200 kPa model
@@ -1789,11 +1795,35 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
   quantity at a steady point; drive `thermal.py` over the whole log instead.
 - **Enrichment uses dwell above the 180 kPa gate as a proxy** for turbine inlet
   temperature, which this vehicle does not expose. (`ENR_LOAD` = 180 kPa on the
-  corrected charge-temperature scale of mistake 13.) The weakest cell of the fit
-  is 3500–4500 rpm at **long** dwell — observed 0.90 against a modelled 0.93,
-  and that speed band is the thinnest of the three at n = 235 samples above the
-  gate, against 441 and 665. Every one of the nine cells is within 0.027 of
-  measurement.
+  corrected charge-temperature scale of mistake 13.) The 3500–4500 rpm band is
+  the thinnest of the three at n = 235 samples above the gate, against 441 and
+  665.
+
+  **THE WORST CELL IS 4500–7000 RPM AT 4–8 S OF DWELL, AND IT MISSES BY 0.076.**
+  The car runs λ 0.83 there and the model 0.91. Re-measured 28 September by
+  `plot_sim_vs_car.py` (chart 4; `figures/sim_vs_car/numbers.txt`), which
+  evaluates `base_lambda` at each sample's own rpm, pressure and dwell and
+  compares the medians cell by cell. Until then this bullet said the weakest
+  cell was 3500–4500 rpm at long dwell (0.90 against 0.93, still true, now the
+  second worst) and that every cell sat within 0.027 of measurement.
+  **Those figures come from the old dwell axis**, rows divided by an assumed
+  4.6 Hz, which AUDIT.md H3 replaced with the timestamps on 16 September. On the
+  old axis this cell reads 0.87 against 0.91; on the timestamps the car is
+  richer sooner. `drive10` is not the cause: without it the gap is 0.074. The
+  cause is that `ENR_DWELL_LO` and `ENR_DWELL_HI` were fitted on the old axis
+  (`verify_docs.py` says so beside `dwell_column`), so the model enriches later
+  than the car in this window. Even on the old axis this method gives 0.043,
+  so the 0.027 came from a method that is not recorded.
+
+  What it does NOT touch: any experiment. The locked climb runs at 2706 rpm,
+  where the map returns 1.000 at any dwell (next bullet), so Phase D, D2 and C4
+  never enter this band. What it does touch: Chapter 3's account of the
+  enrichment fit, and the app's modelled-lambda fallback, which will enrich a
+  few seconds late in a hard pull above 4500 rpm. **`base_lambda()`'s docstring
+  table still reads 0.87 for this cell.** Correcting a docstring is safe for
+  the trained agents, but it was left for a moment when no other session is
+  building in the tree.
+
   <!-- RETIRED-OK -->
   *(This line read "short dwell, n=29, observed 0.94, model 1.00" until
   9 September — the seven-drive
