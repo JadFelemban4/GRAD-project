@@ -1,5 +1,8 @@
 """The agent replay page's server side: the model loader, the episode store and
-the three routes.
+the seven routes. Three GETs serve the page and its episodes. Four serve the
+hidden models panel (design M3 section 7.6): a status GET and an ask POST for
+each of jev and Laya. Each POST asks one model about one second of a finished
+episode.
 
 Imported only from the --simulation branch of app/server.py, which calls
 install(app), so --live and --replay never load agent code, SB3 or torch.
@@ -20,6 +23,14 @@ import sys
 import threading
 
 import numpy as np
+from fastapi import Request
+from fastapi.exception_handlers import (http_exception_handler,
+                                        request_validation_exception_handler)
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
+from pydantic import BaseModel, ConfigDict, Field
+from starlette.exceptions import HTTPException
 
 from app import agent_catalog
 from app import agent_catalog as C
@@ -235,10 +246,14 @@ class EpisodeStore:
 # ---- routes: added by install(app), and only under --simulation ------------
 #
 # app/server.py calls install(app) inside `if a.simulation:` in main(), so the
-# --live and --replay processes never import this module. Every route here is
-# a GET and answers with Cache-Control: no-store. A request names an episode
-# by three strings that must match fixed patterns before anything is looked up;
-# no path is ever built from a request.
+# --live and --replay processes never import this module. Every route here
+# answers with Cache-Control: no-store, and every one is a GET except two
+# POSTs, /api/agents/jev and /api/agents/laya, which ask a language model about
+# one second of a finished episode. The four model routes use NoStoreRoute, so
+# the refusals FastAPI makes itself (a body that fails AskBody, a wrong method)
+# are no-store as well. A request names an episode by strings that must match
+# fixed patterns before anything is looked up; no path is ever built from a
+# request.
 
 NO_STORE = {"Cache-Control": "no-store"}
 SEED_TEXT = re.compile(r"[0-9]{1,3}")
@@ -246,6 +261,66 @@ EP_TEXT = re.compile(r"[0-9]{1,2}")
 SINCE_TEXT = re.compile(r"[0-9]{1,4}")
 STATIC = Path(__file__).resolve().parent / "static"
 _ROADS = {}
+
+# The two POSTs' body (design M3 section 7.6, C7). Pydantic's `pattern` is an
+# unanchored search, so TRACE_KEY carries its own ^...$, and strict=True
+# refuses "312", true and 1.0 as a step. AskBody and Request must be
+# module-level names: `from __future__ import annotations` makes the handlers'
+# annotations strings, which FastAPI resolves against this module's globals.
+TRACE_KEY = (rf"^{agent_catalog.RUNS_NAME.pattern.strip('^$')}"
+             rf"/(?:{SEED_TEXT.pattern})/(?:{EP_TEXT.pattern})$")
+LOCAL_HOST = re.compile(r"^(127\.0\.0\.1|localhost):\d{1,5}$")
+MODEL_HTTP = {"no_key": 503, "not_configured": 503, "not_found": 503, "foreign_origin": 403,
+              "no_trace": 409, "step_not_computed": 409, "busy": 409, "server_error": 500}
+
+
+class AskBody(BaseModel):
+    """{"trace": "runs_c4/5/1", "step": 312}, and nothing else, nothing coerced."""
+    model_config = ConfigDict(extra="forbid", strict=True)
+    trace: str = Field(pattern=TRACE_KEY)
+    step: int = Field(ge=0, le=agent_trace.STEPS - 1)
+
+
+def same_origin(request):
+    """True when Origin is present and equals http:// + Host, and Host is this
+    machine by name and port. Checking Host as well refuses DNS rebinding
+    (design M3 C8); browsers send Origin on every POST."""
+    host = request.headers.get("host") or ""
+    return (LOCAL_HOST.fullmatch(host) is not None
+            and request.headers.get("origin") == f"http://{host}")
+
+
+class NoStoreRoute(APIRoute):
+    """The four model routes' class: EVERY response carries no-store, FastAPI's
+    own included. A body that fails AskBody is refused before the handler
+    runs, with FastAPI's own 422 {"detail": [...]}; a JSON body its reader
+    cannot hold (not UTF-8, nested too deep) gets FastAPI's own 400; a wrong
+    method gets FastAPI's own 405 {"detail": "Method Not Allowed"} and its
+    Allow header. Only the header is added; no body changes."""
+
+    def get_route_handler(self):
+        handler = super().get_route_handler()
+
+        async def no_store(request):
+            try:
+                response = await handler(request)
+            except RequestValidationError as exc:
+                response = await request_validation_exception_handler(request, exc)
+            except HTTPException as exc:
+                response = await http_exception_handler(request, exc)
+            response.headers.update(NO_STORE)
+            return response
+
+        return no_store
+
+    async def handle(self, scope, receive, send):
+        if self.methods and scope["method"] not in self.methods:
+            allow = ", ".join(sorted(self.methods))
+            response = JSONResponse({"detail": "Method Not Allowed"}, status_code=405,
+                                    headers={"Allow": allow, **NO_STORE})
+            await response(scope, receive, send)
+            return
+        await super().handle(scope, receive, send)
 
 
 def sb3_available():
@@ -338,12 +413,33 @@ def catalog(root=ROOT, sb3=None):
     return agent_trace.jsonable(body)
 
 
-def install(app, store=None):
-    """Add GET /agents, GET /api/agents/catalog and GET /api/agents/episode to `app`."""
+def install(app, store=None, jev_send=None, laya=None):
+    """Add the page's seven routes to `app`.
+
+    GET /agents, GET /api/agents/catalog and GET /api/agents/episode serve the
+    page and its episodes. GET /api/agents/jev/status, POST /api/agents/jev,
+    GET /api/agents/laya/status and POST /api/agents/laya serve the hidden
+    models panel: each POST asks one model about one second of a finished
+    episode. /api/agents/jev sends it to an external service in the USA;
+    /api/agents/laya sends it to a worker process on this machine, and nothing
+    leaves the machine. Neither has a path to the vehicle.
+
+    `jev_send` replaces jev's HTTP call and `laya` the Laya bridge; tests pass
+    fakes. The defaults are jev._send and a LayaBridge(), whose construction
+    reads no file and starts nothing. Each model has its own lock, so one
+    model's slow or failing call never makes the other busy.
+    """
     from fastapi.responses import HTMLResponse, JSONResponse
 
+    from app import jev
+    from app.laya_bridge import LayaBridge, LayaError
+
     store = store if store is not None else EpisodeStore()
+    jev_send = jev_send if jev_send is not None else jev._send
+    laya = laya if laya is not None else LayaBridge()
     app.state.agent_store = store
+    app.state.laya = laya
+    app.state.model_locks = {"jev": threading.Lock(), "laya": threading.Lock()}
 
     def answer(body, status=200):
         return JSONResponse(body, status_code=status, headers=NO_STORE)
@@ -402,3 +498,87 @@ def install(app, store=None):
             return answer(out)
         except Exception as exc:
             return answer({"detail": f"server error: {type(exc).__name__}"}, 500)
+
+    # ---- the models panel (design M3 section 7.6) ---------------------------
+
+    def refuse(model, code, step, status=None, kind=None):
+        """A fixed code for the asking model's own column, and one stderr line
+        that carries no state and no key. Never str(exc), never a vendor body."""
+        print(f"{model}: {code} (step {step})", file=sys.stderr)
+        body = {"model": model, "code": code}
+        if code == "vendor_status":
+            body["status"] = status
+        if code == "worker_error":
+            body["kind"] = kind
+        return answer(body, MODEL_HTTP.get(code, 502))
+
+    def ask_model(model, body, request):
+        """The guards in order (Origin, trace, this model's own lock), then one ask."""
+        if not same_origin(request):
+            return refuse(model, "foreign_origin", body.step)
+        runs, seed, ep = body.trace.split("/")
+        trace = store.trace((runs, int(seed), int(ep)))
+        if trace is None:
+            return refuse(model, "no_trace", body.step)
+        if body.step >= len(trace.obs[0]):
+            return refuse(model, "step_not_computed", body.step)
+        lock = app.state.model_locks[model]
+        if not lock.acquire(blocking=False):
+            return refuse(model, "busy", body.step)
+        try:
+            if model == "jev":
+                out = dict(model="jev", runs_on="external",
+                           **jev.ask(trace, body.step, send=jev_send))
+            else:
+                out = dict(model="laya", runs_on="local", **laya.ask(trace, body.step))
+        except jev.JevError as err:
+            return refuse(model, err.code, body.step, status=err.status)
+        except LayaError as err:
+            return refuse(model, err.code, body.step, kind=err.kind)
+        finally:
+            lock.release()
+        return answer(dict(out, trace=body.trace, step=body.step))
+
+    def guarded(model, body, request):
+        """Anything unexpected is 500 server_error with no-store, never str(exc)."""
+        try:
+            return ask_model(model, body, request)
+        except Exception as exc:
+            print(f"{model}: server_error {type(exc).__name__} (step {body.step})",
+                  file=sys.stderr)
+            return answer({"model": model, "code": "server_error"}, 500)
+
+    def agents_jev_status():
+        """Whether a jev key is configured, and where jev runs. Never the key;
+        sends nothing."""
+        try:
+            key, source = jev.load_key()
+            return answer({"configured": bool(key), "source": source if key else None,
+                           "vendor": "typesafe.ai", "model": jev.MODEL, "hosted": "USA"})
+        except Exception as exc:
+            print(f"jev: server_error {type(exc).__name__} (status)", file=sys.stderr)
+            return answer({"model": "jev", "code": "server_error"}, 500)
+
+    def agents_ask_jev(body: AskBody, request: Request):
+        """Ask jev about one second: one paid call to an external service in the USA."""
+        return guarded("jev", body, request)
+
+    def agents_laya_status():
+        """Laya's column: configured or not, and its worker's state. Never starts it."""
+        try:
+            return answer(laya.status())
+        except Exception as exc:
+            print(f"laya: server_error {type(exc).__name__} (status)", file=sys.stderr)
+            return answer({"model": "laya", "code": "server_error"}, 500)
+
+    def agents_ask_laya(body: AskBody, request: Request):
+        """Ask Laya about one second, twice (options forward, then reversed), in a
+        worker on this machine. The first press starts the worker."""
+        return guarded("laya", body, request)
+
+    for path, method, endpoint in (("/api/agents/jev/status", "GET", agents_jev_status),
+                                   ("/api/agents/jev", "POST", agents_ask_jev),
+                                   ("/api/agents/laya/status", "GET", agents_laya_status),
+                                   ("/api/agents/laya", "POST", agents_ask_laya)):
+        app.router.add_api_route(path, endpoint, methods=[method],
+                                 route_class_override=NoStoreRoute)

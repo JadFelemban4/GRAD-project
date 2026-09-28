@@ -1343,7 +1343,8 @@ class RouteTests(unittest.TestCase):
 
     def test_routes_only_under_simulation(self):
         code = ("import json, sys, app.server as s\n"
-                "print(json.dumps({'mods': sorted(m for m in sys.modules if m.startswith('app.agent')),\n"
+                "print(json.dumps({'mods': sorted(m for m in sys.modules if m.startswith(\n"
+                "  ('app.agent', 'app.jev', 'app.laya', 'app.model_questions'))),\n"
                 "  'paths': sorted(r.path for r in s.app.routes if hasattr(r, 'path')),\n"
                 "  'methods': sorted({m for r in s.app.routes for m in (getattr(r, 'methods', None) or ())})}))\n")
         run = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
@@ -1373,11 +1374,15 @@ class RouteTests(unittest.TestCase):
         app, client = _client(_StubStore())
         paths = {r.path: r for r in app.routes if hasattr(r, "methods")}
         added = set(paths) - {r.path for r in FastAPI().routes}
-        self.assertEqual(added, {"/agents", "/api/agents/episode", "/api/agents/catalog"})
+        posts = {"/api/agents/jev", "/api/agents/laya"}
+        self.assertEqual(added, {"/agents", "/api/agents/episode", "/api/agents/catalog",
+                                 "/api/agents/jev/status", "/api/agents/laya/status"} | posts)
         for p in sorted(added):
-            self.assertEqual(set(paths[p].methods), {"GET"}, p)
+            self.assertEqual(set(paths[p].methods), {"POST"} if p in posts else {"GET"}, p)
         self.assertEqual(client.post(EPISODE_URL).status_code, 405)
         self.assertEqual(client.post(CATALOG_URL).status_code, 405)
+        for p in sorted(posts):
+            self.assertEqual(client.get(p).status_code, 405, p)
 
     @unittest.skipUnless(HAVE_C4, NO_C4)
     def test_episode_route_contract(self):
@@ -2608,6 +2613,8 @@ if mode == "exit_start":
 if mode == "bad_ready":
     send({"ready": False, "error": "ImportError"})
     sys.exit(0)
+if mode == "slow_start":
+    time.sleep(1.5)
 send({"ready": True, "device": "fake", "laya": "0.0.0", "load_s": 0.0,
       "env": {k: os.environ.get(k) for k in ("TYPESAFE_API_KEY", "HF_TOKEN",
                                             "HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE")}})
@@ -2617,6 +2624,9 @@ for line in sys.stdin:
         time.sleep(60)
     if mode == "eof":
         sys.exit(0)
+    if mode == "deep":
+        print("[" * 100000, flush=True)
+        continue
     rid = req["id"] + (100 if mode == "badid" else 0)
     if mode in ("error", "value_error"):
         send({"id": rid, "ok": False, "net_attempts": 0,
@@ -2627,8 +2637,9 @@ for line in sys.stdin:
         keys = list(q["criteria"])
         pick = (keys[-1] if mode == "order" else "retard 5 deg" if mode == "bad_choice"
                 else sorted(keys)[0])
+        top = 10 ** 400 if mode == "huge" else 0.6
         answers[qid] = {"choice": pick, "confidence": 0.5, "answer_confidence": 0.6,
-                        "probabilities": {k: (0.6 if k == pick else 0.1) for k in keys}}
+                        "probabilities": {k: (top if k == pick else 0.1) for k in keys}}
     send({"id": rid, "ok": True, "device": "fake", "ms": 1.0, "model": "fake-laya",
           "answers": answers, "usage": {"input_tokens": 1, "output_tokens": 0},
           "net_attempts": 1 if mode == "net" else 0})
@@ -2859,6 +2870,43 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(Path(env["HF_HOME"]), Path("C:/x") / ".cache" / "huggingface")
         self.assertEqual({k: env[k] for k in LB.OFFLINE}, LB.OFFLINE)
 
+    def test_status_reads_the_worker_once(self):
+        """The status route calls status() on its own thread, beside an ask that
+        may kill the worker. _Vanishing's worker is gone at the second read of
+        _proc, as it is when a kill runs between two reads."""
+        class _Vanishing(LB.LayaBridge):
+            @property
+            def _proc(self):
+                proc, self._slot = self._slot, None
+                return proc
+
+            @_proc.setter
+            def _proc(self, value):
+                self._slot = value
+
+        bridge = _Vanishing(command=["never-started"])
+        bridge._proc = mock.Mock(**{"poll.return_value": None})
+        self.assertEqual(bridge.status()["worker"], "ready")
+        self.assertEqual(bridge.spawns, 0)
+
+    def test_a_worker_dead_between_presses_is_reaped(self):
+        """A worker found dead at the next press is killed and forgotten like any
+        other: its stdin closed and its ready line cleared, even when the fresh
+        start then fails."""
+        spawned = _Spawned()
+        with spawned.patch():
+            bridge = _fake_bridge("ok")
+            self.addCleanup(bridge.close)
+            bridge.ask(_obs_trace(5), 1)
+        dead = spawned.procs[0]
+        dead.kill()
+        dead.wait(5)
+        with mock.patch.object(LB.subprocess, "Popen", side_effect=OSError("no second worker")):
+            self.ask_fails(bridge, "start_failed")
+        self.assertTrue(dead.stdin.closed, "the dead worker's stdin was left open")
+        self.assertIsNone(bridge.ready, "the dead worker's ready line outlived it")
+        self.assertEqual(bridge.status()["worker"], "failed")
+
 
 class FairnessTests(unittest.TestCase):
     """Spec test 15, fairness: both models get the same state and the same questions."""
@@ -2937,6 +2985,323 @@ class LayaRealTests(unittest.TestCase):
               f"{first['started_s']} s, both requests {first['ms']} ms then {again['ms']} ms, "
               f"input tokens {first['usage'][0]['input_tokens']}; order check (an observation, "
               f"not asserted): {held}", file=sys.stderr)
+
+
+# ---- M3: the four model routes (spec test 16) --------------------------------
+#
+# jev is always the jev tests' _FakeSend, and AskRouteTests is a _JevCase, so a
+# request that reached urllib.request.urlopen would fail before any byte left.
+# Laya is always the fake worker, or a stub.
+
+ASK_BASE = "http://127.0.0.1:8000"
+ORIGIN = {"Origin": ASK_BASE}
+ASK_URLS = {"jev": "/api/agents/jev", "laya": "/api/agents/laya"}
+STATUS_URLS = {"jev": "/api/agents/jev/status", "laya": "/api/agents/laya/status"}
+ASK_BODY = {"trace": "runs_c4/5/1", "step": 2}
+JEV_KEYS = {"model", "runs_on", "model_name", "ms", "answers", "sent", "trace", "step"}
+
+
+class _TraceStore:
+    """The store as the model routes see it: one finished trace, every key recorded."""
+    needs_sb3 = False
+
+    def __init__(self):
+        self.keys = []
+
+    def trace(self, key):
+        self.keys.append(key)
+        return _obs_trace(5) if key == ("runs_c4", 5, 1) else None
+
+
+class _Boom:
+    """A Laya bridge whose ask raises what no code expects."""
+    spawns = 0
+
+    def status(self):
+        return {"configured": True, "source": "command", "problem": None, "worker": "stopped",
+                "device": None, "laya": None}
+
+    def ask(self, trace, step):
+        raise RuntimeError("secret-detail")
+
+
+class AskRouteTests(_JevCase):
+    """Spec test 16: the four model routes, each check run for BOTH models."""
+
+    def client(self, send=None, laya=None):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        self.app = FastAPI()
+        self.store = _TraceStore()
+        self.send = send if send is not None else _FakeSend()
+        self.laya = laya if laya is not None else _fake_bridge("order")
+        if isinstance(self.laya, LB.LayaBridge):
+            self.addCleanup(self.laya.close)
+        API.install(self.app, store=self.store, jev_send=self.send, laya=self.laya)
+        return TestClient(self.app, base_url=ASK_BASE)
+
+    def test_bad_bodies_are_422_with_no_store(self):
+        c = self.client()
+        bodies = {f"json {b!r}": {"json": b} for b in (
+            [dict(ASK_BODY, extra=1)]
+            + [dict(ASK_BODY, step=s) for s in ("312", True, 1.0, 719)]
+            + [dict(ASK_BODY, trace=t) for t in ("xx/runs_c4/5/1", "runs_c4/5/1/zz",
+                                                 "runs_c4/5/123", "runs_C4/5/1",
+                                                 "../runs_c4/5/1", "runs_c4/5/1\n")])}
+        bodies["a form"] = {"data": {"trace": "runs_c4/5/1", "step": "2"}}
+        bodies["text/plain"] = {"content": json.dumps(ASK_BODY),
+                                "headers": {"Content-Type": "text/plain"}}
+        with _jev_key(SENTINEL_KEY):
+            for model, url in ASK_URLS.items():
+                for why, kw in bodies.items():
+                    with self.subTest(model=model, body=why):
+                        kw = dict(kw, headers=dict(ORIGIN, **kw.get("headers", {})))
+                        r = c.post(url, **kw)
+                        self.assertEqual(r.status_code, 422)
+                        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual((self.send.calls, self.laya.spawns, self.store.keys), ([], 0, []))
+
+    def test_an_unreadable_body_is_400_with_no_store(self):
+        """A JSON body the reader fails on with something other than a JSON
+        decode error (bytes that are not UTF-8, nesting 100 000 deep) is
+        FastAPI's own 400, raised before the handler: no-store as well."""
+        c = self.client()
+        with _jev_key(SENTINEL_KEY):
+            for model, url in ASK_URLS.items():
+                for why, content in (("not UTF-8", bytes([0xFF, 0xFE, 0xFD])),
+                                     ("nesting 100 000 deep", b"[" * 100_000 + b"]" * 100_000)):
+                    with self.subTest(model=model, body=why):
+                        r = c.post(url, content=content,
+                                   headers=dict(ORIGIN, **{"Content-Type": "application/json"}))
+                        self.assertEqual((r.status_code, r.json()),
+                                         (400, {"detail": "There was an error parsing the body"}))
+                        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual((self.send.calls, self.laya.spawns, self.store.keys), ([], 0, []))
+
+    def test_the_origin_guard(self):
+        c = self.client()
+        cases = (({}, "no Origin"), ({"Origin": "http://evil.test"}, "a foreign Origin"),
+                 ({"Origin": "http://localhost:8000"}, "an Origin that is not http:// + Host"),
+                 ({"Host": "evil.test:8000", "Origin": "http://evil.test:8000"}, "DNS rebinding"))
+        with _jev_key(SENTINEL_KEY):
+            for model, url in ASK_URLS.items():
+                for headers, why in cases:
+                    with self.subTest(model=model, why=why):
+                        r = c.post(url, json=ASK_BODY, headers=headers)
+                        self.assertEqual((r.status_code, r.json()),
+                                         (403, {"model": model, "code": "foreign_origin"}))
+                        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual((self.send.calls, self.laya.spawns, self.store.keys), ([], 0, []))
+
+    def test_trace_resolution(self):
+        c = self.client()
+        local = {"Host": "localhost:8000", "Origin": "http://localhost:8000"}
+        with _jev_key(SENTINEL_KEY):
+            for model, url in ASK_URLS.items():
+                with self.subTest(model=model):
+                    r = c.post(url, json={"trace": "runs_c4/05/1", "step": 2}, headers=ORIGIN)
+                    self.assertEqual(r.status_code, 200, r.text[:300])
+                    self.assertEqual(self.store.keys[-1], ("runs_c4", 5, 1))
+                    r = c.post(url, json={"trace": "runs_c4/5/2", "step": 2}, headers=ORIGIN)
+                    self.assertEqual((r.status_code, r.json()),
+                                     (409, {"model": model, "code": "no_trace"}))
+                    r = c.post(url, json={"trace": "runs_c4/5/1", "step": 5}, headers=ORIGIN)
+                    self.assertEqual((r.status_code, r.json()),
+                                     (409, {"model": model, "code": "step_not_computed"}))
+                    r = c.post(url, json={"trace": "runs_c4/5/1", "step": 4}, headers=local)
+                    self.assertEqual(r.status_code, 200, "localhost is this machine too")
+
+    def test_wrong_methods_are_405_with_no_store(self):
+        c = self.client()
+        cases = ([(url, "get", "POST") for url in ASK_URLS.values()]
+                 + [(url, "post", "GET") for url in STATUS_URLS.values()])
+        for url, method, allow in cases:
+            with self.subTest(url=url, method=method):
+                r = getattr(c, method)(url, headers=ORIGIN)
+                self.assertEqual((r.status_code, r.headers.get("allow"),
+                                  r.headers.get("cache-control")), (405, allow, "no-store"))
+        self.assertEqual((self.send.calls, self.laya.spawns, self.store.keys), ([], 0, []))
+
+    def test_locks_are_per_model(self):
+        c = self.client()
+        locks = self.app.state.model_locks
+        self.assertIsNot(locks["jev"], locks["laya"])
+        with _jev_key(SENTINEL_KEY):
+            for held, free in (("jev", "laya"), ("laya", "jev")):
+                with self.subTest(held=held):
+                    self.assertTrue(locks[held].acquire(blocking=False))
+                    try:
+                        r = c.post(ASK_URLS[held], json=ASK_BODY, headers=ORIGIN)
+                        self.assertEqual((r.status_code, r.json()),
+                                         (409, {"model": held, "code": "busy"}))
+                        r = c.post(ASK_URLS[free], json=ASK_BODY, headers=ORIGIN)
+                        self.assertEqual(r.status_code, 200, r.text[:300])
+                    finally:
+                        locks[held].release()
+
+    def test_jev_failures_never_touch_laya(self):
+        with _jev_key(None):
+            c = self.client()
+            r = c.post(ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual((r.status_code, r.json()), (503, {"model": "jev", "code": "no_key"}))
+        self.assertEqual((self.send.calls, self.laya.spawns), ([], 0),
+                         "no_key must reach neither the send nor the bridge")
+        for send, want in ((_FakeSend(exc=URLError("down")), {"model": "jev", "code": "network"}),
+                           (_FakeSend(status=402, payload=b"sentinel-body no credit"),
+                            {"model": "jev", "code": "vendor_status", "status": 402})):
+            with self.subTest(code=want["code"]):
+                c = self.client(send=send)
+                err = io.StringIO()
+                with _jev_key(SENTINEL_KEY), contextlib.redirect_stderr(err):
+                    r = c.post(ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+                    laya = c.post(ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)
+                self.assertEqual((r.status_code, r.json()), (502, want))
+                self.assertEqual(r.headers.get("cache-control"), "no-store")
+                self.assertEqual(len(send.calls), 1, "one call per press, never a retry")
+                self.assertEqual(laya.status_code, 200, laya.text[:300])
+                self.assertIn(f"jev: {want['code']} (step 2)", err.getvalue())
+                for text in (r.text, laya.text, err.getvalue()):
+                    self.assertNotIn("sentinel", text)
+
+    def test_laya_failures_stay_in_laya_s_column(self):
+        for mode, want in (("error", {"model": "laya", "code": "worker_error", "kind": "other"}),
+                           ("value_error", {"model": "laya", "code": "worker_error",
+                                            "kind": "ValueError"}),
+                           ("net", {"model": "laya", "code": "network_attempt"})):
+            with self.subTest(mode=mode):
+                c = self.client(laya=_fake_bridge(mode))
+                with _jev_key(SENTINEL_KEY):
+                    r = c.post(ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)
+                    j = c.post(ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+                self.assertEqual((r.status_code, r.json()), (502, want))
+                self.assertEqual(r.headers.get("cache-control"), "no-store")
+                self.assertEqual(j.status_code, 200, "a Laya failure must not touch jev")
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {"APPDATA": tmp}):
+            os.environ.pop("LAYA_HOME", None)
+            c = self.client(laya=LB.LayaBridge())
+            r = c.post(ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual((r.status_code, r.json()), (503, {"model": "laya", "code": "not_configured"}))
+        self.assertEqual(self.laya.spawns, 0)
+
+    def test_an_unexpected_error_is_500(self):
+        c = self.client(laya=_Boom())
+        err = io.StringIO()
+        with _jev_key(SENTINEL_KEY), contextlib.redirect_stderr(err):
+            r = c.post(ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)
+            jev_r = c.post(ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual((r.status_code, r.json()), (500, {"model": "laya", "code": "server_error"}))
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertIn("laya: server_error RuntimeError (step 2)", err.getvalue())
+        self.assertNotIn("secret-detail", r.text + err.getvalue())
+        self.assertEqual(jev_r.status_code, 200)
+        self.assertTrue(self.app.state.model_locks["laya"].acquire(blocking=False),
+                        "the lock was not released after the error")
+        self.app.state.model_locks["laya"].release()
+
+    def test_the_status_routes(self):
+        c = self.client()
+        with _jev_key(None):
+            none = c.get(STATUS_URLS["jev"])
+        self.assertEqual(none.json(), {"configured": False, "source": None, "vendor": "typesafe.ai",
+                                       "model": "jev-latest", "hosted": "USA"})
+        with _jev_key(SENTINEL_KEY):
+            some = c.get(STATUS_URLS["jev"])
+        self.assertEqual((some.json()["configured"], some.json()["source"]), (True, "env"))
+        self.assertNotIn(SENTINEL_KEY, some.text)
+        laya = [c.get(STATUS_URLS["laya"]) for _ in range(3)]
+        self.assertEqual(self.laya.spawns, 0, "the status route started the worker")
+        self.assertEqual(laya[0].json(), {"configured": True, "source": "command", "problem": None,
+                                          "worker": "stopped", "device": None, "laya": None})
+        c.post(ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)
+        after = c.get(STATUS_URLS["laya"]).json()
+        self.assertEqual((after["worker"], after["device"], after["laya"]), ("ready", "fake", "0.0.0"))
+        for resp in [none, some] + laya:
+            self.assertEqual(resp.headers.get("cache-control"), "no-store")
+        self.assertEqual(self.send.calls, [], "a status route sends nothing")
+
+    def test_answers_are_no_store_and_carry_the_contract(self):
+        c = self.client()
+        with _jev_key(SENTINEL_KEY):
+            j = c.post(ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual(j.status_code, 200, j.text[:300])
+        got = j.json()
+        self.assertEqual(set(got), JEV_KEYS)
+        self.assertEqual((got["model"], got["runs_on"], got["model_name"], got["trace"], got["step"]),
+                         ("jev", "external", "jev-1.13.0", "runs_c4/5/1", 2))
+        self.assertEqual(got["answers"], MQ.to_action(_model_answer()))
+        self.assertEqual(got["sent"], json.loads(json.dumps(JEV.build_request(_obs_trace(5), 2))))
+        self.assertEqual([key for _, key in self.send.calls], [SENTINEL_KEY])
+        self.assertNotIn(SENTINEL_KEY, j.text)
+        self.assertEqual(j.headers.get("cache-control"), "no-store")
+        first = c.post(ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)
+        again = c.post(ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual(first.status_code, 200, first.text[:300])
+        got = first.json()
+        self.assertEqual(set(got), LAYA_KEYS | {"model", "runs_on", "trace", "step"})
+        self.assertEqual((got["model"], got["runs_on"], got["device"], got["laya"]),
+                         ("laya", "local", "fake", "0.0.0"))
+        self.assertIsInstance(got["started_s"], float)
+        self.assertIsNone(again.json()["started_s"])
+        for qid in MQ.IDS:
+            with self.subTest(qid=qid):
+                self.assertEqual(got["answers"][qid]["choice"], MQ.KEYS[qid][-1])
+                self.assertEqual(got["answers_reversed"][qid]["choice"], MQ.KEYS[qid][0])
+                self.assertEqual(list(got["sent"][1]["questions"][qid]["criteria"]),
+                                 list(reversed(MQ.KEYS[qid])))
+        self.assertEqual(first.headers.get("cache-control"), "no-store")
+
+    def test_the_server_docstring_names_both_posts(self):
+        doc = ast.get_docstring(ast.parse((ROOT / "app" / "server.py").read_text(encoding="utf-8")))
+        for text in ("/api/agents/jev", "/api/agents/laya", "Neither", "path to the vehicle"):
+            self.assertIn(text, doc)
+        self.assertNotIn("Every HTTP route below is a GET.", doc)
+        for text in ("/api/agents/jev", "/api/agents/laya"):
+            self.assertIn(text, API.install.__doc__)
+
+    def test_an_absurd_answer_is_bad_answer_never_500(self):
+        """Carried from Task 2: a reply that to_action or the parser cannot hold
+        (a 400-digit probability overflows, nesting 100 000 deep exhausts
+        json.loads) is the model's own answer, so it is bad_answer, never 500."""
+        huge = json.dumps({"model": "jev-1.13.0", "answers": _model_answer()}).replace(
+            "0.6", "1" + "0" * 400, 1).encode("utf-8")
+        deep = b"[" * 100_000 + b"]" * 100_000
+        for why, payload, mode in (("a 400-digit probability", huge, "huge"),
+                                   ("nesting 100 000 deep", deep, "deep")):
+            c = self.client(send=_FakeSend(payload=payload), laya=_fake_bridge(mode))
+            for model, url in ASK_URLS.items():
+                with self.subTest(why=why, model=model):
+                    err = io.StringIO()
+                    with _jev_key(SENTINEL_KEY), contextlib.redirect_stderr(err):
+                        r = c.post(url, json=ASK_BODY, headers=ORIGIN)
+                    self.assertEqual((r.status_code, r.json()),
+                                     (502, {"model": model, "code": "bad_answer"}))
+                    self.assertEqual(r.headers.get("cache-control"), "no-store")
+                    self.assertEqual(err.getvalue(), f"{model}: bad_answer (step 2)\n")
+
+    def test_a_status_call_during_a_laya_start_is_never_500(self):
+        """The status route runs beside an ask, on another thread, by design. A
+        status call while the worker starts, and while a start times out and
+        the worker is killed, answers 200 with no-store every time."""
+        from fastapi.testclient import TestClient
+        for mode, kw, want, end in (("slow_start", {}, 200, "ready"),
+                                    ("hang_start", {"start_timeout": 1}, 502, "failed")):
+            with self.subTest(mode=mode):
+                c = self.client(laya=_fake_bridge(mode, **kw))
+                pressed, seen = [], []
+                press = threading.Thread(target=lambda: pressed.append(
+                    TestClient(self.app, base_url=ASK_BASE).post(
+                        ASK_URLS["laya"], json=ASK_BODY, headers=ORIGIN)))
+                with contextlib.redirect_stderr(io.StringIO()):
+                    press.start()
+                    while press.is_alive():
+                        seen.append(c.get(STATUS_URLS["laya"]))
+                        time.sleep(0.02)
+                    press.join()
+                self.assertEqual(pressed[0].status_code, want, pressed[0].text[:300])
+                self.assertEqual({(r.status_code, r.headers.get("cache-control")) for r in seen},
+                                 {(200, "no-store")})
+                self.assertIn("starting", [r.json()["worker"] for r in seen])
+                self.assertEqual(c.get(STATUS_URLS["laya"]).json()["worker"], end)
 
 
 def _shape(x):

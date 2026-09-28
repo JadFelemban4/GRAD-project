@@ -40,8 +40,8 @@ import subprocess
 import threading
 import time
 
-from app.model_questions import (BadAnswer, QUESTIONS, QUESTIONS_REVERSED, REPO, build_state,
-                                 to_action, user_setting)
+from app.model_questions import (QUESTIONS, QUESTIONS_REVERSED, REPO, build_state, to_action,
+                                 user_setting)
 
 WORKER = Path(__file__).resolve().parent / "laya_worker.py"
 START_TIMEOUT_S = 90.0
@@ -133,7 +133,10 @@ class LayaBridge:
         self.spawns = 0
 
     def _alive(self):
-        return self._proc is not None and self._proc.poll() is None
+        # One read: status() runs on the status route's thread, beside an ask
+        # whose kill can set _proc to None between two reads.
+        proc = self._proc
+        return proc is not None and proc.poll() is None
 
     def status(self):
         """What the page's Laya column shows. Reads the setting; never spawns."""
@@ -237,7 +240,7 @@ class LayaBridge:
             raise LayaError("worker_died")
         try:
             reply = json.loads(raw)
-        except ValueError:
+        except (ValueError, RecursionError):      # deep nesting exhausts json.loads
             reply = None
         if not isinstance(reply, dict) or reply.get("id") != rid:
             self._kill()
@@ -255,7 +258,7 @@ class LayaBridge:
         state = build_state(trace, step)
         started_s = None
         if not self._alive():
-            self._proc = None
+            self._kill()             # none yet, or one that died since the last press
             started_s = self._start()
         t0 = time.perf_counter()
         forward = self._request(state, QUESTIONS)
@@ -264,7 +267,8 @@ class LayaBridge:
         try:
             answers = to_action(forward.get("answers"))
             answers_reversed = to_action(reverse.get("answers"))
-        except BadAnswer:
+        # BadAnswer is a ValueError; a huge integer overflows in to_action.
+        except (ValueError, OverflowError):
             raise LayaError("bad_answer") from None
         name = forward.get("model")
         return {"model_name": name if isinstance(name, str) and len(name) <= 64 else None,
