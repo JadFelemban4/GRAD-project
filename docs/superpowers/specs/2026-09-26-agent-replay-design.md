@@ -465,6 +465,8 @@ Row 2 therefore shows each car's `map_kpa` beside it: «ضغط المشعب ال
 | "the temperature was measured" | The lab's model-output caveat | panel |
 | "jev is part of the thesis" | Hidden by default; the §7 text; no comparison; never applied | jev panel |
 
+*(Amended while building M2, 28 September, after the Task 10 review: the row "C4 is a clean negative" names the select, and a closed select shows only as much of its option as fits. At 390 px the C4 option read «C4 · أصغر من الحد الأدنى المهم (50 وحدة) عند 300 000 خطوة» and nothing more, which is that misreading itself; at 1440 px it stopped inside «بفارق بذرة واحدة». The milestone walk (`fa4e4aa`) passed the row on the strip and the box; the review failed it, and it was right to. The chosen experiment's whole short line now also stands under the select, found, missing or none alike, exactly as the box prints it (`experimentNote`, `#pick-experiment-note`; `f2e3e5f`). The option text is unchanged, so the open list still names each experiment's line. A ruling taken while building, not Jad's word: the line now shows twice in the side column, under the select and in the box.)*
+
 **Layout.**
 
 - **Desktop (≥ 1100 px, RTL):**
@@ -684,6 +686,7 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
   - *(Amended while building M1, 27 September: this line read "with `app\start-simulation.ps1` running". The line above it was corrected when the plan was written (walkthrough log, 26 September); at M1 the two runs printed 49 of 49 for `app.test_replay` and 59 of 59 for `app.test_replay --full`.)*
   - *(Amended while building M2, 28 September: M2 fixed the banner, not the interpreter. `app\start-simulation.ps1` now prints the `/agents` address and, when its own `python` has no stable-baselines3, says that `/agents` lists the experiments but answers 503 for an episode, and how to start the server with an interpreter that has it. Its last line still calls bare `python`, deliberately: the teammates' machines have other Python installations than this one, so no path written here would be right on all of them, and `/simulation` must start exactly as before. A ruling taken while building, not Jad's word; changing the interpreter is one line.)*
   - the first «احسب» shows «تحميل الشبكتين…» for about 5 s, and later builds move within about a second;
+  - *(Amended while building M2, 28 September, after the Task 10 review: on the M2 verification the first build on a cold server drew its first frame after 15.8 s, and after 14.3 s on the re-run that followed the Task 10 fix (the 28 Sep prototype: 17.5 s and 17.3 s), each time with another session's work on the same machine; later builds drew theirs within 0.57 to 0.67 s. The 5 s above is M1's one measurement, not a bound.)*
   - a pause shows ten applied actions in Arabic with row 2 as a ceiling offset beside `map_kpa`, the held flags, the preview markers, the blind zeros, the weights, the damage, and the C4 short line with its one-seed clause (also in the scene strip);
   - it is checked at 1440 px and 390 px against the misreading table.
 
@@ -879,3 +882,73 @@ M1 was built task by task (11 plan tasks plus one controller-added task, 10b), e
 - Final re-review: at 1440 px the Arabic dt caption breaks between '(AUDIT2.md' and 'H2-2)' at the space; H2-2 itself no longer breaks (a no-break space or an isolate would keep the citation whole).
 - Final re-review: the M1 plan file still carries «مختلفان» and agents.action.tick_duty; M2 must copy from this spec, not from the plan.
 - Left for later by the final review's triage: F2 the scored-artefact dot wraps alone (agents.css:106); F3 the device line wraps inside '(torch ..., SB3 2.9.0)' at 390 px; F6 a cache hit ignores preempt, so an unwatched build keeps running (agent_api.py:157-161).
+
+## Build record for M2 (28 September 2026): every ruling the controller made, and what was left for later
+
+M2 was built task by task from `docs/superpowers/plans/2026-09-28-agent-replay-m2.md` (10 tasks), each by a fresh implementer and checked by a fresh reviewer, with fix rounds where a review asked for them. The working ledger lives under `.superpowers/sdd/`, which is gitignored scratch; this section is its permanent record, so that no decision taken on Jad's behalf and no deferred item lives only in a scratch file. Commits `8f6789b` (the plan) through `f2e3e5f`, and the commit that adds this record, on JMF-2340550-sep17. Another session committed unrelated files on the same branch while M2 was built (`plot_*.py`, `CLAUDE.md`, `CHECKPOINT.md`, `team/`); every M2 commit's subject starts "Agent replay M2", and the reviews judged only those.
+
+### Rulings (each with what it costs if wrong)
+
+1. Ruling: the same setup as M1 (build record for M1, rulings 1 and 2): in place on JMF-2340550-sep17, one Workflow per task (implementer, reviewer, up to 5 fix rounds, a fresh fixer carrying the report), reviewers on opus — cost if wrong: as in M1.
+2. Ruling: implementers on opus for every M2 task, because each task integrates with M1's committed code rather than transcribing new files, and M1's sonnet tasks needed the more fix rounds — cost if wrong: a higher token cost only.
+3. Ruling: build without a separate plan review by Jad: he cannot review a 6 000-line English plan, chose "the whole of M2", and was told the build would follow the plan as M1's did — cost if wrong: Jad wanted to see the plan first; nothing is irreversible, every commit is on his own branch.
+4. Ruling (plan critic's gap 1): without stable-baselines3 the page says so at the picker as soon as the catalog arrives (`sb3` false), not only after a full selection — cost if wrong: one extra notice line.
+5. Ruling (gap 2): the catalog does not carry `analyse_phase_d2.load`'s `incomplete` list in M2, because every table is complete today and the gap cannot be seen — cost if wrong: an incomplete future results file reads "no row for this seed" without naming why.
+6. Ruling (gap 3): a refused pair shows ALL of its problems (both arms, every line of `check_pair`'s list), not only the first, because §8 says "with reason and fields" — cost if wrong: a longer list under the picker.
+7. Ruling (gap 4): Phase D's episode note prints «12.0٪» (one decimal, like every other grade on the page), and §6 is amended — cost if wrong: none found.
+8. Ruling (gap 5): the lab launcher gets the `/agents` banner and the no-stable-baselines3 warning only; its interpreter is NOT changed, because the teammates' machines have other Python paths (§10 amendment) — cost if wrong: the launcher still starts a server whose `/agents` answers 503 on a `.venv` without stable-baselines3, now with a printed warning.
+9. Ruling: Task 9's edit to `start-simulation.ps1` (banner and warning) is accepted although Jad's approval of 26 Sep named only three exports, one i18n key and one link: §10 already assigned the launcher to M2, and the edit changes nothing the lab does — cost if wrong: one more lab file touched than Jad approved.
+10. Ruling (Task 2, carried to Task 3): an arm whose recorded zip sha DIFFERS from its `final.zip` is labelled `scored` = `mismatch`, a third value beside `match` and `not recorded` (§4 amendment) — cost if wrong: one more value the page renders.
+11. Ruling (Task 6): `computeState` checks stable-baselines3 BEFORE the selection: on a machine without it nothing can run, so the warning beats "choose a pair" — cost if wrong: that machine shows only the warning.
+12. Ruling (Task 7): the page uses Task 6's `refusedPairs`, `scoredKey` and `agents.verdict.scored_mismatch` instead of the inline logic its brief predates, so `mismatch` reaches the page and nothing is duplicated — cost if wrong: none found.
+13. Ruling: two Task 7 minors were folded into Task 8, which edited the same files: the refused-pair and refused-experiment labels put the name inside an isolate, so "runs_sixspeed_18sep (no name recorded)" is not drawn with a mirrored parenthesis in Arabic; and after a failed catalog request the picker note stops saying the list is loading — cost if wrong: two more small edits in Task 8.
+14. Ruling (Task 10, fix round 1, taken by the fixer; the review allowed a fix or a ruling): the C4 misreading at the closed experiment select is fixed in code (the whole short line under the select, `f2e3e5f`), not exempted by a ruling, and Steps 1 to 5 of the verification were run again (§6 amendment) — cost if wrong: the short line shows twice in the side column.
+
+### Carried between tasks, and closed
+
+- Task 1 to Task 10: §4 said the not-found box names one `results/<file>`; the code names every missing file, sorted and joined by " · " (§4 amendment).
+- Task 3 to Task 4: an exception from `analyse_phase_d.parse` (a non-UTF-8 results file) would have failed the whole catalog; the catalog route's fixed-text 500 covers it.
+- Task 3 to Task 7: the page renders `scored` = `mismatch`.
+- Task 8 to Task 10: Phase D's long blind lane label fits over the chase view at 390 px, below both cars and over neither; the refused sixspeed pair's name is drawn with its parentheses the right way round at 1440 and 390 px.
+
+### Taken from M1's left-for-later list
+
+F6 (a preempt answered from the cache now cancels the other build); a superseded build that fails reports nothing; `renderStopped` named every blind car alike; `read_agent` on a missing directory; an unreadable `final.zip` showed ready (M1 ruling 6 reversed); the Task 3 test gaps (unknown protocol, cross-arm protocol, results file absent); `MISSING_TEXT` named only the first file; the 10b grouped-number regex; the `agent_catalog` comments at `:36-38` and `:102`; non-KeyError failures reached FastAPI's 500 without no-store; the lab launcher named only `/simulation`. Every other item of M1's list stays deferred as written there, including, in code M2 edits: the store's untested preempt during the loader and two networks on different devices, preempt=true with since omitted untested on the route, and the no-write snapshot watching `runs_c4/*_seed0` only.
+
+### Left for later (M2's own; none blocks the milestone)
+
+- Task 1: minor (deferred): the comment at `agent_catalog.py:260` calls the INCONCLUSIVE gloss `PHASE_D2_RESULT.txt:31-33` "in the team's words", but it paraphrases ("the team cares about" against the file's "would care about") — say "paraphrasing".
+- Task 1: minor (deferred): the whole-item test checks the blank line after an item, not before (start lines are pinned).
+- Task 1: minor (deferred): `verdict()` is called twice in `test_d2_and_phase_d_verdicts`.
+- Task 2: minor (deferred): an existing but unreadable results file skips the sha check with `result_file` true (`agent_catalog.py:180`; M1 behaviour).
+- Task 2: minor (deferred): no test of `read_agent` on a path that is a FILE, not a directory.
+- Task 2: minor (deferred): the comment at `agent_catalog.py:109-112` paraphrases `run_phase_d.py:330`.
+- Task 3: minor (deferred): `warnings.catch_warnings` in `table_rows` is not thread-safe under FastAPI's threadpool (`agent_catalog.py:156`).
+- Task 3: minor (deferred): `AGENT_NAME` with `int()` lists `sighted_seed01` as seed 1 with both arms missing (`agent_catalog.py:189-195`; M1's regex).
+- Task 3: minor (deferred): `table_rows` reads the repository's `results/` whatever `root` is (`agent_catalog.py:141-160`).
+- Task 3: minor (deferred): in a half pair whose present arm is refused, `reason` is that refusal, not the "missing" line (`agent_catalog.py:199-204`); the page lists every line (ruling 6).
+- Task 4: minor (deferred): the fixed-text 500s log nothing on the server console (`agent_api.py:157-159`, `:212-213`); a traceback to stderr would help an operator without writing to disk.
+- Task 4: minor (deferred): `catalog()` runs `jsonable` over constants that are already JSON (`agent_api.py:129-132`).
+- Task 4: minor (deferred): a precondition globs `ROOT/results` where `load` reads `analyse_phase_d2.HERE/results` (the same directory today).
+- Task 4: minor (deferred): `PageTests.test_page_assets_ids` fails instead of skipping on a fresh clone without the vendored Three.js (M1).
+- Task 4: minor (deferred): an implementer created and deleted an empty `x.py` in `%TEMP%`, the machine trap the environment block warns about; nothing was left behind.
+- Task 5: minor (deferred): going back to a key whose build was just cancelled, before its worker exits, answers from the doomed build until the next poll restarts it (`agent_api.py:163`, `:173`); it heals itself, and the progress may step back.
+- Task 5: minor (deferred): the join-all-builders loop is written out four times in `test_agents.py`; a shared helper would do.
+- Task 6: minor (deferred): `_shape` compares only `experiments[0]` and the first item of each list, and never values; its docstring says more.
+- Task 6: minor (deferred): the catalog fixture is served under `/static/sim` in every server mode (tags, zip shas, verdict quotes; no machine path), as M1's test files there are.
+- Task 7: minor (deferred): a non-200 catalog shows only "HTTP <status>", dropping the safe fixed-text detail (`agents.mjs` `loadCatalog`).
+- Task 7: minor (deferred): the nav test's late-frame assertion cannot tell the fix from its absence; only `requests.length === 0` pins it.
+- Task 7: minor (deferred): `clearEpisode` repeats `compute()`'s reset block.
+- Task 7: minor (deferred): `loadCatalog().catch(console.error)` hides a render error from the page.
+- Task 8: minor (deferred): `state.preempted` belongs to the page, not to the build it stopped, so with two viewers "stopping the previous episode" could describe the other viewer's build (`agents.mjs:403`, `:428`).
+- Task 8: minor (deferred): the comment and test cite UAX #9 N1 and N2 for the mirrored parenthesis and ignore N0 (paired brackets); the isolate is harmless.
+- Task 8: minor (deferred): `experiment_empty` and the selectable experiment option print the name without an isolate; unreachable on today's tree.
+- Task 8: minor (deferred): the extra stopping test never asserts the URL of the requests it answers, and one Task 7 test message now reads slightly wrong.
+- Task 9: minor (deferred): a redundant `assertIsNot` on strings, and the conditional stable-baselines3 note is not pinned by a test.
+- Task 9: minor (deferred): the launcher's suggested command omits `--http-port $Port`, and any non-zero probe exit reads as "no stable-baselines3".
+- Task 4, 9 and 10: minor (deferred): the suite output carries third-party deprecation warnings (Starlette's httpx testclient, anyio's `BlockingPortal`), printed by `test_page_assets_ids`; M1 recorded the same.
+- Task 10: minor (deferred): M1 F2 is visible at 390 px: the blind car's scored line wraps so its dot sits on a line of its own (`agents.css`, `.verdict-scored li`).
+- Task 10: minor (deferred): at 390 px a quoted results line that wraps continues flush left, while the file's own lines start indented, so a quote reads unevenly (`agents.css`, `.quote pre`); nothing is clipped.
+- Task 10: minor (deferred): the cold first frame is about three times §10's "about 5 s" (§10 amendment).
+- Task 10: known limit: the no-write snapshot (test 11) raises when another session writes to the shared working tree during the run. It did so twice on 28 Sep: the first run named no file, the second only `.git/index`; the re-runs with HEAD unchanged before and after passed.
+- Correction: the milestone commit `fa4e4aa` says the first default run failed because the other session "committed"; that run ended at 11:19:37, before that session's commit at 11:21:18, so the cause was its uncommitted writes. The same commit's walk passed "C4 is a clean negative" against its own evidence (ruling 14). The commit is history and is not rewritten.
