@@ -195,3 +195,31 @@ test('the models panel stretches, comes after the pause panel below 1100 px, and
   assert.match(css, /@media\(max-width:760px\)\{\s*\.models-columns\{grid-template-columns:1fr\}/);
   assert.match(css, /(?:^|\})\.footer-index\{[^}]*touch-action:manipulation/m);
 });
+
+// Jad did not find the pause panel on 28 Sep: at 1440 x 900 it started 957 px
+// below the fold, under the verdict box, and before «احسب» it said only "—"
+// (M3 design 7.8, his option 1). It now sits right under the play bar in the
+// main column, the models panel right after it, and before an episode it says
+// what to do. Below 1100 px the one column keeps transport, pause panel,
+// profile, models panel.
+test('the pause panel sits under the play bar, the models panel right after it, and phones keep that order', () => {
+  const html = read(HTML);
+  const main = html.slice(html.indexOf('<div class="agents-col agents-col-main">'), html.indexOf('<aside'));
+  const side = html.slice(html.indexOf('<aside'), html.indexOf('</aside>'));
+  const at = ['<section class="transport', '<section class="pause-panel">', '<section id="models-panel"',
+    '<article class="profile-panel">'].map(marker => main.indexOf(marker));
+  assert.ok(at.every(i => i >= 0), `the main column is missing the transport, a panel or the profile: ${at}`);
+  assert.deepEqual([...at].sort((a, b) => a - b), at, 'transport, pause panel, models panel, profile, in that order');
+  assert.equal(side.indexOf('pause-panel'), -1, 'the pause panel is still in the side column');
+  assert.equal(side.indexOf('models-panel'), -1, 'the models panel is still in the side column');
+  // data-i18n, because draw() returns before renderPanel while there is no
+  // road: without it an English page would keep this Arabic line until an
+  // episode arrives. renderPanel overwrites it once a frame exists.
+  assert.ok(html.includes(`<h2 id="pause-heading" data-i18n="agents.pause.empty">${STRINGS.ar['agents.pause.empty']}</h2>`),
+    'before any episode, the pause panel says what to do, in the page\'s language, not "—"');
+  const narrow = read(new URL('./agents.css', import.meta.url)).match(/@media\(max-width:1099px\)\{([\s\S]*?)\n\}/);
+  assert.ok(narrow, 'agents.css has no <1100 px block');
+  for (const [name, n] of [['agents-transport', 4], ['pause-panel', 5], ['profile-panel', 6], ['models-panel', 7]]) {
+    assert.match(narrow[1], new RegExp(`\\.${name}\\{order:${n}\\}`), `.${name} must be order ${n} below 1100 px`);
+  }
+});

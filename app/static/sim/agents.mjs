@@ -1034,7 +1034,8 @@ function renderStopped() {
 function renderPanel(k) {
   const frame = k >= 0 ? state.frames[k] || null : null;
   const road = state.road;
-  setText($('pause-heading'), frame ? t(currentLang, 'agents.pause.heading', { k, k1: k + 1 }) : EM_DASH);
+  setText($('pause-heading'), frame ? t(currentLang, 'agents.pause.heading', { k, k1: k + 1 })
+    : t(currentLang, 'agents.pause.empty'));
   setText($('grade-now'), frame && road
     ? t(currentLang, 'agents.pause.grade_now', { grade: fmt(road.grade_pct[k], 1) }) : '');
   const w = state.meta?.episode?.weights;

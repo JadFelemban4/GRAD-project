@@ -248,11 +248,11 @@ test('changing the pair after a computation clears the old episode and drops its
   nodes.compute.click();
   h.reply(await h.nextRequest(), { status: 'building', since: 0, steps: 719, frames: [{ k: 0, cars: [car(), car()] }], meta: META, road: ROAD });
   const inFlight = await h.nextRequest();
-  assert.notEqual(nodes['pause-heading'].textContent, '—', 'the episode is on screen');
+  assert.notEqual(nodes['pause-heading'].textContent, AR('agents.pause.empty'), 'the episode is on screen');
   assert.equal(nodes['scene-prompt'].hidden, true);
 
   h.change(nodes['pick-pair'], '3');
-  assert.equal(nodes['pause-heading'].textContent, '—', 'the old episode left the pause panel');
+  assert.equal(nodes['pause-heading'].textContent, AR('agents.pause.empty'), 'the old episode left the pause panel');
   assert.equal(nodes['scene-prompt'].hidden, false, 'the scene asks for «احسب» again');
   assert.equal(nodes.loading.hidden, true, 'no loading card for an episode nobody asked for');
   assert.equal(h.history.at(-1), '/agents?runs=runs_c4&seed=3&ep=1', 'the episode is kept: the same twenty episodes');
@@ -261,7 +261,7 @@ test('changing the pair after a computation clears the old episode and drops its
 
   h.reply(inFlight, { status: 'building', since: 1, steps: 719, frames: [{ k: 1, cars: [car(), car()] }] });
   await wait(450);
-  assert.equal(nodes['pause-heading'].textContent, '—', 'a late frame of the old key changed the page');
+  assert.equal(nodes['pause-heading'].textContent, AR('agents.pause.empty'), 'a late frame of the old key changed the page');
   assert.equal(h.requests.length, 0, 'the old key is not polled again');
 });
 

@@ -65,33 +65,8 @@
           </div>
           <div class="rate-control"><label for="rate" data-i18n="rate.label">سرعة العرض</label><select id="rate" data-i18n-aria="rate.aria" aria-label="سرعة العرض"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option><option value="16">16×</option></select></div>
         </section>
-        <article class="profile-panel">
-          <div id="profile" class="profile" role="img"></div>
-          <div class="profile-captions"><span id="profile-ve"></span><span id="rise-caption"></span></div>
-        </article>
-      </div>
-      <aside class="agents-col agents-col-side">
-        <section class="picker-panel">
-          <div class="pick-row"><label for="pick-experiment" data-i18n="agents.pick.experiment">التجربة</label><select id="pick-experiment" disabled></select></div>
-          <p id="pick-experiment-note" class="pick-caption"></p>
-          <div class="pick-row"><label for="pick-pair" data-i18n="agents.pick.pair">الزوج</label><select id="pick-pair" disabled></select></div>
-          <p id="pick-pair-note" class="pick-caption"></p>
-          <div class="pick-row"><label for="pick-episode" data-i18n="agents.pick.episode">الحلقة</label><select id="pick-episode" disabled></select></div>
-          <p id="pick-episode-note" class="pick-caption"></p>
-          <div id="pick-note" class="pick-note"></div>
-          <button id="compute" class="play-button compute-button" type="button" disabled data-i18n-aria="agents.compute_aria" aria-label="احسب"><span data-i18n="agents.compute">احسب</span></button>
-          <details id="pick-refused" class="pick-refused" hidden></details>
-        </section>
-        <section id="verdict" class="verdict-panel" data-state="waiting">
-          <h2 data-i18n="agents.verdict.heading">الحكم المسجَّل مسبقاً</h2>
-          <p id="verdict-short" class="verdict-short">—</p>
-          <ul id="verdict-cells" class="verdict-cells"></ul>
-          <details id="verdict-more"><summary>—</summary><div id="verdict-lines"></div></details>
-          <ul id="verdict-scored" class="verdict-scored"></ul>
-          <p id="illustration-note" class="illustration-note" data-i18n="agents.illustration">حلقة واحدة لزوج واحد مثال توضيحي، لا نتيجة.</p>
-        </section>
         <section class="pause-panel">
-          <div class="panel-heading"><h2 id="pause-heading">—</h2><span id="grade-now" class="sample-tag"></span></div>
+          <div class="panel-heading"><h2 id="pause-heading" data-i18n="agents.pause.empty">اضغط احسب، ثم أوقف العرض عند أي ثانية لترى ما قرّره كل وكيل</h2><span id="grade-now" class="sample-tag"></span></div>
           <p id="weights-line" class="weights-line"></p>
           <div id="actions" class="actions"></div>
           <p id="seen-sighted" class="seen sighted"></p>
@@ -140,6 +115,31 @@
               <details class="model-sent"><summary data-i18n="agents.models.sent">ما الذي أُرسل</summary><pre id="model-laya-sent-body" dir="ltr"></pre></details>
             </article>
           </div>
+        </section>
+        <article class="profile-panel">
+          <div id="profile" class="profile" role="img"></div>
+          <div class="profile-captions"><span id="profile-ve"></span><span id="rise-caption"></span></div>
+        </article>
+      </div>
+      <aside class="agents-col agents-col-side">
+        <section class="picker-panel">
+          <div class="pick-row"><label for="pick-experiment" data-i18n="agents.pick.experiment">التجربة</label><select id="pick-experiment" disabled></select></div>
+          <p id="pick-experiment-note" class="pick-caption"></p>
+          <div class="pick-row"><label for="pick-pair" data-i18n="agents.pick.pair">الزوج</label><select id="pick-pair" disabled></select></div>
+          <p id="pick-pair-note" class="pick-caption"></p>
+          <div class="pick-row"><label for="pick-episode" data-i18n="agents.pick.episode">الحلقة</label><select id="pick-episode" disabled></select></div>
+          <p id="pick-episode-note" class="pick-caption"></p>
+          <div id="pick-note" class="pick-note"></div>
+          <button id="compute" class="play-button compute-button" type="button" disabled data-i18n-aria="agents.compute_aria" aria-label="احسب"><span data-i18n="agents.compute">احسب</span></button>
+          <details id="pick-refused" class="pick-refused" hidden></details>
+        </section>
+        <section id="verdict" class="verdict-panel" data-state="waiting">
+          <h2 data-i18n="agents.verdict.heading">الحكم المسجَّل مسبقاً</h2>
+          <p id="verdict-short" class="verdict-short">—</p>
+          <ul id="verdict-cells" class="verdict-cells"></ul>
+          <details id="verdict-more"><summary>—</summary><div id="verdict-lines"></div></details>
+          <ul id="verdict-scored" class="verdict-scored"></ul>
+          <p id="illustration-note" class="illustration-note" data-i18n="agents.illustration">حلقة واحدة لزوج واحد مثال توضيحي، لا نتيجة.</p>
         </section>
       </aside>
     </section>

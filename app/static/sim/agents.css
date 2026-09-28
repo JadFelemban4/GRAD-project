@@ -16,8 +16,10 @@
 .agents-intro{align-items:flex-end}
 .sim-badge{max-width:560px;margin:0;padding:9px 12px;border:1px dashed var(--estimated);border-radius:9px;background:var(--estimated-bg);color:var(--estimated-ink);font-size:11px;line-height:1.75}
 
-/* >= 1100 px: main column (chase, timeline, profile) | side column (picker,
-   verdict, pause panel). The grid runs ltr and its children rtl, exactly as the
+/* >= 1100 px: main column (chase, timeline, pause panel, models panel,
+   profile) | side column (picker, verdict). The pause panel sits right under
+   the play bar (M3 design 7.8: at 1440 x 900 it started 957 px below the fold
+   in the side column). The grid runs ltr and its children rtl, exactly as the
    lab's .lab-layout does, so the side column sits at the reading start. */
 .agents-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:17px;direction:ltr;align-items:start;margin-bottom:17px}
 .agents-layout>*{direction:rtl;min-width:0}
@@ -77,7 +79,7 @@ html[dir=ltr] .profile-climb-label{direction:ltr}
 .profile-captions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;margin-top:6px;font-size:9px;color:var(--muted)}
 #profile-ve{font-weight:600;color:var(--ink-2)}
 
-/* side column */
+/* the cards: picker and verdict (side column), pause and models panels (main) */
 .picker-panel,.verdict-panel,.pause-panel,.models-panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
 .pick-row{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;gap:10px;margin-bottom:8px}
 .pick-row label{font-size:10px;color:var(--muted)}
@@ -127,12 +129,12 @@ html[dir=ltr] .profile-climb-label{direction:ltr}
 .footer-index{display:inline-flex;align-items:center;min-height:32px;min-width:32px;padding:0 8px;touch-action:manipulation}
 
 /* < 1100 px: one column, in reading order badge, picker, verdict, chase,
-   timeline, profile, pause panel. The two column wrappers dissolve so their
-   children can be ordered together. */
+   timeline, pause panel, profile, models panel. The two column wrappers
+   dissolve so their children can be ordered together. */
 @media(max-width:1099px){
 .agents-layout{display:flex;flex-direction:column;gap:12px}
 .agents-col{display:contents}
-.picker-panel{order:1}.verdict-panel{order:2}.chase-panel{order:3}.agents-transport{order:4}.profile-panel{order:5}.pause-panel{order:6}.models-panel{order:7}
+.picker-panel{order:1}.verdict-panel{order:2}.chase-panel{order:3}.agents-transport{order:4}.pause-panel{order:5}.profile-panel{order:6}.models-panel{order:7}
 }
 /* < 760 px: phone. The lab hides its last nav link here; this page has four
    and needs all of them, so the nav takes a row of its own instead. */
