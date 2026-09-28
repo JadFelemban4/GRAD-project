@@ -1,6 +1,7 @@
 ---
-name: <your name>
-email: <the address in your `git config user.email`>
+name: <your name, as the team writes it>
+student_number: <your university number>
+email: <optional: what `git config user.email` prints on your machine>
 updated: <YYYY-MM-DD>
 ---
 

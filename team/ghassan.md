@@ -1,6 +1,7 @@
 ---
 name: Ghassan Alrefaei
-email: <set this to your `git config user.email`>
+student_number: 2340394
+email: <optional: what `git config user.email` prints on your machine>
 updated: 2026-09-19
 ---
 
@@ -11,8 +12,9 @@ updated: 2026-09-19
 > fill. Nobody should guess your background for you, and a profile that guesses
 > is worse than none, because it steers every explanation you get.
 >
-> To finish it: set `email:` above to whatever `git config user.email` prints on
-> your machine, then work through `team/_TEMPLATE.md` and replace this file.
+> To finish it: work through `team/_TEMPLATE.md` and replace this file — or
+> tell the assistant who you are at the start of a session and let it ask you
+> the template's questions, one at a time.
 
 Student number **2340394**. GitHub **`badcloor`**.
 

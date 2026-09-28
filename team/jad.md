@@ -1,7 +1,8 @@
 ---
 name: Jad Felemban
+student_number: 2340550
 email: endo.felemban@gmail.com
-updated: 2026-09-26
+updated: 2026-09-28
 ---
 
 # Jad
