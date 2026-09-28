@@ -1822,6 +1822,31 @@ class PageTests(unittest.TestCase):
         self.assertNotEqual(head, -1, "the one read of .cars must be inside carOf")
         self.assertLess(hits[0] - head, 120, "the one read of .cars must be inside carOf")
 
+    def test_the_picker_opens_empty_and_disabled(self):
+        """Nothing is selected when the page opens (design section 6, Picker).
+
+        The three selects carry no <option> in the markup, so nothing can read
+        as chosen before the catalog arrives, and they stay disabled until
+        agents.mjs fills them from it. The list of pairs that cannot run
+        starts hidden and empty; agents.mjs fills it from the catalog too. The
+        address is only ever REPLACED: a pushState would make every choice a
+        step of the back button.
+        """
+        html = self.read("agents.html")
+        for name in ("pick-experiment", "pick-pair", "pick-episode"):
+            m = re.search(rf'<select id="{name}"([^>]*)>(.*?)</select>', html, flags=re.S)
+            self.assertIsNotNone(m, f"#{name} is missing")
+            self.assertIn("disabled", m.group(1), f"#{name} must start disabled")
+            self.assertEqual(m.group(2).strip(), "", f"#{name} must carry no option in the markup")
+        for name in ("pick-pair-note", "pick-episode-note"):
+            self.assertTrue(f'<p id="{name}" class="pick-caption"></p>' in html, f"#{name} is missing")
+        self.assertTrue('<details id="pick-refused" class="pick-refused" hidden></details>' in html,
+                        "#pick-refused is missing, or not hidden and empty")
+        page = self.read("sim/agents.mjs")
+        self.assertTrue("fetch('/api/agents/catalog'" in page, "the page does not load the catalog")
+        self.assertFalse("parseEpisodeQuery" in page, "M1's read-only address parser is still used")
+        self.assertFalse("pushState" in page, "the address is replaced, never pushed")
+
     @unittest.skipUnless(HAVE_ALL_RUNS, NO_ALL_RUNS)
     def test_catalog_fixture_has_the_server_shape(self):
         """agent-picker.test.mjs drives the picker from a copy of the catalog.

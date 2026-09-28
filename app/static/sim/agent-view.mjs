@@ -248,30 +248,6 @@ export function appendFrames(frames, payload) {
   return true;
 }
 
-// The server's own patterns (app/agent_catalog.py RUNS_NAME, app/agent_api.py
-// SEED_TEXT and EP_TEXT). RUNS is lowercase-only there, because on Windows
-// runs_C4 would open runs_c4 under a name no verdict is recorded for.
-const RUNS_RE = /^runs[a-z0-9_]*$/;
-const SEED_RE = /^[0-9]{1,3}$/;
-const EP_RE = /^[0-9]{1,2}$/;
-
-/**
- * The M1 page's read-only picker: ?runs=runs_c4&seed=5&ep=1. All three are
- * required and must match the server's own validation; anything else is null,
- * and the page then selects nothing.
- */
-export function parseEpisodeQuery(search) {
-  const q = new URLSearchParams(typeof search === 'string' ? search : '');
-  const runs = q.get('runs');
-  const seed = q.get('seed');
-  const ep = q.get('ep');
-  if (runs === null || seed === null || ep === null) return null;
-  if (!RUNS_RE.test(runs) || !SEED_RE.test(seed) || !EP_RE.test(ep)) return null;
-  const epNum = Number(ep);
-  if (epNum < 1 || epNum > 20) return null;
-  return { runs, seed: Number(seed), ep: epNum };
-}
-
 /** Step at which a lane's car first went null (its simulation stopped), or null. */
 export function laneStoppedAt(frames, lane) {
   const k = frames.findIndex(f => f && f.cars && f.cars[lane] == null);

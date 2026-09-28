@@ -1,105 +1,31 @@
-// The /agents page RUNNING, against a fake DOM and a fake server: what the
-// viewer is actually shown after a failed request is retried, and how a
-// grouped number reads in Arabic. agents-page.test.mjs checks the page's text
-// without running it; this file runs agents.mjs itself (it exports nothing and
-// boots on import), so it owns the globals of its own test process.
+// The /agents page RUNNING, against a fake DOM and a fake server
+// (agents-page-harness.mjs), opened from a FULL address: what the viewer is
+// shown after a failed request is retried, how a grouped number reads in
+// Arabic, and the pause panel. agents-page-nav.test.mjs opens the page from
+// its nav link instead, agents-page-address.test.mjs from an address that
+// names too much; agents-page.test.mjs checks the page's text without running
+// it. This file owns the globals of its own test process.
 //
 // The fake DOM holds only the elements these checks read. Every other id is
 // null, which agents.mjs already tolerates, so the profile, the chase view and
 // the rest of the pause panel stay out of the way.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
+import { readFileSync } from 'node:fs';
+import { installFakePage, byClass, FakeNode } from './agents-page-harness.mjs';
 
-// The page loads its chase view with import('./agent-scene.mjs'), which needs
-// Three.js and WebGL. In this process that one import resolves to a stand-in,
-// whose behaviour each test sets through globalThis.chaseFake. The chase view
-// is mounted only where a test puts a #chase node in the fake DOM.
-const FAKE_SCENE = `data:text/javascript,${encodeURIComponent(`
-export function createChaseScene() {
-  const fake = globalThis.chaseFake;
-  if (fake.fail) throw new Error(fake.fail);
-  const scene = { disposed: false, update() {}, setTheme() {}, dispose() { scene.disposed = true; } };
-  fake.scenes.push(scene);
-  if (fake.onCreate) fake.onCreate();
-  return scene;
-}`)}`;
-registerHooks({
-  resolve(specifier, context, next) {
-    if (specifier === './agent-scene.mjs' && String(context.parentURL).endsWith('/agents.mjs')) {
-      return { url: FAKE_SCENE, shortCircuit: true };
-    }
-    return next(specifier, context);
-  },
-});
-globalThis.chaseFake = { fail: null, scenes: [], onCreate: null };
-
-class FakeNode {
-  constructor(tag) {
-    this.tagName = tag;
-    this.children = [];
-    this.own = '';
-    this.hidden = false;
-    this.disabled = false;
-    this.className = '';
-    this.dataset = {};
-    this.style = {};
-    this.attrs = {};
-    this.listeners = {};
-  }
-  get textContent() { return this.own + this.children.map(c => c.textContent).join(''); }
-  set textContent(v) { this.own = String(v); this.children = []; }
-  appendChild(node) { this.children.push(node); return node; }
-  append(...nodes) { this.children.push(...nodes); }
-  setAttribute(name, value) { this.attrs[name] = String(value); }
-  getAttribute(name) { return name in this.attrs ? this.attrs[name] : null; }
-  addEventListener(type, fn) { (this.listeners[type] ||= []).push(fn); }
-  click() { for (const fn of this.listeners.click || []) fn(); }
-  querySelector() { return null; }
-  querySelectorAll() { return []; }
-}
-
-const nodes = Object.fromEntries(['compute', 'error', 'pick-note', 'rise-caption', 'seek', 'actions', 'lane-stopped',
-  'lang-toggle', 'turb-sighted', 'turb-blind']
-  .map(id => [id, new FakeNode('div')]));
-// Every node under `node` whose class list holds `name`.
-function byClass(node, name, out = []) {
-  if (String(node.className).split(' ').includes(name)) out.push(node);
-  for (const child of node.children) byClass(child, name, out);
-  return out;
-}
-globalThis.document = {
-  documentElement: new FakeNode('html'),
-  activeElement: null,
-  getElementById: id => nodes[id] || null,
-  createElement: tag => new FakeNode(tag),
-  querySelector: () => null,
-  querySelectorAll: () => [],
+// The server's own catalog (agent_api.catalog), sb3 pinned true so these tests
+// never depend on the machine that generated the fixture.
+const CATALOG = {
+  ...JSON.parse(readFileSync(new URL('./agent-catalog.fixture.json', import.meta.url), 'utf8')),
+  sb3: true,
 };
-globalThis.window = {
-  location: { search: '?runs=runs_c4&seed=5&ep=1' },
-  matchMedia: () => ({ matches: false }),
-};
-globalThis.getComputedStyle = () => ({ getPropertyValue: () => '' });
-globalThis.requestAnimationFrame = () => 0;
-
-// Each request waits until the test answers it, so the order is the test's.
-const requests = [];
-let arrived = null;
-globalThis.fetch = url => new Promise((resolve, reject) => {
-  requests.push({ url: String(url), resolve, reject });
-  if (arrived) { arrived(); arrived = null; }
+const h = installFakePage({
+  search: '?runs=runs_c4&seed=5&ep=1',
+  ids: ['compute', 'error', 'pick-experiment', 'pick-pair', 'pick-episode', 'pick-note', 'rise-caption',
+    'seek', 'actions', 'lane-stopped', 'lang-toggle', 'turb-sighted', 'turb-blind'],
 });
-async function nextRequest() {
-  while (!requests.length) await new Promise(resolve => { arrived = resolve; });
-  return requests.shift();
-}
-const reply = (req, body) => req.resolve({ status: 200, json: async () => body });
-const settle = () => new Promise(resolve => setTimeout(resolve, 20));
-function seekTo(time) {
-  nodes.seek.value = String(time);
-  for (const fn of nodes.seek.listeners.input || []) fn();
-}
+const { nodes, nextRequest, reply, settle, seekTo } = h;
 
 // The page keeps the first meta it is given for a key (applyMeta), so every
 // reply here carries this one. act is engine_env's ACT_LO / ACT_HI.
@@ -117,8 +43,24 @@ const ROAD = {
 };
 
 await import('./agents.mjs');
+// The page's only request at boot is the catalog; it is answered here, before
+// any test, so every test below starts from the restored selection.
+const boot = await nextRequest();
+reply(boot, CATALOG);
+await settle();
 
 const retryButton = () => nodes.error.children.find(c => c.tagName === 'button') || null;
+
+test('a full address restores its selection and computes nothing until «احسب»', async () => {
+  assert.equal(boot.url, '/api/agents/catalog');
+  assert.equal(nodes['pick-experiment'].value, 'runs_c4');
+  assert.equal(nodes['pick-pair'].value, '5');
+  assert.equal(nodes['pick-episode'].value, '1');
+  assert.equal(nodes.compute.disabled, false, '«احسب» is ready');
+  assert.deepEqual(h.history, [], 'an address the catalog allows is kept as it is');
+  await settle();
+  assert.equal(h.requests.length, 0, 'no episode request before «احسب»');
+});
 
 test('a retry that reaches the server clears the "server unavailable" alert', async () => {
   nodes.compute.click();

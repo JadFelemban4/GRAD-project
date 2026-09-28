@@ -252,19 +252,6 @@ test('appendFrames takes only the slice that starts where the held frames end', 
   assert.deepEqual(frames.map(f => f.k), [0, 1, 2]);
 });
 
-test('parseEpisodeQuery reads the M1 address and nothing else', () => {
-  const { parseEpisodeQuery } = api();
-  assert.deepEqual(parseEpisodeQuery('?runs=runs_c4&seed=5&ep=1'), { runs: 'runs_c4', seed: 5, ep: 1 });
-  assert.deepEqual(parseEpisodeQuery('runs=runs&seed=0&ep=20'), { runs: 'runs', seed: 0, ep: 20 });
-  // runs_C4 is refused as the server refuses it (agent_catalog.RUNS_NAME is
-  // lowercase-only: on Windows it would alias runs_c4 with no verdict).
-  for (const bad of ['?runs=runs_c4&seed=5abc&ep=1', '?runs=../x&seed=5&ep=1', '?runs=runs_c4/../runs&seed=5&ep=1',
-    '?runs=runs_c4&seed=5&ep=0', '?runs=runs_c4&seed=5&ep=21', '?runs=runs_c4&seed=1234&ep=1', '?runs=runs_C4&seed=5&ep=1',
-    '?runs=runs_c4&seed=5', '?seed=5&ep=1', '', undefined]) {
-    assert.equal(parseEpisodeQuery(bad), null, String(bad));
-  }
-});
-
 test('laneStoppedAt names the first step a car went null', () => {
   const { laneStoppedAt } = api();
   const car = { damage: 0 };

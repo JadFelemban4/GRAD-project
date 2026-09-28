@@ -82,7 +82,20 @@ html[dir=ltr] .profile-climb-label{direction:ltr}
 .pick-row{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;gap:10px;margin-bottom:8px}
 .pick-row label{font-size:10px;color:var(--muted)}
 .pick-row select{width:100%;min-width:0;background:var(--field-bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px}
-.pick-row select:disabled{opacity:1;cursor:default;color:var(--ink)}
+.pick-row select:disabled{opacity:.55;cursor:not-allowed}
+/* Under the pair row: "difference of the medians of 20 episodes ...; not
+   this episode". Under the episode row: Phase D's one road. Aligned with the
+   selects (the 72 px label column plus the 10 px gap). */
+.pick-caption{margin:-3px 0 9px;padding-inline-start:82px;font-size:9px;line-height:1.7;color:var(--muted)}
+.pick-caption:empty{display:none}
+.pick-reason{color:var(--ink-2)}
+.pick-warning{color:var(--warn-ink)}
+/* Every pair that cannot run, with every problem the server found. The
+   problems are ltr code-like lines that must wrap, never widen the page. */
+.pick-refused{margin-top:12px;font-size:10px;line-height:1.7;color:var(--muted)}
+.pick-refused summary{cursor:pointer}
+.refused-pair b{font-weight:600;color:var(--ink-2)}
+.refused-pair ul{margin:2px 0 8px;padding-inline-start:18px;font:9px/1.6 Consolas,monospace;overflow-wrap:anywhere}
 .pick-note{display:flex;flex-direction:column;gap:4px;margin:4px 0 12px;font-size:10px;line-height:1.7;color:var(--muted)}
 .pick-note:empty{display:none}
 .pick-note>span{display:flex;align-items:baseline;gap:6px}
@@ -129,6 +142,7 @@ main.agents-main{padding:18px 16px 0}
 .agents-intro{align-items:stretch}
 .chase-view{aspect-ratio:4/3}
 .pick-row{grid-template-columns:1fr;gap:4px}
+.pick-caption{padding-inline-start:0}
 .scene-strip>span{font-size:9px}
 }
 /* pause panel: five rows, each a bar from lo to hi with a tick at the neutral

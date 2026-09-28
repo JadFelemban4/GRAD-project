@@ -10,17 +10,26 @@
 // Lane 0 is always the sighted agent and lane 1 the blind one, in run_lanes
 // order and in meta.agents order.
 //
-// M1: the picker is READ-ONLY. It shows ?runs=&seed=&ep= from the address and
-// nothing computes until «احسب» is pressed. Nothing is stored in the browser
-// except the lab's own theme and language preferences.
+// M2: the picker WORKS. At boot the page loads GET /api/agents/catalog, and
+// agent-picker.mjs decides what the three selects offer. The page opens with
+// NOTHING selected unless the address names a selection the catalog allows,
+// never a default pair. Every change of a select replaces the address (never a
+// new history entry) and clears the episode on screen. Nothing computes until
+// «احسب» is pressed. Nothing is stored in the browser except the lab's own
+// theme and language preferences.
 import './agents-strings.mjs';
 import { t, LANGS, DEFAULT_LANG, resolveLang, applyTranslations } from './i18n.mjs';
 import { PlaybackClock, formatTime } from './playback.mjs';
 import {
-  DT, PROFILE_VE, parseEpisodeQuery, appendFrames, createPlayState, playOrWait,
+  DT, PROFILE_VE, appendFrames, createPlayState, playOrWait,
   pauseByUser, resumeIfStalled, settleDone, episodeAt, profilePoints, previewMarks, gradeRamp,
   ACTIONS, M_PER_UNIT, createEpisodeRoad, gaugeFraction, commandPhysical, laneStoppedAt,
 } from './agent-view.mjs';
+import {
+  NOTHING, parsePickerQuery, experimentOf, pairOf, resolveSelection, choose, selectionSearch,
+  computeState, experimentOptions, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
+  refusedPairs, scoredKey,
+} from './agent-picker.mjs';
 
 const $ = id => document.getElementById(id);
 const POLL_MS = 400;
@@ -44,7 +53,9 @@ let chaseToken = 0;
 const BLIND_LABEL = { d2: 'agents.car.blind', 'phase-d': 'agents.car.blind' };
 
 const state = {
-  query: parseEpisodeQuery(window.location.search),
+  catalog: null,   // GET /api/agents/catalog, once it has arrived
+  bootQuery: parsePickerQuery(window.location.search),
+  sel: { ...NOTHING },   // what the three selects name: { runs, seed, ep }
   frames: [],
   road: null,
   meta: null,
@@ -98,6 +109,7 @@ function fmtInt(v) {
 }
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const keyOf = q => `${q.runs}/${q.seed}/${q.ep}`;
+const sameSel = (a, b) => a.runs === b.runs && a.seed === b.seed && a.ep === b.ep;
 
 // fingerprint.format_budget writes "trained N steps of M requested, ..."; the
 // page shows N and falls back to the whole line rather than guess.
@@ -118,7 +130,7 @@ function renderLoad() {
   card.hidden = !state.load;
   if (!state.load) return;
   setText($('load-title'), state.load.text());
-  setText($('load-detail'), state.query ? keyOf(state.query) : '');
+  setText($('load-detail'), state.sel.runs === null ? '' : keyOf(state.sel));
   const bar = $('load-progress');
   if (bar) bar.value = Math.max(0, Math.min(1, state.load.progress || 0));
 }
@@ -160,7 +172,7 @@ function setControlsEnabled(on) {
 }
 
 function episodeUrl(since, preempt) {
-  const q = state.query;
+  const q = state.sel;
   const params = new URLSearchParams({
     runs: q.runs, seed: String(q.seed), ep: String(q.ep), since: String(since),
   });
@@ -171,14 +183,14 @@ function episodeUrl(since, preempt) {
 // «احسب». The one request that carries a person's decision sends preempt=1;
 // every poll after it waits its turn (app.replay's rule, kept here).
 function compute() {
-  if (!state.query) return;
+  if (!computeState(state.catalog, state.sel).ok) return;
   state.loadToken += 1;
   const token = state.loadToken;
   const now = performance.now();
   pauseByUser(state.play, now);
   state.play = createPlayState(new PlaybackClock(0));
   state.play.clock.setRate(Number($('rate')?.value) || 1, now);
-  if (state.metaKey !== keyOf(state.query)) { state.meta = null; state.road = null; }
+  if (state.metaKey !== keyOf(state.sel)) { state.meta = null; state.road = null; }
   state.frames = [];
   state.done = false;
   state.device = null;
@@ -298,50 +310,180 @@ function applyMeta(meta, road) {
   renderAll();
 }
 
-function option(select, text) {
+// ---------------------------------------------------------------- picker
+// What the three selects name, read from the catalog. The verdict box follows
+// the chosen experiment even before «احسب»; after it, the episode's own meta
+// is only the fallback (the two always agree: the route reads one catalog).
+function currentExperiment() {
+  return experimentOf(state.catalog, state.sel.runs);
+}
+function currentPair() {
+  return pairOf(currentExperiment(), state.sel.seed);
+}
+function currentVerdict() {
+  return currentExperiment()?.verdict ?? state.meta?.verdict ?? null;
+}
+
+// The <option>s and the refused list are rebuilt only when their text
+// changed, so a select is never rebuilt under the viewer's pointer by a poll
+// or a redraw, and an open list does not close.
+const drawn = new WeakMap();
+function fillSelect(select, options, value) {
   if (!select) return;
-  select.textContent = '';
-  const o = el('option', '', text);
-  o.selected = true;
-  select.appendChild(o);
+  const signature = JSON.stringify(options);
+  if (drawn.get(select) !== signature) {
+    drawn.set(select, signature);
+    select.textContent = '';
+    for (const o of options) {
+      const node = el('option', '', o.text);
+      node.value = o.value;
+      node.disabled = o.disabled;
+      select.appendChild(node);
+    }
+  }
+  select.value = value === null ? '' : String(value);
+}
+
+// Every pair that cannot run, in every experiment, with EVERY problem the
+// server found (design section 8, "listed and disabled with reason and
+// fields"): both arms, and each stored and live field of a plant mismatch
+// (agent-picker.refusedPairs). A greyed option has room for the first
+// problem only.
+function renderRefused() {
+  const box = $('pick-refused');
+  if (!box) return;
+  const refused = refusedPairs(state.catalog);
+  box.hidden = !refused.length;
+  const signature = JSON.stringify([currentLang, refused]);
+  if (drawn.get(box) === signature) return;
+  drawn.set(box, signature);
+  box.textContent = '';
+  if (!refused.length) return;
+  box.appendChild(el('summary', '', t(currentLang, 'agents.pick.refused_summary', { n: refused.length })));
+  for (const r of refused) {
+    const item = el('div', 'refused-pair');
+    item.appendChild(el('b', '', t(currentLang, 'agents.pick.refused_pair', { name: r.name, seed: r.seed })));
+    // The server's own words, read left to right: bullets and indent on the left.
+    const list = el('ul');
+    list.dir = 'ltr';
+    for (const problem of r.problems) list.appendChild(el('li', '', String(problem)));
+    item.appendChild(list);
+    box.appendChild(item);
+  }
 }
 
 function renderPicker() {
-  const q = state.query;
-  const m = state.meta;
-  const button = $('compute');
-  if (button) button.disabled = !q;
+  const catalog = state.catalog;
+  const sel = state.sel;
+  const experiment = currentExperiment();
+  const pair = currentPair();
+  const episodes = episodeOptions(catalog, pair, currentLang);
+  fillSelect($('pick-experiment'), experimentOptions(catalog, currentLang), sel.runs);
+  fillSelect($('pick-pair'), pairOptions(experiment, currentLang), sel.seed);
+  fillSelect($('pick-episode'), episodes, sel.ep);
+  const enable = (id, on) => { const node = $(id); if (node) node.disabled = !on; };
+  enable('pick-experiment', Boolean(catalog));
+  enable('pick-pair', Boolean(experiment));
+  enable('pick-episode', Boolean(pair));
+  setText($('pick-pair-note'), pairQualifier(experiment, currentLang));
+  setText($('pick-episode-note'), sameRoadNote(catalog, experiment, currentLang));
+  const can = computeState(catalog, sel);
+  enable('compute', can.ok);
+  renderRefused();
   const note = $('pick-note');
-  if (note) note.textContent = '';
-  if (!q) {
-    for (const id of ['pick-experiment', 'pick-pair', 'pick-episode']) option($(id), EM_DASH);
-    setText(note, t(currentLang, 'agents.pick.none'));
-    return;
-  }
-  const short = m?.verdict?.short?.[currentLang];
-  option($('pick-experiment'), m ? (short ? `${m.experiment} · ${short}` : m.experiment) : q.runs);
-  option($('pick-pair'), t(currentLang, 'agents.pick.pair_option', { seed: q.seed }));
-  const e = m?.episode;
-  const episodeText = e
-    ? t(currentLang, 'agents.pick.episode_option', {
-      idx: m.ep,
-      start: fmt(e.climb_start_s, 0),
-      grade: num(e.grade) === null ? EM_DASH : fmt(e.grade * 100, 1),
-      w0: fmt(e.weights[0], 2),
-      w1: fmt(e.weights[1], 2),
-      w2: fmt(e.weights[2], 2),
-    })
-    : `${t(currentLang, 'agents.pick.episode')} ${q.ep}`;
-  option($('pick-episode'), episodeText);
-  if (!note || !m) return;
-  // The select may truncate on a narrow screen; the weights must stay legible.
-  note.appendChild(el('span', '', episodeText));
-  (m.agents || []).forEach((agent, i) => {
+  if (!note) return;
+  note.textContent = '';
+  // Without stable-baselines3 nothing can be computed (design section 4,
+  // Runnability). Said as soon as the catalog arrives, not after three
+  // choices; the pairs stay selectable, so their verdicts and table rows can
+  // still be read.
+  if (catalog && !catalog.sb3) note.appendChild(el('span', 'pick-reason pick-warning', t(currentLang, 'agents.load.no_sb3')));
+  // The select may truncate on a narrow screen; the chosen episode and its
+  // weights must stay legible, so they are spelled out here as well.
+  const chosen = episodes.find(o => sel.ep !== null && o.value === String(sel.ep));
+  if (chosen) note.appendChild(el('span', '', chosen.text));
+  (pair?.agents || []).forEach((agent, i) => {
     const line = el('span', LANES[i]);
     line.appendChild(el('i', 'lane-dot'));
     line.appendChild(el('span', '', `${t(currentLang, LANE_LABEL[i])} · ${t(currentLang, 'agents.pick.budget', { budget: budgetSteps(agent.budget_line) })}`));
     note.appendChild(line);
   });
+  // What is still to choose; the missing stable-baselines3 is said once, above.
+  if (!can.ok && can.reason !== 'agents.load.no_sb3') note.appendChild(el('span', 'pick-reason', t(currentLang, can.reason)));
+}
+
+// Everything on screen that belongs to the episode last computed goes, and a
+// late response for it is dropped: loadToken is what poll() checks after every
+// await, and chaseToken is what mountChase() checks after its import.
+function clearEpisode() {
+  state.loadToken += 1;
+  const now = performance.now();
+  pauseByUser(state.play, now);
+  state.play = createPlayState(new PlaybackClock(0));
+  state.play.clock.setRate(Number($('rate')?.value) || 1, now);
+  state.frames = [];
+  state.meta = null;
+  state.metaKey = null;
+  state.road = null;
+  state.done = false;
+  state.device = null;
+  state.versions = null;
+  state.lastK = -2;
+  state.drawnTime = -1;
+  const profile = $('profile');
+  if (profile) profile.textContent = '';
+  state.profile = null;
+  chaseToken += 1;
+  chase?.dispose();
+  chase = null;
+  const scene = $('chase');
+  if (scene) scene.textContent = '';
+  showLoad(null);
+  showError(null);
+  const prompt = $('scene-prompt');
+  if (prompt) prompt.hidden = false;
+  setControlsEnabled(false);
+  renderPanel(-1);
+}
+
+// A viewer changed one select. choose() says what that selects; a choice that
+// changes nothing (the same value, or a greyed option) only redraws the picker.
+function onPick(level, select) {
+  if (!state.catalog || !select) return;
+  const next = choose(state.catalog, state.sel, level, select.value);
+  if (sameSel(next, state.sel)) { renderPicker(); return; }
+  clearEpisode();
+  state.sel = next;
+  window.history?.replaceState?.(null, '', `/agents${selectionSearch(next)}`);
+  renderAll();
+}
+
+// The catalog, once, at boot. It never starts a computation.
+async function loadCatalog() {
+  showError(null);
+  let res;
+  let body = null;
+  try {
+    res = await fetch('/api/agents/catalog', { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    body = await res.json().catch(() => null);
+  } catch (err) {
+    showError(() => t(currentLang, 'agents.pick.catalog_error', { message: t(currentLang, 'agents.load.server_down') }),
+      { retry: loadCatalog });
+    return;
+  }
+  if (res.status !== 200 || !body || !Array.isArray(body.experiments)) {
+    const message = `HTTP ${res.status}`;
+    showError(() => t(currentLang, 'agents.pick.catalog_error', { message }), { retry: loadCatalog });
+    return;
+  }
+  state.catalog = body;
+  state.sel = resolveSelection(body, state.bootQuery);
+  // The address never names more than is selected. It is compared as TEXT:
+  // parsePickerQuery has already dropped a malformed level (runs_C4, seed=5abc,
+  // ep=21), so comparing selections would leave such an address as it was.
+  const search = selectionSearch(state.sel);
+  if (window.location.search !== search) window.history?.replaceState?.(null, '', `/agents${search}`);
+  renderAll();
 }
 
 function renderBadge() {
@@ -360,7 +502,7 @@ function renderBadge() {
 // its results/<file>:<line>. The short line and the glosses are authored and
 // arrive from the server only when every anchor they summarise was found.
 function renderVerdict() {
-  const v = state.meta?.verdict || null;
+  const v = currentVerdict();
   const box = $('verdict');
   if (box) box.dataset.state = v ? v.state : 'waiting';
   const shortText = v?.short?.[currentLang] || EM_DASH;
@@ -398,11 +540,14 @@ function renderVerdict() {
   const scored = $('verdict-scored');
   if (!scored) return;
   scored.textContent = '';
-  const m = state.meta;
-  (m?.agents || []).forEach((agent, i) => {
-    const status = !m.result_file ? t(currentLang, 'agents.verdict.no_result')
-      : agent.scored === 'match' ? t(currentLang, 'agents.verdict.scored_match')
-        : t(currentLang, 'agents.verdict.not_recorded');
+  // The chosen pair's agents from the catalog, so the box reads before «احسب».
+  const agents = state.meta?.agents ?? currentPair()?.agents ?? [];
+  const resultFile = state.meta ? state.meta.result_file : currentPair()?.result_file;
+  agents.forEach((agent, i) => {
+    // agent-picker.scoredKey: match, not recorded, mismatch or no result file;
+    // null when the sha check never ran, and then nothing is claimed.
+    const key = scoredKey(agent.scored, resultFile);
+    const status = key ? t(currentLang, key) : EM_DASH;
     const li = el('li', LANES[i]);
     li.appendChild(el('i', 'lane-dot'));
     li.appendChild(el('span', '', `${t(currentLang, LANE_LABEL[i])} · ${status}`));
@@ -957,6 +1102,9 @@ function start() {
     state.play.clock.setRate(Number($('rate').value), performance.now());
   });
   $('compute')?.addEventListener('click', compute);
+  $('pick-experiment')?.addEventListener('change', () => onPick('runs', $('pick-experiment')));
+  $('pick-pair')?.addEventListener('change', () => onPick('seed', $('pick-pair')));
+  $('pick-episode')?.addEventListener('change', () => onPick('ep', $('pick-episode')));
   $('theme-toggle')?.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   });
@@ -967,6 +1115,7 @@ function start() {
     window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
   applyLanguage(recall(STORE.lang, LANGS, DEFAULT_LANG));
   requestAnimationFrame(loop);
+  loadCatalog().catch(err => console.error(err));
 }
 
 try {
