@@ -194,6 +194,22 @@ test('the pair row\'s minus is U+2212, written as an escape', () => {
   }
 });
 
+// A name the server made up ends in a parenthesis: 'runs_sixspeed_18sep (no
+// name recorded)'. In an Arabic line the closing parenthesis sits between the
+// Latin name and Arabic text, so it takes the line's right-to-left direction
+// and is drawn mirrored (UAX #9 N1/N2), unless {name} is its own first-strong
+// isolate, U+2068 ... U+2069. Written as escapes in agents-strings.mjs.
+const FSI = String.fromCodePoint(0x2068);
+test('a name in the Arabic refused labels is isolated, so its parenthesis is not mirrored', () => {
+  const { AGENT_STRINGS } = api();
+  for (const key of ['agents.pick.refused_pair', 'agents.pick.experiment_refused']) {
+    assert.ok(AGENT_STRINGS.ar[key].includes(`${FSI}{name}${PDI}`), `ar ${key}: {name} is not inside U+2068 ... U+2069`);
+  }
+  const src = readFileSync(new URL('./agents-strings.mjs', import.meta.url), 'utf8');
+  assert.equal(src.split(escapeText('2068')).length - 1, 2, 'the U+2068 escape must appear once per refused label');
+  assert.equal(src.split(FSI).length - 1, 0, 'a literal U+2068 in agents-strings.mjs: write the escape');
+});
+
 test('the M2 picker strings keep their clauses', () => {
   const { AGENT_STRINGS } = api();
   const mustSay = {

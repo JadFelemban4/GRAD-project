@@ -28,7 +28,7 @@ import {
 import {
   NOTHING, parsePickerQuery, experimentOf, pairOf, resolveSelection, choose, selectionSearch,
   computeState, experimentOptions, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
-  refusedPairs, scoredKey,
+  refusedPairs, scoredKey, blindLabelKey, notBlindCite,
 } from './agent-picker.mjs';
 
 const $ = id => document.getElementById(id);
@@ -37,7 +37,6 @@ const THEMES = ['light', 'dark'];
 const STORE = { theme: 'grad.sim.theme', lang: 'grad.sim.lang' };
 const EM_DASH = '—';
 const LANES = ['sighted', 'blind'];
-const LANE_LABEL = ['agents.car.sighted', 'agents.car.blind'];
 const PROFILE_W = 1000;
 const PROFILE_PAD = 24;
 const KM_STEP = 5;   // the profile's horizontal scale: a label every 5 km
@@ -48,12 +47,10 @@ let currentLang = DEFAULT_LANG;
 // Three.js or WebGL fails, every other surface of the page still renders.
 let chase = null;
 let chaseToken = 0;
-// The blind car's label, by protocol. M2 gives Phase D's blind car its own
-// ("may have memorised the road", PHASE_D_RESULT.txt:33-37) as one more row.
-const BLIND_LABEL = { d2: 'agents.car.blind', 'phase-d': 'agents.car.blind' };
 
 const state = {
   catalog: null,   // GET /api/agents/catalog, once it has arrived
+  catalogFailed: false,   // the last catalog request failed; a retry clears it
   bootQuery: parsePickerQuery(window.location.search),
   sel: { ...NOTHING },   // what the three selects name: { runs, seed, ep }
   frames: [],
@@ -63,6 +60,10 @@ const state = {
   done: false,
   loadToken: 0,
   polling: null,
+  // True from «احسب» until an answer other than 'busy' (or a failed request):
+  // while it holds, a 'busy' answer means this page's preempt is stopping the
+  // other build, and the page says so instead of asking for «احسب» again.
+  preempted: false,
   play: createPlayState(new PlaybackClock(0)),
   device: null,
   versions: null,
@@ -202,6 +203,7 @@ function compute() {
   setControlsEnabled(false);
   showLoad(() => t(currentLang, 'agents.load.networks'), 0);
   renderAll();
+  state.preempted = true;
   poll(token, true);
 }
 
@@ -218,6 +220,9 @@ async function poll(token, preempt) {
         body = await res.json().catch(() => null);
       } catch (err) {
         if (token !== state.loadToken) return;
+        // The preempt may never have reached the server: a retry that finds
+        // another build running must ask for «احسب» again (M1's busy text).
+        state.preempted = false;
         // Frames already received stay playable; the retry resumes from them.
         showLoad(null);
         showError(() => t(currentLang, 'agents.load.server_down'), { retry: () => poll(token, false) });
@@ -242,6 +247,7 @@ function stop(text, options) {
 
 // One response. Returns true to keep polling.
 function handle(status, body) {
+  if (!(status === 200 && body?.status === 'busy')) state.preempted = false;
   if (status === 404) { stop(() => t(currentLang, 'agents.load.not_found')); return false; }
   if (status === 409) {
     stop(() => t(currentLang, 'agents.load.refused'), { items: (body && body.problems) || [] });
@@ -275,7 +281,12 @@ function handle(status, body) {
   if (body.status === 'loading') showLoad(() => t(currentLang, 'agents.load.networks'), 0);
   else if (body.status === 'busy') {
     const a = body.active || {};
-    showLoad(() => t(currentLang, 'agents.load.busy', { runs: a.runs, seed: a.seed, ep: a.ep }), 0);
+    // After this page's own preempt the other build is being stopped (the
+    // store cancels it on that request); only without one is «احسب» needed.
+    const stopping = state.preempted;
+    showLoad(() => (stopping
+      ? t(currentLang, 'agents.load.stopping', { runs: a.runs, seed: a.seed, ep: a.ep })
+      : t(currentLang, 'agents.load.busy', { runs: a.runs, seed: a.seed, ep: a.ep })), 0);
   } else if (body.status === 'building') {
     const percent = Math.round(state.frames.length / steps * 100);
     showLoad(() => t(currentLang, 'agents.load.building', { percent }), state.frames.length / steps);
@@ -322,6 +333,15 @@ function currentPair() {
 }
 function currentVerdict() {
   return currentExperiment()?.verdict ?? state.meta?.verdict ?? null;
+}
+function currentProtocol() {
+  return state.meta?.protocol ?? currentPair()?.protocol ?? currentExperiment()?.protocol ?? null;
+}
+// The i18n key naming lane j's car. Phase D's blind car may have memorised its
+// one road (results/PHASE_D_RESULT.txt:33-40), so it is never called blind
+// alone: every place that names a car calls this, never a fixed key.
+function laneLabel(j) {
+  return j === 0 ? 'agents.car.sighted' : blindLabelKey(currentProtocol());
 }
 
 // The <option>s and the refused list are rebuilt only when their text
@@ -405,11 +425,15 @@ function renderPicker() {
   (pair?.agents || []).forEach((agent, i) => {
     const line = el('span', LANES[i]);
     line.appendChild(el('i', 'lane-dot'));
-    line.appendChild(el('span', '', `${t(currentLang, LANE_LABEL[i])} · ${t(currentLang, 'agents.pick.budget', { budget: budgetSteps(agent.budget_line) })}`));
+    line.appendChild(el('span', '', `${t(currentLang, laneLabel(i))} · ${t(currentLang, 'agents.pick.budget', { budget: budgetSteps(agent.budget_line) })}`));
     note.appendChild(line);
   });
   // What is still to choose; the missing stable-baselines3 is said once, above.
-  if (!can.ok && can.reason !== 'agents.load.no_sb3') note.appendChild(el('span', 'pick-reason', t(currentLang, can.reason)));
+  // Before a catalog, whether it is still loading or its request failed.
+  if (!can.ok && can.reason !== 'agents.load.no_sb3') {
+    const reason = !catalog && state.catalogFailed ? 'agents.pick.catalog_failed' : can.reason;
+    note.appendChild(el('span', 'pick-reason', t(currentLang, reason)));
+  }
 }
 
 // Everything on screen that belongs to the episode last computed goes, and a
@@ -461,18 +485,24 @@ function onPick(level, select) {
 // The catalog, once, at boot. It never starts a computation.
 async function loadCatalog() {
   showError(null);
+  state.catalogFailed = false;
+  renderPicker();
   let res;
   let body = null;
   try {
     res = await fetch('/api/agents/catalog', { headers: { Accept: 'application/json' }, cache: 'no-store' });
     body = await res.json().catch(() => null);
   } catch (err) {
+    state.catalogFailed = true;
+    renderPicker();
     showError(() => t(currentLang, 'agents.pick.catalog_error', { message: t(currentLang, 'agents.load.server_down') }),
       { retry: loadCatalog });
     return;
   }
   if (res.status !== 200 || !body || !Array.isArray(body.experiments)) {
     const message = `HTTP ${res.status}`;
+    state.catalogFailed = true;
+    renderPicker();
     showError(() => t(currentLang, 'agents.pick.catalog_error', { message }), { retry: loadCatalog });
     return;
   }
@@ -550,7 +580,7 @@ function renderVerdict() {
     const status = key ? t(currentLang, key) : EM_DASH;
     const li = el('li', LANES[i]);
     li.appendChild(el('i', 'lane-dot'));
-    li.appendChild(el('span', '', `${t(currentLang, LANE_LABEL[i])} · ${status}`));
+    li.appendChild(el('span', '', `${t(currentLang, laneLabel(i))} · ${status}`));
     const sha = el('code', '', `zip sha ${agent.zip_sha || EM_DASH}`);
     sha.dir = 'ltr';
     li.appendChild(sha);
@@ -781,8 +811,8 @@ async function mountChase(road) {
 
 function renderLaneLabels() {
   const m = state.meta;
-  setText($('lane-sighted-label'), m ? t(currentLang, 'agents.car.sighted') : '');
-  setText($('lane-blind-label'), m ? t(currentLang, BLIND_LABEL[m.protocol] || 'agents.car.blind') : '');
+  setText($('lane-sighted-label'), m ? t(currentLang, laneLabel(0)) : '');
+  setText($('lane-blind-label'), m ? t(currentLang, laneLabel(1)) : '');
 }
 
 // ---------------------------------------------------------------- pause panel
@@ -910,7 +940,12 @@ function renderSeen(frame) {
     ? horizons.map((h, i) => t(currentLang, 'agents.seen.item', { h, pct: fmt(sighted.preview_pct[i], 1) })).join(' · ')
     : '');
   const zeros = blind ? blind.preview_pct.map(v => (v === 0 ? '0' : fmt(v, 1))).join(' · ') : '';
-  setText($('seen-blind'), blind ? t(currentLang, 'agents.seen.blind', { zeros }) : '');
+  // Phase D's blind car saw zeros too, on the one road it was trained and
+  // scored on; the caveat is cited from the verdict's own not_blind line.
+  const text = currentProtocol() === 'phase-d'
+    ? t(currentLang, 'agents.seen.blind_phase_d', { zeros, cite: notBlindCite(currentVerdict()) })
+    : t(currentLang, 'agents.seen.blind', { zeros });
+  setText($('seen-blind'), blind ? text : '');
 }
 
 // The limit arrives as 849.9 (TURB_PROTECT_K - 273.15, one decimal); the
@@ -963,9 +998,9 @@ function renderDevice() {
 function renderStopped() {
   const node = $('lane-stopped');
   if (!node) return;
-  const parts = LANE_LABEL.map((label, j) => {
+  const parts = LANES.map((_, j) => {
     const k = laneStoppedAt(state.frames, j);
-    return k === null ? null : `${t(currentLang, label)}: ${t(currentLang, 'agents.lane.stopped', { k })}`;
+    return k === null ? null : `${t(currentLang, laneLabel(j))}: ${t(currentLang, 'agents.lane.stopped', { k })}`;
   }).filter(Boolean);
   node.hidden = !parts.length;
   setText(node, parts.join(' · '));

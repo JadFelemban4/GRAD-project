@@ -79,6 +79,25 @@ const car = (over = {}) => ({
   ...over,
 });
 
+// The boot request, failed. The note under the selects must stop saying the
+// list is loading; the retry asks for the catalog again, and the next test
+// answers that request.
+test('a catalog request that fails says so under the selects, and its retry asks again', async () => {
+  const first = await h.nextRequest();
+  assert.equal(first.url, '/api/agents/catalog');
+  h.fail(first);
+  await h.settle();
+  assert.equal(nodes['pick-note'].textContent, AR('agents.pick.catalog_failed'), 'not «تحميل قائمة التجارب…» any more');
+  assert.equal(nodes['pick-experiment'].disabled, true, 'nothing can be chosen without the catalog');
+  assert.equal(nodes.compute.disabled, true);
+  const retry = nodes.error.children.find(c => c.tagName === 'button');
+  assert.ok(retry, 'the error offers a retry');
+  retry.click();
+  assert.equal(nodes['pick-note'].textContent, AR('agents.pick.catalog_loading'), 'retrying, the list is loading again');
+  assert.equal(nodes.error.hidden, true);
+});
+
+// Starts from: the catalog asked for again by the retry, not yet answered.
 test('from the nav link the page selects nothing, computes nothing, and says what to choose', async () => {
   const first = await h.nextRequest();
   assert.equal(first.url, '/api/agents/catalog', 'the page\'s only request at boot is the catalog');
@@ -230,4 +249,104 @@ test('changing the pair after a computation clears the old episode and drops its
   await wait(450);
   assert.equal(nodes['pause-heading'].textContent, '—', 'a late frame of the old key changed the page');
   assert.equal(h.requests.length, 0, 'the old key is not polled again');
+});
+
+// Starts from: runs_c4 / 3 / 1, nothing computed.
+test('Phase D: the same-road episodes, and the blind car named as possibly memorising its road wherever it is named', async () => {
+  const PD = FIXTURE.experiments.find(e => e.runs === 'runs');
+  h.change(nodes['pick-experiment'], 'runs');
+  assert.equal(nodes['pick-pair-note'].textContent, AR('agents.pick.pair_qualifier_same_road'));
+  assert.match(nodes['pick-episode-note'].textContent, /180/, 'the one road\'s climb start');
+  assert.match(nodes['pick-episode-note'].textContent, /12\.0/, 'and its grade');
+  h.change(nodes['pick-pair'], '0');
+  const episodes = options(nodes['pick-episode']).slice(1);
+  assert.equal(episodes.length, 20);
+  assert.ok(episodes.every(o => o.text.includes('الطريق نفسه')), 'every Phase D episode says it is the same road');
+  h.change(nodes['pick-episode'], '1');
+  assert.match(byClass(nodes['pick-note'], 'blind')[0].textContent, /قد يحفظه/, 'the blind arm\'s budget line');
+  assert.doesNotMatch(byClass(nodes['pick-note'], 'sighted')[0].textContent, /قد يحفظه/);
+  assert.equal(nodes['verdict-short'].textContent, PD.verdict.short.ar);
+  assert.match(byClass(nodes['verdict-scored'], 'blind')[0].textContent, /قد يحفظه/, 'the verdict box\'s scored line');
+
+  nodes.compute.click();
+  const req = await h.nextRequest();
+  assert.match(req.url, /runs=runs&seed=0&ep=1&/);
+  const meta = {
+    ...META, experiment: 'Phase D', runs: 'runs', prefix: 'phase_d', protocol: 'phase-d', seed: 0, ep: 1,
+    episode: { ...CATALOG.episodes['phase-d'][0] }, agents: PD.pairs[0].agents, verdict: PD.verdict,
+  };
+  const blind = car({ preview_pct: [0, 0, 0, 0] });
+  h.reply(req, { status: 'ready', since: 0, steps: 2, meta, road: ROAD,
+    frames: [{ k: 0, cars: [car(), blind] }, { k: 1, cars: [car(), null] }] });
+  await h.settle();
+  assert.match(nodes['lane-blind-label'].textContent, /قد يحفظه/, 'the scene label');
+  assert.match(nodes['sim-badge'].textContent, /12\.0/, 'the badge reads the one road\'s grade');
+  h.seekTo(0.5);
+  assert.match(nodes['seen-blind'].textContent, /قد يحفظه/, 'the pause panel line');
+  assert.ok(nodes['seen-blind'].textContent.includes('results/PHASE_D_RESULT.txt:33-40'), 'cited where results/ says it');
+  assert.match(nodes['seen-blind'].textContent, /0 · 0 · 0 · 0/, 'with the inputs it was actually given');
+  h.seekTo(1.5);
+  assert.equal(nodes['lane-stopped'].hidden, false);
+  assert.ok(nodes['lane-stopped'].textContent.startsWith(AR('agents.car.blind_phase_d')), 'the stopped lane');
+
+  h.change(nodes['pick-experiment'], 'runs_c4');
+  h.change(nodes['pick-pair'], '5');
+  h.change(nodes['pick-episode'], '1');
+  const c4Blind = byClass(nodes['pick-note'], 'blind')[0].textContent;
+  assert.ok(c4Blind.startsWith(AR('agents.car.blind')), 'C4\'s blind car keeps its own label');
+  assert.doesNotMatch(c4Blind, /قد يحفظه/, 'without the Phase D caveat');
+});
+
+// Starts from: runs_c4 / 5 / 1, nothing computed.
+test('«احسب» over another running build says it is stopping it, not to press «احسب» again', async () => {
+  const title = () => nodes['load-title'].textContent;
+  const busy = { status: 'busy', since: 0, steps: 719, frames: [], active: { runs: 'runs_c4', seed: 3, ep: 1 } };
+  nodes.compute.click();
+  const req = await h.nextRequest();
+  assert.match(req.url, /preempt=1/);
+  h.reply(req, { ...busy, meta: META, road: ROAD });
+  await h.settle();
+  assert.match(title(), /يُوقَف/);
+  for (const part of ['runs_c4', ' 3 ', ' 1)']) assert.ok(title().includes(part), `names the build it stops: ${part}`);
+  assert.doesNotMatch(title(), /اضغط احسب/, 'this press already asked for it');
+
+  const second = await h.nextRequest();
+  assert.doesNotMatch(second.url, /preempt/);
+  h.reply(second, busy);
+  await h.settle();
+  assert.match(title(), /يُوقَف/, 'still stopping it on the next poll');
+
+  h.reply(await h.nextRequest(), { status: 'loading', since: 0, steps: 719, frames: [] });
+  await h.settle();
+  assert.equal(title(), AR('agents.load.networks'));
+
+  h.fail(await h.nextRequest());
+  await h.settle();
+  const retry = nodes.error.children.find(c => c.tagName === 'button');
+  assert.ok(retry, 'a failed poll offers a retry');
+  retry.click();
+  h.reply(await h.nextRequest(), busy);
+  await h.settle();
+  assert.match(title(), /اضغط احسب/, 'after a failed request the preempt may never have arrived');
+});
+
+// Each of the two ways «يُوقَف» ends, on its own (the test above passes through
+// both at once). Starts from: runs_c4 / 5 / 1, a busy answer still polled.
+test('«يُوقَف» ends once this page\'s own build answers, and when the «احسب» request itself fails', async () => {
+  const title = () => nodes['load-title'].textContent;
+  const busy = { status: 'busy', since: 0, steps: 719, frames: [], active: { runs: 'runs_c4', seed: 3, ep: 1 } };
+  nodes.compute.click();
+  h.reply(await h.nextRequest(), { status: 'loading', since: 0, steps: 719, frames: [] });
+  await h.settle();
+  h.reply(await h.nextRequest(), busy);
+  await h.settle();
+  assert.match(title(), /اضغط احسب/, 'its own build answered, so this build was started by someone else');
+
+  nodes.compute.click();
+  h.fail(await h.nextRequest());
+  await h.settle();
+  nodes.error.children.find(c => c.tagName === 'button').click();
+  h.reply(await h.nextRequest(), busy);
+  await h.settle();
+  assert.match(title(), /اضغط احسب/, 'the «احسب» request failed, so its preempt may never have arrived');
 });
