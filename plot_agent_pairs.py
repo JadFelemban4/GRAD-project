@@ -10,6 +10,10 @@ pair as a dot and writes figures/agent_pairs/:
 
     1_phase_d.svg, 2_d2.svg, 3_c4.svg     one chart per experiment (vector)
     1_phase_d.png, 2_d2.png, 3_c4.png     the same, 2000 x 1280 px
+    <file>_vs_baseline.svg / .png         every agent against the baseline ECU, as
+                                          the result files print it (added 28 Sep
+                                          2026 at Jad's request, beside the pair
+                                          charts, not instead of them)
     index.html      the charts, each experiment's verdict quoted from results/,
                     and the numbers; open it in a browser, or print it
     page.html       the same page for the web (no document skeleton). Published
@@ -47,6 +51,7 @@ from __future__ import annotations
 
 import math
 import os
+import re
 import sys
 import warnings
 from pathlib import Path
@@ -117,6 +122,91 @@ def pairs(prefix):
 
 def signed(v):
     return f"{v:+.1f}".replace("-", "−")
+
+
+# "  agent (blind) runs_c4\blind_seed5 cuts median damage  60.4 %" -- the lines
+# evaluate.py prints under each seed's policy table.
+CUT_ROW = re.compile(r"^\s+(reactive|current-grade|agent \(blind\) \S+|agent \S+)"
+                     r"\s+cuts median damage\s+(-?[\d.]+) %\s*$")
+
+
+def cuts(prefix, rows):
+    """{seed: {role: per cent of the baseline ECU's median damage removed}}.
+
+    READ from the 'cuts median damage' lines evaluate.py printed in each
+    results/<prefix>_seed<k>.txt, and each one checked against the medians the
+    same file prints, so a line that drifted from its table stops the run."""
+    out = {}
+    for s, a, b, c, bl, _ in rows:
+        t = {}
+        path = os.path.join(HERE, "results", f"{prefix}_seed{s}.txt")
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                m = CUT_ROW.match(line.rstrip("\n"))
+                if m:
+                    who = m.group(1)
+                    role = ("blind" if who.startswith("agent (blind)")
+                            else "sighted" if who.startswith("agent ") else who)
+                    t[role] = float(m.group(2))
+        for role, med in (("sighted", a), ("blind", b), ("current-grade", c)):
+            if role not in t or abs(t[role] - 100.0 * (1.0 - med / bl)) > 0.1:
+                raise SystemExit(f"{path}: the {role} cut is missing or does not match its median")
+        out[s] = t
+    return out
+
+
+def chart_vs_baseline(ex, rows, cut):
+    """Every agent measured against the baseline ECU, as the results print it."""
+    seeds = [r[0] for r in rows]
+    base = rows[0][4]
+    cg = sorted({cut[s]["current-grade"] for s in seeds})
+    vals = [cut[s][k] for s in seeds for k in ("sighted", "blind")] + cg
+    ylo = min(0.0, math.floor(min(vals) / 10.0) * 10.0)
+    yhi = math.ceil((max(vals) + 6.0) / 10.0) * 10.0
+
+    say(f"{ex['name'].upper()}: EVERY AGENT AGAINST THE BASELINE ECU  (results/{ex['prefix']}_seed*.txt)")
+    say(f"   baseline ECU median damage: {base:.1f}")
+    say(f"   {'seed':>4}{'sighted cut %':>15}{'blind cut %':>13}{'curr-grade cut %':>18}")
+    for s in seeds:
+        say(f"   {s:>4}{cut[s]['sighted']:>15.1f}{cut[s]['blind']:>13.1f}{cut[s]['current-grade']:>18.1f}")
+    say()
+
+    sv = Svg()
+    header(sv, f"{ex['name']}: every agent against the baseline ECU",
+           f"share of the baseline ECU's median damage ({base:.1f}) that each agent removes · median of the "
+           "twenty frozen episodes · higher is better",
+           "SUPERVISION", "learned protection, not preview: the blind agent is measured the same way")
+    ftop = footer(sv, (
+        f"Read from the 'cuts median damage' lines evaluate.py printed in results/{ex['prefix']}_seed*.txt, "
+        "each checked against the medians beside it. The grey line is current-grade, the best hand-written "
+        "policy, and it is what an agent has to beat. The baseline ECU never enriches on this scenario and "
+        "the agents can, so part of every cut measured against the baseline comes from a lever it does not "
+        "pull here (CLAUDE.md, limitations). This chart measures learned protection; whether seeing the "
+        "road ahead helps is the next chart's question, in the damage units its test was registered in."))
+    box = (100, 170, W - 160, ftop - 58)
+    legend_row(sv, 56, 146, [("dot", SIGHTED, "the sighted agent", 1.0),
+                             ("dot", BLIND, "the blind agent", 1.0),
+                             ("line", INK2, "current-grade, the best hand-written policy", 1.0)])
+    xs = Scale(-0.5, len(seeds) - 0.5, box[0], box[2])
+    ys = Scale(ylo, yhi, box[3], box[1])
+    y_axis(sv, ys, box, [(v, f"{v:g} %") for v in nice_ticks(ylo, yhi, 6)],
+           "damage removed against the baseline ECU")
+    sv.line(box[0], ys(0.0), box[2], ys(0.0), INK, 1.4)
+    sv.text(box[2] + 8, ys(0.0) + 4, "the baseline ECU", size=11, color=INK)
+    for c in cg:
+        sv.line(box[0], ys(c), box[2], ys(c), INK2, 1.3)
+        sv.text(box[2] + 8, ys(c) + 4, f"current-grade {c:.1f} %", size=11, color=INK2)
+    for s in seeds:
+        x = xs(s)
+        a, b = cut[s]["sighted"], cut[s]["blind"]
+        sv.line(x - 7, ys(a), x + 7, ys(b), AXIS, 2.4)
+        sv.dot(x - 7, ys(a), SIGHTED, r=6.0, title=f"seed {s}: sighted removes {a:.1f}")
+        sv.dot(x + 7, ys(b), BLIND, r=6.0, title=f"seed {s}: blind removes {b:.1f}")
+    x_axis(sv, xs, box, [(s, f"{s}") for s in seeds], "pair, by its seed number")
+    table = (["seed", "sighted removes, %", "blind removes, %", "current-grade removes, %"],
+             [[f"{s}", f"{cut[s]['sighted']:.1f}", f"{cut[s]['blind']:.1f}",
+               f"{cut[s]['current-grade']:.1f}"] for s in seeds])
+    return sv.render(f"{ex['name']}: the share of the baseline ECU's damage each agent removes"), table
 
 
 def chart(ex, rows, ver):
@@ -208,7 +298,9 @@ a { color: var(--model); }
 """
 
 
-def build_page(sections, web):
+def build_page(sections, web, vb=None):
+    """vb: {prefix: (svg, table)} -- the every-agent-against-the-baseline charts."""
+    vb = vb or {}
     ladder = "\n".join(
         f'<li><span class="kind">{esc((cells[0] if cells else "no verdict").lower())}</span>'
         f'<a href="#{ex["anchor"]}">{esc(ex["title"])}</a><span class="result">{esc(short)}</span></li>'
@@ -239,6 +331,9 @@ def build_page(sections, web):
         "smallest effect worth caring about; the black bar beside each chart is that length.</li>",
         "<li>The grey line is the current-grade rule, the best hand-written policy. Both agents beating "
         "it is a separate claim from preview (AUDIT.md C3): the blind agents beat it too.</li>",
+        "<li>Each experiment opens with every agent measured against the baseline ECU, as the result "
+        "files print it: the share of the baseline's damage removed. That is learned protection. The "
+        "pair chart under it is the preview test the team registered, in damage units.</li>",
         "</ul>",
         '<div class="say"><p><b>What may be said, and what may not.</b> The sentences that may be said '
         "are the preregistered readings quoted under each chart. \"Preview does not help\" is not one of "
@@ -246,8 +341,10 @@ def build_page(sections, web):
         "</section>",
     ]
     for ex, svg, _, cells, _, ver in sections:
-        body += [f'<section id="{ex["anchor"]}">',
-                 '<figure class="chart"><div class="scroll">', svg, "</div></figure>",
+        body.append(f'<section id="{ex["anchor"]}">')
+        if ex["prefix"] in vb:
+            body += ['<figure class="chart"><div class="scroll">', vb[ex["prefix"]][0], "</div></figure>"]
+        body += ['<figure class="chart"><div class="scroll">', svg, "</div></figure>",
                  '<div class="verdict">']
         if ver["state"] != "found":
             body.append(f'<p class="say">{esc((ver["short"] or {}).get("en", ""))}</p>')
@@ -262,6 +359,10 @@ def build_page(sections, web):
         body += ["</div>", "</section>"]
     body += ['<section class="numbers">', "<h2>The numbers behind each chart</h2>"]
     for ex, _, (thead, trows), _, _, _ in sections:
+        if ex["prefix"] in vb:
+            vhead, vrows = vb[ex["prefix"]][1]
+            body += ["<div>", f"<h3>{esc(ex['name'])}: every agent against the baseline ECU</h3>",
+                     f'<div class="scroll">{html_table(vhead, vrows)}</div>', "</div>"]
         body += ["<div>", f"<h3>{esc(ex['title'])}</h3>",
                  f'<div class="scroll">{html_table(thead, trows)}</div>', "</div>"]
     body += ["</section>",
@@ -282,19 +383,23 @@ def main():
     say("THE PREVIEW ABLATION, PAIR BY PAIR  (plot_agent_pairs.py)")
     say(f"minimum effect of interest (analyse_phase_d2.MEI): {MEI:.0f} damage units")
     say()
-    sections = []
+    sections, vb, files = [], {}, []
     for ex in EXPERIMENTS:
         rows = pairs(ex["prefix"])
         ver = verdict(ex["prefix"])
+        vsvg, vtable = chart_vs_baseline(ex, rows, cuts(ex["prefix"], rows))
+        vb[ex["prefix"]] = (vsvg, vtable)
         svg, table, cells, short = chart(ex, rows, ver)
         sections.append((ex, svg, table, cells, short, ver))
-        with open(os.path.join(OUT, ex["file"] + ".svg"), "w", encoding="utf-8", newline="\n") as fh:
-            fh.write('<?xml version="1.0" encoding="UTF-8"?>\n' + svg + "\n")
+        for name, doc in ((ex["file"] + "_vs_baseline", vsvg), (ex["file"], svg)):
+            files.append(name)
+            with open(os.path.join(OUT, name + ".svg"), "w", encoding="utf-8", newline="\n") as fh:
+                fh.write('<?xml version="1.0" encoding="UTF-8"?>\n' + doc + "\n")
     page = os.path.join(OUT, "index.html")
     with open(page, "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(build_page(sections, web=False))
+        fh.write(build_page(sections, web=False, vb=vb))
     with open(os.path.join(OUT, "page.html"), "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(build_page(sections, web=True))
+        fh.write(build_page(sections, web=True, vb=vb))
 
     say("WRITTEN")
     say("   figures/agent_pairs/index.html and page.html")
@@ -302,15 +407,15 @@ def main():
     if browser is None:
         say("   NO CHROME OR EDGE FOUND: no PNG and no PDF. Open index.html and print it.")
     else:
-        for ex in EXPERIMENTS:
-            png = os.path.join(OUT, ex["file"] + ".png")
+        for name in files:
+            png = os.path.join(OUT, name + ".png")
             if os.path.exists(png):
                 os.remove(png)
             run_browser(browser, ["--hide-scrollbars", f"--window-size={W},{H}",
                                   "--force-device-scale-factor=2", f"--screenshot={png}",
-                                  Path(OUT, ex["file"] + ".svg").as_uri()])
+                                  Path(OUT, name + ".svg").as_uri()])
             size = png_size(png) if os.path.exists(png) else None
-            say(f"   figures/agent_pairs/{ex['file']}.png   "
+            say(f"   figures/agent_pairs/{name}.png   "
                 + (f"{size[0]} x {size[1]} px" if size else "NOT WRITTEN"))
         pdf = os.path.join(OUT, "agent_pairs.pdf")
         if os.path.exists(pdf):

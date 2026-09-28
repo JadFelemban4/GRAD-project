@@ -390,11 +390,12 @@ def build_page(ctx, web):
     head.append(f"<style>{page_css()}{PAIRS.EXTRA_CSS}{STUDY_CSS}</style>")
     c4v = ctx["verdicts"]["c4"]
     tiles = [
-        ("Learned supervision", f"{c['med_s']} of {c['n']}",
-         f"C4 sighted agents with a lower median damage than the current-grade rule; blind agents "
-         f"{c['med_b']} of {c['n']}, so it is not the preview channel. On the worst episode "
-         f"{c['worst_s']} of {c['n']} sighted and {c['worst_b']} of {c['n']} blind agents do worse "
-         "than the rule."),
+        ("Every agent against the baseline", f"{c['cut_lo']:.0f}–{c['cut_hi']:.0f} %",
+         f"of the baseline ECU's median damage removed by the C4 agents, sighted and blind alike; "
+         f"current-grade, the best hand-written policy, removes {c['cut_cg']:.1f} %. Sighted agents beat "
+         f"its median in {c['med_s']} of {c['n']} pairs and blind agents in {c['med_b']} of {c['n']}, so "
+         f"it is not the preview channel; on the worst episode {c['worst_s']} and {c['worst_b']} of "
+         f"{c['n']} do worse than it."),
         ("Preview, C4", (c4v["cells"][0]["cell"].lower() if c4v["cells"] else "no verdict found"),
          ((c4v["short"] or {}).get("en", "") + ". Phase D and D2 were inconclusive. "
           "\"Preview does not help\" is not a sentence any of them supports.")),
@@ -446,9 +447,15 @@ def build_page(ctx, web):
                 "before its agents trained, and 50 damage units were set in advance as the smallest effect "
                 "worth caring about.") + "</p>",
             *[f'<figure class="chart"><div class="scroll">{svg}</div></figure>' for svg in ctx["agent_svgs"]],
-            "<h3>The ablation, paired by seed</h3>"]
-    for ex, svg, ver in ctx["pairs"]:
-        body += [f'<figure class="chart"><div class="scroll">{svg}</div></figure>',
+            "<h3>Each experiment: every agent against the baseline, then the preview test</h3>",
+            "<p>" + esc(
+                "For each experiment the first chart measures both agents of every pair against the baseline "
+                "ECU, as the result files print it; that is learned protection. The second is the test the "
+                "team registered before training: the sighted agent against its blind twin, in damage "
+                "units.") + "</p>"]
+    for ex, svg, ver, vsvg, _ in ctx["pairs"]:
+        body += [f'<figure class="chart"><div class="scroll">{vsvg}</div></figure>',
+                 f'<figure class="chart"><div class="scroll">{svg}</div></figure>',
                  f'<div class="verdict">{verdict_block(ver)}</div>']
     body.append("<details><summary>Show the numbers</summary>")
     for title, (thead, trows) in ctx["agent_tables"]:
@@ -541,14 +548,24 @@ def main():
     fuel_name, fuel_svg = chart_fuel("c4", "C4", budget_c4, tables["c4"])
     counts = pol[3]
     agent_svgs = [roads[1], pol[1], fuel_svg]
-    pairs, verdicts = [], {}
+    pairs, verdicts, cut_c4 = [], {}, None
     for ex in PAIRS.EXPERIMENTS:
         ver = verdict(ex["prefix"])
         verdicts[ex["prefix"]] = ver
-        svg, _, _, _ = PAIRS.chart(ex, PAIRS.pairs(ex["prefix"]), ver)
-        pairs.append((ex, svg, ver))
+        prow = PAIRS.pairs(ex["prefix"])
+        cut = PAIRS.cuts(ex["prefix"], prow)
+        if ex["prefix"] == "c4":
+            cut_c4 = cut
+        vsvg, vtable = PAIRS.chart_vs_baseline(ex, prow, cut)
+        svg, _, _, _ = PAIRS.chart(ex, prow, ver)
+        pairs.append((ex, svg, ver, vsvg, vtable))
+    c4_cuts = [cut_c4[s][k] for s in cut_c4 for k in ("sighted", "blind")]
+    counts = dict(counts, cut_lo=min(c4_cuts), cut_hi=max(c4_cuts),
+                  cut_cg=cut_c4[min(cut_c4)]["current-grade"])
     names = {"phase_d": "Phase D", "d2": "Phase D2", "c4": "C4"}
     agent_tables = [("The frozen test roads", roads[2])]
+    agent_tables += [(f"{ex['name']}: every agent against the baseline ECU", vtable)
+                     for ex, _, _, _, vtable in pairs]
     for p in ("phase_d", "d2", "c4"):
         t = tables[p]
         hand = t[min(t)]
@@ -630,8 +647,10 @@ def main():
         size = png_size(png) if os.path.exists(png) else None
         say(f"   figures/study/{name}.png   " + (f"{size[0]} x {size[1]} px" if size else "NOT WRITTEN"))
     say("   figures/study/numbers.txt   (this output)")
+    everything = (LINES + ["", "--- read by plot_agent_pairs.py's functions ---"] + PAIRS.LINES
+                  + ["", "--- read by plot_sim_vs_car.py's functions ---"] + SVC.LINES)
     with open(os.path.join(OUT, "numbers.txt"), "w", encoding="ascii", newline="\n") as fh:
-        fh.write("\n".join(LINES) + "\n")
+        fh.write("\n".join(everything) + "\n")
 
 
 if __name__ == "__main__":

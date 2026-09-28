@@ -1,6 +1,18 @@
 THE PREVIEW ABLATION, PAIR BY PAIR  (plot_agent_pairs.py)
 minimum effect of interest (analyse_phase_d2.MEI): 50 damage units
 
+PHASE D: EVERY AGENT AGAINST THE BASELINE ECU  (results/phase_d_seed*.txt)
+   baseline ECU median damage: 959.8
+   seed  sighted cut %  blind cut %  curr-grade cut %
+      0           64.5         63.5              34.0
+      1           63.1         63.7              34.0
+      2           67.9         60.7              34.0
+      3           68.5         28.1              34.0
+      4           33.4         61.7              34.0
+      5           45.2         75.3              34.0
+      6           48.1         42.7              34.0
+      7           65.5         56.4              34.0
+
 PHASE D  (results/phase_d_seed*.txt, analyse_phase_d2.load)
    seed  baseline  curr-grade   sighted     blind  blind-sighted
       0     959.8       633.2     340.5     350.3           +9.8
@@ -16,6 +28,18 @@ PHASE D  (results/phase_d_seed*.txt, analyse_phase_d2.load)
    quoted  results/PHASE_D_RESULT.txt:33  (not_blind)
    quoted  results/PHASE_D2_RESULT.txt:65  (post_hoc)
 
+PHASE D2: EVERY AGENT AGAINST THE BASELINE ECU  (results/d2_seed*.txt)
+   baseline ECU median damage: 1118.0
+   seed  sighted cut %  blind cut %  curr-grade cut %
+      0           68.4         48.5              41.5
+      1           56.6         63.2              41.5
+      2           43.8         44.2              41.5
+      3           70.4         70.3              41.5
+      4           68.0         63.5              41.5
+      5           47.5         53.5              41.5
+      6           60.4         67.8              41.5
+      7           64.2         63.6              41.5
+
 PHASE D2  (results/d2_seed*.txt, analyse_phase_d2.load)
    seed  baseline  curr-grade   sighted     blind  blind-sighted
       0    1118.0       653.5     353.5     575.2         +221.7
@@ -29,6 +53,18 @@ PHASE D2  (results/d2_seed*.txt, analyse_phase_d2.load)
    preregistered cell(s), quoted: INCONCLUSIVE
    quoted  results/PHASE_D2_RESULT.txt:30  (result)
    quoted  results/PHASE_D2_RESULT.txt:86  (c1)
+
+C4: EVERY AGENT AGAINST THE BASELINE ECU  (results/c4_seed*.txt)
+   baseline ECU median damage: 1118.0
+   seed  sighted cut %  blind cut %  curr-grade cut %
+      0           67.8         35.6              41.5
+      1           56.2         63.3              41.5
+      2           46.1         53.1              41.5
+      3           69.9         68.7              41.5
+      4           70.2         66.8              41.5
+      5           60.4         60.4              41.5
+      6           68.0         68.9              41.5
+      7           67.3         67.5              41.5
 
 C4  (results/c4_seed*.txt, analyse_phase_d2.load)
    seed  baseline  curr-grade   sighted     blind  blind-sighted
@@ -51,8 +87,11 @@ C4  (results/c4_seed*.txt, analyse_phase_d2.load)
 
 WRITTEN
    figures/agent_pairs/index.html and page.html
+   figures/agent_pairs/1_phase_d_vs_baseline.png   2000 x 1280 px
    figures/agent_pairs/1_phase_d.png   2000 x 1280 px
+   figures/agent_pairs/2_d2_vs_baseline.png   2000 x 1280 px
    figures/agent_pairs/2_d2.png   2000 x 1280 px
+   figures/agent_pairs/3_c4_vs_baseline.png   2000 x 1280 px
    figures/agent_pairs/3_c4.png   2000 x 1280 px
    figures/agent_pairs/agent_pairs.pdf   printed from index.html
    figures/agent_pairs/numbers.txt      (this output)
