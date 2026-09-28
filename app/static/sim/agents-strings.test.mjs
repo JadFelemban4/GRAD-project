@@ -252,3 +252,86 @@ test('the M2 picker strings keep their clauses', () => {
     assert.doesNotMatch(seen, /[{][a-z0-9_]+[}]/i, `${lang}: an unfilled placeholder in ${seen}`);
   }
 });
+
+// M3: the models panel (model-panel.mjs), behind the footer gesture. The
+// Arabic honesty lines are design 7.7, 7.5b and 7.8 of
+// docs/superpowers/specs/2026-09-28-agent-replay-m3-design.md, word for word,
+// so they are pinned whole; the rest keep the clauses that carry a caveat.
+const M3_KEYS = [
+  'agents.pause.empty',
+  'agents.models.heading', 'agents.models.not_thesis', 'agents.models.claim', 'agents.models.levels',
+  'agents.models.jev.name', 'agents.models.jev.where', 'agents.models.jev.text',
+  'agents.models.jev.status.configured', 'agents.models.jev.status.no_key',
+  'agents.models.jev.ask', 'agents.models.jev.latency',
+  'agents.models.laya.name', 'agents.models.laya.where', 'agents.models.laya.device_unknown',
+  'agents.models.laya.text', 'agents.models.laya.check',
+  'agents.models.laya.status.not_configured', 'agents.models.laya.status.not_found',
+  'agents.models.laya.status.stopped', 'agents.models.laya.status.starting',
+  'agents.models.laya.status.ready', 'agents.models.laya.status.failed',
+  'agents.models.laya.ask', 'agents.models.laya.latency', 'agents.models.laya.first_load',
+  'agents.models.reason.pause', 'agents.models.reason.not_done', 'agents.models.reason.stopped',
+  'agents.models.reason.asking',
+  'agents.models.ask_this', 'agents.models.reference', 'agents.models.choice', 'agents.models.chosen_p',
+  'agents.models.reversed', 'agents.models.held', 'agents.models.changed',
+  'agents.models.footer', 'agents.models.sent', 'agents.models.no_answer', 'agents.models.no_answer_plain',
+  'agents.models.error.server_error',
+];
+
+test('the M3 strings keep their clauses', () => {
+  const { AGENT_STRINGS } = api();
+  for (const lang of LANGS) {
+    const missing = M3_KEYS.filter(key => !Object.prototype.hasOwnProperty.call(AGENT_STRINGS[lang], key));
+    assert.deepEqual(missing, [], `${lang}: M3 keys missing`);
+  }
+  const verbatim = {
+    'agents.models.not_thesis': 'ليس جزءاً من الرسالة ولا من أي نتيجة. لا يقارن أي رقم هنا النموذجين بالوكيلين، ولا يُحسب أي فرق.',
+    'agents.models.claim': 'الاحتمالات ادعاء النموذج نفسه، ولم تُختبر على هذه المهمة.',
+    'agents.models.levels': 'كل نموذج يختار واحداً من خمسة مستويات لكل إجراء: للتعديلات الثلاثة الحدّان و"بلا تعديل" ونقطتان في المنتصف؛ وللمروحة والمضخة خمس قيم متساوية التباعد. المعروض هو اختيار النموذج نفسه، ولا يُحسب منه متوسط.',
+    'agents.models.laya.check': 'نسأل لايا مرتين، والخيارات بترتيبين متعاكسين. إذا تغيّر اختياره بتغيير الترتيب وحده، فذلك الاختيار لا يأتي من حالة المحرك.',
+    'agents.models.held': 'ثبت',
+    'agents.models.changed': 'تغيّر بتغيير الترتيب',
+    'agents.pause.empty': 'اضغط احسب، ثم أوقف العرض عند أي ثانية لترى ما قرّره كل وكيل',
+  };
+  for (const [key, text] of Object.entries(verbatim)) assert.equal(AGENT_STRINGS.ar[key], text, `ar ${key} is not the design's line`);
+  const mustSay = {
+    'agents.models.not_thesis': { en: [/not part of the thesis/i, /no difference is computed/] },
+    'agents.models.claim': { en: [/model's own claim/, /untested/] },
+    'agents.models.levels': { en: [/five levels/, /no average is computed/] },
+    'agents.models.laya.check': { en: [/twice/, /opposite orders/, /does not come from the engine state/] },
+    'agents.models.laya.text': {
+      ar: [/لا يُرسل شيئاً خارجه/, /تجربة تشغيل، لا تقييم/, /README_AR\.md:31/],
+      en: [/sends nothing out of it/, /A trial run, not an evaluation/, /README_AR\.md:31/],
+    },
+    'agents.models.jev.text': {
+      ar: [/الولايات المتحدة/, /بلا حدّ زمني \(MCA §4\.1\)/, /تمنع تدريب/, /غير معروف/, /الدقة العددية/],
+      en: [/USA/, /in perpetuity/, /\(MCA §4\.1\)/, /forbids training/, /unknown/, /numeric precision/],
+    },
+    'agents.models.jev.where': { ar: [/الولايات المتحدة/, /مدفوع/], en: [/USA/, /paid/] },
+    'agents.models.jev.ask': { ar: [/مدفوع/], en: [/paid/] },
+    'agents.models.jev.latency': { ar: [/مقيسة من هذا الجهاز/, /70–500 ms/], en: [/measured from this machine/, /70–500 ms/] },
+    'agents.models.laya.where': { ar: [/على هذا الجهاز/], en: [/On this machine/] },
+    'agents.models.footer': { ar: [/لم يُطبَّق/, /حد سرعة التغيير/], en: [/not applied/, /not rate-limited/] },
+    'agents.models.error.vendor_status': { ar: [/HTTP \{status\}/, /رصيد/], en: [/HTTP \{status\}/, /credit/] },
+    'agents.models.error.no_key': { ar: [/لم يُرسل شيء/], en: [/nothing was sent/] },
+    'agents.pause.empty': { en: [/Compute/, /pause/] },
+  };
+  for (const [key, langs] of Object.entries(mustSay)) {
+    for (const [lang, patterns] of Object.entries(langs)) {
+      assert.ok(AGENT_STRINGS[lang][key], `${key} missing in ${lang}`);
+      for (const p of patterns) assert.match(AGENT_STRINGS[lang][key], p, `${key} lost a clause in ${lang}`);
+    }
+  }
+  // Design 7.7: the reference line names no car on its own and subtracts
+  // nothing; the page puts the two lane values after its colon.
+  for (const lang of LANGS) {
+    const ref = AGENT_STRINGS[lang]['agents.models.reference'];
+    assert.ok(ref.endsWith(':'), `${lang}: the reference line ends at its colon`);
+    assert.doesNotMatch(ref, /[{][a-z0-9_]+[}]/i, `${lang}: the reference line takes no placeholder`);
+  }
+  // Design C9: the page never shows the model's confidence.
+  for (const lang of LANGS) {
+    for (const key of Object.keys(AGENT_STRINGS[lang]).filter(k => k.startsWith('agents.models.'))) {
+      assert.doesNotMatch(AGENT_STRINGS[lang][key], /confidence|الثقة/i, `${lang} ${key} names the confidence`);
+    }
+  }
+});
