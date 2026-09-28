@@ -35,10 +35,12 @@ from evaluate import DT, DURATION
 ROOT = Path(__file__).resolve().parent.parent
 # Lowercase only: NTFS is case-insensitive, so "runs_C4" would otherwise
 # resolve to the same directory as "runs_c4" while carrying no verdict --
-# the eight real C4 agents would come back ready with no C4 caveats attached.
+# the sixteen real C4 agents (eight pairs) would come back ready with no C4
+# caveats attached.
 RUNS_NAME = re.compile(r"^runs[a-z0-9_]*$")
 AGENT_NAME = re.compile(r"^(sighted|blind)_seed(\d+)$")
 ARMS = ("sighted", "blind")
+UNREADABLE_ZIP = "final.zip is not a readable stable-baselines3 zip"
 
 
 class Refused(Exception):
@@ -83,12 +85,15 @@ def protocol_of(meta):
 
 
 def read_agent(runs, name, root=ROOT):
-    """One agent directory's status. KeyError if either name is malformed."""
+    """One agent directory's status. KeyError if either name is malformed or
+    the directory is not there: a missing directory is not an agent at all."""
     m = AGENT_NAME.fullmatch(str(name))
     if not RUNS_NAME.fullmatch(str(runs)) or m is None:
         raise KeyError(f"{runs}/{name}")
     arm, seed = m.group(1), int(m.group(2))
     d = Path(root) / runs / name
+    if not d.is_dir():
+        raise KeyError(f"{runs}/{name}")
     out = {"runs": runs, "tag": name, "arm": arm, "seed": seed, "status": None,
            "reason": None, "problems": [], "protocol": None, "budget": None,
            "budget_line": None, "zip_sha": None, "train_dt": None}
@@ -102,7 +107,9 @@ def read_agent(runs, name, root=ROOT):
     if not (d / "final.zip").is_file():
         return dict(out, status="incomplete", reason="no final.zip")
     # evaluate.py:369 decides the arm by "blind" in the path string that
-    # run_phase_d.py:330 hands it, f"{runs}/{name}". Apply that exact rule.
+    # run_phase_d.py:330 hands it, os.path.join(out, tag) -- a backslash on
+    # Windows. "blind" in a path gives the same answer for either separator,
+    # so f"{runs}/{name}" applies that exact rule here.
     scored_blind = "blind" in f"{runs}/{name}"
     if scored_blind != (arm == "blind") or scored_blind != (not meta.get("use_preview", True)):
         return dict(out, status="incompatible",
@@ -116,9 +123,13 @@ def read_agent(runs, name, root=ROOT):
                     reason="plant mismatch: " + ", ".join(f for f, _, _ in bad),
                     problems=[f"{f}: stored {a!r} live {b!r}" for f, a, b in bad])
     budget = FP.model_budget(str(d / "final.zip"))
+    if budget is None:
+        # Not an SB3 zip (FP.model_budget reads its 'data' member). M1 called
+        # it ready with 'budget unreadable' and let SAC.load fail at build time.
+        return dict(out, status="incomplete", reason=UNREADABLE_ZIP, protocol=protocol,
+                    train_dt=meta.get("train_dt"))
     return dict(out, status="ready", protocol=protocol, budget=budget,
-                budget_line=FP.format_budget(budget),
-                zip_sha=budget["sha"] if budget else None,
+                budget_line=FP.format_budget(budget), zip_sha=budget["sha"],
                 train_dt=meta.get("train_dt"))
 
 
@@ -144,27 +155,40 @@ def scored_shas(prefix, seed, root=ROOT):
     return out
 
 
-def find_pair(runs, seed, root=ROOT):
-    """The sighted and blind agent of one seed, checked. KeyError for a name
-    that is malformed or not on disk; Refused for a pair that must not run."""
+def check_pair(runs, seed, root=ROOT):
+    """The sighted and blind agent of one seed, checked, with the problems
+    RETURNED rather than raised: the catalog lists a refused pair with its
+    reason, and find_pair raises on the same list, so both share one rule.
+
+    KeyError for a name that is malformed or an arm directory not on disk.
+    Otherwise 'problems' is [] when the pair may run. 'protocol' is the arms'
+    shared protocol once both are ready and agree, else None. Each agent
+    gains 'scored' ('match' or 'not recorded') once the sha check has run,
+    None when an earlier check refused the pair first.
+    """
     if (not RUNS_NAME.fullmatch(str(runs)) or not isinstance(seed, int)
             or isinstance(seed, bool) or seed < 0):
         raise KeyError(f"{runs}/{seed}")
     root = Path(root)
     if not all((root / runs / f"{arm}_seed{seed}").is_dir() for arm in ARMS):
         raise KeyError(f"{runs}/{seed}")
-    agents = [read_agent(runs, f"{arm}_seed{seed}", root) for arm in ARMS]
+    agents = [dict(read_agent(runs, f"{arm}_seed{seed}", root), scored=None) for arm in ARMS]
+    prefix = RPD.result_prefix(str(root / runs))
+    pair = {"runs": runs, "seed": seed, "prefix": prefix,
+            "experiment": RPD.CLOSED_PREFIX.get(prefix) or f"{runs} (no name recorded)",
+            "protocol": None,
+            "result_file": (root / "results" / f"{prefix}_seed{seed}.txt").is_file(),
+            "agents": agents, "problems": []}
     problems = []
     for a in agents:
         if a["status"] != "ready":
             problems.append(f"{a['tag']}: {a['status']} -- {a['reason']}")
             problems.extend(f"{a['tag']}: {p}" for p in a["problems"])
     if problems:
-        raise Refused(problems)
+        return dict(pair, problems=problems)
     if agents[0]["protocol"] != agents[1]["protocol"]:
-        raise Refused([f"the two arms were trained on different protocols: "
-                       f"{agents[0]['protocol']} and {agents[1]['protocol']}"])
-    prefix = RPD.result_prefix(str(root / runs))
+        return dict(pair, problems=[f"the two arms were trained on different protocols: "
+                                    f"{agents[0]['protocol']} and {agents[1]['protocol']}"])
     shas = scored_shas(prefix, seed, root)
     for a in agents:
         recorded = None if shas is None else shas[a["arm"]]
@@ -172,12 +196,16 @@ def find_pair(runs, seed, root=ROOT):
             problems.append(f"{a['tag']}: not the scored artefact -- results/{prefix}_seed{seed}.txt "
                             f"records zip sha {recorded}, final.zip is {a['zip_sha']}")
         a["scored"] = "match" if recorded is not None and recorded == a["zip_sha"] else "not recorded"
-    if problems:
-        raise Refused(problems)
-    return {"runs": runs, "seed": seed, "prefix": prefix,
-            "experiment": RPD.CLOSED_PREFIX.get(prefix) or f"{runs} (no name recorded)",
-            "protocol": agents[0]["protocol"], "result_file": shas is not None,
-            "agents": agents}
+    return dict(pair, protocol=agents[0]["protocol"], problems=problems)
+
+
+def find_pair(runs, seed, root=ROOT):
+    """check_pair, raising Refused(problems) for a pair that must not run.
+    KeyError for a name that is malformed or not on disk."""
+    pair = check_pair(runs, seed, root)
+    if pair["problems"]:
+        raise Refused(pair["problems"])
+    return pair
 
 
 # ---- verdicts: quoted from results/, cited by line --------------------------

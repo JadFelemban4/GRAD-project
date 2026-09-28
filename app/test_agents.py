@@ -174,10 +174,10 @@ def _nan_policy(env, obs):
     return np.full(5, np.nan, dtype=np.float32)
 
 
-def _fake_agent(root, runs, name, src_arm, drop=(), **meta_changes):
-    """A copy of runs_c4/<src_arm>_seed0 at root/runs/name, built with
+def _fake_agent(root, runs, name, src_arm, drop=(), src_runs="runs_c4", **meta_changes):
+    """A copy of <src_runs>/<src_arm>_seed0 at root/runs/name, built with
     shutil.copy and json.dump only. `drop` names files to leave out."""
-    src = ROOT / "runs_c4" / f"{src_arm}_seed0"
+    src = ROOT / src_runs / f"{src_arm}_seed0"
     d = Path(root) / runs / name
     d.mkdir(parents=True)
     if "final.zip" not in drop:
@@ -352,6 +352,73 @@ class CatalogTests(unittest.TestCase):
                 "incompatible", "evaluate.py would have scored this agent as the other arm"))
             with self.assertRaises(AC.Refused):
                 AC.find_pair("runs_zz_blind", 0, root)
+        self.assertEqual(threading.active_count(), threads, "the catalog started a thread")
+
+    def test_read_agent_refuses_a_directory_that_is_not_there(self):
+        """M1 called a missing directory 'incompatible (no meta.json)'; discover
+        lists only directories that exist, so a missing one is a KeyError."""
+        with tempfile.TemporaryDirectory() as tmp:
+            for runs, name, root in (("runs_c4", "sighted_seed99", ROOT),
+                                     ("runs_zz", "blind_seed0", tmp)):
+                with self.subTest(runs=runs, name=name):
+                    with self.assertRaises(KeyError):
+                        AC.read_agent(runs, name, root)
+
+    @unittest.skipUnless(HAVE_C4, NO_C4)
+    def test_status_and_pair_gaps(self):
+        """The M1 test gaps: an unknown protocol, an unreadable final.zip, and
+        two arms on different protocols; and check_pair agrees with find_pair."""
+        threads = threading.active_count()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.assertNotIn(str(ROOT.resolve()).lower(), str(root.resolve()).lower())
+
+            # (a) a protocol this code does not know
+            _fake_agent(root, "runs_zzproto", "sighted_seed0", "sighted",
+                        scenario={"protocol": "something-else"})
+            a = AC.read_agent("runs_zzproto", "sighted_seed0", root)
+            self.assertEqual((a["status"], a["reason"]), ("incompatible", "unknown protocol"))
+
+            # (b) a final.zip that is not a stable-baselines3 zip: incomplete, not ready
+            _fake_agent(root, "runs_zzbadzip", "sighted_seed0", "sighted")
+            d = _fake_agent(root, "runs_zzbadzip", "blind_seed0", "blind", drop=("final.zip",))
+            shutil.copy(d / "meta.json", d / "final.zip")
+            a = AC.read_agent("runs_zzbadzip", "blind_seed0", root)
+            self.assertEqual((a["status"], a["reason"], a["zip_sha"], a["budget_line"]),
+                             ("incomplete", AC.UNREADABLE_ZIP, None, None))
+            self.assertEqual((a["protocol"], a["train_dt"]), ("d2", 0.2))
+            want = ["blind_seed0: incomplete -- final.zip is not a readable stable-baselines3 zip"]
+            pair = AC.check_pair("runs_zzbadzip", 0, root)
+            self.assertEqual((pair["problems"], pair["protocol"]), (want, None))
+            self.assertEqual([a["scored"] for a in pair["agents"]], [None, None])
+            with self.assertRaises(AC.Refused) as cm:
+                AC.find_pair("runs_zzbadzip", 0, root)
+            self.assertEqual(cm.exception.problems, want)
+
+            # (c) a clean pair: check_pair finds nothing, and find_pair returns the same dict
+            _fake_pair(root, "runs_zzclean")
+            pair = AC.check_pair("runs_zzclean", 0, root)
+            self.assertEqual((pair["problems"], pair["protocol"], pair["result_file"]),
+                             ([], "d2", False))
+            self.assertEqual([a["scored"] for a in pair["agents"]], ["not recorded"] * 2)
+            self.assertEqual(AC.find_pair("runs_zzclean", 0, root), pair)
+            with self.assertRaises(KeyError):
+                AC.check_pair("runs_zzclean", 1, root)
+
+            # (d) two ready arms trained on different protocols
+            with self.subTest("the two arms on different protocols"):
+                if not (ROOT / "runs" / "sighted_seed0" / "final.zip").is_file():
+                    self.skipTest("runs/sighted_seed0 is not on this machine")
+                _fake_agent(root, "runs_zzmix", "sighted_seed0", "sighted", src_runs="runs")
+                _fake_agent(root, "runs_zzmix", "blind_seed0", "blind")
+                pair = AC.check_pair("runs_zzmix", 0, root)
+                self.assertEqual([(a["status"], a["protocol"]) for a in pair["agents"]],
+                                 [("ready", "phase-d"), ("ready", "d2")])
+                want = ["the two arms were trained on different protocols: phase-d and d2"]
+                self.assertEqual((pair["problems"], pair["protocol"]), (want, None))
+                with self.assertRaises(AC.Refused) as cm:
+                    AC.find_pair("runs_zzmix", 0, root)
+                self.assertEqual(cm.exception.problems, want)
         self.assertEqual(threading.active_count(), threads, "the catalog started a thread")
 
     def test_c4_verdict(self):
