@@ -1,0 +1,72 @@
+THE SIMULATOR AGAINST THE CAR'S LOGS  (plot_sim_vs_car.py)
+data/master_samples.csv: 82984 rows from 7 drives
+
+1. GEARBOX  (engine_env.Vehicle: ZF 8HP51 ratios x final drive)
+   moving samples (v > 20 km/h): 79134  from 7 drives
+   within 4% of a published overall ratio: 68575  = 86.7 %
+   wheel radius used: 0.33 m (the model's constant)
+   gear 1: overall ratio 16.537   samples within 4%: 12
+   gear 2: overall ratio 10.584   samples within 4%: 348
+   gear 3: overall ratio  6.842   samples within 4%: 3598
+   gear 4: overall ratio  5.418   samples within 4%: 7551
+   gear 5: overall ratio  4.145   samples within 4%: 9187
+   gear 6: overall ratio  3.150   samples within 4%: 8189
+   gear 7: overall ratio  2.589   samples within 4%: 7314
+   gear 8: overall ratio  2.016   samples within 4%: 32376
+
+2. BOOST PRESSURE UNDER BOOST  (same computation as verify_docs.py, CHARGE TEMPERATURE)
+   model samples above 200 kPa, MAF not pinned: 762   median 228.3 kPa
+   car rows, Boost pressure above 15 psi gauge: 1097   median 224.0 kPa
+   gap, model vs car: +1.9 %
+   same samples with the pre-throttle sensor as charge temperature (median 107 C): median 279.5 kPa, gap +24.8 %  (587 samples with a sensor reading)
+
+3. COMPRESSOR ENVELOPE  (fit_envelope.envelope; plant.boost_ceiling_kpa)
+   stable samples, MAF not pinned: 40716
+    flow kg/s  car PR p95  model PR   rows  readings
+        0.015       1.159     1.198  24060      1120
+        0.045       1.312     1.507  14759       809
+        0.075       1.582     1.735   1040        68
+        0.105       1.933     1.911    166        15
+        0.135       2.283     2.050    249        22
+        0.165       2.353     2.164    142        15
+        0.195       2.440     2.258    124        13
+        0.225       2.415     2.337     36         5
+        0.255       2.342     2.405     40         5
+        0.285       2.515     2.463     53         4
+        0.315       2.473     2.514     47         5
+   RMS, model ceiling vs today's p95 bins: 0.135 (pressure ratio)
+
+4. ENRICHMENT  (engine_env.BaselineECU.base_lambda, v4)
+   samples above the 180 kPa gate with lambda 0.5-1.3: 1341
+   cell                         rows  readings  car med        car IQR   model
+   cell 1000-3500 rpm 0-4 s      249        23     0.99   0.98-0.99    1.00
+   cell 1000-3500 rpm 4-8 s      123         9     0.99   0.99-0.99    1.00
+   cell 1000-3500 rpm 8+ s        69         8     0.98   0.94-0.99    1.00
+   cell 3500-4500 rpm 0-4 s      137        14     0.99   0.98-0.99    1.00
+   cell 3500-4500 rpm 4-8 s       45         5     0.98   0.96-0.99    0.98
+   cell 3500-4500 rpm 8+ s        53         7     0.90   0.90-0.97    0.93
+   cell 4500-7000 rpm 0-4 s      435        53     0.98   0.94-0.99    1.00
+   cell 4500-7000 rpm 4-8 s      142        15     0.83   0.80-0.88    0.91
+   cell 4500-7000 rpm 8+ s        88         7     0.79   0.78-0.81    0.81
+   largest |car median - model median| over the cells: 0.076  (cell 4500-7000 rpm 4-8 s)
+
+5. LOAD AT THE STEADY POINTS  (compare_log.py, default mode)
+   points scored: 26   manifold pressure 30-75 kPa
+   derived k = 269.6 / T_charge, mean 0.831   residual MAPE 1.4 %   (0 free parameters)
+   fitted k = 0.839   residual MAPE 1.1 %   (1 free parameter)
+   CONSISTENCY CHECK: eta_v, residual gas and T cancel out (CLAUDE.md mistake 12)
+
+WRITTEN
+   figures/sim_vs_car/index.html       (every chart, a cover and the tables)
+   figures/sim_vs_car/1_gear_ratios.svg
+   figures/sim_vs_car/2_boost_pressure.svg
+   figures/sim_vs_car/3_compressor_envelope.svg
+   figures/sim_vs_car/4_enrichment.svg
+   figures/sim_vs_car/5_load_consistency.svg
+   figures/sim_vs_car/1_gear_ratios.png   2000 x 1280 px
+   figures/sim_vs_car/2_boost_pressure.png   2000 x 1280 px
+   figures/sim_vs_car/3_compressor_envelope.png   2000 x 1280 px
+   figures/sim_vs_car/4_enrichment.png   2000 x 1280 px
+   figures/sim_vs_car/5_load_consistency.png   2000 x 1280 px
+   figures/sim_vs_car/sim_vs_car.pdf   printed from index.html
+   figures/sim_vs_car/numbers.txt      (this output)
