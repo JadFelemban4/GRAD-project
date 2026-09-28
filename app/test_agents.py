@@ -1052,7 +1052,8 @@ class StoreTests(unittest.TestCase):
             self.assertEqual(r["frames"], [])
         self.assertEqual(len(_builders()), 1)
         gate.set()
-        _wait_for(s, self.K1, "ready")
+        for t in _builders():                # join, never poll: a poll would rebuild a cancelled K1
+            t.join(5)
         self.assertIsNotNone(s.trace(self.K1), "a plain poll cancelled the build")
 
     def test_preempt_cancels_and_keeps_nothing_partial(self):
@@ -1089,13 +1090,16 @@ class StoreTests(unittest.TestCase):
         _wait_for(s, self.K2, "ready")
         settle()
 
-        # a plain poll answered from the cache cancels nothing
+        # a plain poll answered from the cache cancels nothing. Read the cache
+        # after settle(), never through _wait_for: polling K1 to an idle store
+        # would rebuild a cancelled K1 and hide the cancel.
         gate.clear()
         self.assertEqual(s.poll(self.K1, preempt=True)["status"], "loading")
         self.assertEqual(s.poll(self.K2)["status"], "ready")
         gate.set()
-        _wait_for(s, self.K1, "ready")
         settle()
+        self.assertIsNotNone(s.trace(self.K1),
+                             "a plain poll answered from the cache cancelled the build")
 
         # «احسب» for a cached episode: answered from the cache, and K3 is cancelled
         gate.clear()
