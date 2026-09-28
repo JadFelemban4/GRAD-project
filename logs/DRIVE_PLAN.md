@@ -1,10 +1,20 @@
 # Drives we need — what to log, and how to drive it
 
-Written 27 September 2026, from what the simulator-versus-car comparison
-(`model_vs_data.py`) could not settle. Three drives, in order of value. Each
-answers one question the existing logs cannot. None of them is needed to run
-Phase D, which is simulation; they make the simulator it runs on more
-trustworthy.
+Written 27 September 2026 and revised 28 September, from what the
+simulator-versus-car comparison (`model_vs_data.py`) could not settle. Three
+drives, **A, B and C**, in order of value. Each answers one question the existing
+logs cannot. None of them is needed to run Phase D, which is simulation; they
+make the simulator it runs on more trustworthy.
+
+*(Lettered, not numbered, on purpose: `DRIVE_1_card_v1.md` and `v2` are the
+**completed** first drive of 6 September, kept as a record. These are new.)*
+
+**What each drive would change, and when.** A and B would change the plant
+(the oil node; the boost ceiling and the gearbox workaround). A plant change
+after the Phase D retrain means retraining again, so either drive A and B
+first, or retrain now on the current plant and retrain once more after them —
+three hours of machine time each way. C changes no parameter the training
+uses; it decides whether the knock model can be kept at all.
 
 **Read-only, always.** BimmerLink logs; nothing is ever written to the car.
 Passenger runs the phone, driver drives. Every instruction below is to be
@@ -35,7 +45,7 @@ safely, skip it; a missing pull costs less than anything else.
 
 ---
 
-## Drive 1 — a long mountain climb, for heat (most valuable)
+## Drive A — a long mountain climb, for heat (most valuable)
 
 **Why.** The car has never been logged under sustained load. Only 1.8 % of the
 logged moving samples reach the manifold pressure of the locked climb — the
@@ -44,9 +54,11 @@ in the region the whole experiment runs in. This drive gives:
 
 - the **oil node's** real response to sustained load. On hard pulls the model's
   oil spikes to 140 °C where the sump reads 107 °C; its fuel-to-oil heat share
-  (5 %) and oil heat capacity are ASSUMED numbers that this drive can measure,
-  using the logged coolant as the boundary so the unidentifiable radiator
-  stays out of the fit;
+  (5 %) and oil heat capacity are ASSUMED numbers. **The logs we have cannot
+  fix them** (28 September, `model_vs_data.py`): fitted on the three light-load
+  calibration drives they fix the pulls but take drive10 — the only drive in
+  the published band — from 116 to 102 °C against the car's 117. The drives
+  disagree, and only sustained load can say which way;
 - the first **sustained-load coolant** data, and — if the climb is long and hot
   enough to push coolant past 100 °C — the **radiator**, which CLAUDE.md says
   can only be identified by a drive that overwhelms the cooling system;
@@ -83,7 +95,7 @@ in the region the whole experiment runs in. This drive gives:
 
 ---
 
-## Drive 2 — full-throttle roll-ons in a high gear, for low-rpm boost
+## Drive B — full-throttle roll-ons in a high gear, for low-rpm boost
 
 **Why.** The simulator's boost ceiling is "what the car was seen to do", and on
 flat roads the car was never asked for boost at low engine speed. So the model
@@ -126,29 +138,37 @@ higher, engine warm.
 
 ---
 
-## Drive 3 — loaded, steady-gear driving in the heat, for knock
+## Drive C — loaded, steady-gear driving in the heat, for knock
 
-**Why.** The model's knock integral has **no detectable relationship** with the
-retard the car applies (correlation −0.12 over 14 318 samples on 7475b5d7).
-CLAUDE.md: *settling it needs a deliberate drive.* The retard is target minus
-actual ignition angle, and it can only be read cleanly when both are sampled
-fast and the gear is not changing (a gearshift torque cut looks like 45° of
-retard).
+**Why.** The model's knock integral shows **no detectable relationship** with
+the retard the car applies (correlation −0.12 over 14 318 rows of 7475b5d7).
+**But that drive could not have seen it** (28 September): logged with 26
+channels, it holds only about 400 genuine readings of each ignition angle in
+55 minutes — one every ~8 s — and a third of the target/actual pairs in a row
+were read more than a second apart. A knock retard lasts a second or two. The
+test so far is not a refutation; it is a test this sampling cannot perform —
+mistake 13b's trap again, where a real relationship read +0.35 until faster
+logging showed +0.95.
 
-**Channels (8):**
+So this drive logs **as few channels as possible**, to read both angles every
+~1.25 s:
+
+**Channels (6):**
 
 | channel | why |
 |---|---|
 | `Engine speed` | operating point |
-| `Vehicle speed` | gear inference (the `Actual gear` channel clamps at 6 — mistake 18) |
 | `Air mass flow` | load |
 | `Actual ignition angle` | what the car fired |
 | `Target ignition angle from torque intervention` | target minus actual = retard |
-| `Lambda actual value` | the model needs it at each sample |
 | `Coolant temperature` | warm filter |
 | `Ambient temperature` | knock depends on it |
 
-**How to drive.** The same climb as drive 1 works — a second ascent with this
+`Vehicle speed` and `Lambda actual value` are left out on purpose: in a held
+gear the gear does not need inferring, and below 3300 rpm this engine does not
+enrich, so lambda is 1.0.
+
+**How to drive.** The same climb as drive A works — a second ascent with this
 channel set — in the afternoon heat.
 
 1. **Manual mode (M).** Choose a gear that keeps the engine at **2000–3500 rpm**

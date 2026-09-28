@@ -122,7 +122,35 @@ def phase_d():
         d = np.loadtxt(f, delimiter=",", skiprows=1, usecols=(0, 1, 2))
         curves.append(dict(run=tag, blind=tag.startswith("blind"), ret=_r(d[:, 1], 1)))
 
-    return dict(trace=trace, sweep=sweep, eval=ev, base_med=_r(base, 1),
+    # Damage split by term, on the hand-written traces. The knock term rests on
+    # the knock model the car's logs have not been able to test.
+    split = {}
+    for nm in names:
+        T_ = tr[nm]
+        tt = np.array(T_["t_turb"]) + 273.15
+        to = np.array(T_["t_oil"]) + 273.15
+        ki = np.array(T_["ki"])
+        turb = float(np.sum(np.exp((tt - 1123.0) / 45.0)))
+        oil = float(np.sum(0.4 * np.exp((to - 408.0) / 12.0)))
+        knk = float(np.sum(40.0 * np.maximum(0.0, ki - 0.85) ** 2))
+        split[nm] = dict(turb=turb, oil=oil, knock=knk, thermal=turb + oil,
+                         knock_pct=100.0 * knk / (turb + oil + knk))
+    tb = split["baseline ECU"]["thermal"]
+    cut_th = {nm: 100.0 * (1.0 - v["thermal"] / tb) for nm, v in split.items()}
+    split_out = dict(knock_pct_base=_r(split["baseline ECU"]["knock_pct"], 1),
+                     knock_pct_grade=_r(split["current-grade"]["knock_pct"], 1),
+                     knock_pct_pred=_r(split["predictive (hand)"]["knock_pct"], 1),
+                     thermal_grade=_r(split["current-grade"]["thermal"], 1),
+                     thermal_pred=_r(split["predictive (hand)"]["thermal"], 1),
+                     preview_thermal=_r(cut_th["predictive (hand)"] - cut_th["current-grade"], 2))
+
+    from engine_env import make_grade_climb
+    c720 = make_grade_climb(duration=720.0, dt=1.0)
+    climb_m = float(np.sum(c720["v_mps"] * c720["grade"]))
+    isa = 101.325 * (1.0 - 2.25577e-5 * climb_m) ** 5.25588     # standard atmosphere
+    elev = dict(climb_m=_r(climb_m, 0), isa_kpa=_r(isa, 0), p_model=c720["p_baro"])
+
+    return dict(trace=trace, sweep=sweep, eval=ev, base_med=_r(base, 1), split=split_out, elev=elev,
                 base_fuel=_r(base_f, 0), ablation=ablation, curves=curves,
                 n_episodes=len(col("baseline ECU", "damage")))
 
@@ -228,6 +256,21 @@ def model_vs_car():
                        over120=_r(D["load_over_120_pct"], 1),
                        load_med_lo=_r(min(D["load_median_by_drive"].values()), 0),
                        load_med_hi=_r(max(D["load_median_by_drive"].values()), 0))
+
+    KS = R["knock_sampling"]
+    out["knock_s"] = dict(fresh=min(KS["fresh_target"], KS["fresh_actual"]),
+                          minutes=_r(KS["minutes"], 0),
+                          every_s=_r(60.0 * KS["minutes"] / min(KS["fresh_target"], KS["fresh_actual"]), 0),
+                          within1=_r(KS["paired_within_1s_pct"], 0),
+                          late_pct=_r(100.0 - KS["paired_within_1s_pct"], 0))
+    OI = R["oil_identification"]
+    out["oil_id"] = {k: dict(frac_pct=_r(100 * OI[k]["frac"], 1), c_kj=_r(OI[k]["c_oil"] / 1000, 0),
+                             fit=_r(OI[k]["fit_rmse"], 2), held=_r(OI[k]["held_out_rmse"], 2),
+                             pull=_r(OI[k]["peaks"]["7475b5d7"]["model"], 0),
+                             pull_car=_r(OI[k]["peaks"]["7475b5d7"]["car"], 0),
+                             d10=_r(OI[k]["peaks"]["drive10"]["model"], 0),
+                             d10_car=_r(OI[k]["peaks"]["drive10"]["car"], 0))
+                     for k in ("shipped", "best")}
 
     out["lit"] = [dict(name=r["name"], value=_r(r["value"], 1), unit=r["unit"],
                        lo=r["lo"], hi=r["hi"], ok=r["ok"]) for r in R["literature"]]

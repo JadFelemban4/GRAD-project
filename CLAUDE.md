@@ -39,7 +39,43 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
-## Current state — 27 September 2026 (training roads, and two calibration fixes)
+## Current state — 28 September 2026 (the retrain is ready; three comparisons re-read)
+
+> ### 28 SEPTEMBER: WHAT THE "OFF" AND "NEGATIVE" COMPARISONS ACTUALLY SAY
+>
+> Three measurements, none of which changed the model (`model_vs_data.py`):
+>
+> - **The knock comparison could not have seen knock.** `7475b5d7` was logged
+>   with 26 channels, so its 14 318 rows hold only **404 readings of the target
+>   ignition angle and 410 of the actual** in 55 minutes — one every ~8 s — and
+>   a third of the pairs in a row were read more than a second apart. A knock
+>   retard lasts a second or two. The −0.12 correlation is therefore **untested,
+>   not refuted**: mistake 13b's trap again. Drive C in `logs/DRIVE_PLAN.md`
+>   logs 6 channels to read both angles every ~1.25 s.
+> - **Preview's −0.4 against current-grade is entirely the knock term.** On the
+>   hand-written policies the knock damage term is 6–12 % of total damage, and
+>   on turbine and oil damage alone predictive and current-grade TIE
+>   (555.7 vs 555.8). Until the knock model is tested, report Phase D both
+>   ways — total damage and thermal-only.
+> - **The logs we have cannot calibrate the oil node.** Fitting the two ASSUMED
+>   oil parameters on the three light-load calibration drives fixes the hard
+>   pulls (134 → 102 °C, car 107) but breaks drive10, the only drive inside the
+>   published band (116 → 102 °C, car 117). The drives pull opposite ways; only
+>   sustained-load data (drive A) can decide. `thermal.py` is unchanged.
+>
+> **Elevation, stated plainly.** The scored climb rises **2 340 m** in its
+> 720 s (3 120 m over a 900 s training episode); the training roads climb up to
+> 3.8 km. But `p_baro` is fixed at 101.3 kPa and the plant never reads it:
+> **the engine breathes sea-level air the whole way**, where a standard
+> atmosphere gives about 76 kPa at 2 340 m. The scenario is sustained heavy load
+> at sea level, not a mountain — which is also why no real road will ever cover
+> it. Adding altitude would change the locked scenario, so it is not for Phase D.
+>
+> **A plant change after the retrain means retraining again.** Drives A and B
+> would change the plant (oil node; boost ceiling and the gearbox workaround).
+> Either drive first, or retrain now and retrain once more afterwards — about
+> three hours of machine time each way. The improvement plan for every
+> comparison is under "What to do next".
 
 > ### 27 SEPTEMBER: THE RETRAIN IS READY, ON VARIED ROADS AT dt = 1.0
 >
@@ -125,7 +161,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — 1.4 % load residual, zero fitted parameters, 26 pooled points from ten drives, 295.0 minutes, 30–75 kPa. Read mistake 12 before quoting it |
-| C · get an agent to learn | **ran.** Ten SAC agents, 50 k steps, 173 min each — **on the unloaded 110 km/h scenario**. Retrain at 130 |
+| C · get an agent to learn | **retrain READY, not run** (27 Sep): a new road every episode, dt = 1.0, `runs/terrain_dt1/`. The ten agents of 19 Sep trained at 110 km/h, dt 0.2, one road — a record, not a result |
 | D · baselines and the ablation | **protocol exists** (`evaluate.py`, twenty frozen episodes). No valid result yet |
 | E · battery plant | not started |
 | F · the H/τ sweep | measurable again now the scenario binds, but not before D |
@@ -1117,6 +1153,12 @@ miss -- mistake 7's 1020.0 kg/h at least looked like a sensor limit.)*
 
 ## Known limitations to state in the thesis, not fix quietly
 
+- **Altitude is not modelled.** The scored climb rises 2 340 m in 720 s, but
+  `p_baro` is a fixed 101.3 kPa that the plant never reads: compressor inlet,
+  boost ceiling and exhaust backpressure all see sea-level air throughout. A
+  standard atmosphere would give about 76 kPa at the top, and colder air. The
+  scenario is sustained heavy load at sea level — say that, and do not describe
+  it as a mountain.
 - **The boosted inversion is now within 2 % of the car, and the old 28 % gap
   was the charge temperature, not the breathing model.** See mistake 13. What
   remains uncertain under boost is the MAF ceiling at 1020 kg/h and the logger's
@@ -1338,6 +1380,23 @@ re-analysis of these logs.
 knock term, because the baseline was over-retarded by the scheduling error of
 AUDIT.md C2 and sat at KI 0.3-0.4. Fixing C2 is what made the term live.
 
+**28 September: this test could not have seen knock, so it is UNTESTED, not
+refuted.** Counting genuine readings (AUDIT.md H4) instead of rows: the drive
+holds **404 target and 410 actual ignition readings in 55 minutes**, one every
+~8 s, and a third of the pairs in a row were read more than a second apart. A
+knock retard lasts a second or two, so most were never sampled, and the ones
+that were are paired with the wrong moment. Filtering to steady inferred gear
+does not rescue it — above 120 kPa only 106 rows even have an inferable gear,
+because engine speed and road speed were themselves read seconds apart. This is
+mistake 13b exactly: the compressor-outlet hypothesis read +0.35 on slow data
+and +0.95 once `pull01` logged 7 channels. The table above stands as a
+measurement of THIS drive; it is not evidence against Douaud-Eyzat.
+
+**What it costs Phase D, measured.** On the hand-written policies the knock
+term is **6.4 % of the baseline's damage and 11–12 % of the protecting
+policies'**, and it is all of preview's −0.4 against current-grade: on turbine
+and oil damage alone the two tie. Report both until drive C settles it.
+
 ### Limits the LIVE APP adds, and they are the simulator's limits plus three
 
 The app reuses `plant.predict`, `plant.map_from_airflow`,
@@ -1434,6 +1493,9 @@ train.py              SAC training, dt = 1.0, a new road every episode.
 generality_test.py    The H/τ experiment. H1, H2, H2b.
 README.md             The public-facing summary. Tracked by verify_docs.py.
 CLAUDE.md             This file. The handoff and the mistake log.
+handoff.md            The short entry point: what to run, what it prints today.
+NEXT_CHAT_PROMPT.md   The prompt to paste into a new session.
+SESSION_REPORT_*.md   One per session, dated. 2026-09-28 is the latest.
 REFERENCES.md         Where every number we did not measure comes from. Written
                       for a non-specialist. Read before quoting a published band.
 DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
@@ -1593,8 +1655,28 @@ Everything below assumes the 130 km/h lock. See the current-state box at the top
    It has beaten the predictive policy on every hand-written comparison so far.
    If the trained agent cannot beat it either, that is a RESULT about H/τ, not a
    failure.
+7. **Report damage two ways until the knock model is tested** — total, and
+   turbine plus oil alone. The knock term is 6–12 % of damage and is ALL of the
+   hand-written −0.4 (28 September). This is an extra column in the reporting,
+   not a change to the reward, the training or the twenty episodes.
 
 Do not start Phase E or F until D produces a table.
+
+### Improving the comparisons that do not agree — 28 September
+
+Each row says what it would take, and whether it touches the plant. **A plant
+change after the retrain means retraining.** Decide the order before step 3:
+either drives A and B first, or retrain now and again after them.
+
+| comparison | status | what would improve it | touches the plant? |
+|---|---|---|---|
+| Knock | untested | Drive C: 6 channels, both ignition angles every ~1.25 s, held gear. Then re-run the comparison; if a relationship appears, retune Douaud-Eyzat to the car's retard onset | only if retuned |
+| Oil on hard pulls | off | Drive A (sustained climb + hot idle). Fit `frac_fuel_to_oil` and `c_oil` with the block pinned to measured coolant (`model_vs_data.oil_identification` does this) and re-check `ua_block_oil`'s p95-gap criterion jointly. The existing logs cannot: light-load drives and drive10 disagree | yes |
+| Compressor ceiling | limited | Drive B (roll-ons in a held high gear from 1600–1900 rpm): the car's real low-flow boost. Refit `boost_ceiling_kpa` there and retire the gearbox kickdown workaround. The top above 0.314 kg/s stays out of reach — the MAF saturates | yes |
+| Load | limited | Nothing at part load: both pressure channels on this car are pre-throttle, so no part-load test of `eta_v` exists. At wide-open throttle the boost comparison IS an `eta_v` test (+1.9 %); drive B extends it down in rpm. Say so in Chapter 3 | no |
+| Enrichment | off | Refit `ENR_DWELL_LO/HI` on timestamps once there are more independent readings at 4500–7000 rpm — needs seconds of full load at high rpm, a track-day job. Irrelevant to Phase D: the climb never enriches | no (not for D) |
+| Operating region | not covered | Drive A gives sustained load at road speeds; the exact 130 km/h / 12 % point does not exist on any road and is sea-level air by construction | no |
+| Published bands | limited | Two of the three misses are the oil node (drive A). The EGT cruise band needs a source — library access, REFERENCES.md section 3 | via the oil node |
 
 **Where the app fits in that order: nowhere.** It is finished enough to demo and
 it is not on this path. If you have an hour, spend it on step 2, not on `app/`.

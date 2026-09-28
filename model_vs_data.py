@@ -21,7 +21,12 @@ is asked of every comparison here before its result is quoted.
   spark         the fitted part-load spark map against logged spark.
   thermal       thermal.py free-running over a whole drive against the
                 logged coolant and oil channels.
-  knock         the model knock integral against the car's own retard.
+  knock         the model knock integral against the car's own retard, and
+                how many genuine readings that retard rests on -- about one
+                per 8 s on a 26-channel drive, too few to see a knock event.
+  oil           which ASSUMED oil parameter drives the spikes on hard pulls,
+                and whether the logs we have can identify it (they cannot:
+                the light-load drives and drive10 pull opposite ways).
   gearbox       overall ratio from engine and road speed against the eight
                 published ZF 8HP51 ratios (mistake 18).
   envelope      logged pressure ratio against plant.boost_ceiling_kpa.
@@ -362,6 +367,119 @@ def oil_variant(variant, source="7475b5d7-20260908_142743.csv"):
                 rmse=float(np.sqrt(np.mean((om[ok] - oc[ok]) ** 2))))
 
 
+def knock_sampling():
+    """Could 7475b5d7 have seen knock at all? Count what the retard rests on.
+
+    The retard is target minus actual ignition angle. The logger polls one
+    channel per row (mistake 13b), so on this 26-channel drive each angle is
+    refreshed every few seconds and the two values paired in a row can be
+    seconds apart. Knock retard events last a second or two. This measures how
+    many genuine readings there are and how far apart the pairs sit -- the same
+    question mistake 13b asked of the compressor-outlet sensor, where a real
+    relationship read +0.35 until faster logging showed +0.95.
+    """
+    S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
+    d = S[S.source == "7475b5d7-20260908_142743.csv"].sort_values("t")
+    d = d[np.isfinite(d.spark_tgt) & np.isfinite(d.spark)].reset_index(drop=True)
+    t = d.t.to_numpy()
+
+    def last_fresh(col):
+        v = d[col].to_numpy()
+        out, last = np.empty(len(v)), t[0]
+        for i in range(len(v)):
+            if i == 0 or v[i] != v[i - 1]:
+                last = t[i]
+            out[i] = last
+        return out
+    gap = np.abs(last_fresh("spark_tgt") - last_fresh("spark"))
+    minutes = (t[-1] - t[0]) / 60.0
+    return dict(rows=len(d), minutes=float(minutes),
+                fresh_target=int((d.spark_tgt.diff() != 0).sum()),
+                fresh_actual=int((d.spark.diff() != 0).sum()),
+                pair_gap_median=float(np.median(gap)), pair_gap_p90=float(np.percentile(gap, 90)),
+                paired_within_1s_pct=float(100.0 * (gap < 1.0).mean()))
+
+
+OIL_FIT_DRIVES = ("cb67b01f-20260908_084142.csv", "3aca2ec1-20260907_072817.csv",
+                  "683640a0-20260907_070212.csv")
+OIL_HELD_OUT = ("7475b5d7-20260908_142743.csv", "drive10-20260918_233912.csv")
+
+
+def oil_inputs(source):
+    """Per-second fuel flow and boundary temperatures for the oil node alone.
+
+    The block is PINNED to the measured coolant, so the radiator -- which
+    thermal.py documents as unidentifiable from these logs -- drops out and the
+    oil node can be fitted on its own.
+    """
+    from plant import predict, charge_temperature
+    from engine_env import GEO
+    S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
+    d = S[S.source == source].sort_values("t").reset_index(drop=True)
+    for col in ("ect_c", "oil_c", "t_amb"):
+        d.loc[d[col] == 0.0, col] = np.nan                     # AUDIT.md M8
+    t0 = d.t.iloc[0]
+    grid = np.arange(0.0, d.t.iloc[-1] - t0, 1.0)
+    d = d.iloc[np.clip(np.searchsorted(d.t.to_numpy() - t0, grid, side="right") - 1,
+                       0, len(d) - 1)].reset_index(drop=True)
+    rows = []
+    for _, r in d.iterrows():
+        if not (np.isfinite(r.rpm) and r.rpm > 400 and np.isfinite(r.map_kpa)
+                and np.isfinite(r.ect_c)):
+            continue
+        amb = (r.t_amb if np.isfinite(r.t_amb) else 30.0) + 273.15
+        ect = r.ect_c + 273.15
+        lam = r.lam if np.isfinite(r.lam) and 0.5 < r.lam < 1.5 else 1.0
+        o = predict(rpm=r.rpm, map_kpa=r.map_kpa, iat_k=charge_temperature(amb, ect), ect_k=ect,
+                    spark_btdc=r.spark if np.isfinite(r.spark) else 20.0, lam=lam, geo=GEO)
+        rows.append((o["mdot_fuel_gps"], ect, amb,
+                     r.oil_c + 273.15 if np.isfinite(r.oil_c) else np.nan))
+    return source, np.array(rows)
+
+
+def oil_identification(inputs):
+    """Can the logs we have identify the two ASSUMED oil parameters?
+
+    Fits frac_fuel_to_oil and c_oil on the three drives ua_block_oil was
+    calibrated on, holding the MEASURED ua_block_oil, then scores the two drives
+    that load the oil hardest: 7475b5d7 (hard pulls) and drive10 (the only drive
+    inside the published 115-140 C band). No parameter in thermal.py is changed.
+    """
+    from thermal import ThermalParams
+    p = ThermalParams()
+    ua_bo, ua_oa = p.ua_block_oil, p.ua_oil_amb
+
+    def sim(a, frac, cap):
+        f, tb, ta, to = a.T
+        out, x = np.empty(len(f)), to[np.isfinite(to)][0]
+        for i in range(len(f)):
+            x += (frac * f[i] * 1e-3 * 44.0e6 + ua_bo * (tb[i] - x) - ua_oa * (x - ta[i])) / cap
+            out[i] = x
+        return out
+
+    def score(names, frac, cap):
+        err, peaks = [], {}
+        for n in names:
+            a = inputs[n]
+            m = sim(a, frac, cap)
+            ok = np.isfinite(a[:, 3])
+            err.append(m[ok] - a[ok, 3])
+            peaks[n.split("-")[0]] = dict(model=float(m.max() - 273.15),
+                                          car=float(np.nanmax(a[:, 3]) - 273.15))
+        return float(np.sqrt(np.mean(np.concatenate(err) ** 2))), peaks
+
+    grid = [(fr, cap) for fr in np.round(np.arange(0.005, 0.0651, 0.005), 3)
+            for cap in (6e3, 9e3, 12e3, 18e3, 24e3, 36e3, 48e3, 72e3)]
+    fits = [(fr, cap, score(OIL_FIT_DRIVES, fr, cap)[0]) for fr, cap in grid]
+    best = min(fits, key=lambda g: g[2])
+
+    def row(fr, cap):
+        rf, _ = score(OIL_FIT_DRIVES, fr, cap)
+        rh, pk = score(OIL_HELD_OUT, fr, cap)
+        return dict(frac=float(fr), c_oil=float(cap), fit_rmse=rf, held_out_rmse=rh, peaks=pk)
+    return dict(shipped=row(p.frac_fuel_to_oil, p.c_oil), best=row(best[0], best[1]))
+
+
 def knock_all_samples():
     """AUDIT.md H5 reproduced on every sample of 7475b5d7, not the 1 Hz grid."""
     from plant import predict, charge_temperature
@@ -478,6 +596,8 @@ def _heavy(job):
         return kind, literature()
     if kind == "oil":
         return kind, oil_variant(arg)
+    if kind == "oil_in":
+        return kind, oil_inputs(arg)
     if kind == "duty":
         S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
         return kind, duty_cycle(S)
@@ -493,7 +613,8 @@ def main():
     jobs = [("replay", "drive10-20260918_233912.csv"),
             ("replay", "7475b5d7-20260908_142743.csv"),
             ("knock", None), ("load", None), ("literature", None), ("duty", None)] + [
-            ("oil", v) for v in OIL_VARIANTS]
+            ("oil", v) for v in OIL_VARIANTS] + [
+            ("oil_in", s) for s in OIL_FIT_DRIVES + OIL_HELD_OUT]
     with ProcessPoolExecutor(max_workers=min(10, len(jobs))) as ex:
         futs = [ex.submit(_heavy, j) for j in jobs]
         res["boost"] = boost_gap(S)
@@ -501,15 +622,19 @@ def main():
         res["spark"] = spark(P)
         res["gearbox"] = gearbox(S)
         res["envelope"] = envelope(S)
-        res["thermal"], res["oil_sensitivity"] = {}, []
+        res["thermal"], res["oil_sensitivity"], oil_in = {}, [], {}
+        res["knock_sampling"] = knock_sampling()
         for f in futs:
             kind, val = f.result()
             if kind == "replay":
                 res["thermal"][val[0]] = val[1]
             elif kind == "oil":
                 res["oil_sensitivity"].append(val)
+            elif kind == "oil_in":
+                oil_in[val[0]] = val[1]
             else:
                 res[kind] = val
+        res["oil_identification"] = oil_identification(oil_in)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as fh:
@@ -547,6 +672,15 @@ def main():
     for o in res["oil_sensitivity"]:
         print(f"  oil on 7475b5d7, {o['variant']:<34} peak {o['peak_model']:6.1f} C "
               f"(car {o['peak_car']:.0f}), oil-block gap {o['max_gap']:5.1f} K, RMSE {o['rmse']:4.1f} K")
+    KS = res["knock_sampling"]
+    print(f"  knock: readings behind the retard       {KS['fresh_target']} target / {KS['fresh_actual']} actual "
+          f"in {KS['minutes']:.0f} min; pairs within 1 s {KS['paired_within_1s_pct']:.0f} %")
+    OI = res["oil_identification"]
+    for k in ("shipped", "best"):
+        o = OI[k]
+        pk = "  ".join(f"{n} {v['model']:.0f}/{v['car']:.0f} C" for n, v in o["peaks"].items())
+        print(f"  oil fit, {k:<8} frac {o['frac']:.3f} c_oil {o['c_oil']:>6.0f}  fit RMSE {o['fit_rmse']:.2f} K  "
+              f"held-out {o['held_out_rmse']:.2f} K   peaks model/car: {pk}")
     D = res["duty"]
     print(f"  scenario operating point                {D['scenario_rpm']:.0f} rpm, {D['scenario_map']:.0f} kPa")
     print(f"  logged moving samples at or above it    {D['frac_logs_at_or_above_scenario']:6.2f} %")

@@ -336,3 +336,29 @@ Dwell STRENGTHENED, −0.41 → **−0.44**, which is the variable the model use
 between 119 minutes that moved six figures and 119 minutes that would also have
 settled the biggest open question in the audit.
 
+
+---
+
+## 27–28 September — M16's other half, and what the audit did not find
+
+**M16 fixed the environment and missed the trainer.** M16 made the slew limit
+and the smoothness penalty scale with `dt`, so that one physical actuator rate
+means the same thing at every step length. But `train.py` never passed `dt` at
+all: the cycle and the environment both took their 0.2 s default, while
+`evaluate.py` scores at 1.0 s. Every trained agent was therefore scored with five
+times the actuator movement per step it had trained with. `train.py` now passes
+`dt = 1.0` to both halves (27 September).
+
+**Two defects no audit item named**, both found by the training roads and the
+comparison against the car, both fixed with their effect measured:
+
+- the gearbox asked 8th gear for torque the modelled engine cannot deliver
+  near 9 % at 130 km/h (`Vehicle.DELIVERABLE_TORQUE`);
+- the car-fitted spark map was never in use, because the model's knock limit
+  sat below it everywhere (`SPARK_A` 26.18 → 13.33).
+
+**And one audit finding re-read.** H5, the knock model against the car's
+retard, was recorded as a negative result. Counting readings instead of rows
+(H4's own method), the drive behind it holds one reading of each ignition angle
+every ~8 s — too slow to see a knock event. H5 stands as a measurement of that
+drive; it is not evidence against the knock model. See `SESSION_REPORT_2026-09-28.md`.

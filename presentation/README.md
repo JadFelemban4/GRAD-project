@@ -1,5 +1,7 @@
 # presentation/ — the team briefing site
 
+> **28 September 2026: for current results use `results/page/index.html` (built by `make_page.py`) and `results/figures/`, not this folder.** It is out of date as described below and needs a rewrite, not a regeneration.
+
 An interactive, bilingual explainer of this project, written for the five of us rather
 than for an examiner. It starts at "what is a piston" and ends at the sentence we have
 to defend in the viva.

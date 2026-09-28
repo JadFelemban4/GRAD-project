@@ -1,5 +1,7 @@
 # Channel set — what is actually being recorded, and what to add next
 
+> **28 September 2026:** the channel sets for the next three drives, each chosen for refresh rate over coverage, are in [`DRIVE_PLAN.md`](DRIVE_PLAN.md). Fewer channels read each one more often; the knock drive uses six.
+
 Regenerated 8 September 2026 from `logs/raw/cb67b01f-20260908_084142.csv`.
 
 This supersedes `bimmerlink_channel_selection.md`, which was written from the

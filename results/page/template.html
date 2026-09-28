@@ -252,19 +252,20 @@ html{scroll-behavior:smooth}
     <div class="stat">
       <span class="k">Simulation vs car</span>
       <span class="v">4<small>of 11 agree</small></span>
-      <p>Three more agree within limits the comparison cannot see past, two disagree, one is a negative result and one region the car never reached.</p>
+      <p>Three more agree within limits the comparison cannot see past, two disagree, and two cannot be tested with the logs we have.</p>
     </div>
   </div>
 
   <div class="findings">
-    <h3>Changed on 27 September</h3>
+    <h3>Changed on 27–28 September</h3>
     <ol>
       <li><b>Training now runs on a new road every episode.</b> Five kinds of road, from flat to two steep climbs, so the preview channel has something to report. Scoring stays on the locked climb. <a href="#f-roads">The roads</a></li>
       <li><b>Those roads found a gearbox defect, now fixed.</b> In 8th at 130 km/h the model's engine sustains 333 Nm, but the box only downshifted above 375 Nm, so grades near 9 % could not be driven by any policy. It now kicks down when the engine falls short.</li>
       <li><b>The car-fitted spark map was never in use, now fixed.</b> The model's knock limit sat below it at every steady point. Refitted, part-load spark goes from {{mc.spark.before.mean|+.1f}}° to {{mc.spark.after.mean|+.2f}}° against the car. <a href="#f-spark">Spark</a></li>
-      <li><b>One enrichment cell was on a retired axis.</b> The documents now say the worst cell is {{mc.enrich.worst|.3f}} lean, not 0.027. The constants are unchanged: the data behind that cell is too thin to refit on.</li>
-      <li><b>The oil spikes come from an assumed heat share, still open.</b> Halving it takes the pull peak from {{mc.oil.as.peak_model|.0f}} °C to {{mc.oil.half.peak_model|.0f}} °C. Measuring it needs a drive. <a href="#drives">What to drive</a></li>
-      <li><b>Training now uses the same 1.0 s step as scoring.</b> Every earlier agent learned at 0.2 s. The retrain gets 55 episodes where the old runs had 11.</li>
+      <li><b>Preview's −0.4 against current-grade is entirely the knock term.</b> That term is {{pd.split.knock_pct_base|.0f}}–{{pd.split.knock_pct_pred|.0f}} % of the damage. On turbine and oil damage alone, predictive and current-grade tie ({{pd.split.thermal_pred|.1f}} against {{pd.split.thermal_grade|.1f}}). <a href="#f-abl">The ablation</a></li>
+      <li><b>The knock comparison could not have seen knock.</b> The drive behind it holds one reading of each ignition angle every {{mc.knock_s.every_s|.0f}} s, and a knock retard lasts a second or two. So the negative result is untested, not refuted. <a href="#f-knock">Knock</a></li>
+      <li><b>The logs we have cannot calibrate the oil node.</b> A fit that fixes the hard pulls breaks drive10, the one drive in the published band. It needs sustained-load data. <a href="#drives">What to drive</a></li>
+      <li><b>Training uses the same 1.0 s step as scoring,</b> and the retrain gets 55 episodes where the old runs had 11.</li>
     </ol>
   </div>
 </section>
@@ -358,7 +359,7 @@ html{scroll-behavior:smooth}
       <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade, no preview at all</span>
     </div>
     <div class="chart" id="c-abl"></div>
-    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = 5. If it survives the retrain, a preview advantage of zero on this scenario is a result about H/τ, not a failure.</p>
+    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = 5. If it survives the retrain, a preview advantage of zero on this scenario is a result about H/τ, not a failure. On the hand-written policies, the −0.4 by which predictive trails current-grade comes entirely from the knock term: on turbine and oil damage alone the gap is {{pd.split.preview_thermal|+.2f}} points. Report both until the knock model is tested.</p>
     <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-abl"></div></details>
   </div>
 
@@ -409,7 +410,7 @@ html{scroll-behavior:smooth}
         <tr><td><a href="#f-spark">Part-load spark</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.spark.after.mean|+.2f}}° after the refit, was {{mc.spark.before.mean|+.1f}}°</td></tr>
         <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median</td></tr>
         <tr><td><a href="#f-th74">Oil on hard pulls</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>model {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C</td></tr>
-        <tr><td><a href="#f-knock">Knock</a></td><td><span class="pill crit"><i>∅</i>negative</span></td><td>correlation {{mc.knock.corr|+.2f}} with the car's own retard</td></tr>
+        <tr><td><a href="#f-knock">Knock</a></td><td><span class="pill none"><i>○</i>untested</span></td><td>correlation {{mc.knock.corr|+.2f}}, but on one reading every {{mc.knock_s.every_s|.0f}} s; drive C can test it</td></tr>
         <tr><td><a href="#f-gear">Gearbox ratios</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.gear.within|.1f}} % of samples within 4 % of a published ratio</td></tr>
         <tr><td><a href="#f-env">Compressor ceiling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>fitted to this data; the top rests on 4–5 readings per bin</td></tr>
         <tr><td><a href="#f-duty">Operating region</a></td><td><span class="pill none"><i>○</i>not covered</span></td><td>{{mc.duty.frac|.1f}} % of logged samples reach the climb's load</td></tr>
@@ -502,20 +503,20 @@ html{scroll-behavior:smooth}
     </div>
     <div class="chart" id="c-th74-oil"></div>
     <div class="chart" id="c-th74-ect"></div>
-    <p class="cap">The spikes come from the oil's own assumed heat input: 5 % of fuel energy pushes the modelled oil up to {{mc.oil.as.max_gap|.0f}} K above the block on a pull. Replaying the drive with one assumption changed at a time: halving that share takes the peak to {{mc.oil.half.peak_model|.0f}} °C, doubling the oil's heat capacity to {{mc.oil.double.peak_model|.0f}} °C, and pinning the block to the measured coolant to {{mc.oil.block.peak_model|.0f}} °C. Both oil parameters are assumed, and a sustained-load drive can measure them (<a href="#drives">drive 1</a>).</p>
+    <p class="cap">The spikes come from the oil's own assumed heat input: 5 % of fuel energy pushes the modelled oil up to {{mc.oil.as.max_gap|.0f}} K above the block on a pull. Replaying the drive with one assumption changed at a time: halving that share takes the peak to {{mc.oil.half.peak_model|.0f}} °C, doubling the oil's heat capacity to {{mc.oil.double.peak_model|.0f}} °C, and pinning the block to the measured coolant to {{mc.oil.block.peak_model|.0f}} °C. Both oil parameters are assumed, and the logs we have cannot fix them. Fitted on the three light-load calibration drives ({{mc.oil_id.best.frac_pct|.0f}} % share, {{mc.oil_id.best.c_kj|.0f}} kJ/K), the pull peak falls to {{mc.oil_id.best.pull|.0f}} °C, but drive10's sustained peak falls to {{mc.oil_id.best.d10|.0f}} °C against the car's {{mc.oil_id.best.d10_car|.0f}}. The drives pull opposite ways; sustained load has to decide (<a href="#drives">drive A</a>).</p>
   </div>
 
   <div class="fig" id="f-knock">
     <div class="fig-head">
-      <div class="row"><h3>Knock</h3><span class="pill crit"><i>∅</i>negative</span></div>
-      <p class="take">The model's knock integral carries no detectable information about the retard the car applies: correlation {{mc.knock.corr|+.3f}} over {{mc.knock.n|,}} paired samples.</p>
+      <div class="row"><h3>Knock</h3><span class="pill none"><i>○</i>untested</span></div>
+      <p class="take">The model's knock integral shows no relationship with the retard the car applies: correlation {{mc.knock.corr|+.3f}} over {{mc.knock.n|,}} rows. Those rows hold only {{mc.knock_s.fresh}} real readings of each ignition angle, one every {{mc.knock_s.every_s|.0f}} s. A knock retard lasts a second or two, so this test could not have seen it either way.</p>
     </div>
     <div class="legend">
       <span style="color:var(--car)"><i class="lr" style="background:currentColor"></i>car samples, darker = more</span>
       <span style="color:var(--crit)"><i class="lk dash"></i>damage-term knee, KI 0.85</span>
     </div>
     <div class="chart" id="c-knock"></div>
-    <p class="cap">Where the model says knock (KI above 0.85) the car's median retard is {{mc.knock.med_rt_knock|.1f}}°; where it says none, {{mc.knock.med_rt_quiet|.1f}}°. Do not quote a knock-limited spark or knock damage term as calibrated. {{mc.knock.above20}} samples above 20° are gearshift torque cuts and sit off the top. Drive 7475b5d7, the only full drive logging the target ignition angle.</p>
+    <p class="cap">Where the model says knock (KI above 0.85) the car's median retard is {{mc.knock.med_rt_knock|.1f}}°; where it says none, {{mc.knock.med_rt_quiet|.1f}}°. {{mc.knock_s.late_pct|.0f}} % of the paired readings were taken more than a second apart. This is the trap of mistake 13b, where a real relationship read +0.35 until faster logging showed +0.95. Until drive C logs both angles fast, do not quote a knock-limited spark or the knock damage term as calibrated, or as refuted. {{mc.knock.above20}} rows above 20° are gearshift torque cuts and sit off the top.</p>
   </div>
 
   <div class="fig" id="f-gear">
@@ -573,7 +574,7 @@ html{scroll-behavior:smooth}
   <div class="sect-head">
     <p class="eyebrow">Part 3 · for the car</p>
     <h2>Drives we need</h2>
-    <p class="prose cap">Three drives, in order of value. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
+    <p class="prose cap">Three drives, A to C, in order of value. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
   </div>
 
   <div class="fig">
@@ -589,8 +590,8 @@ html{scroll-behavior:smooth}
 
   <div class="fig">
     <div class="fig-head">
-      <div class="row"><h3>1 · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable</span></div>
-      <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. This drive measures the oil node, the first sustained-load coolant data, and the hot idle.</p>
+      <div class="row"><h3>A · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable</span></div>
+      <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. This drive calibrates the oil node, which the existing logs cannot, and adds the first sustained-load coolant data and a hot idle. It changes the plant, so do it before the retrain or retrain again after it.</p>
     </div>
     <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Oil temperature</code>, <code>Engine radiator outlet temperature (coolant)</code>, <code>Ambient temperature</code>.</p>
     <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
@@ -603,7 +604,7 @@ html{scroll-behavior:smooth}
 
   <div class="fig">
     <div class="fig-head">
-      <h3>2 · Full-throttle roll-ons in a high gear, for low-rpm boost</h3>
+      <h3>B · Full-throttle roll-ons in a high gear, for low-rpm boost</h3>
       <p class="take">The model can only make 333 Nm at 2100 rpm because the car was never asked for boost at low engine speed. This drive measures the real boost there, so the gearbox workaround can be retired.</p>
     </div>
     <p class="cap"><b>Channels (7):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Boost pressure</code>, <code>Ambient pressure</code>, <code>Throttle valve angle related to the lower stop</code>, <code>Coolant temperature</code>.</p>
@@ -617,10 +618,10 @@ html{scroll-behavior:smooth}
 
   <div class="fig">
     <div class="fig-head">
-      <h3>3 · Loaded, steady-gear driving in the heat, for knock</h3>
-      <p class="take">The model's knock integral has no link to the car's retard (r = {{mc.knock.corr|+.2f}}). Reading retard cleanly needs both ignition angles sampled fast, with no gearshifts in the way.</p>
+      <h3>C · Loaded, steady-gear driving in the heat, for knock</h3>
+      <p class="take">The old drive read each ignition angle only every {{mc.knock_s.every_s|.0f}} s, too slowly to see a knock event. This one logs as few channels as possible so both are read every ~1.25 s, with no gearshifts in the way.</p>
     </div>
-    <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Actual ignition angle</code>, <code>Target ignition angle from torque intervention</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Ambient temperature</code>.</p>
+    <p class="cap"><b>Channels (6):</b> <code>Engine speed</code>, <code>Air mass flow</code>, <code>Actual ignition angle</code>, <code>Target ignition angle from torque intervention</code>, <code>Coolant temperature</code>, <code>Ambient temperature</code>. Speed and lambda are left out on purpose: in a held gear the gear is known, and below 3300 rpm lambda is 1.0.</p>
     <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
       <li>A second ascent of the same climb, in the afternoon heat, gearbox in <b>M</b>.</li>
       <li>Pick a gear that keeps the engine at <b>2000–3500 rpm</b>: low speed and high load is where an engine knocks.</li>
@@ -644,6 +645,7 @@ html{scroll-behavior:smooth}
     <div class="cav"><h3>Not Phase D's answer</h3><p>The ten agents trained at 110 km/h, where the constraint never binds, at a 0.2 s step, on one road. The retrain fixes all three: 130 km/h, dt = 1.0 and a new road every episode. That retrain is what settles it.</p></div>
     <div class="cav"><h3>Hand-written rows are one rollout</h3><p>They do not read the preference weights, so their zero spread is structural. It is not a sign of stability.</p></div>
     <div class="cav"><h3>Turbine temperature is modelled</h3><p>No sensor on this car reads it. Its heat capacity, <code>c_turb</code> = 6000 J/K, is assumed, and it sets τ, the denominator of the claim.</p></div>
+    <div class="cav"><h3>Altitude is not modelled</h3><p>The scored climb rises {{pd.elev.climb_m|,}} m, but the engine breathes sea-level air ({{pd.elev.p_model}} kPa) the whole way; a standard atmosphere would give about {{pd.elev.isa_kpa|.0f}} kPa at the top. Read the scenario as sustained heavy load at sea level, not as a mountain.</p></div>
     <div class="cav"><h3>One workaround, stated</h3><p>At low engine speed the model's boost ceiling is too low, because the car was never logged there. The gearbox compensates by kicking down, running about 600 rpm faster than the real car would. Drive 2 would retire it.</p></div>
   </div>
 

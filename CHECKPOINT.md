@@ -836,3 +836,31 @@ than trivially negative, and only a trained pair can settle it.
 
 `test_reward.py` 4 of 4 on the loaded scenario, neutral **−0.00038**.
 `verify_docs.py` 38 of 38. `validate.py` 8 of 11. `app.test_replay` 49 of 49.
+
+---
+
+## Session of 21–28 September 2026 — training roads, two fixes, three comparisons re-read
+
+Full account: `SESSION_REPORT_2026-09-28.md`. What was verified, and on what:
+
+| check | result, 28 September |
+|---|---|
+| `verify_docs.py` | all checks pass |
+| `test_reward.py` | 8 of 8 — four new checks on the training roads |
+| `check_roads.py` | PASS over 40 roads; 11 bind; worst neutral +0.004, worst p95 tracking 0.015 |
+| `check_premise.py` | baseline 951.9 at 884 °C; current-grade cuts 34.4 %, predictive 34.0 %; preview −0.4 |
+| `validate.py` | 8 of 11 (unchanged — no plant or thermal change) |
+| `check_map.py` | 6 cells above the compressor ceiling, 0 without knock-free spark (unchanged) |
+| `python -m app.test_replay` | 49 of 49; `--full` 59 of 59; `pull01` pin 608.0 → 609.2 °C with its reason |
+| `model_vs_data.py` | eleven comparisons: 4 agree, 3 limited, 2 off, 1 untested, 1 not covered |
+| `evaluate.py`, ten existing agents | training +25.9 pts over current-grade; ablation mean −0.5, CI −2.0 to +1.1 |
+
+What changed in the simulator: the gearbox kicks down when the engine cannot
+deliver the request (`Vehicle.DELIVERABLE_TORQUE`), and the part-load spark
+map's offset was refitted (`SPARK_A` 26.18 → 13.33). What changed in training:
+a new road every episode, dt = 1.0, output to `runs/terrain_dt1/`. Scoring is
+untouched.
+
+What was re-read without changing the model: the knock test rests on one
+reading per ~8 s and is untested; preview's −0.4 is entirely the knock term;
+the existing logs cannot calibrate the oil node. The retrain has not been run.

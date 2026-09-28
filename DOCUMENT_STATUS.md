@@ -102,3 +102,22 @@ are worth recording anyway, because both will otherwise be discovered late:
 
 `verify_docs.py` scans the repository's markdown and Python, **not the PDFs**.
 That gap is the entire reason this file exists, and the app does not narrow it.
+
+---
+
+## Added 28 September 2026 — the premise figures moved again
+
+No team PDF has been regenerated since 16 September, so every premise figure in
+them is older than anything below. The current figures come from
+`check_premise.py` on the corrected simulator (the gearbox kickdown and the
+spark-offset refit of 27 September):
+
+| what a PDF may say | what is true now |
+|---|---|
+| premise 829.2 / 548.6 / 437.6, or 256.5 at 801 °C | **951.9 / 671.1 / 624.5 / 628.4** on the locked 12 % / 130 km/h climb, baseline peak 884 °C |
+| "preview is worth 13.4 points" | preview is **−0.4** against current-grade on hand-written policies — and that −0.4 is entirely the untested knock term |
+| any trained-agent figure | none is a Phase D result yet; the retrain has not been run |
+| "the knock model is refuted" | untested: the only comparison rested on one reading per ~8 s |
+
+The phone page (`results/page/index.html`) and `results/figures/` are generated
+from the scripts and are current; prefer them to any PDF when showing results.

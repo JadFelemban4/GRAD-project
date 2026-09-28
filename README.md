@@ -15,6 +15,17 @@ pip install -r requirements.txt
 
 Python 3.11 or newer.
 
+> **Updated 28 September 2026.** The Phase D retrain is ready and not yet run:
+> training now draws a new road every episode, at the same 1.0 s step the
+> scoring uses, while `evaluate.py` still scores only the locked 12 % / 130 km/h
+> climb. Two simulator fixes landed (the gearbox now kicks down when the engine
+> cannot deliver the request; the part-load spark map's offset was refitted),
+> and the premise now reads baseline 951.9, current-grade cuts 34.4 %. The
+> simulator is laid beside the car in eleven places by `model_vs_data.py`, and
+> the results are on a phone-readable page built by `make_page.py`. The drives
+> that would settle what the logs cannot are in `logs/DRIVE_PLAN.md`. Details:
+> `SESSION_REPORT_2026-09-28.md`.
+
 > **Updated 16 September 2026.** Two things arrived since the last pass. The
 > dataset is now **ten drives, 295.0 minutes** (`pull01`, which contributes
 > zero samples by design, so no calibration figure moved). And `app/` exists —
