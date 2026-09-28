@@ -48,5 +48,19 @@ Write-Host '  original timestamps. About 75 samples a second, so a short drive'
 Write-Host '  takes seconds and the 2-hour Taif drive takes several minutes.'
 Write-Host '  Picking a different drive cancels the one being computed.'
 Write-Host ''
+Write-Host '  agent replay   ->  ' -NoNewline
+Write-Host "http://localhost:$Port/agents"
+# /agents computes an episode with stable-baselines3 and torch. Say so here
+# when THIS python cannot: the page still lists every experiment, and its
+# episode route answers 503. A native command's exit code never throws under
+# $ErrorActionPreference 'Stop' in Windows PowerShell 5.1, so it is read here.
+python -c "import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('stable_baselines3') else 1)"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host '  Note: this python has no stable-baselines3, so /agents lists the'
+    Write-Host '  experiments but cannot compute an episode (it answers 503). To'
+    Write-Host '  compute one, start the server with an interpreter that has it:'
+    Write-Host '      <that python> -m app.server --simulation'
+}
+Write-Host ''
 
 python -m app.server --simulation --http-port $Port

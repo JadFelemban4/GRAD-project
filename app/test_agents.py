@@ -1847,6 +1847,42 @@ class PageTests(unittest.TestCase):
         self.assertFalse("parseEpisodeQuery" in page, "M1's read-only address parser is still used")
         self.assertFalse("pushState" in page, "the address is replaced, never pushed")
 
+    def test_the_lab_links_to_agents_where_phones_keep_it(self):
+        """The replay lab's one link to /agents (design section 2, edit 4).
+
+        Jad found on 28 Sep that the lab had no way to /agents. The link sits
+        right AFTER the lab's first link, never at the end: the lab's phone
+        rule hides .topbar nav a:last-child below 760 px (sim/style.css), so a
+        link at the end would vanish on phones.
+        """
+        html = self.read("simulation.html")
+        nav = re.search(r"<nav[^>]*>(.*?)</nav>", html, flags=re.S)
+        self.assertIsNotNone(nav, "simulation.html has no <nav>")
+        links = re.findall(r"<a\b([^>]*)>", nav.group(1))
+
+        def attr(tag, name):
+            m = re.search(rf'\b{name}="([^"]*)"', tag)
+            return m.group(1) if m else None
+
+        self.assertEqual([attr(a, "href") for a in links], ["/simulation", "/agents", "/", "/review"])
+        agents = links[1]
+        self.assertEqual(attr(agents, "data-i18n"), "nav.agents")
+        self.assertNotIn("active", attr(agents, "class") or "", "the lab's page stays the active one")
+        self.assertIn("active", attr(links[0], "class") or "")
+        self.assertIsNot(links[-1], agents, "the last link is hidden on phones")
+        self.assertTrue(".topbar nav a:last-child{display:none}" in self.read("sim/style.css"),
+                        "the phone rule this placement answers has moved; re-check where the link sits")
+
+    def test_the_lab_launcher_names_the_agents_page(self):
+        """app/start-simulation.ps1 names /agents and says when its python
+        cannot compute an episode (design section 10, M1 Verify note). Only its
+        banner changes: its interpreter and its last line stay as they were."""
+        text = (self.STATIC.parent / "start-simulation.ps1").read_text(encoding="utf-8")
+        self.assertTrue("localhost:$Port/agents" in text, "the banner does not name /agents")
+        self.assertTrue("stable_baselines3" in text, "the banner does not check for stable-baselines3")
+        self.assertEqual(text.rstrip().splitlines()[-1],
+                         "python -m app.server --simulation --http-port $Port")
+
     @unittest.skipUnless(HAVE_ALL_RUNS, NO_ALL_RUNS)
     def test_catalog_fixture_has_the_server_shape(self):
         """agent-picker.test.mjs drives the picker from a copy of the catalog.
