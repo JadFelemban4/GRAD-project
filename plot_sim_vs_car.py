@@ -8,6 +8,12 @@ draws. Writes into figures/sim_vs_car/:
 
     index.html           every chart, a cover and the numbers behind each
                          chart; open it in a browser, or print it
+    page.html            the same page for the web: no document skeleton,
+                         follows the viewer's light or dark theme. Published
+                         privately on 28 September 2026 at
+                         https://claude.ai/artifact/YWSKwwCEPAwg1oMXCVXTec
+                         -- update THAT page (the Artifact tool's `url`);
+                         never publish it again as a new one
     1_gear_ratios.svg ... 5_load_consistency.svg     one chart each (vector)
     1_gear_ratios.png ... 5_load_consistency.png     the same, 2000 x 1280 px
     sim_vs_car.pdf       index.html printed: A4 landscape, a chart per page
@@ -135,35 +141,52 @@ class Scale:
         return self.r0 + (self.f(v) - self.a0) / (self.a1 - self.a0) * (self.r1 - self.r0)
 
 
+# Every colour an element uses is ALSO named as a class (f-ink, s-grid, ...).
+# A standalone SVG, and the PNG shot from it, ignores the classes and draws the
+# light palette from the attributes. The web page styles the classes from its
+# theme tokens, which beat presentation attributes, so the same charts follow
+# the viewer into dark mode without a second drawing.
+TOKEN = {MODEL: "model", CAR: "car", SURFACE: "surface", INK: "ink", INK2: "ink2",
+         MUTED: "muted", GRID: "grid", AXIS: "axis", TAG_BG: "tag"}
+
+
+def _cls(fill=None, stroke=None):
+    c = [f"f-{TOKEN[fill]}"] if fill in TOKEN else []
+    c += [f"s-{TOKEN[stroke]}"] if stroke in TOKEN else []
+    return f' class="{" ".join(c)}"' if c else ""
+
+
 class Svg:
     def __init__(self, w=W, h=H):
         self.w, self.h = w, h
-        self.p = [f'<rect x="0" y="0" width="{w}" height="{h}" fill="{SURFACE}"/>']
+        self.p = [f'<rect x="0" y="0" width="{w}" height="{h}" fill="{SURFACE}"{_cls(SURFACE)}/>']
 
     def text(self, x, y, s, size=12.5, color=INK, anchor="start", weight=400,
              rotate=None):
         rot = f' transform="rotate({rotate} {x:.1f} {y:.1f})"' if rotate else ""
-        self.p.append(f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" fill="{color}" '
+        self.p.append(f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" fill="{color}"{_cls(color)} '
                       f'text-anchor="{anchor}" font-weight="{weight}"{rot}>{esc(s)}</text>')
 
     def line(self, x1, y1, x2, y2, color, width=1.0, opacity=1.0):
         self.p.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
-                      f'stroke="{color}" stroke-width="{width}" stroke-opacity="{opacity}" '
-                      f'stroke-linecap="round"/>')
+                      f'stroke="{color}"{_cls(stroke=color)} stroke-width="{width}" '
+                      f'stroke-opacity="{opacity}" stroke-linecap="round"/>')
 
     def rect(self, x, y, w, h, fill, opacity=1.0, rx=0):
         self.p.append(f'<rect x="{x:.2f}" y="{y:.2f}" width="{max(w, 0):.2f}" '
-                      f'height="{max(h, 0):.2f}" rx="{rx}" fill="{fill}" fill-opacity="{opacity}"/>')
+                      f'height="{max(h, 0):.2f}" rx="{rx}" fill="{fill}"{_cls(fill)} '
+                      f'fill-opacity="{opacity}"/>')
 
     def path(self, pts, stroke="none", fill="none", width=2.0, fill_opacity=1.0, close=False):
         d = "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in pts) + (" Z" if close else "")
-        self.p.append(f'<path d="{d}" stroke="{stroke}" stroke-width="{width}" fill="{fill}" '
-                      f'fill-opacity="{fill_opacity}" stroke-linejoin="round" stroke-linecap="round"/>')
+        self.p.append(f'<path d="{d}" stroke="{stroke}" stroke-width="{width}" fill="{fill}"'
+                      f'{_cls(fill, stroke)} fill-opacity="{fill_opacity}" '
+                      f'stroke-linejoin="round" stroke-linecap="round"/>')
 
     def dot(self, cx, cy, fill, r=5.0, title=None):
         tt = f"<title>{esc(title)}</title>" if title else ""
         self.p.append(f'<circle cx="{cx:.2f}" cy="{cy:.2f}" r="{r}" fill="{fill}" '
-                      f'stroke="{SURFACE}" stroke-width="2">{tt}</circle>')
+                      f'stroke="{SURFACE}"{_cls(fill, SURFACE)} stroke-width="2">{tt}</circle>')
 
     def clip(self, cid, box):
         x0, y0, x1, y1 = box
@@ -752,28 +775,112 @@ NOT_CHARTED = [
     "Air mass flow and coolant: equal by construction, so a chart of them would prove nothing.",
 ]
 
-CSS = """
-@page { size: A4 landscape; margin: 9mm; }
-* { box-sizing: border-box; }
-body { margin: 0; background: #fcfcfb; color: #0b0b0b;
-       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-section { max-width: 1032px; margin: 0 auto; padding: 24px 16px; break-after: page; }
-section:last-of-type { break-after: auto; }
-svg { display: block; width: 100%; height: auto; }
-h1 { font-size: 30px; font-weight: 600; margin: 40px 0 8px; }
-h2 { font-size: 17px; font-weight: 600; margin: 26px 0 8px; }
-p, li { font-size: 14px; line-height: 1.5; color: #52514e; }
-.lede { font-size: 16px; }
-ol { padding-left: 22px; }
-.kind { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .02em;
-        background: #f0efec; color: #0b0b0b; border-radius: 4px; padding: 1px 7px; margin-right: 6px; }
-.item-title { color: #0b0b0b; font-weight: 600; }
-table { border-collapse: collapse; font-size: 12.5px; margin: 6px 0 18px;
-        font-variant-numeric: tabular-nums; }
-th, td { padding: 3px 10px; border-bottom: 1px solid #e1e0d9; text-align: right; }
-th { color: #52514e; font-weight: 600; }
-th:first-child, td:first-child { text-align: left; }
-.foot { font-size: 12px; color: #898781; }
+TITLE = "Simulator Against the Supra"
+ANCHOR = {"1_gear_ratios": "gears", "2_boost_pressure": "boost",
+          "3_compressor_envelope": "envelope", "4_enrichment": "enrichment",
+          "5_load_consistency": "load"}
+KIND_CLASS = {"INDEPENDENT CHECK": "independent", "FIT": "fit",
+              "CONSISTENCY CHECK": "consistency"}
+KIND_MEANS = [
+    ("INDEPENDENT CHECK", "the model side came from a published source, or from a model written "
+                          "without this data; the logs never touched it"),
+    ("FIT", "the model side was fitted to this car's logs; the chart shows the fit and tests nothing"),
+    ("CONSISTENCY CHECK", "the comparison cancels the model it appears to test (CLAUDE.md mistake 12)"),
+]
+
+# Page tokens. LIGHT is the chart palette above; DARK is the dataviz reference
+# palette's dark column -- the same hues stepped for a dark surface, not an
+# inversion of the light one.
+LIGHT = dict(page="#f9f9f7", surface=SURFACE, ink=INK, ink2=INK2, muted=MUTED, grid=GRID,
+             axis=AXIS, tag=TAG_BG, model=MODEL, car=CAR, rule="rgba(11,11,11,0.10)")
+DARK = dict(page="#0d0d0d", surface="#1a1a19", ink="#ffffff", ink2="#c3c2b7", muted="#898781",
+            grid="#2c2c2a", axis="#383835", tag="#2c2c2a", model="#3987e5", car="#d95926",
+            rule="rgba(255,255,255,0.10)")
+FONTS_URL = ("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600"
+             "&family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500"
+             "&display=swap")
+
+
+def tokens(d):
+    return " ".join(f"--{k}: {v};" for k, v in d.items())
+
+
+def page_css():
+    marks = "\n".join(f".chart .f-{t} {{ fill: var(--{t}); }} .chart .s-{t} {{ stroke: var(--{t}); }}"
+                      for t in TOKEN.values())
+    return f"""
+:root {{ {tokens(LIGHT)}
+  --font-head: 'Barlow Semi Condensed', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-body: 'Barlow', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-data: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace; }}
+@media (prefers-color-scheme: dark) {{
+  :root:not([data-theme="light"]) {{ color-scheme: dark; {tokens(DARK)} }}
+}}
+:root[data-theme="dark"] {{ color-scheme: dark; {tokens(DARK)} }}
+@media print {{
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {{ color-scheme: light; {tokens(LIGHT)} }}
+}}
+@page {{ size: A4 landscape; margin: 9mm; }}
+* {{ box-sizing: border-box; }}
+body {{ margin: 0; background: var(--page); color: var(--ink);
+       font: 400 16px/1.55 var(--font-body); padding-inline: 16px; padding-block: 28px 56px; }}
+.wrap {{ max-width: 1040px; margin: 0 auto; display: grid; gap: 36px;
+         grid-template-columns: minmax(0, 1fr); }}
+section {{ display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }}
+/* A grid item will not shrink below its content by default, so one 720px
+   chart would widen the whole page on a phone; the scroll box must take it. */
+.wrap > *, section > *, .numbers > div > * {{ min-width: 0; }}
+h1, h2 {{ font-family: var(--font-head); font-weight: 700; text-wrap: balance; margin: 0; }}
+h1 {{ font-size: clamp(32px, 5.2vw, 46px); line-height: 1.04; }}
+h2 {{ font-size: 23px; line-height: 1.2; }}
+p {{ margin: 0; max-width: 68ch; color: var(--ink2); }}
+.lede {{ font-size: 18px; color: var(--ink); }}
+.meta {{ font-family: var(--font-data); font-size: 12.5px; color: var(--muted); letter-spacing: .02em; }}
+header {{ display: grid; gap: 12px; }}
+.ladder {{ list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--grid); }}
+.ladder li {{ display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: 4px 18px;
+             align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--grid); }}
+.ladder a {{ color: var(--ink); font-weight: 600; text-decoration: none; }}
+.ladder a:hover, .ladder a:focus-visible {{ text-decoration: underline; }}
+.ladder .result {{ grid-column: 2; font-family: var(--font-data); font-size: 13px; color: var(--ink2); }}
+.kind {{ justify-self: start; font-family: var(--font-head); font-size: 12.5px; font-weight: 700;
+        letter-spacing: .06em; text-transform: uppercase; border-radius: 4px; padding: 1px 8px;
+        border: 1.5px solid var(--ink); color: var(--ink); white-space: nowrap; }}
+.kind.independent {{ background: var(--ink); color: var(--page); }}
+.kind.consistency {{ border-style: dashed; border-color: var(--ink2); color: var(--ink2); }}
+.key {{ margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14.5px; color: var(--ink2); }}
+.key li {{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }}
+figure.chart {{ margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; }}
+.scroll {{ overflow-x: auto; }}
+.chart svg {{ display: block; width: 100%; height: auto; min-width: 720px; font-family: var(--font-body); }}
+{marks}
+ul.missing {{ margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink2); max-width: 75ch; }}
+.numbers > div {{ display: grid; gap: 6px; }}
+.numbers h3 {{ font: 600 15.5px/1.3 var(--font-body); margin: 0; }}
+table {{ border-collapse: collapse; font-size: 13px; }}
+th, td {{ padding: 4px 12px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }}
+td {{ font-family: var(--font-data); font-variant-numeric: tabular-nums; }}
+th {{ color: var(--ink2); font-weight: 600; }}
+th:first-child, td:first-child {{ text-align: left; font-family: var(--font-body); }}
+code {{ font-family: var(--font-data); font-size: .92em; }}
+footer p {{ font-size: 13.5px; color: var(--muted); }}
+a:focus-visible {{ outline: 2px solid var(--model); outline-offset: 2px; }}
+@media (max-width: 640px) {{
+  .ladder li {{ grid-template-columns: minmax(0, 1fr); }}
+  .ladder .result {{ grid-column: 1; }}
+}}
+@media print {{
+  body {{ padding: 0; background: var(--surface); font-size: 13.5px; }}
+  h1 {{ font-size: 32px; }}
+  .lede {{ font-size: 15.5px; }}
+  section {{ gap: 12px; }}
+  .ladder li {{ padding: 7px 0; }}
+  .wrap {{ display: block; }}
+  section {{ break-after: page; }}
+  section.numbers {{ break-after: auto; }}
+  figure.chart {{ border: 0; }}
+  .chart svg {{ min-width: 0; }}
+}}
 """
 
 
@@ -785,42 +892,58 @@ def html_table(head, rows):
     return "\n".join(out)
 
 
-def build_page(charts):
-    cover_items = "\n".join(
-        f'<li><span class="item-title">{esc(t)}</span><br>'
-        f'<span class="kind">{esc(k)}</span>{esc(n)}</li>'
-        for _, _, _, (t, k, n) in charts)
+def build_page(charts, meta, web):
+    """web=False: a whole document, for opening locally and for printing the PDF.
+    web=True: the published page -- no doctype, html, head or body of its own
+    (the artifact host wraps it), plus the Google Fonts link it may load."""
+    ladder = "\n".join(
+        f'<li><span class="kind {KIND_CLASS[k]}">{esc(k.lower())}</span>'
+        f'<a href="#{ANCHOR[name]}">{esc(t)}</a><span class="result">{esc(n)}</span></li>'
+        for name, _, _, (t, k, n) in charts)
+    key = "\n".join(f'<li><span class="kind {KIND_CLASS[k]}">{esc(k.lower())}</span>'
+                    f'<span>{esc(m)}</span></li>' for k, m in KIND_MEANS)
     missing = "\n".join(f"<li>{esc(m)}</li>" for m in NOT_CHARTED)
-    parts = [
-        "<!doctype html>", '<html lang="en">', "<head>", '<meta charset="utf-8">',
-        '<meta name="viewport" content="width=device-width, initial-scale=1">',
-        "<title>Simulator against the car</title>", f"<style>{CSS}</style>", "</head>", "<body>",
-        "<section>",
-        "<h1>The simulator against our car's logs</h1>",
-        '<p class="lede">Five comparisons this repository computes, one chart each. Each chart says what '
-        "kind of evidence it is, because they are not the same kind.</p>",
-        f"<ol>{cover_items}</ol>",
-        "<h2>What the three kinds mean</h2>",
-        "<p><span class=\"kind\">INDEPENDENT CHECK</span>the model side came from a published source, or from "
-        "a model written without this data; the logs never touched it.<br>"
-        "<span class=\"kind\">FIT</span>the model side was fitted to this car's logs; the chart shows how the "
-        "fit sits on the data, and tests nothing.<br>"
-        "<span class=\"kind\">CONSISTENCY CHECK</span>the comparison cancels the model it appears to test "
-        "(CLAUDE.md mistake 12).</p>",
+    lede = ("The engine simulator set beside the logged drives of the team's test car, a Toyota GR "
+            "Supra. Five comparisons, one chart each, ordered from the strongest kind of evidence to "
+            "the weakest.")
+    head = [f"<title>{TITLE}</title>"]
+    if web:
+        head.append(f'<link rel="stylesheet" href="{esc(FONTS_URL)}">')
+    head.append(f"<style>{page_css()}</style>")
+    body = [
+        '<div class="wrap">',
+        '<section class="cover">',
+        "<header>",
+        '<p class="meta">BSc graduation project, University of Jeddah · phase B, the simulator '
+        "against the car</p>",
+        "<h1>The simulator against the Supra's logs</h1>",
+        f'<p class="lede">{esc(lede)}</p>',
+        f'<p class="meta">{esc(meta)}</p>',
+        "</header>",
+        f'<ol class="ladder">{ladder}</ol>',
+        f'<ul class="key">{key}</ul>',
         "<h2>Not charted, and why</h2>",
-        f"<ul>{missing}</ul>",
-        '<p class="foot">Regenerate with <code>python plot_sim_vs_car.py</code>. Every number on these pages '
-        "is printed in figures/sim_vs_car/numbers.txt, and the tables at the end carry the values behind "
-        "each chart.</p>",
+        f'<ul class="missing">{missing}</ul>',
         "</section>",
     ]
-    for _, svg, _, _ in charts:
-        parts += ["<section>", svg, "</section>"]
-    parts += ["<section>", "<h1>The numbers behind each chart</h1>"]
-    for (name, _, (head, rows), (title, _, _)) in charts:
-        parts += [f"<h2>{esc(name[0])}. {esc(title)}</h2>", html_table(head, rows)]
-    parts += ["</section>", "</body>", "</html>"]
-    return "\n".join(parts) + "\n"
+    for name, svg, _, _ in charts:
+        body += [f'<section id="{ANCHOR[name]}">', '<figure class="chart"><div class="scroll">', svg,
+                 "</div></figure>", "</section>"]
+    body += ['<section class="numbers">', "<h2>The numbers behind each chart</h2>"]
+    for (name, _, (thead, rows), (title, _, _)) in charts:
+        body += ["<div>", f"<h3>{esc(name[0])}. {esc(title)}</h3>",
+                 f'<div class="scroll">{html_table(thead, rows)}</div>', "</div>"]
+    body += ["</section>",
+             "<footer><p>Built by <code>plot_sim_vs_car.py</code> from <code>data/master_samples.csv</code>, "
+             "<code>data/master_points.csv</code> and <code>logs/raw/</code>. Every value on this page is "
+             "printed, with its definition, in <code>figures/sim_vs_car/numbers.txt</code>. Read-only: "
+             "nothing in this project writes to the car.</p></footer>",
+             "</div>"]
+    if web:
+        return "\n".join(head + body) + "\n"
+    return "\n".join(["<!doctype html>", '<html lang="en">', "<head>", '<meta charset="utf-8">',
+                      '<meta name="viewport" content="width=device-width, initial-scale=1">', *head,
+                      "</head>", "<body>", *body, "</body>", "</html>"]) + "\n"
 
 
 def find_browser():
@@ -865,12 +988,18 @@ def main():
     for name, svg, _, _ in charts:
         with open(os.path.join(OUT, name + ".svg"), "w", encoding="utf-8", newline="\n") as fh:
             fh.write('<?xml version="1.0" encoding="UTF-8"?>\n' + svg + "\n")
+    n_points = len(pd.read_csv(os.path.join(HERE, "data", "master_points.csv")))
+    meta = (f"{len(S):,} logged samples · {S.source.nunique()} drives · {n_points} steady points · "
+            "gearbox ZF 8HP51 · engine B58, 3.0 L")
     page = os.path.join(OUT, "index.html")
     with open(page, "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(build_page(charts))
+        fh.write(build_page(charts, meta, web=False))
+    with open(os.path.join(OUT, "page.html"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(build_page(charts, meta, web=True))
 
     say("WRITTEN")
     say("   figures/sim_vs_car/index.html       (every chart, a cover and the tables)")
+    say("   figures/sim_vs_car/page.html        (the same, as the published web page)")
     for name, *_ in charts:
         say(f"   figures/sim_vs_car/{name}.svg")
 

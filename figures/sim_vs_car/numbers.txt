@@ -58,6 +58,7 @@ data/master_samples.csv: 82984 rows from 7 drives
 
 WRITTEN
    figures/sim_vs_car/index.html       (every chart, a cover and the tables)
+   figures/sim_vs_car/page.html        (the same, as the published web page)
    figures/sim_vs_car/1_gear_ratios.svg
    figures/sim_vs_car/2_boost_pressure.svg
    figures/sim_vs_car/3_compressor_envelope.svg
