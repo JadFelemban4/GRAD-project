@@ -1052,3 +1052,11 @@ M3 was built task by task from `docs/superpowers/plans/2026-09-28-agent-replay-m
 - Task 10: minor (deferred): the Task 10 report miscounts the console windows (three, not four).
 
 *(Corrected 29 September, after the M3 final review: the Task 6 and Task 8 items above cited `agent_api.py:81-84` and `model-panel.mjs:998`; the route comment is at `:252-253` and `WORKER_KINDS` at `:109`, at those tasks' commits and now.)*
+
+### M3 closing notes (29 September 2026, after the final fix wave `0ab0043`, `4c492c5`)
+
+- Beyond the fix brief's wording, recorded so no visible change goes unlisted: `fmtNet` prints a float32 network value that rounds to zero as an unsigned `0.000` (it read `-0.000`), and `fmtAction` uses the shared U+2212 constant with the same output.
+- Two claims rest on node tests only and were never seen in a browser: that jev's latency line draws "70–500 ms" in order, and that a negative network value draws U+2212 inside its isolate. No jev call was allowed and every network value at the verified second was positive. Look at both on the first real jev answer and the first negative value.
+- Still open, and to be put to Jad before his first real jev call: a failed press at a second erases a paid jev answer already held there (the design's "a new press replaces").
+- Setup the handoff gives Jad, because the page shows neither: `setx LAYA_HOME "C:\Users\admin\Documents\Local AI\laya"` then a new terminal window; the jev key in `TYPESAFE_API_KEY` or in `%APPDATA%\grad-project\typesafe_key` (read on every press, never inside the repository); the server started from the repository root with the system Python, `-m app.server --simulation`.
+
