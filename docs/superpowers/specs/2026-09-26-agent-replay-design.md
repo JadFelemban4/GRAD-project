@@ -25,13 +25,13 @@ At any paused second the page shows, for each agent:
 - what the sighted agent saw of the road ahead;
 - each car's damage so far.
 
-Beside the agents sits the experiment's preregistered verdict, quoted word for word from `results/`, together with a short verdict line that keeps its qualifiers. A hidden panel, unlocked by a gesture, sends that same paused moment to jev once and shows jev's choice next to the agents' actions. Every number on the page comes from a tracer that a test proves `==` to `evaluate.run_episode`.
+Beside the agents sits the experiment's preregistered verdict, quoted word for word from `results/`, together with a short verdict line that keeps its qualifiers. A hidden panel, unlocked by a gesture, lets Jad ask two language models about that same paused moment, jev (an external service) and Laya (on this machine), one button each, and shows each model's choice next to the agents' actions. Every number on the page comes from a tracer that a test proves `==` to `evaluate.run_episode`.
 
 **Non-goals.**
 
 - **No writes and no training.** No training, no evaluation, and no writes into `runs*/`, `results/` or anywhere else. Traces live in memory only.
 - **No statistics.** The page computes no statistic and no difference between the cars. The seed's table row is quoted, not computed.
-- **jev does not drive an episode.** That is deferred, and nothing here blocks it.
+- **Neither model drives an episode.** That is deferred, and nothing here blocks it.
 - **`/simulation` behaves exactly as it does today.**
 - **No recorded-drive data** appears on this page or goes to jev.
 - **Cut from the page:** charts, the gear strip, a baseline-ECU twin (`env.thermal_base` and `map_b_prev` are not the scored "baseline ECU" row, recon §8) and comparator cars.
@@ -59,7 +59,10 @@ All four sit at the top level of `app/`, so `app.test_replay`'s `test_read_only`
 | `app/agent_trace.py` | Step N envs of one frozen episode in lockstep, mirroring `run_episode`; build the road from the cycle | `STEPS = 719`<br>`PREVIEW = slice(14, 14+len(PREVIEW_S))`<br>`GRADE_OBS_SCALE = 12.0`<br>`episode(protocol, idx) -> {seed, weights, road}`<br>`build_cycle(ep) -> dict`<br>`route(cycle) -> dict`<br>`run_lanes(lanes, ep, on_frame=None) -> list[dict]`<br>`jsonable(x)` | `evaluate`: `DT`, `DURATION`, `EPISODES`, `EPISODES_D2`<br>`engine_env`: `SupervisoryTunerEnv`, `make_grade_climb`, `PREVIEW_S`<br>`random_road.climb`<br>`app.replay.finite` |
 | `app/agent_catalog.py` | Find agents; decide status, protocol, arm and budget; check each zip against the scored one; quote verdicts and table rows | `live_fingerprint(protocol)` (cached)<br>`read_agent(runs, name, root) -> dict`<br>`discover(root=ROOT) -> list[dict]`<br>`find_pair(runs, seed, root=ROOT)` (raises `KeyError`/`Refused`)<br>`scored_shas(prefix, seed, root) -> dict or None`<br>`verdict(prefix, root=ROOT) -> {state, lines, short, cells}`<br>`table_rows(prefix)`<br>`VERDICT_LINES`, `SHORT_VERDICT` | `fingerprint`: `read`, `compare`, `plant_fingerprint`, `model_budget`, `format_budget`, `running_pid`<br>`run_phase_d`: `result_prefix`, `CLOSED_PREFIX`<br>`analyse_phase_d2.load`<br>`analyse_c4.BUDGET` (the regex `analyse_c4` itself uses on the `model …: … zip sha` line, `analyse_c4.py:83`) |
 | `app/agent_api.py` | Routes, the default model loader, and the single-worker episode store | `install(app) -> None`<br>`load_pair(runs, seed) -> (m_s, m_b)`<br>`class EpisodeStore(loader=load_pair, tracer=run_lanes, keep=2)` with `.poll(key, since, preempt) -> dict` and `.trace(key) -> Trace or None` | the two modules above; `evaluate.agent_policy`; `app.replay.BuildCancelled`; (M3) `app.jev` |
-| `app/jev.py` (M3) | Build one jev request from a simulated trace step, send it, map the answers into the action space | `LEVELS`, `NET`, `OPTIONS`<br>`load_key()`<br>`decode(obs) -> dict`<br>`build_request(trace, step) -> dict`<br>`to_action(answers) -> dict`<br>`ask(trace, step, send=_send, clock=perf_counter) -> dict` | `engine_env`: `ACT_LO`, `ACT_HI`, `neutral_action`, `PREVIEW_S`, `TURB_PROTECT_K`, `OIL_PROTECT_K`<br>`urllib.request` |
+| `app/model_questions.py` **[new; C4]** | The one question both models are asked, and the one way their answers become actions | `LEVELS`, `NET`, `OPTIONS`, `QUESTIONS`<br>`decode(obs) -> dict`<br>`build_state(trace, step) -> dict`<br>`to_action(answers) -> dict` (raises `BadAnswer`)<br>`user_setting(env_var, file_name) -> (value, source)` | `engine_env`: `ACT_LO`, `ACT_HI`, `neutral_action`, `PREVIEW_S`, `TURB_PROTECT_K`, `OIL_PROTECT_K`<br>`app.agent_api.Trace` |
+| `app/jev.py` **[changed from §7: slimmed]** | Send one question set to jev and return its answer | `load_key()`<br>`build_request(trace, step) -> dict`<br>`ask(trace, step, send=_send, clock=perf_counter) -> dict` | `model_questions`, `urllib.request` |
+| `app/laya_bridge.py` **[new]** | Start, keep and stop Laya's worker; ask it one question set | `load_home() -> (python, model_dir, source)`<br>`class LayaBridge(command=None, start_timeout=90, answer_timeout=20)` with `.status()`, `.ask(trace, step)`, `.close()`<br>`worker_env() -> dict`<br>Building a `LayaBridge` reads no file and starts nothing | `model_questions`, `subprocess`, `threading`, `queue`, `json`, `os`, `sys`, `pathlib`, `atexit` |
+| `app/laya_worker.py` **[new]** | Runs **only** under Laya's own `.venv` python and is never imported by the server. Loads Laya once and answers one JSON line per request | `python -I -B -X utf8 laya_worker.py <model_dir>` | stdlib, `laya`, `torch`. It imports `socket` only to refuse it (§7.5) |
 | `app/test_agents.py` | The new suite (§9) | `python -m app.test_agents [--full]` | all of the above |
 
 `jsonable` fixes a failure the original draft would have shipped. `app.replay.finite()` (`replay.py:31-32`) accepts only Python `int`/`float`, and numpy `float32` is neither. Measured today, `finite(env.prev_act[3])` returns `None`, so as drafted the page would have shown null for every action and every preview value. `jsonable` therefore converts first:
@@ -80,8 +83,9 @@ It applies to every frame field and to `meta.act` and the `road` arrays.
 | `sim/agent-view.mjs` | Pure, node-testable functions: `createEpisodeRoad(road, mPerUnit)`, `episodeAt(frames, road, t)`, `profilePoints(road, {ve, width})`, `previewMarks(road, k, previewS)`, `gaugeFraction(v, lo, hi)`, `playOrWait(clock, computedEnd, done, now)`, `resumeIfStalled(state, newEnd, now)`, `CAR_OFFSET`, `LANE_W`, `ROAD_W`, `ACTIONS` |
 | `sim/agent-scene.mjs` | `createChaseScene(host, episodeRoad) -> {update({distance_m, marks}), setTheme, dispose}` |
 | `sim/tap-unlock.mjs` (M3) | `createTapUnlock({taps: 10, windowMs: 4000}) -> {tap(nowMs) -> boolean}` |
+| `sim/model-panel.mjs` (M3) | Pure panel logic: `askState(view, k)`, `createAnswers()`, `rowView(answer, i)`, `failureOf(httpStatus, body)`, `errorText(code, status, lang, kind)`, `statusLine(name, status, failure, inFlight, lang)`, `MODELS`, `QUESTION_IDS`, `ERROR_CODES` (M3 design §7.2) |
 | `sim/agents.css` | Grid and panel rules. It also overrides the lab's phone rule that hides the last nav link. |
-| `sim/agent-view.test.mjs`, `sim/agents-strings.test.mjs`, `sim/tap-unlock.test.mjs` | Node tests, picked up by the existing glob |
+| `sim/agent-view.test.mjs`, `sim/agents-strings.test.mjs`, `sim/tap-unlock.test.mjs`, `sim/model-panel.test.mjs`, `sim/agents-page-models.test.mjs` (M3) | Node tests, picked up by the existing glob |
 
 **Reused by import, never copied:**
 
@@ -91,7 +95,7 @@ It applies to every frame field and to `meta.act` and the `road` arrays.
 
 ### Edits to existing files: the complete list
 
-1. **`app/server.py`.** In `main()`'s `if a.simulation:` branch (`:298`): `from app.agent_api import install; install(app)`, plus one printed `/agents` URL. Module-level routes do not change, so `--live` and `--replay` never import agent code. In M3, the docstring sentence at `:43` is amended (§7).
+1. **`app/server.py`.** In `main()`'s `if a.simulation:` branch (`:298`): `from app.agent_api import install; install(app)`, plus one printed `/agents` URL. Module-level routes do not change, so `--live` and `--replay` never import agent code. In M3, the docstring sentence at `:43` is amended to name the two POSTs, `/api/agents/jev` (an external service) and `/api/agents/laya` (on this machine) (M3 design §7.6).
 2. **`app/static/sim/scene.mjs`** (approved, §11 Q2). Add `export` to `function stage` (`:326`), `function ribbonGeometry` (`:453`) and `function supra` (`:580`). This changes no behaviour, and the lab suites are re-run.
 3. **`app/static/sim/i18n.mjs`** (approved, §11 Q2). Add one key, `nav.agents`, in both languages, for the link. Every other key lives in `agents-strings.mjs`.
 4. **`app/static/simulation.html:39`** (M2). Add one `<a href="/agents" data-i18n="nav.agents">`, inserted **after the first link, not at the end**. The lab's phone rule hides `.topbar nav a:last-child` below 760 px (`style.css:100`), so a link at the end would vanish on phones. This link is the only edit to the page, and it is needed because decision 7 says "linked from it". Under `--live` or `--replay` the link 404s, which is correct.
@@ -159,7 +163,7 @@ A lane that terminates early (non-finite reward, `engine_env.py:819`) stops. Its
   - The page shows «تحميل الشبكتين…» ("loading the two networks…") until the first frame arrives.
   - Playback at 1× to 8× never catches up with the computation; at 16× it waits.
 
-### 3.4 Routes (added by `install(app)`, only under `--simulation`)
+### 3.4 Routes (added by `install(app, store=None, jev_send=None, laya=None)`, only under `--simulation`)
 
 ```
 GET  /agents                                   -> agents.html
@@ -171,7 +175,9 @@ GET  /api/agents/episode?runs=runs_c4&seed=5&ep=1&since=0&preempt=1
      404 unknown runs/seed/ep     409 {status: "refused", problems: [...]}
      503 stable-baselines3 not installed
 GET  /api/agents/jev/status                    (M3)
-POST /api/agents/jev    body {"trace": "runs_c4/5/1", "step": 312}      (M3, §7)
+POST /api/agents/jev    body {"trace": "runs_c4/5/1", "step": 312}      (M3 design §7.6)
+GET  /api/agents/laya/status                   (M3)
+POST /api/agents/laya   body {"trace": "runs_c4/5/1", "step": 312}      (M3 design §7.6)
 ```
 
 - `road` is computed synchronously on the first request from `build_cycle(ep)`, using only the cycle arrays and no plant.
@@ -463,7 +469,10 @@ Row 2 therefore shows each car's `map_kpa` beside it: «ضغط المشعب ال
 | "the network's output was applied" | Applied values, with the command on a second line when held | panel |
 | "it saved damage by refusing torque" | Delivered against requested torque | panel |
 | "the temperature was measured" | The lab's model-output caveat | panel |
-| "jev is part of the thesis" | Hidden by default; the §7 text; no comparison; never applied | jev panel |
+| "jev or Laya is part of the thesis" | Hidden by default; the shared honesty lines; no comparison; never applied | models panel |
+| "Laya's answer is an engine judgement" | «تجربة تشغيل، لا تقييم»; the README line (`README_AR.md:31`); the order check, held or changed per action (M3 design §7.5b) | models panel |
+| "Laya sent data out" | The where-it-runs line; the offline variables, the absolute-path check and the socket guard together (M3 design §7.5); tests 18 to 20 | models panel |
+| "the models were told nothing about the agents" | M3 design §7.3: the state is the sighted agent's own observation, which already carries its earlier trims in its spark and lambda | models panel |
 
 *(Amended while building M2, 28 September, after the Task 10 review: the row "C4 is a clean negative" names the select, and a closed select shows only as much of its option as fits. At 390 px the C4 option read «C4 · أصغر من الحد الأدنى المهم (50 وحدة) عند 300 000 خطوة» and nothing more, which is that misreading itself; at 1440 px it stopped inside «بفارق بذرة واحدة». The milestone walk (`fa4e4aa`) passed the row on the strip and the box; the review failed it, and it was right to. The chosen experiment's whole short line now also stands under the select, found, missing or none alike, exactly as the box prints it (`experimentNote`, `#pick-experiment-note`; `f2e3e5f`). The option text is unchanged, so the open list still names each experiment's line. A ruling taken while building, not Jad's word: the line now shows twice in the side column, under the select and in the box.)*
 
@@ -471,11 +480,11 @@ Row 2 therefore shows each car's `map_kpa` beside it: «ضغط المشعب ال
 
 - **Desktop (≥ 1100 px, RTL):**
   - a grid of `minmax(0,1.6fr) minmax(320px,1fr)`;
-  - main column: the chase view (16:9) with its overlay, the timeline, then the profile;
-  - side column: picker, verdict box, pause panel, then jev once unlocked.
+  - main column: the chase view (16:9) with its overlay, the timeline, the pause panel, the models panel once unlocked, then the profile (M3 design §7.8, Jad's option 1);
+  - side column: picker, verdict box.
 - **Phone (< 760 px):**
   - one column with a 16 px gutter and no horizontal scroll;
-  - order: badge, picker, verdict, chase view (4:3), timeline, profile, pause panel;
+  - order: badge, picker, verdict, chase view (4:3), timeline, pause panel, profile, models panel once unlocked (below 1100 px);
   - the verdict shows the short line, the C4 one-seed line and the illustration line; the rest sits in `<details>`;
   - in the pause panel, labels sit on their own lines and values stack by car.
 - The nav on `agents.html` reads simulation, agents (active), monitor, review, and `agents.css` restores the last link on phones.
@@ -484,6 +493,8 @@ Row 2 therefore shows each car's `map_kpa` beside it: «ضغط المشعب ال
 ---
 
 ## 7. jev (M3)
+
+*(Replaced by §7 of `2026-09-28-agent-replay-m3-design.md`, approved 28 September and built 29 Sep, as are rows 14 to 17 of §9 and the M3 part of §10. Kept here as approved.)*
 
 **Gesture.** `tap-unlock.mjs` is a pure counter: 10 taps within 4000 ms returns `true`. Its state is a module variable, and it never touches `localStorage`, `sessionStorage`, IndexedDB or cookies.
 
@@ -609,7 +620,7 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 | WebGL fails | a message in place of the chase view; the profile and panel still work |
 | verdict `missing` or `none` | stated in the box and in the short line; a cell is never guessed |
 | lab build and agent build at once | separate single workers; both slow down; nothing breaks |
-| jev | §7 |
+| jev, Laya | M3 design §7.9 |
 
 ---
 
@@ -708,7 +719,7 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
   - the lab's nav shows the link on a phone;
   - `--full` passes the Phase D proof.
 
-**M3: the jev paused moment.**
+**M3: the jev paused moment.** *(Replaced by §10 of `2026-09-28-agent-replay-m3-design.md`.)*
 
 - **Commits:** commit 1 is the `.gitignore` patterns alone. Then `jev.py`, the POST and status routes, the `server.py:43` amendment, `tap-unlock.mjs` and the panel.
 - **Verify:**
@@ -795,6 +806,7 @@ Never sent: the agents' actions, the experiment or verdict, or anything from `lo
 | 28 Sep | M3 revisit, Q2 | **Decided: one button per model** ("ask jev", "ask Laya"), each asking about the same paused second with the same questions, each with its own answer column and its own errors. Jad's reason: "I may have no credit on jev, so the other must not fail with it" -- a jev failure (no key, no credit, network) must never block or hide Laya's answer, and the reverse. Recommended was one button for both; Jad's reason outranks it. |
 | 28 Sep | M3 revisit, Q3 | Told the Laya spike's result (`2026-09-28-laya-spike.md`: runs locally in 34 ms with no network, but on one probe its answers followed the ORDER of the options, not the engine state), Jad chose: **add Laya with an automatic order check** -- every "ask Laya" asks the same five questions twice, options in the design's order and reversed, and the page shows for each action whether the choice held (the same level both times) or changed. Free and about 70 ms. Not asked for jev (each jev call is paid); whether jev shows the same position effect is unknown until Jad tries it with his key. |
 | 28 Sep | M3 revisit, Q4 | **Decided: move the pause panel directly under the play bar**, with the empty-state line «اضغط احسب، ثم أوقف العرض عند أي ثانية لترى ما قرّره كل وكيل» (the M3 design's §7.8 option 1, recommended), so both it and the models panel after it are on screen. The verdict quotes stay open as they are. **The M3 design (`2026-09-28-agent-replay-m3-design.md`) is APPROVED**; the plan is next. |
+| 29 Sep | M3 built | **M3 is built and verified; the milestone commit carries every suite's output and the verification record.** jev and Laya sit behind ten taps on `02 — AGENTS`, forgotten on reload, one button and one column each; Laya asks twice, options forward and reversed, and each action says held or changed. Every suite passed; the M3 design's amendments give the counts. The browser check passed all 84 of its checks at 1440 and 390 px, in Arabic and English: locked, the panel is hidden and nothing is asked; the pause panel sits under the play bar and says what to do before «احسب»; an episode played to its natural end enables both buttons at the last second with no seek; Laya answered on this machine (cuda), and test 20 ran it for real; jev with no key, and jev forced to fail through a refused local proxy, each stayed in jev's column while Laya answered. After a Laya press, a hard kill of the server, Ctrl+C in its console window, Ctrl+Break and closing that window each left no Laya worker. The hard kill shows the worker ending when its input closes. The Ctrl+C, Ctrl+Break and close rows do not show that `close()` or `atexit` ran, because the worker shares its console with the server and receives the same event; those rest on the bridge tests and test 20. `LAYA_HOME` was unchanged. No real jev call was made. An observation, not a result: at second 312 of `runs_c4/5/1`, Laya's choice changed with the order for spark, lambda, fan and pump and held for boost. Every departure from the M3 design is a dated amendment there ("Amendments while building M3"); the controller's rulings and what was left for later, the visible-text findings for the final review among them, are in the build record for M3 below. |
 
 ---
 
@@ -958,3 +970,82 @@ F6 (a preempt answered from the cache now cancels the other build); a superseded
 - Task 10: minor (deferred): the cold first frame is about three times §10's "about 5 s" (§10 amendment).
 - Task 10: known limit: the no-write snapshot (test 11) raises when another session writes to the shared working tree during the run. It did so three times on 28 Sep: the first run named no file, the second only `.git/index`, and the third — the Task 10 fix round's first `--full` run, from the other session's commit `f96d5b4` — also `.git/index`; the re-runs with HEAD unchanged before and after passed.
 - Correction: the milestone commit `fa4e4aa` says the first default run failed because the other session "committed"; that run ended at 11:19:37, before that session's commit at 11:21:18, so the cause was its uncommitted writes. The same commit's walk passed "C4 is a clean negative" against its own evidence (ruling 14). The commit is history and is not rewritten.
+
+## Build record for M3 (29 September 2026): every ruling the controller made, and what was left for later
+
+M3 was built task by task from `docs/superpowers/plans/2026-09-28-agent-replay-m3.md` (11 tasks), subagent-driven as M1 and M2 were. The working ledger lives under `.superpowers/sdd/`, which is gitignored scratch; this section is its permanent record, transcribed by Task 11, so that no decision taken on Jad's behalf and no deferred item lives only in a scratch file. File and line references are as each review gave them, at that task's commit. Commits `5dda9d8` (the plan) through `1a80a6a`, and the commit that adds this record, on JMF-2340550-sep17; every M3 commit's subject starts "Agent replay M3". Task 10, the verification, made no commit by design; its record is in the milestone commit's message. The departures from the M3 design are the dated amendments in that file ("Amendments while building M3") and are not repeated here.
+
+### Rulings (each with what it costs if wrong)
+
+1. Ruling: the same setup as M2 (in place on JMF-2340550-sep17; one Workflow per task; implementers and reviewers on opus; reviews pinned to "Agent replay M3" commits, because another session commits on this branch) -- cost if wrong: as in the build record for M2.
+2. Ruling: every implementer is told that its commit subjects must start "Agent replay M3", because the reviewers judge only such commits -- cost if wrong: none.
+3. Ruling: build without a separate plan review by Jad, as for M2 -- cost if wrong: Jad wanted to see the plan first; nothing is irreversible.
+4. Ruling: (plan critic's gap 1, shutdown) Task 10 must TRY both of the design's shutdown checks, not only a hard kill: start the server in its own console (Start-Process) and close it (CloseMainWindow), and send it Ctrl+C or Ctrl+Break where the platform allows; if either cannot be emulated, report exactly why and leave it for Jad with the command to run -- cost if wrong: one more verification step.
+5. Ruling: (gap 2, FastAPI's own 422 and 405 without no-store) follow what the plan's Task 6 does, and the Task 6 reviewer checks it against the design's "every response carries no-store" -- cost if wrong: a 422 or 405 could be cached by the browser; harmless for a POST.
+6. Ruling: (gap 3, the commit split 6a/6b not recorded) Task 11 records every departure from the design's seven commits, 4a/4b and 6a/6b included -- cost if wrong: none.
+7. Ruling: fold two Task 5 minors into Task 6, which wires the status route to run beside asks: LayaBridge._alive reads self._proc once, so a status call racing a kill or close cannot raise AttributeError (a 500); and a worker found dead between presses is reaped by _kill, so its stdin closes and ready clears, not only forgotten -- cost if wrong: two small edits in Task 6's diff.
+8. Ruling: accept NoStoreRoute also catching FastAPI's own 400 (a body that is not UTF-8, or nested too deep) to add no-store, because the design's rule is that every response of the four routes is no-store -- cost if wrong: none found.
+9. Ruling: fold one Task 7 minor into Task 8: model-panel.failureOf passed any string kind to errorText; the page now keeps only the four names (ValueError, RuntimeError, OutOfMemoryError, other), with a test, so "never forward str(exc)" does not rest on the server alone -- cost if wrong: one small edit in Task 8's diff.
+
+### Carried between tasks, and closed
+
+- Task 2 to Task 3: a key with a character outside latin-1 (a pasted curly quote) would have failed when the Bearer header was encoded; such a key now reads as no_key, and nothing is sent.
+- Task 2 to Task 6: to_action can raise OverflowError on an absurd JSON integer; both models map it to bad_answer, and a reply nested too deep for json.loads as well, never a 500.
+- Task 3 to Task 6: JevError is raised "from None" but keeps the original exception as __context__, and ask's frame holds the key; the routes print and return only the code, never an exception object or a traceback.
+- Task 3 to Task 11: the plan text still shows urllib.request.urlopen in _send; the M3 design's amendments record that _send posts through _OPENER, which refuses every redirect.
+- Task 4 to Task 5: (a) a probe that a socket object's own connect, connect_ex and sendto are refused and counted in the worker; (b) a test that no app module imports laya_worker; (c) the worker docstring's blind spot names asyncio's proactor ConnectEx on Windows.
+- Task 5 to Task 6: the two ruled laya_bridge edits (_alive reads _proc once; a worker found dead between presses is reaped by _kill).
+- Task 5, by the controller: the Laya folder counted 32572 entries against 32571, a counting difference (with or without the folder itself); nothing under the folder was newer than 28 Sep 00:00, so no write happened.
+- Task 7 to Task 8: failureOf keeps only the four kind names, any other string reads other, with a test.
+- Task 8 to Task 10: the loop's play-state renderModels hook, which node cannot run, was checked in the browser: at 16x an episode played to its natural end enabled both buttons at the last second with no seek; the two model columns measured 291 px each at 1100 px and 374 px each at 1440 px, side by side, and one 320 px column at 390 px.
+- Task 9 to Task 10: the English boot text of #pause-heading is the English empty line; before Compute it wraps on its own over two lines at 390 px, since #grade-now is still empty; while an uncached episode loads it shows for under 3 s.
+- Task 10 to Task 11: the Ctrl+C and window-close rows are not cited as proof of LayaBridge.close() or atexit; the card's memory rose by about 2.0 GB with the server and Laya loaded (not the spike's 1.7 for Laya alone; an upper bound on Laya's share, since that server's agents ran on the same card); the Starlette and anyio deprecation warnings are named once as environmental (M3 design, "Amendments while building M3").
+
+### Left for later (M3's own, as the controller deferred them; 3 marked open for the final review)
+
+- Task 1: minor (deferred): *typesafe_key* has no directory anchor, so a future file named, for example, test_typesafe_key.py would be ignored (.gitignore:27).
+- Task 1: minor (deferred): the commit message labels the run "python" though $PY ran it, and pastes only the last line (app/ unchanged).
+- Task 2: minor (deferred): build_state accepts step -1 through numpy wraparound; the route's ge=0 guards it (model_questions.py:173).
+- Task 2: minor (deferred): decode raises TypeError, not ValueError, for non-numeric input (model_questions.py:134).
+- Task 2: minor (deferred): three tautological assertions in test_questions_and_options; no test ties the key and description texts to the LEVELS numbers (checked by hand, correct).
+- Task 2: minor (deferred): test_no_recorded_drive_imports checks direct imports only (agent_api imports app.replay transitively).
+- Task 2: minor (deferred): _NEUTRAL copies page_constants' neutral_phys one-liner (plan-mandated; guarded by a test).
+- Task 2: minor (deferred): a test asserts cwd == ROOT (plan-mandated).
+- Task 2: minor (deferred): user_setting's printable rule rejects a no-break space in a file's value while environment values are not checked the same way; a cp1252 file with non-ASCII text reads as no file.
+- Task 3: minor (deferred): the HTTPError of a non-2xx reply or a refused redirect is not closed (ResourceWarning) (jev.py:100-109).
+- Task 3: minor (deferred): the 400-digit payload test is built by string replace, which is fragile (test_agents.py:462-463); the leak-check expression is written out three times.
+- Task 3: minor (deferred): NET_ALLOWED gives jev.py every NET_ROOTS entry, where it needs only urllib and http (test_agents.py:229; plan-mandated).
+- Task 3: minor (deferred): a non-latin-1 key makes the status route say configured: false although TYPESAFE_API_KEY is set; _header_safe also rejects a tab.
+- Task 3: minor (deferred): _OPENER is built at import time and takes the proxy settings of that moment.
+- Task 4: minor (deferred): the protocol stream is protected at the Python level only (the sys.stdout rebind), not at fd 1 (laya_worker.py:56-57).
+- Task 4: minor (deferred): the guard-probe subprocess runs without -B (test_agents.py:2485).
+- Task 4: minor (deferred): a third AST import walker; WORKER_GUARDED copies GUARDED (plan-mandated pin).
+- Task 4: minor (deferred): no default-suite test of the real worker's bad-request line, of it staying alive after one, or of its exit 0 at EOF (left to the bridge and test 20).
+- Task 5: minor (deferred): the killed-server test's first readline() has no timeout (test_agents.py:2832).
+- Task 5: minor (deferred): cwd and HF_HOME are derived from the resolved model folder, not from LAYA_HOME; they differ only under junctions (laya_bridge.py:180).
+- Task 5: minor (deferred): status() reads user_setting twice per call (laya_bridge.py:143).
+- Task 5: minor (deferred): the real spawn contract (argv, cwd, env, stderr) is pinned only under --full; load_home's "not absolute" and "python under the repository" branches are untested.
+- Task 5: minor (deferred): test 20's snapshot records files only, not empty folders (test_agents.py:2662).
+- Task 5: minor (deferred): worker_env drops HF_TOKEN* but not HUGGING_FACE_HUB_TOKEN, which HF_HUB_OFFLINE=1 makes moot (laya_bridge.py:91).
+- Task 5: minor (deferred): an asyncio loop built inside the worker by a future laya or torch would count as a network attempt (the guard blocks loop creation), and would show as start_failed or network_attempt.
+- Task 6: minor (deferred): the route comment names only the 422 and the 405, not the 400 (agent_api.py:81-84; the brief's wording kept).
+- Task 6: minor (deferred): commit bc09b4f says 11 AskRouteTests; there are 14.
+- Task 6: minor (deferred): _start's ready-line parse catches only ValueError; a RecursionError ready line would give a 500 and wedge the bridge (laya_bridge.py:210; the worker writes that line, low risk).
+- Task 6: minor (deferred): Laya's device and usage pass through unvalidated; a NaN would make JSONResponse raise, a 500 in Laya's column only.
+- Task 6: minor (deferred): three near-identical server_error blocks and a redundant local import in install() (plan-mandated).
+- Task 6: minor (deferred): the refusal lines print uncaptured into the suite output, and the Starlette and anyio deprecation warnings now fire at the first TestClient import.
+- Task 6: minor (deferred): NoStoreRoute bypasses any future app-level exception handler for these four routes.
+- Task 7: minor (deferred): a FastAPI 422 reads "Server error (HTTP 422)" although it is a bad request from the page (design wording).
+- Task 7: minor (deferred): the shared timeout sentence names no duration (jev 10 s, Laya 20 s).
+- Task 7: minor (deferred): jev's status line shows the raw source token (env or file) untranslated in Arabic; Task 10 saw «مفتاح مُعَدّ (env)».
+- Task 7: minor (deferred): rowView's defensive paths for a missing reversed entry are untested (the server cannot produce them).
+- Task 7: minor (deferred): askState's reasons before the first frame and for an out-of-range k read slightly off (the brief's order).
+- Task 7: minor (deferred): statusLine checks the Laya problem before the worker state, which hides a running worker if LAYA_HOME stops resolving.
+- Task 8: minor (deferred; the final review should triage it): a failed press at a second erases a successful answer already held there, so a paid jev answer can be lost to a later network failure (the design says "a new press replaces").
+- Task 8: minor (deferred): loadModelStatus has no sequence guard, so a slow status reply can overwrite a newer one (agents.mjs:1070-1080).
+- Task 8: minor (deferred): WORKER_KINDS repeats laya_bridge.KINDS plus 'other', with no test tying them (model-panel.mjs:998).
+- Task 9: minor (deferred): a test title says "phones keep that order" although the narrow order differs (plan-mandated).
+- Task 10: minor (open for the final review): in the Arabic page a signed number inside a sentence is drawn with its sign on the right of the digits, in the choice line and the reversed line (agents.mjs:1164, :1177); M2's «أمر به» line does the same (agents.mjs:946).
+- Task 10: minor (open for the final review): the choice line's network value uses a hyphen-minus while every level uses U+2212, two minus glyphs on one line (agents.mjs:1164).
+- Task 10: minor (open for the final review): the latency line «{ms} ms على {device}» is drawn as "cuda على ms 65": right when read right to left, reversed to a Latin reader (agents-strings.mjs:173).
+- Task 10: minor (deferred): the Task 10 report miscounts the console windows (three, not four).
