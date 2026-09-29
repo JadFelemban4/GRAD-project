@@ -21,43 +21,36 @@ C3 had already withdrawn.)*
 
 ---
 
-> ## ⚠️ READ THIS BEFORE ANYTHING ELSE — 28 September 2026
+> ## ⚠️ READ THIS BEFORE ANYTHING ELSE — 28 September 2026, evening
 >
-> **The Phase D retrain is ready and has not been run.** Everything it needs is
-> committed: the locked scenario (12 % at 130 km/h, 42 °C, which binds), a new
-> road every training episode, and a 1.0 s step that matches the scoring.
+> **The working tree carries uncommitted work** — review it, then commit.
+> `SESSION_REPORT_2026-09-28_evening.md` is the full account.
 >
-> **Decide two things first.**
-> 1. **Calibrate before or after the retrain.** Two drives in
->    `logs/DRIVE_PLAN.md` (A and B) would change the plant — the oil node, the
->    boost ceiling at low rpm. A plant change after the retrain means retraining
->    again. It is about three hours of machine time either way.
-> 2. **The fuel.** The owner's manual says 95 RON minimum, 98 recommended; the
->    model runs 95. Find out which the car was filled with while it was logged.
->    98 moves only the knock term, but changing it is a plant change
->    (REFERENCES.md section 2c).
+> **Drive B is in, and the data now sets the constants.** `derive_params.py`
+> recomputes everything the car's logs can set — the thermal network's block and
+> oil nodes, the boost ceiling, the spark offset, the enrichment dwell, the
+> gearbox's kickdown table — into `data/derived_params.json`, and
+> `build_dataset.py` runs it after every rebuild. **A new drive therefore
+> changes the plant.** REFERENCES.md section 4b lists every constant that is
+> still typed, and why.
 >
-> **Three things the latest pass found** (CLAUDE.md, current-state box):
-> - the knock comparison could not have seen knock — it rests on one reading
->   of each ignition angle every ~8 s. Untested, not refuted;
-> - preview's −0.4 against current-grade is entirely the knock term; on
->   turbine and oil damage alone the two tie;
-> - the logs we have cannot calibrate the oil node — the drives disagree.
+> **The Phase D retrain is still ready and not run.** It must train on the
+> plant as derived now; the ten agents in `runs/` trained on an older plant, at
+> 110 km/h, dt 0.2, on one road.
 >
-> **And later the same day** (CLAUDE.md, the first 28 September box):
-> - `validate.py` rows 8–11 (oil, coolant) are now scored against bands from
->   our own drives, through `car_thermal.py`: **7 of 11**, 1 of 4 of the car rows;
-> - the car's oil takes **70–100 s** to follow a change and the model's takes
->   **14 s** — the oil node is four to seven times too light, or too tightly
->   coupled. `thermal.py` is unchanged;
-> - no source shows uprated cooling on a GCC car, and it would barely move the
->   turbine anyway.
+> **Decide three things first.**
+> 1. **Drive A before the retrain, or after?** It is the data `validate.py`
+>    rows 8 and 9 (the oil) still need, and the coolant regulation law. Log
+>    `Ambient temperature` on EVERY drive from now on — drive B did not.
+> 2. **The fuel.** 95 or 98 RON while the car was logged (REFERENCES.md 2c).
+> 3. **Merge `sep17`** — it has four CODE conflicts, not only documents.
 >
-> **The ten agents in `runs/` are a record, not a result.** They trained at
-> 110 km/h (nothing binds), at dt = 0.2 s, on one road.
->
-> **Merge `origin/JMF-2340550-sep17`** before reporting Phase D. The code it
-> needs is already here; the merge is documents and history.
+> **What the evening found** (CLAUDE.md, the evening box):
+> - the oil node had the wrong structure — the car's oil heats with engine speed
+>   and is cooled by road speed; derived, its time constant is 57 s (was 14);
+> - `validate.py` reads **8 of 11**; rows 8 and 9 still miss, and why is stated;
+> - four defects fixed and measured (exhaust flow, the ceiling's inlet
+>   temperature, air density, the H/τ axis); the premise moved, preview did not.
 
 ## Do this first
 
@@ -75,25 +68,29 @@ reproduce, the number here is stale and the script is right.
 
 | command | what it prints today |
 |---|---|
-| `python check_premise.py` | baseline **951.9** at **884 °C**; reactive 671.1 (cuts 29.5 %), current-grade 624.5 (34.4 %), predictive 628.4 (34.0 %); preview over current-grade **−0.4**. Hand-written — read AUDIT.md C1 and C3 first |
-| `python test_reward.py` | **8 of 8** pass. Neutral scores inside ±0.05 on the locked climb and on every training-road family; the gearbox's torque table still matches the plant |
-| `python check_roads.py` | **PASS** over 40 roads; 11 push the baseline past 850 °C; worst neutral reward about +0.004, worst p95 tracking error 0.015 against a 0.05 band |
-| `python validate.py` | **7 of 11** inside their band — 6 of 7 against literature, **1 of 4 against our own car** (rows 8–11, oil and coolant); displacement 2997.5 cc; turbine τ **48.0 s** |
-| `python compare_log.py data/master_points.csv` | fitted k 0.837 → **1.1 %**; derived k 0.831 → **1.4 %**, PASS. Mistake 12: it cannot see the breathing model |
+| `python check_premise.py` | baseline **920.1** at **883 °C**; reactive 625.7 (cuts 32.0 %), current-grade 520.5 (43.4 %), predictive 523.5 (43.1 %); preview over current-grade **−0.3**. Writes `results/premise.json`. Hand-written — read AUDIT.md C1 and C3 first |
+| `python test_reward.py` | **8 of 8** pass. Neutral scores inside ±0.05 on the locked climb and on every training-road family; the gearbox's torque table still matches the plant. A random policy scores just above neutral (informational) |
+| `python check_roads.py` | **PASS** over 40 roads; 14 push the baseline past 850 °C; worst neutral reward about −0.002, worst p95 tracking error 0.016 against a 0.05 band |
+| `python validate.py` | **8 of 11** inside their band — 6 of 7 against literature, **2 of 4 against our own car** (rows 8–11, oil and coolant); displacement 2997.5 cc; turbine τ **48.0 s** |
+| `python compare_log.py data/master_points.csv` | fitted k 0.839 → **1.1 %**; derived k 0.831 → **1.4 %**, PASS. Mistake 12: it cannot see the breathing model |
+| `python derive_params.py` | re-derives every constant the logs set into `data/derived_params.json`, in about a minute; `build_dataset.py` runs it |
+| `python calibrate_thermal.py` | the thermal fit with leave-one-drive-out scores, `results/thermal_calibration.json` (~3 min) |
+| `python run_results.py` | regenerates `results/traces_130kmh.json`, `sweep_speed_grade.json` and the Phase D files (~15 min) |
+| `python compare_calibration.py` | the 28 Sep before/after comparisons, `results/calibration_comparison.json`, for figures 20–25 |
 | `python check_map.py` | spark falls with load in every row and rises with speed in every column; **6 cells above the compressor ceiling**, 0 with no knock-free spark |
-| `python build_dataset.py "logs/raw/*.csv"` | 295.0 min, 10 drives, 26 operating points |
+| `python build_dataset.py "logs/raw/*.csv"` | 321.7 min, 11 drives, 26 operating points — then it runs `derive_params.py` |
 | `python model_vs_data.py` | eleven comparisons of the simulator against the car, each beside the figure the documents quote; ~10 min |
 | `python verify_docs.py` | recomputes the published figures and scans every tracked document. **Do not memorise its count** — it moves each time a figure is added |
-| `python -m app.test_replay` | **49 of 49**. Add `--full` for **59 of 59**: 14278 of 14340 samples estimated, peak estimated turbine **890.6 °C**, **15 thermal · 0 mismatch · 19 novel** |
+| `python -m app.test_replay` | **49 of 49**. Add `--full` for **59 of 59**: 14278 of 14340 samples estimated, peak estimated turbine **873.1 °C**, **14 thermal · 0 mismatch · 19 novel**. Both drives' pins moved on 28 Sep (exhaust = air + fuel; the derived enrichment dwell); the change behind each is written beside it |
 | `python make_figures.py` / `python make_page.py` | the thesis figures in `results/figures/`, and the phone page `results/page/index.html` |
 
-`validate.py` being 7 of 11 is expected, not a failure. Against literature the one miss
-is the cruise-band EGT maximum. Rows 8–11 are scored against the car's own logs, and
-three miss: the model's oil is too cool on sustained load and warms 5–7 times too
-fast, and its free-running coolant settles below the car's heat-management setpoint.
-Over drive10's hottest ten minutes the car's oil sat at 103–111 °C and the model's
-at 96 °C; the car's oil peaked at **117 °C**. `validation_table.md` section A says
-how each band is built.
+`validate.py` being 8 of 11 is expected, not a failure. Against literature the one miss
+is the cruise-band EGT maximum. Against the car, rows 10 and 11 (coolant) pass since the
+thermal network was derived from the logs; rows 8 and 9 (oil) still miss — the model's oil
+runs cool of the car's over drive10's sustained high-rpm stretch (97.0 °C against
+103–111) and its time constant is 60 s against the car's 70–100. Drive A is the data.
+`validation_table.md` section A says how each band is built, section C what the
+derivation changed.
 
 ---
 
@@ -254,7 +251,7 @@ with something that transfers is real, publishable work.**
 |---|---|
 | the rules, the traps, the mistakes already made, the improvement plan | [CLAUDE.md](CLAUDE.md) |
 | what was verified, and on what date | [CHECKPOINT.md](CHECKPOINT.md) |
-| the last session in full | [SESSION_REPORT_2026-09-28.md](SESSION_REPORT_2026-09-28.md) |
+| the last session in full | [SESSION_REPORT_2026-09-28_evening.md](SESSION_REPORT_2026-09-28_evening.md); the morning's is [SESSION_REPORT_2026-09-28.md](SESSION_REPORT_2026-09-28.md) |
 | the prompt to continue in a new session | [NEXT_CHAT_PROMPT.md](NEXT_CHAT_PROMPT.md) |
 | **where every number we did not measure comes from** | [REFERENCES.md](REFERENCES.md) |
 | the drives still worth making, and how | [logs/DRIVE_PLAN.md](logs/DRIVE_PLAN.md) |

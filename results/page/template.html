@@ -88,7 +88,7 @@ section+section{border-top:1px solid var(--rule)}
 .meta dd{margin:0}
 
 /* ---------------------------------------------------------- headline */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
   background:var(--rule);border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin-top:28px}
 .stat{background:var(--surface);padding:18px 18px 16px;display:flex;flex-direction:column;gap:6px}
 .stat .k{font:500 12px/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
@@ -166,6 +166,7 @@ section+section{border-top:1px solid var(--rule)}
 .pill.warn{color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%,transparent)}
 .pill.serious{color:var(--serious-ink);background:color-mix(in srgb,var(--serious) 13%,transparent)}
 .pill.crit{color:var(--crit-ink);background:color-mix(in srgb,var(--crit) 11%,transparent)}
+.fig table{margin-top:2px}
 .pill.none{color:var(--none-ink);background:color-mix(in srgb,var(--ink-3) 10%,transparent)}
 
 /* -------------------------------------------------------------- table */
@@ -198,6 +199,8 @@ footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--rule);font-si
 footer pre{font:12.5px/1.6 var(--mono);color:var(--ink-2);background:var(--surface);
   border:1px solid var(--rule);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:10px 0 0}
 
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.stats{grid-template-columns:1fr}}
 @media (max-width:560px){
   body{font-size:14.5px}
   .fig{padding:14px 12px 12px;border-radius:8px}
@@ -250,24 +253,32 @@ html{scroll-behavior:smooth}
       <p>Mean over five paired seeds, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}. Indistinguishable from zero, on agents that are not yet Phase D's (see caveats).</p>
     </div>
     <div class="stat">
+      <span class="k">Preview on the H/τ sweep</span>
+      <span class="v">{{gen.vs_grade_absmax|.2f}}<small>pts or less</small></span>
+      <p>Preview over current-grade, either way, at every time constant where the limit binds. Against the reactive policy it looks like {{gen.vs_react_lo|.0f}}–{{gen.vs_react_hi|.0f}} points, but that gap is timing, not preview.</p>
+    </div>
+    <div class="stat">
       <span class="k">Simulation vs car</span>
-      <span class="v">3<small>of 11 agree</small></span>
-      <p>Three more agree within limits the comparison cannot see past, three disagree, and two cannot be tested with the logs we have.</p>
+      <span class="v">4<small>of 11 agree</small></span>
+      <p>Five more agree within limits the comparison cannot see past, one is untested, and one is a region the car was never driven in. None is marked off since the thermal network was derived from the logs.</p>
     </div>
   </div>
 
   <div class="findings">
-    <h3>Changed on 27–28 September</h3>
+    <h3>Changed on 27–29 September</h3>
     <ol>
-      <li><b>Training now runs on a new road every episode.</b> Five kinds of road, from flat to two steep climbs, so the preview channel has something to report. Scoring stays on the locked climb. <a href="#f-roads">The roads</a></li>
-      <li><b>Those roads found a gearbox defect, now fixed.</b> In 8th at 130 km/h the model's engine sustains 333 Nm, but the box only downshifted above 375 Nm, so grades near 9 % could not be driven by any policy. It now kicks down when the engine falls short.</li>
-      <li><b>The car-fitted spark map was never in use, now fixed.</b> The model's knock limit sat below it at every steady point. Refitted, part-load spark goes from {{mc.spark.before.mean|+.1f}}° to {{mc.spark.after.mean|+.2f}}° against the car. <a href="#f-spark">Spark</a></li>
-      <li><b>Preview's −0.4 against current-grade is entirely the knock term.</b> That term is {{pd.split.knock_pct_base|.0f}}–{{pd.split.knock_pct_pred|.0f}} % of the damage. On turbine and oil damage alone, predictive and current-grade tie ({{pd.split.thermal_pred|.1f}} against {{pd.split.thermal_grade|.1f}}). <a href="#f-abl">The ablation</a></li>
+      <li><b>With the honest comparator, the H/τ sweep shows no preview value.</b> The sweep used to measure preview only against the reactive policy. Against current-grade, which acts on the grade the car is on now, preview is worth {{gen.vs_grade_lo|+.2f}} to {{gen.vs_grade_hi|+.2f}} points at every time constant where the limit binds. No sweep result can be cited for the criterion; the trained ablation on varied roads is the test. <a href="#f-htau">The sweep</a></li>
+      <li><b>Drive B is in, and the data now sets the constants.</b> Full-throttle roll-ons in a held gear; the dataset is {{meta.minutes|.1f}} minutes over {{meta.drives}} drives. Every constant the car's logs can set (the thermal network, the boost ceiling, the spark offset, the enrichment dwell, the gearbox's kickdown table) is recomputed from them on every rebuild by <code>derive_params.py</code>, not typed into the code.</li>
+      <li><b>The oil node had the wrong structure, now re-fitted to the car.</b> The car's oil heats with engine speed and is cooled by road speed; the model heated it with a share of fuel. Derived, drive10's oil runs {{mc.thermal.drive10.oil_med|+.1f}} K and its coolant {{mc.thermal.drive10.ect_med|+.1f}} K from the car (median), and the oil takes {{mc.lit.8.value|.0f}} s to respond (the car: {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s). <a href="#f-th10">Oil and coolant</a></li>
+      <li><b>The validation table scores oil and coolant against the car:</b> {{mc.lit_ok}} of {{mc.lit_n}} inside, and {{mc.lit_c_ok}} of {{mc.lit_c_n}} of the car rows. Both coolant rows are inside; both oil rows still miss. <a href="#f-lit">The table</a></li>
+      <li><b>Three physics fixes moved the premise, and preview stayed level.</b> Exhaust flow was fuel × 15, now air + fuel; the boost ceiling read the charge temperature as its inlet, now ambient; air density was a typed 1.2 kg/m³, now computed at 42 °C. The baseline's damage went from {{cal.steps.0.baseline|.1f}} to {{cal.steps_last_baseline|.1f}}, and preview over current-grade stayed between {{cal.steps_pv_lo|+.1f}} and {{cal.steps_pv_hi|+.1f}} points. <a href="#f-steps">One change at a time</a></li>
+      <li><b>Two of 28 September's claims were wrong, corrected on the 29th.</b> The derived boost ceiling does not match drive B at 1600–2000 rpm: it sits {{cal.boost.low_worst|+.0f}} % from the highest boost the car reached there. And the coolant is {{mc.row8.coolant_part|.1f}} K of row 8's {{mc.row8.miss|.1f}} K oil miss, not "about 6 K"; the larger part is the oil node itself. <a href="#f-env">Ceiling</a> · <a href="#f-th10">Oil</a></li>
+      <li><b>Preview's {{pd.ablation.pred_minus_grade|+.1f}} against current-grade is entirely the knock term.</b> That term is {{pd.split.knock_pct_base|.0f}}–{{pd.split.knock_pct_pred|.0f}} % of the damage. On turbine and oil damage alone, predictive and current-grade tie ({{pd.split.thermal_pred|.1f}} against {{pd.split.thermal_grade|.1f}}). <a href="#f-abl">The ablation</a></li>
       <li><b>The knock comparison could not have seen knock.</b> The drive behind it holds one reading of each ignition angle every {{mc.knock_s.every_s|.0f}} s, and a knock retard lasts a second or two. So the negative result is untested, not refuted. <a href="#f-knock">Knock</a></li>
-      <li><b>The logs we have cannot calibrate the oil node.</b> A fit that fixes the hard pulls breaks drive10, the one drive in the published band. It needs sustained-load data. <a href="#drives">What to drive</a></li>
-      <li><b>The validation table now scores oil and coolant against the car,</b> not against unsourced ranges: {{mc.lit_ok}} of {{mc.lit_n}} inside, and {{mc.lit_c_ok}} of {{mc.lit_c_n}} of the car rows. The car's oil takes {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s to respond; the model's takes {{mc.lit.8.value|.0f}} s. <a href="#f-lit">The table</a></li>
+      <li><b>Training now runs on a new road every episode, at the 1.0 s step scoring uses.</b> Five kinds of road, from flat to two steep climbs, so the preview channel has something to report; the retrain gets 55 episodes where the old runs had 11. Scoring stays on the locked climb. <a href="#f-roads">The roads</a></li>
+      <li><b>Those roads found a gearbox defect, now fixed.</b> In 8th at 130 km/h the model's engine could sustain 333 Nm, but the box only downshifted above 375 Nm, so grades near 9 % could not be driven by any policy. It now kicks down when the engine falls short.</li>
+      <li><b>The car-fitted spark map was never in use, now fixed.</b> The model's knock limit sat below it at every steady point. Refitted, part-load spark goes from {{mc.spark.before.mean|+.1f}}° to {{mc.spark.after.mean|+.2f}}° against the car. <a href="#f-spark">Spark</a></li>
       <li><b>GCC specification and fuel, checked.</b> No admissible source shows uprated cooling on a GCC car, and on the model stronger cooling barely moves the turbine, which trades heat with exhaust and air. The manual asks for 95 RON minimum and 98 recommended; the model runs 95, and 98 moves only the knock term. Which fuel the car was logged on decides it. <code>REFERENCES.md</code> 2c</li>
-      <li><b>Training uses the same 1.0 s step as scoring,</b> and the retrain gets 55 episodes where the old runs had 11.</li>
     </ol>
   </div>
 </section>
@@ -288,7 +299,7 @@ html{scroll-behavior:smooth}
           <button type="button" id="z-top" aria-pressed="false">The top</button>
         </div>
       </div>
-      <p class="take">The baseline ECU settles at {{pd.trace.series.0.peak|.0f}} °C. Every protecting policy pulls it back towards the trigger, and all four sit within 25 K of each other at the top.</p>
+      <p class="take">The baseline ECU settles at {{pd.trace.series.0.peak|.0f}} °C. Every protecting policy pulls it back towards the trigger, and all four peak within {{pd.trace.spread|.0f}} K of each other.</p>
     </div>
     <div class="legend">
       <span style="color:var(--pd-base)"><i class="lk"></i>baseline ECU</span>
@@ -314,6 +325,29 @@ html{scroll-behavior:smooth}
     <div class="chart" id="c-damage"></div>
   </div>
 
+  <div class="fig" id="f-steps">
+    <div class="fig-head">
+      <h3>The premise, one change at a time</h3>
+      <p class="take">Six changes to the plant on 28 September moved the baseline's damage from {{cal.steps.0.baseline|.1f}} to {{cal.steps_last_baseline|.1f}}. Preview over current-grade stayed between {{cal.steps_pv_lo|+.1f}} and {{cal.steps_pv_hi|+.1f}} points at every step.</p>
+    </div>
+    <div class="tbl-wrap" id="t-steps"></div>
+    <p class="cap">The hand-written policies on the locked climb after each change, in order. Step 4 raised the baseline because the exhaust flow had been fuel × 15, well short of air + fuel; step 6 lowered it again because 42 °C air is thinner than the 1.2 kg/m³ that had been typed, so the car needs less power. This is a record: each step needs the code as it stood at that step, so it cannot be regenerated (<code>compare_calibration.py</code>).</p>
+  </div>
+
+  <div class="fig" id="f-htau">
+    <div class="fig-head">
+      <h3>The H/τ sweep, against both comparators</h3>
+      <p class="take">Sweeping the turbine housing's heat capacity moves τ from {{gen.h2.0.tau_s|.0f}} to {{gen.h2.4.tau_s|.0f}} s against a {{gen.horizon|.0f}} s horizon. Where the limit binds ({{gen.n_bind}} of {{gen.n_all}} values), preview over current-grade is {{gen.vs_grade_lo|+.2f}} to {{gen.vs_grade_hi|+.2f}} points. The {{gen.vs_react_lo|.0f}}–{{gen.vs_react_hi|.0f}} points over the reactive policy are timing, not preview.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-react)"><i class="lr" style="background:currentColor"></i>predictive minus reactive</span>
+      <span style="color:var(--pd-grade)"><i class="lr" style="background:currentColor"></i>predictive minus current-grade: the preview measurement</span>
+    </div>
+    <div class="chart" id="c-htau"></div>
+    <p class="cap">Hand-written policies, one rollout each, scored with <code>exp((T − 1123)/45)</code>; τ = C/UA at the climb's own exhaust flow of {{gen.exh|.1f}} g/s. A predictive policy written by hand that acts on the grade ahead lands on one that acts on the grade now (AUDIT.md C3), so this sweep cannot confirm or refute the criterion. Re-scored under six cost curvatures at τ = {{gen.h2.2.tau_s|.0f}} s, preview over current-grade is never more than {{gen.h1_grade_max|.2f}} points from zero; with the limit re-set per τ to keep it binding (H2b), at most {{gen.h2b_grade_max|+.1f}}. The trained ablation on varied roads is the test.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-h1"></div><div class="tbl-wrap" id="t-h2b"></div></details>
+  </div>
+
   <div class="fig" id="f-sweep">
     <div class="fig-head">
       <h3>Why 12 % at 130 km/h</h3>
@@ -337,7 +371,7 @@ html{scroll-behavior:smooth}
   <div class="fig" id="f-eval">
     <div class="fig-head">
       <h3>Every policy, twenty frozen episodes</h3>
-      <p class="take">All ten trained agents beat every hand-written policy. The two seeds that trained worst still cut more damage than the best hand-written one.</p>
+      <p class="take">{{pd.agents.beat}} of {{pd.agents.n}} trained agents beat every hand-written policy. The other {{pd.agents.n_below}}, {{pd.agents.below}}, cut {{pd.agents.below_lo|.1f}}–{{pd.agents.below_hi|.1f}} %, no more than current-grade's {{pd.agents.best_hand|.1f}} %. Every agent beats the reactive policy and the baseline.</p>
     </div>
     <div class="legend">
       <span style="color:var(--pd-base)"><i class="lr" style="background:currentColor"></i>hand-written</span>
@@ -361,14 +395,14 @@ html{scroll-behavior:smooth}
       <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade, no preview at all</span>
     </div>
     <div class="chart" id="c-abl"></div>
-    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = 5. If it survives the retrain, a preview advantage of zero on this scenario is a result about H/τ, not a failure. On the hand-written policies, the −0.4 by which predictive trails current-grade comes entirely from the knock term: on turbine and oil damage alone the gap is {{pd.split.preview_thermal|+.2f}} points. Report both until the knock model is tested.</p>
+    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = 5. If it survives the retrain, a preview advantage of zero on this scenario is a result about H/τ, not a failure. On the hand-written policies predictive minus current-grade is {{pd.ablation.pred_minus_grade|+.1f}} points, and it comes entirely from the knock term: on turbine and oil damage alone it is {{pd.split.preview_thermal|+.2f}}. Report both until the knock model is tested.</p>
     <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-abl"></div></details>
   </div>
 
   <div class="fig" id="f-trade">
     <div class="fig-head">
       <h3>Damage against fuel</h3>
-      <p class="take">Protection is not free. Seeds 0 and 1 are the exception: they cut about 45 % of the damage while burning less fuel than the baseline.</p>
+      <p class="take">Protection is not free. Seeds {{pd.trade.low_fuel}} are the exception: their agents cut {{pd.trade.lf_lo|.0f}}–{{pd.trade.lf_hi|.0f}} % of the damage while burning less fuel than the baseline.</p>
     </div>
     <div class="legend">
       <span style="color:var(--pd-sight)"><i class="ld" style="background:currentColor"></i>trained, sighted</span>
@@ -377,7 +411,7 @@ html{scroll-behavior:smooth}
       <span style="color:var(--pd-base)"><i class="lsq" style="background:currentColor"></i>hand-written</span>
     </div>
     <div class="chart" id="c-trade"></div>
-    <p class="cap">A long tie would be a preview effect. The ties for seeds 2 and 4 run sideways: the sighted agent reaches the same damage cut as its blinded twin and burns more fuel doing it.</p>
+    <p class="cap">A tie that ran straight up, more damage cut for the same fuel, would be a preview effect. None does. Where the sighted agent cuts more than its blinded twin (seeds {{pd.trade.more}}, by {{pd.trade.more_cut}} points), it burns {{pd.trade.more_fuel}} points more fuel doing it; for seeds {{pd.trade.less}} it cuts less.</p>
   </div>
 
   <div class="fig" id="f-curves">
@@ -390,7 +424,7 @@ html{scroll-behavior:smooth}
       <span style="color:var(--pd-blind)"><i class="lk"></i>blinded</span>
     </div>
     <div class="chart" id="c-curves"></div>
-    <p class="cap">Consecutive points are not scored with the same ruler, so a rising curve here is not evidence of learning. These runs trained at 110 km/h, where nothing binds.</p>
+    <p class="cap">Consecutive points are not scored with the same ruler, so a rising curve here is not evidence of learning. These runs trained at 110 km/h, where nothing binds, on the plant as it stood before 28 September.</p>
   </div>
 </section>
 
@@ -408,13 +442,13 @@ html{scroll-behavior:smooth}
       <tbody>
         <tr><td><a href="#f-load">Load, relative air filling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>{{mc.load.mape|.1f}} % over {{mc.load.n}} points, but blind to the breathing model</td></tr>
         <tr><td><a href="#f-boost">Manifold pressure under boost</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>median {{mc.boost.gap_sim|+.1f}} % against the car's boost channel</td></tr>
-        <tr><td><a href="#f-enrich">Enrichment, λ</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>worst cell {{mc.enrich.worst|.3f}} lean; the documented 0.027 is on a retired axis</td></tr>
+        <tr><td><a href="#f-enrich">Enrichment, λ</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>worst cell {{mc.enrich.worst|.3f}} lean, at 3500–4500 rpm and long dwell; the dwell thresholds are derived from the car since 28 Sep</td></tr>
         <tr><td><a href="#f-spark">Part-load spark</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.spark.after.mean|+.2f}}° after the refit, was {{mc.spark.before.mean|+.1f}}°</td></tr>
-        <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>runs cool: oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median</td></tr>
-        <tr><td><a href="#f-th74">Oil on hard pulls</a></td><td><span class="pill serious"><i>✕</i>off</span></td><td>model {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C</td></tr>
+        <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median, since the thermal network was derived from the logs (drive10 is in the fit)</td></tr>
+        <tr><td><a href="#f-th74">Oil on hard pulls</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>the {{cal.pull.before|.0f}} °C spikes are gone: peak {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C; its coolant median sits {{mc.thermal.7475b5d7.ect_med|+.1f}} K from the car's</td></tr>
         <tr><td><a href="#f-knock">Knock</a></td><td><span class="pill none"><i>○</i>untested</span></td><td>correlation {{mc.knock.corr|+.2f}}, but on one reading every {{mc.knock_s.every_s|.0f}} s; drive C can test it</td></tr>
         <tr><td><a href="#f-gear">Gearbox ratios</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.gear.within|.1f}} % of samples within 4 % of a published ratio</td></tr>
-        <tr><td><a href="#f-env">Compressor ceiling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>fitted to this data; the top rests on 4–5 readings per bin</td></tr>
+        <tr><td><a href="#f-env">Compressor ceiling</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>the measured envelope since 28 Sep; within {{cal.boost.high_lo|+.0f}} to {{cal.boost.high_hi|+.0f}} % of drive B's highest boost from 2000 rpm up, but {{cal.boost.low_worst|+.0f}} % at 1600–2000 rpm; the top two bins rest on {{cal.boost.top_readings.0}} and {{cal.boost.top_readings.1}} readings</td></tr>
         <tr><td><a href="#f-duty">Operating region</a></td><td><span class="pill none"><i>○</i>not covered</span></td><td>{{mc.duty.frac|.1f}} % of logged samples reach the climb's load</td></tr>
         <tr><td><a href="#f-lit">Validation table</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>{{mc.lit_ok}} of {{mc.lit_n}} inside: {{mc.lit_l_ok}} of {{mc.lit_l_n}} against literature, {{mc.lit_c_ok}} of {{mc.lit_c_n}} against our car</td></tr>
       </tbody>
@@ -454,8 +488,8 @@ html{scroll-behavior:smooth}
 
   <div class="fig" id="f-enrich">
     <div class="fig-head">
-      <div class="row"><h3>Enrichment</h3><span class="pill serious"><i>✕</i>off</span></div>
-      <p class="take">The model reproduces the shape: no enrichment below 3500 rpm, then richer with speed and with time at high load. It runs lean of the car in the 4500–7000 rpm, 4–8 s cell: {{mc.enrich.cells.7.sim|.3f}} against {{mc.enrich.cells.7.car|.3f}}.</p>
+      <div class="row"><h3>Enrichment</h3><span class="pill warn"><i>◐</i>limited</span></div>
+      <p class="take">The model reproduces the shape: no enrichment below 3500 rpm, then richer with speed and with time at high load. Since 28 September its dwell thresholds are derived from the car on the timestamp axis, and the 4500–7000 rpm, 4–8 s cell reads {{mc.enrich.cells.7.sim|.3f}} against the car's {{mc.enrich.cells.7.car|.3f}}. It still runs lean at 3500–4500 rpm and long dwell: {{mc.enrich.cells.5.sim|.3f}} against {{mc.enrich.cells.5.car|.3f}}; the speed band and depth are held (too few readings to derive them).</p>
     </div>
     <div class="legend">
       <span style="color:var(--car)"><i class="ld" style="background:currentColor"></i>car, median λ</span>
@@ -482,8 +516,8 @@ html{scroll-behavior:smooth}
 
   <div class="fig" id="f-th10">
     <div class="fig-head">
-      <div class="row"><h3>Oil and coolant over a two-hour drive</h3><span class="pill serious"><i>✕</i>off</span></div>
-      <p class="take"><code>thermal.py</code> driven free-running over drive10, fed the car's measured fuel, runs cool of both sensors: oil {{mc.thermal.drive10.oil_med|+.1f}} K and coolant {{mc.thermal.drive10.ect_med|+.1f}} K median. The validation table's rows 8 and 11 score exactly this drive and both miss.</p>
+      <div class="row"><h3>Oil and coolant over a two-hour drive</h3><span class="pill good"><i>✓</i>agrees</span></div>
+      <p class="take"><code>thermal.py</code> driven free-running over drive10, fed the car's measured fuel, with its block and oil nodes derived from the car's logs: oil {{mc.thermal.drive10.oil_med|+.1f}} K and coolant {{mc.thermal.drive10.ect_med|+.1f}} K median. drive10 is in the fit; fitted without it, its coolant still lands inside the car's band (<code>validate.py</code> row 11), and its hottest ten minutes of oil still run cool (row 8).</p>
     </div>
     <div class="legend">
       <span style="color:var(--car)"><i class="lk"></i>car, sensor</span>
@@ -491,13 +525,28 @@ html{scroll-behavior:smooth}
     </div>
     <div class="chart" id="c-th10-oil"></div>
     <div class="chart" id="c-th10-ect"></div>
-    <p class="cap">drive10 is the only drive whose oil reaches the published 115–140 °C band: the car peaks at {{mc.thermal.drive10.oil_peak_car|.0f}} °C, the model at {{mc.thermal.drive10.oil_peak_sim|.0f}} °C. At the four-minute idle near minute 45 the model cools while the car holds 93 °C: its 88 °C thermostat stands in for the B58's heat-management valve.</p>
+    <p class="cap">drive10 is the only drive whose oil reaches the published 115–140 °C band: the car peaks at {{mc.thermal.drive10.oil_peak_car|.0f}} °C, the model at {{mc.thermal.drive10.oil_peak_sim|.0f}} °C. Over the hottest ten minutes, the ones <code>validate.py</code> row 8 scores, the model's oil misses by {{mc.row8.miss|.1f}} K. Replaying with the block pinned to the car's coolant ({{mc.row8.car_ect|.1f}} °C there, where the model's own sits at {{mc.row8.ect_free|.1f}} °C near its {{cal.t_stat_c|.1f}} °C regulation point) recovers {{mc.row8.coolant_part|.1f}} K of it. The other {{mc.row8.oil_part|.1f}} K is the oil node itself: it runs {{mc.row8.rise_model|.1f}} K over its coolant where the car's oil runs {{mc.row8.rise_car|.1f}} K.</p>
+  </div>
+
+  <div class="fig" id="f-thfit">
+    <div class="fig-head">
+      <h3>Every drive, fitted and held out</h3>
+      <p class="take">The derived constants beat the old ones on every drive with oil, coolant and ambient logged, and they still do on each drive when that drive is left out of the fit.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-react)"><i class="ld" style="background:currentColor"></i>constants assumed until 28 Sep</span>
+      <span style="color:var(--sim)"><i class="ld" style="background:currentColor"></i>derived, this drive in the fit</span>
+      <span style="color:var(--sim)"><i class="lo"></i>derived, this drive held out</span>
+    </div>
+    <div class="chart" id="c-thfit-oil"></div>
+    <div class="chart" id="c-thfit-ect"></div>
+    <p class="cap">Root-mean-square error of <code>thermal.py</code> free-running over each whole drive, from <code>calibrate_thermal.py</code>. Held out means refitted on the other drives and then scored on this one. The block's heat capacity rests on one warm-up drive, 683640a0, which is why that drive's coolant gets worse when it is held out.</p>
   </div>
 
   <div class="fig" id="f-th74">
     <div class="fig-head">
-      <div class="row"><h3>Oil on hard pulls</h3><span class="pill serious"><i>✕</i>off</span></div>
-      <p class="take">On 7475b5d7's pulls to 230 km/h the model's oil spikes to {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C and falls back within a minute. The real sump barely moves and peaks at {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C.</p>
+      <div class="row"><h3>Oil on hard pulls</h3><span class="pill warn"><i>◐</i>limited</span></div>
+      <p class="take">With the old oil node, heated by {{cal.old_frac_pct|.0f}} % of fuel energy, the model's oil spiked to {{cal.pull.before|.0f}} °C on 7475b5d7's pulls to 230 km/h and fell back within a minute. Heated by engine speed and cooled by road speed, it peaks at {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C, though it still rises a few kelvin on pulls where the car's sump barely moves. Its coolant median sits {{mc.thermal.7475b5d7.ect_med|+.1f}} K from the car's: on this drive the car's valve holds the coolant lower than the model's fixed stand-in does.</p>
     </div>
     <div class="legend">
       <span style="color:var(--car)"><i class="lk"></i>car, sensor</span>
@@ -505,7 +554,12 @@ html{scroll-behavior:smooth}
     </div>
     <div class="chart" id="c-th74-oil"></div>
     <div class="chart" id="c-th74-ect"></div>
-    <p class="cap">The spikes come from the oil's own assumed heat input: 5 % of fuel energy pushes the modelled oil up to {{mc.oil.as.max_gap|.0f}} K above the block on a pull. Replaying the drive with one assumption changed at a time: halving that share takes the peak to {{mc.oil.half.peak_model|.0f}} °C, doubling the oil's heat capacity to {{mc.oil.double.peak_model|.0f}} °C, and pinning the block to the measured coolant to {{mc.oil.block.peak_model|.0f}} °C. Both oil parameters are assumed, and the logs we have cannot fix them. Fitted on the three light-load calibration drives ({{mc.oil_id.best.frac_pct|.0f}} % share, {{mc.oil_id.best.c_kj|.0f}} kJ/K), the pull peak falls to {{mc.oil_id.best.pull|.0f}} °C, but drive10's sustained peak falls to {{mc.oil_id.best.d10|.0f}} °C against the car's {{mc.oil_id.best.d10_car|.0f}}. The drives pull opposite ways; sustained load has to decide (<a href="#drives">drive A</a>).</p>
+    <p class="cap">Why the structure changed: seven oil-node structures, each fitted with drive10 held out. The one shipped until 28 September misses drive10 by {{cal.struct_shipped|.2f}} K; heat from engine speed with road-speed cooling misses it by {{cal.struct_chosen|.2f}} K, and the best of the seven, {{cal.struct_best_name}}, by {{cal.struct_best|.2f}} K. The shipped figure is free-running; the six others were fitted with the block pinned to the measured coolant, so they compare with each other more fairly than with it. A record of 28 September (<code>calibrate_thermal.py</code>).</p>
+    <div class="legend">
+      <span style="color:var(--sim)"><i class="lr" style="background:currentColor"></i>the structure now in <code>thermal.py</code></span>
+      <span style="color:var(--pd-react)"><i class="lr" style="background:currentColor"></i>the others</span>
+    </div>
+    <div class="chart" id="c-struct"></div>
   </div>
 
   <div class="fig" id="f-knock">
@@ -537,14 +591,22 @@ html{scroll-behavior:smooth}
   <div class="fig" id="f-env">
     <div class="fig-head">
       <div class="row"><h3>Compressor ceiling</h3><span class="pill warn"><i>◐</i>limited</span></div>
-      <p class="take">The simulator never lets boost exceed what the car was seen to reach at each flow. The highest pressure ratio logged is {{mc.env.pr_max|.2f}}.</p>
+      <p class="take">The simulator never lets boost exceed the ceiling, which since 28 September is the measured envelope itself, with no formula. The highest pressure ratio logged is {{mc.env.pr_max|.2f}}. Drive B shows the envelope is still too low at 1600–2000 rpm.</p>
     </div>
     <div class="legend">
       <span style="color:var(--car)"><i class="ld" style="background:currentColor"></i>car, quasi-steady sample</span>
       <span style="color:var(--sim)"><i class="lk"></i>simulation, <code>boost_ceiling_kpa</code></span>
     </div>
     <div class="chart" id="c-env"></div>
-    <p class="cap">{{mc.env.shown|,}} of {{mc.env.n|,}} samples shown. It is an operating ceiling fitted to these data, not a compressor map, and its top rests on four to five independent readings per flow bin. Above 0.314 kg/s the air-mass sensor saturates.</p>
+    <p class="cap">{{mc.env.shown|,}} of {{mc.env.n|,}} samples shown. It is an operating ceiling taken from these data, not a compressor map, and its top two flow bins rest on {{cal.boost.top_readings.0}} and {{cal.boost.top_readings.1}} independent readings. Above 0.314 kg/s the air-mass sensor saturates.</p>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="ld" style="background:currentColor"></i>car, drive B at full throttle</span>
+      <span style="color:var(--sim)"><i class="lk"></i>simulation, at the derived ceiling</span>
+      <span style="color:var(--pd-react)"><i class="lk dash"></i>simulation, at the 8 September formula</span>
+    </div>
+    <div class="chart" id="c-boostB"></div>
+    <p class="cap">{{cal.boost.n}} genuine full-throttle boost readings from drive B, each paired with engine speed interpolated to the moment it was read (a {{cal.boost.shift|+.0f}} rpm median shift from the last reading), against the manifold pressure the modelled engine reaches at the ceiling. Judged against the highest reading in each 200 rpm band, the derived ceiling sits {{cal.boost.high_lo|+.0f}} to {{cal.boost.high_hi|+.0f}} % from the car from 2000 rpm up, where the old formula sat as much as {{cal.boost.before_2000|+.0f}} %. At 1600–2000 rpm it sits {{cal.boost.low_worst|+.0f}} to {{cal.boost.low_best|+.0f}} %: the car made more boost there than the model allows. The envelope is built from quasi-steady samples and roll-ons are transients, so those readings are outside it by construction. At the locked climb's {{mc.duty.scen_rpm|.0f}} rpm the ceiling sits {{cal.boost.at_climb|+.1f}} % from the car's highest. On 28 September this was written up as a match from 1400 to 2400 rpm; it is not one at 1600–2000.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-boostB"></div></details>
   </div>
 
   <div class="fig" id="f-duty">
@@ -571,7 +633,7 @@ html{scroll-behavior:smooth}
       <span style="color:var(--ink-2)">rows marked <b>· car</b> are scored against our logs</span>
     </div>
     <div class="chart" id="c-lit"></div>
-    <p class="cap">The car rows say one thing: the oil node takes {{mc.lit.8.value|.0f}} s to follow a change where the car's oil takes {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s, and on drive10's hottest ten minutes it sits at {{mc.lit.7.value|.0f}} °C against the car's {{mc.lit.7.lo|.0f}}–{{mc.lit.7.hi|.0f}} °C. The car's own oil time constant sits inside the old literature range of 20–400 s, so that range was right and the model was not. <code>REFERENCES.md</code> section 3 grades every literature band. Position 0 is the low edge of each band, 1 the high edge.</p>
+    <p class="cap">The car rows since the thermal network was derived from the logs: the oil takes {{mc.lit.8.value|.0f}} s to follow a change where the car's takes {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s (it took {{cal.rows.1.before|.0f}} s before), and on drive10's hottest ten minutes it sits at {{mc.lit.7.value|.0f}} °C against the car's {{mc.lit.7.lo|.0f}}–{{mc.lit.7.hi|.0f}} °C. Both coolant rows are inside. <code>REFERENCES.md</code> section 3 grades every literature band. Position 0 is the low edge of each band, 1 the high edge.</p>
     <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-lit"></div></details>
   </div>
 </section>
@@ -581,7 +643,7 @@ html{scroll-behavior:smooth}
   <div class="sect-head">
     <p class="eyebrow">Part 3 · for the car</p>
     <h2>Drives we need</h2>
-    <p class="prose cap">Three drives, A to C, in order of value. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
+    <p class="prose cap">Three drives, A to C, in order of value; B is done. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
   </div>
 
   <div class="fig">
@@ -598,7 +660,7 @@ html{scroll-behavior:smooth}
   <div class="fig">
     <div class="fig-head">
       <div class="row"><h3>A · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable</span></div>
-      <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. This drive calibrates the oil node, which the existing logs cannot, and adds the first sustained-load coolant data and a hot idle. It changes the plant, so do it before the retrain or retrain again after it.</p>
+      <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. It is the data the oil rows of the validation table still need, and the coolant regulation law, and it adds the first sustained-load coolant data and a hot idle. Log ambient temperature too. It changes the plant, so do it before the retrain or retrain again after it.</p>
     </div>
     <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Oil temperature</code>, <code>Engine radiator outlet temperature (coolant)</code>, <code>Ambient temperature</code>.</p>
     <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
@@ -611,16 +673,17 @@ html{scroll-behavior:smooth}
 
   <div class="fig">
     <div class="fig-head">
-      <h3>B · Full-throttle roll-ons in a high gear, for low-rpm boost</h3>
-      <p class="take">The model can only make 333 Nm at 2100 rpm because the car was never asked for boost at low engine speed. This drive measures the real boost there, so the gearbox workaround can be retired.</p>
+      <div class="row"><h3>B · Full-throttle roll-ons in a high gear, for low-rpm boost</h3><span class="pill good"><i>✓</i>done 28 Sep</span></div>
+      <p class="take">Logged and in the dataset. The boost ceiling is now the measured envelope: within a few per cent of the car's highest boost from 2000 rpm up, still {{cal.boost.low_worst|+.0f}} % at 1600–2000 rpm (<a href="#f-env">Compressor ceiling</a>). It did not retire the gearbox workaround: with no torque channel, the pulls can't say whether the real car would hold the gear. It logged no ambient temperature, so every plan on this page now lists that channel.</p>
     </div>
-    <p class="cap"><b>Channels (7):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Boost pressure</code>, <code>Ambient pressure</code>, <code>Throttle valve angle related to the lower stop</code>, <code>Coolant temperature</code>.</p>
-    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+    <details><summary>How it was driven</summary>
+    <p class="cap" style="margin-top:8px"><b>Channels (7):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Boost pressure</code>, <code>Ambient pressure</code>, <code>Throttle valve angle related to the lower stop</code>, <code>Coolant temperature</code>.</p>
+    <ol class="cap" style="margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
       <li>A straight, empty road with a limit of 120 km/h or more. Gearbox in <b>M</b>; hold the gear with the paddles.</li>
       <li>From a steady speed, <b>floor it for 3–4 seconds and lift</b>, always before the limit: 6th from 70 km/h (about 1770 rpm), 7th from 90 km/h (about 1870 rpm), 8th from 100 km/h (about 1620 rpm).</li>
       <li>Each three times, with a minute of steady cruising between pulls so the logger gets fresh readings.</li>
-      <li>If the box kicks down anyway, keep going. That is useful data too.</li>
     </ol>
+    </details>
   </div>
 
   <div class="fig">
@@ -649,18 +712,23 @@ html{scroll-behavior:smooth}
     <h2>What this page is not</h2>
   </div>
   <div class="caveats">
-    <div class="cav"><h3>Not Phase D's answer</h3><p>The ten agents trained at 110 km/h, where the constraint never binds, at a 0.2 s step, on one road. The retrain fixes all three: 130 km/h, dt = 1.0 and a new road every episode. That retrain is what settles it.</p></div>
+    <div class="cav"><h3>Not Phase D's answer</h3><p>The ten agents trained at 110 km/h, where the constraint never binds, at a 0.2 s step, on one road, and on the plant before its constants were derived from the logs. Re-scored on today's plant they are a record. The retrain fixes all four: 130 km/h, dt = 1.0, a new road every episode, the derived plant. That retrain is what settles it.</p></div>
     <div class="cav"><h3>Hand-written rows are one rollout</h3><p>They do not read the preference weights, so their zero spread is structural. It is not a sign of stability.</p></div>
     <div class="cav"><h3>Turbine temperature is modelled</h3><p>No sensor on this car reads it. Its heat capacity, <code>c_turb</code> = 6000 J/K, is assumed, and it sets τ, the denominator of the claim.</p></div>
     <div class="cav"><h3>Altitude is not modelled</h3><p>The scored climb rises {{pd.elev.climb_m|,}} m, but the engine breathes sea-level air ({{pd.elev.p_model}} kPa) the whole way; a standard atmosphere would give about {{pd.elev.isa_kpa|.0f}} kPa at the top. Read the scenario as sustained heavy load at sea level, not as a mountain.</p></div>
-    <div class="cav"><h3>One workaround, stated</h3><p>At low engine speed the model's boost ceiling is too low, because the car was never logged there. The gearbox compensates by kicking down, running about 600 rpm faster than the real car would. Drive 2 would retire it.</p></div>
+    <div class="cav"><h3>One workaround, stated</h3><p>When the modelled engine falls short of the torque asked for, the gearbox kicks down. Drive B showed the ceiling is still too low at 1600–2000 rpm, so the model runs a gear lower there than the car may need. There is no torque channel to settle it, so the workaround stays. The locked climb runs above that band.</p></div>
+    <div class="cav"><h3>The H/τ sweep is hand-written</h3><p>It shows preview worth nothing over current-grade, but a hand-written predictive policy cannot do anything current-grade does not. It neither confirms nor refutes the criterion; only the trained pair can.</p></div>
   </div>
 
   <footer>
     <p>Regenerate everything on this page from the repository:</p>
-<pre>python model_vs_data.py     # the comparisons against the car
-python make_figures.py      # thesis PNGs, results/figures/
-python make_page.py         # this page</pre>
+<pre>python run_results.py           # Phase D files, the traces, the speed-by-grade sweep
+python check_roads.py           # the training roads
+python model_vs_data.py         # the comparisons against the car
+python compare_calibration.py   # the 28 September derivation, before and after
+python generality_test.py       # the H/tau sweep
+python make_figures.py          # thesis PNGs, results/figures/
+python make_page.py             # this page</pre>
     <p style="margin-top:12px">Branch {{meta.branch}} at {{meta.commit}}. Every number in the text is filled from the same data as the charts.</p>
   </footer>
 </section>
@@ -697,7 +765,9 @@ function H(tag, a, p) {
 const fin = v => v != null && isFinite(v);
 const f = (v, d = 1, sign = false) => {
   if (!fin(v)) return "–";
-  const s = (sign && v > 0 ? "+" : "") + v.toFixed(d);
+  let s = v.toFixed(d);
+  if (Number(s) === 0) s = s.replace("-", "");
+  if (sign && Number(s) >= 0) s = "+" + s;
   return s.replace("-", "−");
 };
 const mix = t => `color-mix(in oklab, var(--seq-lo), var(--seq-hi) ${Math.round(Math.max(0, Math.min(1, t)) * 100)}%)`;
@@ -1045,7 +1115,8 @@ mount("c-trade", (host, w, h) => {
   const xs = E.map(e => e.fuel_pct), ys = E.map(e => e.cut);
   const P = plot(host, { w, h,
     x: { d: [Math.floor(Math.min(...xs) - 2), Math.ceil(Math.max(...xs) + 2)], label: "extra fuel vs baseline (%)" },
-    y: { d: [-6, 80], label: "damage cut vs baseline (%)" }, m: { l: 50 } });
+    // 29 Sep: sized from the data. A fixed 80 clipped sighted seed 2 (83.9 %).
+    y: { d: [-6, Math.max(80, Math.ceil(Math.max(...ys) / 10) * 10 + 5)], label: "damage cut vs baseline (%)" }, m: { l: 50 } });
   vline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
   hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
   for (let s = 0; s < 5; s++) {
@@ -1288,7 +1359,8 @@ mount("c-knock", (host, w, h) => {
     rows: c => [{ c: "var(--car)", v: String(c[2]), k: "samples" }] });
   vline(P, 0.85, { c: "var(--crit)", label: "knee", dy: 14 });
   const bx = P.W - P.m.r - 8;
-  T(P.top, bx, P.m.t + 18, "r = " + f(K.corr, 3), { class: "lbl", "text-anchor": "end", style: "fill:var(--ink);font-size:14px;font-weight:600" });
+  // on a phone the knee's label reaches this corner; drop the r label clear of it
+  T(P.top, bx, P.m.t + (narrow(w) ? 44 : 18), "r = " + f(K.corr, 3), { class: "lbl", "text-anchor": "end", style: "fill:var(--ink);font-size:14px;font-weight:600" });
 });
 
 mount("c-gear", (host, w, h) => {
@@ -1320,8 +1392,8 @@ mount("c-env", (host, w, h) => {
   const P = plot(host, { w, h, x: { d: [0, 0.36], label: "corrected mass flow (kg/s)", fmt: v => v.toFixed(2) },
     y: { d: [0.95, 2.65], label: "pressure ratio", fmt: v => v.toFixed(1) }, m: { l: 50 } });
   S("rect", { x: P.x(0.314), y: P.m.t, width: P.x(0.36) - P.x(0.314), height: P.ph, style: "fill:var(--band)" }, P.g);
-  T(P.top, P.x(0.337), P.H - P.m.b - 10, "MAF", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-3)" });
-  T(P.top, P.x(0.337), P.H - P.m.b - 24, "sensor", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-3)" });
+  T(P.top, P.x(0.337), P.H - P.m.b - 24, "MAF", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-3)" });
+  T(P.top, P.x(0.337), P.H - P.m.b - 10, "sensor", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-3)" });
   for (const p of V.pts) S("circle", { cx: P.x(p[0]), cy: P.y(p[1]), r: 2.2, style: "fill:var(--car);opacity:.45" }, P.g);
   const cx = V.curve.map(p => p[0]), cy = V.curve.map(p => p[1]);
   line(P, cx, cy, { c: "var(--sim)", w: 2.6 });
@@ -1402,6 +1474,124 @@ table("t-enrich", ["rpm", "dwell", "n", "car λ", "sim λ", "sim − car", "car,
   [2, 3, 4, 5, 6]);
 table("t-lit", ["quantity", "model", "band", "band from", "inside"],
   MC.lit.map(r => [r.name, `${r.value} ${r.unit}`, `${r.lo}–${r.hi}`, r.basis, r.ok ? "yes" : "no"]), [1, 2]);
+
+
+// ============================================ 28 September: the derivation
+const CAL = D.cal, GEN = D.gen;
+const interp = (x, pts) => {
+  if (x <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++)
+    if (x <= pts[i][0]) return pts[i - 1][1] + (x - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0]) * (pts[i][1] - pts[i - 1][1]);
+  return pts[pts.length - 1][1];
+};
+
+mount("c-htau", (host, w) => {
+  const rows = GEN.h2;
+  const grp = 56, lw = narrow(w) ? 86 : 118, h = rows.length * grp + 46;
+  const vals = rows.filter(r => r.binds).flatMap(r => [r.predictive - r.reactive, r.predictive - r.grade]);
+  const xmax = Math.max(5, ...vals) * (narrow(w) ? 1.4 : 1.22), xmin = Math.min(0, ...vals) - 1;
+  const P = plot(host, { w, h, x: { d: [xmin, xmax], label: "preview edge (points of damage cut)" },
+    y: { d: [1, 0], none: true }, m: { l: lw, t: 6, r: 10 } });
+  vline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
+  rows.forEach((r, i) => {
+    const y0 = P.m.t + i * grp + 8;
+    T(P.svg, lw - 8, y0 + 13, `τ ${f(r.tau_s, 0)} s`, { "text-anchor": "end", style: "fill:var(--ink)" });
+    T(P.svg, lw - 8, y0 + 29, `H/τ ${f(r.h_tau, 2)}`, { "text-anchor": "end", style: "fill:var(--ink-3)" });
+    if (!r.binds) {
+      T(P.top, P.x(0) + 8, y0 + 22, "the limit is never reached", { class: "lbl", style: "fill:var(--ink-3)" });
+      return;
+    }
+    [["reactive", "var(--pd-react)", "over reactive", 0], ["grade", "var(--pd-grade)", "over current-grade", 19]].forEach(([k, c, nm, dy]) => {
+      const v = r.predictive - r[k];
+      const x0 = P.x(Math.min(0, v)), x1 = P.x(Math.max(0, v));
+      const bar = S("rect", { x: x0, y: y0 + dy, width: Math.max(2, x1 - x0), height: 16, rx: 3, style: `fill:${c}` }, P.g);
+      markTip(P, bar, x1, y0 + dy + 8, `τ ${f(r.tau_s, 1)} s, H/τ ${f(r.h_tau, 2)}`, [
+        { c, v: f(v, 2, true) + " pts", k: "preview " + nm },
+        { v: f(r.predictive, 1) + " %", k: "predictive cuts" },
+        { v: f(r[k], 1) + " %", k: (k === "grade" ? "current-grade" : "reactive") + " cuts" }]);
+      T(P.top, x1 + 7, y0 + dy + 12, f(v, k === "grade" ? 2 : 1, true) + " pts", { class: "lbl", style: "fill:var(--ink)" });
+    });
+  });
+}, () => 0);
+
+mount("c-struct", (host, w) => {
+  const St = CAL.structures;
+  // Phone labels: the full names are 30-40 characters and run off a 390 px screen.
+  const short = n => n.startsWith("as shipped") ? "as shipped" : n.startsWith("+ a separate") ? "+ sensor lag"
+    : n.replace(/engine speed/g, "rpm").replace("fuel share", "fuel").replace(" cooling", "")
+       .replace("constant", "const.").replace(" (refitted)", ", refit");
+  const rowH = 30, lw = narrow(w) ? 158 : 290, h = St.length * rowH + 46;
+  const xmax = Math.max(...St.map(o => o.rmse)) * (narrow(w) ? 1.5 : 1.3);
+  const P = plot(host, { w, h, x: { d: [0, xmax], label: "drive10 oil RMSE, drive10 held out (K)" },
+    y: { d: [1, 0], none: true }, m: { l: lw, t: 6, r: 10 } });
+  St.forEach((o, i) => {
+    const y = P.m.t + (i + 0.5) * rowH;
+    const c = o.chosen ? "var(--sim)" : "var(--pd-react)";
+    T(P.svg, lw - 8, y + 4, narrow(w) ? short(o.name) : o.name,
+      { "text-anchor": "end", style: o.chosen ? "fill:var(--ink);font-weight:600" : "fill:var(--ink-2)" });
+    const bar = S("rect", { x: P.x(0), y: y - 8, width: P.x(o.rmse) - P.x(0), height: 16, rx: 3, style: `fill:${c}` }, P.g);
+    T(P.top, P.x(o.rmse) + 7, y + 4, f(o.rmse, 2) + " K" + (o.note === "free-running" && !narrow(w) ? " · free-running" : ""),
+      { class: "lbl", style: "fill:var(--ink)" });
+    markTip(P, bar, P.x(o.rmse), y, o.name, [{ c, v: f(o.rmse, 2) + " K", k: "drive10 held out" }, { v: o.note, k: "" }]);
+  });
+}, () => 0);
+
+function rmsePlot(id, key, label) {
+  mount(id, (host, w) => {
+    const Pd = CAL.per_drive;
+    const rowH = 26, lw = 78, h = Pd.length * rowH + 46;
+    const xmax = Math.ceil(Math.max(...Pd.flatMap(d => d[key])) + 0.5);
+    const P = plot(host, { w, h, x: { d: [0, xmax], label }, y: { d: [1, 0], none: true }, m: { l: lw, t: 6, r: 14 } });
+    Pd.forEach((d, i) => {
+      const y = P.m.t + (i + 0.5) * rowH;
+      const [b, fi, ho] = d[key];
+      T(P.svg, lw - 8, y + 4, d.drive, { "text-anchor": "end", style: "fill:var(--ink-2)" });
+      S("line", { x1: P.x(Math.min(b, fi, ho)), x2: P.x(Math.max(b, fi, ho)), y1: y, y2: y,
+                  style: "stroke:var(--rule);stroke-width:2" }, P.g);
+      S("circle", { cx: P.x(b), cy: y, r: 5.5, style: "fill:var(--pd-react);stroke:var(--surface);stroke-width:2" }, P.g);
+      S("circle", { cx: P.x(ho), cy: y, r: 6, style: "fill:none;stroke:var(--sim);stroke-width:2" }, P.g);
+      S("circle", { cx: P.x(fi), cy: y, r: 3.6, style: "fill:var(--sim)" }, P.g);
+      const hit = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
+      markTip(P, hit, P.x(Math.max(b, ho)), y, d.drive, [
+        { c: "var(--pd-react)", v: f(b, 2) + " K", k: "constants assumed until 28 Sep" },
+        { c: "var(--sim)", v: f(fi, 2) + " K", k: "derived, in the fit" },
+        { c: "var(--sim)", v: f(ho, 2) + " K", k: "derived, held out" }]);
+    });
+  }, () => 0);
+}
+rmsePlot("c-thfit-oil", "oil", "oil RMSE over the whole drive (K)");
+rmsePlot("c-thfit-ect", "ect", "coolant RMSE over the whole drive (K)");
+
+mount("c-boostB", (host, w, h) => {
+  const Bb = CAL.boost;
+  const P = plot(host, { w, h, x: { d: [1400, 4200], label: "engine speed (rpm)", fmt: v => (v / 1000) + "k",
+    ticks: [1500, 2000, 2500, 3000, 3500, 4000] }, y: { d: [100, 260], label: "manifold pressure (kPa)" }, m: { l: 50 } });
+  S("rect", { x: P.x(1600), y: P.m.t, width: P.x(2000) - P.x(1600), height: P.ph, style: "fill:var(--band)" }, P.g);
+  T(P.top, P.x(1800), P.m.t + 14, narrow(w) ? "too low" : "ceiling too low", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-3)" });
+  line(P, Bb.before.map(p => p[0]), Bb.before.map(p => p[1]), { c: "var(--pd-react)", w: 2, dash: "6 4" });
+  line(P, Bb.after.map(p => p[0]), Bb.after.map(p => p[1]), { c: "var(--sim)", w: 2.6 });
+  const pts = Bb.car.filter(p => p[0] >= 1400 && p[0] <= 4200).map(p => ({ x: p[0], y: p[1] }));
+  for (const p of pts) S("circle", { cx: P.x(p.x), cy: P.y(p.y), r: 3.6,
+                                     style: "fill:var(--car);stroke:var(--surface);stroke-width:1.2" }, P.g);
+  nearest(P, pts, p => ({ title: `${f(p.x, 0)} rpm`, rows: [
+    { c: "var(--car)", v: f(p.y, 1) + " kPa", k: "car, this reading" },
+    { c: "var(--sim)", v: f(interp(p.x, Bb.after), 1) + " kPa", k: "derived ceiling" },
+    { c: "var(--pd-react)", v: f(interp(p.x, Bb.before), 1) + " kPa", k: "8 Sep formula" }] }));
+});
+
+table("t-steps", ["step", "baseline", "reactive", "current-grade", "predictive", "preview vs grade", "peak °C"],
+  CAL.steps.map(p => [p.step.replace(/^\d\s+/, m => m.trim() + " · "), f(p.baseline, 1), f(p.reactive, 1), f(p.current_grade, 1),
+                      f(p.predictive, 1), f(p.preview_vs_grade, 1, true), String(p.peak_turb)]), [1, 2, 3, 4, 5, 6]);
+table("t-h1", ["cost model (τ " + f(GEN.h2[2].tau_s, 0) + " s)", "reactive %", "current-grade %", "predictive %", "vs reactive", "vs current-grade"],
+  GEN.h1.map(r => [r.cost, f(r.reactive, 1), f(r.grade, 1), f(r.predictive, 1),
+                   f(r.predictive - r.reactive, 1, true), f(r.predictive - r.grade, 1, true)]), [1, 2, 3, 4, 5]);
+table("t-h2b", ["C, J/K", "τ s", "H/τ", "limit K", "reactive %", "current-grade %", "predictive %", "vs current-grade"],
+  GEN.h2b.map(r => [String(r.c_turb), f(r.tau_s, 1), f(r.h_tau, 2), f(r.t_ref_k, 0),
+                    r.binds ? f(r.reactive, 1) : "–", r.binds ? f(r.grade, 1) : "–", r.binds ? f(r.predictive, 1) : "–",
+                    r.binds ? f(r.predictive - r.grade, 1, true) : "never binds"]), [1, 2, 3, 4, 5, 6, 7]);
+table("t-boostB", ["rpm", "readings", "car, highest kPa", "derived ceiling", "", "8 Sep formula", ""],
+  CAL.boost.bands.map(b => [`${b.lo}–${b.lo + 200}`, String(b.n), f(b.car, 1), f(b.now, 1), f(b.now_pct, 1, true) + " %",
+                            f(b.before, 1), f(b.before_pct, 1, true) + " %"]), [1, 2, 3, 4, 5, 6]);
 
 charts.forEach(c => ro.observe(c.host));
 })();

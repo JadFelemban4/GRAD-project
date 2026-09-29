@@ -1,6 +1,8 @@
 """make_page.py -- build the phone-readable results page from results/.
 
     python model_vs_data.py      # if the comparisons are stale
+    python compare_calibration.py   # the 28 Sep before/after
+    python generality_test.py    # the H/tau sweep -> results/generality.json
     python make_page.py          # writes results/page/index.html
 
 The page is results/page/template.html with two kinds of hole filled:
@@ -60,6 +62,8 @@ def phase_d():
                               peak=_r(max(tr[n]["t_turb"]), 1))
                          for n in names],
                  climb_from=float(t[int(np.argmax(np.array(tr[names[0]]["grade"]) > 0))]))
+    peaks = [max(tr[n]["t_turb"]) for n in names]
+    trace["spread"] = _r(max(peaks) - min(peaks), 1)
 
     sw = _load("sweep_speed_grade.json")
     speeds = sorted({r["v_kmh"] for r in sw})
@@ -99,8 +103,11 @@ def phase_d():
     # to the last printed digit.
     cut = {n.replace("runs/", ""): 100.0 * (1.0 - float(np.median(col(n, "damage"))) / base)
            for n in order}
+    fuel = {n.replace("runs/", ""): 100.0 * (float(np.median(col(n, "fuel"))) / base_f - 1.0)
+            for n in order}
     seeds = [dict(seed=s, s=_r(cut[f"sighted_seed{s}"], 2), b=_r(cut[f"blind_seed{s}"], 2),
-                  d=_r(cut[f"sighted_seed{s}"] - cut[f"blind_seed{s}"], 4))
+                  d=_r(cut[f"sighted_seed{s}"] - cut[f"blind_seed{s}"], 4),
+                  fs=_r(fuel[f"sighted_seed{s}"], 2), fb=_r(fuel[f"blind_seed{s}"], 2))
              for s in range(5)]
     dd = np.array([x["d"] for x in seeds])
     sd = float(dd.std(ddof=1))
@@ -114,7 +121,45 @@ def phase_d():
                     grade_cut=cut["current-grade"], predictive_cut=cut["predictive (hand)"],
                     sighted_median=_r(s_med, 1),
                     agent_over_grade=_r(s_med - cut["current-grade"], 1),
-                    within=int((np.abs(dd) <= 0.75).sum()))
+                    within=int((np.abs(dd) <= 0.75).sum()),
+                    pred_minus_grade=_r(cut["predictive (hand)"] - cut["current-grade"], 2))
+
+    # 29 September 2026: the sentences about which agents beat which policy were
+    # typed, and went false when the agents were re-scored on the derived plant
+    # ("all ten beat every hand-written policy" -- three do not). They are
+    # computed now, and the claims the text makes without a number are asserted.
+    hand = [n for n in order if kind(n) == "hand"]
+    agents = [n.replace("runs/", "") for n in order if kind(n) != "hand"]
+    best_hand = max(cut[n] for n in hand)
+    below = [a for a in agents if cut[a] <= best_hand]
+    assert all(cut[a] > cut["reactive"] for a in agents), "the text says every agent beats reactive"
+
+    def names_(xs):
+        xs = [shortish(x) for x in xs]
+        return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+    def shortish(n):
+        return n.replace("sighted_seed", "sighted ").replace("blind_seed", "blinded ")
+
+    def seeds_(xs):
+        return names_([f"__{x}" for x in xs]).replace("__", "")
+
+    agents_ = dict(n=len(agents), beat=len(agents) - len(below), n_below=len(below),
+                   below=names_(below) if below else "none",
+                   below_lo=_r(min(cut[a] for a in below), 1) if below else None,
+                   below_hi=_r(max(cut[a] for a in below), 1) if below else None,
+                   best_hand=_r(best_hand, 1))
+    low_fuel = [x["seed"] for x in seeds if x["fs"] < 0 and x["fb"] < 0]
+    lf_cuts = [c for x in seeds if x["seed"] in low_fuel for c in (x["s"], x["b"])]
+    more = [x for x in seeds if x["d"] > 0.75]
+    less = [x for x in seeds if x["d"] < -0.75]
+    fmt = lambda v: f"{v:.1f}"
+    trade = dict(low_fuel=seeds_(low_fuel), lf_lo=_r(min(lf_cuts), 1), lf_hi=_r(max(lf_cuts), 1),
+                 more=seeds_([x["seed"] for x in more]),
+                 more_cut=names_([f"__{fmt(x['d'])}" for x in more]).replace("__", ""),
+                 more_fuel=names_([f"__{fmt(x['fs'] - x['fb'])}" for x in more]).replace("__", ""),
+                 less=seeds_([x["seed"] for x in less]))
+    assert low_fuel and more, "the damage-against-fuel text needs both kinds of seed"
 
     curves = []
     for f in sorted(glob.glob(os.path.join(HERE, "runs", "*", "curve.csv"))):
@@ -151,7 +196,7 @@ def phase_d():
     elev = dict(climb_m=_r(climb_m, 0), isa_kpa=_r(isa, 0), p_model=c720["p_baro"])
 
     return dict(trace=trace, sweep=sweep, eval=ev, base_med=_r(base, 1), split=split_out, elev=elev,
-                base_fuel=_r(base_f, 0), ablation=ablation, curves=curves,
+                base_fuel=_r(base_f, 0), ablation=ablation, curves=curves, agents=agents_, trade=trade,
                 n_episodes=len(col("baseline ECU", "damage")))
 
 
@@ -192,9 +237,8 @@ def model_vs_car():
                         a_before=Sp["spark_a_before"], a_after=Sp["spark_a_after"],
                         n=len(Sp["points"]))
 
-    out["oil"] = {o["variant"].split()[0]: dict((k, _r(v, 1)) for k, v in o.items()
-                                                if k != "variant")
-                  for o in R.get("oil_sensitivity", [])}
+    # Row 8's miss split into the coolant's share and the oil node's own (29 Sep).
+    out["row8"] = {k: _r(v, 1) for k, v in R["row8"].items()}
 
     th = {}
     for key, name, step in (("drive10-20260918_233912.csv", "drive10", 3),
@@ -254,8 +298,10 @@ def model_vs_car():
                        scen_rpm=_r(D["scenario_rpm"], 0), scen_map=_r(D["scenario_map"], 0),
                        frac=_r(D["frac_logs_at_or_above_scenario"], 1), n=D["n"],
                        over120=_r(D["load_over_120_pct"], 1),
-                       load_med_lo=_r(min(D["load_median_by_drive"].values()), 0),
-                       load_med_hi=_r(max(D["load_median_by_drive"].values()), 0))
+                       # drives that did not log `Relative air filling` (drive B) carry
+                       # no median; they are left out rather than read as zero
+                       load_med_lo=_r(min(v for v in D["load_median_by_drive"].values() if v is not None), 0),
+                       load_med_hi=_r(max(v for v in D["load_median_by_drive"].values() if v is not None), 0))
 
     KS = R["knock_sampling"]
     out["knock_s"] = dict(fresh=min(KS["fresh_target"], KS["fresh_actual"]),
@@ -263,14 +309,6 @@ def model_vs_car():
                           every_s=_r(60.0 * KS["minutes"] / min(KS["fresh_target"], KS["fresh_actual"]), 0),
                           within1=_r(KS["paired_within_1s_pct"], 0),
                           late_pct=_r(100.0 - KS["paired_within_1s_pct"], 0))
-    OI = R["oil_identification"]
-    out["oil_id"] = {k: dict(frac_pct=_r(100 * OI[k]["frac"], 1), c_kj=_r(OI[k]["c_oil"] / 1000, 0),
-                             fit=_r(OI[k]["fit_rmse"], 2), held=_r(OI[k]["held_out_rmse"], 2),
-                             pull=_r(OI[k]["peaks"]["7475b5d7"]["model"], 0),
-                             pull_car=_r(OI[k]["peaks"]["7475b5d7"]["car"], 0),
-                             d10=_r(OI[k]["peaks"]["drive10"]["model"], 0),
-                             d10_car=_r(OI[k]["peaks"]["drive10"]["car"], 0))
-                     for k in ("shipped", "best")}
 
     out["lit"] = [dict(name=r["name"], value=_r(r["value"], 1), unit=r["unit"],
                        lo=r["lo"], hi=r["hi"], ok=r["ok"], basis=r["basis"])
@@ -306,6 +344,89 @@ def training_roads():
                 tol=T["tolerance"], step_s=5)
 
 
+def calibration():
+    """The 28 September derivation, before against after (compare_calibration.py)."""
+    C = _load("calibration_comparison.json")
+    import derived
+    out = {}
+    # the oil-node structures, each fitted with drive10 held out (a RECORD)
+    out["structures"] = [dict(name=o["structure"].replace("(chosen)", "").strip(),
+                              chosen="(chosen)" in o["structure"], rmse=o["drive10_rmse"],
+                              note=o["note"]) for o in C["oil_structures"]]
+    st = out["structures"]
+    out["struct_shipped"] = st[0]["rmse"]
+    out["struct_chosen"] = next(o["rmse"] for o in st if o["chosen"])
+    best = min(st, key=lambda o: o["rmse"])
+    out["struct_best"], out["struct_best_name"] = best["rmse"], best["name"]
+    out["old_frac_pct"] = _r(100 * C["thermal"]["before"]["frac_fuel_to_oil"], 1)
+    # every usable drive: RMSE with the old constants, fitted, and held out
+    out["per_drive"] = [dict(drive=d["drive"].split("-")[0],
+                             oil=[_r(d["shipped"]["oil"], 2), _r(d["fitted"]["oil"], 2), _r(d["held_out"]["oil"], 2)],
+                             ect=[_r(d["shipped"]["coolant"], 2), _r(d["fitted"]["coolant"], 2),
+                                  _r(d["held_out"]["coolant"], 2)])
+                        for d in C["thermal"]["per_drive"]]
+    tr = C["thermal"]["traces"]["7475b5d7-20260908_142743.csv"]
+    out["pull"] = dict(before=_r(np.nanmax(tr["before_oil"]), 1), after=_r(np.nanmax(tr["after_oil"]), 1),
+                       car=_r(np.nanmax(tr["car_oil"]), 1))
+    out["rows"] = [dict(name=r["name"], before=_r(r["before"], 1), after=_r(r["after"], 1),
+                        lo=r["lo"], hi=r["hi"], inside=r["inside"]) for r in C["rows"]]
+    out["t_stat_c"] = _r(derived.get("thermal", "t_stat_open") - 273.15, 1)
+    # the premise at each step of the change (a RECORD, measured once per step)
+    out["steps"] = C["premise_steps"]
+    out["steps_last_baseline"] = C["premise_steps"][-1]["baseline"]
+    out["steps_pv_lo"] = min(x["preview_vs_grade"] for x in C["premise_steps"])
+    out["steps_pv_hi"] = max(x["preview_vs_grade"] for x in C["premise_steps"])
+    # drive B against the ceiling, per 200 rpm band: the car's HIGHEST genuine
+    # full-throttle reading, because a ceiling is judged against the top of what
+    # the car did, not against a transient's spool-up
+    B = C["boost"]
+    r = np.array(B["car_wot"]["rpm"], float)
+    q = np.array(B["car_wot"]["map_kpa"], float)
+    mr = np.array([m["rpm"] for m in B["model_after"]], float)
+    ma = np.array([m["map_kpa"] for m in B["model_after"]], float)
+    mb = np.array([m["map_kpa"] for m in B["model_before"]], float)
+    bands = []
+    for lo in range(1400, 4400, 200):
+        k = (r >= lo) & (r < lo + 200)
+        if not k.any():
+            continue
+        top = float(q[k].max())
+        now, bef = float(np.interp(lo + 100, mr, ma)), float(np.interp(lo + 100, mr, mb))
+        bands.append(dict(lo=lo, n=int(k.sum()), car=_r(top, 1), now=_r(now, 1), before=_r(bef, 1),
+                          now_pct=_r(100 * (now / top - 1), 1), before_pct=_r(100 * (bef / top - 1), 1)))
+    low = [b for b in bands if 1600 <= b["lo"] < 2000]
+    high = [b for b in bands if b["lo"] >= 2000]
+    out["boost"] = dict(car=[[_r(a, 0), _r(b, 1)] for a, b in zip(r, q)],
+                        before=[[m["rpm"], _r(m["map_kpa"], 1)] for m in B["model_before"]],
+                        after=[[m["rpm"], _r(m["map_kpa"], 1)] for m in B["model_after"]],
+                        bands=bands, n=len(r), shift=_r(B["car_wot"].get("rpm_shift_median"), 0),
+                        low_worst=min(b["now_pct"] for b in low), low_best=max(b["now_pct"] for b in low),
+                        high_lo=min(b["now_pct"] for b in high), high_hi=max(b["now_pct"] for b in high),
+                        before_2000=min(b["before_pct"] for b in high if b["lo"] < 2400),
+                        top_readings=[B["bins"][-2]["readings"], B["bins"][-1]["readings"]])
+    return out
+
+
+def generality():
+    """The H/tau sweep, generality_test.py, with both comparators."""
+    path = os.path.join(RES, "generality.json")
+    if not os.path.exists(path):
+        raise SystemExit("results/generality.json missing -- run generality_test.py")
+    G = _load("generality.json")
+    rnd = lambda rows: [{k: (_r(v, 4) if isinstance(v, float) else v) for k, v in x.items()} for x in rows]
+    h2 = [x for x in G["h2"] if x["binds"]]
+    vs_g = [x["predictive"] - x["grade"] for x in h2]
+    vs_r = [x["predictive"] - x["reactive"] for x in h2]
+    h2b = [x for x in G["h2b"] if x["binds"]]
+    return dict(h1=rnd(G["h1"]), h2=rnd(G["h2"]), h2b=rnd(G["h2b"]), exh=_r(G["exh_gps"], 1),
+                horizon=G["horizon_s"], n_bind=len(h2), n_all=len(G["h2"]),
+                vs_grade_lo=_r(min(vs_g), 2), vs_grade_hi=_r(max(vs_g), 2),
+                vs_grade_absmax=_r(max(abs(v) for v in vs_g), 2),
+                vs_react_lo=_r(min(vs_r), 1), vs_react_hi=_r(max(vs_r), 1),
+                h2b_grade_max=_r(max(x["predictive"] - x["grade"] for x in h2b), 1),
+                h1_grade_max=_r(max(abs(x["predictive"] - x["grade"]) for x in G["h1"]), 2))
+
+
 def meta():
     def git(*a):
         try:
@@ -314,8 +435,11 @@ def meta():
             return "?"
     import pandas as pd
     M = pd.read_csv(os.path.join(HERE, "data", "manifest.csv"))
+    # 29 September 2026: the page said "@ c628564" while it was built from a
+    # working tree 58 files ahead of it. Say so when the tree is not clean.
+    dirty = git("status", "--porcelain", "--untracked-files=no") not in ("", "?")
     return dict(branch=git("branch", "--show-current"),
-                commit=git("rev-parse", "--short", "HEAD"),
+                commit=git("rev-parse", "--short", "HEAD") + (" + uncommitted changes" if dirty else ""),
                 built=date.today().isoformat(),
                 drives=len(M), minutes=_r(M.duration_min.sum(), 1))
 
@@ -348,6 +472,9 @@ def render(template, data):
         if f == ",":
             return f"{int(v):,}".replace(",", " ")    # thin-space thousands
         s = format(float(v), f)
+        if float(s) == 0.0:                          # no "−0.0"
+            s = s.lstrip("+-")
+            s = ("+" if f.startswith("+") else "") + s
         return s.replace("-", "−")                   # a real minus sign
     out = FMT.sub(sub, template)
     if missing:
@@ -356,7 +483,12 @@ def render(template, data):
 
 
 def main():
-    data = dict(meta=meta(), pd=phase_d(), mc=model_vs_car(), roads=training_roads())
+    data = dict(meta=meta(), pd=phase_d(), mc=model_vs_car(), roads=training_roads(),
+                cal=calibration(), gen=generality())
+    # the ceiling against drive B in the band the locked climb runs in
+    b = data["cal"]["boost"]
+    rpm = data["mc"]["duty"]["scen_rpm"]
+    b["at_climb"] = next(x["now_pct"] for x in b["bands"] if x["lo"] <= rpm < x["lo"] + 200)
     with open(os.path.join(PAGE, "template.html"), encoding="utf-8") as fh:
         tpl = fh.read()
     html = render(tpl, data)

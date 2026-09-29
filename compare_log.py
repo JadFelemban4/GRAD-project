@@ -218,7 +218,7 @@ def main():
         # WHY THIS IS EVIDENCE AND NOT NUMEROLOGY. The reference temperature is
         # the one thing we had to assume. Had BMW normalised to 20 C, the same
         # arithmetic would give 289.4 / T_in ~ 0.890 over these points, which
-        # the fit rules out at 0.837 -- a 6.3 % separation, several times the
+        # the fit rules out at 0.839 -- a 6.2 % separation, several times the
         # residual either constant leaves behind. The data picks the reference
         # state on its own; a fudge factor would have matched either. Report
         # that, not just the residual.

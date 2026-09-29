@@ -13,11 +13,14 @@ Nodes:
 PARAMETER PROVENANCE. Read REFERENCES.md section 4 before quoting any number
 below. Every field of ThermalParams carries one of three labels:
 
-  MEASURED        fitted to this car's own logs. Only ua_block_oil qualifies.
+  DERIVED         computed from the car's own logs by derive_params.py and read
+                  from data/derived_params.json (derived.py) -- NOT typed here.
+                  Recomputed whenever a drive arrives. Since 28 September 2026
+                  that is the whole block and oil nodes, and the radiator's
+                  overall size (not its split, below).
   ASSUMED         an engineering estimate nobody has verified. Declare it as
                   such in the thesis; never present it as a literature value.
-  UNIDENTIFIABLE  cannot be determined from any drive this car can produce
-                  (the radiator group). Left at reasoned values on purpose.
+  UNIDENTIFIABLE  cannot be determined from any drive this car can produce.
 
 Two kinds of number appear. C is a heat capacity: how much heat it takes to
 warm that lump by one degree, in J/K. UA is a heat-transfer rate: how fast
@@ -30,89 +33,119 @@ because the claim is about the ratio, not about one engine's heat capacity.
 """
 
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+import derived
+
+
+def _d(key):
+    """A DERIVED field: read from data/derived_params.json when a ThermalParams
+    is made, so a re-derivation takes effect without touching this file."""
+    return field(default_factory=lambda: float(derived.get("thermal", key)))
 
 
 @dataclass
 class ThermalParams:
-    c_block: float = 105_000.0     # ASSUMED   J/K, structure + coolant (metal mass x specific heat)
-    c_oil: float = 12_000.0        # ASSUMED   J/K, sump volume x oil properties
+    # ======================================================================
+    # THE BLOCK AND OIL NODES ARE DERIVED FROM THE CAR, 28 SEPTEMBER 2026.
+    # calibrate_thermal.py does the estimating, derive_params.py runs it on
+    # every drive that carries coolant, oil and ambient, and the values live in
+    # data/derived_params.json. Before and after, per drive and held out:
+    # results/thermal_calibration.json and results/figures/fig20.
+    #
+    # WHY. With the old ASSUMED values, replayed over the car's drives, the oil
+    # spiked to 140 C on hard pulls where the sump read 107 C (time constant
+    # 14 s against the car's 70-100 s), the coolant spiked on every pull, and
+    # at a four-minute idle on drive10 the block cooled 13 K where the car held
+    # 93.5 C. validate.py rows 8, 9 and 11 were outside the car's own bands.
+    #
+    # THE OIL NODE'S STRUCTURE CHANGED, because the data rejected it. It was
+    # heated by 5 % of FUEL energy and cooled through a constant 60 W/K. The car
+    # runs its oil 11-15 K ABOVE coolant at 3700-4800 rpm and 70-100 km/h on
+    # moderate fuel (drive10), and 2-3 K BELOW coolant cruising at 2600 rpm and
+    # 130-140 km/h (3aca2ec1): oil heat follows ENGINE SPEED (friction,
+    # windage, churning) and the sump is cooled by ROAD SPEED. Four structures
+    # were fitted with the block pinned to measured coolant and scored on
+    # drive10 held out; engine-speed heating with road-speed cooling won. An
+    # oil-SENSOR lag was also tried and the data did not support it.
+    #
+    # WHAT THE DATA PINS AND WHAT IT DOES NOT. Each node's equation divided by
+    # its capacity has only RATIOS. c_block is identified by the one warm-up in
+    # the logs (683640a0, radiator shut); left out, that drive is predicted
+    # ~14 K wrong, so c_block and frac_fuel_to_coolant are fixed as a ratio,
+    # not separately. c_oil is pinned only weakly. Quote time constants and
+    # heat splits; quote a capacity alone only with that caveat.
+    #
+    # NOT REPRODUCED, AND STATED. (1) On the two hottest-afternoon drives
+    # (41-45 C ambient) the car's heat-management valve runs the coolant ~9 K
+    # lower (82-84 C) after load; on drive10's sustained 4000+ rpm stretch it
+    # lets it rise to 97-99 C. A fixed stand-in setpoint does neither, and two
+    # regimes on a handful of drives are not enough to fit the valve's control
+    # law. (2) validate.py row 8 (drive10's hottest ten minutes of oil) stays
+    # below the car's band even with drive10 in the fit: the model's oil runs
+    # ~6 K over coolant at sustained 4300 rpm where the car's runs 12-15 K.
+    # Drive A of logs/DRIVE_PLAN.md is the data that would settle both.
+    # ======================================================================
+    c_block: float = _d("c_block")                 # DERIVED* J/K. *As a ratio with
+                                                    # frac_fuel_to_coolant; set by 683640a0's warm-up.
+                                                    # Was an ASSUMED 105 000
+    c_oil: float = _d("c_oil")                     # DERIVED* J/K. *Weakly; the time constant
+                                                    # is the robust figure. Was an ASSUMED 12 000
     c_turb: float = 6_000.0        # ASSUMED   J/K, manifold + turbine housing. LOAD-BEARING: sets
-                                   #           tau and so H/tau; swept 800-60 000 in generality_test.py
+                                   #           tau and so H/tau; swept 800-60 000 in generality_test.py.
+                                   #           No channel on this car measures the turbine.
 
-    # The oil cooler is an oil-to-coolant exchanger, so oil temperature is tied to
-    # coolant temperature, not to ambient. Heat leaving the oil enters the block.
-    #
-    # CALIBRATED 8 Sep 2026 against 80 minutes of logged oil and coolant across
-    # three drives. The old 450 W/K let the oil node float 80 K above the block
-    # under load, which this car never does.
-    #
-    #     measured oil minus coolant   median -1.2 K,  p95 +5.4 K,  max +12.0 K
-    #     (pooled over the three drives used for the fit; -1.0 K / +5.5 K over
-    #      all five drives that carry both channels)
-    #
-    # Sweeping the coupling against the logs:
-    #
-    #     W/K    oil RMSE   modelled p95 gap
-    #     450      4.67 K       8.6 K     too loose, gap too wide
-    #     800      4.08 K       5.6 K     <-- matches the measured gap
-    #    1000      3.96 K       4.7 K
-    #    6000      3.66 K       1.0 K     RMSE floor, but the gap collapses
-    #
-    # RMSE keeps falling all the way to 6000, but that is the wrong criterion on
-    # its own: it is dominated by long idle and cruise stretches where oil and
-    # coolant are equal whatever the coupling. The p95 gap is what carries the
-    # information about the exchanger, and it picks 800.
-    #
-    # WHAT THIS VALUE DOES NOT COVER. At 800 W/K a sustained hard climb settles
-    # the oil at 110 C, about 5 K under the 115-140 C band published for
-    # sustained load. That band describes a harder duty cycle than any drive
-    # recorded here -- the hottest oil in 168 minutes of logs is 107 C, on
-    # 7475b5d7, which also peaked at 111 C after the filter. The value is set by
-    # the measurement and the band is reported as a miss; do not raise the number
-    # to close a gap the data does not support.
-    #
-    # NOTE: `Oil temperature after filter` runs +6.8 K hotter than `Oil
-    # temperature` at oil above 100 C. If the published band refers to that
-    # hotter point, 110.2 + 6.8 = 117 C is inside it. Not applied; see
-    # logs/CHANNEL_CENSUS.md.
-    #
-    # Not cosmetic: oil is a protected component in the H/tau sweep, and this
-    # moves its time constant from 25 s to 16 s. Re-run generality_test.py.
-    ua_block_oil: float = 800.0    # MEASURED  W/K, oil cooler + conduction. The ONLY measured
-                                   #           parameter in this file; the fit is the table above
-    ua_block_amb: float = 45.0     # ASSUMED   W/K, convection off the block itself
-    ua_oil_amb: float = 60.0       # ASSUMED   W/K, sump surface only
+    # The oil cooler is an oil-to-coolant exchanger (BMW ST1505 section 4.1), so
+    # oil temperature is tied to coolant temperature. Heat leaving the oil enters
+    # the block. Until 28 September this was 800 W/K, chosen on 8 September by
+    # the p95 oil-minus-coolant gap with frac_fuel_to_oil ASSUMED at 5 %; with
+    # the oil's heat input and sump cooling estimated alongside it, the data
+    # gives a looser coupling.
+    ua_block_oil: float = _d("ua_block_oil")       # DERIVED  W/K
+    ua_block_amb: float = _d("ua_block_amb")       # DERIVED  W/K, block to ambient with the radiator
+                                                    # shut. Was an ASSUMED 45; the car holds its
+                                                    # coolant at idle on ~1.7 kW of fuel heat, so
+                                                    # standing losses are near zero
+    ua_oil_amb: float = _d("ua_oil_amb")           # DERIVED  W/K, sump to ambient at a standstill.
+                                                    # Was an ASSUMED 60
+    ua_oil_ram: float = _d("ua_oil_ram")           # DERIVED  W/K per (m/s) of road speed: the sump
+                                                    # sits in the airstream. NEW 28 September
     ua_turb_amb: float = 18.0      # ASSUMED   W/K
     ua_gas_turb: float = 0.90      # ASSUMED   W/K per (g/s) of exhaust flow
 
-    # NOT IDENTIFIABLE FROM THE LOGS, AND LEFT ALONE ON PURPOSE.
-    # The thermostat is regulating for 88-99 % of every drive recorded so far
-    # (coolant sits at 88-97 C throughout), so it absorbs any radiator sizing
-    # error and the data cannot tell a 300 W/K radiator from a 3000 W/K one.
-    # A least-squares fit does drive these to their lower bounds, but only by
-    # trading against frac_fuel_to_coolant, which is the same unidentifiability
-    # wearing a different hat. Fitting them anyway would be fitting noise.
-    #
-    # To identify them you need a drive that OVERWHELMS the cooling system --
-    # sustained climb in traffic, high ambient, fan at full duty, coolant pushed
-    # above the thermostat's fully-open point. That is a specific drive to plan,
-    # not something a normal log contains.
-    ua_rad_min: float = 300.0      # UNIDENTIFIABLE  W/K, fan off, stationary
-    ua_rad_ram: float = 60.0       # UNIDENTIFIABLE  W/K per (m/s) of vehicle speed
-    ua_rad_fan: float = 700.0      # UNIDENTIFIABLE  W/K, fan at 100 %
+    # THE RADIATOR: ITS SIZE IS DERIVED, ITS SPLIT IS NOT. No coolant-flow or fan
+    # signal exists on this car (every water-pump and fan-actual channel reads
+    # zero, logs/CHANNEL_CENSUS.md), so the three terms cannot be told apart.
+    # Their overall size can: wherever the coolant climbs above its regulated
+    # point, the radiator is open and its capacity sets the temperature.
+    # derive_params.py scales the reasoned 300 / 60 / 700 split by one factor
+    # the data sets (`_ua_rad_scale` in data/derived_params.json); the SPLIT
+    # between them stays UNIDENTIFIABLE.
+    ua_rad_min: float = _d("ua_rad_min")           # DERIVED size, UNIDENTIFIABLE split. W/K, fan off
+    ua_rad_ram: float = _d("ua_rad_ram")           # same. W/K per (m/s) of vehicle speed
+    ua_rad_fan: float = _d("ua_rad_fan")           # same. W/K, fan at 100 %
 
-    t_stat_open: float = 361.0     # ASSUMED   K, the model's stand-in thermostat cracks open (88 C).
-                                   #           MODELLING EQUIVALENT: the real B58 has no thermostat but a
-                                   #           DME-driven rotary valve ("heat management module", BMW
-                                   #           training document ST1505, 2015). 88 C is identified from
-                                   #           the logged coolant channel; never cite it to BMW.
-                                   #           REFERENCES.md section 2.
-    t_stat_span: float = 9.0       # ASSUMED   K, fully open 9 K later
+    # The stand-in thermostat. MODELLING EQUIVALENT: the real B58 has no
+    # thermostat but a DME-driven rotary valve ("heat management module", BMW
+    # training document ST1505, 2015). Both numbers come from the logged
+    # coolant; never cite them to BMW. REFERENCES.md section 2. Until 28 Sep
+    # they were 88 C and 9 K, which let the block drift 4-13 K below the car at
+    # light load and spike on every pull; the car's valve regulates tightly.
+    t_stat_open: float = _d("t_stat_open")         # DERIVED  K, cracks open
+    t_stat_span: float = _d("t_stat_span")         # DERIVED  K, fully open this much later
 
-    frac_fuel_to_coolant: float = 0.26   # ASSUMED   fraction of fuel energy reaching the coolant;
-                                         #           near the textbook energy split, not sourced to a page
-    frac_fuel_to_oil: float = 0.050      # ASSUMED   same, for the oil
+    frac_fuel_to_coolant: float = _d("frac_fuel_to_coolant")  # DERIVED* share of fuel energy to the
+                                                               # coolant, *as a ratio with c_block.
+                                                               # Was an ASSUMED 0.26
+    frac_fuel_to_oil: float = _d("frac_fuel_to_oil")          # DERIVED  same, for the oil. Was an
+                                                               # ASSUMED 0.050 -- the pull spikes
+    # The oil's main heat input: friction, windage and churning, which rise with
+    # ENGINE SPEED, not with fuel.  q = k_oil_rpm * (rpm / 3000) ** n_oil_rpm, W.
+    # NEW 28 September 2026. The exponent comes out near 4, steep, and it is what
+    # separates drive10's sustained 4000+ rpm (oil 11-15 K over coolant) from
+    # 2600 rpm cruising (oil below coolant).
+    k_oil_rpm: float = _d("k_oil_rpm")             # DERIVED  W at 3000 rpm
+    n_oil_rpm: float = _d("n_oil_rpm")             # DERIVED  exponent
 
 
 class ThermalNetwork:
@@ -132,7 +165,14 @@ class ThermalNetwork:
         return np.array([self.t_block, self.t_oil, self.t_turb])
 
     def step(self, dt, mdot_fuel_gps, mdot_exh_gps, egt_k,
-             t_amb, vehicle_mps, fan_duty, coolant_pump_duty=1.0):
+             t_amb, vehicle_mps, fan_duty, coolant_pump_duty=1.0, *, rpm):
+        """Advance the three nodes by dt seconds.
+
+        `rpm` is REQUIRED and keyword-only, on purpose: since 28 September the
+        oil's main heat input is engine speed (k_oil_rpm), and a default of zero
+        would let a caller that forgot it run the oil 10-15 K cold under load
+        without a word -- the same shape as mistake 1's silent default geometry.
+        """
         p = self.p
         q_fuel = mdot_fuel_gps * 1e-3 * 44.0e6                     # W
 
@@ -148,9 +188,11 @@ class ThermalNetwork:
         q_out_block = (ua_rad + p.ua_block_amb) * (self.t_block - t_amb) \
                       + p.ua_block_oil * (self.t_block - self.t_oil)
 
+        r = max(float(rpm), 0.0) / 3000.0 if rpm > 400.0 else 0.0
         q_in_oil = q_fuel * p.frac_fuel_to_oil \
+                   + p.k_oil_rpm * r ** p.n_oil_rpm \
                    + p.ua_block_oil * (self.t_block - self.t_oil)
-        q_out_oil = p.ua_oil_amb * (self.t_oil - t_amb)
+        q_out_oil = (p.ua_oil_amb + p.ua_oil_ram * vehicle_mps) * (self.t_oil - t_amb)
 
         ua_gt = p.ua_gas_turb * max(mdot_exh_gps, 0.5)
         q_in_turb = ua_gt * (egt_k - self.t_turb)
@@ -176,7 +218,7 @@ if __name__ == "__main__":
         egt = 1150.0 if climbing else 950.0
         spd = 22.0 if climbing else 33.0
         fan = 1.0 if tn.t_block > 373.0 else 0.0
-        tn.step(1.0, mf, mex, egt, 315.0, spd, fan)
+        tn.step(1.0, mf, mex, egt, 315.0, spd, fan, rpm=3000.0 if climbing else 2200.0)
         if i % 150 == 0:
             print(f"  {t:5.0f} |   {tn.t_block-273.15:6.1f}  | {tn.t_oil-273.15:5.1f} "
                   f"|  {tn.t_turb-273.15:6.1f}")

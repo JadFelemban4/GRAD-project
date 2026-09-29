@@ -34,9 +34,10 @@ class BaselineECU:
     CALIBRATED AGAINST THE REAL CAR — spark 7 Sep 2026, lambda 8 Sep 2026
     ---------------------------------------------------------------------
     The spark map comes from a 41.8-minute log (3aca2ec1-20260907_072817). The
-    lambda strategy comes from 295.0 minutes pooled across ten drives, six of
-    which carry usable samples, because the single-drive version of it was wrong
-    twice. Two things changed from the original guessed calibration, and both
+    lambda strategy's shape comes from the drives pooled by 8 September (eight),
+    because the single-drive version of it was wrong twice; since 28 September
+    its dwell thresholds are re-derived from every drive that logs lambda
+    (derive_params.py). Two things changed from the original guessed calibration, and both
     matter:
 
     1. ENRICHMENT IS THERMAL, NOT LOAD-BASED. Over the 1055 samples above
@@ -101,9 +102,26 @@ class BaselineECU:
     # gives 5.8. That is mistake 6: a part-load fit setting spark in boost. With
     # the 7 September slopes the line stays above the knock limit throughout
     # boost, so the climb is still knock-limited exactly as before.
-    SPARK_A = 13.33       # was 26.18 until 27 Sep; 34.0 before 7 Sep
-    SPARK_B = 0.00695     # was 0.0028   per rpm
-    SPARK_C = 0.1307      # was 0.155    per kPa above 40
+    #
+    # SPARK_A IS DERIVED, 28 September 2026 -- not typed. The offset is DEFINED
+    # as the value at which the commanded part-load spark has zero mean bias
+    # against the car's logged spark over data/master_points.csv, and
+    # derive_params.py solves for it whenever the data changes (13.33 was the
+    # 27 September solution of the same condition, to rounding). It lives in
+    # data/derived_params.json with its bias, RMS and point count.
+    #
+    # SPARK_B AND SPARK_C ARE STILL THE 7 SEPTEMBER FIT, and are typed, and that
+    # is a decision rather than an oversight: re-deriving the slopes from the
+    # current points gives a load slope that, extended into boost, falls below
+    # the knock limit (the paragraph above) -- a part-load fit setting spark in
+    # boost, mistake 6. No data on this car can separate them further: every
+    # steady point is 30-75 kPa. REFERENCES.md section 4b.
+    @property
+    def SPARK_A(self):
+        import derived
+        return float(derived.get("spark", "SPARK_A"))
+    SPARK_B = 0.00695     # FITTED 7 Sep, held (see above). was 0.0028   per rpm
+    SPARK_C = 0.1307      # FITTED 7 Sep, held (see above). was 0.155    per kPa above 40
     SPARK_MIN = -10.0     # was +2.0     measured minimum -9 deg at full load
     SPARK_MAX = 46.0
 
@@ -148,7 +166,7 @@ class BaselineECU:
                              self.SPARK_MIN, self.SPARK_MAX))
 
     # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on the dataset as it stood that
-    # morning, re-checked the same afternoon against the full 295.0 minutes over
+    # morning, re-checked the same afternoon against the full dataset of the time, over
     # eight drives. The structure held and no refit was needed; see base_lambda().
     # Load gates the timer; SPEED and DWELL set the depth.
     # 200.0 until 10 September. The gate is expressed in MANIFOLD PRESSURE, and
@@ -169,11 +187,26 @@ class BaselineECU:
     # quantity's definition changes. Gating on air mass flow, which is measured
     # and did not change, would have been immune. Consider that for v5.
     ENR_LOAD   = 180.0    # kPa; above this the high-load timer runs
-    ENR_RPM_LO = 3300.0   # rpm; below this the engine stays stoichiometric
-    ENR_RPM_HI = 5200.0   # rpm; full speed authority
-    ENR_DWELL_LO = 2.0    # s of sustained high load before enrichment starts
-    ENR_DWELL_HI = 9.0    # s at which it is fully applied
-    ENR_DEPTH  = 0.19     # lambda deficit at full authority -> floor 0.81
+    ENR_RPM_LO = 3300.0   # FITTED 8 Sep, held. rpm; below this the engine stays stoichiometric
+    ENR_RPM_HI = 5200.0   # FITTED 8 Sep, held. rpm; full speed authority
+    # ENR_DWELL_LO / HI ARE DERIVED (28 September 2026): solved by derive_params.py
+    # on the TIMESTAMP dwell axis from the car's genuine lambda readings, and read
+    # from data/derived_params.json. They were 2.0 / 9.0 s, fitted on 8 September on
+    # the row-count axis AUDIT.md H3 retired and never re-derived; on the right axis
+    # the car enriches much sooner into a pull. ENR_RPM_LO/HI and ENR_DEPTH are HELD
+    # at their 8 September values: a free fit of all five on ~100 readings puts
+    # RPM_LO on its grid edge and cannot reach the car's 0.79 floor (the attempt is
+    # recorded in the derived file as free_fit_all_five).
+    @property
+    def ENR_DWELL_LO(self):
+        import derived
+        return float(derived.get("enrichment", "ENR_DWELL_LO"))
+
+    @property
+    def ENR_DWELL_HI(self):
+        import derived
+        return float(derived.get("enrichment", "ENR_DWELL_HI"))
+    ENR_DEPTH  = 0.19     # FITTED 8 Sep, held. lambda deficit at full authority -> floor 0.81
 
     def base_lambda(self, rpm, map_kpa, dwell_s=0.0):
         """Enrichment is thermal protection, not a load table. MEASURED, THREE TIMES.
@@ -261,16 +294,15 @@ class BaselineECU:
         a proxy for it. State the proxy in Chapter 3.
 
         Model against the table, every sample scored at its own speed and dwell
-        (model_vs_data.py): within 0.02 of the car in seven cells, 0.033 lean at
-        3500-4500 rpm and long dwell, and 0.076 LEAN at 4500-7000 rpm and 4-8 s,
-        where the car reads 0.83 and the model a median 0.906. The car enriches
-        sooner into a pull than ENR_DWELL_LO/HI say -- and those two constants
-        were fitted on the retired row-count axis, which overstated dwell on the
-        fast-logging drives. They are NOT refitted here: that cell holds 142
-        forward-filled rows, a few dozen independent readings at most
-        (AUDIT.md H4), which is too thin to move a calibration on. It barely
+        (model_vs_data.py). Until 28 September the 4500-7000 rpm, 4-8 s cell was
+        0.076 LEAN (car 0.83, model 0.906): ENR_DWELL_LO/HI had been fitted on
+        the retired row-count axis, and the car enriches much sooner into a pull.
+        They are now DERIVED on the timestamp axis from ~100 genuine lambda
+        readings (derive_params.derive_enrichment; see the properties above) and
+        that cell is within 0.02. The worst cell is now 3500-4500 rpm at long
+        dwell, 0.033 lean -- the held speed band, not the dwell. It barely
         matters for Phase D: enrichment needs 180 kPa AND 3300 rpm, and the
-        locked climb runs 178 kPa at 2706 rpm, so it never enriches there.
+        locked climb runs 175-178 kPa at 2706 rpm, so it never enriches there.
         """
         if self.enrichment_map:            # v1, kept only for before/after work
             if map_kpa <= 120.0:
@@ -411,12 +443,20 @@ class Vehicle:
     #
     # THE LOCKED CLIMB IS UNCHANGED. 12 % at 130 km/h asks 340 Nm in 7th at
     # 2706 rpm, where the engine sustains 384; it was already in 7th.
-    DELIVERABLE_TORQUE = (
-        (1000, 237), (1200, 254), (1400, 271), (1600, 288), (1800, 306), (2000, 323),
-        (2200, 341), (2400, 358), (2600, 375), (2800, 391), (3000, 407), (3200, 422),
-        (3400, 436), (3600, 449), (3800, 458), (4000, 466), (4200, 470), (4400, 472),
-        (4600, 470), (4800, 467), (5000, 459), (5200, 447), (5400, 446), (5600, 444),
-        (5800, 442), (6000, 440), (6200, 438), (6400, 435), (6600, 434))
+    #
+    # THE TABLE IS DERIVED, 28 September 2026 -- no longer typed. It is a
+    # property of the plant (the boost ceiling and the spark map), and those are
+    # now derived from the logs, so derive_params.py re-measures this table
+    # through measure_deliverable_torque() every time they move and stores it in
+    # data/derived_params.json. test_reward.py still checks the stored table
+    # against a fresh measurement.
+    @property
+    def DELIVERABLE_TORQUE(self):
+        import derived
+        t = derived.get("deliverable_torque")
+        if t is None:
+            raise RuntimeError("no deliverable-torque table yet; run python derive_params.py")
+        return tuple((int(a), float(b)) for a, b in t)
 
     def shift_ceiling_nm(self, rpm):
         """Most torque this gear may be asked for before the box hands one back."""
@@ -507,9 +547,13 @@ class Vehicle:
             g -= 1
         return g
 
-    def demand(self, v_mps, accel, grade):
+    def demand(self, v_mps, accel, grade, *, rho):
+        """Tractive force -> engine torque and speed. `rho` is the air density,
+        kg/m^3, REQUIRED: it was a typed 1.2 (air at about 21 C) until
+        28 September while the locked scenario runs at 42 C, where it is 1.12 --
+        drag 7 % too high. The environment computes it from its own cycle."""
         f = (self.mass * accel
-             + 0.5 * 1.2 * self.cd_a * v_mps ** 2
+             + 0.5 * rho * self.cd_a * v_mps ** 2
              + self.crr * self.mass * 9.81 * np.cos(np.arctan(grade))
              + self.mass * 9.81 * np.sin(np.arctan(grade)))
         g = self.gear_for(v_mps, force_n=f)
@@ -648,13 +692,15 @@ class SupervisoryTunerEnv(gym.Env):
                     mdot_air=r.mdot_air_gps,      # for the compressor ceiling, M1
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
 
-    # Hard ceiling on manifold pressure, MEASURED not guessed. Across 74 013
-    # quasi-steady samples from eight drives -- with the saturated MAF samples
-    # excluded -- the highest pressure ratio the car reached is 2.52, which
-    # against a 99.3 kPa inlet is 250 kPa absolute. This replaces the 240 that
-    # used to sit here as a round number. See plant.boost_ceiling_kpa for the
-    # flow-dependent version of the same envelope.
-    MAP_CEIL_KPA = 250.0
+    # Hard ceiling on manifold pressure, DERIVED: the highest pressure ratio the
+    # car reached in any quasi-steady, MAF-unpinned sample (the boost ceiling's
+    # cap in data/derived_params.json) against the 99.3 kPa inlet that
+    # plant.boost_ceiling_kpa assumes. It was a typed 250.0 (PR 2.52), which
+    # replaced a round 240 on 8 September; it now moves with the data.
+    @property
+    def MAP_CEIL_KPA(self):
+        from plant import boost_ceiling_constants
+        return 99.3 * float(boost_ceiling_constants()["pr_cap"])
 
     def _map_for(self, torque_req, rpm, boost_trim):
         """Open-loop feed-forward guess at the manifold pressure for a torque."""
@@ -687,8 +733,14 @@ class SupervisoryTunerEnv(gym.Env):
             # all -- only by check_map.py. It is applied here now, so a heavier
             # scenario or a trained agent with +15 boost trim meets the ceiling
             # the compressor actually has instead of an undocumented 215 kPa.
+            #
+            # 28 September 2026: the ceiling was evaluated at `iat_k`, the
+            # CHARGE temperature (~330 K on the climb), where the compressor
+            # INLET is ambient -- boost_ceiling_kpa's own docstring warns that
+            # the downstream temperature inflates corrected flow and raises the
+            # ceiling. It is the cycle's ambient now.
             ceil = min(self.MAP_CEIL_KPA,
-                       boost_ceiling_kpa(out["mdot_air"], iat_k) + boost_trim)
+                       boost_ceiling_kpa(out["mdot_air"], self.cycle["t_amb"]) + boost_trim)
             mp = float(np.clip(mp + 0.35 * err + state["i"] * 0.02, 25.0, ceil))
         state["map"] = mp
         return out, mp
@@ -787,7 +839,9 @@ class SupervisoryTunerEnv(gym.Env):
         nxt = float(c["v_mps"][min(self.k + 1, n - 1)])
         accel = (nxt - self.v) / self.dt
         grade = float(c["grade"][self.k])
-        self.torque_req, self.rpm = self.veh.demand(self.v, accel, grade)
+        # Air density from the cycle's own ambient and pressure (ideal gas).
+        rho = c.get("p_baro", 101.3) * 1000.0 / (287.0 * c["t_amb"])
+        self.torque_req, self.rpm = self.veh.demand(self.v, accel, grade, rho=rho)
         self.aggression = float(np.clip(abs(accel) / 2.5, 0.0, 1.0))
         self.iat_k = charge_temperature(c["t_amb"], self.thermal.t_block)
         # AUDIT.md L14: the baseline's charge temperature used to be the AGENT's
@@ -818,8 +872,13 @@ class SupervisoryTunerEnv(gym.Env):
                                          0.0, self.pi_base)
         self.map_b_prev = map_b
         self.knock_flag_base = base["ki"] > 1.0
-        self.thermal_base.step(self.dt, base["mdot_fuel"], base["mdot_fuel"] * 15.0,
-                               base["egt_k"], c["t_amb"], self.v, fan_b)
+        # EXHAUST MASS FLOW IS AIR + FUEL (28 September 2026). It was fuel x 15,
+        # a round stand-in for the stoichiometric 15.7 that also ignored lambda:
+        # 5 % low at lambda 1, 16 % high at lambda 0.81 (AUDIT.md M2). The plant
+        # computes the air mass the engine breathed; the turbine's gas-side heat
+        # transfer scales with the sum.
+        self.thermal_base.step(self.dt, base["mdot_fuel"], base["mdot_air"] + base["mdot_fuel"],
+                               base["egt_k"], c["t_amb"], self.v, fan_b, rpm=self.rpm)
 
         # --- agent ---------------------------------------------------------
         # Same bounds as the baseline. If the agent is floored at 0 while the
@@ -832,8 +891,8 @@ class SupervisoryTunerEnv(gym.Env):
                                                self.thermal.t_block, self.spark, self.lam,
                                                act[2], self.pi_agent)
         self.tps = float(np.clip(self.map_kpa / self.MAP_CEIL_KPA, 0.0, 1.0))
-        self.thermal.step(self.dt, out["mdot_fuel"], out["mdot_fuel"] * 15.0,
-                          out["egt_k"], c["t_amb"], self.v, act[3], act[4])
+        self.thermal.step(self.dt, out["mdot_fuel"], out["mdot_air"] + out["mdot_fuel"],
+                          out["egt_k"], c["t_amb"], self.v, act[3], act[4], rpm=self.rpm)
 
         # --- damage rates ---------------------------------------------------
         d_a = damage_rate(self.thermal.t_turb, self.thermal.t_oil, out["ki"])
@@ -881,6 +940,8 @@ class SupervisoryTunerEnv(gym.Env):
                     egt_c=out["egt_k"] - 273.15, ki=out["ki"],
                     spark=self.spark, lam=self.lam,
                     t_turb=self.thermal.t_turb, t_oil=self.thermal.t_oil,
+                    t_block=self.thermal.t_block,
+                    mdot_fuel=out["mdot_fuel"], mdot_exh=out["mdot_air"] + out["mdot_fuel"],
                     r_fuel=r_fuel, r_life=r_life, r_resp=r_resp)
         if truncated or terminated:
             info["episode_summary"] = dict(e)
@@ -896,7 +957,7 @@ def measure_deliverable_torque(rpms=None, t_amb=315.0, t_block=365.0, settle=30)
     the worst torque over the second half of the settled window.
     """
     rpms = list(rpms) if rpms is not None else list(range(1000, 6601, 200))
-    env = SupervisoryTunerEnv(make_grade_climb(duration=60.0, dt=1.0), dt=1.0, seed=0)
+    env = SupervisoryTunerEnv(make_grade_climb(duration=60.0, dt=1.0, t_amb=t_amb), dt=1.0, seed=0)
     env.reset(seed=0)
     iat = charge_temperature(t_amb, t_block)
     out = []

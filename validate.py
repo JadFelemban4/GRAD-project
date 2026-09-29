@@ -153,7 +153,7 @@ def _step_response(key, horizon_s, dt=0.25):
         # 25 m/s and full fan: climbing, not cruising. Ram air scales with road
         # speed, so a climb rejects less heat than a motorway cruise at the same
         # power, which is exactly why sustained climbs are the limiting case.
-        tn.step(dt, mf, me, egt_k, t_amb=315.0, vehicle_mps=25.0, fan_duty=1.0)
+        tn.step(dt, mf, me, egt_k, t_amb=315.0, vehicle_mps=25.0, fan_duty=1.0, rpm=3000.0)
         x.append(tn.state()[IDX[key]] - 273.15)
     x = np.array(x)
     t = np.arange(len(x)) * dt
@@ -213,6 +213,11 @@ def check_against_car(block_climb_c):
     setpoint. Against the old bands, row 11 passed on a 1-600 s range almost
     nothing could fail. The replays are fed measured fuel and take seconds;
     see car_thermal.py.
+
+    28 September, evening: back to 8 of 11. With the block and oil nodes
+    derived from the logs (derive_params.py) both coolant rows are inside; both
+    oil rows still miss. Row 8's miss is split into the coolant's share and the
+    oil node's own by model_vs_data.row8_split.
     """
     import car_thermal as CT
 

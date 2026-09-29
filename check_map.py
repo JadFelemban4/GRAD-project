@@ -27,7 +27,7 @@ speed's ceiling are marked `--` rather than filled with numbers from an
 operating point this engine cannot occupy.
 """
 import numpy as np
-from plant import Operating, run_cycle, b58, boost_ceiling_kpa
+from plant import Operating, run_cycle, b58, boost_ceiling_kpa, EXH_BACKPRESSURE_RATIO
 
 GEO = b58()          # the one engine; never rely on run_cycle's default
 
@@ -35,6 +35,10 @@ RPMS = [1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000]
 MAPS = [40, 60, 80, 100, 140, 180, 220]
 
 KI_LIMIT = 1.0
+
+# Backpressure: plant.EXH_BACKPRESSURE_RATIO, imported. AUDIT.md M2 unified it at
+# 1.15 on 16 September in the environment and predict(); this file kept a typed
+# 1.12 until 28 September.
 
 
 def reachable(rpm, map_kpa, lam=1.0):
@@ -61,7 +65,7 @@ def sweep(rpm, map_kpa, lam, iat_k=298.0):
     knocked = False
     for sp in np.arange(0.0, 46.0, 1.0):
         r = run_cycle(Operating(rpm=rpm, map_kpa=map_kpa, spark_btdc=float(sp), lam=lam,
-                                iat_k=iat_k, p_exh_kpa=max(105.0, map_kpa * 1.12)),
+                                iat_k=iat_k, p_exh_kpa=max(105.0, map_kpa * EXH_BACKPRESSURE_RATIO)),
                       geo=GEO)
         if r.torque_nm > best_t:
             best_t, mbt = r.torque_nm, sp
@@ -132,7 +136,7 @@ for rpm, m in [(2000, 60), (2500, 100), (3000, 180), (5000, 220)]:
         continue
     sp = min(mbt, klsa)
     r = run_cycle(Operating(rpm=rpm, map_kpa=m, spark_btdc=float(sp), lam=lam,
-                            p_exh_kpa=max(105.0, m * 1.12)), geo=GEO)
+                            p_exh_kpa=max(105.0, m * EXH_BACKPRESSURE_RATIO)), geo=GEO)
     lim = "knock" if klsa < mbt else "MBT"
     print(f"  {rpm:5d} rpm {m:4d} kPa  spark {sp:4.0f} ({lim}-limited)  "
           f"T {r.torque_nm:6.1f} Nm  BSFC {r.bsfc_gpkwh:6.1f}  EGT {r.egt_c:4.0f} C  "

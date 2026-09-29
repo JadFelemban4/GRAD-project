@@ -19,6 +19,9 @@ Note: the hand-written policies are rule-based on measured temperature, so their
 trajectories do not depend on the damage function. That lets us record each
 trajectory once and re-score it under different cost models.
 """
+import json
+import os
+
 import numpy as np
 from engine_env import (SupervisoryTunerEnv, make_grade_climb, ACT_LO, ACT_HI,
                         TURB_PROTECT_K, neutral_action)
@@ -58,6 +61,21 @@ def p_reactive(env):
     return _protect(float(np.clip(over / 25.0, 0.0, 1.0)))
 
 
+def p_grade_now(env):
+    """The HONEST comparator (AUDIT.md C3), added here 28 September 2026: acts
+    on the grade the car is on NOW, no preview, same depth as p_predictive.
+    Until then this file measured "preview" as predictive minus REACTIVE, which
+    check_premise.py showed is mostly protection depth: a policy that knows only
+    the current grade lands on the predictive one. The tables below now report
+    preview over current-grade beside preview over reactive; only the first is
+    a preview measurement."""
+    g = float(env.cycle["grade"][min(env.k, len(env.cycle["grade"]) - 1)])
+    over = env.thermal.t_turb - TURB_PROTECT_K
+    k_now = float(np.clip(over / 25.0, 0.0, 1.0))
+    k_grade = float(np.clip(g / 0.08, 0.0, 1.0)) if g > 0.02 else 0.0
+    return _protect(max(k_now, 0.55 * k_grade))
+
+
 def p_predictive(env):
     ahead = max(env._preview()[2], env._preview()[3])
     over = env.thermal.t_turb - TURB_PROTECT_K
@@ -75,12 +93,15 @@ def _exhaust_of_climb(seed=0):
     env = SupervisoryTunerEnv(make_grade_climb(duration=720.0, dt=2.0), dt=2.0,
                               seed=seed, use_preview=True)
     env.reset(seed=seed)
+    # 28 September 2026: this read info.get("mdot"), a key the environment never
+    # emitted, so `vals` stayed empty and main() silently fell back to the very
+    # 112.5 g/s AUDIT.md M12 asked to replace -- the fix had never worked. The
+    # environment reports its exhaust flow (air + fuel) as `mdot_exh` now, and a
+    # missing key is an error rather than a fallback.
     vals = []
     while True:
         _, _, term, trunc, info = env.step(NEUTRAL)
-        f = info.get("mdot")
-        if f:
-            vals.append(f * 15.0)
+        vals.append(info["mdot_exh"])
         if term or trunc:
             break
     vals = sorted(vals)
@@ -96,11 +117,10 @@ def trajectory(policy, c_turb=6000.0, seed=0):
     env.reset(seed=seed)
     env.thermal.p = tp
     env.thermal_base.p = tp
-    temps, fuel = [], 0.0
+    temps = []
     while True:
         _, _, term, trunc, info = env.step(policy(env))
         temps.append(info["t_turb"])
-        fuel += info.get("mdot", 0.0)
         if term or trunc:
             break
     s = info["episode_summary"]
@@ -134,23 +154,32 @@ def main():
 
     tr_base, f_base = trajectory(p_neutral)
     tr_reac, f_reac = trajectory(p_reactive)
+    tr_grade, f_grade = trajectory(p_grade_now)
     tr_pred, f_pred = trajectory(p_predictive)
+    # 29 September 2026: the tables are also written to results/generality.json,
+    # so the results page quotes the run instead of a number typed beside it.
+    out = dict(horizon_s=30.0, t_ref_k=float(TURB_PROTECT_K), h1=[], h2=[], h2b=[])
 
-    print(f"{'cost model':<22}{'reactive':>12}{'predictive':>13}{'preview edge':>15}")
+    print(f"{'cost model':<18}{'reactive':>10}{'cur-grade':>11}{'predictive':>12}"
+          f"{'vs reactive':>13}{'vs cur-grade':>14}")
     print("-" * 78)
     rows = []
     for p, name in [(1.0, "linear  (p=1)"), (1.5, "p = 1.5"), (2.0, "quadratic (p=2)"),
                     (3.0, "p = 3"), (4.0, "p = 4"), ("exp", "exponential")]:
         d_b = damage(tr_base, p)
         d_r = damage(tr_reac, p)
+        d_g = damage(tr_grade, p)
         d_p = damage(tr_pred, p)
         if d_b <= 1e-9:
             continue
         red_r = 100.0 * (d_b - d_r) / d_b
+        red_g = 100.0 * (d_b - d_g) / d_b
         red_p = 100.0 * (d_b - d_p) / d_b
         edge = red_p - red_r
         rows.append((name, red_r, red_p, edge))
-        print(f"{name:<22}{red_r:>11.1f}%{red_p:>12.1f}%{edge:>14.1f} pts")
+        out["h1"].append(dict(cost=name, reactive=red_r, grade=red_g, predictive=red_p))
+        print(f"{name:<18}{red_r:>9.1f}%{red_g:>10.1f}%{red_p:>11.1f}%{edge:>11.1f} pts"
+              f"{red_p - red_g:>11.1f} pts")
 
     print("-" * 78)
     if not rows:
@@ -172,13 +201,15 @@ def main():
   The figures this file used to print -- 16.5 / 18.0 / 26.0 points -- were
   measured against a baseline whose cooling was switched off (AUDIT.md C1) and
   on a tau axis that assumed 112.5 g/s of exhaust (M12). They are void.""")
+        _write(out)
         return
 
     # AUDIT.md nitpick: this said "grew 0.7x" for a SHRINK. Say which way.
     _r = rows[-1][3] / max(rows[0][3], 1e-9)
     _verb = "grew" if _r >= 1.0 else "SHRANK"
-    print(f"preview edge {_verb} {_r:.2f}x from linear to exponential cost "
-          f"({rows[0][3]:+.1f} -> {rows[-1][3]:+.1f} pts)")
+    print(f"preview-over-REACTIVE edge {_verb} {_r:.2f}x from linear to exponential cost "
+          f"({rows[0][3]:+.1f} -> {rows[-1][3]:+.1f} pts). Read the current-grade column: "
+          "that is the preview measurement (AUDIT.md C3).")
 
     # --------------------------------------------------------------- H2: timescale
     print()
@@ -194,28 +225,32 @@ def main():
     # baseline trajectory instead, so the axis of this experiment is the episode's
     # own physics rather than a constant typed in beside it.
     _P = ThermalParams()
-    EXH_GPS = float(np.mean(_EXH_SAMPLES)) if (_EXH_SAMPLES := _exhaust_of_climb()) else 112.5
+    EXH_GPS = float(np.mean(_exhaust_of_climb()))
     UA = _P.ua_gas_turb * EXH_GPS + _P.ua_turb_amb
+    out["exh_gps"] = EXH_GPS
     print(f"tau axis uses the climb's own mean exhaust flow: {EXH_GPS:.1f} g/s "
           f"(was an assumed 112.5)")
-    print(f"{'C_turb [J/K]':<15}{'tau [s]':>10}{'H/tau':>9}{'reactive':>12}"
-          f"{'predictive':>13}{'preview edge':>15}")
-    print("-" * 78)
+    print(f"{'C_turb [J/K]':<13}{'tau [s]':>8}{'H/tau':>7}{'reactive':>10}{'cur-grade':>11}"
+          f"{'predictive':>12}{'vs reactive':>13}{'vs cur-grade':>14}")
+    print("-" * 88)
     for c in [800.0, 2500.0, 6000.0, 18000.0, 60000.0]:
         tau = c / UA
         tb, _ = trajectory(p_neutral, c_turb=c)
         tr, _ = trajectory(p_reactive, c_turb=c)
+        tg, _ = trajectory(p_grade_now, c_turb=c)
         tp_, _ = trajectory(p_predictive, c_turb=c)
-        d_b, d_r, d_p = damage(tb, "exp"), damage(tr, "exp"), damage(tp_, "exp")
+        d_b, d_r, d_g, d_p = (damage(x, "exp") for x in (tb, tr, tg, tp_))
+        row = dict(c_turb=c, tau_s=tau, h_tau=30.0 / tau, binds=bool(d_b > 1e-6))
+        out["h2"].append(row)
         if d_b <= 1e-6:
-            print(f"{c:<15.0f}{tau:>10.1f}{30.0/tau:>9.2f}"
+            print(f"{c:<13.0f}{tau:>8.1f}{30.0/tau:>7.2f}"
                   f"{'  (never exceeds limit)':>50}")
             continue
-        red_r = 100.0 * (d_b - d_r) / d_b
-        red_p = 100.0 * (d_b - d_p) / d_b
-        print(f"{c:<15.0f}{tau:>10.1f}{30.0/tau:>9.2f}{red_r:>11.1f}%"
-              f"{red_p:>12.1f}%{red_p - red_r:>14.1f} pts")
-    print("-" * 78)
+        red_r, red_g, red_p = (100.0 * (d_b - x) / d_b for x in (d_r, d_g, d_p))
+        row.update(reactive=red_r, grade=red_g, predictive=red_p)
+        print(f"{c:<13.0f}{tau:>8.1f}{30.0/tau:>7.2f}{red_r:>9.1f}%{red_g:>10.1f}%"
+              f"{red_p:>11.1f}%{red_p - red_r:>10.1f} pts{red_p - red_g:>10.1f} pts")
+    print("-" * 88)
 
     # ------------------------------------------ H2b: threshold scaled with the mass
     print()
@@ -234,28 +269,37 @@ def main():
 
     This is the protocol Phase F should use. State the choice in the methods.
     """)
-    print(f"{'C_turb [J/K]':<15}{'tau [s]':>10}{'H/tau':>9}{'t_ref [K]':>11}"
-          f"{'reactive':>11}{'predictive':>12}{'preview edge':>15}")
-    print("-" * 83)
+    print(f"{'C_turb [J/K]':<13}{'tau [s]':>8}{'H/tau':>7}{'t_ref [K]':>10}{'reactive':>10}"
+          f"{'cur-grade':>11}{'predictive':>12}{'vs reactive':>13}{'vs cur-grade':>14}")
+    print("-" * 98)
     for c in [800.0, 2500.0, 6000.0, 18000.0, 60000.0]:
         tau = c / UA
         tb, _ = trajectory(p_neutral, c_turb=c)
         tr, _ = trajectory(p_reactive, c_turb=c)
+        tg, _ = trajectory(p_grade_now, c_turb=c)
         tp_, _ = trajectory(p_predictive, c_turb=c)
         t_ref = float(np.percentile(tb, 80.0))
-        d_b = damage(tb, "exp", t_ref=t_ref)
-        d_r = damage(tr, "exp", t_ref=t_ref)
-        d_p = damage(tp_, "exp", t_ref=t_ref)
+        d_b, d_r, d_g, d_p = (damage(x, "exp", t_ref=t_ref) for x in (tb, tr, tg, tp_))
+        row = dict(c_turb=c, tau_s=tau, h_tau=30.0 / tau, t_ref_k=t_ref, binds=bool(d_b > 1e-9))
+        out["h2b"].append(row)
         if d_b <= 1e-9:
-            print(f"{c:<15.0f}{tau:>10.1f}{30.0/tau:>9.2f}{t_ref:>11.0f}"
+            print(f"{c:<13.0f}{tau:>8.1f}{30.0/tau:>7.2f}{t_ref:>10.0f}"
                   f"{'  (degenerate)':>38}")
             continue
-        red_r = 100.0 * (d_b - d_r) / d_b
-        red_p = 100.0 * (d_b - d_p) / d_b
-        print(f"{c:<15.0f}{tau:>10.1f}{30.0/tau:>9.2f}{t_ref:>11.0f}"
-              f"{red_r:>10.1f}%{red_p:>11.1f}%{red_p - red_r:>14.1f} pts")
-    print("-" * 83)
+        red_r, red_g, red_p = (100.0 * (d_b - x) / d_b for x in (d_r, d_g, d_p))
+        row.update(reactive=red_r, grade=red_g, predictive=red_p)
+        print(f"{c:<13.0f}{tau:>8.1f}{30.0/tau:>7.2f}{t_ref:>10.0f}{red_r:>9.1f}%{red_g:>10.1f}%"
+              f"{red_p:>11.1f}%{red_p - red_r:>10.1f} pts{red_p - red_g:>10.1f} pts")
+    print("-" * 98)
     print("Every row now yields a data point. Use this table for Figure 5.")
+    _write(out)
+
+
+def _write(out):
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "generality.json")
+    with open(path, "w") as fh:
+        json.dump(out, fh, indent=1)
+    print(f"wrote {os.path.relpath(path)}")
 
 
 

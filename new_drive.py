@@ -52,9 +52,14 @@ def fresh(series: pd.Series) -> int:
 
 
 def col(df, *names):
+    """A channel by name, CASE-INSENSITIVELY. The 28 September export writes
+    "Engine Speed" where every earlier drive writes "Engine speed"; matched
+    exactly, this script reported that drive as carrying no channels at all."""
+    low = {c.strip().lower(): c for c in df.columns}
     for n in names:
-        if n in df.columns:
-            return pd.to_numeric(df[n], errors="coerce")
+        c = low.get(n.lower())
+        if c is not None:
+            return pd.to_numeric(df[c], errors="coerce")
     return None
 
 
@@ -220,10 +225,13 @@ def main():
         print("  This drive changes nothing the project is short of. Adding it is")
         print("  harmless -- more minutes in the manifest -- but do not expect a")
         print("  figure to move, and do not report it as new evidence.")
+    # Until 28 September this closed by saying the standard scenario did not
+    # bind the protection trigger (AUDIT.md C2). It has bound since the ZF 8HP51
+    # and the 130 km/h lock (19 September); the sentence was stale.
     print("""
-  Whatever it does, remember what a new drive CANNOT fix: the standard scenario
-  not binding the protection trigger (AUDIT.md C2) is a property of the
-  SIMULATOR, not of the data. No log will restore the preview result.""")
+  Adding it re-derives every constant the data sets (build_dataset.py runs
+  derive_params.py), which changes the simulator -- and a plant change after
+  the Phase D retrain means retraining. Decide the order before adding it.""")
 
 
 if __name__ == "__main__":

@@ -55,7 +55,7 @@ import sys
 import numpy as np
 
 import check_premise as C
-from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K
+from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K, damage_rate
 
 DT = 1.0
 DURATION = 720.0
@@ -94,15 +94,20 @@ def run_episode(policy, seed, weights, use_preview=True):
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)   # override the fresh draw
     obs = env._obs()
-    ret, peak = 0.0, 0.0
+    ret, peak, thermal = 0.0, 0.0, 0.0
     while True:
         obs, r, term, trunc, info = env.step(policy(env, obs))
         ret += r
         peak = max(peak, info["t_turb"])
+        # DAMAGE TWO WAYS (handoff step 4, 28 September): the same damage model
+        # without its knock term, because the knock model is untested against
+        # this car. A REPORTING column only -- the episode, the policy and the
+        # reward are untouched.
+        thermal += damage_rate(info["t_turb"], info["t_oil"]) * env.dt
         if term or trunc:
             break
     s = info["episode_summary"]
-    return dict(ret=ret, damage=s["damage"], fuel=s["fuel"],
+    return dict(ret=ret, damage=s["damage"], damage_thermal=thermal, fuel=s["fuel"],
                 torque_viol=s["torque_viol"], peak_turb=peak - 273.15,
                 knock=s["knock_events"])
 
@@ -152,8 +157,8 @@ def main():
           f"{DURATION:.0f} s, dt {DT}")
     print(f"trigger:  {TURB_PROTECT_K - 273.15:.0f} C\n")
     print(f"{'policy':<28}{'damage med':>12}{'IQR':>9}{'worst':>9}"
-          f"{'fuel med':>10}{'peak C':>9}")
-    print("-" * 77)
+          f"{'thermal med':>12}{'fuel med':>10}{'peak C':>9}")
+    print("-" * 89)
 
     out = {}
     for name, pol, prev in policies:
@@ -161,10 +166,11 @@ def main():
         out[name] = rows
         dm, di, dw, _ = summarise(rows, "damage")
         fm, _, _, _ = summarise(rows, "fuel")
+        tm, _, _, _ = summarise(rows, "damage_thermal")
         pk = max(r["peak_turb"] for r in rows)
-        print(f"{name:<28}{dm:>12.1f}{di:>9.1f}{dw:>9.1f}{fm:>10.0f}{pk:>9.0f}")
+        print(f"{name:<28}{dm:>12.1f}{di:>9.1f}{dw:>9.1f}{tm:>12.1f}{fm:>10.0f}{pk:>9.0f}")
 
-    print("-" * 77)
+    print("-" * 89)
     base = np.median([r["damage"] for r in out["baseline ECU"]])
     for name in out:
         if name == "baseline ECU":

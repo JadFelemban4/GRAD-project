@@ -349,10 +349,11 @@ def phase_d():
     fig.suptitle("Phase D protocol -- twenty frozen episodes, 12 % at 130 km/h",
                  color=INK, fontsize=13, x=0.012, ha="left", fontweight="bold")
     fig.text(0.012, 0.005,
-             "THESE AGENTS ARE OUT OF DISTRIBUTION TWICE OVER: trained at "
-             "110 km/h where the constraint never binds, and at dt = 0.2 s "
-             "while this protocol runs dt = 1.0 s.\nThis is what the existing "
-             "runs are worth, not Phase D's answer.",
+             "THESE AGENTS ARE OUT OF DISTRIBUTION FOUR TIMES OVER: trained at "
+             "110 km/h where the constraint never binds, at dt = 0.2 s while this "
+             "protocol runs dt = 1.0 s, on one road,\nand on the plant before its "
+             "constants were derived from the logs (28 Sep). This is what the "
+             "existing runs are worth, not Phase D's answer.",
              color=CRIT, fontsize=9)
     fig.tight_layout(rect=(0, 0.045, 1, 0.94))
     _save(fig, "fig6_phase_d.png")
@@ -596,23 +597,21 @@ def model_vs_data():
                        frameon=False, fontsize=9.5, labelcolor=INK2)
         axes[1].set_xlabel("minutes into the drive", color=INK2, fontsize=10)
         OS = {o["variant"]: o for o in R.get("oil_sensitivity", [])}
+        # Captions rewritten 28 September (evening): the block and oil nodes are
+        # DERIVED from the logs now (derive_params.py), and the oil is heated by
+        # engine speed, not by a share of fuel. Before and after: figure 20.
         if name == "drive10":
             cap = ("drive10 reaches 117 C of oil -- the only drive inside the published "
-                   "115-140 C band. Fed the car's measured fuel, the model runs cool "
-                   "of both sensors;\nvalidate.py rows 8 and 11 score this drive "
-                   "and both miss. The coolant drifts down at light load where the "
-                   "car's heat-management valve holds 92-94 C.")
+                   "115-140 C band. thermal.py with its constants derived from the logs, "
+                   "fed the car's measured fuel;\ndrive10 is in the fit. Over the sustained "
+                   "4000+ rpm stretch the car's valve let the coolant rise to 97-99 C, and "
+                   "the model's oil runs cool there (validate.py row 8).")
         elif OS:
-            cap = (f"The spikes come from the oil's own ASSUMED heat input: 5 % of fuel "
-                   f"energy drives the modelled oil up to "
-                   f"{OS['as shipped']['max_gap']:.0f} K above the block on a pull. "
-                   f"Halving that share cuts the peak to "
-                   f"{OS['half fuel-to-oil share']['peak_model']:.0f} C;\ndoubling the "
-                   f"oil's heat capacity only to "
-                   f"{OS['double oil capacity']['peak_model']:.0f} C; pinning the block "
-                   f"to the measured coolant to "
-                   f"{OS['block pinned to measured coolant']['peak_model']:.0f} C. "
-                   "Measuring it needs a sustained-load drive (logs/DRIVE_PLAN.md).")
+            cap = (f"Heated by engine speed instead of a share of fuel, the modelled oil no longer "
+                   f"spikes on the pulls (peak {OS['as shipped']['peak_model']:.0f} C, car "
+                   f"{OS['as shipped']['peak_car']:.0f} C; it reached 140 C before).\nBetween pulls, at "
+                   "42 C ambient, the car's heat-management valve runs the coolant at 82-84 C; the "
+                   "model's fixed stand-in does not, so its medians run warm (figure 20).")
         else:
             cap = "Run model_vs_data.py for the oil sensitivity."
         fig.suptitle(f"Thermal network driven over {name}, against the car's own "
@@ -832,6 +831,229 @@ def training_roads():
     _save(fig, "fig19_training_roads.png")
 
 
+# ------------------------------------------------------------------------
+# 28 September 2026: the constants the data can set, derived from the data.
+# Figures 20-25 read results/calibration_comparison.json (compare_calibration.py).
+# Colour carries one meaning throughout: the CAR is blue, the model with the
+# constants assumed until 28 September is orange, the model with the constants
+# derived from the logs is aqua, and a held-out score is violet. Aqua is below
+# 3:1 against the surface (validator WARN), so every aqua series is labelled.
+# ------------------------------------------------------------------------
+def _cal():
+    path = os.path.join(RES, "calibration_comparison.json")
+    if not os.path.exists(path):
+        print("  (skipping figures 20-25: run compare_calibration.py)")
+        return None
+    with open(path) as fh:
+        return json.load(fh)
+
+
+def _nan(v):
+    return np.array([np.nan if x is None else x for x in v], float)
+
+
+def thermal_calibration(C):
+    th = C["thermal"]["traces"]
+    names = {"drive10-20260918_233912.csv": "drive10 -- 2 h, sustained 4000+ rpm early on",
+             "7475b5d7-20260908_142743.csv": "7475b5d7 -- hard pulls at 42 C",
+             "683640a0-20260907_070212.csv": "683640a0 -- the warm-up"}
+    fig, axes = plt.subplots(3, 2, figsize=(13.2, 11.0), sharex="row")
+    for i, (src, title) in enumerate(names.items()):
+        d = th[src]
+        t = np.array(d["t_min"])
+        for j, (q, lab) in enumerate((("oil", "oil (C)"), ("coolant", "coolant (C)"))):
+            ax = axes[i, j]
+            _style(ax, f"{title}: {q}" if j == 0 else q, "minutes into the drive" if i == 2 else None, lab)
+            ax.plot(t, _nan(d[f"car_{q}"]), color=BLUE, lw=1.6, label="car", zorder=3)
+            ax.plot(t, _nan(d[f"before_{q}"]), color=ORANGE, lw=1.2, label="model, constants assumed (before)",
+                    zorder=2)
+            ax.plot(t, _nan(d[f"after_{q}"]), color=AQUA, lw=1.8, label="model, constants derived from the logs",
+                    zorder=4)
+            car, bef, aft = _nan(d[f"car_{q}"]), _nan(d[f"before_{q}"]), _nan(d[f"after_{q}"])
+            ok = np.isfinite(car)
+            rb = np.sqrt(np.nanmean((bef[ok] - car[ok]) ** 2))
+            ra = np.sqrt(np.nanmean((aft[ok] - car[ok]) ** 2))
+            ax.text(0.99, 0.96, f"RMSE before {rb:.1f} K  ->  derived {ra:.1f} K", transform=ax.transAxes,
+                    ha="right", va="top", fontsize=9, color=INK,
+                    bbox=dict(boxstyle="round,pad=0.3", fc=SURFACE, ec=GRID))
+    h, lab = axes[0, 0].get_legend_handles_labels()
+    fig.legend(h, lab, loc="upper left", ncol=3, frameon=False, bbox_to_anchor=(0.012, 0.955), fontsize=10)
+    fig.suptitle("Oil and coolant: the car, the model before, and the model derived from the logs",
+                 color=INK, fontsize=13, x=0.012, ha="left", fontweight="bold")
+    fig.text(0.012, 0.005,
+             "thermal.py free-running over each whole drive (raw logs), fed the car's measured fuel, engine and "
+             "road speed. drive10 was IN the fit; its held-out scores are in figure 21.\nThe derived oil node is "
+             "heated by engine speed and cooled by road speed (calibrate_thermal.py). Not reproduced: the car's "
+             "heat-management valve running 82-84 C on the hot drives.",
+             color=INK2, fontsize=9)
+    fig.tight_layout(rect=(0, 0.045, 1, 0.93))
+    _save(fig, "fig20_thermal_calibration.png")
+
+
+def thermal_rmse(C):
+    rows = C["thermal"]["per_drive"]
+    labels = [r["drive"].split("-")[0] for r in rows]
+    y = np.arange(len(rows))
+    fig, axes = plt.subplots(1, 2, figsize=(13.2, 5.4), sharey=True)
+    for ax, q, title in ((axes[0], "coolant", "Coolant"), (axes[1], "oil", "Oil")):
+        _style(ax, f"{title}: free-running RMSE against the car", "RMSE (K)", None)
+        vals = [(ORANGE, "before", [r["shipped"][q] for r in rows]),
+                (AQUA, "derived, in-sample", [r["fitted"][q] for r in rows]),
+                (VIOLET, "derived, drive HELD OUT of the fit", [r["held_out"][q] for r in rows])]
+        for k, (col, lab, v) in enumerate(vals):
+            yy = y + (k - 1) * 0.27
+            ax.barh(yy, v, height=0.24, color=col, label=lab, edgecolor=SURFACE, lw=2)
+            for a, b in zip(yy, v):
+                ax.text(b + 0.15, a, f"{b:.1f}", va="center", fontsize=8, color=INK2)
+        ax.set_yticks(y, labels)
+    axes[0].invert_yaxis()          # once: the panels share y, a second call would undo it
+    h, lab = axes[0].get_legend_handles_labels()
+    fig.legend(h, lab, loc="upper left", ncol=3, frameon=False, bbox_to_anchor=(0.012, 0.92), fontsize=10)
+    fig.suptitle("Per drive: before, derived, and held out -- the warm-up drive is the one the fit needs",
+                 color=INK, fontsize=13, x=0.012, ha="left", fontweight="bold")
+    fig.text(0.012, 0.01,
+             "Held out = parameters fitted on the other six drives, scored on this one (calibrate_thermal.py). "
+             "683640a0 holds the only warm-up; left out, the block's heat capacity is unidentified.",
+             color=INK2, fontsize=9)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.86))
+    _save(fig, "fig21_thermal_rmse.png")
+
+
+def boost_drive_b(C):
+    B = C["boost"]
+    fig, (ax, az) = plt.subplots(1, 2, figsize=(13.2, 5.6))
+    _style(ax, "Full throttle: manifold pressure against engine speed", "engine speed (rpm)",
+           "manifold pressure (kPa abs)")
+    ax.scatter(B["car_wot"]["rpm"], B["car_wot"]["map_kpa"], s=30, color=BLUE, edgecolor=SURFACE, lw=1.2,
+               label="car, drive B roll-ons (genuine readings, throttle >= 95 %)", zorder=3)
+    for key, col, lab, lw in (("model_before", ORANGE, "model, 8 Sep formula at charge temperature", 1.4),
+                              ("model_after", AQUA, "model, derived envelope at ambient", 2.0)):
+        m = B[key]
+        ax.plot([r["rpm"] for r in m], [r["map_kpa"] for r in m], color=col, lw=lw, label=lab, zorder=4)
+        ax.text(m[-1]["rpm"] + 30, m[-1]["map_kpa"], "before" if key == "model_before" else "derived",
+                color=INK2, fontsize=9, va="center")
+    ax.legend(frameon=False, fontsize=9, loc="lower right")
+    _style(az, "The envelope: 95th-percentile pressure ratio per flow bin", "corrected air flow (kg/s)",
+           "pressure ratio")
+    fl = np.array([b["flow"] for b in B["bins"]])
+    pr = np.array([b["pr"] for b in B["bins"]])
+    az.scatter(fl, pr, s=42, color=BLUE, edgecolor=SURFACE, lw=1.2, label="bins (p95, stable rows)", zorder=4)
+    for b in B["bins"]:
+        az.annotate(f"{b['readings']}", (b["flow"], b["pr"]), textcoords="offset points", xytext=(-9, 7),
+                    ha="right", fontsize=8, color=INK3)
+    m = np.linspace(0, 0.36, 200)
+    f = B["formula_before"]
+    az.plot(m, np.minimum(1 + f["A"] * m / (1 + f["B"] * m), f["cap"]), color=ORANGE, lw=1.4,
+            label="8 Sep formula (A 14.50, B 6.40, cap 2.6)")
+    az.plot(m, np.minimum(np.interp(m, B["envelope_flow"], B["envelope_pr"]), B["pr_cap"]), color=AQUA, lw=2.0,
+            label="derived: the envelope itself (monotone, capped)")
+    az.legend(frameon=False, fontsize=9, loc="lower right")
+    az.text(0.01, 0.97, "small numbers: independent readings per bin", transform=az.transAxes, va="top",
+            fontsize=8, color=INK3)
+    fig.suptitle("Drive B: what the car's boost does at low engine speed, and the ceiling now derived from it",
+                 color=INK, fontsize=13, x=0.012, ha="left", fontweight="bold")
+    # 29 September 2026: judged against the TOP of what the car did in each
+    # 200 rpm band, because a ceiling is a limit (mistake 22). Computed here so
+    # the caption cannot drift from the points.
+    r = np.array(B["car_wot"]["rpm"], float)
+    q = np.array(B["car_wot"]["map_kpa"], float)
+    mr = np.array([x["rpm"] for x in B["model_after"]], float)
+    ma = np.array([x["map_kpa"] for x in B["model_after"]], float)
+    gap = {lo: 100 * (np.interp(lo + 100, mr, ma) / q[(r >= lo) & (r < lo + 200)].max() - 1)
+           for lo in range(1400, 4200, 200) if ((r >= lo) & (r < lo + 200)).any()}
+    low = [v for lo, v in gap.items() if 1600 <= lo < 2000]
+    high = [v for lo, v in gap.items() if lo >= 2000]
+    fig.text(0.012, 0.01,
+             f"Against the highest reading per 200 rpm band, the derived ceiling is {min(low):+.0f} to "
+             f"{max(low):+.0f} % at 1600-2000 rpm -- the car made more boost there than the model allows -- and "
+             f"{min(high):+.0f} to {max(high):+.0f} % from 2000 rpm up. Roll-ons are transients and the envelope "
+             "is built from quasi-steady rows.\nEngine speed is interpolated to each boost reading's moment. "
+             "Drive B logged no ambient temperature; its corrected flow uses the ambient of the other afternoon "
+             "drives (build_dataset.AMB_FALLBACK_C).",
+             color=INK2, fontsize=9)
+    fig.tight_layout(rect=(0, 0.06, 1, 0.93))
+    _save(fig, "fig22_boost_drive_b.png")
+
+
+def premise_steps(C):
+    P = C["premise_steps"]
+    fig, (ax, az) = plt.subplots(1, 2, figsize=(13.2, 5.0), gridspec_kw=dict(width_ratios=(1.5, 1.0)),
+                                 sharey=True)
+    y = np.arange(len(P))
+    _style(ax, "Baseline damage on the locked climb", "damage (arb. units)", None)
+    ax.barh(y, [p["baseline"] for p in P], height=0.6, color=BLUE, edgecolor=SURFACE, lw=2)
+    for yy, p in zip(y, P):
+        ax.text(p["baseline"] + 8, yy, f"{p['baseline']:.1f}   peak {p['peak_turb']} C, oil {p['peak_oil']} C",
+                va="center", fontsize=9, color=INK2)
+    ax.set_yticks(y, [p["step"] for p in P])
+    ax.invert_yaxis()
+    ax.set_xlim(0, max(p["baseline"] for p in P) * 1.45)
+    _style(az, "Preview over current-grade, hand-written", "points", None)
+    az.axvline(0, color=INK3, lw=1.0)
+    az.scatter([p["preview_vs_grade"] for p in P], y, s=60, color=VIOLET, edgecolor=SURFACE, lw=1.2, zorder=3)
+    for yy, p in zip(y, P):
+        az.text(p["preview_vs_grade"] + 0.05, yy, f"{p['preview_vs_grade']:+.1f}", va="center", fontsize=9,
+                color=INK2)
+    az.set_xlim(-1.0, 1.0)
+    fig.suptitle("Each change, one at a time -- and the preview question did not move",
+                 color=INK, fontsize=13, x=0.012, ha="left", fontweight="bold")
+    fig.text(0.012, 0.01,
+             "check_premise.py after each step, in order (a record: each step needs the code as it stood). "
+             "Step 4 (exhaust = air + fuel) raises the turbine 5 K and the exponential damage 13 %;\nstep 6 "
+             "(air at 42 C is 1.12 kg/m3, not 1.2) lowers the torque demand. The scenario still binds: peak 883 C "
+             "against the 850 C trigger.", color=INK2, fontsize=9)
+    fig.tight_layout(rect=(0, 0.07, 1, 0.92))
+    _save(fig, "fig23_premise_steps.png")
+
+
+def oil_structures(C):
+    O = C["oil_structures"]
+    fig, ax = plt.subplots(figsize=(11.0, 4.6))
+    _style(ax, "Choosing the oil node's form: drive10 held out", "oil RMSE on drive10 (K)", None)
+    y = np.arange(len(O))
+    cols = [AQUA if "chosen" in o["structure"] else (ORANGE if "as shipped" in o["structure"] else BLUE)
+            for o in O]
+    ax.barh(y, [o["drive10_rmse"] for o in O], height=0.6, color=cols, edgecolor=SURFACE, lw=2)
+    for yy, o in zip(y, O):
+        ax.text(o["drive10_rmse"] + 0.08, yy, f"{o['drive10_rmse']:.2f}  ({o['note']})", va="center",
+                fontsize=9, color=INK2)
+    ax.set_yticks(y, [o["structure"] for o in O])
+    ax.invert_yaxis()
+    ax.set_xlim(0, 9)
+    fig.text(0.012, 0.01, "Fitted on six drives, scored on drive10 (a record, calibrate_thermal.py). The two-input "
+             "form is 0.1 K better and adds a parameter; the simpler form was kept.", color=INK2, fontsize=9)
+    fig.tight_layout(rect=(0, 0.05, 1, 1))
+    _save(fig, "fig24_oil_structures.png")
+
+
+def validation_rows(C):
+    R = C["rows"]
+    fig, axes = plt.subplots(1, len(R), figsize=(13.2, 4.2))
+    for ax, r in zip(axes, R):
+        unit = "s" if "time constant" in r["name"] else "C"
+        _style(ax, r["name"].replace(" (", "\n("), None, unit)
+        ax.axhspan(r["lo"], r["hi"], color="#e9eef6", zorder=0)
+        ax.text(1.5, r["hi"], "car's band", fontsize=8, color=INK3, va="bottom", ha="center")
+        ax.scatter([0], [r["before"]], s=70, color=ORANGE, zorder=3, edgecolor=SURFACE, lw=1.2)
+        ax.scatter([1], [r["after"]], s=70, color=AQUA, zorder=3, edgecolor=SURFACE, lw=1.2)
+        ax.text(0, r["before"], f"  {r['before']:.1f}", fontsize=9, color=INK2, va="center")
+        ax.text(1, r["after"], f"  {r['after']:.1f}", fontsize=9, color=INK2, va="center")
+        ax.set_xticks([0, 1], ["before", "derived"])
+        ax.set_xlim(-0.5, 2.0)
+        lo = min(r["lo"], r["before"], r["after"]); hi = max(r["hi"], r["before"], r["after"])
+        pad = 0.15 * (hi - lo)
+        ax.set_ylim(lo - pad, hi + pad)
+        ax.set_title(ax.get_title(loc="left") + ("\ninside" if r["inside"] else "\nOUTSIDE"), color=INK,
+                     fontsize=10, loc="left", fontweight="bold")
+    fig.suptitle("validate.py rows 8-11 against the car's own bands, before and after",
+                 color=INK, fontsize=13, x=0.012, ha="left", fontweight="bold")
+    fig.text(0.012, 0.01, "Rows 8 and 11 score drive10, which is in the fit. Fitted WITHOUT drive10 (leave-one-out): "
+             "row 8 96.1 C (still outside), row 11 92.0 C (still inside) -- the coolant is a genuine prediction.",
+             color=INK2, fontsize=9)
+    fig.tight_layout(rect=(0, 0.05, 1, 0.9))
+    _save(fig, "fig25_validation_rows.png")
+
+
 if __name__ == "__main__":
     print("writing figures to results/figures/")
     traces()
@@ -840,4 +1062,12 @@ if __name__ == "__main__":
     phase_d()
     model_vs_data()
     training_roads()
+    _C = _cal()
+    if _C is not None:
+        thermal_calibration(_C)
+        thermal_rmse(_C)
+        boost_drive_b(_C)
+        premise_steps(_C)
+        oil_structures(_C)
+        validation_rows(_C)
     print("done")

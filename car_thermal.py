@@ -75,6 +75,52 @@ def log_grid(source):
     return g
 
 
+# Raw-log channel names, matched case-insensitively. BimmerLink's export changed
+# its capitalisation between versions: the 28 September drive B writes "Engine
+# Speed" and "Coolant Temperature" where every earlier drive writes "Engine speed".
+RAW_CHANNELS = {
+    "rpm": "engine speed", "v_kmh": "vehicle speed", "air_kgh": "air mass flow",
+    "lam": "lambda actual value", "ect_c": "coolant temperature",
+    "oil_c": "oil temperature", "t_amb": "ambient temperature",
+    "rad_out_c": "engine radiator outlet temperature (coolant)",
+}
+
+
+def raw_grid(source):
+    """One drive on a 1 s grid, read from logs/raw/ rather than master_samples.
+
+    WHY BOTH EXIST. master_samples.csv keeps only warm, running rows (coolant
+    above 75 C, rpm above 500), which is right for the combustion calibrations
+    and wrong for a thermal fit: it throws away the warm-up in 683640a0 (coolant
+    63 C, oil 55 C at the start) -- the only stretch in the logs where the
+    radiator is shut and the block's heat capacity shows on its own. The
+    calibration in calibrate_thermal.py reads the whole log through this.
+
+    Placeholder zeros are masked (AUDIT.md M8): an exact 0 in a temperature or
+    lambda channel is BimmerLink writing a blank until the car first answers.
+    Missing channels come back as NaN columns; the caller decides what that means.
+    """
+    path = os.path.join(HERE, "logs", "raw", source)
+    d = pd.read_csv(path, low_memory=False)
+    cols = {c.strip().lower(): c for c in d.columns}
+    t = pd.to_numeric(d[cols["time"]], errors="coerce").to_numpy(float)
+    out = {}
+    for key, name in RAW_CHANNELS.items():
+        c = cols.get(name)
+        v = (pd.to_numeric(d[c], errors="coerce").to_numpy(float).copy() if c is not None
+             else np.full(len(d), np.nan))
+        if key in ("ect_c", "oil_c", "t_amb", "rad_out_c", "lam"):
+            v[v == 0.0] = np.nan
+        out[key] = v
+    t = t - t[0]
+    grid = np.arange(0.0, t[-1], 1.0)
+    idx = np.clip(np.searchsorted(t, grid, side="right") - 1, 0, len(t) - 1)
+    g = pd.DataFrame({k: v[idx] for k, v in out.items()})
+    g["tr"] = grid
+    g["air_gps"] = g.air_kgh / 3.6
+    return g
+
+
 def measured_fuel_gps(air_gps, lam, rpm):
     """Fuel burned, g/s: MEASURED air mass flow over (14.7 x MEASURED lambda)."""
     from plant import AFR_STOICH
@@ -99,6 +145,7 @@ def thermal_replay(source, params=None, pin_block=False):
     from plant import charge_temperature
     d = log_grid(source)
     fuel = measured_fuel_gps(d.air_gps.to_numpy(), d.lam.to_numpy(), d.rpm.to_numpy())
+    air_gps = np.where(np.isfinite(d.air_gps.to_numpy()), d.air_gps.to_numpy(), 0.0)
     amb = d.t_amb.ffill().bfill().fillna(30.0).to_numpy() + 273.15
     ect = d.ect_c.to_numpy() + 273.15
     oil = d.oil_c.to_numpy() + 273.15
@@ -120,7 +167,8 @@ def thermal_replay(source, params=None, pin_block=False):
                                  tn.t_block, False, 1.0)
         else:
             fan = 0.0
-        tn.step(1.0, fuel[i], fuel[i] * 15.0, tn.t_turb, amb[i], v[i], fan)
+        # exhaust = measured air + measured fuel; the turbine is not scored here
+        tn.step(1.0, fuel[i], air_gps[i] + fuel[i], tn.t_turb, amb[i], v[i], fan, rpm=rpm[i])
         oil_m[i], blk_m[i] = tn.t_oil, tn.t_block
     return dict(t=d.tr.to_numpy(), fuel=fuel, t_amb=amb, ect_car=ect, oil_car=oil,
                 ect_model=blk_m, oil_model=oil_m)

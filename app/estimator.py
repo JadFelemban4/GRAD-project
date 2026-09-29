@@ -35,8 +35,8 @@ against 295 minutes of logs from this car:
     thermal.ThermalNetwork      block / oil / turbine, calibrated
     engine_env.BaselineECU      what a production ECU would command here
 
-So the app inherits the validation. It also inherits the LIMITS: 7 of 11
-validation bands, four documented misses -- three of them oil and coolant,
+So the app inherits the validation. It also inherits the LIMITS: 8 of 11
+validation bands, three documented misses -- two of them the oil node,
 scored against this car's own logs -- and a load residual that was only
 ever checked at 30-75 kPa -- and that residual, per CLAUDE.md mistake 12, does
 not test the breathing model at all. Do not let the app imply more confidence
@@ -436,7 +436,8 @@ class Estimator:
             self._seeded = False
             self.reseeds += 1
         fuel = out["mdot_fuel_gps"]
-        exh = fuel * 15.0
+        # Air + fuel, as engine_env since 28 Sep (it was fuel x 15; AUDIT.md M2).
+        exh = out["mdot_air_gps"] + fuel
         if not self._seeded:
             self._seed(s, ect_k, egt_k, exh)
             self._t_start = s.t
@@ -450,7 +451,7 @@ class Estimator:
         while remaining > 1e-9:
             step = min(MAX_SUBSTEP_S, remaining)
             for tn in (self.tn, self.tn_lo, self.tn_hi):
-                tn.step(step, fuel, exh, egt_k, self.t_amb_k, v_mps, ecu_fan)
+                tn.step(step, fuel, exh, egt_k, self.t_amb_k, v_mps, ecu_fan, rpm=s.rpm)
             remaining -= step
 
         # --- the block is MEASURED, so stop integrating a guess at it -------

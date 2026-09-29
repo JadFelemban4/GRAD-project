@@ -154,7 +154,7 @@ def main():
 
     # The shift rule's table must still describe the plant it was measured on.
     probe = [1600, 2200, 2600, 3200, 4400]
-    table = dict(Vehicle.DELIVERABLE_TORQUE)
+    table = dict(Vehicle().DELIVERABLE_TORQUE)     # derived: data/derived_params.json
     fresh = dict(measure_deliverable_torque(probe))
     drift = max(abs(fresh[r] - table[r]) / table[r] for r in probe)
 

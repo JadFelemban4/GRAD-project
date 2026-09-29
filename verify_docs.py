@@ -233,6 +233,21 @@ def _paragraph_is_historical(block, n, is_md):
     return n in _historical_lines(block, is_md)
 
 
+# A tracked file whose FIRST LINE carries "RETIRED-OK: file" is a dated record
+# declared out of date in full -- presentation/index.html since 28 September
+# 2026, which says so in a banner on the page itself. It is skipped, and every
+# run PRINTS that it was skipped: an exemption nobody can see is how 55 stale
+# figures shipped on 11 September.
+FILE_RETIRED = "RETIRED-OK: file"
+SKIPPED_FILES = set()
+
+
+def _file_is_retired(path):
+    with open(path, encoding="utf-8") as fh:
+        head = fh.readline()
+    return FILE_RETIRED in head
+
+
 def scan_documents(label, value, patterns, files, tol):
     """Fail if any named document states a DIFFERENT value for this figure.
 
@@ -245,6 +260,9 @@ def scan_documents(label, value, patterns, files, tol):
     for rel in files:
         path = os.path.join(HERE, rel)
         if not os.path.exists(path):
+            continue
+        if _file_is_retired(path):
+            SKIPPED_FILES.add(rel)
             continue
         with open(path, encoding="utf-8") as fh:
             block = fh.read().splitlines()
@@ -447,10 +465,26 @@ RETIRED = [
     # moving rows 8-11 onto car data; nothing was guarding it.
     (r"\b241\.2\b", "best BSFC 241.2 g/kWh (before the converged cycle model)",
      "239.9 g/kWh (validate.py row 3)"),
+    # 28 September 2026 (evening). The premise on the plant before the block and
+    # oil nodes, the boost ceiling, the exhaust flow and the air density were
+    # derived from the data. results/premise.json holds the current figures.
+    (r"\b951\.9\b|\b624\.5\b|\b628\.4\b|\b671\.1\b",
+     "premise 951.9 / 671.1 / 624.5 / 628.4 (before the derived plant)",
+     "run check_premise.py; results/premise.json"),
+    # The fitted load constant as compare_log.py printed it before the 26-point
+    # dataset; it has printed 0.839 since, and the documents never followed.
+    (r"\b0\.837\b", "fitted k 0.837 (compare_log.py prints 0.839 on the 26 points)",
+     "0.839 fitted; 0.831 derived is the one to quote"),
+    # The dataset before drive B.
+    (r"\b295\.0\s*min", "295.0 minutes (before drive B)", "321.7 minutes, eleven drives"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to
 # contain retired values throughout. Exempting them is deliberate.
+# A dated SESSION REPORT records what was true on its day -- the same call as
+# AUDIT.md and AUDIT_FIXES.md below. Exempted by name pattern (28 Sep 2026),
+# after the derived plant retired figures that every earlier report quotes.
+RETIRED_EXEMPT_PREFIX = ("SESSION_REPORT_",)
 RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md",
                   # AUDIT.md is a review: quoting the figures it found wrong is
@@ -505,7 +539,12 @@ def check_simulation(here):
     # MEASURES changed, not to make a check pass: against the car, the oil node
     # is too slow to warm on sustained load and too fast overall, and the
     # free-running coolant settles below the heat-management setpoint.
-    figure("validate.py rows inside their band", inside, 7, 0,
+    #
+    # 8 from 28 September 2026 (evening): the block and oil nodes of thermal.py
+    # are now derived from the car's logs (derive_params.py), and rows 10 and 11
+    # (coolant) are inside the car's bands; rows 8 and 9 (oil) are still out.
+    # The expectation moved because the MODEL moved, measured, not to pass.
+    figure("validate.py rows inside their band", inside, 8, 0,
            patterns=[r"\b" + NUM + r"\s*\*{0,2}\s*of\s+\*{0,2}\s*11\b"],
            files=ALL)
     car = [r for r in rows if r.get("basis") == "our car"]
@@ -536,6 +575,8 @@ def check_simulation(here):
         if r is not None:
             chk(label, round(float(r["model"]), 1), expect, tol)
 
+    check_derived(here)
+
     # The crank-angle step is now a studied number; assert it has not been
     # quietly rounded back to something convenient.
     from plant import DTHETA_DEG
@@ -544,11 +585,59 @@ def check_simulation(here):
         bool(V.test_convergence()), True)
 
 
+def check_derived(here):
+    """The constants derived from the data, and the premise figures, are FRESH.
+
+    28 September 2026. Every constant the car's logs can set now lives in
+    data/derived_params.json (derive_params.py), recomputed from the data. That
+    only helps if nothing quotes a derivation made from OLDER data, so:
+
+      1. the derived file's input fingerprint must match the data as shipped --
+         a drive added without re-deriving fails here;
+      2. results/premise.json must have been produced on THAT derivation -- a
+         premise figure from an older plant fails here;
+      3. the premise figures the documents quote are checked against it. Until
+         now nothing checked them at all: check_simulation's note said the
+         premise was void and guarded by RETIRED, which stopped being true the
+         day the scenario was re-locked.
+    """
+    import json
+    import derived
+    import derive_params
+
+    print("\nDERIVED CONSTANTS AND PREMISE  (derive_params.py, check_premise.py)")
+    d = derived.all_params()
+    fp = derive_params.fingerprint()
+    chk("derived constants were computed from the data as shipped",
+        d.get("_inputs", {}).get("data_sha1"), fp["data_sha1"])
+    chk("...and from the raw logs as shipped", tuple(d.get("_inputs", {}).get("raw_logs", [])),
+        tuple(fp["raw_logs"]))
+    path = os.path.join(here, "results", "premise.json")
+    if not os.path.exists(path):
+        chk("results/premise.json exists (run check_premise.py)", False, True)
+        return
+    p = json.load(open(path))
+    chk("premise figures were computed on the current derived constants",
+        (p.get("_derived_inputs") or {}).get("data_sha1"), fp["data_sha1"])
+    base = p["baseline ECU (true neutral)"]["damage"]
+    figure("premise baseline damage", round(base, 1), round(base, 1), 0.0,
+           patterns=[r"baseline ECU \(true neutral\)\s*\|\s*\*{0,2}" + NUM,
+                     r"baseline \*\*" + NUM + r"\*\* at"],
+           files=ALL, dtol=0.05)
+    g = p["_preview_over_current_grade_pts"]
+    figure("preview over current-grade, hand-written", round(g, 1), round(g, 1), 0.0,
+           patterns=[r"preview over current[- ]grade\s*\*{0,2}" + NUM,
+                     r"preview over current-grade \*\*" + NUM],
+           files=ALL, dtol=0.05)
+
+
 def check_retired(here):
     """Fail if any document still quotes a figure this project has retired."""
     print("\nRETIRED FIGURES  (mistake 11 -- the old value must not survive)")
     docs = [p for p in glob.glob(os.path.join(here, "**", "*.md"), recursive=True)
-            if os.path.basename(p) not in RETIRED_EXEMPT]
+            if os.path.basename(p) not in RETIRED_EXEMPT
+            and not os.path.basename(p).startswith(RETIRED_EXEMPT_PREFIX)
+            and ".venv" not in p]
     docs += [p for p in glob.glob(os.path.join(here, "*.py"))
              if os.path.basename(p) != os.path.basename(__file__)]
 
@@ -607,6 +696,9 @@ def report_documents():
     if not DOC_FAILURES:
         print(f"  ok     {DOC_HITS} figure mentions across {len(TRACKED_DOCS)} "
               f"tracked files all agree with the data")
+    for rel in sorted(SKIPPED_FILES):
+        print(f"  SKIPPED {rel}: first line declares it a dated record ({FILE_RETIRED}) --"
+              f" it is NOT being checked")
     if DOC_UNMATCHED:
         print(f"  note   {len(DOC_UNMATCHED)} pattern(s) matched nothing anywhere "
               f"-- check the regex has not rotted:")
@@ -633,22 +725,25 @@ def main():
     # the purpose-built 7-channel drive of mistake 13b -- joined logs/raw/.
     # It adds 7.5 minutes and ZERO samples and ZERO operating points, by
     # design: it carries no coolant channel, so the warm filter excludes it.
-    figure("total minutes", round(float(M.duration_min.sum()), 1), 295.0, 0.15,
+    # 295.0 over ten drives until 28 September 2026, when drive B (the
+    # full-throttle roll-ons of logs/DRIVE_PLAN.md, 26.7 min) joined.
+    figure("total minutes", round(float(M.duration_min.sum()), 1), 321.7, 0.15,
            " min",
            # Anchored to a DATASET-SCALE drive count. validation_table.md says
            # "three drives (80 minutes)" about the thermal fit, which is a
            # different quantity; a looser pattern reports it as a wrong total.
            patterns=[NUM + r"\s*min(?:ute)?s?\b[^.\n]{0,30}?"
-                     r"(?:pooled|dataset|manifest|\b(?:6|7|8|six|seven|eight)\b\s*drives)",
-                     r"\b(?:6|7|8|six|seven|eight)\s+drives[^.\n]{0,30}?\b" + NUM
-                     + r"\s*min(?:ute)?s?\b"],
+                     r"(?:pooled|dataset|manifest|\b(?:6|7|8|9|10|11|six|seven|eight|nine|ten|eleven)"
+                     r"\b\s*drives)",
+                     r"\b(?:6|7|8|9|10|11|six|seven|eight|nine|ten|eleven)\s+drives[^.\n]{0,30}?\b"
+                     + NUM + r"\s*min(?:ute)?s?\b"],
            files=ALL, dtol=0.15)
-    figure("drives in the manifest", len(M), 10, 0,
+    figure("drives in the manifest", len(M), 11, 0,         # 10 until drive B, 28 Sep
            patterns=[WORDNUM + r"\s+drives,?\s+(?:and\s+)?\d+(?:\.\d+)?\s*min",
                      r"\d+(?:\.\d+)?\s*min(?:ute)?s?\s+(?:over|across|pooled across)\s+"
                      + WORDNUM + r"\s+drives"],
            files=ALL)
-    figure("drives that carry samples", S.source.nunique(), 7, 0,
+    figure("drives that carry samples", S.source.nunique(), 8, 0,   # 7 until drive B
            # The number must be the SUBJECT of 'carry'. Without the lookbehind,
            # 'Six of the nine drives carry usable samples' -- a correct sentence
            # -- reports nine. A false positive of exactly the kind AUDIT.md H2
@@ -686,7 +781,8 @@ def main():
            files=ALL, dtol=0.6)
 
     print("\nMAF SATURATION  (CLAUDE.md mistake 7)")
-    figure("samples pinned at the 1020 kg/h ceiling", int(S.maf_pinned.sum()), 547, 0,
+    # 547 over six drives until drive B, whose last roll-on pinned the MAF 21 times.
+    figure("samples pinned at the 1020 kg/h ceiling", int(S.maf_pinned.sum()), 568, 0,
            patterns=[r"(?:1020(?:\.0)?\s*kg/h|ceiling|pinned)[^.\n]{0,70}?\b" + NUM
                      + r"\s+samples",
                      NUM + r"\s+samples[^.\n]{0,50}?(?:pinned|ceiling|1020)"],
@@ -706,14 +802,16 @@ def main():
     # The raw-log figure, for the record: 573 pinned samples across 6 of the
     # 9 drives; 517 across 5 once the warm filter has run.
     hits = int(S.loc[S.maf_pinned.astype(bool), "source"].nunique())
-    figure("drives showing that exact ceiling", hits, 6, 0,
+    figure("drives showing that exact ceiling", hits, 7, 0,
            patterns=[WORDNUM + r"\s+separate\s+drives",
                      r"1020\s*kg/h on\s+" + WORDNUM + r"\s+drives"],
            files=ALL)
 
     print("\nCOMPRESSOR ENVELOPE  (validation_table.md D)")
     st = S[S.stable == 1]
-    figure("quasi-steady samples behind the fit", len(st), 74013, 0,
+    # 74 013 until drive B (28 Sep), whose stable rows now carry a corrected
+    # flow on build_dataset.AMB_FALLBACK_C and so join the envelope.
+    figure("quasi-steady samples behind the fit", len(st), 83272, 0,
            patterns=[NUM + r"\s+quasi-steady",
                      r"refitted[^.\n]{0,30}?on\s+" + NUM],
            files=ALL)
@@ -849,7 +947,13 @@ def main():
     # region BY CONSTRUCTION. Gating the model at 180 admits samples 20 kPa below
     # anything the logged set contains, which drags the model median down and
     # flatters the gap to +2.3 %. Quote the matched-gate figure, +3.0 %.
-    hi = S[(S.map_kpa > 200) & (~S.maf_pinned.astype(bool))]
+    # 28 September 2026: rows whose ambient was NOT logged (drive B,
+    # t_amb_assumed = 1) are excluded. Their charge temperature is built on
+    # build_dataset.AMB_FALLBACK_C, so scoring the charge-temperature model on
+    # them would be circular. Admitted, they doubled the population and moved
+    # the gap from +1.9 % to +1.0 % -- on an assumption, not a measurement.
+    _assumed = S["t_amb_assumed"].astype(bool) if "t_amb_assumed" in S else False
+    hi = S[(S.map_kpa > 200) & (~S.maf_pinned.astype(bool)) & (~_assumed)]
     logged = []
     for f in sorted(glob.glob(os.path.join(here, "logs/raw/*.csv"))):
         if os.path.basename(f) not in set(hi.source):

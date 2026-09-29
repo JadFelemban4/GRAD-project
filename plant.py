@@ -380,11 +380,11 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 
 
 # ---------------------------------------------------------------------------
-# Compressor boost ceiling — measured, refit dated 8 September 2026
+# Compressor boost ceiling -- DERIVED from the logs, re-derived with every drive
 # ---------------------------------------------------------------------------
 # This is NOT a compressor map. It is the OPERATING CEILING: the highest
 # pressure ratio the vehicle was observed to reach at a given corrected mass
-# flow, across 74 013 quasi-steady samples over 295.0 minutes and ten drives.
+# flow, over every quasi-steady, MAF-unpinned sample in data/master_samples.csv.
 #
 # The difference matters. A compressor map shows what the compressor CAN do,
 # bounded by surge and choke, with efficiency islands and shaft-speed lines.
@@ -396,40 +396,32 @@ def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
 # manifold pressure was an unbounded input, so it would produce whatever power
 # the commanded boost implied. This bounds it to what the vehicle actually does.
 #
-# REFITTED 8 September 2026, after the mid-load drive (cb67b01f) filled the
-# empty middle. The shipped constants stand on the quasi-steady set named above,
-# whose size verify_docs.py checks against the shipped data on every run — so if
-# this comment and the data ever part company again, the run says so.
+# THE CEILING IS THE MEASURED ENVELOPE ITSELF (28 September 2026): the 95th
+# percentile of pressure ratio in each 0.03 kg/s corrected-flow bin, made
+# monotone by a running maximum (a ceiling cannot fall as flow rises), anchored
+# at PR 1 with no flow, interpolated linearly between bins, and capped at the
+# highest stable pressure ratio in the logs. NO CONSTANT IS FITTED. It is
+# computed by derive_params.py every time the data changes and read from
+# data/derived_params.json, which also carries each bin's row and
+# independent-reading counts.
 #
-# RETIRED-OK: the FIRST version of this curve stood on 13 764 samples from the
-# two 7 September drives alone. That is why its middle was empty and its shape
-# was wrong. It is void, and none of the numbers below come from it.
+# What it replaced: PR = 1 + A*m/(1 + B*m) with A = 14.5023, B = 6.4019, fitted
+# once on 8 September, capped at 2.6 "observed peak plus margin" -- a margin
+# nobody measured. That form was chosen because a quadratic turned over above
+# 0.25 kg/s; the running maximum guarantees the same thing without a formula,
+# and unlike it can follow the envelope's jump from PR 1.6 at 0.075 kg/s to 2.1
+# at 0.105 kg/s -- exactly where drive B's low-rpm roll-ons sit, and where the
+# formula left the modelled engine short of torque at 1600-2200 rpm.
 #
-# Measured envelope (95th percentile of pressure ratio per flow bin, n >= 15):
-#     0.021 kg/s -> 1.175      0.194 kg/s -> 2.219
-#     0.039 kg/s -> 1.314      0.230 kg/s -> 2.415
-#     0.070 kg/s -> 1.537      0.260 kg/s -> 2.287
-#     0.105 kg/s -> 1.933      0.289 kg/s -> 2.515
-#     0.134 kg/s -> 2.283      0.303 kg/s -> 2.395
-#     0.164 kg/s -> 2.353
+# Drive B (28 September) was logged for exactly this: full-throttle roll-ons in
+# a held 6th, 7th and 8th from 1440-2000 rpm, where the flat-road logs had never
+# asked for boost. It logged no ambient temperature, so its corrected flow uses
+# an ambient taken from our own afternoon logs (build_dataset.AMB_FALLBACK_C);
+# derive_params.py re-derives A and B at the coolest and hottest ambient ever
+# logged and records both, so the effect of that assumption is on file.
 #
-# THE FIT SHAPE CHANGED, AND THAT IS THE POINT. The old quadratic was fitted
-# across an empty middle and under-predicted badly once the middle was measured
-# (1.53 against 2.28 observed at 0.134 kg/s). Worse, a parabola refitted to the
-# filled data turns over and falls above 0.25 kg/s, which no boost ceiling does.
-#
-# The shipped form is monotone and saturating,
-#
-#     PR = 1 + a*m / (1 + b*m)
-#
-# which is the shape the physics gives: pressure ratio climbs with flow until
-# the wastegate opens to hold the boost target, then flattens. RMS residual
-# against the binned envelope is 0.129 in pressure ratio.
-#
-# REMAINING GAP: 0.33-0.36 kg/s corrected. Above 0.30 the car is at full
-# throttle and does not stay there long enough to log a steady window.
+# REMAINING GAP: above 0.314 kg/s corrected, where the MAF saturates.
 
-BOOST_CEIL_A, BOOST_CEIL_B = 14.5023, 6.4019      # PR = 1 + A*m/(1 + B*m)
 T_REF_CORR, P_REF_CORR = 298.0, 101.3
 
 
@@ -451,9 +443,18 @@ def boost_ceiling_kpa(mdot_air_gps, t_inlet_k=298.0, p_inlet_kpa=99.3):
     the downstream temperature inflates corrected flow and raises the ceiling by
     about 10 %, which quietly defeats the point of having a ceiling.
     """
+    c = boost_ceiling_constants()
     m = corrected_flow(mdot_air_gps, t_inlet_k, p_inlet_kpa)
-    pr = 1.0 + BOOST_CEIL_A * m / (1.0 + BOOST_CEIL_B * m)
-    return float(p_inlet_kpa * min(pr, 2.6))       # 2.6 = observed peak plus margin
+    pr = float(np.interp(m, c["envelope_flow"], c["envelope_pr"]))
+    return float(p_inlet_kpa * min(pr, c["pr_cap"]))
+
+
+def boost_ceiling_constants():
+    """A, B and the cap, DERIVED from the logs (derive_params.py). Read when
+    called, not at import, so build_dataset.py -- which imports this module --
+    can run before the derived file exists."""
+    import derived
+    return derived.get("boost_ceiling")
 
 
 def charge_temperature(t_amb_k, t_block_k=None) -> float:

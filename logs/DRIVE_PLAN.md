@@ -16,6 +16,17 @@ first, or retrain now on the current plant and retrain once more after them —
 three hours of machine time each way. C changes no parameter the training
 uses; it decides whether the knock model can be kept at all.
 
+> **28 September 2026, evening: DRIVE B IS DONE** —
+> `logs/raw/driveB_rollons-20260928_140513.csv`, 41 full-throttle roll-ons in a
+> held 6th/7th/8th. What it bought and what it could not: the evening session
+> report, section 1. **One lesson for every drive below: log `Ambient
+> temperature`.** Drive B's list left it out, so its corrected flow and charge
+> temperature rest on an ambient borrowed from other drives
+> (`build_dataset.AMB_FALLBACK_C`), and the charge-temperature check has to
+> exclude it. It is now on every list below. **Drive A is the most valuable
+> drive left**: `validate.py` rows 8 and 9 (the oil) and the coolant regulation
+> law all need sustained load logged with oil and ambient.
+
 **Read-only, always.** BimmerLink logs; nothing is ever written to the car.
 Passenger runs the phone, driver drives. Every instruction below is to be
 done only where it is legal and the road is clear — if a step cannot be done
@@ -80,7 +91,7 @@ in the region the whole experiment runs in. This drive gives:
 | `Coolant temperature` | the block node's boundary — and the warm filter |
 | `Oil temperature` | the node being identified |
 | `Engine radiator outlet temperature (coolant)` | radiator cold side |
-| `Ambient temperature` | every heat flow's boundary |
+| `Ambient temperature` | every heat flow's boundary -- and without it the thermal fit cannot use the drive at all (`calibrate_thermal.usable_drives`) |
 
 **How to drive.**
 
@@ -98,7 +109,7 @@ in the region the whole experiment runs in. This drive gives:
 
 ---
 
-## Drive B — full-throttle roll-ons in a high gear, for low-rpm boost
+## Drive B — full-throttle roll-ons in a high gear, for low-rpm boost — DONE 28 September
 
 **Why.** The simulator's boost ceiling is "what the car was seen to do", and on
 flat roads the car was never asked for boost at low engine speed. So the model
@@ -119,6 +130,7 @@ ceiling be refitted and the workaround retired.
 | `Ambient pressure` | pressure ratio |
 | `Throttle valve angle related to the lower stop` | proves the pull was full throttle |
 | `Coolant temperature` | warm filter |
+| `Ambient temperature` | ADDED 28 Sep: corrected flow and charge temperature need it; the drive as logged did not have it |
 
 **How to drive.** A straight, empty multi-lane road with a 120 km/h limit or
 higher, engine warm.

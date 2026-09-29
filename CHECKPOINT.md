@@ -1,4 +1,4 @@
-# CHECKPOINT.md — state as of 19 September 2026
+# CHECKPOINT.md — state as of 28 September 2026 (evening)
 
 **What this file is for:** a dated snapshot of where the work stands and what was
 verified when. `CLAUDE.md` is the permanent handoff and the mistake log — the
@@ -21,6 +21,7 @@ file if it is more than a week old.
 > document was swept against the data. See the 11 September section at the
 > bottom of this file.
 
+> <!-- RETIRED-OK -->
 > **14 September, the citation pass, the live app and a ninth drive.**
 > `REFERENCES.md` now records, row by row, which of `validate.py`'s eleven
 > bands have a source and which do not — **seven do not**. `app/` runs the
@@ -30,6 +31,7 @@ file if it is more than a week old.
 > compression ratio depends on an engine version nobody has recorded. See the
 > last section of this file.
 
+> <!-- RETIRED-OK -->
 > **13–16 September, v19, the ninth drive and the live app.** `pull01` joined
 > `logs/raw/`, taking the manifest to **ten drives, 295.0 minutes** — it
 > contributes zero samples and zero operating points by design, so no
@@ -45,13 +47,13 @@ file if it is more than a week old.
 | Phase | Status |
 |---|---|
 | A · setup | done |
-| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.831, zero free parameters), 1.1 % with k fitted (0.837, one). 26 pooled points, 30–75 kPa, 295.0 min logged. Read mistake 12 before quoting either |
-| C · get an agent to learn | **next.** `train.py` exists and runs; nothing trained yet |
-| D · baselines and the ablation | not started. **This is the floor of the project** |
+| B · match the simulator to the car | **passed** — 1.4 % load residual with k derived (0.831, zero free parameters), 1.1 % with k fitted (0.839, one). 26 pooled points, 30–75 kPa, 321.7 min logged over eleven drives. Since 28 Sep the constants the logs can set are DERIVED from them (`derive_params.py`); `validate.py` 8 of 11. Read mistake 12 before quoting the residual |
+| C · get an agent to learn | **retrain ready, not run.** New road every episode, dt = 1.0. The ten agents in `runs/` are a record (110 km/h, dt 0.2, one road, an older plant) |
+| D · baselines and the ablation | protocol exists (`evaluate.py`, twenty frozen episodes, now with a thermal-only damage column). **No valid result yet. This is the floor of the project** |
 | E · battery plant | not started. `battery.py` does not exist |
-| F · the H/τ sweep | preliminary only, from hand-written policies |
+| F · the H/τ sweep | measurable again (the scenario binds); `generality_test.py` now reports preview over CURRENT-GRADE, the honest comparator. Not before D |
 | G · writing | not started |
-| **APP · live supervisor** | **working and tested, 46 of 46 replay checks.** `app/` runs this same physics beside the car and estimates turbine temperature. A SECOND deliverable — it does not advance D, and D is the passing bar |
+| **APP · live supervisor** | **working and tested.** `app/` runs this same physics beside the car and estimates turbine temperature. A SECOND deliverable — it does not advance D |
 
 **Phase D is the passing bar.** Validated simulator + agent beating two baselines
 + an ablation isolating preview. Do not start E or F until D produces a table.
@@ -625,6 +627,7 @@ is the citation pass, this one is the app. Neither supersedes the other.)*
 
 ### The dataset now reads three different drive counts, and all three are right
 
+<!-- RETIRED-OK -->
 | population | count | used for |
 |---|---|---|
 | manifest | **9** drives, 295.0 min | "how much have we logged" |
@@ -826,6 +829,7 @@ duty cycle is wrong, not the model. Measured on the simulator:
 
 **What the loaded scenario shows.** `check_premise.py`, hand-written policies:
 
+<!-- RETIRED-OK -->
 | policy | damage | cuts | peak turbine |
 |---|---|---|---|
 | baseline ECU (true neutral) | 959.8 | — | 884 °C |
@@ -848,6 +852,7 @@ than trivially negative, and only a trained pair can settle it.
 
 Full account: `SESSION_REPORT_2026-09-28.md`. What was verified, and on what:
 
+<!-- RETIRED-OK -->
 | check | result, 28 September |
 |---|---|
 | `verify_docs.py` | all checks pass |
@@ -856,7 +861,7 @@ Full account: `SESSION_REPORT_2026-09-28.md`. What was verified, and on what:
 | `check_premise.py` | baseline 951.9 at 884 °C; current-grade cuts 34.4 %, predictive 34.0 %; preview −0.4 |
 | `validate.py` | 7 of 11 — rows 8–11 (oil, coolant) now scored against our own car; it read eight of eleven against literature bands |
 | `check_map.py` | 6 cells above the compressor ceiling, 0 without knock-free spark (unchanged) |
-| `python -m app.test_replay` | 49 of 49; `--full` 59 of 59; `pull01` pin 608.0 → 609.2 °C with its reason |
+| `python -m app.test_replay` | 49 of 49; `--full` 59 of 59; `pull01` pin 608.0 → 609.2 °C with its reason (that morning) |
 | `model_vs_data.py` | eleven comparisons: 3 agree, 3 limited, 3 off, 1 untested, 1 not covered — drive10's oil and coolant moved to *off* once the replay was fed the car's measured fuel |
 | `evaluate.py`, ten existing agents | training +25.9 pts over current-grade; ablation mean −0.5, CI −2.0 to +1.1 |
 
@@ -884,10 +889,36 @@ seeded at the first real reading, fed measured fuel (air mass / 14.7 λ).
 | 10 coolant, synthetic climb | 94.5 °C | 83.5–95.6 | inside |
 | 11 coolant, drive10 | 88.4 °C | 91.8–94 | outside |
 
-**7 of 11**: 6 of 7 literature, 1 of 4 car. The car's oil τ implies
+<!-- RETIRED-OK -->
+**7 of 11** (that afternoon): 6 of 7 literature, 1 of 4 car. The car's oil τ implies
 c_oil ≈ 60 000–86 000 J/K against the assumed 12 000; `thermal.py` unchanged,
 because it moves the locked scenario. REFERENCES.md gained section 2c (GCC
 spec: no uprated cooling found; 95 vs 98 RON moves only the knock term) and
 section 3 now grades rows 8–11 as MEASURED (ours). Found by hand: REFERENCES
 still quoted the pre-H1 best BSFC (239.9 since); fixed and guarded in
 `verify_docs.RETIRED`. Verification on this tree is in the commit message.
+
+---
+
+## Session of 28 September 2026, evening — drive B, and the constants the data sets
+
+Full account: `SESSION_REPORT_2026-09-28_evening.md`. Verified on this tree:
+
+| check | result, 28 September (evening) |
+|---|---|
+| `build_dataset.py` | 321.7 min, 11 drives, 26 operating points; drive B's 7 windows dropped (no spark or lambda channel); then `derive_params.py` |
+| `derive_params.py` | thermal fit on 7 drives, oil τ 57 s, stat opens 92.1 °C, radiator ×1.42; envelope over 11 bins, cap 2.515; SPARK_A 13.42; ENR_DWELL 1.5 / 3.0 s |
+| `validate.py` | **8 of 11**: 6 of 7 literature, 2 of 4 car — rows 10 and 11 inside, rows 8 and 9 outside |
+| `check_premise.py` | baseline 920.1 at 883 °C; reactive 625.7, current-grade 520.5, predictive 523.5; preview over current-grade −0.3 |
+| `test_reward.py` | 8 of 8 |
+| `check_roads.py` | PASS; 14 of 40 roads bind |
+| `check_map.py` | unchanged shape; 6 cells above the ceiling, 0 unsafe |
+| `compare_log.py` | 1.4 % derived (k 0.831); 1.1 % fitted (k 0.839) |
+| `model_vs_data.py` | charge temperature +1.9 % (drive B's assumed-ambient rows excluded); drive10 oil median −1.6 K, coolant −0.6 K |
+| `python -m app.test_replay` | 49 of 49; `--full` 59 of 59. Pins moved and attributed by reverting one change at a time: `pull01` 609.2 → 604.8 °C, thermal 1 → 0 (the derived enrichment dwell); `7475b5d7` 890.6 → 873.1 °C, thermal 15 → 14 (exhaust = air + fuel) |
+| `generality_test.py` | τ axis on the measured 121.3 g/s; preview over CURRENT-GRADE 0.0 points at every τ and cost curvature (the reactive edges are 13–80 points) |
+| `run_results.py` | traces, sweep (3 of 12 bind; 12 % / 130 km/h 883.0 °C) and the ten old agents re-scored: +25.7 over current-grade, ablation mean −1.3 (t −0.53) |
+| `verify_docs.py` | all checks pass (run it and read its total) |
+
+What changed in the simulator, one step at a time and each measured, is
+section 6 of the session report and `results/figures/fig23`.

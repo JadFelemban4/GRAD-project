@@ -117,7 +117,10 @@ def boost_gap(S):
     """Inverted manifold pressure under boost vs the car's own boost channel."""
     import glob
     from plant import map_from_airflow
-    hi = S[(S.map_kpa > 200) & (~S.maf_pinned.astype(bool))].copy()
+    # Rows whose ambient was not logged (drive B) are excluded: their charge
+    # temperature rests on an assumed ambient, which would make this circular.
+    _assumed = S["t_amb_assumed"].astype(bool) if "t_amb_assumed" in S else False
+    hi = S[(S.map_kpa > 200) & (~S.maf_pinned.astype(bool)) & (~_assumed)].copy()
     # The same samples re-inverted with the raw pre-throttle sensor as the
     # charge temperature -- what the model did before mistake 13.
     raw = [map_from_airflow(a, n, t + 273.15)
@@ -284,6 +287,33 @@ def oil_variant(variant, source="7475b5d7-20260908_142743.csv"):
     return dict(variant=variant, peak_model=float(om.max()), peak_car=float(np.nanmax(oc)),
                 max_gap=float(np.max(r["oil_model"] - r["ect_model"])),
                 rmse=float(np.sqrt(np.mean((om[ok] - oc[ok]) ** 2))))
+
+
+def row8_split():
+    """How much of validate.py row 8's miss is the COOLANT, and how much the oil?
+
+    Added 29 September 2026. Row 8 scores the model's oil over drive10's hottest
+    ten minutes against the car's. The oil sits on the block, so a block that
+    runs cool drags the oil down with it. Replaying the same drive with the
+    block pinned to the MEASURED coolant takes the coolant out of the question:
+    what the oil gains is the coolant's share of the miss, and what is still
+    missing is the oil node's own rise over its coolant.
+
+    28 September's documents said "about 6 K" of the miss was the coolant and
+    that it was "most of" it. Measured here, on the row's own window, it is
+    neither; see the printout.
+    """
+    import car_thermal as CT
+    k = 273.15
+    free = CT.thermal_replay(CT.SUSTAINED_DRIVE)
+    pin = CT.thermal_replay(CT.SUSTAINED_DRIVE, pin_block=True)
+    sl = CT.hottest_window(free["oil_car"])
+    med = lambda v: float(np.nanmedian(v[sl]) - k)
+    car_oil, car_ect = med(free["oil_car"]), med(free["ect_car"])
+    oil_free, ect_free, oil_pin = med(free["oil_model"]), med(free["ect_model"]), med(pin["oil_model"])
+    return dict(car_oil=car_oil, car_ect=car_ect, oil_free=oil_free, ect_free=ect_free,
+                oil_pinned=oil_pin, miss=car_oil - oil_free, coolant_part=oil_pin - oil_free,
+                oil_part=car_oil - oil_pin, rise_car=car_oil - car_ect, rise_model=oil_pin - car_ect)
 
 
 def knock_sampling():
@@ -495,6 +525,8 @@ def _heavy(job):
         return kind, oil_variant(arg)
     if kind == "oil_in":
         return kind, oil_inputs(arg)
+    if kind == "row8":
+        return kind, row8_split()
     if kind == "duty":
         S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
         return kind, duty_cycle(S)
@@ -509,7 +541,8 @@ def main():
 
     jobs = [("replay", "drive10-20260918_233912.csv"),
             ("replay", "7475b5d7-20260908_142743.csv"),
-            ("knock", None), ("load", None), ("literature", None), ("duty", None)] + [
+            ("knock", None), ("load", None), ("literature", None), ("duty", None),
+            ("row8", None)] + [
             ("oil", v) for v in OIL_VARIANTS] + [
             ("oil_in", s) for s in OIL_FIT_DRIVES + OIL_HELD_OUT]
     with ProcessPoolExecutor(max_workers=min(10, len(jobs))) as ex:
@@ -578,6 +611,13 @@ def main():
         pk = "  ".join(f"{n} {v['model']:.0f}/{v['car']:.0f} C" for n, v in o["peaks"].items())
         print(f"  oil fit, {k:<8} frac {o['frac']:.3f} c_oil {o['c_oil']:>6.0f}  fit RMSE {o['fit_rmse']:.2f} K  "
               f"held-out {o['held_out_rmse']:.2f} K   peaks model/car: {pk}")
+    R8 = res["row8"]
+    print(f"  row 8, drive10's hottest 10 min: car oil {R8['car_oil']:.1f} C, model {R8['oil_free']:.1f} C "
+          f"-> miss {R8['miss']:.1f} K")
+    print(f"    coolant's share (block pinned to the car's {R8['car_ect']:.1f} C, model's own "
+          f"{R8['ect_free']:.1f} C)   {R8['coolant_part']:.1f} K")
+    print(f"    oil node's share (oil over coolant: car {R8['rise_car']:.1f} K, model "
+          f"{R8['rise_model']:.1f} K)   {R8['oil_part']:.1f} K")
     D = res["duty"]
     print(f"  scenario operating point                {D['scenario_rpm']:.0f} rpm, {D['scenario_map']:.0f} kPa")
     print(f"  logged moving samples at or above it    {D['frac_logs_at_or_above_scenario']:6.2f} %")

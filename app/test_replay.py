@@ -98,13 +98,33 @@ LOG_FULL = os.path.join(ROOT, "logs", "raw", "7475b5d7-20260908_142743.csv")
 # the turbine node runs slightly hotter between pulls. 7475b5d7 reports its own
 # spark and never takes the fallback, and its peak did not move: the estimator's
 # physics is unchanged. No alert count moves.
+# ---------------------------------------------------------------------------
+#
+# MOVED 28 SEPTEMBER (evening) by the derived plant. Attributed by reverting
+# each change in turn on the full replay (the pins came back exactly with all
+# of them reverted: 609.2 C / 1 and 890.6 C / 15):
+#
+#   pull01    peak 609.2 -> 604.8 C, thermal 1 -> 0
+#       ENR_DWELL_LO/HI derived on the timestamp axis (2/9 s -> 1.5/3 s):
+#       pull01 logs no lambda, so the fallback runs through BaselineECU, which
+#       now enriches much sooner into a pull, and the modelled EGT is cooler.
+#       Reverting that alone gives 618.0 C. The exhaust flow (below) moves it
+#       the other way on this drive's shorter pulls; either change alone
+#       restores the one thermal warning.
+#   7475b5d7  peak 890.6 -> 873.1 C, thermal 15 -> 14
+#       EXHAUST MASS FLOW = AIR + FUEL (was fuel x 15; AUDIT.md M2). This drive
+#       reports its own spark and lambda, so the ECU fallback never runs; on its
+#       rich pulls (lambda 0.78) air + fuel is ~12.5 x fuel, not 15, the turbine
+#       node's gas-side conductance is lower and it lags the exhaust more.
+#       Reverting that alone gives 890.7 C and 15 warnings. The enrichment,
+#       spark and thermal-network changes move it by 0.3 K or less.
 EXPECT_FAST = {           # pull01, 7 channels, 1.45 s per channel
     "rows": 2193, "estimated": 2186,
-    "peak_turb_c": 609.2, "thermal": 1, "mismatch": 0, "novel": 4,
+    "peak_turb_c": 604.8, "thermal": 0, "mismatch": 0, "novel": 4,
 }
 EXPECT_FULL = {           # 7475b5d7, 26 channels, 7.5 s per channel
     "rows": 14340, "estimated": 14278,
-    "peak_turb_c": 890.6, "thermal": 15, "mismatch": 0, "novel": 19,
+    "peak_turb_c": 873.1, "thermal": 14, "mismatch": 0, "novel": 19,
 }
 
 checks: list[tuple[str, bool, str]] = []

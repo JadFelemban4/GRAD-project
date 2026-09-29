@@ -1,145 +1,107 @@
 # Prompt for the next chat
 
 Copy everything inside the fence into a new Claude Code session opened in
-`C:\Users\badcl\Desktop\GRAD-project`. Written 28 September 2026.
+`C:\Users\badcl\Desktop\GRAD-project`. Written 28 September 2026 (evening).
 
 ---
 
 ```
 Continue the BMW B58 graduation project. Read CLAUDE.md first — it is the
-handoff and the mistake log, and its current-state boxes (the two 28 September
-boxes and 27 September) are current. Then handoff.md (the short entry point) and
-SESSION_REPORT_2026-09-28.md (the last session in full).
+handoff and the mistake log, and its FIRST current-state box (28 September,
+evening) is current. Then handoff.md (the short entry point) and
+SESSION_REPORT_2026-09-28_evening.md (the last session in full).
 
 WHERE THINGS STAND
 
-The Phase D retrain is READY and has NOT been run. Everything it needs is
-committed on branch JMF-2340550 (not pushed):
+The working tree on branch JMF-2340550 may carry the evening's work
+UNCOMMITTED — check `git status` first and ask the user before committing.
 
-  - the locked scoring scenario: 12 % at 130 km/h, 42 C, which binds
-    (baseline 884 C against the 850 C trigger). evaluate.py scores it on
-    twenty frozen episodes. NEITHER may change.
-  - TRAINING on a new road every episode (engine_env.TerrainTrainingEnv):
-    the locked climb itself, single climbs of 4-14 %, rolling hills, double
-    climbs, flat. check_roads.py PASSES: 11 of 40 roads push the baseline past
-    the trigger; worst neutral reward about +0.004.
-  - train.py passes dt = 1.0, the step evaluate.py scores at (it never passed
-    dt before). 50 000 steps = 55 episodes. Output: runs/terrain_dt1/.
+1. DRIVE B IS IN (logs/raw/driveB_rollons-20260928_140513.csv): full-throttle
+   roll-ons in held gears. Dataset 321.7 min, eleven drives, eight carrying
+   samples. It logged no ambient temperature and no oil.
 
-Two simulator fixes landed on 27 September, each with its measured effect:
-  - GEARBOX: in 8th at 130 km/h the model sustains 333 Nm but the box only
-    downshifted above 375 Nm, so ~9 % grades were undrivable by any policy.
-    It now kicks down when the engine falls short
-    (Vehicle.DELIVERABLE_TORQUE). A stated workaround: the boost ceiling is
-    too low at low rpm because the car was never logged there.
-  - SPARK: the car-fitted map sat above the model's knock limit at all 26
-    steady points and was never used. SPARK_A 26.18 -> 13.33 (offset only):
-    part-load bias +3.16 -> -0.08 deg. Boost stays knock-limited.
+2. THE DATA SETS THE CONSTANTS. derive_params.py recomputes everything the
+   car's logs can set -> data/derived_params.json -> read through derived.py by
+   thermal.py, plant.py and engine_env.py. build_dataset.py runs it at the end.
+   Derived: the thermal block + oil nodes (calibrate_thermal.py), the boost
+   ceiling (it IS the measured envelope now, no formula), SPARK_A, ENR_DWELL_LO
+   / HI, the gearbox's DELIVERABLE_TORQUE, MAP_CEIL_KPA. What cannot be derived
+   and why: REFERENCES.md section 4b. A NEW DRIVE CHANGES THE PLANT, and a
+   plant change after the retrain means retraining.
 
-Hand-written premise now: baseline 951.9, reactive 671.1 (29.5 %),
-current-grade 624.5 (34.4 %), predictive 628.4 (34.0 %).
+3. THE OIL NODE WAS RE-STRUCTURED from the data: heated by engine speed,
+   cooled by road speed (it was 5 % of fuel, constant cooling). Oil tau 14 ->
+   57 s. validate.py 8 of 11 (6/7 literature, 2/4 car). Rows 10-11 (coolant)
+   pass; rows 8-9 (oil) still miss — 97.0 C vs 103-111, 60 s vs 70-100 — and
+   that was NOT tuned away. Drive A is the data that would settle it.
 
-The ten agents in runs/ are a record, not a result (110 km/h, dt 0.2, one
-road). Scored on the locked climb anyway (results/phase_d_130kmh.txt):
-training beats current-grade by +25.9 points; sighted minus blinded, paired by
-seed, mean -0.5, 95 % CI -2.0 to +1.1 -- indistinguishable from zero.
+4. THE PREMISE on the derived plant: baseline 920.1 at 883 C, current-grade
+   520.5, predictive 523.5; preview over current-grade -0.3 (it was -0.4 and
+   did not move through any of the evening's changes). results/premise.json.
 
-THREE FINDINGS FROM 28 SEPTEMBER (model_vs_data.py prints all three)
-  - The knock comparison could not have seen knock: 7475b5d7 holds ~404
-    readings of each ignition angle in 55 min, one per ~8 s. UNTESTED, not
-    refuted. Drive C tests it.
-  - Preview's -0.4 against current-grade is ENTIRELY the knock term (6-12 %
-    of damage). On turbine + oil damage alone the two tie. Report both.
-  - The existing logs CANNOT calibrate the oil node: fitting it on the light-
-    load drives fixes the hard pulls but breaks drive10. Drive A decides.
-
-LATER ON 28 SEPTEMBER (uncommitted work is committed at the end of that session)
-  - validate.py rows 8-11 (oil, coolant) are scored against bands computed
-    from OUR OWN DRIVES, through car_thermal.py (thermal.py free-running over
-    a logged drive, fed measured fuel = air mass / 14.7 lambda). validate.py
-    now reads 7 of 11: 6 of 7 literature, 1 of 4 our car.
-  - The car's oil time constant is 70-100 s; the model's is 14 s
-    (= c_oil / (ua_block_oil + ua_oil_amb) = 12 000 / 860). The oil node is
-    4-7x too light, or too tightly coupled -- only the ratio is known.
-    thermal.py is NOT changed: it moves the locked scenario.
-  - drive10's oil and coolant now read -6.1 K / -4.7 K (off), not agrees.
-  - GCC spec: no admissible source for uprated cooling; 50 % stronger cooling
-    moves the climb's turbine 0.5 K. REFERENCES.md section 2c.
-  - FUEL: the manual says 95 RON minimum, 98 recommended; the model runs 95.
-    98 moves only the knock term. Nobody has said which fuel the car was
-    LOGGED on -- ask before the retrain.
-
-Altitude is NOT modelled: the scored climb rises 2 340 m in sea-level air.
-It is sustained load at sea level, not a mountain.
+5. The Phase D retrain is READY and NOT RUN: TerrainTrainingEnv, dt = 1.0,
+   output runs/terrain_dt1/. The ten agents in runs/ are a record (110 km/h,
+   dt 0.2, one road, an older plant).
 
 DO THESE, IN THIS ORDER
 
-1. Run verify_docs.py, test_reward.py (8 of 8) and check_roads.py (PASS) to
-   confirm the tree is sound.
+1. git status. If the evening's work is uncommitted, run verify_docs.py,
+   test_reward.py, check_roads.py and python -m app.test_replay, show the user
+   the results, and ask before committing.
 
-2. ASK THE USER two things, then act on the answers:
-     - which fuel the car was filled with while it was logged (95 or 98 RON),
-       and the manual's page. If 98: refit BaselineECU.knock_limited_spark,
-       re-run validate.py and check_map.py (REFERENCES.md 2c).
-     - which order: (a) retrain now on the current plant, and again after
-       drives A/B; or (b) wait for drives A and B (logs/DRIVE_PLAN.md),
-       recalibrate -- including the oil node against the car's 70-100 s
-       time constant -- then retrain.
-   A plant change after the retrain means retraining again (~3 h each).
+2. ASK THE USER:
+     - which fuel the car was logged on (95 or 98 RON) — REFERENCES.md 2c;
+     - drive A before the retrain, or after. Drive A must log Ambient
+       temperature and Oil temperature (logs/DRIVE_PLAN.md).
+     - whether to merge origin/JMF-2340550-sep17 now: 7 conflicts, 4 in code
+       (engine_env.py, train.py, evaluate.py, verify_docs.py). Resolve code
+       toward THIS branch — sep17's engine_env.py has the six-speed gearbox.
 
-3. RETRAIN (only with the user's go-ahead -- it occupies the machine):
+3. RETRAIN (only with the user's go-ahead — ~3 h of machine time):
        python train.py --steps 50000 --seed 0..4
        python train.py --steps 50000 --seed 0..4 --no-preview
-   Ten together, OMP_NUM_THREADS=1 each; ~3 h on the 20-core box.
+   Record the data/derived_params.json commit beside the result.
 
-4. SCORE ONLY WITH evaluate.py. Twenty frozen episodes, paired by seed, three
-   rows (sighted, blinded, current-grade), and damage two ways: total and
-   turbine + oil. Adding that second column is a reporting change, not a
-   change to training or the episodes.
-
-5. Update results/, make_figures.py, make_page.py and republish the page
-   (Artifact, same file path results/page/index.html).
-
-6. Merge origin/JMF-2340550-sep17 before reporting Phase D. The code it needs
-   is already here; the merge is documents and history.
+4. SCORE ONLY WITH evaluate.py (twenty frozen episodes, paired by seed; it now
+   prints a thermal-only damage column too). Then run_results.py,
+   compare_calibration.py, make_figures.py, make_page.py.
 
 IF A NEW DRIVE CSV ARRIVES
-   Follow logs/DRIVE_PLAN.md and CLAUDE.md's routine: new_drive.py, then
-   build_dataset.py, compare_log.py, model_vs_data.py, validate.py. Drive A ->
-   fit the oil node with the block pinned to measured coolant
-   (model_vs_data.oil_identification), re-check ua_block_oil jointly, and
-   require the car's oil time constant (validate.py row 9) to come out too. Drive B
-   -> refit boost_ceiling_kpa at low flow and retire the gearbox workaround.
-   Drive C -> re-run the knock comparison on readings, not rows.
+   python new_drive.py <file>; then build_dataset.py (which re-derives the
+   plant); then compare_log.py, model_vs_data.py, validate.py, check_premise.py,
+   test_reward.py, check_roads.py, verify_docs.py. Header capitalisation varies
+   between exports — the readers are case-insensitive now. A drive with no
+   ambient channel gets build_dataset.AMB_FALLBACK_C and is excluded from the
+   charge-temperature check.
 
 HOUSE RULES THAT ARE NOT NEGOTIABLE
 - The car is read-only. Nothing is ever written to its ECU.
-- Run verify_docs.py before quoting any number. Never edit its expected
-  values to make a check pass. When a figure changes, grep the tree for the
-  OLD value yourself -- including sections marked RETIRED-OK, which the
-  checker skips.
-- Never edit logs/raw/ or data/ by hand. Regenerate with build_dataset.py.
+- Run verify_docs.py before quoting any number. Never edit its expected values
+  to make a check pass — only for a measured change, with the reason beside it.
+- Never edit logs/raw/, data/ or data/derived_params.json by hand.
+- No fitted number typed into a module where the data can set it: derive it
+  (derive_params.py) or say why it cannot be derived (REFERENCES.md 4b).
 - After changing the env, the plant, the gearbox, the reward or the roads:
-  test_reward.py AND check_roads.py, output pasted into the commit message.
+  test_reward.py AND check_roads.py, output in the commit message.
 - After changing plant.py or thermal.py: validate.py and validation_table.md
   in the same commit.
-- After any change under app/: python -m app.test_replay (49 of 49; --full
-  59 of 59) in the commit message. A moved pin gets its reason written beside
-  it, never a silent update.
-- Count READINGS, not rows: the logger polls one channel per row.
-- Cite nothing from memory. REFERENCES.md grades every number.
-- One change at a time, each with its measured effect.
+- After any change under app/: python -m app.test_replay; a moved pin gets the
+  change that moved it written beside it (revert one change at a time).
+- Count READINGS, not rows. Cite nothing from memory. One change at a time.
+- Every comparison gets a figure (make_figures.py).
 
 OPEN QUESTIONS WORTH YOUR ATTENTION
-- The 850 C trigger cannot be validated on this car: every pre-catalyst
-  exhaust channel reads zero. It needs a published source.
-- Enrichment's worst cell (4500-7000 rpm, 4-8 s) is 0.076 lean; the dwell
-  constants were fitted on a retired axis and are too thinly supported to
-  refit. Irrelevant to Phase D (the climb never enriches).
-- The knock-retard p99 (9.8 deg) was filtered with `Actual gear`, which clamps
-  at 6 (mistake 18). Re-derive it from the inferred gear before quoting it.
-- presentation/ is marked out of date and needs a rewrite, not a regeneration.
-- AUDIT.md open items: M6 in part, M15, L8.
+- The coolant regulation law: on the two 41-45 C afternoon drives the car's
+  valve runs 82-84 C after load; on drive10's high-rpm stretch it let 97-99 C.
+  A fixed stand-in setpoint does neither.
+- Road load (mass, drag area, rolling resistance) is typed and unsourced; the
+  wheel-torque channel could not identify it. Toyota's kerb weight needs to be
+  opened from a spec sheet.
+- The 850 C trigger cannot be validated on this car (no pre-catalyst exhaust
+  channel).
+- generality_test.py now reports preview over CURRENT-GRADE as well as over
+  reactive; only the former is a preview measurement (AUDIT.md C3).
+- presentation/ is out of date (banner on the page); it needs a rewrite.
 ```
 
 ---
@@ -150,10 +112,11 @@ OPEN QUESTIONS WORTH YOUR ATTENTION
 |---|---|
 | `CLAUDE.md` | the handoff, the mistake log, the improvement plan. Current-state boxes at the top |
 | `handoff.md` | what to run first and what each command prints today |
-| `SESSION_REPORT_2026-09-28.md` | 21–28 September in full, including the validation table's move onto car data (section 6) and the GCC / fuel check (section 7) |
-| `validation_table.md` section A | how each of the eleven rows is scored, and why rows 8–11 use our own drives |
+| `SESSION_REPORT_2026-09-28_evening.md` | drive B, the derived constants, the oil node, every fix — in full |
+| `SESSION_REPORT_2026-09-28.md` | 21–28 September (morning) in full, including the validation table's move onto car data (section 6) and the GCC / fuel check (section 7) |
+| `validation_table.md` sections A and C | how each of the eleven rows is scored, and what the 28 Sep thermal derivation changed |
 | `logs/DRIVE_PLAN.md` | the three drives still worth making, and how |
 | `results/phase_d_130kmh.txt` | the latest scoring of the existing agents, with its caveats |
 | `AUDIT.md` + `AUDIT_FIXES.md` | the 15 September review and what was done about it |
-| `REFERENCES.md` | where every number comes from |
+| `REFERENCES.md` | where every number comes from; section 4b says, constant by constant, whether the data sets it |
 | `CHECKPOINT.md` | dated snapshots, newest last |
