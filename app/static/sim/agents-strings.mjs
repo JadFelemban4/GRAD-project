@@ -22,8 +22,11 @@
 // M3 adds the models panel's strings (agents.models.*; model-panel.mjs) and
 // the pause panel's empty line (agents.pause.empty), from sections 7.5b, 7.7,
 // 7.8 and 7.9 of docs/superpowers/specs/2026-09-28-agent-replay-m3-design.md,
-// verbatim where it gives them. None of them needs an escape: the en dash in
-// '70–500 ms' and the section sign in 'MCA §4.1' are ordinary characters.
+// verbatim where it gives them. The en dash in '70–500 ms' and the section
+// sign in 'MCA §4.1' are ordinary characters. The two Arabic latency lines
+// carry escapes: each Latin run that must keep its order ("{ms} ms",
+// "{device}", "70–500 ms") is a left-to-right isolate, U+2066 ... U+2069,
+// or the line draws "65 ms" as "ms 65" (the M3 final review, 29 Sep).
 
 import { STRINGS } from './i18n.mjs';
 
@@ -157,7 +160,7 @@ export const AGENT_STRINGS = {
     'agents.models.jev.status.configured': 'مفتاح مُعَدّ ({source})',
     'agents.models.jev.status.no_key': 'لا مفتاح؛ لن يُرسل شيء',
     'agents.models.jev.ask': 'اسأل jev عن هذه الثانية (استدعاء مدفوع واحد)',
-    'agents.models.jev.latency': '{ms} ms، مقيسة من هذا الجهاز (ادعاء المورّد 70–500 ms)',
+    'agents.models.jev.latency': '\u2066{ms} ms\u2069، مقيسة من هذا الجهاز (ادعاء المورّد \u206670–500 ms\u2069)',
     'agents.models.laya.name': 'Laya · {model} · laya {version}',
     'agents.models.laya.where': 'على هذا الجهاز ({device}) · مجاني، بلا مفتاح',
     'agents.models.laya.device_unknown': 'لم يُحمَّل بعد',
@@ -170,7 +173,7 @@ export const AGENT_STRINGS = {
     'agents.models.laya.status.ready': 'محمَّل على {device} حتى يُغلق الخادم',
     'agents.models.laya.status.failed': 'تعذّر التشغيل: {code}',
     'agents.models.laya.ask': 'اسأل لايا عن هذه الثانية (على هذا الجهاز)',
-    'agents.models.laya.latency': '{ms} ms على {device}',
+    'agents.models.laya.latency': '\u2066{ms} ms\u2069 على \u2066{device}\u2069',
     'agents.models.laya.first_load': 'التحميل الأول {s} ث',
     'agents.models.reason.pause': 'أوقف العرض أولاً',
     'agents.models.reason.not_done': 'انتظر حتى تكتمل الحلقة',

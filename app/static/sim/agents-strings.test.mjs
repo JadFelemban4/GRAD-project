@@ -210,6 +210,24 @@ test('a name in the Arabic refused labels is isolated, so its parenthesis is not
   assert.equal(src.split(FSI).length - 1, 0, 'a literal U+2068 in agents-strings.mjs: write the escape');
 });
 
+// The two latency lines put a Latin number and unit inside an Arabic sentence:
+// «{ms} ms على {device}» was drawn "cuda على ms 65" (measured 28 Sep), and the
+// vendor's "70-500 ms" after Arabic letters would draw its range backwards.
+// Each Latin run that must keep its order is its own left-to-right isolate,
+// U+2066 ... U+2069, in the Arabic strings only, written as escapes (the M3
+// final review, Minor 2). The English lines read left to right already.
+test('the Arabic latency lines isolate each Latin run, so it keeps its order', () => {
+  const { AGENT_STRINGS } = api();
+  const iso = text => `${LRI}${text}${PDI}`;
+  assert.equal(AGENT_STRINGS.ar['agents.models.laya.latency'], `${iso('{ms} ms')} على ${iso('{device}')}`);
+  const jev = AGENT_STRINGS.ar['agents.models.jev.latency'];
+  assert.ok(jev.startsWith(`${iso('{ms} ms')}، `), `the measured latency is not isolated: ${jev}`);
+  assert.ok(jev.endsWith(`(ادعاء المورّد ${iso('70–500 ms')})`), `the vendor's range is not isolated: ${jev}`);
+  for (const key of ['agents.models.laya.latency', 'agents.models.jev.latency']) {
+    assert.ok(!AGENT_STRINGS.en[key].includes(LRI), `en ${key}: an English line needs no isolate`);
+  }
+});
+
 test('the M2 picker strings keep their clauses', () => {
   const { AGENT_STRINGS } = api();
   const mustSay = {

@@ -28,7 +28,7 @@ import {
 import {
   NOTHING, parsePickerQuery, experimentOf, pairOf, resolveSelection, choose, selectionSearch,
   computeState, experimentOptions, experimentNote, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
-  refusedPairs, scoredKey, blindLabelKey, notBlindCite,
+  refusedPairs, scoredKey, blindLabelKey, notBlindCite, isolateLtr,
 } from './agent-picker.mjs';
 import { createTapUnlock } from './tap-unlock.mjs';
 import {
@@ -839,6 +839,12 @@ function renderLaneLabels() {
 }
 
 // ---------------------------------------------------------------- pause panel
+// U+2212 MINUS SIGN, built from its code point (an editor draws it like a
+// hyphen): every negative number the pause panel and the models panel print.
+// A signed number that goes INTO an Arabic sentence also goes through
+// isolateLtr (agent-picker.mjs), or the sentence draws its sign on the right.
+const MINUS = String.fromCodePoint(0x2212);
+
 // The APPLIED action (env.prev_act after rescale, slew limit and bounds) in
 // its own unit: trims signed, duties as fractions.
 function fmtAction(i, v) {
@@ -847,7 +853,16 @@ function fmtAction(i, v) {
   const key = ACTIONS[i].key;
   const text = n.toFixed(ACTIONS[i].digits);
   if (key === 'fan' || key === 'pump') return text;
-  return n > 0 ? `+${text}` : text.replace('-', '\u2212');
+  return n > 0 ? `+${text}` : text.replace('-', MINUS);
+}
+
+// A model's choice in network units (level_net), three decimals, with the
+// same minus as fmtAction. NET is float32 (app/model_questions.py), so the
+// pump's middle option arrives as -5.96e-08: a value that rounds to zero
+// reads 0.000 with no sign, as formatDiff reads +0.0.
+function fmtNet(v) {
+  const text = fmt(v, 3);
+  return /^-0\.0+$/.test(text) ? text.slice(1) : text.replace('-', MINUS);
 }
 
 // The note under each duty row, by device. The modelled computer schedules the
@@ -943,7 +958,7 @@ function renderActions(frame) {
       const command = Array.isArray(car.cmd) ? commandPhysical(car.cmd, act.lo, act.hi)[i] : null;
       const held = Boolean(car.held?.[i]) && num(applied) !== null && num(command) !== null;
       cell.held.hidden = !held;
-      if (held) setText(cell.held, t(currentLang, 'agents.action.held', { x: fmtAction(i, command) }));
+      if (held) setText(cell.held, t(currentLang, 'agents.action.held', { x: isolateLtr(fmtAction(i, command)) }));
       // Row 2 offsets the CEILING of the agent's own pressure loop; its own
       // manifold pressure is what shows whether that ceiling was reached.
       cell.map.hidden = ACTIONS[i].key !== 'boost';
@@ -1160,8 +1175,8 @@ function renderModelRows(host, body, frame) {
       ref.appendChild(span);
     });
     row.appendChild(ref);
-    row.appendChild(el('p', 'model-choice',
-      t(currentLang, 'agents.models.choice', { level: fmtAction(i, v.level), net: fmt(v.net, 3) })));
+    row.appendChild(el('p', 'model-choice', t(currentLang, 'agents.models.choice',
+      { level: isolateLtr(fmtAction(i, v.level)), net: isolateLtr(fmtNet(v.net)) })));
     const bars = el('div', 'model-bars');
     for (const b of v.bars) {
       const bar = el('div', b.chosen ? 'model-bar chosen' : 'model-bar');
@@ -1174,7 +1189,7 @@ function renderModelRows(host, body, frame) {
     row.appendChild(el('p', 'model-chosen-p', t(currentLang, 'agents.models.chosen_p', { p: fmt(v.chosenP, 2) })));
     if (v.reversed) {
       const order = el('p', 'model-order');
-      order.append(el('span', '', t(currentLang, 'agents.models.reversed', { level: fmtAction(i, v.reversed.level) })),
+      order.append(el('span', '', t(currentLang, 'agents.models.reversed', { level: isolateLtr(fmtAction(i, v.reversed.level)) })),
         el('b', v.verdict, t(currentLang, v.verdict === 'held' ? 'agents.models.held' : 'agents.models.changed')));
       row.appendChild(order);
     }

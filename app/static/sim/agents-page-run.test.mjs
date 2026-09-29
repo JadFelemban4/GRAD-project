@@ -12,6 +12,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { t } from './i18n.mjs';
 import { installFakePage, byClass, FakeNode } from './agents-page-harness.mjs';
 
 // The server's own catalog (agent_api.catalog), sb3 pinned true so these tests
@@ -141,6 +142,13 @@ test('a diverged step and a stopped lane show a dash, never a held command', asy
   const [spark] = rows();
   assert.equal(part(spark, 0, 'held-line').hidden, false, 'the sighted car was held on spark');
   assert.match(part(spark, 0, 'held-line').textContent, /8\.0/, 'with its command, -8.0 degrees');
+  // Inside the Arabic sentence the command keeps its sign on the left only in
+  // a left-to-right isolate, U+2066 ... U+2069 (the M3 final review,
+  // Important 1: it was drawn with the sign on the right), and its minus is
+  // U+2212. All three are built from their code points, never typed.
+  const [LRI, PDI, MINUS] = [0x2066, 0x2069, 0x2212].map(c => String.fromCodePoint(c));
+  assert.equal(part(spark, 0, 'held-line').textContent, t('ar', 'agents.action.held', { x: `${LRI}${MINUS}8.0${PDI}` }),
+    'the held command is isolated, with U+2212');
   rows().forEach((row, i) => {
     assert.equal(part(row, 1, 'value').textContent, '—', `row ${i}: the diverged car's value`);
     assert.equal(part(row, 1, 'held-line').hidden, true, `row ${i}: a held line with no value`);

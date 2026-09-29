@@ -148,17 +148,28 @@ export function computeState(catalog, sel) {
 }
 
 /**
+ * `text` inside a left-to-right isolate, U+2066 ... U+2069. In an Arabic line
+ * a bare "+360.6" is drawn "360.6+": the digits after Arabic letters become
+ * Arabic numbers (UAX #9 W2) and the leading sign then resolves right-to-left.
+ * The isolate keeps a signed number's sign on its left. formatDiff uses it for
+ * the pair row, and agents.mjs for every signed number it puts into an
+ * Arabic sentence (the held command, the models panel's choice and reversed
+ * lines).
+ */
+export function isolateLtr(text) {
+  return `${LRI}${text}${PDI}`;
+}
+
+/**
  * A results-table difference as the tables print it: signed, one decimal,
- * inside a left-to-right isolate. In an Arabic line a bare "+360.6" is drawn
- * "360.6+": the digits after Arabic letters become Arabic numbers (UAX #9 W2)
- * and the leading sign then resolves right-to-left. U+2212 for a negative, as
- * the pause panel writes it; a value that rounds to 0.0 reads +0.0.
+ * inside a left-to-right isolate (isolateLtr). U+2212 for a negative, as the
+ * pause panel writes it; a value that rounds to 0.0 reads +0.0.
  */
 export function formatDiff(v) {
   if (typeof v !== 'number' || !Number.isFinite(v)) return EM_DASH;
   const text = Math.abs(v).toFixed(1);
   const sign = v < 0 && text !== '0.0' ? MINUS : '+';
-  return `${LRI}${sign}${text}${PDI}`;
+  return isolateLtr(`${sign}${text}`);
 }
 
 const fixed = (v, digits) => (typeof v === 'number' && Number.isFinite(v) ? v.toFixed(digits) : EM_DASH);

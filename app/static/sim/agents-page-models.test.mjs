@@ -13,7 +13,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { STRINGS } from './i18n.mjs';
+import { STRINGS, t } from './i18n.mjs';
 import { installFakePage, byClass } from './agents-page-harness.mjs';
 
 const CATALOG = {
@@ -287,4 +287,71 @@ test('and the reverse: jev\'s failures never clear Laya\'s answer, and a Laya fa
   assert.equal(nodes['ask-jev'].disabled, false, 'jev stays askable');
   assert.match(nodes['model-jev-latency'].textContent, /412 ms/);
   assert.match(nodes['model-jev-name'].textContent, /jev-latest/);
+});
+
+// U+2066 LEFT-TO-RIGHT ISOLATE, U+2069 POP DIRECTIONAL ISOLATE and U+2212
+// MINUS SIGN, built from their code points: each is invisible, or looks like
+// an ASCII character, in an editor.
+const LRI = String.fromCodePoint(0x2066);
+const PDI = String.fromCodePoint(0x2069);
+const MINUS = String.fromCodePoint(0x2212);
+const iso = text => `${LRI}${text}${PDI}`;
+// Every isolated run, so what is left of a line can be checked for bare digits.
+const ISOLATED = new RegExp(`${LRI}[^${PDI}]*${PDI}`, 'g');
+
+// In an Arabic line a bare "+4.0" is drawn "4.0+", and minus 0.075 with its
+// sign on the right: the digits after Arabic letters become Arabic numbers
+// (UAX #9 W2) and the sign then resolves right-to-left. Measured in the
+// browser on 28 Sep (the M3 final review, Important 1), beside bars in a
+// left-to-right box that draw the same level with its sign on the left. M2's
+// formatDiff isolates the pair row's number; the models panel's choice and
+// reversed lines now do the same, and every negative is U+2212, the levels'
+// minus, never a hyphen-minus.
+// Starts from: the new episode at second 0, jev's answer held there, Laya's
+// last press a worker_error.
+test('the model lines keep each signed number in a left-to-right isolate, with one minus sign', async () => {
+  const signed = {
+    ...ANSWERS,
+    spark_trim: pick(0, 0),
+    lambda_trim: pick(1, 1),
+    boost_ceiling: pick(2, 3),
+    // NET is float32 (app/model_questions.py): the pump's middle option is
+    // -5.96e-08 there, which rounds to zero and reads with no sign.
+    coolant_pump: { ...pick(4, 2), level_net: -5.960464477539063e-08 },
+  };
+  nodes['ask-laya'].click();
+  reply(await nextRequest(), { ...LAYA_OK, answers: signed, answers_reversed: { ...signed, spark_trim: pick(0, 4) } });
+  reply(await nextRequest(), LAYA_READY);
+  await settle();
+  const rows = rowsOf('laya');
+  assert.equal(rows.length, 5);
+  const choice = i => byClass(rows[i], 'model-choice')[0].textContent;
+  const reversed = i => byClass(rows[i], 'model-order')[0].children[0].textContent;
+  const expect = (level, net) => t('ar', 'agents.models.choice', { level: iso(level), net: iso(net) });
+  assert.equal(choice(0), expect(`${MINUS}8.0`, `${MINUS}1.000`), 'spark: level and network value isolated, U+2212');
+  assert.equal(choice(1), expect(`${MINUS}0.075`, `${MINUS}0.286`), 'lambda: level and network value isolated, U+2212');
+  assert.equal(choice(2), expect('+7.5', '0.727'), 'boost: a positive level keeps its plus, inside the isolate');
+  assert.equal(choice(4), expect('0.65', '0.000'), 'pump: a float32 zero reads 0.000, with no sign');
+  assert.equal(reversed(0), t('ar', 'agents.models.reversed', { level: iso('+4.0') }), 'spark reversed: +4.0, isolated');
+  assert.equal(reversed(1), t('ar', 'agents.models.reversed', { level: iso(`${MINUS}0.075`) }), 'lambda reversed: U+2212, isolated');
+  for (const [i, row] of rows.entries()) {
+    for (const line of [choice(i), reversed(i)]) {
+      assert.doesNotMatch(line, /-/, `row ${i}: a hyphen-minus in "${line}"`);
+      assert.doesNotMatch(line.replace(ISOLATED, ''), /\d/, `row ${i}: a number outside an isolate in "${line}"`);
+    }
+    assert.equal(byClass(row, 'model-choice').length, 1);
+  }
+});
+
+// «{ms} ms على {device}» was drawn "cuda على ms 65" (measured 28 Sep), and the
+// vendor's "70–500 ms" after Arabic letters is predicted to draw "ms 500–70".
+// Each Latin run that must keep its order is its own left-to-right isolate in
+// the Arabic strings (agents-strings.mjs), as the refused labels isolate a name.
+// Starts from: second 0 holding jev's answer (412.3 ms) and Laya's (70.2 ms on cuda).
+test('both latency lines keep their Latin runs in order, each in a left-to-right isolate', () => {
+  const laya = nodes['model-laya-latency'].textContent;
+  assert.ok(laya.startsWith(`${iso('70 ms')} على ${iso('cuda')}`), `Laya's latency line: "${laya}"`);
+  const jev = nodes['model-jev-latency'].textContent;
+  assert.ok(jev.startsWith(iso('412 ms')), `jev's measured latency is not isolated: "${jev}"`);
+  assert.ok(jev.includes(`(ادعاء المورّد ${iso('70–500 ms')})`), `jev's vendor range is not isolated: "${jev}"`);
 });
