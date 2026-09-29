@@ -485,6 +485,17 @@ RETIRED = [
 # AUDIT.md and AUDIT_FIXES.md below. Exempted by name pattern (28 Sep 2026),
 # after the derived plant retired figures that every earlier report quotes.
 RETIRED_EXEMPT_PREFIX = ("SESSION_REPORT_",)
+# GENERATED per-agent reports (record_agents.py, knock_margin.py; 29 Sep 2026):
+# tables of agent scores computed from the records, never prose. The retired
+# patterns are written for prose and match their numbers by coincidence -- the
+# first hit was an agent's 2.8 % thermal cut read as the retired 2.8 % load
+# residual. Exempted by folder: results/agents/<set>/..., generated only. The
+# hand-written index one level up, results/agents/README.md, is still checked.
+RETIRED_EXEMPT_DIRS = (os.path.join("results", "agents") + os.sep,)
+
+
+def _generated_agent_report(rel):
+    return rel.startswith(RETIRED_EXEMPT_DIRS) and len(rel.split(os.sep)) >= 4
 RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md",
                   # AUDIT.md is a review: quoting the figures it found wrong is
@@ -637,6 +648,7 @@ def check_retired(here):
     docs = [p for p in glob.glob(os.path.join(here, "**", "*.md"), recursive=True)
             if os.path.basename(p) not in RETIRED_EXEMPT
             and not os.path.basename(p).startswith(RETIRED_EXEMPT_PREFIX)
+            and not _generated_agent_report(os.path.relpath(p, here))
             and ".venv" not in p]
     docs += [p for p in glob.glob(os.path.join(here, "*.py"))
              if os.path.basename(p) != os.path.basename(__file__)]

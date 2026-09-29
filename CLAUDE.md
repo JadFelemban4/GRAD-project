@@ -39,6 +39,76 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
+## Current state — 29 September 2026 (the retrain: twenty agents, every action recorded)
+
+> ### THE RETRAIN RAN. THE AGENTS PROTECT; PREVIEW ADDS NOTHING MEASURABLE.
+>
+> Committed on `JMF-2340550` on 29 September. Full account:
+> `SESSION_REPORT_2026-09-29.md`. Every table, generated:
+> `results/agents/terrain_dt1/README.md` and `KNOCK_MARGIN.md` beside it.
+>
+> - **Twenty agents** (`python train_all.py`): seeds 0–9, sighted and blinded,
+>   50 000 steps (55 episodes) each, a new road every episode, 130 km/h,
+>   dt 1.0, on the derived plant (data fingerprint `c4fdd4babfb3752a`, commit
+>   `cbb8d09`). All twenty at once took 234 min on the team laptop, 3.6 steps/s
+>   each. **Ten seeds, not five:** with five pairs an exact Wilcoxon test
+>   cannot go below p = 0.0625, so five seeds could never show a preview effect.
+> - **On the CPU, and it was measured:** the plant is 84 % of a step (61.6 ms,
+>   against 11.5 ms for SAC's update), so a GPU could save at most 16 %, and
+>   twenty CUDA contexts do not fit a 4 GB laptop card. The installed torch is
+>   a CPU build. `train.py --device` is there for when that changes.
+> - **Scored with the twenty frozen episodes** (`run_results.py` ->
+>   `results/phase_d_130kmh.*`; `record_agents.py` re-ran all 480 agent and
+>   hand-written episodes and found them identical):
+>
+>   | | median cut | over current-grade | thermal-only cut |
+>   |---|---|---|---|
+>   | sighted, median of 10 | 67.9 % | +24.5 | 67.0 % |
+>   | blinded, median of 10 | 65.4 % | +22.0 | 68.5 % |
+>   | current-grade, hand-written | 43.4 % | — | 47.2 % |
+>
+>   **All twenty beat every hand-written policy**; the weakest, blinded seed 1,
+>   cuts 49.0 %.
+> - **THE ABLATION, TEN PAIRS: sighted minus blinded +1.2 points, 95 % CI −4.4
+>   to +6.8, paired t p = 0.65, exact Wilcoxon p = 0.43.** Thermal-only (no
+>   knock term): −1.5 points, p = 0.56. The pairs run from −14.3 to +14.6. At
+>   this scenario's H/τ (30 s over τ ≈ 47 s, 0.64) what a learned policy gains
+>   comes from learning to protect, not from seeing ahead. **One point on the
+>   H/τ curve, not the curve** — Phase F is what maps it.
+> - **Every agent advances spark to just under the knock knee.** On the climb
+>   the median trim is +3.5 to +4.0° over the baseline's 1.2° (the trim's upper
+>   bound is +4), and the knock integral's 95th percentile is 0.77–0.79 against
+>   the baseline's 0.61 and the damage knee's 0.85. **MOST of every agent's gain
+>   over the hand-written policies is margin the UNTESTED knock model grants.**
+>   Measured (`knock_margin.py`, a diagnostic beside the twenty episodes, never a
+>   change to them): with spark advance forbidden the median cut falls 67.9 ->
+>   41.6 % (sighted) and 65.4 -> 41.7 % (blinded), against current-grade's
+>   43.4 %; 9 of 20 still beat it; the margin over it, median of all twenty,
+>   +24.4 -> −1.8 points. A LOWER BOUND — an agent trained without the lever could
+>   do better than one that has it taken away. The ablation is untouched, under
+>   the cap too (−0.95 points). **Drive C (knock) now decides how much of the
+>   agents' advantage is real.** `results/agents/terrain_dt1/KNOCK_MARGIN.md`.
+> - **Blinded seed 6 does MORE damage than the baseline ECU on 5 of the 20
+>   episodes** (worst 2 527 against 920, turbine 932 °C) — exactly the five with
+>   the lowest weight on component life (at most 0.089). The preference-weighted
+>   reward lets it trade life for fuel. No other agent does. By `evaluate.py`'s
+>   own standard, a protection policy that is sometimes terrible is not one.
+> - **Every action is recorded.** Training: `train_record.npz`, all 50 000
+>   steps of each run (action, observation, reward, engine state). Evaluation:
+>   `eval_record.npz`, every step of the twenty episodes, the commanded AND the
+>   applied actuators. With config, curve, policy weights and a scored summary,
+>   in `results/agents/terrain_dt1/` (the twenty) and
+>   `results/agents/sep19_110kmh/` (the ten of 19 September, whose TRAINING
+>   actions were never recorded and cannot be recovered). **The per-step
+>   records (85 MB) are gitignored by the team's decision**; everything else —
+>   configs, curves, summaries, policy weights, READMEs, figures — is in git.
+> - **The fuel is settled: 95 RON**, confirmed by the team — what the model
+>   already runs, so no refit (REFERENCES.md 2c).
+> - **Still open, each a plant change and so a retrain:** the boost ceiling low
+>   at 1600–2000 rpm (mistake 22) and drive A. **The team will retrain after
+>   each new drive** (the plant re-derives from the logs), so a drive is a
+>   retrain by plan, not a setback. And the sep17 merge.
+
 ## Current state — 28 September 2026, evening (drive B; the data sets the constants)
 
 > ### THE CONSTANTS THE CAR'S LOGS CAN SET ARE NOW COMPUTED FROM THEM
@@ -280,8 +350,8 @@ dataset size, the oil node).*
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — 1.4 % load residual, zero fitted parameters, 26 pooled points, 30–75 kPa, from a dataset of eleven drives, 321.7 minutes. Read mistake 12 before quoting it. **Since 28 Sep the thermal network, boost ceiling, spark offset and enrichment dwell are DERIVED from the logs** (`derive_params.py`); validate.py 8 of 11 |
-| C · get an agent to learn | **retrain READY, not run** (27 Sep): a new road every episode, dt = 1.0, `runs/terrain_dt1/`. The ten agents of 19 Sep trained at 110 km/h, dt 0.2, one road, on the plant BEFORE the 28 Sep derivation — a record, not a result |
-| D · baselines and the ablation | **protocol exists** (`evaluate.py`, twenty frozen episodes). No valid result yet |
+| C · get an agent to learn | **done 29 Sep**: twenty agents, ten seeds a side, 130 km/h, a new road every episode, dt 1.0, the derived plant; every action recorded in `results/agents/terrain_dt1/`. The ten agents of 19 Sep are documented in `results/agents/sep19_110kmh/` as a record |
+| D · baselines and the ablation | **first result 29 Sep**: all twenty agents beat every hand-written policy (sighted +24.5 points over current-grade); sighted minus blinded +1.2, 95 % CI −4.4 to +6.8, n = 10 — no measurable preview value. With spark advance forbidden the agents fall to current-grade's level (`knock_margin.py`): their margin rests on the untested knock model. Open: drive C (knock), the ceiling, drive A (a retrain after each drive, by plan), the sep17 merge |
 | E · battery plant | not started |
 | F · the H/τ sweep | measurable again now the scenario binds, but not before D |
 | G · writing | not started |
@@ -378,6 +448,14 @@ python calibrate_thermal.py  the thermal fit, per drive, with every drive also
 python test_reward.py      8 of 8 checks pass, four of them on the TRAINING
                            roads -- run it after any change to the reward, the
                            plant, the gearbox or the roads
+python train_all.py        the twenty agents: seeds 0-9 x sighted/blinded, one
+                           process each on the CPU, ~4 h; writes runs/terrain_dt1/
+python record_agents.py runs/terrain_dt1   scores them on the twenty frozen
+                           episodes, records EVERY step, and documents each agent
+                           in results/agents/terrain_dt1/ (README.md: every table)
+python knock_margin.py     the twenty with spark advance forbidden, a diagnostic:
+                           median cut 67.9 -> 41.6 % sighted, 65.4 -> 41.7 %
+                           blinded, against current-grade's 43.4 %
 python check_roads.py      drives the baseline over 40 training roads and fails
                            if any is one the baseline cannot drive; 14 bind
 python model_vs_data.py    eleven comparisons of the simulator against the car,
@@ -1736,8 +1814,20 @@ verify_docs.py        Recomputes the published figures from the shipped data,
                       finds written there against those figures, and against a
                       list of retired ones. Fails naming file and line. Run it
                       before quoting anything. Never edit its expected values.
-train.py              SAC training, dt = 1.0, a new road every episode.
-                      Writes runs/terrain_dt1/ (runs/ is gitignored).
+train.py              SAC training, dt = 1.0, a new road every episode, on the
+                      CPU (measured: the plant is 84 % of a step). Writes
+                      runs/terrain_dt1/<tag>/ (gitignored): the model,
+                      config.json and train_record.npz -- EVERY training
+                      action, the observation it came from, the reward.
+train_all.py          Every seed of both halves, one process each (10 seeds x
+                      sighted/blinded = 20 runs by default).
+record_agents.py      Scores agents on the twenty frozen episodes, recording
+                      EVERY step (action, applied actuators, observation,
+                      engine state), and documents each in results/agents/
+                      <set>/<tag>/: config, curve, policy weights, records,
+                      summary; README.md, index.json and figures per set.
+knock_margin.py       The same agents with spark advance forbidden -- how much
+                      of their gain rests on the untested knock model.
 generality_test.py    The H/τ experiment. H1, H2, H2b.
 README.md             The public-facing summary. Tracked by verify_docs.py.
 CLAUDE.md             This file. The handoff and the mistake log.
@@ -1831,7 +1921,11 @@ python verify_docs.py                        # fails if anything quotes the old 
 **Since 28 September a new drive CHANGES THE SIMULATOR**: `build_dataset.py`
 runs `derive_params.py`, which re-derives every constant the logs can set. That
 is the point — nothing is frozen at one day's fit — and it means a drive added
-after the Phase D retrain invalidates the trained agents. Decide the order first.
+after the Phase D retrain invalidates the trained agents. **The team's plan
+(29 September): retrain after every drive** — `python check_roads.py`, then
+`python train_all.py` (~4 h), then `python record_agents.py runs/terrain_dt1`,
+`python run_results.py phase_d` and `python knock_margin.py`. Move the previous
+`runs/terrain_dt1/` aside first: train.py RESUMES any checkpoint it finds there.
 Channel names are matched case-insensitively (exports differ). A drive with no
 `Ambient temperature` channel gets `build_dataset.AMB_FALLBACK_C`, flagged.
 
@@ -1898,9 +1992,11 @@ Everything below assumes the 130 km/h lock. See the current-state box at the top
 2. **Adopt the locked scenario here** — DONE 19 September:
    `make_grade_climb(..., v_kmh=130.0)`. It was decided 18 September before any
    training existed; adopting it is not tuning.
-3. **Retrain at 130, on varied roads, at dt = 1.0** — READY since 27 September.
-   `python train.py --steps 50000 --seed 0..4`, then the same five with
-   `--no-preview`. Every episode is a new road (`TerrainTrainingEnv`); scoring
+3. **Retrain at 130, on varied roads, at dt = 1.0** — DONE 29 September, ten
+   seeds a side (`python train_all.py`, 234 min), scored and documented
+   (`python record_agents.py runs/terrain_dt1`). Results in the box at the top.
+   What the step said before it ran: `python train.py --steps 50000 --seed 0..4`,
+   then the same five with `--no-preview`. Every episode is a new road (`TerrainTrainingEnv`); scoring
    stays on the locked climb. Output goes to `runs/terrain_dt1/`, deliberately
    not `runs/`, where train.py would resume the 110 km/h agents. Run
    `python check_roads.py` first; it must PASS. 13.7 steps/s for one run alone,
@@ -1911,6 +2007,10 @@ Everything below assumes the 130 km/h lock. See the current-state box at the top
    `evaluate.py` scores it in (train.py never passed dt before, so every earlier
    agent learned at 0.2 s and was scored at 1.0 s). If the ablation is still
    inside its noise at 55 episodes, raise the steps; do not change the twenty.
+   **29 Sep: it is inside its noise (CI −4.4 to +6.8), and the seeds disagree by
+   up to 29 points between pairs.** Before raising the steps, measure how much of
+   the agents' gain rests on the knock margin (step 9): if most of it does, more
+   steps buy a better exploit of an untested model, not a better answer.
 5. **Score with `evaluate.py` and nothing else.** Twenty frozen episodes, median
    and IQR. **The twenty never change.** Changing the test set after seeing a
    result is the one mistake this project cannot recover from.
@@ -1919,16 +2019,29 @@ Everything below assumes the 130 km/h lock. See the current-state box at the top
    It has beaten the predictive policy on every hand-written comparison so far.
    If the trained agent cannot beat it either, that is a RESULT about H/τ, not a
    failure.
-7. **Settle the octane before the retrain.** Ask which fuel the car was filled
-   with while it was logged (95 or 98 RON; the manual says 98 recommended). If
-   98, refit `BaselineECU.knock_limited_spark`, re-run `validate.py` and
-   `check_map.py` — a plant change, so before step 3. REFERENCES.md 2c.
+7. **The octane — SETTLED 29 September: 95 RON**, confirmed by the team; the
+   model already runs 95, so nothing is refitted. (What this step said before:
+   ask which fuel the car was logged on, and if 98, refit
+   `BaselineECU.knock_limited_spark`. REFERENCES.md 2c.)
 8. **Report damage two ways until the knock model is tested** — total, and
    turbine plus oil alone. The knock term is 6–12 % of damage and is ALL of the
    hand-written −0.4 (28 September). This is an extra column in the reporting,
    not a change to the reward, the training or the twenty episodes.
 
-Do not start Phase E or F until D produces a table.
+9. **(29 Sep) Measure the knock margin — DONE the same day** (`knock_margin.py`):
+   with spark advance forbidden the agents' median cut falls to 41.6 / 41.7 %,
+   below current-grade's 43.4 %, and the median margin over it goes +24.4 ->
+   −1.8 points. So **drive C (logs/DRIVE_PLAN.md) is now the most valuable
+   drive**: it decides whether the knock margin the agents use is real. If the
+   car knocks earlier than the model says, the reward's knock term has to move
+   before the next retrain; if it does not, the agents' margin stands.
+10. **(29 Sep) Where the agent records live — DECIDED by the team:** git keeps
+   the summaries, configs, curves, policy weights, READMEs and figures (about
+   11 MB); the per-step `train_record.npz` / `eval_record.npz` (85 MB) stay on
+   the training machine and are gitignored. `eval_summary.json` carries what the
+   page and the READMEs read from the records, so both build from git alone.
+
+Do not start Phase E or F until D produces a table. **It has one now (29 Sep).**
 
 ### Improving the comparisons that do not agree — 28 September
 

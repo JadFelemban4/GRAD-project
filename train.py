@@ -32,16 +32,46 @@ better than running them one after another. Cap each at OMP_NUM_THREADS=1.
      300,000 steps    ~6 h alone
 
 Agree who takes which seed BEFORE anyone starts, or you will end up with three
-copies of seed 0.
+copies of seed 0. `python train_all.py` launches every seed of both halves on
+one machine, one process each.
+
+TEN SEEDS, NOT FIVE (29 September 2026). The ablation is paired by seed, and
+with five pairs the smallest two-sided p-value an exact Wilcoxon signed-rank
+test can return is 2/32 = 0.0625: five seeds could never show a preview effect
+at the 5 % level however large it was. Ten pairs can (2/1024).
+
+THE GPU DOES NOT HELP HERE, AND IT WAS MEASURED (29 September 2026). One
+training step, one thread, on the team laptop: the plant 61.6 ms, SAC's
+gradient update 11.5 ms, choosing the action 0.2 ms -- 13.6 steps/s, and the
+network is 16 % of the step. The plant is numpy on the CPU. Even a GPU that
+made the network free would make a run at most 1.19x faster, and twenty runs
+at once would need twenty CUDA contexts on a 4 GB laptop card. Training
+therefore runs on the CPU (--device cpu, the default); the installed torch is
+a CPU build anyway. Re-measure before changing it.
+
+WHAT IS RECORDED, so the agents are documented and not just saved
+-----------------------------------------------------------------
+  config.json          every SAC setting, the versions, the git commit, the
+                       plant's data fingerprint, wall time and steps/s
+  curve.csv            one row per episode: return, length, road
+  train_record.npz     EVERY step of training: the action the agent took, the
+                       observation it took it from, the reward and what the
+                       engine did (ActionRecorder, below)
+  final.zip, ckpt_*    the model itself (gitignored; record_agents.py exports
+                       the policy weights into results/agents/)
 
 Checkpoints are written every 10,000 steps, so a closed laptop costs you minutes
 rather than the whole run. Re-running the same seed resumes from its checkpoint.
 """
 import argparse
 import glob
+import json
+import platform
 import re
 import os
+import subprocess
 import time
+from datetime import datetime
 
 import numpy as np
 
@@ -50,7 +80,7 @@ from engine_env import SupervisoryTunerEnv, TerrainTrainingEnv, make_grade_climb
 try:
     from stable_baselines3 import SAC
     from stable_baselines3.common.monitor import Monitor
-    from stable_baselines3.common.callbacks import CheckpointCallback
+    from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
 except ImportError:
     raise SystemExit(
         "stable-baselines3 is not installed.\n\n"
@@ -87,6 +117,139 @@ def build_env(use_preview, seed, duration, dt=1.0, fixed_road=False):
     return Monitor(env)
 
 
+# What the engine did on each training step, read off the step's info dict.
+REC_INFO = ("t_turb", "t_oil", "t_block", "torque_req", "torque", "mdot_fuel", "ki",
+            "spark", "lam", "egt_c", "r_fuel", "r_life", "r_resp")
+REC_F32 = ("r_fuel", "r_life", "r_resp")
+CHUNK = 10_000          # the checkpoint interval; a chunk is written with each one
+
+
+class ActionRecorder(BaseCallback):
+    """Every action the agent takes while it learns, and what it cost.
+
+    Written 29 September 2026: until then a training run left a model and a
+    one-row-per-episode curve, and nothing of the 50 000 decisions in between.
+
+    Per step: the timestep, the episode, the ACTION (the network's output in
+    [-1, 1], exactly what went to env.step), the OBSERVATION it was chosen from
+    (which carries the grade now and the four preview values, zero when
+    blinded), the reward, and the engine quantities in REC_INFO. The action,
+    reward and reward terms are float32; the observation and engine quantities
+    float16, which is far finer than anything they are read for.
+
+    A chunk is written every CHUNK steps, with the checkpoint, so a resumed run
+    keeps what it had recorded; train.py merges the chunks at the end.
+    """
+
+    def __init__(self, outdir):
+        super().__init__()
+        self.dir = os.path.join(outdir, "record")
+        os.makedirs(self.dir, exist_ok=True)
+        self._clear()
+
+    def _clear(self):
+        self.buf = {k: [] for k in ("step", "episode", "action", "obs", "reward") + REC_INFO}
+
+    def _on_training_start(self):
+        # Episodes continue their numbering across a resume. learn() resets the
+        # environment, so a resumed run always starts a fresh episode.
+        prev = [np.load(f)["episode"] for f in glob.glob(os.path.join(self.dir, "rec_*.npz"))]
+        prev = [p for p in prev if len(p)]
+        self.episode = int(max(p.max() for p in prev)) + 1 if prev else 0
+
+    def _on_step(self):
+        b = self.buf
+        b["step"].append(self.num_timesteps)
+        b["episode"].append(self.episode)
+        b["action"].append(np.asarray(self.locals["actions"][0], np.float32))
+        # _last_obs is the observation the action was chosen from: SB3 replaces
+        # it only after this callback has run.
+        b["obs"].append(np.asarray(self.model._last_obs[0], np.float32))
+        b["reward"].append(float(self.locals["rewards"][0]))
+        info = self.locals["infos"][0]
+        for k in REC_INFO:
+            b[k].append(float(info.get(k, np.nan)))
+        if self.locals["dones"][0]:
+            self.episode += 1
+        if self.num_timesteps % CHUNK == 0:
+            self._flush()
+        return True
+
+    def _on_training_end(self):
+        self._flush()
+
+    def _flush(self):
+        b = self.buf
+        if not b["step"]:
+            return
+        path = os.path.join(self.dir, f"rec_{b['step'][0]:07d}_{b['step'][-1]:07d}.npz")
+        np.savez_compressed(path, **_record_arrays(b))
+        self._clear()
+
+
+def _record_arrays(b):
+    out = dict(step=np.asarray(b["step"], np.int32), episode=np.asarray(b["episode"], np.int32),
+               action=np.asarray(b["action"], np.float32), reward=np.asarray(b["reward"], np.float32),
+               obs=np.asarray(b["obs"], np.float16))
+    for k in REC_INFO:
+        out[k] = np.asarray(b[k], np.float32 if k in REC_F32 else np.float16)
+    return out
+
+
+def merge_records(outdir):
+    """The chunks, in step order, as one train_record.npz. A step recorded twice
+    (a chunk written after the last checkpoint, then the same steps again on
+    resume) keeps its LAST recording, the one the saved model continued from."""
+    files = glob.glob(os.path.join(outdir, "record", "rec_*.npz"))
+    if not files:
+        return None
+    parts = [dict(np.load(f)) for f in sorted(files, key=os.path.getmtime)]
+    cat = {k: np.concatenate([p[k] for p in parts]) for k in parts[0]}
+    rev = cat["step"][::-1]
+    _, first_in_rev = np.unique(rev, return_index=True)
+    keep = np.sort(len(rev) - 1 - first_in_rev)
+    cat = {k: v[keep] for k, v in cat.items()}
+    path = os.path.join(outdir, "train_record.npz")
+    np.savez_compressed(path, **cat)
+    return path, int(len(keep))
+
+
+def _git(*args):
+    try:
+        return subprocess.check_output(["git", *args], text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        return None
+
+
+def run_config(a, tag, model, outdir):
+    """Everything needed to say what this agent is, written beside it."""
+    import stable_baselines3
+    import torch
+    import gymnasium
+    try:
+        with open(os.path.join("data", "derived_params.json")) as fh:
+            plant = json.load(fh).get("_inputs")
+    except FileNotFoundError:
+        plant = None
+    return dict(
+        tag=tag, seed=a.seed, preview=not a.no_preview, steps=a.steps, dt=a.dt,
+        duration_s=a.duration, steps_per_episode=int(round(a.duration / a.dt)),
+        roads="the locked climb only" if a.fixed_road else "a new road every episode (TerrainTrainingEnv)",
+        device=str(model.device), algorithm="SAC",
+        sac=dict(learning_rate=a.lr, buffer_size=model.buffer_size, batch_size=model.batch_size,
+                 learning_starts=model.learning_starts, gamma=model.gamma, tau=model.tau,
+                 train_freq=str(model.train_freq), gradient_steps=model.gradient_steps,
+                 ent_coef=str(model.ent_coef), target_entropy=float(model.target_entropy),
+                 policy="MlpPolicy", net_arch=str(model.policy.net_arch)),
+        versions=dict(python=platform.python_version(), stable_baselines3=stable_baselines3.__version__,
+                      torch=torch.__version__, gymnasium=gymnasium.__version__, numpy=np.__version__),
+        git_commit=_git("rev-parse", "--short", "HEAD"),
+        git_dirty=bool(_git("status", "--porcelain", "--untracked-files=no")),
+        plant_inputs=plant, output=outdir.replace(os.sep, "/"),
+        machine=dict(system=platform.system(), processor=platform.processor(), cpus=os.cpu_count(),
+                     omp_threads=os.environ.get("OMP_NUM_THREADS")))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--steps", type=int, default=50_000)
@@ -101,6 +264,9 @@ def main():
                     help="step length in seconds; 1.0 is what evaluate.py scores at")
     ap.add_argument("--fixed-road", action="store_true",
                     help="train on the locked climb only, as runs before 27 Sep did")
+    ap.add_argument("--device", default="cpu",
+                    help="cpu (measured: the plant is 84 %% of a step, see the docstring), "
+                         "cuda or auto")
     # NOT "runs". train.py resumes from any checkpoint in its output folder, and
     # runs/ holds the ten agents trained at 110 km/h and dt = 0.2 on 19 September.
     # Pointing a new run there would silently CONTINUE one of those instead of
@@ -152,13 +318,21 @@ def main():
         m = re.search(r"ckpt_(\d+)_steps", resume_from)
         done_steps = int(m.group(1)) if m else 0
         print(f"resuming from {resume_from} at {done_steps} steps")
-        model = SAC.load(resume_from, env=env)
+        model = SAC.load(resume_from, env=env, device=a.device)
     else:
         model = SAC("MlpPolicy", env, seed=a.seed, learning_rate=a.lr,
-                    verbose=1, tensorboard_log=None)
+                    verbose=1, tensorboard_log=None, device=a.device)
 
-    cb = CheckpointCallback(save_freq=10_000, save_path=outdir,
-                            name_prefix="ckpt", verbose=0)
+    cb = CallbackList([CheckpointCallback(save_freq=CHUNK, save_path=outdir,
+                                          name_prefix="ckpt", verbose=0),
+                       ActionRecorder(outdir)])
+
+    cfg_path = os.path.join(outdir, "config.json")
+    cfg = run_config(a, tag, model, outdir)
+    cfg.update(started=datetime.now().isoformat(timespec="seconds"), resumed_from=resume_from,
+               status="running")
+    with open(cfg_path, "w") as fh:
+        json.dump(cfg, fh, indent=1)
 
     t0 = time.time()
     remaining = max(0, a.steps - done_steps)
@@ -172,6 +346,7 @@ def main():
 
     model.save(os.path.join(outdir, "final"))
     model.save(ckpt_path)
+    merged = merge_records(outdir)
 
     # the learning curve — Monitor recorded every episode return
     rewards = np.array(env.get_episode_rewards(), dtype=float)
@@ -189,7 +364,16 @@ def main():
         for i, (r, n) in enumerate(zip(rewards, lengths)):
             fh.write(f"{i},{r:.6f},{n:.0f},{roads[i]}\n")
 
-    print(f"\ntrained in {mins:.0f} min | {len(rewards)} episodes")
+    cfg.update(status="finished", finished=datetime.now().isoformat(timespec="seconds"),
+               wall_min_this_session=round(mins, 1),
+               steps_per_s_this_session=round(remaining / max(mins * 60, 1e-9), 2),
+               episodes=int(len(rewards)), total_timesteps=int(model.num_timesteps),
+               recorded_steps=merged[1] if merged else 0)
+    with open(cfg_path, "w") as fh:
+        json.dump(cfg, fh, indent=1)
+
+    print(f"\ntrained in {mins:.0f} min | {len(rewards)} episodes"
+          + (f" | {merged[1]:,} steps recorded in {merged[0]}" if merged else ""))
     # This used to compare the first five episode returns with the last five
     # and call the curve improved. It cannot say that: every episode draws new
     # preference weights, and now a new road, so consecutive returns are scored
@@ -223,8 +407,8 @@ def main():
     except ImportError:
         print("  (matplotlib not installed — curve.csv written, no plot)")
 
-    print(f"\nnext: run the same command with --seed 1, 2, 3, 4 on other machines,")
-    print(f"then the same five again with --no-preview. Phase D needs both sets.")
+    print("\nnext: every seed 0-9, with and without --no-preview (python train_all.py),")
+    print("then python record_agents.py runs/terrain_dt1 to score and document them.")
 
 
 if __name__ == "__main__":

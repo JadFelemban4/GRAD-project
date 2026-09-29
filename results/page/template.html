@@ -245,12 +245,12 @@ html{scroll-behavior:smooth}
     <div class="stat">
       <span class="k">Training beats hand-written</span>
       <span class="v">{{pd.ablation.agent_over_grade|+.1f}}<small>pts</small></span>
-      <p>The median trained agent cuts damage by {{pd.ablation.sighted_median|.1f}} %; the best hand-written policy, current-grade, cuts {{pd.ablation.grade_cut|.1f}} %.</p>
+      <p>The median sighted agent cuts damage by {{pd.ablation.sighted_median|.1f}} % and the median blinded one {{pd.ablation.blind_median|.1f}} %; the best hand-written policy, current-grade, cuts {{pd.ablation.grade_cut|.1f}} %. With spark advance forbidden the agents' median falls to {{pd.rec.km.sighted|.1f}} %: most of the margin rests on the untested knock model.</p>
     </div>
     <div class="stat">
       <span class="k">Preview, sighted minus blinded</span>
       <span class="v">{{pd.ablation.mean|+.1f}}<small>pts</small></span>
-      <p>Mean over five paired seeds, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}. Indistinguishable from zero, on agents that are not yet Phase D's (see caveats).</p>
+      <p>Mean over {{pd.ablation.n}} paired seeds, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}. {{pd.ablation.verdict}} The agents were retrained on 29 September (see caveats for what is still open).</p>
     </div>
     <div class="stat">
       <span class="k">Preview on the H/τ sweep</span>
@@ -267,6 +267,9 @@ html{scroll-behavior:smooth}
   <div class="findings">
     <h3>Changed on 27–29 September</h3>
     <ol>
+      <li><b>The agents were retrained, ten seeds a side, and preview still adds nothing measurable.</b> A new road every episode at 130 km/h, dt 1.0, on the derived plant, 50 000 steps each. {{pd.agents.sentence}} Sighted minus blinded: {{pd.ablation.mean|+.1f}} points, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = {{pd.ablation.n}}. Every action they took, in training and in the twenty frozen episodes, is recorded in <code>results/agents/</code>. <a href="#f-abl">The ablation</a></li>
+      <li><b>Most of what the agents gain over the hand-written policies is spark advance the untested knock model allows.</b> On the climb they run {{pd.rec.trim_lo|.1f}}–{{pd.rec.trim_hi|.1f}}° past the baseline's {{pd.rec.sp_base|.1f}}°, taking the modelled knock integral from {{pd.rec.ki_base|.2f}} to {{pd.rec.ki_lo|.2f}}–{{pd.rec.ki_hi|.2f}}, under the 0.85 where the damage model starts charging. Re-scored with that advance forbidden (<code>knock_margin.py</code>, a diagnostic beside the protocol), the median cut falls from {{pd.rec.km.sighted_orig|.1f}} to {{pd.rec.km.sighted|.1f}} % (sighted) and {{pd.rec.km.blind_orig|.1f}} to {{pd.rec.km.blind|.1f}} % (blinded), against current-grade's {{pd.rec.km.grade|.1f}} %; {{pd.rec.km.beat}} of {{pd.rec.km.n}} still beat it, and the median margin over it goes from {{pd.rec.km.og_orig|+.1f}} to {{pd.rec.km.og|+.1f}} points. A lower bound: an agent trained without the lever could do better than one that has it taken away. The ablation is untouched, under the cap too ({{pd.rec.km.abl|+.2f}} points).</li>
+      <li><b>One agent sometimes does worse than no protection at all.</b> {{pd.rec.bad_sentence}} The reward lets it trade component life for fuel when life is weighted that little. <a href="#f-eval">Every policy</a></li>
       <li><b>With the honest comparator, the H/τ sweep shows no preview value.</b> The sweep used to measure preview only against the reactive policy. Against current-grade, which acts on the grade the car is on now, preview is worth {{gen.vs_grade_lo|+.2f}} to {{gen.vs_grade_hi|+.2f}} points at every time constant where the limit binds. No sweep result can be cited for the criterion; the trained ablation on varied roads is the test. <a href="#f-htau">The sweep</a></li>
       <li><b>Drive B is in, and the data now sets the constants.</b> Full-throttle roll-ons in a held gear; the dataset is {{meta.minutes|.1f}} minutes over {{meta.drives}} drives. Every constant the car's logs can set (the thermal network, the boost ceiling, the spark offset, the enrichment dwell, the gearbox's kickdown table) is recomputed from them on every rebuild by <code>derive_params.py</code>, not typed into the code.</li>
       <li><b>The oil node had the wrong structure, now re-fitted to the car.</b> The car's oil heats with engine speed and is cooled by road speed; the model heated it with a share of fuel. Derived, drive10's oil runs {{mc.thermal.drive10.oil_med|+.1f}} K and its coolant {{mc.thermal.drive10.ect_med|+.1f}} K from the car (median), and the oil takes {{mc.lit.8.value|.0f}} s to respond (the car: {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s). <a href="#f-th10">Oil and coolant</a></li>
@@ -278,7 +281,7 @@ html{scroll-behavior:smooth}
       <li><b>Training now runs on a new road every episode, at the 1.0 s step scoring uses.</b> Five kinds of road, from flat to two steep climbs, so the preview channel has something to report; the retrain gets 55 episodes where the old runs had 11. Scoring stays on the locked climb. <a href="#f-roads">The roads</a></li>
       <li><b>Those roads found a gearbox defect, now fixed.</b> In 8th at 130 km/h the model's engine could sustain 333 Nm, but the box only downshifted above 375 Nm, so grades near 9 % could not be driven by any policy. It now kicks down when the engine falls short.</li>
       <li><b>The car-fitted spark map was never in use, now fixed.</b> The model's knock limit sat below it at every steady point. Refitted, part-load spark goes from {{mc.spark.before.mean|+.1f}}° to {{mc.spark.after.mean|+.2f}}° against the car. <a href="#f-spark">Spark</a></li>
-      <li><b>GCC specification and fuel, checked.</b> No admissible source shows uprated cooling on a GCC car, and on the model stronger cooling barely moves the turbine, which trades heat with exhaust and air. The manual asks for 95 RON minimum and 98 recommended; the model runs 95, and 98 moves only the knock term. Which fuel the car was logged on decides it. <code>REFERENCES.md</code> 2c</li>
+      <li><b>GCC specification and fuel, checked.</b> No admissible source shows uprated cooling on a GCC car, and on the model stronger cooling barely moves the turbine, which trades heat with exhaust and air. The manual asks for 95 RON minimum and 98 recommended; the car was logged on 95 (the team, 29 September), which is what the model runs, so nothing is refitted. <code>REFERENCES.md</code> 2c</li>
     </ol>
   </div>
 </section>
@@ -371,7 +374,7 @@ html{scroll-behavior:smooth}
   <div class="fig" id="f-eval">
     <div class="fig-head">
       <h3>Every policy, twenty frozen episodes</h3>
-      <p class="take">{{pd.agents.beat}} of {{pd.agents.n}} trained agents beat every hand-written policy. The other {{pd.agents.n_below}}, {{pd.agents.below}}, cut {{pd.agents.below_lo|.1f}}–{{pd.agents.below_hi|.1f}} %, no more than current-grade's {{pd.agents.best_hand|.1f}} %. Every agent beats the reactive policy and the baseline.</p>
+      <p class="take">{{pd.agents.sentence}}</p>
     </div>
     <div class="legend">
       <span style="color:var(--pd-base)"><i class="lr" style="background:currentColor"></i>hand-written</span>
@@ -387,7 +390,7 @@ html{scroll-behavior:smooth}
   <div class="fig" id="f-abl">
     <div class="fig-head">
       <h3>The ablation, paired by seed</h3>
-      <p class="take">Sighted minus blinded: median {{pd.ablation.median|+.1f}}, mean {{pd.ablation.mean|+.1f}} points. {{pd.ablation.within}} of 5 seeds sit within ±0.75 points.</p>
+      <p class="take">Sighted minus blinded: median {{pd.ablation.median|+.1f}}, mean {{pd.ablation.mean|+.1f}} points. {{pd.ablation.within}} of {{pd.ablation.n}} seeds sit within ±0.75 points.</p>
     </div>
     <div class="legend">
       <span style="color:var(--pd-sight)"><i class="lr" style="background:currentColor"></i>sighted (sees the grade 2–30 s ahead)</span>
@@ -395,14 +398,14 @@ html{scroll-behavior:smooth}
       <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade, no preview at all</span>
     </div>
     <div class="chart" id="c-abl"></div>
-    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = 5. If it survives the retrain, a preview advantage of zero on this scenario is a result about H/τ, not a failure. On the hand-written policies predictive minus current-grade is {{pd.ablation.pred_minus_grade|+.1f}} points, and it comes entirely from the knock term: on turbine and oil damage alone it is {{pd.split.preview_thermal|+.2f}}. Report both until the knock model is tested.</p>
+    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = {{pd.ablation.n}}. {{pd.ablation.reading}} On the hand-written policies predictive minus current-grade is {{pd.ablation.pred_minus_grade|+.1f}} points, and it comes entirely from the knock term: on turbine and oil damage alone it is {{pd.split.preview_thermal|+.2f}}. Report both until the knock model is tested.</p>
     <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-abl"></div></details>
   </div>
 
   <div class="fig" id="f-trade">
     <div class="fig-head">
       <h3>Damage against fuel</h3>
-      <p class="take">Protection is not free. Seeds {{pd.trade.low_fuel}} are the exception: their agents cut {{pd.trade.lf_lo|.0f}}–{{pd.trade.lf_hi|.0f}} % of the damage while burning less fuel than the baseline.</p>
+      <p class="take">{{pd.trade.take}}</p>
     </div>
     <div class="legend">
       <span style="color:var(--pd-sight)"><i class="ld" style="background:currentColor"></i>trained, sighted</span>
@@ -411,20 +414,20 @@ html{scroll-behavior:smooth}
       <span style="color:var(--pd-base)"><i class="lsq" style="background:currentColor"></i>hand-written</span>
     </div>
     <div class="chart" id="c-trade"></div>
-    <p class="cap">A tie that ran straight up, more damage cut for the same fuel, would be a preview effect. None does. Where the sighted agent cuts more than its blinded twin (seeds {{pd.trade.more}}, by {{pd.trade.more_cut}} points), it burns {{pd.trade.more_fuel}} points more fuel doing it; for seeds {{pd.trade.less}} it cuts less.</p>
+    <p class="cap">{{pd.trade.cap}}</p>
   </div>
 
   <div class="fig" id="f-curves">
     <div class="fig-head">
-      <h3>Every training run, eleven episodes each</h3>
-      <p class="take">50 000 steps against a 4 500-step episode is eleven points per run, with the preference weights redrawn at every reset.</p>
+      <h3>Every training run, {{pd.curve_eps}} episodes each</h3>
+      <p class="take">{{pd.curve_runs}} runs of 50 000 steps at a 1 s step: {{pd.curve_eps}} episodes of 900 s each, every one on a new road with new preference weights.</p>
     </div>
     <div class="legend">
       <span style="color:var(--pd-sight)"><i class="lk"></i>sighted</span>
       <span style="color:var(--pd-blind)"><i class="lk"></i>blinded</span>
     </div>
     <div class="chart" id="c-curves"></div>
-    <p class="cap">Consecutive points are not scored with the same ruler, so a rising curve here is not evidence of learning. These runs trained at 110 km/h, where nothing binds, on the plant as it stood before 28 September.</p>
+    <p class="cap">Consecutive points are not scored with the same ruler: the road and the preference weights change every episode, so a rising curve here is not evidence of learning. The twenty frozen episodes above are.</p>
   </div>
 </section>
 
@@ -643,7 +646,7 @@ html{scroll-behavior:smooth}
   <div class="sect-head">
     <p class="eyebrow">Part 3 · for the car</p>
     <h2>Drives we need</h2>
-    <p class="prose cap">Three drives, A to C, in order of value; B is done. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
+    <p class="prose cap">Three drives, A to C; B is done, and since 29 September C matters most for Phase D and A for the thermal model. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
   </div>
 
   <div class="fig">
@@ -659,7 +662,7 @@ html{scroll-behavior:smooth}
 
   <div class="fig">
     <div class="fig-head">
-      <div class="row"><h3>A · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable</span></div>
+      <div class="row"><h3>A · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable for the thermal model</span></div>
       <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. It is the data the oil rows of the validation table still need, and the coolant regulation law, and it adds the first sustained-load coolant data and a hot idle. Log ambient temperature too. It changes the plant, so do it before the retrain or retrain again after it.</p>
     </div>
     <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Oil temperature</code>, <code>Engine radiator outlet temperature (coolant)</code>, <code>Ambient temperature</code>.</p>
@@ -688,8 +691,8 @@ html{scroll-behavior:smooth}
 
   <div class="fig">
     <div class="fig-head">
-      <h3>C · Loaded, steady-gear driving in the heat, for knock</h3>
-      <p class="take">The old drive read each ignition angle only every {{mc.knock_s.every_s|.0f}} s, too slowly to see a knock event. This one logs as few channels as possible so both are read every ~1.25 s, with no gearshifts in the way.</p>
+      <div class="row"><h3>C · Loaded, steady-gear driving in the heat, for knock</h3><span class="pill none"><i>★</i>most valuable for Phase D</span></div>
+      <p class="take">The trained agents run spark to just under the knock model's knee, and with that forbidden they fall to current-grade's level, so whether the car tolerates that spark decides how much of their advantage is real. The old drive read each ignition angle only every {{mc.knock_s.every_s|.0f}} s, too slowly to see a knock event. This one logs as few channels as possible so both are read every ~1.25 s, with no gearshifts in the way.</p>
     </div>
     <p class="cap"><b>Channels (6):</b> <code>Engine speed</code>, <code>Air mass flow</code>, <code>Actual ignition angle</code>, <code>Target ignition angle from torque intervention</code>, <code>Coolant temperature</code>, <code>Ambient temperature</code>. Speed and lambda are left out on purpose: in a held gear the gear is known, and below 3300 rpm lambda is 1.0.</p>
     <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
@@ -712,7 +715,7 @@ html{scroll-behavior:smooth}
     <h2>What this page is not</h2>
   </div>
   <div class="caveats">
-    <div class="cav"><h3>Not Phase D's answer</h3><p>The ten agents trained at 110 km/h, where the constraint never binds, at a 0.2 s step, on one road, and on the plant before its constants were derived from the logs. Re-scored on today's plant they are a record. The retrain fixes all four: 130 km/h, dt = 1.0, a new road every episode, the derived plant. That retrain is what settles it.</p></div>
+    <div class="cav"><h3>Phase D's first run, not its last</h3><p>The {{pd.agents.n}} agents trained on 29 September at 130 km/h on a new road every episode, at dt 1.0, on the plant derived from the logs. Still open, and each would change the plant and so need a retrain: the boost ceiling low at 1600–2000 rpm, and drive A. The team retrains after every drive. The fuel is settled: 95 RON, what the model runs.</p></div>
     <div class="cav"><h3>Hand-written rows are one rollout</h3><p>They do not read the preference weights, so their zero spread is structural. It is not a sign of stability.</p></div>
     <div class="cav"><h3>Turbine temperature is modelled</h3><p>No sensor on this car reads it. Its heat capacity, <code>c_turb</code> = 6000 J/K, is assumed, and it sets τ, the denominator of the claim.</p></div>
     <div class="cav"><h3>Altitude is not modelled</h3><p>The scored climb rises {{pd.elev.climb_m|,}} m, but the engine breathes sea-level air ({{pd.elev.p_model}} kPa) the whole way; a standard atmosphere would give about {{pd.elev.isa_kpa|.0f}} kPa at the top. Read the scenario as sustained heavy load at sea level, not as a mountain.</p></div>
@@ -722,7 +725,9 @@ html{scroll-behavior:smooth}
 
   <footer>
     <p>Regenerate everything on this page from the repository:</p>
-<pre>python run_results.py           # Phase D files, the traces, the speed-by-grade sweep
+<pre>python train_all.py             # the agents: 10 seeds x sighted/blinded, ~4 h
+python record_agents.py runs/terrain_dt1   # score, record and document them
+python run_results.py           # Phase D files, the traces, the speed-by-grade sweep
 python check_roads.py           # the training roads
 python model_vs_data.py         # the comparisons against the car
 python compare_calibration.py   # the 28 September derivation, before and after
@@ -1119,13 +1124,17 @@ mount("c-trade", (host, w, h) => {
     y: { d: [-6, Math.max(80, Math.ceil(Math.max(...ys) / 10) * 10 + 5)], label: "damage cut vs baseline (%)" }, m: { l: 50 } });
   vline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
   hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
-  for (let s = 0; s < 5; s++) {
+  // Every seed the data holds (29 Sep: this looped over five). Seed labels on
+  // the chart only while there are few enough to read; the tooltip names each.
+  const seeds = PD.ablation.seeds.map(x => x.seed);
+  for (const s of seeds) {
     const a = by("sighted_seed" + s), b = by("blind_seed" + s);
+    if (!a || !b) continue;
     S("line", { x1: P.x(a.fuel_pct), y1: P.y(a.cut), x2: P.x(b.fuel_pct), y2: P.y(b.cut),
                 style: "stroke:var(--ink-3);stroke-width:1.4" }, P.g);
-    const up = s === 1 || s === 2;
-    T(P.top, (P.x(a.fuel_pct) + P.x(b.fuel_pct)) / 2, (P.y(a.cut) + P.y(b.cut)) / 2 + (up ? -12 : 20),
-      "seed " + s, { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-2)" });
+    if (seeds.length <= 5)
+      T(P.top, (P.x(a.fuel_pct) + P.x(b.fuel_pct)) / 2, (P.y(a.cut) + P.y(b.cut)) / 2 + (s === 1 || s === 2 ? -12 : 20),
+        "seed " + s, { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-2)" });
   }
   const pts = E.map(e => ({ x: e.fuel_pct, y: e.cut, e }));
   for (const p of pts) {
@@ -1150,22 +1159,23 @@ mount("c-trade", (host, w, h) => {
 mount("c-curves", (host, w, h) => {
   const C = PD.curves;
   const all = C.flatMap(c => c.ret);
-  const P = plot(host, { w, h, x: { d: [0, 10], label: "training episode", ticks: [0, 2, 4, 6, 8, 10] },
+  const nEp = Math.max(...C.map(c => c.ret.length)) - 1;     // 29 Sep: was a fixed 0-10
+  const P = plot(host, { w, h, x: { d: [0, nEp], label: "training episode" },
     y: { d: [Math.floor(Math.min(...all) / 100) * 100, Math.ceil(Math.max(...all) / 100) * 100], label: "episode return" },
     m: { l: 50 } });
   hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
   const xs = C[0].ret.map((_, i) => i);
   C.forEach(c => line(P, xs, c.ret, { c: c.blind ? "var(--pd-blind)" : "var(--pd-sight)", w: 1.7, op: 0.8 }));
-  // The tooltip gives the median of each group's five runs at that episode;
-  // ten rows would bury the phone screen.
+  // The tooltip gives the median of each group's runs at that episode; one
+  // row per run would bury the phone screen.
   const median = blind => xs.map(i => {
     const v = C.filter(c => c.blind === blind).map(c => c.ret[i]).sort((a, b) => a - b);
     return v[Math.floor(v.length / 2)];
   });
   const med = v => "median " + f(v, 0);
   crosshair(P, xs, [
-    { name: "sighted, 5 runs", ys: median(false), c: "var(--pd-sight)", f: med },
-    { name: "blinded, 5 runs", ys: median(true), c: "var(--pd-blind)", f: med }
+    { name: `sighted, ${C.filter(c => !c.blind).length} runs`, ys: median(false), c: "var(--pd-sight)", f: med },
+    { name: `blinded, ${C.filter(c => c.blind).length} runs`, ys: median(true), c: "var(--pd-blind)", f: med }
   ], v => `episode ${v}`);
 });
 

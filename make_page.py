@@ -35,6 +35,11 @@ RES = os.path.join(HERE, "results")
 PAGE = os.path.join(RES, "page")
 
 
+# The agents the page shows: results/agents/<AGENT_SET>/, written by
+# record_agents.py, and the same set run_results.py scores into phase_d_*.
+AGENT_SET = "terrain_dt1"
+
+
 def _load(name):
     with open(os.path.join(RES, name)) as fh:
         return json.load(fh)
@@ -93,27 +98,29 @@ def phase_d():
     for n in order:
         d = col(n, "damage")
         q1, me, q3 = np.percentile(d, [25, 50, 75])
-        ev.append(dict(name=n.replace("runs/", ""), kind=kind(n), med=_r(me, 1),
+        ev.append(dict(name=n.split("/")[-1], kind=kind(n), med=_r(me, 1),
                        q1=_r(q1, 1), q3=_r(q3, 1), worst=_r(d.max(), 1),
                        fuel=_r(np.median(col(n, "fuel")), 0),
                        fuel_pct=_r(100 * (np.median(col(n, "fuel")) / base_f - 1), 2),
                        peak=_r(col(n, "peak_turb").max(), 1),
-                       cut=_r(100 * (1 - me / base), 2)))
+                       cut=_r(100 * (1 - me / base), 4)))     # 4, not 2: the chart rounds once, to 1
     # Differences from the UNROUNDED cuts, so the page and results/*.txt agree
     # to the last printed digit.
-    cut = {n.replace("runs/", ""): 100.0 * (1.0 - float(np.median(col(n, "damage"))) / base)
+    cut = {n.split("/")[-1]: 100.0 * (1.0 - float(np.median(col(n, "damage"))) / base)
            for n in order}
-    fuel = {n.replace("runs/", ""): 100.0 * (float(np.median(col(n, "fuel"))) / base_f - 1.0)
+    fuel = {n.split("/")[-1]: 100.0 * (float(np.median(col(n, "fuel"))) / base_f - 1.0)
             for n in order}
     seeds = [dict(seed=s, s=_r(cut[f"sighted_seed{s}"], 2), b=_r(cut[f"blind_seed{s}"], 2),
                   d=_r(cut[f"sighted_seed{s}"] - cut[f"blind_seed{s}"], 4),
                   fs=_r(fuel[f"sighted_seed{s}"], 2), fb=_r(fuel[f"blind_seed{s}"], 2))
-             for s in range(5)]
+             for s in sorted({int(k.split("seed")[-1]) for k in cut if "_seed" in k})
+             if f"sighted_seed{s}" in cut and f"blind_seed{s}" in cut]
     dd = np.array([x["d"] for x in seeds])
     sd = float(dd.std(ddof=1))
-    half = 2.776 * sd / np.sqrt(len(dd))           # t(0.975, 4)
+    from scipy import stats as _st
+    half = float(_st.t.ppf(0.975, len(dd) - 1)) * sd / np.sqrt(len(dd))    # was 2.776, t(0.975, 4)
     from scipy import stats
-    s_med = float(np.median([x["s"] for x in seeds]))
+    s_med = float(np.median([cut[f"sighted_seed{x['seed']}"] for x in seeds]))      # unrounded, as results/*.txt
     ablation = dict(seeds=seeds, mean=_r(dd.mean(), 4), median=_r(np.median(dd), 4),
                     sd=_r(sd, 4), lo=_r(dd.mean() - half, 4), hi=_r(dd.mean() + half, 4),
                     p_t=_r(stats.ttest_1samp(dd, 0.0).pvalue, 2),
@@ -121,18 +128,35 @@ def phase_d():
                     grade_cut=cut["current-grade"], predictive_cut=cut["predictive (hand)"],
                     sighted_median=_r(s_med, 1),
                     agent_over_grade=_r(s_med - cut["current-grade"], 1),
-                    within=int((np.abs(dd) <= 0.75).sum()),
+                    within=int((np.abs(dd) <= 0.75).sum()), n=len(dd),
                     pred_minus_grade=_r(cut["predictive (hand)"] - cut["current-grade"], 2))
+    lo_, hi_ = ablation["lo"], ablation["hi"]
+    ablation["verdict"] = ("Indistinguishable from zero." if lo_ <= 0 <= hi_
+                           else "Preview helps: the interval excludes zero." if lo_ > 0
+                           else "Preview hurts: the interval excludes zero.")
+    s_med_b = float(np.median([cut[f"blind_seed{x['seed']}"] for x in seeds]))
+    ablation["blind_median"] = _r(s_med_b, 1)
+    ablation["blind_over_grade"] = _r(s_med_b - cut["current-grade"], 1)
+    g_ = cut["current-grade"]
+    if lo_ <= 0 <= hi_:
+        sg = lambda v: f"{v:+.1f}".replace("-", "−")
+        ablation["reading"] = (
+            f"The blinded agents beat current-grade by {sg(s_med_b - g_)} points and the sighted ones by "
+            f"{sg(s_med - g_)}: on this scenario what the agents gain comes from learning to protect, not "
+            f"from seeing ahead. That is one point on the H/τ curve, not the curve.")
+    else:
+        ablation["reading"] = (
+            f"The interval excludes zero: preview {'helps' if lo_ > 0 else 'hurts'} a learned policy on this "
+            f"scenario by {abs(float(dd.mean())):.1f} points on average.")
 
     # 29 September 2026: the sentences about which agents beat which policy were
     # typed, and went false when the agents were re-scored on the derived plant
     # ("all ten beat every hand-written policy" -- three do not). They are
     # computed now, and the claims the text makes without a number are asserted.
     hand = [n for n in order if kind(n) == "hand"]
-    agents = [n.replace("runs/", "") for n in order if kind(n) != "hand"]
+    agents = [n.split("/")[-1] for n in order if kind(n) != "hand"]
     best_hand = max(cut[n] for n in hand)
     below = [a for a in agents if cut[a] <= best_hand]
-    assert all(cut[a] > cut["reactive"] for a in agents), "the text says every agent beats reactive"
 
     def names_(xs):
         xs = [shortish(x) for x in xs]
@@ -144,28 +168,44 @@ def phase_d():
     def seeds_(xs):
         return names_([f"__{x}" for x in xs]).replace("__", "")
 
+    beat_reactive = sum(cut[a] > cut["reactive"] for a in agents)
+    mn = min(agents, key=lambda a: cut[a])
+    if not below:
+        sentence = (f"All {len(agents)} trained agents beat every hand-written policy: the weakest, "
+                    f"{shortish(mn)}, cuts {cut[mn]:.1f} % against current-grade's {best_hand:.1f} %.")
+    else:
+        sentence = (f"{len(agents) - len(below)} of {len(agents)} trained agents beat every hand-written "
+                    f"policy. The other {len(below)}, {names_(below)}, cut {min(cut[a] for a in below):.1f}"
+                    f"–{max(cut[a] for a in below):.1f} %, no more than current-grade's {best_hand:.1f} %.")
+    sentence += (" Every agent beats the reactive policy and the baseline." if beat_reactive == len(agents)
+                 else f" {beat_reactive} of {len(agents)} beat the reactive policy.")
     agents_ = dict(n=len(agents), beat=len(agents) - len(below), n_below=len(below),
-                   below=names_(below) if below else "none",
-                   below_lo=_r(min(cut[a] for a in below), 1) if below else None,
-                   below_hi=_r(max(cut[a] for a in below), 1) if below else None,
-                   best_hand=_r(best_hand, 1))
-    low_fuel = [x["seed"] for x in seeds if x["fs"] < 0 and x["fb"] < 0]
-    lf_cuts = [c for x in seeds if x["seed"] in low_fuel for c in (x["s"], x["b"])]
-    more = [x for x in seeds if x["d"] > 0.75]
-    less = [x for x in seeds if x["d"] < -0.75]
-    fmt = lambda v: f"{v:.1f}"
-    trade = dict(low_fuel=seeds_(low_fuel), lf_lo=_r(min(lf_cuts), 1), lf_hi=_r(max(lf_cuts), 1),
-                 more=seeds_([x["seed"] for x in more]),
-                 more_cut=names_([f"__{fmt(x['d'])}" for x in more]).replace("__", ""),
-                 more_fuel=names_([f"__{fmt(x['fs'] - x['fb'])}" for x in more]).replace("__", ""),
-                 less=seeds_([x["seed"] for x in less]))
-    assert low_fuel and more, "the damage-against-fuel text needs both kinds of seed"
+                   best_hand=_r(best_hand, 1), sentence=sentence)
 
+    # Damage against fuel: which way does each seed's tie run? (29 Sep: the
+    # sentences were typed for five seeds and went false on the retrain.)
+    fuel_less = [a for a in agents if fuel[a] < 0]
+    fuel_more = [fuel[a] for a in agents if fuel[a] >= 0]
+    both_s = [x["seed"] for x in seeds if x["d"] > 0.75 and x["fs"] <= x["fb"]]
+    both_b = [x["seed"] for x in seeds if x["d"] < -0.75 and x["fb"] <= x["fs"]]
+    take = (f"Protection usually costs fuel. {len(fuel_less)} of {len(agents)} agents cut damage while "
+            f"burning less fuel than the baseline" + (f"; the rest burn {min(fuel_more):.1f}–"
+                                                         f"{max(fuel_more):.1f} % more." if fuel_more else "."))
+    cap = (f"A tie that ran straight up, more damage cut for the same fuel, would be a preview effect. Of "
+           f"the {len(seeds)} pairs, the sighted agent is better on both damage and fuel in {len(both_s)}"
+           + (f" (seed{'s' if len(both_s) > 1 else ''} {seeds_(both_s)})" if both_s else "") + f", the blinded one in {len(both_b)}"
+           + (f" (seed{'s' if len(both_b) > 1 else ''} {seeds_(both_b)})" if both_b else "")
+           + f", and the other {len(seeds) - len(both_s) - len(both_b)} trade one for the other or tie.")
+    trade = dict(take=take, cap=cap)
+
+    # From results/agents/ (record_agents.py), which is committed -- until 29 Sep
+    # this read runs/, which is gitignored, so nobody else could rebuild it.
     curves = []
-    for f in sorted(glob.glob(os.path.join(HERE, "runs", "*", "curve.csv"))):
+    for f in sorted(glob.glob(os.path.join(RES, "agents", AGENT_SET, "*_seed*", "curve.csv"))):
         tag = os.path.basename(os.path.dirname(f))
         d = np.loadtxt(f, delimiter=",", skiprows=1, usecols=(0, 1, 2))
         curves.append(dict(run=tag, blind=tag.startswith("blind"), ret=_r(d[:, 1], 1)))
+    curve_eps = max((len(c["ret"]) for c in curves), default=0)
 
     # Damage split by term, on the hand-written traces. The knock term rests on
     # the knock model the car's logs have not been able to test.
@@ -197,7 +237,67 @@ def phase_d():
 
     return dict(trace=trace, sweep=sweep, eval=ev, base_med=_r(base, 1), split=split_out, elev=elev,
                 base_fuel=_r(base_f, 0), ablation=ablation, curves=curves, agents=agents_, trade=trade,
+                curve_eps=curve_eps, curve_runs=len(curves), rec=agent_records(),
                 n_episodes=len(col("baseline ECU", "damage")))
+
+
+def agent_records():
+    """Read off the evaluation records (record_agents.py): how far the agents
+    advance spark and how close that takes the modelled knock integral to the
+    damage knee, and every episode an agent does worse than the baseline."""
+    import evaluate as E
+    root = os.path.join(RES, "agents", AGENT_SET)
+    # From eval_summary.json, never eval_record.npz: the records are not in git
+    # (29 Sep), so the page must build from what is committed.
+    with open(os.path.join(root, "baseline_ECU", "eval_summary.json")) as fh:
+        B = json.load(fh)
+    base_dmg = B["summary"]["damage"]["median"]
+    out = dict(ki_base=_r(B["engine_on_climb"]["ki_p95"], 2), sp_base=_r(B["engine_on_climb"]["spark_median"], 1))
+    trims, kis = [], []
+    w_life = np.array([e[1][2] for e in E.EPISODES])
+    bad = []
+    for d in sorted(glob.glob(os.path.join(root, "*_seed*"))):
+        with open(os.path.join(d, "eval_summary.json")) as fh:
+            S_ = json.load(fh)
+        trims.append(S_["engine_on_climb"]["spark_trim_median"])
+        kis.append(S_["engine_on_climb"]["ki_p95"])
+        eps = S_["episodes"]
+        worse = [i for i, e in enumerate(eps) if e["damage"] > base_dmg]
+        if worse:
+            bad.append(dict(agent=os.path.basename(d), n=len(worse), episodes=worse,
+                            worst=_r(max(eps[i]["damage"] for i in worse), 0),
+                            peak=_r(max(eps[i]["peak_turb"] for i in worse), 0),
+                            w_life_max=_r(max(w_life[i] for i in worse), 3),
+                            lowest=sorted(worse) == sorted(np.argsort(w_life)[:len(worse)].tolist())))
+    # knock_margin.py: the same agents with spark advance forbidden (a diagnostic)
+    km_path = os.path.join(root, "knock_margin.json")
+    if not os.path.exists(km_path):
+        raise SystemExit(f"{km_path} missing -- run knock_margin.py")
+    with open(km_path) as fh:
+        K = json.load(fh)["summary"]
+    out["km"] = dict(sighted=_r(K["sighted_cut"], 1), sighted_orig=_r(K["sighted_cut_orig"], 1),
+                     blind=_r(K["blind_cut"], 1), blind_orig=_r(K["blind_cut_orig"], 1),
+                     grade=_r(K["grade_cut"], 1), beat=K["beat_grade"], n=K["n"],
+                     og=_r(K["over_grade_median"], 1), og_orig=_r(K["over_grade_median_orig"], 1),
+                     ki_lo=_r(K["ki_p95_lo"], 2),
+                     ki_hi=_r(K["ki_p95_hi"], 2), abl=_r(K["ablation"]["mean"], 2),
+                     abl_lo=_r(K["ablation"]["ci95"][0], 1), abl_hi=_r(K["ablation"]["ci95"][1], 1),
+                     abl_pw=_r(K["ablation"]["p_wilcoxon"], 2))
+    out.update(trim_lo=_r(min(trims), 1), trim_hi=_r(max(trims), 1), ki_lo=_r(min(kis), 2),
+               ki_hi=_r(max(kis), 2), base_dmg=_r(base_dmg, 0), n_bad=len(bad), bad=bad)
+    if bad:
+        b = max(bad, key=lambda x: x["worst"])
+        out["bad_sentence"] = (
+            f"{b['agent'].replace('blind_seed', 'Blinded seed ').replace('sighted_seed', 'Sighted seed ')} "
+            f"does more damage than the baseline on {b['n']} of the twenty episodes (worst {b['worst']:.0f} "
+            f"against {base_dmg:.0f}, turbine {b['peak']:.0f} °C), and they are "
+            + ("exactly the five" if b["lowest"] and b["n"] == 5 else f"the {b['n']}" if b["lowest"] else "episodes")
+            + f" whose weight on component life is lowest (at most {b['w_life_max']:.3f}). "
+            + (f"{len(bad) - 1} other agent" + ("s" if len(bad) > 2 else "") + " also do." if len(bad) > 1
+               else "No other agent does."))
+    else:
+        out["bad_sentence"] = "No agent does more damage than the baseline on any of the twenty episodes."
+    return out
 
 
 def model_vs_car():

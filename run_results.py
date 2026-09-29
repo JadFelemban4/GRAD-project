@@ -2,6 +2,7 @@
 
     python run_results.py              # ~10-15 min on a multi-core machine
     python run_results.py traces sweep # a subset
+    python run_results.py phase_d --agents=runs   # score the 19 Sep agents instead
 
 Writes, from the simulator as it stands (data/derived_params.json):
 
@@ -110,15 +111,17 @@ def episode(job):
     return r
 
 
-def _paired(rows, base):
-    """Sighted minus blinded, paired by seed, in points of damage cut."""
+def _paired(rows, base, agent_set):
+    """Sighted minus blinded, paired by seed, in points of damage cut. Every
+    seed the set holds (29 Sep: this read range(5), and the retrain has ten)."""
     cut = {}
     for r in rows:
         cut.setdefault(r["policy"], []).append(r["damage"])
     med = {k: float(np.median(v)) for k, v in cut.items()}
+    seeds = sorted({int(k.split("seed")[-1]) for k in med if "_seed" in k})
     diffs = []
-    for s in range(5):
-        a, b = f"runs/sighted_seed{s}", f"runs/blind_seed{s}"
+    for s in seeds:
+        a, b = f"{agent_set}/sighted_seed{s}", f"{agent_set}/blind_seed{s}"
         if a in med and b in med:
             diffs.append((s, 100 * (1 - med[a] / base), 100 * (1 - med[b] / base)))
     return med, diffs
@@ -138,17 +141,30 @@ def _signed_rank_p(d):
     return float(np.mean(np.abs(stats - tot / 2) >= abs(w - tot / 2) - 1e-9))
 
 
-def phase_d(pool):
+# Which agents Phase D scores. The retrain of 29 September (130 km/h, varied
+# roads, dt 1.0, the derived plant, ten seeds a side) once it exists; the ten
+# agents of 19 September in runs/ are documented by record_agents.py as a record.
+AGENT_SET = "runs/terrain_dt1"
+
+
+def phase_d(pool, agent_set=AGENT_SET):
     import evaluate as E
     agents = sorted(os.path.relpath(p, HERE).replace("\\", "/")
-                    for p in glob.glob(os.path.join(HERE, "runs", "*_seed*"))
+                    for p in glob.glob(os.path.join(HERE, agent_set, "*_seed*"))
                     if os.path.exists(os.path.join(p, "final.zip")))
+    agents.sort(key=lambda a: ("blind" in a, int(a.split("seed")[-1])))
     specs = [(n, "hand:" + f) for n, f in POLICIES] + [(a, a) for a in agents]
     jobs = [(lab, spec, i, s, w) for lab, spec in specs for i, (s, w) in enumerate(E.EPISODES)]
     rows = list(pool.map(episode, jobs, chunksize=1))
     with open(os.path.join(RES, "phase_d_130kmh_raw.json"), "w") as fh:
         json.dump(rows, fh)
+    phase_d_report(rows, agent_set)
 
+
+def phase_d_report(rows, agent_set=AGENT_SET):
+    """results/phase_d_130kmh.txt from the per-episode rows. `python
+    run_results.py phase_d_report` rebuilds it from phase_d_130kmh_raw.json
+    without re-running an episode (29 Sep: a footer change is not worth 70 min)."""
     by = {}
     for r in rows:
         by.setdefault(r["policy"], []).append(r)
@@ -166,12 +182,12 @@ def phase_d(pool):
     for name, rs in by.items():
         d = np.array([r["damage"] for r in rs]); t = np.array([r["damage_thermal"] for r in rs])
         q1, q3 = np.percentile(d, [25, 75])
-        lines.append(f"{name.replace('runs/', ''):<22}{np.median(d):>11.1f}{q3 - q1:>8.1f}{d.max():>8.1f}"
+        lines.append(f"{name.split('/')[-1]:<22}{np.median(d):>11.1f}{q3 - q1:>8.1f}{d.max():>8.1f}"
                      f"{np.median(t):>12.1f}{np.median([r['fuel'] for r in rs]):>10.0f}"
                      f"{max(r['peak_turb'] for r in rs):>8.0f}{100 * (1 - np.median(d) / base):>8.1f}"
                      f"{100 * (1 - np.median(t) / base_t):>16.1f}")
     lines.append("-" * 103)
-    med, diffs = _paired(rows, base)
+    med, diffs = _paired(rows, base, agent_set)
     if diffs:
         dd = np.array([a - b for _, a, b in diffs])
         lines += ["", "THE ABLATION, PAIRED BY SEED -- the only correct way to read it",
@@ -185,10 +201,19 @@ def phase_d(pool):
         g = 100 * (1 - med["current-grade"] / base)
         lines.append(f"AGENT (sighted median {np.median(sighted):.1f} %) over CURRENT-GRADE "
                      f"({g:.1f} %): {np.median(sighted) - g:+.1f} points")
-    lines += ["", "READ THIS BEFORE QUOTING ANY ROW. The agents in runs/ trained at 110 km/h, at",
-              "dt = 0.2 s, on one road, on the plant BEFORE its constants were derived from the",
-              "logs. They are a record, not Phase D's answer: the retrain is (handoff.md).",
-              "The hand-written rows have zero IQR by construction: they ignore the preference",
+    if agent_set == "runs":
+        lines += ["", "READ THIS BEFORE QUOTING ANY ROW. The agents in runs/ trained at 110 km/h, at",
+                  "dt = 0.2 s, on one road, on the plant BEFORE its constants were derived from the",
+                  "logs. They are a record, not Phase D's answer: the retrain is (handoff.md)."]
+    else:
+        lines += ["", f"AGENTS: {agent_set}, trained 29 September 2026 at 130 km/h on a new road every",
+                  "episode, dt 1.0, 50 000 steps, on the plant derived from the logs; configuration,",
+                  "every action and the full records in results/agents/ (record_agents.py).",
+                  "The fuel is 95 RON, confirmed (REFERENCES.md 2c). OPEN, and each would change the",
+                  "plant and so need a retrain: the boost ceiling 9-20 % low at 1600-2000 rpm",
+                  "(mistake 22), drive A -- the team retrains after every drive. The knock model is",
+                  "untested: read the thermal-only column, and results/agents/<set>/KNOCK_MARGIN.md."]
+    lines += ["The hand-written rows have zero IQR by construction: they ignore the preference",
               "weights, so all twenty episodes are one rollout repeated."]
     with open(os.path.join(RES, "phase_d_130kmh.txt"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
@@ -196,7 +221,13 @@ def phase_d(pool):
 
 
 def main():
-    want = set(sys.argv[1:]) or {"traces", "sweep", "phase_d"}
+    args = [x for x in sys.argv[1:] if not x.startswith("--agents=")]
+    agent_set = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--agents=")), AGENT_SET)
+    want = set(args) or {"traces", "sweep", "phase_d"}
+    if want == {"phase_d_report"}:
+        with open(os.path.join(RES, "phase_d_130kmh_raw.json")) as fh:
+            phase_d_report(json.load(fh), agent_set.rstrip("/"))
+        return
     t0 = time.time()
     with ProcessPoolExecutor(max_workers=min(18, os.cpu_count() or 4)) as pool:
         if "traces" in want:
@@ -212,7 +243,7 @@ def main():
                 print(f"   {s['v_kmh']} km/h {s['grade']:2d} %  peak {s['peak_c']:6.1f} C"
                       f"{'  binds' if s['binds'] else ''}")
         if "phase_d" in want:
-            phase_d(pool)
+            phase_d(pool, agent_set.rstrip("/"))
     print(f"\n{(time.time() - t0) / 60:.1f} min")
 
 

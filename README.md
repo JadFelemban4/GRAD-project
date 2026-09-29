@@ -2,6 +2,14 @@
 
 > **Opening this in Claude Code?** Read `CLAUDE.md` first — it carries the
 > project's claim, its current state, and the mistakes already made (twenty-two, numbered).
+>
+> **29 September 2026: the retrain ran.** Twenty agents, ten seeds a side; all
+> beat every hand-written policy, and sighted minus blinded is +1.2 points (95 % CI
+> −4.4 to +6.8, n = 10). With spark advance forbidden their median cut falls to
+> ~41.6 %, below current-grade's 43.4 %: most of their margin rests on the
+> untested knock model (`results/agents/terrain_dt1/KNOCK_MARGIN.md`). Every
+> action is recorded (per-step records on the training machine, gitignored);
+> the generated tables are in `results/agents/terrain_dt1/README.md`.
 
 Working code for the validated parts of the project. Every number quoted in the
 handbook is this code's actual output, and `validate.py` regenerates the ones

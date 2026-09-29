@@ -11,7 +11,8 @@ Inputs, all written by the simulation runs:
     results/traces_130kmh.json      per-step traces, four hand-written policies
     results/sweep_speed_grade.json  peak turbine over speed x grade, baseline
     results/phase_d_130kmh_raw.json per-episode rows, frozen 20-episode protocol
-    runs/*/curve.csv                training returns, one row per episode
+    results/agents/<set>/*/curve.csv   training returns, one row per episode
+                                    (record_agents.py; AGENT_SET below)
 
 Palette and mark rules follow the project data-visualisation conventions:
 categorical hues assigned in fixed order and never cycled, one axis per chart,
@@ -222,13 +223,24 @@ def sweep():
 
 
 # ------------------------------------------------------------------- fig 5
+# The agents figures 5-7 show: results/agents/<AGENT_SET>/ (record_agents.py),
+# the set run_results.py scores into phase_d_130kmh_*. 29 September 2026: these
+# read runs/ (gitignored) and hard-coded five seeds; they follow the data now.
+AGENT_SET = "terrain_dt1"
+
+
+def _seed_of(n):
+    return int(n.split("seed")[-1])
+
+
 def curves():
-    files = sorted(glob.glob(os.path.join(HERE, "runs", "*", "curve.csv")))
+    files = sorted(glob.glob(os.path.join(RES, "agents", AGENT_SET, "*_seed*", "curve.csv")))
     if not files:
         print("  (no training curves found)")
         return
+    n_ep = max(len(np.loadtxt(f, delimiter=",", skiprows=1, usecols=(0,), ndmin=1)) for f in files)
     fig, ax = plt.subplots(figsize=(9.6, 5.0))
-    _style(ax, "Every training run this project has -- eleven episodes each",
+    _style(ax, f"Every training run of {AGENT_SET} -- {len(files)} runs, {n_ep} episodes each",
            "episode", "episode return")
     ax.axhline(0, color=INK3, lw=0.9, ls="--", zorder=2)
     seen = set()
@@ -238,15 +250,14 @@ def curves():
         col = ORANGE if blind else BLUE
         lbl = "blinded (no preview)" if blind else "sighted (preview)"
         d = np.loadtxt(f, delimiter=",", skiprows=1, usecols=(0, 1, 2))
-        ax.plot(d[:, 0], d[:, 1], color=col, lw=1.6, alpha=0.65, zorder=3,
-                marker="o", ms=4, label=None if lbl in seen else lbl)
+        ax.plot(d[:, 0], d[:, 1], color=col, lw=1.2, alpha=0.55, zorder=3,
+                label=None if lbl in seen else lbl)
         seen.add(lbl)
     ax.legend(loc="lower right", frameon=False, fontsize=9, labelcolor=INK2)
     ax.text(0.02, 0.97,
-            "50 000 steps against a 4 500-step episode is eleven points, and the\n"
-            "preference weights are redrawn at every reset -- so consecutive\n"
-            "points are not scored with the same ruler. These ran at 110 km/h,\n"
-            "where the constraint does not bind.",
+            "Every episode draws new preference weights AND a new road, so\n"
+            "consecutive returns are not scored with the same ruler and this\n"
+            "curve cannot show learning. The twenty frozen episodes can (fig 6).",
             transform=ax.transAxes, va="top", color=INK2, fontsize=9,
             bbox=dict(fc=SURFACE, ec=GRID, lw=0.8, boxstyle="round,pad=0.5"),
             zorder=6)
@@ -275,8 +286,8 @@ def phase_d():
     def cut(n):
         return 100.0 * (1.0 - float(np.median(col(n, "damage"))) / base)
 
-    cols = [BLUE if n.startswith("runs/sighted")
-            else ORANGE if n.startswith("runs/blind")
+    cols = [BLUE if "sighted_seed" in n
+            else ORANGE if "blind_seed" in n
             else AQUA if n == "current-grade"
             else VIOLET if n == "predictive (hand)"
             else INK3 if n == "reactive"
@@ -295,14 +306,15 @@ def phase_d():
     ax.barh(y, med, color=cols, height=0.62, zorder=3)
     ax.errorbar(med, y, xerr=[med - q1, q3 - med], fmt="none", ecolor=INK2,
                 elinewidth=1.4, capsize=4, zorder=4)
-    ax.set_yticks(y, [n.replace("runs/", "") for n in names])
+    ax.set_yticks(y, [n.split("/")[-1] for n in names])
     ax.invert_yaxis()
     ax.axvline(base, color=CRIT, lw=1.3, ls=(0, (5, 3)), zorder=2)
     ax.text(base, -0.80, " baseline median", color=CRIT, fontsize=9,
             va="center")
-    for yi, m in zip(y, med):
+    for yi, m, top in zip(y, med, q3):
+        # past the whisker, not on it (29 Sep: the agents' IQRs are wide)
         ax.annotate(f"{m:.0f}   cuts {100 * (1 - m / base):.1f} %",
-                    xy=(m, yi), xytext=(8, 0), textcoords="offset points",
+                    xy=(max(m, top), yi), xytext=(8, 0), textcoords="offset points",
                     va="center", color=INK, fontsize=9)
     ax.set_xlim(0, max(q3) * 1.34)
 
@@ -316,16 +328,19 @@ def phase_d():
             "rollout. Only the agents see w and therefore vary.",
             transform=ax.transAxes, color=INK3, fontsize=8.5, va="top")
 
-    _style(ar, "The ablation, PAIRED by seed",
+    _style(ar, "The ablation, PAIRED by seed: blue sighted, orange blinded",
            "damage cut vs baseline (%)", None)
-    s_cut = [cut(f"runs/sighted_seed{s}") for s in range(5)]
-    b_cut = [cut(f"runs/blind_seed{s}") for s in range(5)]
-    yy = np.arange(5)
+    sighted = {_seed_of(n): n for n in names if "sighted_seed" in n}
+    blinded = {_seed_of(n): n for n in names if "blind_seed" in n}
+    seeds = sorted(set(sighted) & set(blinded))
+    s_cut = [cut(sighted[s]) for s in seeds]
+    b_cut = [cut(blinded[s]) for s in seeds]
+    yy = np.arange(len(seeds))
     ar.barh(yy - 0.19, s_cut, height=0.34, color=BLUE, zorder=3,
             label="sighted (preview)")
     ar.barh(yy + 0.19, b_cut, height=0.34, color=ORANGE, zorder=3,
             label="blinded (no preview)")
-    ar.set_yticks(yy, [f"seed {s}" for s in range(5)])
+    ar.set_yticks(yy, [f"seed {s}" for s in seeds])
     ar.invert_yaxis()
     g_cut = cut("current-grade")
     ar.axvline(g_cut, color=AQUA, lw=2.0, ls=(0, (5, 3)), zorder=5)
@@ -337,24 +352,37 @@ def phase_d():
                     color=INK, fontsize=9.5, fontweight="bold")
     d = np.array(s_cut) - np.array(b_cut)
     ar.set_xlim(0, max(max(s_cut), max(b_cut)) * 1.32)
-    ar.legend(loc="upper right", frameon=False, fontsize=9, labelcolor=INK2)
+    # No legend: ten seeds fill the panel and every placement covered a label
+    # (29 Sep). The title names the colours, which match the left panel's rows.
+    from scipy import stats as _st
+    n_ = len(d)
+    half = _st.t.ppf(0.975, n_ - 1) * d.std(ddof=1) / np.sqrt(n_)
+    p_t = _st.ttest_1samp(d, 0.0).pvalue
+    p_w = _st.wilcoxon(d).pvalue if np.any(d != 0) else 1.0
+    lo, hi = d.mean() - half, d.mean() + half
+    verdict = ("indistinguishable from zero" if lo <= 0 <= hi
+               else "preview HELPS" if lo > 0 else "preview HURTS")
     ar.text(0, -0.085,
             f"paired difference: median {np.median(d):+.1f}, mean {d.mean():+.1f}, "
-            f"sd {d.std(ddof=1):.1f} points (n = 5)\n"
-            f"95 % CI {d.mean() - 2.776 * d.std(ddof=1) / np.sqrt(5):+.1f} to "
-            f"{d.mean() + 2.776 * d.std(ddof=1) / np.sqrt(5):+.1f} -- "
-            "indistinguishable from zero",
+            f"sd {d.std(ddof=1):.1f} points (n = {n_})\n"
+            f"95 % CI {lo:+.1f} to {hi:+.1f}; t-test p {p_t:.2f}, Wilcoxon p {p_w:.2f} -- {verdict}",
             transform=ar.transAxes, color=INK2, fontsize=8.5, va="top")
 
     fig.suptitle("Phase D protocol -- twenty frozen episodes, 12 % at 130 km/h",
                  color=INK, fontsize=13, x=0.012, ha="left", fontweight="bold")
-    fig.text(0.012, 0.005,
-             "THESE AGENTS ARE OUT OF DISTRIBUTION FOUR TIMES OVER: trained at "
-             "110 km/h where the constraint never binds, at dt = 0.2 s while this "
-             "protocol runs dt = 1.0 s, on one road,\nand on the plant before its "
-             "constants were derived from the logs (28 Sep). This is what the "
-             "existing runs are worth, not Phase D's answer.",
-             color=CRIT, fontsize=9)
+    if any(n.startswith("runs/terrain_dt1/") for n in names):
+        foot, fc = ("Agents trained 29 September 2026: 130 km/h, a new road every episode, dt 1.0, "
+                    "50 000 steps, on the plant derived from the logs. Still open, and each would "
+                    "change the plant:\nthe boost ceiling low at 1600-2000 rpm, drive A (a retrain after each drive). "
+                    "The knock model is untested -- read the thermal-only column and "
+                    "KNOCK_MARGIN.md too."), INK2
+    else:
+        foot, fc = ("THESE AGENTS ARE OUT OF DISTRIBUTION FOUR TIMES OVER: trained at "
+                    "110 km/h where the constraint never binds, at dt = 0.2 s while this "
+                    "protocol runs dt = 1.0 s, on one road,\nand on the plant before its "
+                    "constants were derived from the logs (28 Sep). This is what the "
+                    "existing runs are worth, not Phase D's answer."), CRIT
+    fig.text(0.012, 0.005, foot, color=fc, fontsize=9)
     fig.tight_layout(rect=(0, 0.045, 1, 0.94))
     _save(fig, "fig6_phase_d.png")
 
@@ -372,21 +400,20 @@ def phase_d():
     ax.axhline(0, color=INK3, lw=0.9, ls="--", zorder=2)
     ax.axvline(0, color=INK3, lw=0.9, ls="--", zorder=2)
 
-    for i in range(5):
-        xs, ys = xy(f"runs/sighted_seed{i}")
-        xb, yb = xy(f"runs/blind_seed{i}")
+    for k, i in enumerate(seeds):
+        xs, ys = xy(sighted[i])
+        xb, yb = xy(blinded[i])
         ax.plot([xs, xb], [ys, yb], color=INK3, lw=1.2, zorder=3)
-        ax.scatter([xs], [ys], s=130, color=BLUE, zorder=5, marker="o",
-                   edgecolor=SURFACE, linewidth=1.8,
-                   label="trained, sighted" if i == 0 else None)
-        ax.scatter([xb], [yb], s=130, color=ORANGE, zorder=5, marker="o",
-                   edgecolor=SURFACE, linewidth=1.8,
-                   label="trained, blinded" if i == 0 else None)
-        ax.annotate(f"seed {i}", xy=((xs + xb) / 2, (ys + yb) / 2),
-                    xytext={0: (0, -24), 1: (0, 16), 2: (0, 16),
-                            3: (-26, -24), 4: (0, -24)}[i],
-                    textcoords="offset points", ha="center",
-                    color=INK2, fontsize=9, fontweight="bold")
+        ax.scatter([xs], [ys], s=110, color=BLUE, zorder=5, marker="o",
+                   edgecolor=SURFACE, linewidth=1.6,
+                   label="trained, sighted" if k == 0 else None)
+        ax.scatter([xb], [yb], s=110, color=ORANGE, zorder=5, marker="o",
+                   edgecolor=SURFACE, linewidth=1.6,
+                   label="trained, blinded" if k == 0 else None)
+        ax.annotate(f"{i}", xy=(xs, ys), xytext=(0, 0), textcoords="offset points",
+                    ha="center", va="center", color=SURFACE, fontsize=7, fontweight="bold", zorder=6)
+        ax.annotate(f"{i}", xy=(xb, yb), xytext=(0, 0), textcoords="offset points",
+                    ha="center", va="center", color=SURFACE, fontsize=7, fontweight="bold", zorder=6)
 
     hand = [("baseline ECU", INK2, (0, -20)), ("reactive", INK3, (0, -20)),
             ("current-grade", AQUA, (-62, 2)),
@@ -400,10 +427,13 @@ def phase_d():
                     ha="center", color=c, fontsize=9, fontweight="bold")
 
     ax.legend(loc="lower right", frameon=False, fontsize=9, labelcolor=INK2)
+    agents_all = [sighted[i] for i in seeds] + [blinded[i] for i in seeds]
+    both = [n.split("/")[-1] for n in agents_all if xy(n)[0] < 0 and xy(n)[1] > 0]
     ax.text(0, -0.13,
-            "Seeds 0 and 1 cut damage by about 45 % while burning LESS fuel "
-            "than the baseline -- the only points in the figure that beat it "
-            "on both axes.",
+            ("Numbers are seeds. Beating the baseline on BOTH axes (less damage AND less fuel): "
+             + (", ".join(both) if both else "no agent") + ".")
+            if len(both) < 8 else
+            f"Numbers are seeds. {len(both)} of {len(agents_all)} agents beat the baseline on both axes.",
             transform=ax.transAxes, color=INK2, fontsize=9)
     ax.margins(0.17)
     _save(fig, "fig7_damage_vs_fuel.png")

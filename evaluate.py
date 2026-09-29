@@ -86,9 +86,43 @@ EPISODES = (
 )
 
 
-def run_episode(policy, seed, weights, use_preview=True):
+# What record_agents.py keeps of every evaluation step (29 September 2026), read
+# off the environment AFTER the step, so the episode itself is untouched.
+RECORD_STATE = ("t_turb", "t_oil", "t_block", "torque", "torque_req", "spark", "lam", "ki",
+                "egt_c", "mdot_fuel", "r_fuel", "r_life", "r_resp")
+
+
+def _record_step(record, env, a, obs_before, r, info):
+    """Append one step. `action` is what the policy returned, in [-1, 1];
+    `applied` is what the actuators actually did after the slew limit and the
+    bounds, in physical units (spark trim deg, lambda trim, boost trim kPa, fan
+    duty, pump duty) -- the two differ whenever the policy asks for more than
+    the slew allows."""
+    record["action"].append(np.asarray(a, np.float32))
+    record["applied"].append(np.asarray(env.prev_act, np.float32))
+    record["obs"].append(np.asarray(obs_before, np.float32))
+    record["reward"].append(float(r))
+    record["rpm"].append(float(env.rpm))
+    record["map_kpa"].append(float(env.map_kpa))
+    record["grade"].append(float(env.cycle["grade"][env.k - 1]))
+    record["t_turb_base"].append(float(env.thermal_base.t_turb))
+    record["damage_rate"].append(damage_rate(info["t_turb"], info["t_oil"], info["ki"]))
+    for k in RECORD_STATE:
+        record[k].append(float(info[k]))
+
+
+def new_record():
+    return {k: [] for k in ("action", "applied", "obs", "reward", "rpm", "map_kpa", "grade",
+                            "t_turb_base", "damage_rate") + RECORD_STATE}
+
+
+def run_episode(policy, seed, weights, use_preview=True, record=None):
     """One episode with the weights PINNED after reset, so every policy sees
-    the same ruler on the same episode."""
+    the same ruler on the same episode.
+
+    `record`, if given (new_record()), receives every step: the action, what
+    the actuators did, the observation and the engine's state. It only reads;
+    the scores are identical with or without it (record_agents.py checks)."""
     env = SupervisoryTunerEnv(make_grade_climb(duration=DURATION, dt=DT),
                               dt=DT, seed=seed, use_preview=use_preview)
     obs, _ = env.reset(seed=seed)
@@ -96,7 +130,11 @@ def run_episode(policy, seed, weights, use_preview=True):
     obs = env._obs()
     ret, peak, thermal = 0.0, 0.0, 0.0
     while True:
-        obs, r, term, trunc, info = env.step(policy(env, obs))
+        a = policy(env, obs)
+        obs_before = obs
+        obs, r, term, trunc, info = env.step(a)
+        if record is not None:
+            _record_step(record, env, a, obs_before, r, info)
         ret += r
         peak = max(peak, info["t_turb"])
         # DAMAGE TWO WAYS (handoff step 4, 28 September): the same damage model

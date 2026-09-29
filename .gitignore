@@ -5,3 +5,10 @@ runs/
 
 # the app writes exactly one file, and it is per-drive, not source
 app/review_log.jsonl
+
+# Per-step agent records (record_agents.py, train.py): 85 MB of binaries, kept
+# on disk and NOT in git -- the team's decision, 29 September 2026. What is
+# committed for every agent: config, curve, policy weights, eval_summary.json
+# (which carries the statistics the page and the README read), README, figures.
+results/agents/**/train_record.npz
+results/agents/**/eval_record.npz

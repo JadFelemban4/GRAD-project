@@ -237,7 +237,12 @@ the radiator, fan and oil-cooler part numbers — that would settle it.
   load — and the spark and lambda calibrations are fitted to this car. No
   channel on the car measures EGT before the catalyst.
 
-### The fuel — ASSUMED 95 RON, and it moves only the knock term
+### The fuel — 95 RON, CONFIRMED by the team (29 September 2026)
+
+**Settled 29 September 2026: the team confirms the car was logged on 95 RON** —
+the fuel `plant.Operating.octane` already assumes, so nothing is refitted and the
+knock-limited spark, `validate.py` and `check_map.py` stand as they are. What
+follows is kept because it says what a fuel change WOULD cost.
 
 `plant.Operating.octane` is **95 RON**. The team reports (28 Sep) that the
 owner's manual gives **95 RON as the minimum and 98 RON as recommended for
@@ -425,7 +430,7 @@ ONCE** (from our data, but not re-derived automatically, for the reason given),
 | `volumetric_efficiency`, residual fraction | `plant` | **CANNOT** | the same ratio; and both pressure channels sit before the throttle, so there is no part-load test at all (mistake 12) |
 | `UA_PORT`, `CP_EXH`, `EXH_BACKPRESSURE_RATIO` | `plant` | **CANNOT** | no exhaust temperature before the catalyst and no exhaust pressure channel |
 | combustion: Wiebe, burn duration, ignition delay, Woschni, Chen-Flynn FMEP, γ(T), combustion efficiency, fuel properties | `plant` | **CANNOT** | need cylinder pressure; the car publishes none. Published correlations, cited in section 1 |
-| knock: Douaud-Eyzat constants, octane 95, the knock-limited surface, the ECU's 3° pull / 12° cap / 0.35 °/s restore | `plant`, `BaselineECU` | **CANNOT (yet)** | the only log with both ignition angles reads each every ~8 s -- too slow to see a knock event (drive C would). Which fuel the car was logged on is not recorded (section 2c) |
+| knock: Douaud-Eyzat constants, octane 95, the knock-limited surface, the ECU's 3° pull / 12° cap / 0.35 °/s restore | `plant`, `BaselineECU` | **CANNOT (yet)** | the only log with both ignition angles reads each every ~8 s -- too slow to see a knock event (drive C would). The fuel is 95 RON, confirmed by the team on 29 September (section 2c) |
 | `iat_compensation`, cold-start retard | `BaselineECU` | **CANNOT** | spark against CHARGE temperature, which is modelled, not measured, so the slope is confounded with the model it would test |
 | fan schedule (367 / 372 K) | `BaselineECU` | **CANNOT** | every fan-actual and fan-duty channel reads zero |
 | `p_baro` 101.3 kPa | scenario | **DESIGN** | altitude is not modelled (CLAUDE.md, limitations) |

@@ -21,6 +21,21 @@ C3 had already withdrawn.)*
 
 ---
 
+> ## 29 September 2026 — THE RETRAIN RAN
+>
+> Twenty agents, seeds 0–9 sighted and blinded, 130 km/h on varied roads, on the
+> derived plant. **All twenty beat every hand-written policy; sighted minus
+> blinded is +1.2 points (95 % CI −4.4 to +6.8, n = 10) — no measurable preview
+> value.** Every agent advances spark to just under the untested knock model's
+> knee, and with that advance forbidden (`knock_margin.py`) their median cut
+> falls to ~41.6 %, below current-grade's 43.4 %: **most of their margin rests on
+> the knock model, so drive C (knock) is now the most valuable drive.** Blinded
+> seed 6 does more damage than the baseline on the five episodes that weight
+> component life least. The fuel is settled (95 RON). Every action is recorded
+> (`results/agents/`; the per-step records stay on the training machine,
+> gitignored); `results/agents/terrain_dt1/README.md` has every table.
+> `SESSION_REPORT_2026-09-29.md` is the full account. Committed 29 September.
+
 > ## ⚠️ READ THIS BEFORE ANYTHING ELSE — 28 September 2026, evening
 >
 > **The working tree carries uncommitted work** — review it, then commit.
@@ -42,7 +57,7 @@ C3 had already withdrawn.)*
 > 1. **Drive A before the retrain, or after?** It is the data `validate.py`
 >    rows 8 and 9 (the oil) still need, and the coolant regulation law. Log
 >    `Ambient temperature` on EVERY drive from now on — drive B did not.
-> 2. **The fuel.** 95 or 98 RON while the car was logged (REFERENCES.md 2c).
+> 2. **The fuel** — settled 29 September: 95 RON, what the model runs (REFERENCES.md 2c).
 > 3. **Merge `sep17`** — it has four CODE conflicts, not only documents.
 >
 > **What the evening found** (CLAUDE.md, the evening box):
@@ -118,7 +133,14 @@ because it looks like progress. The reward has carried a live hack twice
 (mistake 5), and the training roads found a gearbox defect that no single-road
 check could have (27 September).
 
-### Step 3 — the ten runs that ARE Phase D · about three hours
+### Step 3 — the runs that ARE Phase D · DONE 29 September (twenty, 234 min)
+
+```bash
+python train_all.py                          # seeds 0-9, sighted and blinded
+python record_agents.py runs/terrain_dt1     # score, record, document
+```
+
+*(What this step said before it ran, kept for the commands:)*
 
 > **Ask the owner before starting this.** It occupies the machine for the
 > afternoon, and every run must use a different seed.

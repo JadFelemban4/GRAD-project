@@ -1,0 +1,30 @@
+{
+ "tag": "blind_seed2",
+ "seed": 2,
+ "preview": false,
+ "total_timesteps": 50000,
+ "algorithm": "SAC",
+ "sac": {
+  "learning_rate": 0.0003,
+  "buffer_size": 1000000,
+  "batch_size": 256,
+  "learning_starts": 100,
+  "gamma": 0.99,
+  "tau": 0.005,
+  "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+  "gradient_steps": 1,
+  "ent_coef": "auto",
+  "target_entropy": -5.0,
+  "policy": "MlpPolicy",
+  "net_arch": "[256, 256]"
+ },
+ "config_source": "read back out of final.zip on 2026-09-29; train.py wrote no config before 29 September",
+ "trained": "19 September 2026, ten runs sharing the team laptop, 173 min",
+ "scenario": "the locked climb ONLY, at 110 km/h (the lock moved to 130 km/h the same day)",
+ "dt": 0.2,
+ "steps_per_episode": 4499,
+ "roads": "one road: make_grade_climb at 110 km/h",
+ "plant": "before 27 Sep (gearbox kickdown, spark refit) and before 28 Sep (derived constants)",
+ "status": "A RECORD, NOT A RESULT: trained at 110 km/h where nothing binds, at dt 0.2 while scored at 1.0, on one road, on an older plant. Kept so the retrain has a before.",
+ "episodes": 11
+}

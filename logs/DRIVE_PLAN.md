@@ -27,6 +27,15 @@ uses; it decides whether the knock model can be kept at all.
 > drive left**: `validate.py` rows 8 and 9 (the oil) and the coolant regulation
 > law all need sustained load logged with oil and ambient.
 
+> **29 September 2026: DRIVE C MOVES UP.** The retrained agents advance spark
+> to just under the knock model's knee, and with that advance forbidden their
+> median damage cut falls from ~68 % to ~42 %, below the hand-written
+> current-grade policy (`knock_margin.py`, `results/agents/terrain_dt1/
+> KNOCK_MARGIN.md`). Whether the car tolerates that spark is exactly what drive
+> C measures, so **for Phase D's claim drive C is now the most valuable drive**;
+> drive A stays the most valuable for the thermal model. The team retrains the
+> agents after every drive.
+
 **Read-only, always.** BimmerLink logs; nothing is ever written to the car.
 Passenger runs the phone, driver drives. Every instruction below is to be
 done only where it is legal and the road is clear — if a step cannot be done
