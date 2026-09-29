@@ -32,7 +32,7 @@ import {
 } from './agent-picker.mjs';
 import { createTapUnlock } from './tap-unlock.mjs';
 import {
-  MODELS, askState, createAnswers, rowView, failureOf, errorText, statusLine,
+  MODELS, askState, createAnswers, rowView, failureOf, errorText, statusLine, keyErrorText,
 } from './model-panel.mjs';
 
 const $ = id => document.getElementById(id);
@@ -86,11 +86,16 @@ const state = {
 // status, its own request in flight and its own answers, one per second of
 // the episode on screen, so a jev failure never touches Laya's column and the
 // reverse. Nothing here is saved, averaged, applied or compared with the
-// agents.
+// agents. jev also has its key field (29 Sep, after M3): whether a key
+// request is in flight and how the last one failed; the key itself is never
+// held here (sendJevKey).
 const models = {
   unlocked: false,
   gesture: createTapUnlock({ taps: 10, windowMs: 4000 }),
-  jev: { status: null, statusFailure: null, inFlight: false, answers: createAnswers(), drawn: null },
+  jev: {
+    status: null, statusFailure: null, inFlight: false, answers: createAnswers(), drawn: null,
+    keyInFlight: false, keyFailure: null,
+  },
   laya: { status: null, statusFailure: null, inFlight: false, answers: createAnswers(), drawn: null },
 };
 
@@ -1144,6 +1149,32 @@ async function askModel(name) {
   renderModels();
 }
 
+// jev's key field (Jad, 29 Sep, after M3). The caller has already emptied
+// the field, so the key lives only in `value` and in the request body, and
+// goes to the server's memory: nothing is stored in the browser, nothing is
+// logged, and the answer is jev's status, never the key. value null clears
+// the server's key. A failure shows in jev's column only (#jev-key-error).
+// Then jev's status is read again, whatever the answer was.
+async function sendJevKey(value) {
+  const m = models.jev;
+  m.keyInFlight = true;
+  renderModels();
+  try {
+    const res = await fetch('/api/agents/jev/key', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ key: value }),
+    });
+    const body = await res.json().catch(() => null);
+    m.keyFailure = res.status === 200 ? null : failureOf(res.status, body);
+  } catch (err) {
+    m.keyFailure = failureOf(null, null);
+  }
+  m.keyInFlight = false;
+  renderModels();
+  await loadModelStatus('jev');
+}
+
 // One row per action, in ACTIONS order, with the pause panel's own labels and
 // units: what the two agents applied in this second (nothing subtracted), the
 // model's choice in physical and network units, five bars labelled with the
@@ -1204,6 +1235,14 @@ function renderModels() {
   const k = state.lastK;
   const key = state.metaKey;
   const frame = k >= 0 ? state.frames[k] || null : null;
+  // jev's key field: its buttons wait while a key request is in flight, and
+  // its failure is jev's alone.
+  for (const button of [$('jev-key-save'), $('jev-key-clear')]) {
+    if (button) button.disabled = models.jev.keyInFlight;
+  }
+  const keyError = $('jev-key-error');
+  if (keyError) keyError.hidden = !models.jev.keyFailure;
+  setText(keyError, models.jev.keyFailure ? keyErrorText(models.jev.keyFailure, currentLang) : '');
   for (const name of MODELS) {
     const m = models[name];
     const n = modelNodes(name);
@@ -1370,6 +1409,21 @@ function start() {
   });
   $('ask-jev')?.addEventListener('click', () => { askModel('jev').catch(err => console.error(err)); });
   $('ask-laya')?.addEventListener('click', () => { askModel('laya').catch(err => console.error(err)); });
+  // jev's key field: the field is emptied BEFORE the request is sent, an
+  // empty field (or one of spaces) sends nothing, and a press while a key
+  // request is in flight does nothing and leaves the field as typed.
+  $('jev-key-save')?.addEventListener('click', () => {
+    const input = $('jev-key');
+    if (!input || models.jev.keyInFlight) return;
+    const value = input.value;
+    input.value = '';
+    if (!value.trim()) return;
+    sendJevKey(value).catch(err => console.error(err));
+  });
+  $('jev-key-clear')?.addEventListener('click', () => {
+    if (models.jev.keyInFlight) return;
+    sendJevKey(null).catch(err => console.error(err));
+  });
   $('pick-experiment')?.addEventListener('change', () => onPick('runs', $('pick-experiment')));
   $('pick-pair')?.addEventListener('change', () => onPick('seed', $('pick-pair')));
   $('pick-episode')?.addEventListener('change', () => onPick('ep', $('pick-episode')));

@@ -1374,7 +1374,8 @@ class RouteTests(unittest.TestCase):
         app, client = _client(_StubStore())
         paths = {r.path: r for r in app.routes if hasattr(r, "methods")}
         added = set(paths) - {r.path for r in FastAPI().routes}
-        posts = {"/api/agents/jev", "/api/agents/laya"}
+        # 29 Sep, after M3: the third POST keeps a jev key pasted on the page.
+        posts = {"/api/agents/jev", "/api/agents/laya", "/api/agents/jev/key"}
         self.assertEqual(added, {"/agents", "/api/agents/episode", "/api/agents/catalog",
                                  "/api/agents/jev/status", "/api/agents/laya/status"} | posts)
         for p in sorted(added):
@@ -3250,13 +3251,16 @@ class AskRouteTests(_JevCase):
                                  list(reversed(MQ.KEYS[qid])))
         self.assertEqual(first.headers.get("cache-control"), "no-store")
 
-    def test_the_server_docstring_names_both_posts(self):
+    def test_the_server_docstring_names_every_post(self):
         doc = ast.get_docstring(ast.parse((ROOT / "app" / "server.py").read_text(encoding="utf-8")))
-        for text in ("/api/agents/jev", "/api/agents/laya", "Neither", "path to the vehicle"):
+        for text in ("/api/agents/jev", "/api/agents/laya", "Neither", "path to the vehicle",
+                     "/api/agents/jev/key", "memory", "sends nothing"):
             self.assertIn(text, doc)
         self.assertNotIn("Every HTTP route below is a GET.", doc)
-        for text in ("/api/agents/jev", "/api/agents/laya"):
+        self.assertNotIn("Two POST routes", doc)
+        for text in ("/api/agents/jev", "/api/agents/laya", "/api/agents/jev/key", "memory"):
             self.assertIn(text, API.install.__doc__)
+        self.assertNotIn("seven routes", API.__doc__ + API.install.__doc__)
 
     def test_an_absurd_answer_is_bad_answer_never_500(self):
         """Carried from Task 2: a reply that to_action or the parser cannot hold
@@ -3302,6 +3306,288 @@ class AskRouteTests(_JevCase):
                                  {(200, "no-store")})
                 self.assertIn("starting", [r.json()["worker"] for r in seen])
                 self.assertEqual(c.get(STATUS_URLS["laya"]).json()["worker"], end)
+
+
+# ---- after M3: the jev key field (29 Sep) ------------------------------------
+#
+# Jad's decision (walkthrough log of the main design, "29 Sep | after M3"): a
+# key pasted on the page lives in the server process's memory only, is gone
+# when the server stops, is never written to any file, and never comes back to
+# the page. PAGE_KEY is a sentinel: no response body or header, no stderr line
+# and no log record (the root logger at DEBUG) may carry it. jev is always a
+# fake send or jev's own _send over a recorder; nothing reaches a socket.
+
+KEY_URL = "/api/agents/jev/key"
+PAGE_KEY = "sentinel-page-key-M3"
+JEV_WHERE = {"vendor": "typesafe.ai", "model": "jev-latest", "hosted": "USA"}
+JEV_ORDER = ["configured", "source", "vendor", "model", "hosted"]
+
+
+class JevPageKeyTests(_JevCase):
+    """POST /api/agents/jev/key: the page's key, in this process's memory only."""
+
+    def setUp(self):
+        super().setUp()
+        self.records, root = _Records(), logging.getLogger()
+        self.addCleanup(root.setLevel, root.level)
+        self.addCleanup(root.removeHandler, self.records)
+        root.addHandler(self.records)
+        root.setLevel(logging.DEBUG)
+        self.stderr = self.enterContext(contextlib.redirect_stderr(io.StringIO()))
+        self.responses = []
+
+    def client(self, send=None):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        self.app = FastAPI()
+        self.send = send if send is not None else _FakeSend()
+        API.install(self.app, store=_TraceStore(), jev_send=self.send, laya=_fake_bridge("order"))
+        return TestClient(self.app, base_url=ASK_BASE)
+
+    def call(self, c, method, url, **kw):
+        """One request, kept for the leak check: (response, the stderr lines it printed)."""
+        before = len(self.stderr.getvalue())
+        r = getattr(c, method)(url, **kw)
+        self.responses.append(r)
+        return r, self.stderr.getvalue()[before:].splitlines()
+
+    def put(self, c, key, headers=ORIGIN):
+        return self.call(c, "post", KEY_URL, json={"key": key}, headers=headers)
+
+    def held(self):
+        return self.app.state.jev_key.get()
+
+    def assert_nothing_leaked(self, *secrets):
+        logged = " ".join(f"{r.getMessage()} {r.exc_text or ''}" for r in self.records.records)
+        for secret in (PAGE_KEY,) + secrets:
+            for r in self.responses:
+                self.assertNotIn(secret, r.text)
+                self.assertNotIn(secret, repr(list(r.headers.items())))
+            self.assertNotIn(secret, self.stderr.getvalue())
+            self.assertNotIn(secret, logged)
+        self.assertTrue(self.responses, "the leak check read no response")
+        for r in self.responses:
+            self.assertEqual(r.headers.get("cache-control"), "no-store", r.request.url)
+
+    def test_the_page_key_is_the_key_jev_sends_and_wins_over_the_environment(self):
+        with _jev_key("env-key-must-lose"):
+            c = self.client()
+            r, _ = self.call(c, "get", STATUS_URLS["jev"])
+            self.assertEqual(r.json()["source"], "env")
+            r, lines = self.put(c, PAGE_KEY)
+            self.assertEqual((r.status_code, r.json()), (200, dict(configured=True, source="page", **JEV_WHERE)))
+            self.assertEqual(list(r.json()), JEV_ORDER, "exactly the jev status body")
+            self.assertEqual(lines, ["jev: page key set"])
+            self.assertEqual(self.held(), PAGE_KEY)
+            r, _ = self.call(c, "get", STATUS_URLS["jev"])
+            self.assertEqual(r.json(), dict(configured=True, source="page", **JEV_WHERE))
+            r, _ = self.call(c, "post", ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual(r.status_code, 200, r.text[:300])
+        self.assertEqual([key for _, key in self.send.calls], [PAGE_KEY],
+                         "the page key wins over TYPESAFE_API_KEY")
+        self.assert_nothing_leaked("env-key-must-lose")
+
+    def test_the_page_key_reaches_the_authorization_header(self):
+        """jev's own _send, its opener replaced by a recorder: no socket exists."""
+        sent = []
+
+        class Reply:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def read(self):
+                return json.dumps({"model": "jev-1.13.0", "answers": _model_answer()}).encode("utf-8")
+
+        def opener(request, timeout=None):
+            sent.append((request.full_url, request.get_method(), request.get_header("Authorization")))
+            return Reply()
+
+        with _jev_key(None), mock.patch.object(JEV._OPENER, "open", opener):
+            c = self.client(send=JEV._send)
+            self.put(c, PAGE_KEY)
+            r, _ = self.call(c, "post", ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual(r.status_code, 200, r.text[:300])
+        self.assertEqual(sent, [(JEV.URL, "POST", f"Bearer {PAGE_KEY}")])
+        self.assert_nothing_leaked()
+
+    def test_clear_falls_back_to_the_environment_then_to_no_key(self):
+        with _jev_key("env-key-0000"):
+            c = self.client()
+            self.put(c, PAGE_KEY)
+            r, lines = self.put(c, None)
+            self.assertEqual((r.status_code, r.json()), (200, dict(configured=True, source="env", **JEV_WHERE)))
+            self.assertEqual(lines, ["jev: page key cleared"])
+            self.assertIsNone(self.held())
+            r, _ = self.call(c, "post", ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+            self.assertEqual([key for _, key in self.send.calls], ["env-key-0000"])
+        with _jev_key(None):
+            c = self.client()
+            self.put(c, PAGE_KEY)
+            r, _ = self.put(c, None)
+            self.assertEqual((r.status_code, r.json()), (200, dict(configured=False, source=None, **JEV_WHERE)))
+            r, _ = self.call(c, "get", STATUS_URLS["jev"])
+            self.assertEqual(r.json(), dict(configured=False, source=None, **JEV_WHERE))
+            r, lines = self.put(c, None)
+            self.assertEqual((r.status_code, lines), (200, ["jev: page key cleared"]),
+                             "clearing with nothing held is not an error")
+            r, _ = self.call(c, "post", ASK_URLS["jev"], json=ASK_BODY, headers=ORIGIN)
+        self.assertEqual((r.status_code, r.json()), (503, {"model": "jev", "code": "no_key"}))
+        self.assertEqual(self.send.calls, [], "cleared, and no key anywhere: nothing is sent")
+        self.assert_nothing_leaked()
+
+    def test_the_origin_guard_comes_first_and_changes_nothing(self):
+        other = "sentinel-other-key-0000"
+        cases = (({}, "no Origin"), ({"Origin": "http://evil.test"}, "a foreign Origin"),
+                 ({"Origin": "http://localhost:8000"}, "an Origin that is not http:// + Host"),
+                 ({"Host": "evil.test:8000", "Origin": "http://evil.test:8000"}, "DNS rebinding"))
+        with _jev_key(None):
+            c = self.client()
+            self.put(c, PAGE_KEY)
+            for headers, why in cases:
+                for kw in ({"json": {"key": other}}, {"json": {"key": None}}, {"content": b"not json"}):
+                    with self.subTest(why=why, body=sorted(kw)[0]):
+                        r, lines = self.call(c, "post", KEY_URL, headers=headers, **kw)
+                        self.assertEqual((r.status_code, r.json()),
+                                         (403, {"model": "jev", "code": "foreign_origin"}))
+                        self.assertEqual(lines, ["jev: foreign_origin"])
+                        self.assertEqual(self.held(), PAGE_KEY, "a refused request changes nothing")
+            c = self.client()
+            r, _ = self.put(c, other, headers={"Origin": "http://evil.test"})
+            self.assertEqual(r.status_code, 403)
+            self.assertIsNone(self.held(), "nothing held, and a refused set keeps nothing")
+        self.assert_nothing_leaked(other)
+
+    def test_bad_bodies_are_422_with_a_fixed_code_and_keep_the_held_key(self):
+        refused, bad = "bad_key_request", "bad_key"
+        cases = {
+            "not JSON": ({"content": b"key=sentinel-body-0000"}, refused),
+            "not UTF-8": ({"content": bytes([0xFF, 0xFE]) + b'{"key": "sentinel-body-0000"}'}, refused),
+            "over 4096 bytes": ({"json": {"key": "sentinel-body-" + "0" * 4100}}, refused),
+            "empty": ({"content": b""}, refused),
+            "a JSON list": ({"json": ["sentinel-body-0000"]}, refused),
+            "a JSON string": ({"json": "sentinel-body-0000"}, refused),
+            "no member": ({"json": {}}, refused),
+            "another name": ({"json": {"api_key": "sentinel-body-0000"}}, refused),
+            "an extra member": ({"json": {"key": "sentinel-body-0000", "x": 1}}, refused),
+            "the member twice": ({"content": b'{"key": "sentinel-body-0000", "key": "sentinel-body-0001"}'},
+                                 refused),
+            "a number": ({"json": {"key": 12345678}}, refused),
+            "a list": ({"json": {"key": ["sentinel-body-0000"]}}, refused),
+            "true": ({"json": {"key": True}}, refused),
+            "an object": ({"json": {"key": {"k": "sentinel-body-0000"}}}, refused),
+            "nesting 2000 deep": ({"content": b'{"key": ' + b"[" * 2000 + b"]" * 2000 + b"}"}, refused),
+            "a line break": ({"json": {"key": "sentinel\nbody-0000"}}, bad),
+            "a character outside latin-1": ({"json": {"key": "sentinel-body-0000" + chr(0x2019)}}, bad),
+            "a no-break space inside": ({"json": {"key": "sentinel" + chr(0xA0) + "body-0000"}}, bad),
+            "seven characters": ({"json": {"key": "sentin7"}}, bad),
+            "only spaces": ({"json": {"key": " " * 20}}, bad),
+            "the empty string": ({"json": {"key": ""}}, bad),
+            "513 characters": ({"json": {"key": "sentinel-body-" + "0" * 499}}, bad),
+        }
+        with _jev_key(None):
+            c = self.client()
+            self.put(c, PAGE_KEY)
+            for why, (kw, code) in cases.items():
+                with self.subTest(why=why):
+                    headers = dict(ORIGIN, **{"Content-Type": "application/json"})
+                    r, lines = self.call(c, "post", KEY_URL, headers=headers, **kw)
+                    self.assertEqual((r.status_code, r.json()), (422, {"model": "jev", "code": code}))
+                    self.assertEqual(lines, [f"jev: {code}"])
+                    self.assertEqual(self.held(), PAGE_KEY, "a refused set leaves the held key")
+        self.assert_nothing_leaked("sentinel-body", "sentin7", "sentinel\nbody")
+
+    def test_a_wrong_method_is_405_with_no_store(self):
+        c = self.client()
+        for method in ("get", "put", "delete"):
+            with self.subTest(method=method):
+                r, _ = self.call(c, method, KEY_URL, headers=ORIGIN)
+                self.assertEqual((r.status_code, r.headers.get("allow")), (405, "POST"))
+        self.assertIsNone(self.held())
+        self.assert_nothing_leaked()
+
+    def test_each_app_starts_with_no_page_key(self):
+        with _jev_key(None):
+            first = self.client()
+            first_app = self.app
+            self.put(first, PAGE_KEY)
+            second = self.client()
+            r, _ = self.call(second, "get", STATUS_URLS["jev"])
+        self.assertEqual(r.json(), dict(configured=False, source=None, **JEV_WHERE))
+        self.assertIsInstance(self.app.state.jev_key, JEV.SessionKey)
+        self.assertIsNone(self.held(), "a fresh install() holds no key")
+        self.assertIsNot(first_app.state.jev_key, self.app.state.jev_key)
+        self.assertEqual(first_app.state.jev_key.get(), PAGE_KEY)
+        self.assert_nothing_leaked()
+
+    def test_the_holder_shows_only_whether_a_key_is_held(self):
+        held = JEV.SessionKey()
+        self.assertEqual((repr(held), str(held), held.get()), ("SessionKey(empty)", "SessionKey(empty)", None))
+        self.assertIs(held.set(f"  {PAGE_KEY}\n"), True)
+        self.assertEqual(held.get(), PAGE_KEY, "surrounding whitespace is stripped")
+        self.assertEqual({repr(held), str(held), f"{held}", f"{held!r}"}, {"SessionKey(set)"})
+        with self.assertRaises(TypeError):
+            vars(held)
+        refused = ("x" * 7, "x" * 513, "sentinel\nkey-M3", PAGE_KEY + chr(0x2019),
+                   "sentinel" + chr(0xA0) + "key-M3", "", " " * 9, None, 12345678, PAGE_KEY.encode())
+        for i, value in enumerate(refused):
+            with self.subTest(refused=i):
+                self.assertIs(held.set(value), False)
+                self.assertEqual(held.get(), PAGE_KEY, "a refused value keeps nothing new")
+        for i, value in enumerate(("x" * 8, "x" * 512, PAGE_KEY + chr(0xE9))):
+            with self.subTest(accepted=i):
+                self.assertIs(held.set(value), True)
+                self.assertEqual(held.get(), value)
+        held.clear()
+        self.assertEqual((held.get(), repr(held)), (None, "SessionKey(empty)"))
+        self.assertIsInstance(held._lock, type(threading.Lock()))
+        c = self.client()
+        self.put(c, PAGE_KEY)
+        self.assertNotIn(PAGE_KEY, repr(self.app.state.jev_key) + str(self.app.state.jev_key))
+        self.assert_nothing_leaked()
+
+    def test_ask_uses_the_key_it_is_given_and_reads_nothing_else(self):
+        send = _FakeSend()
+        with _jev_key("env-key-0000"), mock.patch.object(
+                JEV, "load_key", side_effect=AssertionError("load_key was read")):
+            JEV.ask(_obs_trace(), 3, send=send, key=PAGE_KEY)
+        self.assertEqual([key for _, key in send.calls], [PAGE_KEY])
+        send = _FakeSend()
+        with _jev_key("env-key-0000"):
+            JEV.ask(_obs_trace(), 3, send=send, key=None)
+        self.assertEqual([key for _, key in send.calls], ["env-key-0000"], "None: load_key, as before")
+        for i, value in enumerate(("", "sentinel\nkey-M3")):
+            with self.subTest(given=i):
+                send = _FakeSend()
+                with _jev_key("env-key-0000"), self.assertRaises(JEV.JevError) as caught:
+                    JEV.ask(_obs_trace(), 3, send=send, key=value)
+                self.assertEqual((caught.exception.code, send.calls), ("no_key", []),
+                                 "a given key no header can carry is no key; the environment is not read")
+
+    def test_an_unexpected_error_is_500_and_names_only_its_class(self):
+        class Boom:
+            def get(self):
+                return None
+
+            def set(self, value):
+                raise RuntimeError(f"secret {value}")
+
+            def clear(self):
+                raise RuntimeError("secret clear")
+
+        with _jev_key(None):
+            c = self.client()
+            self.app.state.jev_key = Boom()
+            for i, key in enumerate((PAGE_KEY, None)):
+                with self.subTest(case=i):
+                    r, lines = self.put(c, key)
+                    self.assertEqual((r.status_code, r.json()), (500, {"model": "jev", "code": "server_error"}))
+                    self.assertEqual(lines, ["jev: server_error RuntimeError (key)"])
+        self.assert_nothing_leaked("secret")
 
 
 def _shape(x):
@@ -3376,6 +3662,29 @@ class PageTests(unittest.TestCase):
             response = client.get("/agents")
         self.assertEqual(response.status_code, 200)
         self.assertIn("/static/sim/agents.mjs", response.text)
+
+    def test_the_jev_key_field(self):
+        """The field Jad asked for (29 Sep, after M3), in jev's column right under
+        its status line: what is typed is hidden, never autofilled, spell-checked
+        or capitalised, and there is no <form> that could submit it anywhere.
+        Every id is written out, so test_page_assets_ids sees each one."""
+        html = self.read("agents.html")
+        self.assertNotIn("<form", html, "the key field must not sit inside a form")
+        jev = re.search(r'<article class="model-col jev">(.*?)</article>', html, flags=re.S)
+        self.assertIsNotNone(jev, "jev's column is missing")
+        jev = jev.group(1)
+        self.assertIn('<input id="jev-key" type="password" autocomplete="off" spellcheck="false" '
+                      'autocapitalize="off" dir="ltr" maxlength="512">', jev)
+        marks = ('id="model-jev-status"', 'for="jev-key"', 'id="jev-key"', 'id="jev-key-save"',
+                 'id="jev-key-clear"', 'id="jev-key-error"', 'id="jev-key-note"', 'id="ask-jev"')
+        at = [jev.find(m) for m in marks]
+        self.assertNotIn(-1, at, f"missing from jev's column: {[m for m, i in zip(marks, at) if i < 0]}")
+        self.assertEqual(at, sorted(at), "the field sits under jev's status line, before its ask button")
+        for name in ("jev-key-save", "jev-key-clear"):
+            self.assertRegex(jev, rf'<button id="{name}" type="button"')
+        self.assertIn('id="jev-key-error" class="model-error" role="status" hidden', jev)
+        laya = re.search(r'<article class="model-col laya">(.*?)</article>', html, flags=re.S).group(1)
+        self.assertNotIn("jev-key", laya)
 
     def test_every_string_names_its_language(self):
         """t() with any first argument but currentLang renders one language only.

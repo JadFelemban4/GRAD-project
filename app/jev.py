@@ -7,12 +7,14 @@ redirect followed.
 The answer is shown, never applied, averaged, compared with the agents or
 saved.
 
-The key is read on every call, from TYPESAFE_API_KEY or from
-<APPDATA>/grad-project/typesafe_key (model_questions.user_setting), and it
+The key is read on every call. A key pasted on the page (29 Sep, after M3)
+wins: the server holds it in a SessionKey, in this process's memory only, and
+passes it to ask(). Otherwise it comes from TYPESAFE_API_KEY or from
+<APPDATA>/grad-project/typesafe_key (model_questions.user_setting). It
 appears in one place only: the Authorization header that _send builds. It is
-never logged, returned or put into an error. Every failure is a JevError with
-a fixed code; vendor_status also keeps the integer HTTP status. Neither
-str(exc) nor the vendor's body is ever kept.
+never logged, returned, written to a file or put into an error. Every failure
+is a JevError with a fixed code; vendor_status also keeps the integer HTTP
+status. Neither str(exc) nor the vendor's body is ever kept.
 
 Imported only by app.agent_api.install(), which only the --simulation branch
 of app/server.py calls. Nothing here has a path to the vehicle.
@@ -21,6 +23,7 @@ from __future__ import annotations
 
 import http.client
 import json
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -67,6 +70,48 @@ def load_key():
     return key, source
 
 
+class SessionKey:
+    """The jev key pasted on the page (Jad, 29 Sep, after M3): held in this
+    process's memory only, gone when the server stops, never written to a file.
+
+    set() strips surrounding whitespace and keeps the value only if an HTTP
+    header can carry it (_header_safe) and it is MIN_LEN to MAX_LEN characters
+    long; otherwise it keeps nothing new and returns False, so a refused value
+    leaves the key already held. repr and str say only whether a key is held,
+    and __slots__ leaves no __dict__ for vars() to show.
+    """
+
+    MIN_LEN, MAX_LEN = 8, 512
+    __slots__ = ("_lock", "_value")
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._value = None
+
+    def set(self, value):
+        if not isinstance(value, str):
+            return False
+        value = value.strip()
+        if not (self.MIN_LEN <= len(value) <= self.MAX_LEN and _header_safe(value)):
+            return False
+        with self._lock:
+            self._value = value
+        return True
+
+    def clear(self):
+        with self._lock:
+            self._value = None
+
+    def get(self):
+        with self._lock:
+            return self._value
+
+    def __repr__(self):
+        return f"SessionKey({'empty' if self.get() is None else 'set'})"
+
+    __str__ = __repr__
+
+
 def build_request(trace, step):
     """The exact body sent, which the page shows as 'what was sent': no key in it."""
     return {"model": MODEL, "state": build_state(trace, step), "questions": QUESTIONS}
@@ -109,15 +154,19 @@ def _send(body, key, timeout=TIMEOUT_S):
         return err.code, b""
 
 
-def ask(trace, step, send=_send, clock=time.perf_counter):
+def ask(trace, step, send=_send, clock=time.perf_counter, key=None):
     """Ask jev about one second: {'model_name', 'ms', 'answers', 'sent'}.
 
-    `ms` is `clock` read around the call. JevError codes: no_key (before
-    anything is sent), timeout, network, the STATUS_CODES names,
-    vendor_status (with the status) and bad_answer.
+    `key` is the page's key (SessionKey.get()): when given it is the key, and
+    neither the environment nor the file is read; None means load_key(), as
+    before. A key no HTTP header can carry is no key either way. `ms` is
+    `clock` read around the call. JevError codes: no_key (before anything is
+    sent), timeout, network, the STATUS_CODES names, vendor_status (with the
+    status) and bad_answer.
     """
-    key, _source = load_key()
-    if not key:
+    if key is None:
+        key, _source = load_key()
+    if not key or not _header_safe(key):
         raise JevError("no_key")
     body = build_request(trace, step)
     start = clock()

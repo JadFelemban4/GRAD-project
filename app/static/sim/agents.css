@@ -211,6 +211,15 @@ main.agents-main{padding:18px 16px 0}
 .model-where:empty{display:none}
 .model-text{margin:0;font-size:9px;line-height:1.75;color:var(--muted)}
 .model-status{margin:0;font-size:10px;line-height:1.7;color:var(--ink-2)}
+/* The jev key field (29 Sep, after M3), under jev's status line: a label, a
+   field whose text is hidden, two quiet buttons, its own error line and the
+   note that says where the key goes. */
+.model-key{display:flex;flex-direction:column;gap:5px;padding:8px 0;border-top:1px dashed var(--hairline);border-bottom:1px dashed var(--hairline)}
+.model-key label{font-size:10px;color:var(--muted)}
+.model-key input{width:100%;min-width:0;background:var(--field-bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--ink)}
+.model-key-buttons{display:flex;flex-wrap:wrap;gap:6px}
+.model-key-buttons button{flex:1 1 auto;min-width:0;border:1px solid var(--line);border-radius:7px;background:transparent;padding:6px 10px;font-size:10px}
+.model-key-buttons button:hover:not(:disabled){background:var(--field-bg)}
 .model-ask{width:100%;min-width:0}
 .model-reason,.model-latency{margin:0;font-size:9px;line-height:1.7;color:var(--muted)}
 .model-reason:empty,.model-latency:empty{display:none}

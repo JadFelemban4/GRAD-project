@@ -92,6 +92,13 @@
               <p class="model-where" data-i18n="agents.models.jev.where">خدمة خارجية في الولايات المتحدة · كل ضغطة استدعاء مدفوع واحد</p>
               <p id="model-jev-text" class="model-text" data-i18n="agents.models.jev.text">خدمة خارجية تعمل في الولايات المتحدة. ليست جزءاً من الرسالة ولا من أي نتيجة، ولا يقارنها أي رقم بالوكلاء. هذه الصفحة لا تحفظ شيئاً؛ لكن اتفاقية المورّد تسمح له بالاحتفاظ بما يُرسل لاستخراج بيانات القياس بلا حدّ زمني (MCA §4.1). تُرسَل إليه حالة هذه الحلقة المحاكاة فقط، لا بيانات السيارة المسجّلة. كل ضغطة استدعاء واحد مدفوع. اتفاقية المورّد تمنع تدريب أي نموذج على تقليد إجاباته. شروط موقع المورّد موجّهة لزوّار الولايات المتحدة؛ هل الاستخدام من السعودية مسموح؟ غير معروف. ويقول المورّد إن النموذج ضعيف في الدقة العددية.</p>
               <p id="model-jev-status" class="model-status"></p>
+              <div class="model-key">
+                <label for="jev-key" data-i18n="agents.models.jev.key.label">الصق مفتاح jev</label>
+                <input id="jev-key" type="password" autocomplete="off" spellcheck="false" autocapitalize="off" dir="ltr" maxlength="512">
+                <div class="model-key-buttons"><button id="jev-key-save" type="button" data-i18n="agents.models.jev.key.save">احفظ لهذه الجلسة</button><button id="jev-key-clear" type="button" data-i18n="agents.models.jev.key.clear">امسح</button></div>
+                <p id="jev-key-error" class="model-error" role="status" hidden></p>
+                <p id="jev-key-note" class="model-text" data-i18n="agents.models.jev.key.note">يبقى في ذاكرة الخادم حتى يُغلق، ولا يُحفظ في أي ملف، ولا يعود إلى هذه الصفحة.</p>
+              </div>
               <button id="ask-jev" class="play-button model-ask" type="button" disabled data-i18n="agents.models.jev.ask">اسأل jev عن هذه الثانية (استدعاء مدفوع واحد)</button>
               <p id="model-jev-reason" class="model-reason"></p>
               <p id="model-jev-latency" class="model-latency"></p>

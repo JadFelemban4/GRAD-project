@@ -40,12 +40,14 @@ If a future version is ever asked to suggest ECU parameters, the SUGGESTION is
 text on a screen and stays here. APPLYING it is a different product with
 different safety obligations, and this codebase is not the place for it. The
 separation is structural: there is no code path from this process to the bus.
-Every route this module defines is a GET. Two POST routes, /api/agents/jev and
-/api/agents/laya, are added by app.agent_api.install() only under
---simulation. Each asks a language model about one simulated second:
-/api/agents/jev sends it to an external service in the USA; /api/agents/laya
-sends it to a process on this machine, and nothing leaves the machine. Neither
-has a path to the vehicle.
+Every route this module defines is a GET. Three POST routes, /api/agents/jev,
+/api/agents/laya and /api/agents/jev/key, are added by app.agent_api.install()
+only under --simulation. The first two each ask a language model about one
+simulated second: /api/agents/jev sends it to an external service in the USA;
+/api/agents/laya sends it to a process on this machine, and nothing leaves the
+machine. Neither has a path to the vehicle. The third, /api/agents/jev/key,
+keeps a jev key pasted on the page in this process's memory for the session;
+it sends nothing anywhere and has no path to the vehicle either.
 """
 from __future__ import annotations
 

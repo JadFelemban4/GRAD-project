@@ -1,8 +1,10 @@
 """The agent replay page's server side: the model loader, the episode store and
-the seven routes. Three GETs serve the page and its episodes. Four serve the
+the eight routes. Three GETs serve the page and its episodes. Five serve the
 hidden models panel (design M3 section 7.6): a status GET and an ask POST for
-each of jev and Laya. Each POST asks one model about one second of a finished
-episode.
+each of jev and Laya, each ask asking one model about one second of a
+finished episode, and a POST that keeps a jev key pasted on the page in this
+process's memory for the session (Jad, 29 Sep, after M3). That one sends
+nothing anywhere and has no path to the vehicle.
 
 Imported only from the --simulation branch of app/server.py, which calls
 install(app), so --live and --replay never load agent code, SB3 or torch.
@@ -17,6 +19,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass
 import importlib.util
+import json
 from pathlib import Path
 import re
 import sys
@@ -247,9 +250,11 @@ class EpisodeStore:
 #
 # app/server.py calls install(app) inside `if a.simulation:` in main(), so the
 # --live and --replay processes never import this module. Every route here
-# answers with Cache-Control: no-store, and every one is a GET except two
-# POSTs, /api/agents/jev and /api/agents/laya, which ask a language model about
-# one second of a finished episode. The four model routes use NoStoreRoute, so
+# answers with Cache-Control: no-store, and every one is a GET except three
+# POSTs: /api/agents/jev and /api/agents/laya ask a language model about one
+# second of a finished episode, and /api/agents/jev/key keeps a jev key pasted
+# on the page in this process's memory for the session, sends nothing anywhere
+# and has no path to the vehicle. The five model routes use NoStoreRoute, so
 # the refusals FastAPI makes itself (a body that fails AskBody, a wrong method)
 # are no-store as well. A request names an episode by strings that must match
 # fixed patterns before anything is looked up; no path is ever built from a
@@ -271,7 +276,38 @@ TRACE_KEY = (rf"^{agent_catalog.RUNS_NAME.pattern.strip('^$')}"
              rf"/(?:{SEED_TEXT.pattern})/(?:{EP_TEXT.pattern})$")
 LOCAL_HOST = re.compile(r"^(127\.0\.0\.1|localhost):\d{1,5}$")
 MODEL_HTTP = {"no_key": 503, "not_configured": 503, "not_found": 503, "foreign_origin": 403,
-              "no_trace": 409, "step_not_computed": 409, "busy": 409, "server_error": 500}
+              "no_trace": 409, "step_not_computed": 409, "busy": 409, "server_error": 500,
+              "bad_key": 422, "bad_key_request": 422}
+# The jev key POST's body is read by its handler, never by FastAPI, so no 422
+# of FastAPI's (which echoes the submitted input) can ever hold the key.
+KEY_BODY_MAX = 4096
+
+
+class _Members(list):
+    """A JSON object as its (name, value) pairs in order, so a name given
+    twice is seen rather than silently collapsed to the last value."""
+
+
+def key_from_body(raw):
+    """The value of a body that is exactly {"key": <string or null>}.
+
+    Raises ValueError for anything else: over KEY_BODY_MAX bytes, not UTF-8,
+    not JSON (nested too deep included), not an object with exactly one
+    member named "key", or a value neither a string nor null. The value is
+    not judged here; SessionKey.set does that.
+    """
+    if len(raw) > KEY_BODY_MAX:
+        raise ValueError("body too large")
+    try:
+        data = json.loads(raw.decode("utf-8"), object_pairs_hook=_Members)
+    except RecursionError:
+        raise ValueError("nested too deep") from None
+    if type(data) is not _Members or len(data) != 1 or data[0][0] != "key":
+        raise ValueError("not {\"key\": ...}")
+    value = data[0][1]
+    if value is not None and not isinstance(value, str):
+        raise ValueError("key is neither a string nor null")
+    return value
 
 
 class AskBody(BaseModel):
@@ -291,12 +327,13 @@ def same_origin(request):
 
 
 class NoStoreRoute(APIRoute):
-    """The four model routes' class: EVERY response carries no-store, FastAPI's
+    """The five model routes' class: EVERY response carries no-store, FastAPI's
     own included. A body that fails AskBody is refused before the handler
     runs, with FastAPI's own 422 {"detail": [...]}; a JSON body its reader
     cannot hold (not UTF-8, nested too deep) gets FastAPI's own 400; a wrong
     method gets FastAPI's own 405 {"detail": "Method Not Allowed"} and its
-    Allow header. Only the header is added; no body changes."""
+    Allow header. Only the header is added; no body changes. The jev key
+    route declares no body model, so FastAPI never reads its body."""
 
     def get_route_handler(self):
         handler = super().get_route_handler()
@@ -414,15 +451,21 @@ def catalog(root=ROOT, sb3=None):
 
 
 def install(app, store=None, jev_send=None, laya=None):
-    """Add the page's seven routes to `app`.
+    """Add the page's eight routes to `app`.
 
     GET /agents, GET /api/agents/catalog and GET /api/agents/episode serve the
     page and its episodes. GET /api/agents/jev/status, POST /api/agents/jev,
-    GET /api/agents/laya/status and POST /api/agents/laya serve the hidden
-    models panel: each POST asks one model about one second of a finished
-    episode. /api/agents/jev sends it to an external service in the USA;
+    POST /api/agents/jev/key, GET /api/agents/laya/status and POST
+    /api/agents/laya serve the hidden models panel. POST /api/agents/jev and
+    POST /api/agents/laya each ask one model about one second of a finished
+    episode: /api/agents/jev sends it to an external service in the USA;
     /api/agents/laya sends it to a worker process on this machine, and nothing
-    leaves the machine. Neither has a path to the vehicle.
+    leaves the machine. Neither has a path to the vehicle. POST
+    /api/agents/jev/key keeps a jev key pasted on the page in this process's
+    memory for the session (app.state.jev_key, one jev.SessionKey per app),
+    where it wins over TYPESAFE_API_KEY and the key file; it is gone when the
+    server stops, is never written to a file, never comes back in a response,
+    sends nothing anywhere and has no path to the vehicle.
 
     `jev_send` replaces jev's HTTP call and `laya` the Laya bridge; tests pass
     fakes. The defaults are jev._send and a LayaBridge(), whose construction
@@ -440,6 +483,7 @@ def install(app, store=None, jev_send=None, laya=None):
     app.state.agent_store = store
     app.state.laya = laya
     app.state.model_locks = {"jev": threading.Lock(), "laya": threading.Lock()}
+    app.state.jev_key = jev.SessionKey()
 
     def answer(body, status=200):
         return JSONResponse(body, status_code=status, headers=NO_STORE)
@@ -528,7 +572,7 @@ def install(app, store=None, jev_send=None, laya=None):
         try:
             if model == "jev":
                 out = dict(model="jev", runs_on="external",
-                           **jev.ask(trace, body.step, send=jev_send))
+                           **jev.ask(trace, body.step, send=jev_send, key=app.state.jev_key.get()))
             else:
                 out = dict(model="laya", runs_on="local", **laya.ask(trace, body.step))
         except jev.JevError as err:
@@ -548,13 +592,22 @@ def install(app, store=None, jev_send=None, laya=None):
                   file=sys.stderr)
             return answer({"model": model, "code": "server_error"}, 500)
 
+    def jev_status():
+        """jev's status body. The page's key wins over TYPESAFE_API_KEY and the
+        key file; source is 'page', 'env', 'file' or None. Never the key."""
+        if app.state.jev_key.get() is not None:
+            configured, source = True, "page"
+        else:
+            key, source = jev.load_key()
+            configured = bool(key)
+        return {"configured": configured, "source": source if configured else None,
+                "vendor": "typesafe.ai", "model": jev.MODEL, "hosted": "USA"}
+
     def agents_jev_status():
         """Whether a jev key is configured, and where jev runs. Never the key;
         sends nothing."""
         try:
-            key, source = jev.load_key()
-            return answer({"configured": bool(key), "source": source if key else None,
-                           "vendor": "typesafe.ai", "model": jev.MODEL, "hosted": "USA"})
+            return answer(jev_status())
         except Exception as exc:
             print(f"jev: server_error {type(exc).__name__} (status)", file=sys.stderr)
             return answer({"model": "jev", "code": "server_error"}, 500)
@@ -562,6 +615,41 @@ def install(app, store=None, jev_send=None, laya=None):
     def agents_ask_jev(body: AskBody, request: Request):
         """Ask jev about one second: one paid call to an external service in the USA."""
         return guarded("jev", body, request)
+
+    def key_refused(code):
+        """A fixed code for jev's column and one stderr line naming it: never
+        the key, the body or str(exc)."""
+        print(f"jev: {code}", file=sys.stderr)
+        return answer({"model": "jev", "code": code}, MODEL_HTTP[code])
+
+    async def agents_jev_key(request: Request):
+        """Keep, or with null clear, the jev key pasted on the page: in this
+        process's memory only, for the session. The answer is jev's status
+        body, never the key; this sends nothing anywhere.
+
+        The Origin/Host guard comes first, so a refused request changes
+        nothing; then the body is read here, not by FastAPI (key_from_body),
+        so no 422 of FastAPI's can echo the key. A value SessionKey.set
+        refuses is bad_key, and the key already held stays as it was.
+        """
+        try:
+            if not same_origin(request):
+                return key_refused("foreign_origin")
+            try:
+                value = key_from_body(await request.body())
+            except ValueError:
+                return key_refused("bad_key_request")
+            if value is None:
+                app.state.jev_key.clear()
+                print("jev: page key cleared", file=sys.stderr)
+            elif app.state.jev_key.set(value):
+                print("jev: page key set", file=sys.stderr)
+            else:
+                return key_refused("bad_key")
+            return answer(jev_status())
+        except Exception as exc:
+            print(f"jev: server_error {type(exc).__name__} (key)", file=sys.stderr)
+            return answer({"model": "jev", "code": "server_error"}, 500)
 
     def agents_laya_status():
         """Laya's column: configured or not, and its worker's state. Never starts it."""
@@ -578,6 +666,7 @@ def install(app, store=None, jev_send=None, laya=None):
 
     for path, method, endpoint in (("/api/agents/jev/status", "GET", agents_jev_status),
                                    ("/api/agents/jev", "POST", agents_ask_jev),
+                                   ("/api/agents/jev/key", "POST", agents_jev_key),
                                    ("/api/agents/laya/status", "GET", agents_laya_status),
                                    ("/api/agents/laya", "POST", agents_ask_laya)):
         app.router.add_api_route(path, endpoint, methods=[method],

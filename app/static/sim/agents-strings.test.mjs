@@ -353,3 +353,27 @@ test('the M3 strings keep their clauses', () => {
     }
   }
 });
+
+// The jev key field (Jad, 29 Sep, after M3): the Arabic lines are the brief's,
+// word for word, and the note keeps its three promises in both languages.
+test('the jev key field\'s strings are the approved lines', () => {
+  const { AGENT_STRINGS } = api();
+  const verbatim = {
+    'agents.models.jev.key.save': ['احفظ لهذه الجلسة', 'Keep for this session'],
+    'agents.models.jev.key.clear': ['امسح', 'Clear'],
+    'agents.models.jev.key.note': ['يبقى في ذاكرة الخادم حتى يُغلق، ولا يُحفظ في أي ملف، ولا يعود إلى هذه الصفحة.',
+      "Kept in the server's memory until it stops; saved in no file; it never comes back to this page."],
+    'agents.models.jev.status.page': ['مفتاح من الصفحة، لهذه الجلسة فقط', 'Key from this page, for this session only'],
+    'agents.models.jev.source.env': ['من متغيّر البيئة', 'from the environment variable'],
+    'agents.models.jev.source.file': ['من ملف', 'from a file'],
+    'agents.models.error.bad_key': ['تعذّر استعمال هذا المفتاح؛ لم يُحفظ شيء.', 'This key could not be used; nothing was kept.'],
+    'agents.models.error.bad_key_request': ['طلب غير صالح؛ لم يُحفظ شيء.', 'Invalid request; nothing was kept.'],
+  };
+  for (const [key, [ar, en]] of Object.entries(verbatim)) {
+    assert.equal(AGENT_STRINGS.ar[key], ar, `ar ${key} is not the approved line`);
+    assert.equal(AGENT_STRINGS.en[key], en, `en ${key} is not the approved line`);
+  }
+  for (const lang of LANGS) {
+    assert.ok(AGENT_STRINGS[lang]['agents.models.jev.key.label'], `${lang}: the field has no label`);
+  }
+});

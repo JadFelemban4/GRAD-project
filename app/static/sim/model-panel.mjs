@@ -30,15 +30,21 @@ export const MODELS = Object.freeze(['jev', 'laya']);
 // (agent-view.mjs) and row i of app/model_questions.py LEVELS.
 export const QUESTION_IDS = Object.freeze(['spark_trim', 'lambda_trim', 'boost_ceiling', 'cooling_fan', 'coolant_pump']);
 
-// Every code the two POST routes answer with (design 7.9). Each has a sentence
+// Every code the three POST routes answer with (design 7.9, and the jev key
+// field of 29 Sep: bad_key and bad_key_request). Each has a sentence
 // agents.models.error.<code> in both languages; any other code is shown as
 // agents.models.error.server_error with its HTTP status.
 export const ERROR_CODES = Object.freeze([
   'no_key', 'network', 'timeout', 'key_rejected', 'vendor_refused', 'request_rejected', 'rate_limited',
   'overloaded', 'vendor_status', 'not_configured', 'not_found', 'start_failed', 'start_timeout',
   'worker_error', 'worker_died', 'network_attempt', 'bad_answer', 'foreign_origin', 'no_trace',
-  'step_not_computed', 'busy',
+  'step_not_computed', 'busy', 'bad_key', 'bad_key_request',
 ]);
+
+// Where jev's key came from, as the status route names it. 'page' has a line
+// of its own; the other two are words inside the configured line, so no raw
+// token shows inside an Arabic line. Any other value reads as a dash.
+const JEV_SOURCES = Object.freeze(['env', 'file']);
 
 /**
  * May this model be asked about second k now? view = { playing, waiting, done,
@@ -147,18 +153,35 @@ export function errorText(code, status, lang, kind = null) {
 }
 
 /**
+ * The sentence jev's key field shows when a save or a clear failed (a
+ * failureOf result), in jev's column only: the code's own sentence, the
+ * page's server-down sentence for a request that never reached the server,
+ * and a server error with its HTTP status for anything else. Nothing the
+ * server sent is shown but its code.
+ */
+export function keyErrorText(failure, lang) {
+  if (failure.code === 'server_down') return t(lang, 'agents.load.server_down');
+  if (!ERROR_CODES.includes(failure.code)) {
+    return t(lang, 'agents.models.error.server_error', { status: failure.status ?? EM_DASH });
+  }
+  return t(lang, `agents.models.error.${failure.code}`, { status: failure.status ?? EM_DASH, kind: failure.kind ?? 'other' });
+}
+
+/**
  * One model's status line, from its GET status route. A failed status request
  * (failure) shows its error here, in this column only. jev says whether a key
- * is configured and where from, never the key; Laya says what its worker is
- * doing, and reads 'starting' while its first press is in flight.
+ * is configured and where from (the page, the environment variable or a
+ * file), never the key; Laya says what its worker is doing, and reads
+ * 'starting' while its first press is in flight.
  */
 export function statusLine(name, status, failure, inFlight, lang) {
   if (failure) return errorText(failure.code, failure.status, lang, failure.kind);
   if (!status) return EM_DASH;
   if (name === 'jev') {
-    return status.configured
-      ? t(lang, 'agents.models.jev.status.configured', { source: status.source ?? EM_DASH })
-      : t(lang, 'agents.models.jev.status.no_key');
+    if (!status.configured) return t(lang, 'agents.models.jev.status.no_key');
+    if (status.source === 'page') return t(lang, 'agents.models.jev.status.page');
+    const source = JEV_SOURCES.includes(status.source) ? t(lang, `agents.models.jev.source.${status.source}`) : EM_DASH;
+    return t(lang, 'agents.models.jev.status.configured', { source });
   }
   if (status.problem === 'not_configured') return t(lang, 'agents.models.laya.status.not_configured');
   if (status.problem === 'not_found') return t(lang, 'agents.models.laya.status.not_found');

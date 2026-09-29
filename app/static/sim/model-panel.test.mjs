@@ -9,6 +9,7 @@ import { STRINGS, LANGS } from './i18n.mjs';
 import { ACTIONS } from './agent-view.mjs';
 import {
   MODELS, QUESTION_IDS, ERROR_CODES, askState, createAnswers, rowView, failureOf, errorText, statusLine,
+  keyErrorText,
 } from './model-panel.mjs';
 
 const SRC = readFileSync(new URL('./model-panel.mjs', import.meta.url), 'utf8');
@@ -174,8 +175,10 @@ test('rowView: jev has no order check; a missing action gives no row', () => {
 });
 
 test('every error code has its sentence in both languages', () => {
-  assert.equal(ERROR_CODES.length, 21);
-  assert.equal(new Set(ERROR_CODES).size, 21);
+  // 21 from M3, and bad_key and bad_key_request from the jev key field (29 Sep).
+  assert.equal(ERROR_CODES.length, 23);
+  assert.equal(new Set(ERROR_CODES).size, 23);
+  assert.ok(ERROR_CODES.includes('bad_key') && ERROR_CODES.includes('bad_key_request'));
   assert.deepEqual(ERROR_CODES.filter(code => !has(`agents.models.error.${code}`)), []);
   assert.ok(has('agents.models.error.server_error'));
 });
@@ -254,8 +257,46 @@ test('no error text leaves a {placeholder} unfilled, whatever the status and kin
 test('statusLine: jev says whether a key is configured, never the key', () => {
   assert.equal(statusLine('jev', { configured: false, source: null }, null, false, 'ar'), 'لا مفتاح؛ لن يُرسل شيء');
   assert.equal(statusLine('jev', { configured: false, source: null }, null, false, 'en'), 'No key; nothing will be sent');
-  assert.equal(statusLine('jev', { configured: true, source: 'env' }, null, false, 'en'), 'Key configured (env)');
   assert.equal(statusLine('jev', null, null, false, 'en'), '—');
+});
+
+// The jev key field (29 Sep, after M3): a key pasted on the page says so, and
+// the other two sources are words, so no raw token ('env', 'file') shows
+// inside an Arabic line; a source the page does not know is a dash.
+test('statusLine: jev names where its key comes from, in words, in both languages', () => {
+  const on = source => ({ configured: true, source });
+  const line = (source, lang) => statusLine('jev', on(source), null, false, lang);
+  assert.equal(line('page', 'ar'), 'مفتاح من الصفحة، لهذه الجلسة فقط');
+  assert.equal(line('page', 'en'), 'Key from this page, for this session only');
+  assert.equal(line('env', 'ar'), 'مفتاح مُعَدّ (من متغيّر البيئة)');
+  assert.equal(line('env', 'en'), 'Key configured (from the environment variable)');
+  assert.equal(line('file', 'ar'), 'مفتاح مُعَدّ (من ملف)');
+  assert.equal(line('file', 'en'), 'Key configured (from a file)');
+  assert.equal(line('made_up', 'en'), 'Key configured (—)', 'an unknown source is never shown as sent');
+  for (const source of ['page', 'env', 'file', 'made_up', 'toString', null]) {
+    assert.doesNotMatch(line(source, 'ar'), /[A-Za-z]/, `ar ${source}: a Latin token inside an Arabic line`);
+    for (const lang of LANGS) assert.doesNotMatch(line(source, lang), UNFILLED);
+  }
+});
+
+test('keyErrorText: the code\'s own sentence for jev\'s key field, nothing substituted', () => {
+  const text = (status, body, lang) => keyErrorText(failureOf(status, body), lang);
+  assert.equal(text(422, { model: 'jev', code: 'bad_key' }, 'ar'), 'تعذّر استعمال هذا المفتاح؛ لم يُحفظ شيء.');
+  assert.equal(text(422, { model: 'jev', code: 'bad_key' }, 'en'), 'This key could not be used; nothing was kept.');
+  assert.equal(text(422, { model: 'jev', code: 'bad_key_request' }, 'ar'), 'طلب غير صالح؛ لم يُحفظ شيء.');
+  assert.equal(text(422, { model: 'jev', code: 'bad_key_request' }, 'en'), 'Invalid request; nothing was kept.');
+  assert.equal(text(403, { model: 'jev', code: 'foreign_origin' }, 'en'), STRINGS.en['agents.models.error.foreign_origin']);
+  // The server's own 500 and anything unknown: a server error with its HTTP status.
+  assert.equal(text(500, { model: 'jev', code: 'server_error' }, 'en'), 'Server error (HTTP 500)');
+  assert.equal(text(422, { detail: [{ input: 'sentinel' }] }, 'en'), 'Server error (HTTP 422)');
+  assert.equal(text(null, null, 'ar'), STRINGS.ar['agents.load.server_down']);
+  for (const lang of LANGS) {
+    for (const code of [...ERROR_CODES, 'server_error', 'server_down', 'made_up']) {
+      const t = keyErrorText({ code, status: null, kind: null }, lang);
+      assert.doesNotMatch(t, UNFILLED, `${lang} ${code}: ${t}`);
+      assert.ok(!t.includes('agents.'), `${lang} ${code}: a key is showing: ${t}`);
+    }
+  }
 });
 
 test('statusLine: Laya reads its worker state, and a failed status request stays in its own column', () => {

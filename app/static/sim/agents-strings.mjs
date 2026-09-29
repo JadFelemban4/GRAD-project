@@ -27,6 +27,11 @@
 // carry escapes: each Latin run that must keep its order ("{ms} ms",
 // "{device}", "70–500 ms") is a left-to-right isolate, U+2066 ... U+2069,
 // or the line draws "65 ms" as "ms 65" (the M3 final review, 29 Sep).
+//
+// The jev key field (Jad, 29 Sep, after M3) adds agents.models.jev.key.*,
+// agents.models.jev.status.page, agents.models.jev.source.* (so the status
+// line names a source in words) and the codes bad_key and bad_key_request,
+// verbatim from its brief; agents-strings.test.mjs pins them.
 
 import { STRINGS } from './i18n.mjs';
 
@@ -159,6 +164,13 @@ export const AGENT_STRINGS = {
     'agents.models.jev.text': 'خدمة خارجية تعمل في الولايات المتحدة. ليست جزءاً من الرسالة ولا من أي نتيجة، ولا يقارنها أي رقم بالوكلاء. هذه الصفحة لا تحفظ شيئاً؛ لكن اتفاقية المورّد تسمح له بالاحتفاظ بما يُرسل لاستخراج بيانات القياس بلا حدّ زمني (MCA §4.1). تُرسَل إليه حالة هذه الحلقة المحاكاة فقط، لا بيانات السيارة المسجّلة. كل ضغطة استدعاء واحد مدفوع. اتفاقية المورّد تمنع تدريب أي نموذج على تقليد إجاباته. شروط موقع المورّد موجّهة لزوّار الولايات المتحدة؛ هل الاستخدام من السعودية مسموح؟ غير معروف. ويقول المورّد إن النموذج ضعيف في الدقة العددية.',
     'agents.models.jev.status.configured': 'مفتاح مُعَدّ ({source})',
     'agents.models.jev.status.no_key': 'لا مفتاح؛ لن يُرسل شيء',
+    'agents.models.jev.status.page': 'مفتاح من الصفحة، لهذه الجلسة فقط',
+    'agents.models.jev.source.env': 'من متغيّر البيئة',
+    'agents.models.jev.source.file': 'من ملف',
+    'agents.models.jev.key.label': 'الصق مفتاح jev',
+    'agents.models.jev.key.save': 'احفظ لهذه الجلسة',
+    'agents.models.jev.key.clear': 'امسح',
+    'agents.models.jev.key.note': 'يبقى في ذاكرة الخادم حتى يُغلق، ولا يُحفظ في أي ملف، ولا يعود إلى هذه الصفحة.',
     'agents.models.jev.ask': 'اسأل jev عن هذه الثانية (استدعاء مدفوع واحد)',
     'agents.models.jev.latency': '\u2066{ms} ms\u2069، مقيسة من هذا الجهاز (ادعاء المورّد \u206670–500 ms\u2069)',
     'agents.models.laya.name': 'Laya · {model} · laya {version}',
@@ -211,6 +223,8 @@ export const AGENT_STRINGS = {
     'agents.models.error.no_trace': 'هذه الحلقة لم تعد محفوظة في الخادم؛ اضغط احسب ثم اسأل.',
     'agents.models.error.step_not_computed': 'هذه الثانية لم تُحسب للمُبصر.',
     'agents.models.error.busy': 'سؤال آخر لهذا النموذج جارٍ الآن.',
+    'agents.models.error.bad_key': 'تعذّر استعمال هذا المفتاح؛ لم يُحفظ شيء.',
+    'agents.models.error.bad_key_request': 'طلب غير صالح؛ لم يُحفظ شيء.',
     'agents.models.error.server_error': 'خطأ في الخادم (HTTP {status})',
   },
 
@@ -340,6 +354,13 @@ export const AGENT_STRINGS = {
     'agents.models.jev.text': "An external service in the USA. It is not part of the thesis or of any result, and no figure compares it with the agents. This page saves nothing, but the vendor's agreement lets it keep what is sent, in perpetuity, to derive telemetry (MCA §4.1). It receives only this simulated episode's state, never the recorded car data. Each press is one paid call. The vendor's agreement forbids training any model to imitate its answers. The vendor's site terms are aimed at US visitors; whether use from Saudi Arabia is permitted is unknown. The vendor says the model is weak at numeric precision.",
     'agents.models.jev.status.configured': 'Key configured ({source})',
     'agents.models.jev.status.no_key': 'No key; nothing will be sent',
+    'agents.models.jev.status.page': 'Key from this page, for this session only',
+    'agents.models.jev.source.env': 'from the environment variable',
+    'agents.models.jev.source.file': 'from a file',
+    'agents.models.jev.key.label': 'Paste the jev key',
+    'agents.models.jev.key.save': 'Keep for this session',
+    'agents.models.jev.key.clear': 'Clear',
+    'agents.models.jev.key.note': "Kept in the server's memory until it stops; saved in no file; it never comes back to this page.",
     'agents.models.jev.ask': 'Ask jev about this second (one paid call)',
     'agents.models.jev.latency': '{ms} ms, measured from this machine (vendor claim 70–500 ms)',
     'agents.models.laya.name': 'Laya · {model} · laya {version}',
@@ -392,6 +413,8 @@ export const AGENT_STRINGS = {
     'agents.models.error.no_trace': 'This episode is no longer held by the server; press Compute, then ask.',
     'agents.models.error.step_not_computed': 'This second was not computed for the sighted car.',
     'agents.models.error.busy': 'Another question to this model is running now.',
+    'agents.models.error.bad_key': 'This key could not be used; nothing was kept.',
+    'agents.models.error.bad_key_request': 'Invalid request; nothing was kept.',
     'agents.models.error.server_error': 'Server error (HTTP {status})',
   },
 };
