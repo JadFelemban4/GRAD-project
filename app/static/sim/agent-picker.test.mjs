@@ -310,3 +310,49 @@ test('the fixture is the server\'s catalog', () => {
     climb_start_s: 141, grade: 0.13314, idx: 1, seed: 1000, weights: [0.690154, 0.012829, 0.297017],
   });
 });
+
+// 30 Sep 2026: an agent whose certificate was reconstructed (reconstruct_meta.py),
+// trained on a new road every episode. The fixture holds none: every agent in
+// it was certified when its training started, before train.py recorded a road.
+test('a reconstructed certificate and a terrain-trained blind arm read as what they are', () => {
+  assert.equal(P.blindLabelKey('phase-d'), 'agents.car.blind_phase_d', 'no road recorded: Phase D keeps its caveat');
+  assert.equal(P.blindLabelKey('phase-d', null), 'agents.car.blind_phase_d');
+  assert.equal(P.blindLabelKey('phase-d', 'fixed'), 'agents.car.blind_phase_d');
+  assert.equal(P.blindLabelKey('phase-d', 'terrain'), 'agents.car.blind', 'a new road every episode: no one road to memorise');
+  assert.equal(P.blindLabelKey('d2', 'terrain'), 'agents.car.blind');
+  assert.equal(P.blindLabelKey('d2'), 'agents.car.blind');
+
+  const rebuilt = arm => ({
+    arm, certificate: 'reconstructed', train_road: 'terrain',
+    reconstructed: { written: '2026-09-30T17:20:00', reproduced_device: 'cpu', episodes: [1, 20], scores: `results/agents/terrain_dt1/${arm}_seed0/eval_summary.json` },
+  });
+  const pair = [rebuilt('sighted'), rebuilt('blind')];
+  assert.equal(P.blindTrainRoad(pair), 'terrain');
+  assert.equal(P.blindTrainRoad([{ arm: 'sighted', train_road: 'terrain' }]), null, 'the blind arm\'s own road, not the sighted one\'s');
+  assert.equal(P.blindTrainRoad(null), null);
+  assert.deepEqual(P.reconstructedNote(pair[1]), {
+    date: '2026-09-30', file: 'results/agents/terrain_dt1/blind_seed0/eval_summary.json', episodes: '1, 20',
+  });
+  assert.equal(P.reconstructedNote({ certificate: 'training', reconstructed: null }), null);
+  assert.equal(P.reconstructedNote({ certificate: 'training', reconstructed: pair[0].reconstructed }), null,
+    'a certificate written at training is never called reconstructed');
+  assert.equal(P.reconstructedNote(null), null);
+  assert.equal(P.reproducedDevice(pair), 'cpu');
+  assert.equal(P.reproducedDevice([pair[0], { ...pair[1], reconstructed: { ...pair[1].reconstructed, reproduced_device: 'cuda:0' } }]), null,
+    'two devices: nothing is claimed for the pair');
+  assert.equal(P.reproducedDevice([pair[0], { arm: 'blind', certificate: 'training', reconstructed: null }]), null);
+  assert.equal(P.reproducedDevice([]), null);
+  assert.equal(P.reproducedDevice(null), null);
+
+  // On the real tree nothing is reconstructed, and no training road is recorded.
+  for (const e of CATALOG.experiments) {
+    for (const p of e.pairs) {
+      assert.equal(P.reproducedDevice(p.agents), null, `${e.runs} seed ${p.seed}`);
+      assert.equal(P.blindTrainRoad(p.agents), null, `${e.runs} seed ${p.seed}`);
+      for (const a of p.agents) assert.equal(P.reconstructedNote(a), null, `${e.runs} ${a.tag}`);
+    }
+  }
+  for (const key of ['agents.verdict.reconstructed', 'agents.device.line_reproduced', 'agents.device.warning_reproduced']) {
+    for (const lang of ['ar', 'en']) assert.notEqual(t(lang, key), key, `${key} has no ${lang} string`);
+  }
+});

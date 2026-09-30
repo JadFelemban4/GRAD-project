@@ -377,3 +377,28 @@ test('the jev key field\'s strings are the approved lines', () => {
     assert.ok(AGENT_STRINGS[lang]['agents.models.jev.key.label'], `${lang}: the field has no label`);
   }
 });
+
+// 30 Sep 2026: an agent whose certificate was reconstructed after training
+// (reconstruct_meta.py). The line must say BOTH halves in both languages --
+// that it was reconstructed, and that it was not written when training
+// started -- and each Latin run in the Arabic lines is its own isolate.
+test('the reconstructed-certificate strings say what the certificate is not', () => {
+  const { AGENT_STRINGS } = api();
+  const iso = text => `${LRI}${text}${PDI}`;
+  const line = { ar: AGENT_STRINGS.ar['agents.verdict.reconstructed'], en: AGENT_STRINGS.en['agents.verdict.reconstructed'] };
+  assert.match(line.en, /reconstructed/);
+  assert.match(line.en, /not written when training started/);
+  assert.match(line.ar, /أُعيد بناؤها/);
+  assert.match(line.ar, /لم تُكتب عند بدء التدريب/);
+  for (const slot of ['{date}', '{file}', '{episodes}']) {
+    assert.ok(line.ar.includes(iso(slot)), `ar agents.verdict.reconstructed: ${slot} is not isolated`);
+  }
+  for (const key of ['agents.device.line_reproduced', 'agents.device.warning_reproduced']) {
+    assert.ok(AGENT_STRINGS.ar[key].includes(iso('{reproduced}')), `ar ${key}: {reproduced} is not isolated`);
+    assert.ok(!AGENT_STRINGS.en[key].includes(LRI), `en ${key}: an English line needs no isolate`);
+    for (const lang of LANGS) {
+      assert.doesNotMatch(AGENT_STRINGS[lang][key], /cuda/, `${lang} ${key}: nothing about cuda is known of these agents`);
+    }
+  }
+  assert.ok(AGENT_STRINGS.ar['agents.device.line_reproduced'].includes(RLM), 'agents.device.line_reproduced lost its RLM');
+});

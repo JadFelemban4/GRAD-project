@@ -484,23 +484,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 58e3452007d9dc14",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed0",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "58e3452007d9dc14"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 776423729a22144f",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed0",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "776423729a22144f"
       }
      ],
@@ -517,23 +523,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 1000000, zip sha 03abe6a2914dac51",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed1",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "03abe6a2914dac51"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 1000000, zip sha 001d97bf98a93cd6",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed1",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "001d97bf98a93cd6"
       }
      ],
@@ -550,23 +562,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha fa4f23bfd572e04c",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed2",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "fa4f23bfd572e04c"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha c4b1574e4adb71dd",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed2",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "c4b1574e4adb71dd"
       }
      ],
@@ -583,23 +601,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 7eb89c98b3de9b87",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed3",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "7eb89c98b3de9b87"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha e1b165aa65452f58",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed3",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "e1b165aa65452f58"
       }
      ],
@@ -616,23 +640,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 5683a6338c82e652",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed4",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "5683a6338c82e652"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 3107631f6ddc585c",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed4",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "3107631f6ddc585c"
       }
      ],
@@ -649,23 +679,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha f742fbc0dca599e5",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed5",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "f742fbc0dca599e5"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha c9dcb2d1af396c40",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed5",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "c9dcb2d1af396c40"
       }
      ],
@@ -682,23 +718,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha c5ad7a145e796716",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed6",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "c5ad7a145e796716"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 497f975e206b662a",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed6",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "497f975e206b662a"
       }
      ],
@@ -715,23 +757,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 1000000, zip sha fb881a6b3260b1a1",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed7",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "fb881a6b3260b1a1"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 8b82872f373d6b8a",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed7",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "8b82872f373d6b8a"
       }
      ],
@@ -800,23 +848,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 20f0ae6a9c1564a9",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed0",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "20f0ae6a9c1564a9"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 9ab8d2b29cbb9d06",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed0",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "9ab8d2b29cbb9d06"
       }
      ],
@@ -833,23 +887,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 0a748c7ec8a06538",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed1",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "0a748c7ec8a06538"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha f028e248ee8077d3",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed1",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "f028e248ee8077d3"
       }
      ],
@@ -866,23 +926,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 715dde293b07ed7b",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed2",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "715dde293b07ed7b"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha c347fc06b1a4c7ba",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed2",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "c347fc06b1a4c7ba"
       }
      ],
@@ -899,23 +965,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 5a18511a5a854dcc",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed3",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "5a18511a5a854dcc"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 025819a8d558d092",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed3",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "025819a8d558d092"
       }
      ],
@@ -932,23 +1004,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha e86d703b10e769c9",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed4",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "e86d703b10e769c9"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha d3979efee0e825c8",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed4",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "d3979efee0e825c8"
       }
      ],
@@ -965,23 +1043,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 3466b26631d888ef",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed5",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "3466b26631d888ef"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha b6450a8e66a03d75",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed5",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "b6450a8e66a03d75"
       }
      ],
@@ -998,23 +1082,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha d1dab3e32ba70c33",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed6",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "d1dab3e32ba70c33"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha 952396a6de6738f9",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed6",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "952396a6de6738f9"
       }
      ],
@@ -1031,23 +1121,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha b75d3ab8374adf23",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "sighted_seed7",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "b75d3ab8374adf23"
       },
       {
        "arm": "blind",
        "budget_line": "trained 300000 steps of 300000 requested, from step 0, buffer 300000, zip sha e0a2cc00d0d66052",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "match",
        "status": "ready",
        "tag": "blind_seed7",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "e0a2cc00d0d66052"
       }
      ],
@@ -1140,23 +1236,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha b4185e97545d6f6a",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed0",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "b4185e97545d6f6a"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 3fc0ce73f98087b5",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed0",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "3fc0ce73f98087b5"
       }
      ],
@@ -1173,23 +1275,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 30beae3d971624da",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed1",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "30beae3d971624da"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha b38a3ddf8f1a8b9b",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed1",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "b38a3ddf8f1a8b9b"
       }
      ],
@@ -1206,23 +1314,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 0939fcbb0f39f51c",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed2",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "0939fcbb0f39f51c"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha a94bdf3b8eabd63f",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed2",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "a94bdf3b8eabd63f"
       }
      ],
@@ -1239,23 +1353,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 44fe1ca2af4a60f3",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed3",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "44fe1ca2af4a60f3"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha b8b7ff6a86a09b47",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed3",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "b8b7ff6a86a09b47"
       }
      ],
@@ -1272,23 +1392,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha fcb7892e7c5bfacf",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed4",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "fcb7892e7c5bfacf"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 4cf4f5712f43bba9",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed4",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "4cf4f5712f43bba9"
       }
      ],
@@ -1305,23 +1431,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha ba3c0d191371938b",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed5",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "ba3c0d191371938b"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 7a88f5a4fd14610e",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed5",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "7a88f5a4fd14610e"
       }
      ],
@@ -1338,23 +1470,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha d0e3b4bacf970fb7",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed6",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "d0e3b4bacf970fb7"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 4621acbdb7ad342b",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed6",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "4621acbdb7ad342b"
       }
      ],
@@ -1371,23 +1509,29 @@
       {
        "arm": "sighted",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha 05c98c86f0568492",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "sighted_seed7",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "05c98c86f0568492"
       },
       {
        "arm": "blind",
        "budget_line": "trained 50000 steps of 50000 requested, from step 0, buffer 50000, zip sha d644e735d2b4f6f0",
+       "certificate": "training",
        "problems": [],
        "reason": null,
+       "reconstructed": null,
        "scored": "not recorded",
        "status": "ready",
        "tag": "blind_seed7",
        "train_dt": 0.2,
+       "train_road": null,
        "zip_sha": "d644e735d2b4f6f0"
       }
      ],
@@ -1443,23 +1587,29 @@
       {
        "arm": "sighted",
        "budget_line": null,
+       "certificate": null,
        "problems": [],
        "reason": "no meta.json: plant unknown (AUDIT2 C2-1)",
+       "reconstructed": null,
        "scored": null,
        "status": "incompatible",
        "tag": "sighted_seed0",
        "train_dt": null,
+       "train_road": null,
        "zip_sha": null
       },
       {
        "arm": "blind",
        "budget_line": null,
+       "certificate": null,
        "problems": [],
        "reason": "no meta.json: plant unknown (AUDIT2 C2-1)",
+       "reconstructed": null,
        "scored": null,
        "status": "incompatible",
        "tag": "blind_seed0",
        "train_dt": null,
+       "train_road": null,
        "zip_sha": null
       }
      ],

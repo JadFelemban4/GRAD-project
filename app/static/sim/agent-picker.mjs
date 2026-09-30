@@ -292,9 +292,48 @@ export function scoredKey(scored, resultFile) {
   return SCORED.get(scored) ?? null;
 }
 
-/** The blind car's label key: Phase D's blind agent may have memorised its one road. */
-export function blindLabelKey(protocol) {
-  return protocol === 'phase-d' ? 'agents.car.blind_phase_d' : 'agents.car.blind';
+/**
+ * The blind car's label key. Phase D's blind agent may have memorised its one
+ * road: it trained on the road it is scored on, the same in every episode. An
+ * agent whose certificate says its training drew a new road every episode
+ * (train_road 'terrain') had no one road to memorise, so that caveat and its
+ * citation of Phase D's result are not said of it.
+ */
+export function blindLabelKey(protocol, trainRoad = null) {
+  return protocol === 'phase-d' && trainRoad !== 'terrain' ? 'agents.car.blind_phase_d' : 'agents.car.blind';
+}
+
+/** The blind arm's training road design from its certificate, or null when it records none. */
+export function blindTrainRoad(agents) {
+  return (agents || []).find(a => a?.arm === 'blind')?.train_road ?? null;
+}
+
+/**
+ * What the verdict box says of an agent whose certificate was RECONSTRUCTED
+ * (app/agent_catalog.py reconstructed_meta; written by reconstruct_meta.py,
+ * never at training): the day, the file of committed scores, and the frozen
+ * episodes that were re-run and found equal to it. null for an agent
+ * certified when its training started, and for one with no certificate.
+ */
+export function reconstructedNote(agent) {
+  const r = agent?.certificate === 'reconstructed' ? agent.reconstructed : null;
+  if (!r) return null;
+  return {
+    date: String(r.written || '').slice(0, 10) || EM_DASH,
+    file: r.scores || EM_DASH,
+    episodes: Array.isArray(r.episodes) && r.episodes.length ? r.episodes.join(', ') : EM_DASH,
+  };
+}
+
+/**
+ * The device the committed scores were reproduced on, when every agent of the
+ * pair carries a reconstructed certificate naming the same one. null
+ * otherwise: the closed experiments' result files record no device.
+ */
+export function reproducedDevice(agents) {
+  const list = agents || [];
+  const devices = new Set(list.map(a => (a?.certificate === 'reconstructed' ? a.reconstructed?.reproduced_device : null) || null));
+  return list.length && devices.size === 1 ? [...devices][0] : null;
 }
 
 /**

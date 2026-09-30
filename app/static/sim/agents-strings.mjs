@@ -226,6 +226,14 @@ export const AGENT_STRINGS = {
     'agents.models.error.bad_key': 'تعذّر استعمال هذا المفتاح؛ لم يُحفظ شيء.',
     'agents.models.error.bad_key_request': 'طلب غير صالح؛ لم يُحفظ شيء.',
     'agents.models.error.server_error': 'خطأ في الخادم (HTTP {status})',
+
+    // --- added 30 Sep 2026: an agent whose certificate was RECONSTRUCTED
+    // (reconstruct_meta.py, read by app/agent_catalog.py), and the device its
+    // committed scores were reproduced on. Each Latin run (a date, a file, a
+    // list of episodes, a device) is a left-to-right isolate, as above.
+    'agents.verdict.reconstructed': 'شهادة أُعيد بناؤها في \u2066{date}\u2069، ولم تُكتب عند بدء التدريب. أُعيد تشغيل حلقات مجمَّدة فساوت النتائج المحفوظة في \u2066{file}\u2069، وهي: \u2066{episodes}\u2069',
+    'agents.device.line_reproduced': 'أُعيد إنتاج النتائج المحفوظة على \u2066{reproduced}\u2069 عند إعادة بناء الشهادة. هذه الحلقة حُسبت على {device} \u200f(torch {torch}، SB3 {sb3})',
+    'agents.device.warning_reproduced': 'تنبيه: هذه الحلقة لم تُحسب على \u2066{reproduced}\u2069، فقد لا تطابق ما قُيِّم',
   },
 
   en: {
@@ -416,6 +424,13 @@ export const AGENT_STRINGS = {
     'agents.models.error.bad_key': 'This key could not be used; nothing was kept.',
     'agents.models.error.bad_key_request': 'Invalid request; nothing was kept.',
     'agents.models.error.server_error': 'Server error (HTTP {status})',
+
+    // --- added 30 Sep 2026: an agent whose certificate was RECONSTRUCTED
+    // (reconstruct_meta.py, read by app/agent_catalog.py), and the device its
+    // committed scores were reproduced on
+    'agents.verdict.reconstructed': 'Certificate reconstructed on {date}, not written when training started. Frozen episodes were re-run and equal the committed scores in {file}: {episodes}',
+    'agents.device.line_reproduced': 'The committed scores were reproduced on {reproduced} when the certificate was reconstructed. This episode was computed on {device} (torch {torch}, SB3 {sb3})',
+    'agents.device.warning_reproduced': 'Warning: this episode was not computed on {reproduced}, so it may not match what was scored',
   },
 };
 

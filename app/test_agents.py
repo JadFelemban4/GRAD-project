@@ -1323,8 +1323,8 @@ class _StubStore:
 
 
 META_KEYS = {"experiment", "runs", "prefix", "protocol", "seed", "ep", "episode", "dt",
-             "duration_s", "steps", "train_dt", "agents", "result_file", "preview_s", "act",
-             "limits", "scenario", "verdict", "fingerprint_taken"}
+             "duration_s", "steps", "train_dt", "train_road", "agents", "result_file",
+             "preview_s", "act", "limits", "scenario", "verdict", "fingerprint_taken"}
 EPISODE_URL = "/api/agents/episode?runs=runs_c4&seed=5&ep=1"
 CATALOG_URL = "/api/agents/catalog"
 CATALOG_KEYS = {"experiments", "episodes", "preview_s", "act", "limits", "sb3"}
@@ -3588,6 +3588,194 @@ class JevPageKeyTests(_JevCase):
                     self.assertEqual((r.status_code, r.json()), (500, {"model": "jev", "code": "server_error"}))
                     self.assertEqual(lines, ["jev: server_error RuntimeError (key)"])
         self.assert_nothing_leaked("secret")
+
+
+def _zip_like_sb3(path, steps=50000):
+    """A zip FP.model_budget can read: stable-baselines3's 'data' member and
+    nothing else. No network is in it, and the catalog never loads one."""
+    import zipfile
+    with zipfile.ZipFile(path, "w") as z:
+        z.writestr("data", json.dumps({"num_timesteps": steps, "_total_timesteps": steps,
+                                       "_num_timesteps_at_start": 0, "buffer_size": 1000000}))
+
+
+def _rebuilt_agent(root, runs_path, name, meta_changes=None, **block_changes):
+    """An agent directory with NO meta.json and a meta_reconstructed.json shaped
+    as reconstruct_meta.py writes one: the live fingerprint, the training fields
+    from config.json, and the block. A block key given as None is left out."""
+    d = Path(root) / runs_path / name
+    d.mkdir(parents=True)
+    _zip_like_sb3(d / "final.zip")
+    meta = dict(AC.live_fingerprint("phase-d"), train_dt=1.0, train_road="terrain",
+                use_preview="blind" not in name, tag=name)
+    meta.update(meta_changes or {})
+    block = {"written": "2026-09-30T17:20:00", "reproduced_device": "cpu",
+             "zip_sha": FP.model_budget(str(d / "final.zip"))["sha"],
+             "evidence": {"episodes": [1, 20], "identical": True,
+                          "scores": f"results/agents/zzset/{name}/eval_summary.json"}}
+    block.update(block_changes)
+    meta["reconstructed"] = {k: v for k, v in block.items() if v is not None}
+    with open(d / AC.RECONSTRUCTED, "w", encoding="utf-8") as fh:
+        json.dump(meta, fh)
+    return d
+
+
+class ReconstructedTests(unittest.TestCase):
+    """30 September 2026: agents trained before train.py wrote meta.json.
+
+    The twenty agents of the 29 September retrain carry config.json and no
+    meta.json, so the catalog refused them all, and they sit in
+    runs/terrain_dt1, one level below anything the catalog listed. These are
+    the rules that let the page show them without calling them what they are
+    not. Every fixture is built in a temporary directory, with a zip that
+    holds no network, so nothing here needs an agent on this machine.
+    """
+
+    def test_a_runs_name_may_stand_for_a_set_one_level_down(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "runs" / "terrain_dt1" / "sighted_seed0").mkdir(parents=True)
+            (root / "runs" / "_logs").mkdir()                       # no agent inside: not a set
+            (root / "runs" / "empty_set").mkdir()
+            (root / "runs" / "Upper" / "sighted_seed0").mkdir(parents=True)   # not SET_NAME
+            (root / "runs" / "sighted_seed3").mkdir()               # an agent of runs/ itself
+            (root / "runs_c9" / "blind_seed0").mkdir(parents=True)
+            self.assertEqual(AC.runs_dir("runs_terrain_dt1", root), root / "runs" / "terrain_dt1")
+            self.assertEqual(AC.runs_dir("runs_c9", root), root / "runs_c9")
+            self.assertEqual(AC.runs_dir("runs", root), root / "runs")
+            self.assertEqual(AC.runs_dir("runs_", root), root / "runs_", "never runs/ itself")
+            self.assertEqual(AC.runs_dir("runs_nothere", root), root / "runs_nothere")
+            self.assertEqual([name for name, _ in AC.experiment_dirs(root)],
+                             ["runs", "runs_c9", "runs_terrain_dt1"])
+            self.assertEqual(AC.shown_path("runs_terrain_dt1", root), "runs/terrain_dt1")
+            self.assertEqual(AC.shown_path("runs_c9", root), "runs_c9")
+            for name, _ in AC.experiment_dirs(root):
+                self.assertTrue(AC.RUNS_NAME.fullmatch(name), name)
+            # A top-level directory of the same name wins, everywhere.
+            (root / "runs_terrain_dt1" / "sighted_seed7").mkdir(parents=True)
+            self.assertEqual(AC.runs_dir("runs_terrain_dt1", root), root / "runs_terrain_dt1")
+            self.assertEqual(dict(AC.experiment_dirs(root))["runs_terrain_dt1"],
+                             root / "runs_terrain_dt1")
+            with self.assertRaises(KeyError):
+                AC.read_agent("runs_terrain_dt1", "sighted_seed0", root)
+
+    def test_a_reconstructed_certificate_is_read_and_called_reconstructed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for arm in AC.ARMS:
+                _rebuilt_agent(root, "runs/zzset", f"{arm}_seed0")
+            for arm in AC.ARMS:
+                a = AC.read_agent("runs_zzset", f"{arm}_seed0", root)
+                self.assertEqual((a["status"], a["reason"], a["certificate"], a["train_road"],
+                                  a["train_dt"], a["protocol"]),
+                                 ("ready", None, "reconstructed", "terrain", 1.0, "phase-d"))
+                self.assertEqual(a["reconstructed"], {
+                    "written": "2026-09-30T17:20:00", "reproduced_device": "cpu",
+                    "episodes": [1, 20],
+                    "scores": f"results/agents/zzset/{arm}_seed0/eval_summary.json"})
+            pair = AC.find_pair("runs_zzset", 0, root)
+            self.assertEqual((pair["experiment"], pair["prefix"], pair["protocol"]),
+                             ("runs/zzset (no name recorded)", "zzset", "phase-d"))
+            self.assertEqual([a["scored"] for a in pair["agents"]], ["not recorded"] * 2)
+            [exp] = [e for e in AC.discover(root) if e["runs"] == "runs_zzset"]
+            self.assertEqual((exp["name"], exp["protocol"], exp["verdict"]["state"]),
+                             ("runs/zzset (no name recorded)", "phase-d", "none"))
+            [row] = exp["pairs"]
+            self.assertTrue(row["runnable"], row["problems"])
+            for a in row["agents"]:
+                self.assertEqual(set(a), set(AC.CATALOG_AGENT_KEYS))
+                self.assertEqual((a["certificate"], a["train_road"]), ("reconstructed", "terrain"))
+            # The loader opens the directory the name stands for, and the
+            # episode's meta tells the page what the certificate is.
+            with mock.patch.object(API, "ROOT", root):
+                self.assertEqual(API.pair_paths("runs_zzset", 0), tuple(
+                    str(root / "runs" / "zzset" / f"{arm}_seed0") + "/final" for arm in AC.ARMS))
+            ep = T.episode("phase-d", 1)
+            meta = API.episode_meta(pair, ep, T.route(T.build_cycle(ep)), AC.verdict("zzset", root))
+            json.dumps(meta, allow_nan=False)
+            self.assertEqual(meta["train_road"], {"sighted": "terrain", "blind": "terrain"})
+            self.assertEqual([(a["certificate"], a["reconstructed"]["reproduced_device"])
+                              for a in meta["agents"]], [("reconstructed", "cpu")] * 2)
+
+    def test_a_reconstructed_certificate_certifies_one_zip_on_one_plant(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            # Another final.zip in its place: the reconstruction never ran it.
+            d = _rebuilt_agent(root, "runs/zzset", "sighted_seed0")
+            certified = FP.model_budget(str(d / "final.zip"))["sha"]
+            _zip_like_sb3(d / "final.zip", steps=49999)
+            a = AC.read_agent("runs_zzset", "sighted_seed0", root)
+            self.assertEqual((a["status"], a["reason"], a["certificate"]),
+                             ("incompatible", f"{AC.RECONSTRUCTED} certifies another final.zip",
+                              "reconstructed"))
+            self.assertIn(certified, a["problems"][0])
+            _rebuilt_agent(root, "runs/zzset", "blind_seed0")
+            with self.assertRaises(AC.Refused):
+                AC.find_pair("runs_zzset", 0, root)
+            # The plant moved since: refused on the fatal field, like any agent.
+            _rebuilt_agent(root, "runs/zzset", "sighted_seed1", meta_changes={"plant_sha": "0" * 16})
+            a = AC.read_agent("runs_zzset", "sighted_seed1", root)
+            self.assertEqual((a["status"], a["reason"]), ("incompatible", "plant mismatch: plant_sha"))
+            # A block that lacks a required key, or no block at all, is no certificate.
+            for seed, change in ((2, {"evidence": None}), (3, {"zip_sha": None}),
+                                 (4, {"written": None}), (5, {"evidence": "re-run"})):
+                _rebuilt_agent(root, "runs/zzset", f"sighted_seed{seed}", **change)
+                a = AC.read_agent("runs_zzset", f"sighted_seed{seed}", root)
+                self.assertEqual((a["status"], a["reason"], a["certificate"]),
+                                 ("incompatible", AC.NO_META, None), change)
+            d = _rebuilt_agent(root, "runs/zzset", "sighted_seed6")
+            with open(d / AC.RECONSTRUCTED, "w", encoding="utf-8") as fh:
+                json.dump(AC.live_fingerprint("phase-d"), fh)
+            self.assertEqual(AC.read_agent("runs_zzset", "sighted_seed6", root)["reason"], AC.NO_META)
+
+    def test_a_certificate_written_at_training_always_wins(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            d = _rebuilt_agent(root, "runs/zzset", "sighted_seed0")
+            with open(d / "meta.json", "w", encoding="utf-8") as fh:
+                json.dump(dict(AC.live_fingerprint("phase-d"), train_dt=0.2), fh)
+            a = AC.read_agent("runs_zzset", "sighted_seed0", root)
+            self.assertEqual((a["status"], a["certificate"], a["reconstructed"], a["train_dt"],
+                              a["train_road"]), ("ready", "training", None, 0.2, None))
+
+    def test_only_the_catalog_reads_the_reconstructed_file(self):
+        """evaluate.py and train.py read meta.json and nothing else, so an agent
+        with a reconstructed certificate is still refused by both: no scoring
+        path and no resume path changed."""
+        import evaluate as EV
+        for name in ("evaluate.py", "train.py", "fingerprint.py", "run_phase_d.py"):
+            self.assertNotIn(AC.RECONSTRUCTED, (ROOT / name).read_text(encoding="utf-8"), name)
+        with tempfile.TemporaryDirectory() as tmp:
+            d = _rebuilt_agent(tmp, "runs/zzset", "sighted_seed0")
+            with self.assertRaises(SystemExit) as refused:
+                EV.check_model_fingerprint(str(d), AC.live_fingerprint("phase-d"), False)
+            self.assertIn("has no meta.json", str(refused.exception))
+
+    def test_the_script_that_writes_it_refuses_rather_than_guesses(self):
+        import reconstruct_meta as RM
+        self.assertEqual(RM.RECONSTRUCTED, AC.RECONSTRUCTED)
+        self.assertNotEqual(RM.RECONSTRUCTED, "meta.json")
+        self.assertEqual(RM.parse_episodes("all", 20), tuple(range(1, 21)))
+        self.assertEqual(RM.parse_episodes("20,1,1", 20), (1, 20))
+        for text in ("0", "21", "1,21"):
+            with self.assertRaises(SystemExit):
+                RM.parse_episodes(text, 20)
+        row = {"damage": 327.9909850116052, "knock": 1}
+        self.assertEqual(RM.differences(dict(row), dict(row)), [])
+        # Equal, not close: the very next float is a difference.
+        import math
+        nearest = math.nextafter(row["damage"], math.inf)
+        self.assertEqual(RM.differences(dict(row, damage=nearest), row),
+                         [f"damage: committed {row['damage']!r} re-run {nearest!r}"])
+        self.assertEqual(len(RM.differences({"damage": 1.0}, {"damage": 1.0, "fuel": 2.0})), 1)
+        with self.assertRaises(RM.Refused):
+            RM.committed("results/agents/no_such_set/sighted_seed0/eval_summary.json")
+        with self.assertRaises(RM.Refused):
+            RM.plant_sha_at("0000000")
+        # The derived constants are hashed by value; the '_' bookkeeping keys are not in it.
+        self.assertEqual(RM.derived_sha_of({"a": 1, "_inputs": {"data_sha1": "x"}}),
+                         RM.derived_sha_of({"a": 1, "_inputs": {"data_sha1": "y"}}))
+        self.assertNotEqual(RM.derived_sha_of({"a": 1}), RM.derived_sha_of({"a": 2}))
 
 
 def _shape(x):

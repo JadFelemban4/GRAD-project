@@ -29,6 +29,7 @@ import {
   NOTHING, parsePickerQuery, experimentOf, pairOf, resolveSelection, choose, selectionSearch,
   computeState, experimentOptions, experimentNote, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
   refusedPairs, scoredKey, blindLabelKey, notBlindCite, isolateLtr,
+  blindTrainRoad, reconstructedNote, reproducedDevice,
 } from './agent-picker.mjs';
 import { createTapUnlock } from './tap-unlock.mjs';
 import {
@@ -361,11 +362,19 @@ function currentVerdict() {
 function currentProtocol() {
   return state.meta?.protocol ?? currentPair()?.protocol ?? currentExperiment()?.protocol ?? null;
 }
+// The blind arm's training road design, from its certificate: null for every
+// agent trained before train.py recorded one.
+function currentTrainRoad() {
+  return state.meta?.train_road?.blind ?? blindTrainRoad(currentPair()?.agents);
+}
 // The i18n key naming lane j's car. Phase D's blind car may have memorised its
 // one road (results/PHASE_D_RESULT.txt:33-40), so it is never called blind
 // alone: every place that names a car calls this, never a fixed key.
+function blindKey() {
+  return blindLabelKey(currentProtocol(), currentTrainRoad());
+}
 function laneLabel(j) {
-  return j === 0 ? 'agents.car.sighted' : blindLabelKey(currentProtocol());
+  return j === 0 ? 'agents.car.sighted' : blindKey();
 }
 
 // The <option>s and the refused list are rebuilt only when their text
@@ -603,9 +612,14 @@ function renderVerdict() {
   const resultFile = state.meta ? state.meta.result_file : currentPair()?.result_file;
   agents.forEach((agent, i) => {
     // agent-picker.scoredKey: match, not recorded, mismatch or no result file;
-    // null when the sha check never ran, and then nothing is claimed.
+    // null when the sha check never ran, and then nothing is claimed. An agent
+    // whose certificate was reconstructed says THAT instead, with the scores it
+    // was re-run against: its scores are not in results/<prefix>_seed<N>.txt.
     const key = scoredKey(agent.scored, resultFile);
-    const status = key ? t(currentLang, key) : EM_DASH;
+    const rebuilt = reconstructedNote(agent);
+    const status = rebuilt
+      ? t(currentLang, 'agents.verdict.reconstructed', { date: rebuilt.date, file: rebuilt.file, episodes: rebuilt.episodes })
+      : (key ? t(currentLang, key) : EM_DASH);
     const li = el('li', LANES[i]);
     li.appendChild(el('i', 'lane-dot'));
     li.appendChild(el('span', '', `${t(currentLang, laneLabel(i))} · ${status}`));
@@ -985,7 +999,7 @@ function renderSeen(frame) {
   const zeros = blind ? blind.preview_pct.map(v => (v === 0 ? '0' : fmt(v, 1))).join(' · ') : '';
   // Phase D's blind car saw zeros too, on the one road it was trained and
   // scored on; the caveat is cited from the verdict's own not_blind line.
-  const text = currentProtocol() === 'phase-d'
+  const text = blindKey() === 'agents.car.blind_phase_d'
     ? t(currentLang, 'agents.seen.blind_phase_d', { zeros, cite: notBlindCite(currentVerdict()) })
     : t(currentLang, 'agents.seen.blind', { zeros });
   setText($('seen-blind'), blind ? text : '');
@@ -1020,11 +1034,22 @@ function renderDevice() {
   const line = $('device-line');
   if (line) {
     const v = state.versions || {};
-    const signature = `${state.device}|${v.torch}|${v.sb3}|${currentLang}`;
+    // A pair with reconstructed certificates records the device its committed
+    // scores were reproduced on; the closed experiments record none, and their
+    // line says what is known of them instead (cuda, on the machine that scored).
+    const reproduced = reproducedDevice(state.meta?.agents);
+    const signature = `${state.device}|${v.torch}|${v.sb3}|${currentLang}|${reproduced}`;
     if (line.dataset.signature !== signature) {
       line.dataset.signature = signature;
       line.textContent = '';
-      if (state.device) {
+      if (state.device && reproduced) {
+        line.appendChild(el('span', '', t(currentLang, 'agents.device.line_reproduced', {
+          reproduced, device: state.device, torch: v.torch || EM_DASH, sb3: v.sb3 || EM_DASH,
+        })));
+        if (String(state.device) !== reproduced) {
+          line.appendChild(el('strong', 'device-warning', t(currentLang, 'agents.device.warning_reproduced', { reproduced })));
+        }
+      } else if (state.device) {
         line.appendChild(el('span', '', t(currentLang, 'agents.device.line', {
           device: state.device, torch: v.torch || EM_DASH, sb3: v.sb3 || EM_DASH,
         })));

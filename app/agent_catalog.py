@@ -11,6 +11,22 @@ rule, then the protocol, then the fatal fingerprint fields. A pair runs only
 when both arms are ready AND each final.zip is the one results/ recorded as
 scored, where results/ records one (only C4 does today).
 
+A RECONSTRUCTED CERTIFICATE IS SECOND CLASS, AND SAYS SO (30 September 2026).
+The twenty agents of the 29 September retrain were trained by a train.py that
+wrote config.json and no meta.json, so this module refused all of them. An
+agent with no meta.json may now carry meta_reconstructed.json, which only
+reconstruct_meta.py writes, after re-running frozen episodes and finding the
+committed scores to the last digit. It is read HERE AND NOWHERE ELSE:
+evaluate.py and train.py read meta.json and still refuse these agents, so no
+scoring path changed. Such an agent is 'ready' with certificate
+'reconstructed', the page says so beside it, and the file certifies one
+final.zip by its sha: another zip in its place is refused.
+
+A runs NAME may stand for a folder one level down. train.py's default output
+for the terrain design is runs/terrain_dt1, which no top-level runs*/ pattern
+finds; it is listed under the name runs_terrain_dt1 (runs_dir). A top-level
+directory of that name wins, and a name is still never a path.
+
 Verdicts are QUOTED, never computed: each anchor is a pattern searched in a
 file under results/, returned with its line number so the page can cite it as
 results/<file>:<line>. The short line and the glosses are authored text, and
@@ -40,8 +56,14 @@ ROOT = Path(__file__).resolve().parent.parent
 # caveats attached.
 RUNS_NAME = re.compile(r"^runs[a-z0-9_]*$")
 AGENT_NAME = re.compile(r"^(sighted|blind)_seed(\d+)$")
+# A set one level down, runs/<set>/: listed as runs_<set>, so the same
+# characters RUNS_NAME allows and nothing that could leave the directory.
+SET_NAME = re.compile(r"^[a-z0-9_]+$")
 ARMS = ("sighted", "blind")
 UNREADABLE_ZIP = "final.zip is not a readable stable-baselines3 zip"
+NO_META = "no meta.json: plant unknown (AUDIT2 C2-1)"
+RECONSTRUCTED = "meta_reconstructed.json"
+RECONSTRUCTED_KEYS = ("written", "zip_sha", "evidence")
 
 
 class Refused(Exception):
@@ -85,6 +107,64 @@ def protocol_of(meta):
     return None
 
 
+def runs_dir(runs, root=ROOT):
+    """The directory a runs NAME stands for. The caller has matched the name
+    against RUNS_NAME, so nothing here can leave `root`.
+
+    root/<runs> when that is a directory. Otherwise runs_<set> stands for
+    root/runs/<set> when THAT is one: train.py's terrain design writes to
+    runs/terrain_dt1 by default. A top-level directory always wins, and a name
+    that is neither comes back as root/<runs>, which is not a directory.
+    """
+    root = Path(root)
+    top = root / runs
+    if top.is_dir() or not runs.startswith("runs_") or len(runs) == len("runs_"):
+        return top
+    nested = root / "runs" / runs[len("runs_"):]
+    return nested if nested.is_dir() else top
+
+
+def experiment_dirs(root=ROOT):
+    """[(runs name, directory)] for every experiment under `root`, by name:
+    each top-level runs*/ matching RUNS_NAME, then each runs/<set>/ that holds
+    at least one agent directory and whose name no top-level directory took."""
+    root = Path(root)
+    found = {p.name: p for p in root.glob("runs*") if p.is_dir() and RUNS_NAME.fullmatch(p.name)}
+    sets = root / "runs"
+    for p in (sorted(sets.iterdir()) if sets.is_dir() else ()):
+        name = f"runs_{p.name}"
+        if (name in found or not p.is_dir() or not SET_NAME.fullmatch(p.name)
+                or AGENT_NAME.fullmatch(p.name)):
+            continue
+        if any(AGENT_NAME.fullmatch(c.name) and c.is_dir() for c in p.iterdir()):
+            found[name] = p
+    return sorted(found.items())
+
+
+def shown_path(runs, root=ROOT):
+    """The experiment's directory as a person would type it: runs_c4, or
+    runs/terrain_dt1 for a set one level down."""
+    return runs_dir(runs, root).relative_to(Path(root)).as_posix()
+
+
+def reconstructed_meta(d):
+    """meta_reconstructed.json of one agent directory, or None.
+
+    Only reconstruct_meta.py writes that file, and only after it has re-run
+    frozen episodes and found the committed scores exactly. It is a
+    fingerprint like meta.json plus a 'reconstructed' block: when it was
+    written, the sha of the final.zip it certifies, and the evidence. A file
+    without that block, or with a block missing one of RECONSTRUCTED_KEYS, is
+    no certificate at all.
+    """
+    meta = FP.read(str(Path(d) / RECONSTRUCTED))
+    block = (meta or {}).get("reconstructed")
+    if (not isinstance(block, dict) or any(k not in block for k in RECONSTRUCTED_KEYS)
+            or not isinstance(block["evidence"], dict)):
+        return None
+    return meta
+
+
 def read_agent(runs, name, root=ROOT):
     """One agent directory's status. KeyError if either name is malformed or
     the directory is not there: a missing directory is not an agent at all."""
@@ -92,19 +172,32 @@ def read_agent(runs, name, root=ROOT):
     if not RUNS_NAME.fullmatch(str(runs)) or m is None:
         raise KeyError(f"{runs}/{name}")
     arm, seed = m.group(1), int(m.group(2))
-    d = Path(root) / runs / name
+    d = runs_dir(runs, root) / name
     if not d.is_dir():
         raise KeyError(f"{runs}/{name}")
     out = {"runs": runs, "tag": name, "arm": arm, "seed": seed, "status": None,
            "reason": None, "problems": [], "protocol": None, "budget": None,
-           "budget_line": None, "zip_sha": None, "train_dt": None}
+           "budget_line": None, "zip_sha": None, "train_dt": None,
+           "train_road": None, "certificate": None, "reconstructed": None}
 
     if FP.running_pid(str(d)) is not None:
         return dict(out, status="training", reason="training now")
     meta = FP.read(str(d / "meta.json"))
-    if meta is None:
-        return dict(out, status="incompatible",
-                    reason="no meta.json: plant unknown (AUDIT2 C2-1)")
+    if meta is not None:
+        out["certificate"] = "training"
+    else:
+        # A genuine meta.json always wins; the reconstructed one is read only
+        # where there is none.
+        meta = reconstructed_meta(d)
+        if meta is None:
+            return dict(out, status="incompatible", reason=NO_META)
+        block = meta["reconstructed"]
+        out.update(certificate="reconstructed",
+                   reconstructed={"written": block["written"],
+                                  "reproduced_device": block.get("reproduced_device"),
+                                  "episodes": block["evidence"].get("episodes"),
+                                  "scores": block["evidence"].get("scores")})
+    out["train_road"] = meta.get("train_road")
     if not (d / "final.zip").is_file():
         return dict(out, status="incomplete", reason="no final.zip")
     # evaluate.py:369 decides the arm by "blind" in the path string that
@@ -129,6 +222,12 @@ def read_agent(runs, name, root=ROOT):
         # it ready with 'budget unreadable' and let SAC.load fail at build time.
         return dict(out, status="incomplete", reason=UNREADABLE_ZIP, protocol=protocol,
                     train_dt=meta.get("train_dt"))
+    if out["certificate"] == "reconstructed" and meta["reconstructed"]["zip_sha"] != budget["sha"]:
+        # The reconstruction re-ran ONE zip; any other in its place is uncertified.
+        return dict(out, status="incompatible", protocol=protocol,
+                    reason=f"{RECONSTRUCTED} certifies another final.zip",
+                    problems=[f"zip sha: certified {meta['reconstructed']['zip_sha']!r} "
+                              f"final.zip {budget['sha']!r}"])
     return dict(out, status="ready", protocol=protocol, budget=budget,
                 budget_line=FP.format_budget(budget), zip_sha=budget["sha"],
                 train_dt=meta.get("train_dt"))
@@ -184,12 +283,13 @@ def check_pair(runs, seed, root=ROOT):
             or isinstance(seed, bool) or seed < 0):
         raise KeyError(f"{runs}/{seed}")
     root = Path(root)
-    if not all((root / runs / f"{arm}_seed{seed}").is_dir() for arm in ARMS):
+    if not all((runs_dir(runs, root) / f"{arm}_seed{seed}").is_dir() for arm in ARMS):
         raise KeyError(f"{runs}/{seed}")
     agents = [dict(read_agent(runs, f"{arm}_seed{seed}", root), scored=None) for arm in ARMS]
     prefix = RPD.result_prefix(str(root / runs))
     pair = {"runs": runs, "seed": seed, "prefix": prefix,
-            "experiment": RPD.CLOSED_PREFIX.get(prefix) or f"{runs} (no name recorded)",
+            "experiment": (RPD.CLOSED_PREFIX.get(prefix)
+                           or f"{shown_path(runs, root)} (no name recorded)"),
             "protocol": None,
             "result_file": (root / "results" / f"{prefix}_seed{seed}.txt").is_file(),
             "agents": agents, "problems": []}
@@ -379,7 +479,8 @@ def verdict(prefix, root=ROOT):
 # ---- the catalog: every runs*/ experiment, every pair, for the picker --------
 # What the page may show of each agent. 'budget' (the whole dict) stays here.
 CATALOG_AGENT_KEYS = ("tag", "arm", "status", "reason", "problems", "budget_line",
-                      "train_dt", "zip_sha", "scored")
+                      "train_dt", "zip_sha", "scored", "train_road", "certificate",
+                      "reconstructed")
 
 
 def table_rows(prefix):
@@ -408,14 +509,16 @@ def _missing_agent(arm, seed):
     """The half of a pair whose directory is not there, as the catalog lists it."""
     return {"tag": f"{arm}_seed{seed}", "arm": arm, "status": "missing",
             "reason": "no such directory", "problems": [], "budget_line": None,
-            "train_dt": None, "zip_sha": None, "scored": None}
+            "train_dt": None, "zip_sha": None, "scored": None, "train_road": None,
+            "certificate": None, "reconstructed": None}
 
 
 def discover(root=ROOT):
     """Every experiment under `root` and every pair in it, for the picker.
 
     Lists root/runs*/ directories whose name matches RUNS_NAME, sorted by
-    name, so a future runs_X appears with no code change; inside each, only
+    name, so a future runs_X appears with no code change, and each runs/<set>/
+    that holds agents, as runs_<set> (experiment_dirs); inside each, only
     children that are directories matching AGENT_NAME (_logs, checkpoints and
     files are ignored). EVERY seed is listed: a pair that cannot run carries
     every one of its problems, both arms, and a seed with one arm missing
@@ -424,10 +527,8 @@ def discover(root=ROOT):
     """
     root = Path(root)
     out = []
-    for d in sorted((p for p in root.glob("runs*") if p.is_dir() and RUNS_NAME.fullmatch(p.name)),
-                    key=lambda p: p.name):
-        runs = d.name
-        prefix = RPD.result_prefix(str(d))
+    for runs, d in experiment_dirs(root):
+        prefix = RPD.result_prefix(str(root / runs))
         diffs = table_rows(prefix)["diffs"]
         seeds = set()
         for child in d.iterdir():
@@ -460,7 +561,8 @@ def discover(root=ROOT):
         protocols = {p["protocol"] for p in pairs if p["runnable"]}
         out.append({
             "runs": runs,
-            "name": RPD.CLOSED_PREFIX.get(prefix) or f"{runs} (no name recorded)",
+            "name": (RPD.CLOSED_PREFIX.get(prefix)
+                     or f"{shown_path(runs, root)} (no name recorded)"),
             "prefix": prefix,
             "protocol": protocols.pop() if len(protocols) == 1 else None,
             "verdict": verdict(prefix, root),
