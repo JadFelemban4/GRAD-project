@@ -54,6 +54,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import mimetypes
 import os
 import sys
 import threading
@@ -84,6 +85,12 @@ LIMITS = {
     "valid_map_kpa": [VALID_MAP_LO, VALID_MAP_HI],
     "mismatch_pct": MISMATCH_PCT,
 }
+# StaticFiles takes a file's type from `mimetypes`, which on Windows reads the
+# registry, and a registry that maps .mjs to text/plain (Ghassan's laptop,
+# 30 September 2026) served every page script as text. A browser refuses a
+# module script that is not JavaScript, so /simulation and /agents rendered
+# empty while every route returned 200. Pinned here, before the mount.
+mimetypes.add_type('text/javascript', '.mjs')
 app = FastAPI(title="Engine Supervisor — live")
 app.mount('/static', StaticFiles(directory=os.path.join(HERE, 'static')), name='static')
 # Set here as well as in main() so that /api/review still works if this module
