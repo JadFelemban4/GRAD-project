@@ -1,5 +1,13 @@
 # presentation/ — the team briefing site
 
+> **28 September 2026: for current results use `results/page/index.html` (built by `make_page.py`) and `results/figures/`, not this folder.** It is out of date as described below and needs a rewrite, not a regeneration.
+>
+> **Later on 28 September** the simulator's constants were derived from the car's
+> logs and every premise figure moved again. `index.html` now shows an
+> out-of-date banner at the top of the page, and its first line declares it a
+> dated record, which `verify_docs.py` skips and **reports as skipped** on every
+> run. Rewrite it from `results/` before showing it to anyone.
+
 An interactive, bilingual explainer of this project, written for the five of us rather
 than for an examiner. It starts at "what is a piston" and ends at the sentence we have
 to defend in the viva.
@@ -69,8 +77,9 @@ or `logs/raw/`.
 > used to make as evidence is an identity that could not have failed.
 >
 > **The constraint now binds.** On the locked scenario — 12 % at 130 km/h,
-> 42 °C — `check_premise.py` prints a baseline of **959.8** damage units peaking
-> at **884 °C** against the 850 °C trigger. Against the honest comparator, the
+> 42 °C — `check_premise.py` prints a baseline of **920.1** damage units peaking
+> <!-- RETIRED-OK: 959.8, 884 -- the sep17 plant's figure, named beside the merged one -->
+> at **883 °C** on the merged plant (959.8 at 884 °C on sep17's, before 30 September) against the 850 °C trigger. Against the honest comparator, the
 > policy that acts on the grade the car is on now, hand-written preview
 > **loses by 0.4 points**. And the project's result is not from this script at
 > all: it is Phase D (`python analyse_phase_d.py`), a **null** — with agents
@@ -143,13 +152,14 @@ If the app is added to the briefing later, two things have to come with it:
    heat capacity is an ASSUMED number (REFERENCES.md section 4) and the vehicle
    publishes no channel to check it against. A screenshot without that caption
    is the most misleading artefact this project could produce.
-2. **Its alert counts are not measurements.** 15 thermal / 0 mismatch / 19 novel
+2. **Its alert counts are not measurements.** 14 thermal / 0 mismatch / 19 novel
    on `7475b5d7` is a property of thresholds we chose, pinned so a regression is
    visible. A slide that presents them as findings about the car is wrong.
 
 <!-- RETIRED-OK: 168.1 -->
-The dataset behind this page also moved: **ten drives, 295.0 minutes**, up from
-eight and 168.1 before `pull01` and the Taif drive `drive10` arrived. (The
+The dataset behind this page also moved: **eleven drives, 321.7 minutes** since
+<!-- RETIRED-OK: 295.0, 10 -- the manifest before drive B -->
+drive B (28 September), up from ten and 295.0 before it and eight and 168.1 before `pull01` and the Taif drive `drive10` arrived. (The
 superseded pair is named on purpose, so anyone holding an older caption can
 recognise it.) `pull01` contributes zero samples and zero operating points by
 design; `drive10` took the operating points to 26 over 30–75 kPa. Any caption

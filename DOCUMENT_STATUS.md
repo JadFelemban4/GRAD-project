@@ -36,18 +36,31 @@ to the supervisor without knowing what is stale.
 | `Novelty_Statement.pdf` | Claim 1 says 62 % vs 32 % damage reduction (void — the four-cylinder; now **47.2 % vs 33.8 %** at the 1123 K trigger); Claim 2 says the sweep moved the advantage 7.6 → 49.9 points (void — now **16.5 → 26.0 points** over H/τ 4.47 → 0.60 at the fixed 1123 K limit) |
 
 Checked and **clean**: `Roles_And_Lessons.pdf`, `Team_Working_Model.pdf`,
-`Roadmap_Two_Plants.pdf`, `Logging_Channel_Reference.pdf`,
+`Logging_Channel_Reference.pdf`,
 `Preview_Worth_Proposal.pdf` and its team variant, `Project_Proposal_5.pptx`,
 `موجز_المشروع_للفريق.pdf`.
+
+**`Roadmap_Two_Plants.pdf` was listed as clean here until 28 September 2026, and
+it is not.** Its orientation section gives, as *"the evidence that justified the
+change"* to the H/τ claim, that sweeping the turbine time constant moved the
+preview advantage *"from 7.6 points to 49.9 points -- a 7× swing driven purely
+by a dimensionless ratio"*. That is the same void sweep `Novelty_Statement.pdf`
+is flagged for above (four-cylinder era, cooling-disabled baseline, AUDIT.md
+C1). `Project_Vocabulary.pdf` quotes 49.9 once as well. Found by extracting the
+PDFs' text (`pdftotext`) and searching for every void figure, not only the
+premise triplet. **The central claim currently has no surviving quantitative
+support from any sweep** -- Phase F has not been re-run on the corrected
+simulator -- and no document shown to the supervisor should imply otherwise.
 
 **`Novelty_Statement.pdf` moved out of that list on 13 September 2026.** The
 8 September pass searched for the premise triplet and the engine displacement,
 and neither of its two void figures is one of those. It was never re-checked
 against the rest of the void list.
 
-**`verify_docs.py` cannot see any of this.** It globs `*.md` and `*.py` only,
-and `DOC/` is untracked, so every figure in these PDFs is outside the checker's
-reach. All 33 checks pass with 62 % / 32 % / 7.6 / 49.9 still shipping in
+**`verify_docs.py` cannot see any of this.** It scans `.md`, `.py` and
+`presentation/index.html` only, so every figure in these PDFs is outside the
+checker's reach. (This sentence said `DOC/` was untracked until 28 September;
+it is tracked -- six files -- but tracked is not the same as checked.) All 33 checks pass with 62 % / 32 % / 7.6 / 49.9 still shipping in
 `DOC/Novelty_Statement.pdf`. A green run says nothing about a PDF.
 
 ---
@@ -102,3 +115,22 @@ are worth recording anyway, because both will otherwise be discovered late:
 
 `verify_docs.py` scans the repository's markdown and Python, **not the PDFs**.
 That gap is the entire reason this file exists, and the app does not narrow it.
+
+---
+
+## Added 28 September 2026 — the premise figures moved again
+
+No team PDF has been regenerated since 16 September, so every premise figure in
+them is older than anything below. The current figures come from
+`check_premise.py` on the corrected simulator (the gearbox kickdown and the
+spark-offset refit of 27 September):
+
+| what a PDF may say | what is true now |
+|---|---|
+| premise 829.2 / 548.6 / 437.6, or 256.5 at 801 °C | **951.9 / 671.1 / 624.5 / 628.4** on the locked 12 % / 130 km/h climb, baseline peak 884 °C |
+| "preview is worth 13.4 points" | preview is **−0.4** against current-grade on hand-written policies — and that −0.4 is entirely the untested knock term |
+| any trained-agent figure | none is a Phase D result yet; the retrain has not been run |
+| "the knock model is refuted" | untested: the only comparison rested on one reading per ~8 s |
+
+The phone page (`results/page/index.html`) and `results/figures/` are generated
+from the scripts and are current; prefer them to any PDF when showing results.

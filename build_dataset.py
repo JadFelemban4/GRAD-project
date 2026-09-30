@@ -86,10 +86,14 @@ CH = {
     "oil_filt": "Oil temperature after filter",
     "bst_tgt":  "Boost pressure setpoint",
     "trq_whl":  "Coordinated target torque on the wheel",
+    # Drive B (28 Sep) logged the throttle TARGET, not the actual angle. It is
+    # a different quantity and is kept in its own column; both say "wide open"
+    # the same way, which is what the boost ceiling needs.
+    "tps_tgt":  "Target Value for Throttle Valve Angle, Based on (Lower) Stop",
 }
 
 # WINDOW_S = 60 s, and the choice is now justified by the drives rather than
-# assumed. Re-measured 11 September on the shipped ten drives, 295.0 minutes,
+# assumed. Re-measured 11 September on the drives shipped then,
 # six of which carry usable samples, against the DRIVE_1 card, which asked for
 # three-minute holds. Count the windows this function returns with WINDOW_S set
 # each way:
@@ -127,19 +131,27 @@ LOAD_PTP_FRAC = 0.25   # AUDIT.md M3: peak-to-peak spread of the LOAD channel
 SPAN_TOL, MAX_HOLE_X = 0.20, 4.0
 DEDUPE_RPM, DEDUPE_LOAD = 100.0, 5.0
 
+# Ambient for a drive that logged no ambient channel -- see derive(). From our
+# own logs: the median over the two other early-afternoon drives, 41.5 and 42.0 C.
+AMB_FALLBACK_C = 42.0
+
 
 def read_drive(path):
     with open(path, newline="", encoding="utf-8-sig") as f:
         rdr = csv.reader(f)
         header = [h.strip() for h in next(rdr)]
         rows = list(rdr)
-    idx = {h: i for i, h in enumerate(header)}
-    if "Time" not in idx:
+    # CASE-INSENSITIVE, 28 September 2026. BimmerLink's export changed its
+    # capitalisation: drive B writes "Engine Speed", "Air Mass Flow", "Coolant
+    # Temperature" where every earlier drive writes "Engine speed". Matched
+    # exactly, that whole drive read as NaN and contributed nothing, silently.
+    idx = {h.lower(): i for i, h in enumerate(header)}
+    if "time" not in idx:
         return None
     n = len(rows)
 
     def col(name):
-        i = idx.get(name)
+        i = idx.get(name.lower())
         out = np.full(n, np.nan)
         if i is None:
             return out
@@ -152,10 +164,23 @@ def read_drive(path):
         return out
 
     d = {k: col(v) for k, v in CH.items()}
+    # PLACEHOLDER ZEROS (AUDIT.md M8, fixed in app/reader.py on 16 Sep and only
+    # now here). BimmerLink writes 0 into a channel until the car first answers
+    # for it. For a temperature, a pressure or lambda an exact 0 at the START of
+    # the log is that blank, not a reading: drive10's first two ambient rows
+    # read 0 C, and were the "coldest ambient ever logged" until 28 September.
+    # Only the LEADING run is masked -- a later exact zero is left for the
+    # physical checks downstream to judge.
+    for k in ("t_amb", "iat_pre", "iat_amb", "ect", "rad_out", "oil", "oil_filt",
+              "p_amb", "lam"):
+        v = d[k]
+        nz = np.flatnonzero(np.isfinite(v) & (v != 0.0))
+        lead = nz[0] if len(nz) else len(v)
+        v[:lead] = np.where(v[:lead] == 0.0, np.nan, v[:lead])
     d["t"] = col("Time")
     d["_file"] = os.path.basename(path)
     d["_n"] = n
-    d["_present"] = {k: (CH[k] in idx) for k in CH}
+    d["_present"] = {k: (CH[k].lower() in idx) for k in CH}
     return d
 
 
@@ -179,7 +204,24 @@ def derive(d):
     # was corrected rather than kept; the boosted figure was likewise +22.6 %
     # and is +23.7 %. See plant.charge_temperature() for the evidence and the
     # limit.
-    t_amb_k = np.where(np.isfinite(d["t_amb"]), d["t_amb"], 25.0) + 273.15
+    #
+    # A DRIVE THAT NEVER LOGGED AMBIENT TEMPERATURE (28 September 2026). Drive B
+    # carries seven channels and ambient is not one of them -- logs/DRIVE_PLAN.md
+    # left it off that drive's list. Its rows used to fall through to a flat
+    # 25 C here without a word. That is now AMB_FALLBACK_C, taken from our own
+    # logs rather than chosen: the median ambient on the two other drives logged
+    # in the early afternoon (670063b2 at 14:20, 41.5 C; 7475b5d7 at 14:27,
+    # 42.0 C), drive B having been logged at 14:05. Every such row carries
+    # `t_amb_assumed = 1` and keeps t_amb = NaN, so nothing can mistake it for a
+    # reading -- and the charge-temperature check (verify_docs.py,
+    # model_vs_data.boost_gap) excludes those rows, because scoring the charge
+    # temperature model on an assumed ambient would be circular. The effect of
+    # the assumption is bracketed over the whole logged range, 19-45 C, in
+    # fit_envelope.py.
+    no_amb_channel = not d["_present"]["t_amb"]
+    fallback = AMB_FALLBACK_C if no_amb_channel else 25.0
+    d["t_amb_assumed"] = np.full(len(d["t"]), 1 if no_amb_channel else 0)
+    t_amb_k = np.where(np.isfinite(d["t_amb"]), d["t_amb"], fallback) + 273.15
     t_blk_k = np.where(np.isfinite(d["ect"]), d["ect"], 90.0) + 273.15
     iat_k = charge_temperature(t_amb_k, t_blk_k)
     d["t_charge_k"] = iat_k
@@ -193,7 +235,10 @@ def derive(d):
 
     # compressor inlet is AMBIENT. (`iat_pre` is the compressor OUTLET.)
     t01 = d["iat_amb"].copy()
-    t01 = np.where(np.isfinite(t01), t01, d["t_amb"]) + 273.15
+    t01 = np.where(np.isfinite(t01), t01, d["t_amb"])
+    if no_amb_channel and not d["_present"]["iat_amb"]:
+        t01 = np.where(np.isfinite(t01), t01, AMB_FALLBACK_C)
+    t01 = t01 + 273.15
     # AUDIT.md L9: the 0.98 is a 2 % INLET DEPRESSION -- the pressure drop
     # across the air filter and inlet tract before the compressor. It is an
     # assumption, not a measurement, and it sits silently inside every
@@ -206,8 +251,8 @@ def derive(d):
     d["press_ratio"] = ((d["p_amb"] + d["boost"]) * PSI_TO_KPA) / p01
 
     # THE MAF CHANNEL SATURATES. "Air mass flow" tops out at exactly 1020.0 kg/h
-    # on six separate drives -- 3aca2ec1, 670063b2, 683640a0, cb67b01f and
-    # 7475b5d7 -- 547 samples in all. That is a sensor range limit, not a coincidence: the same
+    # on seven separate drives -- 3aca2ec1, 670063b2, 683640a0, cb67b01f,
+    # 7475b5d7, drive10 and drive B -- 568 samples in all. That is a sensor range limit, not a coincidence: the same
     # samples show "Air mass flow participating in combustion" reaching 1233 kg/h.
     #
     # A pinned sample reports less air than the engine is actually breathing, so
@@ -229,8 +274,9 @@ def derive(d):
     # AUDIT.md M4: this flag does NOT mean what its name and docstring say, and
     # the reason is the forward fill. np.gradient over a staircase is zero
     # everywhere except the two rows beside each genuine update, so the flag
-    # rejects only those: 93.9 % of warm rows come out "quasi-steady"
-    # (74 013 of 46 707; 2 337 rejected). "74 013 quasi-steady samples" is
+    # rejects only those: 93.9 % of warm rows came out "quasi-steady" when this
+    # was measured (16 Sep), and 89 % do now (83 272 of 93 576 warm rows,
+    # 28 Sep). "83 272 quasi-steady samples" is
     # therefore a count of ROWS that are not adjacent to an update -- which is
     # nearly the opposite of what a steadiness filter is for.
     #
@@ -245,7 +291,7 @@ def derive(d):
     # is NOT what makes this flag unselective. The thresholds are: 40 g/s per
     # second of air and 0.6 bar per second of boost admit nearly everything a
     # road drive does. Neither flag is a steadiness filter in any useful sense,
-    # and "74 013 quasi-steady samples" should be read as "warm rows that are
+    # and "83 272 quasi-steady samples" should be read as "warm rows that are
     # not mid-transient", which is a much weaker claim.
     dt = np.gradient(d["t"])
     with np.errstate(invalid="ignore", divide="ignore"):
@@ -424,7 +470,8 @@ def fresh_readings(df, col, source_col="source"):
         whole warm set                        46707
           fresh lambda readings                1288      36.3x
 
-        "547 samples pinned at the MAF ceiling" is 14 separate EXCURSIONS.
+        The rows pinned at the MAF ceiling were, on that day, 14 separate
+        EXCURSIONS.
 
     So a correlation quoted to two decimals on "1055 samples" actually rests on
     of order 70 independent readings, where the standard error is about
@@ -516,6 +563,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("csvs", nargs="+")
     ap.add_argument("--out", default="data")
+    ap.add_argument("--no-derive", action="store_true",
+                    help="skip derive_params.py after writing data/")
     ap.add_argument("--sample-every", type=int, default=1,
                     help="keep every Nth sample in master_samples.csv")
     a = ap.parse_args()
@@ -573,7 +622,8 @@ def main():
                 "load_pct": d["load_pct"][i], "air_gps": round(float(d["air_gps"][i]), 2),
                 "lam": d["lam"][i], "spark": d["spark"][i],
                 "iat_pre_c": d["iat_pre"][i], "ect_c": d["ect"][i], "oil_c": d["oil"][i],
-                "rad_out_c": d["rad_out"][i], "tps": d["tps"][i], "gear": d["gear"][i],
+                "rad_out_c": d["rad_out"][i], "tps": d["tps"][i], "tps_tgt": d["tps_tgt"][i],
+                "gear": d["gear"][i],
                 "wastegate": d["wg"][i],
                 "spark_tgt": d["spk_tgt"][i], "oil_filt_c": d["oil_filt"][i],
                 "boost_tgt": d["bst_tgt"][i], "trq_wheel": d["trq_whl"][i],
@@ -582,6 +632,7 @@ def main():
                 "stable": int(bool(d["stable"][i])),
                 "stable_rate": int(bool(d["stable_rate"][i])),   # AUDIT.md M4
                 "maf_pinned": int(bool(d["maf_pinned"][i])),
+                "t_amb_assumed": int(d["t_amb_assumed"][i]),     # 28 Sep, drive B
             })
 
     # Sanity floor. A "steady point" at 15 kPa or 600 rpm is an idle or overrun
@@ -600,6 +651,19 @@ def main():
     # air (this vehicle logs 16.0). Those windows are real vehicle behaviour and
     # they stay in master_samples, but they are not operating points a
     # combustion model can be scored against, so they leave master_points.
+    #
+    # A window from a drive that never LOGGED spark or lambda is dropped too --
+    # the combustion model needs both as inputs -- but it is counted separately.
+    # Until 28 September it was reported as "fuel cut", because a missing
+    # channel reads NaN and NaN > 0 is False: drive B (seven channels, no spark,
+    # no lambda) would have been described as a drive full of overrun.
+    before = len(all_points)
+    no_channel = [p for p in all_points
+                  if not (np.isfinite(p.get("spark", np.nan)) and np.isfinite(p.get("lam", np.nan)))]
+    all_points = [p for p in all_points if p not in no_channel]
+    if no_channel:
+        print(f"  dropped {len(no_channel)} window(s) from drives that did not log spark "
+              f"and lambda -- the combustion model needs both")
     before = len(all_points)
     all_points = [p for p in all_points
                   if float(p.get("spark", 0.0)) > 0.0
@@ -657,6 +721,17 @@ def main():
                   ", ".join(f"{a_:.2f}-{b:.2f}" for a_, b in gap))
         else:
             print("compressor operating line: every flow bin populated")
+
+    # THE CONSTANTS THE DATA SETS ARE RE-DERIVED FROM THE DATA JUST WRITTEN
+    # (28 September 2026; derive_params.py, derived.py). Only when writing the
+    # real data/ -- a scratch --out is a comparison, not a new dataset.
+    if os.path.abspath(a.out) == os.path.abspath(os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), "data")) and not a.no_derive:
+        print()
+        print("re-deriving every constant the data sets (derive_params.py) ...")
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                     "derive_params.py")], check=True)
 
 
 if __name__ == "__main__":

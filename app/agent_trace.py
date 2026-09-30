@@ -22,7 +22,7 @@ import numpy as np
 
 import random_road as RR
 from app.replay import finite
-from engine_env import PREVIEW_S, SupervisoryTunerEnv, make_grade_climb
+from engine_env import PREVIEW_S, SupervisoryTunerEnv, damage_rate, make_grade_climb
 from evaluate import DT, DURATION, EPISODES, EPISODES_D2
 
 # An episode is 719 steps, not 720: engine_env.py truncates at k >= n - 1.
@@ -180,7 +180,7 @@ def run_lanes(lanes, ep, on_frame=None):
         env.w = np.asarray(ep["weights"], dtype=np.float32)   # override the fresh draw
         obs = env._obs()
         state.append({"policy": policy, "env": env, "obs": obs, "ret": 0.0,
-                      "peak": 0.0, "info": None, "done": False})
+                      "peak": 0.0, "thermal": 0.0, "info": None, "done": False})
     k = 0
     while not all(s["done"] for s in state):
         cars, seen = [], []
@@ -194,6 +194,7 @@ def run_lanes(lanes, ep, on_frame=None):
             obs, r, term, trunc, info = env.step(a)
             s["ret"] += r
             s["peak"] = max(s["peak"], info["t_turb"])
+            s["thermal"] += damage_rate(info["t_turb"], info["t_oil"]) * env.dt   # as evaluate.run_episode
             s["obs"], s["info"], s["done"] = obs, info, bool(term or trunc)
             cars.append(_car(env, a, obs_in, info))
             seen.append(np.array(obs_in, dtype=np.float32, copy=True))
@@ -203,7 +204,7 @@ def run_lanes(lanes, ep, on_frame=None):
     out = []
     for s in state:
         e = s["info"]["episode_summary"]
-        out.append(dict(ret=s["ret"], damage=e["damage"], fuel=e["fuel"],
+        out.append(dict(ret=s["ret"], damage=e["damage"], damage_thermal=s["thermal"], fuel=e["fuel"],
                         torque_viol=e["torque_viol"], peak_turb=s["peak"] - 273.15,
                         knock=e["knock_events"]))
     return out

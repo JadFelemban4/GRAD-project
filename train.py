@@ -1,145 +1,60 @@
-"""train.py — Phase C, steps C1 and C4.
+"""train.py -- Phase C: every training design this project has run, in one file.
 
 Trains a SAC agent on the engine environment and saves everything Phase D needs.
 
     pip install "stable-baselines3[extra]"      # once; also uncomment it in requirements.txt
 
-    python train.py --steps 50000  --seed 0                # C1: the first bad run
-    python train.py --steps 50000 --seed 0 --road random   # PHASE D2: a new climb
-                                                           # every episode; writes
-                                                           # to runs_d2/, never runs/
+A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Three designs exist:
 
-    python train.py --steps 300000 --seed 0 --road random --out runs_c4
-                                                           # C4: a real run, D2's
-                                                           # design, its OWN directory
-    python train.py ... --no-preview                       # the blinded arm of any of them
+    --road terrain   dt 1.0   a new road every episode (engine_env.TerrainTrainingEnv),
+                              scored by evaluate.py on the locked climb. The design
+                              of the 29 September retrain. DEFAULT -> runs/terrain_dt1/
+    --road fixed     dt 0.2   Phase D's one locked climb, 12 % from 180 s.
+                              CLOSED: runs/ takes no new work -- give it --out
+    --road random    dt 0.2   Phase D2 and C4: a new climb every episode, start
+                              120-300 s, grade 12-16 %. CLOSED: runs_d2/, runs_c4/
+
+    python train.py --steps 50000 --seed 0                      # terrain, dt 1.0
+    python train.py --steps 50000 --seed 0 --no-preview         # its blinded arm
+    python train.py --steps 50000 --seed 0 --fixed-road         # locked climb at dt 1.0
+    python train.py --steps 50000  --seed 0 --road fixed  --out runs_x
+                                              # C1: the first bad run (11 episodes at dt 0.2)
+    python train.py --steps 300000 --seed 0 --road random --out runs_c5
+                                              # C4's design, in a NEW directory
+    python train.py ... --no-preview          # the blinded arm of any of them
 
 A NEW BUDGET NEEDS ITS OWN --out. `--steps 300000` into runs/ or runs_d2/ is
 refused: those hold the Phase D and D2 agents, and continuing one of them is not
 a C4 run. See "A RESUME IS NOT A LONGER RUN" below.
 
-PHASE D2 -- `--road random`
----------------------------
-Phase D's road never changed, so its blinded arm could learn when the hill
-comes from a thermal clock (`results/PREREGISTRATION.md` limit 7). With
-`--road random` every episode draws its own climb -- start uniform on
-[120, 300] s, grade uniform on [12, 16] % -- through `random_road.RandomClimb`,
-seeded from `--seed`. The environment itself is untouched, which is why the
-sixteen Phase D agents still pass their fingerprint check; the D2 fingerprint
-differs from Phase D's in `scenario` and `episodes_sha`, so neither experiment's
-agent can be scored under the other's protocol. The rules are
-`results/PREREGISTRATION_D2.md`, committed before the first D2 run.
-
-HOW LONG THIS TAKES — read before you start
---------------------------------------------
-MEASURED 17 September 2026, by timing 2000 SAC steps with gradient updates
-already running (200 warm-up steps first, past learning_starts):
-
-      OMP_NUM_THREADS=1   19.19 steps/s   ->  50k steps = 0.72 h
-      OMP_NUM_THREADS=6   18.14 steps/s   ->  50k steps = 0.77 h
-
-      50,000 steps   ~45 minutes
-     300,000 steps   ~4.5 hours
-
-TWO THINGS THAT SURPRISED US, AND BOTH CORRECT THIS FILE'S OWN OLD ADVICE.
-
-**Thread count does not matter.** One thread is marginally FASTER than six --
-the policy network is tiny, so threading overhead exceeds the gain. Any
-"on one CPU core" qualifier attached to these figures is meaningless.
-
-**SAC's gradient updates are nearly free.** The environment alone runs at
-19.5 steps/s and the full training loop at 19.2, so the updates cost about 2 %.
-The docstring used to say they "bring the training loop down to 3.0 steps/s" --
-a 6.4x error that made Phase D look like a week of overnights. Each env step
-runs six engine cycles at ~9 ms; a gradient step on this network is ~1 ms. The
-combustion model dominates completely and nothing else is close.
-
-Caveat on the measurement: 2000 steps, no episode boundary crossed (an episode
-is 4500 steps at dt = 0.2). Re-time it if you change `plant.DTHETA_DEG`, which
-is what actually sets the cost -- halving it roughly doubles the run.
-
-*(A paragraph here planned Phase D as five seeds per arm, one per team member.
-It ran as eight seeds per arm on one machine, through `run_phase_d.py`, which
-is how every experiment since has been launched.)*
-
-Checkpoints are written every 10,000 steps. Re-running the same command
-RESUMES from the latest one -- for a C1-style run. A run started with
-`--no-resume` (every new experiment, including C4, whose preregistration
-forbids resuming) refuses instead, and its crash is re-run from scratch with
-`run_phase_d.py --seeds <k> --restart-crashed`. See "A RESUME IS NOT A LONGER
-RUN" below for why a resume is not the same agent.
-
-WHAT `runs/<tag>/meta.json` IS, AND WHY IT IS NOT OPTIONAL   (AUDIT2.md C2-1)
-----------------------------------------------------------------------------
-Every run now writes a fingerprint of the plant it is training against before
-the first step: the SHA of plant.py + thermal.py + engine_env.py, the eight gear
-ratios, the final drive, the crank-angle step, the protection trigger, the
-scenario tuple and a hash of the twenty frozen evaluation episodes. See
-`fingerprint.py` for what each field means and which ones are fatal.
-
-RETIRED-OK: 11.7 -- naming the void figure IS the reason this mechanism exists
-This is not bookkeeping. On 18 September two agents were trained here, scored at
-+11.7 points, and written up as the project's result. Seven hours later the
-gearbox under them was replaced and nothing in `runs/` recorded which gearbox
-had produced them. The same pair scores +7.5 on the corrected plant, and the
-+11.7 cannot be regenerated from this tree at all. `evaluate.py` now refuses a
-model whose fingerprint disagrees with the live one, and the only way it can do
-that is if this file wrote one down.
-
-TWO RESUME DEFECTS FIXED AT THE SAME TIME   (AUDIT2.md H2-3)
--------------------------------------------
-`curve.csv` is the only record of how a run learned, and the resume path used to
-**overwrite** it with whatever the current process had in its Monitor -- so a
-re-run of a finished agent blanked a twelve-episode curve down to its header,
-and a mid-run resume kept only the post-resume episodes. It appends now.
-
-And a re-run with nothing left to do used to call `learn(0)` and then re-save
-`final.zip`, rewriting the only copy of a trained agent for no reason. It now
-stops before either.
-
-A RESUME IS NOT A LONGER RUN   (23 September 2026, found preparing C4)
----------------------------------------------------------------------
-Re-running the same seed resumes from its last checkpoint -- and until this
-date it did so whatever `--steps` said, because `steps_requested` is an
-ADVISORY field. So `python train.py --steps 300000 --road random` (C4's
-budget, with the default `--out`) would have found a Phase D2 agent in
-`runs_d2/`, resumed it from 50 000 steps, and overwritten its `final.zip`; the
-same call without `--road random` would have done it to a Phase D agent in
-`runs/`. Those two directories are gitignored: the agents exist nowhere else.
-
-And the result would not even have been a C4 agent:
-
-  * the checkpoints hold no replay buffer, so the resumed run starts with an
-    EMPTY one -- and `SAC.load` restores the OLD size, 50 000 slots, which a
-    300 000-step run then fills and evicts from;
-  * the road stream restarts from its seed, so the agent re-drives the same
-    roads it has already seen, in the same order;
-  * `meta.json` is never rewritten on a resume, so the agent would carry a
-    50 000-step certificate for a 300 000-step model.
-
-A resume whose `--steps` differs from the run's own is now REFUSED. A new
-budget goes into a fresh `--out` directory. Continuing a run to a larger
-budget on purpose is `--extend`, which records the extension in `meta.json`
-before the first new step. `fingerprint.model_budget()` reads what a zip was
-actually trained for, from the zip, which is how `analyse_c4.py` tells a C4
-agent from a resumed D2 one.
+(train_all.py and run_phase_d.py are the two launchers. Neither should lean on
+the defaults above: a default that selects an experiment is the trap AUDIT2.md
+Part 3 is about. Both pass --road and --dt explicitly.)
 """
 import argparse
+import csv
 import glob
+import hashlib
+import json
+import platform
 import re
 import os
+import subprocess
 import time
+from datetime import datetime
 
 import numpy as np
 
 import fingerprint as FP
 import random_road as RR
-from engine_env import SupervisoryTunerEnv, make_grade_climb
+from engine_env import SupervisoryTunerEnv, TerrainTrainingEnv, make_grade_climb
 
 try:
+    import gymnasium as gym
     from stable_baselines3 import SAC
     from stable_baselines3.common.monitor import Monitor
-    from stable_baselines3.common.callbacks import CheckpointCallback
+    from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
+    from stable_baselines3.common.utils import get_device
 except ImportError:
     raise SystemExit(
         "stable-baselines3 is not installed.\n\n"
@@ -148,11 +63,16 @@ except ImportError:
         "so the rest of the team installs the same thing."
     )
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 # Experiments whose preregistrations say "sixteen runs, then stop". Nothing new
 # is trained into their directories -- see "CLOSED EXPERIMENTS" in main().
 CLOSED = {"runs": "Phase D", "runs_d2": "Phase D2",
           "runs_c4": "C4"}           # closed 24 Sep 2026, after its result
+
+# Each road's own step. fixed and random are the designs Phase D, D2 and C4 ran
+# at 0.2 s; terrain is the 27 September design at evaluate.py's 1.0 s.
+DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0}
 
 
 def buffer_size(a):
@@ -167,18 +87,189 @@ def buffer_size(a):
     return int(min(1_000_000, max(10_000, a.steps)))
 
 
-def build_env(use_preview, seed, duration, road="fixed"):
-    """The training environment. `road="random"` is Phase D2.
+class _RoadLog(gym.Wrapper):
+    """Keeps the D2 road each episode drew, for curve.csv. It only reads."""
 
-    The random-road wrapper sits INSIDE Monitor, so Monitor's episode returns
-    are the returns of the drawn roads, and `env.unwrapped` still reaches the
-    SupervisoryTunerEnv for `dt` and the fingerprint.
+    def __init__(self, env):
+        super().__init__(env)
+        self.road_log = []
+
+    def reset(self, **kw):
+        obs, info = self.env.reset(**kw)
+        r = info.get("road") or {}
+        self.road_log.append(f"climb {r.get('start_s', float('nan')):.0f}s "
+                             f"{100 * r.get('grade', float('nan')):.2f}%")
+        return obs, info
+
+
+def build_env(use_preview, seed, duration, road="terrain", dt=1.0):
+    """The training environment. dt is passed EXPLICITLY, to the cycle and the env.
+
+    terrain  TerrainTrainingEnv: a new road every episode.
+    fixed    make_grade_climb, Phase D's road.
+    random   the same, rebuilt at every reset by random_road.RandomClimb (D2).
+
+    The wrappers sit INSIDE Monitor, so Monitor's episode returns are the
+    returns of the drawn roads, and `env.unwrapped` still reaches the
+    SupervisoryTunerEnv for `dt` and the fingerprint. At dt 0.2 the fixed and
+    random builds are the objects Phase D and D2 trained on.
     """
-    env = SupervisoryTunerEnv(make_grade_climb(duration=duration),
-                              use_preview=use_preview, seed=seed)
-    if road == "random":
-        env = RR.RandomClimb(env, seed=seed, duration=duration)
+    if road == "terrain":
+        env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
+    else:
+        env = SupervisoryTunerEnv(make_grade_climb(duration=duration, dt=dt), dt=dt,
+                                  use_preview=use_preview, seed=seed)
+        if road == "random":
+            env = _RoadLog(RR.RandomClimb(env, seed=seed, duration=duration))
     return Monitor(env)
+
+
+def _road_log(env):
+    try:
+        return list(env.get_wrapper_attr("road_log"))
+    except AttributeError:
+        return []
+
+
+def derived_sha():
+    """A hash of data/derived_params.json's values: since 28 September the
+    plant's thermal, boost, spark, enrichment and gearbox constants live there,
+    not in the three files fingerprint.py hashes."""
+    p = os.path.join(HERE, "data", "derived_params.json")
+    try:
+        with open(p, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    vals = {k: v for k, v in d.items() if not k.startswith("_")}
+    return hashlib.sha256(json.dumps(vals, sort_keys=True).encode()).hexdigest()[:16]
+
+
+# What the engine did on each training step, read off the step's info dict.
+REC_INFO = ("t_turb", "t_oil", "t_block", "torque_req", "torque", "mdot_fuel", "ki",
+            "spark", "lam", "egt_c", "r_fuel", "r_life", "r_resp")
+REC_F32 = ("r_fuel", "r_life", "r_resp")
+CHUNK = 10_000          # the checkpoint interval; a chunk is written with each one
+
+
+class ActionRecorder(BaseCallback):
+    """Every action the agent takes while it learns, and what it cost.
+
+    Per step: the timestep, the episode, the ACTION (the network's output in
+    [-1, 1], exactly what went to env.step), the OBSERVATION it was chosen from,
+    the reward, and the engine quantities in REC_INFO. It only reads: an agent
+    trained with it is the agent trained without it (30 Sep 2026, 600 steps, on
+    CUDA and on CPU: largest weight difference 0.0).
+    """
+
+    def __init__(self, outdir):
+        super().__init__()
+        self.dir = os.path.join(outdir, "record")
+        os.makedirs(self.dir, exist_ok=True)
+        self._clear()
+
+    def _clear(self):
+        self.buf = {k: [] for k in ("step", "episode", "action", "obs", "reward") + REC_INFO}
+
+    def _on_training_start(self):
+        prev = [np.load(f)["episode"] for f in glob.glob(os.path.join(self.dir, "rec_*.npz"))]
+        prev = [p for p in prev if len(p)]
+        self.episode = int(max(p.max() for p in prev)) + 1 if prev else 0
+
+    def _on_step(self):
+        b = self.buf
+        b["step"].append(self.num_timesteps)
+        b["episode"].append(self.episode)
+        b["action"].append(np.asarray(self.locals["actions"][0], np.float32))
+        b["obs"].append(np.asarray(self.model._last_obs[0], np.float32))
+        b["reward"].append(float(self.locals["rewards"][0]))
+        info = self.locals["infos"][0]
+        for k in REC_INFO:
+            b[k].append(float(info.get(k, np.nan)))
+        if self.locals["dones"][0]:
+            self.episode += 1
+        if self.num_timesteps % CHUNK == 0:
+            self._flush()
+        return True
+
+    def _on_training_end(self):
+        self._flush()
+
+    def _flush(self):
+        b = self.buf
+        if not b["step"]:
+            return
+        path = os.path.join(self.dir, f"rec_{b['step'][0]:07d}_{b['step'][-1]:07d}.npz")
+        np.savez_compressed(path, **_record_arrays(b))
+        self._clear()
+
+
+def _record_arrays(b):
+    out = dict(step=np.asarray(b["step"], np.int32), episode=np.asarray(b["episode"], np.int32),
+               action=np.asarray(b["action"], np.float32), reward=np.asarray(b["reward"], np.float32),
+               obs=np.asarray(b["obs"], np.float16))
+    for k in REC_INFO:
+        out[k] = np.asarray(b[k], np.float32 if k in REC_F32 else np.float16)
+    return out
+
+
+def merge_records(outdir):
+    """The chunks, in step order, as one train_record.npz. A step recorded twice
+    keeps its LAST recording, the one the saved model continued from."""
+    files = glob.glob(os.path.join(glob.escape(outdir), "record", "rec_*.npz"))
+    if not files:
+        return None
+    parts = [dict(np.load(f)) for f in sorted(files, key=os.path.getmtime)]
+    cat = {k: np.concatenate([p[k] for p in parts]) for k in parts[0]}
+    rev = cat["step"][::-1]
+    _, first_in_rev = np.unique(rev, return_index=True)
+    keep = np.sort(len(rev) - 1 - first_in_rev)
+    cat = {k: v[keep] for k, v in cat.items()}
+    path = os.path.join(outdir, "train_record.npz")
+    np.savez_compressed(path, **cat)
+    return path, int(len(keep))
+
+
+def _git(*args):
+    try:
+        return subprocess.check_output(["git", *args], text=True, stderr=subprocess.DEVNULL,
+                                       cwd=HERE).strip()
+    except Exception:
+        return None
+
+
+ROADS_TEXT = {"terrain": "a new road every episode (TerrainTrainingEnv)",
+              "fixed": "the locked climb only",
+              "random": "a new climb every episode (random_road.RandomClimb, Phase D2)"}
+
+
+def run_config(a, tag, model, outdir, live):
+    """Everything needed to say what this agent is, written beside it.
+    The git fields are meta.json's, so the two files cannot disagree."""
+    import stable_baselines3
+    import torch
+    try:
+        with open(os.path.join(HERE, "data", "derived_params.json"), encoding="utf-8") as fh:
+            plant = json.load(fh).get("_inputs")
+    except (OSError, ValueError):
+        plant = None
+    return dict(
+        tag=tag, seed=a.seed, preview=not a.no_preview, steps=a.steps, dt=a.dt,
+        duration_s=a.duration, steps_per_episode=int(round(a.duration / a.dt)),
+        road=a.road, roads=ROADS_TEXT[a.road],
+        device=str(model.device), algorithm="SAC",
+        sac=dict(learning_rate=a.lr, buffer_size=model.buffer_size, batch_size=model.batch_size,
+                 learning_starts=model.learning_starts, gamma=model.gamma, tau=model.tau,
+                 train_freq=str(model.train_freq), gradient_steps=model.gradient_steps,
+                 ent_coef=str(model.ent_coef), target_entropy=float(model.target_entropy),
+                 policy="MlpPolicy", net_arch=str(model.policy.net_arch)),
+        versions=dict(python=platform.python_version(), stable_baselines3=stable_baselines3.__version__,
+                      torch=torch.__version__, gymnasium=gym.__version__, numpy=np.__version__),
+        git_head=live.get("git_head"), git_dirty=live.get("git_dirty"),
+        plant_sha=live.get("plant_sha"), derived_sha=live.get("derived_sha"),
+        plant_inputs=plant, output=outdir.replace(os.sep, "/"),
+        machine=dict(system=platform.system(), processor=platform.processor(), cpus=os.cpu_count(),
+                     omp_threads=os.environ.get("OMP_NUM_THREADS")))
 
 
 def main():
@@ -191,14 +282,23 @@ def main():
                     help="episode length in seconds; 900 is the standard scenario")
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
+    ap.add_argument("--road", choices=("terrain", "fixed", "random"), default="terrain",
+                    help="terrain: a new road every episode (27 Sep). fixed: Phase D's "
+                         "climb, 12 %% from 180 s. random: Phase D2 / C4, start 120-300 s, "
+                         "grade 12-16 %%.")
+    ap.add_argument("--fixed-road", action="store_true",
+                    help="the same as --road fixed --dt 1.0 (the 27 Sep spelling)")
+    ap.add_argument("--dt", type=float, default=None,
+                    help="step length, s. Default: the design's own -- 1.0 for terrain "
+                         "(evaluate.py's step), 0.2 for fixed and random (Phase D, D2, C4)")
+    ap.add_argument("--device", default="auto",
+                    help="auto (SB3's default: cuda where torch has it, else cpu), cpu or cuda. "
+                         "CPU and CUDA train different agents from one seed; the device is "
+                         "written into meta.json")
     ap.add_argument("--out", default=None,
-                    help="default runs/ for the fixed road, runs_d2/ for "
-                         "--road random -- so a D2 run can never land in a "
-                         "Phase D directory by omission")
-    ap.add_argument("--road", choices=("fixed", "random"), default="fixed",
-                    help="'fixed' is Phase D's climb (12 %% from 180 s, "
-                         "unchanged). 'random' is Phase D2: a new climb every "
-                         "episode, start 120-300 s, grade 12-16 %%.")
+                    help="default runs/terrain_dt1 for terrain; runs/ and runs_d2/ -- both "
+                         "CLOSED -- for fixed and random at their own dt; otherwise "
+                         "runs/<road>_dt<dt>")
     ap.add_argument("--buffer", type=int, default=None,
                     help="SAC replay buffer size. Default: sized to the run, "
                          "because a buffer bigger than --steps can never fill "
@@ -220,66 +320,56 @@ def main():
                          "C4's crash rule; run_phase_d.py passes it for every "
                          "new experiment.")
     a = ap.parse_args()
+    if a.fixed_road:
+        if a.road == "random":
+            raise SystemExit("--fixed-road and --road random contradict each other.")
+        a.road = "fixed"
+        if a.dt is None:
+            a.dt = 1.0
+    if a.dt is None:
+        a.dt = DESIGN_DT[a.road]
     if a.out is None:
-        a.out = "runs_d2" if a.road == "random" else "runs"
+        if a.road in ("fixed", "random") and a.dt == DESIGN_DT[a.road]:
+            a.out = "runs" if a.road == "fixed" else "runs_d2"      # CLOSED: refuses new work
+        else:
+            a.out = os.path.join("runs", {"fixed": "locked", "random": "random",
+                                          "terrain": "terrain"}[a.road]
+                                 + f"_dt{a.dt:g}".replace(".", "p"))
     protocol = "d2" if a.road == "random" else "phase-d"
+    device = get_device(a.device)
 
     tag = f"{'blind' if a.no_preview else 'sighted'}_seed{a.seed}"
     outdir = os.path.join(a.out, tag)
     # No directory is created until every refusal below has had its say: a
     # refused call must leave nothing behind, not even an empty folder.
-    # .lower(): on Windows runs_C4 IS runs_c4, and the review found the
-    # capitalised spelling walked past the guard.
     closed = CLOSED.get(os.path.basename(os.path.normpath(a.out)).lower())
 
-    # ONE PROCESS PER DIRECTORY. Two train.py calls on the same tag -- a
-    # duplicated --seeds, a relaunch while a run was still going -- would both
-    # write ckpt_*, final.zip and curve.csv into it. The RUNNING mark is how a
-    # live run is told apart from a crashed one (fingerprint.running_pid).
     busy = FP.running_pid(outdir)
     if busy:
         raise SystemExit(f"\nREFUSING: {outdir} is being trained right now by "
                          f"process {busy}. Wait for it, or stop it first.")
 
     print(f"configuration : {'BLINDED (no preview)' if a.no_preview else 'sighted'}")
-    print(f"road          : {a.road}"
-          + ("   (Phase D2: start 120-300 s, grade 12-16 %, per episode)"
-             if a.road == "random" else "   (Phase D: 12 % from 180 s)"))
+    print(f"road          : {a.road}   ({ROADS_TEXT[a.road]})")
+    print(f"step          : dt = {a.dt:g} s, {a.duration / a.dt:.0f} steps per episode, "
+          f"{a.steps / (a.duration / a.dt):.0f} episodes")
     print(f"seed          : {a.seed}")
     print(f"steps         : {a.steps:,}")
-    # MEASURED 17 September 2026 -- see the docstring for the full table.
-    # 2000 SAC steps with gradient updates running: 19.19 steps/s at one thread,
-    # 18.14 at six. Threads do not matter and the gradient updates cost ~2 %;
-    # the combustion model is the whole cost.
-    #
-    # This was 3.0 until 17 September, quoted as "measured on one CPU core" and
-    # wrong by 6.4x. It made 50k steps look like 4.6 hours instead of 45 minutes
-    # and turned Phase D into "five overnights, twice" in every document that
-    # repeated it. THE ERROR WAS IN THE FIGURE, NOT IN THE HARDWARE -- do not
-    # re-introduce a per-machine qualifier to explain it away.
-    #
-    # Re-measure if you change plant.DTHETA_DEG, which is what actually sets the
-    # cost, or move to a GPU. An estimate wrong by a factor of six is how five
-    # people plan two weeks around work that fits in an evening.
-    STEPS_PER_S = 19.2
+    print(f"device        : {device}")
+    # MEASURED, and the two figures are two machines and two devices:
+    #   19.2 steps/s  17 Sep, Jad's 12-core machine, SAC on CUDA, dt 0.2, locked climb
+    #   13.7 steps/s  27 Sep, the 20-thread team laptop, SAC on CPU, dt 1.0, varied roads
+    # A step costs six engine evaluations whatever dt is. Re-measure after
+    # changing plant.DTHETA_DEG, the plant, the machine or the device.
+    STEPS_PER_S = 19.2 if device.type == "cuda" else 13.7
     mins_est = a.steps / STEPS_PER_S / 60
     print(f"estimate      : about {mins_est:.0f} minutes "
-          f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on CPU")
+          f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on {device.type}")
     print(f"output        : {outdir}/\n")
 
-    env = build_env(not a.no_preview, a.seed, a.duration, a.road)
+    env = build_env(not a.no_preview, a.seed, a.duration, a.road, a.dt)
 
     ckpt_path = os.path.join(outdir, "checkpoint.zip")
-
-    # AUDIT.md H6. The periodic callback writes `ckpt_<n>_steps.zip` every
-    # 10 000 steps; this used to look ONLY for `checkpoint.zip`, which is
-    # written once, after learn() returns. So a laptop closed at hour 3 of a
-    # 4.6-hour run had nothing the script would load -- exactly the case the
-    # docstring promised to cover. And on the one path where checkpoint.zip did
-    # exist (a finished run) it restarted the step count from zero and trained
-    # a second full run.
-    # glob.escape: a "[" in --out would otherwise make the pattern miss the
-    # checkpoints while os.path.exists still found checkpoint.zip.
     periodic = sorted(glob.glob(os.path.join(glob.escape(outdir), "ckpt_*_steps.zip")),
                       key=lambda f: int(re.search(r"ckpt_(\d+)_steps",
                                                   os.path.basename(f)).group(1)))
@@ -287,12 +377,6 @@ def main():
     done_steps = 0
     extending, was_steps = False, None
 
-    # CLOSED EXPERIMENTS. runs/ and runs_d2/ hold Phase D's and Phase D2's
-    # agents, whose preregistrations say "sixteen runs, then stop". A new seed
-    # trained there would be globbed into their pinned analyses as if it had
-    # always belonged (analyse_phase_d2.load reads every d2_seed*.txt), and an
-    # --extend would turn one of their agents into something else. Found by
-    # the review of the C4 trap fixes, 23 September 2026.
     if closed and not resume_from:
         raise SystemExit(
             f"\nREFUSING: {a.out}/ is {closed}'s, a closed experiment, and "
@@ -304,35 +388,23 @@ def main():
             f"{closed}'s agents after its result was\npublished. Train a new "
             "experiment into its own --out instead.")
 
-    # ---- the fingerprint, written BEFORE the first step -------------------
-    # AUDIT2.md C2-1. Built from the live objects by fingerprint.py; see that
-    # file for which fields are fatal and why the plant SHA outranks the git
-    # commit.
     meta_path = os.path.join(outdir, "meta.json")
     live = FP.plant_fingerprint(protocol=protocol,
                                 train_dt=float(env.unwrapped.dt),
                                 train_duration=a.duration,
                                 steps_requested=a.steps, seed=a.seed,
-                                use_preview=not a.no_preview, tag=tag)
+                                use_preview=not a.no_preview, tag=tag,
+                                train_road=a.road, train_device=str(device),
+                                derived_sha=derived_sha())
     stored = FP.read(meta_path)
 
     if resume_from:
-        # HOW FAR THE CHECKPOINT GOT, FROM THE CHECKPOINT. This used to be read
-        # off the FILE NAME, and `checkpoint.zip` has no number in it -- so a
-        # finished run whose ckpt_*_steps.zip had been deleted to save disk
-        # resumed "at 0 steps", trained a whole second budget on top, and
-        # overwrote final.zip AND checkpoint.zip, the only two copies. Found
-        # by the review of the C4 trap fixes; it predates them.
         b = FP.model_budget(resume_from)
         if b is None or b["num_timesteps"] is None:
             raise SystemExit(f"\n{resume_from} is not a readable "
                              "stable-baselines3 zip -- refusing to guess how far "
                              "it got.")
         done_steps = b["num_timesteps"]
-        # A checkpoint with no meta.json predates this mechanism. Refuse rather
-        # than guess: `runs_sixspeed_18sep/` holds exactly such a pair and
-        # resuming into one is how an agent comes to have been trained on two
-        # different gearboxes with nothing recording either.
         if stored is None:
             raise SystemExit(
                 f"\n{resume_from} exists but {meta_path} does not.\n"
@@ -351,40 +423,27 @@ def main():
                 raise SystemExit(
                     "\nREFUSING to resume: the checkpoint was trained on a "
                     "different plant.\n"
-                    "Resuming would produce an agent that has seen two physical "
-                    "systems and\nbelongs to neither -- which is exactly how "
-                    "results/phase_d_seed0.txt happened.\n"
                     "Train into a fresh --out directory, or pass "
                     "--force-plant-mismatch if you\nreally mean it and will say "
                     "so beside every number the run produces."
                 )
-            print("\n  --force-plant-mismatch given; continuing anyway. The "
-                  "resulting agent has\n  seen two plants. Say so beside every "
-                  "number it produces.")
-        # The advisory fields are not refused over, but a resume that silently
-        # changes the EPISODE LENGTH or the step is training a different task:
-        # `--duration 300` on the second call trains 50 000 further steps on
-        # 300-second episodes while meta.json still records 900. Report every
-        # advisory move, and refuse on the two that change what is learned.
+            print("\n  --force-plant-mismatch given; continuing anyway.")
+        # The advisory fields are not refused over, except the ones that change
+        # WHAT IS LEARNED: the episode length, the step, the road design, the
+        # device, and the derived plant constants.
         adv = FP.advisory_diff(stored, live)
-        learned = [t for t in adv if t[0] in ("train_duration", "train_dt")]
+        learned = [t for t in adv if t[0] in ("train_duration", "train_dt", "train_road",
+                                              "train_device", "derived_sha")]
         if adv:
             print("\nadvisory fields that moved since this run started:")
             for k, was, now in adv:
                 print(f"  {k:<22} stored {was!r}  live {now!r}")
         if learned and not a.force_plant_mismatch:
             raise SystemExit(
-                "\nREFUSING to resume: the episode length or the step has "
-                "changed.\nThe agent would be trained on two different tasks "
-                "and meta.json would record\nonly the first. Pass the original "
-                "values, use a fresh --out directory, or\npass "
-                "--force-plant-mismatch and say so beside the result.")
-        # A DIFFERENT BUDGET IS A DIFFERENT RUN. Found 23 September 2026 while
-        # preparing C4: `--steps 300000 --road random` with the default --out
-        # resolves to runs_d2/, finds a D2 agent's ckpt_50000_steps.zip whose
-        # fatal fingerprint matches, and resumes it -- overwriting final.zip,
-        # the only copy of a Phase D2 agent. `steps_requested` was advisory, so
-        # nothing stopped it. See "A RESUME IS NOT A LONGER RUN" above.
+                "\nREFUSING to resume: " + ", ".join(t[0] for t in learned) + " changed.\n"
+                "The agent would be trained on two different tasks and meta.json would\n"
+                "record only the first. Pass the original values, use a fresh --out\n"
+                "directory, or pass --force-plant-mismatch and say so beside the result.")
         was_steps = stored.get("steps_requested")
         extending = was_steps != a.steps
         if extending and not a.extend:
@@ -392,10 +451,7 @@ def main():
                 f"\nREFUSING to resume: {outdir} was started with --steps "
                 f"{was_steps}, and this call asks for {a.steps}.\n"
                 "That would continue an existing agent, not train a new one at "
-                "the new budget:\nits replay buffer restarts EMPTY at the old "
-                "size, its roads replay from the\nstart, and final.zip -- "
-                "possibly the only copy of a trained agent -- is\n"
-                "overwritten.\n\n"
+                "the new budget.\n\n"
                 "  A NEW budget:      use a fresh --out directory, e.g. "
                 "--out runs_c5"
                 + ("" if closed else
@@ -405,10 +461,6 @@ def main():
             raise SystemExit(
                 f"\n--extend asks for {a.steps} steps but {outdir} already "
                 f"holds {done_steps}. Nothing to extend.")
-        # A RUN THAT MUST NOT BE RESUMED. C4's preregistration (section 6):
-        # a crashed run is re-run FROM SCRATCH, because a resume is not the
-        # same agent -- the buffer restarts empty and the road stream restarts.
-        # A finished run re-run with the same --steps is still a no-op below.
         if stored.get("resume_allowed") is False and done_steps < a.steps:
             raise SystemExit(
                 f"\nREFUSING to resume {outdir}: this run was started with "
@@ -417,121 +469,113 @@ def main():
                 "  python run_phase_d.py ... --seeds <this seed> --restart-crashed\n"
                 "moves this directory aside and trains the seed again from step 0.")
         print(f"resuming from {resume_from} at {done_steps} steps")
-        model = SAC.load(resume_from, env=env)
+        model = SAC.load(resume_from, env=env, device=a.device)
     else:
-        # A FRESH START THAT IS NOT A FRESH DIRECTORY IS THE DANGEROUS CASE,
-        # and it was missed on the first pass. `resume_from` keys on the
-        # CHECKPOINT files only, so a directory holding `final.zip` and no
-        # checkpoints -- which is what you get when you copy a teammate's
-        # trained agent without its 16 MB of checkpoints, or delete them to
-        # reclaim disk -- takes this branch. It then rewrote meta.json with the
-        # CURRENT plant while the OLD `final.zip` sat beside it untouched, and
-        # `evaluate.py` afterwards found a matching fingerprint and scored a
-        # six-speed agent as a ZF one.
-        #
-        # That is `results/phase_d_seed0.txt` again WITH A CERTIFICATE
-        # ATTACHED, which is worse than no certificate. Reproduced on this tree
-        # before the guard below existed.
         if os.path.exists(os.path.join(outdir, "final.zip")):
             raise SystemExit(
                 f"\n{outdir}/final.zip exists but no checkpoint does, so this "
                 "would be a\nFRESH run in a directory that already holds a "
-                "trained agent. Whatever is\nwritten to meta.json here would "
-                "describe THIS tree while final.zip came from\nsomewhere else "
-                "-- a certificate on the wrong artefact, which is how\n"
-                "results/phase_d_seed0.txt happened (AUDIT2.md C2-1).\n\n"
-                "Train into a fresh --out directory. If you meant to retrain "
-                "over this one,\ndelete it yourself so the decision is "
-                "yours and is in your shell history.")
+                "trained agent.\n\nTrain into a fresh --out directory. If you "
+                "meant to retrain over this one,\ndelete it yourself.")
         if stored is not None and FP.compare(stored, live):
             print(FP.format_block(stored, "STORED (meta.json)"))
             print(FP.format_block(live, "LIVE (this tree)"))
             if not a.force_plant_mismatch:
                 raise SystemExit(
                     f"\n{meta_path} describes a different plant and there is no "
-                    "checkpoint to\nresume. Overwriting it would erase the only "
-                    "record of what this directory\nheld. Use a fresh --out "
+                    "checkpoint to\nresume. Use a fresh --out "
                     "directory, or pass --force-plant-mismatch.")
         if a.no_resume:
             live["resume_allowed"] = False
         FP.write(meta_path, live)
         print(FP.format_block(live, "PLANT FINGERPRINT (written to meta.json)"))
         print()
-        # SIZE THE REPLAY BUFFER TO THE RUN. SB3's default is 1 000 000
-        # transitions, which for a 50 000-step run is a buffer that can never
-        # be more than 5 % full -- and it is allocated in full at construction:
-        # (1000000, 1, 23) float32 is 87.7 MB for the observations alone, about
-        # 200 MB per run once actions, rewards and next-observations are added.
-        #
-        # Sixteen of those in parallel is 3.2 GB of buffers nothing will ever
-        # write to, and on 21 September it is what made 13 of 16 Phase D runs
-        # die with numpy MemoryError while 3 survived.
-        #
-        # THIS CANNOT CHANGE WHAT IS LEARNED, and that is not an assumption --
-        # `run_phase_d.py --prove-buffer` trains the same seed both ways and
-        # compares every network weight. A buffer only affects behaviour when
-        # it EVICTS, and neither size evicts when the run is shorter than the
-        # smaller of the two.
         model = SAC("MlpPolicy", env, seed=a.seed, learning_rate=a.lr,
-                    buffer_size=buffer_size(a), verbose=1, tensorboard_log=None)
-
-    cb = CheckpointCallback(save_freq=10_000, save_path=outdir,
-                            name_prefix="ckpt", verbose=0)
+                    buffer_size=buffer_size(a), verbose=1, tensorboard_log=None,
+                    device=a.device)
 
     t0 = time.time()
     remaining = max(0, a.steps - done_steps)
 
-    # AUDIT2.md H2-3. This used to fall through to `learn(0)` and then re-save
-    # `final.zip` and blank `curve.csv`, so re-running a FINISHED run destroyed
-    # the only record of it while printing "nothing to do". `runs/` holds the
-    # only copies of the trained agents; a no-op must be a genuine no-op.
+    # A no-op must be a genuine no-op: nothing below this line may run on it --
+    # not the recorder's folder, not config.json (AUDIT2.md H2-3).
     if remaining == 0:
         print(f"already at {done_steps} of {a.steps} steps; nothing to do.")
-        print(f"  {outdir}/final.zip and curve.csv left untouched.")
+        print(f"  {outdir}/final.zip, curve.csv and config.json left untouched.")
         print("  A new budget is a new run: use a fresh --out directory. To "
               "continue THIS\n  agent on purpose, pass a larger --steps WITH "
               "--extend. Do not delete this\n  directory in place.")
         return
 
+    cb = CallbackList([CheckpointCallback(save_freq=CHUNK, save_path=outdir,
+                                          name_prefix="ckpt", verbose=0),
+                       ActionRecorder(outdir)])
+
+    cfg_path = os.path.join(outdir, "config.json")
+    prev = None
+    if os.path.exists(cfg_path):
+        try:
+            with open(cfg_path, encoding="utf-8") as fh:
+                prev = json.load(fh)
+        except (OSError, ValueError):
+            prev = None
+    cfg = run_config(a, tag, model, outdir, live)
+    cfg.update(started=datetime.now().isoformat(timespec="seconds"), resumed_from=resume_from,
+               status="running")
+    if isinstance(prev, dict):
+        cfg["previous_sessions"] = prev.pop("previous_sessions", []) + [prev]
+    with open(cfg_path, "w", encoding="utf-8") as fh:
+        json.dump(cfg, fh, indent=1)
+
     FP.claim_running(outdir)
     try:
         _train_and_save(a, model, env, cb, outdir, ckpt_path, remaining,
                         resume_from, extending, was_steps, done_steps,
-                        stored, live, meta_path, t0, tag)
+                        stored, live, meta_path, t0, tag, cfg, cfg_path)
     finally:
         FP.release_running(outdir)
 
 
 def _save_atomic(model, dest_zip):
-    """model.save, but a kill mid-write cannot leave a truncated dest_zip.
-
-    stable-baselines3 writes its zip in place. A power cut during the ~3 MB
-    write of final.zip used to leave a truncated file that every tool then
-    treated as a finished agent (the launcher skipped it, train.py called it
-    "nothing to do"). Written beside, then renamed: os.replace is atomic.
-    """
+    """model.save, but a kill mid-write cannot leave a truncated dest_zip."""
     tmp = dest_zip[:-len(".zip")] + ".saving.zip"
     model.save(tmp)
     os.replace(tmp, dest_zip)
 
 
+def _write_curve(curve_path, rewards, lengths, roads):
+    """APPEND, with each episode's road (AUDIT2.md H2-3). Monitor only knows the
+    episodes THIS process ran. Reads a curve.csv of three columns (before the
+    road column existed) as well as four. Returns every return, oldest first."""
+    prior = []
+    if os.path.exists(curve_path):
+        with open(curve_path, newline="", encoding="utf-8") as fh:
+            rows = list(csv.reader(fh))
+        if rows and [c.strip() for c in rows[0][:3]] == ["episode", "return", "length"]:
+            for r in rows[1:]:
+                try:
+                    prior.append((float(r[1]), float(r[2]), r[3] if len(r) > 3 else ""))
+                except (ValueError, IndexError):
+                    pass
+    fresh = [(float(r), float(n), road) for r, n, road in zip(rewards, lengths, roads)]
+    with open(curve_path, "w", newline="", encoding="utf-8") as fh:
+        fh.write("episode,return,length,road\n")
+        for i, (r, n, road) in enumerate(prior + fresh):
+            fh.write(f"{i},{r:.6f},{n:.0f},{road}\n")
+    return np.array([p[0] for p in prior + fresh], dtype=float), len(prior)
+
+
 def _train_and_save(a, model, env, cb, outdir, ckpt_path, remaining,
                     resume_from, extending, was_steps, done_steps,
-                    stored, live, meta_path, t0, tag):
-    # reset_num_timesteps=False so the resumed run CONTINUES the schedule
-    # rather than starting a second one (AUDIT.md H6).
+                    stored, live, meta_path, t0, tag, cfg, cfg_path):
     model.learn(total_timesteps=remaining, callback=cb, progress_bar=False,
                 reset_num_timesteps=(resume_from is None))
     mins = (time.time() - t0) / 60
 
     _save_atomic(model, os.path.join(outdir, "final.zip"))
     _save_atomic(model, ckpt_path)
+    merged = merge_records(outdir)
 
-    # --extend: recorded only now that it has COMPLETED. It used to be written
-    # before the first new step, so an extension aborted after a few seconds
-    # left meta.json saying the new budget -- and the next call at that budget
-    # passed the "different --steps" refusal without --extend. The original
-    # request is kept beside it, never overwritten.
     if resume_from and extending:
         stored.setdefault("steps_requested_original", was_steps)
         stored["steps_requested"] = a.steps
@@ -546,49 +590,35 @@ def _train_and_save(a, model, env, cb, outdir, ckpt_path, remaining,
         print(f"  --extend: meta.json now records {was_steps} -> {a.steps} "
               "steps, under 'extensions'.")
 
-    # the learning curve — Monitor recorded every episode return
-    #
-    # AUDIT2.md H2-3: APPEND. `Monitor` only knows the episodes THIS process
-    # ran, so writing it out wholesale threw away everything before a resume --
-    # measured on a scratch copy, a finished twelve-episode run came back as a
-    # header-only file. The curve is the only evidence of how a run learned.
-    curve_path = os.path.join(outdir, "curve.csv")
     rewards = np.array(env.get_episode_rewards(), dtype=float)
     lengths = np.array(env.get_episode_lengths(), dtype=float)
-    prior = np.empty((0, 3))
-    if os.path.exists(curve_path):
-        try:
-            prior = np.atleast_2d(
-                np.loadtxt(curve_path, delimiter=",", skiprows=1, ndmin=2))
-        except (OSError, ValueError):
-            prior = np.empty((0, 3))
-        if prior.size and prior.shape[1] != 3:
-            prior = np.empty((0, 3))
-    fresh = np.column_stack([np.arange(len(rewards)) + len(prior), rewards, lengths])
-    np.savetxt(curve_path, np.vstack([prior, fresh]) if prior.size else fresh,
-               delimiter=",", header="episode,return,length", comments="")
-    if prior.size:
-        print(f"  curve.csv: {len(prior)} earlier episodes kept, "
-              f"{len(rewards)} appended")
+    log = _road_log(env)
+    roads = [log[i] if i < len(log) else ("locked" if a.road == "fixed" else "?")
+             for i in range(len(rewards))]
+    curve, n_prior = _write_curve(os.path.join(outdir, "curve.csv"), rewards, lengths, roads)
+    if n_prior:
+        print(f"  curve.csv: {n_prior} earlier episodes kept, {len(rewards)} appended")
 
-    # Summarise the WHOLE curve, not this process's slice of it: after a resume
-    # "first 5 -> last 5" over the post-resume episodes alone is a comparison
-    # between two halves of the same tail.
-    curve = np.concatenate([prior[:, 1], rewards]) if prior.size else rewards
-    print(f"\ntrained in {mins:.0f} min | {len(curve)} episodes")
-    if len(curve) >= 10:
-        first = float(np.mean(curve[:5]))
-        last = float(np.mean(curve[-5:]))
-        print(f"mean return: first 5 episodes {first:+.2f}  ->  last 5 {last:+.2f}")
-        if last <= first:
-            print("\n  The curve did not improve. Before changing anything else:")
-            print("    1. re-run test_reward.py — a broken reward trains normally and means nothing")
-            print("    2. if that passes, divide the learning rate by 3 (--lr 1e-4)")
-            print("    3. if it still will not learn, cut the action space: fix lambda")
-            print("       at nominal and let the agent control only spark and boost trim.")
-        else:
-            print("\n  The curve improved. 'Flat at the end and above zero' is the only")
-            print("  stopping criterion you need — if it is still climbing, train longer.")
+    cfg.update(status="finished", finished=datetime.now().isoformat(timespec="seconds"),
+               wall_min_this_session=round(mins, 1),
+               steps_per_s_this_session=round(remaining / max(mins * 60, 1e-9), 2),
+               episodes_this_session=int(len(rewards)), episodes=int(len(curve)),
+               total_timesteps=int(model.num_timesteps),
+               recorded_steps=merged[1] if merged else 0)
+    with open(cfg_path, "w", encoding="utf-8") as fh:
+        json.dump(cfg, fh, indent=1)
+
+    print(f"\ntrained in {mins:.0f} min | {len(curve)} episodes ({len(rewards)} this session)"
+          + (f" | {merged[1]:,} steps recorded in {merged[0]}" if merged else ""))
+    # No first-five-versus-last-five verdict: every episode draws new preference
+    # weights (and, on terrain and random, a new road), so consecutive returns
+    # are scored with different rulers. evaluate.py's docstring measured it:
+    # eleven episodes, -506.4 to +643.6, the largest in the FIRST five.
+    print("\n  Episode returns vary with the road and the preference weights, so this")
+    print("  curve cannot show learning. Score the run on the frozen episodes:")
+    print(f"      python evaluate.py{' --protocol d2' if a.road == 'random' else ''} {outdir}")
+    print("  If the agent does not beat the baseline there, re-run test_reward.py")
+    print("  before changing anything else -- a broken reward trains normally.")
 
     try:
         import matplotlib
@@ -603,20 +633,21 @@ def _train_and_save(a, model, env, cb, outdir, ckpt_path, remaining,
                      label=f"moving average ({k})")
             plt.axhline(0, color="#5E6C75", lw=0.8, ls="--")
             plt.xlabel("episode"); plt.ylabel("return")
-            plt.title(f"{tag} — {a.steps:,} steps")
+            plt.title(f"{tag} -- {a.steps:,} steps")
             plt.legend(); plt.tight_layout()
             png = os.path.join(outdir, "curve.png")
             plt.savefig(png, dpi=130)
             print(f"  curve written to {png}")
     except ImportError:
-        print("  (matplotlib not installed — curve.csv written, no plot)")
+        print("  (matplotlib not importable -- curve.csv written, no plot)")
 
-    # This used to say "run the same command with --seed 1, 2, 3, 4 on other
-    # machines" -- Phase D's original five-person plan, long superseded by
-    # run_phase_d.py, which launches every seed of both arms on one machine.
-    print("\nnext: an experiment's other seeds and arms go through "
-          "run_phase_d.py, with the\nsame --steps, --road and --out -- "
-          "never a second directory per seed.")
+    if a.road == "terrain":
+        print("\nnext: every seed of both arms through train_all.py (the same --steps and "
+              f"--out), then\n      python record_agents.py {a.out}")
+    else:
+        print("\nnext: an experiment's other seeds and arms go through "
+              "run_phase_d.py, with the\nsame --steps, --road, --dt and --out -- "
+              "never a second directory per seed.")
 
 
 if __name__ == "__main__":

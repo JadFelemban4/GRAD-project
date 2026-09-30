@@ -1,0 +1,66 @@
+{
+ "baseline ECU (true neutral)": {
+  "fuel": 4572.683043604976,
+  "fuel_base": 4572.67453523129,
+  "damage": 920.0705545676985,
+  "damage_base": 921.3301107983657,
+  "peak_turb": 883.0045557555549,
+  "peak_oil": 93.87152099609375,
+  "knock": 2.0
+ },
+ "reactive protection": {
+  "fuel": 4714.276010528162,
+  "fuel_base": 4572.67453523129,
+  "damage": 625.7331991166799,
+  "damage_base": 921.3301107983657,
+  "peak_turb": 860.1381774682246,
+  "peak_oil": 94.0272216796875,
+  "knock": 2.0
+ },
+ "current-grade protection": {
+  "fuel": 4840.869479355725,
+  "fuel_base": 4572.67453523129,
+  "damage": 520.5485717643293,
+  "damage_base": 921.3301107983657,
+  "peak_turb": 853.3454747558704,
+  "peak_oil": 94.09310913085938,
+  "knock": 2.0
+ },
+ "predictive protection": {
+  "fuel": 4845.608573362605,
+  "fuel_base": 4572.67453523129,
+  "damage": 523.4767035544676,
+  "damage_base": 921.3301107983657,
+  "peak_turb": 853.3453798406894,
+  "peak_oil": 94.09307861328125,
+  "knock": 2.0
+ },
+ "predictive, preview disabled": {
+  "fuel": 4714.276010528162,
+  "fuel_base": 4572.67453523129,
+  "damage": 625.7331991166799,
+  "damage_base": 921.3301107983657,
+  "peak_turb": 860.1381774682246,
+  "peak_oil": 94.0272216796875,
+  "knock": 2.0
+ },
+ "_preview_over_reactive_pts": 11.11,
+ "_preview_over_current_grade_pts": -0.32,
+ "_derived_inputs": {
+  "data_sha1": "c4fdd4babfb3752a",
+  "raw_logs": [
+   "3aca2ec1-20260907_072817.csv",
+   "3f64372e-20260907_070041.csv",
+   "670063b2-20260907_142018.csv",
+   "683640a0-20260907_070212.csv",
+   "7475b5d7-20260908_142743.csv",
+   "cb67b01f-20260908_084142.csv",
+   "drive10-20260918_233912.csv",
+   "driveB_rollons-20260928_140513.csv",
+   "f51686d7-20260906_154426.csv",
+   "fb988991-20260906_143515.csv",
+   "pull01-20260913_093527.csv"
+  ]
+ },
+ "_derived_generated": "2026-09-28 17:56"
+}

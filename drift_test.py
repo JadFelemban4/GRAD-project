@@ -39,8 +39,13 @@ DRIFTS = [
      "1.7 % with zero fitted parameters", "MISSED"),
     (5, 'CLAUDE.md "295.0 min" (current-state table) -> 299.0',
      "CLAUDE.md", "295.0 minutes", "299.0 minutes", "MISSED"),
-    (6, "CLAUDE.md app peak 890.6 -> 895.1",
-     "CLAUDE.md", "890.6", "895.1", "MISSED"),
+    # Rows 6 and 13 re-anchored 30 September 2026, in the merge: the app pin
+    # moved 890.6 -> 873.1 C and the premise 959.8 at 884 -> 920.1 at 883 C
+    # with Ghassan's physics, and the old figures are now marked history, so
+    # drifting them tested nothing (row 6 MISSED, row 13 anchor not found).
+    # Same protection, on the live figure.
+    (6, "CLAUDE.md app peak 873.1 -> 877.6 (was 890.6 -> 895.1)",
+     "CLAUDE.md", "873.1", "877.6", "MISSED"),
     (7, 'results/README.md and CHECKPOINT.md "+11.7" -> "+13.7"',
      "results/README.md", "11.7", "13.7", "MISSED"),
     (8, 'engine_env.py docstring "12 % at 130 km/h" -> 120 km/h',
@@ -57,8 +62,8 @@ DRIFTS = [
     # fix-3 sweep corrected to the live premise figure, so the row reported
     # ERROR (anchor not found) rather than testing anything. It now drifts the
     # CURRENT premise peak in CLAUDE.md, which is the same protection.
-    (13, 'CLAUDE.md premise "959.8 at 884 °C" -> 870 (was "294.2 at 812")',
-     "CLAUDE.md", "959.8 at 884 °C", "959.8 at 870 °C", "MISSED"),
+    (13, 'CLAUDE.md premise "920.1 at 883 °C" -> 870 (was "959.8 at 884", "294.2 at 812")',
+     "CLAUDE.md", "920.1 at 883 °C", "920.1 at 870 °C", "MISSED"),
     (14, 'CLAUDE.md "derived k = 0.831" -> 0.851',
      "CLAUDE.md", "derived k = 0.831", "derived k = 0.851", "CAUGHT"),
     # Two more of the audit's own structural worries, added here because the
@@ -111,8 +116,12 @@ def run_one(row):
         n_changed = s.count(old)
 
         env = dict(os.environ, PYTHONIOENCODING="utf-8")
+        # encoding: the merged tree's documents carry Arabic (conflict_ar.md),
+        # and text=True alone decodes with the Windows code page (cp1252) and
+        # crashed here on 30 September 2026. The child already writes UTF-8.
         r = subprocess.run([sys.executable, "verify_docs.py"], cwd=work,
-                           capture_output=True, text=True, timeout=1800, env=env)
+                           capture_output=True, text=True, timeout=1800, env=env,
+                           encoding="utf-8", errors="replace")
         out = r.stdout + r.stderr
         caught = r.returncode != 0
         why = ""

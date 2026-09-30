@@ -9,18 +9,24 @@ python compare_log.py data/master_points.csv
 
 **Do not edit `plant.py` or `thermal.py` without re-running both and updating this file.**
 
-Last regenerated: **22 September 2026, section B from a fresh run of
-`compare_log.py data/master_points.csv`** — 26 operating points; fitted k 0.839
-with a 1.1 % residual; derived k 0.831 with 1.4 %;
-the 20 °C reference gives 0.891. Section A's rows were checked against
-`validate.py`'s block in `FULL_RUN.txt` (21 September, exit 0) and are
-unchanged. The dataset today is **ten drives, 295.0 minutes** in the
-manifest, **seven** of them carrying samples and **eight** behind the fitted
-calibrations; `drive10`, the Taif drive, is the one that added samples after
-16 September, and the 117 °C hottest-oil figure below is its. Before that:
-11 September 2026, **after the charge-temperature correction** (and, before it,
-the engine-geometry correction).
+Last regenerated: **30 September 2026, the merge of `JMF-2340550` into
+`JMF-2340550-sep17`** — section B from a fresh run of `compare_log.py
+data/master_points.csv` on the merged data: 26 operating points; fitted k 0.839
+with a 1.1 % residual; derived k 0.831 with 1.4 %; the 20 °C reference gives
+0.891. Section A from `validate.py` on the merged plant: **8 of 11**, 6 of 7
+against literature, 2 of 4 against the car. The dataset is **eleven drives,
+321.7 minutes**, eight carrying samples.
 
+Last regenerated: **28 September 2026, evening — thermal.py's block and oil
+nodes derived from our own logs** (`derive_params.py`, `calibrate_thermal.py`),
+and drive B added. `validate.py` returns **8 of 11**: 6 of 7 against literature,
+2 of 4 against the car. Earlier the same day rows 8–11 (oil and coolant) moved
+onto bands from our own logs, when it read seven of the eleven. Section A says how each car
+band is built; section C what the derivation changed.
+Before that: 11 September, after the charge-temperature correction (and, before
+it, the engine-geometry correction).
+
+<!-- RETIRED-OK: dated record of the 16 September re-check -->
 **Re-checked 16 September 2026 and UNCHANGED.** `validate.py` still returns
 **8 of 11** inside band with identical values, so nothing in this table has been
 rewritten. Two things happened around it that a reader will otherwise wonder
@@ -80,72 +86,109 @@ did not come out of `compare_log.py` should be regenerated.
 
 ---
 
-## A. Against published figures — `validate.py`
+## A. The eleven rows — `validate.py`
 
-| Quantity | Model | Published band | Status | Source |
-|---|---|---|---|---|
-| Displacement | 2997.5 cc | 2990–3000 | inside | REFERENCES.md §3 row 1 |
-| MFB50 at MBT (2500 rpm, 60 kPa) | 8.5° aTDC | 8–10 | inside | REFERENCES.md §3 row 2 |
-| Best BSFC, knock-feasible, λ=1 | 239.9 g/kWh | 235–260 | inside | REFERENCES.md §3 row 3 |
-| Knock-limited spark (3000 rpm, 200 kPa) | 11.0° BTDC | 8–14 | inside | REFERENCES.md §3 row 4 |
-| EGT, cruise band, minimum | 724.1 °C | 600–750 | inside | REFERENCES.md §3 row 5 |
-| EGT, cruise band, maximum | 787.7 °C | 600–750 | **outside** | REFERENCES.md §3 row 6 |
-| Turbine housing time constant | 48.0 s | 40–120 | inside | REFERENCES.md §3 row 7 |
-| Oil temperature, sustained climb | 110.2 °C | 115–140 | **outside** | REFERENCES.md §3 row 8 |
-| Oil time constant | 16.0 s | 20–400 | **outside** | REFERENCES.md §3 row 9 |
-| Coolant, thermostat-regulated | 94.5 °C | 88–108 | inside | REFERENCES.md §3 row 10 |
-| Coolant apparent time constant | 9.5 s | 1–600 | inside | REFERENCES.md §3 row 11 |
+Rows 1–7 are quantities no channel on this car can see — cylinder pressure,
+brake efficiency, exhaust temperature, the turbine — so a published range is the
+only yardstick. **Rows 8–11 are oil and coolant, which the car does log, and
+since 28 September they are scored against bands computed from our own drives**
+(`validate.check_against_car`, replays in `car_thermal.py`).
 
-The **Source** column points at the row of `REFERENCES.md` section 3 that
-records where each band comes from, what kind of claim it is (general engine
-physics, or a fact specific to the B58 that only BMW or Toyota can supply),
-and whether anyone has actually opened that source. CONFIRMED or UNVERIFIED
-is recorded there and only there, so the two files cannot disagree. A band
-whose row is still UNVERIFIED is an engineering-judgement band and must be
-described as one in Chapter 3.
+| # | Quantity | Model | Band | Status | Basis |
+|---|---|---|---|---|---|
+| 1 | Displacement | 2997.5 cc | 2990–3000 | inside | literature — REFERENCES.md §3 row 1 |
+| 2 | MFB50 at MBT (2500 rpm, 60 kPa) | 8.5° aTDC | 8–10 | inside | literature — row 2 |
+| 3 | Best BSFC, knock-feasible, λ=1 | 239.9 g/kWh | 235–260 | inside | literature — row 3 |
+| 4 | Knock-limited spark (3000 rpm, 200 kPa) | 11.0° BTDC | 8–14 | inside | literature — row 4 |
+| 5 | EGT, cruise band, minimum | 724.1 °C | 600–750 | inside | literature — row 5 |
+| 6 | EGT, cruise band, maximum | 787.7 °C | 600–750 | **outside** | literature — row 6 |
+| 7 | Turbine housing time constant | 48.0 s | 40–120 | inside | literature — row 7 |
+| 8 | Oil, sustained load (drive10, hottest 10 min) | 97.0 °C | 103–111 | **outside** | **our car** — the car's interquartile range over that window. In-sample: drive10 is in the thermal fit; fitted without it, 96.1 °C |
+| 9 | Oil apparent time constant (identified) | 60.0 s | 70–100 | **outside** | **our car** — identified on 4 of 5 drives |
+| 10 | Coolant, regulated (synthetic climb) | 93.0 °C | 83.6–95.5 | inside | **our car** — warm coolant, 5th–95th percentile, all drives |
+| 11 | Coolant, whole drive (drive10, free-running) | 92.2 °C | 91.8–94 | inside | **our car** — the car's interquartile range over the drive. In-sample; fitted WITHOUT drive10 it is 92.0 °C, still inside -- a genuine prediction |
 
-<!-- RETIRED-OK: 10 -->
-**8 of 11 inside**, down from a claimed 10 of 11 on the wrong engine. Report the
-three misses with their reasons; each is informative.
+**8 of 11 inside: 6 of 7 against literature, 2 of 4 against our own car.** Before
+the thermal derivation (28 September, evening) rows 8–11 read 96.4 °C, 14.0 s,
+94.5 °C and 88.4 °C, and the table read seven of the eleven. Row 10's band moved 83.5–95.6
+→ 83.6–95.5 when drive B's coolant joined the pool, by the rule fixed for it. The
+literature rows' sources and grades live in `REFERENCES.md` section 3 and only
+there; an UNVERIFIED band is an engineering-judgement band in Chapter 3.
 
-### The three misses
+### How rows 8–11 are scored
 
-**EGT maximum, 787.7 °C against a 600–750 band.** The band describes moderate
-cruise. The test's own worst point is 2500 rpm at 100 kPa, and the measured
-cruise range on this car is **30–75 kPa** — so that point is above cruise for
-this engine, and 787.7 °C port-exit at near-full naturally-aspirated load is
-normal. The test point is mislabelled rather than the model being wrong, but
-the band was not moved to make it pass. State it as it is.
-<!-- RETIRED-OK: 777 -->
-(This paragraph said 777 °C until 22 September — the 0.5° crank-angle figure,
-superseded by the 16 September regeneration above.)
+Each rule was fixed before the model was scored against it.
 
-**Oil temperature, 110.2 °C against a 115–140 band, and oil τ 16.0 s against
-20–400.** Both come from the same parameter, `ua_block_oil`, and both are
-consequences of calibrating it against the car instead of the literature — see
-section C. The model reproduces the measured oil trace to about 4 K RMSE. The
-hottest measured oil anywhere in 295.0 minutes of logging is **117 °C**, on
-`drive10` (the Taif drive) — inside the band's lower end, so since that drive
-the band is no longer above everything the car has done (CLAUDE.md, known
-limitations, "the oil band is now supported by our own car").
-<!-- RETIRED-OK: 107, 168 -->
-Until `drive10` this sentence said the hottest was 107 °C, in 168 minutes of
-logs, and the argument below was written then.
+- **The replay.** `thermal.py` is driven over a logged drive on a 1 s grid,
+  **free-running** from a seed taken at the first real reading, with the fuel the
+  car burned formed from two measured channels, air mass over (14.7 × λ). No
+  combustion model is involved, so the replay captures the car's fuel cut on
+  overrun, and it runs in seconds.
+- **Row 8** uses drive10 — chosen because it is the only drive whose oil reaches
+  the published 115–140 °C band, the longest, and logged with ten channels so
+  oil is read every couple of seconds. The window is the 10 minutes where the
+  CAR's rolling-median oil is highest; the band is the car's interquartile range
+  there.
+- **Row 9** identifies an apparent first-order time constant by one method
+  (`car_thermal.identify_tau`) from the car's oil and from the model's, with the
+  block pinned to the measured coolant. The method was checked first: on the
+  model it recovers the analytic 14 s on every drive. A drive whose best fit
+  sits at the edge of the candidate grid did not excite the oil enough to say —
+  `3aca2ec1`, the steady cruise, is excluded that way. The band is the car's
+  range over the other four.
+- **Row 10** keeps the synthetic sustained climb and scores its settled coolant
+  against the car's own warm range, instead of a band whose upper half was
+  judgement.
+- **Row 11** replaces a "regulation response" row whose 1–600 s band almost
+  nothing could fail (AUDIT.md L10) with the whole of drive10 replayed.
 
-*(Written before `drive10`, 18 September; see CLAUDE.md, known limitations, for
-the current reading.)* **There may be a resolution, and it is not a tuning knob.** `Oil temperature
-after filter` — recorded for the first time on 8 September — runs consistently
-hotter than the `Oil temperature` channel the model is calibrated against:
-+11.0 K median over a whole drive, and **+6.8 K at oil above 100 °C**, which is
-the regime the published band describes. Model 110.2 °C plus 6.8 K is 117 °C,
-inside 115–140. If the published figure refers to a hotter point in the oil
-circuit, the two numbers were never measuring the same place.
+### The misses
 
-*(Written before `drive10`, 18 September; see CLAUDE.md, known limitations, for
-the current reading.)* This is **not applied anywhere** and the row is still reported as a miss.
-Confirm it with a sustained high-load drive recording both channels first.
-**Matching the car and missing the band is the better failure**; do not raise the
-coupling to close a gap the data does not support.
+**EGT maximum, 787.7 °C against a 600–750 band** (literature). The band
+describes moderate cruise. The test's own worst point is 2500 rpm at 100 kPa, and
+the measured cruise range on this car is **30–75 kPa** — so that point is above
+cruise for this engine, and ~790 °C port-exit at near-full naturally-aspirated
+load is normal. The test point is mislabelled rather than the model being wrong,
+but the band was not moved to make it pass.
+
+**Oil, rows 8 and 9 — better, and still outside.** Before the derivation the
+model's oil took 14 s to follow a change where the car's takes 70–100 s, and
+spiked to 140 °C on hard pulls where the car's sump read 107 °C. The data showed
+why: the car's oil heats with ENGINE SPEED and is cooled by ROAD SPEED, where the
+model heated it with 5 % of fuel and cooled it through a constant (section C).
+With that structure, fitted to the car, the oil's time constant is 57 s (row 9
+identifies 60 s against the car's 70–100) and drive10's oil RMSE falls from 7.55
+to 3.64 K. Row 8 still misses at 97.0 °C against 103–111, even though drive10 is
+in the fit. Of the 12.0 K miss, 4.6 K is the coolant: the car's heat-management
+valve let it rise to 97–99 °C over that stretch while the model regulates near
+93, and pinning the model's block to the measured coolant recovers 4.6 K. The
+other 7.3 K is the oil node itself, running 4.4 K over its coolant at sustained
+4300 rpm where the car's oil runs 11.7 K (`model_vs_data.row8_split`).
+*(Corrected 29 September: this said "about 6 K is the coolant", which had not
+been measured; the larger share is the oil node.)* **The fit's objective was not changed to make these pass** — that
+would be tuning to the band. Drive A in `logs/DRIVE_PLAN.md` is the data.
+
+**Coolant, rows 10 and 11 — both inside now.** The stand-in thermostat opened at
+88 °C over 9 K and let the block drift below the car at light load; derived from
+the logs it opens at 92.1 °C over 2.8 K, and the block's standing losses are near
+zero, as the car's four-minute idle on drive10 shows (the model cooled 13 K
+there, the car held 93.5 °C). Not reproduced: on the two hottest-afternoon
+drives the car's valve runs the coolant ~9 K lower (82–84 °C) after load.
+
+*(The literature bands these rows used to be scored against — 115–140 °C,
+20–400 s, 88–108 °C, 1–600 s — are kept in REFERENCES.md section 3. The car's
+own oil time constant, 70–100 s, sits inside the old 20–400 s band: the band was
+right, and the model was not.)*
+
+**A note on the two oil channels.** `Oil temperature after filter`, recorded
+since 8 September, runs hotter than the `Oil temperature` channel the model is
+compared with: +11.0 K median over a whole drive, and **+6.8 K at oil above
+100 °C**. Until 28 September this was offered as a possible reconciliation of the
+old literature miss — the synthetic climb's 110.2 °C plus 6.8 K is 117 °C, inside
+115–140. Row 8 now compares the model against the `Oil temperature` channel on
+the same drive, so the offset no longer bears on the table. It is not applied
+anywhere. **Matching the car and missing a band is the better failure**; do not
+raise the coupling to close a gap the data does not support.
 
 Note the turbine constant now sits inside its band at 48.0 s on the climb. That
 step response is `C/UA` recomputed at this condition, not an independent check
@@ -162,7 +205,7 @@ figure came from the four-cylinder.
 
 ## B. Against the vehicle — `compare_log.py`
 
-Source: **ten drives, 295.0 minutes**, 3.52–6.63 Hz, 2023 GR Supra B58B30O1.
+Source: **eleven drives, 321.7 minutes**, 3.52–6.63 Hz, 2023 GR Supra B58B30O1.
 `build_dataset.py` finds **26 distinct operating points**, 30–75 kPa manifold
 pressure, with the charge temperature modelled rather than read from the
 pre-throttle sensor — see section E, limit 2, for why that sensor cannot be used.
@@ -320,7 +363,46 @@ Using it gives **75.3 % air-mass error** and a 17.2 % load residual.
 
 ---
 
-## C. The thermal network — calibrated 8 September
+## C. The thermal network — derived from the logs, 28 September
+
+**The block and oil nodes are no longer typed.** `derive_params.py` fits them to
+every drive that logs coolant, oil and ambient (seven on 28 September) with
+`calibrate_thermal.py`, and `thermal.py` reads the result from
+`data/derived_params.json`. The fit is staged so each node is identified with
+its neighbour measured: the oil with the block pinned to the car's coolant, then
+the block with the oil pinned to the car's oil, then both free-running as the
+environment runs them. Every drive is also scored by parameters fitted WITHOUT
+it (`results/thermal_calibration.json`, `results/figures/fig20`, `fig21`).
+
+| free-running RMSE against the car | coolant, before → derived (held out) | oil, before → derived (held out) |
+|---|---|---|
+| drive10 | 5.51 → 2.28 (2.35) K | 7.55 → 3.57 (3.90) K |
+| 3aca2ec1 | 3.81 → 1.56 (1.65) | 3.31 → 1.22 (1.28) |
+| cb67b01f | 3.88 → 2.60 (2.84) | 4.37 → 1.31 (1.41) |
+| fb988991 | 4.02 → 0.98 (1.17) | 4.88 → 1.95 (2.34) |
+| 683640a0 | 6.99 → 2.93 (14.2) | 6.55 → 3.30 (14.3) |
+| 7475b5d7 | 4.84 → 6.66 (6.82) | 7.12 → 5.95 (6.22) |
+| 670063b2 | 4.47 → 5.31 (5.39) | 7.93 → 5.17 (5.65) |
+
+**The oil node's STRUCTURE changed, because the data rejected it.** It was heated
+by a fixed share of fuel energy and cooled through a constant conductance. The
+car runs its oil 11–15 K above coolant at 3700–4800 rpm and 70–100 km/h on
+moderate fuel (drive10), and 2–3 K below it cruising at 2600 rpm and
+130–140 km/h (3aca2ec1): oil heat follows engine speed (friction, windage,
+churning) and the sump is cooled by road speed. Scored on drive10 held out, with
+the block pinned: fuel share 3.30 K, engine speed with road-speed cooling
+**2.78 K** (chosen), both inputs 2.68 K (one more parameter, not kept), a
+separate sensor lag 2.79 K (not supported). `fig24`.
+
+**What the table does not hide.** 683640a0 holds the only warm-up in the logs,
+the one stretch with the radiator shut; left out, the block's heat capacity is
+unidentified, so it and the coolant heat share are known as a RATIO only. The two
+41–45 °C afternoon drives get WORSE on coolant: after load the car's valve runs
+the coolant 82–84 °C, which no fixed setpoint can follow. The radiator's overall
+size is derived (×1.42 on the reasoned split); the split between its three terms
+is still unidentifiable.
+
+## C′. The thermal network — calibrated 8 September (superseded by the above)
 
 `thermal.py` was the largest unvalidated part of the model. It has now been run
 as a time series over three drives (80 minutes) against logged coolant and oil.
@@ -384,46 +466,52 @@ cruise, not as an upper bound on anything the car has done.
 
 ---
 
-## D. The compressor operating envelope — refitted 8 September
+## D. The compressor operating envelope — the boost ceiling itself, since 28 September
 
-Fitted to **74 013 quasi-steady samples**. An operating line, not a compressor map.
+`plant.boost_ceiling_kpa` no longer evaluates a fitted formula. It interpolates
+the measured envelope — the 95th-percentile pressure ratio per 0.03 kg/s
+corrected-flow bin, over stable, MAF-unpinned rows, made monotone by a running
+maximum and capped at the highest stable pressure ratio in the logs.
+`derive_params.py` recomputes it whenever the data changes; `python
+fit_envelope.py` prints it from the same code. On 83 272 quasi-steady rows:
 
-Measured 95th-percentile pressure ratio per corrected-flow bin:
-
-| kg/s | 0.021 | 0.039 | 0.070 | 0.105 | 0.134 | 0.164 | 0.194 | 0.230 | 0.260 | 0.280 | 0.301 |
+| kg/s | 0.015 | 0.045 | 0.075 | 0.105 | 0.135 | 0.165 | 0.195 | 0.225 | 0.255 | 0.285 | 0.315 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| PR | 1.175 | 1.314 | 1.537 | 1.933 | 2.283 | 2.353 | 2.219 | 2.415 | 2.287 | 2.515 | 2.333 |
+| PR p95 | 1.154 | 1.311 | 1.599 | 2.095 | 2.283 | 2.353 | 2.440 | 2.453 | 2.447 | 2.515 | 2.473 |
+| ceiling | 1.154 | 1.311 | 1.599 | 2.095 | 2.283 | 2.353 | 2.440 | 2.453 | 2.453 | 2.515 | 2.515 |
+| independent readings | 1583 | 1033 | 99 | 31 | 56 | 45 | 37 | 28 | 14 | 8 | 5 |
 
-Shipped form, RMS residual **0.135** in pressure ratio:
+The ceiling leaves an RMS of 0.013 against its own bins; the 8 September formula
+PR = 1 + A m / (1 + B m), refitted to these bins, would leave 0.128 — it cannot
+follow the jump from 1.60 at 0.075 kg/s to 2.10 at 0.105, which is where drive B's
+low-rpm roll-ons sit. Checked against drive B directly (`fig22`): at full throttle
+the car reached 127–143 kPa at 1400–1650 rpm, 146–175 at 1650–1900, 175–225 at
+1900–2150 and 218–229 at 2150–2400; the modelled engine at the derived ceiling
+reaches 133–138, 147, 198 and 221 kPa there. Above 2600 rpm the model runs
+10–15 kPa above the car. Roll-ons are transients, so this is spool-limited boost.
 
-```
-PR = 1 + 14.5023 m / (1 + 6.4019 m)
-```
+**Drive B logged no ambient temperature.** Its corrected flow uses
+`build_dataset.AMB_FALLBACK_C` (42 °C, the median of the two other afternoon
+drives); `data/derived_params.json` records the fit re-made at 19 °C and 45 °C.
 
-The 7 September quadratic was fitted across an empty middle and under-predicted
-badly once the 8 September mid-load drive filled it — 1.53 against 2.28 observed
-at 0.134 kg/s. A parabola refitted to the filled data falls above 0.25 kg/s,
-which no boost ceiling does, so the form was changed to one that is monotone and
-saturating: pressure ratio rises with flow until the wastegate opens to hold the
-boost target, then flattens.
+The highest pressure ratio observed anywhere is **2.52** (250 kPa absolute), at a
+highest stable corrected flow of 0.314 kg/s. `MAP_CEIL_KPA` is derived from it.
 
-The highest pressure ratio observed anywhere is **2.52**, or 250 kPa absolute, at
-a highest corrected flow of 0.314 kg/s.
-`engine_env.SupervisoryTunerEnv.MAP_CEIL_KPA` is that measured number rather
-than the round 240 that used to sit there.
-
----
+<!-- RETIRED-OK: the envelope as published on 8 September -->
+*Until 28 September this section published the 8 September refit: bins from
+0.021 to 0.301 kg/s on 74 013 samples, and PR = 1 + 14.5023 m / (1 + 6.4019 m) at
+RMS 0.135, capped at 2.6 in the code "observed peak plus margin".*
 
 ## E. Stated limits — put these in Chapter 3 verbatim
 
-1. **The MAF channel saturates at 1020 kg/h.** Exactly 1020.0 kg/h on six
-   separate drives — 547 samples pinned at that ceiling — while the
+1. **The MAF channel saturates at 1020 kg/h.** Exactly 1020.0 kg/h on seven
+   separate drives — 568 samples pinned at that ceiling — while the
    combustion-air channel reaches 1233 kg/h on the same samples, a median ratio
    of 1.095. Pinned samples are flagged (`maf_pinned`) and excluded from
    everything fitted on air mass. They are **not** repaired by substituting the
    combustion-air channel: that is the ECU's modelled trapped charge, a different
    quantity, and splicing two definitions puts a step in the middle of the curve.
-   **The envelope above 0.303 kg/s corrected flow is therefore unmeasured, not
+   **The envelope above 0.314 kg/s corrected flow is therefore unmeasured, not
    merely sparse.**
 
 2. **There is no logged manifold pressure on this car to compare against, and
@@ -488,23 +576,20 @@ than the round 240 that used to sit there.
    1.15 × manifold pressure. An assumption, not a measurement.
 
 6. **Oil above 117 °C is extrapolation.** That is the hottest oil anywhere in
-   the logs, on `drive10`, the Taif drive. The thermal model reproduces the
-   logged oil trace, but everything it says about oil on a sustained climb
-   rests on the network's structure, not on measurement.
-   <!-- RETIRED-OK: 107, 111, 45 -->
-   (Before `drive10` this limit read 107 °C, on `7475b5d7` at 45 °C ambient,
-   111 °C after the filter.)
+   the logs (drive10, at 3700-4800 rpm; `7475b5d7` peaked at 107 °C, 111 °C after
+   the filter -- this line credited 117 °C to 7475b5d7 until 28 September). The thermal model
+   reproduces the logged oil trace, but everything it says about oil on a
+   sustained climb rests on the network's structure, not on measurement.
 
-7. **Three drives contribute no samples, and a fourth contributes no operating
-   points.** The manifest lists **ten drives and 295.0 minutes**. `3f64372e`
+7. **Two drives contribute no samples, and a third contributes no operating
+   points.** The manifest lists **eleven drives and 321.7 minutes**. `3f64372e`
    (0.7 min) and `f51686d7` (0.8 min) are too short to contain a warm running
-   window, and `pull01` carries no coolant channel, so the warm-sample filter
-   excludes it; `master_samples.csv` therefore covers seven of the ten.
-   `fb988991` is one of those seven, but every one of its windows is rejected
-   for span or a logger gap (section B), so it carries samples and contributes
-   **zero** operating points. Quote it as "ten drives, 295.0 minutes, seven carrying
-   samples, 26 distinct operating points" rather than implying all ten were
-   analysed.
+   window, and `pull01` carries no coolant channel, so `master_samples.csv`
+   covers eight drives. `fb988991` is one of those eight, but every one of its
+   windows is rejected for span or a logger gap (section B), and drive B logged
+   no spark or lambda, so neither contributes an operating point. Quote it as
+   "eleven drives, 321.7 minutes, eight carrying samples, 26 distinct operating
+   points".
 
 8. **The radiator-outlet channel is missing on `fb988991`.** It was added to the
    recording set after that drive. Thermal work uses the other four.

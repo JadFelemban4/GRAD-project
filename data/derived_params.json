@@ -1,0 +1,330 @@
+{
+ "_about": "Every constant computed from the car's logs. Regenerate with python derive_params.py; never edit by hand. See derived.py.",
+ "_generated": "2026-09-28 17:56",
+ "_inputs": {
+  "data_sha1": "c4fdd4babfb3752a",
+  "raw_logs": [
+   "3aca2ec1-20260907_072817.csv",
+   "3f64372e-20260907_070041.csv",
+   "670063b2-20260907_142018.csv",
+   "683640a0-20260907_070212.csv",
+   "7475b5d7-20260908_142743.csv",
+   "cb67b01f-20260908_084142.csv",
+   "drive10-20260918_233912.csv",
+   "driveB_rollons-20260928_140513.csv",
+   "f51686d7-20260906_154426.csv",
+   "fb988991-20260906_143515.csv",
+   "pull01-20260913_093527.csv"
+  ]
+ },
+ "thermal": {
+  "c_oil": 27213.388951454046,
+  "frac_fuel_to_oil": 0.004179253710548352,
+  "k_oil_rpm": 610.105591707557,
+  "n_oil_rpm": 3.8632102712622967,
+  "ua_block_oil": 473.74711411189725,
+  "ua_oil_amb": 0.3759006107079665,
+  "ua_oil_ram": 0.6756243799622054,
+  "c_block": 36350.24543062068,
+  "frac_fuel_to_coolant": 0.1783556582646251,
+  "ua_block_amb": 2.438868735352064,
+  "t_stat_open": 365.2325578339178,
+  "t_stat_span": 2.8455312832104833,
+  "ua_rad_min": 426.8377781262202,
+  "ua_rad_ram": 85.36755562524404,
+  "ua_rad_fan": 995.9548156278471,
+  "_ua_rad_scale": 1.4227925937540673,
+  "_oil_tau_rest_s": 57.39731695449495,
+  "_fit_oil_rmse_k": 1.7601162253338554,
+  "_fit_coolant_rmse_k": 2.9640403909967743,
+  "_drives": [
+   "3aca2ec1-20260907_072817.csv",
+   "670063b2-20260907_142018.csv",
+   "683640a0-20260907_070212.csv",
+   "7475b5d7-20260908_142743.csv",
+   "cb67b01f-20260908_084142.csv",
+   "drive10-20260918_233912.csv",
+   "fb988991-20260906_143515.csv"
+  ],
+  "_excluded": {
+   "3f64372e-20260907_070041.csv": "0.7 min, shorter than 5",
+   "driveB_rollons-20260928_140513.csv": "no oil / ambient channel",
+   "f51686d7-20260906_154426.csv": "no coolant / oil channel",
+   "pull01-20260913_093527.csv": "no coolant / oil / ambient channel"
+  },
+  "_method": "calibrate_thermal.fit: stage 1 oil with block pinned to measured coolant, stage 2 block with oil pinned; cross-entropy search, seed 0"
+ },
+ "boost_ceiling": {
+  "envelope_flow": [
+   0.0,
+   0.015,
+   0.045,
+   0.075,
+   0.105,
+   0.135,
+   0.16499999999999998,
+   0.195,
+   0.22499999999999998,
+   0.255,
+   0.28500000000000003,
+   0.315
+  ],
+  "envelope_pr": [
+   1.0,
+   1.1537,
+   1.3112,
+   1.5989,
+   2.094645,
+   2.2828,
+   2.3525,
+   2.4399,
+   2.4531,
+   2.4531,
+   2.5155,
+   2.5155
+  ],
+  "envelope_rms_vs_bins": 0.012993980774329169,
+  "A": 15.2698252637675,
+  "B": 6.290368601516854,
+  "pr_cap": 2.5155,
+  "rms": 0.12766530702949355,
+  "bins": [
+   {
+    "flow": 0.015,
+    "pr_p95": 1.1537,
+    "rows": 29870,
+    "readings": 1583
+   },
+   {
+    "flow": 0.045,
+    "pr_p95": 1.3112,
+    "rows": 16538,
+    "readings": 1033
+   },
+   {
+    "flow": 0.075,
+    "pr_p95": 1.5989,
+    "rows": 1175,
+    "readings": 99
+   },
+   {
+    "flow": 0.105,
+    "pr_p95": 2.094645,
+    "rows": 234,
+    "readings": 31
+   },
+   {
+    "flow": 0.135,
+    "pr_p95": 2.2828,
+    "rows": 405,
+    "readings": 56
+   },
+   {
+    "flow": 0.16499999999999998,
+    "pr_p95": 2.3525,
+    "rows": 271,
+    "readings": 45
+   },
+   {
+    "flow": 0.195,
+    "pr_p95": 2.4399,
+    "rows": 221,
+    "readings": 37
+   },
+   {
+    "flow": 0.22499999999999998,
+    "pr_p95": 2.4531,
+    "rows": 133,
+    "readings": 28
+   },
+   {
+    "flow": 0.255,
+    "pr_p95": 2.44727,
+    "rows": 79,
+    "readings": 14
+   },
+   {
+    "flow": 0.28500000000000003,
+    "pr_p95": 2.5155,
+    "rows": 70,
+    "readings": 8
+   },
+   {
+    "flow": 0.315,
+    "pr_p95": 2.4728,
+    "rows": 47,
+    "readings": 5
+   }
+  ],
+  "sensitivity_to_assumed_ambient": {
+   "19 C": {
+    "A": 15.692585713398655,
+    "B": 6.506668724693468,
+    "rms": 0.13358227472285666
+   },
+   "45 C": {
+    "A": 15.2698252637675,
+    "B": 6.290368601516854,
+    "rms": 0.12766530702949355
+   }
+  },
+  "_method": "p95 pressure ratio per 0.03 kg/s corrected-flow bin, >= 15 rows, stable and not MAF-pinned; the plant interpolates the running maximum of the bins (no fitted constant); A and B are a least-squares PR = 1 + A m/(1 + B m) kept for comparison only; cap = highest stable pressure ratio observed"
+ },
+ "enrichment": {
+  "ENR_DWELL_LO": 1.5,
+  "ENR_DWELL_HI": 3.0,
+  "rmse": 0.05684971458711867,
+  "rmse_8sep_2_9s": 0.06946798757443033,
+  "readings": 100,
+  "readings_above_rpm_lo": 75,
+  "by_drive": {
+   "3aca2ec1-20260907_072817.csv": 1,
+   "670063b2-20260907_142018.csv": 9,
+   "683640a0-20260907_070212.csv": 2,
+   "7475b5d7-20260908_142743.csv": 27,
+   "cb67b01f-20260908_084142.csv": 26,
+   "drive10-20260918_233912.csv": 35
+  },
+  "held": {
+   "ENR_RPM_LO": 3300.0,
+   "ENR_RPM_HI": 5200.0,
+   "ENR_DEPTH": 0.19
+  },
+  "free_fit_all_five": {
+   "ENR_RPM_LO": 2500.0,
+   "ENR_RPM_HI": 4600.0,
+   "ENR_DWELL_LO": 1.5,
+   "ENR_DWELL_HI": 2.5,
+   "ENR_DEPTH": 0.13369292226101914,
+   "rmse": 0.053224997877728795,
+   "note": "NOT USED: RPM_LO on the grid edge, floor 1-DEPTH above the car's 0.79"
+  },
+  "_method": "least squares over genuine lambda readings above ENR_LOAD, timestamp dwell, 0.25 s grid"
+ },
+ "spark": {
+  "SPARK_A": 13.421659605705909,
+  "bias": 1.1614640873001638e-15,
+  "rms": 2.4950340939558715,
+  "n_points": 26,
+  "line_sets": 25,
+  "_method": "solved for zero mean bias over master_points (bisection); slopes held"
+ },
+ "deliverable_torque": [
+  [
+   1000,
+   213.6
+  ],
+  [
+   1200,
+   223.2
+  ],
+  [
+   1400,
+   233.4
+  ],
+  [
+   1600,
+   249.3
+  ],
+  [
+   1800,
+   271.2
+  ],
+  [
+   2000,
+   316.3
+  ],
+  [
+   2200,
+   375.9
+  ],
+  [
+   2400,
+   399.9
+  ],
+  [
+   2600,
+   413.3
+  ],
+  [
+   2800,
+   427.1
+  ],
+  [
+   3000,
+   442.6
+  ],
+  [
+   3200,
+   455.8
+  ],
+  [
+   3400,
+   463.9
+  ],
+  [
+   3600,
+   470.5
+  ],
+  [
+   3800,
+   473.9
+  ],
+  [
+   4000,
+   475.0
+  ],
+  [
+   4200,
+   478.4
+  ],
+  [
+   4400,
+   480.8
+  ],
+  [
+   4600,
+   475.8
+  ],
+  [
+   4800,
+   468.0
+  ],
+  [
+   5000,
+   458.2
+  ],
+  [
+   5200,
+   446.7
+  ],
+  [
+   5400,
+   445.2
+  ],
+  [
+   5600,
+   443.4
+  ],
+  [
+   5800,
+   441.4
+  ],
+  [
+   6000,
+   439.3
+  ],
+  [
+   6200,
+   437.2
+  ],
+  [
+   6400,
+   435.1
+  ],
+  [
+   6600,
+   433.2
+  ]
+ ]
+}

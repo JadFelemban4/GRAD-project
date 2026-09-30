@@ -336,3 +336,57 @@ Dwell STRENGTHENED, −0.41 → **−0.44**, which is the variable the model use
 between 119 minutes that moved six figures and 119 minutes that would also have
 settled the biggest open question in the audit.
 
+
+---
+
+## 27–28 September — M16's other half, and what the audit did not find
+
+**M16 fixed the environment and missed the trainer.** M16 made the slew limit
+and the smoothness penalty scale with `dt`, so that one physical actuator rate
+means the same thing at every step length. But `train.py` never passed `dt` at
+all: the cycle and the environment both took their 0.2 s default, while
+`evaluate.py` scores at 1.0 s. Every trained agent was therefore scored with five
+times the actuator movement per step it had trained with. `train.py` now passes
+`dt = 1.0` to both halves (27 September).
+
+**Two defects no audit item named**, both found by the training roads and the
+comparison against the car, both fixed with their effect measured:
+
+- the gearbox asked 8th gear for torque the modelled engine cannot deliver
+  near 9 % at 130 km/h (`Vehicle.DELIVERABLE_TORQUE`);
+- the car-fitted spark map was never in use, because the model's knock limit
+  sat below it everywhere (`SPARK_A` 26.18 → 13.33).
+
+**And one audit finding re-read.** H5, the knock model against the car's
+retard, was recorded as a negative result. Counting readings instead of rows
+(H4's own method), the drive behind it holds one reading of each ignition angle
+every ~8 s — too slow to see a knock event. H5 stands as a measurement of that
+drive; it is not evidence against the knock model. See `SESSION_REPORT_2026-09-28.md`.
+
+---
+
+## 28 September, evening — three audit items that were not as fixed as recorded
+
+- **M12 was never working.** The fix made `generality_test.py` take the τ axis
+  from the climb's own exhaust flow by reading `info.get("mdot")` — a key the
+  environment never emitted. The list stayed empty and the script silently fell
+  back to the very 112.5 g/s M12 asked to replace. The environment now reports
+  `mdot_exh` (air + fuel) and a missing key is an error: the climb's measured
+  flow is 121–124 g/s. The same script now also reports preview over
+  CURRENT-GRADE — AUDIT.md C3's comparator had reached `check_premise.py` and
+  `evaluate.py` but never the H/τ sweep.
+- **M2 missed two items.** The exhaust mass flow was still fuel × 15 in the
+  environment and the app (now air + fuel; +5 K turbine on the climb), and
+  `check_map.py` still typed a 1.12 backpressure (now the shared 1.15).
+- **M5 regenerated the bins, not the plant's constants.** `fit_envelope.py`
+  fitted PR = 1 + A·m^B while the plant evaluated PR = 1 + A·m/(1 + B·m), so it
+  could never reproduce the shipped 14.5023 / 6.4019. The plant's ceiling is now
+  the measured envelope itself (no fitted constants), computed by
+  `derive_params.py`, and `fit_envelope.py` prints it from the same code.
+- **M8 had reached the app but not `build_dataset.py`.** drive10's first two
+  ambient rows (placeholder zeros) were in `master_samples.csv` as 0 °C. Each
+  channel's leading run of zeros is masked now.
+- **L8 is narrowed, not closed.** The compressor inlet was the charge
+  temperature in the environment's ceiling (now ambient); across drives the
+  logged inlet still differs by channel.
+

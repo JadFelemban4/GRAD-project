@@ -1,3 +1,5 @@
+> **28 September 2026: the drives still worth making are in [`DRIVE_PLAN.md`](DRIVE_PLAN.md)** — A (a long climb), B (roll-ons in a held gear), C (knock, 6 channels). This card is the completed first drive of 6 September.
+
 > **COMPLETED — all four questions answered. Kept as the record; do not re-drive.**
 >
 > Drive 1 and six more have been logged: **113 minutes across seven drives**.

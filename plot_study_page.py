@@ -430,7 +430,7 @@ def build_page(ctx, web):
             "<h2>Found on 28 September</h2>",
             '<ul class="latest">',
             f"<li>The enrichment map misses the car in one cell ({esc(ctx['enrichment'])}). The documents "
-            "said every cell was within 0.027; that was measured on the old dwell axis.</li>",
+            "said every cell was within 0.027; that was measured on the old dwell axis.</li>",  # RETIRED-OK: 0.027 -- names the superseded claim
             "<li>The raw-sensor temperature quoted beside mistake 13's table does not reproduce; the boost "
             "comparison it explains does.</li>",
             "<li>matplotlib is blocked by Windows Application Control on the team's machine, so these charts "

@@ -37,3 +37,18 @@ run on. The failure this directory records cannot happen silently again — that
 is what the fingerprint is for, and this file is what it is for.
 
 Run `python analyse_phase_d.py` for the preregistered test over all eight seeds.
+
+## `phase_d_seed0_110kmh.txt` — moved here in the merge, 30 September 2026
+
+Ghassan's branch (`JMF-2340550`, commit `7f6c7f1`, 19 September) scored one
+sighted/blinded pair trained and scored at **110 km/h** on the ZF plant, where
+the scenario does not bind (baseline 462.7 at 840 °C). Its header says
+"12 % at 130 km/h" because the `evaluate.py` of that day printed the scenario as
+a literal, the same defect as the six-speed file above. It ends "This is the
+project's result"; it is not.
+
+It was moved here, not deleted, because its name matched
+`results/phase_d_seed*.txt`, the glob `analyse_phase_d.py` reads. Left in
+`results/`, it made the preregistered Phase D test read **n = 9, 6 of 9, sign
+p 0.2539** instead of n = 8, 5 of 8, p 0.3633 (measured on a trial build of the
+merge). The merge review is `conflict.md`, section 5.

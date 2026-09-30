@@ -1,0 +1,4736 @@
+{
+ "set": "terrain_dt1",
+ "generated": "2026-09-29 20:04",
+ "baseline_median_damage": 920.071,
+ "regression_checked": 0,
+ "policies": {
+  "baseline ECU": {
+   "damage": {
+    "median": 920.071,
+    "q1": 920.071,
+    "q3": 920.071,
+    "worst": 920.071,
+    "best": 920.071
+   },
+   "damage_thermal": {
+    "median": 859.513,
+    "q1": 859.513,
+    "q3": 859.513,
+    "worst": 859.513,
+    "best": 859.513
+   },
+   "fuel": {
+    "median": 4572.683,
+    "q1": 4572.683,
+    "q3": 4572.683,
+    "worst": 4572.683,
+    "best": 4572.683
+   },
+   "ret": {
+    "median": -0.116,
+    "q1": -0.251,
+    "q3": -0.036,
+    "worst": 0.185,
+    "best": -0.355
+   },
+   "torque_viol": {
+    "median": 0.004,
+    "q1": 0.004,
+    "q3": 0.004,
+    "worst": 0.004,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 883.005,
+    "q1": 883.005,
+    "q3": 883.005,
+    "worst": 883.005,
+    "best": 883.005
+   },
+   "knock": {
+    "median": 2.0,
+    "q1": 2.0,
+    "q3": 2.0,
+    "worst": 2.0,
+    "best": 2.0
+   },
+   "cut_pct": -0.0,
+   "thermal_cut_pct": 0.0,
+   "fuel_vs_baseline_pct": -0.0,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9911,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "reactive": {
+   "damage": {
+    "median": 625.733,
+    "q1": 625.733,
+    "q3": 625.733,
+    "worst": 625.733,
+    "best": 625.733
+   },
+   "damage_thermal": {
+    "median": 565.176,
+    "q1": 565.176,
+    "q3": 565.176,
+    "worst": 565.176,
+    "best": 565.176
+   },
+   "fuel": {
+    "median": 4714.276,
+    "q1": 4714.276,
+    "q3": 4714.276,
+    "worst": 4714.276,
+    "best": 4714.276
+   },
+   "ret": {
+    "median": 34.523,
+    "q1": 13.31,
+    "q3": 41.7,
+    "worst": 69.393,
+    "best": -3.24
+   },
+   "torque_viol": {
+    "median": 0.004,
+    "q1": 0.004,
+    "q3": 0.004,
+    "worst": 0.004,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 860.138,
+    "q1": 860.138,
+    "q3": 860.138,
+    "worst": 860.138,
+    "best": 860.138
+   },
+   "knock": {
+    "median": 2.0,
+    "q1": 2.0,
+    "q3": 2.0,
+    "worst": 2.0,
+    "best": 2.0
+   },
+   "cut_pct": 31.991,
+   "thermal_cut_pct": 34.245,
+   "fuel_vs_baseline_pct": 3.096,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.0308,
+      "p5": -0.0411,
+      "p50": -0.0409,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -5.5363,
+      "p5": -7.4036,
+      "p50": -7.3679,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9911,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "current-grade": {
+   "damage": {
+    "median": 520.549,
+    "q1": 520.549,
+    "q3": 520.549,
+    "worst": 520.549,
+    "best": 520.549
+   },
+   "damage_thermal": {
+    "median": 453.714,
+    "q1": 453.714,
+    "q3": 453.714,
+    "worst": 453.714,
+    "best": 453.714
+   },
+   "fuel": {
+    "median": 4840.869,
+    "q1": 4840.869,
+    "q3": 4840.869,
+    "worst": 4840.869,
+    "best": 4840.869
+   },
+   "ret": {
+    "median": 53.06,
+    "q1": 19.506,
+    "q3": 64.746,
+    "worst": 107.793,
+    "best": -7.536
+   },
+   "torque_viol": {
+    "median": 0.004,
+    "q1": 0.004,
+    "q3": 0.004,
+    "worst": 0.004,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 853.345,
+    "q1": 853.345,
+    "q3": 853.345,
+    "worst": 853.345,
+    "best": 853.345
+   },
+   "knock": {
+    "median": 2.0,
+    "q1": 2.0,
+    "q3": 2.0,
+    "worst": 2.0,
+    "best": 2.0
+   },
+   "cut_pct": 43.423,
+   "thermal_cut_pct": 47.213,
+   "fuel_vs_baseline_pct": 5.865,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.055,
+      "p5": -0.055,
+      "p50": -0.055,
+      "p95": -0.055
+     },
+     "slew_limited_pct": 0.1
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -9.9,
+      "p5": -9.9,
+      "p50": -9.9,
+      "p95": -9.9
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9911,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "predictive (hand)": {
+   "damage": {
+    "median": 523.477,
+    "q1": 523.477,
+    "q3": 523.477,
+    "worst": 523.477,
+    "best": 523.477
+   },
+   "damage_thermal": {
+    "median": 453.393,
+    "q1": 453.393,
+    "q3": 453.393,
+    "worst": 453.393,
+    "best": 453.393
+   },
+   "fuel": {
+    "median": 4845.609,
+    "q1": 4845.609,
+    "q3": 4845.609,
+    "worst": 4845.609,
+    "best": 4845.609
+   },
+   "ret": {
+    "median": 52.931,
+    "q1": 19.086,
+    "q3": 64.77,
+    "worst": 108.0,
+    "best": -8.471
+   },
+   "torque_viol": {
+    "median": 0.004,
+    "q1": 0.004,
+    "q3": 0.004,
+    "worst": 0.004,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 853.345,
+    "q1": 853.345,
+    "q3": 853.345,
+    "worst": 853.345,
+    "best": 853.345
+   },
+   "knock": {
+    "median": 2.0,
+    "q1": 2.0,
+    "q3": 2.0,
+    "worst": 2.0,
+    "best": 2.0
+   },
+   "cut_pct": 43.105,
+   "thermal_cut_pct": 47.25,
+   "fuel_vs_baseline_pct": 5.969,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.009,
+      "p5": -0.055,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.055,
+      "p5": -0.055,
+      "p50": -0.055,
+      "p95": -0.055
+     },
+     "slew_limited_pct": 0.1
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -1.65,
+      "p5": -9.9,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -9.9,
+      "p5": -9.9,
+      "p50": -9.9,
+      "p95": -9.9
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9911,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "sighted_seed0": {
+   "damage": {
+    "median": 387.062,
+    "q1": 359.249,
+    "q3": 470.316,
+    "worst": 528.898,
+    "best": 271.536
+   },
+   "damage_thermal": {
+    "median": 377.509,
+    "q1": 349.978,
+    "q3": 456.38,
+    "worst": 493.014,
+    "best": 261.196
+   },
+   "fuel": {
+    "median": 4476.778,
+    "q1": 4455.1,
+    "q3": 4491.627,
+    "worst": 4610.814,
+    "best": 4413.332
+   },
+   "ret": {
+    "median": 67.875,
+    "q1": 28.781,
+    "q3": 86.128,
+    "worst": 161.02,
+    "best": 8.081
+   },
+   "torque_viol": {
+    "median": 0.011,
+    "q1": 0.003,
+    "q3": 0.016,
+    "worst": 0.024,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 845.273,
+    "q1": 841.727,
+    "q3": 853.133,
+    "worst": 856.157,
+    "best": 827.597
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 57.931,
+   "thermal_cut_pct": 56.079,
+   "fuel_vs_baseline_pct": -2.097,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.146,
+      "p5": -3.3854,
+      "p50": 0.33,
+      "p95": 2.6713
+     },
+     "climb": {
+      "mean": 3.5469,
+      "p5": 0.7317,
+      "p50": 3.9483,
+      "p95": 3.9668
+     },
+     "slew_limited_pct": 8.9
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0115,
+      "p5": -0.0407,
+      "p50": 0.013,
+      "p95": 0.0583
+     },
+     "climb": {
+      "mean": -0.0045,
+      "p5": -0.0436,
+      "p50": -0.0136,
+      "p95": 0.0527
+     },
+     "slew_limited_pct": 10.5
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -17.4678,
+      "p5": -30.7725,
+      "p50": -18.8618,
+      "p95": 7.1832
+     },
+     "climb": {
+      "mean": -9.1228,
+      "p5": -19.9582,
+      "p50": -14.9772,
+      "p95": 12.9948
+     },
+     "slew_limited_pct": 2.8
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.7881,
+      "p5": 0.3273,
+      "p50": 0.8396,
+      "p95": 0.9655
+     },
+     "climb": {
+      "mean": 0.5376,
+      "p5": 0.3246,
+      "p50": 0.407,
+      "p95": 0.9825
+     },
+     "slew_limited_pct": 1.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6037,
+      "p5": 0.3761,
+      "p50": 0.5791,
+      "p95": 0.935
+     },
+     "climb": {
+      "mean": 0.6287,
+      "p5": 0.3115,
+      "p50": 0.7016,
+      "p95": 0.797
+     },
+     "slew_limited_pct": 1.8
+    }
+   },
+   "config": {
+    "tag": "sighted_seed0",
+    "seed": 0,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed0",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:48:25",
+    "wall_min_this_session": 232.7,
+    "steps_per_s_this_session": 3.58,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed1": {
+   "damage": {
+    "median": 425.988,
+    "q1": 412.84,
+    "q3": 446.165,
+    "worst": 490.467,
+    "best": 405.245
+   },
+   "damage_thermal": {
+    "median": 395.788,
+    "q1": 370.858,
+    "q3": 412.604,
+    "worst": 467.487,
+    "best": 361.406
+   },
+   "fuel": {
+    "median": 4434.978,
+    "q1": 4425.912,
+    "q3": 4447.654,
+    "worst": 4457.316,
+    "best": 4398.754
+   },
+   "ret": {
+    "median": 68.43,
+    "q1": 34.258,
+    "q3": 79.926,
+    "worst": 117.002,
+    "best": 9.927
+   },
+   "torque_viol": {
+    "median": 0.025,
+    "q1": 0.024,
+    "q3": 0.036,
+    "worst": 0.046,
+    "best": 0.017
+   },
+   "peak_turb": {
+    "median": 847.712,
+    "q1": 845.087,
+    "q3": 849.17,
+    "worst": 854.396,
+    "best": 844.113
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 53.701,
+   "thermal_cut_pct": 53.952,
+   "fuel_vs_baseline_pct": -3.011,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 1.5888,
+      "p5": -4.0382,
+      "p50": 2.6467,
+      "p95": 3.9147
+     },
+     "climb": {
+      "mean": 3.6858,
+      "p5": 3.4847,
+      "p50": 3.9179,
+      "p95": 3.9574
+     },
+     "slew_limited_pct": 5.7
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0087,
+      "p5": -0.0527,
+      "p50": -0.0068,
+      "p95": 0.0331
+     },
+     "climb": {
+      "mean": -0.0075,
+      "p5": -0.0282,
+      "p50": -0.0089,
+      "p95": 0.0211
+     },
+     "slew_limited_pct": 41.4
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -23.4112,
+      "p5": -39.0644,
+      "p50": -33.7438,
+      "p95": 9.4886
+     },
+     "climb": {
+      "mean": -27.2876,
+      "p5": -34.2188,
+      "p50": -31.1791,
+      "p95": 6.2057
+     },
+     "slew_limited_pct": 7.4
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4058,
+      "p5": 0.1135,
+      "p50": 0.2959,
+      "p95": 0.9935
+     },
+     "climb": {
+      "mean": 0.8521,
+      "p5": 0.6055,
+      "p50": 0.8939,
+      "p95": 0.9837
+     },
+     "slew_limited_pct": 8.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.7089,
+      "p5": 0.3786,
+      "p50": 0.7546,
+      "p95": 0.9403
+     },
+     "climb": {
+      "mean": 0.7414,
+      "p5": 0.5345,
+      "p50": 0.7662,
+      "p95": 0.8285
+     },
+     "slew_limited_pct": 3.5
+    }
+   },
+   "config": {
+    "tag": "sighted_seed1",
+    "seed": 1,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed1",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:45",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:48:04",
+    "wall_min_this_session": 232.3,
+    "steps_per_s_this_session": 3.59,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed2": {
+   "damage": {
+    "median": 280.048,
+    "q1": 264.2,
+    "q3": 322.56,
+    "worst": 392.579,
+    "best": 208.49
+   },
+   "damage_thermal": {
+    "median": 263.98,
+    "q1": 248.799,
+    "q3": 303.917,
+    "worst": 386.659,
+    "best": 190.944
+   },
+   "fuel": {
+    "median": 4644.95,
+    "q1": 4564.683,
+    "q3": 4672.613,
+    "worst": 4838.275,
+    "best": 4468.293
+   },
+   "ret": {
+    "median": 75.915,
+    "q1": 37.463,
+    "q3": 92.535,
+    "worst": 123.611,
+    "best": 10.079
+   },
+   "torque_viol": {
+    "median": 0.012,
+    "q1": 0.01,
+    "q3": 0.03,
+    "worst": 0.06,
+    "best": 0.005
+   },
+   "peak_turb": {
+    "median": 826.412,
+    "q1": 823.792,
+    "q3": 833.319,
+    "worst": 846.131,
+    "best": 810.148
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 69.562,
+   "thermal_cut_pct": 69.287,
+   "fuel_vs_baseline_pct": 1.58,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0826,
+      "p5": -5.6718,
+      "p50": 0.4857,
+      "p95": 3.6523
+     },
+     "climb": {
+      "mean": 3.4277,
+      "p5": -0.6425,
+      "p50": 3.9066,
+      "p95": 3.9636
+     },
+     "slew_limited_pct": 8.3
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0223,
+      "p5": -0.0135,
+      "p50": 0.0263,
+      "p95": 0.0474
+     },
+     "climb": {
+      "mean": -0.0437,
+      "p5": -0.0748,
+      "p50": -0.0499,
+      "p95": 0.0303
+     },
+     "slew_limited_pct": 28.2
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -17.0706,
+      "p5": -37.5304,
+      "p50": -17.6507,
+      "p95": 10.437
+     },
+     "climb": {
+      "mean": -23.0815,
+      "p5": -36.2701,
+      "p50": -30.2331,
+      "p95": 11.6412
+     },
+     "slew_limited_pct": 5.6
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4261,
+      "p5": 0.1152,
+      "p50": 0.4191,
+      "p95": 0.8064
+     },
+     "climb": {
+      "mean": 0.4558,
+      "p5": 0.2299,
+      "p50": 0.388,
+      "p95": 0.9128
+     },
+     "slew_limited_pct": 1.3
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5974,
+      "p5": 0.3826,
+      "p50": 0.5354,
+      "p95": 0.9926
+     },
+     "climb": {
+      "mean": 0.648,
+      "p5": 0.5749,
+      "p50": 0.6069,
+      "p95": 0.8407
+     },
+     "slew_limited_pct": 1.1
+    }
+   },
+   "config": {
+    "tag": "sighted_seed2",
+    "seed": 2,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed2",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:49:12",
+    "wall_min_this_session": 233.4,
+    "steps_per_s_this_session": 3.57,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed3": {
+   "damage": {
+    "median": 284.166,
+    "q1": 273.826,
+    "q3": 489.269,
+    "worst": 524.07,
+    "best": 261.872
+   },
+   "damage_thermal": {
+    "median": 247.669,
+    "q1": 236.063,
+    "q3": 448.696,
+    "worst": 483.496,
+    "best": 211.422
+   },
+   "fuel": {
+    "median": 4632.727,
+    "q1": 4462.072,
+    "q3": 4665.34,
+    "worst": 4789.519,
+    "best": 4417.016
+   },
+   "ret": {
+    "median": 82.44,
+    "q1": 29.077,
+    "q3": 101.395,
+    "worst": 172.502,
+    "best": 6.414
+   },
+   "torque_viol": {
+    "median": 0.002,
+    "q1": 0.0,
+    "q3": 0.007,
+    "worst": 0.028,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 824.195,
+    "q1": 822.837,
+    "q3": 853.388,
+    "worst": 856.55,
+    "best": 816.635
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 3.0,
+    "best": 1.0
+   },
+   "cut_pct": 69.115,
+   "thermal_cut_pct": 71.185,
+   "fuel_vs_baseline_pct": 1.313,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.8989,
+      "p5": -3.0266,
+      "p50": 1.1723,
+      "p95": 3.8218
+     },
+     "climb": {
+      "mean": 3.6198,
+      "p5": 2.7452,
+      "p50": 3.8643,
+      "p95": 3.9336
+     },
+     "slew_limited_pct": 11.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0001,
+      "p5": -0.0802,
+      "p50": 0.0088,
+      "p95": 0.0428
+     },
+     "climb": {
+      "mean": -0.0339,
+      "p5": -0.0679,
+      "p50": -0.0553,
+      "p95": 0.0349
+     },
+     "slew_limited_pct": 21.6
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -10.4918,
+      "p5": -37.9747,
+      "p50": -10.0,
+      "p95": 9.6846
+     },
+     "climb": {
+      "mean": -2.2451,
+      "p5": -18.3671,
+      "p50": -0.7344,
+      "p95": 9.0703
+     },
+     "slew_limited_pct": 4.4
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6995,
+      "p5": 0.0913,
+      "p50": 0.8637,
+      "p95": 0.9508
+     },
+     "climb": {
+      "mean": 0.3816,
+      "p5": 0.0651,
+      "p50": 0.4349,
+      "p95": 0.6696
+     },
+     "slew_limited_pct": 3.8
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.8023,
+      "p5": 0.5306,
+      "p50": 0.8443,
+      "p95": 0.963
+     },
+     "climb": {
+      "mean": 0.6504,
+      "p5": 0.3233,
+      "p50": 0.7285,
+      "p95": 0.8448
+     },
+     "slew_limited_pct": 9.1
+    }
+   },
+   "config": {
+    "tag": "sighted_seed3",
+    "seed": 3,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed3",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:49:03",
+    "wall_min_this_session": 233.3,
+    "steps_per_s_this_session": 3.57,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed4": {
+   "damage": {
+    "median": 307.015,
+    "q1": 300.387,
+    "q3": 318.408,
+    "worst": 355.717,
+    "best": 264.837
+   },
+   "damage_thermal": {
+    "median": 302.694,
+    "q1": 295.978,
+    "q3": 312.317,
+    "worst": 342.516,
+    "best": 259.326
+   },
+   "fuel": {
+    "median": 4576.774,
+    "q1": 4548.425,
+    "q3": 4605.177,
+    "worst": 4618.286,
+    "best": 4482.531
+   },
+   "ret": {
+    "median": 74.46,
+    "q1": 33.444,
+    "q3": 90.48,
+    "worst": 148.427,
+    "best": 5.883
+   },
+   "torque_viol": {
+    "median": 0.014,
+    "q1": 0.014,
+    "q3": 0.022,
+    "worst": 0.027,
+    "best": 0.011
+   },
+   "peak_turb": {
+    "median": 832.505,
+    "q1": 831.435,
+    "q3": 834.626,
+    "worst": 839.295,
+    "best": 826.351
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 66.631,
+   "thermal_cut_pct": 64.783,
+   "fuel_vs_baseline_pct": 0.089,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -2.935,
+      "p5": -6.0089,
+      "p50": -3.5757,
+      "p95": 2.4282
+     },
+     "climb": {
+      "mean": 3.5374,
+      "p5": 2.8257,
+      "p50": 3.6931,
+      "p95": 3.9657
+     },
+     "slew_limited_pct": 9.8
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0059,
+      "p5": -0.0874,
+      "p50": 0.0257,
+      "p95": 0.0416
+     },
+     "climb": {
+      "mean": -0.0347,
+      "p5": -0.0507,
+      "p50": -0.0389,
+      "p95": -0.0025
+     },
+     "slew_limited_pct": 25.9
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.4384,
+      "p5": -18.7029,
+      "p50": -0.0422,
+      "p95": 13.4225
+     },
+     "climb": {
+      "mean": -7.3463,
+      "p5": -32.7244,
+      "p50": -1.0741,
+      "p95": 2.3348
+     },
+     "slew_limited_pct": 4.2
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6609,
+      "p5": 0.1875,
+      "p50": 0.769,
+      "p95": 0.8757
+     },
+     "climb": {
+      "mean": 0.4577,
+      "p5": 0.1556,
+      "p50": 0.4709,
+      "p95": 0.7336
+     },
+     "slew_limited_pct": 4.7
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5316,
+      "p5": 0.3107,
+      "p50": 0.3612,
+      "p95": 0.9725
+     },
+     "climb": {
+      "mean": 0.8416,
+      "p5": 0.4476,
+      "p50": 0.9213,
+      "p95": 0.9784
+     },
+     "slew_limited_pct": 11.1
+    }
+   },
+   "config": {
+    "tag": "sighted_seed4",
+    "seed": 4,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed4",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:47:35",
+    "wall_min_this_session": 231.8,
+    "steps_per_s_this_session": 3.6,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed5": {
+   "damage": {
+    "median": 362.613,
+    "q1": 336.061,
+    "q3": 428.543,
+    "worst": 468.207,
+    "best": 305.193
+   },
+   "damage_thermal": {
+    "median": 348.044,
+    "q1": 318.902,
+    "q3": 403.076,
+    "worst": 438.726,
+    "best": 292.06
+   },
+   "fuel": {
+    "median": 4499.329,
+    "q1": 4457.742,
+    "q3": 4522.832,
+    "worst": 4555.782,
+    "best": 4443.64
+   },
+   "ret": {
+    "median": 69.249,
+    "q1": 31.112,
+    "q3": 90.121,
+    "worst": 151.57,
+    "best": 7.651
+   },
+   "torque_viol": {
+    "median": 0.028,
+    "q1": 0.02,
+    "q3": 0.037,
+    "worst": 0.049,
+    "best": 0.003
+   },
+   "peak_turb": {
+    "median": 840.378,
+    "q1": 836.557,
+    "q3": 846.694,
+    "worst": 850.327,
+    "best": 832.457
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 2.0,
+    "best": 1.0
+   },
+   "cut_pct": 60.589,
+   "thermal_cut_pct": 59.507,
+   "fuel_vs_baseline_pct": -1.604,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 1.4013,
+      "p5": -4.4274,
+      "p50": 2.8346,
+      "p95": 3.471
+     },
+     "climb": {
+      "mean": 3.4364,
+      "p5": 1.7967,
+      "p50": 3.7791,
+      "p95": 3.9276
+     },
+     "slew_limited_pct": 6.7
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0249,
+      "p5": -0.0377,
+      "p50": 0.0345,
+      "p95": 0.0523
+     },
+     "climb": {
+      "mean": -0.0197,
+      "p5": -0.038,
+      "p50": -0.0248,
+      "p95": 0.0176
+     },
+     "slew_limited_pct": 26.3
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -4.0903,
+      "p5": -34.189,
+      "p50": 4.349,
+      "p95": 13.6956
+     },
+     "climb": {
+      "mean": -3.2685,
+      "p5": -17.0309,
+      "p50": -2.3559,
+      "p95": 6.7474
+     },
+     "slew_limited_pct": 3.5
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6915,
+      "p5": 0.1176,
+      "p50": 0.815,
+      "p95": 0.9447
+     },
+     "climb": {
+      "mean": 0.2077,
+      "p5": 0.1269,
+      "p50": 0.1386,
+      "p95": 0.4309
+     },
+     "slew_limited_pct": 2.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5476,
+      "p5": 0.3092,
+      "p50": 0.3846,
+      "p95": 0.9952
+     },
+     "climb": {
+      "mean": 0.7565,
+      "p5": 0.5239,
+      "p50": 0.7423,
+      "p95": 0.9568
+     },
+     "slew_limited_pct": 1.8
+    }
+   },
+   "config": {
+    "tag": "sighted_seed5",
+    "seed": 5,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed5",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:47:36",
+    "wall_min_this_session": 231.8,
+    "steps_per_s_this_session": 3.59,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed6": {
+   "damage": {
+    "median": 270.084,
+    "q1": 239.543,
+    "q3": 345.853,
+    "worst": 369.433,
+    "best": 186.788
+   },
+   "damage_thermal": {
+    "median": 240.891,
+    "q1": 212.551,
+    "q3": 329.494,
+    "worst": 347.941,
+    "best": 163.528
+   },
+   "fuel": {
+    "median": 4663.422,
+    "q1": 4484.597,
+    "q3": 4757.926,
+    "worst": 5044.51,
+    "best": 4462.169
+   },
+   "ret": {
+    "median": 82.919,
+    "q1": 35.558,
+    "q3": 102.971,
+    "worst": 186.102,
+    "best": 8.202
+   },
+   "torque_viol": {
+    "median": 0.009,
+    "q1": 0.002,
+    "q3": 0.012,
+    "worst": 0.02,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 821.397,
+    "q1": 815.489,
+    "q3": 837.301,
+    "worst": 840.188,
+    "best": 804.359
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 70.645,
+   "thermal_cut_pct": 71.974,
+   "fuel_vs_baseline_pct": 1.984,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.4467,
+      "p5": -5.3559,
+      "p50": 1.0031,
+      "p95": 3.7565
+     },
+     "climb": {
+      "mean": 3.7642,
+      "p5": 3.4539,
+      "p50": 3.8986,
+      "p95": 3.9493
+     },
+     "slew_limited_pct": 6.4
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0028,
+      "p5": -0.0713,
+      "p50": 0.0108,
+      "p95": 0.0463
+     },
+     "climb": {
+      "mean": -0.0526,
+      "p5": -0.1104,
+      "p50": -0.0608,
+      "p95": 0.0023
+     },
+     "slew_limited_pct": 30.6
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -11.8323,
+      "p5": -35.2713,
+      "p50": -11.2806,
+      "p95": 13.1996
+     },
+     "climb": {
+      "mean": 7.616,
+      "p5": -16.7272,
+      "p50": 13.8558,
+      "p95": 14.1881
+     },
+     "slew_limited_pct": 19.8
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4517,
+      "p5": 0.0533,
+      "p50": 0.4647,
+      "p95": 0.7875
+     },
+     "climb": {
+      "mean": 0.771,
+      "p5": 0.1281,
+      "p50": 0.923,
+      "p95": 0.9639
+     },
+     "slew_limited_pct": 11.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6875,
+      "p5": 0.3516,
+      "p50": 0.6405,
+      "p95": 0.9724
+     },
+     "climb": {
+      "mean": 0.7418,
+      "p5": 0.557,
+      "p50": 0.7101,
+      "p95": 0.9839
+     },
+     "slew_limited_pct": 1.8
+    }
+   },
+   "config": {
+    "tag": "sighted_seed6",
+    "seed": 6,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed6",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:48:47",
+    "wall_min_this_session": 233.0,
+    "steps_per_s_this_session": 3.58,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed7": {
+   "damage": {
+    "median": 257.257,
+    "q1": 244.662,
+    "q3": 436.948,
+    "worst": 548.305,
+    "best": 220.998
+   },
+   "damage_thermal": {
+    "median": 232.904,
+    "q1": 223.274,
+    "q3": 396.098,
+    "worst": 471.645,
+    "best": 189.87
+   },
+   "fuel": {
+    "median": 4721.719,
+    "q1": 4468.653,
+    "q3": 4774.181,
+    "worst": 4951.623,
+    "best": 4440.218
+   },
+   "ret": {
+    "median": 78.161,
+    "q1": 29.209,
+    "q3": 95.727,
+    "worst": 169.564,
+    "best": 5.687
+   },
+   "torque_viol": {
+    "median": 0.141,
+    "q1": 0.114,
+    "q3": 0.166,
+    "worst": 0.197,
+    "best": 0.094
+   },
+   "peak_turb": {
+    "median": 820.452,
+    "q1": 817.902,
+    "q3": 845.4,
+    "worst": 854.634,
+    "best": 809.685
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 72.039,
+   "thermal_cut_pct": 72.903,
+   "fuel_vs_baseline_pct": 3.259,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -1.3558,
+      "p5": -7.9047,
+      "p50": -0.9043,
+      "p95": 3.0811
+     },
+     "climb": {
+      "mean": 3.4402,
+      "p5": 0.4646,
+      "p50": 3.8305,
+      "p95": 3.9266
+     },
+     "slew_limited_pct": 7.1
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.006,
+      "p5": -0.0868,
+      "p50": -0.002,
+      "p95": 0.04
+     },
+     "climb": {
+      "mean": -0.0375,
+      "p5": -0.0897,
+      "p50": -0.054,
+      "p95": 0.0534
+     },
+     "slew_limited_pct": 68.6
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -2.5243,
+      "p5": -18.2767,
+      "p50": -1.474,
+      "p95": 10.4798
+     },
+     "climb": {
+      "mean": -20.3378,
+      "p5": -29.5296,
+      "p50": -25.7375,
+      "p95": -0.4142
+     },
+     "slew_limited_pct": 12.2
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6222,
+      "p5": 0.1327,
+      "p50": 0.6714,
+      "p95": 0.9214
+     },
+     "climb": {
+      "mean": 0.7379,
+      "p5": 0.5506,
+      "p50": 0.7158,
+      "p95": 0.9654
+     },
+     "slew_limited_pct": 5.8
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4974,
+      "p5": 0.3144,
+      "p50": 0.4694,
+      "p95": 0.8524
+     },
+     "climb": {
+      "mean": 0.5992,
+      "p5": 0.4108,
+      "p50": 0.6324,
+      "p95": 0.7101
+     },
+     "slew_limited_pct": 2.7
+    }
+   },
+   "config": {
+    "tag": "sighted_seed7",
+    "seed": 7,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed7",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:48:57",
+    "wall_min_this_session": 233.2,
+    "steps_per_s_this_session": 3.57,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed8": {
+   "damage": {
+    "median": 368.63,
+    "q1": 305.084,
+    "q3": 453.901,
+    "worst": 489.543,
+    "best": 284.39
+   },
+   "damage_thermal": {
+    "median": 357.704,
+    "q1": 294.392,
+    "q3": 439.784,
+    "worst": 468.224,
+    "best": 273.711
+   },
+   "fuel": {
+    "median": 4525.058,
+    "q1": 4512.507,
+    "q3": 4610.315,
+    "worst": 4646.145,
+    "best": 4475.592
+   },
+   "ret": {
+    "median": 76.746,
+    "q1": 30.763,
+    "q3": 94.743,
+    "worst": 156.004,
+    "best": 6.42
+   },
+   "torque_viol": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.084,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 845.234,
+    "q1": 835.579,
+    "q3": 854.464,
+    "worst": 856.019,
+    "best": 831.242
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 59.935,
+   "thermal_cut_pct": 58.383,
+   "fuel_vs_baseline_pct": -1.042,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -3.2363,
+      "p5": -7.3524,
+      "p50": -3.1876,
+      "p95": 1.4776
+     },
+     "climb": {
+      "mean": 3.7831,
+      "p5": 3.7094,
+      "p50": 3.8806,
+      "p95": 3.9476
+     },
+     "slew_limited_pct": 13.9
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0027,
+      "p5": -0.0693,
+      "p50": 0.0063,
+      "p95": 0.0443
+     },
+     "climb": {
+      "mean": -0.015,
+      "p5": -0.1,
+      "p50": -0.0234,
+      "p95": 0.0555
+     },
+     "slew_limited_pct": 38.2
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -22.9016,
+      "p5": -39.0948,
+      "p50": -33.5975,
+      "p95": 13.4471
+     },
+     "climb": {
+      "mean": -20.8106,
+      "p5": -33.5468,
+      "p50": -23.5196,
+      "p95": -2.947
+     },
+     "slew_limited_pct": 5.1
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5518,
+      "p5": 0.0115,
+      "p50": 0.693,
+      "p95": 0.9053
+     },
+     "climb": {
+      "mean": 0.3286,
+      "p5": 0.0449,
+      "p50": 0.4003,
+      "p95": 0.4873
+     },
+     "slew_limited_pct": 1.9
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6259,
+      "p5": 0.3008,
+      "p50": 0.6575,
+      "p95": 0.844
+     },
+     "climb": {
+      "mean": 0.5809,
+      "p5": 0.3499,
+      "p50": 0.6549,
+      "p95": 0.6968
+     },
+     "slew_limited_pct": 2.6
+    }
+   },
+   "config": {
+    "tag": "sighted_seed8",
+    "seed": 8,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed8",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:48:51",
+    "wall_min_this_session": 233.1,
+    "steps_per_s_this_session": 3.58,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed9": {
+   "damage": {
+    "median": 201.756,
+    "q1": 189.103,
+    "q3": 244.857,
+    "worst": 512.462,
+    "best": 181.922
+   },
+   "damage_thermal": {
+    "median": 188.381,
+    "q1": 177.209,
+    "q3": 221.019,
+    "worst": 482.081,
+    "best": 173.753
+   },
+   "fuel": {
+    "median": 4879.289,
+    "q1": 4725.493,
+    "q3": 4951.01,
+    "worst": 5007.389,
+    "best": 4409.146
+   },
+   "ret": {
+    "median": 89.276,
+    "q1": 38.572,
+    "q3": 107.481,
+    "worst": 178.428,
+    "best": 10.765
+   },
+   "torque_viol": {
+    "median": 0.027,
+    "q1": 0.013,
+    "q3": 0.031,
+    "worst": 0.045,
+    "best": 0.009
+   },
+   "peak_turb": {
+    "median": 810.658,
+    "q1": 807.505,
+    "q3": 817.27,
+    "worst": 857.601,
+    "best": 806.853
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.25,
+    "worst": 2.0,
+    "best": 1.0
+   },
+   "cut_pct": 78.072,
+   "thermal_cut_pct": 78.083,
+   "fuel_vs_baseline_pct": 6.705,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0262,
+      "p5": -4.9459,
+      "p50": 0.1781,
+      "p95": 3.4772
+     },
+     "climb": {
+      "mean": 3.4516,
+      "p5": 2.1309,
+      "p50": 3.7359,
+      "p95": 3.8946
+     },
+     "slew_limited_pct": 13.4
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0127,
+      "p5": -0.0378,
+      "p50": 0.0134,
+      "p95": 0.0526
+     },
+     "climb": {
+      "mean": -0.0744,
+      "p5": -0.1023,
+      "p50": -0.0903,
+      "p95": -0.0051
+     },
+     "slew_limited_pct": 14.4
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -3.6689,
+      "p5": -34.3011,
+      "p50": 4.9158,
+      "p95": 10.0
+     },
+     "climb": {
+      "mean": 6.3558,
+      "p5": -34.395,
+      "p50": 13.9662,
+      "p95": 14.4239
+     },
+     "slew_limited_pct": 1.4
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4515,
+      "p5": 0.1606,
+      "p50": 0.4327,
+      "p95": 0.9898
+     },
+     "climb": {
+      "mean": 0.6724,
+      "p5": 0.0112,
+      "p50": 0.8922,
+      "p95": 0.956
+     },
+     "slew_limited_pct": 11.3
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6698,
+      "p5": 0.3493,
+      "p50": 0.6915,
+      "p95": 0.9421
+     },
+     "climb": {
+      "mean": 0.7392,
+      "p5": 0.4335,
+      "p50": 0.8004,
+      "p95": 0.8493
+     },
+     "slew_limited_pct": 7.2
+    }
+   },
+   "config": {
+    "tag": "sighted_seed9",
+    "seed": 9,
+    "preview": true,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/sighted_seed9",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:47:49",
+    "wall_min_this_session": 232.0,
+    "steps_per_s_this_session": 3.59,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed0": {
+   "damage": {
+    "median": 443.759,
+    "q1": 412.326,
+    "q3": 456.268,
+    "worst": 527.053,
+    "best": 355.353
+   },
+   "damage_thermal": {
+    "median": 431.107,
+    "q1": 398.851,
+    "q3": 435.063,
+    "worst": 448.837,
+    "best": 348.44
+   },
+   "fuel": {
+    "median": 4407.882,
+    "q1": 4394.78,
+    "q3": 4423.339,
+    "worst": 4467.739,
+    "best": 4380.443
+   },
+   "ret": {
+    "median": 63.914,
+    "q1": 30.341,
+    "q3": 74.59,
+    "worst": 114.128,
+    "best": 1.736
+   },
+   "torque_viol": {
+    "median": 0.296,
+    "q1": 0.221,
+    "q3": 0.426,
+    "worst": 0.544,
+    "best": 0.022
+   },
+   "peak_turb": {
+    "median": 852.62,
+    "q1": 850.06,
+    "q3": 852.722,
+    "worst": 853.653,
+    "best": 845.352
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 3.0,
+    "best": 1.0
+   },
+   "cut_pct": 51.769,
+   "thermal_cut_pct": 49.843,
+   "fuel_vs_baseline_pct": -3.604,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 1.847,
+      "p5": -2.6206,
+      "p50": 2.592,
+      "p95": 3.9325
+     },
+     "climb": {
+      "mean": 3.9088,
+      "p5": 3.7071,
+      "p50": 3.9778,
+      "p95": 3.9835
+     },
+     "slew_limited_pct": 5.9
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0091,
+      "p5": -0.0269,
+      "p50": 0.0084,
+      "p95": 0.0416
+     },
+     "climb": {
+      "mean": 0.0007,
+      "p5": -0.0347,
+      "p50": 0.0055,
+      "p95": 0.0293
+     },
+     "slew_limited_pct": 9.9
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -26.0081,
+      "p5": -33.9629,
+      "p50": -27.8652,
+      "p95": -7.0232
+     },
+     "climb": {
+      "mean": -17.5435,
+      "p5": -39.5854,
+      "p50": -11.7089,
+      "p95": -4.4687
+     },
+     "slew_limited_pct": 5.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5073,
+      "p5": 0.2262,
+      "p50": 0.503,
+      "p95": 0.8304
+     },
+     "climb": {
+      "mean": 0.2892,
+      "p5": 0.0124,
+      "p50": 0.3225,
+      "p95": 0.7254
+     },
+     "slew_limited_pct": 1.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.602,
+      "p5": 0.3668,
+      "p50": 0.6272,
+      "p95": 0.7472
+     },
+     "climb": {
+      "mean": 0.6093,
+      "p5": 0.312,
+      "p50": 0.7271,
+      "p95": 0.7924
+     },
+     "slew_limited_pct": 1.4
+    }
+   },
+   "config": {
+    "tag": "blind_seed0",
+    "seed": 0,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed0",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:45",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:45:59",
+    "wall_min_this_session": 230.2,
+    "steps_per_s_this_session": 3.62,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed1": {
+   "damage": {
+    "median": 469.004,
+    "q1": 428.894,
+    "q3": 499.041,
+    "worst": 598.091,
+    "best": 392.899
+   },
+   "damage_thermal": {
+    "median": 413.55,
+    "q1": 381.191,
+    "q3": 448.712,
+    "worst": 570.681,
+    "best": 343.523
+   },
+   "fuel": {
+    "median": 4471.282,
+    "q1": 4400.022,
+    "q3": 4634.039,
+    "worst": 4908.628,
+    "best": 4391.507
+   },
+   "ret": {
+    "median": 62.686,
+    "q1": 33.808,
+    "q3": 73.909,
+    "worst": 92.751,
+    "best": 11.864
+   },
+   "torque_viol": {
+    "median": 0.004,
+    "q1": 0.0,
+    "q3": 0.009,
+    "worst": 0.483,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 849.79,
+    "q1": 846.067,
+    "q3": 853.503,
+    "worst": 861.253,
+    "best": 841.362
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 49.025,
+   "thermal_cut_pct": 51.886,
+   "fuel_vs_baseline_pct": -2.218,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 2.6877,
+      "p5": -4.343,
+      "p50": 3.5844,
+      "p95": 3.8176
+     },
+     "climb": {
+      "mean": 2.8026,
+      "p5": -0.0207,
+      "p50": 3.7793,
+      "p95": 3.9395
+     },
+     "slew_limited_pct": 5.1
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0446,
+      "p5": -0.0121,
+      "p50": 0.0507,
+      "p95": 0.0586
+     },
+     "climb": {
+      "mean": -0.0164,
+      "p5": -0.0532,
+      "p50": -0.0187,
+      "p95": 0.031
+     },
+     "slew_limited_pct": 49.2
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -10.9686,
+      "p5": -23.1427,
+      "p50": -11.8552,
+      "p95": 5.9754
+     },
+     "climb": {
+      "mean": -30.4715,
+      "p5": -38.9489,
+      "p50": -32.3288,
+      "p95": -18.2765
+     },
+     "slew_limited_pct": 4.8
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.1753,
+      "p5": 0.0642,
+      "p50": 0.1346,
+      "p95": 0.4038
+     },
+     "climb": {
+      "mean": 0.6891,
+      "p5": 0.4647,
+      "p50": 0.6601,
+      "p95": 0.9289
+     },
+     "slew_limited_pct": 1.2
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.8147,
+      "p5": 0.4909,
+      "p50": 0.8878,
+      "p95": 0.9646
+     },
+     "climb": {
+      "mean": 0.7289,
+      "p5": 0.5582,
+      "p50": 0.7471,
+      "p95": 0.8221
+     },
+     "slew_limited_pct": 2.6
+    }
+   },
+   "config": {
+    "tag": "blind_seed1",
+    "seed": 1,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed1",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:45",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:45:32",
+    "wall_min_this_session": 229.8,
+    "steps_per_s_this_session": 3.63,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed2": {
+   "damage": {
+    "median": 414.707,
+    "q1": 400.939,
+    "q3": 458.485,
+    "worst": 501.825,
+    "best": 358.132
+   },
+   "damage_thermal": {
+    "median": 347.075,
+    "q1": 338.37,
+    "q3": 394.088,
+    "worst": 431.775,
+    "best": 331.314
+   },
+   "fuel": {
+    "median": 4549.816,
+    "q1": 4466.815,
+    "q3": 4552.803,
+    "worst": 4566.221,
+    "best": 4412.477
+   },
+   "ret": {
+    "median": 72.432,
+    "q1": 33.812,
+    "q3": 89.715,
+    "worst": 145.819,
+    "best": 10.058
+   },
+   "torque_viol": {
+    "median": 0.003,
+    "q1": 0.0,
+    "q3": 0.006,
+    "worst": 0.072,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 842.196,
+    "q1": 841.386,
+    "q3": 848.594,
+    "worst": 852.166,
+    "best": 839.639
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 54.927,
+   "thermal_cut_pct": 59.62,
+   "fuel_vs_baseline_pct": -0.5,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 2.0687,
+      "p5": -4.2533,
+      "p50": 3.0314,
+      "p95": 3.4804
+     },
+     "climb": {
+      "mean": 3.6546,
+      "p5": 2.5294,
+      "p50": 3.8086,
+      "p95": 3.8881
+     },
+     "slew_limited_pct": 3.4
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0276,
+      "p5": -0.009,
+      "p50": 0.0303,
+      "p95": 0.0561
+     },
+     "climb": {
+      "mean": -0.0242,
+      "p5": -0.1004,
+      "p50": -0.0217,
+      "p95": 0.019
+     },
+     "slew_limited_pct": 23.5
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.6613,
+      "p5": -19.2206,
+      "p50": 7.323,
+      "p95": 14.7762
+     },
+     "climb": {
+      "mean": -11.5152,
+      "p5": -35.978,
+      "p50": -13.4681,
+      "p95": 13.2029
+     },
+     "slew_limited_pct": 8.3
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.3736,
+      "p5": 0.1008,
+      "p50": 0.4281,
+      "p95": 0.743
+     },
+     "climb": {
+      "mean": 0.4656,
+      "p5": 0.1988,
+      "p50": 0.2723,
+      "p95": 0.9522
+     },
+     "slew_limited_pct": 2.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6749,
+      "p5": 0.5753,
+      "p50": 0.6709,
+      "p95": 0.8713
+     },
+     "climb": {
+      "mean": 0.764,
+      "p5": 0.3316,
+      "p50": 0.858,
+      "p95": 0.9639
+     },
+     "slew_limited_pct": 8.9
+    }
+   },
+   "config": {
+    "tag": "blind_seed2",
+    "seed": 2,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed2",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:45",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:47:34",
+    "wall_min_this_session": 231.8,
+    "steps_per_s_this_session": 3.6,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed3": {
+   "damage": {
+    "median": 227.587,
+    "q1": 221.557,
+    "q3": 234.342,
+    "worst": 255.276,
+    "best": 214.921
+   },
+   "damage_thermal": {
+    "median": 171.521,
+    "q1": 164.717,
+    "q3": 184.071,
+    "worst": 204.297,
+    "best": 157.339
+   },
+   "fuel": {
+    "median": 4969.382,
+    "q1": 4879.924,
+    "q3": 5009.251,
+    "worst": 5141.651,
+    "best": 4805.754
+   },
+   "ret": {
+    "median": 87.176,
+    "q1": 30.559,
+    "q3": 107.769,
+    "worst": 185.079,
+    "best": -8.152
+   },
+   "torque_viol": {
+    "median": 0.163,
+    "q1": 0.153,
+    "q3": 0.199,
+    "worst": 0.254,
+    "best": 0.039
+   },
+   "peak_turb": {
+    "median": 805.595,
+    "q1": 804.143,
+    "q3": 810.214,
+    "worst": 815.915,
+    "best": 802.28
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 75.264,
+   "thermal_cut_pct": 80.044,
+   "fuel_vs_baseline_pct": 8.675,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.2615,
+      "p5": -4.5205,
+      "p50": 0.5272,
+      "p95": 3.1722
+     },
+     "climb": {
+      "mean": 3.6045,
+      "p5": 3.3306,
+      "p50": 3.9247,
+      "p95": 3.9874
+     },
+     "slew_limited_pct": 5.9
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0023,
+      "p5": -0.0305,
+      "p50": -0.0066,
+      "p95": 0.0234
+     },
+     "climb": {
+      "mean": -0.0991,
+      "p5": -0.121,
+      "p50": -0.1041,
+      "p95": -0.071
+     },
+     "slew_limited_pct": 44.5
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 2.1377,
+      "p5": -16.6809,
+      "p50": 4.2858,
+      "p95": 14.2931
+     },
+     "climb": {
+      "mean": -6.0347,
+      "p5": -17.0127,
+      "p50": -11.873,
+      "p95": 14.0393
+     },
+     "slew_limited_pct": 7.6
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5995,
+      "p5": 0.3597,
+      "p50": 0.6027,
+      "p95": 0.8064
+     },
+     "climb": {
+      "mean": 0.3926,
+      "p5": 0.0566,
+      "p50": 0.3689,
+      "p95": 0.787
+     },
+     "slew_limited_pct": 11.2
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.682,
+      "p5": 0.3772,
+      "p50": 0.7166,
+      "p95": 0.8907
+     },
+     "climb": {
+      "mean": 0.8641,
+      "p5": 0.468,
+      "p50": 0.8719,
+      "p95": 0.9883
+     },
+     "slew_limited_pct": 2.3
+    }
+   },
+   "config": {
+    "tag": "blind_seed3",
+    "seed": 3,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed3",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:46:32",
+    "wall_min_this_session": 230.8,
+    "steps_per_s_this_session": 3.61,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed4": {
+   "damage": {
+    "median": 364.128,
+    "q1": 328.311,
+    "q3": 392.953,
+    "worst": 494.329,
+    "best": 244.23
+   },
+   "damage_thermal": {
+    "median": 316.421,
+    "q1": 294.836,
+    "q3": 359.813,
+    "worst": 440.131,
+    "best": 193.739
+   },
+   "fuel": {
+    "median": 4563.934,
+    "q1": 4503.452,
+    "q3": 4589.039,
+    "worst": 4879.86,
+    "best": 4459.068
+   },
+   "ret": {
+    "median": 75.37,
+    "q1": 33.299,
+    "q3": 86.4,
+    "worst": 129.612,
+    "best": 5.394
+   },
+   "torque_viol": {
+    "median": 0.061,
+    "q1": 0.043,
+    "q3": 0.067,
+    "worst": 0.079,
+    "best": 0.017
+   },
+   "peak_turb": {
+    "median": 836.722,
+    "q1": 832.442,
+    "q3": 842.862,
+    "worst": 849.03,
+    "best": 809.283
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 60.424,
+   "thermal_cut_pct": 63.186,
+   "fuel_vs_baseline_pct": -0.191,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.7416,
+      "p5": -5.6446,
+      "p50": -0.8201,
+      "p95": 3.7847
+     },
+     "climb": {
+      "mean": 3.4221,
+      "p5": 2.3357,
+      "p50": 3.7551,
+      "p95": 3.8904
+     },
+     "slew_limited_pct": 4.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0206,
+      "p5": -0.1069,
+      "p50": -0.013,
+      "p95": 0.0448
+     },
+     "climb": {
+      "mean": -0.0299,
+      "p5": -0.0674,
+      "p50": -0.0282,
+      "p95": 0.0122
+     },
+     "slew_limited_pct": 16.2
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.2969,
+      "p5": -6.9636,
+      "p50": -1.7684,
+      "p95": 9.6618
+     },
+     "climb": {
+      "mean": -7.0518,
+      "p5": -21.1015,
+      "p50": -5.3627,
+      "p95": 7.5087
+     },
+     "slew_limited_pct": 3.4
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5429,
+      "p5": 0.2847,
+      "p50": 0.5291,
+      "p95": 0.8875
+     },
+     "climb": {
+      "mean": 0.3587,
+      "p5": 0.0128,
+      "p50": 0.3649,
+      "p95": 0.7418
+     },
+     "slew_limited_pct": 1.6
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6905,
+      "p5": 0.5111,
+      "p50": 0.6964,
+      "p95": 0.8029
+     },
+     "climb": {
+      "mean": 0.7786,
+      "p5": 0.5728,
+      "p50": 0.8191,
+      "p95": 0.9385
+     },
+     "slew_limited_pct": 1.2
+    }
+   },
+   "config": {
+    "tag": "blind_seed4",
+    "seed": 4,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed4",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:44:31",
+    "wall_min_this_session": 228.7,
+    "steps_per_s_this_session": 3.64,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed5": {
+   "damage": {
+    "median": 230.873,
+    "q1": 222.192,
+    "q3": 361.115,
+    "worst": 504.832,
+    "best": 215.491
+   },
+   "damage_thermal": {
+    "median": 190.688,
+    "q1": 183.48,
+    "q3": 317.694,
+    "worst": 397.532,
+    "best": 179.739
+   },
+   "fuel": {
+    "median": 4856.353,
+    "q1": 4659.162,
+    "q3": 4919.081,
+    "worst": 4996.226,
+    "best": 4418.111
+   },
+   "ret": {
+    "median": 88.587,
+    "q1": 38.009,
+    "q3": 106.178,
+    "worst": 146.969,
+    "best": 9.048
+   },
+   "torque_viol": {
+    "median": 0.007,
+    "q1": 0.006,
+    "q3": 0.009,
+    "worst": 0.023,
+    "best": 0.001
+   },
+   "peak_turb": {
+    "median": 812.654,
+    "q1": 810.366,
+    "q3": 837.425,
+    "worst": 848.33,
+    "best": 808.778
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 2.0,
+    "best": 1.0
+   },
+   "cut_pct": 74.907,
+   "thermal_cut_pct": 77.814,
+   "fuel_vs_baseline_pct": 6.204,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.5798,
+      "p5": -3.125,
+      "p50": 1.0233,
+      "p95": 2.5233
+     },
+     "climb": {
+      "mean": 3.4202,
+      "p5": 1.087,
+      "p50": 3.7953,
+      "p95": 3.9287
+     },
+     "slew_limited_pct": 25.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0069,
+      "p5": -0.0199,
+      "p50": 0.0068,
+      "p95": 0.0329
+     },
+     "climb": {
+      "mean": -0.0685,
+      "p5": -0.1088,
+      "p50": -0.0923,
+      "p95": 0.0105
+     },
+     "slew_limited_pct": 35.1
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -1.6352,
+      "p5": -13.0795,
+      "p50": -0.4528,
+      "p95": 12.8724
+     },
+     "climb": {
+      "mean": -14.7371,
+      "p5": -23.4381,
+      "p50": -19.306,
+      "p95": 9.9218
+     },
+     "slew_limited_pct": 16.7
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.2935,
+      "p5": 0.0536,
+      "p50": 0.2839,
+      "p95": 0.5671
+     },
+     "climb": {
+      "mean": 0.7068,
+      "p5": 0.4966,
+      "p50": 0.7012,
+      "p95": 0.8946
+     },
+     "slew_limited_pct": 5.5
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6468,
+      "p5": 0.3689,
+      "p50": 0.6682,
+      "p95": 0.9544
+     },
+     "climb": {
+      "mean": 0.6368,
+      "p5": 0.4561,
+      "p50": 0.6267,
+      "p95": 0.8003
+     },
+     "slew_limited_pct": 18.4
+    }
+   },
+   "config": {
+    "tag": "blind_seed5",
+    "seed": 5,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed5",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:45:45",
+    "wall_min_this_session": 230.0,
+    "steps_per_s_this_session": 3.62,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed6": {
+   "damage": {
+    "median": 253.103,
+    "q1": 235.685,
+    "q3": 661.747,
+    "worst": 2526.695,
+    "best": 228.343
+   },
+   "damage_thermal": {
+    "median": 207.678,
+    "q1": 200.943,
+    "q3": 644.83,
+    "worst": 2509.709,
+    "best": 198.634
+   },
+   "fuel": {
+    "median": 4778.086,
+    "q1": 4757.859,
+    "q3": 4814.557,
+    "worst": 5027.446,
+    "best": 4640.104
+   },
+   "ret": {
+    "median": 87.515,
+    "q1": 12.419,
+    "q3": 104.761,
+    "worst": 163.67,
+    "best": -60.449
+   },
+   "torque_viol": {
+    "median": 0.011,
+    "q1": 0.007,
+    "q3": 0.012,
+    "worst": 0.118,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 815.379,
+    "q1": 813.481,
+    "q3": 857.991,
+    "worst": 931.84,
+    "best": 812.855
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 3.0,
+    "best": 1.0
+   },
+   "cut_pct": 72.491,
+   "thermal_cut_pct": 75.838,
+   "fuel_vs_baseline_pct": 4.492,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -4.117,
+      "p5": -7.5327,
+      "p50": -4.4333,
+      "p95": 0.8598
+     },
+     "climb": {
+      "mean": 1.4753,
+      "p5": -6.3508,
+      "p50": 3.8924,
+      "p95": 3.9396
+     },
+     "slew_limited_pct": 6.9
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0213,
+      "p5": -0.1131,
+      "p50": 0.0516,
+      "p95": 0.0588
+     },
+     "climb": {
+      "mean": -0.0502,
+      "p5": -0.0836,
+      "p50": -0.0696,
+      "p95": 0.0222
+     },
+     "slew_limited_pct": 22.6
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -18.8017,
+      "p5": -31.9964,
+      "p50": -19.3383,
+      "p95": -2.5352
+     },
+     "climb": {
+      "mean": -13.2788,
+      "p5": -20.973,
+      "p50": -14.241,
+      "p95": -3.7839
+     },
+     "slew_limited_pct": 2.4
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6914,
+      "p5": 0.008,
+      "p50": 0.8766,
+      "p95": 0.9656
+     },
+     "climb": {
+      "mean": 0.7049,
+      "p5": 0.4663,
+      "p50": 0.6845,
+      "p95": 0.9762
+     },
+     "slew_limited_pct": 1.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6861,
+      "p5": 0.5249,
+      "p50": 0.712,
+      "p95": 0.8519
+     },
+     "climb": {
+      "mean": 0.7146,
+      "p5": 0.5672,
+      "p50": 0.6286,
+      "p95": 0.9825
+     },
+     "slew_limited_pct": 1.0
+    }
+   },
+   "config": {
+    "tag": "blind_seed6",
+    "seed": 6,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed6",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:46:49",
+    "wall_min_this_session": 231.0,
+    "steps_per_s_this_session": 3.61,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed7": {
+   "damage": {
+    "median": 272.06,
+    "q1": 265.412,
+    "q3": 322.052,
+    "worst": 534.721,
+    "best": 240.886
+   },
+   "damage_thermal": {
+    "median": 225.61,
+    "q1": 215.744,
+    "q3": 272.763,
+    "worst": 456.242,
+    "best": 198.121
+   },
+   "fuel": {
+    "median": 4826.251,
+    "q1": 4707.143,
+    "q3": 4836.562,
+    "worst": 4870.581,
+    "best": 4488.267
+   },
+   "ret": {
+    "median": 83.473,
+    "q1": 31.904,
+    "q3": 101.393,
+    "worst": 178.246,
+    "best": 4.526
+   },
+   "torque_viol": {
+    "median": 0.036,
+    "q1": 0.027,
+    "q3": 0.043,
+    "worst": 0.073,
+    "best": 0.013
+   },
+   "peak_turb": {
+    "median": 821.297,
+    "q1": 818.548,
+    "q3": 826.796,
+    "worst": 850.897,
+    "best": 815.509
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 70.431,
+   "thermal_cut_pct": 73.751,
+   "fuel_vs_baseline_pct": 5.545,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.3113,
+      "p5": -4.2271,
+      "p50": 0.7621,
+      "p95": 3.7761
+     },
+     "climb": {
+      "mean": 2.9555,
+      "p5": -1.1778,
+      "p50": 3.4654,
+      "p95": 3.7669
+     },
+     "slew_limited_pct": 18.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0012,
+      "p5": -0.0627,
+      "p50": 0.0039,
+      "p95": 0.048
+     },
+     "climb": {
+      "mean": -0.0636,
+      "p5": -0.1012,
+      "p50": -0.0737,
+      "p95": -0.0045
+     },
+     "slew_limited_pct": 31.4
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -5.3119,
+      "p5": -25.4003,
+      "p50": -2.8658,
+      "p95": 7.9678
+     },
+     "climb": {
+      "mean": -3.971,
+      "p5": -8.628,
+      "p50": -5.9901,
+      "p95": 8.54
+     },
+     "slew_limited_pct": 4.4
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4613,
+      "p5": 0.0324,
+      "p50": 0.4633,
+      "p95": 0.845
+     },
+     "climb": {
+      "mean": 0.4502,
+      "p5": 0.201,
+      "p50": 0.2978,
+      "p95": 0.9814
+     },
+     "slew_limited_pct": 3.0
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5702,
+      "p5": 0.3099,
+      "p50": 0.6197,
+      "p95": 0.7827
+     },
+     "climb": {
+      "mean": 0.6911,
+      "p5": 0.5258,
+      "p50": 0.6411,
+      "p95": 0.9859
+     },
+     "slew_limited_pct": 1.2
+    }
+   },
+   "config": {
+    "tag": "blind_seed7",
+    "seed": 7,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed7",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:47:04",
+    "wall_min_this_session": 231.3,
+    "steps_per_s_this_session": 3.6,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed8": {
+   "damage": {
+    "median": 386.821,
+    "q1": 376.294,
+    "q3": 471.395,
+    "worst": 567.141,
+    "best": 370.829
+   },
+   "damage_thermal": {
+    "median": 354.586,
+    "q1": 349.478,
+    "q3": 436.244,
+    "worst": 490.276,
+    "best": 347.436
+   },
+   "fuel": {
+    "median": 4558.137,
+    "q1": 4469.113,
+    "q3": 4578.333,
+    "worst": 4724.656,
+    "best": 4435.479
+   },
+   "ret": {
+    "median": 64.042,
+    "q1": 29.456,
+    "q3": 77.456,
+    "worst": 99.332,
+    "best": 8.066
+   },
+   "torque_viol": {
+    "median": 0.009,
+    "q1": 0.001,
+    "q3": 0.014,
+    "worst": 0.023,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 838.961,
+    "q1": 838.393,
+    "q3": 848.461,
+    "worst": 853.274,
+    "best": 838.279
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 57.957,
+   "thermal_cut_pct": 58.746,
+   "fuel_vs_baseline_pct": -0.318,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.9794,
+      "p5": -3.6627,
+      "p50": -1.5732,
+      "p95": 2.9684
+     },
+     "climb": {
+      "mean": 2.846,
+      "p5": -3.8739,
+      "p50": 3.6281,
+      "p95": 3.9668
+     },
+     "slew_limited_pct": 3.5
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0093,
+      "p5": -0.0362,
+      "p50": -0.0062,
+      "p95": 0.019
+     },
+     "climb": {
+      "mean": -0.0179,
+      "p5": -0.0364,
+      "p50": -0.0269,
+      "p95": 0.0317
+     },
+     "slew_limited_pct": 29.3
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 9.7504,
+      "p5": -4.7394,
+      "p50": 12.0652,
+      "p95": 13.5946
+     },
+     "climb": {
+      "mean": -6.0183,
+      "p5": -15.1469,
+      "p50": -10.5349,
+      "p95": 12.8032
+     },
+     "slew_limited_pct": 8.9
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.1558,
+      "p5": 0.0116,
+      "p50": 0.0648,
+      "p95": 0.8107
+     },
+     "climb": {
+      "mean": 0.4209,
+      "p5": 0.0237,
+      "p50": 0.5285,
+      "p95": 0.6121
+     },
+     "slew_limited_pct": 2.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.3353,
+      "p5": 0.3068,
+      "p50": 0.3132,
+      "p95": 0.4744
+     },
+     "climb": {
+      "mean": 0.7635,
+      "p5": 0.5472,
+      "p50": 0.7447,
+      "p95": 0.9815
+     },
+     "slew_limited_pct": 0.7
+    }
+   },
+   "config": {
+    "tag": "blind_seed8",
+    "seed": 8,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed8",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:46:46",
+    "wall_min_this_session": 231.0,
+    "steps_per_s_this_session": 3.61,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed9": {
+   "damage": {
+    "median": 190.161,
+    "q1": 180.094,
+    "q3": 212.446,
+    "worst": 371.616,
+    "best": 174.407
+   },
+   "damage_thermal": {
+    "median": 168.239,
+    "q1": 165.321,
+    "q3": 181.034,
+    "worst": 328.403,
+    "best": 162.734
+   },
+   "fuel": {
+    "median": 5025.244,
+    "q1": 4954.526,
+    "q3": 5057.638,
+    "worst": 5086.826,
+    "best": 4580.4
+   },
+   "ret": {
+    "median": 86.951,
+    "q1": 31.921,
+    "q3": 106.42,
+    "worst": 173.487,
+    "best": -2.37
+   },
+   "torque_viol": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.005,
+    "worst": 0.046,
+    "best": 0.0
+   },
+   "peak_turb": {
+    "median": 803.237,
+    "q1": 802.405,
+    "q3": 806.376,
+    "worst": 833.944,
+    "best": 801.58
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 79.332,
+   "thermal_cut_pct": 80.426,
+   "fuel_vs_baseline_pct": 9.897,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.103,
+      "p5": -3.5634,
+      "p50": 0.5052,
+      "p95": 2.1828
+     },
+     "climb": {
+      "mean": 3.1154,
+      "p5": -3.0888,
+      "p50": 3.8207,
+      "p95": 3.8909
+     },
+     "slew_limited_pct": 15.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0177,
+      "p5": -0.0232,
+      "p50": 0.0238,
+      "p95": 0.0474
+     },
+     "climb": {
+      "mean": -0.0976,
+      "p5": -0.1203,
+      "p50": -0.1121,
+      "p95": -0.0296
+     },
+     "slew_limited_pct": 10.0
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -9.7966,
+      "p5": -28.3278,
+      "p50": -10.0123,
+      "p95": 12.9257
+     },
+     "climb": {
+      "mean": -5.2608,
+      "p5": -15.621,
+      "p50": -4.8504,
+      "p95": 2.4169
+     },
+     "slew_limited_pct": 0.8
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.3655,
+      "p5": 0.1894,
+      "p50": 0.3466,
+      "p95": 0.619
+     },
+     "climb": {
+      "mean": 0.1298,
+      "p5": 0.0145,
+      "p50": 0.0306,
+      "p95": 0.5515
+     },
+     "slew_limited_pct": 1.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.74,
+      "p5": 0.4217,
+      "p50": 0.7856,
+      "p95": 0.9714
+     },
+     "climb": {
+      "mean": 0.394,
+      "p5": 0.3067,
+      "p50": 0.3127,
+      "p95": 0.7662
+     },
+     "slew_limited_pct": 1.3
+    }
+   },
+   "config": {
+    "tag": "blind_seed9",
+    "seed": 9,
+    "preview": false,
+    "steps": 50000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "roads": "a new road every episode (TerrainTrainingEnv)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_commit": "cbb8d09",
+    "git_dirty": true,
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/terrain_dt1/blind_seed9",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "started": "2026-09-29T11:55:46",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-09-29T15:45:09",
+    "wall_min_this_session": 229.4,
+    "steps_per_s_this_session": 3.63,
+    "episodes": 55,
+    "total_timesteps": 50000,
+    "recorded_steps": 50000,
+    "config_source": "written by train.py during training"
+   }
+  }
+ },
+ "ablation": {
+  "pairs": [
+   {
+    "seed": 0,
+    "sighted": 57.931,
+    "blinded": 51.769,
+    "sighted_thermal": 56.079,
+    "blinded_thermal": 49.843
+   },
+   {
+    "seed": 1,
+    "sighted": 53.701,
+    "blinded": 49.025,
+    "sighted_thermal": 53.952,
+    "blinded_thermal": 51.886
+   },
+   {
+    "seed": 2,
+    "sighted": 69.562,
+    "blinded": 54.927,
+    "sighted_thermal": 69.287,
+    "blinded_thermal": 59.62
+   },
+   {
+    "seed": 3,
+    "sighted": 69.115,
+    "blinded": 75.264,
+    "sighted_thermal": 71.185,
+    "blinded_thermal": 80.044
+   },
+   {
+    "seed": 4,
+    "sighted": 66.631,
+    "blinded": 60.424,
+    "sighted_thermal": 64.783,
+    "blinded_thermal": 63.186
+   },
+   {
+    "seed": 5,
+    "sighted": 60.589,
+    "blinded": 74.907,
+    "sighted_thermal": 59.507,
+    "blinded_thermal": 77.814
+   },
+   {
+    "seed": 6,
+    "sighted": 70.645,
+    "blinded": 72.491,
+    "sighted_thermal": 71.974,
+    "blinded_thermal": 75.838
+   },
+   {
+    "seed": 7,
+    "sighted": 72.039,
+    "blinded": 70.431,
+    "sighted_thermal": 72.903,
+    "blinded_thermal": 73.751
+   },
+   {
+    "seed": 8,
+    "sighted": 59.935,
+    "blinded": 57.957,
+    "sighted_thermal": 58.383,
+    "blinded_thermal": 58.746
+   },
+   {
+    "seed": 9,
+    "sighted": 78.072,
+    "blinded": 79.332,
+    "sighted_thermal": 78.083,
+    "blinded_thermal": 80.426
+   }
+  ],
+  "n": 10,
+  "mean": 1.1693000000000011,
+  "median": 1.7930000000000028,
+  "sd": 7.839936635940086,
+  "ci95": [
+   -4.439052814892159,
+   6.777652814892162
+  ],
+  "p_t": 0.648406012250384,
+  "p_wilcoxon": 0.431640625,
+  "smallest_possible_p_wilcoxon": 0.001953125,
+  "thermal_mean": -1.501799999999998,
+  "p_t_thermal": 0.5590542691227736,
+  "sighted_over_grade": [
+   14.51,
+   10.28,
+   26.14,
+   25.69,
+   23.21,
+   17.17,
+   27.22,
+   28.62,
+   16.51,
+   34.65
+  ]
+ },
+ "findings": [
+  "SPARK. On the climb every agent advances spark 3.5-4.0 deg past the baseline (median; the trim's upper bound is +4), whose own spark there is 1.2 deg. That takes the modelled knock integral from the baseline's 0.61 to 0.77-0.79 (95th percentile), just under the 0.85 knee where the damage model starts charging for knock. Part of what the agents save is margin the production-representative baseline keeps and the UNTESTED knock model says is not needed (CLAUDE.md, the knock model). Sighted and blinded do it alike, so it does not touch the ablation; it does touch every agent-versus-hand-written gap. How much of the gain it is: KNOCK_MARGIN.md beside this file (knock_margin.py), where it exists.",
+  "BLIND_SEED6 does MORE damage than the baseline ECU on 5 of 20 episodes (numbers 7, 12, 14, 15, 16; worst 2527 against 920, peak turbine 932 C). Their weight on component life is 0.089, 0.034, 0.029, 0.049, 0.062 -- exactly the lowest in the frozen set. The reward lets an agent trade life for fuel when life is weighted that little; by evaluate.py's own standard a protection policy that is sometimes terrible is not one.",
+  "20 of 20 agents beat the best hand-written policy on median damage (43.4 % cut). 9 burn less fuel than the baseline."
+ ]
+}

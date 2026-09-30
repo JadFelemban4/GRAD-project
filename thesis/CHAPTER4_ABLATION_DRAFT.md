@@ -96,6 +96,7 @@ the same in every training and evaluation episode.
 | exact paired permutation test | p = 0.4922 |
 | **verdict** | **not significant** |
 
+<!-- RETIRED-OK: 959.8 -- Phase D's plant (tag sep17-before-merge), where the experiment ran -->
 **Spread across episodes and worst episode**, as the preregistration requires
 for every arm (`results/phase_d_seed*.txt`). On the fixed road the two
 hand-written policies score the same damage in every episode — baseline 959.8
@@ -185,6 +186,7 @@ grade in the range still pushes the turbine past the trigger (0 of 121 grades
 fail to bind; the weakest, 13.73 %, by 6.9 K, where the gearbox hands back a
 gear). Both outputs are recorded in `PREREGISTRATION_D2.md` section 10.
 
+<!-- RETIRED-OK: 959.8 -- Phase D's plant (tag sep17-before-merge), where the experiment ran -->
 **The minimum effect of interest was set in advance: 50 damage units.** Set by
 the team before any D2 agent trained, after being shown the power analysis:
 about 5 % of Phase D's baseline damage (959.8), four times the largest known

@@ -2,6 +2,15 @@
 
 > **Opening this in Claude Code?** Read `CLAUDE.md` first — it carries the
 > project's claim, its current state, and the mistakes already made.
+>
+> **29 September 2026: the retrain ran.** Twenty agents, ten seeds a side; all
+> beat every hand-written policy, and sighted minus blinded is +1.2 points (95 % CI
+> −4.4 to +6.8, n = 10) — **INCONCLUSIVE** under the preregistered MEI rule
+> (sign-test power 0.26), not "no effect". With spark advance forbidden their median cut falls to
+> ~41.6 %, below current-grade's 43.4 %: most of their margin rests on the
+> untested knock model (`results/agents/terrain_dt1/KNOCK_MARGIN.md`). Every
+> action is recorded (per-step records on the training machine, gitignored);
+> the generated tables are in `results/agents/terrain_dt1/README.md`.
 
 Working code for the validated parts of the project. Every number quoted in the
 handbook is this code's actual output, and `validate.py` regenerates the ones
@@ -15,7 +24,9 @@ pip install -r requirements.txt
 
 Python 3.11 or newer.
 
-> **PHASE D HAS RUN, 22 September 2026, AND THE RESULT IS A NULL.**
+> **PHASE D HAS RUN, 22 September 2026, AND THE RESULT IS A NULL.** *(On the plant of
+> `JMF-2340550-sep17`, tag `sep17-before-merge`; these agents are refused on the merged
+> plant and re-run only from that tag. D2 and C4 below likewise.)*
 > Sixteen agents — eight seeds per arm, sighted and blinded — trained on the
 > corrected ZF plant under `results/PREREGISTRATION.md`, which was committed
 > **before any of them started**.
@@ -63,8 +74,35 @@ Python 3.11 or newer.
 > `python analyse_phase_d.py` reproduces every number above.
 > Full account: `CHECKPOINT.md`, 21–22 September.
 
+> **Updated 28 September 2026, evening.** Drive B (full-throttle roll-ons) is in:
+> **321.7 minutes, eleven drives**. And **the data now sets the constants**:
+> `derive_params.py` recomputes everything the car's logs can set — the thermal
+> network's block and oil nodes, the boost ceiling (now the measured envelope
+> itself), the spark offset, the enrichment dwell, the gearbox's kickdown table —
+> into `data/derived_params.json`, and `build_dataset.py` runs it after every
+> rebuild. The oil node was re-structured from the data (heated by engine speed,
+> cooled by road speed); `validate.py` reads **8 of 11**. Four defects were fixed
+> on the way. The premise now reads baseline **920.1** at 883 °C and preview over
+> current-grade **−0.3**. Details: `SESSION_REPORT_2026-09-28_evening.md`;
+> what is still typed and why: REFERENCES.md section 4b.
+
+<!-- RETIRED-OK -->
+> **Updated 28 September 2026.** The Phase D retrain is ready and not yet run:
+> training now draws a new road every episode, at the same 1.0 s step the
+> scoring uses, while `evaluate.py` still scores only the locked 12 % / 130 km/h
+> climb. Two simulator fixes landed (the gearbox now kicks down when the engine
+> cannot deliver the request; the part-load spark map's offset was refitted),
+> <!-- RETIRED-OK: 951.9, 34.4 -- the 28 September morning plant -->
+> and the premise then read baseline 951.9, current-grade cuts 34.4 %. The
+> simulator is laid beside the car in eleven places by `model_vs_data.py`, and
+> the results are on a phone-readable page built by `make_page.py`. The drives
+> that would settle what the logs cannot are in `logs/DRIVE_PLAN.md`. Details:
+> `SESSION_REPORT_2026-09-28.md`.
+
+> <!-- RETIRED-OK -->
 > **Updated 16 September 2026.** Two things arrived since the last pass. The
-> dataset is now **ten drives, 295.0 minutes** (`pull01`, which contributes
+> <!-- RETIRED-OK: 295.0, 10 -- the manifest before drive B -->
+> dataset was then **ten drives, 295.0 minutes** (`pull01`, which contributes
 > zero samples by design, so no calibration figure moved). And `app/` exists —
 > a live supervisor that runs this same physics beside the car and estimates
 > turbine temperature, which the vehicle has no sensor for. **It is a second
@@ -122,30 +160,32 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 > come out any other way. It becomes a real ablation only when a TRAINED blinded
 > agent is raced against a trained sighted one — which is Phase D.
 >
-> **What the script prints today** (`check_premise.py`, `FULL_RUN.txt`
-> 21 September; the locked scenario, 12 % at 130 km/h in 42 °C air on the ZF
-> 8HP51 gearbox), with the true neutral, equal protection depth, and the ECU
-> scheduled on the pressure the engine runs at:
+> **What the script prints on the merged plant** (30 September 2026; the locked
+> scenario, 12 % at 130 km/h in 42 °C air; `results/premise.json`), with the true
+> neutral, equal protection depth, and the ECU scheduled on the pressure the
+> engine runs at:
 >
-> | policy | fuel g | damage | peak turbine |
+> | policy | damage | fuel g | peak turbine |
 > |---|---|---|---|
-> | baseline ECU (true neutral) | 4664 | 959.8 | 884 °C |
-> | reactive protection | 4843 | 679.0 | 862 °C |
-> | current-grade protection | 4936 | 633.2 | 861 °C |
-> | predictive protection | 4941 | 637.4 | 861 °C |
-> | predictive, preview disabled | 4843 | 679.0 | 862 °C |
+> | baseline ECU (true neutral) | 920.1 | 4573 | 883 °C |
+> | reactive protection | 625.7 | 4714 | 860 °C |
+> | current-grade protection | 520.5 | 4841 | 853 °C |
+> | predictive protection | 523.5 | 4846 | 853 °C |
+> | predictive, preview disabled | 625.7 | 4714 | 860 °C |
 >
-> **The constraint binds.** The baseline, 959.8 at 884 °C, crosses the 850 °C
-> trigger by about 34 K, so every protecting policy acts: reactive cuts damage
-> 29.3 %, current-grade 34.0 %, predictive 33.6 %. Preview gains **+4.3 points**
-> over reactive, but against a policy that merely knows the grade it is on
+> **The constraint binds.** The baseline, 920.1 at 883 °C, crosses the 850 °C
+> trigger, so every protecting policy acts: reactive cuts damage 32.0 %,
+> current-grade 43.4 %, predictive 43.1 %. Preview gains **+11.1 points** over
+> reactive, but against a policy that merely knows the grade it is on
 > right now — information any car has from a nose-down accelerometer, and the
-> comparator the audit asked for — it **loses by 0.4 points**. These are
+> comparator the audit asked for — it **loses by 0.3 points**, and that 0.3 is
+> one second of knock at the grade step (`CLAUDE.md`'s first box). These are
 > hand-written policies. The trained answer is Phase D, in the box at the top
 > of this file.
 
-> <!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 38, 78 -->
-> *(This table read 256.5 / 801 °C and −2.2 points until 17 September — the
+> <!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 38, 78, 959.8, 884, 34.0, 0.4 -->
+> *(On sep17's plant, until the merge of 30 September, it read baseline 959.8 at
+> 884 °C, current-grade cutting 34.0 % and preview −0.4 against it. This table read 256.5 / 801 °C and −2.2 points until 17 September — the
 > figures from before the H1 crank-angle correction took `plant.DTHETA_DEG`
 > from 0.5° to 0.25°, a move `AUDIT_FIXES.md` records in its own H1 section. It
 > then read baseline 294.2 at 812 °C until 22 September, with the constraint
@@ -214,7 +254,7 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 |---|---|---|
 | `plant.py` | 0-D single-zone SI cycle model. `Geometry()` **is** the B58B30O1 inline-six from the 2023 GR Supra — 2997.5 cc; `b58()` is an alias for it. Wiebe burn, Woschni heat transfer, Chen-Flynn friction, Douaud-Eyzat knock integral. One cycle ≈ 4.6 ms. | B |
 | `thermal.py` | 3-node lumped-capacitance network — block/coolant, oil, turbine housing — with a stand-in thermostat (the real B58 uses a heat-management valve; see REFERENCES.md section 2). | B |
-| `validate.py` | **Regenerates the validation table.** Eleven quantities against published bands. Currently 8 of 11 inside; the three misses are explained in validation_table.md. | B |
+| `validate.py` | **Regenerates the validation table.** Eleven quantities: rows 1-7 against literature bands, rows 8-11 (oil and coolant) against bands computed from our own logs. Currently 8 of 11 inside; the misses are explained in validation_table.md. | B |
 | `extract_steady.py` | Finds steady operating points in a BimmerLink CSV and **de-duplicates** them. | B |
 | `compare_log.py` | Runs the plant at those points and scores the error. | B |
 | `check_map.py` | Derives MBT and knock-limited spark maps. Confirms the calibration surface has the right shape. | B |
@@ -251,7 +291,7 @@ temperature, so the app runs the validated physics next to the live stream and
 estimates it. Everything else is supporting cast. Because it reuses
 `plant.predict`, `plant.map_from_airflow`, `plant.charge_temperature` and
 `thermal.ThermalNetwork` unchanged, it **inherits Phase B's validation and
-Phase B's limits** — 8 of 11 bands, three documented misses, and a load range
+Phase B's limits** — 8 of 11 bands (the oil and coolant rows scored against the car itself), the misses documented, and a load range
 checked only where the steady points sit. It must not imply more confidence
 than that, and `t_turb_c` is a model output with an assumed heat capacity
 (REFERENCES.md section 4), never a reading.
@@ -344,15 +384,17 @@ number.
 ### 3. Peak power is not a prediction of this model
 
 Manifold pressure is an **input**. `plant.boost_ceiling_kpa` now bounds it to
-what the car was observed to do — refitted on 74 013 quasi-steady
-samples — and `SupervisoryTunerEnv.MAP_CEIL_KPA` is the measured 250 kPa rather
+what the car was observed to do — since 28 September it IS the measured
+envelope, recomputed from the data on every rebuild (83 272 quasi-steady
+samples), with no fitted constant — and `SupervisoryTunerEnv.MAP_CEIL_KPA` is
+derived from the highest pressure ratio the car reached (2.52, 250 kPa) rather
 than the round 240 that used to sit there. But an operating line is not a
 compressor map: no efficiency islands, no speed lines, because the car has no
 turbo speed sensor and no pre-intercooler temperature. Full-load points remain
 outside the validated envelope. Say so rather than tuning towards a number.
 
 **Two further things you must state.** The MAF channel saturates at exactly
-1020 kg/h on six drives, so the envelope above 0.314 kg/s corrected flow is
+1020 kg/h on 7 drives, so the envelope above 0.314 kg/s corrected flow is
 unmeasured, not merely sparse. And the air-mass inversion used to disagree with
 the logged boost channel by **+23.7 %** under boost — which this project blamed
 on `volumetric_efficiency()` for two weeks. **It was the charge temperature.**
@@ -432,8 +474,8 @@ reward is only safe relative to the dynamics it scores.
 
 ### 6. The MAF channel saturates, and it does not say so
 
-`Air mass flow` tops out at exactly **1020.0 kg/h** on six separate drives,
-**547 samples** — while `Air mass flow participating in combustion` reaches
+`Air mass flow` tops out at exactly **1020.0 kg/h** on seven separate drives,
+**568 samples** — while `Air mass flow participating in combustion` reaches
 1233 kg/h on those same samples, a median ratio of **1.095**. A pinned sample
 under-reports air, so anything inverted from it is biased at the very top of
 the envelope. `build_dataset.py` flags them as `maf_pinned` and excludes them
@@ -450,9 +492,19 @@ maximum repeated across drives is the tell.
 
 <!-- RETIRED-OK: section 527.2, 51.4, 26.9, 2.13, 1.38, 8.43, 244, 930 -- the version history of the headline; every figure named here is one it moved AWAY from -->
 
+> **HISTORY, AND ITS CLOSING ARGUMENT IS WITHDRAWN.** This section records how
+> the premise figures moved up to 8 September. Its last paragraphs call the
+> "preview-disabled equals reactive" identity "the sentence to defend in the
+> viva"; AUDIT.md C3 showed that identity holds by construction and is not
+> evidence, and it was withdrawn on 16 September. The figures here are void.
+> Current figures: `python check_premise.py` (`results/premise.json`). *(Note
+> added 28 September 2026: the section is exempt from the checker, so nothing
+> would otherwise have flagged the retracted argument.)*
+
 `BaselineECU` was guessed. It is now calibrated against the real car: its
-enrichment and spark fits were built on eight drives of the ten in the
-manifest (295.0 minutes in all). Two things were wrong, and the
+enrichment shape and spark slopes were fitted on eight drives, and since 28 September
+its spark offset and enrichment dwell are derived from all of them (the manifest now
+holds eleven drives, 321.7 minutes). Two things were wrong, and the
 second one was distorting every result.
 
 **Its enrichment map has been wrong three times, and the third time it was the
@@ -494,7 +546,11 @@ Median lambda, pooled, above 180 kPa:
 |---|---|---|---|---|
 | 1000-3500 rpm | 0.99 | 0.99 | 0.98 | 441 |
 | 3500-4500 rpm | 0.99 | 0.98 | 0.90 | 235 |
-| 4500-7000 rpm | 0.98 | 0.87 | 0.79 | 665 |
+| 4500-7000 rpm | 0.98 | 0.83 | 0.79 | 665 |
+
+Dwell counted in seconds from the timestamps. *(Until 27 September this table
+read 422 / 168 / 465 and 0.87 in the 4500-7000 rpm, 4-8 s cell: the counts
+predate drive10, and 0.87 was the row-count dwell axis AUDIT.md H3 retired.)*
 
 Read the bottom row across: at the same load the car runs stoichiometric for
 the first seconds of a pull and enriches only once it has been up there a
@@ -505,9 +561,10 @@ would have enriched on the wrong signal and flattered the agent for the wrong
 reason.
 
 The remaining limitation: dwell above the 180 kPa gate stands in for turbine
-inlet temperature, which this car does not expose. The weakest cell of the fit
-is 3500–4500 rpm at long dwell — observed 0.90 against a modelled 0.93, on the
-235 samples in that band. Say both in Chapter 3.
+inlet temperature, which this car does not expose. Since 28 September the dwell
+thresholds are derived from the car on the timestamp axis; the weakest cell is
+3500–4500 rpm at long dwell, 0.033 lean (`model_vs_data.py`). Say both in
+Chapter 3.
 
 **Its spark map was not knock-limited.** At 3000 rpm and 140 kPa the old baseline
 commanded 26.9° BTDC, giving a knock integral of **2.13**. Production engines sit
@@ -536,7 +593,7 @@ the fitted line into boost — extrapolated, it puts the baseline at +21° at
 baseline with its cooling switched off, and its preview edge rests on an
 ablation identity that could not fail. It stays in this table only as the
 record of how the headline moved. What `check_premise.py` prints today is in
-the box near the top of this file: baseline 959.8 at 884 °C, and hand-written
+the box near the top of this file: baseline 920.1 at 883 °C on the merged plant, and hand-written
 preview −0.4 points against current-grade.
 
 <!-- RETIRED-OK: 110, 297, 879, 244 -->
@@ -612,6 +669,17 @@ model, change the trigger with it.**
 
 `generality_test.py` prints three tables. H2b was, when this section was
 written, the one it told you to use; it no longer is — see below.
+
+> **HISTORY. The H2 table below is void** (AUDIT.md C1 and M12). And since
+> 28 September `generality_test.py` also measures preview against the
+> CURRENT-GRADE comparator (AUDIT.md C3): on the derived plant, at every τ and
+> every cost curvature, **preview over current-grade is 0.0 points**. The edges
+> it reports over the reactive policy are timing that a policy reading only the
+> current grade gets for free. Run `python generality_test.py` for the tables.
+
+**And not before the thermal fix:** `generality_test.py` runs at dt 2.0, where the
+merged plant's coolant node oscillates 85–95 °C without settling (`thermal.py`,
+`step()`'s docstring). No H/τ figure is quotable until the network is sub-stepped.
 
 With a fixed constraint threshold, the two largest thermal masses never get hot
 enough to violate it, so two of the five sweep points return nothing. H2b sets

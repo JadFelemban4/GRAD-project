@@ -424,6 +424,21 @@ def _paragraph_is_historical(block, n, is_md, figure=None, rel=None):
     return _num_token(figure) in named or str(figure) in named
 
 
+# A tracked file whose FIRST LINE carries "RETIRED-OK: file" is a dated record
+# declared out of date in full -- presentation/index.html since 28 September
+# 2026, which says so in a banner on the page itself. It is skipped, and every
+# run PRINTS that it was skipped: an exemption nobody can see is how 55 stale
+# figures shipped on 11 September.
+FILE_RETIRED = "RETIRED-OK: file"
+SKIPPED_FILES = set()
+
+
+def _file_is_retired(path):
+    with open(path, encoding="utf-8") as fh:
+        head = fh.readline()
+    return FILE_RETIRED in head
+
+
 def scan_documents(label, value, patterns, files, tol):
     """Fail if any named document states a DIFFERENT value for this figure.
 
@@ -444,6 +459,9 @@ def scan_documents(label, value, patterns, files, tol):
     for rel in files:
         path = os.path.join(HERE, rel)
         if not os.path.exists(path):
+            continue
+        if _file_is_retired(path):
+            SKIPPED_FILES.add(rel)
             continue
         raw, block = read_lines(path)
         is_md = path.endswith(".md")
@@ -796,6 +814,33 @@ RETIRED = [
      "NOTHING -- it was produced on a gearbox this branch replaced seven hours "
      "later, and re-scoring the same pair here gives a different number that is "
      "not a result either"),
+    # --- added 27 September 2026. The enrichment cell table was never
+    # regenerated after AUDIT.md H3 moved dwell onto the timestamps, and the
+    # README copy of it was shielded by a section-wide RETIRED-OK. Both claims
+    # below were live in two documents.
+    (r"within 0\.027", "every enrichment cell within 0.027 (row-count dwell axis)",
+     "worst cell 0.076 lean, 4500-7000 rpm at 4-8 s (model_vs_data.py)"),
+    (r"4500\s*[-–]\s*7000[^\n]{0,24}?\b0\.98\b[^\n]{0,8}?\b0\.87\b",
+     "the 4500-7000 rpm, 4-8 s enrichment cell at 0.87 (row-count dwell axis)",
+     "0.83, dwell from the timestamps"),
+    # 28 September 2026. validate.py has printed 239.9 since the cycle model was
+    # converged (AUDIT.md H1), but REFERENCES.md section 3 row 3 still placed
+    # "our 241.2" between Heywood's 270 and Conway's 233. Found by hand while
+    # moving rows 8-11 onto car data; nothing was guarding it.
+    (r"\b241\.2\b", "best BSFC 241.2 g/kWh (before the converged cycle model)",
+     "239.9 g/kWh (validate.py row 3)"),
+    # 28 September 2026 (evening). The premise on the plant before the block and
+    # oil nodes, the boost ceiling, the exhaust flow and the air density were
+    # derived from the data. results/premise.json holds the current figures.
+    (r"\b951\.9\b|\b624\.5\b|\b628\.4\b|\b671\.1\b",
+     "premise 951.9 / 671.1 / 624.5 / 628.4 (before the derived plant)",
+     "run check_premise.py; results/premise.json"),
+    # The fitted load constant as compare_log.py printed it before the 26-point
+    # dataset; it has printed 0.839 since, and the documents never followed.
+    (r"\b0\.837\b", "fitted k 0.837 (compare_log.py prints 0.839 on the 26 points)",
+     "0.839 fitted; 0.831 derived is the one to quote"),
+    # The dataset before drive B.
+    (r"\b295\.0\s*min", "295.0 minutes (before drive B)", "321.7 minutes, eleven drives"),
 ]
 
 # Files whose whole job is to record what changed, so they are expected to
@@ -812,6 +857,23 @@ RETIRED = [
 # unguarded in full, so a LIVE wrong figure inside one passes. None of them is
 # a source of truth and nothing should be quoted from one without running the
 # script it cites.
+# A dated SESSION REPORT records what was true on its day -- the same call as
+# AUDIT.md and AUDIT_FIXES.md below. Exempted by name pattern (28 Sep 2026),
+# after the derived plant retired figures that every earlier report quotes.
+# 30 September 2026: dated next-session prompts are records of their day too.
+RETIRED_EXEMPT_PREFIX = ("SESSION_REPORT_", "NEXT_SESSION_")
+# GENERATED per-agent reports (record_agents.py, knock_margin.py; 29 Sep 2026):
+# tables of agent scores computed from the records, never prose. The retired
+# patterns are written for prose and match their numbers by coincidence -- the
+# first hit was an agent's 2.8 % thermal cut read as the retired 2.8 % load
+# residual. Exempted by folder: results/agents/<set>/..., generated only. The
+# hand-written index one level up, results/agents/README.md, is still checked.
+RETIRED_EXEMPT_AGENT_DIRS = ("results/agents/",)
+
+
+def _generated_agent_report(rel):
+    rel = rel.replace(os.sep, "/")
+    return rel.startswith(RETIRED_EXEMPT_AGENT_DIRS) and len(rel.split("/")) >= 4
 RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md",
                   # AUDIT.md is a review: quoting the figures it found wrong is
@@ -844,7 +906,19 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   # recording as a claim. Regenerate it with full_run.py; never
                   # quote a figure from it that the block above it did not
                   # print.
-                  "FULL_RUN.txt"}
+                  "FULL_RUN.txt",
+                  # The merge review of 30 September 2026 and its Arabic copy: a
+                  # dated decision record whose content is the two branches'
+                  # figures side by side, the superseded ones included. Same call
+                  # as AUDIT2.md, with the same cost: a live figure in it is
+                  # unguarded, so quote nothing from it without the script behind it.
+                  "conflict.md", "conflict_ar.md",
+                  # The preregistrations are FROZEN: each quotes the plant its
+                  # experiment ran on (959.8 is Phase D's, D2's and C4's baseline,
+                  # on the plant of tag sep17-before-merge). Editing one to follow
+                  # the merged plant would rewrite the rule after the result.
+                  "PREREGISTRATION.md", "PREREGISTRATION_D2.md",
+                  "PREREGISTRATION_C4.md"}
 
 # Exempt by DIRECTORY, where a basename rule would be wrong. `results/void/`
 # holds result files this project has declared void, beside a README whose
@@ -852,7 +926,17 @@ RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
 # something retired, on purpose. Exempting it by basename is not available:
 # one of the files is called README.md, and that would exempt every README in
 # the repository.
-RETIRED_EXEMPT_DIRS = ("results/void/",)
+RETIRED_EXEMPT_DIRS = ("results/void/",
+                       # the merge review's evidence (30 Sep 2026): reports that
+                       # quote both branches' figures, superseded ones included
+                       "_merge_review/",
+                       # a dated meeting deck of 20 September
+                       "presentation/meeting-update-2026-09-20/",
+                       # GENERATED pages built before the merge (28-29 Sep), from
+                       # the pre-merge plants. Regenerate them after the thermal
+                       # fix (plot_study_page.py, plot_agent_pairs.py, make_page.py)
+                       # rather than hand-editing a generated file.
+                       "figures/study/", "figures/agent_pairs/", "results/page/")
 
 # A line that names a retired figure ON PURPOSE -- "the old 39.5 s figure is
 # void", the mistake log's was/should-say tables -- carries this marker. It is
@@ -1059,9 +1143,22 @@ def check_simulation(here):
         return
 
     inside = sum(1 for r in rows if r.get("inside"))
-    figure("validate.py rows inside the published band", inside, 8, 0,
+    # 8 until 28 September 2026, when rows 8-11 (oil and coolant) moved from
+    # literature bands onto bands computed from our own logs (validate.py
+    # check_against_car). The expected value changed because what the table
+    # MEASURES changed, not to make a check pass: against the car, the oil node
+    # is too slow to warm on sustained load and too fast overall, and the
+    # free-running coolant settles below the heat-management setpoint.
+    #
+    # 8 from 28 September 2026 (evening): the block and oil nodes of thermal.py
+    # are now derived from the car's logs (derive_params.py), and rows 10 and 11
+    # (coolant) are inside the car's bands; rows 8 and 9 (oil) are still out.
+    # The expectation moved because the MODEL moved, measured, not to pass.
+    figure("validate.py rows inside their band", inside, 8, 0,
            patterns=[r"\b" + NUM + r"\s*\*{0,2}\s*of\s+\*{0,2}\s*11\b"],
            files=ALL)
+    car = [r for r in rows if r.get("basis") == "our car"]
+    chk("validate.py rows scored against our own car", len(car), 4, 0)
 
     by_name = {r["name"]: r for r in rows}
 
@@ -1087,6 +1184,8 @@ def check_simulation(here):
         r = by_name.get(name)
         if r is not None:
             chk(label, round(float(r["model"]), 1), expect, tol)
+
+    check_derived(here)
 
     # The crank-angle step is now a studied number; assert it has not been
     # quietly rounded back to something convenient.
@@ -1266,10 +1365,17 @@ def check_scenario(here):
     # files carry the same 1118.0 baseline row -- scoped out here BEFORE the
     # first one exists, rather than after it has produced eight false
     # contradictions.
+    # MOVED IN THE MERGE, 30 September 2026. The pins below held the values of
+    # JMF-2340550-sep17's plant (959.8 / 884 C / 890.6 C / 608.0 C / 15 thermal
+    # alerts). The merge took Ghassan's physics (conflict.md decision 1, agreed by
+    # both), and on that plant the same scripts print 920.1 / 883 C / 873.1 C /
+    # 604.8 C / 14 -- measured on a trial build of the merge before committing.
+    # The frozen Phase D result files (results/phase_d_seed*.txt) were scored on
+    # the old plant and are scoped out of the premise scan like D2's and C4's.
     PREMISE_FILES = [f for f in ALL
-                     if not re.match(r"results/(d2|c4)_seed\d+\.txt$", f)]
+                     if not re.match(r"results/(d2|c4|phase_d)_seed\d+\.txt$", f)]
     print(f"  note   one neutral premise rollout, {_time.time() - _t0:.0f} s")
-    figure("check_premise baseline damage", round(float(r["damage"]), 1), 959.8, 0.3,
+    figure("check_premise baseline damage", round(float(r["damage"]), 1), 920.1, 0.3,
            # THREE DIGITS AND ONE DECIMAL. Every damage figure this project has
            # ever published is written that way (959.8, 572.8, 294.2, 414.4),
            # and a bare NUM after the word "baseline" reads the 1.0 out of
@@ -1288,7 +1394,7 @@ def check_scenario(here):
                      r"^[>\s]*baseline[^|\n]{0,40}?\s(\d{3}\.\d)\s"],
            files=PREMISE_FILES, dtol=0.3)
     figure("check_premise baseline peak turbine",
-           round(float(r["peak_turb"])), 884, 0.6, " C",
+           round(float(r["peak_turb"])), 883, 0.6, " C",
            # ANY "baseline <damage> at <peak> C" sentence, not just one that
            # already carries the right damage. CLAUDE.md says "baseline 294.2 at
            # 812 C" -- both halves wrong -- and a pattern anchored on 959.8
@@ -1296,7 +1402,7 @@ def check_scenario(here):
            # already-wrong line without anything moving.
            patterns=[r"baseline[^.\n|]{0,26}?\d{3}\.\d\s*(?:at|/|\|)\s*\*{0,2}"
                      + NUM + r"\s*\*{0,2}\s*°?\s*C",
-                     r"\b(?:959\.8|960)\b[^.\n|]{0,14}?(?:at|/|\|)\s*\*{0,2}" + NUM
+                     r"\b(?:920\.1|920)\b[^.\n|]{0,14}?(?:at|/|\|)\s*\*{0,2}" + NUM
                      + r"\s*\*{0,2}\s*°?\s*C",
                      # the pipe-table form, as the README writes it
                      r"^[>\s]*\|[^|\n]*baseline[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*\*{0,2}"
@@ -1375,9 +1481,9 @@ def check_scenario(here):
     # this project chose. They are pinned so a regression is visible, and the
     # documents that repeat them have to move when the pin does.
     chk("app peak 7475b5d7 (MODEL OUTPUT; a pin, not a run of the suite)",
-        float(TR.EXPECT_FULL["peak_turb_c"]), 890.6, 0.0, " C")
+        float(TR.EXPECT_FULL["peak_turb_c"]), 873.1, 0.0, " C")
     chk("app peak pull01 (MODEL OUTPUT; a pin, not a run of the suite)",
-        float(TR.EXPECT_FAST["peak_turb_c"]), 608.0, 0.0, " C")
+        float(TR.EXPECT_FAST["peak_turb_c"]), 604.8, 0.0, " C")
     # The two drives' peaks are written identically, so the documents are
     # checked against BOTH pinned values at once -- see scan_allowed(). The word
     # TURBINE has to be in the sentence: `7475b5d7` is also the drive behind the
@@ -1396,7 +1502,7 @@ def check_scenario(here):
     # "13 thermal / 0 mismatch / 19 novel" -- and a bare "N thermal" also reads
     # pull01's 1 thermal and 4 novel, which are correct figures for that drive.
     figure("app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)",
-           int(TR.EXPECT_FULL["thermal"]), 15, 0,
+           int(TR.EXPECT_FULL["thermal"]), 14, 0,
            patterns=[r"\b" + NUM + r"\s+thermal\s*[/\u00b7]\s*\d+\s+mismatch"],
            files=ALL)
     # The third leg of the trio. The comment above says "documents always write
@@ -1449,6 +1555,52 @@ def check_scenario(here):
            files=ALL, dtol=0.002)
 
 
+def check_derived(here):
+    """The constants derived from the data, and the premise figures, are FRESH.
+
+    28 September 2026. Every constant the car's logs can set now lives in
+    data/derived_params.json (derive_params.py), recomputed from the data. That
+    only helps if nothing quotes a derivation made from OLDER data, so:
+
+      1. the derived file's input fingerprint must match the data as shipped --
+         a drive added without re-deriving fails here;
+      2. results/premise.json must have been produced on THAT derivation -- a
+         premise figure from an older plant fails here;
+      3. the premise figures the documents quote are checked against it. Until
+         now nothing checked them at all: check_simulation's note said the
+         premise was void and guarded by RETIRED, which stopped being true the
+         day the scenario was re-locked.
+    """
+    import json
+    import derived
+    import derive_params
+
+    print("\nDERIVED CONSTANTS AND PREMISE  (derive_params.py, check_premise.py)")
+    d = derived.all_params()
+    fp = derive_params.fingerprint()
+    chk("derived constants were computed from the data as shipped",
+        d.get("_inputs", {}).get("data_sha1"), fp["data_sha1"])
+    chk("...and from the raw logs as shipped", tuple(d.get("_inputs", {}).get("raw_logs", [])),
+        tuple(fp["raw_logs"]))
+    path = os.path.join(here, "results", "premise.json")
+    if not os.path.exists(path):
+        chk("results/premise.json exists (run check_premise.py)", False, True)
+        return
+    p = json.load(open(path))
+    chk("premise figures were computed on the current derived constants",
+        (p.get("_derived_inputs") or {}).get("data_sha1"), fp["data_sha1"])
+    base = p["baseline ECU (true neutral)"]["damage"]
+    figure("premise baseline damage", round(base, 1), round(base, 1), 0.0,
+           patterns=[r"baseline ECU \(true neutral\)\s*\|\s*\*{0,2}" + NUM,
+                     r"baseline \*\*" + NUM + r"\*\* at"],
+           files=ALL, dtol=0.05)
+    g = p["_preview_over_current_grade_pts"]
+    figure("preview over current-grade, hand-written", round(g, 1), round(g, 1), 0.0,
+           patterns=[r"preview over current[- ]grade\s*\*{0,2}" + NUM,
+                     r"preview over current-grade \*\*" + NUM],
+           files=ALL, dtol=0.05)
+
+
 def check_retired(here):
     """Fail if any document still quotes a figure this project has retired.
 
@@ -1462,11 +1614,19 @@ def check_retired(here):
     docs = [f for f in tracked_files(here)
             if os.path.basename(f) not in RETIRED_EXEMPT
             and not f.startswith(RETIRED_EXEMPT_DIRS)
+            and not os.path.basename(f).startswith(RETIRED_EXEMPT_PREFIX)
+            and not _generated_agent_report(f)
             and os.path.basename(f) != os.path.basename(__file__)]
 
     found, n_marked = [], 0
     for rel in docs:
         path = os.path.join(here, rel)
+        # Merged 30 September 2026: Ghassan's whole-file marker was honoured by
+        # the figure scan only, so presentation/index.html -- a dated briefing
+        # whose first line declares it -- was still reported here.
+        if _file_is_retired(path):
+            SKIPPED_FILES.add(rel)
+            continue
         raw, block = read_lines(path)
         is_md = path.endswith(".md")
         for n, line in enumerate(block, 1):
@@ -1557,6 +1717,9 @@ def report_documents():
     if not DOC_FAILURES:
         print(f"  ok     {DOC_HITS} figure mentions across {len(ALL)} "
               f"tracked files all agree with the data")
+    for rel in sorted(SKIPPED_FILES):
+        print(f"  SKIPPED {rel}: first line declares it a dated record ({FILE_RETIRED}) --"
+              f" it is NOT being checked")
     if DOC_UNMATCHED:
         print(f"  note   {len(DOC_UNMATCHED)} pattern(s) matched nothing anywhere "
               f"-- check the regex has not rotted:")
@@ -1576,6 +1739,8 @@ MD_CH = MD + ["logs/CHANNEL_SET_FINAL.md"]
 ALL = [f for f in tracked_files(HERE)
        if os.path.basename(f) not in RETIRED_EXEMPT
        and not f.startswith(RETIRED_EXEMPT_DIRS)
+       and not os.path.basename(f).startswith(RETIRED_EXEMPT_PREFIX)
+       and not _generated_agent_report(f)
        and os.path.basename(f) != os.path.basename(__file__)]
 ENV = ["engine_env.py"]
 
@@ -1591,7 +1756,9 @@ def main():
     # the purpose-built 7-channel drive of mistake 13b -- joined logs/raw/.
     # It adds 7.5 minutes and ZERO samples and ZERO operating points, by
     # design: it carries no coolant channel, so the warm filter excludes it.
-    figure("total minutes", round(float(M.duration_min.sum()), 1), 295.0, 0.15,
+    # 295.0 over ten drives until 28 September 2026, when drive B (the
+    # full-throttle roll-ons of logs/DRIVE_PLAN.md, 26.7 min) joined.
+    figure("total minutes", round(float(M.duration_min.sum()), 1), 321.7, 0.15,
            " min",
            # Anchored to a DATASET-SCALE drive count. validation_table.md says
            # "three drives (80 minutes)" about the thermal fit, which is a
@@ -1612,16 +1779,16 @@ def main():
            # "eight drives, 295.0 minutes" is wrong in a way worth catching.
            patterns=[r"(?<!adds )" + NUM + r"\s*min(?:ute)?s?\b[^.\n]{0,30}?"
                      r"(?:pooled|dataset|manifest|"
-                     r"\b(?:6|7|8|9|10|six|seven|eight|nine|ten)\b\s*drives)",
-                     r"\b(?:6|7|8|9|10|six|seven|eight|nine|ten)\s+drives"
+                     r"\b(?:6|7|8|9|10|11|six|seven|eight|nine|ten|eleven)\b\s*drives)",
+                     r"\b(?:6|7|8|9|10|11|six|seven|eight|nine|ten|eleven)\s+drives"
                      r"[^.\n]{0,30}?(?<!adds )\b" + NUM + r"\s*min(?:ute)?s?\b"],
            files=ALL, dtol=0.15)
-    figure("drives in the manifest", len(M), 10, 0,
+    figure("drives in the manifest", len(M), 11, 0,         # 10 until drive B, 28 Sep
            patterns=[WORDNUM + r"\s+drives,?\s+(?:and\s+)?\d+(?:\.\d+)?\s*min",
                      r"\d+(?:\.\d+)?\s*min(?:ute)?s?\s+(?:over|across|pooled across)\s+"
                      + WORDNUM + r"\s+drives"],
            files=ALL)
-    figure("drives that carry samples", S.source.nunique(), 7, 0,
+    figure("drives that carry samples", S.source.nunique(), 8, 0,   # 7 until drive B
            # The number must be the SUBJECT of 'carry'. Without the lookbehind,
            # 'Six of the nine drives carry usable samples' -- a correct sentence
            # -- reports nine. A false positive of exactly the kind AUDIT.md H2
@@ -1659,7 +1826,8 @@ def main():
            files=ALL, dtol=0.6)
 
     print("\nMAF SATURATION  (CLAUDE.md mistake 7)")
-    figure("samples pinned at the 1020 kg/h ceiling", int(S.maf_pinned.sum()), 547, 0,
+    # 547 over six drives until drive B, whose last roll-on pinned the MAF 21 times.
+    figure("samples pinned at the 1020 kg/h ceiling", int(S.maf_pinned.sum()), 568, 0,
            patterns=[r"(?:1020(?:\.0)?\s*kg/h|ceiling|pinned)[^.\n]{0,70}?\b" + NUM
                      + r"\s+samples",
                      NUM + r"\s+samples[^.\n]{0,50}?(?:pinned|ceiling|1020)"],
@@ -1679,14 +1847,16 @@ def main():
     # The raw-log figure, for the record: 573 pinned samples across 6 of the
     # 9 drives; 517 across 5 once the warm filter has run.
     hits = int(S.loc[S.maf_pinned.astype(bool), "source"].nunique())
-    figure("drives showing that exact ceiling", hits, 6, 0,
+    figure("drives showing that exact ceiling", hits, 7, 0,
            patterns=[WORDNUM + r"\s+separate\s+drives",
                      r"1020\s*kg/h on\s+" + WORDNUM + r"\s+drives"],
            files=ALL)
 
     print("\nCOMPRESSOR ENVELOPE  (validation_table.md D)")
     st = S[S.stable == 1]
-    figure("quasi-steady samples behind the fit", len(st), 74013, 0,
+    # 74 013 until drive B (28 Sep), whose stable rows now carry a corrected
+    # flow on build_dataset.AMB_FALLBACK_C and so join the envelope.
+    figure("quasi-steady samples behind the fit", len(st), 83272, 0,
            patterns=[NUM + r"\s+quasi-steady",
                      r"refitted[^.\n]{0,30}?on\s+" + NUM],
            files=ALL)
@@ -1822,7 +1992,13 @@ def main():
     # region BY CONSTRUCTION. Gating the model at 180 admits samples 20 kPa below
     # anything the logged set contains, which drags the model median down and
     # flatters the gap to +2.3 %. Quote the matched-gate figure, +3.0 %.
-    hi = S[(S.map_kpa > 200) & (~S.maf_pinned.astype(bool))]
+    # 28 September 2026: rows whose ambient was NOT logged (drive B,
+    # t_amb_assumed = 1) are excluded. Their charge temperature is built on
+    # build_dataset.AMB_FALLBACK_C, so scoring the charge-temperature model on
+    # them would be circular. Admitted, they doubled the population and moved
+    # the gap from +1.9 % to +1.0 % -- on an assumption, not a measurement.
+    _assumed = S["t_amb_assumed"].astype(bool) if "t_amb_assumed" in S else False
+    hi = S[(S.map_kpa > 200) & (~S.maf_pinned.astype(bool)) & (~_assumed)]
     logged = []
     for f in sorted(glob.glob(os.path.join(here, "logs/raw/*.csv"))):
         if os.path.basename(f) not in set(hi.source):

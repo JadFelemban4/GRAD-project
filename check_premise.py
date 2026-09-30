@@ -174,6 +174,22 @@ if __name__ == "__main__":
     print(f"\n  preview over reactive      {gap:+5.1f} points")
     print(f"  preview over current grade {grade_gap:+5.1f} points   <- THE HONEST ONE")
 
+    # WRITTEN TO results/premise.json (28 September 2026), with the fingerprint
+    # of the derived constants it ran on. verify_docs.py fails if the plant has
+    # been re-derived since, and checks the documents against these numbers --
+    # until then nothing checked the premise figures the handoff quotes at all.
+    import json
+    import os
+    import derived
+    _here = os.path.dirname(os.path.abspath(__file__))
+    rec = {name: {k: float(v) for k, v in r.items()} for name, r in out.items()}
+    rec["_preview_over_reactive_pts"] = round(float(gap), 2)
+    rec["_preview_over_current_grade_pts"] = round(float(grade_gap), 2)
+    rec["_derived_inputs"] = derived.all_params().get("_inputs")
+    rec["_derived_generated"] = derived.all_params().get("_generated")
+    with open(os.path.join(_here, "results", "premise.json"), "w") as fh:
+        json.dump(rec, fh, indent=1)
+
     # AUDIT.md C2. Say it loudly rather than letting a reader infer it from a
     # small number: if the baseline never reaches the trigger, this experiment
     # is not measuring protection at all.

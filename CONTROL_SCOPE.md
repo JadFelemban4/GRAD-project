@@ -73,7 +73,7 @@ road car to a validated model of that road car.
 ### 2a. Write access — UNVERIFIED in its strong form
 
 What is **certain**: everything this project has ever done to the vehicle is a
-read. Ten drives, 295.0 minutes, logged through BimmerLink over OBD-II. The
+read. Eleven drives, 321.7 minutes, logged through BimmerLink over OBD-II. The
 channel census in [logs/CHANNEL_CENSUS.md](logs/CHANNEL_CENSUS.md) enumerates
 all 656 channels the car offers — every one of them offered for reading only,
 many of them all-zero on this car (the census marks which are live), none of
@@ -158,7 +158,7 @@ it, so breaking it fails a test rather than going unnoticed.
 > not run it on our own vehicle: we have no write authority over the engine
 > computer, and no safe way to let a partially trained policy command spark and
 > boost on a road car. So we did two things instead. We calibrated a cycle model
-> and a thermal network against 295.0 minutes of read-only logs from that car —
+> and a thermal network against 321.7 minutes of read-only logs from that car —
 > over 26 pooled steady operating points at 30–75 kPa the modelled load agrees
 > with the vehicle's own to 1.4 %, with no fitted parameters — and we gave the
 > agent full authority inside that model.
@@ -241,7 +241,7 @@ version of this conversation that survives.
    against the 850 °C trigger), and hand-written preview loses to the
    `current-grade` comparator by 0.4 points. Hand-written policies cannot
    answer the preview question; trained agents can, which is item 1.
-3. **What is safe to quote today:** ten drives, 295.0 minutes, 26 operating
+3. **What is safe to quote today:** eleven drives, 321.7 minutes, 26 operating
    points, 30–75 kPa, 1.4 % load residual with zero fitted parameters — with
    `CLAUDE.md` mistake 12 beside it for what that residual does not test — and
    Phase D's result, with its budget and its limits beside it (item 1). The

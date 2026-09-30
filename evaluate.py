@@ -20,7 +20,8 @@ gearbox with the car's real ZF 8HP51; the result file was kept. The same
 command on the corrected plant prints +7.5, with every row moved -- baseline
 damage 572.8 -> 959.8, peak 857 -> 884 C -- and the +11.7 cannot be regenerated
 from this tree at all, because the `engine_env.py` it needs no longer exists
-here.
+here. (Those are the 19-21 September plant's figures. On the plant derived from
+the logs, merged 30 September, the baseline row is 920.1 at 883 C.)
 
 So the scenario line is now built from `inspect.signature(make_grade_climb)`
 rather than typed, and a full fingerprint block (gear ratios, final drive,
@@ -36,6 +37,35 @@ than refusing is producing a number whose provenance is a footnote.
 A model with no `meta.json` is refused too. That is the pre-fingerprint case --
 `runs_sixspeed_18sep/` is exactly it -- and "we do not know which plant this
 agent saw" is the finding, not an inconvenience.
+
+THE HEADER IS ALSO CHECKED AGAINST THE CYCLE   (JMF-2340550, 3207727)
+----------------------------------------------------------------------
+The other branch removed the same literal a different way: it read the
+scenario off the cycle object. Both are kept. `scenario_line` states the
+declared defaults -- the source fingerprint.py's FATAL `scenario` field uses,
+so the header and the refusal cannot disagree -- and then builds the cycle
+exactly as `run_episode` builds it (`episode_cycle`) and refuses to print a
+header the cycle does not carry. A default the function body stopped honouring
+would otherwise pass unseen.
+
+DAMAGE TWO WAYS   (JMF-2340550, cbb8d09)
+----------------------------------------
+`run_episode` also returns `damage_thermal`: the same damage model without its
+knock term, because the knock model is untested against this car (CLAUDE.md,
+"THE KNOCK MODEL IS NOT VALIDATED"). A reporting column only -- the episode,
+the policy and the reward are untouched. It is printed in its own indented
+block BELOW the policy table, never as a sixth column of it:
+`analyse_phase_d.parse`, which analyse_phase_d2.py and analyse_c4.py import,
+reads the LAST FIVE fields of each policy row, and a sixth column makes it read
+the IQR as the damage median without an error.
+
+RECORDING   (JMF-2340550, 74de99a)
+----------------------------------
+`run_episode(..., record=new_record())` appends every step -- the action, what
+the actuators applied, the observation, the reward terms and the engine state
+-- for record_agents.py and knock_margin.py. It reads the environment after
+each step and writes nothing into it; the scores are identical with or
+without it.
 
 ================================================================================
 THE TWENTY EPISODES ARE FROZEN. DO NOT EDIT `EPISODES`.
@@ -93,7 +123,8 @@ import numpy as np
 import check_premise as C
 import fingerprint as FP
 import random_road as RR
-from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K
+from engine_env import (SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K,
+                        damage_rate)
 
 DT = 1.0
 DURATION = 720.0
@@ -141,6 +172,14 @@ EPISODES = (
 # The sweep's deepest point, 13.73 % at +6.9 K, falls between strata and no
 # frozen episode lands on it -- stated so nobody reads the set as covering it.
 # All twenty bind.
+#
+# THOSE MARGINS ARE THE 22 SEPTEMBER PLANT'S (plant_sha b5a3069f32a83754). On
+# the plant derived from the logs (JMF-2340550, plant_sha c236a8db3e201090,
+# measured 29-30 September with the neutral policy) all twenty still bind and
+# the same two roads are still the thinnest, at +12.2 and +13.1 K; but 13.73 %
+# at a 300 s start is +75.5 K there -- the gear hand-back moved to between
+# 13.76 and 13.988 %, and the new deepest point is unmeasured. Re-run
+# check_random_road.py before anything is trained or scored on this set.
 # ==============================================================================
 EPISODES_D2 = (
     (1000, (0.690154, 0.012829, 0.297017), 141.05, 0.13314),
@@ -172,9 +211,40 @@ PROTOCOLS = {
 }
 
 
-def run_episode(policy, seed, weights, use_preview=True, road=None):
-    """One episode with the weights PINNED after reset, so every policy sees
-    the same ruler on the same episode.
+# What record_agents.py keeps of every evaluation step (29 September 2026), read
+# off the environment AFTER the step, so the episode itself is untouched.
+RECORD_STATE = ("t_turb", "t_oil", "t_block", "torque", "torque_req", "spark", "lam", "ki",
+                "egt_c", "mdot_fuel", "r_fuel", "r_life", "r_resp")
+
+
+def _record_step(record, env, a, obs_before, r, info):
+    """Append one step. `action` is what the policy returned, in [-1, 1];
+    `applied` is what the actuators actually did after the slew limit and the
+    bounds, in physical units (spark trim deg, lambda trim, boost trim kPa, fan
+    duty, pump duty) -- the two differ whenever the policy asks for more than
+    the slew allows."""
+    record["action"].append(np.asarray(a, np.float32))
+    record["applied"].append(np.asarray(env.prev_act, np.float32))
+    record["obs"].append(np.asarray(obs_before, np.float32))
+    record["reward"].append(float(r))
+    record["rpm"].append(float(env.rpm))
+    record["map_kpa"].append(float(env.map_kpa))
+    record["grade"].append(float(env.cycle["grade"][env.k - 1]))
+    record["t_turb_base"].append(float(env.thermal_base.t_turb))
+    record["damage_rate"].append(damage_rate(info["t_turb"], info["t_oil"], info["ki"]))
+    for k in RECORD_STATE:
+        record[k].append(float(info[k]))
+
+
+def new_record():
+    return {k: [] for k in ("action", "applied", "obs", "reward", "rpm", "map_kpa", "grade",
+                            "t_turb_base", "damage_rate") + RECORD_STATE}
+
+
+def episode_cycle(road=None):
+    """The cycle an evaluation episode runs on -- ONE definition, used by
+    run_episode and by scenario_line's check, so the header cannot describe a
+    road the episodes did not drive.
 
     `road` is None for Phase D's fixed climb, or a (start_s, grade) pair for a
     Phase D2 episode -- in which case the cycle is built by random_road.climb,
@@ -182,22 +252,42 @@ def run_episode(policy, seed, weights, use_preview=True, road=None):
     D2 road and not two.
     """
     if road is None:
-        cycle = make_grade_climb(duration=DURATION, dt=DT)
-    else:
-        cycle = RR.climb(road[0], road[1], duration=DURATION, dt=DT)
-    env = SupervisoryTunerEnv(cycle, dt=DT, seed=seed, use_preview=use_preview)
+        return make_grade_climb(duration=DURATION, dt=DT)
+    return RR.climb(road[0], road[1], duration=DURATION, dt=DT)
+
+
+def run_episode(policy, seed, weights, use_preview=True, road=None, record=None):
+    """One episode with the weights PINNED after reset, so every policy sees
+    the same ruler on the same episode.
+
+    `road`: see episode_cycle. `record`, if given (new_record()), receives
+    every step: the action, what the actuators did, the observation and the
+    engine's state. It only reads; the scores are identical with or without it
+    (record_agents.py checks).
+    """
+    env = SupervisoryTunerEnv(episode_cycle(road), dt=DT, seed=seed,
+                              use_preview=use_preview)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)   # override the fresh draw
     obs = env._obs()
-    ret, peak = 0.0, 0.0
+    ret, peak, thermal = 0.0, 0.0, 0.0
     while True:
-        obs, r, term, trunc, info = env.step(policy(env, obs))
+        a = policy(env, obs)
+        obs_before = obs
+        obs, r, term, trunc, info = env.step(a)
+        if record is not None:
+            _record_step(record, env, a, obs_before, r, info)
         ret += r
         peak = max(peak, info["t_turb"])
+        # DAMAGE TWO WAYS (JMF-2340550, 28 September): the same damage model
+        # without its knock term, because the knock model is untested against
+        # this car. A REPORTING column only -- the episode, the policy and the
+        # reward are untouched.
+        thermal += damage_rate(info["t_turb"], info["t_oil"]) * env.dt
         if term or trunc:
             break
     s = info["episode_summary"]
-    return dict(ret=ret, damage=s["damage"], fuel=s["fuel"],
+    return dict(ret=ret, damage=s["damage"], damage_thermal=thermal, fuel=s["fuel"],
                 torque_viol=s["torque_viol"], peak_turb=peak - 273.15,
                 knock=s["knock_events"])
 
@@ -225,9 +315,18 @@ def scenario_line(protocol="phase-d"):
     from `inspect.signature` changes when the experiment changes.
 
     For Phase D2 it is built from `random_road.RANGES` for the same reason.
+
+    AND THE CYCLE IS READ AS WELL (JMF-2340550, 3207727, which derived the
+    header from the cycle object instead). The declared values are what the
+    fingerprint's FATAL `scenario` field records; the cycle is what the
+    episodes drive. They must agree, and this refuses to print if they do not.
     """
     if protocol == "d2":
         (s0, s1), (g0, g1) = RR.RANGES["start_s"], RR.RANGES["grade"]
+        off = [(st, g) for _, _, st, g in EPISODES_D2
+               if not (s0 <= st <= s1 and g0 <= g <= g1)]
+        if off:
+            raise SystemExit(f"EPISODES_D2 roads outside random_road.RANGES: {off}")
         return (f"scenario: climb from {s0:.0f}-{s1:.0f} s at {100 * g0:.0f}-"
                 f"{100 * g1:.0f} %, per episode, {RR.V_KMH:.0f} km/h, "
                 f"{RR.T_AMB_K - 273.15:.0f} C, {DURATION:.0f} s, dt {DT}")
@@ -235,6 +334,12 @@ def scenario_line(protocol="phase-d"):
     grade = float(d["grade"].default)
     v = float(d["v_kmh"].default)
     t_amb = float(d["t_amb"].default)
+    c = episode_cycle()
+    seen = (float(np.max(c["grade"])), float(np.max(c["v_mps"]) * 3.6), float(c["t_amb"]))
+    if not np.allclose(seen, (grade, v, t_amb), rtol=0.0, atol=1e-6):
+        raise SystemExit(f"make_grade_climb declares (grade, km/h, K) = "
+                         f"{(grade, v, t_amb)} but the cycle run_episode drives "
+                         f"carries {seen}. Fix the function before scoring on it.")
     return (f"scenario: {100 * grade:.0f} % at {v:.0f} km/h, "
             f"{t_amb - 273.15:.0f} C, {DURATION:.0f} s, dt {DT}")
 
@@ -263,11 +368,13 @@ def check_model_fingerprint(path, live, force):
 
     bad = FP.compare(stored, live)
     if not bad:
-        # The dt asymmetry is legitimate and permanent (train 0.2, score 1.0),
-        # so it is reported rather than refused -- but it is reported EVERY
-        # time, because CLAUDE.md records it as an open problem and AUDIT2.md
-        # H2-2 measures the headline percentage moving 37.0 -> 30.1 % on the
-        # step alone. A reader of a result file should not have to know that.
+        # The dt asymmetry (trained at 0.2, scored at 1.0) is legitimate for
+        # every agent trained before 27 September -- train.py passes dt 1.0
+        # since then (JMF-2340550) -- so it is reported rather than refused,
+        # and it is reported EVERY time: AUDIT2.md H2-2 measured the baseline's
+        # "cuts" moving 37.0 -> 34.0 % between dt 0.2 and 1.0 on the step
+        # alone, 94 % of it the knock term. A reader of a result file should
+        # not have to know that.
         t_dt = stored.get("train_dt")
         if t_dt is not None and abs(float(t_dt) - DT) > 1e-9:
             return [f"note {os.path.basename(path.rstrip('/'))}: trained at "
@@ -408,6 +515,18 @@ def main():
             continue
         med = np.median([r["damage"] for r in out[name]])
         say(f"  {name:<26} cuts median damage {100*(1-med/base):5.1f} %")
+
+    # DAMAGE TWO WAYS (JMF-2340550, 28 September). Its OWN block, indented, and
+    # worded without "cuts median damage": analyse_phase_d.parse reads rows that
+    # START with a policy name and takes their last five fields, and
+    # plot_agent_pairs.CUT_ROW reads "cuts median damage" lines -- a sixth
+    # table column or a reused phrase would feed both a wrong number silently.
+    say("")
+    say("  WITHOUT THE KNOCK TERM (turbine + oil only; the knock model is untested)")
+    base_t = np.median([r["damage_thermal"] for r in out["baseline ECU"]])
+    for name in out:
+        tm = np.median([r["damage_thermal"] for r in out[name]])
+        say(f"    {name:<26} thermal med {tm:8.1f}   thermal cut {100*(1-tm/base_t):5.1f} %")
 
     grade = next((n for n in out if n.startswith("current-grade")), None)
     agent = next((n for n in out if n.startswith("agent ") and "blind" not in n), None)

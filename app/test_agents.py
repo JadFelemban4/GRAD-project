@@ -196,7 +196,7 @@ class TraceTests(unittest.TestCase):
             self.assertEqual(set(result), RESULT_KEYS)
 
 
-RESULT_KEYS = {"ret", "damage", "fuel", "torque_viol", "peak_turb", "knock"}
+RESULT_KEYS = {"ret", "damage", "damage_thermal", "fuel", "torque_viol", "peak_turb", "knock"}
 
 
 def _short_cycle(ep):
