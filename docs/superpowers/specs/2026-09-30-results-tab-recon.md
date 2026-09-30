@@ -307,6 +307,10 @@ local ref and on no remote branch (checked after `git fetch` on 30 September,
 
 ## 10. Decisions still open, for Jad
 
+*(Later on 30 September: 1 was decided, a committed post-hoc script, printed with and without the knock term; 2,
+`c-ep1` waits for Ghassan's commit; 3, the pause does not cover this tab. 4 and 5 are open. See
+`2026-09-30-results-tab-design.md` §1 and §11.)*
+
 1. Ghassan's set has no preregistered verdict. Show his numbers only; or add a
    small committed script that prints the MEI-rule reading so the tab can quote
    it, labelled post hoc; or show make_page's t-interval wording (retired).
