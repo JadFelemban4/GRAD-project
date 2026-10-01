@@ -2,7 +2,7 @@
 name: Khaled Alotaibi
 student_number: 2340507
 email: <optional: what `git config user.email` prints on your machine>
-updated: 2026-09-28
+updated: 2026-10-01
 ---
 
 # Khaled
@@ -15,6 +15,9 @@ updated: 2026-09-28
 > To finish it: work through `team/_TEMPLATE.md` and replace this file — or
 > tell the assistant who you are at the start of a session and let it ask you
 > the template's questions, one at a time.
+
+**Graduation supervisor:** د. همام محمد الغامدي (Dr. Hammam Mohammed Al-Ghamdi).
+Recorded 1 October 2026 at Jad's request, in every file in `team/`.
 
 ## What I am responsible for
 

@@ -2,10 +2,13 @@
 name: Jad Felemban
 student_number: 2340550
 email: endo.felemban@gmail.com
-updated: 2026-09-28
+updated: 2026-10-01
 ---
 
 # Jad
+
+**Graduation supervisor:** د. همام محمد الغامدي (Dr. Hammam Mohammed Al-Ghamdi).
+Recorded 1 October 2026 at Jad's request, in every file in `team/`.
 
 ## What I am responsible for
 
@@ -144,6 +147,12 @@ the battery specifics.
   below.
 
 ## Anything else
+
+**Reading every file of the project takes about 25 % of the usage** on the
+Claude Max plan ($100) with Opus 5.5. Measured by Jad on 1 October 2026: one
+session read all 465 tracked files once, with three helper agents reading the
+app, the results and the older documents. A full read is a real cost, so it is
+worth doing on purpose, not by default.
 
 <!-- RETIRED-OK: 548.6, 168.1, 8 -- naming the void figure IS the warning -->
 **My interview prep sheet is out of date and I nearly presented from it.** It
