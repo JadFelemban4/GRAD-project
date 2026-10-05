@@ -11,8 +11,13 @@ teammate's clone). Every file directly in results/ whose name matches
 *_seed*.txt is a candidate. A name that fails results_eval.NAME_RE, a file
 whose first line is not an evaluate.py header, a file with no plant
 fingerprint block or no policy table, and a file that cannot be read at all
-are listed under not_read with the reason, never dropped silently. A seed
-with one arm only is listed under its section's unpaired.
+are listed under not_read with the reason, never dropped silently. So are two
+files that name the same prefix and seed (the seed written with and without
+a leading zero): both are listed with the reason duplicate_seed and neither
+is read, because the names cannot say which of them is the experiment's
+seed. A prefix left with no seed shows as missing when it is a known
+experiment and not at all otherwise. A seed with one arm only is listed
+under its section's unpaired.
 
 FAILURE COSTS ONE SECTION. Each section is built inside its own try, which
 catches Exception and SystemExit and nothing broader: a broken file or
@@ -55,7 +60,8 @@ KNOWN = {
     "phase_d": {"order": 0, "notes": ["blind_not_blind", "budget_c1", "spark_bound_jad",
                                       "spike_unmeasured"], "mei_after_result": True},
     "d2": {"order": 1, "notes": ["budget_c1", "spark_bound_jad", "spike_unmeasured"]},
-    "c4": {"order": 2, "notes": ["spark_bound_jad", "spike_unmeasured"], "continues": "d2"},
+    "c4": {"order": 2, "notes": ["c4_not_converged", "spark_bound_jad", "spike_unmeasured"],
+           "continues": "d2"},
 }
 UNKNOWN_ORDER = 100
 ARMS = ("sighted", "blind")
@@ -100,10 +106,14 @@ def discover_evaluations(results_root):
     """({prefix: {seed: path}}, not_read) for every *_seed*.txt directly in results_root.
 
     Only the name is read here; a file is parsed by its section. A name that
-    fails NAME_RE is listed with the reason "name".
+    fails NAME_RE is listed with the reason "name". Two files that name the
+    same prefix and seed (the seed written with and without a leading zero)
+    are both listed with the reason "duplicate_seed" and neither is returned
+    in the groups, so neither is read; a prefix left with no seed is not in
+    the groups at all.
     """
     results_root = Path(results_root)
-    groups, not_read = {}, []
+    named, not_read = {}, []
     for path in sorted(results_root.glob("*_seed*.txt")):
         if not path.is_file():
             continue
@@ -111,8 +121,14 @@ def discover_evaluations(results_root):
         if got is None:
             not_read.append({"path": _rel(path, results_root), "reason": "name", "type": None})
             continue
-        prefix, seed = got
-        groups.setdefault(prefix, {})[seed] = path
+        named.setdefault(got, []).append(path)
+    groups = {}
+    for (prefix, seed), paths in named.items():
+        if len(paths) > 1:
+            not_read.extend({"path": _rel(path, results_root), "reason": "duplicate_seed",
+                             "type": None} for path in paths)
+            continue
+        groups.setdefault(prefix, {})[seed] = paths[0]
     return groups, not_read
 
 
@@ -276,7 +292,9 @@ def build(results_root: Path = RESULTS, git_root: Path = ROOT, *, live: dict | N
     {built, import_failures, sections, not_read}, through jsonable. `live`
     replaces results_provenance.live_side(git_root) and `verdict` replaces
     app.agent_catalog.verdict; tests pass stand-ins. `verdict` is called as
-    verdict(prefix, root=<the parent of results_root>).
+    verdict(prefix, root=<the parent of results_root>). built.head is None
+    whenever built.git reads unavailable, so no git fact survives a git lost
+    part-way through the build.
     """
     started = time.perf_counter()
     results_root, git_root = Path(results_root), Path(git_root)
@@ -309,8 +327,10 @@ def build(results_root: Path = RESULTS, git_root: Path = ROOT, *, live: dict | N
             section = _unavailable(prefix, ctx, "build", type_=type(exc).__name__)
         if section is not None:
             sections.append(section)
-    built = {"head": head, "python": live["python"], "plant_sha": live["plant_sha"],
-             "restart_needed": live["restart_needed"],
+    # Git's state at the END of the build decides: a git lost part-way (a status
+    # it rejected, a timeout) takes the head with it, as it takes every commit fact.
+    built = {"head": head if git.available else None, "python": live["python"],
+             "plant_sha": live["plant_sha"], "restart_needed": live["restart_needed"],
              "derived_loaded_differs": live["derived_loaded_differs"],
              "git": "ok" if git.available else "unavailable",
              "elapsed_ms": int(round((time.perf_counter() - started) * 1000))}

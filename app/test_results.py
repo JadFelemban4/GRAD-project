@@ -1188,9 +1188,10 @@ def _ar(*points):
 
 
 # The wording rules (spec 5.2 and 5.5) for every text the tab shows from the
-# server: current-grade is exempt, and quoted anchor lines are verbatim and
-# exempt. Arabic is matched with its vowel marks dropped, so the order of a
-# shadda and its vowel cannot hide a word.
+# server: current-grade is exempt (its Arabic name is taken out of a text
+# before the Arabic words are looked for), and quoted anchor lines are
+# verbatim and exempt. Arabic is matched with its vowel marks dropped, so the
+# order of a shadda and its vowel cannot hide a word.
 AR_NEW = _ar(0x062D, 0x062F, 0x064A, 0x062B)                  # hadith: new, recent
 AR_OLD = _ar(0x0642, 0x062F, 0x064A, 0x0645)                  # qadim: old
 AR_UPDATED = _ar(0x0645, 0x062D, 0x062F, 0x062B)              # muhaddath: updated
@@ -1200,16 +1201,28 @@ AR_NOT = _ar(0x0644, 0x0627)                                  # la: not
 AR_AVAILS = _ar(0x064A, 0x0641, 0x064A, 0x062F)               # yufid: is of use
 AR_INSPECTION = _ar(0x0627, 0x0644, 0x0645, 0x0639, 0x0627, 0x064A, 0x0646, 0x0629)  # al-muayana
 AR_AVAILS_F = _ar(0x062A, 0x0641, 0x064A, 0x062F)             # tufid: is of use (feminine)
+AR_CURRENT = _ar(0x062D, 0x0627, 0x0644, 0x064A)              # hali: current
+AR_THE = _ar(0x0627, 0x0644)                                  # al-: the
+AR_MAYL = _ar(0x0627, 0x0644, 0x0645, 0x064A, 0x0644)         # al-mayl: the grade, the slope
+AR_SITUATION = _ar(0x0627, 0x0644, 0x0648, 0x0636, 0x0639)    # al-wad: the situation
 _AR_BLOCK = f"[{chr(0x0600)}-{chr(0x06FF)}]"
 _AR_MARKS = re.compile(f"[{chr(0x064B)}-{chr(0x0652)}]")
 _AR_PREFIX = "|".join((_ar(0x0627, 0x0644), _ar(0x0648), _ar(0x0628)))       # al-, wa-, bi-
 _AR_SUFFIX = "|".join((_ar(0x0629), _ar(0x0648, 0x0646), _ar(0x064A, 0x0646), _ar(0x0627, 0x062A)))
+# current-grade's Arabic name, "al-mayl al-hali": the one place the word for current may stand
+_AR_EXEMPT = re.compile(AR_MAYL + r"\s+" + AR_THE + AR_CURRENT)
 BANNED = (
     re.compile(r"\b(?:current(?!-grade)|stale|outdated|fresh|up[ -]to[ -]date)\b", re.I),
     re.compile(r"preview (?:helps|does not help|doesn't help)|adds nothing measurable"
                r"|not from seeing ahead|replicat|pooled", re.I),
     re.compile(f"(?<!{_AR_BLOCK})(?:{_AR_PREFIX})?(?:{AR_NEW}|{AR_OLD}|{AR_UPDATED})"
                f"(?:{_AR_SUFFIX})?(?!{_AR_BLOCK})"),
+    # The Arabic word for current. No word boundary, unlike the three words
+    # above, which sit inside common words (updating, presenting): this one
+    # must also catch its feminine form, its adverb and a conjunction or a
+    # preposition in front of it, and the tab has no use for a longer word
+    # that contains it.
+    re.compile(AR_CURRENT),
     re.compile("|".join((f"{AR_PREVIEW} {AR_HELPS}", f"{AR_HELPS} {AR_PREVIEW}",
                          f"{AR_PREVIEW} {AR_NOT} {AR_AVAILS}", f"{AR_NOT} {AR_AVAILS} {AR_PREVIEW}",
                          f"{AR_PREVIEW} {AR_NOT} {AR_HELPS}",
@@ -1218,8 +1231,10 @@ BANNED = (
 
 
 def _banned(text):
-    """True when `text` breaks a wording rule (Arabic vowel marks dropped first)."""
-    bare = _AR_MARKS.sub("", text)
+    """True when `text` breaks a wording rule (Arabic vowel marks dropped first,
+    then current-grade's Arabic name taken out, so that only a use of the word
+    for current outside that name is found)."""
+    bare = _AR_EXEMPT.sub(" ", _AR_MARKS.sub("", text))
     return any(rx.search(bare) for rx in BANNED)
 
 
@@ -1344,6 +1359,54 @@ class DataTests(unittest.TestCase):
         for name in NEVER_READ + ("zz_seed0",):
             self.assertNotIn(name, text, f"{name} must never be a candidate")
 
+    def test_two_files_naming_one_seed_are_both_listed_and_neither_is_read(self):
+        # Spec 4.1: an unpaired or unreadable seed is listed, never dropped
+        # silently. A seed written with and without a leading zero is one seed
+        # named twice: the names cannot say which file is the experiment's, and
+        # showing either would hide the other.
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            res = base / "results"
+            res.mkdir()
+            for name, seed in (("newexp_seed0.txt", 0), ("newexp_seed7.txt", 7),
+                               ("newexp_seed07.txt", 7)):
+                (res / name).write_text(_data_text(seed), encoding="utf-8")
+            got = RD.build(res, base, live=self.live)
+        listed = sorted((n["path"], n["reason"], n["type"]) for n in got["not_read"])
+        self.assertEqual(listed, [("results/newexp_seed07.txt", "duplicate_seed", None),
+                                  ("results/newexp_seed7.txt", "duplicate_seed", None)])
+        sec = self.section(got, "newexp")
+        self.assertEqual([s["seed"] for s in sec["seeds"]], [0])
+        self.assertEqual(sec["unpaired"], [])
+        self.assertEqual(sorted(sec["provenance"]["files"]), ["0"])
+        text = json.dumps(sec)
+        for name in ("newexp_seed7.txt", "newexp_seed07.txt"):
+            self.assertNotIn(name, text, f"{name} must not be read")
+
+    def test_a_prefix_whose_every_seed_is_named_twice_is_missing_or_absent(self):
+        # The ruling on Task 4's review: such a prefix is left out of discovery,
+        # so a known experiment reads as its usual missing section and an
+        # unknown one has no section; the not-read list says why in both cases.
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            res = base / "results"
+            res.mkdir()
+            for name, seed in (("d2_seed3.txt", 3), ("d2_seed03.txt", 3),
+                               ("zz_seed1.txt", 1), ("zz_seed01.txt", 1)):
+                (res / name).write_text(_data_text(seed), encoding="utf-8")
+            got = RD.build(res, base, live=self.live)
+        self.assertEqual(sorted((n["path"], n["reason"], n["type"]) for n in got["not_read"]), [
+            ("results/d2_seed03.txt", "duplicate_seed", None),
+            ("results/d2_seed3.txt", "duplicate_seed", None),
+            ("results/zz_seed01.txt", "duplicate_seed", None),
+            ("results/zz_seed1.txt", "duplicate_seed", None)])
+        self.assertEqual([s["prefix"] for s in got["sections"]], ["phase_d", "d2", "c4"])
+        d2 = self.section(got, "d2")
+        self.assertEqual(d2["state"], "unavailable")
+        self.assertEqual(d2["error"], {
+            "kind": "missing", "file": "results/d2_seed<N>.txt",
+            "command": RD.EVAL_COMMAND.replace("<prefix>", "d2"), "type": None, "module": None})
+
     def test_sections_in_order_known_first(self):
         self.assertEqual([s["prefix"] for s in self.tree["sections"]],
                          ["phase_d", "d2", "c4", "newexp"])
@@ -1437,6 +1500,9 @@ class DataTests(unittest.TestCase):
                               "git must reject the damaged index for this test to mean anything")
             got = RD.build(res, base, live=self.live)
         self.assertEqual(got["built"]["git"], "unavailable")
+        # Spec 6.3: with git unavailable the git facts are omitted, the head
+        # of the checkout among them, even when it was read before git was lost.
+        self.assertIsNone(got["built"]["head"])
         files = self.section(got, "newexp")["provenance"]["files"]
         self.assertEqual(sorted(files), ["0", "1"])
         for seed, entry in files.items():
@@ -1575,6 +1641,9 @@ class DataTests(unittest.TestCase):
         self.assertEqual(keys["phase_d"], RD.KNOWN["phase_d"]["notes"] + tail)
         self.assertEqual(keys["d2"], RD.KNOWN["d2"]["notes"] + tail)
         self.assertEqual(keys["c4"], RD.KNOWN["c4"]["notes"] + ["budget_from_file"] + tail)
+        # Spec 5.4: C4's budget is "not converged", and only C4's
+        self.assertIn("c4_not_converged", keys["c4"])
+        self.assertEqual([p for p, found in keys.items() if "c4_not_converged" in found], ["c4"])
         notes = {n["key"]: n["values"] for n in self.section(self.real, "c4")["notes"]}
         self.assertEqual(notes["budget_from_file"], {"steps": analyse_c4.C4_STEPS})
         self.assertEqual(notes["dt_mismatch"], {"train_dt": 0.2, "eval_dt": 1.0})
@@ -1640,9 +1709,19 @@ class DataTests(unittest.TestCase):
                "preview does not help",
                _ar(0x0646, 0x062A, 0x064A, 0x062C, 0x0629) + " " + AR_OLD + _ar(0x0629),  # an old result
                _ar(0x0645, 0x062D, 0x062F, 0x064E, 0x0651, 0x062B),                      # updated, marked
-               f"{AR_PREVIEW} {AR_NOT} {AR_AVAILS}")
+               f"{AR_PREVIEW} {AR_NOT} {AR_AVAILS}",
+               AR_SITUATION + " " + AR_THE + AR_CURRENT,                                 # the current situation
+               AR_THE + AR_CURRENT + _ar(0x0629),                                        # the current, feminine
+               AR_THE + AR_CURRENT + _ar(0x0651, 0x064F),                                # the current, marked
+               AR_CURRENT + _ar(0x0627, 0x064B),                                         # currently
+               AR_MAYL + " " + AR_THE + AR_CURRENT + " " + _ar(0x0648) + AR_SITUATION
+               + " " + AR_THE + AR_CURRENT)             # current-grade, then the current situation
         fine = ("current-grade", "Current-grade median",
-                _ar(0x062A) + AR_NEW + " " + _ar(0x0627, 0x0644, 0x0645, 0x0644, 0x0641))  # updating the file
+                _ar(0x062A) + AR_NEW + " " + _ar(0x0627, 0x0644, 0x0645, 0x0644, 0x0641),  # updating the file
+                AR_MAYL + " " + AR_THE + AR_CURRENT,                                       # current-grade
+                _ar(0x0628, 0x0627, 0x0644, 0x0645, 0x064E, 0x064A, 0x0652, 0x0644) + " "
+                + AR_THE + AR_CURRENT + _ar(0x0651),                                       # with current-grade, marked
+                _ar(0x062D, 0x0627, 0x0644, 0x0629) + " " + _ar(0x0627, 0x0644, 0x0645, 0x0644, 0x0641))  # the file's state
         self.assertEqual([text for text in bad if not _banned(text)], [])
         self.assertEqual([text for text in fine if _banned(text)], [])
         from app import agent_catalog
