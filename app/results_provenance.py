@@ -423,8 +423,10 @@ def classify_eval(parsed: dict, live: dict, git: Git, rel: str,
     and `title_protocols` maps a header title to its protocol (from
     evaluate.PROTOCOLS). The states, first match wins: forced, not_recorded,
     then a valid comparison or cannot_compare, then another, then
-    cannot_compare for a one-sided field or a needed restart, then same or
-    same_code. Each FATAL field is compared as the text format_block wrote."""
+    cannot_compare for a one-sided field or a needed restart (the plant files
+    changed after the server started: "restart"; the derived constants did:
+    "derived_restart"), then same or same_code. Each FATAL field is compared as
+    the text format_block wrote."""
     fp = dict(parsed.get("fingerprint") or {})
     protocol = (parsed.get("protocol") or EV.protocol_from_fingerprint(fp)
                 or title_protocols.get(parsed.get("title")))
@@ -468,6 +470,8 @@ def classify_eval(parsed: dict, live: dict, git: Git, rel: str,
         return done("cannot_compare", "one_sided")
     if live.get("restart_needed"):
         return done("cannot_compare", "restart")
+    if live.get("derived_loaded_differs"):
+        return done("cannot_compare", "derived_restart")
     return done("same" if rec_d is not None else "same_code")
 
 

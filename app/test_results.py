@@ -828,8 +828,8 @@ class ProvenanceLiveTests(unittest.TestCase):
 # A header title to its protocol, as Task 4 builds it from evaluate.PROTOCOLS.
 TITLE_PROTOCOLS = {"PHASE D EVALUATION": "phase-d",
                    "PHASE D2 EVALUATION (randomised climb)": "d2"}
-REASONS = (None, "python", "no_git_route", "dirty", "one_sided", "restart", "protocol",
-           "import", "derived_differs")
+REASONS = (None, "python", "no_git_route", "dirty", "one_sided", "restart", "derived_restart",
+           "protocol", "import", "derived_differs")
 CLASSIFIED_KEYS = {"state", "reason", "route", "protocol", "recorded", "live", "differs",
                    "tag", "forced", "file"}
 D2_FILE = "results/d2_seed0.txt"
@@ -998,7 +998,8 @@ class ProvenanceStateTests(unittest.TestCase):
         fp["scenario"] = re.sub(r"road_sha=[0-9a-f]+", "road_sha=fedcba9876543210", fp["scenario"])
         parsed = {"title": "PHASE D2 EVALUATION (randomised climb)", "protocol": None,
                   "fingerprint": fp, "forced": []}
-        live = dict(self.live, restart_needed=False, derived_sha=None)
+        live = dict(self.live, restart_needed=False, derived_sha=None,
+                    derived_loaded_differs=False)
         got = self._classify(parsed, live)
         self.assertEqual((got["state"], got["reason"], got["route"], got["differs"]),
                          ("same_code", None, "git", []))
@@ -1065,6 +1066,41 @@ class ProvenanceStateTests(unittest.TestCase):
         got = self._classify(parsed, self._live_like(parsed, derived_sha="abcdef0123456789",
                                                      restart_needed=True))
         self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "restart"))
+
+    def test_derived_constants_changed_since_start_leave_no_same(self):
+        parsed = self._parsed(derived_sha="abcdef0123456789")
+        got = self._classify(parsed, self._live_like(parsed, derived_sha="abcdef0123456789",
+                                                     derived_loaded_differs=True))
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "derived_restart"))
+        self.assertEqual(got["recorded"]["derived_sha"], "abcdef0123456789")
+
+    def test_derived_constants_changed_since_start_leave_no_same_code(self):
+        parsed = self._parsed()
+        got = self._classify(parsed, self._live_like(parsed, derived_loaded_differs=True))
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "derived_restart"))
+        self.assertIsNone(got["recorded"]["derived_sha"])
+
+    def test_a_plant_restart_comes_before_a_derived_restart(self):
+        parsed = self._parsed(derived_sha="abcdef0123456789")
+        got = self._classify(parsed, self._live_like(parsed, derived_sha="abcdef0123456789",
+                                                     restart_needed=True,
+                                                     derived_loaded_differs=True))
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "restart"))
+
+    def test_a_fatal_difference_comes_before_a_derived_restart(self):
+        parsed = self._parsed()
+        live = self._live_like(parsed, derived_loaded_differs=True)
+        live["blocks"]["d2"]["plant_sha"] = "0000000000000000"
+        got = self._classify(parsed, live)
+        self.assertEqual((got["state"], got["reason"], got["differs"]),
+                         ("another", None, ["plant_sha"]))
+
+    def test_a_one_sided_field_comes_before_a_derived_restart(self):
+        parsed = self._parsed()
+        live = self._live_like(parsed, derived_loaded_differs=True)
+        del live["blocks"]["d2"]["dtheta_deg"]
+        got = self._classify(parsed, live)
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "one_sided"))
 
     def test_a_changed_file_says_so(self):
         got = self._classify(self._parsed(), status={D2_FILE: "M"})
