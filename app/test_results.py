@@ -7,15 +7,26 @@ Run from the repository root. Fixtures are made in temporary directories
 OUTSIDE the repository, with Path.write_text and Path.write_bytes only:
 app/test_replay.py's read-only scan reads every app/*.py, this file included.
 """
+import ast
+import hashlib
+import importlib.util
+import json
+import os
 from pathlib import Path
+import platform
+import subprocess
+import sys
 import tempfile
+import types
 import unittest
+from unittest import mock
 import warnings
 
 import analyse_phase_d as APD
 import analyse_phase_d2 as APD2
 import fingerprint as FP
 from app import results_eval as EV
+from app import results_provenance as RP
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "results"
@@ -434,6 +445,323 @@ class EvalParserTests(unittest.TestCase):
                 EV.parse_eval_file(path)
             with self.assertRaises(OSError):
                 EV.parse_eval_file(Path(tmp) / "zz_seed1.txt")
+
+
+# ---- Task 2: app/results_provenance.py, git and the live side -----------------
+
+# The result files of Jad's three experiments, as git names them.
+SEEDED = [f"results/{prefix}_seed{seed}.txt" for prefix in REAL for seed in REAL_SEEDS]
+CHILD_ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONDONTWRITEBYTECODE="1")
+LIVE_KEYS = {"python", "minor", "plant_sha", "plant_text_sha", "restart_needed",
+             "derived_sha", "data_sha1", "derived_loaded_differs", "blocks", "import_errors"}
+# Two file names git would quote by default, the second built from its code
+# points so that this file stays ASCII.
+SPACED = "notes/b c.txt"
+ACCENTED = "notes/" + chr(0xE9) + "t" + chr(0xE9) + ".txt"
+
+
+def _git_out(*args, cwd=ROOT):
+    """git's own answer, asked directly, to compare the helper with; None on failure."""
+    try:
+        r = subprocess.run(["git", *args], cwd=cwd, capture_output=True, timeout=60,
+                           env=dict(os.environ, GIT_OPTIONAL_LOCKS="0"))
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return r.stdout.decode("utf-8", errors="replace") if r.returncode == 0 else None
+
+
+def _clean(*relpaths):
+    """True when git shows no change to `relpaths` in this checkout."""
+    out = _git_out("status", "--porcelain", "--", *relpaths)
+    return out is not None and out.strip() == ""
+
+
+def _index_file():
+    """This checkout's index file (a worktree keeps its own), or None."""
+    rel = _git_out("rev-parse", "--git-path", "index")
+    if not rel:
+        return None
+    path = Path(rel.strip())
+    return path if path.is_absolute() else ROOT / path
+
+
+def _child(code):
+    """(True, stdout) of `code` run by a new interpreter from the repository
+    root, or (False, the last line it wrote to stderr)."""
+    r = subprocess.run([sys.executable, "-B", "-c", code], cwd=ROOT, capture_output=True,
+                       timeout=900, env=CHILD_ENV)
+    if r.returncode != 0:
+        lines = r.stderr.decode("utf-8", errors="replace").strip().splitlines()
+        return False, lines[-1] if lines else f"exit code {r.returncode}"
+    return True, r.stdout.decode("utf-8", errors="replace").strip()
+
+
+class ProvenanceLiveTests(unittest.TestCase):
+    """results_provenance part 1, against this checkout and against fixtures."""
+
+    def _need_git(self):
+        git = RP.Git(ROOT)
+        if not git.available:
+            self.skipTest(f"git is not usable here ({git.reason})")
+        return git
+
+    def test_optional_locks_are_set_before_fingerprint_is_imported(self):
+        tree = ast.parse(Path(RP.__file__).read_text(encoding="utf-8"))
+        order = []
+        for node in tree.body:
+            if isinstance(node, ast.Assign) and "GIT_OPTIONAL_LOCKS" in ast.dump(node):
+                order.append("locks")
+            elif isinstance(node, ast.Import) and any(a.name == "fingerprint" for a in node.names):
+                order.append("fingerprint")
+        self.assertEqual(order, ["locks", "fingerprint"])
+        self.assertEqual(os.environ.get("GIT_OPTIONAL_LOCKS"), "0")
+
+    def test_git_reads_this_checkout(self):
+        git = self._need_git()
+        self.assertIsNone(git.reason)
+        self.assertEqual(git.head_short(), _git_out("rev-parse", "--short", "HEAD").strip())
+        full = _git_out("rev-parse", "HEAD").strip()
+        self.assertEqual(git.resolve("HEAD"), full)
+        self.assertEqual(git.resolve(full[:12]), full)
+        for refused in ("--output=x", "HEAD~1", "a b", ""):
+            self.assertIsNone(git.resolve(refused), refused)
+        self.assertIsNone(git.resolve("f" * 40))
+        self.assertTrue(git.available, "an unknown commit is an answer, not a broken git")
+
+    def test_last_commits_equal_a_per_file_log(self):
+        git = self._need_git()
+        rels = [r for r in SEEDED if (ROOT / r).is_file()]
+        if not rels:
+            self.skipTest("no results/<prefix>_seed<N>.txt in this checkout")
+        got = git.last_commits(rels)
+        self.assertEqual(sorted(got), sorted(rels))
+        for rel in rels:
+            one = _git_out("log", "-1", "--format=%h%x09%cI", "--", rel).strip()
+            short, _, date = one.partition("\t")
+            self.assertEqual(got[rel], {"short": short, "date": date}, rel)
+
+    def test_status_leaves_out_a_clean_committed_file(self):
+        git = self._need_git()
+        rel = "results/phase_d_seed0.txt"
+        if not (ROOT / rel).is_file() or not _clean(rel):
+            self.skipTest(f"{rel} is absent or changed in this checkout")
+        self.assertNotIn(rel, git.status([rel]))
+        self.assertEqual(git.status([]), {})
+        self.assertEqual(git.last_commits([]), {})
+
+    def test_a_missing_git_is_unavailable_and_answers_none(self):
+        git = RP.Git(ROOT, exe="git-does-not-exist")
+        self.assertFalse(git.available)
+        self.assertEqual(git.reason, "missing")
+        self.assertIsNone(git.run("--version"))
+        self.assertIsNone(git.head_short())
+        self.assertIsNone(git.resolve("HEAD"))
+        self.assertIsNone(git.show("HEAD", "plant.py"))
+        self.assertEqual(git.last_commits(["results"]), {})
+        self.assertEqual(git.status(["results"]), {})
+        self.assertIsNone(RP.plant_at(git, "HEAD"))
+        self.assertIsNone(RP.road_sha_at(git, "HEAD"))
+
+    def test_a_folder_outside_any_checkout_is_not_a_repo(self):
+        self._need_git()
+        with tempfile.TemporaryDirectory() as tmp:
+            ceiling = {"GIT_CEILING_DIRECTORIES": str(Path(tmp).resolve().parent)}
+            with mock.patch.dict(os.environ, ceiling):
+                git = RP.Git(tmp)
+            self.assertEqual((git.available, git.reason), (False, "not_a_repo"))
+            self.assertIsNone(git.head_short())
+            gone = RP.Git(Path(tmp) / "absent")
+            self.assertEqual((gone.available, gone.reason), (False, "not_a_repo"))
+
+    def test_a_temporary_repository_reads_back(self):
+        self._need_git()
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+
+            def git(*args):
+                r = subprocess.run(["git", *args], cwd=repo, capture_output=True, timeout=60)
+                self.assertEqual(r.returncode, 0, r.stderr.decode("utf-8", errors="replace"))
+                return r.stdout.decode("utf-8", errors="replace").strip()
+
+            git("init", "-q")
+            for key, value in (("user.name", "results tab test"),
+                               ("user.email", "test@example.invalid"),
+                               ("commit.gpgsign", "false"), ("core.autocrlf", "false")):
+                git("config", key, value)
+            (repo / "notes").mkdir()
+            (repo / "a.txt").write_bytes(b"one\n")
+            (repo / SPACED).write_bytes(b"two\n")
+            (repo / ACCENTED).write_bytes(b"three\n")
+            git("add", "-A")
+            git("commit", "-q", "-m", "first")
+            first = git("rev-parse", "HEAD")
+            (repo / "a.txt").write_bytes(b"one, again\n")
+            git("commit", "-q", "-am", "second")
+            second = git("rev-parse", "HEAD")
+            (repo / SPACED).write_bytes(b"two, changed\n")
+            (repo / "notes" / "new.txt").write_bytes(b"four\n")
+
+            helper = RP.Git(repo)
+            self.assertTrue(helper.available, helper.reason)
+            last = helper.last_commits(["a.txt", "notes"])
+            self.assertEqual(sorted(last), sorted(["a.txt", SPACED, ACCENTED]))
+            self.assertTrue(second.startswith(last["a.txt"]["short"]))
+            self.assertTrue(first.startswith(last[SPACED]["short"]))
+            self.assertTrue(first.startswith(last[ACCENTED]["short"]))
+            self.assertEqual(last["a.txt"]["date"], git("log", "-1", "--format=%cI", "--", "a.txt"))
+            self.assertEqual(helper.status(["a.txt", "notes"]),
+                             {SPACED: "M", "notes/new.txt": "??"})
+            self.assertEqual(helper.resolve(first[:10]), first)
+            self.assertEqual(helper.show(first, "a.txt"), b"one\n")
+            self.assertIsNone(helper.show(first, "notes/new.txt"))
+            self.assertTrue(helper.available)
+
+    def test_hashes_equal_fingerprint_sha_files(self):
+        sources = [(ROOT / n).read_bytes() for n in FP.PLANT_FILES]
+        self.assertEqual(RP.code_hash(sources), FP._sha_files(FP.PLANT_FILES))
+        self.assertEqual(RP.byte_hash(sources), FP._sha_files(FP.PLANT_FILES, code_only=False))
+        lf = [s.replace(b"\r\n", b"\n") for s in sources]
+        crlf = [s.replace(b"\n", b"\r\n") for s in lf]
+        self.assertEqual(RP.code_hash(lf), RP.code_hash(crlf))
+        self.assertEqual(RP.byte_hash(lf), RP.byte_hash(crlf))
+        commented = [lf[0] + b"\n# a comment the code hash does not see\n"] + lf[1:]
+        self.assertEqual(RP.code_hash(commented), RP.code_hash(lf))
+        self.assertNotEqual(RP.byte_hash(commented), RP.byte_hash(lf))
+        # A file that does not parse is hashed as bytes, after the same CRLF rule.
+        self.assertEqual(RP.code_hash([b"def (:\r\n"]), hashlib.sha256(b"def (:\n").hexdigest()[:16])
+
+    def test_minor(self):
+        self.assertEqual(RP.minor("3.12.10"), "3.12")
+        self.assertEqual(RP.minor("3.13.2"), "3.13")
+        self.assertEqual(RP.minor(platform.python_version()),
+                         ".".join(platform.python_version_tuple()[:2]))
+        for bad in (None, "", "None", "three"):
+            self.assertIsNone(RP.minor(bad), bad)
+
+    def test_plant_at_head_equals_the_files_on_disk(self):
+        git = self._need_git()
+        if not _clean(*FP.PLANT_FILES):
+            self.skipTest("the plant files have uncommitted changes, so HEAD's plant is not the disk's")
+        got = RP.plant_at(git, "HEAD")
+        self.assertEqual(got, {"plant_sha": FP._sha_files(FP.PLANT_FILES),
+                               "plant_text_sha": FP._sha_files(FP.PLANT_FILES, code_only=False)})
+        self.assertEqual(RP.plant_at(git, git.resolve("HEAD")), got)
+        self.assertIsNone(RP.plant_at(git, "f" * 40))
+
+    def test_road_sha_at_head_equals_random_road(self):
+        git = self._need_git()
+        try:
+            import random_road
+        except (Exception, SystemExit) as exc:
+            self.skipTest(f"random_road cannot be imported here ({type(exc).__name__})")
+        if not _clean("random_road.py"):
+            self.skipTest("random_road.py has uncommitted changes")
+        self.assertEqual(RP.road_sha_at(git, "HEAD"), random_road.code_sha())
+
+    def test_data_fingerprint_equals_derive_params(self):
+        if importlib.util.find_spec("pandas") is None:
+            self.skipTest("pandas is not installed, and derive_params imports it")
+        ok, out = _child("import derive_params; print(derive_params.fingerprint()['data_sha1'])")
+        if not ok:
+            self.skipTest(f"derive_params could not be imported in a subprocess: {out}")
+        self.assertEqual(RP.data_fingerprint(ROOT), out)
+
+    def test_derived_sha_equals_train(self):
+        missing = [m for m in ("torch", "stable_baselines3") if importlib.util.find_spec(m) is None]
+        if missing:
+            self.skipTest(f"{', '.join(missing)} not installed, and train imports them")
+        ok, out = _child("import train; print(train.derived_sha())")
+        if not ok:
+            self.skipTest(f"train could not be imported in a subprocess: {out}")
+        self.assertEqual(RP.derived_sha(ROOT), out)
+
+    def test_data_hashes_on_a_temporary_tree(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.assertIsNone(RP.data_fingerprint(root))
+            self.assertIsNone(RP.derived_sha(root))
+            (root / "data").mkdir()
+            samples, points = b"a,b\r\n1,2\r\n", b"x\r\n3\r\n"
+            (root / "data" / "master_samples.csv").write_bytes(samples)
+            (root / "data" / "master_points.csv").write_bytes(points)
+            want = hashlib.sha1(b"a,b\n1,2\nx\n3\n").hexdigest()[:16]
+            self.assertEqual(RP.data_fingerprint(root), want)
+            path = root / "data" / "derived_params.json"
+            path.write_text(json.dumps({"b": [1, 2], "a": {"c": 0.5}, "_note": "kept out"}),
+                            encoding="utf-8")
+            kept = json.dumps({"a": {"c": 0.5}, "b": [1, 2]}, sort_keys=True)
+            self.assertEqual(RP.derived_sha(root), hashlib.sha256(kept.encode()).hexdigest()[:16])
+            for text in ("[1, 2]", "{not json"):
+                path.write_text(text, encoding="utf-8")
+                self.assertIsNone(RP.derived_sha(root), text)
+
+    def test_derived_loaded_differs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "data").mkdir()
+            (root / "data" / "derived_params.json").write_text(json.dumps({"a": 1, "_b": 2}),
+                                                                encoding="utf-8")
+            fake = types.SimpleNamespace(_CACHE={})
+            with mock.patch.dict(sys.modules, {"derived": fake}):
+                self.assertFalse(RP.derived_loaded_differs(root), "nothing loaded yet")
+                fake._CACHE["d"] = {"a": 1, "_b": 99}
+                self.assertFalse(RP.derived_loaded_differs(root), "underscore keys are not values")
+                fake._CACHE["d"] = {"a": 2}
+                self.assertTrue(RP.derived_loaded_differs(root))
+            with mock.patch.dict(sys.modules):
+                sys.modules.pop("derived", None)
+                self.assertFalse(RP.derived_loaded_differs(root))
+
+    def test_live_side(self):
+        env_before = {k: os.environ.get(k) for k in ("DERIVING_PARAMS", "OMP_NUM_THREADS")}
+        index = _index_file()
+        index_before = index.stat().st_mtime_ns if index is not None and index.is_file() else None
+        modules_before = set(sys.modules)
+        live = RP.live_side(ROOT)
+        self.assertEqual(set(live), LIVE_KEYS)
+        self.assertEqual(live["python"], platform.python_version())
+        self.assertEqual(live["minor"], RP.minor(platform.python_version()))
+        self.assertEqual(live["plant_sha"], FP._sha_files(FP.PLANT_FILES))
+        self.assertEqual(live["plant_text_sha"], FP._sha_files(FP.PLANT_FILES, code_only=False))
+        self.assertIs(live["restart_needed"], live["plant_sha"] != RP.IMPORT_PLANT_SHA)
+        self.assertEqual(live["derived_sha"], RP.derived_sha(ROOT))
+        self.assertEqual(live["data_sha1"], RP.data_fingerprint(ROOT))
+        self.assertIsInstance(live["derived_loaded_differs"], bool)
+        for protocol in ("phase-d", "d2"):
+            module = f"fingerprint.plant_fingerprint({protocol})"
+            if any(e["module"] == module for e in live["import_errors"]):
+                self.assertNotIn(protocol, live["blocks"])
+                continue
+            block = live["blocks"][protocol]
+            self.assertEqual(block["plant_sha"], live["plant_sha"])
+            self.assertLessEqual(set(FP.FATAL), set(block), protocol)
+        self.assertEqual({k: os.environ.get(k) for k in env_before}, env_before)
+        new = set(sys.modules) - modules_before
+        self.assertFalse({"derive_params", "train", "record_agents", "knock_margin"} & new)
+        if index_before is not None:
+            self.assertEqual(index.stat().st_mtime_ns, index_before, ".git/index was rewritten")
+
+    def test_live_side_restart_and_import_errors(self):
+        with mock.patch.object(RP, "IMPORT_PLANT_SHA", "0" * 16):
+            self.assertIs(RP.live_side(ROOT, protocols=())["restart_needed"], True)
+
+        def refuses(protocol="phase-d", **advisory):
+            raise AssertionError("an import-time check failed")
+
+        with mock.patch.object(RP.FP, "plant_fingerprint", refuses):
+            live = RP.live_side(ROOT)
+        self.assertEqual(live["blocks"], {})
+        self.assertEqual(live["import_errors"], [
+            {"module": "fingerprint.plant_fingerprint(phase-d)", "type": "AssertionError"},
+            {"module": "fingerprint.plant_fingerprint(d2)", "type": "AssertionError"}])
+        with mock.patch.object(RP.FP, "plant_fingerprint", side_effect=SystemExit(2)):
+            got = RP.live_side(ROOT, protocols=("d2",))["import_errors"]
+        self.assertEqual(got, [{"module": "fingerprint.plant_fingerprint(d2)", "type": "SystemExit"}])
+        with mock.patch.object(RP.FP, "plant_fingerprint", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                RP.live_side(ROOT, protocols=("d2",))
+        self.assertEqual(RP.live_side(ROOT, protocols=("phase-x",))["import_errors"],
+                         [{"module": "fingerprint.plant_fingerprint(phase-x)", "type": "ValueError"}])
 
 
 if __name__ == "__main__":
