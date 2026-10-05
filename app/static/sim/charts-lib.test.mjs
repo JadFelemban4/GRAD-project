@@ -364,11 +364,14 @@ test('results.css: every token in both themes, the resets of design 7.3, and no 
     '.rc-chart{position:relative;width:100%;height:auto;direction:ltr;touch-action:pan-y}',
     '.rc-plot text{stroke:none;font-family:Consolas,ui-monospace,monospace;font-size:11px;fill:var(--rc-muted)}',
     'html[dir=rtl] .rc-tip{direction:rtl}',
+    '.rc-chart-error{margin:12px 0;font-size:11px;line-height:1.75;color:var(--rc-muted);text-align:center}',
+    'html[dir=rtl] .rc-chart-error{direction:rtl}',
     '.rc-tip .rc-tl{white-space:normal}',
   ]) assert.ok(css.includes(rule), `missing ${rule}`);
   assert.doesNotMatch(css, /ellipsis/, 'a tooltip label is never cut');
   for (const cls of ['rc-plot', 'rc-grid', 'rc-axis', 'rc-ln', 'rc-hit', 'rc-hair', 'rc-hdot', 'rc-mark', 'rc-ring',
-    'rc-lbl', 'rc-tip', 'rc-tt', 'rc-tr', 'rc-tl', 'rc-key', 'rc-dot', 'rc-pair', 'rc-band', 'rc-mei', 'rc-mei-label']) {
+    'rc-lbl', 'rc-tip', 'rc-tt', 'rc-tr', 'rc-tl', 'rc-key', 'rc-dot', 'rc-pair', 'rc-band', 'rc-mei', 'rc-mei-label',
+    'rc-chart-error']) {
     assert.ok(css.includes(`.${cls}`), `no rule for .${cls}, a class the chart code writes`);
   }
   for (const hex of new Set(css.match(/#[0-9a-fA-F]{6}\b/g))) {

@@ -118,6 +118,8 @@ main.results-main{max-width:1180px;font-size:12px}
 .rc-tip .rc-tl{white-space:normal}
 .rc-tip .rc-key{display:inline-block;width:12px;height:0;border-top:2.5px solid;flex:none}
 html[dir=rtl] .rc-tip{direction:rtl}
+.rc-chart-error{margin:12px 0;font-size:11px;line-height:1.75;color:var(--rc-muted);text-align:center}
+html[dir=rtl] .rc-chart-error{direction:rtl}
 
 /* < 760 px: phone. The nav row is agents.css's. */
 @media(max-width:760px){
