@@ -10,9 +10,11 @@ THE GIT HELPER. One class, Git, makes every git call of a build, each with a
 timeout. A missing git, a folder that is not a checkout, a timeout or any
 other failure to run git leaves the helper unavailable, with a reason, and
 every later call returns None without running anything: a build without git
-omits the git facts and changes nothing else. A commit named in a result file
-reaches git only after it matches a plain ref pattern, so the text of a file
-can never become a git option.
+omits the git facts and changes nothing else. A file log or a status that git
+runs and rejects does the same, because the empty table it would otherwise
+return reads as "no commit" and as "nothing changed". A commit named in a
+result file reaches git only after it matches a plain ref pattern, so the text
+of a file can never become a git option.
 
 THE LIVE SIDE. live_side() describes this tree: the plant hashes read from
 disk, the hash of the derived constants and of the logs they were derived
@@ -71,8 +73,12 @@ class Git:
     be run ("missing", "timeout", "error") or the folder is not a checkout
     ("not_a_repo"); from then on every call returns None and runs nothing. A
     command that runs and fails, such as asking for a commit this clone does
-    not have, returns None and leaves the helper available: an unknown commit
-    is an answer, not a broken git.
+    not have, returns None from run, resolve, show and head_short and leaves
+    the helper available: an unknown commit is an answer, not a broken git.
+    last_commits and status are the exception, because their answer is a table
+    and an empty table reads as "no commit" or "nothing changed": a log or a
+    status that fails, for a non-empty list of paths, loses the helper with
+    reason "error" and returns the empty table an unavailable helper returns.
     """
 
     def __init__(self, root, exe: str = "git", timeout: float = GIT_TIMEOUT_S):
@@ -91,8 +97,21 @@ class Git:
         self.available = False
         self.reason = reason
 
+    def _unanswered(self):
+        """The empty table of last_commits and status when git gave no answer.
+
+        A git that ran and exited with an error is lost here, with reason
+        "error". A helper that was already lost, or that run lost during this
+        very call, keeps the reason it has."""
+        if self.available:
+            self._lose("error")
+        return {}
+
     def run(self, *args: str, binary: bool = False):
-        """git's stdout (text, or bytes when `binary`), or None on any failure."""
+        """git's stdout (text, or bytes when `binary`), or None on any failure.
+
+        A command that exits with an error returns None and leaves the helper
+        available; what that means is for the caller to say."""
         if not self.available:
             return None
         try:
@@ -140,14 +159,21 @@ class Git:
         the date being the committer date in ISO form. A merge names a file
         only when the merge itself changed it against every parent, so a file
         a merge only carried over keeps the commit that made it.
+
+        A log that git rejects (it exits with an error) is not "no commit":
+        the helper is lost with reason "error" and {} is returned, as for any
+        unavailable helper, so check `available` before reading {} as "no
+        commit".
         """
         if not relpaths:
             return {}
         out = self.run("-c", "core.quotePath=false", "log", "--format=%x00%h%x09%cI",
                        "--name-only", "--diff-merges=dense-combined", "--",
                        *[str(p).replace("\\", "/") for p in relpaths])
+        if out is None:
+            return self._unanswered()
         found = {}
-        for record in (out or "").split("\x00")[1:]:
+        for record in out.split("\x00")[1:]:
             head, _, names = record.partition("\n")
             short, _, date = head.partition("\t")
             for name in names.splitlines():
@@ -159,12 +185,19 @@ class Git:
         """rel -> its git status code ("M", "??", ...) for every changed or
         untracked file under `relpaths`, from ONE status call; a clean file is
         absent. Read with -z, so no path is quoted and a rename is
-        "XY to" followed by "from"."""
+        "XY to" followed by "from".
+
+        A status that git rejects (it exits with an error) is not "clean": the
+        helper is lost with reason "error" and {} is returned, as for any
+        unavailable helper, so check `available` before reading {} as
+        "nothing changed"."""
         if not relpaths:
             return {}
         out = self.run("status", "--porcelain=v1", "-z", "--untracked-files=all", "--",
                        *[str(p).replace("\\", "/") for p in relpaths])
-        fields = (out or "").split("\x00")
+        if out is None:
+            return self._unanswered()
+        fields = out.split("\x00")
         codes, i = {}, 0
         while i < len(fields):
             entry, i = fields[i], i + 1

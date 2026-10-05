@@ -616,6 +616,64 @@ class ProvenanceLiveTests(unittest.TestCase):
             self.assertIsNone(helper.show(first, "notes/new.txt"))
             self.assertTrue(helper.available)
 
+    def _temp_repo(self, repo):
+        """`repo` made a repository with one commit (a.txt); the function that
+        runs git in it, which fails the test when git fails."""
+
+        def git(*args):
+            r = subprocess.run(["git", *args], cwd=repo, capture_output=True, timeout=60)
+            self.assertEqual(r.returncode, 0, r.stderr.decode("utf-8", errors="replace"))
+            return r.stdout.decode("utf-8", errors="replace").strip()
+
+        git("init", "-q")
+        for key, value in (("user.name", "results tab test"),
+                           ("user.email", "test@example.invalid"),
+                           ("commit.gpgsign", "false"), ("core.autocrlf", "false")):
+            git("config", key, value)
+        (repo / "a.txt").write_bytes(b"one\n")
+        git("add", "-A")
+        git("commit", "-q", "-m", "first")
+        return git
+
+    def test_a_status_git_rejects_loses_git_instead_of_reading_clean(self):
+        self._need_git()
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            self._temp_repo(repo)
+            (repo / "a.txt").write_bytes(b"one, changed\n")
+            helper = RP.Git(repo)
+            self.assertEqual(helper.status(["a.txt"]), {"a.txt": "M"})
+            (repo / ".git" / "index").write_bytes(b"not an index")
+            self.assertIsNone(_git_out("status", "--porcelain", cwd=repo),
+                              "git must reject the damaged index for this test to mean anything")
+            self.assertEqual(helper.status(["a.txt"]), {})
+            self.assertEqual((helper.available, helper.reason), (False, "error"))
+            # Lost for good: nothing runs again, and the reason stays.
+            self.assertIsNone(helper.head_short())
+            self.assertEqual(helper.last_commits(["a.txt"]), {})
+            self.assertEqual((helper.available, helper.reason), (False, "error"))
+
+    def test_a_log_git_rejects_loses_git_instead_of_reading_no_commit(self):
+        self._need_git()
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            git = self._temp_repo(repo)
+            helper = RP.Git(repo)
+            self.assertEqual(sorted(helper.last_commits(["a.txt"])), ["a.txt"])
+            git("update-ref", "-d", "HEAD")  # the branch HEAD names has no commit now
+            self.assertIsNone(_git_out("log", "--", "a.txt", cwd=repo),
+                              "git must reject a log with no commit for this test to mean anything")
+            self.assertEqual(helper.last_commits(["a.txt"]), {})
+            self.assertEqual((helper.available, helper.reason), (False, "error"))
+
+    def test_a_rejected_call_keeps_the_reason_git_was_already_lost_for(self):
+        git = self._need_git()
+        git.exe = "git-does-not-exist"  # the next call cannot even start
+        self.assertEqual(git.status(["results"]), {})
+        self.assertEqual((git.available, git.reason), (False, "missing"))
+        self.assertEqual(git.last_commits(["results"]), {})
+        self.assertEqual((git.available, git.reason), (False, "missing"))
+
     def test_hashes_equal_fingerprint_sha_files(self):
         sources = [(ROOT / n).read_bytes() for n in FP.PLANT_FILES]
         self.assertEqual(RP.code_hash(sources), FP._sha_files(FP.PLANT_FILES))
