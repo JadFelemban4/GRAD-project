@@ -1,0 +1,27 @@
+diff --git a/handoff.md b/handoff.md
+index def7f2b..48931c4 100644
+--- a/handoff.md
++++ b/handoff.md
+@@ -364,11 +364,6 @@ ways, total and turbine plus oil, until the knock model is tested.
+ | Cite the 88 °C thermostat to BMW | The B58 has a heat-management valve; 88 °C is our own stand-in, identified from the logs |
+ | Quote the knock model as calibrated — or as refuted | The only test so far could not see knock (28 September) |
+ | Describe the scenario as a mountain | It is sustained load in sea-level air; altitude is not modelled |
+-| **Add a write path to `app/`, in any form** | The read-only rule is structural. `app/test_replay.py` asserts no write path exists |
+-| **Write raw samples to disk from `app/`** | Only what the model marks is persisted. A test asserts it |
+-| Lower an `app/` threshold to quiet a demo | A threshold changes for a measurement, and the measurement goes in the docstring. Mistake 14 |
+-| **Unzip a release archive over the tree** | Diff first, take only what is new. Mistake 16 |
+-
+ | **Add a write path to `app/`, in any form** | The read-only rule is structural, not stylistic. A future version may SUGGEST an ECU parameter as text on a screen; applying it is a different product and must never share a code path. `app/test_replay.py` asserts that no write path exists |
+ | **Write raw samples to disk from `app/`** | The stream is memory → websocket → gone. Only what the model *marks* is persisted, to `app/review_log.jsonl`. A test asserts a whole replay creates exactly one file |
+ | Add a seventh live channel without justifying it | The adapter polls one channel per round trip, so every addition costs every other channel ~14 % of its rate. Put the reason in the channel's `why` field |
+@@ -388,10 +383,6 @@ One constant to watch while reading older prose: **`ENR_LOAD` is 180 kPa, not
+ changed definition when the charge temperature was corrected; 180 on the current
+ scale selects exactly the samples that 200 selected on the old one, and
+ every enrichment figure reproduces without a refit.
+-On the charge-temperature row, the car settles it: 762 boosted model samples
+-against 1097 logged readings of the car's own boost channel put the shipped
+-`charge_temperature()` at **+1.9 %** of the car, where the raw sensor inverts
+-about 25 % high.
+ 
+ ---
+ 

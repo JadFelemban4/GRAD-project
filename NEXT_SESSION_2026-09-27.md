@@ -1,5 +1,8 @@
 # NEXT SESSION — 27 September 2026: finish explaining B and C, then the team's decision
 
+> **SUPERSEDED — kept as the record. Do not paste this into a new session;**
+> what is current is `CLAUDE.md`'s first box.
+
 Written at the close of the C4 session (23–27 September). Paste everything
 inside the fence into a fresh Claude Code session opened in this repository.
 It does not replace `NEXT_SESSION_2026-09-24.md` — it points at it and says

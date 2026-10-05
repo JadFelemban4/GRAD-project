@@ -1,0 +1,34 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 7c95786..ca8e6b3 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -675,16 +675,19 @@ documents have been swept behind them.
+   closing note of mistake 11.
+ 
+ **What "passing project" means here:** validated simulator + agent beating two
+-baselines + an ablation isolating preview. That is Phase D, **and Phase D is
+-in.** The floor is down, with a SPLIT VERDICT that must be reported as two
+-claims and never as one:
+-
+-- the agent **does** beat the comparators — **+29 to +34 points** over
+-  `current-grade` on five of eight seeds, positive on seven of eight;
+-- the ablation isolating preview is **NOT SIGNIFICANT** (p = 0.3633 sign,
+-  p = 0.4922 permutation).
+-
+-Everything after it raises the ceiling, nothing after it protects the floor.
++baselines + an ablation isolating preview. That is Phase D, and it has now run
++four times (the box at the top). The verdict is SPLIT, and it must be reported
++as two claims and never as one:
++
++- the trained agents beat `current-grade` on the median in every set (Phase D:
++  **+29 to +34 points** on five of eight seeds, positive on seven of eight) —
++  **but with spark advance forbidden that margin disappears**, so this claim
++  rests on the untested knock model until drive C;
++- the ablation isolating preview has not separated from seed noise in any of
++  the four (Phase D: p = 0.3633 sign, p = 0.4922 permutation).
++
++Whether the floor is down is drive C's question. Everything after Phase D
++raises the ceiling.
+ 
+ ---
+ 

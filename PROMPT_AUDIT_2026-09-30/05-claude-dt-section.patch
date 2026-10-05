@@ -1,0 +1,47 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 2e5b83c..ed91637 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2827,10 +2827,10 @@ against actually correlates.** See mistakes 3 and 6.
+ 
+ ## Open, and honest about it
+ 
+-### THE AGENT IS SCORED IN A DISCRETISATION IT DID NOT LEARN IN. Measured 19 Sep
++### PHASE D, D2 AND C4 WERE SCORED IN A DISCRETISATION THEY DID NOT LEARN IN. Measured 19 Sep
+ 
+-`dt` is not consistent across this project and never has been. Ghassan logged it
+-as an open question on 19 September; this measures it.
++`dt` was not consistent across this project until 27 September. Ghassan logged
++it as an open question on 19 September; this measures it.
+ 
+ ```
+ train.py         dt = 0.2   duration 900 s   ->  4500 steps per episode
+@@ -2867,19 +2867,21 @@ The cause is one loop. `_track_torque`'s PI accumulates per STEP with no `dt` in
+ it, so it advances five times per second at 0.2 and once at 1.0. This is the
+ same defect AUDIT.md M16 fixed for `SLEW`, in the loop M16 did not touch.
+ 
+-**What this does and does not do to the ablation.** Both the sighted and the
+-blinded agent train at 0.2 and are scored at 1.0, so the handicap is shared and
++**What this does and does not do to the ablation.** In Phase D, D2 and C4 the
++sighted and the blinded agent both trained at 0.2 and were scored at 1.0, so the
++handicap is shared and
+ is not a bias by construction. Whether it is SYMMETRIC is unmeasured, and there
+ is a reason to doubt it: a policy whose entire value is timing may lose more to
+ a coarser step than one with no preview at all. **Quote no ablation figure
+ without this paragraph beside it**, and note that the hand-written comparators
+ are unaffected — they have no `dt`, they are functions of the current state.
+ 
+-Three ways out, and the choice is the team's, not the next session's: train at
+-1.0 to match the protocol; score at 0.2 to match the training; or leave it and
+-state it as a limitation. The third is legitimate and is the only one that
+-costs nothing, but it has to be written down rather than discovered by an
+-examiner.
++Three ways out were listed: train at 1.0 to match the protocol; score at 0.2 to
++match the training; or leave it and state it as a limitation. **The team chose
++the first on 27 September:** `train.py` passes dt = 1.0 for the terrain design
++(`runs/terrain_dt1/`), so the 29 September agents and every run after them learn
++in the step they are scored in. For Phase D, D2 and C4 this section stays a
++stated limitation — written down rather than discovered by an examiner.
+ 
+ **Phase F's H2b threshold rule does not survive the correct engine.** It sets
+ the constraint at the 80th percentile of the unprotected trace, which assumes

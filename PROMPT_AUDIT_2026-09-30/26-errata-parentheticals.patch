@@ -1,0 +1,125 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 89fadc8..45313aa 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -608,7 +608,7 @@ dataset size, the oil node).*
+ | E · battery plant | not started. `battery.py` does not exist |
+ | F · the H/τ sweep | preliminary, hand-written policies only; **not quotable until the thermal network is sub-stepped** (the sweep runs at dt 2.0) |
+ | G · writing | **started** — `thesis/CHAPTER4_ABLATION_DRAFT.md`, drafted and reviewed 23 September; C4 paragraphs (4.10) added after. It must now carry Ghassan's retrain and the two merge-review findings |
+-| **APP · the live supervisor** | **runs; the six audit findings against it are now FIXED.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its suite reports **49 of 49**, up from 46 because each fix shipped with a regression test. *(This row said "has six known bugs … passes 46 of 46" until 17 September; the fixes and the count both moved on 16 September and this row did not.)* The lesson still stands and is worth more than the fixes: **the suite reported 46 of 46 while all six were live.** Only M9 carries no test of its own. **Read `AUDIT.md` and `AUDIT_FIXES.md` before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
++| **APP · the live supervisor** | **runs; the six audit findings against it are now FIXED.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its suite reports **49 of 49**, up from 46 because each fix shipped with a regression test. The lesson still stands and is worth more than the fixes: **the suite reported 46 of 46 while all six were live.** Only M9 carries no test of its own. **Read `AUDIT.md` and `AUDIT_FIXES.md` before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
+ 
+ **Where the app sits, and what it must not be allowed to become.** The app is
+ the demonstrable, showable half of this project and it will be the first thing
+@@ -618,10 +618,8 @@ has not proved the claim — preview has not separated from seed noise in any of
+ the four (the box at the top).** That is the project's result so far; what it is
+ not is a confirmation. The rule that got us there
+ is worth keeping for E, F and G: treat time spent on `app/` past the point where
+-it works as time taken from the claim. *(This paragraph read "the claim is
+-proved in Phase D … if the app is finished and Phase D is not, the project has a
+-nice screen and no result" until 22 September. Note the verb: **tested**, not
+-proved. A phase that can only confirm is not an experiment.)*
++it works as time taken from the claim. Note the verb: **tested**, not proved —
++a phase that can only confirm is not an experiment.
+ 
+ What the app does earn, and it is worth saying plainly in the thesis: it is the
+ same validated plant, running forward in real time against a live stream rather
+@@ -652,9 +650,6 @@ different numbers and every one of them is correct:
+ | drives behind the 8 September fits | **8** | the set the enrichment shape and the spark slopes were built on |
+ | drives behind the thermal derivation | **7** | log coolant, oil and ambient for 5 min or more (`calibrate_thermal.usable_drives`) |
+ 
+-*(Updated 28 September, evening, for drive B. The rows above read 9 / 6 / 8 until
+-the tenth drive, then 10 / 7 / 8.)*
+-
+ `verify_docs.py` asserts the first two separately for exactly this reason. A
+ sentence that says "ten drives" about a *fit* is wrong, and so is one that says
+ "eight drives" about the *logs*. Say which population you mean.
+@@ -786,13 +781,6 @@ python -m app.test_replay  49 of 49 fast checks. Add --full for 59 of 59,
+                            derived enrichment dwell moved pull01)
+ ```
+ 
+-<!-- RETIRED-OK: 256.5, 801 -->
+-*(The `check_premise.py` line above said 256.5 at 801 C until 17 Sep -- the
+-pre-H1 figures, superseded when DTHETA_DEG went 0.5 -> 0.25. AUDIT_FIXES.md H1
+-records the move and that line did not follow it. Until 22 Sep it then quoted a
+-baseline that did not bind at all; the scenario had moved on and the line again
+-did not follow.)*
+-
+ **Two of those app figures are not measurements and must never be quoted as
+ though they were.** The peak turbine temperature is a MODEL OUTPUT whose heat
+ capacity is an assumed number (REFERENCES.md section 4), and the alert counts
+@@ -855,11 +843,6 @@ trained sighted one, which is Phase D.
+ > they were trained blind, not zeroed at evaluation — and across eight pairs the
+ > difference does not separate from seed noise. That is a real ablation and a
+ > real answer. See `results/PREREGISTRATION.md` and `analyse_phase_d.py`.
+->
+-> *(This paragraph ended "**Until then this project has no measured preview
+-> advantage at all**" until 22 September. It is now measured, and the measured
+-> value is "not distinguishable from zero", which is a different statement from
+-> "unmeasured".)*
+ 
+ The honest comparator —
+ added 16 September — is a policy that acts on the grade the car is on right now,
+@@ -2520,10 +2503,7 @@ thought to look for.** The same lesson as mistake 11, one more level down.
+ | **M7** | nothing in the test suite imports `app/server.py` | "36 of 36 pass" therefore says nothing about whether the product starts |
+ 
+ **ALL SIX ARE NOW FIXED**, and `AUDIT_FIXES.md` carries a row per finding
+-saying what moved. This paragraph said "none of these is fixed as of
+-16 September" until 17 September, which was already untrue when it was written:
+-the fixes landed in the same pass that produced `AUDIT_FIXES.md`. Mistake 11 for
+-the fifth time — the code moved and the prose did not.
++saying what moved.
+ 
+ Verified by running the suite, not by reading the response document: it reports
+ **49 of 49** (three new regressions over the old 46), and five of the six carry a
+@@ -2561,8 +2541,7 @@ test p = 0.3633, permutation p = 0.4922. The blinded agents were trained blind
+ rather than zeroed at evaluation, so the comparison could have failed, and
+ across eight pairs it did not separate from seed noise.
+ 
+-C1 and C2 remain where they were. *(This paragraph ended "it is not addressed
+-here and it is not addressed anywhere yet" until 22 September.)*
++C1 and C2 remain where they were.
+ ---
+ 
+ ## Repository layout
+@@ -3052,15 +3031,11 @@ not a result.
+    steps with gradient updates running: **19.19 steps/s at one thread, 18.14 at
+    six.** Checkpoints land every 10 000 steps.
+ 
+-   *(This said "about 4.6 hours on one CPU core … 3.0 steps/s once SAC's
+-   gradient updates are included" until 17 September. Wrong by 6.4x, and the
+-   "one CPU core" qualifier was meaningless — one thread is marginally FASTER
+-   than six, because the policy network is tiny. The gradient updates cost about
+-   2 %: the environment alone runs 19.5 steps/s and the training loop 19.2. Each
+-   env step runs six engine cycles at ~9 ms against ~1 ms for a gradient step,
+-   so the combustion model is the entire cost. **What sets it is
+-   `plant.DTHETA_DEG`** — halving the crank-angle step roughly doubles the run,
+-   and it was halved on 16 September. Re-time after touching it.)*
++   One thread is marginally faster than six, because the policy network is
++   tiny, and the combustion model is the whole cost: each env step runs six
++   engine cycles at ~9 ms against ~1 ms for a gradient step. **What sets it is
++   `plant.DTHETA_DEG`** — halving the crank-angle step roughly doubles the run.
++   Re-time after touching it.
+ 3. `python test_reward.py` before trusting any training curve.
+ 4. Five seeds, one per team member, overnight — `--seed 0` through `--seed 4`.
+    Then the same five with `--no-preview`. That is Phase D's input.
+diff --git a/handoff.md b/handoff.md
+index 1f739af..f727637 100644
+--- a/handoff.md
++++ b/handoff.md
+@@ -131,15 +131,6 @@ The row worth looking at is **current-grade protection**: no preview at all,
+ only the gradient the car is on right now, and hand-written preview **loses to
+ it by 0.3 points**.
+ 
+-<!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 110 -->
+-*(This block held 256.5 / 801 °C / 2.2 points until 17 September — the figures
+-from before the H1 crank-angle correction took `plant.DTHETA_DEG` to 0.25°;
+-`AUDIT_FIXES.md` H1 records the move. It then held baseline 294.2 at 812 °C
+-until 22 September — the six-speed run at 110 km/h, from before the scenario
+-moved to 12 % at 130 km/h — in which the constraint did not bind and
+-current-grade beat predictive by 1.8 points. Both times the code moved and
+-this file did not.)*
+-
+ **How the scenario compares with the car's own driving, measured over every
+ drive** — on 17–19 September, with the app's physics of that day (exhaust
+ = fuel × 15). On the merged physics `7475b5d7` peaks at 873.1 °C (the pinned

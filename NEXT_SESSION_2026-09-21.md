@@ -1,5 +1,8 @@
 # Prompt for the next session — written 21 September 2026, after the second audit
 
+> **SUPERSEDED — kept as the record. Do not paste this into a new session;**
+> what is current is `CLAUDE.md`'s first box.
+
 Paste everything in the block below into a fresh Claude Code session. It is
 accurate as of commit `fdba1b9` on `JMF-2340550-sep17` and it will go stale;
 if a number here disagrees with a script, **the script is right**.

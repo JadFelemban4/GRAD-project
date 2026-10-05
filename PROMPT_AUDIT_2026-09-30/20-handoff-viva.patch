@@ -1,0 +1,31 @@
+diff --git a/handoff.md b/handoff.md
+index a6bab1d..016f4d7 100644
+--- a/handoff.md
++++ b/handoff.md
+@@ -435,14 +435,17 @@ with this sentence, which is the refuted claim:
+ > blinded agents against eight trained sighted ones, preregistered — and
+ > **preview is not significant**: 5 of 8 positive, mean +4.8, p = 0.3633.
+ >
+-> The defensible sentence is: *we built an ablation that could fail, ran it
+-> eight times, and it did not separate.* `python analyse_phase_d.py`.
++> The defensible sentence is the one at the top of this section: *we built an
++> ablation that could fail, ran it four times, and it has not separated.*
+ The hand-written policies cannot carry this. Their "preview disabled equals
+ reactive, to the decimal" was an identity built into the code (AUDIT.md C3), and
+-their −0.4 against current-grade turned out to be the untested knock term. On
+-the existing (not yet valid) agents, training beat every hand-written policy by
+-about 26 points while sighted and blinded were indistinguishable.
+-
+-**If the retrain shows no preview advantage on this scenario, that is the
+-result**: a statement about H/τ at this operating point, reported as one. Pair it
+-with a validation table that says what it does not cover, and defend that.
++their deficit against current-grade (−0.3 points on the merged plant) is one
++second of knock at the grade step. On the twenty agents of 29 September,
++training beat every hand-written policy while sighted and blinded were
++indistinguishable — and most of that margin rests on the knock model.
++
++**The retrain did not separate preview from seed noise on this scenario
++(INCONCLUSIVE under the MEI rule), and that is the result**: a statement about
++H/τ at this operating point, reported as one — never *preview does not help*.
++Pair it with a validation table that says what it does not cover, and defend
++that.

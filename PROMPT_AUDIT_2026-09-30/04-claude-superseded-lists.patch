@@ -1,0 +1,27 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 231429f..2e5b83c 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2961,6 +2961,7 @@ not a result.
+ >   and 5 of 8 blinded agents are worse than `current-grade`'s worst.
+ > - **Next is the team's decision** — longer budget (the agents were still
+ >   changing) or more seeds (the result hangs on one seed); one, not both.
++>   *(Superseded 30 September: the merge's live list above comes first.)*
+ >
+ > The full account: `PREREGISTRATION_C4.md` section 11. The traps that could
+ > have destroyed Phase D's and D2's agents are closed (`f987049`; `train.py`
+@@ -3000,9 +3001,13 @@ not a result.
+ >
+ > **DO NOT add seeds to D2** — its section 7, same rule as Phase D.
+ 
++> *(SUPERSEDED 23 September — the MEI was set at 50 damage units on
++> 22 September, and the ledger below was swept to zero in `3f4627d`. Kept as the
++> record. The DO NOT at its end still holds.)*
++>
+ > **THIS LIST WAS THE ROUTE TO PHASE D AND PHASE D IS DONE.** Steps 1–5 below
+ > were followed on 21–22 September and are kept as the record of how, not as
+-> instructions. **The live list is now:**
++> instructions. **The list that followed it, 22 September:**
+ >
+ > 1. **Set the minimum effect of interest.** `results/PREREGISTRATION.md`
+ >    section 5 says TEAM DECISION — NOT YET SET. It blocks the write-up, not the

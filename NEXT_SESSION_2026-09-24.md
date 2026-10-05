@@ -1,5 +1,8 @@
 # Next session — 24 September 2026, after C4
 
+> **SUPERSEDED — kept as the record. Do not paste this into a new session;**
+> what is current is `CLAUDE.md`'s first box.
+
 Paste the block below as the first message of the next session. It was checked
 before commit by three read-only reviewers (facts, traps, completeness), each
 finding challenged by a second. **If a number here disagrees with a script, the

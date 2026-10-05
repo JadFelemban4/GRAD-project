@@ -1,0 +1,29 @@
+diff --git a/handoff.md b/handoff.md
+index f336cb0..705a0ed 100644
+--- a/handoff.md
++++ b/handoff.md
+@@ -60,9 +60,10 @@ model and therefore cannot validate it.
+ >
+ > Twenty agents, seeds 0–9 sighted and blinded, 130 km/h on varied roads, on the
+ > derived plant. **All twenty beat every hand-written policy; sighted minus
+-> blinded is +1.2 points (95 % CI −4.4 to +6.8, n = 10) — no measurable preview
+-> value.** Every agent advances spark to just under the untested knock model's
+-> knee, and with that advance forbidden (`knock_margin.py`) their median cut
++> blinded is +1.2 points (95 % CI −4.4 to +6.8, n = 10) — INCONCLUSIVE under the
++> MEI rule (sign-test power 0.26).** Every agent advances spark to the +4° action
++> bound, which sits just under the untested knock model's knee, and with that
++> advance forbidden (`knock_margin.py`) their median cut
+ > falls to ~41.6 %, below current-grade's 43.4 %: **most of their margin rests on
+ > the knock model, so drive C (knock) is now the most valuable drive.** Blinded
+ > seed 6 does more damage than the baseline on the five episodes that weight
+@@ -184,8 +185,8 @@ samples with `t_turb_c` above `engine_env.TURB_PROTECT_K - 273.15`.
+ > `use_preview=False` the preview term is literally zero, so the predictive
+ > policy returns the reactive policy's vector on every step — the identity
+ > could not have failed. The real ablation needs a TRAINED blinded agent, and
+-> that is Phase D — which has now run, and returned a null (the box at the top
+-> of this file).
++> that is Phase D — which has now run as four trained ablations, none of them
++> decisive (the box at the top of this file).
+ 
+ ---
+ 

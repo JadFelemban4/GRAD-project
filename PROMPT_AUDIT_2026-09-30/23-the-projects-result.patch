@@ -1,0 +1,41 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 26aad22..db94568 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -613,9 +613,10 @@ dataset size, the oil node).*
+ **Where the app sits, and what it must not be allowed to become.** The app is
+ the demonstrable, showable half of this project and it will be the first thing
+ anyone asks to see. It is still not the claim. The claim is the H/τ criterion,
+-and the claim is TESTED in Phase D. **Phase D has now run, and it did not prove
+-the claim — it returned a null on preview (p = 0.3633).** That is still the
+-project's result; what it is not is a confirmation. The rule that got us there
++and the claim is TESTED in Phase D. **Phase D has now run four times, and it
++has not proved the claim — preview has not separated from seed noise in any of
++the four (the box at the top).** That is the project's result so far; what it is
++not is a confirmation. The rule that got us there
+ is worth keeping for E, F and G: treat time spent on `app/` past the point where
+ it works as time taken from the claim. *(This paragraph read "the claim is
+ proved in Phase D … if the app is finished and Phase D is not, the project has a
+@@ -700,7 +701,8 @@ Anyone can regenerate these. Do not quote a number that a script does not print.
+ from this list** — a list goes stale, a transcript is dated.
+ 
+ ```
+-python analyse_phase_d.py  THE PROJECT'S RESULT. 5 of 8 seeds positive, mean
++python analyse_phase_d.py  Phase D, the first of the four ablations (the box at
++                           the top has all four). 5 of 8 seeds positive, mean
+                            +4.8 damage units, exact one-sided sign p = 0.3633,
+                            exact paired permutation p = 0.4922 -> NOT
+                            SIGNIFICANT at alpha 0.05. Also prints the agent's
+diff --git a/handoff.md b/handoff.md
+index 016f4d7..1f739af 100644
+--- a/handoff.md
++++ b/handoff.md
+@@ -381,7 +381,7 @@ refuted (`results/PREREGISTRATION.md` limit 8).
+ | You need | File |
+ |---|---|
+ | the rules, the traps, the mistakes already made, the improvement plan | [CLAUDE.md](CLAUDE.md) |
+-| **the project's result**, and the rules Phase D was run under | `python analyse_phase_d.py` and [results/PREREGISTRATION.md](results/PREREGISTRATION.md) |
++| **the four preview ablations**, and the rules they were run under | `python analyse_phase_d.py`, `analyse_phase_d2.py`, `analyse_c4.py`, [results/agents/terrain_dt1/README.md](results/agents/terrain_dt1/README.md) and [results/PREREGISTRATION.md](results/PREREGISTRATION.md) |
+ | what was verified, and on what date | [CHECKPOINT.md](CHECKPOINT.md) |
+ | the last session in full | the newest `SESSION_REPORT_*.md` — [SESSION_REPORT_2026-09-30_merge.md](SESSION_REPORT_2026-09-30_merge.md) on 30 September |
+ | the prompt to continue in a new session | the newest `NEXT_SESSION_*.md`; read its first lines for SUPERSEDED before pasting it |

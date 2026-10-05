@@ -1,0 +1,31 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 7e96f72..df1e491 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2703,8 +2703,9 @@ generality_test.py    The H/τ experiment. H1, H2, H2b.
+ README.md             The public-facing summary. Tracked by verify_docs.py.
+ CLAUDE.md             This file. The handoff and the mistake log.
+ handoff.md            The short entry point: what to run, what it prints today.
+-NEXT_CHAT_PROMPT.md   The prompt to paste into a new session.
+-SESSION_REPORT_*.md   One per session, dated. 2026-09-28 is the latest.
++NEXT_SESSION_*.md     The prompt for the next session, one per session, dated.
++                      Read its first lines for SUPERSEDED before pasting it.
++SESSION_REPORT_*.md   One per session, dated. The newest date is the latest.
+ REFERENCES.md         Where every number we did not measure comes from. Written
+                       for a non-specialist. Read before quoting a published band.
+ DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
+diff --git a/handoff.md b/handoff.md
+index b2c09aa..f336cb0 100644
+--- a/handoff.md
++++ b/handoff.md
+@@ -477,8 +477,8 @@ refuted (`results/PREREGISTRATION.md` limit 8).
+ | the rules, the traps, the mistakes already made, the improvement plan | [CLAUDE.md](CLAUDE.md) |
+ | **the project's result**, and the rules Phase D was run under | `python analyse_phase_d.py` and [results/PREREGISTRATION.md](results/PREREGISTRATION.md) |
+ | what was verified, and on what date | [CHECKPOINT.md](CHECKPOINT.md) |
+-| the last session in full | [SESSION_REPORT_2026-09-28_evening.md](SESSION_REPORT_2026-09-28_evening.md); the morning's is [SESSION_REPORT_2026-09-28.md](SESSION_REPORT_2026-09-28.md) |
+-| the prompt to continue in a new session | [NEXT_CHAT_PROMPT.md](NEXT_CHAT_PROMPT.md) |
++| the last session in full | the newest `SESSION_REPORT_*.md` — [SESSION_REPORT_2026-09-30_merge.md](SESSION_REPORT_2026-09-30_merge.md) on 30 September |
++| the prompt to continue in a new session | the newest `NEXT_SESSION_*.md`; read its first lines for SUPERSEDED before pasting it |
+ | **where every number we did not measure comes from** | [REFERENCES.md](REFERENCES.md) |
+ | the drives still worth making, and how | [logs/DRIVE_PLAN.md](logs/DRIVE_PLAN.md) |
+ | results, figures, and the phone page | [results/](results/) — `results/page/index.html` |

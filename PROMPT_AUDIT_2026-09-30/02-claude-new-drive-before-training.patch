@@ -1,0 +1,23 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index ca8e6b3..f492d68 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2794,10 +2794,14 @@ python verify_docs.py                        # fails if anything quotes the old
+ runs `derive_params.py`, which re-derives every constant the logs can set. That
+ is the point — nothing is frozen at one day's fit — and it means a drive added
+ after the Phase D retrain invalidates the trained agents. **The team's plan
+-(29 September): retrain after every drive** — `python check_roads.py`, then
+-`python train_all.py` (~4 h), then `python record_agents.py runs/terrain_dt1`,
+-`python run_results.py phase_d` and `python knock_margin.py`. Move the previous
+-`runs/terrain_dt1/` aside first: train.py RESUMES any checkpoint it finds there.
++(29 September): retrain after every drive — but not before the five steps Jad
++and Ghassan agreed on 30 September** (the box at the top, and the live list
++under "What to do next"). Until those land and the new preregistration is
++committed, a new drive is re-derived and re-scored, not trained on. After that:
++`python check_roads.py`, then `python train_all.py` (~4 h), then
++`python record_agents.py runs/terrain_dt1`, `python run_results.py phase_d` and
++`python knock_margin.py`. Move the previous `runs/terrain_dt1/` aside first:
++train.py RESUMES any checkpoint it finds there.
+ Channel names are matched case-insensitively (exports differ). A drive with no
+ `Ambient temperature` channel gets `build_dataset.AMB_FALLBACK_C`, flagged.
+ 

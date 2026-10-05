@@ -150,7 +150,9 @@ the battery specifics.
 calls `548.6 = 548.6` the project's strongest fairness evidence. The
 15 September audit proved that identity is guaranteed by construction and is
 not evidence at all (`AUDIT.md` C3). It also quotes 168.1 minutes over eight
-drives; the figure is **175.5 over nine**. That sheet reviews a presentation in
+drives; the figure is **321.7 minutes over eleven drives** on 30 September, and
+it grows with every drive, so take it from `python build_dataset.py`, not from
+here. That sheet reviews a presentation in
 `Documents\engine-supervisor\presentation`, a **different directory** from this
 repository.
 

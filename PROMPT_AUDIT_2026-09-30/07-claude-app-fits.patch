@@ -1,0 +1,23 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 8583d30..2066852 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -3145,12 +3145,13 @@ the five agreed steps.
+ | Operating region | not covered | Drive A gives sustained load at road speeds; the exact 130 km/h / 12 % point does not exist on any road and is sea-level air by construction | no |
+ | Validation table | limited | 8 of 11 (28 Sep, evening). Both car-row misses are the oil node: row 8 (97.0 °C against 103–111) and row 9 (60 s against 70–100), after the oil node was re-structured and derived. Drive A, logged WITH ambient and oil, is the data. The literature miss, EGT cruise max, needs a source — library access, REFERENCES.md section 3 | via the oil node |
+ 
+-**Where the app fits in that order: nowhere.** It is finished enough to demo and
+-it is not on this path. If you have an hour, spend it on step 2, not on `app/`.
+-The app's own next steps, for when D is done and only then, are kept separately
+-below so they cannot be mistaken for the critical path.
++**Where the app fits in that order: behind the live list.** It is finished
++enough to demo; the agents page waits for step 1 and the retrain (the live
++list). If you have an hour, spend it on the live list, not on `app/`. The app's
++own next steps are kept separately below so they cannot be mistaken for the
++critical path.
+ 
+-### The app's backlog — AFTER Phase D, not before
++### The app's backlog — behind the live list
+ 
+ Listed because the work is understood, not because it is scheduled. Each item
+ says what it would buy, so that none of them gets started because it is

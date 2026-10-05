@@ -1,0 +1,22 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index df1e491..5577995 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2818,14 +2818,14 @@ Then check, in this order:
+    0.33–0.36 kg/s remains, and the MAF sensor cannot reach it.
+ 4. **Does the load residual stay near 1.4 %?** If it jumps, the new drive covers
+    a region the model has not seen, which is information, not failure.
+-6. **Did any window get rejected for span or a logger gap?** It prints both. A
++5. **Did any window get rejected for span or a logger gap?** It prints both. A
+    drive that loses every window that way was logged with too many channels
+    selected — see mistake 8.
+-5. **Did the new drive push any channel to a flat maximum?** See mistake 6.
++6. **Did the new drive push any channel to a flat maximum?** See mistake 7.
+ 
+ If the drive changes a calibration — lambda, spark, the boost ceiling — **check
+ how many samples support the change, and check that the variable you are fitting
+-against actually correlates.** See mistakes 3 and 6.
++against actually correlates.** See mistakes 4 and 6.
+ 
+ ---
+ 

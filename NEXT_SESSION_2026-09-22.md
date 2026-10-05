@@ -1,5 +1,8 @@
 # Prompt for the next session — written 22 September 2026, after Phase D produced a null
 
+> **SUPERSEDED — kept as the record. Do not paste this into a new session;**
+> what is current is `CLAUDE.md`'s first box.
+
 Paste the block below into a fresh Claude Code session. Accurate as of commit
 `4510f33` on `JMF-2340550-sep17`, the close of the 21-22 September session. If a number here disagrees with a script,
 **the script is right** — run it.

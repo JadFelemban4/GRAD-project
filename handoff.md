@@ -60,9 +60,10 @@ model and therefore cannot validate it.
 >
 > Twenty agents, seeds 0–9 sighted and blinded, 130 km/h on varied roads, on the
 > derived plant. **All twenty beat every hand-written policy; sighted minus
-> blinded is +1.2 points (95 % CI −4.4 to +6.8, n = 10) — no measurable preview
-> value.** Every agent advances spark to just under the untested knock model's
-> knee, and with that advance forbidden (`knock_margin.py`) their median cut
+> blinded is +1.2 points (95 % CI −4.4 to +6.8, n = 10) — INCONCLUSIVE under the
+> MEI rule (sign-test power 0.26).** Every agent advances spark to the +4° action
+> bound, which sits just under the untested knock model's knee, and with that
+> advance forbidden (`knock_margin.py`) their median cut
 > falls to ~41.6 %, below current-grade's 43.4 %: **most of their margin rests on
 > the knock model, so drive C (knock) is now the most valuable drive.** Blinded
 > seed 6 does more damage than the baseline on the five episodes that weight
@@ -128,16 +129,7 @@ from the exhaust flow, −6.2 K from the air density.)*
 
 The row worth looking at is **current-grade protection**: no preview at all,
 only the gradient the car is on right now, and hand-written preview **loses to
-it by 0.4 points**.
-
-<!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 110 -->
-*(This block held 256.5 / 801 °C / 2.2 points until 17 September — the figures
-from before the H1 crank-angle correction took `plant.DTHETA_DEG` to 0.25°;
-`AUDIT_FIXES.md` H1 records the move. It then held baseline 294.2 at 812 °C
-until 22 September — the six-speed run at 110 km/h, from before the scenario
-moved to 12 % at 130 km/h — in which the constraint did not bind and
-current-grade beat predictive by 1.8 points. Both times the code moved and
-this file did not.)*
+it by 0.3 points**.
 
 **How the scenario compares with the car's own driving, measured over every
 drive** — on 17–19 September, with the app's physics of that day (exhaust
@@ -184,8 +176,8 @@ samples with `t_turb_c` above `engine_env.TURB_PROTECT_K - 273.15`.
 > `use_preview=False` the preview term is literally zero, so the predictive
 > policy returns the reactive policy's vector on every step — the identity
 > could not have failed. The real ablation needs a TRAINED blinded agent, and
-> that is Phase D — which has now run, and returned a null (the box at the top
-> of this file).
+> that is Phase D — which has now run as four trained ablations, none of them
+> decisive (the box at the top of this file).
 
 ---
 
@@ -227,122 +219,36 @@ derivation changed.
 ## The path to a passing project
 
 **Phase D is the bar**: validated simulator + agent beating two baselines + an
-ablation isolating preview. Everything after D raises the ceiling. Nothing after
-D protects the floor.
+ablation isolating preview. It has run four times (the box at the top of this
+file): none separated preview from seed noise, and the agents' margin over
+`current-grade` rests on the untested knock model until drive C.
 
-> **This route was followed on 21–22 September, and Phase D is done** — with
-> eight seeds per arm rather than the five below, preregistered before any
-> agent trained. The steps are kept as the record of how it was run, not as
-> instructions, and some sentences in them describe the state before that run
-> (step 1's "nothing in that file past the imports has ever been executed",
-> for one). **Do not add seeds to Phase D:** more seeds, having seen the
-> result, is a second experiment with its own preregistration
-> (`results/PREREGISTRATION.md` section 7).
+How the runs were made is recorded in `CLAUDE.md` ("How Phase D was actually
+run") and, for the twenty agents of 29 September, in
+`SESSION_REPORT_2026-09-29.md`. What still binds the next training run — after
+the five agreed steps in `CLAUDE.md`'s first box and a new preregistration:
 
-### Step 1 — install the trainer · 2 minutes
-### Step 1 — decide the order: drives first, or retrain first
-
-`logs/DRIVE_PLAN.md` lists three drives. A (a long climb) and B (roll-ons in a
-held gear) would change the plant; C (knock) would not. Retraining after a plant
-change is three more hours. Both orders are defensible — say which you chose.
-
-### Step 2 — check the gates · a few minutes
-
-```bash
-python test_reward.py     # 8 of 8
-python check_roads.py     # PASS
-```
-
-A training curve computed against a broken reward is worse than no curve,
-because it looks like progress. The reward has carried a live hack twice
-(mistake 5), and the training roads found a gearbox defect that no single-road
-check could have (27 September).
-
-Until that install happens, `train.py` raises `SystemExit` in its import block
-with the instruction above, so **nothing in that file past the imports has ever
-been executed.** Step 1 is also the first time anybody finds out.
-
-### Step 2 — one training run, to prove it runs · 45 minutes
-
-> **Agree the seed assignment first**, or you end up with three copies of
-> seed 0.
-### Step 3 — the runs that ARE Phase D · DONE 29 September (twenty, 234 min)
-
-```bash
-python train_all.py                          # seeds 0-9, sighted and blinded
-python record_agents.py runs/terrain_dt1     # score, record, document
-```
-
-**About 45 minutes per seed. Re-measured 17 September**, by timing 2000 SAC
-steps with gradient updates already running:
-*(What this step said before it ran, kept for the commands:)*
-
-```
-OMP_NUM_THREADS=1   19.19 steps/s   ->  50k = 0.72 h
-OMP_NUM_THREADS=6   18.14 steps/s   ->  50k = 0.77 h
-```
-
-*(This section said **4.6 hours on one CPU core** until 17 September, and told
-you to plan an overnight. Wrong by 6.4×. Two things were wrong with it: the
-"one CPU core" qualifier is meaningless — **one thread is marginally faster
-than six**, because the policy network is tiny — and **SAC's gradient updates
-are nearly free**, about 2 %, not the 6.5× slowdown claimed. The environment
-alone runs 19.5 steps/s and the full loop 19.2. Each env step runs six engine
-cycles at ~9 ms against ~1 ms for a gradient step, so the combustion model is
-the whole cost, and `plant.DTHETA_DEG` is what sets it.)*
-
-Checkpoints land every 10 000 steps, and re-running the same seed resumes from
-its checkpoint -- at the SAME `--steps` only, and not for C4, whose runs are
-started with `--no-resume` and re-run a crash from scratch
-(`results/PREREGISTRATION_C4.md` section 6). A different `--steps` is refused:
-see `train.py`, "A RESUME IS NOT A LONGER RUN".
-
-**Expect a poor result.** It running at all is the point of this step.
-
-`train.py` options: `--steps` · `--seed` · `--no-preview` · `--duration` · `--lr`
-· `--out` (default `runs`).
-
-### Step 3 — check the gate before believing any curve · 1 minute
-> **Ask the owner before starting this.** It occupies the machine for the
-> afternoon, and every run must use a different seed.
-
-```bash
-python train.py --steps 50000 --seed 0 ... --seed 4               # sighted
-python train.py --steps 50000 --seed 0 ... --seed 4 --no-preview  # blinded
-```
-
-All four checks must pass, and neutral must score **inside ±0.05** — that is the criterion the check applies. The exact figure depends on the reset seed (the command table above quotes one draw, −0.00038, from `FULL_RUN.txt`), so do not treat one value as a requirement. A training curve
-computed against a broken reward is worse than no curve, because it looks like
-progress. The reward has carried a live hack twice (mistake 5), and the second
-time it came back only because the plant changed underneath it.
-Measured: **13.7 steps/s for one run alone**, about an hour each; ten sharing a
-20-core machine took 173 min on 19 September — run them together, capped with
-`OMP_NUM_THREADS=1`. Every episode is a new road; the output goes to
-`runs/terrain_dt1/`, deliberately not `runs/`, where `train.py` would resume the
-110 km/h agents. 50 000 steps is 55 episodes. **The training curve cannot show
-learning** — returns vary with the road and the preference weights. Score it.
-
-### Step 4 — score with the frozen protocol, and nothing else
-
-```bash
-python evaluate.py runs/terrain_dt1/sighted_seed0 runs/terrain_dt1/blind_seed0
-```
-
-Ten runs total, **about 45 minutes each — 7.5 hours altogether**. That is one
-evening on one machine, or under an hour if the five of you take one seed each.
-Agree who takes which seed before anyone starts.
-
-*(This said "about 4.6 hours each … one overnight each, twice" until
-17 September. See step 2: the rate was wrong by 6.4×, so Phase D is an evening,
-not two weeks. **Nothing about the work changed — only the estimate.**)*
-Twenty frozen episodes, median and IQR, **paired by seed** across all five.
-Report three rows — sighted, blinded, and current-grade — and report damage two
-ways, total and turbine plus oil, until the knock model is tested.
+1. **Check the gates first:** `python test_reward.py` (8 of 8) and
+   `python check_roads.py` (PASS). A training curve computed against a broken
+   reward is worse than no curve, because it looks like progress — the reward
+   has carried a live hack twice (mistake 5), and the training roads found a
+   gearbox defect that no single-road check could have (27 September).
+2. **Ask the owner before starting.** `python train_all.py` occupies the machine
+   for about four hours (twenty runs took 234 min on 29 September).
+3. **Move the previous `runs/terrain_dt1/` aside first.** `train.py` resumes any
+   checkpoint it finds there, at the same `--steps` only; a different `--steps`
+   is refused (`train.py`, "A RESUME IS NOT A LONGER RUN").
+4. **The training curve cannot show learning** — returns vary with the road and
+   the preference weights. Score it: `python record_agents.py runs/terrain_dt1`
+   runs `evaluate.py`'s twenty frozen episodes, median and IQR, paired by seed.
+   Report three rows — sighted, blinded and `current-grade` — and damage two
+   ways, total and turbine plus oil, until the knock model is tested.
 
 > **The twenty episodes never change.** Changing the test set after seeing
-> results is the one mistake this project cannot recover from.
-
-**Do not start Phase E or F until D produces a table.**
+> results is the one mistake this project cannot recover from. **Do not add
+> seeds to Phase D or D2:** more seeds, having seen the result, is a second
+> experiment with its own preregistration (`results/PREREGISTRATION.md`
+> section 7).
 
 ---
 
@@ -363,11 +269,6 @@ ways, total and turbine plus oil, until the knock model is tested.
 | Cite the 88 °C thermostat to BMW | The B58 has a heat-management valve; 88 °C is our own stand-in, identified from the logs |
 | Quote the knock model as calibrated — or as refuted | The only test so far could not see knock (28 September) |
 | Describe the scenario as a mountain | It is sustained load in sea-level air; altitude is not modelled |
-| **Add a write path to `app/`, in any form** | The read-only rule is structural. `app/test_replay.py` asserts no write path exists |
-| **Write raw samples to disk from `app/`** | Only what the model marks is persisted. A test asserts it |
-| Lower an `app/` threshold to quiet a demo | A threshold changes for a measurement, and the measurement goes in the docstring. Mistake 14 |
-| **Unzip a release archive over the tree** | Diff first, take only what is new. Mistake 16 |
-
 | **Add a write path to `app/`, in any form** | The read-only rule is structural, not stylistic. A future version may SUGGEST an ECU parameter as text on a screen; applying it is a different product and must never share a code path. `app/test_replay.py` asserts that no write path exists |
 | **Write raw samples to disk from `app/`** | The stream is memory → websocket → gone. Only what the model *marks* is persisted, to `app/review_log.jsonl`. A test asserts a whole replay creates exactly one file |
 | Add a seventh live channel without justifying it | The adapter polls one channel per round trip, so every addition costs every other channel ~14 % of its rate. Put the reason in the channel's `why` field |
@@ -387,10 +288,6 @@ One constant to watch while reading older prose: **`ENR_LOAD` is 180 kPa, not
 changed definition when the charge temperature was corrected; 180 on the current
 scale selects exactly the samples that 200 selected on the old one, and
 every enrichment figure reproduces without a refit.
-On the charge-temperature row, the car settles it: 762 boosted model samples
-against 1097 logged readings of the car's own boost channel put the shipped
-`charge_temperature()` at **+1.9 %** of the car, where the raw sensor inverts
-about 25 % high.
 
 ---
 
@@ -475,10 +372,10 @@ refuted (`results/PREREGISTRATION.md` limit 8).
 | You need | File |
 |---|---|
 | the rules, the traps, the mistakes already made, the improvement plan | [CLAUDE.md](CLAUDE.md) |
-| **the project's result**, and the rules Phase D was run under | `python analyse_phase_d.py` and [results/PREREGISTRATION.md](results/PREREGISTRATION.md) |
+| **the four preview ablations**, and the rules they were run under | `python analyse_phase_d.py`, `analyse_phase_d2.py`, `analyse_c4.py`, [results/agents/terrain_dt1/README.md](results/agents/terrain_dt1/README.md) and [results/PREREGISTRATION.md](results/PREREGISTRATION.md) |
 | what was verified, and on what date | [CHECKPOINT.md](CHECKPOINT.md) |
-| the last session in full | [SESSION_REPORT_2026-09-28_evening.md](SESSION_REPORT_2026-09-28_evening.md); the morning's is [SESSION_REPORT_2026-09-28.md](SESSION_REPORT_2026-09-28.md) |
-| the prompt to continue in a new session | [NEXT_CHAT_PROMPT.md](NEXT_CHAT_PROMPT.md) |
+| the last session in full | the newest `SESSION_REPORT_*.md` — [SESSION_REPORT_2026-09-30_merge.md](SESSION_REPORT_2026-09-30_merge.md) on 30 September |
+| the prompt to continue in a new session | the newest `NEXT_SESSION_*.md`; read its first lines for SUPERSEDED before pasting it |
 | **where every number we did not measure comes from** | [REFERENCES.md](REFERENCES.md) |
 | the drives still worth making, and how | [logs/DRIVE_PLAN.md](logs/DRIVE_PLAN.md) |
 | results, figures, and the phone page | [results/](results/) — `results/page/index.html` |
@@ -529,14 +426,17 @@ with this sentence, which is the refuted claim:
 > blinded agents against eight trained sighted ones, preregistered — and
 > **preview is not significant**: 5 of 8 positive, mean +4.8, p = 0.3633.
 >
-> The defensible sentence is: *we built an ablation that could fail, ran it
-> eight times, and it did not separate.* `python analyse_phase_d.py`.
+> The defensible sentence is the one at the top of this section: *we built an
+> ablation that could fail, ran it four times, and it has not separated.*
 The hand-written policies cannot carry this. Their "preview disabled equals
 reactive, to the decimal" was an identity built into the code (AUDIT.md C3), and
-their −0.4 against current-grade turned out to be the untested knock term. On
-the existing (not yet valid) agents, training beat every hand-written policy by
-about 26 points while sighted and blinded were indistinguishable.
+their deficit against current-grade (−0.3 points on the merged plant) is one
+second of knock at the grade step. On the twenty agents of 29 September,
+training beat every hand-written policy while sighted and blinded were
+indistinguishable — and most of that margin rests on the knock model.
 
-**If the retrain shows no preview advantage on this scenario, that is the
-result**: a statement about H/τ at this operating point, reported as one. Pair it
-with a validation table that says what it does not cover, and defend that.
+**The retrain did not separate preview from seed noise on this scenario
+(INCONCLUSIVE under the MEI rule), and that is the result**: a statement about
+H/τ at this operating point, reported as one — never *preview does not help*.
+Pair it with a validation table that says what it does not cover, and defend
+that.

@@ -1,0 +1,19 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index e4461e8..d57ce49 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -868,8 +868,12 @@ step.
+ 17 September over EVERY drive.** *(17 Sep conclusion, since done: the scenario
+ was rebuilt at 12 % / 130 km/h on the ZF 8HP51 and now binds by ~34 K, peak
+ 884 C against the 850 C trigger. The do-not-lower-the-limit half still stands.)*
+-Replaying all nine through `app/` and reading
+-the peak estimated turbine housing against the 1123 K trigger:
++Replaying every drive through `app/` (nine on 17 September, drive10 added on
++the 19th) and reading the peak estimated turbine housing against the 1123 K
++trigger, with the app's physics of those days (exhaust = fuel × 15). The merge's
++exhaust-flow fix has since lowered `7475b5d7`'s pinned peak (the Numbers
++section); the other rows, the 36 seconds and the fraction under the table were
++not re-measured. Replay them before quoting any:
+ 
+ | drive | minutes | peak C | vs trigger | seconds above |
+ |---|---|---|---|---|

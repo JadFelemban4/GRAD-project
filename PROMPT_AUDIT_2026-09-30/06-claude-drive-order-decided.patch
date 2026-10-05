@@ -1,0 +1,16 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index ed91637..8583d30 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -3130,8 +3130,9 @@ Do not start Phase E or F until D produces a table. **It has one now (29 Sep).**
+ ### Improving the comparisons that do not agree — 28 September
+ 
+ Each row says what it would take, and whether it touches the plant. **A plant
+-change after the retrain means retraining.** Decide the order before step 3:
+-either drives A and B first, or retrain now and again after them.
++change after the retrain means retraining.** The order is decided (the live
++list at the top of this section): drive C before drive A, and no training before
++the five agreed steps.
+ 
+ | comparison | status | what would improve it | touches the plant? |
+ |---|---|---|---|

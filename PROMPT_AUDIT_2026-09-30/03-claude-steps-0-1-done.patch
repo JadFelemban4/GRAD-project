@@ -1,0 +1,23 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index f492d68..231429f 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -3059,13 +3059,13 @@ not a result.
+ **Read this first: the scenario changed on 19 September and it now BINDS.**
+ Everything below assumes the 130 km/h lock. See the current-state box at the top.
+ 
+-0. **(28 Sep, evening) Review and commit the working tree**, then decide the
+-   order of drive A and the retrain: the plant is now DERIVED from the logs, so
+-   drive A would change it. Drive A must log `Ambient temperature` and
++0. **(28 Sep, evening) Review and commit the working tree** — DONE 29 September
++   (`cbb8d09`). The order of drive A and the retrain is settled by the live list
++   at the top of this section. Drive A must log `Ambient temperature` and
+    `Oil temperature`; it is the data `validate.py` rows 8 and 9 still need.
+ 
+-1. **Merge `origin/JMF-2340550-sep17`.** Twelve commits, including mistake 17 and
+-   Phase D's first point. Nothing below is reportable until the branches are one.
++1. **Merge `origin/JMF-2340550-sep17`** — DONE 30 September (`a7ce729`), hunk by
++   hunk per `conflict.md`.
+ 2. **Adopt the locked scenario here** — DONE 19 September:
+    `make_grade_climb(..., v_kmh=130.0)`. It was decided 18 September before any
+    training existed; adopting it is not tuning.

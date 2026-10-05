@@ -1,0 +1,22 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index db94568..9dd56b0 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -3162,10 +3162,13 @@ interesting.
+    is a FALSE-POSITIVE rate and none of them is a detection rate. Inducing a
+    leak safely is not obviously possible on a borrowed car; if it is not, say so
+    in the thesis rather than implying the detector is validated.
+-3. **Wire the trained agent in.** Once Phase D has a policy, the app can display
+-   what the agent WOULD command beside what the baseline ECU commands. That is
+-   the honest bridge between the two halves of this project, and it is read-only
+-   in exactly the same way — a suggestion on a screen, never a write.
++3. **Wire the trained agent in, live.** Half of it exists: the agent replay
++   (`python -m app.server --simulation`, `app/agent_api.py`) shows trained
++   agents on finished simulated episodes, with no vehicle connection. What does
++   not exist is the live half — what the agent WOULD command, beside what the
++   baseline ECU commands, while the car is driven. That is the honest bridge
++   between the two halves of this project, and it is read-only in exactly the
++   same way — a suggestion on a screen, never a write.
+ 4. **Oil as a measured node.** `Oil temperature` is an optional channel the car
+    does publish. Adding it makes the oil node measured rather than estimated,
+    at the cost of ~14 % of every other channel's rate. Worth it only if the oil

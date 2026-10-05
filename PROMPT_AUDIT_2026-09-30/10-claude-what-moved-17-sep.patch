@@ -1,0 +1,21 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index d57ce49..4633673 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2545,11 +2545,11 @@ and `:581` name it) but carries no test of its own, so it is the one of the six
+ that could silently regress.
+ 
+ <!-- RETIRED-OK: 890.6, 608.0 -- the app pins of 17 September; 873.1 and 604.8 on the merged physics -->
+-**What moved, and it is small:** `7475b5d7`'s peak estimated turbine is
+-**890.6 °C** against the 884.9 °C this file quotes above, and `pull01` reads
+-**608.0 °C** against 593.7. Both rises are the H1 crank-angle correction, not
+-the app fixes — see `AUDIT_FIXES.md`. The 884.9 and 593.7 figures in the section
+-above are therefore superseded.
++**What moved on 17 September, and it was small:** `7475b5d7`'s peak estimated
++turbine went to **890.6 °C** from the 884.9 °C of mistake 15, and `pull01`'s to
++**608.0 °C** from 593.7. Both rises were the H1 crank-angle correction, not the
++app fixes — see `AUDIT_FIXES.md`. Since the merge the pins have moved again,
++with the exhaust-flow fix: the Numbers section has the current ones.
+ 
+ **The lesson the section title still carries is the one worth keeping:** the
+ suite reported 46 of 46 while all six defects were live. **A test suite pins the

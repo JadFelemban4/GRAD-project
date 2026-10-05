@@ -1,5 +1,8 @@
 # NEXT SESSION — the visual simulation: agents, grade, and jev as a hidden feature
 
+> **SUPERSEDED — kept as the record. Do not paste this into a new session;**
+> what is current is `CLAUDE.md`'s first box.
+
 Written on 26 September 2026, at Jad's request, by the session that ran C4.
 Paste everything inside the fence into a fresh Claude Code session opened in
 this repository.

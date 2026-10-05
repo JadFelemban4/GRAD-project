@@ -1,0 +1,52 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 8395222..dcd8e0a 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2276,34 +2276,22 @@ and for a limit only the second one means anything.
+   (x1.42). The three terms still cannot be told apart, and the heat-management
+   valve's control law (82-84 C after load on hot afternoons, 97-99 C on
+   drive10's high-rpm stretch) is not modelled.
+-- **THE OIL BAND IS NOW SUPPORTED BY OUR OWN CAR, AND THE MODEL MISSES IT LOW.**
+-  This is the most valuable thing `drive10` delivered (18 September, 119.5 min).
++- **THE OIL BAND IS SUPPORTED BY OUR OWN CAR, AND THE MODEL MISSES IT LOW.**
++  This is the most valuable thing `drive10` delivered (18 September).
+   <!-- RETIRED-OK: 107 -->
+-  The hottest oil in the logs was 107 °C across the first nine drives, which
+-  sat *below* the published 115–140 °C band — so the band was unverifiable from
+-  our own data and `validate.py`'s miss could not be interpreted. `drive10`
+-  reaches **117 °C**, with **1320 rows above 110 °C and 60 above 115 °C**.
+-
+-  That changes what the miss means. The band's lower end is now inside our own
+-  measurement, and the model's **110.2 °C is confirmed about 7 K too cool on a
+-  sustained climb** rather than merely disagreeing with an unsourced number.
+-  Say it that way in the thesis: the miss is real, it is measured, and it points
+-  at the thermal network's oil path (`ua_block_oil`, the only MEASURED parameter
+-  in `thermal.py`) rather than at the band.
+-
++  The hottest oil in the first nine drives was 107 °C, *below* the published
++  115–140 °C band; `drive10` reaches **117 °C**, with **1320 rows above 110 °C
++  and 60 above 115 °C**, so the band's lower end is inside our own measurement.
+   Above 117 °C is still extrapolation.
+ 
+-  **28 September: the row is now scored like with like, and the pointer above
+-  was wrong.** `validate.py` row 8 replays drive10 itself and compares the model
+-  with the car over the car's hottest ten minutes: 96.4 °C against 103–111 °C.
+-  Row 9 finds the car's oil time constant at 70–100 s against the model's 14 s.
+-  That points at the RATIO c_oil / ua_block_oil, not at `ua_block_oil` alone —
+-  which was fitted with the fuel-to-oil share assumed. See the 28 September box.
+-
+-  **28 September, evening: the oil node was re-structured and derived** (heated
+-  by engine speed, cooled by road speed; mistake 20). Row 8 reads 97.0 C and
+-  row 9 60 s -- both still outside, and both now with the cause measured:
+-  the coolant regulation above, and the oil's heating at sustained 4300 rpm.
++  `validate.py` row 8 replays drive10 and compares model and car over the car's
++  hottest ten minutes: **97.0 °C against 103–111 °C**. Row 9 finds the car's oil
++  time constant at 70–100 s against the model's 60 s. Both are outside after the
++  oil node was re-structured and derived (mistake 20), and the miss is measured,
++  not tuned in: of row 8's 12.0 K, 4.6 K is the coolant (the car's
++  heat-management valve holds it higher than the model's regulation) and 7.3 K
++  is the oil node itself (`model_vs_data.row8_split`). Say it that way in the
++  thesis. Drive A, logged with oil AND ambient, is the data that can move it.
+ - **Eleven drives in the manifest, eight with usable samples.** `3f64372e` and `f51686d7` are under
+   a minute each and contain no warm running window; `fb988991` is a census log
+   whose windows are all rejected for span or logger gaps (mistake 8), so it

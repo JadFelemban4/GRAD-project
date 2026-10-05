@@ -1,0 +1,13 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 5577995..8395222 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2761,7 +2761,7 @@ asserts both, so breaking either fails a check rather than going unnoticed.
+   output into the commit message.
+ - Change one thing, re-run, write down what happened. Two changes at once and
+   you no longer know which one did it.
+-- Report numbers with the condition attached. "1.4 % load residual over 22
++- Report numbers with the condition attached. "1.4 % load residual over 26
+   points, 30–75 kPa" — not "the model is accurate".
+ - **After changing anything under `app/`, re-run `python -m app.test_replay`
+   and paste the output into the commit message.** The app's numbers are a chain

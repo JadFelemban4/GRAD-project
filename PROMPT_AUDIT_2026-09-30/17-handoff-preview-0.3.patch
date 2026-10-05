@@ -1,0 +1,13 @@
+diff --git a/handoff.md b/handoff.md
+index 705a0ed..def7f2b 100644
+--- a/handoff.md
++++ b/handoff.md
+@@ -129,7 +129,7 @@ from the exhaust flow, −6.2 K from the air density.)*
+ 
+ The row worth looking at is **current-grade protection**: no preview at all,
+ only the gradient the car is on right now, and hand-written preview **loses to
+-it by 0.4 points**.
++it by 0.3 points**.
+ 
+ <!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 110 -->
+ *(This block held 256.5 / 801 °C / 2.2 points until 17 September — the figures

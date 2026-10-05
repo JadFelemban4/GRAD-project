@@ -1,0 +1,26 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 9dd56b0..89fadc8 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -2720,9 +2720,20 @@ app/                  THE LIVE SUPERVISOR. Runs this same physics alongside
+   estimator.py        The virtual sensor. Read its docstring before touching it.
+   reader.py           OBD-II, or replay of the logs above. Channel budget here.
+   alerts.py           thermal / mismatch / novel. The ONLY file that writes.
+-  server.py           localhost. /, /driver, /review.
++  server.py           localhost. /, /driver, /review; --simulation adds the 3D
++                      replay lab and the agents page, with no vehicle connection.
+   static/*.html       dashboard, driver mode, review view.
+   test_replay.py      Replay-driven regression checks. Run after any app change.
++  agent_api.py        The agent replay (--simulation only): trained agents on
++                      finished episodes, and the hidden models panel.
++  jev.py              Calls an external service: the model jev (api.typesafe.ai),
++                      one paid call per press. Its key is read per call or held
++                      in memory, and never logged, returned or written. Nothing
++                      in it reaches the car.
++  laya_bridge.py      Laya, a local model, run offline in its own interpreter
++                      (laya_worker.py); no key.
++  model_questions.py  The one question both models are asked. Their answers are
++                      shown, never applied.
+   review_log.jsonl    Generated, gitignored. Marked events only, never raw data.
+ ```
+ 

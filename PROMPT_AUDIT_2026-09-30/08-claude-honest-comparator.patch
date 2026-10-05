@@ -1,0 +1,20 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 2066852..e4461e8 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -858,12 +858,11 @@ trained sighted one, which is Phase D.
+ > value is "not distinguishable from zero", which is a different statement from
+ > "unmeasured".)*
+ 
+-<!-- RETIRED-OK: 1.8, 252.3, 257.7, 2.2 -->
+ The honest comparator —
+ added 16 September — is a policy that acts on the grade the car is on right now,
+-with no preview, which currently BEATS the predictive one by **0.4 points**
+-(633.2 against 637.4 damage; it read 1.8 points, 252.3 against 257.7, until
+-22 September, and 2.2 until 17 September, on the pre-H1 crank-angle step).
++with no preview, and it still BEATS the predictive one: by **0.3 points** on the
++merged plant (`check_premise.py`), all of it one second of knock at the grade
++step.
+ 
+ **And the scenario is the thing to fix, not the threshold — measured
+ 17 September over EVERY drive.** *(17 Sep conclusion, since done: the scenario
