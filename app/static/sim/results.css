@@ -1,0 +1,128 @@
+/* The results tab (/results). Loaded AFTER style.css and agents.css: the
+   tokens, the topbar, the nav, the toggles and the footer are the lab's; the
+   sighted and blind colours, the verdict quote and the phone nav row are
+   agents.css's; only what this tab adds lives here.
+
+   COLOURS. One table for both themes, every role distinct from every other
+   role on the same figure: sighted blue and blind amber are agents.css's own
+   tokens, the three hand-written policies are slate, grey and violet, and the
+   MEI bracket is an ink grey. NEVER red or green, here as on /agents: the tab
+   shows no winner. The three blocks below are the same list three times, like
+   style.css's palette: edit all three. charts-lib.test.mjs pins them.
+
+   RESETS. style.css has element rules written for the lab's icons and panels:
+   svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;
+   stroke-linecap:round;stroke-linejoin:round}, h2{font-size:12px},
+   a{text-decoration:none}, dt and dd as flex rows. They match this tab's
+   elements too, whatever their class, so each is reset on the tab's own
+   elements: a chart's svg takes its size from its width and height attributes
+   and draws with SVG's own defaults (fill black, no stroke), so every shape
+   states its own colour.
+
+   CHARTS. The chart rules are those of results/page/template.html (lines
+   123-147), renamed rc- and moved onto these tokens. A chart host is
+   direction:ltr, because its SVG labels are numbers and Latin only; its
+   tooltip turns back to rtl in Arabic. */
+
+:root{--rc-sighted:var(--agent-sighted,#2f6db0);--rc-blind:var(--agent-blind,#b5761c);--rc-baseline:#5b6470;--rc-reactive:#8a8f98;--rc-grade:#6b4fa0;--rc-text:var(--ink);--rc-muted:var(--muted);--rc-grid:#e3e6e1;--rc-axis:#c9cdc6;--rc-tip-bg:var(--paper);--rc-tip-fg:var(--ink);--rc-mei:#4b4f56}
+:root[data-theme="dark"]{--rc-baseline:#b9c0c8;--rc-reactive:#8d939a;--rc-grade:#b9a3e8;--rc-grid:#2a2f2e;--rc-axis:#3a403f;--rc-mei:#c7ccd2}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--rc-baseline:#b9c0c8;--rc-reactive:#8d939a;--rc-grade:#b9a3e8;--rc-grid:#2a2f2e;--rc-axis:#3a403f;--rc-mei:#c7ccd2}}
+
+/* the page */
+main.results-main{max-width:1180px;font-size:12px}
+.results-main a{color:inherit;text-decoration:underline;text-decoration-color:var(--rc-axis);text-underline-offset:3px}
+.results-main a:hover{text-decoration-color:currentColor}
+.results-main dl{margin:0}
+.results-main dt{display:block;font-size:inherit;color:var(--rc-muted)}
+.results-main dd{display:block;margin:0;direction:inherit}
+.results-main h3{margin:0;font-size:12px;font-weight:650;line-height:1.5}
+#built{margin:0 0 6px;font-size:10px;line-height:1.7;color:var(--rc-muted)}
+#warnings{margin:0 0 12px;padding:0;list-style:none;font-size:11px;line-height:1.7;color:var(--warn-ink)}
+#warnings:empty{display:none}
+
+/* the summary and the files not read */
+#summary,#not-read{margin:0 0 17px;padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+#summary h2,#not-read h2{margin:0 0 6px;font-size:14px;font-weight:650}
+#summary>p{margin:0 0 8px;font-size:11px;line-height:1.75;color:var(--ink-2)}
+#not-read-list{margin:0;padding-inline-start:18px;font:10px/1.75 Consolas,ui-monospace,monospace;color:var(--rc-muted);overflow-wrap:anywhere}
+
+/* the tables: the summary and every "the numbers" table */
+.results-main table{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}
+.results-main th,.results-main td{text-align:start;padding:6px 8px;border-bottom:1px solid var(--hairline);vertical-align:top}
+.results-main th{font-size:10px;font-weight:600;color:var(--rc-muted)}
+
+/* one experiment */
+.rc-section{margin:0 0 28px;padding:20px 0 0;border-top:1px solid var(--line);scroll-margin-top:16px}
+.rc-section h2{margin:0;font-size:17px;font-weight:650;line-height:1.4}
+.rc-meta{margin:4px 0 0;font-size:10px;line-height:1.7;color:var(--rc-muted)}
+.rc-plant{margin:10px 0 0;padding:7px 10px;border-inline-start:3px solid var(--rc-axis);border-radius:4px;background:var(--field-bg);font-size:11px;line-height:1.75;color:var(--ink-2)}
+.rc-plant[data-state="forced"],.rc-plant[data-state="another"],.rc-plant[data-state="mixed"]{border-inline-start-color:var(--warn-ink);color:var(--rc-text)}
+.rc-plant[data-state="same"],.rc-plant[data-state="same_code"]{border-inline-start-color:var(--rc-muted)}
+.rc-plant-details,.rc-checks,.rc-unpaired{margin:6px 0 0;padding-inline-start:18px;font-size:10px;line-height:1.75;color:var(--rc-muted)}
+.rc-plant-details:empty,.rc-checks:empty,.rc-unpaired:empty{display:none}
+.rc-verdict{margin:14px 0 0;padding:12px 14px;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.rc-verdict h3{margin-bottom:6px}
+.rc-verdict[data-state="none"] .verdict-short{color:var(--rc-muted)}
+.rc-verdict[data-state="missing"] .verdict-short,.rc-verdict[data-state="unavailable"] .verdict-short{color:var(--warn-ink)}
+.rc-verdict details summary{cursor:pointer;font-size:10px;color:var(--rc-muted)}
+.rc-notes{margin:12px 0 0;padding-block:10px;padding-inline:28px 12px;background:var(--seed-bg);border-radius:8px;font-size:11px;line-height:1.8;color:var(--ink-2)}
+.rc-notes:empty{display:none}
+.rc-note{margin:12px 0 0;font-size:11px;line-height:1.75;color:var(--rc-muted)}
+
+/* one figure */
+.rc-figure{margin:17px 0 0;padding:16px 18px 12px;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.rc-what{margin:4px 0 8px;font-size:11px;line-height:1.75;color:var(--ink-2)}
+.rc-axis-y{margin:0 0 2px;font-size:10px;color:var(--rc-muted)}
+.rc-axis-x{margin:2px 0 6px;font-size:10px;color:var(--rc-muted);text-align:center}
+.rc-legend{display:flex;flex-wrap:wrap;gap:4px 16px;margin:4px 0 8px;font-size:10px;line-height:1.6;color:var(--ink-2)}
+.rc-legend>span{display:inline-flex;align-items:center;gap:6px}
+.rc-swatch{display:inline-block;flex:none}
+.rc-sw-dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+.rc-sw-square{width:9px;height:9px;background:currentColor}
+.rc-sw-dash{width:16px;height:0;border-top:2px dashed currentColor}
+.rc-sw-bracket{width:5px;height:12px;border:1.6px solid currentColor;border-inline-start:0}
+.rc-table{margin-top:8px;padding-top:6px;max-width:100%;overflow-x:auto;border-top:1px solid var(--hairline)}
+.rc-table summary{cursor:pointer;font-size:10px;color:var(--rc-muted)}
+.rc-table table{margin-top:6px}
+.rc-table td{font-family:Consolas,ui-monospace,monospace;white-space:nowrap}
+
+/* the chart: the resets, then template.html's rules, renamed */
+.rc-chart{position:relative;width:100%;height:auto;direction:ltr;touch-action:pan-y}
+.rc-chart > svg{width:auto;height:auto;fill:#000;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter}
+.rc-chart > svg{display:block;overflow:visible}
+.rc-plot text{stroke:none;font-family:Consolas,ui-monospace,monospace;font-size:11px;fill:var(--rc-muted)}
+.rc-plot .rc-lbl{font-weight:600}
+.rc-plot .rc-grid line{stroke:var(--rc-grid);stroke-width:1}
+.rc-plot .rc-axis{stroke:var(--rc-axis);stroke-width:1}
+.rc-plot .rc-ln{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.rc-plot .rc-hit{fill:transparent;cursor:crosshair}
+.rc-plot .rc-hair{stroke:var(--rc-muted);stroke-width:1;stroke-dasharray:3 3;pointer-events:none}
+.rc-plot .rc-hdot{stroke:var(--rc-tip-bg);stroke-width:2;pointer-events:none}
+.rc-plot .rc-dot{stroke:var(--rc-tip-bg);stroke-width:1.5}
+.rc-plot .rc-mark{cursor:pointer}
+.rc-plot .rc-mark:hover,.rc-plot .rc-mark:focus{filter:brightness(1.12)}
+.rc-plot .rc-mark:focus{outline:none}
+.rc-plot .rc-mark:focus-visible{stroke:var(--rc-text);stroke-width:2}
+.rc-plot .rc-ring{fill:none;stroke:var(--rc-text);stroke-width:1.5;pointer-events:none}
+.rc-plot .rc-pair{stroke:var(--rc-muted);stroke-opacity:.55;stroke-width:2;stroke-linecap:round}
+.rc-plot .rc-band{fill:var(--rc-grid);opacity:.5}
+.rc-plot .rc-mei{stroke:var(--rc-mei);stroke-width:1.6}
+.rc-plot .rc-mei-label{fill:var(--rc-mei)}
+
+/* the tooltip */
+.rc-tip{position:absolute;z-index:5;pointer-events:none;min-width:130px;max-width:260px;padding:8px 10px;background:var(--rc-tip-bg);color:var(--rc-tip-fg);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.14);font-size:11.5px;line-height:1.45;text-align:start}
+.rc-tip .rc-tt{margin-bottom:4px;font-size:11px;line-height:1.35;color:var(--rc-muted)}
+.rc-tip .rc-tr{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.rc-tip .rc-tr b{font:600 12.5px/1.4 Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;color:var(--rc-tip-fg)}
+.rc-tip .rc-tl{min-width:0;color:var(--rc-muted)}
+.rc-tip .rc-tl{white-space:normal}
+.rc-tip .rc-key{display:inline-block;width:12px;height:0;border-top:2.5px solid;flex:none}
+html[dir=rtl] .rc-tip{direction:rtl}
+
+/* < 760 px: phone. The nav row is agents.css's. */
+@media(max-width:760px){
+main.results-main{padding:18px 16px 0}
+#summary,#not-read,.rc-figure{padding:12px}
+.rc-section h2{font-size:15px}
+.rc-verdict{padding:10px 12px}
+}
