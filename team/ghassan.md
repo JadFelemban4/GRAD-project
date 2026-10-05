@@ -2,7 +2,7 @@
 name: Ghassan Alrefaei
 student_number: 2340394
 email: <optional: what `git config user.email` prints on your machine>
-updated: 2026-09-19
+updated: 2026-10-01
 ---
 
 # Ghassan
@@ -17,6 +17,9 @@ updated: 2026-09-19
 > the template's questions, one at a time.
 
 Student number **2340394**. GitHub **`badcloor`**.
+
+**Graduation supervisor:** د. همام محمد الغامدي (Dr. Hammam Mohammed Al-Ghamdi).
+Recorded 1 October 2026 at Jad's request, in every file in `team/`.
 
 ## What to assume I know
 
