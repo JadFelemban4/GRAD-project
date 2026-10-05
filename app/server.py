@@ -90,11 +90,14 @@ LIMITS = {
 class RevalidatedStatic(StaticFiles):
     """/static, with Cache-Control: no-cache on every answer.
 
-    Without it a browser may run a file from its cache for hours after the
-    file changed (heuristic freshness, from Last-Modified), and the pages
-    load i18n.mjs and style.css without a version query: after an update
-    the nav could show the key nav.results instead of its name. no-cache
-    keeps the cache but asks first, and on this machine the answer is a 304.
+    A browser that holds a file served without Cache-Control may reuse it
+    for hours after the file changed, without asking the server, and the
+    pages load i18n.mjs and style.css without a version query. With
+    no-cache the browser keeps its copy but asks first, and on this
+    machine the answer is a 304. That covers every update made once this
+    class serves the files. A copy a browser took from the server before
+    this class existed is not asked about again until it expires, or until
+    the page is reloaded once with the cache bypassed (Ctrl+F5).
     """
 
     async def get_response(self, path, scope):
