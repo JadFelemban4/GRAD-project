@@ -1153,5 +1153,530 @@ class ProvenanceStateTests(unittest.TestCase):
             RP.section_provenance({})
 
 
+# ---- Task 4: app/results_data.py (discovery, sections, notes, verdicts, build) ----
+import json  # noqa: E402
+import os  # noqa: E402
+import platform  # noqa: E402
+import re  # noqa: E402
+import subprocess  # noqa: E402
+import sys  # noqa: E402
+import tempfile  # noqa: E402
+import unittest  # noqa: E402
+import warnings  # noqa: E402
+from pathlib import Path  # noqa: E402
+from unittest import mock  # noqa: E402
+
+import numpy as np  # noqa: E402
+
+import analyse_phase_d2  # noqa: E402
+import evaluate  # noqa: E402
+import fingerprint as FP  # noqa: E402
+import run_phase_d  # noqa: E402
+from app import results_data as RD  # noqa: E402
+from app import results_provenance as RP  # noqa: E402
+
+HAND_ROWS = (("baseline ECU", 0), ("reactive", 1), ("current-grade", 2))
+NOTE = "note {arm}_seed{seed}: trained at dt 0.2, scored at dt 1 (known, unresolved -- AUDIT2.md H2-2)"
+MODEL = ("model runs_x\\{arm}_seed{seed}: trained 1000 steps of 1000 requested, from step 0, "
+         "buffer 1000, zip sha 0123456789abcdef")
+NEVER_READ = ("phase_d_130kmh.txt", "c4_convergence.txt")
+
+
+def _ar(*points):
+    """Arabic text from its code points, so that this file stays ASCII (Task 1's byte check)."""
+    return "".join(map(chr, points))
+
+
+# The wording rules (spec 5.2 and 5.5) for every text the tab shows from the
+# server: current-grade is exempt, and quoted anchor lines are verbatim and
+# exempt. Arabic is matched with its vowel marks dropped, so the order of a
+# shadda and its vowel cannot hide a word.
+AR_NEW = _ar(0x062D, 0x062F, 0x064A, 0x062B)                  # hadith: new, recent
+AR_OLD = _ar(0x0642, 0x062F, 0x064A, 0x0645)                  # qadim: old
+AR_UPDATED = _ar(0x0645, 0x062D, 0x062F, 0x062B)              # muhaddath: updated
+AR_PREVIEW = _ar(0x0627, 0x0644, 0x0627, 0x0633, 0x062A, 0x0628, 0x0627, 0x0642)  # al-istibaq
+AR_HELPS = _ar(0x064A, 0x0633, 0x0627, 0x0639, 0x062F)        # yusaid: helps
+AR_NOT = _ar(0x0644, 0x0627)                                  # la: not
+AR_AVAILS = _ar(0x064A, 0x0641, 0x064A, 0x062F)               # yufid: is of use
+AR_INSPECTION = _ar(0x0627, 0x0644, 0x0645, 0x0639, 0x0627, 0x064A, 0x0646, 0x0629)  # al-muayana
+AR_AVAILS_F = _ar(0x062A, 0x0641, 0x064A, 0x062F)             # tufid: is of use (feminine)
+_AR_BLOCK = f"[{chr(0x0600)}-{chr(0x06FF)}]"
+_AR_MARKS = re.compile(f"[{chr(0x064B)}-{chr(0x0652)}]")
+_AR_PREFIX = "|".join((_ar(0x0627, 0x0644), _ar(0x0648), _ar(0x0628)))       # al-, wa-, bi-
+_AR_SUFFIX = "|".join((_ar(0x0629), _ar(0x0648, 0x0646), _ar(0x064A, 0x0646), _ar(0x0627, 0x062A)))
+BANNED = (
+    re.compile(r"\b(?:current(?!-grade)|stale|outdated|fresh|up[ -]to[ -]date)\b", re.I),
+    re.compile(r"preview (?:helps|does not help|doesn't help)|adds nothing measurable"
+               r"|not from seeing ahead|replicat|pooled", re.I),
+    re.compile(f"(?<!{_AR_BLOCK})(?:{_AR_PREFIX})?(?:{AR_NEW}|{AR_OLD}|{AR_UPDATED})"
+               f"(?:{_AR_SUFFIX})?(?!{_AR_BLOCK})"),
+    re.compile("|".join((f"{AR_PREVIEW} {AR_HELPS}", f"{AR_HELPS} {AR_PREVIEW}",
+                         f"{AR_PREVIEW} {AR_NOT} {AR_AVAILS}", f"{AR_NOT} {AR_AVAILS} {AR_PREVIEW}",
+                         f"{AR_PREVIEW} {AR_NOT} {AR_HELPS}",
+                         f"{AR_INSPECTION} {AR_NOT} {AR_AVAILS_F}"))),
+)
+
+
+def _banned(text):
+    """True when `text` breaks a wording rule (Arabic vowel marks dropped first)."""
+    bare = _AR_MARKS.sub("", text)
+    return any(rx.search(bare) for rx in BANNED)
+
+
+def _texts(x, path=()):
+    """(where, text) for every string in an answer, quoted verdict lines left out."""
+    if isinstance(x, dict):
+        for key, value in x.items():
+            if not (key == "lines" and "verdict" in path):
+                yield from _texts(value, path + (str(key),))
+    elif isinstance(x, list):
+        for value in x:
+            yield from _texts(value, path)
+    elif isinstance(x, str):
+        yield "/".join(path), x
+
+
+def _row_values(seed, k):
+    """(median, IQR, worst, fuel, peak) made from the seed and the row, so that
+    no damage figure is typed in this file (verify_docs.py reads it)."""
+    return (1000.0 + 10 * k + seed, 10.0, 2000.0 + k, 4000.0 + k, 1100.0 + k)
+
+
+def _data_text(seed, arms=("sighted", "blind"), *, thermal=False, header=None, block=True,
+               table=True, models=True):
+    """One results/<prefix>_seed<N>.txt in evaluate.py's own layout (its main()).
+
+    The header, scenario, trigger and fingerprint block are copied from the
+    real results/c4_seed0.txt, so the provenance code reads a real block.
+    """
+    real = (RD.RESULTS / "c4_seed0.txt").read_text(encoding="utf-8").splitlines()
+    head = real[:real.index("-" * 62) + 1]
+    if header is not None:
+        head[0] = header
+    if not block:
+        head = head[:next(i for i, line in enumerate(head) if line.startswith("--- "))]
+    lines = list(head)
+    for arm in arms:
+        lines.append(NOTE.format(arm=arm, seed=seed))
+        if models:
+            lines.append(MODEL.format(arm=arm, seed=seed))
+    if table:
+        rows = [(label, _row_values(seed, k)) for label, k in HAND_ROWS]
+        rows += [(("agent (blind)" if arm == "blind" else "agent") + f" runs_x\\{arm}_seed{seed}",
+                  _row_values(seed, 3 if arm == "sighted" else 4)) for arm in arms]
+        lines += ["", f"{'policy':<28}{'damage med':>12}{'IQR':>9}{'worst':>9}"
+                      f"{'fuel med':>10}{'peak C':>9}", "-" * 77]
+        lines += [f"{label:<28}{v[0]:>12.1f}{v[1]:>9.1f}{v[2]:>9.1f}{v[3]:>10.0f}{v[4]:>9.0f}"
+                  for label, v in rows]
+        lines.append("-" * 77)
+        if thermal:
+            lines += ["", "  WITHOUT THE KNOCK TERM (turbine + oil only; the knock model is untested)"]
+            lines += [f"    {label:<26} thermal med {v[0] - 5:8.1f}   thermal cut {2.0 + i:5.1f} %"
+                      for i, (label, v) in enumerate(rows)]
+    return "\n".join(lines) + "\n"
+
+
+def _found_verdict(prefix, root=None):
+    """A stand-in for app.agent_catalog.verdict with every anchor found."""
+    return {"state": "found", "lines": [{"key": "result", "file": "X.txt", "line": 1,
+                                         "text": "RESULT"}],
+            "missing": [], "short": {"ar": "a reading (ar)", "en": "a reading"},
+            "cells": [{"cell": "INCONCLUSIVE", "gloss": {"ar": "a gloss (ar)", "en": "a gloss"}}]}
+
+
+class DataTests(unittest.TestCase):
+    """app/results_data.py on a temporary tree and on the real one (spec 4.1, 4.4, 5.6, 9)."""
+
+    @classmethod
+    def setUpClass(cls):
+        # analyse_phase_d.parse leaves each file it reads to the garbage
+        # collector, and unittest shows that as a ResourceWarning per file.
+        cls.quiet = warnings.catch_warnings()
+        cls.quiet.__enter__()
+        warnings.filterwarnings("ignore", category=ResourceWarning, module="analyse_phase_d")
+        # One real build first: every module build() imports is then loaded, so
+        # the mock.patch.dict(sys.modules, ...) tests below remove nothing else.
+        cls.real = RD.build(RD.RESULTS, RD.ROOT)
+        cls.live = RP.live_side(RD.ROOT)
+        cls.tmp = tempfile.TemporaryDirectory()
+        base = Path(cls.tmp.name)
+        res = base / "results"
+        (res / "nested").mkdir(parents=True)
+        files = {
+            "newexp_seed0.txt": _data_text(0, thermal=True),
+            "newexp_seed1.txt": _data_text(1),
+            "newexp_seed2.txt": _data_text(2, arms=("sighted",)),
+            "Bad-Name_seed0.txt": _data_text(0),
+            "hdr_seed0.txt": _data_text(0, header="not an evaluate.py header"),
+            "noblock_seed0.txt": _data_text(0, block=False),
+            "d2_seed0.txt": "",
+            "c4_seed0.txt": _data_text(0, table=False),
+            "nested/zz_seed0.txt": _data_text(0),
+        }
+        for name, text in files.items():
+            (res / name).write_text(text, encoding="utf-8")
+        (res / "bytes_seed0.txt").write_bytes(b"\xff\xfe\x00not utf-8\n")
+        for name in NEVER_READ:
+            (res / name).write_text((RD.RESULTS / name).read_text(encoding="utf-8"),
+                                    encoding="utf-8")
+        cls.tree = RD.build(res, base, live=cls.live)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+        cls.quiet.__exit__(None, None, None)
+
+    def section(self, built, prefix):
+        return next(s for s in built["sections"] if s["prefix"] == prefix)
+
+    # ---- the temporary tree ---------------------------------------------
+    def test_discovery_lists_every_file_it_does_not_read(self):
+        got = sorted((n["path"], n["reason"], n["type"]) for n in self.tree["not_read"])
+        self.assertEqual(got, [
+            ("results/Bad-Name_seed0.txt", "name", None),
+            ("results/bytes_seed0.txt", "unreadable", "UnicodeDecodeError"),
+            ("results/c4_seed0.txt", "no_table", None),
+            ("results/d2_seed0.txt", "header", None),
+            ("results/hdr_seed0.txt", "header", None),
+            ("results/noblock_seed0.txt", "no_fingerprint", None),
+        ])
+        text = json.dumps(self.tree)
+        for name in NEVER_READ + ("zz_seed0",):
+            self.assertNotIn(name, text, f"{name} must never be a candidate")
+
+    def test_sections_in_order_known_first(self):
+        self.assertEqual([s["prefix"] for s in self.tree["sections"]],
+                         ["phase_d", "d2", "c4", "newexp"])
+        self.assertEqual([s["id"] for s in self.tree["sections"]],
+                         ["exp-phase_d", "exp-d2", "exp-c4", "exp-newexp"])
+
+    def test_each_failure_kind_costs_only_its_section(self):
+        phase_d = self.section(self.tree, "phase_d")
+        self.assertEqual(phase_d["state"], "unavailable")
+        self.assertEqual(phase_d["name"], run_phase_d.CLOSED_PREFIX["phase_d"])
+        self.assertEqual(phase_d["error"], {
+            "kind": "missing", "file": "results/phase_d_seed<N>.txt",
+            "command": RD.EVAL_COMMAND.replace("<prefix>", "phase_d"), "type": None,
+            "module": None})
+        for prefix in ("d2", "c4"):
+            sec = self.section(self.tree, prefix)
+            self.assertEqual(sec["state"], "unavailable", prefix)
+            self.assertEqual(sec["error"], {
+                "kind": "read", "file": f"results/{prefix}_seed0.txt", "command": None,
+                "type": "NotEvaluationFile", "module": None}, prefix)
+        self.assertEqual(self.section(self.tree, "newexp")["state"], "ok")
+
+    def test_a_new_prefix_appears_by_itself(self):
+        sec = self.section(self.tree, "newexp")
+        self.assertIsNone(sec["name"])
+        self.assertFalse(sec["known"])
+        self.assertEqual(sec["order"], RD.UNKNOWN_ORDER)
+        self.assertIsNone(sec["continues"])
+        self.assertEqual(sec["protocol"], "d2")
+        self.assertEqual([s["seed"] for s in sec["seeds"]], [0, 1])
+        self.assertEqual(sec["unpaired"], [{"seed": 2, "file": "results/newexp_seed2.txt",
+                                            "have": ["baseline", "reactive", "current_grade",
+                                                     "sighted"]}])
+        for s in sec["seeds"]:
+            self.assertEqual(s["diff"], s["blind"]["median"] - s["sighted"]["median"])
+            self.assertEqual(s["budget"], {"steps": 1000, "requested": 1000})
+            self.assertEqual(s["file"], f"results/newexp_seed{s['seed']}.txt")
+        self.assertEqual(sec["seeds"][0]["sighted"]["dir"], "runs_x/sighted_seed0")
+        self.assertIsNone(sec["seeds"][0]["baseline"]["dir"])
+        self.assertEqual(sec["mei"], analyse_phase_d2.MEI)
+        self.assertFalse(sec["mei_after_result"])
+        self.assertEqual(sec["thermal_recorded"], "some")
+        self.assertEqual(set(sec["seeds"][0]["thermal"]), set(RD.E.ROLES))
+        self.assertIsNone(sec["seeds"][1]["thermal"])
+        self.assertEqual(sorted(sec["provenance"]["files"]), ["0", "1", "2"])
+        self.assertEqual(sec["checks"], [{"name": "parse_equals_analysis", "state": "pass",
+                                          "detail": None}])
+        self.assertIsNone(sec["error"])
+
+    def test_an_unknown_prefix_gets_only_what_its_files_record(self):
+        sec = self.section(self.tree, "newexp")
+        self.assertEqual(sec["notes"], [
+            {"key": "budget_from_file", "values": {"steps": 1000}},
+            {"key": "dt_mismatch", "values": {"train_dt": 0.2, "eval_dt": 1.0}},
+            {"key": "knock_model", "values": {}},
+            {"key": "turbine_modelled", "values": {}},
+            {"key": "no_other_notes", "values": {}},
+        ])
+
+    def test_no_verdict_shows_no_short_line(self):
+        verdict = self.section(self.tree, "newexp")["verdict"]
+        self.assertEqual(verdict["state"], "none")
+        self.assertIsNone(verdict["short"], "the 'none' text says nothing here is a result")
+        self.assertEqual((verdict["lines"], verdict["cells"], verdict["missing"]), ([], [], []))
+
+    def test_temporary_tree_has_no_git(self):
+        self.assertEqual(self.tree["built"]["git"], "unavailable")
+        self.assertIsNone(self.tree["built"]["head"])
+        self.assertEqual(self.tree["import_failures"], [])
+
+    def test_a_git_that_fails_leaves_no_commit_fact(self):
+        # The controller's ruling on Task 2's review: build() asks git status
+        # before git log, so a status git rejects loses git before any commit
+        # is read, and no file shows a last commit beside "git unavailable".
+        if _git_out("--version") is None:
+            self.skipTest("git is not usable here")
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            res = base / "results"
+            res.mkdir()
+            for seed in (0, 1):
+                (res / f"newexp_seed{seed}.txt").write_text(_data_text(seed), encoding="utf-8")
+            for args in (("init", "-q"), ("config", "user.name", "results tab test"),
+                         ("config", "user.email", "test@example.invalid"),
+                         ("config", "commit.gpgsign", "false"),
+                         ("config", "core.autocrlf", "false"),
+                         ("add", "-A"), ("commit", "-q", "-m", "first")):
+                self.assertIsNotNone(_git_out(*args, cwd=base), args)
+            (base / ".git" / "index").write_bytes(b"not an index")
+            self.assertIsNone(_git_out("status", "--porcelain", cwd=base),
+                              "git must reject the damaged index for this test to mean anything")
+            got = RD.build(res, base, live=self.live)
+        self.assertEqual(got["built"]["git"], "unavailable")
+        files = self.section(got, "newexp")["provenance"]["files"]
+        self.assertEqual(sorted(files), ["0", "1"])
+        for seed, entry in files.items():
+            self.assertIsNone(entry["file"]["commit"], seed)
+
+    # ---- failures --------------------------------------------------------
+    def test_a_reader_raising_system_exit_costs_one_section(self):
+        def verdict(prefix, root=None):
+            if prefix == "d2":
+                raise SystemExit("a reader gave up")
+            return _found_verdict(prefix)
+
+        got = RD.build(RD.RESULTS, RD.ROOT, live=self.live, verdict=verdict)
+        self.assertEqual([s["state"] for s in got["sections"]], ["ok", "unavailable", "ok"])
+        self.assertEqual(self.section(got, "d2")["error"], {
+            "kind": "build", "file": None, "command": None, "type": "SystemExit",
+            "module": None})
+
+    def test_keyboard_interrupt_is_not_caught(self):
+        def verdict(prefix, root=None):
+            raise KeyboardInterrupt
+
+        with self.assertRaises(KeyboardInterrupt):
+            RD.build(RD.RESULTS, RD.ROOT, live=self.live, verdict=verdict)
+
+    def test_catalog_import_failure_is_one_line_and_no_verdict(self):
+        with mock.patch.dict(sys.modules, {"app.agent_catalog": None}):
+            got = RD.build(RD.RESULTS, RD.ROOT, live=self.live)
+        self.assertEqual(got["import_failures"],
+                         [{"module": "app.agent_catalog", "type": "ModuleNotFoundError"}])
+        self.assertEqual([s["state"] for s in got["sections"]], ["ok", "ok", "ok"])
+        for sec in got["sections"]:
+            self.assertEqual(sec["verdict"], {"state": "unavailable"}, sec["prefix"])
+
+    def test_a_section_says_which_module_it_needs(self):
+        with mock.patch.dict(sys.modules, {"analyse_phase_d2": None}):
+            got = RD.build(RD.RESULTS, RD.ROOT, live=self.live, verdict=_found_verdict)
+        self.assertEqual(got["import_failures"],
+                         [{"module": "analyse_phase_d2", "type": "ModuleNotFoundError"}])
+        for sec in got["sections"]:
+            self.assertEqual(sec["state"], "unavailable", sec["prefix"])
+            self.assertEqual(sec["error"]["kind"], "module")
+            self.assertEqual(sec["error"]["module"], "analyse_phase_d2")
+
+    def test_without_analyse_phase_d_the_check_is_not_compared(self):
+        with mock.patch.dict(sys.modules, {"analyse_phase_d": None}):
+            got = RD.build(RD.RESULTS, RD.ROOT, live=self.live, verdict=_found_verdict)
+        self.assertEqual(got["import_failures"],
+                         [{"module": "analyse_phase_d", "type": "ModuleNotFoundError"}])
+        for sec in got["sections"]:
+            self.assertEqual(sec["checks"], [{"name": "parse_equals_analysis",
+                                              "state": "not_compared", "detail": None}])
+
+    def test_live_side_import_errors_reach_the_tab(self):
+        live = dict(self.live, blocks={}, import_errors=[
+            {"module": "fingerprint.plant_fingerprint(phase-d)", "type": "AssertionError"},
+            {"module": "fingerprint.plant_fingerprint(d2)", "type": "AssertionError"}])
+        got = RD.build(RD.RESULTS, RD.ROOT, live=live, verdict=_found_verdict)
+        self.assertEqual(got["import_failures"], live["import_errors"])
+        for sec in got["sections"]:
+            self.assertEqual(sec["provenance"]["state"], "cannot_compare", sec["prefix"])
+            self.assertEqual(sec["provenance"]["reason"], "import", sec["prefix"])
+
+    def test_nan_becomes_null(self):
+        parse = RD.E.parse_eval_file
+
+        def with_nan(path):
+            out = parse(path)
+            if Path(path).name == "c4_seed3.txt":
+                out["policies"]["sighted"]["median"] = float("nan")
+            return out
+
+        with mock.patch.object(RD.E, "parse_eval_file", with_nan):
+            got = RD.build(RD.RESULTS, RD.ROOT, live=self.live, verdict=_found_verdict)
+        seed3 = next(s for s in self.section(got, "c4")["seeds"] if s["seed"] == 3)
+        self.assertIsNone(seed3["sighted"]["median"])
+        self.assertIsNone(seed3["diff"])
+        check = self.section(got, "c4")["checks"][0]
+        self.assertEqual(check["state"], "fail")
+        self.assertIn("results/c4_seed3.txt", check["detail"])
+        json.dumps(got, allow_nan=False)
+
+    def test_jsonable(self):
+        got = RD.jsonable({"a": float("nan"), 1: (np.float32(2.5), np.int64(3), np.bool_(True),
+                                                   float("inf"), None, "x"),
+                           "arr": np.array([1.0, np.nan])})
+        self.assertEqual(got, {"a": None, "1": [2.5, 3, True, None, None, "x"],
+                               "arr": [1.0, None]})
+        self.assertIs(RD.jsonable(True), True)
+        with self.assertRaises(TypeError):
+            RD.jsonable(object())
+
+    # ---- the real tree ---------------------------------------------------
+    def test_real_tree_three_sections_in_order(self):
+        secs = self.real["sections"]
+        self.assertEqual([s["prefix"] for s in secs], ["phase_d", "d2", "c4"])
+        self.assertEqual([s["state"] for s in secs], ["ok", "ok", "ok"])
+        for sec in secs:
+            self.assertEqual(sec["name"], run_phase_d.CLOSED_PREFIX[sec["prefix"]])
+            self.assertTrue(sec["known"])
+            self.assertEqual([s["seed"] for s in sec["seeds"]], list(range(8)))
+            self.assertEqual(sec["unpaired"], [])
+            self.assertEqual(sec["thermal_recorded"], "none")
+            self.assertEqual(sec["episodes"], len(evaluate.EPISODES))
+            self.assertTrue(sec["scenario"].startswith("scenario: "))
+            self.assertEqual(sec["mei"], analyse_phase_d2.MEI)
+        self.assertEqual([s["protocol"] for s in secs], ["phase-d", "d2", "d2"])
+        self.assertEqual([s["mei_after_result"] for s in secs], [True, False, False])
+        self.assertEqual([s["continues"] for s in secs], [None, None, "d2"])
+        self.assertFalse([n for n in self.real["not_read"]
+                          if n["path"].split("/")[-1].startswith(("phase_d_", "d2_", "c4_"))])
+
+    def test_real_tree_diffs_equal_the_analysis(self):
+        for sec in self.real["sections"]:
+            rows, incomplete = analyse_phase_d2.load(sec["prefix"])
+            self.assertEqual(incomplete, [], sec["prefix"])
+            self.assertEqual([(s["seed"], s["diff"]) for s in sec["seeds"]],
+                             [(seed, diff) for seed, _, diff in rows], sec["prefix"])
+
+    def test_real_tree_checks_pass(self):
+        for sec in self.real["sections"]:
+            self.assertEqual(sec["checks"], [{"name": "parse_equals_analysis",
+                                              "state": "pass", "detail": None}], sec["prefix"])
+
+    def test_real_tree_is_made_on_another_plant(self):
+        for sec in self.real["sections"]:
+            prov = sec["provenance"]
+            self.assertEqual(prov["state"], "another", sec["prefix"])
+            self.assertTrue(prov["commits"], sec["prefix"])
+            self.assertEqual(sorted(prov["files"]), [str(k) for k in range(8)])
+
+    def test_real_tree_notes(self):
+        import analyse_c4
+        keys = {s["prefix"]: [n["key"] for n in s["notes"]] for s in self.real["sections"]}
+        tail = ["dt_mismatch", "no_thermal_only", "knock_model", "turbine_modelled"]
+        self.assertEqual(keys["phase_d"], RD.KNOWN["phase_d"]["notes"] + tail)
+        self.assertEqual(keys["d2"], RD.KNOWN["d2"]["notes"] + tail)
+        self.assertEqual(keys["c4"], RD.KNOWN["c4"]["notes"] + ["budget_from_file"] + tail)
+        notes = {n["key"]: n["values"] for n in self.section(self.real, "c4")["notes"]}
+        self.assertEqual(notes["budget_from_file"], {"steps": analyse_c4.C4_STEPS})
+        self.assertEqual(notes["dt_mismatch"], {"train_dt": 0.2, "eval_dt": 1.0})
+        for s in self.section(self.real, "c4")["seeds"]:
+            self.assertEqual(s["budget"], {"steps": analyse_c4.C4_STEPS,
+                                           "requested": analyse_c4.C4_STEPS})
+        for prefix in ("phase_d", "d2"):
+            self.assertEqual([s["budget"] for s in self.section(self.real, prefix)["seeds"]],
+                             [None] * 8, prefix)
+
+    def test_real_tree_verdicts_are_quoted(self):
+        from app import agent_catalog
+        for sec in self.real["sections"]:
+            want = agent_catalog.verdict(sec["prefix"])
+            self.assertEqual(sec["verdict"], {k: want[k] for k in
+                                              ("state", "lines", "cells", "missing", "short")})
+            self.assertEqual(sec["verdict"]["state"], "found", sec["prefix"])
+
+    def test_real_tree_serialises_strictly(self):
+        json.dumps(self.real, allow_nan=False)
+        built = self.real["built"]
+        self.assertEqual(set(self.real), {"built", "import_failures", "sections", "not_read"})
+        self.assertEqual(self.real["import_failures"], [])
+        self.assertEqual(built["python"], platform.python_version())
+        self.assertEqual(built["plant_sha"], FP._sha_files(FP.PLANT_FILES))
+        self.assertEqual(built["git"], "ok")
+        head = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=RD.ROOT,
+                              capture_output=True, text=True, timeout=60,
+                              env=dict(os.environ, GIT_OPTIONAL_LOCKS="0")).stdout.strip()
+        self.assertEqual(built["head"], head)
+        self.assertIsInstance(built["elapsed_ms"], int)
+        print(f"\n    build() on the real tree: {built['elapsed_ms']} ms", file=sys.stderr)
+
+    def test_build_leaves_no_trace(self):
+        # --git-path, because in a worktree .git is a file and the index lives elsewhere
+        where = subprocess.run(["git", "rev-parse", "--git-path", "index"], cwd=RD.ROOT,
+                               capture_output=True, text=True, timeout=60,
+                               env=dict(os.environ, GIT_OPTIONAL_LOCKS="0")).stdout.strip()
+        index = Path(where) if Path(where).is_absolute() else RD.ROOT / where
+        self.assertTrue(index.is_file(), index)
+        env = {k: os.environ.get(k) for k in ("DERIVING_PARAMS", "OMP_NUM_THREADS")}
+        before = (index.stat().st_mtime_ns, index.stat().st_size)
+        RD.build(RD.RESULTS, RD.ROOT)
+        self.assertEqual((index.stat().st_mtime_ns, index.stat().st_size), before,
+                         ".git/index moved during a build")
+        self.assertEqual({k: os.environ.get(k) for k in env}, env)
+
+    def test_without_git_only_the_git_facts_go(self):
+        with mock.patch.dict(os.environ, {"PATH": ""}):
+            got = RD.build(RD.RESULTS, RD.ROOT, live=self.live, verdict=_found_verdict)
+        self.assertEqual(got["built"]["git"], "unavailable")
+        self.assertIsNone(got["built"]["head"])
+        self.assertEqual([s["state"] for s in got["sections"]], ["ok", "ok", "ok"])
+        for sec, real in zip(got["sections"], self.real["sections"]):
+            self.assertEqual(sec["seeds"], real["seeds"], sec["prefix"])
+            self.assertEqual(sec["provenance"]["state"], "another", sec["prefix"])
+            self.assertIsNone(sec["provenance"]["tag"], sec["prefix"])
+            for item in sec["provenance"]["files"].values():
+                self.assertIsNone(item["file"]["commit"], sec["prefix"])
+
+    def test_wording_of_the_answer_and_of_the_quoted_verdicts(self):
+        bad = ("an up to date figure", "a stale file", "the current plant", "pooled seeds",
+               "preview does not help",
+               _ar(0x0646, 0x062A, 0x064A, 0x062C, 0x0629) + " " + AR_OLD + _ar(0x0629),  # an old result
+               _ar(0x0645, 0x062D, 0x062F, 0x064E, 0x0651, 0x062B),                      # updated, marked
+               f"{AR_PREVIEW} {AR_NOT} {AR_AVAILS}")
+        fine = ("current-grade", "Current-grade median",
+                _ar(0x062A) + AR_NEW + " " + _ar(0x0627, 0x0644, 0x0645, 0x0644, 0x0641))  # updating the file
+        self.assertEqual([text for text in bad if not _banned(text)], [])
+        self.assertEqual([text for text in fine if _banned(text)], [])
+        from app import agent_catalog
+        texts = list(_texts(self.real))
+        texts += [(f"SHORT_VERDICT[{k}][{lang}]", v[lang])
+                  for k, v in agent_catalog.SHORT_VERDICT.items() for lang in ("ar", "en")]
+        texts += [(f"GLOSS[{k}][{lang}]", v[lang])
+                  for k, v in agent_catalog.GLOSS.items() for lang in ("ar", "en")]
+        self.assertGreater(len(texts), 100)
+        self.assertEqual([(where, text) for where, text in texts if _banned(text)], [])
+
+    def test_known_matches_the_closed_prefixes(self):
+        self.assertEqual(set(RD.KNOWN), set(run_phase_d.CLOSED_PREFIX))
+
+    def test_imports_stay_light(self):
+        """Importing results_data loads no agent code; a build never imports the
+        four modules spec 5.2 forbids, nor sets DERIVING_PARAMS."""
+        code = ("import json, os, sys\n"
+                "import app.results_data as RD\n"
+                "heavy = ('app.agent', 'evaluate', 'engine_env', 'random_road')\n"
+                "first = sorted(m for m in sys.modules if m.startswith(heavy))\n"
+                "RD.build(RD.RESULTS, RD.ROOT)\n"
+                "banned = ('derive_params', 'record_agents', 'knock_margin', 'train')\n"
+                "print(json.dumps([first, sorted(m for m in banned if m in sys.modules),\n"
+                "                  os.environ.get('DERIVING_PARAMS')]))\n")
+        run = subprocess.run([sys.executable, "-c", code], cwd=RD.ROOT, capture_output=True,
+                             text=True, timeout=300,
+                             env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertEqual(run.returncode, 0, run.stderr[-2000:])
+        first, banned, deriving = json.loads(run.stdout.strip().splitlines()[-1])
+        self.assertEqual(first, [])
+        self.assertEqual(banned, [])
+        self.assertIsNone(deriving)
+
+
 if __name__ == "__main__":
     unittest.main()
