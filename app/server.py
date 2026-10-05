@@ -48,6 +48,9 @@ simulated second: /api/agents/jev sends it to an external service in the USA;
 machine. Neither has a path to the vehicle. The third, /api/agents/jev/key,
 keeps a jev key pasted on the page in this process's memory for the session;
 it sends nothing anywhere and has no path to the vehicle either.
+Two GET routes, /results and /api/results, are added by
+app.results_api.mount_results() only under --simulation: they read the
+result files under results/ and write nothing.
 """
 from __future__ import annotations
 
@@ -84,8 +87,24 @@ LIMITS = {
     "valid_map_kpa": [VALID_MAP_LO, VALID_MAP_HI],
     "mismatch_pct": MISMATCH_PCT,
 }
+class RevalidatedStatic(StaticFiles):
+    """/static, with Cache-Control: no-cache on every answer.
+
+    Without it a browser may run a file from its cache for hours after the
+    file changed (heuristic freshness, from Last-Modified), and the pages
+    load i18n.mjs and style.css without a version query: after an update
+    the nav could show the key nav.results instead of its name. no-cache
+    keeps the cache but asks first, and on this machine the answer is a 304.
+    """
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 app = FastAPI(title="Engine Supervisor — live")
-app.mount('/static', StaticFiles(directory=os.path.join(HERE, 'static')), name='static')
+app.mount('/static', RevalidatedStatic(directory=os.path.join(HERE, 'static')), name='static')
 # Set here as well as in main() so that /api/review still works if this module
 # is served by an external ASGI runner that never calls main().
 app.state.review_path = os.path.join(HERE, "review_log.jsonl")
@@ -305,9 +324,12 @@ def main():
     if a.simulation:
         print(f'  3D replay lab: http://localhost:{a.http_port}/simulation')
         print(f'  agent replay:  http://localhost:{a.http_port}/agents')
+        print(f'  results:       http://localhost:{a.http_port}/results')
         print('  Local recordings only. No vehicle connection. In-memory replay cache.')
         from app.agent_api import install
         install(app)
+        from app.results_api import mount_results
+        mount_results(app)
         import uvicorn
         uvicorn.run(app, host='127.0.0.1', port=a.http_port, log_level='warning')
         return

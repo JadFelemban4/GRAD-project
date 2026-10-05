@@ -1656,7 +1656,8 @@ def tearDownModule():
 
 
 NEW_MODULES = ("agent_trace.py", "agent_catalog.py", "agent_api.py", "model_questions.py",
-               "jev.py", "laya_worker.py", "laya_bridge.py")
+               "jev.py", "laya_worker.py", "laya_bridge.py",
+               "results_eval.py", "results_provenance.py", "results_data.py", "results_api.py")
 WRITE_PATTERNS = (
     (r"\bopen\s*\([^)]*,\s*(mode\s*=\s*)?['\"][^'\"]*[wax+]", "write-mode open"),
     (r"\.write\w*\s*\(", "write / write_text / write_bytes"),

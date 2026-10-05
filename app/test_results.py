@@ -1757,5 +1757,199 @@ class DataTests(unittest.TestCase):
         self.assertIsNone(deriving)
 
 
+# ---- Task 5: app/results_api.py and its wiring in app/server.py ---------------
+import ast  # noqa: E402
+import json  # noqa: E402
+import os  # noqa: E402
+import re  # noqa: E402
+import subprocess  # noqa: E402
+import sys  # noqa: E402
+import tempfile  # noqa: E402
+import threading  # noqa: E402
+import time  # noqa: E402
+import types  # noqa: E402
+import unittest  # noqa: E402
+import warnings  # noqa: E402
+from pathlib import Path  # noqa: E402
+from unittest import mock  # noqa: E402
+
+from fastapi import FastAPI  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+
+from app import results_api as RA  # noqa: E402
+
+APP_DIR = Path(RA.__file__).resolve().parent
+LOCAL = {"host": "127.0.0.1:8000"}
+TOP_KEYS = {"built", "import_failures", "sections", "not_read"}
+REFUSAL = "refused: this page answers 127.0.0.1 and localhost only"
+
+
+def _results_client(build=None):
+    app = FastAPI()
+    RA.mount_results(app, build=build)
+    return app, TestClient(app)
+
+
+class RouteTests(unittest.TestCase):
+    """app/results_api.py: two GET routes, the Host guard, the lock, no-store (spec 6.1)."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.page = Path(tmp.name) / "results.html"
+        self.page.write_text("<!doctype html><title>a results page</title>\n", encoding="utf-8")
+        patcher = mock.patch.object(RA, "PAGE", self.page)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_the_page_answers_this_machine_with_or_without_a_port(self):
+        _, client = _results_client(build=lambda: {})
+        for host in ("127.0.0.1:8000", "localhost:8765", "localhost", "127.0.0.1"):
+            r = client.get("/results", headers={"host": host})
+            self.assertEqual(r.status_code, 200, host)
+            self.assertEqual(r.headers.get("cache-control"), "no-store", host)
+            self.assertTrue(r.headers.get("content-type", "").startswith("text/html"), host)
+            self.assertEqual(r.text, self.page.read_text(encoding="utf-8"), host)
+
+    def test_the_page_is_read_on_every_request(self):
+        _, client = _results_client(build=lambda: {})
+        self.page.write_text("<!doctype html><title>changed</title>\n", encoding="utf-8")
+        self.assertIn("changed", client.get("/results", headers=LOCAL).text)
+
+    def test_a_foreign_host_is_refused_on_both_routes(self):
+        calls = []
+        _, client = _results_client(build=lambda: calls.append(1) or {})
+        for host in ("evil.example:8000", "127.0.0.1.evil.example", "localhost.evil.example:8000",
+                     "127.0.0.2:8000", "localhost:123456", "testserver"):
+            for path in ("/results", "/api/results"):
+                r = client.get(path, headers={"host": host})
+                self.assertEqual(r.status_code, 403, (host, path))
+                self.assertEqual(r.headers.get("cache-control"), "no-store", (host, path))
+                self.assertEqual(r.text, REFUSAL, (host, path))
+        self.assertEqual(calls, [], "a refused request must not build")
+        self.assertFalse(RA.host_ok(types.SimpleNamespace(headers={})))
+
+    def test_only_get(self):
+        app, client = _results_client(build=lambda: {})
+        for path in ("/results", "/api/results"):
+            self.assertEqual(client.post(path, headers=LOCAL).status_code, 405, path)
+        added = {r.path: set(r.methods) for r in app.routes
+                 if getattr(r, "path", None) in ("/results", "/api/results")}
+        self.assertEqual(added, {"/results": {"GET"}, "/api/results": {"GET"}})
+
+    def test_the_answer_is_the_build_with_no_store(self):
+        body = {"built": {"head": None}, "import_failures": [], "sections": [], "not_read": []}
+        _, client = _results_client(build=lambda: body)
+        r = client.get("/api/results", headers=LOCAL)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(r.json(), body)
+
+    def test_the_default_build_answers_the_contract_keys(self):
+        _, client = _results_client()
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=ResourceWarning, module="analyse_phase_d")
+            r = client.get("/api/results", headers={"host": "localhost"})
+        self.assertEqual(r.status_code, 200, r.text[:300])
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(set(r.json()), TOP_KEYS)
+
+    def test_a_failing_build_is_a_fixed_500(self):
+        for exc in (RuntimeError("secret detail"), SystemExit("secret detail")):
+            def boom(exc=exc):
+                raise exc
+
+            _, client = _results_client(build=boom)
+            r = client.get("/api/results", headers=LOCAL)
+            self.assertEqual(r.status_code, 500, type(exc).__name__)
+            self.assertEqual(r.headers.get("cache-control"), "no-store")
+            self.assertEqual(r.json(), {"detail": f"results failed: {type(exc).__name__}"})
+            self.assertNotIn("secret", r.text)
+
+    def test_one_build_at_a_time(self):
+        state = {"inside": 0, "peak": 0}
+        guard = threading.Lock()
+
+        def slow():
+            with guard:
+                state["inside"] += 1
+                state["peak"] = max(state["peak"], state["inside"])
+            time.sleep(0.2)
+            with guard:
+                state["inside"] -= 1
+            return {}
+
+        app, _ = _results_client(build=slow)
+        endpoint = next(r.endpoint for r in app.routes
+                        if getattr(r, "path", None) == "/api/results")
+        request = types.SimpleNamespace(headers=dict(LOCAL))
+        threads = [threading.Thread(target=endpoint, args=(request,)) for _ in range(3)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(10)
+        self.assertEqual(state["peak"], 1)
+
+    def test_the_host_pattern_is_agent_api_s_plus_no_port(self):
+        tree = ast.parse((APP_DIR / "agent_api.py").read_text(encoding="utf-8"))
+        theirs = next(re.compile(ast.literal_eval(n.value.args[0])) for n in ast.walk(tree)
+                      if isinstance(n, ast.Assign)
+                      and [getattr(t, "id", None) for t in n.targets] == ["LOCAL_HOST"])
+        hosts = ["127.0.0.1:8000", "localhost:8765", "localhost:1", "127.0.0.1:65535",
+                 "localhost", "127.0.0.1", "evil.example:8000", "127.0.0.1.evil.example:8000",
+                 "localhost.evil.example", "LOCALHOST:8000", "127.0.0.1:", "localhost:123456",
+                 "[::1]:8000", ""]
+        ours = {h for h in hosts if RA.LOCAL_HOST.fullmatch(h)}
+        self.assertEqual(ours, {h for h in hosts if theirs.fullmatch(h)} | {"localhost", "127.0.0.1"})
+
+    def test_server_mounts_results_inside_simulation_after_install(self):
+        tree = ast.parse((APP_DIR / "server.py").read_text(encoding="utf-8"))
+        calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
+                 and getattr(n.func, "id", getattr(n.func, "attr", None)) == "mount_results"]
+        self.assertEqual(len(calls), 1, "mount_results( must be called exactly once")
+        guarded = [n for n in ast.walk(tree) if isinstance(n, ast.If)
+                   and isinstance(n.test, ast.Attribute) and n.test.attr == "simulation"
+                   and getattr(n.test.value, "id", None) == "a"]
+        self.assertEqual(len(guarded), 1)
+        body = [ast.unparse(s) for s in guarded[0].body]
+        at = body.index("install(app)")
+        self.assertEqual(body[at + 1:at + 3], ["from app.results_api import mount_results",
+                                               "mount_results(app)"])
+        agents = body.index("print(f'  agent replay:  http://localhost:{a.http_port}/agents')")
+        self.assertEqual(body[agents + 1],
+                         "print(f'  results:       http://localhost:{a.http_port}/results')")
+        top = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
+        self.assertFalse([n for n in top if "results" in (getattr(n, "module", "") or "")],
+                         "server.py must not import the results modules at module level")
+
+    def test_static_files_are_revalidated_on_every_load(self):
+        from app import server
+        client = TestClient(server.app)
+        first = client.get("/static/sim/i18n.mjs")
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(first.headers.get("cache-control"), "no-cache")
+        again = client.get("/static/sim/i18n.mjs", headers={"if-none-match": first.headers["etag"]})
+        self.assertEqual(again.status_code, 304)
+        self.assertEqual(again.headers.get("cache-control"), "no-cache")
+
+    def test_importing_the_server_loads_no_results_module(self):
+        code = ("import json, sys\n"
+                "import app.server\n"
+                "from fastapi import FastAPI\n"
+                "before = sorted(m for m in sys.modules if m.startswith('app.results'))\n"
+                "from app.results_api import mount_results\n"
+                "mount_results(FastAPI())\n"
+                "after = sorted(m for m in sys.modules if m.startswith('app.results'))\n"
+                "print(json.dumps([before, after]))\n")
+        run = subprocess.run([sys.executable, "-c", code], cwd=APP_DIR.parent, capture_output=True,
+                             text=True, timeout=180,
+                             env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertEqual(run.returncode, 0, run.stderr[-2000:])
+        before, after = json.loads(run.stdout.strip().splitlines()[-1])
+        self.assertEqual(before, [], "--live and --replay would load the readers")
+        self.assertEqual(after, ["app.results_api", "app.results_eval", "app.results_provenance"],
+                         "mounting takes the plant hash now, and loads no reader")
+
+
 if __name__ == "__main__":
     unittest.main()
