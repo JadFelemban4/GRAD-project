@@ -14,6 +14,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import subprocess
 import sys
 import tempfile
@@ -820,6 +821,300 @@ class ProvenanceLiveTests(unittest.TestCase):
                 RP.live_side(ROOT, protocols=("d2",))
         self.assertEqual(RP.live_side(ROOT, protocols=("phase-x",))["import_errors"],
                          [{"module": "fingerprint.plant_fingerprint(phase-x)", "type": "ValueError"}])
+
+
+# ---- Task 3: app/results_provenance.py, the plant state of a file -------------
+
+# A header title to its protocol, as Task 4 builds it from evaluate.PROTOCOLS.
+TITLE_PROTOCOLS = {"PHASE D EVALUATION": "phase-d",
+                   "PHASE D2 EVALUATION (randomised climb)": "d2"}
+REASONS = (None, "python", "no_git_route", "dirty", "one_sided", "restart", "protocol",
+           "import", "derived_differs")
+CLASSIFIED_KEYS = {"state", "reason", "route", "protocol", "recorded", "live", "differs",
+                   "tag", "forced", "file"}
+D2_FILE = "results/d2_seed0.txt"
+
+
+class ProvenanceStateTests(unittest.TestCase):
+    """results_provenance part 2: classify_eval, tag_for, section_provenance."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.git = RP.Git(ROOT)
+        cls.live = RP.live_side(ROOT)
+        cls.rels = [r for r in SEEDED if (ROOT / r).is_file()]
+        cls.last = cls.git.last_commits(cls.rels)
+        cls.status = cls.git.status(cls.rels)
+
+    def _parsed(self, rel=D2_FILE, **fields):
+        """A real file's parse with fingerprint fields changed; None deletes one."""
+        if not (ROOT / rel).is_file():
+            self.skipTest(f"{rel} is not in this checkout")
+        parsed = EV.parse_eval_file(ROOT / rel)
+        for key, value in fields.items():
+            if value is None:
+                parsed["fingerprint"].pop(key, None)
+            else:
+                parsed["fingerprint"][key] = value
+        return parsed
+
+    def _live_like(self, parsed, **changes):
+        """A live side whose blocks are `parsed`'s own block, under its Python:
+        this tree as if it were the plant that file was made on."""
+        fp = parsed["fingerprint"]
+        live = {"python": fp["python"], "minor": RP.minor(fp["python"]),
+                "plant_sha": fp["plant_sha"], "plant_text_sha": fp.get("plant_text_sha"),
+                "restart_needed": False, "derived_sha": None, "data_sha1": None,
+                "derived_loaded_differs": False,
+                "blocks": {"phase-d": dict(fp), "d2": dict(fp)}, "import_errors": []}
+        live.update(changes)
+        return live
+
+    def _classify(self, parsed, live=None, rel=D2_FILE, git=None, status=None):
+        got = RP.classify_eval(parsed, self.live if live is None else live,
+                               self.git if git is None else git, rel, self.last,
+                               self.status if status is None else status, TITLE_PROTOCOLS)
+        self.assertEqual(set(got), CLASSIFIED_KEYS)
+        self.assertIn(got["state"], RP.STATES)
+        self.assertIn(got["reason"], REASONS)
+        self.assertIn(got["route"], (None, "same_python", "git"))
+        self.assertEqual(set(got["recorded"]), {"plant_sha", "python", "git_head", "derived_sha"})
+        self.assertEqual(set(got["file"]), {"rel", "commit", "changed"})
+        return got
+
+    def _need_commit(self, parsed):
+        """Skip unless git here knows the commit the parsed file records."""
+        if not self.git.available or self.git.resolve(parsed["fingerprint"].get("git_head")) is None:
+            self.skipTest("the commit this file records is not in this clone")
+
+    def _need_tags(self):
+        if not self.git.available or any(self.git.resolve(t) is None for t in RP.TAGS):
+            self.skipTest("the tags sep17-before-merge and ghassan-before-merge are not in this clone")
+
+    def test_jads_files_are_made_on_another_plant(self):
+        self._need_tags()
+        if not self.rels:
+            self.skipTest("no results/<prefix>_seed<N>.txt in this checkout")
+        for prefix in REAL:
+            for seed in REAL_SEEDS:
+                rel = f"results/{prefix}_seed{seed}.txt"
+                if not (ROOT / rel).is_file():
+                    continue
+                parsed = EV.parse_eval_file(ROOT / rel)
+                got = self._classify(parsed, rel=rel)
+                same_python = RP.minor(parsed["fingerprint"].get("python")) == self.live["minor"]
+                with self.subTest(rel=rel):
+                    self.assertEqual((got["state"], got["reason"]), ("another", None))
+                    self.assertEqual(got["route"], "same_python" if same_python else "git")
+                    self.assertEqual(got["tag"], "sep17-before-merge")
+                    self.assertIn("plant_sha", got["differs"])
+                    self.assertEqual(got["protocol"], REAL[prefix][1] or REAL[prefix][2])
+                    self.assertEqual(got["recorded"]["plant_sha"], parsed["fingerprint"]["plant_sha"])
+                    self.assertEqual(got["live"], {"plant_sha": self.live["plant_sha"],
+                                                   "python": self.live["python"]})
+                    self.assertEqual(got["file"], {"rel": rel, "commit": self.last.get(rel),
+                                                   "changed": rel in self.status})
+                    self.assertEqual(got["forced"], [])
+
+    def test_title_protocols_are_evaluates(self):
+        try:
+            import evaluate
+        except (Exception, SystemExit) as exc:
+            self.skipTest(f"evaluate cannot be imported here ({type(exc).__name__})")
+        self.assertEqual({header: name for name, (_episodes, header, _prefix)
+                          in evaluate.PROTOCOLS.items()}, TITLE_PROTOCOLS)
+
+    def test_forced_comes_before_everything(self):
+        parsed = self._parsed(plant_sha=None)
+        parsed["forced"] = ["!! runs_x/sighted_seed0: PLANT MISMATCH",
+                            "     plant_sha                model 'aaaa'  live 'bbbb'"]
+        got = self._classify(parsed)
+        self.assertEqual((got["state"], got["reason"], got["route"]), ("forced", None, None))
+        self.assertEqual(got["forced"], parsed["forced"])
+
+    def test_not_recorded(self):
+        got = self._classify(self._parsed(plant_sha=None))
+        self.assertEqual((got["state"], got["reason"], got["route"]), ("not_recorded", None, None))
+        self.assertIsNone(got["recorded"]["plant_sha"])
+
+    def test_the_protocol_and_its_live_block(self):
+        parsed = self._parsed("results/phase_d_seed0.txt", scenario=None)
+        self.assertEqual(self._classify(parsed, rel="results/phase_d_seed0.txt")["protocol"],
+                         "phase-d", "taken from the title through title_protocols")
+        parsed = self._parsed(scenario=None)
+        parsed["title"] = "SOME NEW EVALUATION"
+        got = self._classify(parsed)
+        self.assertEqual((got["state"], got["reason"], got["protocol"]),
+                         ("cannot_compare", "protocol", None))
+        broken = dict(self.live, blocks={k: v for k, v in self.live["blocks"].items() if k != "d2"},
+                      import_errors=[{"module": "fingerprint.plant_fingerprint(d2)",
+                                      "type": "AssertionError"}])
+        got = self._classify(self._parsed(), broken)
+        self.assertEqual((got["state"], got["reason"], got["protocol"]),
+                         ("cannot_compare", "import", "d2"))
+        parsed = self._parsed()
+        parsed["protocol"] = "d9"
+        got = self._classify(parsed, broken)
+        self.assertEqual((got["state"], got["reason"], got["protocol"]),
+                         ("cannot_compare", "protocol", "d9"))
+
+    def test_another_python_with_no_route_through_git(self):
+        got = self._classify(self._parsed(python="3.13.2", git_head="0" * 40))
+        self.assertEqual((got["state"], got["reason"], got["route"]), ("cannot_compare", "python", None))
+        got = self._classify(self._parsed(python="3.13.2", git_head=None))
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "python"))
+        nogit = RP.Git(ROOT, exe="git-does-not-exist")
+        got = RP.classify_eval(self._parsed(python="3.13.2"), self.live, nogit, D2_FILE,
+                               {}, {}, TITLE_PROTOCOLS)
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "python"))
+        self.assertEqual(got["file"], {"rel": D2_FILE, "commit": None, "changed": False})
+
+    def test_the_same_python_needs_no_git(self):
+        parsed = self._parsed()
+        live = self._live_like(parsed)
+        live["blocks"]["d2"]["plant_sha"] = "0000000000000000"
+        nogit = RP.Git(ROOT, exe="git-does-not-exist")
+        got = RP.classify_eval(parsed, live, nogit, D2_FILE, {}, {}, TITLE_PROTOCOLS)
+        self.assertEqual((got["state"], got["route"], got["differs"], got["tag"]),
+                         ("another", "same_python", ["plant_sha"], None))
+
+    def test_another_python_through_git(self):
+        self._need_tags()
+        parsed = self._parsed(python="3.13.2", plant_sha="0123456789abcdef")
+        self._need_commit(parsed)
+        got = self._classify(parsed)
+        self.assertEqual((got["state"], got["reason"], got["route"], got["tag"]),
+                         ("another", None, "git", "sep17-before-merge"))
+        self.assertIn("plant_sha", got["differs"])
+        self.assertEqual(got["recorded"]["plant_sha"], "0123456789abcdef")
+
+    def test_the_git_route_recomputes_plant_and_road(self):
+        if "d2" not in self.live["blocks"] or not self.git.available:
+            self.skipTest("no live d2 block, or no git, here")
+        if not _clean(*FP.PLANT_FILES, "random_road.py"):
+            self.skipTest("the plant files or random_road.py have uncommitted changes")
+        fp = dict(self.live["blocks"]["d2"], python="3.13.2", plant_sha="0123456789abcdef",
+                  git_head=self.git.resolve("HEAD"), git_dirty_plant_files="")
+        fp["scenario"] = re.sub(r"road_sha=[0-9a-f]+", "road_sha=fedcba9876543210", fp["scenario"])
+        parsed = {"title": "PHASE D2 EVALUATION (randomised climb)", "protocol": None,
+                  "fingerprint": fp, "forced": []}
+        live = dict(self.live, restart_needed=False, derived_sha=None)
+        got = self._classify(parsed, live)
+        self.assertEqual((got["state"], got["reason"], got["route"], got["differs"]),
+                         ("same_code", None, "git", []))
+
+    def test_the_bytes_at_the_commit_must_be_the_bytes_hashed(self):
+        parsed = self._parsed(python="3.13.2", plant_text_sha="0123456789abcdef")
+        self._need_commit(parsed)
+        got = self._classify(parsed)
+        self.assertEqual((got["state"], got["reason"], got["route"]),
+                         ("cannot_compare", "no_git_route", None))
+
+    def test_dirty_plant_files_have_no_git_route(self):
+        parsed = self._parsed(python="3.13.2", git_dirty_plant_files="engine_env.py")
+        self._need_commit(parsed)
+        got = self._classify(parsed)
+        self.assertEqual((got["state"], got["reason"], got["route"]), ("cannot_compare", "dirty", None))
+
+    def test_same_plant_code_derived_not_recorded(self):
+        parsed = self._parsed()
+        got = self._classify(parsed, self._live_like(parsed))
+        self.assertEqual((got["state"], got["reason"], got["route"], got["differs"], got["tag"]),
+                         ("same_code", None, "same_python", [], None))
+
+    def test_same_plant(self):
+        parsed = self._parsed(derived_sha="abcdef0123456789")
+        got = self._classify(parsed, self._live_like(parsed, derived_sha="abcdef0123456789"))
+        self.assertEqual((got["state"], got["reason"]), ("same", None))
+        self.assertEqual(got["recorded"]["derived_sha"], "abcdef0123456789")
+
+    def test_only_the_derived_constants_differ(self):
+        parsed = self._parsed(derived_sha="abcdef0123456789")
+        got = self._classify(parsed, self._live_like(parsed, derived_sha="0123456789abcdef"))
+        self.assertEqual((got["state"], got["reason"], got["differs"]),
+                         ("another", "derived_differs", []))
+        self.assertEqual(got["tag"], RP.tag_for(self.git, parsed["fingerprint"]["plant_sha"]))
+
+    def test_a_fatal_difference_and_the_derived_constants(self):
+        parsed = self._parsed(derived_sha="abcdef0123456789")
+        live = self._live_like(parsed, derived_sha="0123456789abcdef")
+        live["blocks"]["d2"]["plant_sha"] = "0000000000000000"
+        got = self._classify(parsed, live)
+        self.assertEqual((got["state"], got["reason"], got["differs"]), ("another", None, ["plant_sha"]))
+
+    def test_a_field_on_one_side_only(self):
+        parsed = self._parsed()
+        live = self._live_like(parsed)
+        del live["blocks"]["d2"]["dtheta_deg"]
+        got = self._classify(parsed, live)
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "one_sided"))
+        parsed = self._parsed(episodes_sha=None)
+        got = self._classify(parsed, self._live_like(self._parsed()))
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "one_sided"))
+        live = self._live_like(self._parsed())
+        live["blocks"]["d2"]["plant_sha"] = "0000000000000000"
+        got = self._classify(parsed, live)
+        self.assertEqual((got["state"], got["differs"]), ("another", ["plant_sha"]),
+                         "a shared field that differs comes before a field on one side only")
+        parsed = self._parsed(derived_sha="abcdef0123456789")
+        got = self._classify(parsed, self._live_like(parsed, derived_sha=None))
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "one_sided"))
+
+    def test_a_restart_is_needed(self):
+        parsed = self._parsed(derived_sha="abcdef0123456789")
+        got = self._classify(parsed, self._live_like(parsed, derived_sha="abcdef0123456789",
+                                                     restart_needed=True))
+        self.assertEqual((got["state"], got["reason"]), ("cannot_compare", "restart"))
+
+    def test_a_changed_file_says_so(self):
+        got = self._classify(self._parsed(), status={D2_FILE: "M"})
+        self.assertTrue(got["file"]["changed"])
+        self.assertEqual(got["file"]["commit"], self.last.get(D2_FILE))
+
+    def test_tag_for(self):
+        self._need_tags()
+        sep17 = RP.plant_at(self.git, "sep17-before-merge")["plant_sha"]
+        ghassan = RP.plant_at(self.git, "ghassan-before-merge")["plant_sha"]
+        self.assertEqual(RP.tag_for(self.git, sep17), "sep17-before-merge")
+        self.assertEqual(RP.tag_for(self.git, ghassan),
+                         "sep17-before-merge" if ghassan == sep17 else "ghassan-before-merge")
+        self.assertIsNone(RP.tag_for(self.git, "0" * 16))
+        self.assertIsNone(RP.tag_for(self.git, None))
+        self.assertIsNone(RP.tag_for(RP.Git(ROOT, exe="git-does-not-exist"), sep17))
+
+    def test_section_provenance_of_phase_d(self):
+        self._need_tags()
+        per = {}
+        for seed in REAL_SEEDS:
+            rel = f"results/phase_d_seed{seed}.txt"
+            if (ROOT / rel).is_file():
+                per[seed] = self._classify(EV.parse_eval_file(ROOT / rel), rel=rel)
+        if not per:
+            self.skipTest("no Phase D result file in this checkout")
+        got = RP.section_provenance(per)
+        self.assertEqual((got["state"], got["reason"], got["tag"]),
+                         ("another", None, "sep17-before-merge"))
+        heads = sorted({p["recorded"]["git_head"][:7] for p in per.values()})
+        self.assertEqual(got["commits"], heads)
+        self.assertEqual(len(heads), 2, "Phase D's files record two commits")
+        self.assertEqual(list(got["files"]), [str(s) for s in sorted(per)])
+        self.assertIs(got["files"][str(min(per))], per[min(per)])
+
+    def test_section_provenance_mixed_and_common(self):
+        a = {"state": "another", "reason": None, "tag": "sep17-before-merge",
+             "recorded": {"git_head": "a" * 40}}
+        b = {"state": "same", "reason": None, "tag": None, "recorded": {"git_head": "b" * 40}}
+        got = RP.section_provenance({1: b, 0: a})
+        self.assertEqual((got["state"], got["reason"], got["tag"]), ("mixed", None, None))
+        self.assertEqual(got["commits"], ["aaaaaaa", "bbbbbbb"])
+        self.assertEqual(list(got["files"]), ["0", "1"])
+        c = {"state": "cannot_compare", "reason": "python", "tag": None,
+             "recorded": {"git_head": None}}
+        got = RP.section_provenance({0: c, 3: dict(c)})
+        self.assertEqual((got["state"], got["reason"], got["tag"], got["commits"]),
+                         ("cannot_compare", "python", None, []))
+        with self.assertRaises(ValueError):
+            RP.section_provenance({})
 
 
 if __name__ == "__main__":

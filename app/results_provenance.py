@@ -32,6 +32,12 @@ tree, so a plant hash depends on the Python minor version. A hash recorded
 under another Python is compared only through git: the recorded commit's
 plant files are read from git and hashed under this Python (plant_at,
 road_sha_at), cached per commit, since a commit never changes.
+
+THE PLANT STATES. classify_eval decides one evaluation file's plant state in
+the design's order (forced, not recorded, another plant, cannot compare, same
+plant code, same plant), and section_provenance sums one experiment's files:
+one state when they agree, "mixed" with every file's own state when they do
+not. The words the page shows for each state live in results-strings.mjs.
 """
 from __future__ import annotations
 
@@ -354,3 +360,137 @@ def live_side(root, protocols=("phase-d", "d2")) -> dict:
         "blocks": blocks,
         "import_errors": errors,
     }
+
+
+# ---------------------------------------------------------------------------
+# The plant state of an evaluation file, in the design's order of precedence
+# ---------------------------------------------------------------------------
+_ROAD_TOKEN = re.compile(r"\broad_sha=[0-9a-f]+")
+_RECORDED = ("plant_sha", "python", "git_head", "derived_sha")
+
+
+def _given(fp, key):
+    """A block field's text, or None when it is absent, empty or "None"."""
+    value = fp.get(key)
+    return None if value in (None, "", "None") else value
+
+
+def tag_for(git: Git, plant_sha: str) -> str | None:
+    """The first of TAGS whose plant, hashed under this Python, is `plant_sha`."""
+    if not plant_sha:
+        return None
+    for tag in TAGS:
+        plant = plant_at(git, tag)
+        if plant is not None and plant["plant_sha"] == plant_sha:
+            return tag
+    return None
+
+
+def _git_route(fp, git):
+    """(the recorded block to compare, None), or (None, why there is no route).
+
+    The route needs the recorded commit here, its plant files byte-equal to
+    the recorded plant_text_sha, and no plant file dirty when the run was
+    made. The copy then carries the commit's plant hashed under this Python,
+    and the road_sha of a d2 scenario recomputed from the commit's
+    random_road.py the same way."""
+    head = _given(fp, "git_head")
+    commit = git.resolve(head) if head else None
+    plant = plant_at(git, commit) if commit else None
+    if plant is None:
+        return None, "python"
+    dirty = fp.get("git_dirty_plant_files")
+    if dirty not in ("", None, "None"):
+        return None, "dirty"
+    if dirty != "" or plant["plant_text_sha"] != fp.get("plant_text_sha"):
+        return None, "no_git_route"
+    rec = dict(fp, plant_sha=plant["plant_sha"])
+    scenario = rec.get("scenario")
+    if scenario is not None and _ROAD_TOKEN.search(scenario):
+        road = road_sha_at(git, commit)
+        if road is None:
+            return None, "no_git_route"
+        rec["scenario"] = _ROAD_TOKEN.sub(lambda m: "road_sha=" + road, scenario)
+    return rec, None
+
+
+def classify_eval(parsed: dict, live: dict, git: Git, rel: str,
+                  last: dict, status: dict, title_protocols: dict[str, str]) -> dict:
+    """The plant state of one parsed evaluation file against `live`.
+
+    `parsed` is results_eval.parse_eval_file's dict, `live` is live_side's,
+    `last` and `status` are Git.last_commits and Git.status over the files,
+    and `title_protocols` maps a header title to its protocol (from
+    evaluate.PROTOCOLS). The states, first match wins: forced, not_recorded,
+    then a valid comparison or cannot_compare, then another, then
+    cannot_compare for a one-sided field or a needed restart, then same or
+    same_code. Each FATAL field is compared as the text format_block wrote."""
+    fp = dict(parsed.get("fingerprint") or {})
+    protocol = (parsed.get("protocol") or EV.protocol_from_fingerprint(fp)
+                or title_protocols.get(parsed.get("title")))
+    commit = last.get(rel)
+    out = {"state": None, "reason": None, "route": None, "protocol": protocol,
+           "recorded": {k: _given(fp, k) for k in _RECORDED},
+           "live": {"plant_sha": live["plant_sha"], "python": live["python"]},
+           "differs": [], "tag": None,
+           "forced": list(parsed.get("forced") or []),
+           "file": {"rel": rel, "commit": dict(commit) if commit else None,
+                    "changed": rel in status}}
+
+    def done(state, reason=None):
+        out["state"], out["reason"] = state, reason
+        return out
+
+    if out["forced"]:
+        return done("forced")
+    if out["recorded"]["plant_sha"] is None:
+        return done("not_recorded")
+    block = live["blocks"].get(protocol) if protocol else None
+    if block is None:
+        module = f"fingerprint.plant_fingerprint({protocol})"
+        listed = any(e.get("module") == module for e in live.get("import_errors", ()))
+        return done("cannot_compare", "import" if protocol and listed else "protocol")
+    if live["minor"] is not None and minor(out["recorded"]["python"]) == live["minor"]:
+        rec, out["route"] = fp, "same_python"
+    else:
+        rec, why = _git_route(fp, git)
+        if rec is None:
+            return done("cannot_compare", why)
+        out["route"] = "git"
+    out["differs"] = [f for f in FP.FATAL if f in rec and f in block and rec[f] != block[f]]
+    rec_d, live_d = out["recorded"]["derived_sha"], live.get("derived_sha")
+    derived_differs = rec_d is not None and live_d is not None and rec_d != live_d
+    if out["differs"] or derived_differs:
+        out["tag"] = tag_for(git, rec.get("plant_sha"))
+        return done("another", None if out["differs"] else "derived_differs")
+    one_sided = any((f in rec) != (f in block) for f in FP.FATAL)
+    if one_sided or (rec_d is not None and live_d is None):
+        return done("cannot_compare", "one_sided")
+    if live.get("restart_needed"):
+        return done("cannot_compare", "restart")
+    return done("same" if rec_d is not None else "same_code")
+
+
+def section_provenance(per_file: dict[int, dict]) -> dict:
+    """One experiment's plant label from its files' classify_eval results.
+
+    The common state, or "mixed" when the files disagree (the page then shows
+    them seed by seed); the common reason and tag, or None; the distinct
+    recorded commits, short; and every file's own result by seed."""
+    if not per_file:
+        raise ValueError("section_provenance needs at least one file")
+    seeds = sorted(per_file)
+    items = [per_file[s] for s in seeds]
+
+    def common(key):
+        values = {item.get(key) for item in items}
+        return values.pop() if len(values) == 1 else None
+
+    states = {item["state"] for item in items}
+    heads = {item["recorded"]["git_head"][:7] for item in items
+             if item["recorded"].get("git_head")}
+    return {"state": states.pop() if len(states) == 1 else "mixed",
+            "reason": common("reason"),
+            "tag": common("tag"),
+            "commits": sorted(heads),
+            "files": {str(s): per_file[s] for s in seeds}}
