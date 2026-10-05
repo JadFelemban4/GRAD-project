@@ -102,16 +102,16 @@ export const RESULTS_STRINGS = {
 
     // --- the required notes (spec 5.4)
     'results.notes.heading': 'لا تُقرأ النتيجة دون ما يلي',
-    'results.note.blind_not_blind': 'لم يكن الوكيل الأعمى أعمى تماماً: جاء الصعود في الثانية نفسها في كل حلقة، فأمكن أن تعمل حالته الحرارية كساعة (\u2066results/PREREGISTRATION.md\u2069، القيد \u20667\u2069).',
-    'results.note.budget_c1': 'دُرِّب الوكلاء \u206650\u202f000\u2069 خطوة، وهي ميزانية \u2066C1\u2069. يذكرها التسجيل المسبق؛ ولا تذكرها هذه الملفات.',
+    'results.note.blind_not_blind': 'لم يكن الوكيل الأعمى أعمى تماماً: جاء الصعود في الثانية نفسها في كل حلقة، فأمكن أن تعمل حالته الحرارية كساعة (\u2066results/PREREGISTRATION.md\u2069، القيد \u20667\u2069، وُجد في \u206622\u2069 سبتمبر).',
+    'results.note.budget_c1': 'دُرِّب الوكلاء \u206650\u202f000\u2069 خطوة، وهي ميزانية \u2066C1\u2069، كما يسجّلها التسجيل المسبق في \u2066results/PREREGISTRATION.md\u2069 (\u206621\u2069 سبتمبر) وفي \u2066results/PREREGISTRATION_D2.md\u2069 (\u206622\u2069 سبتمبر)؛ ولا تذكرها هذه الملفات.',
     'results.note.budget_from_file': 'دُرِّب الوكلاء \u2066{steps}\u2069 خطوة، كما تسجّله أسطر النموذج في هذه الملفات.',
     'results.note.c4_not_converged': 'لم يستقر تدريب الوكلاء بحسب قاعدة \u2066C4\u2069 نفسها، التي وُضعت في \u206623\u2069 سبتمبر قبل أن يُدرَّب أي وكيل من \u2066C4\u2069 (\u2066results/PREREGISTRATION_C4.md\u2069، \u20665b\u2069؛ \u2066results/C4_RESULT.txt\u2069).',
     'results.note.spark_bound_jad': 'كل وكيل يدفع تعديل توقيت الشرارة إلى الحدّ الأعلى للإجراء، \u2066+4°\u2069 (هذا مقيس). والهامش فوق \u2066current-grade\u2069 مع منع تبكير الشرارة قِيس لـ \u2066C4\u2069 على حلقة واحدة، ولم يُقَس لـ \u2066Phase D\u2069 ولا لـ \u2066D2\u2069 (\u2066SESSION_REPORT_2026-09-30_merge.md\u2069).',
-    'results.note.spike_unmeasured': 'في كل حلقة قفزة طَرْق مدّتها خطوة واحدة عند تغيّر الميل المفاجئ؛ ولم يُقَس قطّ هل حرّكت نتيجة هذه التجربة (\u2066conflict.md\u2069).',
+    'results.note.spike_unmeasured': 'في كل حلقة قفزة طَرْق مدّتها خطوة واحدة عند تغيّر الميل المفاجئ؛ ولم يُقَس قطّ هل حرّكت نتيجة هذه التجربة (\u2066conflict.md\u2069، القسم \u20663b\u2069، \u206630\u2069 سبتمبر).',
     'results.note.dt_mismatch': 'دُرِّب الوكلاء بخطوة زمنية \u2066{train_dt}\u2069 ث وقُيِّموا بخطوة \u2066{eval_dt}\u2069 ث، كما تسجّل أسطر الملاحظات في هذه الملفات.',
     'results.note.no_thermal_only': 'لم تسجّل هذه الملفات الضرر دون ضرر الطَّرْق، فلا يُعرف كم من كل فرق يعود إلى ضرر الطَّرْق.',
-    'results.note.knock_model': 'الهامش فوق \u2066current-grade\u2069 قائم على نموذج الطَّرْق، الذي لم يُختبر على السيارة (الرحلة \u2066C\u2069).',
-    'results.note.turbine_modelled': 'درجات حرارة التيربو منمذَجة لا مقيسة: لا حساس في هذه السيارة يقرؤها، والسعة الحرارية لغلاف التيربو، \u2066c_turb\u2069، مفترَضة؛ وهي التي تحدّد \u2066τ\u2069.',
+    'results.note.knock_model': 'الهامش فوق \u2066current-grade\u2069 قائم على نموذج الطَّرْق، الذي لم يُختبر على السيارة (الرحلة \u2066C\u2069؛ \u2066conflict.md\u2069، القسم \u20663a\u2069، \u206630\u2069 سبتمبر).',
+    'results.note.turbine_modelled': 'درجات حرارة التيربو منمذَجة لا مقيسة: لا حساس في هذه السيارة يقرؤها، والسعة الحرارية لغلاف التيربو، \u2066c_turb\u2069، مفترَضة؛ وهي التي تحدّد \u2066τ\u2069 (\u2066CLAUDE.md\u2069، \u2066Limits the live app adds\u2069).',
     'results.note.no_other_notes': 'لا ملاحظات أخرى مسجَّلة لهذه التجربة.',
 
     // --- the figures
@@ -239,16 +239,16 @@ export const RESULTS_STRINGS = {
 
     // --- the required notes (spec 5.4)
     'results.notes.heading': 'Not to be read without',
-    'results.note.blind_not_blind': 'The blind agent was not fully blind: the climb came at the same second in every episode, so its thermal state could serve as a clock (results/PREREGISTRATION.md, limit 7).',
-    'results.note.budget_c1': 'Trained for 50 000 steps, the C1 budget. The preregistration records it; these files do not.',
+    'results.note.blind_not_blind': 'The blind agent was not fully blind: the climb came at the same second in every episode, so its thermal state could serve as a clock (results/PREREGISTRATION.md, limit 7, found on 22 September).',
+    'results.note.budget_c1': 'Trained for 50 000 steps, the C1 budget, as the preregistrations record it: results/PREREGISTRATION.md (21 September) and results/PREREGISTRATION_D2.md (22 September); these files do not.',
     'results.note.budget_from_file': "Trained for {steps} steps, as these files' model lines record.",
     'results.note.c4_not_converged': "The agents had not converged by C4's own rule, set on 23 September before any C4 agent trained (results/PREREGISTRATION_C4.md, 5b; results/C4_RESULT.txt).",
     'results.note.spark_bound_jad': 'Every agent pushes its spark trim to the +4° action bound (measured). The margin over current-grade with spark advance forbidden was measured for C4 on one episode, and not for Phase D or D2 (SESSION_REPORT_2026-09-30_merge.md).',
-    'results.note.spike_unmeasured': "Every episode holds a one-step knock spike at the grade step; whether it moved this experiment's result was never measured (conflict.md).",
+    'results.note.spike_unmeasured': "Every episode holds a one-step knock spike at the grade step; whether it moved this experiment's result was never measured (conflict.md, section 3b, 30 September).",
     'results.note.dt_mismatch': "Trained at a {train_dt} s step and scored at {eval_dt} s, as these files' note lines record.",
     'results.note.no_thermal_only': 'Damage without the knock term was not recorded in these files, so how much of each difference is the knock term is unknown.',
-    'results.note.knock_model': 'The margin over current-grade rests on the knock model, which has not been tested on the car (drive C).',
-    'results.note.turbine_modelled': "Turbine temperatures are modelled, not measured: no sensor on this car reads them, and the housing's heat capacity, c_turb, is assumed; it sets τ.",
+    'results.note.knock_model': 'The margin over current-grade rests on the knock model, which has not been tested on the car (drive C; conflict.md, section 3a, 30 September).',
+    'results.note.turbine_modelled': "Turbine temperatures are modelled, not measured: no sensor on this car reads them, and the housing's heat capacity, c_turb, is assumed; it sets τ (CLAUDE.md, 'Limits the live app adds').",
     'results.note.no_other_notes': 'No other notes recorded for this experiment.',
 
     // --- the figures
