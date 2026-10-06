@@ -2717,7 +2717,8 @@ app/                  THE LIVE SUPERVISOR. Runs this same physics alongside
   results_api.py      The results tab (--simulation only): GET /results and
                       GET /api/results, answered to this machine only.
   results_data.py     Reads results/ on every request: one section per
-                      experiment, its verdict quoted, nothing recomputed.
+                      experiment, its verdict quoted, nothing written; the
+                      one figure computed is blind minus sighted per seed.
   results_provenance.py  Where a result file's numbers came from: the plant
                       states, the git facts, this tree's fingerprint.
   results_eval.py     Parses one evaluate.py result file, results/<prefix>_seed<N>.txt.

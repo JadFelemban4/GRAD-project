@@ -89,7 +89,8 @@ server reads `results/` again: each experiment is its own section, never
 counted together with another, labelled with the plant its files record, its
 preregistered verdict quoted word for word with its file and line, and its
 charts show their numbers under the pointer, on a tap and in a folded table.
-Nothing is recomputed and nothing is written. After a new drive, a retrain or a
+Nothing is written, and the only figure computed is blind minus sighted per
+seed, which the analysis scripts print too. After a new drive, a retrain or a
 new experiment, re-run the scripts that write `results/` and reload the page.
 It answers only a browser on this machine (`127.0.0.1` or `localhost`). Its
 own suite is `python -m app.test_results`.
