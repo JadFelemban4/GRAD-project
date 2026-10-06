@@ -166,3 +166,12 @@ minor findings are these known limits:
 - app/README.md's Tests section and file list were not updated for the tab;
 - no test pins the no-network rule or that subprocess is used for git only.
 
+## After the final fix wave
+
+The fix wave's own re-review found nothing to fix before merge and left four
+small points, parked rather than fixed (the process allows one fix wave):
+
+- a doc comment in `app/static/sim/results-view.mjs` (about line 257) still quotes the old unpaired line;
+- when the URL carries a fragment, Reload or Back lands on the fragment's section rather than on the reader's last place (still better than the top of the page, as before the fix);
+- the unpaired line reads "its file holds only —" for a file with no agent arm, and names only the agent arms of a one-arm file;
+- the build record's "checks, as printed" table carries Task 10's counts; after the fix wave the Python suite runs one test more and the node suite one more.
