@@ -8,7 +8,7 @@ Two things live here and they share the same physics.
 | `/review` | what the supervisor marked during a drive | none |
 | `/simulation` | **the 3D replay lab** — recorded drives, rendered | **none, ever** |
 | `/agents` | **the agent replay page** — two trained agents on one simulated episode | **none, ever** |
-| `/results` | **the results tab** — every experiment in `results/`, as its files record it | **none, ever** |
+| `/results` | **the results tab** — Jad's three evaluation experiments in `results/` (Phase D, D2 and C4) as their files record them; Ghassan's set comes with R1b | **none, ever** |
 
 Everything below is about `/simulation`, except the sections on opening
 `/agents` and `/results`. For the supervisor read `CLAUDE.md` and `AUDIT.md` first.
@@ -94,11 +94,12 @@ new experiment, re-run the scripts that write `results/` and reload the page.
 It answers only a browser on this machine (`127.0.0.1` or `localhost`). Its
 own suite is `python -m app.test_results`.
 
-The first time the lab is opened after this update, a browser that had it open
-in the hours before may still hold the old `i18n.mjs`, and the new nav link
-then reads `nav.results`. Reload the page once with the cache bypassed
-(Ctrl+F5). The server now answers `/static` with `Cache-Control: no-cache`, so
-later updates need no such reload.
+The first time the lab is opened after the update that added this tab, a
+browser that had opened the lab before it may still hold its old copy of
+`i18n.mjs` (for hours, or for days if that file had not changed for weeks),
+and the new nav link then reads `nav.results`. Reload the page once with the
+cache bypassed (Ctrl+F5). The server now answers `/static` with
+`Cache-Control: no-cache`, so later updates need no such reload.
 
 ---
 
