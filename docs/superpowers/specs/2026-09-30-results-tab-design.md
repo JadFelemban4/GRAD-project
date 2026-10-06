@@ -719,3 +719,79 @@ rule); §4.3 and §4.4 (a path is not an identity; separators; the raw-file chec
 order); §6.4 (the kept fields named, the life weights' condition, the split block, scipy); §7.1 and §7.2 (the lever
 strings, axis titles in HTML, drive names isolated, cell alignment); §7.3 (the colour roles of R2); §8 and §9 (the
 new suite in the checks, the skips, `NEW_MODULES` for `app/` files only, the Python wording test, the added cases).
+
+---
+
+## Build record, R1a
+
+Built on 2026-10-06, branch `JMF-2340550-results-tab`, by the R1a plan, task by task. Every figure in this record is copied from the run it names; the outputs themselves stay in the session scratchpad.
+
+### What was built
+
+- **The server side, under `--simulation` only.** `app/results_eval.py` parses an `evaluate.py` result file; `app/results_provenance.py` gives each file its plant state (§5.2), with git and the fingerprint of this tree; `app/results_data.py` finds the experiments in `results/` (§4.1), builds one section each with its notes, its quoted verdict and the cross-check against `analyse_phase_d.parse` (§4.4); `app/results_api.py` serves `GET /results` and `GET /api/results` behind the Host guard, one build at a time, `no-store`. `app/server.py` mounts them right after `install(app)`.
+- **Two changes the spec did not name, from the plan's review.** Mounting imports `app.results_provenance`, so the plant hash the tab compares against is taken when the server starts, which is when the server loaded the plant (§5.2). And `/static` now answers `Cache-Control: no-cache` in every mode: §7.1 records that it sent none, and R1a changes `i18n.mjs` and `style.css`, which the pages load without a version query, so a browser could keep running its cached copies after an update. That covers every later update. For this one, a browser that cached the lab's files before it needs one reload with the cache bypassed (Ctrl+F5), or its nav shows the key `nav.results`; `app/README.md` says so (Task 5's review).
+- **The page.** `app/static/results.html`, and in `app/static/sim/`: `results.mjs` (the DOM), `results-view.mjs` (every sentence), `results-charts.mjs` (the pairs chart and the hand-written comparison), `charts-lib.mjs` (the copy of Ghassan's drawing code), `results-format.mjs`, `results-strings.mjs` (Arabic and English) and `results.css`.
+- **The nav.** «النتائج» / "Results" is the third link of `simulation.html` and `agents.html`. With five links the lab's top bar ran wider than a phone, so `style.css` now gives its nav a row of its own there, as `agents.css` does (§7.4); the browser check measures it.
+- **Tests.** `app/test_results.py`; `results-format`, `results-strings`, `charts-lib`, `results-charts`, `results-view` and `results-page` under `app/static/sim/`; the two nav pins (`app/test_agents.py`, `agents-page.test.mjs`).
+- **Documents.** `app/README.md` (the page table, "Opening the results tab"), `app/start-simulation.ps1` (the banner); CLAUDE.md's repository layout: edited (its app/ block lists the results modules and the page).
+
+### Commits
+
+- `169deed` Results tab R1a (task 1): the evaluation-file parser
+- `1fe6e76` Results tab R1a (task 2): results_provenance part 1, the git helper and the live side
+- `13794a4` Results tab R1a (task 2): a git status or log that fails loses git, never reads as clean
+- `96c3beb` Results tab R1a (task 3): results_provenance part 2, the plant state of each file
+- `0dd7c52` Results tab R1a (task 3): derived constants changed after the server started leave no same state
+- `ac9f43f` Results tab R1a (task 4): results_data, the evaluation sections and build()
+- `38ac3de` Results tab R1a (task 4): duplicate seeds listed, no head without git, C4's convergence note, the Arabic word for current
+- `6d4a1c1` Results tab R1a (task 5): GET /results and /api/results under --simulation
+- `eaf16fa` Results tab R1a (task 5): say what no-cache on /static covers and what it does not
+- `04f1096` Results tab R1a (task 6): number formatting, the tab's strings, nav.results
+- `0497c1e` Results tab R1a (task 6): the notes name their files and dates (spec 5.4)
+- `84e1d83` Results tab R1a (task 7): the drawing library and the tab's stylesheet
+- `236b3ff` Results tab R1a (task 7): the chart-failure note follows the page's direction
+- `32b83eb` Results tab R1a (task 8): the pairs chart and the hand-written comparison
+- `ccc4acc` Results tab R1a (task 8): every seed stays on the pairs chart; no difference no script prints
+- `5416fd6` Results tab R1a (task 9): the page, its view helpers, and the nav link
+- `628367d` Results tab R1a (task 9): a mixed plant names each file's facts; a language switch keeps the reader's place
+- `1c16043` Results tab R1a (task 10): the tab in the README, the launcher and the layout
+
+### What the reviews changed
+
+Each task was reviewed before the next began; from Task 5 on, by four reviewers, one per lens, with three refuters on every serious finding. Where a finding held against the spec, the task got a fix commit, listed above with the others. The plan document keeps its code as planned; these are the places where the shipped code differs from it:
+
+- **Task 2** (`13794a4`): a `git status` or `git log` that exits with an error now loses git for the build, so a file is never shown unchanged when git could not say (`fingerprint.py`'s rule: unknown is not clean).
+- **Task 3** (`0dd7c52`): derived constants changed after the server started leave no "same" plant state, as changed plant files already did (§5.2).
+- **Task 4** (in its first commit, and `38ac3de`): the build asks git's status before its log, so a failed status leaves no commit date on the page; two files naming one seed are both listed as not read (§4.1); the head commit is left out when git is unavailable (§6.3); C4 carries its "not converged" note (§5.4); the Python wording test bans the Arabic word for current (§5.5).
+- **Task 5** (`eaf16fa`): the docstring of the `/static` revalidation says what it covers: every later update, but not a browser that cached the lab before this one, which needs one Ctrl+F5 (`app/README.md`).
+- **Task 6** (in its first commit, and `0497c1e`): three strings for the reason and note keys above, and five notes that now name their files and dates (§5.4).
+- **Task 7** (`236b3ff`): the "could not be drawn" note follows the page's direction in Arabic.
+- **Task 8** (`ccc4acc`): every seed stays on the pairs chart and in its table, with a dash where a median is missing (§4.1); blind minus sighted is shown for the total damage only, since no script prints it without the knock term (§5.1).
+- **Task 9** (`628367d`): when a section's files disagree on the plant, each seed carries its own facts (a changed file, its forced lines, its hashes and tag, its last commit) (§5.2); a language switch keeps the reader's place on the page and every open table; the plant line has a colon between its label and its state.
+
+### The checks, as printed
+
+| check | as printed |
+|---|---|
+| `python -m app.test_results` | Ran 119 tests in 8.960s · OK |
+| `python -m app.test_agents` | Ran 126 tests in 42.906s · FAILED (failures=16, errors=3, skipped=1) |
+| `python -m app.test_simulation` | Ran 15 tests in 1.101s · OK |
+| `python -m app.test_replay` | 49 of 49 checks pass |
+| `node --test "static/sim/*.test.mjs"` | ℹ tests 235 · ℹ pass 235 · ℹ fail 0 |
+| `python verify_docs.py` | All 73 checks pass (849 figure mentions scanned in the documents). |
+| `python drift_test.py` | 16 of 16 drifts CAUGHT |
+| the browser check (scratchpad script) | 18 of 18 browser checks pass |
+
+**The agents suite against its baseline.** Before R1a the suite already failed, because the merged plant refuses Jad's agents; the coordinator captured that list before any R1a change. Entries this run has and the baseline does not: none.
+
+**The browser check.** Every check passed. Screenshots at 1440 px and in a 390 px frame, both languages and both themes, of `/results`, `/simulation` and `/agents`, are in the scratchpad, not in the repository.
+
+### The build time of `/api/results`
+
+`INFO  /api/results build: cold 325 ms (wall 332 ms), warm 244 ms (wall 253 ms)` (the build's own `elapsed_ms`, and the wall clock seen by the client, on the first request after the server started and on the next).
+
+### Left for R1b and R2
+
+- **R1b, Ghassan's set:** `analyse_agent_set.py`, its committed capture and the `posthoc:` anchors; the agent-set reader and port; the pairs chart both ways; `f-eval`, `f-abl`, `f-trade`, `f-curves`; the two new figures; the incomplete box; the two provenance lines; the record fold.
+- **R2, the simulator and the car:** every figure of §3.3 and §3.4, their readers, strings and tests, and the defect fixes that belong to them.
+- **Not in R1a, by its contract:** stepping a crosshair or nearest-point chart with the arrow keys (§7.3); R1a's figures are per-mark charts, whose marks take keyboard focus.
