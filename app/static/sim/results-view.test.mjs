@@ -100,13 +100,40 @@ test('every state has its own label, and an unknown one claims nothing', () => {
   }
 });
 
-test('a mixed section is told seed by seed, with each reason', () => {
+test('a mixed section is told seed by seed, with each reason and each file\'s own facts', () => {
+  // Spec 5.2: the facts appear in every state, mixed included. Seed 2's file is
+  // modified (its last commit is not a fact about it) and reached through git;
+  // seed 3's was forced (its own lines quoted, no hashes).
+  const forced = '!! runs_c4/blind_seed3: PLANT MISMATCH';
   const prov = { state: 'mixed', reason: null, tag: null, commits: ['c5a5341'],
-    files: { 1: file(1, { state: 'cannot_compare', reason: 'python', recorded: { ...file(1).recorded, python: '3.13.2' } }), 0: file(0) } };
+    files: {
+      3: file(3, { state: 'forced', forced: [forced], tag: null, route: null }),
+      1: file(1, { state: 'cannot_compare', reason: 'python', tag: null, route: null,
+        recorded: { ...file(1).recorded, python: '3.13.2' } }),
+      2: file(2, { state: 'same_code', tag: null, route: 'git', differs: [],
+        recorded: { ...file(2).recorded, plant_sha: '9f1c2e3d4b5a6978', python: '3.13.2' },
+        file: { rel: 'results/c4_seed2.txt', commit: { short: 'a3a048e', date: '2026-09-22T03:02:51+03:00' }, changed: true } }),
+      0: file(0),
+    } };
   assert.deepEqual(plantView(prov, 'en').details, [
     'Seed 0 · Made on another plant',
+    'recorded b5a3069f32a83754 · this tree c236a8db3e201090',
+    'the plant of sep17-before-merge',
+    'last commit a3a048e (2026-09-22T03:02:51+03:00)',
     'Seed 1 · Cannot compare · recorded under Python 3.13.2; this server runs 3.12.10, and git cannot reach the recorded commit',
+    'recorded b5a3069f32a83754 · this tree c236a8db3e201090',
+    'last commit a3a048e (2026-09-22T03:02:51+03:00)',
+    'Seed 2 · Same plant code as this tree; derived constants not recorded',
+    'recorded 9f1c2e3d4b5a6978 · this tree c236a8db3e201090',
+    'compared through git: recorded under another Python',
+    'results/c4_seed2.txt: changed since its last commit (2026-09-22T03:02:51+03:00)',
+    'Seed 3 · Agents scored with a plant mismatch forced',
+    "The file's own lines:",
+    forced,
+    'last commit a3a048e (2026-09-22T03:02:51+03:00)',
+    'from commits c5a5341',
   ]);
+  assert.ok(plantView(prov, 'ar').details.includes(iso(forced)), 'a forced line sits in an isolate in Arabic too');
 });
 
 test('a forced file quotes its own lines and shows no hash comparison', () => {

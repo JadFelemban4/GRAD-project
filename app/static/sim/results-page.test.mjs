@@ -122,6 +122,17 @@ test('the nav reads simulation, agents, results (active), monitor, review', () =
   assert.deepEqual(links.map(a => attr(a, 'aria-current') || null), [null, null, 'page', null, null]);
 });
 
+test('every fold results.mjs builds carries a stable key, so a language switch can open it again', () => {
+  // A language switch rebuilds every section. Each details carries data-fold
+  // (its section id and figure kind, or its section id and "verdict"); render()
+  // reads the open ones before the rebuild and opens them again after it.
+  const src = read(new URL('./results.mjs', import.meta.url));
+  const folds = [...src.matchAll(/const (\w+) = el\('details', '([\w-]+)'\)/g)].map(m => ({ name: m[1], cls: m[2] }));
+  assert.deepEqual(folds.map(f => f.cls).sort(), ['rc-table', 'rc-verdict-lines']);
+  for (const { name, cls } of folds) assert.ok(src.includes(`${name}.dataset.fold = `), `${cls} carries no data-fold key`);
+  assert.ok(src.includes("querySelectorAll('details[data-fold][open]')"), 'the open folds are not read before a rebuild');
+});
+
 test('the page module and the markup carry no literal invisible character', () => {
   // An isolate in the markup is a character reference (&#x2066;), never the
   // character: an editor shows neither, and the Write tool decodes escapes.

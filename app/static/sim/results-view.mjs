@@ -80,54 +80,76 @@ function reasonText(reason, recordedPython, livePython, lang) {
 
 const distinct = values => [...new Set(values.filter(v => v !== null && v !== undefined && v !== ''))];
 
-/**
- * The plant line of a section and its details, from section_provenance's
- * answer: {state, reason, tag, commits, files: {seed: classify_eval(...)}}.
- * A common state lists both hashes, the tag, the git route, the reason, the
- * recorded commits and each file's own commit; "mixed" lists every seed.
- */
-export function plantView(prov, lang) {
-  const files = Object.entries(prov?.files || {})
-    .sort((a, b) => Number(a[0]) - Number(b[0])).map(([seed, f]) => ({ seed, ...f }));
-  const state = prov?.state || 'cannot_compare';
-  const details = [];
-  if (state === 'mixed') {
-    for (const f of files) {
-      const parts = [t(lang, 'results.tip.seed', { seed: slot(lang, Number(f.seed)) }), stateText(f.state, lang)];
-      if (f.reason) parts.push(reasonText(f.reason, f.recorded?.python, f.live?.python, lang));
-      details.push(parts.join(' · '));
-    }
-    return { state, text: stateText(state, lang), details };
-  }
+// The facts of files that share one state (spec 5.2: they appear in every
+// state): a forced state's own lines quoted, both hashes, the tag and the git
+// route. A section in one state passes all its files; a mixed one, each
+// seed's file alone, under that seed's own state.
+function plantFacts(files, state, tag, lang) {
+  const out = [];
   const forced = distinct(files.flatMap(f => f.forced || []));
   if (state === 'forced' && forced.length) {
-    details.push(t(lang, 'results.plant.forced_lines'));
-    for (const line of forced) details.push(slot(lang, line));
+    out.push(t(lang, 'results.plant.forced_lines'));
+    for (const line of forced) out.push(slot(lang, line));
   }
   const recorded = distinct(files.map(f => f.recorded?.plant_sha));
   const live = distinct(files.map(f => f.live?.plant_sha));
   if (recorded.length && state !== 'forced' && state !== 'not_recorded') {
-    details.push(t(lang, 'results.plant.hashes', { recorded: slot(lang, recorded.join(', ')), live: slot(lang, live.join(', ')) }));
+    out.push(t(lang, 'results.plant.hashes', { recorded: slot(lang, recorded.join(', ')), live: slot(lang, live.join(', ')) }));
   }
-  if (prov?.tag) details.push(t(lang, 'results.plant.tag', { tag: slot(lang, prov.tag) }));
-  if (files.length && files.every(f => f.route === 'git')) details.push(t(lang, 'results.plant.route_git'));
-  if (prov?.reason) {
-    details.push(reasonText(prov.reason, distinct(files.map(f => f.recorded?.python)).join(', '),
-      distinct(files.map(f => f.live?.python)).join(', '), lang));
-  }
-  if ((prov?.commits || []).length) details.push(t(lang, 'results.plant.commits', { list: slot(lang, prov.commits.join(', ')) }));
+  if (tag) out.push(t(lang, 'results.plant.tag', { tag: slot(lang, tag) }));
+  if (files.length && files.every(f => f.route === 'git')) out.push(t(lang, 'results.plant.route_git'));
+  return out;
+}
+
+// Each file's own commit: a file git shows modified or untracked reads
+// "changed since its last commit (<date>)" and its last commit is not shown as
+// a fact about it; every other file shows its last commit, each one once.
+function fileCommits(files, lang) {
+  const out = [];
   const committed = new Map();
   for (const f of files) {
     const c = f.file?.commit;
     if (f.file?.changed) {
-      details.push(`${slot(lang, f.file.rel)}: ${t(lang, 'results.plant.changed', { date: slot(lang, c?.date) })}`);
+      out.push(`${slot(lang, f.file.rel)}: ${t(lang, 'results.plant.changed', { date: slot(lang, c?.date) })}`);
     } else if (c && c.short) {
       committed.set(`${c.short} ${c.date}`, c);
     }
   }
   for (const c of committed.values()) {
-    details.push(t(lang, 'results.plant.committed', { commit: slot(lang, c.short), date: slot(lang, c.date) }));
+    out.push(t(lang, 'results.plant.committed', { commit: slot(lang, c.short), date: slot(lang, c.date) }));
   }
+  return out;
+}
+
+/**
+ * The plant line of a section and its details, from section_provenance's
+ * answer: {state, reason, tag, commits, files: {seed: classify_eval(...)}}.
+ * A common state lists both hashes, the tag, the git route, the reason, the
+ * recorded commits and each file's own commit; "mixed" lists every seed with
+ * its own state, reason and facts by the same rules, then the commits.
+ */
+export function plantView(prov, lang) {
+  const files = Object.entries(prov?.files || {})
+    .sort((a, b) => Number(a[0]) - Number(b[0])).map(([seed, f]) => ({ seed, ...f }));
+  const state = prov?.state || 'cannot_compare';
+  const commits = (prov?.commits || []).length
+    ? [t(lang, 'results.plant.commits', { list: slot(lang, prov.commits.join(', ')) })] : [];
+  const details = [];
+  if (state === 'mixed') {
+    for (const f of files) {
+      const parts = [t(lang, 'results.tip.seed', { seed: slot(lang, Number(f.seed)) }), stateText(f.state, lang)];
+      if (f.reason) parts.push(reasonText(f.reason, f.recorded?.python, f.live?.python, lang));
+      details.push(parts.join(' · '), ...plantFacts([f], f.state, f.tag, lang), ...fileCommits([f], lang));
+    }
+    details.push(...commits);
+    return { state, text: stateText(state, lang), details };
+  }
+  details.push(...plantFacts(files, state, prov?.tag, lang));
+  if (prov?.reason) {
+    details.push(reasonText(prov.reason, distinct(files.map(f => f.recorded?.python)).join(', '),
+      distinct(files.map(f => f.live?.python)).join(', '), lang));
+  }
+  details.push(...commits, ...fileCommits(files, lang));
   return { state, text: stateText(state, lang), details };
 }
 

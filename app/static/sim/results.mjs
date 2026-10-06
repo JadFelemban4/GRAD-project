@@ -129,7 +129,7 @@ function renderNotRead() {
 }
 
 // ----------------------------------------------------------- a section
-function verdictBlock(verdict) {
+function verdictBlock(verdict, fold) {
   const view = verdictView(verdict, currentLang);
   const box = el('section', 'rc-verdict');
   box.dataset.state = view.state;
@@ -146,6 +146,7 @@ function verdictBlock(verdict) {
   box.appendChild(cells);
   if (view.lines.length) {
     const more = el('details', 'rc-verdict-lines');
+    more.dataset.fold = fold;
     more.appendChild(el('summary', '', t(currentLang, 'results.verdict.lines')));
     for (const line of view.lines) {
       const fig = el('figure', 'quote');
@@ -187,8 +188,9 @@ function legend(kind, layout, section) {
   return box;
 }
 
-function numbersTable(table) {
+function numbersTable(table, fold) {
   const details = el('details', 'rc-table');
+  details.dataset.fold = fold;
   details.appendChild(el('summary', '', t(currentLang, 'results.table.toggle')));
   const tbl = el('table');
   const head = el('tr');
@@ -238,7 +240,8 @@ function figure(section, kind) {
     fig.appendChild(host);
     fig.appendChild(el('div', 'rc-axis-x', t(currentLang, 'results.chart.axis.seed')));
     fig.appendChild(legend(kind, layout, section));
-    fig.appendChild(numbersTable(hand ? handTable(layout, currentLang) : pairsTable(layout, currentLang)));
+    fig.appendChild(numbersTable(hand ? handTable(layout, currentLang) : pairsTable(layout, currentLang),
+      `${section.id}:${kind}`));
     if (layout.empty) {
       host.appendChild(el('p', 'rc-chart-error', t(currentLang, 'results.chart.unavailable')));
       return { node: fig, chart: null };
@@ -271,11 +274,11 @@ function okSection(section, markers) {
   const plant = plantView(section.provenance, currentLang);
   const line = el('p', 'rc-plant');
   line.dataset.state = plant.state;
-  line.append(el('b', '', t(currentLang, 'results.plant.label')), ' ', el('span', '', plant.text));
+  line.append(el('b', '', t(currentLang, 'results.plant.label')), ': ', el('span', '', plant.text));
   node.appendChild(line);
   node.appendChild(list('rc-plant-details', plant.details));
   node.appendChild(list('rc-checks', checkItems(section.checks, currentLang)));
-  node.appendChild(verdictBlock(section.verdict));
+  node.appendChild(verdictBlock(section.verdict, `${section.id}:verdict`));
   const notesHeading = el('p', 'rc-note rc-notes-heading');
   notesHeading.appendChild(el('b', '', t(currentLang, 'results.notes.heading')));
   node.appendChild(notesHeading);
@@ -313,27 +316,54 @@ function buildSection(section, markers) {
   }
 }
 
+// Builds every section and returns its charts; render() mounts them.
 function renderSections() {
   const host = $('sections');
-  if (!host) return;
+  if (!host) return [];
   host.textContent = '';
   const rows = summaryRows(state.payload, currentLang);
+  const charts = [];
   for (const section of state.payload?.sections || []) {
     const markers = rows.find(r => r.id === section.id)?.markers || [];
     const built = buildSection(section, markers);
     host.appendChild(built.node);
-    // Mounted once the node is in the page, so each host has its width.
-    for (const chart of built.charts) mounter.mount(chart.host, chart.draw);
+    charts.push(...built.charts);
   }
+  return charts;
+}
+
+// The reader's place before a rebuild (a language switch): the section at the
+// top of the viewport with its offset, and every open fold. At the very top of
+// the page there is no section to hold.
+function readPlace() {
+  const top = window.scrollY > 0
+    ? [...document.querySelectorAll('#sections > .rc-section')].find(s => s.getBoundingClientRect().bottom > 0)
+    : null;
+  return {
+    id: top ? top.id : null,
+    offset: top ? top.getBoundingClientRect().top : 0,
+    open: new Set([...document.querySelectorAll('details[data-fold][open]')].map(d => d.dataset.fold)),
+  };
 }
 
 function render() {
+  const place = readPlace();
   mounter.clear();
   renderError();
   renderBuilt();
   renderSummary();
-  renderSections();
+  const charts = renderSections();
   renderNotRead();
+  for (const fold of document.querySelectorAll('details[data-fold]')) {
+    if (place.open.has(fold.dataset.fold)) fold.open = true;
+  }
+  // Mounted once the whole page is built: each host has its width, and no
+  // layout is read while the page is shorter than before, so the browser has
+  // no shorter page to clamp the scroll to. Then the reader's section goes
+  // back to its offset.
+  for (const chart of charts) mounter.mount(chart.host, chart.draw);
+  const anchor = place.id ? $(place.id) : null;
+  if (anchor) window.scrollBy(0, anchor.getBoundingClientRect().top - place.offset);
 }
 
 // ---------------------------------------------------- theme and language
