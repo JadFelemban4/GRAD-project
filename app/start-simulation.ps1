@@ -61,6 +61,8 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host '  compute one, start the server with an interpreter that has it:'
     Write-Host '      <that python> -m app.server --simulation'
 }
+Write-Host '  results tab    ->  ' -NoNewline
+Write-Host "http://localhost:$Port/results"
 Write-Host ''
 
 python -m app.server --simulation --http-port $Port

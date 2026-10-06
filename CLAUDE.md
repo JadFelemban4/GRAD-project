@@ -2700,7 +2700,8 @@ app/                  THE LIVE SUPERVISOR. Runs this same physics alongside
   reader.py           OBD-II, or replay of the logs above. Channel budget here.
   alerts.py           thermal / mismatch / novel. The ONLY file that writes.
   server.py           localhost. /, /driver, /review; --simulation adds the 3D
-                      replay lab and the agents page, with no vehicle connection.
+                      replay lab, the agents page and the results tab, with no
+                      vehicle connection.
   static/*.html       dashboard, driver mode, review view.
   test_replay.py      Replay-driven regression checks. Run after any app change.
   agent_api.py        The agent replay (--simulation only): trained agents on
@@ -2713,6 +2714,16 @@ app/                  THE LIVE SUPERVISOR. Runs this same physics alongside
                       (laya_worker.py); no key.
   model_questions.py  The one question both models are asked. Their answers are
                       shown, never applied.
+  results_api.py      The results tab (--simulation only): GET /results and
+                      GET /api/results, answered to this machine only.
+  results_data.py     Reads results/ on every request: one section per
+                      experiment, its verdict quoted, nothing recomputed.
+  results_provenance.py  Where a result file's numbers came from: the plant
+                      states, the git facts, this tree's fingerprint.
+  results_eval.py     Parses one evaluate.py result file, results/<prefix>_seed<N>.txt.
+  test_results.py     The results tab's suite.
+  static/results.html, static/sim/results*.mjs, charts-lib.mjs
+                      The results tab's page: view, charts, strings, styles.
   review_log.jsonl    Generated, gitignored. Marked events only, never raw data.
 ```
 

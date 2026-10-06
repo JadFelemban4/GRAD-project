@@ -2032,5 +2032,35 @@ class PageTests(unittest.TestCase):
         self.assertNotIn("<html", refused.text)
 
 
+class DocsTests(unittest.TestCase):
+    """The lab's own documents name the results tab where a person looks for
+    it: the launcher's banner and app/README.md's page table and its section
+    (results-tab design, what else the change touches)."""
+
+    def read(self, rel):
+        path = ROOT / "app" / rel
+        self.assertTrue(path.is_file(), f"app/{rel} does not exist")
+        return path.read_text(encoding="utf-8")
+
+    def test_the_launcher_names_the_results_tab_and_keeps_its_last_line(self):
+        text = self.read("start-simulation.ps1")
+        self.assertTrue("localhost:$Port/results" in text, "the banner does not name /results")
+        self.assertLess(text.index("localhost:$Port/agents"), text.index("localhost:$Port/results"),
+                        "the results line follows the agent replay's")
+        self.assertEqual(text.rstrip().splitlines()[-1],
+                         "python -m app.server --simulation --http-port $Port")
+
+    def test_the_readme_lists_the_page_and_says_how_to_open_it(self):
+        text = self.read("README.md")
+        rows = [line for line in text.splitlines() if line.startswith("| `/")]
+        self.assertEqual([row.split("|")[1].strip() for row in rows],
+                         ["`/` and `/driver`", "`/review`", "`/simulation`", "`/agents`", "`/results`"])
+        self.assertIn("**none, ever**", rows[-1], "the results tab has no vehicle connection")
+        self.assertIn("### Opening the results tab, `/results`", text)
+        section = text.split("### Opening the results tab, `/results`", 1)[1].split("\n---", 1)[0]
+        for needed in ("--simulation", "http://localhost:8000/results", "python -m app.test_results"):
+            self.assertIn(needed, section, f"the section does not say {needed}")
+
+
 if __name__ == "__main__":
     unittest.main()

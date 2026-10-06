@@ -8,9 +8,10 @@ Two things live here and they share the same physics.
 | `/review` | what the supervisor marked during a drive | none |
 | `/simulation` | **the 3D replay lab** — recorded drives, rendered | **none, ever** |
 | `/agents` | **the agent replay page** — two trained agents on one simulated episode | **none, ever** |
+| `/results` | **the results tab** — every experiment in `results/`, as its files record it | **none, ever** |
 
-Everything below is about `/simulation`, except the section on opening
-`/agents`. For the supervisor read `CLAUDE.md` and `AUDIT.md` first.
+Everything below is about `/simulation`, except the sections on opening
+`/agents` and `/results`. For the supervisor read `CLAUDE.md` and `AUDIT.md` first.
 
 **The project never writes to the vehicle's ECU.** `app/test_replay.py`
 asserts that no write path exists and that no raw car data reaches the disk.
@@ -72,6 +73,32 @@ Then open <http://localhost:8000/agents?runs=runs_c4&seed=5&ep=1> and press
 minute and a quarter, and it streams: each second can be played as soon as
 it has been computed. Everything on the page is a simulation, and nothing is
 written to disk.
+
+### Opening the results tab, `/results`
+
+Like `/agents`, the tab exists only when the server runs with `--simulation`.
+It replays nothing and needs neither stable-baselines3 nor torch, so any
+interpreter that runs the lab runs it, `app\start-simulation.ps1` included:
+
+```powershell
+C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m app.server --simulation
+```
+
+Then open <http://localhost:8000/results>. Every time the page opens, the
+server reads `results/` again: each experiment is its own section, never
+counted together with another, labelled with the plant its files record, its
+preregistered verdict quoted word for word with its file and line, and its
+charts show their numbers under the pointer, on a tap and in a folded table.
+Nothing is recomputed and nothing is written. After a new drive, a retrain or a
+new experiment, re-run the scripts that write `results/` and reload the page.
+It answers only a browser on this machine (`127.0.0.1` or `localhost`). Its
+own suite is `python -m app.test_results`.
+
+The first time the lab is opened after this update, a browser that had it open
+in the hours before may still hold the old `i18n.mjs`, and the new nav link
+then reads `nav.results`. Reload the page once with the cache bypassed
+(Ctrl+F5). The server now answers `/static` with `Cache-Control: no-cache`, so
+later updates need no such reload.
 
 ---
 
