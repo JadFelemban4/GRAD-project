@@ -769,6 +769,7 @@ Each task was reviewed before the next began: Tasks 5 to 9 by four reviewers, on
 - **Task 8** (`ccc4acc`): every seed stays on the pairs chart and in its table, with a dash where a median is missing (§4.1); blind minus sighted is shown for the total damage only, since no script prints it without the knock term (§5.1).
 - **Task 9** (`628367d`): when a section's files disagree on the plant, each seed carries its own facts (a changed file, its forced lines, its hashes and tag, its last commit) (§5.2); a language switch keeps the reader's place on the page and every open table; the plant line has a colon between its label and its state.
 - **Task 10** (a fix commit after this record): the README says which experiments the tab shows in R1a, and how long a browser can keep its old copy of `i18n.mjs`; this record says how Task 10 was reviewed.
+- **The final review** (its fix commits): the heading names what R1a shows and says the agent sets come with R1b; the intro says which one figure is computed; the build line, the run commits and the unpaired line say what they mean; a failed build is logged on the server and named on the page; the files-not-read list separates path and reason; reload, Back and a link to a section keep their place.
 
 ### The checks, as printed
 
