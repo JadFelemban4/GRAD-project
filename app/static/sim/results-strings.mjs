@@ -33,14 +33,15 @@ export const RESULTS_STRINGS = {
   ar: {
     // --- page, intro, footer and loading
     'results.page.title': 'النتائج — GRAD',
-    'results.intro.heading': 'كل تجربة، كما تسجّلها ملفاتها',
-    'results.intro.note': 'يُقرأ كل ما هنا من \u2066results/\u2069 في كل مرة تُفتح فيها هذه الصفحة. لا يُعاد هنا حساب أي شيء.',
+    'results.intro.heading': 'تجارب التقييم، كما تسجّلها ملفاتها',
+    'results.intro.note': 'يُقرأ كل ما هنا من \u2066results/\u2069 في كل مرة تُفتح فيها هذه الصفحة. الرقم الوحيد المحسوب هنا هو الأعمى \u2212 المُبصر لكل بذرة، كما تطبعه سكربتات التحليل.',
+    'results.intro.agent_sets': 'مجموعات الوكلاء (\u2066results/agents/\u2069، ومنها وكلاء غسان العشرون) ليست في هذه الصفحة بعد؛ تأتي مع المرحلة \u2066R1b\u2069.',
     'results.footer.index': '03 — RESULTS',
     'results.loading': 'جارٍ قراءة ملفات النتائج…',
     'results.error.fetch': 'تعذّرت قراءة النتائج (\u2066{status}\u2069).',
 
     // --- the build line and the tab-level warnings
-    'results.built.line': 'قُرئت من \u2066commit {head}\u2069 · \u2066Python {python}\u2069 · المحاكي \u2066{plant}\u2069',
+    'results.built.line': 'المستودع عند \u2066commit {head}\u2069 · \u2066Python {python}\u2069 · المحاكي \u2066{plant}\u2069',
     'results.built.git_unavailable': 'لا يتوفر \u2066git\u2069 هنا، فلا تُعرض معلومات الـ \u2066commits\u2069.',
     'results.built.restart': 'تغيّرت ملفات المحاكي بعد أن بدأ الخادم: أعد تشغيل الخادم.',
     'results.built.derived_restart': 'تغيّرت الثوابت المشتقة بعد أن بدأ الخادم: أعد تشغيل الخادم.',
@@ -84,7 +85,7 @@ export const RESULTS_STRINGS = {
     'results.plant.reason.import': 'تعذّر حساب بصمة هذه النسخة',
     'results.plant.reason.derived_differs': 'الثوابت المشتقة مختلفة',
     'results.plant.reason.derived_restart': 'تغيّرت الثوابت المشتقة بعد أن بدأ الخادم؛ أعد تشغيل الخادم',
-    'results.plant.commits': 'من الـ \u2066commits\u2069 {list}',
+    'results.plant.commits': 'شُغّلت من الـ \u2066commits\u2069 {list}',
     'results.plant.committed': 'آخر \u2066commit {commit}\u2069 (\u2066{date}\u2069)',
     'results.plant.changed': 'تغيّر منذ آخر \u2066commit\u2069 له (\u2066{date}\u2069)',
     'results.plant.forced_lines': 'أسطر الملف نفسه:',
@@ -153,7 +154,7 @@ export const RESULTS_STRINGS = {
     'results.table.current_grade': 'وسيط \u2066current-grade\u2069',
     'results.table.baseline': 'وسيط حاسوب المحرك المنمذَج',
     'results.table.reactive': 'وسيط السياسة التفاعلية',
-    'results.unpaired': 'البذرة \u2066{seed}\u2069 بلا زوج ({have})؛ لم تُرسم.',
+    'results.unpaired': 'البذرة \u2066{seed}\u2069 بلا زوج: في ملفها {have} فقط؛ لم تُرسم.',
 
     // --- files not read, and the summary's marker
     'results.not_read.heading': 'ملفات لم تُقرأ',
@@ -170,14 +171,15 @@ export const RESULTS_STRINGS = {
   en: {
     // --- page, intro, footer and loading
     'results.page.title': 'Results — GRAD',
-    'results.intro.heading': 'Every experiment, as its files record it',
-    'results.intro.note': 'Read from results/ every time this page opens. Nothing here is recomputed.',
+    'results.intro.heading': 'The evaluation experiments, as their files record them',
+    'results.intro.note': 'Read from results/ every time this page opens. The only figure computed here is blind minus sighted per seed, as the analysis scripts print it.',
+    'results.intro.agent_sets': "Agent sets (results/agents/, Ghassan's twenty agents among them) are not on this tab yet; they come with milestone R1b.",
     'results.footer.index': '03 — RESULTS',
     'results.loading': 'Reading the result files…',
     'results.error.fetch': 'Could not read the results ({status}).',
 
     // --- the build line and the tab-level warnings
-    'results.built.line': 'Read from commit {head} · Python {python} · plant {plant}',
+    'results.built.line': 'Repository at commit {head} · Python {python} · plant {plant}',
     'results.built.git_unavailable': 'git is not available here, so the commit facts are left out.',
     'results.built.restart': 'The plant files changed after the server started: restart the server.',
     'results.built.derived_restart': 'The derived constants changed after the server started: restart the server.',
@@ -221,7 +223,7 @@ export const RESULTS_STRINGS = {
     'results.plant.reason.import': 'the live fingerprint could not be built',
     'results.plant.reason.derived_differs': 'the derived constants differ',
     'results.plant.reason.derived_restart': 'the derived constants changed after the server started; restart the server',
-    'results.plant.commits': 'from commits {list}',
+    'results.plant.commits': 'run from commits {list}',
     'results.plant.committed': 'last commit {commit} ({date})',
     'results.plant.changed': 'changed since its last commit ({date})',
     'results.plant.forced_lines': "The file's own lines:",
@@ -290,7 +292,7 @@ export const RESULTS_STRINGS = {
     'results.table.current_grade': 'Current-grade median',
     'results.table.baseline': 'Engine computer median',
     'results.table.reactive': 'Reactive median',
-    'results.unpaired': 'Seed {seed} has no pair ({have}); it is not drawn.',
+    'results.unpaired': 'Seed {seed} has no pair: its file holds only {have}; it is not drawn.',
 
     // --- files not read, and the summary's marker
     'results.not_read.heading': 'Files not read',

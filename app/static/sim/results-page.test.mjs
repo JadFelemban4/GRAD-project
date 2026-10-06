@@ -92,6 +92,13 @@ test('every key results.html names exists in both languages, carries no placehol
   for (const [, , key, text] of marked) assert.equal(decode(text), STRINGS.ar[key], `the markup's text for ${key}`);
 });
 
+test('the intro says what R1a leaves out: the agent-sets line follows the intro note, in the same style', () => {
+  const intro = read(HTML).match(/<section class="page-intro results-intro">([\s\S]*?)<\/section>/);
+  assert.ok(intro, 'results.html has no intro section');
+  const notes = [...intro[1].matchAll(/<p class="([^"]+)" data-i18n="([^"]+)">/g)].map(m => [m[1], m[2]]);
+  assert.deepEqual(notes, [['intro-note', 'results.intro.note'], ['intro-note', 'results.intro.agent_sets']]);
+});
+
 test('every key results.mjs names exists, and each t() call fills exactly its placeholders', () => {
   const src = read(new URL('./results.mjs', import.meta.url));
   const calls = [...src.matchAll(/\bt\(\s*currentLang\s*,\s*'([^']+)'\s*(?:,\s*\{([^}]*)\})?/g)]
@@ -145,10 +152,13 @@ test('the page module and the markup carry no literal invisible character', () =
 
 test('results.html carries no figure of its own', () => {
   // verify_docs.py reads .html: the numbers live in the data, never in the
-  // markup. The lab's footer (B58, the page index) is the only exception.
+  // markup. The lab's footer (B58, the page index) is one exception; the name
+  // of the milestone the agent sets come with, R1b, is the other: a name, not
+  // a figure.
   const text = read(HTML)
     .replace(/<script[\s\S]*?<\/script>/g, '')
     .replace(/<footer[\s\S]*?<\/footer>/g, '')
+    .replace(/\bR1b\b/g, '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&#x[0-9a-f]+;/gi, '');
   assert.deepEqual(text.match(/\d+/g) || [], []);

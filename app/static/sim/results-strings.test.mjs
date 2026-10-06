@@ -43,12 +43,13 @@ const nfc = text => text.normalize('NFC');
 // Contract section 5: every key, with its English exactly as the contract fixes it.
 const CONTRACT = {
   'results.page.title': 'Results — GRAD',
-  'results.intro.heading': 'Every experiment, as its files record it',
-  'results.intro.note': 'Read from results/ every time this page opens. Nothing here is recomputed.',
+  'results.intro.heading': 'The evaluation experiments, as their files record them',
+  'results.intro.note': 'Read from results/ every time this page opens. The only figure computed here is blind minus sighted per seed, as the analysis scripts print it.',
+  'results.intro.agent_sets': "Agent sets (results/agents/, Ghassan's twenty agents among them) are not on this tab yet; they come with milestone R1b.",
   'results.footer.index': '03 — RESULTS',
   'results.loading': 'Reading the result files…',
   'results.error.fetch': 'Could not read the results ({status}).',
-  'results.built.line': 'Read from commit {head} · Python {python} · plant {plant}',
+  'results.built.line': 'Repository at commit {head} · Python {python} · plant {plant}',
   'results.built.git_unavailable': 'git is not available here, so the commit facts are left out.',
   'results.built.restart': 'The plant files changed after the server started: restart the server.',
   'results.built.derived_restart': 'The derived constants changed after the server started: restart the server.',
@@ -86,7 +87,7 @@ const CONTRACT = {
   'results.plant.reason.import': 'the live fingerprint could not be built',
   'results.plant.reason.derived_differs': 'the derived constants differ',
   'results.plant.reason.derived_restart': 'the derived constants changed after the server started; restart the server',
-  'results.plant.commits': 'from commits {list}',
+  'results.plant.commits': 'run from commits {list}',
   'results.plant.committed': 'last commit {commit} ({date})',
   'results.plant.changed': 'changed since its last commit ({date})',
   'results.plant.forced_lines': "The file's own lines:",
@@ -145,7 +146,7 @@ const CONTRACT = {
   'results.table.current_grade': 'Current-grade median',
   'results.table.baseline': 'Engine computer median',
   'results.table.reactive': 'Reactive median',
-  'results.unpaired': 'Seed {seed} has no pair ({have}); it is not drawn.',
+  'results.unpaired': 'Seed {seed} has no pair: its file holds only {have}; it is not drawn.',
   'results.not_read.heading': 'Files not read',
   'results.not_read.reason.name': 'the name is not <prefix>_seed<N>.txt',
   'results.not_read.reason.header': 'the first line is not an evaluate.py header',
@@ -361,7 +362,8 @@ test('the notes keep their clauses in Arabic, and their literal numbers are isol
     'results.note.knock_model': [iso('current-grade'), 'نموذج الطَّرْق', 'لم يُختبر على السيارة', iso('C'), iso('conflict.md'), iso('3a'), iso('30')],
     'results.note.turbine_modelled': ['منمذَجة لا مقيسة', 'لا حساس', iso('c_turb'), 'مفترَضة', iso('τ'), iso('CLAUDE.md')],
     'results.summary.note': ['تجربة مستقلة', 'لا تُدمج الصفوف في نتيجة واحدة'],
-    'results.intro.note': [iso('results/'), 'لا يُعاد هنا حساب أي شيء'],
+    'results.intro.note': [iso('results/'), 'الرقم الوحيد المحسوب هنا', 'سكربتات التحليل'],
+    'results.intro.agent_sets': [iso('results/agents/'), 'وكلاء غسان العشرون', iso('R1b')],
     'results.chart.mei': [iso('{mei}'), 'الحد الأدنى المهم', 'وحدة ضرر'],
     'results.chart.mei_after': [iso('22'), 'بعد هذه النتيجة'],
     'results.plant.same_code': ['الثوابت المشتقة غير'],
@@ -392,7 +394,7 @@ test('t() fills a results line in both languages, leaving no placeholder', () =>
     for (const value of ['abc1234', '3.12.10', 'f00dbabe']) assert.ok(line.includes(value), `${lang}: ${line}`);
     assert.doesNotMatch(line, /\{\w+\}/, `${lang}: an unfilled placeholder in ${line}`);
   }
-  assert.equal(t('en', 'results.unpaired', { seed: 3, have: 'sighted' }), 'Seed 3 has no pair (sighted); it is not drawn.');
+  assert.equal(t('en', 'results.unpaired', { seed: 3, have: 'sighted' }), 'Seed 3 has no pair: its file holds only sighted; it is not drawn.');
   assert.equal(t('ar', 'results.tip.seed', { seed: 3 }), `بذرة ${iso('3')}`);
 });
 
@@ -404,7 +406,7 @@ test('results-strings.mjs carries its invisible characters as escapes, never lit
   const count = hex => src.split(escapeText(hex)).length - 1;
   assert.ok(count('2066') > 0, 'the Arabic lines isolate their Latin runs');
   assert.equal(count('2066'), count('2069'), 'every isolate opened in the source is closed');
-  assert.equal(count('2212'), 4, 'U+2212: blind minus sighted, in the tooltip and the table, in both languages');
+  assert.equal(count('2212'), 5, 'U+2212: blind minus sighted, in the tooltip and the table in both languages, and in the Arabic intro note');
   assert.equal(count('202f'), 1, 'U+202F: the Arabic 50 000 of results.note.budget_c1');
   assert.match(src, /^import \{ STRINGS \} from '\.\/i18n\.mjs';$/m, 'the lab table comes from i18n.mjs, unversioned');
 });

@@ -79,7 +79,7 @@ test('a common plant state lists both hashes, the tag, the commits and each file
   assert.deepEqual(v.details, [
     'recorded b5a3069f32a83754 · this tree c236a8db3e201090',
     'the plant of sep17-before-merge',
-    'from commits c5a5341',
+    'run from commits c5a5341',
     'last commit a3a048e (2026-09-22T03:02:51+03:00)',
   ]);
   const ar = plantView(PROV, 'ar');
@@ -131,7 +131,7 @@ test('a mixed section is told seed by seed, with each reason and each file\'s ow
     "The file's own lines:",
     forced,
     'last commit a3a048e (2026-09-22T03:02:51+03:00)',
-    'from commits c5a5341',
+    'run from commits c5a5341',
   ]);
   assert.ok(plantView(prov, 'ar').details.includes(iso(forced)), 'a forced line sits in an isolate in Arabic too');
 });
@@ -252,10 +252,10 @@ test('the build line and every warning above the summary', () => {
   const built = { head: '031ed24', python: '3.12.10', plant_sha: 'c236a8db3e201090', restart_needed: false,
     derived_loaded_differs: false, git: 'ok', elapsed_ms: 412 };
   assert.deepEqual(builtView(built, [], 'en'),
-    { line: 'Read from commit 031ed24 · Python 3.12.10 · plant c236a8db3e201090', warnings: [] });
+    { line: 'Repository at commit 031ed24 · Python 3.12.10 · plant c236a8db3e201090', warnings: [] });
   const bad = builtView({ ...built, head: null, git: 'unavailable', restart_needed: true, derived_loaded_differs: true },
     [{ module: 'app.agent_catalog', type: 'AssertionError' }], 'en');
-  assert.equal(bad.line, `Read from commit ${EM_DASH} · Python 3.12.10 · plant c236a8db3e201090`);
+  assert.equal(bad.line, `Repository at commit ${EM_DASH} · Python 3.12.10 · plant c236a8db3e201090`);
   assert.deepEqual(bad.warnings, [
     'git is not available here, so the commit facts are left out.',
     'The plant files changed after the server started: restart the server.',
@@ -282,8 +282,8 @@ test('cross-checks say pass, fail with the detail, or not compared', () => {
 
 test('unpaired seeds, the thermal-only note and the MEI lines', () => {
   assert.deepEqual(unpairedItems([{ seed: 3, file: 'results/c4_seed3.txt', have: ['baseline', 'reactive', 'sighted'] }], 'en'),
-    ['Seed 3 has no pair (Sighted agent); it is not drawn.']);
-  assert.deepEqual(unpairedItems([{ seed: 4, have: ['baseline'] }], 'en'), [`Seed 4 has no pair (${EM_DASH}); it is not drawn.`]);
+    ['Seed 3 has no pair: its file holds only Sighted agent; it is not drawn.']);
+  assert.deepEqual(unpairedItems([{ seed: 4, have: ['baseline'] }], 'en'), [`Seed 4 has no pair: its file holds only ${EM_DASH}; it is not drawn.`]);
   assert.equal(thermalNote(section('c4', { thermal_recorded: 'none' }), 'en'), 'Damage without the knock term: not recorded in these files.');
   assert.equal(thermalNote(section('c4', { thermal_recorded: 'all' }), 'en'), null);
   const some = section('c4', { thermal_recorded: 'some', seeds: [
