@@ -2349,3 +2349,45 @@ September were exempted as records; `drift_test.py` needed an encoding for Arabi
 fingerprint covers `data/derived_params.json`; cap the spark trim at 0; ramp every
 grade change; a new preregistration; then drive C before drive A (`CLAUDE.md`, the
 first box).
+
+---
+
+## Session of 30 September – 6 October 2026 — the results tab, milestone R1a
+
+Jad asked on 30 September for a page with interactive charts, built from Ghassan's
+published page and adapting by itself when the results change. It was designed
+(`docs/superpowers/specs/2026-09-30-results-tab-design.md`, approved by Jad on
+5 October), planned (`docs/superpowers/plans/2026-10-05-results-tab-r1a.md`, applied
+from its own text in a scratch clone before execution) and built by subagent-driven
+execution: a fresh implementer per task, a review before the next task began, a
+whole-branch review at the end. From Task 5 on Jad raised the effort, and each review
+became four lenses with three refuters on every serious finding. **Branch
+`JMF-2340550-results-tab`, not pushed.** The build record at the end of the spec says
+what was built and what the reviews changed; every ruling the controller made on
+Jad's behalf, with its cost if wrong, and every deferred minor finding are in
+`docs/superpowers/plans/2026-10-05-results-tab-r1a-review-notes.md`.
+
+| what | result |
+|---|---|
+| the tab | `/results` in the lab (`python -m app.server --simulation`): Phase D, D2 and C4, each rebuilt from `results/<prefix>_seed<N>.txt` on every open, with its plant state, its preregistered verdict quoted with file and line, its required notes, the pairs chart and the hand-written comparison, Arabic first and English |
+| not in R1a | Ghassan's set (`results/agents/`), which the page names as coming with R1b; the simulator and car figures (R2) |
+| tasks | ten, each reviewed; nine needed a fix commit; the final review six more fixes |
+| decisions | 23 rulings, each with its reason and its cost if wrong (the review notes) |
+| after updating | a browser that opened the lab before this update may show `nav.results` in the nav until one Ctrl+F5; `/static` now answers `Cache-Control: no-cache`, so later updates need none |
+
+Checks on the final tree (`f5a93cc`), each read off its own run:
+
+| check | result |
+|---|---|
+| `python -m app.test_results` | 120 tests, OK |
+| `python -m app.test_simulation` | 15 tests, OK |
+| `python -m app.test_replay` | 49 of 49, READ-ONLY passes |
+| `node --test "static/sim/*.test.mjs"` | 236 pass, 0 fail |
+| `python -m app.test_agents` | its pre-R1a baseline exactly (the merged plant refuses Jad's agents); no new failing entry |
+| `verify_docs.py` | all 73 checks pass |
+| `drift_test.py` | 16 of 16 drifts caught |
+| browser check (headless Chrome, both languages and themes) | 18 of 18 at Task 10; the fix wave's own checks 16 of 16 |
+
+**Next, in order:** Jad opens the tab and reads it; the branch is pushed when he says
+so; R1b (Ghassan's set, his post-hoc reading through `analyse_agent_set.py`, the
+incomplete box) is the next milestone, and the review notes are its starting list.
