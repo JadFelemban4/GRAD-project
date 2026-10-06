@@ -367,7 +367,18 @@ test('results.css: every token in both themes, the resets of design 7.3, and no 
     '.rc-chart-error{margin:12px 0;font-size:11px;line-height:1.75;color:var(--rc-muted);text-align:center}',
     'html[dir=rtl] .rc-chart-error{direction:rtl}',
     '.rc-tip .rc-tl{white-space:normal}',
+    '#not-read-list code{font-family:Consolas,ui-monospace,monospace;margin-inline-end:.75em}',
+    // The path is dir=ltr, so its own inline end is its right side; in Arabic
+    // the reason sits to its left, and the gap goes there.
+    'html[dir=rtl] #not-read-list code{margin-inline-end:0;margin-left:.75em}',
   ]) assert.ok(css.includes(rule), `missing ${rule}`);
+  // The files not read: the path alone is monospace, and a gap separates it
+  // from its reason, which (Arabic included) reads in the page's own font.
+  const notRead = block('#not-read-list{');
+  assert.doesNotMatch(notRead, /Consolas|monospace/, 'the list itself sets no monospace font; its code does');
+  for (const kept of ['font-size:10px', 'line-height:1.75', 'color:var(--rc-muted)', 'overflow-wrap:anywhere']) {
+    assert.ok(notRead.includes(kept), `#not-read-list lost ${kept}`);
+  }
   assert.doesNotMatch(css, /ellipsis/, 'a tooltip label is never cut');
   for (const cls of ['rc-plot', 'rc-grid', 'rc-axis', 'rc-ln', 'rc-hit', 'rc-hair', 'rc-hdot', 'rc-mark', 'rc-ring',
     'rc-lbl', 'rc-tip', 'rc-tt', 'rc-tr', 'rc-tl', 'rc-key', 'rc-dot', 'rc-pair', 'rc-band', 'rc-mei', 'rc-mei-label',

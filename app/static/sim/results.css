@@ -44,7 +44,9 @@ main.results-main{max-width:1180px;font-size:12px}
 #summary,#not-read{margin:0 0 17px;padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
 #summary h2,#not-read h2{margin:0 0 6px;font-size:14px;font-weight:650}
 #summary>p{margin:0 0 8px;font-size:11px;line-height:1.75;color:var(--ink-2)}
-#not-read-list{margin:0;padding-inline-start:18px;font:10px/1.75 Consolas,ui-monospace,monospace;color:var(--rc-muted);overflow-wrap:anywhere}
+#not-read-list{margin:0;padding-inline-start:18px;font-size:10px;line-height:1.75;color:var(--rc-muted);overflow-wrap:anywhere}
+#not-read-list code{font-family:Consolas,ui-monospace,monospace;margin-inline-end:.75em}
+html[dir=rtl] #not-read-list code{margin-inline-end:0;margin-left:.75em}
 
 /* the tables: the summary and every "the numbers" table */
 .results-main table{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}
