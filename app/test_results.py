@@ -1860,11 +1860,35 @@ class RouteTests(unittest.TestCase):
                 raise exc
 
             _, client = _results_client(build=boom)
-            r = client.get("/api/results", headers=LOCAL)
+            with self.assertLogs("uvicorn.error", level="ERROR"):
+                r = client.get("/api/results", headers=LOCAL)
             self.assertEqual(r.status_code, 500, type(exc).__name__)
             self.assertEqual(r.headers.get("cache-control"), "no-store")
             self.assertEqual(r.json(), {"detail": f"results failed: {type(exc).__name__}"})
             self.assertNotIn("secret", r.text)
+
+    def test_a_failing_build_is_logged_on_the_server_with_its_traceback(self):
+        # With the server's log_level 'warning' a handled 500 writes nothing
+        # unless the route logs it: the traceback goes to uvicorn's error log,
+        # and the answer stays the fixed text, the type's name only.
+        def boom():
+            raise KeyError("secret detail")
+
+        _, client = _results_client(build=boom)
+        with self.assertLogs("uvicorn.error", level="ERROR") as logged:
+            r = client.get("/api/results", headers=LOCAL)
+        self.assertEqual(len(logged.records), 1)
+        record = logged.records[0]
+        self.assertEqual(record.getMessage(), "results build failed")
+        self.assertEqual(record.levelname, "ERROR")
+        self.assertIsNotNone(record.exc_info, "the log carries no traceback")
+        self.assertIs(record.exc_info[0], KeyError)
+        self.assertIn("Traceback", logged.output[0])
+        self.assertIn("boom", logged.output[0], "the traceback does not reach the build")
+        self.assertEqual(r.status_code, 500)
+        self.assertEqual(r.headers.get("cache-control"), "no-store")
+        self.assertEqual(r.json(), {"detail": "results failed: KeyError"})
+        self.assertNotIn("secret", r.text)
 
     def test_one_build_at_a_time(self):
         state = {"inside": 0, "peak": 0}

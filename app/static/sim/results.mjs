@@ -10,7 +10,8 @@
 // A language switch rebuilds every section and redraws every chart (the SVG
 // labels hold no words, but the tooltips and tables do); a theme switch
 // redraws nothing, because every colour is a CSS variable. Nothing is stored
-// in the browser except the lab's own theme and language preferences.
+// in the browser except the lab's own theme and language preferences and, in
+// this tab's sessionStorage until the page is next built, the reader's place.
 import './results-strings.mjs?v=R1a';
 import { t, LANGS, DEFAULT_LANG, resolveLang, applyTranslations } from './i18n.mjs';
 import { inline } from './results-format.mjs?v=R1a';
@@ -26,6 +27,7 @@ import {
 const $ = id => document.getElementById(id);
 const THEMES = ['light', 'dark'];
 const STORE = { theme: 'grad.sim.theme', lang: 'grad.sim.lang' };
+const PLACE_KEY = 'grad.results.place';
 const ARMS = ['sighted', 'blind'];
 
 let currentLang = DEFAULT_LANG;
@@ -346,6 +348,44 @@ function readPlace() {
   };
 }
 
+// Reload, Back and a link to a section. Every section is built after the
+// fetch, so the browser's own scroll restoration and a #exp-... fragment find
+// no element when they look. The page keeps the place itself: on pagehide it
+// saves what readPlace() reads, and after the first render it scrolls to the
+// fragment's section, or else back to the saved place. A page left before its
+// sections arrived has no place of its own and keeps the one already saved.
+function savePlace() {
+  if (!state.payload) return;
+  const { id, offset } = readPlace();
+  try { sessionStorage.setItem(PLACE_KEY, JSON.stringify({ id, offset })); } catch (e) { /* a place is a convenience */ }
+}
+function takePlace() {
+  let saved = null;
+  try {
+    saved = JSON.parse(sessionStorage.getItem(PLACE_KEY));
+    sessionStorage.removeItem(PLACE_KEY);
+  } catch (e) { saved = null; }
+  return saved && typeof saved.id === 'string' && Number.isFinite(saved.offset) ? saved : null;
+}
+function fragmentTarget() {
+  try {
+    const id = decodeURIComponent(location.hash.slice(1));
+    return id ? document.getElementById(id) : null;
+  } catch (e) { return null; }
+}
+function restorePlace() {
+  const target = fragmentTarget();
+  const saved = takePlace();
+  if (target) target.scrollIntoView();
+  else {
+    const anchor = saved ? $(saved.id) : null;
+    if (anchor) window.scrollBy(0, anchor.getBoundingClientRect().top - saved.offset);
+  }
+  // From here every section exists, so the browser's own restoration is right
+  // again: Back after a summary link returns to where the reader was.
+  try { history.scrollRestoration = 'auto'; } catch (e) { /* the browser keeps its own mode */ }
+}
+
 function render() {
   const place = readPlace();
   mounter.clear();
@@ -414,15 +454,29 @@ async function load() {
     return;
   }
   if (response.status !== 200) {
-    state.failure = String(response.status);
+    state.failure = await failureOf(response);
     render();
     return;
   }
   state.payload = await response.json();
   render();
+  restorePlace();
+}
+
+// A failed build answers `results failed: <Type>` (app/results_api.py): the
+// page names the status and that type, and nothing else of the body.
+async function failureOf(response) {
+  const status = String(response.status);
+  try {
+    const detail = (await response.json())?.detail;
+    const m = typeof detail === 'string' ? /^results failed: ([A-Za-z_][A-Za-z0-9_]*)$/.exec(detail) : null;
+    return m ? `${status} ${m[1]}` : status;
+  } catch (e) { return status; }
 }
 
 function start() {
+  try { history.scrollRestoration = 'manual'; } catch (e) { /* the page restores the place itself either way */ }
+  window.addEventListener('pagehide', savePlace);
   $('theme-toggle')?.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   });

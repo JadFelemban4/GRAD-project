@@ -25,8 +25,12 @@ The pattern is app.agent_api.LOCAL_HOST's, copied rather than imported
 
 Neither route takes a parameter, so nothing from a request reaches the
 filesystem. A failure outside every section answers a server error with a
-fixed text naming the exception's type, never str(exc).
+fixed text naming the exception's type, never str(exc); its traceback goes
+to uvicorn's error log, which the server's log level still prints, so a
+failed build leaves a trace on the server while the browser still sees only
+the type's name.
 """
+import logging
 import re
 import threading
 from pathlib import Path
@@ -78,6 +82,7 @@ def mount_results(app, build=None) -> None:
                     run = build
                 return JSONResponse(run(), headers=NO_STORE)
         except (Exception, SystemExit) as exc:
+            logging.getLogger("uvicorn.error").exception("results build failed")
             return JSONResponse({"detail": f"results failed: {type(exc).__name__}"},
                                 status_code=500, headers=NO_STORE)
 
