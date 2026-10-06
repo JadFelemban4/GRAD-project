@@ -143,7 +143,8 @@ test('pairsLayout thermal: only the seeds whose files recorded both arms; none a
   assert.deepEqual(L.marks.map(m => [m.seed, m.role, m.value]),
     [[0, 'sighted', 300], [0, 'blind', 310.5], [2, 'sighted', 280], [2, 'blind', 250]]);
   for (const m of L.marks) assert.deepEqual([m.worst, m.fuel, m.peak], [null, null, null], 'no thermal worst, fuel or peak is recorded');
-  assert.deepEqual(L.links.map(l => l.diff), [10.5, -30]);
+  assert.deepEqual(L.links.map(l => [l.seed, l.a, l.b, l.diff]), [[0, 300, 310.5, null], [2, 280, 250, null]],
+    'joined, with no difference: no script prints blind minus sighted without the knock term (design 5.1)');
   assert.deepEqual(L.reference, { role: 'current_grade', values: [600, 600] });
   assert.deepEqual(L.y.d, [0, 600 * 1.08]);
   for (const m of L.marks) assert.ok(inside(m.value, L.y.d));
@@ -151,6 +152,45 @@ test('pairsLayout thermal: only the seeds whose files recorded both arms; none a
   assert.equal(none.empty, true);
   assert.deepEqual([none.seeds, none.marks, none.links, none.svgLabels], [[], [], [], []]);
   assert.equal(none.reference, null);
+});
+
+test('pairsLayout total: a seed whose file printed no usable median stays on the axis and in the table (design 4.1)', () => {
+  // The server sends a median a file printed as nan or inf as null, keeps the
+  // seed paired and sends its difference as null (app/test_results.py,
+  // test_nan_becomes_null). Here seed 3 lost its sighted median, seed 5 both.
+  const section = c4Section();
+  const bySeed = Object.fromEntries(section.seeds.map(s => [s.seed, s]));
+  bySeed[3].sighted.median = null;
+  bySeed[3].diff = null;
+  bySeed[5].sighted.median = null;
+  bySeed[5].blind.median = null;
+  bySeed[5].diff = null;
+  const L = pairsLayout(section);
+  assert.equal(L.empty, false);
+  assert.deepEqual(L.seeds, SEEDS, 'every seed of the section, in order: none dropped');
+  assert.deepEqual(L.x, { d: [-0.5, 7.5], ticks: SEEDS });
+  assert.deepEqual(L.marks.filter(m => m.seed === 3).map(m => [m.i, m.role, m.value]), [[3, 'blind', 349.5]],
+    'seed 3: its blind mark only');
+  assert.deepEqual(L.marks.filter(m => m.seed === 5), [], 'seed 5: no mark');
+  assert.equal(L.marks.length, 13);
+  assert.deepEqual(L.links.map(l => [l.i, l.seed]), [[0, 0], [1, 1], [2, 2], [4, 4], [6, 6], [7, 7]],
+    'no link without both arms, and every link at its own seed');
+  assert.deepEqual(L.svgLabels, [...SEEDS.map(String), '0', '200', '400', '600', 'MEI']);
+  const en = pairsTable(L, 'en');
+  assert.deepEqual(en.rows.map(r => r[0]), SEEDS.map(String), 'one row per seed');
+  assert.deepEqual(en.rows[3], ['3', EM_DASH, '349.5', EM_DASH, EM_DASH, '721.0', '653.5']);
+  assert.deepEqual(en.rows[5], ['5', EM_DASH, EM_DASH, EM_DASH, EM_DASH, EM_DASH, '653.5']);
+  assert.deepEqual(pairsTable(L, 'ar').rows[3], ['3', EM_DASH, '349.5', EM_DASH, EM_DASH, '721.0', '653.5'].map(iso),
+    'every cell isolated in Arabic, the dashes too');
+  const blind3 = L.marks.find(m => m.seed === 3 && m.role === 'blind');
+  assert.deepEqual(pairsTip(L, blind3, 'en').rows.map(r => r.k),
+    ['median', 'worst', 'fuel', 'peak'].map(k => t('en', `results.tip.${k}`)), 'no difference without both arms');
+  installFakeDocument();
+  const host = fakeHost(640);
+  assert.ok(drawPairs(host, 640, 358, L, 'en'), 'drawn');
+  assert.deepEqual(svgTexts(host), [...SEEDS.map(String), '0', '200', '400', '600', 'MEI'], 'one x label per seed');
+  assert.equal(walk(host).filter(el => el.classes().includes('rc-mark')).length, 13);
+  assert.equal(walk(host).filter(el => el.classes().includes('rc-pair')).length, 6);
 });
 
 test('pairsLayout refuses a measure it does not know', () => {
@@ -206,7 +246,8 @@ test('pairsTip: the median, worst, fuel, peak and the pair\'s difference, isolat
   section.seeds.find(s => s.seed === 0).thermal = { sighted: { median: 300, cut: 60 }, blind: { median: 310.5, cut: 58 } };
   const T = pairsLayout(section, 'thermal');
   assert.deepEqual(pairsTip(T, T.marks[0], 'en').rows,
-    [{ c: 'var(--rc-sighted)', v: '300.0', k: t('en', 'results.tip.median') }, { v: '+10.5', k: t('en', 'results.tip.diff') }]);
+    [{ c: 'var(--rc-sighted)', v: '300.0', k: t('en', 'results.tip.median') }],
+    'without the knock term, the median only: no script prints that difference (design 5.1)');
 });
 
 test('handTip: each policy\'s median, worst, fuel and peak, the engine computer by its legend name', () => {
@@ -241,8 +282,9 @@ test('pairsTable and handTable: headers from the strings, one row per seed, cell
   const section = c4Section();
   section.seeds.find(s => s.seed === 0).thermal = { sighted: { median: 300, cut: 60 }, blind: { median: 310.5, cut: 58 } };
   const thermal = pairsTable(pairsLayout(section, 'thermal'), 'en');
-  assert.deepEqual(thermal.head, ['seed', 'sighted', 'blind', 'diff', 'current_grade'].map(k => t('en', `results.table.${k}`)));
-  assert.deepEqual(thermal.rows, [['0', '300.0', '310.5', '+10.5', EM_DASH]], 'no thermal current-grade recorded: a dash');
+  assert.deepEqual(thermal.head, ['seed', 'sighted', 'blind', 'current_grade'].map(k => t('en', `results.table.${k}`)),
+    'no blind minus sighted column without the knock term (design 5.1)');
+  assert.deepEqual(thermal.rows, [['0', '300.0', '310.5', EM_DASH]], 'no thermal current-grade recorded: a dash');
   const H = handLayout(c4Section());
   const hand = handTable(H, 'en');
   assert.deepEqual(hand.head, ['seed', 'baseline', 'reactive', 'current_grade', 'sighted', 'blind']

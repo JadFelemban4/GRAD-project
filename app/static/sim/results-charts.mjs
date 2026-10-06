@@ -7,8 +7,9 @@
 // a layout into SVG through charts-lib.mjs. Nothing here computes a statistic:
 // every value is a median, a worst episode, a fuel or a peak that a result
 // file records (GET /api/results), and the one difference, blind minus sighted
-// per seed, is the one the analysis scripts print (design 5.1). No mean, no
-// winner, nothing summed or averaged across experiments.
+// per seed, is the one the analysis scripts print (design 5.1), so it is given
+// for the total damage only: no script prints it without the knock term. No
+// mean, no winner, nothing summed or averaged across experiments.
 //
 // SVG text holds numbers and the Latin "MEI" only. Every word of a figure, in
 // either language, is HTML (the title, the axis titles, the legend, the
@@ -76,23 +77,28 @@ function axes(seeds, yd) {
 
 /**
  * The pairs of one evaluation section. measure 'total' reads each policy's
- * median damage; 'thermal' reads the median without the knock term
- * (seed.thermal[role].median) and keeps only the seeds whose files recorded it
- * for both arms. Seeds ascending; a seed without both arms is not drawn (the
- * section lists it as unpaired).
+ * median damage and keeps every seed of the section: an arm whose file
+ * printed no usable median (nan or inf, sent as null) gets no mark, and a seed
+ * without both arms gets no link, but it stays on the axis and in the numbers
+ * table, never dropped (design 4.1). measure 'thermal' reads the median
+ * without the knock term (seed.thermal[role].median) and keeps only the seeds
+ * whose files recorded it for both arms (the section names the others).
+ * Seeds ascending. The difference blind minus sighted is given for 'total'
+ * only (design 5.1).
  */
 export function pairsLayout(section, measure = 'total') {
   if (!MEASURES.includes(measure)) throw new Error(`pairsLayout: unknown measure "${measure}"`);
   const total = measure === 'total';
   const rows = seedsOf(section)
     .map(s => ({ s, a: valueOf(s, 'sighted', measure), b: valueOf(s, 'blind', measure) }))
-    .filter(r => r.a !== null && r.b !== null)
+    .filter(r => total || (r.a !== null && r.b !== null))
     .sort((p, q) => p.s.seed - q.s.seed);
   const seeds = rows.map(r => r.s.seed);
   const marks = [];
   const links = [];
   rows.forEach(({ s, a, b }, i) => {
     for (const [role, value, dx] of [['sighted', a, -PAIR_DX], ['blind', b, PAIR_DX]]) {
+      if (value === null) continue;
       const p = s[role] || {};
       marks.push({
         i, seed: s.seed, role, x: i + dx, value,
@@ -101,16 +107,17 @@ export function pairsLayout(section, measure = 'total') {
         peak: total ? orNull(p.peak) : null,
       });
     }
-    links.push({ i, seed: s.seed, a, b, diff: b - a });
+    if (a !== null && b !== null) links.push({ i, seed: s.seed, a, b, diff: total ? b - a : null });
   });
   const refs = rows.map(({ s }) => valueOf(s, 'current_grade', measure));
   const reference = refs.some(v => v !== null) ? { role: 'current_grade', values: refs } : null;
   const mei = { value: orNull(section?.mei), afterResult: Boolean(section?.mei_after_result) };
-  const ax = axes(seeds, yDomain([...rows.flatMap(r => [r.a, r.b]), ...refs], mei.value));
+  const drawn = marks.length > 0;
+  const ax = axes(drawn ? seeds : [], yDomain([...rows.flatMap(r => [r.a, r.b]), ...refs], mei.value));
   return {
-    empty: seeds.length === 0, measure, seeds,
+    empty: !drawn, measure, seeds: drawn ? seeds : [],
     x: ax.x, y: ax.y, marks, links, reference, mei,
-    svgLabels: seeds.length ? [...ax.labels, ...(mei.value !== null ? ['MEI'] : [])] : [],
+    svgLabels: drawn ? [...ax.labels, ...(mei.value !== null ? ['MEI'] : [])] : [],
   };
 }
 
@@ -155,12 +162,12 @@ function detailRows(mark, lang) {
   ];
 }
 
-/** The tooltip of one pairs mark: its median, (total only) worst, fuel, peak, and its pair's blind minus sighted. */
+/** The tooltip of one pairs mark: its median, (total only) worst, fuel, peak and its pair's blind minus sighted. */
 export function pairsTip(layout, mark, lang) {
   const rows = [medianRow(mark, lang)];
   if (layout.measure === 'total') rows.push(...detailRows(mark, lang));
   const link = layout.links.find(l => l.i === mark.i);
-  if (link) rows.push({ v: inline(lang, fmtSigned(link.diff, 1)), k: t(lang, 'results.tip.diff') });
+  if (link && link.diff !== null) rows.push({ v: inline(lang, fmtSigned(link.diff, 1)), k: t(lang, 'results.tip.diff') });
   return { title: tipTitle(mark.role, mark.seed, lang), rows };
 }
 
@@ -169,17 +176,19 @@ export function handTip(layout, mark, lang) {
   return { title: tipTitle(mark.role, mark.seed, lang), rows: [medianRow(mark, lang), ...detailRows(mark, lang)] };
 }
 
-/** "The numbers" under the pairs chart: one row per drawn seed. */
+/** "The numbers" under the pairs chart: one row per seed on its axis, an em dash where a value is missing. */
 export function pairsTable(layout, lang) {
   const total = layout.measure === 'total';
-  const head = ['results.table.seed', 'results.table.sighted', 'results.table.blind', 'results.table.diff',
-    ...(total ? ['results.table.sighted_worst', 'results.table.blind_worst'] : []),
+  const head = ['results.table.seed', 'results.table.sighted', 'results.table.blind',
+    ...(total ? ['results.table.diff', 'results.table.sighted_worst', 'results.table.blind_worst'] : []),
     'results.table.current_grade'].map(k => t(lang, k));
-  const rows = layout.links.map(l => {
-    const worst = role => layout.marks.find(m => m.i === l.i && m.role === role)?.worst ?? null;
-    const ref = layout.reference ? layout.reference.values[l.i] : null;
-    return [String(l.seed), fmtNum(l.a, 1), fmtNum(l.b, 1), fmtSigned(l.diff, 1),
-      ...(total ? [fmtNum(worst('sighted'), 1), fmtNum(worst('blind'), 1)] : []),
+  const rows = layout.seeds.map((seed, i) => {
+    const mark = role => layout.marks.find(m => m.i === i && m.role === role) || null;
+    const link = layout.links.find(l => l.i === i) || null;
+    const ref = layout.reference ? layout.reference.values[i] : null;
+    return [String(seed), fmtNum(mark('sighted')?.value ?? null, 1), fmtNum(mark('blind')?.value ?? null, 1),
+      ...(total ? [fmtSigned(link ? link.diff : null, 1), fmtNum(mark('sighted')?.worst ?? null, 1),
+        fmtNum(mark('blind')?.worst ?? null, 1)] : []),
       fmtNum(ref, 1)].map(text => inline(lang, text));
   });
   return { head, rows };
