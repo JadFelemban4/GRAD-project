@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f3ed">
+  <title data-i18n="results.page.title">النتائج — GRAD</title>
+  <link rel="stylesheet" href="/static/sim/style.css">
+  <link rel="stylesheet" href="/static/sim/agents.css">
+  <link rel="stylesheet" href="/static/sim/results.css?v=R1a">
+  <script>
+    // The lab's own pre-paint block, unchanged: the same two keys, wrapped
+    // because localStorage throws in private mode. Nothing else is stored.
+    try {
+      var s = localStorage.getItem('grad.sim.theme');
+      if (s === 'dark' || s === 'light') document.documentElement.dataset.theme = s;
+      var l = localStorage.getItem('grad.sim.lang');
+      if (l === 'en' || l === 'ar') {
+        document.documentElement.lang = l;
+        document.documentElement.dir = l === 'en' ? 'ltr' : 'rtl';
+      }
+    } catch (e) { /* no stored preference is not an error */ }
+  </script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.5 1.5m11.2 11.2 1.5 1.5M19.1 4.9l-1.5 1.5M6.4 17.6l-1.5 1.5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></symbol>
+  </svg>
+  <header class="topbar">
+    <a href="/simulation" class="brand" data-i18n-aria="brand.aria" aria-label="مختبر GRAD"><span class="brand-mark">G<span>╱</span></span><div><strong dir="ltr">GRAD<span class="brand-point">.</span></strong><small data-i18n="brand.tagline">مختبر الأنظمة الهندسية</small></div></a>
+    <nav data-i18n-aria="nav.aria" aria-label="التنقل الرئيسي"><a href="/simulation" data-i18n="nav.simulation">مختبر الرحلة</a><a href="/agents" data-i18n="nav.agents">الوكلاء</a><a class="active" href="/results" aria-current="page" data-i18n="nav.results">النتائج</a><a href="/" data-i18n="nav.monitor">المراقبة</a><a href="/review" data-i18n="nav.review">مراجعة التنبيهات</a></nav>
+    <div class="topbar-tools">
+      <button id="theme-toggle" type="button" data-i18n-title="theme.to_dark" data-i18n-aria="theme.aria" aria-label="تبديل الوضع الليلي" title="الوضع الليلي"><svg><use href="#i-moon"/></svg></button>
+      <button id="lang-toggle" type="button" data-i18n-title="lang.switch_to_english" data-i18n-aria="lang.aria" aria-label="تغيير اللغة" title="English"><span dir="ltr">EN</span></button>
+    </div>
+  </header>
+  <main class="results-main">
+    <section class="page-intro results-intro">
+      <div><p class="eyebrow"><span class="small-rule"></span><span data-i18n="intro.eyebrow">المحرك · الطريق · الزمن</span></p><h1><span data-i18n="results.intro.heading">كل تجربة، كما تسجّلها ملفاتها</span><span>.</span></h1><p class="intro-note" data-i18n="results.intro.note">يُقرأ كل ما هنا من &#x2066;results/&#x2069; في كل مرة تُفتح فيها هذه الصفحة. لا يُعاد هنا حساب أي شيء.</p></div>
+    </section>
+    <div id="error" class="error" role="alert" hidden></div>
+    <p id="built" class="rc-built" role="status" aria-live="polite" data-i18n="results.loading">جارٍ قراءة ملفات النتائج…</p>
+    <ul id="warnings" class="rc-warnings" hidden></ul>
+    <section id="summary" class="rc-summary" hidden>
+      <h2 data-i18n="results.summary.heading">الملخّص</h2>
+      <p class="rc-summary-note" data-i18n="results.summary.note">كل صف تجربة مستقلة، لها محاكيها وطريقها؛ ولا تُدمج الصفوف في نتيجة واحدة.</p>
+      <table class="rc-summary-table">
+        <thead><tr><th scope="col" data-i18n="results.summary.col.experiment">التجربة</th><th scope="col" data-i18n="results.summary.col.plant">المحاكي</th><th scope="col" data-i18n="results.summary.col.verdict">الحكم</th></tr></thead>
+        <tbody id="summary-rows"></tbody>
+      </table>
+    </section>
+    <div id="sections" class="rc-sections"></div>
+    <section id="not-read" class="rc-not-read" hidden>
+      <h2 data-i18n="results.not_read.heading">ملفات لم تُقرأ</h2>
+      <ul id="not-read-list"></ul>
+    </section>
+    <footer><span dir="ltr" data-i18n="footer.brand">GRAD / ENGINEERING REPLAY LAB</span><span data-i18n="footer.note">مشروع تخرّج · محرك B58 · عرض علمي استكشافي</span><span id="footer-index" class="footer-index" dir="ltr" data-i18n="results.footer.index">03 — RESULTS</span></footer>
+  </main>
+  <noscript><p data-i18n="noscript">يحتاج المختبر إلى JavaScript لعرض بيانات الرحلة والمشهد ثلاثي الأبعاد.</p></noscript>
+  <script type="module" src="/static/sim/results.mjs?v=R1a"></script>
+</body>
+</html>

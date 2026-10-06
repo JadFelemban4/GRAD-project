@@ -1951,5 +1951,86 @@ class RouteTests(unittest.TestCase):
                          "mounting takes the plant hash now, and loads no reader")
 
 
+class PageTests(unittest.TestCase):
+    """The /results page can load every asset, id and module it names, and
+    the route serves it (results-tab design, the tests section, routes).
+
+    The lab was dead for a day once because main.mjs did not exist: both
+    suites passed, the route returned 200 and the browser 404'd one module.
+    These are the same checks for this page, plus the version query: the
+    tab's own modules carry one query and the lab's shared modules none, or a
+    browser loads two copies of results-strings.mjs and its merge refuses.
+    """
+
+    STATIC = ROOT / "app" / "static"
+    OWN = ("results.mjs", "results-view.mjs", "results-charts.mjs", "results-format.mjs",
+           "results-strings.mjs", "charts-lib.mjs")
+    SHARED = ("i18n.mjs", "agent-picker.mjs")
+    VERSION = "v=R1a"
+    IDS = ("error", "built", "warnings", "summary", "summary-rows", "sections", "not-read",
+           "not-read-list", "theme-toggle", "lang-toggle", "footer-index")
+
+    def read(self, rel):
+        path = self.STATIC / rel
+        self.assertTrue(path.is_file(), f"{rel} does not exist")
+        return path.read_text(encoding="utf-8")
+
+    def test_page_assets_ids_and_imports(self):
+        import re
+        html = self.read("results.html")
+        page = self.read("sim/results.mjs")
+        refs = (re.findall(r'<script[^>]+src="/static/([^"]+)"', html)
+                + re.findall(r'<link[^>]+href="/static/([^"]+)"', html))
+        self.assertIn(f"sim/results.mjs?{self.VERSION}", refs)
+        self.assertIn(f"sim/results.css?{self.VERSION}", refs)
+        for ref in refs:
+            self.assertTrue((self.STATIC / ref.split("?")[0]).is_file(),
+                            f"{ref} is referenced by the page and does not exist")
+        self.assertNotIn('type="importmap"', html, "this page loads no Three.js")
+
+        ids = re.findall(r'\sid="([^"]+)"', html)
+        self.assertEqual(len(ids), len(set(ids)), "an id is declared twice in results.html")
+        self.assertFalse(set(self.IDS) - set(ids), f"missing ids: {sorted(set(self.IDS) - set(ids))}")
+        used = set(re.findall(r"\$\('([^']+)'\)", page))
+        self.assertTrue(used, "the id scan found nothing; the pattern has drifted")
+        self.assertFalse(used - set(ids), f"results.mjs reads ids the page does not define: {sorted(used - set(ids))}")
+        for symbol in set(re.findall(r"'#(i-[a-z]+)'", page)):
+            self.assertIn(f'id="{symbol}"', html, f"#{symbol} is not in the icon library")
+
+        for name in self.OWN:
+            src = self.read(f"sim/{name}")
+            specs = (re.findall(r"\bfrom\s+'(\./[^']+)'", src)
+                     + re.findall(r"^import\s+'(\./[^']+)'", src, flags=re.M)
+                     + re.findall(r"\bimport\(\s*'(\./[^']+)'\s*\)", src))
+            for spec in specs:
+                path, _, query = spec[2:].partition("?")
+                self.assertTrue((self.STATIC / "sim" / path).is_file(), f"{name} imports missing {spec}")
+                if path in self.OWN:
+                    self.assertEqual(query, self.VERSION, f"{name} imports {spec} without ?{self.VERSION}")
+                else:
+                    self.assertIn(path, self.SHARED, f"{name} imports {spec}, neither the tab's nor a lab module")
+                    self.assertEqual(query, "", f"{name} imports the shared {spec} with a query")
+
+    def test_the_route_serves_the_page_to_a_local_host_only(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from app.results_api import mount_results
+        app = FastAPI()
+        # GET /results reads only the page: the build is never called here.
+        mount_results(app, build=lambda: {"built": {}, "import_failures": [], "sections": [], "not_read": []})
+        html = (self.STATIC / "results.html").read_text(encoding="utf-8")
+        with TestClient(app) as client:
+            for host in ("127.0.0.1:8000", "localhost"):
+                r = client.get("/results", headers={"host": host})
+                self.assertEqual(r.status_code, 200, host)
+                self.assertEqual(r.headers.get("cache-control"), "no-store", host)
+                self.assertEqual(r.text, html, host)
+                self.assertIn(f'src="/static/sim/results.mjs?{self.VERSION}"', r.text)
+            refused = client.get("/results", headers={"host": "evil.example:8000"})
+        self.assertEqual(refused.status_code, 403)
+        self.assertEqual(refused.headers.get("cache-control"), "no-store")
+        self.assertNotIn("<html", refused.text)
+
+
 if __name__ == "__main__":
     unittest.main()

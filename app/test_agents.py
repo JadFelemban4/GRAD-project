@@ -3777,12 +3777,17 @@ class PageTests(unittest.TestCase):
         self.assertFalse("pushState" in page, "the address is replaced, never pushed")
 
     def test_the_lab_links_to_agents_where_phones_keep_it(self):
-        """The replay lab's one link to /agents (design section 2, edit 4).
+        """The replay lab's links to /agents (design section 2, edit 4) and to
+        /results (the results-tab design, its nav section).
 
         Jad found on 28 Sep that the lab had no way to /agents. The link sits
         right AFTER the lab's first link, never at the end: the lab's phone
         rule hides .topbar nav a:last-child below 760 px (sim/style.css), so a
-        link at the end would vanish on phones.
+        link at the end would vanish on phones. /results comes right after
+        /agents, for the same reason. With five links the top bar ran wider
+        than a phone, so style.css's last block now gives the nav a row of its
+        own there and shows the last link again, as agents.css does on /agents;
+        both links still sit before the last one, should that block ever go.
         """
         html = self.read("simulation.html")
         nav = re.search(r"<nav[^>]*>(.*?)</nav>", html, flags=re.S)
@@ -3793,14 +3798,18 @@ class PageTests(unittest.TestCase):
             m = re.search(rf'\b{name}="([^"]*)"', tag)
             return m.group(1) if m else None
 
-        self.assertEqual([attr(a, "href") for a in links], ["/simulation", "/agents", "/", "/review"])
-        agents = links[1]
-        self.assertEqual(attr(agents, "data-i18n"), "nav.agents")
-        self.assertNotIn("active", attr(agents, "class") or "", "the lab's page stays the active one")
+        self.assertEqual([attr(a, "href") for a in links],
+                         ["/simulation", "/agents", "/results", "/", "/review"])
+        for i, key in ((1, "nav.agents"), (2, "nav.results")):
+            self.assertEqual(attr(links[i], "data-i18n"), key)
+            self.assertNotIn("active", attr(links[i], "class") or "", "the lab's page stays the active one")
+            self.assertLess(i, len(links) - 1, "the last link is hidden on phones")
         self.assertIn("active", attr(links[0], "class") or "")
-        self.assertIsNot(links[-1], agents, "the last link is hidden on phones")
-        self.assertTrue(".topbar nav a:last-child{display:none}" in self.read("sim/style.css"),
+        style = self.read("sim/style.css")
+        self.assertTrue(".topbar nav a:last-child{display:none}" in style,
                         "the phone rule this placement answers has moved; re-check where the link sits")
+        self.assertTrue(".topbar nav{order:3;width:100%;height:40px;gap:16px}.topbar nav a:last-child{display:flex}"
+                        in style, "five links need the nav's own row on phones (style.css, its last block)")
 
     def test_the_lab_launcher_names_the_agents_page(self):
         """app/start-simulation.ps1 names /agents and says when its python

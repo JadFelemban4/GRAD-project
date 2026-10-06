@@ -97,15 +97,15 @@ test('each t() call fills exactly the placeholders of its string, in both langua
   assert.deepEqual(problems, []);
 });
 
-test('the nav reads simulation, agents (active), monitor, review', () => {
+test('the nav reads simulation, agents (active), results, monitor, review', () => {
   const nav = read(HTML).match(/<nav[^>]*>([\s\S]*?)<\/nav>/);
   assert.ok(nav, 'agents.html has no <nav>');
   const links = [...nav[1].matchAll(/<a\b([^>]*)>/g)].map(m => m[1]);
   const attr = (a, name) => (a.match(new RegExp(`${name}="([^"]+)"`)) || [])[1];
-  assert.deepEqual(links.map(a => attr(a, 'href')), ['/simulation', '/agents', '/', '/review']);
+  assert.deepEqual(links.map(a => attr(a, 'href')), ['/simulation', '/agents', '/results', '/', '/review']);
   assert.deepEqual(links.map(a => attr(a, 'data-i18n')),
-    ['nav.simulation', 'nav.agents', 'nav.monitor', 'nav.review']);
-  assert.deepEqual(links.map(a => /\bclass="[^"]*\bactive\b/.test(a)), [false, true, false, false]);
+    ['nav.simulation', 'nav.agents', 'nav.results', 'nav.monitor', 'nav.review']);
+  assert.deepEqual(links.map(a => /\bclass="[^"]*\bactive\b/.test(a)), [false, true, false, false, false]);
 });
 
 test('the honesty lines are in the markup itself, not only written by script', () => {

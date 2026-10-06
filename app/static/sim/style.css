@@ -161,3 +161,11 @@ html[dir=ltr] .rate-control{padding-right:0;padding-left:20px;border-left:0;bord
    threshold, so the state is visible without looking away from the scene. */
 body.limit-over .world-panel{box-shadow:inset 0 0 0 2px var(--limit-over)}
 body.limit-near .world-panel{box-shadow:inset 0 0 0 2px var(--limit-near)}
+
+/* Five links since the results tab (results-tab design, the nav section). In
+   one row on a phone they made the replay lab's top bar wider than the screen:
+   measured in headless Chrome in a 390 px frame, the page scrolled sideways by
+   33 px in English and 1 px in Arabic. So the nav takes a row of its own there,
+   as agents.css has done for /agents, and with the room the last link, which
+   the rule above hides, is shown again. With this block: no sideways scroll. */
+@media(max-width:760px){.topbar{height:auto;flex-wrap:wrap;row-gap:0;padding:10px 16px 0}.topbar nav{order:3;width:100%;height:40px;gap:16px}.topbar nav a:last-child{display:flex}}
