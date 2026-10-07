@@ -1,0 +1,2241 @@
+{
+  "vehicle": {
+    "name": "تويوتا GR Supra 3.0 موديل 2023",
+    "engine_name": "BMW B58B30O1",
+    "transmission_name": "ZF 8HP51",
+    "fuel": "95 RON",
+    "source": {
+      "file": "plant.py",
+      "symbol": "b58",
+      "variable": "n_cyl",
+      "line": 114,
+      "match": "def b58"
+    }
+  },
+  "actions": [
+    {
+      "id": "spark_trim",
+      "name": "تصحيح الإشعال",
+      "unit": "deg BTDC",
+      "slew_unit": "deg/s",
+      "meaning": "درجات تضاف إلى توقيت الإشعال الأساسي أو تطرح منه."
+    },
+    {
+      "id": "lambda_trim",
+      "name": "تصحيح لامبدا",
+      "unit": "lambda",
+      "slew_unit": "lambda/s",
+      "meaning": "تصحيح لنسبة الخليط الأساسية؛ لامبدا 1 تعني خليطاً متكافئاً."
+    },
+    {
+      "id": "boost_trim",
+      "name": "تصحيح MAP",
+      "unit": "kPa",
+      "slew_unit": "kPa/s",
+      "meaning": "إزاحة ضغط يطلبها المشرف؛ ويقيد مسار العزم وغلاف الضاغط ضغط المجمع."
+    },
+    {
+      "id": "fan_duty",
+      "name": "تشغيل مروحة المشع",
+      "unit": "fraction",
+      "slew_unit": "fraction/s",
+      "meaning": "نسبة تشغيل مطلقة من صفر إلى واحد، وليست تصحيحاً لأمر ECU."
+    },
+    {
+      "id": "pump_duty",
+      "name": "تشغيل مضخة التبريد",
+      "unit": "fraction",
+      "slew_unit": "fraction/s",
+      "meaning": "نسبة تشغيل مطلقة من الحد الأدنى 0.3 إلى كامل التشغيل، وليست تصحيحاً."
+    }
+  ],
+  "observations": [
+    {
+      "id": "rpm",
+      "name": "سرعة المحرك",
+      "unit": "rpm",
+      "scale": "rpm / 3000 - 1",
+      "meaning": "سرعة عمود المرفق بالدورات في الدقيقة، ومتمركزة حول 3000 rpm."
+    },
+    {
+      "id": "map",
+      "name": "ضغط مجمع السحب",
+      "unit": "kPa abs",
+      "scale": "MAP / 120 - 1",
+      "meaning": "الضغط المطلق في مجمع السحب بعد الخانق."
+    },
+    {
+      "id": "tps",
+      "name": "مؤشر الخانق",
+      "unit": "fraction",
+      "scale": "already in [0, 1]",
+      "meaning": "مؤشر نموذجي مبني على ضغط المجمع المحقق، وليس قناة موضع خانق مقاسة."
+    },
+    {
+      "id": "spark",
+      "name": "توقيت الإشعال",
+      "unit": "deg BTDC",
+      "scale": "spark / 20 - 1",
+      "meaning": "توقيت الإشعال الفعلي بعد إضافة تصحيح المشرف إلى الجدول الأساسي وقصه إلى حدود ECU."
+    },
+    {
+      "id": "lam",
+      "name": "لامبدا",
+      "unit": "lambda",
+      "scale": "(lambda - 1) * 8",
+      "meaning": "نسبة الهواء والوقود المحسوبة مقارنة بالخليط المتكافئ."
+    },
+    {
+      "id": "t_block",
+      "name": "حرارة الكتلة وسائل التبريد",
+      "unit": "K",
+      "scale": "(T - 363) / 25",
+      "meaning": "حرارة العقدة المجمعة للكتلة وسائل التبريد."
+    },
+    {
+      "id": "t_oil",
+      "name": "حرارة الزيت",
+      "unit": "K",
+      "scale": "(T - 373) / 30",
+      "meaning": "حرارة العقدة المجمعة لحوض الزيت ومجاريه."
+    },
+    {
+      "id": "t_turb",
+      "name": "حرارة غلاف التوربين",
+      "unit": "K",
+      "scale": "(T - 873) / 200",
+      "meaning": "حرارة محسوبة للغلاف ومجمع العادم؛ لا يوجد حساس لها في السيارة."
+    },
+    {
+      "id": "charge_temp",
+      "name": "حرارة الشحنة",
+      "unit": "K",
+      "scale": "(T - 303) / 25",
+      "meaning": "حرارة هواء السحب المحسوبة بعد الضغط والتبريد."
+    },
+    {
+      "id": "ambient_temp",
+      "name": "حرارة الجو",
+      "unit": "K",
+      "scale": "(T - 293) / 15",
+      "meaning": "حرارة الهواء في السيناريو المستخدمة في حسابات المركبة والمحرك والحرارة."
+    },
+    {
+      "id": "barometric_pressure",
+      "name": "الضغط الجوي",
+      "unit": "kPa abs",
+      "scale": "(pressure - 101.3) / 8",
+      "meaning": "مدخل ضغط السيناريو في الخانة 10. يؤثر في كثافة الجو التي تستخدمها Vehicle.demand لطلب الطريق."
+    },
+    {
+      "id": "humidity",
+      "name": "الرطوبة النوعية",
+      "unit": "kg water/kg dry air",
+      "scale": "humidity * 40 - 0.5",
+      "meaning": "نسبة كتلة بخار الماء إلى كتلة الهواء الجاف؛ وليست رطوبة نسبية."
+    },
+    {
+      "id": "speed",
+      "name": "سرعة المركبة",
+      "unit": "m/s",
+      "scale": "speed / 25 - 1",
+      "meaning": "سرعة الطريق، وهي مختلفة عن RPM المحرك."
+    },
+    {
+      "id": "grade",
+      "name": "ميل الطريق الحالي",
+      "unit": "fraction",
+      "scale": "grade * 12",
+      "meaning": "الميل أسفل المركبة الآن؛ وتراه السياسة المعمّاة أيضاً."
+    },
+    {
+      "id": "preview_2s",
+      "name": "معاينة الميل بعد 2 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "ميل الطريق بعد ثانيتين."
+    },
+    {
+      "id": "preview_5s",
+      "name": "معاينة الميل بعد 5 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "ميل الطريق بعد خمس ثوان."
+    },
+    {
+      "id": "preview_15s",
+      "name": "معاينة الميل بعد 15 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "ميل الطريق بعد خمس عشرة ثانية."
+    },
+    {
+      "id": "preview_30s",
+      "name": "معاينة الميل بعد 30 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "ميل الطريق بعد ثلاثين ثانية."
+    },
+    {
+      "id": "torque_req",
+      "name": "عزم المحرك المطلوب",
+      "unit": "Nm",
+      "scale": "torque request / 200 - 1",
+      "meaning": "الطلب المستنتج من حمل الطريق ونموذج المركبة."
+    },
+    {
+      "id": "aggression",
+      "name": "تغير طلب السائق",
+      "unit": "fraction",
+      "scale": "clipped |acceleration| / 2.5",
+      "meaning": "مؤشر معياري لسرعة تغير المركبة."
+    },
+    {
+      "id": "weight_tracking",
+      "name": "تفضيل التتبع",
+      "unit": "weight",
+      "scale": "Uniform episode draw in [0.45, 0.70]",
+      "meaning": "وزن تتبع العزم؛ يسحب بالتساوي من [0.45,0.70] أثناء التدريب."
+    },
+    {
+      "id": "weight_fuel",
+      "name": "تفضيل الوقود",
+      "unit": "weight",
+      "scale": "First of two Dirichlet(1,1) shares of remaining weight",
+      "meaning": "حصة تفضيل توفير الوقود بعد حد التتبع."
+    },
+    {
+      "id": "weight_life",
+      "name": "تفضيل عمر المكونات",
+      "unit": "weight",
+      "scale": "Second of two Dirichlet(1,1) shares of remaining weight",
+      "meaning": "حصة تفضيل خفض الضرر المحسوب بعد حد التتبع."
+    }
+  ],
+  "preview_s": [
+    2,
+    5,
+    15,
+    30
+  ],
+  "thresholds": {
+    "turb_k": 1123.0,
+    "oil_k": 408.0,
+    "knock_knee": 0.85,
+    "torque_tracking_tolerance": 0.05
+  },
+  "concepts": [
+    {
+      "id": "map_reference",
+      "name": "حلقة PI المرجعية للعزم",
+      "meaning": "حلقة PI الموازية للمرجع تنتج ضغط المانيفولد المطلق الخاص بها مع تصحيح ضغط صفري من المشرف. هذا المرجع ليس ضغط المسار المتحكم فيه ناقص تصحيحه.",
+      "why": "يوضح ضغط المسار المرجعي الموازي عند طلب العزم نفسه.",
+      "unit": "kPa abs",
+      "evidence": "MODELLED",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "base, map_b = self._track_torque",
+        "line": 901,
+        "match": "base, map_b = self._track_torque"
+      },
+      "upstream": [
+        "torque_req",
+        "baseline_ecu"
+      ],
+      "downstream": [
+        "r_fuel",
+        "r_life"
+      ],
+      "caveat": "ضغط المرجع مُصدّر من النموذج؛ وليس خرج ECU مقاسًا من المركبة."
+    },
+    {
+      "id": "four_stroke",
+      "name": "الأشواط الأربعة",
+      "meaning": "تكمل الأسطوانة السحب والضغط والقدرة والعادم خلال دورتين لعمود المرفق.",
+      "why": "يربط حركة المكبس بتكرار الاحتراق وتحويل سرعة المحرك إلى شغل.",
+      "unit": "cycle",
+      "evidence": "MODELLED",
+      "range": "أسطوانة واحدة من إغلاق صمام السحب حتى فتح صمام العادم.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "theta",
+        "line": 186,
+        "match": "def run_cycle"
+      },
+      "upstream": [
+        "air",
+        "combustion"
+      ],
+      "downstream": [
+        "engine_torque",
+        "exhaust_flow"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "نموذج صفري الأبعاد أحادي المنطقة، لا محاكاة تدفق ثلاثية الأبعاد.",
+      "evidence_note": "يقدم النموذج ضغط الأسطوانة بخطوات صغيرة من زاوية المرفق خلال دورة احتراق واحدة.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "engine",
+      "name": "هندسة محرك B58",
+      "meaning": "يمثل النموذج محرك BMW B58B30O1 سداسي الأسطوانات بسعة 2,997.5 cc وتجويف 82.0 mm وشوط 94.6 mm.",
+      "why": "تحدد الأبعاد والحجم ونسبة الانضغاط سعة الهواء ومقياس شغل الضغط.",
+      "unit": "cc, mm, cylinders",
+      "evidence": "MODELLED",
+      "range": "هندسة النموذج: 2,997.5 cc، ست أسطوانات، نسبة انضغاط 10.2:1.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "Geometry",
+        "variable": "n_cyl",
+        "line": 36,
+        "match": "class Geometry"
+      },
+      "upstream": [],
+      "downstream": [
+        "four_stroke",
+        "air",
+        "engine_torque"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "هوية هندسة المشروع؛ وليست معايرة معتمدة من الشركة أو ملف CAD.",
+      "evidence_note": "تحدد الهندسة الافتراضية في plant.Geometry؛ وتسمي b58() محرك Supra 3.0 موديل 2023.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "turbocharger",
+      "name": "الشاحن التوربيني",
+      "meaning": "تدير طاقة العادم توربيناً موصولاً بضاغط يرفع ضغط هواء السحب.",
+      "why": "يرفع الضغط كتلة الهواء المحبوسة وإمكان العزم والحرارة في مسار العادم.",
+      "unit": "pressure, mass flow, temperature",
+      "evidence": "MODELLED",
+      "range": "ضغط المجمع قرب 175 kPa؛ ويتوقف حد الضاغط على تدفق الهواء.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_track_torque",
+        "variable": "boost_ceiling_kpa",
+        "line": 773,
+        "match": "boost_ceiling_kpa"
+      },
+      "upstream": [
+        "air",
+        "engine_torque",
+        "exhaust_flow"
+      ],
+      "downstream": [
+        "charge_temp",
+        "t_turb"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "الضاغط والتوربين مبسطان؛ ولا تمثل استجابتهما العابرة بخريطة تفصيلية.",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "air",
+      "name": "شحنة الهواء وتدفقه",
+      "meaning": "يحدد ضغط المجمع وحرارة الشحنة وسرعة المحرك والكفاءة الحجمية كتلة الهواء في كل دورة.",
+      "why": "لا يحرر الاحتراق طاقة تتجاوز ما يسمح به الأكسجين المتاح.",
+      "unit": "g/s",
+      "evidence": "MODELLED",
+      "range": "نطاق التشغيل يستند إلى تدفق وضغط مسجلين؛ يتشبع MAF فوق نحو 0.314 kg/s.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "m_air",
+        "line": 211,
+        "match": "m_air"
+      },
+      "upstream": [
+        "charge_temp",
+        "map",
+        "turbocharger"
+      ],
+      "downstream": [
+        "combustion",
+        "fuel",
+        "exhaust_flow"
+      ],
+      "increase": "هواء أكثر قد يدعم وقوداً وعزماً أكثر إذا سمحت نسبة الخليط وحدود الطرق.",
+      "decrease": "هواء أقل يخفض سعة العزم.",
+      "caveat": "قناة حرارة السحب في OBD قبل مبرد الشحنة؛ وليست حرارة الشحنة.",
+      "evidence_note": "يحسب النموذج كتلة الهواء المحبوسة ويمرر تدفقها لحساب حد الضاغط.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "charge_temp",
+      "name": "حرارة هواء الشحن",
+      "meaning": "يسخن هواء السحب عند ضغطه؛ ويقدّر النموذج حرارته من الجو والحالة الحرارية للمحرك.",
+      "why": "الهواء الساخن أقل كثافة وقد يزيد الميل إلى الطرق.",
+      "unit": "K",
+      "evidence": "MODELLED",
+      "range": "حالة محسوبة؛ لا تقاس مباشرة عند مجمع السحب في سجلات المشروع.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "charge_temperature",
+        "variable": "def charge_temperature",
+        "line": 520,
+        "match": "def charge_temperature"
+      },
+      "upstream": [
+        "ambient_temp",
+        "t_block",
+        "turbocharger"
+      ],
+      "downstream": [
+        "air",
+        "knock"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "يمثل المبرد البيني بتصحيح تجريبي.",
+      "evidence_note": "يحسب engine_env حرارة الشحنة قبل توقع دورة الاحتراق.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "combustion",
+      "name": "الاحتراق",
+      "meaning": "يصف منحنى Wiebe تقدم الاحتراق؛ وتحدّث موازنة أحادية المنطقة ضغط الأسطوانة وحرارتها.",
+      "why": "يحدد الاحتراق العزم والوقود وحرارة العادم والتعرض المحسوب للطرق.",
+      "unit": "crank angle, pressure, energy",
+      "evidence": "MODELLED",
+      "range": "دورة مثالية واحدة لكل خطوة بيئية.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "dq_burn",
+        "line": 250,
+        "match": "dq_burn ="
+      },
+      "upstream": [
+        "four_stroke",
+        "air",
+        "spark"
+      ],
+      "downstream": [
+        "engine_torque",
+        "egt",
+        "knock"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "لا يمثل اختلاف الأسطوانات أو انتشار اللهب ثلاثي الأبعاد.",
+      "evidence_note": "يدمج run_cycle الضغط والحرارة خلال الاحتراق المحسوب.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "fuel",
+      "name": "تدفق كتلة الوقود",
+      "meaning": "يحسب النموذج تدفق الوقود من كتلة الهواء المحبوسة وسرعة المحرك ولامبدا.",
+      "why": "يؤثر الوقود في العزم والاستهلاك وكتلة العادم والحمل الحراري.",
+      "unit": "g/s",
+      "evidence": "MODELLED",
+      "range": "تحصر البيئة لامبدا ضمن 0.70–1.25.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "mdot_fuel",
+        "line": 297,
+        "match": "mdot_fuel ="
+      },
+      "upstream": [
+        "air",
+        "lam"
+      ],
+      "downstream": [
+        "combustion",
+        "exhaust_flow",
+        "r_fuel",
+        "t_block",
+        "t_oil"
+      ],
+      "increase": "وقود أكثر قد يضيف طاقة، لكنه يزيد الاستهلاك وكتلة العادم.",
+      "decrease": "وقود أقل قد يخفض الاستهلاك لكنه قد يخفض العزم أو يغير حرارة الاحتراق.",
+      "caveat": "لا يستنتج المشروع أوامر الوقود الإنتاجية من خريطة ECU مصنع.",
+      "evidence_note": "يحسب plant.py تدفق الهواء والوقود من كتلة الأسطوانة وRPM.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "spark",
+      "name": "توقيت الإشعال الفعلي",
+      "meaning": "توقيت الإشعال الفعلي هو توقيت الأساس مضافاً إليه تصحيح المشرف، ثم يقيد بحدود ECU.",
+      "why": "يغير التوقيت الشغل والوقود وحرارة العادم والتعرض للطرق معاً.",
+      "unit": "deg BTDC",
+      "evidence": "MODELLED",
+      "range": "تصحيح الفعل −8 إلى +4 deg؛ ويقص التوقيت الكلي مستقلاً إلى حدود ECU.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "self.spark =",
+        "line": 918,
+        "match": "self.spark ="
+      },
+      "upstream": [
+        "spark_trim",
+        "baseline_ecu"
+      ],
+      "downstream": [
+        "combustion",
+        "knock",
+        "egt"
+      ],
+      "increase": "قد يحسن التقديم الكفاءة والعزم حتى يرتفع خطر الطرق.",
+      "decrease": "يقلل التأخير خطر الطرق عادةً، وقد يرفع حرارة العادم والوقود.",
+      "caveat": "القيمة هي توقيت الإشعال الفعلي بعد التصحيح، لا جدول الأساس وحده.",
+      "evidence_note": "يضيف engine_env التصحيح إلى توقيت BaselineECU ثم يقصه إلى حدود ECU.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "knock",
+      "name": "مؤشر الطرق",
+      "meaning": "يجمع نموذج Douaud–Eyzat تعرض الاشتعال الذاتي للغاز النهائي أثناء الاحتراق.",
+      "why": "يقدر خطر الطرق ويسهم في مؤشر الضرر المحاكى فوق العتبة.",
+      "unit": "dimensionless",
+      "evidence": "MODELLED",
+      "range": "العتبة المختارة 0.85؛ ولم يتحقق النموذج على هذه المركبة.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "ki +=",
+        "line": 276,
+        "match": "ki +="
+      },
+      "upstream": [
+        "spark",
+        "charge_temp",
+        "air"
+      ],
+      "downstream": [
+        "damage",
+        "baseline_ecu"
+      ],
+      "increase": "ارتفاع المؤشر يزيد احتمال الطرق والضرر المحسوب.",
+      "decrease": "خفض التقديم أو الحمل يقلل التعرض المتوقع عادةً.",
+      "caveat": "تقدير الطرق غير متحقق، وهو أكبر افتراض غير محسوم وراء هامش الحماية الظاهر.",
+      "evidence_note": "يكامل plant.py التعرض مع زاوية المرفق؛ وتضيف engine_env.damage_rate عقوبة فوق 0.85.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "engine_torque",
+      "name": "عزم المحرك",
+      "meaning": "يحوّل النموذج شغل ضغط الأسطوانة بعد طرح الاحتكاك والضخ المقدّرين إلى عزم فرملة.",
+      "why": "على المركبة تلبية عزم الطريق مع إدارة الوقود والحرارة.",
+      "unit": "Nm",
+      "evidence": "MODELLED",
+      "range": "يحدد الغلاف التشغيلي والهندسة الخرج الممكن.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "torque =",
+        "line": 286,
+        "match": "torque = bmep"
+      },
+      "upstream": [
+        "combustion",
+        "air",
+        "gear"
+      ],
+      "downstream": [
+        "r_resp"
+      ],
+      "increase": "العزم الأعلى يقلل خطأ تتبع الطلب.",
+      "decrease": "نقص العزم يزيد كلفة التتبع وقد يوحي بحماية زائفة عبر حجب الطلب.",
+      "caveat": "عزم محاكى؛ وليس نتيجة تحقق على مقياس دينامومتر.",
+      "evidence_note": "تحول plant.py متوسط الضغط الفعال الصافي والإزاحة إلى عزم.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "torque_req",
+      "name": "حمل الطريق وعزم الدوران المطلوب",
+      "meaning": "تحدد السرعة والتسارع والميل وكثافة الهواء ومقاومة الطريق قوة العجلات؛ وتحولها التروس إلى عزم المحرك المطلوب.",
+      "why": "يتطلب اختبار الحماية العادل الحفاظ على أداء الطريق المطلوب.",
+      "unit": "Nm",
+      "evidence": "MODELLED",
+      "range": "سيناريو النتيجة المقفل: ميل 12% عند 130 km/h وحرارة جو 42 C.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "demand",
+        "variable": "def demand",
+        "line": 550,
+        "match": "def demand"
+      },
+      "upstream": [
+        "speed",
+        "gear",
+        "ambient_temp",
+        "barometric_pressure"
+      ],
+      "downstream": [
+        "r_resp"
+      ],
+      "increase": "الميل الأشد أو السرعة الأعلى يزيدان حمل الطريق والقدرة المطلوبة.",
+      "decrease": "انخفاض الحمل يقلل قوة العجلات والعزم المطلوب.",
+      "caveat": "صعود 130 km/h عند ميل 12% سيناريو اصطناعي، وليس طريقاً سجلته المركبة.",
+      "evidence_note": "تحسب Vehicle.demand القوة وطلب المحرك؛ وتعاقب مكافأة التتبع العزم غير الملبى.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "gear",
+      "name": "ناقل الحركة ZF 8HP51",
+      "meaning": "تحول نسب التروس الثماني والدفع النهائي سرعة العجلات وعزمها إلى سرعة المحرك وطلب عزمه.",
+      "why": "يحدد الترس نقطة تشغيل المحرك وحمل الدورة وتسخين العادم.",
+      "unit": "ratio, RPM, Nm",
+      "evidence": "MODELLED",
+      "range": "ثماني نسب أمامية؛ ويثبت سيناريو الصعود المبلغ عنه على الترس السابع.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "Vehicle",
+        "variable": "gears =",
+        "line": 348,
+        "match": "gears ="
+      },
+      "upstream": [
+        "torque_req"
+      ],
+      "downstream": [
+        "rpm",
+        "engine_torque",
+        "exhaust_flow"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "منطق النقل مبسط مقارنة بمتحكم ناقل الحركة الإنتاجي.",
+      "evidence_note": "يعرف Vehicle النسب الثماني ومنطق الطلب، بما فيه خفض الترس عند تعذر العزم.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "exhaust_flow",
+      "name": "تدفق كتلة العادم",
+      "meaning": "يتكون تدفق العادم من كتلة الهواء مضافاً إليها كتلة الوقود الخارجة من الأسطوانات.",
+      "why": "يتحكم التدفق في انتقال الحرارة المحسوب إلى التوربين.",
+      "unit": "g/s",
+      "evidence": "MODELLED",
+      "range": "يتغير التدفق مع الحمل والخليط وسرعة المحرك.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "mdot_air + out[\"mdot_fuel\"]",
+        "line": 925,
+        "match": "mdot_air + out[\"mdot_fuel\"]"
+      },
+      "upstream": [
+        "air",
+        "rpm"
+      ],
+      "downstream": [
+        "t_turb"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "تدفق الغاز وحرارته يستخدمان تمثيلات مبسطة لمنظومة العادم.",
+      "evidence_note": "يمرر engine_env مجموع mdot_air + mdot_fuel إلى الشبكة الحرارية.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "egt",
+      "name": "حرارة غاز العادم",
+      "meaning": "يقدّر النموذج حرارة العادم بعد التفريغ وفقد حرارة تجريبي في المنفذ ومجرى العادم.",
+      "why": "العادم هو مصدر الحرارة الرئيس لنموذج غلاف التوربين.",
+      "unit": "°C",
+      "evidence": "MODELLED",
+      "range": "محسوبة؛ لا يتوفر مزدوج حراري عند مدخل التوربين في السجلات.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "t_exh =",
+        "line": 302,
+        "match": "t_exh ="
+      },
+      "upstream": [
+        "combustion",
+        "spark"
+      ],
+      "downstream": [
+        "t_turb",
+        "damage"
+      ],
+      "increase": "العادم الأشد حرارة يزيد دخل حرارة التوربين عندما يكون أبرد من الغاز.",
+      "decrease": "العادم الأبرد يقلل تسخين التوربين مع ثبات العوامل الأخرى.",
+      "caveat": "معامل فقد حرارة المنفذ تجريبي؛ وأقصى EGT خارج نطاق تحقق واحد.",
+      "evidence_note": "يستخدم plant.py معامل UA_PORT التجريبي لحساب حرارة العادم بعد التمدد.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "t_block",
+      "name": "حرارة الكتلة وسائل التبريد",
+      "meaning": "تستقبل عقدة الكتلة وسائل التبريد طاقة الوقود، وتتبادل الحرارة مع الزيت بحسب فرق الحرارة، وتطرحها للجو والرديتر عبر منظم حراري بديل في النموذج.",
+      "why": "قد يغير حمل قصير درجات الحرارة والضرر لاحقاً بسبب الذاكرة الحرارية.",
+      "unit": "K",
+      "evidence": "MODELLED",
+      "range": "تبدأ العقدة عند 363 K؛ وتكامل أويلر الصريح متصلب عددياً عند خطوة السيناريو.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "step",
+        "variable": "q_in_block",
+        "line": 215,
+        "match": "q_in_block ="
+      },
+      "upstream": [
+        "fan_duty",
+        "pump_duty",
+        "ambient_temp",
+        "fuel",
+        "t_oil"
+      ],
+      "downstream": [
+        "t_oil",
+        "charge_temp"
+      ],
+      "increase": "دخل الحرارة الأعلى يرفع حرارة الكتلة حتى يتوازن مع طرحها.",
+      "decrease": "زيادة التبريد بالمشع أو الجو تخفض حرارة الكتلة.",
+      "caveat": "تتذبذب عقدة الكتلة وسائل التبريد عند dt=1 s؛ لا تعتمد مسح H/τ قبل تصحيح التكامل.",
+      "evidence_note": "تحتوي ThermalNetwork حالات منفصلة للكتلة والزيت والتوربين؛ ومعاملات الكتلة والزيت مشتقة من السجلات.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "t_oil",
+      "name": "حرارة الزيت",
+      "meaning": "تسخن عقدة الزيت بسرعة المحرك وطاقة الوقود والكتلة، وتبرد بالجو وسرعة الطريق.",
+      "why": "تدخل حرارة الزيت في مؤشر الضرر وتتوفر في بعض سجلات المركبة.",
+      "unit": "K",
+      "evidence": "MODELLED",
+      "range": "التحقق محدود؛ وحرارة الزيت في الصعود المعروض محسوبة.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "step",
+        "variable": "q_in_oil",
+        "line": 220,
+        "match": "q_in_oil ="
+      },
+      "upstream": [
+        "rpm",
+        "t_block",
+        "speed",
+        "fuel",
+        "ambient_temp"
+      ],
+      "downstream": [
+        "damage",
+        "t_block"
+      ],
+      "increase": "طاقة الوقود واحتكاك الدوران وتحريك الزيت مصادر مباشرة؛ تبادل الكتلة والزيت يتجه من الأشد حرارة إلى الأبرد.",
+      "decrease": "تبريد الطريق أو خفض سرعة المحرك يقلل حرارة الزيت عند الاتزان.",
+      "caveat": "تتذبذب عقدة الكتلة وسائل التبريد عند dt=1 s؛ لا تعتمد مسح H/τ قبل التصحيح.",
+      "evidence_note": "تحسب ThermalNetwork حالة الزيت؛ وملاءمة سبع رحلات تقلل قمة الرحلة المحجوبة drive10 بمقدار 16.9 K.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "t_turb",
+      "name": "حرارة غلاف التوربين",
+      "meaning": "تتبادل عقدة غلاف التوربين الحرارة مع حد الغاز والجو؛ يتجه الانتقال من الأشد حرارة إلى الأبرد، وقد يبردها الغاز. لا تبريد مباشر لها بالمروحة أو المضخة في الشبكة الحالية.",
+      "why": "ثابت زمن التوربين المفترض محوري في فرضية H/τ.",
+      "unit": "°C",
+      "evidence": "MODELLED",
+      "range": "عتبة الضرر 1123 K؛ وثابت الزمن عشرات الثواني تقريباً في النموذج الحالي.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "step",
+        "variable": "q_in_turb",
+        "line": 225,
+        "match": "q_in_turb ="
+      },
+      "upstream": [
+        "exhaust_flow",
+        "egt",
+        "ambient_temp"
+      ],
+      "downstream": [
+        "damage"
+      ],
+      "increase": "العادم الأعلى تدفقاً أو حرارة قد يسرع ارتفاع حرارة الغلاف.",
+      "decrease": "يزيد طرح الحرارة إلى الجو انخفاض العقدة نحو حرارة الجو.",
+      "caveat": "حرارة محسوبة بمعاملات توربين مفترضة، وليست قناة مقاسة في السيارة.",
+      "evidence_note": "تحسب ThermalNetwork الحرارة بمعاملات مفترضة؛ ولا يوجد حساس مركبة مطابق.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "damage",
+      "name": "مؤشر الضرر",
+      "meaning": "يجمع مؤشر الضرر حدي حرارة أسيين وعقوبة تربيعية لتجاوز الطرق.",
+      "why": "تعتمد عليه مكافأة العمر ونتيجة التجربة، لكنه ليس عمراً مقاساً.",
+      "unit": "proxy units/s",
+      "evidence": "MODELLED",
+      "range": "مقياس نسبي للمحاكاة؛ ليس تقديراً للضمان أو العمر المتبقي.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "damage_rate",
+        "variable": "d =",
+        "line": 636,
+        "match": "def damage_rate"
+      },
+      "upstream": [
+        "t_turb",
+        "t_oil",
+        "knock"
+      ],
+      "downstream": [
+        "r_life",
+        "preview_result"
+      ],
+      "increase": "ترفع العقد الأشد حرارة وتجاوزات الطرق الضرر المتراكم.",
+      "decrease": "تخفض درجات الحرارة ومؤشر الطرق الأقل قيمة الضرر.",
+      "caveat": "لا يوجد ربط تجريبي مثبت بين هذه الوحدات وعمر المكونات الحقيقي.",
+      "evidence_note": "الدالة damage_rate في engine_env.py؛ ودرجتا الركبة الحرارية 1123 K و408 K.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "preview",
+      "name": "معاينة ميل الطريق القادم",
+      "meaning": "ترى السياسة المرئية ميل الطريق بعد 2 و5 و15 و30 ثانية؛ وتعطى السياسة المعمّاة أصفاراً في هذه الخانات فقط.",
+      "why": "يعزل الاختبار قيمة معلومات المستقبل فوق الميل الحالي والحالة الحرارية.",
+      "unit": "seconds, grade fraction",
+      "evidence": "MODELLED",
+      "range": "H=2–30 s؛ نقطة H/τ تقريبية ولا تثبت منحنى.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_preview",
+        "variable": "PREVIEW_S",
+        "line": 779,
+        "match": "def _preview"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "preview_2s",
+        "preview_5s",
+        "preview_15s",
+        "preview_30s",
+        "policy_action"
+      ],
+      "increase": "قد تتيح المعاينة التصرف قبل وصول المركبة إلى تغير الميل.",
+      "decrease": "التعمية تصفر خانات المستقبل، لكنها لا تخفي الميل الحالي.",
+      "caveat": "المعاينة من طريق مولّد، وليست خريطة خارجية أو تغذية مركبة حية.",
+      "evidence_note": "تقرأ _preview قيم PREVIEW_S؛ ويضم _obs الميل الحالي للذراعين.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "baseline_ecu",
+      "name": "مرجع ECU الأساسي",
+      "meaning": "يجدول نموذج ECU الممثل للإنتاج الإشعال ولامبدا واستجابة الطرق والمروحة، مع حالة حرارية مرجعية.",
+      "why": "تقارن حدود الوقود والعمر المحرك الخاضع للإشراف بهذا المرجع.",
+      "unit": "commands and state",
+      "evidence": "MODELLED",
+      "range": "ليس برنامج مصنع مستخرجاً أو ملف ECU مضبوطاً.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "BaselineECU",
+        "variable": "class BaselineECU",
+        "line": 31,
+        "match": "class BaselineECU"
+      },
+      "upstream": [
+        "rpm",
+        "map",
+        "charge_temp"
+      ],
+      "downstream": [
+        "r_fuel",
+        "r_life",
+        "spark"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "يسمى نموذجاً ممثلاً للإنتاج، ولا ينسب إلى برنامج ECU الحقيقي للمركبة.",
+      "evidence_note": "يعمل BaselineECU وthermal_base بالتوازي مع البيئة المشرفة.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "normalized_actions",
+      "name": "مخرجات السياسة المعيارية",
+      "meaning": "تنتج سياسة SAC خمس قيم ضمن [−1,1]؛ ثم تحولها البيئة إلى وحدات الأفعال وتقيد معدلها وحدودها.",
+      "why": "يسمح المجال المشترك بالتحكم بإشارات ذات وحدات مختلفة.",
+      "unit": "normalized, then actuator units",
+      "evidence": "MODELLED",
+      "range": "خمس قنوات؛ ويتناسب SLEW مع dt.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 675,
+        "match": "return ACT_LO"
+      },
+      "upstream": [
+        "policy_action"
+      ],
+      "downstream": [
+        "spark",
+        "boost_trim",
+        "fan_duty",
+        "pump_duty"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "المروحة والمضخة نسب تشغيل مطلقة؛ والصفر المعياري ليس وضعاً محايداً عاماً.",
+      "evidence_note": "تحدد ACT_LO وACT_HI وSLEW التحويل وحدود الحركة لكل ثانية.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "r_fuel",
+      "name": "مكافأة الوقود",
+      "meaning": "يمثل حد الوقود الخفض النسبي لتدفقه مقارنة بالمرجع الموازي في الخطوة نفسها.",
+      "why": "يكافئ الكفاءة دون معامل مقياس وقود مطلق.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "الموجب يعني وقوداً أقل للسياسة من المرجع في تلك الخطوة.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "r_fuel =",
+        "line": 934,
+        "match": "r_fuel ="
+      },
+      "upstream": [
+        "baseline_ecu",
+        "fuel"
+      ],
+      "downstream": [
+        "policy_reward",
+        "weight_fuel"
+      ],
+      "increase": "تدفق وقود أقل للسياسة يرفع هذا الحد.",
+      "decrease": "تدفق الوقود الأعلى يخفضه.",
+      "caveat": "يحدد وزن الحلقة مقدار تأثير هذا الحد.",
+      "evidence_note": "r_fuel = (baseline fuel − fuel) / (baseline fuel + 1e−6).",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "r_life",
+      "name": "مكافأة عمر المكونات",
+      "meaning": "يمثل حد العمر الخفض النسبي للضرر المحسوب مقارنة بالمرجع.",
+      "why": "يشجع الحماية مع إظهار افتراضات النموذج.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "الموجب يعني ضرراً محسوباً أقل للسياسة من المرجع.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "r_life =",
+        "line": 935,
+        "match": "r_life ="
+      },
+      "upstream": [
+        "damage",
+        "baseline_ecu"
+      ],
+      "downstream": [
+        "policy_reward",
+        "weight_life"
+      ],
+      "increase": "ضرر السياسة الأقل يرفع الحد.",
+      "decrease": "الضرر المحسوب الأعلى يخفضه.",
+      "caveat": "المؤشر ليس عمر مكوّن مقاساً؛ ويمكن أن تفاضله أوزان الوقود.",
+      "evidence_note": "r_life = (baseline damage_rate − damage_rate) / (baseline damage_rate + 0.05).",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "r_resp",
+      "name": "مكافأة تتبع العزم",
+      "meaning": "حد سالب يعاقب عدم تلبية عزم المحرك المطلوب، وتشتد العقوبة بعد خطأ 5%.",
+      "why": "يمنع المتحكم من الظهور بمظهر الحامي عبر حجب العزم.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "سماح 5% قبل عقوبة العتبة الإضافية.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "r_resp =",
+        "line": 938,
+        "match": "r_resp ="
+      },
+      "upstream": [
+        "engine_torque",
+        "torque_req"
+      ],
+      "downstream": [
+        "policy_reward",
+        "weight_tracking"
+      ],
+      "increase": "خطأ العزم الأصغر يجعل العقوبة السالبة أقل.",
+      "decrease": "العزم غير الملبى يجعل المكافأة أكثر سلبية.",
+      "caveat": "كلف العزم والطرق وEGT تشخيصات، وليست حدود مكافأة إضافية.",
+      "evidence_note": "يستخدم r_resp خطأ العزم المطلق المعياري وTRACK_HINGE=25 بعد TRACK_TOL=0.05.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "policy_reward",
+      "name": "المكافأة الموزونة بالتفضيلات",
+      "meaning": "تجمع المكافأة حدود التتبع والوقود والعمر بأوزان الحلقة مع عدم اليقين وتنعيم الأفعال.",
+      "why": "تتيح الأوزان مفاضلات مختلفة حسب الحلقة.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "تتغير الأوزان لكل حلقة؛ وهي ليست ضمان سلامة.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "reward =",
+        "line": 945,
+        "match": "reward ="
+      },
+      "upstream": [
+        "r_fuel",
+        "r_life",
+        "r_resp",
+        "weight_tracking",
+        "weight_fuel",
+        "weight_life"
+      ],
+      "downstream": [
+        "policy_action"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "قد تسمح أولوية عمر منخفضة بأداء أسوأ من المرجع في بعض الحلقات.",
+      "evidence_note": "تستخدم المعادلة w[0] للتتبع وw[1] للوقود وw[2] للعمر.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "constraint_costs",
+      "name": "مؤشرات تشخيص القيود",
+      "meaning": "تعيد البيئة كلف نقص العزم والطرق وارتفاع EGT ضمن بيانات التشخيص.",
+      "why": "تكشف سلوكاً مقلقاً حتى عندما تفاضل المكافأة بين الأهداف.",
+      "unit": "dimensionless costs",
+      "evidence": "MODELLED",
+      "range": "سماح العزم 3% للتشخيص؛ KI>1؛ مرجع EGT هو 1223 K.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "c_torque =",
+        "line": 948,
+        "match": "c_torque ="
+      },
+      "upstream": [
+        "engine_torque",
+        "knock",
+        "egt"
+      ],
+      "downstream": [
+        "diagnostic_frame",
+        "preview_result"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "هذه الكلف ليست درع سلامة صلباً ولا تخصم كلها من المكافأة.",
+      "evidence_note": "تحسب cost_torque وcost_knock وcost_egt بعد المكافأة وتعيدها ضمن info.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "thermal_time_constant",
+      "name": "الثابت الزمني الحراري",
+      "meaning": "تعطي سعة الحرارة مقسومة على معدل انتقال الحرارة زمناً تقريبياً لاستجابة العقدة.",
+      "why": "تقارن الفرضية τ بمدى تقدم معلومة الميل H.",
+      "unit": "seconds",
+      "evidence": "ASSUMED",
+      "range": "ثابت التوربين نحو 47 s في السيناريو المقفل؛ وهو غير مقاس مباشرة.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "ThermalParams",
+        "variable": "c_turb",
+        "line": 48,
+        "match": "class ThermalParams"
+      },
+      "upstream": [
+        "t_turb"
+      ],
+      "downstream": [
+        "preview",
+        "h_over_tau"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "تمنع الصلابة العددية في عقدة الكتلة اعتماد مسح H/τ حالياً.",
+      "evidence_note": "تعرف thermal.py العلاقة C/UA وتبين أن C وUA للتوربين افتراضان.",
+      "evidence_class": "ASSUMED",
+      "evidence_label_ar": "مفترض"
+    },
+    {
+      "id": "h_over_tau",
+      "name": "نسبة H/τ",
+      "meaning": "النسبة H/τ هي أفق المعاينة مقسوماً على زمن الاستجابة الحرارية؛ وهي فرضية تنظيمية قيد الاختبار.",
+      "why": "السؤال البحثي هو متى تفيد معرفة المستقبل، لا من يفوز مرة واحدة.",
+      "unit": "dimensionless",
+      "evidence": "UNVERIFIED",
+      "range": "نقطة واحدة من إعادة التدريب تقارب H/τ=0.64 باستخدام ثابت توربين مفترض.",
+      "source": {
+        "file": "CLAUDE.md",
+        "symbol": "H / τ",
+        "variable": "criterion",
+        "line": 58,
+        "match": "The claim."
+      },
+      "upstream": [
+        "preview",
+        "thermal_time_constant"
+      ],
+      "downstream": [
+        "research_claim"
+      ],
+      "increase": "النسبة الأعلى تعني أفق معاينة أطول نسبة إلى زمن الاستجابة.",
+      "decrease": "النسبة الأقل تعني أفقاً أقصر نسبةً إلى الاستجابة.",
+      "caveat": "المنحنى العام فرضية؛ لم يثبت مسح مصحح عبر مصانع مختلفة.",
+      "evidence_note": "تقترح الفرضية تراكب النقاط من مصانع مختلفة؛ ولم يثبت ذلك بمسح مصحح عبر المصانع.",
+      "evidence_class": "UNVERIFIED",
+      "evidence_label_ar": "غير متحقق"
+    },
+    {
+      "id": "grade",
+      "name": "ميل الطريق الحالي",
+      "meaning": "ميل الطريق عند موضع المركبة الآن، وتراه السياستان المرئية والمعمّاة.",
+      "why": "تقيس المقارنة قيمة المستقبل فوق معرفة الحالة الحالية.",
+      "unit": "%",
+      "evidence": "SCENARIO INPUT",
+      "range": "تعرض البطاقة الميل بالمئة؛ وتخزن الخانة 13 الميل الكسري مضروباً في 12.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "c[\"grade\"][self.k]",
+        "line": 803,
+        "match": "c[\"grade\"][self.k]"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "torque_req",
+        "preview"
+      ],
+      "increase": "الصعود الأشد يزيد قوة العجلات المطلوبة.",
+      "decrease": "الطريق المستوي أو المنحدر يقلل قوة الميل أو يعكسها.",
+      "caveat": "في Phase D التاريخية سمح الطريق الثابت والساعة الحرارية للسياسة المعمّاة باستنتاج التوقيت.",
+      "evidence_note": "الخانة 13 للميل الحالي؛ والخانات 14–17 وحدها تصفر عند تعطيل المعاينة.",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "agent",
+      "name": "متحكم SAC المدرّب",
+      "meaning": "تحول سياسة Soft Actor-Critic عدد 23 ملاحظة إلى خمسة أفعال إشرافية محدودة.",
+      "why": "يختبر ما إذا كانت السياسة تستخدم الحالة والمعاينة مع موازنة التفضيلات.",
+      "unit": "normalized actions",
+      "evidence": "MODELLED",
+      "range": "صادرات policy.npz ليست ملفات Stable-Baselines3 النهائية المطابقة للتقييم.",
+      "source": {
+        "file": "train.py",
+        "symbol": "main",
+        "variable": "SAC",
+        "line": 1,
+        "match": "SAC"
+      },
+      "upstream": [
+        "policy_reward"
+      ],
+      "downstream": [
+        "policy_action"
+      ],
+      "increase": "تغير الملاحظة أو معاملات السياسة قد يغير الفعل.",
+      "decrease": "تفتقد السياسة المعمّاة قيم الميل المستقبلية، لكنها ترى الميل الحالي والحالة الحرارية.",
+      "caveat": "إعادة تشغيل الصادرات غير متحققة الهوية؛ ويجب وسمها UNVERIFIED لا كأثر مسجل مطابق.",
+      "evidence_note": "تضم النتائج الحالية عشرة سياسات مرئية وعشرة معمّاة، تدرب كل منها 50,000 خطوة على طرق متنوعة.",
+      "evidence_class": "MODELLED",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "preview_result",
+      "name": "النتيجة الحالية للمعاينة",
+      "meaning": "عبر عشرة أزواج بذور، متوسط فرق خفض الضرر المرئي ناقص المعمّى +1.169 نقطة مئوية وفاصل 95% [−4.439، +6.778].",
+      "why": "هذا اختبار القيمة الإضافية لمعاينة الميل في إعادة التدريب الحالية.",
+      "unit": "percentage points",
+      "evidence": "STATISTIC",
+      "range": "n=10؛ paired t p=0.6484؛ exact Wilcoxon p=0.4316.",
+      "source": {
+        "file": "results/agents/terrain_dt1/index.json",
+        "symbol": "ablation",
+        "variable": "ci95",
+        "line": 4632,
+        "match": "\"ablation\""
+      },
+      "upstream": [
+        "preview",
+        "agent"
+      ],
+      "downstream": [
+        "research_claim"
+      ],
+      "increase": "الفرق الموجب يرجح المرئي في الإعداد المختبر فقط.",
+      "decrease": "الفرق السالب يرجح المعمّى؛ والفاصل الذي يشمل الصفر لا يحسم الاتجاه.",
+      "caveat": "غير حاسم؛ لا تدّع انعدام الأثر ولا إثبات قاعدة H/τ.",
+      "evidence_note": "يسجل فهرس terrain_dt1 أزواج البيانات وفاصل الثقة واختبارات الأزواج.",
+      "evidence_class": "STATISTIC",
+      "evidence_label_ar": "نتيجة إحصائية"
+    },
+    {
+      "id": "measured_vs_modelled",
+      "name": "المقاس والمشتق والمفترض",
+      "meaning": "تسجل المركبة بعض الإشارات؛ وتشتق البرامج معاملات؛ وتبقى حالات وثوابت أخرى محسوبة أو مفترضة.",
+      "why": "الرقم الدقيق في لوحة العرض لا يعني أنه قياس مباشر.",
+      "unit": "evidence class",
+      "evidence": "MIXED",
+      "range": "حرارة غلاف التوربين وثابته الزمني مبنيان على معاملات مفترضة.",
+      "source": {
+        "file": "REFERENCES.md",
+        "symbol": "First, the four kinds",
+        "variable": "kind | what it means",
+        "line": 21,
+        "match": "## First, the four kinds"
+      },
+      "upstream": [],
+      "downstream": [
+        "research_claim"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "ثمانية من 11 فحص تحقق ناجحة؛ والتحقق محدود وغير شامل.",
+      "evidence_note": "يفرق ملف REFERENCES.md بين القيم المقاسة والمشتقة والمحسوبة والمفترضة.",
+      "evidence_class": "MIXED",
+      "evidence_label_ar": "مصادر مختلطة"
+    },
+    {
+      "id": "rpm",
+      "name": "سرعة المحرك",
+      "meaning": "سرعة عمود المرفق بالدورات في الدقيقة.",
+      "why": "تؤثر السرعة في معدل الدورات ونسب التروس وتدفق الهواء والاحتكاك.",
+      "unit": "rpm",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.rpm / 3000.0 - 1.0",
+        "line": 786,
+        "match": "self.rpm / 3000.0 - 1.0"
+      },
+      "upstream": [
+        "gear"
+      ],
+      "downstream": [
+        "air",
+        "fuel",
+        "t_oil"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "map",
+      "name": "ضغط مجمع السحب",
+      "meaning": "الضغط المطلق بعد الخانق في مجمع السحب المحسوب.",
+      "why": "يحدد ضغط المجمع كتلة الهواء مع RPM وحرارة الشحنة والكفاءة الحجمية.",
+      "unit": "kPa abs",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.map_kpa / 120.0 - 1.0",
+        "line": 787,
+        "match": "self.map_kpa / 120.0 - 1.0"
+      },
+      "upstream": [
+        "turbocharger"
+      ],
+      "downstream": [
+        "air",
+        "torque_req"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "tps",
+      "name": "مؤشر الخانق",
+      "meaning": "مؤشر نموذجي مستند إلى ضغط المجمع المحقق، وليس قناة خانق مقاسة.",
+      "why": "يساعد على وصف الحمل الحالي المحسوب.",
+      "unit": "fraction",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.tps,",
+        "line": 788,
+        "match": "self.tps,"
+      },
+      "upstream": [
+        "map"
+      ],
+      "downstream": [
+        "air"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "lam",
+      "name": "لامبدا",
+      "meaning": "نسبة الهواء والوقود المحسوبة إلى الخليط المتكافئ؛ 1.0 متكافئ.",
+      "why": "تؤثر نسبة الخليط في الوقود والاحتراق وحرارة العادم والطرق.",
+      "unit": "ratio",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "(self.lam - 1.0) * 8.0",
+        "line": 790,
+        "match": "(self.lam - 1.0) * 8.0"
+      },
+      "upstream": [
+        "lambda_trim",
+        "air"
+      ],
+      "downstream": [
+        "fuel",
+        "combustion"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "ambient_temp",
+      "name": "حرارة الجو",
+      "meaning": "حرارة الجو التي يحددها السيناريو المولّد.",
+      "why": "تؤثر حرارة الجو في كثافة الهواء وطرح الحرارة.",
+      "unit": "K",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "(c[\"t_amb\"] - 293.0) / 15.0",
+        "line": 795,
+        "match": "(c[\"t_amb\"] - 293.0) / 15.0"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "charge_temp",
+        "t_block",
+        "t_turb",
+        "t_oil"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "barometric_pressure",
+      "name": "الضغط الجوي",
+      "meaning": "مدخل ضغط السيناريو في الخانة 10. يؤثر في كثافة الجو التي تستخدمها Vehicle.demand لطلب الطريق.",
+      "why": "يربط جو السيناريو بطلب عزم الطريق، وليس بكتلة الهواء عند MAP ثابت.",
+      "unit": "kPa abs",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "مدخل ضغط السيناريو في الخانة 10. يؤثر في كثافة الجو التي تستخدمها Vehicle.demand لطلب الطريق.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "(c.get(\"p_baro\", 101.3) - 101.3) / 8.0",
+        "line": 800,
+        "match": "(c.get(\"p_baro\", 101.3) - 101.3) / 8.0"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "torque_req"
+      ],
+      "increase": "عند حرارة ثابتة، رفع ضغط السيناريو يزيد كثافة الجو وجزء مقاومة الهواء في طلب الطريق.",
+      "decrease": "عند حرارة ثابتة، خفض ضغط السيناريو يقلل كثافة الجو وجزء مقاومة الهواء في طلب الطريق.",
+      "caveat": "مولدات الطريق تثبت p_baro عند 101.3 kPa؛ الارتفاع غير محاكى. استدعاء سقف الضاغط في البيئة لا يمرر p_baro ويستخدم ضغط المدخل الافتراضي 99.3 kPa في plant.boost_ceiling_kpa.",
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "humidity",
+      "name": "مدخل الرطوبة النوعية",
+      "meaning": "يخزن الطريق رطوبة نوعية ثابتة 0.012 kg/kg ويعرضها للسياسة؛ لا تستخدمها معادلات المحرك الحالية.",
+      "why": "يحفظ مصدر المدخل ويتيح تجربة مستقبلية؛ ولا يمثل تأثيراً جوياً حالياً.",
+      "unit": "kg/kg",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "c.get(\"humidity\", 0.01) * 40.0 - 0.5",
+        "line": 797,
+        "match": "c.get(\"humidity\", 0.01) * 40.0 - 0.5"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "قيمة محاكاة أو مدخل سيناريو؛ لا تعد قياساً مباشراً من المركبة ما لم يذكر المصدر ذلك صراحةً.",
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "speed",
+      "name": "سرعة المركبة",
+      "meaning": "سرعة الطريق التي يحددها السيناريو.",
+      "why": "تؤثر السرعة في حمل الطريق واختيار الترس وطرح الحرارة.",
+      "unit": "m/s",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.v / 25.0 - 1.0",
+        "line": 798,
+        "match": "self.v / 25.0 - 1.0"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "torque_req",
+        "gear",
+        "t_oil"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "preview_2s",
+      "name": "معاينة الميل بعد 2 s",
+      "meaning": "ميل الطريق بعد ثانيتين في الطريق المولّد.",
+      "why": "قد تساعد المتحكم على الاستعداد قبل تغير الميل.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "preview_5s",
+      "name": "معاينة الميل بعد 5 s",
+      "meaning": "ميل الطريق بعد خمس ثوان في الطريق المولّد.",
+      "why": "تعطي إنذاراً أبكر من عينة الثانيتين.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "preview_15s",
+      "name": "معاينة الميل بعد 15 s",
+      "meaning": "ميل الطريق بعد خمس عشرة ثانية في الطريق المولّد.",
+      "why": "توفر إشارة أبعد أفقاً؛ وقد تكون أقل دقة عند تغير مفاجئ.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "preview_30s",
+      "name": "معاينة الميل بعد 30 s",
+      "meaning": "ميل الطريق بعد ثلاثين ثانية في الطريق المولّد.",
+      "why": "تمثل أبعد أفق معاينة تعرضه السياسة.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "aggression",
+      "name": "تغير طلب السائق",
+      "meaning": "مؤشر معياري لمقدار تغير السرعة.",
+      "why": "يميز طلب السرعة المتغير عن السير الثابت.",
+      "unit": "normalized",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.aggression",
+        "line": 807,
+        "match": "self.aggression"
+      },
+      "upstream": [
+        "speed"
+      ],
+      "downstream": [
+        "torque_req"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "weight_tracking",
+      "name": "وزن تفضيل تتبع العزم",
+      "meaning": "وزن الحلقة لتتبع العزم؛ تسحب إعادة التدريب قيمة من 0.45 إلى 0.70، بينما يثبت الجسر قيمة Episode 1 عند 0.690154.",
+      "why": "يمنع الحد الأدنى من تحويل رفض العزم إلى حيلة للمكافأة.",
+      "unit": "weight",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "float(self.w[0])",
+        "line": 809,
+        "match": "float(self.w[0])"
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "r_resp"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "قيمة محاكاة أو مدخل سيناريو؛ لا تعد قياساً مباشراً من المركبة ما لم يذكر المصدر ذلك صراحةً.",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "weight_fuel",
+      "name": "وزن تفضيل الوقود",
+      "meaning": "حصة تفضيل الوقود؛ تسحب حصتا الوقود والعمر من Dirichlet(1,1)، ويثبت الجسر قيمة Episode 1 عند 0.012829.",
+      "why": "يحدد مفاضلة الوقود مقابل عمر المكونات في الحلقة.",
+      "unit": "weight",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "float(self.w[1])",
+        "line": 809,
+        "match": "float(self.w[1])"
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "r_fuel"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "قيمة محاكاة أو مدخل سيناريو؛ لا تعد قياساً مباشراً من المركبة ما لم يذكر المصدر ذلك صراحةً.",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "weight_life",
+      "name": "وزن تفضيل عمر المكونات",
+      "meaning": "حصة تفضيل خفض الضرر؛ تسحب الحصتان من Dirichlet(1,1)، ويثبت الجسر قيمة Episode 1 عند 0.297017.",
+      "why": "يحدد قيمة خفض الضرر المحسوب في الحلقة.",
+      "unit": "weight",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "float(self.w[2])",
+        "line": 809,
+        "match": "float(self.w[2])"
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "r_life"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "قيمة محاكاة أو مدخل سيناريو؛ لا تعد قياساً مباشراً من المركبة ما لم يذكر المصدر ذلك صراحةً.",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "spark_trim",
+      "name": "تصحيح الإشعال",
+      "meaning": "أمر إضافي محدود يطبق على توقيت الإشعال الأساسي.",
+      "why": "يفاضل التوقيت بين الكفاءة والطرق وحرارة العادم.",
+      "unit": "deg BTDC",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "spark"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": "قيمة محاكاة أو مدخل سيناريو؛ لا تعد قياساً مباشراً من المركبة ما لم يذكر المصدر ذلك صراحةً.",
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "lambda_trim",
+      "name": "تصحيح لامبدا",
+      "meaning": "أمر إضافي لنسبة الخليط يطبق على لامبدا الأساسية.",
+      "why": "تغير نسبة الخليط تدفق الوقود والاحتراق وكتلة العادم.",
+      "unit": "lambda",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "lam",
+        "fuel"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "boost_trim",
+      "name": "تصحيح MAP",
+      "meaning": "إزاحة MAP مطلوبة، ويقيدها مسار العزم وغلاف الضاغط.",
+      "why": "يغير الهواء المتاح لتلبية طلب العزم.",
+      "unit": "kPa",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "map",
+        "air"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "fan_duty",
+      "name": "تشغيل المروحة",
+      "meaning": "أمر مطلق لنسبة تشغيل مروحة المشع.",
+      "why": "يغير طرح الحرارة المحسوب عبر المشع.",
+      "unit": "fraction",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "t_block"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "pump_duty",
+      "name": "تشغيل المضخة",
+      "meaning": "أمر مطلق لنسبة تشغيل مضخة سائل التبريد.",
+      "why": "يغير تدفق سائل التبريد وطرح الحرارة.",
+      "unit": "fraction",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "t_block"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "policy_action",
+      "name": "فعل السياسة",
+      "meaning": "متجه الأفعال الخمسة بعد تحويل خرج السياسة وتطبيق القيود.",
+      "why": "تنقل هذه القيم مخرجات السياسة إلى الأفعال المحدودة الفعلية.",
+      "unit": "normalized",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent",
+        "preview"
+      ],
+      "downstream": [
+        "normalized_actions"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "diagnostic_frame",
+      "name": "بيانات المحاكاة التشخيصية",
+      "meaning": "قيم الحالة والإشارات المشتقة للمحاكاة عند هذه الخطوة.",
+      "why": "تساعد هذه القيم على تفسير سلوك النموذج أثناء التجربة.",
+      "unit": "mixed",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "cost_torque",
+        "line": 948,
+        "match": "cost_torque"
+      },
+      "upstream": [
+        "constraint_costs"
+      ],
+      "downstream": [
+        "preview_result"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "محسوب بالنموذج"
+    },
+    {
+      "id": "scenario",
+      "name": "سيناريو الطريق المولّد",
+      "meaning": "قيم الطريق والطقس المولدة التي تشكل مدخلات الحلقة.",
+      "why": "يحدد السيناريو ظروف الطريق التي يختبرها المتحكم.",
+      "unit": "scenario",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "تقرأ البيئة خصائص الطريق من الدورة المولدة؛ راجع كائن المصدر لمعرفة المدخلات الدقيقة.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "make_grade_climb",
+        "variable": "def make_grade_climb",
+        "line": 1007,
+        "match": "def make_grade_climb"
+      },
+      "upstream": [],
+      "downstream": [
+        "grade",
+        "speed"
+      ],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "مدخل سيناريو"
+    },
+    {
+      "id": "research_claim",
+      "name": "الاستنتاج البحثي",
+      "meaning": "تفسير النتيجة البحثية في ضوء البيانات المتاحة.",
+      "why": "يربط التفسير بحدود الدليل الحالي.",
+      "unit": "claim",
+      "evidence": "STATISTIC",
+      "evidence_class": "STATISTIC",
+      "evidence_note": "يوضح المصدر المحدد أصل هذه الكمية وطريقة استخدامها في النموذج.",
+      "range": null,
+      "source": {
+        "file": "results/agents/terrain_dt1/index.json",
+        "line": 1,
+        "match": "\"set\""
+      },
+      "upstream": [
+        "preview_result",
+        "measured_vs_modelled"
+      ],
+      "downstream": [],
+      "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
+      "caveat": null,
+      "evidence_label_ar": "نتيجة إحصائية"
+    }
+  ],
+  "tour": [
+    {
+      "id": "road_to_load",
+      "title": "يبدأ حمل المحرك من الطريق",
+      "subtitle": "كيف يتحول الميل إلى عزم مطلوب",
+      "body": "تحدد سرعة الطريق وتسارعه وميله قوة العجلات. وتحول نسب التروس هذه القوة إلى نقطة تشغيل المحرك.",
+      "experiment": "فعّل تجاوز الطريق المتبقي، وارفع الميل من 0% إلى 12%، ثم تقدّم 30 s. قارن العزم المطلوب قبل التغيير وبعده.",
+      "layer": "vehicle",
+      "focus": "grade",
+      "concepts": [
+        "torque_req",
+        "gear",
+        "grade"
+      ]
+    },
+    {
+      "id": "engine_101",
+      "title": "أساسيات المحرك: كيف تصنع الأسطوانة العزم",
+      "subtitle": "أربعة أشواط ودورتان لعمود المرفق",
+      "body": "يحوّل المحرك طاقة الوقود إلى حرارة وضغط. تستغرق أشواط السحب والضغط والقدرة والعادم دورتين لعمود المرفق. يدفع الضغط المكبس فيدير العمود. يحاكي المشروع دورة مبسطة أحادية المنطقة، لا احتراقاً ثلاثي الأبعاد.",
+      "experiment": "افتح مختبر أساسيات المحرك وانتقل بين الأشواط الأربعة. راقب ضغط المكبس للخليط قبل أن يبدأ الشرر شوط القدرة.",
+      "layer": "engine",
+      "focus": "engine",
+      "concepts": [
+        "engine",
+        "four_stroke",
+        "combustion",
+        "engine_torque"
+      ]
+    },
+    {
+      "id": "air_and_fuel",
+      "title": "الهواء والوقود يصنعان الشحنة",
+      "subtitle": "يرفع الضغط كتلة الهواء؛ وتحدد لامبدا الوقود",
+      "body": "يوفر الضاغط هواءً مضغوطاً. وتحدد حرارة الشحنة وسرعة المحرك الأكسجين الداخل في كل دورة؛ ثم تضبط لامبدا كتلة الوقود لذلك الهواء.",
+      "experiment": "ثبّت تجاوز الطريق واختر المشرف اليدوي. ارفع تصحيح MAP قليلاً، وتقدّم 1 s، ثم قارن ضغط المجمع وتدفق الهواء والوقود المحسوب.",
+      "layer": "turbo",
+      "focus": "air",
+      "concepts": [
+        "turbocharger",
+        "air",
+        "charge_temp",
+        "fuel"
+      ]
+    },
+    {
+      "id": "spark_and_burn",
+      "title": "الشرر يبدأ احتراقاً يستغرق زمناً",
+      "subtitle": "يؤثر التوقيت في الشغل والعادم والطرق",
+      "body": "يحدد التوقيت لحظة عمل شمعة الإشعال قبل النقطة الميتة العليا. وقد يغير تعديل صغير العزم والوقود وحرارة العادم والتعرض للطرق معاً.",
+      "experiment": "افتح أساسيات المحرك واتبع الأشواط الأربعة. أثناء الضغط يغلق الصمامان ويضغط المكبس الخليط؛ وقد يزيد التقديم الزائد مؤشر الطرق المحسوب.",
+      "layer": "engine",
+      "focus": "cylinder",
+      "concepts": [
+        "four_stroke",
+        "combustion",
+        "spark",
+        "knock"
+      ]
+    },
+    {
+      "id": "exhaust_to_turbine",
+      "title": "يحمل العادم الحرارة إلى التوربين",
+      "subtitle": "تدفق الهواء والوقود يمران بالجانب الساخن",
+      "body": "تسخن حرارة العادم وكتلته غلاف التوربين. ويتذكر النموذج هذه الحرارة بين الخطوات.",
+      "experiment": "ثبّت الطريق، وارفع الحمل بتصحيح MAP، ثم تقدّم 30 s. قارن حرارة العادم المحسوبة باستجابة غلاف التوربين الأبطأ.",
+      "layer": "turbo",
+      "focus": "t_turb",
+      "concepts": [
+        "exhaust_flow",
+        "egt",
+        "t_turb"
+      ]
+    },
+    {
+      "id": "thermal_memory",
+      "title": "تحتفظ ثلاث عقد بذاكرة الحرارة",
+      "subtitle": "تستجيب الكتلة والزيت والتوربين بسرعات مختلفة",
+      "body": "تسبب السعات الحرارية ومسارات انتقال الحرارة استجابة ممتدة. معاملات الكتلة والزيت مشتقة من السجلات؛ أما ديناميكيات التوربين فمفترضة.",
+      "experiment": "افتح ذاكرة الحرارة وغيّر الحمل لفترة قصيرة. قارن سرعة استجابة حرارة الكتلة والزيت والتوربين.",
+      "layer": "thermal",
+      "focus": "thermal",
+      "concepts": [
+        "t_block",
+        "t_oil",
+        "t_turb",
+        "thermal_time_constant"
+      ]
+    },
+    {
+      "id": "agent_inputs",
+      "title": "ترى السياسة الحالة ومعاينة الطريق",
+      "subtitle": "23 قيمة تتحول إلى خمسة أوامر إشرافية",
+      "body": "ترى السياستان حالة المحرك والمركبة الحالية. وترى السياسة المرئية أربع عينات لميل المستقبل؛ أما المعمّاة فتستقبل أصفاراً في هذه الخانات وحدها.",
+      "experiment": "عطّل معاينة الميل ثم أعد الضبط. فعّلها وأعد الضبط ثانيةً، وقارن الخانات 14–17؛ تبقى خانة الميل الحالي 13 ظاهرة في الحالتين.",
+      "layer": "agent",
+      "focus": "agent",
+      "concepts": [
+        "preview",
+        "normalized_actions",
+        "agent"
+      ]
+    },
+    {
+      "id": "reward_tradeoffs",
+      "title": "توازن المكافأة بين أهداف متنافسة",
+      "subtitle": "تلبية العزم وتوفير الوقود وخفض الضرر المحسوب",
+      "body": "تغير أوزان الحلقة الموازنة بين الاستجابة والوقود ومؤشر العمر. وتكشف كلف القيود السلوك السيئ حتى حين تفاضل المكافأة بين الأهداف.",
+      "experiment": "افتح مقارنة المعاينة، واختر بذرة، ثم قارن أوزان التتبع والوقود والعمر وحدود المكافأة للمتحكمين على البذرة نفسها.",
+      "layer": "agent",
+      "focus": "reward",
+      "concepts": [
+        "r_resp",
+        "r_fuel",
+        "r_life",
+        "policy_reward",
+        "constraint_costs"
+      ]
+    },
+    {
+      "id": "result_and_limits",
+      "title": "ماذا تقول التجربة؟",
+      "subtitle": "أثر المعاينة ما زال غير حاسم",
+      "body": "يشمل فاصل الأزواج الصفر، والاختبارات غير دالة. وتعتمد الأفضلية الظاهرة للسياسات المدربة على نموذج طرق لم يتحقق بعد.",
+      "experiment": "افتح نتيجة البحث واقرأ فاصل 95% واختباري p. اشرح لماذا لا يحسم فاصل يشمل الصفر اتجاه الأثر.",
+      "layer": "agent",
+      "focus": "results",
+      "concepts": [
+        "preview_result",
+        "measured_vs_modelled",
+        "h_over_tau"
+      ]
+    }
+  ],
+  "viva": [
+    {
+      "question": "كيف يحول المحرك الوقود إلى عزم عمود؟",
+      "short": "يحترق الوقود داخل الأسطوانة فيرفع الضغط. يحول المكبس هذا الضغط إلى دوران لعمود المرفق.",
+      "technical": "تكمل الأسطوانة السحب والضغط والقدرة والعادم خلال دورتين لعمود المرفق. يدمج النموذج أحادي المنطقة شغل الضغط، ثم يطرح تقدير الاحتكاك والضخ لإنتاج عزم فرملة محسوب.",
+      "focus": "engine",
+      "layer": "engine"
+    },
+    {
+      "question": "لماذا تحتفظ حرارة المحرك بذاكرة؟",
+      "short": "تخزن المعادن والسوائل الحرارة، لذلك تتغير حرارتها مع الزمن ولا تتبع الحمل فوراً.",
+      "technical": "توازن كل عقدة تغير الطاقة مع سعتها الحرارية والدخل الحراري والانتقال إلى العقد المجاورة والجو. لذلك قد يستمر أثر الحمل على الكتلة والزيت والتوربين بعد تغير طلب الطريق.",
+      "focus": "t_block",
+      "layer": "thermal"
+    },
+    {
+      "question": "ما أدوات التحكم الخمس التي يستخدمها المشرف؟",
+      "short": "تصحيح الإشعال، وتصحيح لامبدا، وتصحيح MAP، وتشغيل مروحة المشع، وتشغيل مضخة التبريد.",
+      "technical": "ترتيب متجه الفعل [spark, lambda, MAP, fan, pump]. حدوده [−8,+4] degrees، و[−0.15,+0.06] lambda، و[−40,+15] kPa، و[0,1] للمروحة، و[0.3,1] للمضخة. أول ثلاثة تصحيحات إضافية؛ والمروحة والمضخة نسب مطلقة، مع حدود لمعدل التغير.",
+      "focus": "agent",
+      "layer": "agent"
+    },
+    {
+      "question": "لماذا لا تقاس حرارة غلاف التوربين من السيارة؟",
+      "short": "لا يحتوي سجل المركبة على حساس لحرارة غلاف التوربين؛ لذا فهي قيمة يقدرها النموذج.",
+      "technical": "تكامل الشبكة الحرارية حالة التوربين باستخدام طاقة العادم وسعة حرارية ومعاملات انتقال مفترضة. ليست قناة OBD ولا يوجد تحقق بحساس مطابق في السيارة.",
+      "focus": "t_turb",
+      "layer": "thermal"
+    },
+    {
+      "question": "ماذا تضيف معاينة ميل الطريق القادم؟",
+      "short": "تضيف أربع عينات للميل بعد 2 و5 و15 و30 ثانية.",
+      "technical": "ترى السياسة المرئية الميل الحالي في الخانة 13 والعينات القادمة في الخانات 14–17. يصفر تعطيل المعاينة العينات الأربع فقط؛ وتظل السياسة المعمّاة ترى الميل الحالي.",
+      "focus": "preview",
+      "layer": "agent"
+    },
+    {
+      "question": "كيف يختلف المشرف عن ECU الأساسي؟",
+      "short": "يضع ECU الأساسي أوامر المحرك الأولية. يقرأ المشرف الملاحظات ويضيف تصحيحات محدودة، بينما يعالج النموذج العزم واختيار الترس.",
+      "technical": "يوفر BaselineECU توقيت الإشعال ولامبدا الأساسيين. تختار السياسة خمسة أفعال؛ ويقيد مسار PI للعزم MAP ويختار نموذج المركبة التروس. سياسة baseline في الجسر مشرف محايد للمشروع؛ وقد تختلف نسب المروحة والمضخة عن جدول ECU.",
+      "focus": "agent",
+      "layer": "agent"
+    },
+    {
+      "question": "لماذا تقارن مكافأتا الوقود والعمر بخط أساس؟",
+      "short": "تسجلان التوفير نسبةً إلى خط الأساس في الحلقة نفسها؛ ويحسب تتبع العزم بصورة مستقلة.",
+      "technical": "في كل خطوة: r_fuel=(baseline fuel−agent fuel)/baseline fuel وr_life=(baseline damage−agent damage)/baseline damage. تجمع المكافأة الموزونة هذين الحدين مع r_resp وحد عدم يقين وعقوبة تنعيم الأفعال؛ أما كلف القيود فهي تشخيصات لا حدود مكافأة إضافية.",
+      "focus": "r_fuel",
+      "layer": "agent"
+    },
+    {
+      "question": "لماذا يزيد الميل الأشد عزم المحرك المطلوب؟",
+      "short": "تقاوم الجاذبية المركبة بقوة أكبر على الصعود الأشد، فيطلب النموذج قوة عجلات وعزم محرك أكبر.",
+      "technical": "يجمع طلب المركبة الميل ومقاومة التدحرج والسحب والتسارع لحساب قوة العجلات. وتحول نسب التروس والدفع النهائي القوة إلى عزم مطلوب يدخل في خطأ التتبع.",
+      "focus": "grade",
+      "layer": "vehicle"
+    },
+    {
+      "question": "ماذا قد يفعل تأخير الشرارة بحرارة العادم؟",
+      "short": "قد يقلل التأخير خطر الطرق، لكنه قد يرسل حرارة أكثر إلى العادم ويزيد استهلاك الوقود.",
+      "technical": "يغير النموذج طور الاحتراق وشغله مع توقيت الشرارة. يقلل التأخير التعرض المحسوب للطرق عادةً، ويميل إلى رفع حرارة العادم عند نقطة الحمل العالية المعنية؛ لكن المقدار يعتمد على نقطة التشغيل.",
+      "focus": "spark",
+      "layer": "engine"
+    },
+    {
+      "question": "ماذا تخبرنا لامبدا، وماذا يغير إغناء الخليط؟",
+      "short": "تقارن لامبدا الخليط بنسبة الهواء والوقود المتكافئة. لامبدا الأقل تعني خليطاً أغنى ووقوداً أكثر لكل كمية هواء.",
+      "technical": "لامبدا هي نسبة الهواء والوقود الفعلية إلى النسبة المتكافئة؛ λ=1 متكافئ وλ<1 غني. يحسب النموذج كتلة الوقود من الهواء ولامبدا. قد يقلل الإغناء ميل الطرق في منطق الحماية، لكنه يرفع تدفق الوقود المحسوب؛ ويتوقف أثره الحراري على نقطة التشغيل.",
+      "focus": "lam",
+      "layer": "engine"
+    },
+    {
+      "question": "لماذا تعاقب المكافأة العزم غير الملبى؟",
+      "short": "من دون عقوبة التتبع يمكن للمتحكم أن يبدو حامياً بمجرد رفض العزم المطلوب.",
+      "technical": "يستخدم r_resp خطأ العزم المطلق المعياري مع TRACK_TOL=0.05 وعقوبة TRACK_HINGE=25. ويثبت وزن التتبع عند حد أدنى 0.45؛ ليظل تسليم العزم مطلوباً، بينما يحدد الوقود والعمر المفاضلة.",
+      "focus": "r_resp",
+      "layer": "agent"
+    },
+    {
+      "question": "ما نتيجة معاينة الطريق الحالية؟",
+      "short": "أثر المعاينة غير حاسم في إعادة التدريب الحالية؛ فالبيانات لا تثبت فائدة موثوقة ولا انعدام الأثر.",
+      "technical": "في عشرة أزواج مرئية/معمّاة، متوسط فرق خفض الضرر +1.1693 نقطة مئوية، وفاصل 95% [−4.4391,+6.7777]، واختبار paired t: p=0.648406، واختبار exact Wilcoxon: p=0.431641. يشمل الفاصل الصفر والاختباران غير دالين. في مقارنة منفصلة مع سياسة يدوية، كانت السياسة التنبؤية أسوأ 0.32 نقطة من سياسة الدرجة الحالية.",
+      "focus": "preview_result",
+      "layer": "agent"
+    },
+    {
+      "question": "ماذا تعني H/τ، وهل ثبت المنحنى؟",
+      "short": "تقارن H/τ أفق المعاينة بزمن الاستجابة الحرارية. لم يثبت المنحنى المصحح عبر الأنظمة بعد.",
+      "technical": "H أفق المعاينة وτ=C/UA ثابت زمني حراري. ما زالت سعة حرارة التوربين مفترضة، ويتذبذب التحديث الحراري عند dt=1 s؛ فلا تعتمد نتائج dt=2 s قبل تصحيح التكامل وتنفيذ التجربة المسجلة مسبقاً.",
+      "focus": "h_over_tau",
+      "layer": "thermal"
+    },
+    {
+      "question": "ما الذي يجعل إعادة تشغيل السياسة تطابق النتيجة المسجلة؟",
+      "short": "الأوزان المصدّرة وحدها لا تكفي؛ يجب أن تطابق هوية النموذج والشيفرة تشغيل التقييم أيضاً.",
+      "technical": "تتضمن الصادرات policy.npz وdata_sha1، لكنها لا تتضمن plant_sha أو تجزئة final.zip المسجلة. تتوفر ملخصات الدرجات، لكن eval_record.npz وtrain_record.npz الخام محليان ومستثنيان من Git؛ وأي تشغيل حي إعادة تمثيل UNVERIFIED وليس أثراً مطابقاً مسجلاً.",
+      "focus": "agent",
+      "layer": "agent"
+    },
+    {
+      "question": "لو توقعنا الحرارة فقط، من سيختار الشرارة والمروحة؟",
+      "short": "المتحكم يختار الأفعال؛ التنبؤ وحده لا يحدد الفعل.",
+      "technical": "SAC يحول obs_in إلى خمسة أفعال؛ نموذجا المحرك والحرارة يحسبان النتائج. القرار المتتابع يعتمد على الحالة والذاكرة الحرارية والمكافأة المتراكمة. MPC وتقليد السياسات بدائل ولا نثبت أفضلية بلا مقارنة. التدريب يحدّث الأوزان في مسار منفصل؛ التطبيق يعيد استعمال أوزان جاهزة أو سياسة يدوية/مكتوبة.",
+      "focus": [
+        "agent",
+        "policy_action",
+        "t_turb",
+        "policy_reward"
+      ]
+    },
+    {
+      "question": "هل خفض مؤشر الضرر 12% يعني زيادة عمر المكونات 12%؟",
+      "short": "لا؛ مؤشر نسبي للحرارة والطرق وليس عمرًا مقاسًا.",
+      "technical": "engine_env.py:636 يجمع أسّيات حرارة التوربين والزيت وحد الطرق الاختياري. المعدل مؤشر/ثانية والتراكم مجموع المعدل × dt. النسبة تحتاج مقام المرجع الموجب؛ فرق نسب الخفض نقاط مئوية وليس نسبة خفض جديدة.",
+      "focus": [
+        "damage",
+        "r_life",
+        "t_turb"
+      ]
+    },
+    {
+      "question": "هل reward قراءة حساس مستقلة أم تقييم مصمم؟",
+      "short": "مصمم من مقادير البيئة والمرجع وأوزان الأهداف.",
+      "technical": "engine_env.py:934–946 يجمع r_resp وr_fuel وr_life بأوزان obs_in[20:23] وعقوبتي عدم اليقين والنعومة. ليس label لأفضل فعل ولا تحققًا مستقلًا. تكاليف القيود تشخيصات لا تُخصم ثانية. العقوبات المفقودة تعني تفصيلًا جزئيًا والمجموع يبقى frame.reward.",
+      "focus": [
+        "policy_reward",
+        "r_resp",
+        "r_fuel",
+        "r_life"
+      ]
+    },
+    {
+      "question": "كيف تفرق مكسبًا ثابتًا عن اختيار أفضل seed؟",
+      "short": "افتح النتائج، فسّر زوجًا مختارًا ثم قارن كل أزواج التدريب وفاصل ثقة المجموعة.",
+      "technical": "قد تغيّر بذور التدريب الأوزان المتعلمة. يستخدم التقييم بذور الطريق المجمدة 1000–1019 والاستدلال الحتمي. فاصل المجموعة يشمل الصفر: غير حاسم لا يثبت انعدام الأثر. إعادة تشغيل الأوزان المصدّرة ليست الأثر التاريخي المقيم نفسه. المصدر: results/agents/terrain_dt1/index.json؛ evaluate.py:134–154,298.",
+      "focus": "preview_result",
+      "layer": "agent",
+      "destination": "seed-results"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "locked",
+      "name": "صعود مقفل 12%",
+      "description": "بروتوكول Episode 1 المسجل: dt=1 s و720 عينة (720 s) وسرعة 130 km/h بعد تدرج 20 s؛ طريق مستوٍ حتى 180 s ثم ميل 12%، وحرارة جو 315 K (41.85 °C). يثبت الجسر البذرة 1000 وأوزان الحلقة (0.690154, 0.012829, 0.297017) من evaluate.EPISODES[0]؛ ولا يغير طلب بذرة الواجهة الطريق أو الأوزان."
+    },
+    {
+      "id": "flat",
+      "name": "طريق مستوٍ",
+      "description": "سيناريو طريق مستوٍ ببذرة محددة بسرعة 130 km/h لجلسة محاكاة 900 s؛ تأتي ظروف الجو من الدورة المولّدة وتسحب الأوزان عند إعادة الضبط وفق البذرة."
+    },
+    {
+      "id": "terrain",
+      "name": "تضاريس متنوعة",
+      "description": "طريق ببذرة محددة من عائلات التضاريس المدعومة لجلسة 900 s؛ يولد تغير الميل لهذه الجولة وتسحب أوزان إعادة الضبط وفق البذرة."
+    }
+  ],
+  "derived": {
+    "data_file": "data/derived_params.json",
+    "generated": "2026-09-28 17:56",
+    "data_sha1": "c4fdd4babfb3752a",
+    "note": "معاملات مشتقة من سجلات المركبة. بصمة البيانات هذه مختلفة عن بصمة شيفرة المحاكي."
+  },
+  "limitations": [
+    "تدربت السياسات العشرون في terrain_dt1 على نسخة ما قبل الدمج من النبات المشتق؛ إعداداتها تسجل git_dirty=true وdata_sha1 ولا تحتوي plant_sha.",
+    "لم يتحقق نموذج الطرق؛ ويسهم تقديم الشرارة في جزء كبير من التحسن الظاهر للسياسات على المتحكمات اليدوية.",
+    "تحسب عقدة التوربين الحرارية من ثوابت مفترضة، ولا يمكن مقارنتها بحساس حرارة توربين في المركبة.",
+    "تتذبذب عقدة الكتلة وسائل التبريد عند dt=1 s؛ لا تعتمد نتائج مسح H/τ قبل تصحيح التكامل المتفق عليه.",
+    "تكامل الضرر مؤشر للمحاكاة، وليس تنبؤاً بعمر مكوّن مقاس.",
+    "تجربة المعاينة الحالية غير حاسمة؛ ولا تدعم ادعاء انعدام الأثر أو قانون H/τ عاماً.",
+    "ملفات policy.npz ليست ملفات Stable-Baselines3 النهائية المطابقة للتقييم؛ وأي إعادة تشغيل للممثل UNVERIFIED وتعليمية."
+  ]
+}

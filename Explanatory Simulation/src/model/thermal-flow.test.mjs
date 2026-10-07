@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { thermalLesson } from './thermal-flow.mjs';
+import fs from 'node:fs';
+const f={t_block:350,t_oil:370,t_turb:500,ambient_c:25,egt_c:100,mdot_fuel:0,rpm:800,thermostat:0};
+test('heat directions follow finite temperatures including inverse gas and hotter oil',()=>{const b=thermalLesson(f,'t_block');assert.equal(b.paths.find(p=>p.id==='exchange').from,'t_oil');assert.equal(thermalLesson(f,'t_turb').paths.find(p=>p.id==='gas').from,'t_turb');assert.equal(b.paths.find(p=>p.id==='fuel').state,'inactive');assert.equal(b.paths.find(p=>p.id==='radiator').state,'inactive');assert.equal(thermalLesson(f,'t_oil').paths.find(p=>p.id==='rpm').state,'active');});
+test('zero valid, missing and equal suppress directed arrows',()=>{assert.equal(thermalLesson({t_block:0,t_oil:0},'t_block').paths.find(p=>p.id==='exchange').state,'equal');assert.equal(thermalLesson({},'t_turb').paths.find(p=>p.id==='gas').state,'unknown');assert.equal(thermalLesson({...f,thermostat:null},'t_block').paths.find(p=>p.id==='radiator').state,'unknown');});
+test('direct source catalog relationships are reciprocal',()=>{const c=JSON.parse(fs.readFileSync(new URL('../../content.ar.json',import.meta.url))).concepts;for(const [a,b] of [['fuel','t_block'],['fuel','t_oil'],['rpm','t_oil'],['t_block','t_oil'],['t_oil','t_block'],['ambient_temp','t_turb']]){assert.ok(c.find(x=>x.id===a).downstream.includes(b),`${a}→${b}`);assert.ok(c.find(x=>x.id===b).upstream.includes(a),`${b}←${a}`);}});
+test('renderer and guide share resolver and active-only directed paths',()=>{const scene=fs.readFileSync(new URL('../Scene.tsx',import.meta.url),'utf8'),ui=fs.readFileSync(new URL('../ThermalGuide.tsx',import.meta.url),'utf8');assert.match(scene,/<ThermalEnergyPaths frame=\{p.frame\} focus=\{p.focus\}/);assert.match(scene,/<ThermalGuide frame=\{p.frame\} focus=\{thermalFocus\}/);assert.equal((ui.match(/thermalLesson\(frame,\s*focus\)/g)||[]).length,2);assert.match(ui,/paths.filter\(p\s*=>\s*p.state\s*===\s*'active'\)/);});
+

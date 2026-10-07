@@ -1,0 +1,2180 @@
+{
+  "vehicle": {
+    "name": "2023 Toyota GR Supra 3.0",
+    "engine_name": "BMW B58B30O1",
+    "transmission_name": "ZF 8HP51",
+    "fuel": "95 RON",
+    "source": {
+      "file": "plant.py",
+      "symbol": "b58",
+      "variable": "n_cyl",
+      "line": 114,
+      "match": "def b58"
+    }
+  },
+  "actions": [
+    {
+      "id": "spark_trim",
+      "name": "Spark trim",
+      "unit": "deg BTDC",
+      "slew_unit": "deg/s",
+      "meaning": "Degrees added to or removed from baseline spark timing."
+    },
+    {
+      "id": "lambda_trim",
+      "name": "Lambda trim",
+      "unit": "lambda",
+      "slew_unit": "lambda/s",
+      "meaning": "A trim to the baseline air-fuel equivalence ratio; lambda 1 is stoichiometric."
+    },
+    {
+      "id": "boost_trim",
+      "name": "MAP trim",
+      "unit": "kPa",
+      "slew_unit": "kPa/s",
+      "meaning": "A pressure offset requested by the supervisor; the torque loop and compressor envelope still constrain manifold pressure."
+    },
+    {
+      "id": "fan_duty",
+      "name": "Radiator fan duty",
+      "unit": "fraction",
+      "slew_unit": "fraction/s",
+      "meaning": "Absolute fan duty from zero to one, not a trim to the ECU fan command."
+    },
+    {
+      "id": "pump_duty",
+      "name": "Coolant pump duty",
+      "unit": "fraction",
+      "slew_unit": "fraction/s",
+      "meaning": "Absolute pump duty from its 0.3 lower bound to full duty, not a trim."
+    }
+  ],
+  "observations": [
+    {
+      "id": "rpm",
+      "name": "Engine speed",
+      "unit": "rpm",
+      "scale": "rpm / 3000 - 1",
+      "meaning": "Crankshaft revolutions per minute, centred around 3000 rpm."
+    },
+    {
+      "id": "map",
+      "name": "Manifold pressure",
+      "unit": "kPa abs",
+      "scale": "MAP / 120 - 1",
+      "meaning": "Absolute pressure in the intake manifold after the throttle."
+    },
+    {
+      "id": "tps",
+      "name": "Throttle proxy",
+      "unit": "fraction",
+      "scale": "already in [0, 1]",
+      "meaning": "A model proxy based on achieved manifold pressure, not a measured throttle-position channel."
+    },
+    {
+      "id": "spark",
+      "name": "Spark timing",
+      "unit": "deg BTDC",
+      "scale": "spark / 20 - 1",
+      "meaning": "Actual model spark timing after the supervisory trim is added to the baseline schedule and clipped to ECU limits."
+    },
+    {
+      "id": "lam",
+      "name": "Lambda",
+      "unit": "lambda",
+      "scale": "(lambda - 1) * 8",
+      "meaning": "Actual modelled air-fuel equivalence ratio relative to stoichiometric mixture."
+    },
+    {
+      "id": "t_block",
+      "name": "Block and coolant temperature",
+      "unit": "K",
+      "scale": "(T - 363) / 25",
+      "meaning": "Temperature of the lumped block/coolant node."
+    },
+    {
+      "id": "t_oil",
+      "name": "Oil temperature",
+      "unit": "K",
+      "scale": "(T - 373) / 30",
+      "meaning": "Temperature of the lumped sump and oil-gallery node."
+    },
+    {
+      "id": "t_turb",
+      "name": "Turbine housing temperature",
+      "unit": "K",
+      "scale": "(T - 873) / 200",
+      "meaning": "Modelled temperature of the turbine housing and exhaust manifold; the car has no sensor for it."
+    },
+    {
+      "id": "charge_temp",
+      "name": "Charge temperature",
+      "unit": "K",
+      "scale": "(T - 303) / 25",
+      "meaning": "Modelled intake charge temperature after compression and charge cooling."
+    },
+    {
+      "id": "ambient_temp",
+      "name": "Ambient temperature",
+      "unit": "K",
+      "scale": "(T - 293) / 15",
+      "meaning": "Scenario air temperature used by vehicle, engine and thermal calculations."
+    },
+    {
+      "id": "barometric_pressure",
+      "name": "Barometric pressure",
+      "unit": "kPa abs",
+      "scale": "(pressure - 101.3) / 8",
+      "meaning": "Scenario pressure input in observation slot 10. It affects ambient density used by Vehicle.demand for road load."
+    },
+    {
+      "id": "humidity",
+      "name": "Specific humidity input",
+      "unit": "kg water/kg dry air",
+      "scale": "humidity * 40 - 0.5",
+      "meaning": "Specific humidity supplied by the generated road scenario; this is not relative humidity."
+    },
+    {
+      "id": "speed",
+      "name": "Vehicle speed",
+      "unit": "m/s",
+      "scale": "speed / 25 - 1",
+      "meaning": "Vehicle road speed, distinct from engine RPM."
+    },
+    {
+      "id": "grade",
+      "name": "Current road grade",
+      "unit": "fraction",
+      "scale": "grade * 12",
+      "meaning": "The slope under the car now; it remains visible to the blinded policy."
+    },
+    {
+      "id": "preview_2s",
+      "name": "Grade preview at 2 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "Road grade sampled two seconds ahead."
+    },
+    {
+      "id": "preview_5s",
+      "name": "Grade preview at 5 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "Road grade sampled five seconds ahead."
+    },
+    {
+      "id": "preview_15s",
+      "name": "Grade preview at 15 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "Road grade sampled fifteen seconds ahead."
+    },
+    {
+      "id": "preview_30s",
+      "name": "Grade preview at 30 s",
+      "unit": "fraction",
+      "scale": "future grade * 12",
+      "meaning": "Road grade sampled thirty seconds ahead."
+    },
+    {
+      "id": "torque_req",
+      "name": "Requested engine torque",
+      "unit": "Nm",
+      "scale": "torque request / 200 - 1",
+      "meaning": "The torque request inferred from road load and the vehicle model."
+    },
+    {
+      "id": "aggression",
+      "name": "Driver demand change",
+      "unit": "fraction",
+      "scale": "clipped |acceleration| / 2.5",
+      "meaning": "A normalized proxy for how quickly vehicle speed is changing."
+    },
+    {
+      "id": "weight_tracking",
+      "name": "Tracking preference",
+      "unit": "weight",
+      "scale": "Uniform episode draw in [0.45, 0.70]",
+      "meaning": "Episode weight on requested-torque tracking, drawn uniformly from 0.45 to 0.70."
+    },
+    {
+      "id": "weight_fuel",
+      "name": "Fuel preference",
+      "unit": "weight",
+      "scale": "First of two Dirichlet(1,1) shares of remaining weight",
+      "meaning": "Episode preference share for fuel saving after the tracking floor is set."
+    },
+    {
+      "id": "weight_life",
+      "name": "Component-life preference",
+      "unit": "weight",
+      "scale": "Second of two Dirichlet(1,1) shares of remaining weight",
+      "meaning": "Episode preference share for modeled damage reduction after the tracking floor is set."
+    }
+  ],
+  "preview_s": [
+    2,
+    5,
+    15,
+    30
+  ],
+  "thresholds": {
+    "turb_k": 1123.0,
+    "oil_k": 408.0,
+    "knock_knee": 0.85,
+    "torque_tracking_tolerance": 0.05
+  },
+  "concepts": [
+    {
+      "id": "map_reference",
+      "name": "Reference torque PI loop",
+      "meaning": "The parallel baseline torque PI loop produces its own absolute manifold pressure with zero supervisory MAP trim. The reference is not supervised pressure minus its trim.",
+      "why": "It identifies the parallel reference pressure for the same torque request.",
+      "unit": "kPa abs",
+      "evidence": "MODELLED",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "base, map_b = self._track_torque",
+        "line": 901,
+        "match": "base, map_b = self._track_torque"
+      },
+      "upstream": [
+        "torque_req",
+        "baseline_ecu"
+      ],
+      "downstream": [
+        "r_fuel",
+        "r_life"
+      ],
+      "caveat": "Reference pressure is exported by the model, not measured vehicle ECU output."
+    },
+    {
+      "id": "four_stroke",
+      "name": "Four-stroke cycle",
+      "meaning": "Each cylinder completes intake, compression, power and exhaust over two crankshaft revolutions.",
+      "why": "It connects piston motion to how engine speed becomes repeated combustion work.",
+      "unit": "cycle",
+      "evidence": "MODELLED",
+      "range": "One cylinder from intake-valve closing through exhaust-valve opening.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "theta",
+        "line": 186,
+        "match": "def run_cycle"
+      },
+      "upstream": [
+        "air",
+        "combustion"
+      ],
+      "downstream": [
+        "engine_torque",
+        "exhaust_flow"
+      ],
+      "increase": "More trapped charge can increase work and exhaust energy.",
+      "decrease": "Less trapped charge reduces available work.",
+      "caveat": "A single-zone 0-D calculation, not a full 3-D flow simulation.",
+      "evidence_note": "The model advances cylinder pressure in small crank-angle increments over one firing cycle.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "engine",
+      "name": "B58 engine geometry",
+      "meaning": "The represented engine is a 2,997.5 cc inline-six B58B30O1 with an 82.0 mm bore and 94.6 mm stroke.",
+      "why": "Bore, stroke, cylinder count and compression ratio set volume, air capacity and pressure-work scaling.",
+      "unit": "cc, mm, cylinders",
+      "evidence": "MODELLED",
+      "range": "Model geometry: 2,997.5 cc, six cylinders, 10.2:1 compression ratio.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "Geometry",
+        "variable": "n_cyl",
+        "line": 36,
+        "match": "class Geometry"
+      },
+      "upstream": [],
+      "downstream": [
+        "four_stroke",
+        "air",
+        "engine_torque"
+      ],
+      "increase": "More displacement can ingest more air per cycle at the same manifold conditions.",
+      "decrease": "Smaller displacement reduces air and fuel per cycle.",
+      "caveat": "This is the project model identity and geometry, not OEM-certified calibration or CAD.",
+      "evidence_note": "Geometry defaults are defined in plant.Geometry and b58() names the 2023 Supra 3.0 engine.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "turbocharger",
+      "name": "Turbocharger",
+      "meaning": "Exhaust energy spins a turbine connected to a compressor that raises intake pressure.",
+      "why": "Boost increases trapped air, torque potential and the heat carried into the exhaust system.",
+      "unit": "pressure, mass flow, temperature",
+      "evidence": "MODELLED",
+      "range": "The scenario runs near 175 kPa manifold pressure; the compressor ceiling depends on air flow.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_track_torque",
+        "variable": "boost_ceiling_kpa",
+        "line": 773,
+        "match": "boost_ceiling_kpa"
+      },
+      "upstream": [
+        "air",
+        "engine_torque",
+        "exhaust_flow"
+      ],
+      "downstream": [
+        "charge_temp",
+        "t_turb"
+      ],
+      "increase": "More boost can raise engine torque and exhaust enthalpy, subject to the compressor map.",
+      "decrease": "Less boost lowers trapped air and may limit torque delivery.",
+      "caveat": "Compressor/turbine are simplified closures, not a detailed turbo map transient model.",
+      "evidence_note": "The compressor ceiling uses a log-informed envelope; compressor and turbine transient dynamics are simplified.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "air",
+      "name": "Air charge and airflow",
+      "meaning": "Manifold pressure, charge temperature, RPM and volumetric efficiency determine the air trapped each cycle.",
+      "why": "Combustion cannot release more fuel energy than the available oxygen supports.",
+      "unit": "g/s",
+      "evidence": "MODELLED",
+      "range": "Operating envelope is informed by logged airflow and pressure; high-flow MAF saturates above about 0.314 kg/s.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "m_air",
+        "line": 211,
+        "match": "m_air"
+      },
+      "upstream": [
+        "charge_temp",
+        "map",
+        "turbocharger"
+      ],
+      "downstream": [
+        "combustion",
+        "fuel",
+        "exhaust_flow"
+      ],
+      "increase": "More air can support more fuel and torque when mixture and knock constraints permit.",
+      "decrease": "Less air reduces torque capacity.",
+      "caveat": "The OBD intake-temperature channel is upstream of the charge cooler; it is not charge temperature.",
+      "evidence_note": "The model calculates trapped air mass and passes airflow into its compressor-ceiling calculation.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "charge_temp",
+      "name": "Charge temperature",
+      "meaning": "Compressed intake air heats up; the model estimates the charge temperature using ambient and engine thermal state.",
+      "why": "Hotter charge is less dense and can increase knock tendency.",
+      "unit": "K",
+      "evidence": "MODELLED",
+      "range": "Modelled state; not directly measured at the manifold in the project logs.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "charge_temperature",
+        "variable": "def charge_temperature",
+        "line": 520,
+        "match": "def charge_temperature"
+      },
+      "upstream": [
+        "ambient_temp",
+        "t_block",
+        "turbocharger"
+      ],
+      "downstream": [
+        "air",
+        "knock"
+      ],
+      "increase": "At fixed pressure, hotter air is less dense and generally increases knock risk.",
+      "decrease": "Cooling the charge raises density and knock margin.",
+      "caveat": "Intercooler behavior is represented by an empirical correction.",
+      "evidence_note": "engine_env computes charge_temperature before the cycle prediction.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "combustion",
+      "name": "Combustion",
+      "meaning": "A Wiebe burn-progress curve releases mixture energy over crank angle while a single-zone first-law balance updates cylinder pressure and temperature.",
+      "why": "The combustion calculation supplies torque, fuel use, exhaust temperature and knock exposure.",
+      "unit": "crank angle, pressure, energy",
+      "evidence": "MODELLED",
+      "range": "One idealized cycle per environment step.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "dq_burn",
+        "line": 250,
+        "match": "dq_burn ="
+      },
+      "upstream": [
+        "four_stroke",
+        "air",
+        "spark"
+      ],
+      "downstream": [
+        "engine_torque",
+        "egt",
+        "knock"
+      ],
+      "increase": "More released energy can increase indicated work and exhaust temperature.",
+      "decrease": "Slow or incomplete burning reduces useful work and can raise unburned fuel losses.",
+      "caveat": "It does not resolve cylinder-to-cylinder variation or 3-D flame propagation.",
+      "evidence_note": "run_cycle integrates pressure and temperature through the modeled burn.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "fuel",
+      "name": "Fuel mass flow",
+      "meaning": "Fuel mass flow is calculated from trapped air mass, engine speed and the modeled lambda value.",
+      "why": "Fuel affects torque, consumption, exhaust mass and thermal loading.",
+      "unit": "g/s",
+      "evidence": "MODELLED",
+      "range": "Lambda is clipped to 0.70–1.25 by the environment.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "mdot_fuel",
+        "line": 297,
+        "match": "mdot_fuel ="
+      },
+      "upstream": [
+        "air",
+        "lam"
+      ],
+      "downstream": [
+        "combustion",
+        "exhaust_flow",
+        "r_fuel"
+      ],
+      "increase": "More fuel can add energy but raises fuel use and exhaust mass.",
+      "decrease": "Less fuel can reduce consumption but may reduce torque or alter combustion temperature.",
+      "caveat": "The project does not infer production ECU fuel commands from an OEM calibration map.",
+      "evidence_note": "plant.py calculates fuel and air mass flow from per-cylinder trapped mass and RPM.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "spark",
+      "name": "Actual spark timing",
+      "meaning": "Actual model spark timing equals the baseline schedule plus the applied supervisory spark trim, then clipped to ECU limits.",
+      "why": "Timing changes work, exhaust temperature, fuel use and knock exposure together.",
+      "unit": "deg BTDC",
+      "evidence": "MODELLED",
+      "range": "Trim action: −8 to +4 deg; total spark is separately clipped to ECU limits.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "self.spark =",
+        "line": 918,
+        "match": "self.spark ="
+      },
+      "upstream": [
+        "spark_trim",
+        "baseline_ecu"
+      ],
+      "downstream": [
+        "combustion",
+        "knock",
+        "egt"
+      ],
+      "increase": "Advance can increase efficiency and torque until knock risk rises.",
+      "decrease": "Retard generally reduces knock risk but can increase exhaust temperature and fuel use.",
+      "caveat": "This refers to actual trimmed timing, not the baseline schedule alone.",
+      "evidence_note": "engine_env adds the action trim to BaselineECU spark and clips to ECU limits.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "knock",
+      "name": "Knock integral",
+      "meaning": "The Douaud–Eyzat model accumulates end-gas autoignition exposure during the unburned part of combustion.",
+      "why": "It supplies a knock-risk estimate and a quadratic contribution to the simulated damage proxy above its knee.",
+      "unit": "dimensionless",
+      "evidence": "MODELLED",
+      "range": "The selected knee is 0.85; model realism has not been validated on this car.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "ki +=",
+        "line": 276,
+        "match": "ki +="
+      },
+      "upstream": [
+        "spark",
+        "charge_temp",
+        "air"
+      ],
+      "downstream": [
+        "damage",
+        "baseline_ecu"
+      ],
+      "increase": "Higher integral increases the modelled probability and knock damage term.",
+      "decrease": "Retarding spark or reducing load generally lowers predicted exposure.",
+      "caveat": "Knock is an unvalidated model estimate and the largest unresolved assumption behind apparent protection margins.",
+      "evidence_note": "plant.py integrates crank-angle exposure; engine_env.damage_rate adds a penalty above 0.85.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "engine_torque",
+      "name": "Engine torque",
+      "meaning": "Cylinder pressure work minus estimated friction and pumping work gives brake torque.",
+      "why": "The vehicle model must deliver road-load torque while the controller manages fuel and component temperatures.",
+      "unit": "Nm",
+      "evidence": "MODELLED",
+      "range": "Geometry and calibrated operating envelope determine feasible output.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "torque =",
+        "line": 286,
+        "match": "torque = bmep"
+      },
+      "upstream": [
+        "combustion",
+        "air",
+        "gear"
+      ],
+      "downstream": [
+        "r_resp"
+      ],
+      "increase": "More delivered torque reduces demand-tracking error.",
+      "decrease": "Insufficient torque raises tracking cost and can make a controller appear protective by starving demand.",
+      "caveat": "This is simulated torque, not a dynamometer validation result.",
+      "evidence_note": "plant.py converts net BMEP and total displacement to torque.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "torque_req",
+      "name": "Road load and torque request",
+      "meaning": "Speed, acceleration, grade, air density, rolling resistance and drag determine wheel force; gearing maps it to engine torque request.",
+      "why": "A fair protection comparison must retain the driver's requested road performance.",
+      "unit": "Nm",
+      "evidence": "MODELLED",
+      "range": "Locked result scenario: 12% grade at 130 km/h, 42 C ambient.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "demand",
+        "variable": "def demand",
+        "line": 550,
+        "match": "def demand"
+      },
+      "upstream": [
+        "speed",
+        "gear",
+        "ambient_temp",
+        "barometric_pressure"
+      ],
+      "downstream": [
+        "r_resp"
+      ],
+      "increase": "Steeper grade or higher speed raises road load and requested power.",
+      "decrease": "Lower road load reduces required wheel force and engine torque.",
+      "caveat": "A 130 km/h, 12% climb is a synthetic binding scenario, not a road the car logged.",
+      "evidence_note": "Vehicle.demand computes vehicle force and engine request; tracking reward penalizes unmet torque.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "gear",
+      "name": "ZF 8HP51 gearbox",
+      "meaning": "Eight gear ratios and a final drive convert wheel speed and torque into engine RPM and torque demand.",
+      "why": "Gear selection sets engine operating point, per-cycle load and exhaust heating.",
+      "unit": "ratio, RPM, Nm",
+      "evidence": "MODELLED",
+      "range": "Eight forward ratios; locked climb holds seventh gear in the reported scenario.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "Vehicle",
+        "variable": "gears =",
+        "line": 348,
+        "match": "gears ="
+      },
+      "upstream": [
+        "torque_req"
+      ],
+      "downstream": [
+        "rpm",
+        "engine_torque",
+        "exhaust_flow"
+      ],
+      "increase": "A numerically higher ratio raises engine speed for fixed wheel speed.",
+      "decrease": "A taller ratio lowers RPM but raises torque required per engine cycle.",
+      "caveat": "Shift logic is simplified relative to the vehicle's production transmission controller.",
+      "evidence_note": "Vehicle defines the eight ratios and demand logic, including kickdown when torque cannot be delivered.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "exhaust_flow",
+      "name": "Exhaust mass flow",
+      "meaning": "The turbine gas stream is air mass plus fuel mass leaving the cylinders.",
+      "why": "Exhaust mass flow controls modeled turbine-side heat transfer.",
+      "unit": "g/s",
+      "evidence": "MODELLED",
+      "range": "Flow varies with load, mixture and engine speed.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "mdot_air + out[\"mdot_fuel\"]",
+        "line": 925,
+        "match": "mdot_air + out[\"mdot_fuel\"]"
+      },
+      "upstream": [
+        "air",
+        "rpm"
+      ],
+      "downstream": [
+        "t_turb"
+      ],
+      "increase": "More exhaust mass strengthens gas-to-housing heat transfer at a given temperature difference.",
+      "decrease": "Lower flow weakens modeled gas-side transfer.",
+      "caveat": "Gas temperature and turbine flow use simplified exhaust-system closures.",
+      "evidence_note": "engine_env sends mdot_air + mdot_fuel to the thermal network.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "egt",
+      "name": "Exhaust gas temperature",
+      "meaning": "The cycle estimates exhaust temperature after blowdown and an empirical port/runner heat-loss step.",
+      "why": "Exhaust is the principal heat source for the turbine housing model.",
+      "unit": "°C",
+      "evidence": "MODELLED",
+      "range": "Modelled; no turbine inlet thermocouple is available in the logged data.",
+      "source": {
+        "file": "plant.py",
+        "symbol": "run_cycle",
+        "variable": "t_exh =",
+        "line": 302,
+        "match": "t_exh ="
+      },
+      "upstream": [
+        "combustion",
+        "spark"
+      ],
+      "downstream": [
+        "t_turb",
+        "damage"
+      ],
+      "increase": "Hotter exhaust raises turbine heat input when the housing is cooler than gas.",
+      "decrease": "Cooler exhaust lowers turbine heating, all else equal.",
+      "caveat": "The port heat-loss coefficient is empirical and EGT max is outside one validation band.",
+      "evidence_note": "plant.py uses an empirical UA_PORT and computes exhaust temperature from end-of-expansion conditions.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "t_block",
+      "name": "Block and coolant thermal node",
+      "meaning": "The lumped block/coolant state receives fuel energy, exchanges heat with oil according to their temperature difference, and rejects heat to ambient air and the radiator through a surrogate thermostat.",
+      "why": "Thermal memory means a short grade change can affect later temperatures and damage.",
+      "unit": "K",
+      "evidence": "MODELLED",
+      "range": "Node initialized warm at 363 K; explicit Euler integration is numerically stiff at the scenario timestep.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "step",
+        "variable": "q_in_block",
+        "line": 215,
+        "match": "q_in_block ="
+      },
+      "upstream": [
+        "fan_duty",
+        "pump_duty",
+        "ambient_temp",
+        "fuel",
+        "t_oil"
+      ],
+      "downstream": [
+        "t_oil",
+        "charge_temp"
+      ],
+      "increase": "More heat input raises block temperature until heat rejection balances it.",
+      "decrease": "More radiator/ambient heat rejection lowers block temperature.",
+      "caveat": "The block/coolant update oscillates at dt=1 s. Do not quote H/τ sweep results until the numerical integration is corrected.",
+      "evidence_note": "ThermalNetwork has separate block, oil and turbine states; block/oil parameters are derived from available logs.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "t_oil",
+      "name": "Oil thermal node",
+      "meaning": "The lumped sump and galleries state receives engine-speed and fuel-energy heating, exchanges heat with the block according to their temperature difference, and exchanges heat with ambient air according to road speed.",
+      "why": "Oil temperature contributes to the project’s thermal damage proxy and is also available as a car log channel on some drives.",
+      "unit": "K",
+      "evidence": "MODELLED",
+      "range": "Validation against the measured car is limited; reported climb oil is modelled.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "step",
+        "variable": "q_in_oil",
+        "line": 220,
+        "match": "q_in_oil ="
+      },
+      "upstream": [
+        "rpm",
+        "t_block",
+        "speed",
+        "fuel",
+        "ambient_temp"
+      ],
+      "downstream": [
+        "damage",
+        "t_block"
+      ],
+      "increase": "Fuel energy and engine-speed friction and churning are direct heat sources; block/oil exchange runs from the hotter node to the colder node.",
+      "decrease": "More road-speed cooling or lower engine speed lowers its equilibrium.",
+      "caveat": "The block/coolant update oscillates at dt=1 s. Do not quote H/τ sweep results until corrected.",
+      "evidence_note": "ThermalNetwork computes a lumped oil state; its structure is fit to seven drives but held-out drive10 underpredicts the peak by 16.9 K.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "t_turb",
+      "name": "Turbine housing temperature",
+      "meaning": "The lumped turbine housing exchanges heat with exhaust gas and ambient air, from the hotter side to the colder side; gas can cool the housing when colder. The current network has no direct fan or pump cooling of this node.",
+      "why": "Its assumed time constant is central to the preview-horizon hypothesis H/tau.",
+      "unit": "°C",
+      "evidence": "MODELLED",
+      "range": "The demonstrator uses a 1123 K damage trigger; tau is roughly tens of seconds in the current model.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "step",
+        "variable": "q_in_turb",
+        "line": 225,
+        "match": "q_in_turb ="
+      },
+      "upstream": [
+        "exhaust_flow",
+        "egt",
+        "ambient_temp"
+      ],
+      "downstream": [
+        "damage"
+      ],
+      "increase": "Higher exhaust flow or gas temperature can raise housing temperature faster.",
+      "decrease": "More ambient heat rejection lowers the node toward ambient.",
+      "caveat": "This is a modeled temperature using assumed turbine thermal parameters, not a measured car channel.",
+      "evidence_note": "ThermalNetwork computes this state from assumed heat capacity and transfer coefficients; there is no matching vehicle sensor.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "damage",
+      "name": "Damage proxy",
+      "meaning": "Instantaneous proxy combines exponential turbine and oil temperature terms plus a quadratic knock excess penalty.",
+      "why": "The agent’s life reward compares instantaneous damage rates; the episode score accumulates rate × dt. This is a simulation proxy, not measured component life.",
+      "unit": "proxy units/s",
+      "evidence": "MODELLED",
+      "range": "A relative simulation metric; it is not a warranty or remaining-life estimate.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "damage_rate",
+        "variable": "d =",
+        "line": 636,
+        "match": "def damage_rate"
+      },
+      "upstream": [
+        "t_turb",
+        "t_oil",
+        "knock"
+      ],
+      "downstream": [
+        "r_life",
+        "preview_result"
+      ],
+      "increase": "Hotter nodes and knock-integral excess increase accumulated proxy damage.",
+      "decrease": "Lower modelled temperatures or knock integral lower the proxy.",
+      "caveat": "No empirical mapping from these units to real component lifespan is established.",
+      "evidence_note": "The sole damage_rate function is in engine_env.py; 1123 K and 408 K are its temperature knees.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "preview",
+      "name": "Future grade preview",
+      "meaning": "The sighted agent receives future road grade at 2, 5, 15 and 30 seconds; the blind arm gets zeros in only those four slots.",
+      "why": "The experiment isolates whether future-grade information adds value beyond current grade and thermal state.",
+      "unit": "seconds, grade fraction",
+      "evidence": "MODELLED",
+      "range": "H=2–30 s; current H/tau point is approximate and does not establish a curve.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_preview",
+        "variable": "PREVIEW_S",
+        "line": 779,
+        "match": "def _preview"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "preview_2s",
+        "preview_5s",
+        "preview_15s",
+        "preview_30s",
+        "policy_action"
+      ],
+      "increase": "A preview signal can let the controller act before the car reaches a grade change.",
+      "decrease": "Blinding zeroes the future-grade slots but does not hide the current grade.",
+      "caveat": "Preview is information from a generated road profile, not an external map or a real-time vehicle feed.",
+      "evidence_note": "_preview samples PREVIEW_S; _obs includes current grade for both arms.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "baseline_ecu",
+      "name": "Baseline ECU reference",
+      "meaning": "A production-representative model schedules spark, lambda, knock response and fan; a parallel thermal state supplies the reference.",
+      "why": "Fuel and component-life reward terms compare the supervised engine against this baseline.",
+      "unit": "commands and state",
+      "evidence": "MODELLED",
+      "range": "It is not extracted factory firmware or a tuned ECU binary.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "BaselineECU",
+        "variable": "class BaselineECU",
+        "line": 31,
+        "match": "class BaselineECU"
+      },
+      "upstream": [
+        "rpm",
+        "map",
+        "charge_temp"
+      ],
+      "downstream": [
+        "r_fuel",
+        "r_life",
+        "spark"
+      ],
+      "increase": "The reference defines the no-supervisor trajectory for a paired comparison.",
+      "decrease": "An inaccurate reference can bias every relative reward and damage comparison.",
+      "caveat": "Call it production-representative, never the vehicle’s actual ECU code.",
+      "evidence_note": "BaselineECU and thermal_base run beside the supervised environment.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "normalized_actions",
+      "name": "Normalized policy output",
+      "meaning": "The SAC policy emits five values in [−1, 1]; the environment rescales them to action-specific units, slew-limits them, and clips to bounds.",
+      "why": "A shared network output range can control signals with different engineering units.",
+      "unit": "normalized, then actuator units",
+      "evidence": "MODELLED",
+      "range": "Five channels; SLEW scales with dt.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 675,
+        "match": "return ACT_LO"
+      },
+      "upstream": [
+        "policy_action"
+      ],
+      "downstream": [
+        "spark",
+        "boost_trim",
+        "fan_duty",
+        "pump_duty"
+      ],
+      "increase": "Increasing an action output moves each actuator toward its high bound.",
+      "decrease": "Decreasing moves it toward its low bound.",
+      "caveat": "Fan and pump are absolute duties; a zero normalized output is not a universal neutral action.",
+      "evidence_note": "ACT_LO, ACT_HI and SLEW define conversion and per-second movement limits.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "r_fuel",
+      "name": "Fuel reward term",
+      "meaning": "Fuel reward is the fractional reduction in fuel flow against the parallel baseline for that step.",
+      "why": "It rewards efficiency without using an absolute fuel-scale coefficient.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "Positive means the supervised model uses less fuel than its baseline at that step.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "r_fuel =",
+        "line": 934,
+        "match": "r_fuel ="
+      },
+      "upstream": [
+        "baseline_ecu",
+        "fuel"
+      ],
+      "downstream": [
+        "policy_reward",
+        "weight_fuel"
+      ],
+      "increase": "Lower agent fuel flow raises this term.",
+      "decrease": "Higher agent fuel flow lowers it.",
+      "caveat": "The episode preference weight changes how much this term matters.",
+      "evidence_note": "r_fuel = (baseline fuel − fuel) / (baseline fuel + 1e−6).",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "r_life",
+      "name": "Component-life reward term",
+      "meaning": "Life reward is the baseline-relative reduction in modelled damage rate with a small denominator stabilizer.",
+      "why": "It encourages thermal and knock protection while making its model assumptions visible.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "Positive means the agent’s damage proxy is lower than the baseline’s.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "r_life =",
+        "line": 935,
+        "match": "r_life ="
+      },
+      "upstream": [
+        "damage",
+        "baseline_ecu"
+      ],
+      "downstream": [
+        "policy_reward",
+        "weight_life"
+      ],
+      "increase": "Lower agent damage proxy raises the term.",
+      "decrease": "Higher modeled damage lowers it.",
+      "caveat": "The proxy is not measured component life, and reward weights can trade it against fuel.",
+      "evidence_note": "r_life = (baseline damage_rate − damage_rate) / (baseline damage_rate + 0.05).",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "r_resp",
+      "name": "Torque tracking reward",
+      "meaning": "A negative error term penalizes failure to deliver requested engine torque, with a steeper penalty beyond 5% error.",
+      "why": "Without it an agent could appear protective by withholding torque.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "5% tolerance before the additional hinge penalty.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "r_resp =",
+        "line": 938,
+        "match": "r_resp ="
+      },
+      "upstream": [
+        "engine_torque",
+        "torque_req"
+      ],
+      "downstream": [
+        "policy_reward",
+        "weight_tracking"
+      ],
+      "increase": "Smaller torque error makes the negative penalty less severe.",
+      "decrease": "More unmet torque makes the reward more negative.",
+      "caveat": "Returned torque, knock and EGT costs are diagnostics; they are not additional reward terms here.",
+      "evidence_note": "r_resp uses normalized absolute torque error and TRACK_HINGE=25 beyond TRACK_TOL=0.05.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "policy_reward",
+      "name": "Preference-weighted reward",
+      "meaning": "Reward combines tracking, fuel and life terms with episode-specific preference weights, uncertainty and actuator smoothness.",
+      "why": "One trained policy can express different trade-offs across preference settings.",
+      "unit": "dimensionless per step",
+      "evidence": "MODELLED",
+      "range": "Weights are resampled for each episode; they are not safety guarantees.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "reward =",
+        "line": 945,
+        "match": "reward ="
+      },
+      "upstream": [
+        "r_fuel",
+        "r_life",
+        "r_resp",
+        "weight_tracking",
+        "weight_fuel",
+        "weight_life"
+      ],
+      "downstream": [
+        "policy_action"
+      ],
+      "increase": "The policy favors whichever positive weighted improvements dominate for that episode.",
+      "decrease": "Unmet torque, uncertainty or abrupt actuator motion lowers reward.",
+      "caveat": "Low life preference can permit an agent to perform worse than baseline on some episodes.",
+      "evidence_note": "The reward formula uses w[0] tracking, w[1] fuel, and w[2] life.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "constraint_costs",
+      "name": "Constraint diagnostics",
+      "meaning": "The environment reports torque shortfall, knock event and high-EGT costs in info as diagnostics.",
+      "why": "They expose unsafe-looking behavior even where the scalar preference reward can trade objectives.",
+      "unit": "dimensionless costs",
+      "evidence": "MODELLED",
+      "range": "Torque tolerance 3% for this diagnostic; knock threshold KI>1; EGT reference 1223 K.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "c_torque =",
+        "line": 948,
+        "match": "c_torque ="
+      },
+      "upstream": [
+        "engine_torque",
+        "knock",
+        "egt"
+      ],
+      "downstream": [
+        "diagnostic_frame",
+        "preview_result"
+      ],
+      "increase": "More shortfall, knock threshold exceedances or high EGT increase costs.",
+      "decrease": "Meeting torque and staying below modeled thresholds reduces them.",
+      "caveat": "These costs are not a hard safety shield and are not all subtracted from reward.",
+      "evidence_note": "cost_torque, cost_knock and cost_egt are calculated after the reward and returned in info.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "thermal_time_constant",
+      "name": "Thermal time constant",
+      "meaning": "For a lumped node, heat capacity divided by heat-transfer rate gives the approximate response time to a step change.",
+      "why": "The hypothesis compares this response time tau with how far ahead grade information arrives H.",
+      "unit": "seconds",
+      "evidence": "ASSUMED",
+      "range": "Modelled turbine tau is about 47 seconds in the locked scenario; this is not directly measured.",
+      "source": {
+        "file": "thermal.py",
+        "symbol": "ThermalParams",
+        "variable": "c_turb",
+        "line": 48,
+        "match": "class ThermalParams"
+      },
+      "upstream": [
+        "t_turb"
+      ],
+      "downstream": [
+        "preview",
+        "h_over_tau"
+      ],
+      "increase": "A larger tau means the component responds more slowly to heating.",
+      "decrease": "A smaller tau means temperatures respond more quickly.",
+      "caveat": "Numerical stiffness in the block node currently prevents quoting the H/tau sweep.",
+      "evidence_note": "thermal.py explains C/UA and identifies turbine C and UA as assumptions.",
+      "evidence_class": "ASSUMED"
+    },
+    {
+      "id": "h_over_tau",
+      "name": "H over tau",
+      "meaning": "H/tau is preview horizon divided by component thermal response time; it is the proposed organizing variable for preview value.",
+      "why": "The project asks when acquiring future information is useful, not whether one controller wins once.",
+      "unit": "dimensionless",
+      "evidence": "UNVERIFIED",
+      "range": "A single retrain scenario lies near H/tau 0.64 using an assumed turbine time constant.",
+      "source": {
+        "file": "CLAUDE.md",
+        "symbol": "H / τ",
+        "variable": "criterion",
+        "line": 58,
+        "match": "The claim."
+      },
+      "upstream": [
+        "preview",
+        "thermal_time_constant"
+      ],
+      "downstream": [
+        "research_claim"
+      ],
+      "increase": "Larger ratio means the preview horizon is long relative to thermal response time.",
+      "decrease": "Smaller ratio means preview is short relative to response time.",
+      "caveat": "The universal curve is a hypothesis, not a current result.",
+      "evidence_note": "The claim predicts points from different plants collapse onto one curve; no corrected cross-plant sweep has established this.",
+      "evidence_class": "UNVERIFIED"
+    },
+    {
+      "id": "grade",
+      "name": "Current grade",
+      "meaning": "The road slope at the vehicle’s current position, available to both sighted and blind policies.",
+      "why": "The comparison asks what future grade adds beyond an ordinary current-state measurement.",
+      "unit": "%",
+      "evidence": "SCENARIO INPUT",
+      "range": "The frame card reports grade in percent; observation slot 13 stores the fractional grade multiplied by 12.",
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "c[\"grade\"][self.k]",
+        "line": 803,
+        "match": "c[\"grade\"][self.k]"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "torque_req",
+        "preview"
+      ],
+      "increase": "A steeper uphill grade increases wheel force demand.",
+      "decrease": "A flatter or downhill grade lowers or reverses grade force.",
+      "caveat": "Historical Phase D’s fixed road and thermal clock let the nominal blind policy infer timing.",
+      "evidence_note": "Observation slot 13 is current grade; slots 14–17 alone are zeroed when preview is disabled.",
+      "evidence_class": "SCENARIO INPUT"
+    },
+    {
+      "id": "agent",
+      "name": "Trained SAC supervisor",
+      "meaning": "A Soft Actor-Critic policy maps 23 observations to five bounded supervisory actions.",
+      "why": "The agent tests whether a learned policy can use current state and preview while balancing preferences.",
+      "unit": "normalized actions",
+      "evidence": "MODELLED",
+      "range": "Stored policy.npz exports are not exact scored Stable-Baselines3 final.zip artifacts.",
+      "source": {
+        "file": "train.py",
+        "symbol": "main",
+        "variable": "SAC",
+        "line": 1,
+        "match": "SAC"
+      },
+      "upstream": [
+        "policy_reward"
+      ],
+      "downstream": [
+        "policy_action"
+      ],
+      "increase": "A changed observation or learned parameter can change the action.",
+      "decrease": "The blind policy lacks future-grade values but retains current grade and thermal state.",
+      "caveat": "Exported policy replays lack complete code identity and must be labelled UNVERIFIED, never the exact recorded scored traces.",
+      "evidence_note": "Current results include ten sighted and ten blind agents, each trained for 50,000 steps on varied roads.",
+      "evidence_class": "MODELLED"
+    },
+    {
+      "id": "preview_result",
+      "name": "Current preview result",
+      "meaning": "Across ten seed pairs, sighted-minus-blind damage-cut mean is +1.169 percentage points with 95% CI [−4.439, +6.778].",
+      "why": "This is the directly relevant experiment for the incremental value of grade preview in the current retrain.",
+      "unit": "percentage points",
+      "evidence": "STATISTIC",
+      "range": "n=10; paired t p=0.6484, exact Wilcoxon p=0.4316.",
+      "source": {
+        "file": "results/agents/terrain_dt1/index.json",
+        "symbol": "ablation",
+        "variable": "ci95",
+        "line": 4632,
+        "match": "\"ablation\""
+      },
+      "upstream": [
+        "preview",
+        "agent"
+      ],
+      "downstream": [
+        "research_claim"
+      ],
+      "increase": "Positive sighted-minus-blind cut favors preview on this tested configuration.",
+      "decrease": "Negative favors the blinded policy; an interval spanning zero leaves direction unresolved.",
+      "caveat": "INCONCLUSIVE; do not say preview has no effect or that the H/tau rule is proven.",
+      "evidence_note": "Generated terrain_dt1 index records paired data, confidence interval and paired tests.",
+      "evidence_class": "STATISTIC"
+    },
+    {
+      "id": "measured_vs_modelled",
+      "name": "Measured, derived and assumed quantities",
+      "meaning": "Logs provide some signals; scripts derive identifiable parameters; other states and constants remain modelled or assumed.",
+      "why": "A precise dashboard number is not automatically a directly measured vehicle value.",
+      "unit": "evidence class",
+      "evidence": "MIXED",
+      "range": "The turbine housing temperature and turbine time constant are modelled from assumed parameters.",
+      "source": {
+        "file": "REFERENCES.md",
+        "symbol": "First, the four kinds",
+        "variable": "kind | what it means",
+        "line": 21,
+        "match": "## First, the four kinds"
+      },
+      "upstream": [],
+      "downstream": [
+        "research_claim"
+      ],
+      "increase": "More independent measurements can reduce uncertainty in fitted parameters.",
+      "decrease": "Using an assumed parameter as if measured overstates evidence.",
+      "caveat": "Eight of eleven validation checks pass; validation is limited and not comprehensive.",
+      "evidence_note": "REFERENCES.md distinguishes measured, derived, modelled and assumed values.",
+      "evidence_class": "MIXED"
+    },
+    {
+      "id": "rpm",
+      "name": "Engine speed",
+      "meaning": "Crankshaft speed in revolutions per minute.",
+      "why": "Speed affects cycle rate, gear mapping, airflow and friction.",
+      "unit": "rpm",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Crankshaft speed in revolutions per minute.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.rpm / 3000.0 - 1.0",
+        "line": 786,
+        "match": "self.rpm / 3000.0 - 1.0"
+      },
+      "upstream": [
+        "gear"
+      ],
+      "downstream": [
+        "air",
+        "fuel"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "map",
+      "name": "Manifold pressure",
+      "meaning": "Absolute pressure after the throttle at the modeled intake manifold.",
+      "why": "It affects trapped air together with RPM, charge temperature and volumetric efficiency.",
+      "unit": "kPa abs",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Absolute pressure after the throttle at the modeled intake manifold.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.map_kpa / 120.0 - 1.0",
+        "line": 787,
+        "match": "self.map_kpa / 120.0 - 1.0"
+      },
+      "upstream": [
+        "turbocharger"
+      ],
+      "downstream": [
+        "air",
+        "torque_req"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "tps",
+      "name": "Throttle proxy",
+      "meaning": "Normalized model proxy based on achieved manifold pressure, not a measured throttle-position channel.",
+      "why": "It helps describe the current modeled load.",
+      "unit": "fraction",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Normalized model proxy based on achieved manifold pressure, not a measured throttle-position channel.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.tps,",
+        "line": 788,
+        "match": "self.tps,"
+      },
+      "upstream": [
+        "map"
+      ],
+      "downstream": [
+        "air"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "lam",
+      "name": "Lambda",
+      "meaning": "Modeled air-fuel equivalence ratio relative to stoichiometric mixture; 1.0 is stoichiometric.",
+      "why": "Mixture affects fuel mass, combustion, exhaust heat and knock.",
+      "unit": "ratio",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Modeled air-fuel equivalence ratio relative to stoichiometric mixture; 1.0 is stoichiometric.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "(self.lam - 1.0) * 8.0",
+        "line": 790,
+        "match": "(self.lam - 1.0) * 8.0"
+      },
+      "upstream": [
+        "lambda_trim",
+        "air"
+      ],
+      "downstream": [
+        "fuel",
+        "combustion"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "ambient_temp",
+      "name": "Ambient temperature",
+      "meaning": "Ambient temperature supplied by the generated scenario.",
+      "why": "It affects air density and thermal heat rejection.",
+      "unit": "K",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Ambient temperature supplied by the generated scenario.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "(c[\"t_amb\"] - 293.0) / 15.0",
+        "line": 795,
+        "match": "(c[\"t_amb\"] - 293.0) / 15.0"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "charge_temp",
+        "t_block",
+        "t_turb"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "barometric_pressure",
+      "name": "Barometric pressure",
+      "meaning": "Scenario pressure input in observation slot 10. It affects ambient density used by Vehicle.demand for road load.",
+      "why": "It connects the scenario atmosphere to road torque demand, not to air mass at fixed MAP.",
+      "unit": "kPa abs",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Scenario pressure input in observation slot 10. It affects ambient density used by Vehicle.demand for road load.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "(c.get(\"p_baro\", 101.3) - 101.3) / 8.0",
+        "line": 800,
+        "match": "(c.get(\"p_baro\", 101.3) - 101.3) / 8.0"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "torque_req"
+      ],
+      "increase": "For fixed temperature, higher scenario pressure raises ambient density and the aerodynamic part of road demand.",
+      "decrease": "For fixed temperature, lower scenario pressure lowers ambient density and the aerodynamic part of road demand.",
+      "caveat": "Road generators set p_baro to 101.3 kPa; altitude is not modeled. The environment compressor ceiling does not pass p_baro and uses plant.boost_ceiling_kpa default inlet pressure 99.3 kPa."
+    },
+    {
+      "id": "humidity",
+      "name": "Specific humidity input",
+      "meaning": "The generated road stores a fixed specific-humidity field (0.012 kg water per kg dry air) and exposes its normalized value to the actor.",
+      "why": "It is included in the observation vector for provenance and future experiments; the current engine/air-density equations do not use it.",
+      "unit": "kg/kg",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Scenario water-vapor mass ratio (kg water per kg dry air), not relative humidity.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "c.get(\"humidity\", 0.01) * 40.0 - 0.5",
+        "line": 797,
+        "match": "c.get(\"humidity\", 0.01) * 40.0 - 0.5"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": "The source cycle fixes this input at 0.012 kg/kg; it is not relative humidity and currently has no causal effect on modeled plant outputs."
+    },
+    {
+      "id": "speed",
+      "name": "Vehicle speed",
+      "meaning": "Road speed supplied by the scenario trajectory.",
+      "why": "Speed controls road load, gear choice and thermal heat rejection.",
+      "unit": "m/s",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Road speed supplied by the scenario trajectory.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.v / 25.0 - 1.0",
+        "line": 798,
+        "match": "self.v / 25.0 - 1.0"
+      },
+      "upstream": [
+        "scenario"
+      ],
+      "downstream": [
+        "torque_req",
+        "gear",
+        "t_oil"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "preview_2s",
+      "name": "Grade preview at 2 s",
+      "meaning": "Road grade sampled two seconds ahead from the generated road.",
+      "why": "It can let a controller prepare before a grade change arrives.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Road grade sampled two seconds ahead from the generated road.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "preview_5s",
+      "name": "Grade preview at 5 s",
+      "meaning": "Road grade sampled five seconds ahead from the generated road.",
+      "why": "It gives more warning than the two-second preview sample.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Road grade sampled five seconds ahead from the generated road.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "preview_15s",
+      "name": "Grade preview at 15 s",
+      "meaning": "Road grade sampled fifteen seconds ahead from the generated road.",
+      "why": "It provides a long-horizon cue, which can be uncertain for sudden changes.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Road grade sampled fifteen seconds ahead from the generated road.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "preview_30s",
+      "name": "Grade preview at 30 s",
+      "meaning": "Road grade sampled thirty seconds ahead from the generated road.",
+      "why": "It gives the longest preview horizon exposed to the policy.",
+      "unit": "fraction",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "Road grade sampled thirty seconds ahead from the generated road.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "g * 12.0",
+        "line": 801,
+        "match": "g * 12.0"
+      },
+      "upstream": [
+        "grade"
+      ],
+      "downstream": [
+        "agent"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "aggression",
+      "name": "Driver demand change",
+      "meaning": "Normalized proxy based on the magnitude of speed change.",
+      "why": "It distinguishes changing speed demand from steady cruising.",
+      "unit": "normalized",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Normalized proxy based on the magnitude of speed change.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "self.aggression",
+        "line": 807,
+        "match": "self.aggression"
+      },
+      "upstream": [
+        "speed"
+      ],
+      "downstream": [
+        "torque_req"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "weight_tracking",
+      "name": "Torque-tracking weight",
+      "meaning": "An episode weight on requested-torque tracking; training resets draw it uniformly from 0.45 to 0.70, while the scored bridge pins the Episode 1 value 0.690154.",
+      "why": "The floor prevents torque refusal from becoming a cheap reward hack.",
+      "unit": "weight",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Episode-level tracking weight drawn uniformly from 0.45 to 0.70.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "float(self.w[0])",
+        "line": 809,
+        "match": "float(self.w[0])"
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "r_resp"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": "Sampled at reset; it is not a driver preference measured from the car."
+    },
+    {
+      "id": "weight_fuel",
+      "name": "Fuel preference weight",
+      "meaning": "An episode preference share for fuel saving; after the tracking floor, fuel and life shares are drawn from Dirichlet(1,1), while the scored bridge pins Episode 1 at 0.012829.",
+      "why": "It sets the fuel-versus-life trade-off for that episode.",
+      "unit": "weight",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Dirichlet share of the remaining episode preference weight assigned to fuel saving.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "float(self.w[1])",
+        "line": 809,
+        "match": "float(self.w[1])"
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "r_fuel"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": "The locked bridge fixes Episode 1 weights for reproducible controller comparisons; other seeded scenarios draw at reset."
+    },
+    {
+      "id": "weight_life",
+      "name": "Life preference weight",
+      "meaning": "An episode preference share for modeled damage; after the tracking floor, fuel and life shares are drawn from Dirichlet(1,1), while the scored bridge pins Episode 1 at 0.297017.",
+      "why": "It sets the episode value for lower modeled damage.",
+      "unit": "weight",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Dirichlet share of the remaining episode preference weight assigned to modeled damage.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_obs",
+        "variable": "float(self.w[2])",
+        "line": 809,
+        "match": "float(self.w[2])"
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "r_life"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": "The locked bridge fixes Episode 1 weights for reproducible controller comparisons; other seeded scenarios draw at reset."
+    },
+    {
+      "id": "spark_trim",
+      "name": "Spark trim",
+      "meaning": "Bounded additive command applied to baseline spark timing.",
+      "why": "Timing trades efficiency against knock and exhaust temperature.",
+      "unit": "deg BTDC",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Bounded additive command applied to baseline spark timing.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "spark"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": "An actuator command, not measured spark timing."
+    },
+    {
+      "id": "lambda_trim",
+      "name": "Lambda trim",
+      "meaning": "Additive mixture-ratio command applied to the baseline lambda.",
+      "why": "Mixture changes fuel flow, combustion and exhaust mass.",
+      "unit": "lambda",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Additive mixture-ratio command applied to the baseline lambda.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "lam",
+        "fuel"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "boost_trim",
+      "name": "MAP trim",
+      "meaning": "Requested manifold-pressure offset, constrained by the torque loop and compressor envelope.",
+      "why": "It changes air charge available to meet torque demand.",
+      "unit": "kPa",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Requested manifold-pressure offset, constrained by the torque loop and compressor envelope.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "map",
+        "air"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "fan_duty",
+      "name": "Fan duty",
+      "meaning": "Absolute radiator-fan duty command.",
+      "why": "It changes modeled radiator heat rejection.",
+      "unit": "fraction",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Absolute radiator-fan duty command.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "t_block"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "pump_duty",
+      "name": "Pump duty",
+      "meaning": "Absolute coolant-pump duty command, bounded below by 0.3.",
+      "why": "It changes modeled coolant heat transfer.",
+      "unit": "fraction",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Absolute coolant-pump duty command, bounded below by 0.3.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent"
+      ],
+      "downstream": [
+        "t_block"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "policy_action",
+      "name": "Policy action",
+      "meaning": "Five normalized supervisor outputs before scaling to physical action bounds.",
+      "why": "The action defines spark, lambda and MAP trims plus fan and pump duties.",
+      "unit": "normalized",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Five normalized supervisor outputs before scaling to physical action bounds.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "_rescale",
+        "variable": "ACT_LO",
+        "line": 644,
+        "match": "ACT_LO ="
+      },
+      "upstream": [
+        "agent",
+        "preview"
+      ],
+      "downstream": [
+        "normalized_actions"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "diagnostic_frame",
+      "name": "Simulation diagnostics",
+      "meaning": "Per-step constraint costs and state values returned by the simulator.",
+      "why": "They describe modeled violations and are not independent validation data.",
+      "unit": "mixed",
+      "evidence": "MODELLED",
+      "evidence_class": "MODELLED",
+      "evidence_note": "Per-step constraint costs and state values returned by the simulator.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "step",
+        "variable": "cost_torque",
+        "line": 948,
+        "match": "cost_torque"
+      },
+      "upstream": [
+        "constraint_costs"
+      ],
+      "downstream": [
+        "preview_result"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "scenario",
+      "name": "Generated road scenario",
+      "meaning": "A deterministic or seeded generated road and ambient condition used by the simulator.",
+      "why": "Scenario inputs define grade, speed and environment conditions.",
+      "unit": "scenario",
+      "evidence": "SCENARIO INPUT",
+      "evidence_class": "SCENARIO INPUT",
+      "evidence_note": "A deterministic or seeded generated road and ambient condition used by the simulator.",
+      "range": null,
+      "source": {
+        "file": "engine_env.py",
+        "symbol": "make_grade_climb",
+        "variable": "def make_grade_climb",
+        "line": 1007,
+        "match": "def make_grade_climb"
+      },
+      "upstream": [],
+      "downstream": [
+        "grade",
+        "speed"
+      ],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    },
+    {
+      "id": "research_claim",
+      "name": "Research interpretation",
+      "meaning": "A claim about preview value, generality or plant behavior that requires a matching experiment.",
+      "why": "Interpretation must follow the protocol and uncertainty evidence.",
+      "unit": "claim",
+      "evidence": "STATISTIC",
+      "evidence_class": "STATISTIC",
+      "evidence_note": "A claim about preview value, generality or plant behavior that requires a matching experiment.",
+      "range": null,
+      "source": {
+        "file": "results/agents/terrain_dt1/index.json",
+        "line": 1,
+        "match": "\"set\""
+      },
+      "upstream": [
+        "preview_result",
+        "measured_vs_modelled"
+      ],
+      "downstream": [],
+      "increase": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "decrease": "The effect depends on the coupled operating point; use a controlled model step to observe it.",
+      "caveat": null
+    }
+  ],
+  "tour": [
+    {
+      "id": "road_to_load",
+      "title": "The road creates the load",
+      "subtitle": "A slope becomes engine torque demand",
+      "body": "Road speed, acceleration, grade and air density determine wheel force. The gearbox maps that road force to the engine operating point.",
+      "experiment": "Enable “Override the remaining road,” set grade from 0% to 12%, then advance 30 s. Compare requested engine torque before and after the grade change.",
+      "layer": "vehicle",
+      "focus": "grade",
+      "concepts": [
+        "torque_req",
+        "gear",
+        "grade"
+      ]
+    },
+    {
+      "id": "engine_101",
+      "title": "Engine 101: how a cylinder makes torque",
+      "subtitle": "Four strokes, two crankshaft turns",
+      "body": "The engine turns fuel energy into heat and pressure. Intake, compression, power and exhaust take two crankshaft revolutions; pressure pushes the piston and turns the crankshaft. This project models a simplified single-zone cycle, not three-dimensional combustion.",
+      "experiment": "Open the Engine 101 lab and step through intake, compression, power and exhaust. Watch the piston compress the mixture before the spark starts the power stroke.",
+      "layer": "engine",
+      "focus": "engine",
+      "concepts": [
+        "engine",
+        "four_stroke",
+        "combustion",
+        "engine_torque"
+      ]
+    },
+    {
+      "id": "air_and_fuel",
+      "title": "Air and fuel make the charge",
+      "subtitle": "Boost raises air mass; lambda sets fuel relative to it",
+      "body": "The compressor supplies pressurized air. Charge temperature and engine speed determine how much oxygen enters each cycle; lambda sets fuel mass for that air.",
+      "experiment": "Keep the road override fixed and select the manual supervisor. Increase MAP trim slightly, advance one second, then compare MAP, modeled airflow and fuel flow.",
+      "layer": "turbo",
+      "focus": "air",
+      "concepts": [
+        "turbocharger",
+        "air",
+        "charge_temp",
+        "fuel"
+      ]
+    },
+    {
+      "id": "spark_and_burn",
+      "title": "Spark starts a finite burn",
+      "subtitle": "Timing changes work, exhaust and knock together",
+      "body": "Spark timing sets when the plug fires before top dead centre. Changing it can alter torque, fuel use, exhaust heat and knock exposure at once; follow those effects through the cycle and test one small trim at a time.",
+      "experiment": "Open Engine 101 and follow intake, compression, power and exhaust. During compression the valves close and the piston squeezes the mixture; excess spark advance can raise modeled knock exposure.",
+      "layer": "engine",
+      "focus": "cylinder",
+      "concepts": [
+        "four_stroke",
+        "combustion",
+        "spark",
+        "knock"
+      ]
+    },
+    {
+      "id": "exhaust_to_turbine",
+      "title": "Exhaust carries heat to the turbo",
+      "subtitle": "Air plus fuel flow through the hot side",
+      "body": "Exhaust temperature and mass flow heat the turbine housing. The model remembers that heat instead of resetting temperature every step.",
+      "experiment": "Keep the road fixed, raise load with MAP trim, and advance 30 s. Compare modeled exhaust gas temperature with the slower turbine-housing response.",
+      "layer": "turbo",
+      "focus": "t_turb",
+      "concepts": [
+        "exhaust_flow",
+        "egt",
+        "t_turb"
+      ]
+    },
+    {
+      "id": "thermal_memory",
+      "title": "Three nodes remember heat",
+      "subtitle": "Block, oil and turbine respond at different rates",
+      "body": "Heat capacities and transfer paths create memory. The block and oil parameters are derived from logs, while turbine dynamics remain assumed.",
+      "experiment": "Open Thermal memory, apply a short load change, and compare how quickly block, oil and turbine temperature states respond.",
+      "layer": "thermal",
+      "focus": "thermal",
+      "concepts": [
+        "t_block",
+        "t_oil",
+        "t_turb",
+        "thermal_time_constant"
+      ]
+    },
+    {
+      "id": "agent_inputs",
+      "title": "The agent sees state and preview",
+      "subtitle": "Twenty-three values become five supervisory commands",
+      "body": "Both policies see present engine and vehicle state. Sighted agents also see four future grade samples; the blind arm receives zeroes in only those slots.",
+      "experiment": "Turn future-grade preview off and load/reset, then turn it on and load/reset. Compare observation slots 14–17; current grade in slot 13 remains visible in both runs.",
+      "layer": "agent",
+      "focus": "agent",
+      "concepts": [
+        "preview",
+        "normalized_actions",
+        "agent"
+      ]
+    },
+    {
+      "id": "reward_tradeoffs",
+      "title": "Reward balances competing goals",
+      "subtitle": "Deliver torque, save fuel, reduce modelled damage",
+      "body": "Episode weights change the balance among response, fuel and life proxy. Returned constraint costs help reveal bad behavior even when a scalar reward trades objectives.",
+      "experiment": "Open Preview comparison, choose a seed, and compare tracking, fuel and life weights and reward terms for the two actors on that fixed seed.",
+      "layer": "agent",
+      "focus": "reward",
+      "concepts": [
+        "r_resp",
+        "r_fuel",
+        "r_life",
+        "policy_reward",
+        "constraint_costs"
+      ]
+    },
+    {
+      "id": "result_and_limits",
+      "title": "What the experiment says",
+      "subtitle": "The preview effect remains inconclusive",
+      "body": "The paired interval includes zero and the tests are not significant. Agents’ apparent advantage over hand policies depends heavily on the untested knock model.",
+      "experiment": "Open Research result and read the paired 95% interval and both p-values. Explain why an interval spanning zero is inconclusive.",
+      "layer": "agent",
+      "focus": "results",
+      "concepts": [
+        "preview_result",
+        "measured_vs_modelled",
+        "h_over_tau"
+      ]
+    }
+  ],
+  "viva": [
+    {
+      "question": "How does an engine turn fuel into shaft torque?",
+      "short": "Fuel burns in the cylinder and raises pressure. The piston turns that pressure into crankshaft rotation.",
+      "technical": "Each cylinder completes intake, compression, power and exhaust over two crankshaft revolutions. The simplified single-zone cycle integrates pressure work and subtracts estimated friction and pumping work to produce modeled brake torque.",
+      "focus": "engine",
+      "layer": "engine"
+    },
+    {
+      "question": "Why does engine temperature have memory?",
+      "short": "The metal and fluids store heat, so their temperatures respond over time instead of instantly following load.",
+      "technical": "Each thermal node integrates heat capacity times temperature change against heat input and transfer to connected nodes and ambient. A change in load can keep affecting block, oil and turbine states after the road demand changes.",
+      "focus": "t_block",
+      "layer": "thermal"
+    },
+    {
+      "question": "What five levers does the supervisor actually control?",
+      "short": "Spark trim, lambda trim, MAP trim, radiator-fan duty and coolant-pump duty.",
+      "technical": "The action vector is ordered [spark, lambda, MAP, fan, pump]. Bounds are [−8,+4] degrees, [−0.15,+0.06] lambda, [−40,+15] kPa, [0,1] fan fraction and [0.3,1] pump fraction. Spark/lambda/MAP are additive trims; fan and pump are absolute duties, all subject to slew limits.",
+      "focus": "agent",
+      "layer": "agent"
+    },
+    {
+      "question": "Why is turbine-housing temperature not measured from the car?",
+      "short": "The logged vehicle has no turbine-housing temperature sensor, so this value is a model estimate.",
+      "technical": "The thermal network integrates a turbine state from exhaust energy and assumed heat capacity and transfer coefficients. It is not an OBD channel and has no direct sensor validation on this car.",
+      "focus": "t_turb",
+      "layer": "thermal"
+    },
+    {
+      "question": "What information does future-grade preview add?",
+      "short": "It adds four upcoming road-grade samples at 2, 5, 15 and 30 seconds ahead.",
+      "technical": "The sighted policy observes current grade at slot 13 and future samples at slots 14–17. Disabling preview zeros only those four samples; the blinded policy still sees current grade.",
+      "focus": "preview",
+      "layer": "agent"
+    },
+    {
+      "question": "How does the supervisor differ from the baseline ECU?",
+      "short": "The baseline ECU sets its base engine commands. The supervisor reads observations and adds bounded trims while the vehicle model handles torque and gear selection.",
+      "technical": "BaselineECU supplies baseline spark and lambda. The policy selects five supervisory actions; a torque PI loop constrains MAP and the vehicle model selects gears. The bridge “baseline” policy is the project neutral supervisor and its fan/pump duties may not exactly match every ECU fan schedule.",
+      "focus": "agent",
+      "layer": "agent"
+    },
+    {
+      "question": "Why are fuel and life rewards measured against a baseline?",
+      "short": "They score savings relative to the baseline for the same episode, while torque response is scored separately.",
+      "technical": "r_fuel=(baseline fuel−fuel)/(baseline fuel+1e−6); r_life=(baseline damage_rate−damage_rate)/(baseline damage_rate+0.05). engine_env.py:934–946 combines r_resp, r_fuel and r_life with actual obs_in[20:23] weights and uncertainty/smoothness penalties. It is not a best-action label or independent validation. Constraint costs are diagnostics and must not be subtracted again. Missing penalties imply partial decomposition; the total stays frame.reward.",
+      "focus": "r_fuel",
+      "layer": "agent"
+    },
+    {
+      "question": "Why does a steeper road grade raise requested engine torque?",
+      "short": "Gravity pulls harder against the car on a steeper climb, so the vehicle model requests more wheel force and engine torque.",
+      "technical": "Vehicle demand combines grade, rolling resistance, aerodynamic drag and acceleration into wheel force. Gear ratios and final drive map wheel force to engine torque demand, which enters the tracking error.",
+      "focus": "grade",
+      "layer": "vehicle"
+    },
+    {
+      "question": "What can spark retard do to exhaust temperature?",
+      "short": "Retarding spark can reduce knock risk, but it may send more heat into the exhaust and increase fuel use.",
+      "technical": "The cycle model changes combustion phasing and work when spark timing moves. Retard generally reduces modeled knock exposure while tending to raise exhaust temperature at the relevant high-load operating point; the direction and size depend on the operating point.",
+      "focus": "spark",
+      "layer": "engine"
+    },
+    {
+      "question": "What does lambda tell us, and what does enrichment change?",
+      "short": "Lambda compares the mixture with stoichiometric air-fuel ratio. Lower lambda is richer and uses more fuel per unit air.",
+      "technical": "Lambda is actual air-fuel ratio divided by stoichiometric ratio; λ=1 is stoichiometric and λ<1 is rich. The model uses air mass and lambda to calculate fuel mass. Enrichment can reduce knock tendency in the protection logic but raises modeled fuel flow; exhaust-temperature effects depend on the operating point.",
+      "focus": "lam",
+      "layer": "engine"
+    },
+    {
+      "question": "Why does the reward penalize missed torque?",
+      "short": "Without a tracking penalty, a controller could look protective by refusing to make the requested torque.",
+      "technical": "r_resp uses normalized absolute torque error with a hinge above TRACK_TOL=0.05 and TRACK_HINGE=25. The tracking weight is floored at 0.45; this keeps torque delivery as a requirement while fuel and life express the preference trade-off.",
+      "focus": "r_resp",
+      "layer": "agent"
+    },
+    {
+      "question": "What is the current preview result?",
+      "short": "In the current paired retrain, preview’s effect is inconclusive; the data do not show either a reliable benefit or no effect.",
+      "technical": "For ten sighted/blind seed pairs, the mean difference in damage cut is +1.1693 percentage points, 95% CI [−4.4391,+6.7777], paired t p=0.648406 and exact Wilcoxon p=0.431641. The interval spans zero and both tests are nonsignificant. In the separate hand-policy premise, predictive is 0.32 points worse than current-grade.",
+      "focus": "preview_result",
+      "layer": "agent"
+    },
+    {
+      "question": "What does H/τ mean, and is the curve established?",
+      "short": "H/τ compares preview time with thermal response time. The corrected cross-plant curve is not established yet.",
+      "technical": "H is a preview horizon and τ=C/UA is a thermal time constant. Turbine heat capacity remains assumed, and the current thermal update oscillates at dt=1 s; the sweep at dt=2 s is not quotable until integration is corrected and the agreed preregistered experiment is run.",
+      "focus": "h_over_tau",
+      "layer": "thermal"
+    },
+    {
+      "question": "What makes a trained actor replay the exact scored result?",
+      "short": "The exported weights alone are not enough; the model and code identity must also match the scored run.",
+      "technical": "The current exports provide policy.npz weights and data_sha1 but no plant_sha or scored final.zip hash. The generated score summaries are available, but raw eval_record.npz and train_record.npz are machine-local/gitignored; live actor runs are UNVERIFIED reenactments, not exact scored traces.",
+      "focus": "agent",
+      "layer": "agent"
+    },
+    {
+      "question": "If we only predict temperature, who chooses spark and fan?",
+      "short": "A controller chooses actions; forecasting alone does not.",
+      "technical": "SAC maps obs_in to five actions. Engine and thermal models calculate outcomes. Sequential decisions depend on state, thermal memory and cumulative reward. MPC and imitation are alternatives; no superiority is established without comparison. Training updates weights separately; this app reuses frozen weights or manual/hand-written policies.",
+      "focus": [
+        "agent",
+        "policy_action",
+        "t_turb",
+        "policy_reward"
+      ]
+    },
+    {
+      "question": "Does 12% lower damage index mean 12% longer component life?",
+      "short": "No. It is a relative thermal/knock index, not measured lifetime.",
+      "technical": "engine_env.py:636 combines exponential turbine/oil temperatures and optional knock. The rate is index/s; accumulated damage sums rate × dt. A reduction needs its positive reference denominator. Differences between reduction percentages are percentage points, not a new reduction ratio.",
+      "focus": [
+        "damage",
+        "r_life",
+        "t_turb"
+      ]
+    },
+    {
+      "question": "Is reward an independent sensor reading or a designed objective?",
+      "short": "It is designed from environment quantities, reference and preference weights.",
+      "technical": "engine_env.py:934–946 combines r_resp, r_fuel and r_life with actual obs_in[20:23] weights and uncertainty/smoothness penalties. It is not a best-action label or independent validation. Constraint costs are diagnostics and must not be subtracted again. Missing penalties imply partial decomposition; the total stays frame.reward.",
+      "focus": [
+        "policy_reward",
+        "r_resp",
+        "r_fuel",
+        "r_life"
+      ]
+    },
+    {
+      "question": "How do you distinguish a stable gain from choosing the best seed?",
+      "short": "Open Results, explain one selected pair, then compare all training pairs and the group confidence interval.",
+      "technical": "Training seeds can change learned weights. Evaluation uses frozen road seeds 1000–1019 and deterministic policy inference. The group interval includes zero: inconclusive does not prove no effect. Replaying exported weights is not the identical scored historical artifact. Source: results/agents/terrain_dt1/index.json; evaluate.py:134–154,298.",
+      "focus": "preview_result",
+      "layer": "agent",
+      "destination": "seed-results"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "locked",
+      "name": "Locked 12% climb",
+      "description": "The scored Episode 1 protocol: dt=1 s, 720 samples (720 s), 130 km/h after a 20 s speed ramp, level for 180 s then 12% grade, 315 K (41.85 °C) ambient. The bridge pins episode seed 1000 and weights (0.690154, 0.012829, 0.297017) from evaluate.EPISODES[0]; the requested UI seed does not change this road or preference tuple."
+    },
+    {
+      "id": "flat",
+      "name": "Flat road",
+      "description": "Seeded flat-road scenario at 130 km/h for a 900 s sandbox session; ambient conditions come from its generated cycle and reset weights follow the requested seed."
+    },
+    {
+      "id": "terrain",
+      "name": "Varied terrain",
+      "description": "Seeded road drawn from the supported terrain families for a 900 s sandbox session; grade changes are generated for this run and reset weights follow the requested seed."
+    }
+  ],
+  "derived": {
+    "data_file": "data/derived_params.json",
+    "generated": "2026-09-28 17:56",
+    "data_sha1": "c4fdd4babfb3752a",
+    "note": "Parameters derived from the car’s logs. This data fingerprint is not the same as the simulator-code plant fingerprint."
+  },
+  "limitations": [
+    "The 20 terrain_dt1 agents were trained on the pre-merge derived plant; their configs have git_dirty=true and data_sha1 but no plant_sha.",
+    "The knock model is unvalidated; spark advance accounts for much of the learned agents’ apparent gain over hand-written policies.",
+    "The turbine thermal node is modelled from assumed constants and cannot be checked against a vehicle turbine-temperature sensor.",
+    "At dt=1 s the block/coolant node oscillates; do not quote H/tau sweep results until the agreed integrator correction is made.",
+    "The damage integral is a simulation proxy, not a measured component lifetime prediction.",
+    "The current preview experiment is inconclusive; no claim of zero effect or a universal H/tau law is supported.",
+    "Exported policy.npz files are not exact scored Stable-Baselines3 final.zip files; any actor replay is an educational, UNVERIFIED rerun."
+  ]
+}

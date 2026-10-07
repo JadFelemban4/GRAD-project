@@ -1,0 +1,4 @@
+# Use the locally configured GRAD-project/.venv and its core project requirements.
+# These are the bridge-only runtime packages when installed into that environment.
+fastapi>=0.110
+uvicorn>=0.27

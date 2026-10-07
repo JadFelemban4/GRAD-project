@@ -1,0 +1,10 @@
+export type StrokeStation = {id: string; name: string; angle: number; intakeOpen: boolean; exhaustOpen: boolean; pistonDirection: 'up' | 'down'; hint: string};
+export const STROKE_STATIONS: ReadonlyArray<Readonly<StrokeStation>>;
+export function strokeAtDegrees(degrees: number): StrokeStation;
+export function globalCycleForCylinder(degrees: number, index: number): number;
+export function cylinderCycleDegrees(globalCycle: number, index: number): number;
+export const SPARK_PULSE_DEGREES: number;
+export const COMBUSTION_DEGREES: number;
+export function ignitionCommandDegrees(spark: unknown): number | null;
+export function sparkPulseAtDegrees(degrees: number, spark: unknown): number;
+export function combustionAtDegrees(degrees: number, spark: unknown): number;

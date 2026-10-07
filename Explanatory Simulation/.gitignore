@@ -1,0 +1,9 @@
+node_modules/
+.npm-cache/
+dist/
+__pycache__/
+.venv/
+.pytest_cache/
+# Local screenshots, validation logs and source snapshots move with the app.
+qa/
+tsconfig.tsbuildinfo

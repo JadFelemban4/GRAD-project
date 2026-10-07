@@ -1,0 +1,125 @@
+:root{--page:#edf0e8;--paper:#fff;--soft:#f5f8f8;--ink:#263c35;--muted:#657a71;--accent:#287e70;--line:#d9e0d7;--selected:#e4f1ed;--danger:#953135;--danger-bg:#ffeded;--warning:#865526;--warning-bg:#fff5e7;color-scheme:light;background:var(--page);color:var(--ink)}
+:root[data-theme=dark]{--page:#0e141c;--paper:#18212d;--soft:#202c3a;--ink:#dce3ec;--muted:#aebdca;--accent:#e1bc86;--line:#3b4b60;--selected:#324153;--danger:#ffb7b7;--danger-bg:#382326;--warning:#f3d197;--warning-bg:#332d21;color-scheme:dark}
+body,.app-shell,.startup{background:var(--page);color:var(--ink)}
+.preference-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}.preference-controls label{display:flex;align-items:center;gap:6px;font-size:12px}.preference-controls button,.preference-controls select{font-size:12px;min-height:36px}.preference-controls select{padding-inline:9px}.topbar{height:auto;min-height:82px;flex-wrap:wrap;padding-block:12px}.connection{flex-wrap:wrap}
+/* Shared surfaces include every mode and overlays; scientific scene/trace colors remain intact. */
+:root :is(.topbar,.mode-nav,.scene-panel,.metric-strip,.inspector,.simulation-controls,.plot-panel,.preview-road,.causal-panel,.agent-panel,.reward-panel,.lab-panel,.thermal-panel,.replay-panel,.results-content,.result-verdict,.viva-card,.source-dialog,.studio-inspector-sheet,.studio-operating,.studio-operating__results,.studio-controls,.studio-flow,.studio-story,.studio-hotspots,.studio-scene-tools,.project-story,.project-mission,.thermal-entry,.lab-output,.source-card,.current-value,.compare-lanes>div,.pair-grid>div,.thermal-values>div,.replay-values>div,.observation-grid button,.action-readout>div,.reward-terms button,.ecu-flow>div,.model-values>div,.model-preview button,.model-controls button){background:var(--paper);color:var(--ink);border-color:var(--line)}
+:root :is(button,select,.search-box,.brand-mark,.tool-tabs,.reading-context,.experiment-prompt,.experiment-icon,.source-code,.lookahead-values>span,.result-row,.studio-inspector-sheet__head button){background:var(--soft);color:var(--ink);border-color:var(--line)}
+:root :is(.subtle,.small-label,.brand-light,.brand small,.project-tag,.connection,.rail-foot,.intro p,.scene-caption,.scene-toolbar,.model-values small,.model-hint,.plot-foot,.range-ends,.source-card small,.lesson-list button small,.variable-list button code,.metric-evidence,.metric-strip button,.metric-strip strong small,dt,.source-dialog>.subtle){color:var(--muted)}
+:root :is(h1,h2,h3,h4,.brand,.current-value strong,.metric-strip strong,.result-verdict strong,.model-values strong,.result-row,.studio-inspector-sheet__head){color:var(--ink)}
+:root :is(button.active,button.selected,button:hover,.lesson-list button.selected,.variable-list button.selected,.mode-nav button.active,.layer-switch button.active,.tool-tabs button.active,.component-selector button.active,.source-code .active-line){background:var(--selected);color:var(--ink);border-color:var(--accent)}
+:root .primary{background:var(--accent);color:var(--page);border-color:var(--accent)}
+:root .notice{background:var(--soft);color:var(--muted);border-color:var(--line)}
+:root .warning{background:var(--warning-bg);color:var(--warning);border-color:var(--warning)}
+:root :is(.error,.error-banner){background:var(--danger-bg);color:var(--danger)}
+:root input:not([type=range]):not([type=checkbox]){background:var(--paper);color:var(--ink);border-color:var(--line)}
+:root :is(button,a,input,select,summary):focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+:root .studio-active{--ink:inherit;--accent:inherit;--line:inherit;--muted:inherit;background:var(--page);color:var(--ink);color-scheme:inherit}
+/* Directional positioning and arrows are Arabic-only; numbers/code stay LTR in both locales. */
+html[dir=ltr] .project-tag{margin-right:auto;margin-left:30px;padding-right:0;padding-left:24px;border-right:0;border-left:1px solid var(--line)}
+html[dir=ltr] .mode-nav .results-nav,html[dir=ltr] .lesson-arrows{margin-right:0;margin-left:auto}
+html[dir=ltr] :is(.lesson-list button,.variable-list button,.observation-grid button){text-align:left}
+html[dir=ltr] :is(.lesson-arrows svg,.causal-chain>span>svg,.viva-card .button-row svg,footer svg){transform:none}
+html[dir=ltr] .connection>.badge{margin-left:10px;margin-right:0}
+html[dir=ltr] .run-row>.subtle{margin-left:auto;margin-right:0}
+html[dir=ltr] :is(.notice,.warning){border-right:0;border-left:3px solid var(--line)}
+html[dir=ltr] .legend-dot{margin-right:0;margin-left:8px}
+html[dir=ltr] .metric-strip button{border-right:0;border-left:1px solid var(--line)}html[dir=ltr] .metric-strip button:first-child{border-left:0}
+html[dir=ltr] .studio-view .studio-scene-tools{right:16px;left:auto}
+html[dir=ltr] .observation-grid button small{margin-left:0;margin-right:6px}
+@media(max-width:700px){.topbar{gap:10px}.connection{font-size:11px}.preference-controls{width:100%;justify-content:flex-end}.preference-controls label>span{font-size:11px}.brand{font-size:20px}.project-tag{display:none}.preference-controls button{padding:7px 10px}.mode-nav{overflow:auto}.workbench{min-width:0}}
+:root[data-theme=dark] .badge.modelled{background:#193940;color:#a5e0eb;border-color:#376974}:root[data-theme=dark] .badge.measured{background:#1a382a;color:#ade8c6;border-color:#3b6a50}:root[data-theme=dark] :is(.badge.assumed,.badge.unverified){background:#3b2e1e;color:#f3d197;border-color:#78613a}:root[data-theme=dark] :is(.badge.derived,.badge.published,.badge.literature,.badge.derived-from-measurements){background:#293247;color:#c6d3ff;border-color:#536383}
+:root :is(.thermal-experiment,.thermal-context,.thermal-chart,.thermal-guide,.studio-inspector-try,.studio-side,.studio-bottom,.studio-operating__inputs,.studio-operating__controls){background:var(--paper);color:var(--ink);border-color:var(--line)}
+:root .studio-active .thermal-experiment{background:var(--paper);color:var(--ink);border-color:var(--line)}
+:root .studio-active .thermal-experiment :is(.thermal-values>div,.button-row button){background:var(--soft);color:var(--ink);border-color:var(--line)}
+:root .studio-active .thermal-experiment .button-row button.primary{background:var(--accent);color:var(--page)}
+:root .studio-active .thermal-experiment :is(summary,.thermal-values strong,.thermal-values span){color:var(--ink)}
+:root .thermal-chart text,:root .preview-road text{fill:var(--ink)}
+:root .thermal-guide small{color:var(--muted)}
+html[dir=ltr] .thermal-applied{border-right:0;border-left:3px solid #5ed7dc;padding-right:0;padding-left:10px}
+html[dir=ltr] .thermal-anchor{direction:ltr}
+/* Studio children have legacy local colors; use the same semantic palette as their surfaces. */
+:root .project-mission p{color:var(--muted)}
+:root .project-mission strong{color:var(--ink)}
+.learning-journey nav ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;list-style:none;padding:0;margin:12px 0}
+.learning-journey nav li{min-width:0}
+.learning-journey nav button{width:100%;height:100%;min-height:52px;display:flex;gap:8px;align-items:center;text-align:start;white-space:normal;line-height:1.5}
+.learning-journey nav button span{color:var(--accent);font-variant-numeric:tabular-nums}
+.learning-journey nav button[aria-current=step]{background:var(--selected);border-color:var(--accent)}
+.learning-journey .learning-journey__connection{display:block;border-top:1px solid var(--line);padding-top:12px;min-width:0}
+.learning-journey p{line-height:1.8;overflow-wrap:anywhere}
+.learning-journey details{font-size:12px;margin-top:10px}
+.learning-journey summary{cursor:pointer;line-height:1.6;color:var(--ink)}
+.learning-journey details p{margin:8px 0 0}
+.learning-journey .learning-journey__show{margin-top:12px;min-height:44px;white-space:normal}
+.scene-toolbar:has(.model-return-button){flex-wrap:wrap;gap:8px}
+.scene-toolbar .model-return-button{min-height:40px;margin-inline-start:auto;font-size:12px;white-space:normal}
+[data-model-viewport]:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+@media(max-width:700px){.learning-journey nav ol{grid-template-columns:repeat(2,minmax(0,1fr))}.learning-journey nav li:last-child{grid-column:1/-1}.learning-journey nav button{min-height:48px}}
+/* Inspector prose follows semantic tokens in every mode and both themes. */
+:root .inspector p,:root .studio-active .inspector p{color:var(--muted)}
+:root .inspector .meaning,:root .studio-active .inspector .meaning{color:var(--ink)}
+:root .inspector p.warning,:root .studio-active .inspector p.warning{color:var(--warning)}
+:root .studio-active .inspector :is(.source-card,.current-value){background:var(--soft);color:var(--ink);border-color:var(--line)}
+:root .studio-active .inspector :is(.current-value strong,.source-card code){color:var(--ink)}
+:root .studio-active .inspector :is(.source-card button,.chain-links button){background:var(--soft);color:var(--ink);border-color:var(--line)}
+:root .studio-active .inspector :is(.source-card button:hover,.chain-links button:hover,.chain-links button.active){background:var(--selected);border-color:var(--accent)}
+.controller-roles,.decision-outcome{background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px;margin-block:12px;min-width:0}.controller-roles p,.decision-outcome p{color:var(--muted);line-height:1.7;font-size:13px}.controller-roles__blocks{display:flex;flex-wrap:wrap;gap:6px}.controller-roles__blocks button{flex:1 1 100px;min-height:48px;font-size:12px}.controller-roles button[aria-pressed=true],.controller-roles button[data-pulse=true]{border-color:var(--accent);background:var(--selected);box-shadow:inset 0 0 0 1px var(--accent)}.decision-outcome dl>div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding-block:6px;flex-wrap:wrap}.decision-outcome dd{margin:0;font-variant-numeric:tabular-nums}.decision-outcome dt button{padding:4px 7px;font-size:12px}.decision-paths{display:grid;gap:6px;margin-block:10px}.decision-outcome details,.controller-roles details{margin-block:12px}.decision-outcome summary,.controller-roles summary{cursor:pointer;color:var(--ink)}.decision-outcome code,.controller-roles code{overflow-wrap:anywhere}.controller-roles a{color:var(--accent)}.decision-outcome .equation{display:block;white-space:normal;overflow-wrap:anywhere;font-size:11px}.compare-lanes .decision-outcome{padding:10px}.controller-roles button,.decision-outcome button{white-space:normal}.project-story .controller-roles h3,.project-story .decision-outcome h3{color:var(--ink)}
+@media(max-width:600px){.controller-roles,.decision-outcome{padding:10px}.decision-outcome dd{font-size:12px}.controller-roles__blocks button{flex-basis:110px}}
+.provenance-drawer{margin-block:16px;padding:12px;background:var(--soft);border:1px solid var(--line);border-radius:10px;color:var(--ink)}.provenance-drawer p{color:var(--muted)}.provenance-drawer code{overflow-wrap:anywhere}.provenance-drawer a{color:var(--accent)}.pair-grid button[aria-pressed=true]{background:var(--selected);border-color:var(--accent)}
+.results-content .chain-links{min-width:0}.results-content .chain-links button{min-width:0;max-width:100%;white-space:normal;flex-wrap:wrap;overflow-wrap:anywhere}.results-content .chain-links code{max-width:100%;overflow-wrap:anywhere;white-space:normal}.provenance-drawer button{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+/* Complete shared theme for studio teaching chrome and scientific plot overlays. */
+:root :is(.preview-panel,.studio-project-panel,.project-story__step,.project-story__timeline,.project-story__readings>button,.project-story__readings>div,.project-story__cumulative,.studio-part-card,.engine-study,.engine-stroke-description,.scene-fallback){background:var(--paper);color:var(--ink);border-color:var(--line)}
+:root :is(.studio-view,.studio-expanded){background:var(--page);color:var(--ink)}
+:root .studio-view :is(button,select,.project-story__horizon){background:var(--soft);color:var(--ink);border-color:var(--line)}
+:root .studio-view :is(button:hover,button.active,button[aria-pressed=true],button[aria-current=step]){background:var(--selected);color:var(--ink);border-color:var(--accent)}
+:root .studio-view .primary{background:var(--accent);color:var(--page)}
+:root :is(.project-story__header h2,.project-story__step-head h3,.project-story__readings strong,.project-story__horizon strong,.studio-part-card h2,.studio-operating__title,.studio-operating__results dd,.studio-comparison__heading strong,.studio-comparison__delta,.engine-study__head strong,.engine-valve-status,.engine-stroke-description,.studio-crank-angle output,.studio-explode output){color:var(--ink)}
+:root :is(.project-story__header p,.project-story__step-head p,.project-story__current,.project-story__note,.project-story__detail,.project-story__detail p,.project-story__readings span,.project-story__horizon small,.project-story__eyebrow,.studio-part-card p,.studio-operating__header p,.studio-operating__eyebrow,.studio-operating__note,.studio-operating__status,.studio-operating__results dt,.studio-operating__results dd small,.studio-operating__control-head label,.studio-operating__control-head small,.studio-comparison__heading,.studio-comparison__row>span:first-child,.studio-comparison__row small,.studio-comparison__columns,.studio-comparison__note,.studio-flow-guide p,.studio-flow-guide__head,.studio-explode,.studio-crank-angle,.studio-integrity,.engine-study p){color:var(--muted)}
+:root .studio-operating__error{color:var(--danger)}
+:root .studio-operating__warnings{color:var(--warning)}
+:root :is(.studio-cycle-controls,.studio-display-controls,.studio-flow-guide,.studio-comparison__row,.studio-comparison__columns){border-color:var(--line)}
+:root[data-theme=light] :is(.air-value,.air-state){color:#146d7b}
+:root[data-theme=light] :is(.exhaust-value,.exhaust-state){color:#95501d}
+:root[data-theme=light] .engine-disassembly-note{color:var(--warning)}
+:root :is(.ci-plot,.preview-panel,.plot-card) svg text{fill:var(--ink)}
+:root[data-theme=light] .thermal-chart path[stroke="#5ed7dc"]{stroke:#127d87}
+:root[data-theme=light] .thermal-chart path[stroke="#cba2f2"]{stroke:#77529a}
+:root[data-theme=light] .thermal-chart line[stroke="#f6df99"]{stroke:#8d671c}
+:root[data-theme=dark] :is(.plot-card,.preview-panel) path[stroke="#127d87"],:root[data-theme=dark] .preview-panel polyline{stroke:#64c2cf}
+:root[data-theme=dark] :is(.plot-card,.preview-panel) line[stroke="#29464c"]{stroke:#b2c2d5}
+:root[data-theme=dark] .badge.statistic{background:#293247;color:#c6d3ff;border-color:#536383}
+:root :is(button,select):disabled{opacity:.58;cursor:default}
+:root .studio-active .topbar{height:auto;min-height:82px}
+html[dir=ltr] :is(.engine-cylinder-label,.thermal-anchor){direction:ltr}
+html[dir=ltr] :is(.project-story__timeline svg,.project-story__step-head>svg){transform:scaleX(-1)}
+html[dir=ltr] .engine-stroke-description{border-right:0;border-left:3px solid var(--accent)}
+.source-dialog{min-width:0;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;overflow-wrap:anywhere}
+.source-dialog .source-code{max-width:100%;overflow-x:auto;unicode-bidi:isolate}
+:root :is(.compare-lanes,.compare-lanes>div,.plot-card,.studio-operating__control,.scene-panel,.main-content,.learning-rail){min-width:0}
+.compare-lanes :is(code,button){overflow-wrap:anywhere;white-space:normal}
+@media(max-width:700px){
+  .compare-lanes{grid-template-columns:minmax(0,1fr)}
+  .compare-header,.scenario-row,.run-row,.button-row{flex-wrap:wrap}
+  .compare-header label,.scenario-row label,.scenario-row select,.button-row select{max-width:100%;min-width:0}
+  .studio-operating__number{max-width:95px}
+  .source-dialog{padding:16px;width:calc(100vw - 24px)}
+  .source-dialog .section-head{align-items:flex-start;gap:10px}
+  .source-dialog h2{font-size:17px;overflow-wrap:anywhere}
+  .source-code>div{min-width:max-content}
+  .engine-study__head{flex-wrap:wrap}
+}
+/* Bounded scientific cards allow missing-value prose and units to wrap instead of expanding mobile grid tracks. */
+:root .metric-strip{grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible}
+:root .reward-terms{grid-template-columns:repeat(3,minmax(0,1fr))}
+:root :is(.metric-strip,.reward-terms,.metric-strip>button,.reward-terms>button){min-width:0;max-width:100%}
+:root :is(.metric-strip>button,.reward-terms>button){white-space:normal;overflow-wrap:anywhere}
+:root .metric-strip strong{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 5px;white-space:normal;max-width:100%;min-width:0}
+:root .metric-strip strong :is(bdi,small){min-width:0;max-width:100%;overflow-wrap:anywhere}
+:root .metric-strip strong small{margin:0}
+:root .reward-terms strong{min-width:0;max-width:100%;overflow-wrap:anywhere}
+@media(max-width:700px){
+  :root .metric-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  :root .metric-strip strong{font-size:18px;letter-spacing:0}
+  :root .reward-terms{grid-template-columns:minmax(0,1fr)}
+}
