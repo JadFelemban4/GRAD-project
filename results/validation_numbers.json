@@ -1,0 +1,81 @@
+{
+ "mei": 50.0,
+ "resolution": {
+  "spark": 0.75,
+  "oil_c": 1.0,
+  "ect_c": 0.1,
+  "t_amb": 0.5,
+  "air_gps": 1.11,
+  "lam": 0.01
+ },
+ "damage_bias": {
+  "baseline ECU": {
+   "damage": 920.1,
+   "peak_turb_c": 883.0,
+   "peak_oil_c": 93.9,
+   "turbine_up_k": 2.6,
+   "turbine_down_k": -2.7,
+   "oil_up_k": 23.1,
+   "oil_down_k": -100.0
+  },
+  "current-grade": {
+   "damage": 520.5,
+   "peak_turb_c": 853.3,
+   "peak_oil_c": 94.1,
+   "turbine_up_k": 4.8,
+   "turbine_down_k": -5.4,
+   "oil_up_k": 23.0,
+   "oil_down_k": -100.0
+  }
+ },
+ "climb_sensitivity": {
+  "none": {
+   "peak_turb_c": 883.0,
+   "damage": 920.1,
+   "damage_thermal": 859.5,
+   "map_climb_kpa": 174.9
+  },
+  "spark +0.75 deg": {
+   "peak_turb_c": 877.24,
+   "damage": 826.2,
+   "damage_thermal": 755.5,
+   "map_climb_kpa": 173.2
+  },
+  "spark -0.75 deg": {
+   "peak_turb_c": 888.81,
+   "damage": 1030.5,
+   "damage_thermal": 978.8,
+   "map_climb_kpa": 176.7
+  },
+  "lambda +0.01": {
+   "peak_turb_c": 882.63,
+   "damage": 912.4,
+   "damage_thermal": 855.9,
+   "map_climb_kpa": 177.3
+  },
+  "lambda -0.01": {
+   "peak_turb_c": 876.92,
+   "damage": 816.4,
+   "damage_thermal": 752.8,
+   "map_climb_kpa": 174.9
+  },
+  "boost ceiling +3.4 kPa": {
+   "peak_turb_c": 883.0,
+   "damage": 920.3,
+   "damage_thermal": 859.4,
+   "map_climb_kpa": 174.9
+  },
+  "ambient +1 K": {
+   "peak_turb_c": 886.43,
+   "damage": 987.2,
+   "damage_thermal": 927.4,
+   "map_climb_kpa": 176.1
+  },
+  "ambient +5 K": {
+   "peak_turb_c": 900.22,
+   "damage": 1318.9,
+   "damage_thermal": 1259.9,
+   "map_climb_kpa": 181.0
+  }
+ }
+}

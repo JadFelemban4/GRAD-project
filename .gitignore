@@ -32,3 +32,8 @@ app/static/vendor/
 # (which carries the statistics the page and the README read), README, figures.
 results/agents/**/train_record.npz
 results/agents/**/eval_record.npz
+
+# conditions_test.py's working files (7 October 2026): one part per condition,
+# merged into results/conditions_test.json, and the run's log.
+results/conditions_test.part*.json
+results/conditions_test.log
