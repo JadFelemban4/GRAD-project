@@ -17,6 +17,7 @@ python car_spark_boost.py     the car's spark under boost against the model's ba
 python timestep_study.py      u_num: the thermal model stepped 1 to 100 times finer
 python damage_robustness.py   the frozen episodes re-scored under eight other damage rulers
 python conditions_test.py     the twenty agents at other ambient temperatures and pressures
+python damage_constants.py    every damage constant: what can set it, and the re-score (8 October)
 ```
 
 The last five are new (7 October) and diagnostics only: none changes a hashed
@@ -86,6 +87,7 @@ accuracy.
 These come from what an error would change, measured on the committed climb
 (`validation_numbers.py`, sections 2 and 3).
 
+<!-- RETIRED-OK: 920.1, 520.5 -- measured on the merged plant of 30 September; the plant of 8 October changes the damages, not the scale of the argument -->
 **What a temperature error does to damage.** A uniform turbine error of
 **+2.6 / −2.7 K** moves the baseline's damage (920.1) by the 50-unit minimum
 effect of interest; for current-grade (520.5) it is **+4.8 / −5.4 K**. No
@@ -348,7 +350,12 @@ thesis should say which components carry it and which do not.
 ## 10. Decisions for Jad and Ghassan
 
 Ghassan's recommendation and Jad's review agree on every item; the last
-column is for Jad's answer, one at a time.
+column is for Jad's answer, one at a time. **Since 8 October the answers are
+recorded in `results/VALIDATION_DECISIONS.md`**, one column each, with six more
+decisions beside these seven: the damage formula's constants (8–10,
+`results/DAMAGE_CONSTANTS.md`), where the per-step records live (11), and what
+the conditions test of section 11 asks of the preregistration (12–13). This
+table is the plan as Jad reviewed it; the sheet is where it is decided.
 
 | # | decision | recommended | Jad |
 |---|---|---|---|
@@ -443,8 +450,17 @@ What it shows:
    current-grade's can be read as protection alone.**
 5. **The preview ablation is inconclusive in every condition:** every 95 %
    interval includes zero, on five episodes per agent.
-6. **Every agent keeps its spark trim between +3 and +4° in every
-   condition.** The knock-model margin travels with them.
+6. **Most agents keep their spark advance; the ones that do not are the ones
+   that fail.** *(Corrected 8 October: this said "every agent keeps its spark
+   trim between +3 and +4° in every condition", read off the group medians,
+   which stay at +2.6 to +4.0°.)* Agent by agent (`conditions_test.py`, each
+   agent's median over its episodes), 45 of the 140 agent-condition cells sit
+   under +3° and 12 retard. At 25 °C the two that retard deepest, blinded
+   seed 6 (−6.86°) and sighted seed 2 (−5.63°), are the two that do about
+   twice the baseline's damage. The per-step records show the mechanism
+   (`show_record.py`): with spark retarded the engine needs more air for the
+   same torque and burns later, so the housing runs hotter, with the knock
+   integral far below any knock reason to retard.
 
 For the next preregistration (decision 7), this is evidence, not a decision:
 

@@ -2288,6 +2288,7 @@ still quoted the pre-H1 best BSFC (239.9 since); fixed and guarded in
 
 Full account: `SESSION_REPORT_2026-09-28_evening.md`. Verified on this tree:
 
+<!-- RETIRED-OK: 920.1, -0.3 -- what check_premise printed on 28 September; 848.1 and -0.0 since 8 October -->
 | check | result, 28 September (evening) |
 |---|---|
 | `build_dataset.py` | 321.7 min, 11 drives, 26 operating points; drive B's 7 windows dropped (no spark or lambda channel); then `derive_params.py` |
@@ -2331,7 +2332,7 @@ Checks, run on a copy of the resolved tree before committing:
 | `analyse_phase_d.py` / `analyse_phase_d2.py` / `analyse_c4.py` | 5 of 8, sign p 0.3633 / 4 of 8, 0.6367 / SMALLER THAN THE MEI — the preregistered figures, unchanged |
 | `validate.py` | 8 of 11 (6 of 7 literature, 2 of 4 car) |
 | `test_reward.py` | 8 of 8 pass; neutral −0.00028; starver −0.13265 (97 % of it from the launch — the training-road starver, −2.32655, is the check that holds) |
-| `check_premise.py` | baseline 920.1 at 883 °C; preview over current-grade −0.3 |
+| `check_premise.py` | baseline 920.1 at 883 °C; preview over current-grade −0.3 <!-- RETIRED-OK: 920.1, -0.3 -- the merged plant's, as printed that day --> |
 | `check_roads.py` | PASS, 40 roads, 14 bind |
 | `random_road.py` | self-test passes, road sha `1a29dc46db24f233` |
 | `python -m app.test_replay --full` | 59 of 59 (pins 873.1 °C, 604.8 °C, 14 thermal) |

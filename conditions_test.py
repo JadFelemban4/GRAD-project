@@ -7,6 +7,18 @@ steep enough that protection is needed, with a speed target that keeps changing.
     python conditions_test.py --merge         the parts -> results/conditions_test.json, the table, the figure
     python conditions_test.py --gears         the baseline on each hill: rpm and gear -> results/conditions_gears.json
     python conditions_test.py --report-only   re-prints and re-draws from results/conditions_test.json
+    python conditions_test.py --set runs/extremes_dt1 --hills-only   the hills on the current plant, no agents
+    python conditions_test.py --set runs/extremes_dt1 --resume-all   the 8 October agents, all of it
+
+ANOTHER AGENT SET (8 October 2026): --set points every path at that set. The
+twenty of 29 September keep the paths they were published under; any other set
+writes results/conditions_<set>/, results/records/conditions_<set>/ and
+results/figures/conditions_test_<set>.png. For the agents of the 8 October
+design (decision 12) this test is the TRANSFER test: they trained on ambients of
+25-45 C and hills to 18 %, so 50 C and the 25 C condition's hill (21.75 % on the
+plant of 29 September) are held out, and the hills are fixed on the current plant
+with --hills-only BEFORE any of them trains. The harness check, which needs the
+agents' committed scores, then runs first in --resume-all.
 
 ABOUT TWO AND A HALF HOURS on 18 workers of the 20-thread team laptop, longer
 than one task in a Claude session may run, so --resume-all is meant to be
@@ -105,8 +117,82 @@ OUT_JSON = os.path.join(HERE, "results", "conditions_test.json")
 OUT_PNG = os.path.join(HERE, "results", "figures", "conditions_test.png")
 
 
+AGENTS_RESULTS = os.path.join(HERE, "results", "agents", "terrain_dt1")
+PART_DIR = os.path.join(HERE, "results")
+HARNESS_JSON = None                              # the 29 Sep set keeps its check in the grades file
+
+
+def use_set(set_dir):
+    """Point every path at one agent set; see the docstring."""
+    global SET, AGENTS_RESULTS, PART_DIR, GRADES_JSON, OUT_JSON, OUT_PNG, RECORDS, GEARS_JSON, HARNESS_JSON
+    SET = set_dir
+    name = os.path.basename(os.path.normpath(set_dir))
+    AGENTS_RESULTS = os.path.join(HERE, "results", "agents", name)
+    if name == "terrain_dt1":
+        return
+    PART_DIR = os.path.join(HERE, "results", f"conditions_{name}")
+    GRADES_JSON = os.path.join(PART_DIR, "conditions_grades.json")
+    OUT_JSON = os.path.join(PART_DIR, "conditions_test.json")
+    GEARS_JSON = os.path.join(PART_DIR, "conditions_gears.json")
+    HARNESS_JSON = os.path.join(PART_DIR, "harness_check.json")
+    OUT_PNG = os.path.join(HERE, "results", "figures", f"conditions_test_{name}.png")
+    RECORDS = os.path.join(HERE, "results", "records", f"conditions_{name}")
+
+
 def _part(k):
-    return os.path.join(HERE, "results", f"conditions_test.part{k}.json")
+    return os.path.join(PART_DIR, f"conditions_test.part{k}.json")
+
+
+# EVERY STEP OF EVERY EPISODE (7 October 2026, Ghassan: "everything from the
+# environment to the actions of the agents recorded"). One .npz per condition
+# and policy, its five episodes stacked, with a .json beside it naming the
+# condition, the hill and the speed profile; the fields are step_record.py's.
+# Gitignored, like every per-step record. Draw one with show_record.py.
+RECORDS = os.path.join(HERE, "results", "records", "conditions")
+
+
+def _slug(s):
+    import re
+    return re.sub(r"[^A-Za-z0-9.]+", "_", s).strip("_")
+
+
+def _records_dir(k):
+    return os.path.join(RECORDS, f"{k}_{_slug(CONDITIONS[k][0])}")
+
+
+def save_records(k, recs):
+    """recs[ref][episode index] -> one file per policy."""
+    import evaluate as E
+    import step_record
+    name, t_amb, p = CONDITIONS[k]
+    g = grades()[name]["grade"]
+    head = step_record.git_head()
+    for ref, by_ep in recs.items():
+        idx = sorted(by_ep)
+        hand = ref in dict(HAND)
+        step_record.save(
+            os.path.join(_records_dir(k), _slug(ref) + ".npz"), [by_ep[i] for i in idx],
+            dict(script="conditions_test.py", commit=head, policy=ref,
+                 source=("check_premise." + dict(HAND)[ref]) if hand else f"{SET}/{ref}/final.zip",
+                 preview=(ref == "predictive (hand)") if hand else ("blind" not in ref),
+                 condition=name, t_amb_k=t_amb, p_kpa=p, compressor_inlet_kpa=round(p * 99.3 / 101.3, 3),
+                 grade=g, climb_from_s=180, profile="varying", speed_steps=SPEED_STEPS,
+                 accel_max_mps2=ACCEL_MAX, dt=E.DT, duration_s=E.DURATION,
+                 episodes=idx, episode_seed=[E.EPISODES[i - 1][0] for i in idx]),
+            seeds=[E.EPISODES[i - 1][0] for i in idx], weights=[E.EPISODES[i - 1][1] for i in idx])
+    print(f"wrote {len(recs)} records to {os.path.relpath(_records_dir(k), HERE)}", flush=True)
+
+
+def _agent_tags():
+    return sorted(t for t in os.listdir(os.path.join(HERE, SET))
+                  if t.startswith(("sighted_seed", "blind_seed"))
+                  and os.path.isfile(os.path.join(HERE, SET, t, "final.zip")))
+
+
+def _records_done(k):
+    d = _records_dir(k)
+    want = len(HAND) + len(_agent_tags())
+    return os.path.isdir(d) and len([f for f in os.listdir(d) if f.endswith(".npz")]) >= want
 
 
 def speed_profile(locked_v_mps, dt):
@@ -145,13 +231,27 @@ def _policy(ref):
 
 
 def _episode(job):
+    return _run(job)
+
+
+def _episode_recorded(job):
+    """The same episode with every step recorded (step_record.py)."""
+    import step_record
+    rec = step_record.new()
+    job, row = _run(job, rec)
+    return job, row, step_record.finish(rec)
+
+
+def _run(job, rec=None):
     """evaluate.run_episode, step for step, on a climb of this grade in this
     ambient and pressure, the compressor inlet following the pressure, on the
-    varying speed profile (or, for the harness check, the locked one)."""
+    varying speed profile (or, for the harness check, the locked one). `rec`,
+    if given, receives every step; it only reads."""
     ref, idx, t_amb, p_baro, grade, profile = job
     import engine_env as EE
     import evaluate as E
     import plant
+    import step_record
     p_inlet = p_baro * 99.3 / 101.3
 
     def ceiling(mdot_air_gps, t_inlet_k=298.0, _p=p_inlet):
@@ -178,7 +278,10 @@ def _episode(job):
     while True:
         k = env.k
         a = policy(env, obs)
+        obs_before = obs
         obs, r, term, trunc, info = env.step(a)
+        if rec is not None:
+            step_record.step(rec, env, a, obs_before, r, info)
         ret += r
         peak = max(peak, info["t_turb"])
         thermal += EE.damage_rate(info["t_turb"], info["t_oil"]) * env.dt
@@ -197,20 +300,15 @@ def _episode(job):
 
 
 # ---------------------------------------------------------------- check and hills
-def calibrate(workers):
-    """The harness check on the locked climb, then for each condition the
-    gentlest grade at which the baseline ECU, on the varying speed profile,
-    peaks at TARGET_PEAK_C, with the whole curve of peak against grade."""
-    def run(jobs):
-        with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker) as pool:
-            return dict(pool.map(_episode, jobs))
-
-    check = run([(ref, i, 315.0, 101.3, 0.12, "locked") for ref, i in CHECK])
+def harness_check(workers):
+    """Five agent and baseline episodes on the locked climb must EQUAL their
+    committed scores (results/agents/<set>/<policy>/eval_summary.json)."""
+    with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker) as pool:
+        check = dict(pool.map(_episode, [(ref, i, 315.0, 101.3, 0.12, "locked") for ref, i in CHECK]))
     bad = []
     for (ref, i, *_), row in check.items():
         folder = ref.replace(" ", "_") if ref in dict(HAND) else ref
-        with open(os.path.join(HERE, "results", "agents", "terrain_dt1", folder, "eval_summary.json"),
-                  encoding="utf-8") as fh:
+        with open(os.path.join(AGENTS_RESULTS, folder, "eval_summary.json"), encoding="utf-8") as fh:
             want = json.load(fh)["episodes"][i - 1]
         bad += [(ref, i, k, row[k], want[k]) for k in ("ret", "damage", "damage_thermal", "fuel",
                                                        "torque_viol", "peak_turb", "knock")
@@ -219,9 +317,24 @@ def calibrate(workers):
           f"{'all identical' if not bad else f'{len(bad)} DIFFER: {bad[:3]}'}", flush=True)
     if bad:
         raise SystemExit("the harness does not reproduce evaluate.py; nothing else is run")
+    return {"episodes": len(check), "identical": True}
 
-    out = {"harness_check": {"episodes": len(check), "identical": True},
+
+def calibrate(workers, harness=True):
+    """The harness check on the locked climb (unless `harness` is False: a set
+    whose agents have not trained yet), then for each condition the gentlest
+    grade at which the baseline ECU, on the varying speed profile, peaks at
+    TARGET_PEAK_C, with the whole curve of peak against grade."""
+    def run(jobs):
+        with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker) as pool:
+            return dict(pool.map(_episode, jobs))
+
+    out = {"harness_check": harness_check(workers) if harness else None,
            "speed_steps": SPEED_STEPS, "accel_max": ACCEL_MAX, "target_peak_c": TARGET_PEAK_C}
+    if not harness:
+        import fingerprint as FP
+        out["fixed_before_training"] = dict(set=SET, plant_sha=FP.plant_fingerprint()["plant_sha"],
+                                            derived_sha=FP.derived_sha())
     for name, t_amb, p in CONDITIONS:
         print(f"hill for {name}: coarse grid", flush=True)
         res = run([("baseline ECU", 1, t_amb, p, g, "varying") for g in COARSE])
@@ -241,6 +354,7 @@ def calibrate(workers):
         out[name] = dict(grade=grade, peak=round(curve[grade], 2),
                          curve={str(g): round(v, 2) for g, v in sorted(curve.items())})
         print(f"   grade {grade * 100:.2f} %, baseline peak {curve[grade]:.1f} C", flush=True)
+    os.makedirs(os.path.dirname(GRADES_JSON), exist_ok=True)
     with open(GRADES_JSON, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1)
         fh.write("\n")
@@ -350,6 +464,10 @@ def summarise(rows):
         sighted = [t for t in tags if t.startswith("sighted")]
         blind = [t for t in tags if t.startswith("blind")]
         worst = max(((t, i) for t in tags for i in EPISODES), key=lambda ti: rows[key(*ti)]["peak_turb"])
+        # Each agent's own spark trim on the climb (median over its episodes).
+        # The group medians alone read "+3 to +4 everywhere" (8 October), and
+        # hid the agents that retard -- the ones that fail at 25 C.
+        spark = {t: float(np.median([rows[key(t, i)]["act_climb"][0] for i in EPISODES])) for t in tags}
         out[name] = dict(
             grade=g, t_amb_c=round(t_amb - 273.15, 2), p_kpa=p,
             base_damage=round(base, 1), base_peak=round(med("baseline ECU", "peak_turb"), 1),
@@ -374,6 +492,9 @@ def summarise(rows):
             short_grade=float(np.median([rows[key("current-grade", i)]["short_steps"] for i in EPISODES])),
             acts_sighted=act_med(sighted), acts_blind=act_med(blind),
             acts_grade=act_med(["current-grade"]), acts_base=act_med(["baseline ECU"]),
+            spark_by_agent={t: round(v, 2) for t, v in spark.items()},
+            spark_under3=int(sum(v < 3.0 for v in spark.values())),
+            spark_retard=sorted(([t, round(v, 2)] for t, v in spark.items() if v < 0.0), key=lambda x: x[1]),
             margins={t: round(margin[t], 2) for t in tags}, cuts={k_: round(v, 2) for k_, v in cut.items()})
     return out
 
@@ -407,6 +528,13 @@ def report(summary, hills):
         cells = "  ".join(f"{a.split(',')[0]} {s['acts_sighted'][j]:+.2f}/{s['acts_blind'][j]:+.2f}/"
                           f"{s['acts_grade'][j]:+.2f}/{s['acts_base'][j]:+.2f}" for j, a in enumerate(ACTS))
         print(f"  {name:30s} {cells}")
+    print("\neach agent's own spark trim on the climb (median of its episodes): how many sit under +3 deg, "
+          "and which retard")
+    for name, s in summary.items():
+        if s.get("grade") is None or "spark_under3" not in s:
+            continue
+        retard = ", ".join(f"{t} {v:+.2f}" for t, v in s["spark_retard"]) or "none"
+        print(f"  {name:30s} under +3: {s['spark_under3']:2d} of {s['n_agents']}   retarding: {retard}")
     print("\n'short' = steps (of 719) delivering under 95 % of the torque asked for: the baseline's most, "
           "current-grade's median, the agents' median, any policy's most; 's>850' = seconds with the "
           "turbine housing above the trigger. Where current-grade is short for many steps, its cut is "
@@ -486,8 +614,24 @@ def main():
                     help="the check and hills if missing, every condition whose part is missing, then the "
                          "merge; safe to stop and start again")
     ap.add_argument("--workers", type=int, default=max(1, min(18, (os.cpu_count() or 2) - 2)))
+    ap.add_argument("--set", default=SET, help="the agent set (default runs/terrain_dt1)")
+    ap.add_argument("--hills-only", action="store_true",
+                    help="the hills on the current plant, without the harness check: a set "
+                         "whose agents have not trained yet")
+    ap.add_argument("--harness", action="store_true",
+                    help="only the harness check, written beside the set's results")
     a = ap.parse_args()
+    use_set(a.set)
     os.environ.setdefault("OMP_NUM_THREADS", "1")
+    if a.hills_only:
+        calibrate(a.workers, harness=False)
+        return 0
+    if a.harness:
+        res = harness_check(a.workers)
+        os.makedirs(PART_DIR, exist_ok=True)
+        with open(HARNESS_JSON or GRADES_JSON + ".harness.json", "w", encoding="utf-8") as fh:
+            json.dump(res, fh)
+        return 0
     if a.report_only:
         with open(OUT_JSON, encoding="utf-8") as fh:
             saved = json.load(fh)
@@ -495,11 +639,13 @@ def main():
         figure(saved["summary"], saved["hills"])
         return 0
     if a.resume_all:
-        me = [sys.executable, "-u", os.path.abspath(__file__)]
+        me = [sys.executable, "-u", os.path.abspath(__file__), "--set", SET]
         if not os.path.isfile(GRADES_JSON):
             subprocess.run(me + ["--calibrate", "--workers", str(a.workers)], check=True)
+        elif grades().get("harness_check") is None and not os.path.isfile(HARNESS_JSON or ""):
+            subprocess.run(me + ["--harness", "--workers", str(a.workers)], check=True)
         for k in range(len(CONDITIONS)):
-            if os.path.isfile(_part(k)):
+            if os.path.isfile(_part(k)) and (_records_done(k) or grades()[CONDITIONS[k][0]]["grade"] is None):
                 print(f"condition {k} already done", flush=True)
                 continue
             print(f"condition {k}: {CONDITIONS[k][0]}", flush=True)
@@ -511,9 +657,7 @@ def main():
     if a.gears:
         gears_report(a.workers)
         return 0
-    tags = sorted(t for t in os.listdir(os.path.join(HERE, SET))
-                  if t.startswith(("sighted_seed", "blind_seed"))
-                  and os.path.isfile(os.path.join(HERE, SET, t, "final.zip")))
+    tags = _agent_tags()
     hills = grades()
     rows = {}
     if a.merge:
@@ -534,17 +678,32 @@ def main():
             return 0
         jobs = [(ref, i, t_amb, p, g, "varying") for ref in [h for h, _ in HAND] + tags for i in EPISODES]
         print(f"{name}, grade {g * 100:.2f} %: {len(jobs)} episodes, {a.workers} workers", flush=True)
+        recs = {}
         with cf.ProcessPoolExecutor(max_workers=a.workers, initializer=_init_worker) as pool:
-            for n, (job, row) in enumerate(pool.map(_episode, jobs, chunksize=2), 1):
+            for n, (job, row, rec) in enumerate(pool.map(_episode_recorded, jobs, chunksize=2), 1):
                 rows[job[:5]] = row
+                recs.setdefault(job[0], {})[job[1]] = rec
                 if n % 20 == 0 or n == len(jobs):
                     print(f"  {n}/{len(jobs)}", flush=True)
+        save_records(a.condition, recs)
         with open(_part(a.condition), "w", encoding="utf-8") as fh:
             json.dump([dict(ref=k_[0], episode=k_[1], t_amb_k=k_[2], p_kpa=k_[3], grade=k_[4], **v)
                        for k_, v in rows.items()], fh, indent=1)
         print(f"wrote {os.path.relpath(_part(a.condition), HERE)}", flush=True)
         return 0
     summary = summarise(rows)
+    if os.path.isfile(OUT_JSON):
+        # A re-run must reproduce the saved rows exactly: the episodes are
+        # deterministic and the recorder only reads.
+        with open(OUT_JSON, encoding="utf-8") as fh:
+            old = {(r["ref"], r["episode"], r["t_amb_k"], r["p_kpa"], r["grade"]): r
+                   for r in json.load(fh)["rows"]}
+        new = {k_: dict(ref=k_[0], episode=k_[1], t_amb_k=k_[2], p_kpa=k_[3], grade=k_[4], **v)
+               for k_, v in rows.items()}
+        differ = [k_ for k_ in new if k_ in old and old[k_] != new[k_]]
+        print(f"against the saved {os.path.relpath(OUT_JSON, HERE)}: {len(new)} rows, "
+              f"{len(set(new) & set(old))} in both, {len(differ)} differ"
+              + (f" -- first {differ[:2]}" if differ else " -- identical"), flush=True)
     with open(OUT_JSON, "w", encoding="utf-8") as fh:
         json.dump({"episodes": EPISODES, "conditions": [list(c) for c in CONDITIONS],
                    "speed_steps": SPEED_STEPS, "accel_max": ACCEL_MAX,

@@ -45,6 +45,11 @@ def _load(name):
         return json.load(fh)
 
 
+def _minus(x):
+    """A signed whole number with a real minus sign, as the page writes them."""
+    return f"{x:+.0f}".replace("-", "−")
+
+
 def _r(x, n=2):
     if x is None:
         return None
@@ -108,6 +113,16 @@ def phase_d():
     # to the last printed digit.
     cut = {n.split("/")[-1]: 100.0 * (1.0 - float(np.median(col(n, "damage"))) / base)
            for n in order}
+    # 8 October: current-grade is the line every policy is compared with (Ghassan,
+    # 7 October: "change the comparing line to the current grade"). The cut stays
+    # against the baseline, as evaluate.py defines it; the charts draw each
+    # policy's margin over current-grade, and its fuel against current-grade's.
+    cg = next(e for e in ev if e["name"] == "current-grade")
+    cg_fuel = float(np.median(col(next(n for n in order if n.endswith("current-grade")), "fuel")))
+    for e in ev:
+        e["over_grade"] = _r(cut[e["name"]] - cut["current-grade"], 4)
+        e["fuel_vs_grade"] = _r(100.0 * (e["fuel"] / cg_fuel - 1.0), 2)
+    grade_fuel_pct = cg["fuel_pct"]
     fuel = {n.split("/")[-1]: 100.0 * (float(np.median(col(n, "fuel"))) / base_f - 1.0)
             for n in order}
     seeds = [dict(seed=s, s=_r(cut[f"sighted_seed{s}"], 2), b=_r(cut[f"blind_seed{s}"], 2),
@@ -131,7 +146,11 @@ def phase_d():
                     within=int((np.abs(dd) <= 0.75).sum()), n=len(dd),
                     pred_minus_grade=_r(cut["predictive (hand)"] - cut["current-grade"], 2))
     lo_, hi_ = ablation["lo"], ablation["hi"]
-    ablation["verdict"] = ("Indistinguishable from zero." if lo_ <= 0 <= hi_
+    # 30 September 2026, agreed at the merge: an interval that spans zero is
+    # INCONCLUSIVE, never "preview adds nothing". Ten pairs cannot tell no
+    # effect from one a few points wide.
+    ablation["verdict"] = ("Inconclusive: the interval spans zero, so these pairs cannot tell no "
+                           "effect from a small one." if lo_ <= 0 <= hi_
                            else "Preview helps: the interval excludes zero." if lo_ > 0
                            else "Preview hurts: the interval excludes zero.")
     s_med_b = float(np.median([cut[f"blind_seed{x['seed']}"] for x in seeds]))
@@ -142,8 +161,9 @@ def phase_d():
         sg = lambda v: f"{v:+.1f}".replace("-", "−")
         ablation["reading"] = (
             f"The blinded agents beat current-grade by {sg(s_med_b - g_)} points and the sighted ones by "
-            f"{sg(s_med - g_)}: on this scenario what the agents gain comes from learning to protect, not "
-            f"from seeing ahead. That is one point on the H/τ curve, not the curve.")
+            f"{sg(s_med - g_)}, so the gain over the hand-written policy does not need the preview "
+            f"channel. Whether preview adds anything on top of it is inconclusive at this training "
+            f"budget. That is one point on the H/τ curve, not the curve.")
     else:
         ablation["reading"] = (
             f"The interval excludes zero: preview {'helps' if lo_ > 0 else 'hurts'} a learned policy on this "
@@ -188,9 +208,14 @@ def phase_d():
     fuel_more = [fuel[a] for a in agents if fuel[a] >= 0]
     both_s = [x["seed"] for x in seeds if x["d"] > 0.75 and x["fs"] <= x["fb"]]
     both_b = [x["seed"] for x in seeds if x["d"] < -0.75 and x["fb"] <= x["fs"]]
-    take = (f"Protection usually costs fuel. {len(fuel_less)} of {len(agents)} agents cut damage while "
-            f"burning less fuel than the baseline" + (f"; the rest burn {min(fuel_more):.1f}–"
-                                                         f"{max(fuel_more):.1f} % more." if fuel_more else "."))
+    # Against current-grade, the comparing line (8 October): which agents beat it
+    # on damage AND fuel. Current-grade pays for its protection in fuel.
+    evd = {e["name"]: e for e in ev}
+    both_cg = [a for a in agents if evd[a]["over_grade"] > 0 and evd[a]["fuel_vs_grade"] < 0]
+    take = (f"Against current-grade, {len(both_cg)} of {len(agents)} agents cut more damage and burn less fuel; "
+            f"current-grade itself burns {grade_fuel_pct:+.1f} % against the baseline, because it protects by "
+            f"enriching and pulling boost. Against the baseline, {len(fuel_less)} of {len(agents)} agents burn "
+            f"less fuel" + (f" and the rest {min(fuel_more):.1f}–{max(fuel_more):.1f} % more." if fuel_more else "."))
     cap = (f"A tie that ran straight up, more damage cut for the same fuel, would be a preview effect. Of "
            f"the {len(seeds)} pairs, the sighted agent is better on both damage and fuel in {len(both_s)}"
            + (f" (seed{'s' if len(both_s) > 1 else ''} {seeds_(both_s)})" if both_s else "") + f", the blinded one in {len(both_b)}"
@@ -264,11 +289,19 @@ def agent_records():
         eps = S_["episodes"]
         worse = [i for i, e in enumerate(eps) if e["damage"] > base_dmg]
         if worse:
+            # 8 October: the page said the reward "lets it trade component life
+            # for fuel". The records say otherwise -- on those episodes it burns
+            # MORE fuel than the baseline too, and its return goes negative.
+            fuel_pct = [100.0 * (eps[i]["fuel"] / B["episodes"][i]["fuel"] - 1.0) for i in worse]
+            good = [i for i in range(len(eps)) if i not in worse]
             bad.append(dict(agent=os.path.basename(d), n=len(worse), episodes=worse,
                             worst=_r(max(eps[i]["damage"] for i in worse), 0),
                             peak=_r(max(eps[i]["peak_turb"] for i in worse), 0),
                             w_life_max=_r(max(w_life[i] for i in worse), 3),
-                            lowest=sorted(worse) == sorted(np.argsort(w_life)[:len(worse)].tolist())))
+                            lowest=sorted(worse) == sorted(np.argsort(w_life)[:len(worse)].tolist()),
+                            fuel_lo=_r(min(fuel_pct), 1), fuel_hi=_r(max(fuel_pct), 1),
+                            ret_bad_max=_r(max(eps[i]["ret"] for i in worse), 0),
+                            ret_good_min=_r(min(eps[i]["ret"] for i in good), 0) if good else None))
     # knock_margin.py: the same agents with spark advance forbidden (a diagnostic)
     km_path = os.path.join(root, "knock_margin.json")
     if not os.path.exists(km_path):
@@ -283,6 +316,96 @@ def agent_records():
                      ki_hi=_r(K["ki_p95_hi"], 2), abl=_r(K["ablation"]["mean"], 2),
                      abl_lo=_r(K["ablation"]["ci95"][0], 1), abl_hi=_r(K["ablation"]["ci95"][1], 1),
                      abl_pw=_r(K["ablation"]["p_wilcoxon"], 2))
+    with open(km_path) as fh:
+        KA = json.load(fh)["agents"]
+    out["km_agents"] = [dict(name=n, preview=v["preview"], cut=_r(v["cut"], 2), cut_orig=_r(v["cut_orig"], 2),
+                             ki=_r(v["ki_p95_climb"], 3), fuel=_r(v["fuel_pct"], 2))
+                        for n, v in KA.items()]
+
+    # What the actuators did on the climb (eval_summary.json) and one episode
+    # step by step (episode_trace.json) -- 30 Sep, the page's action charts.
+    acts = ("spark trim (deg)", "lambda trim", "boost trim (kPa)", "fan duty", "pump duty")
+    keys = ("spark", "lam", "boost", "fan", "pump")
+    actions, neutral = [], None
+    for tag in ["baseline_ECU", "current-grade"] + [os.path.basename(d) for d in sorted(
+            glob.glob(os.path.join(root, "*_seed*")), key=lambda p: ("blind" in p, int(p.split("seed")[-1])))]:
+        with open(os.path.join(root, tag, "eval_summary.json")) as fh:
+            A_ = json.load(fh)["actions"]
+        neutral = neutral or {k: _r(A_[a]["neutral"], 4) for k, a in zip(keys, acts)}
+        actions.append(dict(name=tag.replace("_", " ") if tag == "baseline_ECU" else tag,
+                            kind="hand" if "seed" not in tag else ("sighted" if tag.startswith("sighted") else "blinded"),
+                            **{k: [_r(A_[a]["climb"][q], 4) for q in ("p5", "p50", "p95")] for k, a in zip(keys, acts)}))
+    out["actions"], out["neutral"] = actions, neutral
+    ep_path = os.path.join(root, "episode_trace.json")
+    if not os.path.exists(ep_path):
+        raise SystemExit(f"{ep_path} missing -- run record_agents.py {AGENT_SET} --report-only")
+    with open(ep_path) as fh:
+        out["ep1"] = json.load(fh)
+    # 8 October: blinded seed 6 on its worst and its best frozen episode, beside
+    # the baseline (record_extracts.py, a committed extract of the records).
+    b6_path = os.path.join(root, "bad_episode_trace.json")
+    if not os.path.exists(b6_path):
+        raise SystemExit(f"{b6_path} missing -- run record_extracts.py")
+    with open(b6_path) as fh:
+        out["b6"] = json.load(fh)
+    b6 = out["b6"]
+    b6["agent_name"] = b6["agent"].replace("blind_seed", "Blinded seed ").replace("sighted_seed", "Sighted seed ")
+    for e in b6["episodes"].values():
+        e["episode_n"], e["w_life"] = e["episode"] + 1, e["weights"][2]
+    with open(os.path.join(root, b6["agent"], "eval_summary.json")) as fh:
+        a_eps = json.load(fh)["episodes"]
+    wi = b6["episodes"]["worst"]["episode"]
+    b6["fuel_worst_pct"] = _r(100.0 * (a_eps[wi]["fuel"] / B["episodes"][wi]["fuel"] - 1.0), 1)
+    # against current-grade, the comparing line (8 October)
+    with open(os.path.join(root, "current-grade", "eval_summary.json")) as fh:
+        g_eps = json.load(fh)["episodes"]
+    b6["fuel_worst_vs_grade"] = _r(100.0 * (a_eps[wi]["fuel"] / g_eps[wi]["fuel"] - 1.0), 1)
+    b6["grade_damage"] = _r(g_eps[wi]["damage"], 0)
+    # The caption says the retard is no knock response: past the one-step spike
+    # every policy shows at the grade step, the worst episode's knock integral
+    # stays under the 0.85 knee.
+    t_ = np.array(b6["t"])
+    after = t_ > t_[int(np.argmax(np.array(b6["grade"]) > 0))] + 4
+    if max(np.array(b6["episodes"]["worst"]["ki"])[after]) >= 0.85:
+        raise SystemExit("the seed-6 caption no longer holds (knock integral past 0.85) -- reword template.html")
+    # What the charts show, counted: how many agents sit below the baseline's
+    # own setting on the climb, and how much more the commands change per step
+    # on the flat than on the climb (episode 1).
+    ag = [a for a in actions if a["kind"] != "hand"]
+    below = {k: sum(a[k][1] < neutral[k] - 1e-3 for a in ag) for k in keys}
+    # ...and against current-grade, the comparing line (8 October): its own
+    # median setting on the climb, lever by lever.
+    cg_a = next(a for a in actions if a["name"] == "current-grade")
+    out["cg_setting"] = {k: cg_a[k][1] for k in keys}
+    out["vs_cg"] = dict(n=len(ag), **{f"{k}_above": sum(a[k][1] > cg_a[k][1] + 1e-3 for a in ag) for k in keys},
+                        **{f"{k}_below": sum(a[k][1] < cg_a[k][1] - 1e-3 for a in ag) for k in keys})
+    v_ = out["vs_cg"]
+    if not (v_["spark_above"] == v_["fan_below"] == v_["pump_below"] == len(ag)):
+        raise SystemExit("the actions text no longer holds (every agent advances spark past current-grade "
+                         "and cools less) -- reword template.html")
+    g_ = np.array(out["ep1"]["grade"])
+    ratios = []
+    for k in keys:
+        fl, cl = [], []
+        for p in out["ep1"]["policies"].values():
+            if p["kind"] == "hand":
+                continue
+            d = np.abs(np.diff(np.array(p[k])))
+            fl.append(d[g_[1:] <= 0].mean())
+            cl.append(d[g_[1:] > 0].mean())
+        ratios.append(float(np.median(fl)) / max(float(np.median(cl)), 1e-9))
+    out["beh"] = dict(n=len(ag), fan_below=below["fan"], pump_below=below["pump"], lam_below=below["lam"],
+                      boost_below=below["boost"],
+                      fan_lo=_r(min(a["fan"][1] for a in ag), 2), fan_hi=_r(max(a["fan"][1] for a in ag), 2),
+                      pump_lo=_r(min(a["pump"][1] for a in ag), 2), pump_hi=_r(max(a["pump"][1] for a in ag), 2),
+                      chatter_lo=_r(min(ratios), 1), chatter_hi=_r(max(ratios), 1))
+    # The action charts' prose states these without a number; a retrain that
+    # breaks one must stop the build, not ship a false sentence (mistake 22).
+    b_ = out["beh"]
+    assert min(trims) > 2.0, "text: every agent holds spark well past the baseline on the climb"
+    assert min(below[k] for k in ("fan", "pump", "lam", "boost")) > len(ag) / 2, \
+        "text: the agents protect with spark, mixture and boost and cool less than the baseline"
+    assert b_["chatter_lo"] > 2.0, "text: commands change more on the flat and settle on the climb"
     out.update(trim_lo=_r(min(trims), 1), trim_hi=_r(max(trims), 1), ki_lo=_r(min(kis), 2),
                ki_hi=_r(max(kis), 2), base_dmg=_r(base_dmg, 0), n_bad=len(bad), bad=bad)
     if bad:
@@ -293,8 +416,17 @@ def agent_records():
             f"against {base_dmg:.0f}, turbine {b['peak']:.0f} °C), and they are "
             + ("exactly the five" if b["lowest"] and b["n"] == 5 else f"the {b['n']}" if b["lowest"] else "episodes")
             + f" whose weight on component life is lowest (at most {b['w_life_max']:.3f}). "
+            + f"It is not trading life for fuel: on those episodes it also burns {b['fuel_lo']:.1f}–"
+            f"{b['fuel_hi']:.1f} % more fuel than the baseline, and its return is negative (at most "
+            f"{_minus(b['ret_bad_max'])}, against at least {_minus(b['ret_good_min'])} on its other episodes). Its "
+            "per-step records show it retarding spark on the climb, where on its other episodes it advances. "
             + (f"{len(bad) - 1} other agent" + ("s" if len(bad) > 2 else "") + " also do." if len(bad) > 1
                else "No other agent does."))
+        if not (b["fuel_lo"] > 0 and b["ret_bad_max"] < 0 < b["ret_good_min"]):
+            raise SystemExit("the bad-agent sentence no longer holds (fuel or return) -- reword make_page.py")
+        out["bad_worst"] = dict(name=b["agent"].replace("blind_seed", "blinded seed ")
+                                .replace("sighted_seed", "sighted seed "), n=b["n"],
+                                fuel_lo=b["fuel_lo"], fuel_hi=b["fuel_hi"])
     else:
         out["bad_sentence"] = "No agent does more damage than the baseline on any of the twenty episodes."
     return out
@@ -527,6 +659,147 @@ def generality():
                 h1_grade_max=_r(max(abs(x["predictive"] - x["grade"]) for x in G["h1"]), 2))
 
 
+def validation():
+    """7-8 October 2026: the validation plan's diagnostics, the per-step
+    records and the damage constants, for the Validation section. Every number
+    is read from a results file a script wrote: conditions_test.py,
+    damage_constants.py, timestep_study.py, car_spark_boost.py and
+    training_roads.py; the field counts from step_record.py itself."""
+    import step_record
+    ct, dc = _load("conditions_test.json"), _load("damage_constants.json")
+    ts, sp, rd = _load("timestep_study.json"), _load("car_spark_boost.json"), _load("train_roads_check.json")
+    cond = []
+    for name, s in ct["summary"].items():
+        if s.get("grade") is None:
+            continue
+        m = list(s["margins"].values())
+        cond.append(dict(name=name, grade=_r(100 * s["grade"], 2), base_peak=s["base_peak"],
+                         grade_cut=s["grade_cut"], sighted=s["sighted_margin"], blind=s["blind_margin"],
+                         lo=min(m), hi=max(m), beat=s["beat_grade"], n=s["n_agents"],
+                         short_grade=s["short_grade"], short_agents=s["short_agents_median"],
+                         abl=s["ablation_mean"], abl_lo=s["ablation_lo"], abl_hi=s["ablation_hi"],
+                         spark_s=s["acts_sighted"][0], spark_b=s["acts_blind"][0]))
+    by = {c["name"].split(",")[0]: c for c in cond}
+    # Each agent's own climb spark at 25 C, from the committed rows (median of
+    # its episodes): the group medians hide the agents that retard.
+    c25 = next(c for c in ct["conditions"] if c[0].startswith("25 C"))
+    sp25 = {}
+    for r in ct["rows"]:
+        if "_seed" in r["ref"] and r["t_amb_k"] == c25[1] and r["p_kpa"] == c25[2]:
+            sp25.setdefault(r["ref"], []).append(r["act_climb"][0])
+    pretty = lambda t: t.replace("sighted_seed", "sighted seed ").replace("blind_seed", "blinded seed ")
+    r25 = sorted((float(np.median(v)), t) for t, v in sp25.items())[:2]
+    # The page says these two are also the two that do the most damage there
+    # (about twice the baseline's); check it rather than assume it.
+    dmg25 = {}
+    for r in ct["rows"]:
+        if r["t_amb_k"] == c25[1] and r["p_kpa"] == c25[2]:
+            dmg25.setdefault(r["ref"], []).append(r["damage"])
+    base25 = float(np.median(dmg25["baseline ECU"]))
+    worst2 = sorted((t for t in dmg25 if "_seed" in t), key=lambda t: -float(np.median(dmg25[t])))[:2]
+    if sorted(worst2) != sorted(t for _, t in r25) or min(float(np.median(dmg25[t])) for t in worst2) < 1.7 * base25:
+        raise SystemExit("the 25 C sentence no longer holds: the deepest retarders are not the two agents "
+                         "doing about twice the baseline's damage -- reword template.html")
+    short = [c["short_grade"] for c in cond if c["short_grade"] >= 100]
+    thin = [c for c in cond if "kPa" in c["name"]]
+    knees = {k.split()[0]: _r(v - 273.15, 1) for k, v in dc["constants"][1]["mapped"].items()}
+    rows = [dict(name=k, **v) for k, v in dc["summary"].items()]
+    abl_knock = next(r for r in rows if r["name"].startswith("knee") and "knock" not in r["name"]
+                     and r["ablation_lo"] > 0)
+    dt1, dt2 = ts["u_num_vs_finest"], ts["dt2"]
+    c2 = dt2["cuts"]
+    allc, climb = sp["cells"]["all, 140-240 kPa"], next(v for k, v in sp["cells"].items() if "climb" in k)
+    # 8 October: the rest of the 7 October diagnostics, drawn rather than only
+    # quoted. damage_robustness.py: the nine rulers; timestep_study.py: the
+    # thermal step's convergence; validation_numbers.py: what one step of each
+    # channel's resolution moves; conditions_traces.json: the recorded episodes.
+    rb = _load("damage_robustness.json")
+    robust = [dict(name=k, **v) for k, v in rb["summary"].items()]
+    # Every damage formula tried: the nine rulers plus the damage constants'
+    # own (less the two that repeat a ruler). The summary tiles say all twenty
+    # agents beat current-grade under each, and that the formulas whose
+    # ablation interval clears zero are the ones that weigh the untested knock
+    # term more. Check both, so a new ruler cannot leave a false sentence.
+    formulas = robust + [dict(name=k, **v) for k, v in dc["summary"].items()
+                         if k not in ("as published", "as published, no knock term")]
+    exceptions = sorted(f["name"] for f in formulas if not f["ablation_lo"] <= 0 <= f["ablation_hi"])
+    knee_hi = next(k for k in dc["summary"] if k.startswith("knee") and "1050" in k and "knock" not in k)
+    if not all(f["beat_grade"] == f["n"] for f in formulas) or set(exceptions) != {"knock term x4", knee_hi}:
+        raise SystemExit("the summary's damage-formula sentences no longer hold -- reword template.html "
+                         f"(exceptions now: {exceptions})")
+    vn = _load("validation_numbers.json")
+    sens = [dict(name=k, **v) for k, v in vn["climb_sensitivity"].items()]
+    base_dmg = vn["climb_sensitivity"]["none"]["damage"]
+
+    def ts_rows(block, subs):
+        rows = []
+        for s in subs:
+            b, g = block["climb"][f"baseline ECU | {s}"], block["climb"][f"current-grade | {s}"]
+            rows.append(dict(sub=s, peak=_r(b["peak_turb"], 3), damage=_r(b["damage"], 1),
+                             cut=_r(block["cuts"][str(s)], 2), swing=_r(b["coolant_swing"], 2),
+                             grade_peak=_r(g["peak_turb"], 3)))
+        return rows
+    with open(os.path.join(RES, "conditions_traces.json"), encoding="utf-8") as fh:
+        ctr = json.load(fh)
+    return dict(
+        cond=cond, cond_n=len(cond), c25=by["25 C"], trained=by["42 C"],
+        r25=[dict(name=pretty(t), spark=_r(v, 2)) for v, t in r25],
+        warm_beat_min=min(by[k]["beat"] for k in ("42 C", "35 C", "50 C")),
+        thin_short_hi=max(c["short_agents"] for c in thin),
+        grade_short_n=len(short), grade_short_lo=min(short), grade_short_hi=max(short),
+        dc=dict(creep=_r(dc["creep_scale_k"]["10000"], 1), creep_lo=_r(dc["creep_scale_k"]["100000"], 1),
+                creep_hi=_r(dc["creep_scale_k"]["1000"], 1), oil_rule=_r(dc["oil_rule_scale_k"], 1),
+                q45=_r(8.314462618 * 1123.0 ** 2 / 45.0 / 1000.0, 0), r=_r(dc["housing_fraction_r"], 3),
+                gas_at_knee=_r(dc["constants"][1]["published_as_gas_c"], 0),
+                gas_end=_r(dc["climb_end"]["gas_c"], 0), housing_end=_r(dc["climb_end"]["housing_c"], 0),
+                knees=knees, oil_ref=_r(dc["constants"][3]["value"] - 273.15, 1),
+                rows=rows, knock=abl_knock, constants=dc["constants"]),
+        ts=dict(cut=_r(dt1["cut_points"], 2), peak=_r(dt1["peak_turb_k"], 3),
+                swing2=_r(dt2["climb"]["baseline ECU | 1"]["coolant_swing"], 1),
+                swing1=_r(ts["climb"]["baseline ECU | 1"]["coolant_swing"], 1),
+                cut2=_r(abs(c2["1"] - c2["100"]), 2),
+                rows1=ts_rows(ts, ts["substeps"]), rows2=ts_rows(dt2, dt2["substeps"])),
+        robust=robust, formulas_n=len(formulas), formulas_exc=len(exceptions),
+        formulas_zero=len(formulas) - len(exceptions),
+        vn=dict(res=vn["resolution"], sens=sens, base=base_dmg,
+                spark_up=_r(vn["climb_sensitivity"]["spark +0.75 deg"]["damage"] - base_dmg, 0),
+                spark_dn=_r(vn["climb_sensitivity"]["spark -0.75 deg"]["damage"] - base_dmg, 0),
+                mei=vn["mei"]),
+        ctr=ctr,
+        spark=dict(med=allc["diff_median"], n=allc["readings"], se=allc["diff_se"],
+                   climb=climb["diff_median"], climb_n=climb["readings"],
+                   drives=allc["drives"], genuine=sp["genuine_total"],
+                   cells=[dict(name=k, **{q: v[q] for q in ("readings", "drives", "car_median", "model_median",
+                                                            "diff_median", "diff_q1", "diff_q3", "diff_se")})
+                          for k, v in sp["cells"].items()],
+                   readings=[dict(src=r["source"].split("-")[0], rpm=_r(r["rpm"], 0), map=_r(r["map_kpa"], 1),
+                                  car=_r(r["spark"], 2), model=_r(r["model"], 2), amb=_r(r["t_amb"], 1))
+                             for r in sp["readings"]]),
+        rec=dict(fields=len(step_record.FIELDS), train_fields=5 + len(step_record.INFO + step_record.ENV) + 2,
+                 runs=rd["runs"], reproduced=rd["reproduced"], steps=rd["steps"],
+                 torque_err=rd["torque_err_max_nm"], reward_err=rd["reward_err_max"]))
+
+
+def trained_env():
+    """The world the twenty agents trained in (record_extracts.py ->
+    training_env.json, 8 October): the roads, their steepness, the gears, the
+    air and the preference weights, as the page's training-environment figures
+    draw them."""
+    with open(os.path.join(RES, "agents", AGENT_SET, "training_env.json"), encoding="utf-8") as fh:
+        T = json.load(fh)
+    gears = {int(k): v for k, v in T["gears"].items()}
+    tot = sum(gears.values())
+    T["pct"] = dict(ge4=_r(100 * T["share"]["ge4"], 1), ge10=_r(100 * T["share"]["ge10"], 1),
+                    ge12=_r(100 * T["share"]["ge12"], 1), lt0=_r(100 * T["share"]["lt0"], 1),
+                    g78=_r(100 * (gears[7] + gears[8]) / tot, 1), g8=_r(100 * gears[8] / tot, 1),
+                    g7=_r(100 * gears[7] / tot, 1), g5=_r(100 * gears[5] / tot, 1))
+    wl = T["w_life"]
+    T["wl"] = dict(le=wl["le_threshold"], n=wl["n"], thr=wl["threshold"],
+                   pct=_r(100 * wl["le_threshold"] / wl["n"], 0))
+    T["rise_max"] = max(f["rise_max"] for f in T["families"].values())
+    return T
+
+
 def meta():
     def git(*a):
         try:
@@ -538,10 +811,11 @@ def meta():
     # 29 September 2026: the page said "@ c628564" while it was built from a
     # working tree 58 files ahead of it. Say so when the tree is not clean.
     dirty = git("status", "--porcelain", "--untracked-files=no") not in ("", "?")
-    return dict(branch=git("branch", "--show-current"),
-                commit=git("rev-parse", "--short", "HEAD") + (" + uncommitted changes" if dirty else ""),
+    # The commit only: a branch name here carries a student number, and the
+    # page is read outside the team (30 September 2026).
+    return dict(commit=git("rev-parse", "--short", "HEAD") + (" + uncommitted changes" if dirty else ""),
                 built=date.today().isoformat(),
-                drives=len(M), minutes=_r(M.duration_min.sum(), 1))
+                drives=len(M), minutes=_r(M.duration_min.sum(), 1), agent_set=AGENT_SET)
 
 
 FMT = re.compile(r"\{\{\s*([a-zA-Z0-9_.\-]+)\s*(?:\|\s*([^}\s]+))?\s*\}\}")
@@ -584,7 +858,7 @@ def render(template, data):
 
 def main():
     data = dict(meta=meta(), pd=phase_d(), mc=model_vs_car(), roads=training_roads(),
-                cal=calibration(), gen=generality())
+                cal=calibration(), gen=generality(), val=validation(), tenv=trained_env())
     # the ceiling against drive B in the band the locked climb runs in
     b = data["cal"]["boost"]
     rpm = data["mc"]["duty"]["scen_rpm"]

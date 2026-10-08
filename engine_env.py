@@ -645,6 +645,15 @@ ACT_LO = np.array([-8.0, -0.15, -40.0, 0.0, 0.3], dtype=np.float32)
 ACT_HI = np.array([+4.0, +0.06, +15.0, 1.0, 1.0], dtype=np.float32)
 SLEW = np.array([1.5, 0.03, 10.0, 0.25, 0.2], dtype=np.float32)
 
+# NO SPARK ADVANCE PAST THE BASELINE (8 October 2026, conflict.md decision 3,
+# agreed by Jad and Ghassan before the next training). All 68 agents trained
+# before it pushed the spark trim to its +4 deg bound, onto margin only the
+# UNTESTED knock model grants; forbidding the advance took their median margin
+# over current-grade from +24.4 to -1.8 points (knock_margin.py). Retard stays
+# allowed. The action range keeps its +4 deg end so "no trim" is an interior
+# value a squashed policy can hold; the step clips anything above this.
+SPARK_TRIM_MAX = 0.0
+
 PREVIEW_S = (2.0, 5.0, 15.0, 30.0)
 OBS_DIM = 23
 
@@ -864,6 +873,7 @@ class SupervisoryTunerEnv(gym.Env):
         slew = SLEW * self.dt
         act = np.clip(raw, self.prev_act - slew, self.prev_act + slew)
         act = np.clip(act, ACT_LO, ACT_HI)
+        act[0] = min(act[0], SPARK_TRIM_MAX)
 
         # --- driver demand -------------------------------------------------
         self.v = float(c["v_mps"][self.k])
@@ -968,6 +978,7 @@ class SupervisoryTunerEnv(gym.Env):
 
         info = dict(cost_torque=c_torque, cost_knock=c_knock, cost_egt=c_egt,
                     torque=out["torque"], torque_req=self.torque_req,
+                    torque_base=base["torque"],
                     egt_c=out["egt_k"] - 273.15, ki=out["ki"],
                     spark=self.spark, lam=self.lam,
                     t_turb=self.thermal.t_turb, t_oil=self.thermal.t_oil,
@@ -1132,8 +1143,9 @@ def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.
     Three rows bind. 12 % at 130 km/h was taken because it moves ONE variable
     from the scenario already in use, and because the car's own driving is
     hotter than either: replaying all nine logs through app/ puts 7475b5d7's
-    estimated turbine housing at 890.6 C (RETIRED-OK: 890.6 -- the app physics of
-    17 September; 873.1 C on the merged physics). The synthetic climb is not being made
+    estimated turbine housing at 890.6 C (RETIRED-OK: 890.6, 873.1 -- the app physics of
+    17 September; 873.1 C on the merged physics, 872.7 C since the thermal network
+    was sub-stepped). The synthetic climb is not being made
     harsher than the vehicle -- it is being brought up to it.
 
     THE OTHER TWO BINDING ROWS ARE NOT DISCARDED. 12 % at 150 and 16 % at 110
@@ -1153,13 +1165,20 @@ def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.
     RETIRED-OK: the 10 % at 90 km/h these defaults carried before 8 September
     asked 244 Nm and was sized for the 2.0 L four-cylinder this file simulated
     by mistake (mistake 1). It is void for that reason, not this one.
+
+    RAMPED SINCE 8 OCTOBER 2026 (conflict.md decision 4, agreed by Jad and
+    Ghassan before the next training). The grade used to step from 0 to 12 % in
+    one sample. The baseline ECU schedules spark on the previous step's
+    pressure, so for one step the knock integral reached about 2.1: 59 damage
+    units, the size of the minimum effect of interest, and all of the
+    hand-written preview gap. A real road changes grade over a vertical curve;
+    the climb now reaches its grade over GRADE_RAMP_S, from 180 s.
     """
     n = int(duration / dt)
     t = np.arange(n) * dt
     v = np.full(n, v_kmh / 3.6)
     v[:int(20 / dt)] = np.linspace(0.0, v_kmh / 3.6, int(20 / dt))
-    g = np.zeros(n)
-    g[int(180 / dt):] = grade                    # 3 min flat, then the climb
+    g = grade * np.clip((t - 180.0) / GRADE_RAMP_S, 0.0, 1.0)   # 3 min flat, then the climb
     return dict(t=t, v_mps=v, grade=g, t_amb=t_amb, p_baro=101.3, humidity=0.012)
 
 
@@ -1199,6 +1218,10 @@ TERRAIN_FAMILIES = ("locked", "single", "rolling", "double", "flat")
 TERRAIN_WEIGHTS = (0.15, 0.30, 0.25, 0.20, 0.10)
 TERRAIN_FLAT_START_S = 30.0      # no grade while the car accelerates from rest
 
+# Every grade change on the scored climb is a ramp this long (8 October 2026,
+# conflict.md decision 4: "an 8 s ramp removes" the one-step knock spike).
+GRADE_RAMP_S = 8.0
+
 
 def _smooth_steps(target, width):
     """Turn a piecewise-constant grade into linear ramps `width` samples long.
@@ -1217,7 +1240,8 @@ def _smooth_steps(target, width):
 
 
 def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
-                 family=None, families=TERRAIN_FAMILIES, weights=TERRAIN_WEIGHTS):
+                 family=None, families=TERRAIN_FAMILIES, weights=TERRAIN_WEIGHTS,
+                 grade_max=TERRAIN_GRADE_MAX):
     """One random road for TRAINING, as a cycle dict make_grade_climb's shape.
 
     Families, one drawn per episode:
@@ -1247,7 +1271,7 @@ def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
         elif family == "single":
             t0 = u(60.0, 360.0)
             climb = u(180.0, max(200.0, duration - t0))
-            segs = [(t0, 0.0), (climb, u(0.04, 0.14)), (duration, u(-0.03, 0.01))]
+            segs = [(t0, 0.0), (climb, u(0.04, grade_max)), (duration, u(-0.03, 0.01))]
         elif family == "rolling":
             segs, tt = [(TERRAIN_FLAT_START_S, 0.0)], TERRAIN_FLAT_START_S
             while tt < duration:
@@ -1255,8 +1279,8 @@ def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
                 segs.append((seg, u(-0.03, 0.10)))
                 tt += seg
         elif family == "double":
-            segs = [(u(40.0, 200.0), 0.0), (u(90.0, 240.0), u(0.06, 0.14)),
-                    (u(60.0, 180.0), u(-0.03, 0.02)), (duration, u(0.06, 0.14))]
+            segs = [(u(40.0, 200.0), 0.0), (u(90.0, 240.0), u(0.06, grade_max)),
+                    (u(60.0, 180.0), u(-0.03, 0.02)), (duration, u(0.06, grade_max))]
         else:
             raise ValueError(f"unknown terrain family {family!r}")
 
@@ -1271,7 +1295,7 @@ def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
         target[i:] = segs[-1][1]
         g = _smooth_steps(target, u(4.0, 12.0) / dt)
         g[:int(TERRAIN_FLAT_START_S / dt)] = 0.0
-        g = np.clip(g, TERRAIN_GRADE_MIN, TERRAIN_GRADE_MAX)
+        g = np.clip(g, TERRAIN_GRADE_MIN, grade_max)
 
         v = np.full(n, v_kmh / 3.6)
         v[:int(20 / dt)] = np.linspace(0.0, v_kmh / 3.6, int(20 / dt))
@@ -1316,6 +1340,130 @@ class TerrainTrainingEnv(SupervisoryTunerEnv):
                                   families=self.families, weights=self.weights)
         self.road_log.append(self.cycle["family"])
         return super().reset(seed=seed, options=options)
+
+
+# THE EXTREMES (8 October 2026, decision 12 of results/VALIDATION_DECISIONS.md,
+# chosen by Ghassan): train on conditions the car's logs never reached, so the
+# agent knows them, and check the trained agent afterwards on the states the
+# logs do hold. Over the terrain roads above, every episode also draws its
+# ambient, a speed target that changes during the run, steeper hills, and the
+# turbine housing's heat capacity. Pressure stays at sea level: the plant does
+# not read it yet. 50 C and hills of 18-22 % are kept out, for the transfer test.
+#
+# WHAT THIS GIVES UP, stated: the terrain design held speed at 130 km/h because
+# speed moves the exhaust flow and so the turbine's time constant tau, which is
+# the claim's own axis. Here tau varies in training. The ablation is still
+# scored on the locked climb at its own tau; an H/tau curve built on these
+# agents has to say they trained across tau.
+EXTREME_T_AMB_C = (25.0, 45.0)        # drawn per episode; 50 C held out
+EXTREME_V_KMH = (60.0, 150.0)         # speed targets
+EXTREME_HOLD_S = (60.0, 180.0)        # how long each target is held
+EXTREME_ACCEL = 0.8                   # m/s^2, both ways (the conditions test's rate)
+EXTREME_GRADE_MAX = 0.18              # 18-22 % held out
+EXTREME_C_TURB = (0.75, 1.333)        # x the assumed 6000 J/K, log-uniform: safeguard 1
+# THE LEAST TORQUE A ROAD MAY ASK FOR. This model has no fuel cut and no engine
+# braking: with the throttle shut (the load loop's 25 kPa floor) the engine
+# still makes 12.0 Nm at 1200 rpm, 9.9 at 2100, 7.8 at 2700 and 3.4 at 3500
+# (MEASURED 8 October with _track_torque at a request of 0), and a request below
+# what it makes cannot be met by any policy. The tracking term then fires on
+# every such step for the baseline and every agent alike, and an agent could
+# even earn reward for trimming boost under the floor -- fixing the model's
+# limit, not protecting anything. Measured on the first drafts of these roads:
+# the neutral policy, which IS the baseline, scored -112 to -693 an episode
+# (slowdowns asking for negative torque), then -47.5 (a -1.7 % descent at
+# 79 km/h asking 7.6 Nm of an engine making 10.7). So every road is built to ask
+# for at least this much: slowdowns coast no faster than that allows, and a
+# descent is never steeper than holding speed with that much torque.
+EXTREME_T_FLOOR_NM = 15.0
+
+
+def min_tractive_force(veh, v_mps):
+    """Tractive force, N, that asks EXTREME_T_FLOOR_NM of the engine in the gear
+    the box holds at this speed under light load."""
+    g = veh.gear_for(float(v_mps), force_n=0.0)
+    return EXTREME_T_FLOOR_NM * veh.gears[g] * veh.final_drive * 0.92 / veh.wheel_r
+
+
+def grade_floor(v_mps, t_amb, dt, veh=None):
+    """The steepest grade at each step that still asks min_tractive_force of
+    the engine: m*a + drag + rolling + grade >= that force, with a the
+    environment's own forward difference. Where the car is speeding up (the
+    launch from rest above all) the acceleration supplies the force and the
+    floor sits far below any road; it binds only on a descent held at speed.
+    (Measured 8 October: without the acceleration term the floor put a 3.5 %
+    hill under every launch from rest.)"""
+    veh = veh or Vehicle()
+    rho = 101.3e3 / (287.0 * t_amb)
+    m, g0 = veh.mass, 9.81
+    v = np.asarray(v_mps, dtype=float)
+    a = np.diff(v, append=v[-1]) / dt
+    f_min = np.array([min_tractive_force(veh, x) for x in v])
+    s = (f_min - m * a - 0.5 * rho * veh.cd_a * v ** 2 - veh.crr * m * g0) / (m * g0)
+    return np.tan(np.arcsin(np.clip(s, -0.5, 0.5)))
+
+
+def extreme_speed_profile(rng, n, dt, grade, t_amb, veh=None):
+    """A speed target that changes every 60-180 s between 60 and 150 km/h; the
+    first 20 s run up from rest.
+
+    Speeding up is limited to EXTREME_ACCEL. SLOWING DOWN IS A COAST: a slowdown
+    faster than the road's own drag, rolling resistance and grade would ask the
+    engine for less than it makes with the throttle shut (EXTREME_T_FLOOR_NM),
+    so the car slows no faster than the road slows it, less the margin that
+    keeps min_tractive_force asked for -- the driver lifting off."""
+    veh = veh or Vehicle()
+    rho = 101.3e3 / (287.0 * t_amb)
+    m, g0 = veh.mass, 9.81
+    v = np.empty(n)
+    launch = int(20 / dt)
+    target = rng.uniform(*EXTREME_V_KMH) / 3.6
+    v[:launch] = np.linspace(0.0, target, launch)
+    nxt = launch + int(rng.uniform(*EXTREME_HOLD_S) / dt)
+    for i in range(launch, n):
+        if i >= nxt:
+            target = rng.uniform(*EXTREME_V_KMH) / 3.6
+            nxt = i + int(rng.uniform(*EXTREME_HOLD_S) / dt)
+        # The step that drives from v[i-1] to v[i] is step i-1: the environment
+        # reads its force at v[i-1] and grade[i-1] (forward difference).
+        th = np.arctan(float(grade[i - 1]))
+        road = (0.5 * rho * veh.cd_a * v[i - 1] ** 2 + veh.crr * m * g0 * np.cos(th) + m * g0 * np.sin(th))
+        coast = max(0.0, (road - min_tractive_force(veh, v[i - 1])) / m)
+        v[i] = v[i - 1] + float(np.clip(target - v[i - 1], -min(coast, EXTREME_ACCEL) * dt, EXTREME_ACCEL * dt))
+    return v
+
+
+class ExtremesTrainingEnv(TerrainTrainingEnv):
+    """TerrainTrainingEnv with the conditions above drawn per episode, from the
+    same road stream, so a seed fixes the whole sequence of episodes. TRAINING
+    ONLY: scoring stays on the locked climb (evaluate.py)."""
+
+    def __init__(self, duration=900.0, dt=1.0, seed=None, **kw):
+        super().__init__(duration=duration, dt=dt, seed=seed, **kw)
+        self._c_turb0 = float(self.thermal.p.c_turb)
+        self.c_turb_scale = 1.0
+
+    def reset(self, *, seed=None, options=None):
+        if seed is not None:
+            self._road_rng = self._make_road_rng(seed)
+        rng = self._road_rng
+        t_amb = 273.15 + rng.uniform(*EXTREME_T_AMB_C)
+        c = make_terrain(rng, duration=self.duration, dt=self.dt, v_kmh=self.v_kmh, t_amb=t_amb,
+                         family=(options or {}).get("family"), families=self.families,
+                         weights=self.weights, grade_max=EXTREME_GRADE_MAX)
+        v = extreme_speed_profile(rng, len(c["t"]), self.dt, c["grade"], t_amb, self.veh)
+        # Raising a grade only adds road force, so the coasts computed on the
+        # unfloored grade above still ask at least the floor torque.
+        c["grade"] = np.maximum(c["grade"], grade_floor(v, t_amb, self.dt, self.veh))
+        c["v_mps"], c["t_amb"] = v, t_amb
+        c["elev_m"] = np.cumsum(v * self.dt * c["grade"])
+        lo, hi = np.log(EXTREME_C_TURB[0]), np.log(EXTREME_C_TURB[1])
+        self.c_turb_scale = float(np.exp(rng.uniform(lo, hi)))
+        self.cycle = c
+        self.road_log.append(c["family"])
+        obs, info = SupervisoryTunerEnv.reset(self, seed=seed, options=options)
+        for tn in (self.thermal, self.thermal_base):
+            tn.p.c_turb = self._c_turb0 * self.c_turb_scale
+        return obs, info
 
 
 # ---------------------------------------------------------------------------

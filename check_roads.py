@@ -2,6 +2,8 @@
 
     python check_roads.py              # 40 roads, about two minutes on 20 cores
     python check_roads.py --n 100
+    python check_roads.py --road extremes   # decision 12's roads (8 Oct): ambient,
+                                            # speed and housing capacity drawn too
 
 train.py draws a new road every episode (engine_env.TerrainTrainingEnv). A road
 is only fit to train on if the BASELINE can drive it: if the baseline cannot
@@ -15,7 +17,9 @@ For each road this drives the neutral policy -- the baseline ECU, untouched --
 and reports the family, the grade range, the turbine peak, how long it spends
 above the protection trigger, the neutral policy's mean reward, and the p95
 torque-tracking error in the reward's own units. It writes
-results/training_roads.json, which make_page.py draws.
+results/training_roads.json (or training_roads_extremes.json), which make_page.py
+draws. On the extremes roads each row also carries the ambient, the speed range
+and the housing-capacity scale the road drew.
 
 PASS means every road keeps the neutral reward inside +-0.05 and its p95
 tracking error inside the reward's tolerance band. It also prints how many
@@ -38,9 +42,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FIRST_SEED = 100
 
 
-def drive(seed):
-    from engine_env import TerrainTrainingEnv, neutral_action, TURB_PROTECT_K
-    env = TerrainTrainingEnv(duration=900.0, dt=1.0, seed=seed)
+def drive(job):
+    seed, road = job
+    from engine_env import ExtremesTrainingEnv, TerrainTrainingEnv, neutral_action, TURB_PROTECT_K
+    cls = ExtremesTrainingEnv if road == "extremes" else TerrainTrainingEnv
+    env = cls(duration=900.0, dt=1.0, seed=seed)
     env.reset(seed=seed)
     act = neutral_action()
     rs, errs, turb = [], [], []
@@ -52,8 +58,14 @@ def drive(seed):
         if term or trunc:
             break
     turb = np.array(turb)
-    g = env.cycle["grade"]
-    return dict(seed=seed, family=env.cycle["family"],
+    g, v = env.cycle["grade"], env.cycle["v_mps"]
+    extra = {}
+    if road == "extremes":
+        extra = dict(t_amb_c=float(env.cycle["t_amb"]) - 273.15,
+                     v_min_kmh=float(v[20:].min() * 3.6), v_max_kmh=float(v.max() * 3.6),
+                     c_turb_scale=float(env.c_turb_scale),
+                     v_kmh=[round(float(x) * 3.6, 1) for x in v[::5]])
+    return dict(seed=seed, family=env.cycle["family"], **extra,
                 grade_min=float(g.min()), grade_max=float(g.max()),
                 peak_c=float(turb.max() - 273.15),
                 above_pct=float(100.0 * (turb > TURB_PROTECT_K).mean()),
@@ -65,17 +77,20 @@ def drive(seed):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=40)
+    ap.add_argument("--road", choices=("terrain", "extremes"), default="terrain")
     a = ap.parse_args()
     from engine_env import TRACK_TOL
 
     with ProcessPoolExecutor(max_workers=min(18, a.n)) as ex:
-        R = list(ex.map(drive, range(FIRST_SEED, FIRST_SEED + a.n)))
+        R = list(ex.map(drive, [(s, a.road) for s in range(FIRST_SEED, FIRST_SEED + a.n)]))
 
     print(f"{'seed':>5} {'road':<8}{'grade %':>15}{'peak C':>8}{'>850 C':>8}"
           f"{'neutral r':>11}{'p95 err':>9}")
     for r in R:
         print(f"{r['seed']:>5} {r['family']:<8}{100 * r['grade_min']:>6.1f} to{100 * r['grade_max']:>5.1f}"
-              f"{r['peak_c']:>8.0f}{r['above_pct']:>7.1f}%{r['neutral_r']:>+11.4f}{r['p95_err']:>9.3f}")
+              f"{r['peak_c']:>8.0f}{r['above_pct']:>7.1f}%{r['neutral_r']:>+11.4f}{r['p95_err']:>9.3f}"
+              + (f"   {r['t_amb_c']:4.1f} C  {r['v_min_kmh']:3.0f}-{r['v_max_kmh']:3.0f} km/h"
+                 f"  c_turb x{r['c_turb_scale']:.2f}" if a.road == "extremes" else ""))
 
     worst_r = max(R, key=lambda r: abs(r["neutral_r"]))
     worst_e = max(R, key=lambda r: r["p95_err"])
@@ -89,9 +104,10 @@ def main():
     print("\nPASS -- every road is one the baseline can drive." if ok else
           "\nFAIL -- some road asks for torque the baseline cannot deliver. Do not train.")
 
-    out = os.path.join(HERE, "results", "training_roads.json")
+    out = os.path.join(HERE, "results", "training_roads.json" if a.road == "terrain"
+                       else "training_roads_extremes.json")
     with open(out, "w") as fh:
-        json.dump(dict(roads=R, binding=binding, n=len(R),
+        json.dump(dict(road=a.road, roads=R, binding=binding, n=len(R),
                        worst_neutral_r=worst_r["neutral_r"], worst_p95_err=worst_e["p95_err"],
                        tolerance=TRACK_TOL, passed=ok), fh)
     print(f"wrote {os.path.relpath(out, HERE)}")

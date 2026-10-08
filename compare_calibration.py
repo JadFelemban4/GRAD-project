@@ -64,6 +64,7 @@ PREMISE_STEPS = [
          predictive=590.3, peak_turb=889, peak_oil=94, preview_vs_grade=-0.3),
     dict(step="5  + enrichment dwell derived", baseline=1052.1, reactive=658.9, current_grade=587.5,
          predictive=590.3, peak_turb=889, peak_oil=94, preview_vs_grade=-0.3),
+    # RETIRED-OK: 920.1, -0.3 -- the 28 September plant's premise, the last step of this record
     dict(step="6  + air density from ambient", baseline=920.1, reactive=625.7, current_grade=520.5,
          predictive=523.5, peak_turb=883, peak_oil=94, preview_vs_grade=-0.3),
 ]

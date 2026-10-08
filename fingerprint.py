@@ -82,14 +82,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 # The files that ARE the physics. If any byte of these changes, two results are
 # not comparable, whatever the commit says. Order is fixed so the hash is.
-PLANT_FILES = ("plant.py", "thermal.py", "engine_env.py")
+PLANT_FILES = ("plant.py", "thermal.py", "engine_env.py", "derived.py")
 
 # Fields whose disagreement makes two numbers incomparable. Everything else in
 # the block is printed for the reader and never refused over.
-FATAL = ("plant_sha", "gears", "final_drive", "dtheta_deg", "turb_protect_k",
+FATAL = ("plant_sha", "derived_sha", "gears", "final_drive", "dtheta_deg", "turb_protect_k",
          "oil_protect_k", "scenario", "episodes_sha")
 
-SCHEMA_VERSION = 1
+# 2 since 8 October 2026 (conflict.md decision 2, agreed by Jad and Ghassan):
+# the derived constants are fatal (derived_sha), derived.py is a plant file, and
+# the code hash no longer depends on the Python version (_code_only).
+SCHEMA_VERSION = 2
 
 
 def _code_only(src):
@@ -114,8 +117,8 @@ def _code_only(src):
     the right thing, and the obvious way out would be `--force-plant-mismatch`,
     which is how a refusal becomes a habit and then becomes noise.
 
-    So the fatal hash is over the code: the source parsed to an AST with every
-    docstring stripped, then dumped. A changed constant, a changed formula, a
+    So the fatal hash is over the code: the source with every docstring
+    stripped (see below for how, since 8 October). A changed constant, a changed formula, a
     changed default, a renamed symbol and a deleted branch all move it. A
     comment, a docstring, a blank line and a reflowed paragraph do not.
 
@@ -125,11 +128,25 @@ def _code_only(src):
     If the source does not parse, the byte hash is used instead -- a file that
     cannot be parsed is a file this project cannot run, and the caller will
     find that out one line later.
+
+    THE FORM CHANGED ON 8 OCTOBER 2026, and the reason is the same argument one
+    level down. `ast.dump` is not a stable format: Python 3.12 and 3.13 print the
+    same tree differently, so two people on the same commit with different
+    Pythons got different `plant_sha` values (found 30 September, the agents
+    page report). The code is now the SOURCE TEXT with every docstring and every
+    comment cut out by position, trailing spaces dropped and blank lines removed.
+    The positions come from `ast` and `tokenize`, which agree across versions;
+    the text itself is what was written. A changed constant, formula, default,
+    name or branch still moves it; a comment, a docstring or a blank line does not.
     """
+    import io
+    import tokenize
     try:
         tree = ast.parse(src)
     except SyntaxError:
         return None
+    lines = src.splitlines()
+    drop = set()
     for node in ast.walk(tree):
         if not isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef,
                                  ast.AsyncFunctionDef)):
@@ -138,8 +155,25 @@ def _code_only(src):
         if (body and isinstance(body[0], ast.Expr)
                 and isinstance(body[0].value, ast.Constant)
                 and isinstance(body[0].value.value, str)):
-            node.body = body[1:] or [ast.Pass()]
-    return ast.dump(tree)
+            drop.update(range(body[0].lineno - 1, body[0].end_lineno))
+    cut = {}
+    try:
+        for tok in tokenize.generate_tokens(io.StringIO(src).readline):
+            if tok.type == tokenize.COMMENT:
+                row, col = tok.start
+                cut[row - 1] = min(col, cut.get(row - 1, col))
+    except (tokenize.TokenError, IndentationError):
+        return None
+    out = []
+    for i, line in enumerate(lines):
+        if i in drop:
+            continue
+        if i in cut:
+            line = line[:cut[i]]
+        line = line.rstrip()
+        if line:
+            out.append(line)
+    return "\n".join(out)
 
 
 def _sha_files(names, code_only=True):
@@ -210,6 +244,21 @@ def episodes_sha(protocol="phase-d"):
     return hashlib.sha256(repr(_episode_set(protocol)).encode()).hexdigest()[:16]
 
 
+def derived_sha():
+    """A hash of data/derived_params.json's VALUES (keys starting with "_" are
+    bookkeeping: inputs, timestamps). Since 28 September the plant's thermal,
+    boost, spark, enrichment and gearbox constants live there; since 8 October
+    a change to them is fatal, like a change to the code (conflict.md decision 2)."""
+    p = os.path.join(HERE, "data", "derived_params.json")
+    try:
+        with open(p, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    vals = {k: v for k, v in d.items() if not k.startswith("_")}
+    return hashlib.sha256(json.dumps(vals, sort_keys=True).encode()).hexdigest()[:16]
+
+
 def plant_fingerprint(protocol="phase-d", **advisory):
     """The block, built from the LIVE objects. Never from a literal.
 
@@ -262,6 +311,9 @@ def plant_fingerprint(protocol="phase-d", **advisory):
         # does not. It is recorded so a reader can see the file changed at all;
         # it is NOT compared, for the reason `_code_only` sets out.
         "plant_text_sha": _sha_files(PLANT_FILES, code_only=False),
+        # The constants the logs set live in data/derived_params.json, not in
+        # the files above: a new drive changes the plant without touching them.
+        "derived_sha": derived_sha(),
         "gears": [float(g) for g in E.Vehicle.gears],
         "final_drive": float(E.Vehicle.final_drive),
         "dtheta_deg": float(DTHETA_DEG),

@@ -435,7 +435,7 @@ ONCE** (from our data, but not re-derived automatically, for the reason given),
 | `iat_compensation`, cold-start retard | `BaselineECU` | **CANNOT** | spark against CHARGE temperature, which is modelled, not measured, so the slope is confounded with the model it would test |
 | fan schedule (367 / 372 K) | `BaselineECU` | **CANNOT** | every fan-actual and fan-duty channel reads zero |
 | `p_baro` 101.3 kPa | scenario | **DESIGN** | altitude is not modelled (CLAUDE.md, limitations) |
-| damage model (1123 K knee, 45 K, 0.4, 408 K, 12 K, knock 40, 0.85), reward (`TRACK_*`), action ranges, slew, preview horizons, the locked scenario, the training roads, the load loop's gains | `engine_env` | **DESIGN** | choices that define the experiment, not properties of the car. The 1123 K knee has a published comparison (Conway et al. 2018: 930 °C pre-turbine) but no channel on this car could measure it |
+| damage model (1123 K knee, 45 K, 0.4, 408 K, 12 K, knock 40, 0.85), reward (`TRACK_*`), action ranges, slew, preview horizons, the locked scenario, the training roads, the load loop's gains | `engine_env` | **DESIGN** | choices that define the experiment, not properties of the car. **The damage constants, one by one (8 October, `damage_constants.py`, `results/DAMAGE_CONSTANTS.md`):** the turbine scale is CALCULABLE once a mechanism is named (creep rupture, Larson–Miller C = 20: 20.3 K; the published 45 K is oxidation-like, Q = 233 kJ/mol, and no source gives Q for the alloy); the knee is BRACKETED by published gas limits carried to the housing node (900 °C → 778 °C, Conway's 930 °C → 804 °C, 1050 °C → 907 °C; the 850 °C knee is 984 °C of gas); the oil scale is 14.4 K by the 10 °C doubling rule, a rule of thumb; the oil weight and knee are ONE number (397.0 K) and a valuation, as are the knock weight and square; the knock knee waits for drive C. Adopting any of them is decisions 8–10 of `results/VALIDATION_DECISIONS.md` |
 | `DTHETA_DEG` | `plant` | **studied** | numerical step, set by a convergence study (AUDIT.md H1) |
 
 ---
@@ -650,8 +650,17 @@ session's scratch directory, not in the repository.
   Turbocharged GDI Engine", SAE 2018-01-1423, DOI 10.4271/2018-01-1423,
   EPA-hosted PDF: p. 5 (233 g/kWh best point) and p. 10 (900 °C port / 930 °C
   pre-turbine enrichment limit). The second figure is also a published
-  comparison for the project's 1123 K protection trigger, which is about 80 K
-  more conservative than that engine's enrichment limit.
+  comparison for the project's 1123 K protection trigger.
+  **Corrected 8 October 2026:** this entry said the trigger "is about 80 K more
+  conservative than that engine's enrichment limit". That compared a HOUSING
+  temperature (the 1123 K knee is on `thermal.py`'s turbine node) with a GAS
+  temperature (930 °C pre-turbine). Like for like, through the model's own
+  steady-state turbine balance at the climb's exhaust flow
+  (`damage_constants.py`: the node sits 0.142 of the way from the gas to the
+  ambient), the knee is 984 °C of gas, 54 K HOTTER than that limit, and 930 °C of
+  gas is 804 °C on the housing node, 46 K below the knee. The ratio rests on the
+  ASSUMED `ua_gas_turb` and `ua_turb_amb`. Whether the knee should move is
+  decision 9 of `results/VALIDATION_DECISIONS.md`.
 - **Caton, J. A.**, "Comparisons of Thermocouple, Time-Averaged and
   Mass-Averaged Exhaust Gas Temperatures for a Spark-Ignited Engine",
   SAE 820050, DOI 10.4271/820050. **Abstract**: thermocouple reads about 20 K
@@ -683,6 +692,42 @@ session's scratch directory, not in the repository.
   BMW Six-cylinder Top Engine with Innovative Turbocharging Concept", *MTZ
   worldwide* **77**(10), 2016, pp. 38–45, DOI 10.1007/s38313-016-0104-4.
   **Record only**; which engine it describes is not shown.
+
+**Opened 7–8 October 2026 for the damage constants** (`damage_constants.py`,
+`results/DAMAGE_CONSTANTS.md`):
+
+- **BMW Group University**, ST1505 (above), **section 5.2.1**: *"The exhaust
+  manifold of the 3rd and 4th cylinder and the turbocharger housing form one
+  single cast steel part"*; a twin-scroll turbocharger. No steel grade and no
+  temperature limit anywhere in the document.
+- **Simon, V., Oberholz, G., Mayer, M.**, BorgWarner Turbo Systems technical
+  paper on turbochargers for 1050 °C exhaust gas (PDF in BorgWarner's technical
+  library, file `bwts_library_105_327.pdf`; undated, its bibliography runs to
+  2000). **Full text opened**, printed pp. 3–4: at a 950 °C inlet the inner wall near
+  the flange reaches the gas temperature, with about 100 °C of gradient inside
+  the housing; Ni-resist D5S *"maximum application temperature of 850°C, in
+  special cases of up to 900°C"*; *"the service life of the turbine housing is
+  calculated based on load spectra. A deciding parameter in this regard is the
+  percentage of time at full capacity at exhaust temperatures over 900°C"*,
+  assumed 5 % of the time; heat-resistant austenitic cast steel for 1050 °C. An
+  industry paper, not peer-reviewed: cite it as the manufacturer's statement.
+- **Abdallah et al.**, "A Critical Analysis of the Conventionally Employed Creep
+  Lifing Methods", *Materials (Basel)*, 2014, PMC5453208. **Full text opened**:
+  P_LM = T·(C_LM + log t_f), and *"Larson and Miller expanded their original
+  proposal suggesting that the value of C_LM to be taken as 20 for metallic
+  materials"*, with C varying between alloys. The full author list, volume and
+  pages are to be copied from the article, not written from memory.
+- **Fitch, B.**, "How Heat Affects Lubricants: Understanding the Arrhenius Rate
+  Rule", *Machinery Lubrication* (2024). Opened: *"For every 10°C (18°F) increase
+  in temperature, the rate of lubricant oxidation doubles"*. A trade article.
+- **Holloway, M. D.**, "What the 10-degree rule gets wrong about lubricant
+  life", *Plant Services*, 28 September 2026. Opened: there is no universal
+  10-degree multiplier; it depends on the activation energy and the range.
+- **Tripathi, A. K., Vinu, R.**, "Characterization of Thermal Stability of
+  Synthetic and Semi-Synthetic Engine Oils", *Lubricants* **3** (2015) 54–79,
+  DOI 10.3390/lubricants3010054. **Full text opened and NOT used**: its 89–106
+  kJ/mol are activation energies of DECOMPOSITION under nitrogen (TGA), a
+  stability marker, not the rate of oxidation in a sump.
 
 ### Still open, in order of value
 

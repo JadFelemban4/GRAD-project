@@ -16,7 +16,10 @@ What these two files still show, and the reason they are kept: at 25 C, where
 the baseline ECU never reached the trigger, blinded seed 6 on frozen episodes
 13 and 17 (the two with the least weight on component life) ran its turbine
 housing about 60 K hotter than the baseline did. It is the agent already known
-to trade component life for fuel (`results/agents/terrain_dt1/README.md`).
+to fail on the frozen episodes that weight life least
+(`results/agents/terrain_dt1/README.md`). *(Corrected 8 October: this said it
+trades component life for fuel. The per-step records show it retarding spark on
+those episodes and burning more fuel than the baseline too.)*
 
 Each file is a list of episode rows in `conditions_test.py`'s first format:
 policy, frozen episode, ambient (K), pressure (kPa), and the episode's scores.

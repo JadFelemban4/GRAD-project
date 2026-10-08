@@ -37,6 +37,13 @@ from dataclasses import dataclass, field
 
 import derived
 
+# The largest explicit-Euler step the network takes, in seconds (8 October 2026,
+# conflict.md decision 1: "sub-step this network, e.g. 0.1 s inside each env
+# step"). The coolant node's effective time constant on the climb is about
+# 0.6 s, so steps much past 1 s are unstable; 0.1 s is converged (timestep_study.py:
+# 50 sub-steps of a 1 s step move the published cut by 0.02 points).
+DT_SUB_MAX = 0.1
+
 
 def _d(key):
     """A DERIVED field: read from data/derived_params.json when a ThermalParams
@@ -189,18 +196,27 @@ class ThermalNetwork:
         would let a caller that forgot it run the oil 10-15 K cold under load
         without a word -- the same shape as mistake 1's silent default geometry.
 
-        NUMERICALLY STIFF ABOVE dt ~1.1 s, and NOT YET FIXED (30 September 2026,
-        the merge review; conflict.md decision 1, agreed by Jad and Ghassan).
-        With the derived constants the explicit-Euler factor of a block-node
-        perturbation at the locked climb is -0.78 at dt 1.0, -1.67 at 1.5 and
-        -2.56 at 2.0 (the pre-derivation constants: +0.84 to +0.67). At dt 1.0
-        the coolant zig-zags about 2 K on every step of the climb (Ghassan's
-        re-check: 91.6-93.8 C, sign flips on 100 % of steps in the last 30 %);
-        at dt 2.0 -- where generality_test.py runs -- it swings 85-95 C and
-        never settles. Agreed fix, before ANY retrain: sub-step this network
-        (e.g. 0.1 s inside each env step) or integrate it implicitly, then
-        re-run generality_test.py. Until then no H/tau output is quotable.
+        SUB-STEPPED SINCE 8 OCTOBER 2026 (conflict.md decision 1, agreed by Jad
+        and Ghassan before any retrain). With the derived constants the network
+        is stiff: the explicit-Euler factor of a block-node perturbation at the
+        locked climb was -0.78 at dt 1.0, -1.67 at 1.5 and -2.56 at 2.0, so the
+        coolant zig-zagged about 2 K every step at dt 1.0 and never settled at
+        dt 2.0 (timestep_study.py measured it: a 10.3 K swing at 2 s). The step
+        is now split into equal sub-steps of at most DT_SUB_MAX (0.1 s, the
+        figure agreed), with the engine's inputs held over the env step as
+        before. Every caller gets the same integrator, so the replays that
+        derive the constants (car_thermal.py) and the environment agree.
         """
+        n_sub = max(1, int(np.ceil(dt / DT_SUB_MAX - 1e-9)))
+        h = dt / n_sub
+        for _ in range(n_sub):
+            self._substep(h, mdot_fuel_gps, mdot_exh_gps, egt_k, t_amb, vehicle_mps,
+                          fan_duty, coolant_pump_duty, rpm)
+        return self.state()
+
+    def _substep(self, dt, mdot_fuel_gps, mdot_exh_gps, egt_k, t_amb, vehicle_mps,
+                 fan_duty, coolant_pump_duty, rpm):
+        """One explicit-Euler step of at most DT_SUB_MAX seconds."""
         p = self.p
         q_fuel = mdot_fuel_gps * 1e-3 * 44.0e6                     # W
 

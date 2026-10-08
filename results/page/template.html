@@ -109,6 +109,7 @@ section+section{border-top:1px solid var(--rule)}
 .fig-head .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 .take{font-size:14.5px;color:var(--ink);max-width:70ch}
 .cap{font-size:13.5px;color:var(--ink-2);max-width:72ch;line-height:1.55}
+.cap code,.take code{overflow-wrap:anywhere}
 .cap+.cap{margin-top:-2px}
 .legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--ink-2)}
 .legend span{display:inline-flex;align-items:center;gap:7px}
@@ -150,6 +151,8 @@ section+section{border-top:1px solid var(--rule)}
 .seg button{font:500 12.5px/1 var(--body);color:var(--ink-2);background:none;border:0;
   padding:6px 12px;border-radius:999px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--rule)}
+/* wrap, never hide: a selector whose last button scrolls out of sight is not found */
+.seg{max-width:100%;flex-wrap:wrap;border-radius:16px}
 
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border:1px solid var(--rule);
@@ -219,6 +222,7 @@ html{scroll-behavior:smooth}
       <a href="#summary">Summary</a>
       <a href="#phase-d">Phase D</a>
       <a href="#vs-car">Simulation vs car</a>
+      <a href="#validation">Validation</a>
       <a href="#drives">Drives</a>
       <a href="#caveats">Caveats</a>
     </nav>
@@ -234,7 +238,7 @@ html{scroll-behavior:smooth}
     <h1>B58 preview study</h1>
     <p class="lede">When is it worth knowing the road ahead? The project's claim is that the answer is set by one ratio, <b>H/τ</b>: how far ahead you can see, over how fast the protected part heats up. This page shows what the simulation says on the locked scenario, and every place the simulator can be laid beside the car's own logs.</p>
     <dl class="meta">
-      <div><dt>branch</dt><dd>{{meta.branch}} @ {{meta.commit}}</dd></div>
+      <div><dt>commit</dt><dd>{{meta.commit}}</dd></div>
       <div><dt>logs</dt><dd>{{meta.drives}} drives, {{meta.minutes|.1f}} min</dd></div>
       <div><dt>scenario</dt><dd>12 % grade, 130 km/h, 42 °C</dd></div>
       <div><dt>built</dt><dd>{{meta.built}}</dd></div>
@@ -245,32 +249,47 @@ html{scroll-behavior:smooth}
     <div class="stat">
       <span class="k">Training beats hand-written</span>
       <span class="v">{{pd.ablation.agent_over_grade|+.1f}}<small>pts</small></span>
-      <p>The median sighted agent cuts damage by {{pd.ablation.sighted_median|.1f}} % and the median blinded one {{pd.ablation.blind_median|.1f}} %; the best hand-written policy, current-grade, cuts {{pd.ablation.grade_cut|.1f}} %. With spark advance forbidden the agents' median falls to {{pd.rec.km.sighted|.1f}} %: most of the margin rests on the untested knock model.</p>
+      <p>The median sighted agent cuts damage by {{pd.ablation.sighted_median|.1f}} % and the median blinded one {{pd.ablation.blind_median|.1f}} %; the best hand-written policy, current-grade, cuts {{pd.ablation.grade_cut|.1f}} %. All twenty still beat it under each of the {{val.formulas_n}} damage formulas tried. With spark advance forbidden the agents' median falls to {{pd.rec.km.sighted|.1f}} %: most of the margin rests on the untested knock model.</p>
     </div>
     <div class="stat">
       <span class="k">Preview, sighted minus blinded</span>
       <span class="v">{{pd.ablation.mean|+.1f}}<small>pts</small></span>
-      <p>Mean over {{pd.ablation.n}} paired seeds, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}. {{pd.ablation.verdict}} The agents were retrained on 29 September (see caveats for what is still open).</p>
+      <p>Mean over {{pd.ablation.n}} paired seeds, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}. {{pd.ablation.verdict}} The interval spans zero under {{val.formulas_zero}} of the {{val.formulas_n}} damage formulas tried; the {{val.formulas_exc}} exceptions are the ones that give the untested knock term more weight.</p>
     </div>
     <div class="stat">
       <span class="k">Preview on the H/τ sweep</span>
       <span class="v">{{gen.vs_grade_absmax|.2f}}<small>pts or less</small></span>
-      <p>Preview over current-grade, either way, at every time constant where the limit binds. Against the reactive policy it looks like {{gen.vs_react_lo|.0f}}–{{gen.vs_react_hi|.0f}} points, but that gap is timing, not preview.</p>
+      <p>Preview over current-grade, either way, at every time constant where the limit binds. Against the reactive policy it looks like {{gen.vs_react_lo|.0f}}–{{gen.vs_react_hi|.0f}} points, but that gap is timing, not preview. Not quotable: at the sweep's 2 s step the thermal model's own step error moves a cut by {{val.ts.cut2|.2f}} points, more than this effect.</p>
     </div>
     <div class="stat">
       <span class="k">Simulation vs car</span>
-      <span class="v">4<small>of 11 agree</small></span>
-      <p>Five more agree within limits the comparison cannot see past, one is untested, and one is a region the car was never driven in. None is marked off since the thermal network was derived from the logs.</p>
+      <span class="v">4<small>of 12 agree</small></span>
+      <p>Five more agree within limits the comparison cannot see past, two are untested (knock, and spark under boost, added 7 October), and one is a region the car was never driven in. None is marked off since the thermal network was derived from the logs.</p>
     </div>
+  </div>
+
+  <div class="findings">
+    <h3>Changed on 7–8 October</h3>
+    <ol>
+      <li><b>How the simulator is judged against the car is being made a computation, not a reading.</b> A validation plan built on ASME V&amp;V 20 (comparison error against its uncertainty) and NASA-STD-7009B (how much a use can lean on the model). Thirteen decisions are open, a column each for the two people who decide; nothing is relabelled or retrained until they are answered. <a href="#validation">Validation</a></li>
+      <li><b>Every step is recorded now, from the road to what each actuator did.</b> One definition of a step, {{val.rec.fields}} fields, used by every script that runs episodes; training keeps {{val.rec.train_fields}} a step. The twenty agents of 29 September never recorded their roads: they were regenerated from the seeds and checked on every one of {{val.rec.steps|,}} training steps ({{val.rec.reproduced}} of {{val.rec.runs}} runs). Recording changes nothing an agent learns or scores. <a href="#f-rec">What is recorded</a></li>
+      <li><b>In other air the agents mostly hold up; on a steep hill in cool air they do not.</b> On a speed target that changes mid-run, each condition on its own hill: in the trained and warmer air at least {{val.warm_beat_min}} of 20 beat current-grade. At 25 °C, on a {{val.c25.grade|.2f}} % hill in 5th gear, {{val.c25.beat}} of {{val.c25.n}} do. In thin air their torque delivery breaks down (median {{val.thin_short_hi|.0f}} of 719 steps short at the worst pressure). And current-grade itself is short of torque on this profile in {{val.grade_short_n}} of {{val.cond_n}} conditions. <a href="#f-cond">The conditions</a></li>
+      <li><b>The damage formula, constant by constant.</b> The turbine scale can be calculated once its mechanism is named: {{val.dc.creep|.1f}} K for creep rupture, against the 45 K used. The knee is bracketed by published gas limits. The rest are valuations, or wait for drive C. Under every calculated value all twenty agents still beat current-grade and the ablation stays inconclusive, unless the untested knock term is made large. <a href="#f-dc">The constants</a></li>
+      <li><b>A comparison corrected: the knee is not "80 K more conservative" than a 930 °C limit.</b> The knee is a housing temperature and 930 °C a gas temperature. Like for like, through the model's own heat balance, the knee is {{val.dc.gas_at_knee|.0f}} °C of gas. <a href="#f-dc">The constants</a></li>
+      <li><b>The 1 s step is fine; the sweep's 2 s step is not.</b> Stepping the thermal model up to 50 times finer moves the published cut by {{val.ts.cut|.2f}} points at 1 s. At 2 s the coolant swings {{val.ts.swing2|.1f}} K and a cut moves {{val.ts.cut2|.2f}} points, more than the sweep's preview effects. <a href="#caveats">Caveats</a></li>
+      <li><b>The world the agents trained in, drawn from the roads they actually drove.</b> {{tenv.env.episodes_per_agent}} roads each at a steady {{tenv.env.v_kmh|.0f}} km/h in {{tenv.env.t_amb_c|.0f}} °C sea-level air, grades from {{tenv.env.grade_min_pct|.0f}} to +{{tenv.env.grade_max_pct|.0f}} %, {{tenv.pct.g78|.0f}} % of the time in 7th or 8th gear. The 25 °C hill of the conditions test, {{val.c25.grade|.2f}} % in 5th, is beyond anything they met. <a href="#f-tenv">The training environment</a></li>
+      <li><b>A correction: the agent that sometimes does worse than no protection is not trading life for fuel.</b> On its {{pd.rec.bad_worst.n}} bad episodes {{pd.rec.bad_worst.name}} also burns {{pd.rec.bad_worst.fuel_lo|.1f}}–{{pd.rec.bad_worst.fuel_hi|.1f}} % more fuel than the baseline, and its return turns negative. Its per-step records show it retarding spark on the climb there, where elsewhere it advances; the same retard is behind the failures at 25 °C. <a href="#f-cond">The conditions</a></li>
+      <li><b>The car's own spark under boost runs below the model's baseline.</b> {{val.spark.n}} genuine readings between 140 and 240 kPa: median {{val.spark.med|+.2f}}° (standard error {{val.spark.se|.2f}}°); in the climb's own cell {{val.spark.climb|+.2f}}° from {{val.spark.climb_n}} readings, too few to label. <a href="#f-dc">Validation</a></li>
+    </ol>
   </div>
 
   <div class="findings">
     <h3>Changed on 27–29 September</h3>
     <ol>
-      <li><b>The agents were retrained, ten seeds a side, and preview still adds nothing measurable.</b> A new road every episode at 130 km/h, dt 1.0, on the derived plant, 50 000 steps each. {{pd.agents.sentence}} Sighted minus blinded: {{pd.ablation.mean|+.1f}} points, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = {{pd.ablation.n}}. Every action they took, in training and in the twenty frozen episodes, is recorded in <code>results/agents/</code>. <a href="#f-abl">The ablation</a></li>
-      <li><b>Most of what the agents gain over the hand-written policies is spark advance the untested knock model allows.</b> On the climb they run {{pd.rec.trim_lo|.1f}}–{{pd.rec.trim_hi|.1f}}° past the baseline's {{pd.rec.sp_base|.1f}}°, taking the modelled knock integral from {{pd.rec.ki_base|.2f}} to {{pd.rec.ki_lo|.2f}}–{{pd.rec.ki_hi|.2f}}, under the 0.85 where the damage model starts charging. Re-scored with that advance forbidden (<code>knock_margin.py</code>, a diagnostic beside the protocol), the median cut falls from {{pd.rec.km.sighted_orig|.1f}} to {{pd.rec.km.sighted|.1f}} % (sighted) and {{pd.rec.km.blind_orig|.1f}} to {{pd.rec.km.blind|.1f}} % (blinded), against current-grade's {{pd.rec.km.grade|.1f}} %; {{pd.rec.km.beat}} of {{pd.rec.km.n}} still beat it, and the median margin over it goes from {{pd.rec.km.og_orig|+.1f}} to {{pd.rec.km.og|+.1f}} points. A lower bound: an agent trained without the lever could do better than one that has it taken away. The ablation is untouched, under the cap too ({{pd.rec.km.abl|+.2f}} points).</li>
-      <li><b>One agent sometimes does worse than no protection at all.</b> {{pd.rec.bad_sentence}} The reward lets it trade component life for fuel when life is weighted that little. <a href="#f-eval">Every policy</a></li>
-      <li><b>With the honest comparator, the H/τ sweep shows no preview value.</b> The sweep used to measure preview only against the reactive policy. Against current-grade, which acts on the grade the car is on now, preview is worth {{gen.vs_grade_lo|+.2f}} to {{gen.vs_grade_hi|+.2f}} points at every time constant where the limit binds. No sweep result can be cited for the criterion; the trained ablation on varied roads is the test. <a href="#f-htau">The sweep</a></li>
+      <li><b>The agents were retrained, ten seeds a side, and the preview result is inconclusive.</b> A new road every episode at 130 km/h, dt 1.0, on the derived plant, 50 000 steps each. {{pd.agents.sentence}} Sighted minus blinded: {{pd.ablation.mean|+.1f}} points, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = {{pd.ablation.n}}. Every action they took, in training and in the twenty frozen episodes, is recorded in <code>results/agents/</code>. <a href="#f-abl">The ablation</a></li>
+      <li><b>Most of what the agents gain over the hand-written policies is spark advance the untested knock model allows.</b> On the climb they run {{pd.rec.trim_lo|.1f}}–{{pd.rec.trim_hi|.1f}}° past the baseline's {{pd.rec.sp_base|.1f}}°, taking the modelled knock integral from {{pd.rec.ki_base|.2f}} to {{pd.rec.ki_lo|.2f}}–{{pd.rec.ki_hi|.2f}}, under the 0.85 where the damage model starts charging. Re-scored with that advance forbidden (<code>knock_margin.py</code>, a diagnostic beside the protocol), the median cut falls from {{pd.rec.km.sighted_orig|.1f}} to {{pd.rec.km.sighted|.1f}} % (sighted) and {{pd.rec.km.blind_orig|.1f}} to {{pd.rec.km.blind|.1f}} % (blinded), against current-grade's {{pd.rec.km.grade|.1f}} %; {{pd.rec.km.beat}} of {{pd.rec.km.n}} still beat it, and the median margin over it goes from {{pd.rec.km.og_orig|+.1f}} to {{pd.rec.km.og|+.1f}} points. A lower bound: an agent trained without the lever could do better than one that has it taken away. The ablation is untouched, under the cap too ({{pd.rec.km.abl|+.2f}} points). <a href="#f-km">The knock margin</a> · <a href="#f-act">What the agents do</a></li>
+      <li><b>One agent sometimes does worse than no protection at all.</b> {{pd.rec.bad_sentence}} <a href="#f-eval">Every policy</a></li>
+      <li><b>With the honest comparator, the H/τ sweep shows no preview value.</b> The sweep used to measure preview only against the reactive policy. Against current-grade, which acts on the grade the car is on now, preview is worth {{gen.vs_grade_lo|+.2f}} to {{gen.vs_grade_hi|+.2f}} points at every time constant where the limit binds. No sweep result can be cited for the criterion; the trained ablation on varied roads is the test. Since 30 September the sweep's figures are not quotable at all until the thermal model is stepped more finely (see <a href="#caveats">caveats</a>). <a href="#f-htau">The sweep</a></li>
       <li><b>Drive B is in, and the data now sets the constants.</b> Full-throttle roll-ons in a held gear; the dataset is {{meta.minutes|.1f}} minutes over {{meta.drives}} drives. Every constant the car's logs can set (the thermal network, the boost ceiling, the spark offset, the enrichment dwell, the gearbox's kickdown table) is recomputed from them on every rebuild by <code>derive_params.py</code>, not typed into the code.</li>
       <li><b>The oil node had the wrong structure, now re-fitted to the car.</b> The car's oil heats with engine speed and is cooled by road speed; the model heated it with a share of fuel. Derived, drive10's oil runs {{mc.thermal.drive10.oil_med|+.1f}} K and its coolant {{mc.thermal.drive10.ect_med|+.1f}} K from the car (median), and the oil takes {{mc.lit.8.value|.0f}} s to respond (the car: {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s). <a href="#f-th10">Oil and coolant</a></li>
       <li><b>The validation table scores oil and coolant against the car:</b> {{mc.lit_ok}} of {{mc.lit_n}} inside, and {{mc.lit_c_ok}} of {{mc.lit_c_n}} of the car rows. Both coolant rows are inside; both oil rows still miss. <a href="#f-lit">The table</a></li>
@@ -362,13 +381,49 @@ html{scroll-behavior:smooth}
 
   <div class="fig" id="f-roads">
     <div class="fig-head">
-      <h3>The roads the retrain will learn on</h3>
+      <h3>The training roads, checked before training</h3>
       <p class="take">Every training episode is a new road; only scoring stays on the locked climb. On {{roads.binding}} of {{roads.n}} sampled roads the baseline passes the trigger, so the agent meets roads that need protection and roads where protecting only wastes fuel.</p>
     </div>
     <div class="legend" id="lg-roads"></div>
     <div class="chart" id="c-roads"></div>
     <div class="chart" id="c-roadpeaks"></div>
     <p class="cap">Top: one sampled road of each kind, as the grade the car and the preview channel see. Bottom: the baseline's peak turbine temperature on each of the {{roads.n}} roads from <code>check_roads.py</code>. Held at 130 km/h, the locked 12 % climb would rise about 3 km in its twelve minutes; no real road does that. It stands for sustained heavy load in general, and the training roads inherit the same idealisation. Every road is one the baseline can drive: worst neutral reward {{roads.worst_r|+.4f}}, worst torque-tracking error {{roads.worst_err|.3f}} against a {{roads.tol}} band. Speed and air temperature stay at the locked 130 km/h and 42 °C, so the road ahead is the only thing that changes. Descents stop at −3 %: below about −4.5 % the car coasts and this model has no fuel cut.</p>
+  </div>
+
+  <div class="fig" id="f-tenv">
+    <div class="fig-head">
+      <div class="row"><h3>The environment the twenty agents trained in</h3>
+        <div class="seg" role="group" aria-label="Seed" id="seg-tenv"></div>
+      </div>
+      <p class="take">Every agent drove {{tenv.env.episodes_per_agent}} roads of {{tenv.env.duration_s}} s, a new one each episode, at a steady {{tenv.env.v_kmh|.0f}} km/h in {{tenv.env.t_amb_c|.0f}} °C air at sea-level pressure. The grade ran from {{tenv.env.grade_min_pct|.0f}} to +{{tenv.env.grade_max_pct|.0f}} %: {{tenv.pct.ge4|.0f}} % of the time on a climb of 4 % or more, {{tenv.pct.ge12|.0f}} % at 12 % or steeper, {{tenv.pct.lt0|.0f}} % downhill. Each row is one road, in the order the agent met it; pick a seed.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table class="score">
+        <thead><tr><th>What</th><th>In training</th></tr></thead>
+        <tbody>
+          <tr><td>Road speed</td><td>{{tenv.env.v_kmh|.0f}} km/h, held for the whole episode after a {{tenv.env.launch_s}} s run-up from rest; the driver model turns speed and grade into the torque asked for</td></tr>
+          <tr><td>Air</td><td>{{tenv.env.t_amb_c|.0f}} °C, {{tenv.env.p_kpa}} kPa (sea level, never changes), humidity {{tenv.env.humidity}}</td></tr>
+          <tr><td>Time</td><td>a {{tenv.env.dt_s|.0f}} s step, {{tenv.env.duration_s}} s episodes, {{tenv.env.episodes_per_agent}} episodes ({{tenv.env.steps_per_agent|,}} steps) per agent</td></tr>
+          <tr><td>Roads</td><td>one of five kinds per episode (the table below), grades clipped to {{tenv.env.grade_min_pct|.0f}} to +{{tenv.env.grade_max_pct|.0f}} %, every change ramped over 4–12 s, flat for the first {{tenv.env.flat_start_s|.0f}} s</td></tr>
+          <tr><td>Preference weights</td><td>drawn per episode: torque tracking 0.45–0.70, the rest split at random between fuel and component life</td></tr>
+          <tr><td>The two arms</td><td>the sighted and the blinded agent of a seed drove the same {{tenv.env.episodes_per_agent}} roads with the same weights; only the preview channel differs</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart" id="c-tenv"></div>
+    <p class="cap">From the roads regenerated under every training step (<code>training_roads.py</code>, checked against each run's recorded torque request and reward) and extracted by <code>record_extracts.py</code>. The letter at the left of each row is its kind: L the locked climb, S one climb, R rolling hills, D two climbs, F flat. Hover a row for its steepest grade, its climb and its weight on component life.</p>
+  </div>
+
+  <div class="fig" id="f-tsteep">
+    <div class="fig-head">
+      <h3>How steep, which gears, which weights</h3>
+      <p class="take">Over all ten road sequences the agents spent {{tenv.pct.g78|.0f}} % of their training in 7th and 8th gear and {{tenv.pct.g5|.1f}} % in 5th. No training road was steeper than {{tenv.env.grade_max_pct|.0f}} %; the conditions test's 25 °C hill, {{val.c25.grade|.2f}} %, is beyond anything they met, and it ran in 5th.</p>
+    </div>
+    <div class="chart" id="c-tgrade"></div>
+    <div class="tbl-wrap" id="t-tfam"></div>
+    <div class="chart" id="c-tgear"></div>
+    <div class="chart" id="c-twl"></div>
+    <p class="cap">Top: the share of training time at each grade, beside the locked climb's 12 % and each condition's hill from the conditions test. The table: each kind of road as <code>engine_env.make_terrain</code> draws it, and what the ten sequences actually held. Then the gears the box chose, and the weight on component life drawn for each of the {{tenv.wl.n}} training episodes: {{tenv.wl.le}} of them ({{tenv.wl.pct|.0f}} %) weighted it at {{tenv.wl.thr|.3f}} or less, the range of blinded seed 6's five bad frozen episodes, so it met such weights often in training.</p>
   </div>
 
   <div class="fig" id="f-eval">
@@ -383,7 +438,7 @@ html{scroll-behavior:smooth}
       <span><i class="lk" style="color:var(--ink-2)"></i>interquartile range</span>
     </div>
     <div class="chart" id="c-eval"></div>
-    <p class="cap">Median episode damage; lower is better. The hand-written rows have no spread because they ignore the preference weights, so all twenty episodes are one rollout. Only the agents read the weights and vary.</p>
+    <p class="cap">Median episode damage; lower is better. The green line is current-grade, the line every policy is compared with, and each label gives a policy's margin over it in points of damage cut (the cut itself is against the baseline ECU, as <code>evaluate.py</code> defines it). The hand-written rows have no spread because they ignore the preference weights, so all twenty episodes are one rollout. Only the agents read the weights and vary.</p>
     <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-eval"></div></details>
   </div>
 
@@ -398,8 +453,91 @@ html{scroll-behavior:smooth}
       <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade, no preview at all</span>
     </div>
     <div class="chart" id="c-abl"></div>
-    <p class="cap">Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = {{pd.ablation.n}}. {{pd.ablation.reading}} On the hand-written policies predictive minus current-grade is {{pd.ablation.pred_minus_grade|+.1f}} points, and it comes entirely from the knock term: on turbine and oil damage alone it is {{pd.split.preview_thermal|+.2f}}. Report both until the knock model is tested.</p>
+    <p class="cap">Each bar is an agent's damage cut over current-grade, which sits at zero. Paired t-test p = {{pd.ablation.p_t|.2f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = {{pd.ablation.n}}. {{pd.ablation.reading}} On the hand-written policies predictive minus current-grade is {{pd.ablation.pred_minus_grade|+.1f}} points, and it comes entirely from the knock term: on turbine and oil damage alone it is {{pd.split.preview_thermal|+.2f}}. Report both until the knock model is tested.</p>
     <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-abl"></div></details>
+  </div>
+
+  <div class="fig" id="f-km">
+    <div class="fig-head">
+      <h3>How much rests on the knock model</h3>
+      <p class="take">With spark advance forbidden, the agents' median margin over current-grade goes from {{pd.rec.km.og_orig|+.1f}} to {{pd.rec.km.og|+.1f}} points, and {{pd.rec.km.beat}} of {{pd.rec.km.n}} still beat it. Their median cut falls from {{pd.rec.km.sighted_orig|.1f}} to {{pd.rec.km.sighted|.1f}} % (sighted) and from {{pd.rec.km.blind_orig|.1f}} to {{pd.rec.km.blind|.1f}} % (blinded), against current-grade's {{pd.rec.km.grade|.1f}} %.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="ld" style="background:currentColor"></i>sighted, as trained</span>
+      <span style="color:var(--pd-blind)"><i class="ld" style="background:currentColor"></i>blinded, as trained</span>
+      <span style="color:var(--ink-2)"><i class="lo"></i>the same agent, spark advance forbidden</span>
+      <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade, hand-written</span>
+    </div>
+    <div class="chart" id="c-km"></div>
+    <p class="cap">Each agent's own action on the twenty frozen episodes, with its spark trim capped at zero, the baseline's knock-limited spark; retard is still allowed (<code>knock_margin.py</code>, a diagnostic beside the protocol, never a change to it). The agents never trained with the cap, so read it as a lower bound: an agent trained without the lever could do better than one that has it taken away. With the cap, the knock integral's 95th percentile on the climb falls to {{pd.rec.km.ki_lo|.2f}}–{{pd.rec.km.ki_hi|.2f}}, the baseline's level. Whether the car tolerates the extra spark is what drive C measures.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-km"></div></details>
+  </div>
+
+  <div class="fig" id="f-rulers">
+    <div class="fig-head">
+      <h3>Does the result depend on the damage formula?</h3>
+      <p class="take">Every constant of the damage formula is a choice (see <a href="#f-dc">the constants</a>). Re-scored under {{val.formulas_n}} formulas, all twenty agents beat current-grade every time; the ablation's interval spans zero under {{val.formulas_zero}} of them.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="ld" style="background:currentColor"></i>sighted minus blinded, mean</span>
+      <span style="color:var(--ink-2)"><i class="lk"></i>95 % interval, 10 pairs</span>
+      <span style="color:var(--crit)"><i class="ld" style="background:currentColor"></i>interval clears zero</span>
+    </div>
+    <div class="chart" id="c-rulers"></div>
+    <p class="cap">The twenty frozen episodes of every policy, re-scored from their per-step records under nine rulers that change one constant at a time (<code>damage_robustness.py</code>); the formula itself is untouched and the agents were trained on the published one, so this tests the scoring, not what an agent trained on another formula would do. The interval clears zero only when the knock term is made four times heavier, and, among the calculated values, when the knee moves to 907 °C: both give the untested knock term more weight.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-rulers"></div></details>
+  </div>
+
+  <div class="fig" id="f-act">
+    <div class="fig-head">
+      <div class="row"><h3>What the agents do on the climb</h3>
+        <div class="seg" role="group" aria-label="Actuator" id="seg-act"></div>
+      </div>
+      <p class="take">On the climb every agent holds spark {{pd.rec.trim_lo|.1f}}–{{pd.rec.trim_hi|.1f}}° past the baseline, near the trim's +4° limit. {{pd.rec.beh.fan_below}} of {{pd.rec.beh.n}} run the fan below the baseline's setting ({{pd.rec.beh.fan_lo|.2f}}–{{pd.rec.beh.fan_hi|.2f}} of full duty) and {{pd.rec.beh.pump_below}} of {{pd.rec.beh.n}} the pump; {{pd.rec.beh.lam_below}} run richer and {{pd.rec.beh.boost_below}} trim boost down. They protect with spark, mixture and boost, and cool less than the baseline. Against current-grade, which runs fan and pump at full duty, a richer mixture and less boost: every agent advances spark past it and cools less, {{pd.rec.vs_cg.lam_below}} of {{pd.rec.vs_cg.n}} run richer than it, and {{pd.rec.vs_cg.boost_below}} trim boost further.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-base)"><i class="lk"></i>hand-written</span>
+      <span style="color:var(--pd-sight)"><i class="lk"></i>trained, sighted</span>
+      <span style="color:var(--pd-blind)"><i class="lk"></i>trained, blinded</span>
+      <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade's setting</span>
+      <span style="color:var(--pd-react)"><i class="lk dash"></i>the baseline's setting</span>
+    </div>
+    <div class="chart" id="c-act"></div>
+    <p class="cap">What the actuator actually did after the slew limit, on the climb only, over all twenty frozen episodes: the dot is the median, the bar the 5th to 95th percentile. The axis spans the lever's full range. From each policy's <code>eval_summary.json</code>.</p>
+  </div>
+
+  <div class="fig" id="f-ep1">
+    <div class="fig-head">
+      <div class="row"><h3>One frozen episode, step by step</h3>
+        <div class="seg" role="group" aria-label="Series" id="seg-ep1"></div>
+      </div>
+      <p class="take">Episode 1 of the twenty. On the flat stretch the agents' commands change {{pd.rec.beh.chatter_lo|.0f}}–{{pd.rec.beh.chatter_hi|.0f}} times more from one step to the next than on the climb, where they settle.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="lk"></i>sighted</span>
+      <span style="color:var(--pd-blind)"><i class="lk"></i>blinded</span>
+      <span style="color:var(--pd-base)"><i class="lk dash"></i>baseline ECU</span>
+      <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade</span>
+    </div>
+    <div class="chart" id="c-ep1"></div>
+    <p class="cap">Every 4 s of episode 1 (seed 1000), from <code>results/agents/{{meta.agent_set}}/episode_trace.json</code>, a committed extract of the per-step records; since 8 October it carries the manifold pressure, the knock integral, the coolant and the running damage and fuel as well as the actuators. The shaded span is the climb. The tooltip gives the baseline, current-grade and the median of each group of ten at that moment.</p>
+  </div>
+
+  <div class="fig" id="f-b6">
+    <div class="fig-head">
+      <div class="row"><h3>The agent that sometimes does worse than no protection</h3>
+        <div class="seg" role="group" aria-label="Series" id="seg-b6"></div>
+      </div>
+      <p class="take">{{pd.rec.b6.agent_name}} on its worst frozen episode ({{pd.rec.b6.episodes.worst.episode_n}}, life weighted {{pd.rec.b6.episodes.worst.w_life|.3f}}) and its best ({{pd.rec.b6.episodes.best.episode_n}}, {{pd.rec.b6.episodes.best.w_life|.3f}}), on the same road as current-grade, the comparing line. On the worst it retards spark once the climb starts, so it needs more air for the same torque, burns later and runs hotter: {{pd.rec.b6.episodes.worst.damage|.0f}} damage units against current-grade's {{pd.rec.b6.grade_damage|.0f}}, and {{pd.rec.b6.fuel_worst_vs_grade|+.1f}} % fuel against it ({{pd.rec.b6.fuel_worst_pct|+.1f}} % against the baseline). Its best episode costs {{pd.rec.b6.episodes.best.damage|.0f}}.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--crit)"><i class="lk"></i>worst episode</span>
+      <span style="color:var(--seq-hi)"><i class="lk"></i>best episode</span>
+      <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade</span>
+      <span style="color:var(--pd-react)"><i class="lk dash"></i>baseline ECU</span>
+    </div>
+    <div class="chart" id="c-b6"></div>
+    <p class="cap">Every 2 s, from <code>results/agents/{{meta.agent_set}}/bad_episode_trace.json</code> (<code>record_extracts.py</code>, a committed extract of the per-step records). The shaded span is the climb. Its knock integral stays well under the 0.85 knee on the worst episode, so the retard is not a knock response. Nor is it inexperience: {{tenv.wl.pct|.0f}} % of the training episodes weighted life this low (<a href="#f-tsteep">the weights</a>). It is learned behaviour that loses fuel and component life together (CLAUDE.md mistake 24).</p>
   </div>
 
   <div class="fig" id="f-trade">
@@ -447,6 +585,7 @@ html{scroll-behavior:smooth}
         <tr><td><a href="#f-boost">Manifold pressure under boost</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>median {{mc.boost.gap_sim|+.1f}} % against the car's boost channel</td></tr>
         <tr><td><a href="#f-enrich">Enrichment, λ</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>worst cell {{mc.enrich.worst|.3f}} lean, at 3500–4500 rpm and long dwell; the dwell thresholds are derived from the car since 28 Sep</td></tr>
         <tr><td><a href="#f-spark">Part-load spark</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>{{mc.spark.after.mean|+.2f}}° after the refit, was {{mc.spark.before.mean|+.1f}}°</td></tr>
+        <tr><td><a href="#f-sparkb">Spark under boost</a></td><td><span class="pill none"><i>○</i>untested</span></td><td>the car runs a median {{val.spark.med|+.2f}}° from the model's baseline over {{val.spark.n}} readings (standard error {{val.spark.se|.2f}}°), but only {{val.spark.climb_n}} in the climb's own cell; added 7 October</td></tr>
         <tr><td><a href="#f-th10">Oil and coolant, long drive</a></td><td><span class="pill good"><i>✓</i>agrees</span></td><td>oil {{mc.thermal.drive10.oil_med|+.1f}} K, coolant {{mc.thermal.drive10.ect_med|+.1f}} K median, since the thermal network was derived from the logs (drive10 is in the fit)</td></tr>
         <tr><td><a href="#f-th74">Oil on hard pulls</a></td><td><span class="pill warn"><i>◐</i>limited</span></td><td>the {{cal.pull.before|.0f}} °C spikes are gone: peak {{mc.thermal.7475b5d7.oil_peak_sim|.0f}} °C against the car's {{mc.thermal.7475b5d7.oil_peak_car|.0f}} °C; its coolant median sits {{mc.thermal.7475b5d7.ect_med|+.1f}} K from the car's</td></tr>
         <tr><td><a href="#f-knock">Knock</a></td><td><span class="pill none"><i>○</i>untested</span></td><td>correlation {{mc.knock.corr|+.2f}}, but on one reading every {{mc.knock_s.every_s|.0f}} s; drive C can test it</td></tr>
@@ -515,6 +654,21 @@ html{scroll-behavior:smooth}
     </div>
     <div class="chart" id="c-spark"></div>
     <p class="cap">{{mc.spark.n}} operating points, 30–75 kPa. Before, the line fitted to the car sat above the model's knock limit at every point, so the unvalidated knock model was setting part-load spark. Now the fitted line sets it at {{mc.spark.after.line_sets}} of {{mc.spark.n}} points. Only the offset changed ({{mc.spark.a_before|.2f}} to {{mc.spark.a_after|.2f}}); the slopes stayed, so the knock limit still sets spark in boost and the locked climb is unchanged.</p>
+  </div>
+
+  <div class="fig" id="f-sparkb">
+    <div class="fig-head">
+      <div class="row"><h3>Spark under boost</h3><span class="pill none"><i>○</i>untested</span></div>
+      <p class="take">Where the climb runs, the car's own spark sits below the model's baseline: a median of {{val.spark.med|+.2f}}° over {{val.spark.n}} genuine readings from {{val.spark.drives}} drives at 140–240 kPa. In the climb's own cell there are {{val.spark.climb_n}} readings ({{val.spark.climb|+.2f}}°), too few to label.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--car)"><i class="ld" style="background:currentColor"></i>the car, one reading each</span>
+      <span style="color:var(--sim)"><i class="lk"></i>the model's baseline ECU at the same point</span>
+      <span style="color:var(--ink-2)"><i class="lk dash"></i>median of the readings</span>
+    </div>
+    <div class="chart" id="c-sparkb"></div>
+    <p class="cap">Car spark minus what the model's baseline ECU commands at the same engine speed and manifold pressure (<code>car_spark_boost.py</code>), from {{val.spark.genuine|,}} genuine spark readings in the logs, of which {{val.spark.n}} fall under boost. A spark angle is read every few seconds in these logs, so a reading can land on a knock retard or a shift. The trained agents run {{pd.rec.trim_lo|.1f}}–{{pd.rec.trim_hi|.1f}}° past the baseline on the climb; if the car's own calibration sits below the baseline there, their margin is larger than the car would allow. Drive C settles it.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-sparkb"></div></details>
   </div>
 
   <div class="fig" id="f-th10">
@@ -641,10 +795,133 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
+<!-- ============================================================= VALIDATION -->
+<section id="validation">
+  <div class="sect-head">
+    <p class="eyebrow">Part 3 · how the simulator and the agents are judged</p>
+    <h2>Validation, recording and the damage formula</h2>
+    <p class="prose cap">Added 7–8 October. A plan for computing each comparison's label instead of reading it off a figure, the decisions it needs, what is recorded now, the agents in air they never trained in, and the damage formula constant by constant. Nothing here changed the simulator, the reward or the twenty frozen episodes.</p>
+  </div>
+
+  <div class="fig" id="f-dec">
+    <div class="fig-head">
+      <h3>Thirteen decisions, open</h3>
+      <p class="take">Each needs an answer from both people who decide, before anything that depends on it is computed. A required accuracy chosen after seeing the comparison would be tuning.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table class="score">
+        <thead><tr><th>#</th><th>Decision</th><th>Recommended</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Standards</td><td>ASME V&amp;V 20 for the comparisons; NASA-STD-7009B, free and current, for how far each use may lean on the model</td></tr>
+          <tr><td>2</td><td>Contexts of use</td><td>four, with the live app outside the thesis claim</td></tr>
+          <tr><td>3</td><td>Required accuracies</td><td>turbine-equivalent within 10 K, oil within 20 K, fixed before any label is computed</td></tr>
+          <tr><td>4</td><td>Label rules</td><td>in the order excluded, not covered, off, untested, validated, limited, at two standard uncertainties</td></tr>
+          <tr><td>5</td><td>Relative damage only</td><td>yes, with the minimum effect of interest restated as a share of the baseline's damage</td></tr>
+          <tr><td>6</td><td>Extrapolation</td><td>the twelve-minute hold is outside the data even where the operating point is inside it: say so on every such result</td></tr>
+          <tr><td>7</td><td>Preregistration</td><td>all of this, and 8–13, fixed in writing before the next training</td></tr>
+          <tr><td>8</td><td>Turbine scale</td><td>keep 45 K for the next training; report {{val.dc.creep|.1f}} K (creep rupture) beside it</td></tr>
+          <tr><td>9</td><td>Turbine knee</td><td>keep 850 °C; report {{val.dc.knees.930|.0f}} °C and {{val.dc.knees.1050|.0f}} °C, and the column without the knock term</td></tr>
+          <tr><td>10</td><td>Oil scale</td><td>keep 12 K; the 10 °C rule's {{val.dc.oil_rule|.1f}} K barely moves anything</td></tr>
+          <tr><td>11</td><td>Where the records live</td><td>out of git, backed up outside the repository after every run</td></tr>
+          <tr><td>12</td><td>Where the next agents train, and where they are checked</td><td>train on the extremes the car never reached (25–45 °C, a changing speed target, hills up to 18 %), so the agent knows them; check the trained agent on the logged drives, where the simulator is validated, so we know it trained correctly; hold out 50 °C and the steepest hills as a transfer test</td></tr>
+          <tr><td>13</td><td>The yardstick</td><td>count current-grade's torque shortfall on the new test set before any agent is scored</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">The sheet with both answer columns is <code>results/VALIDATION_DECISIONS.md</code>; the plan is <code>results/VALIDATION_PLAN.md</code>.</p>
+  </div>
+
+  <div class="fig" id="f-unc">
+    <div class="fig-head">
+      <h3>The uncertainty budget, as measured so far</h3>
+      <p class="take">V&amp;V 20 judges a comparison against its uncertainty: the model's numerical error, its inputs' and the measurement's. Two parts are measured. At the 1 s step this page uses, stepping the thermal model up to 50 times finer moves the published cut by {{val.ts.cut|.2f}} points; at the sweep's 2 s step the coolant swings {{val.ts.swing2|.1f}} K and a cut moves {{val.ts.cut2|.2f}}. And one resolution step of the car's spark channel ({{val.vn.res.spark}}°) moves the baseline's damage on the climb by {{val.vn.spark_up|+.0f}} or {{val.vn.spark_dn|+.0f}} units, about twice the minimum effect of interest ({{val.vn.mei|.0f}}).</p>
+    </div>
+    <div class="tbl-wrap" id="t-unum"></div>
+    <div class="tbl-wrap" id="t-sens" style="margin-top:14px"></div>
+    <p class="cap">The thermal step from <code>timestep_study.py</code>: the locked climb's baseline ECU, the thermal network sub-stepped inside each 1 s or 2 s step; the cut is current-grade's against the baseline. The input sensitivity from <code>validation_numbers.py</code>: the baseline on the climb with one input moved by one step of the channel that would measure it. A comparison that disagrees by less than these cannot be told from agreement.</p>
+  </div>
+
+  <div class="fig" id="f-rec">
+    <div class="fig-head">
+      <h3>What is recorded, step by step</h3>
+      <p class="take">One definition of a step, {{val.rec.fields}} fields, for every script that runs episodes: what the agent saw, asked for and got, what it was paid, the road and the gear, the engine, the heat, and the baseline ECU's car running beside it.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table class="score">
+        <thead><tr><th>Where episodes run</th><th>Recorded</th><th>Checked against</th></tr></thead>
+        <tbody>
+          <tr><td>Training (<code>train.py</code>)</td><td>every step, {{val.rec.train_fields}} fields, from the next run on</td><td>an agent trained with the recorder has the same weights as one trained without it</td></tr>
+          <tr><td>The twenty runs of 29 September</td><td>their roads, weights and actuators, regenerated from the seeds and the recorded actions</td><td>{{val.rec.reproduced}} of {{val.rec.runs}} runs, {{val.rec.steps|,}} steps: the torque request to {{val.rec.torque_err|.3f}} Nm, the reward rebuilt to {{val.rec.reward_err|.1e}}</td></tr>
+          <tr><td>The twenty frozen episodes</td><td>every policy, every step</td><td>each episode equals its committed score first</td></tr>
+          <tr><td>The knock margin and the conditions test</td><td>every step, every policy and condition</td><td>each episode equals its committed score first</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Records are binary and stay out of git; <code>show_record.py</code> draws any episode of any of them. The page reads only the small summaries that are committed.</p>
+  </div>
+
+  <div class="fig" id="f-cond">
+    <div class="fig-head">
+      <h3>The agents in air they never trained in</h3>
+      <p class="take">All twenty trained at 42 °C, sea-level pressure and a constant 130 km/h. Here the speed target changes mid-run, and each condition gets the hill on which the baseline ECU reaches the locked climb's own peak.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="ld" style="background:currentColor"></i>sighted, median of 10</span>
+      <span style="color:var(--pd-blind)"><i class="ld" style="background:currentColor"></i>blinded, median of 10</span>
+      <span style="color:var(--ink-2)"><i class="lk"></i>the range of all twenty</span>
+      <span style="color:var(--pd-grade)"><i class="lk"></i>current-grade, hand-written</span>
+    </div>
+    <div class="chart" id="c-cond"></div>
+    <p class="cap">Five frozen episodes per condition (<code>conditions_test.py</code>, a diagnostic beside the protocol). At 25 °C the hill is {{val.c25.grade|.2f}} % and the box runs in 5th at high engine speed, a regime the agents never met; {{val.c25.beat}} of {{val.c25.n}} beat current-grade. The two that do about twice the baseline's damage there, {{val.r25.0.name}} and {{val.r25.1.name}}, are the two that retard spark hardest on the climb ({{val.r25.0.spark|+.2f}}° and {{val.r25.1.spark|+.2f}}°, where most agents advance): their per-step records show the engine taking more air and burning later for the same torque, and the housing running hotter. In thin air the agents fall short of the torque asked for. Current-grade pulls boost on any grade, and on this profile it is itself short of torque for {{val.grade_short_lo|.0f}}–{{val.grade_short_hi|.0f}} of 719 steps in {{val.grade_short_n}} conditions, so there part of its cut is not protection. The ablation stays inconclusive in every condition.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-cond"></div></details>
+  </div>
+
+  <div class="fig" id="f-ctr">
+    <div class="fig-head">
+      <div class="row"><h3>The recorded episodes, condition by condition</h3>
+        <div class="seg" role="group" aria-label="Series" id="seg-ctr-k"></div>
+      </div>
+      <div class="seg" role="group" aria-label="Condition" id="seg-ctr-c" style="margin-top:8px"></div>
+      <p class="take">Frozen episode {{val.ctr.episode}} in each condition, step by step, from the per-step records: the speed target changes mid-run and the shaded span is the climb. Pick a condition and a series.</p>
+    </div>
+    <div class="legend">
+      <span style="color:var(--pd-sight)"><i class="lk"></i>sighted</span>
+      <span style="color:var(--pd-blind)"><i class="lk"></i>blinded</span>
+      <span style="color:var(--pd-base)"><i class="lk dash"></i>baseline ECU</span>
+      <span style="color:var(--pd-grade)"><i class="lk dash"></i>current-grade</span>
+    </div>
+    <div class="chart" id="c-ctr"></div>
+    <p class="cap">Every {{val.ctr.every_s}} s, from <code>results/conditions_traces.json</code> (<code>record_extracts.py</code>, a committed extract of the per-step records in <code>results/records/conditions/</code>). <code>show_record.py</code> draws any single record in full: the road, the gear, the engine, every actuator asked and applied, the heat beside the baseline's.</p>
+  </div>
+
+  <div class="fig" id="f-dc">
+    <div class="fig-head">
+      <h3>The damage formula, constant by constant</h3>
+      <p class="take">Damage per second = exp((T<sub>turbine</sub> − 1123 K)/45 K) + 0.4·exp((T<sub>oil</sub> − 408 K)/12 K) + 40·max(0, KI − 0.85)². Which of these numbers can anything set?</p>
+    </div>
+    <div class="tbl-wrap">
+      <table class="score">
+        <thead><tr><th>Constant</th><th>Status</th><th>What sets it</th></tr></thead>
+        <tbody>
+          <tr><td>turbine scale, 45 K</td><td><span class="pill good"><i>✓</i>calculable</span></td><td>for creep rupture, the Larson–Miller form gives {{val.dc.creep|.1f}} K ({{val.dc.creep_lo|.1f}}–{{val.dc.creep_hi|.1f}} K over lives of 10³–10⁵ h); 45 K would be oxidation with an activation energy of {{val.dc.q45|.0f}} kJ/mol, which no opened source gives for the housing's steel</td></tr>
+          <tr><td>turbine knee, 850 °C</td><td><span class="pill warn"><i>◐</i>bracketed</span></td><td>a housing temperature: the model's housing sits {{val.dc.r|.3f}} of the way from the gas to the air, so published gas limits land at {{val.dc.knees.900|.0f}} °C (900 °C, load spectra), {{val.dc.knees.930|.0f}} °C (930 °C, Conway 2018) and {{val.dc.knees.1050|.0f}} °C (1050 °C, cast-steel housings)</td></tr>
+          <tr><td>oil scale, 12 K</td><td><span class="pill warn"><i>◐</i>rule of thumb</span></td><td>"oxidation doubles every 10 °C" gives {{val.dc.oil_rule|.1f}} K; the rule is not universal</td></tr>
+          <tr><td>oil weight 0.4 and knee 408 K</td><td><span class="pill none"><i>·</i>valuation</span></td><td>one number, {{val.dc.oil_ref|.1f}} °C: what oil life is worth against the housing's</td></tr>
+          <tr><td>knock knee, 0.85</td><td><span class="pill none"><i>○</i>untested</span></td><td>drive C: where the car's own ECU starts to retard</td></tr>
+          <tr><td>knock weight 40, squared</td><td><span class="pill none"><i>·</i>valuation</span></td><td>no published law turns a knock integral into damage per second</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart" id="c-dc"></div>
+    <p class="cap">The twenty frozen episodes of all 24 policies re-scored from their per-step records (<code>damage_constants.py</code>). Every agent beats current-grade under every formula. The ablation's interval excludes zero only with the knee at {{val.dc.knees.1050|.0f}} °C ({{val.dc.knock.ablation_mean|+.2f}} points), where the turbine term shrinks until the untested knock term is a fifth to a third of the damage; without the knock term at the same knee it is back to inconclusive. That is the one-second knock spike at the grade step, post hoc, and not a preview result. The comparison that said the knee is "80 K more conservative" than a 930 °C limit set a housing against a gas temperature; like for like the knee is {{val.dc.gas_at_knee|.0f}} °C of gas.</p>
+    <details><summary>Show the numbers</summary><div class="tbl-wrap" id="t-dc"></div></details>
+  </div>
+</section>
+
 <!-- ================================================================= DRIVES -->
 <section id="drives">
   <div class="sect-head">
-    <p class="eyebrow">Part 3 · for the car</p>
+    <p class="eyebrow">Part 4 · for the car</p>
     <h2>Drives we need</h2>
     <p class="prose cap">Three drives, A to C; B is done, and since 29 September C matters most for Phase D and A for the thermal model. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
   </div>
@@ -715,12 +992,16 @@ html{scroll-behavior:smooth}
     <h2>What this page is not</h2>
   </div>
   <div class="caveats">
-    <div class="cav"><h3>Phase D's first run, not its last</h3><p>The {{pd.agents.n}} agents trained on 29 September at 130 km/h on a new road every episode, at dt 1.0, on the plant derived from the logs. Still open, and each would change the plant and so need a retrain: the boost ceiling low at 1600–2000 rpm, and drive A. The team retrains after every drive. The fuel is settled: 95 RON, what the model runs.</p></div>
+    <div class="cav"><h3>Phase D's first run, not its last</h3><p>The {{pd.agents.n}} agents trained on 29 September at 130 km/h on a new road every episode, at dt 1.0, on the plant derived from the logs. Before the next training, agreed on 30 September: step the thermal model more finely, fingerprint the derived constants, cap the spark trim at zero, ramp every grade change, and preregister. Thirteen decisions are open beside them (<a href="#f-dec">Validation</a>). Still open, and each would change the plant: the boost ceiling low at 1600–2000 rpm, and drive A. The fuel is settled: 95 RON, what the model runs.</p></div>
+    <div class="cav"><h3>Trained for one climate</h3><p>Every agent trained at 42 °C, at sea-level pressure and at 130 km/h. In cooler air on a steep hill some retard spark and do about twice the baseline's damage, and in thin air their torque delivery breaks down (<a href="#f-cond">the conditions</a>). Read every result on this page as a result in the air they trained in.</p></div>
     <div class="cav"><h3>Hand-written rows are one rollout</h3><p>They do not read the preference weights, so their zero spread is structural. It is not a sign of stability.</p></div>
     <div class="cav"><h3>Turbine temperature is modelled</h3><p>No sensor on this car reads it. Its heat capacity, <code>c_turb</code> = 6000 J/K, is assumed, and it sets τ, the denominator of the claim.</p></div>
     <div class="cav"><h3>Altitude is not modelled</h3><p>The scored climb rises {{pd.elev.climb_m|,}} m, but the engine breathes sea-level air ({{pd.elev.p_model}} kPa) the whole way; a standard atmosphere would give about {{pd.elev.isa_kpa|.0f}} kPa at the top. Read the scenario as sustained heavy load at sea level, not as a mountain.</p></div>
     <div class="cav"><h3>One workaround, stated</h3><p>When the modelled engine falls short of the torque asked for, the gearbox kicks down. Drive B showed the ceiling is still too low at 1600–2000 rpm, so the model runs a gear lower there than the car may need. There is no torque channel to settle it, so the workaround stays. The locked climb runs above that band.</p></div>
     <div class="cav"><h3>The H/τ sweep is hand-written</h3><p>It shows preview worth nothing over current-grade, but a hand-written predictive policy cannot do anything current-grade does not. It neither confirms nor refutes the criterion; only the trained pair can.</p></div>
+    <div class="cav"><h3>The thermal model needs a smaller step</h3><p>Found on 30 September and measured on 7 October. With the constants derived from the logs the coolant node is numerically stiff: at the 1 s step it swings about {{val.ts.swing1|.0f}} K back and forth from one step to the next on the climb, though what this page publishes moves by {{val.ts.cut|.2f}} points of cut at most; at the sweep's 2 s step it swings {{val.ts.swing2|.0f}} K and a cut moves {{val.ts.cut2|.2f}} points, so no H/τ sweep figure is quotable. The per-step records show the swing whenever the coolant pump runs near full duty, and the agents see it, since the coolant is one of their inputs. The fix, stepping the thermal model more finely inside each step, is agreed and not yet made.</p></div>
+    <div class="cav"><h3>The records live on one laptop</h3><p>Every step of training and of every test is recorded, but the records are large and kept out of the repository; this page draws small committed extracts of them. Backing them up is decision 11.</p></div>
+    <div class="cav"><h3>Not on this page</h3><p>Three earlier experiments by the same team (Phase D, D2 and C4), on the simulator as it stood before 28 September. Each was preregistered, and they are reported separately. None of them settled the preview question either.</p></div>
   </div>
 
   <footer>
@@ -732,9 +1013,18 @@ python check_roads.py           # the training roads
 python model_vs_data.py         # the comparisons against the car
 python compare_calibration.py   # the 28 September derivation, before and after
 python generality_test.py       # the H/tau sweep
+python knock_margin.py          # the agents with spark advance forbidden
+python conditions_test.py --resume-all   # the agents in other air, every step recorded, ~4 h
+python car_spark_boost.py       # the car's spark under boost against the model
+python timestep_study.py        # the thermal step's convergence
+python validation_numbers.py    # what one resolution step of each input moves
+python damage_robustness.py     # the frozen episodes under nine damage rulers
+python damage_constants.py      # every damage constant: what can set it
+python training_roads.py runs/terrain_dt1   # the 29 Sep training roads, regenerated
+python record_extracts.py       # the small extracts of the records this page draws
 python make_figures.py          # thesis PNGs, results/figures/
 python make_page.py             # this page</pre>
-    <p style="margin-top:12px">Branch {{meta.branch}} at {{meta.commit}}. Every number in the text is filled from the same data as the charts.</p>
+    <p style="margin-top:12px">Built from commit {{meta.commit}}. Every number in the text is filled from the same data as the charts.</p>
   </footer>
 </section>
 </main>
@@ -1069,7 +1359,8 @@ mount("c-eval", (host, w) => {
   const P = plot(host, { w, h, x: { d: [0, xmax], label: "median episode damage" },
     y: { d: [E.length, 0], none: true }, m: { l: lw, t: 6, r: 10 } });
   const y = i => P.m.t + (i + 0.5) * rowH;
-  vline(P, PD.base_med, { c: "var(--crit)" });
+  const CG = E.find(e => e.name === "current-grade");
+  vline(P, CG.med, { c: "var(--pd-grade)", w: 2 });
   E.forEach((e, i) => {
     const c = kindCol(e);
     const label = narrow(w) ? shortName(e.name).replace(" (hand)", "") : shortName(e.name);
@@ -1081,35 +1372,42 @@ mount("c-eval", (host, w) => {
       for (const q of [e.q1, e.q3]) S("line", { x1: P.x(q), x2: P.x(q), y1: y(i) - 5, y2: y(i) + 5, style: "stroke:var(--ink);stroke-width:1.6" }, P.g);
     }
     T(P.top, P.x(Math.max(e.med, e.q3)) + 7, y(i) + 4,
-      narrow(w) ? `${f(e.cut, 1)} %` : `${f(e.med, 0)} · cuts ${f(e.cut, 1)} %`,
+      narrow(w) ? `${f(e.over_grade, 1, true)} pts` : `${f(e.med, 0)} · ${f(e.over_grade, 1, true)} pts`,
       { class: "lbl", style: "fill:var(--ink)" });
     markTip(P, bar, P.x(e.med), y(i), e.name, [
       { c, v: f(e.med, 1), k: "median damage" },
       { v: `${f(e.q1, 0)}–${f(e.q3, 0)}`, k: "interquartile range" },
+      { v: f(e.over_grade, 1, true) + " pts", k: "cut over current-grade" },
+      { v: f(e.fuel_vs_grade, 1, true) + " %", k: "fuel vs current-grade" },
       { v: f(e.cut, 1) + " %", k: "cut vs baseline" },
-      { v: f(e.fuel_pct, 1, true) + " %", k: "fuel vs baseline" },
       { v: f(e.peak, 0) + " °C", k: "hottest episode" }]);
   });
-  T(P.top, P.x(PD.base_med) - 4, P.H - P.m.b - 6, "baseline", { class: "lbl", style: "fill:var(--crit)", "text-anchor": "end" });
+  T(P.top, P.x(CG.med) + 4, P.H - P.m.b - 6, "current-grade", { class: "lbl", style: "fill:var(--pd-grade)" });
 }, () => 0);
 
 mount("c-abl", (host, w) => {
-  const A = PD.ablation;
+  const A = PD.ablation, G = A.grade_cut;
   const grp = 58, h = A.seeds.length * grp + 50;
   const lw = 58;
-  const xmax = Math.max(...A.seeds.map(s => Math.max(s.s, s.b))) * (narrow(w) ? 1.36 : 1.24);
-  const P = plot(host, { w, h, x: { d: [0, xmax], label: "damage cut vs baseline (%)" },
-    y: { d: [1, 0], none: true }, m: { l: lw, t: 8, r: 10 } });
-  vline(P, A.grade_cut, { c: "var(--pd-grade)", w: 2 });
+  // Measured from current-grade, the comparing line (8 October): 0 is current-grade.
+  const m = A.seeds.flatMap(s => [s.s - G, s.b - G]);
+  const xmin = Math.min(0, ...m), xmax = Math.max(0, ...m) * (narrow(w) ? 1.36 : 1.24);
+  const P = plot(host, { w, h, x: { d: [xmin, xmax], label: "damage cut over current-grade (points)" },
+    y: { d: [1, 0], none: true }, m: { l: lw, t: 18, r: 10 } });
+  vline(P, 0, { c: "var(--pd-grade)", w: 2 });
+  T(P.top, P.x(0) + 5, P.m.t - 6, "current-grade", { class: "lbl", style: "fill:var(--pd-grade)" });
   A.seeds.forEach((s, i) => {
     const y0 = P.m.t + i * grp + 8;
     T(P.svg, lw - 8, y0 + 22, "seed " + s.seed, { "text-anchor": "end", style: "fill:var(--ink-2)" });
     [["s", "var(--pd-sight)", "sighted", 0], ["b", "var(--pd-blind)", "blinded", 20]].forEach(([k, c, nm, dy]) => {
-      const r = S("rect", { x: P.x(0), y: y0 + dy, width: P.x(s[k]) - P.x(0), height: 18, rx: 3, style: `fill:${c}` }, P.g);
-      markTip(P, r, P.x(s[k]), y0 + dy + 9, `seed ${s.seed}, ${nm}`,
-        [{ c, v: f(s[k], 1) + " %", k: "damage cut" }, { v: f(s.d, 1, true) + " pts", k: "sighted minus blinded" }]);
+      const v = s[k] - G;
+      const r = S("rect", { x: P.x(Math.min(0, v)), y: y0 + dy, width: Math.abs(P.x(v) - P.x(0)), height: 18, rx: 3,
+                            style: `fill:${c}` }, P.g);
+      markTip(P, r, P.x(v), y0 + dy + 9, `seed ${s.seed}, ${nm}`,
+        [{ c, v: f(v, 1, true) + " pts", k: "over current-grade" }, { v: f(s[k], 1) + " %", k: "damage cut vs baseline" },
+         { v: f(s.d, 1, true) + " pts", k: "sighted minus blinded" }]);
     });
-    T(P.top, P.x(Math.max(s.s, s.b)) + 8, y0 + 23, f(s.d, 1, true) + " pts",
+    T(P.top, P.x(Math.max(0, s.s - G, s.b - G)) + 8, y0 + 23, f(s.d, 1, true) + " pts",
       { class: "lbl", style: "fill:var(--ink);font-weight:600" });
   });
 }, () => 0);
@@ -1117,26 +1415,27 @@ mount("c-abl", (host, w) => {
 mount("c-trade", (host, w, h) => {
   const E = PD.eval;
   const by = n => E.find(e => e.name === n);
-  const xs = E.map(e => e.fuel_pct), ys = E.map(e => e.cut);
+  // Both axes from current-grade, the comparing line (8 October): it sits at 0, 0.
+  const xs = E.map(e => e.fuel_vs_grade), ys = E.map(e => e.over_grade);
   const P = plot(host, { w, h,
-    x: { d: [Math.floor(Math.min(...xs) - 2), Math.ceil(Math.max(...xs) + 2)], label: "extra fuel vs baseline (%)" },
-    // 29 Sep: sized from the data. A fixed 80 clipped sighted seed 2 (83.9 %).
-    y: { d: [-6, Math.max(80, Math.ceil(Math.max(...ys) / 10) * 10 + 5)], label: "damage cut vs baseline (%)" }, m: { l: 50 } });
-  vline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
-  hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "3 3" });
+    x: { d: [Math.floor(Math.min(...xs) - 2), Math.ceil(Math.max(...xs) + 2)], label: "fuel against current-grade (%)" },
+    y: { d: [Math.floor(Math.min(...ys) / 10) * 10 - 4, Math.ceil(Math.max(...ys) / 10) * 10 + 5],
+         label: "damage cut over current-grade (points)" }, m: { l: 50 } });
+  vline(P, 0, { c: "var(--pd-grade)", w: 1.2, dash: "3 3" });
+  hline(P, 0, { c: "var(--pd-grade)", w: 1.2, dash: "3 3" });
   // Every seed the data holds (29 Sep: this looped over five). Seed labels on
   // the chart only while there are few enough to read; the tooltip names each.
   const seeds = PD.ablation.seeds.map(x => x.seed);
   for (const s of seeds) {
     const a = by("sighted_seed" + s), b = by("blind_seed" + s);
     if (!a || !b) continue;
-    S("line", { x1: P.x(a.fuel_pct), y1: P.y(a.cut), x2: P.x(b.fuel_pct), y2: P.y(b.cut),
+    S("line", { x1: P.x(a.fuel_vs_grade), y1: P.y(a.over_grade), x2: P.x(b.fuel_vs_grade), y2: P.y(b.over_grade),
                 style: "stroke:var(--ink-3);stroke-width:1.4" }, P.g);
     if (seeds.length <= 5)
-      T(P.top, (P.x(a.fuel_pct) + P.x(b.fuel_pct)) / 2, (P.y(a.cut) + P.y(b.cut)) / 2 + (s === 1 || s === 2 ? -12 : 20),
+      T(P.top, (P.x(a.fuel_vs_grade) + P.x(b.fuel_vs_grade)) / 2, (P.y(a.over_grade) + P.y(b.over_grade)) / 2 + 20,
         "seed " + s, { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-2)" });
   }
-  const pts = E.map(e => ({ x: e.fuel_pct, y: e.cut, e }));
+  const pts = E.map(e => ({ x: e.fuel_vs_grade, y: e.over_grade, e }));
   for (const p of pts) {
     const c = kindCol(p.e);
     if (p.e.kind === "hand") S("rect", { x: P.x(p.x) - 6, y: P.y(p.y) - 6, width: 12, height: 12,
@@ -1148,12 +1447,13 @@ mount("c-trade", (host, w, h) => {
     const dy = n === "current-grade" ? -12 : n === "predictive (hand)" ? 20 : 20;
     const anchor = n === "current-grade" ? "end" : n === "predictive (hand)" ? "start" : "middle";
     const dx = n === "current-grade" ? -4 : n === "predictive (hand)" ? 4 : 0;
-    T(P.top, P.x(e.fuel_pct) + dx, P.y(e.cut) + dy, n.replace(" (hand)", ""),
+    T(P.top, P.x(e.fuel_vs_grade) + dx, P.y(e.over_grade) + dy, n.replace(" (hand)", ""),
       { class: "lbl", "text-anchor": anchor, style: `fill:${PCOL[n]}` });
   }
   nearest(P, pts, p => ({ title: p.e.name, rows: [
-    { c: kindCol(p.e), v: f(p.y, 1) + " %", k: "damage cut" },
-    { v: f(p.x, 1, true) + " %", k: "fuel vs baseline" }] }));
+    { c: kindCol(p.e), v: f(p.y, 1, true) + " pts", k: "cut over current-grade" },
+    { v: f(p.x, 1, true) + " %", k: "fuel against current-grade" },
+    { v: `${f(p.e.cut, 1)} % · ${f(p.e.fuel_pct, 1, true)} %`, k: "cut and fuel vs baseline" }] }));
 });
 
 mount("c-curves", (host, w, h) => {
@@ -1323,6 +1623,32 @@ mount("c-spark", (host, w) => {
     { c: "var(--third)", v: f(q.p[1], 1) + "°", k: "before the refit" },
     { c: "var(--sim)", v: f(q.p[2], 1) + "°", k: "as shipped" }] }), 20);
 }, w => Math.min(w, 480));
+
+// 7 October: the car's spark under boost against the model's baseline ECU at
+// the same engine speed and manifold pressure (car_spark_boost.py).
+mount("c-sparkb", (host, w, h) => {
+  const SB = D.val.spark, R = SB.readings;
+  const d = R.map(r => r.car - r.model);
+  const lo = Math.min(-2, ...d), hi = Math.max(2, ...d), pad = (hi - lo) * 0.06;
+  const P = plot(host, { w, h, x: { d: [138, 242], label: "manifold pressure (kPa)" },
+    y: { d: [lo - pad, hi + pad], label: "car minus model (°)" }, m: { l: 52 } });
+  hline(P, 0, { c: "var(--sim)", w: 1.8, dash: "none", label: "the model's baseline" });
+  hline(P, SB.med, { c: "var(--ink-2)", w: 1.2, dash: "5 4", label: `median ${f(SB.med, 2, true)}°`, below: true, right: true });
+  const pts = [];
+  R.forEach((r, i) => {
+    S("circle", { cx: P.x(r.map), cy: P.y(d[i]), r: 4.5, style: "fill:var(--car);stroke:var(--surface);stroke-width:1.4;opacity:.9" }, P.g);
+    pts.push({ x: r.map, y: d[i], r });
+  });
+  nearest(P, pts, q => ({ title: `${q.r.src}, ${f(q.r.rpm, 0)} rpm, ${f(q.r.map, 0)} kPa`, rows: [
+    { c: "var(--car)", v: f(q.r.car, 2) + "°", k: "car" },
+    { c: "var(--sim)", v: f(q.r.model, 2) + "°", k: "model's baseline" },
+    { v: f(q.r.car - q.r.model, 2, true) + "°", k: "car minus model" },
+    { v: f(q.r.amb, 1) + " °C", k: "ambient" }] }), 20);
+});
+table("t-sparkb", ["cell", "readings", "drives", "car °", "model °", "car − model", "IQR", "standard error"],
+  D.val.spark.cells.map(c => [c.name, String(c.readings), String(c.drives), f(c.car_median, 2), f(c.model_median, 2),
+                              f(c.diff_median, 2, true), `${f(c.diff_q1, 1, true)} to ${f(c.diff_q3, 1, true)}`,
+                              f(c.diff_se, 2)]), [1, 2, 3, 4, 5, 6, 7]);
 
 function thermal(id, drive, key, label) {
   mount(id, (host, w) => {
@@ -1602,6 +1928,424 @@ table("t-h2b", ["C, J/K", "τ s", "H/τ", "limit K", "reactive %", "current-grad
 table("t-boostB", ["rpm", "readings", "car, highest kPa", "derived ceiling", "", "8 Sep formula", ""],
   CAL.boost.bands.map(b => [`${b.lo}–${b.lo + 200}`, String(b.n), f(b.car, 1), f(b.now, 1), f(b.now_pct, 1, true) + " %",
                             f(b.before, 1), f(b.before_pct, 1, true) + " %"]), [1, 2, 3, 4, 5, 6]);
+
+// ================================== 30 September: the agents' actions, and the knock margin
+// A segmented control that redraws one chart. Each button is a real <button>
+// with aria-pressed, so it works from the keyboard and reads to a screen reader.
+function segButtons(boxId, items, get, set, chartId) {
+  const box = document.getElementById(boxId);
+  items.forEach(([key, label]) => {
+    const b = H("button", { type: "button", "aria-pressed": String(key === get()), text: label }, box);
+    b.addEventListener("click", () => {
+      set(key);
+      box.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      render(charts.find(c => c.host.id === chartId), true);
+    });
+  });
+}
+const REC = PD.rec;
+const polCol = a => a.kind === "sighted" ? "var(--pd-sight)" : a.kind === "blinded" ? "var(--pd-blind)"
+  : a.name === "current-grade" ? "var(--pd-grade)" : "var(--pd-base)";
+
+mount("c-km", (host, w) => {
+  const K = REC.km_agents, G = REC.km.grade;
+  const rowH = 24, lw = narrow(w) ? 76 : 110, h = K.length * rowH + 16 + 42 + 4;   // rows + top + axis
+  // Measured from current-grade, the comparing line (8 October): 0 is current-grade.
+  const xs = K.flatMap(k => [k.cut - G, k.cut_orig - G]);
+  const xmin = Math.floor(Math.min(0, ...xs) / 5) * 5 - 2, xmax = Math.ceil(Math.max(0, ...xs) / 5) * 5 + 2;
+  const P = plot(host, { w, h, x: { d: [xmin, xmax], label: "median damage cut over current-grade (points)" },
+    y: { d: [1, 0], none: true }, m: { l: lw, t: 16, r: 12 } });
+  vline(P, 0, { c: "var(--pd-grade)", w: 1.6 });
+  T(P.top, P.x(0) + 5, P.m.t - 4, "current-grade", { class: "lbl", style: "fill:var(--pd-grade)" });
+  K.forEach((k, i) => {
+    const y = P.m.t + (i + 0.5) * rowH;
+    const c = k.preview ? "var(--pd-sight)" : "var(--pd-blind)";
+    T(P.svg, lw - 8, y + 4, shortName(k.name), { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    S("line", { x1: P.x(k.cut - G), x2: P.x(k.cut_orig - G), y1: y, y2: y, style: "stroke:var(--ink-3);stroke-width:1.6" }, P.g);
+    S("circle", { cx: P.x(k.cut_orig - G), cy: y, r: 5.5, style: `fill:${c};stroke:var(--surface);stroke-width:1.5` }, P.g);
+    S("circle", { cx: P.x(k.cut - G), cy: y, r: 5, style: `fill:var(--surface);stroke:${c};stroke-width:2` }, P.g);
+    const hit = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
+    markTip(P, hit, P.x(k.cut_orig - G), y, k.name, [
+      { c, v: f(k.cut_orig - G, 1, true) + " pts", k: "over current-grade, as trained" },
+      { c, v: f(k.cut - G, 1, true) + " pts", k: "over current-grade, advance forbidden" },
+      { v: `${f(k.cut_orig, 1)} → ${f(k.cut, 1)} %`, k: "cut vs baseline" },
+      { v: f(k.ki, 2), k: "knock integral p95, climb" }]);
+  });
+}, () => 0);
+
+// The action space's own ranges (engine_env.ACT_LO / ACT_HI): what defines the
+// experiment, so written as itself.
+const ACT = [["spark", "Spark", "spark trim, past the baseline (°)", [-8, 4], 2],
+             ["lam", "Lambda", "lambda trim (negative is richer)", [-0.15, 0.06], 3],
+             ["boost", "Boost", "boost trim (kPa)", [-40, 15], 1],
+             ["fan", "Fan", "fan duty", [0, 1], 2],
+             ["pump", "Pump", "coolant pump duty", [0.3, 1], 2]];
+let actSel = "spark";
+mount("c-act", (host, w) => {
+  const A = REC.actions, N = REC.neutral;
+  const [key, , label, dom, dp] = ACT.find(a => a[0] === actSel);
+  const rowH = 22, lw = narrow(w) ? 84 : 118, h = A.length * rowH + 6 + 42 + 4;    // rows + top + axis
+  const P = plot(host, { w, h, x: { d: dom, label }, y: { d: [1, 0], none: true }, m: { l: lw, t: 6, r: 14 } });
+  // current-grade's own setting is the comparing line (8 October); the
+  // baseline's, the trims' zero, stays as a faint second line
+  const CGs = REC.cg_setting[key];
+  vline(P, N[key], { c: "var(--pd-react)", w: 1, dash: "2 3" });
+  vline(P, CGs, { c: "var(--pd-grade)", w: 1.6, dash: "5 4" });
+  A.forEach((a, i) => {
+    const y = P.m.t + (i + 0.5) * rowH;
+    const c = polCol(a);
+    const [p5, p50, p95] = a[key];
+    T(P.svg, lw - 8, y + 4, shortName(a.name), { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    S("line", { x1: P.x(p5), x2: P.x(Math.max(p95, p5)), y1: y, y2: y,
+                style: `stroke:${c};stroke-width:3;stroke-linecap:round;opacity:.5` }, P.g);
+    S("circle", { cx: P.x(p50), cy: y, r: 4.5, style: `fill:${c};stroke:var(--surface);stroke-width:1.5` }, P.g);
+    const hit = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
+    markTip(P, hit, P.x(p50), y, a.name, [
+      { c, v: f(p50, dp), k: "median on the climb" },
+      { v: `${f(p5, dp)} to ${f(p95, dp)}`, k: "5th to 95th percentile" },
+      { v: f(CGs, dp), k: "current-grade's setting" },
+      { v: f(N[key], dp), k: "the baseline's setting" }]);
+  });
+}, () => 0);
+segButtons("seg-act", ACT.map(a => [a[0], a[1]]), () => actSel, k => { actSel = k; }, "c-act");
+
+const EPS = [["turb", "Turbine", "turbine housing (°C)", 1, " °C"], ["spark", "Spark", "spark trim (°)", 2, "°"],
+             ["lam", "Lambda", "lambda trim", 3, ""], ["boost", "Boost", "boost trim (kPa)", 1, " kPa"],
+             ["fan", "Fan", "fan duty", 2, ""], ["pump", "Pump", "coolant pump duty", 2, ""],
+             // recorded since 7 October (step_record.py)
+             ["map", "Pressure", "manifold pressure (kPa)", 1, " kPa"], ["ki", "Knock", "knock integral", 2, ""],
+             ["coolant", "Coolant", "coolant (°C)", 1, " °C"], ["dmg", "Damage", "damage so far", 0, ""],
+             ["fuel", "Fuel", "fuel so far (g)", 0, " g"]]
+  .filter(e => REC.ep1.policies["baseline ECU"][e[0]]);
+let epSel = "turb";
+mount("c-ep1", (host, w, h) => {
+  const E = REC.ep1, t = E.t, tEnd = t[t.length - 1];
+  const [key, , label, dp, unit] = EPS.find(e => e[0] === epSel);
+  const pols = Object.entries(E.policies);
+  const all = pols.flatMap(([, p]) => p[key]);
+  let lo = Math.min(...all), hi = Math.max(...all);
+  if (key === "turb") hi = Math.max(hi, 870);
+  const pad = (hi - lo) * 0.06 || 1;
+  const P = plot(host, { w, h, x: { d: [0, tEnd], label: "time into episode 1 (s)" },
+    y: { d: [lo - pad, hi + pad], label }, m: { l: 52 } });
+  const c0 = t[E.grade.findIndex(g => g > 0)];
+  S("rect", { x: P.x(c0), y: P.m.t, width: P.x(tEnd) - P.x(c0), height: P.ph, style: "fill:var(--band)" }, P.g);
+  // label on the left: before the climb the turbine is near 400 C, so the
+  // left end of the trigger line is the only stretch with no traces under it
+  if (key === "turb") hline(P, 850, { c: "var(--crit)", w: 1, label: narrow(w) ? "850 °C" : "850 °C trigger", below: true });
+  pols.filter(([, p]) => p.kind !== "hand").forEach(([, p]) =>
+    line(P, t, p[key], { c: p.kind === "sighted" ? "var(--pd-sight)" : "var(--pd-blind)", w: 1.1, op: 0.55 }));
+  line(P, t, E.policies["baseline ECU"][key], { c: "var(--pd-base)", w: 2, dash: "6 4" });
+  line(P, t, E.policies["current-grade"][key], { c: "var(--pd-grade)", w: 2, dash: "6 4" });
+  const med = kind => t.map((_, i) => {
+    const v = pols.filter(([, p]) => p.kind === kind).map(([, p]) => p[key][i]).sort((a, b) => a - b);
+    return v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+  });
+  const fmt = v => f(v, dp) + unit;
+  crosshair(P, t, [
+    { name: "baseline ECU", ys: E.policies["baseline ECU"][key], c: "var(--pd-base)", f: fmt },
+    { name: "current-grade", ys: E.policies["current-grade"][key], c: "var(--pd-grade)", f: fmt },
+    { name: "sighted, median of 10", ys: med("sighted"), c: "var(--pd-sight)", f: fmt },
+    { name: "blinded, median of 10", ys: med("blinded"), c: "var(--pd-blind)", f: fmt }], v => `${v} s`);
+});
+segButtons("seg-ep1", EPS.map(e => [e[0], e[1]]), () => epSel, k => { epSel = k; }, "c-ep1");
+
+// 8 October: blinded seed 6 on its worst and its best frozen episode, beside the baseline.
+const B6S = [["spark", "Spark", "spark trim (°)", 2, "°"], ["map", "Pressure", "manifold pressure (kPa)", 1, " kPa"],
+             ["turb", "Turbine", "turbine housing (°C)", 1, " °C"], ["ki", "Knock", "knock integral", 2, ""],
+             ["fuel", "Fuel", "fuel so far (g)", 0, " g"], ["dmg", "Damage", "damage so far", 0, ""]];
+let b6Sel = "spark";
+mount("c-b6", (host, w, h) => {
+  const E = REC.b6, t = E.t, tEnd = t[t.length - 1];
+  const [key, , label, dp, unit] = B6S.find(e => e[0] === b6Sel);
+  const W = E.episodes.worst, Bt = E.episodes.best, Z = E.baseline, G = E.current_grade;
+  const all = [...W[key], ...Bt[key], ...Z[key], ...G[key]];
+  let lo = Math.min(...all), hi = Math.max(...all);
+  if (key === "turb") hi = Math.max(hi, 870);
+  if (key === "ki") hi = Math.max(hi, 0.9);
+  const pad = (hi - lo) * 0.06 || 1;
+  const P = plot(host, { w, h, x: { d: [0, tEnd], label: "time into the episode (s)" },
+    y: { d: [lo - pad, hi + pad], label }, m: { l: 52 } });
+  const c0 = t[E.grade.findIndex(g => g > 0)];
+  S("rect", { x: P.x(c0), y: P.m.t, width: P.x(tEnd) - P.x(c0), height: P.ph, style: "fill:var(--band)" }, P.g);
+  if (key === "turb") hline(P, 850, { c: "var(--crit)", w: 1, label: "850 °C", below: true });
+  if (key === "ki") hline(P, 0.85, { c: "var(--crit)", w: 1, label: "0.85, the knee", below: true });
+  line(P, t, Z[key], { c: "var(--pd-react)", w: 1.2, dash: "4 4" });
+  line(P, t, G[key], { c: "var(--pd-grade)", w: 2, dash: "6 4" });
+  line(P, t, Bt[key], { c: "var(--seq-hi)", w: 1.8 });
+  line(P, t, W[key], { c: "var(--crit)", w: 1.8 });
+  const fmt = v => f(v, dp) + unit;
+  crosshair(P, t, [
+    { name: `worst, episode ${W.episode + 1}`, ys: W[key], c: "var(--crit)", f: fmt },
+    { name: `best, episode ${Bt.episode + 1}`, ys: Bt[key], c: "var(--seq-hi)", f: fmt },
+    { name: "current-grade", ys: G[key], c: "var(--pd-grade)", f: fmt },
+    { name: "baseline ECU", ys: Z[key], c: "var(--pd-react)", f: fmt }], v => `${v} s`);
+});
+segButtons("seg-b6", B6S.map(e => [e[0], e[1]]), () => b6Sel, k => { b6Sel = k; }, "c-b6");
+
+// 8 October: the environment the twenty agents trained in (training_env.json).
+const TE = D.tenv;
+const FAMS = { locked: "L", single: "S", rolling: "R", double: "D", flat: "F" };
+// As engine_env.make_terrain draws each kind of road.
+const FAM_TEXT = {
+  locked: ["the locked climb", "flat to 180 s, then 12 % to the end: the road the protocol scores on"],
+  single: ["one climb", "flat for 60–360 s, one climb of 4–14 % for 180 s or more, then −3 to +1 %"],
+  rolling: ["rolling hills", "hills and dips of 40–150 s each, −3 to +10 %"],
+  double: ["two climbs", "flat for 40–200 s, a climb of 6–14 % for 90–240 s, −3 to +2 % for 60–180 s, then a second climb of 6–14 %"],
+  flat: ["flat", "−1 to +1 % throughout"] };
+const gradeCol = g => mix((g + 3) / 17);
+let teSeed = 0;
+mount("c-tenv", (host, w) => {
+  const E = TE.seeds[teSeed].episodes;
+  const rowH = narrow(w) ? 7 : 8, lw = 26, top = 40;
+  const h = E.length * rowH + top + 42 + 4;
+  const P = plot(host, { w, h, x: { d: [0, TE.env.duration_s], label: "time into the episode (s)" },
+    y: { d: [1, 0], none: true }, m: { l: lw, t: top, r: 12 } });
+  // the colour scale, as a strip above the roads
+  const lgW = Math.min(260, P.pw * 0.7), lgX = P.m.l;
+  for (let i = 0; i < 34; i++)
+    S("rect", { x: lgX + i * lgW / 34, y: 4, width: lgW / 34 + 0.6, height: 9, style: `fill:${gradeCol(-3 + i * 0.5)}` }, P.top);
+  [-3, 0, 4, 8, 12].forEach(g => T(P.top, lgX + (g + 3) / 17 * lgW, 26, `${g > 0 ? "+" : ""}${g} %`,
+    { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-2)" }));
+  T(P.top, lgX + lgW + 8, 13, narrow(w) ? "grade" : `grade, up to +${f(TE.env.grade_max_pct, 0)} %`, { class: "lbl", style: "fill:var(--ink-2)" });
+  E.forEach((e, i) => {
+    const y = P.m.t + i * rowH;
+    for (const [a, b, g] of e.seg)
+      S("rect", { x: P.x(a), y, width: Math.max(0.6, P.x(b) - P.x(a)), height: rowH - 1, style: `fill:${gradeCol(g)}` }, P.g);
+    T(P.svg, lw - 5, y + rowH - 1, FAMS[e.family] || "?", { "text-anchor": "end", style: `fill:var(--ink-2);font-size:${rowH + 1}px` });
+  });
+  const hit = S("rect", { x: P.m.l, y: P.m.t, width: P.pw, height: E.length * rowH, style: "fill:transparent" }, P.top);
+  onPointer(hit, ev => {
+    const [px, py] = localXY(P, ev);
+    const i = Math.max(0, Math.min(E.length - 1, Math.floor((py - P.m.t) / rowH)));
+    const e = E[i], t = Math.max(0, Math.min(e.steps - 1, Math.round(P.x.inv(px))));
+    const s = e.seg.find(([a, b]) => t >= a && t < b) || e.seg[e.seg.length - 1];
+    showTip(host, px, py, `seed ${teSeed}, episode ${i + 1}: ${FAM_TEXT[e.family][0]}`, [
+      { c: gradeCol(s[2]), v: `${f(s[2], 1, true)} %`, k: `grade at ${t} s` },
+      { v: `${f(e.max_pct, 1)} %`, k: "steepest" },
+      { v: `${e.climb_s} s`, k: "at 4 % or more" },
+      { v: `${f(e.rise_m, 0)} m`, k: "climbed" },
+      { v: f(e.w_life, 3), k: "weight on component life" }]);
+  }, () => hideTip(host));
+}, w => 0);
+segButtons("seg-tenv", TE.seeds.map(s => [String(s.seed), "seed " + s.seed]), () => String(teSeed),
+           k => { teSeed = Number(k); }, "c-tenv");
+
+// How steep: the share of training time at each grade, with the test hills marked.
+mount("c-tgrade", (host, w, h) => {
+  const H_ = TE.grade_hist, tot = H_.seconds.reduce((a, b) => a + b, 0);
+  const xmax = Math.max(16, Math.ceil(Math.max(...D.val.cond.map(c => c.grade)) + 1));
+  const pct = H_.seconds.map(s => 100 * s / tot);
+  const P = plot(host, { w, h, x: { d: [-3.5, xmax], label: "grade (%)" },
+    y: { d: [0, Math.max(...pct) * 1.18], label: "share of training time (%)" }, m: { l: 52, t: 22 } });
+  const bw = P.x(0.5) - P.x(0);
+  pct.forEach((p, i) => {
+    if (!p) return;
+    const g = H_.lo_pct[i] + 0.25;
+    const r = S("rect", { x: P.x(H_.lo_pct[i]) + 0.5, y: P.y(p), width: Math.max(1, bw - 1), height: P.y(0) - P.y(p),
+                          rx: 1.5, style: `fill:${gradeCol(g)}` }, P.g);
+    markTip(P, r, P.x(g), P.y(p), `${f(H_.lo_pct[i], 1)} to ${f(H_.lo_pct[i] + 0.5, 1)} %`,
+      [{ c: gradeCol(g), v: f(p, 2) + " %", k: "of training time" }, { v: f(H_.seconds[i] / 3600, 1) + " h", k: "over ten seeds" }]);
+  });
+  // beyond the steepest training grade: never met in training
+  S("rect", { x: P.x(TE.env.grade_max_pct), y: P.m.t, width: P.x(xmax) - P.x(TE.env.grade_max_pct), height: P.ph,
+              style: "fill:var(--band)" }, P.g);
+  T(P.top, P.x(TE.env.grade_max_pct) + 6, P.m.t + 14, "never in training", { class: "lbl", style: "fill:var(--ink-2)" });
+  vline(P, 12, { c: "var(--pd-grade)", w: 1.6, label: "12 %, the scored climb", dy: -8 });
+  D.val.cond.forEach(c => {
+    const x = P.x(c.grade), y0 = P.y(0);
+    S("path", { d: `M${x},${y0 - 9} l5,8 l-10,0 z`, style: "fill:var(--crit)" }, P.top);
+    const t = S("rect", { x: x - 7, y: y0 - 14, width: 14, height: 16, style: "fill:transparent" }, P.top);
+    markTip(P, t, x, y0 - 9, `conditions test: ${c.name}`, [{ c: "var(--crit)", v: f(c.grade, 2) + " %", k: "its hill" }]);
+  });
+  T(P.top, P.x(D.val.c25.grade), P.y(0) - 14, "25 °C hill", { class: "lbl", "text-anchor": "middle", style: "fill:var(--crit)" });
+});
+
+table("t-tfam", ["road", "how it is drawn", "share", "episodes", "steepest", "time at 4 % or more", "most climbed"],
+  Object.keys(FAM_TEXT).filter(k => TE.families[k]).map(k => {
+    const F = TE.families[k];
+    return [FAM_TEXT[k][0], FAM_TEXT[k][1], `${f(100 * TE.env.families[k], 0)} %`, String(F.n), `${f(F.max_pct, 1)} %`,
+            `${f(100 * F.climb_s / F.steps, 0)} %`, `${f(F.rise_max, 0)} m`];
+  }), [2, 3, 4, 5, 6]);
+
+// The gears the box chose in training.
+mount("c-tgear", (host, w) => {
+  const G = TE.gears, tot = Object.values(G).reduce((a, b) => a + b, 0);
+  const gs = [1, 2, 3, 4, 5, 6, 7, 8], pct = gs.map(g => 100 * (G[String(g)] || 0) / tot);
+  const h = 190;
+  const P = plot(host, { w, h, x: { d: [0.4, 8.6], label: "gear", ticks: gs }, y: { d: [0, 100], label: "% of training time" },
+    m: { l: 52, t: 14 } });
+  const bw = (P.x(1) - P.x(0)) * 0.62;
+  gs.forEach((g, i) => {
+    const r = S("rect", { x: P.x(g) - bw / 2, y: P.y(pct[i]), width: bw, height: Math.max(1, P.y(0) - P.y(pct[i])), rx: 2,
+                          style: "fill:var(--seq-hi)" }, P.g);
+    T(P.top, P.x(g), P.y(pct[i]) - 5, f(pct[i], pct[i] < 10 ? 1 : 0) + " %", { class: "lbl", "text-anchor": "middle", style: "fill:var(--ink-2)" });
+    markTip(P, r, P.x(g), P.y(pct[i]), `gear ${g}`, [{ v: f(pct[i], 2) + " %", k: "of training time" }]);
+  });
+}, () => 190);
+
+// The weight on component life, one draw per training episode.
+mount("c-twl", (host, w) => {
+  const W_ = TE.w_life, n = W_.hist.length, bw0 = 0.025;
+  const h = 190;
+  const P = plot(host, { w, h, x: { d: [0, n * bw0], label: "weight on component life, per training episode" },
+    y: { d: [0, Math.max(...W_.hist) * 1.2], label: "episodes" }, m: { l: 52, t: 14 } });
+  const bw = P.x(bw0) - P.x(0);
+  W_.hist.forEach((c, i) => {
+    if (!c) return;
+    const lowW = i * bw0 < W_.threshold;
+    const r = S("rect", { x: P.x(i * bw0) + 0.5, y: P.y(c), width: Math.max(1, bw - 1), height: P.y(0) - P.y(c), rx: 1.5,
+                          style: `fill:${lowW ? "var(--crit)" : "var(--ink-3)"}` }, P.g);
+    markTip(P, r, P.x((i + 0.5) * bw0), P.y(c), `${f(i * bw0, 3)} to ${f((i + 1) * bw0, 3)}`, [{ v: String(c), k: "training episodes" }]);
+  });
+  vline(P, W_.threshold, { c: "var(--crit)", w: 1.4, dy: 12, label: narrow(w) ? `${f(W_.threshold, 3)}: seed 6's bad episodes`
+    : `${f(W_.threshold, 3)}: blinded seed 6's bad frozen episodes are at or below` });
+}, () => 190);
+
+table("t-km", ["agent", "cut as trained %", "advance forbidden %", "over current-grade", "knock p95", "fuel vs baseline %"],
+  REC.km_agents.map(k => [k.name, f(k.cut_orig, 1), f(k.cut, 1), f(k.cut - REC.km.grade, 1, true), f(k.ki, 2),
+                          f(k.fuel, 2, true)]), [1, 2, 3, 4, 5]);
+
+// ============================================ 7-8 October: validation
+const VAL = D.val;
+const condName = c => c.name.split(",")[0];
+
+// The agents' margin over current-grade, per condition: the range of all twenty,
+// and the sighted and blinded medians. 0 is current-grade itself.
+mount("c-cond", (host, w) => {
+  const C = VAL.cond;
+  const rowH = 34, lw = narrow(w) ? 96 : 132, h = C.length * rowH + 18 + 42 + 4;
+  const lo = Math.min(0, ...C.map(c => c.lo)), hi = Math.max(0, ...C.map(c => c.hi));
+  const P = plot(host, { w, h, x: { d: [Math.floor(lo / 10) * 10, Math.ceil(hi / 10) * 10],
+    label: narrow(w) ? "margin over current-grade, points" : "margin over current-grade (points of damage cut)" }, y: { d: [1, 0], none: true },
+    m: { l: lw, t: 18, r: 12 } });
+  vline(P, 0, { c: "var(--pd-grade)", w: 1.6 });
+  T(P.top, P.x(0) + 5, P.m.t - 5, "current-grade", { class: "lbl", style: "fill:var(--pd-grade)" });
+  C.forEach((c, i) => {
+    const y = P.m.t + (i + 0.5) * rowH;
+    T(P.svg, lw - 8, y, condName(c), { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    T(P.svg, lw - 8, y + 13, `hill ${f(c.grade, 2)} %`, { "text-anchor": "end", class: "lbl", style: "fill:var(--ink-3)" });
+    S("line", { x1: P.x(c.lo), x2: P.x(c.hi), y1: y, y2: y, style: "stroke:var(--ink-3);stroke-width:1.6" }, P.g);
+    S("circle", { cx: P.x(c.sighted), cy: y - 5, r: 5, style: "fill:var(--pd-sight);stroke:var(--surface);stroke-width:1.5" }, P.g);
+    S("circle", { cx: P.x(c.blind), cy: y + 5, r: 5, style: "fill:var(--pd-blind);stroke:var(--surface);stroke-width:1.5" }, P.g);
+    const hit = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
+    markTip(P, hit, P.x(c.sighted), y, c.name, [
+      { c: "var(--pd-sight)", v: f(c.sighted, 1, true) + " pts", k: "sighted, median" },
+      { c: "var(--pd-blind)", v: f(c.blind, 1, true) + " pts", k: "blinded, median" },
+      { v: `${c.beat} of ${c.n}`, k: "beat current-grade" },
+      { v: f(c.grade_cut, 1) + " %", k: "current-grade's cut" },
+      { v: f(c.short_grade, 0) + " of 719", k: "current-grade short of torque" }]);
+  });
+}, () => 0);
+
+// The ablation, sighted minus blinded, under each formula: the mean and its 95 % interval.
+const dcShort = n => n.replace("turbine scale", "scale").replace(/ \((creep rupture|10 C doubling rule)\)/, "")
+  .replace("both calculated scales", "both scales").replace(/ \(from (\d+) C gas\)/, " ($1 gas)")
+  .replace("as published, no knock term", "no knock term").replace(", no knock term", ", no knock");
+// The ablation, sighted minus blinded, under a list of damage formulas: the
+// mean and its 95 % interval, one row each. Used for the nine rulers (Phase D)
+// and for the calculated constants (Validation).
+function ablationRows(host, w, R, nameOf, lwWide) {
+  const rowH = 26, lw = narrow(w) ? 118 : lwWide, h = R.length * rowH + 18 + 42 + 4;
+  const lo = Math.min(...R.map(r => r.ablation_lo)), hi = Math.max(...R.map(r => r.ablation_hi));
+  const P = plot(host, { w, h, x: { d: [Math.floor(lo) - 1, Math.ceil(hi) + 1],
+    label: narrow(w) ? "sighted − blinded, points" : "sighted minus blinded, points (mean and 95 % interval)" }, y: { d: [1, 0], none: true },
+    m: { l: lw, t: 18, r: 12 } });
+  vline(P, 0, { c: "var(--ink-2)", w: 1.2, dash: "4 3" });
+  R.forEach((r, i) => {
+    const y = P.m.t + (i + 0.5) * rowH;
+    const c = r.ablation_lo > 0 ? "var(--crit)" : "var(--pd-sight)";
+    T(P.svg, lw - 8, y + 4, narrow(w) ? nameOf(r.name) : r.name, { "text-anchor": "end", style: "fill:var(--ink-2)" });
+    S("line", { x1: P.x(r.ablation_lo), x2: P.x(r.ablation_hi), y1: y, y2: y, style: "stroke:var(--ink-3);stroke-width:2" }, P.g);
+    S("circle", { cx: P.x(r.ablation_mean), cy: y, r: 5, style: `fill:${c};stroke:var(--surface);stroke-width:1.5` }, P.g);
+    const hit = S("rect", { x: P.m.l, y: y - rowH / 2, width: P.pw, height: rowH, style: "fill:transparent" }, P.top);
+    markTip(P, hit, P.x(r.ablation_mean), y, r.name, [
+      { c, v: `${f(r.ablation_mean, 2, true)} [${f(r.ablation_lo, 2, true)}, ${f(r.ablation_hi, 2, true)}]`, k: "ablation, points" },
+      { v: `${r.beat_grade} of ${r.n}`, k: "agents beating current-grade" },
+      { v: f(r.grade_cut, 1) + " %", k: "current-grade's cut" },
+      { v: `${f(r.sighted_median, 1)} / ${f(r.blind_median, 1)} %`, k: "sighted / blinded median cut" }]);
+  });
+}
+mount("c-dc", (host, w) => ablationRows(host, w, VAL.dc.rows, dcShort, 256), () => 0);
+const rulerShort = n => n.replace("turbine ", "").replace(/ \((\d+) C\)/, "");
+mount("c-rulers", (host, w) => ablationRows(host, w, VAL.robust, rulerShort, 200), () => 0);
+table("t-rulers", ["ruler", "current-grade cut %", "sighted %", "blinded %", "beat", "ablation", "95 % interval", "Wilcoxon p"],
+  VAL.robust.map(r => [r.name, f(r.grade_cut, 1), f(r.sighted_median, 1), f(r.blind_median, 1),
+                       `${r.beat_grade}/${r.n}`, f(r.ablation_mean, 2, true),
+                       `${f(r.ablation_lo, 2, true)} to ${f(r.ablation_hi, 2, true)}`, f(r.ablation_p_wilcoxon, 2)]),
+  [1, 2, 3, 4, 5, 6, 7]);
+
+// The uncertainty budget: the thermal step (timestep_study.py) and one
+// resolution step of each input (validation_numbers.py).
+table("t-unum", ["thermal step", "sub-steps", "baseline peak °C", "baseline damage", "current-grade cut %", "coolant swing K"],
+  [...VAL.ts.rows1.map(r => ["1 s", String(r.sub), f(r.peak, 3), f(r.damage, 1), f(r.cut, 2), f(r.swing, 2)]),
+   ...VAL.ts.rows2.map(r => ["2 s", String(r.sub), f(r.peak, 3), f(r.damage, 1), f(r.cut, 2), f(r.swing, 2)])],
+  [1, 2, 3, 4, 5]);
+table("t-sens", ["the baseline on the climb, with", "peak turbine °C", "damage", "change", "without knock"],
+  VAL.vn.sens.map(s => [s.name, f(s.peak_turb_c, 2), f(s.damage, 1), f(s.damage - VAL.vn.base, 1, true),
+                        f(s.damage_thermal, 1)]), [1, 2, 3, 4]);
+
+// The recorded episodes of the conditions test, one condition at a time.
+const CTR = VAL.ctr;
+const CTS = [["turb", "Turbine", "turbine housing (°C)", 1, " °C"], ["spark", "Spark", "spark trim (°)", 2, "°"],
+             ["boost", "Boost", "boost trim (kPa)", 1, " kPa"], ["dmg", "Damage", "damage so far", 0, ""],
+             ["v", "Speed", "road speed (km/h)", 0, " km/h"], ["gear", "Gear", "gear", 0, ""]];
+let ctrK = "turb", ctrC = CTR.conditions.findIndex(c => c.name.startsWith("25 C"));
+if (ctrC < 0) ctrC = 0;
+mount("c-ctr", (host, w, h) => {
+  const C = CTR.conditions[ctrC], t = C.t, tEnd = t[t.length - 1];
+  const [key, , label, dp, unit] = CTS.find(e => e[0] === ctrK);
+  const road = key === "v" || key === "gear";
+  const pols = Object.entries(C.policies);
+  const series = road ? [key === "v" ? C.v_kmh : C.gear] : pols.map(([, p]) => p[key]);
+  const all = series.flat();
+  let lo = Math.min(...all), hi = Math.max(...all);
+  if (key === "turb") hi = Math.max(hi, 870);
+  if (key === "gear") { lo = 0; hi = 8.4; }
+  const pad = (hi - lo) * 0.06 || 1;
+  const P = plot(host, { w, h, x: { d: [0, tEnd], label: `time into frozen episode ${CTR.episode} (s)` },
+    y: { d: [lo - pad, hi + pad], label }, m: { l: 52 } });
+  const c0 = t[C.grade.findIndex(g => g > 0)];
+  S("rect", { x: P.x(c0), y: P.m.t, width: P.x(tEnd) - P.x(c0), height: P.ph, style: "fill:var(--band)" }, P.g);
+  const fmt = v => f(v, dp) + unit;
+  if (road) {
+    line(P, t, series[0], { c: "var(--ink-2)", w: 2 });
+    crosshair(P, t, [{ name: key === "v" ? "road speed" : "gear", ys: series[0], c: "var(--ink-2)", f: fmt },
+                     { name: `grade (the hill is ${f(C.grade_pct, 2)} %)`, ys: C.grade, c: "var(--ink-3)", f: v => f(v, 2) + " %" }],
+              v => `${v} s`);
+    return;
+  }
+  if (key === "turb") hline(P, 850, { c: "var(--crit)", w: 1, label: "850 °C", below: true });
+  pols.filter(([, p]) => p.kind !== "hand").forEach(([, p]) =>
+    line(P, t, p[key], { c: p.kind === "sighted" ? "var(--pd-sight)" : "var(--pd-blind)", w: 1.1, op: 0.55 }));
+  line(P, t, C.policies.baseline_ECU[key], { c: "var(--pd-base)", w: 2, dash: "6 4" });
+  line(P, t, C.policies.current_grade[key], { c: "var(--pd-grade)", w: 2, dash: "6 4" });
+  const med = kind => t.map((_, i) => {
+    const v = pols.filter(([, p]) => p.kind === kind).map(([, p]) => p[key][i]).sort((a, b) => a - b);
+    return v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+  });
+  crosshair(P, t, [
+    { name: "baseline ECU", ys: C.policies.baseline_ECU[key], c: "var(--pd-base)", f: fmt },
+    { name: "current-grade", ys: C.policies.current_grade[key], c: "var(--pd-grade)", f: fmt },
+    { name: "sighted, median of 10", ys: med("sighted"), c: "var(--pd-sight)", f: fmt },
+    { name: "blinded, median of 10", ys: med("blinded"), c: "var(--pd-blind)", f: fmt }], v => `${v} s`);
+});
+segButtons("seg-ctr-k", CTS.map(e => [e[0], e[1]]), () => ctrK, k => { ctrK = k; }, "c-ctr");
+segButtons("seg-ctr-c", CTR.conditions.map((c, i) => [String(i), c.name.split(",")[0].replace(/ C$/, " °C")]),
+           () => String(ctrC), k => { ctrC = Number(k); }, "c-ctr");
+
+table("t-cond", ["condition", "hill %", "baseline peak °C", "current-grade cut %", "sighted", "blinded", "range",
+                 "beat", "cg short", "agents short", "ablation [95 %]"],
+  VAL.cond.map(c => [c.name, f(c.grade, 2), f(c.base_peak, 1), f(c.grade_cut, 1), f(c.sighted, 1, true),
+                     f(c.blind, 1, true), `${f(c.lo, 1, true)} to ${f(c.hi, 1, true)}`, `${c.beat}/${c.n}`,
+                     f(c.short_grade, 0), f(c.short_agents, 0),
+                     `${f(c.abl, 1, true)} [${f(c.abl_lo, 1, true)}, ${f(c.abl_hi, 1, true)}]`]),
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+table("t-dc", ["formula", "current-grade cut %", "sighted %", "blinded %", "beat", "ablation", "95 % interval", "Wilcoxon p"],
+  VAL.dc.rows.map(r => [r.name, f(r.grade_cut, 1), f(r.sighted_median, 1), f(r.blind_median, 1),
+                        `${r.beat_grade}/${r.n}`, f(r.ablation_mean, 2, true),
+                        `${f(r.ablation_lo, 2, true)} to ${f(r.ablation_hi, 2, true)}`, f(r.ablation_p_wilcoxon, 2)]),
+  [1, 2, 3, 4, 5, 6, 7]);
 
 charts.forEach(c => ro.observe(c.host));
 })();

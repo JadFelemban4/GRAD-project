@@ -4,11 +4,18 @@ Trains a SAC agent on the engine environment and saves everything Phase D needs.
 
     pip install "stable-baselines3[extra]"      # once; also uncomment it in requirements.txt
 
-A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Three designs exist:
+A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Four designs exist:
+
+    --road extremes  dt 1.0   decision 12 of results/VALIDATION_DECISIONS.md (8 Oct):
+                              the terrain roads with ambient 25-45 C, a speed target
+                              that changes mid-run (60-150 km/h), hills to 18 % and
+                              the housing's heat capacity drawn per episode
+                              (engine_env.ExtremesTrainingEnv) -> runs/extremes_dt1/
 
     --road terrain   dt 1.0   a new road every episode (engine_env.TerrainTrainingEnv),
                               scored by evaluate.py on the locked climb. The design
-                              of the 29 September retrain. DEFAULT -> runs/terrain_dt1/
+                              of the 29 September retrain. DEFAULT -> runs/terrain_dt1/,
+                              CLOSED since 8 October (its result is published)
     --road fixed     dt 0.2   Phase D's one locked climb, 12 % from 180 s.
                               CLOSED: runs/ takes no new work -- give it --out
     --road random    dt 0.2   Phase D2 and C4: a new climb every episode, start
@@ -34,7 +41,6 @@ Part 3 is about. Both pass --road and --dt explicitly.)
 import argparse
 import csv
 import glob
-import hashlib
 import json
 import platform
 import re
@@ -47,7 +53,9 @@ import numpy as np
 
 import fingerprint as FP
 import random_road as RR
-from engine_env import SupervisoryTunerEnv, TerrainTrainingEnv, make_grade_climb
+import step_record
+from engine_env import (ExtremesTrainingEnv, SupervisoryTunerEnv, TerrainTrainingEnv,
+                        damage_rate, make_grade_climb)
 
 try:
     import gymnasium as gym
@@ -68,11 +76,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # Experiments whose preregistrations say "sixteen runs, then stop". Nothing new
 # is trained into their directories -- see "CLOSED EXPERIMENTS" in main().
 CLOSED = {"runs": "Phase D", "runs_d2": "Phase D2",
-          "runs_c4": "C4"}           # closed 24 Sep 2026, after its result
+          "runs_c4": "C4",           # closed 24 Sep 2026, after its result
+          "terrain_dt1": "the 29 September retrain"}   # closed 8 Oct 2026
 
 # Each road's own step. fixed and random are the designs Phase D, D2 and C4 ran
 # at 0.2 s; terrain is the 27 September design at evaluate.py's 1.0 s.
-DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0}
+DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0, "extremes": 1.0}
 
 
 def buffer_size(a):
@@ -102,10 +111,31 @@ class _RoadLog(gym.Wrapper):
         return obs, info
 
 
+class _StepState(gym.Wrapper):
+    """Puts into every step's info what the environment holds and its info dict
+    does not -- the road (grade, speed, gear), the parallel baseline car, the
+    episode's running totals (step_record.env_state) -- and what the actuators
+    applied, the damage rate and the episode's preference weights, so that
+    ActionRecorder keeps the road and the car beside every training action
+    (7 October 2026; until then a terrain run kept no road at all). Read after
+    the step returns, before the vector env resets. It only reads."""
+
+    def step(self, action):
+        obs, r, term, trunc, info = self.env.step(action)
+        u = self.env.unwrapped
+        info = dict(info, **step_record.env_state(u))
+        info["applied"] = np.asarray(u.prev_act, np.float32)
+        info["weights"] = np.asarray(u.w, np.float32)
+        info["damage_rate"] = damage_rate(info["t_turb"], info["t_oil"], info["ki"])
+        return obs, r, term, trunc, info
+
+
 def build_env(use_preview, seed, duration, road="terrain", dt=1.0):
     """The training environment. dt is passed EXPLICITLY, to the cycle and the env.
 
     terrain  TerrainTrainingEnv: a new road every episode.
+    extremes ExtremesTrainingEnv: the same roads, plus ambient, speed, steeper
+             hills and the housing's heat capacity drawn per episode.
     fixed    make_grade_climb, Phase D's road.
     random   the same, rebuilt at every reset by random_road.RandomClimb (D2).
 
@@ -116,12 +146,14 @@ def build_env(use_preview, seed, duration, road="terrain", dt=1.0):
     """
     if road == "terrain":
         env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
+    elif road == "extremes":
+        env = ExtremesTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
     else:
         env = SupervisoryTunerEnv(make_grade_climb(duration=duration, dt=dt), dt=dt,
                                   use_preview=use_preview, seed=seed)
         if road == "random":
             env = _RoadLog(RR.RandomClimb(env, seed=seed, duration=duration))
-    return Monitor(env)
+    return Monitor(_StepState(env))
 
 
 def _road_log(env):
@@ -133,22 +165,17 @@ def _road_log(env):
 
 def derived_sha():
     """A hash of data/derived_params.json's values: since 28 September the
-    plant's thermal, boost, spark, enrichment and gearbox constants live there,
-    not in the three files fingerprint.py hashes."""
-    p = os.path.join(HERE, "data", "derived_params.json")
-    try:
-        with open(p, encoding="utf-8") as fh:
-            d = json.load(fh)
-    except (OSError, ValueError):
-        return None
-    vals = {k: v for k, v in d.items() if not k.startswith("_")}
-    return hashlib.sha256(json.dumps(vals, sort_keys=True).encode()).hexdigest()[:16]
+    plant's thermal, boost, spark, enrichment and gearbox constants live there.
+    Since 8 October it is fingerprint.py's own, and FATAL there: one definition."""
+    return FP.derived_sha()
 
 
-# What the engine did on each training step, read off the step's info dict.
-REC_INFO = ("t_turb", "t_oil", "t_block", "torque_req", "torque", "mdot_fuel", "ki",
-            "spark", "lam", "egt_c", "r_fuel", "r_life", "r_resp")
-REC_F32 = ("r_fuel", "r_life", "r_resp")
+# What the engine did on each training step, read off the step's info dict:
+# since 7 October 2026 every field step_record.py defines (the road, the gear,
+# the baseline car, the running totals, which _StepState adds to the info
+# dict), plus the applied actuators and the episode's preference weights.
+REC_INFO = step_record.INFO + step_record.ENV
+REC_VEC = ("applied", "weights")
 CHUNK = 10_000          # the checkpoint interval; a chunk is written with each one
 
 
@@ -159,7 +186,10 @@ class ActionRecorder(BaseCallback):
     [-1, 1], exactly what went to env.step), the OBSERVATION it was chosen from,
     the reward, and the engine quantities in REC_INFO. It only reads: an agent
     trained with it is the agent trained without it (30 Sep 2026, 600 steps, on
-    CUDA and on CPU: largest weight difference 0.0).
+    CUDA and on CPU: largest weight difference 0.0). Re-checked 7 October with
+    _StepState and the 44 fields: seed 0, 600 steps, CPU, against the train.py
+    of 2864592 -- largest weight difference 0.0; the 18 fields both keep agree
+    exactly, or to the float16 rounding the old record stored them at.
     """
 
     def __init__(self, outdir):
@@ -169,7 +199,7 @@ class ActionRecorder(BaseCallback):
         self._clear()
 
     def _clear(self):
-        self.buf = {k: [] for k in ("step", "episode", "action", "obs", "reward") + REC_INFO}
+        self.buf = {k: [] for k in ("step", "episode", "action", "obs", "reward") + REC_INFO + REC_VEC}
 
     def _on_training_start(self):
         prev = [np.load(f)["episode"] for f in glob.glob(os.path.join(self.dir, "rec_*.npz"))]
@@ -185,7 +215,9 @@ class ActionRecorder(BaseCallback):
         b["reward"].append(float(self.locals["rewards"][0]))
         info = self.locals["infos"][0]
         for k in REC_INFO:
-            b[k].append(float(info.get(k, np.nan)))
+            b[k].append(info.get(k, np.nan))
+        for k in REC_VEC:
+            b[k].append(np.asarray(info.get(k, np.full(5 if k == "applied" else 3, np.nan)), np.float32))
         if self.locals["dones"][0]:
             self.episode += 1
         if self.num_timesteps % CHUNK == 0:
@@ -205,11 +237,12 @@ class ActionRecorder(BaseCallback):
 
 
 def _record_arrays(b):
-    out = dict(step=np.asarray(b["step"], np.int32), episode=np.asarray(b["episode"], np.int32),
-               action=np.asarray(b["action"], np.float32), reward=np.asarray(b["reward"], np.float32),
-               obs=np.asarray(b["obs"], np.float16))
-    for k in REC_INFO:
-        out[k] = np.asarray(b[k], np.float32 if k in REC_F32 else np.float16)
+    """step_record.cast's rule: float16 for the observation, integers as they
+    are, float32 for everything else (the engine fields were float16 until
+    7 October: 1 K steps at a turbine temperature)."""
+    out = dict(step=np.asarray(b["step"], np.int32), episode=np.asarray(b["episode"], np.int32))
+    for k in ("action", "obs", "reward") + REC_INFO + REC_VEC:
+        out[k] = step_record.cast(k, np.asarray(b[k]))
     return out
 
 
@@ -220,7 +253,10 @@ def merge_records(outdir):
     if not files:
         return None
     parts = [dict(np.load(f)) for f in sorted(files, key=os.path.getmtime)]
-    cat = {k: np.concatenate([p[k] for p in parts]) for k in parts[0]}
+    # A run resumed across 7 October holds chunks with fewer fields: keep the
+    # fields every chunk has.
+    keys = [k for k in parts[0] if all(k in p for p in parts)]
+    cat = {k: np.concatenate([p[k] for p in parts]) for k in keys}
     rev = cat["step"][::-1]
     _, first_in_rev = np.unique(rev, return_index=True)
     keep = np.sort(len(rev) - 1 - first_in_rev)
@@ -239,6 +275,9 @@ def _git(*args):
 
 
 ROADS_TEXT = {"terrain": "a new road every episode (TerrainTrainingEnv)",
+              "extremes": "a new road every episode, ambient 25-45 C, speed target 60-150 km/h "
+                          "changing mid-run, hills to 18 %, housing capacity x0.75-1.33 "
+                          "(ExtremesTrainingEnv, decision 12)",
               "fixed": "the locked climb only",
               "random": "a new climb every episode (random_road.RandomClimb, Phase D2)"}
 
@@ -282,8 +321,10 @@ def main():
                     help="episode length in seconds; 900 is the standard scenario")
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
-    ap.add_argument("--road", choices=("terrain", "fixed", "random"), default="terrain",
-                    help="terrain: a new road every episode (27 Sep). fixed: Phase D's "
+    ap.add_argument("--road", choices=("terrain", "extremes", "fixed", "random"), default="terrain",
+                    help="terrain: a new road every episode (27 Sep). extremes: the same, "
+                         "with ambient, speed, steeper hills and the housing capacity drawn "
+                         "per episode (decision 12, 8 Oct). fixed: Phase D's "
                          "climb, 12 %% from 180 s. random: Phase D2 / C4, start 120-300 s, "
                          "grade 12-16 %%.")
     ap.add_argument("--fixed-road", action="store_true",
@@ -333,7 +374,7 @@ def main():
             a.out = "runs" if a.road == "fixed" else "runs_d2"      # CLOSED: refuses new work
         else:
             a.out = os.path.join("runs", {"fixed": "locked", "random": "random",
-                                          "terrain": "terrain"}[a.road]
+                                          "terrain": "terrain", "extremes": "extremes"}[a.road]
                                  + f"_dt{a.dt:g}".replace(".", "p"))
     protocol = "d2" if a.road == "random" else "phase-d"
     device = get_device(a.device)

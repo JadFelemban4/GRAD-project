@@ -20,8 +20,9 @@ gearbox with the car's real ZF 8HP51; the result file was kept. The same
 command on the corrected plant prints +7.5, with every row moved -- baseline
 damage 572.8 -> 959.8, peak 857 -> 884 C -- and the +11.7 cannot be regenerated
 from this tree at all, because the `engine_env.py` it needs no longer exists
-here. (Those are the 19-21 September plant's figures. On the plant derived from
-the logs, merged 30 September, the baseline row is 920.1 at 883 C.)
+here. (Those are the 19-21 September plant's figures. On the plant of
+8 October -- derived from the logs, merged 30 September, the thermal network
+sub-stepped and the climb ramped -- the baseline row is 848.1 at 883 C.)
 
 So the scenario line is now built from `inspect.signature(make_grade_climb)`
 rather than typed, and a full fingerprint block (gear ratios, final drive,
@@ -212,33 +213,23 @@ PROTOCOLS = {
 
 
 # What record_agents.py keeps of every evaluation step (29 September 2026), read
-# off the environment AFTER the step, so the episode itself is untouched.
-RECORD_STATE = ("t_turb", "t_oil", "t_block", "torque", "torque_req", "spark", "lam", "ki",
-                "egt_c", "mdot_fuel", "r_fuel", "r_life", "r_resp")
-
-
+# off the environment AFTER the step, so the episode itself is untouched. Since
+# 7 October the fields are defined once, in step_record.py, for every script
+# that runs episodes: the 29 September fields under their old names, plus the
+# road speed, the gear, the parallel baseline car and the running totals.
 def _record_step(record, env, a, obs_before, r, info):
     """Append one step. `action` is what the policy returned, in [-1, 1];
     `applied` is what the actuators actually did after the slew limit and the
     bounds, in physical units (spark trim deg, lambda trim, boost trim kPa, fan
     duty, pump duty) -- the two differ whenever the policy asks for more than
-    the slew allows."""
-    record["action"].append(np.asarray(a, np.float32))
-    record["applied"].append(np.asarray(env.prev_act, np.float32))
-    record["obs"].append(np.asarray(obs_before, np.float32))
-    record["reward"].append(float(r))
-    record["rpm"].append(float(env.rpm))
-    record["map_kpa"].append(float(env.map_kpa))
-    record["grade"].append(float(env.cycle["grade"][env.k - 1]))
-    record["t_turb_base"].append(float(env.thermal_base.t_turb))
-    record["damage_rate"].append(damage_rate(info["t_turb"], info["t_oil"], info["ki"]))
-    for k in RECORD_STATE:
-        record[k].append(float(info[k]))
+    the slew allows. step_record.py lists every field."""
+    import step_record
+    step_record.step(record, env, a, obs_before, r, info)
 
 
 def new_record():
-    return {k: [] for k in ("action", "applied", "obs", "reward", "rpm", "map_kpa", "grade",
-                            "t_turb_base", "damage_rate") + RECORD_STATE}
+    import step_record
+    return step_record.new()
 
 
 def episode_cycle(road=None):

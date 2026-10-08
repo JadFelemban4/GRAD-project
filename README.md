@@ -3,7 +3,18 @@
 > **Opening this in Claude Code?** Read `CLAUDE.md` first — it carries the
 > project's claim, its current state, and the mistakes already made.
 >
-> **29 September 2026: the retrain ran.** Twenty agents, ten seeds a side; all
+> **8 October 2026: X1 is preregistered and training.** The four plant fixes
+> Jad and Ghassan agreed on 30 September are in: the thermal network
+> sub-stepped, every grade change ramped over 8 s, the spark trim capped at 0,
+> the fingerprint covering the derived constants. On this plant
+> `check_premise.py` prints baseline **848.1** at 883 °C, current-grade cutting
+> **47.0 %**, and hand-written preview over current-grade **−0.0** points. Then
+> 23 seeds a side on the extremes design (decision 12: ambient 25–45 °C, a
+> changing speed target, hills to 18 %), with the held-out conditions and the
+> logged-drive check fixed before training: `results/PREREGISTRATION_X1.md`.
+>
+> <!-- RETIRED-OK: 43.4 -- current-grade's cut on the merged plant, which these agents trained on -->
+> **29 September 2026: the retrain ran** (on the merged plant). Twenty agents, ten seeds a side; all
 > beat every hand-written policy, and sighted minus blinded is +1.2 points (95 % CI
 > −4.4 to +6.8, n = 10) — **INCONCLUSIVE** under the preregistered MEI rule
 > (sign-test power 0.26), not "no effect". With spark advance forbidden their median cut falls to
@@ -74,6 +85,7 @@ Python 3.11 or newer.
 > `python analyse_phase_d.py` reproduces every number above.
 > Full account: `CHECKPOINT.md`, 21–22 September.
 
+> <!-- RETIRED-OK: 920.1, -0.3 -- the 28 September plant, superseded on 8 October -->
 > **Updated 28 September 2026, evening.** Drive B (full-throttle roll-ons) is in:
 > **321.7 minutes, eleven drives**. And **the data now sets the constants**:
 > `derive_params.py` recomputes everything the car's logs can set — the thermal
@@ -160,28 +172,35 @@ python -m app.test_replay  #  ~1 min  confirms the live app still behaves
 > come out any other way. It becomes a real ablation only when a TRAINED blinded
 > agent is raced against a trained sighted one — which is Phase D.
 >
-> **What the script prints on the merged plant** (30 September 2026; the locked
-> scenario, 12 % at 130 km/h in 42 °C air; `results/premise.json`), with the true
-> neutral, equal protection depth, and the ECU scheduled on the pressure the
-> engine runs at:
+> **What the script prints on the plant of 8 October** (the locked scenario, 12 %
+> at 130 km/h in 42 °C air, the climb ramped over 8 s; `results/premise.json`),
+> with the true neutral, equal protection depth, and the ECU scheduled on the
+> pressure the engine runs at:
 >
 > | policy | damage | fuel g | peak turbine |
 > |---|---|---|---|
-> | baseline ECU (true neutral) | 920.1 | 4573 | 883 °C |
-> | reactive protection | 625.7 | 4714 | 860 °C |
-> | current-grade protection | 520.5 | 4841 | 853 °C |
-> | predictive protection | 523.5 | 4846 | 853 °C |
-> | predictive, preview disabled | 625.7 | 4714 | 860 °C |
+> | baseline ECU (true neutral) | 848.1 | 4544 | 883 °C |
+> | reactive protection | 559.7 | 4683 | 860 °C |
+> | current-grade protection | 449.6 | 4810 | 853 °C |
+> | predictive protection | 449.7 | 4815 | 853 °C |
+> | predictive, preview disabled | 559.7 | 4683 | 860 °C |
 >
-> **The constraint binds.** The baseline, 920.1 at 883 °C, crosses the 850 °C
-> trigger, so every protecting policy acts: reactive cuts damage 32.0 %,
-> current-grade 43.4 %, predictive 43.1 %. Preview gains **+11.1 points** over
+> **The constraint binds.** The baseline, 848.1 at 883 °C, crosses the 850 °C
+> trigger, so every protecting policy acts: reactive cuts damage 34.0 %,
+> current-grade 47.0 %, predictive 47.0 %. Preview gains **+13.0 points** over
 > reactive, but against a policy that merely knows the grade it is on
 > right now — information any car has from a nose-down accelerometer, and the
-> comparator the audit asked for — it **loses by 0.3 points**, and that 0.3 is
-> one second of knock at the grade step (`CLAUDE.md`'s first box). These are
-> hand-written policies. The trained answer is Phase D, in the box at the top
-> of this file.
+> comparator the audit asked for — it gains **−0.0 points**. These are
+> hand-written policies. The trained answer is the ablation, in the box at the
+> top of this file.
+>
+> <!-- RETIRED-OK: 920.1, 625.7, 520.5, 523.5, 4573, 32.0, 43.4, 43.1, 11.1, -0.3, 0.3 -- the merged plant of 30 September -->
+> *(On the merged plant, 30 September to 8 October, it read baseline 920.1,
+> reactive 625.7, current-grade 520.5 and predictive 523.5, cutting 32.0, 43.4
+> and 43.1 %, and preview lost 0.3 points to current-grade: one second of knock
+> at the instantaneous grade step, which the 8 s ramp of 8 October removed.
+> `CLAUDE.md`'s box of 8 October splits the change between the ramp and the
+> sub-stepping.)*
 
 > <!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 38, 78, 959.8, 884, 34.0, 0.4 -->
 > *(On sep17's plant, until the merge of 30 September, it read baseline 959.8 at
@@ -593,8 +612,8 @@ the fitted line into boost — extrapolated, it puts the baseline at +21° at
 baseline with its cooling switched off, and its preview edge rests on an
 ablation identity that could not fail. It stays in this table only as the
 record of how the headline moved. What `check_premise.py` prints today is in
-the box near the top of this file: baseline 920.1 at 883 °C on the merged plant, and hand-written
-preview −0.4 points against current-grade.
+the box near the top of this file: baseline 848.1 at 883 °C on the plant of
+8 October, and hand-written preview −0.0 points against current-grade.
 
 <!-- RETIRED-OK: 110, 297, 879, 244 -->
 Baseline damage was larger in v3 because the scenario finally loaded the

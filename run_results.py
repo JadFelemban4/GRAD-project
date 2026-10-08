@@ -3,6 +3,7 @@
     python run_results.py              # ~10-15 min on a multi-core machine
     python run_results.py traces sweep # a subset
     python run_results.py phase_d --agents=runs   # score the 19 Sep agents instead
+    python run_results.py phase_d --agents=runs/extremes_dt1   # the 8 Oct agents, into their own files
 
 Writes, from the simulator as it stands (data/derived_params.json):
 
@@ -141,10 +142,35 @@ def _signed_rank_p(d):
     return float(np.mean(np.abs(stats - tot / 2) >= abs(w - tot / 2) - 1e-9))
 
 
-# Which agents Phase D scores. The retrain of 29 September (130 km/h, varied
-# roads, dt 1.0, the derived plant, ten seeds a side) once it exists; the ten
-# agents of 19 September in runs/ are documented by record_agents.py as a record.
-AGENT_SET = "runs/terrain_dt1"
+# Which agents Phase D scores. Since 8 October, X1's (results/PREREGISTRATION_X1.md),
+# into their own files. The twenty of 29 September trained on the merged plant
+# and are refused on today's (phase_d checks every agent's meta.json): their
+# published rows stay in phase_d_130kmh_*, which phase_d_report can rebuild.
+AGENT_SET = "runs/extremes_dt1"
+
+
+def phase_d_paths(agent_set=AGENT_SET):
+    """The raw rows and the table for one agent set. The 29 September set (and
+    the 19 September record) keep the names they were published under; a later
+    set gets its own pair, so scoring it never overwrites a published record --
+    the plant of 8 October scores every policy differently (thermal network
+    sub-stepped, grade changes ramped)."""
+    name = os.path.basename(os.path.normpath(agent_set))
+    if name in ("terrain_dt1", "runs"):
+        return os.path.join(RES, "phase_d_130kmh_raw.json"), os.path.join(RES, "phase_d_130kmh.txt")
+    return os.path.join(RES, f"phase_d_{name}_raw.json"), os.path.join(RES, f"phase_d_{name}.txt")
+
+
+FOOTERS = {
+    "extremes_dt1": ["", "AGENTS: runs/extremes_dt1, the 8 October design (decision 12 of",
+                     "results/VALIDATION_DECISIONS.md): a new road every episode with ambient 25-45 C,",
+                     "a speed target of 60-150 km/h changing mid-run, hills to 18 % and the turbine",
+                     "housing's heat capacity drawn per episode; spark trim capped at 0; dt 1.0,",
+                     "50 000 steps; on the plant of 8 October (thermal network sub-stepped, every",
+                     "grade change ramped over 8 s). Preregistered in results/PREREGISTRATION_X1.md",
+                     "before any of them trained. Read the thermal-only column beside the total until",
+                     "drive C tests the knock model."],
+}
 
 
 def phase_d(pool, agent_set=AGENT_SET):
@@ -153,10 +179,22 @@ def phase_d(pool, agent_set=AGENT_SET):
                     for p in glob.glob(os.path.join(HERE, agent_set, "*_seed*"))
                     if os.path.exists(os.path.join(p, "final.zip")))
     agents.sort(key=lambda a: ("blind" in a, int(a.split("seed")[-1])))
+    # THE PLANT CHECK evaluate.py makes, made here too (8 October 2026). This
+    # function loads final.zip and scores it on whatever plant the tree holds,
+    # so re-running it on an older set would overwrite that set's published
+    # record with scores from a plant its agents never trained on.
+    import fingerprint as FP
+    live = FP.plant_fingerprint(protocol="phase-d")
+    for a in agents:
+        stored = FP.read(os.path.join(HERE, a, "meta.json"))
+        bad = FP.compare(stored, live) if stored else [("meta.json", "missing", "")]
+        if bad:
+            raise SystemExit(f"REFUSING to score {a}: its plant differs from this tree's "
+                             f"({', '.join(t[0] for t in bad)}). Score it from the tag it trained on.")
     specs = [(n, "hand:" + f) for n, f in POLICIES] + [(a, a) for a in agents]
     jobs = [(lab, spec, i, s, w) for lab, spec in specs for i, (s, w) in enumerate(E.EPISODES)]
     rows = list(pool.map(episode, jobs, chunksize=1))
-    with open(os.path.join(RES, "phase_d_130kmh_raw.json"), "w") as fh:
+    with open(phase_d_paths(agent_set)[0], "w") as fh:
         json.dump(rows, fh)
     phase_d_report(rows, agent_set)
 
@@ -201,7 +239,9 @@ def phase_d_report(rows, agent_set=AGENT_SET):
         g = 100 * (1 - med["current-grade"] / base)
         lines.append(f"AGENT (sighted median {np.median(sighted):.1f} %) over CURRENT-GRADE "
                      f"({g:.1f} %): {np.median(sighted) - g:+.1f} points")
-    if agent_set == "runs":
+    if os.path.basename(os.path.normpath(agent_set)) in FOOTERS:
+        lines += FOOTERS[os.path.basename(os.path.normpath(agent_set))]
+    elif agent_set == "runs":
         lines += ["", "READ THIS BEFORE QUOTING ANY ROW. The agents in runs/ trained at 110 km/h, at",
                   "dt = 0.2 s, on one road, on the plant BEFORE its constants were derived from the",
                   "logs. They are a record, not Phase D's answer: the retrain is (handoff.md)."]
@@ -215,7 +255,7 @@ def phase_d_report(rows, agent_set=AGENT_SET):
                   "untested: read the thermal-only column, and results/agents/<set>/KNOCK_MARGIN.md."]
     lines += ["The hand-written rows have zero IQR by construction: they ignore the preference",
               "weights, so all twenty episodes are one rollout repeated."]
-    with open(os.path.join(RES, "phase_d_130kmh.txt"), "w", encoding="utf-8") as fh:
+    with open(phase_d_paths(agent_set)[1], "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
     print("\n".join(lines))
 
@@ -225,7 +265,7 @@ def main():
     agent_set = next((x.split("=", 1)[1] for x in sys.argv[1:] if x.startswith("--agents=")), AGENT_SET)
     want = set(args) or {"traces", "sweep", "phase_d"}
     if want == {"phase_d_report"}:
-        with open(os.path.join(RES, "phase_d_130kmh_raw.json")) as fh:
+        with open(phase_d_paths(agent_set.rstrip("/"))[0]) as fh:
             phase_d_report(json.load(fh), agent_set.rstrip("/"))
         return
     t0 = time.time()

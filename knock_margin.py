@@ -3,6 +3,7 @@
     python knock_margin.py                    # the twenty agents of runs/terrain_dt1
     python knock_margin.py runs/terrain_dt1
     python knock_margin.py --report-only      # rebuild the report from knock_margin.json
+    python knock_margin.py --records-only     # re-record every step; checks against knock_margin.json
 
 MEASURED 29 September 2026 (~40 min on the team laptop): with advance
 forbidden the median cut falls from 67.9 to 41.6 % (sighted) and from 65.4 to
@@ -81,7 +82,31 @@ def _job(job):
     g = np.asarray(rec["grade"]) > 0
     row.update(ki_p95_climb=float(np.percentile(np.asarray(rec["ki"])[g], 95)),
                trim_climb=float(np.median(np.asarray(rec["applied"])[g, 0])))
-    return agent_dir, i, row
+    import step_record
+    return agent_dir, i, row, step_record.finish(rec)
+
+
+# EVERY STEP (7 October 2026): one .npz per agent, its twenty capped episodes
+# stacked, the fields of step_record.py. Gitignored, like every per-step record.
+RECORDS = os.path.join(HERE, "results", "records", "knock_margin")
+
+
+def save_records(set_name, recs):
+    import evaluate as E
+    import step_record
+    head = step_record.git_head()
+    for a, eps in recs.items():
+        tag = os.path.basename(a)
+        step_record.save(
+            os.path.join(RECORDS, set_name, tag + ".npz"), eps,
+            dict(script="knock_margin.py", commit=head, policy=tag, source=f"{a}/final.zip",
+                 preview="blind" not in tag,
+                 wrapper="the agent's own action, its spark trim capped at 0 (no advance past the "
+                         "baseline's knock-limited spark)",
+                 protocol="evaluate.EPISODES, twenty frozen episodes, the locked 12 % / 130 km/h climb at 42 C",
+                 dt=E.DT, duration_s=E.DURATION, episodes=list(range(len(eps)))),
+            seeds=[s for s, _ in E.EPISODES], weights=[w for _, w in E.EPISODES])
+    print(f"wrote {len(recs)} records to {os.path.relpath(os.path.join(RECORDS, set_name), HERE)}")
 
 
 def main():
@@ -106,9 +131,25 @@ def main():
     print(f"{len(agents)} agents x {len(E.EPISODES)} frozen episodes, spark advance forbidden")
     t0 = time.time()
     rows = {a: [None] * len(E.EPISODES) for a in agents}
+    recs = {a: [None] * len(E.EPISODES) for a in agents}
     with ProcessPoolExecutor(max_workers=os.cpu_count(), initializer=_init) as ex:
-        for a, i, row in ex.map(_job, jobs, chunksize=1):
-            rows[a][i] = row
+        for a, i, row, rec in ex.map(_job, jobs, chunksize=1):
+            rows[a][i], recs[a][i] = row, rec
+
+    if "--records-only" in sys.argv:
+        # Re-record only: every episode must equal the committed knock_margin.json,
+        # and nothing git tracks is rewritten.
+        with open(os.path.join(res_dir, "knock_margin.json")) as fh:
+            saved = json.load(fh)["agents"]
+        bad = [(os.path.basename(a), i) for a in agents for i in range(len(E.EPISODES))
+               if json.loads(json.dumps(rows[a][i])) != saved[os.path.basename(a)]["episodes"][i]]
+        if bad:
+            raise SystemExit(f"{len(bad)} episodes differ from knock_margin.json -- nothing written. "
+                             f"First: {bad[:3]}")
+        print(f"records only: {len(agents)} agents x {len(E.EPISODES)} episodes equal knock_margin.json")
+        save_records(set_name, recs)
+        return
+    save_records(set_name, recs)
 
     def load(name):
         with open(os.path.join(res_dir, name, "eval_summary.json")) as fh:

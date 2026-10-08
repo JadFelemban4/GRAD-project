@@ -76,15 +76,30 @@ penalty comes almost entirely from the 0-130 km/h launch (97 % of it, measured
 29 September). The training-road starver is the one that holds a sustained
 shortfall. Both stay required, and the launch share is printed beside the
 fixed-road figure so that a small margin is not read as a tested climb.
+
+THE EXTREMES ROADS ARE CHECKED TOO (8 October 2026). Decision 12 trains on
+engine_env.ExtremesTrainingEnv: the same families, plus an ambient of 25-45 C,
+a speed target that changes mid-run, hills to 18 % and the housing's heat
+capacity drawn per episode. Two checks hold it to the same standard as the
+terrain roads: neutral about zero on every family, at two seeds each, over the
+full 900 s; and a punished starver on an extremes road. The first draft of
+these roads failed the first check by a factor of ten (neutral -0.11 to -0.69
+per step): slowing down faster than the road itself slows the car asks the
+engine for negative torque, which this model does not make. Slowdowns are now
+coasts (extreme_speed_profile).
+
+THE BAND ROAD IS RAMPED (8 October). Its 9.3 % arrived as a one-step jump at
+30 s until then; every grade change in the project is ramped over GRADE_RAMP_S
+now, the fourth step agreed on 30 September.
 """
 import argparse
 from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 
-from engine_env import (SupervisoryTunerEnv, TerrainTrainingEnv, Vehicle,
-                        make_grade_climb, measure_deliverable_torque,
-                        neutral_action, TRACK_TOL)
+from engine_env import (ExtremesTrainingEnv, GRADE_RAMP_S, SupervisoryTunerEnv,
+                        TerrainTrainingEnv, Vehicle, make_grade_climb,
+                        measure_deliverable_torque, neutral_action, TRACK_TOL)
 
 # The grade the old shift rule could not serve at 130 km/h ON THE PLANT OF
 # 27 SEPTEMBER: 8th was asked for 366 Nm, under the 375 Nm downshift threshold,
@@ -94,6 +109,10 @@ from engine_env import (SupervisoryTunerEnv, TerrainTrainingEnv, Vehicle,
 # of 348.1 Nm at 2107 rpm, and the old rule tracks here too -- see the module
 # docstring. Kept as a road the baseline must drive, not as the table's guard.
 BAND_GRADE = 0.093
+
+# The extremes roads (decision 12): every family at two seeds, full length.
+XFAMS = ("locked", "single", "rolling", "double", "flat")
+XSEEDS = (11, 12)
 
 
 def true_neutral():
@@ -273,9 +292,12 @@ def road_roll(job):
     act = true_neutral() if policy == "neutral" else torque_starver()
     if kind == "band":
         c = make_grade_climb(duration=duration, dt=1.0)
-        c["grade"][30:] = BAND_GRADE
+        c["grade"] = BAND_GRADE * np.clip((c["t"] - 30.0) / GRADE_RAMP_S, 0.0, 1.0)
         env = SupervisoryTunerEnv(c, dt=1.0, seed=seed)
         env.reset(seed=seed)
+    elif kind.startswith("x-"):
+        env = ExtremesTrainingEnv(duration=duration, dt=1.0, seed=seed)
+        env.reset(seed=seed, options={"family": kind[2:]})
     else:
         env = TerrainTrainingEnv(duration=duration, dt=1.0, seed=seed)
         env.reset(seed=seed, options={"family": kind})
@@ -305,7 +327,9 @@ def main():
     # The training-road rollouts are independent; run them while the rest runs.
     roads = [("band", 0, "neutral", 300.0)] + [
         (fam, 11, "neutral", 600.0) for fam in ("single", "rolling", "double", "flat")] + [
-        ("rolling", 11, "starver", 600.0)]
+        ("rolling", 11, "starver", 600.0)] + [
+        ("x-" + fam, sd, "neutral", 900.0) for fam in XFAMS for sd in XSEEDS] + [
+        ("x-rolling", XSEEDS[0], "starver", 900.0)]
     pool = ProcessPoolExecutor(max_workers=len(roads))
     road_futs = [pool.submit(road_roll, j) for j in roads]
 
@@ -336,12 +360,19 @@ def main():
     fresh = dict(measure_deliverable_torque(probe))
     drift = max(abs(fresh[r] - table[r]) / table[r] for r in probe)
 
-    road = {(k, p): (r, e) for k, p, r, e in (f.result() for f in road_futs)}
+    road = {}
+    for (k, sd, p, _), f in zip(roads, road_futs):
+        _, _, r, e = f.result()
+        road[(k, p)] = road[(k, p, sd)] = (r, e)
     pool.shutdown()
     band_r, band_e = road[("band", "neutral")]
     fams = ("single", "rolling", "double", "flat")
     worst_fam = max(fams, key=lambda f: abs(road[(f, "neutral")][0]))
     r_roll_n, r_roll_s = road[("rolling", "neutral")][0], road[("rolling", "starver")][0]
+    xs = [(f, sd) for f in XFAMS for sd in XSEEDS]
+    worst_x = max(xs, key=lambda k: abs(road[("x-" + k[0], "neutral", k[1])][0]))
+    r_xr_n = road[("x-rolling", "neutral", XSEEDS[0])][0]
+    r_xr_s = road[("x-rolling", "starver", XSEEDS[0])][0]
 
     checks = [
         ("neutral action scores about zero",
@@ -371,6 +402,15 @@ def main():
         ("refusing torque is punished on a training road",
          r_roll_s < r_roll_n - 0.02,
          f"starver {r_roll_s:+.5f}  vs  neutral {r_roll_n:+.5f}   (rolling hills)"),
+        ("neutral scores about zero on every extremes road",
+         all(abs(road[("x-" + f, "neutral", sd)][0]) < 0.05 for f, sd in xs),
+         f"worst {worst_x[0]} seed {worst_x[1]} "
+         f"{road[('x-' + worst_x[0], 'neutral', worst_x[1])][0]:+.5f}, "
+         f"{len(xs)} roads; worst p95 err "
+         f"{max(road[('x-' + f, 'neutral', sd)][1] for f, sd in xs):.3f}"),
+        ("refusing torque is punished on an extremes road",
+         r_xr_s < r_xr_n - 0.02,
+         f"starver {r_xr_s:+.5f}  vs  neutral {r_xr_n:+.5f}   (rolling hills, seed {XSEEDS[0]})"),
     ]
 
     print(f"{'check':46s} {'result':>7}   detail")

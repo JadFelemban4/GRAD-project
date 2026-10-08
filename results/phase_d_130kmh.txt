@@ -4,6 +4,7 @@ trigger:  850 C
 run:      29 September 2026, by run_results.py, on the simulator with its
           data-set constants DERIVED from the logs (data/derived_params.json);
           evaluate.EPISODES and evaluate.run_episode unchanged
+RETIRED-OK: 920.1 -- the merged plant, which these agents trained on; the plant of 8 October scores into results/phase_d_extremes_dt1.txt
 
 policy                 damage med     IQR   worst thermal med  fuel med  peak C  cuts %  cuts % thermal
 -------------------------------------------------------------------------------------------------------

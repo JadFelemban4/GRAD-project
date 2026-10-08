@@ -82,9 +82,87 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
+## 8 October 2026, on `GRA-2340394`: X1 — the agreed fixes in the plant, the extremes design, 23 seeds a side
+
+> <!-- RETIRED-OK: 920.1, 43.4, -0.32, 917.6, 850.4 -- the merged plant's premise, named beside X1's -->
+> **X1 IS PREREGISTERED (`results/PREREGISTRATION_X1.md`, committed before any
+> X1 agent trained) AND TRAINING into `runs/extremes_dt1/`.** Ordered by
+> Ghassan ("add more seeds and retrain") before Jad's column of the decision
+> sheet is filled; section 9 of the preregistration lists the decisions X1
+> adopts provisionally and what a different answer from Jad would cost.
+>
+> - **The four plant steps agreed on 30 September are in**, each measured on the
+>   locked climb (`check_premise.py`): the thermal network sub-stepped
+>   (`thermal.DT_SUB_MAX` 0.1 s), the fingerprint covering the derived constants
+>   (schema 2, `derived_sha` fatal), the spark trim capped at 0, every grade
+>   change ramped over 8 s. **Baseline 920.1 → 848.1 at 883 °C, current-grade
+>   cuts 43.4 → 47.0 %, preview over current-grade −0.32 → −0.01 points**; the
+>   ramp is 70 of the 72 units (the one-step knock spike), the sub-stepping 2.5.
+>   `plant_sha` is now `3c48890dd15bc116`: every earlier agent is refused on it.
+> - **The training design is decision 12** (`engine_env.ExtremesTrainingEnv`,
+>   `train.py --road extremes`): ambient 25–45 °C, a speed target of 60–150 km/h
+>   redrawn every 60–180 s, hills to 18 %, the housing's heat capacity ×0.75–1.33
+>   per episode. No road asks less than 15 Nm: the model has no fuel cut, and the
+>   first drafts made the baseline itself score −0.05 to −0.69 per step. Held
+>   out: 50 °C and hills of 18–22 % (`conditions_test.py --set`); checked on six
+>   logged drives replayed flat (`logged_check.py`); `sanity_probe.py` asks
+>   whether a hotter housing ever gets less protection.
+> - **23 seeds a side, 46 runs:** the exact sign test reaches 0.822 power against
+>   the MEI (5.43 points of cut) at the spread of 29 September; 20 pairs give
+>   0.640. The test is fixed in `analyse_x1.py`, dry-run on the twenty of
+>   29 September (it reproduces their INCONCLUSIVE).
+> - **Gates on this plant:** `test_reward.py` 10 of 10 (two new checks on the
+>   extremes roads); `check_roads.py --road extremes` PASS on 40 roads, 10 bind;
+>   `validate.py` 8 of 11 (row 8, oil, 97.0 → 97.1 °C).
+> - **Every figure below this box that quotes the merged plant (920.1, 43.4 %,
+>   −0.3) is that plant's.** The document sweep follows the launch.
+> - Fixed on the way: `power_analysis.delta_for_power` returned 64.63 points at
+>   23 seeds (a binomial tail that underflowed near p = 1); it gives 5.26 now,
+>   and the script's own output did not move. `train_all.py` passes `--road`
+>   explicitly; `runs/terrain_dt1/` is CLOSED in `train.py`.
+
+## 7–8 October 2026, on `GRA-2340394`: the validation plan, every step recorded, the damage constants
+
+> **THIRTEEN DECISIONS ARE OPEN, ONE SHEET: `results/VALIDATION_DECISIONS.md`,**
+> a column each for Ghassan and Jad. Nothing is relabelled, re-preregistered or
+> retrained until they are answered and committed. Nothing below changed a
+> hashed plant file, the reward or the twenty frozen episodes.
+>
+> - **`results/VALIDATION_PLAN.md` (DRAFT):** every scorecard label to be
+>   COMPUTED (ASME V&V 20's comparison error and validation uncertainty against a
+>   required accuracy per context of use; NASA-STD-7009B for the risk side), not
+>   assigned by reading. Jad's review of 7 October is taken (its section 12).
+> - **Diagnostics behind it:** `validation_numbers.py`, `car_spark_boost.py`,
+>   `timestep_study.py` (u_num: converged at dt 1.0, too large at the sweep's
+>   dt 2.0), `damage_robustness.py`, `conditions_test.py` (the twenty agents in
+>   other air and on a varying speed target), `damage_constants.py`.
+> - **EVERY STEP IS RECORDED** (`step_record.py`, one definition of a step, used
+>   by `evaluate.py`, `record_agents.py`, `knock_margin.py`, `conditions_test.py`
+>   and `train.py`): the action and what the actuators applied, the observation,
+>   the reward and its terms, the road (grade, speed, gear), the engine, the heat,
+>   the parallel baseline car and the running totals. `train.py` now keeps 44
+>   fields a step; an agent trained with the recorder is the agent trained
+>   without it (600 steps, largest weight difference 0.0). The twenty of
+>   29 September recorded no road: `training_roads.py` regenerated their roads,
+>   preference weights and applied actuators from the seeds and the recorded
+>   actions, and checked every step (20 of 20 runs). `show_record.py` draws any
+>   episode of any record. Records stay out of git (decision 11).
+> - **The damage constants** (`results/DAMAGE_CONSTANTS.md`): the turbine scale
+>   is calculable once a mechanism is named (creep rupture: 20.3 K); the knee is
+>   bracketed by published gas limits; the oil weight and knee are one number;
+>   the weights are valuations; the knock knee waits for drive C. Under every
+>   calculated value all twenty agents still beat current-grade and the ablation
+>   stays inconclusive, unless the knock term is made large.
+> - **Mistake 23:** the knee was called "80 K more conservative" than a GAS
+>   limit it is not comparable with; like for like it is 54 K hotter.
+> - **Mistake 24, found in the new records:** blinded seed 6 is NOT trading life
+>   for fuel on its five bad frozen episodes; it burns more fuel there too, and
+>   retards spark. The same retard is behind its failure at 25 °C, and the plan's
+>   "every agent keeps +3 to +4° of spark" was a group median (corrected).
+
 ## Current state — 30 September 2026 (the two branches merged)
 
-> <!-- RETIRED-OK: 959.8, 884 -- sep17's plant, named beside the merged one -->
+> <!-- RETIRED-OK: 959.8, 884, 920.1, 43.4, -0.3 -- sep17's plant, and the merged plant's own premise, superseded on 8 October -->
 > **THE BRANCHES ARE ONE AGAIN.** Ghassan's `JMF-2340550` (tip `74de99a`) was merged
 > into Jad's `JMF-2340550-sep17` (tip `086c519`) on 30 September, hunk by hunk, as
 > both of them agreed: the decisions are `conflict.md` (Arabic copy `conflict_ar.md`),
@@ -213,6 +291,12 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 >   the lowest weight on component life (at most 0.089). The preference-weighted
 >   reward lets it trade life for fuel. No other agent does. By `evaluate.py`'s
 >   own standard, a protection policy that is sometimes terrible is not one.
+>   *(Corrected 8 October, from the per-step records: it is NOT trading life for
+>   fuel. On those five episodes it retards spark on the climb, where on the
+>   other fifteen it advances, burns 6.3–9.9 % more fuel than the baseline, and
+>   its return is negative. It loses on fuel and life together: a policy that
+>   fails on the inputs where life is weighted least, not a trade the reward
+>   pays for. `python show_record.py results/agents/terrain_dt1/blind_seed6/eval_record.npz --episode 12`.)*
 > - **Every action is recorded.** Training: `train_record.npz`, all 50 000
 >   steps of each run (action, observation, reward, engine state). Evaluation:
 >   `eval_record.npz`, every step of the twenty episodes, the commanded AND the
@@ -275,6 +359,7 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 >   stayed at 112.5 g/s); the premise figures were unguarded (`results/premise.json`
 >   and `verify_docs.check_derived` now); `check_map.py` still used 1.12
 >   backpressure; three results files had no script (`run_results.py`).
+> <!-- RETIRED-OK: 920.1, -0.3 -- the 28 September plant, superseded on 8 October -->
 > - **The premise, one change at a time** (`fig23`): baseline damage falls to
 >   **920.1** at **883 °C** (current-grade **520.5**, predictive **523.5**). **Preview over
 >   current-grade stayed at −0.4 → −0.3 through every step.**
@@ -725,8 +810,8 @@ python full_run.py         every script below, one pass, exit codes -> FULL_RUN.
 python -m app.test_simulation   15 of 15. The replay lab. SEPARATE from
                            app.test_replay -- run both after touching app/
 python check_premise.py    the hand-written policies on the locked climb:
-                           baseline 920.1 at 883 C, current-grade cuts 43.4 %,
-                           preview -0.3 points against it. Writes
+                           baseline 848.1 at 883 C, current-grade cuts 47.0 %,
+                           preview -0.0 points against it (8 Oct). Writes
                            results/premise.json. HAND-WRITTEN -- read AUDIT.md
                            C1 and C3 before quoting any of it
 python validate.py         8 of 11 inside their band: 6 of 7 against literature,
@@ -736,9 +821,12 @@ python derive_params.py    every constant the car's logs set, recomputed from
                            runs it). REFERENCES.md 4b: what is still typed, why
 python calibrate_thermal.py  the thermal fit, per drive, with every drive also
                            scored HELD OUT; results/thermal_calibration.json
-python test_reward.py      8 of 8 checks pass, four of them on the TRAINING
-                           roads -- run it after any change to the reward, the
-                           plant, the gearbox or the roads
+python test_reward.py      10 of 10 checks pass, six of them on the TRAINING
+                           roads (two on X1's extremes roads) -- run it after any
+                           change to the reward, the plant, the gearbox or the roads
+python analyse_x1.py       X1's preregistered test, once X1 is scored
+                           (results/PREREGISTRATION_X1.md); --set terrain_dt1 is
+                           its dry run on the twenty of 29 September
 python train_all.py        the twenty agents: seeds 0-9 x sighted/blinded, one
                            process each on the CPU, ~4 h; writes runs/terrain_dt1/
 python record_agents.py runs/terrain_dt1   scores them on the twenty frozen
@@ -746,7 +834,17 @@ python record_agents.py runs/terrain_dt1   scores them on the twenty frozen
                            in results/agents/terrain_dt1/ (README.md: every table)
 python knock_margin.py     the twenty with spark advance forbidden, a diagnostic:
                            median cut 67.9 -> 41.6 % sighted, 65.4 -> 41.7 %
-                           blinded, against current-grade's 43.4 %
+                           blinded, against current-grade's 43.4 % (all on the
+                           merged plant, which those agents trained on)
+python damage_constants.py  every constant of the damage formula: creep rupture
+                           gives a 20.3 K turbine scale (the formula uses 45 K);
+                           the 850 C knee is 984 C of gas; re-scored, every agent
+                           still beats current-grade (results/DAMAGE_CONSTANTS.md)
+python training_roads.py runs/terrain_dt1   the road, weights and actuators under
+                           every step of the 29 Sep training runs, regenerated and
+                           checked: 20 of 20 runs (results/train_roads_check.json)
+python show_record.py <record>   draws one recorded episode; --table, --list,
+                           --zigzag (the coolant node's step-to-step swing)
 python check_roads.py      drives the baseline over 40 training roads and fails
                            if any is one the baseline cannot drive; 14 bind
 python model_vs_data.py    eleven comparisons of the simulator against the car,
@@ -773,11 +871,12 @@ python check_map.py        spark falls with load in every row, rises with speed
 python -m app.test_replay  49 of 49 fast checks. Add --full for 59 of 59,
                            which replays the whole of 7475b5d7 and pins the
                            app's own numbers: 14278 of 14340 samples estimated,
-                           peak estimated turbine 873.1 C, 14 thermal / 0
+                           peak estimated turbine 872.7 C, 14 thermal / 0
                            mismatch / 19 novel alerts. The reason for every
                            move of a pin is written beside it in the file
                            (28 Sep: the exhaust-flow fix moved 7475b5d7; the
-                           derived enrichment dwell moved pull01)
+                           derived enrichment dwell moved pull01; 8 Oct: the
+                           thermal sub-stepping moved both by 0.4-0.6 K)
 ```
 
 <!-- RETIRED-OK: 256.5, 801 -->
@@ -815,10 +914,12 @@ stopped being true. **A reader who stopped at the bold number would have carried
 a void figure into a meeting.** Mistake 11 in its most dangerous form: not a
 stale number in a corner, but a retracted headline still reading as current.
 
-**What replaces it:** run `check_premise.py`. On the merged plant (30 September) it
-prints a baseline of 920.1 at 883 °C, the constraint binding against the 850 °C
-trigger, and preview worth **−0.3 points** against a policy that only knows the
-grade it is on now — all of it one second of knock at the grade step.
+**What replaces it:** run `check_premise.py`. On the plant of 8 October it prints
+a baseline of 848.1 at 883 °C, the constraint binding against the 850 °C
+trigger, and preview worth **−0.0 points** against a policy that only knows the
+grade it is on now. <!-- RETIRED-OK: 920.1, -0.3 -- the merged plant's -->
+On the merged plant (30 September) it read 920.1 and −0.3, and the −0.3 was all
+one second of knock at the instantaneous grade step, which the 8 s ramp removed.
 
 *(A parenthesis here used to restate the arithmetic behind an 11 September typo
 correction to the first figure. It was deleted on 17 September: `RETIRED` now
@@ -939,7 +1040,11 @@ Two conclusions, and they pull in opposite directions — state both:
   high.** Rebuild it from measured driving. Do NOT lower the limit: 1123 K is already 80 K more
   conservative than the 930 C pre-turbine enrichment limit REFERENCES.md cites
   (Conway et al., SAE 2018-01-1423, p. 10), and moving it is turning the one
-  knob the audit named.
+  knob the audit named. *(Corrected 8 October: the "80 K more conservative"
+  half is mistake 23 -- a housing temperature set against a gas temperature.
+  Like for like the knee is 984 C of gas, 54 K HOTTER than Conway's limit. The
+  "do not turn the knob after seeing results" half stands; whether the knee
+  moves is decision 9 of results/VALIDATION_DECISIONS.md, before training.)*
 - **0.206 % is itself a result about H/tau, and it belongs in the thesis.** On
   this vehicle, in this driving, the protected component is near its limit a
   fifth of one percent of the time. That is a statement about how much preview
@@ -1137,7 +1242,7 @@ temperature-matched and should not be quoted as though it were.)*
 
 ---
 
-## Twenty-two mistakes already made. Do not remake them.
+## Twenty-four mistakes already made. Do not remake them.
 
 *(**17 and 18 are the same gearbox, found from two directions and now merged.**
 17 is the mid-climb upshift, found on `sep17` when the reward gate refused to
@@ -2124,6 +2229,52 @@ sentence written under it. When a claim is a comparison, say what it is compared
 against — "inside the range" and "at the top of the range" are different tests,
 and for a limit only the second one means anything.
 
+### 23. A HOUSING TEMPERATURE SET AGAINST A GAS TEMPERATURE
+
+Found 8 October 2026, while asking which published limit could set the damage
+knee (`damage_constants.py`). REFERENCES.md and this file said the 1123 K
+trigger "is already 80 K more conservative than the 930 C pre-turbine
+enrichment limit" of Conway et al. 2018, and used that to say *do not lower the
+limit*. **The 1123 K knee is on `thermal.py`'s turbine HOUSING node; 930 C is a
+GAS temperature at the turbine inlet.** At steady state the node sits a fixed
+fraction of the way from the gas to the ambient: 0.142 on the baseline's own
+climb (1022 C gas, 883 C housing). Like for like, the knee is **984 C of gas,
+54 K hotter than Conway's limit**, and 930 C of gas is 804 C on the node, 46 K
+under the knee. The direction of the comparison was backwards. (The 0.142 rests
+on the ASSUMED `ua_gas_turb` and `ua_turb_amb`; BorgWarner's own housing at a
+950 C inlet has its inner wall at the gas temperature and about 100 C of
+gradient inside it.)
+
+Mistake 14's shape, in a document instead of a detector: **before comparing two
+temperatures, check they are the same temperature.** A housing, the gas through
+it, a thermocouple in that gas and the gas averaged over the cycle are four
+different numbers (REFERENCES.md row 5 already warns about the last two).
+
+### 24. AN AGENT'S BEHAVIOUR EXPLAINED FROM ITS INPUTS, NOT ITS OUTPUTS
+
+Found 8 October 2026, the first day every step was recorded. Since 29 September
+this file, the agents' README and the results page said blinded seed 6 does more
+damage than the baseline on the five frozen episodes that weight life least
+because "the preference-weighted reward lets it trade life for fuel". It was
+read off the weights: low life weight, high damage, so it must be buying fuel.
+**Nobody looked at the fuel.** On those five episodes it burns 6.3–9.9 % MORE
+fuel than the baseline, its return is negative (at most −45, against at least
++32 on its other fifteen), and its per-step record shows why: on the climb its
+median spark trim is −3.2 to −6.4° on those five episodes, against +2.6 to +3.9°
+on the other fifteen. It loses on fuel and life together, so it is not a trade
+the reward pays for. Nor is it inexperience: it met life weights that low in 13 of
+its 56 training episodes, and all ten road sequences together in 124 of 560
+(`record_extracts.py` -> `training_env.json`). The retard is something it learned
+under those weights, and why is open. *(Corrected the same day: this said "a
+policy failing on the inputs it saw least", written before the training weights
+were counted -- this mistake's own shape, one paragraph later.)*
+
+The same records showed the same retard behind its failure at 25 °C in the
+conditions test, and `VALIDATION_PLAN.md` §11 had said "every agent keeps its
+spark between +3 and +4°" from the group medians. **An explanation names
+quantities; measure every one it names before writing it.** "Trades life for
+fuel" names the fuel.
+
 ---
 
 ## Known limitations to state in the thesis, not fix quietly
@@ -2623,6 +2774,21 @@ record_agents.py      Scores agents on the twenty frozen episodes, recording
                       summary; README.md, index.json and figures per set.
 knock_margin.py       The same agents with spark advance forbidden -- how much
                       of their gain rests on the untested knock model.
+step_record.py        What a recorded step holds: ONE definition for every
+                      script that runs episodes (7 Oct). Read it first.
+show_record.py        Draws or tabulates one episode of any record: the road,
+                      the gear, the engine, every actuator asked and applied,
+                      the heat against the parallel baseline car, the damage.
+training_roads.py     The road, weights and applied actuators under every step
+                      of the 29 Sep training runs, regenerated and checked.
+record_extracts.py    Small committed extracts of the gitignored records for the
+                      results page (conditions_traces.json, bad_episode_trace
+                      .json). Re-run after the records are re-made, then
+                      make_page.py.
+conditions_test.py    The twenty agents at 25-50 C and 76-101 kPa, on a speed
+                      target that changes mid-run; every step recorded.
+damage_constants.py   Every damage constant: what can set it, the value where
+                      something can, and the frozen episodes re-scored.
 evaluate.py           The twenty frozen episodes. Prints the fingerprint from
                       the LIVE objects, writes it into the result file, and
                       REFUSES a model whose meta.json differs.

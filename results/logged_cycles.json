@@ -1,0 +1,76 @@
+{
+ "rule": "every manifest drive with vehicle speed and ambient, >= 5 min, except the census log; speed from genuine readings, linear, 3 s mean; median ambient; grade zero",
+ "drives": [
+  {
+   "drive": "3aca2ec1-20260907_072817.csv",
+   "minutes": 41.78,
+   "t_amb_c": 32.0,
+   "v_max_kmh": 142.7,
+   "v_median_moving_kmh": 127.1,
+   "accel_p99": 1.649,
+   "decel_p1": -1.627,
+   "v_sha": "f8b8000cfa543a64"
+  },
+  {
+   "drive": "670063b2-20260907_142018.csv",
+   "minutes": 7.37,
+   "t_amb_c": 41.5,
+   "v_max_kmh": 199.2,
+   "v_median_moving_kmh": 137.2,
+   "accel_p99": 2.12,
+   "decel_p1": -0.888,
+   "v_sha": "2a47086b6a896e1a"
+  },
+  {
+   "drive": "683640a0-20260907_070212.csv",
+   "minutes": 24.43,
+   "t_amb_c": 34.0,
+   "v_max_kmh": 128.6,
+   "v_median_moving_kmh": 97.2,
+   "accel_p99": 1.262,
+   "decel_p1": -1.219,
+   "v_sha": "73189f23155bd1fe"
+  },
+  {
+   "drive": "7475b5d7-20260908_142743.csv",
+   "minutes": 55.12,
+   "t_amb_c": 42.0,
+   "v_max_kmh": 227.5,
+   "v_median_moving_kmh": 124.3,
+   "accel_p99": 1.872,
+   "decel_p1": -1.361,
+   "v_sha": "37cea9016eb9a39c"
+  },
+  {
+   "drive": "cb67b01f-20260908_084142.csv",
+   "minutes": 21.63,
+   "t_amb_c": 36.5,
+   "v_max_kmh": 197.6,
+   "v_median_moving_kmh": 117.4,
+   "accel_p99": 1.694,
+   "decel_p1": -1.507,
+   "v_sha": "c88e94a75225ac9b"
+  },
+  {
+   "drive": "drive10-20260918_233912.csv",
+   "minutes": 119.47,
+   "t_amb_c": 26.5,
+   "v_max_kmh": 164.9,
+   "v_median_moving_kmh": 92.6,
+   "accel_p99": 1.693,
+   "decel_p1": -1.423,
+   "v_sha": "3c4ddd53fab0ef92"
+  }
+ ],
+ "minutes": 269.8,
+ "episodes": {
+  "life_most": 4,
+  "life_least": 15
+ },
+ "criteria": {
+  "demand_nm": 40.0,
+  "t_limit": 0.01,
+  "f_limit": 1.01,
+  "cold_c": 750.0
+ }
+}

@@ -1375,7 +1375,12 @@ def check_scenario(here):
     PREMISE_FILES = [f for f in ALL
                      if not re.match(r"results/(d2|c4|phase_d)_seed\d+\.txt$", f)]
     print(f"  note   one neutral premise rollout, {_time.time() - _t0:.0f} s")
-    figure("check_premise baseline damage", round(float(r["damage"]), 1), 920.1, 0.3,
+    # MOVED 8 OCTOBER 2026, 920.1 -> 848.1: the plant steps agreed on 30 September.
+    # Measured one at a time on the locked climb (CLAUDE.md, the box of 8 October):
+    # the thermal network sub-stepped, 920.1 -> 917.6; every grade change ramped
+    # over 8 s, which removes the one-step knock spike at 180 s, 917.6 -> 848.1.
+    # The peak (883 C) does not move.
+    figure("check_premise baseline damage", round(float(r["damage"]), 1), 848.1, 0.3,
            # THREE DIGITS AND ONE DECIMAL. Every damage figure this project has
            # ever published is written that way (959.8, 572.8, 294.2, 414.4),
            # and a bare NUM after the word "baseline" reads the 1.0 out of
@@ -1480,10 +1485,13 @@ def check_scenario(here):
     # capacity is assumed, and the alert counts are a property of thresholds
     # this project chose. They are pinned so a regression is visible, and the
     # documents that repeat them have to move when the pin does.
+    # MOVED 8 OCTOBER 2026, 873.1 -> 872.7 and 604.8 -> 604.2 C: the thermal
+    # network's sub-stepping, attributed in app/test_replay.py by switching it
+    # off (the old pins come back exactly). No alert count moved.
     chk("app peak 7475b5d7 (MODEL OUTPUT; a pin, not a run of the suite)",
-        float(TR.EXPECT_FULL["peak_turb_c"]), 873.1, 0.0, " C")
+        float(TR.EXPECT_FULL["peak_turb_c"]), 872.7, 0.0, " C")
     chk("app peak pull01 (MODEL OUTPUT; a pin, not a run of the suite)",
-        float(TR.EXPECT_FAST["peak_turb_c"]), 604.8, 0.0, " C")
+        float(TR.EXPECT_FAST["peak_turb_c"]), 604.2, 0.0, " C")
     # The two drives' peaks are written identically, so the documents are
     # checked against BOTH pinned values at once -- see scan_allowed(). The word
     # TURBINE has to be in the sentence: `7475b5d7` is also the drive behind the

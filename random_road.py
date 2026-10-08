@@ -46,7 +46,11 @@ get, without dragging Phase D into it.
 
 THE ONE LINE THIS DUPLICATES, stated rather than hidden
 -------------------------------------------------------
-`make_grade_climb` places the climb with `g[int(180 / dt):] = grade`. `climb()`
+`make_grade_climb` places the climb with
+`g = grade * clip((t - 180) / GRADE_RAMP_S, 0, 1)` -- ramped over 8 s since
+8 October 2026, the fourth step agreed on 30 September (until then it was a
+step, `g[int(180 / dt):] = grade`, and the baseline ECU, scheduling spark on the
+previous step's pressure, knocked for one step at every grade step). `climb()`
 below repeats that expression with `start_s` in place of 180. That is two
 definitions of "where the hill starts", and a second source of truth is how
 this project acquires drift (CLAUDE.md mistake 11). It is guarded rather than
@@ -75,7 +79,7 @@ import inspect
 import gymnasium as gym
 import numpy as np
 
-from engine_env import make_grade_climb
+from engine_env import GRADE_RAMP_S, make_grade_climb
 
 # ---------------------------------------------------------------------------
 # THE DESIGN, as decided 22 September 2026 (results/NEXT_EXPERIMENT_DESIGN.md,
@@ -103,14 +107,12 @@ def climb(start_s, grade, duration=900.0, dt=0.2, t_amb=T_AMB_K, v_kmh=V_KMH):
 
     Built by asking `make_grade_climb` for everything it already defines -- the
     time base, the speed ramp, ambient, pressure, humidity -- and then placing
-    the grade step at `start_s` instead of 180 s, with the SAME expression
-    `make_grade_climb` uses. See "THE ONE LINE THIS DUPLICATES" above.
+    the climb at `start_s` instead of 180 s, ramped over GRADE_RAMP_S, with the
+    SAME expression `make_grade_climb` uses. See "THE ONE LINE THIS DUPLICATES".
     """
     c = make_grade_climb(duration=duration, dt=dt, t_amb=t_amb, grade=grade,
                          v_kmh=v_kmh)
-    g = np.zeros_like(c["grade"])
-    g[int(start_s / dt):] = grade
-    c["grade"] = g
+    c["grade"] = grade * np.clip((c["t"] - start_s) / GRADE_RAMP_S, 0.0, 1.0)
     return c
 
 

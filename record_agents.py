@@ -55,9 +55,6 @@ OUTROOT = os.path.join(HERE, "results", "agents")
 HAND = (("baseline ECU", "p_neutral"), ("reactive", "p_reactive"),
         ("current-grade", "p_grade_now"), ("predictive (hand)", "p_predictive"))
 ACTUATORS = ("spark trim (deg)", "lambda trim", "boost trim (kPa)", "fan duty", "pump duty")
-F32 = ("action", "applied", "reward", "r_fuel", "r_life", "r_resp", "t_turb", "t_oil", "t_block",
-       "t_turb_base", "damage_rate", "torque", "torque_req", "spark", "lam", "ki", "egt_c",
-       "mdot_fuel", "rpm", "map_kpa", "grade")
 
 # What is known about the 19 September agents that their model files do not
 # hold. Sources: CLAUDE.md "Current state -- 19 September" and train.py's
@@ -368,14 +365,43 @@ def read_curve(path):
     return dict(episode=c.iloc[:, 0].to_numpy(float), **{"return": c["return"].to_numpy(float)})
 
 
+def _folder(spec):
+    name = spec[1] if spec[0] == "hand" else os.path.basename(spec[1])
+    return name.replace(" ", "_").replace("(", "").replace(")", "")
+
+
+def records_only(outdir, specs, episodes, res, stacked):
+    """Re-record (7 October 2026: the records gained the road speed, the gear,
+    the parallel baseline car and the running totals, step_record.py). Every
+    episode must first equal the one its committed eval_summary.json holds,
+    field for field; only then is eval_record.npz rewritten, and nothing that
+    git tracks is touched."""
+    import evaluate as E
+    bad = []
+    for s in specs:
+        with open(os.path.join(outdir, _folder(s), "eval_summary.json")) as fh:
+            want = json.load(fh)["episodes"]
+        for i in episodes:
+            if json.loads(json.dumps(res[s][i])) != want[i]:
+                bad.append((s[1], i))
+    if bad:
+        raise SystemExit(f"{len(bad)} episodes differ from their committed eval_summary.json -- nothing "
+                         f"written. First: {bad[:3]}")
+    for s in specs:
+        save_record(os.path.join(outdir, _folder(s), "eval_record.npz"), dict(
+            stacked[s], episode_seed=np.array([E.EPISODES[i][0] for i in episodes]),
+            weights=np.array([E.EPISODES[i][1] for i in episodes])))
+    print(f"records only: {len(specs)} policies x {len(episodes)} episodes equal their committed "
+          f"eval_summary.json; eval_record.npz rewritten with {len(next(iter(stacked.values())))} fields each")
+    return 0
+
+
 def save_record(path, rec):
     """float32 for actions, rewards and the engine; float16 for the (normalised)
-    observation; integers and the preference weights exactly as they are."""
-    def cast(k, v):
-        if np.issubdtype(v.dtype, np.integer) or k == "weights":
-            return v
-        return v.astype(np.float32 if k in F32 else np.float16)
-    np.savez_compressed(path, **{k: cast(k, v) for k, v in rec.items()})
+    observation; integers and the preference weights exactly as they are
+    (step_record.cast: one rule for every record)."""
+    import step_record
+    np.savez_compressed(path, **{k: step_record.cast(k, v) for k, v in rec.items()})
 
 
 def main():
@@ -388,6 +414,9 @@ def main():
                     help="rebuild README, index and figures from the records already written")
     ap.add_argument("--limit", type=int, default=None,
                     help="only the first N frozen episodes -- a quick check of this script, never a result")
+    ap.add_argument("--records-only", action="store_true",
+                    help="re-record every step (eval_record.npz, gitignored) after checking each episode "
+                         "equals its committed eval_summary.json; nothing tracked is rewritten")
     a = ap.parse_args()
     import evaluate as E
     episodes = range(len(E.EPISODES) if a.limit is None else min(a.limit, len(E.EPISODES)))
@@ -422,8 +451,14 @@ def main():
                 print(f"  {k + 1} of {len(jobs)} episodes, {(time.time() - t0) / 60:.1f} min")
     stacked = {s: {k: np.stack([r[k] for r in recs[s]]) for k in recs[s][0]} for s in specs}
 
-    # ---- the regression check: identical to the published protocol rows
-    raw_path = os.path.join(HERE, "results", "phase_d_130kmh_raw.json")
+    if a.records_only:
+        return records_only(outdir, specs, episodes, res, stacked)
+
+    # ---- the regression check: identical to the published protocol rows,
+    # the ones run_results.py wrote for THIS set (a later set has its own file:
+    # run_results.phase_d_paths; the hand-written rows move with the plant)
+    import run_results
+    raw_path = run_results.phase_d_paths(a.set_dir or run_results.AGENT_SET)[0]
     checked, bad = 0, []
     if os.path.exists(raw_path):
         with open(raw_path) as fh:
@@ -438,7 +473,7 @@ def main():
                         bad.append((label, r["episode"], mine["damage"], r["damage"]))
     if bad:
         raise SystemExit(f"RECORDING CHANGED A SCORE -- stop. {bad[:5]}")
-    print(f"regression: {checked} episodes compared with results/phase_d_130kmh_raw.json, all identical")
+    print(f"regression: {checked} episodes compared with {os.path.relpath(raw_path, HERE)}, all identical")
 
     base = res[("hand", "baseline ECU")]
     base_med = float(np.median([r["damage"] for r in base]))
@@ -490,6 +525,8 @@ def report(outdir, set_name, hand, agents, checked, minutes):
     stats_ = paired(agents, hand["current-grade"]["summary"]["cut_pct"]) if agents else {}
     figs = figures(outdir, agents, hand, stats_, set_name) if agents else []
     notes = findings(hand, agents)
+    if agents:
+        episode_trace(outdir, hand, agents)
     write_readme(outdir, set_name, hand, agents, stats_, figs, checked, minutes, notes)
     base_med = hand["baseline ECU"]["summary"]["damage"]["median"]
     index = dict(set=set_name, generated=time.strftime("%Y-%m-%d %H:%M"), baseline_median_damage=base_med,
@@ -500,6 +537,40 @@ def report(outdir, set_name, hand, agents, checked, minutes):
                  ablation=stats_, findings=notes)
     with open(os.path.join(outdir, "index.json"), "w") as fh:
         json.dump(index, fh, indent=1)
+
+
+def episode_trace(outdir, hand, agents, ep=0, every=4):
+    """Episode 1 of the twenty, every `every` s, for the baseline, current-grade
+    and every agent: the five applied actuators, the turbine and the grade.
+    Written 30 Sep 2026 for the results page, which must build from git alone
+    while eval_record.npz is gitignored -- this is the small committed extract
+    (~140 kB) the page's step-by-step chart reads. Values are cast to float64
+    before rounding: rounding a float32 and listing it prints its float64 digits
+    (0.85 -> 0.8500000238418579), which tripled the file."""
+    pols = {n: v for n, v in hand.items() if n in ("baseline ECU", "current-grade")}
+    pols.update(agents)
+    r0 = next(iter(pols.values()))["_rec"]
+    idx = np.arange(0, r0["grade"].shape[1], every)
+    rnd = lambda x, n: np.round(np.asarray(x, dtype=np.float64), n).tolist()
+    out = dict(episode=ep, every_s=every, t=idx.tolist(),
+               grade=rnd(100 * r0["grade"][ep, idx], 2), policies={})
+    for n, v in pols.items():
+        r = v["_rec"]
+        a = r["applied"][ep, idx]
+        out["policies"][n] = dict(
+            kind="hand" if n in hand else ("sighted" if v.get("preview") else "blinded"),
+            turb=rnd(r["t_turb"][ep, idx] - 273.15, 1),
+            spark=rnd(a[:, 0], 2), lam=rnd(a[:, 1], 4),
+            boost=rnd(a[:, 2], 1), fan=rnd(a[:, 3], 3), pump=rnd(a[:, 4], 3))
+        # Since 7 October the records hold the engine and the ledger too
+        # (step_record.py); records written before it do not, and are skipped.
+        for key, field, nd, off in (("map", "map_kpa", 1, 0.0), ("ki", "ki", 3, 0.0),
+                                    ("dmg", "damage_cum", 1, 0.0), ("fuel", "fuel_cum", 1, 0.0),
+                                    ("coolant", "t_block", 1, 273.15)):
+            if field in r:
+                out["policies"][n][key] = rnd(r[field][ep, idx] - off, nd)
+    with open(os.path.join(outdir, "episode_trace.json"), "w") as fh:
+        json.dump(out, fh, separators=(",", ":"))
 
 
 def report_from_disk(outdir, set_name):
@@ -560,6 +631,10 @@ def findings(hand, agents):
                f"How much of the gain it is: KNOCK_MARGIN.md beside this file (knock_margin.py), where it exists.")
     base_dmg = base["summary"]["damage"]["median"]
     w_life = np.array([e[1][2] for e in E.EPISODES])
+    base_eps = base.get("episodes") or []
+    if not base_eps:
+        with open(os.path.join(base["dir"], "eval_summary.json")) as fh:
+            base_eps = json.load(fh)["episodes"]
     for n, v in agents.items():
         eps = v.get("episodes") or []
         if not eps:
@@ -573,8 +648,15 @@ def findings(hand, agents):
                        f"against {base_dmg:.0f}, peak turbine {max(eps[i]['peak_turb'] for i in bad):.0f} C). "
                        f"Their weight on component life is {', '.join(f'{w_life[i]:.3f}' for i in bad)}"
                        + (" -- exactly the lowest in the frozen set" if bad == low else "")
-                       + ". The reward lets an agent trade life for fuel when life is weighted that little; "
-                       "by evaluate.py's own standard a protection policy that is sometimes terrible is not one.")
+                       # 8 October: this said "the reward lets an agent trade life
+                       # for fuel". The fuel and the return say otherwise.
+                       + ". It is not trading life for fuel: on those episodes it burns "
+                       + ", ".join(f"{100 * (eps[i]['fuel'] / base_eps[i]['fuel'] - 1):+.1f}"
+                                   for i in bad)
+                       + " % fuel against the baseline, and its return is "
+                       + ", ".join(f"{eps[i]['ret']:+.0f}" for i in bad)
+                       + "; by evaluate.py's own standard a protection policy that is sometimes terrible is "
+                       "not one.")
     best_hand = max(h["summary"]["cut_pct"] for h in hand.values())
     beat = [n for n, v in agents.items() if v["summary"]["cut_pct"] > best_hand]
     out.append(f"{len(beat)} of {len(agents)} agents beat the best hand-written policy on median damage "

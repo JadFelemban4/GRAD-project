@@ -56,8 +56,11 @@ def damage(rec, c, dt=1.0):
     return d.sum(axis=1) * dt
 
 
-def main():
-    from scipy import stats
+def load_records():
+    """Every policy's recorded turbine, oil and knock integral, checked: the
+    published ruler must give back the committed damage, episode by episode.
+    The records hold the temperatures as float32 (record_agents.py
+    save_record), so agreement is to float32 precision, about 1e-7 relative."""
     names = list(HAND) + sorted(n for n in os.listdir(SET) if n.startswith(("sighted_seed", "blind_seed")))
     recs, committed = {}, {}
     for n in names:
@@ -65,35 +68,39 @@ def main():
         recs[n] = {k: np.asarray(r[k], float) for k in ("t_turb", "t_oil", "ki")}
         with open(os.path.join(SET, n, "eval_summary.json"), encoding="utf-8") as fh:
             committed[n] = np.array([e["damage"] for e in json.load(fh)["episodes"]])
-    # The published ruler must give back the committed damage, episode by
-    # episode. The records hold the temperatures as float32 (record_agents.py
-    # save_record), so agreement is to float32 precision, about 1e-7 relative.
     worst = max(float(np.max(np.abs(damage(recs[n], PUBLISHED) - committed[n]) / committed[n]))
                 for n in names)
     assert worst < 1e-6, f"the re-score does not reproduce the committed damage (worst {worst:.2e})"
+    return names, recs, worst
 
+
+def score(names, recs, c):
+    """The three conclusions under ruler c (a complete set of constants)."""
+    from scipy import stats
     seeds = sorted(int(n.split("seed")[1]) for n in names if n.startswith("sighted_seed"))
-    out = {}
-    for label, change in RULERS:
-        c = dict(PUBLISHED, **change)
-        med = {n: float(np.median(damage(recs[n], c))) for n in names}
-        cut = {n: 100.0 * (1.0 - med[n] / med["baseline_ECU"]) for n in names}
-        diff = np.array([cut[f"sighted_seed{k}"] - cut[f"blind_seed{k}"] for k in seeds])
-        half = float(stats.t.ppf(0.975, len(diff) - 1)) * diff.std(ddof=1) / np.sqrt(len(diff))
-        agents = [n for n in names if "_seed" in n]
-        out[label] = dict(
-            base_damage=round(med["baseline_ECU"], 1),
-            grade_cut=round(cut["current-grade"], 2),
-            pred_minus_grade=round(cut["predictive_hand"] - cut["current-grade"], 2),
-            sighted_median=round(float(np.median([cut[f"sighted_seed{k}"] for k in seeds])), 2),
-            blind_median=round(float(np.median([cut[f"blind_seed{k}"] for k in seeds])), 2),
-            beat_grade=int(sum(cut[n] > cut["current-grade"] for n in agents)), n=len(agents),
-            weakest=min(agents, key=lambda n: cut[n]), weakest_cut=round(min(cut[n] for n in agents), 2),
-            ablation_mean=round(float(diff.mean()), 2),
-            ablation_lo=round(float(diff.mean() - half), 2),
-            ablation_hi=round(float(diff.mean() + half), 2),
-            ablation_positive=int((diff > 0).sum()),
-            ablation_p_wilcoxon=round(float(stats.wilcoxon(diff).pvalue), 2))
+    med = {n: float(np.median(damage(recs[n], c))) for n in names}
+    cut = {n: 100.0 * (1.0 - med[n] / med["baseline_ECU"]) for n in names}
+    diff = np.array([cut[f"sighted_seed{k}"] - cut[f"blind_seed{k}"] for k in seeds])
+    half = float(stats.t.ppf(0.975, len(diff) - 1)) * diff.std(ddof=1) / np.sqrt(len(diff))
+    agents = [n for n in names if "_seed" in n]
+    return dict(
+        base_damage=round(med["baseline_ECU"], 1),
+        grade_cut=round(cut["current-grade"], 2),
+        pred_minus_grade=round(cut["predictive_hand"] - cut["current-grade"], 2),
+        sighted_median=round(float(np.median([cut[f"sighted_seed{k}"] for k in seeds])), 2),
+        blind_median=round(float(np.median([cut[f"blind_seed{k}"] for k in seeds])), 2),
+        beat_grade=int(sum(cut[n] > cut["current-grade"] for n in agents)), n=len(agents),
+        weakest=min(agents, key=lambda n: cut[n]), weakest_cut=round(min(cut[n] for n in agents), 2),
+        ablation_mean=round(float(diff.mean()), 2),
+        ablation_lo=round(float(diff.mean() - half), 2),
+        ablation_hi=round(float(diff.mean() + half), 2),
+        ablation_positive=int((diff > 0).sum()),
+        ablation_p_wilcoxon=round(float(stats.wilcoxon(diff).pvalue), 2))
+
+
+def main():
+    names, recs, worst = load_records()
+    out = {label: score(names, recs, dict(PUBLISHED, **change)) for label, change in RULERS}
 
     print(f"re-score check: the published ruler reproduces the committed damage of {len(names)} "
           f"policies x 20 episodes (worst relative difference {worst:.1e})\n")
