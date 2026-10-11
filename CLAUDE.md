@@ -82,6 +82,40 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
+## 11 October 2026, on `GRA-2340394`: X2 — wider air, 5 seeds a side, 1200 episodes each
+
+> **X2 IS TRAINING** (`runs/wideair_dt1/`, launched 11 October at 05:10, about
+> 50 hours), under `results/PREREGISTRATION_X2.md`, committed as `06f4686`
+> before any X2 agent trained. Ordered by Ghassan: the extremes roads with
+> ambient **0–45 °C** and pressure **80–101.3 kPa** drawn per episode, **5 seeds
+> a side** (he chose five over three once shown that three pairs can never pass
+> the sign test), **1 080 000 steps (1200 episodes) per run**. Nothing else
+> changes from X1, the plant included: X1's fingerprint, so X1's agents stay
+> scoreable.
+>
+> - **Five pairs, said before the result:** the smallest one-sided sign p is
+>   0.031, so every cell but INCONCLUSIVE needs all five pairs on one side, and
+>   at X1's spread the power against the MEI is 0.07. X2 is also a measurement:
+>   whether the agents settle (`check_x2_convergence.py`, C4's rule) and how far
+>   apart the seeds are after 1200 episodes, which sizes the next test
+>   (`analyse_x2.py` prints the seed count).
+> - **`wide_air.py`, no hashed plant file touched:** the compressor inlet follows
+>   the pressure (the conditions test's model, per episode), and two of X1's
+>   rules follow the air, each found by a gate before training. The road's torque
+>   floor: the engine makes 20.6 Nm with the throttle shut at 0 °C, and X1's
+>   15 Nm failed five cold roads. The gearbox's kickdown table: at 45 °C and
+>   80 kPa the sea-level table held a gear the engine could no longer pull. At
+>   101.3 kPa the design reduces to the plant to the bit (`test_wide_air.py`).
+> - **Gates:** `test_reward.py` 12 of 12 (two new, on the thin-air corners);
+>   `check_roads.py --road wideair` PASS, worst neutral −0.0054. **The baseline
+>   passes 850 °C on 2 of 40 wideair roads against 10 of 40 on X1's**: most of
+>   X2's training needs no protection (preregistration limit 7).
+> - **Crash rule, new:** `--keep-buffer`. A run that stops resumes from its last
+>   checkpoint WITH its replay buffer: re-run the same `train_all.py` command.
+>   Keep the laptop plugged in and Windows Update paused until it finishes.
+> - **Scoring is unattended:** `x2_score.py` waits for the ten runs, then runs the
+>   preregistered order (`results/x2_score/SCORE_LOG.txt`).
+
 ## 8–9 October 2026, on `GRA-2340394`: X1 — the agreed fixes in the plant, the extremes design, 23 seeds a side
 
 > **X1 HAS RUN. ITS PREREGISTERED READING IS SMALLER THAN THE MEI**
@@ -735,8 +769,8 @@ dataset size, the oil node).*
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.839), over 26 pooled points, 30–75 kPa, from a dataset of eleven drives, 321.7 minutes. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. **Since 28 Sep the thermal network, boost ceiling, spark offset and enrichment dwell are DERIVED from the logs** (`derive_params.py`); `validate.py` 8 of 11 (6 of 7 literature, 2 of 4 against our car). The knock model is NOT validated |
-| C · get an agent to learn | **Two sets, each on its own plant.** On sep17's plant: C1 (16 agents, 50 000 steps) and C4 (16 agents, 300 000 steps, NOT converged by C4's preregistered rule, `PREREGISTRATION_C4.md` 5b). On Ghassan's derived plant: twenty agents, ten seeds a side, 50 000 steps (55 episodes), a new road every episode, dt 1.0 (`results/agents/terrain_dt1/`). **X1, trained 8 October and scored 9 October:** 23 seeds a side, 50 000 steps, on the plant with the agreed fixes (sub-stepping, spark cap, ramps) and the extremes design (`results/PREREGISTRATION_X1.md`; `runs/extremes_dt1/`, CLOSED in `train.py` since its result) |
-| D · baselines and the ablation | **done four times, never decisively.** Phase D and D2 INCONCLUSIVE; C4 SMALLER THAN THE MEI by the sign test only (p 0.0352), the permutation test disagreeing (0.3867), not converged; Ghassan's retrain INCONCLUSIVE under the MEI rule (6 of 10, power 0.26). Supervision beats `current-grade` on the median in every set — **but with spark advance forbidden that margin disappears** (the box at the top). The MEI is 50 damage units (set 22 Sep); X1 restates it as 5.43 points of cut (decision 5) and is the fifth look, preregistered and scored by `x1_score.py`: **SMALLER THAN THE MEI** (17 of 23 pairs below it, sign p 0.0173, the permutation test agreeing), with six sighted agents and no blinded one protecting little on the scored climb (post hoc) |
+| C · get an agent to learn | **Two sets, each on its own plant.** On sep17's plant: C1 (16 agents, 50 000 steps) and C4 (16 agents, 300 000 steps, NOT converged by C4's preregistered rule, `PREREGISTRATION_C4.md` 5b). On Ghassan's derived plant: twenty agents, ten seeds a side, 50 000 steps (55 episodes), a new road every episode, dt 1.0 (`results/agents/terrain_dt1/`). **X1, trained 8 October and scored 9 October:** 23 seeds a side, 50 000 steps, on the plant with the agreed fixes (sub-stepping, spark cap, ramps) and the extremes design (`results/PREREGISTRATION_X1.md`; `runs/extremes_dt1/`, CLOSED in `train.py` since its result). **X2, training since 11 October, about 50 hours:** 5 seeds a side, 1 080 000 steps (1200 episodes) each, X1's plant, the extremes roads in wider air (0–45 °C, 80–101.3 kPa; `wide_air.py`, `results/PREREGISTRATION_X2.md`, `runs/wideair_dt1/`) |
+| D · baselines and the ablation | **done four times, never decisively.** Phase D and D2 INCONCLUSIVE; C4 SMALLER THAN THE MEI by the sign test only (p 0.0352), the permutation test disagreeing (0.3867), not converged; Ghassan's retrain INCONCLUSIVE under the MEI rule (6 of 10, power 0.26). Supervision beats `current-grade` on the median in every set — **but with spark advance forbidden that margin disappears** (the box at the top). The MEI is 50 damage units (set 22 Sep); X1 restates it as 5.43 points of cut (decision 5) and is the fifth look, preregistered and scored by `x1_score.py`: **SMALLER THAN THE MEI** (17 of 23 pairs below it, sign p 0.0173, the permutation test agreeing), with six sighted agents and no blinded one protecting little on the scored climb (post hoc). X2 is the sixth, training: on five pairs only a unanimous result can leave INCONCLUSIVE, so it is also a measurement of convergence and of the spread after 1200 episodes |
 | E · battery plant | not started. `battery.py` does not exist |
 | F · the H/τ sweep | preliminary, hand-written policies only. **Re-run on 8 October on the sub-stepped plant:** preview over current-grade 0.0 points at every τ where the limit binds (H2), 0.0 to +0.3 with the limit kept binding (H2b), as before. `timestep_study.py` on the same plant: stepping the network 50 times finer moves a cut by 0.00 points at the sweep's 2 s step (it was the reason the sweep was not quotable). Quotable now as a hand-written result; AUDIT.md C3 still says hand-written policies cannot settle the criterion |
 | G · writing | **started** — `thesis/CHAPTER4_ABLATION_DRAFT.md`, drafted and reviewed 23 September; C4 paragraphs (4.10) added after. It must now carry Ghassan's retrain and the two merge-review findings |
@@ -882,14 +916,25 @@ python derive_params.py    every constant the car's logs set, recomputed from
                            runs it). REFERENCES.md 4b: what is still typed, why
 python calibrate_thermal.py  the thermal fit, per drive, with every drive also
                            scored HELD OUT; results/thermal_calibration.json
-python test_reward.py      10 of 10 checks pass, six of them on the TRAINING
-                           roads (two on X1's extremes roads) -- run it after any
-                           change to the reward, the plant, the gearbox or the roads
+python test_reward.py      12 of 12 checks pass, eight of them on the TRAINING
+                           roads (two on X1's extremes roads, two on X2's wideair
+                           corners, 11 Oct) -- run it after any change to the
+                           reward, the plant, the gearbox or the roads
 python analyse_x1.py       X1's preregistered test (results/PREREGISTRATION_X1.md):
                            SMALLER THAN THE MEI, 17 of 23 pairs below 5.43 points
                            of cut, sign p 0.0173, permutation 0.0027; the same
                            thermal-only. --set terrain_dt1 is its dry run on the
                            twenty of 29 September
+python analyse_x2.py       X2's preregistered test: X1's rule, imported, on five
+                           pairs, with the power and the seed count its spread
+                           implies; --set extremes_dt1 --seeds 0-4 is its dry run
+                           (INCONCLUSIVE, sd 26.82, power 0.066)
+python test_wide_air.py    16 tests: X2's roads reduce to the plant at sea level,
+                           leave every other environment alone, and follow the air
+                           (inlet, torque floor, kickdown table); about 6 min
+python check_roads.py --road wideair   X2's roads: PASS, 2 of 40 bind
+python check_x2_convergence.py --selftest   the practice set regenerates; the
+                           verdict itself needs X2's checkpoints
 python train_all.py        the twenty agents: seeds 0-9 x sighted/blinded, one
                            process each on the CPU, ~4 h; writes runs/terrain_dt1/
 python record_agents.py runs/terrain_dt1   scores them on the twenty frozen
@@ -918,6 +963,8 @@ python premise_split.py    the plant changes of 8 October on the locked climb,
 python x1_score.py         waits for X1's 46 runs, then scores them in the order
                            PREREGISTRATION_X1.md section 10 fixes; one line per
                            step in results/x1_score/SCORE_LOG.txt
+python x2_score.py         the same for X2's 10 runs (results/x2_score/); started
+                           11 October beside the training, it waits for them
 python model_vs_data.py    eleven comparisons of the simulator against the car,
                            each printed beside the figure the documents quote
 python run_results.py      regenerates the traces, the speed-by-grade sweep and
@@ -2900,6 +2947,15 @@ sanity_probe.py       A hotter housing must never get less protection: 50 K
 premise_split.py      The 8 October plant changes on the locked climb, one at a time.
 x1_score.py           Scores X1 once its training has finished, in the
                       preregistered order, unattended.
+wide_air.py           X2's training roads (train.py --road wideair): the extremes
+                      design at 0-45 C and 80-101.3 kPa, the compressor inlet,
+                      the kickdown table and the torque floor following the air.
+                      No hashed plant file: plant_sha stays X1's.
+test_wide_air.py      Its 16 tests; read its docstring for what each guards.
+analyse_x2.py         X2's preregistered test (X1's rule, five pairs).
+check_x2_convergence.py  Had X2's agents settled? C4's rule at 720k/900k/1080k
+                      steps, on ten practice episodes of the locked climb.
+x2_score.py           Scores X2 once its training has finished, unattended.
 evaluate.py           The twenty frozen episodes. Prints the fingerprint from
                       the LIVE objects, writes it into the result file, and
                       REFUSES a model whose meta.json differs.
@@ -2977,7 +3033,8 @@ handoff.md            The short entry point: what to run, what it prints today.
 NEXT_CHAT_PROMPT.md   The prompt to paste into a new session. Not on this branch
                       since the merge of 30 September: handoff.md is the entry point.
 SESSION_REPORT_*.md   One per session, dated. 2026-10-08_records is the latest
-                      (it runs to 9 October: X1 trained, scored and transferred).
+                      (it runs to 11 October: X1 trained, scored and transferred;
+                      X2 preregistered and launched).
 REFERENCES.md         Where every number we did not measure comes from. Written
                       for a non-specialist. Read before quoting a published band.
 DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.

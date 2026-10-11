@@ -48,7 +48,9 @@ WHAT IS DELIBERATELY NOT RUN, and why each one:
 analyse_x1.py), and the refusal now uses whichever older agents this machine
 has, so it is refused for the reason it names, not for a missing folder. After
 that day's pass, test_plant_guards.py and app.test_agents were added too: the
-ramp had broken six tests of the second, which no list here ran.
+ramp had broken six tests of the second, which no list here ran. On 11 October
+X2's two gates joined them (check_roads.py --road wideair, test_wide_air.py),
+about 13 minutes more.
 """
 import argparse
 import datetime
@@ -95,6 +97,13 @@ STEPS = [
     ("check_roads.py --road extremes — X1's training roads",
      ["check_roads.py", "--road", "extremes"], True,
      "PASS over 40 roads; how many bind; the worst neutral reward and p95 tracking error"),
+    ("check_roads.py --road wideair — X2's training roads",
+     ["check_roads.py", "--road", "wideair"], True,
+     "PASS over 40 roads at 0-45 C and 80-101.3 kPa; 2 bind (X1's: 10)"),
+    ("test_wide_air.py — X2's roads against the plant",
+     ["test_wide_air.py"], True,
+     "16 tests OK: sea level is the plant to the bit; other environments untouched; "
+     "the inlet, the torque floor and the kickdown table follow the air"),
     ("app.test_replay --full — the live supervisor, both drives",
      ["-m", "app.test_replay", "--full"], True,
      "N of N, and the two pinned peaks"),

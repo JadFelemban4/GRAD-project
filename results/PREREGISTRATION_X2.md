@@ -335,4 +335,34 @@ python sanity_probe.py runs/wideair_dt1
 
 ## 11. Run log — filled in as it runs
 
+- **11 October 2026, before the launch.** Committed locally on `GRA-2340394`:
+  `315e040` (X1's scored results, the 9 October audit, the results page;
+  pushed to GitHub at Ghassan's request) and then this file with X2's code as
+  `06f4686`; the working tree clean. The transfer hills recomputed with
+  `--hills-only` matched X1's first four exactly and were stopped at a 30-minute
+  limit; X1's file was copied instead (section 5e).
+- **05:10.** The 10 runs launched in a hidden process, so no window can close
+  them: `python train_all.py --road wideair --seeds 0-4 --steps 1080000 --jobs 10
+  --keep-buffer --out runs/wideair_dt1`, launcher output in
+  `runs/wideair_dt1/LAUNCH.txt`. Every run's `meta.json`: `git_head` 06f4686,
+  `git_dirty` false, `plant_sha` 3c48890dd15bc116, `derived_sha`
+  326c0835548975e2, `train_road` wideair, 1 080 000 steps, resume allowed; every
+  `config.json`: `keep_buffer` true, a buffer of 1 000 000.
+- **05:13.** `x2_score.py` started in a hidden process: it waits for the 10 runs,
+  then scores them in the order of section 10 (`results/x2_score/SCORE_LOG.txt`).
+  The hills recompute restarted beside the training on 4 workers, into a set of
+  its own (`runs/wideair_dt1_hillcheck`), so the copy is never overwritten.
+- <!-- RETIRED-OK: 241.2, -0.52 -- the two false positives this entry explains, not the retired figures -->
+  **05:15.** Found while committing, not part of X2: `verify_docs.py` read 72 of
+  73 on `315e040`, because two result tables first tracked there (X1's
+  `X1_RESULT.txt` and `phase_d_extremes_dt1.txt`) hold a 241.2 (a damage median)
+  and a −0.52 (a paired difference) that two bare-number retired patterns
+  matched. Scoped out of that scan like the agent reports beside them; 73 of 73;
+  `drift_test.py` running before that fix is committed. No rule of this file
+  changed.
+- **06:30 (about).** `drift_test.py` restarted once (this run log's own entry
+  had quoted the two figures without a marker; marked, 73 of 73), then
+  **16 of 16 drifts CAUGHT**, each on its own anchor. The scoped exemption, the
+  document sweep for X2 and this log committed next, locally.
+
 ## 12. Outcome — added after the result, never above this line

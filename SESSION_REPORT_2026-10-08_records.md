@@ -505,3 +505,59 @@ Found on the way and fixed: the Phase D section called the scored climb "a
 900 s motorway climb". `evaluate.py` scores 720 s (`DURATION = 720.0`); 900 s
 is the training episode and the speed-by-grade sweep. It now says 720 s.
 `verify_docs.py`: 73 of 73.
+
+## 9. X2: wider air, 5 seeds a side, 1200 episodes each (11 October)
+
+Ordered by Ghassan as two items of his list: six agents (three a side) at 1200
+episodes, and training air widened to 0-45 C and "sea level to ..." in pressure.
+Asked before anything was built, he chose an 80 kPa floor (76 kPa held out),
+five seeds a side instead of three, 1200 episodes per agent, and nothing else
+changed. Three pairs were shown to be untestable first: the smallest one-sided
+sign p on three pairs is 0.125, so every outcome would read INCONCLUSIVE; on
+five it is 0.031, and only a unanimous result can leave INCONCLUSIVE (power 0.07
+at X1's spread). Measured before choosing: ten runs side by side train at 6.0
+steps/s each on this laptop (six at 7.5), so 1.08 million steps is about 50 h.
+
+**What was built, with no hashed plant file touched** (plant_sha stays X1's):
+`wide_air.py`, the extremes roads with the air drawn per episode and the
+compressor inlet following the pressure, the conditions test's model made per
+episode. Two of X1's rules had to follow the air, each found by a gate before
+any agent trained:
+
+- **The torque floor** (`check_roads.py`, first run FAIL): five of 40 roads, all
+  at 0-7 C, failed. Measured: with the throttle shut the engine makes 12.1 Nm at
+  42 C (the 8 October row, reproduced) but 20.6 at 0 C, so X1's 15 Nm floor asked
+  for less than the engine makes and the tracking term fired on every descent.
+  The floor is now X1's own rule (1.25 x the closed-throttle torque) at each
+  episode's ambient.
+- **The kickdown table** (`test_reward.py`'s new hot thin-air corner, FAIL): at
+  45 C and 80 kPa the baseline fell short on 80 of 899 steps (neutral -0.139),
+  because the box reads a sea-level table of deliverable torque and held a gear
+  the engine could no longer pull (252.8 Nm deliverable at 2000 rpm and 80 kPa
+  against 316.3 at sea level). The table is now scaled per engine speed by what
+  the engine delivers at the episode's pressure, measured with the stored
+  table's own loop at 80/85/90/95 kPa; neutral -0.0022 afterwards.
+
+Gates afterwards: `test_wide_air.py` 16 tests OK (three guards removed in turn,
+each test failed); `check_roads.py --road wideair` PASS (worst neutral -0.0054;
+the baseline passes 850 C on 2 of 40 roads against X1's 10 of 40, so most of
+X2's training needs no protection); `test_reward.py` 12 of 12. Also new:
+`train.py --keep-buffer` (the replay buffer saved with each checkpoint and
+restored on resume; killed at step 1000 and resumed with it), `analyse_x2.py`
+(X1's rule imported; dry run on X1's seeds 0-4 INCONCLUSIVE, sd 26.82),
+`check_x2_convergence.py` (C4's rule at 720k/900k/1080k steps), `x2_score.py`.
+`analyse_x1.report` takes another set and seed count; X1's result files
+reproduce byte for byte.
+
+**Committed and launched.** `315e040` (X1 scored, the 9 October audit, the page;
+pushed to GitHub at Ghassan's request), then `06f4686` (X2 and its
+preregistration, local). The ten runs launched at 05:10 in a hidden process;
+every meta.json carries 06f4686, a clean tree and X1's plant. `x2_score.py`
+waits beside them. The transfer hills are X1's file copied (same plant
+fingerprint; a recompute had matched the first four exactly before a 30-minute
+limit stopped it, and re-runs beside the training).
+
+**Found on the way, not X2's:** tracking X1's two result tables in `315e040`
+made `verify_docs.py` read 72 of 73: a damage median of 241.2 and a paired
+difference of -0.52 matched two bare-number retired patterns. Scoped out of that
+scan like the agent reports; 73 of 73; drift_test.py run before committing it.

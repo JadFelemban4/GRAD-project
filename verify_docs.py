@@ -871,9 +871,23 @@ RETIRED_EXEMPT_PREFIX = ("SESSION_REPORT_", "NEXT_SESSION_")
 RETIRED_EXEMPT_AGENT_DIRS = ("results/agents/",)
 
 
+# A later agent set's result tables (11 October 2026), written whole by a scoring
+# script on every run: results/phase_d_<set>_dt1.txt (run_results.py) and
+# results/X<n>_RESULT.txt (analyse_x1.py, analyse_x2.py). Two RETIRED patterns
+# are bare numbers, and when X1's tables were first tracked (315e040) both
+# collided with data: blinded seed 19's median damage on X1's climb is 241.2
+# units (not the retired 241.2 g/kWh), and a paired difference was -0.52 points
+# (not a retired enrichment correlation). Same call as the agent reports above,
+# with the same cost: a retired figure in these tables would pass. They are
+# regenerated, never edited, and nothing is quoted from them without the script.
+# The 29 September set keeps its published name (phase_d_130kmh.txt) and its scan.
+RETIRED_EXEMPT_RESULT_TABLES = re.compile(r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT)\.txt$")
+
+
 def _generated_agent_report(rel):
     rel = rel.replace(os.sep, "/")
-    return rel.startswith(RETIRED_EXEMPT_AGENT_DIRS) and len(rel.split("/")) >= 4
+    return ((rel.startswith(RETIRED_EXEMPT_AGENT_DIRS) and len(rel.split("/")) >= 4)
+            or bool(RETIRED_EXEMPT_RESULT_TABLES.match(rel)))
 RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md",
                   # AUDIT.md is a review: quoting the figures it found wrong is
