@@ -3,6 +3,9 @@ it, what it comes to wherever something can, and whether the conclusions move.
 
     python damage_constants.py     prints the account, writes results/damage_constants.json
                                    and results/figures/damage_constants.png
+    python damage_constants.py --set extremes_dt1   X1's agents (8 October): the sensitivity
+                                   rows its preregistration declared (20.3 K; the knees of
+                                   decision 9; no knock term), into results/damage_constants_<set>.json
 
     d = exp((T_turb - 1123)/45) + 0.4 exp((T_oil - 408)/12) + 40 max(0, KI - 0.85)^2   per second
 
@@ -160,6 +163,7 @@ def shares(rec, c):
 
 
 def main():
+    DR._set_from_argv()
     names, recs, worst = DR.load_records()
     P = DR.PUBLISHED
     base = np.load(os.path.join(DR.SET, "baseline_ECU", "eval_record.npz"))
@@ -247,7 +251,7 @@ def main():
         dict(constant="knock weight and square", published=[40.0, 2], unit="-", status="VALUATION",
              value=None, how="no published law for knock damage per second from a knock integral", sources=[]),
     ]
-    path = os.path.join(HERE, "results", "damage_constants.json")
+    path = os.path.join(HERE, "results", f"damage_constants{DR.SUFFIX}.json")
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(dict(published=P, constants=constants, creep_scale_k=s_creep, oil_rule_scale_k=oil_rule,
                        housing_fraction_r=r, climb_end=dict(gas_c=egt_end, housing_c=tt_end),
@@ -297,7 +301,7 @@ def figure(recs, names, out, P, s_creep, knees):
     a.set_title("The ablation under the calculated values", fontsize=10)
     a.set_xlim(right=max(s["ablation_hi"] for s in out.values()) + 9)
     fig.tight_layout()
-    path = os.path.join(HERE, "results", "figures", "damage_constants.png")
+    path = os.path.join(HERE, "results", "figures", f"damage_constants{DR.SUFFIX}.png")
     fig.savefig(path, dpi=130)
     print(f"wrote {os.path.relpath(path, HERE)}")
 

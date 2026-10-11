@@ -204,8 +204,14 @@ class ThermalNetwork:
         dt 2.0 (timestep_study.py measured it: a 10.3 K swing at 2 s). The step
         is now split into equal sub-steps of at most DT_SUB_MAX (0.1 s, the
         figure agreed), with the engine's inputs held over the env step as
-        before. Every caller gets the same integrator, so the replays that
-        derive the constants (car_thermal.py) and the environment agree.
+        before. Every caller of this class gets the same integrator: the
+        environment, the app's estimator, and car_thermal.py's replays of the
+        logged drives (validate.py rows 8-11, model_vs_data.py). The FIT that
+        derives the block and oil constants does not: calibrate_thermal.simulate
+        takes one explicit-Euler step per 1 s sample (found 9 October 2026,
+        CLAUDE.md mistake 25; until then this sentence said the derivation
+        shared it). substep_fit_check.py measures what a sub-stepped fit would
+        change; shipping it is a plant change, so it waits for the next one.
         """
         n_sub = max(1, int(np.ceil(dt / DT_SUB_MAX - 1e-9)))
         h = dt / n_sub

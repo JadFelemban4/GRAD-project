@@ -218,6 +218,7 @@ runs first.
 
 ### 5e. L, the logged-drive check: `logged_check.py --set runs/extremes_dt1`
 
+<!-- RETIRED-OK: 269.8, 6 -- the logged check's subset of the manifest, not the manifest's own total -->
 Fixed before training in `results/logged_cycles.json` (`python logged_check.py
 --build`): **six drives, 269.8 minutes** — every manifest drive that logs
 vehicle speed and ambient and runs five minutes or more, except the census log
@@ -351,8 +352,160 @@ python sanity_probe.py runs/extremes_dt1
 
 ## 11. Run log — filled in as it runs
 
-*(empty at writing)*
+- **8 October 2026, 15:15.** This file committed as `75ca65f` (local, on
+  `GRA-2340394`; working tree clean), then the 46 runs launched in their own
+  window: `python train_all.py --road extremes --seeds 0-22 --no-resume
+  --jobs 23`, launcher output in `runs/extremes_dt1/LAUNCH.txt`. The first
+  wave is seeds 0–10 of both arms and sighted seed 11; the rest start as runs
+  finish. Every run's `meta.json`: `git_head` 75ca65f, `git_dirty` false,
+  `plant_sha` 3c48890dd15bc116, `derived_sha` 326c0835548975e2,
+  `resume_allowed` false.
+- **15:17.** The full `drift_test.py` started beside the training (it runs
+  `verify_docs.py` on sixteen copies of the tree; the working tree is never
+  touched).
+- **15:49.** `x1_score.py` started in its own window: it waits for the 46 runs,
+  then scores them in the order of section 10 (`results/x1_score/SCORE_LOG.txt`).
+- **16:19.** The drift test restarted. Its first rows were "caught" for a reason
+  that had nothing to do with the drift: `verify_docs.py` failed on every copy,
+  on two of this file's own figures (the logged check's drive count and
+  minutes, which the dataset pattern read as the manifest's) and on a comment in
+  `logged_check.py` (its housing threshold next to the word for the ECU car,
+  which the premise pattern read as a damage figure). Marked and reworded;
+  `verify_docs.py` 73 of 73 again. No rule of this file changed.
+- **17:35.** `drift_test.py`: **16 of 16 drifts CAUGHT**, each on its own
+  anchor (rows 6 and 13 on the figures re-anchored on 8 October). The training
+  is at about 25 000 steps a run, no run has crashed, and every run writes its
+  per-step record at each 10 000-step checkpoint.
+- **19:09–19:22.** The first wave finished: 23 of 23 runs exited cleanly after
+  233–246 minutes each (about 3.5 steps a second each, 23 sharing the 20-thread
+  laptop); none crashed. The second wave, blinded seed 11 and seeds 12–22 of both
+  arms, started as each finished.
+- **23:01.** All 46 runs finished, none crashed: `train_all.py` reports "all done in
+  465 min; every run finished" (`runs/extremes_dt1/LAUNCH.txt`). No run was re-run
+  or resumed, so the crash rule never applied. `x1_score.py` takes over.
+- **9 October, 01:04.** Step 1 (`run_results.py phase_d`) exit 0 after 120 min.
+- **03:01.** Step 2 (`record_agents.py`) exit 0 after 117 min: all 1 000 recorded
+  episodes equal step 1's unrecorded scores. Step 3 (`analyse_x1.py`) exit 0:
+  `results/X1_RESULT.txt`. Step 4 (`sanity_probe.py`) exit 0.
+- **03:03.** Step 5 (`conditions_test.py --resume-all`) STOPPED by its own harness
+  check: 5 locked-climb episodes did not equal their committed scores. Cause, found
+  and fixed the same night: the test's worker processes re-import the module and
+  were never told the agent set (`--set`, added on 8 October), so each loaded the
+  29 September agent of the same name from `runs/terrain_dt1`. The pool now passes
+  the set to every worker; the harness check then passed, 5 of 5 identical. The
+  hills fixed before training are unaffected (they ran the baseline ECU only). No
+  rule changed; the step is re-run after step 6.
+- **03:03.** Step 6 (`logged_check.py`) started.
+- **07:22.** Step 6 exit 0 after 259 min. Step 5 re-run from the start
+  (`--resume-all`; the harness check first, 5 of 5 identical).
+- **10:54.** Step 5 scored all seven conditions (250 episodes each, every step
+  recorded). The merge wrote `results/conditions_extremes_dt1/conditions_test.json`,
+  then the report stopped on a lookup: it read the harness result from the hills
+  file, where a set whose hills were fixed before training keeps it beside them
+  (`harness_check.json`). The report now reads it there; `--report-only` printed
+  the table and drew the figure. Nothing was re-run and no row changed.
 
 ## 12. Outcome — added after the result, never above this line
 
-*(empty at writing)*
+Added 9 October 2026, from `results/X1_RESULT.txt` (`python analyse_x1.py`).
+Nothing above this line changed after the result, except the run log of
+section 11, which is appended in time order.
+
+### 12a. The preregistered reading (P)
+
+```
+TOTAL DAMAGE (primary)   positive 10 of 23   mean -10.35   sd 24.78 points
+  preview helps:         sign p 0.7976   permutation p 0.9710
+  smaller than the MEI:  sign p 0.0173 (17 of 23 below 5.43)   permutation p 0.0027
+  preview costs damage:  sign p 0.3388 (13 of 23 negative)
+  CELL: SMALLER THAN THE MEI
+THERMAL-ONLY             the same cell: 17 of 23 below, sign p 0.0173, mean -10.43
+```
+
+**The sentence of section 6, verbatim:** *"Preview's effect on the locked climb
+is below the MEI (5.43 points of cut) for agents trained on the extremes design
+at 50 000 steps."* The sign and permutation tests agree. The other direction,
+preview costing damage, is not significant by the sign test (13 of 23). Never
+"preview does not help".
+
+**What the reading rests on, stated beside it.** The spread is 24.78 points,
+three times the 7.84 of 29 September (section 5b made no prediction). At it,
+X1 had power 0.20 against the MEI and 80 % power only for an effect of 16.6
+points; "smaller than the MEI" is still reached because the paired differences
+sit mostly below it, many of them far below. And much of that comes from one
+arm: **six sighted agents cut less than 40 % on the scored climb (seeds 4, 13,
+16, 17, 21, 22: 0.6–36.3 %); no blinded agent does** (the lowest, seed 1,
+44.4 %). That asymmetry is a POST-HOC observation, not a preregistered test.
+What those six do there is measured (the page's table, from the per-step
+records): five of them enrich at most about half as deeply on the climb as their
+blinded twins (median lambda trim −0.019 to −0.067 against −0.094 to −0.147);
+seed 4 enriches as deeply as its twin but retards spark 4.3° and adds 7.4 kPa of
+boost; three retard spark by 2.2–4.3°. On their own last ten TRAINING roads the
+same six cut 25.6–47.4 % against the parallel baseline car, inside the
+11.2–59.3 % of the other forty (`record_extracts.py --x1`). So they learned to
+protect, and did not carry it to the scored climb. Why is not measured. The scored climb's
+constant 130 km/h is never drawn in X1's training (limit 7).
+
+### 12b. Everything else section 5 names
+
+- **S, supervision:** 39 of 46 agents beat `current-grade` (46.98 %) on the
+  median: 17 of 23 sighted, 22 of 23 blinded; median margins +16.80 and +18.91
+  points. **19 of 46 do more damage than the baseline ECU on at least one frozen
+  episode** (13 sighted, 6 blinded).
+- **The yardstick (decision 13):** `current-grade` short of 95 % of the request
+  on 1 of 719 steps, as measured before training.
+- **Safeguard 2's probe:** no agent passes it outright. The share of probed climb
+  states where a 50 K hotter housing got less protection runs from 1.1 % to
+  98.5 %; median 49.2 % for the sighted, 61.8 % for the blinded agents. Most
+  agents' median response to the hotter housing is small in both levers, so this
+  reads as policies that barely respond to the housing input in a consistent
+  direction (`results/agents/extremes_dt1/sanity_probe.json`).
+- **The sensitivity rows of decisions 8 and 9** (`damage_constants.py --set
+  extremes_dt1`): under every one, 38 or 39 of 46 agents beat current-grade and
+  the ablation's mean is −9.9 to −13.0 points. Its 95 % interval spans zero in
+  seven of nine rows; the two with the creep-rupture scale (20.3 K) exclude zero,
+  on the side of preview costing damage. Descriptive, like every row there.
+- **L, the logged drives (`results/logged_check_extremes_dt1.json`): 1 of 46
+  agents passes** (sighted seed 18): 1 of 23 sighted, 0 of 23 blinded.
+  `current-grade` passes everything (on a flat replay it never acts). The agents
+  deliver their torque (T fails on 14 of 552 runs); they fail on FUEL. With life
+  weighted most (frozen episode 4), 252 of 276 runs burn more than 1 % over the
+  baseline ECU (median +4.33 %, worst +21.40 %); with it weighted least (episode
+  15), 156 of 276 (median +1.29 %). Of that extra fuel, 67.0 % is burned while
+  the parallel ECU car's housing is under 500 °C and 95.4 % under 650 °C
+  (`record_extracts.py --x1` -> `logged_fuel_bands.json`): protection where
+  nothing needed it, on the drives where the simulator is validated. On 236 of
+  552 runs the agent's housing also peaked more than 5 K above the ECU car's.
+  By the preregistered criteria, **X1's agents do harm on the car's own
+  driving**: the fuel cost of protecting at the wrong temperature.
+- **T, transfer** (`python conditions_test.py --set runs/extremes_dt1
+  --report-only`; `results/conditions_extremes_dt1/conditions_test.json`). As
+  section 5d fixed it, descriptive: how many agents of each arm beat their
+  condition's `current-grade`, held out against in range.
+
+  | condition | hill | for X1 | sighted | blinded | of 46 | worse than its ECU |
+  |---|---|---|---|---|---|---|
+  | 42 °C, 101.3 kPa | 8.25 % | in range (control) | 15 of 23 | 14 of 23 | 29 | 2 |
+  | 35 °C | 12.00 % | in range (control) | 20 of 23 | 22 of 23 | 42 | 0 |
+  | **25 °C** | **21.75 %** | **held out** | 17 of 23 | 13 of 23 | **30** | 3 |
+  | **50 °C** | **7.50 %** | **held out** | 14 of 23 | 12 of 23 | **26** | 1 |
+  | 90 kPa | 8.75 % | pressure: untrained | 13 of 23 | 12 of 23 | 25 | 1 |
+  | 82 kPa | 12.00 % | pressure: untrained | 15 of 23 | 17 of 23 | 32 | 3 |
+  | 76 kPa | 12.25 % | pressure: untrained | 11 of 23 | 14 of 23 | 25 | 2 |
+
+  Held out, 26 and 30 of 46 beat the comparator; in range, 29 and 42. Two things
+  limit the comparison, both read off the same run. `current-grade` misses the
+  requested torque by more than 5 % on more than 1 % of the 719 steps (the logged
+  check's T criterion) in five conditions — 42 °C 115 steps, 50 °C 115, 90 kPa
+  297, 82 kPa 16, 76 kPa 222 — so there its cut is partly torque refused, not
+  protection; only 25 °C (held out) and 35 °C (in range) have a comparator that
+  delivers, and there the counts are 30 and 42. And at 82 and 76 kPa the agents
+  miss their torque at least as often as it does (median 20 and 228 steps). The
+  agents doing more
+  damage than their condition's baseline ECU are mostly the same few: blinded
+  seed 2 and sighted seed 17 in four conditions each, sighted seed 21 in two.
+  The sighted-minus-blinded mean's 95 % interval spans zero in all seven
+  conditions. Beside it, not part of this test: the twenty agents of
+  29 September on the same hills (`results/conditions_test.json`, 7 October, the
+  plant before the agreed fixes, spark advance allowed): 6 of 20 at 25 °C,
+  19 of 20 at 50 °C, 19 of 20 at 42 °C, 20 of 20 at 35 °C.

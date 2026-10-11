@@ -82,11 +82,54 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 
 ---
 
-## 8 October 2026, on `GRA-2340394`: X1 — the agreed fixes in the plant, the extremes design, 23 seeds a side
+## 8–9 October 2026, on `GRA-2340394`: X1 — the agreed fixes in the plant, the extremes design, 23 seeds a side
 
+> **X1 HAS RUN. ITS PREREGISTERED READING IS SMALLER THAN THE MEI**
+> (`python analyse_x1.py` -> `results/X1_RESULT.txt`): 17 of 23 seed pairs below
+> 5.43 points of cut, sign p 0.0173, the permutation test agreeing (p 0.0027);
+> preview helps in 10 of 23 (p 0.80); preview costs damage, 13 of 23, is not
+> significant (p 0.34). The same reading without the knock term. **The sentence
+> that may be said:** *"Preview's effect on the locked climb is below the MEI
+> (5.43 points of cut) for agents trained on the extremes design at 50 000
+> steps."* Never "preview does not help".
+>
+> - **Say what it rests on.** Mean −10.35 points, sd 24.78 — three times the
+>   spread of 29 September (power 0.20 against the MEI at it). **Six sighted
+>   agents cut under 40 % on the scored climb (seeds 4, 13, 16, 17, 21, 22) and
+>   no blinded agent does** — post hoc, not a test. On their own training roads
+>   the same six protected like the rest (25.6–47.4 % against the parallel car);
+>   on the climb five enrich at most half as deeply as their twins and three
+>   retard spark 2.2–4.3°. Why their training did not carry over is not measured;
+>   the climb's constant 130 km/h is never drawn in X1's training.
+> - **Supervision, separately:** 39 of 46 beat `current-grade` (17 sighted, 22
+>   blinded); 19 of 46 do more damage than the baseline ECU on some frozen episode.
+> - **No agent passes safeguard 2's probe outright:** a 50 K hotter housing gets
+>   less protection on 1.1–98.5 % of probed climb states (median 49 % sighted,
+>   62 % blinded). Under every damage formula decisions 8 and 9 named, 38–39 of 46
+>   still beat current-grade and the ablation mean stays −9.9 to −13.0 points.
+> - **The transfer test (T; five episodes a condition, so descriptive):** held
+>   out, **30 of 46** agents beat that condition's `current-grade` at 25 °C on
+>   the 21.75 % hill and **26 of 46** at 50 °C; on the in-range controls 29 of 46
+>   at 42 °C and 42 of 46 at 35 °C; under air pressure X1 never trained in,
+>   25–32 of 46. In every condition 0–3 agents do more damage than its baseline
+>   ECU, mostly the same few (blinded seed 2, sighted seeds 17 and 21). Only at
+>   25 and 35 °C does `current-grade` deliver its torque (elsewhere it misses
+>   on 16–297 of 719 steps, so its cut is partly torque refused), which makes
+>   those two the clean pair: held out 30, in range 42. The twenty of
+>   29 September on the same hills, on the plant before the fixes and with
+>   spark advance allowed: 6 of 20 at 25 °C, 19 of 20 at 50 °C — a reading
+>   beside X1, not a test. `python conditions_test.py --set runs/extremes_dt1
+>   --report-only`. Its first run stopped on its own harness check (the workers
+>   loaded the 29 September agents); fixed, 5 of 5 identical, re-run.
+> - **The logged-drive check: 1 of 46 agents passes** (sighted seed 18). They
+>   deliver the torque; they burn fuel: weighting life most, 252 of 276 runs
+>   spend more than 1 % over the ECU (median +4.3 %, worst +21.4 %), and 67 % of
+>   all that extra fuel goes while the ECU car's housing is under 500 °C. On the
+>   car's own driving, X1's agents protect where nothing needs it.
+>
 > <!-- RETIRED-OK: 920.1, 43.4, -0.32, 917.6, 850.4 -- the merged plant's premise, named beside X1's -->
-> **X1 IS PREREGISTERED (`results/PREREGISTRATION_X1.md`, committed before any
-> X1 agent trained) AND TRAINING into `runs/extremes_dt1/`.** Ordered by
+> **X1 WAS PREREGISTERED (`results/PREREGISTRATION_X1.md`, committed before any
+> X1 agent trained) AND TRAINED into `runs/extremes_dt1/`.** Ordered by
 > Ghassan ("add more seeds and retrain") before Jad's column of the decision
 > sheet is filled; section 9 of the preregistration lists the decisions X1
 > adopts provisionally and what a different answer from Jad would cost.
@@ -120,6 +163,11 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 >   23 seeds (a binomial tail that underflowed near p = 1); it gives 5.26 now,
 >   and the script's own output did not move. `train_all.py` passes `--road`
 >   explicitly; `runs/terrain_dt1/` is CLOSED in `train.py`.
+> - **The step error is gone, and the H/τ sweep re-ran on this plant.**
+>   `timestep_study.py`: stepping the network 50 times finer now moves a cut by
+>   0.00 points at 1 s and at the sweep's 2 s (the coolant swing that made the
+>   sweep unquotable is gone); `generality_test.py`: preview over current-grade
+>   0.0 points at every binding τ, 0.0 to +0.3 with the limit kept binding.
 
 ## 7–8 October 2026, on `GRA-2340394`: the validation plan, every step recorded, the damage constants
 
@@ -681,16 +729,16 @@ dataset size, the oil node).*
 > Reproduce in seconds: `python analyse_phase_d.py`.
 > The full account is `CHECKPOINT.md`, entry of 21–22 September.
 
-### Where every phase stands — current, 30 September (after the merge)
+### Where every phase stands — current, 30 September (after the merge); C, D and F updated 8 October
 
 | Phase | Status |
 |---|---|
 | A · setup | done |
 | B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.839), over 26 pooled points, 30–75 kPa, from a dataset of eleven drives, 321.7 minutes. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. **Since 28 Sep the thermal network, boost ceiling, spark offset and enrichment dwell are DERIVED from the logs** (`derive_params.py`); `validate.py` 8 of 11 (6 of 7 literature, 2 of 4 against our car). The knock model is NOT validated |
-| C · get an agent to learn | **Two sets, each on its own plant.** On sep17's plant: C1 (16 agents, 50 000 steps) and C4 (16 agents, 300 000 steps, NOT converged by C4's preregistered rule, `PREREGISTRATION_C4.md` 5b). On Ghassan's derived plant: twenty agents, ten seeds a side, 50 000 steps (55 episodes), a new road every episode, dt 1.0 (`results/agents/terrain_dt1/`). **None has been trained on the merged plant with the agreed fixes** (sub-stepping, spark cap, ramps) |
-| D · baselines and the ablation | **done four times, never decisively.** Phase D and D2 INCONCLUSIVE; C4 SMALLER THAN THE MEI by the sign test only (p 0.0352), the permutation test disagreeing (0.3867), not converged; Ghassan's retrain INCONCLUSIVE under the MEI rule (6 of 10, power 0.26). Supervision beats `current-grade` on the median in every set — **but with spark advance forbidden that margin disappears** (the box at the top). The MEI is 50 damage units (set 22 Sep) |
+| C · get an agent to learn | **Two sets, each on its own plant.** On sep17's plant: C1 (16 agents, 50 000 steps) and C4 (16 agents, 300 000 steps, NOT converged by C4's preregistered rule, `PREREGISTRATION_C4.md` 5b). On Ghassan's derived plant: twenty agents, ten seeds a side, 50 000 steps (55 episodes), a new road every episode, dt 1.0 (`results/agents/terrain_dt1/`). **X1, trained 8 October and scored 9 October:** 23 seeds a side, 50 000 steps, on the plant with the agreed fixes (sub-stepping, spark cap, ramps) and the extremes design (`results/PREREGISTRATION_X1.md`; `runs/extremes_dt1/`, CLOSED in `train.py` since its result) |
+| D · baselines and the ablation | **done four times, never decisively.** Phase D and D2 INCONCLUSIVE; C4 SMALLER THAN THE MEI by the sign test only (p 0.0352), the permutation test disagreeing (0.3867), not converged; Ghassan's retrain INCONCLUSIVE under the MEI rule (6 of 10, power 0.26). Supervision beats `current-grade` on the median in every set — **but with spark advance forbidden that margin disappears** (the box at the top). The MEI is 50 damage units (set 22 Sep); X1 restates it as 5.43 points of cut (decision 5) and is the fifth look, preregistered and scored by `x1_score.py`: **SMALLER THAN THE MEI** (17 of 23 pairs below it, sign p 0.0173, the permutation test agreeing), with six sighted agents and no blinded one protecting little on the scored climb (post hoc) |
 | E · battery plant | not started. `battery.py` does not exist |
-| F · the H/τ sweep | preliminary, hand-written policies only; **not quotable until the thermal network is sub-stepped** (the sweep runs at dt 2.0) |
+| F · the H/τ sweep | preliminary, hand-written policies only. **Re-run on 8 October on the sub-stepped plant:** preview over current-grade 0.0 points at every τ where the limit binds (H2), 0.0 to +0.3 with the limit kept binding (H2b), as before. `timestep_study.py` on the same plant: stepping the network 50 times finer moves a cut by 0.00 points at the sweep's 2 s step (it was the reason the sweep was not quotable). Quotable now as a hand-written result; AUDIT.md C3 still says hand-written policies cannot settle the criterion |
 | G · writing | **started** — `thesis/CHAPTER4_ABLATION_DRAFT.md`, drafted and reviewed 23 September; C4 paragraphs (4.10) added after. It must now carry Ghassan's retrain and the two merge-review findings |
 | **APP · the live supervisor** | **runs; the six audit findings against it are now FIXED.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its suite reports **49 of 49**, up from 46 because each fix shipped with a regression test. *(This row said "has six known bugs … passes 46 of 46" until 17 September; the fixes and the count both moved on 16 September and this row did not.)* The lesson still stands and is worth more than the fixes: **the suite reported 46 of 46 while all six were live.** Only M9 carries no test of its own. **Read `AUDIT.md` and `AUDIT_FIXES.md` before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
 
@@ -798,8 +846,9 @@ python check_random_road.py  D2's gates: 0 of 121 grades fail to bind (weakest
                            13.73 % at +6.9 K), 0 of 20 frozen episodes, and the
                            blind arm's observations identical on every road
                            until its climb arrives -- on SEP17'S plant. On the
-                           merged plant the notch moved to ~13.96 %: re-run
-                           it before any new D2-design training
+                           merged plant the notch moved to ~13.96 %. Re-run
+                           9 Oct on X1's plant (ramped, sub-stepped): PASS,
+                           0 of 121 (weakest 13.97 % at +11.9 K), 0 of 20
 python analyse_c4.py       C4's preregistered test, D2 and Phase D beside it:
                            3 of 8, below-MEI sign p 0.0352 / permutation
                            0.3867 (disagree), SMALLER THAN THE MEI, NOT
@@ -807,8 +856,20 @@ python analyse_c4.py       C4's preregistered test, D2 and Phase D beside it:
 python analyse_phase_d2.py D2's result beside Phase D's, each classified by the
                            MEI rule
 python full_run.py         every script below, one pass, exit codes -> FULL_RUN.txt
-python -m app.test_simulation   15 of 15. The replay lab. SEPARATE from
+python -m app.test_simulation   16 of 16 (9 Oct). The replay lab. SEPARATE from
                            app.test_replay -- run both after touching app/
+python -m app.test_agents  135 tests OK, 14 skipped without runs_c4/ (9 Oct).
+                           The agent replay pages; they read the plant's roads,
+                           so run it after a plant or road change (mistake 25)
+python test_plant_guards.py  6 tests: a 1 s step equals ten 0.1 s steps, the
+                           coolant settles at the sweep's 2 s step, and one
+                           changed derived constant moves derived_sha while
+                           the file's timestamp does not. Each fails with its
+                           guard removed (checked 9 Oct)
+python substep_fit_check.py  DIAGNOSTIC: the thermal fit re-run with the
+                           plant's sub-steps (mistake 25): radiator scale +61 %,
+                           the locked climb's baseline -2.4 units, current-
+                           grade's cut +0.01 points. Writes nothing the plant reads
 python check_premise.py    the hand-written policies on the locked climb:
                            baseline 848.1 at 883 C, current-grade cuts 47.0 %,
                            preview -0.0 points against it (8 Oct). Writes
@@ -824,9 +885,11 @@ python calibrate_thermal.py  the thermal fit, per drive, with every drive also
 python test_reward.py      10 of 10 checks pass, six of them on the TRAINING
                            roads (two on X1's extremes roads) -- run it after any
                            change to the reward, the plant, the gearbox or the roads
-python analyse_x1.py       X1's preregistered test, once X1 is scored
-                           (results/PREREGISTRATION_X1.md); --set terrain_dt1 is
-                           its dry run on the twenty of 29 September
+python analyse_x1.py       X1's preregistered test (results/PREREGISTRATION_X1.md):
+                           SMALLER THAN THE MEI, 17 of 23 pairs below 5.43 points
+                           of cut, sign p 0.0173, permutation 0.0027; the same
+                           thermal-only. --set terrain_dt1 is its dry run on the
+                           twenty of 29 September
 python train_all.py        the twenty agents: seeds 0-9 x sighted/blinded, one
                            process each on the CPU, ~4 h; writes runs/terrain_dt1/
 python record_agents.py runs/terrain_dt1   scores them on the twenty frozen
@@ -847,6 +910,14 @@ python show_record.py <record>   draws one recorded episode; --table, --list,
                            --zigzag (the coolant node's step-to-step swing)
 python check_roads.py      drives the baseline over 40 training roads and fails
                            if any is one the baseline cannot drive; 14 bind
+                           (on the merged plant); --road extremes: X1's roads,
+                           PASS, 10 of 40 bind, worst neutral -0.0043
+python premise_split.py    the plant changes of 8 October on the locked climb,
+                           one at a time: 920.1 -> 917.6 (sub-stepping) ->
+                           848.1 (with the ramp) -> results/premise_split.json
+python x1_score.py         waits for X1's 46 runs, then scores them in the order
+                           PREREGISTRATION_X1.md section 10 fixes; one line per
+                           step in results/x1_score/SCORE_LOG.txt
 python model_vs_data.py    eleven comparisons of the simulator against the car,
                            each printed beside the figure the documents quote
 python run_results.py      regenerates the traces, the speed-by-grade sweep and
@@ -1242,7 +1313,7 @@ temperature-matched and should not be quoted as though it were.)*
 
 ---
 
-## Twenty-four mistakes already made. Do not remake them.
+## Twenty-five mistakes already made. Do not remake them.
 
 *(**17 and 18 are the same gearbox, found from two directions and now merged.**
 17 is the mid-climb upshift, found on `sep17` when the reward gate refused to
@@ -2275,6 +2346,35 @@ spark between +3 and +4°" from the group medians. **An explanation names
 quantities; measure every one it names before writing it.** "Trades life for
 fuel" names the fuel.
 
+### 25. A FIX DECLARED SHARED WITHOUT FOLLOWING EVERY CALLER
+
+Found 9 October 2026, in an audit of everything the simulation touches. Agreed
+step 1 asked for ONE integrator for `thermal.py`, `calibrate_thermal.py` and the
+app. On 8 October `thermal.ThermalNetwork.step` was sub-stepped and its
+docstring said "every caller gets the same integrator, so the replays that
+derive the constants (car_thermal.py) and the environment agree"; the WBS and
+the validation plan then repeated it. **The constants are not derived by those
+replays.** `calibrate_thermal.simulate` has its own copy of the node equations
+and takes one explicit-Euler step per 1 s sample, so the re-derivation of
+8 October ran the fit unchanged and returned the same constants to the last
+digit, and that identical result was read as "re-fitted, nothing moved".
+Re-fitted with the sub-steps (`substep_fit_check.py`, a diagnostic that writes
+nothing the plant reads) the oil constants move under 2 %
+and the coolant constants a lot: the radiator scale +61 %, block-to-ambient
+−42 %. The locked climb barely notices (baseline −2.4 units, current-grade's
+cut +0.01 points), which says the coolant constants are weakly identified,
+not that the gap does not matter. Shipping the fix changes `derived_sha`, so
+it waits for the next plant change.
+
+The same audit found the agreed ramp (step 4) had broken six tests of
+`app.test_agents`, which nobody had run since: the app read the climb as
+starting on the ramp's first step, "181 s at 1.5 %", where it is 180 s at 12 %.
+`agent_trace.route` now starts the climb on the last level step.
+
+**An output that does not move after its input changed is a reason to check
+that the input reached it. And after a plant change, run every suite that
+reads the plant, not the one the convention names.**
+
 ---
 
 ## Known limitations to state in the thesis, not fix quietly
@@ -2789,6 +2889,17 @@ conditions_test.py    The twenty agents at 25-50 C and 76-101 kPa, on a speed
                       target that changes mid-run; every step recorded.
 damage_constants.py   Every damage constant: what can set it, the value where
                       something can, and the frozen episodes re-scored.
+                      --set <name> re-scores another set (X1's sensitivity rows).
+analyse_x1.py         X1's preregistered test: the MEI rule at 5.43 points,
+                      total and thermal-only; --set terrain_dt1 is its dry run.
+logged_check.py       X1's check on the car's own drives, replayed flat: torque
+                      within 5 %, fuel within 1 % of the baseline (--build
+                      fixed the drives before training).
+sanity_probe.py       A hotter housing must never get less protection: 50 K
+                      added to the housing input on each agent's climb states.
+premise_split.py      The 8 October plant changes on the locked climb, one at a time.
+x1_score.py           Scores X1 once its training has finished, in the
+                      preregistered order, unattended.
 evaluate.py           The twenty frozen episodes. Prints the fingerprint from
                       the LIVE objects, writes it into the result file, and
                       REFUSES a model whose meta.json differs.
@@ -2863,8 +2974,10 @@ generality_test.py    The H/τ experiment. H1, H2, H2b.
 README.md             The public-facing summary. Tracked by verify_docs.py.
 CLAUDE.md             This file. The handoff and the mistake log.
 handoff.md            The short entry point: what to run, what it prints today.
-NEXT_CHAT_PROMPT.md   The prompt to paste into a new session.
-SESSION_REPORT_*.md   One per session, dated. 2026-09-28 is the latest.
+NEXT_CHAT_PROMPT.md   The prompt to paste into a new session. Not on this branch
+                      since the merge of 30 September: handoff.md is the entry point.
+SESSION_REPORT_*.md   One per session, dated. 2026-10-08_records is the latest
+                      (it runs to 9 October: X1 trained, scored and transferred).
 REFERENCES.md         Where every number we did not measure comes from. Written
                       for a non-specialist. Read before quoting a published band.
 DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
@@ -2925,7 +3038,11 @@ asserts both, so breaking either fails a check rather than going unnoticed.
 - **After changing anything under `app/`, re-run `python -m app.test_replay`
   and paste the output into the commit message.** The app's numbers are a chain
   — reader, estimator, alert engine — and a change anywhere moves numbers
-  everywhere without announcing it. Use `--full` before a release.
+  everywhere without announcing it. Use `--full` before a release. **After a
+  change to the PLANT or the ROADS, run all three app suites** —
+  `app.test_replay --full`, `app.test_simulation` and `app.test_agents` (about
+  9 min; it skips 14 tests on a machine without `runs_c4/`): the ramp of
+  8 October broke six tests of the third and nobody ran it (mistake 25).
 - **A threshold in `app/` changes only for a measurement, and the measurement
   goes in the docstring beside the number.** This is not decoration: the 15 %
   that became 25 % was justified for weeks by a residual that could not bound
@@ -3070,6 +3187,15 @@ not a result.
 
 > **THE LIVE LIST — 30 September 2026, after the merge. Agreed by Jad and Ghassan**
 > (`conflict.md` section 0 and Ghassan's reply). Before ANY training, in this order:
+>
+> *Where it stands, 9 October:* steps 1–4 landed on 8 October (`75ca65f`), each
+> measured one at a time (`premise_split.py`), with one part of step 1 still
+> open: the fit that derives the thermal constants steps at 1 s, not sub-stepped
+> (mistake 25); re-fitting is a plant change, so it waits for the next. Step 5: X1's preregistration was
+> written and committed before X1 trained, but its test set is decision 12's (the
+> locked climb's twenty frozen episodes), not the one step 5 names; whether X1 IS
+> step 5 is open, for Jad and Ghassan to answer. Step 6, drive C, is still to do, and X1
+> trained before it, on Ghassan's order (PREREGISTRATION_X1.md §0).
 >
 > 1. **Sub-step the thermal network** (or integrate it implicitly), then re-run
 >    `validate.py`, `check_premise.py`, `test_reward.py`, `check_roads.py`,

@@ -18,7 +18,11 @@ design (decision 12) this test is the TRANSFER test: they trained on ambients of
 25-45 C and hills to 18 %, so 50 C and the 25 C condition's hill (21.75 % on the
 plant of 29 September) are held out, and the hills are fixed on the current plant
 with --hills-only BEFORE any of them trains. The harness check, which needs the
-agents' committed scores, then runs first in --resume-all.
+agents' committed scores, then runs first in --resume-all. For X2 (runs/
+wideair_dt1, 11 October: ambient 0-45 C and 80-101.3 kPa in training) the held-out
+conditions are 50 C, 76 kPa and the 25 C hill; this test's altitude is milder
+than X2's training in one more way, its gearbox kicking down on the sea-level
+table (PREREGISTRATION_X2.md 5e).
 
 ABOUT TWO AND A HALF HOURS on 18 workers of the 20-thread team laptop, longer
 than one task in a Claude session may run, so --resume-all is meant to be
@@ -211,7 +215,12 @@ def speed_profile(locked_v_mps, dt):
 _MODELS = {}
 
 
-def _init_worker():
+def _init_worker(set_dir=None):
+    """Each worker re-imports this module, so it must be told the agent set:
+    without it every worker loaded runs/terrain_dt1's agent of the same name
+    (9 October 2026, X1's first harness check; the check caught it)."""
+    if set_dir:
+        use_set(set_dir)
     try:
         import torch
         torch.set_num_threads(1)
@@ -303,7 +312,7 @@ def _run(job, rec=None):
 def harness_check(workers):
     """Five agent and baseline episodes on the locked climb must EQUAL their
     committed scores (results/agents/<set>/<policy>/eval_summary.json)."""
-    with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker) as pool:
+    with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker, initargs=(SET,)) as pool:
         check = dict(pool.map(_episode, [(ref, i, 315.0, 101.3, 0.12, "locked") for ref, i in CHECK]))
     bad = []
     for (ref, i, *_), row in check.items():
@@ -326,7 +335,7 @@ def calibrate(workers, harness=True):
     grade at which the baseline ECU, on the varying speed profile, peaks at
     TARGET_PEAK_C, with the whole curve of peak against grade."""
     def run(jobs):
-        with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker) as pool:
+        with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker, initargs=(SET,)) as pool:
             return dict(pool.map(_episode, jobs))
 
     out = {"harness_check": harness_check(workers) if harness else None,
@@ -421,7 +430,7 @@ def _gears(job):
 def gears_report(workers):
     hills = grades()
     jobs = [(name, t, p, hills[name]["grade"]) for name, t, p in CONDITIONS if hills[name]["grade"] is not None]
-    with cf.ProcessPoolExecutor(max_workers=min(workers, len(jobs)), initializer=_init_worker) as pool:
+    with cf.ProcessPoolExecutor(max_workers=min(workers, len(jobs)), initializer=_init_worker, initargs=(SET,)) as pool:
         res = dict(pool.map(_gears, jobs))
     print("the baseline ECU on each hill: per stretch of the speed target, engine speed (gear) and the hottest turbine")
     for name, segs in res.items():
@@ -500,8 +509,16 @@ def summarise(rows):
 
 
 def report(summary, hills):
-    hc = hills.get("harness_check", {})
-    print(f"harness check: {hc.get('episodes')} episodes on the locked climb equal their committed scores")
+    hc = hills.get("harness_check")
+    if hc is None and HARNESS_JSON and os.path.isfile(HARNESS_JSON):
+        # A set whose hills were fixed before it trained keeps its check beside them.
+        with open(HARNESS_JSON, encoding="utf-8") as fh:
+            hc = json.load(fh)
+    if hc is None:
+        print("harness check: NOT RUN for this set")
+    else:
+        print(f"harness check: {hc.get('episodes')} episodes on the locked climb "
+              + ("equal their committed scores" if hc.get("identical", True) else "DIFFER from their committed scores"))
     print("speed target, km/h: 130 from the launch, then " + ", ".join(
         f"{kmh:.0f} at {t} s" for t, kmh in SPEED_STEPS) + f" (at most {ACCEL_MAX} m/s^2); climb from 180 s")
     print("\neach condition on its own hill (the grade where the baseline peaks at "
@@ -528,13 +545,21 @@ def report(summary, hills):
         cells = "  ".join(f"{a.split(',')[0]} {s['acts_sighted'][j]:+.2f}/{s['acts_blind'][j]:+.2f}/"
                           f"{s['acts_grade'][j]:+.2f}/{s['acts_base'][j]:+.2f}" for j, a in enumerate(ACTS))
         print(f"  {name:30s} {cells}")
-    print("\neach agent's own spark trim on the climb (median of its episodes): how many sit under +3 deg, "
-          "and which retard")
+    import engine_env as EE
+    sparks = [v for s in summary.values() if s.get("grade") is not None
+              for v in s.get("spark_by_agent", {}).values()]
+    capped = bool(sparks) and EE.SPARK_TRIM_MAX < 4.0 and max(sparks) <= EE.SPARK_TRIM_MAX + 1e-6
+    print("\neach agent's own spark trim on the climb (median of its episodes): "
+          + (f"advance is forbidden for this set (cap {EE.SPARK_TRIM_MAX:+.0f} deg), so only which retard"
+             if capped else "how many sit under +3 deg, and which retard"))
     for name, s in summary.items():
         if s.get("grade") is None or "spark_under3" not in s:
             continue
         retard = ", ".join(f"{t} {v:+.2f}" for t, v in s["spark_retard"]) or "none"
-        print(f"  {name:30s} under +3: {s['spark_under3']:2d} of {s['n_agents']}   retarding: {retard}")
+        if capped:
+            print(f"  {name:30s} retarding: {len(s['spark_retard']):2d} of {s['n_agents']}: {retard}")
+        else:
+            print(f"  {name:30s} under +3: {s['spark_under3']:2d} of {s['n_agents']}   retarding: {retard}")
     print("\n'short' = steps (of 719) delivering under 95 % of the torque asked for: the baseline's most, "
           "current-grade's median, the agents' median, any policy's most; 's>850' = seconds with the "
           "turbine housing above the trigger. Where current-grade is short for many steps, its cut is "
@@ -584,17 +609,37 @@ def figure(summary, hills):
     a.set_title("Each agent against current-grade (cg short: its steps short of torque, of 719)", fontsize=10)
     a.legend(fontsize=7.5, loc="lower right")
     a = axes[1, 1]
-    w = 0.2
-    for j, (key, lab, col) in enumerate((("acts_sighted", "sighted", "#4a3aa7"), ("acts_blind", "blinded", "#e87ba4"),
-                                          ("acts_grade", "current-grade", "#1baf7a"),
-                                          ("acts_base", "baseline", "#9aa0a4"))):
-        a.bar(x + (j - 1.5) * w, [summary[n][key][0] for n in names], width=w, color=col, label=lab)
-    a.axhline(4.0, color="#d03b3b", ls=":", lw=1, label="+4 deg, the trim's limit")
+    sparks = [v for n in names for v in summary[n].get("spark_by_agent", {}).values()]
+    if sparks and EE.SPARK_TRIM_MAX < 4.0 and max(sparks) <= EE.SPARK_TRIM_MAX + 1e-6:
+        # A set trained with advance forbidden: every arm's median is the cap, so
+        # bars would show nothing. Each agent's own median instead, which shows
+        # who retards.
+        for k, name in enumerate(names):
+            sp = summary[name]["spark_by_agent"]
+            sig = [val for t, val in sp.items() if t.startswith("sighted")]
+            bli = [val for t, val in sp.items() if t.startswith("blind")]
+            a.scatter(np.full(len(sig), k - 0.12), sig, s=14, color="#4a3aa7", alpha=0.8,
+                      label="sighted, each agent" if k == 0 else None)
+            a.scatter(np.full(len(bli), k + 0.12), bli, s=14, color="#e87ba4", alpha=0.8,
+                      label="blinded, each agent" if k == 0 else None)
+        a.axhline(EE.SPARK_TRIM_MAX, color="#d03b3b", ls=":", lw=1,
+                  label=f"{EE.SPARK_TRIM_MAX:+.0f} deg, the cap")
+        a.set_ylim(min(sparks) - 0.6, EE.SPARK_TRIM_MAX + 1.4)
+        a.set_ylabel("each agent's median spark trim on the climb, deg")
+        a.set_title("Spark, advance forbidden: below 0 is retard (current-grade and baseline hold 0)", fontsize=10)
+        a.legend(fontsize=7.5, loc="upper center", ncol=3)
+    else:
+        w = 0.2
+        for j, (key, lab, col) in enumerate((("acts_sighted", "sighted", "#4a3aa7"), ("acts_blind", "blinded", "#e87ba4"),
+                                              ("acts_grade", "current-grade", "#1baf7a"),
+                                              ("acts_base", "baseline", "#9aa0a4"))):
+            a.bar(x + (j - 1.5) * w, [summary[n][key][0] for n in names], width=w, color=col, label=lab)
+        a.axhline(4.0, color="#d03b3b", ls=":", lw=1, label="+4 deg, the trim's limit")
+        a.set_ylim(0, 5.0)
+        a.set_ylabel("median spark trim on the climb, deg")
+        a.set_title("What they do: spark (current-grade and the baseline hold 0)", fontsize=10)
+        a.legend(fontsize=7.5, loc="upper center", ncol=5)
     a.set_xticks(x, labels, fontsize=7.5)
-    a.set_ylim(0, 5.0)
-    a.set_ylabel("median spark trim on the climb, deg")
-    a.set_title("What they do: spark (current-grade and the baseline hold 0)", fontsize=10)
-    a.legend(fontsize=7.5, loc="upper center", ncol=5)
     fig.tight_layout()
     os.makedirs(os.path.dirname(OUT_PNG), exist_ok=True)
     fig.savefig(OUT_PNG, dpi=120)
@@ -679,7 +724,7 @@ def main():
         jobs = [(ref, i, t_amb, p, g, "varying") for ref in [h for h, _ in HAND] + tags for i in EPISODES]
         print(f"{name}, grade {g * 100:.2f} %: {len(jobs)} episodes, {a.workers} workers", flush=True)
         recs = {}
-        with cf.ProcessPoolExecutor(max_workers=a.workers, initializer=_init_worker) as pool:
+        with cf.ProcessPoolExecutor(max_workers=a.workers, initializer=_init_worker, initargs=(SET,)) as pool:
             for n, (job, row, rec) in enumerate(pool.map(_episode_recorded, jobs, chunksize=2), 1):
                 rows[job[:5]] = row
                 recs.setdefault(job[0], {})[job[1]] = rec

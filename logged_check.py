@@ -66,8 +66,8 @@ MIN_MINUTES = 5.0
 CENSUS = ("fb988991-20260906_143515.csv",)
 DEMAND_NM = 40.0                     # t_ref's floor in the reward: below it the error is scaled to 40 Nm
 T_LIMIT = 0.01                       # T: agent-only shortfall steps, share of demand steps
-F_LIMIT = 1.01                       # F: agent fuel over baseline fuel
-COLD_C = 750.0                       # "nothing needed protecting": baseline housing below this
+F_LIMIT = 1.01                       # F: agent fuel over the ECU car's fuel
+COLD_C = 750.0                       # "nothing needed protecting": the ECU car's housing under this, C
 HAND = (("current-grade", "p_grade_now"),)
 
 

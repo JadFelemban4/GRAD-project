@@ -270,6 +270,15 @@ the H/τ sweep"), **ten times smaller than this numerical error**. So the
 sweep's figures are not just unquotable by agreement: they sit inside u_num.
 Agreed step 1 settles it.
 
+**Settled, 8 October 2026.** Agreed step 1 is in: the network sub-steps itself at
+most 0.1 s (`thermal.DT_SUB_MAX`). Re-run on that plant, `timestep_study.py`
+moves current-grade's cut by 0.00 points between the shipped step and the finest,
+at 1 s and at 2 s alike, and the coolant no longer swings; the table above is the
+plant of 7 October (its results file is kept as
+`results/timestep_study_before_substep.json`). The sweep, re-run on the same plant,
+still puts preview over current-grade at 0.0 points wherever the limit binds.
+<!-- RETIRED-OK: 10.32, 90.33, 971.3, 979.3, 39.19, 39.41 -- the plant of 7 October, before the sub-stepping -->
+
 ## 6. The comparisons, one row each
 
 E is today's value. The last column is what is still missing before a label
@@ -332,8 +341,16 @@ thesis should say which components carry it and which do not.
 
 1. **Agree sections 3, 4 and 7** (the contexts of use, the required
    accuracies, the label rules and their order). Before anything is computed.
-2. **The time-step study**: DONE for u_num (section 5c). Left for agreed step
-   1: the shared integrator, and `calibrate_thermal.py` re-fitted with it.
+2. **The time-step study**: DONE for u_num (section 5c); since 8 October the
+   plant sub-steps itself (`thermal.DT_SUB_MAX`) and the study, re-run on it,
+   settles section 5d. **Not done: "`calibrate_thermal.py` re-fitted with
+   it".** The fit integrates its own block and oil nodes once per 1 s sample
+   (`calibrate_thermal.simulate`), so re-deriving on 8 October gave the same
+   constants without ever using the sub-steps (found 9 October). Re-fitted with
+   them (`substep_fit_check.py`, a diagnostic), the oil constants move under 2 % and the coolant
+   constants a lot (radiator scale +61 %, block-to-ambient −42 %), while the
+   locked climb's baseline moves 2.4 damage units and current-grade's cut 0.01
+   points. Shipping it changes `derived_sha`: with the next plant change.
 3. **u_D and u_input per comparison**, computed in `model_vs_data.py`.
 4. **The missing comparisons**: spark under boost is DONE
    (`car_spark_boost.py`; untested by the rule); lambda in the climb's own

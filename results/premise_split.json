@@ -1,0 +1,61 @@
+{
+ "steps": [
+  {
+   "baseline": 920.1,
+   "peak_turb": 883.0,
+   "peak_oil": 93.9,
+   "knock_events": 2,
+   "reactive": 625.7,
+   "current_grade": 520.5,
+   "predictive": 523.5,
+   "preview_vs_grade": -0.32,
+   "grade_cut": 43.4,
+   "step": "merged plant, 30 September",
+   "substep": false,
+   "ramp": false
+  },
+  {
+   "baseline": 917.6,
+   "peak_turb": 883.0,
+   "peak_oil": 94.0,
+   "knock_events": 2,
+   "reactive": 624.6,
+   "current_grade": 519.4,
+   "predictive": 522.3,
+   "preview_vs_grade": -0.32,
+   "grade_cut": 43.4,
+   "step": "+ thermal network sub-stepped",
+   "substep": true,
+   "ramp": false
+  },
+  {
+   "baseline": 850.4,
+   "peak_turb": 883.0,
+   "peak_oil": 93.9,
+   "knock_events": 1,
+   "reactive": 560.8,
+   "current_grade": 450.8,
+   "predictive": 450.9,
+   "preview_vs_grade": -0.01,
+   "grade_cut": 47.0,
+   "step": "+ every grade change ramped over 8 s",
+   "substep": false,
+   "ramp": true
+  },
+  {
+   "baseline": 848.1,
+   "peak_turb": 883.0,
+   "peak_oil": 94.0,
+   "knock_events": 1,
+   "reactive": 559.7,
+   "current_grade": 449.6,
+   "predictive": 449.7,
+   "preview_vs_grade": -0.01,
+   "grade_cut": 47.0,
+   "step": "both: the plant of 8 October",
+   "substep": true,
+   "ramp": true
+  }
+ ],
+ "note": "python premise_split.py      -> results/premise_split.json  (about two minutes)"
+}

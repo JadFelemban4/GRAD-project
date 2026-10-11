@@ -42,3 +42,10 @@ results/agents/**/train_roads.npz
 # merged into results/conditions_test.json, and the run's log.
 results/conditions_test.part*.json
 results/conditions_test.log
+
+# A later agent set's conditions-test working files (8 October 2026,
+# conditions_test.py --set): one part per condition, merged into the set's own
+# conditions_test.json.
+results/conditions_*/conditions_test.part*.json
+# x1_score.py's per-step logs; SCORE_LOG.txt beside them is the record.
+results/x1_score/*.log

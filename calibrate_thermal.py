@@ -180,7 +180,20 @@ def _block_step(tb, to, i, d, P):
 def simulate(d, P, mode):
     """mode: 'oil' (block pinned), 'block' (oil pinned), 'free' (both free).
     Returns RMSE coolant, RMSE oil (NaN where not simulated) and, for a single
-    member, the traces."""
+    member, the traces.
+
+    ONE EXPLICIT-EULER STEP PER 1 s SAMPLE, NOT SUB-STEPPED (found 9 October
+    2026). Since 8 October thermal.ThermalNetwork splits every step into
+    sub-steps of at most thermal.DT_SUB_MAX (0.1 s); this fit does not, so the
+    derived block and oil constants are fitted with a different integrator
+    from the one the plant runs them in. Re-fitted with ten sub-steps per
+    sample (substep_fit_check.py, a diagnostic, not shipped): the oil constants move under 2 %, the
+    coolant constants a lot (ua_rad_scale +61 %, ua_block_amb -42 %,
+    t_stat_span -13 %, c_block +13 %), the fit's coolant RMSE 2.96 -> 3.00 K,
+    and the locked climb's baseline 848.1 -> 845.6 with current-grade's cut
+    +0.01 points. Sub-stepping here changes derived_sha, which refuses every
+    agent trained on the present constants: do it with the next plant change,
+    and re-train, as for a new drive."""
     n = len(np.atleast_1d(P["c_oil"] if "c_oil" in P else P["c_block"]))
     tb = np.full(n, d["ect"][0])
     to = np.full(n, d["oil"][0])

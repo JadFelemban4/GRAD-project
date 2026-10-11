@@ -1,6 +1,7 @@
 """record_extracts.py -- small committed extracts of the per-step records, for the results page.
 
     python record_extracts.py
+    python record_extracts.py --x1     X1's training world only (8 October)
 
 The per-step records are gitignored (the team's rule, 29 September 2026) and
 live on the machine that made them, while the results page must build from git
@@ -23,6 +24,13 @@ extracts of what the page draws:
         line) and the baseline ECU on the same road: spark trim, manifold
         pressure, turbine, knock integral, and the running fuel and damage,
         every 2 s (CLAUDE.md mistake 24)
+
+  results/agents/extremes_dt1/training_env.json   (--x1)
+        the world X1's agents trained in, read off their own training records,
+        which carry the road at every step since 8 October: every episode of
+        every seed with its ambient, steepest grade, speed range, housing
+        capacity, life weight and whether the parallel baseline car passed
+        850 C; and the seconds per grade, per gear and per speed
 
 Written 8 October 2026, when Ghassan asked for the page to show the new data,
 not only describe it. Re-run after the records are re-made, then make_page.py.
@@ -192,7 +200,128 @@ def training_env(q=0.005):
           f"{out['env']['episodes_per_agent']} episodes, grade {g.min() * 100:.1f} to {g.max() * 100:.1f} %")
 
 
+def x1_training_env(n_seeds=23):
+    """X1's training world, from the 46 runs' own records. The sighted and blinded
+    agent of a seed draw the same road stream and the same weights; checked
+    here on every step's grade, speed, ambient, housing capacity and weights."""
+    import sys
+    runs = os.path.join(HERE, "runs", "extremes_dt1")
+    eps, g_all, gear_all, v_all = [], [], [], []
+    train_cut = {}
+    for sd in range(n_seeds):
+        a = np.load(os.path.join(runs, f"sighted_seed{sd}", "train_record.npz"))
+        b = np.load(os.path.join(runs, f"blind_seed{sd}", "train_record.npz"))
+        for k in ("grade", "v_kmh", "t_amb_c", "c_turb", "weights"):
+            if not np.array_equal(a[k], b[k]):
+                sys.exit(f"seed {sd}: the two arms did not drive the same roads ({k} differs)")
+        ep = a["episode"]
+        for e in np.unique(ep):
+            m = ep == e
+            if m.sum() < 600:            # the last, unfinished episode of a run
+                continue
+            g, v = a["grade"][m].astype(float), a["v_kmh"][m].astype(float)
+            tb = a["t_turb_base"][m].astype(float)
+            eps.append([sd, int(e), rnd(float(a["t_amb_c"][m][0]), 1), rnd(100 * float(g.max()), 2),
+                        rnd(100 * float(g.min()), 2), rnd(float(v[20:].min()), 0), rnd(float(v.max()), 0),
+                        rnd(float(a["c_turb"][m][0]) / 6000.0, 3), rnd(float(a["weights"][m][0][2]), 3),
+                        int(np.nanmax(tb) - 273.15 > 850.0), int((g >= 0.12).sum())])
+        # How much each agent protected on its own last ten complete training
+        # roads: its damage against the parallel baseline car's on the same road.
+        for tag, rec in ((f"sighted_seed{sd}", a), (f"blind_seed{sd}", b)):
+            e2 = rec["episode"]
+            done = [e for e in np.unique(e2) if (e2 == e).sum() >= 600][-10:]
+            cuts = []
+            for e in done:
+                m = e2 == e
+                da, db = float(rec["damage_cum"][m][-1]), float(rec["damage_base_cum"][m][-1])
+                if db > 1.0:
+                    cuts.append(100.0 * (1.0 - da / db))
+            train_cut[tag] = rnd(float(np.median(cuts)), 1) if cuts else None
+        g_all.append(a["grade"].astype(float))
+        gear_all.append(a["gear"].astype(int))
+        v_all.append(a["v_kmh"].astype(float))
+    g, gear, v = np.concatenate(g_all), np.concatenate(gear_all), np.concatenate(v_all)
+    out = dict(
+        fields=["seed", "episode", "t_amb_c", "grade_max_pct", "grade_min_pct", "v_min_kmh", "v_max_kmh",
+                "c_turb_scale", "w_life", "baseline_past_850", "s_at_12pct"],
+        episodes=eps, seeds=n_seeds, train_cut_last10=train_cut,
+        grade_s={str(k): int(((g * 100 >= k) & (g * 100 < k + 1)).sum()) for k in range(-6, 20)},
+        gear_s={str(k): int((gear == k).sum()) for k in range(0, 9)},
+        speed_s={str(k): int(((v >= k) & (v < k + 10)).sum()) for k in range(0, 160, 10)},
+        steps=int(len(g)))
+    path = os.path.join(HERE, "results", "agents", "extremes_dt1", "training_env.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, separators=(",", ":"))
+    print(f"wrote {os.path.relpath(path, HERE)}: {len(eps)} episodes of {n_seeds} seeds, {len(g):,} steps")
+
+
+def x1_pair_trace(every=4):
+    """X1's widest seed pair: the sighted and blinded agent of the seed whose
+    difference is most negative, on frozen episode 1, beside the baseline ECU and
+    current-grade on the same road. Every `every` s: the turbine housing and the
+    three trims applied (spark, lambda, boost). From eval_record.npz."""
+    A = os.path.join(HERE, "results", "agents", "extremes_dt1")
+    with open(os.path.join(A, "index.json"), encoding="utf-8") as fh:
+        pairs = json.load(fh)["ablation"]["pairs"]
+    worst = min(pairs, key=lambda p: p["sighted"] - p["blinded"])
+    sd = worst["seed"]
+    out = dict(seed=sd, episode=1, every_s=every, sighted_cut=worst["sighted"], blinded_cut=worst["blinded"])
+    ep = 0
+    for key, folder in (("sighted", f"sighted_seed{sd}"), ("blind", f"blind_seed{sd}"),
+                        ("baseline", "baseline_ECU"), ("grade", "current-grade")):
+        r = np.load(os.path.join(A, folder, "eval_record.npz"))
+        n = int(r["steps"][ep]) if "steps" in r.files else r["t_turb"].shape[1]
+        sl = slice(0, n, every)
+        out[key] = dict(turb=rnd(r["t_turb"][ep, sl] - 273.15, 1),
+                        spark=rnd(r["applied"][ep, sl, 0], 2), lam=rnd(r["applied"][ep, sl, 1], 3),
+                        boost=rnd(r["applied"][ep, sl, 2], 1),
+                        damage=rnd(r["damage_cum"][ep, n - 1], 1))
+        if key == "baseline":
+            out["t"] = list(range(0, n, every))
+            out["grade"] = rnd(100 * r["grade"][ep, sl], 2)
+    path = os.path.join(A, "pair_trace.json")
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, separators=(",", ":"))
+    print(f"wrote {os.path.relpath(path, HERE)}: seed {sd}, cuts {worst['sighted']:.1f} / {worst['blinded']:.1f} %")
+
+
+def x1_logged_fuel():
+    """Where the agents' extra fuel on the logged drives goes: summed over every
+    agent record of logged_check.py, the fuel burned beyond the parallel ECU car,
+    binned by how hot that car's housing was at the step."""
+    files = [f for f in glob.glob(os.path.join(HERE, "results", "records", "logged", "extremes_dt1", "*.npz"))
+             if "current-grade" not in os.path.basename(f)]
+    bands = [(0, 500), (500, 650), (650, 750), (750, 2000)]
+    extra, base, steps = np.zeros(4), np.zeros(4), np.zeros(4)
+    for f in files:
+        r = np.load(f)
+        fa = np.diff(np.r_[0.0, r["fuel_cum"][0].astype(float)])
+        fb = np.diff(np.r_[0.0, r["fuel_base_cum"][0].astype(float)])
+        tb = r["t_turb_base"][0].astype(float) - 273.15
+        ok = np.isfinite(fa) & np.isfinite(fb) & np.isfinite(tb)
+        for i, (lo, hi) in enumerate(bands):
+            m = ok & (tb >= lo) & (tb < hi)
+            extra[i] += (fa[m] - fb[m]).sum()
+            base[i] += fb[m].sum()
+            steps[i] += m.sum()
+    out = dict(records=len(files), bands=[dict(lo=lo, hi=hi, steps_pct=rnd(100 * n / steps.sum(), 1),
+                                              extra_pct_of_base=rnd(100 * e / b, 2),
+                                              share_of_extra_pct=rnd(100 * e / extra.sum(), 1))
+                                         for (lo, hi), e, b, n in zip(bands, extra, base, steps)])
+    path = os.path.join(HERE, "results", "agents", "extremes_dt1", "logged_fuel_bands.json")
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=1)
+    print(f"wrote {os.path.relpath(path, HERE)}: {len(files)} records")
+
+
 if __name__ == "__main__":
-    conditions()
-    bad_episode()
-    training_env()
+    import sys as _sys
+    if "--x1" in _sys.argv:
+        x1_training_env()
+        x1_pair_trace()
+        x1_logged_fuel()
+    else:
+        conditions()
+        bad_episode()
+        training_env()

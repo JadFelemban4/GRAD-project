@@ -109,7 +109,11 @@ class TraceTests(unittest.TestCase):
         for key in ("s_m", "x_m", "z_m", "grade_pct", "speed_kmh"):
             self.assertEqual(len(r[key]), T.STEPS + 1, key)
         self.assertAlmostEqual(r["length_m"], 25603, delta=1)
-        self.assertAlmostEqual(r["rise_m"], 2755, delta=1)
+        # MOVED 9 OCTOBER, by the 8 s ramp on every grade change (engine_env.
+        # GRADE_RAMP_S, agreed step 4, landed 8 October): the road takes 8 s to
+        # reach its grade, so it climbs less. Episode 1: 2755 -> 2733 m; episode 5:
+        # 1917 -> 1894 m; episode 6: 3247 -> 3220 m. The length does not move.
+        self.assertAlmostEqual(r["rise_m"], 2733, delta=1)
         self.assertEqual(r["climb_start_s"], 141.0)
         v, g = cycle["v_mps"], cycle["grade"]
         for k in range(T.STEPS):
@@ -117,14 +121,15 @@ class TraceTests(unittest.TestCase):
             self.assertAlmostEqual(r["x_m"][k + 1] - r["x_m"][k], v[k] * T.DT * np.cos(theta), delta=1e-9)
             self.assertAlmostEqual(r["z_m"][k + 1] - r["z_m"][k], v[k] * T.DT * np.sin(theta), delta=1e-9)
         json.dumps(r, allow_nan=False)
-        self.assertAlmostEqual(T.route(T.build_cycle(T.episode("d2", 5)))["rise_m"], 1917, delta=1)
-        self.assertAlmostEqual(T.route(T.build_cycle(T.episode("d2", 6)))["rise_m"], 3247, delta=1)
+        self.assertAlmostEqual(T.route(T.build_cycle(T.episode("d2", 5)))["rise_m"], 1894, delta=1)
+        self.assertAlmostEqual(T.route(T.build_cycle(T.episode("d2", 6)))["rise_m"], 3220, delta=1)
         self.assertEqual(T.route(T.build_cycle(T.episode("phase-d", 1)))["climb_start_s"], 180.0)
 
     def test_episode_row(self):
         """The picker's row for one frozen episode, read from the road the env steps."""
         want = {("d2", 1): (1000, 141.0, 0.13314),
-                # the table says 281.95; random_road.climb starts the grade at int(281.95)
+                # the table says 281.95; the climb starts on the last level step before
+                # the ramp leaves zero, int(281.95) (the ramp since 8 October)
                 ("d2", 2): (1001, 281.0, 0.15025),
                 ("phase-d", 1): (1000, 180.0, 0.12),
                 ("phase-d", 20): (1019, 180.0, 0.12)}
@@ -1491,7 +1496,7 @@ class RouteTests(unittest.TestCase):
         self.assertEqual(body["episodes"]["d2"][0],
                          {"idx": 1, "seed": 1000, "weights": [0.690154, 0.012829, 0.297017],
                           "climb_start_s": 141.0, "grade": 0.13314})
-        # the step at which the env's grade begins, not the table's 281.95
+        # the last level step before the env's ramp leaves zero, not the table's 281.95
         self.assertEqual(body["episodes"]["d2"][1]["climb_start_s"], 281.0)
 
         self.assertEqual({k: body[k] for k in ("preview_s", "act", "limits")},

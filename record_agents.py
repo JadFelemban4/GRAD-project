@@ -114,9 +114,18 @@ def _physical(a):
 
 def action_stats(rec):
     """What each actuator did, on the flat and on the climb, over all episodes."""
-    from engine_env import ACT_LO, ACT_HI, neutral_action
+    from engine_env import ACT_LO, ACT_HI, SPARK_TRIM_MAX, neutral_action
     applied = rec["applied"].reshape(-1, 5)
     asked = np.clip(_physical(rec["action"].reshape(-1, 5)), ACT_LO, ACT_HI)
+    # The spark cap (8 October, X1) is not the slew limit: a command above it is
+    # counted on its own, and the slew limit is judged against the capped command.
+    # Whether the cap was in force is read off the RECORD, not today's code: the
+    # agents of 29 September applied up to +4 degrees, and re-reading their
+    # records under today's cap called 90 % of their steps slew-limited.
+    cap_on = (SPARK_TRIM_MAX < ACT_HI[0]) and float(np.nanmax(applied[:, 0])) <= SPARK_TRIM_MAX + 1e-6
+    capped = (asked[:, 0] > SPARK_TRIM_MAX + 1e-9) if cap_on else np.zeros(len(asked), bool)
+    if cap_on:
+        asked[:, 0] = np.minimum(asked[:, 0], SPARK_TRIM_MAX)
     grade = rec["grade"].reshape(-1)
     neutral = _physical(neutral_action())
     limited = np.abs(applied - asked) > 1e-3 * (ACT_HI - ACT_LO)
@@ -131,6 +140,8 @@ def action_stats(rec):
                                p50=round(float(np.median(v)), 4),
                                p95=round(float(np.percentile(v, 95)), 4))
         d["slew_limited_pct"] = round(100.0 * float(limited[:, j].mean()), 1)
+        if j == 0 and cap_on:
+            d["capped_pct"] = round(100.0 * float(capped.mean()), 1)
         out[name] = d
     return out
 
@@ -621,7 +632,17 @@ def findings(hand, agents):
     sp_base = float(np.median(br["spark"][climb]))
     trims = [float(np.median(v["_rec"]["applied"][..., 0][v["_rec"]["grade"] > 0])) for v in agents.values()]
     kis = [float(np.percentile(v["_rec"]["ki"][v["_rec"]["grade"] > 0], 95)) for v in agents.values()]
-    out.append(f"SPARK. On the climb every agent advances spark {min(trims):.1f}-{max(trims):.1f} deg past the "
+    applied_max = max(float(np.nanmax(v["_rec"]["applied"][..., 0])) for v in agents.values())
+    if applied_max <= 1e-9:
+        # 8 October 2026, X1: the trim is capped at 0 (engine_env.SPARK_TRIM_MAX),
+        # so no agent can advance and the sentence below would be false.
+        out.append(f"SPARK. The trim is capped at 0 for this set (engine_env.SPARK_TRIM_MAX): no agent can "
+                   f"advance past the baseline, whose own spark on the climb is {sp_base:.1f} deg. The median "
+                   f"applied trim on the climb runs {min(trims):+.1f} to {max(trims):+.1f} deg across the agents, "
+                   f"and the modelled knock integral's 95th percentile {min(kis):.2f}-{max(kis):.2f}, against "
+                   f"the baseline's {ki_base:.2f} and the 0.85 knee where the damage model starts charging.")
+    else:
+        out.append(f"SPARK. On the climb every agent advances spark {min(trims):.1f}-{max(trims):.1f} deg past the "
                f"baseline (median; the trim's upper bound is +4), whose own spark there is {sp_base:.1f} deg. That "
                f"takes the modelled knock integral from the baseline's {ki_base:.2f} to {min(kis):.2f}-{max(kis):.2f} "
                f"(95th percentile), just under the 0.85 knee where the damage model starts charging for knock. "

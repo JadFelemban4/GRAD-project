@@ -3,7 +3,20 @@
 > **Opening this in Claude Code?** Read `CLAUDE.md` first — it carries the
 > project's claim, its current state, and the mistakes already made.
 >
-> **8 October 2026: X1 is preregistered and training.** The four plant fixes
+> **9 October 2026: X1 has run, and its preregistered reading is SMALLER THAN
+> THE MEI** (`python analyse_x1.py`): 17 of 23 seed pairs below 5.43 points of
+> damage cut (sign p 0.017, permutation p 0.003), the same without the knock term;
+> never "preview does not help". It rests on a spread three times the last
+> set's, and six sighted agents (no blinded one) that protect little on the
+> scored climb though they protected in training. 39 of 46 agents beat
+> current-grade. On the car's own drives, replayed flat, only 1 of 46 passes
+> the logged-drive check: they deliver their torque but burn fuel protecting
+> where nothing needs it. Where they never trained (50 °C; a 21.75 % hill at
+> 25 °C), 26 and 30 of 46 beat that condition's current-grade, against 29 and
+> 42 on the in-range controls — five episodes a condition, so descriptive.
+> `results/PREREGISTRATION_X1.md` section 12.
+>
+> **8 October 2026: X1 was preregistered and trained.** The four plant fixes
 > Jad and Ghassan agreed on 30 September are in: the thermal network
 > sub-stepped, every grade change ramped over 8 s, the spark trim capped at 0,
 > the fingerprint covering the derived constants. On this plant

@@ -26,6 +26,14 @@ A DIAGNOSTIC BESIDE THE PROTOCOL. thermal.py is not edited: the sub-stepping
 exists only inside this process (agreed step 1 will make it permanent, and
 that is a plant change). So plant_sha, the certificates and every published
 figure stand.
+
+SINCE 8 OCTOBER 2026 agreed step 1 IS permanent: thermal.ThermalNetwork.step
+sub-steps at most thermal.DT_SUB_MAX (0.1 s) on its own. So "n = 1 (as shipped)"
+is now the sub-stepped network, and each n splits the call on top of that. Run
+on the plant of 8 October this measures what is left of u_num, which is what
+the H/tau sweep's "not quotable" rested on. (Its first run, 7 October, measured
+the plant before the change; results/timestep_study.json carries whichever ran
+last.)
 """
 import concurrent.futures as cf
 import json

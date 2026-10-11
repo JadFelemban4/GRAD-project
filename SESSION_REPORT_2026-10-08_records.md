@@ -1,7 +1,8 @@
 # Session report — 7–8 October 2026: every step recorded, the damage constants, the decisions, the page
 
-Branch `GRA-2340394`, on top of `2864592` (the validation plan). **Nothing in
-this report is committed or pushed yet.** Written for Ghassan and Jad.
+Branch `GRA-2340394`, on top of `2864592` (the validation plan). Sections 1–7
+were committed with X1's preregistration as `75ca65f` (local, not pushed), on
+Ghassan's word; section 8 is X1. Written for Ghassan and Jad.
 
 Ghassan asked for four things:
 
@@ -280,9 +281,227 @@ agent. All of it is gitignored and exists on this laptop only (decision 11).
 
 ## 7. Not done, and why
 
-- Nothing is committed or pushed: the request did not ask for it. The page is
-  built from the working tree and says so.
-- The training recorder is new; no agent has been trained with it beyond the
-  600-step check. The next training is gated on the five agreed steps and the
-  thirteen decisions.
+- *(Superseded by section 8: committed as `75ca65f` with X1's
+  preregistration, and the next training is running.)* Nothing was committed
+  or pushed until X1: the request did not ask for it.
+- The training recorder was new; X1 is the first training run with it.
 - The chatter seen on the flat in one record is noted, not analysed.
+
+## 8. X1: the agreed fixes, the extremes design, 23 seeds a side
+
+Ghassan, 8 October: *"do it, add more seeds and retrain and update artifact"* —
+decision 12 as worded on 7 October (train on the extremes the car never
+reached; check on the states the logs hold). Jad's column of the decision sheet
+is empty; `results/PREREGISTRATION_X1.md` section 9 says which recommended
+options X1 adopts and what a different answer costs.
+
+### 8.1 The four plant steps of 30 September, one at a time
+
+On the locked climb, `check_premise.py`'s policies (the first row reproduces
+the merged plant's published figures exactly):
+
+| plant | baseline | current-grade cuts | preview over it |
+|---|---|---|---|
+| merged, 30 September | 920.1 at 883.0 °C | 43.4 % | −0.32 points |
+| + thermal sub-stepping (`thermal.DT_SUB_MAX` 0.1 s) | 917.6 | 43.4 % | −0.32 |
+| + every grade change ramped over 8 s | 850.4 | 47.0 % | −0.01 |
+| **both** | **848.1 at 883.0 °C** | **47.0 %** | **−0.01** |
+
+The ramp removed the one-step knock spike and with it all of the hand-written
+preview deficit, as the merge review predicted. The spark trim is capped at 0
+(the command still recorded beside what was applied), and the fingerprint is
+schema 2 (`derived_sha` fatal, `derived.py` hashed, the code hash on text with
+docstrings and comments stripped). `validate.py`: 8 of 11 (row 8, oil, 97.0 →
+97.1 °C). The app's pins moved 873.1 → 872.7 °C and 604.8 → 604.2 °C; switching
+the sub-stepping off brings them back exactly.
+
+### 8.2 The extremes roads, and two defects found building them
+
+`engine_env.ExtremesTrainingEnv`: the terrain families, plus per episode an
+ambient on 25–45 °C, a speed target redrawn every 60–180 s on 60–150 km/h,
+hills to 18 %, and the housing's heat capacity ×0.75–1.333. The first draft
+failed its own smoke test:
+
+- **Slowdowns asked for negative torque.** The model has no fuel cut and no
+  engine braking, and a speed profile slowing at 0.8 m/s² asked the engine for
+  less than nothing; the neutral policy, which IS the baseline, scored −112 to
+  −693 an episode. Slowing down is now a coast no faster than the road allows.
+- **A descent at moderate speed asked for less than the engine makes shut.**
+  Measured: 12.0 Nm at 1200 rpm, 9.9 at 2100, 7.8 at 2700 with the throttle
+  shut. A −1.7 % descent at 79 km/h asked 7.6 Nm of an engine making 10.7, and
+  the tracking hinge fired on 127 steps (−47.5). Every road now asks at least
+  15 Nm (`EXTREME_T_FLOOR_NM`), and the floor carries the acceleration term —
+  without it, it put a 3.5 % hill under every launch from rest.
+
+Then: `check_roads.py --road extremes` PASS on 40 roads (worst neutral −0.0043,
+worst p95 tracking 0.018, 10 roads bind); `test_reward.py` 10 of 10 with two new
+checks on these roads.
+
+### 8.3 Fixed before training
+
+| what | where | value |
+|---|---|---|
+| the held-out hills | `results/conditions_extremes_dt1/conditions_grades.json` | 42 °C 8.25 %, **25 °C 21.75 %**, 35 °C 12.00 %, **50 °C 7.50 %**, 90 / 82 / 76 kPa 8.75 / 12.00 / 12.25 % — every grade as on 29 September |
+| the logged-drive check | `results/logged_cycles.json`, `logged_check.py` | six drives, 269.8 min, flat, at frozen episodes 4 and 15's weightings; pass = T (torque) and F (fuel ≤ +1 %) on all |
+| the statistic | `analyse_x1.py` | the MEI rule at 5.43 points, both ways; dry run on the twenty of 29 September reproduces INCONCLUSIVE |
+| the sanity probe | `sanity_probe.py` | a 50 K hotter housing must not get less protection; dry run on two agents of 29 September: 28 % and 37 % of climb states violate |
+| the yardstick (decision 13) | measured | `current-grade` short of 95 % on 1 of 719 steps of the scored climb |
+| the seeds | `power_analysis.py` | 23 a side: sign-test power 0.822 at the 29 September spread (20 give 0.640) |
+
+On the way, `power_analysis.delta_for_power` was found returning 64.63 points at
+23 seeds where a scan gives 5.26: its binomial tail underflowed near p = 1.
+Fixed; the script's own printed output is byte-identical.
+
+### 8.4 The documents, the commit, the launch
+
+The stale premise figures (920.1, −0.3) were swept: live claims to 848.1 /
+47.0 % / −0.0, records of the merged plant marked with the figures they keep.
+`verify_docs.py` 73 of 73; its two expectations that moved (premise baseline,
+app pins) carry the measured reason; `drift_test.py` rows 6 and 13
+re-anchored and CAUGHT. Committed as `75ca65f`, then the 46 runs launched at
+15:15 (`runs/extremes_dt1/LAUNCH.txt`), and the full drift test beside them.
+Results, and the page, follow in this section when they exist.
+
+### 8.5 Training, scoring, and the result
+
+- **Training:** 46 runs, 15:16–23:01 on 8 October (465 min), two waves of 23; none
+  crashed, none resumed. Every run's `meta.json` carries `plant_sha` 3c48890dd15bc116
+  and the clean commit `75ca65f`.
+- **Scoring** (`x1_score.py`, unattended): the twenty frozen episodes for 50 policies
+  (120 min), then recorded again and found identical, all 1 000 (117 min).
+- **The preregistered reading: SMALLER THAN THE MEI**, total and thermal-only alike:
+  17 of 23 pairs below 5.43 points (sign p 0.0173; permutation p 0.0027); preview helps
+  in 10 of 23 (p 0.80); costs damage in 13 of 23 (p 0.34, not significant). Mean
+  −10.35 points, sd 24.78 (29 September: 7.84).
+- **Post hoc, and the reason the reading must be read with care:** six sighted agents
+  cut under 40 % on the scored climb, no blinded one does. They protected on their own
+  training roads (25.6–47.4 %, inside the other forty's 11.2–59.3 %); on the climb five
+  enrich at most half as deeply as their twins and three retard spark 2.2–4.3°.
+- **Supervision:** 39 of 46 beat current-grade; 19 of 46 do more damage than the
+  baseline ECU on at least one frozen episode.
+- **Probe:** no agent passes outright (1.1–98.5 % of probed states violate).
+- **Logged drives: 1 of 46 pass.** Torque is delivered (14 of 552 runs fail T); fuel is
+  not: life weighted most, 252 of 276 runs over +1 % (median +4.33 %, worst +21.40 %);
+  67 % of the extra fuel is burned with the ECU car's housing under 500 °C.
+- **Sensitivity rows:** 38–39 of 46 beat current-grade under every formula; the
+  ablation mean −9.9 to −13.0 points.
+- **A bug, caught by its own guard:** the transfer test's workers loaded the 29 September
+  agents (the `--set` of 8 October never reached them). Its harness check stopped it
+  before any condition was scored; fixed, 5 of 5 identical, re-run after the logged check
+  (07:22–10:54, all seven conditions). Its report then stopped once more, on reading the
+  harness result from the grades file where a set trained after its hills keeps it
+  beside them (`harness_check.json`); fixed, nothing re-run.
+- **Transfer (T), descriptive, five episodes a condition:** held out, 30 of 46 agents
+  beat that condition's current-grade at 25 °C on the 21.75 % hill (17 sighted, 13
+  blinded) and 26 of 46 at 50 °C (14, 12); in range, 29 of 46 at 42 °C and 42 of 46 at
+  35 °C; under untrained air pressure 25–32 of 46. 0–3 agents per condition do more
+  damage than its baseline ECU (blinded seed 2 and sighted seed 17 in four conditions
+  each, sighted seed 21 in two). Current-grade misses its torque on more than 1 % of the
+  steps in five conditions (16–297 of 719), so only 25 and 35 °C compare against a
+  comparator that delivers: held out 30, in range 42. The twenty of 29 September on the
+  same hills (7 October, the plant before the fixes, spark advance allowed): 6 of 20 at
+  25 °C, 19 of 20 at 50 °C. The figure's spark panel was drawn for the +4° trim and
+  showed nothing for a set whose trim is capped at 0; it now draws each agent's own
+  median trim, which shows who retards (8–18 of 46 per condition).
+- Also on the way: the H/τ sweep and the timestep study re-ran on the sub-stepped plant
+  (preview 0.0 at every binding τ; the step error at 2 s is gone); `record_agents.py`
+  no longer counts the spark cap as slew limiting, and reads whether a cap was in force
+  from the record itself.
+
+### 8.6 The audit of 9 October: everything the simulation touches
+
+Asked for after X1 was scored: go through every file that affects or is affected
+by the simulation, the training and the agents, and say what needs editing or
+regenerating. What was checked, and how:
+
+- **The plant.** The live fingerprint equals all 46 X1 agents' `meta.json` on
+  every fatal key, and on the plant files' full text: nothing has moved since
+  they trained. Rebuilding the dataset from the eleven logs reproduced
+  `derived_sha` exactly (only the file's timestamp changed, and was restored).
+- **The generated files.** Every results file stamped with a plant is on the
+  live one. X1's extracts (`record_extracts.py --x1`) re-ran byte for byte; the
+  older plant's files that the page shows (`traces_130kmh.json`,
+  `sweep_speed_grade.json`) are labelled there as the merged plant's record.
+- **One pass of `full_run.py`**, updated first: it now also runs
+  `premise_split.py`, `check_roads.py --road extremes`, `app.test_simulation`,
+  `model_vs_data.py`, `analyse_phase_d.py` and `analyse_x1.py`, and its refusal
+  uses agents this machine has. **Every block exit 0**, and the refusal exit 1
+  as it should (`FULL_RUN.txt`, about 87 minutes): the dataset rebuilt to the
+  same `derived_sha`; `validate.py` 8 of 11; `test_reward.py` 10 of 10; the
+  premise and its split byte for byte; `check_roads.py --road extremes` PASS and
+  byte for byte; the app suites 59 of 59 and 16 of 16; `verify_docs.py` 73 of 73;
+  `drift_test.py` 16 of 16; `check_random_road.py` PASS on this plant for the
+  first time (0 of 121, weakest 13.97 % at +11.9 K; it was last run on
+  sep17's); the three analyses as published.
+
+Found and fixed (in the working tree, not committed):
+
+- **The fit that derives the thermal constants was never sub-stepped**
+  (CLAUDE.md mistake 25). `calibrate_thermal.simulate` steps its own nodes once
+  per 1 s sample, so the re-derivation of 8 October returned the same constants
+  without touching the new integrator, and the claim that every caller shared
+  it was repeated in `thermal.py`, the WBS and the validation plan. Measured,
+  not shipped (`substep_fit_check.py`): the oil constants move under 2 %, the
+  coolant constants a lot (radiator scale +61 %, block-to-ambient −42 %), the
+  locked climb's baseline 848.1 → 845.6 and current-grade's cut +0.01 points.
+  Shipping it changes `derived_sha`, so it waits for the next plant change. The
+  false claims are corrected.
+- **The ramp broke six tests of `app.test_agents`**, which nobody had run, and
+  the app labelled the scored climb "181 s at 1.5 %". `app/agent_trace.py` now
+  starts a climb on the last level step and reads a fixed road's full grade;
+  the road's rise pins moved with their reason (2755 → 2733 m, 1917 → 1894,
+  3247 → 3220). 135 tests OK, 14 skipped without `runs_c4/`.
+- **X1's run directory was not closed**: `train.py --road extremes` without
+  `--out` would have trained into it. `runs/extremes_dt1` is CLOSED now, as
+  `terrain_dt1` was after its result; `train_all.py`'s examples name a new one.
+- **Regenerated on today's plant:** `FULL_RUN.txt` (30 Sep); `validation_table.md`
+  (row 8 97.0 → 97.1 °C, the only value that moved); `results/model_vs_data.json`
+  (7 Oct: row 8's split is now 2.9 K coolant and 9.0 K oil node of an 11.9 K miss,
+  where the merged plant gave 4.6 and 7.3), its figures 8–18 and the page.
+- **Two missing regression tests**, named by the WBS: `test_plant_guards.py`
+  (a 1 s step equals ten 0.1 s steps; the coolant settles at 2 s; one changed
+  derived constant moves `derived_sha` and the file's timestamp does not).
+- **Stale text:** `CLAUDE.md` (the phase table, the numbers list, the file list,
+  the live list's status, and a convention: after a plant change, run all three
+  app suites), the validation plan's §9 step 2, `results/README.md` (an X1 and a
+  29 September section), the page's validation numbers (now labelled as the
+  merged plant's stored traces).
+
+Not changed, because each needs a decision or an owner:
+
+- **Ship the sub-stepped fit** now (a retrain) or with the next plant change.
+- **Back up X1's runs and records**: 1.7 GB of runs and 457 MB of per-step
+  records exist only on this laptop (decision 11 recommends a sha-checked copy
+  outside the repository after every run).
+- **The app's verdict row for X1**: `app/agent_catalog.py` quotes verdicts for
+  Phase D, D2 and C4 only, so X1 shows "none" (Jad's code).
+- **`validation_numbers.json`** re-scores the merged plant's stored traces;
+  recompute it on today's plant with the labels (WBS 3.12–3.15).
+- **The presentation deck (23 September) and the PDFs** (`DOCUMENT_STATUS.md`,
+  last checked 8 September), and the thesis figures 1–3 and 23, which show the
+  merged plant's premise.
+
+### 8.7 The results page: every abbreviation, with its equation
+
+Asked for by Ghassan on 9 October. The page (`results/page/`, published as
+version 20 of the same artifact) ends with a new section, "Every abbreviation
+on this page": 77 entries in six groups (the claim and the experiments, damage
+and scoring, the engine and the car, statistics, validation, units, drives and
+files), each with what it stands for, the equation the code uses and the file
+it lives in. The abbreviations were taken from the rendered page's own text,
+not from memory.
+
+The section has to type its equations, which makes it prose about code, the
+kind that drifts. So `make_page.glossary()` checks it at every build: each
+constant is read from the live module, each formula (damage, both tests, the
+power calculation, corrected flow, the MEI) is evaluated against the function
+that owns it, and each line the section quotes is looked for in its file. A
+changed constant, a changed formula and a missing line were each shown to stop
+the build. Its worked numbers are tokens: tau 47.2 s and H/tau 0.64 at the
+climb's exhaust flow, the MEI as 100 x 50 / the merged baseline, current-grade's
+cut on today's plant.
+
+Found on the way and fixed: the Phase D section called the scored climb "a
+900 s motorway climb". `evaluate.py` scores 720 s (`DURATION = 720.0`); 900 s
+is the training episode and the speed-by-grade sweep. It now says 720 s.
+`verify_docs.py`: 73 of 73.

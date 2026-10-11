@@ -244,12 +244,16 @@ def episodes_sha(protocol="phase-d"):
     return hashlib.sha256(repr(_episode_set(protocol)).encode()).hexdigest()[:16]
 
 
-def derived_sha():
+def derived_sha(path=None):
     """A hash of data/derived_params.json's VALUES (keys starting with "_" are
     bookkeeping: inputs, timestamps). Since 28 September the plant's thermal,
     boost, spark, enrichment and gearbox constants live there; since 8 October
-    a change to them is fatal, like a change to the code (conflict.md decision 2)."""
-    p = os.path.join(HERE, "data", "derived_params.json")
+    a change to them is fatal, like a change to the code (conflict.md decision 2).
+
+    `path` hashes another copy of the file instead; test_plant_guards.py uses it
+    to show that one changed constant moves the hash and a timestamp does not,
+    without touching the real file."""
+    p = path or os.path.join(HERE, "data", "derived_params.json")
     try:
         with open(p, encoding="utf-8") as fh:
             d = json.load(fh)

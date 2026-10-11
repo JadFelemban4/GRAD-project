@@ -1,0 +1,18 @@
+2026-10-08 15:49:36  x1_score.py started (from step 1)
+2026-10-08 23:04:38  training finished: 46 final.zip
+2026-10-08 23:04:38  step 1 phase_d: run_results.py phase_d --agents=runs/extremes_dt1
+2026-10-09 01:04:19  step 1 phase_d: exit 0 after 120 min
+2026-10-09 01:04:19  step 2 record_agents: record_agents.py runs/extremes_dt1
+2026-10-09 03:01:29  step 2 record_agents: exit 0 after 117 min
+2026-10-09 03:01:29  step 3 analyse_x1: analyse_x1.py
+2026-10-09 03:02:27  step 3 analyse_x1: exit 0 after 1 min
+2026-10-09 03:02:27  step 4 sanity_probe: sanity_probe.py runs/extremes_dt1
+2026-10-09 03:02:33  step 4 sanity_probe: exit 0 after 0 min
+2026-10-09 03:02:33  step 5 conditions: conditions_test.py --set runs/extremes_dt1 --resume-all
+2026-10-09 03:03:34  step 5 conditions: exit 1 after 1 min
+2026-10-09 03:03:34  step 6 logged_check: logged_check.py --set runs/extremes_dt1
+2026-10-09 07:22:19  step 6 logged_check: exit 0 after 259 min
+2026-10-09 07:22:19  x1_score.py finished; FAILED steps [5]
+2026-10-09 07:22:46  step 5 conditions RE-RUN after the worker fix: conditions_test.py --set runs/extremes_dt1 --resume-all (log 5_conditions_rerun.log)
+2026-10-09 10:54:00  step 5 conditions RE-RUN: all 7 conditions scored (parts 0-6, records saved); the merge wrote conditions_test.json, then report() stopped on the harness lookup (a set whose hills were fixed before training keeps its check beside them)
+2026-10-09 10:57:00  step 5 conditions: report() fixed to read harness_check.json; --report-only exit 0 (log 5_conditions_report.log): harness 5 of 5 identical; figure conditions_test_extremes_dt1.png

@@ -9,140 +9,140 @@
  ],
  "climb": {
   "baseline ECU | 1": {
-   "peak_turb": 883.0045557555549,
-   "damage": 920.0705545676985,
-   "damage_thermal": 859.513332936283,
-   "coolant_mean": 92.73322296142578,
-   "coolant_swing": 2.13525390625,
-   "coolant_step": 1.636277198791504,
-   "coolant_flips": 1.0
+   "peak_turb": 883.0176115049757,
+   "damage": 848.0516173749937,
+   "damage_thermal": 845.6023860491603,
+   "coolant_mean": 92.8357925415039,
+   "coolant_swing": 3.0517578125e-05,
+   "coolant_step": 1.4260550074141065e-07,
+   "coolant_flips": 0.009389671361502348
   },
   "baseline ECU | 2": {
-   "peak_turb": 883.0213878972951,
-   "damage": 918.905129812022,
-   "damage_thermal": 858.3687105565175,
-   "coolant_mean": 92.83580017089844,
-   "coolant_swing": 9.1552734375e-05,
-   "coolant_step": 4.2781650222423195e-07,
-   "coolant_flips": 0.028169014084507043
+   "peak_turb": 883.0176115049757,
+   "damage": 848.0516173749937,
+   "damage_thermal": 845.6023860491603,
+   "coolant_mean": 92.8357925415039,
+   "coolant_swing": 3.0517578125e-05,
+   "coolant_step": 1.4260550074141065e-07,
+   "coolant_flips": 0.009389671361502348
   },
   "baseline ECU | 5": {
-   "peak_turb": 883.0210181475285,
-   "damage": 917.9639972492402,
-   "damage_thermal": 857.4273762421137,
-   "coolant_mean": 92.83580780029297,
-   "coolant_swing": 0.0001220703125,
-   "coolant_step": 5.704220029656426e-07,
-   "coolant_flips": 0.03755868544600939
+   "peak_turb": 883.0176115049757,
+   "damage": 848.0516173749937,
+   "damage_thermal": 845.6023860491603,
+   "coolant_mean": 92.8357925415039,
+   "coolant_swing": 3.0517578125e-05,
+   "coolant_step": 1.4260550074141065e-07,
+   "coolant_flips": 0.009389671361502348
   },
   "baseline ECU | 10": {
-   "peak_turb": 883.0208980675212,
-   "damage": 917.6498888976254,
-   "damage_thermal": 857.1131673523722,
+   "peak_turb": 883.0176115049757,
+   "damage": 848.0516173749937,
+   "damage_thermal": 845.6023860491603,
    "coolant_mean": 92.8357925415039,
-   "coolant_swing": 6.103515625e-05,
-   "coolant_step": 2.852110014828213e-07,
-   "coolant_flips": 0.018779342723004695
+   "coolant_swing": 3.0517578125e-05,
+   "coolant_step": 1.4260550074141065e-07,
+   "coolant_flips": 0.009389671361502348
   },
   "baseline ECU | 20": {
-   "peak_turb": 883.0208321302163,
-   "damage": 917.4909545916838,
-   "damage_thermal": 856.9542604232942,
+   "peak_turb": 883.0175575089733,
+   "damage": 847.8942785866698,
+   "damage_thermal": 845.4450168362586,
    "coolant_mean": 92.83575439453125,
    "coolant_swing": 0.0,
    "coolant_step": 0.0,
    "coolant_flips": 0.0
   },
   "baseline ECU | 50": {
-   "peak_turb": 883.0207737001759,
-   "damage": 917.3885355625661,
-   "damage_thermal": 856.851863749648,
-   "coolant_mean": 92.83558654785156,
+   "peak_turb": 883.0174963886187,
+   "damage": 847.7928350696579,
+   "damage_thermal": 845.3435526012995,
+   "coolant_mean": 92.83551788330078,
    "coolant_swing": 0.0,
    "coolant_step": 0.0,
    "coolant_flips": 0.0
   },
   "current-grade | 1": {
-   "peak_turb": 853.3454747558704,
-   "damage": 520.5485717643293,
-   "damage_thermal": 453.71377679093234,
-   "coolant_mean": 92.77323913574219,
-   "coolant_swing": 2.27618408203125,
-   "coolant_step": 1.7433913946151733,
-   "coolant_flips": 1.0
+   "peak_turb": 853.3615321005888,
+   "damage": 449.6249661202416,
+   "damage_thermal": 446.6220819792489,
+   "coolant_mean": 92.88444519042969,
+   "coolant_swing": 0.0001220703125,
+   "coolant_step": 5.704220029656426e-07,
+   "coolant_flips": 0.03755868544600939
   },
   "current-grade | 2": {
-   "peak_turb": 853.363849829259,
-   "damage": 520.0021983859002,
-   "damage_thermal": 453.18893134274333,
-   "coolant_mean": 92.88442993164062,
+   "peak_turb": 853.3615321005888,
+   "damage": 449.6249661202416,
+   "damage_thermal": 446.6220819792489,
+   "coolant_mean": 92.88444519042969,
    "coolant_swing": 0.0001220703125,
    "coolant_step": 5.704220029656426e-07,
    "coolant_flips": 0.03755868544600939
   },
   "current-grade | 5": {
-   "peak_turb": 853.3634405353447,
-   "damage": 519.5248252735533,
-   "damage_thermal": 452.7113565354687,
+   "peak_turb": 853.3615321005888,
+   "damage": 449.6249661202416,
+   "damage_thermal": 446.6220819792489,
    "coolant_mean": 92.88444519042969,
-   "coolant_swing": 0.000152587890625,
-   "coolant_step": 7.130275321287627e-07,
-   "coolant_flips": 0.046948356807511735
+   "coolant_swing": 0.0001220703125,
+   "coolant_step": 5.704220029656426e-07,
+   "coolant_flips": 0.03755868544600939
   },
   "current-grade | 10": {
-   "peak_turb": 853.3633063928361,
-   "damage": 519.3650531250139,
-   "damage_thermal": 452.5515378862082,
+   "peak_turb": 853.3615321005888,
+   "damage": 449.6249661202416,
+   "damage_thermal": 446.6220819792489,
    "coolant_mean": 92.88444519042969,
    "coolant_swing": 0.0001220703125,
    "coolant_step": 5.704220029656426e-07,
    "coolant_flips": 0.03755868544600939
   },
   "current-grade | 20": {
-   "peak_turb": 853.3632395696562,
-   "damage": 519.2834447428165,
-   "damage_thermal": 452.4699030697916,
-   "coolant_mean": 92.88442993164062,
-   "coolant_swing": 3.0517578125e-05,
-   "coolant_step": 1.4260550074141065e-07,
-   "coolant_flips": 0.009389671361502348
+   "peak_turb": 853.3614662366095,
+   "damage": 449.5440863549138,
+   "damage_thermal": 446.54116745020826,
+   "coolant_mean": 92.88441467285156,
+   "coolant_swing": 0.0,
+   "coolant_step": 0.0,
+   "coolant_flips": 0.0
   },
   "current-grade | 50": {
-   "peak_turb": 853.3631468065395,
-   "damage": 519.2272308693101,
-   "damage_thermal": 452.4137148604208,
-   "coolant_mean": 92.88424682617188,
+   "peak_turb": 853.3613780189697,
+   "damage": 449.48855016728135,
+   "damage_thermal": 446.4856092684123,
+   "coolant_mean": 92.88420867919922,
    "coolant_swing": 0.0,
    "coolant_step": 0.0,
    "coolant_flips": 0.0
   }
  },
  "cuts": {
-  "1": 43.4229723818395,
-  "2": 43.4106763021036,
-  "5": 43.40466218388137,
-  "10": 43.40270081120718,
-  "20": 43.40179135892232,
-  "50": 43.40160022264647
+  "1": 46.98141517470567,
+  "2": 46.98141517470567,
+  "5": 46.98141517470567,
+  "10": 46.98141517470567,
+  "20": 46.981115723030264,
+  "50": 46.981322373366176
  },
  "drive10": {
   "1": {
-   "row8_oil": 97.037923069116,
-   "row11_coolant": 92.19131708317622,
-   "oil_median_error": -1.5846112961038727,
-   "coolant_median_error": -0.6027828678668357
+   "row8_oil": 97.10695820117724,
+   "row11_coolant": 92.20598179653746,
+   "oil_median_error": -1.5452235357593906,
+   "coolant_median_error": -0.5733369388111669
   },
   "2": {
-   "row8_oil": 97.1069025301681,
-   "row11_coolant": 92.20406342355432,
-   "oil_median_error": -1.54737025005943,
-   "coolant_median_error": -0.5727966517459322
+   "row8_oil": 97.10695820117724,
+   "row11_coolant": 92.20598179653746,
+   "oil_median_error": -1.5452235357593906,
+   "coolant_median_error": -0.5733369388111669
   },
   "5": {
-   "row8_oil": 97.10698357275487,
-   "row11_coolant": 92.20544574857445,
-   "oil_median_error": -1.5454734948771716,
-   "coolant_median_error": -0.572758477186369
+   "row8_oil": 97.10695820117724,
+   "row11_coolant": 92.20598179653746,
+   "oil_median_error": -1.5452235357593906,
+   "coolant_median_error": -0.5733369388111669
   },
   "10": {
    "row8_oil": 97.10695820117724,
@@ -164,11 +164,11 @@
   }
  },
  "u_num_vs_finest": {
-  "peak_turb_k": 0.01621794462107573,
-  "damage": 2.6820190051324744,
-  "cut_points": 0.02137215919302804,
-  "row8_oil_k": 0.06900375484917731,
-  "row11_coolant_k": 0.01459216861258028
+  "peak_turb_k": 0.00011511635693750577,
+  "damage": 0.25878230533578517,
+  "cut_points": 9.280133949118863e-05,
+  "row8_oil_k": 3.137721205348498e-05,
+  "row11_coolant_k": 7.254474866158489e-05
  },
  "dt2": {
   "substeps": [
@@ -179,83 +179,83 @@
   ],
   "climb": {
    "baseline ECU | 1": {
-    "peak_turb": 882.5625494265497,
-    "damage": 971.3349288358227,
-    "damage_thermal": 849.7191126013425,
-    "coolant_mean": 90.32669830322266,
-    "coolant_swing": 10.321746826171875,
-    "coolant_step": 5.035371780395508,
-    "coolant_flips": 0.5047619047619047
+    "peak_turb": 883.1661832404183,
+    "damage": 855.16642779813,
+    "damage_thermal": 846.0287229672558,
+    "coolant_mean": 92.83613586425781,
+    "coolant_swing": 0.000335693359375,
+    "coolant_step": 3.166918531860574e-06,
+    "coolant_flips": 0.2
    },
    "baseline ECU | 2": {
-    "peak_turb": 883.027794500321,
-    "damage": 979.0997704362165,
-    "damage_thermal": 857.7727996057746,
-    "coolant_mean": 91.9059066772461,
-    "coolant_swing": 0.589508056640625,
-    "coolant_step": 0.37505269050598145,
-    "coolant_flips": 1.0
+    "peak_turb": 883.1661832404183,
+    "damage": 855.16642779813,
+    "damage_thermal": 846.0287229672558,
+    "coolant_mean": 92.83613586425781,
+    "coolant_swing": 0.000335693359375,
+    "coolant_step": 3.166918531860574e-06,
+    "coolant_flips": 0.2
    },
    "baseline ECU | 5": {
-    "peak_turb": 883.1963768164004,
-    "damage": 980.5536679103756,
-    "damage_thermal": 859.1483178017004,
-    "coolant_mean": 92.8361587524414,
+    "peak_turb": 883.1661832404183,
+    "damage": 855.16642779813,
+    "damage_thermal": 846.0287229672558,
+    "coolant_mean": 92.83613586425781,
+    "coolant_swing": 0.000335693359375,
+    "coolant_step": 3.166918531860574e-06,
+    "coolant_flips": 0.2
+   },
+   "baseline ECU | 100": {
+    "peak_turb": 883.1658782004371,
+    "damage": 854.9066089799046,
+    "damage_thermal": 845.7687998473675,
+    "coolant_mean": 92.8360595703125,
+    "coolant_swing": 0.0,
+    "coolant_step": 0.0,
+    "coolant_flips": 0.0
+   },
+   "current-grade | 1": {
+    "peak_turb": 853.518691076417,
+    "damage": 457.66061034205177,
+    "damage_thermal": 446.73024699593407,
+    "coolant_mean": 92.88481140136719,
     "coolant_swing": 0.0003662109375,
     "coolant_step": 3.454820216575172e-06,
     "coolant_flips": 0.22857142857142856
    },
-   "baseline ECU | 100": {
-    "peak_turb": 883.1947842638393,
-    "damage": 979.3464125229711,
-    "damage_thermal": 857.9406461415587,
-    "coolant_mean": 92.83617401123047,
-    "coolant_swing": 9.1552734375e-05,
-    "coolant_step": 8.63705054143793e-07,
-    "coolant_flips": 0.05714285714285714
-   },
-   "current-grade | 1": {
-    "peak_turb": 853.0828188348793,
-    "damage": 590.6233629783079,
-    "damage_thermal": 450.0506334478733,
-    "coolant_mean": 91.23168182373047,
-    "coolant_swing": 10.32806396484375,
-    "coolant_step": 3.98175311088562,
-    "coolant_flips": 0.7238095238095238
-   },
    "current-grade | 2": {
-    "peak_turb": 853.3749146382471,
-    "damage": 593.0043071156839,
-    "damage_thermal": 452.7483212220869,
-    "coolant_mean": 91.89163970947266,
-    "coolant_swing": 0.656005859375,
-    "coolant_step": 0.37667617201805115,
-    "coolant_flips": 1.0
+    "peak_turb": 853.518691076417,
+    "damage": 457.66061034205177,
+    "damage_thermal": 446.73024699593407,
+    "coolant_mean": 92.88481140136719,
+    "coolant_swing": 0.0003662109375,
+    "coolant_step": 3.454820216575172e-06,
+    "coolant_flips": 0.22857142857142856
    },
    "current-grade | 5": {
-    "peak_turb": 853.5559617346233,
-    "damage": 593.9856278496703,
-    "damage_thermal": 453.64611101166815,
-    "coolant_mean": 92.88485717773438,
-    "coolant_swing": 0.00042724609375,
-    "coolant_step": 4.030623586004367e-06,
-    "coolant_flips": 0.2571428571428571
+    "peak_turb": 853.518691076417,
+    "damage": 457.66061034205177,
+    "damage_thermal": 446.73024699593407,
+    "coolant_mean": 92.88481140136719,
+    "coolant_swing": 0.0003662109375,
+    "coolant_step": 3.454820216575172e-06,
+    "coolant_flips": 0.22857142857142856
    },
    "current-grade | 100": {
-    "peak_turb": 853.5543217482094,
-    "damage": 593.3679908005919,
-    "damage_thermal": 453.02807519816133,
-    "coolant_mean": 92.8849105834961,
-    "coolant_swing": 0.00018310546875,
-    "coolant_step": 1.727410108287586e-06,
-    "coolant_flips": 0.11428571428571428
+    "peak_turb": 853.5183669473125,
+    "damage": 457.52393189053845,
+    "damage_thermal": 446.5934565650715,
+    "coolant_mean": 92.884765625,
+    "coolant_swing": 3.0517578125e-05,
+    "coolant_step": 2.8790168471459765e-07,
+    "coolant_flips": 0.01904761904761905
    }
   },
   "cuts": {
-   "1": 39.19467472602991,
-   "2": 39.43372013543791,
-   "5": 39.42344541778189,
-   "100": 39.411838016338876
+   "1": 46.48286047425534,
+   "2": 46.48286047425534,
+   "5": 46.48286047425534,
+   "100": 46.48258335065778
   }
  }
 }

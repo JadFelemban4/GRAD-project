@@ -1,4 +1,49 @@
-# `results/` — Phase D, Phase D2 and C4
+# `results/` — Phase D, Phase D2, C4, the 29 September retrain and X1
+
+## X1 — the extremes design, 23 seeds a side: SMALLER THAN THE MEI (8–9 October 2026)
+
+```bash
+python analyse_x1.py            # X1's preregistered test -> X1_RESULT.txt, X1_RESULT.json
+```
+
+`PREREGISTRATION_X1.md`, committed `75ca65f` before any X1 agent trained. X1
+trains on the plant with the four steps agreed on 30 September (the thermal
+network sub-stepped, the derived constants fingerprinted, the spark trim capped
+at 0, every grade change ramped) and on decision 12's extremes design: ambient
+25–45 °C, a speed target that changes mid-run, hills to 18 %. It changes many
+things at once against 29 September, so X1 against the earlier sets is
+descriptive (its section 2).
+
+| reading | X1 |
+|---|---|
+| pairs (23 seeds a side) where preview helped | 10 of 23 |
+| mean / sd of sighted − blinded, points of cut | −10.35 / 24.78 |
+| effect below the MEI (5.43 points) — sign / permutation | 0.0173 (17 of 23) / 0.0027 — they agree |
+| **cell**, total damage and thermal-only alike | **SMALLER THAN THE MEI** |
+
+- **The sentence that may be said** (its section 6): *"Preview's effect on the
+  locked climb is below the MEI (5.43 points of cut) for agents trained on the
+  extremes design at 50 000 steps."* Never "preview does not help".
+- **What it rests on:** a spread three times 29 September's, and six sighted
+  agents (seeds 4, 13, 16, 17, 21, 22) and no blinded one that protect little
+  on the scored climb, though they protected on their own training roads. That
+  is post hoc, not a test.
+- **Supervision, separately:** 39 of 46 agents beat `current-grade`.
+- **The logged-drive check:** 1 of 46 passes; the agents deliver the torque and
+  burn fuel protecting where nothing needs it (`logged_check_extremes_dt1.json`).
+- **Transfer, descriptive:** held out, 30 of 46 beat their condition's
+  `current-grade` at 25 °C on a 21.75 % hill and 26 of 46 at 50 °C; in range,
+  29 and 42 (`conditions_extremes_dt1/conditions_test.json`).
+
+Every agent: `agents/extremes_dt1/README.md`. The scoring log:
+`x1_score/SCORE_LOG.txt`. The full account: `PREREGISTRATION_X1.md` section 12.
+
+## The 29 September retrain — twenty agents on the merged plant
+
+Ten seeds a side on varied roads, a record of the plant before the agreed
+fixes; its agents are refused on X1's plant, correctly. Every table:
+`agents/terrain_dt1/README.md`, and `agents/terrain_dt1/KNOCK_MARGIN.md` for the
+spark-advance diagnostic.
 
 ## C4 — D2's design at 300 000 steps: SMALLER THAN THE MEI, not converged (24 September 2026)
 

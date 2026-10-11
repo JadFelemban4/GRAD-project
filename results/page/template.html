@@ -198,6 +198,26 @@ details .tbl-wrap{margin-top:8px}
 .cav h3{font-size:16px;margin-bottom:6px}
 .cav p{font-size:13.5px;color:var(--ink-2)}
 
+/* ------------------------------------------------------ abbreviations */
+.gl-jump{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:4px}
+.gl-jump a{font:500 12.5px/1 var(--body);color:var(--ink-2);text-decoration:none;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;background:var(--surface)}
+.gl-jump a:hover{background:var(--hover);color:var(--ink)}
+.gl-group{margin-top:34px;scroll-margin-top:60px}
+.gl-group>h3{font-size:18px;padding-bottom:10px;border-bottom:1.5px solid var(--ink)}
+.gl-list{margin:0}
+.gl-row{display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr);gap:4px 22px;
+  padding:13px 0;border-bottom:1px solid var(--rule)}
+.gl-ab{font:600 14px/1.5 var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.gl-row dd{margin:0;min-width:0;display:flex;flex-direction:column;gap:7px}
+.gl-row dd p{font-size:14px;color:var(--ink-2);max-width:74ch}
+.gl-row dd p b{color:var(--ink);font-weight:600}
+.gl-eq{font:13px/1.65 var(--mono);color:var(--ink);background:var(--band);border-radius:6px;
+  padding:7px 11px;white-space:pre-wrap;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.gl-eq sub,.gl-eq sup{font-size:.78em;line-height:0}
+.gl-eq .w{color:var(--ink-2)}
+.gl-src{font:12px/1.4 var(--mono);color:var(--ink-3);overflow-wrap:anywhere}
+
 footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-3)}
 footer pre{font:12.5px/1.6 var(--mono);color:var(--ink-2);background:var(--surface);
   border:1px solid var(--rule);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:10px 0 0}
@@ -210,9 +230,11 @@ footer pre{font:12.5px/1.6 var(--mono);color:var(--ink-2);background:var(--surfa
   .stat .v{font-size:34px}
   .bar-name{display:none}
   th,td{padding:8px 7px}
+  .gl-row{grid-template-columns:minmax(0,1fr);gap:5px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
+[hidden]{display:none!important}
 </style>
 
 <div class="bar">
@@ -220,11 +242,13 @@ html{scroll-behavior:smooth}
     <span class="bar-name">B58 preview study</span>
     <nav aria-label="Sections">
       <a href="#summary">Summary</a>
+      <a href="#x1">X1</a>
       <a href="#phase-d">Phase D</a>
       <a href="#vs-car">Simulation vs car</a>
       <a href="#validation">Validation</a>
       <a href="#drives">Drives</a>
       <a href="#caveats">Caveats</a>
+      <a href="#glossary">Abbreviations</a>
     </nav>
   </div>
 </div>
@@ -247,25 +271,37 @@ html{scroll-behavior:smooth}
 
   <div class="stats">
     <div class="stat">
-      <span class="k">Training beats hand-written</span>
+      <span class="k">29 Sep agents beat hand-written</span>
       <span class="v">{{pd.ablation.agent_over_grade|+.1f}}<small>pts</small></span>
       <p>The median sighted agent cuts damage by {{pd.ablation.sighted_median|.1f}} % and the median blinded one {{pd.ablation.blind_median|.1f}} %; the best hand-written policy, current-grade, cuts {{pd.ablation.grade_cut|.1f}} %. All twenty still beat it under each of the {{val.formulas_n}} damage formulas tried. With spark advance forbidden the agents' median falls to {{pd.rec.km.sighted|.1f}} %: most of the margin rests on the untested knock model.</p>
     </div>
     <div class="stat">
-      <span class="k">Preview, sighted minus blinded</span>
+      <span class="k">29 Sep: preview, sighted minus blinded</span>
       <span class="v">{{pd.ablation.mean|+.1f}}<small>pts</small></span>
       <p>Mean over {{pd.ablation.n}} paired seeds, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}. {{pd.ablation.verdict}} The interval spans zero under {{val.formulas_zero}} of the {{val.formulas_n}} damage formulas tried; the {{val.formulas_exc}} exceptions are the ones that give the untested knock term more weight.</p>
     </div>
     <div class="stat">
       <span class="k">Preview on the H/τ sweep</span>
       <span class="v">{{gen.vs_grade_absmax|.2f}}<small>pts or less</small></span>
-      <p>Preview over current-grade, either way, at every time constant where the limit binds. Against the reactive policy it looks like {{gen.vs_react_lo|.0f}}–{{gen.vs_react_hi|.0f}} points, but that gap is timing, not preview. Not quotable: at the sweep's 2 s step the thermal model's own step error moves a cut by {{val.ts.cut2|.2f}} points, more than this effect.</p>
+      <p>Preview over current-grade, either way, at every time constant where the limit binds. Against the reactive policy it looks like {{gen.vs_react_lo|.0f}}–{{gen.vs_react_hi|.0f}} points, but that gap is timing, not preview. Since 8 October the thermal model sub-steps itself, and at the sweep's 2 s step its step error moves a cut by {{val.ts.cut2|.2f}} points (it was {{val.ts0.cut2|.2f}}). Hand-written policies on a single-step climb still cannot confirm or refute the criterion.</p>
     </div>
     <div class="stat">
       <span class="k">Simulation vs car</span>
       <span class="v">4<small>of 12 agree</small></span>
       <p>Five more agree within limits the comparison cannot see past, two are untested (knock, and spark under boost, added 7 October), and one is a region the car was never driven in. None is marked off since the thermal network was derived from the logs.</p>
     </div>
+  </div>
+
+  <div class="findings">
+    <h3>Changed on 8–9 October: X1</h3>
+    <ol>
+      <li>{{x1.finding}} <a href="#x1">X1</a></li>
+      {{x1.finding_l}}
+      {{x1.finding_t}}
+      <li><b>The plant fixes agreed on 30 September are in, and the hand-written preview deficit is gone.</b> The thermal network is sub-stepped, every grade change is ramped over 8 s, the spark trim is capped at 0, and the fingerprint covers the derived constants. The baseline's damage went from {{x1.split_first.baseline|.1f}} to {{x1.split_last.baseline|.1f}} ({{x1.ramp_share|.1f}} of it the ramp, which removed the one-step knock spike at the climb), and preview over current-grade from {{x1.split_first.preview_vs_grade|+.2f}} to {{x1.split_last.preview_vs_grade|+.2f}} points. <a href="#f-x1-split">One change at a time</a></li>
+      <li><b>Building the new roads found a limit of the model's own.</b> It has no fuel cut, so with the throttle shut the engine still makes 8–12 Nm. A slowdown asked it for negative torque, a gentle descent for less than it makes, and the tracking penalty charged every policy alike: the baseline itself scored −0.05 to −0.69 per step. Every road now asks at least 15 Nm, and on the {{x1.roads_n}} roads checked the baseline scores {{x1.roads_worst|+.4f}} per step at worst. <a href="#f-x1-roads">The roads</a></li>
+      <li><b>A power calculation was wrong at larger seed counts, now fixed.</b> The 80 %-power effect at 23 seeds came back as 64.63 points, where a direct scan gives 5.26; a probability tail underflowed. Nothing published moved.</li>
+    </ol>
   </div>
 
   <div class="findings">
@@ -276,7 +312,7 @@ html{scroll-behavior:smooth}
       <li><b>In other air the agents mostly hold up; on a steep hill in cool air they do not.</b> On a speed target that changes mid-run, each condition on its own hill: in the trained and warmer air at least {{val.warm_beat_min}} of 20 beat current-grade. At 25 °C, on a {{val.c25.grade|.2f}} % hill in 5th gear, {{val.c25.beat}} of {{val.c25.n}} do. In thin air their torque delivery breaks down (median {{val.thin_short_hi|.0f}} of 719 steps short at the worst pressure). And current-grade itself is short of torque on this profile in {{val.grade_short_n}} of {{val.cond_n}} conditions. <a href="#f-cond">The conditions</a></li>
       <li><b>The damage formula, constant by constant.</b> The turbine scale can be calculated once its mechanism is named: {{val.dc.creep|.1f}} K for creep rupture, against the 45 K used. The knee is bracketed by published gas limits. The rest are valuations, or wait for drive C. Under every calculated value all twenty agents still beat current-grade and the ablation stays inconclusive, unless the untested knock term is made large. <a href="#f-dc">The constants</a></li>
       <li><b>A comparison corrected: the knee is not "80 K more conservative" than a 930 °C limit.</b> The knee is a housing temperature and 930 °C a gas temperature. Like for like, through the model's own heat balance, the knee is {{val.dc.gas_at_knee|.0f}} °C of gas. <a href="#f-dc">The constants</a></li>
-      <li><b>The 1 s step is fine; the sweep's 2 s step is not.</b> Stepping the thermal model up to 50 times finer moves the published cut by {{val.ts.cut|.2f}} points at 1 s. At 2 s the coolant swings {{val.ts.swing2|.1f}} K and a cut moves {{val.ts.cut2|.2f}} points, more than the sweep's preview effects. <a href="#caveats">Caveats</a></li>
+      <li><b>The 1 s step was fine; the sweep's 2 s step was not.</b> Stepping the thermal model up to 50 times finer moved the published cut by {{val.ts0.cut|.2f}} points at 1 s; at 2 s the coolant swung {{val.ts0.swing2|.1f}} K and a cut moved {{val.ts0.cut2|.2f}} points, more than the sweep's preview effects. Since 8 October the model sub-steps itself, and the same study gives {{val.ts.cut|.2f}} and {{val.ts.cut2|.2f}} points. <a href="#caveats">Caveats</a></li>
       <li><b>The world the agents trained in, drawn from the roads they actually drove.</b> {{tenv.env.episodes_per_agent}} roads each at a steady {{tenv.env.v_kmh|.0f}} km/h in {{tenv.env.t_amb_c|.0f}} °C sea-level air, grades from {{tenv.env.grade_min_pct|.0f}} to +{{tenv.env.grade_max_pct|.0f}} %, {{tenv.pct.g78|.0f}} % of the time in 7th or 8th gear. The 25 °C hill of the conditions test, {{val.c25.grade|.2f}} % in 5th, is beyond anything they met. <a href="#f-tenv">The training environment</a></li>
       <li><b>A correction: the agent that sometimes does worse than no protection is not trading life for fuel.</b> On its {{pd.rec.bad_worst.n}} bad episodes {{pd.rec.bad_worst.name}} also burns {{pd.rec.bad_worst.fuel_lo|.1f}}–{{pd.rec.bad_worst.fuel_hi|.1f}} % more fuel than the baseline, and its return turns negative. Its per-step records show it retarding spark on the climb there, where elsewhere it advances; the same retard is behind the failures at 25 °C. <a href="#f-cond">The conditions</a></li>
       <li><b>The car's own spark under boost runs below the model's baseline.</b> {{val.spark.n}} genuine readings between 140 and 240 kPa: median {{val.spark.med|+.2f}}° (standard error {{val.spark.se|.2f}}°); in the climb's own cell {{val.spark.climb|+.2f}}° from {{val.spark.climb_n}} readings, too few to label. <a href="#f-dc">Validation</a></li>
@@ -289,12 +325,12 @@ html{scroll-behavior:smooth}
       <li><b>The agents were retrained, ten seeds a side, and the preview result is inconclusive.</b> A new road every episode at 130 km/h, dt 1.0, on the derived plant, 50 000 steps each. {{pd.agents.sentence}} Sighted minus blinded: {{pd.ablation.mean|+.1f}} points, 95 % interval {{pd.ablation.lo|+.1f}} to {{pd.ablation.hi|+.1f}}, Wilcoxon p = {{pd.ablation.p_w|.2f}}, n = {{pd.ablation.n}}. Every action they took, in training and in the twenty frozen episodes, is recorded in <code>results/agents/</code>. <a href="#f-abl">The ablation</a></li>
       <li><b>Most of what the agents gain over the hand-written policies is spark advance the untested knock model allows.</b> On the climb they run {{pd.rec.trim_lo|.1f}}–{{pd.rec.trim_hi|.1f}}° past the baseline's {{pd.rec.sp_base|.1f}}°, taking the modelled knock integral from {{pd.rec.ki_base|.2f}} to {{pd.rec.ki_lo|.2f}}–{{pd.rec.ki_hi|.2f}}, under the 0.85 where the damage model starts charging. Re-scored with that advance forbidden (<code>knock_margin.py</code>, a diagnostic beside the protocol), the median cut falls from {{pd.rec.km.sighted_orig|.1f}} to {{pd.rec.km.sighted|.1f}} % (sighted) and {{pd.rec.km.blind_orig|.1f}} to {{pd.rec.km.blind|.1f}} % (blinded), against current-grade's {{pd.rec.km.grade|.1f}} %; {{pd.rec.km.beat}} of {{pd.rec.km.n}} still beat it, and the median margin over it goes from {{pd.rec.km.og_orig|+.1f}} to {{pd.rec.km.og|+.1f}} points. A lower bound: an agent trained without the lever could do better than one that has it taken away. The ablation is untouched, under the cap too ({{pd.rec.km.abl|+.2f}} points). <a href="#f-km">The knock margin</a> · <a href="#f-act">What the agents do</a></li>
       <li><b>One agent sometimes does worse than no protection at all.</b> {{pd.rec.bad_sentence}} <a href="#f-eval">Every policy</a></li>
-      <li><b>With the honest comparator, the H/τ sweep shows no preview value.</b> The sweep used to measure preview only against the reactive policy. Against current-grade, which acts on the grade the car is on now, preview is worth {{gen.vs_grade_lo|+.2f}} to {{gen.vs_grade_hi|+.2f}} points at every time constant where the limit binds. No sweep result can be cited for the criterion; the trained ablation on varied roads is the test. Since 30 September the sweep's figures are not quotable at all until the thermal model is stepped more finely (see <a href="#caveats">caveats</a>). <a href="#f-htau">The sweep</a></li>
+      <li><b>With the honest comparator, the H/τ sweep shows no preview value.</b> The sweep used to measure preview only against the reactive policy. Against current-grade, which acts on the grade the car is on now, preview is worth {{gen.vs_grade_lo|+.2f}} to {{gen.vs_grade_hi|+.2f}} points at every time constant where the limit binds. No sweep result can be cited for the criterion; the trained ablation on varied roads is the test. From 30 September to 8 October its figures were not quotable at all, until the thermal model was stepped more finely; it has been since, and re-run on that plant the sweep still shows no preview value against current-grade (see <a href="#caveats">caveats</a>). <a href="#f-htau">The sweep</a></li>
       <li><b>Drive B is in, and the data now sets the constants.</b> Full-throttle roll-ons in a held gear; the dataset is {{meta.minutes|.1f}} minutes over {{meta.drives}} drives. Every constant the car's logs can set (the thermal network, the boost ceiling, the spark offset, the enrichment dwell, the gearbox's kickdown table) is recomputed from them on every rebuild by <code>derive_params.py</code>, not typed into the code.</li>
       <li><b>The oil node had the wrong structure, now re-fitted to the car.</b> The car's oil heats with engine speed and is cooled by road speed; the model heated it with a share of fuel. Derived, drive10's oil runs {{mc.thermal.drive10.oil_med|+.1f}} K and its coolant {{mc.thermal.drive10.ect_med|+.1f}} K from the car (median), and the oil takes {{mc.lit.8.value|.0f}} s to respond (the car: {{mc.lit.8.lo|.0f}}–{{mc.lit.8.hi|.0f}} s). <a href="#f-th10">Oil and coolant</a></li>
       <li><b>The validation table scores oil and coolant against the car:</b> {{mc.lit_ok}} of {{mc.lit_n}} inside, and {{mc.lit_c_ok}} of {{mc.lit_c_n}} of the car rows. Both coolant rows are inside; both oil rows still miss. <a href="#f-lit">The table</a></li>
       <li><b>Three physics fixes moved the premise, and preview stayed level.</b> Exhaust flow was fuel × 15, now air + fuel; the boost ceiling read the charge temperature as its inlet, now ambient; air density was a typed 1.2 kg/m³, now computed at 42 °C. The baseline's damage went from {{cal.steps.0.baseline|.1f}} to {{cal.steps_last_baseline|.1f}}, and preview over current-grade stayed between {{cal.steps_pv_lo|+.1f}} and {{cal.steps_pv_hi|+.1f}} points. <a href="#f-steps">One change at a time</a></li>
-      <li><b>Two of 28 September's claims were wrong, corrected on the 29th.</b> The derived boost ceiling does not match drive B at 1600–2000 rpm: it sits {{cal.boost.low_worst|+.0f}} % from the highest boost the car reached there. And the coolant is {{mc.row8.coolant_part|.1f}} K of row 8's {{mc.row8.miss|.1f}} K oil miss, not "about 6 K"; the larger part is the oil node itself. <a href="#f-env">Ceiling</a> · <a href="#f-th10">Oil</a></li>
+      <li><b>Two of 28 September's claims were wrong, corrected on the 29th.</b> The derived boost ceiling does not match drive B at 1600–2000 rpm: it sits {{cal.boost.low_worst|+.0f}} % from the highest boost the car reached there. And the coolant is not "about 6 K" of row 8's oil miss: on today's plant it is {{mc.row8.coolant_part|.1f}} K of {{mc.row8.miss|.1f}} K, and the larger part is the oil node itself. <a href="#f-env">Ceiling</a> · <a href="#f-th10">Oil</a></li>
       <li><b>Preview's {{pd.ablation.pred_minus_grade|+.1f}} against current-grade is entirely the knock term.</b> That term is {{pd.split.knock_pct_base|.0f}}–{{pd.split.knock_pct_pred|.0f}} % of the damage. On turbine and oil damage alone, predictive and current-grade tie ({{pd.split.thermal_pred|.1f}} against {{pd.split.thermal_grade|.1f}}). <a href="#f-abl">The ablation</a></li>
       <li><b>The knock comparison could not have seen knock.</b> The drive behind it holds one reading of each ignition angle every {{mc.knock_s.every_s|.0f}} s, and a knock retard lasts a second or two. So the negative result is untested, not refuted. <a href="#f-knock">Knock</a></li>
       <li><b>Training now runs on a new road every episode, at the 1.0 s step scoring uses.</b> Five kinds of road, from flat to two steep climbs, so the preview channel has something to report; the retrain gets 55 episodes where the old runs had 11. Scoring stays on the locked climb. <a href="#f-roads">The roads</a></li>
@@ -305,12 +341,159 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
+<!-- ================================================================ X1 -->
+<section id="x1">
+  <div class="sect-head">
+    <p class="eyebrow">{{x1.eyebrow}}</p>
+    <h2>X1: the retrain on the extremes design</h2>
+    <p class="prose cap">Train where the car's logs never went, so the agents know it; check them where the logs do go, so we know they trained correctly. {{x1.runs}} agents, {{x1.seeds}} seeds a side, scored on the same twenty frozen episodes as every set before them. {{x1.lede_tail}}</p>
+  </div>
+
+  <div id="x1-res" hidden>
+    <div class="stats" id="x1-stats"></div>
+
+    <div class="fig" id="f-x1-abl">
+      <div class="fig-head">
+        <h3>The preregistered test: preview, paired by seed</h3>
+        <p class="take" id="x1-abl-take"></p>
+      </div>
+      <div class="legend">
+        <span><i class="lr" style="background:var(--pd-sight)"></i>sighted took less damage</span>
+        <span><i class="lr" style="background:var(--pd-blind)"></i>blinded took less damage</span>
+        <span style="color:var(--ink-2)"><i class="lk dash"></i>the minimum effect of interest</span>
+      </div>
+      <div class="chart" id="c-x1-abl"></div>
+      <p class="cap" id="x1-abl-cap"></p>
+      <div class="tbl-wrap" id="t-x1-low"></div>
+      <p class="cap" id="x1-low-cap"></p>
+    </div>
+
+    <div class="fig" id="f-x1-pair" hidden>
+      <div class="fig-head">
+        <h3>The widest pair, step by step</h3>
+        <p class="take" id="x1-pair-take"></p>
+      </div>
+      <div class="legend">
+        <span style="color:var(--pd-sight)"><i class="lk"></i>sighted</span>
+        <span style="color:var(--pd-blind)"><i class="lk"></i>blinded</span>
+        <span style="color:var(--pd-grade)"><i class="lk"></i>current-grade</span>
+        <span style="color:var(--pd-base)"><i class="lk dash"></i>baseline ECU</span>
+      </div>
+      <div class="chart" id="c-x1-pair-t"></div>
+      <div class="chart" id="c-x1-pair-l"></div>
+      <p class="cap">Frozen episode 1, every 4 s. Top: the turbine housing against the 850 °C trigger. Bottom: the lambda trim each applied (negative is enrichment, the lever that cools the housing here); the spark and boost trims are in the per-step records and the table above. The climb starts at 180 s.</p>
+    </div>
+
+    <div class="fig" id="f-x1-sup">
+      <div class="fig-head">
+        <h3>Every agent against current-grade</h3>
+        <p class="take" id="x1-sup-take"></p>
+      </div>
+      <div class="legend">
+        <span><i class="ld" style="background:var(--pd-sight)"></i>sighted</span>
+        <span><i class="ld" style="background:var(--pd-blind)"></i>blinded</span>
+        <span style="color:var(--pd-grade)"><i class="lk"></i>current-grade, the comparing line</span>
+      </div>
+      <div class="chart" id="c-x1-sup"></div>
+      <p class="cap">Each agent's median damage cut over the twenty frozen episodes, in points over current-grade's. A different claim from preview: the blinded agents have no preview to use.</p>
+    </div>
+
+    <div class="fig" id="f-x1-transfer" hidden>
+      <div class="fig-head">
+        <h3>Where the agents never trained</h3>
+        <p class="take" id="x1-transfer-take"></p>
+      </div>
+      <div class="legend">
+        <span><i class="ld" style="background:var(--pd-sight)"></i>sighted</span>
+        <span><i class="ld" style="background:var(--pd-blind)"></i>blinded</span>
+        <span style="color:var(--pd-grade)"><i class="lk"></i>that condition's current-grade</span>
+        <span><i class="ld" style="background:var(--band);border-radius:2px"></i>held out of training</span>
+      </div>
+      <div class="chart" id="c-x1-transfer"></div>
+      <div class="tbl-wrap" id="t-x1-transfer"></div>
+      <div class="tbl-wrap" id="t-x1-transfer2"></div>
+      <p class="cap">Five frozen episodes per condition, each on its own hill and the changing speed target; every agent against that condition's own current-grade (cg). Descriptive: five episodes carry no test. Beat cg: how many of the 23 sighted / 23 blinded agents cut more damage than cg; margin: each arm's median, in points of cut. s − b: the mean of the sighted-minus-blinded differences, paired by seed. Worse than ECU: agents whose median cut is below zero, more damage than that condition's baseline ECU. &gt;850 s: the median seconds with the housing over the trigger, agents (a) / cg / the ECU. Short: steps under 95 % of the requested torque, of 719, the median agent beside cg. 29 Sep beat: the twenty agents of 29 September, of 20.</p>
+      <p class="cap" id="x1-transfer-cap"></p>
+    </div>
+
+    <div class="fig" id="f-x1-logged" hidden>
+      <div class="fig-head">
+        <h3>The car's own drives: no harm</h3>
+        <p class="take" id="x1-logged-take"></p>
+      </div>
+      <div class="tbl-wrap" id="t-x1-logged"></div>
+      <p class="cap">Every agent on every logged drive at both weightings, replayed flat. Pass: it never misses the requested torque by more than 5 % on more than 1 % of the steps where the baseline ECU in the same run does not, and never burns more than 1 % more fuel than it. A flat replay shows no harm, not protection.</p>
+    </div>
+
+    <div class="fig" id="f-x1-probe" hidden>
+      <div class="fig-head">
+        <h3>A hotter housing must never get less protection</h3>
+        <p class="take" id="x1-probe-take"></p>
+      </div>
+      <div class="tbl-wrap" id="t-x1-probe"></div>
+      <p class="cap">On every tenth step of each agent's own climb, the housing input raised by 50 K and the policy asked again: a violation is a leaner lambda trim (more than 0.005) or a higher boost trim (more than 1 kPa). A reported check, not a gate (<code>sanity_probe.py</code>).</p>
+    </div>
+
+    <div class="fig" id="f-x1-sens" hidden>
+      <div class="fig-head">
+        <h3>Under the damage formulas the decisions name</h3>
+        <p class="take" id="x1-sens-take"></p>
+      </div>
+      <div class="tbl-wrap" id="t-x1-sens"></div>
+      <p class="cap">The twenty frozen episodes re-scored from the per-step records under the constants decisions 8 and 9 pre-declared as sensitivity rows: the creep-rupture turbine scale, the knees carried from published gas limits, and no knock term (<code>damage_constants.py --set extremes_dt1</code>). The agents trained on the published formula; this tests the scoring, not what training on another formula would do.</p>
+    </div>
+  </div>
+
+  <div class="fig" id="f-x1-plan">
+    <div class="fig-head">
+      <h3>How X1 will be read, fixed before training</h3>
+      <p class="take">At the spread the twenty agents of 29 September measured, {{x1.seeds}} pairs give the preregistered sign test {{x1.power|.2f}} power against the minimum effect of interest, {{x1.mei|.2f}} points of damage cut. Twenty pairs would have given {{x1.power20|.2f}}.</p>
+    </div>
+    <div class="tbl-wrap" id="t-x1-plan"></div>
+    <p class="cap">The ablation is read by Phase D2's three-cell rule, imported unchanged, and C4's "costs damage" rule; the exact permutation test is printed beside every sign test. Both are applied to total damage and to damage without the knock term, which is untested against this car. If the seeds spread half as far again as on 29 September, the power falls to {{x1.power_x15|.2f}}; X1 makes no prediction about its own spread. <code>analyse_x1.py</code></p>
+  </div>
+
+  <div class="fig" id="f-x1-split">
+    <div class="fig-head">
+      <h3>The plant X1 trains on, one change at a time</h3>
+      <p class="take">The baseline's damage fell {{x1.total_drop|.1f}} units, from {{x1.split_first.baseline|.1f}} to {{x1.split_last.baseline|.1f}}: {{x1.ramp_share|.1f}} of them the ramp, {{x1.sub_share|.1f}} the sub-stepping. With the knock spike at the grade step gone, the hand-written policies no longer show any preview deficit.</p>
+    </div>
+    <div class="tbl-wrap" id="t-x1-split"></div>
+    <p class="cap">The four hand-written policies on the locked climb, with each change switched on in its own process (<code>premise_split.py</code>); the first row reproduces the merged plant's published premise and the last today's. The spark cap touches no hand-written policy, and the fingerprint is not physics.</p>
+  </div>
+
+  <div class="fig" id="f-x1-roads">
+    <div class="fig-head">
+      <div class="row"><h3>Where X1 trains, and where it is tested</h3></div>
+      <p class="take">{{x1.roads_text}}</p>
+    </div>
+    <div class="legend">
+      <span><i class="ld" style="background:var(--warn)"></i>baseline past 850 °C</span>
+      <span><i class="ld" style="background:var(--ink-3)"></i>does not bind</span>
+      <span><i class="ld" style="background:var(--pd-sight)"></i>a test hill (held out ringed)</span>
+      <span style="color:var(--ink-2)"><i class="lk" style="border-top-width:3px;opacity:.6"></i>the 29 September agents: every road at 42 °C, hills to 14 %</span>
+    </div>
+    <div class="chart" id="c-x1-roads"></div>
+    <p class="cap">Every training road also changes its speed target every one to two minutes, between 60 and 150 km/h, and scales the housing's heat capacity by 0.75–1.33. The shaded bands are held out: air above 45 °C and hills above 18 %. The test hills are the conditions test's, each the gentlest grade at which the baseline reaches the locked climb's own 883 °C on the changing speed target, calibrated on this plant before training (<code>conditions_test.py --hills-only</code>).</p>
+  </div>
+
+  <div class="fig" id="f-x1-tests">
+    <div class="fig-head">
+      <h3>The two checks beside the frozen episodes</h3>
+      <p class="take">Transfer: seven conditions, two of them outside anything X1 trained on. And no harm on the car's own drives: {{x1.drives_min|.1f}} minutes of logged driving replayed flat, where every agent must deliver the torque asked for and burn at most 1 % more fuel than the baseline.</p>
+    </div>
+    <div class="tbl-wrap" id="t-x1-hills"></div>
+    <div class="tbl-wrap" id="t-x1-drives"></div>
+    <p class="cap">The logged drives are every drive with road speed and ambient logged for five minutes or more, except the census log; each at its own median ambient, at the weightings of frozen episodes {{x1.eps.life_most}} (component life weighted most) and {{x1.eps.life_least}} (least). Replayed flat, a drive cannot show that an agent protects, only that it does no harm (<code>logged_check.py</code>).</p>
+  </div>
+</section>
+
 <!-- ================================================================ PHASE D -->
 <section id="phase-d">
   <div class="sect-head">
     <p class="eyebrow">Part 1 · the simulation</p>
     <h2>Phase D on the locked scenario</h2>
-    <p class="prose cap">A 900 s motorway climb in 42 °C air: three minutes flat, then a 12 % grade at 130 km/h. The turbine housing is protected from 850 °C, the knee of the damage model <code>exp((T − 1123)/45)</code>. Every policy is scored on the same {{pd.n_episodes}} frozen episodes from <code>evaluate.py</code>.</p>
+    <p class="prose cap">A 720 s motorway climb in 42 °C air: three minutes flat, then a 12 % grade at 130 km/h. The turbine housing is protected from 850 °C, the knee of the damage model <code>exp((T − 1123)/45)</code>. Every policy is scored on the same {{pd.n_episodes}} frozen episodes from <code>evaluate.py</code>. <b>All of this part is the twenty agents of 29 September and the hand-written policies on the merged plant those agents trained on</b> (baseline {{x1.split_first.baseline|.1f}}); the plant of 8 October and its agents are in <a href="#x1">X1</a> above.</p>
   </div>
 
   <div class="fig" id="f-trace">
@@ -834,11 +1017,11 @@ html{scroll-behavior:smooth}
   <div class="fig" id="f-unc">
     <div class="fig-head">
       <h3>The uncertainty budget, as measured so far</h3>
-      <p class="take">V&amp;V 20 judges a comparison against its uncertainty: the model's numerical error, its inputs' and the measurement's. Two parts are measured. At the 1 s step this page uses, stepping the thermal model up to 50 times finer moves the published cut by {{val.ts.cut|.2f}} points; at the sweep's 2 s step the coolant swings {{val.ts.swing2|.1f}} K and a cut moves {{val.ts.cut2|.2f}}. And one resolution step of the car's spark channel ({{val.vn.res.spark}}°) moves the baseline's damage on the climb by {{val.vn.spark_up|+.0f}} or {{val.vn.spark_dn|+.0f}} units, about twice the minimum effect of interest ({{val.vn.mei|.0f}}).</p>
+      <p class="take">V&amp;V 20 judges a comparison against its uncertainty: the model's numerical error, its inputs' and the measurement's. Two parts are measured. With the thermal model sub-stepping itself since 8 October, stepping it up to 50 times finer moves the published cut by {{val.ts.cut|.2f}} points at the 1 s step and {{val.ts.cut2|.2f}} at the sweep's 2 s step, where the coolant now swings {{val.ts.swing2|.1f}} K (before: {{val.ts0.cut|.2f}}, {{val.ts0.cut2|.2f}} and {{val.ts0.swing2|.1f}} K). And on the merged plant of 30 September, whose stored traces <code>validation_numbers.py</code> re-scores, one resolution step of the car's spark channel ({{val.vn.res.spark}}°) moves the baseline's damage on the climb by {{val.vn.spark_up|+.0f}} or {{val.vn.spark_dn|+.0f}} units, about twice the minimum effect of interest ({{val.vn.mei|.0f}}); it is recomputed on today's plant with the labels.</p>
     </div>
     <div class="tbl-wrap" id="t-unum"></div>
     <div class="tbl-wrap" id="t-sens" style="margin-top:14px"></div>
-    <p class="cap">The thermal step from <code>timestep_study.py</code>: the locked climb's baseline ECU, the thermal network sub-stepped inside each 1 s or 2 s step; the cut is current-grade's against the baseline. The input sensitivity from <code>validation_numbers.py</code>: the baseline on the climb with one input moved by one step of the channel that would measure it. A comparison that disagrees by less than these cannot be told from agreement.</p>
+    <p class="cap">The thermal step from <code>timestep_study.py</code>: the locked climb's baseline ECU, the thermal network sub-stepped inside each 1 s or 2 s step; the cut is current-grade's against the baseline. The input sensitivity from <code>validation_numbers.py</code>: the baseline on the climb (the merged plant's stored traces, 30 September) with one input moved by one step of the channel that would measure it. A comparison that disagrees by less than these cannot be told from agreement.</p>
   </div>
 
   <div class="fig" id="f-rec">
@@ -999,9 +1182,401 @@ html{scroll-behavior:smooth}
     <div class="cav"><h3>Altitude is not modelled</h3><p>The scored climb rises {{pd.elev.climb_m|,}} m, but the engine breathes sea-level air ({{pd.elev.p_model}} kPa) the whole way; a standard atmosphere would give about {{pd.elev.isa_kpa|.0f}} kPa at the top. Read the scenario as sustained heavy load at sea level, not as a mountain.</p></div>
     <div class="cav"><h3>One workaround, stated</h3><p>When the modelled engine falls short of the torque asked for, the gearbox kicks down. Drive B showed the ceiling is still too low at 1600–2000 rpm, so the model runs a gear lower there than the car may need. There is no torque channel to settle it, so the workaround stays. The locked climb runs above that band.</p></div>
     <div class="cav"><h3>The H/τ sweep is hand-written</h3><p>It shows preview worth nothing over current-grade, but a hand-written predictive policy cannot do anything current-grade does not. It neither confirms nor refutes the criterion; only the trained pair can.</p></div>
-    <div class="cav"><h3>The thermal model needs a smaller step</h3><p>Found on 30 September and measured on 7 October. With the constants derived from the logs the coolant node is numerically stiff: at the 1 s step it swings about {{val.ts.swing1|.0f}} K back and forth from one step to the next on the climb, though what this page publishes moves by {{val.ts.cut|.2f}} points of cut at most; at the sweep's 2 s step it swings {{val.ts.swing2|.0f}} K and a cut moves {{val.ts.cut2|.2f}} points, so no H/τ sweep figure is quotable. The per-step records show the swing whenever the coolant pump runs near full duty, and the agents see it, since the coolant is one of their inputs. The fix, stepping the thermal model more finely inside each step, is agreed and not yet made.</p></div>
+    <div class="cav"><h3>The thermal model needed a smaller step, and has one since 8 October</h3><p>Found on 30 September and measured on 7 October. With the constants derived from the logs the coolant node was numerically stiff: at the 1 s step it swung about {{val.ts0.swing1|.0f}} K back and forth from one step to the next on the climb, though what this page published moved by {{val.ts0.cut|.2f}} points of cut at most; at the sweep's 2 s step it swung {{val.ts0.swing2|.0f}} K and a cut moved {{val.ts0.cut2|.2f}} points, so no H/τ sweep figure was quotable. The agents of 29 September trained and were scored on that plant, and they saw the swing, since the coolant is one of their inputs. The fix, the network stepping itself at most 0.1 s at a time, went in on 8 October: the swing is {{val.ts.swing1|.1f}} K now, and the same study moves a cut by {{val.ts.cut|.2f}} points at 1 s and {{val.ts.cut2|.2f}} at 2 s. X1's agents train on the fixed network.</p></div>
     <div class="cav"><h3>The records live on one laptop</h3><p>Every step of training and of every test is recorded, but the records are large and kept out of the repository; this page draws small committed extracts of them. Backing them up is decision 11.</p></div>
     <div class="cav"><h3>Not on this page</h3><p>Three earlier experiments by the same team (Phase D, D2 and C4), on the simulator as it stood before 28 September. Each was preregistered, and they are reported separately. None of them settled the preview question either.</p></div>
+  </div>
+</section>
+
+<!-- ========================================================== ABBREVIATIONS -->
+<section id="glossary">
+  <div class="sect-head">
+    <p class="eyebrow">Reference</p>
+    <h2>Every abbreviation on this page</h2>
+    <p class="prose cap">What each one stands for and, where there is something to calculate, the equation the code uses, with the file it lives in. The worked numbers come from the same data as the rest of the page. The build also checks every equation here against the code: it stops if a constant, a formula or a quoted line has moved. Names and units with nothing to calculate have no equation line.</p>
+    <div class="gl-jump" role="navigation" aria-label="Abbreviation groups">
+      <a href="#gl-claim">The claim and the experiments</a>
+      <a href="#gl-score">Damage and scoring</a>
+      <a href="#gl-engine">The engine and the car</a>
+      <a href="#gl-stats">Statistics</a>
+      <a href="#gl-val">Validation</a>
+      <a href="#gl-units">Units, drives and files</a>
+    </div>
+  </div>
+
+  <div class="gl-group" id="gl-claim">
+    <h3>The claim and the experiments</h3>
+    <dl class="gl-list">
+      <div class="gl-row"><dt class="gl-ab">H/τ</dt><dd>
+        <p><b>Preview horizon over time constant.</b> The ratio the project's claim is about: how far ahead the agent can see, against how fast the part it protects heats up. The claim is that preview pays only where the two are comparable, and that its value from any plant falls on one curve against this ratio.</p>
+        <div class="gl-eq">H/τ = H ÷ τ = 30 s ÷ {{gl.tau|.1f}} s = {{gl.htau|.2f}} <span class="w">on the locked climb</span></div>
+        <p class="gl-src">generality_test.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">H</dt><dd>
+        <p><b>Preview horizon.</b> How far ahead the sighted agent sees the road's grade. It is given the grade at four look-aheads; the longest is H.</p>
+        <div class="gl-eq">preview = grade(t + h), h ∈ {2, 5, 15, 30} s;  H = 30 s<br><span class="w">for the blinded agent all four are 0</span></div>
+        <p class="gl-src">engine_env.PREVIEW_S, SupervisoryTunerEnv._preview</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">τ</dt><dd>
+        <p><b>Tau, the turbine housing's time constant.</b> The time the housing takes to cover 63 % (1 − 1/e) of the way to a new steady temperature. The exhaust carries the heat in, so τ shortens as the exhaust flow rises: it is not one number. C/UA is the same quantity written as its parts (see c<sub>turb</sub> and UA).</p>
+        <div class="gl-eq">τ = C ÷ UA = c<sub>turb</sub> ÷ (0.90·ṁ<sub>exh</sub> + 18) <span class="w">s, with ṁ<sub>exh</sub> in g/s</span><br>at the climb's {{gen.exh|.1f}} g/s: τ = 6000 ÷ {{gl.ua|.1f}} = {{gl.tau|.1f}} s</div>
+        <p class="gl-src">thermal.ThermalParams (all three constants ASSUMED)</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">s, b</dt><dd>
+        <p><b>Sighted and blinded.</b> Two agents trained identically from the same seed (the random number that fixes the network's starting weights and the roads it trains on). The sighted agent receives the preview; the blinded one receives zeros in its place. Each seed gives one pair.</p>
+        <div class="gl-eq">d = cut(sighted) − cut(blinded) <span class="w">in points, one per seed;  "s − b" is the mean of d</span></div>
+        <p class="gl-src">train.py --no-preview; analyse_x1.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">MEI</dt><dd>
+        <p><b>Minimum effect of interest.</b> The smallest preview effect the team agreed, before any agent trained, would be worth reporting. It was set on 22 September as {{gl.mei_units|.0f}} damage units. X1 restates it as a share of the baseline's damage, so that it survives a change of plant.</p>
+        <div class="gl-eq">MEI = 100 × {{gl.mei_units|.0f}} ÷ {{gl.merged|.1f}} = {{gl.mei|.2f}} points of cut<br><span class="w">{{gl.mei_units|.0f}} units over the baseline ECU's damage on the merged plant of 30 September</span></div>
+        <p class="gl-src">analyse_x1.MEI_PTS; results/VALIDATION_DECISIONS.md, decision 5</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">the four readings</dt><dd>
+        <p><b>The preregistered reading of the paired differences d.</b> PREVIEW COSTS DAMAGE, PREVIEW HELPS, SMALLER THAN THE MEI and INCONCLUSIVE. They are checked in this order and the first that holds is the reading. Each test is the exact one-sided sign test at α = 0.05.</p>
+        <div class="gl-eq">PREVIEW COSTS DAMAGE   if the sign test of −d gives p &lt; 0.05<br>PREVIEW HELPS          else if the sign test of d gives p &lt; 0.05<br>SMALLER THAN THE MEI   else if the sign test of (MEI − d) gives p &lt; 0.05<br>INCONCLUSIVE           otherwise</div>
+        <p class="gl-src">analyse_x1.classify (Phase D2's three cells, with C4's check first)</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">X1</dt><dd>
+        <p><b>Experiment X1</b> (a name, not an acronym). The fifth preregistered test of preview: 23 seeds, sighted and blinded, 46 agents, each trained 50 000 steps on the plant of 8 October. They trained on the extremes design: air at 25–45 °C, a speed target of 60–150 km/h redrawn every 60–180 s, hills up to 18 %, and the housing's heat capacity scaled ×0.75–1.33.</p>
+        <p class="gl-src">results/PREREGISTRATION_X1.md, analyse_x1.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">Phase D, D2, C4</dt><dd>
+        <p><b>Experiment names.</b> The project's phases are lettered A to G: A setup, B matching the simulator to the car, C getting an agent to learn, D the baselines and the ablation, E a battery plant, F the H/τ sweep, G writing. This page's Phase D section shows its run of 29 September, ten seeds a side. D2 repeated Phase D on a randomised climb (start 120–300 s, grade 12–16 %, eight seeds a side, 22–23 September). C4 trained D2's design six times longer, 300 000 steps (24 September). D2 and C4 ran on the simulator as it stood before 28 September.</p>
+        <p class="gl-src">CLAUDE.md, the phase table</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">ECU</dt><dd>
+        <p><b>Engine control unit</b>, the car's engine computer. "The baseline ECU" is the simulator's copy of its logic: it sets spark, λ, boost, fan and pump from what the engine is doing, without looking ahead. "The ECU car" is a second car running that logic on the same road, beside the agent's car. Its damage is the zero every cut is measured from.</p>
+        <div class="gl-eq">cut(baseline ECU) = 0 % <span class="w">by definition</span></div>
+        <p class="gl-src">engine_env.BaselineECU</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">cg</dt><dd>
+        <p><b>Current-grade, the honest comparator.</b> A hand-written policy that protects according to the grade the car is on now, with no preview. One depth, k, sets all its levers; it never trims spark.</p>
+        <div class="gl-eq">k = max( clip((T<sub>turb</sub> − 1123 K) ÷ 25 K, 0, 1),  0.55 · clip(g ÷ 0.08, 0, 1) )<br><span class="w">g is the grade now; its term is 0 unless g &gt; 0.02</span><br>λ trim −0.10·k,  boost trim −18·k kPa,  fan duty ≥ k,  pump duty 1</div>
+        <p class="gl-src">check_premise.p_grade_now, check_premise._protect</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">reactive, predictive</dt><dd>
+        <p><b>The other two hand-written policies</b>, with the same levers and depth as current-grade. Reactive acts only on the temperature it can already measure. Predictive is current-grade with the grade taken from the preview instead of the road under the car.</p>
+        <div class="gl-eq">reactive:    k = clip((T<sub>turb</sub> − 1123 K) ÷ 25 K, 0, 1)<br>predictive:  as cg, with g = max(grade at +15 s, grade at +30 s)</div>
+        <p class="gl-src">check_premise.p_reactive, check_premise.p_predictive</p>
+      </dd></div>
+    </dl>
+  </div>
+
+  <div class="gl-group" id="gl-score">
+    <h3>Damage and scoring</h3>
+    <dl class="gl-list">
+      <div class="gl-row"><dt class="gl-ab">damage, D</dt><dd>
+        <p><b>Damage units.</b> The model's measure of harm to the turbine housing, the oil and the engine (knock), summed over an episode. The turbine and oil terms are 1 per second at their knees, 1123 K (850 °C) and 408 K (135 °C). The knock term is zero until the knock integral passes 0.85.</p>
+        <div class="gl-eq">d = exp((T<sub>turb</sub> − 1123 K) ÷ 45 K) + 0.4·exp((T<sub>oil</sub> − 408 K) ÷ 12 K) + 40·max(0, KI − 0.85)² <span class="w">per second</span><br>D = Σ d·dt <span class="w">over the episode</span><br><span class="w">worked: at the baseline's climb peak of {{gl.peak|.1f}} °C the turbine term alone is {{gl.d_peak|.2f}} a second</span></div>
+        <p class="gl-src">engine_env.damage_rate (the one definition)</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">thermal-only</dt><dd>
+        <p><b>Damage without the knock term.</b> It is reported beside the total because the knock model is untested against the car; drive C is the drive that decides it.</p>
+        <div class="gl-eq">d = exp((T<sub>turb</sub> − 1123 K) ÷ 45 K) + 0.4·exp((T<sub>oil</sub> − 408 K) ÷ 12 K)</div>
+        <p class="gl-src">evaluate.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">cut</dt><dd>
+        <p><b>Damage cut</b>, in %: how much less damage a policy does than the baseline ECU, comparing each one's median over the {{pd.n_episodes}} frozen episodes.</p>
+        <div class="gl-eq">cut = 100 × (1 − median D(policy) ÷ median D(baseline ECU))<br><span class="w">worked, current-grade on the locked climb today: 100 × (1 − {{gl.cg_d|.1f}} ÷ {{gl.base_d|.1f}}) = {{gl.cg_cut|.1f}} %</span></div>
+        <p class="gl-src">analyse_x1.py, record_agents.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">pts</dt><dd>
+        <p><b>Percentage points</b>, the difference between two cuts. "Over current-grade" means the policy's cut minus current-grade's.</p>
+        <div class="gl-eq">pts = cut(A) − cut(B)</div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">850 °C, 1123 K</dt><dd>
+        <p><b>The trigger: the knee of the turbine term.</b> At this housing temperature the turbine term is 1 unit a second, and the hand-written policies start protecting. It is a housing temperature, not an exhaust-gas temperature (mistake 23 in CLAUDE.md).</p>
+        <div class="gl-eq">1123 K − 273.15 = 849.85 °C ≈ 850 °C<br>the term doubles every 45·ln 2 = {{gl.double_k|.1f}} K hotter</div>
+        <p class="gl-src">engine_env.TURB_PROTECT_K</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">KI</dt><dd>
+        <p><b>Knock integral.</b> How close the unburned end gas comes to igniting by itself before the flame reaches it. It is the Livengood–Wu integral of the Douaud–Eyzat ignition delay, from the spark to the end of the burn; at 1 the end gas ignites, which is knock. Untested against the car.</p>
+        <div class="gl-eq">KI = ∫ dt ÷ τ<sub>ig</sub>,   τ<sub>ig</sub> = 0.01768 · (RON/100)<sup>3.402</sup> · p<sup>−1.7</sup> · exp(3800 ÷ T<sub>u</sub>) <span class="w">s</span><br><span class="w">p in atm; T<sub>u</sub> = T<sub>IVC</sub> · (p ÷ p<sub>IVC</sub>)<sup>0.32/1.32</sup>, the unburned gas in K; IVC = intake valve closing</span><br>spark limit KI &lt; 1;  damage from KI &gt; 0.85</div>
+        <p class="gl-src">plant.py; check_map.KI_LIMIT</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">reward, w</dt><dd>
+        <p><b>The reward and its preference weights.</b> Every step, the agent is paid for saving fuel and component life against the ECU car, and charged for missing the torque asked for. Each episode draws new weights w<sub>track</sub>, w<sub>fuel</sub> and w<sub>life</sub>; tracking always keeps at least 0.45.</p>
+        <div class="gl-eq">r = w<sub>fuel</sub>·r<sub>fuel</sub> + w<sub>life</sub>·r<sub>life</sub> + w<sub>track</sub>·r<sub>track</sub> − 0.05·S ÷ dt<br>r<sub>fuel</sub> = (fuel<sub>ECU</sub> − fuel) ÷ fuel<sub>ECU</sub>,   r<sub>life</sub> = (d<sub>ECU</sub> − d) ÷ (d<sub>ECU</sub> + 0.05)<br>r<sub>track</sub> = −(e + 25·max(0, e − 0.05)),   e = |torque asked − torque| ÷ max(torque asked, 40 Nm)<br>S = Σ ((a − a<sub>previous</sub>) ÷ action range)²<br>w<sub>track</sub> uniform in [0.45, 0.70];  (w<sub>fuel</sub>, w<sub>life</sub>) = Dirichlet(1, 1) × (1 − w<sub>track</sub>)<br><span class="w">the code also subtracts an uncertainty term, which the plant always sets to 0</span></div>
+        <p class="gl-src">engine_env.SupervisoryTunerEnv.step, reset</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">frozen episodes</dt><dd>
+        <p><b>The {{pd.n_episodes}} scoring episodes.</b> The locked climb (720 s, 12 % at 130 km/h, 42 °C), each with its own preference weights. They were drawn once from a fixed random seed, before any agent was scored, and have never changed.</p>
+        <div class="gl-eq">(episode seed, (w<sub>track</sub>, w<sub>fuel</sub>, w<sub>life</sub>)) × {{pd.n_episodes}}, drawn from default_rng(20260918)</div>
+        <p class="gl-src">evaluate.EPISODES</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">trim</dt><dd>
+        <p><b>The agent's five levers.</b> Three trims are added to what the baseline ECU commands; two cooling duties are set outright.</p>
+        <div class="gl-eq">spark trim −8 to 0° <span class="w">(advance capped at 0 since 8 October; up to +4° before)</span><br>λ trim −0.15 to +0.06 <span class="w">(negative is richer: enrichment)</span><br>boost trim −40 to +15 kPa;  fan duty 0 to 1;  coolant pump duty 0.3 to 1</div>
+        <p class="gl-src">engine_env.ACT_LO, ACT_HI, SPARK_TRIM_MAX</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">dt</dt><dd>
+        <p><b>Time step</b>: the interval between the agent's decisions, 1 s in training and in scoring. Inside each step the thermal network takes equal sub-steps of at most 0.1 s.</p>
+        <div class="gl-eq">n<sub>sub</sub> = ceil(dt ÷ 0.1 s);  each sub-step is dt ÷ n<sub>sub</sub>, explicit Euler<br><span class="w">a 720 s scoring episode is 720 decisions</span></div>
+        <p class="gl-src">evaluate.DT, thermal.DT_SUB_MAX</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">a / cg / ECU</dt><dd>
+        <p><b>Column shorthand</b> in the conditions tables: the agents' median, current-grade, and the baseline ECU, in that order.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">&gt;850 s</dt><dd>
+        <p><b>Seconds above the trigger</b>: how long the turbine housing spends hotter than 850 °C in an episode.</p>
+        <div class="gl-eq">&gt;850 s = Σ dt · [T<sub>turb</sub> &gt; 850 °C] <span class="w">([…] is 1 when true, 0 when not)</span></div>
+        <p class="gl-src">conditions_test.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">short</dt><dd>
+        <p><b>Torque-shortfall steps.</b> Steps where the engine delivers less than 95 % of the torque asked for. A policy that cuts damage by refusing to do the work shows up here.</p>
+        <div class="gl-eq">short = Σ [torque &lt; 0.95 × torque asked]</div>
+        <p class="gl-src">conditions_test.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">violate %, Δλ, Δboost</dt><dd>
+        <p><b>Safeguard 2's probe.</b> On each agent's own climb states, the housing-temperature input is raised by 50 K and the policy is asked again. A hotter housing should never get less protection.</p>
+        <div class="gl-eq">Δλ = λ trim(50 K hotter) − λ trim,   Δboost = boost trim(50 K hotter) − boost trim<br>violation: Δλ &gt; 0.005 (leaner) or Δboost &gt; 1 kPa (more boost)<br>violate % = 100 × violations ÷ states probed</div>
+        <p class="gl-src">sanity_probe.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">fingerprint</dt><dd>
+        <p><b>The plant's fingerprint</b>, plant_sha and derived_sha. Every agent carries the fingerprint of the plant it trained on, and evaluate.py refuses to score it on a plant whose fingerprint differs. SHA-256 is the Secure Hash Algorithm with a 256-bit digest.</p>
+        <div class="gl-eq">plant_sha = first 16 hex digits of SHA-256(plant.py, thermal.py, engine_env.py, derived.py) <span class="w">with comments and docstrings stripped</span><br>derived_sha = first 16 hex digits of SHA-256(the values in data/derived_params.json)</div>
+        <p class="gl-src">fingerprint.py</p>
+      </dd></div>
+    </dl>
+  </div>
+
+  <div class="gl-group" id="gl-engine">
+    <h3>The engine and the car</h3>
+    <dl class="gl-list">
+      <div class="gl-row"><dt class="gl-ab">B58, B58B30O1</dt><dd>
+        <p><b>BMW's engine codes.</b> The B58 is BMW's 3.0 L turbocharged petrol inline-six. B58B30O1 is the 285 kW version in this car, confirmed by the team on 19 September.</p>
+        <div class="gl-eq">displacement = 6 × (π/4) × bore² × stroke = 6 × (π/4) × 82² × 94.6 mm³ = {{gl.disp|.1f}} cc</div>
+        <p class="gl-src">plant.b58</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">BMW</dt><dd>
+        <p><b>Bayerische Motoren Werke</b> (Bavarian Motor Works), the engine's maker.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">ZF 8HP51</dt><dd>
+        <p><b>The car's gearbox.</b> ZF is Zahnradfabrik ("gear factory") Friedrichshafen; the 8HP is its eight-speed torque-converter automatic, here in the 51 size. The model uses its eight published ratios. The gear the car was in is recovered from engine speed and road speed, because the car's own gear channel stops at 6.</p>
+        <div class="gl-eq">ratios 5.250 · 3.360 · 2.172 · 1.720 · 1.316 · 1.000 · 0.822 · 0.640;  final drive 3.150<br>overall ratio = (rpm · 2π/60) · r<sub>wheel</sub> ÷ v,  r<sub>wheel</sub> = 0.33 m;  the gear is the nearest ratio × 3.150</div>
+        <p class="gl-src">engine_env.Vehicle; model_vs_data.gearbox</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">OBD-II</dt><dd>
+        <p><b>On-board diagnostics, second generation</b>: the car's diagnostic port. This project only reads it, through BimmerLink exports, and never writes to the car.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">RON</dt><dd>
+        <p><b>Research octane number</b>: the fuel's resistance to knock. The model runs 95 RON, the fuel the car was logged on.</p>
+        <div class="gl-eq">enters the knock delay as (RON/100)<sup>3.402</sup> <span class="w">(see KI)</span></div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">GCC</dt><dd>
+        <p><b>Gulf Cooperation Council</b>: the market specification of this car, which is sold in Saudi Arabia.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">λ</dt><dd>
+        <p><b>Lambda, the air–fuel equivalence ratio</b>: the air per unit of fuel, over the chemically exact (stoichiometric) amount. Below 1 the mixture is rich, and the extra fuel cools the exhaust (enrichment).</p>
+        <div class="gl-eq">λ = (air ÷ fuel) ÷ 14.7;  from the logs, fuel = air ÷ (14.7 · λ)</div>
+        <p class="gl-src">plant.AFR_STOICH (AFR: air–fuel ratio); car_thermal.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">EGT</dt><dd>
+        <p><b>Exhaust gas temperature</b>: the gas leaving the exhaust port, which heats the turbine housing. No sensor on this car reads it; the model computes it.</p>
+        <div class="gl-eq">EGT = T<sub>wall</sub> + (T<sub>blowdown</sub> − T<sub>wall</sub>) · exp(−UA<sub>port</sub> ÷ (ṁ<sub>exh</sub> · c<sub>p</sub>))<br><span class="w">UA<sub>port</sub> = 15 W/K, c<sub>p</sub> = 1150 J/(kg·K)</span></div>
+        <p class="gl-src">plant.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">UA</dt><dd>
+        <p><b>Heat-transfer conductance</b>: U, the heat-transfer coefficient, times A, the area. It is the heat flow per kelvin of temperature difference, in W/K.</p>
+        <div class="gl-eq">Q̇ = UA · ΔT<br>turbine housing:  c<sub>turb</sub> · dT<sub>turb</sub>/dt = 0.90·ṁ<sub>exh</sub> · (EGT − T<sub>turb</sub>) − 18 · (T<sub>turb</sub> − T<sub>amb</sub>)</div>
+        <p class="gl-src">thermal.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">c<sub>turb</sub></dt><dd>
+        <p><b>The turbine housing's heat capacity</b>: the joules it takes to warm the housing, with the exhaust manifold, by 1 K. It is ASSUMED, not measured, and it sets τ, the denominator of the claim.</p>
+        <div class="gl-eq">c<sub>turb</sub> = 6000 J/K;  τ = c<sub>turb</sub> ÷ UA</div>
+        <p class="gl-src">thermal.ThermalParams</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">ṁ<sub>exh</sub></dt><dd>
+        <p><b>Exhaust mass flow</b>: the air and the fuel that went in, leaving together.</p>
+        <div class="gl-eq">ṁ<sub>exh</sub> = (m<sub>air</sub> + m<sub>fuel</sub>) · n<sub>cyl</sub> · rpm ÷ 120 <span class="w">(masses per cylinder per cycle; each cylinder fires once every two revolutions)</span></div>
+        <p class="gl-src">plant.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">MAF</dt><dd>
+        <p><b>Mass air flow</b> (the sensor): the car's air-mass channel. On the compressor charts the flow is corrected to reference inlet conditions, so that flows on hot and cool days compare.</p>
+        <div class="gl-eq">corrected flow = ṁ<sub>air</sub> · √(T<sub>in</sub> ÷ 298 K) ÷ (p<sub>in</sub> ÷ 101.3 kPa)</div>
+        <p class="gl-src">plant.corrected_flow</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">pressure ratio</dt><dd>
+        <p><b>Compressor pressure ratio</b>: the pressure after the compressor over the pressure before it.</p>
+        <div class="gl-eq">PR = (p<sub>amb</sub> + boost) ÷ (0.98 · p<sub>amb</sub>) <span class="w">(boost is the car's gauge reading; 0.98 is an assumed loss in the air intake)</span></div>
+        <p class="gl-src">build_dataset.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">BSFC</dt><dd>
+        <p><b>Brake-specific fuel consumption</b>: the fuel burned per unit of work delivered at the crankshaft (the "brake"), in g/kWh. Lower is more efficient.</p>
+        <div class="gl-eq">BSFC = ṁ<sub>fuel</sub> [g/h] ÷ P [kW],   P = torque · rpm · 2π/60</div>
+        <p class="gl-src">plant.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">MBT</dt><dd>
+        <p><b>Maximum brake torque</b> spark timing: the spark advance that gives the most torque. Firing earlier or later both lose torque.</p>
+        <div class="gl-eq">MBT = the advance θ in 0, 1, …, 45° BTDC with the highest torque</div>
+        <p class="gl-src">check_map.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">MFB50</dt><dd>
+        <p><b>50 % mass fraction burned</b>: the crank angle at which half the charge has burned.</p>
+        <div class="gl-eq">x<sub>b</sub> = 1 − exp(−5 · x³),  x = (θ − θ<sub>start</sub>) ÷ Δθ<sub>burn</sub> <span class="w">(the Wiebe function)</span><br>MFB50 is the θ at which x<sub>b</sub> = 0.5</div>
+        <p class="gl-src">plant.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">BTDC, aTDC</dt><dd>
+        <p><b>Before and after top dead centre</b>: crank-angle degrees before or after the piston's highest point. Spark is quoted in ° BTDC and MFB50 in ° aTDC.</p>
+        <div class="gl-eq">θ° BTDC = −θ° aTDC</div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">grade, %</dt><dd>
+        <p><b>Road gradient</b>, rise over run. The locked climb is 12 % at 130 km/h.</p>
+        <div class="gl-eq">grade = 100 × rise ÷ run,   θ = atan(rise ÷ run)<br>road load F = m·a + ½·ρ·C<sub>d</sub>A·v² + C<sub>rr</sub>·m·g·cos θ + m·g·sin θ<br><span class="w">m = 1520 kg, C<sub>d</sub>A = 0.66 m² (drag coefficient × frontal area), C<sub>rr</sub> = 0.011 (rolling resistance), ρ the air density</span></div>
+        <p class="gl-src">engine_env.Vehicle.demand</p>
+      </dd></div>
+    </dl>
+  </div>
+
+  <div class="gl-group" id="gl-stats">
+    <h3>Statistics</h3>
+    <dl class="gl-list">
+      <div class="gl-row"><dt class="gl-ab">sign test</dt><dd>
+        <p><b>Exact one-sided sign test.</b> It counts only directions: of n non-zero differences, k have the tested sign. It is the primary test of D2, C4 and X1.</p>
+        <div class="gl-eq">p = Σ<sub>i=k…n</sub> C(n, i) ÷ 2<sup>n</sup> <span class="w">(C(n, i): the number of ways to choose i of n)</span></div>
+        <p class="gl-src">analyse_phase_d.sign_test</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">permutation test</dt><dd>
+        <p><b>Exact paired permutation test.</b> It uses sizes as well as directions: how often a random choice of signs gives a mean difference at least as large as the one observed. It is reported beside the sign test as the sensitivity reading.</p>
+        <div class="gl-eq">p = #{ s ∈ {±1}<sup>n</sup> : mean(s<sub>i</sub> · |d<sub>i</sub>|) ≥ mean(d) } ÷ 2<sup>n</sup></div>
+        <p class="gl-src">analyse_phase_d.perm_test</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">Wilcoxon</dt><dd>
+        <p><b>Wilcoxon signed-rank test</b>, two-sided. It ranks the differences by size and asks whether the positive ones hold more than their share of the ranks.</p>
+        <div class="gl-eq">W⁺ = Σ<sub>d<sub>i</sub> &gt; 0</sub> rank(|d<sub>i</sub>|);  p as scipy.stats.wilcoxon computes it</div>
+        <p class="gl-src">record_agents.py (scipy.stats.wilcoxon)</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">t-test</dt><dd>
+        <p><b>Paired t-test</b>, two-sided: the mean difference over its standard error.</p>
+        <div class="gl-eq">t = d̄ ÷ (s<sub>d</sub> ÷ √n),  with n − 1 degrees of freedom</div>
+        <p class="gl-src">record_agents.py (scipy.stats.ttest_1samp)</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">CI</dt><dd>
+        <p><b>95 % confidence interval.</b> An interval built this way contains the true mean difference in 95 % of repeats of the experiment. The [95 %] beside "s − b" is one.</p>
+        <div class="gl-eq">d̄ ± t<sub>0.975, n−1</sub> · s<sub>d</sub> ÷ √n<br>s<sub>d</sub> = √( Σ (d<sub>i</sub> − d̄)² ÷ (n − 1) ) <span class="w">(the sample standard deviation)</span></div>
+        <p class="gl-src">record_agents.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">p, α, n</dt><dd>
+        <p><b>The p-value, the significance level and the sample size.</b> p is the chance, if preview did nothing, of a result at least this far from zero. A p below α = 0.05 counts as significant. n is the number of seed pairs or samples.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">power</dt><dd>
+        <p><b>Statistical power</b>: the chance that the preregistered sign test detects a true effect of size δ, given the seed-to-seed spread sd.</p>
+        <div class="gl-eq">power = P(K ≥ k<sub>min</sub>),   K ~ Binomial(n, Φ(δ ÷ sd))<br><span class="w">k<sub>min</sub>: the fewest positive pairs with sign-test p &lt; 0.05;  Φ: the normal cumulative distribution function</span></div>
+        <p class="gl-src">power_analysis.power</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">IQR, p95</dt><dd>
+        <p><b>Interquartile range and 95th percentile.</b> The IQR is the middle half of the values, printed on this page as "Q1–Q3". The p95 is the value 95 % of the samples lie below.</p>
+        <div class="gl-eq">IQR = Q3 − Q1 <span class="w">(the 75th percentile minus the 25th)</span></div>
+        <p class="gl-src">evaluate.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">r</dt><dd>
+        <p><b>Pearson correlation</b>, from −1 to +1: how nearly two quantities move together in a straight line.</p>
+        <div class="gl-eq">r = Σ (x<sub>i</sub> − x̄)(y<sub>i</sub> − ȳ) ÷ √( Σ (x<sub>i</sub> − x̄)² · Σ (y<sub>i</sub> − ȳ)² )</div>
+        <p class="gl-src">model_vs_data.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">standard error</dt><dd>
+        <p><b>The standard error of a median</b>: how far the median of n readings would typically move between repeats.</p>
+        <div class="gl-eq">se = 1.2533 · s ÷ √n <span class="w">(1.2533 = √(π/2), for normally distributed readings)</span></div>
+        <p class="gl-src">car_spark_boost.py</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">RMSE, RMS</dt><dd>
+        <p><b>Root-mean-square error</b>: the typical size of the model's miss, with large misses weighted more.</p>
+        <div class="gl-eq">RMSE = √( mean( (model − car)² ) )</div>
+        <p class="gl-src">model_vs_data.py, calibrate_thermal.py</p>
+      </dd></div>
+    </dl>
+  </div>
+
+  <div class="gl-group" id="gl-val">
+    <h3>Validation</h3>
+    <dl class="gl-list">
+      <div class="gl-row"><dt class="gl-ab">ASME</dt><dd>
+        <p><b>American Society of Mechanical Engineers</b>, which publishes the V&amp;V standards.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">V&amp;V 20</dt><dd>
+        <p><b>ASME V&amp;V 20, verification and validation in computational fluid dynamics and heat transfer.</b> The validation plan uses it to judge each comparison with the car against the comparison's own uncertainty.</p>
+        <div class="gl-eq">E = S − D <span class="w">(simulation minus data)</span><br>u<sub>val</sub> = √(u<sub>num</sub>² + u<sub>input</sub>² + u<sub>D</sub>²)<br><span class="w">u<sub>num</sub>: numerical error;  u<sub>input</sub>: error carried in from the model's inputs;  u<sub>D</sub>: the measurement's uncertainty</span></div>
+        <p class="gl-src">results/VALIDATION_PLAN.md</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">labels</dt><dd>
+        <p><b>The proposed labels</b>, with k = 2 and R the accuracy each use of the model requires. They are proposed in the draft plan; the scorecard on this page is still assigned by reading each comparison.</p>
+        <div class="gl-eq">off         |E| − 2·u<sub>val</sub> &gt; R<br>untested    2·u<sub>val</sub> &gt; R<br>validated   |E| + 2·u<sub>val</sub> ≤ R<br>limited     anything in between<br><span class="w">applied in this order, after "excluded" and "not covered"</span></div>
+        <p class="gl-src">results/VALIDATION_PLAN.md, section 7</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">NASA-STD-7009B</dt><dd>
+        <p><b>NASA's Standard for Models and Simulations, revision B</b> (March 2024). It grades how far a decision may lean on a model, on a credibility scale of 0 to 4. NASA is the National Aeronautics and Space Administration.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">AUDIT.md C3, H3</dt><dd>
+        <p><b>Finding codes from the project's technical review of 14 September</b>: C critical, H high, M medium, L low, numbered within each. C3 found that the old preview advantage was protection depth. H3 found that dwell was counted in rows at an assumed 4.6 Hz.</p>
+        <p class="gl-src">AUDIT.md</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">H1, H2, H2b</dt><dd>
+        <p><b>The H/τ sweep's hypotheses</b>, not the audit's codes. H1, convexity: spreading a correction over time helps only if damage is convex in temperature. H2, timescale: preview pays only where τ is comparable with H. H2b is H2 with the limit re-set for each τ so that it keeps binding.</p>
+        <p class="gl-src">generality_test.py</p>
+      </dd></div>
+    </dl>
+  </div>
+
+  <div class="gl-group" id="gl-units">
+    <h3>Units, drives and files</h3>
+    <dl class="gl-list">
+      <div class="gl-row"><dt class="gl-ab">rpm</dt><dd>
+        <p><b>Revolutions per minute.</b></p>
+        <div class="gl-eq">ω = rpm · 2π ÷ 60 <span class="w">rad/s</span></div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">kPa</dt><dd>
+        <p><b>Kilopascal</b>, 1000 Pa: absolute unless the text says otherwise. One standard atmosphere is 101.3 kPa.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">km/h</dt><dd>
+        <p><b>Kilometres per hour.</b></p>
+        <div class="gl-eq">v [m/s] = v [km/h] ÷ 3.6</div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">g/s, kg/s</dt><dd>
+        <p><b>Grams and kilograms per second</b>, mass flow.</p>
+        <div class="gl-eq">1 kg/s = 1000 g/s = 3600 kg/h</div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">Nm</dt><dd>
+        <p><b>Newton-metre</b>, torque.</p>
+        <div class="gl-eq">power P [W] = torque [Nm] · ω [rad/s]</div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">g/kWh</dt><dd>
+        <p><b>Grams per kilowatt-hour</b>: grams of fuel per kilowatt-hour of work, the unit of BSFC.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">J/K, W/K</dt><dd>
+        <p><b>Joules per kelvin and watts per kelvin</b>: a heat capacity and a heat conductance. Their ratio is a time.</p>
+        <div class="gl-eq">(J/K) ÷ (W/K) = s <span class="w">(as in τ = c<sub>turb</sub> ÷ UA)</span></div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">K, °C</dt><dd>
+        <p><b>Kelvin and degrees Celsius.</b> A temperature difference is the same number in both.</p>
+        <div class="gl-eq">T [K] = T [°C] + 273.15</div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">°, deg</dt><dd>
+        <p><b>Crank-angle degrees</b> for spark and burn timing; one four-stroke cycle is 720°. Elsewhere ° is part of °C.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">cc, L</dt><dd>
+        <p><b>Cubic centimetre and litre.</b></p>
+        <div class="gl-eq">1 L = 1000 cc</div>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">Hz</dt><dd>
+        <p><b>Hertz</b>: readings per second.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">drive A, B, C</dt><dd>
+        <p><b>The purpose-built drives</b> in logs/DRIVE_PLAN.md. A is sustained load, not yet driven. B is full-throttle roll-ons, driven on 28 September. C tests knock; it is planned, and it decides whether the knock model holds.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">decision N</dt><dd>
+        <p><b>The numbered open decisions</b> on results/VALIDATION_DECISIONS.md, each with a column for Ghassan and one for Jad.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">BimmerLink</dt><dd>
+        <p><b>The phone app</b> that reads the car's channels over OBD-II and exports them. It is a product name, not an abbreviation.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">CSV</dt><dd>
+        <p><b>Comma-separated values</b>: BimmerLink's export format, kept unedited in logs/raw/.</p>
+      </dd></div>
+      <div class="gl-row"><dt class="gl-ab">PNG</dt><dd>
+        <p><b>Portable Network Graphics</b>: the image format of the thesis figures.</p>
+      </dd></div>
+    </dl>
   </div>
 
   <footer>
@@ -1811,6 +2386,278 @@ table("t-enrich", ["rpm", "dwell", "n", "car λ", "sim λ", "sim − car", "car,
 table("t-lit", ["quantity", "model", "band", "band from", "inside"],
   MC.lit.map(r => [r.name, `${r.value} ${r.unit}`, `${r.lo}–${r.hi}`, r.basis, r.ok ? "yes" : "no"]), [1, 2]);
 
+
+// ===================================================== 8 October: X1
+const X1 = D.x1;
+table("t-x1-plan", ["question", "how it is answered"], [
+  ["Does seeing ahead protect better? (primary)", `sighted minus blinded cut, paired by seed, over the twenty frozen episodes; MEI ${f(X1.mei, 2)} points; ${X1.k_min} of ${X1.seeds} pairs must agree`],
+  ["Do the agents beat current-grade?", "each agent's median cut against the no-preview comparator's; never evidence for preview"],
+  ["Do they hold up where they never trained?", "the conditions test: 50 °C and the 25 °C hill held out, 35 and 42 °C as controls, three pressures untrained"],
+  ["Do they do harm on the car's own drives?", `${X1.drives.length} logged drives replayed flat: torque within 5 %, fuel within 1 % of the baseline`],
+  ["Does a hotter housing ever get less protection?", "50 K added to the housing input on climb states; a leaner lambda or a higher boost trim is a violation, reported per agent"],
+], []);
+table("t-x1-split", ["plant", "baseline", "reactive", "current-grade", "predictive", "grade cuts %", "preview vs grade"],
+  X1.split.map(r => [r.step, f(r.baseline, 1), f(r.reactive, 1), f(r.current_grade, 1), f(r.predictive, 1),
+                     f(r.grade_cut, 1), f(r.preview_vs_grade, 2, true)]), [1, 2, 3, 4, 5, 6]);
+table("t-x1-hills", ["condition", "hill %", "baseline peak °C", "for X1"],
+  X1.hills.map(h => [h.name, f(h.grade, 2), f(h.peak, 1), h.role]), [1, 2]);
+table("t-x1-drives", ["logged drive", "minutes", "ambient °C", "top km/h", "median moving km/h"],
+  X1.drives.map(d => [d.name, f(d.minutes, 1), f(d.t_amb, 1), f(d.vmax, 0), f(d.vmed, 0)]), [1, 2, 3, 4]);
+
+// X1's results, once they exist. The sentences are PREREGISTRATION_X1.md section 6's.
+const XR = X1.res;
+const X1_SENT = {
+  "PREVIEW HELPS": r => `Agents trained on the extremes design with the preview channel took less damage on the locked climb than their blind twins, by the sign test across ${r.n} seeds (p = ${f(r.p_sign, 4)}); the effect is ${f(r.mean, 2, true)} points against an MEI of ${f(XR.mei, 2)}.`,
+  "SMALLER THAN THE MEI": r => `Preview's effect on the locked climb is below the MEI (${f(XR.mei, 2)} points of cut) for agents trained on the extremes design at 50 000 steps.`,
+  "INCONCLUSIVE": r => `INCONCLUSIVE: the experiment rules out neither an effect of the MEI nor none. At its own spread it has 80 % power only for an effect of ${f(r.eff80_own, 2)} points.`,
+  "PREVIEW COSTS DAMAGE": r => `The sighted agents took significantly more damage than their blind twins (sign p = ${f(r.p_neg, 4)}): a finding about this learner at this budget, never evidence that preview is worthless.`,
+};
+if (XR) {
+  document.getElementById("x1-res").hidden = false;
+  const RT = XR.readings.total, RH = XR.readings.thermal, SU = XR.supervision;
+  const stats = document.getElementById("x1-stats");
+  const tile = (k, v, unit, txt) => {
+    const d = H("div", { class: "stat" }, stats);
+    H("span", { class: "k", text: k }, d);
+    const vv = H("span", { class: "v", text: v }, d);
+    if (unit) H("small", { text: unit }, vv);
+    H("p", { text: txt }, d);
+  };
+  tile("Preview, sighted minus blinded", f(RT.mean, 1, true), "pts",
+    `${RT.cell}. ${RT.k} of ${RT.n} seeds positive (${XR.n_pairs} pairs); sign p ${f(RT.p_sign, 3)}, permutation p ${f(RT.p_perm, 3)}. Below the MEI of ${f(XR.mei, 2)}: sign p ${f(RT.p_lt_sign, 3)}.`);
+  tile("The same, without the knock term", f(RH.mean, 1, true), "pts",
+    `${RH.cell}. ${RH.k} of ${RH.n} positive; sign p ${f(RH.p_sign, 3)}; below the MEI: sign p ${f(RH.p_lt_sign, 3)}.`);
+  tile("Agents beating current-grade", String(SU.beat), `of ${SU.n}`,
+    `Current-grade cuts ${f(SU.grade_cut, 1)} %. Median margin: sighted ${f(XR.sighted_median_margin, 1, true)}, blinded ${f(XR.blind_median_margin, 1, true)} points. ${XR.worse.length} of ${SU.n} do more damage than the baseline ECU on at least one frozen episode.`);
+  const LG = XR.logged, CO = XR.conditions;
+  if (LG || CO) {
+    const held = CO ? CO.filter(c => c.held) : [];
+    tile("Held out, and the car's drives",
+      LG ? String(LG.s_ok + LG.b_ok) : "–", LG ? `of ${LG.n_s + LG.n_b} pass` : "",
+      (LG ? `On the logged drives ${LG.s_ok} of ${LG.n_s} sighted and ${LG.b_ok} of ${LG.n_b} blinded agents do no harm. ` : "")
+      + (held.length ? `Held out, ${held.map(c => `${c.name} (${f(c.grade, 2)} % hill): ${c.s_beat + c.b_beat} of ${c.s_n + c.b_n}`).join("; ")} beat current-grade; ` +
+         `in range, ${CO.filter(c => c.kind === "control").map(c => `${c.name.split(",")[0]}: ${c.s_beat + c.b_beat}`).join(", ")}.` : ""));
+  } else {
+    tile("Held out, and the car's drives", "pending", "",
+      "Still being scored: the transfer test on seven conditions and the check on six logged drives run after the frozen episodes (x1_score.py, steps 5 and 6).");
+  }
+  document.getElementById("x1-abl-take").textContent = X1_SENT[RT.cell](RT);
+  document.getElementById("x1-abl-cap").textContent =
+    `Each bar is one seed: the sighted agent's damage cut minus its blinded twin's, over the twenty frozen episodes, in points. ` +
+    `The sign test counts the bars right of zero (preview helps) and left of the dashed line (smaller than the MEI). ` +
+    `The spread of these ${RT.n} differences is ${f(RT.sd, 2)} points; the twenty agents of 29 September had ${f(X1.sd29, 2)}. ` +
+    `Without the knock term: ${RH.cell}, mean ${f(RH.mean, 2, true)}.`;
+  if (XR.low && XR.low.length) {
+    table("t-x1-low", ["agent", "frozen cut %", "twin's cut %", "training cut %", "twin's", "lambda trim on the climb", "twin's", "spark trim °", "twin's", "boost trim kPa", "twin's"],
+      XR.low.map(r => [r.name.replace("_seed", " "), f(r.cut, 1), f(r.twin_cut, 1), f(r.train, 1), f(r.twin_train, 1),
+                       f(r.lam, 3, true), f(r.twin_lam, 3, true), f(r.spark, 1, true), f(r.twin_spark, 1, true),
+                       f(r.boost, 1, true), f(r.twin_boost, 1, true)]), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    document.getElementById("x1-low-cap").textContent =
+      `The agents that cut less than 40 % on the scored climb, beside their twins. Frozen cut: the twenty episodes. ` +
+      `Training cut: their own last ten training roads, against the parallel baseline car on the same road. ` +
+      `The trims are the medians applied on the climb over the twenty episodes (lambda trim negative is enrichment). ` +
+      `What they do is measured here; why their training did not carry over to the scored climb is not.`;
+  }
+  if (XR.pair_trace) {
+    const PT = XR.pair_trace;
+    document.getElementById("f-x1-pair").hidden = false;
+    document.getElementById("x1-pair-take").textContent =
+      `Seed ${PT.seed}: the sighted agent cuts ${f(PT.sighted_cut, 1)} % over the twenty episodes, its blinded twin ${f(PT.blinded_cut, 1)} %. ` +
+      `On episode 1 their housings end at ${f(PT.sighted.turb[PT.sighted.turb.length - 1], 0)} and ${f(PT.blind.turb[PT.blind.turb.length - 1], 0)} °C.`;
+    const series = [["sighted", "var(--pd-sight)", 0], ["blind", "var(--pd-blind)", 0], ["grade", "var(--pd-grade)", 0], ["baseline", "var(--pd-base)", "5 4"]];
+    mount("c-x1-pair-t", (host, w, h) => {
+      const all = series.flatMap(([k]) => PT[k].turb);
+      const P = plot(host, { w, h, x: { d: [0, PT.t[PT.t.length - 1]], label: "time into the episode (s)" },
+        y: { d: [Math.floor(Math.min(...all) / 50) * 50, Math.ceil(Math.max(...all, 860) / 50) * 50], label: "turbine housing (°C)" } });
+      hline(P, 850, { c: "var(--crit)", w: 1.2, label: "850 °C trigger" });
+      vline(P, 180, { c: "var(--ink-3)", w: 1, label: "climb", dy: 30 });
+      for (const [k, c, dash] of series) line(P, PT.t, PT[k].turb, { c, w: 2, dash: dash || null });
+      crosshair(P, PT.t, series.map(([k, c]) => ({ name: k, c, ys: PT[k].turb, f: v => f(v, 0) + " °C" })), v => `${v} s`);
+    }, w => Math.round(Math.min(320, Math.max(220, w * 0.42))));
+    mount("c-x1-pair-l", (host, w, h) => {
+      const all = series.flatMap(([k]) => PT[k].lam);
+      const P = plot(host, { w, h, x: { d: [0, PT.t[PT.t.length - 1]], label: "time into the episode (s)" },
+        y: { d: [Math.min(-0.16, ...all), Math.max(0.02, ...all)], label: "lambda trim applied" } });
+      hline(P, 0, { c: "var(--ink-3)", w: 1, dash: "0" });
+      vline(P, 180, { c: "var(--ink-3)", w: 1 });
+      for (const [k, c, dash] of series) line(P, PT.t, PT[k].lam, { c, w: 2, dash: dash || null });
+      crosshair(P, PT.t, series.map(([k, c]) => ({ name: k, c, ys: PT[k].lam, f: v => f(v, 3, true) })), v => `${v} s`);
+    }, w => Math.round(Math.min(260, Math.max(180, w * 0.34))));
+  }
+  document.getElementById("x1-sup-take").textContent =
+    `${SU.beat} of ${SU.n} agents beat current-grade on the median; sighted ${XR.sighted_beat}, blinded ${XR.blind_beat}.`;
+
+  mount("c-x1-abl", (host, w) => {
+    const D2 = RT.diffs.slice().sort((a, b) => a.d - b.d);
+    const row = 17, h = D2.length * row + 46;
+    const vals = D2.map(x => x.d).concat([0, XR.mei]);
+    const pad = (Math.max(...vals) - Math.min(...vals)) * 0.08 + 0.5;
+    const P = plot(host, { w, h, x: { d: [Math.min(...vals) - pad, Math.max(...vals) + pad], label: "sighted minus blinded cut (points)" },
+      y: { d: [1, 0], none: true }, m: { l: 58, t: 10, r: 12 } });
+    vline(P, 0, { c: "var(--ink-2)", w: 1.4, dash: "0" });
+    vline(P, XR.mei, { c: "var(--ink-2)", w: 1.2, dash: "5 4" });
+    T(P.top, P.x(XR.mei) + 4, P.m.t + 10, "MEI", { class: "lbl", style: "fill:var(--ink-2)" });
+    D2.forEach((x, i) => {
+      const y0 = P.m.t + i * row + 2;
+      T(P.svg, 50, y0 + 11, "seed " + x.seed, { "text-anchor": "end", style: "fill:var(--ink-2);font-size:11px" });
+      const c = x.d >= 0 ? "var(--pd-sight)" : "var(--pd-blind)";
+      const r = S("rect", { x: P.x(Math.min(0, x.d)), y: y0, width: Math.max(1, Math.abs(P.x(x.d) - P.x(0))), height: row - 5, rx: 2,
+                            style: `fill:${c}` }, P.g);
+      markTip(P, r, P.x(x.d), y0 + 6, `seed ${x.seed}`, [{ c, v: f(x.d, 2, true) + " pts", k: "sighted minus blinded" }]);
+    });
+  }, () => 0);
+
+  mount("c-x1-sup", (host, w) => {
+    const PR = XR.pairs.slice().sort((a, b) => a.seed - b.seed);
+    const row = 17, h = PR.length * row + 46;
+    const vals = PR.flatMap(p => [p.s, p.b]).concat([0]);
+    const pad = (Math.max(...vals) - Math.min(...vals)) * 0.06 + 1;
+    const P = plot(host, { w, h, x: { d: [Math.min(...vals) - pad, Math.max(...vals) + pad], label: "damage cut over current-grade (points)" },
+      y: { d: [1, 0], none: true }, m: { l: 58, t: 10, r: 12 } });
+    vline(P, 0, { c: "var(--pd-grade)", w: 2, dash: "0" });
+    PR.forEach((p, i) => {
+      const yc = P.m.t + i * row + 8;
+      T(P.svg, 50, yc + 4, "seed " + p.seed, { "text-anchor": "end", style: "fill:var(--ink-2);font-size:11px" });
+      S("line", { x1: P.x(p.s), x2: P.x(p.b), y1: yc, y2: yc, style: "stroke:var(--ink-3);stroke-width:1.4" }, P.g);
+      const a = S("circle", { cx: P.x(p.s), cy: yc, r: 4.5, style: "fill:var(--pd-sight);stroke:var(--surface);stroke-width:1.5" }, P.g);
+      const b = S("circle", { cx: P.x(p.b), cy: yc, r: 4.5, style: "fill:var(--pd-blind);stroke:var(--surface);stroke-width:1.5" }, P.g);
+      markTip(P, a, P.x(p.s), yc, `seed ${p.seed}, sighted`, [{ c: "var(--pd-sight)", v: f(p.s, 1, true) + " pts", k: "over current-grade" }]);
+      markTip(P, b, P.x(p.b), yc, `seed ${p.seed}, blinded`, [{ c: "var(--pd-blind)", v: f(p.b, 1, true) + " pts", k: "over current-grade" }]);
+    });
+  }, () => 0);
+
+  if (CO) {
+    document.getElementById("f-x1-transfer").hidden = false;
+    const hl = CO.filter(c => c.kind === "held"), ctl = CO.filter(c => c.kind === "control"),
+          pr = CO.filter(c => c.kind === "pressure");
+    const cnt = c => `${c.s_beat + c.b_beat} of ${c.s_n + c.b_n}`;
+    const span = (xs, k) => { const v = xs.map(k); return Math.min(...v) === Math.max(...v) ? `${Math.min(...v)}` : `${Math.min(...v)}–${Math.max(...v)}`; };
+    document.getElementById("x1-transfer-take").textContent =
+      `Held out of training, ${hl.map(c => `${c.name} on a ${f(c.grade, 2)} % hill: ${cnt(c)}`).join("; ")} agents beat that condition's current-grade ` +
+      `(sighted ${hl.map(c => c.s_beat).join(" and ")}, blinded ${hl.map(c => c.b_beat).join(" and ")} of ${hl[0].s_n}). ` +
+      `In range, the controls: ${ctl.map(c => `${c.name}, ${cnt(c)}`).join("; ")}. Under air pressure X1 never trained in, ${span(pr, c => c.s_beat + c.b_beat)} of ${pr[0].s_n + pr[0].b_n}. ` +
+      `In every condition ${span(CO, c => c.worse)} agents do more damage than its baseline ECU.`;
+    mount("c-x1-transfer", (host, w) => {
+      const row = 34, h = CO.length * row + 56;
+      const vals = CO.flatMap(c => Object.values(c.margins)).concat([0]);
+      const pad = (Math.max(...vals) - Math.min(...vals)) * 0.04 + 1;
+      const P = plot(host, { w, h, x: { d: [Math.min(...vals) - pad, Math.max(...vals) + pad], label: "damage cut over that condition's current-grade (points)" },
+        y: { d: [1, 0], none: true }, m: { l: 64, t: 10, r: 12 } });
+      CO.forEach((c, i) => {
+        const yc = P.m.t + i * row + row / 2;
+        if (c.held) S("rect", { x: P.m.l, y: yc - row / 2 + 1, width: P.pw, height: row - 2, style: "fill:var(--band)" }, P.g);
+        T(P.svg, P.m.l - 8, yc - 1, c.name.split(",")[0], { "text-anchor": "end", style: "fill:var(--ink-2);font-size:11px" });
+        T(P.svg, P.m.l - 8, yc + 11, `${f(c.grade, 1)} %`, { "text-anchor": "end", style: "fill:var(--ink-3);font-size:10px" });
+      });
+      vline(P, 0, { c: "var(--pd-grade)", w: 2, dash: "0" });
+      CO.forEach((c, i) => {
+        const yc = P.m.t + i * row + row / 2;
+        for (const [arm, dy, col, lab] of [["sighted", -6, "var(--pd-sight)", "sighted"], ["blind", 6, "var(--pd-blind)", "blinded"]]) {
+          for (const [tag, v] of Object.entries(c.margins).filter(([t]) => t.startsWith(arm))) {
+            const el = S("circle", { cx: P.x(v), cy: yc + dy, r: 3.6, style: `fill:${col};stroke:var(--surface);stroke-width:1` }, P.g);
+            markTip(P, el, P.x(v), yc + dy, `${lab} seed ${tag.split("seed")[1]}, ${c.name.split(",")[0]}`,
+              [{ c: col, v: f(v, 1, true) + " pts", k: "over current-grade" }]);
+          }
+        }
+      });
+    }, () => 0);
+    const kindTxt = { held: "held out", control: "in range", pressure: "untrained air pressure" };
+    table("t-x1-transfer", ["condition", "hill %", "for X1", "beat cg s / b", "margin s / b", "worse than ECU", "29 Sep beat"],
+      CO.map(c => [c.name.split(",")[0], f(c.grade, 2), c.role_short, `${c.s_beat} / ${c.b_beat}`,
+                   `${f(c.s_med, 1, true)} / ${f(c.b_med, 1, true)}`, `${c.worse}`,
+                   c.old ? `${c.old.beat} of ${c.old.n}` : "–"]), [1, 3, 4, 5, 6]);
+    table("t-x1-transfer2", ["condition", "s − b [95 %]", ">850 s: a / cg / ECU", "short: a / cg"],
+      CO.map(c => [c.name.split(",")[0], `${f(c.abl, 1, true)} [${f(c.abl_lo, 1, true)}, ${f(c.abl_hi, 1, true)}]`,
+                   `${f(c.s_above, 0)} / ${f(c.grade_s_above, 0)} / ${f(c.base_s_above, 0)}`,
+                   `${f(c.short_med, 0)} / ${f(c.short_grade, 0)}`]), [1, 2, 3]);
+    // Where current-grade misses the torque on more than 1 % of the steps (the
+    // logged check's preregistered T criterion), its cut is partly torque refused.
+    const lim = 0.01 * 719;
+    const shortC = CO.filter(c => c.short_grade > lim), fullC = CO.filter(c => c.short_grade <= lim);
+    const bothC = shortC.filter(c => c.short_med >= c.short_grade);
+    const often = {};
+    CO.forEach(c => c.worse_names.forEach(t => { often[t] = (often[t] || 0) + 1; }));
+    const rep = Object.entries(often).filter(([, k]) => k >= 2).sort((a, b) => b[1] - a[1]);
+    const o25 = CO.find(c => c.name.startsWith("25")), o50 = CO.find(c => c.name.startsWith("50"));
+    const nm = c => c.name.split(",")[0];
+    document.getElementById("x1-transfer-cap").textContent =
+      `Current-grade misses the requested torque by more than 5 % on more than 1 % of the 719 steps (the logged check's T criterion) in ${shortC.length} of the ${CO.length} conditions: ` +
+      `${shortC.map(c => `${nm(c)} ${f(c.short_grade, 0)}`).join(", ")} steps, the median agent ${shortC.map(c => f(c.short_med, 0)).join(", ")}. ` +
+      `There its cut is partly torque refused rather than protection, and where the agents deliver more of their torque the margins over it understate them` +
+      (bothC.length ? `; at ${bothC.map(nm).join(" and ")} the agents are short at least as often` : "") + `. ` +
+      (fullC.length ? `Only at ${fullC.map(c => `${nm(c)} (${c.kind === "held" ? "held out" : kindTxt[c.kind]})`).join(" and ")} does the comparator deliver its torque: ` +
+        `${fullC.map(c => `${c.s_beat + c.b_beat} of ${c.s_n + c.b_n}`).join(" and ")} agents beat it. ` : "") +
+      (rep.length ? `The agents worse than the baseline ECU are mostly the same few: ${rep.map(([t, k]) => `${t.replace("_seed", " seed ")} in ${k}`).join(", ")} of the ${CO.length} conditions. ` : "") +
+      (o25 && o25.old && o50 && o50.old ? `The 29 September column is the twenty agents of 29 September on the same hills, run on 7 October on the plant before the agreed fixes and with spark advance allowed to +4°: ` +
+        `${o25.old.beat} of ${o25.old.n} at 25 °C, ${o50.old.beat} of ${o50.old.n} at 50 °C. Not the same plant, the same comparator or the same levers; a reading beside X1, never part of its test.` : "");
+  }
+  if (LG) {
+    document.getElementById("f-x1-logged").hidden = false;
+    const fails = LG.agents.filter(a => !a.ok);
+    const W = LG.per_w, B = LG.bands;
+    document.getElementById("x1-logged-take").textContent =
+      `${LG.s_ok} of ${LG.n_s} sighted and ${LG.b_ok} of ${LG.n_b} blinded agents pass on every drive at both weightings. ` +
+      `Torque is rarely the problem (${W.most.t_fail + W.least.t_fail} of ${W.most.n + W.least.n} runs); fuel is: weighting life most, ` +
+      `${W.most.f_fail} of ${W.most.n} runs burn more than 1 % over the baseline ECU (median ${f(W.most.med, 1, true)} %, worst ${f(W.most.max, 1, true)} %), ` +
+      `weighting it least ${W.least.f_fail} of ${W.least.n} (median ${f(W.least.med, 1, true)} %)` +
+      (B ? `. ${f(B[0].share_of_extra_pct, 0)} % of that extra fuel is burned while the baseline car's housing is below ${B[0].hi} °C, ` +
+           `${f(B[0].share_of_extra_pct + B[1].share_of_extra_pct, 0)} % below ${B[1].hi} °C: protection where nothing needed it.` : ".");
+    table("t-x1-logged", ["agent", "passes", "worst fuel vs ECU %", "worst short-only %", "peak °C (ECU)"],
+      LG.agents.map(a => [a.name.replace("_seed", " "), a.ok ? "yes" : "no", f(a.fuel, 2, true), f(a.short, 2), `${f(a.peak, 0)} (${f(a.peak_base, 0)})`]),
+      [2, 3, 4]);
+  }
+  if (XR.probe) {
+    document.getElementById("f-x1-probe").hidden = false;
+    const seedOf = n => [n.startsWith("blind") ? 1 : 0, +n.split("seed")[1]];
+    const PB = XR.probe.slice().sort((a, b) => { const x = seedOf(a.name), y = seedOf(b.name); return x[0] - y[0] || x[1] - y[1]; }), med = arr => { const v = arr.slice().sort((a, b) => a - b); const n = v.length; return n ? (n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2) : NaN; };
+    const sv = PB.filter(p => p.name.startsWith("sighted")).map(p => p.share), bv = PB.filter(p => p.name.startsWith("blind")).map(p => p.share);
+    document.getElementById("x1-probe-take").textContent =
+      `Median share of probed climb states that violate: sighted ${f(med(sv), 1)} %, blinded ${f(med(bv), 1)} %; ${PB.filter(p => p.share === 0).length} of ${PB.length} agents never do.`;
+    table("t-x1-probe", ["agent", "states", "violate %", "median Δλ", "median Δboost kPa"],
+      PB.map(p => [p.name.replace("_seed", " "), String(p.states), f(p.share, 1), f(p.dlam, 4, true), f(p.dboost, 2, true)]), [1, 2, 3, 4]);
+  }
+  if (XR.sens) {
+    document.getElementById("f-x1-sens").hidden = false;
+    const SN = XR.sens;
+    document.getElementById("x1-sens-take").textContent =
+      `Under every row, ${Math.min(...SN.map(r => r.beat)) === Math.max(...SN.map(r => r.beat)) ? Math.min(...SN.map(r => r.beat)) : Math.min(...SN.map(r => r.beat)) + "–" + Math.max(...SN.map(r => r.beat))} of ${SN[0].n} agents beat current-grade; the ablation's 95 % interval ${SN.every(r => r.lo <= 0 && r.hi >= 0) ? "spans zero in every row" : "excludes zero in " + SN.filter(r => r.lo > 0 || r.hi < 0).length + " of " + SN.length + " rows"}.`;
+    table("t-x1-sens", ["formula", "beat grade", "grade cuts %", "sighted − blinded", "95 % interval"],
+      SN.map(r => [r.name, `${r.beat} of ${r.n}`, f(r.grade_cut, 1), f(r.mean, 2, true), `${f(r.lo, 2, true)} to ${f(r.hi, 2, true)}`]), [1, 2, 3, 4]);
+  }
+}
+
+mount("c-x1-roads", (host, w, h) => {
+  const P = plot(host, { w, h, x: { d: [22, 54], label: "ambient air (°C)" },
+    y: { d: [0, 24], label: "steepest grade on the road (%)" }, m: { l: 52, b: 44 } });
+  // held out: hotter air, steeper hills
+  S("rect", { x: P.x(45), y: P.m.t, width: P.x(54) - P.x(45), height: P.ph, style: "fill:var(--band)" }, P.g);
+  S("rect", { x: P.m.l, y: P.y(24), width: P.pw, height: P.y(18) - P.y(24), style: "fill:var(--band)" }, P.g);
+  T(P.top, P.x(53.6), P.m.t + 14, "held out", { class: "lbl", "text-anchor": "end", style: "fill:var(--ink-3)" });
+  // where the twenty of 29 September trained: one ambient, hills to 14 %
+  S("line", { x1: P.x(42), x2: P.x(42), y1: P.y(0), y2: P.y(14),
+              style: "stroke:var(--ink-2);stroke-width:3;stroke-linecap:round;opacity:.45" }, P.g);
+  if (!narrow(w) && !X1.train_eps)
+    T(P.top, P.x(42) + 6, P.y(14) - 4, "29 Sep: all training", { class: "lbl", style: "fill:var(--ink-2)" });
+  const many = !!X1.train_eps;
+  const pts = (X1.train_eps || X1.roads).map(r => ({ x: r.t, y: r.g, r }));
+  for (const p of pts)
+    S("circle", { cx: P.x(p.x), cy: P.y(p.y), r: many ? 2.6 : 4.5,
+                  style: `fill:${p.r.binds ? "var(--warn)" : "var(--ink-3)"};` +
+                         (many ? "opacity:.75" : "stroke:var(--surface);stroke-width:1.5") }, P.g);
+  const amb = { "42 °C, 101.3 kPa": 42, "25 °C": 25, "35 °C": 35, "50 °C": 50 };
+  const tests = X1.hills.filter(hh => amb[hh.name] != null).map(hh => ({ x: amb[hh.name], y: hh.grade, hh }));
+  for (const t of tests) {
+    S("circle", { cx: P.x(t.x), cy: P.y(t.y), r: 6, style: "fill:var(--pd-sight);stroke:var(--surface);stroke-width:2" }, P.g);
+    if (t.hh.held) S("circle", { cx: P.x(t.x), cy: P.y(t.y), r: 10, style: "fill:none;stroke:var(--pd-sight);stroke-width:1.5" }, P.g);
+  }
+  nearest(P, pts.concat(tests), p => p.r ? {
+      title: many ? `seed ${p.r.seed}, training episode ${p.r.ep + 1}, ${f(p.r.t, 1)} °C` : `${p.r.fam} road, ${f(p.r.t, 1)} °C`,
+      rows: [{ v: `${f(p.r.gmin, 1)} to ${f(p.r.g, 1)} %`, k: "grade" }, { v: `${f(p.r.v0, 0)}–${f(p.r.v1, 0)} km/h`, k: "speed target" },
+             many ? { v: p.r.binds ? "yes" : "no", k: "baseline past 850 °C" } : { v: `${f(p.r.peak, 0)} °C`, k: "baseline peak" },
+             { v: `×${f(p.r.ct, 2)}`, k: "housing capacity" },
+             many ? { v: f(p.r.wl, 3), k: "weight on component life" } : { v: f(p.r.r, 4, true), k: "baseline reward per step" }] }
+    : { title: `test hill: ${p.hh.name}`, rows: [{ v: `${f(p.hh.grade, 2)} %`, k: "hill" }, { v: p.hh.role, k: "" }] });
+}, w => Math.round(Math.min(420, Math.max(280, w * 0.6))));
 
 // ============================================ 28 September: the derivation
 const CAL = D.cal, GEN = D.gen;

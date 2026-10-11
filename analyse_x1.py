@@ -77,17 +77,27 @@ def _summary(set_name, folder):
         return json.load(fh)
 
 
-def report(set_name):
+def report(set_name, name="X1", own_set="extremes_dt1", n_fixed=PREREGISTERED_SEEDS,
+           prereg="PREREGISTRATION_X1.md", seeds=None):
+    """The printed reading, and the same numbers as a dict for the results page.
+
+    The keywords let a later experiment read its agents by this same rule
+    (analyse_x2.py, 11 October): its name, its own set, its preregistered pair
+    count and file, and optionally a subset of seeds for a dry run. With the
+    defaults the output is X1's, byte for byte."""
     with open(os.path.join(HERE, "results", "agents", set_name, "index.json"), encoding="utf-8") as fh:
         idx = json.load(fh)
     pairs = idx["ablation"]["pairs"]
+    if seeds is not None:
+        pairs = [r for r in pairs if r["seed"] in set(seeds)]
+    res = dict(set=set_name, mei=MEI_PTS, alpha=ALPHA, n_pairs=len(pairs), readings={})
     out = []
     p = out.append
-    p(f"X1 ANALYSIS -- {set_name}" + ("" if set_name == "extremes_dt1"
-                                       else "   (DRY RUN of the rule, NOT X1's result)"))
-    p(f"rule: results/PREREGISTRATION_X1.md section 5; MEI {MEI_PTS} points of cut; alpha {ALPHA}, one-sided")
-    if set_name == "extremes_dt1" and len(pairs) != PREREGISTERED_SEEDS:
-        p(f"!! {len(pairs)} pairs, the preregistration fixed {PREREGISTERED_SEEDS}: say so beside every figure")
+    p(f"{name} ANALYSIS -- {set_name}" + ("" if set_name == own_set
+                                           else f"   (DRY RUN of the rule, NOT {name}'s result)"))
+    p(f"rule: results/{prereg} section 5; MEI {MEI_PTS} points of cut; alpha {ALPHA}, one-sided")
+    if set_name == own_set and len(pairs) != n_fixed:
+        p(f"!! {len(pairs)} pairs, the preregistration fixed {n_fixed}: say so beside every figure")
     p("")
     for label, a, b in (("TOTAL DAMAGE (primary)", "sighted", "blinded"),
                         ("THERMAL-ONLY DAMAGE (no knock term; the second reading)",
@@ -108,6 +118,9 @@ def report(set_name):
             p("  THE SIGN AND PERMUTATION TESTS DISAGREE. Both are reported; the sign test is primary.")
         p(f"  CELL: {cell}")
         p("")
+        res["readings"]["total" if a == "sighted" else "thermal"] = dict(
+            cell=cell, sd=sd, diffs=[round(v, 4) for v in d], seeds=[r["seed"] for r in pairs],
+            **{k: (round(v, 6) if isinstance(v, float) else v) for k, v in x.items()})
 
     pol = idx["policies"]
     grade = pol["current-grade"]["cut_pct"]
@@ -115,6 +128,8 @@ def report(set_name):
     beat = [k for k, v in agents.items() if v["cut_pct"] > grade]
     p("SUPERVISION, A DIFFERENT CLAIM (never evidence for preview)")
     p(f"  current-grade cuts {grade:.2f} %; {len(beat)} of {len(agents)} agents beat it on the median")
+    res["supervision"] = dict(grade_cut=grade, beat=len(beat), n=len(agents),
+                              margins={k: round(v["cut_pct"] - grade, 3) for k, v in agents.items()})
     for arm in ("sighted", "blind"):
         m = sorted(v["cut_pct"] - grade for k, v in agents.items() if k.startswith(arm))
         if m:
@@ -130,24 +145,39 @@ def report(set_name):
             worse.append(f"{k} ({n_bad})")
     p(f"  agents doing MORE damage than the baseline ECU on at least one frozen episode: "
       f"{len(worse)} of {len(agents)}" + (f": {', '.join(worse)}" if worse else ""))
+    res["worse_than_baseline"] = worse
 
-    cg = _summary(set_name, "current-grade")
-    short = cg.get("yardstick", {}).get("short_steps")
-    p("YARDSTICK (decision 13): current-grade's steps under 95 % of the requested torque: "
-      + (f"{short}" if short is not None else "not in its summary -- see PREREGISTRATION_X1.md 4a"))
-    return "\n".join(out)
+    # From current-grade's own per-step record of the twenty frozen episodes
+    # (record_agents.py): it ignores the weights, so all twenty are one rollout.
+    rec_path = os.path.join(HERE, "results", "agents", set_name, "current-grade", "eval_record.npz")
+    if os.path.isfile(rec_path):
+        import numpy as np
+        r = np.load(rec_path)
+        req, got = r["torque_req"][0], r["torque"][0]
+        dem = np.isfinite(req) & (req > 40.0)
+        short = int((got[dem] < 0.95 * req[dem]).sum())
+        p(f"YARDSTICK (decision 13): current-grade under 95 % of the requested torque on {short} of "
+          f"{int(dem.sum())} demand steps of the scored climb ({prereg} 3b: 1 of 719 before training)")
+        res["yardstick"] = dict(short=short, demand=int(dem.sum()))
+    else:
+        p("YARDSTICK (decision 13): no per-step record of current-grade here; measured before training, "
+          f"1 of 719 demand steps ({prereg} 3b)")
+    return "\n".join(out), res
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--set", default="extremes_dt1")
     a = ap.parse_args()
-    text = report(a.set)
+    text, res = report(a.set)
     print(text)
     if a.set == "extremes_dt1":
         with open(os.path.join(HERE, "results", "X1_RESULT.txt"), "w", encoding="utf-8") as fh:
             fh.write(text + "\n")
-        print("\nwrote results/X1_RESULT.txt")
+        with open(os.path.join(HERE, "results", "X1_RESULT.json"), "w", encoding="utf-8") as fh:
+            json.dump(res, fh, indent=1)
+            fh.write("\n")
+        print("\nwrote results/X1_RESULT.txt and results/X1_RESULT.json")
 
 
 if __name__ == "__main__":

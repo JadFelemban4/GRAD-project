@@ -2,6 +2,8 @@
 
     python damage_robustness.py      prints the table, writes results/damage_robustness.json
                                      and results/figures/damage_robustness.png
+    python damage_robustness.py --set extremes_dt1   another set (X1, 8 October): its own
+                                     results/damage_robustness_<set>.json and figure
 
 Every constant of the damage model is a DESIGN choice, not a property of the
 car (REFERENCES.md, the DESIGN row): the 1123 K knee, the 45 K scale, the oil
@@ -31,6 +33,19 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 SET = os.path.join(HERE, "results", "agents", "terrain_dt1")
+SUFFIX = ""                 # "" for the twenty of 29 September, "_<set>" for any other (use_set)
+
+
+def use_set(name):
+    """Point the re-score at another set's records; its outputs get their own names."""
+    global SET, SUFFIX
+    SET = os.path.join(HERE, "results", "agents", name)
+    SUFFIX = "" if name == "terrain_dt1" else f"_{name}"
+
+
+def _set_from_argv():
+    if "--set" in sys.argv:
+        use_set(sys.argv[sys.argv.index("--set") + 1])
 HAND = ("baseline_ECU", "current-grade", "reactive", "predictive_hand")
 PUBLISHED = dict(knee=1123.0, scale=45.0, w_oil=0.4, oil_knee=408.0, oil_scale=12.0,
                  w_knock=40.0, knock_knee=0.85)
@@ -99,6 +114,7 @@ def score(names, recs, c):
 
 
 def main():
+    _set_from_argv()
     names, recs, worst = load_records()
     out = {label: score(names, recs, dict(PUBLISHED, **change)) for label, change in RULERS}
 
@@ -115,7 +131,7 @@ def main():
     print("\ncuts are % against the baseline ECU under the same ruler; ablation = sighted minus "
           "blinded cut, paired by seed; + = seeds where sighted is better")
 
-    path = os.path.join(HERE, "results", "damage_robustness.json")
+    path = os.path.join(HERE, "results", f"damage_robustness{SUFFIX}.json")
     with open(path, "w", encoding="utf-8") as fh:
         json.dump({"published": PUBLISHED, "rulers": dict(RULERS), "summary": out}, fh, indent=1)
         fh.write("\n")
@@ -139,13 +155,13 @@ def figure(out):
         a2.plot(s["blind_median"], yy, "o", color="#e87ba4", ms=6, label="blinded, median" if yy == y[0] else None)
     a1.axvline(0, color="#d03b3b", lw=1, ls="--")
     a1.set_yticks(y, labels, fontsize=8.5)
-    a1.set_xlabel("sighted minus blinded, points (mean, 95 % interval, 10 pairs)")
+    a1.set_xlabel(f"sighted minus blinded, points (mean, 95 % interval, {out[labels[0]]['n'] // 2} pairs)")
     a1.set_title("The ablation under each ruler", fontsize=10)
     a2.set_xlabel("damage cut against the baseline ECU, %")
     a2.set_title("The supervision claim under each ruler", fontsize=10)
     a2.legend(fontsize=8, loc="lower right")
     fig.tight_layout()
-    path = os.path.join(HERE, "results", "figures", "damage_robustness.png")
+    path = os.path.join(HERE, "results", "figures", f"damage_robustness{SUFFIX}.png")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     fig.savefig(path, dpi=130)
     print(f"wrote {os.path.relpath(path, HERE)}")

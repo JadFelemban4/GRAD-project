@@ -1,6 +1,7 @@
 """full_run.py — run every script that prints a published figure, and capture it.
 
-    python full_run.py                  everything (about 30 minutes)
+    python full_run.py                  everything (about 90 minutes since 9 October;
+                                        check_random_road.py and drift_test.py are most of it)
     python full_run.py --quick          skip the slow ones (app --full, premise)
     python full_run.py --out FILE       where to write the transcript
 
@@ -24,18 +25,30 @@ the same trap written down. Every block below opens with its exit code.
 
 WHAT IS DELIBERATELY NOT RUN, and why each one:
 
-    evaluate.py         there is no agent on this plant to score. The two in
-                        `runs_sixspeed_18sep/` were trained on a gearbox this
-                        branch replaced, and `evaluate.py` now refuses them --
-                        which is itself worth demonstrating, so the refusal is
-                        run and captured instead of the evaluation.
-    generality_test.py  AUDIT2.md H2-5: it still scores preview against the
-                        comparator AUDIT.md C3 retired, on a different episode
-                        length, step and cost function from every other script.
-                        Its numbers are not quotable, and generating unquotable
-                        numbers during a pass whose whole purpose is to make the
-                        documents quotable is how they end up in a document.
-    train.py            hours, and Phase D is not this task.
+    evaluate.py         the agents on this plant are X1's 46 (since 8 October),
+                        and scoring them is about two hours (`x1_score.py`:
+                        run_results.py phase_d, then record_agents.py), logged
+                        in results/x1_score/SCORE_LOG.txt. What IS run is the
+                        refusal: agents from an older plant, or without a
+                        certificate, must be refused -- see REFUSAL below.
+    generality_test.py  slow, and re-run on 8 October on the sub-stepped plant
+                        (results/generality.json). Since then its figures are
+                        quotable as a hand-written result; AUDIT.md C3 still
+                        says hand-written policies cannot settle the criterion.
+                        (Until 28 September it scored preview only against the
+                        comparator C3 retired, AUDIT2.md H2-5.)
+    timestep_study.py   slow; re-run on 8 October (results/timestep_study.json).
+    analyse_c4.py       reads the C4 agents' ZIPs, which live only on the
+                        machine C4 trained on (runs_c4/); its result is
+                        captured in results/C4_RESULT.txt.
+    train.py            hours, and no experiment is this task.
+
+9 October 2026: the X1-era scripts were added (premise_split.py, check_roads.py
+--road extremes, app.test_simulation, model_vs_data.py, analyse_phase_d.py,
+analyse_x1.py), and the refusal now uses whichever older agents this machine
+has, so it is refused for the reason it names, not for a missing folder. After
+that day's pass, test_plant_guards.py and app.test_agents were added too: the
+ramp had broken six tests of the second, which no list here ran.
 """
 import argparse
 import datetime
@@ -66,13 +79,34 @@ STEPS = [
     ("test_reward.py — the reward gate",
      ["test_reward.py"], False,
      "neutral near zero, the starver punished"),
+    ("test_plant_guards.py — the sub-stepping and the derived fingerprint",
+     ["test_plant_guards.py"], False,
+     "6 tests OK: a step equals its sub-steps, the coolant settles at 2 s, one changed "
+     "constant moves derived_sha and a timestamp does not"),
     ("check_premise.py — the premise table, five policies",
      ["check_premise.py"], True,
      "THE BASELINE ROW AND WHETHER THE CONSTRAINT BINDS. This is the block "
      "CLAUDE.md, README.md and handoff.md currently contradict"),
+    # RETIRED-OK: 920.1, 917.6 -- the merged plant's premise: the split's first rows, by design
+    ("premise_split.py — the plant changes of 8 October, one at a time",
+     ["premise_split.py"], True,
+     "the baseline 920.1 -> 917.6 (sub-stepping) -> 848.1 (with the ramp); preview over "
+     "current-grade -0.32 -> -0.01"),
+    ("check_roads.py --road extremes — X1's training roads",
+     ["check_roads.py", "--road", "extremes"], True,
+     "PASS over 40 roads; how many bind; the worst neutral reward and p95 tracking error"),
     ("app.test_replay --full — the live supervisor, both drives",
      ["-m", "app.test_replay", "--full"], True,
      "N of N, and the two pinned peaks"),
+    ("app.test_simulation — the replay lab",
+     ["-m", "app.test_simulation"], False,
+     "the test count and OK"),
+    ("app.test_agents — the agent replay pages, which read the plant's roads",
+     ["-m", "app.test_agents"], True,
+     "135 tests OK; 14 skipped on a machine without runs_c4/"),
+    ("model_vs_data.py — the simulator against the car",
+     ["model_vs_data.py"], True,
+     "each comparison beside the figure the documents quote; writes results/model_vs_data.json"),
     ("verify_docs.py — the guard",
      ["verify_docs.py"], False,
      "the check total, and the known-stale ledger, which is the size of fix 3"),
@@ -92,13 +126,24 @@ STEPS = [
      ["analyse_phase_d2.py"], False,
      "the D2 cell (PREVIEW HELPS / SMALLER THAN THE MEI / INCONCLUSIVE) "
      "beside Phase D's"),
+    ("analyse_phase_d.py — Phase D's preregistered test",
+     ["analyse_phase_d.py"], False,
+     "5 of 8, sign p 0.3633, permutation p 0.4922: NOT SIGNIFICANT"),
+    ("analyse_x1.py — X1's preregistered test",
+     ["analyse_x1.py"], False,
+     "the cell, total and thermal-only; 17 of 23 below 5.43 points, sign p 0.0173"),
 ]
 
 # Run last and separately: it is a DEMONSTRATION of a refusal, not a measurement.
-REFUSAL = ("evaluate.py against the six-speed agents — expected to REFUSE",
-           ["evaluate.py", "runs_sixspeed_18sep/sighted_seed0",
-            "runs_sixspeed_18sep/blind_seed0"],
-           "exit 1 and a named plant mismatch is the CORRECT outcome here")
+# Older agents this machine may hold, newest first: each must be REFUSED by
+# evaluate.py on today's plant (no certificate, or a certificate for another
+# plant). The first pair whose folders exist is the one run.
+REFUSAL_CANDIDATES = [
+    ("the twenty of 29 September", "runs/terrain_dt1/sighted_seed0", "runs/terrain_dt1/blind_seed0",
+     "exit 1: they carry only a reconstructed certificate, which evaluate.py never reads"),
+    ("the six-speed agents", "runs_sixspeed_18sep/sighted_seed0", "runs_sixspeed_18sep/blind_seed0",
+     "exit 1 and a named plant mismatch"),
+]
 
 
 def run(argv, timeout):
@@ -168,18 +213,26 @@ def main():
             w(se.rstrip("\n"))
         summary.append((label.split(" — ")[0], rc, secs))
 
-    label, argv, take = REFUSAL
+    found = [c for c in REFUSAL_CANDIDATES
+             if os.path.isdir(os.path.join(HERE, c[1])) and os.path.isdir(os.path.join(HERE, c[2]))]
     w("")
     w("=" * 78)
-    w(f"[extra]  {label}")
-    w(f"         $ python {' '.join(argv)}")
-    w(f"         read for: {take}")
-    w("=" * 78)
-    rc, so, se, secs = run(argv, 300.0)
-    w(f"EXIT CODE {rc}   ({secs:.0f} s)   -- non-zero is the PASS here")
-    w("")
-    w((so + se).rstrip("\n"))
-    summary.append(("evaluate.py refusal (non-zero expected)", rc, secs))
+    if found:
+        who, sighted, blind, take = found[0]
+        argv = ["evaluate.py", sighted, blind]
+        w(f"[extra]  evaluate.py against {who} — expected to REFUSE")
+        w(f"         $ python {' '.join(argv)}")
+        w(f"         read for: {take}, the CORRECT outcome here")
+        w("=" * 78)
+        rc, so, se, secs = run(argv, 300.0)
+        w(f"EXIT CODE {rc}   ({secs:.0f} s)   -- non-zero is the PASS here")
+        w("")
+        w((so + se).rstrip("\n"))
+        summary.append(("evaluate.py refusal (non-zero expected)", rc, secs))
+    else:
+        w("[extra]  evaluate.py refusal — SKIPPED: no older agents on this machine "
+          f"({', '.join(c[1] for c in REFUSAL_CANDIDATES)})")
+        w("=" * 78)
 
     w("")
     w("=" * 78)

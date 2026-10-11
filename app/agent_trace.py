@@ -100,13 +100,22 @@ def route(cycle):
     x = np.concatenate([[0.0], np.cumsum(ds * np.cos(theta))])
     z = np.concatenate([[0.0], np.cumsum(ds * np.sin(theta))])
     on_climb = np.flatnonzero(g > 0)
+    # Since 8 October every grade change ramps over engine_env.GRADE_RAMP_S, so
+    # the first step above zero is the ramp's first step (1.5 % on the locked
+    # climb, at 181 s). The climb starts on the last level step before it, as
+    # it did before the ramp; a road that steps straight to its grade starts at
+    # that step.
+    start = None
+    if on_climb.size:
+        i0 = int(on_climb[0])
+        start = i0 - 1 if (i0 > 0 and g[i0] < g.max() - 1e-12) else i0
     return jsonable({
         "s_m": s, "x_m": x, "z_m": z,
         "grade_pct": g * 100.0,
         "speed_kmh": v * 3.6,
         "length_m": float(s[-1]),
         "rise_m": float(z[-1]),
-        "climb_start_s": float(cycle["t"][on_climb[0]]) if on_climb.size else None,
+        "climb_start_s": float(cycle["t"][start]) if start is not None else None,
         "p_baro_kpa": float(cycle.get("p_baro", 101.3)),
         "t_amb_c": float(cycle["t_amb"]) - 273.15,
     })
@@ -115,12 +124,13 @@ def route(cycle):
 def episode_row(ep, road):
     """The picker's row for one frozen episode, read from the road the env steps.
 
-    `road` is route(build_cycle(ep)). climb_start_s is route()'s: the first
-    step whose grade is above zero, 141.0 for D2 episode 1 although the table
-    says 141.05, because random_road.climb starts the grade at int(start_s /
-    dt). grade is the table's own value for a randomised climb, and for Phase
-    D's fixed road the grade at that step (0.12). Both are None on a road with
-    no climb. Pure; JSON-safe.
+    `road` is route(build_cycle(ep)). climb_start_s is route()'s: the last
+    level step before the grade leaves zero, 141.0 for D2 episode 1 although
+    the table says 141.05. grade is the table's own value for a randomised
+    climb, and for Phase D's fixed road the climb's full grade (0.12): since
+    8 October the road ramps up to it over engine_env.GRADE_RAMP_S, so the
+    grade AT the start step is 0 and the step after it 1.5 %. Both are None on
+    a road with no climb. Pure; JSON-safe.
     """
     start = road["climb_start_s"]
     if start is None:
@@ -128,7 +138,7 @@ def episode_row(ep, road):
     elif ep["road"] is not None:
         grade = float(ep["road"][1])
     else:
-        grade = road["grade_pct"][int(round(start / DT))] / 100.0
+        grade = max(road["grade_pct"]) / 100.0
     return {"idx": ep["idx"], "seed": ep["seed"], "weights": list(ep["weights"]),
             "climb_start_s": start, "grade": grade}
 
