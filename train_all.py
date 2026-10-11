@@ -1,8 +1,11 @@
 """train_all.py -- every seed of Phase D's pair, on one machine.
 
-    python train_all.py --road extremes --seeds 0-19 --no-resume   # the 8 Oct design: 40 runs
+    python train_all.py --road wideair --seeds 0-4 --steps 1080000 --jobs 10 --keep-buffer --out runs/wideair_dt1
+                                                       # X2 (11 Oct): 5 seeds a side, 1200 episodes each
+    python train_all.py --road extremes --seeds 0-22 --no-resume --out runs/x2   # X1's design, a new experiment
+    python train_all.py --road extremes                # X1 itself (CLOSED since 9 Oct: runs/extremes_dt1)
     python train_all.py --road terrain                 # the 29 Sep design (CLOSED: runs/terrain_dt1)
-    python train_all.py --road extremes --jobs 10      # at most ten at once
+    python train_all.py --road extremes --jobs 10 --out runs/x2   # at most ten at once
 
 THE ROAD IS REQUIRED (8 October 2026). Until then this launcher passed no
 --road and no --dt and leaned on train.py's defaults, which is the trap AUDIT2.md
@@ -19,7 +22,10 @@ not the agent an unbroken run would have trained. With --no-resume (C4's crash
 rule, and the 8 October preregistration's), a run that died is moved aside to
 OUT/<tag>.crashed<N> -- kept, never deleted -- and trained again from step 0;
 on the CPU with one thread a fresh run from the same seed is the same agent
-(C4 retraced its D2 twins bit for bit).
+(C4 retraced its D2 twins bit for bit). With --keep-buffer (X2's rule, for runs
+too long to restart from 0) a crashed run resumes from its last checkpoint WITH
+the replay buffer saved beside it: close to an unbroken run, not equal to it
+(train.py's docstring says what still differs).
 
 WHY ONE PROCESS PER RUN, ON THE CPU (29 September 2026, measured): a step is
 84 % plant, which is numpy on one core, so the runs parallelise across cores
@@ -73,7 +79,7 @@ def move_crashed(outdir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--road", required=True, choices=("terrain", "extremes"))
+    ap.add_argument("--road", required=True, choices=("terrain", "extremes", "wideair"))
     ap.add_argument("--dt", type=float, default=1.0)
     ap.add_argument("--seeds", nargs="+", default=["0-9"], help="'0-19' or '0 1 2'")
     ap.add_argument("--steps", type=int, default=50_000)
@@ -81,7 +87,12 @@ def main():
     ap.add_argument("--out", default=None, help="default runs/<road>_dt1")
     ap.add_argument("--no-resume", action="store_true",
                     help="a crash is re-run from step 0, never resumed (see the docstring)")
+    ap.add_argument("--keep-buffer", action="store_true",
+                    help="each run saves its replay buffer with every checkpoint and a "
+                         "crashed run resumes with it (see the docstring)")
     a = ap.parse_args()
+    if a.keep_buffer and a.no_resume:
+        raise SystemExit("--keep-buffer exists for resuming; --no-resume forbids it. Pick one.")
     a.seeds = seeds(a.seeds)
     if a.out is None:
         a.out = os.path.join("runs", f"{a.road}_dt{a.dt:g}".replace(".", "p"))
@@ -107,6 +118,8 @@ def main():
                 cmd.append("--no-preview")
             if a.no_resume:
                 cmd.append("--no-resume")
+            if a.keep_buffer:
+                cmd.append("--keep-buffer")
             log = open(os.path.join(HERE, a.out, f"log_{tag}.txt"), "a")
             live[tag] = (subprocess.Popen(cmd, cwd=HERE, env=env, stdout=log, stderr=subprocess.STDOUT), log)
             print(f"  started {tag}")

@@ -88,6 +88,16 @@ per step): slowing down faster than the road itself slows the car asks the
 engine for negative torque, which this model does not make. Slowdowns are now
 coasts (extreme_speed_profile).
 
+THE WIDEAIR ROADS ARE CHECKED TOO (11 October 2026). X2 trains on
+wide_air.WideAirTrainingEnv: the extremes roads at an ambient of 0-45 C and a
+pressure of 80-101.3 kPa, the compressor inlet following the pressure. Two
+checks, on the two corners where the air is hardest on the baseline: neutral
+about zero on every family in cold thin air (0 C, 80 kPa) and hot thin air
+(45 C, 80 kPa); and a punished starver on a rolling road in hot thin air. The
+first draft of these roads failed check_roads.py in cold air (the torque floor
+was X1's 15 Nm, under what the engine makes with the throttle shut at 0 C);
+see wide_air.py.
+
 THE BAND ROAD IS RAMPED (8 October). Its 9.3 % arrived as a one-step jump at
 30 s until then; every grade change in the project is ramped over GRADE_RAMP_S
 now, the fourth step agreed on 30 September.
@@ -113,6 +123,8 @@ BAND_GRADE = 0.093
 # The extremes roads (decision 12): every family at two seeds, full length.
 XFAMS = ("locked", "single", "rolling", "double", "flat")
 XSEEDS = (11, 12)
+# The wideair roads (X2): every family at the two thin-air corners, full length.
+WCORNERS = ((0.0, 80.0), (45.0, 80.0))          # (ambient C, pressure kPa)
 
 
 def true_neutral():
@@ -298,6 +310,11 @@ def road_roll(job):
     elif kind.startswith("x-"):
         env = ExtremesTrainingEnv(duration=duration, dt=1.0, seed=seed)
         env.reset(seed=seed, options={"family": kind[2:]})
+    elif kind.startswith("w-"):
+        from wide_air import WideAirTrainingEnv
+        fam, t_c, p_k = kind[2:].split("@")
+        env = WideAirTrainingEnv(duration=duration, dt=1.0, seed=seed)
+        env.reset(seed=seed, options={"family": fam, "t_amb_c": float(t_c), "p_kpa": float(p_k)})
     else:
         env = TerrainTrainingEnv(duration=duration, dt=1.0, seed=seed)
         env.reset(seed=seed, options={"family": kind})
@@ -329,8 +346,10 @@ def main():
         (fam, 11, "neutral", 600.0) for fam in ("single", "rolling", "double", "flat")] + [
         ("rolling", 11, "starver", 600.0)] + [
         ("x-" + fam, sd, "neutral", 900.0) for fam in XFAMS for sd in XSEEDS] + [
-        ("x-rolling", XSEEDS[0], "starver", 900.0)]
-    pool = ProcessPoolExecutor(max_workers=len(roads))
+        ("x-rolling", XSEEDS[0], "starver", 900.0)] + [
+        (f"w-{fam}@{t:g}@{p:g}", XSEEDS[0], "neutral", 900.0) for fam in XFAMS for t, p in WCORNERS] + [
+        (f"w-rolling@{WCORNERS[1][0]:g}@{WCORNERS[1][1]:g}", XSEEDS[0], "starver", 900.0)]
+    pool = ProcessPoolExecutor(max_workers=min(len(roads), 20))
     road_futs = [pool.submit(road_roll, j) for j in roads]
 
     neutral = true_neutral()
@@ -373,6 +392,10 @@ def main():
     worst_x = max(xs, key=lambda k: abs(road[("x-" + k[0], "neutral", k[1])][0]))
     r_xr_n = road[("x-rolling", "neutral", XSEEDS[0])][0]
     r_xr_s = road[("x-rolling", "starver", XSEEDS[0])][0]
+    ws = [f"w-{fam}@{t:g}@{p:g}" for fam in XFAMS for t, p in WCORNERS]
+    worst_w = max(ws, key=lambda k: abs(road[(k, "neutral")][0]))
+    w_hot = f"w-rolling@{WCORNERS[1][0]:g}@{WCORNERS[1][1]:g}"
+    r_wr_n, r_wr_s = road[(w_hot, "neutral")][0], road[(w_hot, "starver")][0]
 
     checks = [
         ("neutral action scores about zero",
@@ -411,6 +434,15 @@ def main():
         ("refusing torque is punished on an extremes road",
          r_xr_s < r_xr_n - 0.02,
          f"starver {r_xr_s:+.5f}  vs  neutral {r_xr_n:+.5f}   (rolling hills, seed {XSEEDS[0]})"),
+        ("neutral scores about zero on every wideair road",
+         all(abs(road[(k, "neutral")][0]) < 0.05 for k in ws),
+         f"worst {worst_w[2:]} {road[(worst_w, 'neutral')][0]:+.5f}, {len(ws)} roads at "
+         + " and ".join(f"{t:g} C {p:g} kPa" for t, p in WCORNERS)
+         + f"; worst p95 err {max(road[(k, 'neutral')][1] for k in ws):.3f}"),
+        ("refusing torque is punished on a wideair road",
+         r_wr_s < r_wr_n - 0.02,
+         f"starver {r_wr_s:+.5f}  vs  neutral {r_wr_n:+.5f}   (rolling hills, "
+         f"{WCORNERS[1][0]:g} C, {WCORNERS[1][1]:g} kPa)"),
     ]
 
     print(f"{'check':46s} {'result':>7}   detail")

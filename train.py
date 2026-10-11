@@ -4,7 +4,12 @@ Trains a SAC agent on the engine environment and saves everything Phase D needs.
 
     pip install "stable-baselines3[extra]"      # once; also uncomment it in requirements.txt
 
-A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Four designs exist:
+A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Five designs exist:
+
+    --road wideair   dt 1.0   X2 (11 Oct, results/PREREGISTRATION_X2.md): the extremes
+                              roads in wider air, ambient 0-45 C and pressure 80-101.3 kPa
+                              drawn per episode, the compressor inlet following the
+                              pressure (wide_air.WideAirTrainingEnv) -> runs/wideair_dt1/
 
     --road extremes  dt 1.0   decision 12 of results/VALIDATION_DECISIONS.md (8 Oct):
                               the terrain roads with ambient 25-45 C, a speed target
@@ -29,6 +34,16 @@ A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Four designs exist:
     python train.py --steps 300000 --seed 0 --road random --out runs_c5
                                               # C4's design, in a NEW directory
     python train.py ... --no-preview          # the blinded arm of any of them
+
+--keep-buffer (11 October 2026) saves the replay buffer beside every checkpoint
+(OUT/<tag>/replay_buffer.pkl, overwritten each time) and loads it when the run
+resumes. Without it a resumed run starts from an empty buffer, so for a while it
+learns from a handful of fresh transitions, which an unbroken run never does.
+The road and weight streams still restart at a resume, and the policy's
+sampling noise is not saved, so a resumed run is CLOSE to an unbroken one, not
+equal to it; config.json records every resume and the buffer it restored. For
+runs long enough that restarting from step 0 is not an option (X2: 1 080 000
+steps, about 50 hours).
 
 A NEW BUDGET NEEDS ITS OWN --out. `--steps 300000` into runs/ or runs_d2/ is
 refused: those hold the Phase D and D2 agents, and continuing one of them is not
@@ -77,11 +92,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # is trained into their directories -- see "CLOSED EXPERIMENTS" in main().
 CLOSED = {"runs": "Phase D", "runs_d2": "Phase D2",
           "runs_c4": "C4",           # closed 24 Sep 2026, after its result
-          "terrain_dt1": "the 29 September retrain"}   # closed 8 Oct 2026
+          "terrain_dt1": "the 29 September retrain",   # closed 8 Oct 2026
+          "extremes_dt1": "X1"}      # closed 9 Oct 2026, after its result (PREREGISTRATION_X1.md §12)
 
 # Each road's own step. fixed and random are the designs Phase D, D2 and C4 ran
 # at 0.2 s; terrain is the 27 September design at evaluate.py's 1.0 s.
-DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0, "extremes": 1.0}
+DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0, "extremes": 1.0, "wideair": 1.0}
 
 
 def buffer_size(a):
@@ -146,6 +162,13 @@ def build_env(use_preview, seed, duration, road="terrain", dt=1.0):
     """
     if road == "terrain":
         env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
+    elif road == "wideair":
+        # Imported here, not at the top: importing wide_air swaps engine_env's
+        # boost ceiling for one that follows a stepping WideAirTrainingEnv's
+        # inlet (and is the plant's otherwise), so no other design's process
+        # ever holds it.
+        from wide_air import WideAirTrainingEnv
+        env = WideAirTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
     elif road == "extremes":
         env = ExtremesTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
     else:
@@ -246,6 +269,56 @@ def _record_arrays(b):
     return out
 
 
+BUFFER_FILE, BUFFER_STAMP = "replay_buffer.pkl", "replay_buffer.json"
+
+
+class BufferKeeper(BaseCallback):
+    """--keep-buffer: the replay buffer, written beside every checkpoint.
+
+    Same cadence as the CheckpointCallback before it in the list (every CHUNK
+    calls of this session), so the buffer on disk belongs to the latest
+    ckpt_*_steps.zip unless the process died between the two writes; the stamp
+    says which step it was saved at. One file, overwritten through a temporary
+    name, so a kill mid-write leaves the previous buffer whole. It only reads
+    the model. The buffer saved at step N holds N - 1 transitions:
+    stable-baselines3 stores a step's transition just after the callbacks run
+    (checked 11 October: killed after step 1000, resumed with 999)."""
+
+    def __init__(self, outdir):
+        super().__init__()
+        self.path = os.path.join(outdir, BUFFER_FILE)
+        self.stamp = os.path.join(outdir, BUFFER_STAMP)
+
+    def _on_step(self):
+        if self.n_calls % CHUNK == 0:
+            tmp = self.path[:-len(".pkl")] + ".saving.pkl"
+            self.model.save_replay_buffer(tmp)
+            os.replace(tmp, self.path)
+            with open(self.stamp, "w", encoding="utf-8") as fh:
+                json.dump(dict(num_timesteps=int(self.num_timesteps),
+                               transitions=int(self.model.replay_buffer.size())), fh)
+        return True
+
+
+def load_buffer(model, outdir, done_steps):
+    """Put the saved replay buffer back into a resumed model; say what it was."""
+    path = os.path.join(outdir, BUFFER_FILE)
+    if not os.path.exists(path):
+        print("  no saved replay buffer: this resume starts from an EMPTY one")
+        return dict(restored=False)
+    model.load_replay_buffer(path)
+    try:
+        with open(os.path.join(outdir, BUFFER_STAMP), encoding="utf-8") as fh:
+            saved_at = json.load(fh).get("num_timesteps")
+    except (OSError, ValueError):
+        saved_at = None
+    n = int(model.replay_buffer.size())
+    print(f"  replay buffer restored: {n:,} transitions, saved at step {saved_at}"
+          + ("" if saved_at == done_steps else
+             f" -- NOT the checkpoint's step {done_steps}; the transitions between are missing"))
+    return dict(restored=True, transitions=n, saved_at=saved_at, checkpoint_step=int(done_steps))
+
+
 def merge_records(outdir):
     """The chunks, in step order, as one train_record.npz. A step recorded twice
     keeps its LAST recording, the one the saved model continued from."""
@@ -278,6 +351,9 @@ ROADS_TEXT = {"terrain": "a new road every episode (TerrainTrainingEnv)",
               "extremes": "a new road every episode, ambient 25-45 C, speed target 60-150 km/h "
                           "changing mid-run, hills to 18 %, housing capacity x0.75-1.33 "
                           "(ExtremesTrainingEnv, decision 12)",
+              "wideair": "the extremes roads (decision 12) in wider air: ambient 0-45 C and "
+                         "pressure 80-101.3 kPa drawn per episode, the compressor inlet "
+                         "following the pressure (wide_air.WideAirTrainingEnv, X2)",
               "fixed": "the locked climb only",
               "random": "a new climb every episode (random_road.RandomClimb, Phase D2)"}
 
@@ -321,7 +397,7 @@ def main():
                     help="episode length in seconds; 900 is the standard scenario")
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
-    ap.add_argument("--road", choices=("terrain", "extremes", "fixed", "random"), default="terrain",
+    ap.add_argument("--road", choices=("terrain", "extremes", "wideair", "fixed", "random"), default="terrain",
                     help="terrain: a new road every episode (27 Sep). extremes: the same, "
                          "with ambient, speed, steeper hills and the housing capacity drawn "
                          "per episode (decision 12, 8 Oct). fixed: Phase D's "
@@ -360,7 +436,14 @@ def main():
                          "resumed: a crash is re-run from scratch instead. "
                          "C4's crash rule; run_phase_d.py passes it for every "
                          "new experiment.")
+    ap.add_argument("--keep-buffer", action="store_true",
+                    help="save the replay buffer with every checkpoint and load "
+                         "it on resume (OUT/<tag>/replay_buffer.pkl). See the "
+                         "docstring: a resumed run is then close to an unbroken "
+                         "one, not equal to it.")
     a = ap.parse_args()
+    if a.keep_buffer and a.no_resume:
+        raise SystemExit("--keep-buffer exists for resuming; --no-resume forbids it. Pick one.")
     if a.fixed_road:
         if a.road == "random":
             raise SystemExit("--fixed-road and --road random contradict each other.")
@@ -374,7 +457,8 @@ def main():
             a.out = "runs" if a.road == "fixed" else "runs_d2"      # CLOSED: refuses new work
         else:
             a.out = os.path.join("runs", {"fixed": "locked", "random": "random",
-                                          "terrain": "terrain", "extremes": "extremes"}[a.road]
+                                          "terrain": "terrain", "extremes": "extremes",
+                                          "wideair": "wideair"}[a.road]
                                  + f"_dt{a.dt:g}".replace(".", "p"))
     protocol = "d2" if a.road == "random" else "phase-d"
     device = get_device(a.device)
@@ -400,6 +484,8 @@ def main():
     # MEASURED, and the two figures are two machines and two devices:
     #   19.2 steps/s  17 Sep, Jad's 12-core machine, SAC on CUDA, dt 0.2, locked climb
     #   13.7 steps/s  27 Sep, the 20-thread team laptop, SAC on CPU, dt 1.0, varied roads
+    # and side by side on that laptop, 11 Oct (a scratch benchmark, X1's roads,
+    # the plant of 8 Oct): 7.5 steps/s each with six at once, 6.0 with ten.
     # A step costs six engine evaluations whatever dt is. Re-measure after
     # changing plant.DTHETA_DEG, the plant, the machine or the device.
     STEPS_PER_S = 19.2 if device.type == "cuda" else 13.7
@@ -417,6 +503,7 @@ def main():
     resume_from = periodic[-1] if periodic else (ckpt_path if os.path.exists(ckpt_path) else None)
     done_steps = 0
     extending, was_steps = False, None
+    buffer_restored = None
 
     if closed and not resume_from:
         raise SystemExit(
@@ -511,6 +598,8 @@ def main():
                 "moves this directory aside and trains the seed again from step 0.")
         print(f"resuming from {resume_from} at {done_steps} steps")
         model = SAC.load(resume_from, env=env, device=a.device)
+        if a.keep_buffer:
+            buffer_restored = load_buffer(model, outdir, done_steps)
     else:
         if os.path.exists(os.path.join(outdir, "final.zip")):
             raise SystemExit(
@@ -549,8 +638,9 @@ def main():
         return
 
     cb = CallbackList([CheckpointCallback(save_freq=CHUNK, save_path=outdir,
-                                          name_prefix="ckpt", verbose=0),
-                       ActionRecorder(outdir)])
+                                          name_prefix="ckpt", verbose=0)]
+                      + ([BufferKeeper(outdir)] if a.keep_buffer else [])
+                      + [ActionRecorder(outdir)])
 
     cfg_path = os.path.join(outdir, "config.json")
     prev = None
@@ -561,6 +651,7 @@ def main():
         except (OSError, ValueError):
             prev = None
     cfg = run_config(a, tag, model, outdir, live)
+    cfg.update(keep_buffer=bool(a.keep_buffer), resumed_buffer=buffer_restored)
     cfg.update(started=datetime.now().isoformat(timespec="seconds"), resumed_from=resume_from,
                status="running")
     if isinstance(prev, dict):

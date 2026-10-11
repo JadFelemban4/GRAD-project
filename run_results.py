@@ -170,6 +170,13 @@ FOOTERS = {
                      "grade change ramped over 8 s). Preregistered in results/PREREGISTRATION_X1.md",
                      "before any of them trained. Read the thermal-only column beside the total until",
                      "drive C tests the knock model."],
+    "wideair_dt1": ["", "AGENTS: runs/wideair_dt1, X2 (11 October): the extremes roads in wider air,",
+                    "ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet,",
+                    "the gearbox's kickdown table and the road's torque floor following the air",
+                    "(wide_air.py); 5 seeds a side, 1 080 000 steps (1200 episodes) each; spark trim",
+                    "capped at 0; on X1's plant. Preregistered in results/PREREGISTRATION_X2.md before",
+                    "any of them trained. Read the thermal-only column beside the total until drive C",
+                    "tests the knock model."],
 }
 
 

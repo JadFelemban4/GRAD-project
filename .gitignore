@@ -49,3 +49,5 @@ results/conditions_test.log
 results/conditions_*/conditions_test.part*.json
 # x1_score.py's per-step logs; SCORE_LOG.txt beside them is the record.
 results/x1_score/*.log
+# x2_score.py's per-step logs, likewise.
+results/x2_score/*.log

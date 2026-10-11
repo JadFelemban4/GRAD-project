@@ -4,6 +4,8 @@
     python check_roads.py --n 100
     python check_roads.py --road extremes   # decision 12's roads (8 Oct): ambient,
                                             # speed and housing capacity drawn too
+    python check_roads.py --road wideair    # X2's (11 Oct): the extremes roads at
+                                            # 0-45 C and 80-101.3 kPa
 
 train.py draws a new road every episode (engine_env.TerrainTrainingEnv). A road
 is only fit to train on if the BASELINE can drive it: if the baseline cannot
@@ -17,9 +19,10 @@ For each road this drives the neutral policy -- the baseline ECU, untouched --
 and reports the family, the grade range, the turbine peak, how long it spends
 above the protection trigger, the neutral policy's mean reward, and the p95
 torque-tracking error in the reward's own units. It writes
-results/training_roads.json (or training_roads_extremes.json), which make_page.py
-draws. On the extremes roads each row also carries the ambient, the speed range
-and the housing-capacity scale the road drew.
+results/training_roads.json (or training_roads_extremes.json, training_roads_
+wideair.json), which make_page.py draws. On the extremes and wideair roads each row
+also carries the ambient, the speed range and the housing-capacity scale the road
+drew, and on the wideair roads the air pressure.
 
 PASS means every road keeps the neutral reward inside +-0.05 and its p95
 tracking error inside the reward's tolerance band. It also prints how many
@@ -45,7 +48,10 @@ FIRST_SEED = 100
 def drive(job):
     seed, road = job
     from engine_env import ExtremesTrainingEnv, TerrainTrainingEnv, neutral_action, TURB_PROTECT_K
-    cls = ExtremesTrainingEnv if road == "extremes" else TerrainTrainingEnv
+    if road == "wideair":
+        from wide_air import WideAirTrainingEnv as cls
+    else:
+        cls = ExtremesTrainingEnv if road == "extremes" else TerrainTrainingEnv
     env = cls(duration=900.0, dt=1.0, seed=seed)
     env.reset(seed=seed)
     act = neutral_action()
@@ -60,8 +66,10 @@ def drive(job):
     turb = np.array(turb)
     g, v = env.cycle["grade"], env.cycle["v_mps"]
     extra = {}
-    if road == "extremes":
+    if road in ("extremes", "wideair"):
         extra = dict(t_amb_c=float(env.cycle["t_amb"]) - 273.15,
+                     p_kpa=float(env.cycle.get("p_baro", 101.3)),
+                     floor_nm=float(getattr(env, "floor_nm", 15.0)),
                      v_min_kmh=float(v[20:].min() * 3.6), v_max_kmh=float(v.max() * 3.6),
                      c_turb_scale=float(env.c_turb_scale),
                      v_kmh=[round(float(x) * 3.6, 1) for x in v[::5]])
@@ -77,7 +85,7 @@ def drive(job):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=40)
-    ap.add_argument("--road", choices=("terrain", "extremes"), default="terrain")
+    ap.add_argument("--road", choices=("terrain", "extremes", "wideair"), default="terrain")
     a = ap.parse_args()
     from engine_env import TRACK_TOL
 
@@ -89,8 +97,9 @@ def main():
     for r in R:
         print(f"{r['seed']:>5} {r['family']:<8}{100 * r['grade_min']:>6.1f} to{100 * r['grade_max']:>5.1f}"
               f"{r['peak_c']:>8.0f}{r['above_pct']:>7.1f}%{r['neutral_r']:>+11.4f}{r['p95_err']:>9.3f}"
-              + (f"   {r['t_amb_c']:4.1f} C  {r['v_min_kmh']:3.0f}-{r['v_max_kmh']:3.0f} km/h"
-                 f"  c_turb x{r['c_turb_scale']:.2f}" if a.road == "extremes" else ""))
+              + (f"   {r['t_amb_c']:4.1f} C {r['p_kpa']:5.1f} kPa  {r['v_min_kmh']:3.0f}-"
+                 f"{r['v_max_kmh']:3.0f} km/h  c_turb x{r['c_turb_scale']:.2f}"
+                 if a.road in ("extremes", "wideair") else ""))
 
     worst_r = max(R, key=lambda r: abs(r["neutral_r"]))
     worst_e = max(R, key=lambda r: r["p95_err"])
@@ -105,7 +114,7 @@ def main():
           "\nFAIL -- some road asks for torque the baseline cannot deliver. Do not train.")
 
     out = os.path.join(HERE, "results", "training_roads.json" if a.road == "terrain"
-                       else "training_roads_extremes.json")
+                       else f"training_roads_{a.road}.json")
     with open(out, "w") as fh:
         json.dump(dict(road=a.road, roads=R, binding=binding, n=len(R),
                        worst_neutral_r=worst_r["neutral_r"], worst_p95_err=worst_e["p95_err"],
