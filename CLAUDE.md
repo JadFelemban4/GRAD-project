@@ -104,8 +104,28 @@ writing to the car, it is the wrong task. Say so rather than finding a way.
 >   the logged-drive check**: with life weighted most, 59 of 60 runs burn more
 >   than 1 % over the ECU car (median +6.92 %), more than X1's agents; five also
 >   fall short of the torque somewhere. Wider air did not teach fuel restraint.
-> - **The transfer test** (step 6) stopped on its own harness, which named seeds
->   X2 does not have; fixed, re-run on 13 October (PREREGISTRATION_X2.md 11-12).
+> - **The transfer test (T; five episodes a condition, so descriptive):** held
+>   out, 8 of 10 agents beat that condition's `current-grade` at 50 °C, 6 of 10
+>   at 76 kPa (partly by refusing torque: a median of 48 steps short, one run 525
+>   of 719) and 5 of 10 at 25 °C on the 21.75 % hill (X1: 26, 25 and 30 of 46);
+>   in range 4–10 of 10. One agent does more damage than its baseline ECU
+>   (sighted seed 2, 25 °C). Its first run stopped on its own harness (it named
+>   seeds X2 does not have); fixed, re-run, 5 of 5 identical
+>   (PREREGISTRATION_X2.md 11–12).
+> - **Why it failed, measured after the result** (`results/X2_AGENTS.md`,
+>   `python x2_agents.py`; description, not a test). (1) The sighted agents read
+>   the preview and use it in opposite directions: seeds 3 and 4 add protection
+>   before the hill, seeds 0–2 lean out and raise boost; seeds 1 and 2 then
+>   enrich about a quarter as deeply as their twins on the climb, whose air X2
+>   drew on 1–2 % of episodes and whose constant speed never. (2) The policies
+>   never settled: each agent's practice cut spans 6.0–88.5 points across six
+>   checkpoints, and which way a pair reads depends on where each twin is in its
+>   swing. (3) The fuel goes to knock: 56–97 % of the extra fuel is spent where
+>   the ECU car's housing is under 500 °C, and what the agents avoid there is the
+>   baseline ECU's one-step knock spike (spark on the previous step's manifold
+>   pressure) at every jump in the torque request. About 85 % of the training
+>   knock falls on the start of a speed-up or the end of a slow-down, which no
+>   observation shows coming. The knock model is untested (drive C).
 >
 > **What X2 was** (`runs/wideair_dt1/`, trained 11–13 October, 51 hours, none
 > crashed), under `results/PREREGISTRATION_X2.md`, committed as `06f4686` before

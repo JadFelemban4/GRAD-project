@@ -1,0 +1,2573 @@
+{
+ "grade_cut": 46.981,
+ "agents": {
+  "sighted_seed0": {
+   "cut": 71.67,
+   "training": {
+    "episodes": 1201,
+    "binding": 148,
+    "scored_like": 22,
+    "cold": 495,
+    "thin": 572,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 41.3,
+      "cool_over": 4.48,
+      "cold_over": 3.69,
+      "cool_lam": 0.011
+     },
+     {
+      "n": 400,
+      "n_binding": 52,
+      "hot_cut": 50.3,
+      "cool_over": 3.28,
+      "cold_over": 2.27,
+      "cool_lam": 0.022
+     },
+     {
+      "n": 401,
+      "n_binding": 48,
+      "hot_cut": 53.5,
+      "cool_over": 2.95,
+      "cold_over": 2.11,
+      "cool_lam": 0.029
+     }
+    ],
+    "scored_like_cut_last_third": 44.2,
+    "scored_like_n_last_third": 10
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0031,
+     "mid": 0.0011,
+     "last": 0.0009
+    },
+    "critic_loss": {
+     "first": 0.0245,
+     "mid": 0.021,
+     "last": 0.0221
+    },
+    "actor_loss": {
+     "first": -5.765,
+     "mid": -0.958,
+     "last": -0.508
+    },
+    "ep_rew_mean": {
+     "first": -17.4,
+     "mid": -1.02,
+     "last": -0.1085
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.0057,
+    "critic_loss_max_entry": 0.578
+   },
+   "scored": {
+    "pre_dlam": 0.0177,
+    "pre_dboost": 15.33,
+    "track_175_240": -0.088,
+    "life_175_240": -0.378,
+    "short_175_240": 0.0,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": 0.0138,
+    "pre_boost": 1.81,
+    "climb_spark": 0.0,
+    "climb_lam": -0.147,
+    "climb_boost": 10.5,
+    "climb_fan": 0.68,
+    "worse": []
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 0,
+    "F_fail": 9,
+    "fuel_over_median": 3.74,
+    "fuel_over_life_most": 6.58,
+    "fuel_over_life_least": 1.25,
+    "cold_spark": 0.0,
+    "cold_lam": 0.0556,
+    "cold_boost": -9.0,
+    "cold_fan": 0.472
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 19.3,
+      "wfuel_per_step": 0.00158,
+      "wlife_per_step": 0.00028,
+      "lam": 0.0556,
+      "spark": 0.0,
+      "boost": 7.16
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 64.5,
+      "wfuel_per_step": -0.00316,
+      "wlife_per_step": 0.00021,
+      "lam": 0.054,
+      "spark": 0.0,
+      "boost": 5.0
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 16.2,
+      "wfuel_per_step": -0.04153,
+      "wlife_per_step": -0.00117,
+      "lam": -0.0223,
+      "spark": -6.15,
+      "boost": -35.19
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 89.6,
+      "wfuel_per_step": -0.00234,
+      "wlife_per_step": 0.00213,
+      "lam": -0.0501,
+      "spark": 0.0,
+      "boost": -29.33
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 10.0,
+      "wfuel_per_step": -0.00073,
+      "wlife_per_step": -0.00365,
+      "lam": 0.0586,
+      "spark": -2.21,
+      "boost": -28.0
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 0.4,
+      "wfuel_per_step": -4e-05,
+      "wlife_per_step": -0.055,
+      "lam": 0.0374,
+      "spark": -6.95,
+      "boost": -2.88
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01039,
+     "knock_agent": 0.02869
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.0001,
+     "oil_agent": 0.01031,
+     "knock_agent": 0.02435
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 157199,
+      "wfuel_per_step": -0.00206,
+      "wlife_per_step": 0.00196
+     },
+     "500-715 C": {
+      "steps": 120906,
+      "wfuel_per_step": -0.00532,
+      "wlife_per_step": 0.0021
+     },
+     "715 C and over": {
+      "steps": 39543,
+      "wfuel_per_step": -0.0152,
+      "wlife_per_step": 0.06383
+     }
+    },
+    "damage": {
+     "steps": 317648,
+     "turb_base": 0.0277,
+     "oil_base": 0.0103,
+     "knock_base": 0.03927,
+     "turb_agent": 0.01855,
+     "oil_agent": 0.01042,
+     "knock_agent": 0.0184
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2536,
+     "spike_share_of_steps": 0.7,
+     "spike_share_of_knock": 97.9,
+     "torque_step_median": 86.8,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2535,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 34.4,
+       "knock_pct": 60.7
+      },
+      "slow-down ends": {
+       "spike_pct": 21.3,
+       "knock_pct": 23.8
+      },
+      "gear shift": {
+       "spike_pct": 37.0,
+       "knock_pct": 11.0
+      },
+      "grade ramp": {
+       "spike_pct": 7.4,
+       "knock_pct": 2.4
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.0
+      }
+     }
+    }
+   },
+   "practice_path": [
+    63.97,
+    54.37,
+    62.47,
+    66.19,
+    59.77,
+    71.73
+   ]
+  },
+  "blind_seed0": {
+   "cut": 72.01,
+   "training": {
+    "episodes": 1201,
+    "binding": 148,
+    "scored_like": 22,
+    "cold": 495,
+    "thin": 572,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 37.7,
+      "cool_over": 4.48,
+      "cold_over": 3.96,
+      "cool_lam": 0.01
+     },
+     {
+      "n": 400,
+      "n_binding": 52,
+      "hot_cut": 47.1,
+      "cool_over": 3.91,
+      "cold_over": 2.93,
+      "cool_lam": 0.024
+     },
+     {
+      "n": 401,
+      "n_binding": 48,
+      "hot_cut": 52.2,
+      "cool_over": 4.03,
+      "cold_over": 2.52,
+      "cool_lam": 0.026
+     }
+    ],
+    "scored_like_cut_last_third": 52.6,
+    "scored_like_n_last_third": 10
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0034,
+     "mid": 0.0014,
+     "last": 0.001
+    },
+    "critic_loss": {
+     "first": 0.0205,
+     "mid": 0.0217,
+     "last": 0.0187
+    },
+    "actor_loss": {
+     "first": -5.86,
+     "mid": -1.6,
+     "last": -0.9135
+    },
+    "ep_rew_mean": {
+     "first": -26.05,
+     "mid": -1.48,
+     "last": 2.975
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.0068,
+    "critic_loss_max_entry": 0.725
+   },
+   "scored": {
+    "pre_dlam": 0.0019,
+    "pre_dboost": -0.28,
+    "track_175_240": -0.194,
+    "life_175_240": 0.342,
+    "short_175_240": 0.2,
+    "onset_median": 184.0,
+    "onset_none": 0,
+    "pre_lam": 0.0327,
+    "pre_boost": 1.83,
+    "climb_spark": 0.0,
+    "climb_lam": -0.147,
+    "climb_boost": 8.8,
+    "climb_fan": 0.54,
+    "worse": []
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 1,
+    "F_fail": 6,
+    "fuel_over_median": 1.97,
+    "fuel_over_life_most": 6.91,
+    "fuel_over_life_least": 0.21,
+    "cold_spark": 0.0,
+    "cold_lam": 0.0438,
+    "cold_boost": -20.33,
+    "cold_fan": 0.474
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 31.6,
+      "wfuel_per_step": 0.00111,
+      "wlife_per_step": 0.00021,
+      "lam": 0.0432,
+      "spark": 0.0,
+      "boost": -20.04
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 86.0,
+      "wfuel_per_step": 0.0005,
+      "wlife_per_step": -0.00012,
+      "lam": 0.0419,
+      "spark": 0.0,
+      "boost": 6.51
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -17.6,
+      "wfuel_per_step": 0.00153,
+      "wlife_per_step": -0.00505,
+      "lam": 0.0175,
+      "spark": 0.0,
+      "boost": -12.48
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 71.0,
+      "wfuel_per_step": -0.00143,
+      "wlife_per_step": 0.0029,
+      "lam": -0.0107,
+      "spark": 0.0,
+      "boost": -35.39
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 25.8,
+      "wfuel_per_step": -0.00092,
+      "wlife_per_step": -2e-05,
+      "lam": 0.0566,
+      "spark": -1.51,
+      "boost": -30.58
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 3.2,
+      "wfuel_per_step": -0.00281,
+      "wlife_per_step": 0.04925,
+      "lam": -0.0544,
+      "spark": 0.0,
+      "boost": -4.09
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.00013,
+     "oil_agent": 0.01039,
+     "knock_agent": 0.01959
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.0001,
+     "oil_agent": 0.01034,
+     "knock_agent": 0.0315
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 157199,
+      "wfuel_per_step": -0.00247,
+      "wlife_per_step": 0.00199
+     },
+     "500-715 C": {
+      "steps": 120906,
+      "wfuel_per_step": -0.00572,
+      "wlife_per_step": 0.00233
+     },
+     "715 C and over": {
+      "steps": 39543,
+      "wfuel_per_step": -0.01633,
+      "wlife_per_step": 0.06537
+     }
+    },
+    "damage": {
+     "steps": 317648,
+     "turb_base": 0.0277,
+     "oil_base": 0.0103,
+     "knock_base": 0.03927,
+     "turb_agent": 0.01833,
+     "oil_agent": 0.01041,
+     "knock_agent": 0.01874
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2536,
+     "spike_share_of_steps": 0.7,
+     "spike_share_of_knock": 97.9,
+     "torque_step_median": 86.8,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2535,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 34.4,
+       "knock_pct": 60.7
+      },
+      "slow-down ends": {
+       "spike_pct": 21.3,
+       "knock_pct": 23.8
+      },
+      "gear shift": {
+       "spike_pct": 37.0,
+       "knock_pct": 11.0
+      },
+      "grade ramp": {
+       "spike_pct": 7.4,
+       "knock_pct": 2.4
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.0
+      }
+     }
+    }
+   },
+   "practice_path": [
+    66.41,
+    70.21,
+    69.79,
+    72.41,
+    72.31,
+    72.1
+   ]
+  },
+  "sighted_seed1": {
+   "cut": 39.26,
+   "training": {
+    "episodes": 1201,
+    "binding": 154,
+    "scored_like": 16,
+    "cold": 495,
+    "thin": 582,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 40.0,
+      "cool_over": 4.67,
+      "cold_over": 3.91,
+      "cool_lam": 0.013
+     },
+     {
+      "n": 400,
+      "n_binding": 50,
+      "hot_cut": 52.9,
+      "cool_over": 4.59,
+      "cold_over": 3.7,
+      "cool_lam": 0.018
+     },
+     {
+      "n": 401,
+      "n_binding": 56,
+      "hot_cut": 49.4,
+      "cool_over": 2.69,
+      "cold_over": 2.64,
+      "cool_lam": 0.031
+     }
+    ],
+    "scored_like_cut_last_third": 63.3,
+    "scored_like_n_last_third": 5
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0018,
+     "mid": 0.0013,
+     "last": 0.0009
+    },
+    "critic_loss": {
+     "first": 0.0169,
+     "mid": 0.0287,
+     "last": 0.0278
+    },
+    "actor_loss": {
+     "first": -4.11,
+     "mid": -1.41,
+     "last": -0.6725
+    },
+    "ep_rew_mean": {
+     "first": -21.5,
+     "mid": -2.68,
+     "last": 2.315
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.0027,
+    "critic_loss_max_entry": 0.344
+   },
+   "scored": {
+    "pre_dlam": 0.0572,
+    "pre_dboost": 26.95,
+    "track_175_240": -0.086,
+    "life_175_240": 0.176,
+    "short_175_240": 0.0,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": 0.0006,
+    "pre_boost": 0.7,
+    "climb_spark": 0.0,
+    "climb_lam": -0.039,
+    "climb_boost": 2.0,
+    "climb_fan": 0.5,
+    "worse": []
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 1,
+    "F_fail": 10,
+    "fuel_over_median": 4.08,
+    "fuel_over_life_most": 5.42,
+    "fuel_over_life_least": 2.08,
+    "cold_spark": -2.04,
+    "cold_lam": 0.014,
+    "cold_boost": -21.4,
+    "cold_fan": 0.595
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 16.4,
+      "wfuel_per_step": 0.00105,
+      "wlife_per_step": 0.00018,
+      "lam": 0.0499,
+      "spark": 0.0,
+      "boost": -13.9
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 74.2,
+      "wfuel_per_step": -0.00928,
+      "wlife_per_step": 0.00017,
+      "lam": -0.0211,
+      "spark": 0.0,
+      "boost": 0.86
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 9.4,
+      "wfuel_per_step": -0.0174,
+      "wlife_per_step": 0.00374,
+      "lam": 0.0121,
+      "spark": 0.0,
+      "boost": 2.2
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 80.3,
+      "wfuel_per_step": -0.00111,
+      "wlife_per_step": 0.00439,
+      "lam": 0.0241,
+      "spark": -4.24,
+      "boost": -35.78
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 19.9,
+      "wfuel_per_step": -0.00089,
+      "wlife_per_step": -0.00036,
+      "lam": 0.0279,
+      "spark": -4.74,
+      "boost": -25.1
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -0.2,
+      "wfuel_per_step": 0.00064,
+      "wlife_per_step": -0.02515,
+      "lam": 0.0578,
+      "spark": -6.11,
+      "boost": -22.35
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.00012,
+     "oil_agent": 0.01037,
+     "knock_agent": 0.0117
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01036,
+     "knock_agent": 0.03715
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 150249,
+      "wfuel_per_step": -0.00231,
+      "wlife_per_step": 0.00182
+     },
+     "500-715 C": {
+      "steps": 117207,
+      "wfuel_per_step": -0.00497,
+      "wlife_per_step": 0.00252
+     },
+     "715 C and over": {
+      "steps": 43000,
+      "wfuel_per_step": -0.01526,
+      "wlife_per_step": 0.0672
+     }
+    },
+    "damage": {
+     "steps": 310456,
+     "turb_base": 0.03123,
+     "oil_base": 0.01031,
+     "knock_base": 0.03929,
+     "turb_agent": 0.02091,
+     "oil_agent": 0.01043,
+     "knock_agent": 0.01711
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2474,
+     "spike_share_of_steps": 0.69,
+     "spike_share_of_knock": 97.9,
+     "torque_step_median": 86.4,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2474,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 34.0,
+       "knock_pct": 61.5
+      },
+      "slow-down ends": {
+       "spike_pct": 21.4,
+       "knock_pct": 23.6
+      },
+      "gear shift": {
+       "spike_pct": 37.3,
+       "knock_pct": 10.5
+      },
+      "grade ramp": {
+       "spike_pct": 7.3,
+       "knock_pct": 2.3
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.0
+      }
+     }
+    }
+   },
+   "practice_path": [
+    64.91,
+    66.72,
+    53.17,
+    54.2,
+    58.53,
+    48.2
+   ]
+  },
+  "blind_seed1": {
+   "cut": 70.56,
+   "training": {
+    "episodes": 1201,
+    "binding": 154,
+    "scored_like": 16,
+    "cold": 495,
+    "thin": 582,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 46.5,
+      "cool_over": 5.28,
+      "cold_over": 4.75,
+      "cool_lam": 0.006
+     },
+     {
+      "n": 400,
+      "n_binding": 50,
+      "hot_cut": 47.3,
+      "cool_over": 4.36,
+      "cold_over": 3.74,
+      "cool_lam": 0.015
+     },
+     {
+      "n": 401,
+      "n_binding": 56,
+      "hot_cut": 49.7,
+      "cool_over": 3.0,
+      "cold_over": 2.54,
+      "cool_lam": 0.025
+     }
+    ],
+    "scored_like_cut_last_third": 51.5,
+    "scored_like_n_last_third": 5
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0028,
+     "mid": 0.0014,
+     "last": 0.001
+    },
+    "critic_loss": {
+     "first": 0.0214,
+     "mid": 0.0184,
+     "last": 0.0203
+    },
+    "actor_loss": {
+     "first": -5.775,
+     "mid": -1.6,
+     "last": -0.916
+    },
+    "ep_rew_mean": {
+     "first": -21.65,
+     "mid": -3.23,
+     "last": 1.35
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.0069,
+    "critic_loss_max_entry": 1.64
+   },
+   "scored": {
+    "pre_dlam": -0.0001,
+    "pre_dboost": -0.13,
+    "track_175_240": -0.28,
+    "life_175_240": 0.063,
+    "short_175_240": 0.3,
+    "onset_median": 120.0,
+    "onset_none": 2,
+    "pre_lam": 0.0572,
+    "pre_boost": -19.96,
+    "climb_spark": 0.0,
+    "climb_lam": -0.149,
+    "climb_boost": -3.3,
+    "climb_fan": 0.91,
+    "worse": [
+     {
+      "episode": 8,
+      "w_life": 0.089,
+      "damage": 871.9,
+      "base": 848.1,
+      "fuel_over": 2.0,
+      "climb_spark": 0.0,
+      "climb_lam": 0.046,
+      "climb_boost": -0.5
+     },
+     {
+      "episode": 13,
+      "w_life": 0.034,
+      "damage": 897.6,
+      "base": 848.1,
+      "fuel_over": 2.47,
+      "climb_spark": 0.0,
+      "climb_lam": 0.052,
+      "climb_boost": -0.4
+     },
+     {
+      "episode": 15,
+      "w_life": 0.029,
+      "damage": 918.3,
+      "base": 848.1,
+      "fuel_over": 2.92,
+      "climb_spark": 0.0,
+      "climb_lam": 0.058,
+      "climb_boost": 6.6
+     },
+     {
+      "episode": 16,
+      "w_life": 0.049,
+      "damage": 904.8,
+      "base": 848.1,
+      "fuel_over": 2.63,
+      "climb_spark": 0.0,
+      "climb_lam": 0.055,
+      "climb_boost": 0.4
+     },
+     {
+      "episode": 17,
+      "w_life": 0.062,
+      "damage": 894.1,
+      "base": 848.1,
+      "fuel_over": 2.46,
+      "climb_spark": 0.0,
+      "climb_lam": 0.053,
+      "climb_boost": 5.1
+     }
+    ]
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 0,
+    "F_fail": 6,
+    "fuel_over_median": 2.59,
+    "fuel_over_life_most": 5.96,
+    "fuel_over_life_least": 0.08,
+    "cold_spark": -0.65,
+    "cold_lam": 0.0462,
+    "cold_boost": -6.49,
+    "cold_fan": 0.849
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": -22.6,
+      "wfuel_per_step": 0.00189,
+      "wlife_per_step": 0.00019,
+      "lam": 0.0548,
+      "spark": 0.0,
+      "boost": -13.41
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 152.6,
+      "wfuel_per_step": 0.00059,
+      "wlife_per_step": -0.00011,
+      "lam": 0.0411,
+      "spark": 0.0,
+      "boost": -5.74
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -30.0,
+      "wfuel_per_step": 0.00329,
+      "wlife_per_step": -0.00075,
+      "lam": 0.0139,
+      "spark": 0.0,
+      "boost": -34.03
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 77.3,
+      "wfuel_per_step": -0.00188,
+      "wlife_per_step": 0.00383,
+      "lam": -0.0005,
+      "spark": -6.2,
+      "boost": 8.32
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 23.4,
+      "wfuel_per_step": -0.00201,
+      "wlife_per_step": -0.00213,
+      "lam": 0.0052,
+      "spark": -5.23,
+      "boost": 3.82
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -0.6,
+      "wfuel_per_step": 0.0012,
+      "wlife_per_step": -0.06541,
+      "lam": 0.0587,
+      "spark": 0.0,
+      "boost": -39.06
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.00015,
+     "oil_agent": 0.01042,
+     "knock_agent": 0.01595
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.0001,
+     "oil_agent": 0.01036,
+     "knock_agent": 0.0318
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 150249,
+      "wfuel_per_step": -0.00228,
+      "wlife_per_step": 0.00178
+     },
+     "500-715 C": {
+      "steps": 117207,
+      "wfuel_per_step": -0.0053,
+      "wlife_per_step": 0.00329
+     },
+     "715 C and over": {
+      "steps": 43000,
+      "wfuel_per_step": -0.01382,
+      "wlife_per_step": 0.06681
+     }
+    },
+    "damage": {
+     "steps": 310456,
+     "turb_base": 0.03123,
+     "oil_base": 0.01031,
+     "knock_base": 0.03929,
+     "turb_agent": 0.02084,
+     "oil_agent": 0.01044,
+     "knock_agent": 0.01837
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2474,
+     "spike_share_of_steps": 0.69,
+     "spike_share_of_knock": 97.9,
+     "torque_step_median": 86.4,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2474,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 34.0,
+       "knock_pct": 61.5
+      },
+      "slow-down ends": {
+       "spike_pct": 21.4,
+       "knock_pct": 23.6
+      },
+      "gear shift": {
+       "spike_pct": 37.3,
+       "knock_pct": 10.5
+      },
+      "grade ramp": {
+       "spike_pct": 7.3,
+       "knock_pct": 2.3
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.0
+      }
+     }
+    }
+   },
+   "practice_path": [
+    33.91,
+    50.22,
+    71.14,
+    70.15,
+    68.9,
+    71.72
+   ]
+  },
+  "sighted_seed2": {
+   "cut": 35.36,
+   "training": {
+    "episodes": 1201,
+    "binding": 150,
+    "scored_like": 15,
+    "cold": 537,
+    "thin": 544,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 50,
+      "hot_cut": 41.1,
+      "cool_over": 4.27,
+      "cold_over": 4.26,
+      "cool_lam": 0.007
+     },
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 51.8,
+      "cool_over": 3.06,
+      "cold_over": 3.11,
+      "cool_lam": 0.021
+     },
+     {
+      "n": 401,
+      "n_binding": 52,
+      "hot_cut": 45.0,
+      "cool_over": 2.75,
+      "cold_over": 2.3,
+      "cool_lam": 0.027
+     }
+    ],
+    "scored_like_cut_last_third": 44.1,
+    "scored_like_n_last_third": 5
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0024,
+     "mid": 0.0013,
+     "last": 0.001
+    },
+    "critic_loss": {
+     "first": 0.012,
+     "mid": 0.0203,
+     "last": 0.0236
+    },
+    "actor_loss": {
+     "first": -4.38,
+     "mid": -1.02,
+     "last": -0.7585
+    },
+    "ep_rew_mean": {
+     "first": -22.95,
+     "mid": 2.12,
+     "last": -1.27
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.004,
+    "critic_loss_max_entry": 0.577
+   },
+   "scored": {
+    "pre_dlam": 0.0048,
+    "pre_dboost": 13.04,
+    "track_175_240": -0.095,
+    "life_175_240": 0.823,
+    "short_175_240": 0.0,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": -0.0394,
+    "pre_boost": -4.77,
+    "climb_spark": 0.0,
+    "climb_lam": -0.042,
+    "climb_boost": 9.3,
+    "climb_fan": 0.88,
+    "worse": [
+     {
+      "episode": 13,
+      "w_life": 0.034,
+      "damage": 865.0,
+      "base": 848.1,
+      "fuel_over": 1.43,
+      "climb_spark": 0.0,
+      "climb_lam": 0.033,
+      "climb_boost": -26.5
+     }
+    ]
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 0,
+    "F_fail": 7,
+    "fuel_over_median": 2.27,
+    "fuel_over_life_most": 11.61,
+    "fuel_over_life_least": 0.45,
+    "cold_spark": 0.0,
+    "cold_lam": 0.0225,
+    "cold_boost": -15.5,
+    "cold_fan": 0.238
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": -7.4,
+      "wfuel_per_step": 0.00205,
+      "wlife_per_step": 0.00021,
+      "lam": 0.0421,
+      "spark": 0.0,
+      "boost": -7.74
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 68.5,
+      "wfuel_per_step": -6e-05,
+      "wlife_per_step": -0.00011,
+      "lam": 0.0444,
+      "spark": 0.0,
+      "boost": -23.62
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 38.9,
+      "wfuel_per_step": -0.01463,
+      "wlife_per_step": -0.0051,
+      "lam": 0.0218,
+      "spark": 0.0,
+      "boost": -35.69
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 70.5,
+      "wfuel_per_step": -0.00156,
+      "wlife_per_step": 0.00254,
+      "lam": -0.0297,
+      "spark": -1.03,
+      "boost": -16.83
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 27.9,
+      "wfuel_per_step": -0.00235,
+      "wlife_per_step": 0.00416,
+      "lam": -0.0754,
+      "spark": -0.18,
+      "boost": -21.12
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 1.6,
+      "wfuel_per_step": -0.00225,
+      "wlife_per_step": 0.06808,
+      "lam": -0.005,
+      "spark": -2.95,
+      "boost": -27.34
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 8e-05,
+     "oil_agent": 0.01043,
+     "knock_agent": 0.0284
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.0001,
+     "oil_agent": 0.01033,
+     "knock_agent": 0.03568
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 151988,
+      "wfuel_per_step": -0.00217,
+      "wlife_per_step": 0.00211
+     },
+     "500-715 C": {
+      "steps": 118590,
+      "wfuel_per_step": -0.00509,
+      "wlife_per_step": 0.00183
+     },
+     "715 C and over": {
+      "steps": 43474,
+      "wfuel_per_step": -0.01306,
+      "wlife_per_step": 0.05742
+     }
+    },
+    "damage": {
+     "steps": 314052,
+     "turb_base": 0.03063,
+     "oil_base": 0.0103,
+     "knock_base": 0.03959,
+     "turb_agent": 0.02178,
+     "oil_agent": 0.01044,
+     "knock_agent": 0.01751
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2411,
+     "spike_share_of_steps": 0.67,
+     "spike_share_of_knock": 97.7,
+     "torque_step_median": 86.1,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2411,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 33.4,
+       "knock_pct": 61.2
+      },
+      "slow-down ends": {
+       "spike_pct": 22.2,
+       "knock_pct": 23.7
+      },
+      "gear shift": {
+       "spike_pct": 36.9,
+       "knock_pct": 10.6
+      },
+      "grade ramp": {
+       "spike_pct": 7.5,
+       "knock_pct": 2.1
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.0
+      }
+     }
+    }
+   },
+   "practice_path": [
+    68.98,
+    58.44,
+    36.96,
+    55.27,
+    70.56,
+    57.54
+   ]
+  },
+  "blind_seed2": {
+   "cut": 47.64,
+   "training": {
+    "episodes": 1201,
+    "binding": 150,
+    "scored_like": 15,
+    "cold": 537,
+    "thin": 544,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 50,
+      "hot_cut": 39.1,
+      "cool_over": 4.35,
+      "cold_over": 3.94,
+      "cool_lam": 0.007
+     },
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 50.0,
+      "cool_over": 4.47,
+      "cold_over": 4.84,
+      "cool_lam": 0.017
+     },
+     {
+      "n": 401,
+      "n_binding": 52,
+      "hot_cut": 47.5,
+      "cool_over": 3.69,
+      "cold_over": 4.11,
+      "cool_lam": 0.023
+     }
+    ],
+    "scored_like_cut_last_third": 43.0,
+    "scored_like_n_last_third": 5
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0028,
+     "mid": 0.0014,
+     "last": 0.0011
+    },
+    "critic_loss": {
+     "first": 0.0206,
+     "mid": 0.0183,
+     "last": 0.02
+    },
+    "actor_loss": {
+     "first": -4.85,
+     "mid": -1.46,
+     "last": -0.886
+    },
+    "ep_rew_mean": {
+     "first": -21.45,
+     "mid": -3.83,
+     "last": -1.323
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.0066,
+    "critic_loss_max_entry": 0.509
+   },
+   "scored": {
+    "pre_dlam": -0.0048,
+    "pre_dboost": 1.21,
+    "track_175_240": -0.123,
+    "life_175_240": -1.112,
+    "short_175_240": 0.1,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": 0.0152,
+    "pre_boost": -6.19,
+    "climb_spark": -0.85,
+    "climb_lam": -0.149,
+    "climb_boost": 12.6,
+    "climb_fan": 0.01,
+    "worse": []
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 0,
+    "F_fail": 8,
+    "fuel_over_median": 2.06,
+    "fuel_over_life_most": 8.68,
+    "fuel_over_life_least": 0.44,
+    "cold_spark": 0.0,
+    "cold_lam": 0.0411,
+    "cold_boost": 5.78,
+    "cold_fan": 0.541
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 35.4,
+      "wfuel_per_step": 0.00148,
+      "wlife_per_step": 0.00016,
+      "lam": 0.0506,
+      "spark": 0.0,
+      "boost": 10.82
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 81.5,
+      "wfuel_per_step": -0.00012,
+      "wlife_per_step": 5e-05,
+      "lam": 0.0468,
+      "spark": 0.0,
+      "boost": 3.63
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -16.9,
+      "wfuel_per_step": 0.0133,
+      "wlife_per_step": -0.00085,
+      "lam": 0.0587,
+      "spark": 0.0,
+      "boost": 8.07
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 56.1,
+      "wfuel_per_step": -0.00119,
+      "wlife_per_step": 0.00213,
+      "lam": 0.0149,
+      "spark": -0.01,
+      "boost": -10.0
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 42.9,
+      "wfuel_per_step": -0.00311,
+      "wlife_per_step": 0.00575,
+      "lam": -0.099,
+      "spark": 0.0,
+      "boost": 0.68
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 1.1,
+      "wfuel_per_step": -0.00027,
+      "wlife_per_step": 0.03825,
+      "lam": 0.059,
+      "spark": 0.0,
+      "boost": 14.68
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01038,
+     "knock_agent": 0.03683
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01034,
+     "knock_agent": 0.03816
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 151988,
+      "wfuel_per_step": -0.00277,
+      "wlife_per_step": 0.00203
+     },
+     "500-715 C": {
+      "steps": 118590,
+      "wfuel_per_step": -0.00551,
+      "wlife_per_step": 0.00237
+     },
+     "715 C and over": {
+      "steps": 43474,
+      "wfuel_per_step": -0.0156,
+      "wlife_per_step": 0.058
+     }
+    },
+    "damage": {
+     "steps": 314052,
+     "turb_base": 0.03063,
+     "oil_base": 0.0103,
+     "knock_base": 0.03959,
+     "turb_agent": 0.02052,
+     "oil_agent": 0.01042,
+     "knock_agent": 0.01719
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2411,
+     "spike_share_of_steps": 0.67,
+     "spike_share_of_knock": 97.7,
+     "torque_step_median": 86.1,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2411,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 33.4,
+       "knock_pct": 61.2
+      },
+      "slow-down ends": {
+       "spike_pct": 22.2,
+       "knock_pct": 23.7
+      },
+      "gear shift": {
+       "spike_pct": 36.9,
+       "knock_pct": 10.6
+      },
+      "grade ramp": {
+       "spike_pct": 7.5,
+       "knock_pct": 2.1
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.0
+      }
+     }
+    }
+   },
+   "practice_path": [
+    29.01,
+    -17.44,
+    26.74,
+    71.05,
+    66.53,
+    37.48
+   ]
+  },
+  "sighted_seed3": {
+   "cut": 71.27,
+   "training": {
+    "episodes": 1201,
+    "binding": 136,
+    "scored_like": 12,
+    "cold": 504,
+    "thin": 551,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 44,
+      "hot_cut": 45.1,
+      "cool_over": 5.11,
+      "cold_over": 5.72,
+      "cool_lam": 0.003
+     },
+     {
+      "n": 400,
+      "n_binding": 53,
+      "hot_cut": 52.3,
+      "cool_over": 4.31,
+      "cold_over": 4.19,
+      "cool_lam": 0.017
+     },
+     {
+      "n": 401,
+      "n_binding": 39,
+      "hot_cut": 44.9,
+      "cool_over": 2.31,
+      "cold_over": 1.96,
+      "cool_lam": 0.028
+     }
+    ],
+    "scored_like_cut_last_third": 62.0,
+    "scored_like_n_last_third": 3
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0028,
+     "mid": 0.0015,
+     "last": 0.001
+    },
+    "critic_loss": {
+     "first": 0.0192,
+     "mid": 0.0282,
+     "last": 0.0239
+    },
+    "actor_loss": {
+     "first": -4.715,
+     "mid": -1.63,
+     "last": -0.698
+    },
+    "ep_rew_mean": {
+     "first": -24.9,
+     "mid": -1.97,
+     "last": -9.595
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.352,
+    "critic_loss_min_entry": 0.007,
+    "critic_loss_max_entry": 0.526
+   },
+   "scored": {
+    "pre_dlam": -0.0115,
+    "pre_dboost": -11.39,
+    "track_175_240": -0.09,
+    "life_175_240": 0.145,
+    "short_175_240": 0.0,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": 0.0264,
+    "pre_boost": -13.97,
+    "climb_spark": 0.0,
+    "climb_lam": -0.135,
+    "climb_boost": 1.0,
+    "climb_fan": 0.99,
+    "worse": []
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 2,
+    "F_fail": 9,
+    "fuel_over_median": 2.68,
+    "fuel_over_life_most": 7.08,
+    "fuel_over_life_least": 0.64,
+    "cold_spark": -0.48,
+    "cold_lam": 0.0114,
+    "cold_boost": -12.91,
+    "cold_fan": 0.52
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 1.3,
+      "wfuel_per_step": 0.002,
+      "wlife_per_step": 0.00023,
+      "lam": 0.0358,
+      "spark": 0.0,
+      "boost": -4.83
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 96.6,
+      "wfuel_per_step": -0.00047,
+      "wlife_per_step": 0.00011,
+      "lam": 0.0316,
+      "spark": 0.0,
+      "boost": -1.15
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 2.1,
+      "wfuel_per_step": 0.00263,
+      "wlife_per_step": -0.00567,
+      "lam": 0.0542,
+      "spark": 0.0,
+      "boost": 3.73
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 92.4,
+      "wfuel_per_step": -0.00205,
+      "wlife_per_step": 0.00354,
+      "lam": -0.0271,
+      "spark": -5.01,
+      "boost": -14.86
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 8.3,
+      "wfuel_per_step": -0.00088,
+      "wlife_per_step": 0.00152,
+      "lam": 0.0041,
+      "spark": 0.0,
+      "boost": -38.55
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -0.7,
+      "wfuel_per_step": -0.00068,
+      "wlife_per_step": -0.03513,
+      "lam": -0.0098,
+      "spark": 0.0,
+      "boost": 14.53
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.00011,
+     "oil_agent": 0.01045,
+     "knock_agent": 0.0147
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01033,
+     "knock_agent": 0.03307
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 169410,
+      "wfuel_per_step": -0.00244,
+      "wlife_per_step": 0.00156
+     },
+     "500-715 C": {
+      "steps": 120261,
+      "wfuel_per_step": -0.00449,
+      "wlife_per_step": 3e-05
+     },
+     "715 C and over": {
+      "steps": 36068,
+      "wfuel_per_step": -0.01169,
+      "wlife_per_step": 0.04972
+     }
+    },
+    "damage": {
+     "steps": 325739,
+     "turb_base": 0.02686,
+     "oil_base": 0.01024,
+     "knock_base": 0.04085,
+     "turb_agent": 0.01884,
+     "oil_agent": 0.01034,
+     "knock_agent": 0.01914
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2414,
+     "spike_share_of_steps": 0.67,
+     "spike_share_of_knock": 98.0,
+     "torque_step_median": 85.8,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2414,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 34.5,
+       "knock_pct": 63.2
+      },
+      "slow-down ends": {
+       "spike_pct": 20.4,
+       "knock_pct": 22.5
+      },
+      "gear shift": {
+       "spike_pct": 37.9,
+       "knock_pct": 10.2
+      },
+      "grade ramp": {
+       "spike_pct": 7.2,
+       "knock_pct": 1.9
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.2
+      }
+     }
+    }
+   },
+   "practice_path": [
+    55.9,
+    59.94,
+    62.6,
+    71.76,
+    65.64,
+    71.06
+   ]
+  },
+  "blind_seed3": {
+   "cut": 46.01,
+   "training": {
+    "episodes": 1201,
+    "binding": 136,
+    "scored_like": 12,
+    "cold": 504,
+    "thin": 551,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 44,
+      "hot_cut": 31.9,
+      "cool_over": 4.6,
+      "cold_over": 4.97,
+      "cool_lam": 0.002
+     },
+     {
+      "n": 400,
+      "n_binding": 53,
+      "hot_cut": 40.3,
+      "cool_over": 4.28,
+      "cold_over": 4.08,
+      "cool_lam": 0.018
+     },
+     {
+      "n": 401,
+      "n_binding": 39,
+      "hot_cut": 48.4,
+      "cool_over": 2.77,
+      "cold_over": 2.59,
+      "cool_lam": 0.029
+     }
+    ],
+    "scored_like_cut_last_third": 58.9,
+    "scored_like_n_last_third": 3
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0031,
+     "mid": 0.0019,
+     "last": 0.0013
+    },
+    "critic_loss": {
+     "first": 0.0194,
+     "mid": 0.0246,
+     "last": 0.0288
+    },
+    "actor_loss": {
+     "first": -4.5,
+     "mid": -2.13,
+     "last": -1.265
+    },
+    "ep_rew_mean": {
+     "first": -31.65,
+     "mid": -3.18,
+     "last": -12.2
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.352,
+    "critic_loss_min_entry": 0.0054,
+    "critic_loss_max_entry": 0.549
+   },
+   "scored": {
+    "pre_dlam": 0.0011,
+    "pre_dboost": -2.82,
+    "track_175_240": -0.088,
+    "life_175_240": -0.093,
+    "short_175_240": 0.0,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": 0.019,
+    "pre_boost": -15.24,
+    "climb_spark": -1.96,
+    "climb_lam": -0.122,
+    "climb_boost": 9.5,
+    "climb_fan": 0.26,
+    "worse": [
+     {
+      "episode": 13,
+      "w_life": 0.034,
+      "damage": 1210.3,
+      "base": 848.1,
+      "fuel_over": 8.15,
+      "climb_spark": -4.68,
+      "climb_lam": -0.027,
+      "climb_boost": 11.2
+     },
+     {
+      "episode": 15,
+      "w_life": 0.029,
+      "damage": 1713.1,
+      "base": 848.1,
+      "fuel_over": 8.8,
+      "climb_spark": -5.82,
+      "climb_lam": -0.021,
+      "climb_boost": 11.2
+     },
+     {
+      "episode": 16,
+      "w_life": 0.049,
+      "damage": 1169.9,
+      "base": 848.1,
+      "fuel_over": 7.7,
+      "climb_spark": -4.46,
+      "climb_lam": -0.028,
+      "climb_boost": 9.7
+     },
+     {
+      "episode": 17,
+      "w_life": 0.062,
+      "damage": 1360.4,
+      "base": 848.1,
+      "fuel_over": 8.49,
+      "climb_spark": -5.1,
+      "climb_lam": -0.028,
+      "climb_boost": 11.0
+     }
+    ]
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 0,
+    "F_fail": 9,
+    "fuel_over_median": 2.75,
+    "fuel_over_life_most": 7.12,
+    "fuel_over_life_least": 1.03,
+    "cold_spark": -0.3,
+    "cold_lam": 0.0052,
+    "cold_boost": -21.58,
+    "cold_fan": 0.354
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 55.7,
+      "wfuel_per_step": 0.00024,
+      "wlife_per_step": 0.00017,
+      "lam": 0.0362,
+      "spark": 0.0,
+      "boost": -18.2
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 43.5,
+      "wfuel_per_step": -0.00135,
+      "wlife_per_step": 4e-05,
+      "lam": 0.0344,
+      "spark": -1.32,
+      "boost": -11.67
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 0.8,
+      "wfuel_per_step": 0.0065,
+      "wlife_per_step": 0.00052,
+      "lam": 0.0416,
+      "spark": -1.5,
+      "boost": -18.85
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 75.6,
+      "wfuel_per_step": -0.00219,
+      "wlife_per_step": 0.00352,
+      "lam": -0.0306,
+      "spark": -1.74,
+      "boost": -34.88
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 24.5,
+      "wfuel_per_step": -0.00246,
+      "wlife_per_step": 0.00314,
+      "lam": -0.0691,
+      "spark": 0.0,
+      "boost": -0.64
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -0.2,
+      "wfuel_per_step": 0.00034,
+      "wlife_per_step": 0.05594,
+      "lam": 0.0585,
+      "spark": -1.5,
+      "boost": 14.05
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.0001,
+     "oil_agent": 0.0104,
+     "knock_agent": 0.03006
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01033,
+     "knock_agent": 0.03354
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 169410,
+      "wfuel_per_step": -0.00296,
+      "wlife_per_step": 0.00156
+     },
+     "500-715 C": {
+      "steps": 120261,
+      "wfuel_per_step": -0.00522,
+      "wlife_per_step": 0.00213
+     },
+     "715 C and over": {
+      "steps": 36068,
+      "wfuel_per_step": -0.01534,
+      "wlife_per_step": 0.04797
+     }
+    },
+    "damage": {
+     "steps": 325739,
+     "turb_base": 0.02686,
+     "oil_base": 0.01024,
+     "knock_base": 0.04085,
+     "turb_agent": 0.01979,
+     "oil_agent": 0.01034,
+     "knock_agent": 0.01726
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2414,
+     "spike_share_of_steps": 0.67,
+     "spike_share_of_knock": 98.0,
+     "torque_step_median": 85.8,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2414,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 34.5,
+       "knock_pct": 63.2
+      },
+      "slow-down ends": {
+       "spike_pct": 20.4,
+       "knock_pct": 22.5
+      },
+      "gear shift": {
+       "spike_pct": 37.9,
+       "knock_pct": 10.2
+      },
+      "grade ramp": {
+       "spike_pct": 7.2,
+       "knock_pct": 1.9
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.2
+      }
+     }
+    }
+   },
+   "practice_path": [
+    59.97,
+    71.08,
+    33.13,
+    18.7,
+    51.79,
+    47.47
+   ]
+  },
+  "sighted_seed4": {
+   "cut": 48.44,
+   "training": {
+    "episodes": 1201,
+    "binding": 147,
+    "scored_like": 21,
+    "cold": 515,
+    "thin": 587,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 51.2,
+      "cool_over": 4.29,
+      "cold_over": 5.71,
+      "cool_lam": 0.015
+     },
+     {
+      "n": 400,
+      "n_binding": 55,
+      "hot_cut": 54.9,
+      "cool_over": 4.26,
+      "cold_over": 3.19,
+      "cool_lam": 0.023
+     },
+     {
+      "n": 401,
+      "n_binding": 44,
+      "hot_cut": 50.7,
+      "cool_over": 2.8,
+      "cold_over": 2.61,
+      "cool_lam": 0.031
+     }
+    ],
+    "scored_like_cut_last_third": 46.3,
+    "scored_like_n_last_third": 7
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0032,
+     "mid": 0.0013,
+     "last": 0.0009
+    },
+    "critic_loss": {
+     "first": 0.0175,
+     "mid": 0.0222,
+     "last": 0.0231
+    },
+    "actor_loss": {
+     "first": -4.95,
+     "mid": -0.987,
+     "last": -0.5535
+    },
+    "ep_rew_mean": {
+     "first": -19.55,
+     "mid": -0.314,
+     "last": -0.202
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.0076,
+    "critic_loss_max_entry": 0.479
+   },
+   "scored": {
+    "pre_dlam": -0.0527,
+    "pre_dboost": -3.82,
+    "track_175_240": -0.118,
+    "life_175_240": 0.136,
+    "short_175_240": 0.1,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": -0.0891,
+    "pre_boost": -25.4,
+    "climb_spark": 0.0,
+    "climb_lam": -0.055,
+    "climb_boost": -12.8,
+    "climb_fan": 0.34,
+    "worse": [
+     {
+      "episode": 2,
+      "w_life": 0.136,
+      "damage": 870.5,
+      "base": 848.1,
+      "fuel_over": 1.3,
+      "climb_spark": 0.0,
+      "climb_lam": 0.0,
+      "climb_boost": -11.3
+     }
+    ]
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 3,
+    "F_fail": 6,
+    "fuel_over_median": 3.12,
+    "fuel_over_life_most": 6.08,
+    "fuel_over_life_least": 0.21,
+    "cold_spark": -0.75,
+    "cold_lam": 0.0223,
+    "cold_boost": 1.88,
+    "cold_fan": 0.536
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 51.1,
+      "wfuel_per_step": -0.00048,
+      "wlife_per_step": 0.00013,
+      "lam": 0.0224,
+      "spark": 0.0,
+      "boost": 11.18
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 50.8,
+      "wfuel_per_step": -0.00023,
+      "wlife_per_step": -5e-05,
+      "lam": 0.0258,
+      "spark": 0.0,
+      "boost": 10.75
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -1.9,
+      "wfuel_per_step": 0.00126,
+      "wlife_per_step": -0.00236,
+      "lam": 0.0174,
+      "spark": 0.0,
+      "boost": -1.22
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 69.6,
+      "wfuel_per_step": -0.0013,
+      "wlife_per_step": 0.00413,
+      "lam": 0.041,
+      "spark": -6.93,
+      "boost": -20.0
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 30.0,
+      "wfuel_per_step": -0.00215,
+      "wlife_per_step": 0.00238,
+      "lam": -0.0477,
+      "spark": -1.5,
+      "boost": 0.38
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": 0.4,
+      "wfuel_per_step": -0.00279,
+      "wlife_per_step": -0.00058,
+      "lam": -0.1071,
+      "spark": 0.0,
+      "boost": -19.28
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 0.00013,
+     "oil_agent": 0.01043,
+     "knock_agent": 0.00942
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01033,
+     "knock_agent": 0.04892
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 156151,
+      "wfuel_per_step": -0.00194,
+      "wlife_per_step": 0.00214
+     },
+     "500-715 C": {
+      "steps": 124484,
+      "wfuel_per_step": -0.00466,
+      "wlife_per_step": 0.00308
+     },
+     "715 C and over": {
+      "steps": 40609,
+      "wfuel_per_step": -0.01767,
+      "wlife_per_step": 0.07138
+     }
+    },
+    "damage": {
+     "steps": 321244,
+     "turb_base": 0.02987,
+     "oil_base": 0.01028,
+     "knock_base": 0.04084,
+     "turb_agent": 0.0198,
+     "oil_agent": 0.01042,
+     "knock_agent": 0.01827
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2543,
+     "spike_share_of_steps": 0.7,
+     "spike_share_of_knock": 97.9,
+     "torque_step_median": 84.1,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2543,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 33.1,
+       "knock_pct": 60.0
+      },
+      "slow-down ends": {
+       "spike_pct": 21.0,
+       "knock_pct": 25.0
+      },
+      "gear shift": {
+       "spike_pct": 37.8,
+       "knock_pct": 10.8
+      },
+      "grade ramp": {
+       "spike_pct": 8.0,
+       "knock_pct": 2.1
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.1
+      }
+     }
+    }
+   },
+   "practice_path": [
+    38.84,
+    68.75,
+    70.57,
+    71.57,
+    72.57,
+    42.17
+   ]
+  },
+  "blind_seed4": {
+   "cut": 51.78,
+   "training": {
+    "episodes": 1201,
+    "binding": 147,
+    "scored_like": 21,
+    "cold": 515,
+    "thin": 587,
+    "thirds": [
+     {
+      "n": 400,
+      "n_binding": 48,
+      "hot_cut": 42.4,
+      "cool_over": 3.61,
+      "cold_over": 3.96,
+      "cool_lam": 0.015
+     },
+     {
+      "n": 400,
+      "n_binding": 55,
+      "hot_cut": 51.0,
+      "cool_over": 4.12,
+      "cold_over": 3.83,
+      "cool_lam": 0.019
+     },
+     {
+      "n": 401,
+      "n_binding": 44,
+      "hot_cut": 50.4,
+      "cool_over": 3.27,
+      "cold_over": 3.47,
+      "cool_lam": 0.028
+     }
+    ],
+    "scored_like_cut_last_third": 50.1,
+    "scored_like_n_last_third": 7
+   },
+   "sb3": {
+    "ent_coef": {
+     "first": 0.0029,
+     "mid": 0.0014,
+     "last": 0.001
+    },
+    "critic_loss": {
+     "first": 0.0126,
+     "mid": 0.0222,
+     "last": 0.0187
+    },
+    "actor_loss": {
+     "first": -4.395,
+     "mid": -1.25,
+     "last": -0.9445
+    },
+    "ep_rew_mean": {
+     "first": -21.8,
+     "mid": -5.39,
+     "last": -0.0878
+    },
+    "entries": 300,
+    "ent_coef_first_entry": 0.351,
+    "critic_loss_min_entry": 0.0046,
+    "critic_loss_max_entry": 1.18
+   },
+   "scored": {
+    "pre_dlam": 0.0125,
+    "pre_dboost": 0.76,
+    "track_175_240": -0.508,
+    "life_175_240": -0.565,
+    "short_175_240": 0.2,
+    "onset_median": 120.0,
+    "onset_none": 0,
+    "pre_lam": -0.0343,
+    "pre_boost": -0.69,
+    "climb_spark": 0.0,
+    "climb_lam": -0.089,
+    "climb_boost": -20.7,
+    "climb_fan": 0.82,
+    "worse": []
+   },
+   "logged": {
+    "runs": 12,
+    "T_fail": 1,
+    "F_fail": 10,
+    "fuel_over_median": 2.2,
+    "fuel_over_life_most": 8.32,
+    "fuel_over_life_least": 2.04,
+    "cold_spark": 0.0,
+    "cold_lam": 0.0029,
+    "cold_boost": -19.21,
+    "cold_fan": 0.453
+   },
+   "logged_bands": {
+    "ep15": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 60.9,
+      "wfuel_per_step": -0.00269,
+      "wlife_per_step": 0.00019,
+      "lam": 0.0174,
+      "spark": 0.0,
+      "boost": -15.18
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 41.7,
+      "wfuel_per_step": -0.00731,
+      "wlife_per_step": -6e-05,
+      "lam": -0.0144,
+      "spark": 0.0,
+      "boost": -10.4
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -2.6,
+      "wfuel_per_step": -0.01758,
+      "wlife_per_step": -0.00311,
+      "lam": -0.0716,
+      "spark": 0.0,
+      "boost": -14.48
+     }
+    },
+    "ep4": {
+     "under 500 C": {
+      "steps": 13589,
+      "extra_share": 97.0,
+      "wfuel_per_step": -0.00327,
+      "wlife_per_step": 0.00242,
+      "lam": -0.1007,
+      "spark": -3.74,
+      "boost": -36.05
+     },
+     "500-715 C": {
+      "steps": 2564,
+      "extra_share": 3.4,
+      "wfuel_per_step": -0.00048,
+      "wlife_per_step": -0.00088,
+      "lam": 0.0241,
+      "spark": 0.0,
+      "boost": -21.47
+     },
+     "715 C and over": {
+      "steps": 29,
+      "extra_share": -0.4,
+      "wfuel_per_step": 0.00025,
+      "wlife_per_step": -0.06179,
+      "lam": 0.0534,
+      "spark": 0.0,
+      "boost": -7.85
+     }
+    }
+   },
+   "logged_damage": {
+    "ep4": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01046,
+     "knock_agent": 0.01441
+    },
+    "ep15": {
+     "steps": 13589,
+     "turb_base": 9e-05,
+     "oil_base": 0.01032,
+     "knock_base": 0.06046,
+     "turb_agent": 9e-05,
+     "oil_agent": 0.01037,
+     "knock_agent": 0.03014
+    }
+   },
+   "training_cool": {
+    "reward": {
+     "under 500 C": {
+      "steps": 156151,
+      "wfuel_per_step": -0.00226,
+      "wlife_per_step": 0.00192
+     },
+     "500-715 C": {
+      "steps": 124484,
+      "wfuel_per_step": -0.00536,
+      "wlife_per_step": 0.00287
+     },
+     "715 C and over": {
+      "steps": 40609,
+      "wfuel_per_step": -0.01631,
+      "wlife_per_step": 0.06225
+     }
+    },
+    "damage": {
+     "steps": 321244,
+     "turb_base": 0.02987,
+     "oil_base": 0.01028,
+     "knock_base": 0.04084,
+     "turb_agent": 0.02055,
+     "oil_agent": 0.0104,
+     "knock_agent": 0.01997
+    },
+    "knock_spikes": {
+     "steps": 360800,
+     "spike_steps": 2543,
+     "spike_share_of_steps": 0.7,
+     "spike_share_of_knock": 97.9,
+     "torque_step_median": 84.1,
+     "on_rise_20": 100.0,
+     "n_rise_20": 2543,
+     "causes": {
+      "speed-up starts": {
+       "spike_pct": 33.1,
+       "knock_pct": 60.0
+      },
+      "slow-down ends": {
+       "spike_pct": 21.0,
+       "knock_pct": 25.0
+      },
+      "gear shift": {
+       "spike_pct": 37.8,
+       "knock_pct": 10.8
+      },
+      "grade ramp": {
+       "spike_pct": 8.0,
+       "knock_pct": 2.1
+      },
+      "none of these": {
+       "spike_pct": 0.0,
+       "knock_pct": 0.1
+      }
+     }
+    }
+   },
+   "practice_path": [
+    57.27,
+    69.72,
+    72.21,
+    60.64,
+    70.06,
+    64.4
+   ]
+  }
+ },
+ "ecu_knock": {
+  "steps": 13589,
+  "ki_median": 0.399,
+  "above_085_pct": 1.4,
+  "above_1_pct": 0.7,
+  "knock_term_mean": 0.0604,
+  "share_above_15": 50.9,
+  "share_first_steps": 16.1,
+  "share_spikes": 83.9,
+  "spikes": 194,
+  "spikes_on_rise_20": 194,
+  "torque_step_median": 75.3,
+  "torque_step_typical": 3.6,
+  "map_step_median": 30.0,
+  "ki_max": 2.34
+ },
+ "logged_all": {
+  "life_most": {
+   "episode": 4,
+   "runs": 60,
+   "over_1pct": 59,
+   "median": 6.92,
+   "worst": 20.12
+  },
+  "life_least": {
+   "episode": 15,
+   "runs": 60,
+   "over_1pct": 21,
+   "median": 0.39,
+   "worst": 4.67
+  }
+ },
+ "trajectory": {
+  "sighted_seed0@180000": 63.97,
+  "sighted_seed0@360000": 54.37,
+  "sighted_seed0@540000": 62.47,
+  "blind_seed0@180000": 66.41,
+  "blind_seed0@360000": 70.21,
+  "blind_seed0@540000": 69.79,
+  "sighted_seed1@180000": 64.91,
+  "sighted_seed1@360000": 66.72,
+  "sighted_seed1@540000": 53.17,
+  "blind_seed1@180000": 33.91,
+  "blind_seed1@360000": 50.22,
+  "blind_seed1@540000": 71.14,
+  "sighted_seed2@180000": 68.98,
+  "sighted_seed2@360000": 58.44,
+  "sighted_seed2@540000": 36.96,
+  "blind_seed2@180000": 29.01,
+  "blind_seed2@360000": -17.44,
+  "blind_seed2@540000": 26.74,
+  "sighted_seed3@180000": 55.9,
+  "sighted_seed3@360000": 59.94,
+  "sighted_seed3@540000": 62.6,
+  "blind_seed3@180000": 59.97,
+  "blind_seed3@360000": 71.08,
+  "blind_seed3@540000": 33.13,
+  "sighted_seed4@180000": 38.84,
+  "sighted_seed4@360000": 68.75,
+  "sighted_seed4@540000": 70.57,
+  "blind_seed4@180000": 57.27,
+  "blind_seed4@360000": 69.72,
+  "blind_seed4@540000": 72.21
+ }
+}

@@ -5,6 +5,7 @@
 ```bash
 python analyse_x2.py            # X2's preregistered test -> X2_RESULT.txt, X2_RESULT.json
 python check_x2_convergence.py  # had the agents settled? -> x2_convergence.txt
+python x2_agents.py             # what the agents did, and why X2 failed -> x2_agents.json (X2_AGENTS.md)
 ```
 
 `PREREGISTRATION_X2.md`, committed `06f4686` before any X2 agent trained. X1's
@@ -29,8 +30,16 @@ Four changes at once against X1, so X2 against X1 is descriptive (its section 2)
 - **The logged-drive check:** 0 of 10 pass; with life weighted most, 59 of 60
   runs burn more than 1 % over the ECU car (median +6.92 %), more than X1's
   (`logged_check_wideair_dt1.json`). **The probe:** no agent passes.
-- **Transfer, descriptive:** re-run on 13 October after its harness was fixed
-  (`conditions_wideair_dt1/`).
+- **Transfer, descriptive** (five episodes a condition, `conditions_wideair_dt1/`):
+  held out, 8 of 10 beat that condition's `current-grade` at 50 °C, 6 of 10 at
+  76 kPa (partly by refusing torque there) and 5 of 10 at 25 °C on the 21.75 %
+  hill (X1: 26, 25 and 30 of 46); one agent does more damage than its baseline
+  ECU (sighted seed 2, 25 °C).
+- **Why it failed, measured after the result** (`X2_AGENTS.md`): the sighted
+  agents use the preview in opposite directions on a climb training rarely drew;
+  the policies never settled (practice cuts span 6.0–88.5 points along training);
+  and the extra fuel buys off the baseline ECU's one-step knock spike at every
+  jump in the torque request, charged by the untested knock model.
 
 Every agent: `agents/wideair_dt1/README.md`. The scoring log:
 `x2_score/SCORE_LOG.txt`. The full account: `PREREGISTRATION_X2.md` section 12.

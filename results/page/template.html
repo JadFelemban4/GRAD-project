@@ -298,6 +298,7 @@ html{scroll-behavior:smooth}
     <ol>
       <li><b>X2 is INCONCLUSIVE, and its agents had not settled.</b> X1's design in wider air ({{x2.t_lo|.0f}}–{{x2.t_hi|.0f}} °C, {{x2.p_lo|.0f}}–{{x2.p_hi|.1f}} kPa), five seeds a side, {{x2.episodes|,}} episodes each. {{x2.res.readings.total.k}} of {{x2.res.readings.total.n}} pairs favour preview, mean {{x2.res.readings.total.mean|+.2f}} points, sd {{x2.res.readings.total.sd|.2f}}: a spread at which a test needs {{x2.seeds80}} seeds. By C4's rule {{x2.conv.pairs_settled}} of {{x2.conv.n}} pairs had settled; the agents were still changing. <a href="#x2">X2</a></li>
       <li><b>Wider air did not teach restraint on the car's own drives.</b> {{x2.res.logged.s_ok}} of {{x2.res.logged.n_s}} sighted and {{x2.res.logged.b_ok}} of {{x2.res.logged.n_b}} blinded agents pass the logged-drive check; with life weighted most, {{x2.res.logged.per_w.most.f_fail}} of {{x2.res.logged.per_w.most.n}} runs burn more than 1 % over the ECU car (median {{x2.res.logged.per_w.most.med|+.2f}} %). {{x2.res.supervision.beat}} of {{x2.res.supervision.n}} agents beat current-grade on the scored climb; none passes the probe.</li>
+      <li><b>Why it failed, measured after the result.</b> The sighted agents use the preview in opposite directions, on a climb whose air X2 drew on {{x2.why.scored_like_lo|.1f}}–{{x2.why.scored_like_hi|.1f}} % of its episodes; the policies kept swinging ({{x2.why.span_lo|.1f}}–{{x2.why.span_hi|.1f}} points along training); and the extra fuel buys off the baseline ECU's one-step knock spike at every jump in the torque request, which the untested knock model charges. <a href="#f-x2-why">Why X2 failed</a></li>
       <li><b>Two of X1's rules had to follow the air, found before any agent trained.</b> In 0 °C air the engine makes 20.6 Nm with the throttle shut, more than X1's 15 Nm road floor; and at 80 kPa the gearbox's sea-level table held a gear the engine could no longer pull. Both now follow the air; at sea level the design is the plant to the bit.</li>
     </ol>
   </div>
@@ -406,6 +407,21 @@ html{scroll-behavior:smooth}
     </div>
     <div class="tbl-wrap" id="t-x2-transfer"></div>
     <p class="cap">X1's seven conditions, each on its own hill, frozen episodes 1, 5, 9, 13 and 17, against each condition's own baseline ECU and current-grade. Held out of X2's training: 50 °C, 76 kPa and the 25 °C condition's 21.75 % hill; 35 and 42 °C and 82 and 90 kPa are in its range. Five episodes a condition: descriptive. Its altitude is milder than X2's training in one more way, its gearbox kicking down on the sea-level table.</p>
+  </div>
+
+  <div class="fig" id="f-x2-why">
+    <div class="fig-head">
+      <h3>Why X2 failed, measured after the result</h3>
+      <p class="take">Three causes, each measured on the agents' outputs before it was written. Description, not a test: the preregistered reading above stands.</p>
+    </div>
+    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li><b>The sighted agents read the preview and use it in opposite directions.</b> As the hill comes into view every sighted agent moves its trims and no blinded one does; some add protection, others lean out and raise boost, and two of those then enrich about a quarter as deeply as their twins on the climb (the table). X2 drew the climb's air on {{x2.why.scored_like_lo|.1f}}–{{x2.why.scored_like_hi|.1f}} % of its training episodes, and its constant 130 km/h never.</li>
+      <li><b>The policies never settled.</b> Each agent's practice cut spans {{x2.why.span_lo|.1f}}–{{x2.why.span_hi|.1f}} points across six checkpoints from 180 000 to 1 080 000 steps, moving a median {{x2.why.move_med|.1f}} points between them: which way a pair reads depends on where each twin is in its swing when training stops.</li>
+      <li><b>The extra fuel buys off a knock spike.</b> On the car's drives with life weighted most, {{x2.why.share_lo|.1f}}–{{x2.why.share_hi|.1f}} % of each agent's extra fuel goes where the ECU car's housing is under 500 °C, and what the agents avoid there is knock: {{x2.why.knock_base|.3f}} a second for the ECU car, {{x2.why.knock_lo|.3f}}–{{x2.why.knock_hi|.3f}} for the agents. The baseline ECU schedules spark on the previous step's manifold pressure, so every jump in the torque request is a one-step knock spike; in training {{x2.why.speed_lo|.1f}}–{{x2.why.speed_hi|.1f}} % of the ECU car's knock falls where a speed change starts or ends (the chart), and no observation shows one coming. The knock model is untested against the car (drive C).</li>
+    </ol>
+    <div class="tbl-wrap" id="t-x2-why"></div>
+    <div class="chart" id="c-x2-knock"></div>
+    <p class="cap" id="x2-why-cap"></p>
   </div>
 </section>
 
@@ -2567,6 +2583,37 @@ if (X2 && X2.res) {
   } else {
     document.getElementById("x2-transfer-take").textContent =
       "Being scored: the first run stopped on its own harness check, which named agents by seeds X2 does not have; fixed and re-run on 13 October.";
+  }
+  const W2 = X2.why;
+  if (W2) {
+    table("t-x2-why", ["sighted agent", "Δlambda ahead", "twin's", "Δboost ahead, kPa", "twin's", "lambda on the climb", "twin's", "cut %", "twin's"],
+      W2.pairs.map(p => [`seed ${p.seed}`, f(p.s_dlam, 3, true), f(p.b_dlam, 3, true), f(p.s_dboost, 1, true), f(p.b_dboost, 1, true),
+                         f(p.s_lam, 3, true), f(p.b_lam, 3, true), f(p.s_cut, 1), f(p.b_cut, 1)]), [1, 2, 3, 4, 5, 6, 7, 8]);
+    mount("c-x2-knock", (host, w) => {
+      const CS = W2.causes.slice().sort((a, b) => b.med - a.med);
+      const row = 24, h = CS.length * row + 46, top = Math.max(...CS.map(c => c.hi));
+      const P = plot(host, { w, h, x: { d: [0, top * 1.6], label: "share of the ECU car's knock damage in training's last third, %" },
+        y: { d: [1, 0], none: true }, m: { l: 112, t: 10, r: 12 } });
+      CS.forEach((c, i) => {
+        const y0 = P.m.t + i * row + 3;
+        T(P.svg, 104, y0 + 12, c.name, { "text-anchor": "end", style: "fill:var(--ink-2);font-size:11px" });
+        const r = S("rect", { x: P.x(0), y: y0, width: Math.max(1, P.x(c.med) - P.x(0)), height: row - 8, rx: 2,
+                              style: "fill:var(--pd-base)" }, P.g);
+        T(P.g, P.x(c.med) + 5, y0 + 12, `${f(c.lo, 1)}–${f(c.hi, 1)} %`, { style: "fill:var(--ink-2);font-size:11px" });
+        markTip(P, r, P.x(c.med), y0 + 8, c.name, [{ c: "var(--pd-base)", v: `${f(c.lo, 1)}–${f(c.hi, 1)} %`, k: "of the ECU car's knock" }]);
+      });
+    }, () => 0);
+    document.getElementById("x2-why-cap").textContent =
+      `Table: each sighted agent beside its blinded twin. Ahead: how the lambda and boost trims change from 90–119 s to 150–179 s, ` +
+      `as the hill comes into the preview's 30 s (the twin cannot see it, so its change is drift); then the lambda trim on the climb, ` +
+      `where −0.15 is the limit, and the cut over the twenty frozen episodes. ` +
+      `Chart: where the ECU car's knock damage falls in the last third of training, by what the step coincides with; the bar is the median ` +
+      `of the five road sequences (a pair's twins share theirs), the label the range. ${W2.spikes_rise20} of ${W2.spikes} spike steps are ` +
+      `torque rises of 20 Nm or more. Does keeping a lever on in cold running pay? On the car's drives with life weighted most, for ` +
+      `${W2.pays_logged} of ${W2.n} agents; averaged over training's weights, for ${W2.pays_train} of ${W2.n}. ` +
+      `python x2_agents.py; the full account is results/X2_AGENTS.md.`;
+  } else {
+    document.getElementById("f-x2-why").hidden = true;
   }
 } else {
   document.getElementById("x2").hidden = true;

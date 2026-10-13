@@ -585,10 +585,57 @@ unattended by `x2_score.py` (`results/x2_score/SCORE_LOG.txt`).
   seed (sighted seed 6, blinded seed 9) and X2 has seeds 0-4. Fixed in
   `conditions_test.check_list` (a missing agent becomes the same arm at seed
   s mod the set's seed count; the 29 September and X1 checks unchanged) and
-  re-run; the harness then passed, 5 of 5 identical.
+  re-run (13:27-14:31, exit 0); the harness then passed, 5 of 5 identical.
+  Descriptive, five episodes a condition: held out, 8 of 10 agents beat that
+  condition's current-grade at 50 C, 6 of 10 at 76 kPa (partly by refusing
+  torque: a median of 48 of 719 steps short, one run 525) and 5 of 10 at 25 C
+  on the 21.75 % hill (X1: 26, 25 and 30 of 46); one agent does more damage
+  than its baseline ECU (sighted seed 2, 25 C).
 - The hills recompute beside training matched the copied file in all seven
   conditions, grades, peaks and curves.
 
 The results page has an X2 section (above X1's, newest first), read through
 `make_page.x1_results` on X2's files; X1's page data was checked identical
 after that function gained its two arguments.
+
+### 9.2 Why X2 failed, measured after the result (13 October)
+
+`python x2_agents.py` -> `results/x2_agents.json`, written up in
+`results/X2_AGENTS.md`. Description, never a test; nothing in the
+preregistration's reading changes. Three causes, each measured on the agents'
+outputs before it was written (mistake 24):
+
+1. **Preview used in opposite directions.** Every sighted agent changes its
+   trims as the climb comes into view, and no blinded one does; seeds 3 and 4
+   add protection, seeds 0-2 lean out and raise boost, and seeds 1 and 2 then
+   enrich about a quarter as deeply as their twins on the climb (lambda trim
+   -0.039 and -0.042 against -0.149). X2 drew the climb's air on 1-2 % of its
+   episodes and its constant 130 km/h never. The preview does buy closer
+   tracking (4 of 5 pairs), which a damage-only test cannot see.
+2. **Never settled.** Each agent's practice cut spans 6.0-88.5 points across six
+   checkpoints (180 000 to 1 080 000 steps), moving a median 8.6 points between
+   them; which way a pair reads depends on where each twin is in its swing.
+   Stable-baselines3's statistics show no divergence.
+3. **The fuel buys off a knock spike.** 56-97 % of each agent's extra fuel on
+   the car's drives goes where the ECU car's housing is under 500 C; there the
+   agents cut the knock term (0.060 -> 0.009-0.037 a second) and nothing else.
+   The knock comes from the baseline ECU's spark on the previous step's manifold
+   pressure, at every jump in the torque request: in training, 60-63 % of the
+   baseline's knock damage on the first step of a speed-up, 22.5-25 % on the
+   step a slow-down ends, 10-11 % on a gear shift, about 2 % on a grade ramp.
+   No observation shows a speed change coming, so a lever helps only if it is
+   already on.
+
+Three first readings the measuring corrected, recorded so they are not re-made:
+
+- *"The model's ECU runs just above the knock knee in ordinary driving."* Its
+  knock integral has a median of 0.40 there; the term sits on 1.4 % of steps,
+  every later one a torque-request jump of 20 Nm or more.
+- *"Training's speed changes produce the spike."* Written before it was
+  measured. The first classification then found only 5 % of spikes on an
+  acceleration, because it read the acceleration one step late:
+  `engine_env.step` serves (v[k+1] - v[k]) / dt, and the record holds v at the
+  step's start. Aligned, the shares above.
+- *"With life weighted most, the life term outweighs the fuel term in cold
+  running."* True for 8 of 10 agents on the car's drives with life weighted
+  most; averaged over training's weights, true for 1 of 10.

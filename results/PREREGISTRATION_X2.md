@@ -383,8 +383,13 @@ python sanity_probe.py runs/wideair_dt1
   (here sighted seed 1 and blinded seed 4); the 29 September and X1 checks are
   unchanged, every seed they name exists. No rule of this file changed.
 - **11:36.** Step 7 (`logged_check.py`) exit 0 after 60 min.
-- **13:40.** Step 6 re-run on the fixed harness; its reading is appended to
-  section 12 when it ends.
+- **13:27.** Step 6 re-run on the fixed harness; its reading is appended to
+  section 12 when it ends. *(Corrected 13 October: this entry said 13:40,
+  written from memory; the re-run's log file was created at 13:27.)*
+- **14:31.** Step 6 exit 0 after 64 minutes. Its harness check passed before and
+  after the battery: 5 of 5 frozen episodes on the locked climb equal their
+  committed scores. `results/conditions_wideair_dt1/conditions_test.json`,
+  `results/figures/conditions_test_wideair_dt1.png`; the reading is in 12b.
 
 ## 12. Outcome — added after the result, never above this line
 
@@ -440,4 +445,19 @@ episodes."* Never "preview does not help".
   +21.40 %); with life weighted least (episode 15), 21 of 60 (median +0.39 %).
   And unlike X1's agents, five of X2's fall short of the torque on some drive
   (blinded seeds 0 and 4, sighted seeds 1, 3 and 4).
-- **T, transfer:** running on the fixed harness (section 11).
+- **T, transfer (descriptive: five episodes a condition).** Held out: at 50 °C
+  **8 of 10** agents beat that condition's `current-grade` (X1: 26 of 46), at
+  76 kPa **6 of 10** (X1, which trained at 101.3 kPa only: 25 of 46), at 25 °C on
+  the 21.75 % hill **5 of 10** (X1: 30 of 46). In range: 9 of 10 at 35 °C, 7 of 10
+  at 42 °C, 10 of 10 at 82 kPa, 4 of 10 at 90 kPa. One agent does more damage than
+  its condition's baseline ECU, sighted seed 2 at 25 °C (X1: 0–3 a condition).
+  Only at 25 and 35 °C does `current-grade` deliver its torque (elsewhere it falls
+  under 95 % of the request on 16–297 of 719 steps); the agents fall short on a
+  median of 1–6 steps, except at 76 kPa: a median of 48, and sighted seed 4 on
+  frozen episode 5 on 525, so the agents' cuts there are partly torque refused.
+  Sighted minus blinded per condition (mean of the five pairs, 95 % interval):
+  −12.4 [−47.1, +22.4] at 25 °C to +17.5 [−16.3, +51.2] at 50 °C; only 90 kPa's
+  interval excludes zero (+15.2 [+5.0, +25.3]), one of seven, not a test.
+  `results/conditions_wideair_dt1/conditions_test.json`.
+- **What the agents did, measured after the result:** `results/X2_AGENTS.md`
+  (`python x2_agents.py`). Description, never a test; nothing above changes.

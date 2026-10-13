@@ -1200,7 +1200,48 @@ def x2():
         out["seeds80"] = next((k for k in range(5, 1001) if PA.power(res["mei"], t["sd"], k) >= 0.8), None)
         x1r = _load("X1_RESULT.json")["readings"]["total"]
         out["sd_x1"] = _r(x1r["sd"], 2)
+    out["why"] = x2_why()
     return out
+
+
+def x2_why():
+    """What X2's agents did, measured after the result (13 October 2026):
+    results/x2_agents.json, from `python x2_agents.py`, written up in
+    results/X2_AGENTS.md. Description, never a test. None until it exists."""
+    if not os.path.isfile(os.path.join(RES, "x2_agents.json")):
+        return None
+    A = _load("x2_agents.json")["agents"]
+    seeds = sorted({int(t.split("_seed")[1]) for t in A})
+    pairs = []
+    for s in seeds:
+        sg, bl = A[f"sighted_seed{s}"], A[f"blind_seed{s}"]
+        pairs.append(dict(seed=s, s_dlam=sg["scored"]["pre_dlam"], s_dboost=sg["scored"]["pre_dboost"],
+                          b_dlam=bl["scored"]["pre_dlam"], b_dboost=bl["scored"]["pre_dboost"],
+                          s_lam=sg["scored"]["climb_lam"], b_lam=bl["scored"]["climb_lam"],
+                          s_cut=sg["cut"], b_cut=bl["cut"]))
+    # a pair's twins drive the same roads beside the same baseline car: one sequence a seed
+    ks = [A[f"sighted_seed{s}"]["training_cool"]["knock_spikes"] for s in seeds]
+    causes = [dict(name=k, lo=min(x["causes"][k]["knock_pct"] for x in ks), hi=max(x["causes"][k]["knock_pct"] for x in ks),
+                   med=_r(float(np.median([x["causes"][k]["knock_pct"] for x in ks])), 1)) for k in ks[0]["causes"]]
+    speed = [x["causes"]["speed-up starts"]["knock_pct"] + x["causes"]["slow-down ends"]["knock_pct"] for x in ks]
+    paths = [a["practice_path"] for a in A.values()]
+    spans = [max(p) - min(p) for p in paths]
+    moves = [abs(b - a) for p in paths for a, b in zip(p, p[1:])]
+    cold = [a["logged_bands"]["ep4"]["under 500 C"] for a in A.values()]
+    train_cold = [a["training_cool"]["reward"]["under 500 C"] for a in A.values()]
+    kn = [a["logged_damage"]["ep4"] for a in A.values()]
+    sl = [100 * a["training"]["scored_like"] / a["training"]["episodes"] for a in A.values()]
+    return dict(n=len(A), pairs=pairs, causes=causes,
+                speed_lo=_r(min(speed), 1), speed_hi=_r(max(speed), 1),
+                spikes=sum(x["spike_steps"] for x in ks), spikes_rise20=sum(x["n_rise_20"] for x in ks),
+                span_lo=_r(min(spans), 1), span_hi=_r(max(spans), 1), move_med=_r(float(np.median(moves)), 1),
+                share_lo=min(c["extra_share"] for c in cold), share_hi=max(c["extra_share"] for c in cold),
+                share_med=_r(float(np.median([c["extra_share"] for c in cold])), 1),
+                knock_base=kn[0]["knock_base"], knock_lo=min(k["knock_agent"] for k in kn),
+                knock_hi=max(k["knock_agent"] for k in kn),
+                scored_like_lo=_r(min(sl), 1), scored_like_hi=_r(max(sl), 1),
+                pays_logged=int(sum(c["wlife_per_step"] > -c["wfuel_per_step"] for c in cold)),
+                pays_train=int(sum(c["wlife_per_step"] > -c["wfuel_per_step"] for c in train_cold)))
 
 
 def _src(path, *snippets):
