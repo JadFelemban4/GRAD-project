@@ -973,6 +973,14 @@ python analyse_x2.py       X2's preregistered test: INCONCLUSIVE, 1 of 5 pairs
                            dry run (INCONCLUSIVE, sd 26.82)
 python check_x2_convergence.py   X2's agents: NOT-CONVERGED (0 of 5 sighted, 1 of
                            5 blinded, 0 of 5 pairs settled) -> results/x2_convergence.txt
+python x2_agents.py        what X2's agents did and why X2 failed, measured after
+                           the result (description, never a test): preview used in
+                           opposite directions, practice cuts spanning 6.0-88.5
+                           points along training, 56.1-97.0 % of the extra fuel on
+                           the car's drives spent where the housing is cool, against
+                           the baseline ECU's one-step knock spike ->
+                           results/x2_agents.json, written up in results/X2_AGENTS.md;
+                           --trajectory also re-scores the 180k-540k checkpoints
 python test_wide_air.py    16 tests: X2's roads reduce to the plant at sea level,
                            leave every other environment alone, and follow the air
                            (inlet, torque floor, kickdown table); about 6 min
@@ -2999,6 +3007,9 @@ analyse_x2.py         X2's preregistered test (X1's rule, five pairs).
 check_x2_convergence.py  Had X2's agents settled? C4's rule at 720k/900k/1080k
                       steps, on ten practice episodes of the locked climb.
 x2_score.py           Scores X2 once its training has finished, unattended.
+x2_agents.py          What X2's agents did and why X2 failed, measured after
+                      the result -> results/x2_agents.json, written up in
+                      results/X2_AGENTS.md. Description, never a test.
 evaluate.py           The twenty frozen episodes. Prints the fingerprint from
                       the LIVE objects, writes it into the result file, and
                       REFUSES a model whose meta.json differs.
@@ -3076,8 +3087,8 @@ handoff.md            The short entry point: what to run, what it prints today.
 NEXT_CHAT_PROMPT.md   The prompt to paste into a new session. Not on this branch
                       since the merge of 30 September: handoff.md is the entry point.
 SESSION_REPORT_*.md   One per session, dated. 2026-10-08_records is the latest
-                      (it runs to 11 October: X1 trained, scored and transferred;
-                      X2 preregistered and launched).
+                      (it runs to 13 October: X1 trained, scored and transferred;
+                      X2 preregistered, trained, scored and explained).
 REFERENCES.md         Where every number we did not measure comes from. Written
                       for a non-specialist. Read before quoting a published band.
 DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
