@@ -1,0 +1,2733 @@
+{
+ "set": "wideair_dt1",
+ "generated": "2026-10-13 09:48",
+ "baseline_median_damage": 848.052,
+ "regression_checked": 280,
+ "policies": {
+  "baseline ECU": {
+   "damage": {
+    "median": 848.052,
+    "q1": 848.052,
+    "q3": 848.052,
+    "worst": 848.052,
+    "best": 848.052
+   },
+   "damage_thermal": {
+    "median": 845.602,
+    "q1": 845.602,
+    "q3": 845.602,
+    "worst": 845.602,
+    "best": 845.602
+   },
+   "fuel": {
+    "median": 4543.971,
+    "q1": 4543.971,
+    "q3": 4543.971,
+    "worst": 4543.971,
+    "best": 4543.971
+   },
+   "ret": {
+    "median": -0.174,
+    "q1": -0.262,
+    "q3": -0.111,
+    "worst": 0.052,
+    "best": -0.343
+   },
+   "torque_viol": {
+    "median": 0.004,
+    "q1": 0.004,
+    "q3": 0.004,
+    "worst": 0.004,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 883.018,
+    "q1": 883.018,
+    "q3": 883.018,
+    "worst": 883.018,
+    "best": 883.018
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": -0.0,
+   "thermal_cut_pct": 0.0,
+   "fuel_vs_baseline_pct": -0.0,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0,
+     "capped_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9912,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "reactive": {
+   "damage": {
+    "median": 559.724,
+    "q1": 559.724,
+    "q3": 559.724,
+    "worst": 559.724,
+    "best": 559.724
+   },
+   "damage_thermal": {
+    "median": 557.275,
+    "q1": 557.275,
+    "q3": 557.275,
+    "worst": 557.275,
+    "best": 557.275
+   },
+   "fuel": {
+    "median": 4683.224,
+    "q1": 4683.224,
+    "q3": 4683.224,
+    "worst": 4683.224,
+    "best": 4683.224
+   },
+   "ret": {
+    "median": 33.795,
+    "q1": 13.023,
+    "q3": 40.829,
+    "worst": 67.936,
+    "best": -3.198
+   },
+   "torque_viol": {
+    "median": 0.004,
+    "q1": 0.004,
+    "q3": 0.004,
+    "worst": 0.004,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 860.134,
+    "q1": 860.134,
+    "q3": 860.134,
+    "worst": 860.134,
+    "best": 860.134
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 33.999,
+   "thermal_cut_pct": 34.097,
+   "fuel_vs_baseline_pct": 3.065,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0,
+     "capped_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.0303,
+      "p5": -0.0411,
+      "p50": -0.041,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -5.4553,
+      "p5": -7.4027,
+      "p50": -7.3719,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9912,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "current-grade": {
+   "damage": {
+    "median": 449.625,
+    "q1": 449.625,
+    "q3": 449.625,
+    "worst": 449.625,
+    "best": 449.625
+   },
+   "damage_thermal": {
+    "median": 446.622,
+    "q1": 446.622,
+    "q3": 446.622,
+    "worst": 446.622,
+    "best": 446.622
+   },
+   "fuel": {
+    "median": 4809.898,
+    "q1": 4809.898,
+    "q3": 4809.898,
+    "worst": 4809.898,
+    "best": 4809.898
+   },
+   "ret": {
+    "median": 51.074,
+    "q1": 18.233,
+    "q3": 62.485,
+    "worst": 104.675,
+    "best": -8.166
+   },
+   "torque_viol": {
+    "median": 0.06,
+    "q1": 0.06,
+    "q3": 0.06,
+    "worst": 0.06,
+    "best": 0.06
+   },
+   "peak_turb": {
+    "median": 853.362,
+    "q1": 853.362,
+    "q3": 853.362,
+    "worst": 853.362,
+    "best": 853.362
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 46.981,
+   "thermal_cut_pct": 47.183,
+   "fuel_vs_baseline_pct": 5.852,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0,
+     "capped_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.0548,
+      "p5": -0.055,
+      "p50": -0.055,
+      "p95": -0.055
+     },
+     "slew_limited_pct": 0.0
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -9.8563,
+      "p5": -9.9,
+      "p50": -9.9,
+      "p95": -9.9
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9912,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "predictive (hand)": {
+   "damage": {
+    "median": 449.705,
+    "q1": 449.705,
+    "q3": 449.705,
+    "worst": 449.705,
+    "best": 449.705
+   },
+   "damage_thermal": {
+    "median": 446.317,
+    "q1": 446.317,
+    "q3": 446.317,
+    "worst": 446.317,
+    "best": 446.317
+   },
+   "fuel": {
+    "median": 4814.704,
+    "q1": 4814.704,
+    "q3": 4814.704,
+    "worst": 4814.704,
+    "best": 4814.704
+   },
+   "ret": {
+    "median": 50.388,
+    "q1": 17.482,
+    "q3": 61.894,
+    "worst": 103.953,
+    "best": -9.257
+   },
+   "torque_viol": {
+    "median": 0.067,
+    "q1": 0.067,
+    "q3": 0.067,
+    "worst": 0.067,
+    "best": 0.067
+   },
+   "peak_turb": {
+    "median": 853.362,
+    "q1": 853.362,
+    "q3": 853.362,
+    "worst": 853.362,
+    "best": 853.362
+   },
+   "knock": {
+    "median": 1.0,
+    "q1": 1.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 1.0
+   },
+   "cut_pct": 46.972,
+   "thermal_cut_pct": 47.219,
+   "fuel_vs_baseline_pct": 5.958,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": 0.0,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 0.0,
+     "capped_pct": 0.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0084,
+      "p5": -0.055,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.055,
+      "p5": -0.055,
+      "p50": -0.055,
+      "p95": -0.055
+     },
+     "slew_limited_pct": 0.0
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -1.511,
+      "p5": -9.9,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -9.9,
+      "p5": -9.9,
+      "p50": -9.9,
+      "p95": -9.9
+     },
+     "slew_limited_pct": 0.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9917,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.4
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.9912,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "climb": {
+      "mean": 1.0,
+      "p5": 1.0,
+      "p50": 1.0,
+      "p95": 1.0
+     },
+     "slew_limited_pct": 0.6
+    }
+   }
+  },
+  "sighted_seed0": {
+   "damage": {
+    "median": 240.243,
+    "q1": 236.854,
+    "q3": 340.408,
+    "worst": 749.409,
+    "best": 234.171
+   },
+   "damage_thermal": {
+    "median": 240.243,
+    "q1": 236.854,
+    "q3": 340.261,
+    "worst": 748.926,
+    "best": 233.02
+   },
+   "fuel": {
+    "median": 5462.741,
+    "q1": 5015.735,
+    "q3": 5491.021,
+    "worst": 5560.715,
+    "best": 4601.403
+   },
+   "ret": {
+    "median": 72.009,
+    "q1": 17.499,
+    "q3": 86.643,
+    "worst": 155.398,
+    "best": -5.559
+   },
+   "torque_viol": {
+    "median": 0.005,
+    "q1": 0.004,
+    "q3": 0.008,
+    "worst": 0.062,
+    "best": 0.003
+   },
+   "peak_turb": {
+    "median": 821.66,
+    "q1": 821.369,
+    "q3": 836.775,
+    "worst": 875.063,
+    "best": 821.185
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.0,
+    "best": 0.0
+   },
+   "cut_pct": 71.671,
+   "thermal_cut_pct": 71.589,
+   "fuel_vs_baseline_pct": 20.22,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -2.1397,
+      "p5": -6.3359,
+      "p50": -1.1148,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.0195,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 2.8,
+     "capped_pct": 86.4
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0017,
+      "p5": -0.145,
+      "p50": 0.0338,
+      "p95": 0.0581
+     },
+     "climb": {
+      "mean": -0.1067,
+      "p5": -0.1498,
+      "p50": -0.1469,
+      "p95": 0.0339
+     },
+     "slew_limited_pct": 2.6
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -8.4782,
+      "p5": -30.8945,
+      "p50": -4.4801,
+      "p95": 14.331
+     },
+     "climb": {
+      "mean": 5.7322,
+      "p5": -10.6571,
+      "p50": 10.461,
+      "p95": 13.3032
+     },
+     "slew_limited_pct": 1.1
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5979,
+      "p5": 0.0358,
+      "p50": 0.7295,
+      "p95": 0.9767
+     },
+     "climb": {
+      "mean": 0.6643,
+      "p5": 0.1668,
+      "p50": 0.6743,
+      "p95": 0.9825
+     },
+     "slew_limited_pct": 1.1
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.8099,
+      "p5": 0.3359,
+      "p50": 0.9853,
+      "p95": 0.9995
+     },
+     "climb": {
+      "mean": 0.5636,
+      "p5": 0.3076,
+      "p50": 0.5412,
+      "p95": 0.9774
+     },
+     "slew_limited_pct": 0.9
+    }
+   },
+   "config": {
+    "tag": "sighted_seed0",
+    "seed": 0,
+    "preview": true,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/sighted_seed0",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:33:17",
+    "wall_min_this_session": 3082.0,
+    "steps_per_s_this_session": 5.84,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed1": {
+   "damage": {
+    "median": 515.117,
+    "q1": 401.262,
+    "q3": 565.709,
+    "worst": 840.366,
+    "best": 235.519
+   },
+   "damage_thermal": {
+    "median": 514.817,
+    "q1": 401.155,
+    "q3": 565.704,
+    "worst": 839.697,
+    "best": 235.519
+   },
+   "fuel": {
+    "median": 4777.145,
+    "q1": 4740.195,
+    "q3": 4896.796,
+    "worst": 5557.645,
+    "best": 4594.217
+   },
+   "ret": {
+    "median": 35.889,
+    "q1": 15.789,
+    "q3": 42.583,
+    "worst": 156.141,
+    "best": -3.263
+   },
+   "torque_viol": {
+    "median": 0.032,
+    "q1": 0.016,
+    "q3": 0.048,
+    "worst": 0.072,
+    "best": 0.005
+   },
+   "peak_turb": {
+    "median": 858.649,
+    "q1": 847.614,
+    "q3": 863.993,
+    "worst": 882.688,
+    "best": 821.389
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.0,
+    "best": 0.0
+   },
+   "cut_pct": 39.259,
+   "thermal_cut_pct": 39.118,
+   "fuel_vs_baseline_pct": 5.132,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -2.6952,
+      "p5": -7.6979,
+      "p50": -0.9011,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.0834,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 2.3,
+     "capped_pct": 84.9
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0377,
+      "p5": -0.1151,
+      "p50": -0.0429,
+      "p95": 0.0533
+     },
+     "climb": {
+      "mean": -0.0535,
+      "p5": -0.1463,
+      "p50": -0.0379,
+      "p95": 0.0217
+     },
+     "slew_limited_pct": 26.1
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -18.2139,
+      "p5": -37.7768,
+      "p50": -23.2566,
+      "p95": 13.793
+     },
+     "climb": {
+      "mean": 3.481,
+      "p5": -11.5062,
+      "p50": 2.2667,
+      "p95": 14.4324
+     },
+     "slew_limited_pct": 1.4
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.7741,
+      "p5": 0.1663,
+      "p50": 0.871,
+      "p95": 0.9934
+     },
+     "climb": {
+      "mean": 0.5021,
+      "p5": 0.1542,
+      "p50": 0.4981,
+      "p95": 0.9142
+     },
+     "slew_limited_pct": 3.7
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5977,
+      "p5": 0.3095,
+      "p50": 0.566,
+      "p95": 0.9974
+     },
+     "climb": {
+      "mean": 0.4198,
+      "p5": 0.3007,
+      "p50": 0.3045,
+      "p95": 0.7997
+     },
+     "slew_limited_pct": 1.2
+    }
+   },
+   "config": {
+    "tag": "sighted_seed1",
+    "seed": 1,
+    "preview": true,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/sighted_seed1",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:31:14",
+    "wall_min_this_session": 3079.9,
+    "steps_per_s_this_session": 5.84,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed2": {
+   "damage": {
+    "median": 548.205,
+    "q1": 240.173,
+    "q3": 816.644,
+    "worst": 865.006,
+    "best": 229.361
+   },
+   "damage_thermal": {
+    "median": 546.667,
+    "q1": 239.36,
+    "q3": 815.276,
+    "worst": 864.252,
+    "best": 229.361
+   },
+   "fuel": {
+    "median": 4828.941,
+    "q1": 4604.574,
+    "q3": 5532.338,
+    "worst": 5645.387,
+    "best": 4581.246
+   },
+   "ret": {
+    "median": 43.562,
+    "q1": -3.147,
+    "q3": 78.832,
+    "worst": 161.99,
+    "best": -6.37
+   },
+   "torque_viol": {
+    "median": 0.019,
+    "q1": 0.015,
+    "q3": 0.027,
+    "worst": 0.052,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 866.438,
+    "q1": 823.06,
+    "q3": 880.419,
+    "worst": 883.078,
+    "best": 821.165
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 1.0,
+    "worst": 1.0,
+    "best": 0.0
+   },
+   "cut_pct": 35.357,
+   "thermal_cut_pct": 35.352,
+   "fuel_vs_baseline_pct": 6.271,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.336,
+      "p5": -1.9899,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.1462,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 2.1,
+     "capped_pct": 94.5
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0394,
+      "p5": -0.1305,
+      "p50": -0.0501,
+      "p95": 0.0516
+     },
+     "climb": {
+      "mean": -0.0639,
+      "p5": -0.1498,
+      "p50": -0.0416,
+      "p95": 0.038
+     },
+     "slew_limited_pct": 30.2
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -11.8061,
+      "p5": -23.5793,
+      "p50": -15.2308,
+      "p95": 14.3004
+     },
+     "climb": {
+      "mean": 0.8046,
+      "p5": -28.5796,
+      "p50": 9.2784,
+      "p95": 13.9262
+     },
+     "slew_limited_pct": 0.5
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5776,
+      "p5": 0.0232,
+      "p50": 0.6819,
+      "p95": 0.9287
+     },
+     "climb": {
+      "mean": 0.7857,
+      "p5": 0.0791,
+      "p50": 0.8759,
+      "p95": 0.9733
+     },
+     "slew_limited_pct": 1.6
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.8377,
+      "p5": 0.4614,
+      "p50": 0.9374,
+      "p95": 0.9992
+     },
+     "climb": {
+      "mean": 0.4939,
+      "p5": 0.3,
+      "p50": 0.3504,
+      "p95": 0.9678
+     },
+     "slew_limited_pct": 1.2
+    }
+   },
+   "config": {
+    "tag": "sighted_seed2",
+    "seed": 2,
+    "preview": true,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/sighted_seed2",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:17:28",
+    "wall_min_this_session": 3066.1,
+    "steps_per_s_this_session": 5.87,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed3": {
+   "damage": {
+    "median": 243.687,
+    "q1": 237.577,
+    "q3": 341.115,
+    "worst": 466.442,
+    "best": 234.277
+   },
+   "damage_thermal": {
+    "median": 243.424,
+    "q1": 237.274,
+    "q3": 340.514,
+    "worst": 465.935,
+    "best": 233.752
+   },
+   "fuel": {
+    "median": 5410.768,
+    "q1": 5008.579,
+    "q3": 5505.36,
+    "worst": 5623.715,
+    "best": 4791.343
+   },
+   "ret": {
+    "median": 74.412,
+    "q1": 18.228,
+    "q3": 87.399,
+    "worst": 149.809,
+    "best": -9.64
+   },
+   "torque_viol": {
+    "median": 0.013,
+    "q1": 0.01,
+    "q3": 0.037,
+    "worst": 0.09,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 822.884,
+    "q1": 821.311,
+    "q3": 838.647,
+    "worst": 854.034,
+    "best": 821.296
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.0,
+    "best": 0.0
+   },
+   "cut_pct": 71.265,
+   "thermal_cut_pct": 71.213,
+   "fuel_vs_baseline_pct": 19.076,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.9196,
+      "p5": -7.5131,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.1505,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 3.1,
+     "capped_pct": 92.0
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0335,
+      "p5": -0.056,
+      "p50": 0.0503,
+      "p95": 0.06
+     },
+     "climb": {
+      "mean": -0.1114,
+      "p5": -0.15,
+      "p50": -0.1351,
+      "p95": -0.0317
+     },
+     "slew_limited_pct": 24.1
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -3.3002,
+      "p5": -36.5299,
+      "p50": 1.6133,
+      "p95": 14.7353
+     },
+     "climb": {
+      "mean": -1.7323,
+      "p5": -24.0838,
+      "p50": 1.0052,
+      "p95": 12.9418
+     },
+     "slew_limited_pct": 1.3
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5232,
+      "p5": 0.0008,
+      "p50": 0.6268,
+      "p95": 0.9979
+     },
+     "climb": {
+      "mean": 0.7223,
+      "p5": 0.0294,
+      "p50": 0.9866,
+      "p95": 0.9995
+     },
+     "slew_limited_pct": 4.7
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.7345,
+      "p5": 0.3067,
+      "p50": 0.8392,
+      "p95": 0.9855
+     },
+     "climb": {
+      "mean": 0.4131,
+      "p5": 0.3021,
+      "p50": 0.3629,
+      "p95": 0.7188
+     },
+     "slew_limited_pct": 1.0
+    }
+   },
+   "config": {
+    "tag": "sighted_seed3",
+    "seed": 3,
+    "preview": true,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/sighted_seed3",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:23:23",
+    "wall_min_this_session": 3072.0,
+    "steps_per_s_this_session": 5.86,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "sighted_seed4": {
+   "damage": {
+    "median": 437.301,
+    "q1": 375.441,
+    "q3": 548.041,
+    "worst": 870.514,
+    "best": 305.12
+   },
+   "damage_thermal": {
+    "median": 437.28,
+    "q1": 375.306,
+    "q3": 547.813,
+    "worst": 870.495,
+    "best": 304.914
+   },
+   "fuel": {
+    "median": 4861.892,
+    "q1": 4783.726,
+    "q3": 5039.341,
+    "worst": 5198.785,
+    "best": 4603.235
+   },
+   "ret": {
+    "median": 33.984,
+    "q1": 4.002,
+    "q3": 66.612,
+    "worst": 135.887,
+    "best": -20.409
+   },
+   "torque_viol": {
+    "median": 0.011,
+    "q1": 0.005,
+    "q3": 0.035,
+    "worst": 0.167,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 850.872,
+    "q1": 847.848,
+    "q3": 860.35,
+    "worst": 882.923,
+    "best": 833.809
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 1.0,
+    "best": 0.0
+   },
+   "cut_pct": 48.435,
+   "thermal_cut_pct": 48.288,
+   "fuel_vs_baseline_pct": 6.997,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -4.0395,
+      "p5": -7.9641,
+      "p50": -4.5,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.1155,
+      "p5": -0.5434,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 3.3,
+     "capped_pct": 77.4
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0405,
+      "p5": -0.14,
+      "p50": -0.0206,
+      "p95": 0.0395
+     },
+     "climb": {
+      "mean": -0.0552,
+      "p5": -0.1048,
+      "p50": -0.0552,
+      "p95": 0.015
+     },
+     "slew_limited_pct": 28.7
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -19.0846,
+      "p5": -39.9378,
+      "p50": -30.0201,
+      "p95": 13.4037
+     },
+     "climb": {
+      "mean": -9.6255,
+      "p5": -18.0947,
+      "p50": -12.838,
+      "p95": 5.3664
+     },
+     "slew_limited_pct": 1.8
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4031,
+      "p5": 0.006,
+      "p50": 0.3368,
+      "p95": 0.9835
+     },
+     "climb": {
+      "mean": 0.411,
+      "p5": 0.011,
+      "p50": 0.3376,
+      "p95": 0.8723
+     },
+     "slew_limited_pct": 1.7
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4655,
+      "p5": 0.3005,
+      "p50": 0.3859,
+      "p95": 0.9671
+     },
+     "climb": {
+      "mean": 0.707,
+      "p5": 0.3082,
+      "p50": 0.7621,
+      "p95": 0.9966
+     },
+     "slew_limited_pct": 1.3
+    }
+   },
+   "config": {
+    "tag": "sighted_seed4",
+    "seed": 4,
+    "preview": true,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/sighted_seed4",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:29:59",
+    "wall_min_this_session": 3078.6,
+    "steps_per_s_this_session": 5.85,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed0": {
+   "damage": {
+    "median": 237.345,
+    "q1": 234.24,
+    "q3": 332.634,
+    "worst": 710.914,
+    "best": 233.205
+   },
+   "damage_thermal": {
+    "median": 237.131,
+    "q1": 234.24,
+    "q3": 332.391,
+    "worst": 709.899,
+    "best": 233.055
+   },
+   "fuel": {
+    "median": 5452.797,
+    "q1": 5074.581,
+    "q3": 5497.8,
+    "worst": 5518.226,
+    "best": 4602.766
+   },
+   "ret": {
+    "median": 73.617,
+    "q1": 16.865,
+    "q3": 88.522,
+    "worst": 152.829,
+    "best": -5.467
+   },
+   "torque_viol": {
+    "median": 0.057,
+    "q1": 0.047,
+    "q3": 0.105,
+    "worst": 0.157,
+    "best": 0.006
+   },
+   "peak_turb": {
+    "median": 821.73,
+    "q1": 821.334,
+    "q3": 835.26,
+    "worst": 873.025,
+    "best": 821.25
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.0,
+    "best": 0.0
+   },
+   "cut_pct": 72.013,
+   "thermal_cut_pct": 71.957,
+   "fuel_vs_baseline_pct": 20.001,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.671,
+      "p5": -5.5332,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.0505,
+      "p5": 0.0,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 1.2,
+     "capped_pct": 93.3
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0307,
+      "p5": -0.0302,
+      "p50": 0.041,
+      "p95": 0.0599
+     },
+     "climb": {
+      "mean": -0.1076,
+      "p5": -0.1498,
+      "p50": -0.1471,
+      "p95": -0.0019
+     },
+     "slew_limited_pct": 5.2
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 1.576,
+      "p5": -20.0,
+      "p50": 3.0637,
+      "p95": 14.6192
+     },
+     "climb": {
+      "mean": 3.957,
+      "p5": -19.5513,
+      "p50": 8.6979,
+      "p95": 14.9902
+     },
+     "slew_limited_pct": 1.5
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6751,
+      "p5": 0.1821,
+      "p50": 0.794,
+      "p95": 0.9709
+     },
+     "climb": {
+      "mean": 0.556,
+      "p5": 0.1646,
+      "p50": 0.5374,
+      "p95": 0.9626
+     },
+     "slew_limited_pct": 1.5
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.8586,
+      "p5": 0.3003,
+      "p50": 0.9535,
+      "p95": 0.998
+     },
+     "climb": {
+      "mean": 0.8578,
+      "p5": 0.3315,
+      "p50": 0.9162,
+      "p95": 0.9969
+     },
+     "slew_limited_pct": 0.9
+    }
+   },
+   "config": {
+    "tag": "blind_seed0",
+    "seed": 0,
+    "preview": false,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/blind_seed0",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:40:55",
+    "wall_min_this_session": 3089.7,
+    "steps_per_s_this_session": 5.83,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed1": {
+   "damage": {
+    "median": 249.62,
+    "q1": 237.849,
+    "q3": 432.102,
+    "worst": 918.276,
+    "best": 231.325
+   },
+   "damage_thermal": {
+    "median": 249.62,
+    "q1": 237.414,
+    "q3": 431.952,
+    "worst": 917.461,
+    "best": 231.325
+   },
+   "fuel": {
+    "median": 5535.196,
+    "q1": 5167.912,
+    "q3": 5572.713,
+    "worst": 5641.806,
+    "best": 4634.917
+   },
+   "ret": {
+    "median": 64.894,
+    "q1": 15.626,
+    "q3": 77.482,
+    "worst": 148.684,
+    "best": -8.34
+   },
+   "torque_viol": {
+    "median": 0.158,
+    "q1": 0.026,
+    "q3": 0.214,
+    "worst": 0.439,
+    "best": 0.009
+   },
+   "peak_turb": {
+    "median": 821.986,
+    "q1": 821.476,
+    "q3": 841.076,
+    "worst": 885.935,
+    "best": 821.316
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.0,
+    "best": 0.0
+   },
+   "cut_pct": 70.565,
+   "thermal_cut_pct": 70.48,
+   "fuel_vs_baseline_pct": 21.814,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -1.0764,
+      "p5": -6.661,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.3476,
+      "p5": -2.4511,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 1.6,
+     "capped_pct": 78.8
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0541,
+      "p5": 0.0296,
+      "p50": 0.0599,
+      "p95": 0.06
+     },
+     "climb": {
+      "mean": -0.0943,
+      "p5": -0.1499,
+      "p50": -0.1492,
+      "p95": 0.0577
+     },
+     "slew_limited_pct": 2.3
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -16.0403,
+      "p5": -38.2237,
+      "p50": -17.9361,
+      "p95": 13.4584
+     },
+     "climb": {
+      "mean": -4.8519,
+      "p5": -25.6719,
+      "p50": -3.3312,
+      "p95": 6.3536
+     },
+     "slew_limited_pct": 2.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.8862,
+      "p5": 0.5624,
+      "p50": 0.9807,
+      "p95": 0.9994
+     },
+     "climb": {
+      "mean": 0.7944,
+      "p5": 0.3037,
+      "p50": 0.9105,
+      "p95": 0.9788
+     },
+     "slew_limited_pct": 0.8
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4437,
+      "p5": 0.3013,
+      "p50": 0.3191,
+      "p95": 0.855
+     },
+     "climb": {
+      "mean": 0.4236,
+      "p5": 0.3086,
+      "p50": 0.3285,
+      "p95": 0.9082
+     },
+     "slew_limited_pct": 1.1
+    }
+   },
+   "config": {
+    "tag": "blind_seed1",
+    "seed": 1,
+    "preview": false,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/blind_seed1",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:31:34",
+    "wall_min_this_session": 3080.3,
+    "steps_per_s_this_session": 5.84,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed2": {
+   "damage": {
+    "median": 444.065,
+    "q1": 305.035,
+    "q3": 593.265,
+    "worst": 749.751,
+    "best": 242.44
+   },
+   "damage_thermal": {
+    "median": 443.443,
+    "q1": 304.335,
+    "q3": 592.659,
+    "worst": 749.221,
+    "best": 241.831
+   },
+   "fuel": {
+    "median": 5646.06,
+    "q1": 5273.756,
+    "q3": 5766.835,
+    "worst": 5955.818,
+    "best": 4618.589
+   },
+   "ret": {
+    "median": 35.433,
+    "q1": 1.152,
+    "q3": 56.576,
+    "worst": 155.12,
+    "best": -28.99
+   },
+   "torque_viol": {
+    "median": 0.033,
+    "q1": 0.024,
+    "q3": 0.058,
+    "worst": 0.086,
+    "best": 0.009
+   },
+   "peak_turb": {
+    "median": 857.16,
+    "q1": 832.913,
+    "q3": 868.835,
+    "worst": 877.293,
+    "best": 822.034
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 1.0,
+    "best": 0.0
+   },
+   "cut_pct": 47.637,
+   "thermal_cut_pct": 47.559,
+   "fuel_vs_baseline_pct": 24.254,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -2.1748,
+      "p5": -6.2963,
+      "p50": -1.1776,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -2.1502,
+      "p5": -7.4373,
+      "p50": -0.9909,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 1.4,
+     "capped_pct": 33.9
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.019,
+      "p5": -0.0738,
+      "p50": 0.0418,
+      "p95": 0.0583
+     },
+     "climb": {
+      "mean": -0.1089,
+      "p5": -0.1499,
+      "p50": -0.1486,
+      "p95": 0.0007
+     },
+     "slew_limited_pct": 9.1
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -6.7582,
+      "p5": -26.6475,
+      "p50": -4.6582,
+      "p95": 12.0331
+     },
+     "climb": {
+      "mean": 6.9475,
+      "p5": -23.5084,
+      "p50": 12.5711,
+      "p95": 14.7854
+     },
+     "slew_limited_pct": 1.3
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5132,
+      "p5": 0.0924,
+      "p50": 0.4501,
+      "p95": 0.9195
+     },
+     "climb": {
+      "mean": 0.2396,
+      "p5": 0.0002,
+      "p50": 0.0115,
+      "p95": 0.9219
+     },
+     "slew_limited_pct": 0.9
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5728,
+      "p5": 0.3203,
+      "p50": 0.5743,
+      "p95": 0.7843
+     },
+     "climb": {
+      "mean": 0.3555,
+      "p5": 0.3,
+      "p50": 0.3008,
+      "p95": 0.8277
+     },
+     "slew_limited_pct": 1.1
+    }
+   },
+   "config": {
+    "tag": "blind_seed2",
+    "seed": 2,
+    "preview": false,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/blind_seed2",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:32:24",
+    "wall_min_this_session": 3081.1,
+    "steps_per_s_this_session": 5.84,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed3": {
+   "damage": {
+    "median": 457.841,
+    "q1": 307.935,
+    "q3": 626.108,
+    "worst": 1713.093,
+    "best": 245.681
+   },
+   "damage_thermal": {
+    "median": 457.835,
+    "q1": 307.891,
+    "q3": 626.03,
+    "worst": 1712.634,
+    "best": 245.5
+   },
+   "fuel": {
+    "median": 5458.82,
+    "q1": 4944.232,
+    "q3": 5502.396,
+    "worst": 5604.651,
+    "best": 4893.726
+   },
+   "ret": {
+    "median": 32.571,
+    "q1": -0.178,
+    "q3": 59.22,
+    "worst": 152.057,
+    "best": -32.932
+   },
+   "torque_viol": {
+    "median": 0.005,
+    "q1": 0.004,
+    "q3": 0.019,
+    "worst": 0.251,
+    "best": 0.003
+   },
+   "peak_turb": {
+    "median": 855.173,
+    "q1": 832.649,
+    "q3": 868.752,
+    "worst": 915.581,
+    "best": 823.462
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.0,
+    "best": 0.0
+   },
+   "cut_pct": 46.013,
+   "thermal_cut_pct": 45.857,
+   "fuel_vs_baseline_pct": 20.133,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -2.061,
+      "p5": -5.8077,
+      "p50": -1.9153,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -2.3492,
+      "p5": -5.5267,
+      "p50": -1.9609,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 6.2,
+     "capped_pct": 24.6
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": 0.0194,
+      "p5": -0.0412,
+      "p50": 0.0328,
+      "p95": 0.0575
+     },
+     "climb": {
+      "mean": -0.0932,
+      "p5": -0.1441,
+      "p50": -0.1216,
+      "p95": -0.0017
+     },
+     "slew_limited_pct": 5.5
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -10.5124,
+      "p5": -38.4646,
+      "p50": -8.7938,
+      "p95": 13.2217
+     },
+     "climb": {
+      "mean": 8.1092,
+      "p5": -1.1682,
+      "p50": 9.5426,
+      "p95": 12.0404
+     },
+     "slew_limited_pct": 1.7
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.4594,
+      "p5": 0.0486,
+      "p50": 0.4281,
+      "p95": 0.9761
+     },
+     "climb": {
+      "mean": 0.3778,
+      "p5": 0.0793,
+      "p50": 0.2577,
+      "p95": 0.8263
+     },
+     "slew_limited_pct": 3.0
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.6252,
+      "p5": 0.3414,
+      "p50": 0.5374,
+      "p95": 0.9755
+     },
+     "climb": {
+      "mean": 0.7486,
+      "p5": 0.4814,
+      "p50": 0.7614,
+      "p95": 0.9329
+     },
+     "slew_limited_pct": 0.8
+    }
+   },
+   "config": {
+    "tag": "blind_seed3",
+    "seed": 3,
+    "preview": false,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/blind_seed3",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:22:55",
+    "wall_min_this_session": 3071.6,
+    "steps_per_s_this_session": 5.86,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  },
+  "blind_seed4": {
+   "damage": {
+    "median": 408.937,
+    "q1": 251.584,
+    "q3": 527.465,
+    "worst": 776.917,
+    "best": 237.888
+   },
+   "damage_thermal": {
+    "median": 408.217,
+    "q1": 250.733,
+    "q3": 527.128,
+    "worst": 775.55,
+    "best": 237.731
+   },
+   "fuel": {
+    "median": 5147.353,
+    "q1": 4886.152,
+    "q3": 5449.464,
+    "worst": 5607.417,
+    "best": 4727.582
+   },
+   "ret": {
+    "median": 27.642,
+    "q1": 0.734,
+    "q3": 73.635,
+    "worst": 150.819,
+    "best": -19.526
+   },
+   "torque_viol": {
+    "median": 0.039,
+    "q1": 0.006,
+    "q3": 0.058,
+    "worst": 0.658,
+    "best": 0.004
+   },
+   "peak_turb": {
+    "median": 845.363,
+    "q1": 825.872,
+    "q3": 858.257,
+    "worst": 875.958,
+    "best": 822.37
+   },
+   "knock": {
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 0.0,
+    "worst": 0.0,
+    "best": 0.0
+   },
+   "cut_pct": 51.779,
+   "thermal_cut_pct": 51.725,
+   "fuel_vs_baseline_pct": 13.279,
+   "actions": {
+    "spark trim (deg)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -1.146,
+      "p5": -5.9376,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "climb": {
+      "mean": -0.7275,
+      "p5": -3.7991,
+      "p50": 0.0,
+      "p95": 0.0
+     },
+     "slew_limited_pct": 11.2,
+     "capped_pct": 71.5
+    },
+    "lambda trim": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.0472,
+      "p5": -0.1168,
+      "p50": -0.0431,
+      "p95": 0.0073
+     },
+     "climb": {
+      "mean": -0.0866,
+      "p5": -0.1428,
+      "p50": -0.0886,
+      "p95": 0.0233
+     },
+     "slew_limited_pct": 17.4
+    },
+    "boost trim (kPa)": {
+     "neutral": 0.0,
+     "flat": {
+      "mean": -0.3803,
+      "p5": -24.4323,
+      "p50": 6.6108,
+      "p95": 13.9355
+     },
+     "climb": {
+      "mean": -17.5051,
+      "p5": -28.8144,
+      "p50": -20.7348,
+      "p95": 12.1888
+     },
+     "slew_limited_pct": 1.0
+    },
+    "fan duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.8075,
+      "p5": 0.3731,
+      "p50": 0.869,
+      "p95": 0.9975
+     },
+     "climb": {
+      "mean": 0.7295,
+      "p5": 0.1605,
+      "p50": 0.8217,
+      "p95": 0.9958
+     },
+     "slew_limited_pct": 2.8
+    },
+    "pump duty": {
+     "neutral": 1.0,
+     "flat": {
+      "mean": 0.5335,
+      "p5": 0.3075,
+      "p50": 0.4464,
+      "p95": 0.8773
+     },
+     "climb": {
+      "mean": 0.4582,
+      "p5": 0.3001,
+      "p50": 0.3039,
+      "p95": 0.9994
+     },
+     "slew_limited_pct": 2.5
+    }
+   },
+   "config": {
+    "tag": "blind_seed4",
+    "seed": 4,
+    "preview": false,
+    "steps": 1080000,
+    "dt": 1.0,
+    "duration_s": 900.0,
+    "steps_per_episode": 900,
+    "road": "wideair",
+    "roads": "the extremes roads (decision 12) in wider air: ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet following the pressure (wide_air.WideAirTrainingEnv, X2)",
+    "device": "cpu",
+    "algorithm": "SAC",
+    "sac": {
+     "learning_rate": 0.0003,
+     "buffer_size": 1000000,
+     "batch_size": 256,
+     "learning_starts": 100,
+     "gamma": 0.99,
+     "tau": 0.005,
+     "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+     "gradient_steps": 1,
+     "ent_coef": "auto",
+     "target_entropy": -5.0,
+     "policy": "MlpPolicy",
+     "net_arch": "[256, 256]"
+    },
+    "versions": {
+     "python": "3.13.2",
+     "stable_baselines3": "2.9.0",
+     "torch": "2.14.0+cpu",
+     "gymnasium": "1.3.0",
+     "numpy": "2.5.3"
+    },
+    "git_head": "06f4686b8993dddaa8862b53dde2c91b6214b399",
+    "git_dirty": false,
+    "plant_sha": "3c48890dd15bc116",
+    "derived_sha": "326c0835548975e2",
+    "plant_inputs": {
+     "data_sha1": "c4fdd4babfb3752a",
+     "raw_logs": [
+      "3aca2ec1-20260907_072817.csv",
+      "3f64372e-20260907_070041.csv",
+      "670063b2-20260907_142018.csv",
+      "683640a0-20260907_070212.csv",
+      "7475b5d7-20260908_142743.csv",
+      "cb67b01f-20260908_084142.csv",
+      "drive10-20260918_233912.csv",
+      "driveB_rollons-20260928_140513.csv",
+      "f51686d7-20260906_154426.csv",
+      "fb988991-20260906_143515.csv",
+      "pull01-20260913_093527.csv"
+     ]
+    },
+    "output": "runs/wideair_dt1/blind_seed4",
+    "machine": {
+     "system": "Windows",
+     "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+     "cpus": 20,
+     "omp_threads": "1"
+    },
+    "keep_buffer": true,
+    "resumed_buffer": null,
+    "started": "2026-10-11T05:11:02",
+    "resumed_from": null,
+    "status": "finished",
+    "finished": "2026-10-13T08:39:01",
+    "wall_min_this_session": 3087.8,
+    "steps_per_s_this_session": 5.83,
+    "episodes_this_session": 1201,
+    "episodes": 1201,
+    "total_timesteps": 1080000,
+    "recorded_steps": 1080000,
+    "config_source": "written by train.py during training"
+   }
+  }
+ },
+ "ablation": {
+  "pairs": [
+   {
+    "seed": 0,
+    "sighted": 71.671,
+    "blinded": 72.013,
+    "sighted_thermal": 71.589,
+    "blinded_thermal": 71.957
+   },
+   {
+    "seed": 1,
+    "sighted": 39.259,
+    "blinded": 70.565,
+    "sighted_thermal": 39.118,
+    "blinded_thermal": 70.48
+   },
+   {
+    "seed": 2,
+    "sighted": 35.357,
+    "blinded": 47.637,
+    "sighted_thermal": 35.352,
+    "blinded_thermal": 47.559
+   },
+   {
+    "seed": 3,
+    "sighted": 71.265,
+    "blinded": 46.013,
+    "sighted_thermal": 71.213,
+    "blinded_thermal": 45.857
+   },
+   {
+    "seed": 4,
+    "sighted": 48.435,
+    "blinded": 51.779,
+    "sighted_thermal": 48.288,
+    "blinded_thermal": 51.725
+   }
+  ],
+  "n": 5,
+  "mean": -4.403999999999999,
+  "median": -3.344000000000001,
+  "sd": 20.511282017465412,
+  "ci95": [
+   -29.872120438091073,
+   21.064120438091074
+  ],
+  "p_t": 0.656224837357321,
+  "p_wilcoxon": 0.4375,
+  "smallest_possible_p_wilcoxon": 0.0625,
+  "thermal_mean": -4.403600000000002,
+  "p_t_thermal": 0.6569626588773659,
+  "sighted_over_grade": [
+   24.69,
+   -7.72,
+   -11.62,
+   24.28,
+   1.45
+  ]
+ },
+ "findings": [
+  "SPARK. The trim is capped at 0 for this set (engine_env.SPARK_TRIM_MAX): no agent can advance past the baseline, whose own spark on the climb is 1.2 deg. The median applied trim on the climb runs -2.0 to +0.0 deg across the agents, and the modelled knock integral's 95th percentile 0.62-0.63, against the baseline's 0.61 and the 0.85 knee where the damage model starts charging.",
+  "SIGHTED_SEED2 does MORE damage than the baseline ECU on 1 of 20 episodes (numbers 12; worst 865 against 848, peak turbine 883 C). Their weight on component life is 0.034. It is not trading life for fuel: on those episodes it burns +1.4 % fuel against the baseline, and its return is -6; by evaluate.py's own standard a protection policy that is sometimes terrible is not one.",
+  "SIGHTED_SEED4 does MORE damage than the baseline ECU on 1 of 20 episodes (numbers 1; worst 871 against 848, peak turbine 883 C). Their weight on component life is 0.136. It is not trading life for fuel: on those episodes it burns +1.3 % fuel against the baseline, and its return is -9; by evaluate.py's own standard a protection policy that is sometimes terrible is not one.",
+  "BLIND_SEED1 does MORE damage than the baseline ECU on 5 of 20 episodes (numbers 7, 12, 14, 15, 16; worst 918 against 848, peak turbine 886 C). Their weight on component life is 0.089, 0.034, 0.029, 0.049, 0.062 -- exactly the lowest in the frozen set. It is not trading life for fuel: on those episodes it burns +2.0, +2.5, +2.9, +2.6, +2.5 % fuel against the baseline, and its return is -5, -8, -7, -8, -6; by evaluate.py's own standard a protection policy that is sometimes terrible is not one.",
+  "BLIND_SEED3 does MORE damage than the baseline ECU on 4 of 20 episodes (numbers 12, 14, 15, 16; worst 1713 against 848, peak turbine 916 C). Their weight on component life is 0.034, 0.029, 0.049, 0.062 -- exactly the lowest in the frozen set. It is not trading life for fuel: on those episodes it burns +8.1, +8.8, +7.7, +8.5 % fuel against the baseline, and its return is -28, -31, -27, -33; by evaluate.py's own standard a protection policy that is sometimes terrible is not one.",
+  "7 of 10 agents beat the best hand-written policy on median damage (47.0 % cut). 0 burn less fuel than the baseline."
+ ]
+}

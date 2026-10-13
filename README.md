@@ -3,6 +3,14 @@
 > **Opening this in Claude Code?** Read `CLAUDE.md` first — it carries the
 > project's claim, its current state, and the mistakes already made.
 >
+> **13 October 2026: X2 has run, and its preregistered reading is INCONCLUSIVE,
+> with agents that had not converged** (`python analyse_x2.py`): X1's design in
+> wider air (0–45 °C, 80–101.3 kPa), five seeds a side, 1200 episodes each. One
+> pair of five favours preview, mean −4.40 points, sd 20.51 — a spread at which
+> a test needs 143 seeds; by C4's rule no pair had settled. 7 of 10 agents beat
+> current-grade; none passes the logged-drive check or the probe.
+> `results/PREREGISTRATION_X2.md` section 12.
+>
 > **9 October 2026: X1 has run, and its preregistered reading is SMALLER THAN
 > THE MEI** (`python analyse_x1.py`): 17 of 23 seed pairs below 5.43 points of
 > damage cut (sign p 0.017, permutation p 0.003), the same without the knock term;

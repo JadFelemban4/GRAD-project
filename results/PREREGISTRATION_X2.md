@@ -365,4 +365,79 @@ python sanity_probe.py runs/wideair_dt1
   **16 of 16 drifts CAUGHT**, each on its own anchor. The scoped exemption, the
   document sweep for X2 and this log committed next, locally.
 
+- **12 October.** The hills recompute beside the training finished: identical
+  to the copy in every one of the seven conditions — grade, peak and the whole
+  peak-against-grade curve (`results/conditions_wideair_dt1_hillcheck/`).
+- **13 October, 08:41.** All 10 runs finished: 3067–3090 minutes each (about
+  51 hours, 5.8 steps a second), 1201 complete episodes each (an episode is 899
+  steps), none crashed, none resumed — the crash rule never applied.
+  `x2_score.py` took over.
+- **09:15–10:35.** Step 1 (`run_results.py phase_d`) exit 0 after 34 min; step 2
+  (`record_agents.py`) exit 0 after 33 min; step 3 (`analyse_x2.py`) exit 0,
+  `results/X2_RESULT.txt`; step 4 (`check_x2_convergence.py`) exit 0 after
+  47 min, `results/x2_convergence.txt`; step 5 (`sanity_probe.py`) exit 0.
+- **10:36.** Step 6 (`conditions_test.py --resume-all`) STOPPED by its own
+  harness check: its five check episodes name agents by seed, and two of them
+  (sighted seed 6, blinded seed 9) are seeds X2 does not have. Fixed: an agent
+  the set lacks is replaced by the same arm at seed s mod the set's seed count
+  (here sighted seed 1 and blinded seed 4); the 29 September and X1 checks are
+  unchanged, every seed they name exists. No rule of this file changed.
+- **11:36.** Step 7 (`logged_check.py`) exit 0 after 60 min.
+- **13:40.** Step 6 re-run on the fixed harness; its reading is appended to
+  section 12 when it ends.
+
 ## 12. Outcome — added after the result, never above this line
+
+Added 13 October 2026, from `results/X2_RESULT.txt` (`python analyse_x2.py`) and
+`results/x2_convergence.txt`. Nothing above this line changed after the result,
+except the run log of section 11, which is appended in time order.
+
+### 12a. The preregistered reading (P)
+
+| seed | sighted cut | blinded cut | d (points) |
+|---|---|---|---|
+| 0 | 71.67 | 72.01 | −0.34 |
+| 1 | 39.26 | 70.56 | −31.31 |
+| 2 | 35.36 | 47.64 | −12.28 |
+| 3 | 71.27 | 46.01 | +25.25 |
+| 4 | 48.44 | 51.78 | −3.34 |
+
+1 of 5 positive, mean −4.40 points, sd 20.51. Preview helps: sign p 0.9688;
+smaller than the MEI: 4 of 5 below 5.43, sign p 0.1875 (permutation 0.1875);
+preview costs damage: 4 of 5 negative, sign p 0.1875. **CELL: INCONCLUSIVE**,
+the same on thermal-only damage (mean −4.40, sd 20.56).
+
+**The sentence that may be said (section 6):** *"INCONCLUSIVE on five pairs: the
+paired differences have an sd of 20.51 points, at which a test needs 143 seeds
+for 80 % power against the MEI. The agents were still changing at 1200
+episodes."* Never "preview does not help".
+
+### 12b. Everything else section 5 names
+
+- **C, convergence: NOT-CONVERGED.** Settled: sighted 0 of 5, blinded 1 of 5
+  (4 each needed); pairs 0 of 5 (4 needed). Between 720 000 and 1 080 000 steps
+  the agents' practice cuts moved by 0.3 to 33.6 points against a band of 2.715,
+  and the pairs' d by 12.2 to 39.2. At this budget, on these roads, the agents
+  had not stopped changing.
+- **D, the spread: an sd of 20.51 points** across the five pairs (X1: 24.78;
+  the twenty of 29 September: 7.84). About 22 times X1's training, on wider
+  air did not pull the seeds together. At this spread a sign test needs **143
+  seeds** a side for 80 % power against the MEI; five pairs have 0.081.
+- **S, supervision:** 7 of 10 agents beat `current-grade` (46.98 %) on the
+  median: sighted median margin +1.45 points (−11.62 to +24.69), blinded +4.80
+  (−0.97 to +25.03). **4 of 10** do more damage than the baseline ECU on at least
+  one frozen episode: sighted seeds 2 and 4 on one each, blinded seed 1 on five,
+  blinded seed 3 on four. Post hoc, not a test: sighted seeds 1 and 2 cut 39.3 %
+  and 35.4 %, under `current-grade`, while no blinded agent is under 46.0 % —
+  X1's pattern (six sighted agents under 40 %, no blinded one) again.
+- **Safeguard 2's probe: no agent passes.** A 50 K hotter housing gets less
+  protection on 22.3–72.9 % of probed climb states for the sighted agents
+  (median 32.5 %) and 55.5–93.1 % for the blinded (median 64.9 %); X1's medians
+  were 49 % and 62 %.
+- **L, the logged-drive check: 0 of 10 pass** (X1: 1 of 46). With life weighted
+  most (episode 4), 59 of 60 agent runs burn more than 1 % over the baseline ECU
+  (median +6.92 %, worst +20.12 %; X1: 252 of 276, median +4.33 %, worst
+  +21.40 %); with life weighted least (episode 15), 21 of 60 (median +0.39 %).
+  And unlike X1's agents, five of X2's fall short of the torque on some drive
+  (blinded seeds 0 and 4, sighted seeds 1, 3 and 4).
+- **T, transfer:** running on the fixed harness (section 11).

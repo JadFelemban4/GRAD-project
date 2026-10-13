@@ -1,0 +1,24 @@
+X2 CONVERGENCE -- runs/wideair_dt1
+rule: results/PREREGISTRATION_X2.md 5c; band 2.715 points of cut; practice set of 10 episodes on the locked climb; baseline ECU damage there 848.1
+
+agent                720,000     900,000   1,080,000    moves   settled
+sighted_seed0          66.19       59.77       71.73    11.96   NO
+blind_seed0            72.41       72.31       72.10     0.30   yes
+sighted_seed1          54.20       58.53       48.20    10.33   NO
+blind_seed1            70.15       68.90       71.72     2.82   NO
+sighted_seed2          55.27       70.56       57.54    15.28   NO
+blind_seed2            71.05       66.53       37.48    33.58   NO
+sighted_seed3          71.76       65.64       71.06     6.12   NO
+blind_seed3            18.70       51.79       47.47    33.08   NO
+sighted_seed4          71.57       72.57       42.17    30.40   NO
+blind_seed4            60.64       70.06       64.40     9.43   NO
+
+pair (sighted - blinded)
+  seed 0                -6.22      -12.54       -0.37    12.16   NO
+  seed 1               -15.95      -10.37      -23.52    13.15   NO
+  seed 2               -15.78       +4.03      +20.06    35.84   NO
+  seed 3               +53.06      +13.85      +23.59    39.21   NO
+  seed 4               +10.93       +2.51      -22.23    33.16   NO
+
+settled: sighted 0 of 5, blinded 1 of 5 (need 4 each); pairs 0 of 5 (need 4)
+VERDICT: NOT-CONVERGED

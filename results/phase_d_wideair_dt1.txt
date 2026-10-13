@@ -1,0 +1,47 @@
+PHASE D EVALUATION -- 20 FIXED EPISODES, frozen 18 Sep 2026
+scenario: 12 % at 130 km/h, 42 C, 720 s, dt 1.0
+trigger:  850 C
+run:      13 October 2026, by run_results.py, on the simulator with its
+          data-set constants DERIVED from the logs (data/derived_params.json);
+          evaluate.EPISODES and evaluate.run_episode unchanged
+
+policy                 damage med     IQR   worst thermal med  fuel med  peak C  cuts %  cuts % thermal
+-------------------------------------------------------------------------------------------------------
+baseline ECU                848.1     0.0   848.1       845.6      4544     883     0.0             0.0
+reactive                    559.7     0.0   559.7       557.3      4683     860    34.0            34.1
+current-grade               449.6     0.0   449.6       446.6      4810     853    47.0            47.2
+predictive (hand)           449.7     0.0   449.7       446.3      4815     853    47.0            47.2
+sighted_seed0               240.2   103.6   749.4       240.2      5463     875    71.7            71.6
+sighted_seed1               515.1   164.4   840.4       514.8      4777     883    39.3            39.1
+sighted_seed2               548.2   576.5   865.0       546.7      4829     883    35.4            35.4
+sighted_seed3               243.7   103.5   466.4       243.4      5411     854    71.3            71.2
+sighted_seed4               437.3   172.6   870.5       437.3      4862     883    48.4            48.3
+blind_seed0                 237.3    98.4   710.9       237.1      5453     873    72.0            72.0
+blind_seed1                 249.6   194.3   918.3       249.6      5535     886    70.6            70.5
+blind_seed2                 444.1   288.2   749.8       443.4      5646     877    47.6            47.6
+blind_seed3                 457.8   318.2  1713.1       457.8      5459     916    46.0            45.9
+blind_seed4                 408.9   275.9   776.9       408.2      5147     876    51.8            51.7
+-------------------------------------------------------------------------------------------------------
+
+THE ABLATION, PAIRED BY SEED -- the only correct way to read it
+seed    sighted cut %  blinded cut %   difference
+-------------------------------------------------
+0                71.7           72.0         -0.3
+1                39.3           70.6        -31.3
+2                35.4           47.6        -12.3
+3                71.3           46.0         25.3
+4                48.4           51.8         -3.3
+-------------------------------------------------
+mean difference -4.4 points, sd 20.5, paired t = -0.48 (n = 5)
+Wilcoxon signed-rank, exact two-sided p = 0.44
+AGENT (sighted median 48.4 %) over CURRENT-GRADE (47.0 %): +1.5 points
+
+AGENTS: runs/wideair_dt1, X2 (11 October): the extremes roads in wider air,
+ambient 0-45 C and pressure 80-101.3 kPa drawn per episode, the compressor inlet,
+the gearbox's kickdown table and the road's torque floor following the air
+(wide_air.py); 5 seeds a side, 1 080 000 steps (1200 episodes) each; spark trim
+capped at 0; on X1's plant. Preregistered in results/PREREGISTRATION_X2.md before
+any of them trained. Read the thermal-only column beside the total until drive C
+tests the knock model.
+The hand-written rows have zero IQR by construction: they ignore the preference
+weights, so all twenty episodes are one rollout repeated.

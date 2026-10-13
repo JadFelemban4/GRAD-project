@@ -975,10 +975,18 @@ X1_FILES = dict(
 )
 
 
-def x1_results(files=None):
+MEI_PTS_X = 5.43                    # analyse_x1.MEI_PTS; glossary() checks it
+
+
+def x1_results(files=None, held=None, pressure_trained=False):
     """X1's results, from the files x1_score.py's steps write (and damage_constants.py
     --set extremes_dt1). None until analyse_x1.py has run; each later block None
-    until its own file exists, so the page says what has not been scored yet."""
+    until its own file exists, so the page says what has not been scored yet.
+
+    x2() reads X2's files through this same function (13 October): `held` names
+    the transfer conditions that set held out of training, as {condition: (role,
+    short role)}, and `pressure_trained` says its training drew air pressure, so
+    the thinner-air conditions it trained in are controls, not untrained air."""
     import power_analysis as PA
     F = dict(X1_FILES, **(files or {}))
 
@@ -1044,7 +1052,11 @@ def x1_results(files=None):
         out[f"{arm}_beat"] = sum(x > 0 for x in v)
     C = load("conditions")
     if C is not None:
-        held = {"25 C": "held out: steeper than 18 %", "50 C": "held out: hotter than 45 °C"}
+        held = held or {"25 C": ("held out: steeper than 18 %", "held out: hill > 18 %"),
+                        "50 C": ("held out: hotter than 45 °C", "held out: air > 45 °C")}
+
+        def thin(name):
+            return not pressure_trained and "kPa" in name and "101.3" not in name
         # The twenty of 29 September on the same hills (conditions_test.py, 7 Oct):
         # the plant before the agreed fixes, spark advance allowed. A reading
         # beside X1's, never part of its test.
@@ -1065,12 +1077,11 @@ def x1_results(files=None):
                              margins={k: _r(x, 1) for k, x in mg.items()},
                              s_above=_r(s.get("agents_s_above"), 0), grade_s_above=_r(s.get("grade_s_above"), 0),
                              base_s_above=_r(s.get("base_s_above"), 0),
-                             role=held.get(name, "pressure: untrained" if "kPa" in name and "101.3" not in name
-                                           else "in range (control)"), held=name in held,
-                             kind="held" if name in held else ("pressure" if "kPa" in name and "101.3" not in name
-                                                               else "control"),
-                             role_short={"25 C": "held out: hill > 18 %", "50 C": "held out: air > 45 °C"}.get(
-                                 name, "untrained air pressure" if "kPa" in name and "101.3" not in name else "in range"),
+                             role=held[name][0] if name in held else
+                             ("pressure: untrained" if thin(name) else "in range (control)"), held=name in held,
+                             kind="held" if name in held else ("pressure" if thin(name) else "control"),
+                             role_short=held[name][1] if name in held else
+                             ("untrained air pressure" if thin(name) else "in range"),
                              grade_cut=_r(s["grade_cut"], 1), s_beat=sum(x > 0 for x in sv), s_n=len(sv),
                              b_beat=sum(x > 0 for x in bv), b_n=len(bv),
                              s_med=_r(float(np.median(sv)), 1) if sv else None,
@@ -1126,6 +1137,69 @@ def x1_results(files=None):
         out["sens"] = [dict(name=k, beat=v["beat_grade"], n=v["n"], grade_cut=_r(v["grade_cut"], 1),
                             mean=_r(v["ablation_mean"], 2), lo=_r(v["ablation_lo"], 2), hi=_r(v["ablation_hi"], 2))
                        for k, v in S["summary"].items()]
+    return out
+
+
+X2_FILES = dict(
+    result=os.path.join(RES, "X2_RESULT.json"),                        # analyse_x2.py
+    index=os.path.join(RES, "agents", "wideair_dt1", "index.json"),    # record_agents.py
+    conditions=os.path.join(RES, "conditions_wideair_dt1", "conditions_test.json"),
+    conditions29=os.path.join(RES, "conditions_wideair_dt1", "no_29_september_reading.json"),
+    logged=os.path.join(RES, "logged_check_wideair_dt1.json"),
+    probe=os.path.join(RES, "agents", "wideair_dt1", "sanity_probe.json"),
+    sens=os.path.join(RES, "damage_constants_wideair_dt1.json"),      # not run for X2
+)
+X2_HELD = {"25 C": ("held out: steeper than 18 %", "held out: hill > 18 %"),
+           "50 C": ("held out: hotter than 45 °C", "held out: air > 45 °C"),
+           "76 kPa, the climb's top": ("held out: thinner than 80 kPa", "held out: air < 80 kPa")}
+_CONV_AGENT = re.compile(r"^((?:sighted|blind)_seed\d+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+([\d.]+)\s+(yes|NO)$")
+_CONV_PAIR = re.compile(r"^\s+seed (\d+)\s+([+-][\d.]+)\s+([+-][\d.]+)\s+([+-][\d.]+)\s+([\d.]+)\s+(yes|NO)$")
+
+
+def x2_convergence(path=os.path.join(RES, "x2_convergence.txt")):
+    """check_x2_convergence.py's table, read back. The format is that script's;
+    a line it cannot read stops the build rather than drop a row."""
+    if not os.path.isfile(path):
+        return None
+    with open(path, encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    agents, pairs, verdict = [], [], None
+    for ln in lines:
+        m = _CONV_AGENT.match(ln)
+        if m:
+            agents.append(dict(name=m[1], c=[float(m[i]) for i in (2, 3, 4)], move=float(m[5]), ok=m[6] == "yes"))
+            continue
+        m = _CONV_PAIR.match(ln)
+        if m:
+            pairs.append(dict(seed=int(m[1]), d=[float(m[i]) for i in (2, 3, 4)], move=float(m[5]), ok=m[6] == "yes"))
+            continue
+        if ln.startswith("VERDICT:"):
+            verdict = ln.split(":", 1)[1].strip()
+    if len(agents) != 10 or len(pairs) != 5 or verdict is None:
+        raise SystemExit(f"{path}: read {len(agents)} agents, {len(pairs)} pairs, verdict {verdict!r}; "
+                         "check_x2_convergence.py's format moved -- update make_page.x2_convergence")
+    n_s = sum(a["ok"] for a in agents if a["name"].startswith("sighted"))
+    n_b = sum(a["ok"] for a in agents if a["name"].startswith("blind"))
+    return dict(agents=agents, pairs=pairs, verdict=verdict, s_settled=n_s, b_settled=n_b,
+                pairs_settled=sum(p["ok"] for p in pairs), n=5, need=4,
+                max_move=max(a["move"] for a in agents), max_pair_move=max(p["move"] for p in pairs))
+
+
+def x2():
+    """X2 (results/PREREGISTRATION_X2.md): X1's readers on X2's files, its
+    convergence check, and the design as its preregistration fixes it."""
+    import power_analysis as PA
+    import wide_air as W
+    res = x1_results(X2_FILES, held=X2_HELD, pressure_trained=True)
+    out = dict(res=res, conv=x2_convergence(), seeds=5, runs=10, steps=1_080_000, episodes=1200,
+               ratio=_r(1_080_000 / 50_000, 1), t_lo=W.WIDE_T_AMB_C[0], t_hi=W.WIDE_T_AMB_C[1],
+               p_lo=W.WIDE_P_KPA[0], p_hi=W.WIDE_P_KPA[1], band=_r(MEI_PTS_X / 2, 3),
+               eyebrow="Experiment X2 · trained 11–13 October 2026")
+    if res is not None:
+        t = res["readings"]["total"]
+        out["seeds80"] = next((k for k in range(5, 1001) if PA.power(res["mei"], t["sd"], k) >= 0.8), None)
+        x1r = _load("X1_RESULT.json")["readings"]["total"]
+        out["sd_x1"] = _r(x1r["sd"], 2)
     return out
 
 
@@ -1209,6 +1283,7 @@ def glossary(gen, x1):
                                                   for i in range(kmin, n + 1)), 1e-9)
     merged = float(x1["split_first"]["baseline"])
     same("MEI_PTS", MEI_PTS, round(100 * MEI_UNITS / merged, 2))
+    same("make_page.MEI_PTS_X", MEI_PTS_X, MEI_PTS)
     same("MEI (units)", MEI_UNITS, 50.0)
     # and the lines the section quotes
     _src("plant.py", "tau = 0.01768 * (op.octane / 100.0) ** 3.402 * p_atm ** -1.7 * np.exp(3800.0 / t_unburned)",
@@ -1337,6 +1412,7 @@ def main():
     data = dict(meta=meta(), pd=phase_d(), mc=model_vs_car(), roads=training_roads(),
                 cal=calibration(), gen=generality(), val=validation(), tenv=trained_env(), x1=x1())
     data["gl"] = glossary(data["gen"], data["x1"])
+    data["x2"] = x2()
     # the ceiling against drive B in the band the locked climb runs in
     b = data["cal"]["boost"]
     rpm = data["mc"]["duty"]["scen_rpm"]

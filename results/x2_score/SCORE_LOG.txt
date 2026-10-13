@@ -1,0 +1,17 @@
+2026-10-11 05:11:58  x2_score.py started (from step 1)
+2026-10-13 08:41:59  training finished: 10 final.zip
+2026-10-13 08:41:59  step 1 phase_d: run_results.py phase_d --agents=runs/wideair_dt1
+2026-10-13 09:15:52  step 1 phase_d: exit 0 after 34 min
+2026-10-13 09:15:52  step 2 record_agents: record_agents.py runs/wideair_dt1
+2026-10-13 09:48:31  step 2 record_agents: exit 0 after 33 min
+2026-10-13 09:48:31  step 3 analyse_x2: analyse_x2.py
+2026-10-13 09:48:31  step 3 analyse_x2: exit 0 after 0 min
+2026-10-13 09:48:31  step 4 convergence: check_x2_convergence.py
+2026-10-13 10:35:29  step 4 convergence: exit 0 after 47 min
+2026-10-13 10:35:29  step 5 sanity_probe: sanity_probe.py runs/wideair_dt1
+2026-10-13 10:35:33  step 5 sanity_probe: exit 0 after 0 min
+2026-10-13 10:35:33  step 6 conditions: conditions_test.py --set runs/wideair_dt1 --resume-all
+2026-10-13 10:36:29  step 6 conditions: exit 1 after 1 min
+2026-10-13 10:36:29  step 7 logged_check: logged_check.py --set runs/wideair_dt1
+2026-10-13 11:36:17  step 7 logged_check: exit 0 after 60 min
+2026-10-13 11:36:17  x2_score.py finished; FAILED steps [6]

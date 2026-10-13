@@ -1,4 +1,39 @@
-# `results/` — Phase D, Phase D2, C4, the 29 September retrain and X1
+# `results/` — Phase D, Phase D2, C4, the 29 September retrain, X1 and X2
+
+## X2 — wider air, 5 seeds a side, 1200 episodes: INCONCLUSIVE, not converged (11–13 October 2026)
+
+```bash
+python analyse_x2.py            # X2's preregistered test -> X2_RESULT.txt, X2_RESULT.json
+python check_x2_convergence.py  # had the agents settled? -> x2_convergence.txt
+```
+
+`PREREGISTRATION_X2.md`, committed `06f4686` before any X2 agent trained. X1's
+plant and X1's roads, with the air widened (ambient 0–45 °C, pressure
+80–101.3 kPa; `wide_air.py`), five seeds a side, about 22 times X1's training.
+Four changes at once against X1, so X2 against X1 is descriptive (its section 2).
+
+| reading | X2 |
+|---|---|
+| pairs (5 seeds a side) where preview helped | 1 of 5 |
+| mean / sd of sighted − blinded, points of cut | −4.40 / 20.51 |
+| effect below the MEI (5.43 points) — sign / permutation | 0.1875 (4 of 5) / 0.1875 |
+| **cell**, total damage and thermal-only alike | **INCONCLUSIVE** |
+| convergence, C4's rule at 720k/900k/1080k steps | **NOT-CONVERGED**: 0 of 5 sighted, 1 of 5 blinded, 0 of 5 pairs settled |
+
+- **The sentence that may be said** (its section 6): *"INCONCLUSIVE on five
+  pairs: the paired differences have an sd of 20.51 points, at which a test
+  needs 143 seeds for 80 % power against the MEI. The agents were still changing
+  at 1200 episodes."* Never "preview does not help".
+- **Supervision, separately:** 7 of 10 beat `current-grade`; 4 of 10 do more
+  damage than the baseline ECU on some frozen episode.
+- **The logged-drive check:** 0 of 10 pass; with life weighted most, 59 of 60
+  runs burn more than 1 % over the ECU car (median +6.92 %), more than X1's
+  (`logged_check_wideair_dt1.json`). **The probe:** no agent passes.
+- **Transfer, descriptive:** re-run on 13 October after its harness was fixed
+  (`conditions_wideair_dt1/`).
+
+Every agent: `agents/wideair_dt1/README.md`. The scoring log:
+`x2_score/SCORE_LOG.txt`. The full account: `PREREGISTRATION_X2.md` section 12.
 
 ## X1 — the extremes design, 23 seeds a side: SMALLER THAN THE MEI (8–9 October 2026)
 

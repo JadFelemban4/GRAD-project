@@ -242,6 +242,7 @@ html{scroll-behavior:smooth}
     <span class="bar-name">B58 preview study</span>
     <nav aria-label="Sections">
       <a href="#summary">Summary</a>
+      <a href="#x2">X2</a>
       <a href="#x1">X1</a>
       <a href="#phase-d">Phase D</a>
       <a href="#vs-car">Simulation vs car</a>
@@ -293,6 +294,15 @@ html{scroll-behavior:smooth}
   </div>
 
   <div class="findings">
+    <h3>Changed on 11–13 October: X2</h3>
+    <ol>
+      <li><b>X2 is INCONCLUSIVE, and its agents had not settled.</b> X1's design in wider air ({{x2.t_lo|.0f}}–{{x2.t_hi|.0f}} °C, {{x2.p_lo|.0f}}–{{x2.p_hi|.1f}} kPa), five seeds a side, {{x2.episodes|,}} episodes each. {{x2.res.readings.total.k}} of {{x2.res.readings.total.n}} pairs favour preview, mean {{x2.res.readings.total.mean|+.2f}} points, sd {{x2.res.readings.total.sd|.2f}}: a spread at which a test needs {{x2.seeds80}} seeds. By C4's rule {{x2.conv.pairs_settled}} of {{x2.conv.n}} pairs had settled; the agents were still changing. <a href="#x2">X2</a></li>
+      <li><b>Wider air did not teach restraint on the car's own drives.</b> {{x2.res.logged.s_ok}} of {{x2.res.logged.n_s}} sighted and {{x2.res.logged.b_ok}} of {{x2.res.logged.n_b}} blinded agents pass the logged-drive check; with life weighted most, {{x2.res.logged.per_w.most.f_fail}} of {{x2.res.logged.per_w.most.n}} runs burn more than 1 % over the ECU car (median {{x2.res.logged.per_w.most.med|+.2f}} %). {{x2.res.supervision.beat}} of {{x2.res.supervision.n}} agents beat current-grade on the scored climb; none passes the probe.</li>
+      <li><b>Two of X1's rules had to follow the air, found before any agent trained.</b> In 0 °C air the engine makes 20.6 Nm with the throttle shut, more than X1's 15 Nm road floor; and at 80 kPa the gearbox's sea-level table held a gear the engine could no longer pull. Both now follow the air; at sea level the design is the plant to the bit.</li>
+    </ol>
+  </div>
+
+  <div class="findings">
     <h3>Changed on 8–9 October: X1</h3>
     <ol>
       <li>{{x1.finding}} <a href="#x1">X1</a></li>
@@ -338,6 +348,64 @@ html{scroll-behavior:smooth}
       <li><b>The car-fitted spark map was never in use, now fixed.</b> The model's knock limit sat below it at every steady point. Refitted, part-load spark goes from {{mc.spark.before.mean|+.1f}}° to {{mc.spark.after.mean|+.2f}}° against the car. <a href="#f-spark">Spark</a></li>
       <li><b>GCC specification and fuel, checked.</b> No admissible source shows uprated cooling on a GCC car, and on the model stronger cooling barely moves the turbine, which trades heat with exhaust and air. The manual asks for 95 RON minimum and 98 recommended; the car was logged on 95 (the team, 29 September), which is what the model runs, so nothing is refitted. <code>REFERENCES.md</code> 2c</li>
     </ol>
+  </div>
+</section>
+
+<!-- ================================================================ X2 -->
+<section id="x2">
+  <div class="sect-head">
+    <p class="eyebrow">{{x2.eyebrow}}</p>
+    <h2>X2: X1's design in wider air, {{x2.episodes|,}} episodes per agent</h2>
+    <p class="prose cap">X1's roads with the air widened to {{x2.t_lo|.0f}}–{{x2.t_hi|.0f}} °C and {{x2.p_lo|.0f}}–{{x2.p_hi|.1f}} kPa, drawn per episode; the compressor inlet, the gearbox's kickdown table and the road's torque floor follow the air. {{x2.seeds}} seeds a side, {{x2.steps|,}} steps each ({{x2.ratio|.1f}} times X1's training), on X1's plant. Preregistered before any agent trained and scored on the same twenty frozen episodes. With five pairs only a unanimous result can leave INCONCLUSIVE, so X2 also measures whether the agents settle and how far apart the seeds land.</p>
+  </div>
+
+  <div class="stats" id="x2-stats"></div>
+
+  <div class="fig" id="f-x2-abl">
+    <div class="fig-head">
+      <h3>The preregistered test: preview, paired by seed</h3>
+      <p class="take" id="x2-abl-take"></p>
+    </div>
+    <div class="legend">
+      <span><i class="lr" style="background:var(--pd-sight)"></i>sighted took less damage</span>
+      <span><i class="lr" style="background:var(--pd-blind)"></i>blinded took less damage</span>
+      <span style="color:var(--ink-2)"><i class="lk dash"></i>the minimum effect of interest</span>
+    </div>
+    <div class="chart" id="c-x2-abl"></div>
+    <p class="cap" id="x2-abl-cap"></p>
+  </div>
+
+  <div class="fig" id="f-x2-conv">
+    <div class="fig-head">
+      <h3>Had they settled? C4's rule at 720 000, 900 000 and 1 080 000 steps</h3>
+      <p class="take" id="x2-conv-take"></p>
+    </div>
+    <div class="tbl-wrap" id="t-x2-conv"></div>
+    <p class="cap">Each agent's damage cut on ten practice episodes of the locked climb, under preference weights no frozen test episode uses, at two thirds, five sixths and all of its training; the pair rows are sighted minus blinded. Settled: it moves by no more than half the MEI ({{x2.band|.3f}} points) across the three. Converged: four of five agents settled in each arm, and four of five pairs (<code>check_x2_convergence.py</code>, C4's rule of 23 September).</p>
+  </div>
+
+  <div class="fig" id="f-x2-sup">
+    <div class="fig-head">
+      <h3>Against current-grade, on the car's own drives, and under the probe</h3>
+      <p class="take" id="x2-sup-take"></p>
+    </div>
+    <div class="legend">
+      <span><i class="ld" style="background:var(--pd-sight)"></i>sighted agent</span>
+      <span><i class="ld" style="background:var(--pd-blind)"></i>blinded twin</span>
+      <span style="color:var(--pd-grade)"><i class="lk"></i>current-grade</span>
+    </div>
+    <div class="chart" id="c-x2-sup"></div>
+    <div class="tbl-wrap" id="t-x2-agents"></div>
+    <p class="cap" id="x2-agents-cap"></p>
+  </div>
+
+  <div class="fig" id="f-x2-transfer">
+    <div class="fig-head">
+      <h3>Where they never trained: the transfer test</h3>
+      <p class="take" id="x2-transfer-take"></p>
+    </div>
+    <div class="tbl-wrap" id="t-x2-transfer"></div>
+    <p class="cap">X1's seven conditions, each on its own hill, frozen episodes 1, 5, 9, 13 and 17, against each condition's own baseline ECU and current-grade. Held out of X2's training: 50 °C, 76 kPa and the 25 °C condition's 21.75 % hill; 35 and 42 °C and 82 and 90 kPa are in its range. Five episodes a condition: descriptive. Its altitude is milder than X2's training in one more way, its gearbox kicking down on the sea-level table.</p>
   </div>
 </section>
 
@@ -2388,6 +2456,122 @@ table("t-lit", ["quantity", "model", "band", "band from", "inside"],
 
 
 // ===================================================== 8 October: X1
+// ---------------------------------------------------------------- X2
+// Read by X1's own readers (make_page.x1_results on X2's files); the sentences
+// are PREREGISTRATION_X2.md section 6's.
+const X2 = D.x2;
+if (X2 && X2.res) {
+  const R2 = X2.res, T2 = R2.readings.total, H2 = R2.readings.thermal, S2 = R2.supervision,
+        L2 = R2.logged, C2 = X2.conv, CO2 = R2.conditions;
+  const st2 = document.getElementById("x2-stats");
+  const tile2 = (k, v, unit, txt) => {
+    const d = H("div", { class: "stat" }, st2);
+    H("span", { class: "k", text: k }, d);
+    const vv = H("span", { class: "v", text: v }, d);
+    if (unit) H("small", { text: unit }, vv);
+    H("p", { text: txt }, d);
+  };
+  tile2("Preview, sighted minus blinded", f(T2.mean, 1, true), "pts",
+    `${T2.cell}. ${T2.k} of ${T2.n} seeds positive; sign p ${f(T2.p_sign, 3)}. Below the MEI of ${f(R2.mei, 2)}: ${T2.k_lt} of ${T2.n_lt}, sign p ${f(T2.p_lt_sign, 3)}. Without the knock term: ${H2.cell}, mean ${f(H2.mean, 2, true)}.`);
+  if (C2) tile2("Pairs settled by 1200 episodes", String(C2.pairs_settled), `of ${C2.n}`,
+    `${C2.verdict} by C4's rule: sighted ${C2.s_settled} of ${C2.n} and blinded ${C2.b_settled} of ${C2.n} agents settled, ${C2.need} each needed. Between 720 000 and 1 080 000 steps the practice cuts still moved by up to ${f(C2.max_move, 1)} points.`);
+  tile2("The spread, and the seeds it needs", f(T2.sd, 1), "pts",
+    `The sd of the paired differences (X1: ${f(X2.sd_x1, 2)}). At this spread a sign test needs ${X2.seeds80} seeds a side for 80 % power against the MEI; five pairs have ${f(T2.power_own, 3)}.`);
+  tile2("Agents beating current-grade", String(S2.beat), `of ${S2.n}`,
+    `Current-grade cuts ${f(S2.grade_cut, 1)} %. Median margin: sighted ${f(R2.sighted_median_margin, 1, true)}, blinded ${f(R2.blind_median_margin, 1, true)} points. ${R2.worse.length} of ${S2.n} do more damage than the baseline ECU on some frozen episode.`);
+  const X2_SENT = {
+    "PREVIEW HELPS": r => `All five agents trained in wide air with the preview channel took less damage on the locked climb than their blind twins (sign p ${f(r.p_sign, 3)}); the mean effect is ${f(r.mean, 2, true)} points against an MEI of ${f(R2.mei, 2)}, at 1200 episodes per agent.`,
+    "SMALLER THAN THE MEI": r => `Preview's effect on the locked climb is below the MEI (${f(R2.mei, 2)} points of cut) in all five pairs of agents trained in wide air for 1200 episodes.`,
+    "INCONCLUSIVE": r => `INCONCLUSIVE on five pairs: the paired differences have an sd of ${f(r.sd, 2)} points, at which a test needs ${X2.seeds80} seeds for 80 % power against the MEI.`,
+    "PREVIEW COSTS DAMAGE": r => `All five sighted agents took more damage than their blind twins: a finding about this learner at this budget, never evidence that preview is worthless.`,
+  };
+  document.getElementById("x2-abl-take").textContent = X2_SENT[T2.cell](T2) +
+    (C2 && C2.verdict !== "CONVERGED" ? " The agents were still changing at 1200 episodes." : "");
+  document.getElementById("x2-abl-cap").textContent =
+    `Each bar is one seed: the sighted agent's damage cut minus its blinded twin's, over the twenty frozen episodes, in points. ` +
+    `Every cell but INCONCLUSIVE needs all ${T2.n} bars on one side of zero, or of the dashed line: the smallest sign p on ${T2.n} pairs is ${f(Math.pow(0.5, T2.n), 3)}. ` +
+    `Without the knock term: ${H2.cell}, mean ${f(H2.mean, 2, true)}.`;
+  mount("c-x2-abl", (host, w) => {
+    const D2 = T2.diffs.slice().sort((a, b) => a.d - b.d);
+    const row = 22, h = D2.length * row + 46;
+    const vals = D2.map(x => x.d).concat([0, R2.mei]);
+    const pad = (Math.max(...vals) - Math.min(...vals)) * 0.08 + 0.5;
+    const P = plot(host, { w, h, x: { d: [Math.min(...vals) - pad, Math.max(...vals) + pad], label: "sighted minus blinded cut (points)" },
+      y: { d: [1, 0], none: true }, m: { l: 58, t: 10, r: 12 } });
+    vline(P, 0, { c: "var(--ink-2)", w: 1.4, dash: "0" });
+    vline(P, R2.mei, { c: "var(--ink-2)", w: 1.2, dash: "5 4" });
+    T(P.top, P.x(R2.mei) + 4, P.m.t + 10, "MEI", { class: "lbl", style: "fill:var(--ink-2)" });
+    D2.forEach((x, i) => {
+      const y0 = P.m.t + i * row + 3;
+      T(P.svg, 50, y0 + 12, "seed " + x.seed, { "text-anchor": "end", style: "fill:var(--ink-2);font-size:11px" });
+      const c = x.d >= 0 ? "var(--pd-sight)" : "var(--pd-blind)";
+      const r = S("rect", { x: P.x(Math.min(0, x.d)), y: y0, width: Math.max(1, Math.abs(P.x(x.d) - P.x(0))), height: row - 7, rx: 2,
+                            style: `fill:${c}` }, P.g);
+      markTip(P, r, P.x(x.d), y0 + 7, `seed ${x.seed}`, [{ c, v: f(x.d, 2, true) + " pts", k: "sighted minus blinded" }]);
+    });
+  }, () => 0);
+  if (C2) {
+    table("t-x2-conv", ["agent", "720 000", "900 000", "1 080 000", "moves", "settled"],
+      C2.agents.map(a => [a.name.replace("_seed", " "), f(a.c[0], 1), f(a.c[1], 1), f(a.c[2], 1), f(a.move, 1), a.ok ? "yes" : "no"])
+        .concat(C2.pairs.map(p => [`pair ${p.seed}, s − b`, f(p.d[0], 1, true), f(p.d[1], 1, true), f(p.d[2], 1, true),
+                                   f(p.move, 1), p.ok ? "yes" : "no"])), [1, 2, 3, 4]);
+    document.getElementById("x2-conv-take").textContent =
+      `${C2.verdict}. ${C2.s_settled} of ${C2.n} sighted and ${C2.b_settled} of ${C2.n} blinded agents moved by less than the band; ` +
+      `${C2.pairs_settled} of ${C2.n} pairs did. The largest moves: ${f(C2.max_move, 1)} points for an agent, ${f(C2.max_pair_move, 1)} for a pair.`;
+  }
+  document.getElementById("x2-sup-take").textContent =
+    `${S2.beat} of ${S2.n} agents beat current-grade on the median (sighted ${R2.sighted_beat}, blinded ${R2.blind_beat}). ` +
+    (L2 ? `On the car's own drives ${L2.s_ok + L2.b_ok} of ${L2.n_s + L2.n_b} pass. ` : "") +
+    (R2.probe ? (R2.probe.some(p => p.share === 0)
+      ? `Under the probe, ${R2.probe.filter(p => p.share === 0).length} of ${R2.probe.length} pass.`
+      : `Under the probe none passes: a 50 K hotter housing gets less protection on ${f(Math.min(...R2.probe.map(p => p.share)), 1)}–${f(Math.max(...R2.probe.map(p => p.share)), 1)} % of climb states.`) : "");
+  mount("c-x2-sup", (host, w) => {
+    const PR = R2.pairs.slice().sort((a, b) => a.seed - b.seed);
+    const row = 20, h = PR.length * row + 46;
+    const vals = PR.flatMap(p => [p.s, p.b]).concat([0]);
+    const pad = (Math.max(...vals) - Math.min(...vals)) * 0.06 + 1;
+    const P = plot(host, { w, h, x: { d: [Math.min(...vals) - pad, Math.max(...vals) + pad], label: "damage cut over current-grade (points)" },
+      y: { d: [1, 0], none: true }, m: { l: 58, t: 10, r: 12 } });
+    vline(P, 0, { c: "var(--pd-grade)", w: 2, dash: "0" });
+    PR.forEach((p, i) => {
+      const yc = P.m.t + i * row + 9;
+      T(P.svg, 50, yc + 4, "seed " + p.seed, { "text-anchor": "end", style: "fill:var(--ink-2);font-size:11px" });
+      S("line", { x1: P.x(p.s), x2: P.x(p.b), y1: yc, y2: yc, style: "stroke:var(--ink-3);stroke-width:1.4" }, P.g);
+      const a = S("circle", { cx: P.x(p.s), cy: yc, r: 4.5, style: "fill:var(--pd-sight);stroke:var(--surface);stroke-width:1.5" }, P.g);
+      const b = S("circle", { cx: P.x(p.b), cy: yc, r: 4.5, style: "fill:var(--pd-blind);stroke:var(--surface);stroke-width:1.5" }, P.g);
+      markTip(P, a, P.x(p.s), yc, `seed ${p.seed}, sighted`, [{ c: "var(--pd-sight)", v: f(p.s, 1, true) + " pts", k: "over current-grade" }]);
+      markTip(P, b, P.x(p.b), yc, `seed ${p.seed}, blinded`, [{ c: "var(--pd-blind)", v: f(p.b, 1, true) + " pts", k: "over current-grade" }]);
+    });
+  }, () => 0);
+  if (L2 && R2.probe) {
+    const pb = Object.fromEntries(R2.probe.map(p => [p.name, p]));
+    table("t-x2-agents", ["agent", "over current-grade, pts", "logged drives", "worst fuel %", "worst torque short %", "probe: states violating %"],
+      L2.agents.map(a => {
+        const blind = a.name.startsWith("blind");
+        const pr = R2.pairs.find(p => `${blind ? "blind" : "sighted"}_seed${p.seed}` === a.name);
+        return [a.name.replace("_seed", " "), pr ? f(blind ? pr.b : pr.s, 1, true) : "–", a.ok ? "pass" : "fail",
+                f(a.fuel, 2, true), f(a.short, 2), pb[a.name] ? f(pb[a.name].share, 1) : "–"];
+      }), [1, 3, 4, 5]);
+    document.getElementById("x2-agents-cap").textContent =
+      `Logged drives: six of the car's own drives replayed flat at two weightings; an agent passes when it delivers the torque and burns at most 1 % more fuel than the baseline ECU on every one. ` +
+      `With life weighted most, ${L2.per_w.most.f_fail} of ${L2.per_w.most.n} runs fail on fuel (median ${f(L2.per_w.most.med, 2, true)} %, worst ${f(L2.per_w.most.max, 2, true)} %); with life weighted least, ${L2.per_w.least.f_fail} of ${L2.per_w.least.n}. ` +
+      `Probe: the housing input raised 50 K on the agent's own climb states; a violation is a leaner lambda or a higher boost trim.`;
+  }
+  if (CO2) {
+    table("t-x2-transfer", ["condition", "hill %", "for X2", "beat current-grade: sighted", "blinded", "worse than its ECU"],
+      CO2.map(c => [c.name, f(c.grade, 2), c.role_short, `${c.s_beat} of ${c.s_n}`, `${c.b_beat} of ${c.b_n}`, String(c.worse)]), [1]);
+    const hl = CO2.filter(c => c.held), ctl = CO2.filter(c => !c.held);
+    document.getElementById("x2-transfer-take").textContent =
+      `Held out of training: ${hl.map(c => `${c.name}, ${c.s_beat + c.b_beat} of ${c.s_n + c.b_n}`).join("; ")} agents beat that condition's current-grade. ` +
+      `In range: ${ctl.map(c => `${c.name.split(",")[0]}, ${c.s_beat + c.b_beat}`).join("; ")} of ${ctl[0].s_n + ctl[0].b_n}.`;
+  } else {
+    document.getElementById("x2-transfer-take").textContent =
+      "Being scored: the first run stopped on its own harness check, which named agents by seeds X2 does not have; fixed and re-run on 13 October.";
+  }
+} else {
+  document.getElementById("x2").hidden = true;
+}
+
 const X1 = D.x1;
 table("t-x1-plan", ["question", "how it is answered"], [
   ["Does seeing ahead protect better? (primary)", `sighted minus blinded cut, paired by seed, over the twenty frozen episodes; MEI ${f(X1.mei, 2)} points; ${X1.k_min} of ${X1.seeds} pairs must agree`],

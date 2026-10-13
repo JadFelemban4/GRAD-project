@@ -561,3 +561,34 @@ limit stopped it, and re-runs beside the training).
 made `verify_docs.py` read 72 of 73: a damage median of 241.2 and a paired
 difference of -0.52 matched two bare-number retired patterns. Scoped out of that
 scan like the agent reports; 73 of 73; drift_test.py run before committing it.
+
+### 9.1 X2's result (13 October)
+
+Trained 11-13 October, about 51 hours, none crashed or resumed; scored
+unattended by `x2_score.py` (`results/x2_score/SCORE_LOG.txt`).
+
+- **P: INCONCLUSIVE** (`results/X2_RESULT.txt`): 1 of 5 pairs favours preview,
+  mean -4.40 points, sd 20.51; 4 of 5 below the MEI (sign p 0.1875) and 4 of 5
+  negative (0.1875); the same thermal-only. At this spread a test needs 143
+  seeds for 80 % power against the MEI.
+- **C: NOT-CONVERGED** (`results/x2_convergence.txt`): sighted 0 of 5, blinded
+  1 of 5, pairs 0 of 5 settled; between 720 000 and 1 080 000 steps the practice
+  cuts still moved by up to 33.6 points against a band of 2.715.
+- **S:** 7 of 10 beat current-grade; 4 of 10 do more damage than the baseline
+  ECU on some frozen episode. Post hoc: sighted seeds 1 and 2 cut under
+  current-grade, no blinded agent does (X1's pattern).
+- **Probe:** no agent passes (22.3-93.1 % of states violate).
+- **L:** 0 of 10 pass the logged-drive check; with life weighted most, 59 of 60
+  runs burn more than 1 % over the ECU car (median +6.92 %, X1's +4.33 %), and
+  five agents fall short of the torque on some drive.
+- **T:** the first run stopped on its own harness check, which names agents by
+  seed (sighted seed 6, blinded seed 9) and X2 has seeds 0-4. Fixed in
+  `conditions_test.check_list` (a missing agent becomes the same arm at seed
+  s mod the set's seed count; the 29 September and X1 checks unchanged) and
+  re-run; the harness then passed, 5 of 5 identical.
+- The hills recompute beside training matched the copied file in all seven
+  conditions, grades, peaks and curves.
+
+The results page has an X2 section (above X1's, newest first), read through
+`make_page.x1_results` on X2's files; X1's page data was checked identical
+after that function gained its two arguments.

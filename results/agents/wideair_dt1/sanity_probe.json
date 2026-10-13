@@ -1,0 +1,80 @@
+{
+ "rule": {
+  "hotter_k": 50.0,
+  "every": 10,
+  "lambda_tol": 0.005,
+  "boost_tol_kpa": 1.0
+ },
+ "agents": {
+  "blind_seed0": {
+   "states": 1060,
+   "violations": 688,
+   "share": 0.6491,
+   "d_lambda_median": -0.0005,
+   "d_boost_kpa_median": 1.586
+  },
+  "blind_seed1": {
+   "states": 1060,
+   "violations": 839,
+   "share": 0.7915,
+   "d_lambda_median": -0.0003,
+   "d_boost_kpa_median": 3.407
+  },
+  "blind_seed2": {
+   "states": 1060,
+   "violations": 624,
+   "share": 0.5887,
+   "d_lambda_median": -0.0,
+   "d_boost_kpa_median": 1.686
+  },
+  "blind_seed3": {
+   "states": 1060,
+   "violations": 987,
+   "share": 0.9311,
+   "d_lambda_median": 0.0048,
+   "d_boost_kpa_median": 2.61
+  },
+  "blind_seed4": {
+   "states": 1060,
+   "violations": 588,
+   "share": 0.5547,
+   "d_lambda_median": -0.007,
+   "d_boost_kpa_median": -4.144
+  },
+  "sighted_seed0": {
+   "states": 1060,
+   "violations": 236,
+   "share": 0.2226,
+   "d_lambda_median": -0.0022,
+   "d_boost_kpa_median": -0.467
+  },
+  "sighted_seed1": {
+   "states": 1060,
+   "violations": 344,
+   "share": 0.3245,
+   "d_lambda_median": -0.0085,
+   "d_boost_kpa_median": -7.025
+  },
+  "sighted_seed2": {
+   "states": 1060,
+   "violations": 773,
+   "share": 0.7292,
+   "d_lambda_median": 0.0147,
+   "d_boost_kpa_median": 1.412
+  },
+  "sighted_seed3": {
+   "states": 1060,
+   "violations": 328,
+   "share": 0.3094,
+   "d_lambda_median": -0.0008,
+   "d_boost_kpa_median": -2.179
+  },
+  "sighted_seed4": {
+   "states": 1060,
+   "violations": 697,
+   "share": 0.6575,
+   "d_lambda_median": 0.0226,
+   "d_boost_kpa_median": -1.13
+  }
+ }
+}

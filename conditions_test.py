@@ -83,6 +83,7 @@ No hashed plant file changes, so plant_sha and every certificate stand.
 """
 import argparse
 import concurrent.futures as cf
+import glob
 import json
 import os
 import subprocess
@@ -309,11 +310,27 @@ def _run(job, rec=None):
 
 
 # ---------------------------------------------------------------- check and hills
+def check_list():
+    """CHECK, for this set. An agent the set does not have is replaced by the same
+    arm at seed (s mod the set's seed count): X2 has seeds 0-4, and its first
+    harness check stopped on sighted_seed6 (13 October). The 29 September set and
+    X1 have every seed CHECK names, so their check is unchanged."""
+    have = {os.path.basename(p) for p in glob.glob(os.path.join(AGENTS_RESULTS, "*_seed*"))}
+    n = len({t.split("_seed")[1] for t in have}) or 1
+    out = []
+    for ref, i in CHECK:
+        if "_seed" in ref and ref not in have:
+            arm, s = ref.split("_seed")
+            ref = f"{arm}_seed{int(s) % n}"
+        out.append((ref, i))
+    return tuple(out)
+
+
 def harness_check(workers):
     """Five agent and baseline episodes on the locked climb must EQUAL their
     committed scores (results/agents/<set>/<policy>/eval_summary.json)."""
     with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker, initargs=(SET,)) as pool:
-        check = dict(pool.map(_episode, [(ref, i, 315.0, 101.3, 0.12, "locked") for ref, i in CHECK]))
+        check = dict(pool.map(_episode, [(ref, i, 315.0, 101.3, 0.12, "locked") for ref, i in check_list()]))
     bad = []
     for (ref, i, *_), row in check.items():
         folder = ref.replace(" ", "_") if ref in dict(HAND) else ref
