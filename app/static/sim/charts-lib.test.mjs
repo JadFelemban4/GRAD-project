@@ -208,6 +208,20 @@ test('crosshair and nearest show the numbers of the point under the pointer', ()
   assert.equal(Q.host.querySelector(':scope > .rc-tip').children[0].textContent, 'q');
 });
 
+test('removing one source chart leaves other sources observed and drawable', () => {
+  const m = newMounter();
+  const one = plainHost(400), two = plainHost(500);
+  let first = 0, second = 0;
+  m.mount(one, () => { first += 1; });
+  m.mount(two, () => { second += 1; });
+  m.unmount(one);
+  m.renderAll(true);
+  assert.equal(first, 1);
+  assert.equal(second, 2);
+  assert.deepEqual([...StubRO.all.at(-1).observed], [two]);
+  m.dispose();
+});
+
 test('createMounter draws each chart at its width, with the default height rule or hOf', () => {
   stubDocument();
   const m = newMounter();

@@ -1,0 +1,142 @@
+{
+  "fixture": true,
+  "scientificResult": false,
+  "cases": [
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 900,
+      "lang": "ar",
+      "overflow": false,
+      "range": "200",
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "width": 1440
+    },
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 900,
+      "lang": "ar",
+      "overflow": false,
+      "range": "200",
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "width": 1440
+    },
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 900,
+      "lang": "en",
+      "overflow": false,
+      "range": "200",
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "width": 1440
+    },
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 900,
+      "lang": "en",
+      "overflow": false,
+      "range": "200",
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "width": 1440
+    },
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 844,
+      "lang": "ar",
+      "overflow": false,
+      "range": "200",
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "width": 390
+    },
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 844,
+      "lang": "ar",
+      "overflow": false,
+      "range": "200",
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 844,
+      "lang": "en",
+      "overflow": false,
+      "range": "200",
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "width": 390
+    },
+    {
+      "actuatorRows": 5,
+      "canvas": true,
+      "height": 844,
+      "lang": "en",
+      "overflow": false,
+      "range": "200",
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "width": 390
+    }
+  ]
+}

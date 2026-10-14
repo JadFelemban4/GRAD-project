@@ -1,0 +1,58 @@
+{
+  "thermal_mapping": {
+    "input_obs_5_6_7": [
+      11,
+      22,
+      33
+    ],
+    "producer_order": [
+      "block",
+      "oil",
+      "turbine"
+    ],
+    "reader_values": {
+      "block": 33.0,
+      "oil": 22.0,
+      "turbine": 11.0
+    }
+  },
+  "fuel_flow": {
+    "input_g_per_s": 10,
+    "reader_value": 10.0,
+    "reader_unit": "kg/s"
+  },
+  "evaluation_without_timing_sidecar": {
+    "training_config": {
+      "dt": 0.2
+    },
+    "evaluation_summary_exists": false,
+    "reader_dt": 0.2,
+    "reader_time_unit": "s",
+    "reader_sample_times": [
+      0.0,
+      0.2
+    ],
+    "issues": [
+      "sample_values_include_pre_and_post_step_phases"
+    ]
+  },
+  "replacement_during_api_request": {
+    "old_reward": 1,
+    "new_reward": 99,
+    "response_reward": 99.0,
+    "old_archive_revision": "b515dc98d0afe3dec76906a5d66f6e93e7a2438f71a8f34754adbcb84e025126",
+    "actual_new_archive_revision": "a2164bdb96a8f94fb3bb4a813f83f91de0991c66f81ae1b9a0f61f3d3bcc35a4",
+    "response_archive_revision": "b515dc98d0afe3dec76906a5d66f6e93e7a2438f71a8f34754adbcb84e025126",
+    "response_source_revision_matches_old": true,
+    "status": 200
+  },
+  "constant_channel_compression": {
+    "samples": 1000000,
+    "uncompressed_bytes": 82000768,
+    "constant_component": {
+      "bytes": 4000128,
+      "ratio": 1006.5747357825868
+    },
+    "reader_outcome": "archive_compression_ratio_limit"
+  }
+}

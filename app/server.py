@@ -58,6 +58,7 @@ import argparse
 import asyncio
 import json
 import os
+from pathlib import Path
 import sys
 import threading
 import time
@@ -332,7 +333,11 @@ def main():
         from app.agent_api import install
         install(app)
         from app.results_api import mount_results
-        mount_results(app)
+        from app.artifact_api import mount_artifacts
+        artifacts = mount_artifacts(app)
+        mount_results(app, artifacts=artifacts)
+        from app.record_api import install_record_routes
+        install_record_routes(app, Path(HERE).parent)
         import uvicorn
         uvicorn.run(app, host='127.0.0.1', port=a.http_port, log_level='warning')
         return

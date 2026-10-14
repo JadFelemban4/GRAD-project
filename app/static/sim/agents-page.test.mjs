@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { STRINGS, LANGS } from './i18n.mjs';
 import './agents-strings.mjs';
+import './artifact-strings.mjs';
 import { ACTIONS } from './agent-view.mjs';
 
 const HTML = new URL('../agents.html', import.meta.url);

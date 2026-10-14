@@ -1629,7 +1629,7 @@ def _snapshot():
             paths = [top]
         elif top.is_dir():
             paths = [p for p in top.rglob("*") if p.is_file()
-                     and not {"__pycache__", "node_modules"} & set(p.relative_to(top).parts)]
+                     and not {"__pycache__", "node_modules", ".superpowers"} & set(p.relative_to(top).parts)]
         else:
             continue
         for p in paths:
@@ -2047,8 +2047,11 @@ class UserSettingTests(unittest.TestCase):
                              ("from-os-environ", "env"))
 
     def test_file_outside_is_read_and_a_file_inside_the_repository_is_refused(self):
-        with tempfile.TemporaryDirectory() as appdata:
-            self.assertNotIn(ROOT, Path(appdata).resolve().parents)
+        # Both sides of the boundary are fixtures under app, so this test does
+        # not need write access outside the user's allowed work directory.
+        with tempfile.TemporaryDirectory() as appdata, \
+                mock.patch.object(MQ, 'REPO', Path(appdata).resolve() / 'repository'):
+            self.assertNotIn(MQ.REPO, Path(appdata).resolve().parents)
             folder = Path(appdata) / "grad-project"
             folder.mkdir()
             (folder / "typesafe_key").write_text("filekey\n", encoding="utf-8")
@@ -2086,7 +2089,8 @@ class UserSettingTests(unittest.TestCase):
             "utf32le_mark": (mark + key).encode("utf-32-le"),
             "two_lines": (key + "\r\n" + key + "\r\n").encode("utf-8"),
         }
-        with tempfile.TemporaryDirectory() as appdata:
+        with tempfile.TemporaryDirectory() as appdata, \
+                mock.patch.object(MQ, 'REPO', Path(appdata).resolve() / 'repository'):
             folder = Path(appdata) / "grad-project"
             folder.mkdir()
             for name, (data, _) in read.items():
@@ -2399,7 +2403,8 @@ class JevKeyTests(_JevCase):
                 seen = (json.dumps(vars(err)) + repr(err)
                         + "".join(traceback.format_exception(err)))
                 self.assertNotIn("sentinel", seen)
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(MQ, 'REPO', Path(tmp).resolve() / 'repository'):
             (Path(tmp) / "grad-project").mkdir()
             (Path(tmp) / "grad-project" / "typesafe_key").write_text(curly + "\n",
                                                                      encoding="utf-8")
@@ -2423,7 +2428,8 @@ class JevKeyTests(_JevCase):
                 self.assertEqual(run.returncode, want)
 
     def test_load_key_prefers_the_environment(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(MQ, 'REPO', Path(tmp).resolve() / 'repository'):
             appdata = Path(tmp).resolve()
             (appdata / "grad-project").mkdir()
             (appdata / "grad-project" / "typesafe_key").write_text("file-key\n", encoding="utf-8")
@@ -2709,7 +2715,8 @@ class BridgeTests(unittest.TestCase):
             python.write_text("", encoding="utf-8")
             (home / "models" / "multilingual").mkdir(parents=True)
             (home / "models" / "multilingual" / "rl_agent_config.json").write_text("{}", encoding="utf-8")
-            with spawned.patch(), mock.patch.dict(os.environ, {"LAYA_HOME": tmp}):
+            with spawned.patch(), mock.patch.dict(os.environ, {"LAYA_HOME": tmp}), \
+                    mock.patch.object(LB, 'REPO', home / 'repository'):
                 real, fake = LB.LayaBridge(), _fake_bridge("ok")
                 seen = [b.status() for b in (real, fake, real, fake, real, fake)]
         self.assertEqual(spawned.procs, [])
@@ -3812,14 +3819,9 @@ class PageTests(unittest.TestCase):
                         in style, "five links need the nav's own row on phones (style.css, its last block)")
 
     def test_the_lab_launcher_names_the_agents_page(self):
-        """app/start-simulation.ps1 names /agents and says when its python
-        cannot compute an episode (design section 10, M1 Verify note). Only its
-        banner changes: its interpreter and its last line stay as they were."""
-        text = (self.STATIC.parent / "start-simulation.ps1").read_text(encoding="utf-8")
-        self.assertTrue("localhost:$Port/agents" in text, "the banner does not name /agents")
-        self.assertTrue("stable_baselines3" in text, "the banner does not check for stable-baselines3")
-        self.assertEqual(text.rstrip().splitlines()[-1],
-                         "python -m app.server --simulation --http-port $Port")
+        """The launcher checks its interpreter and serves the agent route."""
+        from app.test_launcher import assert_launcher_page_contract
+        assert_launcher_page_contract(self, "agents")
 
     @unittest.skipUnless(HAVE_ALL_RUNS, NO_ALL_RUNS)
     def test_catalog_fixture_has_the_server_shape(self):

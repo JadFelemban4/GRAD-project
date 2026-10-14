@@ -39,8 +39,8 @@ export const AGENT_STRINGS = {
   ar: {
     // --- document, intro and badge
     'agents.page.title': 'الوكلاء — GRAD',
-    'agents.intro.heading': 'ماذا قرّر كل وكيل، ثانيةً بثانية',
-    'agents.intro.note': 'حلقة اختبار واحدة تُحسب الآن من الشبكتين المدرَّبتين، على الطريق المحاكى نفسه للسيارتين.',
+    'agents.intro.heading': 'قرارات الوكلاء، عينةً بعينة',
+    'agents.intro.note': 'افحص تسجيل تدريب أو تقييم محفوظًا، أو اختر زوج وكلاء متوافقًا واحسب حلقة محاكاة صراحةً.',
     'agents.badge': 'محاكاة: سيناريو إجهاد اصطناعي — تسلّق متواصل {grade}٪ عند {v} كم/س في {t} °م، أقسى من أي تسلّق مسجّل؛ لا يعني ذلك أنه أحرّ من كل لحظة في الرحلات المسجّلة',
     'agents.badge.short': 'محاكاة',
 
@@ -104,6 +104,8 @@ export const AGENT_STRINGS = {
     'agents.legend.same_place': 'السيارتان في المكان نفسه دائماً: السرعة يفرضها السيناريو، والوكيلان يختاران الحماية فقط',
     'agents.scene.slope': 'الميل غير مضخّم · السيارة ليست بمقياسها',
     'agents.scene.webgl_error': 'تعذّر عرض المشهد ثلاثي الأبعاد في هذا المتصفح. المقطع الجانبي ولوحة القرار يعملان.',
+    'agents.mobile.sighted': 'الاستشرافي',
+    'agents.mobile.blind': 'غير الاستشرافي',
     'agents.profile.ve': 'المقياس الرأسي مضخّم ×{ve}',
     'agents.profile.rise': 'يرتفع الطريق {rise} م بينما يبقى الضغط {p} كيلوباسكال والحرارة {t} °م ثابتين طوال الحلقة',
     'agents.profile.climb': 'يبدأ الصعود عند {start} ث · {grade}٪',
@@ -231,8 +233,8 @@ export const AGENT_STRINGS = {
   en: {
     // --- document, intro and badge
     'agents.page.title': 'Agents — GRAD',
-    'agents.intro.heading': 'What each agent decided, second by second',
-    'agents.intro.note': 'One test episode, computed now from the two trained networks, on the same simulated road for both cars.',
+    'agents.intro.heading': 'Agent decisions, sample by sample',
+    'agents.intro.note': 'Inspect a saved training or evaluation record, or choose a compatible agent pair and explicitly compute one simulated episode.',
     'agents.badge': 'Simulation: a synthetic stress scenario, a sustained {grade} % climb at {v} km/h in {t} °C, harsher than any recorded climb; this does not mean it is hotter than every moment of the recorded drives',
     'agents.badge.short': 'Simulation',
 
@@ -296,6 +298,8 @@ export const AGENT_STRINGS = {
     'agents.legend.same_place': 'Both cars are always at the same place: the scenario sets the speed, and the agents choose only the protection',
     'agents.scene.slope': 'Slope not exaggerated · car not to scale',
     'agents.scene.webgl_error': 'The 3D view could not be shown in this browser. The side profile and the decision panel still work.',
+    'agents.mobile.sighted': 'Sighted lane',
+    'agents.mobile.blind': 'Blind lane',
     'agents.profile.ve': 'Vertical scale exaggerated ×{ve}',
     'agents.profile.rise': 'The road rises {rise} m while pressure stays at {p} kPa and temperature at {t} °C throughout the episode',
     'agents.profile.climb': 'Climb starts at {start} s · {grade} %',

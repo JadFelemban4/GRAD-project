@@ -7,6 +7,7 @@
   <title data-i18n="agents.page.title">الوكلاء على الطريق — GRAD</title>
   <link rel="stylesheet" href="/static/sim/style.css">
   <link rel="stylesheet" href="/static/sim/agents.css">
+  <link rel="stylesheet" href="/static/sim/results.css">
   <script>
     // The lab's own pre-paint block, unchanged: the same two keys, wrapped
     // because localStorage throws in private mode. Nothing else is stored.
@@ -40,10 +41,15 @@
   </header>
   <main class="agents-main">
     <section class="page-intro agents-intro">
-      <div><p class="eyebrow"><span class="small-rule"></span><span data-i18n="intro.eyebrow">المحرك · الطريق · الزمن</span></p><h1><span data-i18n="agents.intro.heading">ماذا قرّر كل وكيل، ثانية بثانية</span><span>.</span></h1><p class="intro-note" data-i18n="agents.intro.note">حلقة اختبار مجمّدة واحدة لزوج واحد.</p></div>
+      <div><p class="eyebrow"><span class="small-rule"></span><span data-i18n="intro.eyebrow">المحرك · الطريق · الزمن</span></p><h1><span data-i18n="agents.intro.heading">قرارات الوكلاء، عينةً بعينة</span><span>.</span></h1><p class="intro-note" data-i18n="agents.intro.note">افحص تسجيلًا محفوظًا، أو احسب حلقة لزوج وكلاء متوافق.</p></div>
       <p id="sim-badge" class="sim-badge" role="note" data-i18n="agents.badge.short">محاكاة</p>
     </section>
     <div id="error" class="error" role="alert" hidden></div>
+    <section class="artifact-strip">
+      <p id="artifact-status" role="status" aria-live="polite"></p>
+      <details><summary data-i18n="artifact.heading">ملفات التدريب والنتائج</summary><div id="artifact-list"></div></details>
+    </section>
+    <section id="saved-records" class="saved-records" aria-label="Saved recordings / التسجيلات المحفوظة"></section>
     <section class="agents-layout">
       <div class="agents-col agents-col-main">
         <article class="chase-panel">
@@ -55,6 +61,7 @@
             <div id="loading" class="loading-card" role="status" aria-live="polite" hidden><span class="loading-indicator"></span><div><strong id="load-title"></strong><p id="load-detail" dir="ltr"></p><progress id="load-progress" max="1" value="0"></progress></div></div>
           </div>
           <div class="chase-captions"><span id="same-place-legend" data-i18n="agents.legend.same_place">السيارتان في المكان نفسه دائماً</span><span id="chase-caption" data-i18n="agents.scene.slope">الميل غير مضخّم · السيارة ليست بمقياسها</span></div>
+          <div class="mobile-lane-switch"><button id="mobile-sighted" type="button" aria-pressed="true" data-i18n="agents.mobile.sighted">الاستشرافي</button><button id="mobile-blind" type="button" aria-pressed="false" data-i18n="agents.mobile.blind">غير الاستشرافي</button></div>
         </article>
         <section class="transport agents-transport" data-i18n-aria="transport.aria" aria-label="التحكم في إعادة التشغيل">
           <div class="transport-buttons"><button id="play" class="play-button" type="button" disabled data-i18n-aria="transport.play_aria" aria-label="تشغيل"><svg><use href="#i-play"/></svg><span data-i18n="transport.play">تشغيل</span></button><button id="restart" class="icon-button" type="button" disabled data-i18n-aria="transport.restart_aria" aria-label="إعادة من البداية"><svg><use href="#i-reset"/></svg></button></div>
@@ -153,6 +160,6 @@
     <footer><span dir="ltr" data-i18n="footer.brand">GRAD / ENGINEERING REPLAY LAB</span><span data-i18n="footer.note">مشروع تخرّج · محرك B58 · عرض علمي استكشافي</span><span id="footer-index" class="footer-index" dir="ltr" data-i18n="agents.footer.index">02 — AGENTS</span></footer>
   </main>
   <noscript><p data-i18n="noscript">يحتاج المختبر إلى JavaScript.</p></noscript>
-  <script type="module" src="/static/sim/agents.mjs"></script>
+  <script type="module" src="/static/sim/agents.mjs?v=20261009"></script>
 </body>
 </html>

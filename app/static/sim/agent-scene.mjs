@@ -249,6 +249,11 @@ function buildChase(view, episodeRoad, lanes) {
   return {
     update,
     setTheme,
+    setLane(lane){
+      if(disposed)return;
+      cars.forEach(({car},index)=>{car.visible=lane==null || (index===0?'sighted':'blind')===lane;});
+      render();
+    },
     dispose() {
       if (disposed) return;
       disposed = true;

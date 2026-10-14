@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createRoad, roadHeight, previewWorldLength, METERS_PER_WORLD_UNIT } from './geometry.mjs';
+import { createEngineAssembly,turboScrollGeometry,turboBladeGeometry } from './engine-assembly.mjs';
 
 // Illustration scale: see METERS_PER_WORLD_UNIT in geometry.mjs, which owns the
 // value and the reason for it. It was 90 and is now 35, chosen so a cruise and
@@ -323,7 +324,7 @@ function disposeGraph(scene) {
   geometries.forEach(g => g.dispose());
   materials.forEach(m => m.dispose());
 }
-export function stage(host, { extent, position, target, shadows = true }) {
+export function stage(host, { extent, position, target, shadows = true, onResize = () => {} }) {
   const paint = createPainter();
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-extent, extent, extent, -extent, 0.1, 250);
@@ -368,6 +369,7 @@ export function stage(host, { extent, position, target, shadows = true }) {
     camera.bottom = -halfHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    onResize();
     render();
   };
   const observer = new ResizeObserver(resize);
@@ -777,8 +779,10 @@ function temperatureColor(material, value, low, high, colors) {
   if (ratio > 0.5) material.color.lerp(colors.hot, (ratio - 0.5) * 2);
 }
 
-export function createEngineScene(host) {
-  const view = stage(host, { extent: 5.9, position: [11, 10, 13], target: [0, 0.7, 0], shadows: false });
+export function createEngineScene(host, options = {}) {
+  let fitFrame=null;
+  const view = (options.makeStage || stage)(host, { extent: 5.9, position: [11, 10, 13], target: [0, 0.7, 0], shadows: false,
+    onResize:()=>fitFrame?.() });
   const { scene, render, paint } = view;
   // These four carry a temperature, so the palette only seeds them; the ramp
   // owns their colour from the first update onward.
@@ -789,36 +793,72 @@ export function createEngineScene(host) {
   const metal = paint.mat('blockMetal', { metalness: 0.45 });
   const dark = paint.mat('engineDark', { metalness: 0.35 });
   const engine = new THREE.Group();
+  const intake = new THREE.Group(),exhaust = new THREE.Group(),coolingPath = new THREE.Group();
+  intake.name='intake-path';exhaust.name='exhaust-path';coolingPath.name='cooling-path';
+  engine.add(intake,exhaust,coolingPath);
+  const intakeMaterial=new THREE.MeshStandardMaterial({color:0x529bdd,metalness:.15,roughness:.4});
+  const exhaustMaterial=new THREE.MeshStandardMaterial({color:0xc99045,metalness:.15,roughness:.4});
+  const coolingMaterial=new THREE.MeshStandardMaterial({color:0x9b7ac6,metalness:.1,roughness:.4});
   engine.position.x = -0.6;
-  box(engine, [6.3, 1.55, 2.1], block, [0, 0.8, 0]);
-  box(engine, [6.55, 0.35, 2.3], metal, [0, 1.77, 0]);
-  box(engine, [6.1, 0.28, 1.6], block, [0, 2.07, 0]);
-  box(engine, [5.4, 0.48, 1.8], oil, [0, -0.22, 0]);
+  engine.add(createEngineAssembly({block,oil,metal,dark}));
   for (let i = 0; i < 6; i++) {
-    const x = -2.5 + i;
-    mesh(engine, new THREE.CylinderGeometry(0.32, 0.32, 0.19, 12), dark, [x, 2.3, 0]);
-    pipe(engine, [[x, 1.35, 1.1], [x, 1.1, 1.7], [x * 0.7, 0.85, 2.2]], 0.13, metal);
+    const x = -2.34 + i * .945;
+    pipe(exhaust, [[x, 2.06, 1.3], [x, 1.7, 1.7], [x * 0.7, 0.85, 2.2]], 0.13, exhaustMaterial);
+    pipe(intake, [[x, 2.06, -1.3], [x, 2.3, -1.65], [x, 2.3, -2.1]], .12, intakeMaterial);
   }
-  pipe(engine, [[-1.8, 0.85, 2.2], [0, 0.85, 2.2], [2, 0.85, 2.2], [2.6, 0.85, 2.7]], 0.21, metal);
+  pipe(intake,[[-2.8,2.3,-2.1],[0,2.3,-2.1],[2.8,2.3,-2.1]],.18,intakeMaterial);
+  pipe(exhaust, [[-1.8, 0.85, 2.2], [0, 0.85, 2.2], [2, 0.85, 2.2], [2.6, 0.85, 2.7]], 0.21, exhaustMaterial);
   // Two housings connected by one shaft represent a single turbo assembly.
-  for (const [z, material] of [[2.6, turbine], [3.8, metal]]) {
-    mesh(engine, new THREE.TorusGeometry(0.62, 0.26, 9, 20), material, [2.55, 1.02, z]);
+  const rotors=[];
+  for (const [z, material,name] of [[2.6, turbine,'turbine'], [3.8, metal,'compressor']]) {
+    const housing=mesh(engine, turboScrollGeometry(name==='compressor'), material, [2.55, 1.02, z]);
+    housing.name=`turbo-${name}`;
+    mesh(engine,new THREE.TorusGeometry(.53,.045,8,32),metal,[2.55,1.02,z+.08]);
     const hub = mesh(engine, new THREE.CylinderGeometry(0.25, 0.25, 0.23, 12), dark, [2.55, 1.02, z]);
     hub.rotation.x = Math.PI / 2;
+    const rotor=new THREE.Group();rotor.name=`${name}-rotor`;rotor.position.set(2.55,1.02,z+.13);
+    for(let blade=0;blade<7;blade++){
+      const angle=blade*Math.PI*2/7;
+      const item=mesh(rotor,turboBladeGeometry(),metal,[0,0,0]);item.rotation.z=angle;
+    }
+    engine.add(rotor);rotors.push(rotor);
   }
   const shaft = mesh(engine, new THREE.CylinderGeometry(0.1, 0.1, 1.2, 10), dark, [2.55, 1.02, 3.2]);
   shaft.rotation.x = Math.PI / 2;
-  pipe(engine, [[2.55, 1.65, 3.8], [1.6, 2.6, 3.8], [-2.8, 2.65, 2.7], [-2.9, 2, 0.75]], 0.18, metal);
-  pipe(engine, [[2.9, 0.5, 2.6], [3.9, 0.3, 2.5], [4.7, 0.3, 2.5]], 0.2, metal);
+  shaft.name='turbo-shaft';
+  pipe(intake, [[4.6,1.02,3.8],[3.8,1.02,3.8],[3.17,1.02,3.8]],.18,intakeMaterial);
+  pipe(intake, [[2.55, 1.65, 3.8], [3.7, 2.6, 2.5], [3.8, 2.65, -2.1], [2.8, 2.3, -2.1]], 0.18, intakeMaterial);
+  pipe(exhaust, [[2.9, 0.5, 2.6], [3.9, 0.3, 2.5], [4.7, 0.3, 2.5]], 0.2, exhaustMaterial);
   // Radiator proxy shares the coolant channel; no radiator-metal temperature exists.
-  box(engine, [0.42, 2.6, 3], coolant, [-4.5, 0.85, 0]);
+  const radiator=box(engine, [0.42, 2.6, 3], coolant, [-4.5, 0.85, 0]);
   for (let i = 0; i < 9; i++) box(engine, [0.48, 0.055, 2.8], metal, [-4.5, -0.24 + i * 0.27, 0]);
-  pipe(engine, [[-4.5, 2, -0.85], [-3.7, 2.6, -1.5], [-2.9, 1.3, -1.1]], 0.17, coolant);
-  pipe(engine, [[2.7, 0.5, -1.05], [2.3, -0.3, -1.8], [-4.2, -0.4, -1.8], [-4.5, -0.2, -0.9]], 0.17, coolant);
+  pipe(coolingPath, [[-4.5, 2, -0.85], [-3.7, 2.6, -1.5], [-2.9, 1.3, -1.1]], 0.17, coolingMaterial);
+  pipe(coolingPath, [[2.7, 0.5, -1.05], [2.3, -0.3, -1.8], [-4.2, -0.4, -1.8], [-4.5, -0.2, -0.9]], 0.17, coolingMaterial);
   mesh(engine, new THREE.CylinderGeometry(0.32, 0.32, 0.68, 12), oil, [1.5, 0.4, -1.4]);
   scene.add(engine);
+  let focus=[engine];
+  // Fit the actual parts rather than the empty corners of a whole-engine box.
+  // Re-run after a viewport resize, retaining the selected camera and sample.
+  fitFrame=()=>{
+    scene.updateMatrixWorld(true);
+    const bounds=new THREE.Box3();for(const object of focus)bounds.expandByObject(object);
+    view.camera.lookAt(bounds.getCenter(new THREE.Vector3()));
+    view.camera.zoom=1;view.camera.updateProjectionMatrix();view.camera.updateMatrixWorld(true);
+    let extent=0;const point=new THREE.Vector3();
+    for(const object of focus)object.traverseVisible(part=>{
+      if(!part.geometry)return;part.geometry.computeBoundingBox();const box=part.geometry.boundingBox;
+      for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
+        point.set(x,y,z).applyMatrix4(part.matrixWorld).project(view.camera);
+        extent=Math.max(extent,Math.abs(point.x),Math.abs(point.y));
+      }
+    });
+    if(extent>0&&Number.isFinite(extent))view.camera.zoom=.88/extent;
+    view.camera.updateProjectionMatrix();
+  };
   let disposed = false;
   let shown = null;
+  let reducedMotion=Boolean(options.reducedMotion);
+  if(view.renderer?.domElement?.style)view.renderer.domElement.style.touchAction='pan-y';
   function repaint() {
     const colors = ramp(view.theme());
     temperatureColor(block, shown?.block_c, 60, 180, colors);
@@ -829,12 +869,29 @@ export function createEngineScene(host) {
   function update(frame) {
     if (disposed) return;
     shown = frame;
+    // A source-time keyed schematic phase, never a measured turbo RPM.
+    rotors.forEach(rotor=>{rotor.rotation.z=reducedMotion||!Number.isFinite(frame?.time)?0:frame.time*.8;});
     repaint();
     render();
   }
   update(null);
+  fitFrame();render();
   return {
     update,
+    setReducedMotion(value){reducedMotion=Boolean(value);update(shown);},
+    setCamera(preset){
+      const cameras={overview:[[11,10,13],[0,.7,0]],turbo:[[7,5,11],[1.95,1.02,3.2]],
+        intake:[[8,11,10],[0,1.8,2]],cooling:[[-10,7,8],[-2,1,-.5]]};
+      const [position,target]=cameras[preset] || cameras.overview;
+      view.camera.position.set(...position);view.camera.lookAt(...target);
+      focus=preset==='turbo'?['turbo-compressor','turbo-turbine','turbo-shaft','compressor-rotor','turbine-rotor'].map(name=>engine.getObjectByName(name)):
+        preset==='intake'?[intake,exhaust]:preset==='cooling'?[coolingPath,radiator]:[engine];
+      fitFrame();
+      intakeMaterial.emissive.setHex(preset==='intake'?0x204060:0);
+      exhaustMaterial.emissive.setHex(preset==='intake'?0x604020:0);
+      coolingMaterial.emissive.setHex(preset==='cooling'?0x403060:0);
+      render();
+    },
     // Same contract as the world scene: re-tint, re-ramp the four temperature
     // nodes at the values they are already showing, re-render.
     setTheme(name) {

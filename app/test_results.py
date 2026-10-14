@@ -1334,7 +1334,9 @@ class DataTests(unittest.TestCase):
         for name in NEVER_READ:
             (res / name).write_text((RD.RESULTS / name).read_text(encoding="utf-8"),
                                     encoding="utf-8")
-        cls.tree = RD.build(res, base, live=cls.live)
+        # Keep the fixture detached even when TEMP is inside this repository.
+        with mock.patch.dict(os.environ, {'GIT_CEILING_DIRECTORIES': str(base.parent.resolve())}):
+            cls.tree = RD.build(res, base, live=cls.live)
 
     @classmethod
     def tearDownClass(cls):
@@ -1665,7 +1667,7 @@ class DataTests(unittest.TestCase):
     def test_real_tree_serialises_strictly(self):
         json.dumps(self.real, allow_nan=False)
         built = self.real["built"]
-        self.assertEqual(set(self.real), {"built", "import_failures", "sections", "not_read"})
+        self.assertEqual(set(self.real), {"built", "import_failures", "sections", "not_read", "graphics"})
         self.assertEqual(self.real["import_failures"], [])
         self.assertEqual(built["python"], platform.python_version())
         self.assertEqual(built["plant_sha"], FP._sha_files(FP.PLANT_FILES))
@@ -1780,7 +1782,7 @@ from app import results_api as RA  # noqa: E402
 
 APP_DIR = Path(RA.__file__).resolve().parent
 LOCAL = {"host": "127.0.0.1:8000"}
-TOP_KEYS = {"built", "import_failures", "sections", "not_read"}
+TOP_KEYS = {"built", "import_failures", "sections", "not_read", "graphics"}
 REFUSAL = "refused: this page answers 127.0.0.1 and localhost only"
 
 
@@ -1937,8 +1939,10 @@ class RouteTests(unittest.TestCase):
         self.assertEqual(len(guarded), 1)
         body = [ast.unparse(s) for s in guarded[0].body]
         at = body.index("install(app)")
-        self.assertEqual(body[at + 1:at + 3], ["from app.results_api import mount_results",
-                                               "mount_results(app)"])
+        self.assertIn("from app.results_api import mount_results", body[at + 1:])
+        mount_at = body.index("mount_results(app, artifacts=artifacts)")
+        self.assertGreater(mount_at, body.index("artifacts = mount_artifacts(app)"))
+        self.assertGreater(mount_at, at)
         agents = body.index("print(f'  agent replay:  http://localhost:{a.http_port}/agents')")
         self.assertEqual(body[agents + 1],
                          "print(f'  results:       http://localhost:{a.http_port}/results')")
@@ -1988,8 +1992,9 @@ class PageTests(unittest.TestCase):
 
     STATIC = ROOT / "app" / "static"
     OWN = ("results.mjs", "results-view.mjs", "results-charts.mjs", "results-format.mjs",
-           "results-strings.mjs", "charts-lib.mjs")
-    SHARED = ("i18n.mjs", "agent-picker.mjs")
+           "results-strings.mjs", "results-selector.mjs", "charts-lib.mjs", "graphics-browser.mjs",
+           "graphics-strings.mjs", "results-graphics.mjs", "chart-selection.mjs")
+    SHARED = ("i18n.mjs", "agent-picker.mjs", "artifact-sync.mjs", "artifact-view.mjs")
     VERSION = "v=R1a"
     IDS = ("error", "built", "warnings", "summary", "summary-rows", "sections", "not-read",
            "not-read-list", "theme-toggle", "lang-toggle", "footer-index")
@@ -2066,13 +2071,9 @@ class DocsTests(unittest.TestCase):
         self.assertTrue(path.is_file(), f"app/{rel} does not exist")
         return path.read_text(encoding="utf-8")
 
-    def test_the_launcher_names_the_results_tab_and_keeps_its_last_line(self):
-        text = self.read("start-simulation.ps1")
-        self.assertTrue("localhost:$Port/results" in text, "the banner does not name /results")
-        self.assertLess(text.index("localhost:$Port/agents"), text.index("localhost:$Port/results"),
-                        "the results line follows the agent replay's")
-        self.assertEqual(text.rstrip().splitlines()[-1],
-                         "python -m app.server --simulation --http-port $Port")
+    def test_the_launcher_names_the_results_tab_and_starts_the_server(self):
+        from app.test_launcher import assert_launcher_page_contract
+        assert_launcher_page_contract(self, "results")
 
     def test_the_readme_lists_the_page_and_says_how_to_open_it(self):
         text = self.read("README.md")

@@ -7,8 +7,8 @@ Two things live here and they share the same physics.
 | `/` and `/driver` | the live supervisor: the project's plant running beside the car | live OBD-II, **read-only** |
 | `/review` | what the supervisor marked during a drive | none |
 | `/simulation` | **the 3D replay lab** — recorded drives, rendered | **none, ever** |
-| `/agents` | **the agent replay page** — two trained agents on one simulated episode | **none, ever** |
-| `/results` | **the results tab** — Jad's three evaluation experiments in `results/` (Phase D, D2 and C4) as their files record them; Ghassan's set comes with R1b | **none, ever** |
+| `/agents` | **saved decisions and agent replay** — inspect a published recording or explicitly compute two compatible agents on one episode | **none, ever** |
+| `/results` | **independent experiments and published reference figures** — Phase D, D2, C4, agent sets and G01–G25 | **none, ever** |
 
 Everything below is about `/simulation`, except the sections on opening
 `/agents` and `/results`. For the supervisor read `CLAUDE.md` and `AUDIT.md` first.
@@ -21,7 +21,16 @@ Breaking either fails a check rather than going unnoticed.
 
 ## Run it
 
-From the **repository root**, not from `app/`.
+On Windows, double-click `app\start.cmd`. It uses the same PowerShell launcher,
+keeps startup errors visible, and accepts the same options. For example:
+
+```cmd
+app\start.cmd -Port 8001 -Python "C:\Python312\python.exe" -SkipVendor
+```
+
+While the server is running, leave its terminal open. Stop it with Ctrl+C.
+
+From the repository root:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File app\start-simulation.ps1
@@ -29,7 +38,25 @@ powershell -ExecutionPolicy Bypass -File app\start-simulation.ps1
 
 Then open <http://localhost:8000/simulation>.
 
+The engine inset and saved-record viewer share a six-cylinder cutaway adapted
+from the Explanatory Simulation geometry, copied into `app/static/sim/`. It
+illustrates pistons, crankshaft, head, gas paths and a single turbo shaft;
+its dimensions and rotor phase are illustrative. Temperature colors use the
+selected frame's recorded channels, and missing channels stay unavailable.
+
 The script vendors Three.js on the first run and then starts the server.
+It prefers `.venv\Scripts\python.exe`, then validates the available `python`,
+checking FastAPI, uvicorn, NumPy and Gymnasium before launch. It prints the
+absolute interpreter path, checks port 8000 on loopback and returns the server's
+exit code. SB3/Torch availability is reported separately, without installing them.
+Choose another existing interpreter or port explicitly:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File app\start-simulation.ps1 -Python "C:\Python312\python.exe" -Port 8000
+```
+
+An absolute path to this script also works from another directory. The app stays
+on `127.0.0.1`; its port 8000 is separate from the explanatory lab's port 8765.
 If you would rather do it by hand:
 
 ```bash
@@ -56,17 +83,16 @@ costs a second, not the whole build.
 ### Opening the agents page, `/agents`
 
 The page exists only when the server runs with `--simulation`. Start it with
-the **system interpreter**, from the repository root:
+the launcher above, or select an interpreter with the same required imports:
 
 ```powershell
-C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m app.server --simulation
+powershell -ExecutionPolicy Bypass -File app\start-simulation.ps1
 ```
 
-Not with `app\start-simulation.ps1`: it ends in a bare `python`, which on
-this machine can resolve to a `.venv` without stable-baselines3 and torch,
-and the page's episode route then answers 503. Its 3D view uses the Three.js
-that script vendors; without it the rest of the page still works and says the
-3D view cannot be shown.
+The repository `.venv` currently has the app dependencies but lacks
+stable-baselines3 and Torch. Browsing runs and results works; actual model
+inference requires both and compatible model fingerprints. A mismatched
+historical model is refused even if those dependencies are available.
 
 Then open <http://localhost:8000/agents?runs=runs_c4&seed=5&ep=1> and press
 «احسب». Nothing is computed before that. The first episode takes about a
@@ -81,19 +107,90 @@ It replays nothing and needs neither stable-baselines3 nor torch, so any
 interpreter that runs the lab runs it, `app\start-simulation.ps1` included:
 
 ```powershell
-C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m app.server --simulation
+powershell -ExecutionPolicy Bypass -File app\start-simulation.ps1
 ```
 
-Then open <http://localhost:8000/results>. Every time the page opens, the
-server reads `results/` again: each experiment is its own section, never
-counted together with another, labelled with the plant its files record, its
+Then open <http://localhost:8000/results>. Stable result changes refresh
+automatically while the page stays open. Choose one experiment to show its own
+summary, charts and source files; explicitly enable a second experiment for
+comparison. Choices survive reload and Back, and new arrivals do not change the
+selected view. Agent sets are separate choices with their recorded member
+summaries. Each experiment is labelled with the plant its files record, its
 preregistered verdict quoted word for word with its file and line, and its
 charts show their numbers under the pointer, on a tap and in a folded table.
 Nothing is written, and the only figure computed is blind minus sighted per
-seed, which the analysis scripts print too. After a new drive, a retrain or a
-new experiment, re-run the scripts that write `results/` and reload the page.
+seed, which the analysis scripts print too. Producers still have to publish
+evaluation files explicitly; opening this page starts no training or evaluation.
 It answers only a browser on this machine (`127.0.0.1` or `localhost`). Its
 own suite is `python -m app.test_results`.
+
+### Automatic discovery in `/agents` and `/results`
+
+Simulation startup mounts `/api/artifacts` and `/api/artifacts/revision`.
+Visible pages poll every two seconds; all clients share one bounded scan.
+Files need an unchanged observation at least one second later before they are
+published. Hidden pages pause polling; failures retain the last snapshot and
+back off to 30 seconds. The status strip names the last successful update.
+
+On 8 October, a small evaluation-text copy published into a disposable local
+fixture appeared in the already-open results page after **3.80 seconds**, measured
+from file publication to DOM insertion. This is one local measurement, not a bound
+for large exports or files that are still changing. A settled registry scan of this
+checkout took **0.43 seconds** for 30 items and 306 source paths. Test outcomes,
+browser evidence and the remaining model limitations are recorded in the
+[A1–A3 session report](SESSION_REPORT_2026-10-08_training-linked-app.md).
+The follow-up fixes for evaluation association, atomic snapshots, schema-invalid
+indexes and individual experiment selection are verified in the
+[Astra follow-up report](SESSION_REPORT_2026-10-08_astra-fixes.md).
+
+Discovery covers flat `runs*`, one nested group under those roots, evaluation
+texts and the published membership of `results/agents/<set>/index.json`.
+New nested runs use server-issued IDs. Partial exports, interrupted training,
+missing recordings and compatibility refusals have separate labels. Agent-set
+evidence and summary plots are displayed independently. The real `terrain_dt1` and
+`sep19_110kmh` sets have summaries but no local training/evaluation recordings.
+
+### Figure groups and saved decisions
+
+The results selector keeps experiments separate. Choose one of five figure
+groups: overview, training, agent decisions, evaluation, or simulator versus
+car. The published reference choice provides G01–G06 and G14–G25; the two
+agent sets provide G07–G13 where their files contain the required evidence.
+Legacy evaluation charts remain reachable after opening the training group.
+Every panel retains its sources, exact-value table, units and recorded limits.
+G25 quotes published statuses and does not certify the current plant.
+
+Open **Agent decisions → Inspect saved training / evaluation records** to
+reach the saved-record viewer. Choose a source, policy, and zero-based episode.
+It reads `train_record.npz` or `eval_record.npz` from registered run/member
+folders. Training uses saved `episode`/`step` boundaries; evaluation uses its
+saved array shape. Recorded/configured timing is used when available; otherwise
+the axis stays in sample indexes. Reading a recording starts no inference.
+
+The viewer requests 200 samples per window; the API allows 1–500. Commands are
+normalised policy outputs before the step. Applied actions retain their physical
+units after the step. The cursor links charts, exact values and recorded
+temperature overlays. Camera, theme and language changes retain the same sample.
+On a phone, switch between command and applied plots; the values table still
+contains both. The engine geometry and rotation are schematic. Reduced motion
+pauses rotor animation; if WebGL fails, paths, numeric values and controls remain.
+
+NPZ members require initial decompression. Archive/header/member/allocation
+limits are checked before NumPy loading with `allow_pickle=False`; only one
+decoded source is cached. File replacement or sidecar changes alter the source
+revision. Subsequent frame requests reuse the bounded cache.
+
+On 9 October, **all 86 expected real recordings were absent**. Their missing
+filenames remain visible. Numeric playback was verified with an explicitly
+labelled local acceptance fixture, separate from the production app. Missing
+recordings and preregistered/posthoc analysis cannot be recreated by the viewer.
+See [coverage and acceptance](verification/astra-graphics-coverage.md) and
+[the implementation report](SESSION_REPORT_2026-10-09_astra-implementation.md).
+
+Unrelated arrivals preserve the selected run and replay. Replacing the selected
+model, metadata or provenance clears old frames and answers; the user computes
+again explicitly. Loaded/disk plant changes require a server restart. Results
+reuse unchanged sections and mounted charts, retaining focus, folds and scroll.
 
 The first time the lab is opened after the update that added this tab, a
 browser that had opened the lab before it may still hold its old copy of

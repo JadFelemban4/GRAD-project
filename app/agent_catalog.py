@@ -21,6 +21,8 @@ prefix with no row (a future runs_X) has the verdict state 'none'.
 from __future__ import annotations
 
 from collections import namedtuple
+import hashlib
+import json
 import os
 from pathlib import Path
 import re
@@ -39,9 +41,133 @@ ROOT = Path(__file__).resolve().parent.parent
 # the sixteen real C4 agents (eight pairs) would come back ready with no C4
 # caveats attached.
 RUNS_NAME = re.compile(r"^runs[a-z0-9_]*$")
+ARTIFACT_ID = re.compile(r"^art_[0-9a-f]{24}$")
 AGENT_NAME = re.compile(r"^(sighted|blind)_seed(\d+)$")
 ARMS = ("sighted", "blind")
 UNREADABLE_ZIP = "final.zip is not a readable stable-baselines3 zip"
+_ARTIFACTS = {}
+_SOURCE_CACHE = {}
+_BUDGET_CACHE = {}
+_EVALUATION_CACHE = {}
+_SOURCE_LOCK = threading.RLock()
+_MAX_EVALUATION_FILES = 512
+_MAX_EVALUATION_BYTES = 16 * 1024 * 1024
+_REPLAY_PLANT_FILES = (*FP.PLANT_FILES, 'derived.py', 'ecu.py', 'controllers/ecu.py', 'random_road.py',
+                       'evaluate.py', 'fingerprint.py', 'app/agent_trace.py', 'data/derived_params.json')
+
+
+def register_artifacts(catalog):
+    """Register a simulation app's contained, server-issued locations."""
+    _ARTIFACTS[str(catalog.root.resolve())] = catalog
+
+
+def run_directory(runs, root=ROOT):
+    root = Path(root).resolve()
+    if RUNS_NAME.fullmatch(str(runs)):
+        directory = root / runs
+    elif ARTIFACT_ID.fullmatch(str(runs)):
+        registry = _ARTIFACTS.get(str(root))
+        if registry is None:
+            raise KeyError(runs)
+        item = next((x for x in registry.snapshot()['items'] if x['id'] == runs), None)
+        if item is None or item['kind'] != 'run_pair':
+            raise KeyError(runs)
+        directory = registry.resolve(runs)
+    else:
+        raise KeyError(runs)
+    if not directory.resolve().is_relative_to(root):
+        raise KeyError(runs)
+    return directory
+
+
+def _source_signature(path):
+    stat = path.stat()
+    return (stat.st_size, stat.st_mtime_ns, getattr(stat, 'st_dev', 0),
+            getattr(stat, 'st_ino', 0), getattr(stat, 'st_ctime_ns', int(stat.st_ctime * 1_000_000_000)))
+
+
+def _source_hash(path, *, code=False):
+    path = Path(path)
+    if not path.is_file():
+        return None
+    key = str(path.resolve()), code
+    with _SOURCE_LOCK:
+        before = _source_signature(path)
+        if key in _SOURCE_CACHE and _SOURCE_CACHE[key][0] == before:
+            return _SOURCE_CACHE[key][1]
+        digest = hashlib.sha256()
+        if code:
+            raw = path.read_bytes().replace(b'\r\n', b'\n')
+            parsed = FP._code_only(raw.decode('utf-8', errors='replace'))
+            digest.update(parsed.encode() if parsed is not None else raw)
+        else:
+            with path.open('rb') as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                    digest.update(chunk)
+        if before != _source_signature(path):
+            raise Refused(['source changed while being read'])
+        value = digest.hexdigest()
+        if len(_SOURCE_CACHE) >= 1024:
+            _SOURCE_CACHE.clear()
+        _SOURCE_CACHE[key] = before, value
+        return value
+
+
+def _disk_plant_identity(root=ROOT):
+    return [(name, _source_hash(Path(root) / name, code=name.endswith('.py')))
+            for name in _REPLAY_PLANT_FILES]
+
+
+_LOADED_PLANT_IDENTITY = _disk_plant_identity()
+
+
+def replay_generation(key, *, root=ROOT):
+    """Model + metadata + frozen episode + loaded plant; no inference or producers."""
+    runs, seed, episode = key
+    directory = run_directory(runs, root)
+    registry = _ARTIFACTS.get(str(Path(root).resolve()))
+    if registry is not None and registry.restart_required():
+        raise Refused(['loaded plant or provenance changed; restart the server before replay'])
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise KeyError(key)
+    disk = _disk_plant_identity()
+    if disk != _LOADED_PLANT_IDENTITY:
+        raise Refused(['plant inputs changed on disk; restart the server before replay'])
+    sources = []
+    for arm in ARMS:
+        child = directory / f'{arm}_seed{seed}'
+        if not child.resolve().is_relative_to(Path(root).resolve()):
+            raise KeyError(key)
+        for name in ('final.zip', 'meta.json', 'config.json'):
+            path = child / name
+            if not path.resolve().is_relative_to(Path(root).resolve()):
+                raise Refused(['artifact source leaves the repository'])
+            sources.append((arm, name, _source_hash(path)))
+    scored = _evaluation_sources(directory, seed, root)
+    if scored['problems']:
+        raise Refused(scored['problems'])
+    sources.append(('scored', scored['files']))
+    return hashlib.sha256(json.dumps([sources, _LOADED_PLANT_IDENTITY, episode],
+                                    sort_keys=True).encode()).hexdigest()
+
+
+def _model_budget(path):
+    """Inspect changed ZIPs only; retain all existing scored-artifact checks."""
+    path = Path(path)
+    with _SOURCE_LOCK:
+        signature = _source_signature(path)
+        key = str(path.resolve())
+        cached = _BUDGET_CACHE.get(key)
+        if cached and cached[0] == signature:
+            return cached[1]
+        from app.artifact_readiness import zip_within_budget
+        budget = FP.model_budget(str(path)) if zip_within_budget(path, signature) else None
+        if signature != _source_signature(path):
+            return None
+        if len(_BUDGET_CACHE) >= 512:
+            _BUDGET_CACHE.clear()
+        _BUDGET_CACHE[key] = signature, budget
+        return budget
 
 
 class Refused(Exception):
@@ -89,20 +215,32 @@ def read_agent(runs, name, root=ROOT):
     """One agent directory's status. KeyError if either name is malformed or
     the directory is not there: a missing directory is not an agent at all."""
     m = AGENT_NAME.fullmatch(str(name))
-    if not RUNS_NAME.fullmatch(str(runs)) or m is None:
+    if m is None:
         raise KeyError(f"{runs}/{name}")
     arm, seed = m.group(1), int(m.group(2))
-    d = Path(root) / runs / name
+    d = run_directory(runs, root) / name
+    if not d.resolve().is_relative_to(Path(root).resolve()):
+        raise KeyError(f"{runs}/{name}")
     if not d.is_dir():
         raise KeyError(f"{runs}/{name}")
     out = {"runs": runs, "tag": name, "arm": arm, "seed": seed, "status": None,
            "reason": None, "problems": [], "protocol": None, "budget": None,
            "budget_line": None, "zip_sha": None, "train_dt": None}
 
+    if any(not (d / file).resolve().is_relative_to(Path(root).resolve())
+           for file in ('RUNNING', 'config.json', 'meta.json', 'final.zip')):
+        return dict(out, status='incompatible', reason='artifact source leaves the repository')
+
     if FP.running_pid(str(d)) is not None:
         return dict(out, status="training", reason="training now")
+    config_path = d / 'config.json'
+    if config_path.is_file():
+        config = FP.read(str(config_path))
+        from app.artifact_readiness import counts_consistent
+        if not isinstance(config, dict) or config.get('status') != 'finished' or not counts_consistent(config, name):
+            return dict(out, status='incomplete', reason='training export is not finished or metadata is inconsistent')
     meta = FP.read(str(d / "meta.json"))
-    if meta is None:
+    if not isinstance(meta, dict):
         return dict(out, status="incompatible",
                     reason="no meta.json: plant unknown (AUDIT2 C2-1)")
     if not (d / "final.zip").is_file():
@@ -111,7 +249,7 @@ def read_agent(runs, name, root=ROOT):
     # run_phase_d.py:330 hands it, os.path.join(out, tag) -- a backslash on
     # Windows. "blind" in a path gives the same answer for either separator,
     # so f"{runs}/{name}" applies that exact rule here.
-    scored_blind = "blind" in f"{runs}/{name}"
+    scored_blind = "blind" in d.relative_to(Path(root)).as_posix()
     if scored_blind != (arm == "blind") or scored_blind != (not meta.get("use_preview", True)):
         return dict(out, status="incompatible",
                     reason="evaluate.py would have scored this agent as the other arm")
@@ -123,7 +261,7 @@ def read_agent(runs, name, root=ROOT):
         return dict(out, status="incompatible", protocol=protocol,
                     reason="plant mismatch: " + ", ".join(f for f, _, _ in bad),
                     problems=[f"{f}: stored {a!r} live {b!r}" for f, a, b in bad])
-    budget = FP.model_budget(str(d / "final.zip"))
+    budget = _model_budget(d / "final.zip")
     if budget is None:
         # Not an SB3 zip (FP.model_budget reads its 'data' member). M1 called
         # it ready with 'budget unreadable' and let SAC.load fail at build time.
@@ -156,6 +294,133 @@ def scored_shas(prefix, seed, root=ROOT):
     return out
 
 
+def _evaluation_records(path, root):
+    """Read changed evaluation text once, with a stable digest and bounded cache."""
+    if not path.resolve().is_relative_to(Path(root).resolve()):
+        raise Refused(['scored source leaves the repository'])
+    with _SOURCE_LOCK:
+        before = _source_signature(path)
+        key = str(path.resolve())
+        cached = _EVALUATION_CACHE.get(key)
+        if cached and cached[0] == before:
+            return cached[1:]
+        if before[0] > _MAX_EVALUATION_BYTES:
+            raise Refused(['scored source exceeds the evaluation read limit'])
+        raw = path.read_bytes()
+        if before != _source_signature(path):
+            raise Refused(['scored source changed while being read'])
+        records = [(match.group(1), match.group(6))
+                   for line in raw.decode('utf-8', errors='replace').splitlines()
+                   if (match := BUDGET.match(line)) is not None]
+        digest = hashlib.sha256(raw).hexdigest()
+        if len(_EVALUATION_CACHE) >= _MAX_EVALUATION_FILES:
+            _EVALUATION_CACHE.clear()
+        _EVALUATION_CACHE[key] = before, records, digest
+        return records, digest
+
+
+def _recorded_directory(raw, root):
+    # The producer records directories, relative to the repo or absolute, using
+    # its platform's separators. Compare the full path, never just the arm tag.
+    path = Path(raw.replace('\\', '/'))
+    return (path if path.is_absolute() else Path(root) / path).resolve()
+
+
+def _evaluation_sources(directory, seed, root=ROOT):
+    """Associate evaluation evidence by model path, independently of UI IDs.
+
+    The producer's default prefix comes from the run directory's basename.
+    A --prefix override is discoverable through its full model budget paths.
+    Legacy flat results without budget lines keep their existing association.
+    """
+    root, directory = Path(root).resolve(), Path(directory).resolve()
+    prefix = RPD.result_prefix(str(directory))
+    suffix = f'_seed{seed}.txt'
+    expected = root / 'results' / f'{prefix}{suffix}'
+    paths = sorted((root / 'results').glob(f'*{suffix}'))
+    if len(paths) > _MAX_EVALUATION_FILES:
+        raise Refused(['too many evaluation sources to associate safely'])
+    files, shas, problems, collision = [], {arm: [] for arm in ARMS}, [], False
+    expected_arms = {directory / f'{arm}_seed{seed}': arm for arm in ARMS}
+    for path in paths:
+        if not path.is_file():
+            continue
+        records, digest = _evaluation_records(path, root)
+        matching = [(expected_arms.get(_recorded_directory(raw, root)), sha)
+                    for raw, sha in records]
+        associated = any(arm is not None for arm, _ in matching)
+        legacy = path == expected and not records and directory.parent == root
+        if not associated and not legacy:
+            collision |= path == expected and bool(records)
+            continue
+        if not files:
+            prefix = path.name[:-len(suffix)]
+        files.append((path.relative_to(root).as_posix(), digest))
+        # A partially matching result must not certify arms from different
+        # groups. Duplicate lines remain visible to the SHA guard as well.
+        if any(arm is None for arm, _ in matching):
+            problems.append(f'{path.relative_to(root).as_posix()}: records different model paths')
+        for arm, sha in matching:
+            if arm is not None:
+                shas[arm].append((path.relative_to(root).as_posix(), sha))
+    if collision and not files:
+        problems.append(f'{expected.relative_to(root).as_posix()}: records different model paths')
+    return {'prefix': prefix, 'files': files, 'shas': shas, 'problems': problems}
+
+
+def discover_registered(snapshot, root=ROOT):
+    """Convert discovered locations using the same fingerprint/scoring gates as flat links."""
+    root = Path(root)
+    experiments = []
+    for item in snapshot.get('items', []):
+        if item.get('kind') != 'run_pair':
+            continue
+        runs = item['relative_path'] if '/' not in item['relative_path'] else item['id']
+        directory = run_directory(runs, root)
+        prefix = RPD.result_prefix(str(directory))
+        flat = directory.parent.resolve() == root.resolve()
+        pairs = []
+        for source in item.get('pairs', []):
+            seed = source['seed']
+            try:
+                pair = check_pair(runs, seed, root)
+            except KeyError:
+                agents = []
+                for arm in ARMS:
+                    try:
+                        agents.append(dict(read_agent(runs, f'{arm}_seed{seed}', root), scored=None))
+                    except KeyError:
+                        agents.append(_missing_agent(arm, seed))
+                pair = {'agents': agents, 'protocol': None, 'result_file': False,
+                        'problems': [problem for agent in agents for problem in _agent_problems(agent)]}
+            except (OSError, ValueError) as exc:
+                pair = {'agents': [], 'protocol': None, 'result_file': False,
+                        'problems': [f'artifact is being updated: {type(exc).__name__}']}
+            problems = pair['problems']
+            if any(arm.get('lifecycle') not in ('finished',) for arm in source.get('arms', {}).values()):
+                problems = problems or ['training export is not finished']
+            try:
+                replay_identity = replay_generation((runs, seed, 1), root=root)
+            except (KeyError, OSError, Refused, ValueError):
+                replay_identity = None
+            source_revision = hashlib.sha256(json.dumps(
+                [source['revision'], replay_identity], sort_keys=True).encode()).hexdigest()[:24]
+            pairs.append({'seed': seed, 'runnable': not problems,
+                          'reason': problems[0] if problems else None, 'problems': problems,
+                          'protocol': pair['protocol'] if not problems else None,
+                          'result_file': pair['result_file'],
+                          'table_diff': table_rows(prefix)['diffs'].get(seed) if flat else None,
+                          'source_revision': source_revision,
+                          'agents': [{key: agent.get(key) for key in CATALOG_AGENT_KEYS} for agent in pair['agents']]})
+        protocols = {p['protocol'] for p in pairs if p['runnable']}
+        experiments.append({'runs': runs, 'name': (RPD.CLOSED_PREFIX.get(prefix) if flat else None) or item['relative_path'],
+                            'prefix': prefix, 'protocol': next(iter(protocols)) if len(protocols) == 1 else None,
+                            'verdict': verdict(prefix if flat else item['relative_path'], root), 'pairs': pairs,
+                            'artifact_id': item['id'], 'relative_path': item['relative_path'],
+                            'source_revision': item['revision']})
+    return experiments
+
+
 def _agent_problems(agent):
     """One agent's lines in a pair's problem list: '<tag>: <status> --
     <reason>', then '<tag>: <line>' for each of its own problems (a plant
@@ -180,36 +445,48 @@ def check_pair(runs, seed, root=ROOT):
     records a different sha; the pair is refused) or 'not recorded'. It is
     None when an earlier check refused the pair first.
     """
-    if (not RUNS_NAME.fullmatch(str(runs)) or not isinstance(seed, int)
+    if (not isinstance(seed, int)
             or isinstance(seed, bool) or seed < 0):
         raise KeyError(f"{runs}/{seed}")
     root = Path(root)
-    if not all((root / runs / f"{arm}_seed{seed}").is_dir() for arm in ARMS):
+    directory = run_directory(runs, root)
+    if not all((directory / f"{arm}_seed{seed}").is_dir() for arm in ARMS):
         raise KeyError(f"{runs}/{seed}")
     agents = [dict(read_agent(runs, f"{arm}_seed{seed}", root), scored=None) for arm in ARMS]
-    prefix = RPD.result_prefix(str(root / runs))
+    prefix = RPD.result_prefix(str(directory))
+    try:
+        evidence = _evaluation_sources(directory, seed, root)
+    except (OSError, Refused) as exc:
+        evidence = {'prefix': prefix, 'files': [], 'shas': {arm: [] for arm in ARMS},
+                    'problems': [f'evaluation evidence is unavailable: {exc}']}
+    prefix = evidence['prefix']
+    flat = directory.parent.resolve() == root.resolve()
     pair = {"runs": runs, "seed": seed, "prefix": prefix,
-            "experiment": RPD.CLOSED_PREFIX.get(prefix) or f"{runs} (no name recorded)",
+            "experiment": (RPD.CLOSED_PREFIX.get(prefix) if flat else None) or directory.relative_to(root.resolve()).as_posix(),
             "protocol": None,
-            "result_file": (root / "results" / f"{prefix}_seed{seed}.txt").is_file(),
+            "result_file": bool(evidence['files']),
             "agents": agents, "problems": []}
-    problems = [line for a in agents for line in _agent_problems(a)]
+    problems = [line for a in agents for line in _agent_problems(a)] + evidence['problems']
+    registry = _ARTIFACTS.get(str(root.resolve()))
+    if registry is not None and registry.restart_required():
+        problems.append('loaded plant or provenance changed; restart the server before replay')
     if problems:
         return dict(pair, problems=problems)
     if agents[0]["protocol"] != agents[1]["protocol"]:
         return dict(pair, problems=[f"the two arms were trained on different protocols: "
                                     f"{agents[0]['protocol']} and {agents[1]['protocol']}"])
-    shas = scored_shas(prefix, seed, root)
     for a in agents:
-        recorded = None if shas is None else shas[a["arm"]]
-        if recorded is None:
+        records = evidence['shas'][a['arm']]
+        mismatches = [(file, sha) for file, sha in records if sha != a['zip_sha']]
+        if not records:
             a["scored"] = "not recorded"
-        elif recorded == a["zip_sha"]:
+        elif not mismatches:
             a["scored"] = "match"
         else:
             a["scored"] = "mismatch"
-            problems.append(f"{a['tag']}: not the scored artefact -- results/{prefix}_seed{seed}.txt "
-                            f"records zip sha {recorded}, final.zip is {a['zip_sha']}")
+            for file, recorded in mismatches:
+                problems.append(f"{a['tag']}: not the scored artefact -- {file} "
+                                f"records zip sha {recorded}, final.zip is {a['zip_sha']}")
     return dict(pair, protocol=agents[0]["protocol"], problems=problems)
 
 

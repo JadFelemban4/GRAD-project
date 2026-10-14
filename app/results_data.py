@@ -334,5 +334,7 @@ def build(results_root: Path = RESULTS, git_root: Path = ROOT, *, live: dict | N
              "derived_loaded_differs": live["derived_loaded_differs"],
              "git": "ok" if git.available else "unavailable",
              "elapsed_ms": int(round((time.perf_counter() - started) * 1000))}
+    from .results_graphics import build_graphics
+    graphics = build_graphics(results_root.parent)
     return jsonable({"built": built, "import_failures": failures, "sections": sections,
-                     "not_read": not_read})
+                     "not_read": not_read, "graphics": graphics})

@@ -54,7 +54,7 @@ def _refused():
                              status_code=403, headers=NO_STORE)
 
 
-def mount_results(app, build=None) -> None:
+def mount_results(app, build=None, artifacts=None) -> None:
     """Add GET /results and GET /api/results to `app`.
 
     `build` replaces app.results_data.build; tests pass a stand-in. The
@@ -63,6 +63,33 @@ def mount_results(app, build=None) -> None:
     see the module docstring.
     """
     from app import results_provenance  # noqa: F401  (its plant hash, taken now)
+    cached = None
+    source_revision = None
+
+    def input_signature():
+        """Pre/post build stat check; a write inside the throttle window is still rejected."""
+        root = getattr(getattr(artifacts, 'catalog', None), 'root', None)
+        if root is None:
+            return None
+        root = Path(root)
+        paths = list((root / 'results').glob('*'))
+        paths += list((root / 'results' / 'agents').glob('*/*'))
+        paths += list((root / 'results' / 'agents').glob('*/*/*'))
+        for runs in root.glob('runs*'):
+            if runs.is_dir() and runs.resolve().is_relative_to(root.resolve()):
+                paths += list(runs.glob('*/curve.csv')) + list(runs.glob('*/*/curve.csv'))
+        paths += [root / 'data' / 'derived_params.json']
+        from app.artifact_catalog import _PROVENANCE_FILES
+        paths += [root / name for name in (*_PROVENANCE_FILES, 'roads.py')]
+        signature = []
+        for path in sorted(paths):
+            try:
+                if path.resolve().is_relative_to(root.resolve()) and path.is_file():
+                    stat = path.stat()
+                    signature.append((str(path.relative_to(root)), stat.st_size, stat.st_mtime_ns))
+            except OSError:
+                signature.append((str(path), None, None))
+        return signature
 
     def results_page(request: Request):
         """The tab's frame, read from app/static/results.html on every request."""
@@ -74,13 +101,31 @@ def mount_results(app, build=None) -> None:
         """Every section, rebuilt from the files, one build at a time."""
         if not host_ok(request):
             return _refused()
+        nonlocal cached, source_revision
         try:
             with _LOCK:
                 if build is None:
                     from app.results_data import build as run
                 else:
                     run = build
-                return JSONResponse(run(), headers=NO_STORE)
+                if artifacts is None:
+                    return JSONResponse(run(), headers=NO_STORE)
+                before = artifacts.published()
+                wanted = f"{before['results_revision']}:{before['plant_revision']}"
+                if before.get('results_updating') or before.get('error'):
+                    return JSONResponse(dict(cached or {'sections': [], 'warnings': []},
+                                             source_revision=source_revision, updating=True, artifacts=before), headers=NO_STORE)
+                if cached is not None and source_revision == wanted:
+                    return JSONResponse(dict(cached, source_revision=source_revision, updating=False, artifacts=before), headers=NO_STORE)
+                signature = input_signature()
+                candidate = run()
+                after = artifacts.published()
+                latest = f"{after['results_revision']}:{after['plant_revision']}"
+                if latest != wanted or after.get('results_updating') or after.get('error') or signature != input_signature():
+                    return JSONResponse(dict(cached or {'sections': [], 'warnings': []},
+                                             source_revision=source_revision, updating=True, artifacts=after), headers=NO_STORE)
+                cached, source_revision = candidate, wanted
+                return JSONResponse(dict(cached, source_revision=source_revision, updating=False, artifacts=after), headers=NO_STORE)
         except (Exception, SystemExit) as exc:
             logging.getLogger("uvicorn.error").exception("results build failed")
             return JSONResponse({"detail": f"results failed: {type(exc).__name__}"},

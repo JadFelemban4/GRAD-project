@@ -1,0 +1,26 @@
+[
+  {
+    "label": "Phase D",
+    "trainingHidden": true,
+    "evaluationHidden": false,
+    "sections": 1
+  },
+  {
+    "label": "Phase D2",
+    "trainingHidden": true,
+    "evaluationHidden": false,
+    "sections": 1
+  },
+  {
+    "label": "C4",
+    "trainingHidden": true,
+    "evaluationHidden": false,
+    "sections": 1
+  },
+  {
+    "label": "Phase D2",
+    "trainingHidden": true,
+    "evaluationHidden": false,
+    "sections": 1
+  }
+]

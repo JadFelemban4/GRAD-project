@@ -246,3 +246,44 @@ main.agents-main{padding:18px 16px 0}
 @media(max-width:760px){
 .models-columns{grid-template-columns:1fr}
 }
+/* Read-only arrival/status strip; expanded evidence stays outside the replay controls. */
+.artifact-strip { margin-block: 1rem; padding: .8rem 1rem; border: 1px solid var(--line, #7775); border-radius: .6rem; min-width: 0; }
+.artifact-strip p { margin-block: .4rem; overflow-wrap: anywhere; }
+.artifact-strip summary { cursor: pointer; padding-block: .5rem; overflow-wrap: anywhere; }
+.artifact-item { border-top: 1px solid var(--line, #7775); padding-block: .3rem; min-width: 0; }
+.artifact-item p { font-size: .82rem; line-height: 1.7; color: var(--muted, #777); }
+.artifact-item bdi { font-size: .85rem; }
+
+.saved-records{margin-block:20px;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--paper);min-width:0}
+.saved-records h2{font-size:22px;margin:0 0 8px}.saved-records h3{font-size:14px;margin-block:10px}
+.record-note{font-size:12px;line-height:1.85;color:var(--muted);overflow-wrap:anywhere}
+.record-selectors{display:grid;grid-template-columns:1fr 1.4fr .7fr;gap:12px;margin-block:18px}
+.record-selectors label{display:grid;gap:7px;min-width:0;font-size:12px}
+.record-selectors select{width:100%;min-width:0;padding:10px;background:var(--field-bg);color:var(--ink);border:1px solid var(--line);border-radius:7px}
+.record-identity{padding:10px 14px;background:var(--field-bg);border-inline-start:3px solid var(--agent-sighted);font-size:12px;overflow-wrap:anywhere}
+.record-identity p{margin-block:5px;line-height:1.8}
+.record-transport,.record-camera,.record-action-mode{display:flex;flex-wrap:wrap;gap:8px;margin-block:12px;align-items:center}
+.saved-records button,.mobile-lane-switch button{min-height:40px;padding:8px 12px;background:var(--field-bg);border:1px solid var(--line);border-radius:6px;color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.saved-records button[aria-pressed=true],.mobile-lane-switch button[aria-pressed=true]{border-color:var(--agent-sighted);box-shadow:inset 0 -2px var(--agent-sighted)}
+.saved-records button:disabled{opacity:.45;cursor:default}.record-transport input{flex:1;min-width:160px}
+.record-sample{position:sticky;top:8px;z-index:4;background:var(--paper);padding:12px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-variant-numeric:tabular-nums}
+.record-engine{height:360px;background:var(--world-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;direction:ltr}
+.record-paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-block:12px}
+.record-path{font-size:12px;line-height:1.8;border-block-start:3px solid #529bdd;padding:10px;background:var(--field-bg);margin:0;overflow-wrap:anywhere}
+.record-path.gas_out{border-color:#c99045}.record-path.cooling_flow{border-color:#9b7ac6}
+.record-temperatures{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.record-temperatures div{padding:12px;border:1px solid var(--line);border-radius:7px}.record-temperatures dt{font-size:12px}.record-temperatures dd{margin:8px 0 0;font-size:20px;font-variant-numeric:tabular-nums}
+.record-actuator-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-block:12px;min-width:0}
+.record-actuator{min-width:0}.record-graphs .rg-panel{padding:12px}.record-graphs .rg-controls{gap:6px}.record-graphs .rg-controls button{font-size:10px;padding:5px 8px;min-height:34px}
+.record-graphs .rg-plot{min-height:190px}
+.record-secondary{margin-top:18px}.record-values{margin-block:16px}.record-values summary{cursor:pointer;padding:12px;font-size:14px}
+.record-action-mode,.mobile-lane-switch{display:none}
+@media(max-width:760px){
+  .saved-records{padding:12px}.record-selectors{grid-template-columns:1fr}.record-engine{height:270px}
+  .record-paths{grid-template-columns:1fr}.record-temperatures{grid-template-columns:1fr 1fr}
+  .record-actuator-row{grid-template-columns:1fr}.record-action-mode,.mobile-lane-switch{display:flex;gap:8px}
+  .record-action-mode{position:sticky;top:114px;z-index:3;padding:8px;background:var(--paper);border:1px solid var(--line);border-radius:8px}
+  .mobile-lane-switch{padding:10px;position:sticky;bottom:0;background:var(--paper)}
+  .saved-records[data-action-mode=command] .applied_trim,.saved-records[data-action-mode=applied] .command_trim{display:none}
+}
+@media(prefers-reduced-motion:reduce){.saved-records *{scroll-behavior:auto;animation:none!important;transition:none!important}}

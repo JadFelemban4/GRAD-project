@@ -1,0 +1,12 @@
+{
+  "identity": "results/agents/sep19_110kmh/baseline_ECU/eval_record.npzRecorded generation: b56520b82dec64c63536e6a6c42faa22522fb1cc2790471771d029e66daca1df · Unknown; no current-plant compatibility claim · evaluate.EPISODES, twenty frozen episodes, 720 s, dt 1.0, the locked 12 % / 130 km/h climb at 42 CThe saved file is absent. Summary results remain available; playback needs this file.",
+  "overflow": false,
+  "source": "results/agents/sep19_110kmh",
+  "temperatures": [
+    "—",
+    "—",
+    "—",
+    "—"
+  ],
+  "transportHidden": true
+}

@@ -3,7 +3,7 @@
 // original CSV timestamps. This file must never do engine physics, never
 // interpolate a telemetry channel between two samples, and never invent a
 // value for a channel the recording does not carry.
-import { createScene, createEngineScene } from './scene.mjs';
+import { createScene, createEngineScene } from './scene.mjs?v=20261009';
 import { PlaybackClock, sampleAt, previewAt, formatTime } from './playback.mjs';
 import {
   EM_DASH, num, fmt, gearState, horizonRatio, previewCaption,

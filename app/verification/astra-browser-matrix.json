@@ -1,0 +1,458 @@
+[
+  {
+    "size": {
+      "width": 1440,
+      "height": 900
+    },
+    "lang": "ar",
+    "theme": "dark",
+    "result": {
+      "density": "العينات داخل شبكة الكثافة المنشورة: 12894 / 14318 · العينات خارج هذه الشبكة؛ محفوظة في المصدر الخام: 1424 · KI 0–1.6, تأخير الإشعال المسجل -2–20°",
+      "knockChannels": 2,
+      "lang": "ar",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "dark",
+      "width": 1440
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "تعديل الإشعال0.6736401915550232مطبّع [−1، 1]2درجة",
+        "تعديل لامبدا0مطبّع [−1، 1]0تعديل لامبدا",
+        "تعديل ضغط الشحن0مطبّع [−1، 1]0كيلوباسكال",
+        "نسبة تشغيل المروحة0مطبّع [−1، 1]0النسبة",
+        "نسبة تشغيل المضخة0مطبّع [−1، 1]0النسبة"
+      ],
+      "lang": "ar",
+      "modePosition": "static",
+      "overflow": false,
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "visibleApplied": 5,
+      "visibleCommand": 5,
+      "width": 1440
+    }
+  },
+  {
+    "size": {
+      "width": 1440,
+      "height": 900
+    },
+    "lang": "ar",
+    "theme": "light",
+    "result": {
+      "density": "العينات داخل شبكة الكثافة المنشورة: 12894 / 14318 · العينات خارج هذه الشبكة؛ محفوظة في المصدر الخام: 1424 · KI 0–1.6, تأخير الإشعال المسجل -2–20°",
+      "knockChannels": 2,
+      "lang": "ar",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "light",
+      "width": 1440
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "تعديل الإشعال0.6736401915550232مطبّع [−1، 1]2درجة",
+        "تعديل لامبدا0مطبّع [−1، 1]0تعديل لامبدا",
+        "تعديل ضغط الشحن0مطبّع [−1، 1]0كيلوباسكال",
+        "نسبة تشغيل المروحة0مطبّع [−1، 1]0النسبة",
+        "نسبة تشغيل المضخة0مطبّع [−1، 1]0النسبة"
+      ],
+      "lang": "ar",
+      "modePosition": "static",
+      "overflow": false,
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "visibleApplied": 5,
+      "visibleCommand": 5,
+      "width": 1440
+    }
+  },
+  {
+    "size": {
+      "width": 1440,
+      "height": 900
+    },
+    "lang": "en",
+    "theme": "dark",
+    "result": {
+      "density": "Samples inside the published density grid: 12894 / 14318 · Samples outside this grid; retained in the raw source: 1424 · KI 0–1.6, Recorded retard -2–20°",
+      "knockChannels": 2,
+      "lang": "en",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "dark",
+      "width": 1440
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "Spark trim0.6736401915550232normalized [-1,1]2deg",
+        "Lambda trim0normalized [-1,1]0Lambda trim",
+        "Boost trim0normalized [-1,1]0kPa",
+        "Fan duty0normalized [-1,1]0Fraction",
+        "Pump duty0normalized [-1,1]0Fraction"
+      ],
+      "lang": "en",
+      "modePosition": "static",
+      "overflow": false,
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "visibleApplied": 5,
+      "visibleCommand": 5,
+      "width": 1440
+    }
+  },
+  {
+    "size": {
+      "width": 1440,
+      "height": 900
+    },
+    "lang": "en",
+    "theme": "light",
+    "result": {
+      "density": "Samples inside the published density grid: 12894 / 14318 · Samples outside this grid; retained in the raw source: 1424 · KI 0–1.6, Recorded retard -2–20°",
+      "knockChannels": 2,
+      "lang": "en",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "light",
+      "width": 1440
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "Spark trim0.6736401915550232normalized [-1,1]2deg",
+        "Lambda trim0normalized [-1,1]0Lambda trim",
+        "Boost trim0normalized [-1,1]0kPa",
+        "Fan duty0normalized [-1,1]0Fraction",
+        "Pump duty0normalized [-1,1]0Fraction"
+      ],
+      "lang": "en",
+      "modePosition": "static",
+      "overflow": false,
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "visibleApplied": 5,
+      "visibleCommand": 5,
+      "width": 1440
+    }
+  },
+  {
+    "size": {
+      "width": 390,
+      "height": 844
+    },
+    "lang": "ar",
+    "theme": "dark",
+    "result": {
+      "density": "العينات داخل شبكة الكثافة المنشورة: 12894 / 14318 · العينات خارج هذه الشبكة؛ محفوظة في المصدر الخام: 1424 · KI 0–1.6, تأخير الإشعال المسجل -2–20°",
+      "knockChannels": 2,
+      "lang": "ar",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "dark",
+      "width": 390
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "تعديل الإشعال0.6736401915550232مطبّع [−1، 1]2درجة",
+        "تعديل لامبدا0مطبّع [−1، 1]0تعديل لامبدا",
+        "تعديل ضغط الشحن0مطبّع [−1، 1]0كيلوباسكال",
+        "نسبة تشغيل المروحة0مطبّع [−1، 1]0النسبة",
+        "نسبة تشغيل المضخة0مطبّع [−1، 1]0النسبة"
+      ],
+      "lang": "ar",
+      "modePosition": "sticky",
+      "overflow": false,
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "visibleApplied": 0,
+      "visibleCommand": 5,
+      "width": 390
+    }
+  },
+  {
+    "size": {
+      "width": 390,
+      "height": 844
+    },
+    "lang": "ar",
+    "theme": "light",
+    "result": {
+      "density": "العينات داخل شبكة الكثافة المنشورة: 12894 / 14318 · العينات خارج هذه الشبكة؛ محفوظة في المصدر الخام: 1424 · KI 0–1.6, تأخير الإشعال المسجل -2–20°",
+      "knockChannels": 2,
+      "lang": "ar",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "light",
+      "width": 390
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "تعديل الإشعال0.6736401915550232مطبّع [−1، 1]2درجة",
+        "تعديل لامبدا0مطبّع [−1، 1]0تعديل لامبدا",
+        "تعديل ضغط الشحن0مطبّع [−1، 1]0كيلوباسكال",
+        "نسبة تشغيل المروحة0مطبّع [−1، 1]0النسبة",
+        "نسبة تشغيل المضخة0مطبّع [−1، 1]0النسبة"
+      ],
+      "lang": "ar",
+      "modePosition": "sticky",
+      "overflow": false,
+      "sample": "عينة المصدر المختارة: 200 · الحلقة (تبدأ من صفر): 0 · الزمن المسجل: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "visibleApplied": 0,
+      "visibleCommand": 5,
+      "width": 390
+    }
+  },
+  {
+    "size": {
+      "width": 390,
+      "height": 844
+    },
+    "lang": "en",
+    "theme": "dark",
+    "result": {
+      "density": "Samples inside the published density grid: 12894 / 14318 · Samples outside this grid; retained in the raw source: 1424 · KI 0–1.6, Recorded retard -2–20°",
+      "knockChannels": 2,
+      "lang": "en",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "dark",
+      "width": 390
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "Spark trim0.6736401915550232normalized [-1,1]2deg",
+        "Lambda trim0normalized [-1,1]0Lambda trim",
+        "Boost trim0normalized [-1,1]0kPa",
+        "Fan duty0normalized [-1,1]0Fraction",
+        "Pump duty0normalized [-1,1]0Fraction"
+      ],
+      "lang": "en",
+      "modePosition": "sticky",
+      "overflow": false,
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "dark",
+      "visibleApplied": 0,
+      "visibleCommand": 5,
+      "width": 390
+    }
+  },
+  {
+    "size": {
+      "width": 390,
+      "height": 844
+    },
+    "lang": "en",
+    "theme": "light",
+    "result": {
+      "density": "Samples inside the published density grid: 12894 / 14318 · Samples outside this grid; retained in the raw source: 1424 · KI 0–1.6, Recorded retard -2–20°",
+      "knockChannels": 2,
+      "lang": "en",
+      "overflow": false,
+      "panels": [
+        "G14",
+        "G15",
+        "G16",
+        "G17",
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22",
+        "G23",
+        "G24",
+        "G25"
+      ],
+      "tableCursor": "",
+      "tableRows": 11,
+      "theme": "light",
+      "width": 390
+    },
+    "record": {
+      "actuators": 5,
+      "canvas": 1,
+      "comparison": [
+        "Spark trim0.6736401915550232normalized [-1,1]2deg",
+        "Lambda trim0normalized [-1,1]0Lambda trim",
+        "Boost trim0normalized [-1,1]0kPa",
+        "Fan duty0normalized [-1,1]0Fraction",
+        "Pump duty0normalized [-1,1]0Fraction"
+      ],
+      "lang": "en",
+      "modePosition": "sticky",
+      "overflow": false,
+      "sample": "Selected source sample: 200 · Episode (zero-based): 0 · Recorded time: 50 s",
+      "temperature": [
+        "500",
+        "90",
+        "100",
+        "—"
+      ],
+      "theme": "light",
+      "visibleApplied": 0,
+      "visibleCommand": 5,
+      "width": 390
+    }
+  }
+]

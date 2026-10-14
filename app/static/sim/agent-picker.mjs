@@ -17,7 +17,7 @@ import { t } from './i18n.mjs';
 // The server's own patterns (app/agent_catalog.py RUNS_NAME, app/agent_api.py
 // SEED_TEXT and EP_TEXT). Lowercase only: on Windows runs_C4 would open the
 // runs_c4 directory under a name no verdict is recorded for.
-const RUNS_RE = /^runs[a-z0-9_]*$/;
+const RUNS_RE = /^(?:runs[a-z0-9_]*|art_[0-9a-f]{24})$/;
 const SEED_RE = /^[0-9]{1,3}$/;
 const EP_RE = /^[0-9]{1,2}$/;
 const EP_MIN = 1;
@@ -82,6 +82,16 @@ export function resolveSelection(catalog, query) {
   if (!pair || !pair.runnable) return { runs: exp.runs, seed: null, ep: null };
   const ep = episodesOf(catalog, pair).find(e => e.idx === query.ep);
   return { runs: exp.runs, seed: pair.seed, ep: ep ? ep.idx : null };
+}
+
+/** A background arrival keeps an unchanged selected pair and source generation. */
+export function reconcileCatalog(previous, next, selection) {
+  const current = resolveSelection(next, selection);
+  const before = pairOf(experimentOf(previous, selection?.runs), selection?.seed);
+  const after = pairOf(experimentOf(next, selection?.runs), selection?.seed);
+  const changed = Boolean(before && (!after || before.source_revision !== after.source_revision))
+    || Boolean(previous?.artifacts?.plant_revision && previous.artifacts.plant_revision !== next?.artifacts?.plant_revision);
+  return { selection: current, sourceChanged: changed };
 }
 
 /**

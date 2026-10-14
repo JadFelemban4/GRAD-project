@@ -295,10 +295,18 @@ export function createMounter({ onError } = {}) {
     if (ro) for (const c of charts) ro.unobserve(c.host);
     charts.length = 0;
   }
+  function unmount(host) {
+    for (let index = charts.length - 1; index >= 0; index -= 1) {
+      if (charts[index].host !== host) continue;
+      if (ro) ro.unobserve(host);
+      hideTip(host);
+      charts.splice(index, 1);
+    }
+  }
   function dispose() {
     clear();
     if (ro) ro.disconnect();
     if (doc && typeof doc.removeEventListener === 'function') doc.removeEventListener('pointerdown', onDown);
   }
-  return { mount, renderAll, clear, dispose };
+  return { mount, unmount, renderAll, clear, dispose };
 }

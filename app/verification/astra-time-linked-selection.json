@@ -1,0 +1,5 @@
+{
+  "G01": "Selected sample 1 · Time (s): 1 · Baseline modelled ECU: 226.08111740600305 · Reactive: 226.08111740600305 · current-grade: 226.08111740600305 · Predictive (hand-written): 226.08111740600305",
+  "G02": "Selected sample 1 · Time (s): 1 · Baseline modelled ECU: 0.012544587471618388 · Reactive: 0.012544587471618388 · current-grade: 0.012544587471618388 · Predictive (hand-written): 0.012544587471618388",
+  "shading": 1
+}

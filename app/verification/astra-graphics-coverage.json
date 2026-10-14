@@ -1,0 +1,1472 @@
+{
+  "date": "2026-10-09",
+  "graphics": [
+    {
+      "id": "G01",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/traces_130kmh.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "SEA_LEVEL_AIR_NO_ALTITUDE_MODEL",
+        "HAND_WRITTEN_SINGLE_SCENARIO_CANNOT_SETTLE_PREVIEW",
+        "TURBINE_CAPACITY_ASSUMED_TAU_CONDITION_DEPENDENT",
+        "TURBINE_THRESHOLD_NOT_RECORDED_IN_TRACE_SOURCE",
+        "BLOCK_AND_COOLANT_TRACE_CHANNELS_NOT_RECORDED"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G02",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/traces_130kmh.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "HAND_WRITTEN_SINGLE_SCENARIO_CANNOT_SETTLE_PREVIEW",
+        "THERMAL_ONLY_DAMAGE_NOT_RECORDED"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G03",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/calibration_comparison.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "HAND_WRITTEN_SINGLE_SCENARIO_CANNOT_SETTLE_PREVIEW",
+        "THERMAL_ONLY_DAMAGE_NOT_RECORDED"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G04",
+      "state": "available",
+      "kind": "scatter",
+      "reason": null,
+      "source_files": [
+        "results/generality.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "H_TAU_METHOD_NOT_QUOTABLE_UNTIL_THERMAL_SUBSTEP",
+        "HAND_WRITTEN_SINGLE_SCENARIO_CANNOT_SETTLE_PREVIEW"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G05",
+      "state": "available",
+      "kind": "heatmap",
+      "reason": null,
+      "source_files": [
+        "results/sweep_speed_grade.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "SEA_LEVEL_AIR_NO_ALTITUDE_MODEL"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "peak",
+          "kind": null,
+          "label": "Recorded peak temperature"
+        }
+      ]
+    },
+    {
+      "id": "G06",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/training_roads.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "SAMPLED_ROADS_NOT_EXACT_TRAINING_HISTORY",
+        "SEA_LEVEL_AIR_NO_ALTITUDE_MODEL"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "grade",
+          "kind": null,
+          "label": "Road grade"
+        },
+        {
+          "id": "elevation",
+          "kind": null,
+          "label": "Road elevation"
+        }
+      ]
+    },
+    {
+      "id": "G14",
+      "state": "available",
+      "kind": "scatter",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "LOAD_COMPARISON_LIMITED_TO_PUBLISHED_30_75_KPA_POINTS"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G15",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "BOOST_SOURCE_POPULATIONS_DIFFER; RAW_SENSOR_IS_PRE_THROTTLE"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G16",
+      "state": "available",
+      "kind": "heatmap",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "TIMESTAMP_DWELL_SOURCE_RETIRED_ROW_COUNT_AXIS_NOT_USED"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "logged",
+          "kind": "heatmap",
+          "label": "Logged mixture"
+        },
+        {
+          "id": "simulated",
+          "kind": "heatmap",
+          "label": "Simulated mixture"
+        }
+      ]
+    },
+    {
+      "id": "G17",
+      "state": "available",
+      "kind": "scatter",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "SPARK_CALIBRATION_STATE_BEFORE_AND_AFTER_RECORDED"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "residual",
+          "kind": "scatter",
+          "label": "Spark residuals (model minus measured)"
+        }
+      ]
+    },
+    {
+      "id": "G18",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/calibration_comparison.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "DRIVE10_IS_IN_THERMAL_FIT_FITTED_DRIVE_TRACE"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "oil",
+          "kind": null,
+          "label": "Oil"
+        },
+        {
+          "id": "coolant",
+          "kind": null,
+          "label": "Coolant"
+        }
+      ]
+    },
+    {
+      "id": "G19",
+      "state": "available",
+      "kind": "bar",
+      "reason": null,
+      "source_files": [
+        "results/calibration_comparison.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "PER_DRIVE_RMSE_FIT_AND_HELD_OUT_COLUMNS_AS_RECORDED"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G20",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/calibration_comparison.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "HARD_PULL_TRACE_AND_STRUCTURE_FIT_HAVE_DISTINCT_AXES"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "hard_pull_oil",
+          "kind": null,
+          "label": "Hard-pull oil trace"
+        },
+        {
+          "id": "oil_structure",
+          "kind": null,
+          "label": "Structure comparison"
+        }
+      ]
+    },
+    {
+      "id": "G21",
+      "state": "available",
+      "kind": "scatter",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "WEAK_KNOCK_SAMPLING_CANNOT_ESTABLISH_AGREEMENT"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "density",
+          "kind": "heatmap",
+          "label": "Published knock/retard sample density"
+        },
+        {
+          "id": "raw",
+          "kind": "scatter",
+          "label": "Recorded knock indicator and retard"
+        }
+      ]
+    },
+    {
+      "id": "G22",
+      "state": "available",
+      "kind": "bar",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "GEAR_CHANNEL_SATURATES_AT_RECORDED_MAXIMUM"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "observed",
+          "kind": null,
+          "label": "Observed overall-ratio histogram"
+        },
+        {
+          "id": "references",
+          "kind": null,
+          "label": "Published gear-ratio references"
+        }
+      ]
+    },
+    {
+      "id": "G23",
+      "state": "available",
+      "kind": "scatter",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json",
+        "results/calibration_comparison.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "OPERATING_ENVELOPE_IS_NOT_A_COMPRESSOR_MAP",
+        "LOW_RPM_BOOST_COMPARISON_HAS_ITS_OWN_AXES"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "operating_envelope",
+          "kind": null,
+          "label": "Logged operating envelope"
+        },
+        {
+          "id": "low_rpm_boost",
+          "kind": null,
+          "label": "Low-RPM boost comparison"
+        }
+      ]
+    },
+    {
+      "id": "G24",
+      "state": "available",
+      "kind": "heatmap",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "SCENARIO_POINT_IS_SIMULATED_AND_SEPARATELY_LABELLED"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": [
+        {
+          "id": "coverage",
+          "kind": "heatmap",
+          "label": "Logged operating-region counts with scenario marker"
+        }
+      ]
+    },
+    {
+      "id": "G25",
+      "state": "available",
+      "kind": "table",
+      "reason": null,
+      "source_files": [
+        "results/model_vs_data.json"
+      ],
+      "caveats": [
+        "HISTORICAL_PUBLISHED_RECORD",
+        "PUBLISHED_VALIDATION_RECORD_HAS_DOCUMENTED_LIMITATIONS",
+        "STATUS_QUOTED_AS_RECORDED_NOT_A_CURRENT_VALIDATION_VERDICT",
+        "VALIDATION_TABLE_LAST_REGENERATED_2026_09_30",
+        "VALIDATION_PLAN_DRAFT_NOT_ON_BRANCH_DECISIONS_PENDING_2026_10_07",
+        "NO_CURRENT_VALIDATION_OR_AGREEMENT_CLAIM"
+      ],
+      "source": "published-reference",
+      "reader": "results_comparisons.read_reference_panels",
+      "channels": []
+    },
+    {
+      "id": "G07",
+      "state": "available",
+      "kind": "bar",
+      "reason": null,
+      "source_files": [
+        "results/agents/sep19_110kmh/index.json",
+        "results/agents/sep19_110kmh/baseline_ECU/eval_summary.json",
+        "results/agents/sep19_110kmh/reactive/eval_summary.json",
+        "results/agents/sep19_110kmh/current-grade/eval_summary.json",
+        "results/agents/sep19_110kmh/predictive_hand/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed4/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed4/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/sep19_110kmh",
+      "reader": "results_sets.read_agent_sets",
+      "channels": []
+    },
+    {
+      "id": "G08",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/agents/sep19_110kmh/baseline_ECU/eval_summary.json",
+        "results/agents/sep19_110kmh/reactive/eval_summary.json",
+        "results/agents/sep19_110kmh/current-grade/eval_summary.json",
+        "results/agents/sep19_110kmh/predictive_hand/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed4/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed4/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/sep19_110kmh",
+      "reader": "results_sets.read_agent_sets",
+      "channels": [
+        {
+          "id": "total",
+          "kind": null,
+          "label": "total damage"
+        },
+        {
+          "id": "thermal",
+          "kind": null,
+          "label": "thermal damage"
+        }
+      ]
+    },
+    {
+      "id": "G09",
+      "state": "unavailable",
+      "kind": "line",
+      "reason": "No validated knock-margin comparison is available.",
+      "source_files": [
+        "results/agents/sep19_110kmh/knock_margin.json"
+      ],
+      "caveats": [
+        "knock_margin_missing",
+        "diagnostic_spark_cap_not_retrained"
+      ],
+      "source": "results/agents/sep19_110kmh",
+      "reader": "results_sets.read_agent_sets",
+      "channels": []
+    },
+    {
+      "id": "G10",
+      "state": "available",
+      "kind": "bar",
+      "reason": null,
+      "source_files": [
+        "results/agents/sep19_110kmh/baseline_ECU/eval_summary.json",
+        "results/agents/sep19_110kmh/reactive/eval_summary.json",
+        "results/agents/sep19_110kmh/current-grade/eval_summary.json",
+        "results/agents/sep19_110kmh/predictive_hand/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed4/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed4/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/sep19_110kmh",
+      "reader": "results_sets.read_agent_sets",
+      "channels": [
+        {
+          "id": "spark_trim",
+          "kind": null,
+          "label": "spark trim (deg)"
+        },
+        {
+          "id": "lambda_trim",
+          "kind": null,
+          "label": "lambda trim"
+        },
+        {
+          "id": "boost_trim",
+          "kind": null,
+          "label": "boost trim (kPa)"
+        },
+        {
+          "id": "fan_duty",
+          "kind": null,
+          "label": "fan duty"
+        },
+        {
+          "id": "pump_duty",
+          "kind": null,
+          "label": "pump duty"
+        }
+      ]
+    },
+    {
+      "id": "G12",
+      "state": "available",
+      "kind": "scatter",
+      "reason": null,
+      "source_files": [
+        "results/agents/sep19_110kmh/index.json",
+        "results/agents/sep19_110kmh/baseline_ECU/eval_summary.json",
+        "results/agents/sep19_110kmh/reactive/eval_summary.json",
+        "results/agents/sep19_110kmh/current-grade/eval_summary.json",
+        "results/agents/sep19_110kmh/predictive_hand/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/sighted_seed4/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed0/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed1/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed2/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed3/eval_summary.json",
+        "results/agents/sep19_110kmh/blind_seed4/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/sep19_110kmh",
+      "reader": "results_sets.read_agent_sets",
+      "channels": [
+        {
+          "id": "damage",
+          "kind": null,
+          "label": "damage"
+        },
+        {
+          "id": "damage_thermal",
+          "kind": null,
+          "label": "damage_thermal"
+        }
+      ]
+    },
+    {
+      "id": "G13",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/agents/sep19_110kmh/sighted_seed0/curve.csv",
+        "results/agents/sep19_110kmh/sighted_seed1/curve.csv",
+        "results/agents/sep19_110kmh/sighted_seed2/curve.csv",
+        "results/agents/sep19_110kmh/sighted_seed3/curve.csv",
+        "results/agents/sep19_110kmh/sighted_seed4/curve.csv",
+        "results/agents/sep19_110kmh/blind_seed0/curve.csv",
+        "results/agents/sep19_110kmh/blind_seed1/curve.csv",
+        "results/agents/sep19_110kmh/blind_seed2/curve.csv",
+        "results/agents/sep19_110kmh/blind_seed3/curve.csv",
+        "results/agents/sep19_110kmh/blind_seed4/curve.csv"
+      ],
+      "caveats": [
+        "raw_training_curve"
+      ],
+      "source": "results/agents/sep19_110kmh",
+      "reader": "results_sets.read_agent_sets",
+      "channels": []
+    },
+    {
+      "id": "G11",
+      "state": "unavailable",
+      "kind": "line",
+      "reason": "missing_record",
+      "source_files": [
+        "results/agents/sep19_110kmh/episode_trace.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/sep19_110kmh",
+      "reader": "results_records.read_episode_panel",
+      "channels": []
+    },
+    {
+      "id": "G07",
+      "state": "available",
+      "kind": "bar",
+      "reason": null,
+      "source_files": [
+        "results/agents/terrain_dt1/index.json",
+        "results/agents/terrain_dt1/baseline_ECU/eval_summary.json",
+        "results/agents/terrain_dt1/reactive/eval_summary.json",
+        "results/agents/terrain_dt1/current-grade/eval_summary.json",
+        "results/agents/terrain_dt1/predictive_hand/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed9/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed9/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/terrain_dt1",
+      "reader": "results_sets.read_agent_sets",
+      "channels": []
+    },
+    {
+      "id": "G08",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/agents/terrain_dt1/baseline_ECU/eval_summary.json",
+        "results/agents/terrain_dt1/reactive/eval_summary.json",
+        "results/agents/terrain_dt1/current-grade/eval_summary.json",
+        "results/agents/terrain_dt1/predictive_hand/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed9/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed9/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/terrain_dt1",
+      "reader": "results_sets.read_agent_sets",
+      "channels": [
+        {
+          "id": "total",
+          "kind": null,
+          "label": "total damage"
+        },
+        {
+          "id": "thermal",
+          "kind": null,
+          "label": "thermal damage"
+        }
+      ]
+    },
+    {
+      "id": "G09",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/agents/terrain_dt1/knock_margin.json",
+        "results/agents/terrain_dt1/index.json",
+        "results/agents/terrain_dt1/baseline_ECU/eval_summary.json",
+        "results/agents/terrain_dt1/reactive/eval_summary.json",
+        "results/agents/terrain_dt1/current-grade/eval_summary.json",
+        "results/agents/terrain_dt1/predictive_hand/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed9/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed9/eval_summary.json"
+      ],
+      "caveats": [
+        "diagnostic_spark_cap_not_retrained"
+      ],
+      "source": "results/agents/terrain_dt1",
+      "reader": "results_sets.read_agent_sets",
+      "channels": []
+    },
+    {
+      "id": "G10",
+      "state": "available",
+      "kind": "bar",
+      "reason": null,
+      "source_files": [
+        "results/agents/terrain_dt1/baseline_ECU/eval_summary.json",
+        "results/agents/terrain_dt1/reactive/eval_summary.json",
+        "results/agents/terrain_dt1/current-grade/eval_summary.json",
+        "results/agents/terrain_dt1/predictive_hand/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed9/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed9/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/terrain_dt1",
+      "reader": "results_sets.read_agent_sets",
+      "channels": [
+        {
+          "id": "spark_trim",
+          "kind": null,
+          "label": "spark trim (deg)"
+        },
+        {
+          "id": "lambda_trim",
+          "kind": null,
+          "label": "lambda trim"
+        },
+        {
+          "id": "boost_trim",
+          "kind": null,
+          "label": "boost trim (kPa)"
+        },
+        {
+          "id": "fan_duty",
+          "kind": null,
+          "label": "fan duty"
+        },
+        {
+          "id": "pump_duty",
+          "kind": null,
+          "label": "pump duty"
+        }
+      ]
+    },
+    {
+      "id": "G12",
+      "state": "available",
+      "kind": "scatter",
+      "reason": null,
+      "source_files": [
+        "results/agents/terrain_dt1/index.json",
+        "results/agents/terrain_dt1/baseline_ECU/eval_summary.json",
+        "results/agents/terrain_dt1/reactive/eval_summary.json",
+        "results/agents/terrain_dt1/current-grade/eval_summary.json",
+        "results/agents/terrain_dt1/predictive_hand/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/sighted_seed9/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed0/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed1/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed2/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed3/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed4/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed5/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed6/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed7/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed8/eval_summary.json",
+        "results/agents/terrain_dt1/blind_seed9/eval_summary.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/terrain_dt1",
+      "reader": "results_sets.read_agent_sets",
+      "channels": [
+        {
+          "id": "damage",
+          "kind": null,
+          "label": "damage"
+        },
+        {
+          "id": "damage_thermal",
+          "kind": null,
+          "label": "damage_thermal"
+        }
+      ]
+    },
+    {
+      "id": "G13",
+      "state": "available",
+      "kind": "line",
+      "reason": null,
+      "source_files": [
+        "results/agents/terrain_dt1/sighted_seed0/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed1/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed2/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed3/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed4/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed5/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed6/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed7/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed8/curve.csv",
+        "results/agents/terrain_dt1/sighted_seed9/curve.csv",
+        "results/agents/terrain_dt1/blind_seed0/curve.csv",
+        "results/agents/terrain_dt1/blind_seed1/curve.csv",
+        "results/agents/terrain_dt1/blind_seed2/curve.csv",
+        "results/agents/terrain_dt1/blind_seed3/curve.csv",
+        "results/agents/terrain_dt1/blind_seed4/curve.csv",
+        "results/agents/terrain_dt1/blind_seed5/curve.csv",
+        "results/agents/terrain_dt1/blind_seed6/curve.csv",
+        "results/agents/terrain_dt1/blind_seed7/curve.csv",
+        "results/agents/terrain_dt1/blind_seed8/curve.csv",
+        "results/agents/terrain_dt1/blind_seed9/curve.csv"
+      ],
+      "caveats": [
+        "raw_training_curve"
+      ],
+      "source": "results/agents/terrain_dt1",
+      "reader": "results_sets.read_agent_sets",
+      "channels": []
+    },
+    {
+      "id": "G11",
+      "state": "unavailable",
+      "kind": "line",
+      "reason": "missing_record",
+      "source_files": [
+        "results/agents/terrain_dt1/episode_trace.json"
+      ],
+      "caveats": [],
+      "source": "results/agents/terrain_dt1",
+      "reader": "results_records.read_episode_panel",
+      "channels": []
+    },
+    {
+      "id": "G13",
+      "state": "unavailable",
+      "kind": "line",
+      "reason": "FileNotFoundError",
+      "source_files": [
+        "runs/curve.csv"
+      ],
+      "caveats": [
+        "curve_unavailable"
+      ],
+      "source": "phase_d",
+      "reader": "results_sets.read_training_panels",
+      "channels": []
+    },
+    {
+      "id": "G13",
+      "state": "unavailable",
+      "kind": "line",
+      "reason": "FileNotFoundError",
+      "source_files": [
+        "runs_c4/curve.csv"
+      ],
+      "caveats": [
+        "curve_unavailable"
+      ],
+      "source": "c4",
+      "reader": "results_sets.read_training_panels",
+      "channels": []
+    },
+    {
+      "id": "G13",
+      "state": "unavailable",
+      "kind": "line",
+      "reason": "FileNotFoundError",
+      "source_files": [
+        "runs_d2/curve.csv"
+      ],
+      "caveats": [
+        "curve_unavailable"
+      ],
+      "source": "d2",
+      "reader": "results_sets.read_training_panels",
+      "channels": []
+    },
+    {
+      "id": "G13",
+      "state": "unavailable",
+      "kind": "line",
+      "reason": "FileNotFoundError",
+      "source_files": [
+        "runs_sixspeed_18sep/curve.csv"
+      ],
+      "caveats": [
+        "curve_unavailable"
+      ],
+      "source": "sixspeed_18sep",
+      "reader": "results_sets.read_training_panels",
+      "channels": []
+    }
+  ],
+  "real_record_count": 86,
+  "real_record_states": {
+    "unavailable": 86
+  },
+  "records": [
+    {
+      "relative_path": "results/agents/sep19_110kmh/baseline_ECU",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/blind_seed0",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/blind_seed1",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/blind_seed2",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/blind_seed3",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/blind_seed4",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/current-grade",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/predictive_hand",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/reactive",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/sighted_seed0",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/sighted_seed1",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/sighted_seed2",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/sighted_seed3",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/sep19_110kmh/sighted_seed4",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/baseline_ECU",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed0",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed1",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed2",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed3",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed4",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed5",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed6",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed7",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed8",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/blind_seed9",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/current-grade",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/predictive_hand",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/reactive",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed0",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed1",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed2",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed3",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed4",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed5",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed6",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed7",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed8",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "results/agents/terrain_dt1/sighted_seed9",
+      "expected_file": "eval_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed0",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed1",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed2",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed3",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed4",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed5",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed6",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/blind_seed7",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed0",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed1",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed2",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed3",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed4",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed5",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed6",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs/sighted_seed7",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed0",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed1",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed2",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed3",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed4",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed5",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed6",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/blind_seed7",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed0",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed1",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed2",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed3",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed4",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed5",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed6",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_c4/sighted_seed7",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed0",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed1",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed2",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed3",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed4",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed5",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed6",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/blind_seed7",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed0",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed1",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed2",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed3",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed4",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed5",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed6",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    },
+    {
+      "relative_path": "runs_d2/sighted_seed7",
+      "expected_file": "train_record.npz",
+      "state": "unavailable",
+      "reason": "missing_record"
+    }
+  ]
+}

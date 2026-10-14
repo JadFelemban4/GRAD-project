@@ -1,7 +1,7 @@
 // The results tab (/results): fetch, render, language, theme.
 //
-// PRESENTATION ONLY. The server (app/results_data.py) reads results/ on every
-// request and sends values; results-view.mjs chooses each sentence and
+// PRESENTATION ONLY. The server publishes stable result snapshots and sends
+// values; results-view.mjs chooses each sentence and
 // results-charts.mjs lays out and draws each figure. This file builds the DOM
 // from them and computes nothing: no statistic, no average across
 // experiments, no winner. Each experiment is its own section, never counted
@@ -13,7 +13,9 @@
 // in the browser except the lab's own theme and language preferences and, in
 // this tab's sessionStorage until the page is next built, the reader's place.
 import './results-strings.mjs?v=R1a';
-import { t, LANGS, DEFAULT_LANG, resolveLang, applyTranslations } from './i18n.mjs';
+import { t, STRINGS, LANGS, DEFAULT_LANG, resolveLang, applyTranslations } from './i18n.mjs';
+import { createArtifactSync } from './artifact-sync.mjs';
+import { itemView, statusView } from './artifact-view.mjs';
 import { inline } from './results-format.mjs?v=R1a';
 import { createMounter } from './charts-lib.mjs?v=R1a';
 import {
@@ -23,6 +25,9 @@ import {
   sectionName, nameSlot, metaText, plantView, verdictView, noteItems, summaryRows, unavailableText,
   notReadItems, builtView, checkItems, unpairedItems, thermalNote, meiLines,
 } from './results-view.mjs?v=R1a';
+import { parseSelectionHash, resolveChoice, selectedSections, selectionHash } from './results-selector.mjs?v=R1a';
+import { createGraphicsBrowser } from './graphics-browser.mjs?v=R1a';
+import { graphicsText } from './graphics-strings.mjs?v=R1a';
 
 const $ = id => document.getElementById(id);
 const THEMES = ['light', 'dark'];
@@ -31,11 +36,77 @@ const PLACE_KEY = 'grad.results.place';
 const ARMS = ['sighted', 'blind'];
 
 let currentLang = DEFAULT_LANG;
+let pageActive = true;
+let bootController = null;
 const state = {
   payload: null,   // GET /api/results, once it has arrived
   failure: null,   // what to put in {status} when it did not
+  artifactStatus: null,
+  primaryChoice: '',
+  compareChoice: '',
+  compareEnabled: false,
+  selectionInitialized: false,
 };
 const mounter = createMounter({ onError: chartFailed });
+const sectionNodes = new Map();
+const registryNodes = new Map();
+const artifactNodes = new Map();
+let summarySignature = null;
+let graphicsBrowser = null;
+
+function registrySets() {
+  return (state.payload?.artifacts?.items || []).filter(item => item.kind === 'agent_set');
+}
+function choices() {
+  const evaluations = (state.payload?.sections || []).map(section => ({
+    id: section.id, type: 'evaluation', label: sectionName(section, currentLang), section,
+    ready: section.state === 'ok',
+  }));
+  const sets = registrySets().map(item => ({
+    id: `set:${item.id}`, type: 'agent_set',
+    label: `${item.name || item.relative_path || item.id}${['current', 'updating / last valid snapshot'].includes(item.coherence)
+      ? '' : ` · ${t(currentLang, 'results.selector.set_pending')}`}`,
+    ready: ['current', 'updating / last valid snapshot'].includes(item.coherence), item,
+  }));
+  const reference = state.payload?.graphics?.reference_panels?.length
+    ? [{id:'reference',type:'reference',label:graphicsText(currentLang,'reference'),ready:true}] : [];
+  return [...evaluations, ...sets, ...reference];
+}
+function initialChoice(all) {
+  return all.find(choice => choice.type === 'evaluation' && choice.section?.state === 'ok')
+    || all.find(choice => choice.type === 'evaluation')
+    || all.find(choice => choice.type === 'agent_set' && choice.ready)
+    || (state.payload?.updating ? null : all[0])
+    || null;
+}
+function selectedChoice() {
+  return choices().find(choice => choice.id === state.primaryChoice) || null;
+}
+function chosenSections() {
+  const sections = state.payload?.sections || [];
+  const compareId = state.compareEnabled && selectedChoice()?.type === 'evaluation' ? state.compareChoice : '';
+  return selectedSections(sections, state.primaryChoice, compareId);
+}
+function writeSelectionHash(mode = 'replace') {
+  if (!state.selectionInitialized || !state.primaryChoice) return;
+  const next = selectionHash(state.primaryChoice,
+    state.compareEnabled ? state.compareChoice : '', choices());
+  if (!next || location.hash === next) return;
+  try { history[`${mode}State`](null, '', next); }
+  catch (e) { location.hash = next; }
+}
+function applySelectionHash() {
+  // Resolve browser navigation through the same readiness gate as first load.
+  state.primaryChoice = '';
+  state.compareChoice = '';
+  state.compareEnabled = false;
+  state.selectionInitialized = false;
+  render();
+  writeSelectionHash('replace');
+  const choice = selectedChoice();
+  const targetId = choice?.type === 'agent_set' ? 'registry-selection' : state.primaryChoice;
+  $(targetId)?.scrollIntoView?.({ block: 'start' });
+}
 
 function remember(key, value) {
   try { localStorage.setItem(key, value); } catch (e) { /* a preference is a convenience */ }
@@ -48,6 +119,20 @@ function recall(key, allowed, fallback) {
 }
 function setText(node, value) {
   if (node && node.textContent !== value) node.textContent = value;
+}
+function syncSelect(select, entries, selected) {
+  if (!select) return;
+  const signature = JSON.stringify(entries.map(entry => [entry.value, entry.label]));
+  if (select.dataset.optionSignature !== signature) {
+    select.textContent = '';
+    for (const entry of entries) {
+      const option = el('option', '', entry.label);
+      option.value = entry.value;
+      select.appendChild(option);
+    }
+    select.dataset.optionSignature = signature;
+  }
+  select.value = entries.some(entry => entry.value === selected) ? selected : (entries[0]?.value || '');
 }
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -95,13 +180,69 @@ function renderError() {
     : t(currentLang, 'results.error.fetch', { status: inline(currentLang, state.failure) }));
 }
 
+function renderSelectors() {
+  const box = $('experiment-controls');
+  const primary = $('experiment-select');
+  const compareToggle = $('compare-enabled');
+  const compareControl = $('compare-control');
+  const compareField = $('compare-field');
+  const compare = $('compare-select');
+  if (!box || !primary || !state.payload) return;
+  const all = choices();
+  if (!state.selectionInitialized) {
+    const parsed = parseSelectionHash(location.hash || '', all);
+    if (parsed) {
+      state.primaryChoice = parsed.primary;
+      state.compareChoice = parsed.compare;
+      state.compareEnabled = parsed.compareEnabled;
+      state.selectionInitialized = true;
+    } else if (!location.hash || !state.payload.updating) {
+      // An explicit link may reference results absent from a partial snapshot.
+      // Keep it pending until it resolves, the snapshot settles, or the reader chooses.
+      const initial = initialChoice(all);
+      if (initial) {
+        state.primaryChoice = initial.id;
+        state.selectionInitialized = true;
+      }
+    }
+  }
+  if (state.selectionInitialized) state.primaryChoice = resolveChoice(all, state.primaryChoice, location.hash || '');
+  const choice = all.find(item => item.id === state.primaryChoice);
+  if (choice?.type !== 'evaluation') {
+    state.compareEnabled = false;
+    state.compareChoice = '';
+  }
+  const evaluations = all.filter(item => item.type === 'evaluation');
+  const primaryEntries = [
+    ...(!state.primaryChoice ? [{ value: '', label: t(currentLang, 'results.selector.waiting') }] : []),
+    ...all.map(item => ({ value: item.id, label: item.label })),
+  ];
+  const compareEntries = [{ value: '', label: t(currentLang, 'results.selector.choose_second') },
+    ...evaluations.filter(item => item.id !== state.primaryChoice).map(item => ({ value: item.id, label: item.label }))];
+  syncSelect(primary, primaryEntries, state.primaryChoice);
+  state.compareChoice = compareEntries.some(entry => entry.value === state.compareChoice) ? state.compareChoice : '';
+  syncSelect(compare, compareEntries, state.compareChoice);
+  compareToggle.checked = state.compareEnabled;
+  compareToggle.disabled = !evaluations.length || choice?.type !== 'evaluation';
+  compareControl.hidden = evaluations.length < 2 || choice?.type !== 'evaluation';
+  compareField.hidden = !state.compareEnabled || choice?.type !== 'evaluation';
+  box.hidden = all.length === 0;
+  writeSelectionHash('replace');
+}
+
 function renderSummary() {
   const rows = $('summary-rows');
   const summary = $('summary');
   if (!rows || !summary) return;
+  const selected = chosenSections();
+  const selectedIds = selected.map(section => section.id);
+  const signature = JSON.stringify([currentLang, selectedIds,
+    state.payload && summaryRows({ ...state.payload, sections: selected }, currentLang)]);
+  if (signature === summarySignature) return;
+  summarySignature = signature;
   rows.textContent = '';
-  if (!state.payload) { summary.hidden = true; return; }
-  for (const row of summaryRows(state.payload, currentLang)) {
+  if (!state.payload || !selectedIds.length) { summary.hidden = true; return; }
+  for (const row of summaryRows({ ...state.payload, sections: selected }, currentLang)) {
     const tr = el('tr');
     const name = el('td', 'rc-summary-name');
     const link = el('a', 'rc-summary-link', row.name);
@@ -119,7 +260,12 @@ function renderNotRead() {
   const ul = $('not-read-list');
   if (!box || !ul) return;
   ul.textContent = '';
-  const items = state.payload ? notReadItems(state.payload.not_read, currentLang) : [];
+  const prefixes = new Set(chosenSections().map(section => section.prefix));
+  const raw = (state.payload?.not_read || []).filter(item => {
+    const match = /(?:^|\/)([a-z][a-z0-9]*(?:_[a-z0-9]+)*)_seed\d+\.txt$/i.exec(item.path || '');
+    return match && prefixes.has(match[1]);
+  });
+  const items = state.payload ? notReadItems(raw, currentLang) : [];
   for (const item of items) {
     const li = el('li');
     const path = el('code', '', item.path);
@@ -128,6 +274,102 @@ function renderNotRead() {
     ul.appendChild(li);
   }
   box.hidden = items.length === 0;
+}
+
+function evidenceText(name, available) {
+  const evidenceKey = `artifact.evidence.${name}`;
+  const evidenceName = STRINGS[currentLang][evidenceKey]
+    ? t(currentLang, evidenceKey) : inline(currentLang, name);
+  return t(currentLang, available ? 'artifact.evidence.available' : 'artifact.evidence.unavailable', { name: evidenceName });
+}
+
+function lifecycleText(lifecycle) {
+  const value = ['running', 'finalizing', 'finished', 'interrupted', 'unknown'].includes(lifecycle)
+    ? lifecycle : 'unknown';
+  return t(currentLang, value === 'finished' ? 'artifact.lifecycle.published' : `artifact.lifecycle.${value}`);
+}
+
+function metricText(name) {
+  const key = `results.registry.metric.${name}`;
+  return STRINGS[currentLang][key]
+    ? t(currentLang, key) : t(currentLang, 'results.registry.metric.other', { name: inline(currentLang, name) });
+}
+
+function statisticText(name) {
+  const key = `results.registry.stat.${name}`;
+  return STRINGS[currentLang][key]
+    ? t(currentLang, key) : t(currentLang, 'results.registry.stat.other', { name: inline(currentLang, name) });
+}
+
+function summaryTable(summary) {
+  if (!summary || typeof summary !== 'object' || Array.isArray(summary) || !Object.keys(summary).length) {
+    return el('p', 'rc-registry-unavailable', t(currentLang, 'results.registry.summary.unavailable'));
+  }
+  const table = el('table', 'rc-registry-table');
+  const caption = el('caption', '', t(currentLang, 'results.registry.summary.caption'));
+  const head = el('tr');
+  for (const key of ['results.registry.summary.metric', 'results.registry.summary.statistic', 'results.registry.summary.value']) {
+    head.appendChild(el('th', '', t(currentLang, key)));
+  }
+  const thead = el('thead');
+  thead.appendChild(head);
+  const tbody = el('tbody');
+  for (const [metric, raw] of Object.entries(summary)) {
+    const values = raw && typeof raw === 'object' && !Array.isArray(raw)
+      ? Object.entries(raw) : [['value', raw]];
+    if (!values.length) values.push(['value', null]);
+    for (const [statistic, value] of values) {
+      const tr = el('tr');
+      tr.append(el('th', '', metricText(metric)), el('td', '', statisticText(statistic)));
+      tr.appendChild(el('td', 'rc-registry-value', value === null || value === undefined
+        ? t(currentLang, 'results.registry.summary.unavailable')
+        : inline(currentLang, typeof value === 'string' ? value : String(value))));
+      tbody.appendChild(tr);
+    }
+  }
+  table.append(caption, thead, tbody);
+  return table;
+}
+
+function capabilityList(capabilities, className) {
+  const ul = el('ul', className);
+  for (const [name, available] of Object.entries(capabilities || {})) {
+    ul.appendChild(el('li', '', evidenceText(name, available === true)));
+  }
+  return ul;
+}
+
+function renderRegistrySet(item) {
+  const node = el('article', 'rc-section rc-registry');
+  node.id = 'registry-selection';
+  const label = item.name || item.relative_path?.split('/').filter(Boolean).at(-1) || item.id;
+  node.append(el('h2', '', label), el('p', 'rc-note', t(currentLang, 'results.registry.notice')));
+  const ready = ['current', 'updating / last valid snapshot'].includes(item.coherence);
+  if (item.coherence === 'updating / last valid snapshot') {
+    node.appendChild(el('p', 'rc-note rc-registry-last-valid', t(currentLang, 'artifact.last_valid')));
+  } else if (!ready) {
+    node.appendChild(el('p', 'rc-note rc-registry-unavailable', t(currentLang, 'results.registry.pending')));
+  }
+  node.appendChild(el('h3', 'rc-registry-heading', t(currentLang, 'results.registry.capabilities')));
+  node.appendChild(capabilityList(item.capabilities, 'rc-registry-capabilities'));
+  const members = Array.isArray(item.members) ? item.members : [];
+  node.appendChild(el('h3', 'rc-registry-heading', t(currentLang, 'results.registry.members')));
+  if (!members.length && ready) node.appendChild(el('p', 'rc-registry-unavailable', t(currentLang, 'results.registry.members.empty')));
+  const listNode = el('ul', 'rc-registry-members');
+  for (const member of members) {
+    const li = el('li');
+    li.appendChild(el('strong', '', member.name || member.relative_path?.split('/').filter(Boolean).at(-1) || ''));
+    li.append(el('span', 'rc-registry-status', `${t(currentLang, 'results.registry.member.lifecycle')}: ${lifecycleText(member.lifecycle)}`));
+    li.appendChild(capabilityList(member.capabilities, 'rc-registry-member-capabilities'));
+    const details = el('details', 'rc-registry-summary');
+    details.dataset.fold = `registry:${item.id}:${member.name || member.relative_path || ''}`;
+    details.appendChild(el('summary', '', t(currentLang, 'results.registry.member.summary')));
+    details.appendChild(summaryTable(member.summary));
+    li.appendChild(details);
+    listNode.appendChild(li);
+  }
+  node.appendChild(listNode);
+  return node;
 }
 
 // ----------------------------------------------------------- a section
@@ -318,20 +560,132 @@ function buildSection(section, markers) {
   }
 }
 
-// Builds every section and returns its charts; render() mounts them.
+// Reuse unchanged sections, including their mounted charts and open folds.
 function renderSections() {
   const host = $('sections');
   if (!host) return [];
-  host.textContent = '';
-  const rows = summaryRows(state.payload, currentLang);
+  const allSections = state.payload?.sections || [];
   const charts = [];
-  for (const section of state.payload?.sections || []) {
+  for (const [id, previous] of sectionNodes) {
+    if (allSections.some(section => section.id === id)) continue;
+    for (const chart of previous.charts) {
+      if (!chart.mounted) continue;
+      mounter.unmount(chart.host);
+      chart.mounted = false;
+    }
+    previous.node.remove();
+    sectionNodes.delete(id);
+  }
+  const currentSets = new Set(registrySets().map(item => `set:${item.id}`));
+  for (const [id, previous] of registryNodes) {
+    if (currentSets.has(id)) continue;
+    previous.node.remove();
+    registryNodes.delete(id);
+  }
+  const choice = selectedChoice();
+  if (choice?.type === 'agent_set') {
+    for (const [id, previous] of registryNodes) {
+      if (id !== choice.id) previous.node.remove();
+    }
+    for (const previous of sectionNodes.values()) {
+      previous.node.remove();
+      for (const chart of previous.charts) {
+        if (!chart.mounted) continue;
+        mounter.unmount(chart.host);
+        chart.mounted = false;
+      }
+    }
+    const signature = JSON.stringify([currentLang, choice.item]);
+    let built = registryNodes.get(choice.id);
+    if (built?.signature !== signature) {
+      built?.node.remove();
+      built = { node: renderRegistrySet(choice.item), signature };
+      registryNodes.set(choice.id, built);
+    }
+    if (host.children[0] !== built.node) host.insertBefore(built.node, host.children[0] || null);
+    return charts;
+  }
+  for (const previous of registryNodes.values()) previous.node.remove();
+  const sections = chosenSections();
+  const rows = summaryRows({ ...state.payload, sections }, currentLang);
+  const selectedIds = new Set(sections.map(section => section.id));
+  for (const [id, previous] of sectionNodes) {
+    if (selectedIds.has(id)) continue;
+    previous.node.remove();
+    for (const chart of previous.charts) {
+      if (!chart.mounted) continue;
+      mounter.unmount(chart.host);
+      chart.mounted = false;
+    }
+  }
+  for (const [index, section] of sections.entries()) {
     const markers = rows.find(r => r.id === section.id)?.markers || [];
-    const built = buildSection(section, markers);
-    host.appendChild(built.node);
-    charts.push(...built.charts);
+    const signature = JSON.stringify([currentLang, section, markers]);
+    let built = sectionNodes.get(section.id);
+    if (built?.signature !== signature) {
+      if (built) {
+        for (const chart of built.charts) {
+          if (!chart.mounted) continue;
+          mounter.unmount(chart.host);
+          chart.mounted = false;
+        }
+        built.node.remove();
+      }
+      built = { ...buildSection(section, markers), signature };
+      sectionNodes.set(section.id, built);
+    }
+    charts.push(...built.charts.filter(chart => !chart.mounted));
+    if (host.children[index] !== built.node) host.insertBefore(built.node, host.children[index] || null);
   }
   return charts;
+}
+
+function renderArtifactStrip() {
+  const status = statusView({ ...(state.payload?.artifacts || {}), ...(state.artifactStatus || {}) }, currentLang);
+  setText($('artifact-status'), `${status.connection} · ${status.lastSuccess}${state.payload?.artifacts?.restart_needed ? ` · ${status.restartNeeded}` : ''}`);
+  const host = $('artifact-list');
+  if (!host) return;
+  const allItems = state.payload?.artifacts?.items || [];
+  const choice = selectedChoice();
+  let items = [];
+  if (choice?.type === 'agent_set') {
+    items = allItems.filter(item => item.id === choice.item.id);
+  } else {
+    const prefixes = new Set(chosenSections().map(section => section.prefix));
+    items = allItems.filter(item => {
+      if (item.kind !== 'evaluation_text') return false;
+      const path = item.relative_path || '';
+      const match = /(?:^|\/)([a-z][a-z0-9]*(?:_[a-z0-9]+)*)_seed\d+\.txt$/i.exec(path);
+      return match && prefixes.has(match[1]);
+    });
+  }
+  for (const [id, previous] of artifactNodes) {
+    if (items.some(item => item.id === id)) continue;
+    previous.node.remove();
+    artifactNodes.delete(id);
+  }
+  for (const item of items) {
+    const signature = JSON.stringify([currentLang, item]);
+    const previous = artifactNodes.get(item.id);
+    if (previous?.signature === signature) continue;
+    const view = itemView(item, currentLang);
+    if (item.kind === 'agent_set') {
+      view.availability = view.availability.replace(` · ${t(currentLang, 'artifact.reader.pending')}`, '');
+    }
+    const node = previous?.node || el('details', 'artifact-item');
+    const open = node.open;
+    node.textContent = '';
+    const summary = el('summary');
+    const path = el('bdi', '', item.relative_path);
+    path.setAttribute('dir', 'ltr');
+    summary.append(path, el('span', '', ` · ${view.lifecycle}`));
+    node.appendChild(summary);
+    for (const line of [view.source, view.availability, view.compatibility, view.issues]) node.appendChild(el('p', '', line));
+    if (item.coherence === 'updating / last valid snapshot') node.appendChild(el('p', '', t(currentLang, 'artifact.last_valid')));
+    node.open = open;
+    if (!previous) host.appendChild(node);
+    artifactNodes.set(item.id, { node, signature });
+  }
 }
 
 // The reader's place before a rebuild (a language switch): the section at the
@@ -368,6 +722,11 @@ function takePlace() {
   return saved && typeof saved.id === 'string' && Number.isFinite(saved.offset) ? saved : null;
 }
 function fragmentTarget() {
+  const parsed = parseSelectionHash(location.hash || '', choices());
+  if (parsed) {
+    const choice = choices().find(item => item.id === parsed.primary);
+    return document.getElementById(choice?.type === 'agent_set' ? 'registry-selection' : parsed.primary);
+  }
   try {
     const id = decodeURIComponent(location.hash.slice(1));
     return id ? document.getElementById(id) : null;
@@ -388,12 +747,17 @@ function restorePlace() {
 
 function render() {
   const place = readPlace();
-  mounter.clear();
+  const focus = document.activeElement;
+  const focusId = focus?.id;
+  const focusFold = focus?.closest?.('details[data-fold]')?.dataset.fold;
   renderError();
   renderBuilt();
+  renderSelectors();
   renderSummary();
   const charts = renderSections();
+  renderGraphics();
   renderNotRead();
+  renderArtifactStrip();
   for (const fold of document.querySelectorAll('details[data-fold]')) {
     if (place.open.has(fold.dataset.fold)) fold.open = true;
   }
@@ -401,9 +765,37 @@ function render() {
   // layout is read while the page is shorter than before, so the browser has
   // no shorter page to clamp the scroll to. Then the reader's section goes
   // back to its offset.
-  for (const chart of charts) mounter.mount(chart.host, chart.draw);
+  for (const chart of charts) {
+    mounter.mount(chart.host, chart.draw);
+    chart.mounted = true;
+  }
+  if (focus && (document.activeElement !== focus || !focus.parentNode)) {
+    const replacement = focusId ? $(focusId) : focusFold
+      ? [...document.querySelectorAll('details[data-fold]')].find(d => d.dataset.fold === focusFold)?.querySelector('summary') : null;
+    (replacement || $('experiment-select'))?.focus({ preventScroll: true });
+  }
   const anchor = place.id ? $(place.id) : null;
   if (anchor) window.scrollBy(0, anchor.getBoundingClientRect().top - place.offset);
+}
+
+function renderGraphics() {
+  const host=$('graphics');
+  if(!host)return;
+  graphicsBrowser ||= createGraphicsBrowser(host,{onGroup:group=>{
+    const sectionHost=$('sections');
+    if(sectionHost)sectionHost.hidden=selectedChoice()?.type==='evaluation' && group!=='evaluation';
+  }});
+  const choice=selectedChoice(),graphics=state.payload?.graphics;
+  let panels=[],recorderTest=false;
+  if(choice?.type==='reference')panels=graphics?.reference_panels || [];
+  if(choice?.type==='agent_set'){
+    const set=graphics?.agent_sets?.find(s=>s.relative_path===choice.item.relative_path);
+    panels=(set?.panels || []).map(panel=>({...panel,provenance:panel.provenance || set.provenance,issues:set.issues}));recorderTest=Boolean(set?.recorder_test);
+  }
+  if(choice?.type==='evaluation')panels=graphics?.experiment_panels?.[choice.section.prefix] || [];
+  graphicsBrowser.render({sourceKey:choice?.id || '',title:choice?.label || '',panels,lang:currentLang,
+    updating:Boolean(state.payload?.updating),recorderTest,
+    externalGroups:choice?.type==='evaluation'?{evaluation:Math.max(1,$('sections')?.children.length || 0)}:{}});
 }
 
 // ---------------------------------------------------- theme and language
@@ -444,24 +836,56 @@ function applyLanguage(name) {
 }
 
 // ---------------------------------------------------------------- boot
-async function load() {
+async function load({ refresh = false, signal } = {}) {
+  if (!refresh && !signal) {
+    bootController?.abort();
+    bootController = new AbortController();
+    signal = bootController.signal;
+  }
   let response;
   try {
-    response = await fetch('/api/results', { cache: 'no-store' });
+    response = await fetch('/api/results', { cache: 'no-store', signal });
   } catch (err) {
+    if (signal?.aborted || !pageActive) return;
+    if (refresh) throw err;
     state.failure = err?.name || 'Error';
     render();
     return;
   }
+  if (signal?.aborted || !pageActive) return;
   if (response.status !== 200) {
+    if (refresh) throw new Error(`HTTP ${response.status}`);
     state.failure = await failureOf(response);
     render();
     return;
   }
-  state.payload = await response.json();
+  const body = await response.json();
+  if (signal?.aborted || !pageActive) return;
+  if (!Array.isArray(body?.sections)) throw new Error('invalid results snapshot');
+  state.failure = null;
+  state.payload = body;
   render();
-  restorePlace();
+  if (!refresh) restorePlace();
+  if (body.artifacts) artifactSync.start();
 }
+
+const artifactSync = createArtifactSync({
+  readRevision: async signal => {
+    const response = await fetch('/api/artifacts/revision', { cache: 'no-store', signal });
+    if (response.status !== 200) throw new Error(`HTTP ${response.status}`);
+    const next = await response.json();
+    if (typeof next?.revision !== 'string') throw new Error('invalid artifact revision');
+    // A file may change while the reader builds, before a new revision settles.
+    return { ...next, updating: Boolean(next.updating || state.payload?.updating) };
+  },
+  onChange: async (_previous, next, { signal }) => {
+    const old = state.payload?.artifacts;
+    state.artifactStatus = { ...state.artifactStatus, ...next };
+    if (!old || state.payload.updating || ['results_revision', 'plant_revision', 'results_updating']
+      .some(key => old[key] !== next[key])) await load({ refresh: true, signal });
+  },
+  onStatus: value => { state.artifactStatus = { ...state.artifactStatus, ...value }; renderArtifactStrip(); },
+});
 
 // A failed build answers `results failed: <Type>` (app/results_api.py): the
 // page names the status and that type, and nothing else of the body.
@@ -476,13 +900,45 @@ async function failureOf(response) {
 
 function start() {
   try { history.scrollRestoration = 'manual'; } catch (e) { /* the page restores the place itself either way */ }
-  window.addEventListener('pagehide', savePlace);
+  window.addEventListener('pagehide', () => {
+    pageActive = false;
+    savePlace();
+    bootController?.abort();
+    artifactSync.stop();
+  });
+  window.addEventListener('pageshow', () => {
+    if (pageActive) return;
+    pageActive = true;
+    if (state.payload?.artifacts) artifactSync.start();
+    else load().catch(err => console.error(err));
+  });
+  document.addEventListener('visibilitychange', () => artifactSync.visibilityChanged());
   $('theme-toggle')?.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   });
   $('lang-toggle')?.addEventListener('click', () => {
     applyLanguage(currentLang === 'ar' ? 'en' : 'ar');
   });
+  $('experiment-select')?.addEventListener('change', () => {
+    state.primaryChoice = $('experiment-select').value;
+    state.compareChoice = state.compareChoice === state.primaryChoice ? '' : state.compareChoice;
+    state.selectionInitialized = true;
+    writeSelectionHash('push');
+    render();
+  });
+  $('compare-enabled')?.addEventListener('change', () => {
+    state.compareEnabled = Boolean($('compare-enabled').checked);
+    if (!state.compareEnabled) state.compareChoice = '';
+    writeSelectionHash('push');
+    render();
+  });
+  $('compare-select')?.addEventListener('change', () => {
+    state.compareChoice = $('compare-select').value;
+    writeSelectionHash('push');
+    render();
+  });
+  window.addEventListener('hashchange', applySelectionHash);
+  window.addEventListener('popstate', applySelectionHash);
   applyTheme(recall(STORE.theme, THEMES,
     window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
   applyLanguage(recall(STORE.lang, LANGS, DEFAULT_LANG));

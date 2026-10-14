@@ -29,7 +29,10 @@ import {
   NOTHING, parsePickerQuery, experimentOf, pairOf, resolveSelection, choose, selectionSearch,
   computeState, experimentOptions, experimentNote, pairOptions, episodeOptions, pairQualifier, sameRoadNote,
   refusedPairs, scoredKey, blindLabelKey, notBlindCite, isolateLtr,
+  reconcileCatalog,
 } from './agent-picker.mjs';
+import { createArtifactSync } from './artifact-sync.mjs';
+import { itemView, statusView } from './artifact-view.mjs';
 import { createTapUnlock } from './tap-unlock.mjs';
 import {
   MODELS, askState, createAnswers, rowView, failureOf, errorText, statusLine, keyErrorText,
@@ -46,15 +49,28 @@ const PROFILE_PAD = 24;
 const KM_STEP = 5;   // the profile's horizontal scale: a label every 5 km
 
 let currentLang = DEFAULT_LANG;
+let pageActive = true;
+let bootController = null;
+const pickerActive = () => ['pick-experiment', 'pick-pair', 'pick-episode']
+  .some(id => $(id) === document.activeElement);
 
 // The chase view is loaded on demand (mountChase) and may never exist: when
 // Three.js or WebGL fails, every other surface of the page still renders.
 let chase = null;
 let chaseToken = 0;
+let recordView = null;
+let mobileLane = 'sighted';
+const phoneView = window.matchMedia?.('(max-width: 760px)');
+const recordQuery = new URLSearchParams(window.location.search);
 
 const state = {
   catalog: null,   // GET /api/agents/catalog, once it has arrived
   catalogFailed: false,   // the last catalog request failed; a retry clears it
+  catalogBooted: false,
+  pendingCatalog: null,
+  artifactStatus: null,
+  sourceChanged: false,
+  generation: null,
   bootQuery: parsePickerQuery(window.location.search),
   sel: { ...NOTHING },   // what the three selects name: { runs, seed, ep }
   frames: [],
@@ -201,6 +217,7 @@ function episodeUrl(since, preempt) {
     runs: q.runs, seed: String(q.seed), ep: String(q.ep), since: String(since),
   });
   if (preempt) params.set('preempt', '1');
+  if (state.generation) params.set('generation', state.generation);
   return `/api/agents/episode?${params}`;
 }
 
@@ -216,6 +233,8 @@ function compute() {
   state.play.clock.setRate(Number($('rate')?.value) || 1, now);
   if (state.metaKey !== keyOf(state.sel)) { state.meta = null; state.road = null; }
   state.frames = [];
+  state.generation = null;
+  state.sourceChanged = false;
   state.done = false;
   state.device = null;
   state.versions = null;
@@ -274,6 +293,11 @@ function handle(status, body) {
   if (!(status === 200 && body?.status === 'busy')) state.preempted = false;
   if (status === 404) { stop(() => t(currentLang, 'agents.load.not_found')); return false; }
   if (status === 409) {
+    if (body?.status === 'invalidated') {
+      clearEpisode();
+      state.sourceChanged = true;
+      renderArtifactStrip();
+    }
     stop(() => t(currentLang, 'agents.load.refused'), { items: (body && body.problems) || [] });
     return false;
   }
@@ -282,6 +306,15 @@ function handle(status, body) {
     const message = `HTTP ${status}`;
     stop(() => t(currentLang, 'agents.load.error', { message }), { retry: compute });
     return false;
+  }
+  if (body.generation) {
+    if (state.generation && state.generation !== body.generation) {
+      clearEpisode();
+      state.sourceChanged = true;
+      renderArtifactStrip();
+      return false;
+    }
+    state.generation = body.generation;
   }
   // The server answered, so an earlier "server unavailable" (and its retry
   // button) is no longer true; a retry resumes polling without «احسب».
@@ -473,6 +506,7 @@ function clearEpisode() {
   state.play = createPlayState(new PlaybackClock(0));
   state.play.clock.setRate(Number($('rate')?.value) || 1, now);
   state.frames = [];
+  state.generation = null;
   state.meta = null;
   state.metaKey = null;
   state.road = null;
@@ -502,6 +536,7 @@ function clearEpisode() {
 // changes nothing (the same value, or a greyed option) only redraws the picker.
 function onPick(level, select) {
   if (!state.catalog || !select) return;
+  state.catalogBooted = true;
   const next = choose(state.catalog, state.sel, level, select.value);
   if (sameSel(next, state.sel)) { renderPicker(); return; }
   clearEpisode();
@@ -510,39 +545,137 @@ function onPick(level, select) {
   renderAll();
 }
 
-// The catalog, once, at boot. It never starts a computation.
-async function loadCatalog() {
-  showError(null);
-  state.catalogFailed = false;
-  renderPicker();
+// Boot once; subsequent publications reconcile the current selection.
+async function loadCatalog({ refresh = false, signal } = {}) {
+  if (!refresh && !signal) {
+    bootController?.abort();
+    bootController = new AbortController();
+    signal = bootController.signal;
+  }
+  if (!refresh) {
+    showError(null);
+    state.catalogFailed = false;
+    renderPicker();
+  }
   let res;
   let body = null;
   try {
-    res = await fetch('/api/agents/catalog', { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    res = await fetch('/api/agents/catalog', { headers: { Accept: 'application/json' }, cache: 'no-store', signal });
     body = await res.json().catch(() => null);
   } catch (err) {
+    if (signal?.aborted || !pageActive) return;
+    if (refresh) throw err;
     state.catalogFailed = true;
     renderPicker();
     showError(() => t(currentLang, 'agents.pick.catalog_error', { message: t(currentLang, 'agents.load.server_down') }),
       { retry: loadCatalog });
     return;
   }
+  if (signal?.aborted || !pageActive) return;
   if (res.status !== 200 || !body || !Array.isArray(body.experiments)) {
+    if (refresh) throw new Error(`HTTP ${res.status}`);
     const message = `HTTP ${res.status}`;
     state.catalogFailed = true;
     renderPicker();
     showError(() => t(currentLang, 'agents.pick.catalog_error', { message }), { retry: loadCatalog });
     return;
   }
+  if (signal?.aborted) return;
+  const editing = pickerActive();
+  if (refresh && editing) {
+    const next = reconcileCatalog(state.catalog, body, state.sel);
+    if (next.sourceChanged || !sameSel(next.selection, state.sel)) {
+      clearEpisode();
+      state.sourceChanged = true;
+      renderArtifactStrip();
+    }
+    state.pendingCatalog = body;
+    return;
+  }
+  acceptCatalog(body);
+  if (body.artifacts) artifactSync.start();
+}
+
+function acceptCatalog(body) {
+  // The first scan can see existing models before their stability check.
+  // Retain the incoming deep link until the training evidence settles.
+  if (!state.catalogBooted && body.artifacts?.training_updating) {
+    state.catalog = body;
+    renderAll();
+    return;
+  }
+  if (state.catalogBooted) {
+    const next = reconcileCatalog(state.catalog, body, state.sel);
+    if (next.sourceChanged || !sameSel(next.selection, state.sel)) {
+      clearEpisode();
+      state.sourceChanged = true;
+    }
+    state.sel = next.selection;
+  } else {
+    state.sel = resolveSelection(body, state.bootQuery);
+    state.catalogBooted = true;
+  }
   state.catalog = body;
-  state.sel = resolveSelection(body, state.bootQuery);
+  state.pendingCatalog = null;
   // The address never names more than is selected. It is compared as TEXT:
   // parsePickerQuery has already dropped a malformed level (runs_C4, seed=5abc,
   // ep=21), so comparing selections would leave such an address as it was.
   const search = selectionSearch(state.sel);
   if (window.location.search !== search) window.history?.replaceState?.(null, '', `/agents${search}`);
   renderAll();
+  recordView?.refresh();
 }
+
+const artifactNodes = new Map();
+function renderArtifactStrip() {
+  const status = statusView({ ...(state.catalog?.artifacts || {}), ...(state.artifactStatus || {}) }, currentLang);
+  const changed = state.sourceChanged ? ` · ${t(currentLang, 'artifact.changed')}` : '';
+  setText($('artifact-status'), `${status.connection} · ${status.lastSuccess}${state.catalog?.artifacts?.restart_needed ? ` · ${status.restartNeeded}` : ''}${changed}`);
+  const host = $('artifact-list');
+  if (!host) return;
+  const items = state.catalog?.artifacts?.items || [];
+  for (const [id, entry] of artifactNodes) {
+    if (!items.some(item => item.id === id)) {
+      entry.node.remove?.();
+      artifactNodes.delete(id);
+    }
+  }
+  for (const item of items) {
+    const signature = JSON.stringify([currentLang, item]);
+    const previous = artifactNodes.get(item.id);
+    if (previous?.signature === signature) continue;
+    const view = itemView(item, currentLang);
+    const node = previous?.node || el('details', 'artifact-item');
+    const open = node.open;
+    node.textContent = '';
+    const summary = el('summary');
+    const path = el('bdi', '', item.relative_path);
+    path.setAttribute('dir', 'ltr');
+    summary.append(path, el('span', '', ` · ${view.lifecycle}`));
+    node.append(summary);
+    for (const line of [view.source, view.availability, view.compatibility, view.issues]) node.append(el('p', '', line));
+    if (item.coherence === 'updating / last valid snapshot') node.append(el('p', '', t(currentLang, 'artifact.last_valid')));
+    node.open = open;
+    if (!previous) host.appendChild(node);
+    artifactNodes.set(item.id, { node, signature });
+  }
+}
+
+const artifactSync = createArtifactSync({
+  readRevision: async signal => {
+    const response = await fetch('/api/artifacts/revision', { cache: 'no-store', signal });
+    if (response.status !== 200) throw new Error(`HTTP ${response.status}`);
+    const next = await response.json();
+    if (typeof next?.revision !== 'string') throw new Error('invalid artifact revision');
+    return next;
+  },
+  onChange: async (_previous, next, { signal }) => {
+    const old = state.catalog?.artifacts;
+    if (!old || ['training_revision', 'results_revision', 'plant_revision', 'updating']
+      .some(key => old[key] !== next[key])) await loadCatalog({ refresh: true, signal });
+  },
+  onStatus: value => { state.artifactStatus = value; renderArtifactStrip(); },
+});
 
 function renderBadge() {
   const m = state.meta;
@@ -825,6 +958,7 @@ async function mountChase(road) {
     const { createChaseScene } = await import('./agent-scene.mjs');
     if (token !== chaseToken) return;
     created = createChaseScene(host, createEpisodeRoad(road, M_PER_UNIT), laneColours());
+    created.setLane?.(phoneView?.matches ? mobileLane : null);
   } catch (err) {
     console.error(err);
     if (token !== chaseToken) return;
@@ -1125,7 +1259,7 @@ async function askModel(name) {
     const res = await fetch(`/api/agents/${name}`, {
       method: 'POST', cache: 'no-store',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ trace: key, step: k }),
+      body: JSON.stringify({ trace: key, step: k, ...(state.generation ? { generation: state.generation } : {}) }),
     });
     const body = await res.json().catch(() => null);
     entry = res.status === 200 && body && body.answers ? { body } : { failure: failureOf(res.status, body) };
@@ -1133,7 +1267,12 @@ async function askModel(name) {
     entry = { failure: failureOf(null, null) };
   }
   m.inFlight = false;
-  if (token === state.loadToken) m.answers.put(key, k, entry);
+  if (token !== state.loadToken || (entry.body?.generation && entry.body.generation !== state.generation)) {
+    renderModels();
+    if (name === 'laya') await loadModelStatus('laya');
+    return;
+  }
+  m.answers.put(key, k, entry);
   // A Laya answer is itself proof that its worker is loaded, so the status
   // line says so now rather than "loads on the first question" beside the
   // answer. The re-fetch below stays the authority: a press may have started,
@@ -1305,6 +1444,8 @@ function draw(time, force = false) {
 }
 
 function renderAll() {
+  recordView?.setLanguage(currentLang);
+  renderArtifactStrip();
   renderPicker();
   renderBadge();
   renderVerdict();
@@ -1328,6 +1469,7 @@ function applyTheme(name) {
   const theme = THEMES.includes(name) ? name : 'light';
   document.documentElement.dataset.theme = theme;
   chase?.setTheme(theme, laneColours());
+  recordView?.setTheme(theme);
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
     meta.setAttribute('content',
@@ -1366,6 +1508,28 @@ function loop(now) {
 }
 
 function start() {
+  document.addEventListener?.('visibilitychange', () => artifactSync.visibilityChanged());
+  window.addEventListener?.('pagehide', () => {
+    pageActive = false;
+    bootController?.abort();
+    artifactSync.stop();
+    state.loadToken += 1;
+    recordView?.suspend();
+  });
+  window.addEventListener?.('pageshow', () => {
+    if (pageActive) return;
+    pageActive = true;
+    recordView?.resume();
+    if (state.catalog?.artifacts) artifactSync.start();
+    else loadCatalog().catch(err => console.error(err));
+  });
+  for (const id of ['pick-experiment', 'pick-pair', 'pick-episode']) {
+    $(id)?.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (pageActive && !pickerActive() && state.pendingCatalog) acceptCatalog(state.pendingCatalog);
+      }, 0);
+    });
+  }
   $('play')?.addEventListener('click', () => {
     const now = performance.now();
     if (state.play.clock.playing || isWaiting()) pauseByUser(state.play, now);
@@ -1427,6 +1591,10 @@ function start() {
   $('pick-experiment')?.addEventListener('change', () => onPick('runs', $('pick-experiment')));
   $('pick-pair')?.addEventListener('change', () => onPick('seed', $('pick-pair')));
   $('pick-episode')?.addEventListener('change', () => onPick('ep', $('pick-episode')));
+  function selectMobileLane(lane){mobileLane=lane;chase?.setLane?.(phoneView?.matches?lane:null);
+    for(const key of LANES)$(`mobile-${key}`)?.setAttribute('aria-pressed',String(key===lane));}
+  for(const lane of LANES)$(`mobile-${lane}`)?.addEventListener('click',()=>selectMobileLane(lane));
+  phoneView?.addEventListener?.('change',()=>selectMobileLane(mobileLane));
   $('theme-toggle')?.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   });
@@ -1436,6 +1604,11 @@ function start() {
   applyTheme(recall(STORE.theme, THEMES,
     window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
   applyLanguage(recall(STORE.lang, LANGS, DEFAULT_LANG));
+  if($('saved-records'))import('./record-view.mjs?v=20261009').then(({createRecordView})=>{
+    if(!pageActive)return;
+    recordView=createRecordView($('saved-records'),{lang:currentLang,initialRecord:recordQuery.get('record'),initialSource:recordQuery.get('record_source')});
+    recordView.refresh();
+  }).catch(error=>console.error(error));
   requestAnimationFrame(loop);
   loadCatalog().catch(err => console.error(err));
 }

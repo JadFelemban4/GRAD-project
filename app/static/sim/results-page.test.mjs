@@ -11,14 +11,17 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { STRINGS, LANGS } from './i18n.mjs';
 import './results-strings.mjs?v=R1a';
+import './artifact-strings.mjs';
 
 const STATIC = new URL('../', import.meta.url);
 const HTML = new URL('../results.html', import.meta.url);
 const VERSION = 'v=R1a';
 const OWN = ['results.mjs', 'results-view.mjs', 'results-charts.mjs', 'results-format.mjs',
-  'results-strings.mjs', 'charts-lib.mjs'];
-const SHARED = ['i18n.mjs', 'agent-picker.mjs'];
+  'results-strings.mjs', 'results-selector.mjs', 'charts-lib.mjs', 'graphics-browser.mjs',
+  'graphics-strings.mjs', 'results-graphics.mjs', 'chart-selection.mjs'];
+const SHARED = ['i18n.mjs', 'agent-picker.mjs', 'artifact-sync.mjs', 'artifact-view.mjs'];
 const IDS = ['error', 'built', 'warnings', 'summary', 'summary-rows', 'sections', 'not-read', 'not-read-list',
+  'experiment-controls', 'experiment-select', 'compare-control', 'compare-enabled', 'compare-field', 'compare-select',
   'theme-toggle', 'lang-toggle', 'footer-index'];
 
 function read(url) {
@@ -76,6 +79,7 @@ test('every import of the tab\'s modules resolves: its own with ?v=R1a, the shar
   for (const name of ['results-strings.mjs', 'results-view.mjs', 'results-charts.mjs', 'charts-lib.mjs', 'i18n.mjs']) {
     assert.ok(page.includes(name), `results.mjs does not import ${name}`);
   }
+  assert.ok(page.includes('results-selector.mjs'), 'results.mjs does not import its selection helpers');
 });
 
 test('every key results.html names exists in both languages, carries no placeholder, and the markup holds its Arabic', () => {
@@ -92,11 +96,13 @@ test('every key results.html names exists in both languages, carries no placehol
   for (const [, , key, text] of marked) assert.equal(decode(text), STRINGS.ar[key], `the markup's text for ${key}`);
 });
 
-test('the intro says what R1a leaves out: the agent-sets line follows the intro note, in the same style', () => {
+test('the intro explains result updates and independent agent-set selections', () => {
   const intro = read(HTML).match(/<section class="page-intro results-intro">([\s\S]*?)<\/section>/);
   assert.ok(intro, 'results.html has no intro section');
   const notes = [...intro[1].matchAll(/<p class="([^"]+)" data-i18n="([^"]+)">/g)].map(m => [m[1], m[2]]);
   assert.deepEqual(notes, [['intro-note', 'results.intro.note'], ['intro-note', 'results.intro.agent_sets']]);
+  assert.match(read(HTML), /id="experiment-select"/);
+  assert.match(read(HTML), /id="compare-enabled"/);
 });
 
 test('every key results.mjs names exists, and each t() call fills exactly its placeholders', () => {
@@ -135,7 +141,7 @@ test('every fold results.mjs builds carries a stable key, so a language switch c
   // reads the open ones before the rebuild and opens them again after it.
   const src = read(new URL('./results.mjs', import.meta.url));
   const folds = [...src.matchAll(/const (\w+) = el\('details', '([\w-]+)'\)/g)].map(m => ({ name: m[1], cls: m[2] }));
-  assert.deepEqual(folds.map(f => f.cls).sort(), ['rc-table', 'rc-verdict-lines']);
+  assert.deepEqual(folds.map(f => f.cls).sort(), ['rc-registry-summary', 'rc-table', 'rc-verdict-lines']);
   for (const { name, cls } of folds) assert.ok(src.includes(`${name}.dataset.fold = `), `${cls} carries no data-fold key`);
   assert.ok(src.includes("querySelectorAll('details[data-fold][open]')"), 'the open folds are not read before a rebuild');
 });

@@ -2,7 +2,7 @@
 name: Jad Felemban
 student_number: 2340550
 email: endo.felemban@gmail.com
-updated: 2026-10-01
+updated: 2026-10-07
 ---
 
 # Jad
@@ -131,9 +131,60 @@ memorise" — right; the small addition I needed: it is the BLIND agent that mus
 not memorise, so that seeing the road is the only difference left between the
 two.
 
+7 October, after Ghassan sent his draft validation plan (`results/VALIDATION_PLAN.md`,
+not yet pushed): **how the simulator is judged against the car**, through a
+kitchen scale and a bag of rice marked 1 kg — a frame I brought myself. The
+scale is the simulator, the bag is the car's reading. In my own words: write
+how much difference you accept BEFORE weighing, chosen by what the scale is
+for (kabsa or gold); compute the difference and how wrong the bag itself may
+be; the verdict then comes from the numbers, not from opinion — which is what
+the supervisor asked Ghassan for. The addition I needed: there is a third
+verdict, "cannot tell", and what decides it is the bag's own error, not how
+much the use matters. I gave the right verdict on a fresh case (gold, bag
+±10 g, scale 1.03: not good) with the use as my reason, and needed that
+correction; then answered a second one right with no help (kabsa, 100 g
+accepted, bag ±50 g, scale 1.08: cannot tell). **The rule in three lines:**
+the worst case inside the limit is good; the best case outside it is not good;
+the limit between the best and the worst case is cannot tell.
+
+Same day, the rest of Ghassan's plan in five parts, one per message, each
+through a new everyday example. What landed:
+
+- **The margin rule:** arriving at the airport 33 minutes early with a watch
+  that may be 10 minutes wrong. I answered the follow-up right: with only a
+  10-degree margin, accepting 10 degrees of error is not enough.
+- **The computer's own step error:** a car wheel that looks to spin backwards
+  on a phone video. The test is more frames until the video stops changing; I
+  understood it but could not invent that test myself.
+- **Errors in what we feed the model:** Google Maps given a wrong starting
+  point.
+- **"Not covered":** a car's AC tried for five minutes, then a ten-hour summer
+  drive to Riyadh; then water that is fine at 95 °C and boils at 100. I first
+  said five degrees outside the tested range is acceptable. That is an
+  opinion, which is what the rule removes.
+- **"Untested" against "cannot tell":** corrected twice. Untested is not worse
+  than "not good", and we did test, with a bag too coarse to see.
+- **Relative damage:** a bathroom scale that adds 10 % to everyone. Answered
+  right.
+- **Spark timing, first idea only:** charcoal lit late is thrown into the bin
+  while at its hottest, so late spark heats the turbo. Understood, not checked
+  back.
+
+What did NOT land:
+
+- Three error sources in one message ("ما فهمت").
+- Asking whether an error "lives in the car or in our computer". The logger is
+  a phone app, so it IS a computer of ours, and both of my wrong answers came
+  from the question. The bag-and-scale frame fixed it.
+
+**Ten check questions in one sitting was too many.** By the end I understood
+but had nothing left to answer with. Ask fewer, keep the ones that matter, and
+when I say I am at my limit, stop asking.
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
-hacking; the learning algorithm; uncertainty models; spark timing, BTDC/ATDC;
+hacking; the learning algorithm; uncertainty models; spark timing beyond the
+first idea (late spark heats the turbo, 7 October), BTDC/ATDC;
 the battery specifics.
 
 ## Corrections I have needed more than once

@@ -109,6 +109,28 @@ test('choosing clears what depends on it, and keeps the episode only across pair
   assert.deepEqual(P.choose(mixed, sel, 'seed', '3'), { runs: 'runs_c4', seed: 3, ep: null });
 });
 
+test('catalog reconciliation clears only the selected pair when its replay identity changes', () => {
+  const previous = structuredClone(CATALOG);
+  previous.artifacts = { plant_revision: 'plant-a' };
+  const selected = P.pairOf(P.experimentOf(previous, 'runs_c4'), 5);
+  selected.source_revision = 'selected-before';
+  const unrelated = P.pairOf(P.experimentOf(previous, 'runs_d2'), 0);
+  unrelated.source_revision = 'unrelated-before';
+
+  const next = structuredClone(previous);
+  next.artifacts.plant_revision = 'plant-a';
+  P.pairOf(P.experimentOf(next, 'runs_c4'), 5).source_revision = 'selected-after';
+  P.pairOf(P.experimentOf(next, 'runs_d2'), 0).source_revision = 'unrelated-after';
+  const invalidated = P.reconcileCatalog(previous, next, FULL);
+  assert.equal(invalidated.sourceChanged, true);
+  assert.deepEqual(invalidated.selection, FULL);
+
+  P.pairOf(P.experimentOf(next, 'runs_c4'), 5).source_revision = 'selected-before';
+  const unrelatedOnly = P.reconcileCatalog(previous, next, FULL);
+  assert.equal(unrelatedOnly.sourceChanged, false, 'another pair keeps the selected trace');
+  assert.deepEqual(unrelatedOnly.selection, FULL);
+});
+
 test('the address follows the selection and never says more than was chosen', () => {
   assert.equal(P.selectionSearch(P.NOTHING), '');
   assert.equal(P.selectionSearch(undefined), '');

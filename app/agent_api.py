@@ -53,11 +53,10 @@ def pair_paths(runs, seed):
     agent_catalog.RUNS_NAME is a KeyError, and so is a seed that is not a
     non-negative int.
     """
-    if not isinstance(runs, str) or not C.RUNS_NAME.fullmatch(runs):
-        raise KeyError(f"unknown runs directory {runs!r}")
+    directory = C.run_directory(runs, ROOT)
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise KeyError(f"unknown seed {seed!r}")
-    return tuple(str(ROOT / runs / f"{arm}_seed{seed}") + "/final" for arm in C.ARMS)
+    return tuple(str(directory / f"{arm}_seed{seed}") + "/final" for arm in C.ARMS)
 
 
 def load_pair(runs, seed):
@@ -114,6 +113,7 @@ class Trace:
     obs: list
     device: str
     versions: dict
+    generation: str | None = None
 
 
 def key_str(key):
@@ -149,28 +149,46 @@ class EpisodeStore:
     """
 
     def __init__(self, loader=load_pair, tracer=agent_trace.run_lanes, keep=2,
-                 episode_for=default_episode_for):
+                 episode_for=default_episode_for, generation_for=None):
         self._loader, self._tracer = loader, tracer
         self._keep, self._episode_for = keep, episode_for
         self.needs_sb3 = loader is load_pair
+        self._generation_for = generation_for or (C.replay_generation if self.needs_sb3 else lambda key: None)
         self._lock = threading.Lock()
         self._cache = OrderedDict()
         self._errors = {}
         self._active = None
+        self._active_generation = None
         self._frames = []
         self._device = None
         self._versions = None
         self._cancel = threading.Event()
 
-    def trace(self, key):
+    def trace(self, key, generation=None):
         """A finished Trace, or None (never a partial one)."""
+        try:
+            current = self._generation_for(key)
+        except (C.Refused, KeyError, OSError):
+            return None
         with self._lock:
-            return self._cache.get(key)
+            trace = self._cache.get(key)
+            if trace is None or trace.generation != current or (generation is not None and generation != current):
+                return None
+            return trace
 
-    def poll(self, key, since=0, preempt=False):
+    def poll(self, key, since=0, preempt=False, generation=None):
         since = max(0, int(since))
-        base = {"steps": agent_trace.STEPS, "since": since}
+        current = self._generation_for(key)
+        base = {"steps": agent_trace.STEPS, "since": since, "generation": current}
         with self._lock:
+            if key in self._cache and self._cache[key].generation != current:
+                self._cache.pop(key)
+                self._errors.pop(key, None)
+            if self._active == key and self._active_generation != current:
+                self._cancel.set()
+                return dict(base, status='invalidated', frames=[], progress=0.0)
+            if generation is not None and generation != current:
+                return dict(base, status="invalidated", frames=[], progress=0.0)
             # «احسب» for this key: whatever else is building is no longer
             # wanted, even when this key is answered from the cache or with its
             # error (M1 F6). The key already building is never cancelled.
@@ -195,19 +213,27 @@ class EpisodeStore:
                             versions=None, active={"runs": runs, "seed": seed, "ep": idx})
             self._cancel = threading.Event()
             self._active, self._frames = key, []
+            self._active_generation = current
             self._device = self._versions = None
-            threading.Thread(target=self._build, args=(key, self._cancel), daemon=True,
+            threading.Thread(target=self._build, args=(key, self._cancel, current), daemon=True,
                              name="agent-builder").start()
             return dict(base, status="loading", progress=0.0, frames=[], device=None,
                         versions=None)
 
-    def _build(self, key, cancel):
+    def _build(self, key, cancel, generation):
         runs, seed, idx = key
         frames, seen_rows = [], []
 
-        def on_frame(frame, seen):
-            if cancel.is_set():
+        def check_generation():
+            try:
+                matches = self._generation_for(key) == generation
+            except (C.Refused, KeyError, OSError):
+                matches = False
+            if cancel.is_set() or not matches:
                 raise BuildCancelled(key_str(key))
+
+        def on_frame(frame, seen):
+            check_generation()
             with self._lock:
                 frames.append(frame)
                 seen_rows.append(seen)
@@ -216,6 +242,7 @@ class EpisodeStore:
         try:
             ep = self._episode_for(runs, seed, idx)
             m_s, m_b = self._loader(runs, seed)
+            check_generation()
             devices = {str(getattr(m, "device", "n/a")) for m in (m_s, m_b)}
             if len(devices) != 1:
                 raise RuntimeError("the two networks loaded on different devices")
@@ -226,8 +253,9 @@ class EpisodeStore:
                 self._device, self._versions = device, vers
             results = self._tracer([(as_policy(m_s), True), (as_policy(m_b), False)],
                                    ep, on_frame)
+            check_generation()
             trace = Trace(key, frames, results, [_lane_obs(seen_rows, 0), _lane_obs(seen_rows, 1)],
-                          device, vers)
+                          device, vers, generation)
             with self._lock:
                 self._cache[key] = trace
                 while len(self._cache) > self._keep:
@@ -244,6 +272,7 @@ class EpisodeStore:
         finally:
             with self._lock:
                 self._active = None
+                self._active_generation = None
 
 
 # ---- routes: added by install(app), and only under --simulation ------------
@@ -272,7 +301,7 @@ _ROADS = {}
 # refuses "312", true and 1.0 as a step. AskBody and Request must be
 # module-level names: `from __future__ import annotations` makes the handlers'
 # annotations strings, which FastAPI resolves against this module's globals.
-TRACE_KEY = (rf"^{agent_catalog.RUNS_NAME.pattern.strip('^$')}"
+TRACE_KEY = (rf"^(?:{agent_catalog.RUNS_NAME.pattern.strip('^$')}|art_[0-9a-f]{{24}})"
              rf"/(?:{SEED_TEXT.pattern})/(?:{EP_TEXT.pattern})$")
 LOCAL_HOST = re.compile(r"^(127\.0\.0\.1|localhost):\d{1,5}$")
 MODEL_HTTP = {"no_key": 503, "not_configured": 503, "not_found": 503, "foreign_origin": 403,
@@ -315,6 +344,7 @@ class AskBody(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     trace: str = Field(pattern=TRACE_KEY)
     step: int = Field(ge=0, le=agent_trace.STEPS - 1)
+    generation: str | None = Field(default=None, pattern=r'^[0-9a-f]{64}$')
 
 
 def same_origin(request):
@@ -438,15 +468,19 @@ def catalog_episodes():
     return out
 
 
-def catalog(root=ROOT, sb3=None):
+def catalog(root=ROOT, sb3=None, artifacts=None):
     """Everything the picker needs, JSON-safe: every runs*/ directory with its
     pairs, their status and quoted table rows, and its quoted verdict
     (agent_catalog.discover, read-only, no thread); the frozen episodes of
     both protocols; the page's constants; and whether stable-baselines3 can
     be imported (`sb3`, looked up unless the caller says). Computes nothing."""
-    body = {"experiments": agent_catalog.discover(root), "episodes": catalog_episodes()}
+    body = {"experiments": (agent_catalog.discover_registered(artifacts, root) if artifacts is not None
+                            else agent_catalog.discover(root)), "episodes": catalog_episodes()}
     body.update(page_constants())
     body["sb3"] = sb3_available() if sb3 is None else bool(sb3)
+    if artifacts is not None:
+        body['source_revision'] = artifacts['training_revision']
+        body['artifacts'] = artifacts
     return agent_trace.jsonable(body)
 
 
@@ -484,6 +518,8 @@ def install(app, store=None, jev_send=None, laya=None):
     app.state.laya = laya
     app.state.model_locks = {"jev": threading.Lock(), "laya": threading.Lock()}
     app.state.jev_key = jev.SessionKey()
+    catalog_cache = None
+    catalog_revision = None
 
     def answer(body, status=200):
         return JSONResponse(body, status_code=status, headers=NO_STORE)
@@ -498,14 +534,25 @@ def install(app, store=None, jev_send=None, laya=None):
     def agents_catalog():
         """Every experiment, pair and episode the picker offers. Read-only;
         starts nothing. A failure is a fixed text, never str(exc)."""
+        nonlocal catalog_cache, catalog_revision
         try:
+            service = getattr(app.state, 'artifacts', None)
+            if service is not None:
+                snapshot = service.published()
+                C.register_artifacts(service.catalog)
+                revision = (snapshot['training_revision'], snapshot['results_revision'], snapshot['plant_revision'])
+                if catalog_cache is None or revision != catalog_revision:
+                    catalog_cache = catalog(root=service.catalog.root,
+                                            sb3=(not store.needs_sb3) or sb3_available(), artifacts=snapshot)
+                    catalog_revision = revision
+                return answer(dict(catalog_cache, artifacts=snapshot))
             return answer(catalog(sb3=(not store.needs_sb3) or sb3_available()))
         except Exception as exc:
             return answer({"detail": f"catalog failed: {type(exc).__name__}"}, 500)
 
     @app.get("/api/agents/episode")
     def agents_episode(runs: str = "", seed: str = "", ep: str = "",
-                       since: str = "0", preempt: str = ""):
+                       since: str = "0", preempt: str = "", generation: str = ""):
         """Start or poll one episode of one pair. since=0 also carries meta and road.
 
         Every parameter is taken as text and checked here, so a malformed one
@@ -515,9 +562,9 @@ def install(app, store=None, jev_send=None, laya=None):
         so a request that fails never starts a build.
         """
         unknown = answer({"detail": "unknown episode"}, 404)
-        if (not agent_catalog.RUNS_NAME.fullmatch(runs) or not SEED_TEXT.fullmatch(seed)
+        if (not (agent_catalog.RUNS_NAME.fullmatch(runs) or C.ARTIFACT_ID.fullmatch(runs)) or not SEED_TEXT.fullmatch(seed)
                 or not EP_TEXT.fullmatch(ep) or not 1 <= int(ep) <= 20
-                or not SINCE_TEXT.fullmatch(since)):
+                or not SINCE_TEXT.fullmatch(since) or (generation and re.fullmatch(r'[0-9a-f]{64}', generation) is None)):
             return unknown
         seed_n, idx, since_n = int(seed), int(ep), int(since)
         preempt_on = preempt in ("1", "true")
@@ -537,7 +584,16 @@ def install(app, store=None, jev_send=None, laya=None):
                 first = {"road": road,
                          "meta": episode_meta(pair, episode, road,
                                               agent_catalog.verdict(pair["prefix"]))}
-            out = store.poll((runs, seed_n, idx), since=since_n, preempt=preempt_on)
+            if isinstance(store, EpisodeStore):
+                try:
+                    out = store.poll((runs, seed_n, idx), since=since_n, preempt=preempt_on,
+                                     generation=generation or None)
+                except C.Refused as refused:
+                    return answer({'status': 'refused', 'problems': refused.problems}, 409)
+                if out['status'] == 'invalidated':
+                    return answer(out, 409)
+            else:
+                out = store.poll((runs, seed_n, idx), since=since_n, preempt=preempt_on)
             out.update(first)
             return answer(out)
         except Exception as exc:
@@ -561,9 +617,12 @@ def install(app, store=None, jev_send=None, laya=None):
         if not same_origin(request):
             return refuse(model, "foreign_origin", body.step)
         runs, seed, ep = body.trace.split("/")
-        trace = store.trace((runs, int(seed), int(ep)))
+        key = runs, int(seed), int(ep)
+        trace = store.trace(key)
         if trace is None:
             return refuse(model, "no_trace", body.step)
+        if trace.generation is not None and body.generation != trace.generation:
+            return refuse(model, 'no_trace', body.step)
         if body.step >= len(trace.obs[0]):
             return refuse(model, "step_not_computed", body.step)
         lock = app.state.model_locks[model]
@@ -581,7 +640,10 @@ def install(app, store=None, jev_send=None, laya=None):
             return refuse(model, err.code, body.step, kind=err.kind)
         finally:
             lock.release()
-        return answer(dict(out, trace=body.trace, step=body.step))
+        if isinstance(store, EpisodeStore) and store.trace(key, generation=trace.generation) is not trace:
+            return refuse(model, 'no_trace', body.step)
+        identity = {'generation': trace.generation} if trace.generation is not None else {}
+        return answer(dict(out, trace=body.trace, step=body.step, **identity))
 
     def guarded(model, body, request):
         """Anything unexpected is 500 server_error with no-store, never str(exc)."""

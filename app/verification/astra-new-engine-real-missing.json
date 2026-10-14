@@ -1,0 +1,13 @@
+{
+  "canvas": true,
+  "identity": "results/agents/terrain_dt1/baseline_ECU/eval_record.npzالجيل المسجل: 41c7006ffe07b19f47a032b7551e24942c8fb0cf4789f04c75016328bf2e40e2 · غير معروف؛ لا يوجد ادعاء توافق مع المحاكي الحالي · evaluate.EPISODES, twenty frozen episodes, 720 s, dt 1.0, the locked 12 % / 130 km/h climb at 42 Cملف التسجيل غير موجود. الملخصات متاحة؛ إعادة العرض تحتاج هذا الملف.",
+  "overflow": false,
+  "temperature": [
+    "—",
+    "—",
+    "—",
+    "—"
+  ],
+  "transportHidden": true,
+  "width": 1440
+}
