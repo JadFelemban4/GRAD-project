@@ -97,4 +97,17 @@ Machine notes: use `C:\Users\admin\AppData\Local\Programs\Python\Python312\pytho
 
 ## 7. Ghassan's core checks on Jad's machine (on the restructure branch)
 
-(filled in when the run finishes)
+Run on 14 October on `8258a1a`, Python 3.12.10; every figure as Ghassan's
+boxes record it:
+
+- `python check_premise.py`: baseline 848.1 at 883 °C, current-grade cuts
+  47.0 %, preview over current-grade -0.0 points.
+- `python validate.py`: 8 of 11 quantities inside their band.
+- `python test_reward.py`: 12 of 12, "All checks pass. The reward is safe to
+  train against."
+- No tracked file changed: `check_premise.py` rewrote `results/premise.json`
+  byte for byte as Ghassan had committed it.
+
+So the simulation on Jad's machine is Ghassan's, and nothing in it is
+needed from him; what is needed is his OK on the restructure and the drive-C
+rule numbers.
