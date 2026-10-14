@@ -779,3 +779,175 @@ handbook with reference code, neither has been built or run, and nothing ships
 here that has not been verified.
 
 `battery.py` is Phase E. When you write it, give it `predict()`.
+
+---
+
+*(Moved here from CLAUDE.md on 14 October 2026, verbatim: the documentation
+restructure, plan v3 phase 4. CLAUDE.md now points here for every figure.)*
+
+## The numbers that matter
+
+Anyone can regenerate these. Do not quote a number that a script does not print.
+**`python full_run.py` runs every one of them in a single pass and writes
+`FULL_RUN.txt` with each block's EXIT CODE. Sweep documents from that file, not
+from this list** — a list goes stale, a transcript is dated.
+
+```
+python analyse_phase_d.py  Phase D, the first of the four ablations (the box at
+                           the top has all four). 5 of 8 seeds positive, mean
+                           +4.8 damage units, exact one-sided sign p = 0.3633,
+                           exact paired permutation p = 0.4922 -> NOT
+                           SIGNIFICANT at alpha 0.05. Also prints the agent's
+                           +29 to +34 points over current-grade, which is a
+                           DIFFERENT claim -- see the box at the top of this file
+python drift_test.py       16 of 16 injected drifts CAUGHT. The guard's own
+                           acceptance test; every row AUDIT2 Part 4a marked
+                           MISSED is now caught
+python power_analysis.py   At Phase D's spread (sd 214.4) eight seeds have power
+                           0.10 against the minimum effect of interest (50
+                           damage units) and reach 80 % only near 269. Read it
+                           before calling any null "no effect"
+python check_random_road.py  D2's gates: 0 of 121 grades fail to bind (weakest
+                           13.73 % at +6.9 K), 0 of 20 frozen episodes, and the
+                           blind arm's observations identical on every road
+                           until its climb arrives -- on SEP17'S plant. On the
+                           merged plant the notch moved to ~13.96 %. Re-run
+                           9 Oct on X1's plant (ramped, sub-stepped): PASS,
+                           0 of 121 (weakest 13.97 % at +11.9 K), 0 of 20
+python analyse_c4.py       C4's preregistered test, D2 and Phase D beside it:
+                           3 of 8, below-MEI sign p 0.0352 / permutation
+                           0.3867 (disagree), SMALLER THAN THE MEI, NOT
+                           CONVERGED. Captured in results/C4_RESULT.txt
+python analyse_phase_d2.py D2's result beside Phase D's, each classified by the
+                           MEI rule
+python full_run.py         every script below, one pass, exit codes -> FULL_RUN.txt
+python -m app.test_simulation   16 of 16 (9 Oct). The replay lab. SEPARATE from
+                           app.test_replay -- run both after touching app/
+python -m app.test_agents  135 tests OK, 14 skipped without runs_c4/ (9 Oct).
+                           The agent replay pages; they read the plant's roads,
+                           so run it after a plant or road change (mistake 25)
+python test_plant_guards.py  6 tests: a 1 s step equals ten 0.1 s steps, the
+                           coolant settles at the sweep's 2 s step, and one
+                           changed derived constant moves derived_sha while
+                           the file's timestamp does not. Each fails with its
+                           guard removed (checked 9 Oct)
+python substep_fit_check.py  DIAGNOSTIC: the thermal fit re-run with the
+                           plant's sub-steps (mistake 25): radiator scale +61 %,
+                           the locked climb's baseline -2.4 units, current-
+                           grade's cut +0.01 points. Writes nothing the plant reads
+python check_premise.py    the hand-written policies on the locked climb:
+                           baseline 848.1 at 883 C, current-grade cuts 47.0 %,
+                           preview -0.0 points against it (8 Oct). Writes
+                           results/premise.json. HAND-WRITTEN -- read AUDIT.md
+                           C1 and C3 before quoting any of it
+python validate.py         8 of 11 inside their band: 6 of 7 against literature,
+                           2 of 4 against our own car (rows 8-11, since 28 Sep)
+python derive_params.py    every constant the car's logs set, recomputed from
+                           them -> data/derived_params.json (build_dataset.py
+                           runs it). REFERENCES.md 4b: what is still typed, why
+python calibrate_thermal.py  the thermal fit, per drive, with every drive also
+                           scored HELD OUT; results/thermal_calibration.json
+python test_reward.py      12 of 12 checks pass, eight of them on the TRAINING
+                           roads (two on X1's extremes roads, two on X2's wideair
+                           corners, 11 Oct) -- run it after any change to the
+                           reward, the plant, the gearbox or the roads
+python analyse_x1.py       X1's preregistered test (results/PREREGISTRATION_X1.md):
+                           SMALLER THAN THE MEI, 17 of 23 pairs below 5.43 points
+                           of cut, sign p 0.0173, permutation 0.0027; the same
+                           thermal-only. --set terrain_dt1 is its dry run on the
+                           twenty of 29 September
+python analyse_x2.py       X2's preregistered test: INCONCLUSIVE, 1 of 5 pairs
+                           positive, mean -4.40, sd 20.51 -> 143 seeds for 80 %
+                           power against the MEI; the same thermal-only. X1's
+                           rule, imported; --set extremes_dt1 --seeds 0-4 is its
+                           dry run (INCONCLUSIVE, sd 26.82)
+python check_x2_convergence.py   X2's agents: NOT-CONVERGED (0 of 5 sighted, 1 of
+                           5 blinded, 0 of 5 pairs settled) -> results/x2_convergence.txt
+python x2_agents.py        what X2's agents did and why X2 failed, measured after
+                           the result (description, never a test): preview used in
+                           opposite directions, practice cuts spanning 6.0-88.5
+                           points along training, 56.1-97.0 % of the extra fuel on
+                           the car's drives spent where the housing is cool, against
+                           the baseline ECU's one-step knock spike ->
+                           results/x2_agents.json, written up in results/X2_AGENTS.md;
+                           --trajectory also re-scores the 180k-540k checkpoints
+python test_wide_air.py    16 tests: X2's roads reduce to the plant at sea level,
+                           leave every other environment alone, and follow the air
+                           (inlet, torque floor, kickdown table); about 6 min
+python check_roads.py --road wideair   X2's roads: PASS, 2 of 40 bind
+python train_all.py        the twenty agents: seeds 0-9 x sighted/blinded, one
+                           process each on the CPU, ~4 h; writes runs/terrain_dt1/
+python record_agents.py runs/terrain_dt1   scores them on the twenty frozen
+                           episodes, records EVERY step, and documents each agent
+                           in results/agents/terrain_dt1/ (README.md: every table)
+python knock_margin.py     the twenty with spark advance forbidden, a diagnostic:
+                           median cut 67.9 -> 41.6 % sighted, 65.4 -> 41.7 %
+                           blinded, against current-grade's 43.4 % (all on the
+                           merged plant, which those agents trained on)
+python damage_constants.py  every constant of the damage formula: creep rupture
+                           gives a 20.3 K turbine scale (the formula uses 45 K);
+                           the 850 C knee is 984 C of gas; re-scored, every agent
+                           still beats current-grade (results/DAMAGE_CONSTANTS.md)
+python training_roads.py runs/terrain_dt1   the road, weights and actuators under
+                           every step of the 29 Sep training runs, regenerated and
+                           checked: 20 of 20 runs (results/train_roads_check.json)
+python show_record.py <record>   draws one recorded episode; --table, --list,
+                           --zigzag (the coolant node's step-to-step swing)
+python check_roads.py      drives the baseline over 40 training roads and fails
+                           if any is one the baseline cannot drive; 14 bind
+                           (on the merged plant); --road extremes: X1's roads,
+                           PASS, 10 of 40 bind, worst neutral -0.0043
+python premise_split.py    the plant changes of 8 October on the locked climb,
+                           one at a time: 920.1 -> 917.6 (sub-stepping) ->
+                           848.1 (with the ramp) -> results/premise_split.json
+python x1_score.py         waits for X1's 46 runs, then scores them in the order
+                           PREREGISTRATION_X1.md section 10 fixes; one line per
+                           step in results/x1_score/SCORE_LOG.txt
+python x2_score.py         the same for X2's 10 runs (results/x2_score/); ran
+                           13 October, every step but the transfer test, whose
+                           harness named seeds X2 lacks (fixed and re-run)
+python model_vs_data.py    eleven comparisons of the simulator against the car,
+                           each printed beside the figure the documents quote
+python run_results.py      regenerates the traces, the speed-by-grade sweep and
+                           the Phase D files the figures and the page draw on
+python compare_calibration.py  the 28 Sep before/after comparisons (figs 20-25)
+python make_page.py        the phone-readable results page, results/page/
+python build_dataset.py "logs/raw/*.csv"    321.7 min, 11 drives, 26 operating points
+python compare_log.py data/master_points.csv   PASS, 1.4 % load residual,
+                           k derived 0.831 and zero free parameters. Read what
+                           it prints, not what you hope: it compares two ECU
+                           channels through the displacement and three defined
+                           constants, and it does NOT measure the breathing
+                           model — mistake 12
+python verify_docs.py      recomputes the published figures from the shipped
+                           data, checks the derived constants and the premise
+                           are FRESH, then greps every tracked document and .py
+                           file both for those figures and for retired ones. It
+                           prints its own total; read that, do not quote a
+                           count from here
+python check_map.py        spark falls with load in every row, rises with speed
+                           in every column; 6 cells above the compressor ceiling
+python -m app.test_replay  49 of 49 fast checks. Add --full for 59 of 59,
+                           which replays the whole of 7475b5d7 and pins the
+                           app's own numbers: 14278 of 14340 samples estimated,
+                           peak estimated turbine 872.7 C, 14 thermal / 0
+                           mismatch / 19 novel alerts. The reason for every
+                           move of a pin is written beside it in the file
+                           (28 Sep: the exhaust-flow fix moved 7475b5d7; the
+                           derived enrichment dwell moved pull01; 8 Oct: the
+                           thermal sub-stepping moved both by 0.4-0.6 K)
+```
+
+**Two of those app figures are not measurements and must never be quoted as
+though they were.** The peak turbine temperature is a MODEL OUTPUT whose heat
+capacity is an assumed number (REFERENCES.md section 4), and the alert counts
+are a property of thresholds this project chose. They are pinned so that a
+regression is visible, which is a different job from being evidence.
+
+`build_dataset.py` used to crash on a Windows console **after** writing all three
+CSVs — its summary header printed a Greek lambda, which cp1252 cannot encode, so
+the run failed loudly on data that was already correct. Header is ASCII now. If
+any script ever does this again, the character is the bug, not the data.
+**It happened again on 16 September, in `verify_docs.py` itself** — see
+mistake 16's second half. Same cause, third occurrence, still the character.
+

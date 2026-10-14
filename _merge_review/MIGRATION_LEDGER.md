@@ -29,7 +29,12 @@ its edit can affect, and one full run covers the finished restructure.
 | `f666778` | (new) | `CHECKPOINT.md` | Rewritten (template 9.3) | the current state only, 67 lines; every verified line names its script or file | — |
 | `f666778` | `verify_docs.py` PINNED_HISTORY | the same | Rewritten (guard) | the 8 pinned mentions moved with the text: CHECKPOINT.md -> STATE_HISTORY.md | PIN 20 |
 | `f666778` | `drift_test.py` row 11 | the same | Rewritten (guard) | row 11 follows its text to STATE_HISTORY.md | DRIFT row 11 CAUGHT |
-| this commit | `CLAUDE.md:690-1753` ("Twenty-five mistakes already made") | `docs/MISTAKES.md` | Moved | the story and evidence of every mistake | NOLOSS 2 (the guard lines below) · DOCS 73/73, 939 · COVER +1 (docs/MISTAKES.md) · PIN 20 · DRIFT row 7 CAUGHT |
-| this commit | `CLAUDE.md:513-576` (mistake 17, inside "The numbers that matter") | `docs/MISTAKES.md`, between 16 and 18 | Moved | mistake 17 had been left among the numbers by an earlier merge | — |
-| this commit | (new) | `CLAUDE.md`, "Mistakes already made: one rule each" | Condensed | one rule line per mistake (1-25, 13b, 17); the full text is docs/MISTAKES.md | — |
-| this commit | `verify_docs.py` PINNED_HISTORY | the same | Rewritten (guard) | mistake 11's 2 pinned mentions moved to docs/MISTAKES.md: CLAUDE.md 3 -> 1 | PIN 20 |
+| `9518115` | `CLAUDE.md:690-1753` ("Twenty-five mistakes already made") | `docs/MISTAKES.md` | Moved | the story and evidence of every mistake | NOLOSS 2 (the guard lines below) · DOCS 73/73, 939 · COVER +1 (docs/MISTAKES.md) · PIN 20 · DRIFT row 7 CAUGHT |
+| `9518115` | `CLAUDE.md:513-576` (mistake 17, inside "The numbers that matter") | `docs/MISTAKES.md`, between 16 and 18 | Moved | mistake 17 had been left among the numbers by an earlier merge | — |
+| `9518115` | (new) | `CLAUDE.md`, "Mistakes already made: one rule each" | Condensed | one rule line per mistake (1-25, 13b, 17); the full text is docs/MISTAKES.md | — |
+| `9518115` | `verify_docs.py` PINNED_HISTORY | the same | Rewritten (guard) | mistake 11's 2 pinned mentions moved to docs/MISTAKES.md: CLAUDE.md 3 -> 1 | PIN 20 |
+| this commit | `CLAUDE.md:183-348` ("The numbers that matter": the scripts and what they print, the two app figures, the console-encoding note) | `README.md`, at its end | Moved | the live figures and the command behind each | NOLOSS 6 (the drift rows below) · DOCS 73/73, 939 · COVER +1 (thesis/LIMITATIONS.md) · PIN 20 · DRIFT rows 6, 12, 13 CAUGHT |
+| this commit | `CLAUDE.md:349-406` (the VOID headline and the ablation identity) | `STATE_HISTORY.md` part C | Moved | void since 16 September; history | — |
+| this commit | `CLAUDE.md:407-625` (the drive replays and the Taif drive; the rolling road; the towing standard) | `thesis/LIMITATIONS.md` | Moved | measured findings the thesis must state | — |
+| this commit | (new) | `CLAUDE.md`, "The numbers that matter" | Rewritten (pointer) | five lines pointing to the three destinations | — |
+| this commit | `drift_test.py` rows 6, 12, 13 | the same | Rewritten (guard) | each row follows its text: README.md, thesis/LIMITATIONS.md, and CHECKPOINT.md (the live premise) | DRIFT rows 6, 12, 13 CAUGHT |

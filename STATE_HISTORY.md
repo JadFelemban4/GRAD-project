@@ -3134,3 +3134,67 @@ Checks on the final tree (`f5a93cc`), each read off its own run:
 **Next, in order:** Jad opens the tab and reads it; the branch is pushed when he says
 so; R1b (Ghassan's set, his post-hoc reading through `analyse_agent_set.py`, the
 incomplete box) is the next milestone, and the review notes are its starting list.
+
+# Part C — the void headline, from CLAUDE.md's "The numbers that matter" (moved 14 October 2026)
+
+The figures this file used to lead with, void since 16 September, and the
+ablation identity, verbatim.
+
+<!-- RETIRED-OK: section -->
+### VOID — the preview advantage this file used to lead with
+
+**Reactive cuts damage 33.8 %, predictive 47.2 % — a 13.4-point advantage.**
+**DO NOT QUOTE ANY OF THAT.** All three figures are void as of 16 September
+(AUDIT.md C1/C2/C3) and they are printed here only so the old value is
+recognisable if someone is still holding it.
+
+Until 17 September this passage stated them as a plain live claim, with the
+retraction three paragraphs further down under a different heading — and a
+parenthesis underneath that said the 13.4-point gap was *"unchanged"*, which had
+stopped being true. **A reader who stopped at the bold number would have carried
+a void figure into a meeting.** Mistake 11 in its most dangerous form: not a
+stale number in a corner, but a retracted headline still reading as current.
+
+**What replaces it:** run `check_premise.py`. On the plant of 8 October it prints
+a baseline of 848.1 at 883 °C, the constraint binding against the 850 °C
+trigger, and preview worth **−0.0 points** against a policy that only knows the
+grade it is on now. <!-- RETIRED-OK: 920.1, -0.3 -- the merged plant's -->
+On the merged plant (30 September) it read 920.1 and −0.3, and the −0.3 was all
+one second of knock at the instantaneous grade step, which the 8 s ramp removed.
+
+*(A parenthesis here used to restate the arithmetic behind an 11 September typo
+correction to the first figure. It was deleted on 17 September: `RETIRED` now
+guards all three numbers, and re-quoting them to explain a superseded rounding
+made the checker fail — correctly. **When a figure goes void, its errata go with
+it.**)*
+
+**WHAT USED TO BE CALLED THE STRONGEST SINGLE FACT IN THE PROJECT WAS AN
+IDENTITY, NOT A FINDING.** This file said, for weeks, that disabling preview
+collapses the predictive policy onto the reactive one *to the decimal* — and
+that the identity holding every time made it the load-bearing claim.
+
+<!-- RETIRED-OK -->
+It could not have failed. `p_predictive` reads its preview through
+`env._preview()`, and with `use_preview=False` that returns zeros, so the
+function computes `k_ahead = 0` and returns **the reactive policy's own vector
+on every single step**. The two rows were the same rollout. AUDIT.md C3.
+
+An ablation is evidence only when the blinded policy could in principle have
+behaved differently and did not. That means a TRAINED blinded agent against a
+trained sighted one, which is Phase D.
+
+> **PHASE D HAS NOW BEEN RUN, 21–22 September 2026, and it settles this
+> paragraph.** Eight trained blinded agents against eight trained sighted ones,
+> paired by seed, preregistered before any of them started. **Preview is not
+> significant:** 5 of 8 positive, mean +4.8 damage units, sign test p = 0.3633,
+> permutation p = 0.4922. The blinded policies COULD have behaved differently —
+> they were trained blind, not zeroed at evaluation — and across eight pairs the
+> difference does not separate from seed noise. That is a real ablation and a
+> real answer. See `results/PREREGISTRATION.md` and `analyse_phase_d.py`.
+
+The honest comparator —
+added 16 September — is a policy that acts on the grade the car is on right now,
+with no preview, and it still BEATS the predictive one: by **0.3 points** on the
+merged plant (`check_premise.py`), all of it one second of knock at the grade
+step.
+

@@ -45,8 +45,11 @@ DRIFTS = [
     # drifting them tested nothing (row 6 MISSED, row 13 anchor not found).
     # Same protection, on the live figure. Re-anchored again 8 October: the
     # sub-stepping moved the pin 873.1 -> 872.7 C.
-    (6, "CLAUDE.md app peak 872.7 -> 877.2 (was 873.1 -> 877.6)",
-     "CLAUDE.md", "872.7", "877.2", "MISSED"),
+    # Rows 6, 12 and 13 follow their text, 14 October 2026 (the documentation
+    # restructure): the numbers to README.md, the drive replays to
+    # thesis/LIMITATIONS.md, the live premise to the new CHECKPOINT.md.
+    (6, "CLAUDE.md app peak 872.7 -> 877.2 (was 873.1 -> 877.6; now in README.md)",
+     "README.md", "872.7", "877.2", "MISSED"),
     (7, 'results/README.md and CHECKPOINT.md "+11.7" -> "+13.7"',
      "results/README.md", "11.7", "13.7", "MISSED"),
     (8, 'engine_env.py docstring "12 % at 130 km/h" -> 120 km/h',
@@ -59,15 +62,15 @@ DRIFTS = [
     # verbatim into STATE_HISTORY.md part B (the documentation restructure).
     (11, 'CHECKPOINT.md "959.8 at 884 C" -> 870 C (now in STATE_HISTORY.md)',
      "STATE_HISTORY.md", "959.8 at 884 C", "959.8 at 870 C", "MISSED"),
-    (12, 'CLAUDE.md "0.206 %" -> 0.306 %',
-     "CLAUDE.md", "0.206 %", "0.306 %", "MISSED"),
+    (12, 'CLAUDE.md "0.206 %" -> 0.306 % (now in thesis/LIMITATIONS.md)',
+     "thesis/LIMITATIONS.md", "0.206 %", "0.306 %", "MISSED"),
     # Anchor moved 22 September 2026. It drifted "294.2 at 812 °C", which the
     # fix-3 sweep corrected to the live premise figure, so the row reported
     # ERROR (anchor not found) rather than testing anything. It now drifts the
     # CURRENT premise peak in CLAUDE.md, which is the same protection.
     # Re-anchored again 8 October: the plant's premise is now 848.1 at 883 °C.
-    (13, 'CLAUDE.md premise "848.1 at 883 °C" -> 870 (was "920.1 at 883", "959.8 at 884")',
-     "CLAUDE.md", "848.1 at 883 °C", "848.1 at 870 °C", "MISSED"),
+    (13, 'CLAUDE.md premise "848.1 at 883 °C" -> 870 (was "920.1 at 883", "959.8 at 884"; now in CHECKPOINT.md)',
+     "CHECKPOINT.md", "848.1 at 883 °C", "848.1 at 870 °C", "MISSED"),
     (14, 'CLAUDE.md "derived k = 0.831" -> 0.851',
      "CLAUDE.md", "derived k = 0.831", "derived k = 0.851", "CAUGHT"),
     # Two more of the audit's own structural worries, added here because the
