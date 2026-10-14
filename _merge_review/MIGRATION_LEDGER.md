@@ -60,4 +60,21 @@ its edit can affect, and one full run covers the finished restructure.
 | `359b9b0` | `handoff.md:1-466` | `STATE_HISTORY.md` part G | Moved | the plan's open decision 2, put to Ghassan the same day: handoff.md becomes a pointer, so the 23 files that name it still lead somewhere | NOLOSS 0 · DOCS 73/73, 939 · COVER 0 · PIN 20 · no drift anchor in handoff.md |
 | `359b9b0` | (new) | `handoff.md` | Rewritten (pointer, 12 lines) | CLAUDE.md, CHECKPOINT.md and README.md, in that order | — |
 | `9cbd7b0` | (new) | `HISTORY.md` | Rewritten (new index, plan section 9.1) | the 48 dated documents (date from the name or the first commit, title from the file's own first line), STATE_HISTORY.md's parts, the backups outside git, and HIST-0001: the merge's conflict git could not see | NOLOSS 0 · DOCS 73/73, 939 · COVER +1 · PIN 20 |
-| this commit | (new) | `verify_docs.py`, check SIZE | Rewritten (guard, gate G-SIZE) | fails if CLAUDE.md passes 300 lines or CHECKPOINT.md 150; shown to fail on a scratch copy padded to 318 lines | DOCS 74/74 (73 + SIZE), 939 · NOLOSS 0 · COVER 0 · PIN 20; the full drift_test run follows on this commit |
+| `8309d66` | (new) | `verify_docs.py`, check SIZE | Rewritten (guard, gate G-SIZE) | fails if CLAUDE.md passes 300 lines or CHECKPOINT.md 150; shown to fail on a scratch copy padded to 318 lines | DOCS 74/74 (73 + SIZE), 939 · NOLOSS 0 · COVER 0 · PIN 20; the full drift_test run follows on this commit |
+
+## The result
+
+| | `main` 39fce4b, before | `8309d66`, after |
+|---|---|---|
+| CLAUDE.md | 3588 lines | 198 lines |
+| CHECKPOINT.md | 2394 lines | 73 lines |
+| handoff.md | 466 lines | 12 lines (a pointer) |
+| verify_docs.py | 72 of 73 (two dated figures; fixed first, `bf8e0af`) | 74 of 74 (73 + SIZE), 939 figure mentions |
+| files in the scan | 274 | 282 (none left; 8 joined) |
+| pinned "11.7" mentions | 20 | 20 |
+| drift_test.py, full run | 16 of 16 CAUGHT | 16 of 16 CAUGHT, each row at its text's new home |
+
+Every removed non-blank line of CLAUDE.md, CHECKPOINT.md and handoff.md is in
+the repository verbatim at its destination, except the lines listed as
+Rewritten above. G-CTX, a fresh Claude Code session at the repository root
+(`/context`, `/memory`), is for after the push.
