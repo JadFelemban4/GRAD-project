@@ -76,5 +76,7 @@ its edit can affect, and one full run covers the finished restructure.
 
 Every removed non-blank line of CLAUDE.md, CHECKPOINT.md and handoff.md is in
 the repository verbatim at its destination, except the lines listed as
-Rewritten above. G-CTX, a fresh Claude Code session at the repository root
-(`/context`, `/memory`), is for after the push.
+Rewritten above. G-CTX, after the push (`cc338f8`): Jad ran `/context` in a fresh Claude Code
+session at the repository root. Every memory file together, CLAUDE.md
+included, came to 5.8k tokens; CLAUDE.md itself is 12,469 bytes, about 3k
+tokens, against 223,697 bytes, about 55k, on `main` before. PASS.

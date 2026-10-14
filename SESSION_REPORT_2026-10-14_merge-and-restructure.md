@@ -111,3 +111,15 @@ boxes record it:
 So the simulation on Jad's machine is Ghassan's, and nothing in it is
 needed from him; what is needed is his OK on the restructure and the drive-C
 rule numbers.
+
+## 8. Closing, the same evening
+
+- The restructure is on `main`: `39fce4b..cc338f8`, on Jad's go.
+- G-CTX passed: in a fresh session, every memory file together came to 5.8k
+  tokens; CLAUDE.md is 12,469 bytes (about 3k tokens) against 223,697 (about
+  55k) before.
+- Jad's folder `graduation project` now holds `GRAD-project` and
+  `GRAD-agent-backups`; `reorganization/` (plan v3, the Phase 0 prompt) and the
+  ZIP of Ghassan's branch went to the Windows Recycle Bin, at his request.
+- The close routine writes a session report and rewrites CHECKPOINT.md; it
+  never appends a session to CHECKPOINT.md or CLAUDE.md.
