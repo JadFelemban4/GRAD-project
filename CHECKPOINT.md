@@ -52,6 +52,11 @@ knock model the agents learn against is untested until drive C.
 3. The validation decisions.
 4. The results tab learns fingerprint schema 2 (`team/jad.md`).
 5. Plan v3 phase 3: tag `sim-v1`, write `CHANGELOG.md` and the results index.
+6. The parallel items of 30 September (Ghassan's twenty on multi-climb roads,
+   the spark-capped rescoring of Jad's 48, Chapter 4 with both branches side by
+   side and never pooled, the battery of Phase E) and the app's backlog are
+   `STATE_HISTORY.md` part E, verbatim. X1 and X2 came after them: check an item
+   before taking it up.
 
 ## Files outside git (where · last backup · manifest)
 
