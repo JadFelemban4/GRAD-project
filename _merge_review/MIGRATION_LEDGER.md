@@ -33,8 +33,11 @@ its edit can affect, and one full run covers the finished restructure.
 | `9518115` | `CLAUDE.md:513-576` (mistake 17, inside "The numbers that matter") | `docs/MISTAKES.md`, between 16 and 18 | Moved | mistake 17 had been left among the numbers by an earlier merge | — |
 | `9518115` | (new) | `CLAUDE.md`, "Mistakes already made: one rule each" | Condensed | one rule line per mistake (1-25, 13b, 17); the full text is docs/MISTAKES.md | — |
 | `9518115` | `verify_docs.py` PINNED_HISTORY | the same | Rewritten (guard) | mistake 11's 2 pinned mentions moved to docs/MISTAKES.md: CLAUDE.md 3 -> 1 | PIN 20 |
-| this commit | `CLAUDE.md:183-348` ("The numbers that matter": the scripts and what they print, the two app figures, the console-encoding note) | `README.md`, at its end | Moved | the live figures and the command behind each | NOLOSS 6 (the drift rows below) · DOCS 73/73, 939 · COVER +1 (thesis/LIMITATIONS.md) · PIN 20 · DRIFT rows 6, 12, 13 CAUGHT |
-| this commit | `CLAUDE.md:349-406` (the VOID headline and the ablation identity) | `STATE_HISTORY.md` part C | Moved | void since 16 September; history | — |
-| this commit | `CLAUDE.md:407-625` (the drive replays and the Taif drive; the rolling road; the towing standard) | `thesis/LIMITATIONS.md` | Moved | measured findings the thesis must state | — |
-| this commit | (new) | `CLAUDE.md`, "The numbers that matter" | Rewritten (pointer) | five lines pointing to the three destinations | — |
-| this commit | `drift_test.py` rows 6, 12, 13 | the same | Rewritten (guard) | each row follows its text: README.md, thesis/LIMITATIONS.md, and CHECKPOINT.md (the live premise) | DRIFT rows 6, 12, 13 CAUGHT |
+| `4c91e79` | `CLAUDE.md:183-348` ("The numbers that matter": the scripts and what they print, the two app figures, the console-encoding note) | `README.md`, at its end | Moved | the live figures and the command behind each | NOLOSS 6 (the drift rows below) · DOCS 73/73, 939 · COVER +1 (thesis/LIMITATIONS.md) · PIN 20 · DRIFT rows 6, 12, 13 CAUGHT |
+| `4c91e79` | `CLAUDE.md:349-406` (the VOID headline and the ablation identity) | `STATE_HISTORY.md` part C | Moved | void since 16 September; history | — |
+| `4c91e79` | `CLAUDE.md:407-625` (the drive replays and the Taif drive; the rolling road; the towing standard) | `thesis/LIMITATIONS.md` | Moved | measured findings the thesis must state | — |
+| `4c91e79` | (new) | `CLAUDE.md`, "The numbers that matter" | Rewritten (pointer) | five lines pointing to the three destinations | — |
+| `4c91e79` | `drift_test.py` rows 6, 12, 13 | the same | Rewritten (guard) | each row follows its text: README.md, thesis/LIMITATIONS.md, and CHECKPOINT.md (the live premise) | DRIFT rows 6, 12, 13 CAUGHT |
+| this commit | `CLAUDE.md` "Known limitations to state in the thesis, not fix quietly" (426 lines, with the knock model, the live app's limits and the 14 September audit) | `thesis/LIMITATIONS.md` | Moved | thesis material | NOLOSS 0 · DOCS 73/73, 939 · COVER 0 · PIN 20 · DRIFT row 14 CAUGHT (its other anchor stays in CLAUDE.md for now) |
+| this commit | `CLAUDE.md` "Open, and honest about it" (84 lines: the discretisation of Phase D, D2 and C4; Phase F's threshold rule) | `thesis/LIMITATIONS.md` | Moved | measured limits | — |
+| this commit | (new) | `CLAUDE.md`, "Known limitations, and what is open" | Rewritten (pointer) | four lines | — |
