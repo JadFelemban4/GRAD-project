@@ -1,20 +1,65 @@
 # Drives we need — what to log, and how to drive it
 
 Written 27 September 2026 and revised 28 September, from what the
-simulator-versus-car comparison (`model_vs_data.py`) could not settle. Three
-drives, **A, B and C**, in order of value. Each answers one question the existing
-logs cannot. None of them is needed to run Phase D, which is simulation; they
-make the simulator it runs on more trustworthy.
+simulator-versus-car comparison (`model_vs_data.py`) could not settle;
+**revised 13 October, after X1 and X2** (the first box below). Four drives:
+**C, A, D, and B (done)**, in the order they are now needed. Each answers one
+question the existing logs cannot. None of them is needed to run an experiment,
+which is simulation; they make the simulator it runs on more trustworthy, and C
+decides what the next training charges for knock.
 
 *(Lettered, not numbered, on purpose: `DRIVE_1_card_v1.md` and `v2` are the
 **completed** first drive of 6 September, kept as a record. These are new.)*
 
-**What each drive would change, and when.** A and B would change the plant
-(the oil node; the boost ceiling and the gearbox workaround). A plant change
-after the Phase D retrain means retraining again, so either drive A and B
-first, or retrain now on the current plant and retrain once more after them —
-three hours of machine time each way. C changes no parameter the training
-uses; it decides whether the knock model can be kept at all.
+**What each drive would change, and when.** A and D change the plant: A the oil
+and coolant constants `derive_params.py` derives from the logs, D the boost
+ceiling (and the thin-air inlet, if training keeps thin air). The team retrains
+after every drive. C changes no fitted parameter; it decides whether the knock
+term, and the one-step knock spike behind most of it, stay in the next
+training's plant and reward, so **C comes before the next training**.
+
+> **13 October 2026: WHAT X1 AND X2 CHANGED, AND THE ORDER NOW.**
+>
+> 1. **Drive C first, with a new part.** Since X1 the agents may not advance
+>    spark, but the knock term still decides what they do. It is the baseline
+>    car's largest damage term in ordinary driving: on the cool stretches of the
+>    car's own drives, 0.060 a second of knock against 0.010 of oil and 0.0001
+>    of turbine. X1's and X2's agents burn 4–7 % more fuel than the baseline ECU
+>    on those drives (median, life weighted most), mostly to avoid it. That knock
+>    comes from a **one-step spike at every sudden rise in torque demand**,
+>    because the model's baseline ECU sets spark from the previous second's
+>    load: on the car's drives 84 % of it (all but each replay's first step)
+>    falls on such rises, and in X2's training about 85 % falls where a speed-up
+>    starts or a slow-down ends (`results/X2_AGENTS.md`, section 5). **Whether
+>    the real car pulls timing on a sudden load step decides whether that is
+>    protection or a model artefact.** Drive C adds those steps (part C2) to its
+>    steady loaded segments (part C1), and carries a draft decision rule to be
+>    fixed before it is driven.
+> 2. **Drive A second**, for the reasons below, plus one: the coolant constants
+>    are weakly identified (stepping the fit's integrator finer moved the
+>    radiator scale by +61 %, CLAUDE.md mistake 25), and sustained load is the
+>    data that pins them. It now logs `Ambient pressure` too.
+> 3. **Drive D, new:** drive B's roll-ons again, held longer, repeated on the
+>    plateau at the top of drive A's climb, and logging the car's own torque
+>    request. It measures (a) the boost the car makes at 1600–2000 rpm when held
+>    long enough to count (the model's ceiling is 9–20 % low there, mistake 22);
+>    (b) the boost in thin air, which nothing has measured: X2 trained down to
+>    80 kPa and its transfer test goes to 76 kPa on a compressor inlet scaled
+>    from sea level, and drive10, the only drive at altitude, logged no ambient
+>    pressure (every other drive with that channel was logged on the coast,
+>    14.1–14.5 psi in the raw logs); (c) how fast the car's own torque request
+>    rises when the pedal goes down: the model's demand jumps in one step, which
+>    is what makes the spike, and a ramped demand would need the car's rate.
+> 4. **Not reachable now:** air colder than 19.0 °C, the coldest in the dataset
+>    (`data/master_samples.csv`, drive10 at altitude), while X2 trained down to
+>    0 °C. Only a winter night at altitude comes close.
+>
+> | drive | question | channels | changes the plant? | when |
+> |---|---|---|---|---|
+> | **C** knock | does the car retard on sudden load steps, and under sustained load? | 6 | the knock term and the ECU's spark lag, by the decision rule | **before the next training** |
+> | **A** heat | oil, coolant and radiator under sustained load; the valve's control law | 9 | yes: the derived thermal constants | next |
+> | **D** boost and torque request | boost at low rpm and in thin air; how fast the torque request rises | 8 | yes: the boost ceiling, and thin air if kept | the same trip as A |
+> | B | boost at low rpm | 7 | done 28 September | — |
 
 > **28 September 2026, evening: DRIVE B IS DONE** —
 > `logs/raw/driveB_rollons-20260928_140513.csv`, 41 full-throttle roll-ons in a
@@ -45,16 +90,20 @@ safely, skip it; a missing pull costs less than anything else.
 
 ## Before every drive
 
-1. **Select ONLY the channels listed for that drive.** Fewer channels means each
-   one is read more often: 7 channels refresh every 1.45 s, 26 every 7.5 s
-   (CLAUDE.md mistake 13b). The speed is the whole point.
+1. **Select ONLY the channels listed for that drive or part.** Fewer channels
+   means each one is read more often: each channel is read about every
+   0.15–0.21 s times the number selected (7 channels: every 1.05 s on drive B,
+   every 1.45 s on `pull01`; 26 channels: every 7.5 s; CLAUDE.md mistake 13b).
+   The speed is the whole point.
 2. **Always include `Coolant temperature`.** `build_dataset.py` keeps only warm
    samples, and a drive without the coolant channel contributes nothing —
    that is what happened to `pull01`.
 3. **Warm the engine first** (coolant at 88 °C or above), then start the log.
 4. **Wait 30 seconds after starting the log before driving.** The first rows
    are placeholder zeros until the car answers (AUDIT.md M8).
-5. After the drive: export the CSV, copy it into `logs/raw/` with a name that
+5. **One log per part.** When the channel set changes, stop the log and start a
+   new one, and name each file for its part (`driveC2_steps-20261020.csv`).
+6. After the drive: export the CSV, copy it into `logs/raw/` with a name that
    says what it is (`climb_thermal-20261004.csv`), then run
 
    ```
@@ -65,11 +114,120 @@ safely, skip it; a missing pull costs less than anything else.
 
 ---
 
-## Drive A — a long mountain climb, for heat (most valuable)
+## Drive C — knock: sustained load and sudden load steps (do this first)
 
-**Why.** The car has never been logged under sustained load. Only 1.8 % of the
-logged moving samples reach the manifold pressure of the locked climb — the
-logs are fast flat-road cruising. So the thermal model has never been checked
+**Why.** The model's knock integral shows **no detectable relationship** with
+the retard the car applies (correlation −0.12 over 14 318 rows of 7475b5d7).
+**But that drive could not have seen it** (28 September): logged with 26
+channels, it holds only about 400 genuine readings of each ignition angle in
+55 minutes — one every ~8 s — and a third of the target/actual pairs in a row
+were read more than a second apart. A knock retard lasts a second or two. The
+test so far is not a refutation; it is a test this sampling cannot perform —
+mistake 13b's trap again, where a real relationship read +0.35 until faster
+logging showed +0.95.
+
+**What it now decides** (13 October):
+
+- **The one-step knock spike (part C2).** Does the car pull timing when the
+  load rises suddenly? The model's baseline ECU does, for one step, at every
+  rise in torque demand, and that spike is what X1's and X2's agents spend fuel
+  avoiding on the car's own drives (the box above).
+- **The knock knee (part C1).** The 0.85 in the damage formula waits for the
+  knock integral at which the car's own ECU starts to retard
+  (`results/DAMAGE_CONSTANTS.md`).
+- **Spark under boost (part C1).** The car runs a median 3.8° below the model's
+  spark at 2000–4000 rpm and 140–240 kPa, but on 31 genuine readings, and on 4
+  in the climb's own cell (2400–3000 rpm, 165–185 kPa); read linearly that is
+  about +29 K of turbine the model would be missing, and by the validation
+  plan's rule it is untested (`results/VALIDATION_PLAN.md`, the spark row).
+  Part C1 is meant to put hundreds of readings in that cell.
+
+So this drive logs **as few channels as possible**, to read both angles about
+every 0.9–1.25 s:
+
+**Channels (6):**
+
+| channel | why |
+|---|---|
+| `Engine speed` | operating point |
+| `Air mass flow` | load; and the marker of each load step in C2 |
+| `Actual ignition angle` | what the car fired |
+| `Target ignition angle from torque intervention` | target minus actual = retard |
+| `Coolant temperature` | warm filter |
+| `Ambient temperature` | knock depends on it |
+
+`Vehicle speed` and `Lambda actual value` are left out on purpose: in a held
+gear the gear does not need inferring, and below 3300 rpm this engine does not
+enrich, so lambda is 1.0.
+
+**How to drive.** Gearbox in **manual mode (M)** throughout. No gear changes
+inside a segment or a step.
+
+*Part C1 — steady loaded segments, on a climb, in the afternoon heat.*
+
+1. The same climb as drive A works — a second ascent with this channel set.
+2. Choose a gear that keeps the engine at **2000–3500 rpm** — low speed and high
+   load is where an engine knocks. The locked climb's own point is 2706 rpm at
+   175 kPa, where the baseline ECU breathes about 400 kg/h of air (its record on
+   the locked climb, median 113 g/s): on the passenger's screen, `Engine speed`
+   near 2700 and `Air mass flow` near 400. Let most segments pass through it.
+3. Hold **firm throttle, near full, for 20–30 seconds at a time**. On most roads
+   the car will gain speed at that load: lift before the limit, and ease off
+   between segments.
+4. **Twenty or more segments.** The climb's cell needs hundreds of readings of
+   each angle; ten segments were the plan before it was known how few the cell
+   holds.
+
+*Part C2 — sudden load steps, on a straight, empty road, in the afternoon heat.*
+*(New, 13 October.)*
+
+1. From a **steady light cruise in a held gear** (6th, 7th or 8th, engine at
+   1500–2500 rpm), **press the pedal firmly and quickly — at least half way, up
+   to the floor — and hold for 5 seconds**, then lift back to cruise. Always
+   before the limit.
+2. **A minute of steady cruising between steps.** The logger reads one channel
+   at a time, so the pause makes each step's readings independent (AUDIT.md H4)
+   and lands them at a different moment of the step each time: lined up on the
+   step afterwards, twenty steps resolve a retard shorter than one reading
+   interval.
+3. **Twenty or more steps**, spread across the three gears.
+4. **If possible, repeat C2 in the cool of an early morning.** A knock retard
+   grows with heat; a drivability retard on a tip-in would not. Whether
+   `Target ignition angle from torque intervention` minus `Actual ignition
+   angle` includes such a retard is not known, and the two sessions together
+   separate them.
+
+**Decision rule — DRAFT, for Jad and Ghassan to fix before the drive.** The
+agreed list of 30 September asks for drive C's rule to be written before the
+drive. The numbers below are placeholders to be set, not results.
+
+- **C2, the spike.** Each step is an air-mass rise of at least ~50 % between two
+  readings. Read the car's retard (target minus actual) in the 3 s after the
+  step against its median over the 20 s before.
+  - It rises by **more than 2° on fewer than 1 step in 5**: the car does not
+    pull timing on a load step. The model's one-step spike is an artefact of its
+    1 s step; schedule the baseline ECU's spark on the current step's load (or
+    ramp the torque demand at the rate drive D measures) before the next
+    training.
+  - It rises by **more than 2° on more than half the steps**: the car does pull
+    timing on load steps. Keep a load-step knock cost, sized to the measured
+    retard, and say so in the next preregistration.
+  - In between: inconclusive; repeat with fewer channels.
+- **C1, the level.** Replay C1 through the model with the car's measured spark
+  and load (as `model_vs_data.py` does for 7475b5d7). Read the knock integral at
+  which the car starts to retard (the knee, now 0.85) and the car-minus-model
+  spark in the climb's cell (now −3.8° on 4 readings). Before the drive, fix
+  which size of change in each would trigger a retune.
+
+---
+
+## Drive A — a long mountain climb, for heat
+
+**Why.** The car has never been logged under sustained load. Only 2.77 % of the
+logged moving samples reach the manifold pressure of the locked climb, and
+those in short pulls (`model_vs_data.py`, the duty cycle; corrected 13 October,
+it quoted a smaller share from before the dataset grew) — the logs are fast
+flat-road cruising. So the thermal model has never been checked
 in the region the whole experiment runs in. This drive gives:
 
 - the **oil node's** real response to sustained load. On hard pulls the model's
@@ -84,12 +242,20 @@ in the region the whole experiment runs in. This drive gives:
   must reproduce that too;
 - the first **sustained-load coolant** data, and — if the climb is long and hot
   enough to push coolant past 100 °C — the **radiator**, which CLAUDE.md says
-  can only be identified by a drive that overwhelms the cooling system;
+  can only be identified by a drive that overwhelms the cooling system. Since
+  9 October there is a second reason: re-fitted with the plant's own
+  sub-steps, the radiator scale moves +61 % and block-to-ambient −42 %
+  (`substep_fit_check.py`, CLAUDE.md mistake 25), so the logs we have barely
+  pin the coolant constants;
 - a **hot idle**, which tests the model's stand-in thermostat against the
   B58's heat-management valve (on drive10 the model cooled 13 K at a four-minute
   idle while the car held 93 °C).
 
-**Channels (8):**
+It will not hold the locked climb's load: a mountain road at legal speed asks
+40–50 kW (drive10) against the climb's 88.7 kW. It is the longest sustained load
+a road can give.
+
+**Channels (9):**
 
 | channel | why |
 |---|---|
@@ -101,6 +267,7 @@ in the region the whole experiment runs in. This drive gives:
 | `Oil temperature` | the node being identified |
 | `Engine radiator outlet temperature (coolant)` | radiator cold side |
 | `Ambient temperature` | every heat flow's boundary -- and without it the thermal fit cannot use the drive at all (`calibrate_thermal.usable_drives`) |
+| `Ambient pressure` | ADDED 13 October: the air the engine breathes as the road climbs, which no log has recorded above the coast. It changes slowly, so it costs the thermal channels nothing they need (each is read about every 1.35–1.9 s; the oil follows a change over 70–100 s) |
 
 **How to drive.**
 
@@ -114,7 +281,74 @@ in the region the whole experiment runs in. This drive gives:
 5. **At the top, pull over somewhere safe and leave the engine running at idle
    for 5 minutes** with the log still going. Do not switch off — the hot idle is
    half the value of the drive.
-6. Stop the log.
+6. Stop the log. Then, on the plateau, drive D's part D2 before coming down.
+
+---
+
+## Drive D — boost and the car's own torque request, at sea level and in thin air (new, 13 October)
+
+**Why.** Three questions, one channel set:
+
+- **Boost at 1600–2000 rpm, held long enough to count.** The model's boost
+  ceiling is the measured envelope, and it sits 9–20 % below the highest boost
+  drive B reached at 1600–2000 rpm (CLAUDE.md mistake 22). Drive B's 3–4 s pulls
+  are transients, which the envelope (built from quasi-steady rows) excludes by
+  construction. Longer pulls, best uphill, give readings it can use.
+- **Boost in thin air.** X2 trained at 80–101.3 kPa and its transfer test runs
+  at 90, 82 and 76 kPa, all on a compressor inlet scaled from sea level
+  (`wide_air.py`, the conditions test's model). No log has recorded the car above
+  the coast: drive10 climbed to Taif without an ambient-pressure channel. The
+  plateau at the top of drive A's climb is about the transfer test's 82 kPa
+  "about Taif" condition. This part matters if the next design keeps thin air in
+  training, or keeps the transfer test's pressure conditions.
+- **How fast the car's torque request rises.** The model's torque demand jumps
+  in a single 1 s step when a speed-up starts, and that jump is what makes the
+  one-step knock spike. If drive C says the spike must go, one way out is to ramp
+  the demand; the car's own request gives the rate. `Coordinated target torque
+  on the wheel` is live (7475b5d7 holds 273 distinct values of it, −37 to
+  2 921 Nm at the wheel), but that drive logged 26 channels, so each was read
+  only about every 8 s, far too slowly to see a tip-in.
+
+**Channels (8):**
+
+| channel | why |
+|---|---|
+| `Engine speed` | the speed the boost is reached at |
+| `Air mass flow` | corrected flow — the ceiling's x-axis |
+| `Boost pressure` | at full throttle this IS manifold pressure (mistake 14) |
+| `Ambient pressure` | the pressure ratio, and the thin air itself |
+| `Throttle valve angle related to the lower stop` | proves the pull was full throttle, and marks when each step began |
+| `Coordinated target torque on the wheel` | the car's own torque request |
+| `Coolant temperature` | warm filter |
+| `Ambient temperature` | corrected flow and charge temperature |
+
+Each is read about every 1.2–1.7 s. `Vehicle speed` is left out: the gear is
+held in M, and a kickdown shows as a jump in engine speed. The pedal channels
+(`Target wheel torque from accelerator pedal request`, `Normalized accelerator
+pedal angle`) were read only 2–8 times in the census log, too few to say whether
+they are useful, so they are not on the list.
+
+**How to drive.** Gearbox in **manual mode (M)**; hold the gear with the paddles.
+
+*Part D1 — at sea level, on a straight, empty road (or a long gentle climb) where
+it is legal.*
+
+1. Drive B's rows: **6th from 70 km/h** (about 1770 rpm), **7th from 90 km/h**
+   (about 1870 rpm), **8th from 100 km/h** (about 1620 rpm). Floor it and **hold
+   for as long as the limit allows — 6–8 seconds if you can — then lift**.
+   Uphill is best: the grade takes the load, so the car gains less speed in the
+   same time.
+2. Each row **three times**, with **a minute of steady cruising** between pulls.
+3. Then **five moderate tip-ins**: from steady cruise, about half pedal for
+   3 seconds, a minute apart. They show how the car shapes an ordinary
+   acceleration, which is what the model's speed-ups are.
+
+*Part D2 — on the plateau at the top of drive A's climb.*
+
+1. The same three full-throttle rows, three times each, a minute apart, on a
+   straight road where it is legal and empty.
+2. If no such road is safe, skip D2: D1 still answers two of the three
+   questions.
 
 ---
 
@@ -162,47 +396,6 @@ higher, engine warm.
 
 ---
 
-## Drive C — loaded, steady-gear driving in the heat, for knock
-
-**Why.** The model's knock integral shows **no detectable relationship** with
-the retard the car applies (correlation −0.12 over 14 318 rows of 7475b5d7).
-**But that drive could not have seen it** (28 September): logged with 26
-channels, it holds only about 400 genuine readings of each ignition angle in
-55 minutes — one every ~8 s — and a third of the target/actual pairs in a row
-were read more than a second apart. A knock retard lasts a second or two. The
-test so far is not a refutation; it is a test this sampling cannot perform —
-mistake 13b's trap again, where a real relationship read +0.35 until faster
-logging showed +0.95.
-
-So this drive logs **as few channels as possible**, to read both angles every
-~1.25 s:
-
-**Channels (6):**
-
-| channel | why |
-|---|---|
-| `Engine speed` | operating point |
-| `Air mass flow` | load |
-| `Actual ignition angle` | what the car fired |
-| `Target ignition angle from torque intervention` | target minus actual = retard |
-| `Coolant temperature` | warm filter |
-| `Ambient temperature` | knock depends on it |
-
-`Vehicle speed` and `Lambda actual value` are left out on purpose: in a held
-gear the gear does not need inferring, and below 3300 rpm this engine does not
-enrich, so lambda is 1.0.
-
-**How to drive.** The same climb as drive A works — a second ascent with this
-channel set — in the afternoon heat.
-
-1. **Manual mode (M).** Choose a gear that keeps the engine at **2000–3500 rpm**
-   on the climb — low speed and high load is where an engine knocks.
-2. Hold **steady throttle for 20–30 seconds at a time**, firm but not
-   necessarily full. No gear changes inside a segment.
-3. Ten or more segments. Ease off between them.
-
----
-
 ## What no drive on this car can settle
 
 - **The turbine temperature and the 850 °C trigger.** Every pre-catalyst exhaust
@@ -213,3 +406,9 @@ channel set — in the afternoon heat.
   road driving in any gear. A track day could do it; a public road cannot.
 - **A real boost leak** for the app's mismatch detector. Inducing one on a
   borrowed car is not something to do.
+- **The locked climb itself** (added 13 October). It holds 88.7 kW for twelve
+  minutes in sea-level air; no legal road does (drive10's Taif climb asks
+  40–50 kW and never reached the trigger). Every result on it is an
+  extrapolation in duration (`results/VALIDATION_PLAN.md`, operating region).
+- **Air colder than about 19 °C** (added 13 October), which X2 trained in down
+  to 0 °C. Not a drive this season; only a winter night at altitude comes near.

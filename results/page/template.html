@@ -1190,31 +1190,60 @@ html{scroll-behavior:smooth}
   <div class="sect-head">
     <p class="eyebrow">Part 4 · for the car</p>
     <h2>Drives we need</h2>
-    <p class="prose cap">Three drives, A to C; B is done, and since 29 September C matters most for Phase D and A for the thermal model. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. Phase D does not wait for them. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
+    <p class="prose cap">Revised 13 October, after X1 and X2. Four drives in the order they are now needed: C first, then A with D on the same trip; B is done. They are lettered because the project's "Drive 1" is the completed first drive of 6 September. Each settles one question the logs cannot. No experiment waits for them, but C decides what the next training charges for knock. Log only, never write to the car; the passenger runs the phone. Skip any step that can't be done legally and safely. Full notes are in <code>logs/DRIVE_PLAN.md</code>.</p>
   </div>
 
   <div class="fig">
     <h3>Before every drive</h3>
     <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
-      <li>Select <b>only</b> the listed channels. Fewer channels are read more often: 7 refresh every 1.45 s, 26 every 7.5 s.</li>
+      <li>Select <b>only</b> the listed channels. Fewer channels are read more often: each is read about every 0.15–0.21 s times the number selected, so 7 refresh every 1.05–1.45 s and 26 every 7.5 s.</li>
       <li>Always include <code>Coolant temperature</code>. Without it the whole drive is filtered out.</li>
       <li>Warm the engine first, to a coolant temperature of 88 °C or more.</li>
       <li>Start the log and wait 30 seconds before driving; the first rows are placeholder zeros.</li>
+      <li><b>One log per part:</b> when the channel set changes, stop the log, start a new one, and name it for its part.</li>
       <li>Afterwards, copy the CSV into <code>logs/raw/</code> with a descriptive name and run <code>python new_drive.py</code> on it.</li>
     </ol>
   </div>
 
   <div class="fig">
     <div class="fig-head">
-      <div class="row"><h3>A · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable for the thermal model</span></div>
-      <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. It is the data the oil rows of the validation table still need, and the coolant regulation law, and it adds the first sustained-load coolant data and a hot idle. Log ambient temperature too. It changes the plant, so do it before the retrain or retrain again after it.</p>
+      <div class="row"><h3>C · Knock: sustained load and sudden load steps</h3><span class="pill none"><i>★</i>first: before the next training</span></div>
+      <p class="take">Since X1 the agents may not advance spark, but the knock term still decides what they do. It is the ECU car's largest damage term in ordinary driving, and X1's and X2's agents burn {{x1.res.logged.per_w.most.med|+.1f}} % and {{x2.res.logged.per_w.most.med|+.1f}} % more fuel than the ECU on the car's own drives (median, life weighted most), mostly to avoid it. That knock is a one-step spike at every sudden rise in torque demand, because the model's ECU sets spark from the previous second's load: in X2's training {{x2.why.speed_lo|.0f}}–{{x2.why.speed_hi|.0f}} % of it falls where a speed change starts or ends. Whether the real car pulls timing on a load step decides whether that is protection or a model artefact. The old drive read each ignition angle only every {{mc.knock_s.every_s|.0f}} s; this one reads both about every second. It also gives the knock knee the damage formula waits for, and spark under boost in the climb's own cell.</p>
     </div>
-    <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Oil temperature</code>, <code>Engine radiator outlet temperature (coolant)</code>, <code>Ambient temperature</code>.</p>
+    <p class="cap"><b>Channels (6):</b> <code>Engine speed</code>, <code>Air mass flow</code>, <code>Actual ignition angle</code>, <code>Target ignition angle from torque intervention</code>, <code>Coolant temperature</code>, <code>Ambient temperature</code>. Speed and lambda are left out on purpose: in a held gear the gear is known, and below 3300 rpm lambda is 1.0.</p>
+    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li><b>C1, on a climb, in the afternoon heat:</b> a second ascent of drive A's climb, gearbox in <b>M</b>, in a gear that keeps the engine at <b>2000–3500 rpm</b>. Near-full throttle for 20–30 s at a time, letting most segments pass through the locked climb's {{mc.duty.scen_rpm|.0f}} rpm. <b>Twenty or more segments.</b></li>
+      <li><b>C2, on a straight, empty road, in the afternoon heat (new):</b> from a steady light cruise in a held 6th, 7th or 8th (1500–2500 rpm), press the pedal firmly and quickly, at least half way, and <b>hold 5 s</b>, always before the limit. A minute of steady cruise between steps; <b>twenty or more</b>.</li>
+      <li>If possible, repeat C2 in the cool of an early morning: a knock retard grows with heat, a drivability retard on a tip-in would not.</li>
+      <li>The decision rule is a <b>draft for Jad and Ghassan to fix before the drive</b>: whether the car's retard rises on most load steps, on few, or in between, and what each answer changes in the plant and the reward.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="fig-head">
+      <div class="row"><h3>A · A long mountain climb, for heat</h3><span class="pill none"><i>★</i>most valuable for the thermal model</span></div>
+      <p class="take">The car has never been logged under sustained load: only {{mc.duty.frac|.1f}} % of samples reach the climb's load. It is the data the oil rows of the validation table still need, and the coolant regulation law, and it adds the first sustained-load coolant data and a hot idle. It also pins the coolant constants, which the logs we have barely do: fitted with a finer integrator, the radiator's size moves a lot. It changes the plant, so the agents are retrained after it.</p>
+    </div>
+    <p class="cap"><b>Channels (9):</b> <code>Engine speed</code>, <code>Vehicle speed</code>, <code>Air mass flow</code>, <code>Lambda actual value</code>, <code>Coolant temperature</code>, <code>Oil temperature</code>, <code>Engine radiator outlet temperature (coolant)</code>, <code>Ambient temperature</code>, and new, <code>Ambient pressure</code>: the air thinning as the road climbs, which no log has recorded.</p>
     <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
       <li>The longest continuous climb within reach, such as an escarpment road up from the coast: 15–25 minutes without stopping.</li>
       <li>In the afternoon, when it is hottest.</li>
       <li>Start the log at the foot of the climb. Climb at a steady, legal speed in <b>D</b>.</li>
       <li><b>At the top, park safely and leave the engine idling for 5 minutes</b> with the log running. Do not switch it off; this tests the model's thermostat against the car's heat-management valve.</li>
+      <li>Then, on the plateau, drive D's part D2 before coming down.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="fig-head">
+      <div class="row"><h3>D · Boost and the car's own torque request, at sea level and in thin air</h3><span class="pill none"><i>+</i>new: the same trip as A</span></div>
+      <p class="take">Drive B's pulls again, held longer, repeated on the plateau, and logging the car's own torque request. Three questions: the boost the car makes at 1600–2000 rpm when held long enough to count (the model's ceiling sits {{cal.boost.low_worst|+.0f}} % from the car's highest there); the boost in thin air, which no log has recorded, though X2 trained down to {{x2.p_lo|.0f}} kPa on an inlet scaled from sea level and drive10 climbed to Taif without an ambient-pressure channel; and how fast the car's torque request rises when the pedal goes down, which is the rate a ramped demand would need if drive C says the spike must go.</p>
+    </div>
+    <p class="cap"><b>Channels (8):</b> <code>Engine speed</code>, <code>Air mass flow</code>, <code>Boost pressure</code>, <code>Ambient pressure</code>, <code>Throttle valve angle related to the lower stop</code>, <code>Coordinated target torque on the wheel</code>, <code>Coolant temperature</code>, <code>Ambient temperature</code>. Vehicle speed is left out: the gear is held in M, and a kickdown shows as a jump in engine speed.</p>
+    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li><b>D1, at sea level:</b> gearbox in <b>M</b>, drive B's rows (6th from 70 km/h, 7th from 90, 8th from 100), but <b>hold full throttle as long as the limit allows, 6–8 s if you can</b>; uphill is best, because the grade takes the load. Each row three times, a minute apart.</li>
+      <li>Then <b>five moderate tip-ins</b>, about half pedal for 3 s from steady cruise, a minute apart: how the car shapes an ordinary acceleration.</li>
+      <li><b>D2, on the plateau at the top of drive A's climb:</b> the same full-throttle rows on a straight road where it is legal and empty. If none is safe, skip it.</li>
     </ol>
   </div>
 
@@ -1234,21 +1263,8 @@ html{scroll-behavior:smooth}
   </div>
 
   <div class="fig">
-    <div class="fig-head">
-      <div class="row"><h3>C · Loaded, steady-gear driving in the heat, for knock</h3><span class="pill none"><i>★</i>most valuable for Phase D</span></div>
-      <p class="take">The trained agents run spark to just under the knock model's knee, and with that forbidden they fall to current-grade's level, so whether the car tolerates that spark decides how much of their advantage is real. The old drive read each ignition angle only every {{mc.knock_s.every_s|.0f}} s, too slowly to see a knock event. This one logs as few channels as possible so both are read every ~1.25 s, with no gearshifts in the way.</p>
-    </div>
-    <p class="cap"><b>Channels (6):</b> <code>Engine speed</code>, <code>Air mass flow</code>, <code>Actual ignition angle</code>, <code>Target ignition angle from torque intervention</code>, <code>Coolant temperature</code>, <code>Ambient temperature</code>. Speed and lambda are left out on purpose: in a held gear the gear is known, and below 3300 rpm lambda is 1.0.</p>
-    <ol class="cap" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
-      <li>A second ascent of the same climb, in the afternoon heat, gearbox in <b>M</b>.</li>
-      <li>Pick a gear that keeps the engine at <b>2000–3500 rpm</b>: low speed and high load is where an engine knocks.</li>
-      <li>Hold <b>steady, firm throttle for 20–30 s</b>, with no gear change inside a segment. Aim for ten or more segments.</li>
-    </ol>
-  </div>
-
-  <div class="fig">
     <h3>What no drive on this car can settle</h3>
-    <p class="cap"><b>The turbine temperature and the 850 °C trigger:</b> every pre-catalyst exhaust channel reads zero, so it needs a published source. <b>Enrichment at high rpm and long dwell:</b> needs seconds of full load at 5000+ rpm, which isn't legal on a road; it's a track-day job. <b>A real boost leak:</b> not something to induce on a borrowed car.</p>
+    <p class="cap"><b>The turbine temperature and the 850 °C trigger:</b> every pre-catalyst exhaust channel reads zero, so it needs a published source. <b>Enrichment at high rpm and long dwell:</b> needs seconds of full load at 5000+ rpm, which isn't legal on a road; it's a track-day job. <b>A real boost leak:</b> not something to induce on a borrowed car. <b>The locked climb itself:</b> twelve minutes of that climbing power in sea-level air, which no legal road holds; every result on it extrapolates in duration. <b>Air colder than {{drv.t_amb_min|.0f}} °C</b>, the coldest the logs hold, while X2 trained down to {{x2.t_lo|.0f}} °C: not this season; only a winter night at altitude comes near.</p>
   </div>
 </section>
 

@@ -1204,6 +1204,23 @@ def x2():
     return out
 
 
+def drives_needed():
+    """What the logs lack, for the "Drives we need" section (13 October 2026):
+    the coldest ambient the dataset holds, measured rows only (a drive with no
+    ambient channel carries build_dataset.AMB_FALLBACK_C, flagged t_amb_assumed)."""
+    import csv
+    t = []
+    with open(os.path.join(HERE, "data", "master_samples.csv"), encoding="utf-8", newline="") as fh:
+        for row in csv.DictReader(fh):
+            if row.get("t_amb_assumed", "0") not in ("0", "0.0", "False", ""):
+                continue
+            try:
+                t.append(float(row["t_amb"]))
+            except (KeyError, ValueError):
+                continue
+    return dict(t_amb_min=min(t))
+
+
 def x2_why():
     """What X2's agents did, measured after the result (13 October 2026):
     results/x2_agents.json, from `python x2_agents.py`, written up in
@@ -1454,6 +1471,7 @@ def main():
                 cal=calibration(), gen=generality(), val=validation(), tenv=trained_env(), x1=x1())
     data["gl"] = glossary(data["gen"], data["x1"])
     data["x2"] = x2()
+    data["drv"] = drives_needed()
     # the ceiling against drive B in the band the locked climb runs in
     b = data["cal"]["boost"]
     rpm = data["mc"]["duty"]["scen_rpm"]
