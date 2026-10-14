@@ -34,11 +34,14 @@ DRIFTS = [
      "**nine drives, 295.0 minutes**", "CAUGHT"),
     (3, "plant.DTHETA_DEG 0.25 -> 0.5",
      "plant.py", "DTHETA_DEG = 0.25", "DTHETA_DEG = 0.5", "CAUGHT"),
-    (4, 'CLAUDE.md load residual "1.4 % with zero fitted parameters" -> 1.7 %',
-     "CLAUDE.md", "1.4 % with zero fitted parameters",
+    # Rows 4, 5 and 14 follow their text, 14 October 2026 (the documentation
+    # restructure): the phase table to README.md, what changed on 11 September
+    # (historical, as row 5 means it) to STATE_HISTORY.md part D.
+    (4, 'CLAUDE.md load residual "1.4 % with zero fitted parameters" -> 1.7 % (now in README.md)',
+     "README.md", "1.4 % with zero fitted parameters",
      "1.7 % with zero fitted parameters", "MISSED"),
-    (5, 'CLAUDE.md "295.0 min" (current-state table) -> 299.0',
-     "CLAUDE.md", "295.0 minutes", "299.0 minutes", "MISSED"),
+    (5, 'CLAUDE.md "295.0 min" (current-state table) -> 299.0 (now in STATE_HISTORY.md)',
+     "STATE_HISTORY.md", "295.0 minutes", "299.0 minutes", "MISSED"),
     # Rows 6 and 13 re-anchored 30 September 2026, in the merge: the app pin
     # moved 890.6 -> 873.1 C and the premise 959.8 at 884 -> 920.1 at 883 C
     # with Ghassan's physics, and the old figures are now marked history, so
@@ -71,8 +74,8 @@ DRIFTS = [
     # Re-anchored again 8 October: the plant's premise is now 848.1 at 883 °C.
     (13, 'CLAUDE.md premise "848.1 at 883 °C" -> 870 (was "920.1 at 883", "959.8 at 884"; now in CHECKPOINT.md)',
      "CHECKPOINT.md", "848.1 at 883 °C", "848.1 at 870 °C", "MISSED"),
-    (14, 'CLAUDE.md "derived k = 0.831" -> 0.851',
-     "CLAUDE.md", "derived k = 0.831", "derived k = 0.851", "CAUGHT"),
+    (14, 'CLAUDE.md "derived k = 0.831" -> 0.851 (now in README.md)',
+     "README.md", "derived k = 0.831", "derived k = 0.851", "CAUGHT"),
     # Two more of the audit's own structural worries, added here because the
     # fix claims to close them and a claim without a test is a docstring.
     (15, "evaluate.EPISODES: one weight changed in the frozen set",

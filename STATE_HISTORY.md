@@ -3198,3 +3198,36 @@ with no preview, and it still BEATS the predictive one: by **0.3 points** on the
 merged plant (`check_premise.py`), all of it one second of knock at the grade
 step.
 
+
+# Part D — what changed on 8 and 11 September, from CLAUDE.md's phase table (moved 14 October 2026)
+
+**What changed since 11 September.**
+
+<!-- RETIRED-OK: 295.0, 10 -- the manifest before drive B -->
+<!-- RETIRED-OK -->
+- **The ninth drive.** `pull01` arrived and the dataset reads **ten drives,
+  295.0 minutes**. It contributes **zero samples and zero operating points** by
+  design — no coolant channel, so the warm filter excludes it. Every calibration
+  figure is unchanged. *Read the manifest/sample distinction below before
+  quoting a drive count.*
+- **`app/` was written, then hardened.** Two defects in it are now mistakes 14
+  and 15, and both are old mistakes recurring in new clothes.
+- **A release archive tried to drag the tree backwards** — mistake 16.
+
+**What changed since 8 September.** Two more mistakes are logged and the
+documents have been swept behind them.
+
+- **Mistake 12** — the load residual cannot see the model it was said to
+  validate. `eta_v`, `f_res` and the intake temperature all cancel out of it.
+  It still earns three things, listed there, but "the simulator matches the car"
+  is not one of them.
+- **Mistake 13** — `Intake air temperature before throttle valve` is a
+  compressor outlet, not a charge temperature. Correcting it moved the
+  operating-point span, both values of k, and the enrichment gate. It did not
+  move the premise result or the load residual, and the second of those is the
+  point of mistake 12.
+- **`verify_docs.py` now opens the documents.** Until 11 September it compared
+  the data against constants written inside itself and never read a document at
+  all, so it printed green while 55 stale figures were still shipping. See the
+  closing note of mistake 11.
+

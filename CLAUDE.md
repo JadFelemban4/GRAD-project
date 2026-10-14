@@ -89,96 +89,11 @@ The dated state boxes that stood here, from Ghassan's X2 box of 11–13 October
 back to Phase D's of 21–22 September, are in `STATE_HISTORY.md`, part A,
 verbatim and newest first. The current state is `CHECKPOINT.md`.
 
-### Where every phase stands — current, 30 September (after the merge); C, D and F updated 8 October
+## Where every phase stands
 
-| Phase | Status |
-|---|---|
-| A · setup | done |
-| B · match the simulator to the car | **passed** — load residual **1.4 % with zero fitted parameters** (derived k = 0.831), **1.1 % with the one fitted k** (0.839), over 26 pooled points, 30–75 kPa, from a dataset of eleven drives, 321.7 minutes. **Read mistake 12 before quoting it:** that residual is a consistency check between two ECU channels, not a test of the cycle model. **Since 28 Sep the thermal network, boost ceiling, spark offset and enrichment dwell are DERIVED from the logs** (`derive_params.py`); `validate.py` 8 of 11 (6 of 7 literature, 2 of 4 against our car). The knock model is NOT validated |
-| C · get an agent to learn | **Two sets, each on its own plant.** On sep17's plant: C1 (16 agents, 50 000 steps) and C4 (16 agents, 300 000 steps, NOT converged by C4's preregistered rule, `PREREGISTRATION_C4.md` 5b). On Ghassan's derived plant: twenty agents, ten seeds a side, 50 000 steps (55 episodes), a new road every episode, dt 1.0 (`results/agents/terrain_dt1/`). **X1, trained 8 October and scored 9 October:** 23 seeds a side, 50 000 steps, on the plant with the agreed fixes (sub-stepping, spark cap, ramps) and the extremes design (`results/PREREGISTRATION_X1.md`; `runs/extremes_dt1/`, CLOSED in `train.py` since its result). **X2, trained 11–13 October (51 hours):** 5 seeds a side, 1 080 000 steps (1200 episodes) each, X1's plant, the extremes roads in wider air (0–45 °C, 80–101.3 kPa; `wide_air.py`, `results/PREREGISTRATION_X2.md`, `runs/wideair_dt1/`). **NOT converged** by C4's rule (0 of 5 sighted, 1 of 5 blinded, 0 of 5 pairs settled) |
-| D · baselines and the ablation | **done four times, never decisively.** Phase D and D2 INCONCLUSIVE; C4 SMALLER THAN THE MEI by the sign test only (p 0.0352), the permutation test disagreeing (0.3867), not converged; Ghassan's retrain INCONCLUSIVE under the MEI rule (6 of 10, power 0.26). Supervision beats `current-grade` on the median in every set — **but with spark advance forbidden that margin disappears** (the box at the top). The MEI is 50 damage units (set 22 Sep); X1 restates it as 5.43 points of cut (decision 5) and is the fifth look, preregistered and scored by `x1_score.py`: **SMALLER THAN THE MEI** (17 of 23 pairs below it, sign p 0.0173, the permutation test agreeing), with six sighted agents and no blinded one protecting little on the scored climb (post hoc). X2 is the sixth: **INCONCLUSIVE** (1 of 5 positive, mean −4.40, sd 20.51, so 143 seeds for 80 % power against the MEI), its agents not converged at 1200 episodes |
-| E · battery plant | not started. `battery.py` does not exist |
-| F · the H/τ sweep | preliminary, hand-written policies only. **Re-run on 8 October on the sub-stepped plant:** preview over current-grade 0.0 points at every τ where the limit binds (H2), 0.0 to +0.3 with the limit kept binding (H2b), as before. `timestep_study.py` on the same plant: stepping the network 50 times finer moves a cut by 0.00 points at the sweep's 2 s step (it was the reason the sweep was not quotable). Quotable now as a hand-written result; AUDIT.md C3 still says hand-written policies cannot settle the criterion |
-| G · writing | **started** — `thesis/CHAPTER4_ABLATION_DRAFT.md`, drafted and reviewed 23 September; C4 paragraphs (4.10) added after. It must now carry Ghassan's retrain and the two merge-review findings |
-| **APP · the live supervisor** | **runs; the six audit findings against it are now FIXED.** `app/` runs this same physics beside the car and estimates turbine temperature, which the vehicle has no sensor for. Its suite reports **49 of 49**, up from 46 because each fix shipped with a regression test. The lesson still stands and is worth more than the fixes: **the suite reported 46 of 46 while all six were live.** Only M9 carries no test of its own. **Read `AUDIT.md` and `AUDIT_FIXES.md` before quoting anything it prints.** A SECOND DELIVERABLE, not a substitute for Phase D |
-
-**Where the app sits, and what it must not be allowed to become.** The app is
-the demonstrable, showable half of this project and it will be the first thing
-anyone asks to see. It is still not the claim. The claim is the H/τ criterion,
-and the claim is TESTED in Phase D. **Phase D has now run four times, and it
-has not proved the claim — preview has not separated from seed noise in any of
-the four (the box at the top).** That is the project's result so far; what it is
-not is a confirmation. The rule that got us there
-is worth keeping for E, F and G: treat time spent on `app/` past the point where
-it works as time taken from the claim. Note the verb: **tested**, not proved —
-a phase that can only confirm is not an experiment.
-
-What the app does earn, and it is worth saying plainly in the thesis: it is the
-same validated plant, running forward in real time against a live stream rather
-than in a scenario, and it inherits Phase B's validation *and* Phase B's limits
-intact. That is an honest end-to-end demonstration that the model is usable
-outside the notebook it was fitted in.
-
-**What changed since 11 September.**
-
-<!-- RETIRED-OK: 295.0, 10 -- the manifest before drive B -->
-<!-- RETIRED-OK -->
-- **The ninth drive.** `pull01` arrived and the dataset reads **ten drives,
-  295.0 minutes**. It contributes **zero samples and zero operating points** by
-  design — no coolant channel, so the warm filter excludes it. Every calibration
-  figure is unchanged. *Read the manifest/sample distinction below before
-  quoting a drive count.*
-- **`app/` was written, then hardened.** Two defects in it are now mistakes 14
-  and 15, and both are old mistakes recurring in new clothes.
-- **A release archive tried to drag the tree backwards** — mistake 16.
-
-**MANIFEST DRIVES vs SAMPLE DRIVES. Quote the right one.** These are now three
-different numbers and every one of them is correct:
-
-| what | count | what it means |
-|---|---|---|
-| drives in the manifest | **11**, 321.7 min | everything ever logged, `pull01` and drive B included |
-| drives carrying usable samples | **8** | survive the warm-sample filter |
-| drives behind the 8 September fits | **8** | the set the enrichment shape and the spark slopes were built on |
-| drives behind the thermal derivation | **7** | log coolant, oil and ambient for 5 min or more (`calibrate_thermal.usable_drives`) |
-
-`verify_docs.py` asserts the first two separately for exactly this reason. A
-sentence that says "ten drives" about a *fit* is wrong, and so is one that says
-"eight drives" about the *logs*. Say which population you mean.
-
-**What changed since 8 September.** Two more mistakes are logged and the
-documents have been swept behind them.
-
-- **Mistake 12** — the load residual cannot see the model it was said to
-  validate. `eta_v`, `f_res` and the intake temperature all cancel out of it.
-  It still earns three things, listed there, but "the simulator matches the car"
-  is not one of them.
-- **Mistake 13** — `Intake air temperature before throttle valve` is a
-  compressor outlet, not a charge temperature. Correcting it moved the
-  operating-point span, both values of k, and the enrichment gate. It did not
-  move the premise result or the load residual, and the second of those is the
-  point of mistake 12.
-- **`verify_docs.py` now opens the documents.** Until 11 September it compared
-  the data against constants written inside itself and never read a document at
-  all, so it printed green while 55 stale figures were still shipping. See the
-  closing note of mistake 11.
-
-**What "passing project" means here:** validated simulator + agent beating two
-baselines + an ablation isolating preview. That is Phase D, and it has now run
-four times (the box at the top). The verdict is SPLIT, and it must be reported
-as two claims and never as one:
-
-- the trained agents beat `current-grade` on the median in every set (Phase D:
-  **+29 to +34 points** on five of eight seeds, positive on seven of eight) —
-  **but with spark advance forbidden that margin disappears**, so this claim
-  rests on the untested knock model until drive C;
-- the ablation isolating preview has not separated from seed noise in any of
-  the four (Phase D: p = 0.3633 sign, p = 0.4922 permutation).
-
-Whether the floor is down is drive C's question. Everything after Phase D
-raises the ceiling.
-
----
+The phase table, the drive counts to quote and what a passing project means are
+in `README.md` ("Where every phase stands"). What changed on 8 and 11 September
+is `STATE_HISTORY.md` part D.
 
 ## The numbers that matter
 

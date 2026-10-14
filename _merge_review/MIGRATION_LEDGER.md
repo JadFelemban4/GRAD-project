@@ -38,6 +38,10 @@ its edit can affect, and one full run covers the finished restructure.
 | `4c91e79` | `CLAUDE.md:407-625` (the drive replays and the Taif drive; the rolling road; the towing standard) | `thesis/LIMITATIONS.md` | Moved | measured findings the thesis must state | — |
 | `4c91e79` | (new) | `CLAUDE.md`, "The numbers that matter" | Rewritten (pointer) | five lines pointing to the three destinations | — |
 | `4c91e79` | `drift_test.py` rows 6, 12, 13 | the same | Rewritten (guard) | each row follows its text: README.md, thesis/LIMITATIONS.md, and CHECKPOINT.md (the live premise) | DRIFT rows 6, 12, 13 CAUGHT |
-| this commit | `CLAUDE.md` "Known limitations to state in the thesis, not fix quietly" (426 lines, with the knock model, the live app's limits and the 14 September audit) | `thesis/LIMITATIONS.md` | Moved | thesis material | NOLOSS 0 · DOCS 73/73, 939 · COVER 0 · PIN 20 · DRIFT row 14 CAUGHT (its other anchor stays in CLAUDE.md for now) |
-| this commit | `CLAUDE.md` "Open, and honest about it" (84 lines: the discretisation of Phase D, D2 and C4; Phase F's threshold rule) | `thesis/LIMITATIONS.md` | Moved | measured limits | — |
-| this commit | (new) | `CLAUDE.md`, "Known limitations, and what is open" | Rewritten (pointer) | four lines | — |
+| `8c6a759` | `CLAUDE.md` "Known limitations to state in the thesis, not fix quietly" (426 lines, with the knock model, the live app's limits and the 14 September audit) | `thesis/LIMITATIONS.md` | Moved | thesis material | NOLOSS 0 · DOCS 73/73, 939 · COVER 0 · PIN 20 · DRIFT row 14 CAUGHT (its other anchor stays in CLAUDE.md for now) |
+| `8c6a759` | `CLAUDE.md` "Open, and honest about it" (84 lines: the discretisation of Phase D, D2 and C4; Phase F's threshold rule) | `thesis/LIMITATIONS.md` | Moved | measured limits | — |
+| `8c6a759` | (new) | `CLAUDE.md`, "Known limitations, and what is open" | Rewritten (pointer) | four lines | — |
+| this commit | `CLAUDE.md:92-121, 135-148, 166-182` ("Where every phase stands": the phase table, where the app sits, the manifest-versus-sample drive counts, what a passing project means) | `README.md`, at its end | Moved | live status | NOLOSS 6 (the drift rows below) · DOCS 73/73, 939 · COVER 0 · PIN 20 · DRIFT rows 4, 5, 14 CAUGHT |
+| this commit | `CLAUDE.md:122-134, 149-165` ("What changed since 11 September", "What changed since 8 September") | `STATE_HISTORY.md` part D | Moved | history | — |
+| this commit | (new) | `CLAUDE.md`, "Where every phase stands" | Rewritten (pointer) | four lines | — |
+| this commit | `drift_test.py` rows 4, 5, 14 | the same | Rewritten (guard) | rows 4 and 14 (live figures) to README.md; row 5 (historical by design) to STATE_HISTORY.md | DRIFT rows 4, 5, 14 CAUGHT |
