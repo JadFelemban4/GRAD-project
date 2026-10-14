@@ -1,0 +1,448 @@
+{
+ "published": {
+  "knee": 1123.0,
+  "scale": 45.0,
+  "w_oil": 0.4,
+  "oil_knee": 408.0,
+  "oil_scale": 12.0,
+  "w_knock": 40.0,
+  "knock_knee": 0.85
+ },
+ "constants": [
+  {
+   "constant": "turbine scale",
+   "published": 45.0,
+   "unit": "K",
+   "status": "CALCULATED FOR ONE MECHANISM",
+   "value": 20.32,
+   "range": [
+    19.51,
+    21.2
+   ],
+   "how": "creep rupture: T / (ln10 (C + log10 t_r)), Larson-Miller C = 20, t_r 1e3-1e5 h; oxidation would be R T^2/Q (45 K = Q 233 kJ/mol, Q for the alloy not found); TMF is per cycle",
+   "sources": [
+    "Abdallah2014",
+    "ST1505",
+    "BorgWarner"
+   ]
+  },
+  {
+   "constant": "turbine knee",
+   "published": 1123.0,
+   "unit": "K (housing node)",
+   "status": "BRACKETED",
+   "value": null,
+   "range": [
+    1051.3,
+    1180.0
+   ],
+   "how": "published gas limits carried to the housing at the climb's steady state, r = 0.1420",
+   "mapped": {
+    "900 C gas": 1051.3,
+    "930 C gas": 1077.0,
+    "1050 C gas": 1180.0
+   },
+   "published_as_gas_c": 983.6,
+   "sources": [
+    "BorgWarner",
+    "Conway2018"
+   ]
+  },
+  {
+   "constant": "oil scale",
+   "published": 12.0,
+   "unit": "K",
+   "status": "CALCULATED FROM A RULE OF THUMB",
+   "value": 14.43,
+   "how": "10 C doubling = 10/ln2; the rule is not universal",
+   "sources": [
+    "Fitch2024",
+    "Holloway2026",
+    "Tripathi2015"
+   ]
+  },
+  {
+   "constant": "oil weight and knee",
+   "published": [
+    0.4,
+    408.0
+   ],
+   "unit": "- , K",
+   "status": "VALUATION (one number)",
+   "value": 397.0,
+   "how": "w exp((T-K)/s) = exp((T-K-s ln w)/s): one reference temperature; relative cost of oil against housing life",
+   "sources": []
+  },
+  {
+   "constant": "knock knee",
+   "published": 0.85,
+   "unit": "knock integral",
+   "status": "CANNOT YET (drive C)",
+   "value": null,
+   "how": "the knock integral at which the car's ECU starts to retard",
+   "sources": []
+  },
+  {
+   "constant": "knock weight and square",
+   "published": [
+    40.0,
+    2
+   ],
+   "unit": "-",
+   "status": "VALUATION",
+   "value": null,
+   "how": "no published law for knock damage per second from a knock integral",
+   "sources": []
+  }
+ ],
+ "creep_scale_k": {
+  "1000": 21.204900138145728,
+  "10000": 20.321362632389658,
+  "100000": 19.50850812709407
+ },
+ "oil_rule_scale_k": 14.426950408889635,
+ "housing_fraction_r": 0.14202087384718387,
+ "climb_end": {
+  "gas_c": 1022.1023559570314,
+  "housing_c": 882.9975830078125
+ },
+ "rulers": {
+  "as published": {},
+  "turbine scale 20.3 K (creep rupture)": {
+   "scale": 20.321362632389658
+  },
+  "oil scale 14.4 K (10 C doubling rule)": {
+   "oil_scale": 14.426950408889635
+  },
+  "both calculated scales": {
+   "scale": 20.321362632389658,
+   "oil_scale": 14.426950408889635
+  },
+  "knee 778 C (from 900 C gas)": {
+   "knee": 1051.2747871080392
+  },
+  "knee 804 C (from 930 C gas)": {
+   "knee": 1077.0141608926237
+  },
+  "knee 907 C (from 1050 C gas)": {
+   "knee": 1179.9716560309616
+  },
+  "knee 907 C, no knock term": {
+   "knee": 1179.9716560309616,
+   "w_knock": 0.0
+  },
+  "as published, no knock term": {
+   "w_knock": 0.0
+  }
+ },
+ "summary": {
+  "as published": {
+   "base_damage": 920.1,
+   "grade_cut": 43.42,
+   "pred_minus_grade": -0.32,
+   "sighted_median": 67.87,
+   "blind_median": 65.43,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed1",
+   "weakest_cut": 49.03,
+   "ablation_mean": 1.17,
+   "ablation_lo": -4.44,
+   "ablation_hi": 6.78,
+   "ablation_positive": 6,
+   "ablation_p_wilcoxon": 0.43
+  },
+  "turbine scale 20.3 K (creep rupture)": {
+   "base_damage": 1966.0,
+   "grade_cut": 73.45,
+   "pred_minus_grade": -0.15,
+   "sighted_median": 91.35,
+   "blind_median": 90.25,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed0",
+   "weakest_cut": 78.0,
+   "ablation_mean": 1.01,
+   "ablation_lo": -2.3,
+   "ablation_hi": 4.32,
+   "ablation_positive": 5,
+   "ablation_p_wilcoxon": 0.49
+  },
+  "oil scale 14.4 K (10 C doubling rule)": {
+   "base_damage": 926.9,
+   "grade_cut": 43.1,
+   "pred_minus_grade": -0.32,
+   "sighted_median": 67.36,
+   "blind_median": 64.93,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed1",
+   "weakest_cut": 48.66,
+   "ablation_mean": 1.17,
+   "ablation_lo": -4.4,
+   "ablation_hi": 6.73,
+   "ablation_positive": 6,
+   "ablation_p_wilcoxon": 0.43
+  },
+  "both calculated scales": {
+   "base_damage": 1972.9,
+   "grade_cut": 73.19,
+   "pred_minus_grade": -0.15,
+   "sighted_median": 91.02,
+   "blind_median": 89.93,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed0",
+   "weakest_cut": 77.72,
+   "ablation_mean": 1.01,
+   "ablation_lo": -2.29,
+   "ablation_hi": 4.31,
+   "ablation_positive": 5,
+   "ablation_p_wilcoxon": 0.49
+  },
+  "knee 778 C (from 900 C gas)": {
+   "base_damage": 4258.3,
+   "grade_cut": 46.78,
+   "pred_minus_grade": -0.04,
+   "sighted_median": 67.86,
+   "blind_median": 68.72,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed0",
+   "weakest_cut": 50.65,
+   "ablation_mean": -1.06,
+   "ablation_lo": -6.72,
+   "ablation_hi": 4.6,
+   "ablation_positive": 5,
+   "ablation_p_wilcoxon": 0.92
+  },
+  "knee 804 C (from 930 C gas)": {
+   "base_damage": 2433.5,
+   "grade_cut": 46.08,
+   "pred_minus_grade": -0.1,
+   "sighted_median": 67.91,
+   "blind_median": 68.23,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed0",
+   "weakest_cut": 50.87,
+   "ablation_mean": -0.71,
+   "ablation_lo": -6.36,
+   "ablation_hi": 4.93,
+   "ablation_positive": 5,
+   "ablation_p_wilcoxon": 1.0
+  },
+  "knee 907 C (from 1050 C gas)": {
+   "base_damage": 309.0,
+   "grade_cut": 34.97,
+   "pred_minus_grade": -1.02,
+   "sighted_median": 65.24,
+   "blind_median": 58.33,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed1",
+   "weakest_cut": 43.64,
+   "ablation_mean": 6.33,
+   "ablation_lo": 0.35,
+   "ablation_hi": 12.3,
+   "ablation_positive": 8,
+   "ablation_p_wilcoxon": 0.03
+  },
+  "knee 907 C, no knock term": {
+   "base_damage": 248.5,
+   "grade_cut": 46.01,
+   "pred_minus_grade": 0.04,
+   "sighted_median": 65.31,
+   "blind_median": 66.69,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed0",
+   "weakest_cut": 48.51,
+   "ablation_mean": -1.43,
+   "ablation_lo": -6.87,
+   "ablation_hi": 4.01,
+   "ablation_positive": 4,
+   "ablation_p_wilcoxon": 0.7
+  },
+  "as published, no knock term": {
+   "base_damage": 859.5,
+   "grade_cut": 47.21,
+   "pred_minus_grade": 0.04,
+   "sighted_median": 67.04,
+   "blind_median": 68.47,
+   "beat_grade": 20,
+   "n": 20,
+   "weakest": "blind_seed0",
+   "weakest_cut": 49.84,
+   "ablation_mean": -1.5,
+   "ablation_lo": -7.1,
+   "ablation_hi": 4.1,
+   "ablation_positive": 4,
+   "ablation_p_wilcoxon": 0.7
+  }
+ },
+ "shares": {
+  "as published": {
+   "baseline ECU": {
+    "turbine": 92.49,
+    "oil": 0.928,
+    "knock": 6.58
+   },
+   "current-grade": {
+    "turbine": 85.5,
+    "oil": 1.663,
+    "knock": 12.84
+   },
+   "trained agents": {
+    "turbine": 88.77,
+    "oil": 2.409,
+    "knock": 8.83
+   }
+  },
+  "turbine scale 20.3 K (creep rupture)": {
+   "baseline ECU": {
+    "turbine": 96.49,
+    "oil": 0.434,
+    "knock": 3.08
+   },
+   "current-grade": {
+    "turbine": 85.54,
+    "oil": 1.659,
+    "knock": 12.8
+   },
+   "trained agents": {
+    "turbine": 90.63,
+    "oil": 2.009,
+    "knock": 7.36
+   }
+  },
+  "oil scale 14.4 K (10 C doubling rule)": {
+   "baseline ECU": {
+    "turbine": 91.8,
+    "oil": 1.662,
+    "knock": 6.53
+   },
+   "current-grade": {
+    "turbine": 84.38,
+    "oil": 2.953,
+    "knock": 12.67
+   },
+   "trained agents": {
+    "turbine": 87.1,
+    "oil": 4.241,
+    "knock": 8.66
+   }
+  },
+  "both calculated scales": {
+   "baseline ECU": {
+    "turbine": 96.15,
+    "oil": 0.781,
+    "knock": 3.07
+   },
+   "current-grade": {
+    "turbine": 84.42,
+    "oil": 2.945,
+    "knock": 12.64
+   },
+   "trained agents": {
+    "turbine": 89.21,
+    "oil": 3.548,
+    "knock": 7.24
+   }
+  },
+  "knee 778 C (from 900 C gas)": {
+   "baseline ECU": {
+    "turbine": 98.38,
+    "oil": 0.201,
+    "knock": 1.42
+   },
+   "current-grade": {
+    "turbine": 96.67,
+    "oil": 0.382,
+    "knock": 2.95
+   },
+   "trained agents": {
+    "turbine": 97.49,
+    "oil": 0.538,
+    "knock": 1.97
+   }
+  },
+  "knee 804 C (from 930 C gas)": {
+   "baseline ECU": {
+    "turbine": 97.16,
+    "oil": 0.351,
+    "knock": 2.49
+   },
+   "current-grade": {
+    "turbine": 94.25,
+    "oil": 0.66,
+    "knock": 5.09
+   },
+   "trained agents": {
+    "turbine": 95.64,
+    "oil": 0.934,
+    "knock": 3.42
+   }
+  },
+  "knee 907 C (from 1050 C gas)": {
+   "baseline ECU": {
+    "turbine": 77.64,
+    "oil": 2.764,
+    "knock": 19.6
+   },
+   "current-grade": {
+    "turbine": 62.44,
+    "oil": 4.308,
+    "knock": 33.26
+   },
+   "trained agents": {
+    "turbine": 69.02,
+    "oil": 6.644,
+    "knock": 24.34
+   }
+  },
+  "knee 907 C, no knock term": {
+   "baseline ECU": {
+    "turbine": 96.56,
+    "oil": 3.437,
+    "knock": 0.0
+   },
+   "current-grade": {
+    "turbine": 93.55,
+    "oil": 6.454,
+    "knock": 0.0
+   },
+   "trained agents": {
+    "turbine": 91.22,
+    "oil": 8.781,
+    "knock": 0.0
+   }
+  },
+  "as published, no knock term": {
+   "baseline ECU": {
+    "turbine": 99.01,
+    "oil": 0.994,
+    "knock": 0.0
+   },
+   "current-grade": {
+    "turbine": 98.09,
+    "oil": 1.908,
+    "knock": 0.0
+   },
+   "trained agents": {
+    "turbine": 97.36,
+    "oil": 2.642,
+    "knock": 0.0
+   }
+  }
+ },
+ "sources": {
+  "ST1505": "BMW Group University, Technical training, B58 Engine, ST1505 (April 2015), section 5.2.1: 'The exhaust manifold of the 3rd and 4th cylinder and the turbocharger housing form one single cast steel part'. Unofficial copy, archive.org item BMWTechnicalTrainingDocuments (REFERENCES.md, grey source).",
+  "BorgWarner": "Simon, V., Oberholz, G., Mayer, M., BorgWarner Turbo Systems technical paper on turbochargers for 1050 C exhaust gas temperature (BWTS library 105/327, undated, cites work of 2000), pp. 3-5: 950 C at the inlet heats the inner wall near the flange to the gas temperature, with a gradient of about 100 C inside the housing; Ni-resist D5S 'maximum application temperature of 850 C, in special cases of up to 900 C'; 'the service life of the turbine housing is calculated based on load spectra. A deciding parameter in this regard is the percentage of time at full capacity at exhaust temperatures over 900 C ... assume this is the case 5% of the time'; heat-resistant austenitic cast steel for 1050 C.",
+  "Conway2018": "Conway, G. et al., SAE 2018-01-1423, p. 10 (REFERENCES.md): 900 C exhaust port, 930 C pre-turbine.",
+  "Abdallah2014": "Abdallah, Z. et al., 'A critical analysis of the conventionally employed creep lifing methods', Materials 7 (2014), PMC5453208: P_LM = T (C_LM + log t_f); 'Larson and Miller ... suggesting that the value of C_LM to be taken as 20 for metallic materials', and that C varies between alloys.",
+  "Fitch2024": "Fitch, B., 'How heat affects lubricants: understanding the Arrhenius rate rule', Machinery Lubrication (2024): 'For every 10 C (18 F) increase in temperature, the rate of lubricant oxidation doubles'.",
+  "Holloway2026": "Holloway, M. D., 'What the 10-degree rule gets wrong about lubricant life', Plant Services (28 Sep 2026): no universal law; doubling between 60 and 70 C alone needs about 66 kJ/mol, and the multiplier changes with temperature.",
+  "Tripathi2015": "Tripathi, A. K., Vinu, R., Lubricants 3 (2015) 54-79: 89-106 kJ/mol are activation energies of DECOMPOSITION under nitrogen (TGA), a stability marker -- not the oxidation rate in a sump. Opened and NOT used."
+ }
+}

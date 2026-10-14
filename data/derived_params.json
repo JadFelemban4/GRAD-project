@@ -1,6 +1,6 @@
 {
  "_about": "Every constant computed from the car's logs. Regenerate with python derive_params.py; never edit by hand. See derived.py.",
- "_generated": "2026-09-28 17:56",
+ "_generated": "2026-10-08 12:37",
  "_inputs": {
   "data_sha1": "c4fdd4babfb3752a",
   "raw_logs": [

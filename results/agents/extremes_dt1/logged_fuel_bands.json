@@ -1,0 +1,33 @@
+{
+ "records": 552,
+ "bands": [
+  {
+   "lo": 0,
+   "hi": 500,
+   "steps_pct": 84.0,
+   "extra_pct_of_base": 3.21,
+   "share_of_extra_pct": 67.0
+  },
+  {
+   "lo": 500,
+   "hi": 650,
+   "steps_pct": 14.8,
+   "extra_pct_of_base": 4.93,
+   "share_of_extra_pct": 28.4
+  },
+  {
+   "lo": 650,
+   "hi": 750,
+   "steps_pct": 1.2,
+   "extra_pct_of_base": 6.1,
+   "share_of_extra_pct": 4.4
+  },
+  {
+   "lo": 750,
+   "hi": 2000,
+   "steps_pct": 0.1,
+   "extra_pct_of_base": 4.16,
+   "share_of_extra_pct": 0.2
+  }
+ ]
+}

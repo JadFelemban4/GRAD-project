@@ -119,13 +119,23 @@ LOG_FULL = os.path.join(ROOT, "logs", "raw", "7475b5d7-20260908_142743.csv")
 #       node's gas-side conductance is lower and it lags the exhaust more.
 #       Reverting that alone gives 890.7 C and 15 warnings. The enrichment,
 #       spark and thermal-network changes move it by 0.3 K or less.
+#
+# MOVED 8 OCTOBER by the thermal network's sub-stepping (thermal.DT_SUB_MAX =
+# 0.1 s, the first step agreed on 30 September): the estimator steps the network
+# by each sample's interval, and an interval longer than 0.1 s is now integrated
+# in sub-steps instead of one explicit Euler step. Attributed by switching it off
+# on the full replay: the pins come back exactly (604.8 C and 873.1 C).
+#
+#   pull01    peak 604.8 -> 604.2 C      7475b5d7  peak 873.1 -> 872.7 C
+#
+# No alert count moves; the warm-start band settles 0.5 s and 0.2 s later.
 EXPECT_FAST = {           # pull01, 7 channels, 1.45 s per channel
     "rows": 2193, "estimated": 2186,
-    "peak_turb_c": 604.8, "thermal": 0, "mismatch": 0, "novel": 4,
+    "peak_turb_c": 604.2, "thermal": 0, "mismatch": 0, "novel": 4,
 }
 EXPECT_FULL = {           # 7475b5d7, 26 channels, 7.5 s per channel
     "rows": 14340, "estimated": 14278,
-    "peak_turb_c": 873.1, "thermal": 14, "mismatch": 0, "novel": 19,
+    "peak_turb_c": 872.7, "thermal": 14, "mismatch": 0, "novel": 19,
 }
 
 checks: list[tuple[str, bool, str]] = []

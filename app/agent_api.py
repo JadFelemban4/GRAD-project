@@ -433,8 +433,15 @@ def episode_meta(pair, ep, road, verdict):
         "duration_s": agent_trace.DURATION,
         "steps": agent_trace.STEPS,
         "train_dt": {a["arm"]: a["train_dt"] for a in agents},
+        # None for every agent trained before train.py recorded its road design.
+        "train_road": {a["arm"]: a.get("train_road") for a in agents},
+        # 'certificate' is 'training' (meta.json, written before the first
+        # step) or 'reconstructed' (agent_catalog.reconstructed_meta), and
+        # 'reconstructed' then says when, on which device and against what.
         "agents": [{"tag": a["tag"], "arm": a["arm"], "budget_line": a["budget_line"],
-                    "zip_sha": a["zip_sha"], "scored": a["scored"]} for a in agents],
+                    "zip_sha": a["zip_sha"], "scored": a["scored"],
+                    "certificate": a.get("certificate"),
+                    "reconstructed": a.get("reconstructed")} for a in agents],
         "result_file": pair["result_file"],
         "preview_s": consts["preview_s"],
         "act": consts["act"],

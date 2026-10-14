@@ -77,11 +77,14 @@ or `logs/raw/`.
 > used to make as evidence is an identity that could not have failed.
 >
 > **The constraint now binds.** On the locked scenario — 12 % at 130 km/h,
-> 42 °C — `check_premise.py` prints a baseline of **920.1** damage units peaking
-> <!-- RETIRED-OK: 959.8, 884 -- the sep17 plant's figure, named beside the merged one -->
-> at **883 °C** on the merged plant (959.8 at 884 °C on sep17's, before 30 September) against the 850 °C trigger. Against the honest comparator, the
-> policy that acts on the grade the car is on now, hand-written preview
-> **loses by 0.4 points**. And the project's result is not from this script at
+> 42 °C — `check_premise.py` prints a baseline of **848.1** damage units peaking
+> <!-- RETIRED-OK: 959.8, 884, 920.1, 0.3 -- the sep17 and merged plants' figures, named beside the 8 October one -->
+> at **883 °C** on the plant of 8 October (920.1 on the merged plant until then,
+> 959.8 at 884 °C on sep17's before 30 September) against the 850 °C trigger.
+> Against the honest comparator, the policy that acts on the grade the car is on
+> now, hand-written preview **gains nothing** (−0.0 points; it lost 0.3 on the
+> merged plant, all of it one second of knock at the grade step the 8 s ramp
+> removed). And the project's result is not from this script at
 > all: it is Phase D (`python analyse_phase_d.py`), a **null** — with agents
 > trained to the C1 budget, preview does not separate from seed noise
 > (p = 0.3633 sign, p = 0.4922 permutation) — and its blinded arm was not

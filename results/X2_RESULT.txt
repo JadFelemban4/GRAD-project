@@ -1,0 +1,39 @@
+X2 ANALYSIS -- wideair_dt1
+rule: results/PREREGISTRATION_X2.md section 5; MEI 5.43 points of cut; alpha 0.05, one-sided
+
+TOTAL DAMAGE (primary)
+  seed   sighted cut   blinded cut   difference
+     0         71.67         72.01        -0.34
+     1         39.26         70.56       -31.31
+     2         35.36         47.64       -12.28
+     3         71.27         46.01       +25.25
+     4         48.44         51.78        -3.34
+  n 5 (non-zero)   positive 1   mean -4.40   sd 20.51 points
+  preview helps:        sign p 0.9688   permutation p 0.7500
+  smaller than the MEI: sign p 0.1875 (4 of 5 below 5.43)   permutation p 0.1875
+  preview costs damage: sign p 0.1875 (4 of 5 negative)
+  CELL: INCONCLUSIVE
+
+THERMAL-ONLY DAMAGE (no knock term; the second reading)
+  seed   sighted cut   blinded cut   difference
+     0         71.59         71.96        -0.37
+     1         39.12         70.48       -31.36
+     2         35.35         47.56       -12.21
+     3         71.21         45.86       +25.36
+     4         48.29         51.73        -3.44
+  n 5 (non-zero)   positive 1   mean -4.40   sd 20.56 points
+  preview helps:        sign p 0.9688   permutation p 0.7500
+  smaller than the MEI: sign p 0.1875 (4 of 5 below 5.43)   permutation p 0.1875
+  preview costs damage: sign p 0.1875 (4 of 5 negative)
+  CELL: INCONCLUSIVE
+
+SUPERVISION, A DIFFERENT CLAIM (never evidence for preview)
+  current-grade cuts 46.98 %; 7 of 10 agents beat it on the median
+  sighted  margin over current-grade, median +1.45 points (range -11.62 to +24.69)
+  blind    margin over current-grade, median +4.80 points (range -0.97 to +25.03)
+  agents doing MORE damage than the baseline ECU on at least one frozen episode: 4 of 10: sighted_seed2 (1), sighted_seed4 (1), blind_seed1 (5), blind_seed3 (4)
+YARDSTICK (decision 13): current-grade under 95 % of the requested torque on 1 of 719 demand steps of the scored climb (PREREGISTRATION_X2.md 3b: 1 of 719 before training)
+
+FIVE PAIRS (PREREGISTRATION_X2.md 5a-5b): the smallest one-sided sign p on 5 pairs is 0.0312; a cell other than INCONCLUSIVE needs all 5 pairs on one side.
+  power against the MEI (5.43 points) at this experiment's own spread (sd 20.51): 0.081
+  the seeds this spread would need for 80 % power against the MEI: 143

@@ -1,49 +1,93 @@
 ==============================================================================
 FULL VERIFICATION RUN
 ==============================================================================
-date          2026-09-21
-commit        8bb7342dd97f543e11136e97e7b56752f2c441b8
+date          2026-10-09
+commit        75ca65f2153ee4d34fee9fddc73cc8aaf5825c66
 working tree  DIRTY -- see below
               M .gitignore
-               M app/estimator.py
-               M app/server.py
-               M app/static/index.html
-              ?? app/package-lock.json
-              ?? app/package.json
-              ?? app/replay.py
-              ?? app/static/sim/
-              ?? app/static/simulation.html
-              ?? app/test_simulation.py
-              ?? app/vendor.mjs
-              ?? docs/
-              ?? full_run.py
-python        3.12.10
+               M CLAUDE.md
+               M README.md
+               M SESSION_REPORT_2026-10-08_records.md
+               M analyse_x1.py
+               M conditions_test.py
+               M damage_constants.py
+               M damage_robustness.py
+               M full_run.py
+               M handoff.md
+               M logged_check.py
+               M make_page.py
+               M record_agents.py
+               M record_extracts.py
+               M results/PREREGISTRATION_X1.md
+               M results/README.md
+               M results/VALIDATION_PLAN.md
+               M results/figures/timestep_study.png
+               M results/generality.json
+               M results/page/index.html
+               M results/page/template.html
+               M results/timestep_study.json
+               M timestep_study.py
+               M train.py
+               M train_all.py
+              ?? premise_split.py
+              ?? results/X1_RESULT.json
+              ?? results/X1_RESULT.txt
+              ?? results/agents/extremes_dt1/
+              ?? results/conditions_extremes_dt1/conditions_test.json
+              ?? results/conditions_extremes_dt1/harness_check.json
+              ?? results/damage_constants_extremes_dt1.json
+              ?? results/figures/conditions_test_extremes_dt1.png
+              ?? results/figures/damage_constants_extremes_dt1.png
+              ?? results/logged_check_extremes_dt1.json
+              ?? results/phase_d_extremes_dt1.txt
+              ?? results/phase_d_extremes_dt1_raw.json
+              ?? results/premise_split.json
+              ?? results/timestep_study_before_substep.json
+              ?? results/x1_score/
+              ?? x1_score.py
+python        3.13.2
 
 Every block records its EXIT CODE. A block with a non-zero code is not a
 source of figures, whatever it printed before it stopped.
 
 
 ==============================================================================
-[1/10]  build_dataset.py — regenerates data/ from logs/raw/
+[1/19]  build_dataset.py — regenerates data/ from logs/raw/
          $ python build_dataset.py logs/raw/*.csv
          read for: minutes, drives, operating points, the span, pinned samples
 ==============================================================================
-EXIT CODE 0   (3 s)
+EXIT CODE 0   (56 s)
 
+thermal: fitting the block and oil nodes to every qualifying drive ...
+   7 drives; oil tau at rest 57.4 s; stat opens 92.1 C; radiator x1.42
+boost ceiling: the envelope, binned and fitted ...
+   envelope over 11 bins, cap PR 2.515, monotone-envelope RMS 0.013  (the old formula's A 15.270 B 6.290 would leave RMS 0.128)
+   drive B's inlet at 19 C: A 15.6926  B 6.5067
+   drive B's inlet at 45 C: A 15.2698  B 6.2904
+enrichment: dwell thresholds on the timestamp axis ...
+   ENR_DWELL_LO 1.50 s  ENR_DWELL_HI 3.00 s  RMSE 0.0568 (8 Sep 2/9 s: 0.0695) over 100 genuine readings
+spark offset: solved for zero mean bias ...
+   SPARK_A 13.422  bias +0.000 deg  RMS 2.50 deg  line sets spark at 25 of 26 points
+deliverable torque: measured through the plant (fresh process) ...
+   249 Nm at 1600 rpm, 316 at 2000, 413 at 2600, 481 at 4400
+
+wrote data\derived_params.json  (0.9 min)
   3aca2ec1: rejected 0 window(s) for wall-clock span, 0 for a logger gap; 10 kept but FLAGGED for unsteady load (AUDIT.md M3)
   670063b2: rejected 46 window(s) for wall-clock span, 0 for a logger gap; 3 kept but FLAGGED for unsteady load (AUDIT.md M3)
   683640a0: rejected 0 window(s) for wall-clock span, 0 for a logger gap; 8 kept but FLAGGED for unsteady load (AUDIT.md M3)
   7475b5d7: rejected 0 window(s) for wall-clock span, 0 for a logger gap; 22 kept but FLAGGED for unsteady load (AUDIT.md M3)
   cb67b01f: rejected 41 window(s) for wall-clock span, 0 for a logger gap; 5 kept but FLAGGED for unsteady load (AUDIT.md M3)
   drive10-: rejected 46 window(s) for wall-clock span, 0 for a logger gap; 7 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  driveB_r: rejected 53 window(s) for wall-clock span, 0 for a logger gap; 0 kept but FLAGGED for unsteady load (AUDIT.md M3)
   fb988991: rejected 22 window(s) for wall-clock span, 116 for a logger gap; 57 kept but FLAGGED for unsteady load (AUDIT.md M3)
+  dropped 7 window(s) from drives that did not log spark and lambda -- the combustion model needs both
   dropped 2 window(s) with fuel cut (negative spark, or lambda outside 0.70-1.10)
 
-MASTER DATASET  (2026-09-21 16:19)
+MASTER DATASET  (2026-10-09 14:51)
 
-  manifest.csv               10 rows
+  manifest.csv               11 rows
   master_points.csv          26 rows
-  master_samples.csv      82984 rows
+  master_samples.csv      93576 rows
 
 drive                                           min     Hz   ch   pts  maxMAP  minlam
 ------------------------------------------------------------------------------------
@@ -54,17 +98,20 @@ drive                                           min     Hz   ch   pts  maxMAP  m
 7475b5d7-20260908_142743.csv                   55.1   4.34   25    30   273.0    0.78
 cb67b01f-20260908_084142.csv                   21.6   4.56   21     5   315.0    0.82
 drive10-20260918_233912.csv                   119.5   5.06   10     7   235.0    0.79
-f51686d7-20260906_154426.csv                    0.8   4.59   25     0            0.98
-fb988991-20260906_143515.csv                   16.3   3.52   24     0   103.0     0.9
-pull01-20260913_093527.csv                      7.5   4.90    7     0   233.0        
+driveB_rollons-20260928_140513.csv             26.7   6.62    7     7   253.0        
+f51686d7-20260906_154426.csv                    0.8   4.59   26     0            0.98
+fb988991-20260906_143515.csv                   16.3   3.52   25     0   103.0     0.9
+pull01-20260913_093527.csv                      7.5   4.90    7     0   245.0        
 ------------------------------------------------------------------------------------
-TOTAL                                         295.0 min across 10 drives, 26 distinct operating points
+TOTAL                                         321.7 min across 11 drives, 26 distinct operating points
 
 operating points span 30 - 75 kPa manifold pressure
 compressor flow bins still EMPTY (kg/s): 0.33-0.36
 
+re-deriving every constant the data sets (derive_params.py) ...
+
 ==============================================================================
-[2/10]  compare_log.py — model against the car at the steady points
+[2/19]  compare_log.py — model against the car at the steady points
          $ python compare_log.py data/master_points.csv
          read for: both load residuals and both values of k
 ==============================================================================
@@ -147,49 +194,53 @@ NOT VALIDATED BY THIS SCRIPT
   drive. Validate it against published correlations and say so.
 
 ==============================================================================
-[3/10]  validate.py — eleven quantities against published bands
+[3/19]  validate.py — eleven quantities against published bands
          $ python validate.py
          read for: N of 11 inside, and which three miss
 ==============================================================================
-EXIT CODE 0   (7 s)
+EXIT CODE 0   (15 s)
 
-====================================================================================================
-PLANT VALIDATION TABLE — regenerated from code
-====================================================================================================
-quantity                                                    model      published   status
-----------------------------------------------------------------------------------------------------
-Displacement                                               2997.5      2990-3000   inside
-MFB50 at MBT (2500 rpm, 60 kPa)                               8.5           8-10   inside
-Best BSFC (knock-feasible, lambda 1)                        239.9        235-260   inside
-Knock-limited spark (3000 rpm, 200 kPa)                      11.0           8-14   inside
-EGT, cruise band (min)                                      724.1        600-750   inside
-EGT, cruise band (max)                                      787.7        600-750   OUTSIDE
-Turbine housing time constant                                48.0         40-120   inside
-Oil temperature, sustained climb                            110.2        115-140   OUTSIDE
-Oil time constant                                            16.0         20-400   OUTSIDE
-Coolant, thermostat-regulated                                94.5         88-108   inside
-Coolant regulation response (NOT a free time constant)        9.5          1-600   inside
-----------------------------------------------------------------------------------------------------
-8 of 11 quantities inside the published band
+=========================================================================================================
+PLANT VALIDATION TABLE -- regenerated from code
+=========================================================================================================
+quantity                                           model           band   status    basis
+---------------------------------------------------------------------------------------------------------
+Displacement                                      2997.5      2990-3000   inside    literature
+MFB50 at MBT (2500 rpm, 60 kPa)                      8.5           8-10   inside    literature
+Best BSFC (knock-feasible, lambda 1)               239.9        235-260   inside    literature
+Knock-limited spark (3000 rpm, 200 kPa)             11.0           8-14   inside    literature
+EGT, cruise band (min)                             724.1        600-750   inside    literature
+EGT, cruise band (max)                             787.7        600-750   OUTSIDE   literature
+Turbine housing time constant                       48.0         40-120   inside    literature
+Oil, sustained load (drive10, hottest 10 min)       97.1        103-111   OUTSIDE   our car
+Oil apparent time constant (identified)             60.0         70-100   OUTSIDE   our car
+Coolant, regulated (synthetic climb)                93.0      83.6-95.5   inside    our car
+Coolant, whole drive (drive10, free-running)        92.2        91.8-94   inside    our car
+---------------------------------------------------------------------------------------------------------
+8 of 11 quantities inside their band
+  against literature: 6 of 7    against our own car: 2 of 4
 
 Conditions behind the headline numbers
   MBT spark at 2500 rpm / 60 kPa   : 32 deg BTDC
   Best BSFC found at               : 4000 rpm, 140 kPa, 24 deg BTDC
   turb   step   229.8 ->   791.2 C   tau =   48.0 s
-  oil    step    85.2 ->   110.2 C   tau =   16.0 s
-  block  step    90.0 ->    94.5 C   tau =    9.5 s
+  oil    step    84.9 ->    95.3 C   tau =   56.2 s
+  block  step    90.2 ->    93.0 C   tau =    1.2 s
 
 Known limitation, state it in Chapter 3
-  MAP is an INPUT to this model. There is no compressor flow ceiling,
-  so peak power is not a model prediction — it is whatever boost is
-  commanded. Full-load points are therefore not validated here.
+  MAP is an INPUT to the cycle model. The environment bounds it with
+  plant.boost_ceiling_kpa, the ceiling the car was OBSERVED to reach --
+  an operating limit fitted to the logs, not a compressor map -- so peak
+  power is not a model prediction. Full-load points are not validated here.
+  Rows 8-11 are scored against our own car (car_thermal.py); rows 1-7
+  against literature, graded in REFERENCES.md section 3.
 
 ==============================================================================
-[4/10]  check_map.py — MBT and knock-limited spark surfaces
+[4/19]  check_map.py — MBT and knock-limited spark surfaces
          $ python check_map.py
          read for: monotonicity in both directions; unreachable cells marked --
 ==============================================================================
-EXIT CODE 0   (20 s)
+EXIT CODE 0   (27 s)
 
 Final spark map = min(MBT, knock limit).  lambda scheduled by load
 -- a placeholder for drawing the surface, NOT an enrichment model.
@@ -199,10 +250,10 @@ See lam_for() and CLAUDE.md mistake 4.
 
   MAP kPa |     40     60     80    100    140    180    220
   -----------------------------------------------------------
-   1200   |     27     22     15     10      3     --     --
+   1200   |     27     22     15     10     --     --     --
    1600   |     30     28     20     15      7     --     --
    2000   |     32     30     24     18     11      5     --
-   2500   |     34     32     28     22     14      9     --
+   2500   |     34     32     28     22     14      9      6
    3000   |     36     34     32     26     17     12      9
    4000   |     40     38     36     33     23     18     15
    5000   |     43     41     39     39     30     24     21
@@ -212,88 +263,99 @@ See lam_for() and CLAUDE.md mistake 4.
 
 Spot checks at the final map:
    2000 rpm   60 kPa  spark   30 (MBT-limited)  T  120.1 Nm  BSFC  276.6  EGT  678 C  Pmax  33.7 bar  MFB50   9.0
-   2500 rpm  100 kPa  spark   22 (knock-limited)  T  246.3 Nm  BSFC  241.9  EGT  797 C  Pmax  48.9 bar  MFB50  16.0
-   3000 rpm  180 kPa  spark   12 (knock-limited)  T  443.3 Nm  BSFC  276.5  EGT  896 C  Pmax  70.9 bar  MFB50  23.5
-   5000 rpm  220 kPa  spark   21 (knock-limited)  T  529.0 Nm  BSFC  304.2  EGT  890 C  Pmax  93.1 bar  MFB50  19.8
+   2500 rpm  100 kPa  spark   22 (knock-limited)  T  245.6 Nm  BSFC  242.6  EGT  803 C  Pmax  48.9 bar  MFB50  16.0
+   3000 rpm  180 kPa  spark   12 (knock-limited)  T  442.0 Nm  BSFC  277.3  EGT  902 C  Pmax  70.9 bar  MFB50  23.5
+   5000 rpm  220 kPa  spark   21 (knock-limited)  T  527.4 Nm  BSFC  305.1  EGT  897 C  Pmax  93.1 bar  MFB50  19.8
 
 ==============================================================================
-[5/10]  fit_envelope.py — the compressor envelope
+[5/19]  fit_envelope.py — the compressor envelope
          $ python fit_envelope.py
          read for: the top bins and how many INDEPENDENT readings each rests on
 ==============================================================================
-EXIT CODE 0   (0 s)
+EXIT CODE 0   (1 s)
 
-Compressor envelope, 95th percentile pressure ratio per 0.03 kg/s bin
-stable & not MAF-pinned, bins with >= 15 rows
+Compressor envelope: p95 pressure ratio per 0.03 kg/s corrected-flow bin
+stable, not MAF-pinned, bins with >= 15 rows
 
- flow kg/s   PR p95    rows  readings
--------------------------------------
-     0.015    1.159   24060      1120
-     0.045    1.312   14759       809
-     0.075    1.582    1040        68
-     0.105    1.933     166        15
-     0.135    2.283     249        22
-     0.165    2.353     142        15
-     0.195    2.440     124        13
-     0.225    2.415      36         5
-     0.255    2.342      40         5
-     0.285    2.515      53         4
-     0.315    2.473      47         5
--------------------------------------
+ flow kg/s   PR p95  ceiling    rows  readings
+----------------------------------------------
+     0.015    1.154    1.154   29870      1583
+     0.045    1.311    1.311   16538      1033
+     0.075    1.599    1.599    1175        99
+     0.105    2.095    2.095     234        31
+     0.135    2.283    2.283     405        56
+     0.165    2.353    2.353     271        45
+     0.195    2.440    2.440     221        37
+     0.225    2.453    2.453     133        28
+     0.255    2.447    2.453      79        14
+     0.285    2.515    2.515      70         8
+     0.315    2.473    2.515      47         5
+----------------------------------------------
+cap (highest stable pressure ratio in the logs): 2.515
+the ceiling interpolates the 'ceiling' column; RMS against the bins 0.013
+for comparison, PR = 1 + A m/(1 + B m) at A 15.270, B 6.290 would leave RMS 0.128
 
-PR = 1 + A * flow**B     A = 4.6641   B = 0.7963   RMS = 0.2077
-highest bin: 0.315 kg/s at PR 2.473
-highest stable corrected flow anywhere: 0.314 kg/s
-
-Quote the bin table with its READINGS column, not just its rows (AUDIT.md H4),
-and quote the highest-flow figure with the filter that produced it -- "0.303"
-and "0.314" in the documents are the same quantity under two different filters.
+rows from a drive with no ambient channel use build_dataset.AMB_FALLBACK_C for
+corrected flow; derive_params.py records the ceiling re-derived at the coolest
+and hottest ambient ever logged (boost_ceiling.sensitivity_to_assumed_ambient).
 
 ==============================================================================
-[6/10]  test_reward.py — the reward gate
+[6/19]  test_reward.py — the reward gate
          $ python test_reward.py
          read for: neutral near zero, the starver punished
 ==============================================================================
-EXIT CODE 0   (271 s)
+EXIT CODE 0   (513 s)
 
 episode length : 300 s   (grade starts at 180 s)
 neutral action : [0.333 0.429 0.455 1.    1.   ]
 
 check                                           result   detail
 ------------------------------------------------------------------------------------------------
-neutral action scores about zero                  PASS   mean reward -0.00038   (want |r| < 0.05)
-refusing torque is punished                       PASS   starver -0.90349  vs  neutral -0.00038
+neutral action scores about zero                  PASS   mean reward -0.00027   (want |r| < 0.05)
+refusing torque is punished                       PASS   starver -0.19646  vs  neutral -0.00027   (66 % of it from the 0-20 s launch)
 disabling preview changes the observation         PASS   max |delta obs| = 1.44
 rewards are finite                                PASS   1499, 1499, 1499 steps
+gearbox table still matches the plant             PASS   worst drift 0.01 % at 5 speeds   (want < 1.5 %)
+baseline delivers torque on a 9.3 % grade         PASS   p95 tracking error 0.002, neutral -0.00087
+neutral scores about zero on every training road    PASS   worst double -0.00063   single 0.005  rolling 0.006  double 0.005  flat 0.000  (p95 err)
+refusing torque is punished on a training road    PASS   starver -2.32707  vs  neutral -0.00046   (rolling hills)
+neutral scores about zero on every extremes road    PASS   worst double seed 12 -0.00355, 10 roads; worst p95 err 0.016
+refusing torque is punished on an extremes road    PASS   starver -0.76126  vs  neutral -0.00113   (rolling hills, seed 11)
 ------------------------------------------------------------------------------------------------
 
-FOR INFORMATION, NOT A PASS/FAIL: random policy scores -0.04744
+FOR INFORMATION, NOT A PASS/FAIL: the fixed-road starver's mean tracking error after 180 s is 0.016 (TRACK_TOL 0.05)
+  The starver does NOT starve on the climb: boost trim at -40 kPa leaves the
+  climb inside the boost ceiling, so "refusing torque is punished" passed on
+  the launch. "refusing torque is punished on a training road" is the check
+  that holds a sustained shortfall; do not drop it.
+
+FOR INFORMATION, NOT A PASS/FAIL: random policy scores -0.00071
 
 All checks pass. The reward is safe to train against.
 
 ==============================================================================
-[7/10]  check_premise.py — the premise table, five policies
+[7/19]  check_premise.py — the premise table, five policies
          $ python check_premise.py
          read for: THE BASELINE ROW AND WHETHER THE CONSTRAINT BINDS. This is the block CLAUDE.md, README.md and handoff.md currently contradict
 ==============================================================================
-EXIT CODE 0   (153 s)
+EXIT CODE 0   (227 s)
 
 protection trigger: 1123 K (850 C) = the knee of the turbine damage term
 
 policy                             fuel g    damage  peak turb C  peak oil C
 ----------------------------------------------------------------------------
-baseline ECU (true neutral)          4664     959.8          884         110
-reactive protection                  4843     679.0          862         111
-current-grade protection             4936     633.2          861         112
-predictive protection                4941     637.4          861         112
-predictive, preview disabled         4843     679.0          862         111
+baseline ECU (true neutral)          4544     848.1          883          94
+reactive protection                  4683     559.7          860          94
+current-grade protection             4810     449.6          853          94
+predictive protection                4815     449.7          853          94
+predictive, preview disabled         4683     559.7          860          94
 ----------------------------------------------------------------------------
-  reactive protection            cuts damage  29.3 %
-  current-grade protection       cuts damage  34.0 %
-  predictive protection          cuts damage  33.6 %
+  reactive protection            cuts damage  34.0 %
+  current-grade protection       cuts damage  47.0 %
+  predictive protection          cuts damage  47.0 %
 
-  preview over reactive       +4.3 points
-  preview over current grade  -0.4 points   <- THE HONEST ONE
+  preview over reactive      +13.0 points
+  preview over current grade  -0.0 points   <- THE HONEST ONE
 
 READ THIS BEFORE QUOTING ANY OF IT.  (AUDIT.md C1 and C3)
 
@@ -317,11 +379,81 @@ READ THIS BEFORE QUOTING ANY OF IT.  (AUDIT.md C1 and C3)
    that is a result about this operating point, which is what H/tau is for.
 
 ==============================================================================
-[8/10]  app.test_replay --full — the live supervisor, both drives
+[8/19]  premise_split.py — the plant changes of 8 October, one at a time
+         $ python premise_split.py
+         read for: the baseline 920.1 -> 917.6 (sub-stepping) -> 848.1 (with the ramp); preview over current-grade -0.32 -> -0.01
+==============================================================================
+EXIT CODE 0   (212 s)
+
+merged plant, 30 September               baseline  920.1 at 883.0 C   current-grade cuts 43.4 %   preview over it -0.32 pts
++ thermal network sub-stepped            baseline  917.6 at 883.0 C   current-grade cuts 43.4 %   preview over it -0.32 pts
++ every grade change ramped over 8 s     baseline  850.4 at 883.0 C   current-grade cuts 47.0 %   preview over it -0.01 pts
+both: the plant of 8 October             baseline  848.1 at 883.0 C   current-grade cuts 47.0 %   preview over it -0.01 pts
+wrote results\premise_split.json
+
+==============================================================================
+[9/19]  check_roads.py --road extremes — X1's training roads
+         $ python check_roads.py --road extremes
+         read for: PASS over 40 roads; how many bind; the worst neutral reward and p95 tracking error
+==============================================================================
+EXIT CODE 0   (409 s)
+
+ seed road            grade %  peak C  >850 C  neutral r  p95 err
+  100 flat       0.0 to  0.2     514    0.0%    -0.0012    0.006   28.1 C   62-144 km/h  c_turb x0.91
+  101 rolling   -2.4 to  9.7     676    0.0%    -0.0029    0.009   39.8 C   65-124 km/h  c_turb x1.09
+  102 single     0.0 to 16.8     892   26.1%    -0.0034    0.012   42.5 C   84-145 km/h  c_turb x1.23
+  103 rolling    0.0 to  9.8     727    0.0%    -0.0007    0.004   26.0 C   75-145 km/h  c_turb x1.10
+  104 single    -2.8 to  5.4     648    0.0%    -0.0013    0.007   26.6 C   67-142 km/h  c_turb x1.25
+  105 flat      -0.3 to  0.0     338    0.0%    -0.0020    0.005   41.7 C   63-102 km/h  c_turb x1.14
+  106 locked     0.0 to 12.0     841    0.0%    -0.0007    0.008   32.9 C   64-147 km/h  c_turb x1.05
+  107 double     0.0 to 14.4     830    0.0%    -0.0006    0.005   28.2 C   63-131 km/h  c_turb x0.89
+  108 rolling   -1.8 to  8.4     622    0.0%    -0.0023    0.011   35.3 C   77-132 km/h  c_turb x1.33
+  109 rolling   -1.6 to  9.2     704    0.0%    -0.0011    0.009   25.3 C   77-134 km/h  c_turb x1.26
+  110 rolling   -0.0 to  8.8     634    0.0%    -0.0011    0.005   37.0 C   62-114 km/h  c_turb x0.83
+  111 double    -1.3 to  9.8     793    0.0%    -0.0010    0.005   34.6 C   68-138 km/h  c_turb x1.05
+  112 single    -2.7 to  6.1     714    0.0%    -0.0015    0.011   38.9 C   64-146 km/h  c_turb x0.96
+  113 locked     0.0 to 12.0     875   35.7%    -0.0005    0.005   35.6 C   61-147 km/h  c_turb x0.87
+  114 flat       0.0 to  0.3     492    0.0%    -0.0032    0.005   41.2 C   76-137 km/h  c_turb x0.99
+  115 double    -0.5 to 15.4     829    0.0%    -0.0014    0.005   36.7 C   68-127 km/h  c_turb x1.17
+  116 single    -1.9 to  9.4     782    0.0%    -0.0014    0.013   26.2 C   90-141 km/h  c_turb x1.07
+  117 double     0.0 to 13.0     911   50.6%    -0.0024    0.003   38.8 C  101-139 km/h  c_turb x0.77
+  118 flat       0.0 to  0.8     494    0.0%    -0.0017    0.006   33.4 C   67-133 km/h  c_turb x1.13
+  119 single    -1.3 to 11.4     569    0.0%    -0.0014    0.007   26.6 C   60-140 km/h  c_turb x1.30
+  120 single     0.0 to 15.6     895   37.5%    -0.0009    0.016   39.1 C   73-136 km/h  c_turb x0.98
+  121 single     0.0 to 12.7     889    9.6%    -0.0023    0.011   37.8 C   67-136 km/h  c_turb x0.96
+  122 double     0.0 to 12.1     861    5.3%    -0.0009    0.005   38.2 C   67-148 km/h  c_turb x0.79
+  123 single    -0.6 to 12.7     805    0.0%    -0.0017    0.012   25.1 C   66-133 km/h  c_turb x0.90
+  124 locked     0.0 to 12.0     844    0.0%    -0.0005    0.003   36.1 C   80-143 km/h  c_turb x1.08
+  125 rolling   -2.5 to 10.0     744    0.0%    -0.0043    0.012   41.5 C   67-143 km/h  c_turb x0.89
+  126 rolling    0.0 to  9.1     778    0.0%    -0.0022    0.009   39.0 C   65-149 km/h  c_turb x0.80
+  127 double     0.0 to 17.8     851    2.2%    -0.0002    0.004   30.7 C   65-142 km/h  c_turb x0.80
+  128 rolling   -2.9 to  9.2     691    0.0%    -0.0019    0.008   36.6 C   61-116 km/h  c_turb x1.33
+  129 flat      -0.1 to  0.0     463    0.0%    -0.0014    0.005   36.3 C   68-141 km/h  c_turb x1.14
+  130 locked     0.0 to 12.0     919   39.2%    -0.0008    0.008   43.4 C   62-148 km/h  c_turb x0.87
+  131 double     0.0 to 14.9     809    0.0%    -0.0010    0.005   25.3 C   62-132 km/h  c_turb x0.81
+  132 locked     0.0 to 12.0     852    1.6%    -0.0006    0.004   38.9 C   64-137 km/h  c_turb x0.94
+  133 double     0.0 to 10.3     825    0.0%    -0.0011    0.008   26.5 C   65-148 km/h  c_turb x0.79
+  134 rolling   -2.2 to  9.8     699    0.0%    -0.0020    0.007   36.5 C   72-141 km/h  c_turb x0.95
+  135 rolling   -2.5 to  9.5     623    0.0%    -0.0019    0.010   29.9 C   70-148 km/h  c_turb x1.27
+  136 rolling   -2.5 to  8.4     613    0.0%    -0.0007    0.006   33.0 C   62-147 km/h  c_turb x1.00
+  137 rolling   -1.1 to  9.0     817    0.0%    -0.0042    0.010   39.1 C   66-142 km/h  c_turb x0.80
+  138 double    -0.9 to  7.5     858    3.3%    -0.0040    0.018   44.8 C   73-150 km/h  c_turb x0.95
+  139 single    -1.0 to 11.2     820    0.0%    -0.0014    0.008   31.9 C   64-145 km/h  c_turb x0.84
+
+roads by family:      {'flat': 5, 'rolling': 12, 'single': 9, 'locked': 5, 'double': 9}
+baseline past 850 C:  10 of 40 roads
+worst neutral reward: -0.0043  (seed 125, want |r| < 0.05)
+worst p95 tracking:   0.018  (seed 138, tolerance band 0.05)
+
+PASS -- every road is one the baseline can drive.
+wrote results\training_roads_extremes.json
+
+==============================================================================
+[10/19]  app.test_replay --full — the live supervisor, both drives
          $ python -m app.test_replay --full
          read for: N of N, and the two pinned peaks
 ==============================================================================
-EXIT CODE 0   (169 s)
+EXIT CODE 0   (257 s)
 
 
 reader
@@ -350,8 +482,8 @@ product starts
 replay: pull01 (7 channels, the fast regression)
   PASS  pull01: rows   got 2193, expected 2193
   PASS  pull01: estimated   got 2186, expected 2186
-  PASS  pull01: peak_turb_c   got 608.0, expected 608.0
-  PASS  pull01: thermal   got 1, expected 1
+  PASS  pull01: peak_turb_c   got 604.2, expected 604.2
+  PASS  pull01: thermal   got 0, expected 0
   PASS  pull01: mismatch   got 0, expected 0
   PASS  pull01: novel   got 4, expected 4
   PASS  estimator: names every modelled input   modelled: ['ambient', 'coolant', 'lambda', 'spark', 'vehicle speed']
@@ -360,17 +492,17 @@ modelled fallbacks
   PASS  H8: the modelled lambda reaches 0.81 after a sustained pull   lambda 0.810 at dwell 19.5 s
   PASS  H8: the estimator marks it modelled
   PASS  M11: the modelled block equals the measured coolant   93.00 C vs 93.00 C
-  PASS  M11: the drift it would have had is reported   block_residual_k = +0.2 K
-  PASS  M10: the estimator publishes where the turbine is heading   heading for 912 C, tau 29 s
-  PASS  M10: a settled node is projected as settled   now 918 C, steady 912 C
+  PASS  M11: the drift it would have had is reported   block_residual_k = +0.0 K
+  PASS  M10: the estimator publishes where the turbine is heading   heading for 910 C, tau 29 s
+  PASS  M10: a settled node is projected as settled   now 916 C, steady 910 C
   PASS  M10: no time-to-threshold when the limit is unreachable   0 such warnings
 
 warm start
   PASS  warm start: nominal never leaves the band   0 samples outside
   PASS  warm start: the band never widens on a continuous stream   0 widenings
   PASS  warm start: no thermal alert fires while warming up
-  PASS  warm start: the band does settle   settled at t=173 s
-  PASS  warm start: settles later at light load than under load   light load 584.0 s vs loaded 105.0 s
+  PASS  warm start: the band does settle   settled at t=169 s
+  PASS  warm start: settles later at light load than under load   light load 580.0 s vs loaded 108.0 s
 
 mismatch detector
   PASS  mismatch: silent at part throttle   0 fired
@@ -382,37 +514,95 @@ mismatch detector
 product rules
   PASS  READ-ONLY: no write path to the vehicle exists in app/   checked 5 patterns
   PASS  NO RAW ON DISK: a replay creates exactly one file   created ['review_log.jsonl']
-  PASS  NO RAW ON DISK: records carry only marked-event fields   5 records
-  PASS  NO RAW ON DISK: far fewer records than samples   5 records against 2194 rows
+  PASS  NO RAW ON DISK: records carry only marked-event fields   4 records
+  PASS  NO RAW ON DISK: far fewer records than samples   4 records against 2194 rows
   PASS  channel budget: every live channel carries a reason   6 channels
   PASS  channel budget: the live set is still six   6 channels
 
 replay: 7475b5d7 (26 channels, the quoted drive)
   PASS  7475b5d7: rows   got 14340, expected 14340
   PASS  7475b5d7: estimated   got 14278, expected 14278
-  PASS  7475b5d7: peak_turb_c   got 890.6, expected 890.6
-  PASS  7475b5d7: thermal   got 15, expected 15
+  PASS  7475b5d7: peak_turb_c   got 872.7, expected 872.7
+  PASS  7475b5d7: thermal   got 14, expected 14
   PASS  7475b5d7: mismatch   got 0, expected 0
   PASS  7475b5d7: novel   got 19, expected 19
   PASS  warm start: nominal never leaves the band   0 samples outside
   PASS  warm start: the band never widens on a continuous stream   0 widenings
   PASS  warm start: no thermal alert fires while warming up
-  PASS  warm start: the band does settle   settled at t=462 s
+  PASS  warm start: the band does settle   settled at t=460 s
 
 59 of 59 checks pass
 
 ==============================================================================
-[9/10]  verify_docs.py — the guard
+[11/19]  app.test_simulation — the replay lab
+         $ python -m app.test_simulation
+         read for: the test count and OK
+==============================================================================
+EXIT CODE 0   (2 s)
+
+
+--- stderr ---
+.....C:\Users\badcl\Desktop\GRAD-project\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+C:\Users\badcl\Desktop\GRAD-project\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+  _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+...........
+----------------------------------------------------------------------
+Ran 16 tests in 1.371s
+
+OK
+
+==============================================================================
+[12/19]  model_vs_data.py — the simulator against the car
+         $ python model_vs_data.py
+         read for: each comparison beside the figure the documents quote; writes results/model_vs_data.json
+==============================================================================
+EXIT CODE 0   (159 s)
+
+model vs data, 2.6 min -> results\model_vs_data.json
+
+  what                                   this run     documented
+  load residual, derived k, 26 points       1.44 %     1.4 %
+  same, on a 1998 cc four-cylinder       48.0 %     48.1 %
+  boosted MAP vs car, charge_temperature    +1.9 %     +1.9 %
+  boosted MAP vs car, raw sensor           +24.8 %     +23.7 % (older population)
+  enrichment, worst cell |model - meas|    0.033       0.027 (on the retired row-count dwell axis, AUDIT.md H3)
+  spark before the 27 Sep refit, RMS        4.00 deg   mean +3.16   line sets 0 of 26
+  spark as shipped, RMS                     2.50 deg   mean +0.00   line sets 25 of 26
+  knock integral vs retard, correlation   -0.119       -0.149
+    paired samples                         14318       13 592
+  gearbox, samples within 4 % of a ratio    87.9 %     86.7 %
+  gear channel maximum                    6.0
+  thermal, drive10-  oil  model-meas median   -1.5 K   max meas 117 C, max model 100 C
+                      coolant model-meas median   -0.6 K
+  thermal, 7475b5d7  oil  model-meas median   +5.3 K   max meas 107 C, max model 103 C
+                      coolant model-meas median   +6.3 K
+  oil on 7475b5d7, as shipped                         peak  102.6 C (car 107), oil-block gap  10.1 K, RMSE  6.1 K
+  oil on 7475b5d7, half fuel-to-oil share             peak  101.1 C (car 107), oil-block gap   8.6 K, RMSE  5.8 K
+  oil on 7475b5d7, double oil capacity                peak   99.2 C (car 107), oil-block gap   7.1 K, RMSE  6.3 K
+  oil on 7475b5d7, block pinned to measured coolant   peak  102.1 C (car 107), oil-block gap  14.7 K, RMSE  1.8 K
+  knock: readings behind the retard       404 target / 410 actual in 55 min; pairs within 1 s 68 %
+  oil fit, shipped  frac 0.004 c_oil  27213  fit RMSE 2.39 K  held-out 3.18 K   peaks model/car: 7475b5d7 96/107 C  drive10 100/117 C
+  oil fit, best     frac 0.005 c_oil  36000  fit RMSE 2.44 K  held-out 3.15 K   peaks model/car: 7475b5d7 96/107 C  drive10 100/117 C
+  row 8, drive10's hottest 10 min: car oil 109.0 C, model 97.1 C -> miss 11.9 K
+    coolant's share (block pinned to the car's 97.3 C, model's own 92.6 C)   2.9 K
+    oil node's share (oil over coolant: car 11.7 K, model 2.8 K)   9.0 K
+  scenario operating point                2706 rpm, 175 kPa
+  logged moving samples at or above it      2.77 %
+  validate.py rows inside their band      8 of 11   (literature 6 of 7, our car 2 of 4)
+
+==============================================================================
+[13/19]  verify_docs.py — the guard
          $ python verify_docs.py
          read for: the check total, and the known-stale ledger, which is the size of fix 3
 ==============================================================================
-EXIT CODE 0   (45 s)
+EXIT CODE 0   (83 s)
 
 
 DATASET SIZE  (CLAUDE.md, validation_table.md B)
-  ok    total minutes                                      data      295.0   docs 295.0 min
-  ok    drives in the manifest                             data         10   docs 10
-  ok    drives that carry samples                          data          7   docs 7
+  ok    total minutes                                      data      321.7   docs 321.7 min
+  ok    drives in the manifest                             data         11   docs 11
+  ok    drives that carry samples                          data          8   docs 8
   ok    distinct operating points                          data         26   docs 26
   ok    every point spans a real 60 s window               data       True   docs True
   ok    no point straddles a logger gap                    data       0.48   docs 0.48 s
@@ -420,11 +610,11 @@ DATASET SIZE  (CLAUDE.md, validation_table.md B)
   ok    operating-point span, high end                     data         75   docs 75 kPa
 
 MAF SATURATION  (CLAUDE.md mistake 7)
-  ok    samples pinned at the 1020 kg/h ceiling            data        547   docs 547
-  ok    drives showing that exact ceiling                  data          6   docs 6
+  ok    samples pinned at the 1020 kg/h ceiling            data        568   docs 568
+  ok    drives showing that exact ceiling                  data          7   docs 7
 
 COMPRESSOR ENVELOPE  (validation_table.md D)
-  ok    quasi-steady samples behind the fit                data      74013   docs 74013
+  ok    quasi-steady samples behind the fit                data      83272   docs 83272
   ok    highest pressure ratio observed                    data       2.52   docs 2.52
 
 ENRICHMENT v4  (engine_env.BaselineECU.base_lambda)
@@ -459,9 +649,17 @@ BASELINE ECU CONSTANTS  (engine_env.py)
   ok    ENR_LOAD, the enrichment gate                      data      180.0   docs 180.0 kPa
 
 SIMULATION FIGURES  (AUDIT.md H2 -- these were unchecked entirely)
-  ok    validate.py rows inside the published band         data          8   docs 8
+  ok    validate.py rows inside their band                 data          8   docs 8
+  ok    validate.py rows scored against our own car        data          4   docs 4
   ok    turbine time constant                              data       48.0   docs 48.0
   ok    displacement                                       data     2997.5   docs 2997.5
+
+DERIVED CONSTANTS AND PREMISE  (derive_params.py, check_premise.py)
+  ok    derived constants were computed from the data as shipped data 'c4fdd4babfb3752a'   docs 'c4fdd4babfb3752a'
+  ok    ...and from the raw logs as shipped                data ('3aca2ec1-20260907_072817.csv', '3f64372e-20260907_070041.csv', '670063b2-20260907_142018.csv', '683640a0-20260907_070212.csv', '7475b5d7-20260908_142743.csv', 'cb67b01f-20260908_084142.csv', 'drive10-20260918_233912.csv', 'driveB_rollons-20260928_140513.csv', 'f51686d7-20260906_154426.csv', 'fb988991-20260906_143515.csv', 'pull01-20260913_093527.csv')   docs ('3aca2ec1-20260907_072817.csv', '3f64372e-20260907_070041.csv', '670063b2-20260907_142018.csv', '683640a0-20260907_070212.csv', '7475b5d7-20260908_142743.csv', 'cb67b01f-20260908_084142.csv', 'drive10-20260918_233912.csv', 'driveB_rollons-20260928_140513.csv', 'f51686d7-20260906_154426.csv', 'fb988991-20260906_143515.csv', 'pull01-20260913_093527.csv')
+  ok    premise figures were computed on the current derived constants data 'c4fdd4babfb3752a'   docs 'c4fdd4babfb3752a'
+  ok    premise baseline damage                            data      848.1   docs 848.1
+  ok    preview over current-grade, hand-written           data       -0.0   docs -0.0
   ok    crank-angle step is the studied one                data       0.25   docs 0.25
 
 CRANK-ANGLE CONVERGENCE  (AUDIT.md H1)
@@ -487,176 +685,108 @@ THE EXPERIMENT'S OWN CONSTANTS  (AUDIT2.md C2-2)
   ok    evaluate.DURATION                                  data      720.0   docs 720.0 s
   ok    evaluate.EPISODES, the frozen set                  data         20   docs 20
   ok    evaluate.EPISODES hash (frozen 18 Sep 2026)        data '05a598a574268b20'   docs '05a598a574268b20'
-  note   one neutral premise rollout, 31 s
-  ok    check_premise baseline damage                      data      959.8   docs 959.8
-  ok    check_premise baseline peak turbine                data        884   docs 884 C
+  note   one neutral premise rollout, 43 s
+  ok    check_premise baseline damage                      data      848.1   docs 848.1
+  ok    check_premise baseline peak turbine                data        883   docs 883 C
   ok    the constraint BINDS on the locked scenario        data       True   docs True
   ok    compare_log.py exited 0                            data          0   docs 0
   ok    load residual, k DERIVED, zero free parameters     data        1.4   docs 1.4 %
   ok    load residual, k FITTED, one free parameter        data        1.1   docs 1.1 %
   ok    fitted k, as compare_log prints it                 data      0.839   docs 0.839
-  ok    app peak 7475b5d7 (MODEL OUTPUT; a pin, not a run of the suite) data      890.6   docs 890.6 C
-  ok    app peak pull01 (MODEL OUTPUT; a pin, not a run of the suite) data      608.0   docs 608.0 C
-  ok    app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE) data         15   docs 15
+  ok    app peak 7475b5d7 (MODEL OUTPUT; a pin, not a run of the suite) data      872.7   docs 872.7 C
+  ok    app peak pull01 (MODEL OUTPUT; a pin, not a run of the suite) data      604.2   docs 604.2 C
+  ok    app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE) data         14   docs 14
   ok    app mismatch alerts on 7475b5d7                    data          0   docs 0
   ok    app novel-operating-point alerts on 7475b5d7       data         19   docs 19
   ok    fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined) data      0.205   docs 0.205 %
 
 DOCUMENTS vs DATA  (every figure above, as the documents state it)
-  ok     625 figure mentions across 53 tracked files all agree with the data
-  note   1 pattern(s) matched nothing anywhere -- check the regex has not rotted:
+  ok     878 figure mentions across 163 tracked files all agree with the data
+  SKIPPED presentation/index.html: first line declares it a dated record (RETIRED-OK: file) -- it is NOT being checked
+  note   2 pattern(s) matched nothing anywhere -- check the regex has not rotted:
+           - quasi-steady samples behind the fit  [pattern 2 of 2 matched nothing]
            - corr(lambda, map_kpa)  [pattern 2 of 3 matched nothing]
 
 RETIRED FIGURES  (mistake 11 -- the old value must not survive)
-  ok     none of the 43 retired figures appear as a live claim in 53 tracked files
-         (139 historical mentions marked RETIRED-OK)
+  ok     none of the 46 retired figures appear as a live claim in 163 tracked files
+         (230 historical mentions marked RETIRED-OK)
 
-KNOWN STALE  (already-reported rot; AUDIT2.md fix 3 sweeps it)
-  known  ABSTRACT.md                        drives in the manifest                1  (H2-1)
-  known  ABSTRACT.md                        quasi-steady samples behind the fit    1  (H2-1)
-  known  ABSTRACT.md                        total minutes                         1  (H2-1)
-  known  CHECKPOINT.md                      app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
-  known  CHECKPOINT.md                      check_premise baseline damage         4  (H2-4)
-  known  CHECKPOINT.md                      check_premise baseline peak turbine    2  (H2-4)
-  known  CHECKPOINT.md                      drives in the manifest                1  (H2-1)
-  known  CHECKPOINT.md                      drives that carry samples             2  (H2-1/H2-7)
-  known  CHECKPOINT.md                      fitted k, as compare_log prints it    1  (H2-1)
-  known  CHECKPOINT.md                      load residual, k DERIVED, zero free parameters    1  (M2-1)
-  known  CHECKPOINT.md                      seconds above 207 kPa                 1  (M2-3)
-  known  CHECKPOINT.md                      total minutes                         2  (H2-1)
-  known  CLAUDE.md                          app peak estimated turbine (either pinned drive)    1  (H2-4)
-  known  CLAUDE.md                          app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
-  known  CLAUDE.md                          check_premise baseline damage         4  (H2-4)
-  known  CLAUDE.md                          check_premise baseline peak turbine    2  (H2-4)
-  known  CLAUDE.md                          fitted k, as compare_log prints it    3  (H2-1)
-  known  CLAUDE.md                          fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)    1  (H2-1)
-  known  CLAUDE.md                          load residual, k DERIVED, zero free parameters    1  (M2-1)
-  known  CONTROL_SCOPE.md                   distinct operating points             1  (H2-1)
-  known  CONTROL_SCOPE.md                   drives in the manifest                1  (H2-1)
-  known  CONTROL_SCOPE.md                   operating-point span, high end        1  (H2-1)
-  known  CONTROL_SCOPE.md                   total minutes                         1  (H2-1)
-  known  DOC/SESSION_REPORT_2026-09-18.md   check_premise baseline damage         1  (H2-4)
-  known  DOC/SESSION_REPORT_2026-09-18.md   check_premise baseline peak turbine    1  (H2-4)
-  known  DOC/SESSION_REPORT_2026-09-18.md   fraction of replayed time above the trigger (36 s / 292.0 min, both pinned prose; last digit undetermined)    1  (H2-1)
-  known  DOC/SESSION_REPORT_2026-09-18.md   load residual, k DERIVED, zero free parameters    1  (M2-1)
-  known  README.md                          check_premise baseline damage         1  (H2-4)
-  known  README.md                          check_premise baseline peak turbine    1  (H2-4)
-  known  README.md                          corr(lambda, air_gps)                 1  (M2-3)
-  known  README.md                          corr(lambda, map_kpa)                 1  (M2-3)
-  known  README.md                          samples, 1000-3500 rpm above 180 kPa    1  (M2-3)
-  known  README.md                          samples, 3500-4500 rpm above 180 kPa    1  (M2-3)
-  known  README.md                          samples, 4500-7000 rpm above 180 kPa    1  (M2-3)
-  known  README.md                          scenario speed, make_grade_climb(v_kmh=)    1  (C2-3)
-  known  REFERENCES.md                      app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
-  known  SESSION_REPORT_2026-09-19.md       check_premise baseline damage         3  (H2-4)
-  known  SESSION_REPORT_2026-09-19.md       check_premise baseline peak turbine    1  (H2-4)
-  known  check_map.py                       corr(lambda, dwell)                   1  (M2-3)
-  known  check_map.py                       corr(lambda, rpm)                     1  (M2-3)
-  known  handoff.md                         check_premise baseline damage         2  (H2-4)
-  known  handoff.md                         check_premise baseline peak turbine    1  (H2-4)
-  known  handoff.md                         fitted k, as compare_log prints it    2  (H2-1)
-  known  presentation/README.md             app thermal alerts on 7475b5d7 (a THRESHOLD CHOICE)    1  (H2-4)
-  known  presentation/index.html            corr(lambda, map_kpa)                 1  (M2-3)
-  known  presentation/index.html            fitted k, as compare_log prints it    1  (H2-1)
-  known  presentation/index.html            samples pinned at the 1020 kg/h ceiling    1  (M2-2)
-  known  presentation/index.html            scenario speed, make_grade_climb(v_kmh=)    1  (C2-3)
-  known  presentation/index.html            total minutes                         1  (H2-1)
-  known  presentation/plan.html             derived k = 269.6 / T_charge, mean over the 26 points    1  (M2-1)
-  known  presentation/plan.html             fitted k, as compare_log prints it    1  (H2-1)
-  known  presentation/plan.html             total minutes                         4  (H2-1)
-  known  results/phase_d_seed0.txt          check_premise baseline damage         1  (H2-4)
-  known  thermal.py                         hottest oil anywhere in the logs      1  (M2-1)
-  known  validate.py                        drives in the manifest                1  (H2-1)
-  known  validate.py                        drives that carry samples             1  (H2-1/H2-7)
-  known  validate.py                        total minutes                         1  (H2-1)
-  known  validation_table.md                fitted k, as compare_log prints it    1  (H2-1)
-  known  CHECKPOINT.md                      a sighted-over-blinded ablation margin    1  (C2-1)
-  known  CHECKPOINT.md                      a sighted-versus-blinded ablation margin    1  (C2-1)
-  known  CHECKPOINT.md                      the void +11.7 Phase D ablation margin (C2-1)    2  (C2-1)
-  known  DOC/SESSION_REPORT_2026-09-18.md   a sighted-over-blinded ablation margin    1  (C2-1)
-  known  DOC/SESSION_REPORT_2026-09-18.md   a sighted-versus-blinded ablation margin    2  (C2-1)
-  known  DOC/SESSION_REPORT_2026-09-18.md   the void +11.7 Phase D ablation margin (C2-1)    2  (C2-1)
-  known  app/alerts.py                      the point span with the sensor as charge temp    1  (H2-1)
-  known  presentation/data.js               premise baseline with its cooling disabled (C1)    2  (C2-3)
-  known  presentation/data.js               premise predictive against a cooling-disabled baseline (C1)    1  (C2-3)
-  known  presentation/data.js               premise reactive against a cooling-disabled baseline (C1)    1  (C2-3)
-  known  presentation/index.html            dwell seconds from rows over an assumed 4.6 Hz (H3)    1  (C2-3)
-  known  presentation/index.html            premise baseline with its cooling disabled (C1)   18  (C2-3)
-  known  presentation/index.html            premise predictive against a cooling-disabled baseline (C1)   15  (C2-3)
-  known  presentation/index.html            premise reactive against a cooling-disabled baseline (C1)   37  (C2-3)
-  known  presentation/index.html            preview edge built on the C1 and C3 artefacts    2  (C2-3)
-  known  presentation/index.html            the H2 table measured against a cooling-disabled baseline (C1)    4  (C2-3)
-  known  presentation/plan.html             dataset size before pull01, the ninth drive    2  (C2-3)
-  known  presentation/plan.html             load residual before the correction    4  (C2-3)
-  known  presentation/plan.html             premise baseline with its cooling disabled (C1)    2  (C2-3)
-  known  presentation/plan.html             premise predictive against a cooling-disabled baseline (C1)    2  (C2-3)
-  known  presentation/plan.html             premise reactive against a cooling-disabled baseline (C1)    4  (C2-3)
-  known  presentation/plan.html             preview edge built on the C1 and C3 artefacts    2  (C2-3)
-  known  presentation/plan.html             the H2 table measured against a cooling-disabled baseline (C1)    6  (C2-3)
-  known  presentation/plan.html             the point span with the sensor as charge temp    2  (C2-3)
-  known  results/README.md                  a sighted-over-blinded ablation margin, number in the middle    1  (C2-1)
-  known  results/README.md                  the void +11.7 Phase D ablation margin (C2-1)    1  (C2-1)
-  known  results/phase_d_seed0.txt          a sighted-over-blinded ablation margin    1  (C2-1)
-  known  results/phase_d_seed0.txt          a sighted-versus-blinded ablation margin    1  (C2-1)
-  known  results/phase_d_seed0.txt          the void +11.7 Phase D ablation margin (C2-1)    1  (C2-1)
-  197 stale figure mentions outstanding across 87 ledger rows
+PINNED HISTORY  (void figures quoted as history must stay the figure they were)
+  ok     CHECKPOINT.md                      the void +11.7 Phase D margin (C2-1) -- not    8
+  ok     CLAUDE.md                          the void +11.7 Phase D margin (C2-1) -- not    3
+  ok     DOC/SESSION_REPORT_2026-09-18.md   the void +11.7 Phase D margin (C2-1) -- not    7
+  ok     results/README.md                  the void +11.7 Phase D margin (C2-1) -- not    2
 
 EXEMPTIONS  (what RETIRED-OK switched off, and where)
-  note   CHECKPOINT.md                                  70 mention(s) excused, 38 by a marker naming no figure
-  note   CLAUDE.md                                      75 mention(s) excused, 17 by a marker naming no figure
-  note   DOC/SESSION_REPORT_2026-09-18.md                9 mention(s) excused, 11 by a marker naming no figure
-  note   README.md                                       9 mention(s) excused, 8 by a marker naming no figure
+  note   ABSTRACT.md                                     1 mention(s) excused
+  note   CHECKPOINT.md                                 204 mention(s) excused, 2 by a marker naming no figure
+  note   CLAUDE.md                                     120 mention(s) excused, 7 by a marker naming no figure
+  note   README.md                                      37 mention(s) excused
+  note   REFERENCES.md                                   1 mention(s) excused, 1 by a marker naming no figure
+  note   app/alerts.py                                   1 mention(s) excused
   note   build_dataset.py                                1 mention(s) excused, 1 by a marker naming no figure
+  note   compare_calibration.py                         13 mention(s) excused
+  note   engine_env.py                                   6 mention(s) excused
   note   evaluate.py                                     2 mention(s) excused
   note   fingerprint.py                                  1 mention(s) excused
-  note   handoff.md                                      4 mention(s) excused, 5 by a marker naming no figure
-  note   presentation/README.md                          7 mention(s) excused, 7 by a marker naming no figure
+  note   full_run.py                                     2 mention(s) excused
+  note   handoff.md                                     23 mention(s) excused
+  note   model_vs_data.py                                2 mention(s) excused
+  note   plot_study_page.py                              1 mention(s) excused
+  note   presentation/README.md                         16 mention(s) excused
+  note   presentation/data.js                            5 mention(s) excused
+  note   presentation/plan.html                         13 mention(s) excused
+  note   record_agents.py                                2 mention(s) excused
+  note   results/PREREGISTRATION_X1.md                   6 mention(s) excused
+  note   results/README.md                               1 mention(s) excused
+  note   results/VALIDATION_PLAN.md                      2 mention(s) excused
+  note   results/phase_d_130kmh.txt                      3 mention(s) excused
   note   team/jad.md                                     6 mention(s) excused
-  note   train.py                                        1 mention(s) excused
+  note   thesis/CHAPTER4_ABLATION_DRAFT.md               4 mention(s) excused
   note   validate.py                                     2 mention(s) excused
-  note   validation_table.md                            13 mention(s) excused, 2 by a marker naming no figure
+  note   validation_table.md                            15 mention(s) excused, 1 by a marker naming no figure
   A marker that names no figure can only excuse the RETIRED scan, never the
-  comparison against live data (H2-6). 89 such mention(s) this run; annotate
+  comparison against live data (H2-6). 12 such mention(s) this run; annotate
   them 'RETIRED-OK: <figures>' as they are touched.
 
 ========================================================================
-All 67 checks pass (625 figure mentions scanned in the documents).
+All 73 checks pass (878 figure mentions scanned in the documents).
 
 ==============================================================================
-[10/10]  drift_test.py — the guard's own acceptance test
+[14/19]  drift_test.py — the guard's own acceptance test
          $ python drift_test.py
          read for: N of 16 drifts CAUGHT
 ==============================================================================
-EXIT CODE 0   (757 s)
+EXIT CODE 0   (1307 s)
 
   row  1  was CAUGHT               now CAUGHT  | README.md "8 of 11" -> "9 of 11"
-          [2 edit(s)] WRONG  README.md:154
+          [3 edit(s)] WRONG  README.md:109
   row  2  was CAUGHT               now CAUGHT  | README.md "ten drives, 295.0 minutes" -> "nine drives"
-          [1 edit(s)] WRONG  README.md:19
+          [1 edit(s)] WRONG  README.md:130
   row  3  was CAUGHT               now CAUGHT  | plant.DTHETA_DEG 0.25 -> 0.5
           [1 edit(s)] WRONG  crank-angle step is the studied one                data        0.5   docs 0.25
   row  4  was MISSED               now CAUGHT  | CLAUDE.md load residual "1.4 % with zero fitted parameters" -> 1.7 %
-          [1 edit(s)] WRONG  CLAUDE.md                          load residual, k DERIVED, zero free parameters    2  count 2, ledger says 1 (M
+          [1 edit(s)] WRONG  CLAUDE.md:737
   row  5  was MISSED               now CAUGHT  | CLAUDE.md "295.0 min" (current-state table) -> 299.0
-          [3 edit(s)] WRONG  CLAUDE.md:69
-  row  6  was MISSED               now CAUGHT  | CLAUDE.md app peak 890.6 -> 895.1
-          [3 edit(s)] WRONG  CLAUDE.md                          app peak estimated turbine (either pinned drive)    3  count 3, ledger says 1 
+          [1 edit(s)] WRONG  CLAUDE.md:768
+  row  6  was MISSED               now CAUGHT  | CLAUDE.md app peak 872.7 -> 877.2 (was 873.1 -> 877.6)
+          [1 edit(s)] WRONG  CLAUDE.md:932
   row  7  was MISSED               now CAUGHT  | results/README.md and CHECKPOINT.md "+11.7" -> "+13.7"
-          [1 edit(s)] WRONG  results/README.md                  the void +11.7 Phase D ablation margin (C2-1)    0  count 0, ledger says 1 (C2
+          [3 edit(s)] WRONG  results/README.md                  the void +11.7 Phase D margin (C2-1) -- not    0  pinned at 2
   row  8  was MISSED               now CAUGHT  | engine_env.py docstring "12 % at 130 km/h" -> 120 km/h
-          [1 edit(s)] WRONG  engine_env.py:845
+          [1 edit(s)] WRONG  engine_env.py:1023
   row  9  was MISSED               now CAUGHT  | engine_env.py DEFAULT v_kmh=130.0 -> 120.0
-          [1 edit(s)] WRONG  scenario speed, make_grade_climb(v_kmh=)           data      120.0   docs 130.0 km/h
+          [1 edit(s)] 
   row 10  was MISSED               now CAUGHT  | engine_env.py TURB_PROTECT_K 1123 -> 1100
           [1 edit(s)] WRONG  TURB_PROTECT_K, the damage knee                    data     1100.0   docs 1123.0 K
   row 11  was MISSED               now CAUGHT  | CHECKPOINT.md "959.8 at 884 C" -> 870 C
-          [2 edit(s)] WRONG  CHECKPOINT.md                      check_premise baseline peak turbine    4  count 4, ledger says 2 (H2-4)
+          [2 edit(s)] WRONG  CHECKPOINT.md:1005
   row 12  was MISSED               now CAUGHT  | CLAUDE.md "0.206 %" -> 0.306 %
-          [3 edit(s)] WRONG  CLAUDE.md                          fraction of replayed time above the trigger (36 s / 292.0 min, both pinned pro
-  row 13  was MISSED               now CAUGHT  | CLAUDE.md "294.2 at 812" -> 799
-          [1 edit(s)] WRONG  CLAUDE.md                          check_premise baseline peak turbine    2  values [799.0, 812.0], ledger says [
+          [3 edit(s)] WRONG  CLAUDE.md:1043
+  row 13  was MISSED               now CAUGHT  | CLAUDE.md premise "848.1 at 883 °C" -> 870 (was "920.1 at 883", "959.8 at 884")
+          [2 edit(s)] WRONG  CLAUDE.md:976
   row 14  was CAUGHT               now CAUGHT  | CLAUDE.md "derived k = 0.831" -> 0.851
-          [2 edit(s)] WRONG  CLAUDE.md:69
+          [2 edit(s)] WRONG  CLAUDE.md:737
   row 15  was not in the audit table now CAUGHT  | evaluate.EPISODES: one weight changed in the frozen set
           [1 edit(s)] WRONG  evaluate.EPISODES hash (frozen 18 Sep 2026)        data '91a6780110b28f9a'   docs '05a598a574268b20'
   row 16  was not in the audit table now CAUGHT  | Vehicle.gears: top gear 0.640 -> 0.680 (the invented six-speed's)
@@ -666,14 +796,470 @@ EXIT CODE 0   (757 s)
 16 of 16 drifts CAUGHT
 
 ==============================================================================
-[extra]  evaluate.py against the six-speed agents — expected to REFUSE
-         $ python evaluate.py runs_sixspeed_18sep/sighted_seed0 runs_sixspeed_18sep/blind_seed0
-         read for: exit 1 and a named plant mismatch is the CORRECT outcome here
+[15/19]  power_analysis.py — what effect size eight seeds can detect
+         $ python power_analysis.py
+         read for: power against the MEI (50 units) and the effect with 80 % power
+==============================================================================
+EXIT CODE 0   (2 s)
+
+==============================================================================
+POWER ANALYSIS -- what effect size this design can detect
+inputs from analyse_phase_d.py and evaluate.py; nothing re-measured
+==============================================================================
+
+PHASE D, MEASURED
+  paired differences (blind - sighted), n = 8
+    +9.8  -5.8  +68.6  +387.2  -271.7  -288.2  +51.0  +87.1
+  mean                        +4.8 damage units
+  standard deviation         214.4 damage units
+  ratio sd / mean               45 x
+
+THE SCALE THE EFFECT IS MEASURED AGAINST
+  baseline ECU damage                959.8
+  current-grade damage               633.2
+  so supervision alone buys          326.6 damage units  (34.0 %)
+  one percentage point of 'cuts vs baseline' = 9.60 damage units
+
+ANCHORS -- effects this project has already measured, in the same units
+  dt discretisation artefact, two FIXED policies      12.5   (1.3 pts)
+  preview edge, hand-written policies (upper end)     22.1   (0.4-2.3 pts)
+  trained agent over current-grade (typical)         287.9   (+29 to +34 pts)
+  supervision over the baseline ECU                  326.6   (34 pts)
+  ^ an effect smaller than the first row is inside a known artefact
+    and must not be adopted as a minimum effect of interest.
+
+EXACT ONE-SIDED SIGN TEST AT 8 SEEDS, alpha = 0.05
+  8 of 8 positive -> p = 0.0039   PASS
+  7 of 8 positive -> p = 0.0352   PASS
+  6 of 8 positive -> p = 0.1445   fail
+  5 of 8 positive -> p = 0.3633   fail
+  so the test needs 7 of 8 seeds to agree.
+
+POWER AT 8 SEEDS, against three assumptions about the spread
+    effect   as pts   sd=214 (Phase D)    sd=100     sd=50
+        10      1.0               0.04      0.06      0.09
+        20      2.1               0.05      0.09      0.18
+        30      3.1               0.07      0.13      0.31
+        50      5.2               0.10      0.24      0.63
+        75      7.8               0.15      0.43      0.90
+       100     10.4               0.22      0.63      0.99
+       150     15.6               0.39      0.90      1.00
+       200     20.8               0.58      0.99      1.00
+       300     31.3               0.87      1.00      1.00
+       400     41.7               0.98      1.00      1.00
+
+EFFECT SIZE REACHING 80 % POWER
+  sd  214.4  ->    269.5 damage units ( 28.1 pts, 28.1 % of baseline)  <- Phase D's measured spread
+  sd  150.0  ->    188.6 damage units ( 19.6 pts, 19.6 % of baseline)
+  sd  100.0  ->    125.7 damage units ( 13.1 pts, 13.1 % of baseline)
+  sd   50.0  ->     62.9 damage units (  6.5 pts,  6.5 % of baseline)
+
+SEEDS NEEDED, at Phase D's measured spread, for 80 % power
+   seeds   need k of n   as a fraction    effect at 80 % power
+       8        7 of 8             0.875    269 units / 28.1 pts
+      10        9 of 10            0.900    297 units / 30.9 pts  <- WORSE than the row above
+      12       10 of 12            0.833    241 units / 25.1 pts
+      16       12 of 16            0.750    181 units / 18.8 pts
+      20       15 of 20            0.750    179 units / 18.7 pts
+      30       20 of 30            0.667    124 units / 12.9 pts
+      40       26 of 40            0.650    111 units / 11.6 pts
+  MORE SEEDS IS NOT MONOTONICALLY BETTER, and the arrow is not a bug.
+  The sign test is discrete: at eight seeds alpha buys one dissenter
+  (7 of 8 = 0.875 of the seeds), at ten it buys one as well (9 of 10
+  = 0.900), which is a STRICTER fraction -- so ten seeds detect a
+  SMALLER effect less often than eight do. Twelve is the next count
+  that genuinely improves on eight, and sixteen the one after.
+  Choose a seed count off this column, never by rounding upward.
+
+WHAT THIS MEANS FOR THE MINIMUM EFFECT OF INTEREST
+  MEI    30 units ( 3.1 pts,  3.1 % of baseline): power at 8 seeds 0.07; 80 % power out of reach inside 400 seeds
+  MEI    50 units ( 5.2 pts,  5.2 % of baseline): power at 8 seeds 0.10; 80 % power needs 186 seeds per arm
+  MEI    96 units (10.0 pts, 10.0 % of baseline): power at 8 seeds 0.21; 80 % power needs 51 seeds per arm
+
+PHASE D2, MEASURED -- the pre-run prediction about the spread, checked
+  paired differences (blind - sighted), n = 8
+    +221.7  -74.4  -3.7  +0.9  +50.5  -67.1  -82.9  +6.2
+  mean +6.4   sd 98.8   (Phase D: sd 214.4)
+  PREDICTED before the run: the spread would not shrink.
+  MEASURED: it fell to 46 % of Phase D's. The prediction was wrong.
+  Why is not established. One candidate, NOT tested: Phase D's largest
+  swings came from blind agents that did or did not memorise the fixed
+  road, and randomising the road removed that source of variance.
+
+  at D2's spread, against the MEI (50 units):
+    power at 8 seeds                  0.24   (Phase D's spread: 0.10)
+    effect with 80 % power, 8 seeds   124 units (12.9 pts)
+    seeds per arm for 80 % power      42
+    (these plan the NEXT experiment; they change nothing about D2's
+    preregistered result, which stands as analyse_phase_d2.py prints it)
+
+C4, MEASURED -- the spread at 300 000 steps, for planning only
+  paired differences (blind - sighted), n = 8
+    +360.6  -80.3  -77.8  +13.4  +38.2  -0.3  -10.0  -2.4
+  mean +30.2   sd 139.9   (D2: sd 98.8; Phase D: 214.4) -- no direction was predicted
+
+  at C4's spread, against the MEI (50 units):
+    power at 8 seeds                  0.15
+    effect with 80 % power, 8 seeds   176 units (18.3 pts)
+    seeds per arm for 80 % power      80
+    power just above it (not monotonic): 80: 0.80  81: 0.78  82: 0.82  83: 0.79  84: 0.77
+
+  SENSITIVITY, planning only: the largest |difference| is seed 0 (+360.6).
+    without it, sd 45.1 and seeds per arm for 80 % power 11
+    So the seeds a follow-up needs range from that to the figure above,
+    depending on whether that seed is typical -- which is what a seeds
+    experiment would find out. It is NEVER a reason to drop the seed.
+
+THE SENTENCE THIS SCRIPT EXISTS TO MAKE SAYABLE
+  With eight seeds and the seed-to-seed spread Phase D measured,
+  this design has 80 % power only against an effect of about
+  269 damage units (28 % of baseline damage).
+  Any minimum effect of interest the team would actually care about
+  is far below that, so the experiment is UNDERPOWERED BY DESIGN and
+  its null must be reported as such. Fixing it means many more seeds,
+  or the C4 budget IF convergence shrinks the spread (a hypothesis C4
+  checks, not a fact) -- not more evaluation episodes, which do not
+  touch seed-to-seed variance.
+==============================================================================
+
+==============================================================================
+[16/19]  check_random_road.py — does every D2 road bind; is the blind arm blind
+         $ python check_random_road.py
+         read for: A False, B 150/120, C 0 of 121 non-binding, D 0 of 20, PASS
+==============================================================================
+EXIT CODE 0   (1848 s)
+
+==============================================================================
+PHASE D2 -- does every road bind, and is the blind arm blind?
+trigger 850 C;  ranges start (120.0, 300.0) s, grade (0.12, 0.16);  road_sha e44153fd81eeaa1e
+==============================================================================
+
+A. THE ROAD CHANGES BETWEEN RESETS
+  road identical across 3 resets with different seeds : False
+  distinct climb starts                               : [146.2, 154.1, 227.1] s
+  distinct grades                                     : [13.66, 13.88, 14.54] %
+  (Phase D printed True, [0.0, 0.12] and t = 180 s -- limit 7.)
+
+B. THE BLIND ARM IS BLIND
+  two roads: climb at 150 s / 12 % and at 250 s / 16 %, same seed and weights
+  BLIND   observations first differ at t = 151 s   (want 150: the moment the earlier climb begins)
+  SIGHTED observations first differ at t = 121 s   (want 120: 30 s of preview earlier)
+  So before its climb arrives, the blind agent sees exactly the same
+  thing whichever road it is on. The sighted row proves the check can
+  see a difference when one exists.
+
+C. EVERY GRADE BINDS -- 121 grades at the worst-case start (300 s), dt 1.0, 720 s
+   0.05 % steps over the whole range, 0.01 % over 13.60-14.10 %; 10 in parallel
+    12.00 %  start  300.0 s  peak  883.0 C  margin  +33.1 K    295 s above   binds
+    12.50 %  start  300.0 s  peak  896.1 C  margin  +46.2 K    313 s above   binds
+    13.00 %  start  300.0 s  peak  908.5 C  margin  +58.6 K    325 s above   binds
+    13.50 %  start  300.0 s  peak  920.2 C  margin  +70.4 K    334 s above   binds
+    13.97 %  start  300.0 s  peak  861.7 C  margin  +11.9 K    258 s above   binds   <- WEAKEST
+    14.00 %  start  300.0 s  peak  862.4 C  margin  +12.5 K    260 s above   binds
+    14.50 %  start  300.0 s  peak  872.8 C  margin  +23.0 K    289 s above   binds
+    15.00 %  start  300.0 s  peak  883.1 C  margin  +33.2 K    307 s above   binds
+    15.50 %  start  300.0 s  peak  893.0 C  margin  +43.1 K    320 s above   binds
+    16.00 %  start  300.0 s  peak  902.7 C  margin  +52.8 K    330 s above   binds
+  ... 121 grades in all; every 0.5 % point, the weakest and any failure shown
+  weakest: 13.97 % at +11.9 K, 258 s above
+  grades that do NOT bind: 0 of 121
+
+D. EVERY FROZEN EVALUATION EPISODE BINDS -- evaluate.EPISODES_D2, dt 1.0, 720 s
+  ep 1000   13.31 %  start  141.1 s  peak  915.9 C  margin  +66.1 K    487 s above   binds
+  ep 1001   15.02 %  start  281.9 s  peak  883.6 C  margin  +33.7 K    326 s above   binds
+  ep 1002   12.72 %  start  181.3 s  peak  901.5 C  margin  +51.7 K    435 s above   binds
+  ep 1003   15.44 %  start  153.8 s  peak  891.8 C  margin  +41.9 K    462 s above   binds
+  ep 1004   12.24 %  start  282.6 s  peak  889.3 C  margin  +39.4 K    321 s above   binds
+  ep 1005   15.39 %  start  128.4 s  peak  890.9 C  margin  +41.1 K    486 s above   binds
+  ep 1006   15.80 %  start  247.5 s  peak  898.9 C  margin  +49.0 K    378 s above   binds
+  ep 1007   15.73 %  start  262.0 s  peak  897.5 C  margin  +47.6 K    362 s above   binds
+  ep 1008   14.03 %  start  228.7 s  peak  863.0 C  margin  +13.1 K    333 s above   binds
+  ep 1009   14.85 %  start  296.2 s  peak  880.0 C  margin  +30.2 K    307 s above   binds
+  ep 1010   14.23 %  start  163.4 s  peak  867.2 C  margin  +17.3 K    410 s above   binds
+  ep 1011   14.48 %  start  204.5 s  peak  872.4 C  margin  +22.5 K    383 s above   binds
+  ep 1012   13.99 %  start  199.7 s  peak  862.1 C  margin  +12.3 K    358 s above   binds
+  ep 1013   14.64 %  start  238.3 s  peak  875.7 C  margin  +25.9 K    356 s above   binds
+  ep 1014   13.01 %  start  137.7 s  peak  908.8 C  margin  +58.9 K    485 s above   binds
+  ep 1015   12.96 %  start  217.9 s  peak  907.6 C  margin  +57.7 K    405 s above   binds
+  ep 1016   12.02 %  start  226.7 s  peak  883.4 C  margin  +33.6 K    368 s above   binds
+  ep 1017   13.46 %  start  271.3 s  peak  919.3 C  margin  +69.4 K    362 s above   binds
+  ep 1018   12.57 %  start  187.7 s  peak  897.8 C  margin  +47.9 K    425 s above   binds
+  ep 1019   13.65 %  start  167.4 s  peak  923.6 C  margin  +73.8 K    467 s above   binds
+  weakest frozen episode: 13.988 %, start 199.7 s, +12.3 K, 358 s above
+  frozen episodes that do NOT bind: 0 of 20
+  neutral damage is not reported here: this checks the ROAD, and the
+  damage figures belong to evaluate.py --protocol d2.
+
+E. THE TRAINING CONDITION BINDS -- dt 0.2, 900 s
+    13.97 %  start  300.0 s  peak  861.7 C  margin  +11.9 K    438 s above   binds
+    13.97 %  start  120.0 s  peak  861.7 C  margin  +11.9 K    614 s above   binds
+    12.00 %  start  300.0 s  peak  883.0 C  margin  +33.2 K    476 s above   binds
+  peak at the thinnest grade: dt 1.0 -> 861.7 C, dt 0.2 -> 861.7 C
+
+==============================================================================
+PASS -- every road in the range binds and the blind arm is blind.
+(30.8 min)
+==============================================================================
+
+==============================================================================
+[17/19]  analyse_phase_d2.py — the D2 preregistered test, both experiments
+         $ python analyse_phase_d2.py
+         read for: the D2 cell (PREVIEW HELPS / SMALLER THAN THE MEI / INCONCLUSIVE) beside Phase D's
+==============================================================================
+EXIT CODE 0   (0 s)
+
+==============================================================================
+PHASE D2 -- the preregistered test, randomised climb
+results/PREREGISTRATION_D2.md, committed before any D2 agent was trained
+==============================================================================
+
+ seed   baseline  curr-grade   sighted   blinded  blind-sighted
+------------------------------------------------------------------------------
+    0     1118.0       653.5     353.5     575.2         +221.7
+    1     1118.0       653.5     485.7     411.3          -74.4
+    2     1118.0       653.5     627.8     624.1           -3.7
+    3     1118.0       653.5     331.4     332.3           +0.9
+    4     1118.0       653.5     357.3     407.8          +50.5
+    5     1118.0       653.5     587.1     520.0          -67.1
+    6     1118.0       653.5     442.8     359.9          -82.9
+    7     1118.0       653.5     400.6     406.8           +6.2
+------------------------------------------------------------------------------
+paired differences (blind - sighted), n = 8
+  positive (preview helped) : 4 of 8
+  mean difference           : +6.4 damage units
+  sd of the differences     : 98.8 damage units   (Phase D: 214.4 -- power_analysis.py)
+
+  H1: preview helps (difference > 0)
+    exact one-sided sign test        p = 0.6367
+    exact paired permutation test    p = 0.4688   (sensitivity)
+  H1: the effect is smaller than the MEI (50 units)
+    exact one-sided sign test        p = 0.1445   (6 of 8 seeds below 50)
+    exact paired permutation test    p = 0.1250   (sensitivity)
+  alpha 0.05, one-sided, both questions
+
+  RESULT: INCONCLUSIVE
+  This experiment cannot tell 'no effect' from 'an effect the team
+  would care about'. It is a statement about the experiment's
+  size, not a statement that preview does nothing.
+  power_analysis.py predicted this cell BEFORE this experiment
+  ran, from Phase D's measured spread.
+
+==============================================================================
+PHASE D, REPORTED BESIDE IT -- the preregistration requires both
+==============================================================================
+
+ seed   baseline  curr-grade   sighted   blinded  blind-sighted
+------------------------------------------------------------------------------
+    0      959.8       633.2     340.5     350.3           +9.8
+    1      959.8       633.2     354.0     348.2           -5.8
+    2      959.8       633.2     308.2     376.8          +68.6
+    3      959.8       633.2     302.5     689.7         +387.2
+    4      959.8       633.2     639.5     367.8         -271.7
+    5      959.8       633.2     525.7     237.5         -288.2
+    6      959.8       633.2     498.5     549.5          +51.0
+    7      959.8       633.2     331.5     418.6          +87.1
+------------------------------------------------------------------------------
+paired differences (blind - sighted), n = 8
+  positive (preview helped) : 5 of 8
+  mean difference           : +4.8 damage units
+  sd of the differences     : 214.4 damage units   (Phase D: 214.4 -- power_analysis.py)
+
+  H1: preview helps (difference > 0)
+    exact one-sided sign test        p = 0.3633
+    exact paired permutation test    p = 0.4922   (sensitivity)
+  H1: the effect is smaller than the MEI (50 units)
+    exact one-sided sign test        p = 0.6367   (4 of 8 seeds below 50)
+    exact paired permutation test    p = 0.2578   (sensitivity)
+  alpha 0.05, one-sided, both questions
+
+  RESULT: INCONCLUSIVE   [MEI set AFTER this result -- see below]
+  This experiment cannot tell 'no effect' from 'an effect the team
+  would care about'. It is a statement about the experiment's
+  size, not a statement that preview does nothing.
+  power_analysis.py explains it -- but was written after this
+  result, so it is an explanation, not a prediction.
+
+  Phase D's primary test is unaffected: its verdict was 'not
+  significant' and still is. The MEI was set on 22 September,
+  AFTER Phase D's result was known, so Phase D's classification
+  under the MEI rule is a POST-HOC reading and is labelled so.
+  results/PREREGISTRATION.md section 5 records the ordering.
+
+==============================================================================
+THE TWO EXPERIMENTS, ONE LINE EACH
+==============================================================================
+  Phase D   fixed climb       blinded arm NOT blind (limit 7)   INCONCLUSIVE
+  Phase D2  randomised climb  blinded arm blind (checked, B)    INCONCLUSIVE
+  (B = check_random_road.py part B: before its climb arrives, the
+  blind agent's observations are identical on every road.)
+
+  Both are C1 agents -- 50 000 steps, 11 training episodes each,
+  which train.py calls 'the first bad run'. A null from either says
+  'with agents trained to the C1 budget', never 'preview does not
+  help'. The next suspect after the design flaw is the budget (C4).
+
+  Preview must beat CURRENT-GRADE, not the baseline ECU. Per D2 seed:
+    seed 0: agent over current-grade  +26.8 points
+    seed 1: agent over current-grade  +15.0 points
+    seed 2: agent over current-grade   +2.3 points
+    seed 3: agent over current-grade  +28.8 points
+    seed 4: agent over current-grade  +26.5 points
+    seed 5: agent over current-grade   +5.9 points
+    seed 6: agent over current-grade  +18.8 points
+    seed 7: agent over current-grade  +22.6 points
+  That is learned SUPERVISION, a separate claim from preview
+  (AUDIT.md C3). Do not read one as evidence for the other.
+
+==============================================================================
+[18/19]  analyse_phase_d.py — Phase D's preregistered test
+         $ python analyse_phase_d.py
+         read for: 5 of 8, sign p 0.3633, permutation p 0.4922: NOT SIGNIFICANT
+==============================================================================
+EXIT CODE 0   (0 s)
+
+==============================================================================
+PHASE D — the preregistered test
+results/PREREGISTRATION.md, committed before any agent was trained
+==============================================================================
+
+ seed   baseline  curr-grade   sighted   blinded  blind-sighted
+------------------------------------------------------------------------------
+    0      959.8       633.2     340.5     350.3           +9.8
+    1      959.8       633.2     354.0     348.2           -5.8
+    2      959.8       633.2     308.2     376.8          +68.6
+    3      959.8       633.2     302.5     689.7         +387.2
+    4      959.8       633.2     639.5     367.8         -271.7
+    5      959.8       633.2     525.7     237.5         -288.2
+    6      959.8       633.2     498.5     549.5          +51.0
+    7      959.8       633.2     331.5     418.6          +87.1
+------------------------------------------------------------------------------
+
+paired differences (blind - sighted), n = 8
+  positive (preview helped) : 5 of 8
+  mean difference           : +4.8 damage units
+
+  exact one-sided sign test        p = 0.3633
+  exact paired permutation test    p = 0.4922   (sensitivity)
+  alpha                            0.05
+
+  RESULT: NOT SIGNIFICANT at alpha 0.05.
+  These are C1 agents: 50 000 steps, 11 training episodes each,
+  which train.py itself calls 'the first bad run'. So the claim
+  is 'with agents trained to the C1 budget, preview does not
+  separate from seed noise' -- NOT 'preview does not help'.
+  See results/PREREGISTRATION.md limit 6.
+
+  AND THE BLINDED ARM IS NOT BLIND. The road is the same hill at
+  the same second in every episode, and the blind agent's thermal
+  state takes a distinct value at every step -- a clock on a road
+  it can memorise. So this compares an explicit preview channel
+  with an implicit one, not foresight with none. Four explanations
+  for the null are live and this experiment separates none of them.
+  Randomise the climb per episode before reading anything into it.
+  See results/PREREGISTRATION.md limits 7 and 8.
+
+  Minimum effect of interest: see results/PREREGISTRATION.md section 5.
+
+  Preview must beat CURRENT-GRADE, not the baseline ECU. Per seed:
+    seed 0: agent over current-grade  +30.5 points
+    seed 1: agent over current-grade  +29.1 points
+    seed 2: agent over current-grade  +33.9 points
+    seed 3: agent over current-grade  +34.5 points
+    seed 4: agent over current-grade   -0.7 points
+    seed 5: agent over current-grade  +11.2 points
+    seed 6: agent over current-grade  +14.0 points
+    seed 7: agent over current-grade  +31.4 points
+
+==============================================================================
+[19/19]  analyse_x1.py — X1's preregistered test
+         $ python analyse_x1.py
+         read for: the cell, total and thermal-only; 17 of 23 below 5.43 points, sign p 0.0173
+==============================================================================
+EXIT CODE 0   (57 s)
+
+X1 ANALYSIS -- extremes_dt1
+rule: results/PREREGISTRATION_X1.md section 5; MEI 5.43 points of cut; alpha 0.05, one-sided
+
+TOTAL DAMAGE (primary)
+  seed   sighted cut   blinded cut   difference
+     0         65.31         68.02        -2.70
+     1         65.63         44.37       +21.26
+     2         64.69         65.20        -0.51
+     3         71.39         66.45        +4.94
+     4          0.60         51.04       -50.44
+     5         68.71         48.72       +19.99
+     6         50.70         68.87       -18.17
+     7         71.93         67.97        +3.96
+     8         72.66         65.86        +6.80
+     9         69.50         47.12       +22.38
+    10         68.38         59.07        +9.31
+    11         59.57         58.15        +1.42
+    12         57.99         65.89        -7.90
+    13         36.28         71.65       -35.37
+    14         63.78         64.04        -0.26
+    15         53.32         68.27       -14.95
+    16         20.50         62.01       -41.51
+    17         12.82         68.12       -55.30
+    18         66.17         56.40        +9.77
+    19         57.11         71.56       -14.45
+    20         72.37         69.52        +2.85
+    21         19.01         72.20       -53.19
+    22         21.58         67.49       -45.91
+  n 23 (non-zero)   positive 10   mean -10.35   sd 24.78 points
+  preview helps:        sign p 0.7976   permutation p 0.9710
+  smaller than the MEI: sign p 0.0173 (17 of 23 below 5.43)   permutation p 0.0027
+  preview costs damage: sign p 0.3388 (13 of 23 negative)
+  CELL: SMALLER THAN THE MEI
+
+THERMAL-ONLY DAMAGE (no knock term; the second reading)
+  seed   sighted cut   blinded cut   difference
+     0         65.30         68.12        -2.82
+     1         65.54         44.33       +21.22
+     2         64.58         65.10        -0.52
+     3         71.31         66.37        +4.94
+     4          0.31         51.16       -50.85
+     5         68.62         48.86       +19.76
+     6         50.56         68.80       -18.24
+     7         71.85         67.89        +3.96
+     8         72.62         65.85        +6.77
+     9         69.51         47.09       +22.42
+    10         68.41         59.02        +9.39
+    11         59.53         58.10        +1.43
+    12         57.92         65.83        -7.90
+    13         36.10         71.71       -35.62
+    14         63.67         63.96        -0.28
+    15         53.32         68.20       -14.88
+    16         20.34         61.95       -41.62
+    17         12.61         68.14       -55.52
+    18         66.13         56.32        +9.81
+    19         57.00         71.47       -14.47
+    20         72.31         69.43        +2.88
+    21         18.80         72.30       -53.50
+    22         21.39         67.51       -46.12
+  n 23 (non-zero)   positive 10   mean -10.43   sd 24.88 points
+  preview helps:        sign p 0.7976   permutation p 0.9715
+  smaller than the MEI: sign p 0.0173 (17 of 23 below 5.43)   permutation p 0.0027
+  preview costs damage: sign p 0.3388 (13 of 23 negative)
+  CELL: SMALLER THAN THE MEI
+
+SUPERVISION, A DIFFERENT CLAIM (never evidence for preview)
+  current-grade cuts 46.98 %; 39 of 46 agents beat it on the median
+  sighted  margin over current-grade, median +16.80 points (range -46.38 to +25.67)
+  blind    margin over current-grade, median +18.91 points (range -2.61 to +25.22)
+  agents doing MORE damage than the baseline ECU on at least one frozen episode: 19 of 46: sighted_seed0 (4), sighted_seed3 (3), sighted_seed4 (9), sighted_seed5 (5), sighted_seed6 (4), sighted_seed7 (1), sighted_seed13 (2), sighted_seed14 (5), sighted_seed15 (5), sighted_seed16 (5), sighted_seed17 (3), sighted_seed18 (5), sighted_seed21 (1), blind_seed1 (3), blind_seed2 (5), blind_seed3 (1), blind_seed5 (2), blind_seed6 (2), blind_seed14 (3)
+YARDSTICK (decision 13): current-grade under 95 % of the requested torque on 1 of 719 demand steps of the scored climb (PREREGISTRATION_X1.md 3b: 1 of 719 before training)
+
+wrote results/X1_RESULT.txt and results/X1_RESULT.json
+
+==============================================================================
+[extra]  evaluate.py against the twenty of 29 September — expected to REFUSE
+         $ python evaluate.py runs/terrain_dt1/sighted_seed0 runs/terrain_dt1/blind_seed0
+         read for: exit 1: they carry only a reconstructed certificate, which evaluate.py never reads, the CORRECT outcome here
 ==============================================================================
 EXIT CODE 1   (2 s)   -- non-zero is the PASS here
 
 
-runs_sixspeed_18sep/sighted_seed0 has no meta.json.
+runs/terrain_dt1/sighted_seed0 has no meta.json.
 It predates the plant fingerprint (AUDIT2.md C2-1), so nothing records which
 plant it was trained on -- and this project has already shipped one result
 that was produced on a gearbox replaced seven hours later. Retrain it with
@@ -683,16 +1269,25 @@ number without provenance.
 ==============================================================================
 SUMMARY — exit code per script
 ==============================================================================
-     0        3 s   build_dataset.py
+     0       56 s   build_dataset.py
      0        1 s   compare_log.py
-     0        7 s   validate.py
-     0       20 s   check_map.py
-     0        0 s   fit_envelope.py
-     0      271 s   test_reward.py
-     0      153 s   check_premise.py
-     0      169 s   app.test_replay --full
-     0       45 s   verify_docs.py
-     0      757 s   drift_test.py
+     0       15 s   validate.py
+     0       27 s   check_map.py
+     0        1 s   fit_envelope.py
+     0      513 s   test_reward.py
+     0      227 s   check_premise.py
+     0      212 s   premise_split.py
+     0      409 s   check_roads.py --road extremes
+     0      257 s   app.test_replay --full
+     0        2 s   app.test_simulation
+     0      159 s   model_vs_data.py
+     0       83 s   verify_docs.py
+     0     1307 s   drift_test.py
+     0        2 s   power_analysis.py
+     0     1848 s   check_random_road.py
+     0        0 s   analyse_phase_d2.py
+     0        0 s   analyse_phase_d.py
+     0       57 s   analyse_x1.py
      1        2 s   evaluate.py refusal (non-zero expected)
 
 A figure not printed above is a figure no script produces. Do not write

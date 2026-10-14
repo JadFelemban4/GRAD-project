@@ -871,9 +871,23 @@ RETIRED_EXEMPT_PREFIX = ("SESSION_REPORT_", "NEXT_SESSION_")
 RETIRED_EXEMPT_AGENT_DIRS = ("results/agents/",)
 
 
+# A later agent set's result tables (11 October 2026), written whole by a scoring
+# script on every run: results/phase_d_<set>_dt1.txt (run_results.py) and
+# results/X<n>_RESULT.txt (analyse_x1.py, analyse_x2.py). Two RETIRED patterns
+# are bare numbers, and when X1's tables were first tracked (315e040) both
+# collided with data: blinded seed 19's median damage on X1's climb is 241.2
+# units (not the retired 241.2 g/kWh), and a paired difference was -0.52 points
+# (not a retired enrichment correlation). Same call as the agent reports above,
+# with the same cost: a retired figure in these tables would pass. They are
+# regenerated, never edited, and nothing is quoted from them without the script.
+# The 29 September set keeps its published name (phase_d_130kmh.txt) and its scan.
+RETIRED_EXEMPT_RESULT_TABLES = re.compile(r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT)\.txt$")
+
+
 def _generated_agent_report(rel):
     rel = rel.replace(os.sep, "/")
-    return rel.startswith(RETIRED_EXEMPT_AGENT_DIRS) and len(rel.split("/")) >= 4
+    return ((rel.startswith(RETIRED_EXEMPT_AGENT_DIRS) and len(rel.split("/")) >= 4)
+            or bool(RETIRED_EXEMPT_RESULT_TABLES.match(rel)))
 RETIRED_EXEMPT = {"DOCUMENT_STATUS.md", "CHANGELOG.md",
                   "DRIVE_1_card_v1.md", "DRIVE_1_card_v2.md",
                   # AUDIT.md is a review: quoting the figures it found wrong is
@@ -1375,7 +1389,12 @@ def check_scenario(here):
     PREMISE_FILES = [f for f in ALL
                      if not re.match(r"results/(d2|c4|phase_d)_seed\d+\.txt$", f)]
     print(f"  note   one neutral premise rollout, {_time.time() - _t0:.0f} s")
-    figure("check_premise baseline damage", round(float(r["damage"]), 1), 920.1, 0.3,
+    # MOVED 8 OCTOBER 2026, 920.1 -> 848.1: the plant steps agreed on 30 September.
+    # Measured one at a time on the locked climb (CLAUDE.md, the box of 8 October):
+    # the thermal network sub-stepped, 920.1 -> 917.6; every grade change ramped
+    # over 8 s, which removes the one-step knock spike at 180 s, 917.6 -> 848.1.
+    # The peak (883 C) does not move.
+    figure("check_premise baseline damage", round(float(r["damage"]), 1), 848.1, 0.3,
            # THREE DIGITS AND ONE DECIMAL. Every damage figure this project has
            # ever published is written that way (959.8, 572.8, 294.2, 414.4),
            # and a bare NUM after the word "baseline" reads the 1.0 out of
@@ -1480,10 +1499,13 @@ def check_scenario(here):
     # capacity is assumed, and the alert counts are a property of thresholds
     # this project chose. They are pinned so a regression is visible, and the
     # documents that repeat them have to move when the pin does.
+    # MOVED 8 OCTOBER 2026, 873.1 -> 872.7 and 604.8 -> 604.2 C: the thermal
+    # network's sub-stepping, attributed in app/test_replay.py by switching it
+    # off (the old pins come back exactly). No alert count moved.
     chk("app peak 7475b5d7 (MODEL OUTPUT; a pin, not a run of the suite)",
-        float(TR.EXPECT_FULL["peak_turb_c"]), 873.1, 0.0, " C")
+        float(TR.EXPECT_FULL["peak_turb_c"]), 872.7, 0.0, " C")
     chk("app peak pull01 (MODEL OUTPUT; a pin, not a run of the suite)",
-        float(TR.EXPECT_FAST["peak_turb_c"]), 604.8, 0.0, " C")
+        float(TR.EXPECT_FAST["peak_turb_c"]), 604.2, 0.0, " C")
     # The two drives' peaks are written identically, so the documents are
     # checked against BOTH pinned values at once -- see scan_allowed(). The word
     # TURBINE has to be in the sentence: `7475b5d7` is also the drive behind the

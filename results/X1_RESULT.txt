@@ -1,0 +1,71 @@
+X1 ANALYSIS -- extremes_dt1
+rule: results/PREREGISTRATION_X1.md section 5; MEI 5.43 points of cut; alpha 0.05, one-sided
+
+TOTAL DAMAGE (primary)
+  seed   sighted cut   blinded cut   difference
+     0         65.31         68.02        -2.70
+     1         65.63         44.37       +21.26
+     2         64.69         65.20        -0.51
+     3         71.39         66.45        +4.94
+     4          0.60         51.04       -50.44
+     5         68.71         48.72       +19.99
+     6         50.70         68.87       -18.17
+     7         71.93         67.97        +3.96
+     8         72.66         65.86        +6.80
+     9         69.50         47.12       +22.38
+    10         68.38         59.07        +9.31
+    11         59.57         58.15        +1.42
+    12         57.99         65.89        -7.90
+    13         36.28         71.65       -35.37
+    14         63.78         64.04        -0.26
+    15         53.32         68.27       -14.95
+    16         20.50         62.01       -41.51
+    17         12.82         68.12       -55.30
+    18         66.17         56.40        +9.77
+    19         57.11         71.56       -14.45
+    20         72.37         69.52        +2.85
+    21         19.01         72.20       -53.19
+    22         21.58         67.49       -45.91
+  n 23 (non-zero)   positive 10   mean -10.35   sd 24.78 points
+  preview helps:        sign p 0.7976   permutation p 0.9710
+  smaller than the MEI: sign p 0.0173 (17 of 23 below 5.43)   permutation p 0.0027
+  preview costs damage: sign p 0.3388 (13 of 23 negative)
+  CELL: SMALLER THAN THE MEI
+
+THERMAL-ONLY DAMAGE (no knock term; the second reading)
+  seed   sighted cut   blinded cut   difference
+     0         65.30         68.12        -2.82
+     1         65.54         44.33       +21.22
+     2         64.58         65.10        -0.52
+     3         71.31         66.37        +4.94
+     4          0.31         51.16       -50.85
+     5         68.62         48.86       +19.76
+     6         50.56         68.80       -18.24
+     7         71.85         67.89        +3.96
+     8         72.62         65.85        +6.77
+     9         69.51         47.09       +22.42
+    10         68.41         59.02        +9.39
+    11         59.53         58.10        +1.43
+    12         57.92         65.83        -7.90
+    13         36.10         71.71       -35.62
+    14         63.67         63.96        -0.28
+    15         53.32         68.20       -14.88
+    16         20.34         61.95       -41.62
+    17         12.61         68.14       -55.52
+    18         66.13         56.32        +9.81
+    19         57.00         71.47       -14.47
+    20         72.31         69.43        +2.88
+    21         18.80         72.30       -53.50
+    22         21.39         67.51       -46.12
+  n 23 (non-zero)   positive 10   mean -10.43   sd 24.88 points
+  preview helps:        sign p 0.7976   permutation p 0.9715
+  smaller than the MEI: sign p 0.0173 (17 of 23 below 5.43)   permutation p 0.0027
+  preview costs damage: sign p 0.3388 (13 of 23 negative)
+  CELL: SMALLER THAN THE MEI
+
+SUPERVISION, A DIFFERENT CLAIM (never evidence for preview)
+  current-grade cuts 46.98 %; 39 of 46 agents beat it on the median
+  sighted  margin over current-grade, median +16.80 points (range -46.38 to +25.67)
+  blind    margin over current-grade, median +18.91 points (range -2.61 to +25.22)
+  agents doing MORE damage than the baseline ECU on at least one frozen episode: 19 of 46: sighted_seed0 (4), sighted_seed3 (3), sighted_seed4 (9), sighted_seed5 (5), sighted_seed6 (4), sighted_seed7 (1), sighted_seed13 (2), sighted_seed14 (5), sighted_seed15 (5), sighted_seed16 (5), sighted_seed17 (3), sighted_seed18 (5), sighted_seed21 (1), blind_seed1 (3), blind_seed2 (5), blind_seed3 (1), blind_seed5 (2), blind_seed6 (2), blind_seed14 (3)
+YARDSTICK (decision 13): current-grade under 95 % of the requested torque on 1 of 719 demand steps of the scored climb (PREREGISTRATION_X1.md 3b: 1 of 719 before training)

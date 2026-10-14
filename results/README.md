@@ -1,4 +1,93 @@
-# `results/` — Phase D, Phase D2 and C4
+# `results/` — Phase D, Phase D2, C4, the 29 September retrain, X1 and X2
+
+## X2 — wider air, 5 seeds a side, 1200 episodes: INCONCLUSIVE, not converged (11–13 October 2026)
+
+```bash
+python analyse_x2.py            # X2's preregistered test -> X2_RESULT.txt, X2_RESULT.json
+python check_x2_convergence.py  # had the agents settled? -> x2_convergence.txt
+python x2_agents.py             # what the agents did, and why X2 failed -> x2_agents.json (X2_AGENTS.md)
+```
+
+`PREREGISTRATION_X2.md`, committed `06f4686` before any X2 agent trained. X1's
+plant and X1's roads, with the air widened (ambient 0–45 °C, pressure
+80–101.3 kPa; `wide_air.py`), five seeds a side, about 22 times X1's training.
+Four changes at once against X1, so X2 against X1 is descriptive (its section 2).
+
+| reading | X2 |
+|---|---|
+| pairs (5 seeds a side) where preview helped | 1 of 5 |
+| mean / sd of sighted − blinded, points of cut | −4.40 / 20.51 |
+| effect below the MEI (5.43 points) — sign / permutation | 0.1875 (4 of 5) / 0.1875 |
+| **cell**, total damage and thermal-only alike | **INCONCLUSIVE** |
+| convergence, C4's rule at 720k/900k/1080k steps | **NOT-CONVERGED**: 0 of 5 sighted, 1 of 5 blinded, 0 of 5 pairs settled |
+
+- **The sentence that may be said** (its section 6): *"INCONCLUSIVE on five
+  pairs: the paired differences have an sd of 20.51 points, at which a test
+  needs 143 seeds for 80 % power against the MEI. The agents were still changing
+  at 1200 episodes."* Never "preview does not help".
+- **Supervision, separately:** 7 of 10 beat `current-grade`; 4 of 10 do more
+  damage than the baseline ECU on some frozen episode.
+- **The logged-drive check:** 0 of 10 pass; with life weighted most, 59 of 60
+  runs burn more than 1 % over the ECU car (median +6.92 %), more than X1's
+  (`logged_check_wideair_dt1.json`). **The probe:** no agent passes.
+- **Transfer, descriptive** (five episodes a condition, `conditions_wideair_dt1/`):
+  held out, 8 of 10 beat that condition's `current-grade` at 50 °C, 6 of 10 at
+  76 kPa (partly by refusing torque there) and 5 of 10 at 25 °C on the 21.75 %
+  hill (X1: 26, 25 and 30 of 46); one agent does more damage than its baseline
+  ECU (sighted seed 2, 25 °C).
+- **Why it failed, measured after the result** (`X2_AGENTS.md`): the sighted
+  agents use the preview in opposite directions on a climb training rarely drew;
+  the policies never settled (practice cuts span 6.0–88.5 points along training);
+  and the extra fuel buys off the baseline ECU's one-step knock spike at every
+  jump in the torque request, charged by the untested knock model.
+
+Every agent: `agents/wideair_dt1/README.md`. The scoring log:
+`x2_score/SCORE_LOG.txt`. The full account: `PREREGISTRATION_X2.md` section 12.
+
+## X1 — the extremes design, 23 seeds a side: SMALLER THAN THE MEI (8–9 October 2026)
+
+```bash
+python analyse_x1.py            # X1's preregistered test -> X1_RESULT.txt, X1_RESULT.json
+```
+
+`PREREGISTRATION_X1.md`, committed `75ca65f` before any X1 agent trained. X1
+trains on the plant with the four steps agreed on 30 September (the thermal
+network sub-stepped, the derived constants fingerprinted, the spark trim capped
+at 0, every grade change ramped) and on decision 12's extremes design: ambient
+25–45 °C, a speed target that changes mid-run, hills to 18 %. It changes many
+things at once against 29 September, so X1 against the earlier sets is
+descriptive (its section 2).
+
+| reading | X1 |
+|---|---|
+| pairs (23 seeds a side) where preview helped | 10 of 23 |
+| mean / sd of sighted − blinded, points of cut | −10.35 / 24.78 |
+| effect below the MEI (5.43 points) — sign / permutation | 0.0173 (17 of 23) / 0.0027 — they agree |
+| **cell**, total damage and thermal-only alike | **SMALLER THAN THE MEI** |
+
+- **The sentence that may be said** (its section 6): *"Preview's effect on the
+  locked climb is below the MEI (5.43 points of cut) for agents trained on the
+  extremes design at 50 000 steps."* Never "preview does not help".
+- **What it rests on:** a spread three times 29 September's, and six sighted
+  agents (seeds 4, 13, 16, 17, 21, 22) and no blinded one that protect little
+  on the scored climb, though they protected on their own training roads. That
+  is post hoc, not a test.
+- **Supervision, separately:** 39 of 46 agents beat `current-grade`.
+- **The logged-drive check:** 1 of 46 passes; the agents deliver the torque and
+  burn fuel protecting where nothing needs it (`logged_check_extremes_dt1.json`).
+- **Transfer, descriptive:** held out, 30 of 46 beat their condition's
+  `current-grade` at 25 °C on a 21.75 % hill and 26 of 46 at 50 °C; in range,
+  29 and 42 (`conditions_extremes_dt1/conditions_test.json`).
+
+Every agent: `agents/extremes_dt1/README.md`. The scoring log:
+`x1_score/SCORE_LOG.txt`. The full account: `PREREGISTRATION_X1.md` section 12.
+
+## The 29 September retrain — twenty agents on the merged plant
+
+Ten seeds a side on varied roads, a record of the plant before the agreed
+fixes; its agents are refused on X1's plant, correctly. Every table:
+`agents/terrain_dt1/README.md`, and `agents/terrain_dt1/KNOCK_MARGIN.md` for the
+spark-advance diagnostic.
 
 ## C4 — D2's design at 300 000 steps: SMALLER THAN THE MEI, not converged (24 September 2026)
 

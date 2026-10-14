@@ -123,6 +123,15 @@ def binom_tail(k, n, p):
         return 0.0
     if p >= 1.0:
         return 1.0
+    # FOR p ABOVE 1/2, COUNT THE FAILURES (8 October 2026). The sum below starts
+    # from (1 - p)**n, which underflows to 0.0 when p is near 1 and n is large --
+    # at 23 seeds and an effect of about 3 sd -- so the tail came back 0 and
+    # delta_for_power's bisection climbed to the effect where p rounds to
+    # exactly 1: 64.63 points at 23 seeds, where a direct scan gives 5.26.
+    # P(X >= k) = 1 - P(n - X >= n - k + 1), and n - X is binomial in 1 - p,
+    # whose sum starts from p**n instead.
+    if p > 0.5:
+        return max(0.0, 1.0 - binom_tail(n - k + 1, n, 1.0 - p))
     pmf = (1.0 - p) ** n                 # j = 0
     total = 0.0
     for j in range(n + 1):

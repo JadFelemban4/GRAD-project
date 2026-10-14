@@ -32,3 +32,22 @@ app/static/vendor/
 # (which carries the statistics the page and the README read), README, figures.
 results/agents/**/train_record.npz
 results/agents/**/eval_record.npz
+# The same rule for every other script's per-step records (step_record.py,
+# 7 October 2026): the conditions test, the knock margin, the diagnostics, and
+# the training roads regenerated beside each train_record.npz (training_roads.py).
+results/records/
+results/agents/**/train_roads.npz
+
+# conditions_test.py's working files (7 October 2026): one part per condition,
+# merged into results/conditions_test.json, and the run's log.
+results/conditions_test.part*.json
+results/conditions_test.log
+
+# A later agent set's conditions-test working files (8 October 2026,
+# conditions_test.py --set): one part per condition, merged into the set's own
+# conditions_test.json.
+results/conditions_*/conditions_test.part*.json
+# x1_score.py's per-step logs; SCORE_LOG.txt beside them is the record.
+results/x1_score/*.log
+# x2_score.py's per-step logs, likewise.
+results/x2_score/*.log

@@ -43,9 +43,10 @@ DRIFTS = [
     # moved 890.6 -> 873.1 C and the premise 959.8 at 884 -> 920.1 at 883 C
     # with Ghassan's physics, and the old figures are now marked history, so
     # drifting them tested nothing (row 6 MISSED, row 13 anchor not found).
-    # Same protection, on the live figure.
-    (6, "CLAUDE.md app peak 873.1 -> 877.6 (was 890.6 -> 895.1)",
-     "CLAUDE.md", "873.1", "877.6", "MISSED"),
+    # Same protection, on the live figure. Re-anchored again 8 October: the
+    # sub-stepping moved the pin 873.1 -> 872.7 C.
+    (6, "CLAUDE.md app peak 872.7 -> 877.2 (was 873.1 -> 877.6)",
+     "CLAUDE.md", "872.7", "877.2", "MISSED"),
     (7, 'results/README.md and CHECKPOINT.md "+11.7" -> "+13.7"',
      "results/README.md", "11.7", "13.7", "MISSED"),
     (8, 'engine_env.py docstring "12 % at 130 km/h" -> 120 km/h',
@@ -62,8 +63,9 @@ DRIFTS = [
     # fix-3 sweep corrected to the live premise figure, so the row reported
     # ERROR (anchor not found) rather than testing anything. It now drifts the
     # CURRENT premise peak in CLAUDE.md, which is the same protection.
-    (13, 'CLAUDE.md premise "920.1 at 883 °C" -> 870 (was "959.8 at 884", "294.2 at 812")',
-     "CLAUDE.md", "920.1 at 883 °C", "920.1 at 870 °C", "MISSED"),
+    # Re-anchored again 8 October: the plant's premise is now 848.1 at 883 °C.
+    (13, 'CLAUDE.md premise "848.1 at 883 °C" -> 870 (was "920.1 at 883", "959.8 at 884")',
+     "CLAUDE.md", "848.1 at 883 °C", "848.1 at 870 °C", "MISSED"),
     (14, 'CLAUDE.md "derived k = 0.831" -> 0.851',
      "CLAUDE.md", "derived k = 0.831", "derived k = 0.851", "CAUGHT"),
     # Two more of the audit's own structural worries, added here because the

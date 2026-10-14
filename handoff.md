@@ -91,35 +91,41 @@ was scheduled on a load the engine was not at, and the reactive comparator
 protected less hard rather than merely later. See the box in
 [README.md](README.md), and `AUDIT.md` findings C1, C2 and C3.
 
-What it prints on the merged plant (30 September; the locked scenario, 12 % at
-130 km/h in 42 °C air, on the ZF 8HP51 gearbox; the physics derived from the
-logs):
+What it prints on the plant of 8 October (the locked scenario, 12 % at
+130 km/h in 42 °C air, the climb ramped over 8 s, on the ZF 8HP51 gearbox; the
+physics derived from the logs; the thermal network sub-stepped):
 
 ```
 protection trigger: 1123 K (850 C) = the knee of the turbine damage term
 
 policy                             fuel g    damage  peak turb C  peak oil C
 ----------------------------------------------------------------------------
-baseline ECU (true neutral)          4573     920.1          883          94
-reactive protection                  4714     625.7          860          94
-current-grade protection             4841     520.5          853          94
-predictive protection                4846     523.5          853          94
-predictive, preview disabled         4714     625.7          860          94
+baseline ECU (true neutral)          4544     848.1          883          94
+reactive protection                  4683     559.7          860          94
+current-grade protection             4810     449.6          853          94
+predictive protection                4815     449.7          853          94
+predictive, preview disabled         4683     559.7          860          94
 ----------------------------------------------------------------------------
-  reactive protection            cuts damage  32.0 %
-  current-grade protection       cuts damage  43.4 %
-  predictive protection          cuts damage  43.1 %
+  reactive protection            cuts damage  34.0 %
+  current-grade protection       cuts damage  47.0 %
+  predictive protection          cuts damage  47.0 %
 
-  preview over reactive      +11.1 points
-  preview over current grade  -0.3 points   <- THE HONEST ONE
+  preview over reactive      +13.0 points
+  preview over current grade  -0.0 points   <- THE HONEST ONE
 ```
 
 **Read the warning underneath it.** The baseline peaks at 883 °C against the
 850 °C trigger, so **the constraint binds**, and every protecting policy acts.
 "Predictive, preview disabled" equals "reactive" **by construction**, not as a
-finding (`AUDIT.md` C3). These are hand-written policies. And the −0.3 is
-entirely one second of knock at the grade step (`CLAUDE.md`'s first box): on
-turbine and oil damage alone the two policies tie.
+finding (`AUDIT.md` C3). These are hand-written policies. Preview and
+current-grade tie: the 8 s ramp of 8 October removed the one second of knock at
+the grade step that was all of the merged plant's deficit.
+
+<!-- RETIRED-OK: 920.1, 625.7, 520.5, 523.5, 4573, 32.0, 43.4, 43.1, 11.1, -0.3 -- the merged plant of 30 September -->
+*(On the merged plant, 30 September to 8 October, it printed baseline 920.1 at
+883 °C, reactive 625.7, current-grade 520.5 and predictive 523.5 (cuts 32.0,
+43.4, 43.1 %), and preview −0.3 against current-grade: that knock spike. The
+ramp is 70 of the 72 units the baseline moved; the sub-stepping 2.5.)*
 
 <!-- RETIRED-OK: 959.8, 884, 679.0, 633.2, 637.4, 29.3, 34.0, 33.6, 4.3 -->
 *(On `JMF-2340550-sep17`'s plant, before the merge, the same script printed
@@ -128,13 +134,24 @@ it. The equal peak is two of the merged plant's corrections cancelling: +5.5 K
 from the exhaust flow, −6.2 K from the air density.)*
 
 The row worth looking at is **current-grade protection**: no preview at all,
-only the gradient the car is on right now, and hand-written preview **loses to
-it by 0.3 points**.
+only the gradient the car is on right now, and hand-written preview **gains
+nothing over it** (−0.0 points).
+
+<!-- RETIRED-OK: 256.5, 801, 294.2, 812, 2.2, 1.8, 110 -->
+*(This block held 256.5 / 801 °C / 2.2 points until 17 September — the figures
+from before the H1 crank-angle correction took `plant.DTHETA_DEG` to 0.25°;
+`AUDIT_FIXES.md` H1 records the move. It then held baseline 294.2 at 812 °C
+until 22 September — the six-speed run at 110 km/h, from before the scenario
+moved to 12 % at 130 km/h — in which the constraint did not bind and
+current-grade beat predictive by 1.8 points. Both times the code moved and
+this file did not.)*
 
 **How the scenario compares with the car's own driving, measured over every
 drive** — on 17–19 September, with the app's physics of that day (exhaust
-= fuel × 15). On the merged physics `7475b5d7` peaks at 873.1 °C (the pinned
-figure in `app/test_replay.py`); the other rows were not re-measured. Replay them through `app/` and read the peak estimated turbine housing
+= fuel × 15). On today's physics `7475b5d7` peaks at 872.7 °C (the pinned
+figure in `app/test_replay.py`; 873.1 °C on the merged plant before the thermal
+network was sub-stepped on 8 October) <!-- RETIRED-OK: 873.1 -- the merged plant's pin -->;
+the other rows were not re-measured. Replay them through `app/` and read the peak estimated turbine housing
 — a MODEL OUTPUT, not a reading — against the 850 °C trigger:
 
 ```
@@ -190,9 +207,16 @@ reproduce, the number here is stale and the script is right.
 |---|---|
 | `python analyse_phase_d.py` | Phase D, on sep17's plant: 5 of 8 seeds positive, mean +4.8, sign p 0.3633, permutation p 0.4922 — NOT SIGNIFICANT. The agent's margin over `current-grade` is a DIFFERENT claim, and it rests on spark advance |
 | `python analyse_phase_d2.py` / `python analyse_c4.py` | D2 INCONCLUSIVE (4 of 8, sign p 0.6367); C4 SMALLER THAN THE MEI by the sign test only (p 0.0352), permutation disagreeing, not converged. From the committed result files |
-| `python check_premise.py` | baseline **920.1** at **883 °C**; reactive 625.7 (cuts 32.0 %), current-grade 520.5 (43.4 %), predictive 523.5 (43.1 %); preview over current-grade **−0.3**. Writes `results/premise.json`. Hand-written — read AUDIT.md C1 and C3 first |
-| `python test_reward.py` | **8 of 8** pass. Neutral scores inside ±0.05 on the locked climb and on every training-road family; the gearbox's torque table still matches the plant. A random policy scores just above neutral (informational) |
-| `python check_roads.py` | **PASS** over 40 roads; 14 push the baseline past 850 °C; worst neutral reward about −0.002, worst p95 tracking error 0.016 against a 0.05 band |
+| `python check_premise.py` | baseline **848.1** at **883 °C**; reactive 559.7 (cuts 34.0 %), current-grade 449.6 (47.0 %), predictive 449.7 (47.0 %); preview over current-grade **−0.0**. Writes `results/premise.json`. Hand-written — read AUDIT.md C1 and C3 first |
+| `python test_reward.py` | **12 of 12** pass. Neutral scores inside ±0.05 on the locked climb, on every training-road family, on the extremes roads of X1 and at X2's two thin-air corners (0 °C and 45 °C, both at 80 kPa); refusing torque is punished on all three kinds of road; the gearbox's torque table still matches the plant. A random policy scores just below neutral (informational) |
+| `python check_roads.py --road extremes` | **PASS** over 40 of X1's training roads; 10 push the baseline past 850 °C; worst neutral reward −0.0043, worst p95 tracking error 0.018 |
+| `python check_roads.py --road wideair` | **PASS** over 40 of X2's training roads (0–45 °C, 80–101.3 kPa); only 2 push the baseline past 850 °C; worst neutral reward −0.0054, worst p95 tracking error 0.013 |
+| `python test_wide_air.py` | **16 tests OK** (about 6 min): X2's roads reduce to the plant at sea level, leave every other environment alone, and follow the air |
+| `python analyse_x2.py` | X2's preregistered test (`results/PREREGISTRATION_X2.md`): **INCONCLUSIVE**, 1 of 5 pairs positive, mean −4.40, sd 20.51 (143 seeds for 80 % power against the MEI); the same thermal-only. `python check_x2_convergence.py`: **NOT-CONVERGED**, 0 of 5 pairs settled. 7 of 10 agents beat current-grade; 0 of 10 pass the logged-drive check |
+| `python analyse_x1.py` | X1's preregistered test (`results/PREREGISTRATION_X1.md`): **SMALLER THAN THE MEI**, 17 of 23 pairs below 5.43 points (sign p 0.0173, permutation p 0.0027), the same without the knock term; 39 of 46 agents beat current-grade. Writes `results/X1_RESULT.txt` and `.json`; `--set terrain_dt1` is its dry run on the twenty of 29 September |
+| `python logged_check.py --set runs/extremes_dt1` | X1's check on the car's own drives, replayed flat (six drives, two weightings): **1 of 46** agents pass. The torque is delivered; the fuel is not — with life weighted most, 252 of 276 runs burn more than 1 % over the baseline ECU. About 4 h; writes `results/logged_check_extremes_dt1.json` |
+| `python conditions_test.py --set runs/extremes_dt1 --report-only` | X1's transfer battery, descriptive (five episodes a condition): held out, **30 of 46** beat that condition's current-grade at 25 °C on a 21.75 % hill and **26 of 46** at 50 °C; in range, 29 (42 °C) and 42 (35 °C). Re-scoring all seven conditions (`--resume-all`) takes about 3.5 h |
+| `python check_roads.py` | **PASS** over 40 roads; 14 push the baseline past 850 °C; worst neutral reward about −0.002, worst p95 tracking error 0.016 against a 0.05 band. The terrain roads of the 29 September agents, as checked on 28 September on the plant they trained on; `results/training_roads.json` is kept as that record (the page draws it), so it was not re-run on X1's plant — X1's own roads are the `--road extremes` row |
 | `python validate.py` | **8 of 11** inside their band — 6 of 7 against literature, **2 of 4 against our own car** (rows 8–11, oil and coolant); displacement 2997.5 cc; turbine τ **48.0 s** |
 | `python compare_log.py data/master_points.csv` | fitted k 0.839 → **1.1 %**; derived k 0.831 → **1.4 %**, PASS. Mistake 12: it cannot see the breathing model |
 | `python derive_params.py` | re-derives every constant the logs set into `data/derived_params.json`, in about a minute; `build_dataset.py` runs it |
@@ -203,7 +227,7 @@ reproduce, the number here is stale and the script is right.
 | `python build_dataset.py "logs/raw/*.csv"` | 321.7 min, 11 drives, 26 operating points — then it runs `derive_params.py` |
 | `python model_vs_data.py` | eleven comparisons of the simulator against the car, each beside the figure the documents quote; ~10 min |
 | `python verify_docs.py` | recomputes the published figures and scans every tracked document. **Do not memorise its count** — it moves each time a figure is added |
-| `python -m app.test_replay` | **49 of 49**. Add `--full` for **59 of 59**: 14278 of 14340 samples estimated, peak estimated turbine **873.1 °C**, **14 thermal · 0 mismatch · 19 novel**. Both drives' pins moved on 28 Sep (exhaust = air + fuel; the derived enrichment dwell); the change behind each is written beside it |
+| `python -m app.test_replay` | **49 of 49**. Add `--full` for **59 of 59**: 14278 of 14340 samples estimated, peak estimated turbine **872.7 °C**, **14 thermal · 0 mismatch · 19 novel**. Both drives' pins moved on 28 Sep (exhaust = air + fuel; the derived enrichment dwell) and again on 8 Oct (the thermal sub-stepping, 0.4–0.6 K); the change behind each is written beside it |
 | `python make_figures.py` / `python make_page.py` | the thesis figures in `results/figures/`, and the phone page `results/page/index.html` |
 
 `validate.py` being 8 of 11 is expected, not a failure. Against literature the one miss

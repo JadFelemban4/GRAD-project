@@ -285,6 +285,25 @@ class ReplayTests(unittest.TestCase):
             self.assertEqual(client.get('/api/replay/trips/not-a-trip').status_code, 404)
             self.assertEqual(client.post('/api/replay/trips').status_code, 405)
 
+    def test_module_scripts_are_served_as_javascript(self):
+        """Both pages rendered empty on one machine while every route returned 200.
+
+        StaticFiles asks `mimetypes`, and on Windows that reads the registry. A
+        machine whose registry maps .mjs to text/plain served every page script
+        as text, and a browser refuses a module script that is not JavaScript:
+        no drives in the picker, no experiments, and nothing on the server side
+        to say why. app.server pins the type, so the registry has no say.
+        """
+        import app.server  # noqa: F401 -- importing it is what pins the type
+        from starlette.responses import FileResponse
+        sim = Path(__file__).resolve().parent / 'static' / 'sim'
+        # FileResponse is what StaticFiles answers with, and it needs no HTTP
+        # client, so this check runs on a machine without the test client too.
+        for name in ('main.mjs', 'agents.mjs'):
+            served = FileResponse(sim / name).media_type
+            self.assertEqual(served, 'text/javascript',
+                             f'{name} is served as {served!r}; a browser will not run it')
+
 
 if __name__ == '__main__':
     unittest.main()

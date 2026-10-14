@@ -9,6 +9,22 @@ python compare_log.py data/master_points.csv
 
 **Do not edit `plant.py` or `thermal.py` without re-running both and updating this file.**
 
+Last regenerated: **9 October 2026, on the plant of 8 October** — the thermal
+network sub-stepped (`thermal.DT_SUB_MAX`, 0.1 s) and every grade change ramped
+— from one pass of `full_run.py` (`FULL_RUN.txt`). Section A from `validate.py`
+on that plant: **8 of 11**, 6 of 7 against literature, 2 of 4 against the car,
+every value as before except row 8, **97.0 → 97.1 °C**. Section B from a fresh
+`compare_log.py` on the dataset rebuilt from the eleven logs, which reproduced
+the derived constants exactly: 26 operating points, fitted k 0.839 with 1.1 %,
+derived k 0.831 with 1.4 %, unchanged. One gap, found the same day: the fit
+behind rows 8–11 (`calibrate_thermal.simulate`) still steps its own block and
+oil nodes once per 1 s sample, not sub-stepped like `thermal.py`. Re-fitted
+with the sub-steps (`substep_fit_check.py`, a diagnostic, not shipped) the oil constants move under 2 %
+and the coolant constants a lot (radiator scale +61 %, block-to-ambient −42 %),
+while the locked climb's baseline moves 2.4 damage units and current-grade's
+cut 0.01 points. Shipping it changes `derived_sha`, so it waits for the next
+plant change.
+
 Last regenerated: **30 September 2026, the merge of `JMF-2340550` into
 `JMF-2340550-sep17`** — section B from a fresh run of `compare_log.py
 data/master_points.csv` on the merged data: 26 operating points; fitted k 0.839
@@ -103,7 +119,7 @@ since 28 September they are scored against bands computed from our own drives**
 | 5 | EGT, cruise band, minimum | 724.1 °C | 600–750 | inside | literature — row 5 |
 | 6 | EGT, cruise band, maximum | 787.7 °C | 600–750 | **outside** | literature — row 6 |
 | 7 | Turbine housing time constant | 48.0 s | 40–120 | inside | literature — row 7 |
-| 8 | Oil, sustained load (drive10, hottest 10 min) | 97.0 °C | 103–111 | **outside** | **our car** — the car's interquartile range over that window. In-sample: drive10 is in the thermal fit; fitted without it, 96.1 °C |
+| 8 | Oil, sustained load (drive10, hottest 10 min) | 97.1 °C | 103–111 | **outside** | **our car** — the car's interquartile range over that window. In-sample: drive10 is in the thermal fit; fitted without it, 96.1 °C |
 | 9 | Oil apparent time constant (identified) | 60.0 s | 70–100 | **outside** | **our car** — identified on 4 of 5 drives |
 | 10 | Coolant, regulated (synthetic climb) | 93.0 °C | 83.6–95.5 | inside | **our car** — warm coolant, 5th–95th percentile, all drives |
 | 11 | Coolant, whole drive (drive10, free-running) | 92.2 °C | 91.8–94 | inside | **our car** — the car's interquartile range over the drive. In-sample; fitted WITHOUT drive10 it is 92.0 °C, still inside -- a genuine prediction |
@@ -165,7 +181,11 @@ valve let it rise to 97–99 °C over that stretch while the model regulates nea
 other 7.3 K is the oil node itself, running 4.4 K over its coolant at sustained
 4300 rpm where the car's oil runs 11.7 K (`model_vs_data.row8_split`).
 *(Corrected 29 September: this said "about 6 K is the coolant", which had not
-been measured; the larger share is the oil node.)* **The fit's objective was not changed to make these pass** — that
+been measured; the larger share is the oil node.)* *(This paragraph is the
+plant of 28 September. On the sub-stepped plant of 8 October the same split,
+re-run on 9 October, is 2.9 K of the coolant and 9.0 K of the oil node, of an
+11.9 K miss, with row 8 at 97.1 °C: the oil node is still the larger share.)*
+**The fit's objective was not changed to make these pass** — that
 would be tuning to the band. Drive A in `logs/DRIVE_PLAN.md` is the data.
 
 **Coolant, rows 10 and 11 — both inside now.** The stand-in thermostat opened at

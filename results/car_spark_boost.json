@@ -1,0 +1,393 @@
+{
+ "window": {
+  "rpm": [
+   2000.0,
+   4000.0
+  ],
+  "map_kpa": [
+   140.0,
+   240.0
+  ]
+ },
+ "genuine_total": 4305,
+ "cells": {
+  "140-160 kPa": {
+   "readings": 7,
+   "drives": 4,
+   "car_median": 4.5,
+   "model_median": 11.28,
+   "diff_median": -6.94,
+   "diff_q1": -12.58,
+   "diff_q3": 2.41,
+   "diff_se": 6.07,
+   "ambient_median": 32.5
+  },
+  "160-180 kPa": {
+   "readings": 4,
+   "drives": 2,
+   "car_median": 1.88,
+   "model_median": 4.4,
+   "diff_median": -6.46,
+   "diff_q1": -9.84,
+   "diff_q3": -2.79,
+   "diff_se": 3.43,
+   "ambient_median": 25.0
+  },
+  "180-200 kPa": {
+   "readings": 4,
+   "drives": 2,
+   "car_median": -0.75,
+   "model_median": 6.87,
+   "diff_median": -3.93,
+   "diff_q1": -13.19,
+   "diff_q3": 1.87,
+   "diff_se": 8.05,
+   "ambient_median": 24.5
+  },
+  "200-240 kPa": {
+   "readings": 16,
+   "drives": 3,
+   "car_median": -1.12,
+   "model_median": -3.95,
+   "diff_median": -2.32,
+   "diff_q1": -5.66,
+   "diff_q3": 4.66,
+   "diff_se": 2.2,
+   "ambient_median": 36.2
+  },
+  "the climb's cell, 2400-3000 rpm, 165-185 kPa": {
+   "readings": 4,
+   "drives": 2,
+   "car_median": 2.62,
+   "model_median": 4.34,
+   "diff_median": -1.78,
+   "diff_q1": -5.86,
+   "diff_q3": 0.96,
+   "diff_se": 4.11,
+   "ambient_median": 21.8
+  },
+  "all, 140-240 kPa": {
+   "readings": 31,
+   "drives": 5,
+   "car_median": 0.0,
+   "model_median": 3.01,
+   "diff_median": -3.81,
+   "diff_q1": -9.62,
+   "diff_q3": 3.01,
+   "diff_se": 2.07,
+   "ambient_median": 36.0
+  }
+ },
+ "readings": [
+  {
+   "source": "3aca2ec1-20260907_072817.csv",
+   "t": 364.232,
+   "rpm": 2781.0,
+   "map_kpa": 175.16,
+   "t_amb": 32.5,
+   "ect_c": 93.36,
+   "spark": -9.0,
+   "model": 3.012
+  },
+  {
+   "source": "3aca2ec1-20260907_072817.csv",
+   "t": 510.903,
+   "rpm": 2442.5,
+   "map_kpa": 152.53,
+   "t_amb": 32.5,
+   "ect_c": 91.96,
+   "spark": 12.0,
+   "model": 4.432
+  },
+  {
+   "source": "683640a0-20260907_070212.csv",
+   "t": 1372.808,
+   "rpm": 3462.5,
+   "map_kpa": 149.04,
+   "t_amb": 34.5,
+   "ect_c": 92.26,
+   "spark": -15.75,
+   "model": 11.277
+  },
+  {
+   "source": "7475b5d7-20260908_142743.csv",
+   "t": 461.915,
+   "rpm": 3822.5,
+   "map_kpa": 201.38,
+   "t_amb": 40.5,
+   "ect_c": 94.46,
+   "spark": 0.0,
+   "model": 5.147
+  },
+  {
+   "source": "7475b5d7-20260908_142743.csv",
+   "t": 690.306,
+   "rpm": 2304.5,
+   "map_kpa": 187.62,
+   "t_amb": 41.0,
+   "ect_c": 88.46,
+   "spark": -1.5,
+   "model": -2.965
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 163.201,
+   "rpm": 2518.0,
+   "map_kpa": 226.47,
+   "t_amb": 36.0,
+   "ect_c": 91.56,
+   "spark": 0.75,
+   "model": -4.872
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 356.791,
+   "rpm": 2132.0,
+   "map_kpa": 231.13,
+   "t_amb": 36.5,
+   "ect_c": 93.16,
+   "spark": -15.0,
+   "model": -7.787
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 387.242,
+   "rpm": 2355.5,
+   "map_kpa": 224.92,
+   "t_amb": 36.5,
+   "ect_c": 96.46,
+   "spark": -1.5,
+   "model": -5.913
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 392.312,
+   "rpm": 2678.0,
+   "map_kpa": 230.33,
+   "t_amb": 36.5,
+   "ect_c": 90.56,
+   "spark": -8.25,
+   "model": -4.204
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 477.992,
+   "rpm": 2333.0,
+   "map_kpa": 226.92,
+   "t_amb": 36.0,
+   "ect_c": 96.26,
+   "spark": -0.75,
+   "model": -6.138
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 488.163,
+   "rpm": 2870.5,
+   "map_kpa": 225.6,
+   "t_amb": 36.0,
+   "ect_c": 87.56,
+   "spark": -7.5,
+   "model": -2.505
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 654.964,
+   "rpm": 2737.0,
+   "map_kpa": 228.3,
+   "t_amb": 36.5,
+   "ect_c": 92.56,
+   "spark": -0.75,
+   "model": -3.693
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 720.513,
+   "rpm": 2472.5,
+   "map_kpa": 150.71,
+   "t_amb": 37.0,
+   "ect_c": 93.56,
+   "spark": 1.5,
+   "model": 4.249
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 725.556,
+   "rpm": 2993.0,
+   "map_kpa": 232.71,
+   "t_amb": 37.0,
+   "ect_c": 94.36,
+   "spark": 0.0,
+   "model": -2.467
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 730.594,
+   "rpm": 3585.0,
+   "map_kpa": 237.42,
+   "t_amb": 37.0,
+   "ect_c": 89.16,
+   "spark": -2.25,
+   "model": 1.062
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 968.167,
+   "rpm": 2007.5,
+   "map_kpa": 237.82,
+   "t_amb": 37.0,
+   "ect_c": 94.26,
+   "spark": 0.0,
+   "model": -9.124
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 1109.766,
+   "rpm": 2865.0,
+   "map_kpa": 230.78,
+   "t_amb": 36.0,
+   "ect_c": 91.36,
+   "spark": -16.5,
+   "model": -2.97
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 1210.596,
+   "rpm": 2028.0,
+   "map_kpa": 234.65,
+   "t_amb": 36.0,
+   "ect_c": 95.36,
+   "spark": 0.0,
+   "model": -8.645
+  },
+  {
+   "source": "cb67b01f-20260908_084142.csv",
+   "t": 1215.636,
+   "rpm": 2377.5,
+   "map_kpa": 226.15,
+   "t_amb": 36.0,
+   "ect_c": 97.26,
+   "spark": -15.75,
+   "model": -5.802
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 44.34,
+   "rpm": 3996.5,
+   "map_kpa": 149.81,
+   "t_amb": 33.5,
+   "ect_c": 94.46,
+   "spark": 0.0,
+   "model": 14.693
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 524.641,
+   "rpm": 3959.5,
+   "map_kpa": 145.48,
+   "t_amb": 30.0,
+   "ect_c": 98.76,
+   "spark": 5.25,
+   "model": 15.715
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 762.961,
+   "rpm": 3884.0,
+   "map_kpa": 181.05,
+   "t_amb": 28.5,
+   "ect_c": 98.06,
+   "spark": -15.0,
+   "model": 9.814
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 838.951,
+   "rpm": 3913.5,
+   "map_kpa": 168.18,
+   "t_amb": 27.0,
+   "ect_c": 94.56,
+   "spark": 3.0,
+   "model": 12.12
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 2264.462,
+   "rpm": 3705.5,
+   "map_kpa": 210.69,
+   "t_amb": 24.5,
+   "ect_c": 94.16,
+   "spark": 4.5,
+   "model": 5.836
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 2423.763,
+   "rpm": 2645.5,
+   "map_kpa": 168.54,
+   "t_amb": 23.0,
+   "ect_c": 92.86,
+   "spark": 0.75,
+   "model": 4.555
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 2425.293,
+   "rpm": 2819.5,
+   "map_kpa": 212.84,
+   "t_amb": 23.0,
+   "ect_c": 93.76,
+   "spark": -9.75,
+   "model": 0.178
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 2506.893,
+   "rpm": 2924.0,
+   "map_kpa": 140.64,
+   "t_amb": 20.5,
+   "ect_c": 94.96,
+   "spark": 4.5,
+   "model": 11.436
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 2526.633,
+   "rpm": 2719.5,
+   "map_kpa": 176.39,
+   "t_amb": 20.5,
+   "ect_c": 93.06,
+   "spark": 4.5,
+   "model": 4.249
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 2528.133,
+   "rpm": 2900.5,
+   "map_kpa": 183.47,
+   "t_amb": 20.5,
+   "ect_c": 93.96,
+   "spark": 7.5,
+   "model": 4.427
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 2614.263,
+   "rpm": 3927.5,
+   "map_kpa": 196.95,
+   "t_amb": 20.5,
+   "ect_c": 95.86,
+   "spark": 0.0,
+   "model": 9.315
+  },
+  {
+   "source": "drive10-20260918_233912.csv",
+   "t": 4871.434,
+   "rpm": 2060.5,
+   "map_kpa": 147.83,
+   "t_amb": 27.0,
+   "ect_c": 93.66,
+   "spark": 13.5,
+   "model": 3.62
+  }
+ ]
+}
