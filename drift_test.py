@@ -55,8 +55,10 @@ DRIFTS = [
      "engine_env.py", "v_kmh=130.0)", "v_kmh=120.0)", "MISSED"),
     (10, "engine_env.py TURB_PROTECT_K 1123 -> 1100",
      "engine_env.py", "TURB_PROTECT_K = 1123.0", "TURB_PROTECT_K = 1100.0", "MISSED"),
-    (11, 'CHECKPOINT.md "959.8 at 884 C" -> 870 C',
-     "CHECKPOINT.md", "959.8 at 884 C", "959.8 at 870 C", "MISSED"),
+    # Row 11 follows its text, 14 October 2026: CHECKPOINT.md was rotated
+    # verbatim into STATE_HISTORY.md part B (the documentation restructure).
+    (11, 'CHECKPOINT.md "959.8 at 884 C" -> 870 C (now in STATE_HISTORY.md)',
+     "STATE_HISTORY.md", "959.8 at 884 C", "959.8 at 870 C", "MISSED"),
     (12, 'CLAUDE.md "0.206 %" -> 0.306 %',
      "CLAUDE.md", "0.206 %", "0.306 %", "MISSED"),
     # Anchor moved 22 September 2026. It drifted "294.2 at 812 °C", which the
