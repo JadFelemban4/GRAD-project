@@ -1,7 +1,7 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-14 — verify_docs.py 73/73 · drift_test.py: the affected rows after each step of the restructure; the full run follows it
-main 39fce4b, with the restructure local on `docs-restructure-2026-10-14` · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
+Last verified: 2026-10-14 — verify_docs.py 74/74 · drift_test.py 16/16 (the full run, on the restructure's final commit)
+main: the merge and the documentation restructure, both pushed on 14 October · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
 `STATE_HISTORY.md` part B, verbatim. This file holds the current state only: the
@@ -22,9 +22,10 @@ knock model the agents learn against is untested until drive C.
 - The plant carries the four steps agreed on 30 September (`75ca65f`), and the
   premise reads baseline 848.1 at 883 °C (`python check_premise.py`).
 - Ghassan's `GRA-2340394` (`c16b857`) was merged into Jad's work on 14 October
-  (`cc5468f`; every conflict, both sides, in `conflict_2026-10-14.md`); `main`
-  is `39fce4b`.
-- `python verify_docs.py`: 73 of 73 checks pass.
+  (`cc5468f`; every conflict, both sides, in `conflict_2026-10-14.md`). Every
+  simulation file is byte-identical to his last push, and his `check_premise`,
+  `validate` and `test_reward` print his figures on Jad's machine.
+- `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
 - App suites after the merge (14 October): `python -m app.test_replay` 49 of 49
   and node 305 of 305; `app.test_results` and `app.test_agents` fail more than
   before the merge, because the results tab assumes fingerprint schema 1 (the
@@ -32,10 +33,9 @@ knock model the agents learn against is untested until drive C.
 
 ## In progress (who · branch · what)
 
-- Jad, with Claude Code · `docs-restructure-2026-10-14` · plan v3 phase 4:
-  `CLAUDE.md` under 200 lines and this file under 100, every moved line
-  verbatim (`_merge_review/MIGRATION_LEDGER.md`). It reaches `main` only after
-  Ghassan's OK.
+- Nothing. The documentation restructure (plan v3 phase 4) is finished and on
+  `main`: every move in `_merge_review/MIGRATION_LEDGER.md`, the session in
+  `SESSION_REPORT_2026-10-14_merge-and-restructure.md`.
 
 ## Blockers
 
@@ -47,8 +47,11 @@ knock model the agents learn against is untested until drive C.
 
 ## Next actions (in order)
 
-1. Finish the documentation restructure; push it after Ghassan's OK.
-2. Drive C, then A, then D (`logs/DRIVE_PLAN.md`, revised 14 October, `c16b857`).
+1. Fix drive C's decision-rule numbers with Ghassan, before the drive; then
+   drive C, then A and D on one trip (`logs/DRIVE_PLAN.md`, revised 14 October,
+   `c16b857`).
+2. A fresh Claude Code session at the root: `/context` must show `CLAUDE.md`
+   under 200 lines (gate G-CTX).
 3. The validation decisions.
 4. The results tab learns fingerprint schema 2, and the learning lab's pins move
    to the live plant (both in `team/jad.md`).
