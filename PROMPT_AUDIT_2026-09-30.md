@@ -162,7 +162,7 @@ patches and this report added. The results are in "Verification" at the end.
 - **Pattern:** Group 2, two instruction files that disagree; the newer one is the 30 September correction. **Action:** carry the corrections over — `16-handoff-29sep-box-corrections.patch`.
 
 ### 17 · `handoff.md:129-131` — contradicts the table seven lines above it
-<!-- RETIRED-OK: 0.4 -- quoted as audit evidence -->
+<!-- RETIRED-OK: 0.4, -0.3 -- quoted as audit evidence; -0.3 was the merged plant's figure on 30 September -->
 - **Says:** "hand-written preview **loses to it by 0.4 points**."
 - **Why it no longer fits:** the table just above prints "preview over current grade -0.3 points".
 - **Pattern:** Group 2. **Action:** 0.4 → 0.3 — `17-handoff-preview-0.3.patch`.

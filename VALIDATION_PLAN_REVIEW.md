@@ -65,6 +65,7 @@ every sighted-minus-blinded difference counted in damage units. A true 50-unit
 effect could then read 40 or 62.5. Points of cut, Ghassan's unit, are close to
 invariant to that error; damage units are not.
 
+<!-- RETIRED-OK: 920.1 -- the check_premise baseline when this review was written, 7 October; the plant fixes merged on 14 October moved it -->
 If decision 5 is agreed, the next preregistration should state the MEI as a
 fraction of the baseline's damage (50 of 920.1 is 5.4 %), not in units. R2's
 basis ("+23 K of oil error moves damage by 50 units") reads the same way once

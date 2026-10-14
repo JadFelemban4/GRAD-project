@@ -257,4 +257,6 @@ Ghassan's plant fixes moved them. `PROMPT_AUDIT_2026-09-30.md` line 167 says
 `VALIDATION_PLAN_REVIEW.md` line 69 says 920.1 for the baseline damage (now
 848.1). Both were right on the day they were written. The fix: mark each as a
 dated figure with a `RETIRED-OK` note, or update the sentence. Do not change
-the data.
+the data. **Fixed the same day**, before the documentation restructure: each
+line now sits under a `RETIRED-OK` marker naming its dated figure, and
+`verify_docs.py` passes 73 of 73 (933 figure mentions).
