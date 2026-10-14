@@ -1019,3 +1019,242 @@ raises the ceiling.
 
 ---
 
+
+---
+
+*(Moved here from CLAUDE.md on 14 October 2026, verbatim: the repository layout,
+every script and what it is for. It sits beside this file's own "Files" list on
+purpose; neither was cut to fit the other.)*
+
+## Repository layout
+
+```
+plant.py              0-D cycle model. predict() is the shared interface.
+thermal.py            3-node lumped-capacitance thermal network.
+engine_env.py         Gymnasium env. BaselineECU lives here. make_grade_climb is
+                      the LOCKED scoring road; make_terrain / TerrainTrainingEnv
+                      are the training roads, never used for scoring.
+check_roads.py        Drives the baseline over sampled training roads; fails if
+                      any is one the baseline cannot drive. Run before training.
+evaluate.py           Phase D's protocol. Twenty frozen episodes. Never edit them.
+                      Reports damage two ways since 28 Sep (total, thermal-only).
+derive_params.py      Every constant the car's logs can set, recomputed from
+                      them -> data/derived_params.json. build_dataset.py runs it.
+derived.py            The ONE reader of data/derived_params.json. No fallback:
+                      if the file is missing it says which command makes it.
+calibrate_thermal.py  The thermal block + oil fit (and its structure), with
+                      leave-one-drive-out scores. derive_params.py calls it.
+car_thermal.py        thermal.py replayed over a logged drive, on measured fuel;
+                      raw_grid() reads a whole raw log, warm-up included.
+run_results.py        Regenerates results/traces_130kmh.json, sweep_speed_grade
+                      .json and the Phase D files from the current plant.
+compare_calibration.py  The 28 Sep before/after comparisons, for figures 20-25.
+model_vs_data.py      Eleven comparisons of the simulator against the car.
+make_figures.py       Thesis figures, results/figures/, from results/*.json.
+make_page.py          The phone-readable results page, results/page/index.html,
+                      from results/page/template.html. Numbers are tokens.
+validate.py           Regenerates the published-figure validation table.
+build_dataset.py      All drives -> data/manifest, master_points, master_samples.
+extract_steady.py     Steady points from one CSV (build_dataset supersedes it).
+compare_log.py        Model vs measurement at steady points.
+check_map.py          MBT and knock-limited spark surfaces.
+check_premise.py      Reactive vs predictive, hand-written. The premise check.
+test_reward.py        Phase C sanity checks. Run after ANY reward change.
+verify_docs.py        Recomputes the published figures from the shipped data,
+                      then OPENS every tracked .md and .py and compares what it
+                      finds written there against those figures, and against a
+                      list of retired ones. Fails naming file and line. Run it
+                      before quoting anything. Never edit its expected values.
+train.py              SAC training, three designs: terrain (dt 1.0, a new road
+                      every episode, runs/terrain_dt1/), fixed and random
+                      (dt 0.2; runs/, runs_d2/, runs_c4/ are CLOSED). Writes
+                      meta.json -- the plant fingerprint -- before the first
+                      step and refuses a resume whose plant, dt, device or
+                      budget differs; also config.json and train_record.npz
+                      (EVERY training action; gitignored).
+train_all.py          Every seed of both halves, one process each (10 seeds x
+                      sighted/blinded = 20 runs by default).
+record_agents.py      Scores agents on the twenty frozen episodes, recording
+                      EVERY step (action, applied actuators, observation,
+                      engine state), and documents each in results/agents/
+                      <set>/<tag>/: config, curve, policy weights, records,
+                      summary; README.md, index.json and figures per set.
+knock_margin.py       The same agents with spark advance forbidden -- how much
+                      of their gain rests on the untested knock model.
+step_record.py        What a recorded step holds: ONE definition for every
+                      script that runs episodes (7 Oct). Read it first.
+show_record.py        Draws or tabulates one episode of any record: the road,
+                      the gear, the engine, every actuator asked and applied,
+                      the heat against the parallel baseline car, the damage.
+training_roads.py     The road, weights and applied actuators under every step
+                      of the 29 Sep training runs, regenerated and checked.
+record_extracts.py    Small committed extracts of the gitignored records for the
+                      results page (conditions_traces.json, bad_episode_trace
+                      .json). Re-run after the records are re-made, then
+                      make_page.py.
+conditions_test.py    The twenty agents at 25-50 C and 76-101 kPa, on a speed
+                      target that changes mid-run; every step recorded.
+damage_constants.py   Every damage constant: what can set it, the value where
+                      something can, and the frozen episodes re-scored.
+                      --set <name> re-scores another set (X1's sensitivity rows).
+analyse_x1.py         X1's preregistered test: the MEI rule at 5.43 points,
+                      total and thermal-only; --set terrain_dt1 is its dry run.
+logged_check.py       X1's check on the car's own drives, replayed flat: torque
+                      within 5 %, fuel within 1 % of the baseline (--build
+                      fixed the drives before training).
+sanity_probe.py       A hotter housing must never get less protection: 50 K
+                      added to the housing input on each agent's climb states.
+premise_split.py      The 8 October plant changes on the locked climb, one at a time.
+x1_score.py           Scores X1 once its training has finished, in the
+                      preregistered order, unattended.
+wide_air.py           X2's training roads (train.py --road wideair): the extremes
+                      design at 0-45 C and 80-101.3 kPa, the compressor inlet,
+                      the kickdown table and the torque floor following the air.
+                      No hashed plant file: plant_sha stays X1's.
+test_wide_air.py      Its 16 tests; read its docstring for what each guards.
+analyse_x2.py         X2's preregistered test (X1's rule, five pairs).
+check_x2_convergence.py  Had X2's agents settled? C4's rule at 720k/900k/1080k
+                      steps, on ten practice episodes of the locked climb.
+x2_score.py           Scores X2 once its training has finished, unattended.
+x2_agents.py          What X2's agents did and why X2 failed, measured after
+                      the result -> results/x2_agents.json, written up in
+                      results/X2_AGENTS.md. Description, never a test.
+evaluate.py           The twenty frozen episodes. Prints the fingerprint from
+                      the LIVE objects, writes it into the result file, and
+                      REFUSES a model whose meta.json differs.
+fingerprint.py        What plant produced this result. The fatal hash is over
+                      the CODE with docstrings stripped, so the document sweep
+                      cannot invalidate a trained agent; read its docstring
+                      before touching it.
+run_phase_d.py        Launches the sixteen runs, and the eight evaluations,
+                      capped by MEASURED free memory. Cores say how many runs
+                      can make progress; memory says how many can START.
+analyse_phase_d.py    The preregistered statistic and nothing else. Does not
+                      drop a seed, add a seed, or switch tails.
+analyse_phase_d2.py   Phase D2's preregistered test -- Phase D's statistic,
+                      IMPORTED not copied, plus the three-cell MEI rule (PREVIEW
+                      HELPS / SMALLER THAN THE MEI / INCONCLUSIVE). Prints both
+                      experiments side by side, Phase D's labelled post-hoc.
+analyse_c4.py         C4's preregistered test -- D2's statistic, IMPORTED, plus
+                      a certificate first: it refuses any agent that is not a
+                      fresh 300 000-step run, read from the ZIP (fingerprint.
+                      model_budget), because meta.json cannot tell C4 from D2.
+check_c4_convergence.py  Had the C4 agents settled? Checkpoints 200k/250k/300k
+                      on ten PRACTICE episodes, never the test set. The rule
+                      was set by the team before any C4 agent trained.
+check_c4_start.py     Run ~15 and ~80 min into C4: certificates, budgets, and
+                      whether each C4 run retraces its D2 twin bit for bit.
+power_analysis.py     What effect size eight seeds can detect, from Phase D's
+                      measured spread. Nothing re-measured; the arithmetic is
+                      the contribution.
+random_road.py        Phase D2's randomised climb, as a WRAPPER. engine_env.py
+                      is untouched on purpose -- editing it would move
+                      plant_sha and lock out all sixteen Phase D agents.
+                      (The merge of 30 Sep moved plant_sha anyway: every
+                      Phase D, D2 and C4 agent is refused on the merged
+                      plant; re-run them from tag sep17-before-merge.)
+check_random_road.py  Does every D2 road bind, and is the blind arm blind.
+                      Run before training; about 38 minutes.
+prove_buffer.py       Proves the replay-buffer size changes nothing learned.
+drift_test.py         The guard's own acceptance test: inject AUDIT2 Part 4a's
+                      drifts and check each is CAUGHT. Currently 16 of 16.
+full_run.py           Every script that prints a published figure, in one pass,
+                      each block opening with its EXIT CODE -> FULL_RUN.txt.
+                      Sweep the documents from that, not from memory.
+plot_sim_vs_car.py    The simulator against the car's logs: five charts, each
+                      labelled INDEPENDENT CHECK, FIT or CONSISTENCY CHECK, into
+                      figures/sim_vs_car/ (SVG, PNG, a printable PDF, a web
+                      page). SVG + headless Chrome, because Application Control
+                      blocks matplotlib on Jad's machine. The web page is
+                      published privately; its URL is in the docstring --
+                      update that page, never publish a second one.
+plot_agent_pairs.py   Phase D, D2 and C4 pair by pair: every agent a dot, every
+                      verdict quoted by app/agent_catalog.py, nothing computed.
+                      figures/agent_pairs/; its page is published the same way.
+plot_study_page.py    The whole study on one page (summary, the ablations, every
+                      policy, fuel, the roads, the simulator against the car,
+                      the drives, the caveats), built from this branch's
+                      results/. figures/study/; published the same way.
+results/PREREGISTRATION.md  Phase D's rules, committed before any agent trained.
+results/PREREGISTRATION_D2.md  Phase D2's rules, committed before any D2 agent
+                      trained -- MEI set, power declared, ten limits, run log.
+results/NEXT_EXPERIMENT_DESIGN.md  Why the climb is randomised the way it is.
+results/PREREGISTRATION_C4.md  C4's rules -- D2's design at 300 000 steps, one
+                      variable at a time -- committed before any C4 agent
+                      trained: convergence rule, crash rule, six readings.
+runs_d2/              Phase D2's trained agents. Gitignored, like runs/.
+runs_c4/              C4's trained agents. Gitignored. A NEW budget always
+                      gets its own directory: train.py refuses to resume a run
+                      whose --steps differs (see its "A RESUME IS NOT A LONGER
+                      RUN"), and run_phase_d.py never relaunches over final.zip.
+results/void/         Result files that are NOT results, with a README saying
+                      why. The +11.7 file lives here.
+generality_test.py    The H/τ experiment. H1, H2, H2b.
+README.md             The public-facing summary. Tracked by verify_docs.py.
+CLAUDE.md             This file. The handoff and the mistake log.
+handoff.md            The short entry point: what to run, what it prints today.
+NEXT_CHAT_PROMPT.md   The prompt to paste into a new session. Not on this branch
+                      since the merge of 30 September: handoff.md is the entry point.
+SESSION_REPORT_*.md   One per session, dated. 2026-10-08_records is the latest
+                      (it runs to 13 October: X1 trained, scored and transferred;
+                      X2 preregistered, trained, scored and explained).
+REFERENCES.md         Where every number we did not measure comes from. Written
+                      for a non-specialist. Read before quoting a published band.
+DOCUMENT_STATUS.md    Which team PDFs still carry void numbers, and why.
+AUDIT.md              Full technical review, 14 Sep. THREE CRITICAL findings
+                      against the headline claim and six against app/.
+                      Read it before quoting any number in this file.
+team/                 ONE PROFILE PER PERSON. Ask who you are talking to,
+                      then read theirs before explaining anything.
+  README.md           how the matching works and how to add yourself.
+  _TEMPLATE.md        copy this.
+logs/CHANNEL_SET_FINAL.md   What is recorded, what to add, and why.
+logs/CHANNEL_CENSUS.md      All 656 channels the car offers, live vs dead.
+logs/DRIVE_PLAN.md          The three drives that would settle what the logs
+                            cannot: channels, and how to drive each one.
+logs/raw/*.csv        Raw BimmerLink exports. Never edit these.
+data/*.csv            Generated. Never edit by hand — re-run build_dataset.py.
+data/derived_params.json  Generated by derive_params.py. Never edit by hand.
+validation_table.md   Chapter 3's evidence. Regenerate after touching the plant.
+app/                  THE LIVE SUPERVISOR. Runs this same physics alongside
+                      the car in real time and estimates what it cannot report.
+  estimator.py        The virtual sensor. Read its docstring before touching it.
+  reader.py           OBD-II, or replay of the logs above. Channel budget here.
+  alerts.py           thermal / mismatch / novel. The ONLY file that writes.
+  server.py           localhost. /, /driver, /review; --simulation adds the 3D
+                      replay lab, the agents page and the results tab, with no
+                      vehicle connection.
+  static/*.html       dashboard, driver mode, review view.
+  test_replay.py      Replay-driven regression checks. Run after any app change.
+  agent_api.py        The agent replay (--simulation only): trained agents on
+                      finished episodes, and the hidden models panel.
+  jev.py              Calls an external service: the model jev (api.typesafe.ai),
+                      one paid call per press. Its key is read per call or held
+                      in memory, and never logged, returned or written. Nothing
+                      in it reaches the car.
+  laya_bridge.py      Laya, a local model, run offline in its own interpreter
+                      (laya_worker.py); no key.
+  model_questions.py  The one question both models are asked. Their answers are
+                      shown, never applied.
+  results_api.py      The results tab (--simulation only): GET /results and
+                      GET /api/results, answered to this machine only.
+  results_data.py     Reads results/ on every request: one section per
+                      experiment, its verdict quoted, nothing written; the
+                      one figure computed is blind minus sighted per seed.
+  results_provenance.py  Where a result file's numbers came from: the plant
+                      states, the git facts, this tree's fingerprint.
+  results_eval.py     Parses one evaluate.py result file, results/<prefix>_seed<N>.txt.
+  test_results.py     The results tab's suite.
+  static/results.html, static/sim/results*.mjs, charts-lib.mjs
+                      The results tab's page: view, charts, strings, styles.
+  review_log.jsonl    Generated, gitignored. Marked events only, never raw data.
+```
+
+**Two rules the app adds, and they are structural, not stylistic.** It never
+transmits to the vehicle (the hard constraint above, in code), and it never
+writes raw car data to disk -- only what the model marks. `app/test_replay.py`
+asserts both, so breaking either fails a check rather than going unnoticed.
+
+
+---
+
