@@ -2,7 +2,7 @@
 name: Jad Felemban
 student_number: 2340550
 email: endo.felemban@gmail.com
-updated: 2026-10-07
+updated: 2026-10-14
 ---
 
 # Jad
@@ -217,3 +217,44 @@ here. That sheet reviews a presentation in
 repository.
 
 My own learning notes are in `LEARNING-CHAT-HANDOFF.md`, outside this repo.
+
+## Open item: the results tab after the merge of 14 October 2026
+
+Recorded at my request, 14 October: I decided to fix it later.
+
+**The problem.** After Ghassan's `GRA-2340394` was merged (merge commit
+`cc5468f`, the conflicts in `conflict_2026-10-14.md`), the results tab can no
+longer tell which plant made the Phase D, D2 and C4 result files. Ghassan's
+branch moved the plant fingerprint to schema 2 on 8 October (`conflict.md`
+decision 2, which Ghassan and I agreed): `derived_sha` became fatal and
+`derived.py` became a plant file. The results tab was written for schema 1 on
+5 and 6 October:
+
+- `app/results_provenance.py`, `plant_at`, hashes today's `FP.PLANT_FILES` at an
+  old commit. `derived.py` does not exist at `sep17-before-merge`, so it
+  returns None and the tab cannot name the plant.
+- `app/test_results.py` checks that every result file carries every fatal
+  field. The old files were written under schema 1, without `derived_sha`.
+- `app/test_agents.py` expects a plant mismatch on `plant_sha` alone. Under
+  schema 2 the same agents mismatch on `plant_sha, derived_sha, scenario`.
+
+Measured on `cc5468f`: `test_results` 55 failing (1 before the merge),
+`test_agents` 22 failing (21 before). Every other app suite is as it was before
+the merge, and node passes 305 of 305. The conflict resolutions did not cause
+this: any merge of the two branches gives the same result.
+
+**The fix, later (about 1 to 2 hours).** Make the results tab read each result
+file's schema and use THAT schema's plant files and hashing rule when it names
+the plant: schema 1 is `plant.py`, `thermal.py` and `engine_env.py`; schema 2
+adds `derived.py` and makes `derived_sha` fatal. Then update the tests, so that
+a schema-1 file is recognised as schema 1 instead of rejected for lacking
+`derived_sha`. Ghassan's schema 2 stays as it is.
+
+**A second, smaller item from the same merge.** `verify_docs.py` fails 1 of its
+73 checks: two dated documents still quote the premise figures from before
+Ghassan's plant fixes moved them. `PROMPT_AUDIT_2026-09-30.md` line 167 says
+-0.3 for preview over current-grade (the data now gives -0.0), and
+`VALIDATION_PLAN_REVIEW.md` line 69 says 920.1 for the baseline damage (now
+848.1). Both were right on the day they were written. The fix: mark each as a
+dated figure with a `RETIRED-OK` note, or update the sentence. Do not change
+the data.
