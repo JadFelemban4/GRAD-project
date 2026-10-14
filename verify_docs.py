@@ -1100,6 +1100,36 @@ def check_pinned_history(here):
     RESULTS.append(not bad)
 
 
+# ---------------------------------------------------------------------------
+# SIZE   (14 October 2026 -- plan v3 phase 4, gate G-SIZE)
+# ---------------------------------------------------------------------------
+# CLAUDE.md is loaded whole into every Claude Code session, and by 14 October it
+# had grown to 3588 lines, CHECKPOINT.md to 2394. The restructure moved out,
+# verbatim, everything that is not a permanent rule (CLAUDE.md) or the current
+# state (CHECKPOINT.md). This keeps them small. The limits are looser than the
+# targets (under 200 and under 100 lines) so that one long entry does not block
+# a commit; the fix for a failure is to move text to its place, never to cut it.
+SIZE_LIMITS = {"CLAUDE.md": 300, "CHECKPOINT.md": 150}
+
+
+def check_sizes(here):
+    """Fail if a file every session reads has grown past its limit."""
+    print("\nSIZE  (files every session reads: targets CLAUDE.md under 200 lines, CHECKPOINT.md under 100)")
+    bad = 0
+    for rel, limit in SIZE_LIMITS.items():
+        try:
+            n = len(open(os.path.join(here, rel), encoding="utf-8").read().splitlines())
+        except OSError:
+            n = None
+        if n is not None and n <= limit:
+            print(f"  ok     {rel:<16} {n:>5} lines (fails above {limit})")
+        else:
+            bad += 1
+            print(f"  WRONG  {rel:<16} {n} lines, over the limit of {limit}: move what is not a "
+                  "permanent rule, or not the current state, to its place, verbatim")
+    RESULTS.append(not bad)
+
+
 def report_known_stale():
     """Print the ledger and fail if any row's count OR values have moved."""
     if not KNOWN_STALE:
@@ -2061,6 +2091,7 @@ def main():
     report_documents()
     check_retired(here)
     check_pinned_history(here)
+    check_sizes(here)
     report_known_stale()
     report_exemptions()
 
