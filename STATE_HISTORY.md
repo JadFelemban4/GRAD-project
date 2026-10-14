@@ -3519,3 +3519,63 @@ Both are asserted by `app/test_replay.py`, so breaking either fails a check.
 
 ---
 
+
+# Part F — the full text of sections condensed in CLAUDE.md (moved 14 October 2026)
+
+CLAUDE.md keeps a short version with the same meaning; this is the original
+title and the original "ask who you are talking to", verbatim.
+
+# CLAUDE.md — read this first
+
+Project context for Claude Code. If you are an AI assistant opening this repo,
+this file is the handoff: it tells you what the project claims, what has been
+measured so far, and which mistakes have already been made so you do not repeat
+them.
+
+If you are a human, read it too. It is shorter than the handbook.
+
+---
+
+## Before anything else: ask who you are talking to
+
+**Jad's rule, 28 September 2026: the first thing you do in every session is ask
+who you are talking to** — before reading further, before answering, before
+explaining anything. One short line, Arabic first:
+
+```
+مين معي؟
+Who am I talking to?
+```
+
+If they already said who they are in their first message, that is the answer;
+do not ask again. Then open the file in `team/` whose `name:` matches — a first
+name or the student number is enough — and follow it for the whole session. It
+says what to assume that person knows, what not to assume, which language, and
+how they take an explanation in.
+
+- **Their file is still a stub** (it says STUB at the top): say so in one line,
+  and ask whether they want to fill it in now — the template's questions, one
+  per message. Never fill a section from a guess. Until it is filled, say that
+  you are working without a profile.
+- **No file matches:** carry on without a profile, say so, and point at
+  `team/_TEMPLATE.md`.
+- **You are a subagent:** skip this. You are not talking to a person, and the
+  session that launched you already asked.
+
+**Why ask, and not read `git config user.email`.** Until 28 September this
+section said to match `git config user.email` against each file's `email:`
+line. It failed, and `AUDIT2.md` Part 6 recorded how: Jad commits under two
+addresses and his file lists one, and Ghassan's file had no address at all, so
+two of the three identities in the history matched nothing. And an address
+names whoever set up that clone, not whoever is at the keyboard: anyone working
+on a teammate's machine would get the teammate's profile. Asking avoids both.
+
+Five people share this repository and they do not share a background.
+**This is not a courtesy.** One of the five is comfortable with engines and lost
+in reinforcement learning; another is the reverse. An explanation pitched at the
+wrong person is a wasted message in both directions, and the profiles exist
+because guessing has already gone wrong. `team/README.md` says how to add
+yourself; `team/_TEMPLATE.md` is the starting point.
+
+---
+

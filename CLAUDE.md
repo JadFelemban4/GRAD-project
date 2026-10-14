@@ -1,56 +1,31 @@
 # CLAUDE.md — read this first
 
-Project context for Claude Code. If you are an AI assistant opening this repo,
-this file is the handoff: it tells you what the project claims, what has been
-measured so far, and which mistakes have already been made so you do not repeat
-them.
-
-If you are a human, read it too. It is shorter than the handbook.
+The handoff for anyone who opens this repository, person or AI: what the project
+claims, the rules, and the mistakes not to repeat. Everything else is one link
+away, in "Where everything is" at the end.
 
 ---
 
 ## Before anything else: ask who you are talking to
 
 **Jad's rule, 28 September 2026: the first thing you do in every session is ask
-who you are talking to** — before reading further, before answering, before
-explaining anything. One short line, Arabic first:
+who you are talking to**, before reading further, answering or explaining. One
+short line, Arabic first:
 
 ```
 مين معي؟
 Who am I talking to?
 ```
 
-If they already said who they are in their first message, that is the answer;
-do not ask again. Then open the file in `team/` whose `name:` matches — a first
-name or the student number is enough — and follow it for the whole session. It
-says what to assume that person knows, what not to assume, which language, and
-how they take an explanation in.
-
-- **Their file is still a stub** (it says STUB at the top): say so in one line,
-  and ask whether they want to fill it in now — the template's questions, one
-  per message. Never fill a section from a guess. Until it is filled, say that
-  you are working without a profile.
-- **No file matches:** carry on without a profile, say so, and point at
-  `team/_TEMPLATE.md`.
-- **You are a subagent:** skip this. You are not talking to a person, and the
-  session that launched you already asked.
-
-**Why ask, and not read `git config user.email`.** Until 28 September this
-section said to match `git config user.email` against each file's `email:`
-line. It failed, and `AUDIT2.md` Part 6 recorded how: Jad commits under two
-addresses and his file lists one, and Ghassan's file had no address at all, so
-two of the three identities in the history matched nothing. And an address
-names whoever set up that clone, not whoever is at the keyboard: anyone working
-on a teammate's machine would get the teammate's profile. Asking avoids both.
-
-Five people share this repository and they do not share a background.
-**This is not a courtesy.** One of the five is comfortable with engines and lost
-in reinforcement learning; another is the reverse. An explanation pitched at the
-wrong person is a wasted message in both directions, and the profiles exist
-because guessing has already gone wrong. `team/README.md` says how to add
-yourself; `team/_TEMPLATE.md` is the starting point.
-
----
+If they said who they are in their first message, that is the answer. Then open
+the file in `team/` whose `name:` matches (a first name or the student number)
+and follow it for the whole session. A stub file: say so, and offer to fill it
+in, one template question per message, never from a guess. No file: carry on
+without a profile, say so, and point at `team/_TEMPLATE.md`. A subagent skips
+this. Do not match `git config user.email` instead: it names whoever set up the
+clone, and it failed (`AUDIT2.md` Part 6). Five people share this repository
+and they do not share a background, so this is not a courtesy. The full text of
+this rule is `STATE_HISTORY.md` part F.
 
 ## What this project is
 
@@ -73,34 +48,47 @@ when plotted against H/τ, regardless of which plant produced the point. If the
 two plants do not overlap, the criterion is wrong or incomplete — and reporting
 that is still a result.
 
----
-
 ## Hard constraint, no exceptions
 
 **The project never writes to the vehicle's ECU.** Read-only OBD-II logging
 only. No flashing, no CAN transmission, no tuning. If a task seems to require
 writing to the car, it is the wrong task. Say so rather than finding a way.
 
----
+The app adds two structural rules: it never transmits to the vehicle, and it
+never writes raw car data to disk. `app/test_replay.py` asserts both.
 
-## State history
+## Training gate — agreed by Jad and Ghassan, 30 September 2026
 
-The dated state boxes that stood here, from Ghassan's X2 box of 11–13 October
-back to Phase D's of 21–22 September, are in `STATE_HISTORY.md`, part A,
-verbatim and newest first. The current state is `CHECKPOINT.md`.
+The live list's six items, verbatim ("Before ANY training, in this order"), each status in brackets from
+Ghassan's note of 9 October. The list as it stood: `STATE_HISTORY.md` part E; `CHECKPOINT.md` never restates it.
 
-## Where every phase stands
+1. [landed `75ca65f`; the fit that derives the thermal constants still steps at
+   1 s, mistake 25] **Sub-step the thermal network** (or integrate it
+   implicitly), then re-run `validate.py`, `check_premise.py`, `test_reward.py`,
+   `check_roads.py`, `generality_test.py` and the app pins, and sweep the
+   figures that move.
+2. [closed, `75ca65f`] **The fingerprint covers `data/derived_params.json`** (and `derived.py`).
+3. [the cap closed, `75ca65f`; the reporting holds until drive C] **Cap the
+   spark trim at 0 for the next training**; report every result with and
+   without the knock term until drive C.
+4. [closed, `75ca65f`] **Ramp every grade change** (the one-step knock spike).
+5. [open question: X1's preregistration came before X1 trained but tests
+   decision 12's set; is X1 step 5?] **A new preregistration**, written before
+   anything trains: D2-style randomised roads plus multi-climb roads as the
+   test set, the blind-arm check, damage reported both ways.
+6. [open; X1 and X2 trained before it, on Ghassan's order] **Drive C (knock),
+   before drive A** (`logs/DRIVE_PLAN.md`): read-only, six channels, roll-ons
+   in a held gear, the passenger on the phone, its decision rule written
+   before the drive.
 
-The phase table, the drive counts to quote and what a passing project means are
-in `README.md` ("Where every phase stands"). What changed on 8 and 11 September
-is `STATE_HISTORY.md` part D.
+## Rules for an experiment that will be reported (plan v3, 6.4, 6.6, 7)
 
-## The numbers that matter
-
-Every figure the project quotes, with the command that prints it, is in
-`README.md` ("The numbers that matter"). The void figures this file used to lead
-with are `STATE_HISTORY.md` part C. The drive replays, the Taif drive, the
-rolling road and the towing standard are in `thesis/LIMITATIONS.md`.
+1. The preregistration is committed before the first training step.
+2. Train from a clean, pushed commit whose `train.py` and `fingerprint.py` are `main`'s.
+3. Every seed and arm on one environment (one machine, one set of versions).
+4. Python 3.12 for every fingerprint, test and run; NumPy 2; record the exact torch, stable-baselines3 and gymnasium versions.
+5. Two results are one experiment only if every FATAL fingerprint field (`plant_sha` on one Python minor), `derived_sha`,
+   the protocol and the environment agree; otherwise compare them only as an ablation declared in advance.
 
 ## Mistakes already made: one rule each
 
@@ -133,18 +121,6 @@ number. Read the entry before you touch what it names.
 23. Before comparing two temperatures, check that they are the same temperature (housing, gas, thermocouple, cycle mean).
 24. An explanation names quantities: measure every one it names before writing it.
 25. An output that does not move after its input changed means: check the input reached it. After a plant change, run every suite that reads the plant.
-
-## Known limitations, and what is open
-
-The limitations the thesis must state, and the open measurements (the
-discretisation Phase D, D2 and C4 were scored in; Phase F's threshold rule), are
-in `thesis/LIMITATIONS.md`, verbatim.
-
-## Repository layout
-
-Every script and file, and what it is for, is in `README.md` ("Repository
-layout"). Two rules from it stay here: the app never writes to the vehicle, and
-it never writes raw car data to disk; `app/test_replay.py` asserts both.
 
 ## Conventions
 
@@ -186,46 +162,32 @@ it never writes raw car data to disk; `app/test_replay.py` asserts both.
   samples, eight behind the fitted calibrations. All three are correct and they
   are not interchangeable.
 
----
-
 ## When a new drive CSV arrives
 
 `python new_drive.py <csv>`, then `python build_dataset.py "logs/raw/*.csv"`. A new
 drive re-derives the plant: it changes the simulator and invalidates trained
 agents. The full routine and its six checks: `.claude/rules/data.md`.
 
-## Training gate — agreed by Jad and Ghassan, 30 September 2026
+## Where things go
 
-The six items of the live list of 30 September, verbatim (`conflict.md` section 0
-and Ghassan's reply): "Before ANY training, in this order". Beside each, its
-status and the commit that closed it, from Ghassan's note of 9 October. The list
-as it stood, with that note, is `STATE_HISTORY.md` part E. `CHECKPOINT.md` never
-restates it.
+A permanent rule goes here; a procedure for one area in `.claude/rules/`; the current state in `CHECKPOINT.md`.
+When the state changes, rewrite the checkpoint and move what is no longer current, verbatim, to the end of
+`STATE_HISTORY.md`; never delete it. This file stays under 200 lines; `verify_docs.py` fails it above 300.
 
-1. **Sub-step the thermal network** (or integrate it implicitly), then re-run
-   `validate.py`, `check_premise.py`, `test_reward.py`, `check_roads.py`,
-   `generality_test.py` and the app pins, and sweep the figures that move.
-   — *Landed in `75ca65f` (8 October). One part is open: the fit that derives
-   the thermal constants still steps at 1 s (mistake 25); re-fitting it is a
-   plant change, so it waits for the next.*
-2. **The fingerprint covers `data/derived_params.json`** (and `derived.py`).
-   — *Closed in `75ca65f`: fingerprint schema 2.*
-3. **Cap the spark trim at 0 for the next training**; report every result
-   with and without the knock term until drive C.
-   — *The cap closed in `75ca65f`; the reporting rule holds until drive C.*
-4. **Ramp every grade change** (the one-step knock spike).
-   — *Closed in `75ca65f`.*
-5. **A new preregistration**, written before anything trains: D2-style
-   randomised roads plus multi-climb roads as the test set, the blind-arm
-   check, damage reported both ways.
-   — *Open question: X1's preregistration was committed before X1 trained,
-   but its test set is decision 12's, not this one. Whether X1 is step 5 is
-   for Jad and Ghassan to answer.*
-6. **Drive C (knock), before drive A** (`logs/DRIVE_PLAN.md`): read-only,
-   six channels, roll-ons in a held gear, the passenger on the phone, its
-   decision rule written before the drive.
-   — *Open. X1 and X2 trained before it, on Ghassan's order
-   (`PREREGISTRATION_X1.md` section 0).*
+## Where everything is
+
+| what | where |
+|---|---|
+| the current state, and the next actions | `CHECKPOINT.md` |
+| every figure with the command that prints it; the phase table; the repository layout | `README.md` |
+| the results, experiment by experiment | `results/README.md` |
+| every mistake, in full | `docs/MISTAKES.md` |
+| the limitations and open measurements for the thesis | `thesis/LIMITATIONS.md` |
+| every superseded state, verbatim (part A the dated boxes, B the old checkpoint, C the void headline, D September's changes, E the old lists, F the full text of condensed sections) | `STATE_HISTORY.md` |
+| an index of the dated documents | `HISTORY.md` |
+| the procedure for one area, loaded when you touch its files | `.claude/rules/` |
+| where every number we did not measure comes from | `REFERENCES.md` |
+| the restructure of 14 October, move by move | `_merge_review/MIGRATION_LEDGER.md` |
 
 ## Tone note for whoever writes the thesis
 
