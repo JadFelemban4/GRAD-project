@@ -26,6 +26,8 @@ knock model the agents learn against is untested until drive C.
   simulation file is byte-identical to his last push, and his `check_premise`,
   `validate` and `test_reward` print his figures on Jad's machine.
 - `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
+- G-CTX passed: in a fresh session every memory file together is 5.8k tokens
+  (Jad's `/context`, 14 October).
 - App suites after the merge (14 October): `python -m app.test_replay` 49 of 49
   and node 305 of 305; `app.test_results` and `app.test_agents` fail more than
   before the merge, because the results tab assumes fingerprint schema 1 (the
@@ -50,13 +52,11 @@ knock model the agents learn against is untested until drive C.
 1. Fix drive C's decision-rule numbers with Ghassan, before the drive; then
    drive C, then A and D on one trip (`logs/DRIVE_PLAN.md`, revised 14 October,
    `c16b857`).
-2. A fresh Claude Code session at the root: `/context` must show `CLAUDE.md`
-   under 200 lines (gate G-CTX).
-3. The validation decisions.
-4. The results tab learns fingerprint schema 2, and the learning lab's pins move
+2. The validation decisions.
+3. The results tab learns fingerprint schema 2, and the learning lab's pins move
    to the live plant (both in `team/jad.md`).
-5. Plan v3 phase 3: tag `sim-v1`, write `CHANGELOG.md` and the results index.
-6. The parallel items of 30 September (Ghassan's twenty on multi-climb roads,
+4. Plan v3 phase 3: tag `sim-v1`, write `CHANGELOG.md` and the results index.
+5. The parallel items of 30 September (Ghassan's twenty on multi-climb roads,
    the spark-capped rescoring of Jad's 48, Chapter 4 with both branches side by
    side and never pooled, the battery of Phase E) and the app's backlog are
    `STATE_HISTORY.md` part E, verbatim. X1 and X2 came after them: check an item

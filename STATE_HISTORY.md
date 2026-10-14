@@ -4131,3 +4131,8 @@ knock model the agents learn against is untested until drive C.
 
 `CLAUDE.md` (Training gate) · `README.md` · `results/README.md` ·
 `STATE_HISTORY.md` · `HISTORY.md` and `CHANGELOG.md` (not written yet)
+
+# Part I — lines rotated out of CHECKPOINT.md, 14 October 2026 (G-CTX done)
+
+2. A fresh Claude Code session at the root: `/context` must show `CLAUDE.md`
+   under 200 lines (gate G-CTX).
