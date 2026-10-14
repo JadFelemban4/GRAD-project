@@ -260,3 +260,12 @@ dated figure with a `RETIRED-OK` note, or update the sentence. Do not change
 the data. **Fixed the same day**, before the documentation restructure: each
 line now sits under a `RETIRED-OK` marker naming its dated figure, and
 `verify_docs.py` passes 73 of 73 (933 figure mentions).
+
+**A third item from the same merge: the learning lab's pins.**
+`Explanatory Simulation/tests/test_catalog.py` still pins the merged plant of
+30 September: its premise figures and its `plant_sha` (`c236a8db3e201090`).
+The plant fixes of 8 October moved both (`plant_sha` is now `3c48890dd15bc116`
+on Python 3.12). Measured on 14 October: `python -m unittest tests.test_catalog`,
+run inside the lab's folder, fails one of its ten tests, on the preview figure.
+The fix, later: move the pins to the live plant, with a comment naming the
+plant they belong to (plan v3, section 12.3, step 4).

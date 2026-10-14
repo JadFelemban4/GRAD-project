@@ -50,7 +50,8 @@ knock model the agents learn against is untested until drive C.
 1. Finish the documentation restructure; push it after Ghassan's OK.
 2. Drive C, then A, then D (`logs/DRIVE_PLAN.md`, revised 14 October, `c16b857`).
 3. The validation decisions.
-4. The results tab learns fingerprint schema 2 (`team/jad.md`).
+4. The results tab learns fingerprint schema 2, and the learning lab's pins move
+   to the live plant (both in `team/jad.md`).
 5. Plan v3 phase 3: tag `sim-v1`, write `CHANGELOG.md` and the results index.
 6. The parallel items of 30 September (Ghassan's twenty on multi-climb roads,
    the spark-capped rescoring of Jad's 48, Chapter 4 with both branches side by
