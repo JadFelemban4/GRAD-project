@@ -2,7 +2,7 @@
 name: Jad Felemban
 student_number: 2340550
 email: endo.felemban@gmail.com
-updated: 2026-10-14
+updated: 2026-10-15
 ---
 
 # Jad
@@ -249,6 +249,17 @@ the plant: schema 1 is `plant.py`, `thermal.py` and `engine_env.py`; schema 2
 adds `derived.py` and makes `derived_sha` fatal. Then update the tests, so that
 a schema-1 file is recognised as schema 1 instead of rejected for lacking
 `derived_sha`. Ghassan's schema 2 stays as it is.
+
+**Fixed 15 October 2026**, on the branch `JMF-2340550-results-schema2`
+(`ca2cd73`, `2fd9aed`, not pushed yet). The tab reads each result file by its
+own schema. Schema 1's rule, copied from `fingerprint.py` at `a7ce729`, gives
+back the hash all 24 files record, `b5a3069f32a83754`, which is the plant of
+`sep17-before-merge`. For Phase D, D2 and C4 the tab now says: made on another
+plant, the plant of `sep17-before-merge`; and a line beside the two hashes
+names the schema whose rule made them. `python -m app.test_results`: 123 of 124
+(the one left needs `pwsh`, as before the merge). `app.test_agents` still has 22
+failing, and that is a separate problem, the agents page's (session report of
+15 October): only the "plant_sha alone" line came with the merge.
 
 **A second, smaller item from the same merge.** `verify_docs.py` fails 1 of its
 73 checks: two dated documents still quote the premise figures from before
