@@ -4136,3 +4136,20 @@ knock model the agents learn against is untested until drive C.
 
 2. A fresh Claude Code session at the root: `/context` must show `CLAUDE.md`
    under 200 lines (gate G-CTX).
+
+# Part J — lines rotated out of CHECKPOINT.md, 15 October 2026 (the results tab reads each file by its own schema)
+
+Last verified: 2026-10-14 — verify_docs.py 74/74 · drift_test.py 16/16 (the full run, on the restructure's final commit)
+main: the merge and the documentation restructure, both pushed on 14 October · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
+
+- App suites after the merge (14 October): `python -m app.test_replay` 49 of 49
+  and node 305 of 305; `app.test_results` and `app.test_agents` fail more than
+  before the merge, because the results tab assumes fingerprint schema 1 (the
+  open item in `team/jad.md`).
+
+- Nothing. The documentation restructure (plan v3 phase 4) is finished and on
+  `main`: every move in `_merge_review/MIGRATION_LEDGER.md`, the session in
+  `SESSION_REPORT_2026-10-14_merge-and-restructure.md`.
+
+3. The results tab learns fingerprint schema 2, and the learning lab's pins move
+   to the live plant (both in `team/jad.md`).

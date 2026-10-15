@@ -78,4 +78,11 @@ plant of `sep17-before-merge`. They differ on `plant_sha`, and D2 and C4 on
 ## 3. Still open from the merge
 
 - The learning lab's pins (`team/jad.md`, the third item).
-- Where this branch goes: Jad decides.
+
+## 4. Closing
+
+Jad, `/close main`: the branch goes to `main`, once he says yes to the files
+named. `CHECKPOINT.md` rewritten, the lines it no longer needs moved verbatim
+to `STATE_HISTORY.md` part J; `HISTORY.md` indexes this report, the next
+session's prompt (`NEXT_SESSION_2026-10-15.md`) and the 14 October report, and
+records the lesson as HIST-0002.

@@ -1,7 +1,7 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-14 — verify_docs.py 74/74 · drift_test.py 16/16 (the full run, on the restructure's final commit)
-main: the merge and the documentation restructure, both pushed on 14 October · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
+Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · drift_test.py 16/16 last run on 14 October (the restructure's final commit)
+main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
 `STATE_HISTORY.md` part B, verbatim. This file holds the current state only: the
@@ -28,16 +28,18 @@ knock model the agents learn against is untested until drive C.
 - `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
 - G-CTX passed: in a fresh session every memory file together is 5.8k tokens
   (Jad's `/context`, 14 October).
-- App suites after the merge (14 October): `python -m app.test_replay` 49 of 49
-  and node 305 of 305; `app.test_results` and `app.test_agents` fail more than
-  before the merge, because the results tab assumes fingerprint schema 1 (the
-  open item in `team/jad.md`).
+- The results tab names the plant of Phase D, D2 and C4: made on another plant,
+  `sep17-before-merge`'s, each file read by its own fingerprint schema
+  (`ca2cd73`, `2fd9aed`; `SESSION_REPORT_2026-10-15_results-schema.md`).
+- App suites (15 October, Python 3.12.10): `python -m app.test_replay` 49 of 49,
+  node 306 of 306, `app.test_results` 123 of 124 (the one needs `pwsh`);
+  `app.test_agents` 22 failing, 19 of them the agents page refusing the old
+  agents, and `app.test_simulation` 1 (its asset check), both as on `main` before.
 
 ## In progress (who · branch · what)
 
-- Nothing. The documentation restructure (plan v3 phase 4) is finished and on
-  `main`: every move in `_merge_review/MIGRATION_LEDGER.md`, the session in
-  `SESSION_REPORT_2026-10-14_merge-and-restructure.md`.
+- Nothing. The results-tab fix of 15 October goes to `main`; the session is
+  `SESSION_REPORT_2026-10-15_results-schema.md`.
 
 ## Blockers
 
@@ -53,14 +55,19 @@ knock model the agents learn against is untested until drive C.
    drive C, then A and D on one trip (`logs/DRIVE_PLAN.md`, revised 14 October,
    `c16b857`).
 2. The validation decisions.
-3. The results tab learns fingerprint schema 2, and the learning lab's pins move
-   to the live plant (both in `team/jad.md`).
+3. The learning lab's pins move to the live plant (`team/jad.md`). The agents
+   page reads each agent's own fingerprint schema and its tests stop copying
+   `runs_c4`'s `meta.json`; `test_simulation`'s asset check learns the `?v=`
+   suffix (`SESSION_REPORT_2026-10-15_results-schema.md`, section 2).
 4. Plan v3 phase 3: tag `sim-v1`, write `CHANGELOG.md` and the results index.
 5. The parallel items of 30 September (Ghassan's twenty on multi-climb roads,
    the spark-capped rescoring of Jad's 48, Chapter 4 with both branches side by
    side and never pooled, the battery of Phase E) and the app's backlog are
    `STATE_HISTORY.md` part E, verbatim. X1 and X2 came after them: check an item
    before taking it up.
+6. For Ghassan, before the next training: `train.py`'s `CLOSED` list has no
+   `wideair_dt1`, though X2's result was published on 13 October (session
+   report of 15 October, 2.3).
 
 ## Files outside git (where · last backup · manifest)
 
@@ -68,6 +75,8 @@ knock model the agents learn against is untested until drive C.
   the machines that trained them. Jad's machine: a backup of 14 October, 4,391
   files, 2.5 GB, VERIFIED, with its `MANIFEST.csv` and `SHA256SUMS`; one copy,
   on the same disk; a Google Drive copy and a USB copy are still to make.
+  Checked 15 October: its 978 agent files are unchanged on disk, and `C:` is
+  still the only disk (session report of 15 October, 2.4).
 - `GRAD-agent-backups/2026-09-23` and `2026-09-24` (`runs_c4`, sha-checked).
 
 ## References

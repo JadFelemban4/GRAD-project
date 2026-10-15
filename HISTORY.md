@@ -57,6 +57,9 @@ the title is the file's own first line.
 | 2026-10-09 | `app/REVIEW_2026-10-09_full-app.md` | Astra review — app after the 9 October implementation |
 | 2026-10-09 | `app/SESSION_REPORT_2026-10-09_astra-implementation.md` | Astra implementation and acceptance — 9 October 2026 |
 | 2026-10-14 | `conflict_2026-10-14.md` | Conflicts of the merge of 14 October 2026 |
+| 2026-10-14 | `SESSION_REPORT_2026-10-14_merge-and-restructure.md` | Session report — 14 October 2026: Phase 0, the merge, the documentation restructure |
+| 2026-10-15 | `SESSION_REPORT_2026-10-15_results-schema.md` | Session report — 15 October 2026: the results tab reads each file by its own fingerprint schema |
+| 2026-10-15 | `NEXT_SESSION_2026-10-15.md` | Prompt for the next session — written 15 October 2026, after the results tab's schema fix |
 | ? | `conflict.md` | conflict.md — Ghassan's branch merged into Jad's: every conflict, and a recommendation for each |
 | ? | `conflict_ar.md` | ملف التعارض: دمج برانش غسان مع برانش جاد |
 
@@ -93,4 +96,25 @@ results tab's schema-1 assumptions are each right alone and wrong together.
 Lesson: after a merge, run every suite against a baseline taken before it. Git
 reports conflicting lines, not conflicting assumptions.
 Evidence: commit `cc5468f` · `team/jad.md` (the open items) · `conflict_2026-10-14.md`
+Replaced by: —
+
+### HIST-0002 — A hashing rule changed, and every reader of the old files had to change with it
+Date: 2026-10-15 · Status: Active reference · Owner(s): Jad
+Context: HIST-0001's 55 failing tests. Fingerprint schema 2 (8 October) changed
+what `plant_sha` hashes (`derived.py` added) and how (the source text instead of
+`ast.dump`); the 24 result files of Phase D, D2 and C4 were written under schema 1.
+What was tried: schema 1's rule, run from git on each file's own commit, before
+any change; then the results tab taught to read each file by its own schema
+(`derived_sha` in the block means schema 2).
+Outcome: the old rule gives back all 24 recorded hashes, and the tab names their
+plant, `sep17-before-merge`'s; `app.test_results` 123 of 124. A second hash had
+moved with the schema, unannounced: `random_road.code_sha` calls
+`fingerprint._code_only`, so `road_sha` changed rule too. Not shown: the agents
+page, whose 22 failing tests are older than the merge but for one.
+Lesson: when a hashing rule changes, find every function that calls it, and
+compare an old file's hash only with one made by that file's own rule. A number
+made by an old rule, shown beside one made by today's, needs a line saying which
+rule made it.
+Evidence: commits `ca2cd73`, `2fd9aed` · `SESSION_REPORT_2026-10-15_results-schema.md` ·
+`app/results_provenance.py`
 Replaced by: —
