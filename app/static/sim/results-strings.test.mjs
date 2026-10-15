@@ -115,6 +115,7 @@ const CONTRACT = {
   'results.plant.hashes': 'recorded {recorded} · this tree {live}',
   'results.plant.tag': 'the plant of {tag}',
   'results.plant.route_git': 'compared through git: recorded under another Python',
+  'results.plant.schema': 'both hashes by the rule of fingerprint schema {schema}, the one these files were written under',
   'results.plant.reason.python': 'recorded under Python {recorded}; this server runs {live}, and git cannot reach the recorded commit',
   'results.plant.reason.no_git_route': "the recorded commit's plant files are not the ones that were hashed",
   'results.plant.reason.dirty': 'the plant files had uncommitted changes when it ran',
@@ -356,7 +357,7 @@ test('in Arabic every Latin letter and digit sits inside an isolate; English lin
 // whatever the caller passes. A slot that may hold Arabic words or a list
 // stays bare, and the caller isolates each Latin item in it (contract 4.5).
 const ISOLATED_SLOTS = new Set(['command', 'commit', 'date', 'detail', 'episodes', 'eval_dt', 'file', 'frozen',
-  'head', 'live', 'mei', 'module', 'plant', 'prefix', 'protocol', 'python', 'recorded', 'seed', 'status',
+  'head', 'live', 'mei', 'module', 'plant', 'prefix', 'protocol', 'python', 'recorded', 'schema', 'seed', 'status',
   'steps', 'tag', 'train_dt', 'type']);
 const BARE_SLOTS = new Set(['have', 'list', 'name', 'other', 'seeds']);
 const slotDepths = text => {

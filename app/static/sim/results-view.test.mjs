@@ -88,6 +88,21 @@ test('a common plant state lists both hashes, the tag, the commits and each file
   assert.equal(ar.details[3], t('ar', 'results.plant.committed', { commit: iso('a3a048e'), date: iso('2026-09-22T03:02:51+03:00') }));
 });
 
+test('the fingerprint schema both hashes were made by is said beside them, in both languages', () => {
+  // A file written under schema 1 is compared with this tree hashed by schema 1's
+  // rule, which is not the plant hash the page's header gives: the line says so.
+  const old = { ...PROV, files: { 0: file(0, { schema: 1 }), 1: file(1, { schema: 1 }) } };
+  assert.deepEqual(plantView(old, 'en').details.slice(0, 2), [
+    'recorded b5a3069f32a83754 · this tree c236a8db3e201090',
+    'both hashes by the rule of fingerprint schema 1, the one these files were written under',
+  ]);
+  assert.equal(plantView(old, 'ar').details[1], t('ar', 'results.plant.schema', { schema: iso('1') }));
+  const two = { ...PROV, files: { 0: file(0, { schema: 1 }), 1: file(1, { schema: 2 }) } };
+  assert.ok(!plantView(two, 'en').details.some(d => d.startsWith('both hashes')), 'two schemas name no one rule');
+  const forced = { ...PROV, state: 'forced', files: { 0: file(0, { state: 'forced', forced: ['!! x'], schema: 1 }) } };
+  assert.ok(!plantView(forced, 'en').details.some(d => d.startsWith('both hashes')), 'no comparison, no rule');
+});
+
 test('every state has its own label, and an unknown one claims nothing', () => {
   const want = {
     forced: 'Agents scored with a plant mismatch forced', not_recorded: 'Plant not recorded in this file',

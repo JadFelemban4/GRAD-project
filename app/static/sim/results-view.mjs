@@ -81,8 +81,11 @@ function reasonText(reason, recordedPython, livePython, lang) {
 const distinct = values => [...new Set(values.filter(v => v !== null && v !== undefined && v !== ''))];
 
 // The facts of files that share one state (spec 5.2: they appear in every
-// state): a forced state's own lines quoted, both hashes, the tag and the git
-// route. A section in one state passes all its files; a mixed one, each
+// state): a forced state's own lines quoted, both hashes and the fingerprint
+// schema whose rule made them, the tag and the git route. A file written under
+// an older schema is compared with this tree hashed by that schema's rule, not
+// with the plant hash the header gives, so the schema is named beside the
+// hashes. A section in one state passes all its files; a mixed one, each
 // seed's file alone, under that seed's own state.
 function plantFacts(files, state, tag, lang) {
   const out = [];
@@ -95,6 +98,8 @@ function plantFacts(files, state, tag, lang) {
   const live = distinct(files.map(f => f.live?.plant_sha));
   if (recorded.length && state !== 'forced' && state !== 'not_recorded') {
     out.push(t(lang, 'results.plant.hashes', { recorded: slot(lang, recorded.join(', ')), live: slot(lang, live.join(', ')) }));
+    const schemas = distinct(files.map(f => f.schema));
+    if (schemas.length === 1) out.push(t(lang, 'results.plant.schema', { schema: slot(lang, schemas[0]) }));
   }
   if (tag) out.push(t(lang, 'results.plant.tag', { tag: slot(lang, tag) }));
   if (files.length && files.every(f => f.route === 'git')) out.push(t(lang, 'results.plant.route_git'));
