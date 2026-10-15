@@ -18,20 +18,37 @@ of a file can never become a git option.
 
 THE LIVE SIDE. live_side() describes this tree: the plant hashes read from
 disk, the hash of the derived constants and of the logs they were derived
-from, and the live fingerprint block of each protocol, rendered by
+from, the live fingerprint block of each protocol, rendered by
 fingerprint.format_block and parsed back by results_eval, so that a result
-file's block and the live one are compared as the same text. The two data
+file's block and the live one are compared as the same text, and this tree's
+plant and road hashes by schema 1's rule. The two data
 hashes are copies of train.derived_sha and derive_params.fingerprint, each
 tested equal to its original in a subprocess. This module never imports
 derive_params (importing it sets DERIVING_PARAMS for the whole process, which
 turns every missing derived constant into NaN), train, record_agents or
 knock_margin.
 
-THE PYTHON VERSION. fingerprint._code_only hashes the interpreter's own syntax
-tree, so a plant hash depends on the Python minor version. A hash recorded
-under another Python is compared only through git: the recorded commit's
-plant files are read from git and hashed under this Python (plant_at,
-road_sha_at), cached per commit, since a commit never changes.
+THE SCHEMA. A result file is read by the fingerprint schema it was written
+under, never by today's. format_block does not print the schema, so it is read
+from the block (schema_of): fingerprint.py has written derived_sha into every
+block since schema 2 (8 October 2026, conflict.md decision 2) and into none
+before. Schema 1 hashed plant.py, thermal.py and engine_env.py, the code being
+the syntax tree without docstrings as ast.dump prints it (_code_only_schema_1,
+tested equal to fingerprint.py at a7ce729); schema 2 hashes
+fingerprint.PLANT_FILES, derived.py among them, by fingerprint._code_only, and
+makes derived_sha fatal. A schema-1 file's plant and road hashes are compared
+with this tree's, a commit's or a tag's hashed by schema 1's rule; derived_sha,
+which no schema-1 file records, is then on one side only, so a schema-1 file
+can be "another" plant but never "same". The 24 files of Phase D, D2 and C4
+are schema 1. From the merge of 14 October (cc5468f) until this rule, every
+file was hashed by today's rule, and the tab named the plant of none of them.
+
+THE PYTHON VERSION. Schema 1's code hash depends on the Python minor version,
+because ast.dump does. Schema 2's is built not to, but a hash recorded under
+another Python is still compared only through git, as CLAUDE.md keeps
+plant_sha to one Python minor: the recorded commit's plant files are read from
+git and hashed under this Python by the file's schema (plant_at, road_sha_at),
+cached per commit and schema, since neither changes.
 
 THE PLANT STATES. classify_eval decides one evaluation file's plant state in
 the design's order (forced, not recorded, another plant, cannot compare, same
@@ -41,6 +58,7 @@ not. The words the page shows for each state live in results-strings.mjs.
 """
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import os
@@ -70,6 +88,10 @@ _REF = re.compile(r"^[0-9A-Za-z][0-9A-Za-z._/-]{0,199}$")
 _OBJECT_ID = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 _PLANT_AT = {}
 _ROAD_AT = {}
+# Schema 1: fingerprint.py from 21 September to 8 October 2026, its last copy on
+# main at a7ce729. Frozen here, since fingerprint.py now holds schema 2 only.
+SCHEMA_1 = 1
+SCHEMA_1_PLANT_FILES = ("plant.py", "thermal.py", "engine_env.py")
 
 
 class Git:
@@ -222,12 +244,53 @@ def minor(version_text: str | None) -> str | None:
     return f"{m.group(1)}.{m.group(2)}" if m else None
 
 
-def code_hash(sources: list[bytes]) -> str:
-    """fingerprint._sha_files(code_only=True) over sources already read."""
+def _code_only_schema_1(src):
+    """fingerprint._code_only as schema 1 had it, copied from a7ce729: the
+    syntax tree with every docstring stripped, printed by ast.dump. ast.dump
+    prints the same tree differently on Python 3.12 and 3.13, which is why a
+    schema-1 hash belongs to one Python minor. None when the source does not
+    parse."""
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return None
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef,
+                                 ast.AsyncFunctionDef)):
+            continue
+        body = node.body
+        if (body and isinstance(body[0], ast.Expr)
+                and isinstance(body[0].value, ast.Constant)
+                and isinstance(body[0].value.value, str)):
+            node.body = body[1:] or [ast.Pass()]
+    return ast.dump(tree)
+
+
+def schema_of(fp: dict) -> int:
+    """The fingerprint schema a block was written under: 2 when it carries
+    derived_sha, which fingerprint.py has written into every block since
+    schema 2, even as "None"; 1 otherwise."""
+    return 2 if "derived_sha" in fp else SCHEMA_1
+
+
+def _code_rule(schema: int):
+    """The function a schema hashed a file's code by."""
+    return _code_only_schema_1 if schema == SCHEMA_1 else FP._code_only
+
+
+def _plant_files(schema: int) -> tuple:
+    """The files a schema's plant_sha is made of, in its fixed order."""
+    return SCHEMA_1_PLANT_FILES if schema == SCHEMA_1 else FP.PLANT_FILES
+
+
+def code_hash(sources: list[bytes], schema: int = FP.SCHEMA_VERSION) -> str:
+    """fingerprint._sha_files(code_only=True) over sources already read, by
+    `schema`'s code rule."""
+    rule = _code_rule(schema)
     h = hashlib.sha256()
     for raw in sources:
         raw = raw.replace(b"\r\n", b"\n")
-        code = FP._code_only(raw.decode("utf-8", errors="replace"))
+        code = rule(raw.decode("utf-8", errors="replace"))
         h.update(code.encode("utf-8") if code is not None else raw)
     return h.hexdigest()[:16]
 
@@ -247,43 +310,49 @@ def _commit_id(git, commit):
     return git.resolve(commit)
 
 
-def plant_at(git: Git, commit: str) -> dict | None:
-    """{"plant_sha", "plant_text_sha"} of fingerprint.PLANT_FILES as `commit`
-    holds them, hashed under THIS Python; None when git cannot read them."""
+def plant_at(git: Git, commit: str, schema: int = FP.SCHEMA_VERSION) -> dict | None:
+    """{"plant_sha", "plant_text_sha"} of `schema`'s plant files as `commit`
+    holds them, hashed by that schema's rule under THIS Python; None when git
+    cannot read them (schema 2 at a commit without derived.py, for one)."""
     full = _commit_id(git, commit)
     if full is None:
         return None
-    if full not in _PLANT_AT:
+    key = full, schema
+    if key not in _PLANT_AT:
         sources = []
-        for name in FP.PLANT_FILES:
+        for name in _plant_files(schema):
             raw = git.show(full, name)
             if raw is None:
                 return None
             sources.append(raw)
-        _PLANT_AT[full] = {"plant_sha": code_hash(sources), "plant_text_sha": byte_hash(sources)}
-    return dict(_PLANT_AT[full])
+        _PLANT_AT[key] = {"plant_sha": code_hash(sources, schema),
+                          "plant_text_sha": byte_hash(sources)}
+    return dict(_PLANT_AT[key])
 
 
-def _road_code_sha(raw):
+def _road_code_sha(raw, schema: int = FP.SCHEMA_VERSION):
     """random_road.code_sha's rule over a file's bytes: the text as inspect
     reads it (UTF-8, a byte-order mark dropped, universal newlines), its code
-    without docstrings by fingerprint._code_only, then SHA-256."""
+    without docstrings by `schema`'s rule (code_sha uses fingerprint._code_only,
+    so the road hash changed rule with the schema), then SHA-256."""
     src = raw.decode("utf-8-sig", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
-    code = FP._code_only(src)
+    code = _code_rule(schema)(src)
     return hashlib.sha256((code if code is not None else src).encode("utf-8")).hexdigest()[:16]
 
 
-def road_sha_at(git: Git, commit: str) -> str | None:
-    """random_road.py's road_sha as `commit` holds the file, under THIS Python."""
+def road_sha_at(git: Git, commit: str, schema: int = FP.SCHEMA_VERSION) -> str | None:
+    """random_road.py's road_sha as `commit` holds the file, by `schema`'s rule
+    under THIS Python."""
     full = _commit_id(git, commit)
     if full is None:
         return None
-    if full not in _ROAD_AT:
+    key = full, schema
+    if key not in _ROAD_AT:
         raw = git.show(full, "random_road.py")
         if raw is None:
             return None
-        _ROAD_AT[full] = _road_code_sha(raw)
-    return _ROAD_AT[full]
+        _ROAD_AT[key] = _road_code_sha(raw, schema)
+    return _ROAD_AT[key]
 
 
 def data_fingerprint(root) -> str | None:
@@ -330,13 +399,27 @@ def derived_loaded_differs(root) -> bool:
         return True
 
 
+def _schema_1_side() -> dict | None:
+    """This tree's plant and road hashes by schema 1's rule, under this Python,
+    read from the files the live plant imports: what a file written under
+    schema 1 is compared with. None when one of them cannot be read."""
+    here = Path(FP.HERE)
+    try:
+        sources = [(here / name).read_bytes() for name in SCHEMA_1_PLANT_FILES]
+        road = (here / "random_road.py").read_bytes()
+    except OSError:
+        return None
+    return {"plant_sha": code_hash(sources, SCHEMA_1), "plant_text_sha": byte_hash(sources),
+            "road_sha": _road_code_sha(road, SCHEMA_1)}
+
+
 def live_side(root, protocols=("phase-d", "d2")) -> dict:
     """This tree as the results tab compares against it. See the module docstring.
 
     A protocol whose live fingerprint cannot be built (an import that fails,
     an assertion at import, an unknown protocol) is absent from "blocks" and
     listed in "import_errors" with the exception's type name; KeyboardInterrupt
-    is never caught."""
+    is never caught. "schema_1" is _schema_1_side()."""
     python = platform.python_version()
     plant_sha = FP._sha_files(FP.PLANT_FILES)
     blocks, errors = {}, []
@@ -359,6 +442,7 @@ def live_side(root, protocols=("phase-d", "d2")) -> dict:
         "derived_loaded_differs": derived_loaded_differs(root),
         "blocks": blocks,
         "import_errors": errors,
+        "schema_1": _schema_1_side(),
     }
 
 
@@ -375,28 +459,40 @@ def _given(fp, key):
     return None if value in (None, "", "None") else value
 
 
-def tag_for(git: Git, plant_sha: str) -> str | None:
-    """The first of TAGS whose plant, hashed under this Python, is `plant_sha`."""
+def tag_for(git: Git, plant_sha: str, schema: int = FP.SCHEMA_VERSION) -> str | None:
+    """The first of TAGS whose plant, hashed by `schema`'s rule under this
+    Python, is `plant_sha`."""
     if not plant_sha:
         return None
     for tag in TAGS:
-        plant = plant_at(git, tag)
+        plant = plant_at(git, tag, schema)
         if plant is not None and plant["plant_sha"] == plant_sha:
             return tag
     return None
 
 
-def _git_route(fp, git):
+def _read_as_schema_1(block: dict, side: dict) -> dict:
+    """The live block with this tree's plant and road hashes by schema 1's rule
+    (side is live_side's "schema_1"). Every other field means the same in both
+    schemas; derived_sha stays, so a schema-1 file finds it on one side only."""
+    out = dict(block, plant_sha=side["plant_sha"], plant_text_sha=side["plant_text_sha"])
+    scenario = out.get("scenario")
+    if scenario is not None and _ROAD_TOKEN.search(scenario):
+        out["scenario"] = _ROAD_TOKEN.sub(lambda m: "road_sha=" + str(side["road_sha"]), scenario)
+    return out
+
+
+def _git_route(fp, git, schema: int = FP.SCHEMA_VERSION):
     """(the recorded block to compare, None), or (None, why there is no route).
 
     The route needs the recorded commit here, its plant files byte-equal to
     the recorded plant_text_sha, and no plant file dirty when the run was
     made. The copy then carries the commit's plant hashed under this Python,
     and the road_sha of a d2 scenario recomputed from the commit's
-    random_road.py the same way."""
+    random_road.py the same way, both by `schema`'s rule and files."""
     head = _given(fp, "git_head")
     commit = git.resolve(head) if head else None
-    plant = plant_at(git, commit) if commit else None
+    plant = plant_at(git, commit, schema) if commit else None
     if plant is None:
         return None, "python"
     dirty = fp.get("git_dirty_plant_files")
@@ -407,7 +503,7 @@ def _git_route(fp, git):
     rec = dict(fp, plant_sha=plant["plant_sha"])
     scenario = rec.get("scenario")
     if scenario is not None and _ROAD_TOKEN.search(scenario):
-        road = road_sha_at(git, commit)
+        road = road_sha_at(git, commit, schema)
         if road is None:
             return None, "no_git_route"
         rec["scenario"] = _ROAD_TOKEN.sub(lambda m: "road_sha=" + road, scenario)
@@ -426,15 +522,20 @@ def classify_eval(parsed: dict, live: dict, git: Git, rel: str,
     cannot_compare for a one-sided field or a needed restart (the plant files
     changed after the server started: "restart"; the derived constants did:
     "derived_restart"), then same or same_code. Each FATAL field is compared as
-    the text format_block wrote."""
+    the text format_block wrote, the plant and road hashes on both sides by the
+    file's own schema (see the module docstring); "live" carries this tree's
+    plant hash by that rule, so the page shows two hashes that compare."""
     fp = dict(parsed.get("fingerprint") or {})
+    schema = schema_of(fp)
+    side = live.get("schema_1") if schema == SCHEMA_1 else None
+    live_plant = (side or {}).get("plant_sha") if schema == SCHEMA_1 else live["plant_sha"]
     protocol = (parsed.get("protocol") or EV.protocol_from_fingerprint(fp)
                 or title_protocols.get(parsed.get("title")))
     commit = last.get(rel)
     out = {"state": None, "reason": None, "route": None, "protocol": protocol,
            "recorded": {k: _given(fp, k) for k in _RECORDED},
-           "live": {"plant_sha": live["plant_sha"], "python": live["python"]},
-           "differs": [], "tag": None,
+           "live": {"plant_sha": live_plant, "python": live["python"]},
+           "differs": [], "tag": None, "schema": schema,
            "forced": list(parsed.get("forced") or []),
            "file": {"rel": rel, "commit": dict(commit) if commit else None,
                     "changed": rel in status}}
@@ -452,10 +553,14 @@ def classify_eval(parsed: dict, live: dict, git: Git, rel: str,
         module = f"fingerprint.plant_fingerprint({protocol})"
         listed = any(e.get("module") == module for e in live.get("import_errors", ()))
         return done("cannot_compare", "import" if protocol and listed else "protocol")
+    if schema == SCHEMA_1:
+        if side is None:
+            return done("cannot_compare", "import")
+        block = _read_as_schema_1(block, side)
     if live["minor"] is not None and minor(out["recorded"]["python"]) == live["minor"]:
         rec, out["route"] = fp, "same_python"
     else:
-        rec, why = _git_route(fp, git)
+        rec, why = _git_route(fp, git, schema)
         if rec is None:
             return done("cannot_compare", why)
         out["route"] = "git"
@@ -463,7 +568,7 @@ def classify_eval(parsed: dict, live: dict, git: Git, rel: str,
     rec_d, live_d = out["recorded"]["derived_sha"], live.get("derived_sha")
     derived_differs = rec_d is not None and live_d is not None and rec_d != live_d
     if out["differs"] or derived_differs:
-        out["tag"] = tag_for(git, rec.get("plant_sha"))
+        out["tag"] = tag_for(git, rec.get("plant_sha"), schema)
         return done("another", None if out["differs"] else "derived_differs")
     one_sided = any((f in rec) != (f in block) for f in FP.FATAL)
     if one_sided or (rec_d is not None and live_d is None):
