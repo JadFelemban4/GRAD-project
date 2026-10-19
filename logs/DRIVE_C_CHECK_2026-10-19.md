@@ -106,7 +106,8 @@ missed them:
    mass near 400). Firm, near-full throttle for **20–30 seconds**, twenty
    segments or more. Last night: the load ran at a median 4824 rpm, in bursts
    of at most 5.5 s.
-3. **In the afternoon heat.** Last night was 17.5–31.5 °C after midnight.
+3. **In the warmest hours available** (section 8: the summer heat is over).
+   Last night was 17.5–31.5 °C after midnight.
 4. **One log per part, named for it** (`driveC2_steps-<date>.csv`), and the
    30-second wait after starting each log.
 
@@ -133,3 +134,36 @@ the repository.
 | `2026-10-19_01-20-16.csv` | 928 | `cf92414011f5f8712c568f2cb4bb6cf3c4c06b1edbcbb320b7d5c851e0aaeb0e` |
 | `2026-10-19_01-20-22.csv` | 249460 | `95d9d64fa5da58035c597c98e9fb3db9238724e4667c5cab899f27f94e953178` |
 | `2026-10-19_01-42-36.csv` | 202056 | `f1eaded840bc7d86fbb62c72b22a6c6195d6e6d8fe4e0f6305b45053832baebb` |
+
+## 8. Ghassan's reply, 19 October: the summer heat is over
+
+Ghassan, by voice message to Jad the same morning: the heat the earlier logs
+were recorded in will not come back this season; he asked us to decide what
+that changes; he will drive C1 and C2.
+
+**Recommended, for Jad and Ghassan to agree before the drive: drive C1 and C2
+now, in the warmest hours available, and do not wait for heat.** Gate G3
+(every drive approved) is 2 November, and the season will not turn before the
+project ends.
+
+- **The warmest hours:** early afternoon, and C2 on the coast rather than at
+  altitude. Last night's first log read 30.0–31.5 °C after midnight (section
+  3's script), so an afternoon on the coast is still warmer than anything these
+  logs hold.
+- **The rule names its temperature.** The verdict holds for the ambient range
+  the drive covers; the scenario's 42 °C stays outside it and is reported as
+  untested (CLAUDE.md mistake 6). The range goes into the rule before the drive.
+- **What is lost:** the hot-against-cool comparison meant to tell a knock retard
+  from a tip-in (drivability) retard (`logs/DRIVE_PLAN.md`, C2 step 4). And the
+  two possible answers are no longer equal: a car that pulls timing on a step in
+  cool air would pull it in heat too, but a car that pulls none says so only up
+  to the temperature driven, because knock grows with heat.
+- **A question for Ghassan, before the drive:** can the step size do the
+  separating instead? A knock retard should need a large step at low engine
+  speed; a tip-in retard should come with any firm step. If so, drive half of
+  the twenty steps at half pedal and half at full, and write that into the
+  rule.
+- **C1's spark comparison is not affected:** the model's spark is computed at
+  each reading's own ambient (`car_spark_boost.py`). The knee may be: cooler air
+  knocks less, so C1 may record too few retards to place it, and "cannot tell"
+  is a possible verdict.
