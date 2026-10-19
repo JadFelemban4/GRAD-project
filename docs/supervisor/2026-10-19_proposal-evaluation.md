@@ -185,3 +185,14 @@ project's set period.)
 - Nothing in the proposal has been changed yet.
 - No reference was read for this file: the strands in 4.2 are a plan, not a
   survey.
+
+## 8. Jad's first answers to Evaluator 2 (19 October), and the verdict on each
+
+Jad's words, translated; his second point read as the phased plan.
+
+| Evaluator 2's point | Jad's answer | verdict |
+|---|---|---|
+| 1. literature survey | "We found several papers: the latest was close to our project, and before it the Mercedes one." | Right as a start. The survey still has to be written, read by the team, and end with the gap (4.2). |
+| 3. phased plan | "We will do it." | Right: the plan exists in Notion (4.4). |
+| 2. comparison | "There are no similar solutions, but we can compare fuel consumption and protection without our project." | Half right. Comparing fuel and protection against the car without the project is right: it is the experiment's comparison with its baseline. "No similar solutions" is wrong, and risky: Mercedes-Benz Predictive Powertrain Control, which Jad cites under point 1, is one, and Evaluator 2's originality level reads "builds on existing/common approaches without clearly naming what distinguishes it". Say instead that similar solutions exist and build preview systems, and that this project asks when preview is worth buying (4.3). Both comparisons are needed. |
+| 4. specialization | "RL exists and we are training it." | Incomplete: it shows the project uses AI, not who applies which knowledge (4.5). |
