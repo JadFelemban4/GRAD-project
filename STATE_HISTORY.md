@@ -4164,3 +4164,17 @@ Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · dr
 1. Fix drive C's decision-rule numbers with Ghassan, before the drive; then
    drive C, then A and D on one trip (`logs/DRIVE_PLAN.md`, revised 14 October,
    `c16b857`).
+
+# Part L — lines rotated out of CHECKPOINT.md, 19 October 2026 (decisions 14–23 answered)
+
+- Ghassan · `main` · drive C's decision rule, PROPOSED 19 October from blind
+  research (`results/DRIVE_C_RULE.md`, `python drive_c_rule_numbers.py`):
+  decisions 14–23 wait for Jad's and Ghassan's columns; the rule's analysis
+  script is written after them (`SESSION_REPORT_2026-10-19_driveC-rule.md`).
+
+- Drive C's repeat waits for decisions 14–23 and the rule's analysis script.
+
+1. Drive C: Jad and Ghassan answer decisions 14–23 (`results/VALIDATION_DECISIONS.md`
+   section E); commit the rule's analysis script; run its stage A blind on the
+   18–19 October files; then repeat drive C (`logs/DRIVE_PLAN.md`), then A and D
+   on one trip. Nobody computes target minus actual on a drive C file before.

@@ -126,12 +126,12 @@ safely, skip it; a missing pull costs less than anything else.
 > October. The logging was right (drive C's six channels, each read about every
 > 0.9 s), but the driving covered neither part: one load step matched C2, no
 > segment reached the climb's cell, and it ran after midnight at 17.5–31.5 °C
-> (Jad's side's check, `drive_c_check.py`). **The decision rule's numbers are now
-> proposed** (`results/DRIVE_C_RULE.md`; decisions 14–23 in
-> `results/VALIDATION_DECISIONS.md`), from research that read no drive C log.
-> **Do not drive again until both columns of 14–23 are filled and the rule's
-> analysis script is committed.** The instructions below are revised to match
-> the rule; nobody computes the retard on the 18–19 October files until then.
+> (Jad's side's check, `drive_c_check.py`). **The decision rule is agreed**
+> (19 October, Jad and Ghassan: decisions 14–23 in `results/VALIDATION_DECISIONS.md`;
+> the rule is `results/DRIVE_C_RULE.md`), from research that read no drive C log.
+> **Drive again once the rule's analysis script is committed.** The instructions
+> below match the rule; nobody computes the retard on the 18–19 October files
+> before that script's stage C.
 
 **Why.** The model's knock integral shows **no detectable relationship** with
 the retard the car applies (correlation −0.12 over 14 318 rows of 7475b5d7).
@@ -228,7 +228,7 @@ on the coast.* *(New, 13 October; revised 19 October to match the rule.)*
 4. A cool-morning session is optional now: the rule's verdict covers only the
    ambient range driven, either way.
 
-**Decision rule — PROPOSED 19 October, for Jad and Ghassan to answer**
+**Decision rule — AGREED 19 October by Jad and Ghassan**
 (`results/DRIVE_C_RULE.md`, decisions 14–23 in `results/VALIDATION_DECISIONS.md`;
 every number printed by `python drive_c_rule_numbers.py`). It replaces the draft
 of 13 October, whose placeholders were: a step = air mass +50 % between two

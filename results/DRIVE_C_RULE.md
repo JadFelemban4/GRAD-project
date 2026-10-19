@@ -1,11 +1,12 @@
-# Drive C's decision rule — PROPOSED, 19 October 2026
+# Drive C's decision rule — AGREED, 19 October 2026
 
-**Status: proposed, not yet binding.** It replaces the placeholders of the
-13 October draft (`logs/DRIVE_PLAN.md`, drive C). It becomes binding when Jad
-and Ghassan have answered decisions 14–23 in `results/VALIDATION_DECISIONS.md`
-and the analysis script that implements it is committed, **before the repeat
-drive and before anyone computes the ignition retard on any drive C log**. That
-is the training gate's item 6 (`CLAUDE.md`): the rule is written before the drive.
+**Status: agreed by Jad and Ghassan on 19 October 2026** (decisions 14–23 in
+`results/VALIDATION_DECISIONS.md`, all ten as recommended; Jad's answer as
+reported by Ghassan), before anyone computed the ignition retard on any drive C
+log. Proposed the same day; it replaces the placeholders of the 13 October draft
+(`logs/DRIVE_PLAN.md`, drive C). The analysis script that implements it is
+committed **before the repeat drive**: the training gate's item 6 (`CLAUDE.md`),
+the rule written before the drive. No number below changes after that.
 
 Every number below is printed by `python drive_c_rule_numbers.py`
 (`results/DRIVE_C_RULE_NUMBERS.txt`) or named with its source file. The research
