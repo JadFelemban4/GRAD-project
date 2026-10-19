@@ -60,6 +60,10 @@ the title is the file's own first line.
 | 2026-10-14 | `SESSION_REPORT_2026-10-14_merge-and-restructure.md` | Session report — 14 October 2026: Phase 0, the merge, the documentation restructure |
 | 2026-10-15 | `SESSION_REPORT_2026-10-15_results-schema.md` | Session report — 15 October 2026: the results tab reads each file by its own fingerprint schema |
 | 2026-10-15 | `NEXT_SESSION_2026-10-15.md` | Prompt for the next session — written 15 October 2026, after the results tab's schema fix |
+| 2026-10-19 | `logs/DRIVE_C_CHECK_2026-10-19.md` | Drive C, first attempt (night of 18–19 October 2026): what it covers |
+| 2026-10-19 | `docs/supervisor/2026-10-19_proposal-evaluation.md` | The proposal's evaluation (SP1 abstract round): what it asks, and how we answer it |
+| 2026-10-19 | `SESSION_REPORT_2026-10-19_driveC-and-evaluation.md` | Session report — 19 October 2026: drive C's first attempt, and the proposal's evaluation |
+| 2026-10-19 | `NEXT_SESSION_2026-10-19.md` | Prompt for the next session — written 19 October 2026, after drive C's first attempt and the proposal's evaluation |
 | ? | `conflict.md` | conflict.md — Ghassan's branch merged into Jad's: every conflict, and a recommendation for each |
 | ? | `conflict_ar.md` | ملف التعارض: دمج برانش غسان مع برانش جاد |
 
@@ -117,4 +121,21 @@ made by an old rule, shown beside one made by today's, needs a line saying which
 rule made it.
 Evidence: commits `ca2cd73`, `2fd9aed` · `SESSION_REPORT_2026-10-15_results-schema.md` ·
 `app/results_provenance.py`
+Replaced by: —
+
+### HIST-0003 — A drive driven before its rule was fixed, judged without its answer
+Date: 2026-10-19 · Status: Active reference · Owner(s): Jad, Ghassan
+Context: Ghassan drove drive C on the night of 18–19 October while its decision
+rule was still the draft of 13 October; the Training gate (item 6) has the rule
+written before the drive.
+What was tried: the logs were checked for adequacy only, by `drive_c_check.py`,
+which counts readings, segments and steps and never subtracts the two ignition
+angles.
+Outcome: the logs cover neither C1 nor C2 (one plan-like step of twenty, no
+loaded segment of 20 s), so drive C is driven again; and because nobody has
+computed the retard, the rule can still be fixed before anyone sees it.
+Lesson: when data arrives before its rule, first ask whether it is enough, with
+a check that cannot see the answer; then fix the rule; only then compute the
+result.
+Evidence: `drive_c_check.py` · `logs/DRIVE_C_CHECK_2026-10-19.md` · commit `821387d`
 Replaced by: —

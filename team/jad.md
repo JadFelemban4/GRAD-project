@@ -181,6 +181,18 @@ What did NOT land:
 but had nothing left to answer with. Ask fewer, keep the ones that matter, and
 when I say I am at my limit, stop asking.
 
+19 October, the proposal's evaluation: **what separates the project from
+Mercedes-Benz's Predictive Powertrain Control**, through Google Maps (it looks
+ahead at the traffic; nobody needs another one, but nothing says on which trip
+looking ahead is worth it). Asked the difference, I answered: theirs is for
+trucks and specific regions, and targets fuel where we target looking ahead.
+The fuel half was right: fuel against protecting the turbo from heat. The
+correction I needed: Mercedes looks ahead too, which is what makes it similar;
+the difference is using preview against measuring when it is worth paying for.
+And "there are no similar solutions" is a trap in front of an evaluator when we
+cite Mercedes ourselves (`docs/supervisor/2026-10-19_proposal-evaluation.md`,
+section 8).
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing beyond the
