@@ -167,3 +167,25 @@ project ends.
   each reading's own ambient (`car_spark_boost.py`). The knee may be: cooler air
   knocks less, so C1 may record too few retards to place it, and "cannot tell"
   is a possible verdict.
+
+## 9. The numbers to fix before the drive
+
+Asked by Ghassan, 19 October: what "fix the rule's numbers" means. The
+decision rule in `logs/DRIVE_PLAN.md` is still the DRAFT of 13 October, its
+numbers placeholders, and the Training gate (item 6) has the rule written
+before the drive: the logs are then judged by numbers chosen before anyone saw
+the retard. Every number below is the draft's, or marked where the draft has
+none.
+
+| | the number | the draft's value | what it decides |
+|---|---|---|---|
+| C2-1 | what counts as a step | an air-mass rise of at least ~50 % between two readings | which rises are steps at all |
+| C2-2 | the windows | the retard over the 3 s after the step, against its median over the 20 s before | what "the retard rose" is measured against |
+| C2-3 | what counts as pulling timing on a step | a rise of more than 2° | whether one step counts as "pulled timing" |
+| C2-4 | the car does not pull timing | fewer than 1 step in 5 | the spike is a model artefact: the baseline ECU's spark follows the current step's load (or the demand is ramped) before the next training |
+| C2-5 | the car pulls timing | more than half the steps | a load-step knock cost stays, sized to the measured retard; between C2-4 and C2-5, inconclusive |
+| C2-6 | the fewest valid steps that allow a verdict | none in the draft; the protocol asks for twenty | below it, no verdict (last night's logs hold one) |
+| C2-7 | the ambient range the verdict covers | none in the draft (section 8) | where the verdict stops |
+| C2-8 | half pedal against full pedal | none in the draft (section 8) | whether the step size separates a knock retard from a tip-in retard |
+| C1-1 | the change in the knee that triggers a retune | none; the knee is now 0.85 | whether the damage formula's knock knee moves |
+| C1-2 | the car-minus-model spark in the climb's cell that triggers a retune, and the readings a verdict needs | none; now −3.8° on 4 readings | whether the baseline ECU's boosted spark is retuned |
