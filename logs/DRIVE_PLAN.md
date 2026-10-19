@@ -112,16 +112,37 @@ safely, skip it; a missing pull costs less than anything else.
    python model_vs_data.py                        # re-score the simulator
    ```
 
+   **Except drive C** (19 October): its CSVs stay out of `logs/raw/`, and
+   `build_dataset.py`, `full_run.py` and `car_spark_boost.py` are not run on
+   them, until its decision rule's analysis has run (`results/DRIVE_C_RULE.md`,
+   section 1). `new_drive.py` is safe on them: it withholds the retard unless
+   given `--unblind`.
+
 ---
 
 ## Drive C — knock: sustained load and sudden load steps (do this first)
+
+> **19 October 2026: DRIVEN ONCE, TO BE REPEATED.** Ghassan drove it on 18–19
+> October. The logging was right (drive C's six channels, each read about every
+> 0.9 s), but the driving covered neither part: one load step matched C2, no
+> segment reached the climb's cell, and it ran after midnight at 17.5–31.5 °C
+> (Jad's side's check, `drive_c_check.py`). **The decision rule's numbers are now
+> proposed** (`results/DRIVE_C_RULE.md`; decisions 14–23 in
+> `results/VALIDATION_DECISIONS.md`), from research that read no drive C log.
+> **Do not drive again until both columns of 14–23 are filled and the rule's
+> analysis script is committed.** The instructions below are revised to match
+> the rule; nobody computes the retard on the 18–19 October files until then.
 
 **Why.** The model's knock integral shows **no detectable relationship** with
 the retard the car applies (correlation −0.12 over 14 318 rows of 7475b5d7).
 **But that drive could not have seen it** (28 September): logged with 26
 channels, it holds only about 400 genuine readings of each ignition angle in
 55 minutes — one every ~8 s — and a third of the target/actual pairs in a row
-were read more than a second apart. A knock retard lasts a second or two. The
+were read more than a second apart. A knock retard lasts a second or two. *(Corrected
+19 October: Bosch's documented setting is a 3° step per knock event recovered
+0.75° at a time at about 4 s per degree, so a single event lasts about 12 s;
+faster, 1–2 s per degree, only after a load-range change. The conclusion stands:
+8 s sampling still cannot resolve its onset.)* The
 test so far is not a refutation; it is a test this sampling cannot perform —
 mistake 13b's trap again, where a real relationship read +0.35 until faster
 logging showed +0.95.
@@ -160,10 +181,15 @@ every 0.9–1.25 s:
 gear the gear does not need inferring, and below 3300 rpm this engine does not
 enrich, so lambda is 1.0.
 
-**How to drive.** Gearbox in **manual mode (M)** throughout. No gear changes
-inside a segment or a step.
+**Select the channels in exactly the order of the table** (19 October): the
+target angle is then polled right after the actual, which the rule's pairing
+needs (`results/DRIVE_C_RULE.md`, V8).
 
-*Part C1 — steady loaded segments, on a climb, in the afternoon heat.*
+**How to drive.** Gearbox in **manual mode (M)** throughout. No gear changes
+inside a segment or a step. Do C2 before C1, or write down the order. Write down
+the fuel grade and fill, and the drive mode.
+
+*Part C1 — steady loaded segments, on a climb, in the warmest hours you can get.*
 
 1. The same climb as drive A works — a second ascent with this channel set.
 2. Choose a gear that keeps the engine at **2000–3500 rpm** — low speed and high
@@ -174,50 +200,56 @@ inside a segment or a step.
 3. Hold **firm throttle, near full, for 20–30 seconds at a time**. On most roads
    the car will gain speed at that load: lift before the limit, and ease off
    between segments.
-4. **Twenty or more segments.** The climb's cell needs hundreds of readings of
-   each angle; ten segments were the plan before it was known how few the cell
-   holds.
+4. **25–30 segments** (revised 19 October from twenty), at least 20 of them held
+   in the cell near 2700 rpm (at 25 °C, 165–185 kPa is about 350–400 kg/h at
+   2400 rpm and 450–510 kg/h at 3000 rpm), the rest near full throttle at
+   2000–3300 rpm for the knee. The spark verdict needs at least 15 segments with
+   5 readings in the cell each.
 
-*Part C2 — sudden load steps, on a straight, empty road, in the afternoon heat.*
-*(New, 13 October.)*
+*Part C2 — sudden load steps, on a straight, empty road, in the warmest hours,
+on the coast.* *(New, 13 October; revised 19 October to match the rule.)*
 
-1. From a **steady light cruise in a held gear** (6th, 7th or 8th, engine at
-   1500–2500 rpm), **press the pedal firmly and quickly — at least half way, up
-   to the floor — and hold for 5 seconds**, then lift back to cruise. Always
-   before the limit.
-2. **A minute of steady cruising between steps.** The logger reads one channel
-   at a time, so the pause makes each step's readings independent (AUDIT.md H4)
-   and lands them at a different moment of the step each time: lined up on the
-   step afterwards, twenty steps resolve a retard shorter than one reading
-   interval.
-3. **Twenty or more steps**, spread across the three gears.
-4. **If possible, repeat C2 in the cool of an early morning.** A knock retard
-   grows with heat; a drivability retard on a tip-in would not. Whether
-   `Target ignition angle from torque intervention` minus `Actual ignition
-   angle` includes such a retard is not known, and the two sessions together
-   separate them.
+1. **35 steps in 5 blocks of 7.** Each block is one gear on its own stretch, and
+   the blocks are at least 5 minutes apart (steps driven with no break count as
+   one block and need far stricter cuts). About 20 full-pedal and 15 half-pedal
+   steps.
+2. Before each step, **a full steady minute of light cruise** in a held gear.
+   Then press the pedal firmly and quickly from the cruise position, without
+   lifting first, and **hold it 7 s where legal (5 s at least)**, then back to the
+   same cruise. Always before the limit.
+   - **Full pedal** only from 1500–2000 rpm in 6th, 1500–1800 in 7th, 1500–1600
+     in 8th: on drive B's rates these end at or below about 116 km/h after 5 s.
+   - **Half pedal** in 6th or 7th at 2000–2500 rpm (in the model, half steps
+     lower or in 8th barely spike, so they would not count).
+   - Full pedal below 2000 rpm is the low-speed pre-ignition region of a
+     downsized turbo engine; worth knowing.
+3. **8–10 minutes of step-free steady cruise** as well, anywhere in the C2 file:
+   the sham windows that measure the channel's jitter on the day.
+4. A cool-morning session is optional now: the rule's verdict covers only the
+   ambient range driven, either way.
 
-**Decision rule — DRAFT, for Jad and Ghassan to fix before the drive.** The
-agreed list of 30 September asks for drive C's rule to be written before the
-drive. The numbers below are placeholders to be set, not results.
+**Decision rule — PROPOSED 19 October, for Jad and Ghassan to answer**
+(`results/DRIVE_C_RULE.md`, decisions 14–23 in `results/VALIDATION_DECISIONS.md`;
+every number printed by `python drive_c_rule_numbers.py`). It replaces the draft
+of 13 October, whose placeholders were: a step = air mass +50 % between two
+readings; the 3 s after against the 20 s before; a pull = more than 2°;
+"does not" under 1 step in 5, "does" over half.
 
-- **C2, the spike.** Each step is an air-mass rise of at least ~50 % between two
-  readings. Read the car's retard (target minus actual) in the 3 s after the
-  step against its median over the 20 s before.
-  - It rises by **more than 2° on fewer than 1 step in 5**: the car does not
-    pull timing on a load step. The model's one-step spike is an artefact of its
-    1 s step; schedule the baseline ECU's spark on the current step's load (or
-    ramp the torque demand at the rate drive D measures) before the next
-    training.
-  - It rises by **more than 2° on more than half the steps**: the car does pull
-    timing on load steps. Keep a load-step knock cost, sized to the measured
-    retard, and say so in the next preregistration.
-  - In between: inconclusive; repeat with fewer channels.
-- **C1, the level.** Replay C1 through the model with the car's measured spark
-  and load (as `model_vs_data.py` does for 7475b5d7). Read the knock integral at
-  which the car starts to retard (the knee, now 0.85) and the car-minus-model
-  spark in the climb's cell (now −3.8° on 4 readings). Before the drive, fix
-  which size of change in each would trigger a retune.
+- **C2:** a step is air above 1.2× its 20-s median reaching 1.5× and holding,
+  from a steady light cruise, counted only where the model's own spike exceeds
+  KI 1.0. **Only the late window decides** (1–5 s after, ending 0.6 s before the
+  release); a step pulls if it rises **≥ 2.25°** (3 counts). At 24 valid steps:
+  **pulls if ≥ 6** (and more often than sham windows), **does not if ≤ 3**,
+  4–5 inconclusive; at least 16 valid steps. Half against full pedal is a
+  non-binding secondary; the verdict covers only the ambient driven.
+- **What it triggers:** "does not", or "pulls" no more often than steady C1
+  running at the same load → schedule the baseline's spark on the current load.
+  "Pulls" and step-specific → keep a load-step knock cost sized with C1's knee.
+- **C1:** retune the damage knee only if the measured onset is more than
+  max(0.10 KI, 2·u_val) from 0.85 (at least 8 confirmed onsets); retune the
+  boosted spark schedule only if it is off by more than max(0.85°, 2·u_val)
+  (at least 15 segments). 0.85° departs from the validation plan's 1.3°: it is
+  the schedule error that moves every car by 10 K, R1's own basis.
 
 ---
 

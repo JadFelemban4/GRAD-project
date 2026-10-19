@@ -59,6 +59,7 @@ the title is the file's own first line.
 | 2026-10-14 | `conflict_2026-10-14.md` | Conflicts of the merge of 14 October 2026 |
 | 2026-10-14 | `SESSION_REPORT_2026-10-14_merge-and-restructure.md` | Session report — 14 October 2026: Phase 0, the merge, the documentation restructure |
 | 2026-10-15 | `SESSION_REPORT_2026-10-15_results-schema.md` | Session report — 15 October 2026: the results tab reads each file by its own fingerprint schema |
+| 2026-10-19 | `SESSION_REPORT_2026-10-19_driveC-rule.md` | Session report — 19 October 2026: drive C's decision rule, proposed blind |
 | 2026-10-15 | `NEXT_SESSION_2026-10-15.md` | Prompt for the next session — written 15 October 2026, after the results tab's schema fix |
 | ? | `conflict.md` | conflict.md — Ghassan's branch merged into Jad's: every conflict, and a recommendation for each |
 | ? | `conflict_ar.md` | ملف التعارض: دمج برانش غسان مع برانش جاد |

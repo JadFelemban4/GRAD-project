@@ -4153,3 +4153,14 @@ main: the merge and the documentation restructure, both pushed on 14 October · 
 
 3. The results tab learns fingerprint schema 2, and the learning lab's pins move
    to the live plant (both in `team/jad.md`).
+
+# Part K — lines rotated out of CHECKPOINT.md, 19 October 2026 (drive C's decision rule, proposed)
+
+Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · drift_test.py 16/16 last run on 14 October (the restructure's final commit)
+
+- Nothing. The results-tab fix of 15 October goes to `main`; the session is
+  `SESSION_REPORT_2026-10-15_results-schema.md`.
+
+1. Fix drive C's decision-rule numbers with Ghassan, before the drive; then
+   drive C, then A and D on one trip (`logs/DRIVE_PLAN.md`, revised 14 October,
+   `c16b857`).

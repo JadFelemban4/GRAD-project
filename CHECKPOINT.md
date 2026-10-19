@@ -1,6 +1,6 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · drift_test.py 16/16 last run on 14 October (the restructure's final commit)
+Last verified: 2026-10-19 — verify_docs.py 74/74 · drift_test.py 16/16 (drive C's rule, proposed) · the app suites below as of 15 October
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
@@ -15,6 +15,8 @@ knock model the agents learn against is untested until drive C.
 
 ## Verified current state (each line names the script or file that proves it)
 
+- Drive C was driven on 18–19 October and covered neither part: the logging
+  was right, the driving was not (Jad's side's check, `drive_c_check.py`).
 - X2 (11–13 October): INCONCLUSIVE on five pairs, the agents not converged
   (`python analyse_x2.py` -> `results/X2_RESULT.txt`; `results/x2_convergence.txt`).
 - X1 (8–9 October): preview's effect below the MEI of 5.43 points of cut, 17 of
@@ -38,22 +40,26 @@ knock model the agents learn against is untested until drive C.
 
 ## In progress (who · branch · what)
 
-- Nothing. The results-tab fix of 15 October goes to `main`; the session is
-  `SESSION_REPORT_2026-10-15_results-schema.md`.
+- Ghassan · `main` · drive C's decision rule, PROPOSED 19 October from blind
+  research (`results/DRIVE_C_RULE.md`, `python drive_c_rule_numbers.py`):
+  decisions 14–23 wait for Jad's and Ghassan's columns; the rule's analysis
+  script is written after them (`SESSION_REPORT_2026-10-19_driveC-rule.md`).
 
 ## Blockers
 
 - The knock model is untested: drive C decides how much of every agent's
   margin is real.
+- Drive C's repeat waits for decisions 14–23 and the rule's analysis script.
 - Thirteen validation decisions wait for Jad's and Ghassan's columns
   (`results/VALIDATION_DECISIONS.md`); nothing is relabelled, re-preregistered
   or retrained until they are answered.
 
 ## Next actions (in order)
 
-1. Fix drive C's decision-rule numbers with Ghassan, before the drive; then
-   drive C, then A and D on one trip (`logs/DRIVE_PLAN.md`, revised 14 October,
-   `c16b857`).
+1. Drive C: Jad and Ghassan answer decisions 14–23 (`results/VALIDATION_DECISIONS.md`
+   section E); commit the rule's analysis script; run its stage A blind on the
+   18–19 October files; then repeat drive C (`logs/DRIVE_PLAN.md`), then A and D
+   on one trip. Nobody computes target minus actual on a drive C file before.
 2. The validation decisions.
 3. The learning lab's pins move to the live plant (`team/jad.md`). The agents
    page reads each agent's own fingerprint schema and its tests stop copying

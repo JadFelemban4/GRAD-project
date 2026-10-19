@@ -1,0 +1,59 @@
+DRIVE C RULE NUMBERS -- for results/DRIVE_C_RULE.md (python drive_c_rule_numbers.py)
+No drive C log is read and no ignition retard is computed on any log.
+
+1. C2 VERDICT CUTS (blocks of 7, ICC 0.1; design q 0.075, m 0.45; both errors <= 5 %)
+   valid steps N  pulls if K >=  does not if K <=  false pulls  false does-not
+              16              5                 1         2.4 %            1.9 %
+              18              5                 2         3.2 %            3.6 %
+              20              5                 2         4.3 %            2.2 %
+              22              6                 3         2.3 %            3.7 %
+              24              6                 3         2.9 %            2.2 %
+              26              6                 4         3.7 %            3.4 %
+              28              6                 4         4.7 %            2.3 %
+              30              7                 5         2.5 %            3.2 %
+              32              7                 6         3.1 %            4.4 %
+              35              7                 6         4.3 %            2.5 %
+
+   N 24, cuts >= 6 / <= 3: chance of each verdict by the car's true pull rate
+   true rate    pulls  inconclusive  does not
+         0.0     2.9 %         11.4 %     85.7 %
+         0.1    11.8 %         24.3 %     63.9 %
+         0.2    27.4 %         31.4 %     41.3 %
+         0.3    46.4 %         30.1 %     23.4 %
+         0.4    64.7 %         23.4 %     11.9 %
+         0.6    89.1 %          8.7 %      2.2 %
+         0.8    97.9 %          1.9 %      0.3 %
+
+   sensitivity at N 24 (cuts held): false 'does not' for a 60 % puller if m is
+   (0.20 = two cylinders retarded; 0.45 = one of six, four to five readings; 0.58 = one, three readings)
+     m 0.20: 0.1 %
+     m 0.45: 2.2 %
+     m 0.58: 7.6 %
+   false 'pulls' for a never-pulling car if q is (the sham windows measure q on the day)
+     q 0.050: 0.9 %
+     q 0.075: 2.9 %
+     q 0.100: 6.3 %
+     q 0.150: 18.5 %
+   one block of 24 instead of blocks of 7 (no break between steps): cuts 8 / 1
+
+2. THE SPARK REQUIREMENT: the boosted schedule (>= 140 kPa) shifted for every car,
+   locked climb, baseline ECU (neutral action)
+   shift -0.85 deg: peak turbine 892.97 C (+9.95 K), damage 1058.0 (x1.248)
+   shift +0.00 deg: peak turbine 883.02 C (+0.00 K), damage 848.1 (x1.000)
+   shift +0.85 deg: peak turbine 873.27 C (-9.75 K), damage 683.4 (x0.806)
+   R1 is 10 K / x1.25 of damage (results/VALIDATION_PLAN.md section 4): about 0.85 deg of schedule.
+
+3. THE KNEE: knock damage on the same baseline run, at other knees
+   climb knock integral: median 0.613 on the climb, max 1.045
+   knee 0.65: knock damage   24.99 (x10.20 of the 0.85 value),  2.87 % of the run's damage
+   knee 0.75: knock damage    9.63 (x3.93 of the 0.85 value),  1.13 % of the run's damage
+   knee 0.85: knock damage    2.45 (x1.00 of the 0.85 value),  0.29 % of the run's damage
+   knee 0.95: knock damage    0.36 (x0.15 of the 0.85 value),  0.04 % of the run's damage
+   knee 1.00: knock damage    0.08 (x0.03 of the 0.85 value),  0.01 % of the run's damage
+   On the locked climb the knock term is the one-step spike plus little else; what a knee
+   shift moves is mainly the knock cost the agents meet in ordinary driving (results/X2_AGENTS.md).
+
+4. INPUT UNCERTAINTY FROM THE CHARGE TEMPERATURE (+6.3 K, the +1.9 % boosted-MAP gap), at the
+   climb's cell (2706 rpm, 175 kPa, coolant 90 C)
+   ambient 25 C: spark -0.48 deg via the MAP + -1.01 via the IAT compensation = -1.49 deg -> u_input 0.86 deg; knock integral at fixed spark +0.055 -> u_input 0.032 KI
+   ambient 42 C: spark -0.46 deg via the MAP + -1.01 via the IAT compensation = -1.46 deg -> u_input 0.84 deg; knock integral at fixed spark +0.051 -> u_input 0.030 KI

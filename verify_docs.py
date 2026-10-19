@@ -881,7 +881,11 @@ RETIRED_EXEMPT_AGENT_DIRS = ("results/agents/",)
 # with the same cost: a retired figure in these tables would pass. They are
 # regenerated, never edited, and nothing is quoted from them without the script.
 # The 29 September set keeps its published name (phase_d_130kmh.txt) and its scan.
-RETIRED_EXEMPT_RESULT_TABLES = re.compile(r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT)\.txt$")
+# 19 October 2026: results/DRIVE_C_RULE_NUMBERS.txt (drive_c_rule_numbers.py) joins
+# them for the same reason: its verdict table's error rates are bare percentages,
+# and two of them (2.3 %) collided with the retired pre-correction load residual.
+RETIRED_EXEMPT_RESULT_TABLES = re.compile(
+    r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT|DRIVE_C_RULE_NUMBERS)\.txt$")
 
 
 def _generated_agent_report(rel):
