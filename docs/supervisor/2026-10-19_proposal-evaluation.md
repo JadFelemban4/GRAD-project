@@ -196,3 +196,13 @@ Jad's words, translated; his second point read as the phased plan.
 | 3. phased plan | "We will do it." | Right: the plan exists in Notion (4.4). |
 | 2. comparison | "There are no similar solutions, but we can compare fuel consumption and protection without our project." | Half right. Comparing fuel and protection against the car without the project is right: it is the experiment's comparison with its baseline. "No similar solutions" is wrong, and risky: Mercedes-Benz Predictive Powertrain Control, which Jad cites under point 1, is one, and Evaluator 2's originality level reads "builds on existing/common approaches without clearly naming what distinguishes it". Say instead that similar solutions exist and build preview systems, and that this project asks when preview is worth buying (4.3). Both comparisons are needed. |
 | 4. specialization | "RL exists and we are training it." | Incomplete: it shows the project uses AI, not who applies which knowledge (4.5). |
+
+**What separates the project from Mercedes-Benz's system.** Jad's answer: it is
+for trucks and specific regions, and it targets fuel consumption where we target
+looking ahead. The fuel half is a real difference of goal: fuel against
+protecting the turbine from heat. The rest needs a correction: Mercedes-Benz
+looks ahead too, which is what makes it similar, and "trucks, specific regions"
+makes the project sound like the same system for cars. The sentence for the
+evaluator: *Mercedes-Benz uses road preview to save fuel on one kind of
+vehicle; we measure when preview is worth paying for, and test it on protecting
+a turbocharger from heat damage.*
