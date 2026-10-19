@@ -73,3 +73,31 @@ reading any drive C log.
 3. Stage A, blind, on the 18–19 October files: how many valid steps and
    segments they already give.
 4. The repeat drive (C2 on the coast, C1 on a climb, the warmest hours).
+
+## 5. Later the same day: the answers, and the analysis script
+
+- **Decisions 14–23 answered**: Jad and Ghassan agree to all ten (Jad's answer as
+  reported by Ghassan), recorded in both columns before any retard was computed
+  on a drive C file (`7ad649c`). Nobody watched the live angles during the
+  18–19 October drive (Ghassan); the rule's disclosure says so (`2d17c0a`).
+- **`drive_c_analysis.py`**, the rule as code, with `test_drive_c_analysis.py`
+  (105 tests on synthetic BimmerLink-style logs, all pass). Built by a second
+  workflow: one implementer, three independent reviews (fidelity to the rule,
+  blindness and robustness, statistics), one agent applying the confirmed fixes.
+  The reviews found real holes, all fixed: a sham or step window that overlapped
+  another step's baseline could leak a response into the frozen list; one lost
+  target poll could manufacture a 10° pull; stage C could have been run twice;
+  the knee's "no onset" bound could sit above the car's own first knock. Every
+  reading the rule leaves open is fixed in the module docstring as an
+  implementation choice (IC1–IC41), each the conservative one.
+- How it runs: `stage-a` reads only speed, air, coolant and ambient; `stage-b`
+  reads the angles only in the baseline windows and writes `frozen.json` with
+  its SHA-256; `stage-c` runs once, only when the scripts, the frozen list and
+  every log are committed and unchanged and the plant is X1's. `dry-run-spark`
+  reproduces −3.81 / 2.07 and −1.78.
+- **Driving guidance added** (no rule number changed): press every 75–90 s. On
+  synthetic logs the script keeps 60–61 valid sham windows at 60–67 s spacing
+  and 91–94 at 75–95 s; at a minute the sham after each step lands in the next
+  step's baseline.
+- Stage A on the 18–19 October files has not run: they are not on this machine.
+

@@ -40,25 +40,27 @@ knock model the agents learn against is untested until drive C.
 
 ## In progress (who · branch · what)
 
-- Ghassan · `main` · drive C's decision rule, AGREED 19 October by Jad and
-  Ghassan (decisions 14–23; `results/DRIVE_C_RULE.md`); its analysis script
-  is being written (`SESSION_REPORT_2026-10-19_driveC-rule.md`).
+- Ghassan · `main` · drive C: the rule AGREED 19 October (decisions 14–23;
+  `results/DRIVE_C_RULE.md`) and its analysis script committed
+  (`drive_c_analysis.py`, `python -m unittest test_drive_c_analysis` 105 of 105;
+  `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
 
 ## Blockers
 
 - The knock model is untested: drive C decides how much of every agent's
   margin is real.
-- Drive C's repeat waits for the rule's analysis script.
+- Stage A has not run on the 18–19 October files: they are not on this machine.
 - Thirteen validation decisions wait for Jad's and Ghassan's columns
   (`results/VALIDATION_DECISIONS.md`); nothing is relabelled, re-preregistered
   or retrained until they are answered.
 
 ## Next actions (in order)
 
-1. Drive C: commit the agreed rule's analysis script; run its stage A blind on
-   the 18–19 October files; then repeat drive C (`logs/DRIVE_PLAN.md`), then A
-   and D on one trip. Nobody computes target minus actual on a drive C file
-   before stage C.
+1. Drive C: put the 18–19 October files in `logs/drive_c/` (never `logs/raw/`) and
+   run `python drive_c_analysis.py stage-a --c2 <files> --c1 <files>` (blind) to
+   count what they give; repeat drive C (`logs/DRIVE_PLAN.md`); then stage A on
+   all files, stage B (the freeze), commit the frozen list, stage C once. Then A
+   and D on one trip.
 2. The validation decisions.
 3. The learning lab's pins move to the live plant (`team/jad.md`). The agents
    page reads each agent's own fingerprint schema and its tests stop copying

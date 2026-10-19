@@ -4178,3 +4178,16 @@ Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · dr
    section E); commit the rule's analysis script; run its stage A blind on the
    18–19 October files; then repeat drive C (`logs/DRIVE_PLAN.md`), then A and D
    on one trip. Nobody computes target minus actual on a drive C file before.
+
+# Part M — lines rotated out of CHECKPOINT.md, 19 October 2026 (drive C's analysis script committed)
+
+- Ghassan · `main` · drive C's decision rule, AGREED 19 October by Jad and
+  Ghassan (decisions 14–23; `results/DRIVE_C_RULE.md`); its analysis script
+  is being written (`SESSION_REPORT_2026-10-19_driveC-rule.md`).
+
+- Drive C's repeat waits for the rule's analysis script.
+
+1. Drive C: commit the agreed rule's analysis script; run its stage A blind on
+   the 18–19 October files; then repeat drive C (`logs/DRIVE_PLAN.md`), then A
+   and D on one trip. Nobody computes target minus actual on a drive C file
+   before stage C.

@@ -342,7 +342,9 @@ together act wrongly about 8–10 % of the time. Stated, not hidden.
   actual; V8).
 - **C2:** 35 steps in 5 blocks of 7, each block one gear on its own stretch, at
   least 5 min apart; a full steady minute before each step, pressing from the
-  cruise pedal position. **Full pedal** only from 1500–2000 rpm in 6th,
+  cruise pedal position, and a press every 75–90 s start to start (driving
+  guidance added 19 October from the analysis script's sham geometry, no rule
+  number changed: at 60 s the sham after each step falls in the next baseline). **Full pedal** only from 1500–2000 rpm in 6th,
   1500–1800 in 7th, 1500–1600 in 8th (these end at or below about 116 km/h after
   5 s on drive B's rates); **half pedal** in 6th or 7th at 2000–2500 rpm. Hold
   7 s where legal. 8–10 min of step-free steady cruise for the shams. C2 before

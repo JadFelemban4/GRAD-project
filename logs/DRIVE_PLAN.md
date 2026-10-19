@@ -213,7 +213,11 @@ on the coast.* *(New, 13 October; revised 19 October to match the rule.)*
    the blocks are at least 5 minutes apart (steps driven with no break count as
    one block and need far stricter cuts). About 20 full-pedal and 15 half-pedal
    steps.
-2. Before each step, **a full steady minute of light cruise** in a held gear.
+2. Before each step, **a full steady minute of light cruise** in a held gear:
+   **press every 75–90 s**, start to start. A press every 60 s still works, but
+   then the sham window after each step falls in the next step's baseline and is
+   lost; at 75 s or more every step also yields one sham (the analysis script on
+   synthetic logs: 60–61 valid shams at 60–67 s, 91–94 at 75–95 s; 24 needed).
    Then press the pedal firmly and quickly from the cruise position, without
    lifting first, and **hold it 7 s where legal (5 s at least)**, then back to the
    same cruise. Always before the limit.
