@@ -1,6 +1,6 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-19 — verify_docs.py 74/74 · the app suites as of 15 October (below; nothing under `app/` changed since) · drift_test.py 16/16 last run on 14 October (the restructure's final commit)
+Last verified: 2026-10-19 — verify_docs.py 74/74 · drift_test.py 16/16 (drive C's rule, proposed) · the app suites below as of 15 October
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
@@ -12,15 +12,12 @@ permanent rules are `CLAUDE.md`, the history is `STATE_HISTORY.md`.
 Test whether preview information is worth acquiring (the H/τ criterion,
 `CLAUDE.md`). The two newest ablations, X1 and X2, did not settle it, and the
 knock model the agents learn against is untested until drive C. Since 19 October
-the project is on the department's research track (Jad), and the team plans in
-Notion (the GRAD Project Dashboard: gates G0–G9, 12 October to 23 November).
+the project is on the research track; the team plans in Notion (gates G0–G9).
 
 ## Verified current state (each line names the script or file that proves it)
 
-- Drive C's first attempt (18–19 October) covers neither C1 nor C2, checked
-  blind; its CSVs stay outside `logs/raw/` (`python drive_c_check.py <folder>`).
-- The proposal's evaluation: both evaluators accept, four corrections asked
-  (`docs/supervisor/2026-10-19_proposal-evaluation.md`).
+- Drive C was driven on 18–19 October and covered neither part: the logging
+  was right, the driving was not (Jad's side's check, `drive_c_check.py`).
 - X2 (11–13 October): INCONCLUSIVE on five pairs, the agents not converged
   (`python analyse_x2.py` -> `results/X2_RESULT.txt`; `results/x2_convergence.txt`).
 - X1 (8–9 October): preview's effect below the MEI of 5.43 points of cut, 17 of
@@ -44,27 +41,31 @@ Notion (the GRAD Project Dashboard: gates G0–G9, 12 October to 23 November).
 
 ## In progress (who · branch · what)
 
-- Jad · `JMF-2340550-driveC-check` · the drive C check and the proposal's
-  evaluation (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
-- Ghassan · drive C again, C2 then C1, once the rule's numbers are fixed.
+- Ghassan · `main` · drive C: the rule AGREED 19 October (decisions 14–23;
+  `results/DRIVE_C_RULE.md`) and its analysis script committed
+  (`drive_c_analysis.py`, `python -m unittest test_drive_c_analysis` 105 of 105;
+  `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
+- Jad · the drive C check and the proposal's evaluation: both accept, four
+  corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 
 ## Blockers
 
 - The knock model is untested: drive C decides how much of every agent's
   margin is real.
+- Stage A has not run on the 18–19 October files (Jad's `Downloads/2026-10-19`).
 - Thirteen validation decisions wait for Jad's and Ghassan's columns
   (`results/VALIDATION_DECISIONS.md`); nothing is relabelled, re-preregistered
   or retrained until they are answered.
 
 ## Next actions (in order)
 
-1. Drive C's ten rule numbers (`logs/DRIVE_C_CHECK_2026-10-19.md` section 9):
-   Claude proposes, Jad and Ghassan fix them; Ghassan then drives C2 and C1 in the
-   warmest hours, before G3 (2 November); then A and D if still needed.
-2. The proposal's corrections (`docs/supervisor/2026-10-19_proposal-evaluation.md`
-   sections 4 and 6): ask Dr. Hammam the deadline and which track's form; bring
-   the literature review (Notion C9-03, 16–18 November) forward; restate the gap
-   for one engine; the team decides on `CLAUDE.md`'s two-plant claim.
+1. Drive C: put the 18–19 October files in `logs/drive_c/` (never `logs/raw/`) and
+   run `python drive_c_analysis.py stage-a --c2 <files> --c1 <files>` (blind) to
+   count what they give; repeat drive C (`logs/DRIVE_PLAN.md`); then stage A on
+   all files, stage B (the freeze), commit the frozen list, stage C once. Then A
+   and D on one trip.
+2. The proposal's corrections, and the two-plant claim in `CLAUDE.md`
+   (`docs/supervisor/2026-10-19_proposal-evaluation.md`, sections 4 to 6).
 3. The validation decisions.
 4. The learning lab's pins move to the live plant (`team/jad.md`). The agents
    page reads each agent's own fingerprint schema and its tests stop copying
@@ -89,9 +90,8 @@ Notion (the GRAD Project Dashboard: gates G0–G9, 12 October to 23 November).
   Checked 15 October: its 978 agent files are unchanged on disk, and `C:` is
   still the only disk (session report of 15 October, 2.4).
 - `GRAD-agent-backups/2026-09-23` and `2026-09-24` (`runs_c4`, sha-checked).
-- Drive C's six CSVs and the evaluation workbook (19 October): Jad's Downloads,
-  one copy; SHA-256 in `logs/DRIVE_C_CHECK_2026-10-19.md` section 7 and in
-  `docs/supervisor/2026-10-19_proposal-evaluation.md`.
+- Drive C's six CSVs and the evaluation workbook: Jad's Downloads, one copy
+  (SHA-256 in `logs/DRIVE_C_CHECK_2026-10-19.md` and the evaluation file).
 
 ## References
 

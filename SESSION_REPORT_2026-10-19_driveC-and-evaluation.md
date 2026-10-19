@@ -83,3 +83,15 @@ from 12 October to 23 November). Notion was read, not changed.
 - No Notion task was created.
 - `python verify_docs.py`: All 74 checks pass, after every commit of this
   session. No app suite was run: nothing under `app/` changed.
+
+## 7. At the push: the rule had been fixed on `main` the same day
+
+When Jad named `main`, it had moved: Ghassan's session
+(`SESSION_REPORT_2026-10-19_driveC-rule.md`) proposed the rule blind, recorded
+decisions 14–23 as agreed by Jad and Ghassan (`7ad649c`), and committed
+`drive_c_analysis.py`. So section 3 above, and section 9 of the check, are
+superseded: the numbers are fixed in `results/DRIVE_C_RULE.md`. The two
+branches were merged; `CHECKPOINT.md`, `HISTORY.md` and `STATE_HISTORY.md`
+conflicted, and `main`'s text was kept in each, with this session's additions
+on top (the line `CHECKPOINT.md` replaced is `STATE_HISTORY.md` part N). Stage A
+has not run on the 18–19 October files; they are on Jad's machine.

@@ -170,6 +170,12 @@ project ends.
 
 ## 9. The numbers to fix before the drive
 
+> **Superseded the same day.** Ghassan's session fixed the rule on `main`:
+> `results/DRIVE_C_RULE.md`, decisions 14–23 agreed by Jad and Ghassan
+> (`7ad649c`), the rule as code in `drive_c_analysis.py`. That rule governs; the
+> table below is kept as the question it answered. Its stage A is the official
+> count of what these logs give.
+
 Asked by Ghassan, 19 October: what "fix the rule's numbers" means. The
 decision rule in `logs/DRIVE_PLAN.md` is still the DRAFT of 13 October, its
 numbers placeholders, and the Training gate (item 6) has the rule written

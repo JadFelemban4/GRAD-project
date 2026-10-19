@@ -1,6 +1,9 @@
 """new_drive.py — what is a candidate drive actually WORTH, before you add it?
 
     python new_drive.py logs/raw/<new>.csv
+    python new_drive.py <file>.csv --unblind    also print the ignition retard (target
+                                                minus actual); only after drive C's
+                                                analysis (results/DRIVE_C_RULE.md)
 
 WHY THIS EXISTS
 ---------------
@@ -64,10 +67,17 @@ def col(df, *names):
 
 
 def main():
-    if len(sys.argv) < 2:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    # 19 October 2026: drive C's decision rule (results/DRIVE_C_RULE.md) is fixed
+    # blind, before anyone sees target minus actual on a drive C log. This script
+    # is the routine's first step on every new drive, so by default it counts the
+    # ignition readings and withholds the retard values; --unblind prints them,
+    # and is for after the rule's analysis has run.
+    unblind = "--unblind" in sys.argv[1:]
+    if not args:
         print(__doc__)
         raise SystemExit(2)
-    path = sys.argv[1]
+    path = args[0]
     df = pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
     name = os.path.basename(path)
 
@@ -132,6 +142,15 @@ def main():
         print("  Needs BOTH 'Target ignition angle from torque intervention'")
         print("  and 'Actual ignition angle' to say anything.")
         verdict.append(("no", "cannot address the knock question"))
+    elif not unblind:
+        print(f"  {fresh(act)} independent actual and {fresh(tgt)} target ignition-angle readings")
+        print("  retard values WITHHELD: drive C's decision rule is fixed blind")
+        print("  (results/DRIVE_C_RULE.md). Pass --unblind only after its analysis.")
+        if fresh(act) >= 100:
+            verdict.append(("HELPS", f"{fresh(act)} ignition readings -- enough to test "
+                                     "the knock model (values withheld)"))
+        else:
+            verdict.append(("marginal", "ignition channels present but thin"))
     else:
         retard = (tgt - act)
         ok = retard.between(-5, 45)

@@ -4,8 +4,7 @@ Paste the block below into a fresh Claude Code session opened at the repository 
 
 ```
 Repository: C:\Users\admin\Documents\graduation project\GRAD-project
-(GitHub JadFelemban4/GRAD-project, public). Branch: JMF-2340550-driveC-check,
-unless Jad pushed today's work to main.
+(GitHub JadFelemban4/GRAD-project, public). Branch: main.
 
 First, before anything else, ask who you are talking to (CLAUDE.md, "Before
 anything else"): «مين معي؟ / Who am I talking to?». Then open their file in
@@ -15,16 +14,18 @@ void figure. The /i-have-adhd skill is not installed here: follow its rules
 by hand.
 
 Read first, in this order: CLAUDE.md, CHECKPOINT.md,
-SESSION_REPORT_2026-10-19_driveC-and-evaluation.md, then the files the task
-names.
+SESSION_REPORT_2026-10-19_driveC-and-evaluation.md,
+SESSION_REPORT_2026-10-19_driveC-rule.md, then the files the task names.
 
 State on 19 October 2026:
 - Drive C's first attempt (Ghassan, night of 18-19 October) covers neither C1
   nor C2: logs/DRIVE_C_CHECK_2026-10-19.md, printed by drive_c_check.py. It was
   checked blind: nobody has computed the retard. The six CSVs are on Jad's
   machine (C:\Users\admin\Downloads\2026-10-19), outside logs/raw/ on purpose.
-- Ghassan will drive C2 and C1 again, in the warmest hours available (the summer
-  heat is over; section 8), once the rule's numbers are fixed.
+- Drive C's rule is AGREED (decisions 14-23, 7ad649c; results/DRIVE_C_RULE.md)
+  and coded (drive_c_analysis.py, stages A/B/C; Ghassan's session report
+  SESSION_REPORT_2026-10-19_driveC-rule.md). Ghassan repeats C2 and C1 in the
+  warmest hours available (logs/DRIVE_PLAN.md).
 - The proposal's evaluation: both evaluators accept; Evaluator 2 asks for four
   corrections. docs/supervisor/2026-10-19_proposal-evaluation.md (the workbook
   stays outside the repository). The team has moved to the research track, and
@@ -32,11 +33,12 @@ State on 19 October 2026:
   November).
 - verify_docs.py: 74 of 74.
 
-The next task, CHECKPOINT.md "Next actions" item 1: drive C's ten rule numbers
-(logs/DRIVE_C_CHECK_2026-10-19.md, section 9). Propose a value for each, with
-its reason, one number per message for Jad; Jad and Ghassan fix them. Do not
-change logs/DRIVE_PLAN.md's numbers yourself, and compute no retard on the
-19 October logs before the numbers are fixed.
+The next task, CHECKPOINT.md "Next actions" item 1: stage A, blind, on the
+18-19 October files, which are on THIS machine (Ghassan's is not). Follow the
+item exactly (logs/drive_c/, never logs/raw/; python drive_c_analysis.py
+stage-a ...); ask Jad, or Ghassan through him, which files go as --c2 and
+which as --c1. Never run stage B or C, and never compute target minus actual,
+outside the rule's own order.
 
 If Jad picks the evaluation instead: CHECKPOINT.md item 2, one correction at a
 time (section 4 of the evaluation file); Jad's first answers and the verdicts

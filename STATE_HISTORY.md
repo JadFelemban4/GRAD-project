@@ -4154,7 +4154,7 @@ main: the merge and the documentation restructure, both pushed on 14 October · 
 3. The results tab learns fingerprint schema 2, and the learning lab's pins move
    to the live plant (both in `team/jad.md`).
 
-# Part K — lines rotated out of CHECKPOINT.md, 19 October 2026 (drive C's first attempt; the proposal's evaluation)
+# Part K — lines rotated out of CHECKPOINT.md, 19 October 2026 (drive C's decision rule, proposed)
 
 Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · drift_test.py 16/16 last run on 14 October (the restructure's final commit)
 
@@ -4164,3 +4164,34 @@ Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · dr
 1. Fix drive C's decision-rule numbers with Ghassan, before the drive; then
    drive C, then A and D on one trip (`logs/DRIVE_PLAN.md`, revised 14 October,
    `c16b857`).
+
+# Part L — lines rotated out of CHECKPOINT.md, 19 October 2026 (decisions 14–23 answered)
+
+- Ghassan · `main` · drive C's decision rule, PROPOSED 19 October from blind
+  research (`results/DRIVE_C_RULE.md`, `python drive_c_rule_numbers.py`):
+  decisions 14–23 wait for Jad's and Ghassan's columns; the rule's analysis
+  script is written after them (`SESSION_REPORT_2026-10-19_driveC-rule.md`).
+
+- Drive C's repeat waits for decisions 14–23 and the rule's analysis script.
+
+1. Drive C: Jad and Ghassan answer decisions 14–23 (`results/VALIDATION_DECISIONS.md`
+   section E); commit the rule's analysis script; run its stage A blind on the
+   18–19 October files; then repeat drive C (`logs/DRIVE_PLAN.md`), then A and D
+   on one trip. Nobody computes target minus actual on a drive C file before.
+
+# Part M — lines rotated out of CHECKPOINT.md, 19 October 2026 (drive C's analysis script committed)
+
+- Ghassan · `main` · drive C's decision rule, AGREED 19 October by Jad and
+  Ghassan (decisions 14–23; `results/DRIVE_C_RULE.md`); its analysis script
+  is being written (`SESSION_REPORT_2026-10-19_driveC-rule.md`).
+
+- Drive C's repeat waits for the rule's analysis script.
+
+1. Drive C: commit the agreed rule's analysis script; run its stage A blind on
+   the 18–19 October files; then repeat drive C (`logs/DRIVE_PLAN.md`), then A
+   and D on one trip. Nobody computes target minus actual on a drive C file
+   before stage C.
+
+# Part N — lines rotated out of CHECKPOINT.md, 19 October 2026 (Jad's session merged: the drive C check, the proposal's evaluation)
+
+- Stage A has not run on the 18–19 October files: they are not on this machine.
