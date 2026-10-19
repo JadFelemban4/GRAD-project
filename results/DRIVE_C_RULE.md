@@ -29,9 +29,9 @@ simulator's half and full steps), a synthesis, and three independent reviews
   was covered (one step matched the plan; no segment in the climb's cell).
   None of this is an ignition value.
 - **No ignition value from those files has been computed, printed or plotted**
-  by this session. To be completed by Ghassan before the rule is committed:
-  who watched the live display of the two angles during the drive, and any
-  impression they formed.
+  by this session. **Nobody watched the live display of the two angles during
+  the drive** (Ghassan, 19 October), so no impression of the outcome was formed
+  before the rule was fixed.
 
 ## 1. Guards that keep the rule blind
 
