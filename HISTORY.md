@@ -65,6 +65,7 @@ the title is the file's own first line.
 | 2026-10-19 | `docs/supervisor/2026-10-19_proposal-evaluation.md` | The proposal's evaluation (SP1 abstract round): what it asks, and how we answer it |
 | 2026-10-19 | `SESSION_REPORT_2026-10-19_driveC-and-evaluation.md` | Session report — 19 October 2026: drive C's first attempt, and the proposal's evaluation |
 | 2026-10-19 | `NEXT_SESSION_2026-10-19.md` | Prompt for the next session — written 19 October 2026, after drive C's first attempt and the proposal's evaluation |
+| 2026-10-20 | `SESSION_REPORT_2026-10-20_four-engines.md` | Session report — 20 October 2026: four engines, their data, and how much to train (branch `GRA-test`) |
 | ? | `conflict.md` | conflict.md — Ghassan's branch merged into Jad's: every conflict, and a recommendation for each |
 | ? | `conflict_ar.md` | ملف التعارض: دمج برانش غسان مع برانش جاد |
 
