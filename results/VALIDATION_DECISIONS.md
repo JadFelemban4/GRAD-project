@@ -29,6 +29,8 @@ Where each decision comes from:
   to all ten** (Jad's answer as reported by Ghassan), before any retard was
   computed on a drive C file. Drive C is repeated once the rule's analysis script
   is committed.
+- 24 (added 20 October, on branch `GRA-test`): the plants, four engines
+  (section F). Ghassan's column filled; Jad's open.
 
 ## A. The validation plan
 
@@ -101,6 +103,21 @@ target minus actual on any drive C log.
 | 21 | C1: the knee (draft: no trigger) | **Requirement 0.10 KI; retune the damage knee only if \|median onset KI − 0.85\| > max(0.10, 2·u_val), the median from confirmed onsets by an interval-censored estimator over all segments, u_input 0.032 KI; untested below 8 confirmed onsets; limited if the two rpm halves differ by more than 0.10. The model ECU's own 1.0 threshold is compared too, and moving it is a separate, later step.** A knee of 0.75 makes the baseline's climb knock damage ×3.93, 0.95 makes it ×0.15 | agree, 19 Oct | agree, 19 Oct (as reported by Ghassan) |
 | 22 | C1: the spark in the climb's cell (draft: no trigger) | **Requirement 0.85° (not the plan's 1.3°): retune the boosted schedule only if \|E\| > max(0.85°, 2·u_val), E the mean of per-segment medians, u_input √(u_al² + 0.86²); at least 15 segments with 5 in-cell readings each (plan 25–30 × 10). An action rule, separate from the label.** −0.85° of schedule for every car is +9.95 K and ×1.248 damage on the locked climb, which is R1's own basis; 1.3° is the one-car trim conversion. In practice a retune needs \|E\| ≳ 1.7°, the resolution the model's charge temperature allows | agree, 19 Oct | agree, 19 Oct (as reported by Ghassan) |
 | 23 | What each verdict triggers, and the guards (new) | **Does not → schedule the baseline's spark on the current load. Pulls, but no more often than steady C1 running at the same load → the same remedy. Pulls and step-specific → keep a load-step knock cost sized with C1's knee. Only the first second pulls → current-load spark plus at most a 1-s protective retard. Drive C files stay out of `logs/raw`; `new_drive.py` withholds the retard; one blind count (stage A), a hash-frozen list, one analysis.** A late pull may be the car's steady knock limit, which is C1's question, not the step's | agree, 19 Oct | agree, 19 Oct (as reported by Ghassan) |
+
+## F. The plants: four engines (added 20 October 2026, on branch `GRA-test`)
+
+Ghassan's session, 20 October. The criterion says preview value falls on one
+curve against H/τ *whatever the plant*, and one engine gives one point. Public
+data that can set an engine's maps exist for three turbocharged gasoline
+engines besides the B58: the US EPA's engine benchmarking test data packages
+(steady-state map with turbine-inlet temperature, spark, lambda and boost, plus
+high-load holds that show the ECU's protection) and Argonne's Downloadable
+Dynamometer Database (10 Hz chassis-dyno driving data). The search is in
+Ghassan's session report of 20 October.
+
+| # | decision | recommended, and why | Ghassan | Jad |
+|---|---|---|---|---|
+| 24 | The plants of the H/τ test | **Four engines, each in its own car: the B58 (GR Supra, our logs); the Mazda 2.5 L turbo (2016 CX-9: EPA map, and Argonne driving data of the same car); the Honda 1.5 L turbo (EPA's L15B7 map, in the 2018 Accord body, whose Argonne driving data has a sibling 1.5 L turbo); the Ford 2.7 L twin-turbo V6 (2015 F-150: EPA map, no driving data). Built on branch `GRA-test`, off `main` at `cf43fbb`; `main`'s plant stays X1's so drive C's stage C can run, and the B58's drives continue. Nothing trains until both columns are filled and a preregistration names the engines, the collapse test and what it holds fixed.** The Mazda is the only engine with a map and driving data of the same engine; the Honda protects by deep enrichment at a low turbine-inlet temperature, the Ford by holding it near a fixed cap, so the engines differ where the criterion is tested. What it costs: no public source logs a turbine housing over time, so every engine's housing τ is assumed, as the B58's is; every agent is retrained, because the plant's fingerprint changes; and it adds scope against the team's 23 November end | agree, 20 Oct (four engines, `GRA-test`, each in its own car) | |
 
 ## What is already settled and needs no answer
 
