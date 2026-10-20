@@ -31,6 +31,8 @@ Where each decision comes from:
   is committed.
 - 24 (added 20 October, on branch `GRA-test`): the plants, four engines
   (section F). Ghassan's column filled; Jad's open.
+- 25–35 (added 20 October, on branch `GRA-test`): how the four-engine test
+  trains (section F, second table). Both columns open.
 
 ## A. The validation plan
 
@@ -118,6 +120,32 @@ Ghassan's session report of 20 October.
 | # | decision | recommended, and why | Ghassan | Jad |
 |---|---|---|---|---|
 | 24 | The plants of the H/τ test | **Four engines, each in its own car: the B58 (GR Supra, our logs); the Mazda 2.5 L turbo (2016 CX-9: EPA map, and Argonne driving data of the same car); the Honda 1.5 L turbo (EPA's L15B7 map, in the 2018 Accord body, whose Argonne driving data has a sibling 1.5 L turbo); the Ford 2.7 L twin-turbo V6 (2015 F-150: EPA map, no driving data). Built on branch `GRA-test`, off `main` at `cf43fbb`; `main`'s plant stays X1's so drive C's stage C can run, and the B58's drives continue. Nothing trains until both columns are filled and a preregistration names the engines, the collapse test and what it holds fixed.** The Mazda is the only engine with a map and driving data of the same engine; the Honda protects by deep enrichment at a low turbine-inlet temperature, the Ford by holding it near a fixed cap, so the engines differ where the criterion is tested. What it costs: no public source logs a turbine housing over time, so every engine's housing τ is assumed, as the B58's is; every agent is retrained, because the plant's fingerprint changes; and it adds scope against the team's 23 November end | agree, 20 Oct (four engines, `GRA-test`, each in its own car) | |
+
+**How the four-engine test trains (decisions 25–35, added 20 October).** From a
+research pass of the same day (Ghassan's session report of 20 October): the
+project's own X1/X2 results, the literature on seeds and on SAC, timings on the
+team laptop, and two reviews against the rules above. What it measured:
+84–94 % of the variance of a seed pair's difference is seed to seed and pairing
+removes none of it (the two arms' correlation is −0.14 in X1, +0.09 in X2);
+twenty evaluation episodes are enough; X2's hot training cut stopped rising
+after about 400–500 episodes (post hoc; X2's own preregistered check found no
+convergence); a tabulated B58 trains 6–8 times faster per run, with every
+frozen-twenty cut within 1.5 points of the exact plant; at today's spread one
+comparison needs 143 seeds a side by the sign test, 90 by a paired t-test.
+
+| # | decision | recommended, and why | Ghassan | Jad |
+|---|---|---|---|---|
+| 25 | When the four-engine training may start | **After drive C: repeat it, run stages A–C on `main`, then merge `GRA-test` into `main` (re-certifying the B58 if stage C retunes it) and train from `main`. Latest start 4 November; if stage C has not run by 1 November, both of you amend rule 2 in writing for this test only ("the commit the preregistration names"), disclosed in the preregistration.** Rule 2 needs `main`'s `train.py` and `fingerprint.py`, both change on `GRA-test`, and `main` must stay X1's plant until stage C; gate item 6 also puts drive C first | | |
+| 26 | Verdicts | **One verdict per engine per horizon, never pooled; the collapse is tested on the per-engine estimates as a cross-plant comparison declared in advance (do the engines differ, and are they equivalent). A pooled value only as a declared secondary.** Rule 5 makes each engine its own plant, and a pooled verdict would assume the collapse it tests | | |
+| 27 | Arms per engine | **Three: blinded, and sighted at two horizons chosen so H/τ matches across engines (about 0.3 and 1.0 of each engine's τ, printed by `check_premise.py --engine` before training), every H at most 150 s (the climb starts at 180 s). H becomes a FATAL fingerprint field, and the blind-arm check runs for every H.** With one shared housing the four τ cluster at about 39–60 s (estimated), and one horizon cannot tell H/τ from τ; the proposal's evaluation asks for a second horizon | | |
+| 28 | Training and scoring backend | **Train on each engine's table only if it passes accuracy gates derived from the MEI (fixed before the table is built for a new engine); score every reported agent on the exact cycle model; record the training and the scoring backend as separate fingerprint fields.** The table is 6–8× faster per run (measured on a loaded machine, one process; its rate with many runs at once is not measured), but an agent trained on it could exploit its error | | |
+| 29 | Training recipe | **450 000 steps (500 episodes); the scored kind of road (12 % at 130 km/h, 42 °C) as a fixed share of training episodes (10 %); learning rate falling linearly to 0 over the last third; the reported policy is the action average of the checkpoints in the last 50 000 steps, declared in advance; the twenty frozen episodes unchanged. Before preregistering, a short pilot of the recipe on `main`'s plant into a new `--out`, read on practice episodes only.** X2's collapses sit in the scored corner its training drew on 1–2 % of episodes; constant-rate training kept wandering; averaging halved X2's checkpoint-to-checkpoint pair swings | | |
+| 30 | Seeds and test | **A paired t-test, one-sided, primary; the exact sign test a declared secondary; alpha split over engines and horizons; seeds per arm fixed before training from the measured many-run rate and the time window (target at least 20), with no interim looks; no seed added after the result.** The t-test needs about 0.63× the sign test's seeds; X1's and X2's distributions were seen before this choice, which the preregistration must say | | |
+| 31 | Which B58 the test uses | **X1's plant (`cf43fbb`), frozen for this test; new drives enter the B58 only after scoring; the four-engine B58 is a new experiment, never compared with X1/X2 as one. The Supra's road load from EPA's test-car data (ours is 15–22 % low) is not in this test; a declared ablation later.** Change one thing at a time; the B58 arm already differs from X1 in steps, recipe and horizons | | |
+| 32 | Python | **Amend rule 4 to "the exact versions the training environment records in `meta.json`": Python 3.13.2 on the team laptop.** X1 and X2 trained on 3.13.2 (their `config.json`), the laptop has no 3.12, and the B58 identity certificate must run on the interpreter behind X1's stored numbers | | |
+| 33 | The damage knee per engine | **Each engine's knee is set so its baseline spends as long above the knee on its locked climb as the B58's baseline does above 1123 K, computed on each calibrated plant before any agent trains; 850 °C for every engine as a sensitivity row re-scored from the records.** With the B58's housing-to-gas ratio, the hottest EPA turbine-inlet gas puts the three housings near 720–780 °C, under the 850 °C knee (an estimate, to recompute per engine) | | |
+| 34 | The locked climb per car | **12 % at 130 km/h and 42 °C for every car; a car that cannot drive it gets its steepest drivable grade, searched in 0.5 % steps by a script committed before training; the twenty frozen episodes unchanged.** One scenario rule, decided before any result | | |
+| 35 | Validation thresholds for the new engines | **Torque, fuel and turbine-inlet temperature against held-out EPA points, with each required accuracy derived from its consequence on the MEI (VALIDATION_PLAN.md's method) and committed before calibrating; the table gates likewise.** The first draft's thresholds equalled the B58 table's own measured errors, which is choosing R to fit E | | |
 
 ## What is already settled and needs no answer
 
