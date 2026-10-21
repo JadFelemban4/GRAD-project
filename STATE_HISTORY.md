@@ -4195,3 +4195,25 @@ Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · dr
 # Part N — lines rotated out of CHECKPOINT.md, 19 October 2026 (Jad's session merged: the drive C check, the proposal's evaluation)
 
 - Stage A has not run on the 18–19 October files: they are not on this machine.
+
+# Part O — lines rotated out of CHECKPOINT.md, 21 October 2026 (GRA-test: build step 1 of decision 24, reviewed and corrected)
+
+Last verified: 2026-10-19 — verify_docs.py 74/74 · drift_test.py 16/16 (drive C's rule, proposed) · the app suites below as of 15 October
+
+# Part P — lines rotated out of CHECKPOINT.md, 21 October 2026 (GRA-test: build step 1 committed; the preview ceiling; the training device)
+
+Last verified: 2026-10-21 (on `GRA-test`, uncommitted) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s of 21 October: `results/B58_IDENTITY.md`)
+
+GRA-test: build step 1 of decision 24 (four engines), reviewed and corrected, uncommitted on e9e16ed · plant_sha ded8da308863d394 (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 99d2a9658b1258a7 · fingerprint schema 3 · the B58 bit-identical to cf43fbb (`results/B58_IDENTITY.md`)
+
+- `GRA-test` (21 October, uncommitted): no default engine anywhere
+  (`python test_engine_threading.py`), and the B58 through `engines.get("b58")`
+  is cf43fbb's plant to the bit, after the review's fixes (`results/B58_IDENTITY.md`).
+
+- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 1 done,
+  reviewed, not committed; the new engines are calibrated next (decisions 25–35 open).
+
+8. `GRA-test`: commit build step 1 with its certificate and archive
+   (`results/B58_IDENTITY*`). For Jad and Ghassan: CLAUDE.md's re-run rule to name
+   `engines.py` and `engine_specs/` (`.claude/rules/physics.md` does); fingerprint
+   schema 4 (decisions 27, 28) before any new engine trains.

@@ -126,3 +126,57 @@ The data are also in the branch's working tree: `logs/epa/` (18 EPA files,
   preregistration follow it.
 - Nothing trained; nothing trains until decisions 24–35 have both columns, gate
   item 6 (drive C) is met or amended, and a preregistration is committed.
+
+## 8. 21 October: why every trained agent fell short, and build step 1 committed
+
+**Ghassan's question:** were the agents short of training, or short of data? His
+view: they never trained as much as they should, and the data is not complete.
+Tested against the committed results by four read-only strands (one of them
+arguing his view); the answer given to him in the session, in plain terms:
+
+- **"Not trained enough" is true as a fact and wrong as the cause.** Phase D and
+  D2 trained 11 episodes and X1 55, and no run ever settled by its own rule. But
+  the two experiments that trained longer changed nothing that mattered: C4 at
+  six times D2's steps widened the paired spread (98.8 → 139.9 damage units,
+  `results/C4_RESULT.txt`) and still read no preview effect; X2 at 21.6 times
+  X1's steps read INCONCLUSIVE with the spread barely moved (24.78 → 20.51) and
+  failed the logged-drive check more often (0 of 10 against 1 of 46). X2's agents
+  reached about 70 % protection at some checkpoint and lost it at a constant
+  learning rate (*scratch*).
+- **"The data is not complete" is true as a fact and wrong as the cause.** The
+  agents train on simulated roads without limit; car data sets the simulator's
+  realism. Where a missing measurement does bite is one mechanism: the model
+  ECU's one-second spark lag makes a knock spike at every sudden load rise, which
+  carries most of the life reward in cool running and teaches the agents to burn
+  4–10 % more fuel on the car's drives; with spark scheduled on the current load,
+  0 of 300 sampled spikes cross the knee (*scratch*). Drive C part C2 decides it.
+- **The main reason: the scored climb cannot show a preview effect.** `python
+  preview_ceiling.py` (committed, `results/preview_ceiling.txt`, from the
+  committed traces): the most a cooler housing at the climb start can save is
+  0.13 points of cut with the agent's own levers, 0.42 with unlimited preview, 1.19
+  even with the exhaust held at ambient for the 30 s, against the MEI of 5.43;
+  about 92 % of the turbine damage accrues more than 3 τ after the climb starts,
+  when both arms see the same grade. X1's and X2's nulls were the right answer
+  for that road. The recommended four-engine test repeated the road, so decisions
+  27 and 34 were revised (`e9e16ed`, then 34's figures from the script).
+- **What bad training did cause:** the seed-to-seed spread and the collapses. The
+  scored condition filled 0.42 % of X1's training steps and 0.028 % of X2's, and no
+  training episode held it for three minutes (*scratch*); the learning rate never
+  fell.
+
+**Build step 1, committed on `GRA-test`.** Engine and car objects with no silent
+default, fingerprint schema 3, every caller threaded, the learning lab included;
+the B58 bit-identical to `cf43fbb` at every certificate level L1–L8, and the check
+shown able to fail (`results/B58_IDENTITY.md`, with its tools archived beside
+it). Two reviews (correctness and the project's rules) found 21 issues; all were
+real, 17 fixed outright, three in part, one pre-existing on `main`
+(`results/training_roads.json` stale since `75ca65f`). Suite failures that remain
+also fail on `cf43fbb`, each named in the certificate.
+
+**Training moves to another device** (Ghassan, 21 October): nothing trains on the
+team laptop. `requirements-lock.txt` pins the laptop's environment, and `python
+check_training_device.py` checks a machine against it; `--identity` and
+`--compare` decide whether a second machine trains identical agents (decision 32).
+Its comparison was checked both ways on X1's runs: a run against itself reads
+IDENTICAL, two different agents read NOT IDENTICAL (103 differences). The
+`--identity` run itself was not run here.

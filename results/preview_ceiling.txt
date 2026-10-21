@@ -1,0 +1,85 @@
+PREVIEW CEILING ON THE SCORED CLIMB -- the most any use of the preview could save
+inputs: results/traces_130kmh.json (30 September plant), results/premise.json; plant b58b30o1; MEI 5.43 points of cut
+
+A. reconstruction check: the rebuilt per-step damage against each trace's own total
+   baseline ECU       rebuilt   920.07   trace   920.07   turbine  850.97  oil   8.54  knock  60.56
+   reactive           rebuilt   625.73   trace   625.73   turbine  556.58  oil   8.60  knock  60.56
+   current-grade      rebuilt   520.55   trace   520.55   turbine  445.06  oil   8.66  knock  66.83
+   predictive (hand)  rebuilt   523.48   trace   523.48   turbine  444.73  oil   8.66  knock  70.08
+
+B. where the damage accrues (step = second; the climb starts at 180 s; tau on the climb ~47 s)
+   RETIRED-OK: 920.1 -- the 30 September plant's baseline, whose traces this reads
+   baseline ECU: total 920.1 units
+      0-149    flat, the preview reads nothing               3.30    0.4 %   (turbine    0.01, oil  1.33, knock   1.96)
+      150-179  flat, the climb inside the 30 s preview       0.30    0.0 %   (turbine    0.00, oil  0.30, knock   0.00)
+      180-227  climb start to +1 tau                        59.84    6.5 %   (turbine    0.71, oil  0.53, knock  58.60)
+      228-323  1 to 3 tau                                   63.02    6.8 %   (turbine   61.82, oil  1.20, knock   0.00)
+      324-718  more than 3 tau after the start             793.60   86.3 %   (turbine  788.43, oil  5.18, knock   0.00)
+   current-grade: total 520.5 units
+      0-149    flat, the preview reads nothing               3.30    0.6 %   (turbine    0.01, oil  1.33, knock   1.96)
+      150-179  flat, the climb inside the 30 s preview       0.30    0.1 %   (turbine    0.00, oil  0.30, knock   0.00)
+      180-227  climb start to +1 tau                        65.92   12.7 %   (turbine    0.51, oil  0.53, knock  64.88)
+      228-323  1 to 3 tau                                   36.00    6.9 %   (turbine   34.78, oil  1.22, knock   0.00)
+      324-718  more than 3 tau after the start             415.03   79.7 %   (turbine  409.75, oil  5.27, knock   0.00)
+
+E. the housing's time constant tau = c / (ua_gt + ua_amb), solved from each trace
+   RETIRED-OK: 127.9 -- a time constant in seconds on the flat, not a damage figure
+   baseline ECU       flat 150-179 s:  127.9 s   climb 230-718 s:  47.3 s
+   reactive           flat 150-179 s:  127.9 s   climb 230-718 s:  47.1 s
+   current-grade      flat 150-179 s:  127.9 s   climb 230-718 s:  46.9 s
+   predictive (hand)  flat 150-179 s:  126.4 s   climb 230-718 s:  46.9 s
+
+F. the one head start the traces hold: hand-written predictive minus current-grade
+   EGT lower on 150-179 s by a median 25.0 K; housing cooler by 2.49 K at 179 s
+   t = 190 s: measured 2.070 K, linear-node prediction 2.070 K
+   t = 228 s: measured 0.911 K, linear-node prediction 0.911 K
+   t = 276 s: measured 0.324 K, linear-node prediction 0.323 K
+   t = 324 s: measured 0.115 K, linear-node prediction 0.115 K
+   turbine damage it saved: 0.323 units = 0.035 points
+
+G. THE CEILING: turbine damage a cooler housing at the climb start can save
+   head start                                                            K   units  points  points, 8 Oct  x MEI
+   measured: the hand-written head start (lambda -0.055, 30 s)         2.5    0.31    0.03           0.04   0.01
+   lambda at its -0.15 bound for 30 s                                  8.8    1.07    0.12           0.13   0.02
+   lambda -0.15 over the whole flat, 20-179 s (unlimited preview)     30.0    3.57    0.39           0.42   0.08
+   IMPOSSIBLE: exhaust gas at ambient for 30 s                        90.9   10.13    1.10           1.19   0.22
+   IMPOSSIBLE: exhaust gas at ambient over the whole flat            309.8   28.47    3.09           3.35   0.62
+   ABSURD: the housing at ambient when the climb starts              399.8   34.43    3.74           4.06   0.75
+   (reference: current-grade's own trajectory; the baseline's gives the same order: 0.21 points at the lambda bound)
+
+H. the weight the climb-start state carries where the damage accrues (sum of rate x memory / sum of rate, on the climb): 0.0125
+
+J. the horizons decision 27 first proposed, on the locked climb, housing capacity scaled to the four engines' estimated tau
+    tau s   H s  H/tau  points, lambda bound  points, EGT at ambient
+       39    12   0.31                  0.05                    0.51
+       39    30   0.77                  0.12                    1.10
+       39    39   1.00                  0.15                    1.34
+       39   100   2.56                  0.29                    2.35
+       39   150   3.85                  0.36                    2.78
+       47    14   0.30                  0.06                    0.61
+       47    30   0.64                  0.12                    1.18
+       47    47   1.00                  0.18                    1.66
+       47   100   2.13                  0.32                    2.67
+       47   150   3.19                  0.40                    3.23
+       60    18   0.30                  0.08                    0.83
+       60    30   0.50                  0.14                    1.30
+       60    60   1.00                  0.25                    2.25
+       60   100   1.67                  0.36                    3.16
+       60   150   2.50                  0.47                    3.94
+
+I. SYNTHETIC first-order illustration (not the plant): the share of a reference's own
+   damage a head start saves, by climb length L, the climb's and flat's tau from section E
+    plateau C   L s  saved, 30 s  saved, unlimited
+        853.3    60        5.20%            16.54%
+        853.3   120        2.27%             7.44%
+        853.3   240        0.74%             2.46%
+        853.3   540        0.23%             0.77%
+        920.0    60        5.27%            16.78%
+        920.0   120        2.21%             7.26%
+        920.0   240        0.68%             2.27%
+        920.0   540        0.20%             0.68%
+       1000.0    60        5.32%            16.94%
+       1000.0   120        2.14%             7.07%
+       1000.0   240        0.62%             2.09%
+       1000.0   540        0.18%             0.60%
+   For scale: the MEI is 5.43 % of the baseline's damage, about 10 % of a current-grade-like reference's own.
