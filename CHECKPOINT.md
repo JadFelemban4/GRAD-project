@@ -63,18 +63,16 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): build step 1
-  committed; build step 2 calibrates the three EPA engines and their cars. Training
-  runs on another device, not this laptop (Ghassan, 21 October); decisions 25–35
-  open.
+  committed; build step 2 calibrates the three EPA engines and their cars, with
+  the thresholds of decision 35 fixed and committed first. Training runs on
+  another device, not this laptop (Ghassan, 21 October). Decisions 1-35 all
+  answered 21 October, both agree (`results/VALIDATION_DECISIONS.md`).
 
 ## Blockers
 
 - The knock model is untested: drive C decides how much of every agent's
   margin is real.
 - Stage A has not run on the 18–19 October files (Jad's `Downloads/2026-10-19`).
-- Thirteen validation decisions wait for Jad's and Ghassan's columns
-  (`results/VALIDATION_DECISIONS.md`); nothing is relabelled, re-preregistered
-  or retrained until they are answered.
 
 ## Next actions (in order)
 
@@ -85,7 +83,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    and D on one trip.
 2. The proposal's corrections, and the two-plant claim in `CLAUDE.md`
    (`docs/supervisor/2026-10-19_proposal-evaluation.md`, sections 4 to 6).
-3. The validation decisions.
+3. The four-engine preregistration, once build step 2, the test roads (decision
+   34), the training recipe (29) and the device benchmark (32) are in: every one
+   of decisions 1-35 is answered (21 October), so nothing else waits for them.
 4. The learning lab's pins move to the live plant (`team/jad.md`). The agents
    page reads each agent's own fingerprint schema and its tests stop copying
    `runs_c4`'s `meta.json`; `test_simulation`'s asset check learns the `?v=`
@@ -108,8 +108,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device, before any training: install from
-   `requirements-lock.txt`, then `python check_training_device.py --identity
-   device.json` there and on this laptop, and `--compare` the two (decision 32).
+   `requirements-lock.txt` (and, to measure its GPU, the CUDA build of the same
+   torch in a second environment); run `python benchmark_training.py` there, which
+   decides CPU or GPU and checks that seed 0 trains identically twice; then
+   `python check_training_device.py --identity device.json` there and on this
+   laptop, and `--compare` the two (recorded, not required; decision 32).
 
 ## Files outside git (where · last backup · manifest)
 

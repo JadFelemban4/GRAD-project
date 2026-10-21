@@ -13,8 +13,13 @@ library can change a result without changing its name. So the decision is made t
 results/B58_IDENTITY.md's level L8 made it between two code trees: 600 SAC steps, seed
 0, CPU, one thread, on each machine, and every trained tensor, every recorded step and
 the learning curve compared by their bytes. Run `--identity` on the team laptop and on
-the training device, then `--compare` the two files. IDENTICAL means the device may train;
-anything else means it may not, until the difference is found.
+the training device, then `--compare` the two files. IDENTICAL means the laptop's B58
+certificate and its numbers carry over to the device unchanged. NOT IDENTICAL with matching
+versions most likely means a different processor: vectorised maths can round the last bit
+differently on another CPU. Then the device may still train, on three conditions
+(decision 32): it trains the identical agent twice from one seed (benchmark_training.py,
+section 4), the B58 identity certificate passes when re-run on it, and every seed, arm and
+engine of the experiment trains on it (rule 3).
 
 The --identity run is an identity test, not an experiment: it trains into a temporary
 directory outside the repository and deletes it once the fingerprint is written. It is the
@@ -49,6 +54,18 @@ COUNTERS = ("num_timesteps", "_total_timesteps", "_n_updates", "_episode_num", "
             "learning_starts", "buffer_size", "batch_size")
 IDENTITY_CMD = ["--engine", "b58", "--steps", "600", "--seed", "0", "--device", "cpu",
                 "--road", "extremes"]
+# The cuBLAS workspace every CUDA run trains with (CUBLAS_WORKSPACE_CONFIG), and the only value
+# train.check_device accepts on CUDA. One constant, so train_all.py, run_phase_d.py and
+# benchmark_training.py, which set it for their CUDA children, cannot disagree. It is not what
+# makes CUDA deterministic in this torch: checked on 21 October 2026 in the installed 2.14.0
+# (its CPU build; no CUDA build is installed on the team laptop), use_deterministic_algorithms's
+# docstring (torch/__init__.py) no longer lists torch.mm, mv or bmm as raising without it, and
+# torch_cpu.dll holds neither the variable's name nor alertCuBLASConfigNotDeterministic, the
+# check that raised over it in earlier versions. What it still does is size cuBLAS's workspace
+# (torch/backends/cuda/__init__.py, cublas_workspace_size), and a different workspace can steer
+# cuBLAS's choice of algorithm (the review of 21 October 2026). So every CUDA run gets this one,
+# and ":16:8", the other value earlier versions accepted, is refused. Belt and braces.
+CUBLAS_WORKSPACE = ":4096:8"
 
 
 def _norm(name):

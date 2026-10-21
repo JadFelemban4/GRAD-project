@@ -4217,3 +4217,16 @@ GRA-test: build step 1 of decision 24 (four engines), reviewed and corrected, un
    (`results/B58_IDENTITY*`). For Jad and Ghassan: CLAUDE.md's re-run rule to name
    `engines.py` and `engine_specs/` (`.claude/rules/physics.md` does); fingerprint
    schema 4 (decisions 27, 28) before any new engine trains.
+
+# Part Q — lines rotated out of CHECKPOINT.md, 21 October 2026 (every decision answered: 1-35, both agree)
+
+- Thirteen validation decisions wait for Jad's and Ghassan's columns
+  (`results/VALIDATION_DECISIONS.md`); nothing is relabelled, re-preregistered
+  or retrained until they are answered.
+
+3. The validation decisions.
+
+- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 1
+  committed; build step 2 calibrates the three EPA engines and their cars. Training
+  runs on another device, not this laptop (Ghassan, 21 October); decisions 25–35
+  open.

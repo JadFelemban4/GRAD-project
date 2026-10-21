@@ -1,11 +1,18 @@
 """run_phase_d.py — launch Phase D's sixteen training runs in parallel.
 
-    python run_phase_d.py --engine b58              seeds 0-7, both arms, 50 000 steps
-    python run_phase_d.py --engine b58 --seeds 0 1  a subset
-    python run_phase_d.py --engine b58 --dry-run    print the commands and stop
+    python run_phase_d.py --engine b58 --device cpu              seeds 0-7, both arms, 50 000 steps
+    python run_phase_d.py --engine b58 --device cpu --seeds 0 1  a subset
+    python run_phase_d.py --engine b58 --device cpu --dry-run    print the commands and stop
 
 --engine is required (20 October 2026) and passed on to every train.py and
-evaluate.py it launches: neither has a default plant.
+evaluate.py it launches: neither has a default plant. --device is required to
+train (21 October 2026, the review of benchmark_training.py; not with
+--evaluate or --prove-buffer): cpu or cuda, passed to every train.py, which
+refuses a device torch cannot give. Without it train.py took "auto", CUDA
+wherever torch sees a GPU, and CPU and CUDA train different agents from one
+seed (rule 3, decision 32). With cuda every run gets CUBLAS_WORKSPACE_CONFIG
+set to check_training_device.CUBLAS_WORKSPACE, the one value train.py accepts
+on CUDA.
 
 WHY IN PARALLEL, AND WHY THAT IS NOT A SHORTCUT
 ------------------------------------------------
@@ -31,7 +38,7 @@ any of these runs started, which is the only thing that makes them evidence.
 
 C4, AND THE THREE THINGS THIS FILE WILL NO LONGER DO   (23 September 2026)
 --------------------------------------------------------------------------
-    python run_phase_d.py --engine b58 --road random --steps 300000 --out runs_c4 --dry-run
+    python run_phase_d.py --engine b58 --road random --steps 300000 --out runs_c4 --device cpu --dry-run
 
 Preparing C4 -- Phase D2's design at 300 000 steps -- found that this launcher
 could destroy the two experiments before it, and that nothing would have said
@@ -243,6 +250,10 @@ def main():
                     help="default 0-7. Duplicates are dropped. REQUIRED with "
                          "--restart-crashed, which must name the seed it means")
     ap.add_argument("--steps", type=int, default=50_000)
+    ap.add_argument("--device", choices=("cpu", "cuda"), default=None,
+                    help="the device every run trains on, passed to train.py. REQUIRED to "
+                         "train; no default (see the docstring). Not used by --evaluate or "
+                         "--prove-buffer")
     ap.add_argument("--road", choices=("fixed", "random"), default="fixed",
                     help="'fixed' is Phase D. 'random' is the randomised "
                          "climb (Phase D2's design, and C4's): trains with "
@@ -283,6 +294,9 @@ def main():
                     help="score the trained pairs instead of training: one "
                          "evaluate.py per seed, under the same memory cap")
     a = ap.parse_args()
+    if a.device is None and not (a.evaluate or a.prove_buffer):
+        ap.error("--device (cpu or cuda) is required to train: every train.py is passed it, "
+                 "and one experiment trains on one device type (decision 32)")
     d2 = a.road == "random"
     if a.out is None:
         a.out = "runs_d2" if d2 else "runs"
@@ -381,7 +395,7 @@ def main():
                         continue
                     crashed.append((tag, d))
                 argv = [sys.executable, "train.py", "--engine", a.engine, "--steps", str(a.steps),
-                        "--seed", str(s), "--out", a.out, "--road", a.road]
+                        "--seed", str(s), "--out", a.out, "--road", a.road, "--device", a.device]
                 if blind:
                     argv.append("--no-preview")
                 if not closed:
@@ -489,6 +503,11 @@ def main():
         os.makedirs(os.path.join(HERE, "results"), exist_ok=True)
     env = dict(os.environ, PYTHONIOENCODING="utf-8", OMP_NUM_THREADS="1",
                MKL_NUM_THREADS="1")
+    if a.device == "cuda" and not a.evaluate:
+        # train.check_device refuses CUDA without it; one constant for every launcher, and the
+        # value benchmark_training.py measured CUDA with
+        from check_training_device import CUBLAS_WORKSPACE
+        env["CUBLAS_WORKSPACE_CONFIG"] = CUBLAS_WORKSPACE
 
     # IN WAVES, not all at once. The first launch started all sixteen and
     # thirteen died allocating memory; a cap is the difference between "twelve
@@ -571,7 +590,7 @@ def main():
             print("A crashed run of a new experiment is re-run FROM SCRATCH, "
                   "once its process is gone:\n  python run_phase_d.py "
                   f"--road {a.road} --steps {a.steps} --out {a.out} "
-                  "--seeds <k> --restart-crashed --engine " + a.engine)
+                  f"--seeds <k> --restart-crashed --engine {a.engine} --device {a.device}")
         return 1
     road = f" --engine {a.engine} --road {a.road}"
     out = f" --out {a.out}"

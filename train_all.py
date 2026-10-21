@@ -1,21 +1,30 @@
 """train_all.py -- every seed of Phase D's pair, on one machine.
 
-    python train_all.py --engine b58 --road wideair --seeds 0-4 --steps 1080000 --jobs 10 --keep-buffer --out runs/wideair_dt1
+    python train_all.py --engine b58 --device cpu --road wideair --seeds 0-4 --steps 1080000 --jobs 10 --keep-buffer --out runs/wideair_dt1
                                                        # X2 (11 Oct): 5 seeds a side, 1200 episodes each
-    python train_all.py --engine b58 --road extremes --seeds 0-22 --no-resume --out runs/x2   # X1's design, a new experiment
-    python train_all.py --engine b58 --road extremes   # X1 itself (CLOSED since 9 Oct: runs/extremes_dt1)
-    python train_all.py --engine b58 --road terrain    # the 29 Sep design (CLOSED: runs/terrain_dt1)
-    python train_all.py --engine b58 --road extremes --jobs 10 --out runs/x2   # at most ten at once
+    python train_all.py --engine b58 --device cpu --road extremes --seeds 0-22 --no-resume --out runs/x2   # X1's design, a new experiment
+    python train_all.py --engine b58 --device cpu --road extremes   # X1 itself (CLOSED since 9 Oct: runs/extremes_dt1)
+    python train_all.py --engine b58 --device cpu --road terrain    # the 29 Sep design (CLOSED: runs/terrain_dt1)
+    python train_all.py --engine b58 --device cpu --road extremes --jobs 10 --out runs/x2   # at most ten at once
 
 THE ROAD IS REQUIRED (8 October 2026). Until then this launcher passed no
 --road and no --dt and leaned on train.py's defaults, which is the trap AUDIT2.md
 Part 3 names: a default that selects an experiment. Both are passed explicitly.
 THE ENGINE IS REQUIRED TOO (20 October 2026, decision 24), and passed on: train.py
 has no default plant.
+THE DEVICE IS REQUIRED TOO (21 October 2026, the review of benchmark_training.py),
+cpu or cuda, and passed on. Without it train.py took "auto", which is CUDA
+wherever the installed torch sees a GPU, whatever was measured or preregistered;
+CPU and CUDA train different agents from one seed, so one experiment trains on
+one device type (rule 3, decision 32), the one benchmark_training.py chose, and
+train.py refuses a device torch cannot give. X1 and X2 trained on the CPU (all
+56 of their config.json files: device cpu). With --device cuda every run gets
+CUBLAS_WORKSPACE_CONFIG set to check_training_device.CUBLAS_WORKSPACE, the one
+value train.py accepts on CUDA; that constant says why it is set.
 
 Each run is `python train.py --engine E --road R --dt 1 --steps STEPS --seed S
---out OUT [--no-preview] [--no-resume]` in its own process with OMP_NUM_THREADS=1,
-logging to OUT/log_<tag>.txt.
+--device D --out OUT [--no-preview] [--no-resume]` in its own process with
+OMP_NUM_THREADS=1, logging to OUT/log_<tag>.txt.
 
 CRASHES. Without --no-resume, re-running resumes every run from its last
 checkpoint, so a closed laptop costs at most the 10 000 steps since the last
@@ -85,6 +94,9 @@ def main():
     ap.add_argument("--engine", required=True, choices=engines.known(),
                     help="the plant every run trains on, passed to train.py (no default)")
     ap.add_argument("--road", required=True, choices=("terrain", "extremes", "wideair"))
+    ap.add_argument("--device", required=True, choices=("cpu", "cuda"),
+                    help="the device every run trains on, passed to train.py (no default: "
+                         "benchmark_training.py chooses it, decision 32; see the docstring)")
     ap.add_argument("--dt", type=float, default=1.0)
     ap.add_argument("--seeds", nargs="+", default=["0-9"], help="'0-19' or '0 1 2'")
     ap.add_argument("--steps", type=int, default=50_000)
@@ -105,9 +117,14 @@ def main():
     runs = [(s, blind) for s in a.seeds for blind in (False, True)]
     os.makedirs(os.path.join(HERE, a.out), exist_ok=True)
     env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", PYTHONUNBUFFERED="1")
+    if a.device == "cuda":
+        # train.check_device refuses CUDA without it; one constant for every launcher, and the
+        # value benchmark_training.py measured CUDA with
+        from check_training_device import CUBLAS_WORKSPACE
+        env["CUBLAS_WORKSPACE_CONFIG"] = CUBLAS_WORKSPACE
     queue, live, done = list(runs), {}, []
     t0 = time.time()
-    print(f"{len(runs)} runs ({a.engine}, {a.road}, dt {a.dt:g}), {a.steps:,} steps each, "
+    print(f"{len(runs)} runs ({a.engine}, {a.road}, dt {a.dt:g}, {a.device}), {a.steps:,} steps each, "
           f"at most {a.jobs} at once -> {a.out}/")
     while queue or live:
         while queue and len(live) < a.jobs:
@@ -118,7 +135,7 @@ def main():
                 if moved:
                     print(f"  {tag} had crashed: moved aside to {moved}, training it again from 0")
             cmd = [sys.executable, "train.py", "--engine", a.engine, "--road", a.road, "--dt", f"{a.dt:g}",
-                   "--steps", str(a.steps), "--seed", str(s), "--out", a.out]
+                   "--steps", str(a.steps), "--seed", str(s), "--device", a.device, "--out", a.out]
             if blind:
                 cmd.append("--no-preview")
             if a.no_resume:

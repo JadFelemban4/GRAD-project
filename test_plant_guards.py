@@ -1,5 +1,5 @@
-"""test_plant_guards.py -- the guards of 8 and 20 October, each with a test that
-fails if the guard is removed.
+"""test_plant_guards.py -- the guards of 8, 20 and 21 October, each with a test
+that fails if the guard is removed.
 
     python test_plant_guards.py        a few seconds; exit code 0 when all pass
 
@@ -26,6 +26,14 @@ fails if the guard is removed.
    schema-3 record of another engine is refused field by field. Added 21
    October 2026 (the review of build step 1): nothing tested any of it, and
    build step 1's own certificate bypassed the refusal on purpose.
+
+4. THE DEVICE ASKED FOR IS THE DEVICE TRAINED ON (21 October 2026, the review
+   of benchmark_training.py; train.check_device). An explicit --device that
+   torch cannot give is refused (stable-baselines3 falls back to the CPU
+   without a word); CUDA is refused unless CUBLAS_WORKSPACE_CONFIG is
+   check_training_device.CUBLAS_WORKSPACE, the one value every CUDA run trains
+   with, and gets torch's deterministic algorithms; on the CPU the function
+   changes nothing.
 
 Added 9 October 2026: WBS v3 rows 2.2 and 2.6 named these tests as missing.
 """
@@ -231,6 +239,53 @@ class SchemaThree(unittest.TestCase):
             FP.backend_of(object())
         with self.assertRaises(ValueError):
             FP.plant_fingerprint(plant=PLANT, backend="table:0123")
+
+
+class DeviceGuard(unittest.TestCase):
+    """Guard 4: train.check_device. No GPU is needed: torch.device("cuda") is
+    only a name until something runs on it, and check_device decides before."""
+
+    def test_a_silent_cpu_fallback_is_refused(self):
+        import torch
+        import train
+        with self.assertRaises(SystemExit) as cm:
+            train.check_device("cuda", torch.device("cpu"))
+        self.assertIn("REFUSING", str(cm.exception))
+        with self.assertRaises(SystemExit):
+            train.check_device("cpu", torch.device("cuda"))
+
+    def test_the_cpu_path_is_left_alone(self):
+        import torch
+        import train
+        before = torch.are_deterministic_algorithms_enabled()
+        for asked in ("cpu", "auto"):
+            self.assertIsNone(train.check_device(asked, torch.device("cpu")))
+        self.assertEqual(torch.are_deterministic_algorithms_enabled(), before)
+
+    def test_cuda_needs_the_cublas_workspace_and_turns_determinism_on(self):
+        from unittest import mock
+        import torch
+        import check_training_device as CTD
+        import train
+        with mock.patch.dict(os.environ):
+            os.environ.pop("CUBLAS_WORKSPACE_CONFIG", None)
+            for asked in ("cuda", "cuda:0", "auto"):
+                with self.assertRaises(SystemExit) as cm:
+                    train.check_device(asked, torch.device("cuda"))
+                self.assertIn("CUBLAS_WORKSPACE_CONFIG", str(cm.exception))
+        # one value only: ":16:8", which earlier torch versions also accepted, is another
+        # workspace (check_training_device.CUBLAS_WORKSPACE)
+        for other in (":16:8", " :4096:8", ""):
+            with mock.patch.dict(os.environ, {"CUBLAS_WORKSPACE_CONFIG": other}):
+                with self.assertRaises(SystemExit):
+                    train.check_device("cuda", torch.device("cuda"))
+        before = torch.are_deterministic_algorithms_enabled()
+        try:
+            with mock.patch.dict(os.environ, {"CUBLAS_WORKSPACE_CONFIG": CTD.CUBLAS_WORKSPACE}):
+                train.check_device("cuda", torch.device("cuda"))
+            self.assertTrue(torch.are_deterministic_algorithms_enabled())
+        finally:
+            torch.use_deterministic_algorithms(before)
 
 
 if __name__ == "__main__":

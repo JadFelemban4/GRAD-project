@@ -58,7 +58,17 @@ a C4 run. See "A RESUME IS NOT A LONGER RUN" below.
 
 (train_all.py and run_phase_d.py are the two launchers. Neither should lean on
 the defaults above: a default that selects an experiment is the trap AUDIT2.md
-Part 3 is about. Both pass --engine, --road and --dt explicitly.)
+Part 3 is about. Both pass --engine, --road and --device explicitly, and
+train_all.py --dt; run_phase_d.py's fixed and random roads train at their
+design step, DESIGN_DT.)
+
+THE DEVICE ASKED FOR IS THE DEVICE TRAINED ON (21 October 2026, the review of
+benchmark_training.py). An explicit --device that torch cannot give is refused:
+stable-baselines3 would fall back to the CPU without a word. On CUDA a run
+needs CUBLAS_WORKSPACE_CONFIG to be check_training_device.CUBLAS_WORKSPACE
+(the launchers set it) and trains with torch's deterministic algorithms, and
+config.json records the CUDA build, the driver and both settings. The CPU
+path is unchanged (check_device).
 """
 import argparse
 import csv
@@ -123,6 +133,58 @@ def refuse_old_schema(stored, outdir, force):
     if stored is not None and FP.schema_problem(stored) and not force:
         raise SystemExit(f"\nREFUSING: {outdir}: {FP.schema_problem(stored)}\n"
                          "Train into a fresh --out directory.")
+
+
+def check_device(asked, device):
+    """Refuse to train on a device other than the one asked for, and make CUDA
+    deterministic before anything runs on it (21 October 2026, the review of
+    benchmark_training.py).
+
+    `asked` is --device as given, `device` what stable-baselines3's get_device
+    made of it -- the CPU, without a word, when --device cuda meets a torch with
+    no usable CUDA, and a CUDA experiment would then hold CPU agents (rule 3,
+    decision 32). "auto" is never refused. On CUDA a run is refused unless
+    CUBLAS_WORKSPACE_CONFIG is check_training_device.CUBLAS_WORKSPACE, the one
+    cuBLAS workspace every CUDA run trains with (that constant says why), and
+    torch's deterministic algorithms are switched on. On the CPU it compares
+    two strings and refuses or returns, with no import and no torch setting, so
+    a CPU run trains the agent it trained before by construction. That is not
+    re-certified: level L8 of results/B58_IDENTITY.md ran before this function
+    existed. A function so test_plant_guards.py can show it refuses."""
+    if asked != "auto" and device.type != asked.split(":")[0]:
+        raise SystemExit(f"\nREFUSING: --device {asked} was asked for and torch offers {device}.\n"
+                         "stable-baselines3 would train there without a word, and one experiment "
+                         "trains on one device type (rule 3, decision 32).")
+    if device.type == "cuda":
+        from check_training_device import CUBLAS_WORKSPACE
+        have = os.environ.get("CUBLAS_WORKSPACE_CONFIG")
+        if have != CUBLAS_WORKSPACE:
+            raise SystemExit(f"\nREFUSING to train on CUDA with CUBLAS_WORKSPACE_CONFIG {have!r}: every "
+                             f"CUDA run trains with {CUBLAS_WORKSPACE}\n(check_training_device."
+                             "CUBLAS_WORKSPACE says why). train_all.py, run_phase_d.py and "
+                             "benchmark_training.py set it for --device cuda.")
+        import torch
+        torch.use_deterministic_algorithms(True)
+
+
+def cuda_machine(device):
+    """What fixes a CUDA run's bits besides the versions, for config.json's
+    machine block: the CUDA torch was built with, the driver (from nvidia-smi;
+    torch does not report it), the GPU, the cuBLAS workspace and the
+    deterministic switch. Written for CUDA runs only: a CPU run's config.json
+    is what it was. Called before the timed window opens (t0): nvidia-smi is a
+    process of its own, and its seconds are not training's (the review of 21
+    October 2026)."""
+    import torch
+    try:
+        r = subprocess.run(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+                           capture_output=True, text=True, timeout=30)
+        driver = r.stdout.strip().splitlines()[0].strip() if r.returncode == 0 and r.stdout.strip() else None
+    except (OSError, subprocess.SubprocessError):
+        driver = None
+    return dict(torch_cuda=torch.version.cuda, driver=driver, gpu=torch.cuda.get_device_name(device),
+                cublas_workspace_config=os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+                deterministic_algorithms=torch.are_deterministic_algorithms_enabled())
 
 
 def buffer_size(a):
@@ -445,7 +507,8 @@ def main():
     ap.add_argument("--device", default="auto",
                     help="auto (SB3's default: cuda where torch has it, else cpu), cpu or cuda. "
                          "CPU and CUDA train different agents from one seed; the device is "
-                         "written into meta.json")
+                         "written into meta.json. A device torch cannot give is refused, and "
+                         "CUDA needs CUBLAS_WORKSPACE_CONFIG (check_device)")
     ap.add_argument("--out", default=None,
                     help="default runs/terrain_dt1 for terrain; runs/ and runs_d2/ -- both "
                          "CLOSED -- for fixed and random at their own dt; otherwise "
@@ -496,6 +559,7 @@ def main():
                                  + f"_dt{a.dt:g}".replace(".", "p"))
     protocol = "d2" if a.road == "random" else "phase-d"
     device = get_device(a.device)
+    check_device(a.device, device)      # before any directory, and before anything runs on CUDA
     plant = engines.get(a.engine)
 
     tag = f"{'blind' if a.no_preview else 'sighted'}_seed{a.seed}"
@@ -663,6 +727,9 @@ def main():
                     buffer_size=buffer_size(a), verbose=1, tensorboard_log=None,
                     device=a.device)
 
+    # On CUDA only, and before t0, so its nvidia-smi call is outside
+    # steps_per_s_this_session's window; on the CPU this is one comparison
+    cuda_block = cuda_machine(model.device) if model.device.type == "cuda" else None
     t0 = time.time()
     remaining = max(0, a.steps - done_steps)
 
@@ -690,6 +757,8 @@ def main():
         except (OSError, ValueError):
             prev = None
     cfg = run_config(a, tag, model, outdir, live, plant)
+    if cuda_block is not None:
+        cfg["machine"]["cuda"] = cuda_block
     cfg.update(keep_buffer=bool(a.keep_buffer), resumed_buffer=buffer_restored)
     cfg.update(started=datetime.now().isoformat(timespec="seconds"), resumed_from=resume_from,
                status="running")
