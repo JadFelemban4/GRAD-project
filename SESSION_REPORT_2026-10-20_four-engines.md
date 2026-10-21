@@ -180,3 +180,70 @@ check_training_device.py` checks a machine against it; `--identity` and
 Its comparison was checked both ways on X1's runs: a run against itself reads
 IDENTICAL, two different agents read NOT IDENTICAL (103 differences). The
 `--identity` run itself was not run here.
+
+## 9. 21 October, later: the training device's benchmark, every decision answered, the validation contract, the reading list
+
+**The benchmark runs on the training device, not here** (`499bd00`). Ghassan: the
+benchmark is "to do on the new device and see if it's faster to train them on the
+CPU or GPU". `python benchmark_training.py --device cpu` in a CPU environment and
+`--device cuda` in a CUDA one, then `--merge` of the two files. It measures a lower
+and an upper bound of each device's training rate, with the repeats interleaved,
+and names a device only if its lower bound beats the other's highest upper bound;
+otherwise its answer is to keep the CPU. It also checks that seed 0 trains the
+identical agent twice. `train.py`, `train_all.py` and `run_phase_d.py` take a
+required `--device` and refuse a mismatch; on CUDA they need
+`CUBLAS_WORKSPACE_CONFIG=:4096:8` and deterministic algorithms. None of it was run
+on this laptop.
+
+**Every decision answered.** Ghassan, 21 October: "Me and jad agreed with what you
+decided" and "Yes covers everything". Decisions 1-35 carry both columns, Jad's as
+reported by Ghassan (Desktop copy `decisions_2026-10-21_answered.md`). The
+contract's own review raised three more, 36-38 (section G): adopted on Ghassan's
+delegation ("fix all the way you see fit"), Jad's column open (Desktop copy
+`decisions_2026-10-21_G.md`).
+
+**The validation contract of decision 35, committed before any fit**
+(`results/ENGINE_THRESHOLDS.md` and `.json`, version 3, `ef5e14e`). It holds the
+accuracy the Mazda, the Honda and the Ford must show on held-out EPA rpm lines,
+each derived from its consequence on the MEI, and the gates of every engine's
+table. Its generator, `engine_thresholds.py` and `thresholds/`, is committed beside
+it; `--check` exits 1 if either file differs from what the code writes. An
+independent re-run found three faults, none a threshold, and all three are fixed:
+a bound rounded to nearest (section 1.5's thermal-only agreement, now rounded up to
+0.48), wall-clock times written into what the contract hashes (they are now in
+`run.json` only, and step 6 refuses an output that holds one), and step 7's need
+for a git checkout (documented; it now stops with a message). After the fixes a
+full re-run from scratch gave back every step output and both contract files byte
+for byte. Nothing has been fitted: no model was run on an EPA row.
+
+**The reading list** (`docs/literature/READING_LIST.md` and `references.bib`,
+`e4e7e4a`). 183 sources for the literature review and for the systematic validation
+of the simulator, each with its DOI or link, its free full text where one exists,
+the way to get it from Jeddah and its price: 121 free, 13 through the Saudi
+Digital Library, 18 that depend on what the SDL login shows, 31 to buy. $392.00
+(SAR 1,470.00) has to be paid whatever the login shows: five ASME papers, five SAE
+papers and ASME V&V 20. If SDL lacks ScienceDirect, SAGE and the other unconfirmed
+databases, the MUST items cost $777.96; if the library or the authors supply the
+papers, only V&V 20's $72.00 is left. Two checks by AI agents compiled and
+re-checked it; no team member has read the sources yet, and none is cited until
+someone has. Hu et al. 2019 (C18) was raised to MUST after the checks, because the
+project's own notes call it the work closest to this one.
+
+**Found on the way.**
+
+- `verify_docs.py`'s retired pattern for the old 2.3 % load residual matched the
+  contract's 12.3 % (S1b): `\b` added, `drift_test.py` 18 of 18 after it.
+- `drift_test.py`'s first run was cut at row 7 of 18 by a time limit on the
+  command, and the pipe still reported success (the exit code was `tail`'s). It was
+  run again to the end. Mistake 19's kind: a result that could have come from the
+  fallback.
+
+**Not done, and why.**
+
+- Build step 2, the calibration of the three EPA engines: designed first (five
+  readers, three independent designs, an adversarial review of each, one plan),
+  then implemented and reviewed before the in-sample stage, because the held-out
+  statistics are computed once.
+- The benchmark and the identity check on the training device: Ghassan runs them
+  there.
+- Drive C's repeat: Ghassan's, on `main`.

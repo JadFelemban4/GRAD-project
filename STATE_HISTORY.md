@@ -4230,3 +4230,20 @@ GRA-test: build step 1 of decision 24 (four engines), reviewed and corrected, un
   committed; build step 2 calibrates the three EPA engines and their cars. Training
   runs on another device, not this laptop (Ghassan, 21 October); decisions 25–35
   open.
+
+# Part R — lines rotated out of CHECKPOINT.md, 21 October 2026 (GRA-test: the validation contract of decision 35 committed; the reading list)
+
+GRA-test: build step 1 of decision 24 (four engines), reviewed, corrected and committed 21 October · plant_sha ded8da308863d394 (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 99d2a9658b1258a7 · fingerprint schema 3 · the B58 bit-identical to cf43fbb (`results/B58_IDENTITY.md`)
+
+- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 1
+  committed; build step 2 calibrates the three EPA engines and their cars, with
+  the thresholds of decision 35 fixed and committed first. Training runs on
+  another device, not this laptop (Ghassan, 21 October). Decisions 1-35 all
+  answered 21 October, both agree (`results/VALIDATION_DECISIONS.md`).
+
+8. `GRA-test`, build step 2: calibrate the Mazda, Honda and Ford on the B58's cycle
+   model from `data/engines/` (thresholds fixed first, decision 35), their cars and
+   the Accord's CVT, each validated on held-out EPA points; then the test roads by
+   `preview_ceiling.py`'s rule (decision 34). For Jad and Ghassan: CLAUDE.md's
+   re-run rule to name `engines.py` and `engine_specs/` (`.claude/rules/physics.md`
+   does); fingerprint schema 4 (decisions 27, 28) before any new engine trains.

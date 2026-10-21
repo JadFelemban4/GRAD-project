@@ -2,7 +2,7 @@
 
 Last verified: 2026-10-21 (on `GRA-test`) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s of 21 October: `results/B58_IDENTITY.md`)
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
-GRA-test: build step 1 of decision 24 (four engines), reviewed, corrected and committed 21 October · plant_sha ded8da308863d394 (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 99d2a9658b1258a7 · fingerprint schema 3 · the B58 bit-identical to cf43fbb (`results/B58_IDENTITY.md`)
+GRA-test: build step 1 of decision 24 (four engines), reviewed, corrected and committed 21 October; the validation contract of decision 35 committed the same day, before any fit (`results/ENGINE_THRESHOLDS.md`, version 3) · plant_sha ded8da308863d394 (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 99d2a9658b1258a7 · fingerprint schema 3 · the B58 bit-identical to cf43fbb (`results/B58_IDENTITY.md`)
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
 `STATE_HISTORY.md` part B, verbatim. This file holds the current state only: the
@@ -41,6 +41,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   with the agent's own levers (0.42 with unlimited preview) against the MEI of
   5.43 (`python preview_ceiling.py` -> `results/preview_ceiling.txt`): the climb
   that X1 and X2 were scored on cannot show a preview effect (decision 34).
+- `python engine_thresholds.py --check`: the validation contract of decision 35
+  (`results/ENGINE_THRESHOLDS.md` and `.json`, version 3) is what its committed
+  generator writes, and a full re-run on 21 October gave back every output byte
+  for byte. Nothing has been fitted to the three EPA engines.
 - `python check_training_device.py`: this laptop matches `requirements-lock.txt`;
   its `--identity`/`--compare` modes decide whether a second machine trains
   identical agents (decision 32). Not yet run on the training device.
@@ -62,11 +66,12 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
-- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 1
-  committed; build step 2 calibrates the three EPA engines and their cars, with
-  the thresholds of decision 35 fixed and committed first. Training runs on
-  another device, not this laptop (Ghassan, 21 October). Decisions 1-35 all
-  answered 21 October, both agree (`results/VALIDATION_DECISIONS.md`).
+- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 1 and
+  the validation contract committed; build step 2 calibrates the three EPA engines
+  and their cars against it next (designed and reviewed first). Training runs on
+  another device, not this laptop (Ghassan, 21 October). Decisions 1-35 answered
+  21 October, both agree; 36-38 (section G) adopted on Ghassan's delegation,
+  Jad's column open (`results/VALIDATION_DECISIONS.md`).
 
 ## Blockers
 
@@ -100,11 +105,13 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    `wideair_dt1`, though X2's result was published on 13 October (session
    report of 15 October, 2.3).
 8. `GRA-test`, build step 2: calibrate the Mazda, Honda and Ford on the B58's cycle
-   model from `data/engines/` (thresholds fixed first, decision 35), their cars and
-   the Accord's CVT, each validated on held-out EPA points; then the test roads by
-   `preview_ceiling.py`'s rule (decision 34). For Jad and Ghassan: CLAUDE.md's
-   re-run rule to name `engines.py` and `engine_specs/` (`.claude/rules/physics.md`
-   does); fingerprint schema 4 (decisions 27, 28) before any new engine trains.
+   model from `data/engines/` against `results/ENGINE_THRESHOLDS.md` (its rule 0:
+   nothing in it changes after a fit; the held-out statistics are computed once),
+   their cars and the Accord's CVT; then the test roads by `preview_ceiling.py`'s
+   rule (decision 34). For Jad: decisions 36-38 before the first fit (Desktop copy
+   `decisions_2026-10-21_G.md`). For Jad and Ghassan: CLAUDE.md's re-run rule to
+   name `engines.py` and `engine_specs/` (`.claude/rules/physics.md` does);
+   fingerprint schema 4 (decisions 27, 28) before any new engine trains.
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device, before any training: install from
@@ -113,6 +120,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    decides CPU or GPU and checks that seed 0 trains identically twice; then
    `python check_training_device.py --identity device.json` there and on this
    laptop, and `--compare` the two (recorded, not required; decision 32).
+11. The literature (`docs/literature/READING_LIST.md`, 183 sources): one person does
+   its ten-minute SDL login check and asks the librarian about interlibrary loan,
+   then buy what remains ($392.00 whatever the login shows). Each source is read
+   in full by a named team member before it is cited.
 
 ## Files outside git (where · last backup · manifest)
 
