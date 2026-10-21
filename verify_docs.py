@@ -716,7 +716,10 @@ RETIRED = [
     (r"\b0\.783\b|\b0\.784\b", "k derived/fitted on the sensor temperature",
      "derived 0.829, fitted 0.837"),
     (r"\b0\.840\b", "the 20 C reference on the sensor temperature", "0.890"),
-    (r"2\.8\s*%|2\.3\s*%", "load residual before the correction",
+    # \b added 21 October 2026: without it the pattern matched the 12.3 % of
+    # results/ENGINE_THRESHOLDS.md (S1b's R under decision 38), which is not
+    # the retired residual. A false positive, as the rule above warns.
+    (r"\b2\.8\s*%|\b2\.3\s*%", "load residual before the correction",
      "1.4 % derived, 1.1 % fitted"),
     (r"volumetric_efficiency\(\)[^.]{0,80}(?:understat|over-predict|fitted at part load)",
      "the boost gap blamed on the breathing model", "it was the charge temperature"),

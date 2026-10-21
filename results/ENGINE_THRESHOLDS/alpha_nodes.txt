@@ -1,0 +1,16 @@
+mazda_25t
+   HELD OUT {'curve': 'wot_torque_curve', 'node_rpm': 1751.1, 'table': 'epa_highload_initial.csv', 'source_row': 18, 'held_out': True}
+   HELD OUT {'curve': 'closed_throttle_torque_curve', 'node_rpm': 3501.0, 'table': 'epa_steady.csv', 'source_row': 152, 'held_out': True}
+   nodes 8 held out 2
+honda_l15b7
+   HELD OUT {'curve': 'wot_torque_curve', 'node_rpm': 1251.0, 'table': 'epa_steady.csv', 'source_row': 43, 'held_out': True}
+   HELD OUT {'curve': 'wot_torque_curve', 'node_rpm': 2012.0, 'table': 'epa_highload_initial.csv', 'source_row': 32, 'held_out': True}
+   HELD OUT {'curve': 'wot_torque_curve', 'node_rpm': 3002.6, 'table': 'epa_highload_initial.csv', 'source_row': 48, 'held_out': True}
+   HELD OUT {'curve': 'wot_torque_curve', 'node_rpm': 4502.1, 'table': 'epa_highload_initial.csv', 'source_row': 64, 'held_out': True}
+   HELD OUT {'curve': 'closed_throttle_torque_curve', 'node_rpm': 3000.0, 'table': 'epa_steady.csv', 'source_row': 117, 'held_out': True}
+   HELD OUT {'curve': 'closed_throttle_torque_curve', 'node_rpm': 4499.0, 'table': 'epa_steady.csv', 'source_row': 168, 'held_out': True}
+   nodes 15 held out 6
+ford_27tt
+   HELD OUT {'curve': 'wot_torque_curve', 'node_rpm': 2000.0, 'table': 'epa_steady_cell9.csv', 'source_row': 80, 'held_out': True}
+   HELD OUT {'curve': 'closed_throttle_torque_curve', 'node_rpm': 1251.0, 'table': 'epa_steady_cell9.csv', 'source_row': 15, 'held_out': True}
+   nodes 10 held out 2

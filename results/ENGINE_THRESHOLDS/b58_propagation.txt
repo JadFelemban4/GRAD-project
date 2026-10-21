@@ -1,0 +1,12 @@
+climb cell {'rpm': 2705.706, 'map': 174.887, 'iat': 330.059, 'ect': 365.986, 'spark': 1.164, 'lam': 1.0, 'egt': 1022.275, 'mdot': 120.84, 'torque': 335.505, 'treq': 335.469, 't_turb': 882.919}
+damage 848.05, peak housing 883.02 C
+housing: f 0.8580, tau 47.34 s, dTh/dln m 119.44 K
+fixed_spark: per kPa {'torque': 2.242914860507696, 'egt': 0.6860755372983931, 'mdot': 0.718639449909098, 'fuel': 0.045773213370006394}; +1 % torque bias: MAP -1.496 kPa, gas -1.026 K, flow -0.890 %, housing -1.943 K
+ecu_schedule: per kPa {'torque': 1.4932583894886022, 'egt': 1.4727934551502528, 'mdot': 0.718639449909098, 'fuel': 0.045773213370006394}; +1 % torque bias: MAP -2.247 kPa, gas -3.309 K, flow -1.336 %, housing -4.435 K
+ECU spark slope -0.1440 deg/kPa (base_spark 6.272, knock limit 6.272)
+env torque bias +0.01: dmap_kpa -2.2200, dspark_deg +0.3229, degt_k -3.3053, dmdot_rel -0.0132, dTh_median_k -4.4399, dpeak_k -4.4261, damage +767.0922, damage_unbiased +848.0516
+env torque bias -0.01: dmap_kpa +2.2761, dspark_deg -0.3245, degt_k +3.3173, dmdot_rel +0.0135, dTh_median_k +4.4633, dpeak_k +4.4505, damage +938.2182, damage_unbiased +848.0516
+env coefficients {'housing_k_per_pct_central': 4.4516, 'housing_k_per_pct_larger': 4.4633, 'flow_pct_per_pct_central': 1.3368, 'flow_pct_per_pct_larger': 1.3534}
+flat: f 0.6163 tau 127.89; ecu-schedule flow per +1 % torque -0.709 %, housing -1.833 K
+lambda at the climb {'-0.01': -7.1, '-0.02': -13.99, '-0.05': -33.47, '-0.10': -62.18, '-0.15': -86.43}
+spark at the climb {'-0.75': (4.1, -1.17), '+0.75': (-4.11, 1.16)}

@@ -1,0 +1,10 @@
+== terrain_dt1: 10 pairs; published formula reproduces the committed damage to 1.0e-07
+  knock term on : -57 K: d -0.89 (slope +0.0362 /K); -25 K: d -0.04 (slope +0.0485 /K); -10 K: d +0.64 (slope +0.0533 /K); -5 K: d +0.90 (slope +0.0540 /K); +0 K: d +1.17 (slope +nan /K); +5 K: d +1.49 (slope +0.0637 /K); +10 K: d +1.84 (slope +0.0671 /K); +25 K: d +3.00 (slope +0.0732 /K); +57 K: d +6.33 (slope +0.0905 /K)
+  knock term off: -57 K: d -1.52 (slope +0.0004 /K); -25 K: d -1.51 (slope +0.0005 /K); -10 K: d -1.51 (slope +0.0006 /K); -5 K: d -1.50 (slope +0.0006 /K); +0 K: d -1.50 (slope +nan /K); +5 K: d -1.50 (slope +0.0007 /K); +10 K: d -1.49 (slope +0.0007 /K); +25 K: d -1.48 (slope +0.0008 /K); +57 K: d -1.43 (slope +0.0013 /K)
+  knock on: largest |slope| over the shifts 0.0905 points per K; at +-10 K: 0.0671, 0.0533
+  knock off: largest |slope| over the shifts 0.0013 points per K; at +-10 K: 0.0007, 0.0006
+== extremes_dt1: 23 pairs; published formula reproduces the committed damage to 1.4e-07
+  knock term on : -57 K: d -10.48 (slope +0.0023 /K); -25 K: d -10.43 (slope +0.0032 /K); -10 K: d -10.38 (slope +0.0037 /K); -5 K: d -10.37 (slope +0.0039 /K); +0 K: d -10.35 (slope +nan /K); +5 K: d -10.33 (slope +0.0043 /K); +10 K: d -10.30 (slope +0.0047 /K); +25 K: d -10.21 (slope +0.0056 /K); +57 K: d -9.88 (slope +0.0083 /K)
+  knock term off: -57 K: d -10.50 (slope +0.0014 /K); -25 K: d -10.47 (slope +0.0018 /K); -10 K: d -10.45 (slope +0.0021 /K); -5 K: d -10.44 (slope +0.0022 /K); +0 K: d -10.43 (slope +nan /K); +5 K: d -10.41 (slope +0.0025 /K); +10 K: d -10.40 (slope +0.0026 /K); +25 K: d -10.35 (slope +0.0031 /K); +57 K: d -10.16 (slope +0.0046 /K)
+  knock on: largest |slope| over the shifts 0.0083 points per K; at +-10 K: 0.0047, 0.0037
+  knock off: largest |slope| over the shifts 0.0046 points per K; at +-10 K: 0.0026, 0.0021

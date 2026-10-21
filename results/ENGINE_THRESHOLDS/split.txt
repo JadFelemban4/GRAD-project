@@ -1,0 +1,52 @@
+== mazda_25t: rows 332, held out 90; lambda_ref {'epa_steady.csv': 1.0, 'epa_highload_initial.csv': 1.0, 'epa_highload_final.csv': 1.0}; hot MAP floor 109.56 kPa
+   lines ['1300', '1500', '1750', '2000', '2250', '2500', '2750', '3000', '3500', '4000', '4500', '5000']
+   eligible ['1500', '1750', '2000', '2250', '2500', '2750', '3000', '3500', '4000']
+   offset 0: held ['1500', '2250', '3000'], rows 89, high-load lines >= 3 holds ['1500', '2250', '3000'], E4b-usable enriched rows 6
+   offset 1: held ['1750', '2500', '3500'], rows 90, high-load lines >= 3 holds ['1750', '2500', '3500'], E4b-usable enriched rows 6
+   offset 2: held ['2000', '2750', '4000'], rows 90, high-load lines >= 3 holds ['2000', '2750', '4000'], E4b-usable enriched rows 6
+   CHOSEN offset 1: held-out lines ['1750', '2500', '3500']
+     epa_steady.csv                 rows  210 held out  54 calibration  156
+     epa_highload_initial.csv       rows   61 held out  18 calibration   43
+     epa_highload_final.csv         rows   61 held out  18 calibration   43
+     line 1750           rows 32 steady_rows 20 holds 6 fired 20 fired_meter 20 hot 11 hot_meter 11 hot_l1 10 hot_enr 1 hot_l1_meter 10 l1_boost 12 l1_thr 7 l1_off_ref 0 initial 6 e4b_extrap 0.0 kPa
+     line 2500           rows 30 steady_rows 18 holds 6 fired 18 fired_meter 18 hot 8 hot_meter 8 hot_l1 5 hot_enr 3 hot_l1_meter 5 l1_boost 6 l1_thr 9 l1_off_ref 1 initial 6 e4b_extrap 56.7 kPa
+     line 3500           rows 28 steady_rows 16 holds 6 fired 16 fired_meter 14 hot 8 hot_meter 6 hot_l1 6 hot_enr 2 hot_l1_meter 6 l1_boost 7 l1_thr 7 l1_off_ref 1 initial 6 e4b_extrap 66.6 kPa
+   deciding lines {'E1a': ['1750', '2500', '3500'], 'E2a': ['1750', '2500', '3500'], 'E3a': ['1750', '2500', '3500'], 'E4a': ['2500'], 'L0': ['1750', '2500', '3500'], 'E4b': ['1750', '2500', '3500']}
+   pooled {'D1_fired_with_meter': 52, 'E1b_fired': 54, 'E4b_enriched_rows': 6, 'E4b_lines': 3, 'E5A_rows': 23, 'E5B_rows': 25, 'E8_final_rows': 18, 'L0_rows': 21, 'E1_initial_rows_descriptive': 18, 'hot_l1_rows_off_ref_by_more_than_0005': 2, 'hot_l1_rows': 21}
+   coverage: fired intake [37.3, 55.0] C, hot intake [37.3, 55.0] C; deepest lambda (cell-referenced) {'value': 0.6941, 'table': 'epa_highload_initial.csv', 'source_row': 59, 'window': 'initial'}
+== honda_l15b7: rows 320, held out 107; lambda_ref {'epa_steady.csv': 0.99, 'epa_highload_initial.csv': 0.99, 'epa_highload_final.csv': 0.99}; hot MAP floor 124.68 kPa
+   lines ['1000', '1250', '1500', '1600', '1700/1750/1800', '2000', '2250', '2500', '3000', '3500', '4000', '4500', '5000']
+   eligible ['1250', '1600', '1700/1750/1800', '2000', '2250', '2500', '3000', '3500', '4000', '4500']
+   offset 0: held ['1250', '2000', '3000', '4500'], rows 107, high-load lines >= 3 holds ['2000', '3000', '4500'], E4b-usable enriched rows 13
+   offset 1: held ['1600', '2250', '3500'], rows 50, high-load lines >= 3 holds ['1600', '2250', '3500'], E4b-usable enriched rows 7
+   offset 2: held ['1700/1750/1800', '2500', '4000'], rows 91, high-load lines >= 3 holds ['1700/1750/1800', '2500', '4000'], E4b-usable enriched rows 12
+   CHOSEN offset 0: held-out lines ['1250', '2000', '3000', '4500']
+     epa_steady.csv                 rows  190 held out  75 calibration  115
+     epa_highload_initial.csv       rows   65 held out  16 calibration   49
+     epa_highload_final.csv         rows   65 held out  16 calibration   49
+     line 1250           rows 20 steady_rows 20 holds 0 fired 14 fired_meter 14 hot 0 hot_meter 0 hot_l1 0 hot_enr 0 hot_l1_meter 0 l1_boost 5 l1_thr 9 l1_off_ref 0 initial 0 e4b_extrap None kPa
+     line 2000           rows 31 steady_rows 21 holds 5 fired 21 fired_meter 21 hot 8 hot_meter 8 hot_l1 5 hot_enr 3 hot_l1_meter 5 l1_boost 10 l1_thr 7 l1_off_ref 0 initial 5 e4b_extrap 19.2 kPa
+     line 3000           rows 29 steady_rows 19 holds 5 fired 19 fired_meter 19 hot 9 hot_meter 9 hot_l1 5 hot_enr 4 hot_l1_meter 5 l1_boost 11 l1_thr 4 l1_off_ref 0 initial 5 e4b_extrap 16.4 kPa
+     line 4500           rows 27 steady_rows 15 holds 6 fired 15 fired_meter 15 hot 6 hot_meter 6 hot_l1 0 hot_enr 6 hot_l1_meter 0 l1_boost 3 l1_thr 6 l1_off_ref 0 initial 6 e4b_extrap 62.6 kPa
+   deciding lines {'E1a': ['2000', '3000', '4500'], 'E2a': ['2000', '3000', '4500'], 'E3a': ['2000', '3000'], 'E4a': ['2000', '3000', '4500'], 'L0': ['2000', '3000'], 'E4b': ['2000', '3000', '4500']}
+   pooled {'D1_fired_with_meter': 69, 'E1b_fired': 69, 'E4b_enriched_rows': 13, 'E4b_lines': 3, 'E5A_rows': 26, 'E5B_rows': 29, 'E8_final_rows': 16, 'L0_rows': 10, 'E1_initial_rows_descriptive': 16, 'hot_l1_rows_off_ref_by_more_than_0005': 0, 'hot_l1_rows': 10}
+   coverage: fired intake [31.5, 51.1] C, hot intake [33.3, 40.4] C; deepest lambda (cell-referenced) {'value': 0.62, 'table': 'epa_highload_final.csv', 'source_row': 70, 'window': 'final'}
+== ford_27tt: rows 294, held out 93; lambda_ref {'epa_steady_cell9.csv': 0.98, 'epa_steady_hd1.csv': 1.0, 'epa_highload_initial_hd1.csv': 1.0, 'epa_highload_final_hd1.csv': 1.0}; hot MAP floor 136.22 kPa
+   lines ['1000', '1250', '1500', '1750/1800', '2000', '2200/2250', '2400', '2500', '2600', '2750', '3000', '3500', '4000', '4500', '5000', '5500']
+   eligible ['1250', '1500', '1750/1800', '2000', '2200/2250', '2400', '2500', '2600', '2750', '3500', '4000', '4500', '5000']
+   offset 0: held ['1250', '2000', '2500', '3500', '5000'], rows 93, high-load lines >= 3 holds ['3500', '5000'], E4b-usable enriched rows 4
+   offset 1: held ['1500', '2200/2250', '2600', '4000'], rows 77, high-load lines >= 3 holds ['4000'], E4b-usable enriched rows 5
+   offset 2: held ['1750/1800', '2400', '2750', '4500'], rows 70, high-load lines >= 3 holds ['4500'], E4b-usable enriched rows 1
+   CHOSEN offset 0: held-out lines ['1250', '2000', '2500', '3500', '5000']
+     epa_steady_cell9.csv           rows  180 held out  63 calibration  117
+     epa_steady_hd1.csv             rows   76 held out  18 calibration   58
+     epa_highload_initial_hd1.csv   rows   19 held out   6 calibration   13
+     epa_highload_final_hd1.csv     rows   19 held out   6 calibration   13
+     line 1250           rows 13 steady_rows 13 holds 0 fired 11 fired_meter 11 hot 3 hot_meter 3 hot_l1 3 hot_enr 0 hot_l1_meter 3 l1_boost 5 l1_thr 6 l1_off_ref 3 initial 0 e4b_extrap None kPa
+     line 2000           rows 22 steady_rows 22 holds 0 fired 19 fired_meter 19 hot 6 hot_meter 6 hot_l1 6 hot_enr 0 hot_l1_meter 6 l1_boost 15 l1_thr 4 l1_off_ref 3 initial 0 e4b_extrap None kPa
+     line 2500           rows 21 steady_rows 21 holds 0 fired 17 fired_meter 17 hot 9 hot_meter 9 hot_l1 6 hot_enr 1 hot_l1_meter 6 l1_boost 10 l1_thr 4 l1_off_ref 0 initial 0 e4b_extrap 21.2 kPa
+     line 3500           rows 27 steady_rows 21 holds 3 fired 17 fired_meter 17 hot 5 hot_meter 5 hot_l1 1 hot_enr 3 hot_l1_meter 1 l1_boost 4 l1_thr 9 l1_off_ref 1 initial 3 e4b_extrap 30.0 kPa
+     line 5000           rows 10 steady_rows 4 holds 3 fired 6 fired_meter 4 hot 3 hot_meter 1 hot_l1 0 hot_enr 3 hot_l1_meter 0 l1_boost 0 l1_thr 2 l1_off_ref 0 initial 3 e4b_extrap None kPa
+   deciding lines {'E1a': ['1250', '2000', '2500', '3500', '5000'], 'E2a': ['1250', '2000', '2500', '3500'], 'E3a': ['1250', '2000', '2500'], 'E4a': ['3500', '5000'], 'L0': ['1250', '2000', '2500'], 'E4b': ['2500', '3500']}
+   pooled {'D1_fired_with_meter': 68, 'E1b_fired': 70, 'E4b_enriched_rows': 4, 'E4b_lines': 2, 'E5A_rows': 25, 'E5B_rows': 34, 'E8_final_rows': 6, 'L0_rows': 16, 'E1_initial_rows_descriptive': 6, 'hot_l1_rows_off_ref_by_more_than_0005': 7, 'hot_l1_rows': 16}
+   coverage: fired intake [24.7, 47.0] C, hot intake [35.4, 47.0] C; deepest lambda (cell-referenced) {'value': 0.7082, 'table': 'epa_highload_final_hd1.csv', 'source_row': 24, 'window': 'final'}

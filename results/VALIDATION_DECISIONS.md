@@ -157,6 +157,20 @@ comparison needs 143 seeds a side by the sign test, 90 by a paired t-test.
 | 34 | The test roads (revised 21 October; it read "the locked climb per car") | **Not the locked climb. Roads on which preview can be worth something: repeated short, hot climbs of about 1–2 τ each, chosen so that the preview ceiling (the most any use of the preview could save, from a current-grade trace, printed by a committed script) is at least twice the MEI on every engine; computed and committed before the preregistration; the locked climb kept only as a declared transfer row; the twenty frozen preference draws reused on the new roads.** Measured on 21 October (`python preview_ceiling.py` → `results/preview_ceiling.txt`, from the committed traces): on the locked climb the most a cooler housing at the climb start can save is 0.13 points of cut with the agent's own levers, 0.42 with unlimited preview, 1.19 even if the exhaust could be held at ambient for the 30 s, against the MEI of 5.43, because about 92 % of the turbine damage accrues more than 3 τ after the climb starts, when both arms know the same thing (on the ramped plant the knock term adds well under a point). Every engine would read about 0 there, and a collapse at zero tests nothing. Gate item 5 already named multi-climb roads as the test set. The preregistration must say that this was found after X1's and X2's results, from hand-written traces, not from any agent of the new test | agree, 21 Oct | agree, 21 Oct (as reported by Ghassan) |
 | 35 | Validation thresholds for the new engines | **Torque, fuel and turbine-inlet temperature against held-out EPA points, with each required accuracy derived from its consequence on the MEI (VALIDATION_PLAN.md's method) and committed before calibrating; the table gates likewise.** The first draft's thresholds equalled the B58 table's own measured errors, which is choosing R to fit E | agree, 21 Oct | agree, 21 Oct (as reported by Ghassan) |
 
+## G. Before the three EPA engines are calibrated (added 21 October 2026, on branch `GRA-test`)
+
+From the validation contract of decision 35 (`results/ENGINE_THRESHOLDS.md`, section 8),
+written and reviewed before any engine was fitted. Ghassan delegated these on 21 October
+("fix all the way you see fit"); the recommended option is adopted so that the contract can be
+committed before calibration, as X1 went ahead on Ghassan's order on 8 October. Jad's column is
+open; an answer that differs, given before the first fit, is applied before it.
+
+| # | decision | recommended, and why | Ghassan | Jad |
+|---|---|---|---|---|
+| 36 | A validation row that can only read "untested" | **It enters the result as a preregistered error band, ((\|E\| + 2u)/R)·b, and the engine's verdict inside that band reads "model-limited"; a row with no statistic at all still drops the engine.** The ECU's boosted enrichment moves the head-start pair at first order (±0.02 of lambda: −16 % / −42 % under K3), and EPA's uncalibrated lambda cannot resolve that on any engine, the B58 included: if "untested" dropped the engine, no engine would survive | delegated 21 Oct ("fix all the way you see fit"): adopted | |
+| 37 | The equivalence margin of the collapse test (decision 26) | **The MEI, 5.43 points.** It has a consequence behind it (decision 5); a margin chosen for what the seed budget can confirm is choosing R to fit E (the review of 20 October). At about 20 seeds per arm the test can refute a collapse but will rarely confirm one within the MEI, and the preregistration says so | delegated 21 Oct: adopted | |
+| 38 | The model-error budget per part | **b = MEI/6 = 0.905 points per part, for six parts**, so the six aligned at their limits add to exactly the MEI (with MEI/5 they would add to 1.2 MEI, enough to manufacture an effect of the size the test looks for); every d-row R scales by 5/6; independent, they add to about 0.41 MEI | delegated 21 Oct: adopted | |
+
 ## What is already settled and needs no answer
 
 - The five steps before any training, agreed on 30 September (`CLAUDE.md`, first

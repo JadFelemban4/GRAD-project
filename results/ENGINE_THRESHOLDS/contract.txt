@@ -1,0 +1,36 @@
+
+== step 6: contract
+b 0.9050  parts 6  linear 5.430 (1.00 MEI)  rss 2.217 (0.408 MEI)
+G 980.275 K; gas/% 3.3173; flow/% 1.3534; housing/% B58 4.4633; bound 5.1828 (f* 0.6250); flow-only bound 2.4507 K/%
+  R E1a  1.9
+  R E2a  4.0
+  R E3a  10.0
+  R E4a  10.0
+  R L0   10.0
+  R D1   16.6
+  R E4b  16.6
+  R L1   9.9
+  R E8   16.6
+  R C3b  16.6
+  R C3d  16.6
+  R S1a  16.6
+  R S1b  12.3
+  R S1c  16.6
+  R S2a  0.905
+  R S2b  0.905
+  worth b: {'E1b_torque_pct': 12.3, 'E2b_fuel_pct': 16.6}  version 2 (b = MEI/5): {'D1': 20.0, 'E4b': 20.0, 'L1': 11.9, 'E8': 20.0, 'C3b': 20.0, 'C3d': 20.0, 'S1a': 20.0, 'S1b': 14.7, 'S1c': 20.0, 'S2a': 1.086, 'S2b': 1.086} {'E1b_torque_pct': 14.7, 'E2b_fuel_pct': 20.0}
+knee slope max {'slope': 0.09054039308833067, 'set': 'terrain_dt1', 'knock': True, 'shift_k': 57} at 10 K {'slope': 0.0670724823715777, 'set': 'terrain_dt1', 'knock': True, 'shift_k': 10}
+E8 K3 lambda [(-0.1, -64.9), (-0.05, -36.1), (-0.02, -16.3), (-0.01, -8.9), (-0.005, -5.1), (0.0, 0.0), (0.005, -9.7), (0.01, -19.4), (0.02, -42.4), (0.05, -81.6)]
+E8 K3 spark  [(-3.0, 19.7), (-1.5, 8.4), (-0.75, 3.2), (0.0, 0.0), (0.75, -5.8), (1.5, -10.2)]
+E8 fixed lambda [(-0.1, 107.2), (-0.05, 133.0), (-0.02, 61.2), (0.0, 0.0), (0.02, -74.9), (0.05, -92.2)]
+E8 fixed spark  [(-1.5, -76.1), (-0.75, -54.2), (0.0, 0.0), (0.75, 59.5)]
+E8 worth b {'lambda_rich': {'shift': -0.0206, 'extrapolated': False}, 'lambda_lean': {'shift': 0.0086, 'extrapolated': False}, 'spark_retard': {'shift': -2.594, 'extrapolated': False}, 'spark_advance': {'shift': 2.625, 'extrapolated': True, 'largest_measured': [1.5, -0.1015]}}
+C3 u_eta 0.0377 u_rad 0.0092 u_torque 0.0388 u_fuel 0.0525
+AFR {'mazda_25t': 14.559, 'honda_l15b7': 14.554, 'ford_27tt': 14.557} E6 AFR {'convention_afr': 14.559, 'air_rel': 0.00968, 'exhaust_flow_rel': 0.00906, 'tau_rel': -0.00778, 'housing_b58_k': 1.08237, 'housing_bound_k': 2.22088}
+fuel by table {'mazda_25t': {'epa_steady.csv': '26864', 'epa_highload_initial.csv': '26864', 'epa_highload_final.csv': '26864'}, 'honda_l15b7': {'epa_steady.csv': '25842', 'epa_highload_initial.csv': '25842', 'epa_highload_final.csv': '25842'}, 'ford_27tt': {'epa_steady_cell9.csv': '25278', 'epa_steady_hd1.csv': '26864', 'epa_highload_initial_hd1.csv': '26864', 'epa_highload_final_hd1.csv': '26864'}}
+lambda floors {'mazda_25t': {'deepest_epa_lambda_cell_referenced': 0.6941, 'floor': 0.684, 'where': {'value': 0.6941, 'table': 'epa_highload_initial.csv', 'source_row': 59, 'window': 'initial'}}, 'honda_l15b7': {'deepest_epa_lambda_cell_referenced': 0.62, 'floor': 0.61, 'where': {'value': 0.62, 'table': 'epa_highload_final.csv', 'source_row': 70, 'window': 'final'}}, 'ford_27tt': {'deepest_epa_lambda_cell_referenced': 0.7082, 'floor': 0.698, 'where': {'value': 0.7082, 'table': 'epa_highload_final_hd1.csv', 'source_row': 24, 'window': 'final'}}}
+D3 files 43 61704001 61704044
+thresholds 82 b58 rows ['S1a', 'S1b', 'S1c', 'S1d', 'S2a', 'S2b', 'C5']
+mazda_25t deciding {'E1a': ['1750', '2500', '3500'], 'E2a': ['1750', '2500', '3500'], 'E3a': ['1750', '2500', '3500'], 'E4a': ['2500'], 'L0': ['1750', '2500', '3500'], 'E4b': ['1750', '2500', '3500']} pooled {'D1_fired_with_meter': 52, 'E1b_fired': 54, 'E4b_enriched_rows': 6, 'E4b_lines': 3, 'E5A_rows': 23, 'E5B_rows': 25, 'E8_final_rows': 18, 'L0_rows': 21, 'E1_initial_rows_descriptive': 18, 'hot_l1_rows_off_ref_by_more_than_0005': 2, 'hot_l1_rows': 21}
+honda_l15b7 deciding {'E1a': ['2000', '3000', '4500'], 'E2a': ['2000', '3000', '4500'], 'E3a': ['2000', '3000'], 'E4a': ['2000', '3000', '4500'], 'L0': ['2000', '3000'], 'E4b': ['2000', '3000', '4500']} pooled {'D1_fired_with_meter': 69, 'E1b_fired': 69, 'E4b_enriched_rows': 13, 'E4b_lines': 3, 'E5A_rows': 26, 'E5B_rows': 29, 'E8_final_rows': 16, 'L0_rows': 10, 'E1_initial_rows_descriptive': 16, 'hot_l1_rows_off_ref_by_more_than_0005': 0, 'hot_l1_rows': 10}
+ford_27tt deciding {'E1a': ['1250', '2000', '2500', '3500', '5000'], 'E2a': ['1250', '2000', '2500', '3500'], 'E3a': ['1250', '2000', '2500'], 'E4a': ['3500', '5000'], 'L0': ['1250', '2000', '2500'], 'E4b': ['2500', '3500']} pooled {'D1_fired_with_meter': 68, 'E1b_fired': 70, 'E4b_enriched_rows': 4, 'E4b_lines': 2, 'E5A_rows': 25, 'E5B_rows': 34, 'E8_final_rows': 6, 'L0_rows': 16, 'E1_initial_rows_descriptive': 6, 'hot_l1_rows_off_ref_by_more_than_0005': 7, 'hot_l1_rows': 16}

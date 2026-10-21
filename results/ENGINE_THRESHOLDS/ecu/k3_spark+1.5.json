@@ -1,0 +1,25 @@
+{
+ "mode": "k3",
+ "name": "spark+1.5",
+ "dspark": 1.5,
+ "dlambda": 0.0,
+ "knee_k": 1104.7653439209012,
+ "knee_shift_k": -18.23465607909884,
+ "time_above_nominal_s": 413,
+ "time_above_knee_s": 413,
+ "base_peak_c": 865.9718123963831,
+ "base_lambda_median_400_718": 1.0,
+ "base_spark_median_400_718": 3.3953211307525635,
+ "damage": {
+  "baseline": 869.9528648660554,
+  "reactive": 569.2440286796362,
+  "current-grade": 467.76975888863063,
+  "predictive": 467.8423911786397
+ },
+ "damage_thermal": {
+  "baseline": 864.086935459039,
+  "reactive": 563.3780992726199,
+  "current-grade": 461.37142551831533,
+  "predictive": 461.0323716058754
+ }
+}

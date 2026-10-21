@@ -1,0 +1,13 @@
+{
+ "python": "3.13.2",
+ "numpy": "2.5.3",
+ "platform": "Windows-11-10.0.26200-SP0",
+ "jobs": 20,
+ "steps": {
+  "split": 0.0,
+  "alpha_nodes": 0.0,
+  "b58_propagation": 145.4,
+  "knee_shift": 0.4,
+  "ecu": 1269.8
+ }
+}
