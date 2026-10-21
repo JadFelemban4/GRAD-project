@@ -171,6 +171,66 @@ open; an answer that differs, given before the first fit, is applied before it.
 | 37 | The equivalence margin of the collapse test (decision 26) | **The MEI, 5.43 points.** It has a consequence behind it (decision 5); a margin chosen for what the seed budget can confirm is choosing R to fit E (the review of 20 October). At about 20 seeds per arm the test can refute a collapse but will rarely confirm one within the MEI, and the preregistration says so | delegated 21 Oct: adopted | |
 | 38 | The model-error budget per part | **b = MEI/6 = 0.905 points per part, for six parts**, so the six aligned at their limits add to exactly the MEI (with MEI/5 they would add to 1.2 MEI, enough to manufacture an effect of the size the test looks for); every d-row R scales by 5/6; independent, they add to about 0.41 MEI | delegated 21 Oct: adopted | |
 
+## H. Building the three EPA engines: build step 2 (added 22 October 2026, on branch `GRA-test`)
+
+From the build-step-2 plan, `docs/build_step_2/PLAN.md`, and its review, `docs/build_step_2/AMENDMENTS.md`, whose
+section 3 these are; where the two differ the amendments govern. Five readers mapped the contract and the code,
+three independent designs were each reviewed adversarially, the plan was synthesized from them, and five more
+reviewers checked it against the files (21-22 October). Ghassan delegated on 21 October ("fix all the way you see
+fit"), and the recommended option of each is adopted under that delegation, so that the plant changes and the
+scripts can be written; nothing in them fits a model. **The first fit (Run 1) waits for both columns.** Jad's
+answers, and any different answer of Ghassan's, given before it, are applied before it: in the code, and through
+contract version 4 where a decision is a rule of the contract (rule 0, `results/ENGINE_THRESHOLDS.md`, permits
+that only before the first fit). Decision 66 of the plan was dropped by the review: it is a procedure, not a
+choice.
+
+*Before the plant changes (group 1).*
+
+| # | decision | recommended, and why | Ghassan | Jad |
+|---|---|---|---|---|
+| 39 | Contract version 4, generated after the plant commit and before any script that names the EPA tables | **Yes, version 4.** Two of version 3's rules cannot be applied as written: C5's threshold "SHIFT_LOAD·T_wot" is not the one the gearbox applies (`engine_env.py:507-510`), and "the neutral action must reproduce the baseline exactly" holds on no engine, the B58 included, because the agent's trims are float32. Its rule text: (a) E8 computed in-sample and reported, but outside the cycle-form criterion, since only the ECU fit moves it; (b) the neutral action's identity on the λ and spark channels at float32, with no clip touching, checked on every locked climb and test road; (c) C5's threshold by decision 70; (d) decisions 49, 54, 55, 59's counting rule, 64 and 71 as rules; (e) the code citations moved to the new lines. A different answer of Jad's to 36-38 goes into it as well | delegated 21 Oct: adopted | |
+| 40 | The Accord's ratio law (a CVT) | **A stateless kickdown law: hold the top ratio while the demand is at most 0.75 of the deliverable torque (ASSUMED); otherwise the lowest engine speed whose demand is at most 0.65 of it (DESIGN).** C5 then reads as the margin to that kickdown threshold, the law's one discrete decision. An economy line would put the demand exactly on its own threshold, and the Accord climbs on the power-limited branch, where the clause first drafted fails every step. Disclosed: 0.75 and 0.65 are points of the D3 strand's in-sample grid, and no gated row uses them | delegated 21 Oct: adopted | |
+| 41 | Form D's cam | **Run by the ECU**, as the contract writes it: a schedule cam(rpm, MAP) the baseline ECU computes and every policy inherits, as it inherits the spark | delegated 21 Oct: adopted | |
+| 42 | Car conventions | **Mass = EPA's equivalent test weight; road force (A + B·v)·cos θ + C·v²·ρ/ρ_ref + m·g·sin θ, ρ_ref at EPA's 98.21 kPa and 20 °C; the wheel radius from EPA's N/V and axle ratio, never from D3; η 0.92.** Each identity holds against its source to round-off. Disclosed: the CX-9's 4.41 against the published 4.411 (2.3e-4) | delegated 21 Oct: adopted | |
+| 43 | Gearbox constants and the CX-9's peak torque | **The Supra's shift constants, ASSUMED and carried; the CX-9's peak torque from Mazda's published sheet, opened and recorded before the plant commit**; never from D3. Only if no published source prints it, a DERIVED value from the calibration High Load Initial rows | delegated 21 Oct: adopted | |
+| 44 | The locked climb for each car | **12 %, 130 km/h and 42 °C for every car, the K3 knee set on that trace, and the delivery reported**: the tracking error over t ≥ 188 s, the gear or ratio, the rpm, the margins to the kickdown and rpm bars, and the knee also at η 0.86 and 0.98. The F-150 climbs in 3rd at η 0.92 and holds 4th from η 0.946, reported as gear-sensitive. A climb at the highest delivered speed stays the declared remedy | delegated 21 Oct: adopted | |
+| 45 | B58 constants the EPA rigs cannot set (thermal network, ECU compensations, knock feedback, fan, housing) | **Typed in each EPA spec as ASSUMED, marked "CARRIED FROM THE B58" with the source, and tested against the B58's values** (derived_sha 326c0835548975e2) | delegated 21 Oct: adopted | |
+| 46 | The load loop's gains | **Scaled by displacement** (`ff_kpa_per_nm` and `p_gain` × 1.2048 Mazda, 2.0028 Honda, 1.1125 Ford; DESIGN); the other loop fields carried unscaled; checked by the tracking test | delegated 21 Oct: adopted | |
+| 47 | Training and scoring | **Refuse the EPA engines in `train.py`, `train_all.py`, `run_phase_d.py` and `evaluate.py` until schema 4 and a committed validation exist** (`engines.trainable()`), with a refusal test per entry point | delegated 21 Oct: adopted | |
+| 48 | Re-runs at commits that touch only EPA files | **The full physics re-run list and the app suites**, as `.claude/rules/physics.md`'s paths require | delegated 21 Oct: adopted | |
+| 61 | Where calibration and validation run | **This laptop's venv (Python 3.13.2, `requirements-lock.txt`), with SciPy pinned in `requirements.txt`.** The frozen-plant dump is re-made on the training device and the comparison recorded; the certificate's training level L8 runs on the device | delegated 21 Oct: adopted | |
+| 67 | Old hashes after the plant commit (mistake 11) | **Grep and update every mention; the build-step-1 certificate page moves verbatim to `STATE_HISTORY.md`.** Hashes are not figures, so `verify_docs.RETIRED` is not used | delegated 21 Oct: adopted | |
+| 68 | CLAUDE.md's re-run rule | **Name `engines.py` and `engine_specs/` in it**, as `.claude/rules/physics.md` does | delegated 21 Oct: adopted | |
+| 69 | The Ford's fuel in use | **HD1's batch (FTAG 26864: AFR_st 14.559, 42.908 MJ/kg)**, the high-load cell; calibration rows still run on their own table's fuel, and Cell 9's batch (14.557) is reported as a variant | delegated 21 Oct: adopted | |
+
+*Before version 4's text (group 2).*
+
+| # | decision | recommended, and why | Ghassan | Jad |
+|---|---|---|---|---|
+| 49 | One model form for the three EPA engines, or one each | **One each** (the plan's draft had one for all three). The ridge is about 10⁴ times too weak to hold unneeded terms neutral, and the contract's "one model form" is the B58's cycle, calibrated per engine. Each engine's form and residual structure are reported (mistake 20) | delegated 21 Oct: adopted | |
+| 54 | Rows without λ, the −120 spark sentinel, the Honda's λ floor | **A fired row without λ runs at λ 1.00, flagged, and every statistic is also reported without it. Sentinel rows enter no fit; in every statistic they run at the model ECU's spark, flagged, and are also reported without. "Censored" is defined on the calibration Final rows themselves.** Declared outcomes, never a stop | delegated 21 Oct: adopted | |
+| 55 | An in-sample statistic with no calibration line | **Neither blocks nor passes; recorded per form** | delegated 21 Oct: adopted | |
+| 57 | Statistic details | **As the plan states**; D1 with unreachable rows counted at the bound gates in-sample | delegated 21 Oct: adopted | |
+| 58 | Held-out rows outside the calibration MAP range | **Flagged per row and reported restricted to the calibration coverage beside it; never relabelled** | delegated 21 Oct: adopted | |
+| 59 | E6 readings | **As amended**: a refit row reports how far the model in use moves; row 9 takes the bracket, then the probe, then ±10 CAD, and includes the rich slope; the Tests lists are counted by a fixed rule; E8 is never excluded | delegated 21 Oct: adopted | |
+| 64 | C5 against the held-out E1a | **Roads drawn at 1.9 %; after the validation, the scored climbs re-checked at max(1.9 %, \|E1a\| + 2u_val) and failures redrawn from a seed stream committed with the roads, with a cap on redraws; a car with no passing climb is reported as gear-sensitive, not dropped** | delegated 21 Oct: adopted | |
+| 65 | Waive the tightenings to validate sooner? | **No**: the roads and the L1 and E8 tightenings come before the held-out run | delegated 21 Oct: adopted | |
+| 70 | C5's threshold in the code | **`Vehicle.shift_ceiling_nm(rpm)`, the threshold the gearbox applies, at the held gear and every rejected higher gear; for the CVT, decision 40's kickdown threshold** | delegated 21 Oct: adopted | |
+| 71 | L1's tightening: which plant | **The B58, on decision 34's roads**, as E8's tightening. An EPA engine's slope would let its own coefficients move its R after its fit | delegated 21 Oct: adopted | |
+
+*Before the calibration scripts are committed (group 3).*
+
+| # | decision | recommended, and why | Ghassan | Jad |
+|---|---|---|---|---|
+| 50 | The estimator | **The plan's section 5 as amended**: staged fits, residuals scaled by each row's R, a declared ridge (w = 0.01) toward the B58's values, `scipy.optimize.least_squares('trf')` from three starts, declared outcomes for a bound hit and non-convergence, no constant held | delegated 21 Oct: adopted | |
+| 51 | The knock scale | **The geometric mean of the knock integral over the calibration Final rows set to 1**, the least-squares reading of "KI = 1 at the High Load Final spark"; E6 row 7's ±10 % are then exact rescalings | delegated 21 Oct: adopted | |
+| 52 | Turbine-inlet pressure below the barometer | **Keep the rows, report their count and size, and refit without them as a sensitivity.** Excluding them selects on the outcome | delegated 21 Oct: adopted | |
+| 53 | The boost envelope; HD1's barometer | **One point per calibration high-load line from its Final rows, anchored, flat past the last point; HD1's barometer the median of the Cell 9 calibration rows, swept over their range** | delegated 21 Oct: adopted | |
+| 56 | Uncertainty terms | **The plan's section 6.2, every input resolution pinned as a number before the scripts are committed; EPA's instrument pages opened first and recorded** | delegated 21 Oct: adopted | |
+| 60 | Computing the held-out statistics once | **As amended**: an armed commit; refusals in a linked worktree, a copy or a non-empty output folder; a STARTED record and crash records; the defect route (no refit, limited at best) | delegated 21 Oct: adopted | |
+| 62 | The Ford's TIT-cap row | **An ECU variant outside the frozen form, enriching by the least amount that holds the model's TIT at or below a cap; the cap's rule fixed before the scripts are committed: the highest TIT on the Ford's calibration Final rows, or the 1223 K EGT limit** | delegated 21 Oct: adopted | |
+| 63 | C3's and C4's inputs the contract does not pin | **Hashed at the arming against the data folder's `MANIFEST.csv`; `d3_rows.py` tested on synthetic traces only** | delegated 21 Oct: adopted | |
+
 ## What is already settled and needs no answer
 
 - The five steps before any training, agreed on 30 September (`CLAUDE.md`, first
