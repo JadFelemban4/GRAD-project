@@ -67,11 +67,13 @@ def _climb(job):
     _substep(n)
     import check_premise as C
     import engine_env as EE
+    import engines
     import evaluate as E
+    plant = engines.get("b58")
     policy = {"baseline ECU": C.p_neutral, "current-grade": C.p_grade_now}[policy_name]
     seed, weights = E.EPISODES[0]
-    cycle = EE.make_grade_climb(duration=E.DURATION, dt=dt)
-    env = EE.SupervisoryTunerEnv(cycle, dt=dt, seed=seed, use_preview=True)
+    cycle = EE.locked_climb(plant, duration=E.DURATION, dt=dt)
+    env = EE.SupervisoryTunerEnv(cycle, plant=plant, dt=dt, seed=seed, use_preview=True)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)
     obs = env._obs()
@@ -79,7 +81,7 @@ def _climb(job):
     while True:
         obs, _, term, trunc, info = env.step(policy(env, obs))
         peak = max(peak, info["t_turb"])
-        thermal += EE.damage_rate(info["t_turb"], info["t_oil"]) * env.dt
+        thermal += EE.damage_rate(info["t_turb"], info["t_oil"], cal=plant.engine.damage) * env.dt
         block.append(info["t_block"] - 273.15)
         if term or trunc:
             break
@@ -95,7 +97,8 @@ def _climb(job):
 def _drive(n):
     _substep(n)
     import car_thermal as CT
-    r = CT.thermal_replay(CT.SUSTAINED_DRIVE)
+    import engines
+    r = CT.thermal_replay(CT.SUSTAINED_DRIVE, plant=engines.get("b58"))
     k = 273.15
     sl = CT.hottest_window(r["oil_car"])
     return n, dict(row8_oil=float(np.median(r["oil_model"][sl]) - k),

@@ -1,0 +1,49 @@
+# engine_specs/a90_supra.toml -- the 2023 Toyota GR Supra 3.0 (A90) the B58 sits
+# in, with its ZF 8HP51: the car's TYPED constants and its locked climb.
+#
+# The format, the labels and the rule against typed DERIVED values are
+# engine_specs/b58.toml's (engines.read_spec). The deliverable-torque table the
+# kickdown reads is DERIVED: measured through this plant by derive_params.py and
+# read from the B58's derived file.
+#
+# Moved here on 20 October 2026 from engine_env.Vehicle's class attributes and
+# make_grade_climb's defaults, value for value.
+
+id = "a90-supra-zf8hp51"
+
+[car]
+mass = { value = 1520.0, unit = "kg", label = "ASSUMED", source = "no source recorded (arrived without one on 10 September). REFERENCES.md section 4b: CANNOT (yet) -- not identified from 7475b5d7's target wheel torque. Decision 31 (recommended, unanswered: results/VALIDATION_DECISIONS.md section F) would keep it for the four-engine test, EPA's road load a declared ablation later" }
+cd_a = { value = 0.66, unit = "m2", label = "ASSUMED", source = "drag area; as mass (REFERENCES.md section 4b: 0.66 m2 is inside the 90 % bootstrap 0.36-1.02 of the failed identification)" }
+crr = { value = 0.011, label = "ASSUMED", source = "rolling resistance coefficient; as mass" }
+wheel_r = { value = 0.33, unit = "m", label = "ASSUMED", source = "REFERENCES.md section 4b: CANNOT separately -- the data fix only the product of the speed channel's scale and the radius (r = 0.335 m, or a speed channel reading ~1.5 % high); the tyre size has not been opened from a source" }
+final_drive = { value = 3.150, label = "PUBLISHED", source = "Toyota's technical specification sheet 220605M (the 8HP51 set and 3.150) and Toyota USA's pressroom (3.15 for the 382 hp automatic): REFERENCES.md section 2b, CONFIRMED" }
+gears = { value = [5.250, 3.360, 2.172, 1.720, 1.316, 1.000, 0.822, 0.640], label = "PUBLISHED", source = "ZF 8HP51, 1st to 8th, from Toyota's technical specification sheet 220605M (REFERENCES.md section 2b, CONFIRMED); 86.7 % of 79 105 moving samples sit within 4 % of one of them. Reverse 3.712 is published too and not carried: the environment never reverses" }
+driveline_eff = { value = 0.92, label = "ASSUMED", source = "REFERENCES.md section 4b: CANNOT -- no engine- or wheel-torque channel at a usable refresh; the efficiency is inseparable from road load" }
+peak_torque_nm = { value = 500.0, unit = "Nm", label = "PUBLISHED", source = "the B58B30O1's 500 Nm at 1800-5000 rpm: Toyota Australia GTP-009045 p. 1 (REFERENCES.md section 7)" }
+shift_load = { value = 0.75, label = "ASSUMED", source = "the fraction of peak torque above which the box hands back a gear, a 25 % reserve: 'ordinary automatic calibration; no source opened for this vehicle's' (REFERENCES.md section 2b)" }
+shift_rpm_max = { value = 6000.0, unit = "rpm", label = "ASSUMED", source = "never hand back a gear into the limiter (engine_env.Vehicle.gear_for); no source recorded" }
+upshift_min_rpm = { value = 2000.0, unit = "rpm", label = "DERIVED_ONCE", source = "swept against the car's own inferred gear, 19 September 2026: 79.7 % within one gear (REFERENCES.md sections 2b and 4b). Not re-derived automatically: drive B was driven in manual mode" }
+rpm_min = { value = 800.0, unit = "rpm", label = "ASSUMED", source = "the engine-speed clip in Vehicle.demand; no source recorded" }
+rpm_max = { value = 6500.0, unit = "rpm", label = "ASSUMED", source = "the engine-speed clip in Vehicle.demand, the top of the 285 kW band at 5800-6500 rpm (REFERENCES.md section 7); no limiter speed recorded" }
+# How the deliverable-torque table (DERIVED, read from the B58's derived file) is
+# measured through this plant: engine_env.measure_deliverable_torque and
+# wide_air.deliverable_torque read these. Until 21 October 2026 they were
+# measure_deliverable_torque's defaults, the B58's for any plant passed (the
+# review of build step 1); the values are the ones the table has been measured
+# at since c6e9e03 (27 September 2026).
+table_rpm_lo = { value = 1000, unit = "rpm", label = "DESIGN", source = "the table's lowest speed since c6e9e03 (27 September 2026), 1000-6600 rpm in 200s: the kickdown interpolates in it (Vehicle.shift_ceiling_nm)" }
+table_rpm_hi = { value = 6600, unit = "rpm", label = "DESIGN", source = "the table's highest speed, as table_rpm_lo" }
+table_rpm_step = { value = 200, unit = "rpm", label = "DESIGN", source = "the grid's spacing, as table_rpm_lo" }
+table_t_amb = { value = 315.0, unit = "K", label = "DESIGN", source = "42 C, the locked climb's ambient: 'charge air at the locked 42 C' (engine_env.Vehicle's note on the table, measured 27 September 2026)" }
+table_t_block = { value = 365.0, unit = "K", label = "ASSUMED", source = "a warm block, 92 C: the block the table has been measured at since c6e9e03 (the charge temperature's block coupling and the ECU's coolant input); no reason recorded for 365 K" }
+table_settle = { value = 30, label = "DERIVED_ONCE", source = "the load loop's steps per speed since c6e9e03, the worst torque of the second half kept. 11 October 2026 (wide_air.deliverable_torque): 16 steps moved a value by 2.9 Nm, the knock feedback and the enrichment dwell need them; held" }
+
+[scenario]
+# THE LOCKED CLIMB, Phase D's evaluation scenario: decided by the team on
+# 18 September 2026, before any training run existed (engine_env.make_grade_climb).
+# Decision 34 (revised 21 October, both columns open) recommends other roads for
+# the four-engine test, repeated short hot climbs, with this climb kept only as a
+# declared transfer row.
+grade = { value = 0.12, label = "DESIGN", source = "12 %: the locked climb, 18 September 2026 (engine_env.make_grade_climb's docstring: the envelope was measured before a row was chosen)" }
+v_kmh = { value = 130.0, unit = "km/h", label = "DESIGN", source = "130 km/h: the locked climb, as grade (110 km/h does not bind)" }
+t_amb = { value = 315.0, unit = "K", label = "DESIGN", source = "42 C: the locked climb, as grade" }

@@ -9,6 +9,12 @@ the fix is uncommitted while this runs), verify_docs.py is run, and the exit
 code plus the reported reason are recorded. The copy is deleted afterwards.
 Nothing touches the real repository.
 
+THE CONTROL RUNS FIRST (20 October 2026). A drift is CAUGHT when verify_docs.py
+exits non-zero, and a copy that fails for any other reason -- a file the copy
+lacks, a figure in a document only the copy scans -- would report every row
+CAUGHT for the wrong reason (mistake 12). So an undrifted copy is checked
+first, and must pass; if it does not, every row reports ERROR.
+
     python drift_test.py            run them all
     python drift_test.py 9 10       run only those rows
 """
@@ -57,10 +63,11 @@ DRIFTS = [
      "results/README.md", "11.7", "13.7", "MISSED"),
     (8, 'engine_env.py docstring "12 % at 130 km/h" -> 120 km/h',
      "engine_env.py", "12 % at 130 km/h, 42 C", "12 % at 120 km/h, 42 C", "MISSED"),
-    (9, "engine_env.py DEFAULT v_kmh=130.0 -> 120.0",
-     "engine_env.py", "v_kmh=130.0)", "v_kmh=120.0)", "MISSED"),
-    (10, "engine_env.py TURB_PROTECT_K 1123 -> 1100",
-     "engine_env.py", "TURB_PROTECT_K = 1123.0", "TURB_PROTECT_K = 1100.0", "MISSED"),
+    (9, "the locked climb's v_kmh 130.0 -> 120.0 (make_grade_climb's default; now engine_specs/a90_supra.toml)",
+     "engine_specs/a90_supra.toml", "v_kmh = { value = 130.0,", "v_kmh = { value = 120.0,", "MISSED"),
+    (10, "the turbine knee 1123 -> 1100 (engine_env.TURB_PROTECT_K; now engine_specs/b58.toml)",
+     "engine_specs/b58.toml", "turb_knee_k = { value = 1123.0,", "turb_knee_k = { value = 1100.0,",
+     "MISSED"),
     # Row 11 follows its text, 14 October 2026: CHECKPOINT.md was rotated
     # verbatim into STATE_HISTORY.md part B (the documentation restructure).
     (11, 'CHECKPOINT.md "959.8 at 884 C" -> 870 C (now in STATE_HISTORY.md)',
@@ -76,19 +83,41 @@ DRIFTS = [
      "CHECKPOINT.md", "848.1 at 883 °C", "848.1 at 870 °C", "MISSED"),
     (14, 'CLAUDE.md "derived k = 0.831" -> 0.851 (now in README.md)',
      "README.md", "derived k = 0.831", "derived k = 0.851", "CAUGHT"),
+    # Rows 9, 10 and 16 follow their values, 20 October 2026 (the four-engine
+    # build, decision 24): make_grade_climb lost its defaults, TURB_PROTECT_K
+    # and Vehicle's class attributes went with them, and the values are the
+    # B58's and the Supra's typed specs now -- engine_specs/a90_supra.toml
+    # [scenario] v_kmh and [car] gears, engine_specs/b58.toml [damage]
+    # turb_knee_k. verify_docs.py reads them from the plant engines.get builds.
     # Two more of the audit's own structural worries, added here because the
     # fix claims to close them and a claim without a test is a docstring.
     (15, "evaluate.EPISODES: one weight changed in the frozen set",
      "evaluate.py", "(1013, (0.592943, 0.187398, 0.219659))",
      "(1013, (0.592943, 0.187398, 0.319659))", "not in the audit table"),
-    (16, "Vehicle.gears: top gear 0.640 -> 0.680 (the invented six-speed's)",
-     "engine_env.py", "1.000, 0.822, 0.640)", "1.000, 0.822, 0.680)",
+    (16, "the car's gears: top gear 0.640 -> 0.680 (the invented six-speed's; Vehicle.gears, "
+         "now engine_specs/a90_supra.toml)",
+     "engine_specs/a90_supra.toml", "1.000, 0.822, 0.640]", "1.000, 0.822, 0.680]",
      "not in the audit table"),
+    # Rows 17 and 18, 21 October 2026 (the review of build step 1): the training
+    # step and episode the documents quote went unchecked when make_grade_climb's
+    # defaults went; verify_docs.py reads them from train.py now (mistake 11).
+    (17, "Phase D's training step: train.DESIGN_DT fixed 0.2 -> 0.5",
+     "train.py", '"fixed": 0.2,', '"fixed": 0.5,', "not in the audit table"),
+    (18, "the training episode: train.DURATION_S 900.0 -> 600.0",
+     "train.py", "DURATION_S = 900.0", "DURATION_S = 600.0", "not in the audit table"),
 ]
 
 
 def copy_tree(dest):
-    """Copy exactly the TRACKED set, with WORKING-TREE contents.
+    """Copy exactly the set a commit of the working tree would hold -- the
+    TRACKED files and the untracked ones git does not ignore -- with
+    WORKING-TREE contents.
+
+    The untracked ones joined on 20 October 2026: the four-engine build's
+    engines.py and engine_specs/ are the plant, untracked until it is
+    committed, and a copy without them cannot build the B58 at all. Once
+    committed they are tracked, and the set is the tracked set again. The
+    control run (main) shows the copy passes before any drift is applied.
 
     Not shutil.copytree. verify_docs.py builds its file list from
     `git ls-files`, and the copy has no .git, so it falls back to a glob --
@@ -97,11 +126,12 @@ def copy_tree(dest):
     untracked docs/ tree; scanning those in the copy and not in the original
     makes every drift row report CAUGHT for the wrong reason.
 
-    Copying the tracked list with working-tree content gives the copy the same
-    file set the real run has, including this session's uncommitted fix.
+    Copying that list with working-tree content gives the copy the file set
+    the real run has once the working tree is committed, including this
+    session's uncommitted fix.
     """
-    files = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True,
-                           text=True, check=True).stdout.splitlines()
+    files = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+                           cwd=ROOT, capture_output=True, text=True, check=True).stdout.splitlines()
     for rel in files:
         src = os.path.join(ROOT, rel)
         if not os.path.isfile(src):
@@ -109,6 +139,33 @@ def copy_tree(dest):
         dst = os.path.join(dest, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copy2(src, dst)
+
+
+def _verify(work):
+    """verify_docs.py in the copy: (exit code, everything it printed)."""
+    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    # encoding: the merged tree's documents carry Arabic (conflict_ar.md),
+    # and text=True alone decodes with the Windows code page (cp1252) and
+    # crashed here on 30 September 2026. The child already writes UTF-8.
+    r = subprocess.run([sys.executable, "verify_docs.py"], cwd=work,
+                       capture_output=True, text=True, timeout=1800, env=env,
+                       encoding="utf-8", errors="replace")
+    return r.returncode, r.stdout + r.stderr
+
+
+def control():
+    """verify_docs.py on an undrifted copy: (passed, the line that says why)."""
+    tmp = tempfile.mkdtemp(prefix="drift0_")
+    work = os.path.join(tmp, "tree")
+    try:
+        copy_tree(work)
+        code, out = _verify(work)
+        lines = [line.strip() for line in out.splitlines() if line.strip()]
+        why = next((line for line in lines if line.startswith("WRONG") or "checks failed" in line
+                    or "checks pass" in line), lines[-1] if lines else "no output")
+        return code == 0, f"exit {code}: {why[:120]}"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def run_one(row):
@@ -125,20 +182,19 @@ def run_one(row):
         io.open(path, "w", encoding="utf-8", newline="").write(s2)
         n_changed = s.count(old)
 
-        env = dict(os.environ, PYTHONIOENCODING="utf-8")
-        # encoding: the merged tree's documents carry Arabic (conflict_ar.md),
-        # and text=True alone decodes with the Windows code page (cp1252) and
-        # crashed here on 30 September 2026. The child already writes UTF-8.
-        r = subprocess.run([sys.executable, "verify_docs.py"], cwd=work,
-                           capture_output=True, text=True, timeout=1800, env=env,
-                           encoding="utf-8", errors="replace")
-        out = r.stdout + r.stderr
-        caught = r.returncode != 0
+        code, out = _verify(work)
+        caught = code != 0
         why = ""
         for line in out.splitlines():
             if line.strip().startswith("WRONG") or "checks failed" in line:
                 why = line.strip()[:120]
                 break
+        if caught and not why:
+            # no WRONG line: verify_docs.py stopped before its report, on an
+            # exception (row 9 since 20 October: random_road.py's import-time
+            # check that its climb is the plant's locked climb). Say which.
+            lines = [line.strip() for line in out.splitlines() if line.strip()]
+            why = "stopped: " + (lines[-1][:112] if lines else "no output")
         if not caught:
             why = "green run, exit 0"
         return (n, desc, before, "CAUGHT" if caught else "MISSED",
@@ -150,6 +206,16 @@ def run_one(row):
 def main():
     want = {int(a) for a in sys.argv[1:]} or {d[0] for d in DRIFTS}
     rows = [d for d in DRIFTS if d[0] in want]
+    ok, why = control()
+    print(f"  control    the undrifted copy {'passes' if ok else 'FAILS'} verify_docs.py | {why}")
+    sys.stdout.flush()
+    if not ok:
+        print("\n" + "=" * 78)
+        print(f"0 of {len(rows)} drifts CAUGHT: the undrifted copy already fails, so a "
+              "non-zero exit says nothing about a drift (mistake 12)")
+        for row in rows:
+            print(f"  STILL ERROR: row {row[0]} -- {row[1]}")
+        return 1
     results = []
     for row in rows:
         res = run_one(row)

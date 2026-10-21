@@ -21,11 +21,19 @@ trajectory once and re-score it under different cost models.
 """
 import json
 import os
+from dataclasses import replace
 
 import numpy as np
-from engine_env import (SupervisoryTunerEnv, make_grade_climb, ACT_LO, ACT_HI,
-                        TURB_PROTECT_K, neutral_action)
-from thermal import ThermalParams
+
+import engines
+from engine_env import (SupervisoryTunerEnv, locked_climb, ACT_LO, ACT_HI,
+                        neutral_action)
+
+# The plant, named (20 October 2026): the B58 in its Supra. Its knee is the one
+# number the policies trigger on and the cost families are scored against; it
+# was engine_env.TURB_PROTECT_K, the B58's for every engine.
+PLANT = engines.get("b58")
+TURB_PROTECT_K = PLANT.engine.damage.turb_knee_k
 
 # AUDIT.md C1: this file defined its own "all actions to zero" neutral, which
 # means the cooling fan OFF and the pump at its 0.3 floor. Every H1/H2 figure
@@ -107,7 +115,7 @@ def _exhaust_of_climb(seed=0):
     the second: the merge moves `plant_sha` anyway, and the axis must be the
     flow the turbine node actually sees. An empty sample still stops the run.
     """
-    env = SupervisoryTunerEnv(make_grade_climb(duration=720.0, dt=2.0), dt=2.0,
+    env = SupervisoryTunerEnv(locked_climb(PLANT, duration=720.0, dt=2.0), plant=PLANT, dt=2.0,
                               seed=seed, use_preview=True)
     env.reset(seed=seed)
     # 28 September 2026: this read info.get("mdot"), a key the environment never
@@ -126,10 +134,12 @@ def _exhaust_of_climb(seed=0):
     return vals[len(vals) // 2:] if vals else []       # the loaded half
 
 
-def trajectory(policy, c_turb=6000.0, seed=0):
-    """Record the turbine temperature trace and fuel for one policy."""
-    tp = ThermalParams(c_turb=c_turb)
-    env = SupervisoryTunerEnv(make_grade_climb(duration=520.0, dt=2.0), dt=2.0, seed=seed)
+def trajectory(policy, c_turb=None, seed=0):
+    """Record the turbine temperature trace and fuel for one policy. `c_turb`
+    None is the plant's own housing (6000 J/K, the old literal default); a
+    swept value is a new record (dataclasses.replace), never a change to it."""
+    tp = replace(PLANT.engine.thermal, c_turb=PLANT.engine.thermal.c_turb if c_turb is None else c_turb)
+    env = SupervisoryTunerEnv(locked_climb(PLANT, duration=520.0, dt=2.0), plant=PLANT, dt=2.0, seed=seed)
     env.thermal.p = tp
     env.thermal_base.p = tp
     env.reset(seed=seed)
@@ -255,7 +265,7 @@ def main():
     # agrees with the climb's step-response tau (48.4 s, CHECKPOINT.md 22 Sep) and
     # with validate.py's 48.0 s, which is the cross-check that the axis now reads
     # the right quantity. RETIRED-OK: 103, 54.0, 0.56 -- named so they are recognised.
-    _P = ThermalParams()
+    _P = PLANT.engine.thermal
     _EXH_SAMPLES = _exhaust_of_climb()
     if not _EXH_SAMPLES:
         # Refuse rather than fall back. A silent fallback to 112.5 is what hid

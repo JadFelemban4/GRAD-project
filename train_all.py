@@ -1,18 +1,20 @@
 """train_all.py -- every seed of Phase D's pair, on one machine.
 
-    python train_all.py --road wideair --seeds 0-4 --steps 1080000 --jobs 10 --keep-buffer --out runs/wideair_dt1
+    python train_all.py --engine b58 --road wideair --seeds 0-4 --steps 1080000 --jobs 10 --keep-buffer --out runs/wideair_dt1
                                                        # X2 (11 Oct): 5 seeds a side, 1200 episodes each
-    python train_all.py --road extremes --seeds 0-22 --no-resume --out runs/x2   # X1's design, a new experiment
-    python train_all.py --road extremes                # X1 itself (CLOSED since 9 Oct: runs/extremes_dt1)
-    python train_all.py --road terrain                 # the 29 Sep design (CLOSED: runs/terrain_dt1)
-    python train_all.py --road extremes --jobs 10 --out runs/x2   # at most ten at once
+    python train_all.py --engine b58 --road extremes --seeds 0-22 --no-resume --out runs/x2   # X1's design, a new experiment
+    python train_all.py --engine b58 --road extremes   # X1 itself (CLOSED since 9 Oct: runs/extremes_dt1)
+    python train_all.py --engine b58 --road terrain    # the 29 Sep design (CLOSED: runs/terrain_dt1)
+    python train_all.py --engine b58 --road extremes --jobs 10 --out runs/x2   # at most ten at once
 
 THE ROAD IS REQUIRED (8 October 2026). Until then this launcher passed no
 --road and no --dt and leaned on train.py's defaults, which is the trap AUDIT2.md
 Part 3 names: a default that selects an experiment. Both are passed explicitly.
+THE ENGINE IS REQUIRED TOO (20 October 2026, decision 24), and passed on: train.py
+has no default plant.
 
-Each run is `python train.py --road R --dt 1 --steps STEPS --seed S --out OUT
-[--no-preview] [--no-resume]` in its own process with OMP_NUM_THREADS=1,
+Each run is `python train.py --engine E --road R --dt 1 --steps STEPS --seed S
+--out OUT [--no-preview] [--no-resume]` in its own process with OMP_NUM_THREADS=1,
 logging to OUT/log_<tag>.txt.
 
 CRASHES. Without --no-resume, re-running resumes every run from its last
@@ -44,6 +46,7 @@ import subprocess
 import sys
 import time
 
+import engines
 import fingerprint as FP
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -79,6 +82,8 @@ def move_crashed(outdir):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--engine", required=True, choices=engines.known(),
+                    help="the plant every run trains on, passed to train.py (no default)")
     ap.add_argument("--road", required=True, choices=("terrain", "extremes", "wideair"))
     ap.add_argument("--dt", type=float, default=1.0)
     ap.add_argument("--seeds", nargs="+", default=["0-9"], help="'0-19' or '0 1 2'")
@@ -102,7 +107,7 @@ def main():
     env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", PYTHONUNBUFFERED="1")
     queue, live, done = list(runs), {}, []
     t0 = time.time()
-    print(f"{len(runs)} runs ({a.road}, dt {a.dt:g}), {a.steps:,} steps each, "
+    print(f"{len(runs)} runs ({a.engine}, {a.road}, dt {a.dt:g}), {a.steps:,} steps each, "
           f"at most {a.jobs} at once -> {a.out}/")
     while queue or live:
         while queue and len(live) < a.jobs:
@@ -112,7 +117,7 @@ def main():
                 moved = move_crashed(os.path.join(HERE, a.out, tag))
                 if moved:
                     print(f"  {tag} had crashed: moved aside to {moved}, training it again from 0")
-            cmd = [sys.executable, "train.py", "--road", a.road, "--dt", f"{a.dt:g}",
+            cmd = [sys.executable, "train.py", "--engine", a.engine, "--road", a.road, "--dt", f"{a.dt:g}",
                    "--steps", str(a.steps), "--seed", str(s), "--out", a.out]
             if blind:
                 cmd.append("--no-preview")

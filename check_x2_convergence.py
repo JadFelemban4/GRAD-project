@@ -88,19 +88,21 @@ def checkpoint_path(agent_dir, steps, final_steps):
 def baseline_damage():
     """The baseline ECU on the locked climb: it ignores the weights, so one episode."""
     import check_premise as C
+    import engines
     import evaluate as E
     s, w = PRACTICE[0]
-    return float(E.run_episode(C.p_neutral, s, w, True)["damage"])
+    return float(E.run_episode(C.p_neutral, s, w, True, plant=engines.get("b58"))["damage"])
 
 
 def score(job):
     tag, path, key = job
     os.environ.setdefault("OMP_NUM_THREADS", "1")
+    import engines
     import evaluate as E
     from stable_baselines3 import SAC
     pol = E.agent_policy(SAC.load(path, device="cpu"))
     preview = not tag.startswith("blind")
-    dmg = [E.run_episode(pol, s, w, preview)["damage"] for s, w in PRACTICE]
+    dmg = [E.run_episode(pol, s, w, preview, plant=engines.get("b58"))["damage"] for s, w in PRACTICE]
     return tag, key, float(np.median(dmg)), FP.model_budget(path)
 
 

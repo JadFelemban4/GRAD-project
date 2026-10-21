@@ -151,14 +151,20 @@ def api_delete_session(session_id: str):
 def api_plant(body: PlantRequest):
     from plant import boost_ceiling_kpa, charge_temperature, predict
 
-    iat_k = float(charge_temperature(body.ambient_c + 273.15))
+    eng = simulation.PLANT.engine           # the lab's engine, named in backend/__init__.py
+    # None: this endpoint has no block-temperature input (an explicit argument
+    # since 20 October 2026; it was charge_temperature's default)
+    iat_k = float(charge_temperature(body.ambient_c + 273.15, None, engine=eng))
     out = predict(body.rpm, body.map_kpa, iat_k,
-                  body.ect_c + 273.15, body.spark, body.lam)
+                  body.ect_c + 273.15, body.spark, body.lam, engine=eng)
     nonfinite = [k for k, v in out.items()
                  if isinstance(v, (int, float)) and not math.isfinite(float(v))]
     values = {k: float(v) for k, v in out.items()
               if isinstance(v, (int, float)) and math.isfinite(float(v))}
-    ceiling = float(boost_ceiling_kpa(values["mdot_air_gps"], body.ambient_c + 273.15))
+    # the compressor breathes sea-level air through the filter: the engine's
+    # inlet_sea_kpa (99.3 kPa on the B58, boost_ceiling_kpa's default until 20 October)
+    ceiling = float(boost_ceiling_kpa(values["mdot_air_gps"], body.ambient_c + 273.15,
+                                      eng.boost.inlet_sea_kpa, engine=eng))
     warnings = []
     if not 30.0 <= body.map_kpa <= 75.0:
         warnings.append(
@@ -179,7 +185,8 @@ def api_plant(body: PlantRequest):
         warnings.append("The source plant returned non-finite diagnostics: " + ", ".join(nonfinite))
     values["iat_k"] = iat_k
     values["charge_temp_c"] = iat_k - 273.15
-    values["charge_temp_source"] = "plant.charge_temperature(ambient_k) default (+12 K; no block-temperature input)"
+    values["charge_temp_source"] = (f"plant.charge_temperature(ambient_k, None) "
+                                    f"(+{eng.charge.rise_k:g} K; no block-temperature input)")
     values["observed_ceiling_kpa"] = ceiling
     values["map_over_ceiling_kpa"] = excess
     values["warnings"] = warnings
@@ -191,10 +198,11 @@ def api_thermal(body: ThermalRequest):
     from plant import charge_temperature, predict
     from thermal import ThermalNetwork
 
+    eng = simulation.PLANT.engine           # the lab's engine, named in backend/__init__.py
     t_amb = body.ambient_c + 273.15
-    engine = predict(body.rpm, body.map_kpa, charge_temperature(t_amb), t_amb,
-                      body.spark, body.lam)
-    net = ThermalNetwork()
+    engine = predict(body.rpm, body.map_kpa, charge_temperature(t_amb, None, engine=eng), t_amb,
+                      body.spark, body.lam, engine=eng)
+    net = ThermalNetwork(eng.thermal)
     net.reset(t_amb=t_amb, warm=False)
     dt = 0.1
     frames = [{"time_s": 0.0, "phase": "start", "t_turb": net.t_turb,
@@ -228,8 +236,8 @@ def api_thermal(body: ThermalRequest):
                                                       else float(t_amb - 273.15))})
     return {"frames": frames,
             "method": ("Cold-start teaching experiment: all thermal nodes begin at ambient; "
-                       "the engine point uses ECT=ambient and plant.charge_temperature(ambient_k) "
-                       "default (+12 K; no block input); heating uses plant.predict output, then "
+                       "the engine point uses ECT=ambient and plant.charge_temperature(ambient_k, None) "
+                       f"(+{eng.charge.rise_k:g} K; no block input); heating uses plant.predict output, then "
                        "cooling removes exhaust and fuel heat. ThermalNetwork integrates at 0.1 s."),
             "initial_state": "cold_start_at_ambient",
             "teaching_experiment": True}

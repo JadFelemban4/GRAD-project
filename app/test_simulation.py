@@ -9,7 +9,10 @@ import tempfile
 import unittest
 
 from app.estimator import Estimator, Sample
-from plant import predict, b58, map_from_airflow, charge_temperature
+from plant import predict, map_from_airflow, charge_temperature
+import engines
+
+ENG = engines.get("b58").engine          # the engine the app reads (it was b58())
 
 
 class ReplayTests(unittest.TestCase):
@@ -47,9 +50,9 @@ class ReplayTests(unittest.TestCase):
                    v_kmh=60, spark_deg=20, lam=1.0)
         st = Estimator().update(s)
         self.assertTrue(hasattr(st, 'fuel_gps'), 'State must expose the already computed fuel output')
-        charge = charge_temperature(303.15, 363.15)
-        map_kpa = map_from_airflow(20, 2000, charge, geo=b58())
-        expected = predict(2000, map_kpa, charge, 363.15, 20, 1.0, geo=b58())
+        charge = charge_temperature(303.15, 363.15, engine=ENG)
+        map_kpa = map_from_airflow(20, 2000, charge, engine=ENG)
+        expected = predict(2000, map_kpa, charge, 363.15, 20, 1.0, engine=ENG)
         self.assertEqual(st.fuel_gps, expected['mdot_fuel_gps'])
 
     def test_replay_keeps_original_timing_and_matches_direct_estimator(self):

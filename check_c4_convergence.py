@@ -90,6 +90,7 @@ from multiprocessing import Pool
 
 import numpy as np
 
+import engines
 import fingerprint as FP
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -157,7 +158,7 @@ def score(job):
     preview = not tag.startswith("blind")
     dmg, ret = [], []
     for s, w, st, g in PRACTICE:
-        r = E.run_episode(pol, s, w, preview, road=(st, g))
+        r = E.run_episode(pol, s, w, preview, road=(st, g), plant=engines.get("b58"))
         dmg.append(r["damage"])
         ret.append(r["ret"])
     return tag, key, dmg, ret, FP.model_budget(path)

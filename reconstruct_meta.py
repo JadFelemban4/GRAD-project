@@ -28,7 +28,7 @@ nothing is written unless ALL of this holds for the agent:
 
 1. `config.json` says the run finished, and `final.zip` is a readable
    stable-baselines3 zip holding the steps the config asked for.
-2. The plant's CODE (fingerprint.PLANT_FILES, docstrings stripped) is identical
+2. The plant's CODE (fingerprint.plant_files("b58"), docstrings stripped) is identical
    on the live tree, at the commit `config.json` names, and at the commit that
    added the agent's scores to git. `config.json` records `git_dirty`, so the
    first of those is a statement about the commit, not about the tree the run
@@ -97,14 +97,16 @@ def _git(*args):
 
 
 def plant_sha_at(commit):
-    """fingerprint.py's code-only plant hash, over the files AS COMMITTED."""
+    """fingerprint.py's code-only plant hash, over the files AS COMMITTED: the
+    B58's (every agent this certifies is the B58's), each by its kind's rule
+    (fingerprint._file_code: a typed spec by its values)."""
     h = hashlib.sha256()
-    for name in FP.PLANT_FILES:
+    for name in FP.plant_files("b58"):
         raw = _git("show", f"{commit}:{name}")
         if raw is None:
             raise Refused(f"git cannot show {name} at {commit}")
         raw = raw.replace(b"\r\n", b"\n")
-        code = FP._code_only(raw.decode("utf-8", errors="replace"))
+        code = FP._file_code(name, raw.decode("utf-8", errors="replace"))
         h.update(code.encode("utf-8") if code is not None else raw)
     return h.hexdigest()[:16]
 
@@ -165,7 +167,8 @@ def _rerun(job):
     model = _MODEL[agent_dir]
     seed, weights = E.EPISODES[idx - 1]
     sighted = "blind" not in os.path.basename(agent_dir)      # evaluate.py's own arm rule
-    row = E.run_episode(E.agent_policy(model), seed, weights, sighted)
+    import engines
+    row = E.run_episode(E.agent_policy(model), seed, weights, sighted, plant=engines.get("b58"))
     return agent_dir, idx, row, str(model.device)
 
 
@@ -242,8 +245,10 @@ def certificate(cfg, evidence, budget, device, derived):
     the block that says it was not written then. What describes this moment
     (the head, the dirty flag, the interpreter) goes inside the block, so no
     top-level field can be read as a record of the training session."""
+    import engines
     fp = FP.plant_fingerprint(
-        protocol="phase-d", train_dt=float(cfg["dt"]), train_duration=float(cfg["duration_s"]),
+        protocol="phase-d", plant=engines.get("b58"), backend=FP.BACKEND_CYCLE, train_dt=float(cfg["dt"]),
+        train_duration=float(cfg["duration_s"]),
         steps_requested=int(cfg["steps"]), seed=int(cfg["seed"]),
         use_preview=bool(cfg["preview"]), tag=cfg["tag"], train_road=cfg["road"],
         train_device=cfg.get("device"), derived_sha=derived_sha_of(derived))
@@ -287,7 +292,7 @@ def main():
     if not tags:
         raise SystemExit(f"{set_dir} holds no sighted_seed<N> or blind_seed<N> folder")
 
-    live_plant = FP._sha_files(FP.PLANT_FILES)
+    live_plant = FP._sha_files(FP.plant_files("b58"))
     derived = live_derived()
     print(f"set            : {set_dir}   ({len(tags)} agents)")
     print(f"live plant_sha : {live_plant}   (python {sys.version.split()[0]})")

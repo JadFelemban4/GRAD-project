@@ -57,12 +57,20 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 
-def regenerate(seed, n_episodes, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0):
-    """The roads a TerrainTrainingEnv(seed=seed) gives on its first n resets."""
+# The terrain runs this regenerates are the B58's (runs/terrain_dt1), named.
+PLANT_NAME = "b58"
+
+
+def regenerate(seed, n_episodes, duration=900.0, dt=1.0, v_kmh=None, t_amb=None):
+    """The roads a TerrainTrainingEnv(seed=seed) gives on its first n resets. The
+    speed and ambient default to the plant's locked climb, as the environment's
+    do (130 km/h and 315 K: they were literal defaults here until 20 October)."""
     import engine_env as EE
+    import engines
+    plant = engines.get(PLANT_NAME)
     rng = np.random.default_rng([int(seed), EE.TerrainTrainingEnv._TERRAIN_STREAM])
     return [EE.make_terrain(rng, duration=duration, dt=dt, v_kmh=v_kmh, t_amb=t_amb,
-                            families=EE.TERRAIN_FAMILIES, weights=EE.TERRAIN_WEIGHTS)
+                            families=EE.TERRAIN_FAMILIES, weights=EE.TERRAIN_WEIGHTS, plant=plant)
             for _ in range(n_episodes)]
 
 
@@ -102,8 +110,9 @@ def drive(cycle, steps, dt=1.0):
     """What SupervisoryTunerEnv.step computes from the road alone: the speed,
     the grade, the driver's torque request, the engine speed and the gear."""
     import engine_env as EE
+    import engines
     import step_record
-    veh = EE.Vehicle()
+    veh = EE.Vehicle(engines.get(PLANT_NAME).car)
     v_all, g_all = cycle["v_mps"], cycle["grade"]
     n = len(v_all)
     rho = cycle.get("p_baro", 101.3) * 1000.0 / (287.0 * cycle["t_amb"])

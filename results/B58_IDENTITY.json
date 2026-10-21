@@ -1,0 +1,3122 @@
+{
+ "what": "Build step 1's identity certificate, made again after its review: the B58 built through engines.get('b58') on branch GRA-test (the uncommitted working tree of build step 1 with the review's fixes) against the plant of commit cf43fbb (a git archive), on one interpreter, every number compared by its bytes (numpy tobytes()).",
+ "date": "2026-10-21",
+ "asked_by": "decision 24, results/VALIDATION_DECISIONS.md section F: the four-engine build threads Engine and Car objects through the code with no default engine; the B58 built that way must be bit-identical to cf43fbb (build step 1). Made again after the review of 21 October 2026, whose fixes changed the plant's code",
+ "verdict": {
+  "result": "BIT-IDENTICAL at every level",
+  "checks": {
+   "harness jobs (L1, L2, L3)": true,
+   "premise.json (L3)": true,
+   "test_reward stdout (L4)": true,
+   "check_roads outputs (L5)": true,
+   "validate.py stdout (L5)": true,
+   "derive_params output (L5)": true,
+   "generality output (L5)": true,
+   "L6 agents": true,
+   "L7 report": true,
+   "L8 training": true,
+   "controls DIFFERENT (harness)": true,
+   "control IDENTICAL (reference against itself)": true,
+   "build_dataset without a derived file": true
+  },
+  "values_compared_byte_for_byte": {
+   "harness": 2685037,
+   "l6_agents": 8513840,
+   "l8_tensor_values": 2433978,
+   "build_dataset_columns": 3617501
+  }
+ },
+ "reference": {
+  "commit": "cf43fbb0442125d48cee2316bb96fdeb52b4e145",
+  "how": "git archive --format=tar cf43fbb (certify/cf43fbb.tar), extracted into scratch trees and checked with tar --compare (no content or size difference). Its evidence is the first certificate's, copied here: the reference tree and the reference-side code of the tools did not change. L8's reference runs were made again in a fresh extraction (S/ref).",
+  "archive_sha256": "e16e721371e8a81a48324bc4fa5af8bb7509bc2811e246cb5640cb90ba85665d"
+ },
+ "candidate": {
+  "tree": "C:\\Users\\badcl\\Desktop\\GRAD-project (the working tree)",
+  "branch": "GRA-test",
+  "head": "e9e16ed3641409720760ca9a04fef8dccdfabbf6",
+  "head_note": "build step 1 and the review's fixes, uncommitted. HEAD was 96884f1 (a session report) when the runs began and moved to e9e16ed during them: another session committed results/VALIDATION_DECISIONS.md (decisions 27, 32 and 34 revised), a document, and nothing else; cf43fbb..HEAD touches four documents and no code",
+  "files": 1217,
+  "manifest": "sha256 of every file git ls-files --cached --others --exclude-standard lists",
+  "manifest_sha256_start": "fd4639ccf6330609",
+  "manifest_sha256_end": "3dd6500b183b6db3",
+  "files_changed_during_the_runs": [
+   "CHECKPOINT.md",
+   "README.md",
+   "STATE_HISTORY.md",
+   "engine_specs/a90_supra.toml",
+   "fingerprint.py",
+   "full_run.py",
+   "results/VALIDATION_DECISIONS.md",
+   "test_wide_air.py",
+   "wide_air.py"
+  ],
+  "files_changed_note": "none of them is code a level computes with: CHECKPOINT.md, README.md and STATE_HISTORY.md are the documents swept with the review's results; results/VALIDATION_DECISIONS.md was committed by another session (e9e16ed: decisions 27, 32 and 34 revised); fingerprint.py changed in its docstring only (its code, _code_only, is the same), wide_air.py in a comment, and engine_specs/a90_supra.toml in a comment that named decision 34 before its revision (its values, which plant_sha and engine_sha hash, are the same: ded8da308863d394 and 99d2a9658b1258a7 printed after it); full_run.py in the expected-output text of three blocks (the test counts); test_wide_air.py in a stand-in's parameter, renamed so the name scan does not take it for plant.py (its 17 tests ran after the change)"
+ },
+ "identity": {
+  "plant_sha": {
+   "reference": "3c48890dd15bc116",
+   "candidate": "ded8da308863d394",
+   "x1_meta_json": "3c48890dd15bc116",
+   "first_certificate": "c276354cff16132c"
+  },
+  "derived_sha": {
+   "reference": "326c0835548975e2",
+   "candidate": "326c0835548975e2"
+  },
+  "engine": "b58b30o1/a90-supra-zf8hp51",
+  "engine_sha": "99d2a9658b1258a7",
+  "engine_sha_first_certificate": "4791be491a7b6c41",
+  "backend": "cycle",
+  "episodes_sha": {
+   "reference": "05a598a574268b20",
+   "candidate": "05a598a574268b20"
+  },
+  "shared_fatal_fields": {
+   "gears": [
+    "5.25 3.36 2.172 1.72 1.316 1 0.822 0.64",
+    "5.25 3.36 2.172 1.72 1.316 1 0.822 0.64"
+   ],
+   "final_drive": [
+    "3.15",
+    "3.15"
+   ],
+   "dtheta_deg": [
+    "0.25",
+    "0.25"
+   ],
+   "turb_protect_k": [
+    "1123",
+    "1123"
+   ],
+   "oil_protect_k": [
+    "408",
+    "408"
+   ],
+   "scenario": [
+    "grade=0.12 t_amb=315 v_kmh=130",
+    "grade=0.12 t_amb=315 v_kmh=130"
+   ]
+  },
+  "schema": {
+   "reference": 2,
+   "candidate": 3
+  },
+  "why_plant_sha_moves": "the B58's plant files are fingerprint.plant_files('b58'): the code of plant.py, thermal.py, engine_env.py, derived.py and engines.py, and the values of engine_specs/b58.toml and a90_supra.toml. engines.py and the specs are new, and the code of the others changed form (literals became record fields): plant_sha moves although every number is the same. It moved again with the review's fixes.",
+  "why_engine_sha_moves": "engine_sha hashes every value of the plant as built. The review moved the deliverable-torque table's conditions -- its grid, 42 C, the 365 K block, 30 settling steps -- from measure_deliverable_torque's defaults into the car's record (engines.Car.table_*), so the record holds six more values; every value it held before is the same",
+  "printed_by": {
+   "reference": "python fingerprint.py (in the archive)",
+   "candidate": "python fingerprint.py --engine b58; python engines.py"
+  }
+ },
+ "environment": {
+  "interpreter": "C:\\Users\\badcl\\Desktop\\GRAD-project\\.venv\\Scripts\\python.exe, for every run in both trees",
+  "python": "3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]",
+  "packages": {
+   "gymnasium": "1.3.0",
+   "matplotlib": "3.11.2",
+   "numpy": "2.5.3",
+   "pandas": "3.0.5",
+   "scipy": "1.18.1",
+   "stable_baselines3": "2.9.0",
+   "torch": "2.14.0"
+  },
+  "pip_freeze": {
+   "lines": 66,
+   "sha256": "163180030680c2d6"
+  },
+  "torch_build": "2.14.0+cpu",
+  "node": "MISSING",
+  "machine": "Windows 11 Home 10.0.26200; 12th Gen Intel Core i9-12900H (6 P-cores, 8 E-cores, 20 threads)",
+  "threads": "OMP_NUM_THREADS=1 and MKL_NUM_THREADS=1 for the harness, L6 (with torch.set_num_threads(1)), L7 and L8; the suites as their own code sets it. Every process is single-threaded, so how many ran at once changes the time, not a number",
+  "rule_4": "CLAUDE.md rule 4 asks for Python 3.12; this machine has 3.11 and 3.13 only. Decision 32 (revised 21 October, both columns open) would amend rule 4 to the versions the training device records, pinned, and re-run this certificate on that device. Every run here is 3.13.2, the interpreter behind X1's stored numbers, on this laptop."
+ },
+ "controls": {
+  "reference_against_reference": {
+   "expect": "BIT-IDENTICAL",
+   "what": "the harness's control jobs run a second time in the reference (first run)",
+   "jobs": [
+    {
+     "job": "units",
+     "values": 115173,
+     "arrays": 77,
+     "result": "BIT-IDENTICAL"
+    },
+    {
+     "job": "extremes:double:12:random",
+     "values": 76498,
+     "arrays": 17,
+     "result": "BIT-IDENTICAL"
+    },
+    {
+     "job": "wideair:locked:45.0:80.0:11:neutral",
+     "values": 60331,
+     "arrays": 14,
+     "result": "BIT-IDENTICAL"
+    },
+    {
+     "job": "cond:current-grade:315.0:82.0:0.13:varying",
+     "values": 53220,
+     "arrays": 46,
+     "result": "BIT-IDENTICAL"
+    }
+   ]
+  },
+  "one_ulp_thermal_c_turb": {
+   "expect": "DIFFERENT",
+   "what": "the corrected candidate with HARNESS_PERTURB=thermal.c_turb: that one field moved by one ulp through the frozen records (dataclasses.replace) and put into engines.get's cache, so every call that fetches the B58 gets it",
+   "jobs": [
+    {
+     "job": "units",
+     "values": 115173,
+     "arrays": 77,
+     "result": "DIFFERENT",
+     "arrays_different": 1,
+     "first_different": {
+      "key": "thermal_None",
+      "status": "DIFFERENT",
+      "n": 5403,
+      "n_differ": 57,
+      "first_flat": 3302,
+      "first_index": [
+       1100,
+       2
+      ],
+      "first_a": "1023.9622170545368",
+      "first_b": "1023.9622170545367",
+      "max_abs": 1.1368683772161603e-13
+     },
+     "different": [
+      {
+       "key": "thermal_None",
+       "status": "DIFFERENT",
+       "n": 5403,
+       "n_differ": 57,
+       "first_flat": 3302,
+       "first_index": [
+        1100,
+        2
+       ],
+       "first_a": "1023.9622170545368",
+       "first_b": "1023.9622170545367",
+       "max_abs": 1.1368683772161603e-13
+      }
+     ]
+    },
+    {
+     "job": "extremes:double:12:random",
+     "values": 76498,
+     "arrays": 17,
+     "result": "DIFFERENT",
+     "arrays_different": 2,
+     "first_different": {
+      "key": "info",
+      "status": "DIFFERENT",
+      "n": 19782,
+      "n_differ": 273,
+      "first_flat": 212,
+      "first_index": [
+       11,
+       14
+      ],
+      "first_a": "538.0972830731831",
+      "first_b": "538.097283073183",
+      "max_abs": 2.2737367544323206e-13
+     },
+     "different": [
+      {
+       "key": "info",
+       "status": "DIFFERENT",
+       "n": 19782,
+       "n_differ": 273,
+       "first_flat": 212,
+       "first_index": [
+        11,
+        14
+       ],
+       "first_a": "538.0972830731831",
+       "first_b": "538.097283073183",
+       "max_abs": 2.2737367544323206e-13
+      },
+      {
+       "key": "state",
+       "status": "DIFFERENT",
+       "n": 23079,
+       "n_differ": 2484,
+       "first_flat": 17,
+       "first_index": [
+        0,
+        17
+       ],
+       "first_a": "5090.3834371023",
+       "first_b": "5090.383437102301",
+       "max_abs": 9.094947017729282e-13
+      }
+     ]
+    },
+    {
+     "job": "wideair:locked:45.0:80.0:11:neutral",
+     "values": 60331,
+     "arrays": 14,
+     "result": "DIFFERENT",
+     "arrays_different": 2,
+     "first_different": {
+      "key": "info",
+      "status": "DIFFERENT",
+      "n": 16182,
+      "n_differ": 356,
+      "first_flat": 104,
+      "first_index": [
+       5,
+       14
+      ],
+      "first_a": "503.73413098945343",
+      "first_b": "503.7341309894534",
+      "max_abs": 1.1368683772161603e-13
+     },
+     "different": [
+      {
+       "key": "info",
+       "status": "DIFFERENT",
+       "n": 16182,
+       "n_differ": 356,
+       "first_flat": 104,
+       "first_index": [
+        5,
+        14
+       ],
+       "first_a": "503.73413098945343",
+       "first_b": "503.7341309894534",
+       "max_abs": 1.1368683772161603e-13
+      },
+      {
+       "key": "state",
+       "status": "DIFFERENT",
+       "n": 18879,
+       "n_differ": 2288,
+       "first_flat": 17,
+       "first_index": [
+        0,
+        17
+       ],
+       "first_a": "5658.664238248714",
+       "first_b": "5658.664238248715",
+       "max_abs": 9.094947017729282e-13
+      }
+     ]
+    },
+    {
+     "job": "cond:current-grade:315.0:82.0:0.13:varying",
+     "values": 53220,
+     "arrays": 46,
+     "result": "DIFFERENT",
+     "arrays_different": 3,
+     "first_different": {
+      "key": "rec_c_turb",
+      "status": "DIFFERENT",
+      "n": 719,
+      "n_differ": 719,
+      "first_flat": 0,
+      "first_index": [
+       0,
+       0
+      ],
+      "first_a": "6000.0",
+      "first_b": "6000.000000000001",
+      "max_abs": 9.094947017729282e-13
+     },
+     "different": [
+      {
+       "key": "rec_c_turb",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 719,
+       "first_flat": 0,
+       "first_index": [
+        0,
+        0
+       ],
+       "first_a": "6000.0",
+       "first_b": "6000.000000000001",
+       "max_abs": 9.094947017729282e-13
+      },
+      {
+       "key": "rec_r_life",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 37,
+       "first_flat": 192,
+       "first_index": [
+        0,
+        192
+       ],
+       "first_a": "0.0015407997754938812",
+       "first_b": "0.0015407997754938528",
+       "max_abs": 2.220446049250313e-15
+      },
+      {
+       "key": "rec_t_turb_base",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 39,
+       "first_flat": 191,
+       "first_index": [
+        0,
+        191
+       ],
+       "first_a": "754.8592695449587",
+       "first_b": "754.8592695449586",
+       "max_abs": 2.2737367544323206e-13
+      }
+     ]
+    }
+   ]
+  },
+  "one_ulp_car_mass": {
+   "expect": "DIFFERENT",
+   "what": "the corrected candidate with HARNESS_PERTURB=car.mass: that one field moved by one ulp through the frozen records (dataclasses.replace) and put into engines.get's cache, so every call that fetches the B58 gets it",
+   "jobs": [
+    {
+     "job": "units",
+     "values": 115173,
+     "arrays": 77,
+     "result": "DIFFERENT",
+     "arrays_different": 9,
+     "first_different": {
+      "key": "demand",
+      "status": "DIFFERENT",
+      "n": 1656,
+      "n_differ": 456,
+      "first_flat": 0,
+      "first_index": [
+       0,
+       0
+      ],
+      "first_a": "-45.56624988776282",
+      "first_b": "-45.56624988776284",
+      "max_abs": 1.7053025658242404e-13
+     },
+     "different": [
+      {
+       "key": "demand",
+       "status": "DIFFERENT",
+       "n": 1656,
+       "n_differ": 456,
+       "first_flat": 0,
+       "first_index": [
+        0,
+        0
+       ],
+       "first_a": "-45.56624988776282",
+       "first_b": "-45.56624988776284",
+       "max_abs": 1.7053025658242404e-13
+      },
+      {
+       "key": "xfloor_double",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 1092,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "-0.055637591006536084",
+       "first_b": "-0.05563759100653608",
+       "max_abs": 2.7755575615628914e-17
+      },
+      {
+       "key": "xfloor_flat",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 1163,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "-0.055637591006536084",
+       "first_b": "-0.05563759100653608",
+       "max_abs": 3.625572064791527e-16
+      },
+      {
+       "key": "xfloor_locked",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 1092,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "-0.055637591006536084",
+       "first_b": "-0.05563759100653608",
+       "max_abs": 2.7755575615628914e-17
+      },
+      {
+       "key": "xfloor_rolling",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 1052,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "-0.055637591006536084",
+       "first_b": "-0.05563759100653608",
+       "max_abs": 7.216449660063518e-16
+      },
+      {
+       "key": "xfloor_single",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 1167,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "-0.055637591006536084",
+       "first_b": "-0.05563759100653608",
+       "max_abs": 7.181755190543981e-16
+      },
+      {
+       "key": "xspeed_flat",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 76,
+       "first_flat": 363,
+       "first_index": [
+        0,
+        363
+       ],
+       "first_a": "22.759731084868662",
+       "first_b": "22.75973108486866",
+       "max_abs": 3.552713678800501e-15
+      },
+      {
+       "key": "xspeed_rolling",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 114,
+       "first_flat": 401,
+       "first_index": [
+        0,
+        401
+       ],
+       "first_a": "23.33044913157253",
+       "first_b": "23.330449131572525",
+       "max_abs": 7.105427357601002e-15
+      },
+      {
+       "key": "xspeed_single",
+       "status": "DIFFERENT",
+       "n": 1800,
+       "n_differ": 83,
+       "first_flat": 770,
+       "first_index": [
+        0,
+        770
+       ],
+       "first_a": "41.20779913188431",
+       "first_b": "41.207799131884315",
+       "max_abs": 7.105427357601002e-15
+      }
+     ]
+    },
+    {
+     "job": "extremes:double:12:random",
+     "values": 76498,
+     "arrays": 17,
+     "result": "DIFFERENT",
+     "arrays_different": 3,
+     "first_different": {
+      "key": "info",
+      "status": "DIFFERENT",
+      "n": 19782,
+      "n_differ": 7058,
+      "first_flat": 4,
+      "first_index": [
+       0,
+       4
+      ],
+      "first_a": "0.7295685584772823",
+      "first_b": "0.7295685584772819",
+      "max_abs": 4.547473508864641e-12
+     },
+     "different": [
+      {
+       "key": "info",
+       "status": "DIFFERENT",
+       "n": 19782,
+       "n_differ": 7058,
+       "first_flat": 4,
+       "first_index": [
+        0,
+        4
+       ],
+       "first_a": "0.7295685584772823",
+       "first_b": "0.7295685584772819",
+       "max_abs": 4.547473508864641e-12
+      },
+      {
+       "key": "state",
+       "status": "DIFFERENT",
+       "n": 23079,
+       "n_differ": 7462,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "48.589037637338876",
+       "first_b": "48.58903763733888",
+       "max_abs": 3.183231456205249e-11
+      },
+      {
+       "key": "summary",
+       "status": "DIFFERENT",
+       "n": 8,
+       "n_differ": 5,
+       "first_flat": 0,
+       "first_index": [
+        0,
+        0
+       ],
+       "first_a": "1545.5228316956488",
+       "first_b": "1545.5228316956807",
+       "max_abs": 3.183231456205249e-11
+      }
+     ]
+    },
+    {
+     "job": "wideair:locked:45.0:80.0:11:neutral",
+     "values": 60331,
+     "arrays": 14,
+     "result": "DIFFERENT",
+     "arrays_different": 6,
+     "first_different": {
+      "key": "cycle_elev",
+      "status": "DIFFERENT",
+      "n": 900,
+      "n_differ": 35,
+      "first_flat": 149,
+      "first_index": [
+       0,
+       149
+      ],
+      "first_a": "4.506216354384783e-15",
+      "first_b": "4.673113256399034e-15",
+      "max_abs": 4.440892098500626e-16
+     },
+     "different": [
+      {
+       "key": "cycle_elev",
+       "status": "DIFFERENT",
+       "n": 900,
+       "n_differ": 35,
+       "first_flat": 149,
+       "first_index": [
+        0,
+        149
+       ],
+       "first_a": "4.506216354384783e-15",
+       "first_b": "4.673113256399034e-15",
+       "max_abs": 4.440892098500626e-16
+      },
+      {
+       "key": "cycle_grade",
+       "status": "DIFFERENT",
+       "n": 900,
+       "n_differ": 7,
+       "first_flat": 149,
+       "first_index": [
+        0,
+        149
+       ],
+       "first_a": "1.543912269879503e-16",
+       "first_b": "1.601094205800966e-16",
+       "max_abs": 5.7181935921463095e-18
+      },
+      {
+       "key": "info",
+       "status": "DIFFERENT",
+       "n": 16182,
+       "n_differ": 6008,
+       "first_flat": 3,
+       "first_index": [
+        0,
+        3
+       ],
+       "first_a": "301.0335343397202",
+       "first_b": "301.0335343397203",
+       "max_abs": 3.183231456205249e-12
+      },
+      {
+       "key": "obs",
+       "status": "DIFFERENT",
+       "n": 20677,
+       "n_differ": 35,
+       "first_flat": 2731,
+       "first_index": [
+        118,
+        17
+       ],
+       "first_a": "1.8526946249803602e-15",
+       "first_b": "1.921312975795668e-15",
+       "max_abs": 6.861835081530768e-17
+      },
+      {
+       "key": "state",
+       "status": "DIFFERENT",
+       "n": 18879,
+       "n_differ": 6134,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "45.3660333656729",
+       "first_b": "45.36603336567289",
+       "max_abs": 1.9610979506978765e-12
+      },
+      {
+       "key": "summary",
+       "status": "DIFFERENT",
+       "n": 8,
+       "n_differ": 6,
+       "first_flat": 0,
+       "first_index": [
+        0,
+        0
+       ],
+       "first_a": "193.1296737848692",
+       "first_b": "193.12967378487116",
+       "max_abs": 2.4726887204451486e-12
+      }
+     ]
+    },
+    {
+     "job": "cond:current-grade:315.0:82.0:0.13:varying",
+     "values": 53220,
+     "arrays": 46,
+     "result": "DIFFERENT",
+     "arrays_different": 25,
+     "first_different": {
+      "key": "rec_cost_egt",
+      "status": "DIFFERENT",
+      "n": 719,
+      "n_differ": 17,
+      "first_flat": 12,
+      "first_index": [
+       0,
+       12
+      ],
+      "first_a": "0.10802501725950378",
+      "first_b": "0.10802501725950833",
+      "max_abs": 2.273181642920008e-14
+     },
+     "different": [
+      {
+       "key": "rec_cost_egt",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 17,
+       "first_flat": 12,
+       "first_index": [
+        0,
+        12
+       ],
+       "first_a": "0.10802501725950378",
+       "first_b": "0.10802501725950833",
+       "max_abs": 2.273181642920008e-14
+      },
+      {
+       "key": "rec_cost_torque",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 12,
+       "first_flat": 9,
+       "first_index": [
+        0,
+        9
+       ],
+       "first_a": "0.017996245029350967",
+       "first_b": "0.01799624502935117",
+       "max_abs": 1.1518563880486e-15
+      },
+      {
+       "key": "rec_damage_base_cum",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 589,
+       "first_flat": 6,
+       "first_index": [
+        0,
+        6
+       ],
+       "first_a": "0.04771767306245944",
+       "first_b": "0.04771767306246086",
+       "max_abs": 1.3642420526593924e-12
+      },
+      {
+       "key": "rec_damage_cum",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 468,
+       "first_flat": 251,
+       "first_index": [
+        0,
+        251
+       ],
+       "first_a": "20.779893695543915",
+       "first_b": "20.77989369554391",
+       "max_abs": 9.947598300641403e-14
+      },
+      {
+       "key": "rec_damage_rate",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 121,
+       "first_flat": 178,
+       "first_index": [
+        0,
+        178
+       ],
+       "first_a": "0.01015325201355339",
+       "first_b": "0.010153252013553389",
+       "max_abs": 3.552713678800501e-15
+      },
+      {
+       "key": "rec_egt_c",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 37,
+       "first_flat": 8,
+       "first_index": [
+        0,
+        8
+       ],
+       "first_a": "851.4157908806814",
+       "first_b": "851.4157908806816",
+       "max_abs": 2.2737367544323206e-12
+      },
+      {
+       "key": "rec_fuel_base_cum",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 668,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "1.1446285344416427",
+       "first_b": "1.144628534441643",
+       "max_abs": 9.094947017729282e-13
+      },
+      {
+       "key": "rec_fuel_cum",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 373,
+       "first_flat": 55,
+       "first_index": [
+        0,
+        55
+       ],
+       "first_a": "156.49915075070157",
+       "first_b": "156.4991507507016",
+       "max_abs": 4.547473508864641e-13
+      },
+      {
+       "key": "rec_ki",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 47,
+       "first_flat": 2,
+       "first_index": [
+        0,
+        2
+       ],
+       "first_a": "0.4281217166524424",
+       "first_b": "0.428121716652442",
+       "max_abs": 1.1102230246251565e-15
+      },
+      {
+       "key": "rec_map_kpa",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 79,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "49.589010786174114",
+       "first_b": "49.58901078617413",
+       "max_abs": 8.526512829121202e-13
+      },
+      {
+       "key": "rec_map_kpa_base",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 96,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "49.58901168084683",
+       "first_b": "49.589011680846816",
+       "max_abs": 1.9895196601282805e-13
+      },
+      {
+       "key": "rec_mdot_exh",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 24,
+       "first_flat": 16,
+       "first_index": [
+        0,
+        16
+       ],
+       "first_a": "132.53234621389137",
+       "first_b": "132.5323462138914",
+       "max_abs": 8.526512829121202e-14
+      },
+      {
+       "key": "rec_mdot_fuel",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 25,
+       "first_flat": 16,
+       "first_index": [
+        0,
+        16
+       ],
+       "first_a": "8.441550714260597",
+       "first_b": "8.441550714260599",
+       "max_abs": 5.329070518200751e-15
+      },
+      {
+       "key": "rec_r_fuel",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 94,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "1.5738256780755433e-09",
+       "first_b": "1.5738258606729293e-09",
+       "max_abs": 1.512567979218857e-15
+      },
+      {
+       "key": "rec_r_life",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 218,
+       "first_flat": 6,
+       "first_index": [
+        0,
+        6
+       ],
+       "first_a": "2.106308522426851e-06",
+       "first_b": "2.1063085463309107e-06",
+       "max_abs": 2.390405962973967e-14
+      },
+      {
+       "key": "rec_r_resp",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 64,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "-0.003816003733731441",
+       "first_b": "-0.003816003733731655",
+       "max_abs": 2.842170943040401e-14
+      },
+      {
+       "key": "rec_t_block_base",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 2,
+       "first_flat": 12,
+       "first_index": [
+        0,
+        12
+       ],
+       "first_a": "366.25851449688855",
+       "first_b": "366.2585144968885",
+       "max_abs": 5.684341886080802e-14
+      },
+      {
+       "key": "rec_t_turb",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 171,
+       "first_flat": 141,
+       "first_index": [
+        0,
+        141
+       ],
+       "first_a": "684.0934571434312",
+       "first_b": "684.0934571434311",
+       "max_abs": 2.2737367544323206e-13
+      },
+      {
+       "key": "rec_t_turb_base",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 205,
+       "first_flat": 5,
+       "first_index": [
+        0,
+        5
+       ],
+       "first_a": "506.74775920056334",
+       "first_b": "506.7477592005634",
+       "max_abs": 4.547473508864641e-13
+      },
+      {
+       "key": "rec_thermostat_base",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 2,
+       "first_flat": 12,
+       "first_index": [
+        0,
+        12
+       ],
+       "first_a": "0.3596676961784349",
+       "first_b": "0.359667696178415",
+       "max_abs": 1.9984014443252818e-14
+      },
+      {
+       "key": "rec_torque",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 39,
+       "first_flat": 5,
+       "first_index": [
+        0,
+        5
+       ],
+       "first_a": "104.22648686574071",
+       "first_b": "104.22648686574075",
+       "max_abs": 7.389644451905042e-13
+      },
+      {
+       "key": "rec_torque_base",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 77,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "65.98783790133773",
+       "first_b": "65.98783790133781",
+       "max_abs": 7.389644451905042e-13
+      },
+      {
+       "key": "rec_torque_req",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 39,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "66.24061181505036",
+       "first_b": "66.24061181505037",
+       "max_abs": 1.1368683772161603e-13
+      },
+      {
+       "key": "rec_tps",
+       "status": "DIFFERENT",
+       "n": 719,
+       "n_differ": 72,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "0.24524912568037632",
+       "first_b": "0.24524912568037638",
+       "max_abs": 4.218847493575595e-15
+      },
+      {
+       "key": "row",
+       "status": "DIFFERENT",
+       "n": 9,
+       "n_differ": 3,
+       "first_flat": 1,
+       "first_index": [
+        0,
+        1
+       ],
+       "first_a": "401.6843636500022",
+       "first_b": "401.6843636500021",
+       "max_abs": 5.684341886080802e-14
+      }
+     ]
+    }
+   ]
+  },
+  "L6_against_the_committed_files": {
+   "expect": "NOT EQUAL",
+   "what": "sighted_seed0 on a perturbed corrected candidate, checked by l6_check.py",
+   "runs": {
+    "one_ulp_car_mass_5_episodes": {
+     "scores_equal": "23 of 35",
+     "first_score_difference": {
+      "episode": 0,
+      "key": "damage",
+      "dump": "261.5112981997566",
+      "committed": "261.51129819975733"
+     },
+     "per_step_fields_different": "0 of 46",
+     "per_step_first_difference": null,
+     "verdict": "NOT EQUAL"
+    },
+    "one_ulp_thermal_c_turb_5_episodes": {
+     "scores_equal": "30 of 35",
+     "first_score_difference": {
+      "episode": 1,
+      "key": "damage",
+      "dump": "716.8821977652233",
+      "committed": "716.8821977652241"
+     },
+     "per_step_fields_different": "0 of 46",
+     "per_step_first_difference": null,
+     "verdict": "NOT EQUAL"
+    },
+    "car_mass_x_1e-9_2_episodes": {
+     "scores_equal": "2 of 14",
+     "first_score_difference": {
+      "episode": 0,
+      "key": "ret",
+      "dump": "93.17130204287241",
+      "committed": "93.17130105409888"
+     },
+     "per_step_fields_different": "32 of 46",
+     "per_step_first_difference": {
+      "field": "action",
+      "n_differ": 4657,
+      "first_index": [
+       0,
+       4,
+       0
+      ],
+      "dump": "-0.8199257254600525",
+      "committed": "-0.8199256658554077"
+     },
+     "verdict": "NOT EQUAL"
+    },
+    "car_mass_x_1e-6_2_episodes": {
+     "scores_equal": "2 of 14",
+     "first_score_difference": {
+      "episode": 0,
+      "key": "ret",
+      "dump": "93.17143052685424",
+      "committed": "93.17130105409888"
+     },
+     "per_step_fields_different": "35 of 46",
+     "per_step_first_difference": {
+      "field": "action",
+      "n_differ": 7105,
+      "first_index": [
+       0,
+       1,
+       0
+      ],
+      "dump": "0.7861793041229248",
+      "committed": "0.7861796617507935"
+     },
+     "verdict": "NOT EQUAL"
+    }
+   },
+   "reading": "the full-precision score check sees a one-ulp change; the per-step check against eval_record.npz (float32, float16 observation) does not, a 1e-9 relative change it does"
+  },
+  "learning_lab": {
+   "what": "lab_dump.py with LAB_PERTURB, against the unperturbed corrected candidate",
+   "one_ulp_thermal_c_turb": "36325 leaf values compared; 0 source-line numbers moved; 0 re-worded strings; 0 other differences",
+   "one_ulp_verdict": "VERDICT: IDENTICAL apart from source-line numbers and the re-worded strings",
+   "thermal_c_turb_x_(1+1e-9)": "36325 leaf values compared; 0 source-line numbers moved; 0 re-worded strings; 1212 other differences",
+   "relative_verdict": "VERDICT: DIFFERENT",
+   "reading": "the lab's 40-step sessions round one ulp of c_turb away; a 1e-9 relative change moves values"
+  },
+  "L8_training": {
+   "what": "the corrected candidate's train.py through l8_perturbed.py (engines.get('b58') replaced before train.main() runs), against the plain candidate run of the same arguments",
+   "expect": {
+    "wrapper_alone": "IDENTICAL",
+    "one_ulp": "IDENTICAL or DIFFERENT (float32 training)",
+    "relative_steps": "DIFFERENT"
+   },
+   "runs": {
+    "wrapper_alone": {
+     "largest_weight_difference": 0.0,
+     "tensors_not_identical": 0,
+     "train_record_fields_different": 0,
+     "identical": true
+    },
+    "one_ulp_car_mass": {
+     "largest_weight_difference": 0.0,
+     "tensors_not_identical": 0,
+     "train_record_fields_different": 0,
+     "identical": true
+    },
+    "one_ulp_thermal_c_turb": {
+     "largest_weight_difference": 0.0,
+     "tensors_not_identical": 0,
+     "train_record_fields_different": 0,
+     "identical": true
+    }
+   },
+   "relative_steps": {
+    "car.mass x (1 + 1e-9)": {
+     "largest_weight_difference": 0.09445488639175892,
+     "tensors_not_identical": 75,
+     "first_tensor_difference": {
+      "tensor": "actor.optimizer.pth:state.0.exp_avg",
+      "max_abs": 0.00024079009926936124,
+      "n_differ": 4835,
+      "first_flat": 23,
+      "first_a": "5.0841194024542347e-05",
+      "first_b": "4.053582961205393e-05"
+     },
+     "train_record_fields_different": 31,
+     "identical": false
+    },
+    "car.mass x (1 + 1e-6)": {
+     "largest_weight_difference": 0.052262650802731514,
+     "tensors_not_identical": 75,
+     "first_tensor_difference": {
+      "tensor": "actor.optimizer.pth:state.0.exp_avg",
+      "max_abs": 0.00022275964147411287,
+      "n_differ": 4835,
+      "first_flat": 23,
+      "first_a": "5.0841194024542347e-05",
+      "first_b": "2.842301364580635e-05"
+     },
+     "train_record_fields_different": 36,
+     "identical": false
+    }
+   },
+   "engine_sha_of_each_run": {
+    "cand_extremes/blind_seed0": "99d2a9658b1258a7",
+    "cand_extremes/sighted_seed0": "99d2a9658b1258a7",
+    "cand_wideair/sighted_seed0": "99d2a9658b1258a7",
+    "ctl_cturb/sighted_seed0": "3f2d8d7cfa119a29",
+    "ctl_mass1e-6/sighted_seed0": "c0545d9617a58c08",
+    "ctl_mass1e-9/sighted_seed0": "5ccc4d38d41fe1f1",
+    "ctl_mass/sighted_seed0": "e2f28c855ba2f02d",
+    "ctl_none/sighted_seed0": "99d2a9658b1258a7",
+    "ref_extremes/blind_seed0": "(schema 2)",
+    "ref_extremes/sighted_seed0": "(schema 2)",
+    "ref_wideair/sighted_seed0": "(schema 2)"
+   },
+   "engine_sha_note": "read from each run's meta.json before the run directories were deleted"
+  }
+ },
+ "levels": {
+  "L1_units": {
+   "what": "harness job 'units': run_cycle on 1200 operating points x 16 fields, predict, the crank-step pair, the boost ceiling at three inlets, charge temperature, airflow inversion, the thermal network at three housings (1801 steps each) and its cold reset, the ECU over 400 steps with knock (both enrichment modes), the gearbox and road load, the damage model, the locked climb at three steps, every terrain family's road and speed profile, the deliverable-torque table re-measured (on the candidate since the review: on the car's own grid and conditions, Car.table_*), the MAP ceiling and the load loop",
+   "rows": [
+    {
+     "job": "units",
+     "values": 115173,
+     "arrays": 77,
+     "result": "BIT-IDENTICAL"
+    }
+   ]
+  },
+  "L2_roads": {
+   "extremes": {
+    "rows": [
+     {
+      "job": "extremes:locked:11:neutral",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:single:11:neutral",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:rolling:11:neutral",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:double:11:neutral",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:flat:11:neutral",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:rolling:12:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:double:12:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:locked:13:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:single:13:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "extremes:flat:13:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     }
+    ],
+    "summary": {
+     "jobs": 10,
+     "identical": 10,
+     "values": 764980,
+     "result": "BIT-IDENTICAL"
+    }
+   },
+   "terrain": {
+    "rows": [
+     {
+      "job": "terrain:single:11:neutral",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "terrain:rolling:11:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "terrain:double:12:neutral",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "terrain:locked:3:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "terrain:flat:4:random",
+      "values": 76498,
+      "arrays": 17,
+      "result": "BIT-IDENTICAL"
+     }
+    ],
+    "summary": {
+     "jobs": 5,
+     "identical": 5,
+     "values": 382490,
+     "result": "BIT-IDENTICAL"
+    }
+   },
+   "random_road": {
+    "rows": [
+     {
+      "job": "rr:300.0:0.1373:neutral",
+      "values": 158371,
+      "arrays": 10,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "rr:120.0:0.16:random",
+      "values": 158371,
+      "arrays": 10,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "rr:180.0:0.12:neutral",
+      "values": 158371,
+      "arrays": 10,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "rrwrap:7:3",
+      "values": 52215,
+      "arrays": 16,
+      "result": "BIT-IDENTICAL"
+     }
+    ],
+    "summary": {
+     "jobs": 4,
+     "identical": 4,
+     "values": 527328,
+     "result": "BIT-IDENTICAL"
+    }
+   },
+   "wideair": {
+    "rows": [
+     {
+      "job": "wideair:locked:45.0:80.0:11:neutral",
+      "values": 60331,
+      "arrays": 14,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "wideair:rolling:0.0:80.0:11:random",
+      "values": 60331,
+      "arrays": 14,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "wideair:double:45.0:101.3:12:neutral",
+      "values": 60331,
+      "arrays": 14,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "wideair:single:0.0:101.3:12:random",
+      "values": 60331,
+      "arrays": 14,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "wideair:double:45.0:80.0:11:neutral",
+      "values": 60331,
+      "arrays": 14,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "wideair:flat:30.0:101.3:5:neutral",
+      "values": 60331,
+      "arrays": 14,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "wideseq:9:4:120",
+      "values": 44760,
+      "arrays": 28,
+      "result": "BIT-IDENTICAL"
+     }
+    ],
+    "summary": {
+     "jobs": 7,
+     "identical": 7,
+     "values": 406746,
+     "result": "BIT-IDENTICAL"
+    }
+   },
+   "conditions": {
+    "rows": [
+     {
+      "job": "cond:baseline ECU:315.0:101.3:0.12:locked",
+      "values": 53220,
+      "arrays": 46,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "cond:current-grade:315.0:82.0:0.13:varying",
+      "values": 53220,
+      "arrays": 46,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "cond:reactive:298.15:101.3:0.18:varying",
+      "values": 53220,
+      "arrays": 46,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "cond:reactive:315.0:76.0:0.14:varying",
+      "values": 53220,
+      "arrays": 46,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "cond:baseline ECU:323.15:101.3:0.2:varying",
+      "values": 53220,
+      "arrays": 46,
+      "result": "BIT-IDENTICAL"
+     },
+     {
+      "job": "cond:predictive (hand):315.0:90.0:0.13:varying",
+      "values": 53220,
+      "arrays": 46,
+      "result": "BIT-IDENTICAL"
+     }
+    ],
+    "summary": {
+     "jobs": 6,
+     "identical": 6,
+     "values": 319320,
+     "result": "BIT-IDENTICAL"
+    }
+   },
+   "what": "every road family: ExtremesTrainingEnv (5 families x neutral and seeded random actions, 900 + 200 steps), TerrainTrainingEnv (5 families), random_road.climb at dt 0.2 and its RandomClimb wrapper, WideAirTrainingEnv at the four corners of 0-45 C x 80-101.3 kPa plus a 4-episode sequence (the thin-air table and the closed-throttle floor, measured in the car's own table conditions since the review), and conditions_test._run; every step's observation, reward, info and 21 internal state values, the roads"
+  },
+  "L3_premise": {
+   "harness": [
+    {
+     "job": "premise",
+     "values": 169000,
+     "arrays": 5,
+     "result": "BIT-IDENTICAL"
+    }
+   ],
+   "check_premise": {
+    "candidate": "exit 0 in 1230 s; results/premise.json before c1bf594708e4605c after c1bf594708e4605c (UNCHANGED); now c1bf594708e4605c",
+    "reference": "exit 0 in 2758 s; results/premise.json before c1bf594708e4605c after c1bf594708e4605c (UNCHANGED); now c1bf594708e4605c",
+    "premise_json_cand_equals_ref": true,
+    "premise_json_equals_committed": true,
+    "premise_json_sha256": "c1bf594708e4605c",
+    "stdout_difference": [
+     "--- reference",
+     "+++ candidate",
+     "@@ -0,0 +1 @@",
+     "+plant: b58b30o1/a90-supra-zf8hp51"
+    ],
+    "where": "run in S/cand, a copy of the candidate's file set (copy_tree.py), not the working tree"
+   }
+  },
+  "L4_test_reward": {
+   "test_reward": {
+    "candidate": "exit 0 in 1529 s",
+    "reference": "exit 0 in 4506 s",
+    "stdout_identical": true,
+    "stdout_bytes_on_disk": 2284,
+    "stdout_sha256": "217ec8093befac03",
+    "verdict": [
+     "FOR INFORMATION, NOT A PASS/FAIL: the fixed-road starver's mean tracking error after 180 s is 0.016 (TRACK_TOL 0.05)",
+     "FOR INFORMATION, NOT A PASS/FAIL: random policy scores -0.00071",
+     "All checks pass. The reward is safe to train against."
+    ]
+   },
+   "test_reward --road random": {
+    "candidate": "exit 0 in 1930 s",
+    "reference": "exit 0 in 1337 s",
+    "stdout_identical": true,
+    "stdout_bytes_on_disk": 1005,
+    "stdout_sha256": "c147937cff9a1cd3",
+    "verdict": [
+     "All checks pass on every D2 road. The reward is safe to train against on the randomised climb."
+    ]
+   }
+  },
+  "L5_suites_that_write_or_pin": {
+   "check_roads --road extremes": {
+    "candidate": "exit 0 in 996 s; results/training_roads_extremes.json before 0ed2a6477e40e6c4 after a3887704067182ad (CHANGED); now 0ed2a6477e40e6c4",
+    "reference": "exit 0 in 3914 s; results/training_roads_extremes.json before 0ed2a6477e40e6c4 after a3887704067182ad (CHANGED); now a3887704067182ad",
+    "output_cand_equals_ref": true,
+    "output_sha256": "a3887704067182ad",
+    "committed_sha256": "0ed2a6477e40e6c4",
+    "output_equals_committed": false,
+    "stdout_identical": true,
+    "verdict_line": [
+     "baseline past 850 C:  10 of 40 roads",
+     "PASS -- every road is one the baseline can drive."
+    ],
+    "committed_file_note": "the committed results/training_roads_extremes.json is older than the code that writes it (06f4686 added floor_nm and p_kpa to every road): both trees write the same file, which differs from the committed one by those keys only, on cf43fbb as well"
+   },
+   "check_roads --road wideair": {
+    "candidate": "exit 0 in 1296 s; results/training_roads_wideair.json before 6a74b624f0c51120 after 6a74b624f0c51120 (UNCHANGED); now 6a74b624f0c51120",
+    "reference": "exit 0 in 2904 s; results/training_roads_wideair.json before 6a74b624f0c51120 after 6a74b624f0c51120 (UNCHANGED); now 6a74b624f0c51120",
+    "output_cand_equals_ref": true,
+    "output_sha256": "6a74b624f0c51120",
+    "committed_sha256": "6a74b624f0c51120",
+    "output_equals_committed": true,
+    "stdout_identical": true,
+    "verdict_line": [
+     "baseline past 850 C:  2 of 40 roads",
+     "PASS -- every road is one the baseline can drive."
+    ]
+   },
+   "validate.py": {
+    "stdout_identical": true,
+    "candidate": "exit 0",
+    "reference": "exit 0 in 51 s",
+    "rows": [
+     "8 of 11 quantities inside their band"
+    ],
+    "validation_table_md": "unchanged: validate.py prints and writes nothing"
+   },
+   "derive_params.py": {
+    "how": "run in a scratch copy of each tree (S/candd; the reference's in the first certificate); the copies' data/derived_params.json compared with the committed one",
+    "derived_sha": {
+     "committed": "326c0835548975e2",
+     "candidate_copy": "326c0835548975e2",
+     "reference_copy": "326c0835548975e2"
+    },
+    "differences": {
+     "committed vs derived in the candidate copy": [
+      "/_generated"
+     ],
+     "committed vs derived in the reference copy": [
+      "/_generated"
+     ],
+     "derived in the candidate copy vs derived in the reference copy": [
+      "/_generated"
+     ]
+    },
+    "candidate_and_reference_files_byte_identical": false,
+    "candidate_and_reference_differ_only_in": [
+     "/_generated"
+    ]
+   },
+   "generality_test.py": {
+    "candidate": "exit 0 in 3329 s; results/generality.json before fed2cbd7e73279f0 after fed2cbd7e73279f0 (UNCHANGED); now fed2cbd7e73279f0",
+    "reference": "exit 0 in 2111 s; results/generality.json before fed2cbd7e73279f0 after fed2cbd7e73279f0 (UNCHANGED); now fed2cbd7e73279f0",
+    "output_cand_equals_ref": true,
+    "output_equals_committed": true,
+    "stdout_difference": []
+   },
+   "app_and_learning_lab_suites": {
+    "how": "every app/test_*.py suite and the learning lab's tests in the corrected candidate; the reference's from the first certificate (the archive, and a git clone of cf43fbb for the suites that read git)",
+    "suites": {
+     "test_simulation": {
+      "candidate": {
+       "ran": 16,
+       "verdict": "FAILED (failures=1)",
+       "failing": [
+        "test_the_page_can_actually_load_every_asset_and_id_it_references (__main__.ReplayTests.test_the_page_can_actually_load_every_asset_and_id_it_references)"
+       ]
+      },
+      "reference_git_clone": {
+       "ran": 16,
+       "verdict": "FAILED (failures=1)",
+       "failing": [
+        "test_the_page_can_actually_load_every_asset_and_id_it_references (__main__.ReplayTests.test_the_page_can_actually_load_every_asset_and_id_it_references)"
+       ]
+      },
+      "reference_archive": {
+       "ran": 16,
+       "verdict": "FAILED (failures=1)",
+       "failing": [
+        "test_the_page_can_actually_load_every_asset_and_id_it_references (__main__.ReplayTests.test_the_page_can_actually_load_every_asset_and_id_it_references)"
+       ]
+      }
+     },
+     "test_agents": {
+      "candidate": {
+       "ran": 135,
+       "verdict": "FAILED (failures=1, errors=1, skipped=14)",
+       "failing": [
+        "test_page_assets_ids (__main__.PageTests.test_page_assets_ids)",
+        "test_the_lab_launcher_names_the_agents_page (__main__.PageTests.test_the_lab_launcher_names_the_agents_page)"
+       ]
+      },
+      "reference_git_clone": {
+       "ran": 135,
+       "verdict": "FAILED (failures=1, errors=1, skipped=14)",
+       "failing": [
+        "test_page_assets_ids (__main__.PageTests.test_page_assets_ids)",
+        "test_the_lab_launcher_names_the_agents_page (__main__.PageTests.test_the_lab_launcher_names_the_agents_page)"
+       ]
+      },
+      "reference_archive": {
+       "ran": 135,
+       "verdict": "FAILED (failures=6, errors=1, skipped=14)",
+       "failing": [
+        "test_key_files_are_ignored (__main__.JevKeyTests.test_key_files_are_ignored)",
+        "test_page_assets_ids (__main__.PageTests.test_page_assets_ids)",
+        "test_the_lab_launcher_names_the_agents_page (__main__.PageTests.test_the_lab_launcher_names_the_agents_page)"
+       ]
+      }
+     },
+     "test_results": {
+      "candidate": {
+       "ran": 125,
+       "verdict": "FAILED (failures=5, errors=1, skipped=5)",
+       "failing": [
+        "test_another_python_through_git (__main__.ProvenanceStateTests.test_another_python_through_git)",
+        "test_another_python_with_no_route_through_git (__main__.ProvenanceStateTests.test_another_python_with_no_route_through_git)",
+        "test_dirty_plant_files_have_no_git_route (__main__.ProvenanceStateTests.test_dirty_plant_files_have_no_git_route)",
+        "test_the_bytes_at_the_commit_must_be_the_bytes_hashed (__main__.ProvenanceStateTests.test_the_bytes_at_the_commit_must_be_the_bytes_hashed)",
+        "test_the_launcher_names_the_results_tab_and_starts_the_server (__main__.DocsTests.test_the_launcher_names_the_results_tab_and_starts_the_server)",
+        "test_without_git_only_the_git_facts_go (__main__.DataTests.test_without_git_only_the_git_facts_go)"
+       ]
+      },
+      "reference_git_clone": {
+       "ran": 124,
+       "verdict": "FAILED (failures=7, errors=1, skipped=1)",
+       "failing": [
+        "test_a_schema_1_record_is_read_by_schema_1s_rule_and_never_called_this_plant (__main__.ProvenanceStateTests.test_a_schema_1_record_is_read_by_schema_1s_rule_and_never_called_this_plant)",
+        "test_another_python_through_git (__main__.ProvenanceStateTests.test_another_python_through_git)",
+        "test_another_python_with_no_route_through_git (__main__.ProvenanceStateTests.test_another_python_with_no_route_through_git)",
+        "test_dirty_plant_files_have_no_git_route (__main__.ProvenanceStateTests.test_dirty_plant_files_have_no_git_route)",
+        "test_the_bytes_at_the_commit_must_be_the_bytes_hashed (__main__.ProvenanceStateTests.test_the_bytes_at_the_commit_must_be_the_bytes_hashed)",
+        "test_the_git_route_recomputes_plant_and_road (__main__.ProvenanceStateTests.test_the_git_route_recomputes_plant_and_road)",
+        "test_the_launcher_names_the_results_tab_and_starts_the_server (__main__.DocsTests.test_the_launcher_names_the_results_tab_and_starts_the_server)",
+        "test_without_git_only_the_git_facts_go (__main__.DataTests.test_without_git_only_the_git_facts_go)"
+       ]
+      },
+      "reference_archive": {
+       "ran": 124,
+       "verdict": "FAILED (failures=5, errors=1, skipped=20)",
+       "failing": [
+        "test_another_python_with_no_route_through_git (__main__.ProvenanceStateTests.test_another_python_with_no_route_through_git)",
+        "test_build_leaves_no_trace (__main__.DataTests.test_build_leaves_no_trace)",
+        "test_real_tree_is_made_on_another_plant (__main__.DataTests.test_real_tree_is_made_on_another_plant)",
+        "test_real_tree_serialises_strictly (__main__.DataTests.test_real_tree_serialises_strictly)",
+        "test_the_launcher_names_the_results_tab_and_starts_the_server (__main__.DocsTests.test_the_launcher_names_the_results_tab_and_starts_the_server)",
+        "test_without_git_only_the_git_facts_go (__main__.DataTests.test_without_git_only_the_git_facts_go)"
+       ]
+      }
+     },
+     "lab_tests": {
+      "candidate": {
+       "ran": 31,
+       "verdict": "FAILED (failures=3, skipped=1)",
+       "failing": [
+        "test_frame_exposes_step_input_time_at_road_transition (test_simulation.SimulationSessionTests.test_frame_exposes_step_input_time_at_road_transition)",
+        "test_locked_scenario_pins_source_evaluation_episode_one (test_simulation.SimulationSessionTests.test_locked_scenario_pins_source_evaluation_episode_one)",
+        "test_preview_blinding_only_zeros_future_grade_channels (test_simulation.SimulationSessionTests.test_preview_blinding_only_zeros_future_grade_channels)"
+       ]
+      },
+      "reference_git_clone": {
+       "ran": 31,
+       "verdict": "FAILED (failures=4, skipped=1)",
+       "failing": [
+        "test_frame_exposes_step_input_time_at_road_transition (test_simulation.SimulationSessionTests.test_frame_exposes_step_input_time_at_road_transition)",
+        "test_locked_scenario_pins_source_evaluation_episode_one (test_simulation.SimulationSessionTests.test_locked_scenario_pins_source_evaluation_episode_one)",
+        "test_preview_blinding_only_zeros_future_grade_channels (test_simulation.SimulationSessionTests.test_preview_blinding_only_zeros_future_grade_channels)",
+        "test_results_are_current_and_inconclusive_with_explicit_caveats (test_catalog.CatalogTests.test_results_are_current_and_inconclusive_with_explicit_caveats)"
+       ]
+      },
+      "reference_archive": {
+       "ran": 31,
+       "verdict": "FAILED (failures=4, skipped=1)",
+       "failing": [
+        "test_frame_exposes_step_input_time_at_road_transition (test_simulation.SimulationSessionTests.test_frame_exposes_step_input_time_at_road_transition)",
+        "test_locked_scenario_pins_source_evaluation_episode_one (test_simulation.SimulationSessionTests.test_locked_scenario_pins_source_evaluation_episode_one)",
+        "test_preview_blinding_only_zeros_future_grade_channels (test_simulation.SimulationSessionTests.test_preview_blinding_only_zeros_future_grade_channels)",
+        "test_results_are_current_and_inconclusive_with_explicit_caveats (test_catalog.CatalogTests.test_results_are_current_and_inconclusive_with_explicit_caveats)"
+       ]
+      }
+     },
+     "test_replay --full": {
+      "candidate": [
+       "59 of 59 checks pass"
+      ],
+      "reference_archive": [
+       "59 of 59 checks pass"
+      ],
+      "differing_lines": [
+       "--- reference",
+       "+++ candidate",
+       "@@ -23 +23 @@",
+       "-  PASS  M7: served limits match engine_env   turb_c 849.9",
+       "+  PASS  M7: served limits match the plant's damage knee   turb_c 849.9"
+      ]
+     },
+     "test_agent_generations": {
+      "candidate": {
+       "ran": 4,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 4,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_agent_sources": {
+      "candidate": {
+       "ran": 15,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 15,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_artifact_api": {
+      "candidate": {
+       "ran": 9,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 9,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_artifacts": {
+      "candidate": {
+       "ran": 29,
+       "verdict": "OK (skipped=1)",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 29,
+       "verdict": "OK (skipped=1)",
+       "failing": []
+      }
+     },
+     "test_graphics_revisions": {
+      "candidate": {
+       "ran": 1,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 1,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_launcher": {
+      "candidate": {
+       "ran": 8,
+       "verdict": "OK (skipped=8)",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 8,
+       "verdict": "OK (skipped=8)",
+       "failing": []
+      }
+     },
+     "test_records": {
+      "candidate": {
+       "ran": 15,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 15,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_results_comparisons": {
+      "candidate": {
+       "ran": 4,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 4,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_results_graphics": {
+      "candidate": {
+       "ran": 1,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 1,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_results_records": {
+      "candidate": {
+       "ran": 3,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 3,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "test_results_sets": {
+      "candidate": {
+       "ran": 10,
+       "verdict": "OK",
+       "failing": []
+      },
+      "reference_archive": {
+       "ran": 10,
+       "verdict": "OK",
+       "failing": []
+      }
+     },
+     "node --test static/sim/*.test.mjs": {
+      "candidate": {
+       "tests": 306,
+       "pass": 306,
+       "fail": 0,
+       "skipped": 0
+      },
+      "reference_archive": {
+       "tests": 306,
+       "pass": 294,
+       "fail": 0,
+       "skipped": 12
+      },
+      "reference_git_clone": {
+       "tests": 306,
+       "pass": 294,
+       "fail": 0,
+       "skipped": 12
+      },
+      "note": "the 12 skipped in any checkout of cf43fbb need app/static/vendor/three.js, which git ignores"
+     }
+    }
+   },
+   "learning_lab_outputs": {
+    "how": "lab_dump.py: catalog metadata in both languages, /api/plant at three points, /api/thermal, four sessions stepped 40 times, in the archive (first certificate) and in the corrected candidate",
+    "result": "36325 leaf values compared; 178 source-line numbers moved; 88 re-worded strings; 0 other differences",
+    "verdict": "VERDICT: IDENTICAL apart from source-line numbers and the re-worded strings",
+    "reworded": [
+     "re-worded /plant_5200_180/charge_temp_source",
+     "re-worded /session_locked_predictive/frames[41]/provenance/scenario_source",
+     "re-worded /thermal/method"
+    ]
+   }
+  },
+  "L6_x1_agents": {
+   "what": "four X1 agents (runs/extremes_dt1: sighted_seed0, sighted_seed4, blind_seed2, blind_seed6) on all twenty frozen episodes through evaluate.run_episode with a record, as record_agents.py's workers run them (OMP 1, torch 1 thread, SAC.load on CPU). Compared: the two trees' dumps, every array by tobytes(); each tree's scores against results/phase_d_extremes_dt1_raw.json by float equality (7 values x 20 episodes); each tree's cast records against results/agents/extremes_dt1/<tag>/eval_record.npz, field by field",
+   "agents": {
+    "sighted_seed0": {
+     "cand_vs_ref": {
+      "values": 2128460,
+      "arrays": 91,
+      "result": "BIT-IDENTICAL"
+     },
+     "cand_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     },
+     "ref_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     }
+    },
+    "sighted_seed4": {
+     "cand_vs_ref": {
+      "values": 2128460,
+      "arrays": 91,
+      "result": "BIT-IDENTICAL"
+     },
+     "cand_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     },
+     "ref_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     }
+    },
+    "blind_seed2": {
+     "cand_vs_ref": {
+      "values": 2128460,
+      "arrays": 91,
+      "result": "BIT-IDENTICAL"
+     },
+     "cand_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     },
+     "ref_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     }
+    },
+    "blind_seed6": {
+     "cand_vs_ref": {
+      "values": 2128460,
+      "arrays": 91,
+      "result": "BIT-IDENTICAL"
+     },
+     "cand_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     },
+     "ref_vs_committed": {
+      "scores": "140 of 140 equal at full precision",
+      "per_step": "46 fields, 1064200 values, all identical",
+      "result": "EQUAL"
+     }
+    }
+   }
+  },
+  "L7_evaluate_end_to_end": {
+   "how": "evaluate.py for X1's sighted_seed0: the three hand-written policies and the agent on the twenty frozen episodes, OMP/MKL threads 1. The reference scored runs/extremes_dt1/sighted_seed0 itself (first certificate); the corrected candidate scored a scratch copy with the byte-identical final.zip and a meta.json re-stamped by make_meta.py with this tree's schema-3 FATAL block and an explicit identity_override. No --force-plant-mismatch. Before the comparison the fingerprint block and each run's model directory were removed, nothing else",
+   "candidate": "exit 0",
+   "reference": "exit 0",
+   "meta_json_sha256": {
+    "original": "7ec24243850172a0",
+    "final_zip": "03e2f26f2c0319fe",
+    "scratch_final_zip": "03e2f26f2c0319fe"
+   },
+   "lines_compared": 27,
+   "identical": true,
+   "diff": [],
+   "fingerprint_blocks": {
+    "reference": [
+     "--- PLANT FINGERPRINT (this run) ------------------------------",
+     "  plant_sha                3c48890dd15bc116",
+     "  derived_sha              326c0835548975e2",
+     "  gears                    5.25 3.36 2.172 1.72 1.316 1 0.822 0.64",
+     "  final_drive              3.15",
+     "  dtheta_deg               0.25",
+     "  turb_protect_k           1123",
+     "  oil_protect_k            408",
+     "  scenario                 grade=0.12 t_amb=315 v_kmh=130",
+     "  episodes_sha             05a598a574268b20",
+     "  eval_dt                  1",
+     "  eval_duration            720",
+     "  git_dirty                None",
+     "  git_dirty_plant_files    None",
+     "  git_head                 None",
+     "  n_episodes               20",
+     "  plant_text_sha           b592730a1aaf259c",
+     "  python                   3.13.2",
+     "--------------------------------------------------------------"
+    ],
+    "candidate": [
+     "--- PLANT FINGERPRINT (this run) ------------------------------",
+     "  plant_sha                ded8da308863d394",
+     "  derived_sha              326c0835548975e2",
+     "  engine                   b58b30o1/a90-supra-zf8hp51",
+     "  engine_sha               99d2a9658b1258a7",
+     "  backend                  cycle",
+     "  gears                    5.25 3.36 2.172 1.72 1.316 1 0.822 0.64",
+     "  final_drive              3.15",
+     "  dtheta_deg               0.25",
+     "  turb_protect_k           1123",
+     "  oil_protect_k            408",
+     "  scenario                 grade=0.12 t_amb=315 v_kmh=130",
+     "  episodes_sha             05a598a574268b20",
+     "  eval_dt                  1",
+     "  eval_duration            720",
+     "  git_dirty                True",
+     "  git_dirty_plant_files    derived.py engine_env.py engine_specs/a90_supra.toml engine_specs/b58.toml engines.py plant.py thermal.py",
+     "  git_head                 96884f1d7db48ee982e5702b9ed1e2ab1a75914d",
+     "  n_episodes               20",
+     "  plant_text_sha           131b73b6c585dd22",
+     "  python                   3.13.2",
+     "--------------------------------------------------------------"
+    ]
+   },
+   "rows_against_the_committed_raw_scores": "VERDICT: every row equals the committed raw scores"
+  },
+  "L8_training": {
+   "how": "train.py --steps 600 --seed 0 --device cpu --road <road> [--no-preview] --out <scratch>, OMP/MKL threads 1, in each tree (the candidate adds --engine b58); both trees run again for this certificate. Compared: every tensor of final.zip by its bytes and by the largest absolute difference; stable-baselines3's counters; every field of the recorded 600 steps; curve.csv. The run directories were deleted afterwards: an identity test, not an experiment",
+   "runs": {
+    "extremes, sighted (X1's design)": {
+     "largest_weight_difference": 0.0,
+     "tensors": 96,
+     "values": 811326,
+     "tensors_not_byte_identical": 0,
+     "sb3_counters": {
+      "num_timesteps": 600,
+      "_total_timesteps": 600,
+      "_n_updates": 500,
+      "_episode_num": 0,
+      "seed": 0,
+      "learning_starts": 100,
+      "buffer_size": 10000,
+      "batch_size": 256
+     },
+     "counters_equal": true,
+     "train_record": "47 fields, 47400 values, all identical",
+     "curve_identical": true,
+     "result": "IDENTICAL"
+    },
+    "extremes, blinded (--no-preview)": {
+     "largest_weight_difference": 0.0,
+     "tensors": 96,
+     "values": 811326,
+     "tensors_not_byte_identical": 0,
+     "sb3_counters": {
+      "num_timesteps": 600,
+      "_total_timesteps": 600,
+      "_n_updates": 500,
+      "_episode_num": 0,
+      "seed": 0,
+      "learning_starts": 100,
+      "buffer_size": 10000,
+      "batch_size": 256
+     },
+     "counters_equal": true,
+     "train_record": "47 fields, 47400 values, all identical",
+     "curve_identical": true,
+     "result": "IDENTICAL"
+    },
+    "wideair, sighted (X2's design)": {
+     "largest_weight_difference": 0.0,
+     "tensors": 96,
+     "values": 811326,
+     "tensors_not_byte_identical": 0,
+     "sb3_counters": {
+      "num_timesteps": 600,
+      "_total_timesteps": 600,
+      "_n_updates": 500,
+      "_episode_num": 0,
+      "seed": 0,
+      "learning_starts": 100,
+      "buffer_size": 10000,
+      "batch_size": 256
+     },
+     "counters_equal": true,
+     "train_record": "47 fields, 47400 values, all identical",
+     "curve_identical": true,
+     "result": "IDENTICAL"
+    }
+   }
+  }
+ },
+ "review_runs": {
+  "build_dataset without a derived file (finding 2)": {
+   "how": "tools/bd_dump.py: build_dataset.read_drive and derive on all eleven drives of logs/raw, in a copy of each tree whose data/derived_params.json is moved aside, every numeric column dumped and compared",
+   "candidate": [
+    "cand exit 0"
+   ],
+   "reference": [
+    "ref exit 0"
+   ],
+   "comparison": true,
+   "values": 3617501,
+   "before_the_fix": [
+    "derive FAILED: FileNotFoundError: C:\\Users\\badcl\\AppData\\Local\\Temp\\claude\\c--Users-badcl-Desktop-GRAD-project\\14077827-1e2d-4826-b805-20b70e9c81f2\\scratchpad\\build1b\\fixes\\before\\data/derived_params.json is missing. It holds every constant computed from data for its engine. Make it with:  python derive_params.py"
+   ],
+   "new_drive": {
+    "identical_to_the_reference": true,
+    "before_the_fix": [
+     "(skipped: FileNotFoundError: C:\\Users\\badcl\\AppData\\Local\\Temp\\claude\\c--Users-badcl-Desktop-GRAD-project\\14077827-1e2d-4826-b805-20b70e9c81f2\\scratchpad\\build1b\\fixes\\before\\data/derived_params.json is missing. It holds every constant computed from data for its engine. Make it with:  python derive_params.py)"
+    ]
+   }
+  },
+  "check_roads.py, the 40 terrain roads (finding 11)": {
+   "candidate": "exit 0 in 608 s",
+   "reference": "exit 0 in 631 s",
+   "output_cand_equals_ref": true,
+   "stdout_identical": true,
+   "output_equals_committed": false,
+   "committed_note": {
+    "new": "C:/Users/badcl/AppData/Local/Temp/claude/c--Users-badcl-Desktop-GRAD-project/14077827-1e2d-4826-b805-20b70e9c81f2/scratchpad/build1b/fixes/F11/cand_roads_terrain_OUT_training_roads.json",
+    "committed": "C:/Users/badcl/Desktop/GRAD-project/results/training_roads.json",
+    "roads": {
+     "compared": 40,
+     "equal": 0
+    },
+    "summary": {
+     "n": {
+      "new": 40,
+      "committed": 40
+     },
+     "binding": {
+      "new": 14,
+      "committed": 14
+     },
+     "worst_neutral_r": {
+      "new": -0.0020247057800366094,
+      "committed": -0.0020051961308468866
+     },
+     "worst_p95_err": {
+      "new": 0.01644889050793138,
+      "committed": 0.016453038687018202
+     },
+     "passed": {
+      "new": true,
+      "committed": true
+     }
+    },
+    "first_difference": "road seed 100: peak_c 736.9097825485758 committed, 736.8890366373793 now"
+   },
+   "verdict_line": [
+    "baseline past 850 C:  14 of 40 roads",
+    "PASS -- every road is one the baseline can drive."
+   ]
+  },
+  "check_random_road.py (finding 11)": {
+   "candidate": "exit 0 in 2777 s",
+   "reference": "exit 0 in 2413 s",
+   "stdout_difference": [
+    "--- reference",
+    "+++ candidate",
+    "@@ -3 +3 @@",
+    "-trigger 850 C;  ranges start (120.0, 300.0) s, grade (0.12, 0.16);  road_sha e44153fd81eeaa1e",
+    "+trigger 850 C;  ranges start (120.0, 300.0) s, grade (0.12, 0.16);  road_sha be19b3d0bcef435d",
+    "@@ -70 +70 @@",
+    "-(40.2 min)",
+    "+(46.3 min)"
+   ]
+  },
+  "evaluate.py --protocol d2 (finding 11)": {
+   "how": "no D2 agent is on this machine (runs_d2/ is not), so the three hand-written policies on the twenty frozen D2 episodes, end to end, in both trees; and X1's sighted_seed0, re-stamped as in L7, under --protocol d2: refused on the FATAL scenario",
+   "candidate": "exit 0",
+   "reference": "exit 0",
+   "report": {
+    "identical": true,
+    "lines_ref": 23,
+    "lines_cand": 23,
+    "diff": [],
+    "ref_fingerprint": [
+     "--- PLANT FINGERPRINT (this run) ------------------------------",
+     "  plant_sha                3c48890dd15bc116",
+     "  derived_sha              326c0835548975e2",
+     "  gears                    5.25 3.36 2.172 1.72 1.316 1 0.822 0.64",
+     "  final_drive              3.15",
+     "  dtheta_deg               0.25",
+     "  turb_protect_k           1123",
+     "  oil_protect_k            408",
+     "  scenario                 grade=0.12 0.16 protocol=random-climb road_sha=e44153fd81eeaa1e start_s=120 300 t_amb=315 v_kmh=130",
+     "  episodes_sha             1c5d49852290d27c",
+     "  eval_dt                  1",
+     "  eval_duration            720",
+     "  git_dirty                None",
+     "  git_dirty_plant_files    None",
+     "  git_head                 None",
+     "  n_episodes               20",
+     "  plant_text_sha           b592730a1aaf259c",
+     "  python                   3.13.2",
+     "--------------------------------------------------------------"
+    ],
+    "cand_fingerprint": [
+     "--- PLANT FINGERPRINT (this run) ------------------------------",
+     "  plant_sha                ded8da308863d394",
+     "  derived_sha              326c0835548975e2",
+     "  engine                   b58b30o1/a90-supra-zf8hp51",
+     "  engine_sha               99d2a9658b1258a7",
+     "  backend                  cycle",
+     "  gears                    5.25 3.36 2.172 1.72 1.316 1 0.822 0.64",
+     "  final_drive              3.15",
+     "  dtheta_deg               0.25",
+     "  turb_protect_k           1123",
+     "  oil_protect_k            408",
+     "  scenario                 grade=0.12 0.16 protocol=random-climb road_sha=be19b3d0bcef435d start_s=120 300 t_amb=315 v_kmh=130",
+     "  episodes_sha             1c5d49852290d27c",
+     "  eval_dt                  1",
+     "  eval_duration            720",
+     "  git_dirty                True",
+     "  git_dirty_plant_files    derived.py engine_env.py engine_specs/a90_supra.toml engine_specs/b58.toml engines.py plant.py thermal.py",
+     "  git_head                 96884f1d7db48ee982e5702b9ed1e2ab1a75914d",
+     "  n_episodes               20",
+     "  plant_text_sha           131b73b6c585dd22",
+     "  python                   3.13.2",
+     "--------------------------------------------------------------"
+    ],
+    "compared": [
+     "PHASE D2 EVALUATION (randomised climb) -- 20 FIXED EPISODES, frozen 22 Sep 2026",
+     "scenario: climb from 120-300 s at 12-16 %, per episode, 130 km/h, 42 C, 720 s, dt 1.0",
+     "trigger:  850 C",
+     "",
+     "",
+     "policy                        damage med      IQR    worst  fuel med   peak C",
+     "-----------------------------------------------------------------------------",
+     "baseline ECU                      1021.4    648.9   2190.9      4698      924",
+     "reactive                           546.6    184.2    823.5      4927      874",
+     "current-grade                      508.6    261.1    796.6      4985      874",
+     "-----------------------------------------------------------------------------",
+     "  reactive                   cuts median damage  46.5 %",
+     "  current-grade              cuts median damage  50.2 %",
+     "",
+     "  WITHOUT THE KNOCK TERM (turbine + oil only; the knock model is untested)",
+     "    baseline ECU               thermal med   1017.9   thermal cut   0.0 %",
+     "    reactive                   thermal med    543.1   thermal cut  46.6 %",
+     "    current-grade              thermal med    504.2   thermal cut  50.5 %",
+     "",
+     "  Hand-written policies only. AUDIT.md C3: these say the environment",
+     "  rewards anticipation; they do NOT say what an agent would gain, and",
+     "  five scenarios have now shown preview losing to current-grade with",
+     "  policies a human wrote. Only a trained pair settles it."
+    ]
+   },
+   "phase_d_agent_under_d2": [
+    "scenario           model {'grade': 0.12, 't_amb': 315.0, 'v_kmh': 130.0}  live {'protocol': 'random-climb', 'start_s': [120.0, 300.0], 'grade': [0.12, 0.16], 'v_kmh': 130.0, 't_amb': 315.0, 'road_sha': 'be19b3d0bcef435d'}",
+    "REFUSING to evaluate C:/Users/badcl/AppData/Local/Temp/claude/c--Users-badcl-Desktop-GRAD-project/14077827-1e2d-4826-b805-20b70e9c81f2/scratchpad/build1b/fixes/L7/cand_model/sighted_seed0: it was trained on a different plant."
+   ]
+  },
+  "the learning lab's build and launcher (finding 11)": {
+   "npm_ci": [
+    "added 134 packages, and audited 135 packages in 9m",
+    "1 high severity vulnerability",
+    "exit 0 in 538 s"
+   ],
+   "npm_build": [
+    "\u001b[32m✓ built in 23.90s\u001b[39m",
+    "exit 0 in 62 s"
+   ],
+   "launch_no_browser": [
+    "Supra Lab is ready: http://127.0.0.1:8765",
+    "exit 124 (124 = stopped by timeout after the check, as intended)"
+   ],
+   "launch_check": [
+    "Local app healthy",
+    "exit 0"
+   ],
+   "where": "in S/cand, a copy of the candidate's file set (node_modules and dist are git-ignored there)"
+  }
+ },
+ "suites": {
+  "cand_test_engine_threading": {
+   "status": {
+    "exit": 0,
+    "seconds": 117
+   },
+   "result": {
+    "ran": 20,
+    "verdict": "OK",
+    "failing": []
+   }
+  },
+  "cand_test_epa_map": {
+   "status": {
+    "exit": 0,
+    "seconds": 27
+   },
+   "result": {
+    "ran": 29,
+    "verdict": "OK",
+    "failing": []
+   }
+  },
+  "cand_test_plant_guards": {
+   "status": {
+    "exit": 0,
+    "seconds": 28
+   },
+   "result": {
+    "ran": 14,
+    "verdict": "OK",
+    "failing": []
+   }
+  },
+  "ref_test_plant_guards": {
+   "status": "MISSING",
+   "result": {
+    "ran": 6,
+    "verdict": "OK",
+    "failing": []
+   }
+  },
+  "cand_test_wide_air": {
+   "status": {
+    "exit": 0,
+    "seconds": 1623
+   },
+   "result": {
+    "ran": 17,
+    "verdict": "OK",
+    "failing": []
+   }
+  },
+  "cand_test_epa_map_with_2021_2023": {
+   "status": {
+    "exit": 0,
+    "seconds": 36
+   },
+   "result": {
+    "ran": 29,
+    "verdict": "OK",
+    "failing": []
+   }
+  },
+  "cand_random_road": {
+   "status": {
+    "exit": 0,
+    "seconds": 13
+   },
+   "output": [
+    "  road_sha                                                : be19b3d0bcef435d",
+    "----------------------------------------------------------------",
+    "SELF-TEST PASSES"
+   ]
+  },
+  "ref_random_road": {
+   "status": "MISSING",
+   "output": [
+    "  road_sha                                                : e44153fd81eeaa1e",
+    "----------------------------------------------------------------",
+    "SELF-TEST PASSES"
+   ]
+  },
+  "cand_verify_docs": {
+   "status": {
+    "exit": 0,
+    "seconds": 399
+   },
+   "verdict": [
+    "All 74 checks pass (953 figure mentions scanned in the documents)."
+   ]
+  },
+  "ref_verify_docs": {
+   "status": "exit 0 in 893 s",
+   "verdict": [
+    "All 74 checks pass (945 figure mentions scanned in the documents)."
+   ],
+   "tree": "the archive (first certificate)"
+  },
+  "verify_docs_checks_only_in_the_reference": [
+   "CHECKPOINT.md       99 lines (fails above 150)",
+   "OIL_PROTECT_K",
+   "TURB_PROTECT_K, the damage knee",
+   "Vehicle.final_drive",
+   "Vehicle.gears, the ZF 8HP51 ratio set",
+   "scenario ambient, make_grade_climb(t_amb=)",
+   "scenario grade, make_grade_climb(grade=)",
+   "scenario speed, make_grade_climb(v_kmh=)",
+   "training episode length, make_grade_climb(duration=)",
+   "training step, make_grade_climb(dt=)"
+  ],
+  "verify_docs_checks_only_in_the_candidate": [
+   "CHECKPOINT.md      111 lines (fails above 150)",
+   "scenario ambient, the plant's locked climb (t_amb)",
+   "scenario grade, the plant's locked climb (grade)",
+   "scenario speed, the plant's locked climb (v_kmh)",
+   "the car's final drive",
+   "the car's gears, the ZF 8HP51 ratio set",
+   "the damage knee (turb_knee_k, was TURB_PROTECT_K)",
+   "the oil knee (oil_knee_k, was OIL_PROTECT_K)",
+   "training episode length, train.DURATION_S and EngineEnv()",
+   "training step, train.DESIGN_DT fixed/random, SupervisoryTunerEnv(dt=)"
+  ],
+  "drift_test": {
+   "status": "exit codes: exit 0 rows 1 2 3;exit 0 rows 4 5 6;exit 0 rows 7 8 9;exit 0 rows 10 11 12;exit 0 rows 13 14 15;exit 0 rows 16 17 18; in 1404 s; 18 of 18 drifts CAUGHT",
+   "control": [
+    "control    the undrifted copy passes verify_docs.py | exit 0: All 74 checks pass (955 figure mentions scanned in the documents)."
+   ],
+   "verdict": [
+    "3 of 3 drifts CAUGHT",
+    "3 of 3 drifts CAUGHT",
+    "3 of 3 drifts CAUGHT",
+    "3 of 3 drifts CAUGHT",
+    "3 of 3 drifts CAUGHT",
+    "3 of 3 drifts CAUGHT",
+    "18 of 18 drifts CAUGHT (all parts)"
+   ],
+   "rows": [
+    "row  1  was CAUGHT               now CAUGHT  | README.md \"8 of 11\" -> \"9 of 11\"",
+    "row  2  was CAUGHT               now CAUGHT  | README.md \"ten drives, 295.0 minutes\" -> \"nine drives\"",
+    "row  3  was CAUGHT               now CAUGHT  | plant.DTHETA_DEG 0.25 -> 0.5",
+    "row  4  was MISSED               now CAUGHT  | CLAUDE.md load residual \"1.4 % with zero fitted parameters\" -> 1.7 % (now in README.md)",
+    "row  5  was MISSED               now CAUGHT  | CLAUDE.md \"295.0 min\" (current-state table) -> 299.0 (now in STATE_HISTORY.md)",
+    "row  6  was MISSED               now CAUGHT  | CLAUDE.md app peak 872.7 -> 877.2 (was 873.1 -> 877.6; now in README.md)",
+    "row  7  was MISSED               now CAUGHT  | results/README.md and CHECKPOINT.md \"+11.7\" -> \"+13.7\"",
+    "row  8  was MISSED               now CAUGHT  | engine_env.py docstring \"12 % at 130 km/h\" -> 120 km/h",
+    "row  9  was MISSED               now CAUGHT  | the locked climb's v_kmh 130.0 -> 120.0 (make_grade_climb's default; now engine_specs/a90_supra.toml)",
+    "row 10  was MISSED               now CAUGHT  | the turbine knee 1123 -> 1100 (engine_env.TURB_PROTECT_K; now engine_specs/b58.toml)",
+    "row 11  was MISSED               now CAUGHT  | CHECKPOINT.md \"959.8 at 884 C\" -> 870 C (now in STATE_HISTORY.md)",
+    "row 12  was MISSED               now CAUGHT  | CLAUDE.md \"0.206 %\" -> 0.306 % (now in thesis/LIMITATIONS.md)",
+    "row 13  was MISSED               now CAUGHT  | CLAUDE.md premise \"848.1 at 883 °C\" -> 870 (was \"920.1 at 883\", \"959.8 at 884\"; now in CHECKPOINT.md)",
+    "row 14  was CAUGHT               now CAUGHT  | CLAUDE.md \"derived k = 0.831\" -> 0.851 (now in README.md)",
+    "row 15  was not in the audit table now CAUGHT  | evaluate.EPISODES: one weight changed in the frozen set",
+    "row 16  was not in the audit table now CAUGHT  | the car's gears: top gear 0.640 -> 0.680 (the invented six-speed's; Vehicle.gears, now engine_specs/a90_supra.toml)",
+    "row 17  was not in the audit table now CAUGHT  | Phase D's training step: train.DESIGN_DT fixed 0.2 -> 0.5",
+    "row 18  was not in the audit table now CAUGHT  | the training episode: train.DURATION_S 900.0 -> 600.0"
+   ]
+  },
+  "drift_control_with_the_certificate_present": "passes with the certificate's files in the copy: exit 0: All 74 checks pass (955 figure mentions scanned in the documents).",
+  "cand_fingerprint": [
+   "--- PLANT FINGERPRINT (live) ----------------------------------",
+   "  plant_sha                ded8da308863d394",
+   "  derived_sha              326c0835548975e2",
+   "  engine                   b58b30o1/a90-supra-zf8hp51",
+   "  engine_sha               99d2a9658b1258a7",
+   "  backend                  cycle",
+   "  gears                    5.25 3.36 2.172 1.72 1.316 1 0.822 0.64",
+   "  final_drive              3.15",
+   "  dtheta_deg               0.25",
+   "  turb_protect_k           1123",
+   "  oil_protect_k            408",
+   "  scenario                 grade=0.12 t_amb=315 v_kmh=130",
+   "  episodes_sha             05a598a574268b20",
+   "  eval_dt                  1",
+   "  eval_duration            720",
+   "  git_dirty                True",
+   "  git_dirty_plant_files    derived.py engine_env.py engine_specs/a90_supra.toml engine_specs/b58.toml engines.py plant.py thermal.py",
+   "  git_head                 96884f1d7db48ee982e5702b9ed1e2ab1a75914d",
+   "  n_episodes               20",
+   "  plant_text_sha           131b73b6c585dd22",
+   "  python                   3.13.2",
+   "--------------------------------------------------------------"
+  ]
+ },
+ "different": [
+  {
+   "where": "check_premise.py, stdout (L3)",
+   "kind": "a printed line, no number",
+   "first_difference": [
+    "--- reference",
+    "+++ candidate",
+    "@@ -0,0 +1 @@",
+    "+plant: b58b30o1/a90-supra-zf8hp51"
+   ],
+   "why": "the candidate prints the plant it names before the table; results/premise.json is byte-identical"
+  },
+  {
+   "where": "evaluate.py's report, the fingerprint block (L7)",
+   "kind": "provenance, removed before the comparison",
+   "first_difference": [
+    "cf43fbb:   plant_sha                3c48890dd15bc116",
+    "candidate:   plant_sha                ded8da308863d394"
+   ],
+   "why": "schema 2 against schema 3: plant_sha moves (section 1), engine / engine_sha / backend are new FATAL fields, the git fields are None in the archive, plant_text_sha hashes other bytes"
+  },
+  {
+   "where": "check_roads.py --road extremes, against the committed results/training_roads_extremes.json (L5)",
+   "kind": "a committed file older than the code that writes it, on cf43fbb as well",
+   "first_difference": "road 0 (seed 100) gains 'floor_nm': 15.0 and 'p_kpa': 101.3; so does every road",
+   "why": "both trees write the same file; the committed one predates 06f4686, which added the two keys"
+  },
+  {
+   "where": "check_roads.py (the 40 terrain roads), against the committed results/training_roads.json",
+   "kind": "a committed file older than the plant, on cf43fbb as well; finding 13, for main",
+   "first_difference": "road seed 100: peak_c 736.9097825485758 committed, 736.8890366373793 now",
+   "why": "the file was last written by cbb8d09 (29 September), before 75ca65f (8 October) sub-stepped the thermal network and ramped the grade; both trees write the same new file"
+  },
+  {
+   "where": "python -m app.test_replay --full (L5)",
+   "kind": "a check's label, same value",
+   "first_difference": [
+    "-  PASS  M7: served limits match engine_env   turb_c 849.9",
+    "+  PASS  M7: served limits match the plant's damage knee   turb_c 849.9"
+   ],
+   "why": "the M7 check reads the damage knee from the plant now (engine_env.TURB_PROTECT_K is gone)"
+  },
+  {
+   "where": "the learning lab's outputs (L5)",
+   "kind": "source-line numbers and three texts",
+   "first_difference": [
+    "re-worded /plant_5200_180/charge_temp_source",
+    "ref: 'plant.charge_temperature(ambient_k) default (+12 K; no block-temperature input)'",
+    "new: 'plant.charge_temperature(ambient_k, None) (+12 K; no block-temperature input)'",
+    "re-worded /session_locked_predictive/frames[41]/provenance/scenario_source",
+    "ref: 'evaluate.episode_cycle() / make_grade_climb()'",
+    "new: 'evaluate.episode_cycle(plant) / engine_env.locked_climb()'"
+   ],
+   "why": "lab_compare.py: no value differs; source-line numbers moved with the edited files, and the re-worded strings are three distinct texts, one under each key it lists, each naming a default which no longer exists"
+  },
+  {
+   "where": "verify_docs.py, the list of checks",
+   "kind": "checks renamed or replaced",
+   "first_difference": {
+    "only_in_the_reference": [
+     "CHECKPOINT.md       99 lines (fails above 150)",
+     "OIL_PROTECT_K",
+     "TURB_PROTECT_K, the damage knee",
+     "Vehicle.final_drive",
+     "Vehicle.gears, the ZF 8HP51 ratio set",
+     "scenario ambient, make_grade_climb(t_amb=)",
+     "scenario grade, make_grade_climb(grade=)",
+     "scenario speed, make_grade_climb(v_kmh=)",
+     "training episode length, make_grade_climb(duration=)",
+     "training step, make_grade_climb(dt=)"
+    ],
+    "only_in_the_candidate": [
+     "CHECKPOINT.md      111 lines (fails above 150)",
+     "scenario ambient, the plant's locked climb (t_amb)",
+     "scenario grade, the plant's locked climb (grade)",
+     "scenario speed, the plant's locked climb (v_kmh)",
+     "the car's final drive",
+     "the car's gears, the ZF 8HP51 ratio set",
+     "the damage knee (turb_knee_k, was TURB_PROTECT_K)",
+     "the oil knee (oil_knee_k, was OIL_PROTECT_K)",
+     "training episode length, train.DURATION_S and EngineEnv()",
+     "training step, train.DESIGN_DT fixed/random, SupervisoryTunerEnv(dt=)"
+    ]
+   },
+   "counts": {
+    "reference": [
+     "All 74 checks pass (945 figure mentions scanned in the documents)."
+    ],
+    "candidate": [
+     "All 74 checks pass (953 figure mentions scanned in the documents)."
+    ]
+   },
+   "why": "make_grade_climb has no defaults, so the two checks that read its duration= and dt= defaults (900 s, 0.2 s) read the values where they live now: train.DURATION_S and EngineEnv's climb, train.DESIGN_DT for Phase D's and D2's roads, SupervisoryTunerEnv's dt (the review: build step 1 had merged them into one structural check that nothing could fail independently); the others read the plant's records"
+  },
+  {
+   "where": "test_results: failing tests (L5)",
+   "kind": "pre-existing failures",
+   "candidate_only": [],
+   "reference_only": [
+    "test_a_schema_1_record_is_read_by_schema_1s_rule_and_never_called_this_plant",
+    "test_the_git_route_recomputes_plant_and_road"
+   ],
+   "both": [
+    "test_another_python_through_git",
+    "test_another_python_with_no_route_through_git",
+    "test_dirty_plant_files_have_no_git_route",
+    "test_the_bytes_at_the_commit_must_be_the_bytes_hashed",
+    "test_the_launcher_names_the_results_tab_and_starts_the_server",
+    "test_without_git_only_the_git_facts_go"
+   ],
+   "why": "no test fails on the candidate alone; 6 fail on cf43fbb as well (a git clone, the same interpreter); the two that fail on cf43fbb only are skipped on the candidate while its plant files are uncommitted (app/test_results.py: 'the plant files or random_road.py have uncommitted changes')"
+  },
+  {
+   "where": "test_agents: failing tests (L5)",
+   "kind": "pre-existing failures",
+   "candidate_only": [],
+   "reference_only": [],
+   "both": [
+    "test_page_assets_ids",
+    "test_the_lab_launcher_names_the_agents_page"
+   ],
+   "why": "no test fails on the candidate alone; 2 fail on cf43fbb as well (a git clone, the same interpreter)"
+  },
+  {
+   "where": "test_simulation: failing tests (L5)",
+   "kind": "pre-existing failures",
+   "candidate_only": [],
+   "reference_only": [],
+   "both": [
+    "test_the_page_can_actually_load_every_asset_and_id_it_references"
+   ],
+   "why": "no test fails on the candidate alone; 1 fails on cf43fbb as well (a git clone, the same interpreter)"
+  },
+  {
+   "where": "lab_tests: failing tests (L5)",
+   "kind": "pre-existing failures",
+   "candidate_only": [],
+   "reference_only": [
+    "test_results_are_current_and_inconclusive_with_explicit_caveats"
+   ],
+   "both": [
+    "test_frame_exposes_step_input_time_at_road_transition",
+    "test_locked_scenario_pins_source_evaluation_episode_one",
+    "test_preview_blinding_only_zeros_future_grade_channels"
+   ],
+   "why": "no test fails on the candidate alone; 3 fail on cf43fbb as well (a git clone, the same interpreter); the one that fails on cf43fbb only is the premise pin build step 1 corrected, -0.32 to -0.01 (results/premise.json since 75ca65f; the comment beside it in test_catalog.py)"
+  },
+  {
+   "where": "python random_road.py, the self-test",
+   "kind": "a code hash: the D2 protocol's road_sha",
+   "first_difference": [
+    "-  road_sha                                                : e44153fd81eeaa1e",
+    "+  road_sha                                                : be19b3d0bcef435d"
+   ],
+   "why": "random_road.code_sha() hashes the module's code: its self-checks build the B58's locked climb by name, and since the review RandomClimb and evaluate.episode_cycle refuse a plant whose locked climb is not the Supra's (check_plant); climb() is unchanged and every random-road job is bit-identical"
+  },
+  {
+   "where": "check_random_road.py, stdout (finding 11)",
+   "kind": "the D2 road_sha and the run time",
+   "first_difference": [
+    "-trigger 850 C;  ranges start (120.0, 300.0) s, grade (0.12, 0.16);  road_sha e44153fd81eeaa1e",
+    "+trigger 850 C;  ranges start (120.0, 300.0) s, grade (0.12, 0.16);  road_sha be19b3d0bcef435d",
+    "-(40.2 min)",
+    "+(46.3 min)"
+   ],
+   "why": "road_sha hashes random_road.py's code (the self-test above); the run time is the machine's. Every figure and the verdict, PASS, are the same in both trees"
+  },
+  {
+   "where": "training's final.zip files (L8)",
+   "kind": "zip bytes",
+   "first_difference": "the 'data' member",
+   "why": "stable-baselines3 stores run metadata there; every tensor and every counter is compared"
+  }
+ ],
+ "review": [
+  {
+   "n": 1,
+   "lens": "correctness",
+   "where": "engine_env.py:1066 (measure_deliverable_torque); wide_air.py:114, 150",
+   "severity": "medium",
+   "finding": "the B58 table's grid, 42 C, a 365 K block and 30 settling steps were defaults beside plant=, and the threading test could not see them",
+   "verdict": "fixed",
+   "fix": "measure_deliverable_torque(rpms, *, plant) and wide_air.deliverable_torque(p_kpa, rpms, *, plant) read the table's conditions from the car's record (engines.Car.table_rpm_lo/hi/step, table_t_amb, table_t_block, table_settle; typed in engine_specs/a90_supra.toml with label and source), derive_params passes plant.car.table_rpms; closed_throttle_nm(env, t_amb) reads table_t_block and wide_air.CLOSED_SETTLE; car_thermal.oil_time_constants(drives, *, plant) (the extended scan found it). test_engine_threading's new Defaults rule flags any default beside a record unless PROTOCOL_DEFAULTS or PLANTS_OWN_IF_NONE names it, with a control",
+   "evidence": [
+    "repro/f1_mdt_default_before.txt",
+    "repro/f1_extended_scan_on_before.txt",
+    "the harness's units job (the table re-measured on the car's grid) and the wideair jobs, BIT-IDENTICAL"
+   ]
+  },
+  {
+   "n": 2,
+   "lens": "correctness",
+   "where": "build_dataset.py:235; new_drive.py:178",
+   "severity": "medium",
+   "finding": "build_dataset.py could no longer run before data/derived_params.json exists",
+   "verdict": "fixed",
+   "fix": "engines.typed_engine(name): the geometry, cycle and charge records from the spec alone (a record with a DERIVED field is refused, never given NaN); build_dataset._engine and new_drive.py use it",
+   "evidence": [
+    "repro/f2_build_dataset_no_derived_before.txt",
+    "repro/f2_build_dataset_no_derived_ref.txt",
+    "F2/cand.txt",
+    "F2/ref.txt",
+    "F2/cmp.json",
+    "F2/new_drive_before.txt",
+    "F2/new_drive_candd.txt",
+    "F2/new_drive_ref.txt"
+   ]
+  },
+  {
+   "n": 3,
+   "lens": "correctness",
+   "where": "wide_air.py:184 (thin_air_ratios)",
+   "severity": "low",
+   "finding": "the thin-air ratios were cached by plant.id, which a dataclasses.replace variant keeps",
+   "verdict": "fixed",
+   "fix": "cached by the frozen Plant itself (value equality); test_wide_air Gearbox.test_a_variant_gets_its_own_ratios",
+   "evidence": [
+    "repro/f3_ratios_cache_before.txt",
+    "repro/f3_ratios_cache_after.txt"
+   ]
+  },
+  {
+   "n": 4,
+   "lens": "correctness",
+   "where": "fingerprint.py:104 (PLANT_FILES)",
+   "severity": "low",
+   "finding": "plant_sha hashed the B58's two specs whatever plant was passed",
+   "verdict": "fixed",
+   "fix": "fingerprint.PLANT_CODE and plant_files(name) = PLANT_CODE + engines.spec_files(name); plant_fingerprint hashes plant_files(engines.name_of(plant)), name_of refusing an unregistered or doubly registered plant; PLANT_FILES removed; app/results_provenance, app/agent_catalog, reconstruct_meta, the lab's catalog and make_page name the B58's list",
+   "evidence": [
+    "repro/f4_plant_files_before.txt",
+    "test_engine_threading Registry.test_plant_files_are_the_plants_own_specs"
+   ]
+  },
+  {
+   "n": 5,
+   "lens": "correctness",
+   "where": "fingerprint.py:179 (_code_only)",
+   "severity": "low",
+   "finding": "the spec-by-values rule applied only when the text failed to parse as Python",
+   "verdict": "fixed",
+   "fix": "fingerprint._file_code(name, src) picks the rule by the file's kind (.toml by its values); _sha_files, reconstruct_meta.plant_sha_at and results_provenance.code_hash (names= required) use it; _code_only no longer falls back to the spec rule",
+   "evidence": [
+    "repro/f5_spec_hash_form_before.txt",
+    "test_engine_threading Registry.test_a_spec_is_hashed_by_its_values_in_either_toml_form",
+    "app.test_results test_hashes_equal_fingerprint_sha_files"
+   ]
+  },
+  {
+   "n": 6,
+   "lens": "correctness",
+   "where": "fingerprint.py:320 (backend)",
+   "severity": "low",
+   "finding": "the FATAL backend came from a keyword default no caller passed",
+   "verdict": "fixed",
+   "fix": "backend is required; fingerprint.backend_of(env) reads it from the environment (cycle without an engine_model; an engine_model or a non-environment refused); train.py reads it from its environment, the seven other callers pass BACKEND_CYCLE with the reason; anything but 'cycle' is refused until decision 28",
+   "evidence": [
+    "repro/f6_backend_before.txt",
+    "test_plant_guards SchemaThree.test_the_backend_is_never_assumed"
+   ]
+  },
+  {
+   "n": 7,
+   "lens": "correctness",
+   "where": "verify_docs.py:1349",
+   "severity": "low",
+   "finding": "the 900 s and 0.2 s value checks were replaced by one that cannot fail independently",
+   "verdict": "fixed (with 8)",
+   "fix": "see 8",
+   "evidence": [
+    "suites/cand_verify_docs.txt"
+   ]
+  },
+  {
+   "n": 8,
+   "lens": "rules",
+   "where": "verify_docs.py:1349",
+   "severity": "medium",
+   "finding": "the guard was weakened and drift_test had no row for either value",
+   "verdict": "fixed",
+   "fix": "two value checks where the values live: train.DURATION_S (a module constant, --duration's default) and EngineEnv's climb (900 s); train.DESIGN_DT fixed/random, SupervisoryTunerEnv's dt and EngineEnv's (0.2 s); drift_test rows 17 (DESIGN_DT fixed 0.2 -> 0.5) and 18 (DURATION_S 900 -> 600); the certificate's sentence corrected",
+   "evidence": [
+    "suites/cand_verify_docs.txt",
+    "suites/drift_test.txt"
+   ]
+  },
+  {
+   "n": 9,
+   "lens": "rules",
+   "where": ".claude/rules/physics.md:2; CLAUDE.md:137",
+   "severity": "medium",
+   "finding": "editing engines.py or engine_specs/ prompted no re-run of the plant's suites",
+   "verdict": "fixed in physics.md; CLAUDE.md left for Jad and Ghassan",
+   "fix": "physics.md's paths name engines.py and engine_specs/**; CLAUDE.md holds the permanent rules, and widening its line 137 to name engines.py and engine_specs/ is theirs to write, as the finding says",
+   "evidence": [
+    ".claude/rules/physics.md"
+   ]
+  },
+  {
+   "n": 10,
+   "lens": "rules",
+   "where": "fingerprint.py:109 (FATAL, schema_problem)",
+   "severity": "medium",
+   "finding": "nothing tested that engine, engine_sha and backend are FATAL or that a schema-2 record is refused",
+   "verdict": "fixed",
+   "fix": "test_plant_guards.SchemaThree, 8 tests: the three fields FATAL, with a control (a FATAL tuple without engine_sha is caught); schema_problem; evaluate.check_model_fingerprint refuses a schema-2 meta.json (a synthetic one, and X1's own where the machine has it), passes a schema-3 one, refuses another engine field by field; train.refuse_old_schema, factored out of train.main, refuses schema 2 and passes a fresh directory, schema 3 and --force-plant-mismatch",
+   "evidence": [
+    "suites/cand_test_plant_guards.txt"
+   ]
+  },
+  {
+   "n": 11,
+   "lens": "rules",
+   "where": ".claude/rules/app.md:26",
+   "severity": "medium",
+   "finding": "suites that read the plant were not run",
+   "verdict": "fixed (run); two plot scripts broken on cf43fbb too, reported",
+   "fix": "the lab's npm ci, npm run build, launch.py --no-browser and --check; check_roads.py's 40 terrain roads and check_random_road.py in both trees; evaluate.py --protocol d2 end to end in both trees (no D2 agent is on this machine: the three hand-written policies, and X1's agent refused under d2); every app suite. app.test_results after the commit cannot run here (nothing is committed). plot_sim_vs_car.py and plot_study_page.py fail to import on both trees (fit_envelope has no envelope since cbb8d09): pre-existing, for main",
+   "evidence": [
+    "lab/npm_ci.txt",
+    "lab/npm_build.txt",
+    "lab/launch_no_browser.txt",
+    "lab/launch_check.txt",
+    "F11/",
+    "F11/plot_imports.txt"
+   ]
+  },
+  {
+   "n": 12,
+   "lens": "rules",
+   "where": "results/B58_IDENTITY.md:174",
+   "severity": "medium",
+   "finding": "the certificate's tools and evidence lived only in a session's scratch folder",
+   "verdict": "fixed",
+   "fix": "results/B58_IDENTITY/certificate_tools.tar.gz: every tool and the small evidence files, its sha256 in the JSON and the .md; the shell tools find their own folder, so the archive unpacked anywhere is S; the reproduce section is written against it. Uncommitted, as the task asks; not git-ignored (*.zip is)",
+   "evidence": [
+    "results/B58_IDENTITY/certificate_tools.tar.gz"
+   ]
+  },
+  {
+   "n": 13,
+   "lens": "rules",
+   "where": "results/training_roads.json",
+   "severity": "low",
+   "finding": "the committed terrain-road check is stale since 75ca65f, on cf43fbb too",
+   "verdict": "real, pre-existing; left for main",
+   "fix": "confirmed: check_roads.py's 40 terrain roads write the same file in both trees, and it differs from the committed one. The fix -- regenerate it on main in its own commit, then grep the tree for its old figures (mistake 11) -- belongs on main, which this task must not touch",
+   "evidence": [
+    "F11/terrain_vs_committed.json"
+   ]
+  },
+  {
+   "n": 14,
+   "lens": "rules",
+   "where": "test_engine_threading.py:40; results/B58_IDENTITY.md:168",
+   "severity": "low",
+   "finding": "the frozen drive-C files were said to refuse on a plant_sha mismatch; they crash before it",
+   "verdict": "fixed",
+   "fix": "both sentences say what was measured: plant_check, which stages A, B and C call first, stops with an exception before its comparison (TypeError on derived_sha() before the review, AttributeError on fingerprint.PLANT_FILES after); FrozenFiles.test_drive_c_analysis_cannot_run_on_this_tree asserts it; the frozen files untouched",
+   "evidence": [
+    "repro/f14_drive_c_plant_check_before.txt",
+    "repro/f14_drive_c_plant_check_after.txt"
+   ]
+  },
+  {
+   "n": 15,
+   "lens": "rules",
+   "where": "verify_docs.py:186",
+   "severity": "low",
+   "finding": "skipping logs/epa/ also hid logs/epa/README.md from the scan",
+   "verdict": "fixed",
+   "fix": "verify_docs skips EPA's own files only, the repo_path rows of logs/epa/MANIFEST.csv (epa_files); the README is scanned; drift_test run after the change",
+   "evidence": [
+    "suites/drift_test.txt"
+   ]
+  },
+  {
+   "n": 16,
+   "lens": "rules",
+   "where": "CHECKPOINT.md:4 and README, results/README, data.md",
+   "severity": "low",
+   "finding": "the live documents described the old state and quoted commands that now stop on --engine",
+   "verdict": "fixed",
+   "fix": "CHECKPOINT.md carries GRA-test's state (the replaced line moved verbatim to STATE_HISTORY.md part O); README.md (train_all --engine b58, the wide_air line, the new files in the layout, the drift count); results/README.md (the quoted commands kept as they ran, with what GRA-test requires); .claude/rules/data.md; fingerprint.py's docstring. The grep of 3c48890dd15bc116, 'schema 2' and '74 checks' finds main's state, X1's and X2's records and dated history only",
+   "evidence": [
+    "CHECKPOINT.md",
+    "STATE_HISTORY.md part O"
+   ]
+  },
+  {
+   "n": 17,
+   "lens": "rules",
+   "where": "engine_specs/a90_supra.toml:15, 32; engine_specs/cars/",
+   "severity": "low",
+   "finding": "unanswered decisions 31 and 34 were written as adopted; [repo_current] pointed at moved lines",
+   "verdict": "fixed",
+   "fix": "'recommended, unanswered' wherever 31 and 34 are named; [repo_current] points at engine_specs/a90_supra.toml, and test_epa_map checks it against engines.get('b58').car, with a control",
+   "evidence": [
+    "suites/cand_test_epa_map.txt"
+   ]
+  },
+  {
+   "n": 18,
+   "lens": "rules",
+   "where": "engine_specs/cars/README.md:91 and the car files",
+   "severity": "low",
+   "finding": "numbers with no committed script; two Supra EPA rows unverified; attributions missing",
+   "verdict": "fixed",
+   "fix": "the three numbers marked UNVERIFIED where they stand; the MY2021 and MY2023 Test Car Lists fetched into scratch with fetch_engine_data.py (sha256 equal to D3_AND_EPA_SOURCES.csv) and all nine EPA rows checked against their files, the two Supra rows among them (the team's data folder still lacks the two lists); Argonne's attribution in engine_specs/cars/README.md; REFERENCES.md section 8 for EPA and Argonne",
+   "evidence": [
+    "repro/f18_fetch_tcl.txt",
+    "repro/f18_carspecs_with_2021_2023.txt",
+    "suites/cand_test_epa_map_with_2021_2023.txt"
+   ]
+  },
+  {
+   "n": 19,
+   "lens": "rules",
+   "where": "derived.py:37; evaluate.py:254; fingerprint.py:109",
+   "severity": "low",
+   "finding": "single-engine assumptions: derived.PATH, D2 roads that ignore the plant, one backend field",
+   "verdict": "fixed in two parts; schema 4 left until decisions 27 and 28 are answered",
+   "fix": "derived.PATH renamed derived.B58_PATH at all eight uses; random_road.check_plant refuses a plant whose locked climb is not the Supra's speed and ambient (in RandomClimb and evaluate.episode_cycle); fingerprint schema 4 (the horizon H, separate training and scoring backends) is in CHECKPOINT.md's next actions, before any new engine trains",
+   "evidence": [
+    "test_engine_threading Signatures (RR.check_plant)"
+   ]
+  },
+  {
+   "n": 20,
+   "lens": "rules",
+   "where": "engine_specs/b58.toml:140",
+   "severity": "low",
+   "finding": "egt_limit_k was DESIGN with no source recorded",
+   "verdict": "fixed",
+   "fix": "labelled ASSUMED; labels and sources are not hashed, so plant_sha and engine_sha do not move on it",
+   "evidence": [
+    "engine_specs/b58.toml"
+   ]
+  },
+  {
+   "n": 21,
+   "lens": "rules",
+   "where": "bash.exe.stackdump",
+   "severity": "low",
+   "finding": "a stray crash dump was neither tracked nor ignored",
+   "verdict": "fixed",
+   "fix": "*.stackdump in .gitignore: git add -A, the manifest and drift_test's copy no longer take it; the file itself is left for its owner to delete",
+   "evidence": [
+    ".gitignore"
+   ]
+  }
+ ],
+ "first_certificate": {
+  "where": "scratchpad build1b/certify (manifests, evidence and tools); its results/B58_IDENTITY.json and .md were replaced by this certificate",
+  "ran": "21 October 2026, 00:29 to 03:43",
+  "manifest_sha256": "e45bb000a67e203c",
+  "files": 1216,
+  "plant_sha": "c276354cff16132c",
+  "engine_sha": "4791be491a7b6c41",
+  "road_sha": "e9df8e57528a95b4",
+  "verify_docs": "All 73 checks pass (953 figure mentions)",
+  "drift_test": "16 of 16 drifts CAUGHT",
+  "verdict": "BIT-IDENTICAL at every level (L1-L8)"
+ },
+ "tools": {
+  "bd_dump.py": "fcfa068d3a93d02e",
+  "bd_no_derived.py": "d1f4dec2e330b253",
+  "bind_calls.py": "7bf3ed4a0581fbcd",
+  "check_l6.sh": "06be554f8fab326b",
+  "cmp.py": "3d424f8b11afe239",
+  "compare_all.sh": "2220420c6c977878",
+  "copy_tree.py": "2d2a13c1659560fc",
+  "derived_check.py": "8f7ff320c02330c0",
+  "drift_control.py": "bb384be61eb9ef95",
+  "epa_openpyxl_check.py": "abff6e91c362aeb0",
+  "harness.py": "8d50e7633be7d3ad",
+  "import_all.py": "99c1adbe60a5794f",
+  "jobs_all.txt": "0d82fecf6b773178",
+  "jobs_ctl.txt": "ef502fa0d39624a5",
+  "l6_agents.py": "01b9613397d94079",
+  "l6_check.py": "001dd85bad7f7b07",
+  "l7_diff.py": "b4935fac84e56a31",
+  "l7_expect.py": "955fb2e4b526ed13",
+  "l8_compare.py": "d5b6eabc85d1b23f",
+  "l8_perturbed.py": "809edf4c30f2638c",
+  "lab_compare.py": "2dfa1b0bbc309b7b",
+  "lab_dump.py": "7115fabda540f6ba",
+  "make_archive.py": "5071d5e56612618b",
+  "make_cert.py": "a6cd572e5166ecdd",
+  "make_md.py": "1fec2b48b22d2e5c",
+  "make_meta.py": "27afe1f07be4cba5",
+  "manifest.py": "77bdcb83c080f8b4",
+  "mdt_default.py": "8efa198fb8c11733",
+  "plant_files_after.py": "bb375d8cd0364f5a",
+  "plant_files_demo.py": "00b889e15e0172fb",
+  "ratios_cache.py": "e69914b432c564ef",
+  "roads_vs_committed.py": "0cad6d45323f7877",
+  "run_app.sh": "45a596885d918478",
+  "run_app_extra.sh": "ac99858431778717",
+  "run_controls.sh": "096ba4f46bf0af72",
+  "run_drift.sh": "80695caef6b7506a",
+  "run_jobs.py": "015510b4b8119315",
+  "run_l4.sh": "4640165e0723464e",
+  "run_l6.sh": "5ffd5ab8ed97fc45",
+  "run_l8.sh": "87afe53b1a30c668",
+  "run_l8_review.sh": "a45cd06f02014a7e",
+  "run_roads.sh": "773ae8652d056a78",
+  "run_roads_review.sh": "8a664eea7f5faee1",
+  "run_suites.sh": "b20a731dcfc7db38",
+  "run_writer.sh": "f2dd6109b29dd65f",
+  "scan_defaults.py": "9eb751cff8c90fc2",
+  "spec_hash_form.py": "cc0be1dc5c285555",
+  "tcl_openpyxl_check.py": "f2e50c3d3d636d1b"
+ },
+ "tools_note": "Every tool and the small evidence files are archived in the repository, in results/B58_IDENTITY/certificate_tools.tar.gz (finding 12 of the review: they lived in a session's scratch only), its sha256 below. The tools derive their folder from their own location, so the archive unpacked anywhere is S. tools/certify_original/ holds the first certificate's tools as they ran; harness.py differs from its first form in one line on the candidate side (the table measured on the car's grid, Car.table_rpms), make_meta.py in passing backend=, and the shell scripts in finding their folder instead of naming it. The reference-side code is unchanged.",
+ "archive": {
+  "path": "results/B58_IDENTITY/certificate_tools.tar.gz",
+  "sha256": "a639190b605c177142e9bc3f95295bc7ae0c335732a4ab6a082e6dbef01503fb",
+  "bytes": 586569,
+  "members": 424
+ },
+ "reproduce": {
+  "conventions": {
+   "S": "the certificate's folder: results/B58_IDENTITY/certificate_tools.tar.gz unpacked anywhere (tar -xzf ... -C <folder>), or the scratch folder this run used (scratchpad build1b/fixes). Every tool finds S from its own location, S/tools",
+   "PY": "C:/Users/badcl/Desktop/GRAD-project/.venv/Scripts/python.exe (Python 3.13.2), for every command in both trees; the shell tools read $PY and $CAND from the environment when set",
+   "REPO": "C:/Users/badcl/Desktop/GRAD-project, the candidate: GRA-test's working tree with build step 1 and the review's fixes",
+   "REF": "$S/ref: git archive cf43fbb, extracted (git archive --format=tar cf43fbb | tar -x -C $S/ref); the first certificate's reference evidence is in the archive under out/ref, L4/ref_*, L5/ref_*, L6 (the npz dumps are not archived: re-run them), L7/ref_*, app/ref*, lab (compare files only)",
+   "shell": "Git Bash; tools/*.sh are bash scripts, tools/*.py run with $PY -I"
+  },
+  "steps": [
+   {
+    "step": "reference tree",
+    "cwd": "REPO",
+    "command": "mkdir -p $S/ref && git archive --format=tar cf43fbb | tar -x -C $S/ref"
+   },
+   {
+    "step": "candidate copies for the writers",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/copy_tree.py REPO $S/cand; $PY -I $S/tools/copy_tree.py REPO $S/candd"
+   },
+   {
+    "step": "candidate manifest, at the start and at the end",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/manifest.py REPO $S/manifest_start.txt   (and manifest_end.txt after the last run; make_cert lists every file that differs)"
+   },
+   {
+    "step": "fingerprints",
+    "cwd": "REPO / REF",
+    "command": "$PY fingerprint.py --engine b58 > $S/out/fp_cand.txt; $PY engines.py   |   (in REF) $PY fingerprint.py > $S/out/fp_ref.txt"
+   },
+   {
+    "step": "L1, L2, L3 harness",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/run_jobs.py REPO cand $S/tools/jobs_all.txt 6; (reference: $PY -I $S/tools/run_jobs.py $S/ref ref $S/tools/jobs_all.txt 3); bash $S/tools/compare_all.sh ref cand"
+   },
+   {
+    "step": "controls (harness)",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/run_jobs.py REPO ctl_cturb $S/tools/jobs_ctl.txt 2 HARNESS_PERTURB=thermal.c_turb; the same with ctl_mass and HARNESS_PERTURB=car.mass; (reference: run_jobs.py $S/ref ref2 jobs_ctl.txt 2); bash $S/tools/compare_all.sh ref ref2; compare_all.sh cand ctl_cturb; compare_all.sh cand ctl_mass"
+   },
+   {
+    "step": "L3 check_premise",
+    "cwd": "any",
+    "command": "CAND=$S/cand bash $S/tools/run_writer.sh cand premise results/premise.json check_premise.py   (the reference: run_writer.sh ref ... in $S/refw)"
+   },
+   {
+    "step": "L4 test_reward",
+    "cwd": "any",
+    "command": "bash $S/tools/run_l4.sh cand; bash $S/tools/run_l4.sh cand --road random; (and ref); cmp $S/L4/cand_stdout.txt $S/L4/ref_stdout.txt"
+   },
+   {
+    "step": "L5 check_roads, and finding 11's road checks",
+    "cwd": "any",
+    "command": "bash $S/tools/run_roads_review.sh   (--road extremes and --road wideair in $S/cand; the 40 terrain roads and check_random_road.py in $S/cand and $S/ref)"
+   },
+   {
+    "step": "L5 validate",
+    "cwd": "REPO and REF",
+    "command": "$PY validate.py > out.txt in each; cmp the two"
+   },
+   {
+    "step": "L5 generality",
+    "cwd": "any",
+    "command": "CAND=$S/cand bash $S/tools/run_writer.sh cand generality results/generality.json generality_test.py"
+   },
+   {
+    "step": "L5 derive_params",
+    "cwd": "any",
+    "command": "(cd $S/candd && $PY derive_params.py); $PY -I $S/tools/derived_check.py REPO/data/derived_params.json $S/L5/derived_params_DERIVED_cand.json $S/L5/derived_params_DERIVED_ref.json --json $S/L5/derived_check.json"
+   },
+   {
+    "step": "finding 2: build_dataset without a derived file",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/bd_dump.py $S/candd $S/F2/cand.npz <every logs/raw csv>; the same in $S/ref; $PY -I $S/tools/cmp.py $S/F2/ref.npz $S/F2/cand.npz --json $S/F2/cmp.json; new_drive.py on pull01 in both copies with the derived file moved aside"
+   },
+   {
+    "step": "finding 11: evaluate.py --protocol d2",
+    "cwd": "REPO and REF",
+    "command": "$PY evaluate.py --engine b58 --protocol d2 --out $S/F11/cand_d2.txt (REPO); $PY evaluate.py --protocol d2 --out $S/F11/ref_d2.txt (REF); $PY -I $S/tools/l7_diff.py $S/F11/ref_d2.txt NONE $S/F11/cand_d2.txt NONE --json $S/F11/d2_diff.json (no model: NONE); and REPO's evaluate.py --engine b58 --protocol d2 on the L7 scratch model: refused"
+   },
+   {
+    "step": "finding 11: the learning lab",
+    "cwd": "$S/cand/Explanatory Simulation",
+    "command": "npm ci; npm run build; $PY launch.py --no-browser (one window); $PY launch.py --check (another)"
+   },
+   {
+    "step": "L5 app suites and the learning lab's tests",
+    "cwd": "any",
+    "command": "bash $S/tools/run_app.sh cand; bash $S/tools/run_app_extra.sh cand; (cd REPO/app && node --test static/sim/*.test.mjs) > $S/app/cand_node_tests.txt"
+   },
+   {
+    "step": "L5 learning-lab outputs",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/lab_dump.py REPO $S/lab/lab_cand.json; $PY -I $S/tools/lab_compare.py $S/lab/lab_ref.json $S/lab/lab_cand.json   (controls: LAB_PERTURB=thermal.c_turb and thermal.c_turb:1e-9)"
+   },
+   {
+    "step": "L6 X1 agents",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/l6_agents.py REPO <tag> $S/L6/cand_<tag>.npz for the four tags; bash $S/tools/check_l6.sh; controls: HARNESS_PERTURB=car.mass / thermal.c_turb (5 episodes), car.mass:1e-9 / car.mass:1e-6 (2 episodes) for sighted_seed0, then l6_check.py"
+   },
+   {
+    "step": "L7 evaluate.py end to end",
+    "cwd": "REPO",
+    "command": "$PY -I $S/tools/make_meta.py REPO REPO/runs/extremes_dt1/sighted_seed0 $S/L7/cand_model/sighted_seed0; OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 $PY evaluate.py --engine b58 --out $S/L7/cand_eval.txt $S/L7/cand_model/sighted_seed0; $PY -I $S/tools/l7_diff.py $S/L7/ref_eval.txt REPO/runs/extremes_dt1/sighted_seed0 $S/L7/cand_eval.txt $S/L7/cand_model/sighted_seed0 --json $S/L7/l7_diff.json; $PY -I $S/tools/l7_expect.py $S/L7/cand_eval.txt"
+   },
+   {
+    "step": "L8 training",
+    "cwd": "any",
+    "command": "bash $S/tools/run_l8.sh, then l8_perturbed.py with car.mass:1e-9 and car.mass:1e-6; $PY -I $S/tools/l8_compare.py <ref run> <cand run> --json ... for each pair and each control; run_identities.json from each run's meta.json; then the run directories deleted"
+   },
+   {
+    "step": "suites",
+    "cwd": "any",
+    "command": "bash $S/tools/run_suites.sh; and test_epa_map.py with GRAD_EXTRA_DATA naming the MY2021 and MY2023 Test Car Lists fetched by fetch_engine_data.py --target <folder> --group epa-test-car-list"
+   },
+   {
+    "step": "drift_test",
+    "cwd": "REPO",
+    "command": "bash $S/tools/run_drift.sh   (python drift_test.py in parts, each with drift_test's own control); then, with the certificate's page, JSON and archive in REPO, $PY -I $S/tools/drift_control.py REPO $S/suites/drift_control_with_certificate.txt (drift_test.control() in a copy that holds them, after checking that git does not ignore them)"
+   },
+   {
+    "step": "the certificate",
+    "cwd": "any",
+    "command": "$PY -I $S/tools/make_archive.py REPO/results/B58_IDENTITY/certificate_tools.tar.gz; $PY -I $S/tools/make_cert.py REPO/results/B58_IDENTITY.json REPO/results/B58_IDENTITY/certificate_tools.tar.gz; $PY -I $S/tools/make_md.py REPO/results/B58_IDENTITY.json REPO/results/B58_IDENTITY.md (the archive is made after the drift control, whose output it holds, and before make_cert, which records its sha256; the drift control ran once more on the final files)"
+   }
+  ]
+ }
+}

@@ -1,0 +1,303 @@
+{
+ "_generated": "by epa_map.py from logs/epa/ -- never edit by hand; run `python epa_map.py`",
+ "engine_id": "honda_l15b7",
+ "engine_name": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel",
+ "alpha": {
+  "file": "logs/epa/honda_l15b7/7- engine_2016_Honda_L15B7_1L5_Tier2.m",
+  "sha256": "547b3d3ff56b8271481b985a0a6a70fc59e75638ceb60deff25b6a6bd62a1d80",
+  "generated": "16-May-2018 14:55:19",
+  "citation": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - ALPHA Map Package. Version 2018-05. Ann Arbor MI: US EPA National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2018.",
+  "fuel_tag": "FTAG 25842",
+  "process_document": "logs/epa/honda_l15b7/3- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - ALPHA Generation Process.html",
+  "process_sha256": "3d172964f6eaae1300ab590277b0bda1f4ea4f8a1816f917393d70c0fbb51828",
+  "inputs": [
+   {
+    "workbook": "4- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data.xlsx",
+    "sheet": "Steady State",
+    "table": "epa_steady.csv"
+   },
+   {
+    "workbook": "4- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data.xlsx",
+    "sheet": "High Load Initial",
+    "table": "epa_highload_initial.csv"
+   },
+   {
+    "workbook": "4- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data.xlsx",
+    "sheet": "Steady State with Transmission",
+    "table": null
+   }
+  ]
+ },
+ "displacement_l": 1.496,
+ "n_cylinders": 4,
+ "compression_ratio": 10.6,
+ "bore_mm": 73.0,
+ "stroke_mm": 89.4,
+ "geometry_notes": {
+  "bore_mm": "EPA's generation script (3- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - ALPHA Generation Process.html): 'enigne.bore_mm = 73;' -- misspelt 'enigne', so the assignment never reached the engine and the .m file has no bore_mm",
+  "stroke_mm": "the ALPHA engine file (7- engine_2016_Honda_L15B7_1L5_Tier2.m): engine.stroke_mm",
+  "epa_source": "Set physical characteristics based on published information: Wada, Y., Nakano, K., Mochizuki, K., and Hata, R., \"Development of a New 1.5L I4 Turbocharged Gasoline Direct Injection Engine,\" SAE Technical Paper 2016-01-1020, 2016, doi:10.4271/2016-01-1020.",
+  "compression_ratio": "geometric, from the .m; the workbook's 'Compression Ratio' channel (effective_compression_ratio) is EPA's estimate of the EFFECTIVE ratio from intake-valve closing, another quantity"
+ },
+ "displacement_from_bore_stroke_l": 1.496694324237613,
+ "wot_torque_curve": {
+  "speed_radps": [
+   0.0,
+   104.82447487477941,
+   131.00441365469436,
+   157.26795223911657,
+   168.02432201562254,
+   179.8212728329758,
+   210.70012400031695,
+   262.1847158301237,
+   314.42814040590815,
+   418.6604179898268,
+   471.45777176088114,
+   523.718635558978,
+   628.3185307179587,
+   659.7344572538566,
+   691.1503837897545
+  ],
+  "speed_rpm": [
+   0.0,
+   1000.9999999999999,
+   1250.9999999999998,
+   1501.7983193277305,
+   1604.5140845070423,
+   1717.166666666667,
+   2012.0379746835442,
+   2503.679611650485,
+   3002.5675675675675,
+   3997.9125,
+   4502.09009009009,
+   5001.144578313253,
+   6000.0,
+   6300.0,
+   6600.000000000001
+  ],
+  "torque_nm": [
+   0.0,
+   129.733,
+   138.889,
+   196.48857142857136,
+   216.1840845070422,
+   231.80737179487164,
+   237.22968354430384,
+   231.20378640776678,
+   232.98675675675668,
+   216.798375,
+   218.27288288288278,
+   213.47463855421688,
+   206.90142601946394,
+   177.34407944525483,
+   0.0
+  ],
+  "node_is_measured": [
+   false,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   false,
+   false,
+   false
+  ],
+  "measured_at_speed": [
+   null,
+   {
+    "table": "epa_steady.csv",
+    "source_row": 23,
+    "speed_rpm": 1001.0,
+    "torque_nm": 129.733
+   },
+   {
+    "table": "epa_steady.csv",
+    "source_row": 43,
+    "speed_rpm": 1251.0,
+    "torque_nm": 138.889
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 11,
+    "speed_rpm": 1501.7983193277312,
+    "torque_nm": 196.48857142857136
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 17,
+    "speed_rpm": 1604.5140845070423,
+    "torque_nm": 216.1840845070422
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 22,
+    "speed_rpm": 1717.1666666666667,
+    "torque_nm": 231.80737179487164
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 32,
+    "speed_rpm": 2012.0379746835442,
+    "torque_nm": 237.22968354430384
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 43,
+    "speed_rpm": 2503.6796116504856,
+    "torque_nm": 231.20378640776678
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 48,
+    "speed_rpm": 3002.5675675675675,
+    "torque_nm": 232.98675675675668
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 58,
+    "speed_rpm": 3997.9125,
+    "torque_nm": 216.798375
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 64,
+    "speed_rpm": 4502.09009009009,
+    "torque_nm": 218.27288288288278
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 70,
+    "speed_rpm": 5001.144578313253,
+    "torque_nm": 213.47463855421688
+   },
+   null,
+   null,
+   null
+  ],
+  "note": "ALPHA full-throttle curve. node_is_measured: the node is a point EPA measured, in the sheets it built the curve from (alpha.inputs). Where it is false the node is EPA's addition, named in its generation document: model rather than data (mistake 6). measured_at_speed: the highest torque measured within 30 rpm of the node, or null where EPA measured none"
+ },
+ "closed_throttle_torque_curve": {
+  "speed_radps": [
+   0.0,
+   104.82447487477941,
+   314.1592653589793,
+   471.1341782833493,
+   523.4940558431791,
+   691.1503837897545
+  ],
+  "speed_rpm": [
+   0.0,
+   1000.9999999999999,
+   3000.0,
+   4498.999999999999,
+   4998.999999999999,
+   6600.000000000001
+  ],
+  "torque_nm": [
+   -12.616064532266137,
+   -15.576,
+   -19.555,
+   -24.587,
+   -27.398,
+   -32.13212256128064
+  ],
+  "node_is_measured": [
+   false,
+   true,
+   true,
+   true,
+   true,
+   false
+  ],
+  "measured_at_speed": [
+   null,
+   {
+    "table": "epa_steady.csv",
+    "source_row": 6,
+    "speed_rpm": 1001.0,
+    "torque_nm": -15.576
+   },
+   {
+    "table": "epa_steady.csv",
+    "source_row": 117,
+    "speed_rpm": 3000.0,
+    "torque_nm": -19.555
+   },
+   {
+    "table": "epa_steady.csv",
+    "source_row": 168,
+    "speed_rpm": 4499.0,
+    "torque_nm": -24.587
+   },
+   {
+    "table": "epa_steady.csv",
+    "source_row": 183,
+    "speed_rpm": 4999.0,
+    "torque_nm": -27.398
+   },
+   null
+  ],
+  "note": "ALPHA closed-throttle (motoring) curve. node_is_measured as above; measured_at_speed: the lowest torque measured within 30 rpm of the node, or null where EPA measured none"
+ },
+ "alpha_fuel": {
+  "id": "FTAG 25842",
+  "description": "Tier 2 Cert",
+  "density_kgpL_15C": 0.74227,
+  "energy_density_MJpkg": 42.898,
+  "carbon_weight_fraction": 0.8665,
+  "gCO2pgal": 8921.2,
+  "energy_density_BTUplbm": 18443.0,
+  "specific_gravity": 0.74298
+ },
+ "tables": {
+  "epa_steady.csv": {
+   "workbook": "logs/epa/honda_l15b7/4- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data.xlsx",
+   "workbook_sha256": "0f9b8933bffffaa669b130e7747d7fde44237f7bcbd2b11b8d1a328dd88e1c8b",
+   "sheet": "Steady State",
+   "rows": 190,
+   "test_cell": "Test Cell 7",
+   "title": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data",
+   "fuel_report": "25842",
+   "citation": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data Package. Version 2018-05. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2018.",
+   "version_serial": 43194,
+   "version_date": "2018-04-04"
+  },
+  "epa_highload_initial.csv": {
+   "workbook": "logs/epa/honda_l15b7/4- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data.xlsx",
+   "workbook_sha256": "0f9b8933bffffaa669b130e7747d7fde44237f7bcbd2b11b8d1a328dd88e1c8b",
+   "sheet": "High Load Initial",
+   "rows": 65,
+   "test_cell": "Test Cell 7",
+   "title": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data",
+   "fuel_report": "25842",
+   "citation": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data Package. Version 2018-05. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2018.",
+   "version_serial": 43194,
+   "version_date": "2018-04-04"
+  },
+  "epa_highload_final.csv": {
+   "workbook": "logs/epa/honda_l15b7/4- 2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data.xlsx",
+   "workbook_sha256": "0f9b8933bffffaa669b130e7747d7fde44237f7bcbd2b11b8d1a328dd88e1c8b",
+   "sheet": "High Load Final",
+   "rows": 65,
+   "test_cell": "Test Cell 7",
+   "title": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data",
+   "fuel_report": "25842",
+   "citation": "2016 Honda 1.5L L15B7 Engine Tier 2 Fuel - Test Data Package. Version 2018-05. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2018.",
+   "version_serial": 43194,
+   "version_date": "2018-04-04"
+  }
+ },
+ "reference_only_columns": [
+  "exhaust_lambda",
+  "fuel_rail_press_mpa_gauge",
+  "spark_timing_cad_btdc"
+ ],
+ "status_definitions": {}
+}

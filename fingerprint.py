@@ -1,6 +1,7 @@
 """fingerprint.py — what plant produced this result, written down beside it.
 
-    from fingerprint import plant_fingerprint, compare, format_block
+    from fingerprint import plant_fingerprint, compare, format_block, BACKEND_CYCLE
+    live = plant_fingerprint(plant=engines.get("b58"), backend=BACKEND_CYCLE)
 
 WHY THIS FILE EXISTS
 --------------------
@@ -36,9 +37,11 @@ The audit measured that the 18 September sighted run started **26 seconds
 before** the commit that locked the scenario, from an uncommitted working tree.
 So `git rev-parse HEAD` describes a tree the run did not use. It is recorded
 anyway -- it is what a reader will look for -- but it is ADVISORY, and the
-fatal comparison is a SHA-256 over the actual bytes of `plant.py`,
-`thermal.py` and `engine_env.py`. Those three files are the physics. A dirty
-tree changes the hash; a commit that does not touch them does not.
+fatal comparison is a SHA-256 over what was actually on disk: the code of
+PLANT_CODE (`plant.py`, `thermal.py` and `engine_env.py`; `derived.py` joined on
+8 October 2026 and `engines.py` on 20 October) and the values of the passed
+plant's own typed specs (plant_files). Those are the physics. A dirty tree
+changes the hash; a commit that does not touch them does not.
 
 FATAL VERSUS ADVISORY, AND WHY `dt` IS NOT FATAL
 -------------------------------------------------
@@ -52,12 +55,20 @@ side by side instead, with the discrepancy named, so nobody has to remember it.
 Fatal means: the two runs are not about the same physical system, and comparing
 their numbers is meaningless.
 
-    plant_sha          the bytes of plant.py + thermal.py + engine_env.py
+    plant_sha          the code of PLANT_CODE (plant.py, thermal.py, engine_env.py,
+                       derived.py, engines.py) and the VALUES of the passed plant's
+                       own typed specs (plant_files: engine_specs/b58.toml and
+                       a90_supra.toml for the B58)
+    derived_sha        the plant's derived file (data/derived_params.json for the B58)
+    engine             the plant's id, engine and car ("b58b30o1/a90-supra-zf8hp51")
+    engine_sha         every value of the plant as built, from the live objects
+    backend            what computes the engine: "cycle", the 0-D cycle model;
+                       every caller says which (backend_of), none is assumed
     gears, final_drive the transmission
     dtheta_deg         the crank-angle integration step (AUDIT.md H1)
     turb_protect_k     the protection trigger; the damage knee
     oil_protect_k      the same for the oil node
-    scenario           grade / v_kmh / t_amb from make_grade_climb's defaults
+    scenario           grade / v_kmh / t_amb of the plant's locked climb
     episodes_sha       the twenty frozen evaluation episodes
 
 Advisory means: worth knowing, not worth refusing over.
@@ -69,6 +80,16 @@ Advisory means: worth knowing, not worth refusing over.
 TWENTY EPISODES ARE FROZEN and that changing the test set after seeing a result
 is "the one mistake this project cannot recover from". A frozen set that moves
 is exactly the event that must stop a run, not warn about one.
+
+SCHEMA 3, 20 OCTOBER 2026 (the four-engine build, decision 24). The plant is
+passed: plant_fingerprint(plant=engines.get(name)), and every plant field is
+read from it -- the gears, the final drive and the knees were class attributes
+and module constants of engine_env, the scenario make_grade_climb's defaults,
+the derived file the B58's by default. Three FATAL fields join: `engine`,
+`engine_sha` and `backend`. A schema-2 record names no engine, so it is refused
+with a message that says so (schema_problem), never matched to one implicitly:
+X1's and X2's agents are scored on main, and B58 agents trained on GRA-test are
+a new experiment (CLAUDE.md rule 5).
 """
 import ast
 import hashlib
@@ -80,19 +101,60 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# The files that ARE the physics. If any byte of these changes, two results are
-# not comparable, whatever the commit says. Order is fixed so the hash is.
-PLANT_FILES = ("plant.py", "thermal.py", "engine_env.py", "derived.py")
+# The code that IS the physics, whatever the engine. If any of it changes, two
+# results are not comparable, whatever the commit says. Order is fixed so the
+# hash is. engines.py joined on 20 October 2026 (schema 3), and with it each
+# plant's typed specs, which plant_files appends: a spec is hashed by its
+# VALUES, not its labels and sources (_file_code).
+PLANT_CODE = ("plant.py", "thermal.py", "engine_env.py", "derived.py", "engines.py")
+
+
+def plant_files(name):
+    """The files the plant registered as `name` (engines.PLANTS) is hashed by, in
+    order: PLANT_CODE, then that plant's own typed specs (engines.spec_files).
+
+    Until 21 October 2026 this was one tuple, PLANT_FILES, naming the B58's two
+    specs for every plant: an edit to the B58's spec would have moved every
+    engine's plant_sha, and an edit to another engine's spec none (the review of
+    build step 1). The B58's list is the tuple it was."""
+    import engines
+    return PLANT_CODE + engines.spec_files(name)
 
 # Fields whose disagreement makes two numbers incomparable. Everything else in
 # the block is printed for the reader and never refused over.
-FATAL = ("plant_sha", "derived_sha", "gears", "final_drive", "dtheta_deg", "turb_protect_k",
-         "oil_protect_k", "scenario", "episodes_sha")
+FATAL = ("plant_sha", "derived_sha", "engine", "engine_sha", "backend", "gears", "final_drive",
+         "dtheta_deg", "turb_protect_k", "oil_protect_k", "scenario", "episodes_sha")
 
 # 2 since 8 October 2026 (conflict.md decision 2, agreed by Jad and Ghassan):
 # the derived constants are fatal (derived_sha), derived.py is a plant file, and
 # the code hash no longer depends on the Python version (_code_only).
-SCHEMA_VERSION = 2
+# 3 since 20 October 2026 (the four-engine build): the plant is passed, and
+# engine, engine_sha and backend are fatal. See the module docstring.
+SCHEMA_VERSION = 3
+
+# What computes the engine. Only the 0-D cycle model exists; decision 28 would
+# add a tabulated backend ("table:<sha>"), recorded separately for training and
+# for scoring. plant_fingerprint has no default for it (21 October 2026, the
+# review of build step 1): a FATAL field filled from a keyword default would
+# record "cycle" for a table-trained agent whose caller forgot to say so, and the
+# comparison would then pass it (mistake 19).
+BACKEND_CYCLE = "cycle"
+
+
+def backend_of(env):
+    """The backend of a SupervisoryTunerEnv (or anything with its `engine`
+    attribute): the 0-D cycle model when it was given no engine_model, which is
+    every environment this project builds. An engine_model has no backend name
+    yet (decision 28 would give it one), so it is refused, never called "cycle";
+    so is an object with no `engine` at all (a wrapper: pass env.unwrapped)."""
+    if not hasattr(env, "engine"):
+        raise TypeError(f"backend_of needs the SupervisoryTunerEnv itself (env.unwrapped), "
+                        f"not a {type(env).__name__}")
+    if env.engine is None:
+        return BACKEND_CYCLE
+    raise ValueError(f"the environment computes its engine with {type(env.engine).__name__}, which "
+                     "has no backend name (decision 28); fingerprint.py records only "
+                     f"{BACKEND_CYCLE!r}, the 0-D cycle model")
 
 
 def _code_only(src):
@@ -128,6 +190,16 @@ def _code_only(src):
     If the source does not parse, the byte hash is used instead -- a file that
     cannot be parsed is a file this project cannot run, and the caller will
     find that out one line later.
+
+    A TYPED SPEC IS HASHED BY ITS VALUES (20 October 2026), by _file_code, which
+    picks the rule by the file's kind: engine_specs/*.toml is not Python, and
+    for it the "code" is every value with its label, source and unit dropped
+    (_spec_values), so correcting a source moves nothing and a changed number
+    moves the hash -- the same rule, one level over. Until 21 October 2026 the
+    spec rule was this function's fallback for text that failed to parse as
+    Python, and the same spec written as TOML tables ([geometry.bore] then
+    value = ..., which engines.read_spec reads alike) parses as Python, so a
+    source correction moved plant_sha (the review of build step 1).
 
     THE FORM CHANGED ON 8 OCTOBER 2026, and the reason is the same argument one
     level down. `ast.dump` is not a stable format: Python 3.12 and 3.13 print the
@@ -176,6 +248,35 @@ def _code_only(src):
     return "\n".join(out)
 
 
+def _spec_values(src):
+    """A typed spec's values as canonical text (engines.read_spec's format):
+    every { value = ..., ... } entry reduced to its value, top-level keys kept.
+    None when `src` is not such a TOML file."""
+    import tomllib
+    try:
+        raw = tomllib.loads(src)
+    except (tomllib.TOMLDecodeError, TypeError):
+        return None
+
+    def values(node):
+        if isinstance(node, dict):
+            if "value" in node and set(node) <= {"value", "label", "source", "unit"}:
+                return node["value"]
+            return {k: values(v) for k, v in node.items()}
+        return node
+    return json.dumps(values(raw), sort_keys=True)
+
+
+def _file_code(name, src):
+    """What plant_sha hashes of the file `name` holding `src`, or None for its
+    bytes: a typed spec (.toml) by its values (_spec_values), anything else as
+    Python by its code (_code_only). By the file's kind, not by whether the text
+    happens to parse as Python (_code_only's docstring)."""
+    if name.endswith(".toml"):
+        return _spec_values(src)
+    return _code_only(src)
+
+
 def _sha_files(names, code_only=True):
     """SHA-256 over `names`, in the given order.
 
@@ -195,7 +296,8 @@ def _sha_files(names, code_only=True):
     refusal itself. Measured: the CRLF and LF forms of this tree hash
     identically once normalised, and still differ after a one-constant edit.
 
-    `code_only` additionally drops comments and docstrings -- see `_code_only`.
+    `code_only` additionally drops comments and docstrings, and a typed spec's
+    labels and sources -- see `_code_only` and `_file_code`.
     """
     h = hashlib.sha256()
     for n in names:
@@ -203,7 +305,7 @@ def _sha_files(names, code_only=True):
         with open(p, "rb") as fh:
             raw = fh.read().replace(b"\r\n", b"\n")
         if code_only:
-            code = _code_only(raw.decode("utf-8", errors="replace"))
+            code = _file_code(n, raw.decode("utf-8", errors="replace"))
             h.update(code.encode("utf-8") if code is not None else raw)
         else:
             h.update(raw)
@@ -244,16 +346,18 @@ def episodes_sha(protocol="phase-d"):
     return hashlib.sha256(repr(_episode_set(protocol)).encode()).hexdigest()[:16]
 
 
-def derived_sha(path=None):
-    """A hash of data/derived_params.json's VALUES (keys starting with "_" are
+def derived_sha(path):
+    """A hash of a derived file's VALUES (keys starting with "_" are
     bookkeeping: inputs, timestamps). Since 28 September the plant's thermal,
     boost, spark, enrichment and gearbox constants live there; since 8 October
     a change to them is fatal, like a change to the code (conflict.md decision 2).
 
-    `path` hashes another copy of the file instead; test_plant_guards.py uses it
-    to show that one changed constant moves the hash and a timestamp does not,
+    `path` is REQUIRED (20 October 2026): it defaulted to the B58's file,
+    data/derived_params.json, for every engine. The fingerprint hashes the
+    plant's own (plant.engine.derived); test_plant_guards.py hashes a copy to
+    show that one changed constant moves the hash and a timestamp does not,
     without touching the real file."""
-    p = path or os.path.join(HERE, "data", "derived_params.json")
+    p = path
     try:
         with open(p, encoding="utf-8") as fh:
             d = json.load(fh)
@@ -263,66 +367,80 @@ def derived_sha(path=None):
     return hashlib.sha256(json.dumps(vals, sort_keys=True).encode()).hexdigest()[:16]
 
 
-def plant_fingerprint(protocol="phase-d", **advisory):
+def plant_fingerprint(protocol="phase-d", *, plant, backend, **advisory):
     """The block, built from the LIVE objects. Never from a literal.
 
-    Every value here is read out of the imported module at the moment of the
-    call, which is the point: a fingerprint typed as a constant would drift the
-    same way the header string did.
+    Every value here is read out of the plant passed in and the imported
+    modules at the moment of the call, which is the point: a fingerprint typed
+    as a constant would drift the same way the header string did. `plant` (an
+    engines.Plant) is REQUIRED (schema 3, 20 October 2026), and so is `backend`,
+    what computes its engine (backend_of(env), or BACKEND_CYCLE from a caller
+    whose episodes run the 0-D cycle model): it was a keyword default until 21
+    October 2026. plant_sha hashes the code and the passed plant's own specs
+    (plant_files, by engines.name_of).
 
     `protocol` selects the experiment, and it changes two FATAL fields:
 
-        phase-d   scenario = make_grade_climb's (grade, v_kmh, t_amb) defaults
+        phase-d   scenario = the plant's locked climb, (grade, v_kmh, t_amb)
+                  (make_grade_climb's defaults until 20 October 2026)
                   episodes_sha = evaluate.EPISODES
-                  -- byte-for-byte what this function returned before Phase D2
-                  existed, so the sixteen Phase D agents still match.
         d2        scenario = random_road.spec(): the two ranges, speed,
                   ambient and a hash of random_road.py's own code
                   episodes_sha = evaluate.EPISODES_D2
 
     So a Phase D agent scored under D2, or the reverse, is REFUSED on
     `scenario` -- which is correct: neither number would belong to either
-    experiment. `plant_sha` is shared and does not move, because Phase D2 is
-    built as a wrapper and `engine_env.py` is untouched (see random_road.py).
+    experiment.
     """
-    import inspect
-
-    import engine_env as E
+    import engines
     import evaluate as V
     from plant import DTHETA_DEG
 
+    if plant is None:
+        raise TypeError("plant_fingerprint(plant=engines.get(name)): there is no default engine")
+    if backend != BACKEND_CYCLE:
+        raise ValueError(f"backend {backend!r}: only {BACKEND_CYCLE!r}, the 0-D cycle model, exists "
+                         "(decision 28 would add a table)")
+    files = plant_files(engines.name_of(plant))
     if protocol == "phase-d":
-        sig = inspect.signature(E.make_grade_climb).parameters
-        scenario = {k: float(sig[k].default) for k in ("grade", "v_kmh", "t_amb")}
+        sc = plant.scenario
+        scenario = {"grade": float(sc.grade), "v_kmh": float(sc.v_kmh), "t_amb": float(sc.t_amb)}
     elif protocol == "d2":
         import random_road as RR
         scenario = RR.spec()
     else:
         raise ValueError(f"unknown protocol {protocol!r}; expected 'phase-d' or 'd2'")
 
-    dirty = _git("status", "--porcelain")
+    # --untracked-files=all (20 October 2026): without it git folds a new
+    # directory into one line ("?? engine_specs/"), and the typed specs, plant
+    # files since schema 3, were missing from git_dirty_plant_files while untracked
+    dirty = _git("status", "--porcelain", "--untracked-files=all")
     dirty_plant = sorted(
-        n for n in PLANT_FILES
+        n for n in files
         if dirty and any(line[3:].strip().endswith(n) for line in dirty.splitlines())
     )
 
     fp = {
         "schema": SCHEMA_VERSION,
         # --- fatal -----------------------------------------------------------
-        "plant_sha": _sha_files(PLANT_FILES),
+        "plant_sha": _sha_files(files),
         # --- advisory, but it belongs beside its fatal twin ------------------
         # The byte hash moves when a comment or a docstring moves and the code
         # does not. It is recorded so a reader can see the file changed at all;
         # it is NOT compared, for the reason `_code_only` sets out.
-        "plant_text_sha": _sha_files(PLANT_FILES, code_only=False),
-        # The constants the logs set live in data/derived_params.json, not in
+        "plant_text_sha": _sha_files(files, code_only=False),
+        # The constants the logs set live in the plant's derived file, not in
         # the files above: a new drive changes the plant without touching them.
-        "derived_sha": derived_sha(),
-        "gears": [float(g) for g in E.Vehicle.gears],
-        "final_drive": float(E.Vehicle.final_drive),
+        "derived_sha": derived_sha(os.path.join(HERE, plant.engine.derived)),
+        # which plant, and every value it was built with (schema 3)
+        "engine": plant.id,
+        "engine_sha": engines.engine_sha(plant),
+        "backend": backend,
+        "gears": [float(g) for g in plant.car.gears],
+        "final_drive": float(plant.car.final_drive),
         "dtheta_deg": float(DTHETA_DEG),
-        "turb_protect_k": float(E.TURB_PROTECT_K),
-        "oil_protect_k": float(E.OIL_PROTECT_K),
+        "turb_protect_k": float(plant.engine.damage.turb_knee_k),
+        "oil_protect_k": float(plant.engine.damage.oil_knee_k),
         "scenario": scenario,
         "episodes_sha": episodes_sha(protocol),
         # --- advisory --------------------------------------------------------
@@ -342,11 +460,30 @@ def plant_fingerprint(protocol="phase-d", **advisory):
     return fp
 
 
+def schema_problem(stored):
+    """Why a stored fingerprint cannot be compared with this tree's, or None.
+
+    A record of an older schema names no engine (schema 3, 20 October 2026):
+    comparing it field by field would list engine, engine_sha and backend as
+    "mismatches" and hide the reason, so the callers ask this first and refuse
+    with its message."""
+    s = stored.get("schema")
+    if s == SCHEMA_VERSION:
+        return None
+    return (f"its meta.json is fingerprint schema {s}, written before the four-engine "
+            f"build; this tree writes schema {SCHEMA_VERSION}. A schema-{s} record names no "
+            "engine (no engine, engine_sha or backend), and none is assumed for it. Agents "
+            "trained before 20 October 2026 -- X1's and X2's among them -- are scored on "
+            "main; a B58 agent trained on this tree is a new experiment (CLAUDE.md rule 5).")
+
+
 def compare(a, b):
     """Fields on which two fingerprints disagree, as (field, a, b) triples.
 
     FATAL fields only. `a` is conventionally the stored one (meta.json) and `b`
     the live one, and the caller decides what to do about a non-empty list.
+    A stored record of an older schema lacks the schema-3 fields, so they show
+    here as disagreements; ask schema_problem first for the reason.
     """
     out = []
     for k in FATAL:
@@ -551,5 +688,13 @@ def read(path):
 
 
 if __name__ == "__main__":
-    print(format_block(plant_fingerprint(), "PLANT FINGERPRINT (live)"))
+    import argparse
+    import engines
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--engine", required=True, choices=engines.known())
+    ap.add_argument("--protocol", default="phase-d", choices=("phase-d", "d2"))
+    a = ap.parse_args()
+    # every environment this tree builds runs the 0-D cycle model (backend_of)
+    print(format_block(plant_fingerprint(a.protocol, plant=engines.get(a.engine), backend=BACKEND_CYCLE),
+                       "PLANT FINGERPRINT (live)"))
     sys.exit(0)

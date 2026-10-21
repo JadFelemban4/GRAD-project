@@ -186,7 +186,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # AUDIT.md L1: both protection limits are imported, not re-typed. 408.0 used to
 # be a literal here and a second literal in engine_env's damage function.
-from engine_env import TURB_PROTECT_K, OIL_PROTECT_K   # noqa: E402
+# Since 20 October 2026 they are the damage knees of the engine this app reads,
+# the B58, from its record (they were engine_env's module constants).
+import engines  # noqa: E402
+TURB_PROTECT_K = engines.get("b58").engine.damage.turb_knee_k
+OIL_PROTECT_K = engines.get("b58").engine.damage.oil_knee_k
 LEAD_S = 30.0                  # how far ahead we project the thermal trend
 
 # -- mismatch gates. See the long note in the module docstring. --------------

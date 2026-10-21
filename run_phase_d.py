@@ -1,8 +1,11 @@
 """run_phase_d.py — launch Phase D's sixteen training runs in parallel.
 
-    python run_phase_d.py              seeds 0-7, both arms, 50 000 steps
-    python run_phase_d.py --seeds 0 1  a subset
-    python run_phase_d.py --dry-run    print the commands and stop
+    python run_phase_d.py --engine b58              seeds 0-7, both arms, 50 000 steps
+    python run_phase_d.py --engine b58 --seeds 0 1  a subset
+    python run_phase_d.py --engine b58 --dry-run    print the commands and stop
+
+--engine is required (20 October 2026) and passed on to every train.py and
+evaluate.py it launches: neither has a default plant.
 
 WHY IN PARALLEL, AND WHY THAT IS NOT A SHORTCUT
 ------------------------------------------------
@@ -28,7 +31,7 @@ any of these runs started, which is the only thing that makes them evidence.
 
 C4, AND THE THREE THINGS THIS FILE WILL NO LONGER DO   (23 September 2026)
 --------------------------------------------------------------------------
-    python run_phase_d.py --road random --steps 300000 --out runs_c4 --dry-run
+    python run_phase_d.py --engine b58 --road random --steps 300000 --out runs_c4 --dry-run
 
 Preparing C4 -- Phase D2's design at 300 000 steps -- found that this launcher
 could destroy the two experiments before it, and that nothing would have said
@@ -233,6 +236,9 @@ def _free_gb():
 
 def main():
     ap = argparse.ArgumentParser()
+    import engines
+    ap.add_argument("--engine", required=True, choices=engines.known(),
+                    help="the plant, passed to every train.py and evaluate.py (no default)")
     ap.add_argument("--seeds", type=int, nargs="*", default=None,
                     help="default 0-7. Duplicates are dropped. REQUIRED with "
                          "--restart-crashed, which must name the seed it means")
@@ -334,7 +340,7 @@ def main():
             if missing:
                 blocked.append(f"{tag}: no final.zip in {', '.join(missing)}")
                 continue
-            argv = [sys.executable, "evaluate.py", "--out", res,
+            argv = [sys.executable, "evaluate.py", "--engine", a.engine, "--out", res,
                     "--protocol", "d2" if d2 else "phase-d"]
             if res_prefix != default_prefix:
                 # evaluate.py titles its report by PROTOCOL, and C4 is scored
@@ -374,7 +380,7 @@ def main():
                             f"--seeds {s} --restart-crashed")
                         continue
                     crashed.append((tag, d))
-                argv = [sys.executable, "train.py", "--steps", str(a.steps),
+                argv = [sys.executable, "train.py", "--engine", a.engine, "--steps", str(a.steps),
                         "--seed", str(s), "--out", a.out, "--road", a.road]
                 if blind:
                     argv.append("--no-preview")
@@ -565,9 +571,9 @@ def main():
             print("A crashed run of a new experiment is re-run FROM SCRATCH, "
                   "once its process is gone:\n  python run_phase_d.py "
                   f"--road {a.road} --steps {a.steps} --out {a.out} "
-                  "--seeds <k> --restart-crashed")
+                  "--seeds <k> --restart-crashed --engine " + a.engine)
         return 1
-    road = f" --road {a.road}"
+    road = f" --engine {a.engine} --road {a.road}"
     out = f" --out {a.out}"
     if a.evaluate:
         print(f"\nnext: python {ANALYSIS.get(res_prefix, '<the experiment analysis script>')}")

@@ -101,15 +101,26 @@ see wide_air.py.
 THE BAND ROAD IS RAMPED (8 October). Its 9.3 % arrived as a one-step jump at
 30 s until then; every grade change in the project is ramped over GRADE_RAMP_S
 now, the fourth step agreed on 30 September.
+
+THE PLANT IS NAMED (20 October 2026, the four-engine build). Every check runs
+on the B58 in its Supra, passed explicitly (PLANT): the band grade and the D2
+notch below are that car's, measured on its gearbox, so this gate is the B58's.
+The step of the fixed-road rollouts, 0.2 s, is passed explicitly too; it was
+the default of both the environment and make_grade_climb. Another engine gets
+its own gate (test_reward.py --engine, a later step), with its own band and notch.
 """
 import argparse
 from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 
+import engines
 from engine_env import (ExtremesTrainingEnv, GRADE_RAMP_S, SupervisoryTunerEnv,
-                        TerrainTrainingEnv, Vehicle, make_grade_climb,
+                        TerrainTrainingEnv, Vehicle, locked_climb,
                         measure_deliverable_torque, neutral_action, TRACK_TOL)
+
+PLANT = engines.get("b58")
+FIXED_DT = 0.2           # the fixed-road rollouts' step (Phase D's), as it always was
 
 # The grade the old shift rule could not serve at 130 km/h ON THE PLANT OF
 # 27 SEPTEMBER: 8th was asked for 366 Nm, under the 375 Nm downshift threshold,
@@ -158,10 +169,11 @@ def roll(action_fn, duration, seed=1, cycle=None, log=None):
     """Mean reward over one episode. Pass a list as `log` to also collect
     (t, reward, tracking error) per step; the rollout itself is unchanged."""
     env = SupervisoryTunerEnv(cycle if cycle is not None
-                              else make_grade_climb(duration=duration), seed=0)
+                              else locked_climb(PLANT, duration=duration, dt=FIXED_DT),
+                              plant=PLANT, dt=FIXED_DT, seed=0)
     obs, _ = env.reset(seed=seed)
     rs = []
-    for _ in range(int(duration / 0.2) + 5):
+    for _ in range(int(duration / FIXED_DT) + 5):
         t = env.k * env.dt
         obs, r, term, trunc, info = env.step(action_fn(env, obs))
         rs.append(r)
@@ -186,11 +198,11 @@ def obs_differs_without_preview(duration, cycle_fn=None, start_s=180.0):
     10 s after that start instead of at the fixed 190 s.
     """
     a = true_neutral()
-    n_steps = int(min(duration - 5.0, start_s + 10.0) / 0.2)
+    n_steps = int(min(duration - 5.0, start_s + 10.0) / FIXED_DT)
     seen = []
     for use_preview in (True, False):
-        cyc = cycle_fn() if cycle_fn is not None else make_grade_climb(duration=duration)
-        env = SupervisoryTunerEnv(cyc, use_preview=use_preview, seed=0)
+        cyc = cycle_fn() if cycle_fn is not None else locked_climb(PLANT, duration=duration, dt=FIXED_DT)
+        env = SupervisoryTunerEnv(cyc, plant=PLANT, dt=FIXED_DT, use_preview=use_preview, seed=0)
         obs, _ = env.reset(seed=1)
         for _ in range(n_steps):
             obs, *_ = env.step(a)
@@ -235,7 +247,7 @@ def _d2_job(job):
     kind, start_s, grade, dur = job
 
     def cyc():
-        return RR.climb(start_s, grade, duration=dur, dt=0.2)
+        return RR.climb(start_s, grade, duration=dur, dt=FIXED_DT)
 
     if kind == "preview":
         d, _ = obs_differs_without_preview(dur, cycle_fn=cyc, start_s=start_s)
@@ -303,20 +315,20 @@ def road_roll(job):
     kind, seed, policy, duration = job
     act = true_neutral() if policy == "neutral" else torque_starver()
     if kind == "band":
-        c = make_grade_climb(duration=duration, dt=1.0)
+        c = locked_climb(PLANT, duration=duration, dt=1.0)
         c["grade"] = BAND_GRADE * np.clip((c["t"] - 30.0) / GRADE_RAMP_S, 0.0, 1.0)
-        env = SupervisoryTunerEnv(c, dt=1.0, seed=seed)
+        env = SupervisoryTunerEnv(c, plant=PLANT, dt=1.0, seed=seed)
         env.reset(seed=seed)
     elif kind.startswith("x-"):
-        env = ExtremesTrainingEnv(duration=duration, dt=1.0, seed=seed)
+        env = ExtremesTrainingEnv(duration=duration, dt=1.0, seed=seed, plant=PLANT)
         env.reset(seed=seed, options={"family": kind[2:]})
     elif kind.startswith("w-"):
         from wide_air import WideAirTrainingEnv
         fam, t_c, p_k = kind[2:].split("@")
-        env = WideAirTrainingEnv(duration=duration, dt=1.0, seed=seed)
+        env = WideAirTrainingEnv(duration=duration, dt=1.0, seed=seed, plant=PLANT)
         env.reset(seed=seed, options={"family": fam, "t_amb_c": float(t_c), "p_kpa": float(p_k)})
     else:
-        env = TerrainTrainingEnv(duration=duration, dt=1.0, seed=seed)
+        env = TerrainTrainingEnv(duration=duration, dt=1.0, seed=seed, plant=PLANT)
         env.reset(seed=seed, options={"family": kind})
     rs, errs = [], []
     while True:
@@ -375,8 +387,8 @@ def main():
 
     # The shift rule's table must still describe the plant it was measured on.
     probe = [1600, 2200, 2600, 3200, 4400]
-    table = dict(Vehicle().DELIVERABLE_TORQUE)     # derived: data/derived_params.json
-    fresh = dict(measure_deliverable_torque(probe))
+    table = dict(Vehicle(PLANT.car).DELIVERABLE_TORQUE)     # derived: data/derived_params.json
+    fresh = dict(measure_deliverable_torque(probe, plant=PLANT))
     drift = max(abs(fresh[r] - table[r]) / table[r] for r in probe)
 
     road = {}

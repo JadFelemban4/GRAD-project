@@ -1,10 +1,17 @@
 """evaluate.py — Phase D's evaluation protocol. TWENTY FIXED EPISODES.
 
-    python evaluate.py                          the hand-written policies only
-    python evaluate.py runs/sighted_seed0        add one trained agent
-    python evaluate.py runs/sighted_seed0 runs/blind_seed0    sighted vs blinded
-    python evaluate.py --out results/<new file>.txt runs/... runs/...
+    python evaluate.py --engine b58                          the hand-written policies only
+    python evaluate.py --engine b58 runs/sighted_seed0        add one trained agent
+    python evaluate.py --engine b58 runs/sighted_seed0 runs/blind_seed0    sighted vs blinded
+    python evaluate.py --engine b58 --out results/<new file>.txt runs/... runs/...
                                                (an existing --out is refused)
+
+--engine IS REQUIRED (20 October 2026, decision 24: the H/tau test runs four
+engines). It names the plant the episodes run on (engines.get), and the
+fingerprint's FATAL `engine` and `engine_sha` fields then refuse a model trained
+on another. A meta.json of fingerprint schema 2 -- every agent trained before the
+four-engine build, X1's and X2's among them -- names no engine and is refused
+with a message that says so: those agents are scored on main.
 
 EVERY RESULT CARRIES THE PLANT THAT PRODUCED IT   (AUDIT2.md C2-1)
 ------------------------------------------------------------------
@@ -24,7 +31,8 @@ here. (Those are the 19-21 September plant's figures. On the plant of
 8 October -- derived from the logs, merged 30 September, the thermal network
 sub-stepped and the climb ramped -- the baseline row is 848.1 at 883 C.)
 
-So the scenario line is now built from `inspect.signature(make_grade_climb)`
+So the scenario line is now built from the plant's own scenario (it was
+`inspect.signature(make_grade_climb)`'s defaults until 20 October 2026)
 rather than typed, and a full fingerprint block (gear ratios, final drive,
 crank-angle step, protection trigger, scenario tuple, a hash of the twenty
 frozen episodes, the SHA of the three physics files) is printed, written into
@@ -43,11 +51,11 @@ THE HEADER IS ALSO CHECKED AGAINST THE CYCLE   (JMF-2340550, 3207727)
 ----------------------------------------------------------------------
 The other branch removed the same literal a different way: it read the
 scenario off the cycle object. Both are kept. `scenario_line` states the
-declared defaults -- the source fingerprint.py's FATAL `scenario` field uses,
-so the header and the refusal cannot disagree -- and then builds the cycle
+plant's declared scenario -- the source fingerprint.py's FATAL `scenario` field
+uses, so the header and the refusal cannot disagree -- and then builds the cycle
 exactly as `run_episode` builds it (`episode_cycle`) and refuses to print a
-header the cycle does not carry. A default the function body stopped honouring
-would otherwise pass unseen.
+header the cycle does not carry. A declared value the road builder stopped
+honouring would otherwise pass unseen.
 
 DAMAGE TWO WAYS   (JMF-2340550, cbb8d09)
 ----------------------------------------
@@ -116,16 +124,15 @@ supervision helps; only beating `current-grade` proves the PREVIEW helped. See
 AUDIT.md C3.
 """
 import argparse
-import inspect
 import os
 
 import numpy as np
 
 import check_premise as C
+import engines
 import fingerprint as FP
 import random_road as RR
-from engine_env import (SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K,
-                        damage_rate)
+from engine_env import SupervisoryTunerEnv, damage_rate, locked_climb
 
 DT = 1.0
 DURATION = 720.0
@@ -232,31 +239,34 @@ def new_record():
     return step_record.new()
 
 
-def episode_cycle(road=None):
+def episode_cycle(road=None, *, plant):
     """The cycle an evaluation episode runs on -- ONE definition, used by
     run_episode and by scenario_line's check, so the header cannot describe a
     road the episodes did not drive.
 
-    `road` is None for Phase D's fixed climb, or a (start_s, grade) pair for a
-    Phase D2 episode -- in which case the cycle is built by random_road.climb,
-    the same function training draws through, so there is one definition of a
-    D2 road and not two.
+    `road` is None for Phase D's fixed climb -- the plant's locked climb -- or a
+    (start_s, grade) pair for a Phase D2 episode -- in which case the cycle is
+    built by random_road.climb, the same function training draws through, so
+    there is one definition of a D2 road and not two. `plant` is required.
     """
     if road is None:
-        return make_grade_climb(duration=DURATION, dt=DT)
+        return locked_climb(plant, duration=DURATION, dt=DT)
+    # D2's roads are built from random_road's constants, the Supra's locked
+    # climb, not from the plant: another car's is refused (21 October 2026)
+    RR.check_plant(plant)
     return RR.climb(road[0], road[1], duration=DURATION, dt=DT)
 
 
-def run_episode(policy, seed, weights, use_preview=True, road=None, record=None):
+def run_episode(policy, seed, weights, use_preview=True, road=None, record=None, *, plant):
     """One episode with the weights PINNED after reset, so every policy sees
     the same ruler on the same episode.
 
     `road`: see episode_cycle. `record`, if given (new_record()), receives
     every step: the action, what the actuators did, the observation and the
     engine's state. It only reads; the scores are identical with or without it
-    (record_agents.py checks).
+    (record_agents.py checks). `plant` (engines.get) is required.
     """
-    env = SupervisoryTunerEnv(episode_cycle(road), dt=DT, seed=seed,
+    env = SupervisoryTunerEnv(episode_cycle(road, plant=plant), plant=plant, dt=DT, seed=seed,
                               use_preview=use_preview)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)   # override the fresh draw
@@ -274,7 +284,7 @@ def run_episode(policy, seed, weights, use_preview=True, road=None, record=None)
         # without its knock term, because the knock model is untested against
         # this car. A REPORTING column only -- the episode, the policy and the
         # reward are untouched.
-        thermal += damage_rate(info["t_turb"], info["t_oil"]) * env.dt
+        thermal += damage_rate(info["t_turb"], info["t_oil"], cal=plant.engine.damage) * env.dt
         if term or trunc:
             break
     s = info["episode_summary"]
@@ -297,13 +307,16 @@ def summarise(rows, key):
     return med, q3 - q1, v.max(), v.min()
 
 
-def scenario_line(protocol="phase-d"):
-    """The scenario sentence, READ FROM THE CYCLE FUNCTION rather than typed.
+def scenario_line(protocol="phase-d", *, plant):
+    """The scenario sentence, READ FROM THE PLANT rather than typed.
 
     AUDIT2.md C2-1 and H2-10. The literal this replaces was identical on the
     six-speed and on the ZF, which is why `results/phase_d_seed0.txt` cannot be
     told apart from a run on a plant that no longer exists. A sentence built
-    from `inspect.signature` changes when the experiment changes.
+    from the declared scenario changes when the experiment changes. It was read
+    from `inspect.signature(make_grade_climb)`'s defaults until 20 October 2026;
+    it is the plant's scenario now (engines.Scenario), the same source the
+    fingerprint's FATAL `scenario` field reads.
 
     For Phase D2 it is built from `random_road.RANGES` for the same reason.
 
@@ -321,16 +334,14 @@ def scenario_line(protocol="phase-d"):
         return (f"scenario: climb from {s0:.0f}-{s1:.0f} s at {100 * g0:.0f}-"
                 f"{100 * g1:.0f} %, per episode, {RR.V_KMH:.0f} km/h, "
                 f"{RR.T_AMB_K - 273.15:.0f} C, {DURATION:.0f} s, dt {DT}")
-    d = inspect.signature(make_grade_climb).parameters
-    grade = float(d["grade"].default)
-    v = float(d["v_kmh"].default)
-    t_amb = float(d["t_amb"].default)
-    c = episode_cycle()
+    sc = plant.scenario
+    grade, v, t_amb = float(sc.grade), float(sc.v_kmh), float(sc.t_amb)
+    c = episode_cycle(plant=plant)
     seen = (float(np.max(c["grade"])), float(np.max(c["v_mps"]) * 3.6), float(c["t_amb"]))
     if not np.allclose(seen, (grade, v, t_amb), rtol=0.0, atol=1e-6):
-        raise SystemExit(f"make_grade_climb declares (grade, km/h, K) = "
+        raise SystemExit(f"the plant declares (grade, km/h, K) = "
                          f"{(grade, v, t_amb)} but the cycle run_episode drives "
-                         f"carries {seen}. Fix the function before scoring on it.")
+                         f"carries {seen}. Fix locked_climb before scoring on it.")
     return (f"scenario: {100 * grade:.0f} % at {v:.0f} km/h, "
             f"{t_amb - 273.15:.0f} C, {DURATION:.0f} s, dt {DT}")
 
@@ -356,6 +367,16 @@ def check_model_fingerprint(path, live, force):
             raise SystemExit(msg)
         print(msg)
         return [f"!! {path}: NO meta.json -- plant unknown, --force-plant-mismatch used"]
+
+    # A fingerprint written before schema 3 names no engine (20 October 2026).
+    # It is refused with its own message, never compared field by field into a
+    # list of "mismatches" that hides the reason.
+    old = FP.schema_problem(stored)
+    if old:
+        if not force:
+            raise SystemExit(f"\nREFUSING to evaluate {path}: {old}")
+        print(old)
+        return [f"!! {path}: {old} --force-plant-mismatch used; the rows below are NOT a result"]
 
     bad = FP.compare(stored, live)
     if not bad:
@@ -398,6 +419,9 @@ def main():
     ap.add_argument("models", nargs="*",
                     help="runs/<tag> directories; 'blind' in the name means "
                          "the preview channel was zeroed during training")
+    ap.add_argument("--engine", required=True, choices=engines.known(),
+                    help="the plant the episodes run on (engines.get). REQUIRED: "
+                         "there is no default engine (CLAUDE.md mistake 1)")
     ap.add_argument("--out", default=None,
                     help="also write the whole report, fingerprint block "
                          "included, to this file")
@@ -438,8 +462,11 @@ def main():
         print(line)
         captured.append(line)
 
-    live = FP.plant_fingerprint(protocol=a.protocol, eval_dt=DT,
-                                eval_duration=DURATION)
+    plant = engines.get(a.engine)
+    # backend: run_episode's SupervisoryTunerEnv has no engine_model, so every
+    # episode below runs the 0-D cycle model (fingerprint.backend_of)
+    live = FP.plant_fingerprint(plant=plant, protocol=a.protocol, backend=FP.BACKEND_CYCLE,
+                                eval_dt=DT, eval_duration=DURATION)
 
     policies = [
         ("baseline ECU",  C.p_neutral,     True),
@@ -475,8 +502,8 @@ def main():
             f"{len(episodes)} FIXED EPISODES, frozen {frozen}")
     else:
         say(f"{header} -- {len(episodes)} FIXED EPISODES, frozen {frozen}")
-    say(scenario_line(a.protocol))
-    say(f"trigger:  {TURB_PROTECT_K - 273.15:.0f} C")
+    say(scenario_line(a.protocol, plant=plant))
+    say(f"trigger:  {plant.engine.damage.turb_knee_k - 273.15:.0f} C")
     say("")
     say(FP.format_block(live, "PLANT FINGERPRINT (this run)"))
     for line in provenance:
@@ -489,9 +516,9 @@ def main():
     out = {}
     for name, pol, prev in policies:
         if a.protocol == "phase-d":
-            rows = [run_episode(pol, s, w, prev) for s, w in episodes]
+            rows = [run_episode(pol, s, w, prev, plant=plant) for s, w in episodes]
         else:
-            rows = [run_episode(pol, s, w, prev, road=(st, g))
+            rows = [run_episode(pol, s, w, prev, road=(st, g), plant=plant)
                     for s, w, st, g in episodes]
         out[name] = rows
         dm, di, dw, _ = summarise(rows, "damage")

@@ -5,8 +5,14 @@ same information too late, the premise of the whole thesis is sound and RL has
 something to find. If it does not, no amount of SAC tuning will help.
 """
 import numpy as np
-from engine_env import (SupervisoryTunerEnv, make_grade_climb, ACT_LO, ACT_HI,
-                        TURB_PROTECT_K, neutral_action)
+from engine_env import (SupervisoryTunerEnv, locked_climb, ACT_LO, ACT_HI,
+                        neutral_action)
+
+# THE PLANT IS NAMED, NOT DEFAULTED (20 October 2026, the four-engine build):
+# rollout() takes it as a required keyword, and the policies read the knee from
+# the environment they act in. This script's own run -- results/premise.json --
+# is the B58's: PREMISE_PLANT below. Another engine's premise is a later step.
+PREMISE_PLANT = "b58"
 
 # AUDIT.md C1, 15 September 2026. This file used to define its own
 #
@@ -57,7 +63,13 @@ NEUTRAL_PUMP = float(ACT_LO[4] + (NEUTRAL[4] + 1.0) * 0.5 * (ACT_HI[4] - ACT_LO[
 #
 # The constant lives in engine_env next to the damage model it comes from, and
 # generality_test.py imports the same one, so the two experiments cannot drift.
-TRIGGER_K = TURB_PROTECT_K
+#
+# PER ENGINE SINCE 20 OCTOBER 2026: it is the knee of the plant the environment
+# runs, env.plant.engine.damage.turb_knee_k (1123 K on the B58). It was the
+# module constant TRIGGER_K = TURB_PROTECT_K, the B58's for every engine.
+def trigger_k(env):
+    """The protection trigger of the plant `env` runs: its turbine damage knee."""
+    return env.plant.engine.damage.turb_knee_k
 
 
 def to_norm(trims):
@@ -65,8 +77,9 @@ def to_norm(trims):
             ).astype(np.float32)
 
 
-def rollout(policy, use_preview=True, seed=0, w=None):
-    env = SupervisoryTunerEnv(make_grade_climb(duration=720.0, dt=1.0), dt=1.0,
+def rollout(policy, use_preview=True, seed=0, w=None, *, plant):
+    """One 720 s episode of the plant's locked climb at dt 1.0. `plant` is required."""
+    env = SupervisoryTunerEnv(locked_climb(plant, duration=720.0, dt=1.0), plant=plant, dt=1.0,
                               seed=seed, use_preview=use_preview)
     obs, _ = env.reset(seed=seed)
     if w is not None:
@@ -113,7 +126,7 @@ def p_reactive(env, obs):
     depth is now the same on both, so the only remaining difference is timing,
     which is what the experiment is supposed to be about.
     """
-    over = env.thermal.t_turb - TRIGGER_K
+    over = env.thermal.t_turb - trigger_k(env)
     if over <= 0:
         return NEUTRAL
     return _protect(float(np.clip(over / 25.0, 0.0, 1.0)))
@@ -129,7 +142,7 @@ def p_grade_now(env, obs):
     acquiring", because it is what you get without buying any.
     """
     grade_now = float(env.cycle["grade"][min(env.k, len(env.cycle["grade"]) - 1)])
-    over = env.thermal.t_turb - TRIGGER_K
+    over = env.thermal.t_turb - trigger_k(env)
     k_now = float(np.clip(over / 25.0, 0.0, 1.0))
     k_grade = float(np.clip(grade_now / 0.08, 0.0, 1.0)) if grade_now > 0.02 else 0.0
     return _protect(max(k_now, 0.55 * k_grade))
@@ -138,13 +151,17 @@ def p_grade_now(env, obs):
 def p_predictive(env, obs):
     """Same levers and the same depth, triggered by the +15 s / +30 s preview."""
     ahead = max(env._preview()[2], env._preview()[3])
-    over = env.thermal.t_turb - TRIGGER_K
+    over = env.thermal.t_turb - trigger_k(env)
     k_now = float(np.clip(over / 25.0, 0.0, 1.0))
     k_ahead = float(np.clip(ahead / 0.08, 0.0, 1.0)) if ahead > 0.02 else 0.0
     return _protect(max(k_now, 0.55 * k_ahead))
 
 
 if __name__ == "__main__":
+    import engines
+    PLANT = engines.get(PREMISE_PLANT)
+    TRIGGER_K = PLANT.engine.damage.turb_knee_k
+    print(f"plant: {PLANT.id}")
     print(f"protection trigger: {TRIGGER_K:.0f} K ({TRIGGER_K - 273.15:.0f} C) "
           f"= the knee of the turbine damage term\n")
     rows = [("baseline ECU (true neutral)", p_neutral, True),
@@ -156,7 +173,7 @@ if __name__ == "__main__":
     print("-" * 76)
     out = {}
     for name, pol, prev in rows:
-        r = rollout(pol, use_preview=prev)
+        r = rollout(pol, use_preview=prev, plant=PLANT)
         out[name] = r
         print(f"{name:<32}{r['fuel']:>9.0f}{r['damage']:>10.1f}"
               f"{r['peak_turb']:>13.0f}{r['peak_oil']:>12.0f}")
@@ -185,8 +202,9 @@ if __name__ == "__main__":
     rec = {name: {k: float(v) for k, v in r.items()} for name, r in out.items()}
     rec["_preview_over_reactive_pts"] = round(float(gap), 2)
     rec["_preview_over_current_grade_pts"] = round(float(grade_gap), 2)
-    rec["_derived_inputs"] = derived.all_params().get("_inputs")
-    rec["_derived_generated"] = derived.all_params().get("_generated")
+    _dpath = os.path.join(_here, PLANT.engine.derived)
+    rec["_derived_inputs"] = derived.all_params(path=_dpath).get("_inputs")
+    rec["_derived_generated"] = derived.all_params(path=_dpath).get("_generated")
     with open(os.path.join(_here, "results", "premise.json"), "w") as fh:
         json.dump(rec, fh, indent=1)
 

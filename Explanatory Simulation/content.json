@@ -5,11 +5,11 @@
     "transmission_name": "ZF 8HP51",
     "fuel": "95 RON",
     "source": {
-      "file": "plant.py",
-      "symbol": "b58",
-      "variable": "n_cyl",
-      "line": 114,
-      "match": "def b58"
+      "file": "engine_specs/a90_supra.toml",
+      "symbol": "[car]",
+      "variable": "gears",
+      "line": 20,
+      "match": "gears = { value ="
     }
   },
   "actions": [
@@ -287,11 +287,11 @@
       "evidence": "MODELLED",
       "range": "Model geometry: 2,997.5 cc, six cylinders, 10.2:1 compression ratio.",
       "source": {
-        "file": "plant.py",
-        "symbol": "Geometry",
+        "file": "engine_specs/b58.toml",
+        "symbol": "[geometry]",
         "variable": "n_cyl",
-        "line": 36,
-        "match": "class Geometry"
+        "line": 35,
+        "match": "n_cyl = { value ="
       },
       "upstream": [],
       "downstream": [
@@ -302,7 +302,7 @@
       "increase": "More displacement can ingest more air per cycle at the same manifold conditions.",
       "decrease": "Smaller displacement reduces air and fuel per cycle.",
       "caveat": "This is the project model identity and geometry, not OEM-certified calibration or CAD.",
-      "evidence_note": "Geometry defaults are defined in plant.Geometry and b58() names the 2023 Supra 3.0 engine.",
+      "evidence_note": "The geometry is the B58's typed record in engine_specs/b58.toml, built into engines.Geometry by engines.get; the 2023 Supra 3.0 engine is named there, never a default.",
       "evidence_class": "MODELLED"
     },
     {
@@ -1035,11 +1035,11 @@
       "evidence": "ASSUMED",
       "range": "Modelled turbine tau is about 47 seconds in the locked scenario; this is not directly measured.",
       "source": {
-        "file": "thermal.py",
-        "symbol": "ThermalParams",
+        "file": "engine_specs/b58.toml",
+        "symbol": "[thermal]",
         "variable": "c_turb",
-        "line": 48,
-        "match": "class ThermalParams"
+        "line": 122,
+        "match": "c_turb = { value ="
       },
       "upstream": [
         "t_turb"

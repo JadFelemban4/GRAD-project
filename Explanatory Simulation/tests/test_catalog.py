@@ -80,10 +80,21 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(data["verdict"], "INCONCLUSIVE")
         self.assertEqual(data["freshness"]["set"], "terrain_dt1")
         self.assertAlmostEqual(data["index"]["ablation"]["ci95"][0], -4.439052814892159)
-        self.assertAlmostEqual(data["premise"]["_preview_over_current_grade_pts"], -0.32, places=1)
+        # The B58 plant's premise since 75ca65f (8 October 2026: the network
+        # sub-stepped, the climb ramped), results/premise.json; unchanged by the
+        # four-engine build of 20 October, which is bit-identical on the B58.
+        # It read -0.32, the plant before 75ca65f, and failed from then on.
+        self.assertAlmostEqual(data["premise"]["_preview_over_current_grade_pts"], -0.01, places=1)
         self.assertTrue(data["caveats"])
         self.assertTrue(data["sources"])
-        self.assertEqual(data["freshness"]["current_plant_sha"], "c236a8db3e201090")
+        # plant_sha of the B58, the lab's plant, on the four-engine build's code
+        # (GRA-test, build step 1 and its review, 21 October 2026):
+        # fingerprint.plant_files("b58"), engines.py and the B58's two spec files
+        # among them. It read c236a8db3e201090, which is not even cf43fbb's
+        # (3c48890dd15bc116, X1's plant), and then c276354cff16132c (build step 1
+        # before its review); the premise pin above failed first and hid the
+        # first. Move it whenever a plant file changes.
+        self.assertEqual(data["freshness"]["current_plant_sha"], "ded8da308863d394")
         self.assertEqual(data["freshness"]["replay_status"], "UNVERIFIED")
         self.assertIn("41.6 %", data["knock_margin"])
         self.assertEqual(data["verdict_evidence"]["n"], 10)

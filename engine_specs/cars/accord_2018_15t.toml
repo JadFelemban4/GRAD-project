@@ -1,0 +1,120 @@
+# engine_specs/cars/accord_2018_15t.toml -- the car around decision 24's Honda engine.
+#
+# PUBLISHED VALUES ONLY. Every value below was printed by the source its `source` key names
+# ([sources] at the end gives the URL), in the units that source prints. Nothing here is
+# derived: no rolling radius, no drag area, no unit conversion -- the code that builds a Car
+# does those in the open, and engine_specs/cars/README.md says how. A value no source prints is
+# in [not_typed] with the reason, never guessed. Read by nothing yet (build step 1 of the
+# four-engine plants, 20 October 2026); test_epa_map.py checks the form and the EPA row.
+#
+# THE ENGINE IS NOT THIS CAR'S. Decision 24 puts EPA's L15B7 map -- from a 2016 Civic, 130 kW
+# and 220 Nm at a compression ratio of 10.6 -- into the 2018 Accord body, whose own 1.5 L turbo
+# is rated 143 kW and 260 Nm at 10.3 (D3ACC). Argonne's Accord data are a sibling calibration.
+
+schema = 1
+car_id = "accord_2018_15t"
+engine_id = "honda_l15b7"
+description = "2018 Honda Accord LX 1.5 L turbo, CVT, front-wheel drive: the car Argonne tested in D3 (test vehicle configuration EJA02C), carrying the 2016 Civic's L15B7 map by decision 24"
+
+[transmission]
+value = "continuously variable transmission (CVT) with torque converter"
+status = "PUBLISHED"
+source = "D3ACC"
+note = "D3ACC: 'Continuously Variable Transmission with overdrive'; no fixed gears -- a ratio law replaces gear_for (the vehicles strand's section 4)"
+
+[cvt_ratio_range]
+value = [2.645, 0.405]
+unit = "1"
+status = "PUBLISHED"
+source = "HSPEC"
+note = "lowest to highest gear, '2.645 ~ 0.405' for every 1.5 L trim; D3ACC prints 'Ratio Range: 2.645-0.405'"
+
+[cvt_reverse_ratio_range]
+value = [1.859, 1.265]
+unit = "1"
+status = "PUBLISHED"
+source = "HSPEC"
+note = "'1.859 ~ 1.265'"
+
+[final_drive]
+value = 5.36
+unit = "1"
+status = "PUBLISHED"
+source = "HSPEC"
+note = "also D3ACC ('Differential Gear Ratio: 5.36') and EPA's axle ratio below. Honda's powertrain press kit (HPK) prints 3.238; the D3 pulley and road speeds rule it out (the vehicles strand: 3.238 would need a 0.192 m tyre radius; UNVERIFIED here, the D3 data are outside the repository and no committed script prints it)"
+
+[tyre_size]
+value = "225/50 R17"
+status = "PUBLISHED"
+source = "HSPEC"
+note = "LX, EX and EX-L (the D3 car is an LX); Sport and Touring carry 235/40 R19"
+
+[curb_weight]
+value = 3131
+unit = "lb"
+status = "PUBLISHED"
+source = "HSPEC"
+note = "LX with the CVT; EX 3199, Sport 3208, EX-L 3217, Touring 3294 lb. The road load uses EPA's test weight below, not this"
+
+# The EPA Test Car List row of the D3 car's configuration: Argonne set its dynamometer to these
+# exact targets for all 56 tests (CATALOGUE.md section 2.2). Coefficients: road-load force
+# F = A + B v + C v^2 with F in lbf and v in mph. B is negative: do not split A and C into a
+# rolling coefficient and a drag area without fitting over a speed band (README.md).
+[epa_test_car]
+status = "PUBLISHED"
+source = "EPA18"
+file_rows = [1932, 1933]
+model_year = 2018
+represented_model = "ACCORD"
+test_vehicle_id = "EJA02C"
+engine_code = "JA01C1"
+tested_transmission = "Continuously Variable"
+equivalent_test_weight_lb = 3500
+target_coef_a_lbf = 43.75
+target_coef_b_lbf_per_mph = -0.6042
+target_coef_c_lbf_per_mph2 = 0.02619
+axle_ratio = 5.36
+n_over_v_rpm_per_mph = 28.2
+note = "rows 1932-1933 (header = row 1); the same test vehicle carries rows 1934-1935 with C 0.02669 (below); EJA01C, the CVT with paddles, is tested at 3500 and 3625 lb"
+
+[[epa_test_car_other_rows]]
+status = "PUBLISHED"
+source = "EPA18"
+file_rows = [1934, 1935]
+model_year = 2018
+represented_model = "ACCORD"
+test_vehicle_id = "EJA02C"
+engine_code = "JA01C1"
+tested_transmission = "Continuously Variable"
+equivalent_test_weight_lb = 3500
+target_coef_a_lbf = 43.75
+target_coef_b_lbf_per_mph = -0.6042
+target_coef_c_lbf_per_mph2 = 0.02669
+axle_ratio = 5.36
+n_over_v_rpm_per_mph = 28.2
+note = "same test vehicle, a C 1.9 % higher; NOT the set D3 drove on"
+
+[not_typed]
+rolling_radius_m = "no source prints it. DERIVE it in code: from EPA's N/V with the CVT's top ratio and the final drive (a CVT's N/V depends on the ratio it was in -- check it), or measure it on the D3 data. Never type the result here"
+drag_area_and_rolling_coefficient = "not published (Honda prints no Cd). The road load is EPA's A, B, C above"
+driveline_efficiency = "not published. The vehicles strand's 0.78 is wheel power over the ECU's own torque figure (UNVERIFIED, an ECU number); ASSUMED wherever the code needs it, and labelled so there"
+
+[sources.HSPEC]
+url = "https://hondanews.com/en-US/releases/release-05333a38042c488186870d08d4a26678-2018-accord-specifications-features"
+what = "Honda, 2018 Accord specifications and features: CVT ratio range, reverse, final drive, tyre size and curb weight per trim"
+opened = "2026-10-20"
+
+[sources.D3ACC]
+url = "https://www.anl.gov/taps/d3-2018-honda-accord-lx"
+what = "Argonne Downloadable Dynamometer Database, 2018 Honda Accord LX: engine 143 kW, 260 N-m, compression 10.3:1; CVT ratio range 2.645-0.405; differential 5.36"
+opened = "2026-10-20"
+
+[sources.EPA18]
+url = "https://www.epa.gov/sites/default/files/2018-10/18tstcar-2018-10-24.xlsx"
+what = "EPA Test Car List, model year 2018; also in logs/epa/D3_AND_EPA_SOURCES.csv with its sha256"
+opened = "2026-10-20"
+
+[sources.HPK]
+url = "https://hondanews.com/en-US/releases/2018-honda-accord-press-kit-powertrain"
+what = "Honda, 2018 Accord press kit, powertrain: prints a 3.238 final drive that the D3 data contradict (cited only for that conflict)"
+opened = "2026-10-20"

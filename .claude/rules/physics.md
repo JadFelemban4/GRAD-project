@@ -5,6 +5,8 @@ paths:
   - "engine_env.py"
   - "derive_params.py"
   - "derived.py"
+  - "engines.py"
+  - "engine_specs/**"
   - "data/**"
 ---
 

@@ -22,8 +22,13 @@ import numpy as np
 
 import random_road as RR
 from app.replay import finite
-from engine_env import PREVIEW_S, SupervisoryTunerEnv, damage_rate, make_grade_climb
+import engines
+from engine_env import PREVIEW_S, SupervisoryTunerEnv, damage_rate, locked_climb
 from evaluate import DT, DURATION, EPISODES, EPISODES_D2
+
+# The plant every episode on these pages runs, named (20 October 2026): the B58,
+# whose agents the pages replay.
+PLANT = engines.get("b58")
 
 # An episode is 719 steps, not 720: engine_env.py truncates at k >= n - 1.
 STEPS = 719
@@ -81,7 +86,7 @@ def build_cycle(ep):
     Never random_road.RandomClimb: that wrapper draws its own road.
     """
     if ep["road"] is None:
-        return make_grade_climb(duration=DURATION, dt=DT)
+        return locked_climb(PLANT, duration=DURATION, dt=DT)
     return RR.climb(ep["road"][0], ep["road"][1], duration=DURATION, dt=DT)
 
 
@@ -185,7 +190,7 @@ def run_lanes(lanes, ep, on_frame=None):
     state = []
     for policy, use_preview in lanes:
         cycle = build_cycle(ep)
-        env = SupervisoryTunerEnv(cycle, dt=DT, seed=ep["seed"], use_preview=use_preview)
+        env = SupervisoryTunerEnv(cycle, plant=PLANT, dt=DT, seed=ep["seed"], use_preview=use_preview)
         obs, _ = env.reset(seed=ep["seed"])
         env.w = np.asarray(ep["weights"], dtype=np.float32)   # override the fresh draw
         obs = env._obs()
@@ -204,7 +209,8 @@ def run_lanes(lanes, ep, on_frame=None):
             obs, r, term, trunc, info = env.step(a)
             s["ret"] += r
             s["peak"] = max(s["peak"], info["t_turb"])
-            s["thermal"] += damage_rate(info["t_turb"], info["t_oil"]) * env.dt   # as evaluate.run_episode
+            s["thermal"] += damage_rate(info["t_turb"], info["t_oil"],
+                                        cal=PLANT.engine.damage) * env.dt   # as evaluate.run_episode
             s["obs"], s["info"], s["done"] = obs, info, bool(term or trunc)
             cars.append(_car(env, a, obs_in, info))
             seen.append(np.array(obs_in, dtype=np.float32, copy=True))

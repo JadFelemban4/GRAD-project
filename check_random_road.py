@@ -50,10 +50,13 @@ from multiprocessing import Pool
 import numpy as np
 
 import check_premise as C
+import engines
 import random_road as RR
-from engine_env import (PREVIEW_S, SupervisoryTunerEnv, TURB_PROTECT_K,
-                        make_grade_climb)
+from engine_env import PREVIEW_S, SupervisoryTunerEnv, locked_climb
 
+# Phase D2 is the B58's (random_road.py): its plant, named (20 October 2026).
+PLANT = engines.get("b58")
+TURB_PROTECT_K = PLANT.engine.damage.turb_knee_k      # the knee; was engine_env's constant
 TRIGGER_C = TURB_PROTECT_K - 273.15
 EVAL_DT, EVAL_DUR = 1.0, 720.0
 TRAIN_DT, TRAIN_DUR = 0.2, 900.0
@@ -63,7 +66,7 @@ WORST_START = RR.RANGES["start_s"][1]          # 300 s: the shortest climb
 def neutral_episode(job):
     """(start_s, grade, dt, duration, seed, weights) -> binding figures."""
     start_s, grade, dt, dur, seed, w = job
-    env = SupervisoryTunerEnv(RR.climb(start_s, grade, duration=dur, dt=dt),
+    env = SupervisoryTunerEnv(RR.climb(start_s, grade, duration=dur, dt=dt), plant=PLANT,
                               dt=dt, seed=seed)
     obs, _ = env.reset(seed=seed)
     if w is not None:
@@ -89,7 +92,7 @@ def obs_trace(start_s, grade, use_preview, n):
     dt 1.0 k IS the time in seconds, so the reported instant is the one the
     agent actually sees.
     """
-    env = SupervisoryTunerEnv(RR.climb(start_s, grade, duration=EVAL_DUR, dt=EVAL_DT),
+    env = SupervisoryTunerEnv(RR.climb(start_s, grade, duration=EVAL_DUR, dt=EVAL_DT), plant=PLANT,
                               dt=EVAL_DT, seed=1000, use_preview=use_preview)
     obs, _ = env.reset(seed=1000)
     out = [(env.k, np.asarray(obs, dtype=float).copy())]
@@ -131,7 +134,8 @@ def main():
     print("=" * 78)
 
     # ---- A ------------------------------------------------------------------
-    env = RR.RandomClimb(SupervisoryTunerEnv(make_grade_climb(), seed=0), seed=0)
+    env = RR.RandomClimb(SupervisoryTunerEnv(locked_climb(PLANT, duration=900.0, dt=0.2), plant=PLANT,
+                                             seed=0), seed=0)
     roads = []
     for s in (0, 1, 2):
         _, info = env.reset(seed=s)

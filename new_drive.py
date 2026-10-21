@@ -170,18 +170,21 @@ def main():
     print("  3. OPERATING RANGE  (validated span is 30-74 kPa)")
     print("-" * 74)
     try:
-        from plant import map_from_airflow, charge_temperature, b58
+        import engines
+        from plant import map_from_airflow, charge_temperature
         rpm = col(df, "Engine speed")
         amb = col(df, "Ambient temperature")
         if air is not None and rpm is not None:
-            geo = b58()
+            # the car these logs are from; its typed records, so this runs
+            # whether or not data/derived_params.json exists (as build_dataset)
+            eng = engines.typed_engine("b58")
             m = warm if warm is not None else pd.Series(True, index=df.index)
             sel = m & rpm.gt(600) & air.gt(0) & air.lt(MAF_CEILING_KGH)
             mp = []
             for a_, n_, ta in zip(air[sel], rpm[sel],
                                   (amb[sel] if amb is not None else [25.0]*int(sel.sum()))):
-                tc = charge_temperature((ta if ta == ta else 25.0) + 273.15, 363.0)
-                mp.append(map_from_airflow(a_ * 1000.0 / 3600.0, n_, tc, geo=geo))
+                tc = charge_temperature((ta if ta == ta else 25.0) + 273.15, 363.0, engine=eng)
+                mp.append(map_from_airflow(a_ * 1000.0 / 3600.0, n_, tc, engine=eng))
             mp = np.array([x for x in mp if np.isfinite(x)])
             if len(mp):
                 above = int((mp > VALID_HI).sum())

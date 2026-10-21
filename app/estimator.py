@@ -105,11 +105,14 @@ from dataclasses import dataclass, field
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from plant import map_from_airflow, charge_temperature, predict, b58   # noqa: E402
+import engines                                                          # noqa: E402
+from plant import map_from_airflow, charge_temperature, predict         # noqa: E402
 from thermal import ThermalNetwork                                      # noqa: E402
 from engine_env import BaselineECU, damage_rate                         # noqa: E402
 
-GEO = b58()
+# The engine this app reads, named: the B58 in the GR Supra (20 October 2026;
+# until then GEO = b58() and the plant's defaults stood for it).
+ENG = engines.get("b58").engine
 
 # Reference only, and no longer used to decide anything. Three turbine time
 # constants at the LOADED tau of 48 s. Kept because the documents quote it and
@@ -228,10 +231,10 @@ class Estimator:
     """Runs the validated physics alongside the car, one sample at a time."""
 
     def __init__(self, t_amb_c: float = DEFAULT_AMB_C):
-        self.tn = ThermalNetwork()
-        self.tn_lo = ThermalNetwork()
-        self.tn_hi = ThermalNetwork()
-        self.ecu = BaselineECU()
+        self.tn = ThermalNetwork(ENG.thermal)
+        self.tn_lo = ThermalNetwork(ENG.thermal)
+        self.tn_hi = ThermalNetwork(ENG.thermal)
+        self.ecu = BaselineECU(ENG.ecu)
         self.t_amb_k = t_amb_c + 273.15
         self.state = State()
         self.damage_total = 0.0
@@ -380,13 +383,13 @@ class Estimator:
         # mistake 13: `iat_pre` is a compressor outlet with a ~10 s lag
         # (confirmed on pull01, mistake 13b). Using it here inflated manifold
         # pressure by 23 % under boost.
-        t_charge_k = charge_temperature(self.t_amb_k, ect_k)
+        t_charge_k = charge_temperature(self.t_amb_k, ect_k, engine=ENG)
 
         # --- manifold pressure: inverted from MEASURED air mass ------------
         # mistake 2: never use the logged "manifold pressure" channel, and
         # never the "boost pressure" channel either -- both sit before the
         # throttle on this car. See alerts.py.
-        map_kpa = map_from_airflow(air_gps, s.rpm, t_charge_k, geo=GEO)
+        map_kpa = map_from_airflow(air_gps, s.rpm, t_charge_k, engine=ENG)
         if not math.isfinite(map_kpa) or map_kpa < 15:
             return self._blank(s.t)
 
@@ -423,7 +426,7 @@ class Estimator:
             modelled.append("lambda")
 
         out = predict(rpm=s.rpm, map_kpa=map_kpa, iat_k=t_charge_k, ect_k=ect_k,
-                      spark_btdc=spark, lam=lam, geo=GEO)
+                      spark_btdc=spark, lam=lam, engine=ENG)
         egt_k = out["egt_c"] + 273.15
         # Fed to the NEXT ecu.step so its retard integrator behaves as the
         # environment's does. 0.85 is the knee the damage term uses.
@@ -488,7 +491,7 @@ class Estimator:
         # knock term, under a docstring claiming it was the same model
         # check_premise.py scores with. It is now imported, and the knock term
         # is passed, so the claim is true.
-        d_rate = damage_rate(self.tn.t_turb, self.tn.t_oil, out["knock_integral"])
+        d_rate = damage_rate(self.tn.t_turb, self.tn.t_oil, out["knock_integral"], cal=ENG.damage)
         self.damage_total += d_rate * min(dt_raw, GAP_RESEED_S)
 
         st = State(t=s.t)

@@ -20,10 +20,24 @@ the matching REFERENCES.md row: it is a pointer, not a citation.
 """
 import numpy as np
 
-from plant import Operating, run_cycle, b58, Geometry
+import engines
+from plant import Operating, run_cycle
 
-GEO = b58()          # the one engine; never rely on run_cycle's default
-from thermal import ThermalNetwork
+# The engine these rows describe, named: never rely on a default (mistake 1).
+# The B58 in its Supra since 20 October 2026 (engines.get); every band below is
+# the B58's, and another engine's table is a later step (validation_table_<id>.md).
+PLANT = engines.get("b58")
+ENG = PLANT.engine
+from thermal import ThermalNetwork  # noqa: E402
+
+# What plant.Operating's defaults supplied until 20 October 2026, when its fields
+# became required: 298 K charge, 363 K coolant, 105 kPa backpressure. Every row
+# that relied on them gets them by name here, so every row is the row it was.
+OP_DEFAULTS = dict(iat_k=298.0, ect_k=363.0, p_exh_kpa=105.0)
+
+
+def _op(**kw):
+    return Operating(**{**OP_DEFAULTS, **kw})
 
 IDX = {"block": 0, "oil": 1, "turb": 2}
 
@@ -36,7 +50,7 @@ def _row(name, value, unit, lo, hi, source):
 
 # ---------------------------------------------------------------- geometry
 def check_displacement():
-    g = b58()
+    g = ENG.geometry
     disp_cc = np.pi / 4 * g.bore ** 2 * g.stroke * g.n_cyl * 1e6
     return _row("Displacement", disp_cc, "cc", 2990, 3000,
                 "REFERENCES.md sec. 3 row 1 (B58 factory figure; see sec. 2)")
@@ -51,7 +65,7 @@ def check_mfb50():
     to open is Heywood, listed in section 1, and nobody has yet)."""
     best = None
     for s in range(8, 46):
-        r = run_cycle(Operating(rpm=2500, map_kpa=60, spark_btdc=s, lam=1.0), geo=GEO)
+        r = run_cycle(_op(rpm=2500, map_kpa=60, spark_btdc=s, lam=1.0), engine=ENG)
         if best is None or r.torque_nm > best[1]:
             best = (s, r.torque_nm, r.mfb50_deg)
     return _row("MFB50 at MBT (2500 rpm, 60 kPa)", best[2], "deg aTDC", 8.0, 10.0,
@@ -67,8 +81,8 @@ def check_bsfc():
     for n in (1500, 2000, 2500, 3000, 3500, 4000, 4500):
         for m in (60, 80, 100, 120, 140, 160, 180):
             for s in range(6, 42, 2):
-                r = run_cycle(Operating(rpm=n, map_kpa=m, spark_btdc=s, lam=1.0,
-                                        p_exh_kpa=max(105, m * 1.15)), geo=GEO)
+                r = run_cycle(_op(rpm=n, map_kpa=m, spark_btdc=s, lam=1.0,
+                                  p_exh_kpa=max(105, m * 1.15)), engine=ENG)
                 if r.knock_integral < 1.0 and r.torque_nm > 0:
                     if best is None or r.bsfc_gpkwh < best[0]:
                         best = (r.bsfc_gpkwh, n, m, s)
@@ -84,8 +98,8 @@ def check_knock_limit():
     Douaud & Eyzat supply the knock model, not this number. Weakest row."""
     limit = None
     for s in range(2, 30):
-        r = run_cycle(Operating(rpm=3000, map_kpa=200, spark_btdc=s, lam=0.85,
-                                p_exh_kpa=230), geo=GEO)
+        r = run_cycle(_op(rpm=3000, map_kpa=200, spark_btdc=s, lam=0.85,
+                          p_exh_kpa=230), engine=ENG)
         if r.knock_integral >= 1.0:
             limit = s - 1
             break
@@ -97,7 +111,7 @@ def check_egt():
     """EGT (exhaust gas temperature) at moderate cruise. Port-exit gas
     600-750 C is the normal band.
     Band: REFERENCES.md section 3, rows 5 and 6 (general engine physics)."""
-    vals = [run_cycle(Operating(rpm=n, map_kpa=m, spark_btdc=22, lam=1.0), geo=GEO).egt_c
+    vals = [run_cycle(_op(rpm=n, map_kpa=m, spark_btdc=22, lam=1.0), engine=ENG).egt_c
             for n, m in ((2000, 70), (2200, 75), (2500, 80), (2500, 100))]
     return (_row("EGT, cruise band (min)", min(vals), "C", 600, 750, "REFERENCES.md sec. 3 row 5"),
             _row("EGT, cruise band (max)", max(vals), "C", 600, 750, "REFERENCES.md sec. 3 row 6"))
@@ -141,10 +155,10 @@ def _step_response(key, horizon_s, dt=0.25):
     The published bands describe this condition. Match the condition to the
     band, not the band to the model.
     """
-    tn = ThermalNetwork()
+    tn = ThermalNetwork(ENG.thermal)
     tn.reset(t_amb=315.0, warm=True)
-    r = run_cycle(Operating(rpm=3000, map_kpa=140, spark_btdc=14, lam=1.0,
-                            p_exh_kpa=161), geo=GEO)
+    r = run_cycle(_op(rpm=3000, map_kpa=140, spark_btdc=14, lam=1.0,
+                      p_exh_kpa=161), engine=ENG)
     mf = r.mdot_fuel_gps
     egt_k = r.egt_c + 273.15
     me = mf * (1.0 + 14.7 * 1.0)      # lambda must match the Operating above
@@ -221,7 +235,7 @@ def check_against_car(block_climb_c):
     """
     import car_thermal as CT
 
-    r = CT.thermal_replay(CT.SUSTAINED_DRIVE)
+    r = CT.thermal_replay(CT.SUSTAINED_DRIVE, plant=PLANT)
     k = 273.15
     sl = CT.hottest_window(r["oil_car"])
     oq1, oq3 = np.nanpercentile(r["oil_car"][sl], [25, 75]) - k
@@ -229,7 +243,7 @@ def check_against_car(block_climb_c):
                    float(np.median(r["oil_model"][sl]) - k), "C", round(oq1, 1), round(oq3, 1),
                    "our car: drive10, car's IQR over its hottest 10 min")
 
-    taus = CT.oil_time_constants()
+    taus = CT.oil_time_constants(CT.OIL_DRIVES, plant=PLANT)
     usable = [t for t in taus if t["identifiable"]]
     tau_row = _row("Oil apparent time constant (identified)",
                    float(np.median([t["tau_model"] for t in usable])), "s",
@@ -328,8 +342,7 @@ def test_convergence(tol_egt_k=12.0, tol_torque_pct=0.6):
     doubles and this fails. It is the regression the audit asked for, and it is
     the reason DTHETA_DEG is a studied number rather than a round one.
     """
-    from plant import Operating, run_cycle, b58, DTHETA_DEG
-    geo = b58()
+    from plant import Operating, run_cycle, DTHETA_DEG
     pts = [dict(rpm=2500, map_kpa=60, spark_btdc=30),
            dict(rpm=2465, map_kpa=150, spark_btdc=8),
            dict(rpm=3000, map_kpa=200, spark_btdc=12)]
@@ -338,8 +351,8 @@ def test_convergence(tol_egt_k=12.0, tol_torque_pct=0.6):
     for kw in pts:
         op = Operating(iat_k=320.0, ect_k=363.0, lam=1.0,
                        p_exh_kpa=max(105.0, kw["map_kpa"] * 1.15), **kw)
-        a = run_cycle(op, geo=geo, dtheta=DTHETA_DEG)
-        b = run_cycle(op, geo=geo, dtheta=DTHETA_DEG / 2.0)
+        a = run_cycle(op, engine=ENG, dtheta=DTHETA_DEG)
+        b = run_cycle(op, engine=ENG, dtheta=DTHETA_DEG / 2.0)
         d_egt = abs(b.egt_c - a.egt_c)
         d_trq = abs(b.torque_nm - a.torque_nm) / max(a.torque_nm, 1e-9) * 100.0
         good = d_egt <= tol_egt_k and d_trq <= tol_torque_pct

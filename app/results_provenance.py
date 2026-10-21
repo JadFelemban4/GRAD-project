@@ -32,11 +32,15 @@ THE SCHEMA. A result file is read by the fingerprint schema it was written
 under, never by today's. format_block does not print the schema, so it is read
 from the block (schema_of): fingerprint.py has written derived_sha into every
 block since schema 2 (8 October 2026, conflict.md decision 2) and into none
-before. Schema 1 hashed plant.py, thermal.py and engine_env.py, the code being
-the syntax tree without docstrings as ast.dump prints it (_code_only_schema_1,
-tested equal to fingerprint.py at a7ce729); schema 2 hashes
-fingerprint.PLANT_FILES, derived.py among them, by fingerprint._code_only, and
-makes derived_sha fatal. A schema-1 file's plant and road hashes are compared
+before, and `engine` into every block since schema 3 (20 October 2026, the
+four-engine build) and into none before. Schema 1 hashed plant.py, thermal.py
+and engine_env.py, the code being the syntax tree without docstrings as
+ast.dump prints it (_code_only_schema_1, tested equal to fingerprint.py at
+a7ce729); schema 2 hashes those three and derived.py by fingerprint._code_only,
+and makes derived_sha fatal; schema 3 hashes fingerprint.plant_files(RESULTS_PLANT)
+(engines.py and the plant's own typed specs join, a spec by its values,
+fingerprint._file_code) and makes engine, engine_sha and backend fatal. A
+schema-1 file's plant and road hashes are compared
 with this tree's, a commit's or a tag's hashed by schema 1's rule; derived_sha,
 which no schema-1 file records, is then on one side only, so a schema-1 file
 can be "another" plant but never "same". The 24 files of Phase D, D2 and C4
@@ -74,13 +78,24 @@ os.environ["GIT_OPTIONAL_LOCKS"] = "0"
 import fingerprint as FP  # the repository root; standard library only at import
 from app import results_eval as EV
 
+# The plant the tab's live side describes, by the name engines.get takes (20
+# October 2026, the four-engine build): every result file on the tab is the
+# B58's, and fingerprint.plant_fingerprint has no default plant any more. It was
+# called without one here until this build, raised TypeError for both
+# protocols, and the tab would have shown every file as "cannot compare".
+RESULTS_PLANT = "b58"
+# The files that plant's plant_sha is made of (schema 3): the code and the B58's
+# own two typed specs. fingerprint.PLANT_FILES named the same list for every
+# plant until 21 October 2026; it is the plant's own now (fingerprint.plant_files).
+PLANT_FILES = FP.plant_files(RESULTS_PLANT)
+
 TAGS = ("sep17-before-merge", "ghassan-before-merge")
 STATES = ("forced", "not_recorded", "another", "cannot_compare", "same_code", "same")
 GIT_TIMEOUT_S = 15
 # The plant code on disk when this module was imported, which is the plant the
 # server runs when the module is imported at start. live_side compares the
 # files on disk against it; a difference means the server needs a restart.
-IMPORT_PLANT_SHA = FP._sha_files(FP.PLANT_FILES)
+IMPORT_PLANT_SHA = FP._sha_files(PLANT_FILES)
 
 # A ref git may be asked about: a hex sha, a tag or HEAD. No leading dash (an
 # option), no revision syntax, no spaces.
@@ -92,6 +107,10 @@ _ROAD_AT = {}
 # main at a7ce729. Frozen here, since fingerprint.py now holds schema 2 only.
 SCHEMA_1 = 1
 SCHEMA_1_PLANT_FILES = ("plant.py", "thermal.py", "engine_env.py")
+# Schema 2: fingerprint.py from 8 to 20 October 2026, its last copy at cf43fbb.
+# Frozen here for the same reason: fingerprint.py hashes schema 3's files now.
+SCHEMA_2 = 2
+SCHEMA_2_PLANT_FILES = ("plant.py", "thermal.py", "engine_env.py", "derived.py")
 
 
 class Git:
@@ -267,30 +286,49 @@ def _code_only_schema_1(src):
 
 
 def schema_of(fp: dict) -> int:
-    """The fingerprint schema a block was written under: 2 when it carries
-    derived_sha, which fingerprint.py has written into every block since
+    """The fingerprint schema a block was written under: 3 when it carries
+    `engine`, which fingerprint.py has written into every block since schema 3;
+    2 when it carries derived_sha, which it has written into every block since
     schema 2, even as "None"; 1 otherwise."""
-    return 2 if "derived_sha" in fp else SCHEMA_1
+    if "engine" in fp:
+        return 3
+    return SCHEMA_2 if "derived_sha" in fp else SCHEMA_1
 
 
 def _code_rule(schema: int):
-    """The function a schema hashed a file's code by."""
+    """The function a schema hashed a Python file's code by."""
     return _code_only_schema_1 if schema == SCHEMA_1 else FP._code_only
+
+
+def _file_rule(schema: int):
+    """The function (name, text) -> what a schema hashed of a plant file: its
+    code rule for Python; since schema 3, a typed spec by its values, chosen by
+    the file's kind (fingerprint._file_code, 21 October 2026)."""
+    if schema >= 3:
+        return FP._file_code
+    rule = _code_rule(schema)
+    return lambda name, src: rule(src)
 
 
 def _plant_files(schema: int) -> tuple:
     """The files a schema's plant_sha is made of, in its fixed order."""
-    return SCHEMA_1_PLANT_FILES if schema == SCHEMA_1 else FP.PLANT_FILES
+    if schema == SCHEMA_1:
+        return SCHEMA_1_PLANT_FILES
+    return SCHEMA_2_PLANT_FILES if schema == SCHEMA_2 else PLANT_FILES
 
 
-def code_hash(sources: list[bytes], schema: int = FP.SCHEMA_VERSION) -> str:
+def code_hash(sources: list[bytes], schema: int = FP.SCHEMA_VERSION, *, names) -> str:
     """fingerprint._sha_files(code_only=True) over sources already read, by
-    `schema`'s code rule."""
-    rule = _code_rule(schema)
+    `schema`'s rule. `names` are the files the sources were read from, in the
+    same order: since schema 3 a file's kind picks its rule (_file_rule)."""
+    names = list(names)
+    if len(names) != len(sources):
+        raise ValueError(f"{len(sources)} sources and {len(names)} names")
+    rule = _file_rule(schema)
     h = hashlib.sha256()
-    for raw in sources:
+    for name, raw in zip(names, sources):
         raw = raw.replace(b"\r\n", b"\n")
-        code = rule(raw.decode("utf-8", errors="replace"))
+        code = rule(name, raw.decode("utf-8", errors="replace"))
         h.update(code.encode("utf-8") if code is not None else raw)
     return h.hexdigest()[:16]
 
@@ -325,7 +363,7 @@ def plant_at(git: Git, commit: str, schema: int = FP.SCHEMA_VERSION) -> dict | N
             if raw is None:
                 return None
             sources.append(raw)
-        _PLANT_AT[key] = {"plant_sha": code_hash(sources, schema),
+        _PLANT_AT[key] = {"plant_sha": code_hash(sources, schema, names=_plant_files(schema)),
                           "plant_text_sha": byte_hash(sources)}
     return dict(_PLANT_AT[key])
 
@@ -374,7 +412,8 @@ def _values_sha(d):
 
 
 def derived_sha(root) -> str | None:
-    """train.derived_sha(), copied, over root/data/derived_params.json."""
+    """train.derived_sha(plant), copied, for the B58: over its derived file,
+    root/data/derived_params.json (engines.get("b58").engine.derived)."""
     try:
         d = json.loads((Path(root) / "data" / "derived_params.json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -385,12 +424,18 @@ def derived_sha(root) -> str | None:
 def derived_loaded_differs(root) -> bool:
     """True when derived.py holds constants in memory and they are not the
     ones in root/data/derived_params.json on disk. False when derived.py was
-    never imported or has not loaded its file yet."""
+    never imported or has not loaded its file yet.
+
+    derived.py caches each engine's file under its own key since 20 October
+    2026 (the four-engine build): os.path.normcase(os.path.abspath(path)), as
+    derived._load makes it, where it was the one key "d". Reading "d" would find
+    nothing and answer False for ever; this reads the B58's file's key."""
     mod = sys.modules.get("derived")
     cache = getattr(mod, "_CACHE", None)
-    if not isinstance(cache, dict) or "d" not in cache:
+    key = os.path.normcase(os.path.abspath(Path(root) / "data" / "derived_params.json"))
+    if not isinstance(cache, dict) or key not in cache:
         return False
-    loaded = cache["d"]
+    loaded = cache[key]
     if not isinstance(loaded, dict):
         return True
     try:
@@ -409,8 +454,8 @@ def _schema_1_side() -> dict | None:
         road = (here / "random_road.py").read_bytes()
     except OSError:
         return None
-    return {"plant_sha": code_hash(sources, SCHEMA_1), "plant_text_sha": byte_hash(sources),
-            "road_sha": _road_code_sha(road, SCHEMA_1)}
+    return {"plant_sha": code_hash(sources, SCHEMA_1, names=SCHEMA_1_PLANT_FILES),
+            "plant_text_sha": byte_hash(sources), "road_sha": _road_code_sha(road, SCHEMA_1)}
 
 
 def live_side(root, protocols=("phase-d", "d2")) -> dict:
@@ -421,11 +466,13 @@ def live_side(root, protocols=("phase-d", "d2")) -> dict:
     listed in "import_errors" with the exception's type name; KeyboardInterrupt
     is never caught. "schema_1" is _schema_1_side()."""
     python = platform.python_version()
-    plant_sha = FP._sha_files(FP.PLANT_FILES)
+    plant_sha = FP._sha_files(PLANT_FILES)
     blocks, errors = {}, []
     for protocol in protocols:
         try:
-            text = FP.format_block(FP.plant_fingerprint(protocol))
+            import engines      # numpy and derived.py; inside the try, as the fingerprint
+            text = FP.format_block(FP.plant_fingerprint(protocol, plant=engines.get(RESULTS_PLANT),
+                                                        backend=FP.BACKEND_CYCLE))
         except (Exception, SystemExit) as exc:
             errors.append({"module": f"fingerprint.plant_fingerprint({protocol})",
                            "type": type(exc).__name__})
@@ -435,7 +482,7 @@ def live_side(root, protocols=("phase-d", "d2")) -> dict:
         "python": python,
         "minor": minor(python),
         "plant_sha": plant_sha,
-        "plant_text_sha": FP._sha_files(FP.PLANT_FILES, code_only=False),
+        "plant_text_sha": FP._sha_files(PLANT_FILES, code_only=False),
         "restart_needed": plant_sha != IMPORT_PLANT_SHA,
         "derived_sha": derived_sha(root),
         "data_sha1": data_fingerprint(root),

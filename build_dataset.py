@@ -54,6 +54,20 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from plant import (map_from_airflow, corrected_flow,   # noqa: E402
                    charge_temperature)
 
+# The engine whose logs these are, named (20 October 2026): the B58 in the GR
+# Supra. The inversion and the charge temperature are its own.
+ENGINE = "b58"
+
+
+def _engine():
+    """The B58's typed records only (engines.typed_engine): the geometry, the
+    cycle model and the charge temperature, all the inversion reads. Not
+    engines.get, which reads the derived file: this script runs before that
+    file exists (it writes the tables the file is derived from), as it did on
+    cf43fbb, and engines.get refused it until 21 October 2026."""
+    import engines
+    return engines.typed_engine(ENGINE)
+
 PSI_TO_KPA = 6.89476
 KGH_TO_GPS = 1000.0 / 3600.0
 
@@ -223,14 +237,15 @@ def derive(d):
     d["t_amb_assumed"] = np.full(len(d["t"]), 1 if no_amb_channel else 0)
     t_amb_k = np.where(np.isfinite(d["t_amb"]), d["t_amb"], fallback) + 273.15
     t_blk_k = np.where(np.isfinite(d["ect"]), d["ect"], 90.0) + 273.15
-    iat_k = charge_temperature(t_amb_k, t_blk_k)
+    eng = _engine()
+    iat_k = charge_temperature(t_amb_k, t_blk_k, engine=eng)
     d["t_charge_k"] = iat_k
     d["iat_sensor_c"] = d["iat_pre"]          # kept: it IS the compressor outlet
 
     mp = np.full(len(air_gps), np.nan)
     ok = np.isfinite(air_gps) & np.isfinite(iat_k) & (d["rpm"] > 500) & (air_gps > 1)
     for i in np.nonzero(ok)[0]:
-        mp[i] = map_from_airflow(air_gps[i], d["rpm"][i], iat_k[i])
+        mp[i] = map_from_airflow(air_gps[i], d["rpm"][i], iat_k[i], engine=eng)
     d["map_kpa"] = mp
 
     # compressor inlet is AMBIENT. (`iat_pre` is the compressor OUTLET.)
@@ -243,8 +258,9 @@ def derive(d):
     # across the air filter and inlet tract before the compressor. It is an
     # assumption, not a measurement, and it sits silently inside every
     # "pressure ratio" this project quotes, including "PR 2.52 = 250 kPa".
-    # Self-consistent with plant.boost_ceiling_kpa's 99.3 kPa default, and
-    # documented here rather than left as a bare number.
+    # Self-consistent with the engine's 99.3 kPa sea-level inlet (plant.
+    # boost_ceiling_kpa's default until 20 October 2026, engine.boost.
+    # inlet_sea_kpa since), and documented here rather than left as a bare number.
     INLET_DEPRESSION = 0.98
     p01 = d["p_amb"] * PSI_TO_KPA * INLET_DEPRESSION
     d["corr_flow"] = corrected_flow(air_gps, t01, p01)

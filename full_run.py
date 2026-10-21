@@ -83,8 +83,8 @@ STEPS = [
      "neutral near zero, the starver punished"),
     ("test_plant_guards.py — the sub-stepping and the derived fingerprint",
      ["test_plant_guards.py"], False,
-     "6 tests OK: a step equals its sub-steps, the coolant settles at 2 s, one changed "
-     "constant moves derived_sha and a timestamp does not"),
+     "14 tests OK: a step equals its sub-steps, the coolant settles at 2 s, one changed "
+     "constant moves derived_sha and a timestamp does not; the schema-3 guards (21 Oct)"),
     ("check_premise.py — the premise table, five policies",
      ["check_premise.py"], True,
      "THE BASELINE ROW AND WHETHER THE CONSTRAINT BINDS. This is the block "
@@ -102,8 +102,9 @@ STEPS = [
      "PASS over 40 roads at 0-45 C and 80-101.3 kPa; 2 bind (X1's: 10)"),
     ("test_wide_air.py — X2's roads against the plant",
      ["test_wide_air.py"], True,
-     "16 tests OK: sea level is the plant to the bit; other environments untouched; "
-     "the inlet, the torque floor and the kickdown table follow the air"),
+     "17 tests OK: sea level is the plant to the bit; other environments untouched; "
+     "the inlet, the torque floor and the kickdown table follow the air; a variant "
+     "plant gets its own table"),
     ("app.test_replay --full — the live supervisor, both drives",
      ["-m", "app.test_replay", "--full"], True,
      "N of N, and the two pinned peaks"),
@@ -121,7 +122,7 @@ STEPS = [
      "the check total, and the known-stale ledger, which is the size of fix 3"),
     ("drift_test.py — the guard's own acceptance test",
      ["drift_test.py"], True,
-     "N of 16 drifts CAUGHT"),
+     "N of 18 drifts CAUGHT"),
     # Added 22 September 2026 with Phase D2. Each prints figures that
     # results/PREREGISTRATION_D2.md quotes, so each belongs in the transcript
     # the documents are swept from.
@@ -228,7 +229,9 @@ def main():
     w("=" * 78)
     if found:
         who, sighted, blind, take = found[0]
-        argv = ["evaluate.py", sighted, blind]
+        # --engine is required since 20 October 2026; without it evaluate.py
+        # exits on argparse, a refusal for a reason it does not name
+        argv = ["evaluate.py", "--engine", "b58", sighted, blind]
         w(f"[extra]  evaluate.py against {who} — expected to REFUSE")
         w(f"         $ python {' '.join(argv)}")
         w(f"         read for: {take}, the CORRECT outcome here")

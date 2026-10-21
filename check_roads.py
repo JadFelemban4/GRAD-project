@@ -30,6 +30,10 @@ roads push the baseline past the trigger: training needs both kinds, roads
 where protection is needed and roads where it only costs fuel.
 
 Evaluation never uses these roads. evaluate.py scores the locked climb only.
+
+THE PLANT IS NAMED (20 October 2026): the roads are the B58 Supra's, and the
+committed results/training_roads*.json are its (PLANT_NAME). Another engine's
+roads are a later step (check_roads.py --engine, writing results/<id>/).
 """
 import argparse
 import collections
@@ -43,16 +47,19 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIRST_SEED = 100
+PLANT_NAME = "b58"
 
 
 def drive(job):
     seed, road = job
-    from engine_env import ExtremesTrainingEnv, TerrainTrainingEnv, neutral_action, TURB_PROTECT_K
+    import engines
+    from engine_env import ExtremesTrainingEnv, TerrainTrainingEnv, neutral_action
+    plant = engines.get(PLANT_NAME)
     if road == "wideair":
         from wide_air import WideAirTrainingEnv as cls
     else:
         cls = ExtremesTrainingEnv if road == "extremes" else TerrainTrainingEnv
-    env = cls(duration=900.0, dt=1.0, seed=seed)
+    env = cls(duration=900.0, dt=1.0, seed=seed, plant=plant)
     env.reset(seed=seed)
     act = neutral_action()
     rs, errs, turb = [], [], []
@@ -69,14 +76,14 @@ def drive(job):
     if road in ("extremes", "wideair"):
         extra = dict(t_amb_c=float(env.cycle["t_amb"]) - 273.15,
                      p_kpa=float(env.cycle.get("p_baro", 101.3)),
-                     floor_nm=float(getattr(env, "floor_nm", 15.0)),
+                     floor_nm=float(env.floor_nm),
                      v_min_kmh=float(v[20:].min() * 3.6), v_max_kmh=float(v.max() * 3.6),
                      c_turb_scale=float(env.c_turb_scale),
                      v_kmh=[round(float(x) * 3.6, 1) for x in v[::5]])
     return dict(seed=seed, family=env.cycle["family"], **extra,
                 grade_min=float(g.min()), grade_max=float(g.max()),
                 peak_c=float(turb.max() - 273.15),
-                above_pct=float(100.0 * (turb > TURB_PROTECT_K).mean()),
+                above_pct=float(100.0 * (turb > plant.engine.damage.turb_knee_k).mean()),
                 neutral_r=float(np.mean(rs)), p95_err=float(np.percentile(errs, 95)),
                 grade=[round(float(x), 4) for x in g[::5]],
                 elev_m=[round(float(x), 1) for x in env.cycle["elev_m"][::5]])

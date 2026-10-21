@@ -6,12 +6,14 @@ from backend.server import api_thermal,ThermalRequest
 from backend.simulation import create_session,reset_frame,step_session
 from thermal import ThermalNetwork
 from plant import predict,charge_temperature
+import engines
+ENG=engines.get('b58').engine  # the engine the lab teaches, named (20 October 2026)
 class ThermalDiagnostics(unittest.TestCase):
  def test_api_exports_source_and_cooling_phase(self):
   r=api_thermal(ThermalRequest(rpm=3000,map_kpa=180,heat_s=1,cool_s=1,ambient_c=42,fan=.2,pump=.4))
   self.assertIsNone(r['frames'][0]['thermostat'])
-  net=ThermalNetwork();net.reset(t_amb=315.15,warm=False)
-  engine=predict(3000,180,charge_temperature(315.15),315.15,10,1.0)
+  net=ThermalNetwork(ENG.thermal);net.reset(t_amb=315.15,warm=False)
+  engine=predict(3000,180,charge_temperature(315.15,None,engine=ENG),315.15,10,1.0,engine=ENG)
   for phase in ['heating','cooling']:
    fuel=engine['mdot_fuel_gps'] if phase=='heating' else 0
    exhaust=engine['mdot_air_gps']+fuel if phase=='heating' else 0

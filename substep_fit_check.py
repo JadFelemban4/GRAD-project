@@ -80,23 +80,33 @@ def simulate_sub(d, P, mode):
 
 
 def premise(D, TH0, patch):
-    """check_premise.py's baseline ECU and current-grade, constants swapped in."""
+    """check_premise.py's baseline ECU and current-grade, constants swapped in.
+
+    Since 20 October 2026 the swap is a variant of the B58's thermal record
+    (dataclasses.replace), passed to the rollout: the plant is built once per
+    process, so patching derived.py's cache, as this did, no longer reaches it."""
+    from dataclasses import replace
     import check_premise as CP
-    D["thermal"] = dict(TH0)
+    import engines
+    th = dict(TH0)
     if patch:
         p = dict(patch)
         scale = p.pop("ua_rad_scale")
-        D["thermal"].update(p)
-        D["thermal"]["ua_rad_min"] = K.UA_RAD_MIN * scale
-        D["thermal"]["ua_rad_ram"] = K.UA_RAD_RAM * scale
-        D["thermal"]["ua_rad_fan"] = K.UA_RAD_FAN * scale
-    b, g = CP.rollout(CP.p_neutral), CP.rollout(CP.p_grade_now)
+        th.update(p)
+        th["ua_rad_min"] = K.UA_RAD_MIN * scale
+        th["ua_rad_ram"] = K.UA_RAD_RAM * scale
+        th["ua_rad_fan"] = K.UA_RAD_FAN * scale
+    base = engines.get("b58")
+    fields = [f for (rec, f) in engines.DERIVED_FIELDS if rec == "thermal"]
+    plant = replace(base, engine=replace(base.engine, thermal=replace(
+        base.engine.thermal, **{f: float(th[f]) for f in fields})))
+    b, g = CP.rollout(CP.p_neutral, plant=plant), CP.rollout(CP.p_grade_now, plant=plant)
     return dict(baseline=b["damage"], current_grade=g["damage"], cut=100.0 * (1.0 - g["damage"] / b["damage"]))
 
 
 def main():
     t0 = time.time()
-    D = derived._load()
+    D = derived._load(derived.B58_PATH)
     TH0 = dict(D["thermal"])
     cur = {k: TH0[k] for k in TH0 if not k.startswith("_") and not k.startswith("ua_rad_")}
     cur["ua_rad_scale"] = TH0["_ua_rad_scale"]

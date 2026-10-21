@@ -26,14 +26,21 @@ A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Five designs exist:
     --road random    dt 0.2   Phase D2 and C4: a new climb every episode, start
                               120-300 s, grade 12-16 %. CLOSED: runs_d2/, runs_c4/
 
-    python train.py --steps 50000 --seed 0                      # terrain, dt 1.0
-    python train.py --steps 50000 --seed 0 --no-preview         # its blinded arm
-    python train.py --steps 50000 --seed 0 --fixed-road         # locked climb at dt 1.0
-    python train.py --steps 50000  --seed 0 --road fixed  --out runs_x
+    python train.py --engine b58 --steps 50000 --seed 0                  # terrain, dt 1.0
+    python train.py --engine b58 --steps 50000 --seed 0 --no-preview     # its blinded arm
+    python train.py --engine b58 --steps 50000 --seed 0 --fixed-road     # locked climb at dt 1.0
+    python train.py --engine b58 --steps 50000  --seed 0 --road fixed  --out runs_x
                                               # C1: the first bad run (11 episodes at dt 0.2)
-    python train.py --steps 300000 --seed 0 --road random --out runs_c5
+    python train.py --engine b58 --steps 300000 --seed 0 --road random --out runs_c5
                                               # C4's design, in a NEW directory
     python train.py ... --no-preview          # the blinded arm of any of them
+
+--engine IS REQUIRED (20 October 2026, decision 24: the H/tau test runs four
+engines). It names the plant every environment is built on (engines.get), and
+meta.json's fingerprint -- schema 3 -- records it in three FATAL fields: engine,
+engine_sha and backend. A run directory holding a schema-2 meta.json (every
+agent trained before the four-engine build) is not resumed: its record names no
+engine. NOTHING TRAINS ON GRA-test until decision 25 says so.
 
 --keep-buffer (11 October 2026) saves the replay buffer beside every checkpoint
 (OUT/<tag>/replay_buffer.pkl, overwritten each time) and loads it when the run
@@ -51,7 +58,7 @@ a C4 run. See "A RESUME IS NOT A LONGER RUN" below.
 
 (train_all.py and run_phase_d.py are the two launchers. Neither should lean on
 the defaults above: a default that selects an experiment is the trap AUDIT2.md
-Part 3 is about. Both pass --road and --dt explicitly.)
+Part 3 is about. Both pass --engine, --road and --dt explicitly.)
 """
 import argparse
 import csv
@@ -66,11 +73,12 @@ from datetime import datetime
 
 import numpy as np
 
+import engines
 import fingerprint as FP
 import random_road as RR
 import step_record
 from engine_env import (ExtremesTrainingEnv, SupervisoryTunerEnv, TerrainTrainingEnv,
-                        damage_rate, make_grade_climb)
+                        damage_rate, locked_climb)
 
 try:
     import gymnasium as gym
@@ -98,6 +106,23 @@ CLOSED = {"runs": "Phase D", "runs_d2": "Phase D2",
 # Each road's own step. fixed and random are the designs Phase D, D2 and C4 ran
 # at 0.2 s; terrain is the 27 September design at evaluate.py's 1.0 s.
 DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0, "extremes": 1.0, "wideair": 1.0}
+# The training episode, s: --duration's default, "the standard scenario". A
+# module constant since 21 October 2026, so verify_docs.py can check the 900 s
+# the documents quote against the live value: it read make_grade_climb's
+# duration= default until that default went (the review of build step 1).
+DURATION_S = 900.0
+
+
+def refuse_old_schema(stored, outdir, force):
+    """Refuse to train into `outdir` when its meta.json (`stored`, or None when
+    there is none) is an older fingerprint schema: a record of schema 2 or less
+    names no engine (20 October 2026), and is refused with its own message
+    before any field is compared. --force-plant-mismatch (`force`) lets it
+    through, as it does every other plant refusal. A function since 21 October
+    2026, so test_plant_guards.py can show it refuses (the review of build step 1)."""
+    if stored is not None and FP.schema_problem(stored) and not force:
+        raise SystemExit(f"\nREFUSING: {outdir}: {FP.schema_problem(stored)}\n"
+                         "Train into a fresh --out directory.")
 
 
 def buffer_size(a):
@@ -142,12 +167,14 @@ class _StepState(gym.Wrapper):
         info = dict(info, **step_record.env_state(u))
         info["applied"] = np.asarray(u.prev_act, np.float32)
         info["weights"] = np.asarray(u.w, np.float32)
-        info["damage_rate"] = damage_rate(info["t_turb"], info["t_oil"], info["ki"])
+        info["damage_rate"] = damage_rate(info["t_turb"], info["t_oil"], info["ki"],
+                                          cal=u.plant.engine.damage)
         return obs, r, term, trunc, info
 
 
-def build_env(use_preview, seed, duration, road="terrain", dt=1.0):
-    """The training environment. dt is passed EXPLICITLY, to the cycle and the env.
+def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant):
+    """The training environment. dt is passed EXPLICITLY, to the cycle and the env,
+    and so is the plant (required, 20 October 2026).
 
     terrain  TerrainTrainingEnv: a new road every episode.
     extremes ExtremesTrainingEnv: the same roads, plus ambient, speed, steeper
@@ -161,18 +188,20 @@ def build_env(use_preview, seed, duration, road="terrain", dt=1.0):
     random builds are the objects Phase D and D2 trained on.
     """
     if road == "terrain":
-        env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
+        env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed,
+                                 plant=plant)
     elif road == "wideair":
-        # Imported here, not at the top: importing wide_air swaps engine_env's
-        # boost ceiling for one that follows a stepping WideAirTrainingEnv's
-        # inlet (and is the plant's otherwise), so no other design's process
-        # ever holds it.
+        # Imported here, not at the top, as before. It used to matter more:
+        # importing wide_air swapped engine_env's boost ceiling for the whole
+        # process until 20 October 2026; the inlet is each environment's own now.
         from wide_air import WideAirTrainingEnv
-        env = WideAirTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
+        env = WideAirTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed,
+                                 plant=plant)
     elif road == "extremes":
-        env = ExtremesTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed)
+        env = ExtremesTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed,
+                                  plant=plant)
     else:
-        env = SupervisoryTunerEnv(make_grade_climb(duration=duration, dt=dt), dt=dt,
+        env = SupervisoryTunerEnv(locked_climb(plant, duration=duration, dt=dt), plant=plant, dt=dt,
                                   use_preview=use_preview, seed=seed)
         if road == "random":
             env = _RoadLog(RR.RandomClimb(env, seed=seed, duration=duration))
@@ -186,11 +215,12 @@ def _road_log(env):
         return []
 
 
-def derived_sha():
-    """A hash of data/derived_params.json's values: since 28 September the
-    plant's thermal, boost, spark, enrichment and gearbox constants live there.
-    Since 8 October it is fingerprint.py's own, and FATAL there: one definition."""
-    return FP.derived_sha()
+def derived_sha(plant):
+    """A hash of the plant's derived file's values (data/derived_params.json for
+    the B58): since 28 September the plant's thermal, boost, spark, enrichment
+    and gearbox constants live there. Since 8 October it is fingerprint.py's
+    own, and FATAL there: one definition. The plant is required (20 October)."""
+    return FP.derived_sha(os.path.join(HERE, plant.engine.derived))
 
 
 # What the engine did on each training step, read off the step's info dict:
@@ -358,13 +388,13 @@ ROADS_TEXT = {"terrain": "a new road every episode (TerrainTrainingEnv)",
               "random": "a new climb every episode (random_road.RandomClimb, Phase D2)"}
 
 
-def run_config(a, tag, model, outdir, live):
+def run_config(a, tag, model, outdir, live, plant_obj):
     """Everything needed to say what this agent is, written beside it.
     The git fields are meta.json's, so the two files cannot disagree."""
     import stable_baselines3
     import torch
     try:
-        with open(os.path.join(HERE, "data", "derived_params.json"), encoding="utf-8") as fh:
+        with open(os.path.join(HERE, plant_obj.engine.derived), encoding="utf-8") as fh:
             plant = json.load(fh).get("_inputs")
     except (OSError, ValueError):
         plant = None
@@ -382,6 +412,7 @@ def run_config(a, tag, model, outdir, live):
                       torch=torch.__version__, gymnasium=gym.__version__, numpy=np.__version__),
         git_head=live.get("git_head"), git_dirty=live.get("git_dirty"),
         plant_sha=live.get("plant_sha"), derived_sha=live.get("derived_sha"),
+        engine=live.get("engine"), engine_sha=live.get("engine_sha"), backend=live.get("backend"),
         plant_inputs=plant, output=outdir.replace(os.sep, "/"),
         machine=dict(system=platform.system(), processor=platform.processor(), cpus=os.cpu_count(),
                      omp_threads=os.environ.get("OMP_NUM_THREADS")))
@@ -389,11 +420,14 @@ def run_config(a, tag, model, outdir, live):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--engine", required=True, choices=engines.known(),
+                    help="the plant to train on (engines.get). REQUIRED: there is no "
+                         "default engine (CLAUDE.md mistake 1)")
     ap.add_argument("--steps", type=int, default=50_000)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--no-preview", action="store_true",
                     help="the blinded baseline for Phase D step D3")
-    ap.add_argument("--duration", type=float, default=900.0,
+    ap.add_argument("--duration", type=float, default=DURATION_S,
                     help="episode length in seconds; 900 is the standard scenario")
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
@@ -462,6 +496,7 @@ def main():
                                  + f"_dt{a.dt:g}".replace(".", "p"))
     protocol = "d2" if a.road == "random" else "phase-d"
     device = get_device(a.device)
+    plant = engines.get(a.engine)
 
     tag = f"{'blind' if a.no_preview else 'sighted'}_seed{a.seed}"
     outdir = os.path.join(a.out, tag)
@@ -474,6 +509,7 @@ def main():
         raise SystemExit(f"\nREFUSING: {outdir} is being trained right now by "
                          f"process {busy}. Wait for it, or stop it first.")
 
+    print(f"plant         : {plant.id}   (--engine {a.engine})")
     print(f"configuration : {'BLINDED (no preview)' if a.no_preview else 'sighted'}")
     print(f"road          : {a.road}   ({ROADS_TEXT[a.road]})")
     print(f"step          : dt = {a.dt:g} s, {a.duration / a.dt:.0f} steps per episode, "
@@ -494,7 +530,7 @@ def main():
           f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on {device.type}")
     print(f"output        : {outdir}/\n")
 
-    env = build_env(not a.no_preview, a.seed, a.duration, a.road, a.dt)
+    env = build_env(not a.no_preview, a.seed, a.duration, a.road, a.dt, plant=plant)
 
     ckpt_path = os.path.join(outdir, "checkpoint.zip")
     periodic = sorted(glob.glob(os.path.join(glob.escape(outdir), "ckpt_*_steps.zip")),
@@ -517,14 +553,17 @@ def main():
             "experiment into its own --out instead.")
 
     meta_path = os.path.join(outdir, "meta.json")
-    live = FP.plant_fingerprint(protocol=protocol,
+    # backend: read from the environment this run trains in (an engine_model
+    # there would be refused, not recorded as the cycle model)
+    live = FP.plant_fingerprint(protocol=protocol, plant=plant,
+                                backend=FP.backend_of(env.unwrapped),
                                 train_dt=float(env.unwrapped.dt),
                                 train_duration=a.duration,
                                 steps_requested=a.steps, seed=a.seed,
                                 use_preview=not a.no_preview, tag=tag,
-                                train_road=a.road, train_device=str(device),
-                                derived_sha=derived_sha())
+                                train_road=a.road, train_device=str(device))
     stored = FP.read(meta_path)
+    refuse_old_schema(stored, outdir, a.force_plant_mismatch)
 
     if resume_from:
         b = FP.model_budget(resume_from)
@@ -650,7 +689,7 @@ def main():
                 prev = json.load(fh)
         except (OSError, ValueError):
             prev = None
-    cfg = run_config(a, tag, model, outdir, live)
+    cfg = run_config(a, tag, model, outdir, live, plant)
     cfg.update(keep_buffer=bool(a.keep_buffer), resumed_buffer=buffer_restored)
     cfg.update(started=datetime.now().isoformat(timespec="seconds"), resumed_from=resume_from,
                status="running")
@@ -748,7 +787,7 @@ def _train_and_save(a, model, env, cb, outdir, ckpt_path, remaining,
     # eleven episodes, -506.4 to +643.6, the largest in the FIRST five.
     print("\n  Episode returns vary with the road and the preference weights, so this")
     print("  curve cannot show learning. Score the run on the frozen episodes:")
-    print(f"      python evaluate.py{' --protocol d2' if a.road == 'random' else ''} {outdir}")
+    print(f"      python evaluate.py --engine {a.engine}{' --protocol d2' if a.road == 'random' else ''} {outdir}")
     print("  If the agent does not beat the baseline there, re-run test_reward.py")
     print("  before changing anything else -- a broken reward trains normally.")
 

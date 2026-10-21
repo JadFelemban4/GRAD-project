@@ -25,8 +25,8 @@ runs = {}
 for label, buf in (("default_1e6", 1_000_000), ("sized", STEPS)):
     out = os.path.join(tmp, label)
     r = subprocess.run(
-        [sys.executable, "train.py", "--steps", str(STEPS), "--seed", str(SEED),
-         "--out", out, "--buffer", str(buf)],
+        [sys.executable, "train.py", "--engine", "b58", "--steps", str(STEPS), "--seed", str(SEED),
+         "--out", out, "--buffer", str(buf)],     # --engine: required since 20 October 2026
         cwd=ROOT, env=env, capture_output=True, text=True, timeout=1800)
     print(f"{label:<12} buffer={buf:<9,} exit {r.returncode}")
     if r.returncode != 0:

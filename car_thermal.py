@@ -129,7 +129,7 @@ def measured_fuel_gps(air_gps, lam, rpm):
     return air / (AFR_STOICH * lam)
 
 
-def thermal_replay(source, params=None, pin_block=False):
+def thermal_replay(source, params=None, pin_block=False, *, plant):
     """Block and oil nodes of thermal.py, driven over one logged drive.
 
     FREE-RUNNING by default: nothing is reset to a measurement after the seed,
@@ -139,10 +139,16 @@ def thermal_replay(source, params=None, pin_block=False):
     the oil node is tested on its own.
 
     The fan duty comes from BaselineECU.step, the one definition of the fan rule.
+
+    `plant` is required (20 October 2026): the logged drives are the B58's, and
+    the network, the ECU and the charge temperature are that plant's. `params`
+    None means the plant's own thermal constants (it meant thermal.ThermalParams()
+    -- the B58's defaults -- until then).
     """
     from thermal import ThermalNetwork
     from engine_env import BaselineECU
     from plant import charge_temperature
+    params = plant.engine.thermal if params is None else params
     d = log_grid(source)
     fuel = measured_fuel_gps(d.air_gps.to_numpy(), d.lam.to_numpy(), d.rpm.to_numpy())
     air_gps = np.where(np.isfinite(d.air_gps.to_numpy()), d.air_gps.to_numpy(), 0.0)
@@ -153,7 +159,7 @@ def thermal_replay(source, params=None, pin_block=False):
     rpm = d.rpm.fillna(0.0).to_numpy()
     mp = d.map_kpa.fillna(40.0).to_numpy()
 
-    tn, ecu = ThermalNetwork(params), BaselineECU()
+    tn, ecu = ThermalNetwork(params), BaselineECU(plant.engine.ecu)
     tn.reset(t_amb=float(amb[0]), warm=True)
     tn.t_block = float(ect[np.isfinite(ect)][0])
     tn.t_oil = float(oil[np.isfinite(oil)][0])
@@ -163,7 +169,8 @@ def thermal_replay(source, params=None, pin_block=False):
         if pin_block and np.isfinite(ect[i]):
             tn.t_block = ect[i]
         if rpm[i] > 400.0:
-            _, _, fan = ecu.step(rpm[i], mp[i], charge_temperature(amb[i], tn.t_block),
+            _, _, fan = ecu.step(rpm[i], mp[i], charge_temperature(amb[i], tn.t_block,
+                                                                   engine=plant.engine),
                                  tn.t_block, False, 1.0)
         else:
             fan = 0.0
@@ -209,12 +216,15 @@ def identify_tau(fuel, t_block, t_amb, t_node, taus=TAU_GRID_S):
     return best[0], best[1], 0 < k_best < len(taus) - 1
 
 
-def oil_time_constants(drives=OIL_DRIVES):
+def oil_time_constants(drives, *, plant):
     """Apparent oil time constant per drive: identified from the car's oil, and
-    from the model's oil by the same method with the block pinned to coolant."""
+    from the model's oil by the same method with the block pinned to coolant.
+    `plant` is required, as in thermal_replay, and so are the `drives`: they are
+    the logs of the car the plant is (OIL_DRIVES for the B58's Supra), and were a
+    default here, the Supra's drives for any plant passed, until 21 October 2026."""
     out = []
     for src in drives:
-        r = thermal_replay(src, pin_block=True)
+        r = thermal_replay(src, pin_block=True, plant=plant)
         tau_c, rmse_c, interior = identify_tau(r["fuel"], r["ect_car"], r["t_amb"], r["oil_car"])
         tau_m, _, _ = identify_tau(r["fuel"], r["ect_car"], r["t_amb"], r["oil_model"])
         out.append(dict(drive=src, tau_car=tau_c, tau_model=tau_m, rmse_car=rmse_c,

@@ -59,6 +59,15 @@ tolerated: `_check_phase_d_road()` asserts that `climb(180, 0.12)` equals
 runs every time this module is imported. If `make_grade_climb`'s road shape is
 ever changed, the import fails instead of the two quietly diverging.
 
+PHASE D2 IS THE B58'S (20 October 2026, the four-engine build). Its road speed
+and ambient are the constants below, and the road it must reproduce is the B58
+Supra's locked climb, named: `engine_env.locked_climb(engines.get("b58"), ...)`,
+since make_grade_climb no longer has defaults to stand in for it. `climb()`
+takes no plant, so a plant whose locked climb is another speed or ambient is
+refused by `check_plant()` -- in RandomClimb and in evaluate.episode_cycle --
+rather than driven on the Supra's road (21 October 2026, the review of build
+step 1).
+
 WHAT THE BLIND AGENT CAN STILL KNOW, and it is legitimate
 ---------------------------------------------------------
 Once the climb starts, observation index 13 carries the grade the car is ON --
@@ -116,6 +125,21 @@ def climb(start_s, grade, duration=900.0, dt=0.2, t_amb=T_AMB_K, v_kmh=V_KMH):
     return c
 
 
+def check_plant(plant):
+    """`plant`, when Phase D2's roads are its roads. climb() builds them from
+    V_KMH and T_AMB_K, the B58 Supra's locked climb, not from the plant, so a
+    plant whose locked climb runs at another speed or in another ambient is
+    refused, never driven on the Supra's road without a word."""
+    sc = plant.scenario
+    if (float(sc.v_kmh), float(sc.t_amb)) != (V_KMH, T_AMB_K):
+        raise ValueError(
+            f"Phase D2's roads run at {V_KMH:g} km/h in {T_AMB_K:g} K air (random_road.py, the B58 "
+            f"Supra's locked climb); {plant.id}'s locked climb is {float(sc.v_kmh):g} km/h in "
+            f"{float(sc.t_amb):g} K. random_road.climb takes no plant yet: give it that plant's "
+            "road before training or scoring it under Phase D2.")
+    return plant
+
+
 def draw(rng, ranges=RANGES):
     """One (start_s, grade) pair, uniform on each range, from `rng`."""
     s = float(rng.uniform(*ranges["start_s"]))
@@ -146,6 +170,7 @@ class RandomClimb(gym.Wrapper):
 
     def __init__(self, env, seed=None, duration=900.0, ranges=RANGES):
         super().__init__(env)
+        check_plant(env.unwrapped.plant)          # the roads below are the Supra's
         self.duration = float(duration)
         self.ranges = ranges
         self._rng = road_rng(0 if seed is None else seed)
@@ -243,9 +268,13 @@ def spec():
 
 
 def _check_phase_d_road():
-    """climb(180, 0.12) must BE Phase D's road. Runs at import; see docstring."""
+    """climb(180, 0.12) must BE Phase D's road -- the B58 Supra's locked climb.
+    Runs at import; see docstring."""
+    import engines
+    from engine_env import locked_climb
+    plant = engines.get("b58")
     for dt, dur in ((0.2, 900.0), (1.0, 720.0)):
-        ref = make_grade_climb(duration=dur, dt=dt)
+        ref = locked_climb(plant, duration=dur, dt=dt)
         got = climb(180.0, 0.12, duration=dur, dt=dt)
         for k in ("t", "v_mps", "grade"):
             if not np.array_equal(ref[k], got[k]):
@@ -265,15 +294,18 @@ _check_phase_d_road()
 
 
 def _selftest():
+    import engines
     import evaluate
-    from engine_env import SupervisoryTunerEnv
+    from engine_env import SupervisoryTunerEnv, locked_climb
+    plant = engines.get("b58")
 
     print("random_road.py self-test")
     print("-" * 64)
     print("  climb(180 s, 12 %) == make_grade_climb(), dt 0.2 and 1.0 : True"
           "   (checked at import)")
 
-    env = RandomClimb(SupervisoryTunerEnv(make_grade_climb(), seed=0), seed=0)
+    env = RandomClimb(SupervisoryTunerEnv(locked_climb(plant, duration=900.0, dt=0.2), plant=plant,
+                                          seed=0), seed=0)
     roads = []
     for s in (0, 1, 2):
         _, info = env.reset(seed=s)

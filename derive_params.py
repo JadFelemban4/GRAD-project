@@ -32,7 +32,14 @@ after it changes (CLAUDE.md, "A plant change after the retrain means retraining"
 
 WHAT IS STILL TYPED, AND WHY: see REFERENCES.md section 4b. In short -- the
 turbine node, the exhaust backpressure, the port heat loss and the combustion
-correlations have no channel on this car to be derived from.
+correlations have no channel on this car to be derived from. Since 20 October
+2026 the typed values live in engine_specs/b58.toml and a90_supra.toml, each
+with its source (engines.py).
+
+THE B58'S FILE ONLY. The logs in logs/raw are the B58 Supra's, so this script
+derives the B58's file, data/derived_params.json, and builds its plant by name
+(ENGINE). A later engine's derived file is written by its own calibration, to
+data/engines/<id>/derived_params.json.
 """
 import hashlib
 import json
@@ -51,6 +58,15 @@ sys.path.insert(0, HERE)
 OUT = os.path.join(HERE, "data", "derived_params.json")
 
 BIN_KGS, MIN_ROWS, PCTL = 0.03, 15, 95.0        # the envelope method, as documented since 8 Sep
+ENGINE = "b58"                                   # the engine whose logs these are
+
+
+def _plant():
+    """The B58 as the code stands, its derived values whatever the file held when
+    this process first read it (NaN while it is being made): only its typed
+    values -- the spark slopes, the enrichment's held constants -- are used here."""
+    import engines
+    return engines.get(ENGINE)
 
 
 def fingerprint():
@@ -171,16 +187,17 @@ def derive_spark(P):
     extends a part-load slope into boost (mistake 6; engine_env.BaselineECU)."""
     from engine_env import BaselineECU
     from plant import charge_temperature
-    ecu = BaselineECU()
+    eng = _plant().engine
+    ecu = BaselineECU(eng.ecu)
     pts = P[np.isfinite(P.spark)]
     amb = pts.t_amb.fillna(25.0).to_numpy() + 273.15
     ect = pts.ect.fillna(90.0).to_numpy() + 273.15
-    comp = np.array([ecu.iat_compensation(charge_temperature(a, e)) for a, e in zip(amb, ect)])
+    comp = np.array([ecu.iat_compensation(charge_temperature(a, e, engine=eng)) for a, e in zip(amb, ect)])
     rpm, mp, meas = pts.rpm.to_numpy(), pts.map_kpa.to_numpy(), pts.spark.to_numpy()
     kl = np.array([ecu.knock_limited_spark(r, m) for r, m in zip(rpm, mp)])
 
     def cmd(a):
-        line = a + ecu.SPARK_B * rpm - ecu.SPARK_C * (mp - 40.0)
+        line = a + ecu.SPARK_B * rpm - ecu.SPARK_C * (mp - eng.ecu.spark_ref_kpa)
         return np.clip(np.minimum(line, kl), ecu.SPARK_MIN, ecu.SPARK_MAX) + comp, line <= kl
 
     lo, hi = -40.0, 80.0
@@ -201,8 +218,7 @@ def derive_spark(P):
 # ------------------------------------------------------------- enrichment
 def _genuine_lambda_above_gate(S):
     from verify_docs import dwell_column
-    from engine_env import BaselineECU
-    gate = BaselineECU.ENR_LOAD
+    gate = _plant().engine.ecu.enr_load
     S2 = dwell_column(S, thr=gate)
     h = S2[(S2.map_kpa > gate) & S2.lam.between(0.5, 1.3)]
     fresh = []
@@ -229,12 +245,11 @@ def derive_enrichment(S):
     as `free_fit_all_five`, as the evidence, and is not used. ENR_LOAD is a
     definition (mistake 13), not a fit.
     """
-    from engine_env import BaselineECU
-    E = BaselineECU
+    c = _plant().engine.ecu            # the held constants: ENR_RPM_LO / HI, ENR_DEPTH
     rpm, dw, lam, by_drive = _genuine_lambda_above_gate(S)
-    s = np.clip((rpm - E.ENR_RPM_LO) / (E.ENR_RPM_HI - E.ENR_RPM_LO), 0.0, 1.0)
+    s = np.clip((rpm - c.enr_rpm_lo) / (c.enr_rpm_hi - c.enr_rpm_lo), 0.0, 1.0)
 
-    def rmse(l0, l1, depth=E.ENR_DEPTH, ss=s):
+    def rmse(l0, l1, depth=c.enr_depth, ss=s):
         return float(np.sqrt(np.mean((1.0 - depth * ss * np.clip((dw - l0) / (l1 - l0), 0, 1) - lam) ** 2)))
     best = min(((rmse(l0, l1), l0, l1) for l0 in np.arange(0.0, 6.01, 0.25)
                 for l1 in np.arange(l0 + 0.5, 15.01, 0.25)), key=lambda x: x[0])
@@ -256,8 +271,8 @@ def derive_enrichment(S):
                     free = (float(sse[k]), r0, r1, l0, float(l1s[k]), float(dep[k]))
     return dict(ENR_DWELL_LO=float(best[1]), ENR_DWELL_HI=float(best[2]), rmse=best[0],
                 rmse_8sep_2_9s=rmse(2.0, 9.0), readings=int(len(lam)),
-                readings_above_rpm_lo=int((rpm > E.ENR_RPM_LO).sum()), by_drive=by_drive,
-                held=dict(ENR_RPM_LO=E.ENR_RPM_LO, ENR_RPM_HI=E.ENR_RPM_HI, ENR_DEPTH=E.ENR_DEPTH),
+                readings_above_rpm_lo=int((rpm > c.enr_rpm_lo).sum()), by_drive=by_drive,
+                held=dict(ENR_RPM_LO=c.enr_rpm_lo, ENR_RPM_HI=c.enr_rpm_hi, ENR_DEPTH=c.enr_depth),
                 free_fit_all_five=dict(ENR_RPM_LO=free[1], ENR_RPM_HI=free[2], ENR_DWELL_LO=free[3],
                                        ENR_DWELL_HI=free[4], ENR_DEPTH=free[5],
                                        rmse=float(np.sqrt(free[0] / len(y))),
@@ -269,10 +284,13 @@ def derive_enrichment(S):
 def derive_torque():
     """Measured through the plant in a FRESH process, so it sees the boost
     ceiling and spark offset just written rather than the ones this process
-    imported."""
+    imported. On the car's own grid and in its own conditions (engines.Car's
+    table_*, engine_specs/a90_supra.toml), which were the measuring function's
+    defaults until 21 October 2026."""
     env = dict(os.environ, DERIVING_PARAMS="1")
-    code = ("import json, engine_env as E; "
-            "print(json.dumps(E.measure_deliverable_torque()))")
+    code = ("import json, engines, engine_env as E; "
+            f"p = engines.get({ENGINE!r}); "
+            "print(json.dumps(E.measure_deliverable_torque(p.car.table_rpms, plant=p)))")
     r = subprocess.run([sys.executable, "-c", code], cwd=HERE, env=env,
                        capture_output=True, text=True, check=True)
     return [[int(a), round(float(b), 1)] for a, b in json.loads(r.stdout.strip().splitlines()[-1])]

@@ -5,11 +5,11 @@
     "transmission_name": "ZF 8HP51",
     "fuel": "95 RON",
     "source": {
-      "file": "plant.py",
-      "symbol": "b58",
-      "variable": "n_cyl",
-      "line": 114,
-      "match": "def b58"
+      "file": "engine_specs/a90_supra.toml",
+      "symbol": "[car]",
+      "variable": "gears",
+      "line": 20,
+      "match": "gears = { value ="
     }
   },
   "actions": [
@@ -288,11 +288,11 @@
       "evidence": "MODELLED",
       "range": "هندسة النموذج: 2,997.5 cc، ست أسطوانات، نسبة انضغاط 10.2:1.",
       "source": {
-        "file": "plant.py",
-        "symbol": "Geometry",
+        "file": "engine_specs/b58.toml",
+        "symbol": "[geometry]",
         "variable": "n_cyl",
-        "line": 36,
-        "match": "class Geometry"
+        "line": 35,
+        "match": "n_cyl = { value ="
       },
       "upstream": [],
       "downstream": [
@@ -303,7 +303,7 @@
       "increase": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
       "decrease": "يتوقف الأثر على نقطة التشغيل المترابطة؛ غيّر هذا المتغير وحده في تجربة مضبوطة.",
       "caveat": "هوية هندسة المشروع؛ وليست معايرة معتمدة من الشركة أو ملف CAD.",
-      "evidence_note": "تحدد الهندسة الافتراضية في plant.Geometry؛ وتسمي b58() محرك Supra 3.0 موديل 2023.",
+      "evidence_note": "تحدد الهندسة في engine_specs/b58.toml، ويبنيها engines.get في engines.Geometry؛ يُسمّى محرك Supra 3.0 موديل 2023 هناك صراحةً، ولا يوجد محرك افتراضي.",
       "evidence_class": "MODELLED",
       "evidence_label_ar": "محسوب بالنموذج"
     },
@@ -1063,11 +1063,11 @@
       "evidence": "ASSUMED",
       "range": "ثابت التوربين نحو 47 s في السيناريو المقفل؛ وهو غير مقاس مباشرة.",
       "source": {
-        "file": "thermal.py",
-        "symbol": "ThermalParams",
+        "file": "engine_specs/b58.toml",
+        "symbol": "[thermal]",
         "variable": "c_turb",
-        "line": 48,
-        "match": "class ThermalParams"
+        "line": 122,
+        "match": "c_turb = { value ="
       },
       "upstream": [
         "t_turb"

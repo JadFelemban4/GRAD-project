@@ -54,23 +54,25 @@ def _assignment_value(tree: ast.Module, name: str) -> Any:
     raise ValueError(f"source constant {name} was not found")
 
 
-def _class_value(tree: ast.Module, class_name: str, name: str) -> Any:
-    for node in tree.body:
-        if not isinstance(node, ast.ClassDef) or node.name != class_name:
-            continue
-        for member in node.body:
-            if isinstance(member, ast.Assign):
-                targets = member.targets
-            elif isinstance(member, ast.AnnAssign):
-                targets = [member.target]
-            else:
-                continue
-            if any(isinstance(target, ast.Name) and target.id == name for target in targets):
-                try:
-                    return ast.literal_eval(member.value)
-                except (ValueError, TypeError):
-                    return None
-    raise ValueError(f"{class_name}.{name} was not found")
+def _lab_plant():
+    """The plant the lab simulates (backend.LAB_PLANT), as engines.get builds it
+    from its typed specs and its derived file. engines.py imports numpy and
+    derived.py only, so this is still not the simulation stack.
+
+    Since 20 October 2026 the engine geometry, the gearbox and the damage knees
+    are this record's fields: they were plant.Geometry's and engine_env.Vehicle's
+    class-level literals and engine_env's TURB_PROTECT_K / OIL_PROTECT_K, which
+    this module used to read off the source tree."""
+    import sys
+
+    from . import LAB_PLANT
+
+    root_text = str(PROJECT_ROOT)
+    if root_text not in sys.path:
+        sys.path.insert(0, root_text)
+    import engines
+
+    return engines.get(LAB_PLANT)
 
 
 def _source_allowlist() -> set[str]:
@@ -79,6 +81,8 @@ def _source_allowlist() -> set[str]:
         "engine_env.py", "plant.py", "thermal.py", "train.py", "evaluate.py",
         "REFERENCES.md", "CLAUDE.md", "validation_table.md", "compare_log.py",
         "data/derived_params.json",
+        # the lab plant's typed values (20 October 2026): the vehicle card's source
+        "engines.py", "engine_specs/b58.toml", "engine_specs/a90_supra.toml",
         "results/premise.json", "results/README.md",
         "results/agents/terrain_dt1/index.json",
         "results/agents/terrain_dt1/README.md",
@@ -224,8 +228,8 @@ def metadata(locale: str = "en") -> dict[str, Any]:
         })
         observations.append(item)
 
-    plant_tree = ast.parse((PROJECT_ROOT / "plant.py").read_text(encoding="utf-8"))
-    geometry = {name: _class_value(plant_tree, "Geometry", name)
+    plant = _lab_plant()
+    geometry = {name: getattr(plant.engine.geometry, name)
                 for name in ("bore", "stroke", "n_cyl", "comp_ratio")}
     data["vehicle"].update(
         cylinders=int(geometry["n_cyl"]),
@@ -234,15 +238,15 @@ def metadata(locale: str = "en") -> dict[str, Any]:
         displacement_cc=(math.pi / 4.0 * geometry["bore"] ** 2
                          * geometry["stroke"] * geometry["n_cyl"] * 1_000_000.0),
         compression_ratio=float(geometry["comp_ratio"]),
-        gears=list(_class_value(tree, "Vehicle", "gears")),
-        final_drive=float(_class_value(tree, "Vehicle", "final_drive")),
+        gears=list(plant.car.gears),
+        final_drive=float(plant.car.final_drive),
     )
     data["vehicle"]["source"] = _resolved_ref(data["vehicle"]["source"])
     data["actions"] = actions
     data["observations"] = observations
     data["preview_s"] = [float(value) for value in preview]
-    data["thresholds"]["turb_k"] = float(_assignment_value(tree, "TURB_PROTECT_K"))
-    data["thresholds"]["oil_k"] = float(_assignment_value(tree, "OIL_PROTECT_K"))
+    data["thresholds"]["turb_k"] = float(plant.engine.damage.turb_knee_k)     # was TURB_PROTECT_K
+    data["thresholds"]["oil_k"] = float(plant.engine.damage.oil_knee_k)       # was OIL_PROTECT_K
     data["thresholds"]["torque_tracking_tolerance"] = float(_assignment_value(tree, "TRACK_TOL"))
     derived_data = _read_json(PROJECT_ROOT / "data/derived_params.json")
     data["derived"] = {
@@ -256,15 +260,20 @@ def metadata(locale: str = "en") -> dict[str, Any]:
 
 
 def _current_plant_sha() -> str:
-    """Use the project fingerprint implementation, without importing engine code."""
+    """Use the project fingerprint implementation, without importing engine code:
+    the files of the lab's plant (backend.LAB_PLANT), fingerprint.plant_files,
+    which names that plant's own typed specs (21 October 2026; it was one list,
+    fingerprint.PLANT_FILES, the B58's for every plant)."""
     import sys
+
+    from . import LAB_PLANT
 
     root_text = str(PROJECT_ROOT)
     if root_text not in sys.path:
         sys.path.insert(0, root_text)
     import fingerprint
 
-    return fingerprint._sha_files(fingerprint.PLANT_FILES)
+    return fingerprint._sha_files(fingerprint.plant_files(LAB_PLANT))
 
 
 def results() -> dict[str, Any]:

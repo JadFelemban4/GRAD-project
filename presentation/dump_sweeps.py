@@ -4,9 +4,10 @@ import numpy as np
 # AUDIT.md L11: was a hard-coded absolute path from one
 # machine, so these scripts ran for exactly one person.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from plant import predict, b58, run_cycle, Operating, DTHETA_DEG
+import engines
+from plant import predict, run_cycle, Operating, DTHETA_DEG
 
-GEO = b58()
+ENG = engines.get("b58").engine        # the engine, named (it was GEO = b58())
 out = {}
 
 # --- spark sweep at a boosted mid-range point -------------------------------
@@ -18,7 +19,7 @@ CASES = [
 for name, op in CASES:
     rows = []
     for sp in np.arange(-6, 44.5, 1.0):
-        r = predict(spark_btdc=float(sp), geo=GEO, **op)
+        r = predict(spark_btdc=float(sp), engine=ENG, **op)
         rows.append([round(float(sp),1), round(r["torque_nm"],1),
                      round(r["knock_integral"],4), round(r["egt_c"],1),
                      round(r["p_max_bar"],1), round(r["mfb50_deg"],2)])
@@ -28,7 +29,7 @@ for name, op in CASES:
 rows = []
 for lam in np.arange(0.75, 1.181, 0.01):
     r = predict(rpm=4500, map_kpa=200, iat_k=333, ect_k=363, spark_btdc=12.0,
-                lam=float(lam), geo=GEO)
+                lam=float(lam), engine=ENG)
     rows.append([round(float(lam),3), round(r["torque_nm"],1), round(r["egt_c"],1),
                  round(r["knock_integral"],4), round(r["mdot_fuel_gps"],2)])
 out["lambda_sweep"] = dict(op=dict(rpm=4500, map_kpa=200, spark_btdc=12.0),
@@ -39,20 +40,19 @@ import plant as P
 traces = {}
 for label, sp in [("retarded", 4.0), ("mbt_ish", 18.0), ("knocking", 32.0)]:
     op = Operating(rpm=3000, map_kpa=200, iat_k=333, ect_k=363,
-                   spark_btdc=sp, lam=1.0, p_exh_kpa=max(105.0, 200*P.EXH_BACKPRESSURE_RATIO))
+                   spark_btdc=sp, lam=1.0, p_exh_kpa=P.exhaust_backpressure_kpa(200, engine=ENG))
     # Was dtheta=0.5, pinned here while the rest of the project moved to
     # plant.DTHETA_DEG = 0.25 (AUDIT.md H1). A hardcoded step means this
     # page was drawn from a cycle model 14-21 K colder in EGT than the one
     # every other script runs. Follow the project default.
-    r = run_cycle(op, geo=GEO, dtheta=DTHETA_DEG)
+    r = run_cycle(op, engine=ENG, dtheta=DTHETA_DEG)
     traces[label] = dict(spark=sp, ki=round(r.knock_integral,3),
                          torque=round(r.torque_nm,1), pmax=round(r.p_max_bar,1),
                          mfb50=round(r.mfb50_deg,2))
 out["pressure_meta"] = traces
 
 # --- thermal first-order: real tau values from the repo ---------------------
-from thermal import ThermalParams
-tp = ThermalParams()
+tp = ENG.thermal
 out["thermal"] = dict(c_block=tp.c_block, c_oil=tp.c_oil, c_turb=tp.c_turb,
                       ua_turb_amb=tp.ua_turb_amb, ua_gas_turb=tp.ua_gas_turb,
                       ua_block_oil=tp.ua_block_oil, ua_block_amb=tp.ua_block_amb,

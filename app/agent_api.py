@@ -39,8 +39,8 @@ from app import agent_catalog
 from app import agent_catalog as C
 from app import agent_trace
 from app.replay import BuildCancelled
-from engine_env import (ACT_HI, ACT_LO, OBS_DIM, OIL_PROTECT_K, PREVIEW_S, SLEW,
-                        TURB_PROTECT_K, neutral_action)
+from app.alerts import OIL_PROTECT_K, TURB_PROTECT_K      # the B58's knees, one definition
+from engine_env import ACT_HI, ACT_LO, OBS_DIM, PREVIEW_S, SLEW, neutral_action
 from evaluate import agent_policy
 
 ROOT = C.ROOT

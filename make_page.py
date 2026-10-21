@@ -259,8 +259,9 @@ def phase_d():
                      thermal_pred=_r(split["predictive (hand)"]["thermal"], 1),
                      preview_thermal=_r(cut_th["predictive (hand)"] - cut_th["current-grade"], 2))
 
-    from engine_env import make_grade_climb
-    c720 = make_grade_climb(duration=720.0, dt=1.0)
+    import engines
+    from engine_env import locked_climb
+    c720 = locked_climb(engines.get("b58"), duration=720.0, dt=1.0)
     climb_m = float(np.sum(c720["v_mps"] * c720["grade"]))
     isa = 101.325 * (1.0 - 2.25577e-5 * climb_m) ** 5.25588     # standard atmosphere
     elev = dict(climb_m=_r(climb_m, 0), isa_kpa=_r(isa, 0), p_model=c720["p_baro"])
@@ -607,7 +608,7 @@ def calibration():
                        car=_r(np.nanmax(tr["car_oil"]), 1))
     out["rows"] = [dict(name=r["name"], before=_r(r["before"], 1), after=_r(r["after"], 1),
                         lo=r["lo"], hi=r["hi"], inside=r["inside"]) for r in C["rows"]]
-    out["t_stat_c"] = _r(derived.get("thermal", "t_stat_open") - 273.15, 1)
+    out["t_stat_c"] = _r(derived.get("thermal", "t_stat_open", path=derived.B58_PATH) - 273.15, 1)
     # the premise at each step of the change (a RECORD, measured once per step)
     out["steps"] = C["premise_steps"]
     out["steps_last_baseline"] = C["premise_steps"][-1]["baseline"]
@@ -1283,11 +1284,15 @@ def glossary(gen, x1):
     file. A change to any of them stops the build and names what to update.
     """
     import engine_env as E
-    import fingerprint as FP
+    import engines
     import plant
     import power_analysis as PA
     import thermal
     from math import comb, erf, exp, log, sqrt
+    # the plant the template's numbers are the B58's of (20 October 2026: the
+    # constants moved from module literals into its records)
+    B58 = engines.get("b58")
+    ENG = B58.engine
     from analyse_phase_d import perm_test, sign_test
     from analyse_phase_d2 import MEI as MEI_UNITS
     from analyse_x1 import MEI_PTS
@@ -1301,32 +1306,47 @@ def glossary(gen, x1):
     # damage: the typed formula, evaluated, against the one definition
     for tt, to, ki in ((1150.0, 400.0, 1.0), (1100.0, 415.0, 0.5), (1180.0, 380.0, 0.9)):
         typed = exp((tt - 1123) / 45) + 0.4 * exp((to - 408) / 12)
-        same("damage_rate, thermal only", E.damage_rate(tt, to), typed)
-        same("damage_rate", E.damage_rate(tt, to, ki), typed + 40 * max(0.0, ki - 0.85) ** 2)
-    same("TURB_PROTECT_K", E.TURB_PROTECT_K, 1123.0)
-    same("OIL_PROTECT_K", E.OIL_PROTECT_K, 408.0)
+        same("damage_rate, thermal only", E.damage_rate(tt, to, cal=ENG.damage), typed)
+        same("damage_rate", E.damage_rate(tt, to, ki, cal=ENG.damage), typed + 40 * max(0.0, ki - 0.85) ** 2)
+    same("turb_knee_k (was TURB_PROTECT_K)", ENG.damage.turb_knee_k, 1123.0)
+    same("oil_knee_k (was OIL_PROTECT_K)", ENG.damage.oil_knee_k, 408.0)
     same("PREVIEW_S", E.PREVIEW_S, (2.0, 5.0, 15.0, 30.0))
     same("ACT_LO", E.ACT_LO, (-8.0, -0.15, -40.0, 0.0, 0.3))
     same("ACT_HI", E.ACT_HI, (4.0, 0.06, 15.0, 1.0, 1.0))
     same("SPARK_TRIM_MAX", E.SPARK_TRIM_MAX, 0.0)
     same("reward constants", (E.TRACK_W_MIN, E.TRACK_W_MAX, E.TRACK_TOL, E.TRACK_HINGE), (0.45, 0.70, 0.05, 25.0))
-    V = E.Vehicle
+    V = B58.car
     same("gears", V.gears, (5.250, 3.360, 2.172, 1.720, 1.316, 1.000, 0.822, 0.640))
     same("final_drive", V.final_drive, 3.150)
     same("vehicle", (V.mass, V.cd_a, V.crr, V.wheel_r), (1520.0, 0.66, 0.011, 0.33))
-    P = thermal.ThermalParams()
+    P = ENG.thermal
     same("thermal", (P.c_turb, P.ua_gas_turb, P.ua_turb_amb), (6000.0, 0.90, 18.0))
     same("DT_SUB_MAX", thermal.DT_SUB_MAX, 0.1)
     same("AFR_STOICH", plant.AFR_STOICH, 14.7)
     same("corrected_flow", plant.corrected_flow(1000.0, 298.0, 101.3), 1.0)
     same("corrected_flow", plant.corrected_flow(500.0, 4 * 298.0, 2 * 101.3), 0.5)
-    g = plant.b58()
+    g = ENG.geometry
     same("geometry", (g.bore, g.stroke, g.n_cyl), (0.082, 0.0946, 6))
     disp = 6 * np.pi / 4 * 82.0 ** 2 * 94.6 / 1000.0
     same("displacement", g.vd_cyl * g.n_cyl * 1e6, disp, 1e-6)
-    same("PLANT_FILES", len(FP.PLANT_FILES), 4)
-    if tuple(FP.PLANT_FILES) != ("plant.py", "thermal.py", "engine_env.py", "derived.py"):
-        raise SystemExit(f"glossary: fingerprint.PLANT_FILES is {FP.PLANT_FILES}")
+    # the numbers the knock, Wiebe and port equations carry, from the B58's record
+    C = ENG.cycle
+    same("knock correlation", (C.knock_a, C.knock_on, C.knock_p, C.knock_b, C.n_poly, C.octane),
+         (0.01768, 3.402, -1.7, 3800.0, 1.32, 95.0))
+    same("Wiebe", (C.wiebe_a, C.wiebe_m), (5.0, 2.0))
+    same("port", (C.ua_port, C.cp_exh), (15.0, 1150.0))
+    # plant_sha's equation as the template types it is fingerprint schema 2's:
+    # the definition behind every agent the page shows (X1's and X2's meta.json,
+    # 3c48890dd15bc116), which app.results_provenance keeps frozen and tests equal
+    # to cf43fbb's fingerprint.py. This tree's schema 3 also hashes engines.py and
+    # the plant's own typed specs (fingerprint.plant_files). Until 21 October 2026
+    # this check compared the template's four files with schema 3's seven and said
+    # seven, which the template does not: a page that shows a schema-3 agent
+    # changes the equation and this check together.
+    from app import results_provenance as RP
+    same("plant_sha's files, schema 2", len(RP.SCHEMA_2_PLANT_FILES), 4)
+    if tuple(RP.SCHEMA_2_PLANT_FILES) != ("plant.py", "thermal.py", "engine_env.py", "derived.py"):
+        raise SystemExit(f"glossary: schema 2's plant files are {RP.SCHEMA_2_PLANT_FILES}")
     # the tests, against the typed formulas
     for d in ([1.0, 1.0, -1.0], [2.0, -0.5, 3.0, 1.0, -4.0, 0.7]):
         nz = [v for v in d if v != 0]
@@ -1344,19 +1364,19 @@ def glossary(gen, x1):
     same("make_page.MEI_PTS_X", MEI_PTS_X, MEI_PTS)
     same("MEI (units)", MEI_UNITS, 50.0)
     # and the lines the section quotes
-    _src("plant.py", "tau = 0.01768 * (op.octane / 100.0) ** 3.402 * p_atm ** -1.7 * np.exp(3800.0 / t_unburned)",
-         "ki += dt / tau", "n_poly = 1.32", "t_unburned = t_ivc * (P[i] / P[0]) ** ((n_poly - 1.0) / n_poly)",
-         "a_w, m_w = 5.0, 2.0", "return 1.0 - np.exp(-a_w * x ** (m_w + 1.0))",
+    _src("plant.py", "tau = knock_a * (octane / 100.0) ** knock_on * p_atm ** knock_p * np.exp(knock_b / t_unburned)",
+         "ki += dt / tau", "n_poly = c.n_poly", "t_unburned = t_ivc * (P[i] / P[0]) ** ((n_poly - 1.0) / n_poly)",
+         "a_w, m_w = c.wiebe_a, c.wiebe_m", "return 1.0 - np.exp(-a_w * x ** (m_w + 1.0))",
          "power_w = torque * op.rpm * 2.0 * np.pi / 60.0", "bsfc = (mdot_fuel * 3.6e6) / (power_w / 1000.0)",
-         "UA_PORT = 15.0", "CP_EXH = 1150.0", "mdot_exh = (m_air + m_fuel) * geo.n_cyl * op.rpm / 120.0",
+         "UA_PORT = c.ua_port", "CP_EXH = c.cp_exh", "mdot_exh = (m_air + m_fuel) * geo.n_cyl * op.rpm / 120.0",
          "retained = np.exp(-UA_PORT / max(mdot_exh * CP_EXH, 1.0))",
          "t_exh = t_wall + (t_blowdown - t_wall) * retained")
-    _src("thermal.py", "ua_gt = p.ua_gas_turb * max(mdot_exh_gps, 0.5)",
+    _src("thermal.py", "ua_gt = p.ua_gas_turb * max(m_h, 0.5)",
          "q_in_turb = ua_gt * (egt_k - self.t_turb)", "q_out_turb = p.ua_turb_amb * (self.t_turb - t_amb)",
          "self.t_turb += dt * (q_in_turb - q_out_turb) / p.c_turb",
          "n_sub = max(1, int(np.ceil(dt / DT_SUB_MAX - 1e-9)))")
     _src("check_map.py", "KI_LIMIT = 1.0", "for sp in np.arange(0.0, 46.0, 1.0):")
-    _src("check_premise.py", "TRIGGER_K = TURB_PROTECT_K", "np.clip(over / 25.0, 0.0, 1.0)",
+    _src("check_premise.py", "return env.plant.engine.damage.turb_knee_k", "np.clip(over / 25.0, 0.0, 1.0)",
          "np.clip(grade_now / 0.08, 0.0, 1.0)) if grade_now > 0.02 else 0.0",
          "return _protect(max(k_now, 0.55 * k_grade))", "max(env._preview()[2], env._preview()[3])",
          "return to_norm([0.0, -0.10 * k, -18.0 * k, fan, pump])", "fan = max(NEUTRAL_FAN, k)")
@@ -1368,7 +1388,8 @@ def glossary(gen, x1):
          "bad = (d_lam > LAMBDA_TOL) | (d_boost > BOOST_TOL)")
     _src("generality_test.py", "h_tau=30.0 / tau")
     _src("record_agents.py", "stats.t.ppf(0.975, n - 1)", "stats.ttest_1samp(d, 0.0)", "stats.wilcoxon(")
-    _src("evaluate.py", "DT = 1.0", "DURATION = 720.0", "default_rng(20260918)",'thermal += damage_rate(info["t_turb"], info["t_oil"]) * env.dt',
+    _src("evaluate.py", "DT = 1.0", "DURATION = 720.0", "default_rng(20260918)",
+         'thermal += damage_rate(info["t_turb"], info["t_oil"], cal=plant.engine.damage) * env.dt',
          "np.percentile(v, [25, 50, 75])")
     _src("car_spark_boost.py", "se = 1.2533 * d.std(ddof=1) / np.sqrt(n)")
     _src("model_vs_data.py", "np.corrcoef(ki, ret)[0, 1]",

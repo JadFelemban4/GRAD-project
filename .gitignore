@@ -51,3 +51,7 @@ results/conditions_*/conditions_test.part*.json
 results/x1_score/*.log
 # x2_score.py's per-step logs, likewise.
 results/x2_score/*.log
+
+# A crashed shell's dump (bash.exe.stackdump, from msys-2.0.dll, 19 October 2026):
+# never source. Ignored since 21 October 2026, so git add -A cannot commit one.
+*.stackdump

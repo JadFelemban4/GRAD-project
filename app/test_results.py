@@ -44,6 +44,9 @@ REAL = {
     "c4": ("C4 EVALUATION (agents from runs_c4/)", "d2", "d2", "22 Sep 2026", "runs_c4"),
 }
 REAL_SEEDS = range(8)
+# The FATAL fields fingerprint schema 3 added (20 October 2026, the four-engine
+# build): which plant, every value it was built with, what computes the engine.
+SCHEMA_3_FIELDS = {"engine", "engine_sha", "backend"}
 # analyse_phase_d.parse names the policies by label prefix; the tab, by role
 APD_NAMES = {"blind": "agent (blind)", "sighted": "agent", "baseline": "baseline ECU",
              "reactive": "reactive", "current_grade": "current-grade"}
@@ -171,10 +174,13 @@ class EvalParserTests(unittest.TestCase):
                                  (title, head_protocol, 20, frozen))
                 self.assertEqual(EV.protocol_from_fingerprint(got["fingerprint"]), block_protocol)
                 # Written in September under fingerprint schema 1: every fatal field
-                # of that schema, and no derived_sha, which schema 2 made fatal.
+                # of that schema, and no derived_sha, which schema 2 made fatal, nor
+                # engine, engine_sha and backend, which schema 3 did (20 October 2026).
                 self.assertEqual(RP.schema_of(got["fingerprint"]), 1)
-                self.assertTrue(set(FP.FATAL) - {"derived_sha"} <= set(got["fingerprint"]))
-                self.assertNotIn("derived_sha", got["fingerprint"])
+                later = {"derived_sha"} | SCHEMA_3_FIELDS
+                self.assertTrue(set(FP.FATAL) - later <= set(got["fingerprint"]))
+                for field in sorted(later):
+                    self.assertNotIn(field, got["fingerprint"])
                 self.assertEqual(got["fingerprint"]["git_dirty_plant_files"], "")
                 self.assertEqual(list(got["policies"]), list(EV.ROLES))
                 self.assertEqual(got["policies"]["sighted"]["dir"], f"{runs}/sighted_seed{seed}")
@@ -681,22 +687,36 @@ class ProvenanceLiveTests(unittest.TestCase):
         self.assertEqual((git.available, git.reason), (False, "missing"))
 
     def test_hashes_equal_fingerprint_sha_files(self):
-        sources = [(ROOT / n).read_bytes() for n in FP.PLANT_FILES]
-        self.assertEqual(RP.code_hash(sources), FP._sha_files(FP.PLANT_FILES))
-        self.assertEqual(RP.byte_hash(sources), FP._sha_files(FP.PLANT_FILES, code_only=False))
+        names = RP.PLANT_FILES                          # the B58's, fingerprint.plant_files("b58")
+        sources = [(ROOT / n).read_bytes() for n in names]
+        self.assertEqual(RP.code_hash(sources, names=names), FP._sha_files(names))
+        self.assertEqual(RP.byte_hash(sources), FP._sha_files(names, code_only=False))
         lf = [s.replace(b"\r\n", b"\n") for s in sources]
         crlf = [s.replace(b"\n", b"\r\n") for s in lf]
-        self.assertEqual(RP.code_hash(lf), RP.code_hash(crlf))
+        self.assertEqual(RP.code_hash(lf, names=names), RP.code_hash(crlf, names=names))
         self.assertEqual(RP.byte_hash(lf), RP.byte_hash(crlf))
         commented = [lf[0] + b"\n# a comment the code hash does not see\n"] + lf[1:]
-        self.assertEqual(RP.code_hash(commented), RP.code_hash(lf))
+        self.assertEqual(RP.code_hash(commented, names=names), RP.code_hash(lf, names=names))
         self.assertNotEqual(RP.byte_hash(commented), RP.byte_hash(lf))
         # A file that does not parse is hashed as bytes, after the same CRLF rule.
-        self.assertEqual(RP.code_hash([b"def (:\r\n"]), hashlib.sha256(b"def (:\n").hexdigest()[:16])
+        self.assertEqual(RP.code_hash([b"def (:\r\n"], names=["x.py"]),
+                         hashlib.sha256(b"def (:\n").hexdigest()[:16])
+        # A typed spec by its values, whichever TOML form it is written in (21
+        # October 2026): the table form parses as Python, and was hashed as code.
+        inline = b'[g]\nbore = { value = 0.082, label = "PUBLISHED", source = "a" }\n'
+        table = b'[g.bore]\nvalue = 0.082\nlabel = "PUBLISHED"\nsource = "a"\n'
+        self.assertEqual(RP.code_hash([table], names=["s.toml"]), RP.code_hash([inline], names=["s.toml"]))
+        self.assertEqual(RP.code_hash([table.replace(b'"a"', b'"b"')], names=["s.toml"]),
+                         RP.code_hash([table], names=["s.toml"]), "a source is not hashed")
+        self.assertNotEqual(RP.code_hash([table.replace(b"0.082", b"0.083")], names=["s.toml"]),
+                            RP.code_hash([table], names=["s.toml"]), "a value is")
+        with self.assertRaises(ValueError):
+            RP.code_hash(sources, names=names[:-1])
         # Schema 1's rule: blind to a comment as well, and not schema 2's rule.
-        self.assertEqual(RP.code_hash(commented, 1), RP.code_hash(lf, 1))
-        self.assertNotEqual(RP.code_hash(lf, 1), RP.code_hash(lf))
-        self.assertEqual(RP.code_hash([b"def (:\r\n"], 1), hashlib.sha256(b"def (:\n").hexdigest()[:16])
+        self.assertEqual(RP.code_hash(commented, 1, names=names), RP.code_hash(lf, 1, names=names))
+        self.assertNotEqual(RP.code_hash(lf, 1, names=names), RP.code_hash(lf, names=names))
+        self.assertEqual(RP.code_hash([b"def (:\r\n"], 1, names=["x.py"]),
+                         hashlib.sha256(b"def (:\n").hexdigest()[:16])
 
     def test_the_schema_1_rule_reproduces_the_hashes_its_files_record(self):
         # evaluate.py wrote these into all 24 results/<prefix>_seed<N>.txt in
@@ -723,7 +743,7 @@ class ProvenanceLiveTests(unittest.TestCase):
         old = {"__name__": "fingerprint_at_a7ce729", "__file__": str(ROOT / "fingerprint.py")}
         exec(compile(raw.decode("utf-8"), "fingerprint.py at a7ce729", "exec"), old)
         self.assertEqual((old["SCHEMA_VERSION"], old["PLANT_FILES"]), (1, RP.SCHEMA_1_PLANT_FILES))
-        for name in (*FP.PLANT_FILES, "random_road.py"):
+        for name in (*RP.PLANT_FILES, "random_road.py"):
             with self.subTest(file=name):
                 src = (ROOT / name).read_bytes().replace(b"\r\n", b"\n").decode("utf-8")
                 self.assertEqual(RP._code_only_schema_1(src), old["_code_only"](src))
@@ -738,11 +758,11 @@ class ProvenanceLiveTests(unittest.TestCase):
 
     def test_plant_at_head_equals_the_files_on_disk(self):
         git = self._need_git()
-        if not _clean(*FP.PLANT_FILES):
+        if not _clean(*RP.PLANT_FILES):
             self.skipTest("the plant files have uncommitted changes, so HEAD's plant is not the disk's")
         got = RP.plant_at(git, "HEAD")
-        self.assertEqual(got, {"plant_sha": FP._sha_files(FP.PLANT_FILES),
-                               "plant_text_sha": FP._sha_files(FP.PLANT_FILES, code_only=False)})
+        self.assertEqual(got, {"plant_sha": FP._sha_files(RP.PLANT_FILES),
+                               "plant_text_sha": FP._sha_files(RP.PLANT_FILES, code_only=False)})
         self.assertEqual(RP.plant_at(git, git.resolve("HEAD")), got)
         self.assertIsNone(RP.plant_at(git, "f" * 40))
 
@@ -768,7 +788,9 @@ class ProvenanceLiveTests(unittest.TestCase):
         missing = [m for m in ("torch", "stable_baselines3") if importlib.util.find_spec(m) is None]
         if missing:
             self.skipTest(f"{', '.join(missing)} not installed, and train imports them")
-        ok, out = _child("import train; print(train.derived_sha())")
+        # the plant is named (20 October 2026): train.derived_sha() without it
+        # raised TypeError in the child, and the test SKIPPED instead of failing
+        ok, out = _child("import engines, train; print(train.derived_sha(engines.get('b58')))")
         if not ok:
             self.skipTest(f"train could not be imported in a subprocess: {out}")
         self.assertEqual(RP.derived_sha(ROOT), out)
@@ -799,16 +821,36 @@ class ProvenanceLiveTests(unittest.TestCase):
             (root / "data").mkdir()
             (root / "data" / "derived_params.json").write_text(json.dumps({"a": 1, "_b": 2}),
                                                                 encoding="utf-8")
+            # derived._load's key for that file (one key per engine's file since
+            # 20 October 2026; it was "d")
+            key = os.path.normcase(os.path.abspath(root / "data" / "derived_params.json"))
             fake = types.SimpleNamespace(_CACHE={})
             with mock.patch.dict(sys.modules, {"derived": fake}):
                 self.assertFalse(RP.derived_loaded_differs(root), "nothing loaded yet")
-                fake._CACHE["d"] = {"a": 1, "_b": 99}
-                self.assertFalse(RP.derived_loaded_differs(root), "underscore keys are not values")
                 fake._CACHE["d"] = {"a": 2}
+                self.assertFalse(RP.derived_loaded_differs(root), "the old key is not this file's")
+                fake._CACHE[key] = {"a": 1, "_b": 99}
+                self.assertFalse(RP.derived_loaded_differs(root), "underscore keys are not values")
+                fake._CACHE[key] = {"a": 2}
                 self.assertTrue(RP.derived_loaded_differs(root))
             with mock.patch.dict(sys.modules):
                 sys.modules.pop("derived", None)
                 self.assertFalse(RP.derived_loaded_differs(root))
+
+    def test_derived_loaded_differs_reads_the_real_cache(self):
+        """The fake above encodes a cache layout; this reads derived.py's own, so
+        a change to how derived.py keys its files fails here (mistake 12)."""
+        import derived
+        derived.all_params(path=derived.B58_PATH)            # the B58's file, as the server loads it
+        self.assertFalse(RP.derived_loaded_differs(ROOT), "the file on disk is the file loaded")
+        key = os.path.normcase(os.path.abspath(derived.B58_PATH))
+        self.assertIn(key, derived._CACHE)
+        kept = derived._CACHE[key]
+        try:
+            derived._CACHE[key] = dict(kept, spark={"SPARK_A": -1.0})
+            self.assertTrue(RP.derived_loaded_differs(ROOT), "a changed loaded value must show")
+        finally:
+            derived._CACHE[key] = kept
 
     def test_live_side(self):
         env_before = {k: os.environ.get(k) for k in ("DERIVING_PARAMS", "OMP_NUM_THREADS")}
@@ -819,8 +861,8 @@ class ProvenanceLiveTests(unittest.TestCase):
         self.assertEqual(set(live), LIVE_KEYS)
         self.assertEqual(live["python"], platform.python_version())
         self.assertEqual(live["minor"], RP.minor(platform.python_version()))
-        self.assertEqual(live["plant_sha"], FP._sha_files(FP.PLANT_FILES))
-        self.assertEqual(live["plant_text_sha"], FP._sha_files(FP.PLANT_FILES, code_only=False))
+        self.assertEqual(live["plant_sha"], FP._sha_files(RP.PLANT_FILES))
+        self.assertEqual(live["plant_text_sha"], FP._sha_files(RP.PLANT_FILES, code_only=False))
         self.assertIs(live["restart_needed"], live["plant_sha"] != RP.IMPORT_PLANT_SHA)
         self.assertEqual(live["derived_sha"], RP.derived_sha(ROOT))
         self.assertEqual(live["data_sha1"], RP.data_fingerprint(ROOT))
@@ -836,7 +878,8 @@ class ProvenanceLiveTests(unittest.TestCase):
         # This tree read by schema 1's rule, for the files written under it
         sources = [(ROOT / n).read_bytes() for n in RP.SCHEMA_1_PLANT_FILES]
         self.assertEqual(live["schema_1"], {
-            "plant_sha": RP.code_hash(sources, 1), "plant_text_sha": RP.byte_hash(sources),
+            "plant_sha": RP.code_hash(sources, 1, names=RP.SCHEMA_1_PLANT_FILES),
+            "plant_text_sha": RP.byte_hash(sources),
             "road_sha": RP._road_code_sha((ROOT / "random_road.py").read_bytes(), 1)})
         if _clean(*RP.SCHEMA_1_PLANT_FILES, "random_road.py") and RP.Git(ROOT).available:
             git = RP.Git(ROOT)
@@ -1055,19 +1098,20 @@ class ProvenanceStateTests(unittest.TestCase):
     def test_the_git_route_recomputes_plant_and_road(self):
         if "d2" not in self.live["blocks"] or not self.git.available:
             self.skipTest("no live d2 block, or no git, here")
-        if not _clean(*FP.PLANT_FILES, "random_road.py"):
+        if not _clean(*RP.PLANT_FILES, "random_road.py"):
             self.skipTest("the plant files or random_road.py have uncommitted changes")
         fp = dict(self.live["blocks"]["d2"], python="3.13.2", plant_sha="0123456789abcdef",
                   git_head=self.git.resolve("HEAD"), git_dirty_plant_files="")
         fp["scenario"] = re.sub(r"road_sha=[0-9a-f]+", "road_sha=fedcba9876543210", fp["scenario"])
         parsed = {"title": "PHASE D2 EVALUATION (randomised climb)", "protocol": None,
                   "fingerprint": fp, "forced": []}
-        # A schema-2 block records the derived constants, and this tree has the same ones
+        # A block of this tree's schema records the derived constants, and this
+        # tree has the same ones. Schema 3 since 20 October 2026 (it was 2).
         live = dict(self.live, restart_needed=False, derived_sha=fp["derived_sha"],
                     derived_loaded_differs=False)
         got = self._classify(parsed, live)
         self.assertEqual((got["schema"], got["state"], got["reason"], got["route"], got["differs"]),
-                         (2, "same", None, "git", []))
+                         (FP.SCHEMA_VERSION, "same", None, "git", []))
 
     def test_a_schema_1_record_is_read_by_schema_1s_rule_and_never_called_this_plant(self):
         if "d2" not in self.live["blocks"] or not self.git.available:
@@ -1082,7 +1126,9 @@ class ProvenanceStateTests(unittest.TestCase):
             h.update((ROOT / name).read_bytes().replace(b"\r\n", b"\n"))
         fp = dict(self.live["blocks"]["d2"], plant_text_sha=h.hexdigest()[:16],
                   git_head=self.git.resolve("HEAD"), git_dirty_plant_files="")
-        del fp["derived_sha"]
+        # nor the fields schema 3 added (20 October 2026)
+        for field in ["derived_sha", *sorted(SCHEMA_3_FIELDS)]:
+            del fp[field]
         live = dict(self.live, restart_needed=False, derived_loaded_differs=False)
         cases = {
             # under another Python: the commit's files, read by schema 1's rule here
@@ -1109,6 +1155,12 @@ class ProvenanceStateTests(unittest.TestCase):
         self.assertEqual(RP.schema_of(parsed["fingerprint"]), 1)
         self.assertEqual(RP.schema_of(dict(parsed["fingerprint"], derived_sha="None")), 2,
                          "schema 2 writes derived_sha even when it could not compute it")
+        self.assertEqual(RP.schema_of(dict(parsed["fingerprint"], derived_sha="None",
+                                           engine="b58b30o1/a90-supra-zf8hp51")), 3,
+                         "schema 3 writes engine into every block")
+        self.assertEqual(RP._plant_files(2), ("plant.py", "thermal.py", "engine_env.py", "derived.py"),
+                         "schema 2's plant files, as fingerprint.py had them at cf43fbb")
+        self.assertEqual(RP._plant_files(3), FP.plant_files(RP.RESULTS_PLANT))
         for protocol, block in self.live["blocks"].items():
             self.assertEqual(RP.schema_of(block), FP.SCHEMA_VERSION,
                              f"a {protocol} block this fingerprint.py writes is read as its own schema")
@@ -1781,7 +1833,7 @@ class DataTests(unittest.TestCase):
         self.assertEqual(set(self.real), {"built", "import_failures", "sections", "not_read", "graphics"})
         self.assertEqual(self.real["import_failures"], [])
         self.assertEqual(built["python"], platform.python_version())
-        self.assertEqual(built["plant_sha"], FP._sha_files(FP.PLANT_FILES))
+        self.assertEqual(built["plant_sha"], FP._sha_files(RP.PLANT_FILES))
         self.assertEqual(built["git"], "ok")
         head = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=RD.ROOT,
                               capture_output=True, text=True, timeout=60,

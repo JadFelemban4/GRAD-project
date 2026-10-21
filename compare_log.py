@@ -23,7 +23,11 @@ import math
 
 import numpy as np
 
+import engines
 from plant import predict, map_from_airflow, charge_temperature
+
+# The engine these logs are scored against, named (20 October 2026): the B58.
+ENG = engines.get("b58").engine
 
 # Logged air mass flow is in kg/h on this export. 1 kg/h = 0.2778 g/s.
 AIRFLOW_KGH_TO_GPS = 1000.0 / 3600.0
@@ -116,19 +120,19 @@ def main():
         # shared with engine_env and build_dataset. plant.charge_temperature()
         # carries the evidence.
         t_amb_k = (amb_c if math.isfinite(amb_c) else 25.0) + 273.15
-        iat_k = charge_temperature(t_amb_k, ect_k)
+        iat_k = charge_temperature(t_amb_k, ect_k, engine=ENG)
         if not math.isfinite(lam) or lam <= 0:
             lam = 1.0
 
         if a.map_from_log:
             map_kpa = f(r, "Intake manifold absolute pressure") * a.map_scale
         else:
-            map_kpa = map_from_airflow(air_meas, rpm, iat_k)
+            map_kpa = map_from_airflow(air_meas, rpm, iat_k, engine=ENG)
         if not math.isfinite(map_kpa) or map_kpa < 15:
             continue
 
         out = predict(rpm=rpm, map_kpa=map_kpa, iat_k=iat_k, ect_k=ect_k,
-                      spark_btdc=spark, lam=lam)
+                      spark_btdc=spark, lam=lam, engine=ENG)
 
         ea = 100.0 * (out["mdot_air_gps"] - air_meas) / air_meas if air_meas > 0 else float("nan")
         # relative filling ~ eta_v * (1 - f_res) * map / p_ref, expressed in percent

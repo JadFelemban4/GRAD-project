@@ -36,7 +36,8 @@ after the Phase D retrain invalidates the trained agents. **The team's plan
 and Ghassan agreed on 30 September** (the box at the top, and the live list
 under "What to do next"). Until those land and the new preregistration is
 committed, a new drive is re-derived and re-scored, not trained on. After that:
-`python check_roads.py`, then `python train_all.py` (~4 h), then
+`python check_roads.py`, then `python train_all.py --engine b58` (~4 h; on
+`GRA-test` every training and scoring script names its engine), then
 `python record_agents.py runs/terrain_dt1`, `python run_results.py phase_d` and
 `python knock_margin.py`. Move the previous `runs/terrain_dt1/` aside first:
 train.py RESUMES any checkpoint it finds there.

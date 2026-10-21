@@ -1,0 +1,177 @@
+# engine_specs/cars/a90_supra_2020.toml -- the car around the B58: our own GR Supra.
+#
+# PUBLISHED VALUES ONLY, plus [repo_current]: the values the plant runs today, listed beside
+# EPA's because they differ. Every other value below was printed by the source its `source` key
+# names ([sources] at the end gives the URL), in the units that source prints. Nothing here is
+# derived: no rolling radius, no drag area, no unit conversion. Read by nothing yet (build step 1
+# of the four-engine plants, 20 October 2026); test_epa_map.py checks the form, the EPA rows, and
+# [repo_current] against the plant engines.get("b58") builds.
+#
+# DECISION 31 (RECOMMENDED, UNANSWERED: results/VALIDATION_DECISIONS.md section F, both columns
+# open) WOULD KEEP THE CURRENT VALUES FOR THE FOUR-ENGINE TEST: the B58 arm would run X1's plant
+# (cf43fbb), frozen, and EPA's road load for the Supra would be a declared ablation later, never a
+# silent swap. Nothing here changes the plant.
+#
+# THE MODEL YEAR IN THE NAME IS NOT OUR CAR'S. The id says 2020 (the task that created this
+# file); our car is a 2023 GCC-specification GR Supra 3.0 with the 285 kW B58B30O1 (REFERENCES.md
+# section 2c; validation_table.md). EPA's 2020 row is the 335 hp engine (B58B30M1); the rows of
+# our engine version are 2021 and 2023, below the 2020 row.
+
+schema = 1
+car_id = "a90_supra_2020"
+engine_id = "b58"
+description = "Toyota GR Supra 3.0 (A90), ZF 8HP51 8-speed automatic, rear-wheel drive. Our car: a 2023 GCC-specification 285 kW B58B30O1 (REFERENCES.md section 2c)"
+
+[transmission]
+value = "8-speed Sports Automatic 8HP 51"
+status = "PUBLISHED"
+source = "TUK"
+note = "TAU names the same unit GA8L51CZ"
+
+[gear_ratios]
+value = [5.250, 3.360, 2.172, 1.720, 1.316, 1.000, 0.822, 0.640]
+unit = "1"
+status = "PUBLISHED"
+source = "TUK"
+note = "1st to 8th. TAU prints 5th as 1.136, a typo: our car's own logs cluster at every one of these eight, 1.316 included (REFERENCES.md section 2b). The plant's gears equal these"
+
+[reverse_ratio]
+value = 3.712
+unit = "1"
+status = "PUBLISHED"
+source = "TUK"
+
+[final_drive]
+value = 3.150
+unit = "1"
+status = "PUBLISHED"
+source = "TUK"
+note = "TAU prints 3.154 and EPA's rows 3.15; the plant's final drive equals TUK's"
+
+[tyre_size_front]
+value = "255/35 ZR19 96Y"
+status = "PUBLISHED"
+source = "TAU"
+note = "the 19-inch fitment of TAU's GTS and Track Edition grades; its GT grade runs 255/40 ZR18 95Y, and TUK lists the same two fitments. Which one our car has is not recorded in the repository: UNVERIFIED"
+
+[tyre_size_rear]
+value = "275/35 ZR19 100Y"
+status = "PUBLISHED"
+source = "TAU"
+note = "the driven axle; 19-inch fitment as above. The GT grade runs 275/40 ZR18 99Y"
+
+[curb_weight]
+value = 1525
+unit = "kg"
+status = "PUBLISHED"
+source = "TAU"
+note = "'Kerb weight without driver (kg) Auto: 1525', marked approximate: Toyota Australia's sheet of the 285 kW B58B30O1 automatic -- our engine version, another market. TUK prints 1495 kg (without driver) for the 250 kW European car"
+
+# EPA's Test Car List rows. Road-load force F = A + B v + C v^2 with F in lbf and v in mph.
+# The Supra is filed under the manufacturer BMW. These are certification targets at EPA's test
+# weight; the plant does not use them (decision 31).
+[epa_test_car]
+status = "PUBLISHED"
+source = "EPA20"
+file_rows = [309, 310]
+model_year = 2020
+represented_model = "Supra 3.0"
+test_vehicle_id = "W000026"
+engine_code = "B58B30M1J29S"
+rated_hp = 335
+tested_transmission = "Semi-Automatic, 8 gears"
+equivalent_test_weight_lb = 3750
+target_coef_a_lbf = 54.9
+target_coef_b_lbf_per_mph = -0.299
+target_coef_c_lbf_per_mph2 = 0.02304
+axle_ratio = 3.15
+n_over_v_rpm_per_mph = 26.2
+note = "the 335 hp engine (11.0:1), not ours; the row CATALOGUE.md section 3 compared the plant against (our level-road force is 15-22 % below it over 50-200 km/h: UNVERIFIED here, computed in the data folder's CATALOGUE.md, outside the repository, by no committed script), and the only Supra row the data folder holds"
+
+[[epa_test_car_other_rows]]
+status = "PUBLISHED"
+source = "EPA21"
+file_rows = [233, 234]
+model_year = 2021
+represented_model = "Supra 3.0"
+test_vehicle_id = "W021814"
+engine_code = "B58B30O1J29S"
+rated_hp = 382
+tested_transmission = "Semi-Automatic, 8 gears"
+equivalent_test_weight_lb = 3750
+target_coef_a_lbf = 56.7
+target_coef_b_lbf_per_mph = -0.263
+target_coef_c_lbf_per_mph2 = 0.02276
+axle_ratio = 3.15
+n_over_v_rpm_per_mph = 26.2
+note = "our engine version's first year (the vehicles strand fitted this row)"
+
+[[epa_test_car_other_rows]]
+status = "PUBLISHED"
+source = "EPA23"
+file_rows = [261, 262]
+model_year = 2023
+represented_model = "Supra 3.0"
+test_vehicle_id = "W047372"
+engine_code = "B58B30O1J29S"
+rated_hp = 382
+tested_transmission = "Semi-Automatic, 8 gears"
+equivalent_test_weight_lb = 3750
+target_coef_a_lbf = 46.2
+target_coef_b_lbf_per_mph = 0
+target_coef_c_lbf_per_mph2 = 0.01991
+axle_ratio = 3.15
+n_over_v_rpm_per_mph = 26.3
+note = "our car's model year, engine and gearbox (US filing); the closest row to our car, and the one a later EPA-road-load ablation should name. B is printed as 0. W047295 (rows 259-260) is the 6-speed manual"
+
+# What the plant runs today: engine_specs/a90_supra.toml [car], the values engines.get("b58").car
+# holds (engine_env.py's class Vehicle, lines 395-398, at d9c3758, before build step 1 moved them;
+# test_epa_map.py checks the copy below against the plant). Not published: REFERENCES.md
+# section 4b marks mass, cd_a and crr "CANNOT (yet)" and wheel_r "CANNOT separately". They DIFFER
+# from EPA's: 1520 kg is a kerb mass (TAU prints 1525 kg without driver) where EPA tests at
+# 3750 lb, and crr 0.011 with a drag area of 0.66 m^2 gives a level-road force 15-22 % below EPA's
+# 2020 target over 50-200 km/h (CATALOGUE.md section 3, outside the repository: UNVERIFIED here).
+# Decision 31 (recommended, unanswered) would keep them for the four-engine test.
+[repo_current]
+status = "REPO"
+source = "REPO"
+mass_kg = 1520.0
+cd_a_m2 = 0.66
+crr = 0.011
+wheel_r_m = 0.33
+note = "decision 31 (recommended, unanswered: results/VALIDATION_DECISIONS.md section F) would keep them; an EPA road load for the Supra would be a declared ablation later"
+
+[not_typed]
+rolling_radius_m = "no source prints it. EPA's N/V (26.2 in 2020 and 2021, 26.3 in 2023) with the 8th gear and the axle ratio fixes it for the tested car; our logs fix only the product of radius and speed-channel scale (REFERENCES.md section 4b). Derive it in code; never type the result here"
+drag_area_and_rolling_coefficient = "not published (Toyota prints no Cd). EPA's road load is the A, B, C above; [repo_current] holds the plant's unsourced values"
+driveline_efficiency = "not published; the plant's 0.92 is ASSUMED (REFERENCES.md section 4b)"
+
+[sources.TUK]
+url = "https://media.toyota.co.uk/wp-content/uploads/sites/5/pdf/220605M-GR-Supra-Tech-Spec.pdf"
+what = "Toyota UK, GR Supra technical specifications 220605M (the 250 kW European 3.0): gear ratios, reverse, final drive, tyres, kerb weights"
+opened = "2026-10-20"
+
+[sources.TAU]
+url = "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/supra/files/20250725_gr_supra_spec_table_gtp009045.pdf"
+what = "Toyota Australia, GR Supra specification table GTP-009045, July 2025 (285 kW B58B30O1): weights, tyres per grade, gear ratios, final drive"
+opened = "2026-10-20"
+
+[sources.EPA20]
+url = "https://www.epa.gov/sites/default/files/2021-03/20tstcar-2021-03-02.xlsx"
+what = "EPA Test Car List, model year 2020; also in logs/epa/D3_AND_EPA_SOURCES.csv with its sha256"
+opened = "2026-10-20"
+
+[sources.EPA21]
+url = "https://www.epa.gov/system/files/documents/2022-04/21-tstcar-2022-04-15.xlsx"
+what = "EPA Test Car List, model year 2021; in logs/epa/D3_AND_EPA_SOURCES.csv, NOT in the data folder of 20 Oct 2026 (the vehicles strand's download was read). Checked 21 Oct 2026 on a download whose sha256 equals the list's (fetch_engine_data.py --target <folder> --group epa-test-car-list, then test_epa_map.py with GRAD_EXTRA_DATA): rows 233-234 as below"
+opened = "2026-10-20"
+
+[sources.EPA23]
+url = "https://www.epa.gov/system/files/documents/2024-05/23-testcar-2024-05-17_0.xlsx"
+what = "EPA Test Car List, model year 2023; in logs/epa/D3_AND_EPA_SOURCES.csv, NOT in the data folder of 20 Oct 2026 (the vehicles strand's download was read). Checked 21 Oct 2026 on a download whose sha256 equals the list's, as EPA21: rows 261-262 as below"
+opened = "2026-10-20"
+
+[sources.REPO]
+path = "engine_specs/a90_supra.toml"
+what = "[car] mass, cd_a, crr, wheel_r: the plant's values, engines.get('b58').car (engine_env.py class Vehicle, lines 395-398, at commit d9c3758, until build step 1 moved them on 20 October 2026)"
+opened = "2026-10-20"

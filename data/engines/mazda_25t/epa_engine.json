@@ -1,0 +1,253 @@
+{
+ "_generated": "by epa_map.py from logs/epa/ -- never edit by hand; run `python epa_map.py`",
+ "engine_id": "mazda_25t",
+ "engine_name": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel",
+ "alpha": {
+  "file": "logs/epa/mazda_25t/7- engine_2016_Mazda_Skyactiv_Turbo_2L5_Tier2.m",
+  "sha256": "e4c7a01f405095f35ac2769bc7fe3f50db032ee9117d39be2deac258fd84f0b3",
+  "generated": "06-Feb-2019 15:40:51",
+  "citation": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - ALPHA Map Package. Version 2019-02. Ann Arbor MI: US EPA National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+  "fuel_tag": "FTAG 26864",
+  "process_document": "logs/epa/mazda_25t/3- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - ALPHA Generation Process.html",
+  "process_sha256": "db72e1c3afb9e4be8a6fe5b067862862f115edf541a72da438203e1006941ee3",
+  "inputs": [
+   {
+    "workbook": "4- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data.xlsx",
+    "sheet": "Steady State",
+    "table": "epa_steady.csv"
+   },
+   {
+    "workbook": "4- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data.xlsx",
+    "sheet": "High Load Initial",
+    "table": "epa_highload_initial.csv"
+   },
+   {
+    "workbook": "4- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data.xlsx",
+    "sheet": "Steady State with Transmission",
+    "table": null
+   }
+  ]
+ },
+ "displacement_l": 2.488,
+ "n_cylinders": 4,
+ "compression_ratio": 10.5,
+ "bore_mm": 89.0,
+ "stroke_mm": null,
+ "stroke_mm_commented_out": 100.0,
+ "geometry_notes": {
+  "bore_mm": "EPA's generation script (3- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - ALPHA Generation Process.html): 'enigne.bore_mm = 89;' -- misspelt 'enigne', so the assignment never reached the engine and the .m file has no bore_mm",
+  "stroke_mm": "not stated by the package; its generation script carries the line '% engine.stroke_mm = 100;', commented out, so EPA does not assert it; a value from a handbook or Wikipedia is not typed here (task of 20 October 2026)",
+  "epa_source": "Set physical characteristics based on published information:",
+  "compression_ratio": "geometric, from the .m"
+ },
+ "wot_torque_curve": {
+  "speed_radps": [
+   0.0,
+   102.73007977238623,
+   130.89969389957471,
+   157.20517738591153,
+   183.37577660702124,
+   209.59980751810605,
+   235.81431413056538,
+   418.87902047863906,
+   523.5987755982989,
+   549.7787143782139,
+   575.9586531581288
+  ],
+  "speed_rpm": [
+   0.0,
+   981.0,
+   1250.0,
+   1501.1988636363637,
+   1751.1096774193547,
+   2001.5307262569831,
+   2251.860824742268,
+   3999.9999999999995,
+   5000.0,
+   5250.000000000001,
+   5500.000000000001
+  ],
+  "torque_nm": [
+   0.0,
+   195.839,
+   350.0,
+   403.4005681818182,
+   434.5258064516127,
+   432.7977653631283,
+   441.64175257731904,
+   391.0,
+   356.0,
+   305.14285714285717,
+   0.0
+  ],
+  "node_is_measured": [
+   false,
+   false,
+   false,
+   true,
+   true,
+   true,
+   true,
+   false,
+   false,
+   false,
+   false
+  ],
+  "measured_at_speed": [
+   null,
+   null,
+   null,
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 12,
+    "speed_rpm": 1501.1988636363637,
+    "torque_nm": 403.4005681818182
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 18,
+    "speed_rpm": 1751.1096774193547,
+    "torque_nm": 434.5258064516127
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 24,
+    "speed_rpm": 2001.5307262569831,
+    "torque_nm": 432.7977653631283
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 30,
+    "speed_rpm": 2251.860824742268,
+    "torque_nm": 441.64175257731904
+   },
+   {
+    "table": "epa_highload_initial.csv",
+    "source_row": 60,
+    "speed_rpm": 4004.1101694915255,
+    "torque_nm": 387.993220338983
+   },
+   {
+    "table": "epa_steady.csv",
+    "source_row": 215,
+    "speed_rpm": 5001.0,
+    "torque_nm": 183.5
+   },
+   null,
+   null
+  ],
+  "note": "ALPHA full-throttle curve. node_is_measured: the node is a point EPA measured, in the sheets it built the curve from (alpha.inputs). Where it is false the node is EPA's addition, named in its generation document: model rather than data (mistake 6). measured_at_speed: the highest torque measured within 30 rpm of the node, or null where EPA measured none"
+ },
+ "closed_throttle_torque_curve": {
+  "speed_radps": [
+   0.0,
+   102.73007977238623,
+   366.62386267392884,
+   523.7034953534185,
+   575.9586531581288
+  ],
+  "speed_rpm": [
+   0.0,
+   981.0,
+   3501.0,
+   5001.0,
+   5500.000000000001
+  ],
+  "torque_nm": [
+   -20.500287313432832,
+   -24.855,
+   -33.0,
+   -42.7,
+   -44.91508830845771
+  ],
+  "node_is_measured": [
+   false,
+   false,
+   true,
+   true,
+   false
+  ],
+  "measured_at_speed": [
+   null,
+   null,
+   {
+    "table": "epa_steady.csv",
+    "source_row": 152,
+    "speed_rpm": 3501.0,
+    "torque_nm": -33.0
+   },
+   {
+    "table": "epa_steady.csv",
+    "source_row": 200,
+    "speed_rpm": 5001.0,
+    "torque_nm": -42.7
+   },
+   null
+  ],
+  "note": "ALPHA closed-throttle (motoring) curve. node_is_measured as above; measured_at_speed: the lowest torque measured within 30 rpm of the node, or null where EPA measured none"
+ },
+ "alpha_fuel": {
+  "id": "FTAG 26864",
+  "description": "Tier 2 Cert",
+  "density_kgpL_15C": 0.74246,
+  "energy_density_MJpkg": 42.908,
+  "carbon_weight_fraction": 0.8663,
+  "research_octane_number": 97.6,
+  "motor_octane_number": 89.0,
+  "alcohol_pct_vol": 0.0,
+  "gCO2pgal": 8921.4,
+  "energy_density_BTUplbm": 18447.0,
+  "specific_gravity": 0.74317
+ },
+ "tables": {
+  "epa_steady.csv": {
+   "workbook": "logs/epa/mazda_25t/4- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data.xlsx",
+   "workbook_sha256": "85f3589670f53bc7cc4bb58494c7c9069aa0c5312be9d534fe54375268ef0230",
+   "sheet": "Steady State",
+   "rows": 210,
+   "test_cell": "Test Cell 9",
+   "title": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data",
+   "fuel_report": "26864",
+   "citation": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data Package. Version 2019-02. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+   "version_serial": 43500,
+   "version_date": "2019-02-04"
+  },
+  "epa_highload_initial.csv": {
+   "workbook": "logs/epa/mazda_25t/4- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data.xlsx",
+   "workbook_sha256": "85f3589670f53bc7cc4bb58494c7c9069aa0c5312be9d534fe54375268ef0230",
+   "sheet": "High Load Initial",
+   "rows": 61,
+   "test_cell": "Test Cell 9",
+   "title": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data",
+   "fuel_report": "26864",
+   "citation": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data Package. Version 2019-02. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+   "version_serial": 43500,
+   "version_date": "2019-02-04"
+  },
+  "epa_highload_final.csv": {
+   "workbook": "logs/epa/mazda_25t/4- 2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data.xlsx",
+   "workbook_sha256": "85f3589670f53bc7cc4bb58494c7c9069aa0c5312be9d534fe54375268ef0230",
+   "sheet": "High Load Final",
+   "rows": 61,
+   "test_cell": "Test Cell 9",
+   "title": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data",
+   "fuel_report": "26864",
+   "citation": "2016 Mazda 2.5L Turbo Skyactiv-G Engine Tier 2 Fuel - Test Data Package. Version 2019-02. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+   "version_serial": 43500,
+   "version_date": "2019-02-04"
+  }
+ },
+ "reference_only_columns": [
+  "exhaust_lambda",
+  "fuel_rail_press_mpa_gauge",
+  "spark_timing_cad_btdc"
+ ],
+ "status_definitions": {
+  "Sensor Calibrated to a Standard": "Added instrumentation that has been tested and adjusted to match a traceable standard",
+  "Sensor Verified to a Standard": "Added Instrumentation that has been tested to confirm correlation with a traceable standard",
+  "Calculated Value": "Value calculated from sensor data during data post processing",
+  "Reference Only \u2013 Uncalibrated Sensor": "Added instrumentation for which documentation of a comparison against a traceable standard is not available",
+  "Reference Only \u2013 Voltage Measurement": "Direct measurement of an OEM sensor with conversion to engineering units provided via analysis of CAN/OBD data or sensor specifications",
+  "Reference Only \u2013 Digital Measurement": "Direct measurement of OEM digital input or output signal with conversion to engineering units provided via analysis of CAN/OBD data, engine or sensor specifications"
+ }
+}

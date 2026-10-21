@@ -1,0 +1,274 @@
+{
+ "_generated": "by epa_map.py from logs/epa/ -- never edit by hand; run `python epa_map.py`",
+ "engine_id": "ford_27tt",
+ "engine_name": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel",
+ "alpha": {
+  "file": "logs/epa/ford_27tt/7- engine_2015_Ford_EcoBoost_2L7_Tier2.m",
+  "sha256": "99b7ce00c210916c7a617d0b45fe1b0e43172553d5609fe0ed1816b3b1b42c55",
+  "generated": "26-Nov-2019 14:00:10",
+  "citation": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel - ALPHA Map Package. Version 2019-11. Ann Arbor MI: US EPA National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+  "fuel_tag": "FTAG 25278",
+  "process_document": "logs/epa/ford_27tt/3- 2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel - ALPHA Generation Process.html",
+  "process_sha256": "ab3ce30d27ec78155553b2af9d54bb8463bcbead7556eb7221f53556efb1b6e7",
+  "inputs": [
+   {
+    "workbook": "4- 2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel Cell 9 - Test Data.xlsx",
+    "sheet": "Steady State",
+    "table": "epa_steady_cell9.csv"
+   },
+   {
+    "workbook": "4- 2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data.xlsx",
+    "sheet": "High Load Initial",
+    "table": "epa_highload_initial_hd1.csv"
+   }
+  ]
+ },
+ "displacement_l": 2.694,
+ "n_cylinders": 6,
+ "compression_ratio": 10.0,
+ "bore_mm": 83.0,
+ "stroke_mm": 83.0,
+ "geometry_notes": {
+  "bore_mm": "the ALPHA engine file (7- engine_2015_Ford_EcoBoost_2L7_Tier2.m): engine.bore_mm",
+  "stroke_mm": "the ALPHA engine file (7- engine_2015_Ford_EcoBoost_2L7_Tier2.m): engine.stroke_mm",
+  "epa_source": "Set physical characteristics based on published information titled: 2015 FORD F-150 TECHNICAL SPECIFICATIONS. (n.d.). Retrieved from https://media.ford.com/content/dam/fordmedia/North%20America/US/2015_Specs/2015_F150_Specs.pdf",
+  "compression_ratio": "geometric, from the .m"
+ },
+ "displacement_from_bore_stroke_l": 2.694482757927221,
+ "wot_torque_curve": {
+  "speed_radps": [
+   0.0,
+   104.71975511965977,
+   157.18435243460928,
+   183.36429121452426,
+   209.43951023931953,
+   314.1592653589793,
+   445.058959258554,
+   602.1385919380436,
+   632.2455215349459,
+   662.352451131848
+  ],
+  "speed_rpm": [
+   0.0,
+   999.9999999999999,
+   1500.9999999999998,
+   1751.0,
+   1999.9999999999998,
+   3000.0,
+   4250.0,
+   5749.999999999999,
+   6037.5,
+   6325.0
+  ],
+  "torque_nm": [
+   0.0,
+   230.06,
+   350.03,
+   416.41,
+   460.97812,
+   508.43174999999997,
+   488.09448,
+   402.67794599999996,
+   345.1525251428571,
+   0.0
+  ],
+  "node_is_measured": [
+   false,
+   true,
+   true,
+   true,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "measured_at_speed": [
+   null,
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 14,
+    "speed_rpm": 1000.0,
+    "torque_nm": 230.06
+   },
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 43,
+    "speed_rpm": 1501.0,
+    "torque_nm": 350.03
+   },
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 60,
+    "speed_rpm": 1751.0,
+    "torque_nm": 416.41
+   },
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 80,
+    "speed_rpm": 2002.0,
+    "torque_nm": 451.98
+   },
+   {
+    "table": "epa_highload_initial_hd1.csv",
+    "source_row": 8,
+    "speed_rpm": 3015.8888888888887,
+    "torque_nm": 496.0288888888889
+   },
+   null,
+   null,
+   null,
+   null
+  ],
+  "note": "ALPHA full-throttle curve. node_is_measured: the node is a point EPA measured, in the sheets it built the curve from (alpha.inputs). Where it is false the node is EPA's addition, named in its generation document: model rather than data (mistake 6). measured_at_speed: the highest torque measured within 30 rpm of the node, or null where EPA measured none"
+ },
+ "closed_throttle_torque_curve": {
+  "speed_radps": [
+   0.0,
+   131.00441365469436,
+   288.084046334184,
+   314.26398511409894,
+   418.9837402337587,
+   471.3436177935886,
+   662.352451131848
+  ],
+  "speed_rpm": [
+   0.0,
+   1250.9999999999998,
+   2751.0,
+   3000.9999999999995,
+   4000.999999999999,
+   4501.0,
+   6325.0
+  ],
+  "torque_nm": [
+   -11.473129230769228,
+   -12.37,
+   -22.75,
+   -28.68,
+   -25.37,
+   -14.7,
+   -16.00766769230769
+  ],
+  "node_is_measured": [
+   false,
+   true,
+   true,
+   true,
+   true,
+   true,
+   false
+  ],
+  "measured_at_speed": [
+   null,
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 15,
+    "speed_rpm": 1251.0,
+    "torque_nm": -12.37
+   },
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 115,
+    "speed_rpm": 2751.0,
+    "torque_nm": -22.75
+   },
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 132,
+    "speed_rpm": 3001.0,
+    "torque_nm": -28.68
+   },
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 160,
+    "speed_rpm": 4001.0,
+    "torque_nm": -25.37
+   },
+   {
+    "table": "epa_steady_cell9.csv",
+    "source_row": 173,
+    "speed_rpm": 4501.0,
+    "torque_nm": -26.36
+   },
+   null
+  ],
+  "note": "ALPHA closed-throttle (motoring) curve. node_is_measured as above; measured_at_speed: the lowest torque measured within 30 rpm of the node, or null where EPA measured none"
+ },
+ "alpha_fuel": {
+  "id": "FTAG 25278",
+  "description": "Tier 2 Cert",
+  "density_kgpL_15C": 0.74245,
+  "energy_density_MJpkg": 42.908,
+  "carbon_weight_fraction": 0.8664,
+  "research_octane_number": 96.6,
+  "motor_octane_number": 88.9,
+  "alcohol_pct_vol": 0.0,
+  "gCO2pgal": 8922.3,
+  "energy_density_BTUplbm": 18447.0,
+  "specific_gravity": 0.74316
+ },
+ "tables": {
+  "epa_steady_cell9.csv": {
+   "workbook": "logs/epa/ford_27tt/4- 2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel Cell 9 - Test Data.xlsx",
+   "workbook_sha256": "fbebbc3a4cff269ff2a96cd21f44d145f5ac7edbc0da44496aa33cb1de73e351",
+   "sheet": "Steady State",
+   "rows": 180,
+   "test_cell": "Test Cell 9",
+   "title": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel Cell 9 - Test Data",
+   "fuel_report": "25278",
+   "citation": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel Cell 9 - Test Data Package. Version 2019-11. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+   "version_serial": 43790,
+   "version_date": "2019-11-21"
+  },
+  "epa_steady_hd1.csv": {
+   "workbook": "logs/epa/ford_27tt/4- 2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data.xlsx",
+   "workbook_sha256": "8e3546a9b090291d557bb3c00d212bae5c8d0bca0a2f8dfe352ae3f55b647104",
+   "sheet": "Steady State",
+   "rows": 76,
+   "test_cell": "Test Cell HD1",
+   "title": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data",
+   "fuel_report": "26864",
+   "citation": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data Package. Version 2019-11. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+   "version_serial": 43790,
+   "version_date": "2019-11-21"
+  },
+  "epa_highload_initial_hd1.csv": {
+   "workbook": "logs/epa/ford_27tt/4- 2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data.xlsx",
+   "workbook_sha256": "8e3546a9b090291d557bb3c00d212bae5c8d0bca0a2f8dfe352ae3f55b647104",
+   "sheet": "High Load Initial",
+   "rows": 19,
+   "test_cell": "Test Cell HD1",
+   "title": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data",
+   "fuel_report": "26864",
+   "citation": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data Package. Version 2019-11. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+   "version_serial": 43790,
+   "version_date": "2019-11-21"
+  },
+  "epa_highload_final_hd1.csv": {
+   "workbook": "logs/epa/ford_27tt/4- 2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data.xlsx",
+   "workbook_sha256": "8e3546a9b090291d557bb3c00d212bae5c8d0bca0a2f8dfe352ae3f55b647104",
+   "sheet": "High Load Final",
+   "rows": 19,
+   "test_cell": "Test Cell HD1",
+   "title": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data",
+   "fuel_report": "26864",
+   "citation": "2015 Ford 2.7L EcoBoost V6 Engine Tier 2 Fuel HD1 - Test Data Package. Version 2019-11. Ann Arbor, MI: US EPA, National Vehicle and Fuel Emissions Laboratory, National Center for Advanced Technology, 2019.",
+   "version_serial": 43790,
+   "version_date": "2019-11-21"
+  }
+ },
+ "reference_only_columns": [
+  "exhaust_lambda",
+  "exhaust_lambda_left",
+  "exhaust_lambda_right",
+  "fuel_rail_press_mpa_gauge",
+  "spark_timing_cad_btdc"
+ ],
+ "status_definitions": {
+  "Sensor Calibrated to a Standard": "Added instrumentation that has been tested and adjusted to match a traceable standard",
+  "Sensor Verified to a Standard": "Added Instrumentation that has been tested to confirm correlation with a traceable standard",
+  "Calculated Value": "Value calculated from sensor data during data post processing"
+ }
+}

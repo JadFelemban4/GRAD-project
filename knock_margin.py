@@ -78,7 +78,9 @@ def _job(job):
 
     seed, w = E.EPISODES[i]
     rec = E.new_record()
-    row = E.run_episode(capped, seed, w, "blind" not in os.path.basename(agent_dir), record=rec)
+    import engines
+    row = E.run_episode(capped, seed, w, "blind" not in os.path.basename(agent_dir), record=rec,
+                        plant=engines.get("b58"))
     g = np.asarray(rec["grade"]) > 0
     row.update(ki_p95_climb=float(np.percentile(np.asarray(rec["ki"])[g], 95)),
                trim_climb=float(np.median(np.asarray(rec["applied"])[g, 0])))

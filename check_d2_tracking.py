@@ -82,10 +82,11 @@ def one_policy(job):
 
 def _episode_with_steps(E, policy, seed, weights, use_preview, road):
     """evaluate.run_episode's loop, keeping the step count for a per-step mean."""
+    import engines
     import random_road as RR
     from engine_env import SupervisoryTunerEnv
     env = SupervisoryTunerEnv(RR.climb(road[0], road[1], duration=E.DURATION, dt=E.DT),
-                              dt=E.DT, seed=seed, use_preview=use_preview)
+                              plant=engines.get("b58"), dt=E.DT, seed=seed, use_preview=use_preview)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)
     obs = env._obs()

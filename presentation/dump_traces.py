@@ -9,12 +9,16 @@ import numpy as np
 # machine, so these scripts ran for exactly one person.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K
+import engines
+from engine_env import SupervisoryTunerEnv, locked_climb
 import check_premise as cp
+
+PLANT = engines.get("b58")
+TURB_PROTECT_K = PLANT.engine.damage.turb_knee_k     # the knee; was engine_env's constant
 
 
 def rollout(policy, use_preview=True, seed=0):
-    env = SupervisoryTunerEnv(make_grade_climb(duration=720.0, dt=1.0), dt=1.0,
+    env = SupervisoryTunerEnv(locked_climb(PLANT, duration=720.0, dt=1.0), plant=PLANT, dt=1.0,
                               seed=seed, use_preview=use_preview)
     obs, _ = env.reset(seed=seed)
     tr = dict(t=[], turb=[], oil=[], block=[], dmg_cum=[], torque=[], torque_req=[],

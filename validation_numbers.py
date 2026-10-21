@@ -65,7 +65,9 @@ def resolution():
 def damage_bias():
     """For each policy in the committed climb traces: its damage, and the
     uniform turbine and oil offsets that move that damage by MEI units."""
+    import engines
     from engine_env import damage_rate
+    cal = engines.get("b58").engine.damage
     with open(os.path.join(HERE, "results", "traces_130kmh.json"), encoding="utf-8") as fh:
         traces = json.load(fh)
     out = {}
@@ -77,7 +79,7 @@ def damage_bias():
         ki = np.asarray(tr["ki"], float)
 
         def dmg(bt=0.0, bo=0.0):
-            return dt * sum(damage_rate(a + bt, b + bo, k) for a, b, k in zip(tt, to, ki))
+            return dt * sum(damage_rate(a + bt, b + bo, k, cal=cal) for a, b, k in zip(tt, to, ki))
 
         base = dmg()
         assert abs(base - tr["dmg_cum"][-1]) < 0.05, "the re-score must equal the committed damage"
@@ -100,12 +102,15 @@ def damage_bias():
 
 def _climb(spec):
     import engine_env as E
+    import engines
     import evaluate as V
+    plant = engines.get("b58")
     label, change = spec
     seed, weights = V.EPISODES[0]
     cycle = E.make_grade_climb(duration=V.DURATION, dt=V.DT,
-                               t_amb=315.0 + change.get("t_amb", 0.0))
-    env = E.SupervisoryTunerEnv(cycle, dt=V.DT, seed=seed, use_preview=True)
+                               t_amb=315.0 + change.get("t_amb", 0.0), grade=plant.scenario.grade,
+                               v_kmh=plant.scenario.v_kmh)
+    env = E.SupervisoryTunerEnv(cycle, plant=plant, dt=V.DT, seed=seed, use_preview=True)
     env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)
     a = np.array(E.neutral_action(), dtype=np.float32)
@@ -117,7 +122,7 @@ def _climb(spec):
     while True:
         _, _, term, trunc, info = env.step(a)
         peak = max(peak, info["t_turb"])
-        thermal += E.damage_rate(info["t_turb"], info["t_oil"]) * env.dt
+        thermal += E.damage_rate(info["t_turb"], info["t_oil"], cal=plant.engine.damage) * env.dt
         maps.append(float(env.map_kpa))
         if term or trunc:
             break

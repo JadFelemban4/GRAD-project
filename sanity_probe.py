@@ -50,7 +50,9 @@ def probe(agent_dir, record_dir):
     model = SAC.load(os.path.join(HERE, agent_dir, "final"), device="cpu")
     rec = np.load(os.path.join(record_dir, "eval_record.npz"))
     obs, grade = rec["obs"].astype(np.float32), rec["grade"]
-    env = E.SupervisoryTunerEnv(E.make_grade_climb(duration=60.0, dt=1.0), dt=1.0)
+    import engines
+    plant = engines.get("b58")
+    env = E.SupervisoryTunerEnv(E.locked_climb(plant, duration=60.0, dt=1.0), plant=plant, dt=1.0)
     states = [obs[e, k] for e in range(obs.shape[0]) for k in range(0, obs.shape[1], EVERY)
               if np.isfinite(grade[e, k]) and grade[e, k] > 0.02]
     x = np.stack(states)

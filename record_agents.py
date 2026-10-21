@@ -100,8 +100,9 @@ def _job(job):
     import evaluate as E
     seed, w = E.EPISODES[i]
     pol, prev = _policy(spec)
+    import engines
     rec = E.new_record()
-    row = E.run_episode(pol, seed, w, prev, record=rec)
+    row = E.run_episode(pol, seed, w, prev, record=rec, plant=engines.get("b58"))
     return spec, i, row, {k: np.asarray(v) for k, v in rec.items()}
 
 

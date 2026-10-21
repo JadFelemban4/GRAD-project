@@ -17,7 +17,12 @@ import threading
 
 from app.estimator import Estimator, MAX_SUBSTEP_S, GAP_RESEED_S
 from app.reader import ReplayReader, _f
+import engines
 from engine_env import Vehicle, PREVIEW_S
+
+# The car whose logs this replays, its gearbox as the environment builds it
+# (20 October 2026: Vehicle's numbers were class attributes until then).
+_VEH = Vehicle(engines.get("b58").car)
 
 ROOT = Path(__file__).resolve().parent.parent
 LOGS = ROOT / 'logs' / 'raw'
@@ -33,10 +38,10 @@ def finite(value):
 
 
 def vehicle_metadata():
-    return dict(name='ZF 8HP51', gears=list(Vehicle.gears), final_drive=Vehicle.final_drive,
-                wheel_radius_m=Vehicle.wheel_r, converter='assumed_locked',
-                upshift_min_rpm=Vehicle.UPSHIFT_MIN_RPM, shift_load=Vehicle.SHIFT_LOAD,
-                peak_torque_nm=Vehicle.PEAK_TORQUE_NM, shift_rpm_max=Vehicle.SHIFT_RPM_MAX,
+    return dict(name='ZF 8HP51', gears=list(_VEH.gears), final_drive=_VEH.final_drive,
+                wheel_radius_m=_VEH.wheel_r, converter='assumed_locked',
+                upshift_min_rpm=_VEH.UPSHIFT_MIN_RPM, shift_load=_VEH.SHIFT_LOAD,
+                peak_torque_nm=_VEH.PEAK_TORQUE_NM, shift_rpm_max=_VEH.SHIFT_RPM_MAX,
                 inference_tolerance=RATIO_TOLERANCE, inference_min_kmh=INFERENCE_MIN_KMH)
 
 
@@ -71,8 +76,8 @@ def infer_gear(rpm, speed_kmh, recorded=None, internal=None):
         else:
             out['gear_note'] = 'low_speed_or_slip'
         return out
-    actual_ratio = rpm * 2 * math.pi * Vehicle.wheel_r / (60 * (speed / 3.6))
-    errors = [abs(actual_ratio / (r * Vehicle.final_drive) - 1) for r in Vehicle.gears]
+    actual_ratio = rpm * 2 * math.pi * _VEH.wheel_r / (60 * (speed / 3.6))
+    errors = [abs(actual_ratio / (r * _VEH.final_drive) - 1) for r in _VEH.gears]
     best = min(range(len(errors)), key=errors.__getitem__)
     out['ratio_error'] = errors[best]
     if errors[best] > RATIO_TOLERANCE:

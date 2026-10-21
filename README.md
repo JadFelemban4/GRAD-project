@@ -800,9 +800,10 @@ python analyse_phase_d.py  Phase D, the first of the four ablations (the box at
                            SIGNIFICANT at alpha 0.05. Also prints the agent's
                            +29 to +34 points over current-grade, which is a
                            DIFFERENT claim -- see the box at the top of this file
-python drift_test.py       16 of 16 injected drifts CAUGHT. The guard's own
+python drift_test.py       18 of 18 injected drifts CAUGHT. The guard's own
                            acceptance test; every row AUDIT2 Part 4a marked
-                           MISSED is now caught
+                           MISSED is now caught (rows 17 and 18, the training
+                           step and episode, added 21 Oct on GRA-test)
 python power_analysis.py   At Phase D's spread (sd 214.4) eight seeds have power
                            0.10 against the minimum effect of interest (50
                            damage units) and reach 80 % only near 269. Read it
@@ -826,11 +827,14 @@ python -m app.test_simulation   16 of 16 (9 Oct). The replay lab. SEPARATE from
 python -m app.test_agents  135 tests OK, 14 skipped without runs_c4/ (9 Oct).
                            The agent replay pages; they read the plant's roads,
                            so run it after a plant or road change (mistake 25)
-python test_plant_guards.py  6 tests: a 1 s step equals ten 0.1 s steps, the
+python test_plant_guards.py  14 tests: a 1 s step equals ten 0.1 s steps, the
                            coolant settles at the sweep's 2 s step, and one
                            changed derived constant moves derived_sha while
                            the file's timestamp does not. Each fails with its
-                           guard removed (checked 9 Oct)
+                           guard removed (checked 9 Oct). Since 21 Oct (GRA-test)
+                           also the schema-3 guards: engine, engine_sha and
+                           backend FATAL, a schema-2 run refused by evaluate.py
+                           and train.py, the backend never assumed
 python substep_fit_check.py  DIAGNOSTIC: the thermal fit re-run with the
                            plant's sub-steps (mistake 25): radiator scale +61 %,
                            the locked climb's baseline -2.4 units, current-
@@ -871,12 +875,13 @@ python x2_agents.py        what X2's agents did and why X2 failed, measured afte
                            the baseline ECU's one-step knock spike ->
                            results/x2_agents.json, written up in results/X2_AGENTS.md;
                            --trajectory also re-scores the 180k-540k checkpoints
-python test_wide_air.py    16 tests: X2's roads reduce to the plant at sea level,
+python test_wide_air.py    17 tests: X2's roads reduce to the plant at sea level,
                            leave every other environment alone, and follow the air
                            (inlet, torque floor, kickdown table); about 6 min
 python check_roads.py --road wideair   X2's roads: PASS, 2 of 40 bind
-python train_all.py        the twenty agents: seeds 0-9 x sighted/blinded, one
-                           process each on the CPU, ~4 h; writes runs/terrain_dt1/
+python train_all.py --engine b58   the twenty agents: seeds 0-9 x sighted/blinded,
+                           one process each on the CPU, ~4 h; writes runs/terrain_dt1/
+                           (--engine is required on GRA-test: no default engine)
 python record_agents.py runs/terrain_dt1   scores them on the twenty frozen
                            episodes, records EVERY step, and documents each agent
                            in results/agents/terrain_dt1/ (README.md: every table)
@@ -1040,8 +1045,32 @@ evaluate.py           Phase D's protocol. Twenty frozen episodes. Never edit the
                       Reports damage two ways since 28 Sep (total, thermal-only).
 derive_params.py      Every constant the car's logs can set, recomputed from
                       them -> data/derived_params.json. build_dataset.py runs it.
-derived.py            The ONE reader of data/derived_params.json. No fallback:
-                      if the file is missing it says which command makes it.
+derived.py            The ONE reader of every engine's derived file (the B58's
+                      is data/derived_params.json, derived.B58_PATH). No
+                      fallback: if a file is missing it says which command
+                      makes it.
+engines.py            The plants, by name (GRA-test, decision 24): frozen Engine
+                      and Car records, every field required, no default engine.
+                      engines.get("b58") is the B58 in its Supra; typed_engine
+                      gives the typed records without the derived file.
+engine_specs/         Each plant's TYPED constants, a TOML file per engine and
+                      per car, every value with its label and source (b58.toml,
+                      a90_supra.toml). cars/ holds what the sources publish
+                      about decision 24's four cars, read by nothing yet.
+test_engine_threading.py  No plant call leans on a default engine: the
+                      signatures, the defaults beside a record, an AST scan of
+                      every .py, the names taken from the plant's modules.
+epa_map.py            logs/epa/ -> data/engines/<engine>/: EPA's benchmarking
+                      tables for the three new engines (never edit those).
+test_epa_map.py       Its tests: hashes, row counts, units, ranges, a
+                      byte-for-byte rebuild, and the car files' EPA rows.
+fetch_engine_data.py  Fetches and verifies the public engine and vehicle data
+                      (EPA, Argonne's D3) into the team's data folder, outside
+                      git; --verify-only downloads nothing.
+logs/epa/             EPA's files, byte for byte as published (MANIFEST.csv);
+                      measurements, never edited. data/engines/ is made from them.
+results/B58_IDENTITY.md  Build step 1's certificate: the B58 through
+                      engines.get is cf43fbb's plant, bit for bit (and the .json).
 calibrate_thermal.py  The thermal block + oil fit (and its structure), with
                       leave-one-drive-out scores. derive_params.py calls it.
 car_thermal.py        thermal.py replayed over a logged drive, on measured fuel;
@@ -1110,8 +1139,10 @@ x1_score.py           Scores X1 once its training has finished, in the
 wide_air.py           X2's training roads (train.py --road wideair): the extremes
                       design at 0-45 C and 80-101.3 kPa, the compressor inlet,
                       the kickdown table and the torque floor following the air.
-                      No hashed plant file: plant_sha stays X1's.
-test_wide_air.py      Its 16 tests; read its docstring for what each guards.
+                      Not a hashed plant file. (On GRA-test plant_sha is not
+                      X1's: build step 1 changed the plant files, every number
+                      kept, results/B58_IDENTITY.md.)
+test_wide_air.py      Its 17 tests; read its docstring for what each guards.
 analyse_x2.py         X2's preregistered test (X1's rule, five pairs).
 check_x2_convergence.py  Had X2's agents settled? C4's rule at 720k/900k/1080k
                       steps, on ten practice episodes of the locked climb.
@@ -1157,7 +1188,7 @@ check_random_road.py  Does every D2 road bind, and is the blind arm blind.
                       Run before training; about 38 minutes.
 prove_buffer.py       Proves the replay-buffer size changes nothing learned.
 drift_test.py         The guard's own acceptance test: inject AUDIT2 Part 4a's
-                      drifts and check each is CAUGHT. Currently 16 of 16.
+                      drifts and check each is CAUGHT. Currently 18 of 18.
 full_run.py           Every script that prints a published figure, in one pass,
                       each block opening with its EXIT CODE -> FULL_RUN.txt.
                       Sweep the documents from that, not from memory.

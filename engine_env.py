@@ -5,20 +5,39 @@ in the 2023 Toyota GR Supra this project logs.
 
 The agent outputs TRIMS relative to a production-representative baseline, so the
 zero action reproduces the baseline exactly and reward at zero action is ~0.
+
+THE PLANT IS PASSED, NEVER DEFAULTED (20 October 2026, decision 24: the H/tau
+test runs four engines). Every class and function here that touches the engine
+or the car takes it explicitly -- SupervisoryTunerEnv(cycle, plant=...),
+BaselineECU(cal), Vehicle(car), damage_rate(..., cal=...), locked_climb(plant,
+...) -- where an `engines.Plant` comes from `engines.get(name)`. The B58's
+numbers that were literals and class attributes here are fields of its records
+now (engine_specs/b58.toml, engine_specs/a90_supra.toml, and the derived file),
+read in the same expressions in the same order. See engines.py.
 """
+
+from dataclasses import replace
 
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 
-from plant import (Operating, run_cycle, b58, boost_ceiling_kpa,
-                   charge_temperature, EXH_BACKPRESSURE_RATIO)
+from plant import (Operating, run_cycle, boost_ceiling_kpa,
+                   charge_temperature, exhaust_backpressure_kpa)
 from thermal import ThermalNetwork
 
-# The one engine in this project. Passed EXPLICITLY to every run_cycle call
-# below -- relying on the default is what let this environment simulate a
-# 2.0 L four-cylinder for three weeks. See plant.py's module docstring.
-GEO = b58()
+# The engine is passed EXPLICITLY to every run_cycle call below, as the
+# environment's own plant (self.plant.engine). Relying on a default is what let
+# this environment simulate a 2.0 L four-cylinder for three weeks; the module
+# constant GEO = b58() that replaced it named the B58 for every environment,
+# and went with the defaults on 20 October 2026.
+
+
+def _need(obj, what):
+    """Refuse a missing plant record by name: there is no default engine."""
+    if obj is None:
+        raise TypeError(f"{what} is required: there is no default engine (CLAUDE.md mistake 1)")
+    return obj
 
 # The charge temperature is IMPORTED, not re-typed. Both branches of it used to
 # sit inline in reset() and step() as literal arithmetic; plant.charge_temperature
@@ -116,16 +135,23 @@ class BaselineECU:
     # the knock limit (the paragraph above) -- a part-load fit setting spark in
     # boost, mistake 6. No data on this car can separate them further: every
     # steady point is 30-75 kPa. REFERENCES.md section 4b.
-    @property
-    def SPARK_A(self):
-        import derived
-        return float(derived.get("spark", "SPARK_A"))
-    SPARK_B = 0.00695     # FITTED 7 Sep, held (see above). was 0.0028   per rpm
-    SPARK_C = 0.1307      # FITTED 7 Sep, held (see above). was 0.155    per kPa above 40
-    SPARK_MIN = -10.0     # was +2.0     measured minimum -9 deg at full load
-    SPARK_MAX = 46.0
+    #
+    # WHERE THEY ARE SINCE 20 OCTOBER 2026: the engine's ECU calibration,
+    # engines.EcuCal, passed to the constructor. SPARK_A is read once when the
+    # plant is built (derived.py caches the file per process, so it is the value
+    # a call would have read); B, C (0.00695 per rpm, was 0.0028; 0.1307 per kPa
+    # above 40, was 0.155), MIN (-10, was +2.0: measured minimum -9 deg at full
+    # load) and MAX (46) are typed in engine_specs/b58.toml with their sources.
+    # The upper-case names stay, read-only, for the documents that use them.
+    SPARK_A = property(lambda self: self.cal.spark_a)
+    SPARK_B = property(lambda self: self.cal.spark_b)
+    SPARK_C = property(lambda self: self.cal.spark_c)
+    SPARK_MIN = property(lambda self: self.cal.spark_min)
+    SPARK_MAX = property(lambda self: self.cal.spark_max)
 
-    def __init__(self, enrichment_map=False):
+    def __init__(self, cal, enrichment_map=False):
+        # REQUIRED (20 October 2026): BaselineECU() used to be the B58's ECU.
+        self.cal = _need(cal, "BaselineECU(cal=plant.engine.ecu)")
         self.knock_retard = 0.0
         self.hot_dwell = 0.0
         self.ltft = 0.0
@@ -138,12 +164,12 @@ class BaselineECU:
 
     # Knock-limited spark surface, fitted to plant.run_cycle on a 9x9 grid
     # (1500-5500 rpm, 80-240 kPa, lambda 1, IAT 55 C). Residual RMS 0.95 deg.
-    # This is what governs the boosted region -- see base_spark().
-    KL_A, KL_B, KL_C, KL_D = 33.636, 0.00641, -0.3673, 0.6385
-
+    # This is what governs the boosted region -- see base_spark(). The B58's
+    # 33.636, 0.00641, -0.3673 and 0.6385 are cal.kl_a..kl_d.
     def knock_limited_spark(self, rpm, map_kpa):
-        return (self.KL_A + self.KL_B * rpm + self.KL_C * map_kpa
-                + self.KL_D * map_kpa ** 2 / 1000.0)
+        c = self.cal
+        return (c.kl_a + c.kl_b * rpm + c.kl_c * map_kpa
+                + c.kl_d * map_kpa ** 2 / 1000.0)
 
     def base_spark(self, rpm, map_kpa):
         """The lesser of the fitted part-load map and the knock limit.
@@ -161,9 +187,10 @@ class BaselineECU:
         Do not extend the fitted map upward without steady high-load measurements,
         and steady high-load measurements are not obtainable on a public road.
         """
-        fitted = self.SPARK_A + self.SPARK_B * rpm - self.SPARK_C * (map_kpa - 40.0)
+        c = self.cal
+        fitted = c.spark_a + c.spark_b * rpm - c.spark_c * (map_kpa - c.spark_ref_kpa)
         return float(np.clip(min(fitted, self.knock_limited_spark(rpm, map_kpa)),
-                             self.SPARK_MIN, self.SPARK_MAX))
+                             c.spark_min, c.spark_max))
 
     # Enrichment, v4 — fitted 8 Sep 2026 (a.m.) on the dataset as it stood that
     # morning, re-checked the same afternoon against the full dataset of the time, over
@@ -186,9 +213,13 @@ class BaselineECU:
     # LESSON: a threshold written in a DERIVED quantity silently moves when that
     # quantity's definition changes. Gating on air mass flow, which is measured
     # and did not change, would have been immune. Consider that for v5.
-    ENR_LOAD   = 180.0    # kPa; above this the high-load timer runs
-    ENR_RPM_LO = 3300.0   # FITTED 8 Sep, held. rpm; below this the engine stays stoichiometric
-    ENR_RPM_HI = 5200.0   # FITTED 8 Sep, held. rpm; full speed authority
+    #
+    # ENR_LOAD    180 kPa; above this the high-load timer runs
+    # ENR_RPM_LO  3300 rpm, FITTED 8 Sep, held; below this the engine stays stoichiometric
+    # ENR_RPM_HI  5200 rpm, FITTED 8 Sep, held; full speed authority
+    # ENR_DEPTH   0.19, FITTED 8 Sep, held; lambda deficit at full authority -> floor 0.81
+    # (cal.enr_load, enr_rpm_lo, enr_rpm_hi, enr_depth; engine_specs/b58.toml.)
+    #
     # ENR_DWELL_LO / HI ARE DERIVED (28 September 2026): solved by derive_params.py
     # on the TIMESTAMP dwell axis from the car's genuine lambda readings, and read
     # from data/derived_params.json. They were 2.0 / 9.0 s, fitted on 8 September on
@@ -196,17 +227,14 @@ class BaselineECU:
     # the car enriches much sooner into a pull. ENR_RPM_LO/HI and ENR_DEPTH are HELD
     # at their 8 September values: a free fit of all five on ~100 readings puts
     # RPM_LO on its grid edge and cannot reach the car's 0.79 floor (the attempt is
-    # recorded in the derived file as free_fit_all_five).
-    @property
-    def ENR_DWELL_LO(self):
-        import derived
-        return float(derived.get("enrichment", "ENR_DWELL_LO"))
-
-    @property
-    def ENR_DWELL_HI(self):
-        import derived
-        return float(derived.get("enrichment", "ENR_DWELL_HI"))
-    ENR_DEPTH  = 0.19     # FITTED 8 Sep, held. lambda deficit at full authority -> floor 0.81
+    # recorded in the derived file as free_fit_all_five). Read once, when the plant
+    # is built (cal.enr_dwell_lo, enr_dwell_hi).
+    ENR_LOAD = property(lambda self: self.cal.enr_load)
+    ENR_RPM_LO = property(lambda self: self.cal.enr_rpm_lo)
+    ENR_RPM_HI = property(lambda self: self.cal.enr_rpm_hi)
+    ENR_DWELL_LO = property(lambda self: self.cal.enr_dwell_lo)
+    ENR_DWELL_HI = property(lambda self: self.cal.enr_dwell_hi)
+    ENR_DEPTH = property(lambda self: self.cal.enr_depth)
 
     def base_lambda(self, rpm, map_kpa, dwell_s=0.0):
         """Enrichment is thermal protection, not a load table. MEASURED, THREE TIMES.
@@ -310,37 +338,41 @@ class BaselineECU:
             if map_kpa <= 180.0:
                 return 1.00 - 0.08 * (map_kpa - 120.0) / 60.0
             return float(np.clip(0.92 - 0.07 * (map_kpa - 180.0) / 60.0, 0.82, 0.92))
-        if map_kpa <= self.ENR_LOAD:
+        c = self.cal
+        if map_kpa <= c.enr_load:
             return 1.00
-        s = np.clip((rpm - self.ENR_RPM_LO) / (self.ENR_RPM_HI - self.ENR_RPM_LO), 0.0, 1.0)
-        t = np.clip((dwell_s - self.ENR_DWELL_LO)
-                    / (self.ENR_DWELL_HI - self.ENR_DWELL_LO), 0.0, 1.0)
-        return float(1.00 - self.ENR_DEPTH * s * t)
+        s = np.clip((rpm - c.enr_rpm_lo) / (c.enr_rpm_hi - c.enr_rpm_lo), 0.0, 1.0)
+        t = np.clip((dwell_s - c.enr_dwell_lo)
+                    / (c.enr_dwell_hi - c.enr_dwell_lo), 0.0, 1.0)
+        return float(1.00 - c.enr_depth * s * t)
 
     def iat_compensation(self, iat_k):
-        """Pull timing as intake air heats up: the classic compensation table."""
+        """Pull timing as intake air heats up: the classic compensation table
+        (0.16 deg per K above 25 C, at most 9 deg, on the B58)."""
+        c = self.cal
         iat_c = iat_k - 273.15
-        return -float(np.clip(0.16 * (iat_c - 25.0), 0.0, 9.0))
+        return -float(np.clip(c.iat_gain * (iat_c - c.iat_ref_c), 0.0, c.iat_max))
 
     def step(self, rpm, map_kpa, iat_k, ect_k, knock_observed, dt):
+        c = self.cal
         spark = self.base_spark(rpm, map_kpa) + self.iat_compensation(iat_k)
-        if ect_k < 340.0:                      # cold: extra retard for catalyst heating
-            spark -= 5.0
+        if ect_k < c.cold_k:                   # cold: extra retard for catalyst heating
+            spark -= c.cold_retard
         if knock_observed:
-            self.knock_retard = min(self.knock_retard + 3.0, 12.0)     # fast pull
+            self.knock_retard = min(self.knock_retard + c.knock_step, c.knock_max)     # fast pull
         else:
-            self.knock_retard = max(self.knock_retard - 0.35 * dt, 0.0)  # slow restore
+            self.knock_retard = max(self.knock_retard - c.knock_restore * dt, 0.0)  # slow restore
         spark -= self.knock_retard
         # Sustained-high-load timer. This is the proxy for turbine inlet
         # temperature that base_lambda() is scheduled on; it accumulates while
         # the engine is above ENR_LOAD and resets the moment it drops off.
-        if map_kpa > self.ENR_LOAD:
+        if map_kpa > c.enr_load:
             self.hot_dwell += dt
         else:
             self.hot_dwell = 0.0
         lam = self.base_lambda(rpm, map_kpa, self.hot_dwell)
-        fan = 1.0 if ect_k > 372.0 else (0.4 if ect_k > 367.0 else 0.0)
-        return (float(np.clip(spark, self.SPARK_MIN, self.SPARK_MAX)),
+        fan = 1.0 if ect_k > c.fan_hi_k else (c.fan_lo_duty if ect_k > c.fan_lo_k else 0.0)
+        return (float(np.clip(spark, c.spark_min, c.spark_max)),
                 float(lam), fan)
 
 
@@ -391,27 +423,38 @@ class Vehicle:
     converter is both the right approximation and the honest one. Say "converter
     assumed locked" wherever the gearbox is described; do not let a reader think
     the slip is modelled.
+
+    THE CAR IS PASSED, NEVER DEFAULTED (20 October 2026). Every number below was
+    a class attribute -- `Vehicle()` was the Supra for every caller -- and is now
+    the car's record, engines.Car, given to the constructor; the values and their
+    sources are in engine_specs/a90_supra.toml. The attribute names stay, on the
+    instance, for the code and the documents that read them.
     """
-    mass = 1520.0
-    cd_a = 0.66
-    crr = 0.011
-    wheel_r = 0.33
 
-    # ZF 8HP51, from Toyota's own sheet. Reverse 3.712 is published too and is
-    # not carried here because this environment never reverses.
-    final_drive = 3.150
-    gears = (5.250, 3.360, 2.172, 1.720, 1.316, 1.000, 0.822, 0.640)
-
-    # Peak torque of the B58B30O1, the figure every manufacturer sheet prints
-    # beside the engine code (REFERENCES.md section 2).
-    PEAK_TORQUE_NM = 500.0
-
-    # ASSUMED. The fraction of peak torque above which the transmission hands
-    # back a gear -- a 25 % reserve, which is an ordinary automatic calibration.
-    # No source has been opened for this vehicle's, so it is engineering
-    # judgement and is declared as such.
-    SHIFT_LOAD = 0.75
-    SHIFT_RPM_MAX = 6000.0        # never hand back a gear into the limiter
+    def __init__(self, car):
+        self.car = _need(car, "Vehicle(car=plant.car)")
+        # mass 1520 kg, drag area 0.66 m2, rolling resistance 0.011 and wheel
+        # radius 0.33 m on the Supra: no source for any of them (REFERENCES.md
+        # section 4b, CANNOT)
+        self.mass, self.cd_a, self.crr, self.wheel_r = car.mass, car.cd_a, car.crr, car.wheel_r
+        # ZF 8HP51, from Toyota's own sheet: 5.250 / 3.360 / 2.172 / 1.720 /
+        # 1.316 / 1.000 / 0.822 / 0.640 on a 3.150 final drive. Reverse 3.712 is
+        # published too and is not carried because this environment never reverses.
+        self.final_drive, self.gears = car.final_drive, car.gears
+        # Peak torque of the B58B30O1, 500 Nm, the figure every manufacturer sheet
+        # prints beside the engine code (REFERENCES.md section 2).
+        self.PEAK_TORQUE_NM = car.peak_torque_nm
+        # ASSUMED. The fraction of peak torque above which the transmission hands
+        # back a gear -- a 25 % reserve (0.75), which is an ordinary automatic
+        # calibration. No source has been opened for this vehicle's, so it is
+        # engineering judgement and is declared as such.
+        self.SHIFT_LOAD = car.shift_load
+        self.SHIFT_RPM_MAX = car.shift_rpm_max     # 6000: never hand back a gear into the limiter
+        # see UPSHIFT_MIN_RPM's note below: 2000 rpm, measured against the car
+        self.UPSHIFT_MIN_RPM = car.upshift_min_rpm
+        # ASSUMED 0.92 on the Supra (REFERENCES.md section 4b, CANNOT): a literal
+        # in three places of this file until 20 October
+        self.driveline_eff = car.driveline_eff
 
     # What the MODELLED engine can sustain at each speed, at the boost ceiling.
     #
@@ -419,8 +462,9 @@ class Vehicle:
     # _track_torque with a 1000 Nm request, BaselineECU.step supplying spark and
     # lambda with its knock feedback and enrichment timer live, charge air at the
     # locked 42 C. Each entry is the worst torque over the settled window; the
-    # loop settles in two steps. Regenerate with measure_deliverable_torque() and
-    # test_reward.py checks the table still matches the plant.
+    # loop settles in two steps. Regenerate with measure_deliverable_torque(
+    # plant.car.table_rpms, plant=plant) and test_reward.py checks the table
+    # still matches the plant.
     #
     # WHY THE SHIFT RULE NEEDS IT. SHIFT_LOAD assumes 75 % of PEAK torque is
     # available in every gear. On the model it is not: at 130 km/h in 8th the
@@ -449,14 +493,16 @@ class Vehicle:
     # now derived from the logs, so derive_params.py re-measures this table
     # through measure_deliverable_torque() every time they move and stores it in
     # data/derived_params.json. test_reward.py still checks the stored table
-    # against a fresh measurement.
+    # against a fresh measurement. Since 20 October engines.py reads it into the
+    # car's record (engines.Car.deliverable_torque) when the plant is built, and
+    # since 21 October the grid, the air and the block it is measured at are the
+    # car's record too (engines.Car.table_*), not the measuring function's defaults.
     @property
     def DELIVERABLE_TORQUE(self):
-        import derived
-        t = derived.get("deliverable_torque")
-        if t is None:
+        t = self.car.deliverable_torque
+        if not t:
             raise RuntimeError("no deliverable-torque table yet; run python derive_params.py")
-        return tuple((int(a), float(b)) for a, b in t)
+        return t
 
     def shift_ceiling_nm(self, rpm):
         """Most torque this gear may be asked for before the box hands one back."""
@@ -496,7 +542,8 @@ class Vehicle:
     # IT WAS NOT TUNED TO MOVE A RESULT, and that is checkable: at the scenario
     # this environment runs -- 130 km/h on a 12 % grade -- 1400 and 2000 rpm
     # both select 7th, 2706 rpm, 340 Nm. They differ only at light load.
-    UPSHIFT_MIN_RPM = 2000.0
+    #
+    # UPSHIFT_MIN_RPM = 2000 is the car's car.upshift_min_rpm, set in __init__.
 
     def _upshift_speeds(self):
         """Road speed (m/s) at which each upshift becomes allowed.
@@ -539,7 +586,7 @@ class Vehicle:
         while g > 0:
             ratio = self.gears[g] * self.final_drive
             rpm_g = v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi)
-            if force_n * self.wheel_r / max(ratio, .1) / 0.92 <= self.shift_ceiling_nm(rpm_g):
+            if force_n * self.wheel_r / max(ratio, .1) / self.driveline_eff <= self.shift_ceiling_nm(rpm_g):
                 break
             lower = self.gears[g - 1] * self.final_drive
             if v_mps / self.wheel_r * lower * 60.0 / (2 * np.pi) > self.SHIFT_RPM_MAX:
@@ -558,8 +605,10 @@ class Vehicle:
              + self.mass * 9.81 * np.sin(np.arctan(grade)))
         g = self.gear_for(v_mps, force_n=f)
         ratio = self.gears[g] * self.final_drive
-        torque = f * self.wheel_r / max(ratio, .1) / 0.92
-        rpm = float(np.clip(v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi), 800.0, 6500.0))
+        torque = f * self.wheel_r / max(ratio, .1) / self.driveline_eff
+        # the engine-speed clip: 800-6500 rpm on the Supra (car.rpm_min, rpm_max)
+        rpm = float(np.clip(v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi),
+                            self.car.rpm_min, self.car.rpm_max))
         return float(torque), rpm
 
 
@@ -603,7 +652,8 @@ TRACK_HINGE = 25.0
 
 # Turbine protection trigger, shared by every hand-written policy in the repo.
 #
-# ONE CONSTANT, DERIVED FROM THE DAMAGE MODEL, IMPORTED EVERYWHERE.
+# ONE NUMBER PER ENGINE, DERIVED FROM THE DAMAGE MODEL: the engine's
+# damage.turb_knee_k, 1123 K on the B58 (engines.DamageCal, engine_specs/b58.toml).
 #
 # The turbine damage term in step() is exp((t_turb - 1123) / 45): 1123 K is the
 # knee, above which damage stops being negligible and starts compounding.
@@ -618,8 +668,9 @@ TRACK_HINGE = 25.0
 # the two files could drift apart and quietly report different experiments.
 #
 # If you change the damage model, change this with it. They are the same number.
-TURB_PROTECT_K = 1123.0
-OIL_PROTECT_K = 408.0      # the oil knee in the same damage model
+# It was the module constant TURB_PROTECT_K until 20 October 2026, with the oil
+# knee OIL_PROTECT_K = 408.0 beside it: the B58's, for every engine. Read
+# plant.engine.damage.turb_knee_k and .oil_knee_k.
 
 # The damage model itself, in ONE place.
 #
@@ -633,12 +684,15 @@ OIL_PROTECT_K = 408.0      # the oil knee in the same damage model
 # knock_integral is optional because the app cannot always form it the way the
 # environment does; omitting it scores thermal damage only, and the caller is
 # expected to know that is what it asked for.
-def damage_rate(t_turb_k, t_oil_k, knock_integral=None):
+#
+# `cal` is the engine's damage record, plant.engine.damage, and REQUIRED (20
+# October 2026): knees, scales and weights are per engine (decision 33).
+def damage_rate(t_turb_k, t_oil_k, knock_integral=None, *, cal):
     """Damage per second at these node temperatures. The ONE definition."""
-    d = (np.exp((t_turb_k - TURB_PROTECT_K) / 45.0)
-         + 0.4 * np.exp((t_oil_k - OIL_PROTECT_K) / 12.0))
+    d = (np.exp((t_turb_k - cal.turb_knee_k) / cal.turb_scale_k)
+         + cal.oil_weight * np.exp((t_oil_k - cal.oil_knee_k) / cal.oil_scale_k))
     if knock_integral is not None:
-        d += 40.0 * max(0.0, knock_integral - 0.85) ** 2
+        d += cal.ki_weight * max(0.0, knock_integral - cal.ki_knee) ** 2
     return float(d)
 
 ACT_LO = np.array([-8.0, -0.15, -40.0, 0.0, 0.3], dtype=np.float32)
@@ -661,20 +715,28 @@ OBS_DIM = 23
 class SupervisoryTunerEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, cycle, engine_model=None, dt=0.2,
-                 use_preview=True, uncertainty_beta=1.0, seed=None):
+    def __init__(self, cycle, *, plant, engine_model=None, dt=0.2,
+                 use_preview=True, uncertainty_beta=1.0, seed=None, inlet_kpa=None):
+        """`plant`, an engines.Plant, is REQUIRED (20 October 2026): the car, its
+        ECU and both thermal networks are built from it. `inlet_kpa` is the
+        compressor's inlet pressure; None means the engine's sea-level inlet
+        (plant.engine.boost.inlet_sea_kpa, 99.3 kPa on the B58). wide_air.py and
+        conditions_test.py set it for thinner air, where they used to swap
+        plant.boost_ceiling_kpa for the whole process."""
         super().__init__()
+        self.plant = _need(plant, "SupervisoryTunerEnv(plant=engines.get(name))")
         self.cycle = cycle                      # dict: t, v_mps, grade, t_amb
         self.engine = engine_model              # None -> use the physics plant
         self.dt = dt
         self.use_preview = use_preview
         self.beta = uncertainty_beta
         self.rng = np.random.default_rng(seed)
+        self.inlet_kpa = plant.engine.boost.inlet_sea_kpa if inlet_kpa is None else inlet_kpa
 
-        self.veh = Vehicle()
-        self.ecu = BaselineECU()
-        self.thermal = ThermalNetwork()
-        self.thermal_base = ThermalNetwork()
+        self.veh = Vehicle(plant.car)
+        self.ecu = BaselineECU(plant.engine.ecu)
+        self.thermal = ThermalNetwork(plant.engine.thermal)
+        self.thermal_base = ThermalNetwork(plant.engine.thermal)
 
         # network sees [-1,1]; the env rescales
         self.action_space = spaces.Box(-1.0, 1.0, shape=(5,), dtype=np.float32)
@@ -692,29 +754,32 @@ class SupervisoryTunerEnv(gym.Env):
         # AUDIT.md M2: the backpressure ratio was 1.12 here and 1.15 in
         # plant.py, which predict(), compare_log.py and the app all use. Two
         # constants for one physical quantity, worth 6 C of EGT at the climb
-        # point. Imported now, so there is one.
+        # point. Imported now, so there is one: plant.exhaust_backpressure_kpa.
+        eng = self.plant.engine
         r = run_cycle(Operating(rpm=rpm, map_kpa=map_kpa, iat_k=iat_k, ect_k=ect_k,
                                 spark_btdc=spark, lam=lam,
-                                p_exh_kpa=max(105.0, map_kpa * EXH_BACKPRESSURE_RATIO)),
-                      geo=GEO)
+                                p_exh_kpa=exhaust_backpressure_kpa(map_kpa, engine=eng)),
+                      engine=eng)
         return dict(torque=r.torque_nm, mdot_fuel=r.mdot_fuel_gps,
                     mdot_air=r.mdot_air_gps,      # for the compressor ceiling, M1
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
 
     # Hard ceiling on manifold pressure, DERIVED: the highest pressure ratio the
     # car reached in any quasi-steady, MAF-unpinned sample (the boost ceiling's
-    # cap in data/derived_params.json) against the 99.3 kPa inlet that
-    # plant.boost_ceiling_kpa assumes. It was a typed 250.0 (PR 2.52), which
-    # replaced a round 240 on 8 September; it now moves with the data.
+    # cap in data/derived_params.json) against the compressor's inlet. It was a
+    # typed 250.0 (PR 2.52), which replaced a round 240 on 8 September; it now
+    # moves with the data. The inlet is this environment's (inlet_kpa): 99.3 kPa
+    # at sea level on the B58, the figure plant.boost_ceiling_kpa used to assume.
     @property
     def MAP_CEIL_KPA(self):
-        from plant import boost_ceiling_constants
-        return 99.3 * float(boost_ceiling_constants()["pr_cap"])
+        return self.inlet_kpa * float(self.plant.engine.boost.pr_cap)
 
     def _map_for(self, torque_req, rpm, boost_trim):
-        """Open-loop feed-forward guess at the manifold pressure for a torque."""
-        base = 40.0 + 0.62 * max(torque_req, 0.0)
-        return float(np.clip(base + boost_trim, 25.0, self.MAP_CEIL_KPA))
+        """Open-loop feed-forward guess at the manifold pressure for a torque
+        (40 kPa + 0.62 kPa per Nm on the B58, floored at the throttle shut)."""
+        lp = self.plant.engine.loop
+        base = lp.ff_offset_kpa + lp.ff_kpa_per_nm * max(torque_req, 0.0)
+        return float(np.clip(base + boost_trim, lp.map_floor_kpa, self.MAP_CEIL_KPA))
 
     def _track_torque(self, torque_req, rpm, iat_k, ect_k, spark, lam,
                       boost_trim, state):
@@ -728,8 +793,9 @@ class SupervisoryTunerEnv(gym.Env):
         constraint is violated from the first step for reasons that have nothing
         to do with the policy.
         """
+        lp, eng = self.plant.engine.loop, self.plant.engine
         ff = self._map_for(torque_req, rpm, boost_trim)
-        mp = float(np.clip(state.get("map", ff), 25.0, self.MAP_CEIL_KPA + boost_trim))
+        mp = float(np.clip(state.get("map", ff), lp.map_floor_kpa, self.MAP_CEIL_KPA + boost_trim))
         out = None
         for _ in range(3):                       # 3 inner iterations is plenty
             out = self._evaluate(rpm, mp, iat_k, ect_k, spark, lam)
@@ -765,7 +831,10 @@ class SupervisoryTunerEnv(gym.Env):
             #
             # AUDIT.md M16 fixed exactly this shape for SLEW (per step -> per
             # second). This loop is the one that was left.
-            state["i"] = float(np.clip(state.get("i", 0.0) + 0.05 * err, -60.0, 60.0))
+            #
+            # The gains are the engine's load loop (engines.LoopCal): 0.05 and a
+            # clip of 60 on the integrator, 0.35 and 0.02 below, on the B58.
+            state["i"] = float(np.clip(state.get("i", 0.0) + lp.i_gain * err, -lp.i_clip, lp.i_clip))
             # AUDIT.md M1. This clamped at `min(MAP_CEIL_KPA, 200 + trim)`,
             # i.e. 160-215 kPa, while README said `plant.boost_ceiling_kpa`
             # bounds the pressure and MAP_CEIL_KPA is the measured 250. The
@@ -779,9 +848,13 @@ class SupervisoryTunerEnv(gym.Env):
             # INLET is ambient -- boost_ceiling_kpa's own docstring warns that
             # the downstream temperature inflates corrected flow and raises the
             # ceiling. It is the cycle's ambient now.
+            #
+            # 20 October 2026: and the inlet PRESSURE is the environment's own,
+            # inlet_kpa, passed explicitly (it was boost_ceiling_kpa's default).
             ceil = min(self.MAP_CEIL_KPA,
-                       boost_ceiling_kpa(out["mdot_air"], self.cycle["t_amb"]) + boost_trim)
-            mp = float(np.clip(mp + 0.35 * err + state["i"] * 0.02, 25.0, ceil))
+                       boost_ceiling_kpa(out["mdot_air"], self.cycle["t_amb"], self.inlet_kpa,
+                                         engine=eng) + boost_trim)
+            mp = float(np.clip(mp + lp.p_gain * err + state["i"] * lp.i_out, lp.map_floor_kpa, ceil))
         state["map"] = mp
         return out, mp
 
@@ -853,7 +926,7 @@ class SupervisoryTunerEnv(gym.Env):
         self.rpm, self.map_kpa, self.tps = 900.0, 40.0, 0.0
         self.map_b_prev = 40.0        # lagged baseline load for ecu.step -- C2
         self.spark, self.lam = 20.0, 1.0
-        self.iat_k = charge_temperature(t_amb)
+        self.iat_k = charge_temperature(t_amb, None, engine=self.plant.engine)
         self.torque_req, self.aggression = 0.0, 0.0
         self.ep = dict(fuel=0.0, fuel_base=0.0, damage=0.0, damage_base=0.0,
                        knock_events=0, torque_viol=0.0, egt_viol=0.0, steps=0)
@@ -861,6 +934,7 @@ class SupervisoryTunerEnv(gym.Env):
 
     def step(self, action):
         c = self.cycle
+        eng = self.plant.engine
         n = len(c["v_mps"])
         raw = self._rescale(np.asarray(action, dtype=np.float32))
         # AUDIT.md M16: SLEW is a per-SECOND rate, so it must scale with dt.
@@ -884,13 +958,13 @@ class SupervisoryTunerEnv(gym.Env):
         rho = c.get("p_baro", 101.3) * 1000.0 / (287.0 * c["t_amb"])
         self.torque_req, self.rpm = self.veh.demand(self.v, accel, grade, rho=rho)
         self.aggression = float(np.clip(abs(accel) / 2.5, 0.0, 1.0))
-        self.iat_k = charge_temperature(c["t_amb"], self.thermal.t_block)
+        self.iat_k = charge_temperature(c["t_amb"], self.thermal.t_block, engine=eng)
         # AUDIT.md L14: the baseline's charge temperature used to be the AGENT's
         # -- computed from the agent's block node and handed to both -- so the
         # "baseline-relative" reference moved with the agent's own fan and pump.
         # 1.5 K with the old cooling-disabled neutral; unbounded with a trained
         # agent. The baseline now gets its own.
-        iat_b = charge_temperature(c["t_amb"], self.thermal_base.t_block)
+        iat_b = charge_temperature(c["t_amb"], self.thermal_base.t_block, engine=eng)
 
         # --- baseline controller (runs in parallel, defines the reference) ---
         #
@@ -912,7 +986,9 @@ class SupervisoryTunerEnv(gym.Env):
                                          self.thermal_base.t_block, sp_b, lam_b,
                                          0.0, self.pi_base)
         self.map_b_prev = map_b
-        self.knock_flag_base = base["ki"] > 1.0
+        # the ECU sees knock above its detection threshold (eng.ecu.knock_detect_ki,
+        # the knock integral of 1 on the B58)
+        self.knock_flag_base = base["ki"] > eng.ecu.knock_detect_ki
         # EXHAUST MASS FLOW IS AIR + FUEL (28 September 2026). It was fuel x 15,
         # a round stand-in for the stoichiometric 15.7 that also ignored lambda:
         # 5 % low at lambda 1, 16 % high at lambda 0.81 (AUDIT.md M2). The plant
@@ -926,7 +1002,7 @@ class SupervisoryTunerEnv(gym.Env):
         # baseline may retard to -10, the neutral action stops being neutral and
         # every baseline-relative reward term is silently offset.
         self.spark = float(np.clip(sp_b + act[0],
-                                   BaselineECU.SPARK_MIN, BaselineECU.SPARK_MAX))
+                                   eng.ecu.spark_min, eng.ecu.spark_max))
         self.lam = float(np.clip(lam_b + act[1], 0.70, 1.25))
         out, self.map_kpa = self._track_torque(self.torque_req, self.rpm, self.iat_k,
                                                self.thermal.t_block, self.spark, self.lam,
@@ -936,8 +1012,8 @@ class SupervisoryTunerEnv(gym.Env):
                           out["egt_k"], c["t_amb"], self.v, act[3], act[4], rpm=self.rpm)
 
         # --- damage rates ---------------------------------------------------
-        d_a = damage_rate(self.thermal.t_turb, self.thermal.t_oil, out["ki"])
-        d_b = damage_rate(self.thermal_base.t_turb, self.thermal_base.t_oil, base["ki"])
+        d_a = damage_rate(self.thermal.t_turb, self.thermal.t_oil, out["ki"], cal=eng.damage)
+        d_b = damage_rate(self.thermal_base.t_turb, self.thermal_base.t_oil, base["ki"], cal=eng.damage)
 
         # --- reward: every term baseline-relative and dimensionless ---------
         eps = 1e-6
@@ -958,7 +1034,7 @@ class SupervisoryTunerEnv(gym.Env):
         # --- constraint costs ------------------------------------------------
         c_torque = max(0.0, abs(self.torque_req - out["torque"]) / t_ref - 0.03)
         c_knock = 1.0 if out["ki"] > 1.0 else 0.0
-        c_egt = max(0.0, out["egt_k"] - 1223.0) / 100.0
+        c_egt = max(0.0, out["egt_k"] - eng.damage.egt_limit_k) / 100.0     # 1223 K on the B58
 
         # --- bookkeeping ------------------------------------------------------
         e = self.ep
@@ -990,32 +1066,43 @@ class SupervisoryTunerEnv(gym.Env):
         return self._obs(), float(reward), bool(terminated), bool(truncated), info
 
 
-def measure_deliverable_torque(rpms=None, t_amb=315.0, t_block=365.0, settle=30):
+def measure_deliverable_torque(rpms, *, plant):
     """Regenerate Vehicle.DELIVERABLE_TORQUE from the plant, as (rpm, Nm) pairs.
 
     Runs the environment's own load loop at a 1000 Nm request so manifold
     pressure pins at the boost ceiling, with BaselineECU.step supplying spark
     and lambda -- knock feedback and enrichment dwell included -- and returns
     the worst torque over the second half of the settled window.
+
+    `plant` and `rpms` are required. The table is that plant's, measured where
+    its car says: plant.car.table_t_amb, table_t_block and table_settle, and
+    the whole table at plant.car.table_rpms (derive_params.py). Until 21 October
+    2026 the grid (1000-6600 in 200s), 42 C, a 365 K block and 30 settling
+    steps were defaults here -- the B58 table's, for whatever plant was passed
+    (the review of build step 1).
     """
-    rpms = list(rpms) if rpms is not None else list(range(1000, 6601, 200))
-    env = SupervisoryTunerEnv(make_grade_climb(duration=60.0, dt=1.0, t_amb=t_amb), dt=1.0, seed=0)
+    car = plant.car
+    t_amb, t_block, settle = car.table_t_amb, car.table_t_block, car.table_settle
+    rpms = list(rpms)
+    sc = plant.scenario
+    env = SupervisoryTunerEnv(make_grade_climb(duration=60.0, dt=1.0, t_amb=t_amb, grade=sc.grade,
+                                               v_kmh=sc.v_kmh), plant=plant, dt=1.0, seed=0)
     env.reset(seed=0)
-    iat = charge_temperature(t_amb, t_block)
+    iat = charge_temperature(t_amb, t_block, engine=plant.engine)
     out = []
     for rpm in rpms:
-        ecu, state, mp_prev, knock, hist = BaselineECU(), {}, 150.0, False, []
+        ecu, state, mp_prev, knock, hist = BaselineECU(plant.engine.ecu), {}, 150.0, False, []
         for _ in range(settle):
             sp, lam, _ = ecu.step(rpm, mp_prev, iat, t_block, knock, 1.0)
             r, mp_prev = env._track_torque(1000.0, rpm, iat, t_block, sp, lam, 0.0, state)
-            knock = r["ki"] > 1.0
+            knock = r["ki"] > plant.engine.ecu.knock_detect_ki
             hist.append(r["torque"])
         out.append((rpm, float(min(hist[settle // 2:]))))
     return out
 
 
 # ------------------------------------------------------------------ cycles
-def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.0):
+def make_grade_climb(*, duration, dt, t_amb, grade, v_kmh):
     """Sustained mountain grade at motorway speed, 42 C ambient.
 
     ========================================================================
@@ -1173,6 +1260,12 @@ def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.
     units, the size of the minimum effect of interest, and all of the
     hand-written preview gap. A real road changes grade over a vertical curve;
     the climb now reaches its grade over GRADE_RAMP_S, from 180 s.
+
+    NO DEFAULTS SINCE 20 OCTOBER 2026 (the four-engine build). The locked
+    climb's grade, speed and ambient were this function's defaults, which made
+    them every engine's; they are the plant's own scenario now (engines.Scenario,
+    engine_specs/a90_supra.toml for the Supra: 12 %, 130 km/h, 315 K), and
+    locked_climb(plant, ...) builds it. Every argument here is required.
     """
     n = int(duration / dt)
     t = np.arange(n) * dt
@@ -1180,6 +1273,14 @@ def make_grade_climb(duration=900.0, dt=0.2, t_amb=315.0, grade=0.12, v_kmh=130.
     v[:int(20 / dt)] = np.linspace(0.0, v_kmh / 3.6, int(20 / dt))
     g = grade * np.clip((t - 180.0) / GRADE_RAMP_S, 0.0, 1.0)   # 3 min flat, then the climb
     return dict(t=t, v_mps=v, grade=g, t_amb=t_amb, p_baro=101.3, humidity=0.012)
+
+
+def locked_climb(plant, *, duration, dt):
+    """The plant's locked climb -- the scored scenario -- at this length and step:
+    make_grade_climb at plant.scenario's grade, speed and ambient (12 % at
+    130 km/h, 42 C for the B58 in its Supra; decision 34 keeps that for every car)."""
+    sc = plant.scenario
+    return make_grade_climb(duration=duration, dt=dt, t_amb=sc.t_amb, grade=sc.grade, v_kmh=sc.v_kmh)
 
 
 # ------------------------------------------------------------------ terrain
@@ -1239,9 +1340,9 @@ def _smooth_steps(target, width):
     return out[width:-width]
 
 
-def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
+def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=None, t_amb=None,
                  family=None, families=TERRAIN_FAMILIES, weights=TERRAIN_WEIGHTS,
-                 grade_max=TERRAIN_GRADE_MAX):
+                 grade_max=TERRAIN_GRADE_MAX, *, plant):
     """One random road for TRAINING, as a cycle dict make_grade_climb's shape.
 
     Families, one drawn per episode:
@@ -1256,14 +1357,21 @@ def make_terrain(rng, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
 
     Grade changes are ramped over 4-12 s. Also returns `family` and `elev_m`,
     the elevation profile the grades integrate to.
+
+    `plant` is required (20 October 2026): the "locked" family is ITS locked
+    climb, and the speed and ambient default to its scenario's (130 km/h and
+    315 K on the Supra, which were this function's literal defaults).
     """
+    sc = plant.scenario
+    v_kmh = sc.v_kmh if v_kmh is None else v_kmh
+    t_amb = sc.t_amb if t_amb is None else t_amb
     if family is None:
         family = str(rng.choice(families, p=np.asarray(weights) / np.sum(weights)))
     n = int(duration / dt)
     t = np.arange(n) * dt
 
     if family == "locked":
-        c = make_grade_climb(duration=duration, dt=dt, t_amb=t_amb, v_kmh=v_kmh)
+        c = make_grade_climb(duration=duration, dt=dt, t_amb=t_amb, grade=sc.grade, v_kmh=v_kmh)
     else:
         u = rng.uniform
         if family == "flat":
@@ -1314,19 +1422,26 @@ class TerrainTrainingEnv(SupervisoryTunerEnv):
     options={"family": "..."} to reset() to force one family.
 
     Scoring stays on the locked climb: evaluate.py builds SupervisoryTunerEnv
-    on make_grade_climb directly and never constructs this class.
+    on the plant's locked climb directly and never constructs this class.
+
+    `plant` is required (20 October 2026); `v_kmh` and `t_amb` default to its
+    scenario's (130 km/h and 315 K on the Supra: they were literal defaults).
     """
 
     _TERRAIN_STREAM = 0x7E4A1   # separates the road stream from the weights stream
 
-    def __init__(self, duration=900.0, dt=1.0, v_kmh=130.0, t_amb=315.0,
-                 seed=None, families=TERRAIN_FAMILIES, weights=TERRAIN_WEIGHTS, **kw):
+    def __init__(self, duration=900.0, dt=1.0, v_kmh=None, t_amb=None,
+                 seed=None, families=TERRAIN_FAMILIES, weights=TERRAIN_WEIGHTS, *, plant, **kw):
+        sc = _need(plant, "TerrainTrainingEnv(plant=engines.get(name))").scenario
+        v_kmh = sc.v_kmh if v_kmh is None else v_kmh
+        t_amb = sc.t_amb if t_amb is None else t_amb
         self.duration, self.v_kmh, self.t_amb = duration, v_kmh, t_amb
         self.families, self.weights = tuple(families), tuple(weights)
         self._road_rng = self._make_road_rng(seed)
         self.road_log = []          # one family name per reset, for train.py's curve
-        super().__init__(make_grade_climb(duration=duration, dt=dt, t_amb=t_amb, v_kmh=v_kmh),
-                         dt=dt, seed=seed, **kw)
+        super().__init__(make_grade_climb(duration=duration, dt=dt, t_amb=t_amb, grade=sc.grade,
+                                          v_kmh=v_kmh),
+                         plant=plant, dt=dt, seed=seed, **kw)
 
     def _make_road_rng(self, seed):
         return np.random.default_rng(None if seed is None else [int(seed), self._TERRAIN_STREAM])
@@ -1337,7 +1452,7 @@ class TerrainTrainingEnv(SupervisoryTunerEnv):
         self.cycle = make_terrain(self._road_rng, duration=self.duration, dt=self.dt,
                                   v_kmh=self.v_kmh, t_amb=self.t_amb,
                                   family=(options or {}).get("family"),
-                                  families=self.families, weights=self.weights)
+                                  families=self.families, weights=self.weights, plant=self.plant)
         self.road_log.append(self.cycle["family"])
         return super().reset(seed=seed, options=options)
 
@@ -1374,44 +1489,48 @@ EXTREME_C_TURB = (0.75, 1.333)        # x the assumed 6000 J/K, log-uniform: saf
 # 79 km/h asking 7.6 Nm of an engine making 10.7). So every road is built to ask
 # for at least this much: slowdowns coast no faster than that allows, and a
 # descent is never steeper than holding speed with that much torque.
-EXTREME_T_FLOOR_NM = 15.0
+#
+# 15 Nm ON THE B58, AND IT IS THE ENGINE'S (20 October 2026): it was the module
+# constant EXTREME_T_FLOOR_NM, a measurement of this engine's closed throttle;
+# it is plant.engine.loop.torque_floor_nm now, passed to the builders below as
+# `floor_nm` and held by ExtremesTrainingEnv as self.floor_nm.
 
 
-def min_tractive_force(veh, v_mps):
-    """Tractive force, N, that asks EXTREME_T_FLOOR_NM of the engine in the gear
-    the box holds at this speed under light load."""
+def min_tractive_force(veh, v_mps, floor_nm):
+    """Tractive force, N, that asks `floor_nm` of the engine in the gear the box
+    holds at this speed under light load."""
     g = veh.gear_for(float(v_mps), force_n=0.0)
-    return EXTREME_T_FLOOR_NM * veh.gears[g] * veh.final_drive * 0.92 / veh.wheel_r
+    return floor_nm * veh.gears[g] * veh.final_drive * veh.driveline_eff / veh.wheel_r
 
 
-def grade_floor(v_mps, t_amb, dt, veh=None):
+def grade_floor(v_mps, t_amb, dt, veh, floor_nm):
     """The steepest grade at each step that still asks min_tractive_force of
     the engine: m*a + drag + rolling + grade >= that force, with a the
     environment's own forward difference. Where the car is speeding up (the
     launch from rest above all) the acceleration supplies the force and the
     floor sits far below any road; it binds only on a descent held at speed.
     (Measured 8 October: without the acceleration term the floor put a 3.5 %
-    hill under every launch from rest.)"""
-    veh = veh or Vehicle()
+    hill under every launch from rest.) `veh` and `floor_nm` are required: they
+    were `veh or Vehicle()` and the B58's 15 Nm until 20 October."""
     rho = 101.3e3 / (287.0 * t_amb)
     m, g0 = veh.mass, 9.81
     v = np.asarray(v_mps, dtype=float)
     a = np.diff(v, append=v[-1]) / dt
-    f_min = np.array([min_tractive_force(veh, x) for x in v])
+    f_min = np.array([min_tractive_force(veh, x, floor_nm) for x in v])
     s = (f_min - m * a - 0.5 * rho * veh.cd_a * v ** 2 - veh.crr * m * g0) / (m * g0)
     return np.tan(np.arcsin(np.clip(s, -0.5, 0.5)))
 
 
-def extreme_speed_profile(rng, n, dt, grade, t_amb, veh=None):
+def extreme_speed_profile(rng, n, dt, grade, t_amb, veh, floor_nm):
     """A speed target that changes every 60-180 s between 60 and 150 km/h; the
     first 20 s run up from rest.
 
     Speeding up is limited to EXTREME_ACCEL. SLOWING DOWN IS A COAST: a slowdown
     faster than the road's own drag, rolling resistance and grade would ask the
-    engine for less than it makes with the throttle shut (EXTREME_T_FLOOR_NM),
+    engine for less than it makes with the throttle shut (floor_nm),
     so the car slows no faster than the road slows it, less the margin that
-    keeps min_tractive_force asked for -- the driver lifting off."""
-    veh = veh or Vehicle()
+    keeps min_tractive_force asked for -- the driver lifting off. `veh` and
+    `floor_nm` are required, as in grade_floor."""
     rho = 101.3e3 / (287.0 * t_amb)
     m, g0 = veh.mass, 9.81
     v = np.empty(n)
@@ -1427,7 +1546,7 @@ def extreme_speed_profile(rng, n, dt, grade, t_amb, veh=None):
         # reads its force at v[i-1] and grade[i-1] (forward difference).
         th = np.arctan(float(grade[i - 1]))
         road = (0.5 * rho * veh.cd_a * v[i - 1] ** 2 + veh.crr * m * g0 * np.cos(th) + m * g0 * np.sin(th))
-        coast = max(0.0, (road - min_tractive_force(veh, v[i - 1])) / m)
+        coast = max(0.0, (road - min_tractive_force(veh, v[i - 1], floor_nm)) / m)
         v[i] = v[i - 1] + float(np.clip(target - v[i - 1], -min(coast, EXTREME_ACCEL) * dt, EXTREME_ACCEL * dt))
     return v
 
@@ -1437,10 +1556,11 @@ class ExtremesTrainingEnv(TerrainTrainingEnv):
     same road stream, so a seed fixes the whole sequence of episodes. TRAINING
     ONLY: scoring stays on the locked climb (evaluate.py)."""
 
-    def __init__(self, duration=900.0, dt=1.0, seed=None, **kw):
-        super().__init__(duration=duration, dt=dt, seed=seed, **kw)
+    def __init__(self, duration=900.0, dt=1.0, seed=None, *, plant, **kw):
+        super().__init__(duration=duration, dt=dt, seed=seed, plant=plant, **kw)
         self._c_turb0 = float(self.thermal.p.c_turb)
         self.c_turb_scale = 1.0
+        self.floor_nm = plant.engine.loop.torque_floor_nm     # 15 Nm on the B58
 
     def reset(self, *, seed=None, options=None):
         if seed is not None:
@@ -1449,11 +1569,11 @@ class ExtremesTrainingEnv(TerrainTrainingEnv):
         t_amb = 273.15 + rng.uniform(*EXTREME_T_AMB_C)
         c = make_terrain(rng, duration=self.duration, dt=self.dt, v_kmh=self.v_kmh, t_amb=t_amb,
                          family=(options or {}).get("family"), families=self.families,
-                         weights=self.weights, grade_max=EXTREME_GRADE_MAX)
-        v = extreme_speed_profile(rng, len(c["t"]), self.dt, c["grade"], t_amb, self.veh)
+                         weights=self.weights, grade_max=EXTREME_GRADE_MAX, plant=self.plant)
+        v = extreme_speed_profile(rng, len(c["t"]), self.dt, c["grade"], t_amb, self.veh, self.floor_nm)
         # Raising a grade only adds road force, so the coasts computed on the
         # unfloored grade above still ask at least the floor torque.
-        c["grade"] = np.maximum(c["grade"], grade_floor(v, t_amb, self.dt, self.veh))
+        c["grade"] = np.maximum(c["grade"], grade_floor(v, t_amb, self.dt, self.veh, self.floor_nm))
         c["v_mps"], c["t_amb"] = v, t_amb
         c["elev_m"] = np.cumsum(v * self.dt * c["grade"])
         lo, hi = np.log(EXTREME_C_TURB[0]), np.log(EXTREME_C_TURB[1])
@@ -1461,8 +1581,11 @@ class ExtremesTrainingEnv(TerrainTrainingEnv):
         self.cycle = c
         self.road_log.append(c["family"])
         obs, info = SupervisoryTunerEnv.reset(self, seed=seed, options=options)
+        # The episode's housing: a NEW record with the drawn capacity, never a
+        # change to the plant's (frozen, and shared by every environment built
+        # from engines.get; it was a mutation until 20 October 2026).
         for tn in (self.thermal, self.thermal_base):
-            tn.p.c_turb = self._c_turb0 * self.c_turb_scale
+            tn.p = replace(tn.p, c_turb=self._c_turb0 * self.c_turb_scale)
         return obs, info
 
 
@@ -1473,13 +1596,16 @@ class ExtremesTrainingEnv(TerrainTrainingEnv):
 # Keep both names working: the descriptive one for the code, the short one for
 # the documents and for anything written from them.
 
-def EngineEnv(cycle=None, **kw):
+def EngineEnv(cycle=None, *, plant, **kw):
     """SupervisoryTunerEnv with a sensible default scenario.
 
-    EngineEnv()  ->  the 900 s grade climb at 42 C, which is the standard
-    evaluation scenario. Pass your own cycle dict to override it.
+    EngineEnv(plant=engines.get("b58"))  ->  that plant's locked climb, 900 s at
+    the 0.2 s step it was built at, which is the standard evaluation scenario.
+    Pass your own cycle dict to override it. The plant is required (20 October
+    2026): this was the one constructor with the B58's whole scenario as a default.
     """
-    return SupervisoryTunerEnv(cycle if cycle is not None else make_grade_climb(), **kw)
+    return SupervisoryTunerEnv(cycle if cycle is not None else locked_climb(plant, duration=900.0, dt=0.2),
+                               plant=plant, **kw)
 
 
 def neutral_action():
@@ -1539,13 +1665,15 @@ def neutral_action():
 
 if __name__ == "__main__":
     from gymnasium.utils.env_checker import check_env
+    import engines
 
-    env = SupervisoryTunerEnv(make_grade_climb(duration=60.0), seed=0)
+    _plant = engines.get("b58")
+    env = SupervisoryTunerEnv(locked_climb(_plant, duration=60.0, dt=0.2), plant=_plant, seed=0)
     check_env(env, skip_render_check=True)
     print("env_checker: PASS")
 
     # A SMOKE TEST, NOT THE REWARD CHECK. This rolls 40 s of flat cruise. The
-    # grade in make_grade_climb() starts at t = 180 s, so nothing here ever gets
+    # grade in the locked climb starts at t = 180 s, so nothing here ever gets
     # hot, no constraint binds, and the mean reward is NOT the neutral-action
     # figure. It reads about -0.05 for a reason that has nothing to do with the
     # reward: cold engine, baseline still warming, torque tracking dominated by

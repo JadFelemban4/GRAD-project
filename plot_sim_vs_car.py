@@ -88,6 +88,14 @@ sys.path.insert(0, HERE)
 from plant import (predict, map_from_airflow, charge_temperature,  # noqa: E402
                    boost_ceiling_kpa, T_REF_CORR, P_REF_CORR)
 from engine_env import BaselineECU, Vehicle  # noqa: E402
+import engines  # noqa: E402
+
+# The car these logs come from and the model they are set against, named
+# (20 October 2026): the B58 in its Supra. VEH is its gearbox as the
+# environment builds it; Vehicle's numbers were class attributes until then.
+PLANT = engines.get("b58")
+ENG = PLANT.engine
+VEH = Vehicle(PLANT.car)
 from compare_log import f as log_field, AIRFLOW_KGH_TO_GPS  # noqa: E402
 from fit_envelope import envelope, BIN_KGS  # noqa: E402
 from verify_docs import dwell_column  # noqa: E402
@@ -297,9 +305,9 @@ NEAR = 0.04            # the tolerance engine_env.Vehicle's own comment quotes
 
 
 def chart_gears(S):
-    ratios = np.array(Vehicle.gears, dtype=float) * Vehicle.final_drive
+    ratios = np.array(VEH.gears, dtype=float) * VEH.final_drive
     mv = S[(S.v_kmh > MOVING_KMH) & (S.rpm > 0)]
-    wheel_rpm = (mv.v_kmh.to_numpy() / 3.6) / (2.0 * np.pi * Vehicle.wheel_r) * 60.0
+    wheel_rpm = (mv.v_kmh.to_numpy() / 3.6) / (2.0 * np.pi * VEH.wheel_r) * 60.0
     overall = mv.rpm.to_numpy() / wheel_rpm
     overall = overall[np.isfinite(overall) & (overall > 0)]
     idx = np.argmin(np.abs(np.log(overall[:, None] / ratios[None, :])), axis=1)
@@ -312,7 +320,7 @@ def chart_gears(S):
     say(f"   moving samples (v > {MOVING_KMH:.0f} km/h): {len(overall)}  from {n_drives} drives")
     say(f"   within {NEAR:.0%} of a published overall ratio: {int(within.sum())}"
         f"  = {100 * share:.1f} %")
-    say(f"   wheel radius used: {Vehicle.wheel_r} m (the model's constant)")
+    say(f"   wheel radius used: {VEH.wheel_r} m (the model's constant)")
     for g, r in enumerate(ratios):
         say(f"   gear {g + 1}: overall ratio {r:6.3f}   samples within {NEAR:.0%}: {per_gear[g]}")
     say()
@@ -325,7 +333,7 @@ def chart_gears(S):
            "the ratios and the final drive are Toyota's published figures; nothing was fitted to these logs")
     ftop = footer(sv, (
         "Overall ratio = engine rpm ÷ wheel rpm, the wheel's rpm taken from road speed and the model's wheel "
-        f"radius ({Vehicle.wheel_r} m, whose source is not recorded). The radius shifts all eight peaks together, "
+        f"radius ({VEH.wheel_r} m, whose source is not recorded). The radius shifts all eight peaks together, "
         "so the SPACING of the peaks is the independent part. Samples between the peaks are gear changes and "
         "torque-converter slip, which the model does not simulate: it assumes the converter locked. The car's "
         "own 'Actual gear' channel stops at 6, so it is not used (CLAUDE.md mistake 18). "
@@ -399,7 +407,7 @@ def chart_boost(S):
     model = hi.map_kpa.to_numpy(dtype=float)
     # The same samples, inverted with the pre-throttle SENSOR as the charge
     # temperature -- what the dataset did before 10 September (mistake 13).
-    sensor = np.array([map_from_airflow(g, r, t + 273.15) for g, r, t in
+    sensor = np.array([map_from_airflow(g, r, t + 273.15, engine=ENG) for g, r, t in
                        zip(hi.air_gps, hi.rpm, hi.iat_pre_c)], dtype=float)
     sensor = sensor[np.isfinite(sensor)]
     m_car, m_model, m_sensor = (float(np.median(x)) for x in (car, model, sensor))
@@ -493,7 +501,7 @@ def chart_envelope(S):
     def ceiling(x):
         # The simulator's own ceiling, called as the simulator calls it. At the
         # reference inlet state, corrected flow equals mass flow in kg/s.
-        return boost_ceiling_kpa(x * 1000.0, T_REF_CORR, P_REF_CORR) / P_REF_CORR
+        return boost_ceiling_kpa(x * 1000.0, T_REF_CORR, P_REF_CORR, engine=ENG) / P_REF_CORR
 
     pr_model = np.array([ceiling(x) for x in m])
     model_at_bins = np.array([ceiling(x) for x in c])
@@ -566,7 +574,7 @@ DWELL = ((0.0, 4.0), (4.0, 8.0), (8.0, math.inf))     # its dwell columns, secon
 
 
 def chart_enrichment(S):
-    ecu = BaselineECU()
+    ecu = BaselineECU(ENG.ecu)
     gate = float(ecu.ENR_LOAD)
     S2 = dwell_column(S, thr=gate)
     h = S2[(S2.map_kpa > gate) & S2.lam.between(0.5, 1.3)].copy()
@@ -694,14 +702,14 @@ def chart_load(points_csv):
         air = air_raw * AIRFLOW_KGH_TO_GPS
         ect_k = (ect_c if math.isfinite(ect_c) else 90.0) + 273.15
         t_amb_k = (amb_c if math.isfinite(amb_c) else 25.0) + 273.15
-        iat_k = charge_temperature(t_amb_k, ect_k)
+        iat_k = charge_temperature(t_amb_k, ect_k, engine=ENG)
         if not math.isfinite(lam) or lam <= 0:
             lam = 1.0
-        map_kpa = map_from_airflow(air, rpm, iat_k)
+        map_kpa = map_from_airflow(air, rpm, iat_k, engine=ENG)
         if not math.isfinite(map_kpa) or map_kpa < 15:
             continue
         out = predict(rpm=rpm, map_kpa=map_kpa, iat_k=iat_k, ect_k=ect_k,
-                      spark_btdc=spark, lam=lam)
+                      spark_btdc=spark, lam=lam, engine=ENG)
         load_model = 100.0 * out["eta_v"] * (1.0 - out["f_res"]) * map_kpa / 100.0
         if math.isfinite(load_meas) and load_meas > 0 and math.isfinite(load_model):
             pairs.append((load_meas, load_model, iat_k, map_kpa, rpm))

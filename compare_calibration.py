@@ -86,7 +86,7 @@ def thermal():
     import calibrate_thermal as K
     import derived
     before = dict(K.shipped_params())
-    th = derived.get("thermal")
+    th = derived.get("thermal", path=derived.B58_PATH)          # the B58's, from its logs
     after = {k: th[k] for k in before if k in th}
     after["ua_rad_scale"] = th["_ua_rad_scale"]
     out = {}
@@ -111,32 +111,37 @@ def thermal():
 def _map_at_ceiling(rpms, before):
     """MAP the environment's load loop reaches at a 1000 Nm request, per rpm.
     `before` re-creates the 8 September ceiling: the formula, sampled finely,
-    evaluated at the CHARGE temperature, as the environment did until then."""
+    evaluated at the CHARGE temperature, as the environment did until then.
+
+    Since 20 October 2026 the old ceiling is a variant of the B58's record
+    (dataclasses.replace on its boost envelope and cap), passed to the
+    environment, where it used to be swapped into plant.boost_ceiling_constants
+    for the process."""
+    from dataclasses import replace
+    import engines
     import plant
     import engine_env as E
-    orig = plant.boost_ceiling_constants
+    b58 = engines.get("b58")
     if before:
         m = np.linspace(0.0, 0.6, 601)
         pr = 1.0 + BOOST_BEFORE["A"] * m / (1.0 + BOOST_BEFORE["B"] * m)
-        plant.boost_ceiling_constants = lambda: dict(envelope_flow=m.tolist(), envelope_pr=pr.tolist(),
-                                                     pr_cap=BOOST_BEFORE["cap"])
-    try:
-        env = E.SupervisoryTunerEnv(E.make_grade_climb(duration=60.0, dt=1.0), dt=1.0, seed=0)
-        env.reset(seed=0)
-        iat = plant.charge_temperature(315.0, 365.0)
-        if before:
-            env.cycle["t_amb"] = iat
-        out = []
-        for r in rpms:
-            ecu, st, mp, kn = E.BaselineECU(), {}, 150.0, False
-            for _ in range(30):
-                sp, lam, _ = ecu.step(r, mp, iat, 365.0, kn, 1.0)
-                o, mp = env._track_torque(1000.0, r, iat, 365.0, sp, lam, 0.0, st)
-                kn = o["ki"] > 1.0
-            out.append(dict(rpm=r, map_kpa=float(mp), torque=float(o["torque"])))
-        return out
-    finally:
-        plant.boost_ceiling_constants = orig
+        boost = replace(b58.engine.boost, envelope_flow=tuple(m.tolist()), envelope_pr=tuple(pr.tolist()),
+                        pr_cap=BOOST_BEFORE["cap"])
+        b58 = replace(b58, engine=replace(b58.engine, boost=boost))
+    env = E.SupervisoryTunerEnv(E.locked_climb(b58, duration=60.0, dt=1.0), plant=b58, dt=1.0, seed=0)
+    env.reset(seed=0)
+    iat = plant.charge_temperature(315.0, 365.0, engine=b58.engine)
+    if before:
+        env.cycle["t_amb"] = iat
+    out = []
+    for r in rpms:
+        ecu, st, mp, kn = E.BaselineECU(b58.engine.ecu), {}, 150.0, False
+        for _ in range(30):
+            sp, lam, _ = ecu.step(r, mp, iat, 365.0, kn, 1.0)
+            o, mp = env._track_torque(1000.0, r, iat, 365.0, sp, lam, 0.0, st)
+            kn = o["ki"] > 1.0
+        out.append(dict(rpm=r, map_kpa=float(mp), torque=float(o["torque"])))
+    return out
 
 
 def boost():
@@ -164,14 +169,14 @@ def boost():
     rpms = list(range(1400, 4201, 100))
     S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"), low_memory=False)
     bins, _ = D.envelope_bins(S)
-    bc = derived.get("boost_ceiling")
+    bc = derived.get("boost_ceiling", path=derived.B58_PATH)
     return dict(car_wot=car, model_before=_map_at_ceiling(rpms, True),
                 model_after=_map_at_ceiling(rpms, False),
                 bins=[dict(flow=b[0], pr=b[1], rows=b[2], readings=b[3]) for b in bins],
                 envelope_flow=bc["envelope_flow"], envelope_pr=bc["envelope_pr"],
                 pr_cap=bc["pr_cap"], formula_before=BOOST_BEFORE,
                 torque_before=[list(x) for x in TORQUE_BEFORE],
-                torque_after=derived.get("deliverable_torque"))
+                torque_after=derived.get("deliverable_torque", path=derived.B58_PATH))
 
 
 def rows():

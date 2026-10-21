@@ -71,7 +71,8 @@ _EVALUATION_CACHE = {}
 _SOURCE_LOCK = threading.RLock()
 _MAX_EVALUATION_FILES = 512
 _MAX_EVALUATION_BYTES = 16 * 1024 * 1024
-_REPLAY_PLANT_FILES = (*FP.PLANT_FILES, 'derived.py', 'ecu.py', 'controllers/ecu.py', 'random_road.py',
+# the replay runs the B58 (live_fingerprint): its plant files, code and its own specs
+_REPLAY_PLANT_FILES = (*FP.plant_files("b58"), 'derived.py', 'ecu.py', 'controllers/ecu.py', 'random_road.py',
                        'evaluate.py', 'fingerprint.py', 'app/agent_trace.py', 'data/derived_params.json')
 
 
@@ -216,8 +217,11 @@ def live_fingerprint(protocol):
     os.environ.setdefault("GIT_OPTIONAL_LOCKS", "0")
     with _FINGERPRINT_LOCK:
         if protocol not in _FINGERPRINTS:
+            import engines
+            # the replay runs evaluate.run_episode: the 0-D cycle model
             _FINGERPRINTS[protocol] = FP.plant_fingerprint(
-                protocol=protocol, eval_dt=DT, eval_duration=DURATION)
+                protocol=protocol, plant=engines.get("b58"), backend=FP.BACKEND_CYCLE,
+                eval_dt=DT, eval_duration=DURATION)
             FINGERPRINT_TAKEN[protocol] = time.strftime("%H:%M")
         return _FINGERPRINTS[protocol]
 
@@ -349,6 +353,12 @@ def read_agent(runs, name, root=ROOT):
     protocol = protocol_of(meta)
     if protocol is None:
         return dict(out, status="incompatible", reason="unknown protocol")
+    # A record of an older fingerprint schema names no engine (20 October 2026):
+    # its own reason, not a list of "mismatches" (fingerprint.schema_problem).
+    old = FP.schema_problem(meta)
+    if old:
+        return dict(out, status="incompatible", protocol=protocol, reason="plant mismatch: " + old,
+                    problems=[old])
     bad = FP.compare(meta, live_fingerprint(protocol))
     if bad:
         return dict(out, status="incompatible", protocol=protocol,

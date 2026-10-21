@@ -33,6 +33,7 @@ import warnings
 
 import numpy as np
 
+import engines
 import fingerprint as FP
 from app import agent_api as API
 from app import agent_catalog as AC
@@ -41,10 +42,17 @@ from app import jev as JEV
 from app import laya_bridge as LB
 from app import model_questions as MQ
 from check_premise import p_grade_now, p_neutral
-from engine_env import (ACT_HI, ACT_LO, OBS_DIM, OIL_PROTECT_K, PREVIEW_S, SLEW,
-                        TURB_PROTECT_K, SupervisoryTunerEnv, make_grade_climb,
-                        neutral_action)
+from engine_env import (ACT_HI, ACT_LO, OBS_DIM, PREVIEW_S, SLEW, SupervisoryTunerEnv,
+                        locked_climb, neutral_action)
 from evaluate import EPISODES, EPISODES_D2, agent_policy, run_episode
+
+# The plant the pages replay, named here independently of the app (20 October
+# 2026, the four-engine build): the B58 in its Supra. The knees the served limits
+# are checked against are that plant's -- engine_env's TURB_PROTECT_K and
+# OIL_PROTECT_K until then -- not the app's own copy of them (app.alerts).
+PLANT = engines.get("b58")
+TURB_PROTECT_K = PLANT.engine.damage.turb_knee_k
+OIL_PROTECT_K = PLANT.engine.damage.oil_knee_k
 
 ROOT = Path(__file__).resolve().parent.parent
 FULL = "--full" in sys.argv
@@ -161,7 +169,7 @@ class TraceTests(unittest.TestCase):
         self.assertEqual(T.STEPS, len(T.build_cycle(ep)["v_mps"]) - 1)
         envs, obs = {}, {}
         for sighted in (True, False):
-            env = SupervisoryTunerEnv(T.build_cycle(ep), dt=T.DT, seed=ep["seed"],
+            env = SupervisoryTunerEnv(T.build_cycle(ep), plant=PLANT, dt=T.DT, seed=ep["seed"],
                                       use_preview=sighted)
             env.reset(seed=ep["seed"])
             env.w = np.asarray(ep["weights"], dtype=np.float32)
@@ -206,7 +214,7 @@ RESULT_KEYS = {"ret", "damage", "damage_thermal", "fuel", "torque_viol", "peak_t
 
 def _short_cycle(ep):
     """A 30 s climb: 29 steps, about a second of plant."""
-    return make_grade_climb(duration=30.0, dt=1.0)
+    return locked_climb(PLANT, duration=30.0, dt=1.0)
 
 
 def _neutral(env, obs):
@@ -1250,8 +1258,8 @@ class ProofTests(unittest.TestCase):
         t0 = time.perf_counter()
         cls.trace = _build_through_store(store, cls.key)
         cls.build_s = time.perf_counter() - t0
-        cls.want = [run_episode(policies[0], seed, weights, True, road=(start_s, grade)),
-                    run_episode(policies[1], seed, weights, False, road=(start_s, grade))]
+        cls.want = [run_episode(policies[0], seed, weights, True, road=(start_s, grade), plant=PLANT),
+                    run_episode(policies[1], seed, weights, False, road=(start_s, grade), plant=PLANT)]
         cls.road = T.route(T.build_cycle(T.episode("d2", 1)))
 
     def test_tracer_equals_run_episode(self):
@@ -1306,7 +1314,7 @@ class ProofTests(unittest.TestCase):
         store = API.EpisodeStore()               # the production loader and episode_for
         got = _build_through_store(store, ("runs", 0, 1))
         want = [run_episode(agent_policy(SAC.load(str(ROOT / "runs" / f"{arm}_seed0") + "/final")),
-                            seed, weights, arm == "sighted", road=None)
+                            seed, weights, arm == "sighted", road=None, plant=PLANT)
                 for arm in ("sighted", "blind")]
         self.assertEqual(got.results, want)
         print(f"\n    Phase D == proof PROVEN on {got.device}", file=sys.stderr)
@@ -1764,7 +1772,7 @@ def _obs_trace(n=8):
         ep = T.episode("d2", 1)
         lanes = []
         for use_preview in (True, False):
-            env = SupervisoryTunerEnv(T.build_cycle(ep), dt=T.DT, seed=ep["seed"],
+            env = SupervisoryTunerEnv(T.build_cycle(ep), plant=PLANT, dt=T.DT, seed=ep["seed"],
                                       use_preview=use_preview)
             env.reset(seed=ep["seed"])
             env.w = np.asarray(ep["weights"], dtype=np.float32)
@@ -1821,7 +1829,8 @@ class QuestionTests(unittest.TestCase):
 
     def test_levels_and_net(self):
         neutral = np.asarray(API.page_constants()["act"]["neutral_phys"], dtype=np.float32)
-        env = SupervisoryTunerEnv(make_grade_climb(), dt=1.0)
+        # make_grade_climb()'s defaults until 20 October 2026: 900 s at the 0.2 s step
+        env = SupervisoryTunerEnv(locked_climb(PLANT, duration=900.0, dt=0.2), plant=PLANT, dt=1.0)
         for table in (MQ.LEVELS, MQ.NET):
             self.assertEqual((table.dtype, table.shape), (np.float32, (5, 5)))
         np.testing.assert_allclose(MQ.LEVELS, np.asarray(self.NAMED), atol=1e-6,
@@ -1951,7 +1960,7 @@ class StateTests(unittest.TestCase):
 
     def test_decode_is_the_observation(self):
         ep = T.episode("d2", 1)
-        env = SupervisoryTunerEnv(T.build_cycle(ep), dt=T.DT, seed=ep["seed"])
+        env = SupervisoryTunerEnv(T.build_cycle(ep), plant=PLANT, dt=T.DT, seed=ep["seed"])
         env.reset(seed=ep["seed"])
         env.w = np.asarray(ep["weights"], dtype=np.float32)
         checked = []

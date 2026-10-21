@@ -29,8 +29,8 @@ from pathlib import Path
 import numpy as np
 
 from app.agent_api import Trace
-from engine_env import (ACT_HI, ACT_LO, OIL_PROTECT_K, PREVIEW_S, TURB_PROTECT_K,
-                        neutral_action)
+from app.alerts import OIL_PROTECT_K, TURB_PROTECT_K      # the B58's knees, one definition
+from engine_env import ACT_HI, ACT_LO, PREVIEW_S, neutral_action
 
 REPO = Path(__file__).resolve().parent.parent
 

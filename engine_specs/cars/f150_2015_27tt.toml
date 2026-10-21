@@ -1,0 +1,101 @@
+# engine_specs/cars/f150_2015_27tt.toml -- the truck around decision 24's Ford engine.
+#
+# PUBLISHED VALUES ONLY. Every value below was printed by the source its `source` key names
+# ([sources] at the end gives the URL), in the units that source prints. Nothing here is
+# derived: no rolling radius, no drag area, no unit conversion -- the code that builds a Car
+# does those in the open, and engine_specs/cars/README.md says how. A value no source prints is
+# in [not_typed] with the reason, never guessed. Read by nothing yet (build step 1 of the
+# four-engine plants, 20 October 2026); test_epa_map.py checks the form and the EPA row.
+#
+# NO DRIVING DATA EXISTS FOR THIS TRUCK. Argonne's D3 has two F-150s and neither is the 2.7 L
+# (CATALOGUE.md section 6). The shift schedule will be ASSUMED; the published values are below.
+
+schema = 1
+car_id = "f150_2015_27tt"
+engine_id = "ford_27tt"
+description = "2015 Ford F-150 4x2 with the 2.7 L EcoBoost V6 and the 6-speed automatic (6R80). EPA's engine came from 'a 2015 Ford F150 2WD', VIN 1FTEX1CP5FFA23506 (its HD1 test report); which body that truck had is not stated, so the 4x2 SuperCab row below is a choice (the vehicles strand's), with the other 4x2 row beside it"
+
+[transmission]
+value = "SelectShift 6-speed automatic with progressive range select and tow/haul mode"
+status = "PUBLISHED"
+source = "FORD"
+note = "the 2.7L EcoBoost column; tow/haul mode is not modelled"
+
+[gear_ratios]
+value = [4.17, 2.34, 1.52, 1.14, 0.86, 0.69]
+unit = "1"
+status = "PUBLISHED"
+source = "FORD"
+note = "1st to 6th as Ford prints them, two decimals ('4.17:1'); a three-decimal set circulates (Wikipedia, uncited there) and is NOT typed"
+
+[reverse_ratio]
+value = 3.40
+unit = "1"
+status = "PUBLISHED"
+source = "FORD"
+
+[available_axle_ratios]
+value = [3.31, 3.55, 3.73]
+unit = "1"
+status = "PUBLISHED"
+source = "FORD"
+note = "for the 2.7L EcoBoost; EPA's tested 4x2 trucks ran 3.31 (the row below), so final_drive is that"
+
+[final_drive]
+value = 3.31
+unit = "1"
+status = "PUBLISHED"
+source = "EPA15"
+note = "the axle ratio of the EPA test truck below, one of Ford's three (FORD)"
+
+[epa_test_car]
+status = "PUBLISHED"
+source = "EPA15"
+file_rows = [1716, 1717]
+model_year = 2015
+represented_model = "F150 4X2 Super Cab"
+test_vehicle_id = "FFA00049"
+engine_code = "FFC1P30A11"
+tested_transmission = "Semi-Automatic, 6 gears"
+equivalent_test_weight_lb = 4750
+target_coef_a_lbf = 22.55
+target_coef_b_lbf_per_mph = 0.391
+target_coef_c_lbf_per_mph2 = 0.03137
+axle_ratio = 3.31
+n_over_v_rpm_per_mph = 26
+note = "rows 1716-1717 (header = row 1); road-load force F = A + B v + C v^2 with F in lbf and v in mph. The 2016 list (16tstcar.csv, rows 1428-1429) repeats this row unchanged"
+
+[[epa_test_car_other_rows]]
+status = "PUBLISHED"
+source = "EPA15"
+file_rows = [1682, 1683]
+model_year = 2015
+represented_model = "F-150 4X2"
+test_vehicle_id = "FFA00008"
+engine_code = "FFC1P30A11"
+tested_transmission = "Automatic, 6 gears"
+equivalent_test_weight_lb = 5000
+target_coef_a_lbf = 23.81
+target_coef_b_lbf_per_mph = 0.3903
+target_coef_c_lbf_per_mph2 = 0.03123
+axle_ratio = 3.31
+n_over_v_rpm_per_mph = 26
+note = "the other 4x2 2.7 L test truck (body not named); the 'F-150 Super Cab Max' rows (3.73 axle, 5250 lb) are another configuration"
+
+[not_typed]
+tyre_size = "Ford's 2015 specification sheet prints none; a secondary listing (cars.com, a 3.5 L V6 XL) shows P245/70R17, which is another truck. Not typed: the model needs the rolling radius, which EPA's N/V fixes for the tested truck"
+rolling_radius_m = "no source prints it. DERIVE it in code from EPA's N/V with the top gear (0.69) and the axle ratio (3.31). Never type the result here"
+curb_weight = "not in Ford's specification sheet, and no Ford figure was found (the vehicles strand). The road load uses EPA's test weight; EPA's 4750 lb class bounds the loaded weight (40 CFR 1066.805), a derivation left to the code"
+drag_area_and_rolling_coefficient = "not published. The road load is EPA's A, B, C above"
+driveline_efficiency = "not published. ASSUMED wherever the code needs it, and labelled so there"
+shift_schedule = "no driving data for this truck; the 6R80 sibling in D3 (a 2012 F-150 3.5 L EcoBoost) is the only lead, and the result is ASSUMED"
+
+[sources.FORD]
+url = "https://web.archive.org/web/20160528201019/https://media.ford.com/content/dam/fordmedia/North%20America/US/2015_Specs/2015_F150_Specs.pdf"
+what = "Ford, 2015 F-150 technical specifications (archived): the 2.7L EcoBoost V6 column -- bore x stroke 3.27 x 3.27 in, compression 10.0:1, 325 hp @ 5750, 375 lb-ft @ 3000, gear ratios, available axle ratios"
+opened = "2026-10-20"
+
+[sources.EPA15]
+url = "https://www.epa.gov/sites/default/files/2016-07/15tstcar.csv"
+what = "EPA Test Car List, model year 2015 (15tstcar.csv); also in logs/epa/D3_AND_EPA_SOURCES.csv with its sha256"
+opened = "2026-10-20"

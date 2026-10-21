@@ -43,23 +43,27 @@ def run(state):
     sys.path.insert(0, HERE)
     import thermal
     import engine_env as E
+    import engines
     import check_premise as C
+    plant = engines.get("b58")
     if not substep:
         thermal.DT_SUB_MAX = 1e9                      # one step per environment step, as before
     if not ramp:
-        ramped = E.make_grade_climb
+        # check_premise builds its road with locked_climb since 20 October 2026
+        # (make_grade_climb until then), so the step goes in there
+        ramped = E.locked_climb
 
-        def stepped(*a, **k):
-            c = ramped(*a, **k)
+        def stepped(pl, *, duration, dt):
+            c = ramped(pl, duration=duration, dt=dt)
             g = np.zeros_like(c["grade"])
-            g[int(180.0 / float(k.get("dt", 1.0))):] = k.get("grade", 0.12)
+            g[int(180.0 / float(dt)):] = pl.scenario.grade
             c["grade"] = g
             return c
-        C.make_grade_climb = stepped
+        C.locked_climb = stepped
     out, raw = {}, {}
     for key, pol in (("baseline", C.p_neutral), ("reactive", C.p_reactive),
                      ("current_grade", C.p_grade_now), ("predictive", C.p_predictive)):
-        r = C.rollout(pol)
+        r = C.rollout(pol, plant=plant)
         raw[key] = float(r["damage"])
         out[key] = round(raw[key], 1)
         if key == "baseline":

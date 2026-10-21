@@ -5,8 +5,11 @@ root = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(root), str(root.parent)]
 from fastapi.testclient import TestClient
 from backend.server import app
+import engines
 from plant import charge_temperature, predict
 from thermal import ThermalNetwork
+
+ENG = engines.get('b58').engine   # the engine the lab teaches, named (20 October 2026)
 
 class ControlledThermalComparison(unittest.TestCase):
     def test_controlled_fan_then_pump_use_actual_source_and_same_initial_time(self):
@@ -20,8 +23,8 @@ class ControlledThermalComparison(unittest.TestCase):
             self.assertEqual(response.status_code, 200, response.text)
             result = response.json()
             runs.append(result)
-            engine = predict(3000,180,charge_temperature(315.15),315.15,8,.92)
-            net = ThermalNetwork()
+            engine = predict(3000,180,charge_temperature(315.15,None,engine=ENG),315.15,8,.92,engine=ENG)
+            net = ThermalNetwork(ENG.thermal)
             net.reset(t_amb=315.15,warm=False)
             index = 1
             for phase, duration in [('heating',120),('cooling',90)]:

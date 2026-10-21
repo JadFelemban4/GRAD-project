@@ -1,0 +1,93 @@
+table,column,epa_channel,epa_unit,epa_description,epa_status,reference_only,calculated,n_values,n_empty,min,max
+epa_steady.csv,speed_rpm,Speed,rpm,Dynamometer (and thus Engine) Speed,Calibration to a Standard,0,0,190,0,1001.0,5000.0
+epa_steady.csv,torque_nm,Torque,Nm,Torque Measured with Inline Torque Sensor,Calibration to a Standard,0,0,190,0,-27.398,192.798
+epa_steady.csv,bmep_bar,BMEP,bar,Brake Mean Effective Pressure,Calculated,0,1,190,0,-2.302966034061623,16.205826901051637
+epa_steady.csv,cell_temp_c,Cell Temp,degC,Air Temperature Measured in the Test Cell,Verification to a Standard,0,0,190,0,24.3,27.8
+epa_steady.csv,cell_press_kpa_abs,Cell Press,kPaA,Barometric Pressure Measured in the Test Cell,Calibration to a Standard,0,0,190,0,98.57,98.62
+epa_steady.csv,bsfc_g_per_kwh,BSFC,g/kW-hr,Brake Specific Fuel Consumption,Calculated,0,1,177,13,223.10187604565965,5544.834065205808
+epa_steady.csv,bte_pct,BTE,%,Brake Thermal Efficiency,Calculated,0,1,177,13,1.5134807513325923,37.615101117772525
+epa_steady.csv,fuel_meter_flow_gps,Fuel Meter Flow,g/s,Fuel Flow Measured with Flow Meter,Calibration to a Standard,0,0,190,0,-0.005,4.614
+epa_steady.csv,injector_fuel_flow_gps,Injector Fuel Flow,g/s,Fuel Flow Estimate from Injector Calibration,Calculated,0,1,190,0,0.0,4.481799405597974
+epa_steady.csv,fuel_rail_press_mpa_gauge,Fuel Rail Press,MPaG,Fuel Rail Pressure,Reference Only,1,0,190,0,3.577877,12.575041
+epa_steady.csv,spark_timing_cad_btdc,Spark Timing,CAD BTDC,Average Spark Timing Across all Cylinders,Reference Only,1,0,190,0,-4.24275,40.0825
+epa_steady.csv,coolant_temp_c,Coolant Temp,degC,Coolant Temperature,Verification to a Standard,0,0,190,0,78.9,94.3
+epa_steady.csv,oil_sump_temp_c,Oil Sump Temp,degC,Oil Temperature,Verification to a Standard,0,0,190,0,82.4,98.1
+epa_steady.csv,cac_inlet_press_kpa_abs,CAC Inlet Press,kPaA,Pressure Measured at Charge Air Cooler Inlet,Calibration to a Standard,0,0,190,0,98.1,146.49
+epa_steady.csv,cac_inlet_temp_c,CAC Inlet Temp,degC,Temperature Measured at Charge Air Cooler Inlet,Verification to a Standard,0,0,190,0,30.2,74.4
+epa_steady.csv,cac_outlet_press_kpa_abs,CAC Outlet Press,kPaA,Pressure Measured at Charge Air Cooler Outlet,Calibration to a Standard,0,0,190,0,98.5,142.42000000000002
+epa_steady.csv,cac_outlet_temp_c,CAC Outlet Temp,degC,Temperature Measured at Charge Air Cooler Outlet,Verification to a Standard,0,0,190,0,22.6,36.7
+epa_steady.csv,intake_manifold_press_kpa_abs,Intake Manifold Press,kPaA,Pressure Measured in the Intake Manifold,Calibration to a Standard,0,0,190,0,23.709999999999994,145.09
+epa_steady.csv,intake_manifold_temp_c,Intake Manifold Temp,degC,Temperature Measured in the Intake Manifold,Verification to a Standard,0,0,190,0,31.5,65.5
+epa_steady.csv,turbine_inlet_press_kpa_abs,Turbine Inlet Press,kPaA,Pressure Measured at Turbocharger Turbine Inlet,Calibration to a Standard,0,0,190,0,97.11,166.0
+epa_steady.csv,turbine_inlet_temp_c,Turbine Inlet Temp,degC,Temperature Measured at Turbocharger Turbine Inlet,Verification to a Standard,0,0,190,0,199.0,833.8
+epa_steady.csv,catalyst_inlet_press_kpa_abs,Catalyst Inlet Press,kPaA,Pressure Measured at the Inlet to the Catalyst,Calibration to a Standard,0,0,190,0,96.61,118.47999999999999
+epa_steady.csv,catalyst_inlet_temp_c,Catalyst Inlet Temp,degC,Temperature Measured at the Inlet to the Catalyst,Verification to a Standard,0,0,190,0,295.1,792.5
+epa_steady.csv,exhaust_lambda,Exhaust Lambda,---,Measured via Wideband Exhaust Oxygen Sensor,Reference Only,1,0,179,11,0.96,1.02
+epa_steady.csv,intake_cam_phase_cad_adv,Intake Cam Phase,CAD ADV,Intake Cam Phaser Advance,Calculated,0,1,190,0,-0.512,61.403
+epa_steady.csv,effective_compression_stroke_mm,Compression Stroke Length,mm,Estimated Effective Compression Stroke Length from Intake Valve Closing,Calculated,0,1,190,0,75.26747721164648,89.9401320669511
+epa_steady.csv,effective_compression_ratio,Compression Ratio,---,Estimated Effective Compression Ratio from Intake Valve Closing,Calculated,0,1,190,0,9.064601767685382,10.636716612852762
+epa_steady.csv,exhaust_cam_phase_cad_ret,Exhaust Cam Phase,CAD RET,Exhaust Cam Phaser Retard,Calculated,0,1,190,0,0.171,40.553
+epa_steady.csv,effective_expansion_stroke_mm,Expansion Stroke Length,mm,Estimated Effective Expansion Stroke Length Until Exhaust Valve Opening,Calculated,0,1,190,0,83.82781495823588,89.88622990062169
+epa_steady.csv,effective_expansion_ratio,Expansion Ratio,---,Estimated Effective Expansion Ratio Until Exhaust Valve Opening,Calculated,0,1,190,0,9.981806880446173,10.630941216599744
+epa_steady.csv,valve_overlap_cad,Valve Overlap,CAD,Estimated Valve Timing Overlap from Cam Phase Measurements,Calculated,0,1,190,0,-44.104,35.065
+epa_highload_initial.csv,speed_rpm,Speed,rpm,Dynamometer (and thus Engine) Speed,Calibration to a Standard,0,0,65,0,1500.7462686567164,5001.9838709677415
+epa_highload_initial.csv,torque_nm,Torque,Nm,Torque Measured with Inline Torque Sensor,Calibration to a Standard,0,0,65,0,163.1528378378378,237.22968354430384
+epa_highload_initial.csv,bmep_bar,BMEP,bar,Brake Mean Effective Pressure,Calculated,0,1,65,0,13.713973425115134,19.940576081236557
+epa_highload_initial.csv,cell_temp_c,Cell Temp,degC,Air Temperature Measured in the Test Cell,Verification to a Standard,0,0,65,0,22.30000000000003,24.5
+epa_highload_initial.csv,cell_press_kpa_abs,Cell Press,kPaA,Barometric Pressure Measured in the Test Cell,Calibration to a Standard,0,0,65,0,98.44711711711716,98.48924731182778
+epa_highload_initial.csv,bsfc_g_per_kwh,BSFC,g/kW-hr,Brake Specific Fuel Consumption,Calculated,0,1,65,0,229.6524538069678,391.68140160577695
+epa_highload_initial.csv,bte_pct,BTE,%,Brake Thermal Efficiency,Calculated,0,1,65,0,21.42557597225077,36.542172695772955
+epa_highload_initial.csv,injector_fuel_flow_gps,Injector Fuel Flow,g/s,Fuel Flow Estimate from Injector Calibration,Calculated,0,1,65,0,1.9522989836722793,11.760408373636249
+epa_highload_initial.csv,fuel_rail_press_mpa_gauge,Fuel Rail Press,MPaG,Fuel Rail Pressure,Reference Only,1,0,65,0,7.596554216867478,17.71876216216216
+epa_highload_initial.csv,spark_timing_cad_btdc,Spark Timing,CAD BTDC,Average Spark Timing Across all Cylinders,Reference Only,1,0,65,0,-5.43455158730158,11.847641891891886
+epa_highload_initial.csv,coolant_temp_c,Coolant Temp,degC,Coolant Temperature,Verification to a Standard,0,0,65,0,83.22436974789902,91.86545454545457
+epa_highload_initial.csv,oil_sump_temp_c,Oil Sump Temp,degC,Oil Temperature,Verification to a Standard,0,0,65,0,84.31181102362203,97.99729729729715
+epa_highload_initial.csv,cac_inlet_press_kpa_abs,CAC Inlet Press,kPaA,Pressure Measured at Charge Air Cooler Inlet,Calibration to a Standard,0,0,65,0,127.24913385826771,189.10117117117116
+epa_highload_initial.csv,cac_inlet_temp_c,CAC Inlet Temp,degC,Temperature Measured at Charge Air Cooler Inlet,Verification to a Standard,0,0,65,0,36.04881889763771,59.99096385542166
+epa_highload_initial.csv,cac_outlet_press_kpa_abs,CAC Outlet Press,kPaA,Pressure Measured at Charge Air Cooler Outlet,Calibration to a Standard,0,0,65,0,126.29086614173231,180.50927927927935
+epa_highload_initial.csv,cac_outlet_temp_c,CAC Outlet Temp,degC,Temperature Measured at Charge Air Cooler Outlet,Verification to a Standard,0,0,65,0,30.387407407407498,36.55120481927709
+epa_highload_initial.csv,intake_manifold_press_kpa_abs,Intake Manifold Press,kPaA,Pressure Measured in the Intake Manifold,Calibration to a Standard,0,0,65,0,125.84362204724417,180.08405405405412
+epa_highload_initial.csv,intake_manifold_temp_c,Intake Manifold Temp,degC,Temperature Measured in the Intake Manifold,Verification to a Standard,0,0,65,0,36.49370078740155,41.60198019801979
+epa_highload_initial.csv,turbine_inlet_press_kpa_abs,Turbine Inlet Press,kPaA,Pressure Measured at Turbocharger Turbine Inlet,Calibration to a Standard,0,0,65,0,119.44475903614467,282.3460843373494
+epa_highload_initial.csv,turbine_inlet_temp_c,Turbine Inlet Temp,degC,Temperature Measured at Turbocharger Turbine Inlet,Verification to a Standard,0,0,65,0,583.6179104477624,752.6936936936937
+epa_highload_initial.csv,catalyst_inlet_press_kpa_abs,Catalyst Inlet Press,kPaA,Pressure Measured at the Inlet to the Catalyst,Calibration to a Standard,0,0,65,0,100.0861417322835,141.3033132530121
+epa_highload_initial.csv,catalyst_inlet_temp_c,Catalyst Inlet Temp,degC,Temperature Measured at the Inlet to the Catalyst,Verification to a Standard,0,0,65,0,533.5974789915967,703.6621621621623
+epa_highload_initial.csv,exhaust_lambda,Exhaust Lambda,---,Measured via Wideband Exhaust Oxygen Sensor,Reference Only,1,0,65,0,0.6116265060240956,1.0113855421686766
+epa_highload_initial.csv,intake_cam_phase_cad_adv,Intake Cam Phase,CAD ADV,Intake Cam Phaser Advance,Calculated,0,1,61,4,-0.6812289156626511,36.768365591397874
+epa_highload_initial.csv,effective_compression_stroke_mm,Compression Stroke Length,mm,Estimated Effective Compression Stroke Length from Intake Valve Closing,Calculated,0,1,61,4,75.18064090863051,88.2275062291806
+epa_highload_initial.csv,effective_compression_ratio,Compression Ratio,---,Estimated Effective Compression Ratio from Intake Valve Closing,Calculated,0,1,61,4,9.055297613637109,10.453215771980544
+epa_highload_initial.csv,exhaust_cam_phase_cad_ret,Exhaust Cam Phase,CAD RET,Exhaust Cam Phaser Retard,Calculated,0,1,65,0,11.002950000000023,40.62577464788738
+epa_highload_initial.csv,effective_expansion_stroke_mm,Expansion Stroke Length,mm,Estimated Effective Expansion Stroke Length Until Exhaust Valve Opening,Calculated,0,1,65,0,87.04015869190896,89.94007211511904
+epa_highload_initial.csv,effective_expansion_ratio,Expansion Ratio,---,Estimated Effective Expansion Ratio Until Exhaust Valve Opening,Calculated,0,1,65,0,10.32599634862971,10.636710189259615
+epa_highload_initial.csv,valve_overlap_cad,Valve Overlap,CAD,Estimated Valve Timing Overlap from Cam Phase Measurements,Calculated,0,1,61,4,-30.152310810810818,32.81749579831933
+epa_highload_final.csv,speed_rpm,Speed,rpm,Dynamometer (and thus Engine) Speed,Calibration to a Standard,0,0,65,0,1500.73,5000.9473684210525
+epa_highload_final.csv,torque_nm,Torque,Nm,Torque Measured with Inline Torque Sensor,Calibration to a Standard,0,0,65,0,157.26423076923078,224.83910394265283
+epa_highload_final.csv,bmep_bar,BMEP,bar,Brake Mean Effective Pressure,Calculated,0,1,65,0,13.219000723934858,18.899073637082275
+epa_highload_final.csv,cell_temp_c,Cell Temp,degC,Air Temperature Measured in the Test Cell,Verification to a Standard,0,0,65,0,22.299999999999553,24.5
+epa_highload_final.csv,cell_press_kpa_abs,Cell Press,kPaA,Barometric Pressure Measured in the Test Cell,Calibration to a Standard,0,0,65,0,98.44715481171511,98.48832000000101
+epa_highload_final.csv,bsfc_g_per_kwh,BSFC,g/kW-hr,Brake Specific Fuel Consumption,Calculated,0,1,65,0,230.00475957608572,404.58522735862005
+epa_highload_final.csv,bte_pct,BTE,%,Brake Thermal Efficiency,Calculated,0,1,65,0,20.74222947241635,36.48619986164312
+epa_highload_final.csv,fuel_meter_flow_gps,Fuel Meter Flow,g/s,Fuel Flow Measured with Flow Meter,Calibration to a Standard,0,0,63,2,1.9769605878423557,12.15678947368422
+epa_highload_final.csv,injector_fuel_flow_gps,Injector Fuel Flow,g/s,Fuel Flow Estimate from Injector Calibration,Calculated,0,1,65,0,1.965700859442612,11.689700306730904
+epa_highload_final.csv,fuel_rail_press_mpa_gauge,Fuel Rail Press,MPaG,Fuel Rail Pressure,Reference Only,1,0,65,0,7.646367201068787,17.61327811059907
+epa_highload_final.csv,spark_timing_cad_btdc,Spark Timing,CAD BTDC,Average Spark Timing Across all Cylinders,Reference Only,1,0,65,0,-5.402713423295492,13.162743131868176
+epa_highload_final.csv,coolant_temp_c,Coolant Temp,degC,Coolant Temperature,Verification to a Standard,0,0,65,0,85.13573333333323,94.63580980683527
+epa_highload_final.csv,oil_sump_temp_c,Oil Sump Temp,degC,Oil Temperature,Verification to a Standard,0,0,65,0,84.66352705410922,98.5314814814808
+epa_highload_final.csv,cac_inlet_press_kpa_abs,CAC Inlet Press,kPaA,Pressure Measured at Charge Air Cooler Inlet,Calibration to a Standard,0,0,65,0,126.45629926519656,188.9208525345622
+epa_highload_final.csv,cac_inlet_temp_c,CAC Inlet Temp,degC,Temperature Measured at Charge Air Cooler Inlet,Verification to a Standard,0,0,65,0,45.44729458917834,81.74285714285706
+epa_highload_final.csv,cac_outlet_press_kpa_abs,CAC Outlet Press,kPaA,Pressure Measured at Charge Air Cooler Outlet,Calibration to a Standard,0,0,65,0,125.75743486973894,180.62292626728097
+epa_highload_final.csv,cac_outlet_temp_c,CAC Outlet Temp,degC,Temperature Measured at Charge Air Cooler Outlet,Verification to a Standard,0,0,65,0,30.214924346629893,37.43566121842509
+epa_highload_final.csv,intake_manifold_press_kpa_abs,Intake Manifold Press,kPaA,Pressure Measured in the Intake Manifold,Calibration to a Standard,0,0,65,0,124.677341349365,180.551267281106
+epa_highload_final.csv,intake_manifold_temp_c,Intake Manifold Temp,degC,Temperature Measured in the Intake Manifold,Verification to a Standard,0,0,65,0,35.781429525717975,40.41075050709956
+epa_highload_final.csv,turbine_inlet_press_kpa_abs,Turbine Inlet Press,kPaA,Pressure Measured at Turbocharger Turbine Inlet,Calibration to a Standard,0,0,65,0,124.04855043420156,280.60476780185763
+epa_highload_final.csv,turbine_inlet_temp_c,Turbine Inlet Temp,degC,Temperature Measured at Turbocharger Turbine Inlet,Verification to a Standard,0,0,65,0,610.1353333333356,779.4448823903364
+epa_highload_final.csv,catalyst_inlet_press_kpa_abs,Catalyst Inlet Press,kPaA,Pressure Measured at the Inlet to the Catalyst,Calibration to a Standard,0,0,65,0,100.52710754842936,140.02674922600607
+epa_highload_final.csv,catalyst_inlet_temp_c,Catalyst Inlet Temp,degC,Temperature Measured at the Inlet to the Catalyst,Verification to a Standard,0,0,65,0,562.4796666666679,708.5017800381427
+epa_highload_final.csv,exhaust_lambda,Exhaust Lambda,---,Measured via Wideband Exhaust Oxygen Sensor,Reference Only,1,0,65,0,0.6100000000000045,0.9904895104895183
+epa_highload_final.csv,intake_cam_phase_cad_adv,Intake Cam Phase,CAD ADV,Intake Cam Phaser Advance,Calculated,0,1,60,5,-0.6973436532507725,37.34414305177149
+epa_highload_final.csv,effective_compression_stroke_mm,Compression Stroke Length,mm,Estimated Effective Compression Stroke Length from Intake Valve Closing,Calculated,0,1,60,5,75.17235932017445,88.32883869409356
+epa_highload_final.csv,effective_compression_ratio,Compression Ratio,---,Estimated Effective Compression Ratio from Intake Valve Closing,Calculated,0,1,60,5,9.054410275368628,10.464073130376697
+epa_highload_final.csv,exhaust_cam_phase_cad_ret,Exhaust Cam Phase,CAD RET,Exhaust Cam Phaser Retard,Calculated,0,1,64,1,9.200651195499336,40.850722397476275
+epa_highload_final.csv,effective_expansion_stroke_mm,Expansion Stroke Length,mm,Estimated Effective Expansion Stroke Length Until Exhaust Valve Opening,Calculated,0,1,64,1,86.58959383249731,89.94007939204765
+epa_highload_final.csv,effective_expansion_ratio,Expansion Ratio,---,Estimated Effective Expansion Ratio Until Exhaust Valve Opening,Calculated,0,1,64,1,10.277720170175494,10.636710968952698
+epa_highload_final.csv,valve_overlap_cad,Valve Overlap,CAD,Estimated Valve Timing Overlap from Cam Phase Measurements,Calculated,0,1,59,6,-31.423741758241718,33.5129876203581

@@ -10,7 +10,12 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from backend.server import app  # noqa: E402
+import engines  # noqa: E402
 from plant import boost_ceiling_kpa, charge_temperature, predict  # noqa: E402
+
+# The engine the lab teaches, named here independently of the backend, so a lab
+# that simulated another engine would fail these comparisons (20 October 2026).
+ENG = engines.get("b58").engine
 
 
 class BridgeApiTests(unittest.TestCase):
@@ -66,14 +71,15 @@ class BridgeApiTests(unittest.TestCase):
                 "spark": 8, "lam": 0.95}
         got = self.client.post("/api/plant", json=body)
         self.assertEqual(got.status_code, 200, got.text)
-        iat_k = charge_temperature(308.15)
-        expected = predict(3000, 250, iat_k, 363.15, 8, 0.95)
+        iat_k = charge_temperature(308.15, None, engine=ENG)
+        expected = predict(3000, 250, iat_k, 363.15, 8, 0.95, engine=ENG)
         self.assertAlmostEqual(got.json()["torque_nm"], expected["torque_nm"], places=6)
         self.assertAlmostEqual(got.json()["iat_k"], iat_k, places=6)
         self.assertAlmostEqual(got.json()["charge_temp_c"], iat_k - 273.15, places=6)
         self.assertIn("no block-temperature input", got.json()["charge_temp_source"])
         self.assertAlmostEqual(got.json()["observed_ceiling_kpa"],
-                               boost_ceiling_kpa(expected["mdot_air_gps"], 308.15), places=6)
+                               boost_ceiling_kpa(expected["mdot_air_gps"], 308.15,
+                                                 ENG.boost.inlet_sea_kpa, engine=ENG), places=6)
         self.assertGreater(got.json()["map_over_ceiling_kpa"], 0.0)
         self.assertTrue(any("not vehicle-feasible" in warning for warning in got.json()["warnings"]))
 

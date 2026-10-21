@@ -753,3 +753,36 @@ session's scratch directory, not in the repository.
 8. **The Bosch handbook page** for the relative-air-charge definition; the
    Springer/Reif edition of *Gasoline Engine Management* shows a search hit near
    page 12 but no text (section 1).
+
+---
+
+## 8. The three new engines and their cars: EPA and Argonne (added 21 October 2026)
+
+Decision 24 (`results/VALIDATION_DECISIONS.md`, section F) adds three engines,
+each in its own car, whose numbers come from the US EPA and from Argonne
+National Laboratory. Every file is listed with its URL, size and SHA-256 in
+`logs/epa/D3_AND_EPA_SOURCES.csv`: 152 rows, of which 15 are EPA's benchmarking
+packages and papers, 9 its Test Car Lists, and 71 and 57 Argonne's D3 files for
+the CX-9 and the Accord. The files this repository holds are in
+`logs/epa/MANIFEST.csv`; `python fetch_engine_data.py --verify-only` re-checks
+the chain from EPA's URL to the file `epa_map.py` reads. None of it sets a plant
+constant yet: the new engines are calibrated in a later build step.
+
+| source | what it gives | status |
+|---|---|---|
+| **US EPA, National Center for Advanced Technology (NCAT)**: engine benchmarking test-data and ALPHA map packages, 2016 Mazda 2.5 L turbo Skyactiv-G, 2016 Honda 1.5 L L15B7, 2015 Ford 2.7 L EcoBoost V6 (Tier 2 fuel; the Ford in two test cells) | steady-state and high-load test points (torque, fuel, manifold pressure, spark, lambda, turbine-inlet gas temperature), the test reports, the fuel analyses, the ALPHA engine files | **CONFIRMED as files**: each byte for byte as EPA published it, hashed (`logs/epa/`). Cite them as EPA's own citations in `logs/epa/README.md`, which `epa_map.py` copies from the workbooks |
+| **US EPA, Test Car Lists**, model years 2015 to 2021 and 2023, and EPA's field definitions | each car's certification road load (target coefficients A, B, C), test weight, axle ratio and N/V | **CONFIRMED** for the rows `engine_specs/cars/*.toml` cite: `test_epa_map.py` checks each against its file. MY2021 and MY2023 are not in the team's data folder; their two Supra rows were checked on 21 October 2026 against downloads whose SHA-256 equals the list's |
+| **Argonne National Laboratory, Downloadable Dynamometer Database (D3)**: 2016 Mazda CX-9, 2018 Honda Accord LX | chassis-dynamometer tests of the two cars and their published test configurations | listed, not held in the repository; every use carries Argonne's attribution, below |
+
+Argonne's condition of use, as `fetch_engine_data.py` quotes it from
+https://www.anl.gov/taps/downloadable-dynamometer-database (opened 20 October
+2026): *"This data is from the Downloadable Dynamometer Database and was
+generated at the Advanced Mobility Technology Laboratory (AMTL) at Argonne
+National Laboratory under the funding and guidance of the U.S. Department of
+Energy (DOE)"*.
+
+What the car files say, and do not: `engine_specs/cars/README.md`. Three
+numbers there rest on the session strand of 20 October 2026 and on no committed
+script -- the CX-9's measured rolling radius 1.6 % under the one N/V gives, the
+0.192 m tyre radius the Accord's 3.238 would need, the Supra's road load 15-22 %
+under EPA's -- and each is marked UNVERIFIED where it stands.

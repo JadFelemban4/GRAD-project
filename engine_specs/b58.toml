@@ -1,0 +1,152 @@
+# engine_specs/b58.toml -- the BMW B58B30O1's TYPED constants: the 3.0 L
+# turbocharged inline-six in the 2023 Toyota GR Supra this project logs.
+#
+# Read by engines.py (engines.read_spec), which refuses a value without a label
+# or a source and refuses the label DERIVED. Every value is written
+#
+#     name = { value = ..., unit = "...", label = "...", source = "..." }
+#
+# LABELS (engines.LABELS; REFERENCES.md, "the four kinds of number" and section 4b):
+#   PUBLISHED     a manufacturer's figure, opened and written down (kind 3)
+#   CORRELATION   a constant of a correlation the model cites (section 1); the
+#                 source says whether the value itself was read off the page
+#   DERIVED_ONCE  set once from our own data or our own model, on the date named,
+#                 and held, for the reason given (section 4b)
+#   DESIGN        a choice that defines the experiment, not a property to measure
+#   ASSUMED       an engineering estimate nobody has verified (kind 4)
+#
+# DERIVED VALUES ARE NOT HERE. The block and oil nodes, the radiator's size, the
+# thermostat stand-in, the boost envelope and its cap, SPARK_A and the two
+# enrichment dwells are computed from the car's logs by derive_params.py and
+# read from the file named below (engines.DERIVED_FIELDS lists them).
+#
+# Moved here on 20 October 2026 (build step 1 of the four-engine test, decision
+# 24) from the literals of plant.py, thermal.py and engine_env.py, value for
+# value. The reasons behind each number are still in the code beside the
+# expression that uses it; the source here says where the number comes from.
+
+id = "b58b30o1"
+derived = "data/derived_params.json"
+
+[geometry]
+bore = { value = 0.0820, unit = "m", label = "PUBLISHED", source = "82.0 mm. REFERENCES.md section 2, CONFIRMED: Toyota Australia GTP-009045 p. 1; BMW 3 Series 05/2015 p. 7; Toyota global newsroom 28 Nov 2024" }
+stroke = { value = 0.0946, unit = "m", label = "PUBLISHED", source = "94.6 mm. REFERENCES.md section 2, CONFIRMED: the same documents and pages as the bore" }
+conrod = { value = 0.1444, unit = "m", label = "ASSUMED", source = "no source recorded in plant.py or REFERENCES.md" }
+n_cyl = { value = 6, label = "PUBLISHED", source = "an inline-six: REFERENCES.md section 2 (2997.5 cc = pi/4 x 82.0^2 x 94.6 x 6, CONFIRMED against Toyota Australia GTP-009045)" }
+comp_ratio = { value = 10.2, label = "PUBLISHED", source = "10.2:1 for the B58B30O1. REFERENCES.md section 2, CONFIRMED and settled for our car: BMW Canada Z4 2020MY Product Guide p. 2; Toyota Australia GTP-009045 p. 1" }
+ivc_deg = { value = -140.0, unit = "deg aTDC firing", label = "ASSUMED", source = "intake valve closing; no source recorded" }
+evo_deg = { value = 140.0, unit = "deg aTDC firing", label = "ASSUMED", source = "exhaust valve opening; no source recorded" }
+
+[cycle]
+# plant.volumetric_efficiency: 0.86 + 0.14 exp(-((rpm - 3800) / 2600)^2), clipped 0.60-1.02
+ve_base = { value = 0.86, label = "ASSUMED", source = "the 'simple breathing curve' of plant.py. REFERENCES.md section 4b: CANNOT -- both pressure channels sit before the throttle, so there is no part-load test (mistake 12)" }
+ve_amp = { value = 0.14, label = "ASSUMED", source = "the breathing curve, as ve_base" }
+ve_rpm = { value = 3800.0, unit = "rpm", label = "ASSUMED", source = "the breathing curve, as ve_base" }
+ve_width = { value = 2600.0, unit = "rpm", label = "ASSUMED", source = "the breathing curve, as ve_base" }
+ve_lo = { value = 0.60, label = "ASSUMED", source = "the breathing curve's clip, as ve_base" }
+ve_hi = { value = 1.02, label = "ASSUMED", source = "the breathing curve's clip, as ve_base" }
+# residual fraction: 0.035 + 6.5 / max(MAP, 25), clipped 0.03-0.18
+fres_a = { value = 0.035, label = "ASSUMED", source = "residual gas fraction, high at low load. REFERENCES.md section 4b: CANNOT" }
+fres_b = { value = 6.5, unit = "kPa", label = "ASSUMED", source = "the residual fraction, as fres_a" }
+fres_map_min = { value = 25.0, unit = "kPa", label = "ASSUMED", source = "the residual fraction, as fres_a" }
+fres_lo = { value = 0.03, label = "ASSUMED", source = "the residual fraction's clip, as fres_a" }
+fres_hi = { value = 0.18, label = "ASSUMED", source = "the residual fraction's clip, as fres_a" }
+t_head_k = { value = 90.0, unit = "K", label = "ASSUMED", source = "the head runs this far over coolant in plant.py's 'crude head/liner mean' wall temperature" }
+port_pickup_k = { value = 12.0, unit = "K", label = "ASSUMED", source = "the fresh charge's port and wall pickup (plant.run_cycle)" }
+t_residual_k = { value = 780.0, unit = "K", label = "ASSUMED", source = "the residual gas temperature mixed into the charge at IVC" }
+# burn: the laminar flame speed factor, the Wiebe duration and the ignition delay
+flame_lam = { value = 0.90, label = "ASSUMED", source = "laminar flame speed peaks slightly rich (plant.burn_duration). REFERENCES.md section 4b: combustion CANNOT -- needs cylinder pressure" }
+flame_width = { value = 0.42, label = "ASSUMED", source = "the flame speed factor's width, as flame_lam" }
+flame_floor = { value = 0.25, label = "ASSUMED", source = "the flame speed factor's floor, as flame_lam" }
+burn_base = { value = 34.0, unit = "deg CA", label = "ASSUMED", source = "Wiebe burn duration at zero rpm, as flame_lam" }
+burn_rpm = { value = 0.0022, unit = "deg CA per rpm", label = "ASSUMED", source = "burn duration's rpm term, as flame_lam" }
+burn_res = { value = 2.0, label = "ASSUMED", source = "burn duration's residual-gas term, as flame_lam" }
+delay_base = { value = 7.0, unit = "deg CA", label = "ASSUMED", source = "ignition delay at zero rpm, as flame_lam" }
+delay_rpm = { value = 0.0011, unit = "deg CA per rpm", label = "ASSUMED", source = "ignition delay's rpm term, as flame_lam" }
+delay_res = { value = 1.5, label = "ASSUMED", source = "ignition delay's residual-gas term, as flame_lam" }
+wiebe_a = { value = 5.0, label = "CORRELATION", source = "the Wiebe function (REFERENCES.md section 1: Vibe 1970; Ghojel 2010, both records CONFIRMED). The value was not read off either page: UNVERIFIED" }
+wiebe_m = { value = 2.0, label = "CORRELATION", source = "the Wiebe shape exponent, as wiebe_a" }
+# knock: tau = a (ON/100)^b p^c exp(B / T_unburned), integrated over the end gas
+knock_a = { value = 0.01768, label = "CORRELATION", source = "Douaud & Eyzat 1978, SAE 780080 (REFERENCES.md section 1: the record CONFIRMED; the constants were not read off its page, UNVERIFIED). Section 4b: CANNOT (yet) -- drive C would test it" }
+knock_on = { value = 3.402, label = "CORRELATION", source = "Douaud & Eyzat's octane exponent, as knock_a" }
+knock_p = { value = -1.7, label = "CORRELATION", source = "Douaud & Eyzat's pressure exponent, as knock_a" }
+knock_b = { value = 3800.0, unit = "K", label = "CORRELATION", source = "Douaud & Eyzat's activation temperature, as knock_a" }
+n_poly = { value = 1.32, label = "ASSUMED", source = "polytropic, not isentropic: the end gas loses heat (plant.run_cycle)" }
+# friction: FMEP = a + b Pmax + c Sp + d Sp^2, bar
+fmep_0 = { value = 0.40, unit = "bar", label = "CORRELATION", source = "the Chen-Flynn FMEP form (REFERENCES.md section 1: the record CONFIRMED, the page carrying the correlation NOT checked). These coefficients: UNVERIFIED" }
+fmep_pmax = { value = 0.005, label = "CORRELATION", source = "Chen-Flynn, per bar of peak pressure, as fmep_0" }
+fmep_sp = { value = 0.090, unit = "bar s/m", label = "CORRELATION", source = "Chen-Flynn, per m/s of mean piston speed, as fmep_0" }
+fmep_sp2 = { value = 0.0009, unit = "bar s2/m2", label = "CORRELATION", source = "Chen-Flynn, the square term, as fmep_0" }
+# the exhaust port and the backpressure
+ua_port = { value = 15.0, unit = "W/K", label = "ASSUMED", source = "'the one openly empirical constant' of plant.py. REFERENCES.md section 4b: CANNOT -- no exhaust temperature before the catalyst" }
+cp_exh = { value = 1150.0, unit = "J/kg/K", label = "ASSUMED", source = "exhaust specific heat. REFERENCES.md section 4b: CANNOT" }
+octane = { value = 95.0, unit = "RON", label = "PUBLISHED", source = "the fuel the car was logged on: 95 RON, confirmed by the team 29 September 2026 (REFERENCES.md section 2c); the team reports the owner's manual gives 95 RON as the minimum. Was plant.Operating.octane's default" }
+exh_bp_ratio = { value = 1.15, label = "ASSUMED", source = "exhaust manifold pressure as a fixed multiple of intake manifold pressure: 'a stated ASSUMPTION, not a measurement' (plant.py). REFERENCES.md section 4b: CANNOT -- no exhaust pressure channel" }
+exh_bp_min_kpa = { value = 105.0, unit = "kPa", label = "ASSUMED", source = "the backpressure model's floor; no source recorded" }
+
+[charge]
+rise_k = { value = 12.0, unit = "K", label = "ASSUMED", source = "plant.charge_temperature's rise over ambient: written for the environment before the boost comparison and never tuned to it. REFERENCES.md section 4b: CANNOT -- no post-intercooler sensor" }
+block_coupling = { value = 0.06, label = "ASSUMED", source = "plant.charge_temperature's coupling to the block, as rise_k" }
+
+[boost]
+inlet_sea_kpa = { value = 99.3, unit = "kPa", label = "ASSUMED", source = "the compressor inlet at sea level: 101.3 kPa less a 2 kPa filter loss (plant.boost_ceiling_kpa's inlet; wide_air.py and conditions_test.py scale it with pressure). No source recorded for the 2 kPa" }
+
+[ecu]
+spark_b = { value = 0.00695, unit = "deg per rpm", label = "DERIVED_ONCE", source = "fitted 7 September 2026 on 11 steady points, 1551-4185 rpm, 43-79 kPa; held, not re-derived: refitting the slopes extends a part-load slope into boost (mistake 6; REFERENCES.md section 4b)" }
+spark_c = { value = 0.1307, unit = "deg per kPa", label = "DERIVED_ONCE", source = "the 7 September load slope, held, as spark_b" }
+spark_ref_kpa = { value = 40.0, unit = "kPa", label = "DERIVED_ONCE", source = "the load the 7 September spark line is written about (its slope is per kPa above 40)" }
+spark_min = { value = -10.0, unit = "deg BTDC", label = "DERIVED_ONCE", source = "the car retards past TDC: median -1.5 deg at 140-189 % load, minimum -9 deg (engine_env.BaselineECU, 7 September 2026). Was +2.0" }
+spark_max = { value = 46.0, unit = "deg BTDC", label = "ASSUMED", source = "the spark clip's upper end; no source recorded" }
+kl_a = { value = 33.636, unit = "deg", label = "DERIVED_ONCE", source = "the knock-limited spark surface, fitted to plant.run_cycle on a 9x9 grid (1500-5500 rpm, 80-240 kPa, lambda 1, IAT 55 C), residual RMS 0.95 deg: a fit to the model's own Douaud-Eyzat surface, not to the car" }
+kl_b = { value = 0.00641, unit = "deg per rpm", label = "DERIVED_ONCE", source = "the knock-limited surface, as kl_a" }
+kl_c = { value = -0.3673, unit = "deg per kPa", label = "DERIVED_ONCE", source = "the knock-limited surface, as kl_a" }
+kl_d = { value = 0.6385, unit = "deg per (kPa^2 / 1000)", label = "DERIVED_ONCE", source = "the knock-limited surface, as kl_a" }
+enr_load = { value = 180.0, unit = "kPa", label = "DESIGN", source = "a definition: the 8 September gate (200 kPa) restated on the corrected charge-temperature scale, selecting the same 1055 samples (mistake 13; REFERENCES.md section 4b)" }
+enr_rpm_lo = { value = 3300.0, unit = "rpm", label = "DERIVED_ONCE", source = "fitted 8 September 2026 over eight drives, held: a free fit of all five enrichment constants on ~100 genuine readings is not identified (REFERENCES.md section 4b; derived_params.json free_fit_all_five)" }
+enr_rpm_hi = { value = 5200.0, unit = "rpm", label = "DERIVED_ONCE", source = "the 8 September fit, held, as enr_rpm_lo" }
+enr_depth = { value = 0.19, label = "DERIVED_ONCE", source = "the 8 September fit, held, as enr_rpm_lo: the lambda deficit at full authority, floor 0.81" }
+iat_gain = { value = 0.16, unit = "deg per K", label = "ASSUMED", source = "'the classic compensation table'. REFERENCES.md section 4b: CANNOT -- spark against a modelled charge temperature is confounded with the model it would test" }
+iat_ref_c = { value = 25.0, unit = "C", label = "ASSUMED", source = "the compensation's reference, as iat_gain" }
+iat_max = { value = 9.0, unit = "deg", label = "ASSUMED", source = "the compensation's most retard, as iat_gain" }
+cold_k = { value = 340.0, unit = "K", label = "ASSUMED", source = "below this coolant the ECU retards for catalyst heating. REFERENCES.md section 4b: CANNOT" }
+cold_retard = { value = 5.0, unit = "deg", label = "ASSUMED", source = "the cold retard, as cold_k" }
+knock_step = { value = 3.0, unit = "deg", label = "ASSUMED", source = "the ECU's 3 deg pull per knock event. REFERENCES.md section 4b: CANNOT (yet) -- drive C would" }
+knock_max = { value = 12.0, unit = "deg", label = "ASSUMED", source = "the 12 deg cap on knock retard, as knock_step" }
+knock_restore = { value = 0.35, unit = "deg/s", label = "ASSUMED", source = "the 0.35 deg/s restore, as knock_step" }
+knock_detect_ki = { value = 1.0, label = "ASSUMED", source = "the baseline ECU sees knock when the model's knock integral passes 1, the Douaud-Eyzat autoignition criterion; a real detector's threshold is not known" }
+fan_hi_k = { value = 372.0, unit = "K", label = "ASSUMED", source = "the fan schedule's full-duty rung. REFERENCES.md section 4b: CANNOT -- every fan-actual and fan-duty channel reads zero" }
+fan_lo_k = { value = 367.0, unit = "K", label = "ASSUMED", source = "the fan schedule's low rung, as fan_hi_k" }
+fan_lo_duty = { value = 0.4, label = "ASSUMED", source = "the fan's low-rung duty, as fan_hi_k" }
+
+[thermal]
+c_turb = { value = 6000.0, unit = "J/K", label = "ASSUMED", source = "manifold + turbine housing. REFERENCES.md section 4: ASSUMED AND LOAD-BEARING -- it sets tau and so H/tau; no channel on this car measures the turbine, no opened source publishes a housing heat capacity; swept 800-60 000 in generality_test.py" }
+n_turbines = { value = 1, label = "PUBLISHED", source = "one twin-scroll turbocharger: Toyota Saudi Arabia, 'In-line 6-Cylinders Turbo (Twin Scroll)' (REFERENCES.md section 2c, opened 28 Sep 2026)" }
+ua_turb_amb = { value = 18.0, unit = "W/K", label = "ASSUMED", source = "turbine housing to air. REFERENCES.md section 4: ASSUMED, underivable for the same reason as c_turb" }
+ua_gas_turb = { value = 0.90, unit = "W/K per g/s", label = "ASSUMED", source = "exhaust gas to turbine housing, per g/s of exhaust flow, as ua_turb_amb" }
+t_block_warm = { value = 363.0, unit = "K", label = "DESIGN", source = "the warm-start block temperature every episode resets to (thermal.ThermalNetwork.reset)" }
+t_oil_warm = { value = 358.0, unit = "K", label = "DESIGN", source = "the warm-start oil temperature, as t_block_warm" }
+t_turb_warm = { value = 500.0, unit = "K", label = "DESIGN", source = "the warm-start turbine housing temperature, as t_block_warm" }
+
+[damage]
+# REFERENCES.md section 4b: the damage model is DESIGN. results/DAMAGE_CONSTANTS.md
+# examines each constant; adopting any change is decisions 8-10 and 33.
+turb_knee_k = { value = 1123.0, unit = "K", label = "DESIGN", source = "the turbine damage knee, 850 C of housing, where exp((T - knee) / scale) reaches unity; the protection trigger. results/DAMAGE_CONSTANTS.md: bracketed by published gas limits carried to the housing node" }
+turb_scale_k = { value = 45.0, unit = "K", label = "DESIGN", source = "the turbine term's scale: oxidation-like (results/DAMAGE_CONSTANTS.md; creep rupture would give 20.3 K)" }
+oil_knee_k = { value = 408.0, unit = "K", label = "DESIGN", source = "the oil knee; with the oil weight one number, a valuation (results/DAMAGE_CONSTANTS.md)" }
+oil_scale_k = { value = 12.0, unit = "K", label = "DESIGN", source = "the oil term's scale (results/DAMAGE_CONSTANTS.md: 14.4 K by the 10 C doubling rule, a rule of thumb)" }
+oil_weight = { value = 0.4, label = "DESIGN", source = "the oil term's weight, a valuation, as oil_knee_k" }
+ki_knee = { value = 0.85, label = "DESIGN", source = "the knock term's knee; it waits for drive C (results/DAMAGE_CONSTANTS.md)" }
+ki_weight = { value = 40.0, label = "DESIGN", source = "the knock term's weight and square, a valuation (results/DAMAGE_CONSTANTS.md)" }
+egt_limit_k = { value = 1223.0, unit = "K", label = "ASSUMED", source = "the EGT constraint cost's limit, 950 C of gas (engine_env.SupervisoryTunerEnv.step, cost_egt): an engineering limit nobody has verified, no source recorded. DESIGN until 21 October 2026 (the review of build step 1)" }
+
+[loop]
+# the environment's load loop: a feed-forward guess, then a PI controller on
+# manifold pressure. REFERENCES.md section 4b: 'the load loop's gains', DESIGN.
+ff_offset_kpa = { value = 40.0, unit = "kPa", label = "DESIGN", source = "the feed-forward guess's offset (SupervisoryTunerEnv._map_for)" }
+ff_kpa_per_nm = { value = 0.62, unit = "kPa per Nm", label = "DESIGN", source = "the feed-forward guess's slope, as ff_offset_kpa" }
+map_floor_kpa = { value = 25.0, unit = "kPa", label = "DESIGN", source = "the load loop's lowest manifold pressure: the throttle shut" }
+i_gain = { value = 0.05, unit = "per Nm", label = "DESIGN", source = "the integrator's gain per inner iteration (SupervisoryTunerEnv._track_torque)" }
+i_clip = { value = 60.0, label = "DESIGN", source = "the integrator's clip, as i_gain" }
+p_gain = { value = 0.35, unit = "kPa per Nm", label = "DESIGN", source = "the proportional gain, as i_gain" }
+i_out = { value = 0.02, unit = "kPa", label = "DESIGN", source = "the integrator's weight on the pressure, as i_gain" }
+torque_floor_nm = { value = 15.0, unit = "Nm", label = "DERIVED_ONCE", source = "the least torque a training road may ask for: 1.25 x the 12.0 Nm the engine makes with the throttle shut at 1200 rpm and 42 C (measured 8 October 2026 with _track_torque at a request of 0; was engine_env.EXTREME_T_FLOOR_NM)" }

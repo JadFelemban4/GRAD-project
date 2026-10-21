@@ -238,7 +238,9 @@ python train.py --steps 300000 --seed 0   # C4: a real run
 
 *(The second line is now refused as written: with the default `--out` it would
 resume a Phase D agent. C4 is `--steps 300000 --road random --out runs_c4`, and
-its rules are `PREREGISTRATION_C4.md`. Corrected 23 September 2026.)*
+its rules are `PREREGISTRATION_C4.md`. Corrected 23 September 2026. On
+`GRA-test`, since 20 October 2026, both lines also stop at once without
+`--engine b58`, which `train.py` requires: there is no default engine.)*
 
 50 000 steps at 4 500 steps per episode is **11 training episodes**. A null has
 two readings and eleven episodes cannot separate them: preview may genuinely not
@@ -351,6 +353,11 @@ python run_phase_d.py --road random --evaluate
 python analyse_phase_d2.py                   # the preregistered test, both experiments
 python check_d2_tracking.py                  # limit 10: torque delivery per agent
 ```
+
+These are the commands as they ran, on the plant those agents trained on. On
+`GRA-test`, since 20 October 2026, `run_phase_d.py`, `train.py` and `evaluate.py`
+also require `--engine b58` (no default engine), and a Phase D or D2 agent is
+refused there anyway: its `meta.json` is fingerprint schema 2.
 
 `evaluate.py` writes the plant fingerprint into every result file and **refuses
 a model whose plant disagrees with the tree it is run on**. That is why these

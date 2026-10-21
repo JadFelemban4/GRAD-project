@@ -119,7 +119,8 @@ def step(rec, env, action, obs_before, reward, info):
     rec["reward"].append(float(reward))
     for k, v in env_state(env).items():
         rec[k].append(v)
-    rec["damage_rate"].append(damage_rate(info["t_turb"], info["t_oil"], info["ki"]))
+    rec["damage_rate"].append(damage_rate(info["t_turb"], info["t_oil"], info["ki"],
+                                          cal=env.plant.engine.damage))
     for k in INFO:
         rec[k].append(float(info[k]))
 

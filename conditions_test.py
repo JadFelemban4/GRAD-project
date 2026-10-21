@@ -71,15 +71,22 @@ episode: damage, peak turbine, seconds above the trigger, torque shortfall,
 and the median of each applied actuator on the climb -- what the agent DOES.
 
 HOW PRESSURE REACHES THE ENGINE HERE, AND WHAT IS LEFT OUT. The plant never
-reads the cycle's p_baro except for drag. For this test, and only in this
-process, the compressor's inlet becomes p_baro * 99.3 / 101.3 (the same 2 kPa
-filter loss plant.boost_ceiling_kpa assumes at sea level), so the boost
-ceiling and the hard pressure cap fall with altitude, and drag uses the
-thinner air. NOT modelled, so altitude here is MILDER than real: the hotter
-compressor outlet at the higher pressure ratio (plant.charge_temperature has
-no pressure ratio in it), the exhaust backpressure's fall, and the colder air
-of a real mountain (ambient is held at 42 C to change one thing at a time).
-No hashed plant file changes, so plant_sha and every certificate stand.
+reads the cycle's p_baro except for drag. For this test the compressor's inlet
+becomes p_baro * 99.3 / 101.3 (the same 2 kPa filter loss the B58's sea-level
+inlet carries), so the boost ceiling and the hard pressure cap fall with
+altitude, and drag uses the thinner air. NOT modelled, so altitude here is
+MILDER than real: the hotter compressor outlet at the higher pressure ratio
+(plant.charge_temperature has no pressure ratio in it), the exhaust
+backpressure's fall, and the colder air of a real mountain (ambient is held at
+42 C to change one thing at a time).
+
+THE INLET IS THE ENVIRONMENT'S (20 October 2026, the four-engine build). It is
+passed as SupervisoryTunerEnv(..., inlet_kpa=), which the flow ceiling and the
+hard cap both read. Until then each worker swapped plant.boost_ceiling_kpa and
+subclassed the environment's cap, so that no hashed plant file changed; the
+plant files change on GRA-test anyway, and the numbers are the swap's, to the
+bit (build step 1's identity harness). The agents tested here are the B58's, so
+the plant is the B58's, named (PLANT_NAME).
 """
 import argparse
 import concurrent.futures as cf
@@ -93,6 +100,15 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+
+# Every agent set this test scores was trained on the B58 in its Supra.
+PLANT_NAME = "b58"
+
+
+def _plant():
+    import engines
+    return engines.get(PLANT_NAME)
+
 
 SET = "runs/terrain_dt1"
 EPISODES = (1, 5, 9, 13, 17)                      # every fourth frozen episode
@@ -180,7 +196,8 @@ def save_records(k, recs):
             dict(script="conditions_test.py", commit=head, policy=ref,
                  source=("check_premise." + dict(HAND)[ref]) if hand else f"{SET}/{ref}/final.zip",
                  preview=(ref == "predictive (hand)") if hand else ("blind" not in ref),
-                 condition=name, t_amb_k=t_amb, p_kpa=p, compressor_inlet_kpa=round(p * 99.3 / 101.3, 3),
+                 condition=name, t_amb_k=t_amb, p_kpa=p,
+                 compressor_inlet_kpa=round(p * _plant().engine.boost.inlet_sea_kpa / 101.3, 3),
                  grade=g, climb_from_s=180, profile="varying", speed_steps=SPEED_STEPS,
                  accel_max_mps2=ACCEL_MAX, dt=E.DT, duration_s=E.DURATION,
                  episodes=idx, episode_seed=[E.EPISODES[i - 1][0] for i in idx]),
@@ -260,26 +277,19 @@ def _run(job, rec=None):
     ref, idx, t_amb, p_baro, grade, profile = job
     import engine_env as EE
     import evaluate as E
-    import plant
     import step_record
-    p_inlet = p_baro * 99.3 / 101.3
-
-    def ceiling(mdot_air_gps, t_inlet_k=298.0, _p=p_inlet):
-        return plant.boost_ceiling_kpa(mdot_air_gps, t_inlet_k, _p)
-    EE.boost_ceiling_kpa = ceiling                # this worker process only
-
-    class Env(EE.SupervisoryTunerEnv):
-        @property
-        def MAP_CEIL_KPA(self):
-            return p_inlet * float(plant.boost_ceiling_constants()["pr_cap"])
+    pl = _plant()
+    p_inlet = p_baro * pl.engine.boost.inlet_sea_kpa / 101.3
 
     policy, preview = _policy(ref)
     seed, weights = E.EPISODES[idx - 1]
-    cycle = EE.make_grade_climb(duration=E.DURATION, dt=E.DT, t_amb=t_amb, grade=grade)
+    cycle = EE.make_grade_climb(duration=E.DURATION, dt=E.DT, t_amb=t_amb, grade=grade,
+                                v_kmh=pl.scenario.v_kmh)
     cycle["p_baro"] = p_baro
     if profile == "varying":
         cycle["v_mps"] = speed_profile(cycle["v_mps"], E.DT)
-    env = Env(cycle, dt=E.DT, seed=seed, use_preview=preview)
+    env = EE.SupervisoryTunerEnv(cycle, plant=pl, dt=E.DT, seed=seed, use_preview=preview,
+                                 inlet_kpa=p_inlet)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)
     obs = env._obs()
@@ -294,7 +304,7 @@ def _run(job, rec=None):
             step_record.step(rec, env, a, obs_before, r, info)
         ret += r
         peak = max(peak, info["t_turb"])
-        thermal += EE.damage_rate(info["t_turb"], info["t_oil"]) * env.dt
+        thermal += EE.damage_rate(info["t_turb"], info["t_oil"], cal=pl.engine.damage) * env.dt
         short += int(info["torque"] < 0.95 * info["torque_req"])
         above += int(info["t_turb"] - 273.15 > TRIGGER_C)
         if cycle["grade"][k] > 0:
@@ -330,7 +340,9 @@ def harness_check(workers):
     """Five agent and baseline episodes on the locked climb must EQUAL their
     committed scores (results/agents/<set>/<policy>/eval_summary.json)."""
     with cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker, initargs=(SET,)) as pool:
-        check = dict(pool.map(_episode, [(ref, i, 315.0, 101.3, 0.12, "locked") for ref, i in check_list()]))
+        sc = _plant().scenario
+        check = dict(pool.map(_episode, [(ref, i, sc.t_amb, 101.3, sc.grade, "locked")
+                                         for ref, i in check_list()]))
     bad = []
     for (ref, i, *_), row in check.items():
         folder = ref.replace(" ", "_") if ref in dict(HAND) else ref
@@ -359,8 +371,10 @@ def calibrate(workers, harness=True):
            "speed_steps": SPEED_STEPS, "accel_max": ACCEL_MAX, "target_peak_c": TARGET_PEAK_C}
     if not harness:
         import fingerprint as FP
-        out["fixed_before_training"] = dict(set=SET, plant_sha=FP.plant_fingerprint()["plant_sha"],
-                                            derived_sha=FP.derived_sha())
+        live = FP.plant_fingerprint(plant=_plant(), backend=FP.BACKEND_CYCLE)   # its envs run the cycle model
+        out["fixed_before_training"] = dict(set=SET, plant_sha=live["plant_sha"],
+                                            derived_sha=live["derived_sha"], engine=live["engine"],
+                                            engine_sha=live["engine_sha"])
     for name, t_amb, p in CONDITIONS:
         print(f"hill for {name}: coarse grid", flush=True)
         res = run([("baseline ECU", 1, t_amb, p, g, "varying") for g in COARSE])
@@ -405,19 +419,15 @@ def _gears(job):
     import check_premise as C
     import engine_env as EE
     import evaluate as E
-    import plant
-    p_inlet = p_baro * 99.3 / 101.3
-    EE.boost_ceiling_kpa = lambda m, t=298.0, _p=p_inlet: plant.boost_ceiling_kpa(m, t, _p)
-
-    class Env(EE.SupervisoryTunerEnv):
-        @property
-        def MAP_CEIL_KPA(self):
-            return p_inlet * float(plant.boost_ceiling_constants()["pr_cap"])
+    pl = _plant()
+    p_inlet = p_baro * pl.engine.boost.inlet_sea_kpa / 101.3
     seed, weights = E.EPISODES[0]
-    cycle = EE.make_grade_climb(duration=E.DURATION, dt=E.DT, t_amb=t_amb, grade=grade)
+    cycle = EE.make_grade_climb(duration=E.DURATION, dt=E.DT, t_amb=t_amb, grade=grade,
+                                v_kmh=pl.scenario.v_kmh)
     cycle["p_baro"] = p_baro
     cycle["v_mps"] = speed_profile(cycle["v_mps"], E.DT)
-    env = Env(cycle, dt=E.DT, seed=seed, use_preview=True)
+    env = EE.SupervisoryTunerEnv(cycle, plant=pl, dt=E.DT, seed=seed, use_preview=True,
+                                 inlet_kpa=p_inlet)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)
     obs = env._obs()
@@ -427,7 +437,7 @@ def _gears(job):
         rows.append((env.k - 1, env.rpm, env.v, env.map_kpa, info["t_turb"] - 273.15))
         if term or trunc:
             break
-    ratios = np.array(EE.Vehicle.gears) * EE.Vehicle.final_drive
+    ratios = np.array(pl.car.gears) * pl.car.final_drive
     out = []
     edges = [180] + [t for t, _ in SPEED_STEPS if t > 180] + [len(rows)]
     for lo, hi in zip(edges[:-1], edges[1:]):
@@ -436,7 +446,7 @@ def _gears(job):
             continue
         rpm = float(np.median([r[1] for r in seg]))
         v = float(np.median([r[2] for r in seg]))
-        wheel_rpm = v / (2 * np.pi * EE.Vehicle.wheel_r) * 60.0 if v > 1.0 else None
+        wheel_rpm = v / (2 * np.pi * pl.car.wheel_r) * 60.0 if v > 1.0 else None
         gear = (int(np.argmin(np.abs(ratios - rpm / wheel_rpm))) + 1) if wheel_rpm else None
         out.append(dict(t_from=lo, kmh=round(v * 3.6, 1), rpm=round(rpm), gear=gear,
                         map_kpa=round(float(np.median([r[3] for r in seg])), 1),
@@ -595,7 +605,7 @@ def figure(summary, hills):
     labels_short = [f"{lab}\ncg short {summary[n].get('short_grade', 0):.0f}" for lab, n in zip(labels, names)]
     fig, axes = plt.subplots(2, 2, figsize=(14, 9))
     a = axes[0, 0]
-    locked = EE.make_grade_climb(duration=E.DURATION, dt=E.DT)
+    locked = EE.locked_climb(_plant(), duration=E.DURATION, dt=E.DT)
     v = speed_profile(locked["v_mps"], E.DT) * 3.6
     a.plot(locked["t"], v, color="#2a78d6", lw=1.6, label="speed target, km/h")
     a.plot(locked["t"], locked["v_mps"] * 3.6, color="#9aa0a4", lw=1, ls="--", label="the locked climb, 130 km/h")

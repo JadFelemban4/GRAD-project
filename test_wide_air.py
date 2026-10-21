@@ -2,16 +2,19 @@
 
     python test_wide_air.py        # about a minute
 
-wide_air.py swaps engine_env's boost ceiling, in its own process, for one that
-follows the inlet of a stepping WideAirTrainingEnv, and copies two of
-engine_env's road builders so their drag can use the episode's air. Each claim
-it makes is checked here, and each check fails if the claim stops holding:
+wide_air.py gives each WideAirTrainingEnv episode its own compressor inlet --
+the environment's `inlet_kpa`, which the flow ceiling and the hard cap both read
+(until 20 October 2026 it swapped engine_env's boost ceiling for the whole
+process instead) -- and copies two of engine_env's road builders so their drag
+can use the episode's air. Each claim it makes is checked here, and each check
+fails if the claim stops holding:
 
   SeaLevel        at 101.3 kPa the road builders return engine_env's, to the bit,
                   and a whole episode equals the same road on the plain
                   environment, step for step
   OtherEnvs       an environment that is not a WideAirTrainingEnv sees the
-                  plant's ceiling, in this process and in one without wide_air
+                  plant's ceiling, in this process and in one without wide_air;
+                  importing wide_air patches nothing
   ThinAir         at 80 kPa both the hard cap and the flow ceiling fall in
                   proportion to the inlet, the steps use it, and the agent sees
                   the pressure
@@ -19,11 +22,17 @@ it makes is checked here, and each check fails if the claim stops holding:
                   the road's floor is X1's rule at the episode's ambient, and
                   the cold road that failed check_roads at 15 Nm now passes
   Gearbox         the kickdown table is the stored one at sea level and the
-                  measured one in thin air, and the hot thin-air climb that
+                  measured one in thin air, a variant plant is measured for its
+                  own and not served another's, and the hot thin-air climb that
                   failed test_reward's corner is now drivable
   Draws           ambient and pressure stay inside 0-45 C and 80-101.3 kPa,
                   a seed repeats its sequence, and forcing an episode's air
                   leaves the stream unchanged
+
+THE PLANT IS NAMED (20 October 2026): every environment, vehicle and builder
+here is the B58's, passed explicitly (PLANT). Expectations that read a module
+constant of the old plant -- the 15 Nm floor, the stored table, the 99.3 kPa
+inlet -- read it from the plant now; the values are the same.
 """
 import copy
 import json
@@ -31,6 +40,7 @@ import os
 import subprocess
 import sys
 import unittest
+from dataclasses import replace
 
 import numpy as np
 
@@ -38,8 +48,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import engine_env as EE                                  # noqa: E402
+import engines                                           # noqa: E402
 import plant                                             # noqa: E402
 import wide_air as W                                     # noqa: E402
+
+PLANT = engines.get("b58")
+ENG = PLANT.engine
+FLOOR = ENG.loop.torque_floor_nm                         # X1's 15 Nm
+SEA_INLET = ENG.boost.inlet_sea_kpa                      # 99.3 kPa
 
 FLOWS = (20.0, 60.0, 120.0, 180.0, 240.0)               # g/s of air
 P_IDX = 10                                               # the pressure input in _obs() (9 is the ambient)
@@ -65,49 +81,61 @@ def same(a, b):
 
 class SeaLevel(unittest.TestCase):
     def test_builders_equal_engine_env(self):
+        veh = EE.Vehicle(PLANT.car)
         for seed in (1, 2, 3):
             for t_amb in (273.15, 300.0, 318.15):
                 c = EE.make_terrain(np.random.default_rng(seed), duration=900.0, dt=1.0, t_amb=t_amb,
-                                    grade_max=EE.EXTREME_GRADE_MAX)
+                                    grade_max=EE.EXTREME_GRADE_MAX, plant=PLANT)
                 r1, r2 = np.random.default_rng(seed + 50), np.random.default_rng(seed + 50)
-                v1 = EE.extreme_speed_profile(r1, len(c["t"]), 1.0, c["grade"], t_amb)
-                v2 = W.speed_profile(r2, len(c["t"]), 1.0, c["grade"], t_amb, 101.3)
+                v1 = EE.extreme_speed_profile(r1, len(c["t"]), 1.0, c["grade"], t_amb, veh, FLOOR)
+                v2 = W.speed_profile(r2, len(c["t"]), 1.0, c["grade"], t_amb, 101.3, veh, FLOOR)
                 self.assertTrue(np.array_equal(v1, v2))
-                self.assertTrue(np.array_equal(EE.grade_floor(v1, t_amb, 1.0),
-                                               W.grade_floor(v1, t_amb, 101.3, 1.0)))
+                self.assertTrue(np.array_equal(EE.grade_floor(v1, t_amb, 1.0, veh, FLOOR),
+                                               W.grade_floor(v1, t_amb, 101.3, 1.0, veh, FLOOR)))
 
     def test_episode_equals_plain_env(self):
-        w = W.WideAirTrainingEnv(seed=5)
+        w = W.WideAirTrainingEnv(seed=5, plant=PLANT)
         w.reset(seed=5, options={"p_kpa": 101.3, "t_amb_c": 30.0})
-        self.assertEqual(w.MAP_CEIL_KPA, EE.SupervisoryTunerEnv.MAP_CEIL_KPA.fget(w))
-        e = EE.SupervisoryTunerEnv(copy.deepcopy(w.cycle), dt=1.0, seed=5)
+        e = EE.SupervisoryTunerEnv(copy.deepcopy(w.cycle), plant=PLANT, dt=1.0, seed=5)
+        # at 101.3 kPa the episode's inlet, and so its hard cap, are the plant's
+        self.assertEqual(w.inlet_kpa, SEA_INLET)
+        self.assertEqual(w.MAP_CEIL_KPA, e.MAP_CEIL_KPA)
         e.reset(seed=5)
         for tn in (e.thermal, e.thermal_base):
-            tn.p.c_turb = w.thermal.p.c_turb
+            tn.p = replace(tn.p, c_turb=w.thermal.p.c_turb)
         self.assertTrue(np.array_equal(w._obs(), e._obs()))
         self.assertTrue(same(rollout(w, 300), rollout(e, 300)))
 
 
 class OtherEnvs(unittest.TestCase):
-    def test_ceiling_is_the_plants_when_nothing_steps(self):
-        self.assertIs(EE.boost_ceiling_kpa, W.boost_ceiling_kpa)
+    def test_importing_wide_air_patches_nothing(self):
+        """engine_env calls the plant's own ceiling, and a plain environment's
+        inlet is the plant's sea-level inlet (until 20 October 2026 the import
+        swapped engine_env.boost_ceiling_kpa for the whole process)."""
+        self.assertIs(EE.boost_ceiling_kpa, plant.boost_ceiling_kpa)
+        self.assertFalse(hasattr(W, "_STEPPING"))
+        e = EE.SupervisoryTunerEnv(EE.locked_climb(PLANT, duration=60.0, dt=1.0), plant=PLANT, dt=1.0)
+        self.assertEqual(e.inlet_kpa, SEA_INLET)
         for m in FLOWS:
             for t in (273.15, 298.0, 318.15):
-                self.assertEqual(EE.boost_ceiling_kpa(m, t), plant.boost_ceiling_kpa(m, t))
+                self.assertEqual(EE.boost_ceiling_kpa(m, t, e.inlet_kpa, engine=ENG),
+                                 plant.boost_ceiling_kpa(m, t, 99.3, engine=ENG))
 
     def test_plain_env_unchanged_beside_a_thin_air_env(self):
         def locked():
-            e = EE.SupervisoryTunerEnv(EE.make_grade_climb(duration=300.0, dt=1.0), dt=1.0, seed=3)
+            e = EE.SupervisoryTunerEnv(EE.locked_climb(PLANT, duration=300.0, dt=1.0), plant=PLANT,
+                                       dt=1.0, seed=3)
             e.reset(seed=3)
             return rollout(e, 300, rng_seed=3)
         before = locked()
-        w = W.WideAirTrainingEnv(seed=9)
+        w = W.WideAirTrainingEnv(seed=9, plant=PLANT)
         w.reset(seed=9, options={"p_kpa": 80.0})
         rollout(w, 50)
         self.assertTrue(same(before, locked()))
         # and against a process that never imported wide_air
-        code = ("import json,numpy as np,engine_env as EE\n"
-                "e=EE.SupervisoryTunerEnv(EE.make_grade_climb(duration=300.0,dt=1.0),dt=1.0,seed=3)\n"
+        code = ("import json,numpy as np,engine_env as EE,engines\n"
+                "P=engines.get('b58')\n"
+                "e=EE.SupervisoryTunerEnv(EE.locked_climb(P,duration=300.0,dt=1.0),plant=P,dt=1.0,seed=3)\n"
                 "e.reset(seed=3);rng=np.random.default_rng(3);out=[]\n"
                 "for _ in range(300):\n"
                 "  o,r,t,tr,i=e.step(rng.uniform(-1.0,1.0,5).astype(np.float32));out.append([r,i['t_turb']])\n"
@@ -121,67 +149,73 @@ class OtherEnvs(unittest.TestCase):
 
 class ThinAir(unittest.TestCase):
     def test_ceilings_fall_with_the_inlet(self):
-        w = W.WideAirTrainingEnv(seed=4)
+        w = W.WideAirTrainingEnv(seed=4, plant=PLANT)
         w.reset(seed=4, options={"p_kpa": 80.0})
         inlet = 99.3 * 80.0 / 101.3
-        cap = float(plant.boost_ceiling_constants()["pr_cap"])
+        cap = float(ENG.boost.pr_cap)
+        self.assertAlmostEqual(w.inlet_kpa, inlet, places=9)
         self.assertAlmostEqual(w.MAP_CEIL_KPA, inlet * cap, places=9)
-        W._STEPPING.append(w._p_inlet)
-        try:
-            for m in FLOWS:
-                self.assertAlmostEqual(EE.boost_ceiling_kpa(m, 315.0),
-                                       plant.boost_ceiling_kpa(m, 315.0, inlet), places=9)
-                self.assertLess(EE.boost_ceiling_kpa(m, 315.0), plant.boost_ceiling_kpa(m, 315.0))
-        finally:
-            W._STEPPING.pop()
-        self.assertEqual(W._STEPPING, [])
+        for m in FLOWS:
+            self.assertAlmostEqual(plant.boost_ceiling_kpa(m, 315.0, w.inlet_kpa, engine=ENG),
+                                   plant.boost_ceiling_kpa(m, 315.0, inlet, engine=ENG), places=9)
+            self.assertLess(plant.boost_ceiling_kpa(m, 315.0, w.inlet_kpa, engine=ENG),
+                            plant.boost_ceiling_kpa(m, 315.0, SEA_INLET, engine=ENG))
 
     def test_steps_use_the_episode_inlet(self):
-        seen, real = [], W._PLANT_CEILING
+        """Every ceiling a step asks for, read through engine_env's own name for it:
+        the episode's inlet on the thin-air environment, the plant's on a plain one."""
+        seen, real = [], EE.boost_ceiling_kpa
 
-        def spy(m, t=298.0, p=99.3):
+        def spy(m, t, p, *, engine):
             seen.append(p)
-            return real(m, t, p)
-        W._PLANT_CEILING = spy
+            return real(m, t, p, engine=engine)
+        EE.boost_ceiling_kpa = spy            # this test only, restored below
         try:
-            w = W.WideAirTrainingEnv(seed=4)
+            w = W.WideAirTrainingEnv(seed=4, plant=PLANT)
             w.reset(seed=4, options={"p_kpa": 80.0})
             seen[:] = []                      # reset's floor measurement shuts the throttle
             rollout(w, 30)
             thin, seen[:] = list(seen), []
-            e = EE.SupervisoryTunerEnv(EE.make_grade_climb(duration=60.0, dt=1.0), dt=1.0, seed=4)
+            e = EE.SupervisoryTunerEnv(EE.locked_climb(PLANT, duration=60.0, dt=1.0), plant=PLANT,
+                                       dt=1.0, seed=4)
             e.reset(seed=4)
             rollout(e, 30)
             plain = list(seen)
         finally:
-            W._PLANT_CEILING = real
+            EE.boost_ceiling_kpa = real
         self.assertTrue(thin and plain)
         self.assertTrue(all(abs(p - 99.3 * 80.0 / 101.3) < 1e-9 for p in thin))
         self.assertTrue(all(p == 99.3 for p in plain))
 
     def test_agent_sees_the_pressure(self):
-        w = W.WideAirTrainingEnv(seed=4)
+        w = W.WideAirTrainingEnv(seed=4, plant=PLANT)
         obs, _ = w.reset(seed=4, options={"p_kpa": 80.0})
         self.assertAlmostEqual(float(obs[P_IDX]), (80.0 - 101.3) / 8.0, places=5)
 
-    def test_stepping_restores_the_stack(self):
-        w = W.WideAirTrainingEnv(seed=6)
+    def test_stepping_leaves_nothing_behind(self):
+        """A thin-air episode's inlet is that environment's alone: stepping it
+        changes neither engine_env nor a plain environment built afterwards (this
+        checked the monkeypatch's stack until 20 October 2026)."""
+        w = W.WideAirTrainingEnv(seed=6, plant=PLANT)
         w.reset(seed=6, options={"p_kpa": 85.0})
         rollout(w, 5)
-        self.assertEqual(W._STEPPING, [])
+        self.assertLess(w.inlet_kpa, SEA_INLET)
+        self.assertIs(EE.boost_ceiling_kpa, plant.boost_ceiling_kpa)
+        e = EE.SupervisoryTunerEnv(EE.locked_climb(PLANT, duration=60.0, dt=1.0), plant=PLANT, dt=1.0)
+        self.assertEqual(e.inlet_kpa, SEA_INLET)
 
 
 class Floor(unittest.TestCase):
     """The road's torque floor is X1's rule at the episode's own ambient."""
 
     def test_closed_throttle_torque_reproduces_the_measurements(self):
-        w = W.WideAirTrainingEnv(seed=1)
+        w = W.WideAirTrainingEnv(seed=1, plant=PLANT)
         self.assertAlmostEqual(W.closed_throttle_nm(w, 315.15), 12.1, delta=0.1)
         self.assertAlmostEqual(W.closed_throttle_nm(w, 273.15), 20.6, delta=0.1)
 
     def test_floor_rule(self):
-        w = W.WideAirTrainingEnv(seed=1)
-        self.assertEqual(W.torque_floor_nm(w, 318.15), EE.EXTREME_T_FLOOR_NM)   # X1's 15 Nm in hot air
+        w = W.WideAirTrainingEnv(seed=1, plant=PLANT)
+        self.assertEqual(W.torque_floor_nm(w, 318.15), FLOOR)   # X1's 15 Nm in hot air
         cold = W.torque_floor_nm(w, 273.15)
         self.assertAlmostEqual(cold, 1.25 * W.closed_throttle_nm(w, 273.15), places=9)
         self.assertGreater(cold, 25.0)
@@ -189,7 +223,7 @@ class Floor(unittest.TestCase):
     def test_cold_road_asks_no_less_than_the_floor_allows(self):
         """seed 109 at 0.7 C failed check_roads with the 15 Nm floor (p95 error 0.094);
         on the neutral policy it must now stay inside the tolerance band."""
-        w = W.WideAirTrainingEnv(seed=109)
+        w = W.WideAirTrainingEnv(seed=109, plant=PLANT)
         w.reset(seed=109)
         self.assertLess(float(w.cycle["t_amb"]) - 273.15, 1.0)
         errs = []
@@ -205,24 +239,55 @@ class Gearbox(unittest.TestCase):
     """The kickdown table follows the pressure; at sea level it is the stored one."""
 
     def test_sea_level_table_is_the_stored_table(self):
-        v = W.ThinAirVehicle()
+        v = W.ThinAirVehicle(PLANT)
         v.set_pressure(101.3)
-        self.assertEqual(v.DELIVERABLE_TORQUE, EE.Vehicle().DELIVERABLE_TORQUE)
+        self.assertEqual(v.DELIVERABLE_TORQUE, EE.Vehicle(PLANT.car).DELIVERABLE_TORQUE)
 
     def test_thin_air_table_is_the_measured_one(self):
-        v = W.ThinAirVehicle()
+        v = W.ThinAirVehicle(PLANT)
         v.set_pressure(80.0)
-        thin, sea = dict(v.DELIVERABLE_TORQUE), dict(EE.Vehicle().DELIVERABLE_TORQUE)
+        thin, sea = dict(v.DELIVERABLE_TORQUE), dict(EE.Vehicle(PLANT.car).DELIVERABLE_TORQUE)
         self.assertTrue(all(thin[r] < sea[r] for r in sea))
         self.assertAlmostEqual(thin[2000], 252.8, delta=0.5)          # deliverable_torque's docstring
-        m = W.deliverable_torque(80.0, (2000, 3000))
+        m = W.deliverable_torque(80.0, (2000, 3000), plant=PLANT)
         self.assertAlmostEqual(thin[2000], m[2000], places=6)
         self.assertAlmostEqual(thin[3000], m[3000], places=6)
+
+    def test_a_variant_gets_its_own_ratios(self):
+        """thin_air_ratios keeps one table per plant, by the plant's values, not by
+        plant.id: a dataclasses.replace variant keeps the id, and until 21 October
+        2026 it was served the ratios of the plant it was made from (the review of
+        build step 1). The measurement is replaced by a stand-in that answers with
+        the plant's bore, so this takes no time; the control is the base plant,
+        served from the cache the second time."""
+        from unittest import mock
+        calls = []
+
+        def stand_in(p_kpa, rpms, **kw):              # kw["plant"]: this file imports plant.py as plant
+            p = kw["plant"]
+            calls.append(p)
+            return {r: p.engine.geometry.bore * 1e4 * p_kpa / W.P_SEA for r in rpms}
+        variant = replace(PLANT, engine=replace(ENG, geometry=replace(ENG.geometry, bore=ENG.geometry.bore * 0.9)))
+        self.assertEqual(variant.id, PLANT.id)
+        saved = dict(W._RATIOS)
+        try:
+            W._RATIOS.clear()
+            with mock.patch.object(W, "deliverable_torque", side_effect=stand_in):
+                base = W.thin_air_ratios(PLANT)
+                again = W.thin_air_ratios(PLANT)
+                mine = W.thin_air_ratios(variant)
+            self.assertIs(again, base)                                   # cached for the same plant
+            self.assertIsNot(mine, base)
+            self.assertNotEqual(mine[80.0][3000], base[80.0][3000])
+            self.assertEqual(len(calls), 2 * len(W.P_TABLE))             # measured once for each plant
+        finally:
+            W._RATIOS.clear()
+            W._RATIOS.update(saved)
 
     def test_hot_thin_climb_is_drivable(self):
         """The road test_reward.py's corner failed before the gearbox knew the air:
         the 12 % climb at 45 C and 80 kPa, neutral -0.139 a step, p95 error 0.171."""
-        w = W.WideAirTrainingEnv(seed=11)
+        w = W.WideAirTrainingEnv(seed=11, plant=PLANT)
         w.reset(seed=11, options={"family": "locked", "t_amb_c": 45.0, "p_kpa": 80.0})
         rs, errs = [], []
         while True:
@@ -238,7 +303,7 @@ class Gearbox(unittest.TestCase):
 class Draws(unittest.TestCase):
     def test_air_inside_the_ranges_and_repeatable(self):
         def air(seed, n=30):
-            w = W.WideAirTrainingEnv(seed=seed)
+            w = W.WideAirTrainingEnv(seed=seed, plant=PLANT)
             out = []
             for i in range(n):
                 w.reset(seed=seed if i == 0 else None)
@@ -254,7 +319,7 @@ class Draws(unittest.TestCase):
         self.assertLess(p.min(), 86.0)
 
     def test_forcing_the_air_keeps_the_stream(self):
-        w1, w2 = W.WideAirTrainingEnv(seed=8), W.WideAirTrainingEnv(seed=8)
+        w1, w2 = W.WideAirTrainingEnv(seed=8, plant=PLANT), W.WideAirTrainingEnv(seed=8, plant=PLANT)
         w1.reset(seed=8)
         w2.reset(seed=8, options={"t_amb_c": 0.0, "p_kpa": 80.0})
         self.assertEqual(w2.cycle["family"], w1.cycle["family"])

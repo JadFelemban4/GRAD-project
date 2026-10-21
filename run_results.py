@@ -48,8 +48,10 @@ POLICIES = (("baseline ECU", "p_neutral"), ("reactive", "p_reactive"),
 def trace(job):
     name, fn = job
     import check_premise as C
-    from engine_env import SupervisoryTunerEnv, make_grade_climb, damage_rate
-    env = SupervisoryTunerEnv(make_grade_climb(duration=720.0, dt=1.0), dt=1.0, seed=0)
+    import engines
+    from engine_env import SupervisoryTunerEnv, damage_rate, locked_climb
+    plant = engines.get("b58")
+    env = SupervisoryTunerEnv(locked_climb(plant, duration=720.0, dt=1.0), plant=plant, dt=1.0, seed=0)
     obs, _ = env.reset(seed=0)
     pol = getattr(C, fn)
     keys = ("t", "t_turb", "t_oil", "dmg_cum", "torque", "torque_req", "spark", "lam",
@@ -59,7 +61,7 @@ def trace(job):
     while True:
         k = env.k
         obs, r, term, trunc, info = env.step(pol(env, obs))
-        dmg += damage_rate(info["t_turb"], info["t_oil"], info["ki"]) * env.dt
+        dmg += damage_rate(info["t_turb"], info["t_oil"], info["ki"], cal=plant.engine.damage) * env.dt
         # float() on every value: the thermal state picks up numpy float32 from
         # the action vector, and json cannot write float32.
         row = dict(t=k * env.dt, t_turb=info["t_turb"] - 273.15, t_oil=info["t_oil"] - 273.15,
@@ -79,9 +81,13 @@ def trace(job):
 def sweep_point(job):
     v, g = job
     import check_premise as C
-    from engine_env import SupervisoryTunerEnv, make_grade_climb, TURB_PROTECT_K
-    env = SupervisoryTunerEnv(make_grade_climb(duration=900.0, dt=1.0, grade=g / 100.0, v_kmh=v),
-                              dt=1.0, seed=0)
+    import engines
+    from engine_env import SupervisoryTunerEnv, make_grade_climb
+    plant = engines.get("b58")
+    TURB_PROTECT_K = plant.engine.damage.turb_knee_k
+    env = SupervisoryTunerEnv(make_grade_climb(duration=900.0, dt=1.0, grade=g / 100.0, v_kmh=v,
+                                               t_amb=plant.scenario.t_amb),
+                              plant=plant, dt=1.0, seed=0)
     obs, _ = env.reset(seed=0)
     temps = []
     while True:
@@ -107,7 +113,8 @@ def episode(job):
         from stable_baselines3 import SAC
         model = SAC.load(os.path.join(HERE, spec, "final"), device="cpu")
         pol, prev = E.agent_policy(model), "blind" not in spec
-    r = E.run_episode(pol, seed, w, use_preview=prev)
+    import engines
+    r = E.run_episode(pol, seed, w, use_preview=prev, plant=engines.get("b58"))
     r.update(policy=label, episode=ep)
     return r
 
@@ -190,8 +197,10 @@ def phase_d(pool, agent_set=AGENT_SET):
     # function loads final.zip and scores it on whatever plant the tree holds,
     # so re-running it on an older set would overwrite that set's published
     # record with scores from a plant its agents never trained on.
+    import engines
     import fingerprint as FP
-    live = FP.plant_fingerprint(protocol="phase-d")
+    # backend: the episodes run through evaluate.run_episode, the 0-D cycle model
+    live = FP.plant_fingerprint(protocol="phase-d", plant=engines.get("b58"), backend=FP.BACKEND_CYCLE)
     for a in agents:
         stored = FP.read(os.path.join(HERE, a, "meta.json"))
         bad = FP.compare(stored, live) if stored else [("meta.json", "missing", "")]

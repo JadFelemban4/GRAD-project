@@ -52,7 +52,8 @@ sys.path.insert(0, HERE)
 import evaluate  # noqa: E402
 import random_road as RR  # noqa: E402
 import validate  # noqa: E402
-from engine_env import make_grade_climb  # noqa: E402
+from engine_env import locked_climb  # noqa: E402
+import engines  # noqa: E402
 from app.agent_catalog import verdict  # noqa: E402
 import plot_sim_vs_car as SVC  # noqa: E402
 import plot_agent_pairs as PAIRS  # noqa: E402
@@ -119,7 +120,7 @@ def policy_tables(prefix):
 def chart_roads():
     eps = evaluate.EPISODES_D2
     (s0, s1), (g0, g1) = RR.RANGES["start_s"], RR.RANGES["grade"]
-    road = make_grade_climb()
+    road = locked_climb(engines.get("b58"), duration=900.0, dt=0.2)   # make_grade_climb()'s old defaults
     gg, tt = np.asarray(road["grade"]), np.asarray(road["t"])
     i = int(np.argmax(gg > 0))
     pd_start, pd_grade = float(tt[i]), float(gg[i])

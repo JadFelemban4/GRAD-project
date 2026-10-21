@@ -1,0 +1,116 @@
+# engine_specs/cars/cx9_2016_25t.toml -- the car around decision 24's Mazda engine.
+#
+# PUBLISHED VALUES ONLY. Every value below was printed by the source its `source` key names
+# ([sources] at the end gives the URL), in the units that source prints. Nothing here is
+# derived: no rolling radius, no drag area, no unit conversion -- the code that builds a Car
+# does those in the open, and engine_specs/cars/README.md says how. A value no source prints is
+# in [not_typed] with the reason, never guessed. Read by nothing yet (build step 1 of the
+# four-engine plants, 20 October 2026); test_epa_map.py checks the form and the EPA row.
+
+schema = 1
+car_id = "cx9_2016_25t"
+engine_id = "mazda_25t"
+description = "2016 Mazda CX-9 2.5 L turbo, front-wheel drive, 6-speed automatic: the car Argonne tested in D3 (VIN JM3TCABY0G0101103, NH519 Table 4); EPA's engine map came from another 2016 CX-9 (VIN JM3TCABYXG0104977, its test report's Table 1)"
+
+[transmission]
+value = "6-speed automatic (Skyactiv-Drive), front-wheel drive"
+status = "PUBLISHED"
+source = "NH519"
+note = "Table 4, p. 13"
+
+[gear_ratios]
+value = [3.487, 1.992, 1.449, 1.00, 0.707, 0.600]
+unit = "1"
+status = "PUBLISHED"
+source = "NH519"
+note = "Table 4, p. 13, 1st to 6th; Mazda's model-year 2019 sheet (MZ19) prints the same six"
+
+[reverse_ratio]
+value = 3.990
+unit = "1"
+status = "PUBLISHED"
+source = "MZ19"
+note = "model year 2019; NH519 does not print a reverse ratio"
+
+[final_drive]
+value = 4.411
+unit = "1"
+status = "PUBLISHED"
+source = "NH519"
+note = "Table 4; MZ19 prints 4.411 too. EPA's Test Car List rounds it to 4.41 (the row below)"
+
+[tyre_size]
+value = "255/60 R18"
+status = "PUBLISHED"
+source = "NH519"
+note = "all-season tyres of the D3 test car (Table 4); MZ19 prints P255/60 R18 for the Sport and Touring trims and P255/50 R20 for the others"
+
+[curb_weight]
+value = 4217
+unit = "lb"
+model_year = 2019
+status = "PUBLISHED"
+source = "MZ19"
+note = "FWD, MODEL YEAR 2019 (AWD 4383 lb): no Mazda sheet for 2016 was opened -- the 2016 and 2017 downloads of 20 October returned web pages, not the PDFs. A 2016 figure exists only in a secondary listing (cars.com, 4054 lb for a FWD Sport), not typed here. The road load uses EPA's test weight below, not this"
+
+# The EPA Test Car List row of the D3 car's configuration: Argonne set its dynamometer to these
+# exact targets for all 70 tests (CATALOGUE.md section 2.1; NH519 Table 5 prints them rounded).
+# Coefficients: road-load force F = A + B v + C v^2 with F in lbf and v in mph.
+[epa_test_car]
+status = "PUBLISHED"
+source = "EPA16"
+file_rows = [2677, 2678]
+model_year = 2016
+represented_model = "CX-9"
+test_vehicle_id = "6EBPYTG2-042"
+engine_code = "6PYTGAAB"
+tested_transmission = "Automatic, 6 gears"
+equivalent_test_weight_lb = 4500
+target_coef_a_lbf = 40.443
+target_coef_b_lbf_per_mph = 0.25936
+target_coef_c_lbf_per_mph2 = 0.026369
+axle_ratio = 4.41
+n_over_v_rpm_per_mph = 30.5
+note = "rows 2677-2678 (header = row 1); the same test vehicle also carries rows 2675-2676 with other targets (below), and a 4250 lb configuration 6EBPYTS1-039 (rows 2679-2682) is another car"
+
+[[epa_test_car_other_rows]]
+status = "PUBLISHED"
+source = "EPA16"
+file_rows = [2675, 2676]
+model_year = 2016
+represented_model = "CX-9"
+test_vehicle_id = "6EBPYTG2-042"
+engine_code = "6PYTGAAB"
+tested_transmission = "Automatic, 6 gears"
+equivalent_test_weight_lb = 4500
+target_coef_a_lbf = 34.833
+target_coef_b_lbf_per_mph = 0.39175
+target_coef_c_lbf_per_mph2 = 0.024874
+axle_ratio = 4.41
+n_over_v_rpm_per_mph = 30.5
+note = "same test vehicle and weight, other targets; NOT the set D3 drove on"
+
+[not_typed]
+rolling_radius_m = "no source prints it. DERIVE it in code: from EPA's N/V (engine rpm per mph in top gear) with the top gear and the axle ratio, or measure it on the D3 data (the vehicles strand found the two differ by 1.6 %, UNVERIFIED here: README.md). Never type the result here"
+drag_area_and_rolling_coefficient = "not published for this car (Mazda prints no Cd). The road load is EPA's A, B, C above; fitting a two-term crr/CdA to them is a derivation and lives in code"
+driveline_efficiency = "not published. ASSUMED wherever the code needs it (the B58's 0.92), and labelled so there"
+
+[sources.NH519]
+url = "https://web.archive.org/web/20200216135822/https://www.nhtsa.gov/sites/nhtsa.dot.gov/files/documents/812519.pdf"
+what = "NHTSA DOT HS 812 519 (Argonne), the 2016 Mazda CX-9 technology assessment: Table 4 (vehicle specification) p. 13, Table 5 (dynamometer) p. 15"
+opened = "2026-10-20"
+
+[sources.MZ19]
+url = "https://www.mazdausa.com/siteassets/pdf/owners-optimized/2019/cx-9/2019-cx-9-features-specs.pdf"
+what = "Mazda USA, 2019 CX-9 specifications"
+opened = "2026-10-20"
+
+[sources.EPA16]
+url = "https://www.epa.gov/sites/default/files/2016-07/16tstcar.csv"
+what = "EPA Test Car List, model year 2016 (16tstcar.csv); also in logs/epa/D3_AND_EPA_SOURCES.csv with its sha256"
+opened = "2026-10-20"
+
+[sources.D3CX9]
+url = "https://www.anl.gov/taps/d3-2016-mazda-cx9"
+what = "Argonne Downloadable Dynamometer Database, 2016 Mazda CX-9: its test summary sets 4500 lb, A 40.443, B 0.25936, C 0.026369 on every test"
+opened = "2026-10-20"

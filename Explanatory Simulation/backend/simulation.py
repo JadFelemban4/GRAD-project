@@ -24,6 +24,7 @@ PROJECT_ROOT = EX_ROOT.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+import engines  # noqa: E402
 from check_premise import p_grade_now, p_neutral, p_predictive, p_reactive  # noqa: E402
 from engine_env import (  # noqa: E402
     ACT_HI,
@@ -34,9 +35,16 @@ from engine_env import (  # noqa: E402
     SupervisoryTunerEnv,
     Vehicle,
     damage_rate,
-    make_grade_climb,
     make_terrain,
 )
+
+from . import LAB_PLANT  # noqa: E402
+
+# The plant every session runs, named (20 October 2026): engines.get builds it
+# from engine_specs/ and its derived file. The environment, its ECU, the roads
+# and the damage rates below are all built from it; the source project has no
+# default engine any more, and neither has the lab.
+PLANT = engines.get(LAB_PLANT)
 
 
 MAX_SESSIONS = 12
@@ -74,7 +82,8 @@ def physical_to_normalized(values) -> list[float]:
 def _current_derived_inputs() -> dict:
     import derived
 
-    return dict(derived.all_params().get("_inputs") or {})
+    # the plant's own derived file (data/derived_params.json for the B58)
+    return dict(derived.all_params(path=str(PROJECT_ROOT / PLANT.engine.derived)).get("_inputs") or {})
 
 
 def _load_actor(policy: str) -> tuple[dict[str, np.ndarray], dict]:
@@ -131,6 +140,8 @@ def _actor_action(weights: dict[str, np.ndarray], obs: np.ndarray) -> np.ndarray
 
 
 class CapturingBaselineECU(BaselineECU):
+    """BaselineECU(cal) that keeps its last command; `cal` is the plant's ECU record."""
+
     def step(self, *args, **kwargs):
         spark, lam, fan = super().step(*args, **kwargs)
         self.last_command = {"spark": float(spark), "lam": float(lam), "fan": float(fan)}
@@ -149,7 +160,7 @@ class CapturingEnv(SupervisoryTunerEnv):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ecu = CapturingBaselineECU()
+        self.ecu = CapturingBaselineECU(self.plant.engine.ecu)
 
 
 @dataclass
@@ -168,31 +179,32 @@ class SimulationSession:
 
 def _cycle_for(scenario: str, seed: int) -> tuple[dict, dict]:
     rng = np.random.default_rng(seed)
+    sc = PLANT.scenario          # the plant's locked climb: 12 % at 130 km/h, 42 C on the B58
     if scenario == "locked":
-        from evaluate import DURATION, DT, EPISODES
+        from evaluate import DURATION, DT, EPISODES, episode_cycle
 
         episode_seed, weights = EPISODES[0]
-        cycle = make_grade_climb(duration=DURATION, dt=DT)
-        road = {"scenario": "locked", "family": "locked", "nominal_grade_pct": 12.0,
-                "nominal_speed_kmh": 130.0, "ambient_c": float(cycle["t_amb"] - 273.15)}
-        provenance = {"scenario_source": "evaluate.episode_cycle() / make_grade_climb()",
+        cycle = episode_cycle(plant=PLANT)
+        road = {"scenario": "locked", "family": "locked", "nominal_grade_pct": sc.grade * 100.0,
+                "nominal_speed_kmh": sc.v_kmh, "ambient_c": float(cycle["t_amb"] - 273.15)}
+        provenance = {"scenario_source": "evaluate.episode_cycle(plant) / engine_env.locked_climb()",
                       "episode": 1, "episode_seed": int(episode_seed),
                       "weights_source": "evaluate.EPISODES[0]",
                       "weights": [float(x) for x in weights],
                       "seed_ignored_for_scenario": True,
                       "dt": float(DT), "duration_s": float(DURATION)}
     elif scenario == "flat":
-        cycle = make_terrain(rng, duration=EPISODE_DURATION_S, dt=SIM_DT, family="flat")
+        cycle = make_terrain(rng, duration=EPISODE_DURATION_S, dt=SIM_DT, family="flat", plant=PLANT)
         road = {"scenario": "flat", "family": "flat", "nominal_grade_pct": None,
-                "nominal_speed_kmh": 130.0, "ambient_c": float(cycle["t_amb"] - 273.15)}
+                "nominal_speed_kmh": sc.v_kmh, "ambient_c": float(cycle["t_amb"] - 273.15)}
         provenance = {"scenario_source": "engine_env.make_terrain(family='flat')",
                       "episode": None, "weights_source": "SupervisoryTunerEnv.reset(seed)",
                       "seed_ignored_for_scenario": False, "dt": SIM_DT,
                       "duration_s": EPISODE_DURATION_S}
     elif scenario == "terrain":
-        cycle = make_terrain(rng, duration=EPISODE_DURATION_S, dt=SIM_DT)
+        cycle = make_terrain(rng, duration=EPISODE_DURATION_S, dt=SIM_DT, plant=PLANT)
         road = {"scenario": "terrain", "family": cycle["family"], "nominal_grade_pct": None,
-                "nominal_speed_kmh": 130.0, "ambient_c": float(cycle["t_amb"] - 273.15)}
+                "nominal_speed_kmh": sc.v_kmh, "ambient_c": float(cycle["t_amb"] - 273.15)}
         provenance = {"scenario_source": "engine_env.make_terrain(seed)",
                       "episode": None, "weights_source": "SupervisoryTunerEnv.reset(seed)",
                       "seed_ignored_for_scenario": False, "dt": SIM_DT,
@@ -217,7 +229,7 @@ def create_session(*, scenario="locked", preview=True, policy="manual", seed=0) 
     if policy not in valid:
         actor_weights, provenance = _load_actor(policy)
     effective_preview = bool(preview) and not policy.startswith("blind_")
-    env = CapturingEnv(cycle, dt=SIM_DT, use_preview=effective_preview, seed=seed)
+    env = CapturingEnv(cycle, plant=PLANT, dt=SIM_DT, use_preview=effective_preview, seed=seed)
     env_seed = int(scenario_provenance.get("episode_seed", seed))
     env.reset(seed=env_seed)
     if scenario == "locked":
@@ -328,7 +340,7 @@ def _frame(session: SimulationSession, *, time_s: float, obs_in, obs, action, in
     preview = [float(x) / 12.0 * 100.0 for x in np.asarray(obs_in)[14:18]]
     btherm = env.thermal_base
     bdamage = damage_rate(btherm.t_turb, btherm.t_oil,
-                          base_out.get("ki") if base_out else None)
+                          base_out.get("ki") if base_out else None, cal=env.plant.engine.damage)
     base_command = getattr(env.ecu, "last_command", {})
     baseline = {
         "map_kpa": float(base_map),
@@ -378,7 +390,8 @@ def _frame(session: SimulationSession, *, time_s: float, obs_in, obs, action, in
         "spark": numeric("spark", None), "lam": numeric("lam", None),
         "mdot_fuel": numeric("mdot_fuel", None),
         "mdot_air": float(r["mdot_exh"] - r["mdot_fuel"]) if "mdot_exh" in r and "mdot_fuel" in r else None,
-        "ki": numeric("ki", None), "damage_rate": float(damage_rate(env.thermal.t_turb, env.thermal.t_oil, r.get("ki"))),
+        "ki": numeric("ki", None), "damage_rate": float(damage_rate(env.thermal.t_turb, env.thermal.t_oil, r.get("ki"),
+                                                                        cal=env.plant.engine.damage)),
         "reward": reward, "r_resp": numeric("r_resp", None), "r_fuel": numeric("r_fuel", None),
         "r_life": numeric("r_life", None), "cost_torque": numeric("cost_torque", None),
         "cost_knock": numeric("cost_knock", None), "cost_egt": numeric("cost_egt", None),

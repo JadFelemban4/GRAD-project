@@ -262,8 +262,11 @@ def figure(rec, meta, title, out):
         dmg = np.nancumsum(rec["damage_rate"]) * float(meta.get("dt", 1.0))
         a.plot(t, dmg, color=AGENT, lw=1.4, label=f"this policy {dmg[-1]:.0f}")
     else:
+        import engines
         from engine_env import damage_rate
-        rate = np.array([damage_rate(tt, oo, kk) for tt, oo, kk in zip(rec["t_turb"], rec["t_oil"], rec["ki"])])
+        cal = engines.get("b58").engine.damage      # the plant every record so far ran on
+        rate = np.array([damage_rate(tt, oo, kk, cal=cal)
+                         for tt, oo, kk in zip(rec["t_turb"], rec["t_oil"], rec["ki"])])
         dmg = np.cumsum(rate) * float(meta.get("dt", 1.0))
         a.plot(t, dmg, color=AGENT, lw=1.4, label=f"this policy {dmg[-1]:.0f} (from the recorded heat)")
     a.legend(fontsize=7, loc="upper left")

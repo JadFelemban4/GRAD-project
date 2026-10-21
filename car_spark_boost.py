@@ -61,12 +61,14 @@ def readings():
 
 
 def model_spark(r):
+    import engines
     from engine_env import BaselineECU
     from plant import charge_temperature
-    ecu = BaselineECU()
+    eng = engines.get("b58").engine          # the car these logs are from, named
+    ecu = BaselineECU(eng.ecu)
     out = []
     for rpm, mp, ta, ect in zip(r.rpm, r.map_kpa, r.t_amb, r.ect_c):
-        iat = charge_temperature(ta + 273.15, ect + 273.15)
+        iat = charge_temperature(ta + 273.15, ect + 273.15, engine=eng)
         s = ecu.base_spark(rpm, mp) + ecu.iat_compensation(iat)
         if ect + 273.15 < 340.0:
             s -= 5.0

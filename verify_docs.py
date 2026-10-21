@@ -91,6 +91,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from plant import charge_temperature  # noqa: E402
 
+# The plant every figure below describes, named (20 October 2026: the B58 in
+# its Supra; its constants were module literals and defaults until then).
+_B58 = None
+
+
+def _plant():
+    global _B58
+    if _B58 is None:
+        import engines
+        _B58 = engines.get("b58")
+    return _B58
+
 RESULTS = []
 DOC_FAILURES = []
 DOC_UNMATCHED = []
@@ -156,6 +168,17 @@ TRACKED_DOCS = [
 #   data/, logs/raw/   measurements. Every figure in this project appears
 #                      somewhere in a timestamp column; scanning them turns
 #                      every check into noise. `build_dataset.py` guards these.
+#   EPA's files        measurements too (20 October 2026): EPA's benchmarking
+#                      files for decision 24's three new engines, byte for byte
+#                      as EPA published them, each a repo_path row of
+#                      logs/epa/MANIFEST.csv (EPA_FILES). Their .html files are
+#                      EPA's ALPHA reports, not this project's documents, and
+#                      scanning them would hold EPA's prose to this project's
+#                      figures; `test_epa_map.py` guards them instead (hashes,
+#                      row counts, units). Only those files: logs/epa/README.md
+#                      is this project's and is scanned like every document. The
+#                      whole of logs/epa/ was skipped until 21 October 2026, the
+#                      README with it (the review of build step 1).
 #   *.csv, *.json      generated. Regenerate, do not edit -- and sweeps.json is
 #                      a numeric dump where every retired figure occurs by
 #                      coincidence.
@@ -166,7 +189,21 @@ TRACKED_DOCS = [
 SCAN_EXT = (".md", ".py", ".html", ".js", ".txt")
 SCAN_SKIP_DIRS = ("data/", "logs/raw/", "runs/", "runs_sixspeed_18sep/",
                   ".venv/", "node_modules/")
+EPA_MANIFEST = "logs/epa/MANIFEST.csv"
 _FILE_CACHE = {}
+
+
+def epa_files(here):
+    """EPA's own files, repository-relative: the repo_path column of
+    logs/epa/MANIFEST.csv, the list epa_map.py staged and test_epa_map.py
+    hashes. An empty set when there is no manifest, so a file EPA published is
+    then scanned and shows, never skipped by a folder name."""
+    import csv
+    try:
+        with open(os.path.join(here, EPA_MANIFEST), encoding="utf-8", newline="") as fh:
+            return {row["repo_path"].replace("\\", "/") for row in csv.DictReader(fh)}
+    except (OSError, KeyError):
+        return set()
 
 
 def tracked_files(here):
@@ -193,10 +230,12 @@ def tracked_files(here):
             out += [os.path.relpath(p, here).replace("\\", "/")
                     for p in glob.glob(os.path.join(here, "**", "*" + ext),
                                        recursive=True)]
+    epa = epa_files(here)
     keep = sorted({
         f.replace("\\", "/") for f in out
         if f.endswith(SCAN_EXT)
         and not f.replace("\\", "/").startswith(SCAN_SKIP_DIRS)
+        and f.replace("\\", "/") not in epa
     })
     _FILE_CACHE["files"] = keep
     return keep
@@ -1268,10 +1307,16 @@ def check_scenario(here):
     checked number, not a remembered one.
 
     WHAT IS ASSERTED HERE AND WHAT IS NOT. Everything below is read from the
-    LIVE object at the moment of the call -- `inspect.signature`, the class
-    attribute, the module constant, the script's own printed output. Nothing is
-    compared against a second copy of itself. Where a figure cannot be
-    recomputed cheaply it is said so in the label rather than quietly pinned.
+    LIVE object at the moment of the call -- the plant's records, the module
+    constant, the script's own printed output. Nothing is compared against a
+    second copy of itself. Where a figure cannot be recomputed cheaply it is
+    said so in the label rather than quietly pinned.
+
+    SINCE 20 OCTOBER 2026 THE CONSTANTS ARE THE PLANT'S. The locked scenario,
+    the damage knee and the gearbox were make_grade_climb's defaults, a module
+    constant and class attributes; they are fields of the B58's records now
+    (engines.get("b58"), engine_specs/), read here from the live objects. A
+    drift injected into engine_specs/*.toml reaches every check below.
     """
     import inspect
     import subprocess
@@ -1281,12 +1326,12 @@ def check_scenario(here):
     from app import test_replay as TR
 
     print("\nTHE EXPERIMENT'S OWN CONSTANTS  (AUDIT2.md C2-2)")
+    PL = _plant()
 
-    # ---- the locked scenario, read from the function that defines it -------
-    sig = inspect.signature(E.make_grade_climb).parameters
-    grade = float(sig["grade"].default)
-    v_kmh = float(sig["v_kmh"].default)
-    t_amb = float(sig["t_amb"].default)
+    # ---- the locked scenario, read from the plant that defines it ----------
+    grade = float(PL.scenario.grade)
+    v_kmh = float(PL.scenario.v_kmh)
+    t_amb = float(PL.scenario.t_amb)
 
     # "12 % at 130 km/h" and "12 % / 130 km/h" are how every document writes it.
     # Anchored to the grade on the left so a bare speed elsewhere cannot match.
@@ -1308,18 +1353,31 @@ def check_scenario(here):
              r"[^.\n]{0,30}?\d+\s*%[^.\n]{0,12}?(?:at|/)\s*\*{0,2}" + NUM
              + r"\s*\*{0,2}\s*km/h"]
     G_PAT = [NUM + r"\s*%\s*(?:grade\s*)?(?:at|/)\s*\*{0,2}130\s*\*{0,2}" + _AMB]
-    figure("scenario speed, make_grade_climb(v_kmh=)", v_kmh, 130.0, 0.0, " km/h",
+    figure("scenario speed, the plant's locked climb (v_kmh)", v_kmh, 130.0, 0.0, " km/h",
            patterns=V_PAT, files=ALL, dtol=0.5)
-    figure("scenario grade, make_grade_climb(grade=)", round(100 * grade, 1), 12.0,
+    figure("scenario grade, the plant's locked climb (grade)", round(100 * grade, 1), 12.0,
            0.0, " %", patterns=G_PAT, files=ALL, dtol=0.5)
     # 42 C and 315 K collide with far too much prose to scan for -- the ambient
     # appears in the thermal fit, the J2807 table and every drive card. Asserted
     # as a VALUE only, and that is the assertion that matters: a changed default
     # is what re-bases the experiment.
-    chk("scenario ambient, make_grade_climb(t_amb=)", t_amb, 315.0, 0.0, " K")
-    chk("training episode length, make_grade_climb(duration=)",
-        float(sig["duration"].default), 900.0, 0.0, " s")
-    chk("training step, make_grade_climb(dt=)", float(sig["dt"].default), 0.2, 0.0, " s")
+    chk("scenario ambient, the plant's locked climb (t_amb)", t_amb, 315.0, 0.0, " K")
+    # The training episode and step the documents quote (900 s, 0.2 s), asserted
+    # as VALUES where they live. Until 20 October 2026 they were make_grade_climb's
+    # duration= and dt= defaults, read here; the defaults went, and these two
+    # checks were merged into one that make_grade_climb has none -- which
+    # test_engine_threading.py asserts already, so nothing checked the values (the
+    # review of build step 1, 21 October). They are train.py's --duration default
+    # and its step for Phase D's and D2's roads, the environment's own step, and
+    # EngineEnv's standard scenario, each read from the live object.
+    import train as TRN
+    env0 = E.EngineEnv(plant=PL)
+    chk("training episode length, train.DURATION_S and EngineEnv()",
+        [float(TRN.DURATION_S), round(len(env0.cycle["t"]) * float(env0.dt), 6)], [900.0, 900.0])
+    chk("training step, train.DESIGN_DT fixed/random, SupervisoryTunerEnv(dt=)",
+        [float(TRN.DESIGN_DT["fixed"]), float(TRN.DESIGN_DT["random"]),
+         float(inspect.signature(E.SupervisoryTunerEnv.__init__).parameters["dt"].default),
+         float(env0.dt)], [0.2, 0.2, 0.2, 0.2])
 
     # ---- the protection trigger -------------------------------------------
     # A VALUE ASSERTION, and it says so instead of dressing up as a document
@@ -1329,10 +1387,11 @@ def check_scenario(here):
     # that produced the number, so the comparison was 1123.0 against 1123.0 and
     # could not fail, and DOC_UNMATCHED could never fire for it either. The
     # Celsius form below is the one that actually asks the documents.
-    chk("TURB_PROTECT_K, the damage knee", float(E.TURB_PROTECT_K), 1123.0, 0.0, " K")
-    chk("OIL_PROTECT_K", float(E.OIL_PROTECT_K), 408.0, 0.0, " K")
+    knee = float(PL.engine.damage.turb_knee_k)          # was engine_env.TURB_PROTECT_K
+    chk("the damage knee (turb_knee_k, was TURB_PROTECT_K)", knee, 1123.0, 0.0, " K")
+    chk("the oil knee (oil_knee_k, was OIL_PROTECT_K)", float(PL.engine.damage.oil_knee_k), 408.0, 0.0, " K")
     figure("the trigger in Celsius, as the documents write it",
-           round(float(E.TURB_PROTECT_K) - 273.15), 850, 0.0, " C",
+           round(knee - 273.15), 850, 0.0, " C",
            # ANCHORED HARD ON PURPOSE. A 26-character window around the word
            # "trigger" also captures the neighbouring number in "the 850 C
            # trigger sits inside the 825-925 C band" -- a correct sentence --
@@ -1347,13 +1406,13 @@ def check_scenario(here):
     # nothing a document could see. The ratios are a VALUE assertion because a
     # prose pattern loose enough to find a ratio table also finds every other
     # decimal in the repository; the value is what actually moved.
-    chk("Vehicle.gears, the ZF 8HP51 ratio set",
-        [round(float(g), 3) for g in E.Vehicle.gears],
+    chk("the car's gears, the ZF 8HP51 ratio set",
+        [round(float(g), 3) for g in PL.car.gears],
         [5.25, 3.36, 2.172, 1.72, 1.316, 1.0, 0.822, 0.64])
-    # Same tautology as TURB_PROTECT_K above: `final_drive = 3.150` is the line
+    # Same tautology as the knee above: the spec's `final_drive` is the line
     # the value came from. A value assertion, honestly labelled.
-    chk("Vehicle.final_drive", float(E.Vehicle.final_drive), 3.150, 0.0)
-    chk("the gearbox has eight forward ratios", len(E.Vehicle.gears), 8)
+    chk("the car's final drive", float(PL.car.final_drive), 3.150, 0.0)
+    chk("the gearbox has eight forward ratios", len(PL.car.gears), 8)
 
     # ---- the evaluation protocol ------------------------------------------
     chk("evaluate.DT", float(V.DT), 1.0, 0.0, " s")
@@ -1404,7 +1463,7 @@ def check_scenario(here):
     import time as _time
     import check_premise as CP
     _t0 = _time.time()
-    r = CP.rollout(CP.p_neutral)
+    r = CP.rollout(CP.p_neutral, plant=PL)
     # THE PREMISE FIGURES DESCRIBE THE LOCKED SCENARIO, and Phase D2's result
     # files record a DIFFERENT one -- a randomised 12-16 % climb, on which the
     # baseline ECU's median damage is 1118.0, not 959.8. The "baseline <3 digits
@@ -1466,7 +1525,7 @@ def check_scenario(here):
                      r"^[>\s]*\|[^|\n]*baseline[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*\*{0,2}"
                      + NUM + r"\s*\*{0,2}\s*°?\s*C\s*\*{0,2}\s*\|"],
            files=PREMISE_FILES, dtol=0.6)
-    binds = float(r["peak_turb"]) > float(E.TURB_PROTECT_K) - 273.15
+    binds = float(r["peak_turb"]) > knee - 273.15
     chk("the constraint BINDS on the locked scenario", binds, True)
 
     # ---- Phase B's headline residual, read off compare_log's own output ----
@@ -1637,7 +1696,7 @@ def check_derived(here):
     import derive_params
 
     print("\nDERIVED CONSTANTS AND PREMISE  (derive_params.py, check_premise.py)")
-    d = derived.all_params()
+    d = derived.all_params(path=derived.B58_PATH)          # the B58's, from its logs
     fp = derive_params.fingerprint()
     chk("derived constants were computed from the data as shipped",
         d.get("_inputs", {}).get("data_sha1"), fp["data_sha1"])
@@ -2026,7 +2085,7 @@ def main():
     din = 100.0 * 273.15 / 101.3
     chk("DIN reference constant, 100*273.15/101.3", round(din, 1), 269.6, 0.05, " K")
     t_ch = charge_temperature(P["t_amb"].fillna(25.0) + 273.15,
-                              P["ect"].fillna(90.0) + 273.15)
+                              P["ect"].fillna(90.0) + 273.15, engine=_plant().engine)
     figure("derived k = 269.6 / T_charge, mean over the 26 points",
            round(float(np.mean(din / t_ch)), 3), 0.831, 0.002,
            # k is always written as 0.8xx. Anchoring on the SHAPE keeps this off
@@ -2081,9 +2140,11 @@ def main():
                      + NUM + r"\s*%"],
            files=ALL, dtol=0.4)
 
-    print("\nBASELINE ECU CONSTANTS  (engine_env.py)")
-    figure("ENR_LOAD, the enrichment gate", 180.0, 180.0, 0.0, " kPa",
-           patterns=[r"ENR_LOAD\s*=\s*" + NUM], files=ENV)
+    print("\nBASELINE ECU CONSTANTS  (engine_specs/b58.toml)")
+    # A VALUE assertion, as the knee's: until 20 October 2026 this scanned
+    # engine_env.py for the assignment `ENR_LOAD = 180.0`, the line the value
+    # came from. The gate is the B58's ECU record now.
+    chk("ENR_LOAD, the enrichment gate", float(_plant().engine.ecu.enr_load), 180.0, 0.0, " kPa")
 
     # check_simulation() must run BEFORE report_documents(), or its
     # DOC_FAILURES are appended after the report has already been

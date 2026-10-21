@@ -347,9 +347,10 @@ def test_server_imports():
     paths = {r.path for r in srv.app.routes if hasattr(r, "path")}
     check("M7: app.server imports and serves its three pages",
           {"/", "/driver", "/review"} <= paths, f"{len(paths)} routes")
-    import engine_env
-    check("M7: served limits match engine_env",
-          abs(srv.LIMITS["turb_c"] - (engine_env.TURB_PROTECT_K - 273.15)) < 0.05,
+    import engines
+    knee = engines.get("b58").engine.damage.turb_knee_k      # was engine_env.TURB_PROTECT_K
+    check("M7: served limits match the plant's damage knee",
+          abs(srv.LIMITS["turb_c"] - (knee - 273.15)) < 0.05,
           f"turb_c {srv.LIMITS['turb_c']}")
 
 

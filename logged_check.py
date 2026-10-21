@@ -205,7 +205,8 @@ def run(job):
     cycle = dict(_CYC[drive])
     policy, preview = _policy(set_dir, ref)
     seed, weights = E.EPISODES[ep - 1]
-    env = EE.SupervisoryTunerEnv(cycle, dt=1.0, seed=seed, use_preview=preview)
+    import engines
+    env = EE.SupervisoryTunerEnv(cycle, plant=engines.get("b58"), dt=1.0, seed=seed, use_preview=preview)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)
     obs = env._obs()

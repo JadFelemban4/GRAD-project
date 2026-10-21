@@ -57,6 +57,13 @@ sys.path.insert(0, HERE)
 OUT = os.path.join(HERE, "results", "model_vs_data.json")
 
 
+def _plant():
+    """The plant these logs are compared with: the B58 in its Supra, the car
+    that drove them, named (20 October 2026; it was every function's default)."""
+    import engines
+    return engines.get("b58")
+
+
 def _clean(o):
     """JSON-safe: numpy scalars to Python, NaN to None."""
     if isinstance(o, dict):
@@ -79,35 +86,39 @@ def load_residual():
     Also re-runs the same residual with the geometry forced to the wrong
     engine, because displacement is the one thing this residual CAN see.
     """
-    from plant import predict, map_from_airflow, charge_temperature, b58, Geometry
+    from dataclasses import replace
+    from plant import predict, map_from_airflow, charge_temperature
     P = pd.read_csv(os.path.join(HERE, "data", "master_points.csv"))
     din = 100.0 * 273.15 / 101.3
+    b58 = _plant().engine
 
-    def score(geo):
+    def score(eng):
         rows = []
         for _, r in P.iterrows():
             ect_k = (r.ect if np.isfinite(r.ect) else 90.0) + 273.15
             amb_k = (r.t_amb if np.isfinite(r.t_amb) else 25.0) + 273.15
-            t_in = charge_temperature(amb_k, ect_k)
-            mp = map_from_airflow(r.air_kgh / 3.6, r.rpm, t_in, geo=geo)
+            t_in = charge_temperature(amb_k, ect_k, engine=eng)
+            mp = map_from_airflow(r.air_kgh / 3.6, r.rpm, t_in, engine=eng)
             lam = r.lam if np.isfinite(r.lam) and r.lam > 0 else 1.0
             spk = r.spark if np.isfinite(r.spark) else 20.0
             o = predict(rpm=r.rpm, map_kpa=mp, iat_k=t_in, ect_k=ect_k,
-                        spark_btdc=spk, lam=lam, geo=geo)
+                        spark_btdc=spk, lam=lam, engine=eng)
             model = (din / t_in) * 100.0 * o["eta_v"] * (1 - o["f_res"]) * mp / 100.0
             rows.append(dict(rpm=r.rpm, map_kpa=mp, meas=r.load_pct, model=model))
         err = [100 * abs(x["model"] - x["meas"]) / x["meas"] for x in rows]
         return rows, float(np.mean(err))
 
-    rows, mape = score(b58())
+    rows, mape = score(b58)
     # RETIRED-OK: the 2.0 L four of mistake 1 is rebuilt here ON PURPOSE, to
     # show that this residual can see displacement. Bore and stroke are
     # scaled together to 1998 cc; the residual cares only about swept volume.
-    g6 = b58()
-    four = Geometry(bore=g6.bore, stroke=g6.stroke, n_cyl=4)
+    # The B58 with only its geometry changed (dataclasses.replace): every other
+    # constant is the B58's, as the old Geometry defaults made it.
+    g6 = b58.geometry
+    four = replace(g6, n_cyl=4)
     k = (1998.0 / (four.vd_total * 1e6)) ** (1 / 3)
-    wrong = Geometry(bore=g6.bore * k, stroke=g6.stroke * k, n_cyl=4)
-    _, wrong_mape = score(wrong)
+    wrong = replace(g6, bore=g6.bore * k, stroke=g6.stroke * k, n_cyl=4)
+    _, wrong_mape = score(replace(b58, geometry=wrong))
     return dict(points=rows, mape=mape, wrong_engine_mape=wrong_mape,
                 wrong_engine_cc=wrong.vd_total * 1e6)
 
@@ -123,7 +134,8 @@ def boost_gap(S):
     hi = S[(S.map_kpa > 200) & (~S.maf_pinned.astype(bool)) & (~_assumed)].copy()
     # The same samples re-inverted with the raw pre-throttle sensor as the
     # charge temperature -- what the model did before mistake 13.
-    raw = [map_from_airflow(a, n, t + 273.15)
+    eng = _plant().engine
+    raw = [map_from_airflow(a, n, t + 273.15, engine=eng)
            for a, n, t in zip(hi.air_gps, hi.rpm, hi.iat_pre_c)
            if np.isfinite(t)]
     logged = []
@@ -153,7 +165,7 @@ def enrichment(S):
     """base_lambda vs measured lambda, in the speed-band x dwell grid."""
     from verify_docs import dwell_column
     from engine_env import BaselineECU
-    ecu = BaselineECU()
+    ecu = BaselineECU(_plant().engine.ecu)
     S2 = dwell_column(S)
     h = S2[(S2.map_kpa > 180) & S2.lam.between(0.5, 1.3)].copy()
     h["model"] = [ecu.base_lambda(r, m, d) for r, m, d in zip(h.rpm, h.map_kpa, h.dwell)]
@@ -212,7 +224,8 @@ def spark(P):
     """
     from engine_env import BaselineECU
     from plant import charge_temperature
-    ecu = BaselineECU()
+    eng = _plant().engine
+    ecu = BaselineECU(eng.ecu)
 
     def command(a, rpm, mp, comp):
         line = a + ecu.SPARK_B * rpm - ecu.SPARK_C * (mp - 40.0)
@@ -226,7 +239,7 @@ def spark(P):
             continue
         amb = (r.t_amb if np.isfinite(r.t_amb) else 25.0) + 273.15
         ect = (r.ect if np.isfinite(r.ect) else 90.0) + 273.15
-        comp = ecu.iat_compensation(charge_temperature(amb, ect))
+        comp = ecu.iat_compensation(charge_temperature(amb, ect, engine=eng))
         before, line_b = command(SPARK_A_BEFORE, r.rpm, r.map_kpa, comp)
         after, line_a = command(ecu.SPARK_A, r.rpm, r.map_kpa, comp)
         pts.append(dict(rpm=r.rpm, map_kpa=r.map_kpa, meas=r.spark,
@@ -251,7 +264,7 @@ def replay(source):
     validation table on one replay. See car_thermal.py.
     """
     import car_thermal as CT
-    r = CT.thermal_replay(source)
+    r = CT.thermal_replay(source, plant=_plant())
     k = 273.15
     return source, dict(t=r["t"].tolist(), ect_meas=(r["ect_car"] - k).tolist(),
                         ect_model=(r["ect_model"] - k).tolist(),
@@ -274,14 +287,15 @@ def oil_variant(variant, source="7475b5d7-20260908_142743.csv"):
     have to measure.
     """
     import car_thermal as CT
-    from thermal import ThermalParams
-    p = ThermalParams()
+    from dataclasses import replace
+    plant = _plant()
+    p = plant.engine.thermal          # frozen: each variant is a new record
     if variant == "half fuel-to-oil share":
-        p.frac_fuel_to_oil *= 0.5
+        p = replace(p, frac_fuel_to_oil=p.frac_fuel_to_oil * 0.5)
     elif variant == "double oil capacity":
-        p.c_oil *= 2.0
+        p = replace(p, c_oil=p.c_oil * 2.0)
     r = CT.thermal_replay(source, params=p,
-                          pin_block=(variant == "block pinned to measured coolant"))
+                          pin_block=(variant == "block pinned to measured coolant"), plant=plant)
     om, oc = r["oil_model"] - 273.15, r["oil_car"] - 273.15
     ok = np.isfinite(oc)
     return dict(variant=variant, peak_model=float(om.max()), peak_car=float(np.nanmax(oc)),
@@ -305,8 +319,8 @@ def row8_split():
     """
     import car_thermal as CT
     k = 273.15
-    free = CT.thermal_replay(CT.SUSTAINED_DRIVE)
-    pin = CT.thermal_replay(CT.SUSTAINED_DRIVE, pin_block=True)
+    free = CT.thermal_replay(CT.SUSTAINED_DRIVE, plant=_plant())
+    pin = CT.thermal_replay(CT.SUSTAINED_DRIVE, pin_block=True, plant=_plant())
     sl = CT.hottest_window(free["oil_car"])
     med = lambda v: float(np.nanmedian(v[sl]) - k)
     car_oil, car_ect = med(free["oil_car"]), med(free["ect_car"])
@@ -375,8 +389,7 @@ def oil_identification(inputs):
     that load the oil hardest: 7475b5d7 (hard pulls) and drive10 (the only drive
     inside the published 115-140 C band). No parameter in thermal.py is changed.
     """
-    from thermal import ThermalParams
-    p = ThermalParams()
+    p = _plant().engine.thermal
     ua_bo, ua_oa = p.ua_block_oil, p.ua_oil_amb
 
     def sim(a, frac, cap):
@@ -413,7 +426,7 @@ def oil_identification(inputs):
 def knock_all_samples():
     """AUDIT.md H5 reproduced on every sample of 7475b5d7, not the 1 Hz grid."""
     from plant import predict, charge_temperature
-    from engine_env import GEO
+    eng = _plant().engine
     S = pd.read_csv(os.path.join(HERE, "data", "master_samples.csv"))
     d = S[(S.source == "7475b5d7-20260908_142743.csv")].copy()
     d = d[np.isfinite(d.spark_tgt) & np.isfinite(d.spark) & np.isfinite(d.map_kpa)
@@ -421,11 +434,11 @@ def knock_all_samples():
     ki = []
     for _, r in d.iterrows():
         t_ch = charge_temperature((r.t_amb if np.isfinite(r.t_amb) else 30.0) + 273.15,
-                                  (r.ect_c if np.isfinite(r.ect_c) else 90.0) + 273.15)
+                                  (r.ect_c if np.isfinite(r.ect_c) else 90.0) + 273.15, engine=eng)
         lam = r.lam if np.isfinite(r.lam) and 0.5 < r.lam < 1.5 else 1.0
         o = predict(rpm=r.rpm, map_kpa=r.map_kpa, iat_k=t_ch,
                     ect_k=(r.ect_c if np.isfinite(r.ect_c) else 90.0) + 273.15,
-                    spark_btdc=r.spark, lam=lam, geo=GEO)
+                    spark_btdc=r.spark, lam=lam, engine=eng)
         ki.append(o["knock_integral"])
     ret = (d.spark_tgt - d.spark).to_numpy()
     ki = np.array(ki)
@@ -439,7 +452,7 @@ def knock_all_samples():
 def gearbox(S):
     """Overall ratio the car actually ran, against the published ratios."""
     from engine_env import Vehicle
-    veh = Vehicle()
+    veh = Vehicle(_plant().car)
     m = S[(S.v_kmh > 20) & (S.rpm > 700)]
     overall = (m.rpm * 2 * np.pi / 60.0) * veh.wheel_r / (m.v_kmh / 3.6)
     overall = overall[np.isfinite(overall) & (overall > 1.0) & (overall < 20.0)]
@@ -466,7 +479,8 @@ def envelope(S):
     # inlet conditions so the curve is drawn on the corrected axis it was fit on.
     t_ref, p_ref = 298.0, 99.3
     per_gps = corrected_flow(1.0, t_ref, p_ref)
-    curve = [boost_ceiling_kpa(f / per_gps, t_ref, p_ref) / p_ref for f in flows]
+    eng = _plant().engine
+    curve = [boost_ceiling_kpa(f / per_gps, t_ref, p_ref, engine=eng) / p_ref for f in flows]
     return dict(flow=take.corr_flow.round(4).tolist(),
                 pr=take.press_ratio.round(3).tolist(),
                 curve_flow=list(flows), curve_pr=curve, n=len(st),
@@ -476,11 +490,12 @@ def envelope(S):
 # ============================================================= duty cycle
 def duty_cycle(S):
     """Where the car was driven, against where the scenario is scored."""
-    from engine_env import SupervisoryTunerEnv, make_grade_climb, neutral_action
+    from engine_env import SupervisoryTunerEnv, locked_climb, neutral_action
     m = S[(S.v_kmh > 5) & np.isfinite(S.map_kpa) & np.isfinite(S.rpm)]
     H, xe, ye = np.histogram2d(m.rpm, m.map_kpa, bins=[np.linspace(600, 7000, 65),
                                                         np.linspace(20, 260, 61)])
-    env = SupervisoryTunerEnv(make_grade_climb(duration=720.0, dt=1.0), dt=1.0, seed=0)
+    plant = _plant()
+    env = SupervisoryTunerEnv(locked_climb(plant, duration=720.0, dt=1.0), plant=plant, dt=1.0, seed=0)
     env.reset(seed=0)
     a = neutral_action()
     rpm, mp = [], []
