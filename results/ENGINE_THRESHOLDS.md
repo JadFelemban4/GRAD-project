@@ -2,6 +2,19 @@
 
 <!-- written by python engine_thresholds.py from thresholds/document_template.md: never edit it by hand -->
 
+**Version 5, written 23 October 2026 by its generator, `engine_thresholds.py`, before any fit:
+version 4 with decision 77 written as the rule of the in-sample stage, and Ghassan's order of the
+same day that Run 1 go ahead before Jad's column is filled recorded.** Decision 77
+(`results/VALIDATION_DECISIONS.md` section H, adopted under Ghassan's delegation of 21 October as
+every decision of that section is) counts an in-sample statistic against a form only when its
+failure exceeds its sampling noise, |E_cal| − 2·u_stat > R, and lets one that does not fail and
+whose 2·u_stat > R neither block nor pass (section 2.4). T0, the synthetic recovery of
+`docs/build_step_2/PLAN.md` section 5.10, raised it: under version 4's criterion a form-A truth
+climbed to A+B+C+D, because its in-sample E4b failed at every form from noise alone. No R, split,
+population, statistic, convention or label rule moved, and no number of version 4's JSON. Section 14
+says what changed, why, and what is open; version 4's own account, in the next paragraph and in
+section 13, is kept as version 4 wrote it.
+
 **Version 4, written 22 October 2026 by its generator, `engine_thresholds.py`, after the plant
 changes of build step 2 and before any fit, and corrected seven times on 23 October, after each of
 its seven reviews, of which the first, fourth and fifth raised decisions 73-76, written into section
@@ -50,17 +63,22 @@ turned version 2's scripts into the generator and ran it; and version 4's nine, 
 October after its first review, of 23 October that wrote decisions 73 and 74 in, of 23 October after
 its second review, of 23 October after its third, of 23 October after its fourth, which wrote
 decision 75 in, of 23 October after its fifth, which wrote decision 76 in, of 23 October after its
-sixth, and of 23 October after its seventh, each of which re-ran its last two steps) no model was
-run on an EPA row and no model-versus-EPA error was computed. `calibrate_epa.py` does not exist in
-the working tree, and no script in the tree runs the cycle on an EPA table: the files that name the
+sixth, and of 23 October after its seventh, each of which re-ran its last two steps; and version
+5's, of 23 October, which re-ran the same two) no model was run on an EPA row and no
+model-versus-EPA error was computed. `calibrate_epa.py` does not exist in the working tree version 5
+was written in, and no script in the tree runs the cycle on an EPA table: the files that name the
 EPA tables are `epa_map.py` and `test_epa_map.py`, which export and test them, and this file's
 generator (`engine_thresholds.py` and `thresholds/`), which reads their structure; the generator
 checks both as it writes this file. Other files name the per-engine folders (`data/engines/<id>/`)
 for the engine records and their derived files, and none of them names an EPA table. Other sessions
 were editing version 3's branch at the same time, and what they ran is not known to this file;
-version 4 was written in a worktree of its own. The EPA tables were read for their structure only:
-speeds, manifold pressures, BMEP, λ, intake and coolant temperatures, the fuel report, which columns
-are present, and each channel's range. Section 9 lists everything that was seen.
+version 4 was written in a worktree of its own, and so was version 5. WP3's scripts,
+`calibrate_epa.py` among them, exist uncommitted in the main working tree (branch `wp3-work`), and
+T0, as reported to version 5's session, ran WP3's fitting procedure on synthetic rows and read no
+EPA output (section 14); none of them, and nothing they wrote, is in the tree version 5 was written
+on. The EPA tables were read for their structure only: speeds, manifold pressures, BMEP, λ, intake
+and coolant temperatures, the fuel report, which columns are present, and each channel's range.
+Section 9 lists everything that was seen.
 
 > **Rule 0. Nothing in this file changes after any fit runs:** no R, split, population, statistic,
 > convention or rule of the model form, for any engine, the B58's table included. A change after
@@ -510,11 +528,38 @@ Fixed now:
   with the same definitions, populations and line minima. These are fit residuals and are never
   labelled.
   - **Each engine its own form** (version 4, decision 49). An engine's form is the first of A,
-    A+B, A+B+C, A+B+C+D at which every one of its own in-sample statistics but E8 (below)
-    satisfies |E_cal| ≤ R.
+    A+B, A+B+C, A+B+C+D at which none of its own in-sample statistics but E8 (below) fails, by
+    the rule below (version 5, decision 77; version 4 required |E_cal| ≤ R of each).
     If none does, its form is A+B+C+D, and the failing in-sample statistics are reported. The three
     EPA engines need not share a form, and each engine's form and its residual structure are
     reported (mistake 20).
+  - **A statistic fails a form only when its failure exceeds its sampling noise** (version 5,
+    decision 77): when |E_cal| − 2·u_stat > R, with R the row's (below) and u_stat computed exactly
+    as for the held-out rows (section 3): the standard error of the mean with one row or hold per
+    cluster, the pooled u_stat for a pooled row (D1, E4b), L0's at its maximising f, and L1's from
+    its two extreme lines. **A statistic that does not fail and has 2·u_stat > R neither blocks the
+    form nor passes it**, and is recorded so per form, as a statistic with no calibration line is
+    (decision 55, below). One that does not fail and has 2·u_stat ≤ R passes. This is the held-out
+    rule of section 3, under which a line decides off whatever its scatter and certifies a pass only
+    if 2·u_stat ≤ R, applied with the sampling term the in-sample stage has.
+    - **Version 5's two readings of decision 77**, written by the agents writing it and noted in its
+      row; neither Ghassan nor Jad has seen them. A statistic with |E_cal| − 2·u_stat > R fails the
+      form whatever its 2·u_stat: decision 77's second clause, "a statistic whose 2 u_stat > R
+      neither blocks nor passes", is read as applying to a statistic that does not fail by its
+      first, since decision 77 counts a failure that exceeds its noise and takes its rule from the
+      held-out off rule; read literally, a statistic failing by more than R + 2·u_stat would block
+      nothing whenever 2·u_stat > R. And a per-line row (E1a, E2a, E3a, E4a, L0) is tested on each
+      calibration line that meets its population's line minimum, as each deciding line is held out:
+      it fails the form if any line fails, passes if no line fails and at least one line has
+      2·u_stat ≤ R, and otherwise neither blocks nor passes. Its worst calibration line is reported
+      as before (section 3). Testing the worst line alone, the one with the largest |E_l|, would let
+      a line that fails beyond its noise pass behind a worse but noisier one.
+    - **Why** (section 14): T0 failed under version 4's |E_cal| ≤ R, a form-A truth climbing to
+      A+B+C+D because its in-sample E4b failed at every form from noise alone, and a criterion that
+      a statistic's own noise can fail adds terms no data asks for. The cost: a form whose in-sample
+      errors lie within their sampling noise is not refused in-sample. The statistics that neither
+      block nor pass are reported with the form chosen, and the held-out statistics then test that
+      form once, under section 7's rules, which decision 77 does not touch.
   - **The R of the in-sample stage is the one this file states for each row.** L1's is 9.9 K: its
     tightening (section 4, decision 71) is measured on decision 34's roads, drawn on the frozen
     plants after the in-sample stage (the JSON's `order_of_work`), so a tightened R gates the
@@ -1624,16 +1669,21 @@ tightenings stay as measured on the roads as first drawn, and the redraws are di
   collapse test's equivalence margin, b with six parts, and E8's expected untested label on every
   engine with its band. Decisions 37, 38 and 36 settled them on 21 October
   (`results/VALIDATION_DECISIONS.md` section G): the margin is the MEI (section 1.1), b = MEI/6
-  (section 1.3), and an untested row with a statistic enters with its band (section 7). Still open,
-  and holding the first fit: Jad's column of those three decisions, and of decisions 39-76 of
-  section H (66 dropped), whose rules of this file version 4 wrote as text (section 13); and
-  Ghassan's own answer to decisions 73-76 and to the readings the agents added to decisions 54, 59
-  and 64 on 23 October. His column of both sections records his delegation of 21 October, and for
-  these rows and readings it records only that: no answer of his to them is recorded, and the sheet
-  asks both of them to answer them before the first fit. An answer of Jad's that differs, or a
-  different answer of Ghassan's, given before the first fit, is applied before it, in this file's
-  generator, as a new version. The questions the seventh review of version 4 left hold the first fit
-  too: a later version of this file settles them before it (section 13).
+  (section 1.3), and an untested row with a statistic enters with its band (section 7). Still open:
+  Jad's column of those three decisions, and of decisions 39-77 of section H (66 dropped), whose
+  rules of this file versions 4 and 5 wrote as text (sections 13 and 14); and Ghassan's own answer
+  to decisions 73-76, to the readings the agents added to decisions 54, 59 and 64 on 23 October, and
+  to version 5's readings of decision 77. His column of both sections records his delegation of 21
+  October, and for these rows and readings it records only that. **They no longer hold the first
+  fit: on 23 October 2026 Ghassan ordered Run 1 to go ahead before Jad's column is filled ("go ahead
+  without it"), as X1 went ahead on his order on 8 October** (`results/VALIDATION_DECISIONS.md`, the
+  notes at the top of sections G and H). His order is recorded as an order, not as an answer to any
+  row. Jad's answers stay his to give. An answer of Jad's that differs, or a different answer of
+  Ghassan's, given before the first fit, is applied before it, in this file's generator, as a new
+  version; given after it, it cannot change version 5 or the frozen calibration (rule 0), and
+  becomes a new contract version and a new fit, reported beside this one. Version 5 does not settle
+  the questions the seventh review of version 4 left for a later version, and Run 1 goes ahead with
+  them open (section 14).
 
 ## 9. Disclosure: what was seen before this was written
 
@@ -1783,6 +1833,16 @@ reason** (`fe_out/design.md:104-116`; `review_0` issue 7). None of the Rs here i
   as the plan states them, and F3, and the hand-offs' commit A item 12; and the plant code
   (`engine_env.py`'s extremes speed profile). It opened no EPA table, read no row value and compared
   nothing with any model.
+- **Seen by version 5's session** (23 October 2026), written in a worktree of its own at `cfe6211`,
+  which also re-ran steps 6 and 7 only and computed no number from EPA data: version 4's two files,
+  its JSON at `a1b88e6` digested to pin what version 5 keeps, the generator and their printouts (the
+  same aggregates: each engine's deepest cell-referenced λ with its table and source row, its floor,
+  the deciding lines and the pooled counts); the decision sheet; `docs/build_step_2/PLAN.md`'s WP3
+  test and run lists, its sections 5.9-5.11 and 10.2, and the lines a search of the plan, its
+  amendments and hand-offs for T0 and synthetic rows printed, the amendments' D10-D14 among them;
+  the main working tree's list of untracked files (WP3's scripts); and T0's outcome, its 12 jobs and
+  587 s, as the task that ordered version 5 reported them, none of T0's outputs opened. It opened no
+  EPA table, read no row value and compared nothing with any model.
 
 **The thresholds are B58-propagated.** Section 1.4's coefficients are the B58's, at its locked
 climb's cell, with its ASSUMED housing constants, except that f is bounded. The same contract with
@@ -1825,7 +1885,9 @@ outputs in seconds, and `--check` exits 1 if either differs from what the code w
    last claim is checked against the .py files a commit would hold. Since version 4 it also reads
    version 3's tree through git (`git show ef5e14e:<file>`: version 3's λ clip and section 13's
    version-3 lines), so the checkout must contain commit `ef5e14e`; a shallow clone or an archive
-   stops it.
+   stops it. Since version 5 it reads version 4's JSON the same way (`git show
+   a1b88e6:results/ENGINE_THRESHOLDS.json`), to check what version 5 keeps of it (section 14), so
+   the checkout must contain `a1b88e6` too.
 
 Version 2's scripts (`split.py`, `alpha_nodes.py`, `b58_propagation.py`, `knee_shift.py`,
 `ecu_shift_one.py` and `build_contract.py`) lived in a session's scratch folder, and version 2's
@@ -2400,6 +2462,114 @@ what each leaves (below).
   - and none from the fifth item left, four citations of lines outside the repository that Appendix
     A does not quote and the scan resolves by the file's name alone: it leaves the roads step
     nothing to settle, and that version quotes them or tightens the scan.
+
+## 14. Version 5: decision 77, before any fit
+
+Written 23 October 2026 by `python engine_thresholds.py --build-only`, on the tree of `cfe6211`
+(version 4, `a1b88e6`, and its checkpoint; the plant code is commit A's, `7a40b9f`), in a worktree
+of its own, and before any fit. No step of 1-5 re-ran: the JSON's `generator_inputs_sha256` and
+`epa_tables_sha256` are version 3's, and so is every number computed from steps 1-5. Version 5 adds
+no number computed from data and no rule constant. It writes one decision of section H as a rule of
+this file, decision 77, and records one order of Ghassan's.
+
+**Why.** T0, the synthetic recovery of `docs/build_step_2/PLAN.md` section 5.10, generates outputs
+from a known truth at the calibration rows' input columns and runs the whole fitting procedure on
+them, and it passes only if, among other things, "the A-truth seeds stop at A". Run on 23 October
+2026 at the production crank step (12 jobs, 587 s, as reported to the session that wrote version 5),
+it failed under version 4's criterion, every in-sample statistic but E8 at |E_cal| ≤ R: a form-A
+truth climbed the ladder to A+B+C+D, because its in-sample E4b failed at every form from noise
+alone. The truth lies in form A, so the data asked for none of the terms the ladder added: version
+4's criterion counted a statistic's own sampling noise against the form. Decision 77, written into
+section H with this version and adopted under Ghassan's delegation of 21 October as every decision
+of that section is, applies to the in-sample stage the rule the held-out rows already follow, the
+off rule |E| − 2·u_val > R, with the sampling term the in-sample stage has, u_stat. It moves no R,
+split, population or statistic, and was decided before any fit, on synthetic data only.
+
+**Rule 0, and T0.** As the plan specifies T0 and as its run was reported to version 5's session, T0
+ran the fitting procedure on synthetic rows: it read the calibration rows' input columns, not their
+outputs (`docs/build_step_2/PLAN.md` section 5.10: "No EPA output is read"), and compared no model
+with an EPA torque, fuel or TIT value. Version 5 reads the fit of rule 0 as a fit to EPA data, Run
+1's calibration, as this file's claims that nothing has been fitted read it (section 10): they check
+that no `calibrate_epa.py`, no output of one and no EPA engine's derived file exists, and they hold
+on the tree version 5 was written on. The plan runs T0 before that fit, "after the contract version
+is final" (its WP3). T0 ran under version 4, and the failure it found is in version 4's criterion, a
+rule of this file, which only a version written before the fit can change; version 5 is that
+version.
+
+**What changed.**
+
+- **The in-sample stage's form criterion** (section 2.4; the JSON's `model_form.in_sample_stage`,
+  `in_sample_rules.form_per_engine` and the new `in_sample_rules.sampling_noise`). Version 4: an
+  engine's form is the first at which every one of its own in-sample statistics but E8 satisfies
+  |E_cal| ≤ R. Version 5: the first at which none of them fails, a statistic failing only when
+  |E_cal| − 2·u_stat > R; one that does not fail and has 2·u_stat > R neither blocks nor passes, and
+  is recorded per form, as decision 55's statistic with no calibration line is; and u_stat is the
+  held-out rows' own (section 3). E8 stays outside the criterion (decision 39(a)), a statistic with
+  no calibration line still neither blocks nor passes (decision 55), and the R is still the one this
+  file states for each row, L1's untightened (decision 71).
+- **Version 5's two readings of decision 77** (section 2.4, and noted in decision 77's row): a
+  statistic that fails beyond its noise fails the form whatever its 2·u_stat, and a per-line row is
+  tested line by line. The agents writing version 5 wrote them on 23 October, each with its reason,
+  and neither Ghassan nor Jad has seen them.
+- **The go-ahead.** On 23 October 2026 Ghassan ordered Run 1 to go ahead before Jad's column of
+  decisions 36-77 is filled ("go ahead without it"), as X1 went ahead on his order on 8 October. It
+  is recorded at the top of sections G and H of the decision sheet, in section 8 and in the JSON
+  (`open_for_the_team`, `version_5.go_ahead`). It is an order, not an answer to any row, and it
+  changes no rule of this file.
+- **The text around them:** the header, section 8's open items, sections 9 and 10, and the JSON's
+  `_generated`, `decisions.77`, `open_for_the_team`, `seen_before_writing` (one entry appended,
+  version 5's session) and `version_5`, this version's record.
+
+**What did not move.**
+
+- Every R, split, population, statistic, convention and label rule, and every rule of the model form
+  but the in-sample criterion. Every part of version 4's JSON (`a1b88e6`) but the strings named
+  above is version 5's, every number, R and rule included, and every key path of version 4's is
+  kept: step 7 checks both against digests of version 4's JSON (`thresholds/document.py`,
+  `V4_DIGESTS`, which it also checks against version 4's JSON read through git), and stops if one
+  differs. Version 3's digests (section 13) still hold. The held-out stage, its labels and section
+  7's on-failure rules are version 4's: decision 77 is a rule of the in-sample stage, whose
+  statistics are fit residuals and are never labelled.
+- **Version 4's record is kept as version 4 wrote it:** section 13 here, whose counts of version 4's
+  entries step 7 reads from version 4's JSON, and `version_4` in the JSON, which the digest above
+  covers. Where section 13 says what holds the first fit, section 8 and this section give the state
+  under version 5.
+- **The JSON's `schema` stays 4.** Version 5 adds three keys, each of a kind schema 4 already has:
+  decision 77's entry in `decisions`, its rule in `model_form.in_sample_rules` (`sampling_noise`,
+  with fields of its own), and `version_5`, this version's record beside `version_4`. Every key of
+  version 4 is kept where it was, with its meaning, so a script that reads schema 4 reads version 5
+  unchanged. The strings that changed are the ones named above, and `generators.sha256`, the
+  generator's own hashes.
+
+**What is open.**
+
+- **Jad's column, and Ghassan's own answers.** Jad's column of decisions 36-38 (section G) and 39-77
+  (section H, 66 dropped) is empty. Ghassan's column records his delegation of 21 October; for
+  decisions 73-76 and the readings the agents added to decisions 54, 59 and 64 on 23 October it
+  records only that, not an answer of his ("adopted by the agents 23 Oct, not yet seen"); decision
+  77's cell reads "delegated 21 Oct: adopted", and version 5's readings of it have been seen by
+  neither of them. Run 1 no longer waits for these answers, on Ghassan's order above. Jad's answers
+  stay his to give. An answer that differs, given before the first fit, is applied before it, as a
+  new version written by this generator; given after it, it cannot change version 5 or the frozen
+  calibration (rule 0), and becomes a new contract version and a new fit, reported beside this one.
+  They answer from the team's dated copy of the sheet on the Desktop (section 13); version 5's
+  session did not open it, and the commit step brings it up to the sheet as committed, decision 77
+  and the go-ahead included, before either of them is asked.
+- **T0 under version 5.** `docs/build_step_2/PLAN.md` section 5.10 passes T0 only if the A-truth
+  seeds stop at A and the B-truth seed's ladder stops at A+B. T0 has not run under version 5's
+  criterion, and whether it passes is not known to this file. The in-sample stage that applies the
+  criterion is WP3's, in scripts not committed when version 5 was written; it reads
+  `model_form.in_sample_rules.sampling_noise`.
+- **The seventh review's questions** (section 13). Version 5 does not settle them, and Run 1 goes
+  ahead with them open. A version written before Run 1 may still settle them; one written after it
+  is, by rule 0, a new contract, disclosed, with every result reported under both.
+- **The claims that nothing has been fitted** hold on the tree version 5 was written on. Once
+  `calibrate_epa.py` is committed, step 7's claims that it does not exist and that only the
+  generator, `epa_map.py` and `test_epa_map.py` name the EPA tables stop the generator, so a later
+  version edits them, still proving from what a fit leaves behind that no fit has run (section 13).
+- **No review.** Version 5 has had no review; version 4 had seven.
+- The rest of section 13's open list stands: the roads' own seed, the roads and the time step they
+  are scored at; the octane of the Ford's Cell 9 rows; a documented λ-sensor floor.
 
 ## Appendix A. Lines cited from outside the repository, verbatim
 

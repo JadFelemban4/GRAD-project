@@ -40,6 +40,17 @@ moves; step 7 checks each code citation's line). The JSON's schema is 4 because 
 new rules; version_4 lists them. plant_values() reads the few numbers the text takes from the plant
 code itself (the neutral action, the shared rich slope, the B58's lambda clip), and version_4
 records them, since no sha256 of the JSON covers the plant code.
+
+VERSION 5 (23 October 2026, on the tree of cfe6211, before any fit). Version 4 with one rule of the
+model form changed: decision 77 of results/VALIDATION_DECISIONS.md section H, raised by T0, the
+synthetic recovery of docs/build_step_2/PLAN.md section 5.10, which failed under version 4's in-sample
+criterion. An in-sample statistic fails a form only if |E_cal| - 2*u_stat > R, and one that does not
+fail with 2*u_stat > R neither blocks nor passes (model_form.in_sample_stage, in_sample_rules
+form_per_engine and the new sampling_noise). It also records Ghassan's order of 23 October that Run 1
+go ahead before Jad's column is filled (open_for_the_team, version_5.go_ahead). No R, split,
+population, statistic, convention or label rule moved, and no number: step 7 checks that every part
+of the JSON but the strings version_5 names is version 4's (V4_TREE), and version_4, version 4's
+record, is kept verbatim. The schema stays 4 (version_5.schema says why).
 """
 import csv
 import glob
@@ -72,6 +83,7 @@ BATCH = {"26864": "mazda_25t", "25842": "honda_l15b7", "25278": "ford_27tt"}
 DECISIONS_DOC = "results/VALIDATION_DECISIONS.md"
 V3_TREE = "ef5e14e"             # version 3's commit: the tree its code citations name
 V3_LAM_CLIP = (0.70, 1.25)      # version 3's lambda clip, every engine: engine_env.py line 1006 of V3_TREE (step 7 checks it)
+V4_TREE = "a1b88e6"             # version 4's commit: the JSON version 5 keeps all but its version_5 strings of (step 7 checks it)
 # Decisions 73-76 were raised on 23 October 2026 by the reviews of version 4 and written into section H by the
 # agents writing it, two days after Ghassan's delegation of 21 October; section H adopts each under that
 # delegation, as it adopts 39-72, which the agents wrote in on 22 October (version 4's fourth review; the second
@@ -980,7 +992,10 @@ def build(inp, generators, d3, n_shares=N_SHARES):
         f"{E8_MIN_ROWS} rows: conventions.statistic_details.e8_subsets)"))
     assert fail_d["untested"] != FAIL["d"]["untested"]
     contract = {
-        "_generated": ("the machine-readable half of results/ENGINE_THRESHOLDS.md (version 4, 22 October 2026, corrected seven times "
+        "_generated": ("the machine-readable half of results/ENGINE_THRESHOLDS.md (version 5, 23 October 2026, before any fit: "
+                       f"version 4 with decision 77 of {SH} written as the rule of the in-sample stage, and Ghassan's order "
+                       "of 23 October that Run 1 go ahead before Jad's column is filled recorded (version_5); "
+                       "version 4, 22 October 2026, corrected seven times "
                        f"on 23 October after its seven reviews, of which the first, fourth and fifth raised decisions 73-76, written in on the same day and adopted "
                        f"under the delegation of 21 October as every decision of {SH} is: version 3 with the rule text of decisions "
                        f"39, 57 and 73-76 of {SH}, written after the plant changes of build step 2 and before any fit; "
@@ -1054,7 +1069,14 @@ def build(inp, generators, d3, n_shares=N_SHARES):
                              f"cap, both fixed in this contract before any fit and from no data (DESIGN); each slot's stream drawn "
                              f"with the first draw's code from numpy.random.default_rng([roads_seed, 0x{REDRAW_STREAM_TAG:X}, k]), "
                              f"fixed by the roads' own seed alone (the derivation after the sixth review; cars C5 redraw cap, "
-                             f"discards, stream; {SH}, {RAISED_V4})")},
+                             f"discards, stream; {SH}, {RAISED_V4})"),
+                      "77": ("the in-sample form criterion counts a statistic against a form only when its failure exceeds "
+                             "its sampling noise: a gating in-sample statistic fails a form only if |E_cal| - 2*u_stat > R, "
+                             "u_stat computed exactly as for the held-out rows, and one whose 2*u_stat > R neither blocks nor "
+                             "passes, recorded per form as decision 55's gap is (model_form.in_sample_rules.sampling_noise, "
+                             "with version 5's two readings of it); raised on 23 October 2026 by T0, the synthetic recovery "
+                             "of docs/build_step_2/PLAN.md section 5.10, which failed under version 4's criterion, and "
+                             f"written in by the agents writing version 5 ({SH}, {ADOPTED_H})")},
         "mei_points": MEI, "r1_housing_k": R1_K,
         "budget": {"b_points": round(B, 3), "b_over_mei": round(B_FRAC, 6), "parts": [dict(id=p, what=w, rows=r) for p, w, r in PARTS],
                    "n_parts": len(PARTS), "linear_sum_points": round(LINEAR, 3), "rss_points": round(RSS, 3),
@@ -1222,14 +1244,59 @@ def build(inp, generators, d3, n_shares=N_SHARES):
             "alternatives_in_order": ["B: VE in rpm and MAP (a linear MAP term)", "C: a per-engine rich-side slope of combustion_efficiency, fitted on enriched hot calibration rows",
                                       "D: the intake cam phase as an input to VE through a schedule cam(rpm, MAP) fitted to EPA's Intake Cam Phase on calibration rows, scheduled by the ECU"],
             "in_sample_stage": ("every gating statistic computed on the calibration lines with the same definitions (fit residuals, never "
-                                "labelled); each engine's form is the first of A, A+B, A+B+C, A+B+C+D at which every one of its own "
-                                "in-sample statistics satisfies |E_cal| <= R, E8 aside and a statistic with no calibration line neither "
-                                "blocking nor passing (in_sample_rules, version 4); if none does, A+B+C+D, with the failing statistics "
+                                "labelled); each engine's form is the first of A, A+B, A+B+C, A+B+C+D at which none of its own "
+                                "in-sample statistics fails, a statistic failing a form only if |E_cal| - 2*u_stat > R (version 5, "
+                                "decision 77: in_sample_rules.sampling_noise; version 4 required |E_cal| <= R of each), E8 aside, and "
+                                "a statistic with no calibration line, or one that does not fail and has 2*u_stat > R, neither "
+                                "blocking nor passing (in_sample_rules); if none does, A+B+C+D, with the failing statistics "
                                 "reported; then the form and constants are frozen (sha256) and the held-out statistics are computed once"),
             "in_sample_rules": {
-                "form_per_engine": (f"decision 49 ({SH}, {ADOPTED_H}): each engine its own form, the first that ITS in-sample statistics "
-                                    "pass; the three EPA engines need not share one; each engine's form and its residual structure are "
-                                    "reported (mistake 20)"),
+                "form_per_engine": (f"decision 49 ({SH}, {ADOPTED_H}): each engine its own form, the first at which none of ITS "
+                                    "in-sample statistics fails (the criterion is sampling_noise's, version 5); the three EPA engines "
+                                    "need not share one; each engine's form and its residual structure are reported (mistake 20)"),
+                "sampling_noise": {
+                    "decision": (f"77 ({SH}, {ADOPTED_H}; raised on 23 October 2026 by T0, docs/build_step_2/PLAN.md section "
+                                 "5.10; written in by the agents writing version 5)"),
+                    "fails": ("a gating in-sample statistic fails a form if and only if |E_cal| - 2*u_stat > R, R the row's "
+                              "(r_in_sample), whatever its 2*u_stat (version 5's reading (a), below)"),
+                    "neither": ("a statistic that does not fail and has 2*u_stat > R neither blocks the form nor passes it, and is "
+                                "recorded so per form, as a statistic with no calibration line is (no_calibration_line, decision 55)"),
+                    "passes": "a statistic that does not fail and has 2*u_stat <= R passes",
+                    "u_stat": ("computed exactly as for the held-out rows (conventions.u_val): the standard error of the mean with "
+                               "one row or hold per cluster; the pooled u_stat for a pooled row (D1, E4b); L0 at its maximising "
+                               "f; L1 from its two extreme lines (rows L1 statistic)"),
+                    "per_line": ("version 5's reading (b): a per-line row (E1a, E2a, E3a, E4a, L0) is tested on each calibration "
+                                 "line that meets its population's line minimum, as each deciding line is held out: it fails the "
+                                 "form if any line fails, passes if no line fails and at least one has 2*u_stat <= R, and "
+                                 "otherwise neither blocks nor passes; its worst calibration line is reported with its u_stat, "
+                                 "as before (conventions.statistic_details.lines)"),
+                    "readings": ("version 5's two readings of decision 77, written by the agents writing it on 23 October 2026, "
+                                 "noted in its row and seen by neither Ghassan nor Jad: (a) a statistic with |E_cal| - 2*u_stat "
+                                 "> R fails the form whatever its 2*u_stat: decision 77's second clause ('a statistic whose 2 "
+                                 "u_stat > R neither blocks nor passes') is read as applying to a statistic that does not fail by "
+                                 "its first, since decision 77 counts a failure that exceeds its noise and takes its rule from "
+                                 "the held-out off rule, under which a line decides an off label whatever its scatter (rows, the "
+                                 "line rule); read literally, a statistic failing by more than R + 2*u_stat would block nothing "
+                                 "whenever 2*u_stat > R; (b) per_line: decision 77 names one E_cal and u_stat per statistic, and "
+                                 "the held-out rule it follows labels a row off if any deciding line reads off; testing the worst "
+                                 "line alone, the one with the largest |E_l|, would let a line that fails beyond its noise pass "
+                                 "behind a worse but noisier one"),
+                    "why": ("T0, the synthetic recovery of docs/build_step_2/PLAN.md section 5.10, run at the production crank "
+                            "step on synthetic rows generated at the calibration rows' inputs, failed under version 4's "
+                            "criterion (|E_cal| <= R): a form-A truth climbed the ladder to A+B+C+D, because its in-sample E4b "
+                            "failed at every form from noise alone (12 jobs, 587 s, 23 October 2026, as reported to the session "
+                            "that wrote version 5). A criterion that a statistic's own noise can fail adds terms no data asks "
+                            "for; decision 77 applies the held-out off rule (|E| - 2*u_val > R) with the sampling term the "
+                            "in-sample stage has. It moves no R, split, population or statistic, and was decided before any "
+                            "fit, on synthetic data only"),
+                    "cost": ("a form whose in-sample errors lie within their sampling noise is not refused in-sample; the "
+                             "statistics that neither block nor pass are reported with the form chosen, and the held-out "
+                             "statistics then test that form once, under on_failure's rules, which decision 77 does not touch"),
+                    "unchanged": ("E8 stays outside the criterion (e8, decision 39(a)); a statistic with no calibration line "
+                                  "neither blocks nor passes (no_calibration_line, decision 55); the R is the one this contract "
+                                  "states for each row, L1's untightened (r_in_sample, decision 71); the held-out statistics, "
+                                  "their labels and on_failure are version 4's"),
+                },
                 "e8": (f"decision 39(a) ({SH}): E8 is computed in-sample, with its held-out definition, and reported, but it is outside "
                        "the form criterion: its inputs are the ECU fit alone (the model ECU's lambda and spark at the Final rows), which "
                        "no form A-D changes, so counting it would force A+B+C+D for a reason no form addresses; its held-out row is unchanged"),
@@ -1305,22 +1372,26 @@ def build(inp, generators, d3, n_shares=N_SHARES):
         "tests_lists": TESTS,
         "on_failure": dict(FAIL, d=fail_d), "thresholds": flat,
         "open_for_the_team": [
-            (f"Jad's column of decisions 36-38 ({SG}) and 39-76 ({SH}, 66 dropped) is empty. Ghassan's column of 39-76 "
+            (f"Jad's column of decisions 36-38 ({SG}) and 39-77 ({SH}, 66 dropped) is empty. Ghassan's column of 39-77 "
              "records his delegation of 21 October, under which decisions 73-76, raised on 23 October by the reviews of "
-             "version 4, and the readings the agents added the same day to decisions 54, 59 and 64 are adopted as 39-72 "
-             "are; for these rows and readings it records only the delegation, no answer of his, and their cells say so "
-             "('adopted by the agents 23 Oct, not yet seen'). The first fit (Run 1) waits for both: Jad's column, and "
-             "Ghassan's own answer to those rows and readings, the four rule constants version 4 adds among them "
-             f"(cars C5 redraw cap_redraws and discards_max, steps thin_below_share; conventions.statistic_details.e8_min_rows), "
-             "as the sheet's note of 23 October says ('Both of them answer these rows and readings before the first fit'). "
-             "They answer from the team's dated copy of the sheet on the Desktop, "
-             "C:/Users/badcl/Desktop/decisions_2026-10-22_H.md, which holds section H as of 22 October, without decisions "
-             "73-76 and the readings of 23 October: the commit step updates it with the sheet as committed, before either "
-             "of them is asked (after version 4's seventh review). "
-             "An answer of Jad's "
-             "that differs from the adopted option, or a different answer of Ghassan's, given before the first fit, is "
-             "applied before it: in the code, and, where the decision is a rule of this contract, through a new version written "
-             "by this generator. Once calibrate_epa.py exists, step 7's claims that it does not and that only the generator, "
+             "version 4, decision 77, raised the same day by T0 (version 5), and the readings the agents added the same day "
+             "to decisions 54, 59 and 64 are adopted as 39-72 are; for 73-76 and those readings it records only the "
+             "delegation, no answer of his, and their cells say so ('adopted by the agents 23 Oct, not yet seen'); decision "
+             "77's cell reads 'delegated 21 Oct: adopted', and version 5's two readings of it "
+             "(model_form.in_sample_rules.sampling_noise.readings) have been seen by neither of them. Run 1, the first fit, "
+             "no longer waits for these answers: on 23 October 2026 Ghassan ordered it to go ahead before Jad's column is "
+             "filled ('go ahead without it'), as X1 went ahead on his order on 8 October (version_5.go_ahead; the sheet's "
+             "notes at the top of sections G and H). His order is recorded as an order, not as an answer to any row. Jad's "
+             "answers stay his to give. An answer of Jad's that differs from the adopted option, or a different answer of "
+             "Ghassan's, given before the first fit, is applied before it: in the code, and, where the decision is a rule of "
+             "this contract, through a new version written by this generator. Given after the first fit, it cannot change "
+             "version 5 or the frozen calibration (rule 0): it becomes a new contract version and a new fit, reported beside "
+             "this one. They answer from the team's dated copy of the sheet on the Desktop, "
+             "C:/Users/badcl/Desktop/decisions_2026-10-22_H.md, which version 4's seventh review found holding section H as "
+             "of 22 October, without decisions 73-76 and the readings of 23 October; the session that wrote version 5 did "
+             "not open it, and the commit step brings it up to the sheet as committed, decision 77 and the go-ahead "
+             "included, before either of them is asked. "
+             "Once calibrate_epa.py exists, step 7's claims that it does not and that only the generator, "
              "epa_map.py and test_epa_map.py name the EPA tables stop the generator, so such a version also edits those claims; "
              "the edited claims must still prove that no fit has run, from what a fit leaves behind, as the claims that nothing a "
              "fit writes exists do now (no results/EPA_CALIBRATION/, no EPA engine's data/engines/<id>/derived_params.json, no "
@@ -1329,13 +1400,13 @@ def build(inp, generators, d3, n_shares=N_SHARES):
              "model evaluation, as the held-out run writes one (decision 60), and the edited claims require that record to be "
              "absent; today's claim, that nothing exists under results/EPA_CALIBRATION/, already does. That version's own "
              "section says which claims it edited, and why"),
-            ("commit A's tree: version 4 was written on 4461a91, before the plant commit, and its code citations are pinned to "
-             "that tree (thresholds/document.py CODE_CITES), and its citations of the decision sheet to their rows' text "
-             "(SHEET_CITES); it is committed only after python engine_thresholds.py --check "
-             "exits 0 on commit A's tree, whose claims include the pins and the scan of every other citation (step 7; "
-             "docs/build_step_2/AMENDMENTS.md A3: 'A citation scan resolves every file:line in the regenerated MD against the "
-             "commit-A tree'), and if a pin or the scan fails there the citations are remapped and both files regenerated before "
-             "the commit, still before any fit (docs/build_step_2/HANDOFFS.md, WP2 item 1)"),
+            ("commit A's tree, version 4's item, closed: version 4 was written on 4461a91, before the plant commit, with its "
+             "code citations pinned to that tree (thresholds/document.py CODE_CITES) and its citations of the decision sheet "
+             "to their rows' text (SHEET_CITES), to be committed only after python engine_thresholds.py --check exited 0 on "
+             "commit A's tree (docs/build_step_2/AMENDMENTS.md A3: 'A citation scan resolves every file:line in the "
+             "regenerated MD against the commit-A tree'); it was committed as a1b88e6 on commit A (7a40b9f), its commit "
+             "message recording that --check exit 0. Version 5 was written on cfe6211, whose code is a1b88e6's, and step "
+             "7's pins and scan hold there"),
             ("left to later steps by rules written here: the roads' own seed, which fixes C5's redraw streams through the "
              "derivation of cars C5 redraw.stream and is committed with decision 34's roads, after the freeze and before any "
              "held-out statistic, and never changed after the held-out run (cars C5 redraw.rule_0: rule 0 freezes the rule that "
@@ -1354,7 +1425,17 @@ def build(inp, generators, d3, n_shares=N_SHARES):
              "candidate's extent is an input of the first draw's code or a property its draw must match (redraw.extent). "
              "The fifth item it left, four citations of lines outside the repository that the .md's appendix A does not "
              "quote, which the scan resolves by the file's name alone, leaves the roads step nothing to settle: such a "
-             "version quotes those lines or tightens the scan"),
+             "version quotes those lines or tightens the scan. Version 5 does not settle these questions, and Run 1 goes "
+             "ahead with them open, on Ghassan's order of 23 October (version_5.go_ahead): a version written before Run 1 "
+             "may still settle them; one written after it is, by rule 0, a new contract, disclosed, with every result "
+             "reported under both"),
+            ("version 5's own: T0, which docs/build_step_2/PLAN.md section 5.10 passes only if the A-truth seeds stop at A "
+             "and the B-truth seed's ladder at A+B, and which the plan runs after the contract version is final (its WP3), "
+             "has not run under version 5's criterion, and its result is not known to this contract; the in-sample stage "
+             "that applies model_form.in_sample_rules.sampling_noise is WP3's, in scripts not committed when version 5 was "
+             "written (calibrate_epa.py does not exist in its tree); version 5's two readings of decision 77 "
+             "(sampling_noise.readings) are the agents' and seen by neither Ghassan nor Jad; and version 5 has had no "
+             "review"),
         ],
         "seen_before_writing": [
             "every channel's minimum and maximum (data/engines/<id>/epa_channels.csv), so the EPA maxima of Turbine Inlet Temp: 900.8 C (Mazda, High Load Final), 833.8 C (Honda, Steady State), 840.1 / 841.8 / 858.6 / 856.3 C (Ford Cell 9 SS / HD1 SS / HLI / HLF); the design notes' 904.0 / 833.8 / 863.3 C mix Tier 2 and Tier 3 workbooks (review_1)",
@@ -1443,6 +1524,15 @@ def build(inp, generators, d3, n_shares=N_SHARES):
              "and its sweep as the plan states them, and F3, and the hand-offs' commit A item 12; and the plant code "
              "(engine_env.py's extremes speed profile). No EPA table was opened, no row value was read, and nothing was "
              "compared with any model"),
+            ("version 5's session (23 October 2026), in a worktree of its own at cfe6211, which re-ran steps 6 and 7 only "
+             "(--build-only, --check) and computed no number from EPA data: version 4's two files, its JSON at a1b88e6 "
+             "digested to pin what version 5 keeps, the generator and their printouts (the same aggregates: each engine's "
+             "deepest cell-referenced lambda with its table and source row, its floor, the deciding lines and the pooled "
+             "counts); the decision sheet; docs/build_step_2/PLAN.md's WP3 test and run lists, its sections 5.9-5.11 and "
+             "10.2, and the lines a search of the plan, its amendments and hand-offs for T0 and synthetic rows printed, the "
+             "amendments' D10-D14 among them; the main working tree's list of untracked files (WP3's scripts); and T0's "
+             "outcome, its 12 jobs and 587 s, as the task that ordered version 5 reported them, none of T0's outputs "
+             "opened. No EPA table was opened, no row value was read, and nothing was compared with any model"),
         ],
         "version_4": {
             "written": ("22 October 2026, build step 2's WP2, by engine_thresholds.py --build-only from the outputs of steps 1-5 as "
@@ -1607,6 +1697,50 @@ def build(inp, generators, d3, n_shares=N_SHARES):
                          "spark_sentinel and censored; the .md's section 2.2; the sheet's row 73; the Desktop copy of the "
                          "sheet, open_for_the_team[0]), and five are left for a later version before any fit "
                          "(open_for_the_team[3])"),
+        },
+        "version_5": {
+            "written": ("23 October 2026, by engine_thresholds.py --build-only from the outputs of steps 1-5 as version 3 left "
+                        f"them, on the tree of cfe6211 (version 4, {V4_TREE}, and its checkpoint; the plant code is commit A's, "
+                        "7a40b9f), in a "
+                        "worktree of its own, before any fit"),
+            "decision": (f"77 ({SH}, {ADOPTED_H}), written as model_form.in_sample_rules.sampling_noise, with "
+                         "model_form.in_sample_stage and in_sample_rules.form_per_engine reworded to it"),
+            "why": "model_form.in_sample_rules.sampling_noise.why",
+            "rule_0": ("as the plan specifies T0 and as its run was reported to the session that wrote version 5, T0 ran the "
+                       "fitting procedure on synthetic rows: it read the calibration rows' input columns and no EPA output "
+                       "(docs/build_step_2/PLAN.md section 5.10: 'No EPA output is read'), and compared no model with an EPA "
+                       "torque, fuel or TIT value. Version 5 reads the fit of rule 0 as a fit to EPA data, Run 1's "
+                       "calibration, as step 7's claims that nothing has been fitted read it; they hold on the tree version 5 "
+                       "was written on. The plan runs T0 "
+                       "before that fit, 'after the contract version is final' (its WP3); T0 ran under version 4, and the "
+                       "failure it found is in version 4's criterion, a rule of this contract, which only a version written "
+                       "before the fit can change. WP3's scripts, calibrate_epa.py among them, exist uncommitted in the main "
+                       "working tree (branch wp3-work), not in version 5's tree, and nothing they wrote is in it"),
+            "moved": ("one rule of the model form, the in-sample stage's form criterion (decision 77): version 4 took an "
+                      "engine's form as the first at which every one of its in-sample statistics but E8 satisfies |E_cal| <= "
+                      "R; version 5 takes the first at which none fails, a statistic failing only when |E_cal| - 2*u_stat > "
+                      "R, and one that does not fail with 2*u_stat > R neither blocking nor passing. No R, split, "
+                      "population, statistic, convention or label rule moved"),
+            "go_ahead": ("on 23 October 2026 Ghassan ordered Run 1, the first fit, to go ahead before Jad's column of "
+                         f"decisions 36-77 is filled ('go ahead without it'), as X1 went ahead on his order on 8 October; "
+                         f"recorded at the top of {SG} and of {SH}. It is an order, not an answer to any row, and it changes "
+                         "no rule of this contract. Jad's answers stay his to give; an answer that differs, given after the "
+                         "first fit, cannot change version 5 or the frozen calibration (rule 0) and becomes a new contract "
+                         "version and a new fit, reported beside this one (open_for_the_team[0])"),
+            "kept": (f"every part of version 4's JSON ({V4_TREE}) but the strings named in changed: its keys with their "
+                     "meanings, every number, every rule and every R; step 7 checks this against digests of version 4's "
+                     "JSON, read through git, and version 3's digests still hold. version_4, version 4's record, is kept "
+                     "verbatim, and so is the .md's section 13, version 4's account"),
+            "changed": ("_generated; decisions.77 (new); model_form.in_sample_stage; model_form.in_sample_rules.form_per_engine "
+                        "and sampling_noise (new); open_for_the_team, whose entries 0, 1 and 3 are reworded to the state under "
+                        "version 5 and which gains entry 4; seen_before_writing, which gains one entry, version 5's session; "
+                        "this record (new); and generators.sha256, the generator's own hashes"),
+            "schema": ("4, kept: version 5 adds three keys, two of them with fields of their own, each of a kind schema 4 "
+                       "already has (an entry of decisions, a rule of model_form.in_sample_rules, and this record beside "
+                       "version_4); every key of version 4 is kept "
+                       "where it was, with its meaning, so a script that reads schema 4 reads version 5 unchanged. The "
+                       "contract's own numbering: not the fingerprint's schema 4 of decisions 27-28 and 47"),
+            "open": "open_for_the_team[0], [3] and [4]",
         },
         "generators": {"entry_point": "python engine_thresholds.py",
                        "sha256": dict(generators),

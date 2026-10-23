@@ -55,6 +55,16 @@ fe_out/). The scan checks the file and the range, not the text. The last claims 
 nothing has been fitted: calibrate_epa.py does not exist, only epa_map.py, test_epa_map.py and the
 generator name the EPA tables, and nothing a fit writes exists (results/EPA_CALIBRATION/,
 results/EPA_VALIDATION/, an EPA engine's derived_params.json).
+
+VERSION 5'S CLAIMS (23 October 2026; section 14 of the .md). Version 5 changed one rule of the model
+form, the in-sample criterion (decision 77), and recorded Ghassan's go-ahead for Run 1. claims() checks
+that every part of the JSON but the strings V5_CHANGED names is version 4's (C.V4_TREE), against
+digests pinned in V4_DIGESTS, and that the pins are what git gives for version 4's JSON; that version
+4's key paths are kept and only V5_NEW_KEYS added; that version 5 appends one session to
+seen_before_writing; that decision 77's rule reads the same in the sheet's row 77, section 2.4 and the
+JSON; and that the sheet records the go-ahead at the top of sections G and H. Version 3's checks are
+unchanged. Section 13, version 4's account, is kept as version 4 wrote it: its counts of version 4's
+entries are read from version 4's JSON.
 """
 import hashlib
 import json
@@ -117,6 +127,24 @@ V4_NEW_KEYS = ("version_4", "tests_lists", "model_form.in_sample_rules", "model_
                "cars[7].redraw") + tuple(
                    f"decisions.{n}" for n in ("39", "40", "49", "54", "55", "57", "59", "64", "70", "71", "73",
                                                "74", "75", "76"))
+# Version 5 (section 14). The key paths it added: decision 77's entry, its rule and version 5's record (a path is new
+# if it is one of these or lies under one). The paths whose value version 5 may change: those, and the strings
+# version_5.changed names (generators.sha256 holds the generator's own hashes). Everything else is version 4's JSON
+# (git show a1b88e6:results/ENGINE_THRESHOLDS.json), digested by _digest on 23 October 2026 when version 5 was
+# written: rest, the JSON without V5_CHANGED; key_paths, every key path of version 4's JSON (_key_paths). claims()
+# also checks that git still gives these digests for version 4's JSON.
+V5_NEW_KEYS = ("decisions.77", "model_form.in_sample_rules.sampling_noise", "version_5")
+V5_CHANGED = V5_NEW_KEYS + ("_generated", "model_form.in_sample_stage", "model_form.in_sample_rules.form_per_engine",
+                            "open_for_the_team", "seen_before_writing", "generators.sha256")
+V4_DIGESTS = dict(
+    rest="1659b338bd1075318b8fe9c00ae5359acb525c1b6f5035bddca7ab300bba7615",
+    key_paths="aa0aa8f40a043a21cace634904d96461463db12e32421c1819c10b8652b1b20d")
+# Decision 77's rule as the sheet's row 77, section 2.4 of the .md and the JSON (model_form.in_sample_rules.sampling_noise)
+# each state it; and the go-ahead's note, as the sheet's sections G and H open with it.
+D77_SHEET = ("fails a form only if \\|E_cal\\| − 2u_stat > R", "a statistic whose 2u_stat > R neither blocks nor passes")
+D77_MD = ("|E_cal| − 2·u_stat > R", "neither blocks the form nor passes it")
+D77_JSON = ("fails a form if and only if |E_cal| - 2*u_stat > R", "has 2*u_stat > R neither blocks the form nor passes it")
+GO_AHEAD_NOTE = "> **23 October 2026: Run 1 goes ahead before Jad's column"
 # The values decisions 54 and 57 state, which version 4 writes and version 3 had no rule for (section 13's list,
 # written after version 4's seventh review): the JSON's conventions entry, the phrase its string holds, and the
 # phrase section 13 lists the value by. A convention whose value is edited stops step 7 until section 13 follows it.
@@ -620,12 +648,19 @@ def values(contract, ns, inp):
     V["SCHEMA"] = contract["schema"]
     V["REDRAW_CAP"], V["REDRAW_DISCARDS"], V["E8_MIN_ROWS"] = C.REDRAW_CAP, C.REDRAW_DISCARDS, C.E8_MIN_ROWS
     V["REDRAW_STREAM_TAG"] = f"0x{C.REDRAW_STREAM_TAG:X}"
-    # The lists of strings the key-path check does not enter (section 13), counted against version 3's JSON.
+    # The lists of strings the key-path check does not enter (section 13), version 4's against version 3's JSON: read
+    # from version 4's own JSON since version 5, so that section 13 keeps version 4's account.
     v3 = json.loads(_git_show(C.V3_TREE, "results/ENGINE_THRESHOLDS.json"))
+    v4 = _v4_json()
     V["V3_OPEN_N"] = word(len(v3["open_for_the_team"]))
-    V["V4_OPEN_N"] = word(len(contract["open_for_the_team"]))
-    V["V4_SESSIONS_N"] = word(len(contract["seen_before_writing"]) - len(v3["seen_before_writing"]))
+    V["V4_OPEN_N"] = word(len(v4["open_for_the_team"]))
+    V["V4_SESSIONS_N"] = word(len(v4["seen_before_writing"]) - len(v3["seen_before_writing"]))
     return V
+
+
+def _v4_json():
+    """Version 4's JSON, as its commit C.V4_TREE holds it."""
+    return json.loads(_git_show(C.V4_TREE, "results/ENGINE_THRESHOLDS.json"))
 
 
 def _sheet_row(n):
@@ -633,6 +668,19 @@ def _sheet_row(n):
     with open(os.path.join(common.REPO, SHEET), encoding="utf-8") as fh:
         rows = [l for l in fh.read().splitlines() if l.startswith((f"| {n} |", f"| {n} ("))]
     return rows[0] if len(rows) == 1 else ""
+
+
+def _sheet_opens_with_go_ahead():
+    """Whether sections G and H of the decision sheet each open with the go-ahead's note (the first line after the
+    heading that is not blank)."""
+    with open(os.path.join(common.REPO, SHEET), encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    ok = []
+    for head in ("## G. ", "## H. "):
+        at = [i for i, l in enumerate(lines) if l.startswith(head)]
+        nxt = next((l for l in lines[at[0] + 1:] if l.strip()), "") if len(at) == 1 else ""
+        ok.append(nxt.startswith(GO_AHEAD_NOTE))
+    return all(ok)
 
 
 def _neutral_action():
@@ -877,16 +925,60 @@ def _c5_cases(share, n_max=12):
 
 
 def _section_13(V):
-    """Section 13 of the .md, its whitespace collapsed, so that a phrase the wrap splits is found."""
+    """Section 13 of the .md, its whitespace collapsed, so that a phrase the wrap splits is found (it ends where
+    section 14, version 5's, begins)."""
     md = _rendered(V)
-    return " ".join(md[md.index("## 13. Version 4"):md.index("## Appendix A")].split())
+    return " ".join(md[md.index("## 13. Version 4"):md.index("## 14. Version 5")].split())
+
+
+def _section(V, start, end):
+    """The .md from the heading `start` to the heading `end`, its whitespace collapsed."""
+    md = _rendered(V)
+    return " ".join(md[md.index(start):md.index(end)].split())
+
+
+def _under(path, keys):
+    """Whether a key path is one of keys or lies under one."""
+    return any(path == k or path.startswith(k + ".") or path.startswith(k + "[") for k in keys)
+
+
+def _without(obj, paths):
+    """A copy of a JSON object with the dotted key paths removed (a missing path is skipped)."""
+    out = json.loads(json.dumps(obj))
+    for p in paths:
+        *head, last = p.split(".")
+        node = out
+        for k in head:
+            node = node.get(k) if isinstance(node, dict) else None
+        if isinstance(node, dict):
+            node.pop(last, None)
+    return out
+
+
+def _version_4_kept(contract):
+    """(what, holds) for each part of version 4's JSON that version 5 keeps (section 14), against V4_DIGESTS; and
+    whether git still gives those digests for version 4's JSON."""
+    v4 = _v4_json()
+    paths = lambda obj: hashlib.sha256("\n".join(sorted(p for p in _key_paths(obj) if not _under(p, V5_NEW_KEYS)))  # noqa: E731
+                                       .encode("utf-8")).hexdigest()
+    return [
+        (f"14: the pins of version 4's JSON (V4_DIGESTS) are what git gives for it at {C.V4_TREE}",
+         (_digest(_without(v4, V5_CHANGED)), paths(v4)) == (V4_DIGESTS["rest"], V4_DIGESTS["key_paths"])),
+        ("14: every part of version 4's JSON but the strings version 5 changes (V5_CHANGED) is version 5's: every "
+         "number, R, rule and population, and version_4", _digest(_without(contract, V5_CHANGED)) == V4_DIGESTS["rest"]),
+        ("14: every key path of version 4's JSON is version 5's, and no key but V5_NEW_KEYS is added",
+         paths(contract) == V4_DIGESTS["key_paths"]),
+        ("14: version 5 appends one entry to version 4's seen_before_writing, its own session's",
+         contract["seen_before_writing"][:-1] == v4["seen_before_writing"]
+         and len(contract["seen_before_writing"]) == len(v4["seen_before_writing"]) + 1),
+    ]
 
 
 def _version_3_kept(contract):
-    """(what, holds) for each part of version 3's JSON that version 4 keeps (section 13)."""
+    """(what, holds) for each part of version 3's JSON that version 4 keeps (section 13), version 5's new keys set
+    aside with version 4's."""
     t = contract["thresholds"]
-    old_paths = sorted(p for p in _key_paths(contract)
-                       if not any(p == k or p.startswith(k + ".") or p.startswith(k + "[") for k in V4_NEW_KEYS))
+    old_paths = sorted(p for p in _key_paths(contract) if not _under(p, V4_NEW_KEYS + V5_NEW_KEYS))
     return [
         ("the per-threshold values (engine, row, kind, part, R, unit)",
          _digest([[x["engine"], x["row"], x["kind"], x["part"], x["R"], x["unit"]] for x in t]) == V3_DIGESTS["per_threshold"]),
@@ -923,6 +1015,8 @@ def claims(V, contract, ns, inp):
     scan_bad, _ = _citation_scan(contract, V)
     sheet_unpinned, sheet_stale, sheet_moved = _sheet_cites(contract, V)
     row76 = _sheet_row(76)
+    row77 = _sheet_row(77)
+    d77 = contract["model_form"]["in_sample_rules"]["sampling_noise"]
     redraw = next(r for r in contract["cars"] if r["id"] == "C5")["redraw"]
     out = [
         ("1.4: the damage reproduces DRIVE_C_RULE_NUMBERS.txt:42's 848.1", round(V["DMG0"], 1) == CITED["damage"]),
@@ -1020,7 +1114,15 @@ def claims(V, contract, ns, inp):
          == (C.REDRAW_CAP, C.REDRAW_DISCARDS, C.C5_THIN_SHARE, C.E8_MIN_ROWS)),
         ("1 and 13: 'version 4's nine' sessions are seen_before_writing's entries added since version 3",
          V["V4_SESSIONS_N"] == "nine" and "and version 4's nine, of 22 October" in _rendered(V)),
-        ("13: the JSON's schema is 4, and version_4 is its record", V["SCHEMA"] == 4 and "version_4" in contract),
+        ("13 and 14: the JSON's schema is 4, version_4 is version 4's record and version_5 version 5's",
+         V["SCHEMA"] == 4 and "version_4" in contract and "version_5" in contract),
+        ("14: decision 77's rule reads the same in the sheet's row 77 (Ghassan's cell 'delegated 21 Oct: adopted', Jad's "
+         "empty), section 2.4 and the JSON's model_form.in_sample_rules.sampling_noise",
+         all(p in row77 for p in D77_SHEET) and row77.endswith("| delegated 21 Oct: adopted | |")
+         and all(p in _section(V, "### 2.4 ", "### 2.5 ") for p in D77_MD)
+         and D77_JSON[0] in d77["fails"] and D77_JSON[1] in d77["neither"]),
+        ("14: the sheet records Ghassan's go-ahead for Run 1 at the top of sections G and H",
+         _sheet_opens_with_go_ahead()),
         ("13: every code citation into PLANT_CODE and engine_specs/ is pinned in CODE_CITES, and every pin is cited"
          + (f" (not pinned: {sorted(unpinned)}; pinned, not cited: {sorted(stale)})" if unpinned or stale else ""),
          not unpinned and not stale),
@@ -1039,7 +1141,8 @@ def claims(V, contract, ns, inp):
          + (f" (not pinned: {sheet_unpinned}; pinned, not cited: {sheet_stale}; moved: {sheet_moved})"
             if sheet_unpinned or sheet_stale or sheet_moved else ""),
          not sheet_unpinned and not sheet_stale and not sheet_moved),
-    ] + [(f"13: version 3's {what} is version 4's", ok) for what, ok in _version_3_kept(contract)] + [
+    ] + [(f"13: version 3's {what} is version 4's", ok) for what, ok in _version_3_kept(contract)] + _version_4_kept(
+        contract) + [
         ("Nothing has been fitted: calibrate_epa.py does not exist", not os.path.exists(os.path.join(common.REPO, "calibrate_epa.py"))),
         ("Nothing has been fitted: the .py files that name the EPA tables are epa_map.py, test_epa_map.py and "
          "this generator", {p for p in tracked_py() if _names_epa_tables(p) and not _is_generator(p)}
