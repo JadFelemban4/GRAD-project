@@ -1,3 +1,4 @@
 
 == step 7: document
-template thresholds/document_template.md: 346 placeholders (237 values), 38 claims checked against the run, all hold
+template thresholds/document_template.md: 396 placeholders (253 values), 67 claims checked against the run, all hold
+citations of the .md and the JSON: 250 resolved (190 in the repository, 3 of EPA tables by their existence, 57 of files outside it that Appendix A quotes)
