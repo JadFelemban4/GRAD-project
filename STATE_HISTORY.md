@@ -4548,3 +4548,28 @@ GRA-test: build step 1 of decision 24 (four engines), reviewed, corrected and co
    `env.veh.ratio` and `env.veh.branch` directly, and never records the Accord
    (`step_record.gear` refuses a CVT, so `evaluate.run_episode(record=...)`
    cannot).
+
+# Part U — lines rotated out of CHECKPOINT.md, 23 October 2026 (GRA-test: contract version 4 committed on commit A; app.test_results run on commit A)
+
+GRA-test: build step 2's commit A (WP1: each engine's own fuel, lambda clip, cycle forms and intake cam threaded through the plant; the three EPA engines registered, typed, not calibrated), on build step 1 and the validation contract of decision 35 (`results/ENGINE_THRESHOLDS.md`, version 3), certified 23 October · plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3 · the B58 bit-identical to cf43fbb at every level run on this laptop; pending: L8 on the training device, and app.test_results on commit A itself after the squash (`results/B58_IDENTITY.md`)
+
+- `python engine_thresholds.py --check`: the validation contract of decision 35
+  (`results/ENGINE_THRESHOLDS.md` and `.json`, version 3) is what its committed
+  generator writes, and a full re-run on 21 October gave back every output byte
+  for byte. Nothing has been fitted to the three EPA engines.
+
+- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 2's
+  commit A (the plant changes, certified); contract version 4 next, then the
+  calibration scripts (WP3) and Run 1, the first fit, which waits for both
+  columns of decisions 36-75 (`results/VALIDATION_DECISIONS.md` sections G and H,
+  adopted on Ghassan's delegation, Jad's column open; `docs/build_step_2/`).
+  Training runs on another device, not this laptop (Ghassan, 21 October).
+
+8. `GRA-test`, build step 2 (`docs/build_step_2/PLAN.md`, as `AMENDMENTS.md` and
+   `HANDOFFS.md` amend it): contract version 4; the calibration scripts and their
+   tests (WP3); Run 1 and the freeze only after both columns of decisions 36-75
+   (Desktop copies `decisions_2026-10-21_G.md`, `decisions_2026-10-22_H.md`); then
+   decision 34's roads and the L1/E8 tightenings; then the held-out validation, run
+   once. Pending from commit A: `python -m app.test_results` on commit A itself,
+   and L8 on the training device. Schema 4 (decisions 27, 28) before any EPA
+   engine trains.
