@@ -4,8 +4,10 @@
 # ([sources] at the end gives the URL), in the units that source prints. Nothing here is
 # derived: no rolling radius, no drag area, no unit conversion -- the code that builds a Car
 # does those in the open, and engine_specs/cars/README.md says how. A value no source prints is
-# in [not_typed] with the reason, never guessed. Read by nothing yet (build step 1 of the
-# four-engine plants, 20 October 2026); test_epa_map.py checks the form and the EPA row.
+# in [not_typed] with the reason, never guessed. Read by engines.published_car since 22 October
+# 2026 (build step 2 P5), which converts the EPA row's test weight, road load and N/V for the
+# plant (README.md, "Deriving what the model needs"); test_epa_map.py checks the form and the
+# EPA row, test_cars.py the conversions (C1, C2).
 #
 # NO DRIVING DATA EXISTS FOR THIS TRUCK. Argonne's D3 has two F-150s and neither is the 2.7 L
 # (CATALOGUE.md section 6). The shift schedule will be ASSUMED; the published values are below.

@@ -347,8 +347,8 @@
         "file": "plant.py",
         "symbol": "run_cycle",
         "variable": "m_air",
-        "line": 211,
-        "match": "m_air"
+        "line": 219,
+        "match": "m_air ="
       },
       "upstream": [
         "charge_temp",
@@ -434,7 +434,7 @@
       "why": "Fuel affects torque, consumption, exhaust mass and thermal loading.",
       "unit": "g/s",
       "evidence": "MODELLED",
-      "range": "Lambda is clipped to 0.70–1.25 by the environment.",
+      "range": "Lambda is clipped by the environment to the engine's own bounds (ecu.lam_floor–ecu.lam_ceiling): 0.70–1.25 on the B58, the lab's engine.",
       "source": {
         "file": "plant.py",
         "symbol": "run_cycle",

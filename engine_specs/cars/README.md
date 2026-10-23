@@ -10,22 +10,28 @@ source prints is listed under `[not_typed]` with the reason, never guessed.
 
 | file | car | engine (`engine_id`) | gearbox | gaps |
 |---|---|---|---|---|
-| `a90_supra_2020.toml` | Toyota GR Supra 3.0, ZF 8HP51 | `b58` | 8-speed automatic | tyre fitment of our car; the plant keeps its own road load (decision 31, recommended, unanswered) |
+| `a90_supra_2020.toml` | Toyota GR Supra 3.0, ZF 8HP51 | `b58` | 8-speed automatic | tyre fitment of our car; the plant keeps its own road load (decision 31, agreed 21 October) |
 | `cx9_2016_25t.toml` | 2016 Mazda CX-9 2.5 L turbo, FWD (the D3 car) | `mazda_25t` | 6-speed automatic | curb weight only for model year 2019 |
 | `accord_2018_15t.toml` | 2018 Honda Accord LX 1.5 L turbo (the D3 car) | `honda_l15b7` | CVT | the engine map is the 2016 Civic's, not this car's engine |
 | `f150_2015_27tt.toml` | 2015 Ford F-150 2.7 L EcoBoost 4x2 | `ford_27tt` | 6-speed automatic (6R80) | no tyre size, no curb weight, no driving data |
 
-Read by nothing yet: build step 1 of the four-engine plants (20 October 2026) is
-the data. `python test_epa_map.py` (class `CarSpecs`) checks every file's form,
-checks each EPA row against the Test Car List file it cites, and checks the
-Supra's `[repo_current]` against the plant `engines.get("b58")` builds.
+Read by `engines.published_car` since 22 October 2026 (build step 2 P5): it converts
+the CX-9's, the Accord's and the F-150's EPA row for the plant (below, "Deriving what
+the model needs"), and `test_cars.py` checks the conversions (C1, C2). The Supra's file
+is read by no plant: its car is `engine_specs/a90_supra.toml` (decision 31). Build step
+1 of the four-engine plants (20 October 2026) was the data. `python test_epa_map.py`
+(class `CarSpecs`) checks every file's form, checks each EPA row against the Test Car
+List file it cites, and checks the Supra's `[repo_current]` against the plant
+`engines.get("b58")` builds.
 
 **Not the plant's constants.** `engine_specs/<car>.toml` one folder up (for example
 `a90_supra.toml`, read by `engines.py`, written in the same build step) holds what
-the plant runs, each value labelled. The files here hold what the sources print. A
-published value reaches the plant only through code that derives from it, or a
-decision that adopts it — and for the Supra, decision 31 (recommended, both
-columns still open) would adopt none of them.
+the plant runs, each value labelled. The three EPA cars' are `cx9_2016.toml`,
+`accord_2018.toml` and `f150_2015.toml` (build step 2 P6, 22 October 2026); each
+names its file here (`published`), which `engines.published_car` converts. The
+files here hold what the sources print. A published value reaches the plant only
+through code that derives from it, or a decision that adopts it — and for the
+Supra, decision 31 (agreed 21 October, both columns) adopts none of them.
 
 ## The fields
 
@@ -64,8 +70,8 @@ choice between them is visible, not silent.
 (`engine_specs/a90_supra.toml` `[car]`, what `engines.get("b58").car` holds; until
 build step 1 they were `engine_env.py`'s class `Vehicle`), status `REPO`, a copy
 that `test_epa_map.py` checks against the plant. They are not published
-(`REFERENCES.md` section 4b) and they differ from EPA's; decision 31 (recommended,
-unanswered) would keep them for the four-engine test.
+(`REFERENCES.md` section 4b) and they differ from EPA's; decision 31 (agreed 21
+October) keeps them for the four-engine test.
 
 **`[not_typed]`**: quantity → why it is not here, and where it comes from instead.
 
@@ -95,7 +101,11 @@ review 0's item 17 on the four-engine design).
   1 mph. The vehicles strand measured the CX-9's on the D3 data and found it 1.6 %
   smaller than N/V gives (UNVERIFIED here: the D3 data are outside the repository
   and no committed script prints it); for the Accord, a CVT's N/V depends on the
-  ratio it was in. Say which one the code uses.
+  ratio it was in. Say which one the code uses. `engines.published_car` (22 October
+  2026) uses EPA's N/V with each car's top ratio (the CX-9's top gear 0.600, the
+  F-150's 0.69, the Accord's CVT at the top of its range, 0.405) and EPA's own axle
+  ratio (the CX-9's 4.41, not the 4.411 its `[final_drive]` prints); it never splits
+  the road load.
 
 ## The sources' own conditions
 

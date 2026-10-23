@@ -5,8 +5,10 @@ code, and is recomputed whenever the data changes. For the B58 that file is
 data/derived_params.json, written by derive_params.py from the car's own logs
 (build_dataset.py runs it at the end); every later engine gets
 data/engines/<id>/derived_params.json (engine_path). engines.py reads them
-through here when it builds a plant, and engines.DERIVED_FIELDS says which field
-of which record comes from where.
+through here when it builds a plant, and engines.DERIVED_BY_SET says which field
+of which record comes from where: DERIVED_FIELDS for the B58, EPA_DERIVED_FIELDS
+for an EPA engine, the one its spec's derived_set names (since 22 October 2026,
+build step 2 P5; it named DERIVED_FIELDS alone until the review of P5).
 
 WHY, 28 September 2026. The load constant k used to be a fitted constant; it is now
 DERIVED, 269.6 / T_charge at each point, so it moves with the data by
@@ -26,9 +28,12 @@ October 2026, a generic name for one engine's file (the review of build step 1).
 NO SILENT FALLBACK. If a file is missing this raises, naming the command that
 makes it. A default that quietly substitutes some other number is mistake 1
 (the 2.0 L inline-four that ran for three weeks because a default picked it).
-The one exception is derive_params.py itself, which sets DERIVING_PARAMS=1 so
-the modules can be imported while the file is being made; in that mode a missing
-value is NaN, which propagates visibly rather than looking like a number.
+The exceptions are derive_params.py itself, the B58's, and an EPA engine's
+completion, `calibrate_epa.py complete` (build step 2, PLAN.md 5.9: a fresh
+process, as derive_params.py; not written yet; named here since the review of
+P5, 22 October 2026). Each sets DERIVING_PARAMS=1 so the modules can be
+imported while the file is being made; in that mode a missing value is NaN,
+which propagates visibly rather than looking like a number.
 """
 import json
 import math
@@ -47,9 +52,22 @@ def engine_path(engine_id):
 
 
 def _maker(path):
-    if os.path.normcase(os.path.abspath(path)) == os.path.normcase(B58_PATH):
+    """The command that writes the derived file `path`. An EPA engine's,
+    data/engines/<id>/derived_params.json, is written by calibrate_epa.py (build
+    step 2 of decision 24, WP3-WP4, 22 October 2026: not written yet), whose
+    subcommands run in order -- fit (the fit and the freeze), e6, complete, check
+    -- so all four are named (the amendments' wrong claim 7: "--engine <id>" alone
+    named none of them)."""
+    full = os.path.normcase(os.path.abspath(path))
+    if full == os.path.normcase(B58_PATH):
         return "python derive_params.py"
-    return "that engine's calibration script (none is written yet: build step 1 has the B58 only)"
+    folder = os.path.dirname(full)
+    if os.path.basename(full) == "derived_params.json" and \
+            os.path.dirname(folder) == os.path.normcase(ENGINES_DIR):
+        eid = os.path.basename(os.path.dirname(os.path.abspath(path)))
+        return (f"python calibrate_epa.py fit --engine {eid}, then e6, complete and check with the same "
+                "--engine, in that order (build step 2 WP3-WP4; calibrate_epa.py is not written yet)")
+    return "that engine's calibration script (none is written for this file)"
 
 
 def _load(path):

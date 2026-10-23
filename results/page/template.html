@@ -1388,7 +1388,7 @@ html{scroll-behavior:smooth}
       <div class="gl-row"><dt class="gl-ab">850 °C, 1123 K</dt><dd>
         <p><b>The trigger: the knee of the turbine term.</b> At this housing temperature the turbine term is 1 unit a second, and the hand-written policies start protecting. It is a housing temperature, not an exhaust-gas temperature (mistake 23 in CLAUDE.md).</p>
         <div class="gl-eq">1123 K − 273.15 = 849.85 °C ≈ 850 °C<br>the term doubles every 45·ln 2 = {{gl.double_k|.1f}} K hotter</div>
-        <p class="gl-src">engine_env.TURB_PROTECT_K</p>
+        <p class="gl-src">engines.DamageCal.turb_knee_k (1123 K on the B58); engine_env.damage_rate</p>
       </dd></div>
       <div class="gl-row"><dt class="gl-ab">KI</dt><dd>
         <p><b>Knock integral.</b> How close the unburned end gas comes to igniting by itself before the flame reaches it. It is the Livengood–Wu integral of the Douaud–Eyzat ignition delay, from the spark to the end of the burn; at 1 the end gas ignites, which is knock. Untested against the car.</p>
@@ -1470,7 +1470,7 @@ html{scroll-behavior:smooth}
       <div class="gl-row"><dt class="gl-ab">λ</dt><dd>
         <p><b>Lambda, the air–fuel equivalence ratio</b>: the air per unit of fuel, over the chemically exact (stoichiometric) amount. Below 1 the mixture is rich, and the extra fuel cools the exhaust (enrichment).</p>
         <div class="gl-eq">λ = (air ÷ fuel) ÷ 14.7;  from the logs, fuel = air ÷ (14.7 · λ)</div>
-        <p class="gl-src">plant.AFR_STOICH (AFR: air–fuel ratio); car_thermal.py</p>
+        <p class="gl-src">engines.Fuel.afr_st (14.7 on the B58; AFR: air–fuel ratio); car_thermal.measured_fuel_gps</p>
       </dd></div>
       <div class="gl-row"><dt class="gl-ab">EGT</dt><dd>
         <p><b>Exhaust gas temperature</b>: the gas leaving the exhaust port, which heats the turbine housing. No sensor on this car reads it; the model computes it.</p>

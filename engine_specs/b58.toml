@@ -27,6 +27,15 @@
 
 id = "b58b30o1"
 derived = "data/derived_params.json"
+# derived_set -- which fields of this engine's records are DERIVED and where in the
+# derived file each is read (engines.DERIVED_BY_SET): "b58", engines.DERIVED_FIELDS,
+# the fields derive_params.py writes from the car's logs. label DESIGN; source:
+# build step 2 P5 (docs/build_step_2/PLAN.md WP1 P5), 22 October 2026: the EPA
+# engines' set ("epa") is another. A top-level key cannot be a { value, label,
+# source } entry (engines.read_spec reads a table as a section), so its label and
+# source are this comment (amendment B13); it is hashed by its value, and adding it
+# moved plant_sha.
+derived_set = "b58"
 
 [geometry]
 bore = { value = 0.0820, unit = "m", label = "PUBLISHED", source = "82.0 mm. REFERENCES.md section 2, CONFIRMED: Toyota Australia GTP-009045 p. 1; BMW 3 Series 05/2015 p. 7; Toyota global newsroom 28 Nov 2024" }
@@ -83,6 +92,18 @@ cp_exh = { value = 1150.0, unit = "J/kg/K", label = "ASSUMED", source = "exhaust
 octane = { value = 95.0, unit = "RON", label = "PUBLISHED", source = "the fuel the car was logged on: 95 RON, confirmed by the team 29 September 2026 (REFERENCES.md section 2c); the team reports the owner's manual gives 95 RON as the minimum. Was plant.Operating.octane's default" }
 exh_bp_ratio = { value = 1.15, label = "ASSUMED", source = "exhaust manifold pressure as a fixed multiple of intake manifold pressure: 'a stated ASSUMPTION, not a measurement' (plant.py). REFERENCES.md section 4b: CANNOT -- no exhaust pressure channel" }
 exh_bp_min_kpa = { value = 105.0, unit = "kPa", label = "ASSUMED", source = "the backpressure model's floor; no source recorded" }
+# the model's form and the terms of forms B and C (engines.CycleCal), added 22
+# October 2026 (build step 2 of decision 24, P3): the B58 is form A, and its two
+# terms hold the values form A means -- no MAP term, the shared rich slope
+form = { value = "A", label = "DESIGN", source = "the cycle model's form, one of A, A+B, A+B+C (engines.CYCLE_FORMS), and A+B+C+D from build step 2 P4 (results/ENGINE_THRESHOLDS.md, the model form): A, plant.run_cycle as on cf43fbb, because the B58 of this test is X1's plant, frozen (decision 31, results/VALIDATION_DECISIONS.md)" }
+ve_map = { value = 0.0, unit = "per kPa", label = "DESIGN", source = "form B's linear MAP term in the breathing (plant.volumetric_efficiency): none, form A's breathing as on cf43fbb. engines.CycleCal refuses a nonzero one without form B" }
+ve_map_ref_kpa = { value = 100.0, unit = "kPa", label = "DESIGN", source = "the MAP form B's term is taken about (plant.volumetric_efficiency); never read under form A. 100 kPa in every spec (docs/build_step_2/AMENDMENTS.md, decision 41 and section 4)" }
+ce_rich_slope = { value = 0.65, label = "ASSUMED", source = "the rich-side slope of plant.combustion_efficiency, 1 - slope x (1 - lambda): the literal 0.65 of plant.py:91 on cf43fbb (return 1.0 - 0.65 * (1.0 - lam); :59 on c47907b), no source recorded there. Shared by forms A and B (the contract: combustion_efficiency 'shared and not fitted'; engines.SHARED_RICH_SLOPE); form C fits each engine its own. REFERENCES.md section 4b, its row 'combustion: Wiebe, ... fuel properties | plant | CANNOT': combustion efficiency CANNOT be set from this car's logs -- it needs cylinder pressure" }
+# form D's term (engines.CycleCal), added 22 October 2026 (build step 2 of
+# decision 24, P4; decision 41): the B58 has no cam input, form A; the cam
+# schedule that would set the cam is the ECU's, in [ecu]
+ve_cam = { value = 0.0, unit = "per deg CA", label = "DESIGN", source = "form D's linear intake-cam term in the breathing (plant.volumetric_efficiency): none, form A's breathing as on cf43fbb, whose valve events are fixed (results/ENGINE_THRESHOLDS.md, form A: 'no cam input'). engines.CycleCal refuses a nonzero one without form D" }
+cam_ref_deg = { value = 0.0, unit = "deg CA", label = "DESIGN", source = "the cam phase form D's term is taken about (plant.volumetric_efficiency); never read under form A. 0 in every spec (docs/build_step_2/AMENDMENTS.md, decision 41 and D8)" }
 
 [charge]
 rise_k = { value = 12.0, unit = "K", label = "ASSUMED", source = "plant.charge_temperature's rise over ambient: written for the environment before the boost comparison and never tuned to it. REFERENCES.md section 4b: CANNOT -- no post-intercooler sensor" }
@@ -117,6 +138,27 @@ knock_detect_ki = { value = 1.0, label = "ASSUMED", source = "the baseline ECU s
 fan_hi_k = { value = 372.0, unit = "K", label = "ASSUMED", source = "the fan schedule's full-duty rung. REFERENCES.md section 4b: CANNOT -- every fan-actual and fan-duty channel reads zero" }
 fan_lo_k = { value = 367.0, unit = "K", label = "ASSUMED", source = "the fan schedule's low rung, as fan_hi_k" }
 fan_lo_duty = { value = 0.4, label = "ASSUMED", source = "the fan's low-rung duty, as fan_hi_k" }
+# the clip on every policy's lambda (engines.EcuCal), added 22 October 2026 (build
+# step 2 of decision 24, P2): engine_env.py's two literals, value for value
+lam_floor = { value = 0.70, label = "DESIGN", source = "the floor of the clip on every policy's lambda, the baseline's plus the agent's trim (engine_env.SupervisoryTunerEnv.step): the literal 0.70 of engine_env.py:930 on cf43fbb (self.lam = float(np.clip(lam_b + act[1], 0.70, 1.25)); :1006 on c47907b). At most 1 - enr_depth = 0.81, the deepest the ECU enriches, so the neutral action is never clipped (engines.Engine)" }
+lam_ceiling = { value = 1.25, label = "DESIGN", source = "the ceiling of that clip: the literal 1.25 of the same line, as lam_floor. At least 1, the leanest the ECU runs (engines.Engine)" }
+# the intake cam schedule of form D (engines.EcuCal; engine_env.BaselineECU.cam_deg),
+# added 22 October 2026 (build step 2 of decision 24, P4; decision 41, the cam run
+# by the ECU): off on the B58, form A, and all twelve schedule fields 0.0, the
+# neutral values a form without D carries (docs/build_step_2/PLAN.md 5.8)
+cam_on = { value = 0, label = "DESIGN", source = "the ECU runs no intake cam: the B58 is form A, the plant of cf43fbb, whose valve events are fixed (decision 31; results/ENGINE_THRESHOLDS.md, form A: 'no cam input'). engines.Engine requires cam_on 1 exactly when the cycle form has D" }
+cam_c0 = { value = 0.0, unit = "deg CA", label = "DESIGN", source = "the intake cam schedule's constant term (engine_env.BaselineECU.cam_deg): 0.0, the cam is off (cam_on 0), as every field of the schedule" }
+cam_c_rpm = { value = 0.0, unit = "deg CA per 1000 rpm", label = "DESIGN", source = "the schedule's rpm/1000 term, as cam_c0" }
+cam_c_map = { value = 0.0, unit = "deg CA per 100 kPa", label = "DESIGN", source = "the schedule's MAP/100 term, as cam_c0" }
+cam_c_rpm2 = { value = 0.0, unit = "deg CA per (1000 rpm)^2", label = "DESIGN", source = "the schedule's (rpm/1000)^2 term, as cam_c0" }
+cam_c_rpm_map = { value = 0.0, unit = "deg CA per (1000 rpm x 100 kPa)", label = "DESIGN", source = "the schedule's (rpm/1000)(MAP/100) term, as cam_c0" }
+cam_c_map2 = { value = 0.0, unit = "deg CA per (100 kPa)^2", label = "DESIGN", source = "the schedule's (MAP/100)^2 term, as cam_c0" }
+cam_rpm_lo = { value = 0.0, unit = "rpm", label = "DESIGN", source = "the low end of the schedule's input domain in engine speed, as cam_c0" }
+cam_rpm_hi = { value = 0.0, unit = "rpm", label = "DESIGN", source = "the high end of that domain, as cam_c0" }
+cam_map_lo = { value = 0.0, unit = "kPa", label = "DESIGN", source = "the low end of the schedule's input domain in MAP, as cam_c0" }
+cam_map_hi = { value = 0.0, unit = "kPa", label = "DESIGN", source = "the high end of that domain, as cam_c0" }
+cam_lo = { value = 0.0, unit = "deg CA", label = "DESIGN", source = "the low end of the schedule's output clamp, as cam_c0" }
+cam_hi = { value = 0.0, unit = "deg CA", label = "DESIGN", source = "the high end of that clamp, as cam_c0" }
 
 [thermal]
 c_turb = { value = 6000.0, unit = "J/K", label = "ASSUMED", source = "manifold + turbine housing. REFERENCES.md section 4: ASSUMED AND LOAD-BEARING -- it sets tau and so H/tau; no channel on this car measures the turbine, no opened source publishes a housing heat capacity; swept 800-60 000 in generality_test.py" }
@@ -150,3 +192,11 @@ i_clip = { value = 60.0, label = "DESIGN", source = "the integrator's clip, as i
 p_gain = { value = 0.35, unit = "kPa per Nm", label = "DESIGN", source = "the proportional gain, as i_gain" }
 i_out = { value = 0.02, unit = "kPa", label = "DESIGN", source = "the integrator's weight on the pressure, as i_gain" }
 torque_floor_nm = { value = 15.0, unit = "Nm", label = "DERIVED_ONCE", source = "the least torque a training road may ask for: 1.25 x the 12.0 Nm the engine makes with the throttle shut at 1200 rpm and 42 C (measured 8 October 2026 with _track_torque at a request of 0; was engine_env.EXTREME_T_FLOOR_NM)" }
+
+[fuel]
+# The fuel the engine burns (engines.Fuel), added 22 October 2026 (build step 2
+# of decision 24, P1): plant.py's LHV and AFR_STOICH and thermal.py's 44.0e6,
+# value for value. engines.py copies lhv_j_per_kg into the thermal record
+# (ThermalParams.fuel_lhv_j_per_kg); it is never typed in [thermal].
+lhv_j_per_kg = { value = 44.0e6, unit = "J/kg", label = "ASSUMED", source = "gasoline's lower heating value: plant.py:32 on cf43fbb (LHV = 44.0e6, 'gasoline lower heating value'; :42 on c47907b) and thermal.py:227 on cf43fbb (:245 on c47907b), no source recorded there. REFERENCES.md section 4b, its row 'combustion: Wiebe, ... fuel properties | plant | CANNOT': fuel properties CANNOT be set from this car's logs -- they need cylinder pressure" }
+afr_st = { value = 14.7, label = "ASSUMED", source = "gasoline's stoichiometric air-fuel ratio: plant.py:33 on cf43fbb (AFR_STOICH = 14.7; :43 on c47907b), no source recorded there. REFERENCES.md section 4b, its row 'combustion: Wiebe, ... fuel properties | plant | CANNOT': fuel properties CANNOT, as lhv_j_per_kg" }

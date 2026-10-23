@@ -1,8 +1,8 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-21 (on `GRA-test`) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s of 21 October: `results/B58_IDENTITY.md`)
+Last verified: 2026-10-23 (on `GRA-test`, commit A's tree) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s of 23 October: `results/B58_IDENTITY.md`)
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
-GRA-test: build step 1 of decision 24 (four engines), reviewed, corrected and committed 21 October; the validation contract of decision 35 committed the same day, before any fit (`results/ENGINE_THRESHOLDS.md`, version 3) · plant_sha ded8da308863d394 (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 99d2a9658b1258a7 · fingerprint schema 3 · the B58 bit-identical to cf43fbb (`results/B58_IDENTITY.md`)
+GRA-test: build step 2's commit A (WP1: each engine's own fuel, lambda clip, cycle forms and intake cam threaded through the plant; the three EPA engines registered, typed, not calibrated), on build step 1 and the validation contract of decision 35 (`results/ENGINE_THRESHOLDS.md`, version 3), certified 23 October · plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3 · the B58 bit-identical to cf43fbb at every level run on this laptop; pending: L8 on the training device, and app.test_results on commit A itself after the squash (`results/B58_IDENTITY.md`)
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
 `STATE_HISTORY.md` part B, verbatim. This file holds the current state only: the
@@ -33,8 +33,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - `GRA-test` (21 October): no default engine anywhere
   (`python test_engine_threading.py`), and the B58 through `engines.get("b58")`
   is cf43fbb's plant to the bit at every level L1–L8, after the review's fixes
-  (`results/B58_IDENTITY.md`). The EPA maps of the Mazda 2.5 T, Honda L15B7 and
-  Ford 2.7 TT are in `logs/epa/`, read by `epa_map.py` into `data/engines/`
+  (build step 1's certificate, `STATE_HISTORY.md` part S; commit A's is
+  `results/B58_IDENTITY.md`). The EPA maps of the Mazda 2.5 T, Honda L15B7
+  and Ford 2.7 TT are in `logs/epa/`, read by `epa_map.py` into `data/engines/`
   (`python test_epa_map.py`); the four cars' published values in
   `engine_specs/cars/`.
 - On the locked climb no use of the preview can save more than 0.13 points of cut
@@ -66,12 +67,12 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
-- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 1 and
-  the validation contract committed; build step 2 calibrates the three EPA engines
-  and their cars against it next (designed and reviewed first). Training runs on
-  another device, not this laptop (Ghassan, 21 October). Decisions 1-35 answered
-  21 October, both agree; 36-38 (section G) adopted on Ghassan's delegation,
-  Jad's column open (`results/VALIDATION_DECISIONS.md`).
+- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 2's
+  commit A (the plant changes, certified); contract version 4 next, then the
+  calibration scripts (WP3) and Run 1, the first fit, which waits for both
+  columns of decisions 36-75 (`results/VALIDATION_DECISIONS.md` sections G and H,
+  adopted on Ghassan's delegation, Jad's column open; `docs/build_step_2/`).
+  Training runs on another device, not this laptop (Ghassan, 21 October).
 
 ## Blockers
 
@@ -104,14 +105,14 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. For Ghassan, before the next training: `train.py`'s `CLOSED` list has no
    `wideair_dt1`, though X2's result was published on 13 October (session
    report of 15 October, 2.3).
-8. `GRA-test`, build step 2: calibrate the Mazda, Honda and Ford on the B58's cycle
-   model from `data/engines/` against `results/ENGINE_THRESHOLDS.md` (its rule 0:
-   nothing in it changes after a fit; the held-out statistics are computed once),
-   their cars and the Accord's CVT; then the test roads by `preview_ceiling.py`'s
-   rule (decision 34). For Jad: decisions 36-38 before the first fit (Desktop copy
-   `decisions_2026-10-21_G.md`). For Jad and Ghassan: CLAUDE.md's re-run rule to
-   name `engines.py` and `engine_specs/` (`.claude/rules/physics.md` does);
-   fingerprint schema 4 (decisions 27, 28) before any new engine trains.
+8. `GRA-test`, build step 2 (`docs/build_step_2/PLAN.md`, as `AMENDMENTS.md` and
+   `HANDOFFS.md` amend it): contract version 4; the calibration scripts and their
+   tests (WP3); Run 1 and the freeze only after both columns of decisions 36-75
+   (Desktop copies `decisions_2026-10-21_G.md`, `decisions_2026-10-22_H.md`); then
+   decision 34's roads and the L1/E8 tightenings; then the held-out validation, run
+   once. Pending from commit A: `python -m app.test_results` on commit A itself,
+   and L8 on the training device. Schema 4 (decisions 27, 28) before any EPA
+   engine trains.
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device, before any training: install from

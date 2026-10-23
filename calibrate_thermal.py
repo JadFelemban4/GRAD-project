@@ -54,7 +54,8 @@ time constants and the heat splits; quote a capacity on its own only with that
 caveat.
 
 INPUTS ARE MEASURED. Fuel = air mass / (14.7 x lambda) from two logged channels
-(car_thermal.measured_fuel_gps); engine speed, road speed and ambient are logged
+(car_thermal.measured_fuel_gps; 14.7 is the B58's fuel's AFR_st, engines.Fuel,
+and so is the 44.0e3 J/g below); engine speed, road speed and ambient are logged
 channels. Drive B (28 Sep) is excluded: it logged no ambient temperature, and no
 oil. Drives are read from logs/raw/ (car_thermal.raw_grid), so the warm-up in
 683640a0 -- the one stretch where the radiator is shut -- is in the fit.
@@ -84,6 +85,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import car_thermal as CT                      # noqa: E402
+import engines                                # noqa: E402
 
 # WHICH DRIVES, DECIDED BY THE DATA, NOT BY A LIST. Every raw log that carries
 # coolant, oil and ambient temperature for at least MIN_MINUTES qualifies, so a
@@ -151,7 +153,11 @@ def load_drive(src):
         return None
     i0 = int(np.argmax(np.isfinite(ect) & np.isfinite(oil)))
     sl = slice(i0, None)
-    fuel = CT.measured_fuel_gps(g.air_gps.to_numpy(), g.lam.to_numpy(), rpm)
+    # The logs are the B58's, so is the fuel they burned (build step 2 P1, 22
+    # October 2026: it was plant.AFR_STOICH). typed_engine, not get: this runs
+    # inside derive_params.py, before the derived file it writes exists.
+    fuel = CT.measured_fuel_gps(g.air_gps.to_numpy(), g.lam.to_numpy(), rpm,
+                                afr_st=engines.typed_engine("b58").fuel.afr_st)
     d = dict(src=src, fuel=fuel[sl], rpm=rpm[sl], amb=amb.to_numpy()[sl] + 273.15,
              v=g.v_kmh.fillna(0.0).to_numpy()[sl] / 3.6, ect=ect[sl], oil=oil[sl])
     d["ect_filled"] = pd.Series(d["ect"]).ffill().bfill().to_numpy()

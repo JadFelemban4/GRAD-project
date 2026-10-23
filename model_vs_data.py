@@ -373,7 +373,10 @@ def oil_inputs(source):
     alone, the block pinned to the measured coolant (car_thermal.py)."""
     import car_thermal as CT
     d = CT.log_grid(source)
-    fuel = CT.measured_fuel_gps(d.air_gps.to_numpy(), d.lam.to_numpy(), d.rpm.to_numpy())
+    # the B58's fuel, the plant these logs are compared with (22 October 2026: it
+    # was plant.AFR_STOICH, one gasoline for every engine)
+    fuel = CT.measured_fuel_gps(d.air_gps.to_numpy(), d.lam.to_numpy(), d.rpm.to_numpy(),
+                                afr_st=_plant().engine.fuel.afr_st)
     ect = d.ect_c.to_numpy() + 273.15
     amb = d.t_amb.ffill().bfill().fillna(30.0).to_numpy() + 273.15
     oil = d.oil_c.to_numpy() + 273.15

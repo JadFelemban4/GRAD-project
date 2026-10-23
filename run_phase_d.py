@@ -244,8 +244,10 @@ def _free_gb():
 def main():
     ap = argparse.ArgumentParser()
     import engines
-    ap.add_argument("--engine", required=True, choices=engines.known(),
-                    help="the plant, passed to every train.py and evaluate.py (no default)")
+    # engines.trainable(), not known() (22 October 2026, decision 47), as train.py
+    ap.add_argument("--engine", required=True, choices=engines.trainable(),
+                    help="the plant, passed to every train.py and evaluate.py (no default; "
+                         "engines.trainable(), decision 47)")
     ap.add_argument("--seeds", type=int, nargs="*", default=None,
                     help="default 0-7. Duplicates are dropped. REQUIRED with "
                          "--restart-crashed, which must name the seed it means")

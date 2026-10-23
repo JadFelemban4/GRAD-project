@@ -4,8 +4,10 @@
 # ([sources] at the end gives the URL), in the units that source prints. Nothing here is
 # derived: no rolling radius, no drag area, no unit conversion -- the code that builds a Car
 # does those in the open, and engine_specs/cars/README.md says how. A value no source prints is
-# in [not_typed] with the reason, never guessed. Read by nothing yet (build step 1 of the
-# four-engine plants, 20 October 2026); test_epa_map.py checks the form and the EPA row.
+# in [not_typed] with the reason, never guessed. Read by engines.published_car since 22 October
+# 2026 (build step 2 P5), which converts the EPA row's test weight, road load and N/V for the
+# plant (README.md, "Deriving what the model needs"); test_epa_map.py checks the form and the
+# EPA row, test_cars.py the conversions (C1, C2).
 
 schema = 1
 car_id = "cx9_2016_25t"
@@ -102,7 +104,7 @@ opened = "2026-10-20"
 
 [sources.MZ19]
 url = "https://www.mazdausa.com/siteassets/pdf/owners-optimized/2019/cx-9/2019-cx-9-features-specs.pdf"
-what = "Mazda USA, 2019 CX-9 specifications"
+what = "Mazda USA, 2019 CX-9 specifications: its engine rows, the same for every trim -- SKYACTIV-G 2.5T, bore x stroke 89 x 100 mm, displacement 2488 cc, 310 lb-ft @ 2,000 rpm (PDF pages 2, 8, 14 and 21: Sport, Touring, Grand Touring, Signature); opened again 22 October 2026, sha256 aa0c19ad21248f1c17c72be13248ff2179fa8c393ea0ac95e194b36a296c45fb (decision 43)"
 opened = "2026-10-20"
 
 [sources.EPA16]

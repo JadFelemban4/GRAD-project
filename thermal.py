@@ -35,10 +35,11 @@ WHERE THEY LIVE SINCE 20 OCTOBER 2026 (the four-engine build, decision 24).
 ThermalParams is one of the engine's records, engines.ThermalParams: frozen,
 no field with a default. Its typed values -- c_turb, ua_turb_amb, ua_gas_turb,
 n_turbines and the warm-start state -- are in engine_specs/b58.toml with their
-sources, its DERIVED ones in the engine's derived file. ThermalNetwork takes it
-as a REQUIRED argument: `ThermalNetwork()` used to build the B58's from
-defaults, which any other engine would have got without a word (mistake 1). The
-notes on each constant below are the B58's.
+sources, its DERIVED ones in the engine's derived file, and its fuel heating
+value is a copy of the engine's fuel's (engines.Fuel, since 22 October 2026).
+ThermalNetwork takes it as a REQUIRED argument: `ThermalNetwork()` used to build
+the B58's from defaults, which any other engine would have got without a word
+(mistake 1). The notes on each constant below are the B58's.
 """
 
 import numpy as np
@@ -181,6 +182,11 @@ DT_SUB_MAX = 0.1
 #   t_block_warm, t_oil_warm, t_turb_warm   DESIGN  K, the warm start every
 #                 episode resets to: 363, 358 and 500 K on the B58 (they were
 #                 literals in ThermalNetwork.reset until 20 October)
+#
+#   fuel_lhv_j_per_kg   the fuel's lower heating value, J/kg, that turns fuel
+#                 flow into heat: a copy of the engine's engines.Fuel, made when
+#                 the plant is built and never typed in [thermal] (44.0e6 on
+#                 the B58; a literal in _substep until 22 October 2026)
 
 
 class ThermalNetwork:
@@ -242,7 +248,11 @@ class ThermalNetwork:
                  fan_duty, coolant_pump_duty, rpm):
         """One explicit-Euler step of at most DT_SUB_MAX seconds."""
         p = self.p
-        q_fuel = mdot_fuel_gps * 1e-3 * 44.0e6                     # W
+        # The fuel's heating value is the engine's (p.fuel_lhv_j_per_kg, a copy of
+        # engines.Fuel's; 22 October 2026, build step 2 P1): it was a literal
+        # 44.0e6 here, the B58's for every engine. (mdot * 1e-3) * LHV, in that
+        # order, as the literal was: never fold it into one constant per gram.
+        q_fuel = mdot_fuel_gps * 1e-3 * p.fuel_lhv_j_per_kg         # W
 
         # The thermostat is what makes coolant temperature a *regulated* variable
         # rather than a free one: below ~88 C the radiator is bypassed entirely.

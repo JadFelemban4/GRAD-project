@@ -34,13 +34,17 @@ through `engines.get("b58")` computes the same doubles.
 import numpy as np
 from dataclasses import dataclass
 
-# Properties of gasoline and air, true of every engine here. The engine's own
-# numbers -- geometry, breathing, burn, knock, friction, port, backpressure,
-# octane -- are fields of engines.Engine (engines.Geometry, engines.CycleCal;
-# the geometry moved there on 20 October 2026 with its volume functions).
+# Properties of gasoline and air, shared physics, the same for every engine here
+# (mistake 1: an engine's own number is never a module constant). The engine's
+# own numbers -- geometry, breathing, burn, knock, friction, port, backpressure,
+# octane, and its fuel's heating value and stoichiometric ratio -- are fields of
+# engines.Engine (engines.Geometry, engines.CycleCal, engines.Fuel; the geometry
+# moved there on 20 October 2026 with its volume functions). LHV = 44.0e6 and
+# AFR_STOICH = 14.7 stood here until 22 October 2026 (build step 2, P1): each
+# EPA engine was mapped on its own test fuel, and the validation contract makes
+# the plant take each engine's LHV and AFR_st (results/ENGINE_THRESHOLDS.json,
+# conventions.fuel). The latent heat is not among them, and stays shared.
 R_AIR = 287.0          # J/kg/K
-LHV = 44.0e6           # J/kg, gasoline lower heating value
-AFR_STOICH = 14.7
 H_FG = 3.50e5          # J/kg, gasoline latent heat of vaporisation
 CP_AIR = 1005.0        # J/kg/K
 
@@ -51,19 +55,61 @@ def gamma_of_T(T):
     return np.clip(1.38 - 1.02e-4 * (T - 300.0), 1.19, 1.40)
 
 
-def combustion_efficiency(lam):
+def combustion_efficiency(lam, *, engine):
     """Fraction of the air-limited chemical energy actually released.
     Rich mixtures leave energy in CO and H2; very lean mixtures burn
-    incompletely and partially misfire."""
+    incompletely and partially misfire.
+
+    THE RICH SLOPE IS THE ENGINE'S (22 October 2026, build step 2 P3): a literal
+    0.65 here for every engine until then, engine.cycle.ce_rich_slope now. The
+    validation contract's form C fits each engine its own on its enriched hot
+    rows (the Honda runs to lambda 0.61, beyond any B58 data); forms A and B
+    share 0.65 (engines.SHARED_RICH_SLOPE, which CycleCal holds them to). The
+    B58's is that double, so the product is the same. The lean branch is shared
+    by every form, unchanged."""
     if lam < 1.0:
-        return 1.0 - 0.65 * (1.0 - lam)
+        return 1.0 - engine.cycle.ce_rich_slope * (1.0 - lam)
     return np.clip(1.0 - 0.55 * (lam - 1.08) ** 2 / 0.04 * (lam > 1.08), 0.80, 1.0)
 
 
-def volumetric_efficiency(rpm, *, engine):
-    """Simple breathing curve, normalised to intake manifold density."""
+def volumetric_efficiency(rpm, map_kpa, cam_deg, *, engine):
+    """Simple breathing curve, normalised to intake manifold density.
+
+    FORM B ADDS A MAP TERM (22 October 2026, build step 2 P3; the contract's form
+    B, "VE in rpm and MAP (a linear MAP term)"): ve_map * (map_kpa -
+    ve_map_ref_kpa) on the rpm curve, before the clip. map_kpa is required, never
+    defaulted (mistake 1). Form A, the B58's, returns the old one-line expression
+    VERBATIM and never reads map_kpa, which may then be None (map_from_airflow,
+    which solves for the MAP). Not form B's sum at ve_map 0: that adds an exact
+    0.0 for a finite MAP, but 0.0 times a NaN MAP is NaN, and eta_v is an output
+    (PLAN.md section 3.2).
+
+    FORM D ADDS A CAM TERM (22 October 2026, build step 2 P4; decision 41, the
+    contract's form D, "the intake cam phase as an input to VE, through a
+    schedule cam(rpm, MAP) ... run by the ECU"): ve_cam * (cam_deg -
+    cam_ref_deg), after form B's term and before the clip. The cam is the ECU's
+    (engine_env.BaselineECU.cam_deg), handed down by run_cycle's caller; cam_deg
+    is required here, never defaulted. A form without D refuses a number, since
+    its breathing would ignore it, and form D refuses None. Form A's check is a
+    comparison before its line, no arithmetic: the line is unchanged."""
     c = engine.cycle
-    return np.clip(c.ve_base + c.ve_amp * np.exp(-((rpm - c.ve_rpm) / c.ve_width) ** 2), c.ve_lo, c.ve_hi)
+    if c.form == "A":
+        if cam_deg is not None:
+            raise ValueError(f"cycle form 'A' has no cam input (form D's), and cam_deg is {cam_deg!r}")
+        return np.clip(c.ve_base + c.ve_amp * np.exp(-((rpm - c.ve_rpm) / c.ve_width) ** 2), c.ve_lo, c.ve_hi)
+    v = c.ve_base + c.ve_amp * np.exp(-((rpm - c.ve_rpm) / c.ve_width) ** 2)
+    if "B" in c.form.split("+"):
+        if map_kpa is None:
+            raise ValueError(f"cycle form {c.form!r} reads the MAP (ve_map, form B): map_kpa is None")
+        v = v + c.ve_map * (map_kpa - c.ve_map_ref_kpa)
+    if "D" in c.form.split("+"):
+        if cam_deg is None:
+            raise ValueError(f"cycle form {c.form!r} reads the intake cam (ve_cam, form D): cam_deg is None. "
+                             "The ECU schedules it (engine_env.BaselineECU.cam_deg)")
+        v = v + c.ve_cam * (cam_deg - c.cam_ref_deg)
+    elif cam_deg is not None:
+        raise ValueError(f"cycle form {c.form!r} has no cam input (form D's), and cam_deg is {cam_deg!r}")
+    return np.clip(v, c.ve_lo, c.ve_hi)
 
 
 def burn_duration(rpm, lam, f_res, *, engine):
@@ -150,17 +196,28 @@ class CycleResult:
 DTHETA_DEG = 0.25
 
 
-def run_cycle(op: Operating, *, engine, dtheta: float = DTHETA_DEG) -> CycleResult:
-    """One closed cycle of `engine`, an engines.Engine: required, no default."""
+def run_cycle(op: Operating, *, engine, dtheta: float = DTHETA_DEG, cam_deg=None) -> CycleResult:
+    """One closed cycle of `engine`, an engines.Engine: required, no default.
+
+    `cam_deg` is the intake cam phase, crank degrees, that the engine's ECU
+    commands (engine_env.BaselineECU.cam_deg; 22 October 2026, build step 2 P4,
+    decision 41): a number for an engine whose cycle form has D, and None, no cam
+    input, for every other, the B58 among them. The breathing refuses either the
+    wrong way round. A keyword beside the operating point, not an Operating field:
+    Operating's seven fields are what the contract's generator and the
+    certificate harness build (PLAN.md section 3.1)."""
     geo, c = engine.geometry, engine.cycle
+    # the engine's fuel (engines.Fuel, 22 October 2026): 14.7 and 44.0 MJ/kg on
+    # the B58, the module constants they replace, read in the same order
+    fuel = engine.fuel
 
     # ---------------- charge preparation ----------------
     # residual fraction: high at low load (small fresh charge, same clearance volume)
     f_res = residual_fraction(op.map_kpa, engine=engine)
-    eta_v = volumetric_efficiency(op.rpm, engine=engine)
+    eta_v = volumetric_efficiency(op.rpm, op.map_kpa, cam_deg, engine=engine)   # B's MAP, D's cam
     rho_int = op.map_kpa * 1000.0 / (R_AIR * op.iat_k)
     m_air = eta_v * rho_int * geo.vd_cyl * (1.0 - f_res)
-    m_fuel = m_air / (AFR_STOICH * op.lam)
+    m_fuel = m_air / (fuel.afr_st * op.lam)
 
     t_wall = 0.5 * op.ect_k + 0.5 * (op.ect_k + c.t_head_k)      # crude head/liner mean
 
@@ -172,8 +229,8 @@ def run_cycle(op: Operating, *, engine, dtheta: float = DTHETA_DEG) -> CycleResu
     t_ivc = (1.0 - f_res) * t_fresh + f_res * c.t_residual_k
 
     # combustion is air-limited when rich, and rich products retain energy as CO/H2
-    eta_comb = combustion_efficiency(op.lam)
-    q_total = min(m_fuel, m_air / AFR_STOICH) * LHV * eta_comb
+    eta_comb = combustion_efficiency(op.lam, engine=engine)
+    q_total = min(m_fuel, m_air / fuel.afr_st) * fuel.lhv_j_per_kg * eta_comb
 
     # ---------------- Wiebe schedule ----------------
     delay = ignition_delay(op.rpm, op.lam, f_res, engine=engine)
@@ -335,19 +392,21 @@ def exhaust_backpressure_kpa(map_kpa, *, engine):
 
 
 def predict(rpm, map_kpa, iat_k, ect_k, spark_btdc, lam,
-            p_exh_kpa=None, *, engine) -> dict:
+            p_exh_kpa=None, cam_deg=None, *, engine) -> dict:
     """Run one engine cycle and return named outputs.
 
     Temperatures in kelvin, pressures in kPa absolute, spark in degrees BTDC.
     If p_exh_kpa is omitted it is estimated from map_kpa (exhaust_backpressure_kpa).
-    `engine` is required; the fuel's octane is the engine's.
+    `engine` is required; the fuel's octane is the engine's. `cam_deg` is
+    run_cycle's: the ECU's intake cam for a form-D engine, None for every other
+    (22 October 2026, build step 2 P4).
     """
     if p_exh_kpa is None:
         p_exh_kpa = exhaust_backpressure_kpa(map_kpa, engine=engine)
     r = run_cycle(Operating(rpm=rpm, map_kpa=map_kpa, iat_k=iat_k, ect_k=ect_k,
                             spark_btdc=spark_btdc, lam=lam,
                             p_exh_kpa=p_exh_kpa),
-                  engine=engine)
+                  engine=engine, cam_deg=cam_deg)
     return dict(
         torque_nm=r.torque_nm, power_kw=r.power_kw,
         bmep_bar=r.bmep_bar, imep_bar=r.imep_bar, fmep_bar=r.fmep_bar,
@@ -530,9 +589,20 @@ def map_from_airflow(mdot_air_gps, rpm, iat_k, *, engine) -> float:
 
     `engine` is required (20 October 2026): the inversion runs through that
     engine's own geometry, breathing and residual fraction.
+
+    FORM A ONLY (22 October 2026, build step 2 P3). The breathing is read once,
+    before the loop, at no MAP; under form B it depends on the MAP solved for,
+    and an inversion would have to iterate it too and be shown to converge
+    (mistake 15). Nothing asks for one: every caller inverts the B58's logged
+    air, and no EPA row is inverted (PLAN.md WP1 P3). Any other form is refused,
+    never inverted with a breathing that ignores its own MAP term. Form A has no
+    cam input either (P4), so the breathing is given None for both.
     """
+    if engine.cycle.form != "A":
+        raise ValueError(f"map_from_airflow inverts form A only; this engine's cycle form is "
+                         f"{engine.cycle.form!r}, whose breathing reads the MAP being solved for")
     geo = engine.geometry
-    eta_v = volumetric_efficiency(rpm, engine=engine)
+    eta_v = volumetric_efficiency(rpm, None, None, engine=engine)
     map_kpa = 100.0
     for _ in range(6):
         f_res = float(residual_fraction(map_kpa, engine=engine))

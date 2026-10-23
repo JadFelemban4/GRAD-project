@@ -1,0 +1,193 @@
+# engine_specs/mazda_25t.toml -- the 2016 Mazda 2.5 L turbocharged inline-four
+# (SKYACTIV-G 2.5T) of EPA's ALPHA map package: its TYPED constants, for the plant
+# the EPA calibration fits (build step 2 of decision 24). Its car is
+# engine_specs/cx9_2016.toml.
+#
+# The format, the labels and the rule against typed DERIVED values are
+# engine_specs/b58.toml's (engines.read_spec). Written on 22 October 2026 (build
+# step 2 P6: docs/build_step_2/PLAN.md WP1 P6 and section 9.2, as its amendments
+# docs/build_step_2/AMENDMENTS.md F10, F12, B13 and C13 correct it; decisions 45,
+# 46 and 69, results/VALIDATION_DECISIONS.md section H), before any fit: no value
+# here was set by an EPA row, and none was compared with one.
+#
+# THE DERIVED VALUES ARE NOT HERE, AND NOT YET ANYWHERE. engines.EPA_DERIVED_FIELDS
+# names them (PLAN.md 5.8): the cycle model's form and its fitted constants, the
+# ECU's spark, knock limit, enrichment and cam schedule, and the boost envelope,
+# written at the freeze; the deliverable-torque table, the K3 knee and the torque
+# floor, completed after it. calibrate_epa.py (WP3-WP4, not written yet) writes
+# them to the derived file named below. Until it has, this plant is registered
+# and NOT CALIBRATED: engines.get refuses it, naming that command, and
+# `python engines.py` lists it as "not calibrated yet". The form is the
+# calibration's too: the ladder starts at form A (PLAN.md 5.4), and a term the
+# frozen form does not use is written there at its neutral value (ve_map 0.0,
+# ve_cam 0.0, ce_rich_slope 0.65, cam_on 0 and the cam schedule 0.0), never
+# typed here.
+#
+# CARRIED FROM THE B58 (decision 45). EPA's rig cannot set the thermal network,
+# the ECU's compensations, its knock feedback, the fan or the turbine housing
+# (EPA held coolant and oil), nor the constants the validation contract shares
+# between engines. Each such value is the B58's, bit for bit, and its source
+# starts "CARRIED FROM THE B58: " and names where the B58's value lives:
+# engine_specs/b58.toml or engine_specs/a90_supra.toml [section] field, or the
+# B58's derived file data/derived_params.json section.key (derived_sha
+# 326c0835548975e2). test_carried.py checks each against the B58's plant, and
+# every other typed value against the value its source gives, pinned there with
+# the file and key it comes from: a second typed copy, whose cross-check against
+# the contract and epa_engine.json is WP3's (docs/build_step_2/HANDOFFS.md). The
+# label says what the value is FOR THIS ENGINE: ASSUMED where the B58's number is
+# an estimate, a fit or a measurement of the B58's own, since carrying it to
+# another engine is an assumption; DESIGN where it is a choice that defines the
+# experiment; CORRELATION where it is a correlation's constant.
+
+id = "mazda_25t"
+derived = "data/engines/mazda_25t/derived_params.json"
+# derived_set -- which fields of this engine's records are DERIVED and where in the
+# derived file each is read (engines.DERIVED_BY_SET): "epa", engines.EPA_DERIVED_FIELDS,
+# what the EPA calibration writes (PLAN.md 5.8). label DESIGN; source: build step 2
+# P5 and P6 (docs/build_step_2/PLAN.md WP1), 22 October 2026. A top-level key cannot
+# be a { value, label, source } entry (engines.read_spec reads a table as a section),
+# so its label and source are this comment (amendment B13); it is hashed by its value.
+derived_set = "epa"
+# freeze -- this engine's freeze record: the sha256 of its derived file's frozen
+# sections (engines.FROZEN_SECTIONS: cycle, ecu, boost_ceiling), written by
+# calibrate_epa.py at the freeze; engines._build refuses the derived file unless its
+# frozen sections hash to it (PLAN.md 5.8, amendment F7). label DESIGN; source:
+# PLAN.md 5.8 and build step 2 P6, 22 October 2026; a comment, as derived_set's
+# (amendment B13).
+freeze = "results/EPA_CALIBRATION/mazda_25t/freeze.json"
+
+[geometry]
+bore = { value = 0.0890, unit = "m", label = "PUBLISHED", source = "89 mm: data/engines/mazda_25t/epa_engine.json bore_mm, from EPA's generation script ('enigne.bore_mm = 89;', misspelt, so the ALPHA engine file has none: its geometry_notes). Mazda USA's 2019 CX-9 specifications (MZ19, engine_specs/cars/cx9_2016_25t.toml [sources.MZ19]), opened again 22 October 2026, print 'BORE X STROKE (MM) 89 x 100' on PDF pages 2, 8, 14 and 21, one per trim" }
+stroke = { value = 0.09998169382972748, unit = "m", label = "DERIVED_ONCE", source = "from EPA's displacement and bore, 22 October 2026: 2.488e-3 / (4 x (pi x 0.089^2 / 4)) m (epa_engine.json displacement_l 2.488, the ALPHA engine file's displacement_L; n_cylinders 4; bore_mm 89), so the plant displaces EPA's 2.488 L (PLAN.md 9.2). EPA asserts no stroke: epa_engine.json stroke_mm is null, its script's '% engine.stroke_mm = 100;' commented out (geometry_notes). MZ19 (model year 2019, opened 22 October 2026, PDF pages 2, 8, 14 and 21) prints 89 x 100 mm and 2488 cc; 100 mm is 0.018 % longer and would displace 2.48846 L, and is not typed, so that the plant keeps the displacement EPA's map package states" }
+conrod = { value = 0.15261476309738528, unit = "m", label = "ASSUMED", source = "the B58's rod-to-stroke ratio on this stroke: 0.09998169382972748 x (0.1444 / 0.0946) m, the B58's conrod over its stroke (engine_specs/b58.toml [geometry]; its 0.1444 has no source recorded), written 22 October 2026 (PLAN.md 9.2). No source opened gives this engine's rod; E6 row 9 probes it" }
+n_cyl = { value = 4, label = "PUBLISHED", source = "an inline-four: epa_engine.json n_cylinders (the ALPHA engine file); MZ19 (PDF page 2): '16-valve 4-cylinder'" }
+comp_ratio = { value = 10.5, label = "PUBLISHED", source = "10.5:1, geometric: epa_engine.json compression_ratio, from the ALPHA engine file (geometry_notes); MZ19 (PDF page 2) prints 'COMPRESSION RATIO 10.5 : 1'" }
+ivc_deg = { value = -140.0, unit = "deg aTDC firing", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [geometry] ivc_deg (ASSUMED there, no source recorded). Form A's valve events are fixed (results/ENGINE_THRESHOLDS.md, the model form: 'no cam input'); E6 row 9 brackets or probes it" }
+evo_deg = { value = 140.0, unit = "deg aTDC firing", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [geometry] evo_deg (ASSUMED there, no source recorded), as ivc_deg" }
+
+[cycle]
+# DERIVED, not typed (engines.EPA_DERIVED_FIELDS): form, ve_base, ve_amp, ve_rpm,
+# ve_width, ve_map, ve_cam, ce_rich_slope, burn_base, burn_rpm, delay_base,
+# delay_rpm, fmep_0, fmep_pmax, fmep_sp, fmep_sp2, ua_port, exh_bp_ratio,
+# exh_bp_min_kpa and knock_a, fitted per engine (PLAN.md 5.2-5.3). Typed: the
+# breathing's clip, the constants the contract shares between engines, the burn
+# terms no stage fits, the octane, and the references of forms B and D.
+ve_lo = { value = 0.30, label = "DESIGN", source = "the breathing curve's lower clip (plant.volumetric_efficiency), a rail: a VE at it on a calibration row is flagged with the rows listed, and the clip is never widened after a fit (PLAN.md 5.6, 9.2). The B58's 0.60 (ASSUMED) belongs to its own curve" }
+ve_hi = { value = 1.30, label = "DESIGN", source = "the breathing curve's upper clip, as ve_lo. The B58's 1.02 (ASSUMED) belongs to its own curve" }
+fres_a = { value = 0.035, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] fres_a (ASSUMED there: the residual gas fraction; REFERENCES.md section 4b, CANNOT). The residual-fraction law is shared between engines and not fitted (results/ENGINE_THRESHOLDS.md, the model form, form A)" }
+fres_b = { value = 6.5, unit = "kPa", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] fres_b (ASSUMED there), as fres_a" }
+fres_map_min = { value = 25.0, unit = "kPa", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] fres_map_min (ASSUMED there), as fres_a" }
+fres_lo = { value = 0.03, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] fres_lo (ASSUMED there), as fres_a" }
+fres_hi = { value = 0.18, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] fres_hi (ASSUMED there), as fres_a" }
+t_head_k = { value = 90.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] t_head_k (ASSUMED there: the head over coolant in the wall temperature). Shared and not fitted (results/ENGINE_THRESHOLDS.md, the model form, form A); E6 row 9 probes it" }
+port_pickup_k = { value = 12.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] port_pickup_k (ASSUMED there: the fresh charge's port and wall pickup), as t_head_k" }
+t_residual_k = { value = 780.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] t_residual_k (ASSUMED there: the residual gas temperature at IVC), as t_head_k" }
+flame_lam = { value = 0.90, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] flame_lam (ASSUMED there: the laminar flame speed factor; REFERENCES.md section 4b, combustion CANNOT). A burn constant no stage fits (PLAN.md 5.2 S4 fits the burn and delay bases and rpm terms); E6 row 9 probes it" }
+flame_width = { value = 0.42, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] flame_width (ASSUMED there), as flame_lam" }
+flame_floor = { value = 0.25, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] flame_floor (ASSUMED there), as flame_lam" }
+burn_res = { value = 2.0, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] burn_res (ASSUMED there: the burn duration's residual-gas term), as flame_lam" }
+delay_res = { value = 1.5, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] delay_res (ASSUMED there: the ignition delay's residual-gas term), as flame_lam" }
+wiebe_a = { value = 5.0, label = "CORRELATION", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] wiebe_a (CORRELATION there: the Wiebe function, Vibe 1970 and Ghojel 2010, the value not read off either page, UNVERIFIED). The Wiebe shape is shared and not fitted (results/ENGINE_THRESHOLDS.md, the model form, form A)" }
+wiebe_m = { value = 2.0, label = "CORRELATION", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] wiebe_m (CORRELATION there: the Wiebe shape exponent), as wiebe_a" }
+knock_on = { value = 3.402, label = "CORRELATION", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] knock_on (CORRELATION there: Douaud & Eyzat 1978, SAE 780080, the constants not read off its page, UNVERIFIED). Only the knock scale knock_a is fitted per engine (PLAN.md 5.2 S6, decision 51)" }
+knock_p = { value = -1.7, label = "CORRELATION", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] knock_p (CORRELATION there: Douaud & Eyzat's pressure exponent), as knock_on" }
+knock_b = { value = 3800.0, unit = "K", label = "CORRELATION", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] knock_b (CORRELATION there: Douaud & Eyzat's activation temperature), as knock_on" }
+n_poly = { value = 1.32, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] n_poly (ASSUMED there: the end gas's polytropic exponent in the knock integral). Not fitted; the knock scale knock_a is (PLAN.md 5.2 S6)" }
+cp_exh = { value = 1150.0, unit = "J/kg/K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [cycle] cp_exh (ASSUMED there: exhaust specific heat; REFERENCES.md section 4b, CANNOT). Shared and not fitted (results/ENGINE_THRESHOLDS.md, the model form, form A); E6 row 9 probes it" }
+octane = { value = 97.6, unit = "RON", label = "PUBLISHED", source = "the research octane number of EPA's test fuel, Tier 2 FTAG 26864: data/engines/mazda_25t/epa_engine.json alpha_fuel research_octane_number; every Mazda table ran that fuel (results/ENGINE_THRESHOLDS.json engines.mazda_25t.fuel_by_table). The knock correlation's ON (plant.run_cycle); the fitted knock scale knock_a absorbs its level (PLAN.md 9.2)" }
+ve_map_ref_kpa = { value = 100.0, unit = "kPa", label = "DESIGN", source = "the MAP form B's term is taken about (plant.volumetric_efficiency): 100 kPa in every spec (amendment D8, decision 41), the B58's too; read only under form B" }
+cam_ref_deg = { value = 0.0, unit = "deg CA", label = "DESIGN", source = "the cam phase form D's term is taken about (plant.volumetric_efficiency): 0 in every spec (amendment D8, decision 41), the B58's too; read only under form D" }
+
+[charge]
+rise_k = { value = 12.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [charge] rise_k (ASSUMED there: plant.charge_temperature's rise over ambient; REFERENCES.md section 4b, CANNOT). Every calibration row is fed EPA's measured charge temperature, so only C3 tests it (PLAN.md 9.2)" }
+block_coupling = { value = 0.06, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [charge] block_coupling (ASSUMED there), as rise_k" }
+
+[boost]
+# DERIVED, not typed: envelope_flow, envelope_pr and pr_cap (PLAN.md 5.2 S3c)
+inlet_sea_kpa = { value = 99.3, unit = "kPa", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [boost] inlet_sea_kpa (ASSUMED there: 101.3 kPa less a 2 kPa filter loss, no source for the 2 kPa). The boost envelope's pressure ratio is MAP over this inlet (PLAN.md 5.2 S3c), so the in-use ceiling never exceeds a measured MAP (PLAN.md 9.2)" }
+
+[ecu]
+# DERIVED, not typed (engines.EPA_DERIVED_FIELDS): spark_a, spark_b, spark_c,
+# spark_min, spark_max, kl_a-kl_d, enr_load, enr_rpm_lo, enr_rpm_hi, enr_depth,
+# cam_on and the twelve fields of the cam schedule, fitted to calibration rows
+# (PLAN.md 5.2 S3a-S3b, 5.3 S3d). Typed: the spark line's reference, the
+# enrichment's dwells, the compensations, the knock feedback, the fan schedule and
+# the clip on every policy's lambda.
+spark_ref_kpa = { value = 40.0, unit = "kPa", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] spark_ref_kpa (DERIVED_ONCE there: the load the B58's 7 September spark line is written about). Here the load the fitted part-load spark plane is written about: its three constants are fitted (PLAN.md 5.2 S3a), so the reference is a choice of how they are written (PLAN.md 9.2: DESIGN)" }
+enr_dwell_lo = { value = 1.5, unit = "s", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json enrichment.ENR_DWELL_LO (DERIVED there from the B58's logs on the timestamp axis, derive_params.py; derived_sha 326c0835548975e2). EPA publishes two window averages of each hold, not the timing within it; S3b's dwell of 30 s puts the gate at full authority (PLAN.md 5.2). E6 row 13 sets the gate at 0 s and at 30 s" }
+enr_dwell_hi = { value = 3.0, unit = "s", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json enrichment.ENR_DWELL_HI (DERIVED there), as enr_dwell_lo" }
+iat_gain = { value = 0.16, unit = "deg per K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] iat_gain (ASSUMED there: 'the classic compensation table'; REFERENCES.md section 4b, CANNOT). The fitted spark's target takes the compensation out (PLAN.md 5.2 S3a; amendment D3)" }
+iat_ref_c = { value = 25.0, unit = "C", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] iat_ref_c (ASSUMED there), as iat_gain" }
+iat_max = { value = 9.0, unit = "deg", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] iat_max (ASSUMED there), as iat_gain" }
+cold_k = { value = 340.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] cold_k (ASSUMED there: the catalyst-heating retard below this coolant). Asserted not to bind on a calibration row (PLAN.md 5.2 S3a)" }
+cold_retard = { value = 5.0, unit = "deg", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] cold_retard (ASSUMED there), as cold_k" }
+knock_step = { value = 3.0, unit = "deg", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] knock_step (ASSUMED there: the ECU's pull per knock event). EPA publishes no knock data (results/ENGINE_THRESHOLDS.md, E6 row 7)" }
+knock_max = { value = 12.0, unit = "deg", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] knock_max (ASSUMED there), as knock_step" }
+knock_restore = { value = 0.35, unit = "deg/s", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] knock_restore (ASSUMED there), as knock_step" }
+knock_detect_ki = { value = 1.0, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] knock_detect_ki (ASSUMED there: the Douaud-Eyzat criterion KI = 1). Kept when the knock scale is fitted: moving it is a separate step (decision 51)" }
+fan_hi_k = { value = 372.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] fan_hi_k (ASSUMED there: the fan schedule; REFERENCES.md section 4b, CANNOT). EPA's rig replaced the radiator with a cooling tower (results/ENGINE_THRESHOLDS.md, the sources seen)" }
+fan_lo_k = { value = 367.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] fan_lo_k (ASSUMED there), as fan_hi_k" }
+fan_lo_duty = { value = 0.4, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] fan_lo_duty (ASSUMED there), as fan_hi_k" }
+lam_floor = { value = 0.684, label = "DERIVED_ONCE", source = "the floor of the clip on every policy's lambda (engine_env.SupervisoryTunerEnv.step): the validation contract's, results/ENGINE_THRESHOLDS.json engines.mazda_25t.lambda_clip_floor.floor (version 3, commit ef5e14e, 21 October 2026; thresholds/contract.py: min(0.70, the engine's deepest EPA lambda on the cell-referenced convention - 0.01), rounded to 0.001), so the neutral action stays neutral (the contract's finding 10). A contract constant over every row, used only for this clip and the frozen-plant dump's lambda grid, never as a fit's bound (amendment C1); engines.Engine refuses it above 1 - enr_depth" }
+lam_ceiling = { value = 1.25, label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [ecu] lam_ceiling (DESIGN there: the ceiling of that clip, the literal 1.25 of engine_env.py on cf43fbb). At least 1, the leanest any ECU runs (engines.Engine); PLAN.md 9.2" }
+
+[thermal]
+# The block, oil, radiator and thermostat network: the B58's DERIVED doubles,
+# carried (decision 45), since EPA held coolant and oil. thermal.py's module
+# docstring says what each is.
+c_block = { value = 36350.24543062068, unit = "J/K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.c_block (DERIVED there: fitted to the B58's drives by derive_params.py, derived_sha 326c0835548975e2). EPA's rig held coolant and oil (a cooling tower at 85 C, oil at 90 C: results/ENGINE_THRESHOLDS.md, the sources seen), so no EPA table can set the network (decision 45)" }
+c_oil = { value = 27213.388951454046, unit = "J/K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.c_oil (DERIVED there), as c_block" }
+ua_block_oil = { value = 473.74711411189725, unit = "W/K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.ua_block_oil (DERIVED there), as c_block" }
+ua_block_amb = { value = 2.438868735352064, unit = "W/K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.ua_block_amb (DERIVED there), as c_block" }
+ua_oil_amb = { value = 0.3759006107079665, unit = "W/K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.ua_oil_amb (DERIVED there), as c_block" }
+ua_oil_ram = { value = 0.6756243799622054, unit = "W/K per m/s", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.ua_oil_ram (DERIVED there), as c_block" }
+ua_rad_min = { value = 426.8377781262202, unit = "W/K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.ua_rad_min (DERIVED there), as c_block" }
+ua_rad_ram = { value = 85.36755562524404, unit = "W/K per m/s", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.ua_rad_ram (DERIVED there), as c_block" }
+ua_rad_fan = { value = 995.9548156278471, unit = "W/K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.ua_rad_fan (DERIVED there), as c_block" }
+t_stat_open = { value = 365.2325578339178, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.t_stat_open (DERIVED there), as c_block" }
+t_stat_span = { value = 2.8455312832104833, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.t_stat_span (DERIVED there), as c_block" }
+frac_fuel_to_coolant = { value = 0.1783556582646251, label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.frac_fuel_to_coolant (DERIVED there), as c_block. A fraction of the fuel's heat: at this engine's 42.908 MJ/kg it carries about 2.5 % less heat per gram than at the B58's 44.0 (decision 45, disclosed)" }
+frac_fuel_to_oil = { value = 0.004179253710548352, label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.frac_fuel_to_oil (DERIVED there), as frac_fuel_to_coolant" }
+k_oil_rpm = { value = 610.105591707557, unit = "W at 3000 rpm", label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.k_oil_rpm (DERIVED there), as c_block" }
+n_oil_rpm = { value = 3.8632102712622967, label = "ASSUMED", source = "CARRIED FROM THE B58: data/derived_params.json thermal.n_oil_rpm (DERIVED there), as c_block" }
+c_turb = { value = 6000.0, unit = "J/K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [thermal] c_turb (ASSUMED there, and load-bearing: it sets tau and so H/tau). No source measures a turbine housing's temperature for any engine (results/ENGINE_THRESHOLDS.md, the sources seen); E6 row 4 sets it x 0.75 and x 1.333 (decision 45)" }
+n_turbines = { value = 1, label = "ASSUMED", source = "one turbocharger, UNVERIFIED: no source opened states the count. MZ19 (PDF page 2, opened 22 October 2026) names the engine 'SKYACTIV-G 2.5T Dynamic Pressure Turbo' (PLAN.md 9.2)" }
+ua_turb_amb = { value = 18.0, unit = "W/K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [thermal] ua_turb_amb (ASSUMED there: turbine housing to air), as c_turb" }
+ua_gas_turb = { value = 0.90, unit = "W/K per g/s", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [thermal] ua_gas_turb (ASSUMED there: exhaust gas to turbine housing), as c_turb" }
+t_block_warm = { value = 363.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [thermal] t_block_warm (DESIGN there: the warm-start block temperature every episode resets to, thermal.ThermalNetwork.reset). Every engine starts from the same warm state (amendment F12)" }
+t_oil_warm = { value = 358.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [thermal] t_oil_warm (DESIGN there), as t_block_warm" }
+t_turb_warm = { value = 500.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [thermal] t_turb_warm (DESIGN there), as t_block_warm" }
+
+[damage]
+# DERIVED, not typed: turb_knee_k, the K3 knee set on this engine's locked climb
+# (decision 33; PLAN.md 5.9 item 4). The valuations are the B58's, the same for
+# every engine (REFERENCES.md section 4b: the damage model is DESIGN).
+turb_scale_k = { value = 45.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [damage] turb_scale_k (DESIGN there: results/DAMAGE_CONSTANTS.md)" }
+oil_knee_k = { value = 408.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [damage] oil_knee_k (DESIGN there: a valuation, results/DAMAGE_CONSTANTS.md)" }
+oil_scale_k = { value = 12.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [damage] oil_scale_k (DESIGN there), as oil_knee_k" }
+oil_weight = { value = 0.4, label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [damage] oil_weight (DESIGN there), as oil_knee_k" }
+ki_knee = { value = 0.85, label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [damage] ki_knee (DESIGN there: the knock term's knee; it waits for drive C)" }
+ki_weight = { value = 40.0, label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [damage] ki_weight (DESIGN there: the knock term's weight, a valuation)" }
+egt_limit_k = { value = 1223.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/b58.toml [damage] egt_limit_k (ASSUMED there: 950 C of gas, the EGT constraint cost's limit, no source recorded)" }
+
+[loop]
+# The environment's load loop (engine_env.SupervisoryTunerEnv._map_for and
+# _track_torque). Decision 46 scales the two gains that turn a torque straight
+# into a pressure by V_d,B58 / V_d, the displacements as engines.Geometry computes
+# them (vd_total): 0.00299750539148849 / 0.002488 = 1.2047851251963384 here.
+# DERIVED, not typed: torque_floor_nm (PLAN.md 5.9 item 2).
+ff_offset_kpa = { value = 40.0, unit = "kPa", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [loop] ff_offset_kpa (DESIGN there: the feed-forward guess's offset). Unscaled (decision 46, amendment F10): a pressure, the guess's MAP at zero torque, not a gain per Nm. The tracking check at neutral tests the loop as declared (PLAN.md 5.9 item 3)" }
+ff_kpa_per_nm = { value = 0.7469667776217298, unit = "kPa per Nm", label = "DESIGN", source = "the B58's feed-forward slope, 0.62 kPa per Nm (engine_specs/b58.toml [loop] ff_kpa_per_nm, DESIGN), x V_d,B58 / V_d = 0.62 x 1.2047851251963384, written 22 October 2026 (decision 46): the slope is per Nm, and a smaller engine makes fewer Nm per kPa. Checked by the tracking test at neutral (PLAN.md 5.9 item 3)" }
+map_floor_kpa = { value = 25.0, unit = "kPa", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [loop] map_floor_kpa (DESIGN there: the load loop's lowest manifold pressure, the throttle shut). Unscaled (decision 46, amendment F10): a pressure" }
+i_gain = { value = 0.05, unit = "per Nm", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [loop] i_gain (DESIGN there: the integrator's gain per inner iteration). Unscaled (decision 46 scales only the feed-forward slope and the proportional gain; amendment F10): the integrator's authority is bounded in pressure, i_clip x i_out = 1.2 kPa, whatever the displacement; the tracking check at neutral tests it (PLAN.md 5.9 item 3)" }
+i_clip = { value = 60.0, label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [loop] i_clip (DESIGN there: the integrator's clip). Unscaled, as i_gain" }
+p_gain = { value = 0.4216747938187184, unit = "kPa per Nm", label = "DESIGN", source = "the B58's proportional gain, 0.35 kPa per Nm (engine_specs/b58.toml [loop] p_gain, DESIGN), x V_d,B58 / V_d = 0.35 x 1.2047851251963384, written 22 October 2026 (decision 46), as ff_kpa_per_nm" }
+i_out = { value = 0.02, unit = "kPa", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/b58.toml [loop] i_out (DESIGN there: the integrator's weight on the pressure). Unscaled, as i_gain" }
+
+[fuel]
+# The fuel the engine burns (engines.Fuel): EPA's test fuel, every Mazda table's
+# (results/ENGINE_THRESHOLDS.json engines.mazda_25t.fuel_by_table; the contract's
+# conventions.fuel: the plant and thermal.py take each engine's). engines.py copies
+# lhv_j_per_kg into the thermal record; it is never typed in [thermal].
+lhv_j_per_kg = { value = 42.908e6, unit = "J/kg", label = "PUBLISHED", source = "42.908 MJ/kg, the lower heating value of Tier 2 FTAG 26864: data/engines/mazda_25t/epa_engine.json alpha_fuel energy_density_MJpkg (EPA's fuel analysis). E6 row 3 moves it to 44.0 MJ/kg in the cycle and the network together (engines.with_fuel)" }
+afr_st = { value = 14.559, label = "DERIVED_ONCE", source = "the stoichiometric air-fuel ratio of FTAG 26864 from its carbon weight fraction 0.8663 (hydrogen the balance, oxygen-free, against air with 23.14 % oxygen by mass): thresholds/contract.py afr_from_carbon, rounded to 0.001, results/ENGINE_THRESHOLDS.json engines.mazda_25t.fuel_by_table (contract version 3, 21 October 2026). E6 row 2 moves it to 14.7" }

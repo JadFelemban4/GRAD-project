@@ -350,8 +350,8 @@
         "file": "plant.py",
         "symbol": "run_cycle",
         "variable": "m_air",
-        "line": 211,
-        "match": "m_air"
+        "line": 219,
+        "match": "m_air ="
       },
       "upstream": [
         "charge_temp",
@@ -440,7 +440,7 @@
       "why": "يؤثر الوقود في العزم والاستهلاك وكتلة العادم والحمل الحراري.",
       "unit": "g/s",
       "evidence": "MODELLED",
-      "range": "تحصر البيئة لامبدا ضمن 0.70–1.25.",
+      "range": "تحصر البيئة لامبدا ضمن حدَّي المحرك نفسه (ecu.lam_floor–ecu.lam_ceiling)، وهما 0.70–1.25 في محرك B58، محرك هذا المختبر.",
       "source": {
         "file": "plant.py",
         "symbol": "run_cycle",

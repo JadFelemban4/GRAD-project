@@ -3,14 +3,15 @@
 # PUBLISHED VALUES ONLY, plus [repo_current]: the values the plant runs today, listed beside
 # EPA's because they differ. Every other value below was printed by the source its `source` key
 # names ([sources] at the end gives the URL), in the units that source prints. Nothing here is
-# derived: no rolling radius, no drag area, no unit conversion. Read by nothing yet (build step 1
-# of the four-engine plants, 20 October 2026); test_epa_map.py checks the form, the EPA rows, and
-# [repo_current] against the plant engines.get("b58") builds.
+# derived: no rolling radius, no drag area, no unit conversion. Read by no plant: the B58's car
+# is engine_specs/a90_supra.toml (decision 31), and engines.published_car converts the three EPA
+# cars' files, not this one (22 October 2026, build step 2 P5); test_epa_map.py checks the form,
+# the EPA rows, and [repo_current] against the plant engines.get("b58") builds.
 #
-# DECISION 31 (RECOMMENDED, UNANSWERED: results/VALIDATION_DECISIONS.md section F, both columns
-# open) WOULD KEEP THE CURRENT VALUES FOR THE FOUR-ENGINE TEST: the B58 arm would run X1's plant
-# (cf43fbb), frozen, and EPA's road load for the Supra would be a declared ablation later, never a
-# silent swap. Nothing here changes the plant.
+# DECISION 31 (AGREED 21 OCTOBER: results/VALIDATION_DECISIONS.md section F, both columns) KEEPS
+# THE CURRENT VALUES FOR THE FOUR-ENGINE TEST: the B58 arm runs X1's plant (cf43fbb), frozen, and
+# EPA's road load for the Supra is a declared ablation later, never a silent swap. Nothing here
+# changes the plant.
 #
 # THE MODEL YEAR IN THE NAME IS NOT OUR CAR'S. The id says 2020 (the task that created this
 # file); our car is a 2023 GCC-specification GR Supra 3.0 with the 285 kW B58B30O1 (REFERENCES.md
@@ -131,7 +132,7 @@ note = "our car's model year, engine and gearbox (US filing); the closest row to
 # from EPA's: 1520 kg is a kerb mass (TAU prints 1525 kg without driver) where EPA tests at
 # 3750 lb, and crr 0.011 with a drag area of 0.66 m^2 gives a level-road force 15-22 % below EPA's
 # 2020 target over 50-200 km/h (CATALOGUE.md section 3, outside the repository: UNVERIFIED here).
-# Decision 31 (recommended, unanswered) would keep them for the four-engine test.
+# Decision 31 (agreed 21 October) keeps them for the four-engine test.
 [repo_current]
 status = "REPO"
 source = "REPO"
@@ -139,7 +140,7 @@ mass_kg = 1520.0
 cd_a_m2 = 0.66
 crr = 0.011
 wheel_r_m = 0.33
-note = "decision 31 (recommended, unanswered: results/VALIDATION_DECISIONS.md section F) would keep them; an EPA road load for the Supra would be a declared ablation later"
+note = "decision 31 (agreed 21 October: results/VALIDATION_DECISIONS.md section F) keeps them; an EPA road load for the Supra is a declared ablation later"
 
 [not_typed]
 rolling_radius_m = "no source prints it. EPA's N/V (26.2 in 2020 and 2021, 26.3 in 2023) with the 8th gear and the axle ratio fixes it for the tested car; our logs fix only the product of radius and speed-channel scale (REFERENCES.md section 4b). Derive it in code; never type the result here"

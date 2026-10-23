@@ -14,6 +14,13 @@ BaselineECU(cal), Vehicle(car), damage_rate(..., cal=...), locked_climb(plant,
 numbers that were literals and class attributes here are fields of its records
 now (engine_specs/b58.toml, engine_specs/a90_supra.toml, and the derived file),
 read in the same expressions in the same order. See engines.py.
+
+EACH CAR RUNS ITS OWN VEHICLE MODEL (22 October 2026, build step 2 P5):
+vehicle_for(car) picks it by the car record's type -- Vehicle for the Supra's
+engines.Car, unchanged; EpaVehicle for an engines.EpaCar, EPA's road load and a
+stepped box; CvtVehicle for an engines.CvtCar, the Accord's CVT and decision 40's
+law. The training roads' builders read the Supra's two-term road load, and refuse
+any other car.
 """
 
 from dataclasses import replace
@@ -22,6 +29,7 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 
+import engines
 from plant import (Operating, run_cycle, boost_ceiling_kpa,
                    charge_temperature, exhaust_backpressure_kpa)
 from thermal import ThermalNetwork
@@ -353,6 +361,36 @@ class BaselineECU:
         iat_c = iat_k - 273.15
         return -float(np.clip(c.iat_gain * (iat_c - c.iat_ref_c), 0.0, c.iat_max))
 
+    def cam_deg(self, rpm, map_kpa):
+        """The intake cam phase this ECU commands, crank degrees; None if it runs none.
+
+        FORM D'S CAM IS THE ECU'S (22 October 2026, build step 2 P4; decision 41).
+        The validation contract's form D gives the breathing the intake cam phase
+        "through a schedule cam(rpm, MAP) fitted to EPA's Intake Cam Phase on
+        calibration rows and run by the ECU" (results/ENGINE_THRESHOLDS.md, the
+        model form). So the schedule is the ECU's, evaluated on the load the ECU
+        sees, and every policy inherits the cam as it inherits the spark: the
+        agent's boost lever acts at the baseline's cam, never at one of its own
+        (SupervisoryTunerEnv.step). A method of its own, so that step()'s 3-tuple
+        is unchanged (thresholds/ecu_shift.py patches step; PLAN.md 3.1).
+
+        cal.cam_on 0 -- every engine whose form has no D, the B58 among them --
+        gives None, which plant.run_cycle reads as no cam input. Otherwise rpm and
+        MAP are clamped to the schedule's domain (cam_rpm_lo-hi, cam_map_lo-hi: the
+        calibration rows that carry a cam value), the full quadratic in x =
+        rpm/1000 and y = MAP/100 is summed in the order written below, which the
+        fit's design matrix must follow, and the cam is clamped to cam_lo-cam_hi,
+        so the schedule is never extrapolated (mistake 6). A Python float
+        (amendment B10)."""
+        c = self.cal
+        if c.cam_on == 0:
+            return None
+        x = float(np.clip(rpm, c.cam_rpm_lo, c.cam_rpm_hi)) / 1000.0
+        y = float(np.clip(map_kpa, c.cam_map_lo, c.cam_map_hi)) / 100.0
+        cam = (c.cam_c0 + c.cam_c_rpm * x + c.cam_c_map * y
+               + c.cam_c_rpm2 * x * x + c.cam_c_rpm_map * x * y + c.cam_c_map2 * y * y)
+        return float(np.clip(cam, c.cam_lo, c.cam_hi))
+
     def step(self, rpm, map_kpa, iat_k, ect_k, knock_observed, dt):
         c = self.cal
         spark = self.base_spark(rpm, map_kpa) + self.iat_compensation(iat_k)
@@ -612,6 +650,250 @@ class Vehicle:
         return float(torque), rpm
 
 
+class _ThreeTermRoad:
+    """EPA's road load, for the cars that run it (22 October 2026, build step 2
+    P5; decision 42): EpaVehicle and CvtVehicle, one definition (mistake 10).
+
+        F = (A + B v) cos(theta) + C v^2 rho/rho_ref + m g sin(theta)
+
+    A, B, C are EPA's certification targets (engines.published_car converts them
+    from lbf and mph with exact factors), measured on a level road at EPA's test
+    weight with the transmission in neutral, so they already hold tyre, bearing
+    and driveline drag (engine_specs/cars/README.md); only C, the air's share,
+    scales with the air density, about EPA's reference air rho_ref (98.21 kPa,
+    20 C). On a grade the A + B v term is read as rolling load, normal to the road
+    (cos theta), and the weight's component along it is added, as the Supra's sum
+    does with its rolling term (Vehicle.demand).
+
+    WHERE IT HOLDS. EPA's targets cover 15-115 km/h (40 CFR 1066.305(a), as the
+    README cites it): C1 checks this force against EPA's own polynomial there, at
+    1e-6 (test_cars.py), and above 115 km/h -- the 130 km/h climb among it -- it
+    is not covered (mistake 6). How much the split matters there (amendment F13):
+    the Accord's A + B v turns negative above 116.5 km/h, and the alternative
+    conventions move the climb force by +1.19 % or +0.28 %."""
+
+    def road_force_n(self, v_mps, grade, *, rho):
+        """The road's force on the car at this speed (m/s) and grade (rise over
+        run), N, in air of density `rho` (kg/m^3, REQUIRED, as Vehicle.demand's)."""
+        th = np.arctan(grade)
+        return ((self.road_a_n + self.road_b_n_per_mps * v_mps) * np.cos(th)
+                + self.road_c_n_per_mps2 * v_mps ** 2 * (rho / self.road_rho_ref)
+                + self.mass * 9.81 * np.sin(th))
+
+    @property
+    def DELIVERABLE_TORQUE(self):
+        """The car's DERIVED deliverable-torque table, refused while it is empty, as
+        Vehicle's is. Its own because the command differs (22 October 2026, the
+        review of P5; mistake 1, in a message): an EPA car's table is measured
+        after its engine's freeze by the completion, not by derive_params.py, the
+        B58's. EpaVehicle's gearbox (Vehicle.shift_ceiling_nm) reads this one,
+        ahead of Vehicle's in the method order."""
+        t = self.car.deliverable_torque
+        if not t:
+            raise RuntimeError("no deliverable-torque table yet: an EPA car's is measured after its engine's "
+                               "freeze, by python calibrate_epa.py complete --engine <its engine> (PLAN.md "
+                               "5.9; calibrate_epa.py is not written yet)")
+        return t
+
+
+class EpaVehicle(_ThreeTermRoad, Vehicle):
+    """A car on EPA's road load with a stepped box: the CX-9 and the F-150 (22
+    October 2026, build step 2 P5; PLAN.md 7.2). Its car is an engines.EpaCar.
+
+    A NEW CLASS, SO THE SUPRA'S SUM IS NOT TOUCHED. Vehicle.demand adds
+    m a + drag + rolling + grade in that order, and the B58's doubles depend on
+    it; this class has its own __init__ (its car has no drag area or rolling
+    coefficient) and its own demand, whose road force is _ThreeTermRoad's. The
+    gearbox is Vehicle's, inherited unchanged: gear_for, the kickdown's
+    shift_ceiling_nm on the car's DERIVED table, the upshift speeds and the
+    engine-speed clip, read from the same attribute names. The converter is
+    modelled as locked, as declared for the Supra (Vehicle's docstring)."""
+
+    def __init__(self, car):
+        self.car = _need(car, "EpaVehicle(car=plant.car)")
+        if type(car) is not engines.EpaCar:
+            raise TypeError(f"EpaVehicle runs an engines.EpaCar, not {type(car).__name__} "
+                            "(engine_env.vehicle_for picks a car's vehicle)")
+        self.mass, self.wheel_r = car.mass, car.wheel_r
+        self.final_drive, self.gears = car.final_drive, car.gears
+        self.PEAK_TORQUE_NM = car.peak_torque_nm
+        self.SHIFT_LOAD = car.shift_load
+        self.SHIFT_RPM_MAX = car.shift_rpm_max
+        self.UPSHIFT_MIN_RPM = car.upshift_min_rpm
+        self.driveline_eff = car.driveline_eff
+        self.road_a_n, self.road_b_n_per_mps = car.road_a_n, car.road_b_n_per_mps
+        self.road_c_n_per_mps2, self.road_rho_ref = car.road_c_n_per_mps2, car.road_rho_ref
+
+    def demand(self, v_mps, accel, grade, *, rho):
+        """Tractive force -> engine torque and speed, as Vehicle.demand, with EPA's
+        road load: f = m a + road_force_n, then Vehicle's gear, torque and
+        engine-speed clip, line for line."""
+        f = self.mass * accel + self.road_force_n(v_mps, grade, rho=rho)
+        g = self.gear_for(v_mps, force_n=f)
+        ratio = self.gears[g] * self.final_drive
+        torque = f * self.wheel_r / max(ratio, .1) / self.driveline_eff
+        rpm = float(np.clip(v_mps / self.wheel_r * ratio * 60.0 / (2 * np.pi),
+                            self.car.rpm_min, self.car.rpm_max))
+        return float(torque), rpm
+
+
+# The CVT law's search (22 October 2026, build step 2 P5; amendment F6): the
+# window scanned in steps of CVT_SCAN_RPM, the first speed that holds the demand
+# then found by bisection to CVT_BISECT_RPM. DESIGN: fine enough that the engine
+# speed it hands back sits within 0.01 rpm of the law's, whatever the table's shape.
+CVT_SCAN_RPM = 10.0
+CVT_BISECT_RPM = 0.01
+
+
+class CvtVehicle(_ThreeTermRoad):
+    """The Accord: EPA's road load and a continuously variable transmission (22
+    October 2026, build step 2 P5; decision 40, its law (b), specified by
+    amendment F6). Its car is an engines.CvtCar; it has no gears.
+
+    THE LAW, A STATELESS KICKDOWN. At wheel speed n_w the ratio may run from the
+    car's low ratio to its top one, so the engine speed N from n_w x top x fd to
+    n_w x low x fd, held in [cvt_rpm_min, rpm_max]. The engine power the road asks
+    is P = f v / eta.
+      economy      N_eco = max(cvt_rpm_min, n_w x top x fd): the top ratio, or
+                   the lowest speed the law allows. Its torque T_eco = P / omega(N_eco).
+                   The box holds N_eco while T_eco <= kickdown_load x T_del(N_eco),
+                   and whenever f <= 0
+      kickdown     otherwise N* is the smallest N in the window with
+                   P / omega(N) <= target_load x T_del(N): a CVT_SCAN_RPM scan,
+                   then bisection to CVT_BISECT_RPM
+      power-limited  no N in the window qualifies: N* is the speed of the most
+                   deliverable power T_del(N) omega(N) on the scan, and the branch
+                   says so (mistake 9: never hand back a value as if it held)
+      low-speed    below about 8.7 km/h even the low ratio turns the engine under
+                   cvt_rpm_min: the low ratio, N = cvt_rpm_min (the launch, and
+                   v = 0). Converter slip is ASSUMED, as the Supra's engine-speed
+                   clip at launch is (Vehicle.demand)
+    T_del is the car's DERIVED deliverable-torque table. The torque asked of the
+    engine is f r / (ratio fd eta), the power balance at N. The converter is
+    modelled as locked, as declared for the Supra.
+
+    Stateless: each call depends on this step's speed and force only, and the
+    law reads nothing it kept. The last call's ratio, branch and economy point are
+    kept on the vehicle (ratio, branch, n_eco, t_eco) for whoever reports them: a
+    CVT is never recorded (step_record.gear refuses it; amendment B16), so
+    completion's delivery check reads env.rpm and these directly; and C5's
+    threshold here is kickdown_threshold_nm at N_eco (decision 70).
+
+    Disclosed (decision 40): 0.75 and 0.65 are points of the D3 strand's in-sample
+    grid (strand_vehicles.md), used by no gated row."""
+
+    def __init__(self, car):
+        self.car = _need(car, "CvtVehicle(car=plant.car)")
+        if type(car) is not engines.CvtCar:
+            raise TypeError(f"CvtVehicle runs an engines.CvtCar, not {type(car).__name__} "
+                            "(engine_env.vehicle_for picks a car's vehicle)")
+        self.mass, self.wheel_r, self.final_drive = car.mass, car.wheel_r, car.final_drive
+        self.ratio_low, self.ratio_top = car.ratio_low_gear, car.ratio_top_gear
+        self.driveline_eff = car.driveline_eff
+        self.road_a_n, self.road_b_n_per_mps = car.road_a_n, car.road_b_n_per_mps
+        self.road_c_n_per_mps2, self.road_rho_ref = car.road_c_n_per_mps2, car.road_rho_ref
+        self.ratio = self.branch = self.n_eco = self.t_eco = None
+
+    def deliverable_nm(self, rpm):
+        """T_del: the deliverable-torque table at this engine speed (np.interp,
+        held at its ends, as Vehicle.shift_ceiling_nm reads it)."""
+        r, t = zip(*self.DELIVERABLE_TORQUE)
+        return float(np.interp(rpm, r, t))
+
+    def kickdown_threshold_nm(self, rpm):
+        """The most torque the box holds a ratio at before it kicks down:
+        kickdown_load x T_del(rpm). At N_eco it is the law's one discrete decision,
+        and C5's threshold for the CVT (decision 70)."""
+        return self.car.kickdown_load * self.deliverable_nm(rpm)
+
+    def _ratio(self, n, n_w):
+        """The ratio that turns the engine at n at wheel speed n_w, held in the range."""
+        return float(np.clip(n / (n_w * self.final_drive), self.ratio_top, self.ratio_low))
+
+    def ratio_for(self, v_mps, force_n):
+        """(ratio, engine rpm, branch, N_eco, T_eco) for this speed (m/s) and
+        tractive force (N): the law in the class docstring. N_eco and T_eco are
+        None on the low-speed branch, where there is no window."""
+        car, fd = self.car, self.final_drive
+        n_w = v_mps / self.wheel_r * 60.0 / (2 * np.pi)
+        n_low = n_w * self.ratio_low * fd
+        if n_low < car.cvt_rpm_min:
+            return self.ratio_low, float(car.cvt_rpm_min), "low-speed", None, None
+        n_lo = max(car.cvt_rpm_min, n_w * self.ratio_top * fd)
+        n_hi = min(car.rpm_max, n_low)
+        if n_hi < n_lo:
+            # the top ratio itself would turn the engine past rpm_max (about 285
+            # km/h on the Accord): no ratio holds the law, so none is invented
+            raise ValueError(f"CvtVehicle: at {v_mps:.2f} m/s the top ratio turns the engine at {n_lo:.0f} rpm, "
+                             f"past rpm_max {car.rpm_max!r}: no ratio of the range holds it")
+        omega = 2 * np.pi / 60.0
+        p_e = force_n * v_mps / self.driveline_eff
+        n_eco = n_lo
+        t_eco = p_e / (n_eco * omega)
+        if force_n <= 0.0 or t_eco <= self.kickdown_threshold_nm(n_eco):
+            return self._ratio(n_eco, n_w), n_eco, "economy", n_eco, t_eco
+
+        def holds(n):
+            return p_e / (n * omega) <= car.target_load * self.deliverable_nm(n)
+        grid = [float(n) for n in np.arange(n_lo, n_hi, CVT_SCAN_RPM)] + [n_hi]
+        below = n_lo
+        for n in grid:
+            if holds(n):
+                lo, hi = below, n
+                while hi - lo > CVT_BISECT_RPM:
+                    mid = 0.5 * (lo + hi)
+                    if holds(mid):
+                        hi = mid
+                    else:
+                        lo = mid
+                return self._ratio(hi, n_w), hi, "kickdown", n_eco, t_eco
+            below = n
+        n_star = max(grid, key=lambda n: self.deliverable_nm(n) * n * omega)
+        return self._ratio(n_star, n_w), n_star, "power-limited", n_eco, t_eco
+
+    def demand(self, v_mps, accel, grade, *, rho):
+        """Tractive force -> engine torque and speed, as Vehicle.demand: f = m a +
+        road_force_n, the ratio by the law, torque f r / (ratio fd eta)."""
+        f = self.mass * accel + self.road_force_n(v_mps, grade, rho=rho)
+        ratio, rpm, branch, n_eco, t_eco = self.ratio_for(v_mps, f)
+        torque = f * self.wheel_r / (ratio * self.final_drive) / self.driveline_eff
+        self.ratio, self.branch, self.n_eco, self.t_eco = ratio, branch, n_eco, t_eco
+        return float(torque), float(rpm)
+
+
+def vehicle_for(car):
+    """The vehicle model of a car record, by the record's exact type (22 October
+    2026, build step 2 P5; PLAN.md 7.2-7.3): Vehicle for an engines.Car (the
+    Supra: the same object as Vehicle(car), so the B58's doubles are untouched),
+    EpaVehicle for an engines.EpaCar, CvtVehicle for an engines.CvtCar. Anything
+    else is refused, never matched to the nearest; `car` is required."""
+    _need(car, "vehicle_for(car=plant.car)")
+    model = {engines.Car: Vehicle, engines.EpaCar: EpaVehicle, engines.CvtCar: CvtVehicle}.get(type(car))
+    if model is None:
+        raise TypeError(f"vehicle_for: {type(car).__name__} is not a car record (engines.CAR_KINDS)")
+    return model(car)
+
+
+# TWO READERS OF THIS FILE THAT LIVE OUTSIDE PLANT_CODE (22 October 2026, the
+# review of build step 2 P5; amendments F2 and F11, decisions 70 and 62). Nothing
+# edits PLANT_CODE after commit A (amendment B5), so their homes are named here;
+# neither needs a hook in this file, since each reads only what it exposes now.
+#   c5_margin(plant, cycle)  C5's margin (PLAN.md 7.4), in a WP3 module outside
+#       PLANT_CODE, beside the roads step that applies it. A stepped box: the
+#       threshold the box applies (decision 70), Vehicle.shift_ceiling_nm(rpm), at
+#       the held gear's rpm and at each rejected higher gear's, from gear_for,
+#       gears, final_drive, wheel_r and driveline_eff, and the SHIFT_RPM_MAX bar.
+#       The CVT: CvtVehicle.kickdown_threshold_nm(N_eco) against T_eco, both from
+#       ratio_for (or the last call's n_eco and t_eco).
+#   the TIT-cap ECU  decision 62's variant for the Ford, a patch of
+#       BaselineECU.step outside PLANT_CODE in thresholds/ecu_shift.py's pattern,
+#       closing over the plant. step's own arguments (rpm, the MAP it is given --
+#       the previous step's, map_b_prev -- iat_k, ect_k), the spark it returns, the
+#       cam (self.cam_deg) and exhaust_backpressure_kpa(map_kpa, engine=...) make
+#       the Operating point, so plant.run_cycle gives the model TIT at each lambda
+#       tried, and the least lambda holding TIT <= cap needs nothing more from here.
+
+
 # ------------------------------------------------------------------ env
 # Torque tracking is always weighted at least this much. See reset().
 TRACK_W_MIN = 0.45
@@ -733,7 +1015,9 @@ class SupervisoryTunerEnv(gym.Env):
         self.rng = np.random.default_rng(seed)
         self.inlet_kpa = plant.engine.boost.inlet_sea_kpa if inlet_kpa is None else inlet_kpa
 
-        self.veh = Vehicle(plant.car)
+        # the car's own vehicle model (vehicle_for, 22 October 2026): Vehicle(car)
+        # for the Supra's engines.Car, as it was
+        self.veh = vehicle_for(plant.car)
         self.ecu = BaselineECU(plant.engine.ecu)
         self.thermal = ThermalNetwork(plant.engine.thermal)
         self.thermal_base = ThermalNetwork(plant.engine.thermal)
@@ -747,9 +1031,17 @@ class SupervisoryTunerEnv(gym.Env):
         a = np.clip(a, -1.0, 1.0)
         return ACT_LO + (a + 1.0) * 0.5 * (ACT_HI - ACT_LO)
 
-    def _evaluate(self, rpm, map_kpa, iat_k, ect_k, spark, lam):
-        """One engine evaluation. Physics plant, or surrogate if supplied."""
+    def _evaluate(self, rpm, map_kpa, iat_k, ect_k, spark, lam, *, cam_deg=None):
+        """One engine evaluation. Physics plant, or surrogate if supplied.
+
+        `cam_deg` is the ECU's intake cam (BaselineECU.cam_deg; 22 October 2026,
+        build step 2 P4), passed to plant.run_cycle by keyword: None on every
+        engine whose form has no D. A surrogate's predict takes no cam, so a cam
+        given with a surrogate is refused, never dropped."""
         if self.engine is not None:
+            if cam_deg is not None:
+                raise ValueError(f"a surrogate engine_model takes no cam input, and this plant's ECU "
+                                 f"commands one (cam_deg {cam_deg!r}, form D)")
             return self.engine.predict(rpm, map_kpa, iat_k, ect_k, spark, lam)
         # AUDIT.md M2: the backpressure ratio was 1.12 here and 1.15 in
         # plant.py, which predict(), compare_log.py and the app all use. Two
@@ -759,7 +1051,7 @@ class SupervisoryTunerEnv(gym.Env):
         r = run_cycle(Operating(rpm=rpm, map_kpa=map_kpa, iat_k=iat_k, ect_k=ect_k,
                                 spark_btdc=spark, lam=lam,
                                 p_exh_kpa=exhaust_backpressure_kpa(map_kpa, engine=eng)),
-                      engine=eng)
+                      engine=eng, cam_deg=cam_deg)
         return dict(torque=r.torque_nm, mdot_fuel=r.mdot_fuel_gps,
                     mdot_air=r.mdot_air_gps,      # for the compressor ceiling, M1
                     egt_k=r.egt_c + 273.15, ki=r.knock_integral, unc=0.0)
@@ -782,7 +1074,7 @@ class SupervisoryTunerEnv(gym.Env):
         return float(np.clip(base + boost_trim, lp.map_floor_kpa, self.MAP_CEIL_KPA))
 
     def _track_torque(self, torque_req, rpm, iat_k, ect_k, spark, lam,
-                      boost_trim, state):
+                      boost_trim, state, *, cam_deg=None):
         """Inner load loop: a PI controller on manifold pressure that makes
         delivered torque follow demand.
 
@@ -792,13 +1084,22 @@ class SupervisoryTunerEnv(gym.Env):
         torque error it cannot fix with spark and lambda alone, and the tracking
         constraint is violated from the first step for reasons that have nothing
         to do with the policy.
+
+        `cam_deg`, the ECU's intake cam (22 October 2026, build step 2 P4), is held
+        through the inner iterations as the spark is: scheduled once, on the load
+        the ECU saw, and passed to _evaluate by keyword. A keyword, so that the
+        callers passing eight positional arguments keep working -- the learning
+        lab's CapturingEnv, which reads args[7], wide_air.py, compare_calibration.py
+        -- on an engine without form D, whose cam is None. A form-D engine run
+        through one of them is refused by the breathing (no cam), never run at a
+        cam nobody scheduled.
         """
         lp, eng = self.plant.engine.loop, self.plant.engine
         ff = self._map_for(torque_req, rpm, boost_trim)
         mp = float(np.clip(state.get("map", ff), lp.map_floor_kpa, self.MAP_CEIL_KPA + boost_trim))
         out = None
         for _ in range(3):                       # 3 inner iterations is plenty
-            out = self._evaluate(rpm, mp, iat_k, ect_k, spark, lam)
+            out = self._evaluate(rpm, mp, iat_k, ect_k, spark, lam, cam_deg=cam_deg)
             err = torque_req - out["torque"]
             # THIS LOOP IS PER STEP, NOT PER SECOND, AND dt IS NOT CONSISTENT
             # ACROSS THE PROJECT. There is no `dt` in the three lines below, so
@@ -982,9 +1283,14 @@ class SupervisoryTunerEnv(gym.Env):
         sp_b, lam_b, fan_b = self.ecu.step(self.rpm, self.map_b_prev,
                                            iat_b, self.thermal_base.t_block,
                                            self.knock_flag_base, self.dt)
+        # Form D's intake cam is the ECU's too (22 October 2026, build step 2 P4;
+        # decision 41): scheduled on the same lagged load as the spark, and handed
+        # to BOTH load loops, the baseline's here and the agent's below, so every
+        # policy inherits it as it inherits the spark. None on an engine without D.
+        cam_b = self.ecu.cam_deg(self.rpm, self.map_b_prev)
         base, map_b = self._track_torque(self.torque_req, self.rpm, iat_b,
                                          self.thermal_base.t_block, sp_b, lam_b,
-                                         0.0, self.pi_base)
+                                         0.0, self.pi_base, cam_deg=cam_b)
         self.map_b_prev = map_b
         # the ECU sees knock above its detection threshold (eng.ecu.knock_detect_ki,
         # the knock integral of 1 on the B58)
@@ -1003,10 +1309,14 @@ class SupervisoryTunerEnv(gym.Env):
         # every baseline-relative reward term is silently offset.
         self.spark = float(np.clip(sp_b + act[0],
                                    eng.ecu.spark_min, eng.ecu.spark_max))
-        self.lam = float(np.clip(lam_b + act[1], 0.70, 1.25))
+        # The lambda clip is the engine's (22 October 2026, build step 2 P2): 0.70
+        # and 1.25 here until then, each engine's ecu.lam_floor and lam_ceiling now.
+        # lam_b + act[1] is float32 (NEP 50), so the clip compares in float32; the
+        # bounds are Python floats, cast as the literals were (engines.Engine).
+        self.lam = float(np.clip(lam_b + act[1], eng.ecu.lam_floor, eng.ecu.lam_ceiling))
         out, self.map_kpa = self._track_torque(self.torque_req, self.rpm, self.iat_k,
                                                self.thermal.t_block, self.spark, self.lam,
-                                               act[2], self.pi_agent)
+                                               act[2], self.pi_agent, cam_deg=cam_b)
         self.tps = float(np.clip(self.map_kpa / self.MAP_CEIL_KPA, 0.0, 1.0))
         self.thermal.step(self.dt, out["mdot_fuel"], out["mdot_air"] + out["mdot_fuel"],
                           out["egt_k"], c["t_amb"], self.v, act[3], act[4], rpm=self.rpm)
@@ -1080,6 +1390,10 @@ def measure_deliverable_torque(rpms, *, plant):
     2026 the grid (1000-6600 in 200s), 42 C, a 365 K block and 30 settling
     steps were defaults here -- the B58 table's, for whatever plant was passed
     (the review of build step 1).
+
+    A form-D engine's cam is the ECU's here as in step(): BaselineECU.cam_deg
+    on the lagged load the ECU's step sees (22 October 2026, build step 2 P4);
+    None, no cam input, on every other engine.
     """
     car = plant.car
     t_amb, t_block, settle = car.table_t_amb, car.table_t_block, car.table_settle
@@ -1094,7 +1408,8 @@ def measure_deliverable_torque(rpms, *, plant):
         ecu, state, mp_prev, knock, hist = BaselineECU(plant.engine.ecu), {}, 150.0, False, []
         for _ in range(settle):
             sp, lam, _ = ecu.step(rpm, mp_prev, iat, t_block, knock, 1.0)
-            r, mp_prev = env._track_torque(1000.0, rpm, iat, t_block, sp, lam, 0.0, state)
+            cam = ecu.cam_deg(rpm, mp_prev)
+            r, mp_prev = env._track_torque(1000.0, rpm, iat, t_block, sp, lam, 0.0, state, cam_deg=cam)
             knock = r["ki"] > plant.engine.ecu.knock_detect_ki
             hist.append(r["torque"])
         out.append((rpm, float(min(hist[settle // 2:]))))
@@ -1278,7 +1593,12 @@ def make_grade_climb(*, duration, dt, t_amb, grade, v_kmh):
 def locked_climb(plant, *, duration, dt):
     """The plant's locked climb -- the scored scenario -- at this length and step:
     make_grade_climb at plant.scenario's grade, speed and ambient (12 % at
-    130 km/h, 42 C for the B58 in its Supra; decision 34 keeps that for every car)."""
+    130 km/h, 42 C for the B58 in its Supra). Decision 44 types the same climb in
+    every car's scenario, its K3 knee set on that trace and its delivery reported;
+    decision 34 (revised 21 October, agreed) scores the four-engine test on other
+    roads, with this climb kept only as a declared transfer row. Corrected 22
+    October 2026 (build step 2 P5; amendment B5): this said "decision 34 keeps
+    that for every car", which the revised decision 34 does not."""
     sc = plant.scenario
     return make_grade_climb(duration=duration, dt=dt, t_amb=sc.t_amb, grade=sc.grade, v_kmh=sc.v_kmh)
 
@@ -1494,11 +1814,28 @@ EXTREME_C_TURB = (0.75, 1.333)        # x the assumed 6000 J/K, log-uniform: saf
 # constant EXTREME_T_FLOOR_NM, a measurement of this engine's closed throttle;
 # it is plant.engine.loop.torque_floor_nm now, passed to the builders below as
 # `floor_nm` and held by ExtremesTrainingEnv as self.floor_nm.
+#
+# THE SUPRA'S CAR ONLY (22 October 2026, build step 2 P5; amendment B15). These
+# builders read the Supra's two-term road load (veh.cd_a, veh.crr) and its gears,
+# and an EPA car has neither the one nor, the Accord, the other. An EpaVehicle is
+# a Vehicle, so a test of the vehicle would let it through, and min_tractive_force
+# reads no road load at all: each builder tests the CAR RECORD, and refuses any
+# but an engines.Car before it reads anything. An EPA car's training roads are a
+# later step's, with their own road load.
+
+
+def _two_term_car(car, who):
+    """Refuse a car that is not the Supra's kind, engines.Car (amendment B15)."""
+    if type(car) is not engines.Car:
+        raise TypeError(f"{who} builds training roads on an engines.Car's two-term road load (drag area, "
+                        f"rolling coefficient) and gears; this car is {type(car).__name__}. No EPA car's "
+                        "training road is built here (amendment B15)")
 
 
 def min_tractive_force(veh, v_mps, floor_nm):
     """Tractive force, N, that asks `floor_nm` of the engine in the gear the box
     holds at this speed under light load."""
+    _two_term_car(getattr(veh, "car", None), "min_tractive_force")
     g = veh.gear_for(float(v_mps), force_n=0.0)
     return floor_nm * veh.gears[g] * veh.final_drive * veh.driveline_eff / veh.wheel_r
 
@@ -1512,6 +1849,7 @@ def grade_floor(v_mps, t_amb, dt, veh, floor_nm):
     (Measured 8 October: without the acceleration term the floor put a 3.5 %
     hill under every launch from rest.) `veh` and `floor_nm` are required: they
     were `veh or Vehicle()` and the B58's 15 Nm until 20 October."""
+    _two_term_car(getattr(veh, "car", None), "grade_floor")
     rho = 101.3e3 / (287.0 * t_amb)
     m, g0 = veh.mass, 9.81
     v = np.asarray(v_mps, dtype=float)
@@ -1531,6 +1869,7 @@ def extreme_speed_profile(rng, n, dt, grade, t_amb, veh, floor_nm):
     so the car slows no faster than the road slows it, less the margin that
     keeps min_tractive_force asked for -- the driver lifting off. `veh` and
     `floor_nm` are required, as in grade_floor."""
+    _two_term_car(getattr(veh, "car", None), "extreme_speed_profile")
     rho = 101.3e3 / (287.0 * t_amb)
     m, g0 = veh.mass, 9.81
     v = np.empty(n)

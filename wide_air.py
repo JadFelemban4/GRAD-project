@@ -216,6 +216,10 @@ class ThinAirVehicle(EE.Vehicle):
     _table = None
 
     def __init__(self, plant):
+        # the Supra's car only (22 October 2026, build step 2 P5; amendment B15):
+        # Vehicle's constructor reads the car's drag area, which an EPA car has not,
+        # and this is the training roads' gearbox
+        EE._two_term_car(plant.car, "ThinAirVehicle")
         super().__init__(plant.car)
         self.plant = plant
 
@@ -247,7 +251,8 @@ min_tractive_force = EE.min_tractive_force
 def grade_floor(v_mps, t_amb, p_kpa, dt, veh, floor_nm):
     """engine_env.grade_floor with drag at this pressure's air density and this
     floor. `veh` and `floor_nm` are required (they were the B58's Vehicle() and
-    15 Nm by default)."""
+    15 Nm by default). The Supra's car only, as engine_env.grade_floor (amendment B15)."""
+    EE._two_term_car(getattr(veh, "car", None), "wide_air.grade_floor")
     rho = _rho(p_kpa, t_amb)
     m, g0 = veh.mass, 9.81
     v = np.asarray(v_mps, dtype=float)
@@ -259,7 +264,9 @@ def grade_floor(v_mps, t_amb, p_kpa, dt, veh, floor_nm):
 
 def speed_profile(rng, n, dt, grade, t_amb, p_kpa, veh, floor_nm):
     """engine_env.extreme_speed_profile with drag at this pressure's air density
-    and this floor; `veh` and `floor_nm` required, as in grade_floor."""
+    and this floor; `veh` and `floor_nm` required, as in grade_floor. The Supra's
+    car only, as engine_env.extreme_speed_profile (amendment B15)."""
+    EE._two_term_car(getattr(veh, "car", None), "wide_air.speed_profile")
     rho = _rho(p_kpa, t_amb)
     m, g0 = veh.mass, 9.81
     v = np.empty(n)

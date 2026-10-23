@@ -134,8 +134,9 @@ number. Read the entry before you touch what it names.
   drifted, mostly for the same reason: one computed on ONE drive and then quoted
   as if it were pooled. On 11 September it found 55 of them in one pass.
 - **Never edit `logs/raw/`.** Those are measurements.
-- After changing `plant.py` or `thermal.py`, re-run `validate.py` and update
-  `validation_table.md` **in the same commit**.
+- After changing `plant.py`, `thermal.py`, `engines.py` or anything under
+  `engine_specs/`, re-run `validate.py` and update `validation_table.md` **in
+  the same commit** (decision 68).
 - After changing the reward or the env, re-run `test_reward.py` and paste the
   output into the commit message.
 - Change one thing, re-run, write down what happened. Two changes at once and

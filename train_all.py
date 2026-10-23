@@ -91,8 +91,10 @@ def move_crashed(outdir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--engine", required=True, choices=engines.known(),
-                    help="the plant every run trains on, passed to train.py (no default)")
+    # engines.trainable(), not known() (22 October 2026, decision 47), as train.py
+    ap.add_argument("--engine", required=True, choices=engines.trainable(),
+                    help="the plant every run trains on, passed to train.py (no default; "
+                         "engines.trainable(), decision 47)")
     ap.add_argument("--road", required=True, choices=("terrain", "extremes", "wideair"))
     ap.add_argument("--device", required=True, choices=("cpu", "cuda"),
                     help="the device every run trains on, passed to train.py (no default: "

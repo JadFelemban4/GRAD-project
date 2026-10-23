@@ -482,8 +482,11 @@ def run_config(a, tag, model, outdir, live, plant_obj):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--engine", required=True, choices=engines.known(),
-                    help="the plant to train on (engines.get). REQUIRED: there is no "
+    # engines.trainable(), not known() (22 October 2026, decision 47): an EPA engine is
+    # registered and refused here until fingerprint schema 4 and its validation exist
+    ap.add_argument("--engine", required=True, choices=engines.trainable(),
+                    help="the plant to train on (engines.get), one that may train "
+                         "(engines.trainable(), decision 47). REQUIRED: there is no "
                          "default engine (CLAUDE.md mistake 1)")
     ap.add_argument("--steps", type=int, default=50_000)
     ap.add_argument("--seed", type=int, default=0)

@@ -827,7 +827,8 @@ python -m app.test_simulation   16 of 16 (9 Oct). The replay lab. SEPARATE from
 python -m app.test_agents  135 tests OK, 14 skipped without runs_c4/ (9 Oct).
                            The agent replay pages; they read the plant's roads,
                            so run it after a plant or road change (mistake 25)
-python test_plant_guards.py  14 tests: a 1 s step equals ten 0.1 s steps, the
+python test_plant_guards.py  19 tests (9 skip until the EPA plants are calibrated):
+                           a 1 s step equals ten 0.1 s steps, the
                            coolant settles at the sweep's 2 s step, and one
                            changed derived constant moves derived_sha while
                            the file's timestamp does not. Each fails with its
@@ -1056,10 +1057,20 @@ engines.py            The plants, by name (GRA-test, decision 24): frozen Engine
 engine_specs/         Each plant's TYPED constants, a TOML file per engine and
                       per car, every value with its label and source (b58.toml,
                       a90_supra.toml). cars/ holds what the sources publish
-                      about decision 24's four cars, read by nothing yet.
+                      about decision 24's four cars; engines.published_car
+                      converts the three EPA cars' rows (build step 2 P5).
 test_engine_threading.py  No plant call leans on a default engine: the
                       signatures, the defaults beside a record, an AST scan of
                       every .py, the names taken from the plant's modules.
+test_fuel_forms.py    Build step 2 (22 Oct): the fuel, the lambda clip and the
+                      cycle forms B, C and D are the engine's; on the B58 every
+                      form at its neutral values gives form A's doubles.
+test_cars.py          The three EPA cars: road load and gearing as identities
+                      (C1, C2), the Accord's kickdown law, the Supra unchanged.
+test_carried.py       Every value an EPA engine spec carries from the B58,
+                      checked against the B58's own, bit for bit.
+test_trainable.py     No EPA engine trains or is scored until it is validated
+                      and schema 4 exists (decision 47).
 epa_map.py            logs/epa/ -> data/engines/<engine>/: EPA's benchmarking
                       tables for the three new engines (never edit those).
 test_epa_map.py       Its tests: hashes, row counts, units, ranges, a
@@ -1069,8 +1080,9 @@ fetch_engine_data.py  Fetches and verifies the public engine and vehicle data
                       git; --verify-only downloads nothing.
 logs/epa/             EPA's files, byte for byte as published (MANIFEST.csv);
                       measurements, never edited. data/engines/ is made from them.
-results/B58_IDENTITY.md  Build step 1's certificate: the B58 through
-                      engines.get is cf43fbb's plant, bit for bit (and the .json).
+results/B58_IDENTITY.md  Commit A's certificate (build step 2): the B58 through
+                      engines.get is cf43fbb's plant, bit for bit (and the .json);
+                      build step 1's is STATE_HISTORY.md part S.
 calibrate_thermal.py  The thermal block + oil fit (and its structure), with
                       leave-one-drive-out scores. derive_params.py calls it.
 car_thermal.py        thermal.py replayed over a logged drive, on measured fuel;
@@ -1140,8 +1152,8 @@ wide_air.py           X2's training roads (train.py --road wideair): the extreme
                       design at 0-45 C and 80-101.3 kPa, the compressor inlet,
                       the kickdown table and the torque floor following the air.
                       Not a hashed plant file. (On GRA-test plant_sha is not
-                      X1's: build step 1 changed the plant files, every number
-                      kept, results/B58_IDENTITY.md.)
+                      X1's: build step 1 and build step 2's commit A changed the
+                      plant files, every number kept, results/B58_IDENTITY.md.)
 test_wide_air.py      Its 17 tests; read its docstring for what each guards.
 analyse_x2.py         X2's preregistered test (X1's rule, five pairs).
 check_x2_convergence.py  Had X2's agents settled? C4's rule at 720k/900k/1080k

@@ -2,9 +2,11 @@
 numpy>=1.26
 gymnasium>=0.29
 pandas>=2.0
-# scipy was listed here until 16 September and is imported by nothing in the
-# repository (AUDIT.md M7). Removed rather than left as a 40 MB install that
-# a reader assumes something depends on.
+# scipy was listed here until 16 September, when nothing imported it (AUDIT.md
+# M7). It is back on 22 October 2026, pinned: build step 2's calibration fits
+# with scipy.optimize.least_squares (decisions 50 and 61), and a fit that is to
+# be reproduced byte for byte needs the version it ran on, the lock's.
+scipy==1.18.1
 
 # Phase C onward, when you start training. Uncomment then.
 # stable-baselines3[extra]>=2.2

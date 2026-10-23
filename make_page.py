@@ -1322,7 +1322,7 @@ def glossary(gen, x1):
     P = ENG.thermal
     same("thermal", (P.c_turb, P.ua_gas_turb, P.ua_turb_amb), (6000.0, 0.90, 18.0))
     same("DT_SUB_MAX", thermal.DT_SUB_MAX, 0.1)
-    same("AFR_STOICH", plant.AFR_STOICH, 14.7)
+    same("fuel.afr_st (was plant.AFR_STOICH)", ENG.fuel.afr_st, 14.7)
     same("corrected_flow", plant.corrected_flow(1000.0, 298.0, 101.3), 1.0)
     same("corrected_flow", plant.corrected_flow(500.0, 4 * 298.0, 2 * 101.3), 0.5)
     g = ENG.geometry
@@ -1410,7 +1410,7 @@ def glossary(gen, x1):
          "ki=r.knock_integral, unc=0.0)",
          "w_track = float(TRACK_W_MIN + (TRACK_W_MAX - TRACK_W_MIN) * self.rng.random())",
          "w_rest = self.rng.dirichlet(np.ones(2)) * (1.0 - w_track)")
-    _src("car_thermal.py", "return air / (AFR_STOICH * lam)")
+    _src("car_thermal.py", "return air / (afr_st * lam)")
     _src("fingerprint.py", "hexdigest()[:16]", 'vals = {k: v for k, v in d.items() if not k.startswith("_")}')
     _src("analyse_x1.py", "shifted = [mei - d for d in diffs]", "if p_neg < ALPHA:",
          "if p_sign < ALPHA:", "if p_lt_sign < ALPHA:")

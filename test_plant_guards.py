@@ -17,7 +17,9 @@ that fails if the guard is removed.
    file's bookkeeping (keys starting with "_", such as the timestamp
    derive_params.py writes) must not, or every rebuild of the dataset would
    lock out every trained agent. Runs on a copy of the file; the real one is
-   never touched.
+   never touched. Since 22 October 2026 (build step 2 P6) for every registered
+   plant that has its derived file; an EPA engine before its calibration is
+   skipped by name.
 
 3. THE FINGERPRINT NAMES THE ENGINE (schema 3, 20 October 2026, the four-engine
    build). engine, engine_sha and backend are FATAL; a record of an older
@@ -35,15 +37,22 @@ that fails if the guard is removed.
    with, and gets torch's deterministic algorithms; on the CPU the function
    changes nothing.
 
+5. THE FINGERPRINT NAMES EVERY DIRTY PLANT FILE (22 October 2026, build step 2
+   P7; found on the way by the reviews of P2-P6). git_dirty_plant_files missed
+   whichever plant file `git status --porcelain` listed first, when that line
+   began with a space: fingerprint._git stripped the whole output. Strip it
+   again and the test fails.
+
 Added 9 October 2026: WBS v3 rows 2.2 and 2.6 named these tests as missing.
 """
-import copy
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import numpy as np
 
@@ -98,37 +107,76 @@ class SubStepping(unittest.TestCase):
                         f"the block node still moves {last.max():.3f} K per 2 s step at the end of a held climb")
 
 
+# EVERY REGISTERED PLANT THAT HAS ITS DERIVED FILE (22 October 2026, build step 2
+# P6; docs/build_step_2/PLAN.md WP1: "DerivedFingerprint per registered plant that
+# has a file"). Each check runs on a copy of each such plant's file, the B58's
+# data/derived_params.json among them; a registered plant whose file does not
+# exist yet -- an EPA engine before its calibration writes it -- is skipped by
+# name, and nothing of it is built (engines.get would stop in derived.py). The
+# constant moved is one its derived set writes (engines.DERIVED_BY_SET): the B58's
+# thermostat span, as before, and an EPA engine's burn base, in a frozen section.
+MOVED_BY_SET = {"b58": ("thermal", "t_stat_span"), "epa": ("cycle", "burn_base")}
+
+
 class DerivedFingerprint(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp(prefix="derived_sha_")
-        self.path = os.path.join(self.dir, "derived_params.json")
-        shutil.copyfile(os.path.join(HERE, "data", "derived_params.json"), self.path)
-        with open(self.path, encoding="utf-8") as fh:
-            self.d = json.load(fh)
 
     def tearDown(self):
         shutil.rmtree(self.dir, ignore_errors=True)
 
-    def _sha_of(self, d):
-        with open(self.path, "w", encoding="utf-8") as fh:
+    def each_plant(self):
+        """(name, its live derived file, its derived set) for each registered plant
+        whose derived file exists; one whose file does not exist yet is a skipped
+        subTest, by name. The B58 is always among those checked."""
+        out = []
+        for name in engines.known():
+            meta = engines.read_spec(engines.PLANTS[name][0])["_meta"]
+            live = os.path.join(HERE, meta["derived"])
+            if os.path.exists(live):
+                out.append((name, live, meta["derived_set"]))
+                continue
+            with self.subTest(plant=name):
+                self.skipTest(f"{name} is not calibrated yet: no {meta['derived']}")
+        self.assertIn("b58", [n for n, _, _ in out], "no registered plant with a derived file was checked")
+        return out
+
+    @staticmethod
+    def _load(live):
+        with open(live, encoding="utf-8") as fh:
+            return json.load(fh)
+
+    def _sha_of(self, name, d):
+        path = os.path.join(self.dir, name, "derived_params.json")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as fh:
             json.dump(d, fh)
-        return FP.derived_sha(self.path)
+        return FP.derived_sha(path)
 
     def test_a_copy_hashes_as_the_live_file(self):
-        self.assertEqual(self._sha_of(self.d), FP.derived_sha(LIVE_DERIVED))
+        lives = []
+        for name, live, _ in self.each_plant():
+            with self.subTest(plant=name):
+                self.assertEqual(self._sha_of(name, self._load(live)), FP.derived_sha(live))
+            lives.append(os.path.normpath(live))
+        self.assertIn(os.path.normpath(LIVE_DERIVED), lives, "the B58's own file was not among them")
 
     def test_one_changed_constant_moves_it(self):
-        d = copy.deepcopy(self.d)
-        stat = d["thermal"]["t_stat_span"]
-        d["thermal"]["t_stat_span"] = stat * 1.001
-        self.assertNotEqual(self._sha_of(d), FP.derived_sha(LIVE_DERIVED),
-                            "derived_sha did not move when a derived constant changed")
+        for name, live, dset in self.each_plant():
+            with self.subTest(plant=name):
+                sec, key = MOVED_BY_SET[dset]
+                d = self._load(live)
+                d[sec][key] = d[sec][key] * 1.001
+                self.assertNotEqual(self._sha_of(name, d), FP.derived_sha(live),
+                                    f"{name}: derived_sha did not move when a derived constant changed")
 
     def test_bookkeeping_does_not(self):
-        d = copy.deepcopy(self.d)
-        d["_generated"] = "2099-01-01 00:00"
-        self.assertEqual(self._sha_of(d), FP.derived_sha(LIVE_DERIVED),
-                         "derived_sha moved on a timestamp: every rebuild would refuse every agent")
+        for name, live, _ in self.each_plant():
+            with self.subTest(plant=name):
+                d = self._load(live)
+                d["_generated"] = "2099-01-01 00:00"
+                self.assertEqual(self._sha_of(name, d), FP.derived_sha(live),
+                                 f"{name}: derived_sha moved on a timestamp: every rebuild would refuse every agent")
 
     def test_it_is_fatal(self):
         self.assertIn("derived_sha", FP.FATAL)
@@ -239,6 +287,45 @@ class SchemaThree(unittest.TestCase):
             FP.backend_of(object())
         with self.assertRaises(ValueError):
             FP.plant_fingerprint(plant=PLANT, backend="table:0123")
+
+
+class GitDirtyPlantFiles(unittest.TestCase):
+    """The fingerprint's advisory git_dirty_plant_files names EVERY dirty plant
+    file (22 October 2026, build step 2 P7; found on the way by the reviews of P2,
+    P3, P4 and P6). fingerprint._git stripped the whole of `git status
+    --porcelain`, and so the leading space of its first line alone: " M
+    engine_env.py" became "M engine_env.py", its path was read as "ngine_env.py",
+    and the first dirty file -- engine_env.py, during WP1 -- was never named. git
+    is not asked here: subprocess.run, which _git calls, answers with a fixed
+    porcelain whose first line is a plant file changed in the work tree only."""
+
+    PORCELAIN = " M engine_env.py\n M engines.py\n?? notes.txt\nM  plant.py\n"
+
+    def _fingerprint(self, porcelain):
+        real = subprocess.run
+
+        def run(args, *a, **kw):
+            if tuple(args[:2]) == ("git", "status"):
+                return subprocess.CompletedProcess(args, 0, stdout=porcelain, stderr="")
+            if tuple(args[:2]) == ("git", "rev-parse"):
+                return subprocess.CompletedProcess(args, 0, stdout="0123abcd\n", stderr="")
+            return real(args, *a, **kw)
+        with mock.patch.object(FP.subprocess, "run", side_effect=run):
+            return FP.plant_fingerprint(plant=PLANT, backend=FP.BACKEND_CYCLE)
+
+    def test_the_first_dirty_plant_file_is_named(self):
+        """Every plant file the porcelain lists, the first among them, whatever its
+        status columns; the untracked note is not a plant file. git_head keeps its
+        hash without the newline, as strip() gave it."""
+        fp = self._fingerprint(self.PORCELAIN)
+        self.assertEqual(fp["git_dirty_plant_files"], ["engine_env.py", "engines.py", "plant.py"])
+        self.assertIs(fp["git_dirty"], True)
+        self.assertEqual(fp["git_head"], "0123abcd")
+
+    def test_a_clean_tree_names_none(self):
+        """The control: an empty porcelain is a clean tree, not an unknown one."""
+        fp = self._fingerprint("")
+        self.assertEqual((fp["git_dirty"], fp["git_dirty_plant_files"]), (False, []))
 
 
 class DeviceGuard(unittest.TestCase):

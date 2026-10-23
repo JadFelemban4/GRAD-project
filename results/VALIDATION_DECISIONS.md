@@ -202,6 +202,7 @@ choice.
 | 67 | Old hashes after the plant commit (mistake 11) | **Grep and update every mention; the build-step-1 certificate page moves verbatim to `STATE_HISTORY.md`.** Hashes are not figures, so `verify_docs.RETIRED` is not used | delegated 21 Oct: adopted | |
 | 68 | CLAUDE.md's re-run rule | **Name `engines.py` and `engine_specs/` in it**, as `.claude/rules/physics.md` does | delegated 21 Oct: adopted | |
 | 69 | The Ford's fuel in use | **HD1's batch (FTAG 26864: AFR_st 14.559, 42.908 MJ/kg)**, the high-load cell; calibration rows still run on their own table's fuel, and Cell 9's batch (14.557) is reported as a variant | delegated 21 Oct: adopted | |
+| 72 (added 22 Oct, the review of build step 2 P6) | The Mazda's stroke | **DERIVED_ONCE, 99.98 mm, from EPA's 2.488 L and its 89 mm bore, as `engine_specs/mazda_25t.toml` types it now**, so the plant displaces what EPA's map package states (PLAN.md 9.2). The other option is PUBLISHED, 100 mm: Mazda's 2019 CX-9 sheet (MZ19, opened 22 October 2026, PDF pages 2, 8, 14 and 21) prints "BORE X STROKE (MM) 89 x 100" and "DISPLACEMENT (CC) 2488", and 100 mm displaces 2.48846 L. The plan's reason, "EPA asserts no stroke", was written before MZ19 was opened; the two strokes differ by 0.018 %. The conrod follows the stroke (the B58's rod ratio), and both are frozen with the plant commit, commit A (amendment B5): an answer is applied before that commit, or the typed value stands | delegated 21 Oct: adopted | |
 
 *Before version 4's text (group 2).*
 

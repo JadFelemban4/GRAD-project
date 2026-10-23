@@ -1,0 +1,62 @@
+# engine_specs/cx9_2016.toml -- the 2016 Mazda CX-9 2.5 L turbo, front-wheel drive,
+# with its 6-speed automatic: the car the mazda_25t plant runs in (decision 24),
+# its TYPED constants and its locked climb.
+#
+# The format, the labels and the rule against typed DERIVED values are
+# engine_specs/b58.toml's (engines.read_spec). Written on 22 October 2026 (build
+# step 2 P6: docs/build_step_2/PLAN.md WP1 P6 and section 7.5, as its amendments
+# docs/build_step_2/AMENDMENTS.md F3, F4, F12 and C13 correct it; decisions 42-45,
+# results/VALIDATION_DECISIONS.md section H).
+#
+# NOT TYPED HERE. The mass, the wheel radius and EPA's road load (A, B, C and the
+# air they hold at) are CONVERTED from the published car file named below, with
+# exact factors (engines.published_car; decision 42); the deliverable-torque
+# table is DERIVED, measured through the frozen plant after its freeze
+# (engines.EPA_DERIVED_FIELDS; PLAN.md 5.9 item 1). Values carried from the
+# Supra's car are marked "CARRIED FROM THE B58: " as engine_specs/mazda_25t.toml
+# describes, and test_carried.py checks them; test_cars.py prints the converted
+# values and checks the typed ones against the published file.
+
+id = "cx9_2016_25t"
+# kind -- which car record and vehicle model this car is (engines.CAR_KINDS,
+# engine_env.vehicle_for): "three_term_stepped", engines.EpaCar and
+# engine_env.EpaVehicle, EPA's three-term road load and a stepped box.
+# label DESIGN; source: decision 42 (results/VALIDATION_DECISIONS.md section H:
+# the EPA cars run EPA's certification road load) and build step 2 P5 and P6
+# (docs/build_step_2/PLAN.md WP1, 7.1-7.2), 22 October 2026. A top-level key cannot
+# be a { value, label, source } entry (engines.read_spec reads a table as a section),
+# so its label and source are this comment (amendment B13); it is hashed by its value.
+kind = "three_term_stepped"
+# published -- the published car file the mass, the wheel radius and the road load
+# are converted from (engines.published_car): EPA's Test Car List row of the car
+# Argonne tested in D3, rows 2677-2678 of 16tstcar.csv, the targets D3 drove on
+# (its [epa_test_car]). label DESIGN; source: decision 42 and
+# engine_specs/cars/README.md, "Deriving what the model needs"; build step 2 P6,
+# 22 October 2026; a comment, as kind's (amendment B13). fingerprint.plant_files
+# hashes the file with the specs (engines.spec_files).
+published = "engine_specs/cars/cx9_2016_25t.toml"
+
+[car]
+final_drive = { value = 4.411, label = "PUBLISHED", source = "NH519 Table 4 p. 13; MZ19 prints 4.411 too (engine_specs/cars/cx9_2016_25t.toml [final_drive]). EPA's Test Car List row rounds it to 4.41, which the wheel radius uses (engines.published_car): the 2.27e-4 gap in the top-gear N/V is decision 42's disclosure (test_cars.py C2)" }
+gears = { value = [3.487, 1.992, 1.449, 1.00, 0.707, 0.600], label = "PUBLISHED", source = "the 6-speed automatic, 1st to 6th: NH519 Table 4 p. 13; MZ19 prints the same six (engine_specs/cars/cx9_2016_25t.toml [gear_ratios])" }
+driveline_eff = { value = 0.92, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] driveline_eff (ASSUMED there: REFERENCES.md section 4b, CANNOT). Not published for this car (engine_specs/cars/cx9_2016_25t.toml [not_typed]). EPA's coast-down targets already hold the driveline's drag (engine_specs/cars/README.md), so the demand is also reported at 0.95, and the K3 knee at 0.86 and 0.98 (decision 44); E6 row 10 sets 0.86-0.98 for C3 (PLAN.md 7.5)" }
+peak_torque_nm = { value = 420.3035639827341, unit = "Nm", label = "PUBLISHED", source = "310 lb-ft @ 2,000 rpm: Mazda USA, 2019 CX-9 specifications (MZ19, engine_specs/cars/cx9_2016_25t.toml [sources.MZ19]), PDF pages 2, 8, 14 and 21 (Sport, Touring, Grand Touring, Signature), opened 22 October 2026, sha256 aa0c19ad21248f1c17c72be13248ff2179fa8c393ea0ac95e194b36a296c45fb; x 1.3558179483314003 N m per lbf ft (4.4482216152605 N x 0.3048 m, exact by definition). Model year 2019: no Mazda sheet of the 2016 car was opened (the curb weight's note there). Decision 43: from Mazda's published sheet, never from D3. It sets the kickdown, shift_load x peak (engine_env.Vehicle.shift_ceiling_nm)" }
+shift_load = { value = 0.75, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] shift_load (ASSUMED there: 'ordinary automatic calibration; no source opened for this vehicle's', REFERENCES.md section 2b). The Supra's shift constants, not D3-derived ones (decision 43); the locked climb's gear and its margin to the kickdown are reported at completion (decision 44, amendment F3)" }
+shift_rpm_max = { value = 5000.0, unit = "rpm", label = "DESIGN", source = "= rpm_max: never hand back a gear that turns the engine above the highest calibration line (PLAN.md 7.5; mistake 6). The margin to this bar on the locked climb is reported at completion (decision 44, amendment F3)" }
+upshift_min_rpm = { value = 2000.0, unit = "rpm", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] upshift_min_rpm (DERIVED_ONCE there: swept against the Supra's own inferred gear, 19 September 2026). The Supra's, not D3's (decision 43)" }
+rpm_min = { value = 1300.0, unit = "rpm", label = "DESIGN", source = "the lowest calibration line, 1300 rpm: results/ENGINE_THRESHOLDS.json engines.mazda_25t.lines (contract version 3), whose end lines are never held out (thresholds/split.py; amendment C13). The engine-speed clip in the vehicle's demand: never run the engine where it was not measured (mistake 6)" }
+rpm_max = { value = 5000.0, unit = "rpm", label = "DESIGN", source = "the highest calibration line, 5000 rpm, as rpm_min" }
+table_rpm_lo = { value = 1300, unit = "rpm", label = "DESIGN", source = "the deliverable-torque table's lowest speed, rpm_min: the grid lies inside the calibration lines, since np.interp clamps at the table's ends (engine_env.Vehicle.shift_ceiling_nm; PLAN.md 5.9 item 1)" }
+table_rpm_hi = { value = 5000, unit = "rpm", label = "DESIGN", source = "the table's highest speed, rpm_max, as table_rpm_lo" }
+table_rpm_step = { value = 100, unit = "rpm", label = "DESIGN", source = "the grid's spacing (PLAN.md 7.5)" }
+table_t_amb = { value = 315.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] table_t_amb (DESIGN there: 42 C, the locked climb's ambient), this car's locked climb's too (decision 44)" }
+table_t_block = { value = 365.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] table_t_block (ASSUMED there: a warm block, 92 C, no reason recorded for 365 K)" }
+table_settle = { value = 30, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] table_settle (DERIVED_ONCE there: the load loop's steps per speed, 11 October 2026). The table is re-measured at 60 and the largest difference reported (PLAN.md 5.9 item 1)" }
+
+[scenario]
+# THE LOCKED CLIMB of every car (decision 44): the Supra's, decided by the team on
+# 18 September 2026 (engine_specs/a90_supra.toml [scenario]), with the delivery
+# reported; a climb at the highest delivered speed is the declared remedy.
+grade = { value = 0.12, label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [scenario] grade (DESIGN there: 12 %, the locked climb). The same climb for every car (decision 44)" }
+v_kmh = { value = 130.0, unit = "km/h", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [scenario] v_kmh (DESIGN there: 130 km/h), as grade. EPA's road load is valid 15-115 km/h, so the climb extrapolates it (mistake 6; engine_env.EpaVehicle)" }
+t_amb = { value = 315.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [scenario] t_amb (DESIGN there: 42 C), as grade" }

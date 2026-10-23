@@ -56,6 +56,8 @@ import os
 
 import numpy as np
 
+import engines
+
 AGENT = ("action", "applied", "obs", "reward")
 INFO = ("t_turb", "t_oil", "t_block", "torque", "torque_req", "torque_base", "spark", "lam", "ki",
         "egt_c", "mdot_fuel", "mdot_exh", "r_fuel", "r_life", "r_resp",
@@ -71,8 +73,23 @@ INTS = ("gear", "steps", "episode_seed", "episode", "step")
 
 
 def gear(env):
-    """The gear the box is in, 1-8, from engine speed and road speed; 0 at rest."""
+    """The gear the box is in, 1-8, from engine speed and road speed; 0 at rest.
+
+    A CVT IS NEVER RECORDED (22 October 2026, build step 2 P5; amendment B16,
+    its second option, chosen at the review of P5). The Accord's box
+    (engines.CvtCar, engine_env.CvtVehicle) has no gears to count, and 0 is
+    "at rest" here: a record holding 0 for every moving step would hand back a
+    value as if it held (mistake 9). B16's first option, the ratio recorded, adds
+    a field to every record, the B58's included, which the identity harness
+    dumps. So: completion's delivery check (PLAN.md 5.9 item 3) reads env.rpm and
+    env.veh directly -- env.veh.ratio and env.veh.branch, the law's last ratio and
+    branch -- and evaluate.run_episode(record=...) is never run on the Accord;
+    this refuses it, by name, rather than record it. It was a 0 until the review."""
     veh = env.veh
+    if isinstance(veh.car, engines.CvtCar):
+        raise ValueError(f"step_record: {veh.car.id} has a CVT, and a record's gear counts a stepped box's "
+                         "gears (0 is at rest). A CVT is never recorded (amendment B16): read env.rpm, "
+                         "env.veh.ratio and env.veh.branch directly, as completion's delivery check does")
     if env.v < 1.0:
         return 0
     wheel_rpm = env.v / veh.wheel_r * 60.0 / (2 * np.pi)

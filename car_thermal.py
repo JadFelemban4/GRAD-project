@@ -8,7 +8,8 @@ WHAT IS FED IN, AND WHY FUEL IS MEASURED RATHER THAN MODELLED
 -------------------------------------------------------------
 Every input is a logged channel on a 1 s grid: engine speed, air mass flow,
 lambda, coolant, oil, ambient, road speed. The fuel the engine burned is formed
-from two MEASURED channels, air mass flow over (14.7 x lambda). Until
+from two MEASURED channels, air mass flow over (AFR_st x lambda), the engine's
+fuel's stoichiometric ratio (14.7 on the B58, engines.Fuel). Until
 28 September the replays took fuel from the combustion model instead, and the
 two differ where it matters: on overrun the car cuts fuel and its lambda channel
 reads ~16, so measured fuel goes to zero, while the model path fell back to
@@ -121,12 +122,17 @@ def raw_grid(source):
     return g
 
 
-def measured_fuel_gps(air_gps, lam, rpm):
-    """Fuel burned, g/s: MEASURED air mass flow over (14.7 x MEASURED lambda)."""
-    from plant import AFR_STOICH
+def measured_fuel_gps(air_gps, lam, rpm, *, afr_st):
+    """Fuel burned, g/s: MEASURED air mass flow over (afr_st x MEASURED lambda).
+
+    `afr_st` is the stoichiometric air-fuel ratio of the fuel the logged engine
+    burned, plant.engine.fuel.afr_st (14.7 on the B58), and is required (22
+    October 2026, build step 2 P1): it was plant.AFR_STOICH, one gasoline for
+    every engine (mistake 1). The same double in the same expression, so the
+    B58's thermal fit reads the fuel it read, and its derived file does not move."""
     air = np.where(np.isfinite(air_gps) & (np.nan_to_num(rpm) > 400.0), air_gps, 0.0)
     lam = np.where(np.isfinite(lam) & (lam > 0.5), lam, 1.0)
-    return air / (AFR_STOICH * lam)
+    return air / (afr_st * lam)
 
 
 def thermal_replay(source, params=None, pin_block=False, *, plant):
@@ -143,14 +149,27 @@ def thermal_replay(source, params=None, pin_block=False, *, plant):
     `plant` is required (20 October 2026): the logged drives are the B58's, and
     the network, the ECU and the charge temperature are that plant's. `params`
     None means the plant's own thermal constants (it meant thermal.ThermalParams()
-    -- the B58's defaults -- until then).
+    -- the B58's defaults -- until then). A `params` given must burn the plant's
+    fuel: its heating value, the copy ThermalParams.fuel_lhv_j_per_kg, is the
+    plant's own, the same double, or it is refused (22 October 2026, build step 2
+    P7; the review of P1). The fuel flow below runs on the plant's afr_st, so a
+    copy of another fuel's would have the network burn one fuel and the replay
+    meter another, the two copies Engine refuses apart (the contract's finding
+    19); change the fuel with engines.with_fuel, on the plant.
     """
     from thermal import ThermalNetwork
     from engine_env import BaselineECU
     from plant import charge_temperature
     params = plant.engine.thermal if params is None else params
+    lhv, own = params.fuel_lhv_j_per_kg, plant.engine.fuel.lhv_j_per_kg
+    if type(lhv) is not float or lhv.hex() != own.hex():
+        raise ValueError(f"thermal_replay: params.fuel_lhv_j_per_kg is {lhv!r} ({type(lhv).__name__}) and the "
+                         f"plant's fuel.lhv_j_per_kg {own!r}: the network would burn another fuel than the "
+                         "fuel flow it is fed. Change the fuel with engines.with_fuel, on the plant")
     d = log_grid(source)
-    fuel = measured_fuel_gps(d.air_gps.to_numpy(), d.lam.to_numpy(), d.rpm.to_numpy())
+    # the plant's own fuel, not a named engine's (amendment B6, 22 October 2026)
+    fuel = measured_fuel_gps(d.air_gps.to_numpy(), d.lam.to_numpy(), d.rpm.to_numpy(),
+                             afr_st=plant.engine.fuel.afr_st)
     air_gps = np.where(np.isfinite(d.air_gps.to_numpy()), d.air_gps.to_numpy(), 0.0)
     amb = d.t_amb.ffill().bfill().fillna(30.0).to_numpy() + 273.15
     ect = d.ect_c.to_numpy() + 273.15

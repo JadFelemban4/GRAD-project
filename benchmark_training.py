@@ -132,7 +132,7 @@ from datetime import datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TRAIN = os.path.join(HERE, "train.py")
-ENGINE = "b58"                       # the one engine that exists yet (engines.known(), 21 October)
+ENGINE = "b58"                       # the one engine that may train (engines.trainable(), decision 47, 22 October)
 ROAD = "extremes"                    # X1's design, the B58 -- what build step 1 certified
 DT = 1.0                             # train.DESIGN_DT["extremes"], passed explicitly; the probe refuses a mismatch
 # The experiment the day counts are for: 4 engines x 3 arms x seeds x 450 000 steps (decisions
@@ -291,7 +291,8 @@ def machine(probe):
              ram_gb=round(vm.total / 2**30, 1), available_gb=round(vm.available / 2**30, 1),
              python=platform.python_version(), torch=probe["torch"], torch_cuda=probe["torch_cuda"],
              packages={k: have.get(k) for k in CTD.CRITICAL}, power=power_plan(), gpus=gpus(),
-             cuda=probe.get("cuda"), engines_known=probe.get("engines_known"))
+             cuda=probe.get("cuda"), engines_known=probe.get("engines_known"),
+             engines_trainable=probe.get("engines_trainable"))
     return m
 
 
@@ -412,8 +413,10 @@ def part_probe():
     import torch
     import engines
     from train import DESIGN_DT
+    # the plants that may train beside the ones registered (decision 47, amendment B7, 22 October
+    # 2026): an EPA engine is registered and refused by train.py until schema 4 and its validation
     out = dict(torch=torch.__version__, torch_cuda=torch.version.cuda, design_dt=DESIGN_DT[ROAD],
-               engines_known=engines.known())
+               engines_known=engines.known(), engines_trainable=list(engines.trainable()))
     if torch.version.cuda is None:
         out["cuda"] = dict(ok=False, why=f"this torch ({torch.__version__}) is a CPU build")
         return out

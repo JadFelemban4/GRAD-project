@@ -68,7 +68,8 @@
 <script>
 const $ = id => document.getElementById(id);
 // Thresholds come from the server (meta.limits), which reads them from
-// engine_env.TURB_PROTECT_K -- the same constant check_premise.py and
+// app.alerts.TURB_PROTECT_K, the B58's damage knee in its engine record
+// (engines.get("b58").engine.damage.turb_knee_k) -- the knee check_premise.py and
 // generality_test.py score with. This page keeps no copy of its own.
 let LIMIT = 850;
 

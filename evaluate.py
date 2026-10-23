@@ -419,8 +419,11 @@ def main():
     ap.add_argument("models", nargs="*",
                     help="runs/<tag> directories; 'blind' in the name means "
                          "the preview channel was zeroed during training")
-    ap.add_argument("--engine", required=True, choices=engines.known(),
-                    help="the plant the episodes run on (engines.get). REQUIRED: "
+    # engines.trainable(), not known() (22 October 2026, decision 47): an EPA engine is
+    # not scored until fingerprint schema 4 and its validation exist
+    ap.add_argument("--engine", required=True, choices=engines.trainable(),
+                    help="the plant the episodes run on (engines.get), one that may be "
+                         "scored (engines.trainable(), decision 47). REQUIRED: "
                          "there is no default engine (CLAUDE.md mistake 1)")
     ap.add_argument("--out", default=None,
                     help="also write the whole report, fingerprint block "

@@ -314,11 +314,20 @@ def _sha_files(names, code_only=True):
 
 def _git(*args):
     """A git field, or None. Never raises: a fingerprint must not fail to build
-    because the result is being produced outside a checkout."""
+    because the result is being produced outside a checkout.
+
+    Only the line ends are stripped (22 October 2026, build step 2 P7; found on
+    the way by the reviews of P2, P3, P4 and P6, outside their scope). `git
+    status --porcelain` begins each line with two status columns, the first a
+    space for a file changed in the work tree only (" M engine_env.py"); the
+    strip() this was dropped that space from the first line alone, so
+    git_dirty_plant_files read that line's path without its first character
+    ("ngine_env.py") and never named the first dirty file. A git_dirty_plant_files
+    recorded before this can be short by that one file."""
     try:
         out = subprocess.run(("git",) + args, cwd=HERE, capture_output=True,
                              text=True, timeout=10)
-        return out.stdout.strip() if out.returncode == 0 else None
+        return out.stdout.rstrip("\r\n") if out.returncode == 0 else None
     except (OSError, subprocess.SubprocessError):
         return None
 
@@ -401,6 +410,22 @@ def plant_fingerprint(protocol="phase-d", *, plant, backend, **advisory):
     if backend != BACKEND_CYCLE:
         raise ValueError(f"backend {backend!r}: only {BACKEND_CYCLE!r}, the 0-D cycle model, exists "
                          "(decision 28 would add a table)")
+    # A CVT HAS NO GEARS (22 October 2026, build step 2 P5; amendment B17). The
+    # FATAL gears and final_drive below record a stepped box; the Accord's CVT
+    # (engines.CvtCar) has a ratio range and a law instead, and schema 3 has no
+    # field for them. Refused by name here, not as an AttributeError at `gears`;
+    # what schema 4 records is still open (CHECKPOINT.md: "fingerprint schema 4
+    # (decisions 27, 28) before any new engine trains").
+    if isinstance(plant.car, engines.CvtCar):
+        raise ValueError(f"{plant.id}: this car has no gears; fingerprint schema 3 cannot record it")
+    # A CANDIDATE IS NEVER FINGERPRINTED (22 October 2026, the review of build step
+    # 2 P5): engines.build_candidate builds it from a calibration's in-memory
+    # values, and derived_sha below would hash the file on disk its engine.derived
+    # names, which it was not built from.
+    if engines.is_candidate(plant):
+        raise ValueError(f"{plant.id}: a candidate (engines.build_candidate), built from in-memory DERIVED "
+                         f"values, not from {plant.engine.derived}: a fingerprint would record that file's "
+                         "derived_sha for it. Fingerprint the plant engines.get builds from the file")
     files = plant_files(engines.name_of(plant))
     if protocol == "phase-d":
         sc = plant.scenario
@@ -687,6 +712,22 @@ def read(path):
         return None
 
 
+def refuse_uncalibrated(name):
+    """Stop, naming the plant, when the plant registered as `name` has no derived
+    file yet (or, an EPA engine, no freeze record): engines.get would die inside
+    derived.py with a traceback, and a fingerprint of a plant that cannot be built
+    is no fingerprint (22 October 2026, build step 2 P5; amendment B7). The CLI
+    below keeps every registered plant among its choices (engines.known()), so
+    that a fingerprint can be asked of any of them, and refuses this one by name."""
+    import derived
+    import engines
+    if not engines.calibrated(name):
+        spec = engines.read_spec(engines.PLANTS[name][0])["_meta"]
+        raise SystemExit(f"fingerprint.py: plant {name!r} is not calibrated yet: no {spec['derived']}"
+                         + (f" or no {spec['freeze']}" if "freeze" in spec else "")
+                         + f". Make it with: {derived._maker(os.path.join(HERE, spec['derived']))}")
+
+
 if __name__ == "__main__":
     import argparse
     import engines
@@ -694,6 +735,7 @@ if __name__ == "__main__":
     ap.add_argument("--engine", required=True, choices=engines.known())
     ap.add_argument("--protocol", default="phase-d", choices=("phase-d", "d2"))
     a = ap.parse_args()
+    refuse_uncalibrated(a.engine)
     # every environment this tree builds runs the 0-D cycle model (backend_of)
     print(format_block(plant_fingerprint(a.protocol, plant=engines.get(a.engine), backend=BACKEND_CYCLE),
                        "PLANT FINGERPRINT (live)"))

@@ -1,0 +1,65 @@
+# engine_specs/f150_2015.toml -- the 2015 Ford F-150 4x2 with the 2.7 L EcoBoost
+# V6 and the 6-speed automatic (6R80): the truck the ford_27tt plant runs in
+# (decision 24), its TYPED constants and its locked climb.
+#
+# The format, the labels and the rule against typed DERIVED values are
+# engine_specs/b58.toml's (engines.read_spec). Written on 22 October 2026 (build
+# step 2 P6: docs/build_step_2/PLAN.md WP1 P6 and section 7.5, as its amendments
+# docs/build_step_2/AMENDMENTS.md F3, F12 and C13 correct it; decisions 42-45,
+# results/VALIDATION_DECISIONS.md section H). The layout is engine_specs/
+# cx9_2016.toml's.
+#
+# NOT TYPED HERE. The mass, the wheel radius and EPA's road load (A, B, C and the
+# air they hold at) are CONVERTED from the published car file named below, with
+# exact factors (engines.published_car; decision 42); the deliverable-torque
+# table is DERIVED, measured through the frozen plant after its freeze
+# (engines.EPA_DERIVED_FIELDS; PLAN.md 5.9 item 1). Values carried from the
+# Supra's car are marked "CARRIED FROM THE B58: " as engine_specs/mazda_25t.toml
+# describes, and test_carried.py checks them; test_cars.py prints the converted
+# values and checks the typed ones against the published file. No driving data
+# exists for this truck (engine_specs/cars/f150_2015_27tt.toml).
+
+id = "f150_2015_27tt"
+# kind -- which car record and vehicle model this car is (engines.CAR_KINDS,
+# engine_env.vehicle_for): "three_term_stepped", engines.EpaCar and
+# engine_env.EpaVehicle, EPA's three-term road load and a stepped box.
+# label DESIGN; source: decision 42 (results/VALIDATION_DECISIONS.md section H:
+# the EPA cars run EPA's certification road load) and build step 2 P5 and P6
+# (docs/build_step_2/PLAN.md WP1, 7.1-7.2), 22 October 2026. A top-level key cannot
+# be a { value, label, source } entry (engines.read_spec reads a table as a section),
+# so its label and source are this comment (amendment B13); it is hashed by its value.
+kind = "three_term_stepped"
+# published -- the published car file the mass, the wheel radius and the road load
+# are converted from (engines.published_car): EPA's Test Car List row of the 4x2
+# SuperCab at 4750 lb, rows 1716-1717 of 15tstcar.csv (its [epa_test_car]); which
+# body EPA's own engine truck had is not stated, so the row is a choice, the other
+# 4x2 row beside it there. label DESIGN; source: decision 42 ("the F-150's 4750 lb
+# SuperCab row") and engine_specs/cars/README.md, "Deriving what the model needs";
+# build step 2 P6, 22 October 2026; a comment, as kind's (amendment B13).
+# fingerprint.plant_files hashes the file with the specs (engines.spec_files).
+published = "engine_specs/cars/f150_2015_27tt.toml"
+
+[car]
+final_drive = { value = 3.31, label = "PUBLISHED", source = "the axle ratio of EPA's test truck (EPA15 rows 1716-1717), one of Ford's three for the 2.7L EcoBoost (engine_specs/cars/f150_2015_27tt.toml [final_drive], [available_axle_ratios])" }
+gears = { value = [4.17, 2.34, 1.52, 1.14, 0.86, 0.69], label = "PUBLISHED", source = "the 6R80, 1st to 6th, as Ford's 2015 F-150 technical specifications print them, two decimals (engine_specs/cars/f150_2015_27tt.toml [gear_ratios]); the three-decimal set that circulates is not typed" }
+driveline_eff = { value = 0.92, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] driveline_eff (ASSUMED there: REFERENCES.md section 4b, CANNOT). Not published for this truck (engine_specs/cars/f150_2015_27tt.toml [not_typed]). EPA's coast-down targets already hold the driveline's drag (engine_specs/cars/README.md), so the demand is also reported at 0.95, and the K3 knee at 0.86 and 0.98; the locked climb's gear is reported as gear-sensitive (decision 44: in 3rd at 0.92, 4th from 0.946); E6 row 10 sets 0.86-0.98 for C3 (PLAN.md 7.5)" }
+peak_torque_nm = { value = 508.43173062427513, unit = "Nm", label = "PUBLISHED", source = "375 lb-ft @ 3000 rpm: Ford's 2015 F-150 technical specifications, the 2.7L EcoBoost V6 column (engine_specs/cars/f150_2015_27tt.toml [sources.FORD]); x 1.3558179483314003 N m per lbf ft (4.4482216152605 N x 0.3048 m, exact by definition). It sets the kickdown, shift_load x peak (engine_env.Vehicle.shift_ceiling_nm); PLAN.md 7.5" }
+shift_load = { value = 0.75, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] shift_load (ASSUMED there: 'ordinary automatic calibration; no source opened for this vehicle's', REFERENCES.md section 2b). The Supra's shift constants (decision 43); no driving data exists for this truck, and the 6R80 sibling in D3 is another engine (engine_specs/cars/f150_2015_27tt.toml [not_typed])" }
+shift_rpm_max = { value = 5500.0, unit = "rpm", label = "DESIGN", source = "= rpm_max: never hand back a gear that turns the engine above the highest calibration line (PLAN.md 7.5; mistake 6). The margin to this bar on the locked climb is reported at completion (decision 44, amendment F3)" }
+upshift_min_rpm = { value = 2000.0, unit = "rpm", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] upshift_min_rpm (DERIVED_ONCE there: swept against the Supra's own inferred gear, 19 September 2026). The Supra's (decision 43)" }
+rpm_min = { value = 1000.0, unit = "rpm", label = "DESIGN", source = "the lowest calibration line, 1000 rpm: results/ENGINE_THRESHOLDS.json engines.ford_27tt.lines (contract version 3), whose end lines are never held out (thresholds/split.py; amendment C13). The engine-speed clip in the vehicle's demand: never run the engine where it was not measured (mistake 6)" }
+rpm_max = { value = 5500.0, unit = "rpm", label = "DESIGN", source = "the highest calibration line, 5500 rpm, as rpm_min" }
+table_rpm_lo = { value = 1000, unit = "rpm", label = "DESIGN", source = "the deliverable-torque table's lowest speed, rpm_min: the grid lies inside the calibration lines, since np.interp clamps at the table's ends (engine_env.Vehicle.shift_ceiling_nm; PLAN.md 5.9 item 1)" }
+table_rpm_hi = { value = 5500, unit = "rpm", label = "DESIGN", source = "the table's highest speed, rpm_max, as table_rpm_lo" }
+table_rpm_step = { value = 100, unit = "rpm", label = "DESIGN", source = "the grid's spacing (PLAN.md 7.5)" }
+table_t_amb = { value = 315.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] table_t_amb (DESIGN there: 42 C, the locked climb's ambient), this truck's locked climb's too (decision 44)" }
+table_t_block = { value = 365.0, unit = "K", label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] table_t_block (ASSUMED there: a warm block, 92 C, no reason recorded for 365 K)" }
+table_settle = { value = 30, label = "ASSUMED", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [car] table_settle (DERIVED_ONCE there: the load loop's steps per speed, 11 October 2026). The table is re-measured at 60 and the largest difference reported (PLAN.md 5.9 item 1)" }
+
+[scenario]
+# THE LOCKED CLIMB of every car (decision 44): the Supra's, decided by the team on
+# 18 September 2026 (engine_specs/a90_supra.toml [scenario]), with the delivery
+# reported; a climb at the highest delivered speed is the declared remedy.
+grade = { value = 0.12, label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [scenario] grade (DESIGN there: 12 %, the locked climb). The same climb for every car (decision 44)" }
+v_kmh = { value = 130.0, unit = "km/h", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [scenario] v_kmh (DESIGN there: 130 km/h), as grade. EPA's road load is valid 15-115 km/h, so the climb extrapolates it (mistake 6; engine_env.EpaVehicle)" }
+t_amb = { value = 315.0, unit = "K", label = "DESIGN", source = "CARRIED FROM THE B58: engine_specs/a90_supra.toml [scenario] t_amb (DESIGN there: 42 C), as grade" }

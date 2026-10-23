@@ -10,9 +10,19 @@
 # make_grade_climb's defaults, value for value.
 
 id = "a90-supra-zf8hp51"
+# kind -- which car record and vehicle model this car is (engines.CAR_KINDS,
+# engine_env.vehicle_for): "two_term_stepped", engines.Car and engine_env.Vehicle,
+# a drag area and a rolling coefficient and a stepped box, the Supra as it was.
+# label DESIGN; source: decision 31 (results/VALIDATION_DECISIONS.md section F: the
+# B58 arm keeps X1's plant, its own road load) and build step 2 P5 (docs/
+# build_step_2/PLAN.md WP1 P5), 22 October 2026. A top-level key cannot be a
+# { value, label, source } entry (engines.read_spec reads a table as a section),
+# so its label and source are this comment (amendment B13); it is hashed by its
+# value, and adding it moved plant_sha.
+kind = "two_term_stepped"
 
 [car]
-mass = { value = 1520.0, unit = "kg", label = "ASSUMED", source = "no source recorded (arrived without one on 10 September). REFERENCES.md section 4b: CANNOT (yet) -- not identified from 7475b5d7's target wheel torque. Decision 31 (recommended, unanswered: results/VALIDATION_DECISIONS.md section F) would keep it for the four-engine test, EPA's road load a declared ablation later" }
+mass = { value = 1520.0, unit = "kg", label = "ASSUMED", source = "no source recorded (arrived without one on 10 September). REFERENCES.md section 4b: CANNOT (yet) -- not identified from 7475b5d7's target wheel torque. Decision 31 (agreed 21 October: results/VALIDATION_DECISIONS.md section F) keeps it for the four-engine test, EPA's road load a declared ablation later" }
 cd_a = { value = 0.66, unit = "m2", label = "ASSUMED", source = "drag area; as mass (REFERENCES.md section 4b: 0.66 m2 is inside the 90 % bootstrap 0.36-1.02 of the failed identification)" }
 crr = { value = 0.011, label = "ASSUMED", source = "rolling resistance coefficient; as mass" }
 wheel_r = { value = 0.33, unit = "m", label = "ASSUMED", source = "REFERENCES.md section 4b: CANNOT separately -- the data fix only the product of the speed channel's scale and the radius (r = 0.335 m, or a speed channel reading ~1.5 % high); the tyre size has not been opened from a source" }
@@ -41,8 +51,8 @@ table_settle = { value = 30, label = "DERIVED_ONCE", source = "the load loop's s
 [scenario]
 # THE LOCKED CLIMB, Phase D's evaluation scenario: decided by the team on
 # 18 September 2026, before any training run existed (engine_env.make_grade_climb).
-# Decision 34 (revised 21 October, both columns open) recommends other roads for
-# the four-engine test, repeated short hot climbs, with this climb kept only as a
+# Decision 34 (revised 21 October, agreed the same day) puts the four-engine test
+# on other roads, repeated short hot climbs, with this climb kept only as a
 # declared transfer row.
 grade = { value = 0.12, label = "DESIGN", source = "12 %: the locked climb, 18 September 2026 (engine_env.make_grade_climb's docstring: the envelope was measured before a row was chosen)" }
 v_kmh = { value = 130.0, unit = "km/h", label = "DESIGN", source = "130 km/h: the locked climb, as grade (110 km/h does not bind)" }
