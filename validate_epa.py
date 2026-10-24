@@ -1162,8 +1162,8 @@ def _arm_dump(ctx):
 
 
 def _arm_rearm(ctx):
-    """On the defect route (C11: "form and constants stay frozen ... nothing is refitted"; the contract,
-    section 7: "No refit after any held-out statistic"): the calibration the re-arming records must be the
+    """On the defect route (the contract, section 7: "No refit after any held-out statistic"; C11: "form
+    and constants stay frozen ... nothing is refitted"): the calibration the re-arming records must be the
     one the previous ARMED.json records -- freeze.json and complete.json (their sha_text: the frozen sections,
     the fits and the refit variants through their chain), the derived file, the plant as built (engine_sha)
     and the frozen-plant dump. Only the in-sample re-run files (in_sample_rerun<k>.json) and the fixed code
@@ -2336,7 +2336,9 @@ def _d3_chain(name, *, source, armed, view, contract, frozen, jobs):
     entries = d3["c3_files"] if D3_SOURCES[name]["c3"] else d3["accord"]
     files = tuple((e["file"].rsplit("/", 1)[-1].split()[0], os.path.join(folder, *e["file"].split("/")))
                   for e in entries)
-    summary = d3_rows.read_summary(os.path.join(folder, *d3["summary"]["file"].split("/")), spec=sspec)
+    # decision 80: only the rows of the tests this chain reads, each test's base phase rows
+    summary = d3_rows.read_summary(os.path.join(folder, *d3["summary"]["file"].split("/")), spec=sspec,
+                                   tests=tuple(t for t, _ in files))
     # decision 63: the D3 fuel's AFR_st taken as the EPA Mazda batch's (its steady table's fuel)
     mazda_steady = next(t.name for t in epa_rows.TABLES["mazda_25t"] if t.role == "steady")
     afr_st = epa_rows.calibration_contract("mazda_25t", source=source).fuel_by_table[mazda_steady].afr_st
@@ -2372,7 +2374,10 @@ def _d3_chain(name, *, source, armed, view, contract, frozen, jobs):
     rec = {"schema": C3_SCHEMA, "provenance": None, **body,
            "inputs": {"eta": eta, "eta_row10": [lo, hi], "radius_gap": radius_gap, "epa_map_lhv_btu_per_lbm": epa_lhv,
                       "baro_kpa_where_the_summary_has_none_declared": D3_BARO_KPA_DECLARED,
-                      "accord_coolant_k_declared": ect_absent}}
+                      "accord_coolant_k_declared": ect_absent,
+                      # decision 79: the summary's modal fuel in gallons, its mass at an ASSUMED density
+                      "d3_modal_fuel_g_per_us_gal_assumed": sspec.modal_fuel_to_g,
+                      "d3_modal_fuel_u_rel_assumed": sspec.modal_fuel_u_rel}}
     return rec, rows, {"rows": body["eta"], "excluded": excluded}
 
 

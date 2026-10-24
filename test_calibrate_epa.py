@@ -1086,25 +1086,32 @@ class Order(RunCase):
 
     def test_t0_and_fit_refuse_while_a_pin_is_open(self):
         """The pins guard on the production tables (decision 56; WP3_INTERFACES.md 11). The production u_D
-        table pins the meter's and the torque's terms from every report's Table 8 (epa_stats.U_D), so the
-        guard names no u_D term; the Mazda's D3 summary columns are still open in production
-        (d3_rows.unpinned_for), so t0 and fit refuse naming them alone. Controls (mistake 12): the production
-        u_D table with the D3 columns pinned passes the guard; one report's torque pin taken away (the Ford's
-        HD1), or every meter pin, refuses naming that term and the gating rows that read it; a D3 summary
-        column unpinned under the synthetic terms refuses too. Every other test runs under pinned_terms,
-        whose synthetic terms read on the synthetic rows, which belong to no report."""
+        table pins the meter's and the torque's terms from every report's Table 8 (epa_stats.U_D), and the
+        production D3 summary columns are pinned since 24 October 2026 (decisions 78-80: d3_rows.unpinned_for
+        names nothing on any engine), so the production tables pass the guard. Controls (mistake 12): a D3
+        summary column left open (d3_rows.unpinned_for patched, as WP3_INTERFACES.md 14 asks) makes t0 and fit
+        refuse naming it alone; one report's torque pin taken away (the Ford's HD1), or every meter pin,
+        refuses naming that term and the gating rows that read it; a D3 summary column unpinned under the
+        synthetic terms refuses too. Every other test runs under pinned_terms, whose synthetic terms read on
+        the synthetic rows, which belong to no report."""
         import d3_rows
         unpinned = [p for p in StandIns(self).patches() if not isinstance(p, type(F.pinned_terms()))]
-        for call in (lambda: C.t0(MAZDA, source=self.src, jobs=1, defect=None),
-                     lambda: C.fit(MAZDA, source=self.src, jobs=1, defect=None)):
-            with self.assertRaises(C.Refusal) as cm:
-                with contextlib_all(unpinned):
-                    call()
-            msg = str(cm.exception)
-            self.assertIn("the D3 summary column cx9_2016.", msg)
-            self.assertNotIn("u_D's", msg, "the production u_D table is pinned (decision 56)")
-        # the production u_D table itself passes the guard once the D3 columns are pinned
+        # the production tables, both pinned, pass the guard
         self.assertEqual(epa_stats.unpinned_u_d(terms=epa_stats.U_D), {})
+        self.assertEqual([d3_rows.unpinned_for(e) for e in (FORD, HONDA, MAZDA)], [(), (), ()])
+        self.assertIsNone(C._pins_guard(MAZDA))
+        # ... and a D3 summary column left open refuses t0 and fit, naming it alone (the u_D table pinned)
+        open_cx9 = (lambda e: ("cx9_2016.test_id",) if e == MAZDA else ())
+        with mock.patch.object(d3_rows, "unpinned_for", open_cx9):
+            for call in (lambda: C.t0(MAZDA, source=self.src, jobs=1, defect=None),
+                         lambda: C.fit(MAZDA, source=self.src, jobs=1, defect=None)):
+                with self.assertRaises(C.Refusal) as cm:
+                    with contextlib_all(unpinned):
+                        call()
+                msg = str(cm.exception)
+                self.assertIn("the D3 summary column cx9_2016.test_id", msg)
+                self.assertNotIn("u_D's", msg, "the production u_D table is pinned (decision 56)")
+        self.assertFalse(os.path.exists(cal(self.src, MAZDA, C.STARTED)))
         with mock.patch.object(d3_rows, "unpinned_for", lambda _engine: ()):
             self.assertIsNone(C._pins_guard(MAZDA))
         # ... and a pin taken away from it refuses, naming the term (the D3 columns pinned, so it is alone)
@@ -1139,14 +1146,18 @@ class Order(RunCase):
         """The code is shared, so one engine's open D3 summary columns hold every engine's T0 and fit (WP3's third
         fix of 24 October 2026, on the Run 1 review's finding: pinning the Honda's columns in d3_rows.py after the
         Ford's T0 would change the code the Ford's T0 certified, and the Ford's arming would refuse under C10). In
-        production the Honda's and the Mazda's columns are open and the Ford has none, so the Ford's guard refuses
-        naming both. Controls: only the Honda's open refuses the Ford naming the Honda's alone; none open passes."""
+        production every column is pinned since 24 October 2026 (decisions 78-80), so no engine's guard names one.
+        Controls, with d3_rows.unpinned_for patched (WP3_INTERFACES.md 14): the Honda's and the Mazda's columns
+        open refuse the Ford naming both; only the Honda's open refuses the Ford and the Mazda naming the Honda's
+        alone; none open passes."""
         import d3_rows
-        self.assertEqual(d3_rows.unpinned_for(FORD), ())
-        self.assertTrue(d3_rows.unpinned_for(HONDA))
-        self.assertTrue(d3_rows.unpinned_for(MAZDA))
-        with self.assertRaises(C.Refusal) as cm:
-            C._pins_guard(FORD)
+        for eng in (FORD, HONDA, MAZDA):
+            self.assertEqual(d3_rows.unpinned_for(eng), ())
+            self.assertIsNone(C._pins_guard(eng))
+        both = (lambda e: {HONDA: ("accord_2018.test_id",), MAZDA: ("cx9_2016.modal_fuel_to_g",)}.get(e, ()))
+        with mock.patch.object(d3_rows, "unpinned_for", both):
+            with self.assertRaises(C.Refusal) as cm:
+                C._pins_guard(FORD)
         msg = str(cm.exception)
         self.assertIn(f"({HONDA})", msg)
         self.assertIn(f"({MAZDA})", msg)

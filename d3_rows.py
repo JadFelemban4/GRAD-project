@@ -36,33 +36,44 @@ and the first real read is inside validate_epa.py run (amendment C5; MD:451). It
 is given. It imports no plant module and no epa_rows (WP3_INTERFACES.md 3.1): the model, the car record
 and the contract's values are passed in. It prints nothing; numbers go to the caller's JSON.
 
-WHAT IS NOT PINNED YET (WP3_INTERFACES.md section 11), and refuses instead of guessing:
-  * the summary workbook's column headers. CATALOGUE.md:279 describes its columns in words only
-    (test ID, cell temperature, fuel used by bag and modal, fuel heating value, ...). Argonne's
-    documentation, ANL_APRF_DynoTestingReference_July2013.pdf (CATALOGUE.md:47, :270; section 5 item 12
-    says it was not read for want of a PDF reader, but pdftotext is on this machine's Git Bash), was
-    read on 23 October 2026: it is a 2013 presentation whose channel names are generic ("Dyno Tractive
-    Effort [N]", "Time [s]", "Fuel flow modal [g/s]"), it prints no summary-workbook header, and it puts
-    the fuel's density and net heating value "at the top of the test summary result sheet", not in a
-    per-test column. So the heating value's place is open too: SummarySpec reads it as a column, as
-    CATALOGUE.md:279 lists it, and whoever pins the spec must check that form first. The workbook is a
-    D3 file, which may not be opened to pin them. SUMMARY_CX9 and SUMMARY_ACCORD hold the sheet names
-    CATALOGUE.md:277-278 prints and None for every column: read_summary refuses (SummaryNotPinned)
-    until each is typed from a source and the read entered in SEEN_BEFORE_THE_FIT.
-  * the Accord's time and road-speed headers, taken by analogy and flagged below: the header check
-    stops a file that does not carry them, before any value is converted.
+THE SUMMARY PINS (24 October 2026; results/VALIDATION_DECISIONS.md section H, decisions 78-81, adopted under
+Ghassan's delegation of 21 October, Jad's column open). No document in the data folder prints the summary
+workbook's columns: CATALOGUE.md:280 names them in words only, and Argonne's reference presentation,
+ANL_APRF_DynoTestingReference_July2013.pdf, prints no summary header and puts the fuel's density and
+heating value "at the top of the test summary result sheet" (its slide 50). So, by decision 78:
+  * the header row of each summary workbook was read, with the labelled cells above it, and the
+    identifier columns of every row below it (the test ID, the cycle and phase label, the Accord's fuel
+    batch label), and nothing else: no test's result value. SummarySpec pins each header as the
+    workbook prints it, each with its source (SummarySpec.sources). The heating value is a column of
+    each row, not a cell at the sheet's top: the only label above either header over the fuel
+    columns is the group label ' Liquid Fuel usage '.
+  * the modal fuel is printed in gallons, and the D3 batches' own densities are not published: by
+    decision 79 its mass is its volume times an ASSUMED density, the midpoint of the union of the
+    densities EPA's NVFEL measured for the certification test fuels in the data folder (three Tier 2,
+    three Tier 3 E10; D3_FUEL_DENSITIES), half the union's width a uniform half-width whose u enters
+    the Direct2 check's u_D (channel_checks).
+  * the sheets hold one row per phase, with sum rows ("Ph 1+2", "p3+4") and no row for the whole
+    test in about half the tests: by decision 80 a test's summary values come from its base phase
+    rows, the sum rows excluded (read_summary), told apart from the identifier column alone.
+  * by decision 81 the Accord's chain applies the converter-lock and A/C rules with its own channels,
+    and its time and road-speed headers are pinned from the catalogue's column list.
+A column pinned after the first fit is a change to this file, which only the defect route admits
+(amendment C10): unpinned_for is the check calibrate_epa.py t0 and fit and validate_epa.py arm make.
 
 The sources read to pin the channel names, 23 October 2026: results/ENGINE_THRESHOLDS.md section 5 and
 appendix A; C:\\Users\\badcl\\Desktop\\GRAD-engine-data\\CATALOGUE.md lines 260-282 (the D3 file format and
 the summaries), 283-405 (the CX-9's tests), 406-521 (the Accord's), 591-628 (the channels), 652-683 (the
 problems); Argonne's reference presentation above (its data-file and summary pages); the CX-9's
-engine_specs/cars/cx9_2016_25t.toml [gear_ratios] for the gear channel's codes. No D3 file and no
-summary workbook was opened. SOURCES_READ records it for calibrate_epa.SEEN_BEFORE_THE_FIT.
+engine_specs/cars/cx9_2016_25t.toml [gear_ratios] for the gear channel's codes. On 24 October 2026, for the
+summary pins: the catalogue's column lists, the summaries' header rows and identifier columns, six NVFEL
+fuel analyses' densities (each read below). No D3 trace file was opened, and no result value of a summary.
+SOURCES_READ records every read for calibrate_epa.SEEN_BEFORE_THE_FIT.
 """
 import csv
 import dataclasses
 import math
 import os
+import re
 import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import dataclass, field
@@ -78,9 +89,37 @@ SOURCES_READ = (
     "(23 October 2026, through pdftotext into a scratch file: generic 2013 channel names, no summary header; "
     "the fuel's heating value 'at the top of the test summary result sheet')",
     "engine_specs/cars/cx9_2016_25t.toml [gear_ratios] (six forward gears, NH519 Table 4): the gear codes",
+    # the summary pins, 24 October 2026 (decisions 78-81, results/VALIDATION_DECISIONS.md section H)
+    "the D3 summary pins' author, 24 October 2026 (decision 78): the header row (row 7) of each summary workbook, "
+    "GRAD-engine-data/anl-d3-2016-mazda-cx9/test-summary/2016_Mazda_CX9_Test_Summary_04052018.xlsx, sheet 'Extended "
+    "Test Summary', and anl-d3-2018-honda-accord-lx/test-summary/2018_Honda_Accord_Test_Summary_20191125.xlsx, sheet "
+    "'G2_TestSummary' (each file's sha256 MANIFEST.csv's), and the labelled cells above it, through a scratch script "
+    "run with -I -B (the scratchpad's d3pin_scripts/summary_header.py) that printed only those strings; no row below "
+    "the header, no result value",
+    "the D3 summary pins' author, 24 October 2026 (decision 78 as amended): the identifier columns of every row "
+    "below the header of both workbooks -- 'Test ID [#]', 'Cycle' and the Accord's 'Fuel Batch' -- through a scratch "
+    "script that decoded no other column (d3pin3_scripts/summary_identifiers.py), and again through d3_rows.sum_row "
+    "to check decision 80's row rule on them (d3pin5_scripts/summary_rows_check.py); no result value",
+    "the D3 summary pins' author, 24 October 2026 (decision 81): GRAD-engine-data/_catalogue/d3_accord_columns.csv "
+    "in full and d3_cx9_columns.csv by grep, the catalogue's derived lists of every column name, its unit as written "
+    "in the name and its file count (CATALOGUE.md:54); names and counts only, no value",
+    "the D3 summary pins' author, 24 October 2026 (decision 79): EPA NVFEL Fuel Analysis Reports 26781, 25206 and "
+    "25402 (GRAD-engine-data/epa-ncat-benchmarking/<engine>_tier3-test-data/unzipped/6- ... .pdf), the Tier 3 test "
+    "fuels of the three engines' Tier 3 packages, printed whole through pdftotext, with the embedded images of "
+    "their scanned pages viewed (d3pin5_scripts/pdf_page_images.py); and the field alpha_fuel.density_kgpL_15C "
+    "alone of each EPA engine's epa_engine.json (d3pin5_scripts/tier2_density.py); fuel properties, "
+    "no row value",
+    "the D3 summary pins' author, 24 October 2026: results/ENGINE_THRESHOLDS.md section 5 (rule text); "
+    "GRAD-engine-data/CATALOGUE.md:1-120, 255-312, 404-430, 495-505 and 588-705 (the layout, the EPA packages and "
+    "fuels, the D3 format and batches, parts of the CX-9's and the Accord's test tables, which print per-test cell "
+    "temperatures and channel maxima of D3 files, as the catalogue lines above do, the channels and the problems); "
+    "MANIFEST.csv's rows of the summaries, the column lists and the test files (paths and sha256); the earlier "
+    "attempts' scratch outputs of decision 78's reads; no D3 trace file and no summary result value; none used "
+    "beyond the pins",
 )
 
 MPH_TO_KPH = 1.609344          # exact, by the definition of the international mile
+L_PER_US_GAL = 3.785411784     # exact: 231 cubic inches of 2.54 cm, the US gallon
 RAD_PER_REV_S = 2.0 * math.pi / 60.0
 
 
@@ -201,29 +240,43 @@ CHANNELS = CarChannels(
     ),
 )
 
-# The Accord's channels (C4, descriptive). CATALOGUE.md:614-628 names them; the Accord has no live
-# coolant (:625), no gear and no turbine-shaft speed (a CVT), and no A/C channel is named, so those rules
-# are reported as not applied. The time and road-speed headers are NOT printed for the Accord:
-# CATALOGUE.md:274 gives Time[s]_RawFacilities in the format block both sets share, and Dyno_Spd is the
-# CX-9's (:599) written in the Accord's double-underscore style. Both are UNVERIFIED; the header check
-# stops a file that lacks them, before any value is converted.
+# The Accord's channels (C4, descriptive). CATALOGUE.md:618-627 names most of them; the catalogue's column
+# list for the Accord (GRAD-engine-data/_catalogue/d3_accord_columns.csv: "every column, its unit as written
+# in the name, and in how many files it appears", CATALOGUE.md:54; names and counts, no value) gives every
+# header below in 56 of 56 files, at the line cited. Decision 81 (24 October 2026, results/VALIDATION_DECISIONS.md
+# section H): the converter-lock and A/C rules apply as on the CX-9, with the Accord's own turbine speed and
+# compressor clutch, and the time and road-speed headers are pinned from the list, no longer by analogy. The
+# Accord has no live coolant (CATALOGUE.md:627) and no gear (a CVT), so those two rules are reported as not
+# applied. A channel's name is a hypothesis (mistake 13): HVAC_AC_clutch_PGM is by its name the compressor's
+# engagement, as the CX-9's HVAC_ACComp_cycling_switch_PCM is, and HVAC_AC_switch_PGM (also 56 of 56,
+# d3_accord_columns.csv:75) by its name the driver's request, which is not read.
 ACCORD_CHANNELS = CarChannels(
     car="accord_2018",
     dialect=ACCORD_DIALECT,
     lam_form="afr",
     gear_codes=None,
     channels=(
-        Channel("time", (("Time[s]_RawFacilities", 1.0), ("Time__s_RawFacilities", 1.0)), "s",
-                "CATALOGUE.md:274 (the shared format block); UNVERIFIED for the Accord"),
-        Channel("force", (("Dyno_TractiveForce__N", 1.0),), "N", "CATALOGUE.md:617"),
-        Channel("rpm", (("Eng_speed_CAN7__rpm", 1.0),), "rpm", "CATALOGUE.md:616"),
-        Channel("map", (("Eng_MAP_sensor_highres_CAN7__kPa", 1.0),), "kPa", "CATALOGUE.md:621"),
+        Channel("time", (("Time[s]_RawFacilities", 1.0),), "s",
+                "d3_accord_columns.csv:2, 'Time[s]_RawFacilities,,56,56,'; CATALOGUE.md:274 (decision 81)"),
+        Channel("force", (("Dyno_TractiveForce__N", 1.0),), "N",
+                "CATALOGUE.md:619; d3_accord_columns.csv:4, 'Dyno_TractiveForce__N,N,56,56,'"),
+        Channel("rpm", (("Eng_speed_CAN7__rpm", 1.0),), "rpm",
+                "CATALOGUE.md:618; d3_accord_columns.csv:34, 'Eng_speed_CAN7__rpm,rpm,56,56,'"),
+        Channel("turbine_rpm", (("Trans_torque_converter_turbine_spd_AT__rpm", 1.0),), "rpm",
+                "d3_accord_columns.csv:105, 'Trans_torque_converter_turbine_spd_AT__rpm,rpm,56,56,' (decision 81)"),
+        Channel("ac", (("HVAC_AC_clutch_PGM", 1.0),), "-",
+                "d3_accord_columns.csv:74, 'HVAC_AC_clutch_PGM,,56,56,' (decision 81: the compressor off when it "
+                "reads 0, as the CX-9's switch)"),
+        Channel("map", (("Eng_MAP_sensor_highres_CAN7__kPa", 1.0),), "kPa",
+                "CATALOGUE.md:622; d3_accord_columns.csv:134, 'Eng_MAP_sensor_highres_CAN7__kPa,kPa,56,56,'"),
         Channel("direct2", (("Eng_FuelFlow_Direct2__gps", 1.0),), "g/s",
-                "CATALOGUE.md:618 (clips at 12.376 in 4 files: a flat maximum, dropped)"),
-        Channel("maf", (("Eng_MAF_sensor_PGM__gps", 1.0),), "g/s", "CATALOGUE.md:620"),
-        Channel("lam", (("Eng_airfuel_ratio_PGM", 1.0),), "AFR", "CATALOGUE.md:624 (an air-fuel ratio)"),
-        Channel("speed", (("Dyno_Spd__mph", MPH_TO_KPH), ("Dyno_Spd__kph", 1.0)), "km/h",
-                "by analogy with CATALOGUE.md:599; UNVERIFIED for the Accord"),
+                "CATALOGUE.md:620 (clips at 12.376 in 4 files: a flat maximum, dropped); d3_accord_columns.csv:23"),
+        Channel("maf", (("Eng_MAF_sensor_PGM__gps", 1.0),), "g/s",
+                "CATALOGUE.md:621; d3_accord_columns.csv:70, 'Eng_MAF_sensor_PGM__gps,gps,56,56,'"),
+        Channel("lam", (("Eng_airfuel_ratio_PGM", 1.0),), "AFR",
+                "CATALOGUE.md:625 (an air-fuel ratio); d3_accord_columns.csv:80, 'Eng_airfuel_ratio_PGM,,56,56,'"),
+        Channel("speed", (("Dyno_Spd__mph", MPH_TO_KPH),), "km/h",
+                "d3_accord_columns.csv:3, 'Dyno_Spd__mph,mph,56,56,' (decision 81)"),
     ),
 )
 
@@ -610,35 +663,163 @@ def segment_census(trace, *, rules):
 
 # ============================================================================ the summary workbook
 
+# The modal fuel's density (decision 79, adopted 24 October 2026 under Ghassan's delegation of 21 October;
+# results/VALIDATION_DECISIONS.md section H; Jad's column open). Both summaries print the modal fuel as a
+# volume, 'Fuel used modal [gal]', and no source gives the D3 batches' own densities: the catalogue names
+# their batches and heating values only (CATALOGUE.md:291, :420-423), grading one Tier 3 ("HF2021 Tier 3
+# General Testing-Regular", :291) and one Tier 2 ("HF0437 Tier 2 CERT fuel", :423) and the others not at all.
+# So the density is ASSUMED, and its band is the union of the densities EPA's National Vehicle and Fuel
+# Emissions Laboratory measured for the certification test fuels in the data folder: the three engines'
+# Tier 2 fuels and the three Tier 3 fuels of their Tier 3 packages. The assumed density is the union's
+# midpoint (assumed_density), and half the union's width is a uniform half-width whose u enters the Direct2
+# check's u_D (channel_checks). Declared and not corrected: the Tier 2 values are stated at 15 C (their
+# field's name) and the Tier 3 ones at 60 F (15.56 C); the temperature of the D3 modal fuel's volume is
+# stated nowhere; the heading's "gal" is read as the US gallon (L_PER_US_GAL). Each Tier 3 report states
+# the density itself beside the specific gravity (60/60 F), so no conversion was made; the two imply a water
+# density of 0.99901 g/cm3, the same in all three. eCFR's specifications state no density for a gasoline test
+# fuel (the fourth attempt's read, recorded in decision 79's row).
+
+@dataclass(frozen=True)
+class FuelDensity:
+    """One certification test fuel's density as EPA's NVFEL measured it: its FTAG, its grade as its report
+    heads it, the density in kg/L (g/cm3), the temperature it is stated at, and where it was read, with the
+    words read."""
+    ftag: str
+    grade: str
+    kg_per_l: float
+    stated_at: str
+    source: str
+
+
+D3_FUEL_DENSITIES = (
+    FuelDensity("26864", "Tier 2", 0.74246, "15 C, by the field's name",
+                "mazda_25t's epa_engine.json, its field alpha_fuel.density_kgpL_15C (the Mazda's Tier 2 fuel, FTAG "
+                "26864: CATALOGUE.md:165, :234)"),
+    FuelDensity("25842", "Tier 2", 0.74227, "15 C, by the field's name",
+                "honda_l15b7's epa_engine.json, its field alpha_fuel.density_kgpL_15C (the Honda's Tier 2 fuel, FTAG "
+                "25842: CATALOGUE.md:166, :232)"),
+    FuelDensity("25278", "Tier 2", 0.74245, "15 C, by the field's name",
+                "ford_27tt's epa_engine.json, its field alpha_fuel.density_kgpL_15C (the Ford's Tier 2 fuel, FTAG "
+                "25278: CATALOGUE.md:167, :230)"),
+    FuelDensity("26781", "Tier 3", 0.74326, "60 F",
+                "NVFEL Fuel Analysis Report 26781 (mazda-2.5t-2016_tier3-test-data), page 1 of 2: '691 Density @ 60 "
+                "deg F D4052 0.74326 g/cm-03 @ 60 deg F' ('69 Specific Gravity @ 60 deg F D4052 0.74400 60/60F'); "
+                "headed 'Tier 3'; '532 Ethanol in Fuel by D5599 9.66 Volume Percent'"),
+    FuelDensity("25206", "Tier 3", 0.74776, "60 F",
+                "NVFEL Fuel Analysis Report 25206 (honda-l15b7-2016_tier3-test-data), page 2 of 3, a scanned page "
+                "viewed: '691 Density @ 60 deg F D4052 0.74776 g/cm-03 @ 60 deg F' ('69 Specific Gravity @ 60 deg F "
+                "D4052 0.74850 60/60F'); headed 'Tier 3' (page 1); '532 Ethanol in Fuel by D5599 9.86 Volume Percent'"),
+    FuelDensity("25402", "Tier 3", 0.74506, "60 F",
+                "NVFEL Fuel Analysis Report 25402 (ford-2.7tt-2015_tier3-hd1-test-data), page 2 of 3: '691 Density @ "
+                "60 deg F D4052 0.74506 g/cm-03 @ 60 deg F' ('69 Specific Gravity @ 60 deg F D4052 0.74580 60/60F'); "
+                "headed 'Tier 3' (page 1, whose text layer misaligns its rows, so its ethanol row is not quoted)"),
+)
+
+
+@dataclass(frozen=True)
+class AssumedDensity:
+    """Decision 79's ASSUMED density: the midpoint of the union of the fuels' densities (kg/L), half the
+    union's width (kg/L), the uniform u of that half-width relative to the midpoint (half-width / sqrt(3) /
+    midpoint), the grams per US gallon at the midpoint, and the fuels' FTAGs."""
+    kg_per_l: float
+    half_width_kg_per_l: float
+    u_rel: float
+    g_per_us_gal: float
+    ftags: tuple
+
+
+def assumed_density(fuels):
+    """Decision 79's rule on `fuels` (FuelDensity records): the union of their densities, its midpoint the
+    assumed density, half its width a uniform half-width."""
+    if not fuels:
+        raise ValueError("no fuel densities: decision 79's band needs at least one")
+    lo, hi = min(f.kg_per_l for f in fuels), max(f.kg_per_l for f in fuels)
+    mid, hw = 0.5 * (lo + hi), 0.5 * (hi - lo)
+    return AssumedDensity(kg_per_l=mid, half_width_kg_per_l=hw, u_rel=hw / math.sqrt(3.0) / mid,
+                          g_per_us_gal=mid * L_PER_US_GAL * 1000.0, ftags=tuple(f.ftag for f in fuels))
+
+
+D3_FUEL_DENSITY = assumed_density(D3_FUEL_DENSITIES)
+
+
 @dataclass(frozen=True)
 class SummarySpec:
     """Where a D3 test summary keeps what C3 reads (decision 63): the sheet, and for each role the header
-    as the workbook prints it, None until pinned from a source (WP3_INTERFACES.md section 11). The modal
-    fuel's factor takes its unit to grams; the heating value's to BTU/lbm; baro, where the summary has
-    one (the Accord's, CATALOGUE.md:279), to kPa."""
+    as the workbook prints it, None until pinned (WP3_INTERFACES.md section 11). cycle is the identifier
+    column decision 80's row rule reads (sum_row). The modal fuel's factor takes its unit to grams, and
+    modal_fuel_u_rel is that factor's relative standard uncertainty (decision 79); the heating value's
+    factor takes its unit to BTU/lbm; baro, where the summary's is pinned, to kPa. sources: (field, where
+    it was read, with the words read) for each pinned field. A field without a source is unpinned, so no
+    pin stands without one (mistake 13)."""
     car: str
     sheet: str
     test_id: Optional[str]
+    cycle: Optional[str]
     cell_temp_c: Optional[str]
     modal_fuel: Optional[str]
     modal_fuel_to_g: Optional[float]
+    modal_fuel_u_rel: Optional[float]
     fuel_lhv: Optional[str]
     fuel_lhv_to_btu_per_lbm: Optional[float]
     baro: Optional[str]
     baro_to_kpa: Optional[float]
+    sources: tuple
 
     def unpinned(self):
-        need = ("test_id", "cell_temp_c", "modal_fuel", "modal_fuel_to_g", "fuel_lhv", "fuel_lhv_to_btu_per_lbm")
-        return tuple(k for k in need if getattr(self, k) is None)
+        src = dict(self.sources)
+        need = SUMMARY_NEED + (("baro", "baro_to_kpa") if self.baro is not None else ())
+        return tuple(k for k in need if getattr(self, k) is None or not src.get(k))
 
 
-# The sheets are CATALOGUE.md:277-278's; the columns are NOT pinned (see the module docstring).
-SUMMARY_CX9 = SummarySpec(car="cx9_2016", sheet="Extended Test Summary", test_id=None, cell_temp_c=None,
-                          modal_fuel=None, modal_fuel_to_g=None, fuel_lhv=None, fuel_lhv_to_btu_per_lbm=None,
-                          baro=None, baro_to_kpa=None)
-SUMMARY_ACCORD = SummarySpec(car="accord_2018", sheet="G2_TestSummary", test_id=None, cell_temp_c=None,
-                             modal_fuel=None, modal_fuel_to_g=None, fuel_lhv=None, fuel_lhv_to_btu_per_lbm=None,
-                             baro=None, baro_to_kpa=None)
+# What read_summary needs pinned, each from a source (WP3_INTERFACES.md section 11; decisions 78-80).
+SUMMARY_NEED = ("test_id", "cycle", "cell_temp_c", "modal_fuel", "modal_fuel_to_g", "modal_fuel_u_rel", "fuel_lhv",
+                "fuel_lhv_to_btu_per_lbm")
+
+
+def _summary_sources(read, *, test_id, cycle, cell_temp, modal_fuel, fuel_lhv):
+    """The sources of one summary's pins: `read` names the header read (decision 78), each column its cell
+    and the words the cell holds; the factors and the density's u say where they come from."""
+    return (
+        ("test_id", f"{read}, {test_id}: 'Test ID [#]' (the test ID, an identifier)"),
+        ("cycle", f"{read}, {cycle}: 'Cycle' (the cycle and phase label, an identifier: decision 78 as amended "
+                  "lets it be read in every row, decision 80 tells a test's base rows from its sum rows by it)"),
+        ("cell_temp_c", f"{read}, {cell_temp}: 'Test Cell Temp [C]' (degrees Celsius, as the heading states)"),
+        ("modal_fuel", f"{read}, {modal_fuel}: 'Fuel used modal [gal]' (a volume in gallons, as the heading "
+                       "states; read as the US gallon, L_PER_US_GAL)"),
+        ("modal_fuel_to_g", "decision 79: D3_FUEL_DENSITY.g_per_us_gal, the ASSUMED density (the midpoint of the "
+                            "union of D3_FUEL_DENSITIES, six NVFEL-measured certification test fuels) x "
+                            "L_PER_US_GAL x 1000 g/kg"),
+        ("modal_fuel_u_rel", "decision 79: D3_FUEL_DENSITY.u_rel, half the union's width as a uniform half-width, "
+                             "/ sqrt(3), relative to the midpoint; it enters the Direct2 check's u_D"),
+        ("fuel_lhv", f"{read}, {fuel_lhv}: 'Fuel Heating Value\\n[BTU/lbm]' (a line break inside the cell; BTU per "
+                     "pound-mass, as the heading states). A column of each row, not a cell at the sheet's top as "
+                     "Argonne's slide 50 says of the density and net energy ('See top of test summary result "
+                     "sheet'): the only label above the header over the fuel columns is ' Liquid Fuel usage '"),
+        ("fuel_lhv_to_btu_per_lbm", "1.0: the heading's unit, BTU/lbm, is the role's (the unit CATALOGUE.md:291 and "
+                                    "the contract print the D3 fuel's heating value in)"),
+    )
+
+
+# The two summaries (CATALOGUE.md:277-278 name the files and sheets), pinned 24 October 2026 from decision
+# 78's header read: each heading as the cell holds it, matched after stripping the cell's ends only.
+SUMMARY_CX9 = SummarySpec(
+    car="cx9_2016", sheet="Extended Test Summary", test_id="Test ID [#]", cycle="Cycle",
+    cell_temp_c="Test Cell Temp [C]", modal_fuel="Fuel used modal [gal]",
+    modal_fuel_to_g=D3_FUEL_DENSITY.g_per_us_gal, modal_fuel_u_rel=D3_FUEL_DENSITY.u_rel,
+    fuel_lhv="Fuel Heating Value\n[BTU/lbm]", fuel_lhv_to_btu_per_lbm=1.0, baro=None, baro_to_kpa=None,
+    sources=_summary_sources(
+        "decision 78's header read of 2016_Mazda_CX9_Test_Summary_04052018.xlsx (sha256 9667a2dc5a3f4cbdc3f5f3942c366aa2"
+        "e253a1dbf549f3e00857bf522efcd8d7, MANIFEST.csv's), sheet 'Extended Test Summary', header row 7",
+        test_id="cell B7", cycle="cell C7", cell_temp="cell F7", modal_fuel="cell O7", fuel_lhv="cell R7"))
+SUMMARY_ACCORD = SummarySpec(
+    car="accord_2018", sheet="G2_TestSummary", test_id="Test ID [#]", cycle="Cycle",
+    cell_temp_c="Test Cell Temp [C]", modal_fuel="Fuel used modal [gal]",
+    modal_fuel_to_g=D3_FUEL_DENSITY.g_per_us_gal, modal_fuel_u_rel=D3_FUEL_DENSITY.u_rel,
+    fuel_lhv="Fuel Heating Value\n[BTU/lbm]", fuel_lhv_to_btu_per_lbm=1.0, baro=None, baro_to_kpa=None,
+    sources=_summary_sources(
+        "decision 78's header read of 2018_Honda_Accord_Test_Summary_20191125.xlsx (sha256 99260167e25a1757128df9d371b0"
+        "14ecdf53c47dd1e59dc86a580c62a21a89dc, MANIFEST.csv's), sheet 'G2_TestSummary', header row 7",
+        test_id="cell B7", cycle="cell C7", cell_temp="cell H7", modal_fuel="cell R7", fuel_lhv="cell AB7"))
 
 
 # Each engine's summary workbook spec (validate_epa.D3_ENGINE names the same objects; the Ford has no D3
@@ -657,14 +838,26 @@ def unpinned_for(engine_name):
 
 @dataclass(frozen=True)
 class SummaryRow:
-    """One test of the summary, in SI-ish units: the cell temperature (degC), the modal fuel (g), the
-    fuel's heating value (BTU/lbm, the unit CATALOGUE.md:291 and the contract print), barometric pressure
-    (kPa) or None."""
+    """One test of the summary (decision 80: from its base phase rows), in SI-ish units: the cell
+    temperature of its first base row (degC), the modal fuel summed over its base rows (g), the fuel's
+    heating value its base rows share (BTU/lbm, the unit CATALOGUE.md:291 and the contract print), the
+    barometric pressure of its first base row (kPa) or None; modal_fuel_u_rel, the modal fuel's relative
+    standard uncertainty from its conversion to grams (decision 79's density); base_rows and sum_rows, how
+    many rows of each kind the test has; cell_temp_spread_c, the largest minus the smallest cell
+    temperature over its base rows, reported (0 for one row)."""
     test: str
     cell_temp_c: float
     modal_fuel_g: float
     fuel_lhv_btu_per_lbm: float
     baro_kpa: Optional[float]
+    modal_fuel_u_rel: float
+    base_rows: int
+    sum_rows: int
+    cell_temp_spread_c: float
+
+    def as_json(self):
+        return {"base_rows": self.base_rows, "sum_rows_excluded": self.sum_rows,
+                "cell_temp_c": float(self.cell_temp_c), "cell_temp_spread_c": float(self.cell_temp_spread_c)}
 
 
 _NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
@@ -681,8 +874,9 @@ def _col_index(ref):
 
 
 def _sheet_rows(path, sheet):
-    """The cells of one worksheet as lists of strings (a number as its stored text), through zipfile and
-    xml.etree, as epa_map.py reads its workbooks (never importing it: amendment C3)."""
+    """The rows of one worksheet as (row number, cells) pairs: the cells a list of strings (a number as its
+    stored text), the number the sheet's own (the row's r attribute, else its place), through zipfile
+    and xml.etree, as epa_map.py reads its workbooks (never importing it: amendment C3)."""
     with zipfile.ZipFile(path) as z:
         wb = ET.fromstring(z.read("xl/workbook.xml"))
         rid = None
@@ -701,7 +895,7 @@ def _sheet_rows(path, sheet):
                 shared.append("".join(t.text or "" for t in si.iter(f"{{{_NS['m']}}}t")))
         ws = ET.fromstring(z.read(target))
     rows = []
-    for row in ws.iter(f"{{{_NS['m']}}}row"):
+    for n, row in enumerate(ws.iter(f"{{{_NS['m']}}}row"), start=1):
         cells = {}
         for k, c in enumerate(row.findall("m:c", _NS)):
             ref = c.get("r")
@@ -715,58 +909,118 @@ def _sheet_rows(path, sheet):
             else:
                 text = v.text if v is not None and v.text is not None else ""
             cells[col] = text
-        rows.append([cells.get(k, "") for k in range(max(cells) + 1)] if cells else [])
+        rn = int(row.get("r")) if (row.get("r") or "").isdigit() else n
+        rows.append((rn, [cells.get(k, "") for k in range(max(cells) + 1)] if cells else []))
     return rows
 
 
-def _test_id(text):
+# Decision 80's sum row (24 October 2026): a cycle label that joins phases, a phase word ("Ph", "ph" or "p")
+# and two or more phase numbers joined by "+", at the label's end, as decision 78's identifier read found
+# them: "UDDS #1, Ph 1+2" and "US06x2, Ph 3+4" on the CX-9's sheet, "UDDS cold start p1+2" and "US06x2 p3+4"
+# on the Accord's. Every other row of a test is a base phase row.
+_SUM_ROW = re.compile(r"(?:^|[\s,])(?:ph|p)\s*[0-9]+(?:\s*\+\s*[0-9]+)+$", re.IGNORECASE)
+
+
+def sum_row(label):
+    """Whether a summary row's cycle label marks a sum row (decision 80), from the label alone. A label
+    that holds "+" in any other form raises ValueError: it might join phases in a form decision 78's read
+    did not see, and a row counted twice, or dropped, must not follow from a guess."""
+    s = label.strip()
+    if _SUM_ROW.search(s):
+        return True
+    if "+" in s:
+        raise ValueError(f"the cycle label {s!r} holds '+' but is not a sum of phases (decision 80)")
+    return False
+
+
+def _summary_test_id(text):
+    """The test ID a summary row's ID cell holds, as the files name it, or None when the cell is not a
+    whole number: a section heading ('Day 1 Standard Cycles'), the disclaimer at the sheet's foot or an
+    empty cell, none of them a test (decision 80)."""
     s = text.strip()
     try:
         x = float(s)
     except ValueError:
-        return s
-    return str(int(x)) if x == int(x) else s
+        return None
+    return str(int(x)) if math.isfinite(x) and x == int(x) else None
 
 
-def read_summary(path, *, spec):
-    """{test: SummaryRow} from a D3 test-summary workbook (decision 63: hashed at the arming against
-    MANIFEST.csv; the cell temperature is the test's metadata). Refuses (SummaryNotPinned) while any of the
-    spec's columns is not pinned, before the file is opened. The header row is the first row that holds
-    every pinned header; a workbook without one stops (HeaderDefect) before any value is converted. Only
-    the pinned columns are converted; a row without a test id ends nothing and is skipped."""
+def read_summary(path, *, spec, tests):
+    """{test: SummaryRow} for each of `tests` (the test IDs the chain reads: C3's 43, C4's Accord files) that
+    the D3 test-summary workbook at `path` lists (decision 63: hashed at the arming against MANIFEST.csv; the
+    cell temperature is the test's metadata). Refuses (SummaryNotPinned) while any of the spec's columns is
+    not pinned, before the file is opened. The header row is the first row that holds every pinned header
+    once; a workbook without one stops (HeaderDefect) before any value is converted.
+
+    Decision 80: a row whose test ID cell is not a whole number is skipped (a section heading, the
+    disclaimer, an empty cell), and so is a row of a test not in `tests`, whose cells are never converted,
+    so another test's empty or odd cell never stops the read. A test's rows are its base phase rows and its
+    sum rows, told apart by the cycle label alone (sum_row); only its base rows' pinned cells are converted:
+    the modal fuel is their sum, the cell temperature the first's (the spread over them reported), the
+    heating value their common value (a test whose rows disagree is refused by name), the barometric
+    pressure, where pinned, the first's. A test with one row is that row. A cell that is not a finite
+    number stops the read naming the test, the row and the column, never the value (TraceDefect). A test of
+    `tests` that the sheet does not list is absent from the result (run_chain refuses it by name)."""
     miss = spec.unpinned()
     if miss:
         raise SummaryNotPinned(f"{spec.car} summary: {', '.join(miss)} not pinned from a source "
                                "(WP3_INTERFACES.md section 11)")
+    wanted = {str(t) for t in tests}
+    if not wanted:
+        raise ValueError(f"{spec.car} summary: no test to read")
+    name = os.path.basename(path)
     rows = _sheet_rows(path, spec.sheet)
-    want = [spec.test_id, spec.cell_temp_c, spec.modal_fuel, spec.fuel_lhv] + ([spec.baro] if spec.baro else [])
+    want = [spec.test_id, spec.cycle, spec.cell_temp_c, spec.modal_fuel, spec.fuel_lhv] + ([spec.baro] if spec.baro else [])
     hdr_at, idx = None, None
-    for k, r in enumerate(rows):
+    for k, (_, r) in enumerate(rows):
         names = [c.strip() for c in r]
         if all(names.count(w) == 1 for w in want):
             hdr_at, idx = k, {w: names.index(w) for w in want}
             break
     if hdr_at is None:
-        raise HeaderDefect(f"{os.path.basename(path)}: no row of sheet {spec.sheet!r} holds every pinned header once")
+        raise HeaderDefect(f"{name}: no row of sheet {spec.sheet!r} holds every pinned header once")
+
+    def cell(r, header):
+        i = idx[header]
+        return r[i].strip() if i < len(r) else ""
+
+    by_test = {}
+    for rn, r in rows[hdr_at + 1:]:
+        test = _summary_test_id(cell(r, spec.test_id))
+        if test is not None and test in wanted:
+            by_test.setdefault(test, []).append((rn, r))
     out = {}
-    for k, r in enumerate(rows[hdr_at + 1:], start=hdr_at + 2):
-        def cell(name):
-            i = idx[name]
-            return r[i].strip() if i < len(r) else ""
-        tid = cell(spec.test_id)
-        if not tid:
-            continue
-        try:
-            row = SummaryRow(
-                test=_test_id(tid), cell_temp_c=float(cell(spec.cell_temp_c)),
-                modal_fuel_g=float(cell(spec.modal_fuel)) * spec.modal_fuel_to_g,
-                fuel_lhv_btu_per_lbm=float(cell(spec.fuel_lhv)) * spec.fuel_lhv_to_btu_per_lbm,
-                baro_kpa=float(cell(spec.baro)) * spec.baro_to_kpa if spec.baro else None)
-        except ValueError:
-            raise TraceDefect(f"{os.path.basename(path)}: sheet row {k} holds a pinned cell that is not a number") from None
-        if row.test in out:
-            raise TraceDefect(f"{os.path.basename(path)}: test {row.test} appears twice")
-        out[row.test] = row
+    for test, entries in by_test.items():
+        base = []
+        for rn, r in entries:
+            try:
+                if not sum_row(cell(r, spec.cycle)):
+                    base.append((rn, r))
+            except ValueError as exc:
+                raise TraceDefect(f"{name}: test {test}, sheet row {rn}: {exc}") from None
+        if not base:
+            raise TraceDefect(f"{name}: test {test} has sum rows only, no base phase row (decision 80)")
+
+        def num(rn, r, header):
+            try:
+                x = float(cell(r, header))
+            except ValueError:
+                x = math.nan
+            if not math.isfinite(x):
+                raise TraceDefect(f"{name}: test {test}, sheet row {rn}, column {header!r} is not a finite number")
+            return x
+
+        temps = [num(rn, r, spec.cell_temp_c) for rn, r in base]
+        fuel = [num(rn, r, spec.modal_fuel) for rn, r in base]
+        lhv = [num(rn, r, spec.fuel_lhv) for rn, r in base]
+        if len(set(lhv)) != 1:
+            raise TraceDefect(f"{name}: test {test}: its base rows' heating values disagree (decision 80)")
+        out[test] = SummaryRow(
+            test=test, cell_temp_c=temps[0], modal_fuel_g=math.fsum(fuel) * spec.modal_fuel_to_g,
+            fuel_lhv_btu_per_lbm=lhv[0] * spec.fuel_lhv_to_btu_per_lbm,
+            baro_kpa=num(*base[0], spec.baro) * spec.baro_to_kpa if spec.baro else None,
+            modal_fuel_u_rel=float(spec.modal_fuel_u_rel), base_rows=len(base), sum_rows=len(entries) - len(base),
+            cell_temp_spread_c=max(temps) - min(temps))
     return out
 
 
@@ -851,18 +1105,23 @@ def _integral(t, y, t_from):
 @dataclass(frozen=True)
 class ChannelChecks:
     """What channel_checks found. direct2_vs_summary: per test (test, integral of Direct2 in g, the
-    summary's modal fuel in g, ratio, the pre-roll's grams, NaN intervals skipped). u_d_fuel: |median
-    ratio - 1|, the common part Direct2's disagreement with the facility adds to the fuel's u_D (MD section
-    5). maf_ratio_median: r~, the median over closed-loop segments of MAF / (Direct2 x AFR_st x lambda);
+    summary's modal fuel in g, ratio, the pre-roll's grams, NaN intervals skipped). u_d_fuel: the common
+    part the Direct2 check adds to the fuel's u_D (MD section 5), sqrt((median ratio - 1)^2 + u_modal_fuel^2):
+    Direct2's disagreement with the facility and the summary's own modal fuel's uncertainty, u_modal_fuel,
+    the relative u of its conversion to grams (decision 79: the ASSUMED density's uniform half-width, carried
+    by the summary rows, SummaryRow.modal_fuel_u_rel; 0 for a summary already in grams). maf_ratio_median: r~, the median over closed-loop segments of MAF / (Direct2 x AFR_st x lambda);
     u_d_air: sqrt((r~ - 1)^2 + u_afr_st^2), with u_afr_st decision 63's unsourced AFR_st term, None when
     the caller did not size it (then listed in unsourced and the air's u_D carries |r~ - 1| alone, said
     so). maf_ratio_if_lambda_is_the_channel: the same median with lambda read as the channel itself, not
     its inverse, and the two medians on the open-loop segments beside them: the test of MD section 5's
     reading (lambda = 1/channel) against CATALOGUE.md:606 ("lambda-like"; first percentile 0.66-0.73 at
     WOT; clipped at 1.999 on fuel cut), reported and gating nothing (mistake 13). flat_maxima: {role:
-    value}; flat_maxima_dropped: segments dropped for holding one. closed_throttle: the PCM MAP at idle."""
+    value}; flat_maxima_dropped: segments dropped for holding one. closed_throttle: the PCM MAP at idle.
+    unsourced: the air's u_D notes (decision 63's AFR_st); assumed_fuel: the fuel's (decision 79's density),
+    each recorded with its own rows' u (c3_rows)."""
     direct2_vs_summary: tuple
     u_d_fuel: Optional[float]
+    u_modal_fuel: Optional[float]
     maf_ratio_median: Optional[float]
     maf_ratio_n: int
     u_afr_st: Optional[float]
@@ -872,12 +1131,14 @@ class ChannelChecks:
     flat_maxima_dropped: int
     closed_throttle: Mapping
     unsourced: tuple
+    assumed_fuel: tuple
 
     def as_json(self):
         return {
             "direct2_vs_summary": [dict(test=t, integral_g=i, modal_g=m, ratio=r, preroll_g=p, nan_intervals=k)
                                    for (t, i, m, r, p, k) in self.direct2_vs_summary],
             "u_D_fuel": self.u_d_fuel,
+            "u_modal_fuel": self.u_modal_fuel,
             "maf_vs_direct2": {"median_ratio": self.maf_ratio_median, "n": self.maf_ratio_n,
                                "u_afr_st": self.u_afr_st, "u_D": self.u_d_air},
             "lambda_reading": dict(self.lambda_reading),
@@ -885,6 +1146,7 @@ class ChannelChecks:
             "flat_maxima": {k: float(v) for k, v in self.flat_maxima.items()},
             "flat_maxima_dropped": int(self.flat_maxima_dropped),
             "unsourced": list(self.unsourced),
+            "assumed_fuel": list(self.assumed_fuel),
         }
 
 
@@ -913,7 +1175,9 @@ def channel_checks(traces, summary, *, segs, afr_st, baro_kpa, rules, u_afr_st):
     Traces; summary: read_summary's rows; segs: every test's segments (segments()); afr_st: the D3
     fuel's (decision 63, from the caller); baro_kpa: the barometric pressure the closed-throttle MAP is
     judged against (the summary's per test where it has one, else this); u_afr_st: decision 63's
-    unsourced relative uncertainty of the D3 fuel's AFR_st, or None when not sized (then reported so)."""
+    unsourced relative uncertainty of the D3 fuel's AFR_st, or None when not sized (then reported so). The
+    modal fuel's own u (SummaryRow.modal_fuel_u_rel, decision 79) is the tests' common value; tests whose
+    rows carry different ones are refused (ValueError), since one u_D term cannot carry two."""
     flats = flat_maxima(traces, roles=("direct2", "maf"), rules=rules)
     # Direct2 against the summary's modal fuel, per test.
     d2 = []
@@ -926,7 +1190,11 @@ def channel_checks(traces, summary, *, segs, afr_st, baro_kpa, rules, u_afr_st):
         d2.append((tr.test, g, float(s.modal_fuel_g), g / s.modal_fuel_g if s.modal_fuel_g > 0 else None,
                    total - g, nan_k))
     ratios = [r for (_, _, _, r, _, _) in d2 if r is not None]
-    u_d_fuel = abs(_median(ratios) - 1.0) if ratios else None
+    u_mf = {float(summary[tr.test].modal_fuel_u_rel) for tr in traces}
+    if len(u_mf) > 1:
+        raise ValueError(f"the tests' modal fuel carries {len(u_mf)} different u (decision 79): one u_D term cannot")
+    u_modal_fuel = u_mf.pop() if u_mf else None
+    u_d_fuel = math.hypot(_median(ratios) - 1.0, u_modal_fuel) if ratios else None
     # The MAF against Direct2 x AFR_st x lambda, on closed-loop segments without a flat maximum.
     by_test = {tr.test: tr for tr in traces}
     r_inv, r_chan, open_inv, open_chan, dropped = [], [], [], [], 0
@@ -960,6 +1228,9 @@ def channel_checks(traces, summary, *, segs, afr_st, baro_kpa, rules, u_afr_st):
     else:
         unsourced.append("u_afr_st (decision 63: the D3 fuel's AFR_st taken as the EPA Mazda batch's)")
         u_d_air = math.hypot(rmed - 1.0, float(u_afr_st)) if rmed is not None else None
+    assumed_fuel = (("u_modal_fuel (decision 79: the D3 batches' density unpublished, ASSUMED as the midpoint of "
+                     "the union of six NVFEL-measured certification test fuels' densities, its half-width uniform)",)
+                    if u_modal_fuel else ())
     # The PCM MAP at closed throttle (idle), per test, in seconds.
     idle_maps, per_test = [], []
     for tr in traces:
@@ -983,13 +1254,15 @@ def channel_checks(traces, summary, *, segs, afr_st, baro_kpa, rules, u_afr_st):
               "median_map_over_baro": _median(idle_maps),
               "below_baro": bool(per_test) and all(p["below"] for p in per_test)}
     return ChannelChecks(
-        direct2_vs_summary=tuple(d2), u_d_fuel=u_d_fuel, maf_ratio_median=rmed, maf_ratio_n=len(r_inv),
+        direct2_vs_summary=tuple(d2), u_d_fuel=u_d_fuel, u_modal_fuel=u_modal_fuel, maf_ratio_median=rmed,
+        maf_ratio_n=len(r_inv),
         u_afr_st=None if u_afr_st is None else float(u_afr_st), u_d_air=u_d_air,
         lambda_reading={"nominal": "1/channel" if any(t.lam_form == "inverse" for t in traces) else "AFR/AFR_st",
                         "closed_loop_median_nominal": rmed, "closed_loop_median_if_channel": _median(r_chan),
                         "open_loop_median_nominal": _median(open_inv), "open_loop_median_if_channel": _median(open_chan),
                         "open_loop_n": len(open_inv)},
-        flat_maxima=flats, flat_maxima_dropped=dropped, closed_throttle=closed, unsourced=tuple(unsourced))
+        flat_maxima=flats, flat_maxima_dropped=dropped, closed_throttle=closed, unsourced=tuple(unsourced),
+        assumed_fuel=assumed_fuel)
 
 
 # ============================================================================ the chain
@@ -999,7 +1272,8 @@ def demand_torque(seg, *, car, eta):
     box: Dyno_TractiveForce x r_N/V / (gear ratio x final drive) / eta, the gear the car's own
     (Trans_gear_actual_CAN) and r_N/V the car record's wheel_r (C2: never D3's radius). The CVT, which has
     no gear: the ratio from engine and wheel speed, which is the power balance F v / (omega_e eta) with v
-    the road speed. It holds only with the converter locked, which the segments assure on the CX-9."""
+    the road speed. It holds only with the converter locked, which the segments assure on the CX-9 and, by
+    decision 81, on the Accord, each with its own turbine speed."""
     if hasattr(car, "gears"):
         if seg.gear is None or not 1 <= seg.gear <= len(car.gears):
             raise ValueError(f"{seg.test} at {seg.t0_s}: gear {seg.gear} is not one of {car.id}'s")
@@ -1364,7 +1638,7 @@ def _one_row(evals, half, *, row, ctx, checks, es, unreachable_keys):
     E = float(np.mean(vals)) if n else None
     u_stat = float(es.u_stat_line(vals)) if n >= 2 else None
     u_d_rel = checks.u_d_fuel if what == "fuel" else checks.u_d_air
-    unsourced = list(checks.unsourced) if what == "air" else []
+    unsourced = list(checks.unsourced) if what == "air" else list(checks.assumed_fuel)
     if hv is not None and n >= 2:
         dv = np.asarray(hv) - np.asarray(vals)
         u_num, u_num_sd = float(es.u_stat_line(list(dv))), float(np.std(dv, ddof=1))
@@ -1486,7 +1760,9 @@ def run_chain(files, *, summary, channels, car, model, context, rules, channel_r
     c4_accord.json (WP3_INTERFACES.md 7.9), without its provenance, which validate_epa adds. The one entry
     point validate_epa.py run calls: its first real read of a D3 file is here (amendment C5; MD:451).
 
-    files: ((test, path), ...), the files ARMED.json hashed; summary: read_summary's {test: SummaryRow};
+    files: ((test, path), ...), the files ARMED.json hashed; summary: read_summary's {test: SummaryRow}, read
+    for these tests (decision 80: each test's base phase rows, the rows counted and the cell temperature's
+    spread over them reported under summary_rows);
     channels: CHANNELS or ACCORD_CHANNELS; car: the car record (engines.EpaCar or CvtCar); model: the frozen
     plant as epa_fit.RowModel; context: c3_context's; rules, channel_rules: CONTRACT_SEGMENTS and
     CHANNEL_RULES; dtheta: the crank-angle step (u_num reruns at half of it, E6 row 8); eta: the car's
@@ -1530,6 +1806,7 @@ def run_chain(files, *, summary, channels, car, model, context, rules, channel_r
         "files": len(traces),
         "segments": segment_counts(evals, context=context, flats=checks.flat_maxima),
         "census": {tr.test: segment_census(tr, rules=rules) for tr in traces},
+        "summary_rows": {tr.test: summary[tr.test].as_json() for tr in traces},
         "channel_checks": checks.as_json(),
         "ecu": {tr.test: {"dt_s": ecus[tr.test].dt_s, "nonuniform_steps": ecus[tr.test].nonuniform_steps}
                 for tr in traces},

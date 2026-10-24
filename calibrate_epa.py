@@ -852,6 +852,35 @@ SEEN_BEFORE_THE_FIT = (
     "(23 October 2026, through pdftotext into a scratch file: generic 2013 channel names, no summary header; "
     "the fuel's heating value 'at the top of the test summary result sheet')",
     "engine_specs/cars/cx9_2016_25t.toml [gear_ratios] (six forward gears, NH519 Table 4): the gear codes",
+    # the D3 summary pins' reads, 24 October 2026 (decisions 78-81)
+    "the D3 summary pins' author, 24 October 2026 (decision 78): the header row (row 7) of each summary workbook, "
+    "GRAD-engine-data/anl-d3-2016-mazda-cx9/test-summary/2016_Mazda_CX9_Test_Summary_04052018.xlsx, sheet "
+    "'Extended Test Summary', and "
+    "anl-d3-2018-honda-accord-lx/test-summary/2018_Honda_Accord_Test_Summary_20191125.xlsx, sheet 'G2_TestSummary' "
+    "(each file's sha256 MANIFEST.csv's), and the labelled cells above it, through a scratch script run with -I -B "
+    "(the scratchpad's d3pin_scripts/summary_header.py) that printed only those strings; no row below the header, "
+    "no result value",
+    "the D3 summary pins' author, 24 October 2026 (decision 78 as amended): the identifier columns of every row "
+    "below the header of both workbooks -- 'Test ID [#]', 'Cycle' and the Accord's 'Fuel Batch' -- through a "
+    "scratch script that decoded no other column (d3pin3_scripts/summary_identifiers.py), and again through "
+    "d3_rows.sum_row to check decision 80's row rule on them (d3pin5_scripts/summary_rows_check.py); no result "
+    "value",
+    "the D3 summary pins' author, 24 October 2026 (decision 81): GRAD-engine-data/_catalogue/d3_accord_columns.csv "
+    "in full and d3_cx9_columns.csv by grep, the catalogue's derived lists of every column name, its unit as "
+    "written in the name and its file count (CATALOGUE.md:54); names and counts only, no value",
+    "the D3 summary pins' author, 24 October 2026 (decision 79): EPA NVFEL Fuel Analysis Reports 26781, 25206 and "
+    "25402 (GRAD-engine-data/epa-ncat-benchmarking/<engine>_tier3-test-data/unzipped/6- ... .pdf), the Tier 3 test "
+    "fuels of the three engines' Tier 3 packages, printed whole through pdftotext, with the embedded images of "
+    "their scanned pages viewed (d3pin5_scripts/pdf_page_images.py); and the field alpha_fuel.density_kgpL_15C "
+    "alone of each EPA engine's epa_engine.json (d3pin5_scripts/tier2_density.py); fuel properties, "
+    "no row value",
+    "the D3 summary pins' author, 24 October 2026: results/ENGINE_THRESHOLDS.md section 5 (rule text); "
+    "GRAD-engine-data/CATALOGUE.md:1-120, 255-312, 404-430, 495-505 and 588-705 (the layout, the EPA packages and "
+    "fuels, the D3 format and batches, parts of the CX-9's and the Accord's test tables, which print per-test cell "
+    "temperatures and channel maxima of D3 files, as the catalogue lines above do, the channels and the problems); "
+    "MANIFEST.csv's rows of the summaries, the column lists and the test files (paths and sha256); the earlier "
+    "attempts' scratch outputs of decision 78's reads; no D3 trace file and no summary result value; none used "
+    "beyond the pins",
 )) + (
     "WP3's validation author, 23 October 2026: the contract's E6 row 11 shift, the d rows' probe, E6 row 10's "
     "driveline efficiency, section 5's radius gap, and each engine's epa_engine.json alpha_fuel heating value, "

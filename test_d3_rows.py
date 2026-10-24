@@ -17,12 +17,16 @@ What each class proves:
                the clipped Direct channel is never converted; the padding rows go; units are converted
   Segments     every rule of MD section 5 cuts (3 s, +-25 rpm, two MAP refreshes, the converter within
                1 %, A/C, one gear, coolant 83.8 C), windows are sized in seconds, not samples, and a gear
-               code the car has no ratio for is cut (mistake 18)
+               code the car has no ratio for is cut (mistake 18); on the Accord the converter and A/C rules
+               cut with its own channels (decision 81)
   Demand       demand_torque against a hand value, for a stepped box and for the CVT's power balance
   Checks       Direct2 against the summary, the MAF against Direct2 x AFR_st x lambda on closed-loop
                segments, flat maxima found and dropped (and a scan-tool hold not taken for one), the
                lambda reading's diagnostic, the PCM MAP at closed throttle
-  Summary      the workbook read through zipfile; the real specs refuse while unpinned
+  Summary      the workbook read through zipfile; the real specs pinned, each pin with its source, and a pin
+               without one refused; decision 80's rows (the base phase rows summed, the sum rows left out, a
+               test with one row, the section headings and another test's cells never read, disagreeing
+               heating values refused); decision 79's assumed density and its u in the Direct2 check
   Contract     the rules against the contract's wording, u_input 5.25 %, E6 row 10's two efficiencies,
                the gear codes against the CX-9's published ratios
   Chain        D1's inversion by hand, the ECU's dwell run on the car's own PCM MAP, a segment end to end
@@ -39,6 +43,7 @@ import tempfile
 import types
 import unittest
 import zipfile
+from unittest import mock
 from dataclasses import dataclass, replace
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -299,9 +304,15 @@ class Reader(Guarded):
         self.assertIsNone(tr.gear)
         self.assertIsNone(tr.coolant_c)
         np.testing.assert_allclose(d3_rows.lam_of(tr, afr_st=AFR), 1.0)
-        # Control: the CX-9's pins do not read an Accord file.
+        np.testing.assert_allclose(tr.turbine_rpm, a["turbine_rpm"])            # decision 81's channels read
+        np.testing.assert_allclose(tr.ac, a["ac"])
+        # Control: the CX-9's pins do not read an Accord file, and an Accord file without the turbine speed
+        # stops at its header (decision 81 made it a pinned channel).
         with self.assertRaises(d3_rows.HeaderDefect):
             d3_rows.read_trace(self.path, test="x", channels=d3_rows.CHANNELS)
+        write_d3(self.path, d3_rows.ACCORD_CHANNELS, acc, drop=("turbine_rpm",))
+        with self.assertRaises(d3_rows.HeaderDefect):
+            d3_rows.read_trace(self.path, test="x", channels=d3_rows.ACCORD_CHANNELS)
 
 
 class Segments(Guarded):
@@ -409,7 +420,34 @@ class Segments(Guarded):
         acc["lam"] = np.full(len(acc["time"]), AFR)
         tr = d3_rows.make_trace("A", channels=d3_rows.ACCORD_CHANNELS, arrays=acc)
         na = d3_rows.segment_census(tr, rules=self.R)["not_applied"]
-        self.assertEqual(len(na), 4)                                         # converter, A/C, gear, coolant
+        # decision 81: the converter and A/C rules apply on the Accord; only the gear and coolant do not
+        self.assertEqual(na, ["one_gear (no gear channel: a CVT)", "coolant (no live coolant channel)"])
+
+    def test_the_accords_converter_and_ac_rules_cut(self):
+        """Decision 81: the Accord's chain applies the converter-lock and A/C rules as C3 does, with its own
+        channels (Trans_torque_converter_turbine_spd_AT__rpm, HVAC_AC_clutch_PGM, each in 56 of 56 files by
+        the catalogue's column list), and its time and road-speed headers are the list's. Controls: the
+        steady trace is one segment; one second of 2 % slip, or of the compressor clutched, splits it."""
+        self.assertEqual(d3_rows.ACCORD_CHANNELS.roles(),
+                         ("time", "force", "rpm", "turbine_rpm", "ac", "map", "direct2", "maf", "lam", "speed"))
+        heads = {c.role: c.headers for c in d3_rows.ACCORD_CHANNELS.channels}
+        self.assertEqual(heads["turbine_rpm"], (("Trans_torque_converter_turbine_spd_AT__rpm", 1.0),))
+        self.assertEqual(heads["ac"], (("HVAC_AC_clutch_PGM", 1.0),))
+        self.assertEqual(heads["time"], (("Time[s]_RawFacilities", 1.0),))
+        self.assertEqual(heads["speed"], (("Dyno_Spd__mph", d3_rows.MPH_TO_KPH),))
+        self.assertFalse(any("UNVERIFIED" in c.source or "analogy" in c.source for c in d3_rows.ACCORD_CHANNELS.channels))
+
+        def accord(arrays):
+            acc = {r: arrays[r] for r in d3_rows.ACCORD_CHANNELS.roles()}
+            acc["lam"] = np.full(len(acc["time"]), AFR)
+            return d3_rows.segments(d3_rows.make_trace("A", channels=d3_rows.ACCORD_CHANNELS, arrays=acc),
+                                    rules=self.R, afr_st=AFR)
+
+        self.assertEqual(len(accord(base_arrays(seconds=20.0))), 1)
+        for key, value in (("turbine_rpm", 2000.0 / 1.02), ("ac", 1.0)):
+            s = accord(mid(base_arrays(seconds=20.0), key, value, 9.0, 10.0))
+            self.assertEqual(len(s), 2, msg=key)
+            self.assertTrue(all(x.t1_s < 9.0 or x.t0_s >= 10.0 for x in s), msg=key)
 
     def test_the_cvt_needs_the_car_to_move(self):
         acc = {r: base_arrays(seconds=20.0)[r] for r in d3_rows.ACCORD_CHANNELS.roles()}
@@ -450,12 +488,18 @@ class Demand(Guarded):
         self.assertAlmostEqual(d3_rows.bmep_bar(2e5 * 2.5e-3 / (4 * math.pi), displacement_l=2.5), 2.0, places=12)
 
 
-def _summary(traces, scale=1.0):
+def srow(test, cell_temp_c, modal_fuel_g, lhv=D3_LHV, *, u=0.0):
+    """A summary row as read_summary builds it from one base row, the modal fuel already in grams (u its
+    relative u, 0 unless a test sets decision 79's)."""
+    return d3_rows.SummaryRow(test=test, cell_temp_c=cell_temp_c, modal_fuel_g=modal_fuel_g, fuel_lhv_btu_per_lbm=lhv,
+                              baro_kpa=None, modal_fuel_u_rel=u, base_rows=1, sum_rows=0, cell_temp_spread_c=0.0)
+
+
+def _summary(traces, scale=1.0, *, u=0.0):
     out = {}
     for tr in traces:
         g, _ = d3_rows._integral(tr.t_s, tr.direct2_gps, 0.0)
-        out[tr.test] = d3_rows.SummaryRow(test=tr.test, cell_temp_c=25.0, modal_fuel_g=g * scale,
-                                          fuel_lhv_btu_per_lbm=D3_LHV, baro_kpa=None)
+        out[tr.test] = srow(tr.test, 25.0, g * scale, u=u)
     return out
 
 
@@ -469,16 +513,49 @@ class Checks(Guarded):
     def test_direct2_against_the_summary(self):
         a = base_arrays(seconds=20.0, t0=-5.0, direct2=3.0)
         tr = trace(a)
-        summ = {"T1": d3_rows.SummaryRow("T1", 25.0, 45.0, D3_LHV, None)}          # 3 g/s x 15 s
+        summ = {"T1": srow("T1", 25.0, 45.0)}                                        # 3 g/s x 15 s
         c, _ = _checks([tr], summ)
         (test, g, modal, ratio, pre, nan_k), = c.direct2_vs_summary
         self.assertAlmostEqual(g, 45.0, places=9)
         self.assertAlmostEqual(pre, 15.0, places=9)                                  # the pre-roll, apart
         self.assertAlmostEqual(c.u_d_fuel, 0.0, places=12)
         # Control: a facility that measured 4 % more moves the fuel's u_D to 4 %.
-        summ = {"T1": d3_rows.SummaryRow("T1", 25.0, 45.0 * 1.04, D3_LHV, None)}
+        summ = {"T1": srow("T1", 25.0, 45.0 * 1.04)}
         c, _ = _checks([tr], summ)
         self.assertAlmostEqual(c.u_d_fuel, 1.0 - 1.0 / 1.04, places=12)
+
+    def test_the_modal_fuels_density_u_enters_the_fuels_u_d(self):
+        """Decision 79: the summary's modal fuel, a volume at an ASSUMED density, carries that density's u,
+        and the Direct2 check's u_D combines it with Direct2's disagreement, sqrt((r - 1)^2 + u^2). The
+        fuel rows record it among their notes, the air rows do not. Controls: the same rows at u 0 give
+        |r - 1| alone (the u reached the output, mistake 25); rows carrying two different u are refused."""
+        a = base_arrays(seconds=20.0, t0=-5.0, direct2=3.0)
+        tr = trace(a)
+        u = d3_rows.D3_FUEL_DENSITY.u_rel
+        c, _ = _checks([tr], {"T1": srow("T1", 25.0, 45.0, u=u)})
+        self.assertAlmostEqual(c.u_modal_fuel, u, places=15)
+        self.assertAlmostEqual(c.u_d_fuel, u, places=15)                            # Direct2 agrees: u alone
+        self.assertEqual(len(c.assumed_fuel), 1)
+        self.assertIn("decision 79", c.assumed_fuel[0])
+        self.assertEqual(c.as_json()["u_modal_fuel"], u)
+        c4, _ = _checks([tr], {"T1": srow("T1", 25.0, 45.0 * 1.04, u=u)})
+        self.assertAlmostEqual(c4.u_d_fuel, math.hypot(1.0 - 1.0 / 1.04, u), places=15)
+        # Control: at u 0 the term vanishes and nothing is noted.
+        c0, _ = _checks([tr], {"T1": srow("T1", 25.0, 45.0 * 1.04)})
+        self.assertAlmostEqual(c0.u_d_fuel, 1.0 - 1.0 / 1.04, places=15)
+        self.assertNotEqual(c0.u_d_fuel, c4.u_d_fuel)
+        self.assertEqual(c0.assumed_fuel, ())
+        # Through the rows: the fuel's u_D carries it, the air's does not.
+        rows = d3_rows.c3_rows(Rows().evals(), context=CTX, checks=replace(c4, u_d_air=0.02),
+                               evals_half=Rows().evals(half=True))
+        self.assertAlmostEqual(rows["C3b"].u.u_D, 100.0 * c4.u_d_fuel, places=12)
+        self.assertIn(c4.assumed_fuel[0], rows["C3b"].u.unsourced)
+        self.assertNotIn(c4.assumed_fuel[0], rows["C3d"].u.unsourced)
+        # Two tests whose rows carry different u: one u_D term cannot carry both.
+        t2 = trace(base_arrays(seconds=20.0, direct2=3.1), "T2")
+        with self.assertRaises(ValueError):
+            _checks([tr, t2], {"T1": srow("T1", 25.0, 45.0, u=u), "T2": srow("T2", 25.0, 62.0, u=2 * u)})
+        _checks([tr, t2], {"T1": srow("T1", 25.0, 45.0, u=u), "T2": srow("T2", 25.0, 62.0, u=u)})
 
     def test_the_maf_against_direct2(self):
         tr = trace(base_arrays(seconds=20.0))
@@ -605,37 +682,204 @@ def write_xlsx(path, sheet, rows):
             f"<si><t>{s}</t></si>" for s in strings) + "</sst>")
 
 
-SPEC = d3_rows.SummarySpec(car="synthetic", sheet="Tests", test_id="Test ID", cell_temp_c="Cell C",
-                           modal_fuel="Fuel modal kg", modal_fuel_to_g=1000.0, fuel_lhv="HV BTU/lb",
-                           fuel_lhv_to_btu_per_lbm=1.0, baro=None, baro_to_kpa=None)
+SPEC = d3_rows.SummarySpec(car="synthetic", sheet="Tests", test_id="Test ID", cycle="Cycle", cell_temp_c="Cell C",
+                           modal_fuel="Fuel modal kg", modal_fuel_to_g=1000.0, modal_fuel_u_rel=0.0, fuel_lhv="HV BTU/lb",
+                           fuel_lhv_to_btu_per_lbm=1.0, baro=None, baro_to_kpa=None,
+                           sources=tuple((k, "synthetic") for k in d3_rows.SUMMARY_NEED))
+HEAD = ["Test ID", "Cycle", "Cell C", "Fuel modal kg", "HV BTU/lb"]
+
+
+def read(rows, tests, spec=SPEC):
+    """read_summary on a synthetic workbook holding `rows` under a title row and a blank one."""
+    with tempfile.TemporaryDirectory() as d:
+        p = os.path.join(d, "summary.xlsx")
+        write_xlsx(p, spec.sheet, [["A synthetic summary"], []] + rows)
+        return d3_rows.read_summary(p, spec=spec, tests=tests)
+
+
+# A test with phases and sum rows, as decision 78's identifier read found the sheets laid out (the labels'
+# forms are the CX-9's and the Accord's; every number is made up): the sum rows carry the sum of their phases,
+# so a reader that counted them would double the fuel.
+UDDS = [[61700001.0, "UDDS #1, Ph 1", 24.0, 0.10, 18300.0],
+        [61700001.0, "UDDS #1, Ph 2", 25.0, 0.20, 18300.0],
+        [61700001.0, "UDDS #1, Ph 1+2", 24.5, 0.30, 18300.0],
+        [61700001.0, "UDDS #2, Ph 3", 25.5, 0.15, 18300.0],
+        [61700001.0, "UDDS #2, Ph 4", 26.0, 0.25, 18300.0],
+        [61700001.0, "UDDS #2, Ph 3+4", 25.7, 0.40, 18300.0]]
+US06 = [[61700002.0, "US06x2 p1", 23.0, 0.5, 18300.0],
+        [61700002.0, "US06x2 p2", 23.5, 0.6, 18300.0],
+        [61700002.0, "US06x2 p1+2", 23.2, 1.1, 18300.0]]
+WOT = [[61700003.0, "WOTs x3", 22.0, 0.05, 18300.0]]
 
 
 class Summary(Guarded):
-    def test_the_real_specs_refuse_while_unpinned(self):
-        # Before the file is opened: the path does not exist, so an open would raise FileNotFoundError.
-        for spec in (d3_rows.SUMMARY_CX9, d3_rows.SUMMARY_ACCORD):
-            with self.assertRaises(d3_rows.SummaryNotPinned):
-                d3_rows.read_summary(os.path.join(HERE, "__no_such_summary__.xlsx"), spec=spec)
-        # Control: a pinned spec does open it.
+    # The strings decision 78's header read printed (24 October 2026; the scratchpad's d3pin/stage2_*.txt):
+    # the same five on both sheets, the heating value's with a line break inside the cell.
+    HEADERS = {"test_id": "Test ID [#]", "cycle": "Cycle", "cell_temp_c": "Test Cell Temp [C]",
+               "modal_fuel": "Fuel used modal [gal]", "fuel_lhv": "Fuel Heating Value\n[BTU/lbm]"}
+
+    def test_the_real_specs_are_pinned_each_from_a_source(self):
+        """The twelve open pins of commit C, closed 24 October 2026 (decisions 78 and 79), and decision 80's
+        cycle column and decision 79's u beside them: every field read_summary needs is set and carries its
+        source, each header's source quotes it, and the guard (unpinned_for) names nothing on any engine.
+        Controls (mistake 12): a pin with its source taken away, or the pin itself, is named by the guard,
+        and read_summary refuses it before the file is opened."""
+        for spec, sheet in ((d3_rows.SUMMARY_CX9, "Extended Test Summary"), (d3_rows.SUMMARY_ACCORD, "G2_TestSummary")):
+            self.assertEqual(spec.sheet, sheet)
+            self.assertEqual(spec.unpinned(), ())
+            for k, h in self.HEADERS.items():
+                self.assertEqual(getattr(spec, k), h, msg=(spec.car, k))
+                self.assertIn(f"'{h}'".replace("\n", "\\n"), dict(spec.sources)[k], msg=(spec.car, k))
+            self.assertEqual(spec.fuel_lhv_to_btu_per_lbm, 1.0)
+            self.assertEqual(spec.modal_fuel_to_g, d3_rows.D3_FUEL_DENSITY.g_per_us_gal)
+            self.assertEqual(spec.modal_fuel_u_rel, d3_rows.D3_FUEL_DENSITY.u_rel)
+            self.assertTrue(all(dict(spec.sources).get(k) for k in d3_rows.SUMMARY_NEED))
+            self.assertIn("decision 79", dict(spec.sources)["modal_fuel_to_g"])
+            # Controls: a source taken away, a pin taken away.
+            for k in ("modal_fuel_to_g", "fuel_lhv", "cycle"):
+                bare = replace(spec, sources=tuple(x for x in spec.sources if x[0] != k))
+                self.assertEqual(bare.unpinned(), (k,))
+                with self.assertRaises(d3_rows.SummaryNotPinned):
+                    d3_rows.read_summary(os.path.join(HERE, "__no_such_summary__.xlsx"), spec=bare, tests=("1",))
+            self.assertEqual(replace(spec, modal_fuel_to_g=None).unpinned(), ("modal_fuel_to_g",))
+        for engine in ("mazda_25t", "honda_l15b7", "ford_27tt"):
+            self.assertEqual(d3_rows.unpinned_for(engine), ())
+        open_cx9 = dict(d3_rows.SUMMARY_FOR, mazda_25t=replace(d3_rows.SUMMARY_CX9, modal_fuel_to_g=None))
+        with mock.patch.object(d3_rows, "SUMMARY_FOR", open_cx9):
+            self.assertEqual(d3_rows.unpinned_for("mazda_25t"), ("cx9_2016.modal_fuel_to_g",))
+            self.assertEqual(d3_rows.unpinned_for("honda_l15b7"), ())
+        # Control of the control: a pinned spec does open the path (which does not exist).
         with self.assertRaises(FileNotFoundError):
-            d3_rows.read_summary(os.path.join(HERE, "__no_such_summary__.xlsx"), spec=SPEC)
+            d3_rows.read_summary(os.path.join(HERE, "__no_such_summary__.xlsx"), spec=SPEC, tests=("1",))
+
+    def test_the_real_pins_read_a_synthetic_workbook_in_their_units(self):
+        """The real specs end to end on a SYNTHETIC workbook that prints their headers (names only, every value
+        made up): gallons become grams at decision 79's assumed density, the heating value is taken as it
+        stands, and each row carries the density's u. Control: the heating value's heading without its line
+        break is not the pinned header, and the read stops before any value."""
+        for spec in (d3_rows.SUMMARY_CX9, d3_rows.SUMMARY_ACCORD):
+            head = [spec.test_id, spec.cycle, "Test Time", spec.cell_temp_c, spec.modal_fuel, spec.fuel_lhv]
+            rows = [head, [61700001.0, "HWY, Ph 1", "x", 21.0, 0.25, 18000.0],
+                    [61700001.0, "HWY, Ph 2", "x", 21.5, 0.5, 18000.0]]
+            out = read(rows, ("61700001",), spec=spec)["61700001"]
+            self.assertAlmostEqual(out.modal_fuel_g, 0.75 * d3_rows.D3_FUEL_DENSITY.g_per_us_gal, places=9)
+            self.assertAlmostEqual(out.modal_fuel_g, 0.75 * 0.745015 * 3785.411784, places=6)   # by hand
+            self.assertEqual(out.fuel_lhv_btu_per_lbm, 18000.0)
+            self.assertEqual(out.modal_fuel_u_rel, d3_rows.D3_FUEL_DENSITY.u_rel)
+            flat = [[h.replace("\n", " ") for h in head]] + rows[1:]
+            with self.assertRaises(d3_rows.HeaderDefect):
+                read(flat, ("61700001",), spec=spec)
 
     def test_a_workbook_is_read(self):
         with tempfile.TemporaryDirectory() as d:
             p = os.path.join(d, "summary.xlsx")
-            write_xlsx(p, "Tests", [["A synthetic summary"], [],
-                                    ["Test ID", "Cycle", "Cell C", "Fuel modal kg", "HV BTU/lb"],
+            write_xlsx(p, "Tests", [["A synthetic summary"], [], HEAD,
                                     [61700001.0, "US06", 24.5, 1.25, 18300.0],
                                     ["61700002", "HWY", 23.0, 0.5, 18300.0], [None, None]])
-            out = d3_rows.read_summary(p, spec=SPEC)
+            out = d3_rows.read_summary(p, spec=SPEC, tests=("61700001", "61700002"))
             self.assertEqual(sorted(out), ["61700001", "61700002"])
             self.assertEqual(out["61700001"].modal_fuel_g, 1250.0)
             self.assertEqual(out["61700002"].cell_temp_c, 23.0)
             # Controls: a header the workbook does not print, and another sheet, stop before any value.
             with self.assertRaises(d3_rows.HeaderDefect):
-                d3_rows.read_summary(p, spec=replace(SPEC, fuel_lhv="Heating value"))
+                d3_rows.read_summary(p, spec=replace(SPEC, fuel_lhv="Heating value"), tests=("61700001",))
             with self.assertRaises(d3_rows.HeaderDefect):
-                d3_rows.read_summary(p, spec=replace(SPEC, sheet="Extended Test Summary"))
+                d3_rows.read_summary(p, spec=replace(SPEC, sheet="Extended Test Summary"), tests=("61700001",))
+
+    def test_the_base_phase_rows_are_summed_and_the_sum_rows_left_out(self):
+        """Decision 80 on a test with two UDDS halves, each a sum row after its two phases: the modal fuel is
+        the four phases' sum (0.70 kg), the cell temperature the first phase's (24.0 C) with the spread over
+        the four reported (2.0 K), and the two sum rows are counted apart. Control: the same rows read with
+        the sum rows taken as phases give twice the fuel, so a reader that kept them fails here; and the
+        Accord's "p1+2" form is a sum row too."""
+        out = read([HEAD] + UDDS + US06, ("61700001", "61700002"))
+        r = out["61700001"]
+        self.assertAlmostEqual(r.modal_fuel_g, 1000.0 * (0.10 + 0.20 + 0.15 + 0.25), places=9)
+        self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c, r.base_rows, r.sum_rows), (24.0, 2.0, 4, 2))
+        self.assertEqual(r.as_json(), {"base_rows": 4, "sum_rows_excluded": 2, "cell_temp_c": 24.0,
+                                       "cell_temp_spread_c": 2.0})
+        r2 = out["61700002"]
+        self.assertAlmostEqual(r2.modal_fuel_g, 1100.0, places=9)
+        self.assertEqual((r2.cell_temp_c, r2.base_rows, r2.sum_rows), (23.0, 2, 1))
+        # Control: every row a phase (the labels' "+" removed) doubles the fuel.
+        as_phases = [[t, c.replace("+", " and "), *rest] for t, c, *rest in UDDS]
+        self.assertAlmostEqual(read([HEAD] + as_phases, ("61700001",))["61700001"].modal_fuel_g, 1400.0, places=9)
+        for label, is_sum in (("UDDS #1, Ph 1+2", True), ("UDDS #2, Ph 3+4", True), ("UDDS cold start p1+2", True),
+                              ("US06x2 p3+4", True), ("UDDS hot #2 start p1+2", True), ("Hwyx3, Ph 1", False),
+                              ("HWYx2  p1", False), ("US06x3 p1 ", False), ("LA92x2 ph1", False),
+                              ("SSS 0-80-0 30 sec 0,3,6% grade - SSS warmup", False), ("WOTs x3", False)):
+            self.assertIs(d3_rows.sum_row(label), is_sum, msg=label)
+
+    def test_a_test_with_one_row_is_that_row(self):
+        """Decision 80: a test with one row (a WOT run) is that row. Control: a test with sum rows only has
+        no base phase row and is refused by name."""
+        r = read([HEAD] + WOT, ("61700003",))["61700003"]
+        self.assertEqual((r.modal_fuel_g, r.cell_temp_c, r.cell_temp_spread_c, r.base_rows, r.sum_rows),
+                         (50.0, 22.0, 0.0, 1, 0))
+        with self.assertRaises(d3_rows.TraceDefect) as cm:
+            read([HEAD, [61700004.0, "US06x2 p1+2", 23.0, 1.0, 18300.0]], ("61700004",))
+        self.assertIn("61700004", str(cm.exception))
+
+    def test_disagreeing_heating_values_are_refused_by_name(self):
+        """Decision 80: a test's base rows must share one heating value; one that differs refuses the test by
+        name, without printing a value. Control: the same rows with the values equal read."""
+        odd = [list(x) for x in US06]
+        odd[1][4] = 18301.0
+        with self.assertRaises(d3_rows.TraceDefect) as cm:
+            read([HEAD] + odd, ("61700002",))
+        self.assertIn("61700002", str(cm.exception))
+        self.assertIn("disagree", str(cm.exception))
+        self.assertNotIn("18301", str(cm.exception))
+        self.assertEqual(read([HEAD] + US06, ("61700002",))["61700002"].fuel_lhv_btu_per_lbm, 18300.0)
+
+    def test_headings_and_other_tests_rows_are_never_converted(self):
+        """Decision 80's code: a row whose test ID cell is not a whole number (a day's heading, the disclaimer
+        at the foot, an empty cell) is skipped, and so is every row of a test the chain does not read, so its
+        empty or odd cells never stop the read; a test the sheet does not list is absent. Controls: the same
+        odd test asked for stops, naming the test and the column but not the cell; a cycle label that holds
+        "+" in another form is refused, never guessed."""
+        rows = ([HEAD, ["Day 1 Standard Cycles"]] + UDDS + [["Day 2, Standard Cycles Repeat 1", None, None]]
+                + [[61700009.0, "HWY, Ph 1", "n/a?", None, 18300.0]] + WOT
+                + [["-This publication is distributed by ..."], [None, None]])
+        out = read(rows, ("61700001", "61700003", "61700005"))
+        self.assertEqual(sorted(out), ["61700001", "61700003"])
+        with self.assertRaises(d3_rows.TraceDefect) as cm:
+            read(rows, ("61700009",))
+        self.assertIn("61700009", str(cm.exception))
+        self.assertIn("Cell C", str(cm.exception))
+        self.assertNotIn("n/a?", str(cm.exception))
+        with self.assertRaises(d3_rows.TraceDefect):
+            read([HEAD, [61700006.0, "UDDS + HWY", 23.0, 1.0, 18300.0]], ("61700006",))
+        with self.assertRaises(ValueError):
+            d3_rows.sum_row("UDDS + HWY")
+        with self.assertRaises(ValueError):
+            read([HEAD] + WOT, ())
+
+    def test_the_assumed_density(self):
+        """Decision 79: the six NVFEL densities (three Tier 2, three Tier 3), their union 0.74227-0.74776 kg/L,
+        the assumed density its midpoint 0.745015 kg/L, the half-width 0.002745 kg/L, its uniform u 0.2127 %
+        of the midpoint, and 2820.19 g per US gallon, each by hand. Controls: the rule on two made-up fuels;
+        the band moves when its widest fuel is left out; no fuel is refused."""
+        f = d3_rows.D3_FUEL_DENSITIES
+        self.assertEqual(sorted(x.ftag for x in f), ["25206", "25278", "25402", "25842", "26781", "26864"])
+        self.assertEqual(sorted(x.grade for x in f), ["Tier 2"] * 3 + ["Tier 3"] * 3)
+        self.assertTrue(all(x.source for x in f))
+        d = d3_rows.D3_FUEL_DENSITY
+        self.assertAlmostEqual(d.kg_per_l, 0.745015, places=12)
+        self.assertAlmostEqual(d.half_width_kg_per_l, 0.002745, places=12)
+        self.assertAlmostEqual(d.u_rel, 0.002745 / math.sqrt(3.0) / 0.745015, places=15)
+        self.assertEqual(round(100 * d.u_rel, 4), 0.2127)
+        self.assertAlmostEqual(d.g_per_us_gal, 0.745015 * 3785.411784, places=9)
+        self.assertEqual(round(d.g_per_us_gal, 2), 2820.19)
+        self.assertAlmostEqual(d3_rows.L_PER_US_GAL, 231 * 2.54 ** 3 / 1000, places=12)
+        two = d3_rows.assumed_density((replace(f[0], kg_per_l=0.70), replace(f[1], kg_per_l=0.80)))
+        self.assertAlmostEqual(two.kg_per_l, 0.75, places=15)
+        self.assertAlmostEqual(two.u_rel, 0.05 / math.sqrt(3.0) / 0.75, places=15)
+        narrower = d3_rows.assumed_density(tuple(x for x in f if x.ftag != "25206"))
+        self.assertAlmostEqual(narrower.kg_per_l, (0.74227 + 0.74506) / 2, places=12)
+        self.assertLess(narrower.u_rel, d.u_rel)
+        with self.assertRaises(ValueError):
+            d3_rows.assumed_density(())
 
 
 class Contract(Guarded):
@@ -782,9 +1026,10 @@ CTX = d3_rows.C3Context(engine="toy", R={"C3a": None, "C3b": 16.6, "C3c": None, 
 
 
 def _fake_checks(u_d_fuel=0.01, u_d_air=0.02, flats=None):
-    return d3_rows.ChannelChecks(direct2_vs_summary=(), u_d_fuel=u_d_fuel, maf_ratio_median=1.0 + u_d_air,
-                                 maf_ratio_n=5, u_afr_st=None, u_d_air=u_d_air, lambda_reading={},
-                                 flat_maxima=flats or {}, flat_maxima_dropped=0, closed_throttle={}, unsourced=())
+    return d3_rows.ChannelChecks(direct2_vs_summary=(), u_d_fuel=u_d_fuel, u_modal_fuel=0.0,
+                                 maf_ratio_median=1.0 + u_d_air, maf_ratio_n=5, u_afr_st=None, u_d_air=u_d_air,
+                                 lambda_reading={}, flat_maxima=flats or {}, flat_maxima_dropped=0, closed_throttle={},
+                                 unsourced=(), assumed_fuel=())
 
 
 class Rows(Guarded):
@@ -975,8 +1220,7 @@ class WholeChain(Guarded):
                 write_d3(p, d3_rows.CHANNELS, a)
                 files.append((t, p))
                 g, _ = d3_rows._integral(a["time"], a["direct2"], 0.0)
-                summ[t] = d3_rows.SummaryRow(test=t, cell_temp_c=25.0, modal_fuel_g=g, fuel_lhv_btu_per_lbm=D3_LHV,
-                                             baro_kpa=None)
+                summ[t] = srow(t, 25.0, g)
             body = d3_rows.run_chain(
                 tuple(files), summary=summ, channels=d3_rows.CHANNELS, car=CX9, model=ToyModel(), context=CTX,
                 rules=d3_rows.CONTRACT_SEGMENTS, channel_rules=d3_rows.CHANNEL_RULES, dtheta=0.25, eta=0.92,
@@ -990,8 +1234,11 @@ class WholeChain(Guarded):
         self.assertEqual(body["segments"]["n"], 4)
         self.assertEqual(sorted(body["rows"]), ["C3a", "C3b", "C3c", "C3d"])
         self.assertEqual(sorted(body["eta"]), ["0.86", "0.98"])
-        for k in ("direct2_vs_summary", "maf_vs_direct2", "pcm_map_closed_throttle", "flat_maxima_dropped"):
+        for k in ("direct2_vs_summary", "maf_vs_direct2", "pcm_map_closed_throttle", "flat_maxima_dropped",
+                  "u_modal_fuel"):
             self.assertIn(k, body["channel_checks"])
+        self.assertEqual(body["summary_rows"]["61700000"], {"base_rows": 1, "sum_rows_excluded": 0, "cell_temp_c": 25.0,
+                                                            "cell_temp_spread_c": 0.0})
         self.assertEqual(body["fuel_scaling"], EPA_LHV / D3_LHV)
         self.assertEqual(body["rows"]["C3b"]["n_rows"], 4)
         self.assertIsNotNone(body["rows"]["C3b"]["label"])                 # labelled: u_num from half dtheta
@@ -1041,7 +1288,7 @@ class Imports(Guarded):
         with open(os.path.join(HERE, "d3_rows.py"), encoding="utf-8") as fh:
             src = fh.read()
         self.assertEqual(self.imported(src) & (self.PLANT | {"thresholds"}), set())
-        self.assertEqual(self.imported(src) - {"csv", "dataclasses", "math", "os", "xml", "zipfile", "typing",
+        self.assertEqual(self.imported(src) - {"csv", "dataclasses", "math", "os", "re", "xml", "zipfile", "typing",
                                                "numpy", "collections", "functools", "epa_stats"}, set())
         self.assertEqual(self.prints(src), [])
         for part in (("epa_", "steady"), ("epa_", "highload")):            # built from parts (amendment C3)

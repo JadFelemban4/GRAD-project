@@ -74,8 +74,8 @@ import validate_epa as V  # noqa: E402
 from thresholds import common, split  # noqa: E402
 
 # The production pin tables, kept before any test pins them (fx.pinned_terms): ArmProofs restores them to
-# show the arming pass on decision 56's u_D terms, which every report's Table 8 pins, refuse once one of them
-# is taken away, and refuse while the D3 summary columns are open.
+# show the arming pass on decision 56's u_D terms, which every report's Table 8 pins, and on the D3 summary
+# columns, pinned since 24 October 2026 (decisions 78-80), and refuse once one of them is taken away.
 PRODUCTION_U_D = epa_stats.U_D
 PRODUCTION_UNPINNED_FOR = d3_rows.unpinned_for
 
@@ -854,9 +854,11 @@ class ArmProofs(Armed):
     def test_arm_refuses_while_a_pin_is_open(self):
         """The arming's pins step on the production tables (decision 56; WP3_INTERFACES.md 11): the production
         u_D table, which pins the meter's and the torque's terms from every report's Table 8, arms the Ford (no
-        D3 chain) and records every term pinned. Controls (mistake 12): one report's torque pin taken away (the
-        Ford's HD1), or every meter pin, refuses at arm/pins naming that term; the production D3 summary columns,
-        still open, refuse the Mazda; under the synthetic terms the Ford arms (every other test)."""
+        D3 chain) and records every term pinned; the production D3 summary columns, pinned since 24 October 2026
+        (decisions 78-80), arm the Mazda, recorded as pinned. Controls (mistake 12): one report's torque pin taken
+        away (the Ford's HD1), or every meter pin, refuses at arm/pins naming that term; a D3 summary column left
+        open (d3_rows.unpinned_for patched, as WP3_INTERFACES.md 14 asks) refuses the Mazda naming it; under the
+        synthetic terms the Ford arms (every other test)."""
         r, src = self.repo()
         self.assertEqual(epa_stats.unpinned_u_d(terms=PRODUCTION_U_D), {})
         with mock.patch.object(epa_stats, "U_D", PRODUCTION_U_D):
@@ -875,11 +877,18 @@ class ArmProofs(Armed):
                 got = [x for x in cm.exception.problems if x.startswith("arm/pins")]
                 self.assertTrue(got and all(name in x for x in got), got)
                 self.assertTrue(any("D1" in x for x in got), got)
+        self.assertEqual([PRODUCTION_UNPINNED_FOR(e) for e in (FORD, MAZDA, "honda_l15b7")], [(), (), ()])
         r, src = self.repo()
         with mock.patch.object(d3_rows, "unpinned_for", PRODUCTION_UNPINNED_FOR):
+            rec = self.arm(src, engine=MAZDA, defect=None, data_folder=self.data)
+        self.assertEqual(rec["pins"]["d3_summary"], "pinned")
+        r, src = self.repo()
+        with mock.patch.object(d3_rows, "unpinned_for", lambda name: ("cx9_2016.test_id",) if name == MAZDA else ()):
             with self.assertRaises(V.Refused) as cm:
                 self.arm(src, engine=MAZDA, defect=None, data_folder=self.data)
-        self.assertTrue(any(x.startswith("arm/pins") and "D3 summary column" in x for x in cm.exception.problems))
+        self.assertTrue(any(x.startswith("arm/pins") and "D3 summary column 'cx9_2016.test_id'" in x
+                            for x in cm.exception.problems))
+        r, src = self.repo()
         rec = self.arm(src, engine=FORD, defect=None, data_folder=self.data)        # the control: pinned
         self.assertEqual(rec["pins"]["d3_summary"], "no D3 chain")
 
