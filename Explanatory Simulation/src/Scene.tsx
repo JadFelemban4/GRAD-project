@@ -22,7 +22,7 @@ import { createSupraModel } from './model/supra.mjs';
 import { routes, cylinderPose } from './model/layout.mjs';
 
 type Point = [number, number, number];
-type Props = { onViewport?:React.RefCallback<HTMLDivElement>; story?:React.ReactNode; onInspectTurbo?:()=>void; onInspectCylinder?:()=>void; onBackToVehicle?:()=>void; frame: any; running: boolean; speed: number; focus: string; onSelect: (id: string) => void; onLessonSelect?: (id: string) => void; layer: string; preview: boolean; road?: {time_s:number[]; grade_pct:number[]; speed_kmh:number[]}; time: number; stroke?: number; animateCycle?: boolean; studio?: boolean; onOperatingFrame?: (frame:Frame)=>void; onError?: (message:string)=>void };
+type Props = { assembly?:boolean; onViewport?:React.RefCallback<HTMLDivElement>; story?:React.ReactNode; onInspectTurbo?:()=>void; onInspectCylinder?:()=>void; onBackToVehicle?:()=>void; frame: any; running: boolean; speed: number; focus: string; onSelect: (id: string) => void; onLessonSelect?: (id: string) => void; layer: string; preview: boolean; road?: {time_s:number[]; grade_pct:number[]; speed_kmh:number[]}; time: number; stroke?: number; animateCycle?: boolean; studio?: boolean; onOperatingFrame?: (frame:Frame)=>void; onError?: (message:string)=>void };
 const Clock=SceneClock;
 type Appearance='solid'|'ghost'|'section';
 type View='iso'|'front'|'side'|'top'|'focus'|'chamber';
@@ -93,10 +93,10 @@ function Car({cutaway,...p}:Props&{cutaway:boolean}) {
     {cutaway&&<Systems {...p}/>}
   </group>;
 }
-function CameraRig({layer,reset,zoomRequest,reduced,studio,visual}:{layer:string;reset:number;zoomRequest:{seq:number;factor:number};reduced:boolean;studio?:boolean;visual:Visual}) {
+function CameraRig({layer,reset,zoomRequest,reduced,studio,assembly,visual}:{layer:string;reset:number;zoomRequest:{seq:number;factor:number};reduced:boolean;studio?:boolean;assembly?:boolean;visual:Visual}) {
   const {camera,size}=useThree();const controls=useRef<any>(null);const moving=useRef(true);
   const view=useMemo(()=>{
-    const engine=layer==='engine';const turbo=studio&&layer==='turbo';const focused=(engine||turbo)&&visual.view==='focus';
+    const engine=layer==='engine';const turbo=(studio||assembly)&&layer==='turbo';const focused=(engine||turbo)&&visual.view==='focus';
     const cylinderFocus=engine&&(visual.view==='chamber'||(focused||visual.view==='side')&&['intake','exhaust','injector','piston','spark'].includes(visual.selectedPart));
     const anchor=studio&&layer==='agent'?[2.2,.73,0]:turbo?(focused?(turboAnchors[visual.selectedPart]||TURBO_CENTER):TURBO_CENTER):cylinderFocus?[cylinderX(visual.selectedCylinder),.88,-.06]:focused?(partInfo[visual.selectedPart]?.anchor||[1.49,.82,-.06]):engine?[1.49,.82,-.06]:layer==='turbo'?[1.83,.82,.15]:layer==='thermal'?[1.35,.75,0]:[0,.73,0];
     const target=new THREE.Vector3(...anchor as Point);
@@ -109,7 +109,7 @@ function CameraRig({layer,reset,zoomRequest,reduced,studio,visual}:{layer:string
     if(reserved){const right=new THREE.Vector3().crossVectors(direction,new THREE.Vector3(0,1,0)).normalize().negate();target.addScaledVector(right,reserved/(2*Math.max(20,zoom)));}
     if(studio){const normal=direction.clone().normalize();const up=new THREE.Vector3(0,1,0).addScaledVector(normal,-normal.y).normalize();target.addScaledVector(up,(top-bottom)/(2*Math.max(20,zoom)));}
     return {target,position:target.clone().add(direction),zoom:Math.max(20,zoom)};
-  },[layer,size.width,size.height,studio,visual.view,visual.explode,visual.selectedPart,visual.selectedCylinder]);
+  },[layer,size.width,size.height,studio,assembly,visual.view,visual.explode,visual.selectedPart,visual.selectedCylinder]);
   useEffect(()=>{moving.current=true;},[view,reset]);
   useEffect(()=>{if(!zoomRequest.seq)return;moving.current=false;const c=camera as THREE.OrthographicCamera;c.zoom=clamp(c.zoom*zoomRequest.factor,view.zoom*.65,view.zoom*3.4);c.updateProjectionMatrix();},[zoomRequest]);
   useFrame((_,dt)=>{if(!moving.current||!controls.current)return;const a=reduced?1:1-Math.exp(-dt*4);camera.position.lerp(view.position,a);controls.current.target.lerp(view.target,a);const c=camera as THREE.OrthographicCamera;c.zoom=THREE.MathUtils.lerp(c.zoom,view.zoom,a);c.updateProjectionMatrix();controls.current.update();if(camera.position.distanceTo(view.position)<.008&&Math.abs(c.zoom-view.zoom)<.05)moving.current=false;});
@@ -139,9 +139,9 @@ function World({cutaway,demo,reduced,reset,zoomRequest,visual,...p}:Props&{cutaw
     <color attach="background" args={[p.studio?'#090e15':'#edf0e8']}/><ambientLight intensity={p.studio?.22:1.1}/><hemisphereLight args={['#dce7f4',p.studio?'#202934':'#89998d',p.studio?.5:1.3]}/><directionalLight position={[2,7,4]} color="#fff0d3" intensity={p.studio?2.4:3.6} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048}/><directionalLight position={[-3,3,-4]} color="#9cb5d6" intensity={p.studio?1.6:2.5}/><directionalLight position={[4,1,-2]} color="#f4a363" intensity={p.studio?.75:1.3}/>
     <mesh position={[0,-.47,0]} rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[30,30]}/>{p.studio?<meshBasicMaterial color="#101720"/>:<meshStandardMaterial color="#e1e7dc" roughness={.6}/>}</mesh>
     {p.studio&&<gridHelper args={[14,28,'#263342','#192431']} position={[0,-.465,0]}/>}
-    {p.studio&&p.layer==='turbo'?<><TurboAssembly frame={p.frame} appearance={visual.appearance} explode={visual.explode} selectedPart={visual.selectedPart} isolatedPart={visual.isolatedPart} onPartSelect={visual.onPartSelect} onSelect={p.onSelect} flowStep={visual.flowStep}/><BoxPart position={[0,.05,0]} size={[2.6,.08,1.8]} unlit color="#1d2834"/></>:engine?<><Engine frame={p.frame} detail onSelect={p.onSelect}/><BoxPart position={[1.49,.13,-.06]} size={[1.95,.06,.95]} unlit={p.studio} color={p.studio?'#1d2834':'#d3dcd0'}/><BoxPart position={[1.49,.06,-.06]} size={[1.82,.08,.85]} unlit={p.studio} color={p.studio?'#101722':'#becab9'}/></>:<><group rotation={[0,0,slope]} onClick={click('grade',p.onSelect)}><BoxPart position={[0,-.065,0]} size={[12,.12,3.45]} color={p.studio?'#263341':'#61726b'}/>{[-1.53,1.53].map(z=><Line key={z} points={[[-6,.001,z],[6,.001,z]]} color="#e0e6d9" lineWidth={2}/>)}<Line points={[[-6,.005,0],[6,.005,0]]} color="#e1dbc2" dashed dashSize={.4} gapSize={.36} lineWidth={2}/></group><Car {...p} cutaway={cutaway}/></>}
+    {(p.studio||p.assembly)&&p.layer==='turbo'?<><TurboAssembly frame={p.frame} appearance={visual.appearance} explode={visual.explode} selectedPart={visual.selectedPart} isolatedPart={visual.isolatedPart} onPartSelect={visual.onPartSelect} onSelect={p.onSelect} flowStep={visual.flowStep}/><BoxPart position={[0,.05,0]} size={[2.6,.08,1.8]} unlit={p.studio} color={p.studio?'#1d2834':'#d3dcd0'}/></>:engine?<><Engine frame={p.frame} detail onSelect={p.onSelect}/><BoxPart position={[1.49,.13,-.06]} size={[1.95,.06,.95]} unlit={p.studio} color={p.studio?'#1d2834':'#d3dcd0'}/><BoxPart position={[1.49,.06,-.06]} size={[1.82,.08,.85]} unlit={p.studio} color={p.studio?'#101722':'#becab9'}/></>:<><group rotation={[0,0,slope]} onClick={click('grade',p.onSelect)}><BoxPart position={[0,-.065,0]} size={[12,.12,3.45]} color={p.studio?'#263341':'#61726b'}/>{[-1.53,1.53].map(z=><Line key={z} points={[[-6,.001,z],[6,.001,z]]} color="#e0e6d9" lineWidth={2}/>)}<Line points={[[-6,.005,0],[6,.005,0]]} color="#e1dbc2" dashed dashSize={.4} gapSize={.36} lineWidth={2}/></group><Car {...p} cutaway={cutaway}/></>}
     {p.studio&&p.layer==='agent'&&<RoadAhead {...p}/>}
-    <CameraRig layer={p.layer} reset={reset} zoomRequest={zoomRequest} reduced={reduced} studio={p.studio} visual={visual}/>
+    <CameraRig layer={p.layer} reset={reset} zoomRequest={zoomRequest} reduced={reduced} studio={p.studio} assembly={p.assembly} visual={visual}/>
   </Clock.Provider></Presentation.Provider>;
 }
 function RoadAhead(p:Props){
@@ -172,7 +172,7 @@ export default function Scene(p:Props) {
     return registerModal(document, { element: sceneElement.current, onClose: () => setExpanded(false) });
   },[expanded]);
   const reduced=typeof window!=='undefined'&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const engine=p.layer==='engine';const turbo=!!p.studio&&p.layer==='turbo';const cutaway=p.studio?appearance!=='solid':body||p.layer!=='vehicle';
+  const engine=p.layer==='engine';const turbo=(!!p.studio||!!p.assembly)&&p.layer==='turbo';const cutaway=p.studio?appearance!=='solid':body||p.layer!=='vehicle';
   const choosePart=(part:string)=>{if(turbo)setFlowStep(['compressor','compressor-housing'].includes(part)?1:part==='turbo-shaft'?2:3);setSelectedPart(part);setIsolatedPart(null);setView(old=>old==='chamber'?'chamber':'focus');};
   const visual:Visual={explode:engine||turbo?explode:0,appearance,selectedPart,selectedCylinder,isolatedPart,onPartSelect:choosePart,onCylinderSelect:setSelectedCylinder,onStroke:setActiveStroke,flowStep,view,playing,rate,manual,orbit,phaseOutput,phaseInput,strokeOutput};
   const sparkCommand=ignitionCommandDegrees(p.frame?.spark);
@@ -227,7 +227,7 @@ export default function Scene(p:Props) {
         {ui(!engine&&cycleControls)}
         <p className="studio-integrity">{ui("حركة وأبعاد تفكيك توضيحية؛ القيم من المحاكي الأصلي. ")}{ui(engine?'الدورة 720°؛ الحركة مبطّأة.':turbo?'حركة الدوّار مبطّأة؛ سرعة التيربو غير محسوبة.':'مسارات التدفق تعليمية.')}{ui(reduced?' الحركة التلقائية متوقفة حسب تفضيل جهازك.':'')}</p>
       </div>
-    </>:<><div className="model-controls">{!engine&&<button onClick={()=>setBody(!body)} disabled={p.layer!=='vehicle'}>{ui(p.layer!=='vehicle'?'الأجزاء مكشوفة':body?'أظهر الهيكل':'اكشف الأجزاء')}</button>}<button aria-label={ui("تكبير النموذج")} onClick={()=>setZoomRequest(z=>({seq:z.seq+1,factor:1.22}))}>＋</button><button aria-label={ui("تصغير النموذج")} onClick={()=>setZoomRequest(z=>({seq:z.seq+1,factor:1/1.22}))}>−</button><button onClick={()=>setReset(r=>r+1)}>{ui("إعادة المنظور")}</button>{p.layer!=='vehicle'&&!engine&&<button onClick={()=>setDemo(!demo)}>{ui(demo?'أوقف حركة المسار':'حرّك المسار')}</button>}</div><p className="model-hint">{ui(engine?uiTemplate("المحرك مكبّر للتعلّم · {0}", "Engine enlarged for learning · {0}", p.stroke==null?'حركة الأشواط مبطّأة':['السحب: يدخل الهواء والوقود','الضغط: يصعد المكبس','القدرة: يدفع الاحتراق المكبس','العادم: تخرج الغازات'][p.stroke]):'اسحب لتدوير السيارة · اضغط الجزء لتفهمه')}{demo&&<small>{ui("حركة توضيحية؛ لا تغيّر المحاكاة")}</small>}</p></>}
+    </>:<><div className="model-controls">{!engine&&<button onClick={()=>setBody(!body)} disabled={p.layer!=='vehicle'}>{ui(p.layer!=='vehicle'?'الأجزاء مكشوفة':body?'أظهر الهيكل':'اكشف الأجزاء')}</button>}<button aria-label={ui("تكبير النموذج")} onClick={()=>setZoomRequest(z=>({seq:z.seq+1,factor:1.22}))}>＋</button><button aria-label={ui("تصغير النموذج")} onClick={()=>setZoomRequest(z=>({seq:z.seq+1,factor:1/1.22}))}>−</button><button onClick={()=>setReset(r=>r+1)}>{ui("إعادة المنظور")}</button>{p.layer!=='vehicle'&&!engine&&!turbo&&<button onClick={()=>setDemo(!demo)}>{ui(demo?'أوقف حركة المسار':'حرّك المسار')}</button>}</div><p className="model-hint">{ui(engine?uiTemplate("المحرك مكبّر للتعلّم · {0}", "Engine enlarged for learning · {0}", p.stroke==null?'حركة الأشواط مبطّأة':['السحب: يدخل الهواء والوقود','الضغط: يصعد المكبس','القدرة: يدفع الاحتراق المكبس','العادم: تخرج الغازات'][p.stroke]):turbo?uiTemplate("التيربو مكبّر للتعلّم · {0}", "Turbo enlarged for learning · {0}", 'حركة الدوّار مبطّأة؛ سرعة التيربو غير محسوبة.'):'اسحب لتدوير السيارة · اضغط الجزء لتفهمه')}{demo&&<small>{ui("حركة توضيحية؛ لا تغيّر المحاكاة")}</small>}</p></>}
   </section>;
 }
 
