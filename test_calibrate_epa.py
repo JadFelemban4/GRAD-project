@@ -1348,11 +1348,13 @@ class Records(RunCase):
         row6 = comp["e6_probes"]["row6"]
         self.assertAlmostEqual(row6["probe"]["ua_port"], r1 / (0.5 * HS["f"]), places=9)
         self.assertEqual(row6["detail"]["ua_port"]["method"], "probe")
-        # a constant the stand-in climb does not see falls back: +-10 crank degrees for IVC (the Mazda's
-        # tables give no effective stroke), +-10 % for the rest
+        # a constant the stand-in climb does not see falls back: +-10 crank degrees for IVC (the synthetic
+        # Mazda's tables give no effective stroke, and their constant Atkinson ratio 1.2 beside an intake cam that
+        # moves with MAP is no exact fit of defect D-1's reading, so no bracket), +-10 % for the rest
         r9 = comp["e6_probes"]["row9"]
         self.assertEqual((r9["ivc_deg"]["method"], r9["ivc_deg"]["size"]), ("fallback", 10.0))
-        self.assertIn("Atkinson", r9["ivc_deg"]["why_not_bracket"])
+        self.assertIn("the Atkinson ratio is not x(EVO0 + exhaust cam)", r9["ivc_deg"]["why_not_bracket"])
+        self.assertIn("no exact fit", comp["e6_probes"]["brackets"]["evo_deg"]["why_not_bracket"])
         self.assertEqual(r9["t_head_k"]["size"], 0.1 * abs(r9["t_head_k"]["value"]))
         self.assertEqual(sorted(comp["e6_row4"]), ["c_turb", "frozen", "ua_gas_turb", "ua_turb_amb"])
         self.assertEqual(sorted(comp["e6_row4"]["c_turb"]), ["x0.75", "x1.333"])
@@ -2679,10 +2681,76 @@ class Pieces(F.Guarded):
         self.assertAlmostEqual(b["ivc_deg"]["bracket"][0], -130.0, places=6)
         self.assertAlmostEqual(b["ivc_deg"]["bracket"][1], -120.0, places=6)
         self.assertAlmostEqual(b["evo_deg"]["bracket"][1], 140.0, places=6)
-        # the control: rows without the strokes give no bracket, with the reason
+        self.assertEqual(b["ivc_deg"]["method"], "strokes")
+        # the control: rows without the strokes give no bracket, with the reason -- the fixture's one row carries
+        # the Atkinson ratio and both cam phases, but one cam pair cannot test three unknowns (defect D-1, 29
+        # October 2026: the reason this asserted before, that no valve event follows from the ratio at all, was
+        # false, and is gone)
         b2 = C.valve_brackets([F.point_row()], geometry=geo)
         self.assertIsNone(b2["ivc_deg"]["bracket"])
-        self.assertIn("Atkinson", b2["ivc_deg"]["why_not_bracket"])
+        self.assertIn("Atkinson ratio and both cam phases give 1 distinct cam pair", b2["ivc_deg"]["why_not_bracket"])
+        self.assertNotIn("ratio of the effective expansion to the effective compression ratio",
+                         b2["ivc_deg"]["why_not_bracket"])
+        # a cam phase alone (the Ford's Cell 9) still brackets nothing, with its own reason
+        b3 = C.valve_brackets([F.point_row(atkinson_ratio=None)], geometry=geo)
+        self.assertIsNone(b3["evo_deg"]["bracket"])
+        self.assertIn("a cam phase is a shift from a base timing", b3["evo_deg"]["why_not_bracket"])
+
+    def test_valve_brackets_from_the_atkinson_ratio(self):
+        """Defect D-1 (29 October 2026): EPA's Atkinson ratio is x(EVO0 + exhaust cam) / x(-(IVC0 + intake cam)),
+        x the slider-crank travel, so synthetic rows made at a known IVC0, EVO0 and rod give them back exactly, and
+        the cams' ranges bracket IVC and EVO. Controls (mistake 12): IVC0 moved 5 deg moves the IVC bracket 5 deg
+        and leaves EVO's; one ratio off by 1e-6 is no exact fit and gives no bracket, with the reason; the old
+        reading of the channel (compression over expansion) fits nothing exactly."""
+        import math
+        geo = engines.Geometry(**engines.read_spec("mazda_25t")["geometry"])
+
+        def x(deg, lam):
+            t = math.radians(deg)
+            return 1.0 - math.cos(t) + lam - math.sqrt(lam * lam - math.sin(t) ** 2)
+        cams = ((-74.0, 0.0), (-50.0, 20.0), (-30.0, 48.0), (-10.0, 5.0), (-0.5, 30.0), (-60.0, 40.0), (-20.0, 12.0))
+
+        def rows_at(ivc0, evo0, lam, *, flip=False, off=0.0):
+            out = []
+            for i, (c, e) in enumerate(cams):
+                num, den = x(evo0 + e, lam), x(-(ivc0 + c), lam)
+                out.append(F.point_row(source_row=6 + i, cam_cad=c, exhaust_cam_cad=e,
+                                       atkinson_ratio=(den / num if flip else num / den) + (off if i == 3 else 0.0)))
+            return out
+        b = C.valve_brackets(rows_at(-80.0, 120.0, 3.684), geometry=geo)
+        fit = b["ivc_deg"]["atkinson_fit"]
+        self.assertEqual((b["ivc_deg"]["method"], b["evo_deg"]["method"]), ("atkinson", "atkinson"))
+        self.assertAlmostEqual(fit["ivc0_deg"], -80.0, places=7)
+        self.assertAlmostEqual(fit["evo0_deg"], 120.0, places=7)
+        self.assertAlmostEqual(fit["rod_over_half_stroke"], 3.684, places=7)
+        self.assertLess(fit["max_abs_residual"], C.ATKINSON_EXACT)
+        self.assertEqual((fit["rows"], fit["starts"]), (len(cams), len(C.ATKINSON_STARTS)))
+        lo, hi = b["ivc_deg"]["bracket"]
+        self.assertAlmostEqual(lo, -80.0 - 74.0, places=6)
+        self.assertAlmostEqual(hi, -80.0 - 0.5, places=6)
+        lo, hi = b["evo_deg"]["bracket"]
+        self.assertAlmostEqual(lo, 120.0, places=6)
+        self.assertAlmostEqual(hi, 168.0, places=6)
+        self.assertAlmostEqual(b["evo_deg"]["rod_m_at_plant_stroke"], 3.684 * 0.5 * geo.stroke, places=9)
+        # the control: IVC0 5 deg later moves the IVC bracket by 5 deg, EVO's not at all
+        b5 = C.valve_brackets(rows_at(-75.0, 120.0, 3.684), geometry=geo)
+        self.assertAlmostEqual(b5["ivc_deg"]["bracket"][0] - b["ivc_deg"]["bracket"][0], 5.0, places=6)
+        self.assertAlmostEqual(b5["evo_deg"]["bracket"][1], b["evo_deg"]["bracket"][1], places=6)
+        # the control: one ratio 1e-6 off is no exact fit, so no bracket, with the reason
+        bad = C.valve_brackets(rows_at(-80.0, 120.0, 3.684, off=1e-6), geometry=geo)
+        self.assertIsNone(bad["ivc_deg"]["bracket"])
+        self.assertIn("no exact fit", bad["ivc_deg"]["why_not_bracket"])
+        # the control: the ratio as EPA's printed description reads it (compression over expansion) is not this
+        # channel's arithmetic, and is no exact fit either
+        inv = C.valve_brackets(rows_at(-80.0, 120.0, 3.684, flip=True), geometry=geo)
+        self.assertIsNone(inv["evo_deg"]["bracket"])
+        self.assertIn("no exact fit", inv["evo_deg"]["why_not_bracket"])
+        # an advance-published intake cam moves IVC the other way (CAM_SIGN): the same events from negated phases
+        adv = [dataclasses.replace(r, cam_cad=-r.cam_cad, cam_channel="intake_cam_phase_cad_adv")
+               for r in rows_at(-80.0, 120.0, 3.684)]
+        ba = C.valve_brackets(adv, geometry=geo)
+        self.assertAlmostEqual(ba["ivc_deg"]["bracket"][0], b["ivc_deg"]["bracket"][0], places=6)
+        self.assertAlmostEqual(ba["ivc_deg"]["bracket"][1], b["ivc_deg"]["bracket"][1], places=6)
 
     def test_probe_sizes_by_hand(self):
         base = {"egt": 1000.0, "mdot": 100.0}

@@ -789,6 +789,7 @@ if __name__ == "__main__":
 # The project (imported after the audit is installed, on the command line)
 # ======================================================================================================
 import numpy as np                                   # noqa: E402
+from scipy.optimize import least_squares             # noqa: E402  E6 row 9's Atkinson fit (D-1)
 
 import d3_rows                                       # noqa: E402  its pin check only (WP3_INTERFACES.md N11)
 import derived                                       # noqa: E402  the B58's derived file's path, for the audit
@@ -1959,44 +1960,157 @@ def slider_crank_angle(stroke_from_tdc_m, *, stroke_m, conrod_m):
     return math.degrees(0.5 * (lo + hi))
 
 
+# E6 row 9's valve events from the Atkinson ratio and the two cam phases (defect D-1, found 24 October 2026 by
+# the read-only defect hunt after Run 1's first pass, fixed 29 October 2026 on the defect route, WP3_INTERFACES.md
+# 5.5.2 and PLAN.md 5.6). EPA's Atkinson ratio is the effective EXPANSION STROKE over the effective COMPRESSION
+# STROKE, x(EVO) / x(IVC), x the slider-crank's piston travel from TDC, with IVC = IVC0 + the intake cam and EVO =
+# EVO0 + the exhaust cam: on the Mazda's 199 calibration steady and Final rows that reading fits to rms 7.6e-16
+# (max 2.4e-15) at one solution every one of 27 starts reached, the two cams nearly independent (corr 0.19);
+# EPA's printed description (compression over expansion) gives rms 0.38, and a ratio of the two effective
+# compression ratios rms 2.0e-3 (the hunt's scratch scripts atk.py and atk_cr.py; mistake 13). The fit is three
+# unknowns -- IVC0, EVO0 and the rod over the half stroke -- on the rows that carry the ratio and both phases,
+# least squares from every start of ATKINSON_STARTS, accepted only when it is EXACT: some start's largest
+# |residual| below ATKINSON_EXACT, every exact start at one solution within ATKINSON_AGREE, the Jacobian there of
+# full rank, and at least ATKINSON_MIN_ROWS distinct (intake, exhaust) cam pairs, so that exactness tests the
+# reading (three unknowns on three rows always fit). Anything else gives no bracket, with the reason.
+ATKINSON_EXACT = 1e-9               # DESIGN: a residual of the ratio, far above the 1e-15 the reading reaches
+ATKINSON_AGREE = 1e-6               # DESIGN: deg on IVC0 and EVO0, relative on the rod over the half stroke
+ATKINSON_MIN_ROWS = 4               # an over-determined fit of three unknowns
+ATKINSON_STARTS = tuple((i, e, lam) for i in (-120.0, -90.0, -60.0) for e in (100.0, 130.0, 160.0)
+                        for lam in (2.4, 3.6, 6.0))          # the hunt's 27 starts (rods 0.12, 0.18, 0.30 m / 50 mm)
+ATKINSON_BOUNDS = ((-179.0, 1.0, 1.0 + 1e-6), (-1.0, 179.0, 40.0))     # IVC0, EVO0 deg aTDC firing; rod / half stroke
+# the sign of each published cam channel on its event (epa_rows maps both intake spellings to cam_cad): a retard
+# moves the event later, an advance earlier
+CAM_SIGN = {"intake_cam_phase_cad_ret": 1.0, "intake_cam_phase_cad_adv": -1.0}
+ATKINSON_CHANNELS = "epa_atkinson_ratio with the intake and exhaust cam phases"
+
+
+def _travel(deg, lam):
+    """The slider-crank's piston travel from TDC at crank angle `deg`, in half strokes: 1 - cos t + lam -
+    sqrt(lam^2 - sin^2 t), lam the rod over the half stroke (slider_crank_angle's x / r)."""
+    t = np.radians(deg)
+    return 1.0 - np.cos(t) + lam - np.sqrt(lam * lam - np.sin(t) ** 2)
+
+
+def atkinson_events(rows):
+    """(fit, why): IVC0, EVO0 and the rod over the half stroke from EPA's Atkinson ratio and the two cam phases on
+    `rows` (the module's note above: ratio = x(EVO0 + exhaust cam) / x(-(IVC0 + s intake cam)), s CAM_SIGN's), or
+    (None, the reason no bracket follows). fit: {ivc0_deg, evo0_deg, rod_over_half_stroke, max_abs_residual, rows,
+    distinct_cam_pairs, starts, starts_exact, intake_cam_sign, intake_cam_range_cad, exhaust_cam_range_cad}."""
+    use = [r for r in rows if all(getattr(r, a, None) is not None and math.isfinite(float(getattr(r, a)))
+                                  for a in ("atkinson_ratio", "cam_cad", "exhaust_cam_cad"))]
+    if not use:
+        return None, "no row carries the Atkinson ratio with both cam phases"
+    chans = sorted({str(getattr(r, "cam_channel", None)) for r in use})
+    if len(chans) != 1 or chans[0] not in CAM_SIGN:
+        return None, (f"the intake cam channel {chans} has no sign on IVC (CAM_SIGN), so the ratio is not read")
+    s = CAM_SIGN[chans[0]]
+    cam = np.array([float(r.cam_cad) for r in use])
+    exh = np.array([float(r.exhaust_cam_cad) for r in use])
+    ratio = np.array([float(r.atkinson_ratio) for r in use])
+    pairs = len({(float(a), float(b)) for a, b in zip(cam, exh)})
+    if pairs < ATKINSON_MIN_ROWS:
+        return None, (f"the rows that carry the Atkinson ratio and both cam phases give {pairs} distinct cam pair(s), "
+                      f"fewer than {ATKINSON_MIN_ROWS}: three unknowns (IVC0, EVO0, the rod) on fewer rows always fit, "
+                      "so an exact fit would not test the reading")
+
+    def resid(p):
+        with np.errstate(all="ignore"):
+            r = _travel(p[1] + exh, p[2]) / _travel(-(p[0] + s * cam), p[2]) - ratio
+        return np.where(np.isfinite(r), r, 1e3)
+    sols = []
+    for x0 in ATKINSON_STARTS:
+        try:
+            q = least_squares(resid, np.array(x0, dtype=float), bounds=ATKINSON_BOUNDS, method="trf", xtol=1e-15,
+                              ftol=1e-15, gtol=1e-15, max_nfev=2000)
+        except (ValueError, FloatingPointError):
+            continue
+        sols.append((float(np.max(np.abs(q.fun))), q))
+    if not sols:
+        return None, "no start of the Atkinson fit could be evaluated"
+    exact = [(m, q) for m, q in sols if m < ATKINSON_EXACT]
+    best = min(m for m, _ in sols)
+    if not exact:
+        return None, (f"the Atkinson ratio is not x(EVO0 + exhaust cam) / x(-(IVC0 + intake cam)) on these rows: no "
+                      f"exact fit over {len(use)} rows (the least largest residual {best:.3g}, {len(sols)} starts)")
+    m0, q0 = min(exact, key=lambda t: t[0])
+    p0 = q0.x
+    agree = all(abs(q.x[0] - p0[0]) <= ATKINSON_AGREE and abs(q.x[1] - p0[1]) <= ATKINSON_AGREE
+                and abs(q.x[2] / p0[2] - 1.0) <= ATKINSON_AGREE for _m, q in exact)
+    sv = np.linalg.svd(np.asarray(q0.jac, dtype=float), compute_uv=False)
+    full = bool(sv.size == 3 and sv[-1] > 1e-10 * sv[0])
+    if not (agree and full):
+        return None, (f"the exact fits of the Atkinson ratio do not identify IVC0, EVO0 and the rod "
+                      f"({len(exact)} exact starts {'agree' if agree else 'disagree'}; the Jacobian "
+                      f"{'has' if full else 'lacks'} full rank)")
+    return {"ivc0_deg": float(p0[0]), "evo0_deg": float(p0[1]), "rod_over_half_stroke": float(p0[2]),
+            "max_abs_residual": float(m0), "rows": len(use), "distinct_cam_pairs": pairs,
+            "starts": len(ATKINSON_STARTS), "starts_exact": len(exact), "intake_cam_channel": chans[0],
+            "intake_cam_sign": s, "intake_cam_range_cad": [float(cam.min()), float(cam.max())],
+            "exhaust_cam_range_cad": [float(exh.min()), float(exh.max())], "exact_below": ATKINSON_EXACT}, None
+
+
 def valve_brackets(rows, *, geometry):
     """E6 row 9's brackets for IVC and EVO from EPA's calculated valve channels on the calibration rows
     (the contract: "the bracket EPA's calculated valve channels give, where one exists (the Honda's
     effective strokes, the Mazda's Atkinson ratio, the cam phases), with why each bracket that cannot be
     computed cannot"). {field: {"bracket": [lo, hi] deg aTDC firing or None, "rows": n, "rows_outside": n,
-    "why_not_bracket": str or None}}. The effective compression stroke is the piston's travel from IVC to
-    TDC, the effective expansion stroke from TDC to EVO, so IVC = -angle and EVO = +angle of the inverted
-    slider-crank. Chosen here (WP3's integration, 23 October 2026), each with its reason:
-      - the Atkinson ratio is the ratio of an effective expansion to an effective compression ratio; the
-        Mazda's tables publish neither ratio nor stroke, so no valve event follows from it without
-        assuming the other side's event, which would make the bracket the model's own value;
-      - a cam phase is a shift from a base timing EPA does not publish, so the phases bracket how far the
-        event travels across the map, not where it is; a fixed IVC or EVO cannot be bracketed by it."""
+    "channel", "method" ("strokes", "atkinson" or None), "why_not_bracket": str or None}}, and under the
+    Atkinson method its fit (atkinson_events) and the rod in metres at the plant's stroke. In order:
+      - the effective strokes (the Honda): the effective compression stroke is the piston's travel from IVC
+        to TDC, the effective expansion stroke from TDC to EVO, so IVC = -angle and EVO = +angle of the
+        inverted slider-crank at the plant's stroke and rod;
+      - the Atkinson ratio with both cam phases (the Mazda; defect D-1, 29 October 2026): the ratio is the
+        effective expansion stroke over the effective compression stroke, x(EVO0 + exhaust cam) /
+        x(-(IVC0 + intake cam)), so an exact fit of IVC0, EVO0 and the rod over the half stroke places both
+        events, and the cams' ranges over the rows bracket them: IVC0 + the intake cam's [min, max], EVO0 +
+        the exhaust cam's (atkinson_events, its acceptance rules in the note above). The docstring this
+        replaces read the ratio as one of an effective expansion to an effective compression RATIO and the
+        phases as shifts from a base nobody could recover, so that no event followed; both were wrong: the
+        ratio's own rows recover the base timing exactly;
+      - a cam phase alone (the Ford's Cell 9: the two phases, no ratio, strokes or overlap) is a shift from
+        a base timing EPA does not publish: the phases bracket how far the event travels across the map,
+        not where it is, so no bracket follows."""
     out = {}
     stroke, rod = float(geometry.stroke), float(geometry.conrod)
+    atk_fit = None
     for field, attr, sign in (("ivc_deg", "eff_compression_stroke_mm", -1.0), ("evo_deg", "eff_expansion_stroke_mm", 1.0)):
         vals = [getattr(r, attr) for r in rows if getattr(r, attr, None) is not None]
         if vals:
             ang = [slider_crank_angle(v / 1000.0, stroke_m=stroke, conrod_m=rod) for v in vals]
             ok = [a for a in ang if a is not None]
             out[field] = {"bracket": sorted([sign * min(ok), sign * max(ok)]) if ok else None, "rows": len(ok),
-                          "rows_outside": len(ang) - len(ok), "channel": attr,
+                          "rows_outside": len(ang) - len(ok), "channel": attr, "method": "strokes" if ok else None,
                           "why_not_bracket": None if ok else "every row's effective stroke lies outside the stroke"}
             continue
         atk = any(getattr(r, "atkinson_ratio", None) is not None for r in rows)
         cam = any(getattr(r, "cam_cad", None) is not None or getattr(r, "exhaust_cam_cad", None) is not None
                   for r in rows)
-        why = []
         if atk:
-            why.append("the Atkinson ratio is a ratio of the effective expansion to the effective compression ratio, "
-                       "and the tables publish neither, so no valve event follows from it without assuming the "
-                       "other side's")
+            if atk_fit is None:
+                atk_fit = atkinson_events(rows)
+            fit, why_atk = atk_fit
+            if fit is not None:
+                if field == "ivc_deg":
+                    ends = [fit["ivc0_deg"] + fit["intake_cam_sign"] * c for c in fit["intake_cam_range_cad"]]
+                else:
+                    ends = [fit["evo0_deg"] + c for c in fit["exhaust_cam_range_cad"]]
+                out[field] = {"bracket": sorted(float(e) for e in ends), "rows": fit["rows"], "rows_outside": 0,
+                              "channel": ATKINSON_CHANNELS, "method": "atkinson", "why_not_bracket": None,
+                              "atkinson_fit": fit, "rod_m_at_plant_stroke": fit["rod_over_half_stroke"] * 0.5 * stroke}
+                continue
+            out[field] = {"bracket": None, "rows": 0, "rows_outside": 0, "channel": None, "method": None,
+                          "why_not_bracket": why_atk}
+            continue
+        why = []
         if cam:
-            why.append("a cam phase is a shift from a base timing EPA does not publish: the phases bracket how far "
-                       "the event travels across the map, not where it is")
+            why.append("a cam phase is a shift from a base timing EPA does not publish, and no Atkinson ratio or "
+                       "effective stroke is published to recover it: the phases bracket how far the event travels "
+                       "across the map, not where it is")
         if not why:
             why.append("no valve channel is published for this engine")
-        out[field] = {"bracket": None, "rows": 0, "rows_outside": 0, "channel": None, "why_not_bracket": "; ".join(why)}
+        out[field] = {"bracket": None, "rows": 0, "rows_outside": 0, "channel": None, "method": None,
+                      "why_not_bracket": "; ".join(why)}
     return out
 
 
