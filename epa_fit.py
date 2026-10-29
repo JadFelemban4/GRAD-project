@@ -3031,6 +3031,48 @@ T0_D1_CEILING_REL = 1e-9
 T0_S1_GRID_STEPS = 2.0
 # T0's cases (t0_cases), in t0.json's order.
 T0_CASES = ("d1_envelope", "d2_gate", "d3_spark_min", "s1_law")
+# DECISION 84 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H): T0's d2_gate case is widened
+# to the data's resolution. The gate is identified only to the gap between neighbouring calibration Final rows
+# (S3b enriches a row when its MAP exceeds the gate, so every gate between two neighbouring Final MAPs gives the
+# Final rows the same schedule), so the case passes when the truth's gate lies within the fitted flat interval
+# widened to the MAPs of the neighbouring calibration Final rows: down to the highest Final MAP at or below the
+# interval's lower end (the highest Final row the fitted gates leave unenriched) and up to the lowest Final MAP
+# above its upper end (the lowest one they enrich), as well as within the grid's 1 kPa of the interval, as before
+# (amendment D2's case: the interval only ever widens). A side with no such Final row is not widened. For all
+# three engines; a test fix, logged as one (the defect route records it, defects.json). It was written after
+# Run 1's first T0 failed this case on the Honda's seed 1 (truth 123.43 kPa, flat interval [125, 125]), and
+# T0 re-runs on every engine on the final code. Read as written, it does not reach below the lowest calibration
+# Final row: a truth placed below that row and a fit that leaves the row unenriched are a row apart and still fail
+# -- the Honda's seed 1 of the first pass among them (t0_truths places the truth between the highest steady MAP
+# below the lowest Final MAP and that Final MAP, which the first pass put in (123.43, 124.86) kPa, below seed 1's
+# interval [125, 125]); a wording that reaches down to that steady MAP is the team's to choose.
+D2_GATE_RULE = ("decision 84: the truth's gate within the fitted flat interval widened to the MAPs of the "
+                "neighbouring calibration Final rows (the highest at or below the interval, the lowest above it), "
+                "or within the gate grid's step of the interval (amendment D2)")
+
+
+def d2_gate_case(flat_gates_kpa, truth_gate_kpa, final_maps_kpa, *, fitted_gate_kpa, step_kpa):
+    """T0's d2_gate case (amendment D2, decision 84 above): {"ok", "detail"}. `flat_gates_kpa` is S3b's flat
+    interval [lo, hi] on its grid, `final_maps_kpa` the MAPs of the calibration Final rows (the seed's T0 rows,
+    which keep the calibration rows' MAPs), `step_kpa` the grid's step. ok when lo - step < truth <= hi + step (the
+    grid's resolution, as before) or when below <= truth <= above, below the highest Final MAP at or below lo
+    (lo itself when none) and above the lowest Final MAP above hi (hi itself when none)."""
+    lo, hi = (float(x) for x in flat_gates_kpa)
+    g, step = float(truth_gate_kpa), float(step_kpa)
+    maps = sorted(float(m) for m in final_maps_kpa)
+    below = [m for m in maps if m <= lo]
+    above = [m for m in maps if m > hi]
+    w_lo = below[-1] if below else lo
+    w_hi = above[0] if above else hi
+    in_grid = bool(lo - step < g <= hi + step)
+    in_gap = bool(w_lo <= g <= w_hi)
+    return {"ok": bool(in_grid or in_gap),
+            "detail": {"truth_gate_kpa": g, "fitted_gate_kpa": fitted_gate_kpa, "flat_gates_kpa": [lo, hi],
+                       "widened_kpa": [w_lo, w_hi],
+                       "neighbour_final_map_kpa": {"below": below[-1] if below else None,
+                                                   "above": above[0] if above else None},
+                       "within_grid_step": in_grid, "within_final_gap": in_gap, "final_rows": len(maps),
+                       "rule": D2_GATE_RULE}}
 
 
 def t0_cases(name, fit, truth, *, rows, view):
@@ -3042,7 +3084,9 @@ def t0_cases(name, fit, truth, *, rows, view):
                     the fitted candidate's plant.boost_ceiling_kpa at each point's corrected flow is inlet x
                     the point's PR within T0_D1_CEILING_REL, so the in-use ceiling passes through every hold
                     it was fitted to;
-      d2_gate       the truth's gate lies on the fitted gate's flat interval, to the grid's 1 kPa;
+      d2_gate       the truth's gate lies on the fitted gate's flat interval, to the grid's 1 kPa, or, since
+                    decision 84 (29 October 2026), within that interval widened to the MAPs of the
+                    neighbouring calibration Final rows (d2_gate_case);
       d3_spark_min  BaselineECU.step of the fitted ECU at every T0 row S3a used returns base + comp - cold
                     unclipped, re-run here independently of S3a's own assertion;
       s1_law        the fitted back-pressure law equals the noise-free truth's at every row S1 used, to the
@@ -3072,10 +3116,10 @@ def t0_cases(name, fit, truth, *, rows, view):
           "detail": {"lines_without_holds": sorted(no), "point_lines": [p["line"] for p in c["points"]],
                      "envelope_unmoved_by_the_lines_without_holds": same, "ceiling_at_points_max_rel": worst}}
     b = fit.stages["S3b"].report
-    g = float(truth.values["ecu"]["enr_load"])
-    lo, hi = b["flat_gates_kpa"]
-    d2 = {"ok": bool(lo - S3B_GATE_STEP_KPA < g <= hi + S3B_GATE_STEP_KPA),
-          "detail": {"truth_gate_kpa": g, "fitted_gate_kpa": fit.values["ecu"]["enr_load"], "flat_gates_kpa": [lo, hi]}}
+    # decision 84: widened to the MAPs of the neighbouring calibration Final rows (d2_gate_case)
+    d2 = d2_gate_case(b["flat_gates_kpa"], truth.values["ecu"]["enr_load"],
+                      [r.map_kpa for r in cal_rows(rows) if _final(r)],
+                      fitted_gate_kpa=fit.values["ecu"]["enr_load"], step_kpa=S3B_GATE_STEP_KPA)
     ecu_cal = cand.engine.ecu
     used = [r for r in cal_rows(rows) if r.pops.fired and _no_sentinel(r) and _finite(r.spark_btdc)]
     clipped = 0

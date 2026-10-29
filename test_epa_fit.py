@@ -313,6 +313,47 @@ class S3b(fx.Guarded):
         st2 = self.fit(tuple(r for r in self.rows if epa_fit._final(r)))
         self.assertEqual(st2.report["flat_gates_kpa"][0], epa_fit.S3B_GATE_DESIGN_KPA)
 
+    def test_d2_gate_case_is_widened_to_the_neighbouring_final_rows(self):
+        """Decision 84 (29 October 2026): T0's d2_gate case passes when the truth's gate lies within the fitted flat
+        interval widened to the MAPs of the neighbouring calibration Final rows, or within the grid's step of it as
+        before. Hand cases on Final MAPs spaced wider than the grid; the controls: the grid's rule alone fails the
+        gap case, a truth past the neighbouring Final row fails, and a truth below the LOWEST Final row with the
+        interval above that row (the Honda's seed 1 of 24 October, in shape) fails, since nothing is widened past
+        a neighbouring Final row."""
+        step = epa_fit.S3B_GATE_STEP_KPA
+
+        def case(flat, g, finals):
+            return epa_fit.d2_gate_case(flat, g, finals, fitted_gate_kpa=flat[1], step_kpa=step)
+        finals = (124.6, 150.0, 175.0)
+        # inside the grid's step of the interval, as before
+        self.assertTrue(case((140.0, 149.0), 139.5, finals)["ok"])
+        # the gap case: the interval [160, 170] lies between the Final rows at 150 and 175, the truth at 152
+        gap = case((160.0, 170.0), 152.0, finals)
+        self.assertTrue(gap["ok"])
+        self.assertEqual((gap["detail"]["within_grid_step"], gap["detail"]["within_final_gap"]), (False, True))
+        self.assertEqual(gap["detail"]["widened_kpa"], [150.0, 175.0])
+        self.assertEqual(gap["detail"]["neighbour_final_map_kpa"], {"below": 150.0, "above": 175.0})
+        self.assertIn("decision 84", gap["detail"]["rule"])
+        # the control: amendment D2's rule alone, as the case read before decision 84, fails it
+        self.assertFalse(160.0 - step < 152.0 <= 170.0 + step)
+        # a truth past the neighbouring Final row above, or below the one below, fails
+        self.assertFalse(case((160.0, 170.0), 176.0, finals)["ok"])
+        self.assertFalse(case((160.0, 170.0), 149.0, finals)["ok"])
+        # the Honda's seed 1 in shape: the interval [125, 125] above the lowest Final row (124.6), the truth below
+        # that row: widened only down to 124.6, so the case fails
+        honda = case((125.0, 125.0), 123.43, finals)
+        self.assertFalse(honda["ok"])
+        self.assertEqual(honda["detail"]["widened_kpa"], [124.6, 150.0])
+        # no Final row below the interval: that side is not widened
+        self.assertEqual(case((100.0, 110.0), 105.0, (150.0,))["detail"]["widened_kpa"], [100.0, 150.0])
+        self.assertFalse(case((100.0, 110.0), 98.0, (150.0,))["ok"])
+        # on this class's fit: the truth between the steady and the Final rows is on the interval
+        st = self.fit(self.rows)
+        on = epa_fit.d2_gate_case(st.report["flat_gates_kpa"], GATE, [r.map_kpa for r in self.rows if epa_fit._final(r)],
+                                  fitted_gate_kpa=st.values["enr_load"], step_kpa=step)
+        self.assertTrue(on["ok"])
+        self.assertEqual(on["detail"]["neighbour_final_map_kpa"], {"below": None, "above": FINAL_MAP[0]})
+
     def test_the_invariants_edge_is_the_largest_depth_engine_accepts(self):
         # HANDOFFS.md WP3 item 1: 1.0 - (1.0 - x) can land an ulp below x, so the edge
         # is searched in doubles: at it 1 - d >= lam_floor, one ulp above it not
@@ -1226,6 +1267,10 @@ class T0(fx.Guarded):
         self.assertFalse(j["out_of_form_seed"]["chi2"]["ok"])
         self.assertTrue(j["out_of_form_detected"])
         self.assertTrue(all(c["ok"] for c in j["cases"].values()), j["cases"])
+        # decision 84: t0_cases reads its d2_gate case through d2_gate_case, on the seed's calibration Final rows
+        n_final = sum(1 for r in epa_fit.cal_rows(rows) if epa_fit._final(r))
+        self.assertTrue(n_final > 0 and all(d["rule"] == epa_fit.D2_GATE_RULE and d["final_rows"] == n_final
+                                            for d in j["cases"]["d2_gate"]["detail"]), j["cases"]["d2_gate"])
         self.assertTrue(j["pass"])
         # the controls: a ladder that stops BEFORE its truth's form (the A+B truth at A) fails T0, and so does
         # an out-of-form seed the judge cannot tell from a recovery

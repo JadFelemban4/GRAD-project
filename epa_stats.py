@@ -2397,11 +2397,14 @@ class InSample:
     criterion: str
     scatter: Mapping = None
     noise: tuple = ()
+    # decision 83: the steady-only TIT reading, {row: StatResult} over STEADY_TIT_ROWS, beside the stage and never
+    # read by passes, failing, noise or no_line (None on a stage built by hand)
+    steady_tit: Mapping = None
 
     def as_json(self):
         return dict(criterion=self.criterion, statistics={r: s.as_json() for r, s in self.results.items()},
                     passes=bool(self.passes), failing=list(self.failing), no_line=list(self.no_line),
-                    noise=list(self.noise))
+                    noise=list(self.noise), steady_only_tit=steady_tit_json(self.steady_tit))
 
 
 def in_sample_stage(results):
@@ -2441,8 +2444,67 @@ def in_sample(evals, *, view):
     for e in evals:
         if e.kind == "initial":
             raise ValueError("the in-sample stage reads no High Load Initial row (finding 21)")
-    return in_sample_stage({r: ROW_FUNCTIONS[r](evals, view=view, stage="in_sample", tightening=None)
-                            for r in IN_SAMPLE_ROWS})
+    stage = in_sample_stage({r: ROW_FUNCTIONS[r](evals, view=view, stage="in_sample", tightening=None)
+                             for r in IN_SAMPLE_ROWS})
+    # decision 83: the steady-only TIT reading beside the stage, from the same evaluations; it decides nothing
+    return replace(stage, steady_tit=steady_tit_reading(evals, view=view, stage="in_sample", tightening=None))
+
+
+# DECISION 83 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H): THE STEADY-ONLY TIT READING,
+# DECLARED BEFORE ANY HELD-OUT STATISTIC EXISTS, A SENSITIVITY BESIDE THE PRIMARY. The contract's pooled hot
+# population stays the primary reading (results/ENGINE_THRESHOLDS.md sections 2-4: High Load Final rows pooled with
+# the steady rows). The defect hunt after Run 1's first pass (F-1) found that the two are not the same temperature
+# (mistake 23): EPA holds a steady point "until the engine torque, fuel flow, and exhaust temperature reach a stable
+# condition", while the Final window "begins when the torque and fuel flow meter measurements become stable" --
+# exhaust temperature is not in its criterion -- and at matched points the Mazda's Final TIT reads up to 113 K
+# below its steady TIT on the 1500 line where the model's own difference is -7 to +11 K. So E3a, E4a, L0 and L1 are
+# also computed with the High Load Final rows left out, and E4b with the Final rows left out of its reference line
+# (its boosted lambda~1 rows; the enriched rows it reads off that line are kept), by the same row functions, in the
+# in-sample record (InSample.steady_tit, in_sample.json) and in Run 2 (validate_epa.py's rows.json, labelled with
+# their u-terms), flagged a sensitivity: never in passes, failing, a label that decides, section 7 or the summary.
+# E4a's population is the enriched hot rows, which on these engines are Final rows, so its reading may have no
+# statistic; that is reported, with its reason. Not a contract rule (rule 0): a reading reported beside one.
+STEADY_TIT_ROWS = ("E3a", "E4a", "L0", "L1", "E4b")
+STEADY_TIT_READING = ("decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 "
+                      "with the High Load Final rows left out, and E4b with the Final rows left out of its reference "
+                      "line (its enriched rows kept); a sensitivity reported beside the primary reading (the "
+                      "contract's pooled hot population), never replacing it and never deciding")
+
+
+def steady_tit_evals(row, evals):
+    """The evaluations of `row`'s steady-only TIT reading (decision 83 above): every one but the High Load Final rows
+    for E3a, E4a, L0 and L1; for E4b every one but the Final rows of its reference line (the boosted lambda~1 rows,
+    population l1_boost), so its enriched rows, and any Initial rows its pair estimate reads, are kept."""
+    if row not in STEADY_TIT_ROWS:
+        raise ValueError(f"{row} has no steady-only TIT reading (decision 83 names {STEADY_TIT_ROWS})")
+    evals = tuple(evals)
+    if row == "E4b":
+        return tuple(e for e in evals if not (e.kind == "final" and _in(e, "l1_boost")))
+    return tuple(e for e in evals if e.kind != "final")
+
+
+def steady_tit_reading(evals, *, view, stage, tightening, unc=None, rows_for=None):
+    """Decision 83's steady-only TIT reading: {row: StatResult} over STEADY_TIT_ROWS, each row's own function on
+    steady_tit_evals; held out with `unc` each gating row is labelled with its u-terms (held_out_row), so the
+    sensitivity reads as the primary does. `rows_for(row)` gives the evaluations a row reads (validate_epa's rule:
+    E4b's include the Initial rows), `evals` itself when None. A sensitivity: nothing reads it to decide."""
+    out = {}
+    for r in STEADY_TIT_ROWS:
+        ev = steady_tit_evals(r, evals if rows_for is None else rows_for(r))
+        if stage == "held_out" and unc is not None:
+            out[r] = held_out_row(r, ev, view=view, tightening=tightening, unc=unc)
+        else:
+            out[r] = ROW_FUNCTIONS[r](ev, view=view, stage=stage, tightening=tightening)
+    return out
+
+
+def steady_tit_json(results):
+    """The steady-only TIT reading as a record (in_sample.json per form, rows.json): the declaration, decides False,
+    and each row's StatResult in its JSON form; None where none was computed (a stage built by hand)."""
+    if results is None:
+        return None
+    return {"reading": STEADY_TIT_READING, "decides": False, "rows": list(STEADY_TIT_ROWS),
+            "statistics": {r: results[r].as_json() for r in STEADY_TIT_ROWS if r in results}}
 
 
 def within_noise(ins, *, z):

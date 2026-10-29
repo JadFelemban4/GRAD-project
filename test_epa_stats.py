@@ -1353,6 +1353,62 @@ class InSampleStage(unittest.TestCase):
 
 
 # =============================================================================================
+class SteadyOnlyTit(unittest.TestCase):
+    """Decision 83 (29 October 2026): the steady-only TIT reading, declared before any held-out statistic -- E3a,
+    E4a, L0 and L1 without the High Load Final rows, E4b without the Final rows of its reference line -- computed
+    beside the primary by the same row functions and never deciding. By hand; the controls: the primary reading
+    and the form's verdict are the pooled population's, whatever the sensitivity reads."""
+
+    def test_e3a_beside_the_primary_and_the_verdict_stays_the_primarys(self):
+        H = pops("fired", "hot", "hot_l1")
+        evs = [ev(i, "2000", H, egt=802.0) for i in range(10)]                         # steady rows: +2 K
+        evs += [ev(20 + i, "2000", H, kind="final", egt=840.0,                         # Final rows: +40 K
+                   ecu=S.EcuOut(spark_btdc=10.0, lam=1.0, cam_deg=None)) for i in range(10)]
+        stage = S.in_sample(evs, view=V)
+        prim, sens = stage.results["E3a"], stage.steady_tit["E3a"]
+        self.assertAlmostEqual(prim.E, 21.0, places=12)                                # the pooled hot rows
+        self.assertAlmostEqual(sens.E, 2.0, places=12)                                 # the steady rows alone
+        self.assertEqual((prim.judgement["outcome"], sens.judgement["outcome"]), ("fails", "passes"))
+        self.assertIn("E3a", stage.failing)                                            # the primary decides
+        self.assertFalse(stage.passes)
+        self.assertEqual(sens.n_rows, 10)
+        rec = S.steady_tit_json(stage.steady_tit)
+        self.assertEqual((rec["decides"], rec["rows"]), (False, list(S.STEADY_TIT_ROWS)))
+        self.assertEqual(rec["statistics"]["E3a"]["E"], sens.E)
+        json.dumps(stage.as_json(), allow_nan=False)
+        self.assertIn("steady_only_tit", stage.as_json())
+        # the control: a sensitivity reading the Final rows alone would fail too; the steady reading does not, so
+        # the two readings are of different rows
+        self.assertEqual(len(S.steady_tit_evals("E3a", evs)), 10)
+        self.assertTrue(all(e.kind == "steady" for e in S.steady_tit_evals("L0", evs)))
+        with self.assertRaises(ValueError):
+            S.steady_tit_evals("E1a", evs)                                             # not a TIT row
+
+    def test_e4b_keeps_its_enriched_rows_and_drops_the_final_rows_of_its_reference(self):
+        """E4bRows' hand sum (eps = 110/102 - 1 on the 2500 line) with its two enriched rows made Final, and two Final
+        boosted lambda~1 rows added to the line's reference with 30 K errors: the primary reads the moved line, the
+        steady-only reading gives the hand sum back, its enriched rows kept."""
+        B = pops("fired", "fired_meter", "l1_boost", "hot", "hot_l1")
+        evs = [replace(e, kind="final", hold=e.source_row) if e.source_row in (10, 11) else e for e in E4bRows().rows()]
+        evs += [ev(40 + i, "2500", B, kind="final", map_kpa=m, egt=830.0) for i, m in enumerate((150.0, 160.0))]
+        prim = S.row_E4b(evs, view=V, stage="in_sample", tightening=None)
+        sens = S.steady_tit_reading(evs, view=V, stage="in_sample", tightening=None)["E4b"]
+        self.assertAlmostEqual(sens.E, 100 * (110.0 / 102.0 - 1.0), places=10)
+        self.assertNotAlmostEqual(prim.E, sens.E, places=3)                           # the control: the moved line
+        self.assertEqual(sens.extra["enriched_rows"], 2)
+        kept = S.steady_tit_evals("E4b", evs)
+        self.assertEqual(sorted(e.source_row for e in kept if e.kind == "final"), [10, 11])
+
+    def test_e4a_on_final_rows_alone_has_no_statistic_and_says_why(self):
+        N = pops("fired", "hot", "hot_enr")
+        evs = [ev(i, "2000", N, kind="final", egt=810.0, lam=0.85) for i in range(4)]
+        sens = S.steady_tit_reading(evs, view=V, stage="in_sample", tightening=None)["E4a"]
+        prim = S.row_E4a(evs, view=V, stage="in_sample", tightening=None)
+        self.assertFalse(prim.no_statistic)                                            # the control
+        self.assertTrue(sens.no_statistic)
+        self.assertIn("hot_enr", sens.reason)
+
+
 class InSampleRule(unittest.TestCase):
     """Decision 77 (23 October 2026): an in-sample statistic fails a form only if |E_cal| - 2 u_stat > R, u_stat the
     held-out run's; one whose 2 u_stat > R neither blocks nor passes, recorded per form. Hand answers for the three

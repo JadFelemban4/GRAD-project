@@ -1828,6 +1828,14 @@ class _Evals:
                 out[r] = es.held_out_row(r, self.rows_for(r), view=self.view, tightening=tight, unc=self.unc())
         return out
 
+    def steady_tit(self, tight):
+        """Decision 83's steady-only TIT reading on the held-out rows (epa_stats.steady_tit_reading): E3a, E4a, L0
+        and L1 without the High Load Final rows, E4b without the Final rows of its reference line, each labelled
+        with its u-terms from the same perturbed evaluations as the primary; a sensitivity beside the primary,
+        read by nothing that decides."""
+        return self.es.steady_tit_reading(None, view=self.view, stage="held_out", tightening=tight, unc=self.unc(),
+                                          rows_for=self.rows_for)
+
 
 def rows_for(r, points, initial):
     """The evaluations row `r` reads of the steady and Final ones (`points`) and the Initial ones (`initial`):
@@ -1933,6 +1941,30 @@ def _excluded(base, variants, rows):
     return out
 
 
+def not_visible_at_r1(spec):
+    """Decision 85 (29 October 2026): the reason a completion's probe record (complete.json's e6_probes) gives for a
+    constant that is not visible at R1, counted as excluded for its row's level rows, or None (a record written
+    before decision 85 carries no such key, and is judged as before)."""
+    if (spec or {}).get("counted_excluded"):
+        return str(spec.get("counted_excluded_why") or spec.get("not_visible_at_r1") or "not visible at R1")
+    return None
+
+
+def level_exclusion(results, runs, rows, *, hidden):
+    """{row: bool or None} for the level rows `rows` of one E6 row: excluded for it when its statistic moves by less
+    than its own u_val under every probe of every constant (_excluded), a constant in `hidden` (decision 85: not
+    visible at R1) counted as excluded rather than judged by its probe; with every constant hidden, every row with
+    a statistic and a u is excluded. `runs` is {constant: [results under each sign of its probe]}."""
+    judged = [v for c, vs in runs.items() if c not in hidden for v in vs]
+    if judged:
+        return _excluded(results, judged, rows)
+    out = {}
+    for r in rows:
+        b = results.get(r)
+        out[r] = None if (b is None or b.no_statistic or b.u is None) else True
+    return out
+
+
 @dataclasses.dataclass(frozen=True)
 class HeldOutState:
     """What the held-out run has read and computed before E6 (held_out_outputs), passed whole to e6_rows:
@@ -2008,6 +2040,8 @@ def held_out_outputs(name, *, source, token, jobs, armed):
     nominal = _Evals(epa_fit.RowModel(frozen, fuels=view.fuel_by_table), points, initial, view=view,
                      conventions=epa_stats.NOMINAL, censoring=cens, jobs=jobs)
     results = nominal.labelled(tight, tuple(epa_stats.ROW_FUNCTIONS))
+    # decision 83: the steady-only TIT reading, beside the primary in rows.json, never in section 7 or the labels
+    steady_tit = nominal.steady_tit(tight)
     st = HeldOutState(name=name, view=view, contract=contract, tight=tight, complete=complete, e6files=e6files,
                       derived_values=derived_values, frozen=frozen, points=points, initial=initial, cens=cens,
                       jobs=jobs, nominal=nominal, results=results, base_values=nominal.values(tight), imt_k=imt_k,
@@ -2043,7 +2077,8 @@ def held_out_outputs(name, *, source, token, jobs, armed):
                                       "contract_rule": contract["conventions"]["labels"]},
                            "per_row": flags},
         "section7": json_ready(s7),
-        "c5_recheck_margin": c5_recheck_margin(results["E1a"])}
+        "c5_recheck_margin": c5_recheck_margin(results["E1a"]),
+        "steady_only_tit": json_ready(epa_stats.steady_tit_json(steady_tit))}
     e6_out = {"schema": E6_SCHEMA, "provenance": prov, "rows": json_ready(e6), "exclusions": exclusions,
               "excluded_for_every_listed_constant": every,
               "sizes_from_the_contract": {"row11_imt_k": imt_k, "d_rows_probe_relative": d_probe_rel,
@@ -2066,7 +2101,9 @@ def e6_rows(st):
                        exclusion label (E2); row 2's E2a, D1 and L0 within their u_val, a miss a finding;
       row 4            completion's record, the roads' ceiling flag left to the roads step;
       rows 5, 6        +-sigma, +-the probe and +-the d rows' probe of each constant; exclusion judged under
-                       the probe (level rows) and the d probe (d rows), both signs;
+                       the probe (level rows) and the d probe (d rows), both signs; a constant the completion
+                       found not visible at R1 counted as excluded for the level rows, with its reason
+                       (decision 85; level_exclusion), here and in row 9;
       row 8            u_num;
       row 9            each constant as completion sized it, the rich slope after its retag identity
                        (HANDOFFS.md WP3 item 3);
@@ -2121,8 +2158,13 @@ def e6_rows(st):
                                        conventions=nominal_conv, shift=None) for s, sg in signs}
                         for tag, d in (("sigma", sig[fld]), ("probe", prb[fld]), ("d_probe", d_probe_rel * abs(v0)))
                         if d is not None}
+        # decision 85: a constant the completion found not visible at R1 is counted as excluded for the level rows,
+        # with its reason, its +-10 % probe still run and reported; the d rows are judged under the d probe as before
+        hidden = {f: not_visible_at_r1((probes[key].get("detail") or {}).get(f)) for f in fields}
+        hidden = {f: why for f, why in hidden.items() if why is not None}
         ex = {}
-        ex.update(_excluded(results, [per[f]["probe"][s] for f in fields for s in "+-"], level))
+        ex.update(level_exclusion(results, {f: [per[f]["probe"][s] for s in "+-"] for f in fields}, level,
+                                  hidden=hidden))
         ex.update(_excluded(results, [per[f]["d_probe"][s] for f in fields for s in "+-"], drows))
         excl[row] = {"all": ex}
         must = E6_ROW5_MUST_MOVE if row == 5 else E6_ROW6_MUST_MOVE
@@ -2132,7 +2174,8 @@ def e6_rows(st):
                               for tag in runs} for f, runs in per.items()},
             "sigma": {f: sig[f] for f in fields}, "probe": {f: prb[f] for f in fields},
             "must_move": list(must), "must_move_moved": moves["by_row"], "findings": moves["findings"],
-            "descriptive_must_move": moves["descriptive"], "excluded_for": ex, "exclusion_reading": E6_EXCLUSION_READING}
+            "descriptive_must_move": moves["descriptive"], "excluded_for": ex, "exclusion_reading": E6_EXCLUSION_READING,
+            "not_visible_at_r1": hidden}
     e6["8"] = {"u_num": {r: (None if results[r].u is None else results[r].u.u_num) for r in gating}}
     e6["9"], excl[9] = {}, {}
     row9 = probes.get("row9") or {}
@@ -2162,8 +2205,11 @@ def e6_rows(st):
         sigma = spec.get("sigma")
         sgm = ({s: st.at(moved(v0 + sg * float(sigma)), conventions=nominal_conv, shift=None) for s, sg in signs}
                if sigma is not None else None)
+        # decision 85: not visible at R1 is counted as excluded for the level rows, with its reason
+        hidden = not_visible_at_r1(spec)
         ex = {}
-        ex.update(_excluded(results, list(lvl.values()), level))
+        ex.update(level_exclusion(results, {const: list(lvl.values())}, level,
+                                  hidden={const: hidden} if hidden is not None else {}))
         ex.update(_excluded(results, list(dpr.values()), drows))
         excl[9][const] = ex
         e6["9"][const] = {"method": spec.get("method"), "why_not_bracket": spec.get("why_not_bracket"),
@@ -2178,7 +2224,8 @@ def e6_rows(st):
                           "worth_b_why": spec.get("worth_b_why"), "band": spec.get("band"),
                           "housing_change_k": spec.get("housing_change_k"),
                           "probe_housing_change_k": spec.get("probe_housing_change_k"),
-                          "load_bearing": spec.get("load_bearing"), "load_bearing_why": spec.get("load_bearing_why")}
+                          "load_bearing": spec.get("load_bearing"), "load_bearing_why": spec.get("load_bearing_why"),
+                          "not_visible_at_r1": hidden}
     e6["11"] = {}
     for tag, sg in (("plus", 1.0), ("minus", -1.0)):
         v = st.at(frozen, conventions=nominal_conv, shift=epa_stats.InputShift("imt", sg * st.imt_k))
@@ -2477,11 +2524,18 @@ def _summary_entry(root, name, fname):
     if "reported" not in rows:
         raise KeyError(f"{rel}: holds no `reported` labels (rows.json's layout, WP3_INTERFACES 7.7)")
     rep = rows["reported"]
+    # decision 83: the steady-only TIT reading's labels beside the primary's, a sensitivity read by nothing here
+    # that decides (None for a rows.json without it)
+    sto = rows.get("steady_only_tit")
     return {"rows_sha_text": common.sha_text(_p(root, rel)),
             "labels": {r: v.get("label") for r, v in sorted(rep.items())},
             "kappa": {r: v.get("kappa") for r, v in sorted(rep.items())},
             "level_850c_label": s7["level_850c_label"], "drop": s7["drop"], "drop_rows": s7["drop_rows"],
-            "c5_recheck_margin": rows.get("c5_recheck_margin")}
+            "c5_recheck_margin": rows.get("c5_recheck_margin"),
+            "steady_only_tit": None if sto is None else {
+                "reading": sto.get("reading"), "decides": False,
+                "labels": {r: v.get("label") for r, v in sorted((sto.get("statistics") or {}).items())},
+                "E": {r: v.get("E") for r, v in sorted((sto.get("statistics") or {}).items())}}}
 
 
 # ---------------------------------------------------------------------------------------------

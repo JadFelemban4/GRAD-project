@@ -194,6 +194,34 @@ def climb_cell(plant):
     return median_point(rec, *CLIMB_S)
 
 
+def median_resolution(values):
+    """(median, resolution) of a window of values: the median as np.median takes it, and how far it moves when
+    one sample crosses it -- the larger gap between the order statistics that form the median and their outer
+    neighbours. A change of the window smaller than that may only reorder samples around the median, so the
+    median does not resolve it (decision 85, 29 October 2026). Needs at least 3 values."""
+    v = np.sort(np.asarray(values, dtype=float))
+    n = len(v)
+    if n < 3:
+        raise ValueError(f"median_resolution needs at least 3 values, not {n}")
+    med = float(np.median(v))
+    lo_i, hi_i = (n // 2, n // 2) if n % 2 else (n // 2 - 1, n // 2)
+    gaps = [med - float(v[lo_i - 1]), float(v[hi_i + 1]) - med]
+    return med, max(gaps)
+
+
+def climb_cell_resolution(plant):
+    """The climb cell's numerical resolution (decision 85, 29 October 2026: an E6 probe whose response slope is
+    below its numerical noise is not visible at R1): the unbiased locked climb run as climb_cell runs it, and for
+    the gas and the exhaust flow over CLIMB_S their medians (climb_cell's own, which the caller checks equal) and
+    median_resolution's resolution. {"egt", "mdot", "egt_resolution_k", "mdot_resolution_gps", "samples"}."""
+    rec, _summary = run_climb(_plant(plant, "epa_coefficients.climb_cell_resolution"), bias=0.0)
+    sel = [r for r in rec if CLIMB_S[0] <= r["t"] <= CLIMB_S[1]]
+    egt, egt_res = median_resolution([r["egt"] for r in sel])
+    mdot, mdot_res = median_resolution([r["mdot"] for r in sel])
+    return {"egt": egt, "mdot": mdot, "egt_resolution_k": egt_res, "mdot_resolution_gps": mdot_res,
+            "samples": len(sel)}
+
+
 def housing_equivalent(hs, d_egt_k, d_ln_mdot):
     """The housing equivalent of a change at the climb cell (results/ENGINE_THRESHOLDS.md section 1.4:
     the housing T_h = f T_gas + (1 - f) T_amb moves by f dT_gas + f(1 - f) G d ln(mdot)), with the

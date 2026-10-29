@@ -1523,7 +1523,12 @@ class HeldOutRun(Armed):
                                        "housing_change_k": 1.0, "load_bearing": True, "worth_r1": None, "worth_b": None},
                      "flame_floor": {"method": "probe", "why_not_bracket": "synthetic", "size": 0.01,
                                      "housing_change_k": 0.0, "load_bearing": False, "worth_r1": None,
-                                     "worth_b": None}}},
+                                     "worth_b": None},
+                     # decision 85: a constant the completion found not visible at R1, counted as excluded
+                     "t_head_k": {"method": "fallback", "why_not_bracket": "synthetic", "size": 9.0,
+                                  "housing_change_k": None, "load_bearing": None, "worth_r1": None, "worth_b": None,
+                                  "visible_at_r1": False, "counted_excluded": True,
+                                  "counted_excluded_why": "not visible at R1: synthetic"}}},
             "e6_in_use": {"1": {"synthetic": True}}, "e6_row4": {"synthetic": True}, "e6_row13": {"synthetic": True}}
         return {"derived": values, "engine_sha": engines.engine_sha(cls.frozen),
                 "frozen": engines.frozen_sections_sha256(values),
@@ -1598,6 +1603,16 @@ class HeldOutRun(Armed):
             self.assertIsNotNone(v["u"]["u_val"], row)
             self.assertIsNotNone(v["kappa"], row)
         self.assertGreater(labelled, 3)
+        # decision 83: the steady-only TIT reading beside the primary, labelled with its u-terms as the primary is,
+        # flagged a sensitivity; the primary's rows, section 7 and the reported labels are the pooled reading's
+        sto = rows["steady_only_tit"]
+        self.assertEqual((sto["decides"], sto["rows"], sorted(sto["statistics"])),
+                         (False, list(epa_stats.STEADY_TIT_ROWS), sorted(epa_stats.STEADY_TIT_ROWS)))
+        for row, v in sto["statistics"].items():
+            if not v["no_statistic"]:
+                self.assertIn(v["label"], epa_stats.LABEL_ORDER, row)
+                self.assertIsNotNone(v["u"]["u_val"], row)
+        self.assertNotIn("steady_only_tit", rows["reported"])
         for k in ("level_850c_label", "drop", "drop_rows", "parts"):
             self.assertIn(k, rows["section7"])
         self.assertIn("margin", rows["c5_recheck_margin"])
@@ -1622,6 +1637,15 @@ class HeldOutRun(Armed):
         self.assertEqual(e6["rows"]["9"]["ce_rich_slope"]["sigma"], 0.05)
         self.assertTrue(any(x not in (None, 0.0) for x in e6["rows"]["9"]["ce_rich_slope"]["delta_E_sigma"]["+"].values()))
         self.assertIsNone(e6["rows"]["9"]["flame_floor"]["delta_E_sigma"])
+        # decision 85: the constant the completion found not visible at R1 is probed at its size and counted as
+        # excluded for every level row with a statistic, its reason carried; the visible ones carry none
+        th = e6["rows"]["9"]["t_head_k"]
+        self.assertEqual((th["size"], th["not_visible_at_r1"]), (9.0, "not visible at R1: synthetic"))
+        lv = [r for r in th["excluded_for"] if epa_stats.KIND[r] == "level"]
+        self.assertTrue(lv and all(th["excluded_for"][r] in (True, None) for r in lv), th["excluded_for"])
+        self.assertIn(True, [th["excluded_for"][r] for r in lv])
+        self.assertIsNone(e6["rows"]["9"]["flame_floor"]["not_visible_at_r1"])
+        self.assertEqual(e6["rows"]["5"]["not_visible_at_r1"], {})
         self.assertEqual(e6["sizes_from_the_contract"], {"row11_imt_k": 6.3, "d_rows_probe_relative": 0.1,
                                                          "d_rows_probe_ivc_evo_cad": 10.0})
         # rows 5 and 6 judge their must_move rows (a finding, never a stop); rows.json reports every label as
@@ -1661,6 +1685,42 @@ class HeldOutRun(Armed):
         self.assertIn("retag", read_text(val_path(r.root, FORD, "crash_1.txt")))
 
 
+class NotVisibleAtR1(fx.Guarded):
+    """Decision 85 (29 October 2026): a constant the completion found not visible at R1 (complete.json's
+    counted_excluded) is counted as excluded for its E6 row's level rows, with its reason, never judged by its +-10 %
+    probe. By hand on stand-in results: the control is the same constant, its probe moving E1a by more than u_val,
+    judged not excluded when it is visible; beside a visible constant the row's exclusion is the visible one's; a
+    record written before decision 85 carries no flag and is judged as before."""
+
+    @staticmethod
+    def res(E, u=1.0, no=False):
+        return types.SimpleNamespace(row="E1a", E=E, u=None if u is None else types.SimpleNamespace(u_val=u),
+                                     no_statistic=no)
+
+    def test_counted_not_judged(self):
+        base = {"E1a": self.res(0.0), "E3a": self.res(0.0), "L0": self.res(0.0, u=None)}
+        moved = {"E1a": self.res(5.0), "E3a": self.res(0.5), "L0": self.res(0.0)}
+        still = {"E1a": self.res(0.5), "E3a": self.res(0.5), "L0": self.res(0.0)}
+        rows = ("E1a", "E3a", "L0")
+        judged = V.level_exclusion(base, {"floor": [moved, moved]}, rows, hidden={})
+        self.assertEqual(judged, {"E1a": False, "E3a": True, "L0": None})        # the control: judged
+        counted = V.level_exclusion(base, {"floor": [moved, moved]}, rows, hidden={"floor": "not visible at R1"})
+        self.assertEqual(counted, {"E1a": True, "E3a": True, "L0": None})        # counted; no u still None
+        # beside a visible constant, the row reads the visible one's runs alone
+        both = V.level_exclusion(base, {"floor": [moved, moved], "ratio": [still, still]}, rows,
+                                 hidden={"floor": "not visible at R1"})
+        self.assertEqual(both, {"E1a": True, "E3a": True, "L0": None})
+        both_seen = V.level_exclusion(base, {"floor": [moved, moved], "ratio": [still, still]}, rows, hidden={})
+        self.assertEqual(both_seen["E1a"], False)
+
+    def test_the_flag_is_read_off_the_completion_record(self):
+        self.assertIsNone(V.not_visible_at_r1({"method": "probe", "size": 1.0}))     # before decision 85
+        self.assertIsNone(V.not_visible_at_r1({"counted_excluded": False, "visible_at_r1": True}))
+        self.assertIsNone(V.not_visible_at_r1(None))
+        self.assertEqual(V.not_visible_at_r1({"counted_excluded": True, "counted_excluded_why": "not visible at R1: x"}),
+                         "not visible at R1: x")
+
+
 class SummaryOfThree(fx.Guarded):
     """summary.json from the three rows.json (WP3_INTERFACES 7.11), a defect re-run's beside its first;
     refused while an engine has none; a rows.json whose section7 lacks a key stops it."""
@@ -1679,11 +1739,18 @@ class SummaryOfThree(fx.Guarded):
                 write_json(val_path(root, eng, V.ROWS), rows("validated"))
             with self.assertRaises(V.Refused):                       # the control: the Ford's is missing
                 V.summary(source=src)
-            write_json(val_path(root, FORD, V.ROWS), rows("off"))
+            # decision 83: the Ford's rows.json carries the steady-only TIT reading, the others do not
+            ford = dict(rows("off"), steady_only_tit={"reading": "decision 83", "decides": False, "rows": ["E3a"],
+                                                      "statistics": {"E3a": {"label": "validated", "E": 2.0}}})
+            write_json(val_path(root, FORD, V.ROWS), ford)
             write_json(val_path(root, MAZDA, "rows_rerun1.json"), rows("limited"))
             write_json(val_path(root, MAZDA, "STARTED_rerun1"), {})
             out = V.summary(source=src)
             self.assertEqual(out["engines"][FORD]["labels"], {"E1a": "off"})
+            self.assertEqual(out["engines"][FORD]["steady_only_tit"],
+                             {"reading": "decision 83", "decides": False, "labels": {"E3a": "validated"},
+                              "E": {"E3a": 2.0}})
+            self.assertIsNone(out["engines"][MAZDA]["steady_only_tit"])           # a rows.json without it
             self.assertEqual(out["engines"][MAZDA]["reruns"]["rows_rerun1.json"]["labels"], {"E1a": "limited"})
             self.assertEqual(len(out["inputs"]), 4)
             self.assertEqual(read_json(os.path.join(root, *V.VAL_REL.split("/"), V.SUMMARY)), out)

@@ -274,6 +274,9 @@ def _cell(plant):
 
 HS = {"f": 0.8, "tau_s": 100.0, "dTh_per_unit_ln_mdot": 150.0, "ua_gas_turb": 1.0, "ua_turb_amb": 1.0,
       "c_turb": 1.0}
+# The stand-in climb cell's median resolution (decision 85), K and g/s: synthetic, far below every response the
+# stand-in cell gives a constant it sees (0.5 K per W/K of UA_PORT, 20 K per unit of the back-pressure ratio)
+STAND_IN_RESOLUTION = {"egt": 1e-4, "mdot": 1e-4}
 
 
 def stand_in_task(item):
@@ -304,6 +307,10 @@ def stand_in_task(item):
         return {"climb": {"point": _cell(plant), "housing": HS}, "stand_in": True}
     if kind == "climb_cell":
         return _cell(plant)
+    if kind == "cell_resolution":                  # decision 85's noise floor: the base cell's medians, a resolution
+        c = _cell(plant)
+        return {"egt": c["egt"], "mdot": c["mdot"], "egt_resolution_k": STAND_IN_RESOLUTION["egt"],
+                "mdot_resolution_gps": STAND_IN_RESOLUTION["mdot"], "samples": 319}
     if kind == "peak":
         return 850.0 + 0.001 * plant.engine.thermal.c_turb
     if kind == "damage":
@@ -1230,8 +1237,13 @@ class Records(RunCase):
         # decision 77's statistics that neither block nor pass, recorded per form (WP3's third fix of 24 October
         # 2026): the judge's own InSample.noise, as a list
         self.assertEqual(sorted(ins["forms"]["A"]),
-                         ["e8", "failing", "no_line", "noise", "passes", "statistics"])
+                         ["e8", "failing", "no_line", "noise", "passes", "statistics", "steady_only_tit"])
         self.assertIsInstance(ins["forms"]["A"]["noise"], list)
+        # decision 83: the steady-only TIT reading beside the form's stage, flagged a sensitivity that decides nothing
+        sto = ins["forms"]["A"]["steady_only_tit"]
+        self.assertEqual((sto["decides"], sto["rows"], sorted(sto["statistics"])),
+                         (False, list(epa_stats.STEADY_TIT_ROWS), sorted(epa_stats.STEADY_TIT_ROWS)))
+        self.assertIn("decision 83", sto["reading"])
         fz = read(cal(self.src, MAZDA, C.FREEZE))
         self.assertEqual(sorted(fz), sorted(epa_freeze.FREEZE_KEYS))
         self.assertEqual(sorted(fz["fits"]), ["fit_A.json", "in_sample.json", "stage0.json"])
@@ -1355,6 +1367,20 @@ class Records(RunCase):
         self.assertEqual((r9["ivc_deg"]["method"], r9["ivc_deg"]["size"]), ("fallback", 10.0))
         self.assertIn("the Atkinson ratio is not x(EVO0 + exhaust cam)", r9["ivc_deg"]["why_not_bracket"])
         self.assertIn("no exact fit", comp["e6_probes"]["brackets"]["evo_deg"]["why_not_bracket"])
+        # decision 85: the noise floor from the stand-in's resolution at the base cell; a constant the stand-in
+        # climb does not see (IVC) is not visible at R1 and counted excluded, one it sees (UA_PORT, the floor of the
+        # back-pressure law through the flow) keeps its probe
+        nn = comp["e6_probes"]["numerical_noise"]
+        cell = comp["e6_probes"]["climb_cell"]["point"]
+        self.assertAlmostEqual(nn["housing_k"], HS["f"] * STAND_IN_RESOLUTION["egt"]
+                               + HS["dTh_per_unit_ln_mdot"] * STAND_IN_RESOLUTION["mdot"] / cell["mdot"], places=15)
+        self.assertIn("decision 85", nn["rule"])
+        self.assertEqual((r9["ivc_deg"]["visible_at_r1"], r9["ivc_deg"]["counted_excluded"]), (False, True))
+        self.assertIn("not visible at R1", r9["ivc_deg"]["not_visible_at_r1"])
+        self.assertIn("ivc_deg", comp["e6_probes"]["not_visible_at_r1"])
+        self.assertTrue(row6["detail"]["ua_port"]["visible_at_r1"])
+        self.assertTrue(comp["e6_probes"]["row5"]["detail"]["exh_bp_min_kpa"]["visible_at_r1"])
+        self.assertNotIn("ua_port", comp["e6_probes"]["not_visible_at_r1"])
         self.assertEqual(r9["t_head_k"]["size"], 0.1 * abs(r9["t_head_k"]["value"]))
         self.assertEqual(sorted(comp["e6_row4"]), ["c_turb", "frozen", "ua_gas_turb", "ua_turb_amb"])
         self.assertEqual(sorted(comp["e6_row4"]["c_turb"]), ["x0.75", "x1.333"])
@@ -2793,6 +2819,56 @@ class Pieces(F.Guarded):
         # the housing f x (+-7 K) = +-3.5 K over 2 x 14 deg: +0.25 K per degree
         self.assertAlmostEqual(out2["ivc_deg"]["slope_k_per_unit"], 0.25, places=12)
 
+    def test_a_probe_below_the_numerical_noise_is_not_visible_at_r1(self):
+        """Decision 85 (29 October 2026): a probe whose antisymmetric housing response |h(+) - h(-)|/2 is at or
+        below the climb cell's numerical noise (numerical_noise_k, the housing equivalent of the median's
+        resolution) is "not visible at R1": the contract's +-10 % fallback, no worth R1, counted as excluded with
+        the reason. By hand, the first pass's exh_bp_min_kpa in shape (a floor near 105 kPa whose +-10 % moves the
+        housing by 1e-5 K): the controls are the same probe with no noise floor, which takes the change worth R1
+        (about 1e6 kPa, as the first pass did), a constant whose response is far above the floor, which keeps its
+        probe, and a bracketed constant below the floor, which keeps its bracket."""
+        base = {"egt": 1000.0, "mdot": 100.0}
+        hs = {"f": 0.5, "dTh_per_unit_ln_mdot": 0.0}
+        res = {"egt": 1000.0, "mdot": 100.0, "egt_resolution_k": 1.2e-4, "mdot_resolution_gps": 9e-5, "samples": 319}
+        noise = C.numerical_noise_k(hs, res)
+        self.assertAlmostEqual(noise, 0.5 * 1.2e-4, places=15)
+        self.assertAlmostEqual(C.numerical_noise_k({"f": -0.5, "dTh_per_unit_ln_mdot": -150.0}, res),
+                               0.5 * 1.2e-4 + 150.0 * 9e-5 / 100.0, places=15)
+        cells = {("floor", 1): {"egt": 1000.00002, "mdot": 100.0}, ("floor", -1): {"egt": 999.99998, "mdot": 100.0},
+                 ("ua", 1): {"egt": 1002.0, "mdot": 100.0}, ("ua", -1): {"egt": 998.0, "mdot": 100.0},
+                 ("ivc_deg", 1): {"egt": 1000.0, "mdot": 100.0}, ("ivc_deg", -1): {"egt": 1000.0, "mdot": 100.0}}
+        kw = dict(r1_k=10.0, rel=0.1, else_rel=0.1, else_cad=10.0,
+                  fields=(("cycle", "floor"), ("cycle", "ua"), ("geometry", "ivc_deg")),
+                  brackets={"ivc_deg": {"bracket": [-150.0, -135.0]}}, v0={"floor": 105.0, "ua": 20.0, "ivc_deg": -140.0},
+                  sigmas={})
+        out = C.probe_sizes(base, hs, cells, noise_k=noise, **kw)
+        fl = out["floor"]
+        self.assertEqual((fl["method"], fl["visible_at_r1"], fl["counted_excluded"]), ("fallback", False, True))
+        self.assertAlmostEqual(fl["size"], 10.5, places=12)                     # the contract's +-10 %
+        self.assertIsNone(fl["worth_r1"])
+        self.assertIn("not visible at R1", fl["not_visible_at_r1"])
+        self.assertEqual(fl["counted_excluded_why"], fl["not_visible_at_r1"])
+        self.assertAlmostEqual(fl["response_k"], 1e-5, places=9)
+        self.assertEqual(fl["numerical_noise_k"], noise)
+        # the controls: the visible constant keeps its probe sized by R1, the bracket its bracket
+        self.assertEqual((out["ua"]["method"], out["ua"]["visible_at_r1"], out["ua"]["counted_excluded"]),
+                         ("probe", True, False))
+        self.assertAlmostEqual(out["ua"]["size"], 20.0)
+        self.assertEqual((out["ivc_deg"]["method"], out["ivc_deg"]["size"]), ("bracket", 10.0))
+        self.assertFalse(out["ivc_deg"]["counted_excluded"])
+        # the control: without a noise floor the same tiny slope takes the change worth R1, 1e6 kPa
+        off = C.probe_sizes(base, hs, cells, **kw)
+        self.assertEqual((off["floor"]["method"], off["floor"]["visible_at_r1"]), ("probe", None))
+        self.assertAlmostEqual(off["floor"]["size"], 10.0 / (1e-5 / 10.5), delta=1.0)
+        # at the edge: a response equal to the noise is not visible, one ulp above it is
+        edge = {("floor", 1): {"egt": 1000.0 + 2.0 * noise, "mdot": 100.0},
+                ("floor", -1): {"egt": 1000.0 - 2.0 * noise, "mdot": 100.0}}
+        one = dict(kw, fields=(("cycle", "floor"),), brackets={}, v0={"floor": 105.0})
+        r = C.probe_sizes(base, hs, edge, noise_k=noise, **one)["floor"]["response_k"]
+        self.assertFalse(C.probe_sizes(base, hs, edge, noise_k=r, **one)["floor"]["visible_at_r1"])
+        import math
+        self.assertTrue(C.probe_sizes(base, hs, edge, noise_k=math.nextafter(r, 0.0), **one)["floor"]["visible_at_r1"])
+
     def test_the_finiteness_assertion(self):
         v = {**frozen_values("A"), **json.loads(json.dumps(epa_fit.PROVISIONAL_COMPLETION))}
         p = engines.build_candidate(MAZDA, v)
@@ -2835,6 +2911,20 @@ class Pieces(F.Guarded):
             self.assertIn(s, C.SEEN_BEFORE_THE_FIT)
         self.assertIn("isolation reviewer", seen)
         self.assertIn("ENGINE_THRESHOLDS.md:980-1010", seen)
+
+    def test_seen_before_the_fit_carries_the_disclosure(self):
+        """Ghassan's order of 29 October 2026: the defect hunt's code-path investigator printed part of the Mazda's
+        ALPHA full-throttle curve, whose node at 1751 rpm is held-out High Load Initial row 18's torque, and that
+        read is recorded where the code records what was seen before the fit (stage0.json carries the tuple), with
+        the hunt's and the fixer's own reads, naming what was seen and where and repeating no torque. The control:
+        the tuple without the entry fails the check."""
+        def disclosed(seen):
+            return any("wot_torque_curve" in s and "rows 12, 18, 24 and 30" in s and "1751 rpm" in s
+                       and "held-out row" in s and "E1i" in s for s in seen)
+        self.assertTrue(disclosed(C.SEEN_BEFORE_THE_FIT))
+        self.assertFalse(disclosed(tuple(s for s in C.SEEN_BEFORE_THE_FIT if not s.startswith("THE DISCLOSURE"))))
+        self.assertTrue(any(s.startswith("the defect hunt, 24 October 2026") for s in C.SEEN_BEFORE_THE_FIT))
+        self.assertTrue(any(s.startswith("the implementer of defect D-1") for s in C.SEEN_BEFORE_THE_FIT))
 
     def test_seen_before_the_fit_carries_the_pin_authors_reads(self):
         """epa_stats.SOURCES_READ, the u_D pins' author's reads (decision 56; the Mazda's ALPHA page read whole

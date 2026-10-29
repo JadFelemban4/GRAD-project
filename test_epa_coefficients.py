@@ -114,6 +114,28 @@ class B58(Guarded):
         self.assertNotEqual(EC.housing_equivalent(hs, math.nextafter(tb["degt_k"], math.inf), tb["dmdot_rel"]),
                             tb["dTh_ss_k"])
 
+    def test_the_climb_cells_resolution(self):
+        """Decision 85 (29 October 2026): climb_cell_resolution runs the climb climb_cell runs, its medians the cell's
+        own bit for bit (b58_propagation.json's climb point), each resolution the gap to the median's next order
+        statistic over CLIMB_S, positive and below the window's spread."""
+        r = EC.climb_cell_resolution(self.plant)
+        point = json.loads(self.file)["climb"]["point"]
+        self.assertEqual((r["egt"], r["mdot"]), (point["egt"], point["mdot"]))
+        self.assertEqual(r["samples"], EC.CLIMB_S[1] - EC.CLIMB_S[0] + 1)
+        for k in ("egt_resolution_k", "mdot_resolution_gps"):
+            self.assertTrue(math.isfinite(r[k]) and r[k] >= 0.0, (k, r[k]))
+
+
+class MedianResolution(Guarded):
+    def test_median_resolution_by_hand(self):
+        """The median and how far it moves when one sample crosses it, by hand, odd and even; the control: fewer
+        than 3 values are refused."""
+        self.assertEqual(EC.median_resolution([7.0, 1.0, 11.0, 2.0, 4.0]), (4.0, 3.0))   # gaps 2 and 3
+        self.assertEqual(EC.median_resolution([1.0, 2.0, 4.0, 7.0]), (3.0, 4.0))         # 3 - 1 and 7 - 3
+        self.assertEqual(EC.median_resolution([5.0, 5.0, 5.0]), (5.0, 0.0))
+        with self.assertRaises(ValueError):
+            EC.median_resolution([1.0, 2.0])
+
 
 class Ambient(Guarded):
     @classmethod

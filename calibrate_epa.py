@@ -969,6 +969,24 @@ SEEN_BEFORE_THE_FIT = (
     "WP3_INTERFACES.md and the four reviews of 24 October with their scratch scripts; T0's synthetic seeds fitted on "
     "test_calibrate_epa's synthetic Mazda tables under synthetic R (test_epa_stats' synthetic view, whose E1a, E2a and "
     "E3a are PLAN.md 5.1's residual scales as epa_fit._scales' docstring quotes them); none used",
+    # after Run 1's first pass (24 October 2026): the defect hunt and the fixes of 29 October 2026
+    "THE DISCLOSURE (Ghassan's order of 29 October 2026; results/VALIDATION_DECISIONS.md section H): the defect "
+    "hunt's code-path investigator, 24 October 2026, after the Mazda's first fit, while reading the Mazda's "
+    "epa_engine.json, printed part of its ALPHA full-throttle curve (wot_torque_curve), whose "
+    "measured_at_speed records cite High Load Initial rows 12, 18, 24 and 30; the node of row 18, at 1751 rpm, is a "
+    "held-out row's (the contract, section 2.3), so that held-out row's Initial torque was seen; only E1i, "
+    "descriptive, reads Initial torque; none used, and no later check opens epa_engine.json's curve fields",
+    "the defect hunt, 24 October 2026 (read-only, after the Mazda's first fit and the Honda's T0): the three engines' "
+    "calibration steady and Final rows through epa_rows.calibration_rows (pickled in the scratchpad's "
+    "defect_hunt/verdict/), the Mazda's frozen fits evaluated on them through epa_fit.evaluate_rows, the Mazda's "
+    "Atkinson ratio and cam phases and the Honda's effective strokes, and the Mazda's and the Honda's Final and "
+    "steady TIT at matched calibration points (finding F-1); calibration rows only, no held-out row",
+    "the implementer of defect D-1 and decisions 82-85, 29 October 2026: the defect hunt's verdict and the Run 1 log; "
+    "the three engines' calibration steady and Final rows from the hunt's pickle, through calibrate_epa.valve_brackets "
+    "(D-1's evidence: the Atkinson fit and the brackets); the Honda's first-pass t0.json (its d2_gate detail: the "
+    "truth's and the fitted gates and the flat intervals of its T0 seeds); the Mazda's first-pass complete.json "
+    "(its E6 probe records) and the frozen Mazda plant's locked climb (model outputs: decision 85's climb-cell "
+    "resolution); no held-out row, no epa_engine.json field, no contract value beyond the code's own reads",
 )
 
 
@@ -1495,7 +1513,8 @@ def stage0_record(yield_, s0, *, view):
 def in_sample_body(in_sample, *, chosen, reason):
     """in_sample.json's body without its provenance (WP3_INTERFACES.md 7.2): per form fitted, every
     in-sample statistic but E8 (each epa_stats.StatResult in its in-sample JSON form, 7.6), passes,
-    failing, noise (decision 77's neither), no_line, and E8 reported apart (decision 39(a): outside the form criterion); the criterion,
+    failing, noise (decision 77's neither), no_line, and E8 reported apart (decision 39(a): outside the form criterion),
+    and decision 83's steady-only TIT reading beside them (steady_only_tit, a sensitivity that decides nothing); the criterion,
     the chosen form and the reason. The one definition fit writes and check recomputes."""
     forms, criterion = {}, None
     for form in engines.CYCLE_FORMS:
@@ -1508,7 +1527,10 @@ def in_sample_body(in_sample, *, chosen, reason):
         forms[form] = {"statistics": {r: v.as_json() for r, v in s.results.items() if r != "E8"},
                        "passes": bool(s.passes), "failing": list(s.failing), "noise": list(s.noise),
                        "no_line": list(s.no_line),
-                       "e8": s.results["E8"].as_json() if "E8" in s.results else None}
+                       "e8": s.results["E8"].as_json() if "E8" in s.results else None,
+                       # decision 83: the steady-only TIT reading beside the form's stage, a sensitivity that
+                       # decides nothing (epa_stats.steady_tit_json; None on a stage built without it)
+                       "steady_only_tit": epa_stats.steady_tit_json(getattr(s, "steady_tit", None))}
     return {"schema": "epa-in-sample/1", "criterion": criterion, "forms": forms, "chosen_form": chosen,
             "reason": reason}
 
@@ -1925,6 +1947,8 @@ def _completion_task(item):
         return epa_coefficients.coefficients(plant)
     if kind == "climb_cell":
         return epa_coefficients.climb_cell(plant)
+    if kind == "cell_resolution":
+        return epa_coefficients.climb_cell_resolution(plant)
     if kind == "peak":
         return float(k3_knee.baseline_trace(plant).t_turb_k.max() - 273.15)
     if kind == "damage":
@@ -2114,7 +2138,37 @@ def valve_brackets(rows, *, geometry):
     return out
 
 
-def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, brackets, v0, sigmas):
+# DECISION 85 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H): an E6 probe whose response
+# slope is below its numerical noise -- so the size that would move the housing by R1 (or d by b) is outside
+# any physical range, as the first pass's exh_bp_min_kpa's 2.28e6 kPa -- is reported "not visible at R1" and
+# probed at the contract's own fallback ("Where neither is computable, it is +-10 %"; +-10 crank degrees for
+# IVC and EVO, row 9), and counted as excluded for that row with the reason (validate_epa's E6 rows count it,
+# never judging its probe). The contract's fallback, not a rule of it (rule 0). The numerical noise is measured,
+# not typed: the climb cell is a median over epa_coefficients.CLIMB_S, and a change smaller than the median's
+# resolution (epa_coefficients.median_resolution: the gap to the next order statistic) may only reorder
+# samples around it, so the noise of the probe's housing response is the housing equivalent of the gas's and
+# the flow's resolutions at the frozen plant's climb (|f| x egt's + |dTh per ln mdot| x mdot's / mdot,
+# numerical_noise_k), and a probe is visible only when its antisymmetric response |h(+) - h(-)| / 2 exceeds
+# it. A constant the climb does not see at all (h 0 both ways) is not visible either. A bracket is a band, not a
+# visibility probe, and is kept.
+NOT_VISIBLE_AT_R1 = ("not visible at R1: the probe's response slope is below the climb cell's numerical noise, "
+                     "so the change worth R1 is not computable and the probe is the contract's +-10 % fallback "
+                     "(decision 85); counted as excluded for this row's level rows, with this reason")
+NOISE_RULE = ("decision 85: the housing equivalent of the climb cell's median resolution over CLIMB_S at the "
+              "frozen plant, |f| x the gas's + |dTh per unit ln mdot| x the flow's / the flow "
+              "(epa_coefficients.climb_cell_resolution); a probe is visible when |h(+) - h(-)| / 2 exceeds it")
+
+
+def numerical_noise_k(hs, resolution):
+    """Decision 85's numerical noise of a probe's housing response, K: the housing equivalent of the climb cell's
+    median resolution (`resolution`, epa_coefficients.climb_cell_resolution's record) with the engine's own f and
+    G term `hs`, each channel's taken at its magnitude so that the two add (NOISE_RULE)."""
+    return (abs(float(hs["f"])) * float(resolution["egt_resolution_k"])
+            + abs(float(hs["dTh_per_unit_ln_mdot"])) * float(resolution["mdot_resolution_gps"]) / float(resolution["mdot"]))
+
+
+def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, brackets, v0, sigmas,
+                noise_k=None):
     """E6 probe sizes (PLAN.md 5.9 item 6; the contract's E6, "the visibility probe is sized by its
     consequence"): for each (record, field) of `fields`, the housing equivalent of moving it by +-rel
     (epa_coefficients.housing_equivalent at the frozen climb cell, the engine's own f and G term `hs`, from
@@ -2133,7 +2187,13 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
     |slope| x the band, and load_bearing whether it exceeds R1. A constant with neither has no band: an
     ASSUMED constant's +-10 % is a probe, not an uncertainty (the contract's E6), so load_bearing is None
     with its reason, and its worth R1 is reported. The probe's own housing change is reported beside it as
-    probe_housing_change_k, never judged. worth_b is None, with WORTH_B_WHY. Returns {field: record}."""
+    probe_housing_change_k, never judged. worth_b is None, with WORTH_B_WHY.
+
+    NOT VISIBLE AT R1 (decision 85, the note above): with `noise_k` (numerical_noise_k; None keeps the rule
+    off, the visibility then None), a constant without a bracket whose antisymmetric response |h(+) - h(-)| / 2
+    is at or below noise_k takes the fallback size, visible_at_r1 False, not_visible_at_r1 NOT_VISIBLE_AT_R1
+    with its numbers, worth_r1 None with that reason, and counted_excluded True, which validate_epa reads to
+    count the constant excluded for its row's level rows. Returns {field: record}."""
     out = {}
     for record, field in fields:
         val = float(v0[field])
@@ -2145,10 +2205,19 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
         step = rel * abs(val)
         slope = (h[1] - h[-1]) / (2.0 * step) if step > 0.0 else float("nan")
         worth = r1_k / abs(slope) if (math.isfinite(slope) and slope != 0.0) else None
+        # decision 85: the probe's antisymmetric response against the climb cell's numerical noise
+        response = abs(h[1] - h[-1]) / 2.0
+        visible = None if noise_k is None else bool(math.isfinite(slope) and response > float(noise_k))
+        hidden = None
         b = (brackets or {}).get(field)
         if b and b.get("bracket"):
             lo, hi = b["bracket"]
             size, method = max(abs(lo - val), abs(hi - val)), "bracket"
+        elif visible is False:
+            size, method = (else_cad if field in ANGLES else else_rel * abs(val)), "fallback"
+            hidden = (f"{NOT_VISIBLE_AT_R1} (|h(+) - h(-)|/2 = {response:.3g} K at +-{rel * 100:g} %, the noise "
+                      f"{float(noise_k):.3g} K)")
+            worth = None
         elif worth is not None:
             size, method = worth, "probe"
         else:
@@ -2170,7 +2239,11 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
                       "housing_eq_k": {"+": h[1], "-": h[-1]}, "slope_k_per_unit": slope if finite else None,
                       "worth_r1": worth, "worth_b": None, "worth_b_why": WORTH_B_WHY, "band": band,
                       "housing_change_k": hc, "probe_housing_change_k": abs(slope) * size if finite else None,
-                      "load_bearing": None if hc is None else bool(hc > r1_k), "load_bearing_why": why}
+                      "load_bearing": None if hc is None else bool(hc > r1_k), "load_bearing_why": why,
+                      "response_k": response, "numerical_noise_k": None if noise_k is None else float(noise_k),
+                      "visible_at_r1": visible, "not_visible_at_r1": hidden,
+                      "worth_r1_why": hidden, "counted_excluded": hidden is not None,
+                      "counted_excluded_why": hidden}
     return out
 
 
@@ -2345,6 +2418,8 @@ def complete(name, *, source, jobs):
     ki = bands["row7_ki"]
     r7 = [("1.00", pf)] + [(f"{k:.2f}", _plant(name, {**values, **epa_fit.knock_rescale(fv, factor=k)})) for k in ki]
     items += [("damage", p, {}) for _, p in r7]
+    # decision 85: the frozen plant's climb cell's numerical resolution, the probes' noise floor (last in the pool)
+    items.append(("cell_resolution", pf, {}))
     res = _tasks(items, jobs)
     coef = res[0]
     base_cell, hs = coef["climb"]["point"], coef["climb"]["housing"]
@@ -2355,7 +2430,8 @@ def complete(name, *, source, jobs):
             i += 1
     peaks = res[i:i + len(ROW4_FIELDS) * len(r4f) + 1]
     i += len(ROW4_FIELDS) * len(r4f) + 1
-    damages = res[i:]
+    damages = res[i:-1]
+    cell_res = res[-1]
     r1 = float(view.r1_housing_k)
     rows_cal = epa_fit.cal_rows(yield_)
     brackets = valve_brackets(rows_cal, geometry=pf.engine.geometry)
@@ -2366,12 +2442,23 @@ def complete(name, *, source, jobs):
     sigmas = {f: sig5[S1_SIGMA_NAMES[f]] for _r, f in ROW5_FIELDS}
     sigmas.update(sig6)
     sigmas["ce_rich_slope"] = sig_slope if form_c else None
+    # decision 85: the noise floor is the frozen climb cell's own (its medians are coefficients' climb point, checked
+    # equal, so the resolution is the base cell's and never a fallback's: mistake 19)
+    if (float(cell_res["egt"]), float(cell_res["mdot"])) != (float(base_cell["egt"]), float(base_cell["mdot"])):
+        raise CompletionDefect("the climb cell's resolution was not measured on the climb the coefficients read "
+                               "(decision 85)")
+    noise = numerical_noise_k(hs, cell_res)
     sizes = probe_sizes(base_cell, hs, cells, r1_k=r1, rel=rel, else_rel=bands["else_rel"],
-                        else_cad=bands["else_cad"], fields=probe_fields, brackets=brackets, v0=v0, sigmas=sigmas)
+                        else_cad=bands["else_cad"], fields=probe_fields, brackets=brackets, v0=v0, sigmas=sigmas,
+                        noise_k=noise)
     e6_probes = {
         "d_rows": f"+-{bands['d_probe_rel'] * 100:g} % (d needs agents; the contract's E6, decision 59)",
         "d_probe_rel": bands["d_probe_rel"], "probe_rel": rel, "r1_housing_k": r1,
         "climb_cell": {"point": base_cell, "housing": hs},
+        "numerical_noise": {"housing_k": noise, "egt_resolution_k": cell_res["egt_resolution_k"],
+                            "mdot_resolution_gps": cell_res["mdot_resolution_gps"], "samples": cell_res["samples"],
+                            "rule": NOISE_RULE},
+        "not_visible_at_r1": sorted(f for f, v in sizes.items() if v["visible_at_r1"] is False),
         "row5": {"sigma": sig5, "probe": {f: sizes[f]["size"] for _r, f in ROW5_FIELDS},
                  "housing_change_k": {f: sizes[f]["housing_change_k"] for _r, f in ROW5_FIELDS},
                  "detail": {f: sizes[f] for _r, f in ROW5_FIELDS}},
