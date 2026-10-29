@@ -25,9 +25,12 @@ project's own code. They are drawn with the Anatomy kit (`kit/`, MIT, see
 4. **The words.** `copy.mjs`, Arabic first. Units stay left-to-right inside
    `<bdi dir="ltr">`, as everywhere in the lab.
 
-The lab shows a figure with `src/FigureFrame.tsx`: an iframe that passes the
-lab's language and theme (`?lang=ar&theme=dark`) and takes the page's height.
-Opened alone, a page falls back to the lab's saved preferences.
+A lesson names its figure in `content.json` and `content.ar.json`
+(`"figure": "housing-lag"`). In the guided tour the figure then takes the stage,
+where the 3D scene usually is, while the lesson's own layer is selected; another
+layer tab brings the 3D scene back. `src/FigureFrame.tsx` shows it: an iframe that
+passes the lab's language and theme (`?lang=ar&theme=dark`) and takes the page's
+height. Opened alone, a page falls back to the lab's saved preferences.
 
 ## After a change
 

@@ -10,3 +10,4 @@
 .reading-context { font-size: .82rem; color: var(--muted); line-height: 1.65; margin: 12px 0 6px; }
 .reading-context bdi { color: var(--ink); }
 .figure-frame{display:block;width:100%;border:0;background:transparent}
+.scene-figure{padding:10px 12px 4px}

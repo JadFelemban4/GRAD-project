@@ -3,7 +3,7 @@ import type { Language } from './model/preferences.mjs';
 export type Mode = 'studio' | 'tour' | 'sandbox' | 'trace' | 'viva';
 export type Source = { file: string; symbol?: string; variable?: string; line: number };
 export type Concept = { id: string; name: string; meaning: string; why: string; unit?: string; evidence: string; range?: unknown; source: Source; upstream: string[]; downstream: string[]; increase?: string; decrease?: string; caveat?: string };
-export type Lesson = { id: string; title: string; subtitle?: string; body: string; experiment: string; layer: string; focus: string; concepts: string[] };
+export type Lesson = { id: string; title: string; subtitle?: string; body: string; experiment: string; layer: string; focus: string; concepts: string[]; figure?: string };
 export type Meta = { vehicle: any; actions: any[]; observations: any[]; preview_s: number[]; thresholds: any; concepts: Concept[]; tour: Lesson[]; viva: any[]; scenarios: any[]; derived: any; limitations: string[] };
 export type Frame = { time_s: number; rpm: number; map_kpa: number; speed_kmh: number; grade_pct: number; gear: number; torque_req: number; torque: number; egt_c: number | null; t_turb: number; t_oil: number; t_block: number; spark: number; lam: number; mdot_fuel: number; mdot_air: number; ki: number; damage_rate: number; reward: number; r_resp: number; r_fuel: number; r_life: number; cost_torque: number; cost_knock: number; cost_egt: number; action: number[]; command: number[]; obs: number[]; obs_in: number[]; preview_pct: number[]; baseline: any; totals: any; [key: string]: any };
 export type Road = { time_s: number[]; grade_pct: number[]; speed_kmh: number[] };

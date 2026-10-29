@@ -1,7 +1,9 @@
 # Housing-lag figure: validation, 29 October 2026
 
 Branch `JMF-2340550-anatomy-housing`. A new lesson, `housing_lag` (sixth of ten),
-opens an interactive figure drawn with the Anatomy kit: a hot-gas test stand.
+puts an interactive figure on the stage, where the 3D scene usually is, so the
+tour no longer shows the car in every lesson. The figure is drawn with the
+Anatomy kit: a hot-gas test stand.
 A burner, standing in for the engine, drives gas into a turbine housing, and a
 two-pen strip recorder draws the gas and the housing metal. The reader lights
 and stops the burner and watches the metal lag the gas; a dot marks where τ ends.
@@ -41,7 +43,7 @@ turbine wheel's spin only shows that gas flows.
 | `npm run build` | type check and bundle pass; `dist/figures/housing-lag.html` written |
 | anatomy line check, mid-run, dark Arabic and light English | `line ends: 0 of 230` in both; the first build had one (a turbine blade ending 1.2 px short of the outlet ring), fixed |
 | `python launch.py --check` | "Local app healthy"; `/figures/housing-lag.html` served (200); `/api/meta` lists the lesson after `exhaust_to_turbine` |
-| in the lab, tour mode, lesson 6 | the figure loads in the frame, follows the language and theme, starts after 1.4 s, console clean |
+| in the lab, tour mode | lesson 5 shows the 3D scene; lesson 6 shows the figure on the stage (745 px tall at 1440 px), with no scrolling; the engine tab brings the 3D scene back and the heat tab brings the figure back; it follows the language and theme, starts after 1.4 s, console clean |
 | screenshots | dark and light, Arabic and English, 1100 px and 390 px, close-ups of the outlet (6×) and the recorder (5×), heating and cooling; kept in `qa/figures/` (not committed) |
 
 ## Failures that were already there
