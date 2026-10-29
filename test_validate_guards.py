@@ -1479,6 +1479,10 @@ def e2e_contract(c):
         "E8": []}
 
 
+# Decision 88's reason as a synthetic completion record carries it (calibrate_epa.BEYOND_RANGE_AT_R1's opening words).
+BEYOND_SYNTHETIC = "worth R1 beyond the constant's range: synthetic"
+
+
 class HeldOutRun(Armed):
     """validate_epa.run with its real computation (held_out_outputs) end to end, on the Ford's synthetic
     held-out rows in a temporary repository, the frozen plant a candidate built from the B58's values on
@@ -1510,6 +1514,7 @@ class HeldOutRun(Armed):
             return rec
         c = values["cycle"]
         cls.ivc0 = float(cls.frozen.engine.geometry.ivc_deg)
+        cls.conrod0 = float(cls.frozen.engine.geometry.conrod)
         e6 = {"1": variant("1", cycle={"ua_port": c["ua_port"] * 1.05}, conventions={"cell_referenced": False}),
               "2": variant("2", conventions={"afr_st": 14.7}),
               "3": variant("3", conventions={"lhv_j_per_kg": 44.0e6}),
@@ -1518,7 +1523,12 @@ class HeldOutRun(Armed):
         complete = {"e6_probes": {
             "d_rows": "+-10 %",
             "row5": {"sigma": {"ratio": 0.01, "floor_kpa": 0.5}, "probe": {"ratio": 0.05, "floor_kpa": 2.0},
-                     "housing_change_k": 1.0},
+                     "housing_change_k": 1.0,
+                     # decision 88: the floor's worth-R1 probe beyond its range, at its fallback, counted excluded
+                     "detail": {"exh_bp_min_kpa": {"method": "fallback", "within_range_at_r1": False,
+                                                   "range_tests_failed": ["bounds"], "counted_excluded": True,
+                                                   "beyond_range_at_r1": BEYOND_SYNTHETIC,
+                                                   "counted_excluded_why": BEYOND_SYNTHETIC}}},
             "row6": {"sigma": 1.0, "probe": 4.0, "housing_change_k": 1.0},
             "row9": {"ce_rich_slope": {"method": "probe", "why_not_bracket": "synthetic", "size": 0.1, "sigma": 0.05,
                                        "housing_change_k": 1.0, "load_bearing": True, "worth_r1": None, "worth_b": None},
@@ -1534,7 +1544,13 @@ class HeldOutRun(Armed):
                      # edge's distance as HEAD 0147f93's completion recorded a bracket, which the reader ignores
                      "ivc_deg": {"method": "bracket", "why_not_bracket": None, "size": 20.0,
                                  "bracket": [cls.ivc0 - 5.0, cls.ivc0 + 20.0], "housing_change_k": 1.0,
-                                 "load_bearing": False, "worth_r1": None, "worth_b": None}}},
+                                 "load_bearing": False, "worth_r1": None, "worth_b": None},
+                     # decision 88: a worth-R1 probe across zero with a NaN cycle, probed at its +-10 % fallback
+                     "conrod": {"method": "fallback", "why_not_bracket": "synthetic", "size": 0.1 * cls.conrod0,
+                                "housing_change_k": None, "load_bearing": None, "worth_r1": 1.75 * cls.conrod0,
+                                "worth_b": None, "within_range_at_r1": False, "range_tests_failed": ["sign", "finite"],
+                                "beyond_range_at_r1": BEYOND_SYNTHETIC, "counted_excluded": True,
+                                "counted_excluded_why": BEYOND_SYNTHETIC}}},
             "e6_in_use": {"1": {"synthetic": True}}, "e6_row4": {"synthetic": True}, "e6_row13": {"synthetic": True}}
         return {"derived": values, "engine_sha": engines.engine_sha(cls.frozen),
                 "frozen": engines.frozen_sections_sha256(values),
@@ -1702,6 +1718,41 @@ class HeldOutRun(Armed):
                          ("bracket", None, [lo, hi], {"+": hi, "-": lo}))
         self.assertEqual(rec["d_probe_size"], 10.0)
 
+    def test_a_probe_beyond_its_range_is_counted_excluded_as_decision_85s_are(self):
+        """Decision 88 (29 October 2026): a constant whose worth-R1 probe the completion found beyond its range
+        (complete.json's beyond_range_at_r1, counted_excluded) is probed at its +-10 % fallback and counted as excluded
+        for every level row with a statistic, its reason carried as beyond_range_at_r1 -- never as decision 85's
+        not_visible_at_r1, which HEAD 0147f93 wrote it under -- in row 9 (the conrod) and in row 5 (the floor of the
+        back-pressure law, beside the ratio, whose probe the row still judges alone). The controls: decision 85's
+        constant keeps its own reason, and a constant judged by its probe carries neither."""
+        import epa_stats
+        moved, real = [], epa_fit.perturbed
+
+        def recording(plant, *, record, field, value):
+            moved.append((field, value))
+            return real(plant, record=record, field=field, value=value)
+        with mock.patch.object(epa_fit, "perturbed", recording):
+            r, src, res, out = self.real_run()
+        self.assertIsInstance(res, dict, out)
+        e6 = read_json(val_path(r.root, FORD, V.E6))["rows"]
+        c9 = e6["9"]["conrod"]
+        self.assertIsNone(c9["not_visible_at_r1"])                         # HEAD: the decision-88 reason here
+        self.assertEqual((c9["beyond_range_at_r1"], c9["range_tests_failed"], c9["method"]),
+                         (BEYOND_SYNTHETIC, ["sign", "finite"], "fallback"))
+        s = 0.1 * self.conrod0
+        self.assertEqual([v for f, v in moved if f == "conrod"][:2], [self.conrod0 + s, self.conrod0 - s])
+        lv = [k for k in c9["excluded_for"] if epa_stats.KIND[k] == "level"]
+        self.assertTrue(lv and all(c9["excluded_for"][k] in (True, None) for k in lv), c9["excluded_for"])
+        self.assertIn(True, [c9["excluded_for"][k] for k in lv])
+        self.assertEqual((e6["5"]["beyond_range_at_r1"], e6["5"]["not_visible_at_r1"]),
+                         ({"exh_bp_min_kpa": BEYOND_SYNTHETIC}, {}))
+        self.assertFalse(e6["5"]["excluded_for"]["E1a"])                   # the ratio's probe moves E1a: judged
+        # the controls: decision 85's constant keeps its reason; a judged constant carries neither
+        th = e6["9"]["t_head_k"]
+        self.assertEqual((th["not_visible_at_r1"], th["beyond_range_at_r1"]), ("not visible at R1: synthetic", None))
+        self.assertEqual((e6["9"]["flame_floor"]["not_visible_at_r1"], e6["9"]["flame_floor"]["beyond_range_at_r1"]),
+                         (None, None))
+
     def test_a_retag_that_is_not_the_plant_stops_the_run(self):
         """HANDOFFS.md WP3 item 3: the rich slope's retag is asserted before row 9's probe is read, never
         relaxed. The control is the whole run above, where it holds."""
@@ -1749,6 +1800,32 @@ class NotVisibleAtR1(fx.Guarded):
         self.assertIsNone(V.not_visible_at_r1(None))
         self.assertEqual(V.not_visible_at_r1({"counted_excluded": True, "counted_excluded_why": "not visible at R1: x"}),
                          "not visible at R1: x")
+
+
+class BeyondRange(fx.Guarded):
+    """Decision 88 (29 October 2026) by hand: the three readers of a completion's probe record. A worth-R1 probe
+    beyond its constant's range is beyond_range_at_r1's, never not_visible_at_r1's (decision 85's), and
+    counted_excluded reads both alike, as level_exclusion's hidden; a record written before decision 88 (no such
+    key) is judged as before."""
+
+    def test_the_readers(self):
+        b88 = {"counted_excluded": True, "beyond_range_at_r1": BEYOND_SYNTHETIC, "counted_excluded_why": BEYOND_SYNTHETIC}
+        n85 = {"counted_excluded": True, "counted_excluded_why": "not visible at R1: x", "not_visible_at_r1": "x"}
+        self.assertEqual((V.beyond_range_at_r1(b88), V.not_visible_at_r1(b88), V.counted_excluded(b88)),
+                         (BEYOND_SYNTHETIC, None, BEYOND_SYNTHETIC))
+        self.assertEqual((V.beyond_range_at_r1(n85), V.not_visible_at_r1(n85), V.counted_excluded(n85)),
+                         (None, "not visible at R1: x", "not visible at R1: x"))
+        for judged in ({"method": "probe", "size": 1.0}, {"counted_excluded": False, "within_range_at_r1": True}, None,
+                       {"counted_excluded": False, "beyond_range_at_r1": BEYOND_SYNTHETIC}):
+            self.assertEqual((V.beyond_range_at_r1(judged), V.counted_excluded(judged)), (None, None), judged)
+        # level_exclusion reads a beyond-range constant as decision 85's: counted, not judged by its probe
+        res = NotVisibleAtR1.res
+        base = {"E1a": res(0.0), "E3a": res(0.0)}
+        moved = {"E1a": res(5.0), "E3a": res(5.0)}
+        self.assertEqual(V.level_exclusion(base, {"conrod": [moved, moved]}, ("E1a", "E3a"), hidden={}),
+                         {"E1a": False, "E3a": False})                               # the control: judged
+        self.assertEqual(V.level_exclusion(base, {"conrod": [moved, moved]}, ("E1a", "E3a"),
+                                           hidden={"conrod": V.counted_excluded(b88)}), {"E1a": True, "E3a": True})
 
 
 class BracketEdges(fx.Guarded):

@@ -987,6 +987,27 @@ SEEN_BEFORE_THE_FIT = (
     "truth's and the fitted gates and the flat intervals of its T0 seeds); the Mazda's first-pass complete.json "
     "(its E6 probe records) and the frozen Mazda plant's locked climb (model outputs: decision 85's climb-cell "
     "resolution); no held-out row, no epa_engine.json field, no contract value beyond the code's own reads",
+    # after Run 1's second pass (29 October 2026): the freeze review's diagnostics and the fixes of 29 October 2026
+    # (docs/build_step_2/RUN1_DIAGNOSTICS.md, its archive run1_diagnostics.tar.gz)
+    "diagnostic A and its checker, 29 October 2026 (read-only, the Honda's T0 d2_gate case): the Honda's calibration "
+    "view and yield through calibrate_epa._load, the yield's row types counted, the inputs of its calibration steady "
+    "and Final rows between about 116 and 133 kPa printed (MAP, speed, line, the lambda and sentinel flags) with the "
+    "T0 truth's commanded lambda at each, T0 seeds 1 and 2's rows (epa_fit.t0_rows, T0_STREAM's own) and their form-A "
+    "fits re-run; the Honda's t0.json and run.json; no held-out row, no epa_engine.json, nothing under logs/",
+    "diagnostic B and its checker, 29 October 2026 (read-only, the Ford's T0 seed-1 chi-square): the three engines' "
+    "calibration views and yields through calibrate_epa._load; T0 seeds 1 and 2's rows and form-A fits (the Ford), "
+    "seed 1's (the Mazda, the Honda); DIAGNOSTIC draws of the Ford's form-A truth at its calibration rows' inputs "
+    "(numpy.random.default_rng([0x7D, k]), k 1-400 through S2 and 1-7 through the whole form-A fit; never T0 seeds); "
+    "the three engines' t0.json; no held-out row, no epa_engine.json, nothing under logs/",
+    "diagnostic C and its checker, 29 October 2026 (read-only, the Mazda's E6 probes): the frozen Mazda's records "
+    "(complete.json, freeze.json, fit_A+B+C+D.json, e6/*.json, data/engines/mazda_25t/derived_params.json), the frozen "
+    "plant's locked climbs at its E6 probe sizes and its single cycles at the climb point and at epa_fit.synthetic_grid "
+    "(model outputs); no loader call, no EPA table, no held-out row",
+    "the implementer of defect D-2 and decisions 86-89, 29 October 2026: the three diagnostics' reports and outputs and "
+    "the Run 1 log; the Honda's calibration view and yield through calibrate_epa._load, T0 seeds 1-3's rows and the "
+    "second pass's t0.json intervals through epa_fit.d2_gate_case (the one changed row's key, MAP and speed printed); "
+    "the frozen Mazda's records and plant (complete.json's row 5, 6 and 9 probe records, one cycle per worth-R1 probe "
+    "at the climb point); synthetic T0 runs on test_epa_fit's rows; no held-out row, no epa_engine.json field",
 )
 
 
@@ -2168,6 +2189,95 @@ NOISE_RULE = ("decision 85: the housing equivalent of the climb cell's median re
 # which is the farther edge's: load-bearing does not move); the probe a bracket gives validate_epa is the two edges.
 BRACKET_EDGES = ("defect D-2: a bracket is applied as its two edges, the constant moved to the bracket's lower edge "
                  "('-') and to its upper edge ('+'); it has no symmetric size")
+# DECISION 88 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H): a worth-R1 probe of E6 rows 5, 6
+# or 9 (method "probe": the change that moves the housing equivalent by R1, linearly) that
+#   (a) "bounds": takes the constant outside epa_fit.BOUNDS where it has an entry (declared in commit C, before any
+#       fit; an entry of None, or no entry, is no bound),
+#   (b) "sign": changes the constant's sign on either side (v0 +- size of the other sign than v0, or zero), or
+#   (c) "finite": gives a non-finite cycle on either side -- the completion runs no climb at the probe size (its
+#       probe climbs are at +-rel, scaled linearly: PLAN.md 5.9 item 6), so (c) is one cycle of the probed plant at
+#       the frozen climb cell's inputs (epa_coefficients.cyc at the climb point's rpm, MAP, intake, coolant, spark
+#       and lambda: range_cycles), its torque, gas, flow and fuel each finite, a cycle that raises counted
+#       non-finite with its exception --
+# is reported "worth R1 beyond the constant's range" with the test or tests it fails, probed at the contract's
+# +-10 % fallback ("Where neither is computable, it is +-10 %"; +-10 crank degrees for IVC and EVO), and counted as
+# excluded for the level rows, as decision 85 treats a probe not visible at R1 (validate_epa reads it as it reads
+# decision 85's). Its change worth R1 is kept and reported beside the reason. No range is typed per constant.
+# Brackets are not probes and are not judged by it, nor is a fallback. The contract's own fallback, as decision 85
+# is: contract version 5 does not change. Measured on the frozen Mazda of Run 1's second pass (read-only;
+# docs/build_step_2/RUN1_DIAGNOSTICS.md): ce_rich_slope +-2331.6 on 0.435 (outside (0, 1.5), across zero; its
+# response is real, 4.1-4.8e-3 K per unit, but +R1 moves the housing -916.5 K, not 10 K); seven more cross zero
+# (conrod, t_head_k, port_pickup_k, burn_res, delay_res, fres_a, fres_b); conrod's minus side gives V < 0 at every
+# crank step and NaN torque and EGT, which validate_epa's row 9 would have run on the held-out rows.
+RANGE_TESTS = ("bounds", "sign", "finite")
+RANGE_CYCLE_CHANNELS = ("torque", "egt", "mdot", "fuel")
+BEYOND_RANGE_AT_R1 = ("worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), "
+                      "so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 "
+                      "reported beside it; counted as excluded for this row's level rows, with this reason")
+RANGE_RULE = ("decision 88: a worth-R1 probe (rows 5, 6, 9) fails (a) bounds when v0 +- size leaves epa_fit.BOUNDS "
+              "where the constant has an entry, (b) sign when v0 +- size is of the other sign than v0 or zero, (c) finite "
+              "when the probed plant's cycle at the frozen climb cell's inputs (epa_coefficients.cyc) is not finite in "
+              "torque, gas, flow and fuel on either side (the completion runs no climb at the probe size); any failure "
+              "takes the +-10 % fallback, counted excluded for the level rows")
+
+
+def _probed(plant, record, field, value):
+    """The plant with one E6 probe applied, as the completion's probe climbs build it (the rich slope through its
+    retag, epa_fit.with_rich_slope_probe; any other constant through epa_fit.perturbed)."""
+    if field == "ce_rich_slope":
+        return epa_fit.with_rich_slope_probe(plant, slope=value)
+    return epa_fit.perturbed(plant, record=record, field=field, value=value)
+
+
+def range_cycles(plant, point, sizes):
+    """Decision 88's test (c), measured: for every worth-R1 probe of `sizes` (probe_sizes' records, method "probe")
+    and each side, one cycle of the probed plant at the climb cell's inputs `point` (the frozen climb point: rpm,
+    map, iat, ect, spark, lam), {(field, +1 or -1): {"value", "torque", "egt", "mdot", "fuel", "ki", "finite",
+    "error"}}, finite when every RANGE_CYCLE_CHANNELS value is. A cycle that raises (ValueError or an arithmetic
+    error, the probed plant refused or its cycle undefined) is not finite, its exception recorded. Runs in the
+    calling process, quietly (a non-finite cycle's floating-point warnings are its result, not output)."""
+    import warnings
+    out = {}
+    for field, rec in sizes.items():
+        if rec["method"] != "probe":
+            continue
+        for sg, side in ((1, "+"), (-1, "-")):
+            v = float(rec["values"][side])
+            try:
+                with warnings.catch_warnings(), np.errstate(all="ignore"):
+                    warnings.simplefilter("ignore", RuntimeWarning)
+                    c = epa_coefficients.cyc(_probed(plant, rec["record"], field, v), point["rpm"], point["map"],
+                                             point["iat"], point["ect"], point["spark"], point["lam"])
+                c = {k: float(c[k]) for k in RANGE_CYCLE_CHANNELS + ("ki",)}
+                ok = all(math.isfinite(c[k]) for k in RANGE_CYCLE_CHANNELS)
+                out[(field, sg)] = dict(c, value=v, finite=ok, error=None)
+            except (ValueError, ArithmeticError) as e:
+                out[(field, sg)] = {"value": v, **{k: None for k in RANGE_CYCLE_CHANNELS + ("ki",)}, "finite": False,
+                                    "error": f"{type(e).__name__}: {e}"}
+    return out
+
+
+def range_tests(field, val, size, *, bounds, cycles):
+    """Decision 88's three tests (RANGE_RULE) of the worth-R1 probe v0 +- size of `field`: {"bounds", "sign",
+    "finite"}, each with its numbers and "fails". `bounds` is epa_fit.BOUNDS; `cycles` range_cycles' record, whose
+    two entries for the field must be the cycles at exactly v0 + size and v0 - size (a coding defect otherwise:
+    mistake 25, the probe the test read must be the probe judged)."""
+    plus, minus = val + size, val - size
+    b = bounds.get(field)
+    lo, hi = (None, None) if b is None else (float(b[0]), float(b[1]))
+    out_b = None if b is None else [v for v in (plus, minus) if not lo <= v <= hi]
+    flip = [v for v in (plus, minus) if v == 0.0 or (v > 0.0) != (val > 0.0)]
+    c = {}
+    for sg, v in ((1, plus), (-1, minus)):
+        got = (cycles or {}).get((field, sg))
+        if got is None or got.get("value") is None or epa_fit._bits(float(got["value"])) != epa_fit._bits(v):
+            raise CompletionDefect(f"decision 88: no cycle of {field} at {v!r} (test (c) must read the probe it judges)")
+        c["+" if sg == 1 else "-"] = got
+    return {"bounds": {"entry": None if b is None else [lo, hi], "plus": plus, "minus": minus,
+                       "outside": out_b, "fails": bool(out_b)},
+            "sign": {"value": val, "plus": plus, "minus": minus, "fails": bool(flip)},
+            "finite": {"source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+                       "cycles": c, "fails": not (c["+"]["finite"] and c["-"]["finite"])}}
 
 
 def numerical_noise_k(hs, resolution):
@@ -2179,7 +2289,7 @@ def numerical_noise_k(hs, resolution):
 
 
 def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, brackets, v0, sigmas,
-                noise_k=None):
+                noise_k=None, bounds=None, probe_cycles=None):
     """E6 probe sizes (PLAN.md 5.9 item 6; the contract's E6, "the visibility probe is sized by its
     consequence"): for each (record, field) of `fields`, the housing equivalent of moving it by +-rel
     (epa_coefficients.housing_equivalent at the frozen climb cell, the engine's own f and G term `hs`, from
@@ -2206,7 +2316,15 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
     off, the visibility then None), a constant without a bracket whose antisymmetric response |h(+) - h(-)| / 2
     is at or below noise_k takes the fallback size, visible_at_r1 False, not_visible_at_r1 NOT_VISIBLE_AT_R1
     with its numbers, worth_r1 None with that reason, and counted_excluded True, which validate_epa reads to
-    count the constant excluded for its row's level rows. Returns {field: record}."""
+    count the constant excluded for its row's level rows.
+
+    BEYOND THE CONSTANT'S RANGE (decision 88, the note above): with `bounds` (epa_fit.BOUNDS; None keeps the rule
+    off, within_range_at_r1 then None) and `probe_cycles` (range_cycles' record at the worth-R1 sizes, which the
+    caller measures from a first pass without `bounds`), a worth-R1 probe that fails any of range_tests' three
+    takes the fallback size, within_range_at_r1 False, beyond_range_at_r1 BEYOND_RANGE_AT_R1 with the tests failed
+    and their numbers, its worth_r1 kept and worth_r1_why that reason, range_tests and range_tests_failed recorded,
+    and counted_excluded True with that reason, as decision 85's. A bracket, a fallback and decision 85's not
+    visible are not judged by it (within_range_at_r1 None). Returns {field: record}."""
     out = {}
     for record, field in fields:
         val = float(v0[field])
@@ -2239,6 +2357,16 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
             size, method = worth, "probe"
         else:
             size, method = (else_cad if field in ANGLES else else_rel * abs(val)), "fallback"
+        # decision 88: a worth-R1 probe beyond the constant's range takes the fallback, counted excluded
+        tests, failed, beyond = None, None, None
+        if method == "probe" and bounds is not None:
+            tests = range_tests(field, val, float(size), bounds=bounds, cycles=probe_cycles)
+            failed = [k for k in RANGE_TESTS if tests[k]["fails"]]
+            if failed:
+                beyond = (f"{BEYOND_RANGE_AT_R1} (fails {', '.join(failed)}: the probe {val!r} +- {float(size):.6g}; "
+                          f"BOUNDS {tests['bounds']['entry']}; the cycles' torque {tests['finite']['cycles']['+']['torque']}"
+                          f" / {tests['finite']['cycles']['-']['torque']} N m)")
+                size, method = (else_cad if field in ANGLES else else_rel * abs(val)), "fallback"
         finite = math.isfinite(slope)
         if method == "bracket":
             # defect D-2: the band judged at its two edges, the linear housing change at each
@@ -2271,8 +2399,10 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
                       "load_bearing": None if hc is None else bool(hc > r1_k), "load_bearing_why": why,
                       "response_k": response, "numerical_noise_k": None if noise_k is None else float(noise_k),
                       "visible_at_r1": visible, "not_visible_at_r1": hidden,
-                      "worth_r1_why": hidden, "counted_excluded": hidden is not None,
-                      "counted_excluded_why": hidden}
+                      "within_range_at_r1": None if tests is None else not failed, "beyond_range_at_r1": beyond,
+                      "range_tests": tests, "range_tests_failed": failed,
+                      "worth_r1_why": hidden or beyond, "counted_excluded": hidden is not None or beyond is not None,
+                      "counted_excluded_why": hidden or beyond}
     return out
 
 
@@ -2477,9 +2607,13 @@ def complete(name, *, source, jobs):
         raise CompletionDefect("the climb cell's resolution was not measured on the climb the coefficients read "
                                "(decision 85)")
     noise = numerical_noise_k(hs, cell_res)
-    sizes = probe_sizes(base_cell, hs, cells, r1_k=r1, rel=rel, else_rel=bands["else_rel"],
-                        else_cad=bands["else_cad"], fields=probe_fields, brackets=brackets, v0=v0, sigmas=sigmas,
-                        noise_k=noise)
+    size_kw = dict(r1_k=r1, rel=rel, else_rel=bands["else_rel"], else_cad=bands["else_cad"], fields=probe_fields,
+                   brackets=brackets, v0=v0, sigmas=sigmas, noise_k=noise)
+    # decision 88: the worth-R1 sizes first, then one cycle of each probed plant at them at the frozen climb cell's
+    # inputs (test (c); the completion runs no climb at the probe size), then the sizes with the range tests
+    first = probe_sizes(base_cell, hs, cells, **size_kw)
+    probe_cycles = range_cycles(pf, base_cell, first)
+    sizes = probe_sizes(base_cell, hs, cells, bounds=epa_fit.BOUNDS, probe_cycles=probe_cycles, **size_kw)
     e6_probes = {
         "d_rows": f"+-{bands['d_probe_rel'] * 100:g} % (d needs agents; the contract's E6, decision 59)",
         "d_probe_rel": bands["d_probe_rel"], "probe_rel": rel, "r1_housing_k": r1,
@@ -2488,6 +2622,10 @@ def complete(name, *, source, jobs):
                             "mdot_resolution_gps": cell_res["mdot_resolution_gps"], "samples": cell_res["samples"],
                             "rule": NOISE_RULE},
         "not_visible_at_r1": sorted(f for f, v in sizes.items() if v["visible_at_r1"] is False),
+        # decision 88: the worth-R1 probes beyond their constant's range, the rule and the cycles' inputs
+        "beyond_range_at_r1": sorted(f for f, v in sizes.items() if v["within_range_at_r1"] is False),
+        "range_rule": RANGE_RULE,
+        "range_cycle_inputs": {k: base_cell[k] for k in ("rpm", "map", "iat", "ect", "spark", "lam")},
         "row5": {"sigma": sig5, "probe": {f: sizes[f]["size"] for _r, f in ROW5_FIELDS},
                  "housing_change_k": {f: sizes[f]["housing_change_k"] for _r, f in ROW5_FIELDS},
                  "detail": {f: sizes[f] for _r, f in ROW5_FIELDS}},

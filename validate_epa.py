@@ -1962,17 +1962,37 @@ def row9_probe_values(spec, v0):
 def not_visible_at_r1(spec):
     """Decision 85 (29 October 2026): the reason a completion's probe record (complete.json's e6_probes) gives for a
     constant that is not visible at R1, counted as excluded for its row's level rows, or None (a record written
-    before decision 85 carries no such key, and is judged as before)."""
-    if (spec or {}).get("counted_excluded"):
-        return str(spec.get("counted_excluded_why") or spec.get("not_visible_at_r1") or "not visible at R1")
+    before decision 85 carries no such key, and is judged as before; a constant counted excluded by decision 88
+    instead is beyond_range_at_r1's)."""
+    s = spec or {}
+    if s.get("counted_excluded") and not s.get("beyond_range_at_r1"):
+        return str(s.get("counted_excluded_why") or s.get("not_visible_at_r1") or "not visible at R1")
     return None
+
+
+def beyond_range_at_r1(spec):
+    """Decision 88 (29 October 2026): the reason a completion's probe record gives for a worth-R1 probe beyond its
+    constant's range (calibrate_epa.range_tests: outside epa_fit.BOUNDS, across zero, or a non-finite cycle), probed
+    at the +-10 % fallback and counted as excluded for its row's level rows, or None (a record written before
+    decision 88 carries no such key)."""
+    s = spec or {}
+    if s.get("counted_excluded") and s.get("beyond_range_at_r1"):
+        return str(s["beyond_range_at_r1"])
+    return None
+
+
+def counted_excluded(spec):
+    """Why a constant's level rows count it excluded rather than judge its probe: decision 85's not visible at R1 or
+    decision 88's beyond the constant's range, read alike (level_exclusion's `hidden`), or None."""
+    return not_visible_at_r1(spec) or beyond_range_at_r1(spec)
 
 
 def level_exclusion(results, runs, rows, *, hidden):
     """{row: bool or None} for the level rows `rows` of one E6 row: excluded for it when its statistic moves by less
     than its own u_val under every probe of every constant (_excluded), a constant in `hidden` (decision 85: not
-    visible at R1) counted as excluded rather than judged by its probe; with every constant hidden, every row with
-    a statistic and a u is excluded. `runs` is {constant: [results under each sign of its probe]}."""
+    visible at R1; decision 88: worth R1 beyond its range; counted_excluded) counted as excluded rather than judged
+    by its probe; with every constant hidden, every row with a statistic and a u is excluded. `runs` is {constant:
+    [results under each sign of its probe]}."""
     judged = [v for c, vs in runs.items() if c not in hidden for v in vs]
     if judged:
         return _excluded(results, judged, rows)
@@ -2120,8 +2140,9 @@ def e6_rows(st):
       row 4            completion's record, the roads' ceiling flag left to the roads step;
       rows 5, 6        +-sigma, +-the probe and +-the d rows' probe of each constant; exclusion judged under
                        the probe (level rows) and the d probe (d rows), both signs; a constant the completion
-                       found not visible at R1 counted as excluded for the level rows, with its reason
-                       (decision 85; level_exclusion), here and in row 9;
+                       found not visible at R1, or whose worth-R1 probe lies beyond its range, counted as
+                       excluded for the level rows, with its reason (decisions 85 and 88; counted_excluded,
+                       level_exclusion), here and in row 9;
       row 8            u_num;
       row 9            each constant as completion sized it, a bracket at its two edges (defect D-2;
                        row9_probe_values), the rich slope after its retag identity (HANDOFFS.md WP3 item 3);
@@ -2177,9 +2198,13 @@ def e6_rows(st):
                         for tag, d in (("sigma", sig[fld]), ("probe", prb[fld]), ("d_probe", d_probe_rel * abs(v0)))
                         if d is not None}
         # decision 85: a constant the completion found not visible at R1 is counted as excluded for the level rows,
-        # with its reason, its +-10 % probe still run and reported; the d rows are judged under the d probe as before
-        hidden = {f: not_visible_at_r1((probes[key].get("detail") or {}).get(f)) for f in fields}
+        # with its reason, its +-10 % probe still run and reported; the d rows are judged under the d probe as before;
+        # decision 88: a worth-R1 probe beyond its constant's range is read the same way (counted_excluded)
+        detail = probes[key].get("detail") or {}
+        hidden = {f: counted_excluded(detail.get(f)) for f in fields}
         hidden = {f: why for f, why in hidden.items() if why is not None}
+        nv = {f: not_visible_at_r1(detail.get(f)) for f in fields}
+        br = {f: beyond_range_at_r1(detail.get(f)) for f in fields}
         ex = {}
         ex.update(level_exclusion(results, {f: [per[f]["probe"][s] for s in "+-"] for f in fields}, level,
                                   hidden=hidden))
@@ -2193,7 +2218,8 @@ def e6_rows(st):
             "sigma": {f: sig[f] for f in fields}, "probe": {f: prb[f] for f in fields},
             "must_move": list(must), "must_move_moved": moves["by_row"], "findings": moves["findings"],
             "descriptive_must_move": moves["descriptive"], "excluded_for": ex, "exclusion_reading": E6_EXCLUSION_READING,
-            "not_visible_at_r1": hidden}
+            "not_visible_at_r1": {f: w for f, w in nv.items() if w is not None},
+            "beyond_range_at_r1": {f: w for f, w in br.items() if w is not None}}
     e6["8"] = {"u_num": {r: (None if results[r].u is None else results[r].u.u_num) for r in gating}}
     e6["9"], excl[9] = {}, {}
     row9 = probes.get("row9") or {}
@@ -2225,8 +2251,9 @@ def e6_rows(st):
         sigma = spec.get("sigma")
         sgm = ({s: st.at(moved(v0 + sg * float(sigma)), conventions=nominal_conv, shift=None) for s, sg in signs}
                if sigma is not None else None)
-        # decision 85: not visible at R1 is counted as excluded for the level rows, with its reason
-        hidden = not_visible_at_r1(spec)
+        # decision 85: not visible at R1 is counted as excluded for the level rows, with its reason; decision 88: so is a
+        # worth-R1 probe beyond its constant's range, probed at the +-10 % fallback (counted_excluded)
+        hidden = counted_excluded(spec)
         ex = {}
         ex.update(level_exclusion(results, {const: list(lvl.values())}, level,
                                   hidden={const: hidden} if hidden is not None else {}))
@@ -2247,7 +2274,8 @@ def e6_rows(st):
                           "housing_change_k": spec.get("housing_change_k"),
                           "probe_housing_change_k": spec.get("probe_housing_change_k"),
                           "load_bearing": spec.get("load_bearing"), "load_bearing_why": spec.get("load_bearing_why"),
-                          "not_visible_at_r1": hidden}
+                          "not_visible_at_r1": not_visible_at_r1(spec), "beyond_range_at_r1": beyond_range_at_r1(spec),
+                          "range_tests_failed": spec.get("range_tests_failed")}
     e6["11"] = {}
     for tag, sg in (("plus", 1.0), ("minus", -1.0)):
         v = st.at(frozen, conventions=nominal_conv, shift=epa_stats.InputShift("imt", sg * st.imt_k))

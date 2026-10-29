@@ -2868,7 +2868,10 @@ def t0_truths(name, *, view, yield_):
     and an enrichment whose gate lies between the calibration steady rows and the
     Final rows (amendment D2's T0 case), placed from the rows' MAPs (inputs: T0 runs
     at the calibration rows' inputs, amendment A1). `yield_` is an addition to the
-    interface's signature: the gate's case needs the rows' MAPs."""
+    interface's signature: the gate's case needs the rows' MAPs. An engine with an entry in
+    T0_SEED_REPLACEMENTS (decision 87: the Ford) gets one truth more after these four,
+    seed 5, the replaced seed's truth again (form A), labelled with the decision; every
+    other engine's four are as before."""
     rows = cal_rows(yield_)
     b = _b58_cycle()
     sp_b58 = engines.read_spec("b58")["ecu"]
@@ -2893,12 +2896,22 @@ def t0_truths(name, *, view, yield_):
     a = {"cycle": cyc, "ecu": ecu, "boost_ceiling": boost}
     bb = _deep(a)
     bb["cycle"].update(form="A+B", ve_map=2e-3)
-    return (Truth(engine=name, seed=1, label="form A", values=_deep(a), expected_form="A", out_of_form=None),
-            Truth(engine=name, seed=2, label="form A", values=_deep(a), expected_form="A", out_of_form=None),
-            Truth(engine=name, seed=3, label="form A+B: ve_map 2e-3 per kPa", values=bb, expected_form="A+B",
-                  out_of_form=None),
-            Truth(engine=name, seed=4, label="outside every form", values=_deep(a), expected_form=None,
-                  out_of_form={"tit_k_per_100kpa_above_100": T0_OUT_OF_FORM_K_PER_100KPA}))
+    truths = (Truth(engine=name, seed=1, label="form A", values=_deep(a), expected_form="A", out_of_form=None),
+              Truth(engine=name, seed=2, label="form A", values=_deep(a), expected_form="A", out_of_form=None),
+              Truth(engine=name, seed=3, label="form A+B: ve_map 2e-3 per kPa", values=bb, expected_form="A+B",
+                    out_of_form=None),
+              Truth(engine=name, seed=4, label="outside every form", values=_deep(a), expected_form=None,
+                    out_of_form={"tit_k_per_100kpa_above_100": T0_OUT_OF_FORM_K_PER_100KPA}))
+    if tuple(t.seed for t in truths) != T0_SEEDS:
+        raise FitDefect(f"T0's truths are seeds {[t.seed for t in truths]}, not T0_SEEDS {T0_SEEDS}")
+    rep = T0_SEED_REPLACEMENTS.get(name)
+    if rep is None:
+        return truths
+    # decision 87: T0_STREAM's next seed, with the replaced seed's truth, declared in T0_SEED_REPLACEMENTS
+    old = next(t for t in truths if t.seed == rep["replaced_seed"])
+    return truths + (Truth(engine=name, seed=rep["seed"],
+                           label=f"{old.label} (decision {rep['decision']}: replaces seed {rep['replaced_seed']})",
+                           values=_deep(old.values), expected_form=old.expected_form, out_of_form=old.out_of_form),)
 
 
 def t0_rows(yield_, *, truth, seed, view, dtheta, jobs):
@@ -3013,10 +3026,45 @@ T0_STOP_Z = float(norm.ppf(0.995))
 # noise stream and seeds are fixed (T0_STREAM, seeds 1-4) and are never changed after a result, which would be
 # seed shopping. Such a failure stops Run 1 for the engine; the team decides what follows and records it in
 # the engine's defects.json, and any further seeds are T0_STREAM's next ones in order (5, 6, ...), named here
-# before any T0 has run.
+# before any T0 has run. The team has decided once under this rule (the string below is unchanged, so that every
+# engine's t0.json body is): DECISION 87 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H) rules
+# the Ford's seed-1 failure of Run 1's second pass (chi-square 42.40 on 13, above its 99 % band 3.57-29.82) SAMPLING,
+# recorded in the Ford's defects.json, on read-only diagnostics (docs/build_step_2/RUN1_DIAGNOSTICS.md): S2 converged
+# at an interior minimum (status xtol, gradient 2.4e-7, no bound active); the truth lies 4.36 linearised sd along
+# S2's weak direction (ve_base, ve_amp, ve_width; corr(base, amp) -0.9965); S2's own objective is 15.60 s^2 worse at
+# the truth (beyond chi2(4)'s 99.5 % point 14.86), the likelihood-ratio total 26.88 against the Wald 42.40; over 400
+# diagnostic S2 draws (rng [0x7D, k], not T0 seeds) the S2 Wald exceeds chi2(4)'s 0.99 and 0.995 points 4 and 1
+# times against 4 and 2 expected; 7 full diagnostic fits all lie inside the band (largest 18.9). T0_STREAM's next
+# seed, 5, with seed 1's form-A truth, takes seed 1's place in the verdict, DECLARED HERE BEFORE IT RUNS
+# (T0_SEED_REPLACEMENTS): the Ford's T0 passes only if seed 5 passes as an in-form seed (its ladder chooses A and its
+# chi-square lies inside its 99 % band) and seeds 2-4 and the four cases pass as before; if seed 5 fails, the Ford
+# stops at T0 for good and is reported as failing T0. Seed 1 still runs; its failure stays in t0.json, marked
+# replaced under decision 87, and is reported. No other seed for any engine. Judging T0 by the likelihood ratio was
+# rejected (the statistic changed after the result), as was stopping the Ford (the diagnostics trace it to sampling).
 T0_ON_SAMPLING_FAILURE = ("a T0 failure traced to sampling rather than a defect stops Run 1 for the engine: the seeds "
                           "and the stream are never changed after a result; the team decides, recorded in defects.json, "
                           "and any further seeds are T0_STREAM's next ones in order (5, 6, ...)")
+# T0's seeds before any replacement (t0_truths): two form-A truths, the form-A+B truth, the out-of-form truth.
+T0_SEEDS = (1, 2, 3, 4)
+# DECISION 87's seed, declared in code before it runs: {engine: {"decision", "replaced_seed", "seed", "rule"}}. An
+# engine without an entry runs T0_SEEDS alone, its t0.json as before; the Ford runs T0_SEEDS and seed 5, and seed 5
+# takes seed 1's place in the verdict (t0_judge). The checks below refuse any other entry: one per engine, the
+# replacement T0_STREAM's next seed after T0_SEEDS, the replaced seed a form-A in-form seed (1 or 2).
+T0_SEED_REPLACEMENTS = {
+    "ford_27tt": {"decision": 87, "replaced_seed": 1, "seed": 5,
+                  "rule": ("decision 87 (29 October 2026): the Ford's seed-1 failure ruled sampling "
+                           "(T0_ON_SAMPLING_FAILURE, recorded in its defects.json); T0_STREAM's next seed, 5, with seed "
+                           "1's form-A truth, takes seed 1's place in the verdict: T0 passes only if seed 5 passes as an "
+                           "in-form seed (its ladder chooses A and its chi-square lies inside its 99 %) and seeds 2-4 and "
+                           "the four cases pass as before; if seed 5 fails, the engine stops at T0 for good and is "
+                           "reported as failing T0. Seed 1 still runs and is reported, marked replaced. No other seed "
+                           "for any engine")},
+}
+for _eng, _rep in T0_SEED_REPLACEMENTS.items():
+    if (set(_rep) != {"decision", "replaced_seed", "seed", "rule"} or _rep["seed"] != max(T0_SEEDS) + 1
+            or _rep["replaced_seed"] not in (1, 2) or _rep["decision"] != 87):
+        raise RuntimeError(f"epa_fit.T0_SEED_REPLACEMENTS[{_eng!r}] is not decision 87's replacement: {_rep!r}")
+del _eng, _rep
 # D1's T0 case (WP3's fix): the lines without holds' rows moved -- MAP up by T0_D1_MAP_MOVE_KPA and the meter
 # doubled -- must leave the envelope bit for bit; moved, not deleted, since a deletion would move decision
 # 53's median cell pressure, a property of every calibration row, and with it every point's corrected flow.
@@ -3046,17 +3094,78 @@ T0_CASES = ("d1_envelope", "d2_gate", "d3_spark_min", "s1_law")
 # -- the Honda's seed 1 of the first pass among them (t0_truths places the truth between the highest steady MAP
 # below the lowest Final MAP and that Final MAP, which the first pass put in (123.43, 124.86) kPa, below seed 1's
 # interval [125, 125]); a wording that reaches down to that steady MAP is the team's to choose.
+#
+# DECISION 86 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H) is that wording, a third reading
+# beside the two above, which are kept: the case passes under any of the three. It ALSO passes when the truth's gate
+# and the nearest gate of the fitted flat interval (lo when the truth lies below the interval, hi when above) are
+# indistinguishable at T0's noise: under the truth's ECU at every T0 row's inputs (one step at S3B_DWELL_S, as
+# t0_rows commands each row), with the truth's gate moved to that nearest gate, the commanded lambda changes by
+# dlam_i, and sum_i (dlam_i / T0_NOISE["lam"])^2 < 1, summed over every T0 row, with or without a published lambda
+# (the stricter reading: a row without lambda counts too). The spark command must not change at any row (the gate
+# moves the lambda schedule alone): a spark that changes is a coding defect (FitDefect), never a pass. The detail
+# records the sum, the rows whose commanded lambda changes and the largest change. Written after the Honda's seed 1
+# failed twice (the second T0 ran before the team chose a wording, against decision 84's own note above, disclosed
+# in decision 86's row), on the measurement that the lowest calibration Final row (124.677 kPa, 1500.74 rpm, 0.74 rpm
+# above the truth's ramp start of 1500 rpm) is enriched by 3.18e-5 in lambda, 0.0064 of the noise sd (sum 4.05e-5),
+# and that no other row or channel changes between gates 123.43 and 125 kPa (docs/build_step_2/RUN1_DIAGNOSTICS.md):
+# the data place the gate only between the 122.18 kPa and 125.58 kPa rows. Disclosed as written after the failure.
+# For all three engines; a test of the code, so contract version 5 does not change.
 D2_GATE_RULE = ("decision 84: the truth's gate within the fitted flat interval widened to the MAPs of the "
                 "neighbouring calibration Final rows (the highest at or below the interval, the lowest above it), "
-                "or within the gate grid's step of the interval (amendment D2)")
+                "or within the gate grid's step of the interval (amendment D2); or, decision 86, the truth's gate "
+                "and the interval's nearest gate indistinguishable at T0's noise: under the truth's ECU at every T0 "
+                "row's inputs, the gate moved to the nearest gate, sum of (dlam / T0_NOISE lam)^2 over every T0 row "
+                "below 1, the spark command unchanged")
 
 
-def d2_gate_case(flat_gates_kpa, truth_gate_kpa, final_maps_kpa, *, fitted_gate_kpa, step_kpa):
-    """T0's d2_gate case (amendment D2, decision 84 above): {"ok", "detail"}. `flat_gates_kpa` is S3b's flat
+def d2_indistinguishable(truth_ecu, rows, *, truth_gate_kpa, nearest_gate_kpa):
+    """Decision 86's reading of T0's d2_gate case (the note above): the commanded lambda under the truth's ECU
+    record `truth_ecu` at every row of `rows` (the seed's T0 rows: speed_rpm, map_kpa, imt_k, ect_k; one
+    BaselineECU step at S3B_DWELL_S from a fresh ECU, as t0_rows commands each row), against the same with its gate
+    moved to `nearest_gate_kpa`. {"indistinguishable", "nearest_gate_kpa", "sum_sq_over_noise", "rows", "noise_lam",
+    "lam_changed_rows" [{table, source_row, map_kpa, speed_rpm, dlam}], "max_abs_dlam", "spark_unchanged"}:
+    indistinguishable when the sum over every row of (dlam / T0_NOISE["lam"])^2 is below 1. A row whose spark
+    command moves with the gate is a coding defect (FitDefect): the gate is a lambda schedule's."""
+    if float(truth_ecu.enr_load) != float(truth_gate_kpa):
+        raise FitDefect(f"decision 86: the truth's ECU gates at {truth_ecu.enr_load!r}, not at the truth's gate "
+                        f"{truth_gate_kpa!r}")
+    rows = tuple(rows)
+    if not rows:                     # a sum over no row is 0 and would pass anything: every T0 row is summed
+        raise FitDefect("decision 86: no T0 row to sum over")
+    moved = replace(truth_ecu, enr_load=float(nearest_gate_kpa))
+    sigma = float(T0_NOISE["lam"])
+    terms, changed, sparks = [], [], []
+    for r in rows:
+        sp0, lam0, _f0 = engine_env.BaselineECU(truth_ecu).step(r.speed_rpm, r.map_kpa, r.imt_k, r.ect_k, False,
+                                                                 S3B_DWELL_S)
+        sp1, lam1, _f1 = engine_env.BaselineECU(moved).step(r.speed_rpm, r.map_kpa, r.imt_k, r.ect_k, False,
+                                                            S3B_DWELL_S)
+        if _bits(sp1) != _bits(sp0):
+            sparks.append([r.table, int(r.source_row)])
+        dl = float(lam1) - float(lam0)
+        terms.append((dl / sigma) ** 2)
+        if dl != 0.0:
+            changed.append({"table": r.table, "source_row": int(r.source_row), "map_kpa": float(r.map_kpa),
+                            "speed_rpm": float(r.speed_rpm), "dlam": dl})
+    if sparks:
+        raise FitDefect(f"decision 86: moving the truth's gate from {truth_gate_kpa!r} to {nearest_gate_kpa!r} kPa "
+                        f"moved the spark command at {len(sparks)} T0 row(s), first {sparks[0]}: the gate is the "
+                        "lambda schedule's alone")
+    total = math.fsum(terms)
+    return {"indistinguishable": bool(total < 1.0), "nearest_gate_kpa": float(nearest_gate_kpa),
+            "sum_sq_over_noise": total, "rows": len(terms), "noise_lam": sigma, "lam_changed_rows": changed,
+            "max_abs_dlam": max((abs(c["dlam"]) for c in changed), default=0.0), "spark_unchanged": True}
+
+
+def d2_gate_case(flat_gates_kpa, truth_gate_kpa, final_maps_kpa, *, fitted_gate_kpa, step_kpa, truth_ecu, rows):
+    """T0's d2_gate case (amendment D2, decisions 84 and 86 above): {"ok", "detail"}. `flat_gates_kpa` is S3b's flat
     interval [lo, hi] on its grid, `final_maps_kpa` the MAPs of the calibration Final rows (the seed's T0 rows,
-    which keep the calibration rows' MAPs), `step_kpa` the grid's step. ok when lo - step < truth <= hi + step (the
-    grid's resolution, as before) or when below <= truth <= above, below the highest Final MAP at or below lo
-    (lo itself when none) and above the lowest Final MAP above hi (hi itself when none)."""
+    which keep the calibration rows' MAPs), `step_kpa` the grid's step, `truth_ecu` the truth's ECU record and `rows`
+    the seed's T0 rows (every one, decision 86). ok under any of three readings: lo - step < truth <= hi + step (the
+    grid's resolution, as before); below <= truth <= above, below the highest Final MAP at or below lo (lo itself
+    when none) and above the lowest Final MAP above hi (hi itself when none; decision 84); or, when the truth lies
+    outside [lo, hi], the truth's gate and the interval's nearest gate (lo below, hi above) indistinguishable at
+    T0's noise (decision 86, d2_indistinguishable; None, with its reason, when the truth lies on the interval)."""
     lo, hi = (float(x) for x in flat_gates_kpa)
     g, step = float(truth_gate_kpa), float(step_kpa)
     maps = sorted(float(m) for m in final_maps_kpa)
@@ -3066,13 +3175,23 @@ def d2_gate_case(flat_gates_kpa, truth_gate_kpa, final_maps_kpa, *, fitted_gate_
     w_hi = above[0] if above else hi
     in_grid = bool(lo - step < g <= hi + step)
     in_gap = bool(w_lo <= g <= w_hi)
-    return {"ok": bool(in_grid or in_gap),
+    # decision 86: the interval's nearest gate to the truth, and whether the two are indistinguishable at T0's noise
+    nearest = lo if g < lo else (hi if g > hi else None)
+    if nearest is None:
+        ind = {"indistinguishable": None, "nearest_gate_kpa": None, "sum_sq_over_noise": None, "rows": None,
+               "noise_lam": float(T0_NOISE["lam"]), "lam_changed_rows": [], "max_abs_dlam": None,
+               "spark_unchanged": None, "why": "the truth's gate lies on the fitted flat interval"}
+    else:
+        ind = d2_indistinguishable(truth_ecu, rows, truth_gate_kpa=g, nearest_gate_kpa=nearest)
+    return {"ok": bool(in_grid or in_gap or ind["indistinguishable"] is True),
             "detail": {"truth_gate_kpa": g, "fitted_gate_kpa": fitted_gate_kpa, "flat_gates_kpa": [lo, hi],
                        "widened_kpa": [w_lo, w_hi],
                        "neighbour_final_map_kpa": {"below": below[-1] if below else None,
                                                    "above": above[0] if above else None},
                        "within_grid_step": in_grid, "within_final_gap": in_gap, "final_rows": len(maps),
-                       "rule": D2_GATE_RULE}}
+                       "rule": D2_GATE_RULE,
+                       "indistinguishable_at_t0_noise": ind["indistinguishable"],
+                       "decision_86": ind}}
 
 
 def t0_cases(name, fit, truth, *, rows, view):
@@ -3086,7 +3205,9 @@ def t0_cases(name, fit, truth, *, rows, view):
                     it was fitted to;
       d2_gate       the truth's gate lies on the fitted gate's flat interval, to the grid's 1 kPa, or, since
                     decision 84 (29 October 2026), within that interval widened to the MAPs of the
-                    neighbouring calibration Final rows (d2_gate_case);
+                    neighbouring calibration Final rows, or, since decision 86 (29 October 2026), the truth's
+                    gate and the interval's nearest gate are indistinguishable at T0's noise under the truth's
+                    ECU at every T0 row (d2_gate_case, d2_indistinguishable);
       d3_spark_min  BaselineECU.step of the fitted ECU at every T0 row S3a used returns base + comp - cold
                     unclipped, re-run here independently of S3a's own assertion;
       s1_law        the fitted back-pressure law equals the noise-free truth's at every row S1 used, to the
@@ -3116,10 +3237,13 @@ def t0_cases(name, fit, truth, *, rows, view):
           "detail": {"lines_without_holds": sorted(no), "point_lines": [p["line"] for p in c["points"]],
                      "envelope_unmoved_by_the_lines_without_holds": same, "ceiling_at_points_max_rel": worst}}
     b = fit.stages["S3b"].report
-    # decision 84: widened to the MAPs of the neighbouring calibration Final rows (d2_gate_case)
+    # decision 84: widened to the MAPs of the neighbouring calibration Final rows; decision 86: or the truth's gate and
+    # the interval's nearest gate indistinguishable at T0's noise under the truth's ECU at every T0 row (d2_gate_case)
+    tcand = candidate(name, truth.values)
     d2 = d2_gate_case(b["flat_gates_kpa"], truth.values["ecu"]["enr_load"],
                       [r.map_kpa for r in cal_rows(rows) if _final(r)],
-                      fitted_gate_kpa=fit.values["ecu"]["enr_load"], step_kpa=S3B_GATE_STEP_KPA)
+                      fitted_gate_kpa=fit.values["ecu"]["enr_load"], step_kpa=S3B_GATE_STEP_KPA,
+                      truth_ecu=tcand.engine.ecu, rows=cal_rows(rows))
     ecu_cal = cand.engine.ecu
     used = [r for r in cal_rows(rows) if r.pops.fired and _no_sentinel(r) and _finite(r.spark_btdc)]
     clipped = 0
@@ -3137,8 +3261,7 @@ def t0_cases(name, fit, truth, *, rows, view):
     # S1's recovery (WP3's fix of 23 October 2026, on the fit review's finding that T0 judged S2 and S4
     # alone): T0's turbine-inlet pressure carries no noise, so the fitted law equals the truth's at every T0
     # row S1 used to within the hinge grid's resolution, T0_S1_GRID_STEPS steps of S1_GRID_KPA times the
-    # fitted ratio (a hinge one step off moves the law by at most that)
-    tcand = candidate(name, truth.values)
+    # fitted ratio (a hinge one step off moves the law by at most that); tcand is the truth's candidate, above
     s1_rows = [r for r in cal_rows(rows) if r.pops.fired and _finite(r.tip_kpa) and _no_sentinel(r)]
     s1_err = max((abs(plant_model.exhaust_backpressure_kpa(r.map_kpa, engine=cand.engine)
                       - plant_model.exhaust_backpressure_kpa(r.map_kpa, engine=tcand.engine)) for r in s1_rows),
@@ -3164,7 +3287,23 @@ def t0_judge(ladders, truths, *, rows, view):
     over no parameter (no covariance, or no data-dominated parameter the truth carries) is empty, on any
     seed: it fails an in-form seed, it is never a detection, and T0 does not pass while any seed has one
     (chi2_empty_seeds; WP3's second fix of 23 October 2026). D1-D3's cases hold on every in-form seed at its
-    judged fit (t0_cases). `ladders`, `truths` and `rows` (each seed's T0 rows) are paired in order."""
+    judged fit (t0_cases). `ladders`, `truths` and `rows` (each seed's T0 rows) are paired in order.
+
+    DECISION 87 (T0_SEED_REPLACEMENTS): for an engine with an entry, the replacement seed takes the replaced seed's
+    place in the verdict -- its ok, its empty chi-square and its cases -- and the replaced seed is still judged and
+    reported, its record marked "replaced" and its cases listed beside the verdict's ("seeds", "verdict_seeds");
+    "seed_replacement" says whether the replacement seed passed and, if it did not, that the engine stops at T0 for
+    good. The replacement seed must be among `truths` (refused otherwise). An engine without an entry is judged as
+    before, its record without these keys."""
+    name = truths[0].engine if truths else None
+    rep = T0_SEED_REPLACEMENTS.get(name)
+    replaced = set()
+    if rep is not None:
+        have = [t.seed for t in truths]
+        if rep["seed"] not in have or rep["replaced_seed"] not in have:
+            raise FitDefect(f"{name}: decision {rep['decision']}'s seeds {rep['replaced_seed']} and {rep['seed']} must "
+                            f"both be judged; the truths are seeds {have}")
+        replaced = {rep["replaced_seed"]}
     seeds, oof, cases_all, empty = [], None, [], []
     for lad, tr, rr in zip(ladders, truths, rows):
         fits = {f.form: f for f in lad.fits}
@@ -3189,15 +3328,34 @@ def t0_judge(ladders, truths, *, rows, view):
                "stopped_beyond_expected_form": bool(reached and lad.chosen != form),
                "within_noise": noise, "chi2": c2, "z": z,
                "ok": bool(lad.chosen == form and not c2["empty"] and c2["ok"])}
+        if rep is not None and tr.seed == rep["replaced_seed"]:
+            rec["replaced"] = {"decision": rep["decision"], "by_seed": rep["seed"], "in_verdict": False}
+        if rep is not None and tr.seed == rep["seed"]:
+            rec["replaces"] = {"decision": rep["decision"], "seed": rep["replaced_seed"], "in_verdict": True}
         seeds.append(rec)
-        cases_all.append(t0_cases(lad.engine, fit, tr, rows=rr, view=view))
-    cases = {k: {"ok": all(c[k]["ok"] for c in cases_all), "detail": [c[k]["detail"] for c in cases_all]}
+        cases_all.append((tr.seed, t0_cases(lad.engine, fit, tr, rows=rr, view=view)))
+    # the verdict's seeds: every in-form seed but one a decision-87 replacement replaced (all of them otherwise)
+    verdict = [s for s in seeds if s["seed"] not in replaced]
+    verdict_cases = [c for sd, c in cases_all if sd not in replaced]
+    cases = {k: {"ok": all(c[k]["ok"] for c in verdict_cases), "detail": [c[k]["detail"] for _sd, c in cases_all]}
              for k in T0_CASES} if cases_all else {}
+    if rep is not None:
+        for k in cases:
+            cases[k].update(seeds=[sd for sd, _c in cases_all], verdict_seeds=[sd for sd, _c in cases_all
+                                                                              if sd not in replaced])
     detected = oof is not None and not oof["chi2"]["empty"] and not oof["chi2"]["ok"]
-    ok = bool(seeds and all(s["ok"] for s in seeds) and detected and not empty
+    ok = bool(verdict and all(s["ok"] for s in verdict) and detected and not [s for s in empty if s not in replaced]
               and all(c["ok"] for c in cases.values()))
+    extra = {}
+    if rep is not None:
+        new = next(s for s in seeds if s["seed"] == rep["seed"])
+        old = next(s for s in seeds if s["seed"] == rep["replaced_seed"])
+        extra["seed_replacement"] = {
+            "decision": rep["decision"], "engine": name, "replaced_seed": rep["replaced_seed"],
+            "replacement_seed": rep["seed"], "replaced_seed_ok": old["ok"], "replacement_seed_ok": new["ok"],
+            "stops_at_t0_for_good": not new["ok"], "rule": rep["rule"]}
     return _py({"seeds": seeds, "out_of_form_seed": oof, "out_of_form_detected": detected, "chi2_empty_seeds": empty,
-                "cases": cases,
+                "cases": cases, **extra,
                 "stop_rule": {"z": T0_STOP_Z, "rule": "PLAN.md 5.10: each in-form seed's ladder stops at its truth's "
                               "form (an A truth at A, the A+B truth at A+B) and the chi^2 of that form's data-dominated "
                               "parameters lies within its 99 %; within_noise (every in-sample statistic but E8 within "
@@ -3215,8 +3373,14 @@ def t0_ladders(name, yield_, *, view, jobs, dtheta):
     (t0_rows) and the engine's whole per-engine ladder on them, the same `ladder` the
     fit runs, its in-sample stage included. Returns (truths, ladders, rows), paired. Run
     once, before Run 1, by calibrate_epa.py t0 on committed code (amendment A1): it
-    evaluates at the calibration rows' inputs, and nothing in WP3 runs it on them."""
+    evaluates at the calibration rows' inputs, and nothing in WP3 runs it on them. For an
+    engine with a decision-87 entry (T0_SEED_REPLACEMENTS) the truths end with the
+    replacement seed, whose rows and ladder are made here as every seed's are (the
+    replaced seed still runs); every other engine's are T0_SEEDS as before."""
     truths = t0_truths(name, view=view, yield_=yield_)
+    want = T0_SEEDS + ((T0_SEED_REPLACEMENTS[name]["seed"],) if name in T0_SEED_REPLACEMENTS else ())
+    if tuple(t.seed for t in truths) != want:
+        raise FitDefect(f"{name}: T0's truths are seeds {[t.seed for t in truths]}, not {list(want)} (decision 87)")
     rows = tuple(t0_rows(yield_, truth=tr, seed=tr.seed, view=view, dtheta=dtheta, jobs=jobs) for tr in truths)
     ladders = tuple(ladder(name, rr, view=view, jobs=jobs, dtheta=dtheta) for rr in rows)
     return truths, ladders, rows

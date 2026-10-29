@@ -121,6 +121,15 @@ def _pops(map_kpa, bmep, meter, lam, kind):
     return epa_rows.populations(cells, 1.0, FINAL_MAP[0], kind)
 
 
+def _gate_row(map_kpa, rpm, n):
+    """A synthetic T0 row for the d2_gate case's hand tests (decisions 84 and 86): decision 86 reads only its
+    inputs (speed, MAP, intake, coolant) and its key; every output is a placeholder."""
+    return _row(epa_rows.SteadyRow, table=TABLE_S, source_row=int(n), line="2000", nominal_rpm=2000, hold=None,
+                speed_rpm=float(rpm), map_kpa=float(map_kpa), imt_k=320.0, ect_k=360.0, spark_btdc=10.0, lam_meas=1.0,
+                torque_nm=0.0, bmep_bar=0.0, fuel_meter_gps=0.0, injector_fuel_gps=0.0, tit_c=0.0, tip_kpa=0.0,
+                pops=_pops(map_kpa, 5.0, 1.0, 1.0, "steady"))
+
+
 def make_rows(values, *, view, cam=False, steady_map=STEADY_MAP, final_map=FINAL_MAP, lines=None,
               final_lines=None, lam_override=None):
     """Synthetic calibration rows made by the plant at `values` (the truth): inputs on
@@ -319,11 +328,17 @@ class S3b(fx.Guarded):
         before. Hand cases on Final MAPs spaced wider than the grid; the controls: the grid's rule alone fails the
         gap case, a truth past the neighbouring Final row fails, and a truth below the LOWEST Final row with the
         interval above that row (the Honda's seed 1 of 24 October, in shape) fails, since nothing is widened past
-        a neighbouring Final row."""
+        a neighbouring Final row. Since decision 86 the case takes the truth's ECU and the T0 rows: here every Final
+        row runs at the ramp's top, so a gate moved across one moves its lambda by the whole depth, 24 noise sd, and
+        decision 86's reading fails whenever a Final row lies between the truth and the interval (it passes the
+        two cases with no row between, as it should); decision 86's own cases are the next test's."""
         step = epa_fit.S3B_GATE_STEP_KPA
+        ecu0 = epa_fit.candidate(NAME, truth_values()).engine.ecu
 
         def case(flat, g, finals):
-            return epa_fit.d2_gate_case(flat, g, finals, fitted_gate_kpa=flat[1], step_kpa=step)
+            rows = tuple(_gate_row(m, 4004.0, i) for i, m in enumerate(finals))
+            return epa_fit.d2_gate_case(flat, g, finals, fitted_gate_kpa=flat[1], step_kpa=step,
+                                        truth_ecu=replace(ecu0, enr_load=float(g)), rows=rows)
         finals = (124.6, 150.0, 175.0)
         # inside the grid's step of the interval, as before
         self.assertTrue(case((140.0, 149.0), 139.5, finals)["ok"])
@@ -344,15 +359,96 @@ class S3b(fx.Guarded):
         honda = case((125.0, 125.0), 123.43, finals)
         self.assertFalse(honda["ok"])
         self.assertEqual(honda["detail"]["widened_kpa"], [124.6, 150.0])
+        self.assertFalse(honda["detail"]["indistinguishable_at_t0_noise"])        # the row at 124.6 moves by 0.12
         # no Final row below the interval: that side is not widened
         self.assertEqual(case((100.0, 110.0), 105.0, (150.0,))["detail"]["widened_kpa"], [100.0, 150.0])
-        self.assertFalse(case((100.0, 110.0), 98.0, (150.0,))["ok"])
+        # 98 below [100, 110] with no row between: the old readings fail it, decision 86's passes it (sum 0)
+        low = case((100.0, 110.0), 98.0, (150.0,))
+        self.assertEqual((low["detail"]["within_grid_step"], low["detail"]["within_final_gap"],
+                          low["detail"]["decision_86"]["sum_sq_over_noise"], low["ok"]), (False, False, 0.0, True))
         # on this class's fit: the truth between the steady and the Final rows is on the interval
         st = self.fit(self.rows)
         on = epa_fit.d2_gate_case(st.report["flat_gates_kpa"], GATE, [r.map_kpa for r in self.rows if epa_fit._final(r)],
-                                  fitted_gate_kpa=st.values["enr_load"], step_kpa=step)
+                                  fitted_gate_kpa=st.values["enr_load"], step_kpa=step,
+                                  truth_ecu=epa_fit.candidate(NAME, self.v).engine.ecu, rows=self.rows)
         self.assertTrue(on["ok"])
         self.assertEqual(on["detail"]["neighbour_final_map_kpa"], {"below": None, "above": FINAL_MAP[0]})
+        self.assertIsNone(on["detail"]["indistinguishable_at_t0_noise"])          # on the interval: not needed
+
+    def test_d2_gate_case_passes_a_gate_indistinguishable_at_t0s_noise(self):
+        """Decision 86 (29 October 2026): T0's d2_gate case also passes when the truth's gate and the fitted flat
+        interval's nearest gate are indistinguishable at T0's noise -- under the truth's ECU at every T0 row's inputs,
+        the gate moved to the nearest gate, sum of (dlam / T0_NOISE lam)^2 below 1 -- with or without a published
+        lambda. The Honda's seed 1 of Run 1's second pass, in shape (the diagnostic's rows around the gate): the
+        truth's gate 123.43 kPa, the midpoint of the steady row at 122.18 and the lowest Final row at 124.677, the
+        interval [125, 125], and that Final row at 1500.74 rpm, 0.74 rpm above the ramp's start of 1500 rpm, so the
+        gate moved to 125 enriches it by 3.2e-5 in lambda, 0.0064 sd. The controls: decision 84's and the grid's
+        readings fail it; the same row moved by one noise sd (a case one sd wide) fails, and just under one sd
+        passes; the sum covers rows without a published lambda (the stricter reading); a spark that moved with the
+        gate would be a coding defect; and no T0 row at all is refused, never a sum of 0."""
+        step = epa_fit.S3B_GATE_STEP_KPA
+        ecu = replace(epa_fit.candidate(NAME, truth_values()).engine.ecu, enr_load=123.42867067468251,
+                      enr_rpm_lo=1500.0, enr_rpm_hi=5000.0, enr_depth=0.15)
+        steady = ((116.41, 1501.0), (121.0, 2500.0), (121.18, 4004.0), (122.08, 3500.0), (122.18, 3995.0),
+                  (125.52, 1501.0), (125.58, 4006.0), (126.11, 3000.0))
+        final = ((124.677341349365, 1500.74), (125.60961538461535, 4999.7), (126.971787, 1500.7), (128.369651, 1600.9))
+        rows = tuple(_gate_row(m, rpm, i) for i, (m, rpm) in enumerate(steady + final))
+        finals = [m for m, _rpm in final]
+
+        def case(rows_, *, flat=(125.0, 125.0), ecu_=ecu):
+            return epa_fit.d2_gate_case(flat, ecu_.enr_load, finals, fitted_gate_kpa=flat[1], step_kpa=step,
+                                        truth_ecu=ecu_, rows=rows_)
+        honda = case(rows)
+        d = honda["detail"]
+        self.assertTrue(honda["ok"])
+        # the controls: the grid's 1 kPa and decision 84's widening, the two earlier readings, both fail it
+        self.assertEqual((d["within_grid_step"], d["within_final_gap"], d["widened_kpa"][0]),
+                         (False, False, 124.677341349365))
+        self.assertTrue(d["indistinguishable_at_t0_noise"])
+        e = d["decision_86"]
+        self.assertEqual((e["nearest_gate_kpa"], e["rows"], e["noise_lam"], e["spark_unchanged"]),
+                         (125.0, len(rows), epa_fit.T0_NOISE["lam"], True))
+        self.assertEqual([(c["map_kpa"], c["speed_rpm"]) for c in e["lam_changed_rows"]], [(124.677341349365, 1500.74)])
+        dlam = 0.15 * (1500.74 - 1500.0) / 3500.0                                   # the ramp's s x the depth
+        self.assertAlmostEqual(e["max_abs_dlam"], dlam, delta=1e-15)
+        self.assertAlmostEqual(e["sum_sq_over_noise"], (dlam / 0.005) ** 2, delta=1e-15)
+        self.assertLess(e["sum_sq_over_noise"], 1e-4)                             # 4.0e-5, as the diagnostic's 4.05e-5
+        self.assertIn("decision 86", d["rule"])
+        # a case one noise sd wide fails: the row's lambda moves by one sd (depth 0.005 at the ramp's top), sum >= 1
+        top = rows[:len(steady)] + (_gate_row(124.677341349365, 5000.0, 99),) + rows[len(steady) + 1:]
+        one = case(top, ecu_=replace(ecu, enr_depth=0.005))
+        self.assertGreaterEqual(one["detail"]["decision_86"]["sum_sq_over_noise"], 1.0)
+        self.assertFalse(one["ok"])
+        under = case(top, ecu_=replace(ecu, enr_depth=0.0049))                     # 0.98 sd: 0.96, passes
+        self.assertLess(under["detail"]["decision_86"]["sum_sq_over_noise"], 1.0)
+        self.assertTrue(under["ok"])
+        # with or without a published lambda: the sum is over the T0 rows' inputs, whatever lambda they publish
+        dark = tuple(replace(r, lambda_missing=True, lam_meas=None) for r in top)
+        self.assertEqual(case(dark, ecu_=replace(ecu, enr_depth=0.005))["detail"]["decision_86"]["sum_sq_over_noise"],
+                         one["detail"]["decision_86"]["sum_sq_over_noise"])
+        # the truth above the interval takes its upper gate: [120, 122] below the truth, nearest 122; the steady
+        # rows at 122.08 and 122.18 at s 0.57 and 0.71 move by about 0.09 and 0.11, so decision 86's reading fails,
+        # and the case passes on decision 84's alone (the truth lies below the lowest Final MAP above the interval)
+        above = case(rows, flat=(120.0, 122.0))
+        a86 = above["detail"]["decision_86"]
+        self.assertEqual((a86["nearest_gate_kpa"], a86["indistinguishable"], len(a86["lam_changed_rows"])),
+                         (122.0, False, 2))
+        self.assertEqual((above["detail"]["within_final_gap"], above["ok"]), (True, True))
+        # a spark that moves with the gate is a coding defect, never a pass
+        real_step = engine_env.BaselineECU.step
+
+        def moving_spark(self_, rpm, map_kpa, iat_k, ect_k, knock, dt):
+            sp, lam, fan = real_step(self_, rpm, map_kpa, iat_k, ect_k, knock, dt)
+            return sp + (0.5 if self_.cal.enr_load == 125.0 else 0.0), lam, fan
+        with mock.patch.object(engine_env.BaselineECU, "step", moving_spark):
+            with self.assertRaises(epa_fit.FitDefect):
+                case(rows)
+        # no T0 row is refused (a sum over none would pass anything), and an ECU not at the truth's gate too
+        with self.assertRaises(epa_fit.FitDefect):
+            case(())
+        with self.assertRaises(epa_fit.FitDefect):
+            epa_fit.d2_gate_case((125.0, 125.0), 123.0, finals, fitted_gate_kpa=125.0, step_kpa=step,
+                                 truth_ecu=ecu, rows=rows)
 
     def test_the_invariants_edge_is_the_largest_depth_engine_accepts(self):
         # HANDOFFS.md WP3 item 1: 1.0 - (1.0 - x) can land an ulp below x, so the edge
@@ -1343,6 +1439,186 @@ class T0(fx.Guarded):
         off = replace(fit, values=dict(fit.values, cycle=dict(fit.values["cycle"],
                                                                 exh_bp_ratio=fit.values["cycle"]["exh_bp_ratio"] * 1.01)))
         self.assertFalse(epa_fit.t0_cases(NAME, off, truths[0], rows=trows[0], view=view)["s1_law"]["ok"])
+
+
+def _to_its_form(cache):
+    """A stand-in ladder (the T0 judge's tests): the forms up to each truth's own, form A from no start and A+B from
+    it for a ve_map truth, made once per set of rows; the form chosen is the last fitted. The real ladder's stopping
+    rule is Ladder's test."""
+    def lad(name, r, *, view, jobs, dtheta):
+        if r not in cache:
+            fa = epa_fit.fit_form(name, r, view=view, form="A", start=None, jobs=jobs, dtheta=dtheta)
+            fits = (fa,)
+            if cache.get(("form", r)) == "A+B":
+                fits += (epa_fit.fit_form(name, r, view=view, form="A+B", start=fa, jobs=jobs, dtheta=dtheta),)
+            cache[r] = epa_fit.Ladder(engine=name, fits=fits, in_sample={f.form: OK_STAGE for f in fits},
+                                      chosen=fits[-1].form, reason="test")
+        return cache[r]
+    return lad
+
+
+class T0Decision86(fx.Guarded):
+    def test_t0_cases_reads_decision_86_on_the_truth_and_its_t0_rows(self):
+        """Decision 86 through t0_cases (whose signature it does not change): the truth's ECU and the seed's T0 rows
+        reach d2_gate_case. On a seed-1 fit of this file's synthetic rows, the truth's gate 145 kPa (between the
+        steady rows' 140 and the Final rows' 150), and S3b's flat interval set to [146, 146]: no T0 row lies between
+        145 and 146, so the gates are indistinguishable (sum 0 over every T0 row) and the case passes, which the
+        grid's 1 kPa and decision 84's widening (no Final row at or below 146) do not; HEAD 0147f93 failed it. The
+        control: the interval at [151, 151] puts the 150 kPa Final rows between, moved by up to the depth: fails."""
+        v, view, rows = dataset()
+        tr = epa_fit.t0_truths(NAME, view=view, yield_=rows)[0]
+        trows = epa_fit.t0_rows(rows, truth=tr, seed=1, view=view, dtheta=DTH, jobs=JOBS)
+        fit = epa_fit.fit_form(NAME, trows, view=view, form="A", start=None, jobs=JOBS, dtheta=DTH)
+        g = tr.values["ecu"]["enr_load"]
+        self.assertEqual(g, 0.5 * (max(STEADY_MAP) + FINAL_MAP[0]))
+
+        def at(flat):
+            st = fit.stages["S3b"]
+            f2 = replace(fit, stages=dict(fit.stages, S3b=replace(st, report=dict(st.report, flat_gates_kpa=list(flat)))))
+            return epa_fit.t0_cases(NAME, f2, tr, rows=trows, view=view)["d2_gate"]
+        near = at((146.0, 146.0))
+        d = near["detail"]
+        self.assertTrue(near["ok"], d)
+        self.assertEqual((d["within_grid_step"], d["within_final_gap"]), (False, False))
+        e = d["decision_86"]
+        self.assertEqual((e["rows"], e["sum_sq_over_noise"], e["lam_changed_rows"], e["nearest_gate_kpa"]),
+                         (len(epa_fit.cal_rows(trows)), 0.0, [], 146.0))
+        far = at((151.0, 151.0))
+        f86 = far["detail"]["decision_86"]
+        self.assertFalse(far["ok"])
+        self.assertGreater(f86["sum_sq_over_noise"], 1.0)
+        self.assertTrue(f86["lam_changed_rows"] and all(c["map_kpa"] == FINAL_MAP[0] for c in f86["lam_changed_rows"]))
+
+
+class T0Decision87(fx.Guarded):
+    """Decision 87 (29 October 2026): T0_STREAM's next seed, 5, with seed 1's form-A truth, takes seed 1's place in
+    the verdict for an engine with an entry in T0_SEED_REPLACEMENTS (the Ford's, declared in code before it runs).
+    On this file's synthetic engine, an entry patched in for the test: the truths, the rows, the stand-in ladders
+    and the judge, against the same engine without the entry, whose T0 is as before."""
+    ENTRY = {NAME: {"decision": 87, "replaced_seed": 1, "seed": 5, "rule": "decision 87, patched in for the test"}}
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.v, cls.view, cls.rows = dataset()
+        cache = {}
+        lad = _to_its_form(cache)
+        for tr in epa_fit.t0_truths(NAME, view=cls.view, yield_=cls.rows):
+            if tr.expected_form == "A+B":      # the A+B truth's rows take A+B too (the stand-in reads it off the cache)
+                cache[("form", epa_fit.t0_rows(cls.rows, truth=tr, seed=tr.seed, view=cls.view, dtheta=DTH,
+                                               jobs=JOBS))] = "A+B"
+        with mock.patch.object(epa_fit, "ladder", lad):
+            cls.plain = epa_fit.t0_ladders(NAME, cls.rows, view=cls.view, jobs=JOBS, dtheta=DTH)
+            with mock.patch.dict(epa_fit.T0_SEED_REPLACEMENTS, cls.ENTRY):
+                cls.five = epa_fit.t0_ladders(NAME, cls.rows, view=cls.view, jobs=JOBS, dtheta=DTH)
+
+    def judge(self, ladders, truths, rows, *, entry=True):
+        with mock.patch.dict(epa_fit.T0_SEED_REPLACEMENTS, self.ENTRY if entry else {}):
+            return epa_fit.t0_judge(ladders, truths, rows=rows, view=self.view)
+
+    @staticmethod
+    def failing(lad):
+        """The ladder of a form-A truth that climbed past A: the seed fails PLAN.md 5.10's stop rule."""
+        return replace(lad, chosen="A+B")
+
+    def test_the_fords_entry_is_decision_87s_and_no_other_engine_has_one(self):
+        self.assertEqual(epa_fit.T0_SEEDS, (1, 2, 3, 4))
+        self.assertEqual(sorted(epa_fit.T0_SEED_REPLACEMENTS), ["ford_27tt"])
+        ford = epa_fit.T0_SEED_REPLACEMENTS["ford_27tt"]
+        self.assertEqual((ford["decision"], ford["replaced_seed"], ford["seed"]), (87, 1, 5))
+        self.assertIn("decision 87", ford["rule"])
+        self.assertIn("stops at T0 for good", ford["rule"])
+        # the string every engine's t0.json carries is unchanged (only its comment names decision 87)
+        self.assertEqual(epa_fit.T0_ON_SAMPLING_FAILURE,
+                         "a T0 failure traced to sampling rather than a defect stops Run 1 for the engine: the seeds "
+                         "and the stream are never changed after a result; the team decides, recorded in defects.json, "
+                         "and any further seeds are T0_STREAM's next ones in order (5, 6, ...)")
+
+    def test_an_engine_without_an_entry_is_as_before(self):
+        truths, lads, trows = self.plain
+        self.assertEqual([t.seed for t in truths], [1, 2, 3, 4])
+        self.assertEqual([t.label for t in truths], ["form A", "form A", "form A+B: ve_map 2e-3 per kPa",
+                                                     "outside every form"])
+        j = self.judge(lads, truths, trows, entry=False)
+        self.assertTrue(j["pass"], j["seeds"])
+        self.assertEqual(sorted(j), ["cases", "chi2_empty_seeds", "out_of_form_detected", "out_of_form_seed", "pass",
+                                     "seeds", "stop_rule"])
+        self.assertTrue(all("replaced" not in s and "replaces" not in s for s in j["seeds"]))
+        self.assertTrue(all(sorted(c) == ["detail", "ok"] for c in j["cases"].values()))
+        # the patched engine's seeds 2-4 are judged exactly as the plain engine's: the same records
+        t5, l5, r5 = self.five
+        j5 = self.judge(l5, t5, r5)
+        self.assertEqual([s for s in j5["seeds"] if s["seed"] in (2, 3)], [s for s in j["seeds"] if s["seed"] in (2, 3)])
+        self.assertEqual(j5["out_of_form_seed"], j["out_of_form_seed"])
+        # the control: without the entry, a failing seed 1 fails T0
+        bad = list(lads)
+        bad[0] = self.failing(lads[0])
+        self.assertFalse(self.judge(bad, truths, trows, entry=False)["pass"])
+
+    def test_seed_5_takes_seed_1s_place_and_seed_1_is_reported(self):
+        truths, lads, trows = self.five
+        self.assertEqual([t.seed for t in truths], [1, 2, 3, 4, 5])
+        self.assertEqual((truths[4].values, truths[4].expected_form, truths[4].out_of_form),
+                         (truths[0].values, "A", None))
+        self.assertIn("decision 87", truths[4].label)
+        # seed 5's rows are its own stream's, not seed 1's
+        self.assertEqual(trows[4], epa_fit.t0_rows(self.rows, truth=truths[4], seed=5, view=self.view, dtheta=DTH,
+                                                   jobs=JOBS))
+        self.assertNotEqual(trows[4], trows[0])
+        both = self.judge(lads, truths, trows)
+        self.assertTrue(both["pass"], both["seeds"])
+        # seed 1 fails (its ladder climbed past A): T0 still passes on seed 5, seed 1's failure reported, marked
+        bad = list(lads)
+        bad[0] = self.failing(lads[0])
+        j = self.judge(bad, truths, trows)
+        self.assertTrue(j["pass"], j["seeds"])
+        s1 = next(s for s in j["seeds"] if s["seed"] == 1)
+        s5 = next(s for s in j["seeds"] if s["seed"] == 5)
+        self.assertEqual((s1["ok"], s1["replaced"]), (False, {"decision": 87, "by_seed": 5, "in_verdict": False}))
+        self.assertEqual((s5["ok"], s5["replaces"]), (True, {"decision": 87, "seed": 1, "in_verdict": True}))
+        rep = j["seed_replacement"]
+        self.assertEqual((rep["replaced_seed_ok"], rep["replacement_seed_ok"], rep["stops_at_t0_for_good"]),
+                         (False, True, False))
+        self.assertEqual({k: (c["seeds"], c["verdict_seeds"]) for k, c in j["cases"].items()},
+                         {k: ([1, 2, 3, 5], [2, 3, 5]) for k in epa_fit.T0_CASES})
+        json.dumps(j, allow_nan=False)
+        # seed 5 failing stops the engine at T0 for good, whether or not seed 1 passed
+        for first in (lads[0], self.failing(lads[0])):
+            stop = list(lads)
+            stop[0], stop[4] = first, self.failing(lads[4])
+            js = self.judge(stop, truths, trows)
+            self.assertFalse(js["pass"])
+            self.assertTrue(js["seed_replacement"]["stops_at_t0_for_good"])
+        # seeds 2-4 still count: seed 2 failing fails T0
+        two = list(lads)
+        two[1] = self.failing(lads[1])
+        self.assertFalse(self.judge(two, truths, trows)["pass"])
+
+    def test_the_replaced_seeds_cases_are_reported_beside_the_verdict(self):
+        """The four cases are the verdict seeds' (5, 2, 3); seed 1's are reported. A case that fails on seed 1 alone
+        leaves T0 passing with the entry and fails it without (the control)."""
+        truths, lads, trows = self.five
+        real = epa_fit.t0_cases
+
+        def seed1_d3_fails(name, fit, truth, *, rows, view):
+            out = real(name, fit, truth, rows=rows, view=view)
+            if truth.seed == 1:
+                out["d3_spark_min"] = dict(out["d3_spark_min"], ok=False)
+            return out
+        with mock.patch.object(epa_fit, "t0_cases", seed1_d3_fails):
+            j = self.judge(lads, truths, trows)
+            self.assertTrue(j["pass"])
+            self.assertTrue(j["cases"]["d3_spark_min"]["ok"])
+            self.assertEqual(len(j["cases"]["d3_spark_min"]["detail"]), 4)          # seeds 1, 2, 3 and 5
+            plain = self.judge(lads[:4], truths[:4], trows[:4], entry=False)
+            self.assertFalse(plain["pass"])                                           # the control
+        # the entry with seed 5 missing from the truths is refused, never judged on seeds 1-4
+        with self.assertRaises(epa_fit.FitDefect):
+            self.judge(lads[:4], truths[:4], trows[:4])
+        with mock.patch.dict(epa_fit.T0_SEED_REPLACEMENTS, self.ENTRY), \
+                mock.patch.object(epa_fit, "t0_truths", lambda name, *, view, yield_: truths[:4]):
+            with self.assertRaises(epa_fit.FitDefect):
+                epa_fit.t0_ladders(NAME, self.rows, view=self.view, jobs=JOBS, dtheta=DTH)
 
 
 # THE REAL T0 ON SYNTHETIC ROWS (WP3's second fix of 23 October 2026, on the fit and test reviews' finding that

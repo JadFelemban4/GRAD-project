@@ -1355,11 +1355,28 @@ class Records(RunCase):
         self.assertEqual(sorted(comp["e6_files"]), sorted(f"{epa_freeze.CALIBRATION_DIR}/{MAZDA}/{C.e6_file(v)}"
                                                           for v in C.E6_VARIANTS))
         # E6 row 6's probe by its hand answer: the stand-in gas moves 0.5 K per W/K of UA_PORT and the flow
-        # not at all, so the housing equivalent's slope is f x 0.5 and the change worth R1 is R1 / (0.5 f)
+        # not at all, so the housing equivalent's slope is f x 0.5 and the change worth R1 is R1 / (0.5 f).
+        # Decision 88: on the stand-in fit's UA_PORT that change, 75 W/K, crosses zero and leaves epa_fit.BOUNDS
+        # (0, 1000), so the probe is the +-10 % fallback, its worth R1 kept and reported, counted excluded; its two
+        # cycles were run at the frozen climb cell's inputs at exactly v0 +- 75 (range_cycles)
         r1 = F.CONTRACT_BLOCKS["r1_housing_k"]
         row6 = comp["e6_probes"]["row6"]
-        self.assertAlmostEqual(row6["probe"]["ua_port"], r1 / (0.5 * HS["f"]), places=9)
-        self.assertEqual(row6["detail"]["ua_port"]["method"], "probe")
+        d6 = row6["detail"]["ua_port"]
+        self.assertAlmostEqual(d6["worth_r1"], r1 / (0.5 * HS["f"]), places=9)
+        self.assertLess(d6["value"], d6["worth_r1"])
+        self.assertEqual((d6["method"], d6["within_range_at_r1"], d6["counted_excluded"]), ("fallback", False, True))
+        self.assertTrue({"bounds", "sign"} <= set(d6["range_tests_failed"]), d6["range_tests_failed"])
+        self.assertIn("worth R1 beyond the constant's range", d6["beyond_range_at_r1"])
+        self.assertEqual((d6["counted_excluded_why"], d6["worth_r1_why"]), (d6["beyond_range_at_r1"],) * 2)
+        self.assertAlmostEqual(row6["probe"]["ua_port"], 0.1 * abs(d6["value"]), places=12)
+        cyc6 = d6["range_tests"]["finite"]["cycles"]
+        self.assertEqual((cyc6["+"]["value"], cyc6["-"]["value"]),
+                         (d6["value"] + d6["worth_r1"], d6["value"] - d6["worth_r1"]))
+        self.assertIn("ua_port", comp["e6_probes"]["beyond_range_at_r1"])
+        self.assertIn("decision 88", comp["e6_probes"]["range_rule"])
+        self.assertEqual(comp["e6_probes"]["range_cycle_inputs"],
+                         {k: comp["e6_probes"]["climb_cell"]["point"][k] for k in ("rpm", "map", "iat", "ect", "spark",
+                                                                                   "lam")})
         # a constant the stand-in climb does not see falls back: +-10 crank degrees for IVC (the synthetic
         # Mazda's tables give no effective stroke, and their constant Atkinson ratio 1.2 beside an intake cam that
         # moves with MAP is no exact fit of defect D-1's reading, so no bracket), +-10 % for the rest
@@ -2864,6 +2881,129 @@ class Pieces(F.Guarded):
         # and a bracket that is not [lo, hi] is refused
         with self.assertRaises(C.CompletionDefect):
             C.probe_sizes(base, hs, cells, brackets={"ivc_deg": {"bracket": [hi, lo]}}, **kw)
+
+    def test_a_worth_r1_probe_beyond_the_constants_range_falls_back(self):
+        """Decision 88 (29 October 2026): a worth-R1 probe (rows 5, 6, 9) that (a) takes the constant outside
+        epa_fit.BOUNDS where it has an entry, (b) changes its sign on either side, or (c) gives a non-finite cycle on
+        either side is reported "worth R1 beyond the constant's range" with the tests it fails, probed at the +-10 %
+        fallback, its worth R1 kept, and counted excluded, as decision 85's not visible. By hand, one synthetic
+        probe per test, sized as complete sizes them (a first pass without the rule, then the cycles at exactly
+        v0 +- the worth R1, then the rule): UA_PORT 20 W/K worth 25 (out of (0, 1000) and across zero), the
+        back-pressure ratio 1.1 worth 0.2 (below 1.0 only), the conrod 0.15 m worth 0.25 (across zero only, no
+        entry), t_head 90 K worth 50 whose minus cycle is NaN (finite only), and cp_exh 1150 worth 100 (none: the
+        control keeps its probe). Brackets and decision 85's not visible are not judged; the rule off (HEAD
+        0147f93's behaviour) keeps every worth-R1 probe; a cycle not at the probe judged is a completion defect."""
+        import math
+        base = {"egt": 1000.0, "mdot": 100.0}
+        hs = {"f": 0.5, "dTh_per_unit_ln_mdot": 0.0}
+        # egt +-e at +-10 %: the housing +-0.5 e, the slope 0.5 e / (0.1 v0), worth 10 / slope
+        spec = {"ua_port": (20.0, 1.6), "exh_bp_ratio": (1.1, 11.0), "conrod": (0.15, 1.2), "t_head_k": (90.0, 3.6),
+                "cp_exh": (1150.0, 23.0), "ivc_deg": (-140.0, 7.0), "flame_floor": (0.25, 0.0)}
+        recs = {"ua_port": "cycle", "exh_bp_ratio": "cycle", "conrod": "geometry", "t_head_k": "cycle",
+                "cp_exh": "cycle", "ivc_deg": "geometry", "flame_floor": "cycle"}
+        cells = {}
+        for f, (_v, e) in spec.items():
+            cells[(f, 1)] = {"egt": 1000.0 + e, "mdot": 100.0}
+            cells[(f, -1)] = {"egt": 1000.0 - e, "mdot": 100.0}
+        kw = dict(r1_k=10.0, rel=0.1, else_rel=0.1, else_cad=10.0, fields=tuple((recs[f], f) for f in spec),
+                  brackets={"ivc_deg": {"bracket": [-154.0, -80.0]}}, v0={f: v for f, (v, _e) in spec.items()},
+                  sigmas={}, noise_k=1e-4)
+        first = C.probe_sizes(base, hs, cells, **kw)
+        for f, w in (("ua_port", 25.0), ("exh_bp_ratio", 0.2), ("conrod", 0.25), ("t_head_k", 50.0), ("cp_exh", 100.0)):
+            self.assertEqual(first[f]["method"], "probe", f)
+            self.assertAlmostEqual(first[f]["worth_r1"], w, places=9, msg=f)
+
+        def cyc(v, finite=True):
+            nan = float("nan")
+            return {"value": v, "torque": 300.0 if finite else nan, "egt": 900.0 if finite else nan, "mdot": 120.0,
+                    "fuel": 8.0, "ki": 0.5, "finite": finite, "error": None}
+        cycles = {}
+        for f, r in first.items():
+            if r["method"] == "probe":
+                cycles[(f, 1)] = cyc(r["values"]["+"])
+                cycles[(f, -1)] = cyc(r["values"]["-"], finite=f != "t_head_k")
+        out = C.probe_sizes(base, hs, cells, bounds=epa_fit.BOUNDS, probe_cycles=cycles, **kw)
+        for f, failed in (("ua_port", ["bounds", "sign"]), ("exh_bp_ratio", ["bounds"]), ("conrod", ["sign"]),
+                          ("t_head_k", ["finite"])):
+            r = out[f]
+            self.assertEqual((r["method"], r["within_range_at_r1"], r["range_tests_failed"], r["counted_excluded"]),
+                             ("fallback", False, failed, True), f)
+            self.assertAlmostEqual(r["size"], 0.1 * spec[f][0], places=12, msg=f)        # the +-10 % fallback
+            self.assertEqual(r["worth_r1"], first[f]["worth_r1"], f)                     # kept, reported
+            self.assertIn("worth R1 beyond the constant's range", r["beyond_range_at_r1"])
+            self.assertEqual((r["counted_excluded_why"], r["worth_r1_why"]), (r["beyond_range_at_r1"],) * 2)
+            self.assertIsNone(r["not_visible_at_r1"])
+            self.assertEqual(r["values"], {"+": spec[f][0] + r["size"], "-": spec[f][0] - r["size"]})
+        self.assertEqual(out["exh_bp_ratio"]["range_tests"]["bounds"]["entry"], [1.0, 2.5])
+        self.assertIsNone(out["conrod"]["range_tests"]["bounds"]["entry"])                 # no entry: no bound
+        # the control: within every test, the probe sized by R1 is kept
+        cp = out["cp_exh"]
+        self.assertEqual((cp["method"], cp["within_range_at_r1"], cp["range_tests_failed"], cp["counted_excluded"],
+                          cp["size"]), ("probe", True, [], False, first["cp_exh"]["size"]))
+        # a bracket and decision 85's not visible are not judged by it
+        self.assertEqual((out["ivc_deg"]["method"], out["ivc_deg"]["within_range_at_r1"]), ("bracket", None))
+        ff = out["flame_floor"]
+        self.assertEqual((ff["method"], ff["visible_at_r1"], ff["within_range_at_r1"], ff["beyond_range_at_r1"]),
+                         ("fallback", False, None, None))
+        # the rule off (no bounds), as HEAD 0147f93 sized them: every worth-R1 probe kept
+        self.assertEqual({f: first[f]["method"] for f in ("ua_port", "exh_bp_ratio", "conrod", "t_head_k")},
+                         {f: "probe" for f in ("ua_port", "exh_bp_ratio", "conrod", "t_head_k")})
+        self.assertTrue(all(first[f]["within_range_at_r1"] is None for f in first))
+        # an entry of None is no bound; a cycle not at the probe judged, or none, is a completion defect
+        none_b = C.probe_sizes(base, hs, cells, bounds=dict(epa_fit.BOUNDS, exh_bp_ratio=None), probe_cycles=cycles, **kw)
+        self.assertEqual((none_b["exh_bp_ratio"]["method"], none_b["exh_bp_ratio"]["range_tests_failed"]), ("probe", []))
+        off = dict(cycles)
+        off[("cp_exh", 1)] = cyc(math.nextafter(cycles[("cp_exh", 1)]["value"], math.inf))
+        with self.assertRaises(C.CompletionDefect):
+            C.probe_sizes(base, hs, cells, bounds=epa_fit.BOUNDS, probe_cycles=off, **kw)
+        gone = {k: v for k, v in cycles.items() if k[0] != "cp_exh"}
+        with self.assertRaises(C.CompletionDefect):
+            C.probe_sizes(base, hs, cells, bounds=epa_fit.BOUNDS, probe_cycles=gone, **kw)
+
+    def test_decision_88s_tests_at_their_edges(self):
+        """range_tests at its edges: a probe that lands exactly on a BOUNDS edge is inside it; one ulp past is
+        outside; a probe that lands exactly on zero changes the constant's sign (it no longer has the value's), one
+        ulp short of zero does not."""
+        import math
+
+        def at(field, val, size, bounds):
+            cyc = {(field, 1): {"value": val + size, "finite": True}, (field, -1): {"value": val - size, "finite": True}}
+            return C.range_tests(field, val, size, bounds=bounds, cycles=cyc)
+        edge = at("exh_bp_ratio", 1.5, 0.5, epa_fit.BOUNDS)
+        self.assertEqual((edge["bounds"]["minus"], edge["bounds"]["fails"], edge["sign"]["fails"]), (1.0, False, False))
+        past = at("exh_bp_ratio", 1.5, math.nextafter(0.5, 1.0), epa_fit.BOUNDS)
+        self.assertTrue(past["bounds"]["fails"])
+        self.assertTrue(at("t_head_k", 2.0, 2.0, {})["sign"]["fails"])                  # lands on 0.0
+        self.assertFalse(at("t_head_k", 2.0, math.nextafter(2.0, 0.0), {})["sign"]["fails"])
+        self.assertTrue(at("ivc_deg", -140.0, 150.0, {})["sign"]["fails"])               # a negative value too
+        self.assertFalse(at("ivc_deg", -140.0, 100.0, {})["sign"]["fails"])
+
+    def test_decision_88s_cycle_is_the_plants_own(self):
+        """range_cycles on a real plant (the B58's; no EPA value): the conrod moved below zero gives a negative cylinder
+        volume and a NaN cycle, as the frozen Mazda's minus probe did (RUN1_DIAGNOSTICS.md), so test (c) fails on it;
+        the plus side is finite; a probe the plant refuses to build is recorded non-finite with its exception; and a
+        method other than "probe" is not cycled."""
+        import epa_coefficients
+        b58 = engines.get("b58")
+        point = {"rpm": 2700.0, "map": 175.0, "iat": 330.0, "ect": 365.0, "spark": 2.0, "lam": 1.0}
+        sizes = {"conrod": {"method": "probe", "record": "geometry", "values": {"+": 0.3, "-": -0.1}},
+                 "ce_rich_slope": {"method": "probe", "record": "cycle", "values": {"+": float("inf"), "-": 0.5}},
+                 "t_head_k": {"method": "fallback", "record": "cycle", "values": {"+": 99.0, "-": 81.0}}}
+        got = C.range_cycles(b58, point, sizes)
+        self.assertEqual(sorted(got), [("ce_rich_slope", -1), ("ce_rich_slope", 1), ("conrod", -1), ("conrod", 1)])
+        self.assertTrue(got[("conrod", 1)]["finite"])
+        self.assertFalse(got[("conrod", -1)]["finite"])
+        self.assertEqual(got[("conrod", -1)]["value"], -0.1)
+        self.assertTrue(got[("ce_rich_slope", -1)]["finite"])
+        self.assertFalse(got[("ce_rich_slope", 1)]["finite"])
+        self.assertIn("ValueError", got[("ce_rich_slope", 1)]["error"])
+        # the climb point's cycle at the plant's own conrod is the plant's own (the probe reaches the cycle: mistake 25)
+        own = C.range_cycles(b58, point, {"conrod": {"method": "probe", "record": "geometry",
+                                                     "values": {"+": b58.engine.geometry.conrod,
+                                                                "-": b58.engine.geometry.conrod}}})
+        ref = epa_coefficients.cyc(b58, *(point[k] for k in ("rpm", "map", "iat", "ect", "spark", "lam")))
+        self.assertEqual(own[("conrod", 1)]["torque"], ref["torque"])
+        self.assertNotEqual(got[("conrod", 1)]["torque"], ref["torque"])
 
     def test_a_probe_below_the_numerical_noise_is_not_visible_at_r1(self):
         """Decision 85 (29 October 2026): a probe whose antisymmetric housing response |h(+) - h(-)|/2 is at or
