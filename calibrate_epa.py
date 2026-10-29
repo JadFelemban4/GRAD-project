@@ -2157,6 +2157,17 @@ NOT_VISIBLE_AT_R1 = ("not visible at R1: the probe's response slope is below the
 NOISE_RULE = ("decision 85: the housing equivalent of the climb cell's median resolution over CLIMB_S at the "
               "frozen plant, |f| x the gas's + |dTh per unit ln mdot| x the flow's / the flow "
               "(epa_coefficients.climb_cell_resolution); a probe is visible when |h(+) - h(-)| / 2 exceeds it")
+# DEFECT D-2 (29 October 2026; results/VALIDATION_DECISIONS.md section H, the note after decision 89): a row-9
+# bracket is applied as its two edges, the constant moved to the bracket's lower edge and to its upper edge, never as
+# v0 +- its farther edge from the value. The contract moves "each uncertain constant ... by its band" (E6), and row 9's
+# band is "the bracket EPA's calculated valve channels give"; no document of the specification (the contract's E6,
+# PLAN.md 5.9 and 6.4, AMENDMENTS.md E3, HANDOFFS.md, WP3_INTERFACES.md) applies a bracket symmetrically about the
+# value. The code did (probe_sizes: size = the farther edge's distance; validate_epa row 9: v0 +- size), so the
+# Mazda's IVC (v0 -140 deg, bracket [-154.27, -80.30]) was to be probed at -199.70 deg, 45 deg outside the bracket.
+# The band's housing change and load_bearing are judged at the two edges (the larger of the two linear changes,
+# which is the farther edge's: load-bearing does not move); the probe a bracket gives validate_epa is the two edges.
+BRACKET_EDGES = ("defect D-2: a bracket is applied as its two edges, the constant moved to the bracket's lower edge "
+                 "('-') and to its upper edge ('+'); it has no symmetric size")
 
 
 def numerical_noise_k(hs, resolution):
@@ -2173,18 +2184,20 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
     consequence"): for each (record, field) of `fields`, the housing equivalent of moving it by +-rel
     (epa_coefficients.housing_equivalent at the frozen climb cell, the engine's own f and G term `hs`, from
     the climb cells `cells[(field, +1)]` and `cells[(field, -1)]` against `base_cell`), its slope per unit
-    of the constant, the change worth R1 (r1_k / |slope|), and the size used: the bracket where `brackets`
-    gives one, else the change worth R1, else +-else_rel of the value (+-else_cad for IVC and EVO). `v0`
-    {field: value}.
+    of the constant, the change worth R1 (r1_k / |slope|), and the probe used: the bracket where `brackets`
+    gives one, applied as its two edges (defect D-2: "bracket" [lo, hi], "values" {"+": hi, "-": lo}, and
+    "size" None, BRACKET_EDGES), else the change worth R1, else +-else_rel of the value (+-else_cad for IVC and
+    EVO), each of these "values" {"+": v0 + size, "-": v0 - size}. `v0` {field: value}.
 
     LOAD-BEARING IS JUDGED AT THE CONSTANT'S BAND, NOT AT THE PROBE (WP3's second fix of 23 October 2026, on
     the contract review's finding): the contract's rule is "a constant whose band moves d by more than b,
     or the housing equivalent by more than R1, becomes a preregistered sensitivity row", and a probe sized
     by its consequence moves the housing equivalent by R1 by construction, so judging it there decided
-    load_bearing by float rounding. The band is the bracket where one exists (its farther edge from the
-    value, the size the probe moves the constant by), else the fit's standard uncertainty where `sigmas`
-    ({field: sigma or None}) gives one (rows 5 and 6, the rich slope under form C); housing_change_k is
-    |slope| x the band, and load_bearing whether it exceeds R1. A constant with neither has no band: an
+    load_bearing by float rounding. The band is the bracket where one exists, judged at its two edges (defect
+    D-2: the band's housing change at each edge, slope x (edge - value), and housing_change_k the larger of the
+    two magnitudes), else the fit's standard uncertainty where `sigmas` ({field: sigma or None}) gives one
+    (rows 5 and 6, the rich slope under form C), housing_change_k |slope| x sigma; load_bearing is whether
+    housing_change_k exceeds R1. A constant with neither has no band: an
     ASSUMED constant's +-10 % is a probe, not an uncertainty (the contract's E6), so load_bearing is None
     with its reason, and its worth R1 is reported. The probe's own housing change is reported beside it as
     probe_housing_change_k, never judged. worth_b is None, with WORTH_B_WHY.
@@ -2209,10 +2222,14 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
         response = abs(h[1] - h[-1]) / 2.0
         visible = None if noise_k is None else bool(math.isfinite(slope) and response > float(noise_k))
         hidden = None
+        edges = None
         b = (brackets or {}).get(field)
         if b and b.get("bracket"):
-            lo, hi = b["bracket"]
-            size, method = max(abs(lo - val), abs(hi - val)), "bracket"
+            # defect D-2: the bracket's two edges, never v0 +- the farther edge's distance (BRACKET_EDGES)
+            lo, hi = (float(x) for x in b["bracket"])
+            if not lo <= hi:
+                raise CompletionDefect(f"{field}'s bracket {b['bracket']!r} is not [lo, hi]")
+            size, method, edges = None, "bracket", (lo, hi)
         elif visible is False:
             size, method = (else_cad if field in ANGLES else else_rel * abs(val)), "fallback"
             hidden = (f"{NOT_VISIBLE_AT_R1} (|h(+) - h(-)|/2 = {response:.3g} K at +-{rel * 100:g} %, the noise "
@@ -2222,23 +2239,35 @@ def probe_sizes(base_cell, hs, cells, *, r1_k, rel, else_rel, else_cad, fields, 
             size, method = worth, "probe"
         else:
             size, method = (else_cad if field in ANGLES else else_rel * abs(val)), "fallback"
-        if method == "bracket":
-            band = {"size": float(size), "source": "the bracket EPA's valve channels give (its farther edge from "
-                                                   "the value)"}
-        elif sigmas.get(field) is not None:
-            band = {"size": float(sigmas[field]), "source": "the fit's standard uncertainty"}
-        else:
-            band = None
         finite = math.isfinite(slope)
-        hc = abs(slope) * band["size"] if (band is not None and finite) else None
+        if method == "bracket":
+            # defect D-2: the band judged at its two edges, the linear housing change at each
+            lo, hi = edges
+            at = {"lo": slope * (lo - val), "hi": slope * (hi - val)} if finite else None
+            band = {"edges": [lo, hi], "housing_change_k_at_edges": at,
+                    "source": "the bracket EPA's valve channels give, judged at its two edges (defect D-2)"}
+            hc = max(abs(at["lo"]), abs(at["hi"])) if finite else None
+            probe_hc = hc
+            values = {"+": hi, "-": lo}
+        else:
+            if sigmas.get(field) is not None:
+                band = {"size": float(sigmas[field]), "source": "the fit's standard uncertainty"}
+            else:
+                band = None
+            hc = abs(slope) * band["size"] if (band is not None and finite) else None
+            probe_hc = abs(slope) * size if finite else None
+            values = {"+": val + float(size), "-": val - float(size)}
         why = None if hc is not None else ("no band (ASSUMED): worth R1 reported" if band is None
                                            else "the housing equivalent's slope is not finite")
-        out[field] = {"record": record, "value": val, "method": method, "size": float(size),
+        out[field] = {"record": record, "value": val, "method": method,
+                      "size": None if size is None else float(size),
+                      "size_why": BRACKET_EDGES if method == "bracket" else None,
+                      "bracket": None if edges is None else [edges[0], edges[1]], "values": values,
                       "why_not_bracket": None if method == "bracket" else (
                           (b or {}).get("why_not_bracket") or "EPA publishes no channel that brackets it"),
                       "housing_eq_k": {"+": h[1], "-": h[-1]}, "slope_k_per_unit": slope if finite else None,
                       "worth_r1": worth, "worth_b": None, "worth_b_why": WORTH_B_WHY, "band": band,
-                      "housing_change_k": hc, "probe_housing_change_k": abs(slope) * size if finite else None,
+                      "housing_change_k": hc, "probe_housing_change_k": probe_hc,
                       "load_bearing": None if hc is None else bool(hc > r1_k), "load_bearing_why": why,
                       "response_k": response, "numerical_noise_k": None if noise_k is None else float(noise_k),
                       "visible_at_r1": visible, "not_visible_at_r1": hidden,

@@ -2805,8 +2805,9 @@ class Pieces(F.Guarded):
         self.assertEqual((out["b"]["method"], out["b"]["size"]), ("fallback", 0.5))
         self.assertIsNone(out["b"]["load_bearing"])                         # no band (ASSUMED)
         self.assertIn("no band", out["b"]["load_bearing_why"])
-        self.assertEqual((out["ivc_deg"]["method"], out["ivc_deg"]["size"]), ("bracket", 10.0))
-        self.assertEqual(out["ivc_deg"]["band"]["size"], 10.0)
+        # defect D-2: a bracket is its two edges, with no symmetric size (test_a_bracket_is_applied_as_its_two_edges)
+        self.assertEqual((out["ivc_deg"]["method"], out["ivc_deg"]["size"]), ("bracket", None))
+        self.assertEqual(out["ivc_deg"]["band"]["edges"], [-150.0, -135.0])
         self.assertIn("agents", out["a"]["worth_b_why"])
         nob = C.probe_sizes(base, hs, cells, r1_k=10.0, rel=0.1, else_rel=0.1, else_cad=10.0,
                             fields=(("cycle", "a"),), brackets={}, v0={"a": 20.0}, sigmas={})
@@ -2818,6 +2819,51 @@ class Pieces(F.Guarded):
                              fields=(("geometry", "ivc_deg"),), brackets={}, v0={"ivc_deg": -140.0}, sigmas={})
         # the housing f x (+-7 K) = +-3.5 K over 2 x 14 deg: +0.25 K per degree
         self.assertAlmostEqual(out2["ivc_deg"]["slope_k_per_unit"], 0.25, places=12)
+
+    def test_a_bracket_is_applied_as_its_two_edges(self):
+        """Defect D-2 (29 October 2026): a row-9 bracket is applied as its two edges -- the constant moved to the
+        bracket's lower edge and to its upper edge -- never as v0 +- its farther edge from the value, which on the
+        Mazda's IVC (v0 -140 deg, bracket [-154.27, -80.30]) probed -199.70 deg, 45 deg outside the bracket. The
+        band is judged at the two edges: the housing change at each, slope x (edge - value), housing_change_k the
+        larger magnitude (the farther edge's, so load_bearing does not move). The controls: HEAD's record gave the
+        bracket a symmetric size, 59.70, whose minus side lies below the bracket; a constant without a bracket keeps
+        v0 +- its size; and a bracket that is not [lo, hi] is a completion defect."""
+        base = {"egt": 1000.0, "mdot": 100.0}
+        hs = {"f": 0.5, "dTh_per_unit_ln_mdot": 0.0}
+        # the Mazda's IVC in shape: +-10 % of 140 deg is +-14 deg, the gas +-3.5 K, the housing +-1.75 K: 0.125 K/deg
+        cells = {("ivc_deg", 1): {"egt": 1003.5, "mdot": 100.0}, ("ivc_deg", -1): {"egt": 996.5, "mdot": 100.0},
+                 ("t_head_k", 1): {"egt": 1002.0, "mdot": 100.0}, ("t_head_k", -1): {"egt": 998.0, "mdot": 100.0}}
+        lo, hi = -154.26905, -80.29795
+        kw = dict(r1_k=10.0, rel=0.1, else_rel=0.1, else_cad=10.0,
+                  fields=(("geometry", "ivc_deg"), ("cycle", "t_head_k")), v0={"ivc_deg": -140.0, "t_head_k": 90.0},
+                  sigmas={})
+        out = C.probe_sizes(base, hs, cells, brackets={"ivc_deg": {"bracket": [lo, hi]}}, **kw)
+        ivc = out["ivc_deg"]
+        self.assertIsNone(ivc["size"])                                  # HEAD: 59.70, the farther edge's distance
+        self.assertEqual((ivc["method"], ivc["bracket"], ivc["values"]), ("bracket", [lo, hi], {"+": hi, "-": lo}))
+        self.assertEqual(ivc["size_why"], C.BRACKET_EDGES)
+        self.assertTrue(lo <= ivc["values"]["-"] <= hi and lo <= ivc["values"]["+"] <= hi)
+        # the control: HEAD's symmetric application, v0 - the farther edge's distance, lies 45 deg below the bracket
+        far = max(abs(lo + 140.0), abs(hi + 140.0))
+        self.assertAlmostEqual(-140.0 - far, -199.70205, places=9)
+        self.assertLess(-140.0 - far, lo - 45.0)
+        # the band at its two edges: 0.125 K/deg x (edge - v0); housing_change_k the larger, the farther edge's
+        slope = ivc["slope_k_per_unit"]
+        self.assertAlmostEqual(slope, 0.125, places=12)
+        at = ivc["band"]["housing_change_k_at_edges"]
+        self.assertEqual((at["lo"], at["hi"]), (slope * (lo + 140.0), slope * (hi + 140.0)))
+        self.assertEqual(ivc["housing_change_k"], max(abs(at["lo"]), abs(at["hi"])))
+        self.assertAlmostEqual(ivc["housing_change_k"], slope * far, places=12)       # load-bearing does not move
+        self.assertEqual(ivc["band"]["edges"], [lo, hi])
+        self.assertEqual(ivc["probe_housing_change_k"], ivc["housing_change_k"])
+        self.assertTrue(ivc["load_bearing"] is False)                                  # 7.46 K, under R1 10 K
+        # the control: a constant without a bracket keeps v0 +- its size (its change worth R1, 10 / 0.01 K per K)
+        th = out["t_head_k"]
+        self.assertEqual((th["method"], th["bracket"]), ("probe", None))
+        self.assertEqual(th["values"], {"+": 90.0 + th["size"], "-": 90.0 - th["size"]})
+        # and a bracket that is not [lo, hi] is refused
+        with self.assertRaises(C.CompletionDefect):
+            C.probe_sizes(base, hs, cells, brackets={"ivc_deg": {"bracket": [hi, lo]}}, **kw)
 
     def test_a_probe_below_the_numerical_noise_is_not_visible_at_r1(self):
         """Decision 85 (29 October 2026): a probe whose antisymmetric housing response |h(+) - h(-)|/2 is at or
@@ -2854,7 +2900,7 @@ class Pieces(F.Guarded):
         self.assertEqual((out["ua"]["method"], out["ua"]["visible_at_r1"], out["ua"]["counted_excluded"]),
                          ("probe", True, False))
         self.assertAlmostEqual(out["ua"]["size"], 20.0)
-        self.assertEqual((out["ivc_deg"]["method"], out["ivc_deg"]["size"]), ("bracket", 10.0))
+        self.assertEqual((out["ivc_deg"]["method"], out["ivc_deg"]["bracket"]), ("bracket", [-150.0, -135.0]))
         self.assertFalse(out["ivc_deg"]["counted_excluded"])
         # the control: without a noise floor the same tiny slope takes the change worth R1, 1e6 kPa
         off = C.probe_sizes(base, hs, cells, **kw)

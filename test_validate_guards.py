@@ -1509,6 +1509,7 @@ class HeldOutRun(Armed):
                 rec["knock_factor"] = knock_factor
             return rec
         c = values["cycle"]
+        cls.ivc0 = float(cls.frozen.engine.geometry.ivc_deg)
         e6 = {"1": variant("1", cycle={"ua_port": c["ua_port"] * 1.05}, conventions={"cell_referenced": False}),
               "2": variant("2", conventions={"afr_st": 14.7}),
               "3": variant("3", conventions={"lhv_j_per_kg": 44.0e6}),
@@ -1528,7 +1529,12 @@ class HeldOutRun(Armed):
                      "t_head_k": {"method": "fallback", "why_not_bracket": "synthetic", "size": 9.0,
                                   "housing_change_k": None, "load_bearing": None, "worth_r1": None, "worth_b": None,
                                   "visible_at_r1": False, "counted_excluded": True,
-                                  "counted_excluded_why": "not visible at R1: synthetic"}}},
+                                  "counted_excluded_why": "not visible at R1: synthetic"},
+                     # defect D-2: a bracket, applied at its two edges [v0 - 5, v0 + 20]; its "size" is the farther
+                     # edge's distance as HEAD 0147f93's completion recorded a bracket, which the reader ignores
+                     "ivc_deg": {"method": "bracket", "why_not_bracket": None, "size": 20.0,
+                                 "bracket": [cls.ivc0 - 5.0, cls.ivc0 + 20.0], "housing_change_k": 1.0,
+                                 "load_bearing": False, "worth_r1": None, "worth_b": None}}},
             "e6_in_use": {"1": {"synthetic": True}}, "e6_row4": {"synthetic": True}, "e6_row13": {"synthetic": True}}
         return {"derived": values, "engine_sha": engines.engine_sha(cls.frozen),
                 "frozen": engines.frozen_sections_sha256(values),
@@ -1672,6 +1678,30 @@ class HeldOutRun(Armed):
         self.assertEqual(read_json(val_path(r2.root, FORD, V.ROWS))["rows"], rows["rows"])
         self.assertEqual(read_json(val_path(r2.root, FORD, V.E6))["rows"], e6["rows"])
 
+    def test_a_bracket_is_applied_at_its_two_edges(self):
+        """Defect D-2 (29 October 2026): E6 row 9 moves a bracketed constant to the bracket's two edges -- the
+        held-out rows evaluated with IVC at the bracket's upper edge ('+') and at its lower edge ('-') -- never to
+        v0 +- its farther edge, which HEAD 0147f93 applied (v0 - 20, 15 deg below this bracket, from the record's
+        size). Read off the plants the run built (epa_fit.perturbed, recorded): the control is the d rows' probe of
+        the same constant, still v0 +- 10 crank degrees, and the e6.json record states the values it applied."""
+        moved, real = [], epa_fit.perturbed
+
+        def recording(plant, *, record, field, value):
+            moved.append((field, value))
+            return real(plant, record=record, field=field, value=value)
+        with mock.patch.object(epa_fit, "perturbed", recording):
+            r, src, res, out = self.real_run()
+        self.assertIsInstance(res, dict, out)
+        ivc = [v for f, v in moved if f == "ivc_deg"]
+        lo, hi = self.ivc0 - 5.0, self.ivc0 + 20.0
+        self.assertEqual(ivc[:2], [hi, lo])                          # HEAD: [v0 + 20, v0 - 20]
+        self.assertNotIn(self.ivc0 - 20.0, ivc)
+        self.assertEqual(ivc[2:4], [self.ivc0 + 10.0, self.ivc0 - 10.0])      # the control: the d rows' +-10 CAD
+        rec = read_json(val_path(r.root, FORD, V.E6))["rows"]["9"]["ivc_deg"]
+        self.assertEqual((rec["method"], rec["size"], rec["bracket"], rec["values"]),
+                         ("bracket", None, [lo, hi], {"+": hi, "-": lo}))
+        self.assertEqual(rec["d_probe_size"], 10.0)
+
     def test_a_retag_that_is_not_the_plant_stops_the_run(self):
         """HANDOFFS.md WP3 item 3: the rich slope's retag is asserted before row 9's probe is read, never
         relaxed. The control is the whole run above, where it holds."""
@@ -1719,6 +1749,27 @@ class NotVisibleAtR1(fx.Guarded):
         self.assertIsNone(V.not_visible_at_r1(None))
         self.assertEqual(V.not_visible_at_r1({"counted_excluded": True, "counted_excluded_why": "not visible at R1: x"}),
                          "not visible at R1: x")
+
+
+class BracketEdges(fx.Guarded):
+    """Defect D-2 (29 October 2026): E6 row 9 applies a bracket as its two edges (validate_epa.row9_probe_values)."""
+
+    def test_row_9s_bracket_is_its_two_edges_and_a_record_without_them_is_refused(self):
+        """Defect D-2 by hand: row9_probe_values gives a bracket's edges, '+' the upper and '-' the lower, its size
+        None, whatever size the record carries (HEAD's completion wrote the farther edge's distance, 59.70 on the
+        Mazda's IVC); a bracket record without its two edges is refused, never applied as v0 +- size (mistake 19);
+        the control, any other probe, is v0 +- its size bit for bit as before."""
+        lo, hi = -154.26905, -80.29795
+        vals, size = V.row9_probe_values({"method": "bracket", "bracket": [lo, hi], "size": 59.70205}, -140.0)
+        self.assertEqual((vals, size), ({"+": hi, "-": lo}, None))
+        for bad in ({"method": "bracket", "size": 59.70205}, {"method": "bracket", "bracket": [hi, lo]},
+                    {"method": "bracket", "bracket": None}):
+            with self.assertRaises(RuntimeError):
+                V.row9_probe_values(bad, -140.0)
+        v0, s = -140.0, 10.0
+        self.assertEqual(V.row9_probe_values({"method": "fallback", "size": s}, v0), ({"+": v0 + s, "-": v0 - s}, s))
+        self.assertEqual(V.row9_probe_values({"method": "probe", "size": 0.3}, 1.32),
+                         ({"+": 1.32 + 1.0 * 0.3, "-": 1.32 + -1.0 * 0.3}, 0.3))       # HEAD's v0 + sg x size
 
 
 class SummaryOfThree(fx.Guarded):

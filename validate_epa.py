@@ -1941,6 +1941,24 @@ def _excluded(base, variants, rows):
     return out
 
 
+def row9_probe_values(spec, v0):
+    """E6 row 9's probe of one constant, from its completion record (complete.json's e6_probes row9) and its value
+    v0 in the frozen plant: ({"+": value, "-": value}, size). A bracket (method "bracket") is applied as its two
+    edges, "+" its upper and "-" its lower, its size None (defect D-2, 29 October 2026: the contract moves a constant
+    "by its band", and row 9's band is "the bracket EPA's calculated valve channels give"; the code had applied it as
+    v0 +- its farther edge, outside the bracket on one side). A bracket record without its two edges (one written
+    before D-2) is refused, never applied symmetrically by a fallback (mistake 19). Any other probe is v0 +- its
+    size, as before."""
+    if spec.get("method") == "bracket":
+        edges = spec.get("bracket")
+        if not (isinstance(edges, (list, tuple)) and len(edges) == 2 and float(edges[0]) <= float(edges[1])):
+            raise RuntimeError(f"E6 row 9: a bracket record without its two edges ({edges!r}); one written before "
+                               "defect D-2 is not applied")
+        return {"+": float(edges[1]), "-": float(edges[0])}, None
+    size = float(spec["size"])
+    return {"+": v0 + size, "-": v0 - size}, size
+
+
 def not_visible_at_r1(spec):
     """Decision 85 (29 October 2026): the reason a completion's probe record (complete.json's e6_probes) gives for a
     constant that is not visible at R1, counted as excluded for its row's level rows, or None (a record written
@@ -2105,8 +2123,8 @@ def e6_rows(st):
                        found not visible at R1 counted as excluded for the level rows, with its reason
                        (decision 85; level_exclusion), here and in row 9;
       row 8            u_num;
-      row 9            each constant as completion sized it, the rich slope after its retag identity
-                       (HANDOFFS.md WP3 item 3);
+      row 9            each constant as completion sized it, a bracket at its two edges (defect D-2;
+                       row9_probe_values), the rich slope after its retag identity (HANDOFFS.md WP3 item 3);
       row 11           the charge temperature +- the contract's shift, on the hot TIT rows;
       row 12           E3a, E5, D1 and L0 unsnapped, labelled by the worse; D1's larger kappa;
       row 13           handed to the preregistration."""
@@ -2185,15 +2203,17 @@ def e6_rows(st):
         # before the probe is read, never relaxed
         raise RuntimeError(f"{name}: the rich slope's retag is not the frozen plant at its own slope")
     for const, spec in sorted(row9.items()):
-        size = float(spec["size"])
         record = spec.get("record") or record_of(frozen.engine, const)
         v0 = float(getattr(getattr(frozen.engine, record), const))
+        # defect D-2 (29 October 2026): a bracket is applied as its two edges, "+" at its upper edge and "-" at its
+        # lower (calibrate_epa.BRACKET_EDGES), never v0 +- its farther edge; any other probe as v0 +- its size
+        values, size = row9_probe_values(spec, v0)
 
         def moved(val, const=const, record=record):
             if const == "ce_rich_slope":
                 return epa_fit.with_rich_slope_probe(frozen, slope=val)
             return epa_fit.perturbed(frozen, record=record, field=const, value=val)
-        lvl = {s: st.at(moved(v0 + sg * size), conventions=nominal_conv, shift=None) for s, sg in signs}
+        lvl = {s: st.at(moved(values[s]), conventions=nominal_conv, shift=None) for s, _sg in signs}
         # the d rows' probe: +-10 % of the constant, and for IVC and EVO the contract's "+-10 crank degrees"
         # (its row 9 band: "else +-10 % (+-10 crank degrees for IVC and EVO)"), never 10 % of an angle
         # (WP3's fix of 23 October 2026: 10 % of -140 deg is 14 CAD)
@@ -2213,7 +2233,9 @@ def e6_rows(st):
         ex.update(_excluded(results, list(dpr.values()), drows))
         excl[9][const] = ex
         e6["9"][const] = {"method": spec.get("method"), "why_not_bracket": spec.get("why_not_bracket"),
-                          "record": record, "size": size, "retag_identity": True if const == "ce_rich_slope" else None,
+                          "record": record, "size": size, "bracket": spec.get("bracket") if spec.get("method") == "bracket"
+                          else None, "values": values,
+                          "retag_identity": True if const == "ce_rich_slope" else None,
                           "delta_E": {s: _deltas(base_values, lvl[s], epa_stats.ROW_FUNCTIONS) for s in "+-"},
                           "d_probe_size": d_size,
                           "delta_E_d_probe": {s: _deltas(base_values, dpr[s], epa_stats.ROW_FUNCTIONS) for s in "+-"},
