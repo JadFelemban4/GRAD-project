@@ -1,8 +1,8 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-23 (on `GRA-test`, commit A's tree) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s of 23 October: `results/B58_IDENTITY.md`)
+Last verified: 2026-10-30 (on `GRA-test`, commit D `25437ba`) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s at commit D, the same results as commit A's: `SESSION_REPORT_2026-10-30_run1.md`)
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
-GRA-test: build step 2's commit A (WP1: each engine's own fuel, lambda clip, cycle forms and intake cam threaded through the plant; the three EPA engines registered, typed, not calibrated), on build step 1 and the validation contract of decision 35 (`results/ENGINE_THRESHOLDS.md`), certified 23 October; contract version 4 on it (decision 39, before any fit) · plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3 · the B58 bit-identical to cf43fbb at every level run on this laptop; pending: L8 on the training device (`results/B58_IDENTITY.md`)
+GRA-test: build step 2's commits A (WP1, certified 23 October, `results/B58_IDENTITY.md`), C (the calibration and validation scripts, WP3) and D (`25437ba`, 30 October: Run 1, the three EPA engines calibrated and frozen), on contract version 5 (`c842d74`, unchanged since the first fit) · the B58: plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3, unchanged by Run 1 (decision 48's re-runs) · pending: L8 on the training device
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
 `STATE_HISTORY.md` part B, verbatim. This file holds the current state only: the
@@ -42,10 +42,15 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   with the agent's own levers (0.42 with unlimited preview) against the MEI of
   5.43 (`python preview_ceiling.py` -> `results/preview_ceiling.txt`): the climb
   that X1 and X2 were scored on cannot show a preview effect (decision 34).
-- `python engine_thresholds.py --check`: the validation contract of decision 35
-  (`results/ENGINE_THRESHOLDS.md` and `.json`, version 4 since 23 October: every
-  R of version 3 kept) is what its committed generator writes, with 67 claims and
-  250 citations checked. Nothing has been fitted to the three EPA engines.
+- `python test_contract_pinned.py` (19 OK): the validation contract (`results/ENGINE_THRESHOLDS.md`
+  and `.json`, version 5) is `c842d74`'s and freeze.json's; `engine_thresholds.py --check` cannot pass
+  once a fit exists (`docs/build_step_2/PLAN.md` 8.4: its manual check is a worktree of `c842d74`).
+- Run 1 (`25437ba`; `results/EPA_CALIBRATION/<id>/`; `python test_epa_plants.py` rebuilds each plant
+  against them, 7 OK): no form passes in-sample, so all three froze at A+B+C+D (decisions 82, 93).
+  Mazda: fails E1a E2a E3a L0 L1, knee 1030.32 K, derived_sha e8318dd80c3375f2. Ford: the same
+  fails, knee 937.17 K, derived_sha 61f84c7d02b6b816. Honda: fails E4a too, knee 911.80 K, no
+  schema-3 fingerprint (CVT, decision 91). Delivery: no step over the tolerance on any engine;
+  the worktree reproduction byte for byte (decision 89). No held-out row read.
 - `python check_training_device.py`: this laptop matches `requirements-lock.txt`;
   its `--identity`/`--compare` modes decide whether a second machine trains
   identical agents (decision 32). Not yet run on the training device.
@@ -67,12 +72,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
-- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 2's
-  commit A (the plant changes, certified) and contract version 4; the calibration
-  scripts (WP3) next, then Run 1, the first fit, which waits for both columns of
-  decisions 36-76 (`results/VALIDATION_DECISIONS.md` sections G and H, adopted on
-  Ghassan's delegation, Jad's column open; `docs/build_step_2/`). Training runs
-  on another device, not this laptop (Ghassan, 21 October).
+- Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
+  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Next:
+  decision 34's test roads and the L1/E8 tightenings, then Run 2. Ghassan has
+  answered decisions 36-93, Jad's column is open (`results/VALIDATION_DECISIONS.md`
+  sections G and H). Training runs on another device, not this laptop (21 October).
 
 ## Blockers
 
@@ -105,14 +109,14 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. For Ghassan, before the next training: `train.py`'s `CLOSED` list has no
    `wideair_dt1`, though X2's result was published on 13 October (session
    report of 15 October, 2.3).
-8. `GRA-test`, build step 2 (`docs/build_step_2/PLAN.md`, as `AMENDMENTS.md` and
-   `HANDOFFS.md` amend it): the calibration scripts and their tests (WP3); Run 1
-   and the freeze only after both columns of decisions 36-76 (Desktop copies
-   `decisions_2026-10-21_G.md`, `decisions_2026-10-22_H.md`); then decision 34's
-   roads and the L1/E8 tightenings; then the held-out validation, run once.
-   Pending from commit A: L8 on the training device (`app.test_results` on commit A
-   gives cf43fbb's clone's eight failures, no new one). Schema 4 (decisions 27,
-   28) before any EPA engine trains.
+8. `GRA-test`, build step 2 (`docs/build_step_2/PLAN.md`, as `AMENDMENTS.md`,
+   `HANDOFFS.md` and `WP3_INTERFACES.md` amend it): decision 34's roads and
+   `EPA_TIGHTENINGS.json`; then the held-out validation (`validate_epa.py arm`, then
+   `run`, once), decision 83's steady-only reading beside it; WP7's documents
+   (PLAN.md 8.5); schema 4 (decisions 27, 28) before any EPA engine trains; the
+   preregistration; L8 and the dump comparison on the training device. Jad's column
+   of decisions 36-93: Desktop copies `decisions_2026-10-21_G.md`,
+   `decisions_2026-10-22_H.md`, `decisions_2026-10-30_H.md`.
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device, before any training: install from

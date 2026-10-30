@@ -4573,3 +4573,30 @@ GRA-test: build step 2's commit A (WP1: each engine's own fuel, lambda clip, cyc
    once. Pending from commit A: `python -m app.test_results` on commit A itself,
    and L8 on the training device. Schema 4 (decisions 27, 28) before any EPA
    engine trains.
+
+# Part V — lines rotated out of CHECKPOINT.md, 30 October 2026 (GRA-test: commit D, Run 1, the three EPA engines calibrated and frozen)
+
+Last verified: 2026-10-23 (on `GRA-test`, commit A's tree) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s of 23 October: `results/B58_IDENTITY.md`)
+
+GRA-test: build step 2's commit A (WP1: each engine's own fuel, lambda clip, cycle forms and intake cam threaded through the plant; the three EPA engines registered, typed, not calibrated), on build step 1 and the validation contract of decision 35 (`results/ENGINE_THRESHOLDS.md`), certified 23 October; contract version 4 on it (decision 39, before any fit) · plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3 · the B58 bit-identical to cf43fbb at every level run on this laptop; pending: L8 on the training device (`results/B58_IDENTITY.md`)
+
+- `python engine_thresholds.py --check`: the validation contract of decision 35
+  (`results/ENGINE_THRESHOLDS.md` and `.json`, version 4 since 23 October: every
+  R of version 3 kept) is what its committed generator writes, with 67 claims and
+  250 citations checked. Nothing has been fitted to the three EPA engines.
+
+- Ghassan · `GRA-test` · the four-engine test (decision 24): build step 2's
+  commit A (the plant changes, certified) and contract version 4; the calibration
+  scripts (WP3) next, then Run 1, the first fit, which waits for both columns of
+  decisions 36-76 (`results/VALIDATION_DECISIONS.md` sections G and H, adopted on
+  Ghassan's delegation, Jad's column open; `docs/build_step_2/`). Training runs
+  on another device, not this laptop (Ghassan, 21 October).
+
+8. `GRA-test`, build step 2 (`docs/build_step_2/PLAN.md`, as `AMENDMENTS.md` and
+   `HANDOFFS.md` amend it): the calibration scripts and their tests (WP3); Run 1
+   and the freeze only after both columns of decisions 36-76 (Desktop copies
+   `decisions_2026-10-21_G.md`, `decisions_2026-10-22_H.md`); then decision 34's
+   roads and the L1/E8 tightenings; then the held-out validation, run once.
+   Pending from commit A: L8 on the training device (`app.test_results` on commit A
+   gives cf43fbb's clone's eight failures, no new one). Schema 4 (decisions 27,
+   28) before any EPA engine trains.
