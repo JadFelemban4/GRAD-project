@@ -1,0 +1,38 @@
+REPRODUCTION, B58 locked climb, today's plant (b58b30o1/a90-supra-zf8hp51); 16 runs in parallel, wall 130 s
+per-run seconds: neutral 129, cg 129, pred 128, lam_H14 128, lam_H15 129, lam_H30 129, lam_H45 128, lam_H47 129, lam_H60 128, lam_H90 129, lam_H100 129, lam_H130 129, lam_H150 129, lam_all 129, egt_H30 129, egt_all 129
+neutral damage 848.052 (damage_base 848.885); premise.json 848.052 / 848.885
+current-grade damage 449.625; premise.json 449.625
+tau of the housing on current-grade: flat 150-179 s median 127.9 s, climb 230-718 s median 46.9 s
+
+G. head start at the climb start, and the points it buys (points = 100 x saved / base)
+   row                                             dEGT K  dT@179 K open-loop pts closed pts kn closed pts nk 8 Oct col
+   pred                                              25.0      2.27         0.032        -0.009         0.036      0.04
+   lam_H30                                           55.2      4.43         0.062         0.044         0.068      0.13
+   lam_all                                           55.2     14.77         0.203         0.185         0.208      0.42
+   egt_H30                                            nan     90.61         1.151         1.151         1.151      1.19
+   egt_all                                            nan    309.29         3.262         3.262         3.262      3.35
+   lam_H14                                           55.2      2.09         0.029         0.012         0.035       nan
+   lam_H15                                           55.2      2.24         0.031         0.014         0.037       nan
+   lam_H45                                           55.2      6.34         0.088         0.071         0.094       nan
+   lam_H47                                           55.2      6.58         0.091         0.074         0.097       nan
+   lam_H60                                           55.2      8.02         0.111         0.094         0.117       nan
+   lam_H90                                           55.2     10.75         0.149         0.131         0.154       nan
+   lam_H100                                          55.2     11.50         0.159         0.141         0.164       nan
+   lam_H130                                          55.2     13.37         0.184         0.166         0.189       nan
+   lam_H150                                          55.2     14.35         0.198         0.179         0.202       nan
+
+   term split of the closed-loop saving (units): turbine / oil / knock; extra fuel %
+   pred            0.307   -0.002   -0.385   +0.100 %
+   lam_H30         0.581   -0.007   -0.199   +0.316 %
+   lam_all         1.797   -0.033   -0.197   +1.708 %
+   egt_H30         9.767    0.000    0.000   +0.000 %
+   egt_all        27.687    0.000    0.000   +0.000 %
+   lam_H14         0.302   -0.003   -0.200   +0.145 %
+   lam_H15         0.321   -0.003   -0.200   +0.155 %
+   lam_H45         0.808   -0.010   -0.199   +0.476 %
+   lam_H47         0.836   -0.010   -0.199   +0.498 %
+   lam_H60         1.006   -0.013   -0.199   +0.637 %
+   lam_H90         1.327   -0.019   -0.198   +0.958 %
+   lam_H100        1.415   -0.021   -0.198   +1.065 %
+   lam_H130        1.635   -0.027   -0.197   +1.387 %
+   lam_H150        1.748   -0.031   -0.197   +1.601 %

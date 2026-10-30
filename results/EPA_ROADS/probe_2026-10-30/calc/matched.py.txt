@@ -1,0 +1,120 @@
+"""Reads ONLY the probe's own output (scratchpad rft2/probe/table_full.csv, headstart.json); opens no
+repository file. Interpolates variant (a) linearly in H to H = r * tau_e (frozen definition), per engine,
+and prints: per family, per r, each engine's points and the minimum; the mix of the families nearest the
+drafted design (v 130, g 10/12, L 67/85, G 50/100); and the spread across engines at matched r.
+
+    python -I matched.py
+"""
+import csv
+import json
+import os
+import sys
+from collections import defaultdict
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+PROBE = os.path.join(os.path.dirname(HERE), "probe")
+TAU = {"b58": 47.3351, "mazda_25t": 42.7418, "honda_l15b7": 47.6717, "ford_27tt": 66.7620}
+ENG = tuple(TAU)
+HS = (15, 30, 45, 60, 90, 130)
+MEI = 5.43
+RS = (0.5, 2 / 3, 1.0, 1.25, 1.5, 130 / TAU["ford_27tt"])
+
+rows = list(csv.DictReader(open(os.path.join(PROBE, "table_full.csv"), encoding="utf-8")))
+A = defaultdict(dict)       # (fid, eng, loop, reading) -> {H: pts}
+B = {}                      # (fid, eng, loop, reading) -> b pts
+META = {}
+for r in rows:
+    k = (r["family"], r["engine"], r["loop"], r["reading"])
+    META[r["family"]] = dict(L=float(r["L_s"]), g=float(r["grade"]), G=float(r["gap_s"]), v=float(r["v_kmh"]),
+                             n=int(r["n_climbs"]), dropped=r["dropped"] == "True")
+    if r["variant"] == "a":
+        A[k][int(r["H_s"])] = float(r["points"])
+    elif r["variant"] == "b":
+        B[k] = float(r["points"])
+
+
+def interp(d, h):
+    xs = sorted(d)
+    if h <= xs[0]:
+        return d[xs[0]] * h / xs[0]          # (a) is 0 at H = 0
+    for x0, x1 in zip(xs, xs[1:]):
+        if x0 <= h <= x1:
+            return d[x0] + (d[x1] - d[x0]) * (h - x0) / (x1 - x0)
+    return float("nan")                      # beyond 130 s: not measured
+
+
+def at(fid, loop, reading, r):
+    return {e: interp(A[(fid, e, loop, reading)], r * TAU[e]) for e in ENG}
+
+
+def show(title, fids, loop, reading):
+    print(f"\n== {title} [{loop}, {reading}] ==")
+    for f in fids:
+        if not all((f, e, loop, reading) in A for e in ENG):
+            continue
+        parts = []
+        for r in RS:
+            v = at(f, loop, reading, r)
+            parts.append(f"r{r:.2f}: min {min(v.values()):.2f} (" + " ".join(f"{v[e]:.2f}" for e in ENG) + ")")
+        print(f"  {f:<20} " + " | ".join(parts))
+
+
+kept = sorted(f for f, m in META.items() if not m["dropped"] and not f.startswith("X_"))
+closed = sorted({k[0] for k in A if k[2] == "closed"})
+print("engines in order:", ENG, "; tau", TAU)
+print("kept families:", len(kept), "; closed-loop (a) families:", len(closed))
+show("closed-loop (a) at H = r tau_e", closed, "closed", "noknock")
+show("closed-loop (a) at H = r tau_e", closed, "closed", "knock")
+
+# the families nearest the drafted design: v 130, g 10-12 %, L 67-85 s, G 50-100 s; equal weight per family
+mix = [f for f in kept if META[f]["v"] == 130 and META[f]["L"] in (67, 85) and META[f]["G"] in (50, 100)
+       and META[f]["g"] in (0.10, 0.12)]
+print("\n== the mix nearest the drafted design (equal weight per family), open loop, no knock ==")
+print("  families:", mix)
+for loop in ("open",):
+    for r in RS:
+        vals = {e: sum(at(f, loop, "noknock", r)[e] for f in mix) / len(mix) for e in ENG}
+        print(f"  r {r:.3f}: " + "  ".join(f"{e} {vals[e]:.2f} (H {r * TAU[e]:.1f} s)" for e in ENG)
+              + f"   min {min(vals.values()):.2f} = {min(vals.values()) / MEI:.2f} MEI;"
+              + f" max/min {max(vals.values()) / min(vals.values()):.2f}")
+mixc = [f for f in mix if f in closed]
+print("  closed-loop check on", mixc)
+for r in RS:
+    vals = {e: sum(at(f, "closed", "noknock", r)[e] for f in mixc) / len(mixc) for e in ENG}
+    print(f"  r {r:.3f}: " + "  ".join(f"{e} {vals[e]:.2f}" for e in ENG) + f"   min {min(vals.values()):.2f}")
+print("  (b) whole gap, open loop, no knock, mix mean: "
+      + "  ".join(f"{e} {sum(B[(f, e, 'open', 'noknock')] for f in mix) / len(mix):.2f}" for e in ENG))
+print("  (b) whole gap, closed loop, no knock, mix mean: "
+      + "  ".join(f"{e} {sum(B[(f, e, 'closed', 'noknock')] for f in mix) / len(mix):.2f}" for e in ENG))
+
+# head-start part (outside the windows), closed loop, no knock, interpolated the same way
+hs = json.load(open(os.path.join(PROBE, "headstart.json"), encoding="utf-8"))
+print("\n== head-start part only (outside the lever's windows), closed loop, no knock, at H = r tau_e ==")
+for f in mixc:
+    parts = []
+    for r in RS:
+        v = {e: interp({h: hs[f"{f}|{e}|a{h}"]["outside"] for h in HS}, r * TAU[e]) for e in ENG}
+        parts.append(f"r{r:.2f}: min {min(v.values()):.2f}")
+    print(f"  {f:<20} " + " | ".join(parts))
+for r in RS:
+    vals = {e: sum(interp({h: hs[f"{f}|{e}|a{h}"]["outside"] for h in HS}, r * TAU[e]) for f in mixc) / len(mixc)
+            for e in ENG}
+    print(f"  mix r {r:.3f}: " + "  ".join(f"{e} {vals[e]:.2f}" for e in ENG) + f"   min {min(vals.values()):.2f}")
+print("\n== fuel extra over current-grade, closed loop, mix mean, (a) at the nearest grid H and (b) ==")
+for h in HS:
+    print(f"  a{h}: " + "  ".join(f"{e} +{sum(hs[f'{f}|{e}|a{h}']['fuel_extra_pct'] for f in mixc) / len(mixc):.1f} %"
+                               for e in ENG))
+print("  b  : " + "  ".join(f"{e} +{sum(hs[f'{f}|{e}|b']['fuel_extra_pct'] for f in mixc) / len(mixc):.1f} %"
+                            for e in ENG))
+
+# current-grade's own cut and the baseline's peak on the mix
+print("\n== current-grade's own cut over the baseline (no knock), and baseline peak minus knee, mix ==")
+for f in mix:
+    cg = {}
+    pk = {}
+    for r in rows:
+        if r["family"] == f and r["variant"] == "b" and r["loop"] == "closed" and r["reading"] == "noknock":
+            cg[r["engine"]] = float(r["cg_cut_pts"])
+            pk[r["engine"]] = float(r["base_peak_minus_knee_K"])
+    print(f"  {f:<20} cg cut " + " ".join(f"{e} {cg[e]:.2f}" for e in ENG) + "   peak-knee K "
+          + " ".join(f"{e} {pk[e]:+.1f}" for e in ENG))

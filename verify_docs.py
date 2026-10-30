@@ -926,8 +926,15 @@ RETIRED_EXEMPT_AGENT_DIRS = ("results/agents/",)
 # 19 October 2026: results/DRIVE_C_RULE_NUMBERS.txt (drive_c_rule_numbers.py) joins
 # them for the same reason: its verdict table's error rates are bare percentages,
 # and two of them (2.3 %) collided with the retired pre-correction load residual.
+# 30 October 2026: the ceiling probe's printed outputs, results/EPA_ROADS/probe_<date>/
+# (and its calc/ and review/), join them: tables of road-family savings printed by the
+# probe's scripts, committed verbatim with them. Their bare numbers collided with the
+# retired enrichment correlations and the pre-correction load residual. Same cost: a
+# retired figure in them would pass. The folder's README.md and its scripts are still
+# checked, and section I quotes nothing from them that a script there did not print.
 RETIRED_EXEMPT_RESULT_TABLES = re.compile(
-    r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT|DRIVE_C_RULE_NUMBERS)\.txt$")
+    r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT|DRIVE_C_RULE_NUMBERS"
+    r"|EPA_ROADS/probe_\d{4}-\d{2}-\d{2}/(?:calc/|review/)?\w+)\.txt$")
 
 
 def _generated_agent_report(rel):

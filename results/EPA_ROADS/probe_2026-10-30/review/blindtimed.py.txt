@@ -1,0 +1,17 @@
+"""ASSUMED first-order weighting: enrichment u seconds before an onset is worth exp(-u/tau).
+Compares (a), lambda at its bound over the last min(H, G) s before each onset, with a BLIND
+policy that enriches from G_min = 50 s after each ramp-down start until the onset (it sees the
+climb end and the grade rise; the gap floor is the generator's, row 101). G ~ U{50..150}.
+Arithmetic only; no plant run. Fuel is proportional to enrichment seconds (ASSUMED)."""
+import numpy as np
+TAU = {"b58": 47.335, "mazda": 42.7418, "honda": 47.6717, "ford": 66.762}
+G = np.arange(50, 151).astype(float)
+w = lambda x, t: t * (1 - np.exp(-np.maximum(x, 0) / t))
+for e, t in TAU.items():
+    for r in (0.5, 1.5):
+        H = r * t
+        a = w(np.minimum(H, G), t).mean(); fa = np.minimum(H, G).mean()
+        bl = w(G - 50, t).mean(); fb = (G - 50).mean()
+        blH = w(np.minimum(H, G - 50), t).mean(); fbH = np.minimum(H, G - 50).mean()
+        print(f"{e:6s} r {r}: blind-timed head start / (a)'s = {bl/a:.2f} at {fb/fa:.2f} of (a)'s enrichment time; "
+              f"capped at H: {blH/a:.2f} at {fbH/fa:.2f}")

@@ -1,0 +1,25 @@
+== drafted-design mix, open loop, (a), no knock: mean / POOLED / median of per-road points ==
+  r 0.500: b58 2.27/2.36/2.13  mazda_25t 1.07/1.15/1.00  honda_l15b7 2.29/2.36/2.22  ford_27tt 1.19/1.26/1.13   min 1.07/1.15/1.00
+  r 0.667: b58 3.04/3.17/2.84  mazda_25t 1.44/1.55/1.35  honda_l15b7 3.07/3.17/2.97  ford_27tt 1.62/1.72/1.51   min 1.44/1.55/1.35
+  r 1.000: b58 4.64/4.93/4.35  mazda_25t 2.40/2.63/2.24  honda_l15b7 4.46/4.57/4.31  ford_27tt 2.06/2.08/1.93   min 2.06/2.08/1.93
+  r 1.250: b58 5.46/5.75/5.17  mazda_25t 2.97/3.26/2.79  honda_l15b7 4.85/4.82/4.81  ford_27tt 2.33/2.25/2.41   min 2.33/2.25/2.41
+  r 1.500: b58 5.96/6.10/5.72  mazda_25t 3.40/3.68/3.22  honda_l15b7 5.42/5.26/5.43  ford_27tt 2.50/2.36/2.59   min 2.50/2.36/2.59
+  r 1.947: b58 6.76/6.62/6.69  mazda_25t 3.87/4.00/3.73  honda_l15b7 6.33/5.96/6.24  ford_27tt 2.67/2.48/2.69   min 2.67/2.48/2.69
+
+== drafted-design mix, closed loop, (a), no knock: mean / POOLED / median of per-road points ==
+  r 0.500: b58 2.24/2.38/1.94  mazda_25t 1.01/1.10/0.80  honda_l15b7 2.30/2.39/2.07  ford_27tt 1.20/1.29/1.04   min 1.01/1.10/0.80
+  r 0.667: b58 2.96/3.16/2.53  mazda_25t 1.35/1.47/1.06  honda_l15b7 3.05/3.18/2.73  ford_27tt 1.61/1.76/1.36   min 1.35/1.47/1.06
+  r 1.000: b58 4.44/4.82/3.63  mazda_25t 2.16/2.42/1.56  honda_l15b7 4.50/4.68/4.06  ford_27tt 2.14/2.23/2.04   min 2.14/2.23/1.56
+  r 1.250: b58 5.29/5.72/4.45  mazda_25t 2.72/3.04/1.95  honda_l15b7 5.05/5.09/5.09  ford_27tt 2.49/2.50/2.54   min 2.49/2.50/1.95
+  r 1.500: b58 5.91/6.22/5.38  mazda_25t 3.17/3.51/2.39  honda_l15b7 5.79/5.71/5.87  ford_27tt 2.70/2.66/2.67   min 2.70/2.66/2.39
+  r 1.947: b58 6.92/7.01/6.99  mazda_25t 3.76/3.98/3.33  honda_l15b7 6.96/6.70/6.83  ford_27tt 2.95/2.85/2.85   min 2.95/2.85/2.85
+
+baseline no-knock damage per family (closed-loop b run's base): 
+  L67_g10_G100_v130    b58 29.9  mazda_25t 52.8  honda_l15b7 152.7  ford_27tt 124.4
+  L67_g10_G50_v130     b58 67.9  mazda_25t 113.3  honda_l15b7 272.7  ford_27tt 333.9
+  L67_g12_G100_v130    b58 76.9  mazda_25t 100.5  honda_l15b7 234.7  ford_27tt 145.4
+  L67_g12_G50_v130     b58 199.7  mazda_25t 228.7  honda_l15b7 437.8  ford_27tt 382.1
+  L85_g10_G100_v130    b58 48.4  mazda_25t 83.2  honda_l15b7 211.2  ford_27tt 217.0
+  L85_g10_G50_v130     b58 86.7  mazda_25t 139.4  honda_l15b7 300.2  ford_27tt 434.4
+  L85_g12_G100_v130    b58 142.5  mazda_25t 167.0  honda_l15b7 325.9  ford_27tt 248.5
+  L85_g12_G50_v130     b58 272.8  mazda_25t 288.0  honda_l15b7 477.7  ford_27tt 485.6

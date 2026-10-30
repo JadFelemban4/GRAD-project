@@ -1,0 +1,93 @@
+"""Planning power of row 113's tests at the probe's ceilings (review, 30 Oct 2026).
+
+Reads nothing from the repository: every input is typed below with its source.
+  sigma: the only measured spreads of a paired d (sighted - blinded, points of cut):
+         X1 24.78 (23 pairs), X2 20.51 (5 pairs)  -- results/README.md:19, :62
+  ceilings at r = 1.5 and 0.5, open loop, no knock, drafted-design mix
+         -- rft2/calc/matched.txt ("the mix nearest the drafted design")
+  n = 20 pairs per engine (decision 30's target); Holm over 8 (engine x H) one-sided at 0.05.
+"""
+import numpy as np
+from scipy import stats
+
+SIG = {"X2 20.51": 20.51, "X1 24.78": 24.78, "10": 10.0, "5": 5.0}
+C15 = {"b58": 5.96, "mazda": 3.40, "honda": 5.42, "ford": 2.50}
+C05 = {"b58": 2.27, "mazda": 1.07, "honda": 2.29, "ford": 1.19}
+N = 20
+ALPHA = 0.05
+
+
+def power_one_sided_t(d, sigma, n, alpha):
+    df = n - 1
+    tc = stats.t.ppf(1 - alpha, df)
+    ncp = d / (sigma / np.sqrt(n))
+    return 1 - stats.nct.cdf(tc, df, ncp)
+
+
+print("== (2) paired one-sided t, n = 20, true d = the whole ceiling (best case) ==")
+for lab, s in SIG.items():
+    row = []
+    for e in C15:
+        p_first = power_one_sided_t(C15[e], s, N, ALPHA / 8)
+        p_last = power_one_sided_t(C15[e], s, N, ALPHA)
+        row.append(f"{e} r1.5 {p_first:.3f}/{p_last:.3f}")
+    for e in C05:
+        p_last = power_one_sided_t(C05[e], s, N, ALPHA)
+        row.append(f"{e} r0.5 -/{p_last:.3f}")
+    print(f"  sigma {lab:>9}: " + "  ".join(row))
+print("  (first/last = Holm's first step alpha/8 and its last step alpha; upper bound of Holm power)")
+
+print("\n== sigma needed for 80 % power at Holm's first step (alpha/8), d = whole ceiling, n = 20 ==")
+df = N - 1
+for e in C15:
+    # solve sigma: power(d, sigma) = 0.8
+    lo, hi = 0.01, 50.0
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        if power_one_sided_t(C15[e], mid, N, ALPHA / 8) > 0.8:
+            lo = mid
+        else:
+            hi = mid
+    print(f"  {e:6s} r1.5 ceiling {C15[e]:.2f}: sigma <= {lo:.2f} points")
+
+print("\n== (4) difference test, Welch, n = 20 each, Holm over 6 pairs x 2 H = 12, two-sided ==")
+for lab, s in SIG.items():
+    se = s * np.sqrt(2.0 / N)
+    dfw = 2 * N - 2
+    z1 = stats.t.ppf(1 - ALPHA / 12 / 2, dfw)
+    zl = stats.t.ppf(1 - ALPHA / 2, dfw)
+    print(f"  sigma {lab:>9}: SE {se:5.2f}; observed |d_i - d_j| must exceed band + {z1*se:5.1f} (first step) / + {zl*se:5.1f} (last step)")
+print(f"  largest possible true difference if d in [0, C]: r1.5 {max(C15.values()):.2f} (B58 full vs any at 0); r0.5 {max(C05.values()):.2f}")
+
+print("\n== (3) TOST, 90 % Welch interval half-width (before the model band) ==")
+for lab, s in SIG.items():
+    se = s * np.sqrt(2.0 / N)
+    print(f"  sigma {lab:>9}: +/- {stats.t.ppf(0.95, 2*N-2)*se:5.1f} points against the MEI 5.43")
+
+print("\n== false-negative risk at d_obs = 0.59 MEI = 3.20 points (MD:139-141), n = 20 ==")
+for lab, s in SIG.items():
+    print(f"  sigma {lab:>9}: power {power_one_sided_t(3.20, s, N, ALPHA/8):.3f} (alpha/8) / {power_one_sided_t(3.20, s, N, ALPHA):.3f} (alpha); FN = 1 - power")
+
+print("\n== effective window / tau at nominal r = 1.5 (window = min(H, G), G ~ U[50,150] whole s; first climb unclipped ignored) ==")
+TAU = {"b58": 47.335, "mazda": 42.7418, "honda": 47.6717, "ford": 66.762}
+G = np.arange(50, 151)
+for e, t in TAU.items():
+    for r in (0.5, 1.5):
+        H = r * t
+        w = np.minimum(H, G).mean()
+        print(f"  {e:6s} r {r}: H {H:6.2f} s, P(G < H) {np.mean(G < H):.2f}, mean window {w:6.2f} s = {w/t:.3f} tau")
+
+print("\n== the B58's model band at d = its whole r = 1.5 ceiling, as row 107 (4) defines it (planning) ==")
+b, MEI = 0.905, 5.43
+d = C15["b58"]
+k_e8 = 1 + 25.9 / 16.6          # untested floor b(1+|E|/R), E the larger end of section 1.5 (MD:374-378), R 16.6
+P = {"P1 at b": b * d / MEI, "P2 at b": b * d / MEI, "P3 at b": b, "P4 E8": k_e8 * b * d / MEI, "P5 at b": b * d / MEI}
+for k, v in P.items():
+    print(f"  {k:8s} {v:5.2f} points (phi = 1)")
+print(f"  Delta_B58 (RSS, exact cycle, P6 = 0) = {np.sqrt(sum(v*v for v in P.values())):.2f} points; kappa_E8 >= {k_e8:.2f}")
+
+print("\n== points per K of exhaust drop at the lambda bound, drafted mix, r = 1.5, open loop (matched.txt; probe section 6 drops) ==")
+DROP = {"b58": 55.3, "honda": 39.0, "mazda": 21.3, "ford": 13.0}
+for e in DROP:
+    print(f"  {e:6s} ceiling {C15[e]:.2f} / drop {DROP[e]:.1f} K = {C15[e]/DROP[e]:.3f} points per K")
+print(f"  ceiling spread B58/Ford {C15['b58']/C15['ford']:.2f}x against exhaust-drop spread {DROP['b58']/DROP['ford']:.2f}x")

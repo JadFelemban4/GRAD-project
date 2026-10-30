@@ -1,0 +1,130 @@
+"""Points of cut for every (family, engine) in runs/: closed-loop variants, open-loop replays.
+
+    python analyse.py [--fids F1 F2 ...]     writes table.json, table.csv, summary.txt
+
+points(variant, reading) = 100 x (D_cg - D_variant) / D_base, D the episode damage in that reading
+(knock: turbine + oil + knock terms, the env's own damage; noknock: turbine + oil), D_base the
+env's parallel baseline ECU network on the same road (preview_ceiling.py's 8 Oct denominator).
+Open-loop rows replay the agent's housing node from the current-grade run's gas and flow, with the
+variant's gas and flow (taken from the closed-loop b run) inside the windows, sub-stepped as
+thermal.py: the turbine term only, section G's method on today's integrator.
+"""
+import glob
+import json
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib  # noqa: E402
+import numpy as np  # noqa: E402
+import grid  # noqa: E402
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+TAU = {"b58": 47.3351, "mazda_25t": 42.7418, "honda_l15b7": 47.6717, "ford_27tt": 66.7620}
+MEI2 = 2 * lib.MEI
+
+
+def load(fid, eng, var):
+    p = grid.path(fid, eng, var)
+    if not os.path.exists(p + ".json"):
+        return None
+    with open(p + ".json", encoding="utf-8") as fh:
+        j = json.load(fh)
+    z = np.load(p + ".npz")
+    j["a"] = {k: z[k] for k in z.files}
+    return j
+
+
+def mask(t, wins):
+    m = np.zeros(len(t), bool)
+    for a, b in wins:
+        m |= (t >= a) & (t < b)
+    return m
+
+
+def analyse(fid, eng):
+    cg, b = load(fid, eng, "cg"), load(fid, eng, "b")
+    if cg is None or b is None:
+        return None
+    p = lib.engines.get(eng)
+    A, B = cg["a"], b["a"]
+    t = A["t"]
+    meta = cg["meta"]
+    tc, tb = cg["totals"], b["totals"]
+    base = {"knock": tc["base_knock"], "noknock": tc["base_noknock"]}
+    dm = p.engine.damage
+    climbs = [(s + lib.RAMP, e) for s, e in zip(meta["onsets"], meta["ends"])]
+    cm = mask(t, climbs)
+    e_ag = np.abs(A["torque_req"] - A["torque"]) / np.maximum(A["torque_req"], 40.0)
+    e_bs = np.abs(A["torque_req"] - A["torque_base"]) / np.maximum(A["torque_req"], 40.0)
+    rec = dict(fid=fid, engine=eng, family=cg["family"], n=meta["n"], duration=meta["duration"],
+               L_over_tau=meta["L"] / TAU[eng], G_over_tau=meta["G"] / TAU[eng],
+               base=base, base_knock_share=1 - base["noknock"] / base["knock"],
+               cg=dict(knock=tc["knock"], noknock=tc["noknock"]),
+               cg_cut=dict(knock=100 * (1 - tc["knock"] / base["knock"]), noknock=100 * (1 - tc["noknock"] / base["noknock"])),
+               hot=dict(base_peak_minus_knee_k=float(A["tb_turb"].max() - dm.turb_knee_k),
+                        base_s_above_knee=int((A["tb_turb"] > dm.turb_knee_k).sum()),
+                        cg_peak_minus_knee_k=float(A["t_turb"].max() - dm.turb_knee_k)),
+               delivery=dict(agent_share=float((e_ag[cm] > lib.E.TRACK_TOL).mean()),
+                             agent_max_short_nm=float((A["torque_req"] - A["torque"])[cm].max()),
+                             base_share=float((e_bs[cm] > lib.E.TRACK_TOL).mean()),
+                             base_max_short_nm=float((A["torque_req"] - A["torque_base"])[cm].max()),
+                             b_agent_share=float(((np.abs(B["torque_req"] - B["torque"]) / np.maximum(B["torque_req"], 40.0))[mask(t, lib.windows(meta, None))] > lib.E.TRACK_TOL).mean())),
+               closed={}, open_a={}, open_c={}, open_b=None)
+    D0 = lib.turb_damage(p, A["t_turb"])
+
+    def closed(v, name):
+        tv = v["totals"]
+        onset_idx = [int(s) - 1 for s in meta["onsets"]]
+        return dict({r: 100 * (tc[r] - tv[r]) / base[r] for r in ("knock", "noknock")},
+                    split_units=dict(turb=tc["turb"] - tv["turb"], oil=tc["oil"] - tv["oil"],
+                                     knock=tc["knockterm"] - tv["knockterm"]),
+                    fuel_extra_pct=100 * (tv["fuel"] / tc["fuel"] - 1),
+                    dT_onsets=[float(A["t_turb"][k] - v["a"]["t_turb"][k]) for k in onset_idx])
+    rec["closed"]["b"] = closed(b, "b")
+    for h in grid.HS:
+        v = load(fid, eng, f"a{h}")
+        if v is not None:
+            rec["closed"][f"a{h}"] = closed(v, f"a{h}")
+    # open loop
+    def ol(win, egt_amb=False):
+        m = mask(t, win)
+        if egt_amb:
+            T = lib.replay_housing(p, A, egt_fn=lambda k: lib.T_AMB if m[k] else A["egt_k"][k])
+        else:
+            T = lib.replay_housing(p, A, egt_fn=lambda k: B["egt_k"][k] if m[k] else A["egt_k"][k],
+                                   mdot_fn=lambda k: B["mdot_exh"][k] if m[k] else A["mdot_exh"][k])
+        s = D0 - lib.turb_damage(p, T)
+        return {r: 100 * s / base[r] for r in ("knock", "noknock")}
+    rec["open_b"] = ol(lib.windows(meta, None))
+    for h in grid.HS:
+        rec["open_a"][f"a{h}"] = ol(lib.windows(meta, h))
+        rec["open_c"][f"c{h}"] = ol(lib.windows(meta, h), egt_amb=True)
+    return rec
+
+
+def main():
+    fids = sys.argv[sys.argv.index("--fids") + 1:] if "--fids" in sys.argv else sorted(grid.FAM)
+    out = []
+    for fid in fids:
+        for eng in lib.ENGINES:
+            r = analyse(fid, eng)
+            if r is not None:
+                out.append(r)
+    name = "table_pilot.json" if "--fids" in sys.argv else "table.json"
+    with open(os.path.join(HERE, name), "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=1)
+    for r in out:
+        print(f"{r['fid']:<22}{r['engine']:<12} L/tau {r['L_over_tau']:.2f} base {r['base']['noknock']:8.1f}/{r['base']['knock']:8.1f} "
+              f"knockshare {r['base_knock_share']:.2f} hot {r['hot']['base_peak_minus_knee_k']:+6.1f} K ({r['hot']['base_s_above_knee']} s) "
+              f"cg cut {r['cg_cut']['noknock']:.1f}/{r['cg_cut']['knock']:.1f} deliv {r['delivery']['agent_share']:.2f}/{r['delivery']['base_share']:.2f}")
+        print("   closed: " + "  ".join(f"{k} {v['noknock']:.2f}/{v['knock']:.2f}" for k, v in r["closed"].items())
+              + f"   open b {r['open_b']['noknock']:.2f}")
+        print("   open a: " + "  ".join(f"{k} {v['noknock']:.2f}" for k, v in r["open_a"].items())
+              + "   open c: " + "  ".join(f"{k} {v['noknock']:.2f}" for k, v in r["open_c"].items()))
+        print("   split b (turb/oil/knock units): " + ", ".join(f"{k} {v:.2f}" for k, v in r["closed"]["b"]["split_units"].items())
+              + f"; fuel +{r['closed']['b']['fuel_extra_pct']:.2f} %; dT onsets b " + " ".join(f"{x:.1f}" for x in r["closed"]["b"]["dT_onsets"]))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,2550 @@
+{
+ "tau": {
+  "b58": {
+   "tau_s": 47.33506914379,
+   "cell_mdot": 120.83990553420966,
+   "cell_egt": 1022.274882648772,
+   "cell_t_turb": 882.9186453077151,
+   "seconds": 60.54236589977518
+  },
+  "mazda_25t": {
+   "tau_s": 42.74181271696412,
+   "cell_mdot": 135.97529077237016,
+   "cell_egt": 884.9982712778325,
+   "cell_t_turb": 776.8419184036105,
+   "seconds": 60.671771600143984
+  },
+  "honda_l15b7": {
+   "tau_s": 47.67174074702707,
+   "cell_mdot": 119.84525343942713,
+   "cell_egt": 757.8876163660415,
+   "cell_t_turb": 655.4064546549165,
+   "seconds": 62.20757879992016
+  },
+  "ford_27tt": {
+   "tau_s": 66.76200860052332,
+   "cell_mdot": 159.7143826680616,
+   "cell_egt": 889.4984430396013,
+   "cell_t_turb": 718.4810424388182,
+   "seconds": 60.3256274999585
+  }
+ },
+ "c5": {
+  "b58|100|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3336875977176932
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 226.90013115275255,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3336875977176932
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 226.90013115275255,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3336875977176932
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 226.90013115275255,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3336875977176932
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 226.90013115275255,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.213952006100251
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 267.67383031937766,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.213952006100251
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 267.67383031937766,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.213952006100251
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 267.67383031937766,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.213952006100251
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 267.67383031937766,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.09495160897153165
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 308.19717285847696,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.09495160897153165
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 308.19717285847696,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.09495160897153165
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 308.19717285847696,
+   "rpm": 2081.3125967062856
+  },
+  "b58|100|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.09495160897153165
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 308.19717285847696,
+   "rpm": 2081.3125967062856
+  },
+  "b58|115|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3609416561129435
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 239.64687895764618,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3609416561129435
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 239.64687895764618,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3609416561129435
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 239.64687895764618,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.3609416561129435
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 239.64687895764618,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.25221179166860974
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.42057812427134,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.25221179166860974
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.42057812427134,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.25221179166860974
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.42057812427134,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.25221179166860974
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.42057812427134,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.1441495448976784
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 320.9439206633706,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.1441495448976784
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 320.9439206633706,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.1441495448976784
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 320.9439206633706,
+   "rpm": 2393.5094862122282
+  },
+  "b58|115|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7"
+   ],
+   "min_margins": {
+    "held": 0.1441495448976784
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 320.9439206633706,
+   "rpm": 2393.5094862122282
+  },
+  "b58|130|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.06212446955298778
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 326.45247426317104,
+   "rpm": 2106.632701289087
+  },
+  "b58|130|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.06212446955298778
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 326.45247426317104,
+   "rpm": 2106.632701289087
+  },
+  "b58|130|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.06212446955298778
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 326.45247426317104,
+   "rpm": 2106.632701289087
+  },
+  "b58|130|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.06212446955298778
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 326.45247426317104,
+   "rpm": 2106.632701289087
+  },
+  "b58|130|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.21347748826149127,
+    "rejected": 0.08832726476171326
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.9459419019408,
+   "rpm": 2705.706375718171
+  },
+  "b58|130|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.21347748826149127,
+    "rejected": 0.08832726476171326
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.9459419019408,
+   "rpm": 2705.706375718171
+  },
+  "b58|130|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.21347748826149127,
+    "rejected": 0.08832726476171326
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.9459419019408,
+   "rpm": 2705.706375718171
+  },
+  "b58|130|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.21347748826149127,
+    "rejected": 0.08832726476171326
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.9459419019408,
+   "rpm": 2705.706375718171
+  },
+  "b58|130|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.10541524149055959,
+    "rejected": 0.2378552028651726
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 335.46928444104014,
+   "rpm": 2705.706375718171
+  },
+  "b58|130|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.10541524149055959,
+    "rejected": 0.2378552028651726
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 335.46928444104014,
+   "rpm": 2705.706375718171
+  },
+  "b58|130|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.10541524149055959,
+    "rejected": 0.2378552028651726
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 335.46928444104014,
+   "rpm": 2705.706375718171
+  },
+  "b58|130|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "7",
+    "8"
+   ],
+   "min_margins": {
+    "held": 0.10541524149055959,
+    "rejected": 0.2378552028651726
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 335.46928444104014,
+   "rpm": 2705.706375718171
+  },
+  "mazda_25t|100|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.0654233216154787
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.60443155511985,
+   "rpm": 2233.6626686131826
+  },
+  "mazda_25t|100|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.0654233216154787
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.60443155511985,
+   "rpm": 2233.6626686131826
+  },
+  "mazda_25t|100|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.0654233216154787
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.60443155511985,
+   "rpm": 2233.6626686131826
+  },
+  "mazda_25t|100|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.0654233216154787
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.60443155511985,
+   "rpm": 2233.6626686131826
+  },
+  "mazda_25t|100|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.22484313030932856,
+    "rejected": 0.09640292742669243
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 244.35089623251676,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|100|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.22484313030932856,
+    "rejected": 0.09640292742669243
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 244.35089623251676,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|100|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.22484313030932856,
+    "rejected": 0.09640292742669243
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 244.35089623251676,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|100|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.22484313030932856,
+    "rejected": 0.09640292742669243
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 244.35089623251676,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|100|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.1111380394999284,
+    "rejected": 0.25723049575681944
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.19388741514524,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|100|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.1111380394999284,
+    "rejected": 0.25723049575681944
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.19388741514524,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|100|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.1111380394999284,
+    "rejected": 0.25723049575681944
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.19388741514524,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|100|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.1111380394999284,
+    "rejected": 0.25723049575681944
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.19388741514524,
+   "rpm": 3159.353138066737
+  },
+  "mazda_25t|115|0.08|45": {
+   "outcome": "fails",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "5",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.0036245569097459462,
+    "rejected": 0.17406239710801596
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 314.08511234678224,
+   "rpm": 2568.7120689051603
+  },
+  "mazda_25t|115|0.08|67": {
+   "outcome": "fails",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "5",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.0036245569097459462,
+    "rejected": 0.17406239710801596
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 314.08511234678224,
+   "rpm": 2568.7120689051603
+  },
+  "mazda_25t|115|0.08|85": {
+   "outcome": "fails",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "5",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.0036245569097459462,
+    "rejected": 0.17406239710801596
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 314.08511234678224,
+   "rpm": 2568.7120689051603
+  },
+  "mazda_25t|115|0.08|130": {
+   "outcome": "fails",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "5",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.0036245569097459462,
+    "rejected": 0.17406239710801596
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 314.08511234678224,
+   "rpm": 2568.7120689051603
+  },
+  "mazda_25t|115|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.18115693899424423,
+    "rejected": 0.15819386280870695
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 258.1219926624379,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|115|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.18115693899424423,
+    "rejected": 0.15819386280870695
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 258.1219926624379,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|115|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.18115693899424423,
+    "rejected": 0.15819386280870695
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 258.1219926624379,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|115|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.18115693899424423,
+    "rejected": 0.15819386280870695
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 258.1219926624379,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|115|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.06745857353339102,
+    "rejected": 0.3190119186232092
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 293.9628638290939,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|115|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.06745857353339102,
+    "rejected": 0.3190119186232092
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 293.9628638290939,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|115|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.06745857353339102,
+    "rejected": 0.3190119186232092
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 293.9628638290939,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|115|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5960106792344713,
+    "held(ungated)": 0.06745857353339102,
+    "rejected": 0.3190119186232092
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 293.9628638290939,
+   "rpm": 3633.256108776747
+  },
+  "mazda_25t|130|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.2462073150089391,
+    "rejected": 0.06618484440036898
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 237.616314004393,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.2462073150089391,
+    "rejected": 0.06618484440036898
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 237.616314004393,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.2462073150089391,
+    "rejected": 0.06618484440036898
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 237.616314004393,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.2462073150089391,
+    "rejected": 0.06618484440036898
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 237.616314004393,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.13180722759986152,
+    "rejected": 0.22799543479510387
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 273.6783873478717,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.13180722759986152,
+    "rejected": 0.22799543479510387
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 273.6783873478717,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.13180722759986152,
+    "rejected": 0.22799543479510387
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 273.6783873478717,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.13180722759986152,
+    "rejected": 0.22799543479510387
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 273.6783873478717,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.018115587487555374,
+    "rejected": 0.3888039780939814
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 309.5171384985552,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.018115587487555374,
+    "rejected": 0.3888039780939814
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 309.5171384985552,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.018115587487555374,
+    "rejected": 0.3888039780939814
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 309.5171384985552,
+   "rpm": 4107.159079486758
+  },
+  "mazda_25t|130|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.5137354108675838,
+    "held(ungated)": 0.018115587487555374,
+    "rejected": 0.3888039780939814
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 309.5171384985552,
+   "rpm": 4107.159079486758
+  },
+  "honda_l15b7|100|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 146.97230439065862,
+   "rpm": 3337.4523089842814
+  },
+  "honda_l15b7|100|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 146.97230439065862,
+   "rpm": 3337.4523089842814
+  },
+  "honda_l15b7|100|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 146.97230439065862,
+   "rpm": 3337.4523089842814
+  },
+  "honda_l15b7|100|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 146.97230439065862,
+   "rpm": 3337.4523089842814
+  },
+  "honda_l15b7|100|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.54977136963433,
+   "rpm": 3821.9933246092814
+  },
+  "honda_l15b7|100|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.54977136963433,
+   "rpm": 3821.9933246092814
+  },
+  "honda_l15b7|100|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.54977136963433,
+   "rpm": 3821.9933246092814
+  },
+  "honda_l15b7|100|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.54977136963433,
+   "rpm": 3821.9933246092814
+  },
+  "honda_l15b7|100|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.88100354697673,
+   "rpm": 4394.249183984281
+  },
+  "honda_l15b7|100|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.88100354697673,
+   "rpm": 4394.249183984281
+  },
+  "honda_l15b7|100|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.88100354697673,
+   "rpm": 4394.249183984281
+  },
+  "honda_l15b7|100|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.36257853868029855
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.88100354697673,
+   "rpm": 4394.249183984281
+  },
+  "honda_l15b7|115|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.68143876169552,
+   "rpm": 3968.720057675674
+  },
+  "honda_l15b7|115|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.68143876169552,
+   "rpm": 3968.720057675674
+  },
+  "honda_l15b7|115|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.68143876169552,
+   "rpm": 3968.720057675674
+  },
+  "honda_l15b7|115|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 151.68143876169552,
+   "rpm": 3968.720057675674
+  },
+  "honda_l15b7|115|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 149.66406249644825,
+   "rpm": 4703.944667050674
+  },
+  "honda_l15b7|115|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 149.66406249644825,
+   "rpm": 4703.944667050674
+  },
+  "honda_l15b7|115|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 149.66406249644825,
+   "rpm": 4703.944667050674
+  },
+  "honda_l15b7|115|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 149.66406249644825,
+   "rpm": 4703.944667050674
+  },
+  "honda_l15b7|115|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 161.08745759003193,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|115|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 161.08745759003193,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|115|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 161.08745759003193,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|115|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.4016003588787461
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 161.08745759003193,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 147.8476184325386,
+   "rpm": 4941.687025117066
+  },
+  "honda_l15b7|130|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 147.8476184325386,
+   "rpm": 4941.687025117066
+  },
+  "honda_l15b7|130|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 147.8476184325386,
+   "rpm": 4941.687025117066
+  },
+  "honda_l15b7|130|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "kickdown"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 147.8476184325386,
+   "rpm": 4941.687025117066
+  },
+  "honda_l15b7|130|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 169.19439060080344,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 169.19439060080344,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 169.19439060080344,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 169.19439060080344,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 192.1295022484195,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 192.1295022484195,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 192.1295022484195,
+   "rpm": 5000.0
+  },
+  "honda_l15b7|130|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "economy",
+    "power-limited"
+   ],
+   "min_margins": {
+    "eco": 0.23575370612079116
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 192.1295022484195,
+   "rpm": 5000.0
+  },
+  "ford_27tt|100|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.245630743446412,
+    "rejected": 0.46887660467718284
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 260.3700632976912,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.245630743446412,
+    "rejected": 0.46887660467718284
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 260.3700632976912,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.245630743446412,
+    "rejected": 0.46887660467718284
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 260.3700632976912,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.245630743446412,
+    "rejected": 0.46887660467718284
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 260.3700632976912,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.11504657178079025,
+    "rejected": 0.7231447008839311
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 305.44110608857574,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.11504657178079025,
+    "rejected": 0.7231447008839311
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 305.44110608857574,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.11504657178079025,
+    "rejected": 0.7231447008839311
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 305.44110608857574,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.11504657178079025,
+    "rejected": 0.7231447008839311
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 305.44110608857574,
+   "rpm": 2669.194512741244
+  },
+  "ford_27tt|100|0.12|45": {
+   "outcome": "fails",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "3",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.3111436419184038,
+    "rejected": 0.014738761400907352
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 262.677322718221,
+   "rpm": 3558.9260169883255
+  },
+  "ford_27tt|100|0.12|67": {
+   "outcome": "fails",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "3",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.3111436419184038,
+    "rejected": 0.014738761400907352
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 262.677322718221,
+   "rpm": 3558.9260169883255
+  },
+  "ford_27tt|100|0.12|85": {
+   "outcome": "fails",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "3",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.3111436419184038,
+    "rejected": 0.014738761400907352
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 262.677322718221,
+   "rpm": 3558.9260169883255
+  },
+  "ford_27tt|100|0.12|130": {
+   "outcome": "fails",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "3",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.3111436419184038,
+    "rejected": 0.014738761400907352
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 262.677322718221,
+   "rpm": 3558.9260169883255
+  },
+  "ford_27tt|115|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.2653699587001074,
+    "rejected": 0.3863013949392806
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.13191745001535,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.2653699587001074,
+    "rejected": 0.3863013949392806
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.13191745001535,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.2653699587001074,
+    "rejected": 0.3863013949392806
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.13191745001535,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.2653699587001074,
+    "rejected": 0.3863013949392806
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 280.13191745001535,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.14718187431273144,
+    "rejected": 0.6093310793250517
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 325.1998466631964,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.14718187431273144,
+    "rejected": 0.6093310793250517
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 325.1998466631964,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.14718187431273144,
+    "rejected": 0.6093310793250517
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 325.1998466631964,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.14718187431273144,
+    "rejected": 0.6093310793250517
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 325.1998466631964,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.029718601658486166,
+    "rejected": 0.8309929901918824
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 369.99138791348815,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.029718601658486166,
+    "rejected": 0.8309929901918824
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 369.99138791348815,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.029718601658486166,
+    "rejected": 0.8309929901918824
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 369.99138791348815,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|115|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "5"
+   ],
+   "min_margins": {
+    "held": 0.029718601658486166,
+    "rejected": 0.8309929901918824
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 369.99138791348815,
+   "rpm": 3069.57368965243
+  },
+  "ford_27tt|130|0.08|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "rejected": 0.22274240919250743
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 302.40768080506365,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.08|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "rejected": 0.22274240919250743
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 302.40768080506365,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.08|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "rejected": 0.22274240919250743
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 302.40768080506365,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.08|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "rejected": 0.22274240919250743
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 302.40768080506365,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.1|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.08877311541538646,
+    "rejected": 0.40495557617704603
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 347.47249644054125,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.1|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.08877311541538646,
+    "rejected": 0.40495557617704603
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 347.47249644054125,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.1|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.08877311541538646,
+    "rejected": 0.40495557617704603
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 347.47249644054125,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.1|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "4",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.08877311541538646,
+    "rejected": 0.40495557617704603
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 347.47249644054125,
+   "rpm": 3469.9528665636167
+  },
+  "ford_27tt|130|0.12|45": {
+   "outcome": "passes",
+   "gated_share": 0.7037037037037037,
+   "thin": false,
+   "held": [
+    "3",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "held(ungated)": 0.22848982250359473,
+    "rejected": 0.028680236661873915
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.19519105405425,
+   "rpm": 4626.603822084823
+  },
+  "ford_27tt|130|0.12|67": {
+   "outcome": "passes",
+   "gated_share": 0.7894736842105263,
+   "thin": false,
+   "held": [
+    "3",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "held(ungated)": 0.22848982250359473,
+    "rejected": 0.028680236661873915
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.19519105405425,
+   "rpm": 4626.603822084823
+  },
+  "ford_27tt|130|0.12|85": {
+   "outcome": "passes",
+   "gated_share": 0.8297872340425532,
+   "thin": false,
+   "held": [
+    "3",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "held(ungated)": 0.22848982250359473,
+    "rejected": 0.028680236661873915
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.19519105405425,
+   "rpm": 4626.603822084823
+  },
+  "ford_27tt|130|0.12|130": {
+   "outcome": "passes",
+   "gated_share": 0.8848920863309353,
+   "thin": false,
+   "held": [
+    "3",
+    "6"
+   ],
+   "min_margins": {
+    "held": 0.17929637056607894,
+    "held(ungated)": 0.22848982250359473,
+    "rejected": 0.028680236661873915
+   },
+   "no_margin_case": [
+    "None"
+   ],
+   "demand_nm": 294.19519105405425,
+   "rpm": 4626.603822084823
+  }
+ }
+}

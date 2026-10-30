@@ -1,6 +1,6 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-30 (on `GRA-test`, commit D `25437ba`) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s at commit D, the same results as commit A's: `SESSION_REPORT_2026-10-30_run1.md`)
+Last verified: 2026-10-30 (on `GRA-test`, section I of the decision sheet, after commit D `25437ba`) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s at commit D, the same results as commit A's: `SESSION_REPORT_2026-10-30_run1.md`)
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 GRA-test: build step 2's commits A (WP1, certified 23 October, `results/B58_IDENTITY.md`), C (the calibration and validation scripts, WP3) and D (`25437ba`, 30 October: Run 1, the three EPA engines calibrated and frozen), on contract version 5 (`c842d74`, unchanged since the first fit) · the B58: plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3, unchanged by Run 1 (decision 48's re-runs) · pending: L8 on the training device
 
@@ -41,7 +41,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - On the locked climb no use of the preview can save more than 0.13 points of cut
   with the agent's own levers (0.42 with unlimited preview) against the MEI of
   5.43 (`python preview_ceiling.py` -> `results/preview_ceiling.txt`): the climb
-  that X1 and X2 were scored on cannot show a preview effect (decision 34).
+  that X1 and X2 were scored on cannot show a preview effect (decision 34). Direct
+  runs give about half of both (`results/EPA_ROADS/probe_2026-10-30/repro.txt`).
+- No road the ceiling probe tried reaches decision 34's 2 MEI on all four engines:
+  λ is the only lever that cools the housing, and the Ford's best is 4.24 points,
+  0.78 MEI (`results/EPA_ROADS/probe_2026-10-30/summary.txt`; section I, row 103).
 - `python test_contract_pinned.py` (19 OK): the validation contract (`results/ENGINE_THRESHOLDS.md`
   and `.json`, version 5) is `c842d74`'s and freeze.json's; `engine_thresholds.py --check` cannot pass
   once a fit exists (`docs/build_step_2/PLAN.md` 8.4: its manual check is a worktree of `c842d74`).
@@ -73,10 +77,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
-  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Next:
-  decision 34's test roads and the L1/E8 tightenings, then Run 2. Both have
-  answered decisions 1-93 (`results/VALIDATION_DECISIONS.md`, 30 October).
-  Training runs on another device, not this laptop (21 October).
+  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Both have
+  answered decisions 1-120 (`results/VALIDATION_DECISIONS.md`; section I, 30
+  October: A+G, the reward without knock). Next: `docs/build_step_2/ORDER_TO_TRAINING.md`
+  steps 3 and 4. Training runs on another device, not this laptop (21 October).
 
 ## Blockers
 
@@ -109,13 +113,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. For Ghassan, before the next training: `train.py`'s `CLOSED` list has no
    `wideair_dt1`, though X2's result was published on 13 October (session
    report of 15 October, 2.3).
-8. `GRA-test`, build step 2 (`docs/build_step_2/PLAN.md`, as `AMENDMENTS.md`,
-   `HANDOFFS.md` and `WP3_INTERFACES.md` amend it): decision 34's roads and
-   `EPA_TIGHTENINGS.json`; then the held-out validation (`validate_epa.py arm`, then
-   `run`, once), decision 83's steady-only reading beside it; WP7's documents
-   (PLAN.md 8.5); schema 4 (decisions 27, 28) before any EPA engine trains; the
-   preregistration; L8 and the dump comparison on the training device. First:
-   decisions 94 onward (the roads' design, the rules for Run 2's outcomes).
+8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
+   order (section I's rows govern it). Next: the device benchmark (step 3) and the
+   roads code (step 4), in which each of you records the sha256 of a private integer
+   (row 96). Nothing in PLANT_CODE or `epa_freeze.CODE_HASHED` changes before the last
+   commit F; `test_epa_rows` fails once until commit G, disclosed (row 120).
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device, before any training: install from

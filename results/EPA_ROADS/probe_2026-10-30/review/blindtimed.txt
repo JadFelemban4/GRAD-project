@@ -1,0 +1,8 @@
+b58    r 0.5: blind-timed head start / (a)'s = 1.48 at 2.11 of (a)'s enrichment time; capped at H: 0.89 at 0.88
+b58    r 1.5: blind-timed head start / (a)'s = 0.76 at 0.73 of (a)'s enrichment time; capped at H: 0.74 at 0.66
+mazda  r 0.5: blind-timed head start / (a)'s = 1.56 at 2.34 of (a)'s enrichment time; capped at H: 0.90 at 0.89
+mazda  r 1.5: blind-timed head start / (a)'s = 0.79 at 0.79 of (a)'s enrichment time; capped at H: 0.76 at 0.69
+honda  r 0.5: blind-timed head start / (a)'s = 1.47 at 2.10 of (a)'s enrichment time; capped at H: 0.89 at 0.88
+honda  r 1.5: blind-timed head start / (a)'s = 0.76 at 0.72 of (a)'s enrichment time; capped at H: 0.74 at 0.66
+ford   r 0.5: blind-timed head start / (a)'s = 1.22 at 1.50 of (a)'s enrichment time; capped at H: 0.84 at 0.83
+ford   r 1.5: blind-timed head start / (a)'s = 0.67 at 0.57 of (a)'s enrichment time; capped at H: 0.67 at 0.57

@@ -1,0 +1,165 @@
+families: 108 in the grid; 48 kept for the shared slot; dropped 60:
+   C5 fails on [], current-grade shortfall on ['ford_27tt'], baseline shortfall on []: 24 families: L130_g10_G100_v100 L130_g10_G200_v100 L130_g10_G50_v100 L130_g12_G100_v115 L130_g12_G200_v115 L130_g12_G50_v115 L45_g10_G100_v100 L45_g10_G200_v100 L45_g10_G50_v100 L45_g12_G100_v115 L45_g12_G200_v115 L45_g12_G50_v115 L67_g10_G100_v100 L67_g10_G200_v100 L67_g10_G50_v100 L67_g12_G100_v115 L67_g12_G200_v115 L67_g12_G50_v115 L85_g10_G100_v100 L85_g10_G200_v100 L85_g10_G50_v100 L85_g12_G100_v115 L85_g12_G200_v115 L85_g12_G50_v115
+   C5 fails on ['ford_27tt'], current-grade shortfall on ['b58'], baseline shortfall on []: 12 families: L130_g12_G100_v100 L130_g12_G200_v100 L130_g12_G50_v100 L45_g12_G100_v100 L45_g12_G200_v100 L45_g12_G50_v100 L67_g12_G100_v100 L67_g12_G200_v100 L67_g12_G50_v100 L85_g12_G100_v100 L85_g12_G200_v100 L85_g12_G50_v100
+   C5 fails on ['mazda_25t'], current-grade shortfall on [], baseline shortfall on []: 12 families: L130_g8_G100_v115 L130_g8_G200_v115 L130_g8_G50_v115 L45_g8_G100_v115 L45_g8_G200_v115 L45_g8_G50_v115 L67_g8_G100_v115 L67_g8_G200_v115 L67_g8_G50_v115 L85_g8_G100_v115 L85_g8_G200_v115 L85_g8_G50_v115
+   C5 fails on [], current-grade shortfall on ['b58'], baseline shortfall on []: 12 families: L130_g8_G100_v130 L130_g8_G200_v130 L130_g8_G50_v130 L45_g8_G100_v130 L45_g8_G200_v130 L45_g8_G50_v130 L67_g8_G100_v130 L67_g8_G200_v130 L67_g8_G50_v130 L85_g8_G100_v130 L85_g8_G200_v130 L85_g8_G50_v130
+   hottest kept family per engine (baseline peak housing minus knee): b58 +23.4 K [L130_g12_G50_v130]; mazda_25t +13.7 K [L130_g12_G50_v130]; honda_l15b7 +13.6 K [L130_g12_G50_v130]; ford_27tt +41.5 K [L130_g12_G50_v130]
+   kept families where any car's baseline exceeds its knee: ['L130_g10_G100_v130', 'L130_g10_G200_v130', 'L130_g10_G50_v130', 'L130_g12_G100_v130', 'L130_g12_G200_v130', 'L130_g12_G50_v130', 'L67_g10_G50_v130', 'L67_g12_G50_v130', 'L85_g10_G100_v130', 'L85_g10_G50_v130', 'L85_g12_G100_v130', 'L85_g12_G50_v130']
+
+=================== reading: noknock ===================
+--- ALL KEPT: 48 families
+  best family per engine, (a) by H; (b); (c) at H130
+    b58          H15 2.82cl [L45_g12_G50_v130]; H30 5.50cl [L45_g12_G50_v130]; H45 8.82cl [L45_g12_G50_v130]; H60 10.62cl [L45_g12_G50_v130]; H90 10.68cl [L45_g12_G50_v130]; H130 11.09cl [L45_g12_G100_v130]
+                 b 11.12 [L45_g12_G100_v130]; c130 53.49 [L45_g12_G50_v130]
+    mazda_25t    H15 1.49cl [L45_g12_G50_v130]; H30 3.04cl [L45_g12_G50_v130]; H45 5.29cl [L45_g12_G50_v130]; H60 6.97cl [L45_g12_G50_v130]; H90 6.99cl [L45_g12_G50_v130]; H130 7.00cl [L45_g12_G50_v130]
+                 b 7.00 [L45_g12_G50_v130]; c130 66.31 [L45_g12_G50_v130]
+    honda_l15b7  H15 2.75cl [L45_g10_G50_v130]; H30 5.43cl [L45_g10_G50_v130]; H45 8.41cl [L45_g10_G50_v130]; H60 7.84cl [L45_g10_G50_v130]; H90 10.69cl [L45_g10_G100_v130]; H130 11.00cl [L45_g10_G100_v130]
+                 b 12.19 [L45_g10_G200_v130]; c130 92.57 [L45_g12_G100_v130]
+    ford_27tt    H15 1.05cl [L45_g10_G50_v130]; H30 2.03cl [L45_g10_G50_v130]; H45 3.22cl [L45_g10_G50_v130]; H60 3.45cl [L45_g12_G50_v130]; H90 3.55cl [L45_g10_G100_v130]; H130 3.99cl [L45_g10_G100_v130]
+                 b 4.01 [L45_g10_G100_v130]; c130 84.35 [L45_g10_G50_v130]
+  best common family (max over families of the min over engines)
+    a H 15: L45_g10_G50_v130     min   1.05 = 0.19 MEI   b58 2.70cl  mazda_25t 1.46cl  honda_l15b7 2.75cl  ford_27tt 1.05cl
+    a H 30: L45_g10_G50_v130     min   2.03 = 0.37 MEI   b58 5.22cl  mazda_25t 2.96cl  honda_l15b7 5.43cl  ford_27tt 2.03cl
+    a H 45: L45_g10_G50_v130     min   3.22 = 0.59 MEI   b58 8.16cl  mazda_25t 5.06cl  honda_l15b7 8.41cl  ford_27tt 3.22cl
+    a H 60: L45_g12_G50_v130     min   3.45 = 0.64 MEI   b58 10.62cl  mazda_25t 6.97cl  honda_l15b7 7.60cl  ford_27tt 3.45cl
+    a H 90: L45_g10_G100_v130    min   3.55 = 0.65 MEI   b58 6.88cl  mazda_25t 4.21cl  honda_l15b7 10.69cl  ford_27tt 3.55cl
+    a H130: L45_g10_G100_v130    min   3.99 = 0.73 MEI   b58 8.25cl  mazda_25t 5.73cl  honda_l15b7 11.00cl  ford_27tt 3.99cl
+    b     : L45_g10_G100_v130    min   4.01 = 0.74 MEI   b58 8.26  mazda_25t 5.72  honda_l15b7 11.07  ford_27tt 4.01
+    c H130: L45_g12_G50_v130     min  53.49
+  2 MEI (10.86) reached by (a) on SOME family, per engine, at H: {'b58': [130], 'mazda_25t': [], 'honda_l15b7': [130], 'ford_27tt': []}
+  2 MEI by (a) on ALL FOUR (one family, one H): none; by (b): none
+  the Ford's largest (a) anywhere in this view: 3.99
+--- SHARED SLOT 1-2 tau ON EVERY ENGINE (L 67 or 85 s): 24 families
+  best family per engine, (a) by H; (b); (c) at H130
+    b58          H15 2.11cl [L67_g10_G50_v130]; H30 4.13cl [L67_g10_G50_v130]; H45 6.57cl [L67_g10_G50_v130]; H60 7.86cl [L67_g10_G50_v130]; H90 7.92cl [L67_g10_G50_v130]; H130 8.98cl [L67_g12_G100_v130]
+                 b 9.03 [L67_g12_G100_v130]; c130 49.76 [L67_g12_G100_v130]
+    mazda_25t    H15 1.11cl [L67_g10_G50_v130]; H30 2.27cl [L67_g10_G50_v130]; H45 3.94cl [L67_g10_G50_v130]; H60 5.15cl [L67_g10_G50_v130]; H90 5.17cl [L67_g10_G50_v130]; H130 5.29cl [L67_g12_G100_v130]
+                 b 5.29 [L67_g12_G100_v130]; c130 60.90 [L67_g12_G100_v130]
+    honda_l15b7  H15 2.02cl [L67_g10_G50_v130]; H30 4.03cl [L67_g10_G50_v130]; H45 6.34cl [L67_g10_G50_v130]; H60 6.00cl [L67_g10_G50_v130]; H90 8.29cl [L67_g10_G100_v130]; H130 8.68cl [L67_g10_G100_v130]
+                 b 10.43 [L67_g10_G200_v130]; c130 87.21 [L67_g12_G100_v130]
+    ford_27tt    H15 0.80cl [L67_g10_G50_v130]; H30 1.55cl [L67_g10_G50_v130]; H45 2.48cl [L67_g10_G50_v130]; H60 2.66cl [L67_g10_G50_v130]; H90 2.95cl [L67_g10_G100_v130]; H130 3.36cl [L67_g10_G100_v130]
+                 b 3.48 [L67_g10_G200_v130]; c130 81.41 [L67_g10_G100_v130]
+  best common family (max over families of the min over engines)
+    a H 15: L67_g10_G50_v130     min   0.80 = 0.15 MEI   b58 2.11cl  mazda_25t 1.11cl  honda_l15b7 2.02cl  ford_27tt 0.80cl
+    a H 30: L67_g10_G50_v130     min   1.55 = 0.29 MEI   b58 4.13cl  mazda_25t 2.27cl  honda_l15b7 4.03cl  ford_27tt 1.55cl
+    a H 45: L67_g10_G50_v130     min   2.48 = 0.46 MEI   b58 6.57cl  mazda_25t 3.94cl  honda_l15b7 6.34cl  ford_27tt 2.48cl
+    a H 60: L67_g10_G50_v130     min   2.66 = 0.49 MEI   b58 7.86cl  mazda_25t 5.15cl  honda_l15b7 6.00cl  ford_27tt 2.66cl
+    a H 90: L67_g10_G100_v130    min   2.95 = 0.54 MEI   b58 6.69cl  mazda_25t 3.64cl  honda_l15b7 8.29cl  ford_27tt 2.95cl
+    a H130: L67_g10_G100_v130    min   3.36 = 0.62 MEI   b58 8.19cl  mazda_25t 5.04cl  honda_l15b7 8.68cl  ford_27tt 3.36cl
+    b     : L67_g10_G200_v130    min   3.48 = 0.64 MEI   b58 6.50  mazda_25t 3.89  honda_l15b7 10.43  ford_27tt 3.48
+    c H130: L67_g12_G100_v130    min  49.76
+  2 MEI (10.86) reached by (a) on SOME family, per engine, at H: {'b58': [], 'mazda_25t': [], 'honda_l15b7': [], 'ford_27tt': []}
+  2 MEI by (a) on ALL FOUR (one family, one H): none; by (b): none
+  the Ford's largest (a) anywhere in this view: 3.36
+--- COVERED (v <= 115 km/h): 24 families
+  best family per engine, (a) by H; (b); (c) at H130
+    b58          H15 1.56ol [L45_g10_G50_v115]; H30 3.11ol [L45_g10_G50_v115]; H45 4.91ol [L45_g10_G50_v115]; H60 5.63ol [L45_g10_G50_v115]; H90 5.68ol [L45_g10_G50_v115]; H130 5.72ol [L45_g10_G50_v115]
+                 b 5.57 [L67_g10_G50_v115]; c130 38.91 [L67_g10_G50_v115]
+    mazda_25t    H15 1.06ol [L45_g10_G50_v115]; H30 2.18ol [L45_g10_G50_v115]; H45 3.60ol [L45_g10_G50_v115]; H60 4.41ol [L45_g10_G50_v115]; H90 4.43ol [L45_g10_G50_v115]; H130 4.45ol [L45_g10_G50_v115]
+                 b 4.20 [L45_g10_G50_v115]; c130 50.56 [L67_g10_G50_v115]
+    honda_l15b7  H15 1.64ol [L45_g10_G50_v115]; H30 3.36ol [L45_g10_G50_v115]; H45 5.30ol [L45_g10_G50_v115]; H60 4.72ol [L45_g10_G50_v115]; H90 5.95ol [L45_g10_G100_v115]; H130 5.91ol [L45_g10_G100_v115]
+                 b 5.94 [L45_g10_G100_v115]; c130 81.47 [L45_g10_G50_v115]
+    ford_27tt    H15 0.39ol [L45_g10_G50_v115]; H30 0.81ol [L45_g10_G50_v115]; H45 1.38ol [L45_g10_G50_v115]; H60 1.58ol [L45_g10_G50_v115]; H90 1.58ol [L45_g10_G50_v115]; H130 1.59ol [L45_g10_G50_v115]
+                 b 1.47 [L45_g10_G50_v115]; c130 68.01 [L67_g10_G50_v115]
+  best common family (max over families of the min over engines)
+    a H 15: L45_g10_G50_v115     min   0.39 = 0.07 MEI   b58 1.56ol  mazda_25t 1.06ol  honda_l15b7 1.64ol  ford_27tt 0.39ol
+    a H 30: L45_g10_G50_v115     min   0.81 = 0.15 MEI   b58 3.11ol  mazda_25t 2.18ol  honda_l15b7 3.36ol  ford_27tt 0.81ol
+    a H 45: L45_g10_G50_v115     min   1.38 = 0.25 MEI   b58 4.91ol  mazda_25t 3.60ol  honda_l15b7 5.30ol  ford_27tt 1.38ol
+    a H 60: L45_g10_G50_v115     min   1.58 = 0.29 MEI   b58 5.63ol  mazda_25t 4.41ol  honda_l15b7 4.72ol  ford_27tt 1.58ol
+    a H 90: L45_g10_G50_v115     min   1.58 = 0.29 MEI   b58 5.68ol  mazda_25t 4.43ol  honda_l15b7 4.77ol  ford_27tt 1.58ol
+    a H130: L45_g10_G50_v115     min   1.59 = 0.29 MEI   b58 5.72ol  mazda_25t 4.45ol  honda_l15b7 4.83ol  ford_27tt 1.59ol
+    b     : L45_g10_G50_v115     min   1.47 = 0.27 MEI   b58 5.45  mazda_25t 4.20  honda_l15b7 5.06  ford_27tt 1.47
+    c H130: L67_g10_G50_v115     min  38.91
+  2 MEI (10.86) reached by (a) on SOME family, per engine, at H: {'b58': [], 'mazda_25t': [], 'honda_l15b7': [], 'ford_27tt': []}
+  2 MEI by (a) on ALL FOUR (one family, one H): none; by (b): none
+  the Ford's largest (a) anywhere in this view: 1.59
+
+=================== reading: knock ===================
+--- ALL KEPT: 48 families
+  best family per engine, (a) by H; (b); (c) at H130
+    b58          H15 1.27cl [L67_g12_G50_v130]; H30 3.66cl [L45_g12_G50_v130]; H45 6.80cl [L45_g12_G50_v130]; H60 8.45cl [L45_g12_G50_v130]; H90 8.51cl [L45_g12_G50_v130]; H130 8.57cl [L45_g12_G50_v130]
+                 b 8.59 [L45_g12_G50_v130]; c130 50.54 [L45_g12_G50_v130]
+    mazda_25t    H15 5.62cl [L45_g10_G50_v130]; H30 8.41cl [L45_g10_G50_v130]; H45 10.39cl [L45_g10_G50_v130]; H60 13.98cl [L45_g10_G50_v130]; H90 16.92cl [L45_g10_G100_v130]; H130 21.04cl [L45_g10_G100_v130]
+                 b 27.00 [L45_g10_G200_v130]; c130 22.72 [L67_g12_G50_v130]
+    honda_l15b7  H15 2.72cl [L45_g10_G50_v130]; H30 5.37cl [L45_g10_G50_v130]; H45 8.31cl [L45_g10_G50_v130]; H60 7.76cl [L45_g10_G50_v130]; H90 10.50cl [L45_g10_G100_v130]; H130 10.81cl [L45_g10_G100_v130]
+                 b 11.80 [L45_g10_G200_v130]; c130 88.89 [L45_g10_G50_v130]
+    ford_27tt    H15 0.92cl [L45_g10_G50_v130]; H30 1.77cl [L45_g10_G50_v130]; H45 2.81cl [L45_g10_G50_v130]; H60 3.07cl [L45_g12_G50_v130]; H90 3.10cl [L45_g12_G50_v130]; H130 3.13cl [L45_g12_G50_v130]
+                 b 3.15 [L45_g12_G50_v130]; c130 74.46 [L67_g10_G50_v130]
+  best common family (max over families of the min over engines)
+    a H 15: L45_g12_G50_v130     min   0.84 = 0.16 MEI   b58 1.12cl  mazda_25t 3.91cl  honda_l15b7 2.14cl  ford_27tt 0.84cl
+    a H 30: L45_g10_G50_v130     min   1.77 = 0.33 MEI   b58 2.63cl  mazda_25t 8.41cl  honda_l15b7 5.37cl  ford_27tt 1.77cl
+    a H 45: L45_g10_G50_v130     min   2.81 = 0.52 MEI   b58 5.38cl  mazda_25t 10.39cl  honda_l15b7 8.31cl  ford_27tt 2.81cl
+    a H 60: L45_g12_G50_v130     min   3.07 = 0.57 MEI   b58 8.45cl  mazda_25t 11.44cl  honda_l15b7 6.15cl  ford_27tt 3.07cl
+    a H 90: L45_g12_G50_v130     min   3.10 = 0.57 MEI   b58 8.51cl  mazda_25t 12.04cl  honda_l15b7 6.23cl  ford_27tt 3.10cl
+    a H130: L45_g12_G50_v130     min   3.13 = 0.58 MEI   b58 8.57cl  mazda_25t 12.83cl  honda_l15b7 6.30cl  ford_27tt 3.13cl
+    b     : L45_g12_G50_v130     min   3.15 = 0.58 MEI   b58 8.59  mazda_25t 13.09  honda_l15b7 6.34  ford_27tt 3.15
+    c H130: L67_g12_G50_v130     min  22.72
+  2 MEI (10.86) reached by (a) on SOME family, per engine, at H: {'b58': [], 'mazda_25t': [60, 90, 130], 'honda_l15b7': [], 'ford_27tt': []}
+  2 MEI by (a) on ALL FOUR (one family, one H): none; by (b): none
+  the Ford's largest (a) anywhere in this view: nan
+--- SHARED SLOT 1-2 tau ON EVERY ENGINE (L 67 or 85 s): 24 families
+  best family per engine, (a) by H; (b); (c) at H130
+    b58          H15 1.27cl [L67_g12_G50_v130]; H30 3.14cl [L67_g12_G50_v130]; H45 5.53cl [L67_g12_G50_v130]; H60 6.90cl [L67_g12_G50_v130]; H90 6.95cl [L67_g12_G50_v130]; H130 7.55cl [L67_g12_G100_v130]
+                 b 7.59 [L67_g12_G100_v130]; c130 47.35 [L67_g12_G100_v130]
+    mazda_25t    H15 3.95cl [L67_g10_G50_v130]; H30 5.97cl [L67_g10_G50_v130]; H45 7.51cl [L67_g10_G50_v130]; H60 10.06cl [L67_g10_G50_v130]; H90 12.40cl [L67_g10_G100_v130]; H130 15.55cl [L67_g10_G100_v130]
+                 b 21.31 [L67_g10_G200_v130]; c130 22.72 [L67_g12_G50_v130]
+    honda_l15b7  H15 2.00cl [L67_g10_G50_v130]; H30 4.00cl [L67_g10_G50_v130]; H45 6.29cl [L67_g10_G50_v130]; H60 5.96cl [L67_g10_G50_v130]; H90 8.18cl [L67_g10_G100_v130]; H130 8.56cl [L67_g10_G100_v130]
+                 b 10.22 [L67_g10_G200_v130]; c130 85.80 [L67_g10_G100_v130]
+    ford_27tt    H15 0.74cl [L67_g10_G50_v130]; H30 1.45cl [L67_g10_G50_v130]; H45 2.31cl [L67_g10_G50_v130]; H60 2.47cl [L67_g10_G50_v130]; H90 2.50cl [L67_g10_G50_v130]; H130 2.80cl [L67_g10_G100_v130]
+                 b 2.82 [L67_g10_G100_v130]; c130 74.46 [L67_g10_G50_v130]
+  best common family (max over families of the min over engines)
+    a H 15: L67_g10_G50_v130     min   0.74 = 0.14 MEI   b58 0.97cl  mazda_25t 3.95cl  honda_l15b7 2.00cl  ford_27tt 0.74cl
+    a H 30: L67_g10_G50_v130     min   1.45 = 0.27 MEI   b58 2.92cl  mazda_25t 5.97cl  honda_l15b7 4.00cl  ford_27tt 1.45cl
+    a H 45: L67_g10_G50_v130     min   2.31 = 0.43 MEI   b58 5.27cl  mazda_25t 7.51cl  honda_l15b7 6.29cl  ford_27tt 2.31cl
+    a H 60: L67_g10_G50_v130     min   2.47 = 0.46 MEI   b58 6.38cl  mazda_25t 10.06cl  honda_l15b7 5.96cl  ford_27tt 2.47cl
+    a H 90: L67_g10_G50_v130     min   2.50 = 0.46 MEI   b58 6.44cl  mazda_25t 10.61cl  honda_l15b7 6.05cl  ford_27tt 2.50cl
+    a H130: L67_g10_G100_v130    min   2.80 = 0.52 MEI   b58 6.05cl  mazda_25t 15.55cl  honda_l15b7 8.56cl  ford_27tt 2.80cl
+    b     : L67_g10_G100_v130    min   2.82 = 0.52 MEI   b58 6.09  mazda_25t 15.89  honda_l15b7 8.63  ford_27tt 2.82
+    c H130: L67_g12_G50_v130     min  22.72
+  2 MEI (10.86) reached by (a) on SOME family, per engine, at H: {'b58': [], 'mazda_25t': [90, 130], 'honda_l15b7': [], 'ford_27tt': []}
+  2 MEI by (a) on ALL FOUR (one family, one H): none; by (b): none
+  the Ford's largest (a) anywhere in this view: nan
+--- COVERED (v <= 115 km/h): 24 families
+  best family per engine, (a) by H; (b); (c) at H130
+    b58          H15: n/a; H30: n/a; H45: n/a; H60: n/a; H90: n/a; H130: n/a
+                 b 5.29 [L67_g10_G50_v115]; c130 36.97 [L67_g10_G50_v115]
+    mazda_25t    H15: n/a; H30: n/a; H45: n/a; H60: n/a; H90: n/a; H130: n/a
+                 b 11.51 [L45_g10_G100_v115]; c130 9.98 [L130_g8_G50_v100]
+    honda_l15b7  H15: n/a; H30: n/a; H45: n/a; H60: n/a; H90: n/a; H130: n/a
+                 b 5.76 [L45_g10_G100_v115]; c130 80.17 [L45_g10_G50_v115]
+    ford_27tt    H15: n/a; H30: n/a; H45: n/a; H60: n/a; H90: n/a; H130: n/a
+                 b 1.17 [L67_g10_G50_v115]; c130 57.42 [L67_g10_G50_v115]
+  best common family (max over families of the min over engines)
+    a H 15: n/a (no closed-loop run)
+    a H 30: n/a (no closed-loop run)
+    a H 45: n/a (no closed-loop run)
+    a H 60: n/a (no closed-loop run)
+    a H 90: n/a (no closed-loop run)
+    a H130: n/a (no closed-loop run)
+    b     : L67_g10_G50_v115     min   1.17 = 0.22 MEI   b58 5.29  mazda_25t 8.10  honda_l15b7 4.08  ford_27tt 1.17
+    c H130: L85_g10_G50_v115     min   7.61
+  2 MEI (10.86) reached by (a) on SOME family, per engine, at H: {'b58': [], 'mazda_25t': [], 'honda_l15b7': [], 'ford_27tt': []}
+  2 MEI by (a) on ALL FOUR (one family, one H): none; by (b): none
+  the Ford's largest (a) anywhere in this view: nan
+
+OPEN vs CLOSED LOOP, no-knock points: (a) 288 pairs, closed - open mean -0.002, min -0.641, max +0.421; (b) 440 pairs, mean -0.228, min -1.222, max +0.375
+
+EXPLORATORY, L = 30 s (outside 1-2 tau; C5 not computed):
+   X_L30_g10_G100_v130: (a) H130 open, no knock: b58 6.44  mazda_25t 5.41  honda_l15b7 12.25  ford_27tt 4.05; (b) closed no knock: b58 5.57  mazda_25t 4.70  honda_l15b7 12.48  ford_27tt 3.80
+   X_L30_g12_G100_v130: (a) H130 open, no knock: b58 9.78  mazda_25t 6.78  honda_l15b7 12.46  ford_27tt 4.24; (b) closed no knock: b58 9.26  mazda_25t 6.32  honda_l15b7 12.74  ford_27tt 4.02
+
+WHERE THE CLOSED-LOOP SAVING COMES FROM on L45_g10_G100_v130 (damage units; turbine / oil / knock by phase)
+   b58          b     turb: gap +0.99, ramp_up +0.03, climb +0.47, ramp_down +0.22  oil: gap -0.09, ramp_up -0.01, climb -0.02, ramp_down -0.00  knock: gap +0.00, ramp_up -0.63, climb +0.00, ramp_down +0.00   (base no-knock 19.2, knock 21.7)
+   b58          a130  turb: gap +0.98, ramp_up +0.03, climb +0.47, ramp_down +0.22  oil: gap -0.08, ramp_up -0.01, climb -0.02, ramp_down -0.00  knock: gap +0.00, ramp_up -0.63, climb +0.00, ramp_down +0.00   (base no-knock 19.2, knock 21.7)
+   b58          a30   turb: gap +0.23, ramp_up +0.01, climb +0.19, ramp_down +0.08  oil: gap -0.01, ramp_up -0.00, climb -0.01, ramp_down -0.00  knock: gap +0.00, ramp_up -0.60, climb +0.00, ramp_down +0.00   (base no-knock 19.2, knock 21.7)
+   mazda_25t    b     turb: gap +1.23, ramp_up +0.03, climb +0.55, ramp_down +0.25  oil: gap -0.11, ramp_up -0.01, climb -0.03, ramp_down -0.01  knock: gap +44.36, ramp_up +8.04, climb +0.15, ramp_down +7.68   (base no-knock 33.3, knock 290.1)
+   mazda_25t    a130  turb: gap +1.23, ramp_up +0.03, climb +0.55, ramp_down +0.25  oil: gap -0.11, ramp_up -0.01, climb -0.03, ramp_down -0.01  knock: gap +43.26, ramp_up +8.04, climb +0.15, ramp_down +7.68   (base no-knock 33.3, knock 290.1)
+   mazda_25t    a30   turb: gap +0.20, ramp_up +0.01, climb +0.19, ramp_down +0.07  oil: gap -0.02, ramp_up -0.00, climb -0.02, ramp_down -0.00  knock: gap +13.24, ramp_up +8.01, climb +0.05, ramp_down +0.01   (base no-knock 33.3, knock 290.1)
+   honda_l15b7  b     turb: gap +8.03, ramp_up +0.52, climb +3.76, ramp_down +0.92  oil: gap -0.09, ramp_up -0.01, climb -0.03, ramp_down -0.01  knock: gap +0.00, ramp_up +0.00, climb +0.00, ramp_down +0.00   (base no-knock 118.2, knock 120.3)
+   honda_l15b7  a130  turb: gap +7.97, ramp_up +0.52, climb +3.73, ramp_down +0.91  oil: gap -0.09, ramp_up -0.01, climb -0.03, ramp_down -0.01  knock: gap +0.00, ramp_up +0.00, climb +0.00, ramp_down +0.00   (base no-knock 118.2, knock 120.3)
+   honda_l15b7  a30   turb: gap +2.02, ramp_up +0.22, climb +1.56, ramp_down +0.39  oil: gap -0.01, ramp_up -0.00, climb -0.01, ramp_down -0.00  knock: gap +0.00, ramp_up +0.00, climb +0.00, ramp_down +0.00   (base no-knock 118.2, knock 120.3)
+   ford_27tt    b     turb: gap +1.73, ramp_up +0.07, climb +0.80, ramp_down +0.31  oil: gap -0.09, ramp_up -0.01, climb -0.03, ramp_down -0.01  knock: gap +0.00, ramp_up +0.00, climb +0.00, ramp_down +0.00   (base no-knock 69.2, knock 94.1)
+   ford_27tt    a130  turb: gap +1.72, ramp_up +0.07, climb +0.80, ramp_down +0.31  oil: gap -0.09, ramp_up -0.01, climb -0.03, ramp_down -0.01  knock: gap +0.00, ramp_up +0.00, climb +0.00, ramp_down +0.00   (base no-knock 69.2, knock 94.1)
+   ford_27tt    a30   turb: gap +0.43, ramp_up +0.03, climb +0.30, ramp_down +0.11  oil: gap -0.02, ramp_up -0.00, climb -0.01, ramp_down -0.00  knock: gap +0.00, ramp_up +0.00, climb +0.00, ramp_down +0.00   (base no-knock 69.2, knock 94.1)
+
+STAGE-2 LIST (12): L45_g10_G100_v130 L45_g12_G100_v130 L45_g12_G50_v130 L45_g10_G50_v130 L67_g10_G100_v130 L67_g12_G100_v130 L85_g10_G100_v130 L85_g12_G100_v130 L67_g10_G50_v130 L67_g12_G50_v130 L45_g12_G200_v130 L45_g10_G200_v130

@@ -1,0 +1,118 @@
+"""Reproduction (the control, mistake 12): section G's lambda-bound head-start rows and section J's
+B58 points of results/preview_ceiling.txt, rebuilt with DIRECT plant runs on today's B58 plant
+(sub-stepped network, 8 s ramp), on the locked climb (720 s, dt 1 s, onset 180 s).
+
+    python repro.py            writes repro.json and repro.txt here
+"""
+import json
+import os
+import sys
+import time
+from multiprocessing import Pool
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib  # noqa: E402
+import numpy as np  # noqa: E402
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+HS = (14, 15, 30, 45, 47, 60, 90, 100, 130, 150)
+
+
+def task(spec):
+    name, kind, arg = spec
+    p = lib.engines.get("b58")
+    c, m = lib.locked(p)
+    t0 = time.perf_counter()
+    if kind == "neutral":
+        pol = lambda env, obs: lib.E.neutral_action()  # noqa: E731
+        r = lib.run(p, c, pol)
+    elif kind == "cg":
+        r = lib.run(p, c, lib.C.p_grade_now)
+    elif kind == "pred":
+        r = lib.run(p, c, lib.C.p_predictive)
+    elif kind == "lam":
+        r = lib.run(p, c, lib.lambda_variant(lib.windows(m, arg)))
+    elif kind == "egt":
+        w = lib.windows(m, arg)
+        r = lib.run(p, c, lib.C.p_grade_now, egt_override=lambda t: lib.in_windows(t, w))
+    sec = time.perf_counter() - t0
+    keep = {k: v.tolist() for k, v in r.items() if isinstance(v, np.ndarray)}
+    return name, dict(kind=kind, arg=arg, seconds=sec, totals=lib.totals(r), arrays=keep)
+
+
+def main():
+    specs = [("neutral", "neutral", None), ("cg", "cg", None), ("pred", "pred", None)]
+    specs += [(f"lam_H{h}", "lam", h) for h in HS] + [("lam_all", "lam", None)]
+    specs += [("egt_H30", "egt", 30), ("egt_all", "egt", None)]
+    t0 = time.perf_counter()
+    with Pool(len(specs)) as pool:
+        res = dict(pool.map(task, specs))
+    wall = time.perf_counter() - t0
+    p = lib.engines.get("b58")
+    c, m = lib.locked(p)
+    A = {k: {kk: np.asarray(vv) for kk, vv in v["arrays"].items()} for k, v in res.items()}
+    base_8oct = 848.885  # results/premise.json "baseline ECU (true neutral)" damage_base (8 Oct plant)
+    neu = res["neutral"]["totals"]
+    cg = res["cg"]["totals"]
+    out = dict(wall_s=wall, per_run_s={k: v["seconds"] for k, v in res.items()},
+               neutral=neu, cg=cg, rows={})
+    lines = []
+    P = lambda x: print(x) or lines.append(x)  # noqa: E731
+    P(f"REPRODUCTION, B58 locked climb, today's plant ({p.id}); {len(specs)} runs in parallel, wall {wall:.0f} s")
+    P(f"per-run seconds: " + ", ".join(f"{k} {v['seconds']:.0f}" for k, v in res.items()))
+    P(f"neutral damage {neu['knock']:.3f} (damage_base {neu['env_damage_base']:.3f}); premise.json 848.052 / 848.885")
+    P(f"current-grade damage {cg['knock']:.3f}; premise.json 449.625")
+    Tcg = A["cg"]["t_turb"]
+    tau = lib.tau_series(p, A["cg"])
+    k0 = 180  # the record at index k is the state after the step that reads t = k
+    P(f"tau of the housing on current-grade: flat 150-179 s median {np.median(tau[150:180]):.1f} s, "
+      f"climb 230-718 s median {np.median(tau[230:]):.1f} s")
+    P("")
+    P("G. head start at the climb start, and the points it buys (points = 100 x saved / base)")
+    P(f"   {'row':<46}{'dEGT K':>8}{'dT@179 K':>10}{'open-loop pts':>14}{'closed pts kn':>14}"
+      f"{'closed pts nk':>14}{'8 Oct col':>10}")
+    eight_oct = {"pred": 0.04, "lam_H30": 0.13, "lam_all": 0.42, "egt_H30": 1.19, "egt_all": 3.35}
+    for key in ["pred", "lam_H30", "lam_all", "egt_H30", "egt_all"] + [f"lam_H{h}" for h in HS if h != 30]:
+        r = A[key]
+        dT = float(Tcg[179 - 1] - r["t_turb"][179 - 1])   # state after the step reading t=178 -> at 179 s
+        dT179 = float(Tcg[179] - r["t_turb"][179])
+        if key.startswith("egt") or key == "pred" or key.startswith("lam"):
+            w = lib.windows(m, res[key]["arg"]) if key not in ("pred",) else [(150.0, 180.0)]
+        sel = np.zeros(len(r["t"]), bool)
+        for a, b in w:
+            sel |= (r["t"] >= a) & (r["t"] < b)
+        degt = float(np.median(A["cg"]["egt_k"][sel] - r["egt_k"][sel])) if key.startswith(("lam", "pred")) else float("nan")
+        # open loop (section G's method): the deviation at the climb start decays under current-grade's
+        # own inputs; here the housing is replayed with the variant's gas before 180 s and the
+        # reference's after, sub-stepped
+        if key.startswith("egt"):
+            Trep = lib.replay_housing(p, A["cg"], egt_fn=lambda k: lib.T_AMB if lib.in_windows(A["cg"]["t"][k], w) else A["cg"]["egt_k"][k])
+        else:
+            Trep = lib.replay_housing(p, A["cg"], egt_fn=lambda k: r["egt_k"][k] if A["cg"]["t"][k] < 180 else A["cg"]["egt_k"][k],
+                                      mdot_fn=lambda k: r["mdot_exh"][k] if A["cg"]["t"][k] < 180 else A["cg"]["mdot_exh"][k])
+        ol = 100 * (lib.turb_damage(p, Tcg) - lib.turb_damage(p, Trep)) / base_8oct
+        tv = res[key]["totals"]
+        ck = 100 * (cg["knock"] - tv["knock"]) / base_8oct
+        cn = 100 * (cg["noknock"] - tv["noknock"]) / base_8oct
+        out["rows"][key] = dict(dEGT_K=degt, dT_179=dT179, open_loop_pts=ol, closed_knock_pts=ck,
+                                closed_noknock_pts=cn, d_turb=cg["turb"] - tv["turb"], d_oil=cg["oil"] - tv["oil"],
+                                d_knockterm=cg["knockterm"] - tv["knockterm"], fuel_extra_pct=100 * (tv["fuel"] / cg["fuel"] - 1),
+                                eight_oct=eight_oct.get(key))
+        P(f"   {key:<46}{degt:8.1f}{dT179:10.2f}{ol:14.3f}{ck:14.3f}{cn:14.3f}"
+          f"{(eight_oct.get(key) if eight_oct.get(key) is not None else float('nan')):10.2f}")
+    P("")
+    P("   term split of the closed-loop saving (units): turbine / oil / knock; extra fuel %")
+    for key, v in out["rows"].items():
+        P(f"   {key:<12} {v['d_turb']:8.3f} {v['d_oil']:8.3f} {v['d_knockterm']:8.3f}   {v['fuel_extra_pct']:+.3f} %")
+    with open(os.path.join(HERE, "repro.json"), "w", encoding="utf-8") as fh:
+        json.dump(dict(out, arrays_saved=False), fh, indent=1)
+    np.savez_compressed(os.path.join(HERE, "repro_traces.npz"),
+                        **{f"{k}__{kk}": vv for k, v in A.items() for kk, vv in v.items()})
+    with open(os.path.join(HERE, "repro.txt"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+    with open(os.path.join(HERE, "repro_opened.txt"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(sorted(lib.OPENED)) + "\n")
+
+
+if __name__ == "__main__":
+    main()

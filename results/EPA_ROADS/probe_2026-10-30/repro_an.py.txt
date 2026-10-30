@@ -1,0 +1,51 @@
+"""Decomposition of the reproduction gap (no plant run: open-loop replays of the saved traces)."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib
+import numpy as np
+HERE = os.path.dirname(os.path.abspath(__file__))
+z = np.load(os.path.join(HERE, "repro_traces.npz"))
+A = {}
+for k in z.files:
+    a, b = k.split("__"); A.setdefault(a, {})[b] = z[k]
+p = lib.engines.get("b58")
+cg = A["cg"]; t = cg["t"]
+B = 848.885
+Tcg = cg["t_turb"]
+D0 = lib.turb_damage(p, Tcg)
+lines = []
+P = lambda s: print(s) or lines.append(s)
+def pts(T): return 100 * (D0 - lib.turb_damage(p, T)) / B
+# check: replay of cg itself reproduces its own housing
+T_self = lib.replay_housing(p, cg)
+P(f"replay check: max |T_replay - T_env| on current-grade = {np.abs(T_self - Tcg).max():.2e} K")
+egt_bound_G = 25.0 * 0.15 / 0.055
+var = A["lam_H30"]
+w30 = (t >= 150) & (t < 180)
+d_med = float(np.median(cg["egt_k"][w30] - var["egt_k"][w30]))
+dm_rel = float(np.median(var["mdot_exh"][w30] / cg["mdot_exh"][w30] - 1))
+P(f"lambda bound, 150-179 s: measured EGT drop median {d_med:.1f} K (G ASSUMED {egt_bound_G:.1f} K, linear from the hand-written -0.055's 25.0 K); exhaust flow +{100*dm_rel:.1f} %")
+rows = [
+ ("G's assumption: EGT - 68.2 K for 30 s, reference flow", lambda k: cg["egt_k"][k] - (egt_bound_G if w30[k] else 0), None),
+ ("measured median drop 55.2 K for 30 s, reference flow", lambda k: cg["egt_k"][k] - (d_med if w30[k] else 0), None),
+ ("the run's own gas (slew included), reference flow", lambda k: var["egt_k"][k] if t[k] < 180 else cg["egt_k"][k], None),
+ ("the run's own gas and flow (= the direct run, open loop)", lambda k: var["egt_k"][k] if t[k] < 180 else cg["egt_k"][k], lambda k: var["mdot_exh"][k] if t[k] < 180 else cg["mdot_exh"][k]),
+]
+P(f"{'decomposition, H = 30 s':<62}{'dT@179 K':>9}{'points':>8}")
+for lab, ef, mf in rows:
+    T = lib.replay_housing(p, cg, egt_fn=ef, mdot_fn=mf)
+    P(f"{lab:<62}{Tcg[179]-T[179]:9.2f}{pts(T):8.3f}")
+P("published section G row 'lambda at its -0.15 bound for 30 s': 8.8 K, 0.13 points (8 Oct column)")
+P("")
+P("J, the B58 row (tau 47 s): open loop on today's plant, points of the 8 Oct baseline")
+P(f"{'H s':>5}{'lam bound, direct gas+flow':>28}{'lam, G-style 68.2 K ref flow':>30}{'EGT at ambient':>16}{'J published (lam / ambient)':>30}")
+J = {14: (0.06, 0.61), 30: (0.12, 1.18), 47: (0.18, 1.66), 100: (0.32, 2.67), 150: (0.40, 3.23)}
+for H in (14, 30, 47, 100, 150):
+    w = (t >= 180 - H) & (t < 180)
+    var = A[f"lam_H{H}"]
+    Ta = lib.replay_housing(p, cg, egt_fn=lambda k: var["egt_k"][k] if t[k] < 180 else cg["egt_k"][k],
+                            mdot_fn=lambda k: var["mdot_exh"][k] if t[k] < 180 else cg["mdot_exh"][k])
+    Tg = lib.replay_housing(p, cg, egt_fn=lambda k: cg["egt_k"][k] - (egt_bound_G if w[k] else 0))
+    Tc = lib.replay_housing(p, cg, egt_fn=lambda k: lib.T_AMB if w[k] else cg["egt_k"][k])
+    P(f"{H:5d}{pts(Ta):28.3f}{pts(Tg):30.3f}{pts(Tc):16.3f}{J[H][0]:>22.2f} / {J[H][1]:.2f}")
+open(os.path.join(HERE, "repro_an.txt"), "w", encoding="utf-8").write("\n".join(lines) + "\n")

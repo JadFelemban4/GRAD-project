@@ -1,0 +1,41 @@
+"""Arithmetic of the drafted road design only: no plant, no repository file. Prints (1) H = r tau per engine
+and the step each preview sample falls on at dt 1 s (int(h / dt), as engine_env._preview takes it, per the
+draft row 117); (2) the number of climbs per 900 s road under the drafted generator, simulated from a
+scratch seed (NOT roads_seed); (3) the slot bounds from the frozen tau.
+
+    python -I design.py
+"""
+import numpy as np
+
+TAU = {"b58": 47.3351, "mazda_25t": 42.7418, "honda_l15b7": 47.6717, "ford_27tt": 66.7620}
+RS = (0.5, 1.5)
+FR = (1 / 15, 1 / 6, 1 / 2, 1.0)
+DT = 1.0
+print("slot bounds: L >= max tau =", max(TAU.values()), " L <= 2 min tau =", 2 * min(TAU.values()))
+for e, t in TAU.items():
+    print(f"  {e:<12} L/tau over [67, 85] s: {67 / t:.2f}-{85 / t:.2f}")
+for r in RS:
+    for e, t in TAU.items():
+        H = r * t
+        steps = [int(H * f / DT) for f in FR]
+        print(f"r {r}: {e:<12} H {H:7.2f} s  samples {[round(H * f, 2) for f in FR]} -> steps {steps}")
+
+# the drafted generator: lead U[150, 210], then climbs L U[67, 85] (whole s), gaps G U[50, 150] (whole s),
+# a climb accepted only if its ramp-down ends at least 60 s before 900 s
+RAMP, TOTAL, TAIL = 8, 900, 60
+rng = np.random.default_rng(12345)          # a scratch seed, not roads_seed
+counts = []
+for _ in range(100000):
+    s = int(rng.integers(150, 211))
+    n = 0
+    while True:
+        L = int(rng.integers(67, 86))
+        if s + L + RAMP > TOTAL - TAIL:
+            break
+        n += 1
+        s = s + L + int(rng.integers(50, 151))
+    counts.append(n)
+c = np.bincount(counts)
+print("climbs per road (share of 100 000 simulated roads):",
+      {k: round(float(v) / len(counts), 4) for k, v in enumerate(c) if v})
+print("mean climbs per road", float(np.mean(counts)), "; for 20 roads about", 20 * float(np.mean(counts)), "slots")

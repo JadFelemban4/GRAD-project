@@ -1,0 +1,45 @@
+"""Split every closed-loop (a) and (b) saving into what accrues INSIDE the lever's windows (the lever
+acting on the damage of the moment) and OUTSIDE them (carried state: the head start), no-knock
+reading, points of the baseline; and the extra fuel each variant burns over current-grade."""
+import json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import numpy as np
+import lib, grid
+HERE = os.path.dirname(os.path.abspath(__file__))
+fids = open(os.path.join(HERE, "stage2_list.txt")).read().split()
+out = {}
+lines = []
+P = lambda s: print(s) or lines.append(s)
+P("family / engine: per H, total no-knock points = inside-window + outside-window (head start); fuel extra % over current-grade")
+for f in fids:
+    for e in lib.ENGINES:
+        A = np.load(os.path.join(HERE, "runs", f"{f}__{e}__cg.npz")); j = json.load(open(os.path.join(HERE, "runs", f"{f}__{e}__cg.json")))
+        meta = j["meta"]; base = j["totals"]["base_noknock"]; fuel0 = j["totals"]["fuel"]
+        t = A["t"]; parts = []
+        for var in [f"a{h}" for h in grid.HS] + ["b"]:
+            p = os.path.join(HERE, "runs", f"{f}__{e}__{var}.npz")
+            if not os.path.exists(p):
+                continue
+            B = np.load(p); jb = json.load(open(p[:-4] + ".json"))
+            wins = lib.windows(meta, None if var == "b" else int(var[1:]))
+            m = np.zeros(len(t), bool)
+            for a, b in wins:
+                m |= (t >= a) & (t < b)
+            d = (A["d_turb"] + A["d_oil"]) - (B["d_turb"] + B["d_oil"])
+            tot, ins, outs = 100 * d.sum() / base, 100 * d[m].sum() / base, 100 * d[~m].sum() / base
+            fx = 100 * (jb["totals"]["fuel"] / fuel0 - 1)
+            out[f"{f}|{e}|{var}"] = dict(total=tot, inside=ins, outside=outs, fuel_extra_pct=fx)
+            parts.append(f"{var} {tot:.2f}={ins:.2f}+{outs:.2f} (+{fx:.1f}% fuel)")
+        P(f"{f:<20} {e:<12} " + "  ".join(parts))
+json.dump(out, open(os.path.join(HERE, "headstart.json"), "w"), indent=1)
+open(os.path.join(HERE, "headstart.txt"), "w").write("\n".join(lines) + "\n")
+# best common family by head-start-only (outside) at each H
+P("")
+P("best common family by the HEAD-START part only (outside the windows), no knock:")
+for h in grid.HS:
+    best = max(fids, key=lambda f: min(out[f"{f}|{e}|a{h}"]["outside"] for e in lib.ENGINES))
+    P(f"  H{h:>3}: {best:<20} min {min(out[f'{best}|{e}|a{h}']['outside'] for e in lib.ENGINES):.2f}  " + "  ".join(f"{e} {out[f'{best}|{e}|a{h}']['outside']:.2f}" for e in lib.ENGINES))
+for e in lib.ENGINES:
+    bf, bh = max(((f, h) for f in fids for h in grid.HS), key=lambda x: out[f"{x[0]}|{e}|a{x[1]}"]["outside"])
+    P(f"  per engine best head-start part: {e} {out[f'{bf}|{e}|a{bh}']['outside']:.2f} [{bf}, H{bh}]")
+open(os.path.join(HERE, "headstart.txt"), "w").write("\n".join(lines) + "\n")

@@ -1,0 +1,16 @@
+replay check: max |T_replay - T_env| on current-grade = 0.00e+00 K
+lambda bound, 150-179 s: measured EGT drop median 55.2 K (G ASSUMED 68.2 K, linear from the hand-written -0.055's 25.0 K); exhaust flow +7.6 %
+decomposition, H = 30 s                                        dT@179 K  points
+G's assumption: EGT - 68.2 K for 30 s, reference flow              8.79   0.122
+measured median drop 55.2 K for 30 s, reference flow               7.12   0.099
+the run's own gas (slew included), reference flow                  6.76   0.094
+the run's own gas and flow (= the direct run, open loop)           4.43   0.062
+published section G row 'lambda at its -0.15 bound for 30 s': 8.8 K, 0.13 points (8 Oct column)
+
+J, the B58 row (tau 47 s): open loop on today's plant, points of the 8 Oct baseline
+  H s  lam bound, direct gas+flow  lam, G-style 68.2 K ref flow  EGT at ambient   J published (lam / ambient)
+   14                       0.029                         0.061           0.598                  0.06 / 0.61
+   30                       0.062                         0.122           1.151                  0.12 / 1.18
+   47                       0.091                         0.178           1.625                  0.18 / 1.66
+  100                       0.159                         0.311           2.625                  0.32 / 2.67
+  150                       0.198                         0.393           3.179                  0.40 / 3.23

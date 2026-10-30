@@ -1,0 +1,1760 @@
+L130_g10_G100_v100    b58          L/tau 2.75 base     16.4/    18.9 knockshare 0.13 hot -141.3 K (0 s) cg cut 15.3/11.5 deliv 0.00/0.00
+   closed: b 1.59/1.39   open b 1.88
+   open a: a15 0.24  a30 0.47  a45 0.70  a60 0.94  a90 1.49  a130 1.86   open c: c15 4.56  c30 8.06  c45 10.85  c60 13.18  c90 17.24  c130 20.39
+   split b (turb/oil/knock units): turb 0.32, oil -0.06, knock 0.00; fuel +5.04 %; dT onsets b 5.1 9.1 9.9
+L130_g10_G100_v100    mazda_25t    L/tau 3.04 base     21.2/   190.8 knockshare 0.89 hot -126.3 K (0 s) cg cut 9.6/-14.6 deliv 0.00/0.00
+   closed: b 0.72/0.98   open b 1.00
+   open a: a15 0.08  a30 0.17  a45 0.27  a60 0.39  a90 0.71  a130 1.01   open c: c15 5.09  c30 9.16  c45 12.53  c60 15.46  c90 20.97  c130 26.42
+   split b (turb/oil/knock units): turb 0.21, oil -0.06, knock 1.71; fuel +4.76 %; dT onsets b -1.1 3.4 4.0
+L130_g10_G100_v100    honda_l15b7  L/tau 2.73 base     79.4/    79.4 knockshare 0.00 hot  -51.4 K (0 s) cg cut 2.2/2.2 deliv 0.00/0.00
+   closed: b 2.74/2.74   open b 2.72
+   open a: a15 0.36  a30 0.71  a45 1.07  a60 1.45  a90 2.36  a130 2.69   open c: c15 10.27  c30 18.66  c45 25.74  c60 31.93  c90 43.16  c130 53.01
+   split b (turb/oil/knock units): turb 2.22, oil -0.04, knock 0.00; fuel +3.16 %; dT onsets b 2.7 4.3 4.7
+L130_g10_G100_v100    ford_27tt    L/tau 1.95 base     35.8/    43.6 knockshare 0.18 hot  -84.1 K (0 s) cg cut 37.8/31.4 deliv 1.00/0.00
+   closed: b 0.06/0.05   open b 0.19
+   open a: a15 0.01  a30 0.03  a45 0.05  a60 0.07  a90 0.12  a130 0.19   open c: c15 4.54  c30 8.28  c45 11.45  c60 14.20  c90 18.97  c130 23.06
+   split b (turb/oil/knock units): turb 0.07, oil -0.05, knock 0.00; fuel +3.65 %; dT onsets b -0.4 0.4 0.6
+L130_g10_G100_v115    b58          L/tau 2.75 base     35.3/    36.9 knockshare 0.04 hot  -88.1 K (0 s) cg cut 27.1/26.0 deliv 0.00/0.00
+   closed: b 3.80/3.64   open b 3.91
+   open a: a15 0.54  a30 1.04  a45 1.52  a60 2.01  a90 3.16  a130 3.87   open c: c15 8.07  c30 13.92  c45 18.42  c60 22.09  c90 28.44  c130 32.98
+   split b (turb/oil/knock units): turb 1.41, oil -0.07, knock 0.00; fuel +5.34 %; dT onsets b 10.4 14.5 15.0
+L130_g10_G100_v115    mazda_25t    L/tau 3.04 base     49.6/   291.7 knockshare 0.83 hot  -74.0 K (0 s) cg cut 16.1/8.9 deliv 0.00/0.00
+   closed: b 2.25/4.18   open b 2.37
+   open a: a15 0.26  a30 0.52  a45 0.78  a60 1.05  a90 1.79  a130 2.36   open c: c15 7.69  c30 13.59  c45 18.33  c60 22.38  c90 30.14  c130 37.77
+   split b (turb/oil/knock units): turb 1.20, oil -0.08, knock 11.07; fuel +4.82 %; dT onsets b 2.8 7.2 7.6
+L130_g10_G100_v115    honda_l15b7  L/tau 2.73 base    144.8/   146.3 knockshare 0.01 hot  -30.2 K (0 s) cg cut -0.7/-0.7 deliv 0.00/0.00
+   closed: b 3.16/3.13   open b 3.11
+   open a: a15 0.43  a30 0.85  a45 1.29  a60 1.75  a90 2.90  a130 3.08   open c: c15 12.75  c30 22.68  c45 30.81  c60 37.81  c90 50.48  c130 60.23
+   split b (turb/oil/knock units): turb 4.64, oil -0.07, knock 0.00; fuel +3.21 %; dT onsets b 3.4 5.4 5.7
+L130_g10_G100_v115    ford_27tt    L/tau 1.95 base    112.2/   129.8 knockshare 0.14 hot  -25.8 K (0 s) cg cut 7.9/6.8 deliv 0.00/0.00
+   closed: b 0.95/0.82   open b 0.99
+   open a: a15 0.12  a30 0.24  a45 0.36  a60 0.49  a90 0.80  a130 0.99   open c: c15 12.15  c30 21.73  c45 29.53  c60 36.12  c90 47.43  c130 56.18
+   split b (turb/oil/knock units): turb 1.13, oil -0.07, knock 0.00; fuel +3.50 %; dT onsets b 0.5 1.4 1.6
+L130_g10_G100_v130    b58          L/tau 2.75 base     83.4/    85.7 knockshare 0.03 hot  -43.3 K (0 s) cg cut 35.5/33.4 deliv 0.00/0.00
+   closed: b 4.84/4.29   open b 4.86
+   open a: a15 0.66  a30 1.28  a45 1.86  a60 2.44  a90 3.86  a130 4.81   open c: c15 8.63  c30 14.82  c45 19.55  c60 23.42  c90 30.47  c130 36.07
+   split b (turb/oil/knock units): turb 4.11, oil -0.08, knock -0.36; fuel +5.22 %; dT onsets b 14.8 18.8 19.2
+L130_g10_G100_v130    mazda_25t    L/tau 3.04 base    133.3/   474.5 knockshare 0.72 hot  -27.3 K (0 s) cg cut 21.1/7.2 deliv 0.00/0.00
+   closed: b 2.71/8.70   open b 2.73
+   open a: a15 0.29  a30 0.57  a45 0.84  a60 1.14  a90 1.97  a130 2.72   open c: c15 9.84  c30 16.87  c45 22.26  c60 26.72  c90 35.37  c130 43.01
+   split b (turb/oil/knock units): turb 3.72, oil -0.11, knock 37.66; fuel +5.27 %; dT onsets b 3.1 8.6 8.9
+L130_g10_G100_v130    honda_l15b7  L/tau 2.73 base    267.6/   269.7 knockshare 0.01 hot  -10.1 K (0 s) cg cut -1.2/-1.2 deliv 0.00/0.00
+   closed: b 4.94/4.90   open b 4.86
+   open a: a15 0.69  a30 1.37  a45 2.07  a60 2.81  a90 4.59  a130 4.81   open c: c15 15.72  c30 27.12  c45 36.06  c60 43.58  c90 56.97  c130 65.75
+   split b (turb/oil/knock units): turb 13.32, oil -0.09, knock 0.00; fuel +3.35 %; dT onsets b 7.3 8.8 9.0
+L130_g10_G100_v130    ford_27tt    L/tau 1.95 base    392.5/   417.4 knockshare 0.06 hot  +29.5 K (135 s) cg cut 6.0/5.6 deliv 0.00/0.00
+   closed: b 1.78/1.68   open b 1.76
+   open a: a15 0.27  a30 0.53  a45 0.79  a60 1.04  a90 1.61  a130 1.73   open c: c15 15.73  c30 27.43  c45 36.54  c60 44.01  c90 56.63  c130 65.24
+   split b (turb/oil/knock units): turb 7.08, oil -0.09, knock 0.00; fuel +3.43 %; dT onsets b 2.6 3.0 2.9
+L130_g10_G200_v100    b58          L/tau 2.75 base     10.6/    13.0 knockshare 0.19 hot -157.3 K (0 s) cg cut 9.6/6.1 deliv 0.00/0.00
+   closed: b 0.70/0.58   open b 1.18
+   open a: a15 0.10  a30 0.20  a45 0.28  a60 0.37  a90 0.51  a130 0.70   open c: c15 2.63  c30 4.69  c45 6.33  c60 7.66  c90 9.68  c130 11.56
+   split b (turb/oil/knock units): turb 0.13, oil -0.05, knock 0.00; fuel +6.63 %; dT onsets b 5.1 11.4
+L130_g10_G200_v100    mazda_25t    L/tau 3.04 base     13.2/   134.7 knockshare 0.90 hot -138.7 K (0 s) cg cut 6.6/-13.5 deliv 0.00/0.00
+   closed: b 0.02/0.82   open b 0.47
+   open a: a15 0.01  a30 0.01  a45 0.02  a60 0.03  a90 0.06  a130 0.11   open c: c15 3.22  c30 5.83  c45 7.96  c60 9.74  c90 12.53  c130 15.25
+   split b (turb/oil/knock units): turb 0.06, oil -0.06, knock 1.10; fuel +6.28 %; dT onsets b -1.1 3.0
+L130_g10_G200_v100    honda_l15b7  L/tau 2.73 base     39.2/    39.2 knockshare -0.00 hot  -65.8 K (0 s) cg cut 0.7/0.7 deliv 0.00/0.00
+   closed: b 2.45/2.45   open b 2.50
+   open a: a15 0.20  a30 0.39  a45 0.57  a60 0.75  a90 1.08  a130 1.51   open c: c15 7.82  c30 14.23  c45 19.58  c60 24.11  c90 31.37  c130 38.72
+   split b (turb/oil/knock units): turb 1.00, oil -0.04, knock 0.00; fuel +4.21 %; dT onsets b 2.7 5.7
+L130_g10_G200_v100    ford_27tt    L/tau 1.95 base     17.2/    25.0 knockshare 0.31 hot -110.1 K (0 s) cg cut 27.9/19.7 deliv 1.00/0.00
+   closed: b -0.20/-0.14   open b 0.06
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.00   open c: c15 2.84  c30 5.22  c45 7.22  c60 8.93  c90 11.69  c130 14.48
+   split b (turb/oil/knock units): turb 0.01, oil -0.05, knock 0.00; fuel +4.80 %; dT onsets b -0.4 0.4
+L130_g10_G200_v115    b58          L/tau 2.75 base     20.0/    21.5 knockshare 0.07 hot  -99.1 K (0 s) cg cut 21.8/20.2 deliv 0.00/0.00
+   closed: b 2.96/2.75   open b 3.25
+   open a: a15 0.32  a30 0.61  a45 0.87  a60 1.10  a90 1.51  a130 1.99   open c: c15 5.95  c30 10.37  c45 13.77  c60 16.44  c90 20.36  c130 23.88
+   split b (turb/oil/knock units): turb 0.66, oil -0.07, knock 0.00; fuel +6.99 %; dT onsets b 10.4 18.2
+L130_g10_G200_v115    mazda_25t    L/tau 3.04 base     28.1/   193.5 knockshare 0.85 hot  -82.6 K (0 s) cg cut 13.5/7.9 deliv 0.00/0.00
+   closed: b 1.53/3.90   open b 1.76
+   open a: a15 0.13  a30 0.24  a45 0.35  a60 0.45  a90 0.63  a130 0.86   open c: c15 5.89  c30 10.48  c45 14.14  c60 17.10  c90 21.62  c130 25.87
+   split b (turb/oil/knock units): turb 0.50, oil -0.07, knock 7.12; fuel +6.32 %; dT onsets b 2.8 7.8
+L130_g10_G200_v115    honda_l15b7  L/tau 2.73 base     77.8/    79.3 knockshare 0.02 hot  -38.2 K (0 s) cg cut -1.8/-1.8 deliv 0.00/0.00
+   closed: b 3.10/3.04   open b 3.11
+   open a: a15 0.26  a30 0.50  a45 0.72  a60 0.94  a90 1.34  a130 1.89   open c: c15 10.14  c30 18.09  c45 24.51  c60 29.79  c90 38.05  c130 46.29
+   split b (turb/oil/knock units): turb 2.47, oil -0.06, knock 0.00; fuel +4.25 %; dT onsets b 3.4 7.3
+L130_g10_G200_v115    ford_27tt    L/tau 1.95 base     49.2/    66.8 knockshare 0.26 hot  -45.3 K (0 s) cg cut 6.7/4.9 deliv 0.00/0.00
+   closed: b 0.69/0.51   open b 0.81
+   open a: a15 0.06  a30 0.11  a45 0.17  a60 0.22  a90 0.32  a130 0.45   open c: c15 9.40  c30 16.93  c45 23.05  c60 28.11  c90 35.96  c130 43.48
+   split b (turb/oil/knock units): turb 0.40, oil -0.06, knock 0.00; fuel +4.63 %; dT onsets b 0.5 1.7
+L130_g10_G200_v130    b58          L/tau 2.75 base     45.0/    47.1 knockshare 0.05 hot  -51.3 K (0 s) cg cut 32.3/29.4 deliv 0.00/0.00
+   closed: b 4.31/3.64   open b 4.41
+   open a: a15 0.45  a30 0.85  a45 1.20  a60 1.52  a90 2.06  a130 2.68   open c: c15 7.03  c30 12.21  c45 16.16  c60 19.26  c90 23.78  c130 27.83
+   split b (turb/oil/knock units): turb 2.02, oil -0.08, knock -0.22; fuel +6.82 %; dT onsets b 14.8 23.4
+L130_g10_G200_v130    mazda_25t    L/tau 3.04 base     76.5/   324.6 knockshare 0.76 hot  -32.3 K (0 s) cg cut 19.5/5.9 deliv 0.00/0.00
+   closed: b 2.06/11.18   open b 2.15
+   open a: a15 0.15  a30 0.29  a45 0.41  a60 0.53  a90 0.72  a130 0.96   open c: c15 8.26  c30 14.28  c45 18.83  c60 22.39  c90 27.57  c130 32.23
+   split b (turb/oil/knock units): turb 1.68, oil -0.10, knock 34.73; fuel +6.88 %; dT onsets b 3.1 8.7
+L130_g10_G200_v130    honda_l15b7  L/tau 2.73 base    157.8/   159.9 knockshare 0.01 hot  -14.0 K (0 s) cg cut -2.0/-2.0 deliv 0.00/0.00
+   closed: b 5.45/5.38   open b 5.42
+   open a: a15 0.47  a30 0.91  a45 1.31  a60 1.70  a90 2.43  a130 3.40   open c: c15 12.73  c30 22.03  c45 29.17  c60 34.88  c90 43.59  c130 52.22
+   split b (turb/oil/knock units): turb 8.69, oil -0.08, knock 0.00; fuel +4.46 %; dT onsets b 7.3 12.1
+L130_g10_G200_v130    ford_27tt    L/tau 1.95 base    181.8/   206.7 knockshare 0.12 hot  +16.1 K (36 s) cg cut 5.1/4.5 deliv 0.00/0.00
+   closed: b 1.96/1.72   open b 1.98
+   open a: a15 0.19  a30 0.37  a45 0.53  a60 0.68  a90 0.95  a130 1.29   open c: c15 13.10  c30 23.06  c45 30.84  c60 37.05  c90 46.30  c130 54.78
+   split b (turb/oil/knock units): turb 3.65, oil -0.08, knock 0.00; fuel +4.65 %; dT onsets b 2.6 4.1
+L130_g10_G50_v100     b58          L/tau 2.75 base     18.3/    20.7 knockshare 0.12 hot -128.6 K (0 s) cg cut 20.0/16.0 deliv 0.00/0.00
+   closed: b 1.63/1.44   open b 1.77
+   open a: a15 0.42  a30 0.86  a45 1.42  a60 1.70  a90 1.73  a130 1.75   open c: c15 6.63  c30 11.76  c45 16.61  c60 20.65  c90 21.10  c130 21.53
+   split b (turb/oil/knock units): turb 0.34, oil -0.04, knock 0.00; fuel +3.89 %; dT onsets b 5.1 6.3 6.9
+L130_g10_G50_v100     mazda_25t    L/tau 3.04 base     24.2/   194.1 knockshare 0.88 hot -115.9 K (0 s) cg cut 12.1/-14.4 deliv 0.00/0.00
+   closed: b 0.84/1.15   open b 1.02
+   open a: a15 0.21  a30 0.45  a45 0.79  a60 1.04  a90 1.03  a130 1.02   open c: c15 7.25  c30 13.20  c45 19.45  c60 25.72  c90 26.33  c130 26.91
+   split b (turb/oil/knock units): turb 0.25, oil -0.04, knock 2.03; fuel +3.67 %; dT onsets b -1.1 2.6 3.2
+L130_g10_G50_v100     honda_l15b7  L/tau 2.73 base     98.3/    98.3 knockshare -0.00 hot  -40.9 K (0 s) cg cut 3.4/3.4 deliv 0.00/0.00
+   closed: b 2.05/2.05   open b 1.98
+   open a: a15 0.52  a30 1.08  a45 1.78  a60 1.87  a90 1.91  a130 1.96   open c: c15 12.76  c30 23.34  c45 34.26  c60 44.49  c90 45.59  c130 46.69
+   split b (turb/oil/knock units): turb 2.05, oil -0.03, knock 0.00; fuel +2.43 %; dT onsets b 2.7 2.7 3.0
+L130_g10_G50_v100     ford_27tt    L/tau 1.95 base     47.6/    55.4 knockshare 0.14 hot  -66.2 K (0 s) cg cut 43.2/37.4 deliv 1.00/0.00
+   closed: b 0.11/0.09   open b 0.18
+   open a: a15 0.03  a30 0.07  a45 0.13  a60 0.19  a90 0.18  a130 0.18   open c: c15 5.85  c30 10.71  c45 15.53  c60 20.31  c90 20.87  c130 21.45
+   split b (turb/oil/knock units): turb 0.09, oil -0.03, knock 0.00; fuel +2.81 %; dT onsets b -0.4 0.3 0.5
+L130_g10_G50_v115     b58          L/tau 2.75 base     42.2/    43.8 knockshare 0.04 hot  -78.7 K (0 s) cg cut 30.9/29.8 deliv 0.00/0.00
+   closed: b 3.24/3.13   open b 3.24
+   open a: a15 0.80  a30 1.62  a45 2.62  a60 3.07  a90 3.14  a130 3.20   open c: c15 10.31  c30 17.84  c45 24.63  c60 29.65  c90 30.31  c130 30.88
+   split b (turb/oil/knock units): turb 1.42, oil -0.05, knock 0.00; fuel +4.13 %; dT onsets b 10.4 9.9 10.2
+L130_g10_G50_v115     mazda_25t    L/tau 3.04 base     59.6/   302.8 knockshare 0.80 hot  -66.2 K (0 s) cg cut 18.2/9.4 deliv 0.00/0.00
+   closed: b 2.05/4.05   open b 2.09
+   open a: a15 0.46  a30 0.97  a45 1.64  a60 2.03  a90 2.05  a130 2.08   open c: c15 10.01  c30 17.90  c45 26.44  c60 33.90  c90 34.70  c130 35.42
+   split b (turb/oil/knock units): turb 1.28, oil -0.06, knock 11.04; fuel +3.72 %; dT onsets b 2.8 5.2 5.6
+L130_g10_G50_v115     honda_l15b7  L/tau 2.73 base    166.5/   168.0 knockshare 0.01 hot  -24.0 K (0 s) cg cut 0.2/0.2 deliv 0.00/0.00
+   closed: b 2.23/2.21   open b 2.14
+   open a: a15 0.63  a30 1.30  a45 2.11  a60 2.01  a90 2.06  a130 2.11   open c: c15 15.78  c30 28.27  c45 40.52  c60 50.29  c90 51.56  c130 52.73
+   split b (turb/oil/knock units): turb 3.76, oil -0.05, knock 0.00; fuel +2.48 %; dT onsets b 3.4 3.3 3.5
+L130_g10_G50_v115     ford_27tt    L/tau 1.95 base    152.3/   169.9 knockshare 0.10 hot  -11.5 K (0 s) cg cut 8.7/7.8 deliv 0.00/0.00
+   closed: b 0.76/0.68   open b 0.76
+   open a: a15 0.18  a30 0.38  a45 0.64  a60 0.74  a90 0.75  a130 0.76   open c: c15 14.81  c30 26.55  c45 37.71  c60 47.38  c90 48.49  c130 49.59
+   split b (turb/oil/knock units): turb 1.21, oil -0.05, knock 0.00; fuel +2.70 %; dT onsets b 0.5 1.0 1.1
+L130_g10_G50_v130     b58          L/tau 2.75 base    102.5/   104.8 knockshare 0.02 hot  -36.0 K (0 s) cg cut 38.0/36.2 deliv 0.00/0.00
+   closed: b 3.99/3.54   open b 3.95
+   open a: a15 0.96  a30 1.94  a45 3.13  a60 3.74  a90 3.83  a130 3.91   open c: c15 10.69  c30 18.43  c45 25.87  c60 31.37  c90 32.06  c130 32.65
+   split b (turb/oil/knock units): turb 4.14, oil -0.06, knock -0.38; fuel +4.03 %; dT onsets b 14.8 12.9 13.1
+L130_g10_G50_v130     mazda_25t    L/tau 3.04 base    156.5/   489.0 knockshare 0.68 hot  -22.4 K (0 s) cg cut 22.5/8.4 deliv 0.00/0.00
+   closed: b 2.43/6.58   open b 2.40
+   open a: a15 0.50  a30 1.05  a45 1.86  a60 2.35  a90 2.37  a130 2.39   open c: c15 12.30  c30 21.31  c45 30.67  c60 37.49  c90 38.45  c130 39.25
+   split b (turb/oil/knock units): turb 3.89, oil -0.08, knock 28.38; fuel +4.08 %; dT onsets b 3.1 6.6 6.9
+L130_g10_G50_v130     honda_l15b7  L/tau 2.73 base    284.4/   286.5 knockshare 0.01 hot   -6.8 K (0 s) cg cut -0.6/-0.6 deliv 0.00/0.00
+   closed: b 3.33/3.31   open b 3.21
+   open a: a15 0.95  a30 1.97  a45 3.05  a60 2.96  a90 3.06  a130 3.16   open c: c15 19.30  c30 33.46  c45 46.35  c60 55.02  c90 56.46  c130 57.68
+   split b (turb/oil/knock units): turb 9.55, oil -0.07, knock 0.00; fuel +2.58 %; dT onsets b 7.3 5.3 5.3
+L130_g10_G50_v130     ford_27tt    L/tau 1.95 base    511.2/   536.2 knockshare 0.05 hot  +40.2 K (203 s) cg cut 6.6/6.3 deliv 0.00/0.00
+   closed: b 1.20/1.14   open b 1.14
+   open a: a15 0.37  a30 0.74  a45 1.02  a60 1.04  a90 1.08  a130 1.12   open c: c15 18.91  c30 32.96  c45 45.28  c60 54.49  c90 55.70  c130 56.80
+   split b (turb/oil/knock units): turb 6.19, oil -0.06, knock 0.00; fuel +2.57 %; dT onsets b 2.6 2.0 1.5
+L130_g12_G100_v100    b58          L/tau 2.75 base     46.8/    49.4 knockshare 0.05 hot  -64.7 K (0 s) cg cut 58.9/52.9 deliv 1.00/0.00
+   closed: b 1.30/1.24   open b 1.39
+   open a: a15 0.17  a30 0.34  a45 0.50  a60 0.67  a90 1.08  a130 1.38   open c: c15 3.10  c30 5.50  c45 7.43  c60 9.05  c90 11.95  c130 14.48
+   split b (turb/oil/knock units): turb 0.67, oil -0.06, knock 0.00; fuel +4.87 %; dT onsets b 5.1 10.0 10.8
+L130_g12_G100_v100    mazda_25t    L/tau 3.04 base     44.0/   175.5 knockshare 0.75 hot  -75.6 K (0 s) cg cut 17.0/-7.7 deliv 0.00/0.00
+   closed: b 1.24/2.66   open b 1.37
+   open a: a15 0.11  a30 0.23  a45 0.36  a60 0.51  a90 0.94  a130 1.38   open c: c15 5.67  c30 10.27  c45 14.14  c60 17.56  c90 24.27  c130 32.22
+   split b (turb/oil/knock units): turb 0.61, oil -0.06, knock 4.13; fuel +4.27 %; dT onsets b -1.1 4.1 4.7
+L130_g12_G100_v100    honda_l15b7  L/tau 2.73 base    112.7/   112.7 knockshare -0.00 hot  -35.5 K (0 s) cg cut 0.5/0.5 deliv 0.00/0.00
+   closed: b 2.47/2.47   open b 2.44
+   open a: a15 0.32  a30 0.64  a45 0.98  a60 1.33  a90 2.20  a130 2.42   open c: c15 9.07  c30 16.62  c45 23.12  c60 28.96  c90 40.11  c130 51.52
+   split b (turb/oil/knock units): turb 2.83, oil -0.05, knock 0.00; fuel +2.67 %; dT onsets b 2.7 4.3 4.6
+L130_g12_G100_v100    ford_27tt    L/tau 1.95 base     40.9/    48.5 knockshare 0.16 hot  -78.8 K (0 s) cg cut 7.8/6.6 deliv 0.00/0.00
+   closed: b 0.25/0.21   open b 0.37
+   open a: a15 0.03  a30 0.06  a45 0.09  a60 0.13  a90 0.24  a130 0.37   open c: c15 7.13  c30 13.14  c45 18.31  c60 22.89  c90 31.19  c130 39.48
+   split b (turb/oil/knock units): turb 0.15, oil -0.05, knock 0.00; fuel +3.12 %; dT onsets b -0.4 0.5 0.7
+L130_g12_G100_v115    b58          L/tau 2.75 base    121.8/   123.3 knockshare 0.01 hot  -19.5 K (0 s) cg cut 37.7/36.9 deliv 0.00/0.00
+   closed: b 3.93/3.88   open b 3.90
+   open a: a15 0.51  a30 0.98  a45 1.44  a60 1.90  a90 3.04  a130 3.87   open c: c15 7.43  c30 13.01  c45 17.43  c60 21.12  c90 28.01  c130 34.29
+   split b (turb/oil/knock units): turb 4.86, oil -0.07, knock 0.00; fuel +4.70 %; dT onsets b 10.4 15.5 16.0
+L130_g12_G100_v115    mazda_25t    L/tau 3.04 base    112.3/   349.5 knockshare 0.68 hot  -29.9 K (0 s) cg cut 22.2/6.6 deliv 0.00/0.00
+   closed: b 2.34/2.73   open b 2.37
+   open a: a15 0.25  a30 0.49  a45 0.74  a60 0.99  a90 1.71  a130 2.36   open c: c15 6.88  c30 12.24  c45 16.62  c60 20.41  c90 28.06  c130 36.98
+   split b (turb/oil/knock units): turb 2.71, oil -0.08, knock 6.90; fuel +4.36 %; dT onsets b 2.8 7.9 8.2
+L130_g12_G100_v115    honda_l15b7  L/tau 2.73 base    188.1/   189.6 knockshare 0.01 hot  -19.1 K (0 s) cg cut -2.4/-2.4 deliv 0.00/0.00
+   closed: b 2.80/2.78   open b 2.77
+   open a: a15 0.38  a30 0.75  a45 1.15  a60 1.57  a90 2.65  a130 2.74   open c: c15 11.08  c30 19.90  c45 27.28  c60 33.82  c90 46.32  c130 57.37
+   split b (turb/oil/knock units): turb 5.35, oil -0.07, knock 0.00; fuel +2.75 %; dT onsets b 3.4 5.4 5.7
+L130_g12_G100_v115    ford_27tt    L/tau 1.95 base    434.2/   451.8 knockshare 0.04 hot  +41.9 K (159 s) cg cut 16.7/16.1 deliv 0.13/0.00
+   closed: b 0.63/0.60   open b 0.81
+   open a: a15 0.11  a30 0.22  a45 0.33  a60 0.45  a90 0.72  a130 0.81   open c: c15 9.86  c30 17.82  c45 24.43  c60 30.14  c90 40.50  c130 50.11
+   split b (turb/oil/knock units): turb 2.78, oil -0.07, knock 0.00; fuel +3.00 %; dT onsets b 0.5 1.6 1.5
+L130_g12_G100_v130    b58          L/tau 2.75 base    280.9/   284.3 knockshare 0.01 hot  +17.4 K (96 s) cg cut 42.0/40.9 deliv 0.00/0.00
+   closed: b 4.19/3.92   open b 4.14
+   open a: a15 0.54  a30 1.04  a45 1.51  a60 1.98  a90 3.18  a130 4.10   open c: c15 6.93  c30 12.08  c45 16.12  c60 19.50  c90 26.08  c130 32.66
+   split b (turb/oil/knock units): turb 11.84, oil -0.08, knock -0.60; fuel +4.63 %; dT onsets b 14.8 19.7 20.0
+L130_g12_G100_v130    mazda_25t    L/tau 3.04 base    281.8/   626.4 knockshare 0.55 hot   +9.7 K (79 s) cg cut 25.8/7.3 deliv 0.00/0.00
+   closed: b 2.50/6.65   open b 2.48
+   open a: a15 0.25  a30 0.49  a45 0.73  a60 0.98  a90 1.72  a130 2.47   open c: c15 8.16  c30 14.10  c45 18.73  c60 22.61  c90 30.48  c130 38.54
+   split b (turb/oil/knock units): turb 7.14, oil -0.11, knock 34.63; fuel +4.81 %; dT onsets b 3.1 9.3 9.5
+L130_g12_G100_v130    honda_l15b7  L/tau 2.73 base    413.8/   514.8 knockshare 0.20 hot  +10.7 K (130 s) cg cut -0.6/15.9 deliv 0.00/0.00
+   closed: b 4.44/3.57   open b 4.36
+   open a: a15 0.62  a30 1.23  a45 1.86  a60 2.53  a90 4.17  a130 4.32   open c: c15 13.98  c30 24.22  c45 32.35  c60 39.31  c90 52.31  c130 61.98
+   split b (turb/oil/knock units): turb 18.45, oil -0.10, knock 0.01; fuel +3.01 %; dT onsets b 7.3 9.0 9.1
+L130_g12_G100_v130    ford_27tt    L/tau 1.95 base    433.0/   457.9 knockshare 0.05 hot  +32.1 K (162 s) cg cut 12.9/12.2 deliv 0.00/0.00
+   closed: b 1.61/1.52   open b 1.62
+   open a: a15 0.23  a30 0.45  a45 0.67  a60 0.90  a90 1.39  a130 1.60   open c: c15 13.45  c30 23.58  c45 31.58  c60 38.23  c90 49.82  c130 58.49
+   split b (turb/oil/knock units): turb 7.05, oil -0.10, knock 0.00; fuel +3.41 %; dT onsets b 2.6 3.1 2.9
+L130_g12_G200_v100    b58          L/tau 2.75 base     23.8/    26.3 knockshare 0.10 hot  -79.0 K (0 s) cg cut 50.2/42.2 deliv 1.00/0.00
+   closed: b 0.85/0.78   open b 1.06
+   open a: a15 0.09  a30 0.17  a45 0.25  a60 0.32  a90 0.44  a130 0.60   open c: c15 2.21  c30 3.96  c45 5.36  c60 6.50  c90 8.25  c130 9.90
+   split b (turb/oil/knock units): turb 0.26, oil -0.05, knock 0.00; fuel +6.42 %; dT onsets b 5.1 12.2
+L130_g12_G200_v100    mazda_25t    L/tau 3.04 base     24.0/   120.0 knockshare 0.80 hot  -86.9 K (0 s) cg cut 13.8/-8.4 deliv 0.00/0.00
+   closed: b 0.51/1.99   open b 0.76
+   open a: a15 0.01  a30 0.03  a45 0.04  a60 0.06  a90 0.11  a130 0.19   open c: c15 4.16  c30 7.57  c45 10.41  c60 12.79  c90 16.58  c130 20.32
+   split b (turb/oil/knock units): turb 0.18, oil -0.06, knock 2.27; fuel +5.68 %; dT onsets b -1.1 3.7
+L130_g12_G200_v100    honda_l15b7  L/tau 2.73 base     56.2/    56.2 knockshare -0.00 hot  -47.2 K (0 s) cg cut -1.0/-1.0 deliv 0.00/0.00
+   closed: b 2.28/2.28   open b 2.31
+   open a: a15 0.18  a30 0.36  a45 0.52  a60 0.68  a90 0.98  a130 1.39   open c: c15 7.04  c30 12.90  c45 17.86  c60 22.11  c90 29.04  c130 36.25
+   split b (turb/oil/knock units): turb 1.32, oil -0.04, knock 0.00; fuel +3.56 %; dT onsets b 2.7 5.8
+L130_g12_G200_v100    ford_27tt    L/tau 1.95 base     19.6/    27.2 knockshare 0.28 hot -102.6 K (0 s) cg cut 5.6/4.1 deliv 0.00/0.00
+   closed: b -0.09/-0.07   open b 0.15
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 0.00  a130 0.02   open c: c15 4.59  c30 8.48  c45 11.80  c60 14.67  c90 19.37  c130 24.21
+   split b (turb/oil/knock units): turb 0.03, oil -0.05, knock 0.00; fuel +4.17 %; dT onsets b -0.4 0.5
+L130_g12_G200_v115    b58          L/tau 2.75 base     62.2/    63.7 knockshare 0.02 hot  -28.9 K (0 s) cg cut 34.7/33.4 deliv 0.00/0.00
+   closed: b 3.45/3.37   open b 3.50
+   open a: a15 0.33  a30 0.63  a45 0.90  a60 1.14  a90 1.56  a130 2.05   open c: c15 6.15  c30 10.89  c45 14.63  c60 17.64  c90 22.16  c130 26.31
+   split b (turb/oil/knock units): turb 2.21, oil -0.07, knock 0.00; fuel +6.23 %; dT onsets b 10.4 19.2
+L130_g12_G200_v115    mazda_25t    L/tau 3.04 base     60.8/   222.8 knockshare 0.73 hot  -37.2 K (0 s) cg cut 20.2/5.1 deliv 0.00/0.00
+   closed: b 1.73/2.33   open b 1.83
+   open a: a15 0.12  a30 0.23  a45 0.34  a60 0.44  a90 0.61  a130 0.83   open c: c15 5.59  c30 10.02  c45 13.60  c60 16.54  c90 21.08  c130 25.38
+   split b (turb/oil/knock units): turb 1.13, oil -0.07, knock 4.14; fuel +5.78 %; dT onsets b 2.8 8.4
+L130_g12_G200_v115    honda_l15b7  L/tau 2.73 base    102.9/   104.4 knockshare 0.01 hot  -25.3 K (0 s) cg cut -3.5/-3.5 deliv 0.00/0.00
+   closed: b 2.77/2.73   open b 2.78
+   open a: a15 0.22  a30 0.43  a45 0.63  a60 0.82  a90 1.17  a130 1.66   open c: c15 8.79  c30 15.81  c45 21.54  c60 26.33  c90 33.95  c130 41.79
+   split b (turb/oil/knock units): turb 2.91, oil -0.06, knock 0.00; fuel +3.67 %; dT onsets b 3.4 7.4
+L130_g12_G200_v115    ford_27tt    L/tau 1.95 base    179.7/   197.3 knockshare 0.09 hot  +24.1 K (49 s) cg cut 9.5/8.6 deliv 0.01/0.00
+   closed: b 0.76/0.69   open b 0.81
+   open a: a15 0.06  a30 0.11  a45 0.17  a60 0.22  a90 0.31  a130 0.44   open c: c15 8.51  c30 15.49  c45 21.30  c60 26.18  c90 33.91  c130 41.49
+   split b (turb/oil/knock units): turb 1.44, oil -0.06, knock 0.00; fuel +4.02 %; dT onsets b 0.5 2.0
+L130_g12_G200_v130    b58          L/tau 2.75 base    148.5/   151.4 knockshare 0.02 hot  +10.7 K (34 s) cg cut 40.3/38.8 deliv 0.00/0.00
+   closed: b 3.81/3.47   open b 3.80
+   open a: a15 0.38  a30 0.71  a45 1.00  a60 1.27  a90 1.72  a130 2.21   open c: c15 5.90  c30 10.39  c45 13.91  c60 16.73  c90 20.94  c130 24.76
+   split b (turb/oil/knock units): turb 5.73, oil -0.08, knock -0.40; fuel +6.12 %; dT onsets b 14.8 24.2
+L130_g12_G200_v130    mazda_25t    L/tau 3.04 base    160.7/   411.8 knockshare 0.61 hot   +5.6 K (28 s) cg cut 24.6/2.0 deliv 0.00/0.00
+   closed: b 1.90/8.76   open b 1.93
+   open a: a15 0.13  a30 0.25  a45 0.35  a60 0.45  a90 0.61  a130 0.81   open c: c15 6.93  c30 12.09  c45 16.06  c60 19.20  c90 23.82  c130 27.98
+   split b (turb/oil/knock units): turb 3.16, oil -0.10, knock 33.01; fuel +6.35 %; dT onsets b 3.1 9.2
+L130_g12_G200_v130    honda_l15b7  L/tau 2.73 base    241.4/   309.4 knockshare 0.22 hot   +7.4 K (48 s) cg cut -1.6/16.9 deliv 0.00/0.00
+   closed: b 4.83/3.77   open b 4.80
+   open a: a15 0.42  a30 0.80  a45 1.16  a60 1.49  a90 2.13  a130 2.97   open c: c15 11.28  c30 19.60  c45 26.04  c60 31.22  c90 39.19  c130 47.21
+   split b (turb/oil/knock units): turb 11.75, oil -0.08, knock 0.00; fuel +4.05 %; dT onsets b 7.3 12.4
+L130_g12_G200_v130    ford_27tt    L/tau 1.95 base    205.9/   230.9 knockshare 0.11 hot  +20.4 K (57 s) cg cut 11.4/10.2 deliv 0.00/0.00
+   closed: b 1.78/1.59   open b 1.80
+   open a: a15 0.16  a30 0.31  a45 0.45  a60 0.58  a90 0.81  a130 1.10   open c: c15 11.20  c30 19.80  c45 26.59  c60 32.05  c90 40.30  c130 48.02
+   split b (turb/oil/knock units): turb 3.75, oil -0.09, knock 0.00; fuel +4.60 %; dT onsets b 2.6 4.1
+L130_g12_G50_v100     b58          L/tau 2.75 base     60.7/    63.2 knockshare 0.04 hot  -53.3 K (0 s) cg cut 63.7/58.5 deliv 1.00/0.00
+   closed: b 1.15/1.11   open b 1.18
+   open a: a15 0.27  a30 0.56  a45 0.92  a60 1.14  a90 1.15  a130 1.17   open c: c15 4.00  c30 7.13  c45 10.21  c60 13.05  c90 13.31  c130 13.55
+   split b (turb/oil/knock units): turb 0.74, oil -0.04, knock 0.00; fuel +3.75 %; dT onsets b 5.1 7.0 7.6
+L130_g12_G50_v100     mazda_25t    L/tau 3.04 base     54.4/   186.5 knockshare 0.71 hot  -66.2 K (0 s) cg cut 19.3/-5.9 deliv 0.00/0.00
+   closed: b 1.23/2.88   open b 1.30
+   open a: a15 0.26  a30 0.55  a45 0.98  a60 1.32  a90 1.31  a130 1.31   open c: c15 7.50  c30 13.80  c45 21.09  c60 29.12  c90 29.77  c130 30.39
+   split b (turb/oil/knock units): turb 0.71, oil -0.05, knock 4.71; fuel +3.27 %; dT onsets b -1.1 3.2 3.7
+L130_g12_G50_v100     honda_l15b7  L/tau 2.73 base    137.8/   137.8 knockshare 0.00 hot  -26.9 K (0 s) cg cut 1.6/1.6 deliv 0.00/0.00
+   closed: b 1.80/1.80   open b 1.74
+   open a: a15 0.48  a30 1.00  a45 1.69  a60 1.64  a90 1.67  a130 1.71   open c: c15 11.36  c30 21.10  c45 31.93  c60 43.23  c90 44.24  c130 45.25
+   split b (turb/oil/knock units): turb 2.51, oil -0.04, knock 0.00; fuel +2.06 %; dT onsets b 2.7 2.6 2.8
+L130_g12_G50_v100     ford_27tt    L/tau 1.95 base     54.0/    61.7 knockshare 0.12 hot  -62.3 K (0 s) cg cut 9.1/8.0 deliv 0.00/0.00
+   closed: b 0.28/0.25   open b 0.34
+   open a: a15 0.06  a30 0.14  a45 0.26  a60 0.36  a90 0.35  a130 0.35   open c: c15 9.31  c30 17.26  c45 25.87  c60 35.12  c90 36.00  c130 36.91
+   split b (turb/oil/knock units): turb 0.19, oil -0.04, knock 0.00; fuel +2.39 %; dT onsets b -0.4 0.4 0.6
+L130_g12_G50_v115     b58          L/tau 2.75 base    154.7/   156.3 knockshare 0.01 hot  -11.4 K (0 s) cg cut 39.9/39.2 deliv 0.00/0.00
+   closed: b 3.25/3.22   open b 3.17
+   open a: a15 0.75  a30 1.52  a45 2.51  a60 3.03  a90 3.09  a130 3.14   open c: c15 9.11  c30 16.10  c45 23.05  c60 29.31  c90 29.96  c130 30.53
+   split b (turb/oil/knock units): turb 5.08, oil -0.05, knock 0.00; fuel +3.62 %; dT onsets b 10.4 10.6 10.9
+L130_g12_G50_v115     mazda_25t    L/tau 3.04 base    138.4/   376.4 knockshare 0.63 hot  -23.3 K (0 s) cg cut 23.8/8.1 deliv 0.00/0.00
+   closed: b 2.10/2.60   open b 2.08
+   open a: a15 0.44  a30 0.92  a45 1.60  a60 2.03  a90 2.05  a130 2.07   open c: c15 8.80  c30 15.92  c45 24.46  c60 32.51  c90 33.26  c130 33.95
+   split b (turb/oil/knock units): turb 2.96, oil -0.06, knock 6.90; fuel +3.35 %; dT onsets b 2.8 5.8 6.1
+L130_g12_G50_v115     honda_l15b7  L/tau 2.73 base    213.6/   215.1 knockshare 0.01 hot  -14.1 K (0 s) cg cut -1.5/-1.5 deliv 0.00/0.00
+   closed: b 1.94/1.93   open b 1.87
+   open a: a15 0.56  a30 1.19  a45 1.90  a60 1.76  a90 1.80  a130 1.85   open c: c15 13.95  c30 25.38  c45 37.44  c60 48.02  c90 49.21  c130 50.32
+   split b (turb/oil/knock units): turb 4.21, oil -0.06, knock 0.00; fuel +2.12 %; dT onsets b 3.4 3.2 3.4
+L130_g12_G50_v115     ford_27tt    L/tau 1.95 base    611.0/   628.6 knockshare 0.03 hot  +55.0 K (228 s) cg cut 26.7/26.0 deliv 0.28/0.00
+   closed: b 0.37/0.36   open b 0.52
+   open a: a15 0.15  a30 0.32  a45 0.48  a60 0.51  a90 0.51  a130 0.52   open c: c15 10.94  c30 19.84  c45 28.63  c60 37.75  c90 38.63  c130 39.50
+   split b (turb/oil/knock units): turb 2.28, oil -0.05, knock 0.00; fuel +2.30 %; dT onsets b 0.5 1.0 0.9
+L130_g12_G50_v130     b58          L/tau 2.75 base    348.5/   352.0 knockshare 0.01 hot  +23.4 K (143 s) cg cut 43.4/42.5 deliv 0.00/0.00
+   closed: b 3.49/3.27   open b 3.41
+   open a: a15 0.79  a30 1.60  a45 2.67  a60 3.25  a90 3.31  a130 3.38   open c: c15 8.55  c30 15.04  c45 22.04  c60 28.04  c90 28.68  c130 29.25
+   split b (turb/oil/knock units): turb 12.22, oil -0.06, knock -0.65; fuel +3.56 %; dT onsets b 14.8 13.5 13.6
+L130_g12_G50_v130     mazda_25t    L/tau 3.04 base    331.8/   667.9 knockshare 0.50 hot  +13.7 K (122 s) cg cut 26.9/9.4 deliv 0.00/0.00
+   closed: b 2.27/4.89   open b 2.22
+   open a: a15 0.44  a30 0.93  a45 1.69  a60 2.18  a90 2.20  a130 2.21   open c: c15 10.25  c30 17.98  c45 26.65  c60 33.58  c90 34.46  c130 35.20
+   split b (turb/oil/knock units): turb 7.62, oil -0.08, knock 25.14; fuel +3.71 %; dT onsets b 3.1 7.2 7.5
+L130_g12_G50_v130     honda_l15b7  L/tau 2.73 base    446.8/   547.7 knockshare 0.18 hot  +13.6 K (189 s) cg cut 0.2/15.6 deliv 0.00/0.00
+   closed: b 2.98/2.43   open b 2.86
+   open a: a15 0.88  a30 1.83  a45 2.72  a60 2.65  a90 2.74  a130 2.82   open c: c15 17.41  c30 30.43  c45 42.92  c60 52.11  c90 53.45  c130 54.61
+   split b (turb/oil/knock units): turb 13.37, oil -0.08, knock 0.00; fuel +2.29 %; dT onsets b 7.3 5.3 5.2
+L130_g12_G50_v130     ford_27tt    L/tau 1.95 base    553.5/   578.4 knockshare 0.04 hot  +41.5 K (229 s) cg cut 14.9/14.3 deliv 0.00/0.00
+   closed: b 1.09/1.04   open b 1.10
+   open a: a15 0.31  a30 0.63  a45 0.89  a60 1.01  a90 1.04  a130 1.08   open c: c15 16.14  c30 28.33  c45 39.35  c60 48.48  c90 49.55  c130 50.52
+   split b (turb/oil/knock units): turb 6.12, oil -0.07, knock 0.00; fuel +2.55 %; dT onsets b 2.6 2.1 1.6
+L130_g8_G100_v100     b58          L/tau 2.75 base     10.3/    12.7 knockshare 0.19 hot -222.2 K (0 s) cg cut 4.1/3.3 deliv 0.00/0.00
+   closed: b 0.18/0.15   open b 0.69
+   open a: a15 0.09  a30 0.18  a45 0.27  a60 0.36  a90 0.56  a130 0.68   open c: c15 1.87  c30 3.26  c45 4.34  c60 5.21  c90 6.62  c130 7.47
+   split b (turb/oil/knock units): turb 0.07, oil -0.05, knock 0.00; fuel +5.82 %; dT onsets b 5.1 8.2 9.0
+L130_g8_G100_v100     mazda_25t    L/tau 3.04 base     19.6/    59.2 knockshare 0.67 hot -128.4 K (0 s) cg cut 10.3/2.7 deliv 0.00/0.00
+   closed: b 0.69/1.52   open b 0.98
+   open a: a15 0.09  a30 0.18  a45 0.28  a60 0.40  a90 0.72  a130 0.98   open c: c15 5.44  c30 9.73  c45 13.24  c60 16.25  c90 21.68  c130 26.42
+   split b (turb/oil/knock units): turb 0.20, oil -0.06, knock 0.76; fuel +5.16 %; dT onsets b -1.1 3.2 3.9
+L130_g8_G100_v100     honda_l15b7  L/tau 2.73 base     46.9/    46.9 knockshare 0.00 hot  -79.8 K (0 s) cg cut 2.5/2.5 deliv 0.00/0.00
+   closed: b 2.82/2.82   open b 2.82
+   open a: a15 0.37  a30 0.74  a45 1.11  a60 1.50  a90 2.38  a130 2.78   open c: c15 11.11  c30 19.98  c45 27.29  c60 33.52  c90 44.21  c130 52.09
+   split b (turb/oil/knock units): turb 1.36, oil -0.04, knock 0.00; fuel +3.75 %; dT onsets b 2.7 4.2 4.6
+L130_g8_G100_v100     ford_27tt    L/tau 1.95 base     15.8/    23.6 knockshare 0.33 hot -153.4 K (0 s) cg cut 4.6/3.8 deliv 0.00/0.00
+   closed: b -0.14/-0.09   open b 0.15
+   open a: a15 0.01  a30 0.02  a45 0.03  a60 0.05  a90 0.09  a130 0.16   open c: c15 4.97  c30 9.04  c45 12.46  c60 15.40  c90 20.39  c130 24.09
+   split b (turb/oil/knock units): turb 0.02, oil -0.05, knock 0.00; fuel +3.93 %; dT onsets b -0.4 0.3 0.5
+L130_g8_G100_v115     b58          L/tau 2.75 base     14.8/    16.3 knockshare 0.09 hot -162.0 K (0 s) cg cut 12.3/11.2 deliv 0.00/0.00
+   closed: b 2.20/1.99   open b 2.60
+   open a: a15 0.37  a30 0.72  a45 1.05  a60 1.39  a90 2.15  a130 2.58   open c: c15 5.76  c30 9.77  c45 12.73  c60 15.06  c90 18.77  c130 20.84
+   split b (turb/oil/knock units): turb 0.39, oil -0.07, knock 0.00; fuel +6.10 %; dT onsets b 10.4 13.5 14.1
+L130_g8_G100_v115     mazda_25t    L/tau 3.04 base     52.6/    78.6 knockshare 0.33 hot  -66.4 K (0 s) cg cut 18.6/12.1 deliv 0.00/0.00
+   closed: b 2.45/6.26   open b 2.55
+   open a: a15 0.30  a30 0.59  a45 0.88  a60 1.18  a90 1.96  a130 2.53   open c: c15 8.65  c30 15.20  c45 20.39  c60 24.73  c90 32.71  c130 39.77
+   split b (turb/oil/knock units): turb 1.36, oil -0.07, knock 3.64; fuel +5.21 %; dT onsets b 2.8 7.2 7.7
+L130_g8_G100_v115     honda_l15b7  L/tau 2.73 base    109.0/   110.5 knockshare 0.01 hot  -41.9 K (0 s) cg cut 2.4/2.4 deliv 0.00/0.00
+   closed: b 3.64/3.59   open b 3.58
+   open a: a15 0.49  a30 0.97  a45 1.46  a60 1.97  a90 3.18  a130 3.55   open c: c15 14.82  c30 26.02  c45 34.90  c60 42.28  c90 54.73  c130 62.85
+   split b (turb/oil/knock units): turb 4.03, oil -0.06, knock 0.00; fuel +3.94 %; dT onsets b 3.4 5.4 5.9
+L130_g8_G100_v115     ford_27tt    L/tau 1.95 base     40.4/    58.0 knockshare 0.30 hot  -84.5 K (0 s) cg cut 8.0/5.6 deliv 0.00/0.00
+   closed: b 0.75/0.52   open b 0.88
+   open a: a15 0.10  a30 0.21  a45 0.31  a60 0.42  a90 0.68  a130 0.88   open c: c15 11.82  c30 20.90  c45 28.11  c60 34.03  c90 43.61  c130 49.64
+   split b (turb/oil/knock units): turb 0.37, oil -0.06, knock 0.00; fuel +4.15 %; dT onsets b 0.5 1.3 1.5
+L130_g8_G100_v130     b58          L/tau 2.75 base    103.6/   105.6 knockshare 0.02 hot  -28.0 K (0 s) cg cut 63.3/61.9 deliv 1.00/0.00
+   closed: b 3.01/2.89   open b 3.02
+   open a: a15 0.44  a30 0.84  a45 1.21  a60 1.58  a90 2.45  a130 2.99   open c: c15 5.61  c30 9.49  c45 12.36  c60 14.63  c90 18.44  c130 21.02
+   split b (turb/oil/knock units): turb 3.20, oil -0.08, knock -0.07; fuel +5.99 %; dT onsets b 14.8 18.8 19.4
+L130_g8_G100_v130     mazda_25t    L/tau 3.04 base     63.6/   361.3 knockshare 0.82 hot  -66.5 K (0 s) cg cut 15.1/12.5 deliv 0.00/0.00
+   closed: b 2.80/10.17   open b 2.89
+   open a: a15 0.32  a30 0.63  a45 0.93  a60 1.26  a90 2.15  a130 2.88   open c: c15 11.33  c30 19.23  c45 25.17  c60 30.02  c90 38.92  c130 45.63
+   split b (turb/oil/knock units): turb 1.89, oil -0.11, knock 34.97; fuel +5.80 %; dT onsets b 3.1 8.0 8.3
+L130_g8_G100_v130     honda_l15b7  L/tau 2.73 base    193.1/   195.2 knockshare 0.01 hot  -26.2 K (0 s) cg cut -1.7/-1.7 deliv 0.00/0.00
+   closed: b 5.49/5.43   open b 5.40
+   open a: a15 0.79  a30 1.57  a45 2.36  a60 3.19  a90 5.10  a130 5.34   open c: c15 18.22  c30 31.08  c45 40.88  c60 48.88  c90 62.24  c130 69.85
+   split b (turb/oil/knock units): turb 10.70, oil -0.09, knock 0.00; fuel +3.85 %; dT onsets b 7.3 8.7 8.9
+L130_g8_G100_v130     ford_27tt    L/tau 1.95 base    127.8/   152.8 knockshare 0.16 hot  -28.4 K (0 s) cg cut 4.5/3.8 deliv 0.00/0.00
+   closed: b 2.20/1.84   open b 2.20
+   open a: a15 0.31  a30 0.60  a45 0.89  a60 1.18  a90 1.84  a130 2.17   open c: c15 18.17  c30 31.21  c45 41.04  c60 48.82  c90 61.06  c130 67.91
+   split b (turb/oil/knock units): turb 2.90, oil -0.09, knock 0.00; fuel +4.04 %; dT onsets b 2.6 3.0 3.1
+L130_g8_G200_v100     b58          L/tau 2.75 base      8.0/    10.4 knockshare 0.23 hot -238.4 K (0 s) cg cut 2.3/1.7 deliv 0.00/0.00
+   closed: b -0.27/-0.20   open b 0.39
+   open a: a15 0.03  a30 0.07  a45 0.10  a60 0.12  a90 0.18  a130 0.24   open c: c15 0.92  c30 1.63  c45 2.17  c60 2.60  c90 3.24  c130 3.83
+   split b (turb/oil/knock units): turb 0.03, oil -0.05, knock 0.00; fuel +7.54 %; dT onsets b 5.1 10.3
+L130_g8_G200_v100     mazda_25t    L/tau 3.04 base     12.2/    47.4 knockshare 0.74 hot -143.2 K (0 s) cg cut 6.9/1.2 deliv 0.00/0.00
+   closed: b -0.04/1.21   open b 0.43
+   open a: a15 0.00  a30 0.01  a45 0.02  a60 0.03  a90 0.06  a130 0.11   open c: c15 3.36  c30 6.05  c45 8.24  c60 10.04  c90 12.83  c130 15.51
+   split b (turb/oil/knock units): turb 0.05, oil -0.06, knock 0.58; fuel +6.74 %; dT onsets b -1.1 2.9
+L130_g8_G200_v100     honda_l15b7  L/tau 2.73 base     24.2/    24.2 knockshare 0.00 hot  -96.2 K (0 s) cg cut 1.2/1.2 deliv 0.00/0.00
+   closed: b 2.36/2.36   open b 2.46
+   open a: a15 0.20  a30 0.39  a45 0.57  a60 0.75  a90 1.08  a130 1.51   open c: c15 7.97  c30 14.39  c45 19.66  c60 24.06  c90 30.98  c130 37.79
+   split b (turb/oil/knock units): turb 0.61, oil -0.04, knock 0.00; fuel +4.97 %; dT onsets b 2.7 5.5
+L130_g8_G200_v100     ford_27tt    L/tau 1.95 base     10.1/    17.9 knockshare 0.43 hot -178.5 K (0 s) cg cut 2.7/2.2 deliv 0.00/0.00
+   closed: b -0.41/-0.23   open b 0.03
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.01   open c: c15 2.47  c30 4.52  c45 6.24  c60 7.70  c90 10.06  c130 12.42
+   split b (turb/oil/knock units): turb 0.00, oil -0.05, knock 0.00; fuel +5.13 %; dT onsets b -0.4 0.2
+L130_g8_G200_v115     b58          L/tau 2.75 base     10.2/    11.8 knockshare 0.13 hot -173.5 K (0 s) cg cut 8.1/7.1 deliv 0.00/0.00
+   closed: b 1.27/1.10   open b 1.90
+   open a: a15 0.19  a30 0.36  a45 0.51  a60 0.65  a90 0.91  a130 1.21   open c: c15 3.52  c30 6.03  c45 7.90  c60 9.33  c90 11.38  c130 13.19
+   split b (turb/oil/knock units): turb 0.20, oil -0.07, knock 0.00; fuel +7.87 %; dT onsets b 10.4 17.2
+L130_g8_G200_v115     mazda_25t    L/tau 3.04 base     28.7/    50.5 knockshare 0.43 hot  -76.9 K (0 s) cg cut 15.7/8.6 deliv 0.00/0.00
+   closed: b 1.68/4.79   open b 1.89
+   open a: a15 0.14  a30 0.28  a45 0.40  a60 0.51  a90 0.72  a130 0.97   open c: c15 6.71  c30 11.87  c45 15.94  c60 19.22  c90 24.14  c130 28.66
+   split b (turb/oil/knock units): turb 0.55, oil -0.07, knock 1.94; fuel +6.78 %; dT onsets b 2.8 7.8
+L130_g8_G200_v115     honda_l15b7  L/tau 2.73 base     57.3/    58.7 knockshare 0.03 hot  -52.3 K (0 s) cg cut 1.1/1.1 deliv 0.00/0.00
+   closed: b 3.50/3.41   open b 3.51
+   open a: a15 0.30  a30 0.57  a45 0.83  a60 1.08  a90 1.55  a130 2.16   open c: c15 11.77  c30 20.79  c45 27.90  c60 33.65  c90 42.41  c130 50.78
+   split b (turb/oil/knock units): turb 2.06, oil -0.05, knock 0.00; fuel +5.17 %; dT onsets b 3.4 7.2
+L130_g8_G200_v115     ford_27tt    L/tau 1.95 base     20.7/    38.3 knockshare 0.46 hot -104.4 K (0 s) cg cut 6.0/3.2 deliv 0.00/0.00
+   closed: b 0.36/0.20   open b 0.65
+   open a: a15 0.05  a30 0.09  a45 0.13  a60 0.17  a90 0.25  a130 0.36   open c: c15 8.08  c30 14.40  c45 19.45  c60 23.55  c90 29.79  c130 35.63
+   split b (turb/oil/knock units): turb 0.14, oil -0.06, knock 0.00; fuel +5.40 %; dT onsets b 0.5 1.6
+L130_g8_G200_v130     b58          L/tau 2.75 base     53.6/    55.6 knockshare 0.04 hot  -37.8 K (0 s) cg cut 59.7/57.4 deliv 1.00/0.00
+   closed: b 2.69/2.54   open b 2.78
+   open a: a15 0.30  a30 0.56  a45 0.79  a60 1.00  a90 1.36  a130 1.76   open c: c15 4.59  c30 7.86  c45 10.29  c60 12.15  c90 14.78  c130 17.05
+   split b (turb/oil/knock units): turb 1.52, oil -0.08, knock -0.03; fuel +7.70 %; dT onsets b 14.8 23.3
+L130_g8_G200_v130     mazda_25t    L/tau 3.04 base     37.6/   257.4 knockshare 0.85 hot  -72.1 K (0 s) cg cut 13.2/11.1 deliv 0.00/0.00
+   closed: b 2.05/13.11   open b 2.26
+   open a: a15 0.17  a30 0.32  a45 0.46  a60 0.58  a90 0.80  a130 1.08   open c: c15 9.17  c30 15.69  c45 20.53  c60 24.26  c90 29.63  c130 34.43
+   split b (turb/oil/knock units): turb 0.87, oil -0.10, knock 32.98; fuel +7.49 %; dT onsets b 3.1 8.1
+L130_g8_G200_v130     honda_l15b7  L/tau 2.73 base    114.1/   116.2 knockshare 0.02 hot  -30.7 K (0 s) cg cut -2.4/-2.3 deliv 0.00/0.00
+   closed: b 6.13/6.02   open b 6.09
+   open a: a15 0.55  a30 1.06  a45 1.53  a60 1.98  a90 2.84  a130 3.96   open c: c15 14.77  c30 25.33  c45 33.31  c60 39.59  c90 48.98  c130 57.97
+   split b (turb/oil/knock units): turb 7.08, oil -0.08, knock 0.00; fuel +5.04 %; dT onsets b 7.3 12.0
+L130_g8_G200_v130     ford_27tt    L/tau 1.95 base     62.5/    87.5 knockshare 0.28 hot  -42.4 K (0 s) cg cut 3.8/2.7 deliv 0.00/0.00
+   closed: b 2.16/1.55   open b 2.24
+   open a: a15 0.21  a30 0.41  a45 0.59  a60 0.76  a90 1.07  a130 1.46   open c: c15 14.50  c30 25.18  c45 33.29  c60 39.62  c90 48.84  c130 57.04
+   split b (turb/oil/knock units): turb 1.43, oil -0.08, knock 0.00; fuel +5.25 %; dT onsets b 2.6 4.0
+L130_g8_G50_v100      b58          L/tau 2.75 base      9.7/    12.1 knockshare 0.20 hot -209.5 K (0 s) cg cut 6.0/4.8 deliv 0.00/0.00
+   closed: b 0.34/0.27   open b 0.71
+   open a: a15 0.17  a30 0.35  a45 0.57  a60 0.67  a90 0.69  a130 0.70   open c: c15 3.03  c30 5.26  c45 7.18  c60 8.46  c90 8.67  c130 8.87
+   split b (turb/oil/knock units): turb 0.07, oil -0.04, knock 0.00; fuel +4.52 %; dT onsets b 5.1 5.7 6.2
+L130_g8_G50_v100      mazda_25t    L/tau 3.04 base     22.6/    61.2 knockshare 0.63 hot -116.1 K (0 s) cg cut 13.1/4.1 deliv 0.00/0.00
+   closed: b 0.84/1.56   open b 1.00
+   open a: a15 0.22  a30 0.46  a45 0.81  a60 1.03  a90 1.02  a130 1.01   open c: c15 7.75  c30 13.97  c45 20.07  c60 25.79  c90 26.44  c130 27.04
+   split b (turb/oil/knock units): turb 0.23, oil -0.04, knock 0.77; fuel +3.99 %; dT onsets b -1.1 2.4 3.1
+L130_g8_G50_v100      honda_l15b7  L/tau 2.73 base     56.9/    56.9 knockshare 0.00 hot  -67.8 K (0 s) cg cut 3.6/3.6 deliv 0.00/0.00
+   closed: b 2.19/2.19   open b 2.13
+   open a: a15 0.54  a30 1.11  a45 1.80  a60 1.99  a90 2.04  a130 2.09   open c: c15 13.93  c30 25.09  c45 35.74  c60 44.47  c90 45.69  c130 46.89
+   split b (turb/oil/knock units): turb 1.27, oil -0.03, knock 0.00; fuel +2.89 %; dT onsets b 2.7 2.8 3.0
+L130_g8_G50_v100      ford_27tt    L/tau 1.95 base     17.3/    25.1 knockshare 0.31 hot -136.1 K (0 s) cg cut 6.2/5.0 deliv 0.00/0.00
+   closed: b -0.02/-0.01   open b 0.17
+   open a: a15 0.03  a30 0.06  a45 0.13  a60 0.19  a90 0.18  a130 0.18   open c: c15 7.36  c30 13.40  c45 19.19  c60 24.07  c90 24.87  c130 25.69
+   split b (turb/oil/knock units): turb 0.03, oil -0.03, knock 0.00; fuel +3.03 %; dT onsets b -0.4 0.2 0.4
+L130_g8_G50_v115      b58          L/tau 2.75 base     15.2/    16.8 knockshare 0.09 hot -152.1 K (0 s) cg cut 16.0/14.6 deliv 0.00/0.00
+   closed: b 2.11/1.91   open b 2.34
+   open a: a15 0.59  a30 1.19  a45 1.89  a60 2.19  a90 2.25  a130 2.31   open c: c15 8.11  c30 13.69  c45 18.24  c60 20.97  c90 21.44  c130 21.85
+   split b (turb/oil/knock units): turb 0.37, oil -0.05, knock 0.00; fuel +4.75 %; dT onsets b 10.4 9.3 9.6
+L130_g8_G50_v115      mazda_25t    L/tau 3.04 base     65.6/    91.7 knockshare 0.28 hot  -56.9 K (0 s) cg cut 20.8/14.6 deliv 0.00/0.00
+   closed: b 2.22/6.21   open b 2.23
+   open a: a15 0.51  a30 1.06  a45 1.76  a60 2.16  a90 2.19  a130 2.21   open c: c15 11.04  c30 19.53  c45 27.96  c60 35.25  c90 36.09  c130 36.83
+   split b (turb/oil/knock units): turb 1.51, oil -0.05, knock 4.24; fuel +4.04 %; dT onsets b 2.8 5.2 5.7
+L130_g8_G50_v115      honda_l15b7  L/tau 2.73 base    127.5/   129.0 knockshare 0.01 hot  -33.8 K (0 s) cg cut 3.4/3.4 deliv 0.00/0.00
+   closed: b 2.65/2.62   open b 2.54
+   open a: a15 0.70  a30 1.44  a45 2.37  a60 2.39  a90 2.45  a130 2.50   open c: c15 18.02  c30 31.65  c45 43.96  c60 52.63  c90 53.97  c130 55.20
+   split b (turb/oil/knock units): turb 3.42, oil -0.04, knock 0.00; fuel +3.05 %; dT onsets b 3.4 3.5 3.7
+L130_g8_G50_v115      ford_27tt    L/tau 1.95 base     50.2/    67.8 knockshare 0.26 hot  -69.9 K (0 s) cg cut 9.4/7.0 deliv 0.00/0.00
+   closed: b 0.66/0.49   open b 0.73
+   open a: a15 0.16  a30 0.33  a45 0.56  a60 0.70  a90 0.71  a130 0.72   open c: c15 14.98  c30 26.40  c45 36.56  c60 43.69  c90 44.88  c130 46.04
+   split b (turb/oil/knock units): turb 0.38, oil -0.05, knock 0.00; fuel +3.22 %; dT onsets b 0.5 0.9 1.1
+L130_g8_G50_v130      b58          L/tau 2.75 base    131.8/   133.7 knockshare 0.01 hot  -19.2 K (0 s) cg cut 65.6/64.5 deliv 1.00/0.00
+   closed: b 2.46/2.36   open b 2.41
+   open a: a15 0.61  a30 1.22  a45 1.94  a60 2.28  a90 2.34  a130 2.39   open c: c15 6.80  c30 11.48  c45 15.53  c60 18.32  c90 18.69  c130 19.00
+   split b (turb/oil/knock units): turb 3.30, oil -0.06, knock -0.09; fuel +4.66 %; dT onsets b 14.8 13.1 13.3
+L130_g8_G50_v130      mazda_25t    L/tau 3.04 base     73.1/   362.2 knockshare 0.80 hot  -61.0 K (0 s) cg cut 16.8/13.2 deliv 0.00/0.00
+   closed: b 2.52/7.64   open b 2.53
+   open a: a15 0.55  a30 1.14  a45 1.98  a60 2.46  a90 2.49  a130 2.51   open c: c15 14.28  c30 24.38  c45 33.91  c60 40.46  c90 41.46  c130 42.27
+   split b (turb/oil/knock units): turb 1.92, oil -0.08, knock 25.83; fuel +4.51 %; dT onsets b 3.1 6.1 6.4
+L130_g8_G50_v130      honda_l15b7  L/tau 2.73 base    204.2/   206.3 knockshare 0.01 hot  -22.3 K (0 s) cg cut -1.2/-1.2 deliv 0.00/0.00
+   closed: b 3.71/3.67   open b 3.55
+   open a: a15 1.07  a30 2.20  a45 3.35  a60 3.25  a90 3.38  a130 3.49   open c: c15 22.05  c30 37.56  c45 50.71  c60 58.66  c90 60.19  c130 61.46
+   split b (turb/oil/knock units): turb 7.64, oil -0.07, knock 0.00; fuel +2.99 %; dT onsets b 7.3 5.2 5.3
+L130_g8_G50_v130      ford_27tt    L/tau 1.95 base    159.1/   184.0 knockshare 0.14 hot  -17.2 K (0 s) cg cut 5.1/4.4 deliv 0.00/0.00
+   closed: b 1.66/1.44   open b 1.62
+   open a: a15 0.41  a30 0.82  a45 1.32  a60 1.48  a90 1.53  a130 1.59   open c: c15 21.87  c30 37.35  c45 50.27  c60 58.07  c90 59.43  c130 60.64
+   split b (turb/oil/knock units): turb 2.71, oil -0.06, knock 0.00; fuel +3.13 %; dT onsets b 2.6 2.1 2.0
+L45_g10_G100_v100     b58          L/tau 0.95 base      9.9/    12.3 knockshare 0.20 hot -248.7 K (0 s) cg cut 2.0/-3.0 deliv 0.00/0.00
+   closed: b -0.02/0.01   open b 0.83
+   open a: a15 0.11  a30 0.23  a45 0.33  a60 0.44  a90 0.69  a130 0.83   open c: c15 2.15  c30 3.45  c45 4.28  c60 4.82  c90 5.47  c130 5.74
+   split b (turb/oil/knock units): turb 0.08, oil -0.09, knock 0.00; fuel +10.06 %; dT onsets b 5.1 8.2 9.8 10.5 10.8
+L45_g10_G100_v100     mazda_25t    L/tau 1.05 base     11.1/   135.8 knockshare 0.92 hot -216.1 K (0 s) cg cut 1.9/12.3 deliv 0.00/0.00
+   closed: b -0.29/2.28   open b 0.56
+   open a: a15 0.05  a30 0.09  a45 0.15  a60 0.22  a90 0.39  a130 0.56   open c: c15 3.66  c30 6.12  c45 7.85  c60 9.11  c90 10.85  c130 11.88
+   split b (turb/oil/knock units): turb 0.06, oil -0.09, knock 3.13; fuel +9.52 %; dT onsets b -1.1 1.5 2.8 3.3 3.5
+L45_g10_G100_v100     honda_l15b7  L/tau 0.94 base     22.4/    22.4 knockshare -0.00 hot -130.8 K (0 s) cg cut 0.0/0.0 deliv 0.00/0.00
+   closed: b 3.68/3.68   open b 3.85
+   open a: a15 0.56  a30 1.12  a45 1.68  a60 2.27  a90 3.57  a130 3.82   open c: c15 16.52  c30 27.83  c45 35.82  c60 41.63  c90 49.32  c130 53.47
+   split b (turb/oil/knock units): turb 0.89, oil -0.06, knock 0.00; fuel +7.09 %; dT onsets b 2.7 3.8 4.6 5.0 5.2
+L45_g10_G100_v100     ford_27tt    L/tau 0.67 base     12.1/    19.9 knockshare 0.39 hot -196.1 K (0 s) cg cut 9.1/6.5 deliv 1.00/0.00
+   closed: b -0.51/-0.31   open b 0.09
+   open a: a15 0.00  a30 0.01  a45 0.01  a60 0.02  a90 0.04  a130 0.09   open c: c15 3.64  c30 6.26  c45 8.19  c60 9.64  c90 11.63  c130 12.81
+   split b (turb/oil/knock units): turb 0.01, oil -0.07, knock 0.00; fuel +7.33 %; dT onsets b -0.4 -0.0 0.2 0.4 0.5
+L45_g10_G100_v115     b58          L/tau 0.95 base     12.5/    14.0 knockshare 0.11 hot -184.4 K (0 s) cg cut 6.6/5.6 deliv 0.00/0.00
+   closed: b 3.12/2.78   open b 3.92
+   open a: a15 0.59  a30 1.14  a45 1.66  a60 2.18  a90 3.32  a130 3.90   open c: c15 8.16  c30 12.59  c45 15.16  c60 16.75  c90 18.46  c130 19.04
+   split b (turb/oil/knock units): turb 0.50, oil -0.11, knock 0.00; fuel +10.48 %; dT onsets b 10.4 14.2 15.9 16.5 16.7
+L45_g10_G100_v115     mazda_25t    L/tau 1.05 base     15.7/   190.1 knockshare 0.92 hot -156.1 K (0 s) cg cut 5.1/3.5 deliv 0.00/0.00
+   closed: b 2.38/11.51   open b 3.07
+   open a: a15 0.37  a30 0.74  a45 1.10  a60 1.48  a90 2.43  a130 3.06   open c: c15 10.83  c30 17.57  c45 22.02  c60 25.15  c90 29.30  c130 31.51
+   split b (turb/oil/knock units): turb 0.49, oil -0.12, knock 21.51; fuel +9.54 %; dT onsets b 2.8 5.9 7.2 7.6 7.7
+L45_g10_G100_v115     honda_l15b7  L/tau 0.94 base     47.6/    49.1 knockshare 0.03 hot  -88.4 K (0 s) cg cut -1.8/-1.7 deliv 0.00/0.00
+   closed: b 5.94/5.76   open b 5.95
+   open a: a15 0.93  a30 1.85  a45 2.79  a60 3.76  a90 5.95  a130 5.91   open c: c15 27.04  c30 44.04  c45 55.24  c60 62.90  c90 72.20  c130 76.19
+   split b (turb/oil/knock units): turb 2.92, oil -0.10, knock 0.00; fuel +7.28 %; dT onsets b 3.4 4.8 5.8 6.1 6.3
+L45_g10_G100_v115     ford_27tt    L/tau 0.67 base     22.3/    39.9 knockshare 0.44 hot -127.0 K (0 s) cg cut 3.4/1.9 deliv 0.00/0.00
+   closed: b 0.85/0.48   open b 1.28
+   open a: a15 0.16  a30 0.32  a45 0.48  a60 0.65  a90 1.04  a130 1.27   open c: c15 17.40  c30 28.59  c45 36.06  c60 41.23  c90 47.57  c130 50.51
+   split b (turb/oil/knock units): turb 0.29, oil -0.10, knock 0.00; fuel +7.12 %; dT onsets b 0.5 1.1 1.5 1.6 1.7
+L45_g10_G100_v130     b58          L/tau 0.95 base     19.2/    21.7 knockshare 0.11 hot -130.0 K (0 s) cg cut 15.6/5.6 deliv 0.00/0.00
+   closed: b 8.26/4.40  a15 1.34/-1.57  a30 2.48/-0.55  a45 3.55/0.40  a60 4.59/1.33  a90 6.88/3.37  a130 8.25/4.39   open b 8.76
+   open a: a15 1.34  a30 2.56  a45 3.71  a60 4.83  a90 7.34  a130 8.71   open c: c15 15.61  c30 23.88  c45 28.66  c60 31.61  c90 34.89  c130 36.06
+   split b (turb/oil/knock units): turb 1.71, oil -0.12, knock -0.63; fuel +10.27 %; dT onsets b 14.8 19.0 20.7 21.2 21.3
+L45_g10_G100_v130     mazda_25t    L/tau 1.05 base     33.3/   290.1 knockshare 0.89 hot  -97.7 K (0 s) cg cut 10.4/-0.0 deliv 0.00/0.00
+   closed: b 5.72/21.42  a15 0.67/5.09  a30 1.29/7.50  a45 1.91/9.90  a60 2.55/12.32  a90 4.21/16.92  a130 5.73/21.04   open b 6.09
+   open a: a15 0.71  a30 1.39  a45 2.07  a60 2.78  a90 4.62  a130 6.07   open c: c15 22.64  c30 35.20  c45 42.85  c60 47.91  c90 54.22  c130 56.92
+   split b (turb/oil/knock units): turb 2.07, oil -0.16, knock 60.23; fuel +10.22 %; dT onsets b 3.1 7.3 8.6 8.8 8.9
+L45_g10_G100_v130     honda_l15b7  L/tau 0.94 base    118.2/   120.3 knockshare 0.02 hot  -48.9 K (0 s) cg cut -2.3/-2.2 deliv 0.00/0.00
+   closed: b 11.07/10.88  a15 1.84/1.80  a30 3.52/3.45  a45 5.19/5.10  a60 6.91/6.79  a90 10.69/10.50  a130 11.00/10.81   open b 10.92
+   open a: a15 1.73  a30 3.43  a45 5.13  a60 6.88  a90 10.73  a130 10.85   open c: c15 36.55  c30 57.37  c45 70.08  c60 78.21  c90 87.18  c130 90.17
+   split b (turb/oil/knock units): turb 13.23, oil -0.13, knock 0.00; fuel +7.41 %; dT onsets b 7.3 8.9 9.8 10.0 10.1
+L45_g10_G100_v130     ford_27tt    L/tau 0.67 base     69.2/    94.1 knockshare 0.26 hot  -58.6 K (0 s) cg cut 3.6/2.6 deliv 0.00/0.00
+   closed: b 4.01/2.95  a15 0.65/0.47  a30 1.21/0.89  a45 1.76/1.29  a60 2.32/1.70  a90 3.55/2.61  a130 3.99/2.93   open b 4.10
+   open a: a15 0.61  a30 1.19  a45 1.77  a60 2.36  a90 3.65  a130 4.07   open c: c15 32.47  c30 51.00  c45 62.18  c60 69.25  c90 77.00  c130 79.78
+   split b (turb/oil/knock units): turb 2.91, oil -0.13, knock 0.00; fuel +7.11 %; dT onsets b 2.6 3.2 3.5 3.6 3.7
+L45_g10_G200_v100     b58          L/tau 0.95 base      8.3/    10.7 knockshare 0.23 hot -287.5 K (0 s) cg cut 0.8/-2.5 deliv 0.00/0.00
+   closed: b -0.69/-0.51   open b 0.31
+   open a: a15 0.03  a30 0.05  a45 0.07  a60 0.10  a90 0.14  a130 0.19   open c: c15 0.64  c30 1.07  c45 1.36  c60 1.56  c90 1.83  c130 2.02
+   split b (turb/oil/knock units): turb 0.03, oil -0.08, knock 0.00; fuel +12.65 %; dT onsets b 5.1 9.9 11.1
+L45_g10_G200_v100     mazda_25t    L/tau 1.05 base      8.8/    94.3 knockshare 0.91 hot -252.3 K (0 s) cg cut 0.9/11.3 deliv 0.00/0.00
+   closed: b -0.90/1.80   open b 0.13
+   open a: a15 -0.00  a30 0.00  a45 0.00  a60 0.00  a90 0.01  a130 0.03   open c: c15 1.18  c30 2.02  c45 2.63  c60 3.09  c90 3.73  c130 4.27
+   split b (turb/oil/knock units): turb 0.01, oil -0.09, knock 1.78; fuel +12.01 %; dT onsets b -1.1 1.2 1.9
+L45_g10_G200_v100     honda_l15b7  L/tau 0.94 base     12.6/    12.6 knockshare -0.00 hot -165.4 K (0 s) cg cut -0.3/-0.3 deliv 0.00/0.00
+   closed: b 2.03/2.03   open b 2.44
+   open a: a15 0.20  a30 0.39  a45 0.58  a60 0.76  a90 1.11  a130 1.58   open c: c15 7.71  c30 13.34  c45 17.56  c60 20.81  c90 25.39  c130 29.22
+   split b (turb/oil/knock units): turb 0.31, oil -0.06, knock 0.00; fuel +9.18 %; dT onsets b 2.7 4.9 5.6
+L45_g10_G200_v100     ford_27tt    L/tau 0.67 base      9.0/    16.7 knockshare 0.46 hot -242.3 K (0 s) cg cut 3.3/2.5 deliv 1.00/0.00
+   closed: b -0.78/-0.42   open b 0.00
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.01   open c: c15 1.13  c30 2.00  c45 2.69  c60 3.24  c90 4.06  c130 4.81
+   split b (turb/oil/knock units): turb 0.00, oil -0.07, knock 0.00; fuel +9.24 %; dT onsets b -0.4 -0.1 0.1
+L45_g10_G200_v115     b58          L/tau 0.95 base      9.2/    10.8 knockshare 0.14 hot -216.1 K (0 s) cg cut 2.7/2.1 deliv 0.00/0.00
+   closed: b 0.84/0.72   open b 1.96
+   open a: a15 0.19  a30 0.36  a45 0.52  a60 0.66  a90 0.92  a130 1.25   open c: c15 3.20  c30 5.11  c45 6.32  c60 7.13  c90 8.10  c130 8.76
+   split b (turb/oil/knock units): turb 0.18, oil -0.11, knock 0.00; fuel +13.06 %; dT onsets b 10.4 17.1 18.3
+L45_g10_G200_v115     mazda_25t    L/tau 1.05 base     10.4/   120.3 knockshare 0.91 hot -186.6 K (0 s) cg cut 2.3/3.4 deliv 0.00/0.00
+   closed: b 0.39/9.88   open b 1.43
+   open a: a15 0.10  a30 0.20  a45 0.29  a60 0.38  a90 0.54  a130 0.75   open c: c15 4.66  c30 7.72  c45 9.83  c60 11.34  c90 13.33  c130 14.89
+   split b (turb/oil/knock units): turb 0.15, oil -0.11, knock 11.85; fuel +11.98 %; dT onsets b 2.8 6.4 7.1
+L45_g10_G200_v115     honda_l15b7  L/tau 0.94 base     23.9/    25.4 knockshare 0.06 hot -113.0 K (0 s) cg cut -1.8/-1.7 deliv 0.00/0.00
+   closed: b 5.07/4.78   open b 5.32
+   open a: a15 0.46  a30 0.90  a45 1.32  a60 1.72  a90 2.50  a130 3.55   open c: c15 17.22  c30 28.89  c45 37.13  c60 43.15  c90 51.17  c130 57.37
+   split b (turb/oil/knock units): turb 1.30, oil -0.08, knock 0.00; fuel +9.37 %; dT onsets b 3.4 6.4 7.2
+L45_g10_G200_v115     ford_27tt    L/tau 0.67 base     12.3/    29.9 knockshare 0.59 hot -166.9 K (0 s) cg cut 1.7/0.7 deliv 0.00/0.00
+   closed: b -0.13/-0.05   open b 0.65
+   open a: a15 0.04  a30 0.09  a45 0.13  a60 0.17  a90 0.25  a130 0.36   open c: c15 7.49  c30 12.72  c45 16.50  c60 19.30  c90 23.09  c130 26.06
+   split b (turb/oil/knock units): turb 0.08, oil -0.10, knock 0.00; fuel +9.03 %; dT onsets b 0.5 1.3 1.6
+L45_g10_G200_v130     b58          L/tau 0.95 base     11.4/    13.7 knockshare 0.17 hot -159.9 K (0 s) cg cut 7.7/-0.7 deliv 0.00/0.00
+   closed: b 4.45/1.21  a15 0.53/-2.06  a30 0.94/-1.70  a45 1.31/-1.39  a60 1.63/-1.12  a90 2.18/-0.66  a130 2.79/-0.13   open b 5.41
+   open a: a15 0.56  a30 1.05  a45 1.50  a60 1.89  a90 2.60  a130 3.43   open c: c15 7.75  c30 12.24  c45 15.01  c60 16.83  c90 18.99  c130 20.46
+   split b (turb/oil/knock units): turb 0.62, oil -0.12, knock -0.34; fuel +12.82 %; dT onsets b 14.8 22.5 23.7
+L45_g10_G200_v130     mazda_25t    L/tau 1.05 base     17.9/   204.5 knockshare 0.91 hot -120.0 K (0 s) cg cut 6.4/-0.3 deliv 0.00/0.00
+   closed: b 3.31/27.00  a15 0.25/4.23  a30 0.46/6.19  a45 0.65/8.15  a60 0.81/10.11  a90 1.10/14.03  a130 1.48/19.26   open b 4.10
+   open a: a15 0.30  a30 0.57  a45 0.82  a60 1.05  a90 1.47  a130 2.02   open c: c15 14.46  c30 23.00  c45 28.42  c60 32.08  c90 36.61  c130 39.96
+   split b (turb/oil/knock units): turb 0.74, oil -0.15, knock 54.62; fuel +12.73 %; dT onsets b 3.1 7.5 8.0
+L45_g10_G200_v130     honda_l15b7  L/tau 0.94 base     63.3/    65.4 knockshare 0.03 hot  -63.7 K (0 s) cg cut -2.5/-2.4 deliv 0.00/0.00
+   closed: b 12.19/11.80  a15 1.17/1.14  a30 2.19/2.12  a45 3.16/3.06  a60 4.08/3.95  a90 5.85/5.66  a130 8.18/7.91   open b 12.20
+   open a: a15 1.09  a30 2.12  a45 3.10  a60 4.04  a90 5.83  a130 8.20   open c: c15 27.14  c30 44.07  c45 55.34  c60 63.24  c90 73.31  c130 80.60
+   split b (turb/oil/knock units): turb 7.84, oil -0.12, knock 0.00; fuel +9.58 %; dT onsets b 7.3 11.7 12.5
+L45_g10_G200_v130     ford_27tt    L/tau 0.67 base     28.8/    53.7 knockshare 0.46 hot  -91.5 K (0 s) cg cut 2.4/1.3 deliv 0.00/0.00
+   closed: b 3.36/1.80  a15 0.34/0.18  a30 0.62/0.33  a45 0.89/0.48  a60 1.13/0.61  a90 1.60/0.85  a130 2.18/1.17   open b 3.74
+   open a: a15 0.34  a30 0.65  a45 0.95  a60 1.23  a90 1.76  a130 2.43   open c: c15 21.17  c30 34.51  c45 43.34  c60 49.43  c90 56.99  c130 62.31
+   split b (turb/oil/knock units): turb 1.09, oil -0.12, knock 0.00; fuel +8.94 %; dT onsets b 2.6 4.0 4.3
+L45_g10_G50_v100      b58          L/tau 0.95 base     11.5/    13.9 knockshare 0.17 hot -206.3 K (0 s) cg cut 5.9/-1.0 deliv 0.00/0.00
+   closed: b 1.24/1.06   open b 1.80
+   open a: a15 0.46  a30 0.93  a45 1.51  a60 1.77  a90 1.79  a130 1.80   open c: c15 6.69  c30 10.33  c45 12.64  c60 13.84  c90 13.88  c130 13.92
+   split b (turb/oil/knock units): turb 0.22, oil -0.07, knock 0.00; fuel +7.41 %; dT onsets b 5.1 6.3 7.5 8.3 8.7 8.9 9.0
+L45_g10_G50_v100      mazda_25t    L/tau 1.05 base     14.5/   178.4 knockshare 0.92 hot -176.7 K (0 s) cg cut 5.0/12.0 deliv 0.00/0.00
+   closed: b 0.86/2.48   open b 1.41
+   open a: a15 0.29  a30 0.61  a45 1.07  a60 1.43  a90 1.42  a130 1.42   open c: c15 10.34  c30 16.88  c45 21.93  c60 25.34  c90 25.44  c130 25.53
+   split b (turb/oil/knock units): turb 0.21, oil -0.08, knock 4.30; fuel +6.98 %; dT onsets b -1.1 1.1 2.5 3.2 3.6 3.7 3.8
+L45_g10_G50_v100      honda_l15b7  L/tau 0.94 base     43.8/    43.8 knockshare 0.00 hot  -94.9 K (0 s) cg cut 1.4/1.4 deliv 0.00/0.00
+   closed: b 4.15/4.15   open b 4.06
+   open a: a15 1.21  a30 2.47  a45 4.00  a60 3.94  a90 3.99  a130 4.03   open c: c15 27.74  c30 45.35  c45 58.69  c60 67.20  c90 67.52  c130 67.84
+   split b (turb/oil/knock units): turb 1.87, oil -0.06, knock 0.00; fuel +5.16 %; dT onsets b 2.7 2.7 3.2 3.5 3.8 3.9 4.0
+L45_g10_G50_v100      ford_27tt    L/tau 0.67 base     18.6/    26.5 knockshare 0.30 hot -146.6 K (0 s) cg cut 21.8/16.3 deliv 1.00/0.00
+   closed: b -0.06/-0.04   open b 0.27
+   open a: a15 0.04  a30 0.09  a45 0.19  a60 0.28  a90 0.28  a130 0.28   open c: c15 9.41  c30 15.60  c45 20.38  c60 23.78  c90 23.94  c130 24.11
+   split b (turb/oil/knock units): turb 0.05, oil -0.06, knock 0.00; fuel +5.37 %; dT onsets b -0.4 -0.0 0.3 0.5 0.6 0.7 0.7
+L45_g10_G50_v115      b58          L/tau 0.95 base     18.2/    19.7 knockshare 0.08 hot -148.4 K (0 s) cg cut 14.8/13.4 deliv 0.00/0.00
+   closed: b 5.45/5.03   open b 5.75
+   open a: a15 1.56  a30 3.11  a45 4.91  a60 5.63  a90 5.68  a130 5.72   open c: c15 17.60  c30 25.98  c45 30.62  c60 32.60  c90 32.68  c130 32.73
+   split b (turb/oil/knock units): turb 1.09, oil -0.09, knock 0.00; fuel +7.76 %; dT onsets b 10.4 11.0 12.0 12.6 12.9 13.1 13.1
+L45_g10_G50_v115      mazda_25t    L/tau 1.05 base     26.8/   266.3 knockshare 0.90 hot -121.7 K (0 s) cg cut 10.4/4.6 deliv 0.00/0.00
+   closed: b 4.20/11.29   open b 4.46
+   open a: a15 1.06  a30 2.18  a45 3.60  a60 4.41  a90 4.43  a130 4.45   open c: c15 21.28  c30 33.68  c45 42.96  c60 48.05  c90 48.19  c130 48.32
+   split b (turb/oil/knock units): turb 1.23, oil -0.10, knock 28.94; fuel +7.02 %; dT onsets b 2.8 4.6 5.8 6.4 6.6 6.7 6.7
+L45_g10_G50_v115      honda_l15b7  L/tau 0.94 base     90.7/    92.2 knockshare 0.02 hot  -62.5 K (0 s) cg cut -0.8/-0.8 deliv 0.00/0.00
+   closed: b 5.06/4.97   open b 4.86
+   open a: a15 1.64  a30 3.36  a45 5.30  a60 4.72  a90 4.77  a130 4.83   open c: c15 37.53  c30 59.01  c45 73.45  c60 80.87  c90 81.19  c130 81.47
+   split b (turb/oil/knock units): turb 4.68, oil -0.09, knock 0.00; fuel +5.35 %; dT onsets b 3.4 3.2 3.7 4.1 4.3 4.4 4.4
+L45_g10_G50_v115      ford_27tt    L/tau 0.67 base     48.2/    65.8 knockshare 0.27 hot  -83.8 K (0 s) cg cut 5.8/4.2 deliv 0.00/0.00
+   closed: b 1.47/1.08   open b 1.60
+   open a: a15 0.39  a30 0.81  a45 1.38  a60 1.58  a90 1.58  a130 1.59   open c: c15 30.48  c30 48.21  c45 60.12  c60 66.93  c90 67.20  c130 67.47
+   split b (turb/oil/knock units): turb 0.80, oil -0.09, knock 0.00; fuel +5.20 %; dT onsets b 0.5 0.8 1.1 1.3 1.4 1.5 1.5
+L45_g10_G50_v130      b58          L/tau 0.95 base     37.4/    40.1 knockshare 0.07 hot  -96.0 K (0 s) cg cut 25.9/17.1 deliv 0.00/0.00
+   closed: b 9.78/6.56  a15 2.70/0.27  a30 5.22/2.63  a45 8.16/5.38  a60 9.65/6.43  a90 9.71/6.49  a130 9.76/6.54   open b 9.81
+   open a: a15 2.65  a30 5.26  a45 8.22  a60 9.63  a90 9.71  a130 9.78   open c: c15 25.47  c30 37.46  c45 44.38  c60 47.19  c90 47.27  c130 47.34
+   split b (turb/oil/knock units): turb 3.76, oil -0.11, knock -1.03; fuel +7.60 %; dT onsets b 14.8 14.8 15.7 16.2 16.4 16.5 16.5
+L45_g10_G50_v130      mazda_25t    L/tau 1.05 base     66.2/   384.6 knockshare 0.83 hot  -71.1 K (0 s) cg cut 15.4/1.1 deliv 0.00/0.00
+   closed: b 6.58/15.85  a15 1.46/5.62  a30 2.96/8.41  a45 5.06/10.39  a60 6.56/13.98  a90 6.58/14.66  a130 6.58/15.56   open b 6.58
+   open a: a15 1.47  a30 3.05  a45 5.25  a60 6.53  a90 6.56  a130 6.58   open c: c15 32.22  c30 48.67  c45 59.57  c60 64.24  c90 64.40  c130 64.52
+   split b (turb/oil/knock units): turb 4.50, oil -0.14, knock 56.60; fuel +7.57 %; dT onsets b 3.1 5.9 7.3 7.8 7.9 8.0 8.0
+L45_g10_G50_v130      honda_l15b7  L/tau 0.94 base    193.9/   196.0 knockshare 0.01 hot  -32.7 K (0 s) cg cut -1.5/-1.5 deliv 0.00/0.00
+   closed: b 8.11/8.03  a15 2.75/2.72  a30 5.43/5.37  a45 8.41/8.31  a60 7.84/7.76  a90 7.95/7.87  a130 8.06/7.97   open b 7.79
+   open a: a15 2.62  a30 5.35  a45 8.02  a60 7.51  a90 7.63  a130 7.74   open c: c15 46.60  c30 70.03  c45 83.68  c60 89.31  c90 89.62  c130 89.87
+   split b (turb/oil/knock units): turb 15.87, oil -0.13, knock 0.00; fuel +5.39 %; dT onsets b 7.3 6.2 6.3 6.5 6.6 6.7 6.7
+L45_g10_G50_v130      ford_27tt    L/tau 0.67 base    169.9/   194.9 knockshare 0.13 hot  -22.3 K (0 s) cg cut 4.9/4.3 deliv 0.00/0.00
+   closed: b 3.51/3.06  a15 1.05/0.92  a30 2.03/1.77  a45 3.22/2.81  a60 3.41/2.97  a90 3.45/3.01  a130 3.49/3.04   open b 3.41
+   open a: a15 0.98  a30 1.98  a45 3.18  a60 3.30  a90 3.35  a130 3.39   open c: c15 43.74  c30 65.65  c45 78.46  c60 83.93  c90 84.15  c130 84.35
+   split b (turb/oil/knock units): turb 6.08, oil -0.12, knock 0.00; fuel +5.23 %; dT onsets b 2.6 2.4 2.5 2.6 2.7 2.7 2.7
+L45_g12_G100_v100     b58          L/tau 0.95 base     11.8/    14.5 knockshare 0.19 hot -183.6 K (0 s) cg cut 14.2/-5.5 deliv 1.00/0.00
+   closed: b 0.61/0.54   open b 1.32
+   open a: a15 0.18  a30 0.34  a45 0.51  a60 0.68  a90 1.06  a130 1.31   open c: c15 3.13  c30 5.04  c45 6.27  c60 7.09  c90 8.09  c130 8.55
+   split b (turb/oil/knock units): turb 0.16, oil -0.09, knock 0.01; fuel +9.79 %; dT onsets b 5.1 8.8 10.7 11.4 11.7
+L45_g12_G100_v100     mazda_25t    L/tau 1.05 base     13.3/   136.5 knockshare 0.90 hot -173.1 K (0 s) cg cut 4.4/12.1 deliv 0.00/0.00
+   closed: b 0.50/5.84   open b 1.22
+   open a: a15 0.10  a30 0.21  a45 0.33  a60 0.46  a90 0.84  a130 1.22   open c: c15 6.30  c30 10.62  c45 13.73  c60 16.06  c90 19.47  c130 21.83
+   split b (turb/oil/knock units): turb 0.16, oil -0.10, knock 7.90; fuel +8.79 %; dT onsets b -1.1 2.1 3.5 4.0 4.2
+L45_g12_G100_v100     honda_l15b7  L/tau 0.94 base     29.3/    29.3 knockshare -0.00 hot -111.1 K (0 s) cg cut -1.3/-1.3 deliv 0.00/0.00
+   closed: b 3.92/3.92   open b 4.04
+   open a: a15 0.61  a30 1.23  a45 1.85  a60 2.49  a90 3.98  a130 4.00   open c: c15 17.60  c30 30.02  c45 39.08  c60 45.90  c90 55.41  c130 61.36
+   split b (turb/oil/knock units): turb 1.22, oil -0.07, knock 0.00; fuel +6.25 %; dT onsets b 2.7 3.7 4.5 4.9 5.0
+L45_g12_G100_v100     ford_27tt    L/tau 0.67 base     13.2/    20.8 knockshare 0.37 hot -184.7 K (0 s) cg cut 2.4/1.5 deliv 0.00/0.00
+   closed: b -0.38/-0.24   open b 0.19
+   open a: a15 0.01  a30 0.02  a45 0.03  a60 0.05  a90 0.10  a130 0.20   open c: c15 5.74  c30 9.95  c45 13.12  c60 15.56  c90 19.04  c130 21.39
+   split b (turb/oil/knock units): turb 0.03, oil -0.08, knock 0.00; fuel +6.55 %; dT onsets b -0.4 0.1 0.4 0.5 0.6
+L45_g12_G100_v115     b58          L/tau 0.95 base     19.5/    21.0 knockshare 0.07 hot -124.5 K (0 s) cg cut 15.4/10.7 deliv 0.00/0.00
+   closed: b 6.73/6.25   open b 7.16
+   open a: a15 1.04  a30 2.01  a45 2.93  a60 3.84  a90 5.92  a130 7.13   open c: c15 14.08  c30 22.09  c45 26.99  c60 30.17  c90 33.96  c130 35.58
+   split b (turb/oil/knock units): turb 1.42, oil -0.11, knock 0.00; fuel +9.59 %; dT onsets b 10.4 14.8 16.7 17.3 17.4
+L45_g12_G100_v115     mazda_25t    L/tau 1.05 base     23.1/   192.6 knockshare 0.88 hot -115.4 K (0 s) cg cut 9.8/-0.5 deliv 0.00/0.00
+   closed: b 4.08/6.81   open b 4.53
+   open a: a15 0.53  a30 1.04  a45 1.55  a60 2.09  a90 3.47  a130 4.51   open c: c15 14.37  c30 23.59  c45 29.86  c60 34.40  c90 40.85  c130 44.91
+   split b (turb/oil/knock units): turb 1.06, oil -0.12, knock 12.17; fuel +8.88 %; dT onsets b 2.8 6.5 7.8 8.2 8.3
+L45_g12_G100_v115     honda_l15b7  L/tau 0.94 base     60.7/    62.2 knockshare 0.02 hot  -73.9 K (0 s) cg cut -3.5/-3.4 deliv 0.00/0.00
+   closed: b 5.85/5.71   open b 5.84
+   open a: a15 0.92  a30 1.84  a45 2.77  a60 3.75  a90 6.03  a130 5.81   open c: c15 26.43  c30 43.74  c45 55.60  c60 64.06  c90 75.05  c130 80.50
+   split b (turb/oil/knock units): turb 3.65, oil -0.10, knock 0.00; fuel +6.40 %; dT onsets b 3.4 4.8 5.7 6.1 6.2
+L45_g12_G100_v115     ford_27tt    L/tau 0.67 base     47.3/    64.9 knockshare 0.27 hot  -69.9 K (0 s) cg cut 5.9/4.3 deliv 0.03/0.00
+   closed: b 1.61/1.17   open b 1.79
+   open a: a15 0.23  a30 0.45  a45 0.69  a60 0.93  a90 1.51  a130 1.78   open c: c15 22.07  c30 36.72  c45 46.83  c60 54.07  c90 63.57  c130 68.89
+   split b (turb/oil/knock units): turb 0.86, oil -0.10, knock 0.00; fuel +6.40 %; dT onsets b 0.5 1.2 1.6 1.8 1.9
+L45_g12_G100_v130     b58          L/tau 0.95 base     36.9/    41.3 knockshare 0.11 hot  -78.4 K (0 s) cg cut 24.4/14.7 deliv 0.00/0.00
+   closed: b 11.12/7.47  a15 1.72/-0.92  a30 3.20/0.42  a45 4.59/1.66  a60 5.94/2.87  a90 9.01/5.63  a130 11.09/7.44   open b 11.26
+   open a: a15 1.67  a30 3.20  a45 4.63  a60 6.03  a90 9.27  a130 11.21   open c: c15 19.42  c30 30.31  c45 36.92  c60 41.23  c90 46.54  c130 48.96
+   split b (turb/oil/knock units): turb 4.22, oil -0.12, knock -1.02; fuel +9.44 %; dT onsets b 14.8 19.5 21.2 21.6 21.7
+L45_g12_G100_v130     mazda_25t    L/tau 1.05 base     55.7/   308.5 knockshare 0.82 hot  -62.8 K (0 s) cg cut 15.0/-9.7 deliv 0.00/0.00
+   closed: b 6.70/18.88  a15 0.77/3.50  a30 1.47/5.84  a45 2.16/8.18  a60 2.89/10.43  a90 4.79/14.97  a130 6.70/18.52   open b 6.87
+   open a: a15 0.77  a30 1.50  a45 2.24  a60 3.01  a90 5.06  a130 6.86   open c: c15 23.54  c30 37.11  c45 45.67  c60 51.52  c90 59.40  c130 63.41
+   split b (turb/oil/knock units): turb 3.90, oil -0.16, knock 54.51; fuel +9.58 %; dT onsets b 3.1 7.9 9.2 9.4 9.5
+L45_g12_G100_v130     honda_l15b7  L/tau 0.94 base    178.6/   232.4 knockshare 0.23 hot  -25.4 K (0 s) cg cut -2.3/10.0 deliv 0.00/0.00
+   closed: b 10.90/8.38  a15 1.79/1.38  a30 3.43/2.64  a45 5.07/3.90  a60 6.76/5.20  a90 10.56/8.12  a130 10.83/8.33   open b 10.72
+   open a: a15 1.69  a30 3.34  a45 5.00  a60 6.71  a90 10.59  a130 10.65   open c: c15 35.36  c30 56.18  c45 69.35  c60 78.13  c90 88.55  c130 92.57
+   split b (turb/oil/knock units): turb 19.59, oil -0.14, knock 0.01; fuel +6.86 %; dT onsets b 7.3 9.1 9.9 10.2 10.2
+L45_g12_G100_v130     ford_27tt    L/tau 0.67 base     82.1/   107.0 knockshare 0.23 hot  -49.5 K (0 s) cg cut 7.3/5.6 deliv 0.00/0.00
+   closed: b 4.01/3.08  a15 0.60/0.46  a30 1.12/0.86  a45 1.63/1.25  a60 2.15/1.65  a90 3.31/2.54  a130 3.99/3.06   open b 4.09
+   open a: a15 0.56  a30 1.10  a45 1.64  a60 2.19  a90 3.40  a130 4.06   open c: c15 30.18  c30 47.82  c45 58.73  c60 65.79  c90 73.83  c130 76.99
+   split b (turb/oil/knock units): turb 3.43, oil -0.14, knock 0.00; fuel +6.99 %; dT onsets b 2.6 3.3 3.6 3.7 3.8
+L45_g12_G200_v100     b58          L/tau 0.95 base      8.8/    11.3 knockshare 0.23 hot -227.6 K (0 s) cg cut 4.9/-7.6 deliv 1.00/0.00
+   closed: b -0.46/-0.32   open b 0.49
+   open a: a15 0.04  a30 0.08  a45 0.11  a60 0.15  a90 0.21  a130 0.29   open c: c15 0.97  c30 1.61  c45 2.05  c60 2.36  c90 2.76  c130 3.06
+   split b (turb/oil/knock units): turb 0.04, oil -0.08, knock 0.00; fuel +12.35 %; dT onsets b 5.1 10.5 11.8
+L45_g12_G200_v100     mazda_25t    L/tau 1.05 base      9.4/    93.5 knockshare 0.90 hot -211.6 K (0 s) cg cut 1.7/10.8 deliv 0.00/0.00
+   closed: b -0.66/4.33   open b 0.31
+   open a: a15 0.00  a30 0.01  a45 0.01  a60 0.02  a90 0.04  a130 0.08   open c: c15 2.13  c30 3.65  c45 4.77  c60 5.63  c90 6.82  c130 7.82
+   split b (turb/oil/knock units): turb 0.03, oil -0.09, knock 4.11; fuel +11.28 %; dT onsets b -1.1 1.8 2.5
+L45_g12_G200_v100     honda_l15b7  L/tau 0.94 base     14.9/    14.9 knockshare 0.00 hot -145.3 K (0 s) cg cut -1.2/-1.2 deliv 0.00/0.00
+   closed: b 2.43/2.43   open b 2.79
+   open a: a15 0.24  a30 0.46  a45 0.68  a60 0.89  a90 1.30  a130 1.85   open c: c15 8.94  c30 15.57  c45 20.61  c60 24.54  c90 30.18  c130 35.03
+   split b (turb/oil/knock units): turb 0.42, oil -0.06, knock 0.00; fuel +8.19 %; dT onsets b 2.7 5.0 5.7
+L45_g12_G200_v100     ford_27tt    L/tau 0.67 base      9.4/    17.0 knockshare 0.45 hot -231.2 K (0 s) cg cut 1.1/0.6 deliv 0.00/0.00
+   closed: b -0.74/-0.41   open b 0.02
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.01   open c: c15 1.69  c30 3.00  c45 4.03  c60 4.87  c90 6.12  c130 7.26
+   split b (turb/oil/knock units): turb 0.00, oil -0.07, knock 0.00; fuel +8.46 %; dT onsets b -0.4 -0.0 0.2
+L45_g12_G200_v115     b58          L/tau 0.95 base     11.2/    12.7 knockshare 0.12 hot -160.0 K (0 s) cg cut 6.9/2.5 deliv 0.00/0.00
+   closed: b 3.03/2.69   open b 3.93
+   open a: a15 0.38  a30 0.73  a45 1.04  a60 1.32  a90 1.82  a130 2.43   open c: c15 6.40  c30 10.32  c45 12.86  c60 14.57  c90 16.66  c130 18.14
+   split b (turb/oil/knock units): turb 0.45, oil -0.11, knock 0.00; fuel +12.18 %; dT onsets b 10.4 17.8 19.0
+L45_g12_G200_v115     mazda_25t    L/tau 1.05 base     12.7/   119.6 knockshare 0.89 hot -147.3 K (0 s) cg cut 4.9/-0.7 deliv 0.00/0.00
+   closed: b 1.49/5.78   open b 2.35
+   open a: a15 0.17  a30 0.32  a45 0.46  a60 0.60  a90 0.85  a130 1.18   open c: c15 7.15  c30 11.95  c45 15.30  c60 17.73  c90 20.95  c130 23.53
+   split b (turb/oil/knock units): turb 0.30, oil -0.11, knock 6.73; fuel +11.32 %; dT onsets b 2.8 6.9 7.6
+L45_g12_G200_v115     honda_l15b7  L/tau 0.94 base     29.0/    30.5 knockshare 0.05 hot  -97.7 K (0 s) cg cut -3.4/-3.2 deliv 0.00/0.00
+   closed: b 5.27/5.01   open b 5.47
+   open a: a15 0.47  a30 0.92  a45 1.35  a60 1.76  a90 2.56  a130 3.66   open c: c15 17.62  c30 29.85  c45 38.66  c60 45.21  c90 54.15  c130 61.36
+   split b (turb/oil/knock units): turb 1.61, oil -0.09, knock 0.00; fuel +8.41 %; dT onsets b 3.4 6.5 7.3
+L45_g12_G200_v115     ford_27tt    L/tau 0.67 base     18.1/    35.7 knockshare 0.49 hot -115.2 K (0 s) cg cut 3.4/1.7 deliv 0.03/0.00
+   closed: b 0.56/0.28   open b 1.08
+   open a: a15 0.08  a30 0.15  a45 0.22  a60 0.29  a90 0.43  a130 0.61   open c: c15 11.76  c30 20.10  c45 26.17  c60 30.71  c90 36.91  c130 41.88
+   split b (turb/oil/knock units): turb 0.20, oil -0.10, knock 0.00; fuel +8.28 %; dT onsets b 0.5 1.5 1.8
+L45_g12_G200_v130     b58          L/tau 0.95 base     16.6/    20.1 knockshare 0.17 hot -110.1 K (0 s) cg cut 14.8/3.8 deliv 0.00/0.00
+   closed: b 7.70/3.41  a15 0.87/-2.28  a30 1.58/-1.68  a45 2.20/-1.16  a60 2.75/-0.70  a90 3.69/0.08  a130 4.75/0.97   open b 8.30
+   open a: a15 0.86  a30 1.62  a45 2.29  a60 2.90  a90 3.94  a130 5.15   open c: c15 12.01  c30 19.20  c45 23.77  c60 26.82  c90 30.51  c130 33.10
+   split b (turb/oil/knock units): turb 1.40, oil -0.12, knock -0.60; fuel +11.99 %; dT onsets b 14.8 23.1 24.2
+L45_g12_G200_v130     mazda_25t    L/tau 1.05 base     25.9/   210.5 knockshare 0.88 hot  -86.2 K (0 s) cg cut 10.4/-12.4 deliv 0.00/0.00
+   closed: b 4.47/25.39  a15 0.34/3.04  a30 0.61/4.98  a45 0.86/6.90  a60 1.08/8.83  a90 1.48/12.67  a130 1.98/17.81   open b 4.99
+   open a: a15 0.36  a30 0.68  a45 0.97  a60 1.23  a90 1.72  a130 2.34   open c: c15 16.84  c30 27.05  c45 33.66  c60 38.18  c90 43.82  c130 48.06
+   split b (turb/oil/knock units): turb 1.31, oil -0.15, knock 52.28; fuel +12.10 %; dT onsets b 3.1 7.9 8.4
+L45_g12_G200_v130     honda_l15b7  L/tau 0.94 base     88.2/   121.3 knockshare 0.27 hot  -41.4 K (0 s) cg cut -2.9/11.5 deliv 0.00/0.00
+   closed: b 12.11/8.81  a15 1.18/0.86  a30 2.19/1.59  a45 3.14/2.29  a60 4.04/2.94  a90 5.76/4.19  a130 8.02/5.84   open b 12.07
+   open a: a15 1.09  a30 2.11  a45 3.07  a60 3.99  a90 5.72  a130 8.02   open c: c15 27.13  c30 44.32  c45 55.91  c60 64.11  c90 74.76  c130 82.80
+   split b (turb/oil/knock units): turb 10.79, oil -0.12, knock 0.01; fuel +9.01 %; dT onsets b 7.3 12.0 12.7
+L45_g12_G200_v130     ford_27tt    L/tau 0.67 base     33.1/    58.0 knockshare 0.43 hot  -81.9 K (0 s) cg cut 5.0/2.9 deliv 0.00/0.00
+   closed: b 3.41/1.95  a15 0.33/0.19  a30 0.60/0.34  a45 0.85/0.49  a60 1.09/0.62  a90 1.53/0.88  a130 2.10/1.20   open b 3.75
+   open a: a15 0.32  a30 0.62  a45 0.91  a60 1.18  a90 1.68  a130 2.33   open c: c15 20.36  c30 33.38  c45 42.10  c60 48.18  c90 55.84  c130 61.35
+   split b (turb/oil/knock units): turb 1.26, oil -0.13, knock 0.00; fuel +8.82 %; dT onsets b 2.6 4.0 4.3
+L45_g12_G50_v100      b58          L/tau 0.95 base     18.9/    21.7 knockshare 0.13 hot -137.3 K (0 s) cg cut 33.7/11.0 deliv 1.00/0.00
+   closed: b 2.02/1.79   open b 2.33
+   open a: a15 0.57  a30 1.16  a45 1.90  a60 2.30  a90 2.31  a130 2.33   open c: c15 7.81  c30 12.13  c45 14.99  c60 16.58  c90 16.62  c130 16.65
+   split b (turb/oil/knock units): turb 0.46, oil -0.08, knock 0.01; fuel +7.17 %; dT onsets b 5.1 6.8 8.3 9.2 9.6 9.8 9.9
+L45_g12_G50_v100      mazda_25t    L/tau 1.05 base     22.0/   184.7 knockshare 0.88 hot -132.3 K (0 s) cg cut 10.2/12.6 deliv 0.00/0.00
+   closed: b 2.16/6.50   open b 2.52
+   open a: a15 0.49  a30 1.06  a45 1.87  a60 2.53  a90 2.53  a130 2.52   open c: c15 14.99  c30 24.92  c45 33.48  c60 39.76  c90 39.89  c130 40.01
+   split b (turb/oil/knock units): turb 0.56, oil -0.08, knock 11.53; fuel +6.35 %; dT onsets b -1.1 1.6 3.1 3.9 4.2 4.3 4.4
+L45_g12_G50_v100      honda_l15b7  L/tau 0.94 base     61.4/    61.4 knockshare 0.00 hot  -76.7 K (0 s) cg cut -0.1/-0.1 deliv 0.00/0.00
+   closed: b 3.91/3.91   open b 3.80
+   open a: a15 1.22  a30 2.52  a45 4.17  a60 3.70  a90 3.73  a130 3.78   open c: c15 27.48  c30 45.91  c45 61.21  c60 72.10  c90 72.41  c130 72.70
+   split b (turb/oil/knock units): turb 2.47, oil -0.07, knock 0.00; fuel +4.56 %; dT onsets b 2.7 2.5 2.9 3.3 3.5 3.6 3.6
+L45_g12_G50_v100      ford_27tt    L/tau 0.67 base     21.6/    29.3 knockshare 0.26 hot -135.9 K (0 s) cg cut 5.3/3.8 deliv 0.00/0.00
+   closed: b 0.24/0.36   open b 0.54
+   open a: a15 0.08  a30 0.18  a45 0.37  a60 0.55  a90 0.55  a130 0.54   open c: c15 15.09  c30 25.48  c45 34.28  c60 40.99  c90 41.22  c130 41.46
+   split b (turb/oil/knock units): turb 0.12, oil -0.07, knock 0.05; fuel +4.71 %; dT onsets b -0.4 0.0 0.3 0.5 0.7 0.8 0.8
+L45_g12_G50_v115      b58          L/tau 0.95 base     41.1/    42.6 knockshare 0.04 hot  -85.7 K (0 s) cg cut 26.6/23.1 deliv 0.00/0.00
+   closed: b 8.37/8.08   open b 8.31
+   open a: a15 2.16  a30 4.33  a45 6.97  a60 8.18  a90 8.23  a130 8.28   open c: c15 23.53  c30 35.82  c45 43.60  c60 47.62  c90 47.71  c130 47.78
+   split b (turb/oil/knock units): turb 3.53, oil -0.10, knock 0.00; fuel +7.00 %; dT onsets b 10.4 11.3 12.6 13.2 13.5 13.6 13.7
+L45_g12_G50_v115      mazda_25t    L/tau 1.05 base     49.9/   282.5 knockshare 0.82 hot  -80.7 K (0 s) cg cut 16.3/0.6 deliv 0.00/0.00
+   closed: b 5.47/7.23   open b 5.53
+   open a: a15 1.25  a30 2.59  a45 4.39  a60 5.49  a90 5.51  a130 5.52   open c: c15 23.52  c30 38.02  c45 50.23  c60 57.46  c90 57.60  c130 57.73
+   split b (turb/oil/knock units): turb 2.83, oil -0.11, knock 17.69; fuel +6.47 %; dT onsets b 2.8 5.0 6.4 6.9 7.2 7.2 7.3
+L45_g12_G50_v115      honda_l15b7  L/tau 0.94 base    118.0/   119.5 knockshare 0.01 hot  -49.6 K (0 s) cg cut -2.5/-2.5 deliv 0.00/0.00
+   closed: b 4.67/4.61   open b 4.48
+   open a: a15 1.58  a30 3.26  a45 5.03  a60 4.36  a90 4.41  a130 4.46   open c: c15 35.81  c30 57.71  c45 73.94  c60 83.26  c90 83.56  c130 83.83
+   split b (turb/oil/knock units): turb 5.62, oil -0.10, knock 0.00; fuel +4.65 %; dT onsets b 3.4 3.1 3.6 3.9 4.1 4.1 4.2
+L45_g12_G50_v115      ford_27tt    L/tau 0.67 base    142.5/   160.1 knockshare 0.11 hot  -22.9 K (0 s) cg cut 8.2/7.3 deliv 0.03/0.00
+   closed: b 1.83/1.63   open b 1.82
+   open a: a15 0.47  a30 0.97  a45 1.66  a60 1.81  a90 1.81  a130 1.82   open c: c15 31.91  c30 51.67  c45 66.29  c60 76.32  c90 76.55  c130 76.78
+   split b (turb/oil/knock units): turb 2.71, oil -0.09, knock 0.00; fuel +4.60 %; dT onsets b 0.5 0.8 1.2 1.4 1.5 1.6 1.6
+L45_g12_G50_v130      b58          L/tau 0.95 base     92.5/    97.9 knockshare 0.06 hot  -43.0 K (0 s) cg cut 33.4/27.3 deliv 0.00/0.00
+   closed: b 10.76/8.59  a15 2.82/1.12  a30 5.50/3.66  a45 8.82/6.80  a60 10.62/8.45  a90 10.68/8.51  a130 10.73/8.57   open b 10.57
+   open a: a15 2.76  a30 5.50  a45 8.82  a60 10.41  a90 10.47  a130 10.54   open c: c15 26.20  c30 39.82  c45 48.97  c60 53.34  c90 53.43  c130 53.49
+   split b (turb/oil/knock units): turb 10.06, oil -0.11, knock -1.54; fuel +6.89 %; dT onsets b 14.8 14.9 15.9 16.4 16.6 16.7 16.7
+L45_g12_G50_v130      mazda_25t    L/tau 1.05 base    125.2/   437.5 knockshare 0.71 hot  -35.0 K (0 s) cg cut 20.1/-0.4 deliv 0.00/0.00
+   closed: b 7.00/13.09  a15 1.49/3.91  a30 3.04/6.61  a45 5.29/8.55  a60 6.97/11.44  a90 6.99/12.04  a130 7.00/12.83   open b 6.90
+   open a: a15 1.48  a30 3.09  a45 5.42  a60 6.86  a90 6.88  a130 6.90   open c: c15 30.82  c30 47.64  c45 60.10  c60 66.04  c90 66.19  c130 66.31
+   split b (turb/oil/knock units): turb 8.91, oil -0.15, knock 48.50; fuel +7.01 %; dT onsets b 3.1 6.4 7.8 8.3 8.4 8.5 8.5
+L45_g12_G50_v130      honda_l15b7  L/tau 0.94 base    315.6/   390.0 knockshare 0.19 hot   -8.2 K (0 s) cg cut -1.0/9.1 deliv 0.00/0.00
+   closed: b 7.83/6.34  a15 2.65/2.14  a30 5.27/4.26  a45 8.09/6.55  a60 7.60/6.15  a90 7.70/6.23  a130 7.79/6.30   open b 7.50
+   open a: a15 2.54  a30 5.20  a45 7.67  a60 7.27  a90 7.37  a130 7.46   open c: c15 44.41  c30 68.13  c45 83.26  c60 90.24  c90 90.53  c130 90.75
+   split b (turb/oil/knock units): turb 24.85, oil -0.13, knock 0.01; fuel +4.93 %; dT onsets b 7.3 6.1 6.3 6.5 6.6 6.6 6.7
+L45_g12_G50_v130      ford_27tt    L/tau 0.67 base    202.8/   227.7 knockshare 0.11 hot  -14.6 K (0 s) cg cut 9.7/8.7 deliv 0.00/0.00
+   closed: b 3.54/3.15  a15 0.95/0.84  a30 1.83/1.63  a45 2.94/2.62  a60 3.45/3.07  a90 3.48/3.10  a130 3.52/3.13   open b 3.46
+   open a: a15 0.88  a30 1.79  a45 2.89  a60 3.36  a90 3.40  a130 3.43   open c: c15 39.84  c30 60.62  c45 73.36  c60 79.46  c90 79.67  c130 79.84
+   split b (turb/oil/knock units): turb 7.30, oil -0.13, knock 0.00; fuel +5.12 %; dT onsets b 2.6 2.6 2.7 2.8 2.8 2.9 2.9
+L45_g8_G100_v100      b58          L/tau 0.95 base      9.3/    11.7 knockshare 0.21 hot -311.9 K (0 s) cg cut 0.8/0.5 deliv 0.00/0.00
+   closed: b -0.61/-0.48   open b 0.29
+   open a: a15 0.04  a30 0.08  a45 0.12  a60 0.16  a90 0.24  a130 0.29   open c: c15 0.82  c30 1.30  c45 1.59  c60 1.78  c90 1.98  c130 2.05
+   split b (turb/oil/knock units): turb 0.03, oil -0.08, knock 0.00; fuel +11.11 %; dT onsets b 5.1 7.7 9.1 9.7 10.0
+L45_g8_G100_v100      mazda_25t    L/tau 1.05 base     10.5/    58.6 knockshare 0.82 hot -227.8 K (0 s) cg cut 1.7/-0.6 deliv 0.00/0.00
+   closed: b -0.43/1.83   open b 0.43
+   open a: a15 0.04  a30 0.08  a45 0.12  a60 0.17  a90 0.32  a130 0.43   open c: c15 3.21  c30 5.32  c45 6.77  c60 7.81  c90 9.19  c130 9.92
+   split b (turb/oil/knock units): turb 0.05, oil -0.09, knock 1.12; fuel +10.09 %; dT onsets b -1.1 1.3 2.5 3.0 3.2
+L45_g8_G100_v100      honda_l15b7  L/tau 0.94 base     16.9/    16.9 knockshare 0.00 hot -158.0 K (0 s) cg cut 0.5/0.5 deliv 0.00/0.00
+   closed: b 2.97/2.97   open b 3.22
+   open a: a15 0.46  a30 0.91  a45 1.36  a60 1.83  a90 2.85  a130 3.19   open c: c15 13.95  c30 23.21  c45 29.55  c60 34.02  c90 39.61  c130 42.22
+   split b (turb/oil/knock units): turb 0.56, oil -0.06, knock 0.00; fuel +8.06 %; dT onsets b 2.7 3.8 4.6 5.0 5.2
+L45_g8_G100_v100      ford_27tt    L/tau 0.67 base     10.3/    18.2 knockshare 0.43 hot -249.1 K (0 s) cg cut 1.1/2.1 deliv 0.00/0.00
+   closed: b -0.66/-0.37   open b 0.04
+   open a: a15 -0.00  a30 -0.00  a45 -0.00  a60 0.00  a90 0.01  a130 0.04   open c: c15 2.46  c30 4.22  c45 5.51  c60 6.47  c90 7.77  c130 8.47
+   split b (turb/oil/knock units): turb 0.00, oil -0.07, knock 0.00; fuel +7.73 %; dT onsets b -0.4 -0.1 0.1 0.3 0.3
+L45_g8_G100_v115      b58          L/tau 0.95 base     10.2/    11.8 knockshare 0.13 hot -243.3 K (0 s) cg cut 2.4/2.1 deliv 0.00/0.00
+   closed: b 0.77/0.67   open b 1.79
+   open a: a15 0.27  a30 0.53  a45 0.78  a60 1.02  a90 1.53  a130 1.77   open c: c15 3.89  c30 5.90  c45 7.02  c60 7.67  c90 8.30  c130 8.48
+   split b (turb/oil/knock units): turb 0.19, oil -0.11, knock 0.00; fuel +11.47 %; dT onsets b 10.4 13.7 15.2 15.8 16.0
+L45_g8_G100_v115      mazda_25t    L/tau 1.05 base     14.8/    48.9 knockshare 0.70 hot -158.7 K (0 s) cg cut 5.6/0.7 deliv 0.00/0.00
+   closed: b 2.34/11.39   open b 3.04
+   open a: a15 0.38  a30 0.75  a45 1.12  a60 1.51  a90 2.44  a130 3.03   open c: c15 11.11  c30 17.82  c45 22.13  c60 25.08  c90 28.83  c130 30.62
+   split b (turb/oil/knock units): turb 0.46, oil -0.11, knock 5.23; fuel +10.09 %; dT onsets b 2.8 5.8 7.1 7.6 7.7
+L45_g8_G100_v115      honda_l15b7  L/tau 0.94 base     36.6/    38.0 knockshare 0.04 hot -104.6 K (0 s) cg cut 0.3/0.3 deliv 0.00/0.00
+   closed: b 6.13/5.89   open b 6.16
+   open a: a15 0.93  a30 1.84  a45 2.76  a60 3.70  a90 5.78  a130 6.12   open c: c15 27.31  c30 43.65  c45 53.90  c60 60.57  c90 68.07  c130 70.82
+   split b (turb/oil/knock units): turb 2.33, oil -0.08, knock 0.00; fuel +8.43 %; dT onsets b 3.4 4.9 5.9 6.3 6.5
+L45_g8_G100_v115      ford_27tt    L/tau 0.67 base     14.9/    32.5 knockshare 0.54 hot -173.7 K (0 s) cg cut 2.6/1.2 deliv 0.00/0.00
+   closed: b 0.17/0.08   open b 0.81
+   open a: a15 0.09  a30 0.19  a45 0.29  a60 0.39  a90 0.62  a130 0.81   open c: c15 11.63  c30 18.91  c45 23.63  c60 26.79  c90 30.47  c130 31.92
+   split b (turb/oil/knock units): turb 0.12, oil -0.10, knock 0.00; fuel +8.00 %; dT onsets b 0.5 1.0 1.4 1.6 1.6
+L45_g8_G100_v130      b58          L/tau 0.95 base     18.7/    20.6 knockshare 0.10 hot -130.4 K (0 s) cg cut 28.8/24.2 deliv 1.00/0.00
+   closed: b 5.41/4.34   open b 5.92
+   open a: a15 0.94  a30 1.79  a45 2.59  a60 3.37  a90 5.04  a130 5.89   open c: c15 10.80  c30 16.16  c45 19.07  c60 20.77  c90 22.47  c130 22.98
+   split b (turb/oil/knock units): turb 1.13, oil -0.12, knock -0.11; fuel +11.29 %; dT onsets b 14.8 19.0 20.8 21.3 21.5
+L45_g8_G100_v130      mazda_25t    L/tau 1.05 base     22.0/   275.1 knockshare 0.92 hot -132.0 K (0 s) cg cut 6.1/6.3 deliv 0.00/0.00
+   closed: b 4.35/20.45   open b 4.96
+   open a: a15 0.59  a30 1.17  a45 1.74  a60 2.35  a90 3.84  a130 4.95   open c: c15 19.94  c30 30.57  c45 36.82  c60 40.79  c90 45.36  c130 47.03
+   split b (turb/oil/knock units): turb 1.12, oil -0.16, knock 55.29; fuel +10.94 %; dT onsets b 3.1 6.8 7.9 8.2 8.3
+L45_g8_G100_v130      honda_l15b7  L/tau 0.94 base     91.3/    93.4 knockshare 0.02 hot  -64.3 K (0 s) cg cut -2.0/-2.0 deliv 0.00/0.00
+   closed: b 11.32/11.06   open b 11.15
+   open a: a15 1.82  a30 3.60  a45 5.36  a60 7.16  a90 11.01  a130 11.07   open c: c15 38.31  c30 59.07  c45 71.12  c60 78.46  c90 85.93  c130 88.10
+   split b (turb/oil/knock units): turb 10.46, oil -0.13, knock 0.00; fuel +8.36 %; dT onsets b 7.3 8.9 9.7 10.0 10.1
+L45_g8_G100_v130      ford_27tt    L/tau 0.67 base     35.4/    60.3 knockshare 0.41 hot -104.2 K (0 s) cg cut 2.6/1.5 deliv 0.00/0.00
+   closed: b 3.56/2.09   open b 3.81
+   open a: a15 0.54  a30 1.07  a45 1.60  a60 2.13  a90 3.26  a130 3.77   open c: c15 29.56  c30 45.73  c45 55.10  c60 60.75  c90 66.49  c130 68.23
+   split b (turb/oil/knock units): turb 1.39, oil -0.13, knock 0.00; fuel +7.80 %; dT onsets b 2.6 3.2 3.5 3.7 3.7
+L45_g8_G200_v100      b58          L/tau 0.95 base      8.1/    10.5 knockshare 0.23 hot -343.3 K (0 s) cg cut 0.5/0.3 deliv 0.00/0.00
+   closed: b -0.89/-0.68   open b 0.13
+   open a: a15 0.01  a30 0.02  a45 0.03  a60 0.04  a90 0.06  a130 0.08   open c: c15 0.28  c30 0.47  c45 0.59  c60 0.68  c90 0.79  c130 0.87
+   split b (turb/oil/knock units): turb 0.01, oil -0.08, knock 0.00; fuel +13.65 %; dT onsets b 5.1 9.2 10.4
+L45_g8_G200_v100      mazda_25t    L/tau 1.05 base      8.6/    48.3 knockshare 0.82 hot -264.7 K (0 s) cg cut 0.8/-0.7 deliv 0.00/0.00
+   closed: b -0.94/2.34   open b 0.09
+   open a: a15 -0.00  a30 -0.00  a45 -0.00  a60 0.00  a90 0.01  a130 0.02   open c: c15 1.02  c30 1.73  c45 2.24  c60 2.63  c90 3.16  c130 3.59
+   split b (turb/oil/knock units): turb 0.01, oil -0.09, knock 1.21; fuel +12.57 %; dT onsets b -1.1 1.0 1.7
+L45_g8_G200_v100      honda_l15b7  L/tau 0.94 base     10.9/    10.9 knockshare 0.00 hot -190.9 K (0 s) cg cut 0.2/0.2 deliv 0.00/0.00
+   closed: b 1.44/1.44   open b 1.91
+   open a: a15 0.15  a30 0.30  a45 0.45  a60 0.58  a90 0.86  a130 1.22   open c: c15 6.05  c30 10.41  c45 13.65  c60 16.10  c90 19.53  c130 22.33
+   split b (turb/oil/knock units): turb 0.21, oil -0.06, knock 0.00; fuel +10.24 %; dT onsets b 2.7 4.8 5.5
+L45_g8_G200_v100      ford_27tt    L/tau 0.67 base      8.5/    16.3 knockshare 0.48 hot -287.2 K (0 s) cg cut 0.6/1.3 deliv 0.00/0.00
+   closed: b -0.82/-0.43   open b -0.01
+   open a: a15 -0.00  a30 -0.00  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.01   open c: c15 0.78  c30 1.39  c45 1.87  c60 2.25  c90 2.83  c130 3.36
+   split b (turb/oil/knock units): turb -0.00, oil -0.07, knock 0.00; fuel +9.65 %; dT onsets b -0.4 -0.2 -0.1
+L45_g8_G200_v115      b58          L/tau 0.95 base      8.5/    10.1 knockshare 0.15 hot -269.4 K (0 s) cg cut 1.1/1.0 deliv 0.00/0.00
+   closed: b -0.25/-0.21   open b 0.97
+   open a: a15 0.09  a30 0.18  a45 0.26  a60 0.33  a90 0.46  a130 0.63   open c: c15 1.57  c30 2.49  c45 3.06  c60 3.44  c90 3.90  c130 4.20
+   split b (turb/oil/knock units): turb 0.08, oil -0.11, knock 0.00; fuel +13.99 %; dT onsets b 10.4 16.4 17.7
+L45_g8_G200_v115      mazda_25t    L/tau 1.05 base     10.0/    35.8 knockshare 0.72 hot -191.3 K (0 s) cg cut 2.4/0.0 deliv 0.00/0.00
+   closed: b 0.30/8.39   open b 1.36
+   open a: a15 0.10  a30 0.20  a45 0.29  a60 0.37  a90 0.53  a130 0.74   open c: c15 4.59  c30 7.55  c45 9.56  c60 10.97  c90 12.80  c130 14.20
+   split b (turb/oil/knock units): turb 0.14, oil -0.11, knock 2.98; fuel +12.51 %; dT onsets b 2.8 6.3 7.0
+L45_g8_G200_v115      honda_l15b7  L/tau 0.94 base     19.6/    21.1 knockshare 0.07 hot -129.6 K (0 s) cg cut -0.2/-0.2 deliv 0.00/0.00
+   closed: b 4.89/4.55   open b 5.18
+   open a: a15 0.44  a30 0.86  a45 1.26  a60 1.65  a90 2.39  a130 3.39   open c: c15 16.55  c30 27.47  c45 35.00  c60 40.39  c90 47.38  c130 52.52
+   split b (turb/oil/knock units): turb 1.04, oil -0.08, knock 0.00; fuel +10.63 %; dT onsets b 3.4 6.4 7.2
+L45_g8_G200_v115      ford_27tt    L/tau 0.67 base     10.3/    27.9 knockshare 0.63 hot -207.8 K (0 s) cg cut 1.3/0.5 deliv 0.00/0.00
+   closed: b -0.52/-0.19   open b 0.39
+   open a: a15 0.03  a30 0.05  a45 0.08  a60 0.10  a90 0.15  a130 0.22   open c: c15 4.66  c30 7.89  c45 10.21  c60 11.93  c90 14.24  c130 16.02
+   split b (turb/oil/knock units): turb 0.04, oil -0.09, knock 0.00; fuel +9.89 %; dT onsets b 0.5 1.2 1.5
+L45_g8_G200_v130      b58          L/tau 0.95 base     11.1/    13.1 knockshare 0.15 hot -162.3 K (0 s) cg cut 14.5/11.0 deliv 1.00/0.00
+   closed: b 2.81/2.03   open b 3.80
+   open a: a15 0.40  a30 0.75  a45 1.07  a60 1.36  a90 1.86  a130 2.47   open c: c15 5.45  c30 8.48  c45 10.30  c60 11.47  c90 12.81  c130 13.69
+   split b (turb/oil/knock units): turb 0.43, oil -0.12, knock -0.05; fuel +13.77 %; dT onsets b 14.8 22.4 23.6
+L45_g8_G200_v130      mazda_25t    L/tau 1.05 base     13.7/   198.4 knockshare 0.93 hot -153.0 K (0 s) cg cut 3.4/5.1 deliv 0.00/0.00
+   closed: b 2.09/26.29   open b 3.13
+   open a: a15 0.23  a30 0.45  a45 0.64  a60 0.83  a90 1.16  a130 1.62   open c: c15 11.44  c30 18.04  c45 22.17  c60 24.93  c90 28.33  c130 30.80
+   split b (turb/oil/knock units): turb 0.44, oil -0.15, knock 51.88; fuel +13.40 %; dT onsets b 3.1 7.0 7.5
+L45_g8_G200_v130      honda_l15b7  L/tau 0.94 base     51.4/    53.5 knockshare 0.04 hot  -78.8 K (0 s) cg cut -2.0/-1.9 deliv 0.00/0.00
+   closed: b 12.30/11.82   open b 12.33
+   open a: a15 1.13  a30 2.19  a45 3.21  a60 4.18  a90 6.04  a130 8.47   open c: c15 27.77  c30 44.64  c45 55.62  c60 63.16  c90 72.52  c130 78.95
+   split b (turb/oil/knock units): turb 6.44, oil -0.11, knock 0.00; fuel +10.52 %; dT onsets b 7.3 11.6 12.4
+L45_g8_G200_v130      ford_27tt    L/tau 0.67 base     18.7/    43.6 knockshare 0.57 hot -132.2 K (0 s) cg cut 1.6/0.7 deliv 0.00/0.00
+   closed: b 2.58/1.11   open b 3.17
+   open a: a15 0.27  a30 0.53  a45 0.78  a60 1.01  a90 1.46  a130 2.04   open c: c15 17.24  c30 27.95  c45 34.97  c60 39.77  c90 45.65  c130 49.66
+   split b (turb/oil/knock units): turb 0.61, oil -0.12, knock 0.00; fuel +9.61 %; dT onsets b 2.6 4.0 4.3
+L45_g8_G50_v100       b58          L/tau 0.95 base      9.6/    12.0 knockshare 0.20 hot -275.9 K (0 s) cg cut 1.6/1.2 deliv 0.00/0.00
+   closed: b -0.14/-0.11   open b 0.57
+   open a: a15 0.15  a30 0.30  a45 0.48  a60 0.56  a90 0.56  a130 0.57   open c: c15 2.36  c30 3.55  c45 4.22  c60 4.51  c90 4.53  c130 4.54
+   split b (turb/oil/knock units): turb 0.06, oil -0.07, knock 0.00; fuel +8.34 %; dT onsets b 5.1 6.1 7.1 7.7 8.1 8.3 8.4
+L45_g8_G50_v100       mazda_25t    L/tau 1.05 base     13.1/    69.9 knockshare 0.81 hot -186.3 K (0 s) cg cut 4.6/-0.9 deliv 0.00/0.00
+   closed: b 0.61/2.26   open b 1.17
+   open a: a15 0.25  a30 0.53  a45 0.92  a60 1.18  a90 1.18  a130 1.17   open c: c15 9.51  c30 15.31  c45 19.47  c60 22.13  c90 22.23  c130 22.32
+   split b (turb/oil/knock units): turb 0.16, oil -0.08, knock 1.50; fuel +7.47 %; dT onsets b -1.1 0.9 2.2 3.0 3.4 3.5 3.6
+L45_g8_G50_v100       honda_l15b7  L/tau 0.94 base     28.4/    28.4 knockshare 0.00 hot -122.5 K (0 s) cg cut 1.8/1.8 deliv 0.00/0.00
+   closed: b 3.88/3.88   open b 3.85
+   open a: a15 1.08  a30 2.19  a45 3.50  a60 3.72  a90 3.77  a130 3.82   open c: c15 25.90  c30 41.43  c45 52.14  c60 58.16  c90 58.50  c130 58.83
+   split b (turb/oil/knock units): turb 1.15, oil -0.05, knock 0.00; fuel +5.92 %; dT onsets b 2.7 2.9 3.3 3.7 3.9 4.1 4.2
+L45_g8_G50_v100       ford_27tt    L/tau 0.67 base     12.1/    20.1 knockshare 0.40 hot -206.3 K (0 s) cg cut 2.3/3.2 deliv 0.00/0.00
+   closed: b -0.34/-0.21   open b 0.16
+   open a: a15 0.02  a30 0.04  a45 0.10  a60 0.17  a90 0.17  a130 0.17   open c: c15 7.30  c30 12.04  c45 15.57  c60 17.76  c90 17.93  c130 18.10
+   split b (turb/oil/knock units): turb 0.02, oil -0.06, knock 0.00; fuel +5.73 %; dT onsets b -0.4 -0.1 0.2 0.3 0.5 0.5 0.6
+L45_g8_G50_v115       b58          L/tau 0.95 base     11.7/    13.2 knockshare 0.12 hot -212.4 K (0 s) cg cut 5.6/4.9 deliv 0.00/0.00
+   closed: b 2.13/1.88   open b 2.79
+   open a: a15 0.78  a30 1.53  a45 2.39  a60 2.72  a90 2.75  a130 2.78   open c: c15 9.09  c30 13.01  c45 14.92  c60 15.59  c90 15.63  c130 15.67
+   split b (turb/oil/knock units): turb 0.34, oil -0.09, knock 0.00; fuel +8.66 %; dT onsets b 10.4 10.8 11.6 12.2 12.5 12.6 12.7
+L45_g8_G50_v115       mazda_25t    L/tau 1.05 base     25.8/    68.3 knockshare 0.62 hot -121.1 K (0 s) cg cut 11.5/3.1 deliv 0.00/0.00
+   closed: b 4.35/16.94   open b 4.58
+   open a: a15 1.12  a30 2.30  a45 3.73  a60 4.53  a90 4.55  a130 4.57   open c: c15 22.44  c30 34.94  c45 43.44  c60 48.06  c90 48.20  c130 48.33
+   split b (turb/oil/knock units): turb 1.22, oil -0.10, knock 10.45; fuel +7.51 %; dT onsets b 2.8 4.5 5.8 6.4 6.7 6.8 6.8
+L45_g8_G50_v115       honda_l15b7  L/tau 0.94 base     67.4/    68.9 knockshare 0.02 hot  -77.1 K (0 s) cg cut 1.6/1.6 deliv 0.00/0.00
+   closed: b 5.71/5.59   open b 5.48
+   open a: a15 1.69  a30 3.43  a45 5.59  a60 5.33  a90 5.39  a130 5.45   open c: c15 39.07  c30 59.66  c45 72.02  c60 77.56  c90 77.89  c130 78.18
+   split b (turb/oil/knock units): turb 3.92, oil -0.08, knock 0.00; fuel +6.26 %; dT onsets b 3.4 3.5 4.1 4.5 4.7 4.9 4.9
+L45_g8_G50_v115       ford_27tt    L/tau 0.67 base     23.4/    41.0 knockshare 0.43 hot -135.2 K (0 s) cg cut 5.0/2.9 deliv 0.00/0.00
+   closed: b 0.91/0.52   open b 1.23
+   open a: a15 0.27  a30 0.56  a45 0.96  a60 1.20  a90 1.21  a130 1.22   open c: c15 23.93  c30 37.04  c45 45.17  c60 48.98  c90 49.26  c130 49.52
+   split b (turb/oil/knock units): turb 0.30, oil -0.08, knock 0.00; fuel +5.96 %; dT onsets b 0.5 0.8 1.1 1.3 1.4 1.5 1.5
+L45_g8_G50_v130       b58          L/tau 0.95 base     37.2/    39.2 knockshare 0.05 hot  -93.4 K (0 s) cg cut 46.0/41.8 deliv 1.00/0.00
+   closed: b 6.37/5.47   open b 6.40
+   open a: a15 1.79  a30 3.52  a45 5.43  a60 6.27  a90 6.32  a130 6.38   open c: c15 16.93  c30 24.08  c45 27.64  c60 28.95  c90 29.00  c130 29.04
+   split b (turb/oil/knock units): turb 2.47, oil -0.10, knock -0.23; fuel +8.52 %; dT onsets b 14.8 15.0 16.0 16.6 16.9 17.0 17.1
+L45_g8_G50_v130       mazda_25t    L/tau 1.05 base     37.2/   350.3 knockshare 0.89 hot -106.1 K (0 s) cg cut 10.2/7.5 deliv 0.00/0.00
+   closed: b 5.75/14.76   open b 5.91
+   open a: a15 1.36  a30 2.80  a45 4.75  a60 5.85  a90 5.87  a130 5.89   open c: c15 31.48  c30 46.41  c45 55.15  c60 58.64  c90 58.80  c130 58.92
+   split b (turb/oil/knock units): turb 2.28, oil -0.14, knock 49.56; fuel +8.22 %; dT onsets b 3.1 5.5 6.8 7.3 7.5 7.5 7.6
+L45_g8_G50_v130       honda_l15b7  L/tau 0.94 base    144.3/   146.4 knockshare 0.01 hot  -48.0 K (0 s) cg cut -1.5/-1.5 deliv 0.00/0.00
+   closed: b 8.47/8.35   open b 8.10
+   open a: a15 2.79  a30 5.64  a45 8.38  a60 7.78  a90 7.91  a130 8.03   open c: c15 49.30  c30 72.12  c45 84.07  c60 88.43  c90 88.77  c130 89.03
+   split b (turb/oil/knock units): turb 12.36, oil -0.13, knock 0.00; fuel +6.26 %; dT onsets b 7.3 6.2 6.4 6.6 6.7 6.8 6.8
+L45_g8_G50_v130       ford_27tt    L/tau 0.67 base     69.6/    94.5 knockshare 0.26 hot  -72.0 K (0 s) cg cut 3.9/2.9 deliv 0.00/0.00
+   closed: b 3.56/2.62   open b 3.52
+   open a: a15 0.95  a30 1.92  a45 3.07  a60 3.39  a90 3.44  a130 3.49   open c: c15 43.34  c30 63.32  c45 73.74  c60 77.54  c90 77.81  c130 78.04
+   split b (turb/oil/knock units): turb 2.59, oil -0.11, knock 0.00; fuel +5.83 %; dT onsets b 2.6 2.6 2.7 2.8 2.8 2.9 2.9
+L67_g10_G100_v100     b58          L/tau 1.42 base     10.3/    12.7 knockshare 0.19 hot -202.0 K (0 s) cg cut 4.8/0.3 deliv 0.00/0.00
+   closed: b 0.73/0.61   open b 1.37
+   open a: a15 0.19  a30 0.36  a45 0.54  a60 0.72  a90 1.12  a130 1.37   open c: c15 3.47  c30 5.79  c45 7.42  c60 8.62  c90 10.29  c130 11.19
+   split b (turb/oil/knock units): turb 0.15, oil -0.07, knock 0.00; fuel +7.93 %; dT onsets b 5.1 8.5 10.0 10.5
+L67_g10_G100_v100     mazda_25t    L/tau 1.57 base     12.3/   147.2 knockshare 0.92 hot -176.2 K (0 s) cg cut 3.9/0.6 deliv 0.00/0.00
+   closed: b 0.24/1.66   open b 0.87
+   open a: a15 0.07  a30 0.15  a45 0.24  a60 0.34  a90 0.62  a130 0.88   open c: c15 5.04  c30 8.69  c45 11.45  c60 13.63  c90 17.07  c130 19.59
+   split b (turb/oil/knock units): turb 0.11, oil -0.08, knock 2.41; fuel +7.50 %; dT onsets b -1.1 2.3 3.4 3.8
+L67_g10_G100_v100     honda_l15b7  L/tau 1.41 base     32.5/    32.5 knockshare 0.00 hot  -96.4 K (0 s) cg cut 0.4/0.4 deliv 0.00/0.00
+   closed: b 3.82/3.82   open b 3.87
+   open a: a15 0.54  a30 1.08  a45 1.63  a60 2.19  a90 3.49  a130 3.84   open c: c15 15.80  c30 27.49  c45 36.43  c60 43.48  c90 54.14  c130 61.20
+   split b (turb/oil/knock units): turb 1.30, oil -0.05, knock 0.00; fuel +5.32 %; dT onsets b 2.7 4.0 4.7 5.0
+L67_g10_G100_v100     ford_27tt    L/tau 1.00 base     14.9/    22.7 knockshare 0.34 hot -149.9 K (0 s) cg cut 18.4/12.8 deliv 1.00/0.00
+   closed: b -0.25/-0.17   open b 0.15
+   open a: a15 0.01  a30 0.02  a45 0.03  a60 0.04  a90 0.08  a130 0.15   open c: c15 4.74  c30 8.35  c45 11.15  c60 13.39  c90 16.77  c130 19.09
+   split b (turb/oil/knock units): turb 0.02, oil -0.06, knock 0.00; fuel +5.76 %; dT onsets b -0.4 0.1 0.4 0.6
+L67_g10_G100_v115     b58          L/tau 1.42 base     15.7/    17.2 knockshare 0.09 hot -141.4 K (0 s) cg cut 13.4/12.0 deliv 0.00/0.00
+   closed: b 4.40/4.01   open b 4.87
+   open a: a15 0.71  a30 1.37  a45 2.00  a60 2.63  a90 4.06  a130 4.84   open c: c15 10.15  c30 16.40  c45 20.52  c60 23.41  c90 27.23  c130 29.02
+   split b (turb/oil/knock units): turb 0.78, oil -0.09, knock 0.00; fuel +8.31 %; dT onsets b 10.4 14.3 15.7 16.0
+L67_g10_G100_v115     mazda_25t    L/tau 1.57 base     21.4/   208.9 knockshare 0.90 hot -118.5 K (0 s) cg cut 9.0/5.4 deliv 0.00/0.00
+   closed: b 3.01/8.32   open b 3.41
+   open a: a15 0.40  a30 0.79  a45 1.19  a60 1.60  a90 2.65  a130 3.40   open c: c15 11.59  c30 19.52  c45 25.26  c60 29.68  c90 36.60  c130 41.41
+   split b (turb/oil/knock units): turb 0.74, oil -0.10, knock 16.73; fuel +7.54 %; dT onsets b 2.8 6.4 7.5 7.7
+L67_g10_G100_v115     honda_l15b7  L/tau 1.41 base     68.1/    69.6 knockshare 0.02 hot  -62.1 K (0 s) cg cut -1.8/-1.7 deliv 0.00/0.00
+   closed: b 5.16/5.05   open b 5.12
+   open a: a15 0.76  a30 1.51  a45 2.28  a60 3.09  a90 4.97  a130 5.09   open c: c15 22.36  c30 37.89  c45 49.19  c60 57.79  c90 70.22  c130 77.07
+   split b (turb/oil/knock units): turb 3.60, oil -0.08, knock 0.00; fuel +5.44 %; dT onsets b 3.4 5.1 5.8 6.1
+L67_g10_G100_v115     ford_27tt    L/tau 1.00 base     35.7/    53.3 knockshare 0.33 hot  -84.2 K (0 s) cg cut 5.2/3.5 deliv 0.00/0.00
+   closed: b 1.16/0.78   open b 1.36
+   open a: a15 0.17  a30 0.34  a45 0.51  a60 0.69  a90 1.11  a130 1.36   open c: c15 17.82  c30 30.30  c45 39.37  c60 46.20  c90 55.86  c130 61.36
+   split b (turb/oil/knock units): turb 0.50, oil -0.08, knock 0.00; fuel +5.57 %; dT onsets b 0.5 1.2 1.6 1.7
+L67_g10_G100_v130     b58          L/tau 1.42 base     29.9/    32.3 knockshare 0.07 hot  -89.9 K (0 s) cg cut 24.2/18.1 deliv 0.00/0.00
+   closed: b 8.22/6.09  a15 1.27/-0.29  a30 2.36/0.73  a45 3.39/1.69  a60 4.40/2.62  a90 6.69/4.76  a130 8.19/6.05   open b 8.42
+   open a: a15 1.23  a30 2.36  a45 3.43  a60 4.49  a90 6.92  a130 8.37   open c: c15 15.06  c30 24.24  c45 30.27  c60 34.53  c90 40.43  c130 43.44
+   split b (turb/oil/knock units): turb 2.56, oil -0.10, knock -0.49; fuel +8.14 %; dT onsets b 14.8 18.9 20.1 20.4
+L67_g10_G100_v130     mazda_25t    L/tau 1.57 base     52.8/   324.8 knockshare 0.84 hot  -64.9 K (0 s) cg cut 14.8/2.4 deliv 0.00/0.00
+   closed: b 5.04/15.89  a15 0.57/3.68  a30 1.10/5.44  a45 1.63/7.20  a60 2.18/8.97  a90 3.64/12.40  a130 5.04/15.55   open b 5.20
+   open a: a15 0.58  a30 1.14  a45 1.70  a60 2.29  a90 3.87  a130 5.18   open c: c15 18.97  c30 30.85  c45 38.94  c60 44.90  c90 54.06  c130 59.50
+   split b (turb/oil/knock units): turb 2.80, oil -0.14, knock 48.94; fuel +8.15 %; dT onsets b 3.1 7.9 8.8 8.9
+L67_g10_G100_v130     honda_l15b7  L/tau 1.41 base    152.7/   154.8 knockshare 0.01 hot  -30.9 K (0 s) cg cut -2.2/-2.1 deliv 0.00/0.00
+   closed: b 8.75/8.63  a15 1.38/1.36  a30 2.65/2.62  a45 3.94/3.88  a60 5.27/5.20  a90 8.29/8.18  a130 8.68/8.56   open b 8.62
+   open a: a15 1.30  a30 2.59  a45 3.89  a60 5.24  a90 8.33  a130 8.55   open c: c15 28.59  c30 46.91  c45 59.53  c60 68.73  c90 81.32  c130 86.98
+   split b (turb/oil/knock units): turb 13.48, oil -0.11, knock 0.00; fuel +5.59 %; dT onsets b 7.3 8.9 9.5 9.6
+L67_g10_G100_v130     ford_27tt    L/tau 1.00 base    124.4/   149.3 knockshare 0.17 hot  -20.4 K (0 s) cg cut 4.3/3.6 deliv 0.00/0.00
+   closed: b 3.39/2.82  a15 0.53/0.45  a30 1.00/0.83  a45 1.45/1.21  a60 1.92/1.60  a90 2.95/2.45  a130 3.36/2.80   open b 3.39
+   open a: a15 0.49  a30 0.97  a45 1.44  a60 1.91  a90 2.98  a130 3.36   open c: c15 27.39  c30 44.91  c45 56.74  c60 65.12  c90 76.19  c130 81.41
+   split b (turb/oil/knock units): turb 4.33, oil -0.11, knock 0.00; fuel +5.58 %; dT onsets b 2.6 3.1 3.4 3.5
+L67_g10_G200_v100     b58          L/tau 1.42 base      9.5/    12.0 knockshare 0.20 hot -234.1 K (0 s) cg cut 2.0/-1.2 deliv 0.00/0.00
+   closed: b -0.20/-0.14   open b 0.66
+   open a: a15 0.06  a30 0.11  a45 0.15  a60 0.20  a90 0.28  a130 0.39   open c: c15 1.34  c30 2.27  c45 2.94  c60 3.45  c90 4.13  c130 4.69
+   split b (turb/oil/knock units): turb 0.06, oil -0.08, knock 0.00; fuel +10.47 %; dT onsets b 5.1 10.4 11.5
+L67_g10_G200_v100     mazda_25t    L/tau 1.57 base     10.6/   118.3 knockshare 0.91 hot -204.8 K (0 s) cg cut 1.8/1.2 deliv 0.00/0.00
+   closed: b -0.54/1.47   open b 0.32
+   open a: a15 0.00  a30 0.01  a45 0.02  a60 0.02  a90 0.04  a130 0.08   open c: c15 2.15  c30 3.76  c45 4.98  c60 5.93  c90 7.32  c130 8.56
+   split b (turb/oil/knock units): turb 0.03, oil -0.09, knock 1.80; fuel +9.93 %; dT onsets b -1.1 2.0 2.5
+L67_g10_G200_v100     honda_l15b7  L/tau 1.41 base     19.9/    19.9 knockshare 0.00 hot -124.4 K (0 s) cg cut -0.4/-0.4 deliv 0.00/0.00
+   closed: b 3.03/3.03   open b 3.27
+   open a: a15 0.26  a30 0.51  a45 0.74  a60 0.97  a90 1.42  a130 2.02   open c: c15 9.68  c30 17.06  c45 22.80  c60 27.38  c90 34.16  c130 40.31
+   split b (turb/oil/knock units): turb 0.66, oil -0.06, knock 0.00; fuel +7.21 %; dT onsets b 2.7 5.2 5.9
+L67_g10_G200_v100     ford_27tt    L/tau 1.00 base     11.3/    19.1 knockshare 0.41 hot -190.4 K (0 s) cg cut 8.5/5.7 deliv 1.00/0.00
+   closed: b -0.59/-0.35   open b 0.03
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.01   open c: c15 1.97  c30 3.52  c45 4.77  c60 5.79  c90 7.35  c130 8.80
+   split b (turb/oil/knock units): turb 0.00, oil -0.07, knock 0.00; fuel +7.63 %; dT onsets b -0.4 0.1 0.2
+L67_g10_G200_v115     b58          L/tau 1.42 base     12.1/    13.7 knockshare 0.11 hot -166.9 K (0 s) cg cut 7.1/6.1 deliv 0.00/0.00
+   closed: b 2.44/2.16   open b 3.27
+   open a: a15 0.31  a30 0.59  a45 0.84  a60 1.08  a90 1.49  a130 2.00   open c: c15 5.33  c30 8.78  c45 11.14  c60 12.80  c90 14.96  c130 16.62
+   split b (turb/oil/knock units): turb 0.40, oil -0.11, knock 0.00; fuel +10.90 %; dT onsets b 10.4 17.5 18.5
+L67_g10_G200_v115     mazda_25t    L/tau 1.57 base     15.0/   158.7 knockshare 0.91 hot -141.5 K (0 s) cg cut 5.3/5.1 deliv 0.00/0.00
+   closed: b 1.49/7.64   open b 2.22
+   open a: a15 0.16  a30 0.30  a45 0.43  a60 0.56  a90 0.79  a130 1.10   open c: c15 6.76  c30 11.52  c45 14.99  c60 17.61  c90 21.25  c130 24.36
+   split b (turb/oil/knock units): turb 0.34, oil -0.11, knock 11.89; fuel +9.95 %; dT onsets b 2.8 7.0 7.5
+L67_g10_G200_v115     honda_l15b7  L/tau 1.41 base     41.5/    43.0 knockshare 0.03 hot  -80.9 K (0 s) cg cut -2.3/-2.2 deliv 0.00/0.00
+   closed: b 5.25/5.07   open b 5.36
+   open a: a15 0.44  a30 0.86  a45 1.26  a60 1.64  a90 2.38  a130 3.39   open c: c15 16.41  c30 28.22  c45 37.01  c60 43.75  c90 53.38  c130 61.73
+   split b (turb/oil/knock units): turb 2.27, oil -0.09, knock 0.00; fuel +7.34 %; dT onsets b 3.4 6.8 7.4
+L67_g10_G200_v115     ford_27tt    L/tau 1.00 base     20.2/    37.8 knockshare 0.47 hot -118.3 K (0 s) cg cut 3.2/1.7 deliv 0.00/0.00
+   closed: b 0.52/0.28   open b 0.99
+   open a: a15 0.07  a30 0.13  a45 0.20  a60 0.26  a90 0.38  a130 0.54   open c: c15 10.55  c30 18.27  c45 24.07  c60 28.53  c90 34.85  c130 40.21
+   split b (turb/oil/knock units): turb 0.20, oil -0.10, knock 0.00; fuel +7.41 %; dT onsets b 0.5 1.5 1.7
+L67_g10_G200_v130     b58          L/tau 1.42 base     18.8/    21.1 knockshare 0.11 hot -112.3 K (0 s) cg cut 16.5/10.2 deliv 0.00/0.00
+   closed: b 6.50/4.18   open b 7.04
+   open a: a15 0.70  a30 1.33  a45 1.88  a60 2.38  a90 3.25  a130 4.27   open c: c15 10.09  c30 16.52  c45 20.85  c60 23.90  c90 27.82  c130 30.85
+   split b (turb/oil/knock units): turb 1.34, oil -0.12, knock -0.34; fuel +10.68 %; dT onsets b 14.8 22.9 23.7
+L67_g10_G200_v130     mazda_25t    L/tau 1.57 base     33.0/   264.0 knockshare 0.87 hot  -80.7 K (0 s) cg cut 11.4/1.6 deliv 0.00/0.00
+   closed: b 3.89/21.31   open b 4.30
+   open a: a15 0.30  a30 0.57  a45 0.81  a60 1.04  a90 1.45  a130 1.98   open c: c15 14.54  c30 23.94  c45 30.37  c60 34.99  c90 41.11  c130 46.10
+   split b (turb/oil/knock units): turb 1.44, oil -0.16, knock 54.97; fuel +10.66 %; dT onsets b 3.1 8.0 8.4
+L67_g10_G200_v130     honda_l15b7  L/tau 1.41 base    103.4/   105.5 knockshare 0.02 hot  -41.6 K (0 s) cg cut -2.7/-2.6 deliv 0.00/0.00
+   closed: b 10.43/10.22   open b 10.40
+   open a: a15 0.89  a30 1.72  a45 2.51  a60 3.27  a90 4.72  a130 6.68   open c: c15 22.55  c30 37.64  c45 48.35  c60 56.32  c90 67.36  c130 76.67
+   split b (turb/oil/knock units): turb 10.90, oil -0.12, knock 0.00; fuel +7.57 %; dT onsets b 7.3 11.9 12.4
+L67_g10_G200_v130     ford_27tt    L/tau 1.00 base     62.0/    86.9 knockshare 0.29 hot  -47.4 K (0 s) cg cut 3.3/2.4 deliv 0.00/0.00
+   closed: b 3.48/2.49   open b 3.63
+   open a: a15 0.33  a30 0.63  a45 0.91  a60 1.18  a90 1.68  a130 2.30   open c: c15 20.91  c30 35.02  c45 44.91  c60 52.10  c90 61.65  c130 69.15
+   split b (turb/oil/knock units): turb 2.29, oil -0.13, knock 0.00; fuel +7.38 %; dT onsets b 2.6 4.0 4.3
+L67_g10_G50_v100      b58          L/tau 1.42 base     15.2/    17.7 knockshare 0.14 hot -169.5 K (0 s) cg cut 11.5/6.0 deliv 0.00/0.00
+   closed: b 2.05/1.79   open b 2.39
+   open a: a15 0.60  a30 1.21  a45 1.98  a60 2.34  a90 2.36  a130 2.38   open c: c15 8.68  c30 14.25  c45 18.53  c60 21.30  c90 21.40  c130 21.50
+   split b (turb/oil/knock units): turb 0.38, oil -0.07, knock 0.00; fuel +5.67 %; dT onsets b 5.1 6.3 7.4 7.9 8.1 8.1
+L67_g10_G50_v100      mazda_25t    L/tau 1.57 base     20.1/   209.6 knockshare 0.90 hot -147.6 K (0 s) cg cut 8.1/-0.2 deliv 0.00/0.00
+   closed: b 1.30/1.81   open b 1.64
+   open a: a15 0.33  a30 0.72  a45 1.25  a60 1.66  a90 1.65  a130 1.65   open c: c15 11.10  c30 19.06  c45 26.24  c60 32.08  c90 32.27  c130 32.45
+   split b (turb/oil/knock units): turb 0.33, oil -0.07, knock 3.53; fuel +5.35 %; dT onsets b -1.1 1.7 3.0 3.4 3.6 3.6
+L67_g10_G50_v100      honda_l15b7  L/tau 1.41 base     74.7/    74.7 knockshare 0.00 hot  -69.1 K (0 s) cg cut 2.3/2.3 deliv 0.00/0.00
+   closed: b 3.65/3.65   open b 3.54
+   open a: a15 1.01  a30 2.07  a45 3.39  a60 3.45  a90 3.48  a130 3.52   open c: c15 23.08  c30 39.73  c45 54.41  c60 65.58  c90 66.03  c130 66.47
+   split b (turb/oil/knock units): turb 2.78, oil -0.05, knock 0.00; fuel +3.79 %; dT onsets b 2.7 2.7 3.2 3.4 3.5 3.6
+L67_g10_G50_v100      ford_27tt    L/tau 1.00 base     31.9/    39.8 knockshare 0.20 hot -108.7 K (0 s) cg cut 33.0/27.1 deliv 1.00/0.00
+   closed: b 0.15/0.12   open b 0.32
+   open a: a15 0.05  a30 0.11  a45 0.23  a60 0.33  a90 0.32  a130 0.32   open c: c15 9.52  c30 16.47  c45 22.49  c60 27.45  c90 27.68  c130 27.92
+   split b (turb/oil/knock units): turb 0.10, oil -0.06, knock 0.00; fuel +4.11 %; dT onsets b -0.4 0.1 0.4 0.6 0.7 0.7
+L67_g10_G50_v115      b58          L/tau 1.42 base     29.4/    31.0 knockshare 0.05 hot -115.0 K (0 s) cg cut 22.7/21.4 deliv 0.00/0.00
+   closed: b 5.57/5.29   open b 5.64
+   open a: a15 1.48  a30 2.97  a45 4.77  a60 5.52  a90 5.57  a130 5.61   open c: c15 17.40  c30 27.55  c45 34.69  c60 38.61  c90 38.77  c130 38.91
+   split b (turb/oil/knock units): turb 1.72, oil -0.08, knock 0.00; fuel +5.98 %; dT onsets b 10.4 10.6 11.3 11.7 11.8 11.8
+L67_g10_G50_v115      mazda_25t    L/tau 1.57 base     43.8/   319.3 knockshare 0.86 hot  -94.9 K (0 s) cg cut 14.2/6.7 deliv 0.00/0.00
+   closed: b 3.88/8.10   open b 3.98
+   open a: a15 0.92  a30 1.90  a45 3.19  a60 3.94  a90 3.95  a130 3.97   open c: c15 18.50  c30 31.01  c45 42.32  c60 50.08  c90 50.33  c130 50.56
+   split b (turb/oil/knock units): turb 1.79, oil -0.09, knock 24.16; fuel +5.41 %; dT onsets b 2.8 4.8 5.8 6.2 6.2 6.3
+L67_g10_G50_v115      honda_l15b7  L/tau 1.41 base    142.0/   143.5 knockshare 0.01 hot  -43.8 K (0 s) cg cut -0.4/-0.4 deliv 0.00/0.00
+   closed: b 4.12/4.08   open b 3.95
+   open a: a15 1.26  a30 2.61  a45 4.18  a60 3.84  a90 3.88  a130 3.93   open c: c15 29.49  c30 49.27  c45 65.31  c60 75.44  c90 75.91  c130 76.33
+   split b (turb/oil/knock units): turb 5.94, oil -0.09, knock 0.00; fuel +3.91 %; dT onsets b 3.4 3.3 3.7 3.9 4.0 4.0
+L67_g10_G50_v115      ford_27tt    L/tau 1.00 base     95.4/   113.0 knockshare 0.16 hot  -49.8 K (0 s) cg cut 7.3/6.1 deliv 0.00/0.00
+   closed: b 1.39/1.17   open b 1.42
+   open a: a15 0.35  a30 0.72  a45 1.22  a60 1.40  a90 1.41  a130 1.41   open c: c15 26.18  c30 43.73  c45 57.64  c60 67.21  c90 67.62  c130 68.01
+   split b (turb/oil/knock units): turb 1.40, oil -0.08, knock 0.00; fuel +3.96 %; dT onsets b 0.5 0.9 1.1 1.3 1.4 1.4
+L67_g10_G50_v130      b58          L/tau 1.42 base     67.9/    70.5 knockshare 0.04 hot  -66.5 K (0 s) cg cut 32.1/27.7 deliv 0.00/0.00
+   closed: b 8.00/6.51  a15 2.11/0.97  a30 4.13/2.92  a45 6.57/5.27  a60 7.86/6.38  a90 7.92/6.44  a130 7.97/6.49   open b 7.94
+   open a: a15 2.06  a30 4.13  a45 6.58  a60 7.78  a90 7.85  a130 7.91   open c: c15 20.89  c30 33.05  c45 42.11  c60 47.00  c90 47.17  c130 47.31
+   split b (turb/oil/knock units): turb 5.52, oil -0.10, knock -0.84; fuel +5.86 %; dT onsets b 14.8 14.0 14.6 14.8 14.9 14.9
+L67_g10_G50_v130      mazda_25t    L/tau 1.57 base    113.3/   481.4 knockshare 0.76 hot  -46.8 K (0 s) cg cut 18.9/4.3 deliv 0.00/0.00
+   closed: b 5.18/11.56  a15 1.11/3.95  a30 2.27/5.97  a45 3.94/7.51  a60 5.15/10.06  a90 5.17/10.61  a130 5.18/11.33   open b 5.13
+   open a: a15 1.11  a30 2.32  a45 4.06  a60 5.08  a90 5.10  a130 5.12   open c: c15 24.89  c30 40.15  c45 52.93  c60 60.02  c90 60.32  c130 60.55
+   split b (turb/oil/knock units): turb 6.00, oil -0.13, knock 49.78; fuel +5.87 %; dT onsets b 3.1 6.2 7.2 7.5 7.5 7.5
+L67_g10_G50_v130      honda_l15b7  L/tau 1.41 base    272.7/   274.8 knockshare 0.01 hot  -20.0 K (0 s) cg cut -1.1/-1.1 deliv 0.00/0.00
+   closed: b 6.23/6.18  a15 2.02/2.00  a30 4.03/4.00  a45 6.34/6.29  a60 6.00/5.96  a90 6.09/6.05  a130 6.18/6.13   open b 5.98
+   open a: a15 1.93  a30 3.98  a45 6.07  a60 5.76  a90 5.85  a130 5.94   open c: c15 36.08  c30 58.01  c45 74.00  c60 82.31  c90 82.81  c130 83.20
+   split b (turb/oil/knock units): turb 17.10, oil -0.12, knock 0.00; fuel +3.98 %; dT onsets b 7.3 5.8 5.9 6.0 6.0 6.0
+L67_g10_G50_v130      ford_27tt    L/tau 1.00 base    333.9/   358.8 knockshare 0.07 hot   +7.3 K (49 s) cg cut 5.5/5.1 deliv 0.00/0.00
+   closed: b 2.74/2.55  a15 0.80/0.74  a30 1.55/1.45  a45 2.48/2.31  a60 2.66/2.47  a90 2.69/2.50  a130 2.72/2.53   open b 2.65
+   open a: a15 0.74  a30 1.51  a45 2.44  a60 2.56  a90 2.60  a130 2.63   open c: c15 34.87  c30 55.89  c45 71.15  c60 79.32  c90 79.69  c130 80.02
+   split b (turb/oil/knock units): turb 9.26, oil -0.11, knock 0.00; fuel +3.99 %; dT onsets b 2.6 2.3 2.3 2.4 2.4 2.4
+L67_g12_G100_v100     b58          L/tau 1.42 base     16.1/    18.7 knockshare 0.14 hot -129.6 K (0 s) cg cut 31.4/16.4 deliv 1.00/0.00
+   closed: b 1.36/1.20   open b 1.77
+   open a: a15 0.23  a30 0.45  a45 0.67  a60 0.89  a90 1.40  a130 1.76   open c: c15 4.11  c30 6.88  c45 8.85  c60 10.31  c90 12.40  c130 13.67
+   split b (turb/oil/knock units): turb 0.29, oil -0.07, knock 0.01; fuel +7.70 %; dT onsets b 5.1 9.3 10.9 11.4
+L67_g12_G100_v100     mazda_25t    L/tau 1.57 base     17.8/   137.8 knockshare 0.87 hot -128.7 K (0 s) cg cut 8.7/2.8 deliv 0.00/0.00
+   closed: b 1.25/4.53   open b 1.68
+   open a: a15 0.14  a30 0.29  a45 0.46  a60 0.64  a90 1.17  a130 1.69   open c: c15 7.78  c30 13.54  c45 18.00  c60 21.60  c90 27.61  c130 32.88
+   split b (turb/oil/knock units): turb 0.30, oil -0.08, knock 6.02; fuel +6.84 %; dT onsets b -1.1 2.9 4.2 4.5
+L67_g12_G100_v100     honda_l15b7  L/tau 1.41 base     45.1/    45.1 knockshare 0.00 hot  -77.0 K (0 s) cg cut -1.1/-1.1 deliv 0.00/0.00
+   closed: b 3.79/3.79   open b 3.81
+   open a: a15 0.55  a30 1.10  a45 1.65  a60 2.24  a90 3.61  a130 3.78   open c: c15 15.57  c30 27.42  c45 36.76  c60 44.37  c90 56.53  c130 65.94
+   split b (turb/oil/knock units): turb 1.77, oil -0.06, knock 0.00; fuel +4.60 %; dT onsets b 2.7 3.9 4.6 4.9
+L67_g12_G100_v100     ford_27tt    L/tau 1.00 base     16.8/    24.4 knockshare 0.31 hot -140.2 K (0 s) cg cut 4.1/2.8 deliv 0.00/0.00
+   closed: b -0.06/-0.04   open b 0.31
+   open a: a15 0.02  a30 0.04  a45 0.07  a60 0.10  a90 0.18  a130 0.32   open c: c15 7.60  c30 13.51  c45 18.21  c60 22.06  c90 28.12  c130 32.92
+   split b (turb/oil/knock units): turb 0.05, oil -0.06, knock 0.00; fuel +5.05 %; dT onsets b -0.4 0.2 0.5 0.7
+L67_g12_G100_v115     b58          L/tau 1.42 base     34.6/    36.1 knockshare 0.04 hot  -75.5 K (0 s) cg cut 25.8/23.0 deliv 0.00/0.00
+   closed: b 7.00/6.71   open b 7.12
+   open a: a15 1.00  a30 1.92  a45 2.81  a60 3.69  a90 5.76  a130 7.08   open c: c15 13.86  c30 22.84  c45 29.02  c60 33.55  c90 40.17  c130 44.14
+   split b (turb/oil/knock units): turb 2.52, oil -0.09, knock 0.00; fuel +7.49 %; dT onsets b 10.4 15.1 16.5 16.8
+L67_g12_G100_v115     mazda_25t    L/tau 1.57 base     38.6/   221.5 knockshare 0.83 hot  -75.4 K (0 s) cg cut 15.1/1.4 deliv 0.00/0.00
+   closed: b 4.11/5.02   open b 4.30
+   open a: a15 0.48  a30 0.95  a45 1.42  a60 1.92  a90 3.23  a130 4.29   open c: c15 13.09  c30 22.31  c45 29.16  c60 34.56  c90 43.58  c130 51.11
+   split b (turb/oil/knock units): turb 1.69, oil -0.10, knock 9.53; fuel +6.95 %; dT onsets b 2.8 7.1 8.1 8.3
+L67_g12_G100_v115     honda_l15b7  L/tau 1.41 base     88.9/    90.4 knockshare 0.02 hot  -48.2 K (0 s) cg cut -3.5/-3.4 deliv 0.00/0.00
+   closed: b 4.88/4.80   open b 4.84
+   open a: a15 0.72  a30 1.44  a45 2.17  a60 2.95  a90 4.84  a130 4.81   open c: c15 20.85  c30 35.86  c45 47.19  c60 56.14  c90 69.97  c130 78.84
+   split b (turb/oil/knock units): turb 4.43, oil -0.09, knock 0.00; fuel +4.73 %; dT onsets b 3.4 5.1 5.8 6.0
+L67_g12_G100_v115     ford_27tt    L/tau 1.00 base    102.5/   120.1 knockshare 0.15 hot  -20.5 K (0 s) cg cut 7.8/6.7 deliv 0.02/0.00
+   closed: b 1.57/1.34   open b 1.62
+   open a: a15 0.20  a30 0.41  a45 0.61  a60 0.83  a90 1.35  a130 1.62   open c: c15 18.95  c30 32.68  c45 42.99  c60 51.02  c90 63.20  c130 71.82
+   split b (turb/oil/knock units): turb 1.70, oil -0.09, knock 0.00; fuel +4.91 %; dT onsets b 0.5 1.3 1.7 1.9
+L67_g12_G100_v130     b58          L/tau 1.42 base     76.9/    80.9 knockshare 0.05 hot  -32.2 K (0 s) cg cut 33.2/28.7 deliv 0.00/0.00
+   closed: b 9.03/7.59  a15 1.32/0.26  a30 2.47/1.36  a45 3.55/2.39  a60 4.61/3.40  a90 7.11/5.78  a130 8.98/7.55   open b 9.00
+   open a: a15 1.27  a30 2.44  a45 3.53  a60 4.61  a90 7.22  a130 8.95   open c: c15 15.39  c30 25.28  c45 32.08  c60 37.10  c90 44.76  c130 49.76
+   split b (turb/oil/knock units): turb 7.05, oil -0.10, knock -0.81; fuel +7.37 %; dT onsets b 14.8 19.6 20.7 21.0
+L67_g12_G100_v130     mazda_25t    L/tau 1.57 base    100.5/   371.5 knockshare 0.73 hot  -27.1 K (0 s) cg cut 19.9/-3.1 deliv 0.00/0.00
+   closed: b 5.29/13.39  a15 0.58/2.30  a30 1.12/3.92  a45 1.64/5.55  a60 2.20/7.18  a90 3.69/10.40  a130 5.29/13.09   open b 5.33
+   open a: a15 0.57  a30 1.12  a45 1.66  a60 2.24  a90 3.84  a130 5.32   open c: c15 17.84  c30 29.39  c45 37.49  c60 43.64  c90 53.75  c130 60.90
+   split b (turb/oil/knock units): turb 5.46, oil -0.14, knock 44.44; fuel +7.56 %; dT onsets b 3.1 8.6 9.4 9.6
+L67_g12_G100_v130     honda_l15b7  L/tau 1.41 base    234.7/   301.5 knockshare 0.22 hot   -8.1 K (0 s) cg cut -2.0/13.5 deliv 0.00/0.00
+   closed: b 8.33/6.49  a15 1.31/1.02  a30 2.51/1.95  a45 3.72/2.90  a60 4.98/3.88  a90 7.93/6.17  a130 8.27/6.44   open b 8.19
+   open a: a15 1.23  a30 2.44  a45 3.67  a60 4.95  a90 7.96  a130 8.13   open c: c15 26.73  c30 44.31  c45 56.79  c60 66.20  c90 80.01  c130 87.21
+   split b (turb/oil/knock units): turb 19.66, oil -0.12, knock 0.01; fuel +5.12 %; dT onsets b 7.3 9.0 9.6 9.7
+L67_g12_G100_v130     ford_27tt    L/tau 1.00 base    145.4/   170.3 knockshare 0.15 hot  -13.4 K (0 s) cg cut 9.4/8.0 deliv 0.00/0.00
+   closed: b 3.26/2.78  a15 0.48/0.41  a30 0.89/0.76  a45 1.30/1.11  a60 1.71/1.46  a90 2.65/2.27  a130 3.23/2.76   open b 3.27
+   open a: a15 0.44  a30 0.87  a45 1.29  a60 1.71  a90 2.69  a130 3.24   open c: c15 24.55  c30 40.61  c45 51.68  c60 59.70  c90 70.68  c130 76.39
+   split b (turb/oil/knock units): turb 4.86, oil -0.12, knock 0.00; fuel +5.50 %; dT onsets b 2.6 3.2 3.5 3.5
+L67_g12_G200_v100     b58          L/tau 1.42 base     11.6/    14.2 knockshare 0.18 hot -164.0 K (0 s) cg cut 15.7/3.8 deliv 1.00/0.00
+   closed: b 0.28/0.26   open b 1.00
+   open a: a15 0.08  a30 0.16  a45 0.22  a60 0.29  a90 0.41  a130 0.56   open c: c15 1.89  c30 3.22  c45 4.19  c60 4.92  c90 5.91  c130 6.73
+   split b (turb/oil/knock units): turb 0.12, oil -0.09, knock 0.00; fuel +10.19 %; dT onsets b 5.1 11.1 12.2
+L67_g12_G200_v100     mazda_25t    L/tau 1.57 base     12.8/   109.1 knockshare 0.88 hot -157.9 K (0 s) cg cut 4.5/2.6 deliv 0.00/0.00
+   closed: b 0.01/3.83   open b 0.73
+   open a: a15 0.01  a30 0.03  a45 0.05  a60 0.07  a90 0.12  a130 0.20   open c: c15 3.86  c30 6.78  c45 9.04  c60 10.82  c90 13.45  c130 15.82
+   split b (turb/oil/knock units): turb 0.09, oil -0.09, knock 4.17; fuel +9.18 %; dT onsets b -1.1 2.6 3.2
+L67_g12_G200_v100     honda_l15b7  L/tau 1.41 base     25.8/    25.8 knockshare -0.00 hot -103.5 K (0 s) cg cut -1.8/-1.8 deliv 0.00/0.00
+   closed: b 3.30/3.30   open b 3.48
+   open a: a15 0.28  a30 0.55  a45 0.80  a60 1.05  a90 1.53  a130 2.18   open c: c15 10.27  c30 18.25  c45 24.58  c60 29.70  c90 37.45  c130 44.71
+   split b (turb/oil/knock units): turb 0.91, oil -0.06, knock 0.00; fuel +6.29 %; dT onsets b 2.7 5.3 5.9
+L67_g12_G200_v100     ford_27tt    L/tau 1.00 base     12.2/    19.8 knockshare 0.39 hot -179.9 K (0 s) cg cut 2.1/1.3 deliv 0.00/0.00
+   closed: b -0.51/-0.31   open b 0.09
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 0.00   open c: c15 3.14  c30 5.64  c45 7.67  c60 9.34  c90 11.92  c130 14.38
+   split b (turb/oil/knock units): turb 0.01, oil -0.07, knock 0.00; fuel +6.83 %; dT onsets b -0.4 0.2 0.4
+L67_g12_G200_v115     b58          L/tau 1.42 base     20.0/    21.6 knockshare 0.07 hot -102.1 K (0 s) cg cut 17.3/14.0 deliv 0.00/0.00
+   closed: b 5.34/4.97   open b 5.79
+   open a: a15 0.54  a30 1.03  a45 1.47  a60 1.87  a90 2.57  a130 3.41   open c: c15 9.24  c30 15.47  c45 19.84  c60 23.01  c90 27.22  c130 30.55
+   split b (turb/oil/knock units): turb 1.18, oil -0.11, knock 0.00; fuel +9.98 %; dT onsets b 10.4 18.4 19.3
+L67_g12_G200_v115     mazda_25t    L/tau 1.57 base     22.9/   163.0 knockshare 0.86 hot  -98.2 K (0 s) cg cut 10.5/0.5 deliv 0.00/0.00
+   closed: b 2.72/4.54   open b 3.18
+   open a: a15 0.21  a30 0.41  a45 0.59  a60 0.76  a90 1.08  a130 1.50   open c: c15 8.96  c30 15.43  c45 20.24  c60 23.92  c90 29.13  c130 33.63
+   split b (turb/oil/knock units): turb 0.74, oil -0.11, knock 6.79; fuel +9.27 %; dT onsets b 2.8 7.6 8.1
+L67_g12_G200_v115     honda_l15b7  L/tau 1.41 base     53.1/    54.6 knockshare 0.03 hot  -65.5 K (0 s) cg cut -4.1/-3.9 deliv 0.00/0.00
+   closed: b 5.15/5.01   open b 5.23
+   open a: a15 0.43  a30 0.83  a45 1.21  a60 1.58  a90 2.30  a130 3.29   open c: c15 15.77  c30 27.39  c45 36.24  c60 43.17  c90 53.32  c130 62.51
+   split b (turb/oil/knock units): turb 2.83, oil -0.09, knock 0.00; fuel +6.48 %; dT onsets b 3.4 6.9 7.5
+L67_g12_G200_v115     ford_27tt    L/tau 1.00 base     43.5/    61.1 knockshare 0.29 hot  -57.1 K (0 s) cg cut 6.0/4.2 deliv 0.02/0.00
+   closed: b 1.18/0.84   open b 1.39
+   open a: a15 0.10  a30 0.19  a45 0.28  a60 0.36  a90 0.53  a130 0.76   open c: c15 13.66  c30 23.88  c45 31.69  c60 37.79  c90 46.59  c130 54.25
+   split b (turb/oil/knock units): turb 0.61, oil -0.10, knock 0.00; fuel +6.65 %; dT onsets b 0.5 1.7 1.9
+L67_g12_G200_v130     b58          L/tau 1.42 base     40.1/    43.5 knockshare 0.08 hot  -54.9 K (0 s) cg cut 27.1/21.1 deliv 0.00/0.00
+   closed: b 8.45/6.41   open b 8.63
+   open a: a15 0.85  a30 1.60  a45 2.27  a60 2.87  a90 3.90  a130 5.07   open c: c15 12.29  c30 20.47  c45 26.17  c60 30.30  c90 35.74  c130 40.06
+   split b (turb/oil/knock units): turb 3.51, oil -0.12, knock -0.59; fuel +9.82 %; dT onsets b 14.8 23.6 24.4
+L67_g12_G200_v130     mazda_25t    L/tau 1.57 base     58.0/   288.3 knockshare 0.80 hot  -42.9 K (0 s) cg cut 16.7/-11.3 deliv 0.00/0.00
+   closed: b 4.40/18.84   open b 4.60
+   open a: a15 0.31  a30 0.58  a45 0.83  a60 1.06  a90 1.48  a130 2.00   open c: c15 14.70  c30 24.51  c45 31.38  c60 36.39  c90 43.14  c130 48.70
+   split b (turb/oil/knock units): turb 2.71, oil -0.16, knock 51.78; fuel +10.02 %; dT onsets b 3.1 8.5 8.9
+L67_g12_G200_v130     honda_l15b7  L/tau 1.41 base    150.9/   201.6 knockshare 0.25 hot  -19.1 K (0 s) cg cut -2.8/14.8 deliv 0.00/0.00
+   closed: b 9.92/7.43   open b 9.87
+   open a: a15 0.85  a30 1.64  a45 2.38  a60 3.09  a90 4.43  a130 6.25   open c: c15 21.53  c30 36.18  c45 46.73  c60 54.67  c90 65.88  c130 75.70
+   split b (turb/oil/knock units): turb 15.10, oil -0.12, knock 0.01; fuel +7.02 %; dT onsets b 7.3 12.1 12.6
+L67_g12_G200_v130     ford_27tt    L/tau 1.00 base     72.4/    97.3 knockshare 0.26 hot  -39.0 K (0 s) cg cut 7.5/5.6 deliv 0.00/0.00
+   closed: b 3.35/2.49   open b 3.49
+   open a: a15 0.30  a30 0.57  a45 0.83  a60 1.07  a90 1.52  a130 2.10   open c: c15 19.09  c30 32.17  c45 41.47  c60 48.32  c90 57.57  c130 65.02
+   split b (turb/oil/knock units): turb 2.56, oil -0.14, knock 0.00; fuel +7.29 %; dT onsets b 2.6 4.1 4.3
+L67_g12_G50_v100      b58          L/tau 1.42 base     35.2/    37.9 knockshare 0.07 hot  -96.5 K (0 s) cg cut 50.4/37.7 deliv 1.00/0.00
+   closed: b 2.13/1.99   open b 2.24
+   open a: a15 0.54  a30 1.09  a45 1.81  a60 2.21  a90 2.22  a130 2.24   open c: c15 7.37  c30 12.18  c45 16.05  c60 18.76  c90 18.84  c130 18.91
+   split b (turb/oil/knock units): turb 0.82, oil -0.07, knock 0.01; fuel +5.49 %; dT onsets b 5.1 6.9 8.1 8.7 8.9 9.0
+L67_g12_G50_v100      mazda_25t    L/tau 1.57 base     37.2/   205.0 knockshare 0.82 hot -100.0 K (0 s) cg cut 14.7/3.5 deliv 0.00/0.00
+   closed: b 2.31/5.13   open b 2.49
+   open a: a15 0.49  a30 1.04  a45 1.86  a60 2.50  a90 2.50  a130 2.49   open c: c15 13.75  c30 24.01  c45 34.33  c60 43.55  c90 43.78  c130 43.99
+   split b (turb/oil/knock units): turb 0.93, oil -0.07, knock 9.66; fuel +4.82 %; dT onsets b -1.1 2.2 3.6 4.0 4.1 4.1
+L67_g12_G50_v100      honda_l15b7  L/tau 1.41 base    105.7/   105.7 knockshare 0.00 hot  -52.5 K (0 s) cg cut 0.7/0.7 deliv 0.00/0.00
+   closed: b 3.31/3.31   open b 3.20
+   open a: a15 0.97  a30 2.01  a45 3.37  a60 3.12  a90 3.15  a130 3.18   open c: c15 21.71  c30 38.13  c45 53.96  c60 67.47  c90 67.89  c130 68.31
+   split b (turb/oil/knock units): turb 3.56, oil -0.06, knock 0.00; fuel +3.29 %; dT onsets b 2.7 2.6 3.0 3.2 3.3 3.3
+L67_g12_G50_v100      ford_27tt    L/tau 1.00 base     37.3/    44.9 knockshare 0.17 hot -101.0 K (0 s) cg cut 7.3/6.1 deliv 0.00/0.00
+   closed: b 0.46/0.38   open b 0.61
+   open a: a15 0.10  a30 0.22  a45 0.43  a60 0.62  a90 0.62  a130 0.61   open c: c15 15.13  c30 26.65  c45 37.67  c60 47.48  c90 47.83  c130 48.19
+   split b (turb/oil/knock units): turb 0.23, oil -0.06, knock 0.00; fuel +3.55 %; dT onsets b -0.4 0.1 0.5 0.6 0.7 0.8
+L67_g12_G50_v115      b58          L/tau 1.42 base     86.6/    88.2 knockshare 0.02 hot  -48.9 K (0 s) cg cut 33.8/32.2 deliv 0.00/0.00
+   closed: b 6.82/6.70   open b 6.68
+   open a: a15 1.67  a30 3.37  a45 5.53  a60 6.57  a90 6.62  a130 6.66   open c: c15 18.83  c30 30.73  c45 40.22  c60 46.65  c90 46.83  c130 46.98
+   split b (turb/oil/knock units): turb 5.99, oil -0.09, knock 0.00; fuel +5.32 %; dT onsets b 10.4 11.0 12.0 12.3 12.4 12.4
+L67_g12_G50_v115      mazda_25t    L/tau 1.57 base     92.1/   360.9 knockshare 0.74 hot  -51.9 K (0 s) cg cut 20.1/3.5 deliv 0.00/0.00
+   closed: b 4.44/5.30   open b 4.42
+   open a: a15 0.97  a30 2.02  a45 3.48  a60 4.39  a90 4.40  a130 4.42   open c: c15 18.24  c30 31.16  c45 44.30  c60 54.09  c90 54.34  c130 54.57
+   split b (turb/oil/knock units): turb 4.19, oil -0.10, knock 15.05; fuel +4.93 %; dT onsets b 2.8 5.3 6.4 6.7 6.7 6.7
+L67_g12_G50_v115      honda_l15b7  L/tau 1.41 base    184.0/   185.5 knockshare 0.01 hot  -32.0 K (0 s) cg cut -2.1/-2.1 deliv 0.00/0.00
+   closed: b 3.71/3.68   open b 3.55
+   open a: a15 1.18  a30 2.46  a45 3.86  a60 3.46  a90 3.50  a130 3.53   open c: c15 27.23  c30 46.53  c45 63.68  c60 75.78  c90 76.24  c130 76.65
+   split b (turb/oil/knock units): turb 6.92, oil -0.10, knock 0.00; fuel +3.37 %; dT onsets b 3.4 3.1 3.6 3.7 3.8 3.8
+L67_g12_G50_v115      ford_27tt    L/tau 1.00 base    334.1/   351.7 knockshare 0.05 hot  +14.5 K (83 s) cg cut 9.4/8.9 deliv 0.02/0.00
+   closed: b 1.50/1.42   open b 1.46
+   open a: a15 0.37  a30 0.77  a45 1.31  a60 1.45  a90 1.46  a130 1.46   open c: c15 24.60  c30 42.09  c45 57.35  c60 70.19  c90 70.53  c130 70.87
+   split b (turb/oil/knock units): turb 5.08, oil -0.08, knock 0.00; fuel +3.44 %; dT onsets b 0.5 0.9 1.2 1.4 1.4 1.4
+L67_g12_G50_v130      b58          L/tau 1.42 base    199.7/   204.6 knockshare 0.02 hot   -9.2 K (0 s) cg cut 38.7/36.0 deliv 0.00/0.00
+   closed: b 7.86/7.02  a15 1.95/1.27  a30 3.86/3.14  a45 6.31/5.53  a60 7.73/6.90  a90 7.78/6.95  a130 7.83/7.00   open b 7.68
+   open a: a15 1.91  a30 3.85  a45 6.31  a60 7.55  a90 7.60  a130 7.66   open c: c15 19.02  c30 31.03  c45 41.38  c60 47.99  c90 48.16  c130 48.31
+   split b (turb/oil/knock units): turb 15.79, oil -0.10, knock -1.32; fuel +5.24 %; dT onsets b 14.8 14.2 14.9 15.1 15.2 15.2
+L67_g12_G50_v130      mazda_25t    L/tau 1.57 base    228.7/   594.7 knockshare 0.62 hot   -9.9 K (0 s) cg cut 23.4/4.0 deliv 0.00/0.00
+   closed: b 5.18/9.27  a15 1.07/2.63  a30 2.19/4.50  a45 3.86/6.03  a60 5.15/8.05  a90 5.16/8.49  a130 5.17/9.08   open b 5.08
+   open a: a15 1.06  a30 2.21  a45 3.94  a60 5.04  a90 5.06  a130 5.07   open c: c15 22.37  c30 36.82  c45 50.24  c60 58.56  c90 58.85  c130 59.08
+   split b (turb/oil/knock units): turb 11.98, oil -0.13, knock 43.27; fuel +5.38 %; dT onsets b 3.1 6.8 7.8 8.0 8.0 8.0
+L67_g12_G50_v130      honda_l15b7  L/tau 1.41 base    437.8/   537.0 knockshare 0.18 hot   +2.9 K (55 s) cg cut -0.5/12.3 deliv 0.00/0.00
+   closed: b 5.86/4.78  a15 1.90/1.55  a30 3.82/3.12  a45 5.96/4.86  a60 5.67/4.62  a90 5.75/4.69  a130 5.82/4.75   open b 5.62
+   open a: a15 1.83  a30 3.78  a45 5.67  a60 5.43  a90 5.51  a130 5.58   open c: c15 33.54  c30 54.87  c45 71.71  c60 81.50  c90 81.98  c130 82.36
+   split b (turb/oil/knock units): turb 25.77, oil -0.13, knock 0.01; fuel +3.60 %; dT onsets b 7.3 5.7 5.9 6.0 6.0 6.0
+L67_g12_G50_v130      ford_27tt    L/tau 1.00 base    382.1/   407.0 knockshare 0.06 hot  +12.2 K (92 s) cg cut 11.3/10.6 deliv 0.00/0.00
+   closed: b 2.68/2.52  a15 0.70/0.66  a30 1.37/1.29  a45 2.21/2.07  a60 2.61/2.45  a90 2.64/2.48  a130 2.67/2.50   open b 2.61
+   open a: a15 0.65  a30 1.34  a45 2.17  a60 2.53  a90 2.56  a130 2.59   open c: c15 31.00  c30 50.31  c45 64.88  c60 73.70  c90 74.03  c130 74.33
+   split b (turb/oil/knock units): turb 10.38, oil -0.12, knock 0.00; fuel +3.92 %; dT onsets b 2.6 2.4 2.4 2.5 2.5 2.5
+L67_g8_G100_v100      b58          L/tau 1.42 base      8.9/    11.3 knockshare 0.21 hot -274.5 K (0 s) cg cut 1.3/1.0 deliv 0.00/0.00
+   closed: b -0.33/-0.26   open b 0.43
+   open a: a15 0.06  a30 0.12  a45 0.17  a60 0.23  a90 0.36  a130 0.43   open c: c15 1.21  c30 1.99  c45 2.52  c60 2.89  c90 3.36  c130 3.57
+   split b (turb/oil/knock units): turb 0.04, oil -0.07, knock 0.00; fuel +8.91 %; dT onsets b 5.1 7.9 9.2 9.6
+L67_g8_G100_v100      mazda_25t    L/tau 1.57 base     11.4/    55.1 knockshare 0.79 hot -184.7 K (0 s) cg cut 3.7/-0.3 deliv 0.00/0.00
+   closed: b 0.09/1.73   open b 0.74
+   open a: a15 0.06  a30 0.14  a45 0.21  a60 0.30  a90 0.55  a130 0.74   open c: c15 4.76  c30 8.14  c45 10.65  c60 12.59  c90 15.54  c130 17.45
+   split b (turb/oil/knock units): turb 0.09, oil -0.08, knock 0.94; fuel +8.01 %; dT onsets b -1.1 2.0 3.2 3.6
+L67_g8_G100_v100      honda_l15b7  L/tau 1.41 base     21.9/    21.9 knockshare 0.00 hot -125.2 K (0 s) cg cut 0.9/0.9 deliv 0.00/0.00
+   closed: b 3.37/3.37   open b 3.49
+   open a: a15 0.48  a30 0.96  a45 1.44  a60 1.93  a90 3.03  a130 3.45   open c: c15 14.58  c30 25.05  c45 32.80  c60 38.73  c90 47.19  c130 51.92
+   split b (turb/oil/knock units): turb 0.79, oil -0.05, knock 0.00; fuel +6.16 %; dT onsets b 2.7 4.0 4.7 5.0
+L67_g8_G100_v100      ford_27tt    L/tau 1.00 base     10.7/    18.5 knockshare 0.42 hot -210.9 K (0 s) cg cut 1.8/2.2 deliv 0.00/0.00
+   closed: b -0.48/-0.28   open b 0.08
+   open a: a15 0.00  a30 0.00  a45 0.01  a60 0.02  a90 0.03  a130 0.08   open c: c15 3.53  c30 6.19  c45 8.25  c60 9.88  c90 12.30  c130 13.77
+   split b (turb/oil/knock units): turb 0.01, oil -0.06, knock 0.00; fuel +6.13 %; dT onsets b -0.4 0.0 0.3 0.4
+L67_g8_G100_v115      b58          L/tau 1.42 base     10.5/    12.1 knockshare 0.13 hot -208.5 K (0 s) cg cut 4.7/4.1 deliv 0.00/0.00
+   closed: b 1.53/1.34   open b 2.32
+   open a: a15 0.34  a30 0.67  a45 0.98  a60 1.29  a90 1.96  a130 2.30   open c: c15 5.10  c30 8.08  c45 9.96  c60 11.20  c90 12.69  c130 13.24
+   split b (turb/oil/knock units): turb 0.25, oil -0.09, knock 0.00; fuel +9.26 %; dT onsets b 10.4 13.6 14.9 15.2
+L67_g8_G100_v115      mazda_25t    L/tau 1.57 base     20.6/    50.7 knockshare 0.59 hot -117.5 K (0 s) cg cut 10.3/3.5 deliv 0.00/0.00
+   closed: b 3.15/9.44   open b 3.54
+   open a: a15 0.43  a30 0.86  a45 1.28  a60 1.71  a90 2.80  a130 3.53   open c: c15 12.50  c30 20.84  c45 26.73  c60 31.13  c90 37.73  c130 41.82
+   split b (turb/oil/knock units): turb 0.74, oil -0.09, knock 4.13; fuel +8.05 %; dT onsets b 2.8 6.4 7.5 7.7
+L67_g8_G100_v115      honda_l15b7  L/tau 1.41 base     50.9/    52.3 knockshare 0.03 hot  -77.6 K (0 s) cg cut 0.8/0.8 deliv 0.00/0.00
+   closed: b 5.55/5.39   open b 5.51
+   open a: a15 0.80  a30 1.59  a45 2.38  a60 3.20  a90 5.06  a130 5.47   open c: c15 23.84  c30 39.65  c45 50.64  c60 58.60  c90 69.23  c130 74.17
+   split b (turb/oil/knock units): turb 2.89, oil -0.07, knock 0.00; fuel +6.45 %; dT onsets b 3.4 5.1 6.0 6.3
+L67_g8_G100_v115      ford_27tt    L/tau 1.00 base     18.6/    36.2 knockshare 0.49 hot -137.3 K (0 s) cg cut 4.3/2.2 deliv 0.00/0.00
+   closed: b 0.54/0.28   open b 0.96
+   open a: a15 0.11  a30 0.22  a45 0.34  a60 0.46  a90 0.74  a130 0.96   open c: c15 13.42  c30 22.55  c45 28.99  c60 33.67  c90 39.90  c130 42.85
+   split b (turb/oil/knock units): turb 0.18, oil -0.08, knock 0.00; fuel +6.39 %; dT onsets b 0.5 1.1 1.5 1.6
+L67_g8_G100_v130      b58          L/tau 1.42 base     31.3/    33.2 knockshare 0.06 hot  -84.0 K (0 s) cg cut 45.6/42.0 deliv 1.00/0.00
+   closed: b 5.27/4.68   open b 5.46
+   open a: a15 0.84  a30 1.60  a45 2.32  a60 3.02  a90 4.58  a130 5.43   open c: c15 10.07  c30 15.84  c45 19.43  c60 21.82  c90 24.83  c130 26.09
+   split b (turb/oil/knock units): turb 1.75, oil -0.10, knock -0.09; fuel +9.10 %; dT onsets b 14.8 18.9 20.3 20.6
+L67_g8_G100_v130      mazda_25t    L/tau 1.57 base     29.9/   285.0 knockshare 0.89 hot -101.9 K (0 s) cg cut 9.3/8.6 deliv 0.00/0.00
+   closed: b 4.34/16.25   open b 4.68
+   open a: a15 0.54  a30 1.07  a45 1.59  a60 2.15  a90 3.57  a130 4.66   open c: c15 18.54  c30 29.71  c45 37.08  c60 42.34  c90 49.81  c130 53.54
+   split b (turb/oil/knock units): turb 1.43, oil -0.13, knock 45.02; fuel +8.81 %; dT onsets b 3.1 7.3 8.2 8.3
+L67_g8_G100_v130      honda_l15b7  L/tau 1.41 base    113.8/   115.9 knockshare 0.02 hot  -47.1 K (0 s) cg cut -2.2/-2.1 deliv 0.00/0.00
+   closed: b 9.21/9.04   open b 9.06
+   open a: a15 1.42  a30 2.80  a45 4.20  a60 5.63  a90 8.79  a130 8.98   open c: c15 31.07  c30 50.10  c45 62.66  c60 71.39  c90 82.42  c130 86.66
+   split b (turb/oil/knock units): turb 10.59, oil -0.11, knock 0.00; fuel +6.36 %; dT onsets b 7.3 8.8 9.4 9.6
+L67_g8_G100_v130      ford_27tt    L/tau 1.00 base     51.9/    76.8 knockshare 0.32 hot  -72.7 K (0 s) cg cut 3.3/2.2 deliv 0.00/0.00
+   closed: b 3.30/2.23   open b 3.40
+   open a: a15 0.48  a30 0.95  a45 1.41  a60 1.88  a90 2.89  a130 3.36   open c: c15 27.20  c30 43.85  c45 54.62  c60 61.92  c90 70.77  c130 74.19
+   split b (turb/oil/knock units): turb 1.82, oil -0.11, knock 0.00; fuel +6.23 %; dT onsets b 2.6 3.1 3.4 3.5
+L67_g8_G200_v100      b58          L/tau 1.42 base      9.0/    11.4 knockshare 0.21 hot -302.1 K (0 s) cg cut 0.7/0.5 deliv 0.00/0.00
+   closed: b -0.69/-0.54   open b 0.23
+   open a: a15 0.02  a30 0.04  a45 0.05  a60 0.07  a90 0.10  a130 0.14   open c: c15 0.49  c30 0.82  c45 1.05  c60 1.23  c90 1.46  c130 1.65
+   split b (turb/oil/knock units): turb 0.02, oil -0.08, knock 0.00; fuel +11.52 %; dT onsets b 5.1 9.6 10.6
+L67_g8_G200_v100      mazda_25t    L/tau 1.57 base     10.1/    49.9 knockshare 0.80 hot -215.2 K (0 s) cg cut 1.7/-0.5 deliv 0.00/0.00
+   closed: b -0.63/2.31   open b 0.25
+   open a: a15 0.00  a30 0.01  a45 0.01  a60 0.02  a90 0.03  a130 0.07   open c: c15 1.95  c30 3.38  c45 4.46  c60 5.29  c90 6.48  c130 7.53
+   split b (turb/oil/knock units): turb 0.03, oil -0.09, knock 1.22; fuel +10.50 %; dT onsets b -1.1 1.7 2.3
+L67_g8_G200_v100      honda_l15b7  L/tau 1.41 base     15.2/    15.2 knockshare 0.00 hot -153.2 K (0 s) cg cut 0.2/0.2 deliv 0.00/0.00
+   closed: b 2.38/2.38   open b 2.69
+   open a: a15 0.21  a30 0.41  a45 0.61  a60 0.80  a90 1.16  a130 1.66   open c: c15 8.11  c30 14.18  c45 18.83  c60 22.48  c90 27.79  c130 32.46
+   split b (turb/oil/knock units): turb 0.42, oil -0.06, knock 0.00; fuel +8.23 %; dT onsets b 2.7 5.1 5.7
+L67_g8_G200_v100      ford_27tt    L/tau 1.00 base      9.8/    17.6 knockshare 0.44 hot -245.9 K (0 s) cg cut 1.0/1.5 deliv 0.00/0.00
+   closed: b -0.70/-0.39   open b 0.01
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.01   open c: c15 1.34  c30 2.40  c45 3.25  c60 3.94  c90 5.00  c130 5.99
+   split b (turb/oil/knock units): turb 0.00, oil -0.07, knock 0.00; fuel +8.04 %; dT onsets b -0.4 -0.1 0.1
+L67_g8_G200_v115      b58          L/tau 1.42 base      9.9/    11.4 knockshare 0.13 hot -230.9 K (0 s) cg cut 2.4/2.1 deliv 0.00/0.00
+   closed: b 0.45/0.39   open b 1.50
+   open a: a15 0.14  a30 0.27  a45 0.39  a60 0.50  a90 0.70  a130 0.95   open c: c15 2.44  c30 3.97  c45 4.98  c60 5.69  c90 6.59  c130 7.26
+   split b (turb/oil/knock units): turb 0.15, oil -0.11, knock 0.00; fuel +11.90 %; dT onsets b 10.4 16.7 17.7
+L67_g8_G200_v115      mazda_25t    L/tau 1.57 base     14.3/    40.2 knockshare 0.64 hot -143.1 K (0 s) cg cut 5.9/1.5 deliv 0.00/0.00
+   closed: b 1.50/8.06   open b 2.23
+   open a: a15 0.16  a30 0.31  a45 0.46  a60 0.59  a90 0.83  a130 1.15   open c: c15 7.11  c30 12.01  c45 15.53  c60 18.14  c90 21.69  c130 24.64
+   split b (turb/oil/knock units): turb 0.32, oil -0.11, knock 3.03; fuel +10.49 %; dT onsets b 2.8 6.9 7.5
+L67_g8_G200_v115      honda_l15b7  L/tau 1.41 base     32.0/    33.4 knockshare 0.04 hot  -98.1 K (0 s) cg cut -0.1/-0.1 deliv 0.00/0.00
+   closed: b 5.37/5.13   open b 5.51
+   open a: a15 0.45  a30 0.88  a45 1.29  a60 1.68  a90 2.43  a130 3.45   open c: c15 16.87  c30 28.64  c45 37.16  c60 43.54  c90 52.35  c130 59.58
+   split b (turb/oil/knock units): turb 1.80, oil -0.08, knock 0.00; fuel +8.57 %; dT onsets b 3.4 6.7 7.4
+L67_g8_G200_v115      ford_27tt    L/tau 1.00 base     13.7/    31.3 knockshare 0.56 hot -167.9 K (0 s) cg cut 2.4/1.1 deliv 0.00/0.00
+   closed: b -0.08/-0.03   open b 0.62
+   open a: a15 0.04  a30 0.08  a45 0.12  a60 0.15  a90 0.23  a130 0.33   open c: c15 6.84  c30 11.77  c45 15.42  c60 18.20  c90 22.08  c130 25.30
+   split b (turb/oil/knock units): turb 0.09, oil -0.10, knock 0.00; fuel +8.32 %; dT onsets b 0.5 1.3 1.6
+L67_g8_G200_v130      b58          L/tau 1.42 base     19.0/    21.0 knockshare 0.09 hot -109.0 K (0 s) cg cut 32.4/28.6 deliv 1.00/0.00
+   closed: b 4.18/3.56   open b 4.72
+   open a: a15 0.49  a30 0.92  a45 1.30  a60 1.65  a90 2.25  a130 2.97   open c: c15 6.86  c30 11.04  c45 13.75  c60 15.59  c90 17.88  c130 19.56
+   split b (turb/oil/knock units): turb 0.91, oil -0.12, knock -0.05; fuel +11.70 %; dT onsets b 14.8 22.8 23.7
+L67_g8_G200_v130      mazda_25t    L/tau 1.57 base     21.0/   239.3 knockshare 0.91 hot -117.7 K (0 s) cg cut 6.4/7.4 deliv 0.00/0.00
+   closed: b 2.97/22.05   open b 3.64
+   open a: a15 0.26  a30 0.50  a45 0.71  a60 0.91  a90 1.28  a130 1.77   open c: c15 12.87  c30 20.95  c45 26.36  c60 30.18  c90 35.18  c130 39.20
+   split b (turb/oil/knock units): turb 0.78, oil -0.15, knock 52.13; fuel +11.37 %; dT onsets b 3.1 7.5 7.9
+L67_g8_G200_v130      honda_l15b7  L/tau 1.41 base     79.7/    81.7 knockshare 0.03 hot  -58.2 K (0 s) cg cut -2.4/-2.3 deliv 0.00/0.00
+   closed: b 10.90/10.62   open b 10.87
+   open a: a15 0.96  a30 1.86  a45 2.71  a60 3.53  a90 5.10  a130 7.19   open c: c15 24.08  c30 39.72  c45 50.56  c60 58.45  c90 69.07  c130 77.55
+   split b (turb/oil/knock units): turb 8.80, oil -0.12, knock 0.00; fuel +8.43 %; dT onsets b 7.3 11.7 12.3
+L67_g8_G200_v130      ford_27tt    L/tau 1.00 base     31.2/    56.1 knockshare 0.44 hot  -96.9 K (0 s) cg cut 2.3/1.3 deliv 0.00/0.00
+   closed: b 3.06/1.70   open b 3.39
+   open a: a15 0.29  a30 0.57  a45 0.83  a60 1.08  a90 1.54  a130 2.14   open c: c15 18.83  c30 31.21  c45 39.71  c60 45.79  c90 53.70  c130 59.69
+   split b (turb/oil/knock units): turb 1.08, oil -0.13, knock 0.00; fuel +8.08 %; dT onsets b 2.6 4.0 4.2
+L67_g8_G50_v100       b58          L/tau 1.42 base     10.7/    13.1 knockshare 0.18 hot -245.2 K (0 s) cg cut 3.1/2.4 deliv 0.00/0.00
+   closed: b 0.24/0.20   open b 0.80
+   open a: a15 0.20  a30 0.41  a45 0.66  a60 0.78  a90 0.78  a130 0.79   open c: c15 3.26  c30 5.21  c45 6.55  c60 7.24  c90 7.28  c130 7.32
+   split b (turb/oil/knock units): turb 0.09, oil -0.06, knock 0.00; fuel +6.49 %; dT onsets b 5.1 5.9 6.8 7.3 7.5 7.6
+L67_g8_G50_v100       mazda_25t    L/tau 1.57 base     18.2/    70.8 knockshare 0.74 hot -153.3 K (0 s) cg cut 8.2/0.7 deliv 0.00/0.00
+   closed: b 1.16/2.16   open b 1.50
+   open a: a15 0.32  a30 0.69  a45 1.19  a60 1.52  a90 1.51  a130 1.50   open c: c15 11.05  c30 18.73  c45 25.16  c60 30.06  c90 30.25  c130 30.43
+   split b (turb/oil/knock units): turb 0.28, oil -0.07, knock 1.32; fuel +5.77 %; dT onsets b -1.1 1.5 2.8 3.3 3.5 3.5
+L67_g8_G50_v100       honda_l15b7  L/tau 1.41 base     45.3/    45.3 knockshare -0.00 hot  -96.8 K (0 s) cg cut 2.7/2.7 deliv 0.00/0.00
+   closed: b 3.66/3.66   open b 3.58
+   open a: a15 0.97  a30 1.99  a45 3.20  a60 3.46  a90 3.50  a130 3.55   open c: c15 23.30  c30 39.27  c45 52.10  c60 60.61  c90 61.09  c130 61.56
+   split b (turb/oil/knock units): turb 1.71, oil -0.05, knock 0.00; fuel +4.41 %; dT onsets b 2.7 2.8 3.3 3.5 3.7 3.7
+L67_g8_G50_v100       ford_27tt    L/tau 1.00 base     15.8/    23.7 knockshare 0.34 hot -173.5 K (0 s) cg cut 3.9/4.0 deliv 0.00/0.00
+   closed: b -0.10/-0.07   open b 0.24
+   open a: a15 0.04  a30 0.08  a45 0.17  a60 0.26  a90 0.25  a130 0.25   open c: c15 9.26  c30 15.90  c45 21.46  c60 25.38  c90 25.66  c130 25.95
+   split b (turb/oil/knock units): turb 0.04, oil -0.06, knock 0.00; fuel +4.41 %; dT onsets b -0.4 0.0 0.3 0.4 0.5 0.6
+L67_g8_G50_v115       b58          L/tau 1.42 base     14.5/    16.0 knockshare 0.10 hot -184.4 K (0 s) cg cut 9.7/8.8 deliv 0.00/0.00
+   closed: b 2.78/2.52   open b 3.21
+   open a: a15 0.87  a30 1.73  a45 2.72  a60 3.12  a90 3.16  a130 3.19   open c: c15 10.67  c30 16.37  c45 19.88  c60 21.44  c90 21.54  c130 21.63
+   split b (turb/oil/knock units): turb 0.49, oil -0.08, knock 0.00; fuel +6.78 %; dT onsets b 10.4 10.3 10.9 11.2 11.3 11.4
+L67_g8_G50_v115       mazda_25t    L/tau 1.57 base     44.3/    82.8 knockshare 0.47 hot  -90.5 K (0 s) cg cut 16.0/7.8 deliv 0.00/0.00
+   closed: b 4.12/12.77   open b 4.19
+   open a: a15 1.00  a30 2.06  a45 3.39  a60 4.14  a90 4.16  a130 4.18   open c: c15 20.00  c30 33.02  c45 43.71  c60 50.94  c90 51.20  c130 51.43
+   split b (turb/oil/knock units): turb 1.91, oil -0.09, knock 8.75; fuel +5.82 %; dT onsets b 2.8 4.8 5.9 6.2 6.3 6.4
+L67_g8_G50_v115       honda_l15b7  L/tau 1.41 base    106.5/   108.0 knockshare 0.01 hot  -56.6 K (0 s) cg cut 2.4/2.4 deliv 0.00/0.00
+   closed: b 4.77/4.71   open b 4.57
+   open a: a15 1.35  a30 2.76  a45 4.55  a60 4.44  a90 4.49  a130 4.54   open c: c15 31.96  c30 51.91  c45 66.44  c60 74.41  c90 74.89  c130 75.32
+   split b (turb/oil/knock units): turb 5.15, oil -0.07, knock 0.00; fuel +4.67 %; dT onsets b 3.4 3.5 4.0 4.3 4.4 4.5
+L67_g8_G50_v115       ford_27tt    L/tau 1.00 base     37.8/    55.4 knockshare 0.32 hot -104.9 K (0 s) cg cut 7.1/4.9 deliv 0.00/0.00
+   closed: b 1.06/0.72   open b 1.22
+   open a: a15 0.27  a30 0.56  a45 0.96  a60 1.20  a90 1.21  a130 1.21   open c: c15 23.39  c30 38.22  c45 49.05  c60 55.07  c90 55.48  c130 55.88
+   split b (turb/oil/knock units): turb 0.48, oil -0.08, knock 0.00; fuel +4.63 %; dT onsets b 0.5 0.9 1.1 1.3 1.3 1.4
+L67_g8_G50_v130       b58          L/tau 1.42 base     75.2/    77.2 knockshare 0.03 hot  -57.5 K (0 s) cg cut 57.1/54.8 deliv 1.00/0.00
+   closed: b 5.07/4.68   open b 5.00
+   open a: a15 1.35  a30 2.68  a45 4.19  a60 4.89  a90 4.93  a130 4.98   open c: c15 13.49  c30 20.65  c45 25.30  c60 27.57  c90 27.66  c130 27.74
+   split b (turb/oil/knock units): turb 3.90, oil -0.09, knock -0.20; fuel +6.67 %; dT onsets b 14.8 14.2 14.9 15.2 15.4 15.4
+L67_g8_G50_v130       mazda_25t    L/tau 1.57 base     57.9/   399.9 knockshare 0.86 hot  -84.1 K (0 s) cg cut 13.3/10.1 deliv 0.00/0.00
+   closed: b 4.90/11.80   open b 4.94
+   open a: a15 1.11  a30 2.30  a45 3.94  a60 4.89  a90 4.91  a130 4.93   open c: c15 26.28  c30 41.44  c45 52.71  c60 58.50  c90 58.79  c130 59.01
+   split b (turb/oil/knock units): turb 2.96, oil -0.13, knock 44.36; fuel +6.44 %; dT onsets b 3.1 5.7 6.7 7.0 7.1 7.1
+L67_g8_G50_v130       honda_l15b7  L/tau 1.41 base    199.4/   201.5 knockshare 0.01 hot  -35.6 K (0 s) cg cut -1.4/-1.4 deliv 0.00/0.00
+   closed: b 6.66/6.59   open b 6.36
+   open a: a15 2.10  a30 4.29  a45 6.47  a60 6.10  a90 6.21  a130 6.31   open c: c15 39.35  c30 61.66  c45 76.41  c60 83.17  c90 83.68  c130 84.08
+   split b (turb/oil/knock units): turb 13.40, oil -0.12, knock 0.00; fuel +4.65 %; dT onsets b 7.3 5.8 5.9 6.0 6.1 6.1
+L67_g8_G50_v130       ford_27tt    L/tau 1.00 base    119.2/   144.1 knockshare 0.17 hot  -46.6 K (0 s) cg cut 4.5/3.7 deliv 0.00/0.00
+   closed: b 2.95/2.44   open b 2.88
+   open a: a15 0.77  a30 1.55  a45 2.49  a60 2.77  a90 2.81  a130 2.86   open c: c15 36.92  c30 57.56  c45 70.90  c60 76.92  c90 77.33  c130 77.69
+   split b (turb/oil/knock units): turb 3.62, oil -0.10, knock 0.00; fuel +4.52 %; dT onsets b 2.6 2.4 2.4 2.5 2.5 2.5
+L85_g10_G100_v100     b58          L/tau 1.80 base     12.9/    15.3 knockshare 0.16 hot -176.7 K (0 s) cg cut 8.2/3.9 deliv 0.00/0.00
+   closed: b 1.31/1.12   open b 1.82
+   open a: a15 0.24  a30 0.47  a45 0.70  a60 0.93  a90 1.47  a130 1.81   open c: c15 4.41  c30 7.53  c45 9.84  c60 11.63  c90 14.37  c130 16.09
+   split b (turb/oil/knock units): turb 0.24, oil -0.07, knock 0.00; fuel +6.77 %; dT onsets b 5.1 8.8 10.0 10.3
+L85_g10_G100_v100     mazda_25t    L/tau 1.99 base     16.0/   173.4 knockshare 0.91 hot -155.1 K (0 s) cg cut 5.9/-6.5 deliv 0.00/0.00
+   closed: b 0.61/1.44   open b 1.10
+   open a: a15 0.09  a30 0.19  a45 0.30  a60 0.43  a90 0.78  a130 1.10   open c: c15 5.71  c30 10.01  c45 13.40  c60 16.18  c90 20.94  c130 24.89
+   split b (turb/oil/knock units): turb 0.18, oil -0.08, knock 2.40; fuel +6.40 %; dT onsets b -1.1 2.7 3.7 3.9
+L85_g10_G100_v100     honda_l15b7  L/tau 1.78 base     50.6/    50.6 knockshare 0.00 hot  -77.6 K (0 s) cg cut 1.1/1.1 deliv 0.00/0.00
+   closed: b 3.74/3.74   open b 3.74
+   open a: a15 0.51  a30 1.01  a45 1.53  a60 2.07  a90 3.33  a130 3.71   open c: c15 14.49  c30 25.65  c45 34.53  c60 41.86  c90 53.82  c130 62.66
+   split b (turb/oil/knock units): turb 1.94, oil -0.05, knock 0.00; fuel +4.42 %; dT onsets b 2.7 4.1 4.7 4.9
+L85_g10_G100_v100     ford_27tt    L/tau 1.27 base     22.0/    29.8 knockshare 0.26 hot -122.8 K (0 s) cg cut 26.5/20.2 deliv 1.00/0.00
+   closed: b -0.07/-0.05   open b 0.20
+   open a: a15 0.01  a30 0.03  a45 0.05  a60 0.07  a90 0.12  a130 0.21   open c: c15 5.28  c30 9.42  c45 12.75  c60 15.50  c90 19.88  c130 23.13
+   split b (turb/oil/knock units): turb 0.05, oil -0.06, knock 0.00; fuel +4.92 %; dT onsets b -0.4 0.2 0.5 0.6
+L85_g10_G100_v115     b58          L/tau 1.80 base     22.7/    24.2 knockshare 0.06 hot -118.9 K (0 s) cg cut 18.9/17.6 deliv 0.00/0.00
+   closed: b 4.83/4.52   open b 5.12
+   open a: a15 0.72  a30 1.40  a45 2.05  a60 2.70  a90 4.22  a130 5.09   open c: c15 10.45  c30 17.34  c45 22.18  c60 25.80  c90 31.19  c130 34.18
+   split b (turb/oil/knock units): turb 1.19, oil -0.09, knock 0.00; fuel +7.13 %; dT onsets b 10.4 14.4 15.5 15.7
+L85_g10_G100_v115     mazda_25t    L/tau 1.99 base     31.9/   256.6 knockshare 0.88 hot  -99.3 K (0 s) cg cut 11.9/6.9 deliv 0.00/0.00
+   closed: b 3.11/6.57   open b 3.37
+   open a: a15 0.38  a30 0.76  a45 1.14  a60 1.54  a90 2.59  a130 3.36   open c: c15 10.93  c30 18.79  c45 24.74  c60 29.54  c90 37.78  c130 44.43
+   split b (turb/oil/knock units): turb 1.09, oil -0.10, knock 15.87; fuel +6.46 %; dT onsets b 2.8 6.8 7.6 7.7
+L85_g10_G100_v115     honda_l15b7  L/tau 1.78 base    101.6/   103.1 knockshare 0.01 hot  -48.4 K (0 s) cg cut -1.4/-1.4 deliv 0.00/0.00
+   closed: b 4.63/4.57   open b 4.58
+   open a: a15 0.66  a30 1.31  a45 1.98  a60 2.68  a90 4.38  a130 4.55   open c: c15 19.12  c30 33.06  c45 43.74  c60 52.32  c90 65.97  c130 74.58
+   split b (turb/oil/knock units): turb 4.79, oil -0.08, knock 0.00; fuel +4.52 %; dT onsets b 3.4 5.2 5.8 6.0
+L85_g10_G100_v115     ford_27tt    L/tau 1.27 base     60.9/    78.5 knockshare 0.22 hot  -60.2 K (0 s) cg cut 6.4/4.9 deliv 0.00/0.00
+   closed: b 1.25/0.97   open b 1.36
+   open a: a15 0.16  a30 0.33  a45 0.50  a60 0.68  a90 1.10  a130 1.35   open c: c15 16.74  c30 29.03  c45 38.38  c60 45.75  c90 57.04  c130 64.29
+   split b (turb/oil/knock units): turb 0.84, oil -0.08, knock 0.00; fuel +4.74 %; dT onsets b 0.5 1.3 1.6 1.7
+L85_g10_G100_v130     b58          L/tau 1.80 base     48.4/    50.8 knockshare 0.05 hot  -69.6 K (0 s) cg cut 29.3/25.2 deliv 0.00/0.00
+   closed: b 7.48/6.16  a15 1.11/0.13  a30 2.07/1.06  a45 2.98/1.93  a60 3.88/2.79  a90 5.99/4.80  a130 7.44/6.12   open b 7.57
+   open a: a15 1.07  a30 2.06  a45 2.99  a60 3.92  a90 6.14  a130 7.52   open c: c15 13.30  c30 21.99  c45 28.09  c60 32.68  c90 39.89  c130 44.31
+   split b (turb/oil/knock units): turb 3.72, oil -0.10, knock -0.49; fuel +6.98 %; dT onsets b 14.8 18.9 19.8 19.9
+L85_g10_G100_v130     mazda_25t    L/tau 1.99 base     83.2/   403.9 knockshare 0.79 hot  -48.1 K (0 s) cg cut 17.5/4.1 deliv 0.00/0.00
+   closed: b 4.41/13.09  a15 0.49/2.99  a30 0.94/4.44  a45 1.38/5.89  a60 1.86/7.35  a90 3.13/10.20  a130 4.40/12.81   open b 4.49
+   open a: a15 0.49  a30 0.95  a45 1.42  a60 1.92  a90 3.29  a130 4.47   open c: c15 15.83  c30 26.33  c45 33.87  c60 39.76  c90 49.83  c130 56.95
+   split b (turb/oil/knock units): turb 3.81, oil -0.14, knock 49.18; fuel +7.01 %; dT onsets b 3.1 8.2 8.9 8.9
+L85_g10_G100_v130     honda_l15b7  L/tau 1.78 base    211.2/   213.3 knockshare 0.01 hot  -21.8 K (0 s) cg cut -1.8/-1.8 deliv 0.00/0.00
+   closed: b 7.47/7.40  a15 1.14/1.13  a30 2.20/2.18  a45 3.27/3.24  a60 4.40/4.36  a90 7.02/6.95  a130 7.41/7.34   open b 7.36
+   open a: a15 1.08  a30 2.14  a45 3.23  a60 4.38  a90 7.06  a130 7.30   open c: c15 23.85  c30 40.00  c45 51.80  c60 60.98  c90 75.08  c130 82.47
+   split b (turb/oil/knock units): turb 15.89, oil -0.12, knock 0.00; fuel +4.67 %; dT onsets b 7.3 8.9 9.3 9.4
+L85_g10_G100_v130     ford_27tt    L/tau 1.27 base    217.0/   241.9 knockshare 0.10 hot   +0.4 K (3 s) cg cut 4.9/4.4 deliv 0.00/0.00
+   closed: b 2.95/2.65  a15 0.46/0.41  a30 0.85/0.77  a45 1.25/1.12  a60 1.64/1.47  a90 2.55/2.28  a130 2.93/2.63   open b 2.93
+   open a: a15 0.42  a30 0.82  a45 1.22  a60 1.63  a90 2.56  a130 2.90   open c: c15 23.53  c30 39.52  c45 50.97  c60 59.60  c90 72.25  c130 79.17
+   split b (turb/oil/knock units): turb 6.52, oil -0.11, knock 0.00; fuel +4.76 %; dT onsets b 2.6 3.1 3.3 3.3
+L85_g10_G200_v100     b58          L/tau 1.80 base     10.9/    13.4 knockshare 0.18 hot -203.3 K (0 s) cg cut 3.8/0.6 deliv 0.00/0.00
+   closed: b 0.24/0.21   open b 1.00
+   open a: a15 0.08  a30 0.16  a45 0.23  a60 0.29  a90 0.41  a130 0.57   open c: c15 1.95  c30 3.37  c45 4.43  c60 5.25  c90 6.41  c130 7.41
+   split b (turb/oil/knock units): turb 0.11, oil -0.08, knock 0.00; fuel +9.17 %; dT onsets b 5.1 10.8 11.7
+L85_g10_G200_v100     mazda_25t    L/tau 1.99 base     12.7/   138.7 knockshare 0.91 hot -178.0 K (0 s) cg cut 3.1/-4.4 deliv 0.00/0.00
+   closed: b -0.24/1.29   open b 0.48
+   open a: a15 0.01  a30 0.02  a45 0.03  a60 0.04  a90 0.07  a130 0.13   open c: c15 2.83  c30 5.00  c45 6.71  c60 8.07  c90 10.11  c130 12.01
+   split b (turb/oil/knock units): turb 0.06, oil -0.09, knock 1.82; fuel +8.69 %; dT onsets b -1.1 2.4 2.9
+L85_g10_G200_v100     honda_l15b7  L/tau 1.78 base     29.0/    29.0 knockshare 0.00 hot -100.8 K (0 s) cg cut -0.1/-0.1 deliv 0.00/0.00
+   closed: b 3.34/3.34   open b 3.49
+   open a: a15 0.27  a30 0.52  a45 0.77  a60 1.01  a90 1.46  a130 2.09   open c: c15 9.89  c30 17.64  c45 23.83  c60 28.87  c90 36.60  c130 43.95
+   split b (turb/oil/knock units): turb 1.03, oil -0.06, knock 0.00; fuel +6.14 %; dT onsets b 2.7 5.4 6.0
+L85_g10_G200_v100     ford_27tt    L/tau 1.27 base     14.4/    22.1 knockshare 0.35 hot -158.9 K (0 s) cg cut 14.6/10.0 deliv 1.00/0.00
+   closed: b -0.43/-0.28   open b 0.07
+   open a: a15 -0.00  a30 -0.00  a45 -0.01  a60 -0.01  a90 -0.01  a130 0.00   open c: c15 2.57  c30 4.64  c45 6.33  c60 7.73  c90 9.91  c130 12.01
+   split b (turb/oil/knock units): turb 0.01, oil -0.07, knock 0.00; fuel +6.67 %; dT onsets b -0.4 0.2 0.3
+L85_g10_G200_v115     b58          L/tau 1.80 base     15.9/    17.4 knockshare 0.09 hot -139.2 K (0 s) cg cut 11.9/10.7 deliv 0.00/0.00
+   closed: b 3.32/3.03   open b 3.94
+   open a: a15 0.37  a30 0.70  a45 1.00  a60 1.27  a90 1.76  a130 2.35   open c: c15 6.38  c30 10.73  c45 13.84  c60 16.13  c90 19.24  c130 21.81
+   split b (turb/oil/knock units): turb 0.64, oil -0.11, knock 0.00; fuel +9.60 %; dT onsets b 10.4 17.8 18.6
+L85_g10_G200_v115     mazda_25t    L/tau 1.99 base     20.9/   192.3 knockshare 0.89 hot -116.9 K (0 s) cg cut 8.2/6.1 deliv 0.00/0.00
+   closed: b 1.97/6.42   open b 2.49
+   open a: a15 0.17  a30 0.32  a45 0.47  a60 0.60  a90 0.86  a130 1.19   open c: c15 7.28  c30 12.62  c45 16.66  c60 19.79  c90 24.32  c130 28.36
+   split b (turb/oil/knock units): turb 0.53, oil -0.11, knock 11.93; fuel +8.73 %; dT onsets b 2.8 7.3 7.7
+L85_g10_G200_v115     honda_l15b7  L/tau 1.78 base     61.0/    62.5 knockshare 0.02 hot  -63.3 K (0 s) cg cut -2.3/-2.2 deliv 0.00/0.00
+   closed: b 4.93/4.81   open b 4.98
+   open a: a15 0.40  a30 0.77  a45 1.13  a60 1.47  a90 2.13  a130 3.04   open c: c15 14.68  c30 25.62  c45 34.02  c60 40.67  c90 50.54  c130 59.69
+   split b (turb/oil/knock units): turb 3.10, oil -0.09, knock 0.00; fuel +6.23 %; dT onsets b 3.4 7.0 7.5
+L85_g10_G200_v115     ford_27tt    L/tau 1.27 base     31.2/    48.8 knockshare 0.36 hot  -89.5 K (0 s) cg cut 4.6/2.9 deliv 0.00/0.00
+   closed: b 0.82/0.53   open b 1.13
+   open a: a15 0.08  a30 0.15  a45 0.22  a60 0.29  a90 0.42  a130 0.60   open c: c15 11.34  c30 19.91  c45 26.53  c60 31.76  c90 39.41  c130 46.24
+   split b (turb/oil/knock units): turb 0.36, oil -0.10, knock 0.00; fuel +6.46 %; dT onsets b 0.5 1.6 1.8
+L85_g10_G200_v130     b58          L/tau 1.80 base     28.9/    31.2 knockshare 0.07 hot  -86.6 K (0 s) cg cut 22.9/18.2 deliv 0.00/0.00
+   closed: b 6.68/5.10   open b 7.00
+   open a: a15 0.68  a30 1.28  a45 1.82  a60 2.30  a90 3.14  a130 4.12   open c: c15 9.95  c30 16.68  c45 21.44  c60 24.94  c90 29.68  c130 33.60
+   split b (turb/oil/knock units): turb 2.05, oil -0.12, knock -0.34; fuel +9.40 %; dT onsets b 14.8 23.1 23.7
+L85_g10_G200_v130     mazda_25t    L/tau 1.99 base     51.5/   318.9 knockshare 0.84 hot  -60.1 K (0 s) cg cut 14.6/3.0 deliv 0.00/0.00
+   closed: b 3.65/17.90   open b 3.90
+   open a: a15 0.26  a30 0.50  a45 0.71  a60 0.91  a90 1.26  a130 1.72   open c: c15 12.81  c30 21.53  c45 27.76  c60 32.39  c90 38.79  c130 44.27
+   split b (turb/oil/knock units): turb 2.04, oil -0.16, knock 55.21; fuel +9.42 %; dT onsets b 3.1 8.3 8.5
+L85_g10_G200_v130     honda_l15b7  L/tau 1.78 base    142.2/   144.3 knockshare 0.01 hot  -29.9 K (0 s) cg cut -2.5/-2.4 deliv 0.00/0.00
+   closed: b 9.04/8.91   open b 9.00
+   open a: a15 0.75  a30 1.44  a45 2.11  a60 2.74  a90 3.96  a130 5.62   open c: c15 19.11  c30 32.39  c45 42.15  c60 49.65  c90 60.53  c130 70.50
+   split b (turb/oil/knock units): turb 12.98, oil -0.13, knock 0.00; fuel +6.47 %; dT onsets b 7.3 12.0 12.4
+L85_g10_G200_v130     ford_27tt    L/tau 1.27 base    107.2/   132.1 knockshare 0.19 hot  -22.0 K (0 s) cg cut 4.0/3.2 deliv 0.00/0.00
+   closed: b 3.19/2.59   open b 3.26
+   open a: a15 0.29  a30 0.56  a45 0.81  a60 1.05  a90 1.48  a130 2.03   open c: c15 18.88  c30 32.18  c45 41.90  c60 49.20  c90 59.35  c130 67.87
+   split b (turb/oil/knock units): turb 3.55, oil -0.13, knock 0.00; fuel +6.45 %; dT onsets b 2.6 4.0 4.2
+L85_g10_G50_v100      b58          L/tau 1.80 base     17.3/    19.7 knockshare 0.12 hot -151.7 K (0 s) cg cut 15.1/10.3 deliv 0.00/0.00
+   closed: b 2.15/1.89   open b 2.38
+   open a: a15 0.58  a30 1.19  a45 1.95  a60 2.33  a90 2.35  a130 2.37   open c: c15 8.64  c30 14.66  c45 19.75  c60 23.41  c90 23.59  c130 23.76
+   split b (turb/oil/knock units): turb 0.43, oil -0.06, knock 0.00; fuel +4.87 %; dT onsets b 5.1 6.3 7.2 7.5 7.6
+L85_g10_G50_v100      mazda_25t    L/tau 1.99 base     23.1/   211.9 knockshare 0.89 hot -133.7 K (0 s) cg cut 9.8/-8.0 deliv 0.00/0.00
+   closed: b 1.28/1.48   open b 1.54
+   open a: a15 0.31  a30 0.67  a45 1.18  a60 1.56  a90 1.55  a130 1.54   open c: c15 10.23  c30 18.02  c45 25.59  c60 32.35  c90 32.63  c130 32.90
+   split b (turb/oil/knock units): turb 0.36, oil -0.06, knock 2.85; fuel +4.59 %; dT onsets b -1.1 2.1 3.1 3.4 3.5
+L85_g10_G50_v100      honda_l15b7  L/tau 1.78 base     91.2/    91.2 knockshare -0.00 hot  -56.8 K (0 s) cg cut 2.8/2.8 deliv 0.00/0.00
+   closed: b 3.13/3.13   open b 3.02
+   open a: a15 0.84  a30 1.73  a45 2.85  a60 2.93  a90 2.96  a130 3.00   open c: c15 19.41  c30 34.30  c45 48.43  c60 60.21  c90 60.80  c130 61.37
+   split b (turb/oil/knock units): turb 2.90, oil -0.05, knock 0.00; fuel +3.17 %; dT onsets b 2.7 2.7 3.1 3.3 3.4
+L85_g10_G50_v100      ford_27tt    L/tau 1.27 base     40.7/    48.6 knockshare 0.16 hot  -90.2 K (0 s) cg cut 37.9/32.2 deliv 1.00/0.00
+   closed: b 0.18/0.15   open b 0.29
+   open a: a15 0.05  a30 0.11  a45 0.21  a60 0.30  a90 0.30  a130 0.29   open c: c15 8.50  c30 15.05  c45 21.09  c60 26.47  c90 26.77  c130 27.08
+   split b (turb/oil/knock units): turb 0.12, oil -0.05, knock 0.00; fuel +3.53 %; dT onsets b -0.4 0.2 0.5 0.6 0.7
+L85_g10_G50_v115      b58          L/tau 1.80 base     36.4/    38.0 knockshare 0.04 hot  -99.1 K (0 s) cg cut 26.4/25.3 deliv 0.00/0.00
+   closed: b 4.92/4.72   open b 4.94
+   open a: a15 1.27  a30 2.56  a45 4.14  a60 4.81  a90 4.86  a130 4.91   open c: c15 15.35  c30 25.23  c45 33.02  c60 37.89  c90 38.16  c130 38.38
+   split b (turb/oil/knock units): turb 1.87, oil -0.07, knock 0.00; fuel +5.15 %; dT onsets b 10.4 10.3 10.9 11.1 11.2
+L85_g10_G50_v115      mazda_25t    L/tau 1.99 base     53.4/   332.0 knockshare 0.84 hot  -82.3 K (0 s) cg cut 16.0/7.8 deliv 0.00/0.00
+   closed: b 3.31/6.49   open b 3.37
+   open a: a15 0.76  a30 1.59  a45 2.68  a60 3.32  a90 3.34  a130 3.36   open c: c15 15.61  c30 26.92  c45 38.08  c60 46.62  c90 47.00  c130 47.32
+   split b (turb/oil/knock units): turb 1.85, oil -0.08, knock 19.79; fuel +4.65 %; dT onsets b 2.8 5.0 5.8 6.0 6.0
+L85_g10_G50_v115      honda_l15b7  L/tau 1.78 base    164.7/   166.2 knockshare 0.01 hot  -35.0 K (0 s) cg cut -0.1/-0.1 deliv 0.00/0.00
+   closed: b 3.44/3.41   open b 3.30
+   open a: a15 1.02  a30 2.12  a45 3.43  a60 3.20  a90 3.24  a130 3.28   open c: c15 24.39  c30 42.00  c45 57.61  c60 68.53  c90 69.18  c130 69.75
+   split b (turb/oil/knock units): turb 5.75, oil -0.08, knock 0.00; fuel +3.27 %; dT onsets b 3.4 3.3 3.6 3.8 3.8
+L85_g10_G50_v115      ford_27tt    L/tau 1.27 base    126.4/   144.0 knockshare 0.12 hot  -33.2 K (0 s) cg cut 7.9/7.0 deliv 0.00/0.00
+   closed: b 1.20/1.05   open b 1.21
+   open a: a15 0.29  a30 0.61  a45 1.03  a60 1.19  a90 1.20  a130 1.20   open c: c15 22.25  c30 38.29  c45 52.08  c60 62.56  c90 63.11  c130 63.65
+   split b (turb/oil/knock units): turb 1.58, oil -0.07, knock 0.00; fuel +3.38 %; dT onsets b 0.5 0.9 1.1 1.3 1.3
+L85_g10_G50_v130      b58          L/tau 1.80 base     86.7/    89.2 knockshare 0.03 hot  -52.8 K (0 s) cg cut 34.8/31.7 deliv 0.00/0.00
+   closed: b 6.54/5.60   open b 6.48
+   open a: a15 1.64  a30 3.31  a45 5.32  a60 6.31  a90 6.38  a130 6.44   open c: c15 17.18  c30 28.22  c45 37.50  c60 43.25  c90 43.53  c130 43.76
+   split b (turb/oil/knock units): turb 5.75, oil -0.08, knock -0.68; fuel +5.03 %; dT onsets b 14.8 13.6 13.9 14.1 14.1
+L85_g10_G50_v130      mazda_25t    L/tau 1.99 base    139.4/   514.0 knockshare 0.73 hot  -35.6 K (0 s) cg cut 20.5/6.0 deliv 0.00/0.00
+   closed: b 4.18/9.44   open b 4.12
+   open a: a15 0.88  a30 1.84  a45 3.24  a60 4.08  a90 4.10  a130 4.11   open c: c15 20.11  c30 33.50  c45 45.98  c60 53.81  c90 54.27  c130 54.62
+   split b (turb/oil/knock units): turb 5.93, oil -0.12, knock 42.73; fuel +5.06 %; dT onsets b 3.1 6.4 7.1 7.2 7.3
+L85_g10_G50_v130      honda_l15b7  L/tau 1.78 base    300.2/   302.3 knockshare 0.01 hot  -14.1 K (0 s) cg cut -0.9/-0.9 deliv 0.00/0.00
+   closed: b 5.12/5.09   open b 4.92
+   open a: a15 1.55  a30 3.21  a45 4.93  a60 4.71  a90 4.79  a130 4.88   open c: c15 29.77  c30 49.49  c45 65.46  c60 74.75  c90 75.46  c130 76.03
+   split b (turb/oil/knock units): turb 15.48, oil -0.11, knock 0.00; fuel +3.35 %; dT onsets b 7.3 5.6 5.7 5.7 5.7
+L85_g10_G50_v130      ford_27tt    L/tau 1.27 base    434.4/   459.3 knockshare 0.05 hot  +21.6 K (152 s) cg cut 6.0/5.7 deliv 0.00/0.00
+   closed: b 2.09/1.97   open b 2.00
+   open a: a15 0.60  a30 1.22  a45 1.86  a60 1.92  a90 1.95  a130 1.98   open c: c15 28.98  c30 48.11  c45 63.44  c60 72.75  c90 73.29  c130 73.77
+   split b (turb/oil/knock units): turb 9.15, oil -0.09, knock 0.00; fuel +3.35 %; dT onsets b 2.6 2.2 2.2 2.1 2.0
+L85_g12_G100_v100     b58          L/tau 1.80 base     25.5/    28.1 knockshare 0.09 hot -101.9 K (0 s) cg cut 44.0/32.8 deliv 1.00/0.00
+   closed: b 1.65/1.51   open b 1.89
+   open a: a15 0.24  a30 0.47  a45 0.70  a60 0.93  a90 1.48  a130 1.88   open c: c15 4.22  c30 7.23  c45 9.48  c60 11.23  c90 14.00  c130 15.95
+   split b (turb/oil/knock units): turb 0.49, oil -0.07, knock 0.01; fuel +6.57 %; dT onsets b 5.1 9.5 10.9 11.2
+L85_g12_G100_v100     mazda_25t    L/tau 1.99 base     26.9/   160.2 knockshare 0.83 hot -105.8 K (0 s) cg cut 12.1/-2.0 deliv 0.00/0.00
+   closed: b 1.56/4.03   open b 1.85
+   open a: a15 0.16  a30 0.32  a45 0.50  a60 0.70  a90 1.28  a130 1.86   open c: c15 7.77  c30 13.77  c45 18.57  c60 22.61  c90 29.89  c130 37.15
+   split b (turb/oil/knock units): turb 0.50, oil -0.08, knock 6.03; fuel +5.79 %; dT onsets b -1.1 3.4 4.4 4.6
+L85_g12_G100_v100     honda_l15b7  L/tau 1.78 base     71.5/    71.5 knockshare -0.00 hot  -59.3 K (0 s) cg cut -0.6/-0.6 deliv 0.00/0.00
+   closed: b 3.55/3.55   open b 3.53
+   open a: a15 0.49  a30 0.98  a45 1.48  a60 2.01  a90 3.28  a130 3.51   open c: c15 13.59  c30 24.35  c45 33.15  c60 40.64  c90 53.57  c130 64.81
+   split b (turb/oil/knock units): turb 2.60, oil -0.06, knock 0.00; fuel +3.79 %; dT onsets b 2.7 4.1 4.7 4.8
+L85_g12_G100_v100     ford_27tt    L/tau 1.27 base     25.2/    32.8 knockshare 0.23 hot -114.8 K (0 s) cg cut 5.6/4.3 deliv 0.00/0.00
+   closed: b 0.16/0.12   open b 0.41
+   open a: a15 0.03  a30 0.06  a45 0.10  a60 0.14  a90 0.26  a130 0.41   open c: c15 8.40  c30 15.13  c45 20.67  c60 25.34  c90 33.15  c130 39.93
+   split b (turb/oil/knock units): turb 0.10, oil -0.06, knock 0.00; fuel +4.26 %; dT onsets b -0.4 0.3 0.6 0.7
+L85_g12_G100_v115     b58          L/tau 1.80 base     61.7/    63.3 knockshare 0.02 hot  -51.0 K (0 s) cg cut 31.4/29.7 deliv 0.00/0.00
+   closed: b 6.31/6.17   open b 6.33
+   open a: a15 0.86  a30 1.65  a45 2.42  a60 3.19  a90 5.05  a130 6.30   open c: c15 12.00  c30 20.28  c45 26.35  c60 31.06  c90 38.75  c130 44.28
+   split b (turb/oil/knock units): turb 3.99, oil -0.09, knock 0.00; fuel +6.37 %; dT onsets b 10.4 15.3 16.4 16.5
+L85_g12_G100_v115     mazda_25t    L/tau 1.99 base     64.2/   283.8 knockshare 0.77 hot  -55.1 K (0 s) cg cut 18.3/3.1 deliv 0.00/0.00
+   closed: b 3.74/4.22   open b 3.84
+   open a: a15 0.42  a30 0.82  a45 1.23  a60 1.66  a90 2.83  a130 3.83   open c: c15 11.13  c30 19.34  c45 25.69  c60 30.93  c90 40.50  c130 49.77
+   split b (turb/oil/knock units): turb 2.50, oil -0.10, knock 9.57; fuel +5.90 %; dT onsets b 2.8 7.4 8.2 8.3
+L85_g12_G100_v115     honda_l15b7  L/tau 1.78 base    132.8/   134.3 knockshare 0.01 hot  -35.4 K (0 s) cg cut -3.1/-3.1 deliv 0.00/0.00
+   closed: b 4.27/4.22   open b 4.22
+   open a: a15 0.60  a30 1.20  a45 1.83  a60 2.50  a90 4.15  a130 4.19   open c: c15 17.32  c30 30.36  c45 40.66  c60 49.23  c90 63.81  c130 74.50
+   split b (turb/oil/knock units): turb 5.76, oil -0.09, knock 0.00; fuel +3.90 %; dT onsets b 3.4 5.2 5.8 5.9
+L85_g12_G100_v115     ford_27tt    L/tau 1.27 base    202.5/   220.1 knockshare 0.08 hot   +5.8 K (22 s) cg cut 8.8/8.1 deliv 0.01/0.00
+   closed: b 1.45/1.33   open b 1.46
+   open a: a15 0.18  a30 0.36  a45 0.54  a60 0.74  a90 1.21  a130 1.46   open c: c15 16.08  c30 28.27  c45 37.83  c60 45.63  c90 58.47  c130 68.85
+   split b (turb/oil/knock units): turb 3.03, oil -0.09, knock 0.00; fuel +4.13 %; dT onsets b 0.5 1.4 1.8 1.9
+L85_g12_G100_v130     b58          L/tau 1.80 base    142.5/   146.4 knockshare 0.03 hot   -9.9 K (0 s) cg cut 37.3/34.7 deliv 0.00/0.00
+   closed: b 7.36/6.61  a15 1.03/0.46  a30 1.94/1.34  a45 2.79/2.17  a60 3.64/2.99  a90 5.68/4.98  a130 7.32/6.57   open b 7.30
+   open a: a15 0.99  a30 1.90  a45 2.77  a60 3.62  a90 5.75  a130 7.26   open c: c15 12.19  c30 20.54  c45 26.63  c60 31.40  c90 39.57  c130 46.02
+   split b (turb/oil/knock units): turb 10.59, oil -0.10, knock -0.81; fuel +6.26 %; dT onsets b 14.8 19.6 20.5 20.6
+L85_g12_G100_v130     mazda_25t    L/tau 1.99 base    167.0/   488.4 knockshare 0.66 hot  -10.1 K (0 s) cg cut 22.4/1.4 deliv 0.00/0.00
+   closed: b 4.37/10.72  a15 0.47/1.93  a30 0.89/3.21  a45 1.31/4.49  a60 1.76/5.78  a90 2.99/8.36  a130 4.36/10.49   open b 4.36
+   open a: a15 0.45  a30 0.89  a45 1.32  a60 1.78  a90 3.09  a130 4.35   open c: c15 14.08  c30 23.71  c45 30.80  c60 36.45  c90 46.76  c130 55.42
+   split b (turb/oil/knock units): turb 7.43, oil -0.14, knock 45.04; fuel +6.46 %; dT onsets b 3.1 8.9 9.5 9.6
+L85_g12_G100_v130     honda_l15b7  L/tau 1.78 base    325.9/   411.9 knockshare 0.21 hot   +0.4 K (7 s) cg cut -1.5/14.5 deliv 0.00/0.00
+   closed: b 6.97/5.52  a15 1.06/0.84  a30 2.04/1.61  a45 3.03/2.40  a60 4.08/3.23  a90 6.58/5.21  a130 6.92/5.48   open b 6.85
+   open a: a15 1.00  a30 1.99  a45 2.99  a60 4.06  a90 6.62  a130 6.80   open c: c15 21.84  c30 36.95  c45 48.24  c60 57.29  c90 72.12  c130 81.12
+   split b (turb/oil/knock units): turb 22.84, oil -0.12, knock 0.01; fuel +4.24 %; dT onsets b 7.3 9.0 9.4 9.5
+L85_g12_G100_v130     ford_27tt    L/tau 1.27 base    248.5/   273.5 knockshare 0.09 hot   +5.8 K (26 s) cg cut 10.5/9.6 deliv 0.00/0.00
+   closed: b 2.79/2.54  a15 0.40/0.36  a30 0.75/0.68  a45 1.09/0.99  a60 1.44/1.31  a90 2.26/2.05  a130 2.77/2.52   open b 2.78
+   open a: a15 0.37  a30 0.72  a45 1.07  a60 1.43  a90 2.27  a130 2.76   open c: c15 20.70  c30 35.05  c45 45.53  c60 53.58  c90 65.80  c130 73.19
+   split b (turb/oil/knock units): turb 7.07, oil -0.13, knock 0.00; fuel +4.70 %; dT onsets b 2.6 3.2 3.4 3.4
+L85_g12_G200_v100     b58          L/tau 1.80 base     16.0/    18.6 knockshare 0.14 hot -128.9 K (0 s) cg cut 28.0/17.1 deliv 1.00/0.00
+   closed: b 0.79/0.70   open b 1.30
+   open a: a15 0.10  a30 0.20  a45 0.29  a60 0.37  a90 0.52  a130 0.72   open c: c15 2.39  c30 4.16  c45 5.49  c60 6.51  c90 7.98  c130 9.26
+   split b (turb/oil/knock units): turb 0.21, oil -0.09, knock 0.00; fuel +8.91 %; dT onsets b 5.1 11.5 12.5
+L85_g12_G200_v100     mazda_25t    L/tau 1.99 base     17.5/   123.6 knockshare 0.86 hot -128.5 K (0 s) cg cut 7.5/-2.3 deliv 0.00/0.00
+   closed: b 0.47/3.46   open b 1.00
+   open a: a15 0.02  a30 0.04  a45 0.07  a60 0.10  a90 0.17  a130 0.28   open c: c15 4.65  c30 8.28  c45 11.17  c60 13.52  c90 17.08  c130 20.42
+   split b (turb/oil/knock units): turb 0.18, oil -0.09, knock 4.19; fuel +7.97 %; dT onsets b -1.1 3.1 3.6
+L85_g12_G200_v100     honda_l15b7  L/tau 1.78 base     39.5/    39.5 knockshare 0.00 hot  -80.3 K (0 s) cg cut -1.7/-1.7 deliv 0.00/0.00
+   closed: b 3.40/3.40   open b 3.50
+   open a: a15 0.27  a30 0.53  a45 0.78  a60 1.01  a90 1.48  a130 2.11   open c: c15 9.82  c30 17.66  c45 24.05  c60 29.33  c90 37.59  c130 45.73
+   split b (turb/oil/knock units): turb 1.41, oil -0.06, knock 0.00; fuel +5.29 %; dT onsets b 2.7 5.5 6.0
+L85_g12_G200_v100     ford_27tt    L/tau 1.27 base     15.8/    23.4 knockshare 0.33 hot -149.4 K (0 s) cg cut 3.2/2.1 deliv 0.00/0.00
+   closed: b -0.31/-0.21   open b 0.16
+   open a: a15 -0.00  a30 -0.00  a45 -0.00  a60 -0.00  a90 0.00  a130 0.02   open c: c15 4.16  c30 7.55  c45 10.34  c60 12.68  c90 16.38  c130 20.01
+   split b (turb/oil/knock units): turb 0.03, oil -0.07, knock 0.00; fuel +5.90 %; dT onsets b -0.4 0.3 0.5
+L85_g12_G200_v115     b58          L/tau 1.80 base     33.8/    35.4 knockshare 0.04 hot  -71.1 K (0 s) cg cut 24.8/22.5 deliv 0.00/0.00
+   closed: b 5.60/5.36   open b 5.83
+   open a: a15 0.53  a30 1.00  a45 1.43  a60 1.83  a90 2.52  a130 3.33   open c: c15 9.15  c30 15.65  c45 20.44  c60 24.06  c90 29.12  c130 33.41
+   split b (turb/oil/knock units): turb 2.00, oil -0.11, knock 0.00; fuel +8.70 %; dT onsets b 10.4 18.7 19.4
+L85_g12_G200_v115     mazda_25t    L/tau 1.99 base     37.0/   204.5 knockshare 0.82 hot  -72.2 K (0 s) cg cut 14.5/1.8 deliv 0.00/0.00
+   closed: b 2.87/3.86   open b 3.15
+   open a: a15 0.20  a30 0.39  a45 0.56  a60 0.73  a90 1.03  a130 1.42   open c: c15 8.46  c30 14.81  c45 19.70  c60 23.56  c90 29.22  c130 34.34
+   split b (turb/oil/knock units): turb 1.18, oil -0.12, knock 6.83; fuel +8.08 %; dT onsets b 2.8 7.9 8.3
+L85_g12_G200_v115     honda_l15b7  L/tau 1.78 base     79.6/    81.1 knockshare 0.02 hot  -48.4 K (0 s) cg cut -4.0/-4.0 deliv 0.00/0.00
+   closed: b 4.66/4.57   open b 4.70
+   open a: a15 0.37  a30 0.71  a45 1.04  a60 1.36  a90 1.98  a130 2.84   open c: c15 13.54  c30 23.87  c45 31.97  c60 38.49  c90 48.43  c130 58.02
+   split b (turb/oil/knock units): turb 3.80, oil -0.10, knock 0.00; fuel +5.45 %; dT onsets b 3.4 7.1 7.5
+L85_g12_G200_v115     ford_27tt    L/tau 1.27 base     85.0/   102.6 knockshare 0.17 hot  -24.2 K (0 s) cg cut 7.4/6.1 deliv 0.01/0.00
+   closed: b 1.27/1.05   open b 1.37
+   open a: a15 0.09  a30 0.18  a45 0.27  a60 0.35  a90 0.51  a130 0.73   open c: c15 12.63  c30 22.41  c45 30.12  c60 36.31  c90 45.58  c130 54.07
+   split b (turb/oil/knock units): turb 1.18, oil -0.10, knock 0.00; fuel +5.73 %; dT onsets b 0.5 1.8 2.0
+L85_g12_G200_v130     b58          L/tau 1.80 base     75.9/    79.3 knockshare 0.04 hot  -26.2 K (0 s) cg cut 33.2/29.7 deliv 0.00/0.00
+   closed: b 7.31/6.24   open b 7.36
+   open a: a15 0.70  a30 1.32  a45 1.87  a60 2.36  a90 3.21  a130 4.18   open c: c15 10.29  c30 17.55  c45 22.87  c60 26.89  c90 32.48  c130 37.20
+   split b (turb/oil/knock units): turb 5.67, oil -0.12, knock -0.59; fuel +8.56 %; dT onsets b 14.8 23.9 24.4
+L85_g12_G200_v130     mazda_25t    L/tau 1.99 base     99.0/   366.8 knockshare 0.73 hot  -21.2 K (0 s) cg cut 20.1/-6.4 deliv 0.00/0.00
+   closed: b 3.78/15.12   open b 3.87
+   open a: a15 0.25  a30 0.47  a45 0.67  a60 0.86  a90 1.19  a130 1.61   open c: c15 11.96  c30 20.32  c45 26.43  c60 31.06  c90 37.54  c130 43.14
+   split b (turb/oil/knock units): turb 3.90, oil -0.16, knock 51.73; fuel +8.78 %; dT onsets b 3.1 8.8 9.1
+L85_g12_G200_v130     honda_l15b7  L/tau 1.78 base    211.8/   276.8 knockshare 0.23 hot   -7.6 K (0 s) cg cut -2.5/15.6 deliv 0.00/0.00
+   closed: b 8.37/6.41   open b 8.32
+   open a: a15 0.69  a30 1.34  a45 1.94  a60 2.51  a90 3.61  a130 5.11   open c: c15 17.73  c30 30.24  c45 39.55  c60 46.78  c90 57.43  c130 67.50
+   split b (turb/oil/knock units): turb 17.86, oil -0.13, knock 0.01; fuel +5.94 %; dT onsets b 7.3 12.2 12.6
+L85_g12_G200_v130     ford_27tt    L/tau 1.27 base    124.6/   149.5 knockshare 0.17 hot  -14.8 K (0 s) cg cut 9.0/7.5 deliv 0.00/0.00
+   closed: b 3.00/2.50   open b 3.06
+   open a: a15 0.26  a30 0.50  a45 0.72  a60 0.93  a90 1.31  a130 1.80   open c: c15 16.77  c30 28.77  c45 37.65  c60 44.41  c90 53.96  c130 62.17
+   split b (turb/oil/knock units): turb 3.88, oil -0.14, knock 0.00; fuel +6.38 %; dT onsets b 2.6 4.1 4.3
+L85_g12_G50_v100      b58          L/tau 1.80 base     47.2/    49.9 knockshare 0.05 hot  -77.3 K (0 s) cg cut 57.0/48.3 deliv 1.00/0.00
+   closed: b 1.86/1.76   open b 1.91
+   open a: a15 0.45  a30 0.92  a45 1.53  a60 1.88  a90 1.89  a130 1.90   open c: c15 6.28  c30 10.71  c45 14.63  c60 17.72  c90 17.84  c130 17.95
+   split b (turb/oil/knock units): turb 0.93, oil -0.06, knock 0.00; fuel +4.71 %; dT onsets b 5.1 6.9 8.0 8.3 8.4
+L85_g12_G50_v100      mazda_25t    L/tau 1.99 base     46.7/   207.7 knockshare 0.78 hot  -85.0 K (0 s) cg cut 16.8/-0.8 deliv 0.00/0.00
+   closed: b 2.03/4.85   open b 2.15
+   open a: a15 0.42  a30 0.90  a45 1.61  a60 2.17  a90 2.16  a130 2.16   open c: c15 11.70  c30 20.93  c45 30.88  c60 40.68  c90 41.00  c130 41.30
+   split b (turb/oil/knock units): turb 1.01, oil -0.07, knock 9.12; fuel +4.12 %; dT onsets b -1.1 2.6 3.7 4.0 4.0
+L85_g12_G50_v100      honda_l15b7  L/tau 1.78 base    128.5/   128.5 knockshare 0.00 hot  -41.2 K (0 s) cg cut 1.1/1.1 deliv 0.00/0.00
+   closed: b 2.79/2.79   open b 2.69
+   open a: a15 0.79  a30 1.64  a45 2.77  a60 2.61  a90 2.64  a130 2.67   open c: c15 17.84  c30 32.12  c45 46.88  c60 60.67  c90 61.21  c130 61.75
+   split b (turb/oil/knock units): turb 3.64, oil -0.05, knock 0.00; fuel +2.73 %; dT onsets b 2.7 2.6 2.9 3.1 3.1
+L85_g12_G50_v100      ford_27tt    L/tau 1.27 base     47.2/    54.8 knockshare 0.14 hot  -84.1 K (0 s) cg cut 8.2/7.0 deliv 0.00/0.00
+   closed: b 0.45/0.39   open b 0.55
+   open a: a15 0.10  a30 0.21  a45 0.40  a60 0.57  a90 0.56  a130 0.56   open c: c15 13.49  c30 24.29  c45 35.26  c60 45.85  c90 46.32  c130 46.80
+   split b (turb/oil/knock units): turb 0.27, oil -0.05, knock 0.00; fuel +3.02 %; dT onsets b -0.4 0.2 0.5 0.7 0.7
+L85_g12_G50_v115      b58          L/tau 1.80 base    119.1/   120.6 knockshare 0.01 hot  -31.9 K (0 s) cg cut 36.6/35.6 deliv 0.00/0.00
+   closed: b 5.50/5.43   open b 5.38
+   open a: a15 1.31  a30 2.66  a45 4.40  a60 5.26  a90 5.31  a130 5.35   open c: c15 15.17  c30 25.63  c45 34.92  c60 42.07  c90 42.35  c130 42.59
+   split b (turb/oil/knock units): turb 6.63, oil -0.08, knock 0.00; fuel +4.55 %; dT onsets b 10.4 10.9 11.6 11.7 11.8
+L85_g12_G50_v115      mazda_25t    L/tau 1.99 base    117.7/   390.0 knockshare 0.70 hot  -38.9 K (0 s) cg cut 21.8/5.3 deliv 0.00/0.00
+   closed: b 3.60/4.25   open b 3.57
+   open a: a15 0.77  a30 1.61  a45 2.79  a60 3.53  a90 3.55  a130 3.56   open c: c15 14.64  c30 25.67  c45 37.87  c60 48.01  c90 48.38  c130 48.71
+   split b (turb/oil/knock units): turb 4.32, oil -0.08, knock 12.35; fuel +4.22 %; dT onsets b 2.8 5.5 6.3 6.5 6.5
+L85_g12_G50_v115      honda_l15b7  L/tau 1.78 base    212.4/   213.9 knockshare 0.01 hot  -23.9 K (0 s) cg cut -1.8/-1.8 deliv 0.00/0.00
+   closed: b 3.06/3.04   open b 2.94
+   open a: a15 0.94  a30 1.98  a45 3.13  a60 2.84  a90 2.88  a130 2.92   open c: c15 22.14  c30 38.92  c45 55.11  c60 67.73  c90 68.35  c130 68.92
+   split b (turb/oil/knock units): turb 6.59, oil -0.09, knock 0.00; fuel +2.80 %; dT onsets b 3.4 3.2 3.5 3.6 3.6
+L85_g12_G50_v115      ford_27tt    L/tau 1.27 base    471.2/   488.8 knockshare 0.04 hot  +32.3 K (183 s) cg cut 12.0/11.6 deliv 0.06/0.00
+   closed: b 0.89/0.86   open b 1.01
+   open a: a15 0.30  a30 0.62  a45 0.96  a60 1.00  a90 1.01  a130 1.01   open c: c15 19.72  c30 34.64  c45 48.46  c60 61.37  c90 61.83  c130 62.28
+   split b (turb/oil/knock units): turb 4.27, oil -0.07, knock 0.00; fuel +2.87 %; dT onsets b 0.5 1.0 1.2 1.1 1.0
+L85_g12_G50_v130      b58          L/tau 1.80 base    272.8/   277.2 knockshare 0.02 hot   +5.9 K (42 s) cg cut 40.8/39.1 deliv 0.00/0.00
+   closed: b 6.12/5.63   open b 5.98
+   open a: a15 1.45  a30 2.94  a45 4.85  a60 5.85  a90 5.90  a130 5.95   open c: c15 14.82  c30 25.02  c45 34.84  c60 42.03  c90 42.31  c130 42.55
+   split b (turb/oil/knock units): turb 16.79, oil -0.09, knock -1.09; fuel +4.48 %; dT onsets b 14.8 13.9 14.4 14.5 14.5
+L85_g12_G50_v130      mazda_25t    L/tau 1.99 base    288.0/   662.9 knockshare 0.57 hot   +1.2 K (15 s) cg cut 25.0/6.4 deliv 0.00/0.00
+   closed: b 4.06/7.36   open b 3.97
+   open a: a15 0.81  a30 1.71  a45 3.06  a60 3.93  a90 3.95  a130 3.96   open c: c15 17.53  c30 29.73  c45 42.22  c60 50.95  c90 51.38  c130 51.73
+   split b (turb/oil/knock units): turb 11.81, oil -0.12, knock 37.08; fuel +4.63 %; dT onsets b 3.1 7.0 7.7 7.7 7.8
+L85_g12_G50_v130      honda_l15b7  L/tau 1.78 base    477.7/   584.7 knockshare 0.18 hot   +7.8 K (141 s) cg cut -0.2/13.7 deliv 0.00/0.00
+   closed: b 4.73/3.86   open b 4.54
+   open a: a15 1.45  a30 3.02  a45 4.52  a60 4.35  a90 4.43  a130 4.50   open c: c15 27.33  c30 46.09  c45 62.39  c60 72.94  c90 73.62  c130 74.17
+   split b (turb/oil/knock units): turb 22.69, oil -0.11, knock 0.01; fuel +3.00 %; dT onsets b 7.3 5.5 5.6 5.6 5.6
+L85_g12_G50_v130      ford_27tt    L/tau 1.27 base    485.6/   510.5 knockshare 0.05 hot  +25.0 K (188 s) cg cut 12.3/11.7 deliv 0.00/0.00
+   closed: b 2.00/1.91   open b 1.95
+   open a: a15 0.52  a30 1.07  a45 1.62  a60 1.87  a90 1.90  a130 1.93   open c: c15 25.46  c30 42.74  c45 57.06  c60 66.91  c90 67.39  c130 67.83
+   split b (turb/oil/knock units): turb 9.83, oil -0.11, knock 0.00; fuel +3.30 %; dT onsets b 2.6 2.3 2.3 2.1 2.1
+L85_g8_G100_v100      b58          L/tau 1.80 base     10.1/    12.5 knockshare 0.19 hot -253.3 K (0 s) cg cut 2.1/1.6 deliv 0.00/0.00
+   closed: b -0.09/-0.07   open b 0.58
+   open a: a15 0.08  a30 0.15  a45 0.23  a60 0.31  a90 0.48  a130 0.58   open c: c15 1.58  c30 2.65  c45 3.41  c60 3.98  c90 4.78  c130 5.17
+   split b (turb/oil/knock units): turb 0.06, oil -0.07, knock 0.00; fuel +7.70 %; dT onsets b 5.1 8.0 9.1 9.5
+L85_g8_G100_v100      mazda_25t    L/tau 1.99 base     14.7/    58.5 knockshare 0.75 hot -161.3 K (0 s) cg cut 5.9/0.5 deliv 0.00/0.00
+   closed: b 0.49/1.74   open b 0.99
+   open a: a15 0.09  a30 0.18  a45 0.29  a60 0.41  a90 0.73  a130 1.00   open c: c15 5.68  c30 9.90  c45 13.15  c60 15.77  c90 20.08  c130 23.22
+   split b (turb/oil/knock units): turb 0.15, oil -0.08, knock 0.94; fuel +6.88 %; dT onsets b -1.1 2.5 3.5 3.8
+L85_g8_G100_v100      honda_l15b7  L/tau 1.78 base     32.0/    32.0 knockshare 0.00 hot -106.5 K (0 s) cg cut 1.5/1.5 deliv 0.00/0.00
+   closed: b 3.53/3.53   open b 3.58
+   open a: a15 0.48  a30 0.96  a45 1.45  a60 1.95  a90 3.09  a130 3.54   open c: c15 14.31  c30 25.02  c45 33.31  c60 39.92  c90 50.09  c130 56.39
+   split b (turb/oil/knock units): turb 1.18, oil -0.05, knock 0.00; fuel +5.18 %; dT onsets b 2.7 4.0 4.7 4.9
+L85_g8_G100_v100      ford_27tt    L/tau 1.27 base     13.1/    21.0 knockshare 0.37 hot -187.6 K (0 s) cg cut 2.7/2.8 deliv 0.00/0.00
+   closed: b -0.33/-0.21   open b 0.13
+   open a: a15 0.01  a30 0.01  a45 0.02  a60 0.03  a90 0.07  a130 0.13   open c: c15 4.51  c30 8.01  c45 10.81  c60 13.09  c90 16.65  c130 18.96
+   split b (turb/oil/knock units): turb 0.02, oil -0.06, knock 0.00; fuel +5.25 %; dT onsets b -0.4 0.1 0.4 0.5
+L85_g8_G100_v115      b58          L/tau 1.80 base     12.8/    14.3 knockshare 0.11 hot -189.4 K (0 s) cg cut 7.2/6.4 deliv 0.00/0.00
+   closed: b 2.08/1.86   open b 2.72
+   open a: a15 0.40  a30 0.77  a45 1.13  a60 1.49  a90 2.28  a130 2.70   open c: c15 5.91  c30 9.61  c45 12.09  c60 13.86  c90 16.23  c130 17.25
+   split b (turb/oil/knock units): turb 0.36, oil -0.09, knock 0.00; fuel +8.03 %; dT onsets b 10.4 13.6 14.6 14.9
+L85_g8_G100_v115      mazda_25t    L/tau 1.99 base     31.6/    61.7 knockshare 0.49 hot  -95.9 K (0 s) cg cut 13.7/6.5 deliv 0.00/0.00
+   closed: b 3.33/8.41   open b 3.56
+   open a: a15 0.43  a30 0.84  a45 1.26  a60 1.69  a90 2.79  a130 3.55   open c: c15 12.05  c30 20.52  c45 26.80  c60 31.74  c90 39.83  c130 45.66
+   split b (turb/oil/knock units): turb 1.15, oil -0.09, knock 4.14; fuel +6.93 %; dT onsets b 2.8 6.7 7.6 7.7
+L85_g8_G100_v115      honda_l15b7  L/tau 1.78 base     75.7/    77.2 knockshare 0.02 hot  -62.8 K (0 s) cg cut 1.4/1.4 deliv 0.00/0.00
+   closed: b 5.13/5.03   open b 5.07
+   open a: a15 0.71  a30 1.42  a45 2.13  a60 2.88  a90 4.60  a130 5.03   open c: c15 21.12  c30 35.88  c45 46.72  c60 55.03  c90 67.26  c130 73.70
+   split b (turb/oil/knock units): turb 3.96, oil -0.07, knock 0.00; fuel +5.43 %; dT onsets b 3.4 5.2 6.0 6.2
+L85_g8_G100_v115      ford_27tt    L/tau 1.27 base     26.9/    44.5 knockshare 0.40 hot -115.9 K (0 s) cg cut 5.8/3.5 deliv 0.00/0.00
+   closed: b 0.78/0.47   open b 1.06
+   open a: a15 0.12  a30 0.25  a45 0.37  a60 0.51  a90 0.81  a130 1.05   open c: c15 14.07  c30 24.09  c45 31.49  c60 37.13  c90 45.23  c130 49.46
+   split b (turb/oil/knock units): turb 0.29, oil -0.08, knock 0.00; fuel +5.51 %; dT onsets b 0.5 1.2 1.5 1.6
+L85_g8_G100_v130      b58          L/tau 1.80 base     54.0/    55.9 knockshare 0.04 hot  -60.1 K (0 s) cg cut 54.3/51.8 deliv 1.00/0.00
+   closed: b 4.72/4.39   open b 4.80
+   open a: a15 0.71  a30 1.37  a45 1.98  a60 2.59  a90 3.98  a130 4.77   open c: c15 8.75  c30 14.16  c45 17.78  c60 20.37  c90 24.05  c130 25.93
+   split b (turb/oil/knock units): turb 2.65, oil -0.10, knock -0.09; fuel +7.89 %; dT onsets b 14.8 18.9 20.0 20.2
+L85_g8_G100_v130      mazda_25t    L/tau 1.99 base     43.6/   335.5 knockshare 0.87 hot  -86.5 K (0 s) cg cut 11.6/10.2 deliv 0.00/0.00
+   closed: b 4.10/14.00   open b 4.32
+   open a: a15 0.49  a30 0.96  a45 1.43  a60 1.93  a90 3.26  a130 4.30   open c: c15 16.57  c30 27.19  c45 34.61  c60 40.24  c90 49.21  c130 54.53
+   split b (turb/oil/knock units): turb 1.92, oil -0.14, knock 45.18; fuel +7.64 %; dT onsets b 3.1 7.6 8.3 8.3
+L85_g8_G100_v130      honda_l15b7  L/tau 1.78 base    155.1/   157.2 knockshare 0.01 hot  -38.2 K (0 s) cg cut -2.0/-2.0 deliv 0.00/0.00
+   closed: b 8.02/7.91   open b 7.88
+   open a: a15 1.20  a30 2.38  a45 3.57  a60 4.80  a90 7.60  a130 7.82   open c: c15 26.57  c30 43.86  c45 56.01  c60 65.07  c90 77.94  c130 83.70
+   split b (turb/oil/knock units): turb 12.56, oil -0.12, knock 0.00; fuel +5.34 %; dT onsets b 7.3 8.7 9.2 9.3
+L85_g8_G100_v130      ford_27tt    L/tau 1.27 base     81.1/   106.0 knockshare 0.24 hot  -54.6 K (0 s) cg cut 3.8/2.9 deliv 0.00/0.00
+   closed: b 3.06/2.34   open b 3.10
+   open a: a15 0.44  a30 0.86  a45 1.27  a60 1.69  a90 2.63  a130 3.07   open c: c15 24.82  c30 40.99  c45 52.09  c60 60.10  c90 70.87  c130 75.61
+   split b (turb/oil/knock units): turb 2.59, oil -0.11, knock 0.00; fuel +5.36 %; dT onsets b 2.6 3.1 3.3 3.4
+L85_g8_G200_v100      b58          L/tau 1.80 base      9.7/    12.2 knockshare 0.20 hot -277.3 K (0 s) cg cut 1.1/0.8 deliv 0.00/0.00
+   closed: b -0.53/-0.42   open b 0.32
+   open a: a15 0.03  a30 0.05  a45 0.07  a60 0.10  a90 0.14  a130 0.19   open c: c15 0.67  c30 1.14  c45 1.49  c60 1.75  c90 2.11  c130 2.42
+   split b (turb/oil/knock units): turb 0.03, oil -0.08, knock 0.00; fuel +10.22 %; dT onsets b 5.1 9.9 10.8
+L85_g8_G200_v100      mazda_25t    L/tau 1.99 base     11.9/    51.5 knockshare 0.77 hot -186.5 K (0 s) cg cut 3.0/-0.1 deliv 0.00/0.00
+   closed: b -0.35/1.84   open b 0.41
+   open a: a15 0.01  a30 0.01  a45 0.02  a60 0.04  a90 0.06  a130 0.12   open c: c15 2.69  c30 4.73  c45 6.31  c60 7.56  c90 9.40  c130 11.07
+   split b (turb/oil/knock units): turb 0.05, oil -0.09, knock 0.99; fuel +9.25 %; dT onsets b -1.1 2.2 2.7
+L85_g8_G200_v100      honda_l15b7  L/tau 1.78 base     20.3/    20.3 knockshare 0.00 hot -130.7 K (0 s) cg cut 0.4/0.4 deliv 0.00/0.00
+   closed: b 2.84/2.84   open b 3.06
+   open a: a15 0.24  a30 0.46  a45 0.68  a60 0.89  a90 1.29  a130 1.84   open c: c15 8.89  c30 15.72  c45 21.09  c60 25.40  c90 31.85  c130 37.80
+   split b (turb/oil/knock units): turb 0.63, oil -0.06, knock 0.00; fuel +7.10 %; dT onsets b 2.7 5.2 5.8
+L85_g8_G200_v100      ford_27tt    L/tau 1.27 base     11.1/    18.9 knockshare 0.41 hot -219.9 K (0 s) cg cut 1.4/1.7 deliv 0.00/0.00
+   closed: b -0.61/-0.36   open b 0.03
+   open a: a15 -0.00  a30 -0.01  a45 -0.01  a60 -0.01  a90 -0.01  a130 -0.01   open c: c15 1.84  c30 3.31  c45 4.51  c60 5.51  c90 7.05  c130 8.53
+   split b (turb/oil/knock units): turb 0.00, oil -0.07, knock 0.00; fuel +7.07 %; dT onsets b -0.4 0.0 0.2
+L85_g8_G200_v115      b58          L/tau 1.80 base     11.2/    12.8 knockshare 0.12 hot -208.2 K (0 s) cg cut 3.9/3.4 deliv 0.00/0.00
+   closed: b 0.96/0.84   open b 1.88
+   open a: a15 0.17  a30 0.33  a45 0.48  a60 0.61  a90 0.86  a130 1.16   open c: c15 3.06  c30 5.07  c45 6.45  c60 7.46  c90 8.79  c130 9.85
+   split b (turb/oil/knock units): turb 0.21, oil -0.11, knock 0.00; fuel +10.60 %; dT onsets b 10.4 16.9 17.7
+L85_g8_G200_v115      mazda_25t    L/tau 1.99 base     20.1/    46.0 knockshare 0.56 hot -116.1 K (0 s) cg cut 9.3/3.6 deliv 0.00/0.00
+   closed: b 2.07/7.48   open b 2.58
+   open a: a15 0.18  a30 0.36  a45 0.51  a60 0.66  a90 0.94  a130 1.30   open c: c15 7.95  c30 13.67  c45 17.93  c60 21.19  c90 25.81  c130 29.81
+   split b (turb/oil/knock units): turb 0.53, oil -0.11, knock 3.03; fuel +9.27 %; dT onsets b 2.8 7.3 7.7
+L85_g8_G200_v115      honda_l15b7  L/tau 1.78 base     45.8/    47.3 knockshare 0.03 hot  -79.8 K (0 s) cg cut 0.3/0.3 deliv 0.00/0.00
+   closed: b 5.24/5.08   open b 5.31
+   open a: a15 0.43  a30 0.83  a45 1.21  a60 1.57  a90 2.28  a130 3.23   open c: c15 15.81  c30 27.24  c45 35.79  c60 42.38  c90 51.85  c130 60.17
+   split b (turb/oil/knock units): turb 2.48, oil -0.08, knock 0.00; fuel +7.39 %; dT onsets b 3.4 6.9 7.5
+L85_g8_G200_v115      ford_27tt    L/tau 1.27 base     17.7/    35.3 knockshare 0.50 hot -143.3 K (0 s) cg cut 3.6/1.8 deliv 0.00/0.00
+   closed: b 0.22/0.11   open b 0.76
+   open a: a15 0.05  a30 0.10  a45 0.14  a60 0.19  a90 0.28  a130 0.40   open c: c15 8.06  c30 14.03  c45 18.57  c60 22.10  c90 27.19  c130 31.61
+   split b (turb/oil/knock units): turb 0.14, oil -0.10, knock 0.00; fuel +7.36 %; dT onsets b 0.5 1.4 1.7
+L85_g8_G200_v130      b58          L/tau 1.80 base     30.8/    32.7 knockshare 0.06 hot  -79.5 K (0 s) cg cut 44.6/41.4 deliv 1.00/0.00
+   closed: b 4.25/3.85   open b 4.56
+   open a: a15 0.46  a30 0.87  a45 1.23  a60 1.56  a90 2.13  a130 2.80   open c: c15 6.64  c30 10.94  c45 13.86  c60 15.95  c90 18.67  c130 20.81
+   split b (turb/oil/knock units): turb 1.43, oil -0.12, knock -0.05; fuel +10.42 %; dT onsets b 14.8 23.0 23.7
+L85_g8_G200_v130      mazda_25t    L/tau 1.99 base     29.3/   275.2 knockshare 0.89 hot  -98.5 K (0 s) cg cut 8.9/8.9 deliv 0.00/0.00
+   closed: b 3.12/19.34   open b 3.59
+   open a: a15 0.25  a30 0.47  a45 0.68  a60 0.87  a90 1.22  a130 1.68   open c: c15 12.39  c30 20.57  c45 26.28  c60 30.46  c90 36.15  c130 40.98
+   split b (turb/oil/knock units): turb 1.07, oil -0.16, knock 52.30; fuel +10.12 %; dT onsets b 3.1 7.8 8.0
+L85_g8_G200_v130      honda_l15b7  L/tau 1.78 base    106.9/   108.9 knockshare 0.02 hot  -46.9 K (0 s) cg cut -2.4/-2.4 deliv 0.00/0.00
+   closed: b 9.68/9.50   open b 9.64
+   open a: a15 0.83  a30 1.60  a45 2.34  a60 3.04  a90 4.39  a130 6.21   open c: c15 21.02  c30 35.23  c45 45.44  c60 53.12  c90 63.97  c130 73.43
+   split b (turb/oil/knock units): turb 10.47, oil -0.12, knock 0.00; fuel +7.25 %; dT onsets b 7.3 11.8 12.3
+L85_g8_G200_v130      ford_27tt    L/tau 1.27 base     46.2/    71.1 knockshare 0.35 hot  -75.7 K (0 s) cg cut 2.9/1.9 deliv 0.00/0.00
+   closed: b 3.07/1.99   open b 3.27
+   open a: a15 0.28  a30 0.55  a45 0.80  a60 1.03  a90 1.47  a130 2.04   open c: c15 18.38  c30 30.94  c45 39.89  c60 46.48  c90 55.44  c130 62.69
+   split b (turb/oil/knock units): turb 1.54, oil -0.13, knock 0.00; fuel +7.15 %; dT onsets b 2.6 4.0 4.2
+L85_g8_G50_v100       b58          L/tau 1.80 base     10.8/    13.3 knockshare 0.18 hot -229.8 K (0 s) cg cut 4.2/3.4 deliv 0.00/0.00
+   closed: b 0.37/0.31   open b 0.85
+   open a: a15 0.21  a30 0.43  a45 0.70  a60 0.82  a90 0.83  a130 0.84   open c: c15 3.49  c30 5.77  c45 7.50  c60 8.49  c90 8.57  c130 8.64
+   split b (turb/oil/knock units): turb 0.10, oil -0.06, knock 0.00; fuel +5.61 %; dT onsets b 5.1 5.9 6.6 7.0 7.1
+L85_g8_G50_v100       mazda_25t    L/tau 1.99 base     21.0/    69.4 knockshare 0.70 hot -137.2 K (0 s) cg cut 10.3/1.9 deliv 0.00/0.00
+   closed: b 1.21/2.00   open b 1.46
+   open a: a15 0.31  a30 0.67  a45 1.16  a60 1.48  a90 1.47  a130 1.46   open c: c15 10.53  c30 18.33  c45 25.35  c60 31.23  c90 31.52  c130 31.79
+   split b (turb/oil/knock units): turb 0.32, oil -0.06, knock 1.14; fuel +4.97 %; dT onsets b -1.1 1.8 3.0 3.3 3.4
+L85_g8_G50_v100       honda_l15b7  L/tau 1.78 base     54.1/    54.1 knockshare 0.00 hot  -84.2 K (0 s) cg cut 3.1/3.1 deliv 0.00/0.00
+   closed: b 3.23/3.23   open b 3.14
+   open a: a15 0.84  a30 1.71  a45 2.77  a60 3.02  a90 3.06  a130 3.11   open c: c15 20.28  c30 35.14  c45 48.04  c60 57.39  c90 58.03  c130 58.65
+   split b (turb/oil/knock units): turb 1.79, oil -0.04, knock 0.00; fuel +3.72 %; dT onsets b 2.7 2.8 3.2 3.4 3.5
+L85_g8_G50_v100       ford_27tt    L/tau 1.27 base     17.5/    25.4 knockshare 0.31 hot -157.2 K (0 s) cg cut 4.9/4.5 deliv 0.00/0.00
+   closed: b -0.02/-0.01   open b 0.25
+   open a: a15 0.04  a30 0.09  a45 0.18  a60 0.26  a90 0.26  a130 0.26   open c: c15 9.31  c30 16.37  c45 22.65  c60 27.41  c90 27.80  c130 28.21
+   split b (turb/oil/knock units): turb 0.05, oil -0.05, knock 0.00; fuel +3.79 %; dT onsets b -0.4 0.1 0.4 0.5 0.6
+L85_g8_G50_v115       b58          L/tau 1.80 base     15.6/    17.2 knockshare 0.09 hot -170.5 K (0 s) cg cut 12.4/11.3 deliv 0.00/0.00
+   closed: b 2.78/2.53   open b 3.10
+   open a: a15 0.82  a30 1.64  a45 2.61  a60 3.00  a90 3.04  a130 3.08   open c: c15 10.45  c30 16.66  c45 20.99  c60 23.16  c90 23.34  c130 23.49
+   split b (turb/oil/knock units): turb 0.51, oil -0.07, knock 0.00; fuel +5.88 %; dT onsets b 10.4 9.9 10.4 10.6 10.7
+L85_g8_G50_v115       mazda_25t    L/tau 1.99 base     55.8/    90.3 knockshare 0.38 hot  -75.7 K (0 s) cg cut 18.2/10.7 deliv 0.00/0.00
+   closed: b 3.54/10.66   open b 3.57
+   open a: a15 0.84  a30 1.74  a45 2.87  a60 3.52  a90 3.54  a130 3.56   open c: c15 17.02  c30 28.95  c45 39.67  c60 47.75  c90 48.13  c130 48.47
+   split b (turb/oil/knock units): turb 2.05, oil -0.08, knock 7.65; fuel +5.02 %; dT onsets b 2.8 5.0 5.8 6.1 6.1
+L85_g8_G50_v115       honda_l15b7  L/tau 1.78 base    124.7/   126.2 knockshare 0.01 hot  -46.7 K (0 s) cg cut 2.9/2.9 deliv 0.00/0.00
+   closed: b 4.04/3.99   open b 3.86
+   open a: a15 1.11  a30 2.29  a45 3.78  a60 3.73  a90 3.78  a130 3.83   open c: c15 26.97  c30 45.26  c45 59.94  c60 68.87  c90 69.54  c130 70.13
+   split b (turb/oil/knock units): turb 5.09, oil -0.06, knock 0.00; fuel +3.94 %; dT onsets b 3.4 3.5 3.9 4.1 4.2
+L85_g8_G50_v115       ford_27tt    L/tau 1.27 base     46.0/    63.6 knockshare 0.28 hot  -89.8 K (0 s) cg cut 8.2/5.9 deliv 0.00/0.00
+   closed: b 0.98/0.71   open b 1.09
+   open a: a15 0.24  a30 0.50  a45 0.86  a60 1.07  a90 1.07  a130 1.08   open c: c15 21.02  c30 35.43  c45 46.89  c60 53.88  c90 54.46  c130 55.01
+   split b (turb/oil/knock units): turb 0.52, oil -0.07, knock 0.00; fuel +4.00 %; dT onsets b 0.5 0.9 1.1 1.2 1.3
+L85_g8_G50_v130       b58          L/tau 1.80 base    102.2/   104.1 knockshare 0.02 hot  -40.5 K (0 s) cg cut 61.2/59.6 deliv 1.00/0.00
+   closed: b 4.09/3.86   open b 4.01
+   open a: a15 1.06  a30 2.11  a45 3.34  a60 3.90  a90 3.95  a130 3.99   open c: c15 10.98  c30 17.51  c45 22.33  c60 25.06  c90 25.21  c130 25.33
+   split b (turb/oil/knock units): turb 4.26, oil -0.08, knock -0.16; fuel +5.78 %; dT onsets b 14.8 13.8 14.3 14.5 14.5
+L85_g8_G50_v130       mazda_25t    L/tau 1.99 base     68.3/   406.6 knockshare 0.83 hot  -73.8 K (0 s) cg cut 14.8/11.4 deliv 0.00/0.00
+   closed: b 4.10/10.07   open b 4.11
+   open a: a15 0.91  a30 1.89  a45 3.27  a60 4.06  a90 4.08  a130 4.10   open c: c15 22.07  c30 36.02  c45 47.64  c60 54.41  c90 54.86  c130 55.21
+   split b (turb/oil/knock units): turb 2.92, oil -0.11, knock 38.16; fuel +5.58 %; dT onsets b 3.1 5.9 6.6 6.8 6.8
+L85_g8_G50_v130       honda_l15b7  L/tau 1.78 base    217.9/   220.0 knockshare 0.01 hot  -29.7 K (0 s) cg cut -1.3/-1.3 deliv 0.00/0.00
+   closed: b 5.55/5.50   open b 5.31
+   open a: a15 1.71  a30 3.50  a45 5.31  a60 5.05  a90 5.16  a130 5.26   open c: c15 33.02  c30 53.64  c45 68.90  c60 76.76  c90 77.49  c130 78.07
+   split b (turb/oil/knock units): turb 12.21, oil -0.11, knock 0.00; fuel +3.91 %; dT onsets b 7.3 5.6 5.7 5.7 5.8
+L85_g8_G50_v130       ford_27tt    L/tau 1.27 base    146.1/   171.1 knockshare 0.15 hot  -34.0 K (0 s) cg cut 4.7/4.0 deliv 0.00/0.00
+   closed: b 2.49/2.13   open b 2.43
+   open a: a15 0.64  a30 1.29  a45 2.08  a60 2.31  a90 2.36  a130 2.40   open c: c15 31.78  c30 51.41  c45 65.58  c60 72.77  c90 73.37  c130 73.90
+   split b (turb/oil/knock units): turb 3.73, oil -0.09, knock 0.00; fuel +3.90 %; dT onsets b 2.6 2.3 2.3 2.3 2.3
+X_L30_g10_G100_v130   b58          L/tau 0.63 base     11.8/    14.3 knockshare 0.17 hot -175.0 K (0 s) cg cut 7.7/-6.2 deliv 0.00/0.00
+   closed: b 5.57/0.15   open b 6.48
+   open a: a15 1.03  a30 1.98  a45 2.86  a60 3.72  a90 5.52  a130 6.44   open c: c15 11.74  c30 17.13  c45 19.83  c60 21.28  c90 22.55  c130 22.88
+   split b (turb/oil/knock units): turb 0.78, oil -0.12, knock -0.64; fuel +12.51 %; dT onsets b 14.8 19.1 21.1 21.8 22.0
+X_L30_g10_G100_v130   mazda_25t    L/tau 0.70 base     18.6/   224.9 knockshare 0.92 hot -135.3 K (0 s) cg cut 6.1/-2.2 deliv 0.00/0.00
+   closed: b 4.70/26.99   open b 5.43
+   open a: a15 0.66  a30 1.29  a45 1.92  a60 2.58  a90 4.19  a130 5.41   open c: c15 21.55  c30 32.05  c45 37.71  c60 41.00  c90 44.30  c130 45.35
+   split b (turb/oil/knock units): turb 1.03, oil -0.16, knock 59.82; fuel +12.37 %; dT onsets b 3.1 6.7 8.1 8.6 8.7
+X_L30_g10_G100_v130   honda_l15b7  L/tau 0.63 base     72.3/    74.4 knockshare 0.03 hot  -69.6 K (0 s) cg cut -2.1/-2.0 deliv 0.00/0.00
+   closed: b 12.48/12.13   open b 12.35
+   open a: a15 2.06  a30 4.06  a45 6.04  a60 8.04  a90 12.27  a130 12.25   open c: c15 42.32  c30 63.43  c45 74.69  c60 80.94  c90 86.52  c130 87.98
+   split b (turb/oil/knock units): turb 9.15, oil -0.12, knock 0.00; fuel +9.53 %; dT onsets b 7.3 9.0 10.0 10.4 10.6
+X_L30_g10_G100_v130   ford_27tt    L/tau 0.45 base     32.2/    57.1 knockshare 0.44 hot -100.0 K (0 s) cg cut 2.7/1.5 deliv 0.00/0.00
+   closed: b 3.80/2.14   open b 4.10
+   open a: a15 0.62  a30 1.21  a45 1.80  a60 2.40  a90 3.67  a130 4.05   open c: c15 32.46  c30 49.04  c45 58.02  c60 63.09  c90 67.76  c130 69.12
+   split b (turb/oil/knock units): turb 1.35, oil -0.13, knock 0.00; fuel +8.75 %; dT onsets b 2.6 3.2 3.6 3.8 3.9
+X_L30_g12_G100_v130   b58          L/tau 0.63 base     16.4/    20.8 knockshare 0.21 hot -131.8 K (0 s) cg cut 13.3/-3.6 deliv 0.00/0.00
+   closed: b 9.26/2.40   open b 9.82
+   open a: a15 1.55  a30 2.95  a45 4.26  a60 5.53  a90 8.29  a130 9.78   open c: c15 17.45  c30 25.86  c45 30.29  c60 32.80  c90 35.21  c130 35.97
+   split b (turb/oil/knock units): turb 1.64, oil -0.12, knock -1.02; fuel +11.70 %; dT onsets b 14.8 19.3 21.4 22.1 22.4
+X_L30_g12_G100_v130   mazda_25t    L/tau 0.70 base     26.3/   226.9 knockshare 0.88 hot -104.2 K (0 s) cg cut 9.6/-9.0 deliv 0.00/0.00
+   closed: b 6.32/25.22   open b 6.80
+   open a: a15 0.80  a30 1.57  a45 2.33  a60 3.13  a90 5.13  a130 6.78   open c: c15 25.01  c30 37.64  c45 44.67  c60 48.91  c90 53.46  c130 55.10
+   split b (turb/oil/knock units): turb 1.82, oil -0.16, knock 55.57; fuel +11.74 %; dT onsets b 3.1 7.2 8.7 9.2 9.3
+X_L30_g12_G100_v130   honda_l15b7  L/tau 0.63 base    105.8/   139.6 knockshare 0.24 hot  -45.8 K (0 s) cg cut -2.4/3.6 deliv 0.00/0.00
+   closed: b 12.74/9.66   open b 12.55
+   open a: a15 2.09  a30 4.11  a45 6.12  a60 8.15  a90 12.56  a130 12.46   open c: c15 42.49  c30 64.40  c45 76.50  c60 83.50  c90 90.14  c130 92.06
+   split b (turb/oil/knock units): turb 13.60, oil -0.13, knock 0.01; fuel +8.98 %; dT onsets b 7.3 9.1 10.2 10.6 10.7
+X_L30_g12_G100_v130   ford_27tt    L/tau 0.45 base     37.9/    62.8 knockshare 0.40 hot  -89.4 K (0 s) cg cut 5.1/3.1 deliv 0.00/0.00
+   closed: b 4.02/2.43   open b 4.28
+   open a: a15 0.60  a30 1.18  a45 1.76  a60 2.34  a90 3.59  a130 4.24   open c: c15 31.70  c30 48.28  c45 57.45  c60 62.75  c90 67.79  c130 69.36
+   split b (turb/oil/knock units): turb 1.66, oil -0.14, knock 0.00; fuel +8.58 %; dT onsets b 2.6 3.3 3.7 3.9 4.0

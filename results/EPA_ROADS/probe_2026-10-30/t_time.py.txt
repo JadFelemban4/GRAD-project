@@ -1,0 +1,13 @@
+import time, sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib
+import numpy as np
+for e in lib.ENGINES:
+    t0 = time.perf_counter()
+    p = lib.engines.get(e)
+    t1 = time.perf_counter()
+    c, m = lib.locked(p)
+    r = lib.run(p, c, lib.C.p_grade_now)
+    t2 = time.perf_counter()
+    th = p.engine.thermal; dm = p.engine.damage; ecu = p.engine.ecu
+    print(f"{e}: get {t1-t0:.1f}s, one 720 s locked-climb run {t2-t1:.1f}s; scenario {p.scenario}; knee {dm.turb_knee_k:.2f} scale {dm.turb_scale_k} lam_floor {ecu.lam_floor} n_turb {th.n_turbines} c_turb {th.c_turb}; ki_knee {dm.ki_knee} ki_w {dm.ki_weight}; tot {lib.totals(r)}", flush=True)

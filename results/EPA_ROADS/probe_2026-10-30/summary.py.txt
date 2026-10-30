@@ -1,0 +1,222 @@
+"""The probe's tables from table.json (analyse.py), c5tau.json and the runs.
+
+    python summary.py            writes table_full.csv, summary.txt, stage2_list.txt
+
+Reading primary: no-knock. Variant (a): the closed-loop run where stage 2 made one, else the open-loop
+replay (flagged 'ol'), in the no-knock reading; in the knock reading closed loop ONLY (an open-loop
+replay holds the knock term fixed, so it cannot read it). A family is DROPPED for the shared slot if
+its climb fails C5 at 1.9 % on any car (c5tau.json) or if any car's current-grade reference or
+baseline misses TRACK_TOL on more than 0 % of its full-grade climb steps (decision 13's yardstick);
+FLAGGED cold where a car's baseline never exceeds its knee, and not covered where v > 115 km/h
+(C1's road-load coverage of the EPA cars). Families named X_ are exploratory (L 30 s, outside 1-2
+tau) and are reported apart.
+"""
+import csv
+import json
+import os
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import numpy as np  # noqa: E402
+
+ENG = ("b58", "mazda_25t", "honda_l15b7", "ford_27tt")
+HS = (15, 30, 45, 60, 90, 130)
+MEI = 5.43
+TWO = 2 * MEI
+
+
+def a_val(r, h, rd):
+    c = r["closed"].get(f"a{h}")
+    if c is not None:
+        return c[rd], "cl"
+    if rd == "knock":
+        return float("nan"), "na"
+    return r["open_a"][f"a{h}"][rd], "ol"
+
+
+def best(keys, fn):
+    keys = [k for k in keys if np.isfinite(fn(k))]
+    return max(keys, key=fn) if keys else None
+
+
+def phase_split(fid, eng, var):
+    """Closed-loop saving per damage term, by phase: gap / ramp up / full grade / ramp down."""
+    def ld(v):
+        z = np.load(os.path.join(HERE, "runs", f"{fid}__{eng}__{v}.npz"))
+        return {k: z[k] for k in z.files}
+    p = os.path.join(HERE, "runs", f"{fid}__{eng}__{var}.npz")
+    if not os.path.exists(p):
+        return None
+    A, B = ld("cg"), ld(var)
+    meta = json.load(open(os.path.join(HERE, "runs", f"{fid}__{eng}__cg.json")))["meta"]
+    t = A["t"]
+    ph = np.full(len(t), "gap", dtype=object)
+    for s, e in zip(meta["onsets"], meta["ends"]):
+        ph[(t >= s) & (t < s + 8)] = "ramp_up"
+        ph[(t >= s + 8) & (t < e)] = "climb"
+        ph[(t >= e) & (t < e + 8)] = "ramp_down"
+    out = {}
+    for term in ("d_turb", "d_oil", "d_knock"):
+        d = A[term] - B[term]
+        out[term] = {q: float(d[ph == q].sum()) for q in ("gap", "ramp_up", "climb", "ramp_down")}
+    return out
+
+
+def main():
+    T = json.load(open(os.path.join(HERE, "table.json"), encoding="utf-8"))
+    C5 = json.load(open(os.path.join(HERE, "c5tau.json"), encoding="utf-8"))["c5"]
+    by = {}
+    for r in T:
+        by.setdefault(r["fid"], {})[r["engine"]] = r
+    allf = {f: d for f, d in by.items() if all(e in d for e in ENG)}
+    fams = {f: d for f, d in allf.items() if not f.startswith("X_")}
+    extra = {f: d for f, d in allf.items() if f.startswith("X_")}
+    status = {}
+    for f, d in fams.items():
+        fam = d["b58"]["family"]
+        c5fail = [e for e in ENG if C5[f"{e}|{fam['v']:g}|{fam['g']:g}|{fam['L']:g}"]["outcome"] == "fails"]
+        ref = [e for e in ENG if d[e]["delivery"]["agent_share"] > 0]
+        car = [e for e in ENG if d[e]["delivery"]["base_share"] > 0]
+        cold = [e for e in ENG if d[e]["hot"]["base_s_above_knee"] == 0]
+        status[f] = dict(c5fail=c5fail, ref_short=ref, car_short=car, cold=cold, covered=fam["v"] <= 115.0,
+                         dropped=bool(c5fail or ref or car))
+    with open(os.path.join(HERE, "table_full.csv"), "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["family", "L_s", "grade", "gap_s", "v_kmh", "n_climbs", "engine", "L_over_tau", "variant", "H_s",
+                    "reading", "points", "loop", "base_damage", "cg_cut_pts", "base_peak_minus_knee_K",
+                    "base_s_above_knee", "c5_fail_cars", "ref_shortfall_cars", "car_shortfall_cars", "dropped"])
+        for f, d in sorted(allf.items()):
+            st = status.get(f, dict(c5fail=["n/a"], ref_short=[], car_short=[], dropped="exploratory"))
+            for e in ENG:
+                r = d[e]
+                fam = r["family"]
+                common = [f, fam["L"], fam["g"], fam["G"], fam["v"], r["n"], e, round(r["L_over_tau"], 3)]
+                for rd in ("noknock", "knock"):
+                    tail = [round(r["base"][rd], 3), round(r["cg_cut"][rd], 3), round(r["hot"]["base_peak_minus_knee_k"], 2),
+                            r["hot"]["base_s_above_knee"], ";".join(st["c5fail"]), ";".join(st["ref_short"]),
+                            ";".join(st["car_short"]), st["dropped"]]
+                    w.writerow(common + ["b", "whole gap", rd, round(r["closed"]["b"][rd], 4), "closed"] + tail)
+                    w.writerow(common + ["b", "whole gap", rd, round(r["open_b"][rd], 4), "open"] + tail)
+                    for h in grid_hs():
+                        if f"a{h}" in r["closed"]:
+                            w.writerow(common + ["a", h, rd, round(r["closed"][f"a{h}"][rd], 4), "closed"] + tail)
+                        w.writerow(common + ["a", h, rd, round(r["open_a"][f"a{h}"][rd], 4), "open"] + tail)
+                        w.writerow(common + ["c", h, rd, round(r["open_c"][f"c{h}"][rd], 4), "open"] + tail)
+    lines = []
+    P = lambda s="": print(s) or lines.append(s)  # noqa: E731
+    keep = [f for f in fams if not status[f]["dropped"]]
+    P(f"families: {len(fams)} in the grid; {len(keep)} kept for the shared slot; dropped {len(fams) - len(keep)}:")
+    why = {}
+    for f in sorted(fams):
+        s = status[f]
+        if s["dropped"]:
+            key = (tuple(s["c5fail"]), tuple(s["ref_short"]), tuple(s["car_short"]))
+            why.setdefault(key, []).append(f)
+    for (c5, rf, cr), fs in why.items():
+        P(f"   C5 fails on {list(c5)}, current-grade shortfall on {list(rf)}, baseline shortfall on {list(cr)}: {len(fs)} families: {' '.join(fs)}")
+    P(f"   hottest kept family per engine (baseline peak housing minus knee): " + "; ".join(
+        f"{e} {max(fams[f][e]['hot']['base_peak_minus_knee_k'] for f in keep):+.1f} K "
+        f"[{max(keep, key=lambda f: fams[f][e]['hot']['base_peak_minus_knee_k'])}]" for e in ENG))
+    P(f"   kept families where any car's baseline exceeds its knee: "
+      f"{[f for f in keep if len(status[f]['cold']) < 4]}")
+    views = [("ALL KEPT", keep), ("SHARED SLOT 1-2 tau ON EVERY ENGINE (L 67 or 85 s)", [f for f in keep if fams[f]['b58']['family']['L'] in (67.0, 85.0)]),
+             ("COVERED (v <= 115 km/h)", [f for f in keep if status[f]["covered"]])]
+    for rd in ("noknock", "knock"):
+        P()
+        P(f"=================== reading: {rd} ===================")
+        for vname, ks in views:
+            P(f"--- {vname}: {len(ks)} families")
+            if not ks:
+                continue
+            P("  best family per engine, (a) by H; (b); (c) at H130")
+            for e in ENG:
+                parts = []
+                for h in HS:
+                    f = best(ks, lambda f: a_val(fams[f][e], h, rd)[0])
+                    if f is None:
+                        parts.append(f"H{h}: n/a")
+                        continue
+                    v, src = a_val(fams[f][e], h, rd)
+                    parts.append(f"H{h} {v:.2f}{src} [{f}]")
+                fb = best(ks, lambda f: fams[f][e]["closed"]["b"][rd])
+                fc = best(ks, lambda f: fams[f][e]["open_c"]["c130"][rd])
+                P(f"    {e:<12} " + "; ".join(parts))
+                P(f"    {'':<12} b {fams[fb][e]['closed']['b'][rd]:.2f} [{fb}]; c130 {fams[fc][e]['open_c']['c130'][rd]:.2f} [{fc}]")
+            P("  best common family (max over families of the min over engines)")
+            for h in HS:
+                f = best(ks, lambda f: min(a_val(fams[f][e], h, rd)[0] for e in ENG))
+                if f is None:
+                    P(f"    a H{h:>3}: n/a (no closed-loop run)")
+                    continue
+                vals = {e: a_val(fams[f][e], h, rd) for e in ENG}
+                mn = min(v for v, _ in vals.values())
+                P(f"    a H{h:>3}: {f:<20} min {mn:6.2f} = {mn / MEI:.2f} MEI   " + "  ".join(f"{e} {v:.2f}{s}" for e, (v, s) in vals.items()))
+            f = best(ks, lambda f: min(fams[f][e]["closed"]["b"][rd] for e in ENG))
+            P(f"    b     : {f:<20} min {min(fams[f][e]['closed']['b'][rd] for e in ENG):6.2f} = "
+              f"{min(fams[f][e]['closed']['b'][rd] for e in ENG) / MEI:.2f} MEI   " + "  ".join(f"{e} {fams[f][e]['closed']['b'][rd]:.2f}" for e in ENG))
+            f = best(ks, lambda f: min(fams[f][e]["open_c"]["c130"][rd] for e in ENG))
+            P(f"    c H130: {f:<20} min {min(fams[f][e]['open_c']['c130'][rd] for e in ENG):6.2f}")
+            reach = {e: [h for h in HS if any(a_val(fams[f][e], h, rd)[0] >= TWO for f in ks)] for e in ENG}
+            P(f"  2 MEI ({TWO:.2f}) reached by (a) on SOME family, per engine, at H: {reach}")
+            allfour = [(f, h) for f in ks for h in HS if all(a_val(fams[f][e], h, rd)[0] >= TWO for e in ENG)]
+            P(f"  2 MEI by (a) on ALL FOUR (one family, one H): {allfour if allfour else 'none'}; by (b): "
+              f"{[f for f in ks if all(fams[f][e]['closed']['b'][rd] >= TWO for e in ENG)] or 'none'}")
+            ford_max = max(max(a_val(fams[f]['ford_27tt'], h, rd)[0] for h in HS if np.isfinite(a_val(fams[f]['ford_27tt'], h, rd)[0])) if any(np.isfinite(a_val(fams[f]['ford_27tt'], h, rd)[0]) for h in HS) else float('nan') for f in ks)
+            P(f"  the Ford's largest (a) anywhere in this view: {ford_max:.2f}")
+    # open vs closed agreement (no knock), stage-2 rows
+    diffs = []
+    for f, d in allf.items():
+        for e in ENG:
+            for h in HS:
+                c = d[e]["closed"].get(f"a{h}")
+                if c is not None:
+                    diffs.append((c["noknock"] - d[e]["open_a"][f"a{h}"]["noknock"], f, e, h))
+        for e in ENG:
+            diffs.append((d[e]["closed"]["b"]["noknock"] - d[e]["open_b"]["noknock"], f, e, "b"))
+    a = np.array([x[0] for x in diffs if x[3] != "b"])
+    b = np.array([x[0] for x in diffs if x[3] == "b"])
+    P()
+    P(f"OPEN vs CLOSED LOOP, no-knock points: (a) {len(a)} pairs, closed - open mean {a.mean() if len(a) else float('nan'):+.3f}, "
+      f"min {a.min() if len(a) else float('nan'):+.3f}, max {a.max() if len(a) else float('nan'):+.3f}; "
+      f"(b) {len(b)} pairs, mean {b.mean():+.3f}, min {b.min():+.3f}, max {b.max():+.3f}")
+    # exploratory
+    if extra:
+        P()
+        P("EXPLORATORY, L = 30 s (outside 1-2 tau; C5 not computed):")
+        for f, d in sorted(extra.items()):
+            P(f"   {f}: (a) H130 open, no knock: " + "  ".join(f"{e} {d[e]['open_a']['a130']['noknock']:.2f}" for e in ENG)
+              + "; (b) closed no knock: " + "  ".join(f"{e} {d[e]['closed']['b']['noknock']:.2f}" for e in ENG))
+    # phase split on the best common family at H130 (no knock)
+    f0 = best(keep, lambda f: min(a_val(fams[f][e], 130, "noknock")[0] for e in ENG))
+    P()
+    P(f"WHERE THE CLOSED-LOOP SAVING COMES FROM on {f0} (damage units; turbine / oil / knock by phase)")
+    for e in ENG:
+        for var in ("b", "a130", "a30"):
+            sp = phase_split(f0, e, var)
+            if sp is None:
+                continue
+            P(f"   {e:<12} {var:<5} " + "  ".join(f"{term[2:]}: " + ", ".join(f"{q} {v:+.2f}" for q, v in sp[term].items())
+                                                for term in ("d_turb", "d_oil", "d_knock"))
+              + f"   (base no-knock {fams[f0][e]['base']['noknock']:.1f}, knock {fams[f0][e]['base']['knock']:.1f})")
+    sc = {f: min(fams[f][e]["open_a"]["a130"]["noknock"] for e in ENG) for f in keep}
+    top = sorted(keep, key=lambda f: -sc[f])[:12]
+    own = set()
+    for e in ENG:
+        own |= set(sorted(keep, key=lambda f: -fams[f][e]["open_a"]["a130"]["noknock"])[:2])
+    s2 = sorted(set(top) | own, key=lambda f: -sc[f])
+    P()
+    P(f"STAGE-2 LIST ({len(s2)}): " + " ".join(s2))
+    with open(os.path.join(HERE, "summary.txt"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+    if not os.path.exists(os.path.join(HERE, "stage2_list.txt")):
+        with open(os.path.join(HERE, "stage2_list.txt"), "w", encoding="utf-8") as fh:
+            fh.write(" ".join(s2) + "\n")
+
+
+def grid_hs():
+    return HS
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,56 @@
+== (2) paired one-sided t, n = 20, true d = the whole ceiling (best case) ==
+  sigma  X2 20.51: b58 r1.5 0.097/0.348  mazda r1.5 0.035/0.176  honda r1.5 0.079/0.307  ford r1.5 0.023/0.132  b58 r0.5 -/0.122  mazda r0.5 -/0.078  honda r0.5 -/0.122  ford r0.5 -/0.082
+  sigma  X1 24.78: b58 r1.5 0.066/0.272  mazda r1.5 0.027/0.146  honda r1.5 0.055/0.242  ford r1.5 0.019/0.113  b58 r0.5 -/0.106  mazda r0.5 -/0.072  honda r0.5 -/0.106  ford r0.5 -/0.075
+  sigma        10: b58 r1.5 0.480/0.822  mazda r1.5 0.136/0.429  honda r1.5 0.393/0.755  ford r1.5 0.071/0.286  b58 r0.5 -/0.253  mazda r0.5 -/0.118  honda r0.5 -/0.256  ford r0.5 -/0.129
+  sigma         5: b58 r1.5 0.991/1.000  mazda r1.5 0.615/0.901  honda r1.5 0.974/0.999  ford r1.5 0.329/0.695  b58 r0.5 -/0.623  mazda r0.5 -/0.235  honda r0.5 -/0.629  ford r0.5 -/0.268
+  (first/last = Holm's first step alpha/8 and its last step alpha; upper bound of Holm power)
+
+== sigma needed for 80 % power at Holm's first step (alpha/8), d = whole ceiling, n = 20 ==
+  b58    r1.5 ceiling 5.96: sigma <= 7.32 points
+  mazda  r1.5 ceiling 3.40: sigma <= 4.17 points
+  honda  r1.5 ceiling 5.42: sigma <= 6.65 points
+  ford   r1.5 ceiling 2.50: sigma <= 3.07 points
+
+== (4) difference test, Welch, n = 20 each, Holm over 6 pairs x 2 H = 12, two-sided ==
+  sigma  X2 20.51: SE  6.49; observed |d_i - d_j| must exceed band +  19.8 (first step) / +  13.1 (last step)
+  sigma  X1 24.78: SE  7.84; observed |d_i - d_j| must exceed band +  23.9 (first step) / +  15.9 (last step)
+  sigma        10: SE  3.16; observed |d_i - d_j| must exceed band +   9.6 (first step) / +   6.4 (last step)
+  sigma         5: SE  1.58; observed |d_i - d_j| must exceed band +   4.8 (first step) / +   3.2 (last step)
+  largest possible true difference if d in [0, C]: r1.5 5.96 (B58 full vs any at 0); r0.5 2.29
+
+== (3) TOST, 90 % Welch interval half-width (before the model band) ==
+  sigma  X2 20.51: +/-  10.9 points against the MEI 5.43
+  sigma  X1 24.78: +/-  13.2 points against the MEI 5.43
+  sigma        10: +/-   5.3 points against the MEI 5.43
+  sigma         5: +/-   2.7 points against the MEI 5.43
+
+== false-negative risk at d_obs = 0.59 MEI = 3.20 points (MD:139-141), n = 20 ==
+  sigma  X2 20.51: power 0.032 (alpha/8) / 0.166 (alpha); FN = 1 - power
+  sigma  X1 24.78: power 0.025 (alpha/8) / 0.138 (alpha); FN = 1 - power
+  sigma        10: power 0.119 (alpha/8) / 0.396 (alpha); FN = 1 - power
+  sigma         5: power 0.551 (alpha/8) / 0.867 (alpha); FN = 1 - power
+
+== effective window / tau at nominal r = 1.5 (window = min(H, G), G ~ U[50,150] whole s; first climb unclipped ignored) ==
+  b58    r 0.5: H  23.67 s, P(G < H) 0.00, mean window  23.67 s = 0.500 tau
+  b58    r 1.5: H  71.00 s, P(G < H) 0.22, mean window  68.71 s = 1.452 tau
+  mazda  r 0.5: H  21.37 s, P(G < H) 0.00, mean window  21.37 s = 0.500 tau
+  mazda  r 1.5: H  64.11 s, P(G < H) 0.15, mean window  63.06 s = 1.475 tau
+  honda  r 0.5: H  23.84 s, P(G < H) 0.00, mean window  23.84 s = 0.500 tau
+  honda  r 1.5: H  71.51 s, P(G < H) 0.22, mean window  69.11 s = 1.450 tau
+  ford   r 0.5: H  33.38 s, P(G < H) 0.00, mean window  33.38 s = 0.500 tau
+  ford   r 1.5: H 100.14 s, P(G < H) 0.50, mean window  87.45 s = 1.310 tau
+
+== the B58's model band at d = its whole r = 1.5 ceiling, as row 107 (4) defines it (planning) ==
+  P1 at b   0.99 points (phi = 1)
+  P2 at b   0.99 points (phi = 1)
+  P3 at b   0.91 points (phi = 1)
+  P4 E8     2.54 points (phi = 1)
+  P5 at b   0.99 points (phi = 1)
+  Delta_B58 (RSS, exact cycle, P6 = 0) = 3.20 points; kappa_E8 >= 2.56
+
+== points per K of exhaust drop at the lambda bound, drafted mix, r = 1.5, open loop (matched.txt; probe section 6 drops) ==
+  b58    ceiling 5.96 / drop 55.3 K = 0.108 points per K
+  honda  ceiling 5.42 / drop 39.0 K = 0.139 points per K
+  mazda  ceiling 3.40 / drop 21.3 K = 0.160 points per K
+  ford   ceiling 2.50 / drop 13.0 K = 0.192 points per K
+  ceiling spread B58/Ford 2.38x against exhaust-drop spread 4.25x

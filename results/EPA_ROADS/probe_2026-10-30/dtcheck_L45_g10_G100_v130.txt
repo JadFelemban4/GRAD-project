@@ -1,0 +1,9 @@
+dt sensitivity on L45_g10_G100_v130 (closed loop; points = 100 (D_cg - D_var) / D_base, both readings)
+b58          dt 0.5: base 19.1/20.0 cg cut 15.32  b 8.22/7.87  a30 2.49/2.39  a130 8.20/7.85
+b58          dt 1.0: base 19.2/21.7 cg cut 15.56  b 8.26/4.40  a30 2.48/-0.55  a130 8.25/4.39
+mazda_25t    dt 0.5: base 33.2/241.4 cg cut 10.31  b 5.66/22.38  a30 1.33/6.63  a130 5.67/22.18
+mazda_25t    dt 1.0: base 33.3/290.1 cg cut 10.38  b 5.72/21.42  a30 1.29/7.50  a130 5.73/21.04
+honda_l15b7  dt 0.5: base 118.5/119.9 cg cut -2.30  b 11.23/11.10  a30 3.54/3.50  a130 11.16/11.02
+honda_l15b7  dt 1.0: base 118.2/120.3 cg cut -2.31  b 11.07/10.88  a30 3.52/3.45  a130 11.00/10.81
+ford_27tt    dt 0.5: base 68.9/83.0 cg cut 3.41  b 4.13/3.44  a30 1.22/1.02  a130 4.10/3.42
+ford_27tt    dt 1.0: base 69.2/94.1 cg cut 3.55  b 4.01/2.95  a30 1.21/0.89  a130 3.99/2.93

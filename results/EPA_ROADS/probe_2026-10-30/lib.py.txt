@@ -1,0 +1,228 @@
+"""Preview-ceiling feasibility probe (decision 34): shared code. SCRATCH ONLY, no repository file is
+written. Imports the repository read-only; an audit hook refuses any open of an EPA table or a
+validation record (logs/epa, data/engines/*/epa_*, results/EPA_VALIDATION), and records every path
+opened so the report can list them.
+
+Road family: flat lead-in, then N climbs of length L at grade g, separated by flat gaps G, at speed
+v, grades ramped over engine_env.GRADE_RAMP_S both ways (linear, the same expression
+make_grade_climb uses for its ramp up). Climb i: ramp up from s_i to s_i + R, full grade to s_i + L,
+ramp down from s_i + L to s_i + L + R; s_{i+1} = s_i + L + G. The speed ramps 0 -> v over the
+first 20 s as make_grade_climb does.
+"""
+import os
+import re
+import sys
+
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
+sys.dont_write_bytecode = True
+
+REPO = r"C:\Users\badcl\Desktop\GRAD-project"
+OPENED = set()
+
+
+def _hook(event, args):
+    if event == "open" and args and isinstance(args[0], (str, bytes, os.PathLike)):
+        p = args[0]
+        s = os.fsdecode(p) if not isinstance(p, str) else p
+        s2 = s.replace("\\", "/").lower()
+        if ("logs/epa" in s2 or re.search(r"data/engines/[^/]+/epa_", s2)
+                or "epa_validation" in s2 or s2.endswith(".csv")):
+            raise PermissionError(f"probe guard: refused to open {s}")
+        OPENED.add(s)
+
+
+sys.addaudithook(_hook)
+sys.path.insert(0, REPO)
+
+import numpy as np  # noqa: E402
+
+import engine_env as E  # noqa: E402
+import engines  # noqa: E402
+import check_premise as C  # noqa: E402
+
+DT = 1.0
+T_AMB = 315.0
+RAMP = E.GRADE_RAMP_S
+LAM_BOUND = float(E.ACT_LO[1])          # -0.15, the agent's lambda-trim bound
+ENGINES = ("b58", "mazda_25t", "honda_l15b7", "ford_27tt")
+MEI = 5.43
+
+
+def road(*, lead, n, L, g, G, v_kmh, tail, dt=DT, t_amb=T_AMB):
+    onsets = [float(lead + i * (L + G)) for i in range(n)]
+    duration = onsets[-1] + L + tail
+    N = int(round(duration / dt))
+    t = np.arange(N) * dt
+    v = np.full(N, v_kmh / 3.6)
+    v[:int(20 / dt)] = np.linspace(0.0, v_kmh / 3.6, int(20 / dt))
+    gr = np.zeros(N)
+    for s in onsets:
+        up = np.clip((t - s) / RAMP, 0.0, 1.0)
+        down = np.clip(1.0 - (t - (s + L)) / RAMP, 0.0, 1.0)
+        gr = np.maximum(gr, g * np.minimum(up, down))
+    c = dict(t=t, v_mps=v, grade=gr, t_amb=t_amb, p_baro=101.3, humidity=0.012)
+    meta = dict(onsets=onsets, ends=[s + L for s in onsets], L=L, g=g, G=G, v_kmh=v_kmh, n=n,
+                lead=lead, tail=tail, duration=duration)
+    return c, meta
+
+
+def locked(plant):
+    c = E.locked_climb(plant, duration=720.0, dt=DT)
+    return c, dict(onsets=[180.0], ends=[720.0], L=540.0, g=plant.scenario.grade, G=None,
+                   v_kmh=plant.scenario.v_kmh, n=1, lead=180.0, tail=0.0, duration=720.0)
+
+
+def windows(meta, H, first_from=20.0):
+    """[start, onset) per climb: H seconds before each onset, clipped to the preceding gap (the
+    previous climb's end, s + L, or first_from for the first climb). H=None: the whole gap."""
+    out = []
+    prev_end = first_from
+    for s, e in zip(meta["onsets"], meta["ends"]):
+        a = prev_end if H is None else max(s - H, prev_end)
+        out.append((a, s))
+        prev_end = e
+    return out
+
+
+def in_windows(t, wins):
+    return any(a <= t < b for a, b in wins)
+
+
+def lambda_variant(wins):
+    """current-grade protection, with the lambda trim at its bound inside the windows."""
+    def p(env, obs):
+        a = C.p_grade_now(env, obs)
+        t = float(env.cycle["t"][env.k])
+        if in_windows(t, wins):
+            a = np.array(a, dtype=np.float32).copy()
+            a[1] = -1.0          # normalised -1 == ACT_LO[1] == -0.15
+        return a
+    return p
+
+
+def run(plant, cycle, policy, *, seed=1000, w=(0.690154, 0.012829, 0.297017), egt_override=None):
+    """One episode at dt 1 s (evaluate.EPISODES[0]'s seed and weights). Returns per-step arrays.
+    egt_override: optional function t -> bool; where True, the AGENT's housing node is fed exhaust
+    at ambient (the impossible row, closed loop), by an instance wrapper on env.thermal.step."""
+    env = E.SupervisoryTunerEnv(cycle, plant=plant, dt=DT, seed=seed, use_preview=True)
+    obs, _ = env.reset(seed=seed)
+    env.w = np.asarray(w, dtype=np.float32)
+    obs = env._obs()
+    if egt_override is not None:
+        orig = env.thermal.step
+
+        def step(dt, mf, mex, egt_k, t_amb, vm, fan, pump=1.0, *, rpm):
+            if egt_override(float(env.cycle["t"][env.k])):
+                egt_k = t_amb
+            return orig(dt, mf, mex, egt_k, t_amb, vm, fan, pump, rpm=rpm)
+        env.thermal.step = step
+    dm = plant.engine.damage
+    keys = ("t", "t_turb", "t_oil", "ki", "egt_k", "mdot_exh", "torque", "torque_req", "lam",
+            "spark", "fuel", "tb_turb", "tb_oil", "grade", "rpm", "map", "lam_trim", "torque_base")
+    rec = {k: [] for k in keys}
+    while True:
+        t = float(env.cycle["t"][env.k])
+        a = policy(env, obs)
+        obs, r, term, trunc, info = env.step(a)
+        rec["t"].append(t)
+        rec["t_turb"].append(info["t_turb"])
+        rec["t_oil"].append(info["t_oil"])
+        rec["ki"].append(info["ki"])
+        rec["egt_k"].append(info["egt_c"] + 273.15)
+        rec["mdot_exh"].append(info["mdot_exh"])
+        rec["torque"].append(info["torque"])
+        rec["torque_req"].append(info["torque_req"])
+        rec["lam"].append(info["lam"])
+        rec["spark"].append(info["spark"])
+        rec["fuel"].append(info["mdot_fuel"])
+        rec["tb_turb"].append(env.thermal_base.t_turb)
+        rec["tb_oil"].append(env.thermal_base.t_oil)
+        rec["grade"].append(float(env.cycle["grade"][env.k - 1]))
+        rec["rpm"].append(env.rpm)
+        rec["map"].append(env.map_kpa)
+        rec["lam_trim"].append(float(env.prev_act[1]))
+        rec["torque_base"].append(info["torque_base"])
+        if term or trunc:
+            break
+    if term:
+        raise RuntimeError("episode terminated (non-finite reward)")
+    out = {k: np.asarray(v, dtype=float) for k, v in rec.items()}
+    s = info["episode_summary"]
+    out["summary"] = {k: float(v) for k, v in s.items()}
+    T, O, K = out["t_turb"], out["t_oil"], out["ki"]
+    out["d_turb"] = np.exp((T - dm.turb_knee_k) / dm.turb_scale_k) * DT
+    out["d_oil"] = dm.oil_weight * np.exp((O - dm.oil_knee_k) / dm.oil_scale_k) * DT
+    out["d_knock"] = dm.ki_weight * np.clip(K - dm.ki_knee, 0.0, None) ** 2 * DT
+    TB, OB = out["tb_turb"], out["tb_oil"]
+    out["db_turb"] = np.exp((TB - dm.turb_knee_k) / dm.turb_scale_k) * DT
+    out["db_oil"] = dm.oil_weight * np.exp((OB - dm.oil_knee_k) / dm.oil_scale_k) * DT
+    return out
+
+
+def totals(r):
+    return dict(knock=float((r["d_turb"] + r["d_oil"] + r["d_knock"]).sum()),
+                noknock=float((r["d_turb"] + r["d_oil"]).sum()),
+                turb=float(r["d_turb"].sum()), oil=float(r["d_oil"].sum()),
+                knockterm=float(r["d_knock"].sum()), fuel=float(r["fuel"].sum() * DT),
+                env_damage=r["summary"]["damage"], env_damage_base=r["summary"]["damage_base"],
+                base_knock=r["summary"]["damage_base"],
+                base_noknock=float((r["db_turb"] + r["db_oil"]).sum()),
+                base_turb=float(r["db_turb"].sum()))
+
+
+def replay_housing(plant, r, egt_fn=None, mdot_fn=None):
+    """The agent's housing node replayed from run r's recorded engine-out inputs, sub-stepped as
+    thermal.ThermalNetwork.step does (n_sub = ceil(dt / DT_SUB_MAX)), with optional replacements of
+    the gas temperature and flow per step (open loop: section G's method on today's integrator).
+    Returns the housing temperature after each env step."""
+    import thermal
+    th = plant.engine.thermal
+    n_sub = max(1, int(np.ceil(DT / thermal.DT_SUB_MAX - 1e-9)))
+    h = DT / n_sub
+    T = th.t_turb_warm
+    out = np.empty(len(r["t"]))
+    for k in range(len(r["t"])):
+        egt = r["egt_k"][k] if egt_fn is None else egt_fn(k)
+        m = r["mdot_exh"][k] if mdot_fn is None else mdot_fn(k)
+        m_h = m if th.n_turbines == 1 else m / th.n_turbines
+        ua = th.ua_gas_turb * max(m_h, 0.5)
+        for _ in range(n_sub):
+            T = T + h * (ua * (egt - T) - th.ua_turb_amb * (T - T_AMB)) / th.c_turb
+        out[k] = T
+    return out
+
+
+def turb_damage(plant, T):
+    dm = plant.engine.damage
+    return float((np.exp((T - dm.turb_knee_k) / dm.turb_scale_k) * DT).sum())
+
+
+def tau_frozen_def(plant):
+    """The frozen definition (calibrate_epa.py complete -> epa_coefficients.housing at the climb cell:
+    the median exhaust flow over t 400-718 s of the neutral locked climb)."""
+    import epa_coefficients as EC
+    cell = EC.climb_cell(plant)
+    hs = EC.housing(plant, cell["egt"], cell["mdot"], t_amb_c=EC.T_AMB_C)
+    return float(hs["tau_s"]), cell
+
+
+def tau_series(plant, r):
+    th = plant.engine.thermal
+    m_h = r["mdot_exh"] / th.n_turbines
+    return th.c_turb / (th.ua_gas_turb * np.maximum(m_h, 0.5) + th.ua_turb_amb)
+
+
+def delivery(r, wins_climb, tol=E.TRACK_TOL):
+    """Share of steps on climbs (full grade) with tracking error > TRACK_TOL, and the largest shortfall."""
+    t = r["t"]
+    sel = np.zeros(len(t), bool)
+    for a, b in wins_climb:
+        sel |= (t >= a) & (t < b)
+    e = np.abs(r["torque_req"] - r["torque"]) / np.maximum(r["torque_req"], 40.0)
+    short = r["torque_req"] - r["torque"]
+    if not sel.any():
+        return dict(share=0.0, largest_shortfall_nm=0.0, steps=0)
+    return dict(share=float((e[sel] > tol).mean()), largest_shortfall_nm=float(short[sel].max()),
+                steps=int(sel.sum()))

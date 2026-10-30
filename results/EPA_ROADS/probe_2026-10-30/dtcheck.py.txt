@@ -1,0 +1,84 @@
+"""dt sensitivity (mistakes 15 and 17; the critique's item 20): the same family at dt 0.5 s and 1.0 s,
+current-grade, b and a at two horizons, every engine. Closed loop only.
+
+    python dtcheck.py FID [H1 H2]
+"""
+import json
+import os
+import sys
+import time
+from multiprocessing import Pool
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib  # noqa: E402
+import numpy as np  # noqa: E402
+import grid  # noqa: E402
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def run_dt(plant, cycle, policy, dt, seed=1000, w=(0.690154, 0.012829, 0.297017)):
+    env = lib.E.SupervisoryTunerEnv(cycle, plant=plant, dt=dt, seed=seed, use_preview=True)
+    obs, _ = env.reset(seed=seed)
+    env.w = np.asarray(w, dtype=np.float32)
+    obs = env._obs()
+    dm = plant.engine.damage
+    tt, to, ki, tb, ob = [], [], [], [], []
+    fuel = 0.0
+    while True:
+        obs, r, term, trunc, info = env.step(policy(env, obs))
+        tt.append(info["t_turb"]); to.append(info["t_oil"]); ki.append(info["ki"])
+        tb.append(env.thermal_base.t_turb); ob.append(env.thermal_base.t_oil)
+        fuel += info["mdot_fuel"] * dt
+        if term or trunc:
+            break
+    T, O, K, TB, OB = (np.asarray(x) for x in (tt, to, ki, tb, ob))
+    dturb = np.exp((T - dm.turb_knee_k) / dm.turb_scale_k) * dt
+    doil = dm.oil_weight * np.exp((O - dm.oil_knee_k) / dm.oil_scale_k) * dt
+    dk = dm.ki_weight * np.clip(K - dm.ki_knee, 0.0, None) ** 2 * dt
+    s = info["episode_summary"]
+    return dict(knock=float((dturb + doil + dk).sum()), noknock=float((dturb + doil).sum()),
+                base_knock=s["damage_base"],
+                base_noknock=float((np.exp((TB - dm.turb_knee_k) / dm.turb_scale_k)
+                                    + dm.oil_weight * np.exp((OB - dm.oil_knee_k) / dm.oil_scale_k)).sum() * dt),
+                env_damage=s["damage"], fuel=fuel, steps=len(T))
+
+
+def task(spec):
+    fid, eng, var, dt = spec
+    f = grid.FAM[fid]
+    p = lib.engines.get(eng)
+    c, m = lib.road(lead=f["lead"], n=f["n"], L=f["L"], g=f["g"], G=f["G"], v_kmh=f["v"], tail=f["tail"], dt=dt)
+    pol = lib.C.p_grade_now if var == "cg" else lib.lambda_variant(lib.windows(m, None if var == "b" else int(var[1:])))
+    t0 = time.perf_counter()
+    r = run_dt(p, c, pol, dt)
+    r["seconds"] = time.perf_counter() - t0
+    return spec, r
+
+
+def main():
+    fid = sys.argv[1]
+    hs = [int(x) for x in sys.argv[2:]] or [30, 130]
+    specs = [(fid, e, v, dt) for e in lib.ENGINES for v in ["cg", "b"] + [f"a{h}" for h in hs] for dt in (0.5, 1.0)]
+    with Pool(min(14, len(specs))) as pool:
+        res = pool.map(task, specs)
+    R = {f"{e}|{v}|{dt}": r for (f_, e, v, dt), r in res}
+    lines = [f"dt sensitivity on {fid} (closed loop; points = 100 (D_cg - D_var) / D_base, both readings)"]
+    for e in lib.ENGINES:
+        for dt in (0.5, 1.0):
+            cg = R[f"{e}|cg|{dt}"]
+            row = [f"{e:<12} dt {dt}: base {cg['base_noknock']:.1f}/{cg['base_knock']:.1f} cg cut {100*(1-cg['noknock']/cg['base_noknock']):.2f}"]
+            for v in ["b"] + [f"a{h}" for h in hs]:
+                x = R[f"{e}|{v}|{dt}"]
+                row.append(f"{v} {100*(cg['noknock']-x['noknock'])/cg['base_noknock']:.2f}/{100*(cg['knock']-x['knock'])/cg['base_knock']:.2f}")
+            lines.append("  ".join(row))
+    txt = "\n".join(lines)
+    print(txt)
+    with open(os.path.join(HERE, f"dtcheck_{fid}.txt"), "w", encoding="utf-8") as fh:
+        fh.write(txt + "\n")
+    with open(os.path.join(HERE, f"dtcheck_{fid}.json"), "w", encoding="utf-8") as fh:
+        json.dump(R, fh, indent=1)
+
+
+if __name__ == "__main__":
+    main()

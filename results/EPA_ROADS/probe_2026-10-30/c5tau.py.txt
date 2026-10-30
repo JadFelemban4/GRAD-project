@@ -1,0 +1,61 @@
+"""tau by the frozen definition on all four plants (a control: the three EPA values must come back),
+and C5 (epa_stats.c5_steps / c5_climb at 1.9 %, thin share 0.5) per car for every (grade, speed,
+climb length) of the grid. No EPA table is read (the audit hook in lib refuses one)."""
+import json, os, sys, time
+from multiprocessing import Pool
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib
+import numpy as np
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+def tau_task(e):
+    t0 = time.perf_counter()
+    tau, cell = lib.tau_frozen_def(lib.engines.get(e))
+    return e, dict(tau_s=tau, cell_mdot=cell["mdot"], cell_egt=cell["egt"], cell_t_turb=cell["t_turb"],
+                   seconds=time.perf_counter() - t0)
+
+def main():
+    with Pool(4) as pool:
+        taus = dict(pool.map(tau_task, lib.ENGINES))
+    frozen = {"mazda_25t": 42.74181271696412, "honda_l15b7": 47.67174074702707, "ford_27tt": 66.76200860052332}
+    for e, v in taus.items():
+        print(f"tau {e}: {v['tau_s']:.4f} s (frozen {frozen.get(e, float('nan')):.4f}); climb cell mdot {v['cell_mdot']:.2f} g/s, "
+              f"egt {v['cell_egt']:.1f} C, housing {v['cell_t_turb']:.1f} C; {v['seconds']:.0f} s")
+    import epa_stats as ES
+    from thresholds import contract as K
+    c5 = {}
+    for e in lib.ENGINES:
+        p = lib.engines.get(e)
+        for v in (100.0, 115.0, 130.0):
+            for g in (0.08, 0.10, 0.12):
+                for L in (45.0, 67.0, 85.0, 130.0):
+                    c, m = lib.road(lead=180.0, n=2, L=L, g=g, G=100.0, v_kmh=v, tail=60.0)
+                    s0 = int(m["onsets"][0]); s1 = int(m["ends"][0] + lib.RAMP)
+                    steps = ES.c5_steps(p, c, first=s0, last=s1, dt=1.0)
+                    out = ES.c5_climb(steps, margin=0.019, thin_share=K.C5_THIN_SHARE)
+                    full = [s for s in steps if not s.transition]
+                    mins = {}
+                    for s in full:
+                        for name, mval, gates in s.margins:
+                            key = name.split("_")[1] + ("" if gates else "(ungated)")
+                            mins[key] = min(mins.get(key, 9.0), mval)
+                    held = sorted({s.held for s in full})
+                    c5[f"{e}|{v:g}|{g:g}|{L:g}"] = dict(outcome=out.outcome, gated_share=out.gated_share, thin=out.thin,
+                                                       held=held, min_margins=mins,
+                                                       no_margin_case=sorted({str(s.no_margin_case) for s in full}),
+                                                       demand_nm=float(np.median([s.demand_nm for s in full])),
+                                                       rpm=float(np.median([s.rpm for s in full])))
+    print(f"\nC5 at 1.9 % (thin share {K.C5_THIN_SHARE}), the first climb of each (v, g, L); outcome / held gear / smallest margins over the climb's non-transition steps")
+    for e in lib.ENGINES:
+        for v in (100.0, 115.0, 130.0):
+            for g in (0.08, 0.10, 0.12):
+                row = [c5[f"{e}|{v:g}|{g:g}|{L:g}"] for L in (45.0, 67.0, 85.0, 130.0)]
+                r0 = row[0]
+                print(f"  {e:<12} {v:5.0f} km/h {100*g:4.0f} %  " + " ".join(f"L{int(L)}:{r['outcome']}" for L, r in zip((45, 67, 85, 130), row))
+                      + f"  held {r0['held']} rpm {r0['rpm']:.0f} demand {r0['demand_nm']:.0f} Nm  margins " + ", ".join(f"{k} {x:.4f}" for k, x in r0['min_margins'].items())
+                      + f"  {r0['no_margin_case']}")
+    json.dump(dict(tau=taus, c5=c5), open(os.path.join(HERE, "c5tau.json"), "w"), indent=1)
+    open(os.path.join(HERE, "c5tau_opened.txt"), "w").write("\n".join(sorted(lib.OPENED)) + "\n")
+
+if __name__ == "__main__":
+    main()

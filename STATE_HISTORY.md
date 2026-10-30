@@ -4600,3 +4600,23 @@ GRA-test: build step 2's commit A (WP1: each engine's own fuel, lambda clip, cyc
    Pending from commit A: L8 on the training device (`app.test_results` on commit A
    gives cf43fbb's clone's eight failures, no new one). Schema 4 (decisions 27,
    28) before any EPA engine trains.
+
+# Part W — lines rotated out of CHECKPOINT.md, 30 October 2026 (GRA-test: section I of the decision sheet, decisions 94-120 answered; the ceiling probe committed)
+
+Last verified: 2026-10-30 (on `GRA-test`, commit D `25437ba`) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s at commit D, the same results as commit A's: `SESSION_REPORT_2026-10-30_run1.md`)
+
+  5.43 (`python preview_ceiling.py` -> `results/preview_ceiling.txt`): the climb
+  that X1 and X2 were scored on cannot show a preview effect (decision 34).
+
+  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Next:
+  decision 34's test roads and the L1/E8 tightenings, then Run 2. Both have
+  answered decisions 1-93 (`results/VALIDATION_DECISIONS.md`, 30 October).
+  Training runs on another device, not this laptop (21 October).
+
+8. `GRA-test`, build step 2 (`docs/build_step_2/PLAN.md`, as `AMENDMENTS.md`,
+   `HANDOFFS.md` and `WP3_INTERFACES.md` amend it): decision 34's roads and
+   `EPA_TIGHTENINGS.json`; then the held-out validation (`validate_epa.py arm`, then
+   `run`, once), decision 83's steady-only reading beside it; WP7's documents
+   (PLAN.md 8.5); schema 4 (decisions 27, 28) before any EPA engine trains; the
+   preregistration; L8 and the dump comparison on the training device. First:
+   decisions 94 onward (the roads' design, the rules for Run 2's outcomes).

@@ -1,0 +1,31 @@
+"""Reads ONLY the probe's table_full.csv (scratch). The drafted-design mix (v 130, g 10/12, L 67/85, G 50/100)
+aggregated three ways at H = r tau_e, variant (a), no knock: equal-weight mean of per-road points, POOLED
+(sum of saved damage over sum of baseline damage: points weighted by each road's baseline damage), and the
+median of per-road points. Open loop (all 8 families) and closed loop (the 6 with closed-loop runs).
+    python -I pooled.py
+"""
+import csv, os, statistics, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import matched as M   # reuses the interpolation and the table read (prints its own report first; ignored)
+rows = M.rows
+BASE = {}
+for r in rows:
+    if r["variant"] == "b" and r["loop"] == "closed" and r["reading"] == "noknock":
+        BASE[(r["family"], r["engine"])] = float(r["base_damage"])
+for loop, fams in (("open", M.mix), ("closed", M.mixc)):
+    print(f"\n== drafted-design mix, {loop} loop, (a), no knock: mean / POOLED / median of per-road points ==")
+    for rr in M.RS:
+        out = []
+        mins = [1e9, 1e9, 1e9]
+        for e in M.ENG:
+            p = [M.at(f, loop, "noknock", rr)[e] for f in fams]
+            b = [BASE[(f, e)] for f in fams]
+            mean = sum(p) / len(p)
+            pooled = sum(pi * bi for pi, bi in zip(p, b)) / sum(b)
+            med = statistics.median(p)
+            mins = [min(mins[0], mean), min(mins[1], pooled), min(mins[2], med)]
+            out.append(f"{e} {mean:.2f}/{pooled:.2f}/{med:.2f}")
+        print(f"  r {rr:.3f}: " + "  ".join(out) + f"   min {mins[0]:.2f}/{mins[1]:.2f}/{mins[2]:.2f}")
+print("\nbaseline no-knock damage per family (closed-loop b run's base): ")
+for f in M.mix:
+    print(f"  {f:<20} " + "  ".join(f"{e} {BASE[(f, e)]:.1f}" for e in M.ENG))

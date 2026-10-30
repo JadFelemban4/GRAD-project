@@ -1,0 +1,131 @@
+"""The repeated-climb grid: direct plant runs, one task per (family, engine, variant), resumable.
+
+    python grid.py pilot             one family, four engines: cg, b, a@30, a@130
+    python grid.py stage1            every family x engine: cg and b (closed loop)
+    python grid.py stage2 FID ...    the listed families x engines: a at every H (closed loop)
+
+Each task writes runs/<fid>__<engine>__<variant>.npz (arrays) and .json (totals, timing).
+Variants: cg = current-grade protection (the reference); b = lambda trim at its bound over each
+whole preceding gap (from the previous climb's end, s + L, or 20 s for the first climb);
+aH = lambda trim at its bound for H s before each onset, clipped to the preceding gap.
+"""
+import itertools
+import json
+import os
+import sys
+import time
+from multiprocessing import Pool
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lib  # noqa: E402
+import numpy as np  # noqa: E402
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(HERE, "runs")
+JOBS = 14
+LEAD, TAIL, MAXDUR = 180.0, 60.0, 900.0
+LS = (45.0, 67.0, 85.0, 130.0)
+GS = (0.08, 0.10, 0.12)
+GAPS = (50.0, 100.0, 200.0)
+VS = (100.0, 115.0, 130.0)
+HS = (15, 30, 45, 60, 90, 130)
+KEEP = ("t", "t_turb", "t_oil", "ki", "egt_k", "mdot_exh", "torque", "torque_req", "torque_base", "lam",
+        "lam_trim", "fuel", "tb_turb", "tb_oil", "grade", "rpm", "map", "d_turb", "d_oil", "d_knock",
+        "db_turb", "db_oil")
+
+
+def families():
+    out = {}
+    for L, g, G, v in itertools.product(LS, GS, GAPS, VS):
+        n = int((MAXDUR - LEAD - TAIL + G) // (L + G))
+        n = max(n, 2)
+        fid = f"L{int(L)}_g{int(round(100 * g))}_G{int(G)}_v{int(v)}"
+        out[fid] = dict(L=L, g=g, G=G, v=v, n=n, lead=LEAD, tail=TAIL)
+    return out
+
+
+FAM = families()
+# EXPLORATORY, outside decision 34's 1-2 tau (added after stage 1 showed the points rise as L falls):
+# L = 30 s, the gap and speed of stage 1's best common family. Reported apart, never as a road family.
+EXTRA = {}
+for _g in (0.10, 0.12):
+    _n = int((MAXDUR - LEAD - TAIL + 100.0) // (30.0 + 100.0))
+    EXTRA[f"X_L30_g{int(round(100 * _g))}_G100_v130"] = dict(L=30.0, g=_g, G=100.0, v=130.0, n=_n, lead=LEAD, tail=TAIL)
+FAM.update(EXTRA)
+
+
+def build(fid):
+    f = FAM[fid]
+    return lib.road(lead=f["lead"], n=f["n"], L=f["L"], g=f["g"], G=f["G"], v_kmh=f["v"], tail=f["tail"])
+
+
+def path(fid, eng, var):
+    return os.path.join(OUT, f"{fid}__{eng}__{var}")
+
+
+def task(spec):
+    fid, eng, var = spec
+    if os.path.exists(path(fid, eng, var) + ".json"):
+        return spec, "skip", 0.0
+    p = lib.engines.get(eng)
+    c, m = build(fid)
+    t0 = time.perf_counter()
+    if var == "cg":
+        r = lib.run(p, c, lib.C.p_grade_now)
+    elif var == "b":
+        r = lib.run(p, c, lib.lambda_variant(lib.windows(m, None)))
+    elif var.startswith("a"):
+        r = lib.run(p, c, lib.lambda_variant(lib.windows(m, int(var[1:]))))
+    else:
+        raise ValueError(var)
+    sec = time.perf_counter() - t0
+    np.savez_compressed(path(fid, eng, var) + ".npz", **{k: r[k] for k in KEEP})
+    with open(path(fid, eng, var) + ".json", "w", encoding="utf-8") as fh:
+        json.dump(dict(fid=fid, engine=eng, variant=var, seconds=sec, steps=len(r["t"]), pid=os.getpid(),
+                       totals=lib.totals(r), meta=m, family=FAM[fid]), fh, indent=1)
+    with open(os.path.join(HERE, f"opened_w{os.getpid()}.txt"), "w") as fh:
+        fh.write(chr(10).join(sorted(lib.OPENED)) + chr(10))
+    return spec, "ran", sec
+
+
+def go(specs):
+    os.makedirs(OUT, exist_ok=True)
+    t0 = time.perf_counter()
+    done = 0
+    log = open(os.path.join(HERE, "grid_log.txt"), "a", encoding="utf-8")
+    log.write(f"start {time.strftime('%H:%M:%S')} {len(specs)} tasks, {JOBS} jobs\n")
+    log.flush()
+    with Pool(JOBS) as pool:
+        for spec, how, sec in pool.imap_unordered(task, specs):
+            done += 1
+            log.write(f"{time.strftime('%H:%M:%S')} {done}/{len(specs)} {how} {spec} {sec:.0f}s\n")
+            log.flush()
+    wall = time.perf_counter() - t0
+    log.write(f"end {time.strftime('%H:%M:%S')} wall {wall:.0f} s\n")
+    log.close()
+    with open(os.path.join(HERE, "opened_" + str(os.getpid()) + ".txt"), "w") as fh:
+        fh.write("\n".join(sorted(lib.OPENED)) + "\n")
+    print(f"{len(specs)} tasks, wall {wall:.0f} s")
+
+
+def main():
+    cmd = sys.argv[1]
+    if cmd == "pilot":
+        fid = "L67_g12_G100_v130"
+        specs = [(fid, e, v) for e in lib.ENGINES for v in ("cg", "b", "a30", "a130")]
+    elif cmd == "stage1":
+        # longest first, so the pool's tail is short
+        fids = sorted(FAM, key=lambda f: -(FAM[f]["lead"] + FAM[f]["n"] * (FAM[f]["L"] + FAM[f]["G"])))
+        specs = [(f, e, v) for f in fids for e in lib.ENGINES for v in ("cg", "b")]
+    elif cmd == "extra":
+        specs = [(f, e, v) for f in EXTRA for e in lib.ENGINES for v in ("cg", "b")]
+    elif cmd == "stage2":
+        fids = sys.argv[2:]
+        specs = [(f, e, f"a{h}") for f in fids for e in lib.ENGINES for h in HS]
+    else:
+        raise SystemExit(__doc__)
+    go(specs)
+
+
+if __name__ == "__main__":
+    main()
