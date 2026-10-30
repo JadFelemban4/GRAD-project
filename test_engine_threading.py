@@ -1512,7 +1512,11 @@ class Registry(unittest.TestCase):
         its files (uncalibrated_or_skip; P7, the review of P6). The control
         (mistake 12): with _missing_files made to say nothing is missing, the same
         listing reaches engines.get and dies in derived.py, so the lines above are
-        the check's, not luck."""
+        the check's, not luck. It runs while any EPA plant's line is checked: once
+        every one is skipped by name, the forced listing builds all three and
+        exits 0, and there is no line left for it to vouch for (decision 91's
+        commit, 30 October 2026; HANDOFFS.md WP4.1: skip, never fail; the
+        calibrated plants' lines are test_epa_plants.py's, with its own controls)."""
         import derived
         import engines
         env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1")
@@ -1531,6 +1535,8 @@ class Registry(unittest.TestCase):
                 rel = os.path.relpath(derived.engine_path(n), HERE).replace(os.sep, "/")
                 self.assertEqual(line, f"{n:6s} {engines.read_spec(e)['_meta']['id']}/"
                                        f"{engines.read_spec(c)['_meta']['id']}   not calibrated yet (no {rel})")
+        if all(calibration_files_written(n) for n in ("ford_27tt", "honda_l15b7", "mazda_25t")):
+            return
         code = ("import sys\nsys.path.insert(0, {here!r})\nsrc = open({path!r}, encoding='utf-8').read()\n"
                 "src = src.replace('missing = _missing_files(n)', 'missing = []')\n"
                 "assert 'missing = []' in src\n"
