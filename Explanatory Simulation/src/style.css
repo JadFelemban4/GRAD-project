@@ -11,3 +11,4 @@
 .reading-context bdi { color: var(--ink); }
 .figure-frame{display:block;width:100%;border:0;background:transparent}
 .scene-figure{padding:10px 12px 4px}
+.map-open{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}.map-open.active,.map-open:hover{border-color:var(--accent);color:var(--accent)}
