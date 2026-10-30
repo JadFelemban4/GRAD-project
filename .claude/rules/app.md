@@ -10,7 +10,7 @@ Loaded when a file under `app/` or `Explanatory Simulation/` is read or edited.
 The app never transmits to the vehicle and never writes raw car data to disk
 (CLAUDE.md, the hard constraint).
 
-After a change under `app/`, from the repository root, on Python 3.12:
+After a change under `app/`, from the repository root, on the lock's Python (decision 32):
 
 ```
 python -m app.test_replay            # add --full before a release

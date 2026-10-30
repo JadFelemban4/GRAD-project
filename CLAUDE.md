@@ -86,7 +86,7 @@ Ghassan's note of 9 October. The list as it stood: `STATE_HISTORY.md` part E; `C
 1. The preregistration is committed before the first training step.
 2. Train from a clean, pushed commit whose `train.py` and `fingerprint.py` are `main`'s.
 3. Every seed and arm on one environment (one machine, one set of versions).
-4. Python 3.12 for every fingerprint, test and run; NumPy 2; record the exact torch, stable-baselines3 and gymnasium versions.
+4. One set of versions, pinned by `requirements-lock.txt` (Python 3.13.2, NumPy 2; decision 32 replaced "Python 3.12"); record the exact versions the device uses (`meta.json`, `config.json`).
 5. Two results are one experiment only if every FATAL fingerprint field (`plant_sha` on one Python minor), `derived_sha`,
    the protocol and the environment agree; otherwise compare them only as an ablation declared in advance.
 

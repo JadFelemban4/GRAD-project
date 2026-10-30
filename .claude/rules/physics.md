@@ -21,7 +21,7 @@ After any change to these files, in the same commit:
    `python check_roads.py`. Update `validation_table.md` from `validate.py`, and
    paste `test_reward.py`'s output into the commit message (CLAUDE.md,
    conventions).
-2. Record the new `plant_sha` (on Python 3.12) and `derived_sha`. A change to
+2. Record the new `plant_sha` (on the lock's Python, decision 32) and `derived_sha`. A change to
    either is a new plant, and every agent trained on the old one is refused.
 3. Run every app suite that reads the plant (`.claude/rules/app.md`), and move
    the learning lab's pins in `Explanatory Simulation/tests/test_catalog.py` to
