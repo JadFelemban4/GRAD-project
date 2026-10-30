@@ -1,0 +1,2144 @@
+{
+ "schema": "epa-complete/1",
+ "provenance": {
+  "engine": "mazda_25t",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "0147f93a0ae9e4c8e579868d80082f5f2069b914",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "f6489f1b5e7b04833d8d68aaeace1b3241a3cdd8b1bbfc80d276ca0b6d4d3ee3",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "55090f0ad7dee32042656ed727a85962cdea9008678ed95a4c88d12c1f66bd01",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "9b6cb463c857597010dfbf64928c3dbf9b7e03a22a7abc32b40d73436ef8573b",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "f86baf59389dea29",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "ab057944b7fb4eeea0d789122a98c1c6d0b6d6fd2e5dae58df88627191d80449",
+    "epa_highload_initial.csv": "0540e533faddcada2cbbbc2917b33ace30114bf70b862196a9ec96f29d2dfeef",
+    "epa_steady.csv": "ab71a0087ee32fabfa21ae1a764015837b54ad531ad2017f38ccf59048286bfc"
+   },
+   "epa_engine_sha256": "cf5fc265d9a6324db9d7b8ceeaac5c75dd46db8dab06efa073fa67113bc1495e",
+   "epa_channels_blob": "a1c5627aa7468af13f28ea71ed2b6d92f3afbb13",
+   "manifest_sha256": "baccffe344e4b40b70ea26def9f26aacabe6f39798db11968c22b6061ce5c1e8"
+  },
+  "view_sha256": "881245bd5ce7693642022627dd40e7f6c77b4981c4090e5a55c2250ec8ae3574",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "frozen_sections_sha256": "21b534e0e98b63308d389dc95bc815dcc9e4ebf550b1564b9766fad2ba5f89a1",
+ "deliverable_torque": {
+  "table": [
+   [
+    1300,
+    233.4
+   ],
+   [
+    1400,
+    238.7
+   ],
+   [
+    1500,
+    244.7
+   ],
+   [
+    1600,
+    250.8
+   ],
+   [
+    1700,
+    264.6
+   ],
+   [
+    1800,
+    271.1
+   ],
+   [
+    1900,
+    369.5
+   ],
+   [
+    2000,
+    379.0
+   ],
+   [
+    2100,
+    391.0
+   ],
+   [
+    2200,
+    393.0
+   ],
+   [
+    2300,
+    395.0
+   ],
+   [
+    2400,
+    385.5
+   ],
+   [
+    2500,
+    371.9
+   ],
+   [
+    2600,
+    385.5
+   ],
+   [
+    2700,
+    375.5
+   ],
+   [
+    2800,
+    337.9
+   ],
+   [
+    2900,
+    441.6
+   ],
+   [
+    3000,
+    436.4
+   ],
+   [
+    3100,
+    434.9
+   ],
+   [
+    3200,
+    433.2
+   ],
+   [
+    3300,
+    431.5
+   ],
+   [
+    3400,
+    429.5
+   ],
+   [
+    3500,
+    427.5
+   ],
+   [
+    3600,
+    425.3
+   ],
+   [
+    3700,
+    423.0
+   ],
+   [
+    3800,
+    420.6
+   ],
+   [
+    3900,
+    418.1
+   ],
+   [
+    4000,
+    417.7
+   ],
+   [
+    4100,
+    417.4
+   ],
+   [
+    4200,
+    416.9
+   ],
+   [
+    4300,
+    416.4
+   ],
+   [
+    4400,
+    410.9
+   ],
+   [
+    4500,
+    410.6
+   ],
+   [
+    4600,
+    410.3
+   ],
+   [
+    4700,
+    410.0
+   ],
+   [
+    4800,
+    404.5
+   ],
+   [
+    4900,
+    404.4
+   ],
+   [
+    5000,
+    402.6
+   ]
+  ],
+  "grid": {
+   "lo": 1300,
+   "hi": 5000,
+   "step": 100
+  },
+  "settle_steps": 30,
+  "remeasured_60_max_abs_diff_nm": 7.548739556981332,
+  "knock_flag_duty": 0.05526315789473684,
+  "knock_flag_duty_60": 0.03728070175438596,
+  "wot_comparison": [
+   {
+    "line": "1300",
+    "key": [
+     "epa_highload_initial.csv",
+     6
+    ],
+    "initial_torque_nm": 313.01052631578926,
+    "model_nm": 233.44707236842106,
+    "label": "transient"
+   },
+   {
+    "line": "1500",
+    "key": [
+     "epa_highload_initial.csv",
+     7
+    ],
+    "initial_torque_nm": 301.51263736263655,
+    "model_nm": 244.7780934065934,
+    "label": "transient"
+   },
+   {
+    "line": "1500",
+    "key": [
+     "epa_highload_initial.csv",
+     8
+    ],
+    "initial_torque_nm": 355.7402061855672,
+    "model_nm": 244.72767010309278,
+    "label": "transient"
+   },
+   {
+    "line": "1500",
+    "key": [
+     "epa_highload_initial.csv",
+     9
+    ],
+    "initial_torque_nm": 383.51097560975575,
+    "model_nm": 244.71487804878046,
+    "label": "transient"
+   },
+   {
+    "line": "1500",
+    "key": [
+     "epa_highload_initial.csv",
+     10
+    ],
+    "initial_torque_nm": 390.4306451612905,
+    "model_nm": 244.67,
+    "label": "transient"
+   },
+   {
+    "line": "1500",
+    "key": [
+     "epa_highload_initial.csv",
+     11
+    ],
+    "initial_torque_nm": 392.71935483870993,
+    "model_nm": 244.72951612903225,
+    "label": "transient"
+   },
+   {
+    "line": "1500",
+    "key": [
+     "epa_highload_initial.csv",
+     12
+    ],
+    "initial_torque_nm": 403.4005681818182,
+    "model_nm": 244.77313068181817,
+    "label": "transient"
+   },
+   {
+    "line": "2000",
+    "key": [
+     "epa_highload_initial.csv",
+     19
+    ],
+    "initial_torque_nm": 284.59130434782537,
+    "model_nm": 379.0878260869565,
+    "label": "transient"
+   },
+   {
+    "line": "2000",
+    "key": [
+     "epa_highload_initial.csv",
+     20
+    ],
+    "initial_torque_nm": 323.9859649122811,
+    "model_nm": 379.1094736842105,
+    "label": "transient"
+   },
+   {
+    "line": "2000",
+    "key": [
+     "epa_highload_initial.csv",
+     21
+    ],
+    "initial_torque_nm": 355.622727272727,
+    "model_nm": 379.1036363636363,
+    "label": "transient"
+   },
+   {
+    "line": "2000",
+    "key": [
+     "epa_highload_initial.csv",
+     22
+    ],
+    "initial_torque_nm": 385.15204081632675,
+    "model_nm": 379.17755102040815,
+    "label": "transient"
+   },
+   {
+    "line": "2000",
+    "key": [
+     "epa_highload_initial.csv",
+     23
+    ],
+    "initial_torque_nm": 408.16029411764686,
+    "model_nm": 379.13941176470587,
+    "label": "transient"
+   },
+   {
+    "line": "2000",
+    "key": [
+     "epa_highload_initial.csv",
+     24
+    ],
+    "initial_torque_nm": 432.7977653631283,
+    "model_nm": 379.18368715083795,
+    "label": "transient"
+   },
+   {
+    "line": "2250",
+    "key": [
+     "epa_highload_initial.csv",
+     25
+    ],
+    "initial_torque_nm": 264.44378698224824,
+    "model_nm": 394.0190532544379,
+    "label": "transient"
+   },
+   {
+    "line": "2250",
+    "key": [
+     "epa_highload_initial.csv",
+     26
+    ],
+    "initial_torque_nm": 311.24215686274505,
+    "model_nm": 394.00588235294117,
+    "label": "transient"
+   },
+   {
+    "line": "2250",
+    "key": [
+     "epa_highload_initial.csv",
+     27
+    ],
+    "initial_torque_nm": 336.99426229508197,
+    "model_nm": 394.00967213114757,
+    "label": "transient"
+   },
+   {
+    "line": "2250",
+    "key": [
+     "epa_highload_initial.csv",
+     28
+    ],
+    "initial_torque_nm": 360.3337500000001,
+    "model_nm": 394.01800000000003,
+    "label": "transient"
+   },
+   {
+    "line": "2250",
+    "key": [
+     "epa_highload_initial.csv",
+     29
+    ],
+    "initial_torque_nm": 414.79895833333313,
+    "model_nm": 394.02770833333335,
+    "label": "transient"
+   },
+   {
+    "line": "2250",
+    "key": [
+     "epa_highload_initial.csv",
+     30
+    ],
+    "initial_torque_nm": 441.64175257731904,
+    "model_nm": 394.0372164948454,
+    "label": "transient"
+   },
+   {
+    "line": "2750",
+    "key": [
+     "epa_highload_initial.csv",
+     37
+    ],
+    "initial_torque_nm": 231.73090909090894,
+    "model_nm": 356.1804363636363,
+    "label": "transient"
+   },
+   {
+    "line": "2750",
+    "key": [
+     "epa_highload_initial.csv",
+     38
+    ],
+    "initial_torque_nm": 288.21464968152867,
+    "model_nm": 356.41500636942675,
+    "label": "transient"
+   },
+   {
+    "line": "2750",
+    "key": [
+     "epa_highload_initial.csv",
+     39
+    ],
+    "initial_torque_nm": 316.8067961165049,
+    "model_nm": 356.3313009708737,
+    "label": "transient"
+   },
+   {
+    "line": "2750",
+    "key": [
+     "epa_highload_initial.csv",
+     40
+    ],
+    "initial_torque_nm": 340.7472000000002,
+    "model_nm": 356.330016,
+    "label": "transient"
+   },
+   {
+    "line": "2750",
+    "key": [
+     "epa_highload_initial.csv",
+     41
+    ],
+    "initial_torque_nm": 396.64105263157904,
+    "model_nm": 356.0113263157894,
+    "label": "transient"
+   },
+   {
+    "line": "2750",
+    "key": [
+     "epa_highload_initial.csv",
+     42
+    ],
+    "initial_torque_nm": 405.7821917808219,
+    "model_nm": 355.7831780821918,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial.csv",
+     43
+    ],
+    "initial_torque_nm": 219.9760869565218,
+    "model_nm": 436.3735869565217,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial.csv",
+     44
+    ],
+    "initial_torque_nm": 272.30185185185195,
+    "model_nm": 436.37638888888887,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial.csv",
+     45
+    ],
+    "initial_torque_nm": 310.8827868852461,
+    "model_nm": 436.3888114754098,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial.csv",
+     46
+    ],
+    "initial_torque_nm": 332.75624999999985,
+    "model_nm": 436.36683593749996,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial.csv",
+     47
+    ],
+    "initial_torque_nm": 420.4340909090907,
+    "model_nm": 436.35994318181815,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial.csv",
+     48
+    ],
+    "initial_torque_nm": 421.50902255639056,
+    "model_nm": 436.3875939849624,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial.csv",
+     55
+    ],
+    "initial_torque_nm": 182.34649681528657,
+    "model_nm": 417.6951082802548,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial.csv",
+     56
+    ],
+    "initial_torque_nm": 225.79336734693885,
+    "model_nm": 417.69187244897955,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial.csv",
+     57
+    ],
+    "initial_torque_nm": 269.9222222222222,
+    "model_nm": 417.68541666666664,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial.csv",
+     58
+    ],
+    "initial_torque_nm": 314.0617647058824,
+    "model_nm": 417.6876911764706,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial.csv",
+     59
+    ],
+    "initial_torque_nm": 387.5690265486727,
+    "model_nm": 417.68770796460177,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial.csv",
+     60
+    ],
+    "initial_torque_nm": 387.993220338983,
+    "model_nm": 417.6876694915254,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial.csv",
+     61
+    ],
+    "initial_torque_nm": 182.5614864864865,
+    "model_nm": 410.59566216216217,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial.csv",
+     62
+    ],
+    "initial_torque_nm": 221.3992537313431,
+    "model_nm": 410.59585820895524,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial.csv",
+     63
+    ],
+    "initial_torque_nm": 258.1193548387096,
+    "model_nm": 410.5795806451613,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial.csv",
+     64
+    ],
+    "initial_torque_nm": 296.1970588235294,
+    "model_nm": 410.58654411764707,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial.csv",
+     65
+    ],
+    "initial_torque_nm": 342.83298969072166,
+    "model_nm": 410.5951134020619,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial.csv",
+     66
+    ],
+    "initial_torque_nm": 344.26304347826067,
+    "model_nm": 410.59545652173915,
+    "label": "transient"
+   }
+  ]
+ },
+ "torque_floor": {
+  "nm": 18.4,
+  "rpm": 1300.0,
+  "t_amb_k": 315.0,
+  "rule": "1.25 x the torque with the throttle shut (the load loop at a request of 0 Nm) at max(1200 rpm, rpm_min) and the car's table ambient, the B58's rule (engine_specs/b58.toml [loop] torque_floor_nm); an extrapolation below every fired calibration row",
+  "extrapolation": true,
+  "closed_nm": 14.691280704125443
+ },
+ "delivery": {
+  "t_from_s": 188.0,
+  "steps": 531,
+  "share_over_track_tol": 0.0,
+  "largest_shortfall_nm": -0.00859486452151259,
+  "held": {
+   "box": "stepped",
+   "counts": {
+    "4": 531
+   }
+  },
+  "rpm": {
+   "min": 4107.159079486758,
+   "median": 4107.159079486758,
+   "max": 4107.159079486758
+  },
+  "demand_nm": {
+   "min": 309.5171384985552,
+   "median": 309.5171384985552,
+   "max": 309.5171384985552
+  },
+  "margin_to_threshold": {
+   "threshold": "Vehicle.shift_ceiling_nm",
+   "held": {
+    "min": -0.018115587487555374,
+    "median": -0.018115587487555374,
+    "max": -0.018115587487555374
+   },
+   "held_lowest_steps": 0,
+   "rejected_higher": 0.3888039780939814,
+   "rejected_higher_steps": 1062
+  },
+  "bar_rpm_margin": {
+   "rpm": {
+    "min": 951.2735061763115,
+    "median": 951.2735061763115,
+    "max": 951.2735061763115
+   },
+   "fraction": {
+    "min": 0.19025470123526228,
+    "median": 0.19025470123526228,
+    "max": 0.19025470123526228
+   },
+   "barred_steps": 531,
+   "shift_rpm_max": 5000.0
+  },
+  "map_vs_ceiling_kpa": {
+   "min": 25.93411265985668,
+   "median": 26.204591219911833,
+   "max": 51.5552776718969,
+   "at_ceiling_steps": 0
+  },
+  "identity": {
+   "max_abs_dlam": 0.0,
+   "max_abs_dspark": 0.0,
+   "contacts_lam": 0,
+   "contacts_spark": 0,
+   "bounds_are_python_floats": true,
+   "steps": 719
+  },
+  "eta": {
+   "0.86": {
+    "t_from_s": 188.0,
+    "steps": 531,
+    "share_over_track_tol": 0.0,
+    "largest_shortfall_nm": -0.013348254349125455,
+    "held": {
+     "box": "stepped",
+     "counts": {
+      "4": 531
+     }
+    },
+    "rpm": {
+     "min": 4107.159079486758,
+     "median": 4107.159079486758,
+     "max": 4107.159079486758
+    },
+    "demand_nm": {
+     "min": 331.1113574635707,
+     "median": 331.1113574635707,
+     "max": 331.1113574635707
+    },
+    "margin_to_threshold": {
+     "threshold": "Vehicle.shift_ceiling_nm",
+     "held": {
+      "min": 0.05038797617610369,
+      "median": 0.05038797617610369,
+      "max": 0.05038797617610369
+     },
+     "held_lowest_steps": 0,
+     "rejected_higher": 0.4856972788912357,
+     "rejected_higher_steps": 1062
+    },
+    "bar_rpm_margin": {
+     "rpm": {
+      "min": 951.2735061763115,
+      "median": 951.2735061763115,
+      "max": 951.2735061763115
+     },
+     "fraction": {
+      "min": 0.19025470123526228,
+      "median": 0.19025470123526228,
+      "max": 0.19025470123526228
+     },
+     "barred_steps": 531,
+     "shift_rpm_max": 5000.0
+    },
+    "map_vs_ceiling_kpa": {
+     "min": 51.1911999327784,
+     "median": 52.47124794747984,
+     "max": 53.11413763055617,
+     "at_ceiling_steps": 0
+    },
+    "identity": {
+     "max_abs_dlam": 0.0,
+     "max_abs_dspark": 0.0,
+     "contacts_lam": 0,
+     "contacts_spark": 0,
+     "bounds_are_python_floats": true,
+     "steps": 719
+    }
+   },
+   "0.98": {
+    "t_from_s": 188.0,
+    "steps": 531,
+    "share_over_track_tol": 0.0,
+    "largest_shortfall_nm": -0.006988957914131788,
+    "held": {
+     "box": "stepped",
+     "counts": {
+      "4": 531
+     }
+    },
+    "rpm": {
+     "min": 4107.159079486758,
+     "median": 4107.159079486758,
+     "max": 4107.159079486758
+    },
+    "demand_nm": {
+     "min": 290.56710961088856,
+     "median": 290.56710961088856,
+     "max": 290.56710961088856
+    },
+    "margin_to_threshold": {
+     "threshold": "Vehicle.shift_ceiling_nm",
+     "held": {
+      "min": -0.07823095968219473,
+      "median": -0.07823095968219473,
+      "max": -0.07823095968219473
+     },
+     "held_lowest_steps": 0,
+     "rejected_higher": 0.3037751631086356,
+     "rejected_higher_steps": 1062
+    },
+    "bar_rpm_margin": {
+     "rpm": {
+      "min": 951.2735061763115,
+      "median": 951.2735061763115,
+      "max": 951.2735061763115
+     },
+     "fraction": {
+      "min": 0.19025470123526228,
+      "median": 0.19025470123526228,
+      "max": 0.19025470123526228
+     },
+     "barred_steps": 531,
+     "shift_rpm_max": 5000.0
+    },
+    "map_vs_ceiling_kpa": {
+     "min": 29.61098501239192,
+     "median": 36.636139914520754,
+     "max": 36.68827275776704,
+     "at_ceiling_steps": 0
+    },
+    "identity": {
+     "max_abs_dlam": 0.0,
+     "max_abs_dspark": 0.0,
+     "contacts_lam": 0,
+     "contacts_spark": 0,
+     "bounds_are_python_floats": true,
+     "steps": 719
+    }
+   }
+  },
+  "provisional_knee_k": 1123.0
+ },
+ "k3": {
+  "seconds": 413,
+  "knee_k": 1030.324458299792,
+  "time_above_knee_s": 413,
+  "trace_sha256": "6da4022e75e1de0b18ec460e2ca1d86aacbc6eb8634b5119382604ce5071d14b",
+  "second_knee_identical": true,
+  "provisional_knees_k": [
+   1123.0,
+   1173.0
+  ],
+  "knee_k_at_eta": {
+   "0.86": 1052.5988643239348,
+   "0.98": 1009.1581474229615
+  }
+ },
+ "f7_table_and_floor_identical_under_two_knees": true,
+ "coefficients": {
+  "episode_summary": {
+   "fuel": 5213.045889684205,
+   "fuel_base": 5213.050615262911,
+   "damage": 1080.1063803616591,
+   "damage_base": 1081.9999682609384,
+   "knock_events": 6,
+   "torque_viol": 0.06568630071099735,
+   "egt_viol": 0.3604086049184889,
+   "steps": 719
+  },
+  "peak_t_turb_c": 776.8728824015117,
+  "climb": {
+   "point": {
+    "rpm": 4107.159079486758,
+    "map": 166.87152003527746,
+    "iat": 330.06512451171875,
+    "ect": 366.0854187011719,
+    "spark": 11.5665283203125,
+    "lam": 1.0,
+    "egt": 884.9982712778325,
+    "mdot": 135.97529077237016,
+    "torque": 309.5441081303844,
+    "treq": 309.5171384985552,
+    "t_turb": 776.8419184036105
+   },
+   "base": {
+    "torque": 309.5421693682445,
+    "egt": 884.9988408694807,
+    "mdot": 135.97448408974805,
+    "fuel": 8.739281707677103,
+    "ki": 0.982355499287408
+   },
+   "fixed_spark": {
+    "per_kpa": {
+     "torque": 2.5536269451066147,
+     "egt": 0.6397493062590911,
+     "mdot": 1.0675916894648054,
+     "fuel": 0.06861570084612145
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -1.2121667574091213,
+     "degt_k": -0.7754828421228173,
+     "dmdot_rel": -0.009517220566185982,
+     "dTh_ss_k": -1.5728866949146674
+    }
+   },
+   "ecu_schedule": {
+    "per_kpa": {
+     "torque": 2.301715357717285,
+     "egt": 1.542478780875399,
+     "mdot": 1.0675916894648054,
+     "fuel": 0.06861570084612145
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -1.3448325325301365,
+     "degt_k": -2.07437564525866,
+     "dmdot_rel": -0.010558834218510043,
+     "dTh_ss_k": -2.8033832419900837
+    },
+    "dspark_dmap_deg_per_kpa": -0.20290647213294655,
+    "base_spark": 16.676528015036446,
+    "knock_limited_spark": 16.676528015036446
+   },
+   "lambda": {
+    "-0.01": {
+     "egt": 880.5672880764838,
+     "degt": -4.431552792996854,
+     "dtorque_rel": -0.0026308974313905553
+    },
+    "-0.02": {
+     "egt": 876.256787609905,
+     "degt": -8.742053259575641,
+     "dtorque_rel": -0.005444085391877351
+    },
+    "-0.05": {
+     "egt": 864.0087574571438,
+     "degt": -20.990083412336844,
+     "dtorque_rel": -0.014611242788184486
+    },
+    "-0.10": {
+     "egt": 845.5368392833576,
+     "degt": -39.46200158612305,
+     "dtorque_rel": -0.03187797700579009
+    },
+    "-0.15": {
+     "egt": 829.2592652426127,
+     "degt": -55.73957562686792,
+     "dtorque_rel": -0.0509935596307195
+    }
+   },
+   "spark": {
+    "-0.75": {
+     "degt": 3.3628269577391166,
+     "dtorque_rel": -0.0032069884233932866
+    },
+    "+0.75": {
+     "degt": -3.2737932262605227,
+     "dtorque_rel": 0.0028546515168383912
+    }
+   },
+   "housing": {
+    "f": 0.8717745618491077,
+    "tau_s": 42.74181271696412,
+    "dTh_per_unit_ln_mdot": 94.23344491856783,
+    "ua_gas_turb": 0.9,
+    "ua_turb_amb": 18.0,
+    "c_turb": 6000.0
+   }
+  },
+  "flat": {
+   "point": {
+    "rpm": 2464.2954476920545,
+    "map": 99.07883826080084,
+    "iat": 330.02813720703125,
+    "ect": 365.46923828125,
+    "spark": 19.447521209716797,
+    "lam": 1.0,
+    "egt": 637.4122555448992,
+    "mdot": 40.05025296920466,
+    "torque": 153.2976618023688,
+    "treq": 153.2840548882158,
+    "t_turb": 414.2473916812283
+   },
+   "base": {
+    "torque": 153.29733663251676,
+    "egt": 637.4120400111747,
+    "mdot": 40.050170092979265,
+    "fuel": 2.5740838159894124,
+    "ki": 0.896481233132995
+   },
+   "fixed_spark": {
+    "per_kpa": {
+     "torque": 2.0691020609106374,
+     "egt": 3.1430851091187435,
+     "mdot": 0.5353979690889457,
+     "fuel": 0.03441082133099449
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -0.7408882313183175,
+     "degt_k": -2.328674767377927,
+     "dmdot_rel": -0.00990432883178351,
+     "dTh_ss_k": -2.863030358750743
+    }
+   },
+   "ecu_schedule": {
+    "per_kpa": {
+     "torque": 2.314187406484038,
+     "egt": 4.004816523610941,
+     "mdot": 0.5353979690889457,
+     "fuel": 0.03441082133099449
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -0.6624240379279505,
+     "degt_k": -2.652886732730937,
+     "dmdot_rel": -0.008855405201999251,
+     "dTh_ss_k": -2.9405331206323817
+    },
+    "dspark_dmap_deg_per_kpa": -0.3921332275986922,
+    "base_spark": 24.54910136927456,
+    "knock_limited_spark": 24.54910136927456
+   },
+   "lambda": {
+    "-0.01": {
+     "egt": 634.7866017802775,
+     "degt": -2.6254382308972026,
+     "dtorque_rel": -0.004488668388341388
+    },
+    "-0.02": {
+     "egt": 632.221358575394,
+     "degt": -5.190681435780675,
+     "dtorque_rel": -0.008887732767056122
+    },
+    "-0.05": {
+     "egt": 624.7976317248508,
+     "degt": -12.614408286323851,
+     "dtorque_rel": -0.021570318914827302
+    },
+    "-0.10": {
+     "egt": 613.2976901447657,
+     "degt": -24.11434986640893,
+     "dtorque_rel": -0.04052189481509372
+    },
+    "-0.15": {
+     "egt": 602.655893888368,
+     "degt": -34.756146122806626,
+     "dtorque_rel": -0.05680377962402905
+    }
+   },
+   "spark": {
+    "-0.75": {
+     "degt": 1.6880867763049991,
+     "dtorque_rel": 0.002838909570466397
+    },
+    "+0.75": {
+     "degt": -1.5880117125091147,
+     "dtorque_rel": -0.0032358683908008112
+    }
+   },
+   "housing": {
+    "f": 0.6669456161948806,
+    "tau_s": 111.0181279350398,
+    "dTh_per_unit_ln_mdot": 132.25842491222267,
+    "ua_gas_turb": 0.9,
+    "ua_turb_amb": 18.0,
+    "c_turb": 6000.0
+   }
+  },
+  "env_torque_bias": {
+   "+0.01": {
+    "dmap_kpa": -1.3339902311517449,
+    "dspark_deg": 0.2732658386230469,
+    "degt_k": -2.063218265343039,
+    "dmdot_rel": -0.010452080231756589,
+    "dTh_median_k": -2.7952768027848833,
+    "dpeak_k": -2.790496200049347,
+    "damage": 1037.6851890718272,
+    "damage_unbiased": 1080.1063803616591
+   },
+   "-0.01": {
+    "dmap_kpa": 1.361935965794828,
+    "dspark_deg": -0.2738609313964844,
+    "degt_k": 2.073916654823279,
+    "dmdot_rel": 0.010712432113894055,
+    "dTh_median_k": 2.8154468115992586,
+    "dpeak_k": 2.8108727867063408,
+    "damage": 1126.8328542983336,
+    "damage_unbiased": 1080.1063803616591
+   }
+  },
+  "env_coefficients": {
+   "housing_k_per_pct_central": 2.805361807192071,
+   "housing_k_per_pct_larger": 2.8154468115992586,
+   "flow_pct_per_pct_central": 1.0582256172825322,
+   "flow_pct_per_pct_larger": 1.0712432113894055
+  }
+ },
+ "e6_probes": {
+  "d_rows": "+-10 % (d needs agents; the contract's E6, decision 59)",
+  "d_probe_rel": 0.1,
+  "probe_rel": 0.1,
+  "r1_housing_k": 10.0,
+  "climb_cell": {
+   "point": {
+    "rpm": 4107.159079486758,
+    "map": 166.87152003527746,
+    "iat": 330.06512451171875,
+    "ect": 366.0854187011719,
+    "spark": 11.5665283203125,
+    "lam": 1.0,
+    "egt": 884.9982712778325,
+    "mdot": 135.97529077237016,
+    "torque": 309.5441081303844,
+    "treq": 309.5171384985552,
+    "t_turb": 776.8419184036105
+   },
+   "housing": {
+    "f": 0.8717745618491077,
+    "tau_s": 42.74181271696412,
+    "dTh_per_unit_ln_mdot": 94.23344491856783,
+    "ua_gas_turb": 0.9,
+    "ua_turb_amb": 18.0,
+    "c_turb": 6000.0
+   }
+  },
+  "numerical_noise": {
+   "housing_k": 0.0001821936093778558,
+   "egt_resolution_k": 0.00013268238808450405,
+   "mdot_resolution_gps": 9.599230224921484e-05,
+   "samples": 319,
+   "rule": "decision 85: the housing equivalent of the climb cell's median resolution over CLIMB_S at the frozen plant, |f| x the gas's + |dTh per unit ln mdot| x the flow's / the flow (epa_coefficients.climb_cell_resolution); a probe is visible when |h(+) - h(-)| / 2 exceeds it"
+  },
+  "not_visible_at_r1": [
+   "exh_bp_min_kpa",
+   "flame_floor",
+   "fres_hi",
+   "fres_lo",
+   "fres_map_min"
+  ],
+  "row5": {
+   "sigma": {
+    "ratio": 0.016569117112457763,
+    "floor_kpa": 2.900497451184961
+   },
+   "probe": {
+    "exh_bp_ratio": 0.049346276780234274,
+    "exh_bp_min_kpa": 10.499154559900495
+   },
+   "housing_change_k": {
+    "exh_bp_ratio": 3.357723863595429,
+    "exh_bp_min_kpa": 1.27199821825049e-05
+   },
+   "detail": {
+    "exh_bp_ratio": {
+     "record": "cycle",
+     "value": 1.116931336159627,
+     "method": "probe",
+     "size": 0.049346276780234274,
+     "why_not_bracket": "EPA publishes no channel that brackets it",
+     "housing_eq_k": {
+      "+": 21.91516516618492,
+      "-": -23.353957816848943
+     },
+     "slope_k_per_unit": 202.64953411856018,
+     "worth_r1": 0.049346276780234274,
+     "worth_b": null,
+     "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+     "band": {
+      "size": 0.016569117112457763,
+      "source": "the fit's standard uncertainty"
+     },
+     "housing_change_k": 3.357723863595429,
+     "probe_housing_change_k": 10.0,
+     "load_bearing": false,
+     "load_bearing_why": null,
+     "response_k": 22.634561491516934,
+     "numerical_noise_k": 0.0001821936093778558,
+     "visible_at_r1": true,
+     "not_visible_at_r1": null,
+     "worth_r1_why": null,
+     "counted_excluded": false,
+     "counted_excluded_why": null
+    },
+    "exh_bp_min_kpa": {
+     "record": "cycle",
+     "value": 104.99154559900494,
+     "method": "fallback",
+     "size": 10.499154559900495,
+     "why_not_bracket": "EPA publishes no channel that brackets it",
+     "housing_eq_k": {
+      "+": -8.443876709723802e-05,
+      "-": 7.648236033028211e-06
+     },
+     "slope_k_per_unit": -4.385448495156689e-06,
+     "worth_r1": null,
+     "worth_b": null,
+     "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+     "band": {
+      "size": 2.900497451184961,
+      "source": "the fit's standard uncertainty"
+     },
+     "housing_change_k": 1.27199821825049e-05,
+     "probe_housing_change_k": 4.6043501565133115e-05,
+     "load_bearing": false,
+     "load_bearing_why": null,
+     "response_k": 4.6043501565133115e-05,
+     "numerical_noise_k": 0.0001821936093778558,
+     "visible_at_r1": false,
+     "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 4.6e-05 K at +-10 %, the noise 0.000182 K)",
+     "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 4.6e-05 K at +-10 %, the noise 0.000182 K)",
+     "counted_excluded": true,
+     "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 4.6e-05 K at +-10 %, the noise 0.000182 K)"
+    }
+   }
+  },
+  "row6": {
+   "sigma": {
+    "ua_port": 0.46915913290017863
+   },
+   "probe": {
+    "ua_port": 2.4009460502257425
+   },
+   "housing_change_k": {
+    "ua_port": 1.9540594544224232
+   },
+   "detail": {
+    "ua_port": {
+     "record": "cycle",
+     "value": 21.82566464671676,
+     "method": "probe",
+     "size": 2.4009460502257425,
+     "why_not_bracket": "EPA publishes no channel that brackets it",
+     "housing_eq_k": {
+      "+": -9.027004399829718,
+      "-": 9.153882792254143
+     },
+     "slope_k_per_unit": -4.165024865535724,
+     "worth_r1": 2.4009460502257425,
+     "worth_b": null,
+     "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+     "band": {
+      "size": 0.46915913290017863,
+      "source": "the fit's standard uncertainty"
+     },
+     "housing_change_k": 1.9540594544224232,
+     "probe_housing_change_k": 10.0,
+     "load_bearing": false,
+     "load_bearing_why": null,
+     "response_k": 9.09044359604193,
+     "numerical_noise_k": 0.0001821936093778558,
+     "visible_at_r1": true,
+     "not_visible_at_r1": null,
+     "worth_r1_why": null,
+     "counted_excluded": false,
+     "counted_excluded_why": null
+    }
+   }
+  },
+  "row9": {
+   "conrod": {
+    "record": "geometry",
+    "value": 0.15261476309738528,
+    "method": "probe",
+    "size": 0.2681793072393065,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -0.5218139173609098,
+     "-": 0.6163407349754944
+    },
+    "slope_k_per_unit": -37.28848471920551,
+    "worth_r1": 0.2681793072393065,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.5690773261682021,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "ivc_deg": {
+    "record": "geometry",
+    "value": -140.0,
+    "method": "bracket",
+    "size": 59.701999999999956,
+    "why_not_bracket": null,
+    "housing_eq_k": {
+     "+": -6.305227884782643,
+     "-": 15.672098381049544
+    },
+    "slope_k_per_unit": -0.7849045094940067,
+    "worth_r1": 12.74040329625136,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": {
+     "size": 59.701999999999956,
+     "source": "the bracket EPA's valve channels give (its farther edge from the value)"
+    },
+    "housing_change_k": 46.86036902581115,
+    "probe_housing_change_k": 46.86036902581115,
+    "load_bearing": true,
+    "load_bearing_why": null,
+    "response_k": 10.988663132916093,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "evo_deg": {
+    "record": "geometry",
+    "value": 140.0,
+    "method": "bracket",
+    "size": 28.60600000000005,
+    "why_not_bracket": null,
+    "housing_eq_k": {
+     "+": -9.658278771655564,
+     "-": 13.341150544558518
+    },
+    "slope_k_per_unit": -0.8214081898647887,
+    "worth_r1": 12.174215114224868,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": {
+     "size": 28.60600000000005,
+     "source": "the bracket EPA's valve channels give (its farther edge from the value)"
+    },
+    "housing_change_k": 23.49720267927219,
+    "probe_housing_change_k": 23.49720267927219,
+    "load_bearing": true,
+    "load_bearing_why": null,
+    "response_k": 11.499714658107042,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "t_head_k": {
+    "record": "cycle",
+    "value": 90.0,
+    "method": "probe",
+    "size": 129.55783397931424,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.6946799351258394,
+     "-": -0.6946609829134324
+    },
+    "slope_k_per_unit": 0.07718560655773732,
+    "worth_r1": 129.55783397931424,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.6946704590196359,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "port_pickup_k": {
+    "record": "cycle",
+    "value": 12.0,
+    "method": "probe",
+    "size": 24.39068441494976,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.49169389270371894,
+     "-": -0.4922883355805234
+    },
+    "slope_k_per_unit": 0.4099925951184342,
+    "worth_r1": 24.39068441494976,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.49199111414212116,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "t_residual_k": {
+    "record": "cycle",
+    "value": 780.0,
+    "method": "probe",
+    "size": 93.39941042789597,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 14.139921440943288,
+     "-": -2.5625394509733144
+    },
+    "slope_k_per_unit": 0.1070670569994654,
+    "worth_r1": 93.39941042789597,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 8.3512304459583,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "cp_exh": {
+    "record": "cycle",
+    "value": 1150.0,
+    "method": "probe",
+    "size": 125.41802699544903,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 8.31642200478158,
+     "-": -10.022249517163656
+    },
+    "slope_k_per_unit": 0.07973335444324016,
+    "worth_r1": 125.41802699544903,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 9.169335760972618,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "burn_res": {
+    "record": "cycle",
+    "value": 2.0,
+    "method": "probe",
+    "size": 4.467525532212336,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.43164837298361763,
+     "-": -0.46370185415189125
+    },
+    "slope_k_per_unit": 2.238375567838772,
+    "worth_r1": 4.467525532212336,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 9.999999999999998,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.44767511356775447,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "delay_res": {
+    "record": "cycle",
+    "value": 1.5,
+    "method": "probe",
+    "size": 1.8219976834942229,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.812752711550615,
+     "-": -0.8337916431307847
+    },
+    "slope_k_per_unit": 5.4884811822713315,
+    "worth_r1": 1.8219976834942229,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.8232721773406999,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "flame_lam": {
+    "record": "cycle",
+    "value": 0.9,
+    "method": "probe",
+    "size": 0.09329085235933543,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 2.071488697943693,
+     "-": 21.365984937154845
+    },
+    "slope_k_per_unit": -107.19164577339528,
+    "worth_r1": 0.09329085235933543,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 9.647248119605576,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "flame_width": {
+    "record": "cycle",
+    "value": 0.42,
+    "method": "probe",
+    "size": 0.31089741855228065,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -1.135620357880356,
+     "-": 1.566235462960901
+    },
+    "slope_k_per_unit": -32.1649502481102,
+    "worth_r1": 0.31089741855228065,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 1.3509279104206287,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "flame_floor": {
+    "record": "cycle",
+    "value": 0.25,
+    "method": "fallback",
+    "size": 0.025,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)"
+   },
+   "wiebe_a": {
+    "record": "cycle",
+    "value": 5.0,
+    "method": "probe",
+    "size": 4.450518453515933,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -1.0507651656503199,
+     "-": 1.1961640639318984
+    },
+    "slope_k_per_unit": -2.2469292295822183,
+    "worth_r1": 4.450518453515933,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.000000000000002,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 1.1234646147911092,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "wiebe_m": {
+    "record": "cycle",
+    "value": 2.0,
+    "method": "probe",
+    "size": 0.6165272431955882,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 1.635732224753055,
+     "-": 8.123685586338787
+    },
+    "slope_k_per_unit": -16.219883403964328,
+    "worth_r1": 0.6165272431955882,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 3.243976680792866,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "ce_rich_slope": {
+    "record": "cycle",
+    "value": 0.43470705817534516,
+    "method": "probe",
+    "size": 2331.576111973863,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.00017633729286405125,
+     "-": -0.00019654957618808652
+    },
+    "slope_k_per_unit": 0.004288944267632855,
+    "worth_r1": 2331.576111973863,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": {
+     "size": 0.0467705439711082,
+     "source": "the fit's standard uncertainty"
+    },
+    "housing_change_k": 0.00020059625645895492,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": false,
+    "load_bearing_why": null,
+    "response_k": 0.00018644343452606888,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null,
+    "sigma": 0.0467705439711082,
+    "sigma_why": null
+   },
+   "fres_a": {
+    "record": "cycle",
+    "value": 0.035,
+    "method": "probe",
+    "size": 0.06248986563271214,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -0.5566719068491648,
+     "-": 0.5635097304651019
+    },
+    "slope_k_per_unit": -160.02594818775236,
+    "worth_r1": 0.06248986563271214,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.5600908186571334,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "fres_b": {
+    "record": "cycle",
+    "value": 6.5,
+    "method": "probe",
+    "size": 10.449831693911305,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -0.6243639709817375,
+     "-": 0.6196752040773764
+    },
+    "slope_k_per_unit": -0.9569532115839336,
+    "worth_r1": 10.449831693911305,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.6220195875295569,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "fres_map_min": {
+    "record": "cycle",
+    "value": 25.0,
+    "method": "fallback",
+    "size": 2.5,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)"
+   },
+   "fres_lo": {
+    "record": "cycle",
+    "value": 0.03,
+    "method": "fallback",
+    "size": 0.003,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)"
+   },
+   "fres_hi": {
+    "record": "cycle",
+    "value": 0.18,
+    "method": "fallback",
+    "size": 0.018,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000182 K)"
+   },
+   "n_poly": {
+    "record": "cycle",
+    "value": 1.32,
+    "method": "probe",
+    "size": 0.030732596185426512,
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 85.89981756746283,
+     "-": -0.0024597432934898235
+    },
+    "slope_k_per_unit": 325.38741405589514,
+    "worth_r1": 0.030732596185426512,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 42.95113865537816,
+    "numerical_noise_k": 0.0001821936093778558,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   }
+  },
+  "row9_not_probed": {
+   "knock_on": "labelled CORRELATION, not ASSUMED: row 9 names the ASSUMED cycle constants; the knock scale knock_a is E6 row 7's",
+   "knock_p": "labelled CORRELATION, not ASSUMED: row 9 names the ASSUMED cycle constants; the knock scale knock_a is E6 row 7's",
+   "knock_b": "labelled CORRELATION, not ASSUMED: row 9 names the ASSUMED cycle constants; the knock scale knock_a is E6 row 7's"
+  },
+  "brackets": {
+   "ivc_deg": {
+    "bracket": [
+     -154.26900000000006,
+     -80.29800000000004
+    ],
+    "rows": 199,
+    "rows_outside": 0,
+    "channel": "epa_atkinson_ratio with the intake and exhaust cam phases",
+    "method": "atkinson",
+    "why_not_bracket": null,
+    "atkinson_fit": {
+     "ivc0_deg": -80.00000000000004,
+     "evo0_deg": 120.00000000000004,
+     "rod_over_half_stroke": 3.6840000000000184,
+     "max_abs_residual": 1.9984014443252818e-15,
+     "rows": 199,
+     "distinct_cam_pairs": 199,
+     "starts": 27,
+     "starts_exact": 27,
+     "intake_cam_channel": "intake_cam_phase_cad_ret",
+     "intake_cam_sign": 1.0,
+     "intake_cam_range_cad": [
+      -74.269,
+      -0.298
+     ],
+     "exhaust_cam_range_cad": [
+      -0.178,
+      48.606
+     ],
+     "exact_below": 1e-09
+    },
+    "rod_m_at_plant_stroke": 0.18416628003435892
+   },
+   "evo_deg": {
+    "bracket": [
+     119.82200000000005,
+     168.60600000000005
+    ],
+    "rows": 199,
+    "rows_outside": 0,
+    "channel": "epa_atkinson_ratio with the intake and exhaust cam phases",
+    "method": "atkinson",
+    "why_not_bracket": null,
+    "atkinson_fit": {
+     "ivc0_deg": -80.00000000000004,
+     "evo0_deg": 120.00000000000004,
+     "rod_over_half_stroke": 3.6840000000000184,
+     "max_abs_residual": 1.9984014443252818e-15,
+     "rows": 199,
+     "distinct_cam_pairs": 199,
+     "starts": 27,
+     "starts_exact": 27,
+     "intake_cam_channel": "intake_cam_phase_cad_ret",
+     "intake_cam_sign": 1.0,
+     "intake_cam_range_cad": [
+      -74.269,
+      -0.298
+     ],
+     "exhaust_cam_range_cad": [
+      -0.178,
+      48.606
+     ],
+     "exact_below": 1e-09
+    },
+    "rod_m_at_plant_stroke": 0.18416628003435892
+   }
+  }
+ },
+ "e6_row4": {
+  "frozen": {
+   "tau_s": 42.74181271696412,
+   "peak_c": 776.8728824015117
+  },
+  "c_turb": {
+   "x0.75": {
+    "tau_s": 32.05635953772309,
+    "peak_c": 776.8928381711704
+   },
+   "x1.333": {
+    "tau_s": 56.97483635171317,
+    "peak_c": 776.8434202180246
+   }
+  },
+  "ua_gas_turb": {
+   "x0.75": {
+    "tau_s": 54.65311060475103,
+    "peak_c": 746.7238234825205
+   },
+   "x1.333": {
+    "tau_s": 33.125460699247675,
+    "peak_c": 801.2135569181497
+   }
+  },
+  "ua_turb_amb": {
+   "x0.75": {
+    "tau_s": 44.15733616117484,
+    "peak_c": 801.2147187797033
+   },
+   "x1.333": {
+    "tau_s": 40.99151318884139,
+    "peak_c": 746.774765874002
+   }
+  }
+ },
+ "e6_row7": {
+  "1.00": {
+   "total": 1080.1063803616591,
+   "thermal": 667.5275621771299,
+   "knock_share": 0.38197979910680907
+  },
+  "0.90": {
+   "total": 713.7449709466105,
+   "thermal": 666.1152151287837,
+   "knock_share": 0.06673217711734963
+  },
+  "1.10": {
+   "total": 1237.9957549236883,
+   "thermal": 915.529371232948,
+   "knock_share": 0.26047454719311014
+  }
+ },
+ "e6_row13": {
+  "dwell_0s": {
+   "ecu": {
+    "enr_dwell_lo": 0.0,
+    "enr_dwell_hi": 1.5
+   },
+   "builds": true
+  },
+  "dwell_30s": {
+   "ecu": {
+    "enr_dwell_lo": 30.0,
+    "enr_dwell_hi": 31.5
+   },
+   "builds": true
+  },
+  "rule": "the enrichment ramp moved whole so that it starts at the gate, its width the engine's (enr_dwell_hi - enr_dwell_lo), each variant built through engines.Engine's invariants"
+ },
+ "e6_in_use": {
+  "frozen": {
+   "hot_tit_at_lambda1_c": 884.9988408694807,
+   "egt_c": 884.9988408694807,
+   "air_gps": 127.23520238207094,
+   "exhaust_gps": 135.97448408974805,
+   "fuel_gps": 8.739281707677103,
+   "tau_s": 42.74203377284872,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 66880.71426306869,
+   "oil_heat_w": 1567.1578685400864,
+   "housing_eq_k": -6.249244318477776e-05,
+   "knock_share": 0.38197979910680907
+  },
+  "1": {
+   "hot_tit_at_lambda1_c": 884.9988408694807,
+   "egt_c": 884.9988408694807,
+   "air_gps": 127.23520238207094,
+   "exhaust_gps": 135.97448408974805,
+   "fuel_gps": 8.739281707677103,
+   "tau_s": 42.74203377284872,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 66880.71426306869,
+   "oil_heat_w": 1567.1578685400864,
+   "housing_eq_k": -6.249244318477776e-05
+  },
+  "2": {
+   "hot_tit_at_lambda1_c": 881.9515600076846,
+   "egt_c": 881.9515600076846,
+   "air_gps": 128.54231055381806,
+   "exhaust_gps": 137.28668542142472,
+   "fuel_gps": 8.744374867606673,
+   "tau_s": 42.38544825841037,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 66919.69162818171,
+   "oil_heat_w": 1568.0711913881582,
+   "housing_eq_k": -1.7515786444643922
+  },
+  "3": {
+   "hot_tit_at_lambda1_c": 892.9447649623252,
+   "egt_c": 892.9447649623252,
+   "air_gps": 127.23520238207094,
+   "exhaust_gps": 135.97448408974805,
+   "fuel_gps": 8.739281707677103,
+   "tau_s": 42.74203377284872,
+   "heat_per_gram_j": 44000.0,
+   "coolant_heat_w": 68582.81503624085,
+   "oil_heat_w": 1607.0417221908222,
+   "housing_eq_k": 6.926992002082605
+  },
+  "7_090": {
+   "hot_tit_at_lambda1_c": 884.9988408694807,
+   "egt_c": 884.9988408694807,
+   "air_gps": 127.23520238207094,
+   "exhaust_gps": 135.97448408974805,
+   "fuel_gps": 8.739281707677103,
+   "tau_s": 42.74203377284872,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 66880.71426306869,
+   "oil_heat_w": 1567.1578685400864,
+   "housing_eq_k": -6.249244318477776e-05,
+   "knock_share": 0.06673217711734963
+  },
+  "7_110": {
+   "hot_tit_at_lambda1_c": 884.9988408694807,
+   "egt_c": 884.9988408694807,
+   "air_gps": 127.23520238207094,
+   "exhaust_gps": 135.97448408974805,
+   "fuel_gps": 8.739281707677103,
+   "tau_s": 42.74203377284872,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 66880.71426306869,
+   "oil_heat_w": 1567.1578685400864,
+   "housing_eq_k": -6.249244318477776e-05,
+   "knock_share": 0.26047454719311014
+  }
+ },
+ "dump": {
+  "sha256": "b2fc42faa5209160fb94714a6f441b91ab29cdb1c9a8b02986a010878d86189d",
+  "n_values": 24501,
+  "keys": [
+   "grid.rpm",
+   "grid.map_kpa",
+   "grid.lam",
+   "run_cycle.torque_nm",
+   "run_cycle.power_kw",
+   "run_cycle.bmep_bar",
+   "run_cycle.imep_bar",
+   "run_cycle.fmep_bar",
+   "run_cycle.bsfc_gpkwh",
+   "run_cycle.egt_c",
+   "run_cycle.p_max_bar",
+   "run_cycle.knock_integral",
+   "run_cycle.knock_prob",
+   "run_cycle.mfb50_deg",
+   "run_cycle.mdot_fuel_gps",
+   "run_cycle.t_max_k",
+   "run_cycle.mdot_air_gps",
+   "run_cycle.eta_v",
+   "run_cycle.f_res",
+   "exhaust_backpressure_kpa",
+   "ecu.base_spark",
+   "ecu.knock_limited_spark",
+   "ecu.base_lambda.dwell_0",
+   "ecu.base_lambda.dwell_3",
+   "ecu.base_lambda.dwell_30",
+   "ecu.iat_compensation",
+   "ecu.cam_deg",
+   "boost_ceiling_kpa",
+   "charge_temperature",
+   "vehicle.road_force_n",
+   "vehicle.demand.torque_nm",
+   "vehicle.demand.rpm",
+   "thermal.state"
+  ]
+ },
+ "derived": {
+  "path": "data/engines/mazda_25t/derived_params.json",
+  "sha_text": "04539bffebf732559171459ac1ef2aae424eeafe973186ce41ade0279752c7bb",
+  "derived_sha": "e8318dd80c3375f2"
+ },
+ "engine_sha": "2558cb2bcad4f2c6",
+ "e6_files": {
+  "results/EPA_CALIBRATION/mazda_25t/e6/row1.json": "73538a771af4ad41cb941fce146e7525284058c781eca6f8479dced2fb870326",
+  "results/EPA_CALIBRATION/mazda_25t/e6/row2.json": "7c4b460c34c1da3fb387674d6c9c01d53fc9948bc84a2164a6c492aecf7b7487",
+  "results/EPA_CALIBRATION/mazda_25t/e6/row3.json": "0cdaca29cc4ca875526b879cbcc6835f0e68a209cf2323abe581d1e8859f1ae1",
+  "results/EPA_CALIBRATION/mazda_25t/e6/row7_090.json": "718cfc8660a6a58b45b70fb74572925f2f42d159fb714a693dc6bdae13b6a5e1",
+  "results/EPA_CALIBRATION/mazda_25t/e6/row7_110.json": "ba66be8ceb050c87f99759f84d676b985791d55a22cdbf663e7e6b743f0daa9b"
+ },
+ "finiteness": {
+  "asserted_before": [
+   {
+    "step": "1 table",
+    "excluded": [
+     "car.deliverable_torque",
+     "engine.damage.turb_knee_k",
+     "engine.loop.torque_floor_nm"
+    ]
+   },
+   {
+    "step": "2 floor",
+    "excluded": [
+     "engine.damage.turb_knee_k",
+     "engine.loop.torque_floor_nm"
+    ]
+   },
+   {
+    "step": "3 delivery and 4 K3",
+    "excluded": [
+     "engine.damage.turb_knee_k"
+    ]
+   },
+   {
+    "step": "5-10 the coefficients, E6 and the dump",
+    "excluded": []
+   }
+  ],
+  "excluded_fields": {
+   "table": "car.deliverable_torque",
+   "knee": "engine.damage.turb_knee_k",
+   "floor": "engine.loop.torque_floor_nm"
+  }
+ }
+}

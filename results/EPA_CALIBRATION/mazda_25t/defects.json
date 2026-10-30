@@ -1,0 +1,18 @@
+[
+ {
+  "k": 1,
+  "run_invocation": 1,
+  "found_by": "calibrate_epa.py fit --defect",
+  "assertion": "D-1, a coding defect (PLAN.md 5.6; WP3_INTERFACES.md 5.5.2 and 16): calibrate_epa.valve_brackets gave the Mazda no IVC or EVO bracket for E6 row 9, on a false reason (EPA's Atkinson ratio is the effective expansion stroke over the effective compression stroke, and with the two cam phases the calibration rows recover the base timing exactly); found by the read-only defect hunt after Run 1's first pass (24 October 2026); fixed in 7ee7408. The re-run is on 0147f93, which also carries decision 84 (T0's d2_gate case widened, epa_fit.d2_gate_case) and decisions 83 and 85 (Ghassan, 29 October 2026)",
+  "fix_commit": "7ee7408bae0d0ca8100b45adb891bf9c83b7882b",
+  "previous_run": "defect_1/"
+ },
+ {
+  "k": 2,
+  "run_invocation": 1,
+  "found_by": "calibrate_epa.py fit --defect",
+  "assertion": "D-2, a coding defect (PLAN.md 5.6; WP3_INTERFACES.md 5.5.2 and 17; results/VALIDATION_DECISIONS.md section H, the note on D-2), and decision 88 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H): D-2: E6 row 9 applied a bracket as v0 +- its farther edge from the value (calibrate_epa.probe_sizes; validate_epa.e6_rows), which no document of the specification says, so the second pass's frozen Mazda had IVC (v0 -140 deg, bracket [-154.27, -80.30] deg) probed at -199.70 deg and EVO (v0 140 deg, bracket [119.82, 168.61] deg) at 111.39 deg, outside the brackets EPA's valve channels give; found by the freeze review after Run 1's second pass (29 October 2026); fixed in 21cc7d4 (calibrate_epa.BRACKET_EDGES: a bracket applied as its two edges, the constant moved to lo and to hi). Decision 88: a worth-R1 probe of rows 5, 6 or 9 that takes its constant outside epa_fit.BOUNDS where it has an entry, changes its sign on either side, or gives a non-finite climb cycle on either side is reported beyond the constant's range at R1 with the tests it fails, probed at the contract's +-10 % fallback and counted excluded for the level rows, as decision 85 treats a probe not visible at R1 (calibrate_epa.RANGE_TESTS, range_tests; measured on the second pass's frozen Mazda: ce_rich_slope +-2331.6 on 0.435, outside (0, 1.5) and across zero, and seven more across zero, conrod's minus side non-finite); declared in 891331c, the fix commit named here, on 21cc7d4, which also carries decisions 86 (T0's d2_gate case, indistinguishable at T0's noise), 87 (the Ford's seed 5; no change for this engine) and 89 (procedure). Both change the completion only (no in-sample statistic, form or frozen section); freeze.json pins calibrate_epa.py, so the Mazda re-runs from T0 on the final code, 891331c, and the second pass's outputs move to defect_2/",
+  "fix_commit": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+  "previous_run": "defect_2/"
+ }
+]

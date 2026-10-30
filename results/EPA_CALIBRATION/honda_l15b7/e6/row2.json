@@ -1,0 +1,3636 @@
+{
+ "schema": "epa-e6/1",
+ "provenance": {
+  "engine": "honda_l15b7",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "a4e6138b9d258b1f",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "7b3d8dbbbf0b58b5ff7613048890ce81bf92f269b920fd51eb2c63751d52757f",
+    "epa_highload_initial.csv": "f69e531f2cfe4c44b275ed222ff4f375f06fe751674eafaa7744503d603af2fc",
+    "epa_steady.csv": "ba8558ca2c35c9ede3583ecc091e58d090abc4bed54d6ffcc7b06b99bc2c018e"
+   },
+   "epa_engine_sha256": "6d3134cb686272e549942ed64a74cc4f60e50bc177f47d63675555c7b8d10d2c",
+   "epa_channels_blob": "3c7b296206a2682c580a6fd2e9017360e92e8924",
+   "manifest_sha256": "fdbcc949a39c343a30f3b88e425e96b0c937e3ff53d97e4cc2ec366988a2a9ed"
+  },
+  "view_sha256": "8c6a700ccbf9e96599a5c3bfbc3817b88f2daefb7e36c1c9340c196723b2da58",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "row": 2,
+ "variant": "2",
+ "conventions": {
+  "snap": true,
+  "cell_referenced": true,
+  "afr_st": 14.7,
+  "lhv_j_per_kg": null
+ },
+ "knock_factor": null,
+ "form": "A+B+C+D",
+ "values": {
+  "cycle": {
+   "form": "A+B+C+D",
+   "ve_base": 1.0070137936207204,
+   "ve_amp": 0.14175023444136614,
+   "ve_rpm": 1490.9801197488323,
+   "ve_width": 1693.2369736545297,
+   "ve_map": 0.0028699412075882925,
+   "ve_cam": -0.004999999999999999,
+   "ce_rich_slope": 0.44932994407850235,
+   "burn_base": 14.252368205470122,
+   "burn_rpm": 2.916098356470306e-07,
+   "delay_base": 9.270248698694784,
+   "delay_rpm": 4.273147698567082e-07,
+   "fmep_0": 0.26237217777373195,
+   "fmep_pmax": 0.015263320885582885,
+   "fmep_sp": -0.09999999998607793,
+   "fmep_sp2": 0.00855412254830673,
+   "ua_port": 10.684556492522553,
+   "exh_bp_ratio": 1.122899602581687,
+   "exh_bp_min_kpa": 104.99111284138775,
+   "knock_a": 0.015622182357253893
+  },
+  "ecu": {
+   "spark_a": 16.321637577332904,
+   "spark_b": 0.004707165431773186,
+   "spark_c": 0.20362915848013072,
+   "spark_min": -20.0,
+   "spark_max": 34.0,
+   "kl_a": -36.220038814659,
+   "kl_b": 0.004923881297203073,
+   "kl_c": 0.4897279257576297,
+   "kl_d": -2.0643824448826895,
+   "enr_load": 130.0,
+   "enr_rpm_lo": 1000.0,
+   "enr_rpm_hi": 5000.0,
+   "enr_depth": 0.315186657367131,
+   "cam_on": 1,
+   "cam_c0": -74.4380823862482,
+   "cam_c_rpm": 43.82089477351036,
+   "cam_c_map": 135.053045135676,
+   "cam_c_rpm2": -7.756194304880083,
+   "cam_c_rpm_map": -0.14329535942168192,
+   "cam_c_map2": -70.29006018264698,
+   "cam_rpm_lo": 1001.0,
+   "cam_rpm_hi": 5000.9473684210525,
+   "cam_map_lo": 23.709999999999994,
+   "cam_map_hi": 176.8809287925697,
+   "cam_lo": -0.6973436532507725,
+   "cam_hi": 61.403
+  },
+  "boost_ceiling": {
+   "envelope_flow": [
+    0.0,
+    0.037602542101871035,
+    0.044299116193892284,
+    0.050609246931954247,
+    0.05651997971860488,
+    0.061717853239833864,
+    0.08597996343509005,
+    0.09686782269989234,
+    0.11629972564492637
+   ],
+   "envelope_pr": [
+    1.0,
+    1.4186587302926812,
+    1.5463339970703975,
+    1.6553676449431813,
+    1.599448322436514,
+    1.615696799658379,
+    1.7305980227489413,
+    1.7540774183328243,
+    1.78127823557472
+   ],
+   "pr_cap": 1.78127823557472
+  }
+ },
+ "frozen_sections_sha256": "87317a713a9ac271875cd7a6cd0ac4b052244d8c288cd84e94c71630c9d04ffd",
+ "fit": {
+  "S1": {
+   "values": {
+    "exh_bp_ratio": 1.122899602581687,
+    "exh_bp_min_kpa": 104.99111284138775
+   },
+   "rows_used": 129,
+   "rows_excluded": {
+    "not_fired_or_no_tip": [
+     [
+      "epa_steady.csv",
+      6
+     ],
+     [
+      "epa_steady.csv",
+      7
+     ],
+     [
+      "epa_steady.csv",
+      8
+     ],
+     [
+      "epa_steady.csv",
+      9
+     ],
+     [
+      "epa_steady.csv",
+      10
+     ],
+     [
+      "epa_steady.csv",
+      44
+     ],
+     [
+      "epa_steady.csv",
+      45
+     ],
+     [
+      "epa_steady.csv",
+      46
+     ],
+     [
+      "epa_steady.csv",
+      47
+     ],
+     [
+      "epa_steady.csv",
+      48
+     ],
+     [
+      "epa_steady.csv",
+      61
+     ],
+     [
+      "epa_steady.csv",
+      62
+     ],
+     [
+      "epa_steady.csv",
+      63
+     ],
+     [
+      "epa_steady.csv",
+      64
+     ],
+     [
+      "epa_steady.csv",
+      97
+     ],
+     [
+      "epa_steady.csv",
+      98
+     ],
+     [
+      "epa_steady.csv",
+      99
+     ],
+     [
+      "epa_steady.csv",
+      100
+     ],
+     [
+      "epa_steady.csv",
+      101
+     ],
+     [
+      "epa_steady.csv",
+      136
+     ],
+     [
+      "epa_steady.csv",
+      137
+     ],
+     [
+      "epa_steady.csv",
+      138
+     ],
+     [
+      "epa_steady.csv",
+      139
+     ],
+     [
+      "epa_steady.csv",
+      140
+     ],
+     [
+      "epa_steady.csv",
+      152
+     ],
+     [
+      "epa_steady.csv",
+      153
+     ],
+     [
+      "epa_steady.csv",
+      154
+     ],
+     [
+      "epa_steady.csv",
+      155
+     ],
+     [
+      "epa_steady.csv",
+      156
+     ],
+     [
+      "epa_steady.csv",
+      183
+     ],
+     [
+      "epa_steady.csv",
+      184
+     ],
+     [
+      "epa_steady.csv",
+      185
+     ],
+     [
+      "epa_steady.csv",
+      186
+     ],
+     [
+      "epa_steady.csv",
+      187
+     ],
+     [
+      "epa_steady.csv",
+      188
+     ]
+    ],
+    "sentinel": []
+   },
+   "flags": [],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "hinge_kpa": 93.5,
+    "ratio": 1.122899602581687,
+    "floor_kpa": 104.99111284138775,
+    "sigma": {
+     "ratio": 0.014469588396927992,
+     "floor_kpa": 2.843764785388861
+    },
+    "residual_vs_rpm": {
+     "slope_k_per_krpm": 11.243614547427054,
+     "n": 129,
+     "unit": "kPa of TIP per 1000 rpm"
+    },
+    "without_tip_below_barometer": {
+     "values": {
+      "exh_bp_ratio": 1.1230038482921947,
+      "exh_bp_min_kpa": 105.11316020014944
+     },
+     "rows_removed": 1
+    },
+    "sse_kpa2": 41081.95062545818,
+    "grid_step_kpa": 0.1,
+    "tie_rule": "the lowest hinge"
+   }
+  },
+  "S2": {
+   "values": {
+    "ve_base": 1.0070137936207204,
+    "ve_amp": 0.14175023444136614,
+    "ve_rpm": 1490.9801197488323,
+    "ve_width": 1693.2369736545297,
+    "ve_map": 0.0028699412075882925,
+    "ve_cam": -0.004999999999999999
+   },
+   "rows_used": 127,
+   "rows_excluded": {
+    "no_meter_or_not_fired": [
+     [
+      "epa_steady.csv",
+      6
+     ],
+     [
+      "epa_steady.csv",
+      7
+     ],
+     [
+      "epa_steady.csv",
+      8
+     ],
+     [
+      "epa_steady.csv",
+      9
+     ],
+     [
+      "epa_steady.csv",
+      10
+     ],
+     [
+      "epa_steady.csv",
+      44
+     ],
+     [
+      "epa_steady.csv",
+      45
+     ],
+     [
+      "epa_steady.csv",
+      46
+     ],
+     [
+      "epa_steady.csv",
+      47
+     ],
+     [
+      "epa_steady.csv",
+      48
+     ],
+     [
+      "epa_steady.csv",
+      61
+     ],
+     [
+      "epa_steady.csv",
+      62
+     ],
+     [
+      "epa_steady.csv",
+      63
+     ],
+     [
+      "epa_steady.csv",
+      64
+     ],
+     [
+      "epa_steady.csv",
+      97
+     ],
+     [
+      "epa_steady.csv",
+      98
+     ],
+     [
+      "epa_steady.csv",
+      99
+     ],
+     [
+      "epa_steady.csv",
+      100
+     ],
+     [
+      "epa_steady.csv",
+      101
+     ],
+     [
+      "epa_steady.csv",
+      136
+     ],
+     [
+      "epa_steady.csv",
+      137
+     ],
+     [
+      "epa_steady.csv",
+      138
+     ],
+     [
+      "epa_steady.csv",
+      139
+     ],
+     [
+      "epa_steady.csv",
+      140
+     ],
+     [
+      "epa_steady.csv",
+      152
+     ],
+     [
+      "epa_steady.csv",
+      153
+     ],
+     [
+      "epa_steady.csv",
+      154
+     ],
+     [
+      "epa_steady.csv",
+      155
+     ],
+     [
+      "epa_steady.csv",
+      156
+     ],
+     [
+      "epa_steady.csv",
+      183
+     ],
+     [
+      "epa_steady.csv",
+      184
+     ],
+     [
+      "epa_steady.csv",
+      185
+     ],
+     [
+      "epa_steady.csv",
+      186
+     ],
+     [
+      "epa_steady.csv",
+      187
+     ],
+     [
+      "epa_steady.csv",
+      188
+     ],
+     [
+      "epa_highload_final.csv",
+      21
+     ],
+     [
+      "epa_highload_final.csv",
+      22
+     ]
+    ],
+    "no_lambda": [],
+    "sentinel": []
+   },
+   "flags": [
+    "S2_bound_active"
+   ],
+   "bounds_active": [
+    "ve_cam"
+   ],
+   "convergence": {
+    "nfev": 8,
+    "njev": 8,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "cost": 571.0361117609798,
+    "grad_norm": 2.944513512213591e-05,
+    "last_step_norm": 1.1095979907987358e-06,
+    "cost_change": 9.663381206337363e-12,
+    "second_attempt": false
+   },
+   "report": {
+    "grid": {
+     "ve_rpm": [
+      1000.0,
+      1500.0,
+      1600.0,
+      1700.0,
+      1750.0,
+      1800.0,
+      2250.0,
+      2500.0,
+      3500.0,
+      4000.0,
+      5000.0
+     ],
+     "ve_width": [
+      300.0,
+      333.21072631730885,
+      370.09796044302817,
+      411.0687006925863,
+      456.57500108029683,
+      507.11895909430575,
+      563.2582556303039,
+      625.612308209313,
+      694.8691053715767,
+      771.7927976544053,
+      857.2321289096401,
+      952.12980098838,
+      1057.5328751189757,
+      1174.6043247427508,
+      1304.6358672766132,
+      1449.062216382841,
+      1609.476911999652,
+      1787.6499027944772,
+      1985.5470750373781,
+      2205.351943368042,
+      2449.489742783179,
+      2720.654187665269,
+      3021.8371931005727,
+      3356.3618864189943,
+      3727.9192731913513,
+      4140.608962241279,
+      4598.984399014577,
+      5108.103106392068,
+      5673.582487282,
+      6301.6618046946605,
+      6999.271023161168,
+      7774.1072710640765,
+      8634.719767533114,
+      9590.604150953763,
+      10652.307249870342,
+      11831.543452281421,
+      13141.32395729829,
+      14596.100335274723,
+      16211.923980390662,
+      18006.623215023243,
+      20000.0
+     ]
+    },
+    "profile_min_cost": 594.5268859343054,
+    "start": {
+     "ve_base": 0.9924842559891889,
+     "ve_amp": 0.12565412465979783,
+     "ve_rpm": 1500.0,
+     "ve_width": 1787.6499027944772,
+     "ve_map": 0.002902324099392256,
+     "ve_cam": -0.005
+    },
+    "declared_start": {
+     "ve_base": 0.86,
+     "ve_amp": 0.14,
+     "ve_rpm": 3800.0,
+     "ve_width": 2600.0,
+     "ve_map": 0.0,
+     "ve_cam": 0.0
+    },
+    "verify_max_rel": 4.174064451475192e-16,
+    "clip_rows": [],
+    "corr_ve_cam_ve_map": 0.023572896374093415,
+    "params": [
+     "ve_base",
+     "ve_amp",
+     "ve_rpm",
+     "ve_width",
+     "ve_map",
+     "ve_cam"
+    ],
+    "estimate": {
+     "ve_base": 1.0070137936207204,
+     "ve_amp": 0.14175023444136614,
+     "ve_rpm": 1490.9801197488323,
+     "ve_width": 1693.2369736545297,
+     "ve_map": 0.0028699412075882925,
+     "ve_cam": -0.004999999999999999
+    },
+    "covariance": [
+     [
+      0.0012635306039263687,
+      -0.0008319105979590361,
+      5.428254807701277,
+      -18.120600286034712,
+      -3.784991132706298e-07,
+      -1.0879627348642148e-05
+     ],
+     [
+      -0.0008319105979590376,
+      0.0017161460447491332,
+      -0.5177927226448352,
+      25.131108044731636,
+      -1.5141020364791766e-07,
+      -2.5900257278078076e-05
+     ],
+     [
+      5.428254807701264,
+      -0.5177927226448232,
+      229948.4362018213,
+      -198807.0555850776,
+      -0.03647659188645637,
+      -0.18679889288430218
+     ],
+     [
+      -18.12060028603472,
+      25.131108044731644,
+      -198807.05558507753,
+      814074.3396628771,
+      0.03684866331417319,
+      -0.40269727545736084
+     ],
+     [
+      -3.7849911327063324e-07,
+      -1.5141020364791453e-07,
+      -0.036476591886456376,
+      0.0368486633141733,
+      9.209993945866752e-08,
+      8.219122524708611e-09
+     ],
+     [
+      -1.0879627348642109e-05,
+      -2.590025727807811e-05,
+      -0.18679889288430243,
+      -0.4026972754573611,
+      8.219122524708636e-09,
+      1.3199748924174977e-06
+     ]
+    ],
+    "residual_variance": 9.435358016336165,
+    "correlations": {
+     "ve_base": {
+      "ve_base": 0.9999999999999998,
+      "ve_amp": -0.5649456283841515,
+      "ve_rpm": 0.31845796294378526,
+      "ve_width": -0.5649989816560644,
+      "ve_map": -0.035086682854319644,
+      "ve_cam": -0.26640250372175833
+     },
+     "ve_amp": {
+      "ve_base": -0.5649456283841525,
+      "ve_amp": 1.0,
+      "ve_rpm": -0.026065351759702645,
+      "ve_width": 0.6723609507548755,
+      "ve_map": -0.012043378881611366,
+      "ve_cam": -0.5441819355810116
+     },
+     "ve_rpm": {
+      "ve_base": 0.3184579629437845,
+      "ve_amp": -0.02606535175970204,
+      "ve_rpm": 0.9999999999999999,
+      "ve_width": -0.45949895733543694,
+      "ve_map": -0.2506509480376892,
+      "ve_cam": -0.3390597461164268
+     },
+     "ve_width": {
+      "ve_base": -0.5649989816560647,
+      "ve_amp": 0.6723609507548757,
+      "ve_rpm": -0.4594989573354367,
+      "ve_width": 1.0000000000000002,
+      "ve_map": 0.13457365045561503,
+      "ve_cam": -0.3884756689949122
+     },
+     "ve_map": {
+      "ve_base": -0.03508668285431996,
+      "ve_amp": -0.012043378881611118,
+      "ve_rpm": -0.2506509480376893,
+      "ve_width": 0.13457365045561542,
+      "ve_map": 0.9999999999999999,
+      "ve_cam": 0.023572896374093346
+     },
+     "ve_cam": {
+      "ve_base": -0.26640250372175733,
+      "ve_amp": -0.5441819355810122,
+      "ve_rpm": -0.33905974611642725,
+      "ve_width": -0.3884756689949125,
+      "ve_map": 0.023572896374093415,
+      "ve_cam": 1.0000000000000002
+     }
+    },
+    "data_or_prior": {
+     "ve_base": "data-dominated",
+     "ve_amp": "data-dominated",
+     "ve_rpm": "data-dominated",
+     "ve_width": "data-dominated",
+     "ve_map": "data-dominated",
+     "ve_cam": "data-dominated"
+    },
+    "zero_columns_at_optimum": [],
+    "bounds": {
+     "ve_base": [
+      0.3,
+      1.3
+     ],
+     "ve_amp": [
+      -0.6,
+      0.6
+     ],
+     "ve_rpm": [
+      1000.0,
+      5000.0
+     ],
+     "ve_width": [
+      300.0,
+      20000.0
+     ],
+     "ve_map": [
+      -0.005,
+      0.005
+     ],
+     "ve_cam": [
+      -0.005,
+      0.005
+     ]
+    },
+    "x_scale": {
+     "ve_base": 0.1,
+     "ve_amp": 0.1,
+     "ve_rpm": 1000.0,
+     "ve_width": 1000.0,
+     "ve_map": 0.001,
+     "ve_cam": 0.001
+    }
+   }
+  },
+  "S3a": {
+   "values": {
+    "spark_a": 16.321637577332904,
+    "spark_b": 0.004707165431773186,
+    "spark_c": 0.20362915848013072,
+    "spark_min": -20.0,
+    "spark_max": 34.0,
+    "kl_a": -36.220038814659,
+    "kl_b": 0.004923881297203073,
+    "kl_c": 0.4897279257576297,
+    "kl_d": -2.0643824448826895
+   },
+   "rows_used": 129,
+   "rows_excluded": {
+    "not_fired": [
+     [
+      "epa_steady.csv",
+      6
+     ],
+     [
+      "epa_steady.csv",
+      7
+     ],
+     [
+      "epa_steady.csv",
+      8
+     ],
+     [
+      "epa_steady.csv",
+      9
+     ],
+     [
+      "epa_steady.csv",
+      10
+     ],
+     [
+      "epa_steady.csv",
+      44
+     ],
+     [
+      "epa_steady.csv",
+      45
+     ],
+     [
+      "epa_steady.csv",
+      46
+     ],
+     [
+      "epa_steady.csv",
+      47
+     ],
+     [
+      "epa_steady.csv",
+      48
+     ],
+     [
+      "epa_steady.csv",
+      61
+     ],
+     [
+      "epa_steady.csv",
+      62
+     ],
+     [
+      "epa_steady.csv",
+      63
+     ],
+     [
+      "epa_steady.csv",
+      64
+     ],
+     [
+      "epa_steady.csv",
+      97
+     ],
+     [
+      "epa_steady.csv",
+      98
+     ],
+     [
+      "epa_steady.csv",
+      99
+     ],
+     [
+      "epa_steady.csv",
+      100
+     ],
+     [
+      "epa_steady.csv",
+      101
+     ],
+     [
+      "epa_steady.csv",
+      136
+     ],
+     [
+      "epa_steady.csv",
+      137
+     ],
+     [
+      "epa_steady.csv",
+      138
+     ],
+     [
+      "epa_steady.csv",
+      139
+     ],
+     [
+      "epa_steady.csv",
+      140
+     ],
+     [
+      "epa_steady.csv",
+      152
+     ],
+     [
+      "epa_steady.csv",
+      153
+     ],
+     [
+      "epa_steady.csv",
+      154
+     ],
+     [
+      "epa_steady.csv",
+      155
+     ],
+     [
+      "epa_steady.csv",
+      156
+     ],
+     [
+      "epa_steady.csv",
+      183
+     ],
+     [
+      "epa_steady.csv",
+      184
+     ],
+     [
+      "epa_steady.csv",
+      185
+     ],
+     [
+      "epa_steady.csv",
+      186
+     ],
+     [
+      "epa_steady.csv",
+      187
+     ],
+     [
+      "epa_steady.csv",
+      188
+     ]
+    ],
+    "sentinel": []
+   },
+   "flags": [
+    "S3a_empty_piece"
+   ],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "iterations": 1,
+    "converged": false,
+    "pieces": {
+     "part_load": {
+      "n": 69,
+      "rank": 3
+     },
+     "knock_limited": {
+      "n": 60,
+      "rank": 4
+     }
+    },
+    "start_map_kpa": 124.677341349365,
+    "spark_min_rule": "floor(min over the rows of {EPA's spark, base, base + comp, base + comp - cold}) - 1 (amendment D3)",
+    "spark_max_rule": "ceil(max over the rows of {EPA's spark, base}) + 1",
+    "unclipped_at_every_row": true,
+    "cold_rows": 0,
+    "rms_deg": 15.485992694609491,
+    "sse_deg2": 30936.260096137306
+   }
+  },
+  "S3b": {
+   "values": {
+    "enr_load": 130.0,
+    "enr_rpm_lo": 1000.0,
+    "enr_rpm_hi": 5000.0,
+    "enr_depth": 0.315186657367131
+   },
+   "rows_used": 157,
+   "rows_excluded": {
+    "no_lambda": [
+     [
+      "epa_steady.csv",
+      6
+     ],
+     [
+      "epa_steady.csv",
+      44
+     ],
+     [
+      "epa_steady.csv",
+      61
+     ],
+     [
+      "epa_steady.csv",
+      97
+     ],
+     [
+      "epa_steady.csv",
+      136
+     ],
+     [
+      "epa_steady.csv",
+      152
+     ],
+     [
+      "epa_steady.csv",
+      183
+     ]
+    ],
+    "sentinel": []
+   },
+   "flags": [
+    "S3b_rpm_hi_highest_edge"
+   ],
+   "bounds_active": [
+    "enr_rpm_hi"
+   ],
+   "convergence": null,
+   "report": {
+    "grid": {
+     "gate_lo_kpa": 100.0,
+     "gate_hi_kpa": 176.8809287925697,
+     "step_kpa": 1.0,
+     "rpm_breakpoints": {
+      "rpm_lo": [
+       -1000.0,
+       -500.0,
+       0.0,
+       500.0,
+       1000.0,
+       1500.0,
+       1600.0,
+       1700.0,
+       1750.0,
+       1800.0,
+       2250.0,
+       2500.0,
+       3500.0,
+       4000.0,
+       5000.0
+      ],
+      "rpm_hi": [
+       1000.0,
+       1500.0,
+       1600.0,
+       1700.0,
+       1750.0,
+       1800.0,
+       2250.0,
+       2500.0,
+       3500.0,
+       4000.0,
+       5000.0
+      ]
+     },
+     "dwell_s": 30.0,
+     "t": 1.0
+    },
+    "flat_width_kpa": 0.0,
+    "flat_gates_kpa": [
+     130.0,
+     130.0
+    ],
+    "tie_rule": "the highest gate (amendment D2), then the lowest rpm_lo, then the lowest rpm_hi",
+    "rows_behind": {
+     "enr_load": 51,
+     "enr_rpm_lo": 50,
+     "enr_rpm_hi": 50,
+     "enr_depth": 51
+    },
+    "censored_rows": [],
+    "steady_rows": 108,
+    "final_rows": 49,
+    "depth_edge": {
+     "c1": 0.38999999999999546,
+     "invariant": 0.39,
+     "active": "C1",
+     "invariant_source": "the contract's all-row lambda clip floor (lambda_clip_floor.floor: round(min(0.70, the deepest lambda over every row - 0.01), 3), held-out and Initial rows included; amendment C1, a C13 disclosure)",
+     "invariant_active": false,
+     "c1_minus_invariant": -4.551914400963142e-15,
+     "at_optimum": false,
+     "engine_invariant_checked": true
+    },
+    "bounds_active_on_grid": true,
+    "grid_edges": {
+     "gate_lo": {
+      "at_optimum": false,
+      "on_flat_interval": false
+     },
+     "gate_hi": {
+      "at_optimum": false,
+      "on_flat_interval": false
+     },
+     "rpm_lo_lowest": {
+      "at_optimum": false
+     },
+     "rpm_lo_highest": {
+      "at_optimum": false
+     },
+     "rpm_hi_lowest": {
+      "at_optimum": false
+     },
+     "rpm_hi_highest": {
+      "at_optimum": true
+     }
+    },
+    "steady_hot_rows_enriched": 6,
+    "sse": 0.6349400621734154
+   }
+  },
+  "S3c": {
+   "values": {
+    "envelope_flow": [
+     0.0,
+     0.037602542101871035,
+     0.044299116193892284,
+     0.050609246931954247,
+     0.05651997971860488,
+     0.061717853239833864,
+     0.08597996343509005,
+     0.09686782269989234,
+     0.11629972564492637
+    ],
+    "envelope_pr": [
+     1.0,
+     1.4186587302926812,
+     1.5463339970703975,
+     1.6553676449431813,
+     1.599448322436514,
+     1.615696799658379,
+     1.7305980227489413,
+     1.7540774183328243,
+     1.78127823557472
+    ],
+    "pr_cap": 1.78127823557472
+   },
+   "rows_used": 8,
+   "rows_excluded": {
+    "lines_without_air": []
+   },
+   "flags": [
+    "S3c_lines_without_holds",
+    "S3c_pr_falls_with_flow"
+   ],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "points": [
+     {
+      "line": "1500",
+      "key": [
+       "epa_highload_final.csv",
+       10
+      ],
+      "corrected_flow": 0.037602542101871035,
+      "pr": 1.4186587302926812
+     },
+     {
+      "line": "1600",
+      "key": [
+       "epa_highload_final.csv",
+       17
+      ],
+      "corrected_flow": 0.044299116193892284,
+      "pr": 1.5463339970703975
+     },
+     {
+      "line": "1700/1750/1800",
+      "key": [
+       "epa_highload_final.csv",
+       27
+      ],
+      "corrected_flow": 0.050609246931954247,
+      "pr": 1.6553676449431813
+     },
+     {
+      "line": "2250",
+      "key": [
+       "epa_highload_final.csv",
+       38
+      ],
+      "corrected_flow": 0.05651997971860488,
+      "pr": 1.599448322436514
+     },
+     {
+      "line": "2500",
+      "key": [
+       "epa_highload_final.csv",
+       43
+      ],
+      "corrected_flow": 0.061717853239833864,
+      "pr": 1.615696799658379
+     },
+     {
+      "line": "3500",
+      "key": [
+       "epa_highload_final.csv",
+       53
+      ],
+      "corrected_flow": 0.08597996343509005,
+      "pr": 1.7305980227489413
+     },
+     {
+      "line": "4000",
+      "key": [
+       "epa_highload_final.csv",
+       58
+      ],
+      "corrected_flow": 0.09686782269989234,
+      "pr": 1.7540774183328243
+     },
+     {
+      "line": "5000",
+      "key": [
+       "epa_highload_final.csv",
+       70
+      ],
+      "corrected_flow": 0.11629972564492637,
+      "pr": 1.78127823557472
+     }
+    ],
+    "lines_without_holds": [
+     "1000"
+    ],
+    "anchor": [
+     0.0,
+     1.0
+    ],
+    "pr_cap": 1.78127823557472,
+    "inlet_sea_kpa": 99.3,
+    "highest_map_rows_skipped": [],
+    "hd1_barometer": null,
+    "cell_temperature_rule": null,
+    "pr_falls_with_flow": [
+     [
+      "1700/1750/1800",
+      "2250"
+     ]
+    ],
+    "filter_loss_kpa": 2.0
+   }
+  },
+  "S3d": {
+   "values": {
+    "cam_on": 1,
+    "cam_c0": -74.4380823862482,
+    "cam_c_rpm": 43.82089477351036,
+    "cam_c_map": 135.053045135676,
+    "cam_c_rpm2": -7.756194304880083,
+    "cam_c_rpm_map": -0.14329535942168192,
+    "cam_c_map2": -70.29006018264698,
+    "cam_rpm_lo": 1001.0,
+    "cam_rpm_hi": 5000.9473684210525,
+    "cam_map_lo": 23.709999999999994,
+    "cam_map_hi": 176.8809287925697,
+    "cam_lo": -0.6973436532507725,
+    "cam_hi": 61.403
+   },
+   "rows_used": 160,
+   "rows_excluded": {
+    "no_cam_value": [
+     [
+      "epa_highload_final.csv",
+      21
+     ],
+     [
+      "epa_highload_final.csv",
+      22
+     ],
+     [
+      "epa_highload_final.csv",
+      26
+     ],
+     [
+      "epa_highload_final.csv",
+      27
+     ]
+    ]
+   },
+   "flags": [],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "domain": {
+     "rpm": [
+      1001.0,
+      5000.9473684210525
+     ],
+     "map_kpa": [
+      23.709999999999994,
+      176.8809287925697
+     ]
+    },
+    "clamp_cad": [
+     -0.6973436532507725,
+     61.403
+    ],
+    "rows": 160,
+    "empty_cells": 4,
+    "extrapolated_rows": [],
+    "term_order": [
+     "cam_c0",
+     "cam_c_rpm",
+     "cam_c_map",
+     "cam_c_rpm2",
+     "cam_c_rpm_map",
+     "cam_c_map2"
+    ],
+    "rms_cad": 11.81026965735925,
+    "channels": [
+     "intake_cam_phase_cad_adv"
+    ]
+   }
+  },
+  "S4": {
+   "values": {
+    "burn_base": 14.252368205470122,
+    "burn_rpm": 2.916098356470306e-07,
+    "delay_base": 9.270248698694784,
+    "delay_rpm": 4.273147698567082e-07,
+    "fmep_0": 0.26237217777373195,
+    "fmep_pmax": 0.015263320885582885,
+    "fmep_sp": -0.09999999998607793,
+    "fmep_sp2": 0.00855412254830673,
+    "ua_port": 10.684556492522553
+   },
+   "rows_used": 93,
+   "rows_excluded": {
+    "not_fired_lambda1": [
+     [
+      "epa_steady.csv",
+      6
+     ],
+     [
+      "epa_steady.csv",
+      7
+     ],
+     [
+      "epa_steady.csv",
+      8
+     ],
+     [
+      "epa_steady.csv",
+      9
+     ],
+     [
+      "epa_steady.csv",
+      10
+     ],
+     [
+      "epa_steady.csv",
+      16
+     ],
+     [
+      "epa_steady.csv",
+      44
+     ],
+     [
+      "epa_steady.csv",
+      45
+     ],
+     [
+      "epa_steady.csv",
+      46
+     ],
+     [
+      "epa_steady.csv",
+      47
+     ],
+     [
+      "epa_steady.csv",
+      48
+     ],
+     [
+      "epa_steady.csv",
+      49
+     ],
+     [
+      "epa_steady.csv",
+      60
+     ],
+     [
+      "epa_steady.csv",
+      61
+     ],
+     [
+      "epa_steady.csv",
+      62
+     ],
+     [
+      "epa_steady.csv",
+      63
+     ],
+     [
+      "epa_steady.csv",
+      64
+     ],
+     [
+      "epa_steady.csv",
+      97
+     ],
+     [
+      "epa_steady.csv",
+      98
+     ],
+     [
+      "epa_steady.csv",
+      99
+     ],
+     [
+      "epa_steady.csv",
+      100
+     ],
+     [
+      "epa_steady.csv",
+      101
+     ],
+     [
+      "epa_steady.csv",
+      136
+     ],
+     [
+      "epa_steady.csv",
+      137
+     ],
+     [
+      "epa_steady.csv",
+      138
+     ],
+     [
+      "epa_steady.csv",
+      139
+     ],
+     [
+      "epa_steady.csv",
+      140
+     ],
+     [
+      "epa_steady.csv",
+      152
+     ],
+     [
+      "epa_steady.csv",
+      153
+     ],
+     [
+      "epa_steady.csv",
+      154
+     ],
+     [
+      "epa_steady.csv",
+      155
+     ],
+     [
+      "epa_steady.csv",
+      156
+     ],
+     [
+      "epa_steady.csv",
+      183
+     ],
+     [
+      "epa_steady.csv",
+      184
+     ],
+     [
+      "epa_steady.csv",
+      185
+     ],
+     [
+      "epa_steady.csv",
+      186
+     ],
+     [
+      "epa_steady.csv",
+      187
+     ],
+     [
+      "epa_steady.csv",
+      188
+     ],
+     [
+      "epa_highload_final.csv",
+      10
+     ],
+     [
+      "epa_highload_final.csv",
+      11
+     ],
+     [
+      "epa_highload_final.csv",
+      13
+     ],
+     [
+      "epa_highload_final.csv",
+      15
+     ],
+     [
+      "epa_highload_final.csv",
+      16
+     ],
+     [
+      "epa_highload_final.csv",
+      17
+     ],
+     [
+      "epa_highload_final.csv",
+      20
+     ],
+     [
+      "epa_highload_final.csv",
+      21
+     ],
+     [
+      "epa_highload_final.csv",
+      22
+     ],
+     [
+      "epa_highload_final.csv",
+      25
+     ],
+     [
+      "epa_highload_final.csv",
+      26
+     ],
+     [
+      "epa_highload_final.csv",
+      27
+     ],
+     [
+      "epa_highload_final.csv",
+      36
+     ],
+     [
+      "epa_highload_final.csv",
+      37
+     ],
+     [
+      "epa_highload_final.csv",
+      38
+     ],
+     [
+      "epa_highload_final.csv",
+      42
+     ],
+     [
+      "epa_highload_final.csv",
+      43
+     ],
+     [
+      "epa_highload_final.csv",
+      49
+     ],
+     [
+      "epa_highload_final.csv",
+      50
+     ],
+     [
+      "epa_highload_final.csv",
+      51
+     ],
+     [
+      "epa_highload_final.csv",
+      52
+     ],
+     [
+      "epa_highload_final.csv",
+      53
+     ],
+     [
+      "epa_highload_final.csv",
+      54
+     ],
+     [
+      "epa_highload_final.csv",
+      55
+     ],
+     [
+      "epa_highload_final.csv",
+      56
+     ],
+     [
+      "epa_highload_final.csv",
+      57
+     ],
+     [
+      "epa_highload_final.csv",
+      58
+     ],
+     [
+      "epa_highload_final.csv",
+      65
+     ],
+     [
+      "epa_highload_final.csv",
+      66
+     ],
+     [
+      "epa_highload_final.csv",
+      67
+     ],
+     [
+      "epa_highload_final.csv",
+      68
+     ],
+     [
+      "epa_highload_final.csv",
+      69
+     ],
+     [
+      "epa_highload_final.csv",
+      70
+     ]
+    ],
+    "sentinel": []
+   },
+   "flags": [
+    "S4_physical_check",
+    "S4_bound_active"
+   ],
+   "bounds_active": [
+    "fmep_sp"
+   ],
+   "convergence": {
+    "nfev": 40,
+    "njev": 24,
+    "status": 3,
+    "message": "`xtol` termination condition is satisfied.",
+    "cost": 1299.9676597865212,
+    "grad_norm": 1.1518464085255242,
+    "last_step_norm": 3.0566061309517433e-06,
+    "cost_change": 1.1245829227846116e-06,
+    "second_attempt": false
+   },
+   "report": {
+    "starts": [
+     {
+      "from": "x1.0",
+      "x0": {
+       "burn_base": 13.206044798306365,
+       "burn_rpm": 1.544749450111775e-08,
+       "delay_base": 9.132415017073386,
+       "delay_rpm": 4.9114696090095827e-08,
+       "fmep_0": 0.1584010686252816,
+       "fmep_pmax": 0.016702962004836445,
+       "fmep_sp": -0.09999999990000001,
+       "fmep_sp2": 0.008429204649716363,
+       "ua_port": 10.687192613000159
+      },
+      "cost": 1300.0659145193083,
+      "nfev": 30,
+      "status": 3
+     },
+     {
+      "from": "x0.8",
+      "x0": {
+       "burn_base": 10.564835838645093,
+       "burn_rpm": 1.23579956008942e-08,
+       "delay_base": 7.305932013658709,
+       "delay_rpm": 3.929175687207666e-08,
+       "fmep_0": 0.1267208549002253,
+       "fmep_pmax": 0.013362369603869157,
+       "fmep_sp": -0.07999999992000001,
+       "fmep_sp2": 0.006743363719773091,
+       "ua_port": 8.549754090400127
+      },
+      "cost": 1300.0214369939645,
+      "nfev": 36,
+      "status": 2
+     },
+     {
+      "from": "x1.2",
+      "x0": {
+       "burn_base": 15.847253757967637,
+       "burn_rpm": 1.8536993401341297e-08,
+       "delay_base": 10.958898020488062,
+       "delay_rpm": 5.893763530811499e-08,
+       "fmep_0": 0.19008128235033792,
+       "fmep_pmax": 0.020043554405803733,
+       "fmep_sp": -0.1,
+       "fmep_sp2": 0.010115045579659636,
+       "ua_port": 12.82463113560019
+      },
+      "cost": 1299.9814887695427,
+      "nfev": 33,
+      "status": 2
+     },
+     {
+      "from": "weakest+",
+      "x0": {
+       "burn_base": 67.53871246468165,
+       "burn_rpm": 0.0,
+       "delay_base": 0.0,
+       "delay_rpm": 0.006,
+       "fmep_0": 0.5230710054856932,
+       "fmep_pmax": 0.015601484152164266,
+       "fmep_sp": -0.1,
+       "fmep_sp2": 0.010684378931975613,
+       "ua_port": 10.74048979346391
+      },
+      "cost": 1299.9676597865212,
+      "nfev": 40,
+      "status": 3
+     },
+     {
+      "from": "weakest-",
+      "x0": {
+       "burn_base": 5.0,
+       "burn_rpm": 0.012,
+       "delay_base": 30.0,
+       "delay_rpm": 0.0,
+       "fmep_0": 0.0017130405888867717,
+       "fmep_pmax": 0.014894025878005701,
+       "fmep_sp": -0.050980644913140125,
+       "fmep_sp2": 0.006433725874105144,
+       "ua_port": 10.630540651886422
+      },
+      "cost": 1299.9726673608932,
+      "nfev": 34,
+      "status": 3
+     }
+    ],
+    "best_start": "weakest+",
+    "resolution": {
+     "weakest_direction_projection": [
+      {
+       "from": "x1.0",
+       "scale_units": -0.02198650126034628,
+       "cost": 1300.0659145193083
+      },
+      {
+       "from": "x0.8",
+       "scale_units": -0.007938495770479283,
+       "cost": 1300.0214369939645
+      },
+      {
+       "from": "x1.2",
+       "scale_units": -0.007502829344984544,
+       "cost": 1299.9814887695427
+      },
+      {
+       "from": "weakest+",
+       "scale_units": 0.0,
+       "cost": 1299.9676597865212
+      },
+      {
+       "from": "weakest-",
+       "scale_units": -0.0028931969686054816,
+       "cost": 1299.9726673608932
+      }
+     ],
+     "spread_scale_units": 0.02198650126034628,
+     "sd_scale_units": 16.25404701951989,
+     "statement": "the five starts choose the basin at the declared tolerances; the one that stopped lowest is polished at TOLERANCES['S4_polish'] and the polished point is the frozen one (polish: its departure from that start); the in-sample stage is evaluated there"
+    },
+    "polish": {
+     "from": "weakest+",
+     "tolerances": {
+      "ftol": 1e-12,
+      "xtol": 1e-12,
+      "gtol": 1e-12
+     },
+     "cost_before": 1299.9676597865212,
+     "cost_after": 1299.9676598020299,
+     "nfev": 21,
+     "status": 3,
+     "kept": false,
+     "departure_scale_units": {
+      "burn_base": 0.0,
+      "burn_rpm": 0.0,
+      "delay_base": 0.0,
+      "delay_rpm": 0.0,
+      "fmep_0": 0.0,
+      "fmep_pmax": 0.0,
+      "fmep_sp": 9.564213618615567e-10,
+      "fmep_sp2": 0.0,
+      "ua_port": 0.0
+     },
+     "departure_norm_scale_units": 9.564213618615567e-10,
+     "departure_along_weakest_scale_units": -3.2048878689606796e-11
+    },
+    "weakest_direction": {
+     "vector": {
+      "burn_base": 0.32852752103051963,
+      "burn_rpm": -0.6116434092676274,
+      "delay_base": -0.33014973242186035,
+      "delay_rpm": 0.6205690671677192,
+      "fmep_0": 0.04009447341565877,
+      "fmep_pmax": 0.004352505399479643,
+      "fmep_sp": -0.033509162349978874,
+      "fmep_sp2": 0.14528528914695502,
+      "ua_port": 6.764416360149905e-05
+     },
+     "sd": 16.25404701951989,
+     "eigenvalue_scaled": 0.05558072542582251,
+     "ki_at_climb_cell": {
+      "fit": 0.7733658972979878,
+      "plus": 0.20083342705018917,
+      "minus": 0.20156153083841513
+     },
+     "lambda_lever": {
+      "fit": 432.1814212766276,
+      "plus": 616.8771770896547,
+      "minus": 616.2621111985209
+     }
+    },
+    "condition_number": 3728.676647052566,
+    "correlations": {
+     "burn_base": {
+      "burn_base": 1.0,
+      "burn_rpm": -0.608436508205197,
+      "delay_base": -0.9977731487580257,
+      "delay_rpm": 0.6016013134984355,
+      "fmep_0": 0.8480332294613706,
+      "fmep_pmax": 0.5077158106351154,
+      "fmep_sp": -0.7291238232330595,
+      "fmep_sp2": 0.5681556147134248,
+      "ua_port": 0.6617793052982449
+     },
+     "burn_rpm": {
+      "burn_base": -0.608436508204991,
+      "burn_rpm": 1.0,
+      "delay_base": 0.6252044671770809,
+      "delay_rpm": -0.9948837065551407,
+      "fmep_0": -0.4732996846360371,
+      "fmep_pmax": 0.043917260119994396,
+      "fmep_sp": 0.49603289171772885,
+      "fmep_sp2": -0.4652603904147546,
+      "ua_port": 0.05419809917289327
+     },
+     "delay_base": {
+      "burn_base": -0.9977731487580193,
+      "burn_rpm": 0.6252044671772843,
+      "delay_base": 1.0000000000000002,
+      "delay_rpm": -0.6240944130123042,
+      "fmep_0": -0.8413851005394515,
+      "fmep_pmax": -0.5056780565935948,
+      "fmep_sp": 0.7313850588532789,
+      "fmep_sp2": -0.5828448549758223,
+      "ua_port": -0.6394728060405223
+     },
+     "delay_rpm": {
+      "burn_base": 0.6016013134982248,
+      "burn_rpm": -0.9948837065551377,
+      "delay_base": -0.624094413012096,
+      "delay_rpm": 1.0,
+      "fmep_0": 0.45976844209755163,
+      "fmep_pmax": -0.038112878717375856,
+      "fmep_sp": -0.4878902559676905,
+      "fmep_sp2": 0.47744132090322766,
+      "ua_port": -0.05852439857060849
+     },
+     "fmep_0": {
+      "burn_base": 0.8480332294613854,
+      "burn_rpm": -0.47329968463624245,
+      "delay_base": -0.8413851005394732,
+      "delay_rpm": 0.45976844209776124,
+      "fmep_0": 1.0000000000000002,
+      "fmep_pmax": 0.3066191891555156,
+      "fmep_sp": -0.9213433392262781,
+      "fmep_sp2": 0.7933020749109337,
+      "ua_port": 0.5833578515417479
+     },
+     "fmep_pmax": {
+      "burn_base": 0.5077158106352271,
+      "burn_rpm": 0.04391726011981617,
+      "delay_base": -0.505678056593711,
+      "delay_rpm": -0.03811287871719504,
+      "fmep_0": 0.3066191891556137,
+      "fmep_pmax": 0.9999999999999999,
+      "fmep_sp": -0.3664558752780956,
+      "fmep_sp2": 0.25747814832865173,
+      "ua_port": 0.5454367369291833
+     },
+     "fmep_sp": {
+      "burn_base": -0.7291238232330426,
+      "burn_rpm": 0.496032891717903,
+      "delay_base": 0.7313850588532689,
+      "delay_rpm": -0.48789025596786867,
+      "fmep_0": -0.9213433392262478,
+      "fmep_pmax": -0.36645587527798723,
+      "fmep_sp": 0.9999999999999999,
+      "fmep_sp2": -0.9472250588327019,
+      "ua_port": -0.4008373399003409
+     },
+     "fmep_sp2": {
+      "burn_base": 0.5681556147133738,
+      "burn_rpm": -0.46526039041488154,
+      "delay_base": -0.5828448549757771,
+      "delay_rpm": 0.477441320903358,
+      "fmep_0": 0.793302074910873,
+      "fmep_pmax": 0.25747814832853977,
+      "fmep_sp": -0.9472250588326697,
+      "fmep_sp2": 1.0,
+      "ua_port": 0.25264286133999553
+     },
+     "ua_port": {
+      "burn_base": 0.6617793052983948,
+      "burn_rpm": 0.05419809917266989,
+      "delay_base": -0.6394728060406774,
+      "delay_rpm": -0.05852439857038196,
+      "fmep_0": 0.5833578515418807,
+      "fmep_pmax": 0.5454367369291918,
+      "fmep_sp": -0.40083733990048515,
+      "fmep_sp2": 0.25264286134014263,
+      "ua_port": 1.0
+     }
+    },
+    "data_or_prior": {
+     "burn_base": "data-dominated",
+     "burn_rpm": "data-dominated",
+     "delay_base": "data-dominated",
+     "delay_rpm": "data-dominated",
+     "fmep_0": "data-dominated",
+     "fmep_pmax": "data-dominated",
+     "fmep_sp": "data-dominated",
+     "fmep_sp2": "data-dominated",
+     "ua_port": "data-dominated"
+    },
+    "residuals": {
+     "by_line": {
+      "1000": {
+       "n": 12,
+       "mean_eff_rel": -0.013354408650128722,
+       "mean_tit_k": -73.67000728580165
+      },
+      "1500": {
+       "n": 14,
+       "mean_eff_rel": 0.02346292414055971,
+       "mean_tit_k": 25.625662048473625
+      },
+      "1600": {
+       "n": 2,
+       "mean_eff_rel": 0.09717486218187432,
+       "mean_tit_k": 85.2294767092136
+      },
+      "1700/1750/1800": {
+       "n": 15,
+       "mean_eff_rel": 0.005693078889289005,
+       "mean_tit_k": 11.368349935541055
+      },
+      "2250": {
+       "n": 3,
+       "mean_eff_rel": 0.007450525733169362,
+       "mean_tit_k": 38.806523176807595
+      },
+      "2500": {
+       "n": 18,
+       "mean_eff_rel": 0.005241718509032174,
+       "mean_tit_k": 5.8813587229071045
+      },
+      "3500": {
+       "n": 11,
+       "mean_eff_rel": -0.023883679951896383,
+       "mean_tit_k": 20.777824816748815
+      },
+      "4000": {
+       "n": 11,
+       "mean_eff_rel": -0.011154250948562988,
+       "mean_tit_k": 13.581547061869948
+      },
+      "5000": {
+       "n": 7,
+       "mean_eff_rel": 0.013889473106685646,
+       "mean_tit_k": 28.19337418397624
+      }
+     },
+     "by_population": {
+      "hot_lambda1": {
+       "n": 26,
+       "mean_eff_rel": 0.03624818085521549,
+       "mean_tit_k": 41.08914560753571
+      },
+      "part_load": {
+       "n": 67,
+       "mean_eff_rel": -0.009939808629289464,
+       "mean_tit_k": -6.791397994029609
+      }
+     }
+    },
+    "physical_checks": {
+     "burn_cad": [
+      17.479240395809157,
+      20.515883714346693
+     ],
+     "burn_ok": false,
+     "delay_cad": [
+      10.980326078563387,
+      12.462783137937937
+     ],
+     "delay_ok": true,
+     "fmep_bar": [
+      0.3553142987383164,
+      1.881378474120469
+     ],
+     "fmep_positive": true
+    },
+    "params": [
+     "burn_base",
+     "burn_rpm",
+     "delay_base",
+     "delay_rpm",
+     "fmep_0",
+     "fmep_pmax",
+     "fmep_sp",
+     "fmep_sp2",
+     "ua_port"
+    ],
+    "estimate": {
+     "burn_base": 14.252368205470122,
+     "burn_rpm": 2.916098356470306e-07,
+     "delay_base": 9.270248698694784,
+     "delay_rpm": 4.273147698567082e-07,
+     "fmep_0": 0.26237217777373195,
+     "fmep_pmax": 0.015263320885582885,
+     "fmep_sp": -0.09999999998607793,
+     "fmep_sp2": 0.00855412254830673,
+     "ua_port": 10.684556492522553
+    },
+    "covariance": [
+     [
+      4880.3287454512765,
+      -0.8311588928908865,
+      -2393.369747801988,
+      0.41755321600901624,
+      24.58785569107273,
+      0.11751366098828397,
+      -3.8806800199714435,
+      0.14322461376393678,
+      25.064334444360473
+     ],
+     [
+      -0.831158892890605,
+      0.0003823741315900502,
+      0.41977809305327773,
+      -0.00019328363677081396,
+      -0.0038411716386883,
+      2.8452643301732924e-06,
+      0.0007389868909941524,
+      -3.2829642286626235e-05,
+      0.0005745750494686368
+     ],
+     [
+      -2393.3697478019726,
+      0.4197780930534143,
+      1178.9812330309392,
+      -0.2129032343475562,
+      -11.990340321664007,
+      -0.05752686191939984,
+      1.9132932414907855,
+      -0.07221580075085468,
+      -11.904029175239822
+     ],
+     [
+      0.41755321600887,
+      -0.0001932836367708134,
+      -0.21290323434748518,
+      9.870906467393088e-05,
+      0.0018958366886709357,
+      -1.2545656746549286e-06,
+      -0.0003693028593620562,
+      1.711686949251201e-05,
+      -0.00031523463941829903
+     ],
+     [
+      24.587855691073155,
+      -0.0038411716386899664,
+      -11.990340321664318,
+      0.0018958366886717998,
+      0.1722528805745845,
+      0.00042162437185896756,
+      -0.02913310368143341,
+      0.0011880853887833757,
+      0.1312613148106035
+     ],
+     [
+      0.11751366098830983,
+      2.845264330161746e-06,
+      -0.05752686191941306,
+      -1.2545656746489768e-06,
+      0.00042162437185910243,
+      1.0977065594452824e-05,
+      -9.2501084811978e-05,
+      3.0782885359389295e-06,
+      0.000979729018146921
+     ],
+     [
+      -3.8806800199713534,
+      0.0007389868909944119,
+      1.9132932414907593,
+      -0.00036930285936219106,
+      -0.029133103681432453,
+      -9.250108481195065e-05,
+      0.005804489295115844,
+      -0.00026041200667009553,
+      -0.016556503856678003
+     ],
+     [
+      0.14322461376392395,
+      -3.2829642286635194e-05,
+      -0.07221580075084909,
+      1.7116869492516683e-05,
+      0.0011880853887832848,
+      3.0782885359375908e-06,
+      -0.0002604120066700867,
+      1.302121878595377e-05,
+      0.0004942552662562389
+     ],
+     [
+      25.06433444436615,
+      0.0005745750494662687,
+      -11.90402917524271,
+      -0.00031523463941707887,
+      0.13126131481063338,
+      0.0009797290181469364,
+      -0.01655650385668396,
+      0.0004942552662565267,
+      0.2939252606379167
+     ]
+    ],
+    "residual_variance": 14.683948215955752,
+    "zero_columns_at_optimum": [],
+    "cycles": 33387,
+    "rows_efficiency": 93,
+    "rows_tit": 93,
+    "d13": "amendment D13: an E1a miss on stoichiometric hot rows at form A is read as a burn/FMEP residual that no form B-D can act on (mistake 20); it is reported, with S4's residuals per line and per population, and never used to justify a form. The ladder still moves by the contract's criterion (section 2.4).",
+    "shortcut": {
+     "epa_steady.csv#11": {
+      "torque_nm": 28.233291209149044,
+      "egt_c": 221.0599983871213,
+      "mdot_fuel_gps": 0.2729330729514457
+     },
+     "epa_steady.csv#12": {
+      "torque_nm": 35.09291364121138,
+      "egt_c": 251.25576308545953,
+      "mdot_fuel_gps": 0.311247661006059
+     },
+     "epa_steady.csv#13": {
+      "torque_nm": 43.1166640277689,
+      "egt_c": 287.3560798061992,
+      "mdot_fuel_gps": 0.3615318646542218
+     },
+     "epa_steady.csv#14": {
+      "torque_nm": 51.56785334729784,
+      "egt_c": 321.5888908385042,
+      "mdot_fuel_gps": 0.4153069573663942
+     },
+     "epa_steady.csv#15": {
+      "torque_nm": 66.56849963572341,
+      "egt_c": 373.38081548546313,
+      "mdot_fuel_gps": 0.5109751577776006
+     },
+     "epa_steady.csv#17": {
+      "torque_nm": 85.18777125104864,
+      "egt_c": 415.61538894522744,
+      "mdot_fuel_gps": 0.630386412941268
+     },
+     "epa_steady.csv#18": {
+      "torque_nm": 94.9778861759188,
+      "egt_c": 443.6029735232961,
+      "mdot_fuel_gps": 0.695884970844806
+     },
+     "epa_steady.csv#19": {
+      "torque_nm": 105.85690284403145,
+      "egt_c": 469.41809461876994,
+      "mdot_fuel_gps": 0.7698023701974304
+     },
+     "epa_steady.csv#20": {
+      "torque_nm": 114.3324573873974,
+      "egt_c": 497.3489237916641,
+      "mdot_fuel_gps": 0.8361334686541411
+     },
+     "epa_steady.csv#21": {
+      "torque_nm": 123.93100814011223,
+      "egt_c": 520.0261692481967,
+      "mdot_fuel_gps": 0.906229561046556
+     },
+     "epa_steady.csv#22": {
+      "torque_nm": 131.39410379004184,
+      "egt_c": 539.9987875663575,
+      "mdot_fuel_gps": 0.9659977039376911
+     },
+     "epa_steady.csv#23": {
+      "torque_nm": 133.14291047278192,
+      "egt_c": 536.5080272741212,
+      "mdot_fuel_gps": 0.9761237173028237
+     },
+     "epa_steady.csv#50": {
+      "torque_nm": 61.91692640783951,
+      "egt_c": 458.20033621589107,
+      "mdot_fuel_gps": 0.7655035314236479
+     },
+     "epa_steady.csv#51": {
+      "torque_nm": 87.83920067200151,
+      "egt_c": 507.0289433578621,
+      "mdot_fuel_gps": 0.9941325465090798
+     },
+     "epa_steady.csv#52": {
+      "torque_nm": 95.25968238663857,
+      "egt_c": 517.3179329810358,
+      "mdot_fuel_gps": 1.0417376181328746
+     },
+     "epa_steady.csv#53": {
+      "torque_nm": 105.70637973712005,
+      "egt_c": 534.5711274635174,
+      "mdot_fuel_gps": 1.1087399851474946
+     },
+     "epa_steady.csv#54": {
+      "torque_nm": 106.92571770575682,
+      "egt_c": 547.9567137381592,
+      "mdot_fuel_gps": 1.1071374327341208
+     },
+     "epa_steady.csv#55": {
+      "torque_nm": 113.78521333671095,
+      "egt_c": 584.904701027269,
+      "mdot_fuel_gps": 1.1786310213219588
+     },
+     "epa_steady.csv#56": {
+      "torque_nm": 116.45961710474212,
+      "egt_c": 590.3956978386933,
+      "mdot_fuel_gps": 1.2098560280224582
+     },
+     "epa_steady.csv#57": {
+      "torque_nm": 125.81301684371017,
+      "egt_c": 626.722438013573,
+      "mdot_fuel_gps": 1.3261061994603252
+     },
+     "epa_steady.csv#58": {
+      "torque_nm": 146.69165877974052,
+      "egt_c": 671.5767431331705,
+      "mdot_fuel_gps": 1.5662045334050183
+     },
+     "epa_steady.csv#59": {
+      "torque_nm": 162.45518928834971,
+      "egt_c": 698.2813862643808,
+      "mdot_fuel_gps": 1.759677770845804
+     },
+     "epa_steady.csv#65": {
+      "torque_nm": 26.95030349069781,
+      "egt_c": 353.8558944019002,
+      "mdot_fuel_gps": 0.44276995186686197
+     },
+     "epa_steady.csv#66": {
+      "torque_nm": 56.41653741076037,
+      "egt_c": 488.99007563868963,
+      "mdot_fuel_gps": 0.7971786642281774
+     },
+     "epa_steady.csv#67": {
+      "torque_nm": 87.69218151525925,
+      "egt_c": 546.2328595071618,
+      "mdot_fuel_gps": 1.1242670379235478
+     },
+     "epa_steady.csv#68": {
+      "torque_nm": 97.51099060713993,
+      "egt_c": 559.473755985406,
+      "mdot_fuel_gps": 1.2143960365295434
+     },
+     "epa_steady.csv#69": {
+      "torque_nm": 106.25154384209317,
+      "egt_c": 582.9994246565584,
+      "mdot_fuel_gps": 1.271006736930807
+     },
+     "epa_steady.csv#70": {
+      "torque_nm": 111.72637218319949,
+      "egt_c": 606.8849728025476,
+      "mdot_fuel_gps": 1.3284670411304653
+     },
+     "epa_steady.csv#71": {
+      "torque_nm": 114.1285014620548,
+      "egt_c": 608.5630008739683,
+      "mdot_fuel_gps": 1.354776712856507
+     },
+     "epa_steady.csv#72": {
+      "torque_nm": 119.97271593080748,
+      "egt_c": 635.8953143499119,
+      "mdot_fuel_gps": 1.4316959594271421
+     },
+     "epa_steady.csv#73": {
+      "torque_nm": 142.91684720581546,
+      "egt_c": 686.9293821435668,
+      "mdot_fuel_gps": 1.7337531025075417
+     },
+     "epa_steady.csv#74": {
+      "torque_nm": 163.57617029510953,
+      "egt_c": 722.7796693649644,
+      "mdot_fuel_gps": 2.009581043059351
+     },
+     "epa_steady.csv#75": {
+      "torque_nm": 172.03685623547415,
+      "egt_c": 732.5457510422008,
+      "mdot_fuel_gps": 2.1257773044600574
+     },
+     "epa_steady.csv#102": {
+      "torque_nm": 22.192990872069366,
+      "egt_c": 444.79458788473005,
+      "mdot_fuel_gps": 0.5521251842812283
+     },
+     "epa_steady.csv#103": {
+      "torque_nm": 28.58011962724231,
+      "egt_c": 479.3669029886829,
+      "mdot_fuel_gps": 0.6398558901697458
+     },
+     "epa_steady.csv#104": {
+      "torque_nm": 37.60255930631299,
+      "egt_c": 529.7150196797878,
+      "mdot_fuel_gps": 0.7721619933525035
+     },
+     "epa_steady.csv#105": {
+      "torque_nm": 60.427068492628365,
+      "egt_c": 602.174575192755,
+      "mdot_fuel_gps": 1.1254375673432002
+     },
+     "epa_steady.csv#106": {
+      "torque_nm": 76.96233983702133,
+      "egt_c": 631.6790119234041,
+      "mdot_fuel_gps": 1.3716659039249328
+     },
+     "epa_steady.csv#107": {
+      "torque_nm": 92.91524571390012,
+      "egt_c": 644.5413771886737,
+      "mdot_fuel_gps": 1.613590145546611
+     },
+     "epa_steady.csv#108": {
+      "torque_nm": 105.09110943170504,
+      "egt_c": 667.9296425843021,
+      "mdot_fuel_gps": 1.7704246634871001
+     },
+     "epa_steady.csv#109": {
+      "torque_nm": 114.46849209057568,
+      "egt_c": 683.8492849814761,
+      "mdot_fuel_gps": 1.9125362002139614
+     },
+     "epa_steady.csv#110": {
+      "torque_nm": 127.36076368552655,
+      "egt_c": 706.7060265931791,
+      "mdot_fuel_gps": 2.1152711816209484
+     },
+     "epa_steady.csv#111": {
+      "torque_nm": 138.27152332007574,
+      "egt_c": 718.1903722284055,
+      "mdot_fuel_gps": 2.293052547640172
+     },
+     "epa_steady.csv#112": {
+      "torque_nm": 133.17825890598368,
+      "egt_c": 726.7343601574681,
+      "mdot_fuel_gps": 2.213641061416975
+     },
+     "epa_steady.csv#113": {
+      "torque_nm": 139.22310283419432,
+      "egt_c": 734.1226088781635,
+      "mdot_fuel_gps": 2.3140241592934627
+     },
+     "epa_steady.csv#114": {
+      "torque_nm": 147.14248094262322,
+      "egt_c": 751.5308739288708,
+      "mdot_fuel_gps": 2.458224218111854
+     },
+     "epa_steady.csv#115": {
+      "torque_nm": 166.03032987067752,
+      "egt_c": 771.3576140608051,
+      "mdot_fuel_gps": 2.785922334009712
+     },
+     "epa_steady.csv#116": {
+      "torque_nm": 181.21323797812158,
+      "egt_c": 782.5202105821028,
+      "mdot_fuel_gps": 3.0525481328857933
+     },
+     "epa_steady.csv#141": {
+      "torque_nm": 22.642092369699053,
+      "egt_c": 581.263482652974,
+      "mdot_fuel_gps": 0.8207387743302744
+     },
+     "epa_steady.csv#142": {
+      "torque_nm": 33.84540349345721,
+      "egt_c": 636.5512349071057,
+      "mdot_fuel_gps": 1.0465103551668187
+     },
+     "epa_steady.csv#143": {
+      "torque_nm": 46.41544187351463,
+      "egt_c": 676.824820752585,
+      "mdot_fuel_gps": 1.321762512134139
+     },
+     "epa_steady.csv#144": {
+      "torque_nm": 62.4708808243106,
+      "egt_c": 703.2974051178563,
+      "mdot_fuel_gps": 1.680838389852311
+     },
+     "epa_steady.csv#145": {
+      "torque_nm": 87.67750511516559,
+      "egt_c": 719.6425801506067,
+      "mdot_fuel_gps": 2.1966479715688467
+     },
+     "epa_steady.csv#146": {
+      "torque_nm": 104.80255237510897,
+      "egt_c": 740.760497370068,
+      "mdot_fuel_gps": 2.5314410945650687
+     },
+     "epa_steady.csv#147": {
+      "torque_nm": 122.3722268379561,
+      "egt_c": 758.143604012169,
+      "mdot_fuel_gps": 2.910778994239559
+     },
+     "epa_steady.csv#148": {
+      "torque_nm": 139.81883396651864,
+      "egt_c": 769.9683703105721,
+      "mdot_fuel_gps": 3.301540134111753
+     },
+     "epa_steady.csv#149": {
+      "torque_nm": 157.8695882053589,
+      "egt_c": 787.7435277894707,
+      "mdot_fuel_gps": 3.6599394815395576
+     },
+     "epa_steady.csv#150": {
+      "torque_nm": 169.63261867257287,
+      "egt_c": 799.445106158364,
+      "mdot_fuel_gps": 3.9117023983449175
+     },
+     "epa_steady.csv#151": {
+      "torque_nm": 168.9909569845612,
+      "egt_c": 815.5154437624655,
+      "mdot_fuel_gps": 3.9191569227273693
+     },
+     "epa_steady.csv#157": {
+      "torque_nm": 20.746055925221523,
+      "egt_c": 630.7847836370178,
+      "mdot_fuel_gps": 0.9308996364240407
+     },
+     "epa_steady.csv#158": {
+      "torque_nm": 26.539250181318963,
+      "egt_c": 649.2727996613177,
+      "mdot_fuel_gps": 1.0424925714194164
+     },
+     "epa_steady.csv#159": {
+      "torque_nm": 42.85885188919474,
+      "egt_c": 709.1954614935123,
+      "mdot_fuel_gps": 1.4515100193332207
+     },
+     "epa_steady.csv#160": {
+      "torque_nm": 61.189057398769656,
+      "egt_c": 735.4234075355403,
+      "mdot_fuel_gps": 1.912848168955085
+     },
+     "epa_steady.csv#161": {
+      "torque_nm": 85.97836525883142,
+      "egt_c": 743.6144960950388,
+      "mdot_fuel_gps": 2.5199179870846242
+     },
+     "epa_steady.csv#162": {
+      "torque_nm": 102.95924589141246,
+      "egt_c": 760.4651935350511,
+      "mdot_fuel_gps": 2.8828626016769134
+     },
+     "epa_steady.csv#163": {
+      "torque_nm": 122.56229464113777,
+      "egt_c": 779.0501990334004,
+      "mdot_fuel_gps": 3.3614603263350777
+     },
+     "epa_steady.csv#164": {
+      "torque_nm": 139.60889587683442,
+      "egt_c": 787.8344089887845,
+      "mdot_fuel_gps": 3.8029695511761243
+     },
+     "epa_steady.csv#165": {
+      "torque_nm": 160.35112589289415,
+      "egt_c": 796.6804152862595,
+      "mdot_fuel_gps": 4.3216284422792075
+     },
+     "epa_steady.csv#166": {
+      "torque_nm": 144.51141294211544,
+      "egt_c": 801.1360989494216,
+      "mdot_fuel_gps": 3.8487968047868404
+     },
+     "epa_steady.csv#167": {
+      "torque_nm": 151.80760780134028,
+      "egt_c": 817.8397534652255,
+      "mdot_fuel_gps": 4.047268988712433
+     },
+     "epa_steady.csv#189": {
+      "torque_nm": 27.338561957524618,
+      "egt_c": 732.0761291933358,
+      "mdot_fuel_gps": 1.4586953284220439
+     },
+     "epa_steady.csv#190": {
+      "torque_nm": 36.98100192538098,
+      "egt_c": 753.7304325671565,
+      "mdot_fuel_gps": 1.736737304420704
+     },
+     "epa_steady.csv#191": {
+      "torque_nm": 47.16130038773531,
+      "egt_c": 769.4154127348826,
+      "mdot_fuel_gps": 2.037419240302218
+     },
+     "epa_steady.csv#192": {
+      "torque_nm": 64.02805295935444,
+      "egt_c": 780.4414332281227,
+      "mdot_fuel_gps": 2.5319831387911997
+     },
+     "epa_steady.csv#193": {
+      "torque_nm": 83.58056521867971,
+      "egt_c": 782.0918040449352,
+      "mdot_fuel_gps": 3.1027301525605315
+     },
+     "epa_steady.csv#194": {
+      "torque_nm": 94.06765897457782,
+      "egt_c": 780.6078360737166,
+      "mdot_fuel_gps": 3.4067919121375922
+     },
+     "epa_steady.csv#195": {
+      "torque_nm": 105.20880670675203,
+      "egt_c": 780.4905714456844,
+      "mdot_fuel_gps": 3.7343862284813003
+     },
+     "epa_highload_final.csv#6": {
+      "torque_nm": 158.92998341138122,
+      "egt_c": 699.5080774460677,
+      "mdot_fuel_gps": 1.7261285852122321
+     },
+     "epa_highload_final.csv#7": {
+      "torque_nm": 163.35245227770199,
+      "egt_c": 701.707340483042,
+      "mdot_fuel_gps": 1.7726710473195921
+     },
+     "epa_highload_final.csv#8": {
+      "torque_nm": 174.4422028281562,
+      "egt_c": 719.8844791318555,
+      "mdot_fuel_gps": 1.9072487684235553
+     },
+     "epa_highload_final.csv#9": {
+      "torque_nm": 179.69162590006974,
+      "egt_c": 717.435094033984,
+      "mdot_fuel_gps": 1.9533408966581467
+     },
+     "epa_highload_final.csv#12": {
+      "torque_nm": 164.69094941094443,
+      "egt_c": 719.2801166753495,
+      "mdot_fuel_gps": 1.8935767248066313
+     },
+     "epa_highload_final.csv#14": {
+      "torque_nm": 187.2239907390492,
+      "egt_c": 732.1881043816549,
+      "mdot_fuel_gps": 2.146322622233182
+     },
+     "epa_highload_final.csv#18": {
+      "torque_nm": 179.55341527469034,
+      "egt_c": 739.4153926142342,
+      "mdot_fuel_gps": 2.169801762909567
+     },
+     "epa_highload_final.csv#19": {
+      "torque_nm": 182.68072797628355,
+      "egt_c": 741.2703940488158,
+      "mdot_fuel_gps": 2.211111060577404
+     },
+     "epa_highload_final.csv#23": {
+      "torque_nm": 174.97270173135138,
+      "egt_c": 736.7374160648823,
+      "mdot_fuel_gps": 2.2057228730336425
+     },
+     "epa_highload_final.csv#24": {
+      "torque_nm": 182.2684820085083,
+      "egt_c": 751.8052648308245,
+      "mdot_fuel_gps": 2.3190232559874264
+     },
+     "epa_highload_final.csv#33": {
+      "torque_nm": 185.28891283677834,
+      "egt_c": 776.07797724062,
+      "mdot_fuel_gps": 2.8433177850560574
+     },
+     "epa_highload_final.csv#34": {
+      "torque_nm": 197.79649126614672,
+      "egt_c": 784.3235664532314,
+      "mdot_fuel_gps": 3.04921846537969
+     },
+     "epa_highload_final.csv#35": {
+      "torque_nm": 205.62297425819366,
+      "egt_c": 785.9840733494135,
+      "mdot_fuel_gps": 3.167256224718208
+     },
+     "epa_highload_final.csv#39": {
+      "torque_nm": 185.25749560228704,
+      "egt_c": 788.9580847702792,
+      "mdot_fuel_gps": 3.1291364507895403
+     },
+     "epa_highload_final.csv#40": {
+      "torque_nm": 189.38122153445866,
+      "egt_c": 787.1253883083697,
+      "mdot_fuel_gps": 3.1898511377998977
+     },
+     "epa_highload_final.csv#41": {
+      "torque_nm": 196.39301914468723,
+      "egt_c": 791.2432363214394,
+      "mdot_fuel_gps": 3.312759281692263
+     }
+    }
+   }
+  },
+  "S5": {
+   "values": {
+    "ce_rich_slope": 0.44932994407850235
+   },
+   "rows_used": 30,
+   "rows_excluded": {
+    "not_enriched_hot": [
+     [
+      "epa_steady.csv",
+      6
+     ],
+     [
+      "epa_steady.csv",
+      7
+     ],
+     [
+      "epa_steady.csv",
+      8
+     ],
+     [
+      "epa_steady.csv",
+      9
+     ],
+     [
+      "epa_steady.csv",
+      10
+     ],
+     [
+      "epa_steady.csv",
+      11
+     ],
+     [
+      "epa_steady.csv",
+      12
+     ],
+     [
+      "epa_steady.csv",
+      13
+     ],
+     [
+      "epa_steady.csv",
+      14
+     ],
+     [
+      "epa_steady.csv",
+      15
+     ],
+     [
+      "epa_steady.csv",
+      16
+     ],
+     [
+      "epa_steady.csv",
+      17
+     ],
+     [
+      "epa_steady.csv",
+      18
+     ],
+     [
+      "epa_steady.csv",
+      19
+     ],
+     [
+      "epa_steady.csv",
+      20
+     ],
+     [
+      "epa_steady.csv",
+      21
+     ],
+     [
+      "epa_steady.csv",
+      22
+     ],
+     [
+      "epa_steady.csv",
+      23
+     ],
+     [
+      "epa_steady.csv",
+      44
+     ],
+     [
+      "epa_steady.csv",
+      45
+     ],
+     [
+      "epa_steady.csv",
+      46
+     ],
+     [
+      "epa_steady.csv",
+      47
+     ],
+     [
+      "epa_steady.csv",
+      48
+     ],
+     [
+      "epa_steady.csv",
+      49
+     ],
+     [
+      "epa_steady.csv",
+      50
+     ],
+     [
+      "epa_steady.csv",
+      51
+     ],
+     [
+      "epa_steady.csv",
+      52
+     ],
+     [
+      "epa_steady.csv",
+      53
+     ],
+     [
+      "epa_steady.csv",
+      54
+     ],
+     [
+      "epa_steady.csv",
+      55
+     ],
+     [
+      "epa_steady.csv",
+      56
+     ],
+     [
+      "epa_steady.csv",
+      57
+     ],
+     [
+      "epa_steady.csv",
+      58
+     ],
+     [
+      "epa_steady.csv",
+      59
+     ],
+     [
+      "epa_steady.csv",
+      60
+     ],
+     [
+      "epa_steady.csv",
+      61
+     ],
+     [
+      "epa_steady.csv",
+      62
+     ],
+     [
+      "epa_steady.csv",
+      63
+     ],
+     [
+      "epa_steady.csv",
+      64
+     ],
+     [
+      "epa_steady.csv",
+      65
+     ],
+     [
+      "epa_steady.csv",
+      66
+     ],
+     [
+      "epa_steady.csv",
+      67
+     ],
+     [
+      "epa_steady.csv",
+      68
+     ],
+     [
+      "epa_steady.csv",
+      69
+     ],
+     [
+      "epa_steady.csv",
+      70
+     ],
+     [
+      "epa_steady.csv",
+      71
+     ],
+     [
+      "epa_steady.csv",
+      72
+     ],
+     [
+      "epa_steady.csv",
+      73
+     ],
+     [
+      "epa_steady.csv",
+      74
+     ],
+     [
+      "epa_steady.csv",
+      75
+     ],
+     [
+      "epa_steady.csv",
+      97
+     ],
+     [
+      "epa_steady.csv",
+      98
+     ],
+     [
+      "epa_steady.csv",
+      99
+     ],
+     [
+      "epa_steady.csv",
+      100
+     ],
+     [
+      "epa_steady.csv",
+      101
+     ],
+     [
+      "epa_steady.csv",
+      102
+     ],
+     [
+      "epa_steady.csv",
+      103
+     ],
+     [
+      "epa_steady.csv",
+      104
+     ],
+     [
+      "epa_steady.csv",
+      105
+     ],
+     [
+      "epa_steady.csv",
+      106
+     ],
+     [
+      "epa_steady.csv",
+      107
+     ],
+     [
+      "epa_steady.csv",
+      108
+     ],
+     [
+      "epa_steady.csv",
+      109
+     ],
+     [
+      "epa_steady.csv",
+      110
+     ],
+     [
+      "epa_steady.csv",
+      111
+     ],
+     [
+      "epa_steady.csv",
+      112
+     ],
+     [
+      "epa_steady.csv",
+      113
+     ],
+     [
+      "epa_steady.csv",
+      114
+     ],
+     [
+      "epa_steady.csv",
+      115
+     ],
+     [
+      "epa_steady.csv",
+      116
+     ],
+     [
+      "epa_steady.csv",
+      136
+     ],
+     [
+      "epa_steady.csv",
+      137
+     ],
+     [
+      "epa_steady.csv",
+      138
+     ],
+     [
+      "epa_steady.csv",
+      139
+     ],
+     [
+      "epa_steady.csv",
+      140
+     ],
+     [
+      "epa_steady.csv",
+      141
+     ],
+     [
+      "epa_steady.csv",
+      142
+     ],
+     [
+      "epa_steady.csv",
+      143
+     ],
+     [
+      "epa_steady.csv",
+      144
+     ],
+     [
+      "epa_steady.csv",
+      145
+     ],
+     [
+      "epa_steady.csv",
+      146
+     ],
+     [
+      "epa_steady.csv",
+      147
+     ],
+     [
+      "epa_steady.csv",
+      148
+     ],
+     [
+      "epa_steady.csv",
+      149
+     ],
+     [
+      "epa_steady.csv",
+      150
+     ],
+     [
+      "epa_steady.csv",
+      151
+     ],
+     [
+      "epa_steady.csv",
+      152
+     ],
+     [
+      "epa_steady.csv",
+      153
+     ],
+     [
+      "epa_steady.csv",
+      154
+     ],
+     [
+      "epa_steady.csv",
+      155
+     ],
+     [
+      "epa_steady.csv",
+      156
+     ],
+     [
+      "epa_steady.csv",
+      157
+     ],
+     [
+      "epa_steady.csv",
+      158
+     ],
+     [
+      "epa_steady.csv",
+      159
+     ],
+     [
+      "epa_steady.csv",
+      160
+     ],
+     [
+      "epa_steady.csv",
+      161
+     ],
+     [
+      "epa_steady.csv",
+      162
+     ],
+     [
+      "epa_steady.csv",
+      163
+     ],
+     [
+      "epa_steady.csv",
+      164
+     ],
+     [
+      "epa_steady.csv",
+      165
+     ],
+     [
+      "epa_steady.csv",
+      166
+     ],
+     [
+      "epa_steady.csv",
+      167
+     ],
+     [
+      "epa_steady.csv",
+      183
+     ],
+     [
+      "epa_steady.csv",
+      184
+     ],
+     [
+      "epa_steady.csv",
+      185
+     ],
+     [
+      "epa_steady.csv",
+      186
+     ],
+     [
+      "epa_steady.csv",
+      187
+     ],
+     [
+      "epa_steady.csv",
+      188
+     ],
+     [
+      "epa_steady.csv",
+      189
+     ],
+     [
+      "epa_steady.csv",
+      190
+     ],
+     [
+      "epa_steady.csv",
+      191
+     ],
+     [
+      "epa_steady.csv",
+      192
+     ],
+     [
+      "epa_steady.csv",
+      193
+     ],
+     [
+      "epa_steady.csv",
+      194
+     ],
+     [
+      "epa_steady.csv",
+      195
+     ],
+     [
+      "epa_highload_final.csv",
+      6
+     ],
+     [
+      "epa_highload_final.csv",
+      7
+     ],
+     [
+      "epa_highload_final.csv",
+      8
+     ],
+     [
+      "epa_highload_final.csv",
+      9
+     ],
+     [
+      "epa_highload_final.csv",
+      10
+     ],
+     [
+      "epa_highload_final.csv",
+      12
+     ],
+     [
+      "epa_highload_final.csv",
+      14
+     ],
+     [
+      "epa_highload_final.csv",
+      18
+     ],
+     [
+      "epa_highload_final.csv",
+      19
+     ],
+     [
+      "epa_highload_final.csv",
+      23
+     ],
+     [
+      "epa_highload_final.csv",
+      24
+     ],
+     [
+      "epa_highload_final.csv",
+      25
+     ],
+     [
+      "epa_highload_final.csv",
+      33
+     ],
+     [
+      "epa_highload_final.csv",
+      34
+     ],
+     [
+      "epa_highload_final.csv",
+      35
+     ],
+     [
+      "epa_highload_final.csv",
+      36
+     ],
+     [
+      "epa_highload_final.csv",
+      39
+     ],
+     [
+      "epa_highload_final.csv",
+      40
+     ],
+     [
+      "epa_highload_final.csv",
+      41
+     ]
+    ]
+   },
+   "flags": [],
+   "bounds_active": [],
+   "convergence": {
+    "nfev": 7,
+    "njev": 0,
+    "status": 0,
+    "message": "Solution found.",
+    "cost": 714.7372040300784,
+    "grad_norm": null,
+    "last_step_norm": null,
+    "cost_change": null,
+    "second_attempt": false
+   },
+   "report": {
+    "slope": 0.44932994407850235,
+    "bound_hit": false,
+    "eta_comb_at_deepest_lambda": 0.8292546212501711,
+    "sigma": 0.04480176544257508,
+    "sigma_fd_step": 0.001,
+    "deepest_lambda_fed": 0.6200000000000045,
+    "rows": 30,
+    "xatol": 0.0001,
+    "objective_at_shared_slope": 1947.1548412740103,
+    "objective_at_fit": 1429.4744080601567,
+    "evaluations": 8
+   }
+  },
+  "S6": {
+   "values": {
+    "knock_a": 0.015622182357253893
+   },
+   "rows_used": 49,
+   "rows_excluded": {
+    "ki_zero": [],
+    "not_final_or_no_lambda": [
+     [
+      "epa_steady.csv",
+      6
+     ],
+     [
+      "epa_steady.csv",
+      7
+     ],
+     [
+      "epa_steady.csv",
+      8
+     ],
+     [
+      "epa_steady.csv",
+      9
+     ],
+     [
+      "epa_steady.csv",
+      10
+     ],
+     [
+      "epa_steady.csv",
+      11
+     ],
+     [
+      "epa_steady.csv",
+      12
+     ],
+     [
+      "epa_steady.csv",
+      13
+     ],
+     [
+      "epa_steady.csv",
+      14
+     ],
+     [
+      "epa_steady.csv",
+      15
+     ],
+     [
+      "epa_steady.csv",
+      16
+     ],
+     [
+      "epa_steady.csv",
+      17
+     ],
+     [
+      "epa_steady.csv",
+      18
+     ],
+     [
+      "epa_steady.csv",
+      19
+     ],
+     [
+      "epa_steady.csv",
+      20
+     ],
+     [
+      "epa_steady.csv",
+      21
+     ],
+     [
+      "epa_steady.csv",
+      22
+     ],
+     [
+      "epa_steady.csv",
+      23
+     ],
+     [
+      "epa_steady.csv",
+      44
+     ],
+     [
+      "epa_steady.csv",
+      45
+     ],
+     [
+      "epa_steady.csv",
+      46
+     ],
+     [
+      "epa_steady.csv",
+      47
+     ],
+     [
+      "epa_steady.csv",
+      48
+     ],
+     [
+      "epa_steady.csv",
+      49
+     ],
+     [
+      "epa_steady.csv",
+      50
+     ],
+     [
+      "epa_steady.csv",
+      51
+     ],
+     [
+      "epa_steady.csv",
+      52
+     ],
+     [
+      "epa_steady.csv",
+      53
+     ],
+     [
+      "epa_steady.csv",
+      54
+     ],
+     [
+      "epa_steady.csv",
+      55
+     ],
+     [
+      "epa_steady.csv",
+      56
+     ],
+     [
+      "epa_steady.csv",
+      57
+     ],
+     [
+      "epa_steady.csv",
+      58
+     ],
+     [
+      "epa_steady.csv",
+      59
+     ],
+     [
+      "epa_steady.csv",
+      60
+     ],
+     [
+      "epa_steady.csv",
+      61
+     ],
+     [
+      "epa_steady.csv",
+      62
+     ],
+     [
+      "epa_steady.csv",
+      63
+     ],
+     [
+      "epa_steady.csv",
+      64
+     ],
+     [
+      "epa_steady.csv",
+      65
+     ],
+     [
+      "epa_steady.csv",
+      66
+     ],
+     [
+      "epa_steady.csv",
+      67
+     ],
+     [
+      "epa_steady.csv",
+      68
+     ],
+     [
+      "epa_steady.csv",
+      69
+     ],
+     [
+      "epa_steady.csv",
+      70
+     ],
+     [
+      "epa_steady.csv",
+      71
+     ],
+     [
+      "epa_steady.csv",
+      72
+     ],
+     [
+      "epa_steady.csv",
+      73
+     ],
+     [
+      "epa_steady.csv",
+      74
+     ],
+     [
+      "epa_steady.csv",
+      75
+     ],
+     [
+      "epa_steady.csv",
+      97
+     ],
+     [
+      "epa_steady.csv",
+      98
+     ],
+     [
+      "epa_steady.csv",
+      99
+     ],
+     [
+      "epa_steady.csv",
+      100
+     ],
+     [
+      "epa_steady.csv",
+      101
+     ],
+     [
+      "epa_steady.csv",
+      102
+     ],
+     [
+      "epa_steady.csv",
+      103
+     ],
+     [
+      "epa_steady.csv",
+      104
+     ],
+     [
+      "epa_steady.csv",
+      105
+     ],
+     [
+      "epa_steady.csv",
+      106
+     ],
+     [
+      "epa_steady.csv",
+      107
+     ],
+     [
+      "epa_steady.csv",
+      108
+     ],
+     [
+      "epa_steady.csv",
+      109
+     ],
+     [
+      "epa_steady.csv",
+      110
+     ],
+     [
+      "epa_steady.csv",
+      111
+     ],
+     [
+      "epa_steady.csv",
+      112
+     ],
+     [
+      "epa_steady.csv",
+      113
+     ],
+     [
+      "epa_steady.csv",
+      114
+     ],
+     [
+      "epa_steady.csv",
+      115
+     ],
+     [
+      "epa_steady.csv",
+      116
+     ],
+     [
+      "epa_steady.csv",
+      136
+     ],
+     [
+      "epa_steady.csv",
+      137
+     ],
+     [
+      "epa_steady.csv",
+      138
+     ],
+     [
+      "epa_steady.csv",
+      139
+     ],
+     [
+      "epa_steady.csv",
+      140
+     ],
+     [
+      "epa_steady.csv",
+      141
+     ],
+     [
+      "epa_steady.csv",
+      142
+     ],
+     [
+      "epa_steady.csv",
+      143
+     ],
+     [
+      "epa_steady.csv",
+      144
+     ],
+     [
+      "epa_steady.csv",
+      145
+     ],
+     [
+      "epa_steady.csv",
+      146
+     ],
+     [
+      "epa_steady.csv",
+      147
+     ],
+     [
+      "epa_steady.csv",
+      148
+     ],
+     [
+      "epa_steady.csv",
+      149
+     ],
+     [
+      "epa_steady.csv",
+      150
+     ],
+     [
+      "epa_steady.csv",
+      151
+     ],
+     [
+      "epa_steady.csv",
+      152
+     ],
+     [
+      "epa_steady.csv",
+      153
+     ],
+     [
+      "epa_steady.csv",
+      154
+     ],
+     [
+      "epa_steady.csv",
+      155
+     ],
+     [
+      "epa_steady.csv",
+      156
+     ],
+     [
+      "epa_steady.csv",
+      157
+     ],
+     [
+      "epa_steady.csv",
+      158
+     ],
+     [
+      "epa_steady.csv",
+      159
+     ],
+     [
+      "epa_steady.csv",
+      160
+     ],
+     [
+      "epa_steady.csv",
+      161
+     ],
+     [
+      "epa_steady.csv",
+      162
+     ],
+     [
+      "epa_steady.csv",
+      163
+     ],
+     [
+      "epa_steady.csv",
+      164
+     ],
+     [
+      "epa_steady.csv",
+      165
+     ],
+     [
+      "epa_steady.csv",
+      166
+     ],
+     [
+      "epa_steady.csv",
+      167
+     ],
+     [
+      "epa_steady.csv",
+      183
+     ],
+     [
+      "epa_steady.csv",
+      184
+     ],
+     [
+      "epa_steady.csv",
+      185
+     ],
+     [
+      "epa_steady.csv",
+      186
+     ],
+     [
+      "epa_steady.csv",
+      187
+     ],
+     [
+      "epa_steady.csv",
+      188
+     ],
+     [
+      "epa_steady.csv",
+      189
+     ],
+     [
+      "epa_steady.csv",
+      190
+     ],
+     [
+      "epa_steady.csv",
+      191
+     ],
+     [
+      "epa_steady.csv",
+      192
+     ],
+     [
+      "epa_steady.csv",
+      193
+     ],
+     [
+      "epa_steady.csv",
+      194
+     ],
+     [
+      "epa_steady.csv",
+      195
+     ]
+    ]
+   },
+   "flags": [],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "knock_a": 0.015622182357253893,
+    "mean_ln_ki": -4.531522549490435e-17,
+    "knock_a_swept_at": 0.01768,
+    "ki_spread": {
+     "min": 0.598308561019584,
+     "p50": 1.14617390074013,
+     "max": 1.365153593789513
+    },
+    "rows": 49
+   }
+  },
+  "verify": {
+   "values": {},
+   "rows_used": 127,
+   "rows_excluded": {},
+   "flags": [],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "max_rel_shortcut": 7.070321205760026e-16,
+    "s2_verify_max_rel": 4.174064451475192e-16,
+    "max_rel_air_at_final": 4.174064451475192e-16,
+    "rows_s4_shortcut": 93,
+    "rows_air": 127,
+    "nonzero_columns_at_start": true,
+    "zero_columns_at_optimum": {},
+    "unmoved_from_start": {
+     "S2": [],
+     "S4": []
+    },
+    "ve_at_clip_rows": [],
+    "rows_ve_checked": 164,
+    "tolerances": {
+     "shortcut": 1e-09,
+     "s2_air": 1e-12
+    }
+   }
+  }
+ }
+}

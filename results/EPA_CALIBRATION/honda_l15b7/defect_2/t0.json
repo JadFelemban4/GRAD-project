@@ -1,0 +1,1516 @@
+{
+ "schema": "epa-t0/1",
+ "provenance": {
+  "engine": "honda_l15b7",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "0147f93a0ae9e4c8e579868d80082f5f2069b914",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "f6489f1b5e7b04833d8d68aaeace1b3241a3cdd8b1bbfc80d276ca0b6d4d3ee3",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "55090f0ad7dee32042656ed727a85962cdea9008678ed95a4c88d12c1f66bd01",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "9b6cb463c857597010dfbf64928c3dbf9b7e03a22a7abc32b40d73436ef8573b",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "a4e6138b9d258b1f",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "7b3d8dbbbf0b58b5ff7613048890ce81bf92f269b920fd51eb2c63751d52757f",
+    "epa_highload_initial.csv": "f69e531f2cfe4c44b275ed222ff4f375f06fe751674eafaa7744503d603af2fc",
+    "epa_steady.csv": "ba8558ca2c35c9ede3583ecc091e58d090abc4bed54d6ffcc7b06b99bc2c018e"
+   },
+   "epa_engine_sha256": "6d3134cb686272e549942ed64a74cc4f60e50bc177f47d63675555c7b8d10d2c",
+   "epa_channels_blob": "3c7b296206a2682c580a6fd2e9017360e92e8924",
+   "manifest_sha256": "fdbcc949a39c343a30f3b88e425e96b0c937e3ff53d97e4cc2ec366988a2a9ed"
+  },
+  "view_sha256": "8c6a700ccbf9e96599a5c3bfbc3817b88f2daefb7e36c1c9340c196723b2da58",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "seeds": [
+  {
+   "seed": 1,
+   "truth": {
+    "ve_base": 0.83,
+    "ve_amp": 0.18,
+    "ve_rpm": 1800.0,
+    "ve_width": 3000.0,
+    "ve_map": 0.0,
+    "ve_cam": 0.0,
+    "ce_rich_slope": 0.65,
+    "burn_base": 39.099999999999994,
+    "burn_rpm": 0.00253,
+    "delay_base": 6.3,
+    "delay_rpm": 0.00099,
+    "fmep_0": 0.48,
+    "fmep_pmax": 0.006,
+    "fmep_sp": 0.108,
+    "fmep_sp2": 0.00108,
+    "ua_port": 45.0,
+    "exh_bp_ratio": 1.45,
+    "exh_bp_min_kpa": 102.0,
+    "knock_a": 0.022984,
+    "form": "A"
+   },
+   "ladder_stops_at": "A",
+   "expected_form": "A",
+   "judged_at": "A",
+   "reached_expected_form": true,
+   "stopped_at_expected_form": true,
+   "stopped_beyond_expected_form": false,
+   "within_noise": {
+    "ok": true,
+    "beyond": [],
+    "z": 2.5758293035489004,
+    "by_row": {
+     "E1a": [
+      {
+       "component": "1500",
+       "E": 0.004619422134248541,
+       "u_stat": 0.19430170004815955,
+       "edge": 2.400488012713418,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 0.040619262807112255,
+       "u_stat": 0.12060418454835603,
+       "edge": 2.210655792690275,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 0.09148238454266266,
+       "u_stat": 0.15567899472634905,
+       "edge": 2.3010025165631647,
+       "ok": true
+      },
+      {
+       "component": "2250",
+       "E": 0.34720971424348673,
+       "u_stat": 0.2965829288823187,
+       "edge": 2.663946999147436,
+       "ok": true
+      },
+      {
+       "component": "2500",
+       "E": 0.3695993625380946,
+       "u_stat": 0.20421450618217277,
+       "edge": 2.4260217092338086,
+       "ok": true
+      },
+      {
+       "component": "3500",
+       "E": 0.28945951346852905,
+       "u_stat": 0.115094371024033,
+       "edge": 2.1964634535572336,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": 0.18858736078657243,
+       "u_stat": 0.13509238007246296,
+       "edge": 2.2479749112768155,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": 0.7446791821317836,
+       "u_stat": 0.19879976698634044,
+       "edge": 2.412074265342109,
+       "ok": true
+      }
+     ],
+     "E2a": [
+      {
+       "component": "1500",
+       "E": -0.004033541373327232,
+       "u_stat": 0.15842074585280183,
+       "edge": 4.40806479945772,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 0.3284681396021061,
+       "u_stat": 0.14147378744711792,
+       "edge": 4.364412327390335,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": -0.0075585328884775205,
+       "u_stat": 0.19757101280952977,
+       "edge": 4.508909204326622,
+       "ok": true
+      },
+      {
+       "component": "2250",
+       "E": 0.004624708533932746,
+       "u_stat": 0.3879961061334819,
+       "edge": 4.9994117398414915,
+       "ok": true
+      },
+      {
+       "component": "2500",
+       "E": -0.054619013973229116,
+       "u_stat": 0.15273729760653326,
+       "edge": 4.393425206919778,
+       "ok": true
+      },
+      {
+       "component": "3500",
+       "E": -0.2014463345918191,
+       "u_stat": 0.12431930255759938,
+       "edge": 4.320225302524626,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": -0.05901460220534917,
+       "u_stat": 0.11817460028084835,
+       "edge": 4.304397598338587,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": 0.04832177344732217,
+       "u_stat": 0.3270764989641938,
+       "edge": 4.842493230534152,
+       "ok": true
+      }
+     ],
+     "E3a": [
+      {
+       "component": "1500",
+       "E": -1.1606341367333286,
+       "u_stat": 1.1944145496441672,
+       "edge": 13.07660799755861,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 1.9783955290438087,
+       "u_stat": 1.9344016452036248,
+       "edge": 14.9826884425487,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": -1.1249892855998713,
+       "u_stat": 1.1166169901326133,
+       "edge": 12.876214764024159,
+       "ok": true
+      }
+     ],
+     "E4a": [
+      {
+       "component": "3500",
+       "E": -1.172753190499705,
+       "u_stat": 1.0327060752675565,
+       "edge": 12.660074570627149,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": 0.31257130868712985,
+       "u_stat": 0.8498139380370002,
+       "edge": 12.188975644159996,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": -1.5168446437316068,
+       "u_stat": 0.7006757789419557,
+       "edge": 11.804821203685641,
+       "ok": true
+      }
+     ],
+     "E4b": [
+      {
+       "component": "pooled",
+       "E": 10.997053892927266,
+       "u_stat": 13.649713635446444,
+       "edge": 51.759332367233945,
+       "ok": true
+      }
+     ],
+     "D1": [
+      {
+       "component": "pooled",
+       "E": 0.5692571226934586,
+       "u_stat": 0.03794793039464084,
+       "edge": 16.697747391119552,
+       "ok": true
+      }
+     ],
+     "L0": [
+      {
+       "component": "1500",
+       "E": 1.2065184135564735,
+       "u_stat": 1.2617388776727776,
+       "edge": 13.250023974536441,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 1.78790779211497,
+       "u_stat": 1.7500916675455502,
+       "edge": 14.50793740116059,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 2.0874725014799593,
+       "u_stat": 1.8306904564156994,
+       "edge": 14.71554612336287,
+       "ok": true
+      }
+     ],
+     "L1": [
+      {
+       "component": "L1",
+       "E": 3.7920893771275663,
+       "u_stat": 2.634518071917309,
+       "edge": 16.686068850373754,
+       "ok": true
+      }
+     ]
+    }
+   },
+   "chi2": {
+    "params": [
+     "ve_base",
+     "ve_amp",
+     "ve_rpm",
+     "ve_width",
+     "burn_base",
+     "burn_rpm",
+     "delay_base",
+     "delay_rpm",
+     "fmep_0",
+     "fmep_pmax",
+     "fmep_sp",
+     "fmep_sp2",
+     "ua_port"
+    ],
+    "value": 16.600950587741785,
+    "dof": 13,
+    "quantile_99_lo": 3.5650345797295384,
+    "quantile_99_hi": 29.819471223653217,
+    "empty": false,
+    "ok": true
+   },
+   "z": {
+    "ve_base": 0.9736940463993855,
+    "ve_amp": -0.9671781626707584,
+    "ve_rpm": 1.059542336297513,
+    "ve_width": -0.9308812324198413,
+    "burn_base": 0.4775964864292249,
+    "burn_rpm": 0.17359966485640901,
+    "delay_base": -0.4192987379355594,
+    "delay_rpm": -0.35227143328995847,
+    "fmep_0": -0.9050158289056074,
+    "fmep_pmax": -0.06090645780395731,
+    "fmep_sp": 0.1920723561597058,
+    "fmep_sp2": 0.368103385886715,
+    "ua_port": -0.27041478045359696
+   },
+   "ok": true
+  },
+  {
+   "seed": 2,
+   "truth": {
+    "ve_base": 0.83,
+    "ve_amp": 0.18,
+    "ve_rpm": 1800.0,
+    "ve_width": 3000.0,
+    "ve_map": 0.0,
+    "ve_cam": 0.0,
+    "ce_rich_slope": 0.65,
+    "burn_base": 39.099999999999994,
+    "burn_rpm": 0.00253,
+    "delay_base": 6.3,
+    "delay_rpm": 0.00099,
+    "fmep_0": 0.48,
+    "fmep_pmax": 0.006,
+    "fmep_sp": 0.108,
+    "fmep_sp2": 0.00108,
+    "ua_port": 45.0,
+    "exh_bp_ratio": 1.45,
+    "exh_bp_min_kpa": 102.0,
+    "knock_a": 0.022984,
+    "form": "A"
+   },
+   "ladder_stops_at": "A",
+   "expected_form": "A",
+   "judged_at": "A",
+   "reached_expected_form": true,
+   "stopped_at_expected_form": true,
+   "stopped_beyond_expected_form": false,
+   "within_noise": {
+    "ok": true,
+    "beyond": [],
+    "z": 2.5758293035489004,
+    "by_row": {
+     "E1a": [
+      {
+       "component": "1500",
+       "E": -0.13904195359059762,
+       "u_stat": 0.14830987928252148,
+       "edge": 2.2820209330617187,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": -0.13907212569412852,
+       "u_stat": 0.19845251081531554,
+       "edge": 2.4111797927209446,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 0.2793168297304675,
+       "u_stat": 0.16655243936277905,
+       "edge": 2.3290106538881976,
+       "ok": true
+      },
+      {
+       "component": "2250",
+       "E": -0.006862641996737325,
+       "u_stat": 0.17667784316447124,
+       "edge": 2.3550919657108618,
+       "ok": true
+      },
+      {
+       "component": "2500",
+       "E": 0.18994084168876585,
+       "u_stat": 0.19036156705410306,
+       "edge": 2.3903389026874473,
+       "ok": true
+      },
+      {
+       "component": "3500",
+       "E": 0.19301474842308014,
+       "u_stat": 0.1582106964141097,
+       "edge": 2.3075237479583426,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": -0.07705389333668076,
+       "u_stat": 0.14216727275103558,
+       "edge": 2.2661986271577463,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": 0.3435442344242849,
+       "u_stat": 0.1623598461881507,
+       "edge": 2.3182112495311307,
+       "ok": true
+      }
+     ],
+     "E2a": [
+      {
+       "component": "1500",
+       "E": 0.19361479303332402,
+       "u_stat": 0.2482683186468762,
+       "edge": 4.63949681031344,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": -0.06466144671253467,
+       "u_stat": 0.15666169423693693,
+       "edge": 4.40353378275912,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 0.09810425649169452,
+       "u_stat": 0.1303456427870529,
+       "edge": 4.335748126280809,
+       "ok": true
+      },
+      {
+       "component": "2250",
+       "E": -0.11082903799241965,
+       "u_stat": 0.283713579304747,
+       "edge": 4.730797751387912,
+       "ok": true
+      },
+      {
+       "component": "2500",
+       "E": -0.22826742043567463,
+       "u_stat": 0.17835929963548772,
+       "edge": 4.459423110561548,
+       "ok": true
+      },
+      {
+       "component": "3500",
+       "E": 0.08953845160300233,
+       "u_stat": 0.17617178080511203,
+       "edge": 4.453788435456201,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": -0.23615978733523754,
+       "u_stat": 0.21496301231999526,
+       "edge": 4.553708026312987,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": -0.08215811177679962,
+       "u_stat": 0.1003727660485201,
+       "edge": 4.258543112066036,
+       "ok": true
+      }
+     ],
+     "E3a": [
+      {
+       "component": "1500",
+       "E": -0.20085883729606735,
+       "u_stat": 0.5989573529730354,
+       "edge": 11.542811901364027,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 0.9125590084978606,
+       "u_stat": 1.141891775570467,
+       "edge": 12.941318296995894,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 0.1702974317809757,
+       "u_stat": 0.8597509164990943,
+       "edge": 12.214571604471391,
+       "ok": true
+      }
+     ],
+     "E4a": [
+      {
+       "component": "3500",
+       "E": 0.49187373663674805,
+       "u_stat": 1.141861016513029,
+       "edge": 12.941239066914395,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": -1.67250679863605,
+       "u_stat": 1.75520129180835,
+       "edge": 14.521098921066832,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": -1.40737509386643,
+       "u_stat": 1.0210465210110837,
+       "edge": 12.630041549107007,
+       "ok": true
+      }
+     ],
+     "E4b": [
+      {
+       "component": "pooled",
+       "E": -7.555040190646256,
+       "u_stat": 9.834780532130132,
+       "edge": 41.93271588863304,
+       "ok": true
+      }
+     ],
+     "D1": [
+      {
+       "component": "pooled",
+       "E": 0.585671616009254,
+       "u_stat": 0.03789325216887827,
+       "edge": 16.697606549343366,
+       "ok": true
+      }
+     ],
+     "L0": [
+      {
+       "component": "1500",
+       "E": 1.1616947492529446,
+       "u_stat": 1.2472245184920714,
+       "edge": 13.212637462836545,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 1.5984481609992163,
+       "u_stat": 1.1561027821056882,
+       "edge": 12.97792342406224,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 1.7025274316444432,
+       "u_stat": 1.014808677627031,
+       "edge": 12.613973929327416,
+       "ok": true
+      }
+     ],
+     "L1": [
+      {
+       "component": "L1",
+       "E": 3.1606577471153017,
+       "u_stat": 1.6084243510114669,
+       "edge": 14.043026575876958,
+       "ok": true
+      }
+     ]
+    }
+   },
+   "chi2": {
+    "params": [
+     "ve_base",
+     "ve_amp",
+     "ve_rpm",
+     "ve_width",
+     "burn_base",
+     "burn_rpm",
+     "delay_base",
+     "delay_rpm",
+     "fmep_0",
+     "fmep_pmax",
+     "fmep_sp",
+     "fmep_sp2",
+     "ua_port"
+    ],
+    "value": 6.050660941588217,
+    "dof": 13,
+    "quantile_99_lo": 3.5650345797295384,
+    "quantile_99_hi": 29.819471223653217,
+    "empty": false,
+    "ok": true
+   },
+   "z": {
+    "ve_base": -0.3135464204637584,
+    "ve_amp": 0.30990799299497435,
+    "ve_rpm": 0.5214877388947162,
+    "ve_width": 0.07816594887329156,
+    "burn_base": -0.4921252549788369,
+    "burn_rpm": 0.44897767988023546,
+    "delay_base": 0.5356040578498326,
+    "delay_rpm": -0.4860134686290314,
+    "fmep_0": 0.19579027293667473,
+    "fmep_pmax": 0.1624233181781763,
+    "fmep_sp": 0.7130039125785539,
+    "fmep_sp2": -0.6245019776028107,
+    "ua_port": -0.44316427740984715
+   },
+   "ok": true
+  },
+  {
+   "seed": 3,
+   "truth": {
+    "ve_base": 0.83,
+    "ve_amp": 0.18,
+    "ve_rpm": 1800.0,
+    "ve_width": 3000.0,
+    "ve_map": 0.002,
+    "ve_cam": 0.0,
+    "ce_rich_slope": 0.65,
+    "burn_base": 39.099999999999994,
+    "burn_rpm": 0.00253,
+    "delay_base": 6.3,
+    "delay_rpm": 0.00099,
+    "fmep_0": 0.48,
+    "fmep_pmax": 0.006,
+    "fmep_sp": 0.108,
+    "fmep_sp2": 0.00108,
+    "ua_port": 45.0,
+    "exh_bp_ratio": 1.45,
+    "exh_bp_min_kpa": 102.0,
+    "knock_a": 0.022984,
+    "form": "A+B"
+   },
+   "ladder_stops_at": "A+B",
+   "expected_form": "A+B",
+   "judged_at": "A+B",
+   "reached_expected_form": true,
+   "stopped_at_expected_form": true,
+   "stopped_beyond_expected_form": false,
+   "within_noise": {
+    "ok": true,
+    "beyond": [],
+    "z": 2.5758293035489004,
+    "by_row": {
+     "E1a": [
+      {
+       "component": "1500",
+       "E": -0.12206366295890031,
+       "u_stat": 0.19089418071253705,
+       "edge": 2.3917108245563123,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": -0.1416035523019795,
+       "u_stat": 0.2090682276111455,
+       "edge": 2.43852406712182,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 0.1941516597814802,
+       "u_stat": 0.16071717019261045,
+       "edge": 2.313979996565582,
+       "ok": true
+      },
+      {
+       "component": "2250",
+       "E": -0.07411755554287969,
+       "u_stat": 0.2509318898017059,
+       "edge": 2.5463577149461374,
+       "ok": true
+      },
+      {
+       "component": "2500",
+       "E": -0.15072674319864016,
+       "u_stat": 0.19864250150097013,
+       "edge": 2.411669176296455,
+       "ok": true
+      },
+      {
+       "component": "3500",
+       "E": -0.14737726663594103,
+       "u_stat": 0.30453370746859004,
+       "edge": 2.684426847615983,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": -0.39553095115996456,
+       "u_stat": 0.20329922670220807,
+       "edge": 2.4236641055283785,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": -0.15903691492458552,
+       "u_stat": 0.17982868970764773,
+       "edge": 2.3632080085677614,
+       "ok": true
+      }
+     ],
+     "E2a": [
+      {
+       "component": "1500",
+       "E": 0.1326185100934421,
+       "u_stat": 0.1588038781895251,
+       "edge": 4.409051682957789,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 0.08615582613631934,
+       "u_stat": 0.27534160651540956,
+       "edge": 4.709232978548623,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 0.061883548812859956,
+       "u_stat": 0.1383782557653796,
+       "edge": 4.356438766174449,
+       "ok": true
+      },
+      {
+       "component": "2250",
+       "E": -0.18293037414233346,
+       "u_stat": 0.1732975065567461,
+       "edge": 4.4463847956208244,
+       "ok": true
+      },
+      {
+       "component": "2500",
+       "E": -0.13428798210204848,
+       "u_stat": 0.19288084360144384,
+       "edge": 4.496828129041831,
+       "ok": true
+      },
+      {
+       "component": "3500",
+       "E": -0.25503028472531886,
+       "u_stat": 0.15733280775874156,
+       "edge": 4.405262456634592,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": 0.10318917033756822,
+       "u_stat": 0.176841517486122,
+       "edge": 4.455513562824808,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": 0.056890591036027706,
+       "u_stat": 0.19875644151809532,
+       "edge": 4.511962666331414,
+       "ok": true
+      }
+     ],
+     "E3a": [
+      {
+       "component": "1500",
+       "E": 0.5174601416689342,
+       "u_stat": 0.7797886393497567,
+       "edge": 12.008602427811628,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": -1.1272627758963172,
+       "u_stat": 0.9083094328924463,
+       "edge": 12.339650053934246,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 0.23410162840236617,
+       "u_stat": 0.8069859954852199,
+       "edge": 12.07865817472441,
+       "ok": true
+      }
+     ],
+     "E4a": [
+      {
+       "component": "3500",
+       "E": 0.7258416161531187,
+       "u_stat": 0.7427149116194637,
+       "edge": 11.913106833532146,
+       "ok": true
+      },
+      {
+       "component": "4000",
+       "E": -0.6363919987585567,
+       "u_stat": 1.3712173304348667,
+       "edge": 13.532021781268226,
+       "ok": true
+      },
+      {
+       "component": "5000",
+       "E": 0.8874451084678109,
+       "u_stat": 1.6533483694567621,
+       "edge": 14.258743179021522,
+       "ok": true
+      }
+     ],
+     "E4b": [
+      {
+       "component": "pooled",
+       "E": 23.0143293021974,
+       "u_stat": 17.9403816450035,
+       "edge": 62.811360758050846,
+       "ok": true
+      }
+     ],
+     "D1": [
+      {
+       "component": "pooled",
+       "E": 0.6120021822112839,
+       "u_stat": 0.03797888245775041,
+       "edge": 16.697827118350713,
+       "ok": true
+      }
+     ],
+     "L0": [
+      {
+       "component": "1500",
+       "E": 1.2802649870984868,
+       "u_stat": 0.9322526464057649,
+       "edge": 12.40132368492298,
+       "ok": true
+      },
+      {
+       "component": "1600",
+       "E": 0.5109118919999958,
+       "u_stat": 1.0759910330844962,
+       "edge": 12.7715692333749,
+       "ok": true
+      },
+      {
+       "component": "1700/1750/1800",
+       "E": 1.5216525886249017,
+       "u_stat": 0.6621633199035224,
+       "edge": 11.705619683142718,
+       "ok": true
+      }
+     ],
+     "L1": [
+      {
+       "component": "L1",
+       "E": 2.7969608719589396,
+       "u_stat": 1.1479794367651701,
+       "edge": 12.856999073091288,
+       "ok": true
+      }
+     ]
+    }
+   },
+   "chi2": {
+    "params": [
+     "ve_base",
+     "ve_amp",
+     "ve_rpm",
+     "ve_width",
+     "ve_map",
+     "burn_base",
+     "burn_rpm",
+     "delay_base",
+     "delay_rpm",
+     "fmep_0",
+     "fmep_pmax",
+     "fmep_sp",
+     "fmep_sp2",
+     "ua_port"
+    ],
+    "value": 20.706688432703025,
+    "dof": 14,
+    "quantile_99_lo": 4.074674957399343,
+    "quantile_99_hi": 31.31934962259528,
+    "empty": false,
+    "ok": true
+   },
+   "z": {
+    "ve_base": 0.1567146840399062,
+    "ve_amp": -0.2279628800770061,
+    "ve_rpm": -0.6245156709577439,
+    "ve_width": 0.2996925517437213,
+    "ve_map": -2.102601791168673,
+    "burn_base": -0.0998674146407327,
+    "burn_rpm": 0.5283783883511608,
+    "delay_base": 0.08149308538721337,
+    "delay_rpm": -0.4816207493656618,
+    "fmep_0": 0.2376088508955584,
+    "fmep_pmax": -0.0003574057146642699,
+    "fmep_sp": -0.1791194791878653,
+    "fmep_sp2": -0.08226659506896217,
+    "ua_port": -0.31537477269567477
+   },
+   "ok": true
+  }
+ ],
+ "out_of_form_seed": {
+  "seed": 4,
+  "truth": {
+   "ve_base": 0.83,
+   "ve_amp": 0.18,
+   "ve_rpm": 1800.0,
+   "ve_width": 3000.0,
+   "ve_map": 0.0,
+   "ve_cam": 0.0,
+   "ce_rich_slope": 0.65,
+   "burn_base": 39.099999999999994,
+   "burn_rpm": 0.00253,
+   "delay_base": 6.3,
+   "delay_rpm": 0.00099,
+   "fmep_0": 0.48,
+   "fmep_pmax": 0.006,
+   "fmep_sp": 0.108,
+   "fmep_sp2": 0.00108,
+   "ua_port": 45.0,
+   "exh_bp_ratio": 1.45,
+   "exh_bp_min_kpa": 102.0,
+   "knock_a": 0.022984,
+   "form": "A"
+  },
+  "ladder_stops_at": "A",
+  "judged_at": "A",
+  "expected_form": null,
+  "chi2": {
+   "params": [
+    "ve_base",
+    "ve_amp",
+    "ve_rpm",
+    "ve_width",
+    "burn_base",
+    "burn_rpm",
+    "delay_base",
+    "delay_rpm",
+    "fmep_0",
+    "fmep_pmax",
+    "fmep_sp",
+    "fmep_sp2",
+    "ua_port"
+   ],
+   "value": 4970.316950479489,
+   "dof": 13,
+   "quantile_99_lo": 3.5650345797295384,
+   "quantile_99_hi": 29.819471223653217,
+   "empty": false,
+   "ok": false
+  },
+  "z": {
+   "ve_base": -0.966884860732475,
+   "ve_amp": 1.000662855681115,
+   "ve_rpm": -0.8581381425334458,
+   "ve_width": 1.2637505570673901,
+   "burn_base": -10.305018640363853,
+   "burn_rpm": -2.702460347514346,
+   "delay_base": 8.74503774203389,
+   "delay_rpm": 2.6005347202799154,
+   "fmep_0": -0.9609016036382659,
+   "fmep_pmax": 0.9959024512908338,
+   "fmep_sp": 2.8617969079866445,
+   "fmep_sp2": -2.026662250657096,
+   "ua_port": -1.2384064033467823
+  }
+ },
+ "out_of_form_detected": true,
+ "chi2_empty_seeds": [],
+ "cases": {
+  "d1_envelope": {
+   "ok": true,
+   "detail": [
+    {
+     "lines_without_holds": [
+      "1000"
+     ],
+     "point_lines": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "envelope_unmoved_by_the_lines_without_holds": true,
+     "ceiling_at_points_max_rel": 0.0
+    },
+    {
+     "lines_without_holds": [
+      "1000"
+     ],
+     "point_lines": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "envelope_unmoved_by_the_lines_without_holds": true,
+     "ceiling_at_points_max_rel": 0.0
+    },
+    {
+     "lines_without_holds": [
+      "1000"
+     ],
+     "point_lines": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "envelope_unmoved_by_the_lines_without_holds": true,
+     "ceiling_at_points_max_rel": 0.0
+    }
+   ]
+  },
+  "d2_gate": {
+   "ok": false,
+   "detail": [
+    {
+     "truth_gate_kpa": 123.42867067468251,
+     "fitted_gate_kpa": 125.0,
+     "flat_gates_kpa": [
+      125.0,
+      125.0
+     ],
+     "widened_kpa": [
+      124.677341349365,
+      125.60961538461535
+     ],
+     "neighbour_final_map_kpa": {
+      "below": 124.677341349365,
+      "above": 125.60961538461535
+     },
+     "within_grid_step": false,
+     "within_final_gap": false,
+     "final_rows": 49,
+     "rule": "decision 84: the truth's gate within the fitted flat interval widened to the MAPs of the neighbouring calibration Final rows (the highest at or below the interval, the lowest above it), or within the gate grid's step of the interval (amendment D2)"
+    },
+    {
+     "truth_gate_kpa": 123.42867067468251,
+     "fitted_gate_kpa": 124.0,
+     "flat_gates_kpa": [
+      123.0,
+      124.0
+     ],
+     "widened_kpa": [
+      123.0,
+      124.677341349365
+     ],
+     "neighbour_final_map_kpa": {
+      "below": null,
+      "above": 124.677341349365
+     },
+     "within_grid_step": true,
+     "within_final_gap": true,
+     "final_rows": 49,
+     "rule": "decision 84: the truth's gate within the fitted flat interval widened to the MAPs of the neighbouring calibration Final rows (the highest at or below the interval, the lowest above it), or within the gate grid's step of the interval (amendment D2)"
+    },
+    {
+     "truth_gate_kpa": 123.42867067468251,
+     "fitted_gate_kpa": 124.0,
+     "flat_gates_kpa": [
+      123.0,
+      124.0
+     ],
+     "widened_kpa": [
+      123.0,
+      124.677341349365
+     ],
+     "neighbour_final_map_kpa": {
+      "below": null,
+      "above": 124.677341349365
+     },
+     "within_grid_step": true,
+     "within_final_gap": true,
+     "final_rows": 49,
+     "rule": "decision 84: the truth's gate within the fitted flat interval widened to the MAPs of the neighbouring calibration Final rows (the highest at or below the interval, the lowest above it), or within the gate grid's step of the interval (amendment D2)"
+    }
+   ]
+  },
+  "d3_spark_min": {
+   "ok": true,
+   "detail": [
+    {
+     "rows": 120,
+     "rows_clipped": 0,
+     "spark_min": -2.0,
+     "spark_max": 32.0
+    },
+    {
+     "rows": 120,
+     "rows_clipped": 0,
+     "spark_min": -2.0,
+     "spark_max": 32.0
+    },
+    {
+     "rows": 118,
+     "rows_clipped": 0,
+     "spark_min": -2.0,
+     "spark_max": 30.0
+    }
+   ]
+  },
+  "s1_law": {
+   "ok": true,
+   "detail": [
+    {
+     "rows": 120,
+     "max_abs_law_kpa": 0.06260019077633672,
+     "edge_kpa": 0.2900068273377629,
+     "fitted": {
+      "exh_bp_ratio": 1.4500341366888145,
+      "exh_bp_min_kpa": 101.93739980922366
+     },
+     "truth": {
+      "exh_bp_ratio": 1.45,
+      "exh_bp_min_kpa": 102.0
+     }
+    },
+    {
+     "rows": 120,
+     "max_abs_law_kpa": 0.06260019077633672,
+     "edge_kpa": 0.2900068273377629,
+     "fitted": {
+      "exh_bp_ratio": 1.4500341366888145,
+      "exh_bp_min_kpa": 101.93739980922366
+     },
+     "truth": {
+      "exh_bp_ratio": 1.45,
+      "exh_bp_min_kpa": 102.0
+     }
+    },
+    {
+     "rows": 118,
+     "max_abs_law_kpa": 0.06295779241170862,
+     "edge_kpa": 0.29000580997891406,
+     "fitted": {
+      "exh_bp_ratio": 1.4500290498945703,
+      "exh_bp_min_kpa": 101.93704220758829
+     },
+     "truth": {
+      "exh_bp_ratio": 1.45,
+      "exh_bp_min_kpa": 102.0
+     }
+    }
+   ]
+  }
+ },
+ "stop_rule": {
+  "z": 2.5758293035489004,
+  "rule": "PLAN.md 5.10: each in-form seed's ladder stops at its truth's form (an A truth at A, the A+B truth at A+B) and the chi^2 of that form's data-dominated parameters lies within its 99 %; within_noise (every in-sample statistic but E8 within R + z u_stat) and stopped_beyond_expected_form are diagnostics beside the verdict; the out-of-form seed fails a chi^2 that tests something; an empty chi^2 on any seed fails T0",
+  "on_sampling_failure": "a T0 failure traced to sampling rather than a defect stops Run 1 for the engine: the seeds and the stream are never changed after a result; the team decides, recorded in defects.json, and any further seeds are T0_STREAM's next ones in order (5, 6, ...)",
+  "ladder_criterion": "each engine's form is the first of A, A+B, A+B+C, A+B+C+D at which no in-sample statistic but E8 fails. A statistic fails a form only if |E_cal| - 2 u_stat > R, on its pooled value or on any of its deciding lines, u_stat the standard error the held-out rows compute (the standard error of the mean with one row or hold per cluster, the pooled u_stat for pooled rows, L0 at its maximising f, L1 from its two extreme lines); it passes if it does not fail and its pooled value or some deciding line has 2 u_stat <= R; otherwise (2 u_stat > R, or u_stat undefined) it neither blocks a form nor passes it, recorded per form, as a statistic with no calibration line that meets its population's line minimum neither blocks nor passes (contract section 2.4; JSON model_form.in_sample_rules: decisions 39(a), 49, 55; decision 77, 23 October 2026; L1 at its untightened R, decision 71)"
+ },
+ "pass": false,
+ "ladders": {
+  "1": {
+   "forms_fitted": [
+    "A"
+   ],
+   "chosen": "A",
+   "reason": "A: no in-sample statistic but E8 fails (noise exceeds R: E4b)",
+   "in_sample": {
+    "A": {
+     "E1a": {
+      "E": 0.7446791821317836,
+      "u_stat": 0.19879976698634044,
+      "R": 1.9,
+      "outcome": "passes",
+      "why": null
+     },
+     "E2a": {
+      "E": 0.3284681396021061,
+      "u_stat": 0.14147378744711792,
+      "R": 4.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E3a": {
+      "E": 1.9783955290438087,
+      "u_stat": 1.9344016452036248,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4a": {
+      "E": -1.5168446437316068,
+      "u_stat": 0.7006757789419557,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4b": {
+      "E": 10.997053892927266,
+      "u_stat": 13.649713635446444,
+      "R": 16.6,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R"
+     },
+     "D1": {
+      "E": 0.5692571226934586,
+      "u_stat": 0.03794793039464084,
+      "R": 16.6,
+      "outcome": "passes",
+      "why": null
+     },
+     "L0": {
+      "E": 2.0874725014799593,
+      "u_stat": 1.8306904564156994,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "L1": {
+      "E": 3.7920893771275663,
+      "u_stat": 2.634518071917309,
+      "R": 9.9,
+      "outcome": "passes",
+      "why": null
+     }
+    }
+   }
+  },
+  "2": {
+   "forms_fitted": [
+    "A"
+   ],
+   "chosen": "A",
+   "reason": "A: no in-sample statistic but E8 fails (noise exceeds R: E4b)",
+   "in_sample": {
+    "A": {
+     "E1a": {
+      "E": 0.3435442344242849,
+      "u_stat": 0.1623598461881507,
+      "R": 1.9,
+      "outcome": "passes",
+      "why": null
+     },
+     "E2a": {
+      "E": -0.23615978733523754,
+      "u_stat": 0.21496301231999526,
+      "R": 4.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E3a": {
+      "E": 0.9125590084978606,
+      "u_stat": 1.141891775570467,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4a": {
+      "E": -1.67250679863605,
+      "u_stat": 1.75520129180835,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4b": {
+      "E": -7.555040190646256,
+      "u_stat": 9.834780532130132,
+      "R": 16.6,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R"
+     },
+     "D1": {
+      "E": 0.585671616009254,
+      "u_stat": 0.03789325216887827,
+      "R": 16.6,
+      "outcome": "passes",
+      "why": null
+     },
+     "L0": {
+      "E": 1.7025274316444432,
+      "u_stat": 1.014808677627031,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "L1": {
+      "E": 3.1606577471153017,
+      "u_stat": 1.6084243510114669,
+      "R": 9.9,
+      "outcome": "passes",
+      "why": null
+     }
+    }
+   }
+  },
+  "3": {
+   "forms_fitted": [
+    "A",
+    "A+B"
+   ],
+   "chosen": "A+B",
+   "reason": "A: fails E1a, E4a, L0 (noise exceeds R: E4b) (amendment D13: an E1a miss on stoichiometric hot rows at form A is read as a burn/FMEP residual that no form B-D can act on (mistake 20); it is reported, with S4's residuals per line and per population, and never used to justify a form. The ladder still moves by the contract's criterion (section 2.4).); A+B: no in-sample statistic but E8 fails (noise exceeds R: E4b)",
+   "in_sample": {
+    "A": {
+     "E1a": {
+      "E": -6.364916242856015,
+      "u_stat": 0.6857616567117973,
+      "R": 1.9,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 3500: |E_cal| - 2 u_stat > R; 4000: |E_cal| - 2 u_stat > R; 5000: |E_cal| - 2 u_stat > R"
+     },
+     "E2a": {
+      "E": -5.508727804475403,
+      "u_stat": 0.7918540303092976,
+      "R": 4.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E3a": {
+      "E": -13.516142689664653,
+      "u_stat": 2.223162921016785,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4a": {
+      "E": -16.147968231716714,
+      "u_stat": 1.8175600897767747,
+      "R": 10.0,
+      "outcome": "fails",
+      "why": "4000: |E_cal| - 2 u_stat > R; 5000: |E_cal| - 2 u_stat > R"
+     },
+     "E4b": {
+      "E": 5.484342767371375,
+      "u_stat": 14.184563619748419,
+      "R": 16.6,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R"
+     },
+     "D1": {
+      "E": 1.5545886465242569,
+      "u_stat": 0.15989032416530333,
+      "R": 16.6,
+      "outcome": "passes",
+      "why": null
+     },
+     "L0": {
+      "E": 24.951210055831105,
+      "u_stat": 2.9557646299429226,
+      "R": 10.0,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1600: |E_cal| - 2 u_stat > R"
+     },
+     "L1": {
+      "E": 9.26486895180795,
+      "u_stat": 4.264920403830937,
+      "R": 9.9,
+      "outcome": "passes",
+      "why": null
+     }
+    },
+    "A+B": {
+     "E1a": {
+      "E": -0.39553095115996456,
+      "u_stat": 0.20329922670220807,
+      "R": 1.9,
+      "outcome": "passes",
+      "why": null
+     },
+     "E2a": {
+      "E": -0.25503028472531886,
+      "u_stat": 0.15733280775874156,
+      "R": 4.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E3a": {
+      "E": -1.1272627758963172,
+      "u_stat": 0.9083094328924463,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4a": {
+      "E": 0.8874451084678109,
+      "u_stat": 1.6533483694567621,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4b": {
+      "E": 23.0143293021974,
+      "u_stat": 17.9403816450035,
+      "R": 16.6,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R"
+     },
+     "D1": {
+      "E": 0.6120021822112839,
+      "u_stat": 0.03797888245775041,
+      "R": 16.6,
+      "outcome": "passes",
+      "why": null
+     },
+     "L0": {
+      "E": 1.5216525886249017,
+      "u_stat": 0.6621633199035224,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "L1": {
+      "E": 2.7969608719589396,
+      "u_stat": 1.1479794367651701,
+      "R": 9.9,
+      "outcome": "passes",
+      "why": null
+     }
+    }
+   }
+  },
+  "4": {
+   "forms_fitted": [
+    "A"
+   ],
+   "chosen": "A",
+   "reason": "A: no in-sample statistic but E8 fails",
+   "in_sample": {
+    "A": {
+     "E1a": {
+      "E": 0.5788309835953132,
+      "u_stat": 0.31172128526033016,
+      "R": 1.9,
+      "outcome": "passes",
+      "why": null
+     },
+     "E2a": {
+      "E": -0.27374870437316495,
+      "u_stat": 0.23789540684068317,
+      "R": 4.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E3a": {
+      "E": -4.303306474421106,
+      "u_stat": 1.277561562330195,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4a": {
+      "E": -8.949232633259461,
+      "u_stat": 1.4017965165620927,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "E4b": {
+      "E": -1.2917941523799215,
+      "u_stat": 4.633208926403647,
+      "R": 16.6,
+      "outcome": "passes",
+      "why": null
+     },
+     "D1": {
+      "E": 0.5924870619851462,
+      "u_stat": 0.04381166003796599,
+      "R": 16.6,
+      "outcome": "passes",
+      "why": null
+     },
+     "L0": {
+      "E": 3.2664347766677415,
+      "u_stat": 2.0119436436608336,
+      "R": 10.0,
+      "outcome": "passes",
+      "why": null
+     },
+     "L1": {
+      "E": 1.8291809541736654,
+      "u_stat": 2.0247697152901645,
+      "R": 9.9,
+      "outcome": "passes",
+      "why": null
+     }
+    }
+   }
+  }
+ }
+}

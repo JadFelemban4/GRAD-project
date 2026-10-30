@@ -1,0 +1,71 @@
+{
+ "schema": "epa-freeze/1",
+ "form": "A+B+C+D",
+ "frozen_sections_sha256": "21b534e0e98b63308d389dc95bc815dcc9e4ebf550b1564b9766fad2ba5f89a1",
+ "derived": {
+  "path": "data/engines/mazda_25t/derived_params.json",
+  "sha_text": "ba3918932f815fb30304fa4bd8fe9e9c40b746d6b031abf4dc45f08cf06a7669",
+  "derived_sha": "21b534e0e98b6330"
+ },
+ "contract": {
+  "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+  "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+  "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7"
+ },
+ "data": {
+  "tables_sha256": {
+   "epa_highload_final.csv": "ab057944b7fb4eeea0d789122a98c1c6d0b6d6fd2e5dae58df88627191d80449",
+   "epa_highload_initial.csv": "0540e533faddcada2cbbbc2917b33ace30114bf70b862196a9ec96f29d2dfeef",
+   "epa_steady.csv": "ab71a0087ee32fabfa21ae1a764015837b54ad531ad2017f38ccf59048286bfc"
+  },
+  "epa_engine_sha256": "cf5fc265d9a6324db9d7b8ceeaac5c75dd46db8dab06efa073fa67113bc1495e",
+  "epa_channels_blob": "a1c5627aa7468af13f28ea71ed2b6d92f3afbb13",
+  "manifest_sha256": "baccffe344e4b40b70ea26def9f26aacabe6f39798db11968c22b6061ce5c1e8"
+ },
+ "code": {
+  "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+  "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+  "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+  "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+  "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+  "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+  "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+  "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+  "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+  "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+  "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+  "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+  "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+  "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+ },
+ "plant": {
+  "plant_sha": "f86baf59389dea29"
+ },
+ "fits": {
+  "fit_A+B+C+D.json": "ba41e234101401ad00fed493a825364977d4e72f614a2f993c23ac8134168e50",
+  "fit_A+B+C.json": "964711536a155ea100e825de1c69a5a54b93183636e4febfdb70c64530f261fb",
+  "fit_A+B.json": "9a0dcfa063eedf793284ccf9c36e7d68b9d92cbd7d2bd92619cdf67039641800",
+  "fit_A.json": "8889d2f8b4c447d265a1430b1c6024dd24407803e45e7a202a1b9ed3a46a6892",
+  "in_sample.json": "d606b55047f90afc1bdefa6e4686aad925fa08c0d9b2124d75b1ca979c50ef96",
+  "stage0.json": "4c8ce4ae7a8be6b8b087f220e6593cca75e95ea32d03ee4b63d26183260d7958"
+ },
+ "versions": {
+  "python": "3.13.2",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "platform": "Windows-11-10.0.26200-SP0"
+ },
+ "git_head": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+ "flags": [
+  "S2_bound_active",
+  "S3c_lines_without_holds",
+  "S3c_pr_falls_with_flow",
+  "S3d_extrapolated_rows",
+  "S4_physical_check"
+ ],
+ "all_row_depth_edge": {
+  "active": false,
+  "flag": "S3b_depth_set_by_the_all_row_floor",
+  "why": "S3b's depth bound is min(C1's, 1 - lam_floor); lam_floor is an all-row quantity, which can be the tighter edge only within the printed rounding of the calibration Final minimum; when active it is named in the C13 disclosure of the results"
+ }
+}

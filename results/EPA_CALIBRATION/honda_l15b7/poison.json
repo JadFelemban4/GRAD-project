@@ -1,0 +1,128 @@
+{
+ "schema": "epa-poison/1",
+ "provenance": {
+  "engine": "honda_l15b7",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "a4e6138b9d258b1f",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "7b3d8dbbbf0b58b5ff7613048890ce81bf92f269b920fd51eb2c63751d52757f",
+    "epa_highload_initial.csv": "f69e531f2cfe4c44b275ed222ff4f375f06fe751674eafaa7744503d603af2fc",
+    "epa_steady.csv": "ba8558ca2c35c9ede3583ecc091e58d090abc4bed54d6ffcc7b06b99bc2c018e"
+   },
+   "epa_engine_sha256": "6d3134cb686272e549942ed64a74cc4f60e50bc177f47d63675555c7b8d10d2c",
+   "epa_channels_blob": "3c7b296206a2682c580a6fd2e9017360e92e8924",
+   "manifest_sha256": "fdbcc949a39c343a30f3b88e425e96b0c937e3ff53d97e4cc2ec366988a2a9ed"
+  },
+  "view_sha256": "8c6a700ccbf9e96599a5c3bfbc3817b88f2daefb7e36c1c9340c196723b2da58",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "runs": {
+  "low": {
+   "copies_are_not_the_tables": true,
+   "stage0_equal": true,
+   "view_equal": true,
+   "yield_equal": true,
+   "manifest_equal": true,
+   "engine_facts_equal": true,
+   "stages": {
+    "S0": true,
+    "S1": true,
+    "S2": true,
+    "S3a": true,
+    "S3b": true,
+    "S3c": true,
+    "S3d": true,
+    "S6": true
+   },
+   "full_form_a": {
+    "frozen_sections_sha256_equal": true
+   }
+  },
+  "high": {
+   "copies_are_not_the_tables": true,
+   "stage0_equal": true,
+   "view_equal": true,
+   "yield_equal": true,
+   "manifest_equal": true,
+   "engine_facts_equal": true,
+   "stages": {
+    "S0": true,
+    "S1": true,
+    "S2": true,
+    "S3a": true,
+    "S3b": true,
+    "S3c": true,
+    "S3d": true,
+    "S6": true
+   },
+   "full_form_a": {
+    "frozen_sections_sha256_equal": true
+   }
+  },
+  "blank": {
+   "copies_are_not_the_tables": true,
+   "stage0_equal": true,
+   "view_equal": true,
+   "yield_equal": true,
+   "manifest_equal": true,
+   "engine_facts_equal": true,
+   "stages": {
+    "S0": true,
+    "S1": true,
+    "S2": true,
+    "S3a": true,
+    "S3b": true,
+    "S3c": true,
+    "S3d": true,
+    "S6": true
+   },
+   "full_form_a": {
+    "frozen_sections_sha256_equal": true
+   }
+  }
+ },
+ "frozen_sections_sha256": "93f0bc13cfb72d3446aa7f1de779a2b6ab6c9e78e636f175ea797d6d51f9c5e0",
+ "form": "A+B+C+D",
+ "reference_equals_fit": {
+  "S1": true,
+  "S3a": true,
+  "S3b": true,
+  "S3c": true,
+  "S3d": true
+ },
+ "garbled_contract_view_equal": true,
+ "garbled_contract_yield_equal": true,
+ "all_equal": true
+}

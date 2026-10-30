@@ -1,0 +1,135 @@
+{
+ "schema": "epa-e6/1",
+ "provenance": {
+  "engine": "mazda_25t",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "0147f93a0ae9e4c8e579868d80082f5f2069b914",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "f6489f1b5e7b04833d8d68aaeace1b3241a3cdd8b1bbfc80d276ca0b6d4d3ee3",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "55090f0ad7dee32042656ed727a85962cdea9008678ed95a4c88d12c1f66bd01",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "9b6cb463c857597010dfbf64928c3dbf9b7e03a22a7abc32b40d73436ef8573b",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "f86baf59389dea29",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "ab057944b7fb4eeea0d789122a98c1c6d0b6d6fd2e5dae58df88627191d80449",
+    "epa_highload_initial.csv": "0540e533faddcada2cbbbc2917b33ace30114bf70b862196a9ec96f29d2dfeef",
+    "epa_steady.csv": "ab71a0087ee32fabfa21ae1a764015837b54ad531ad2017f38ccf59048286bfc"
+   },
+   "epa_engine_sha256": "cf5fc265d9a6324db9d7b8ceeaac5c75dd46db8dab06efa073fa67113bc1495e",
+   "epa_channels_blob": "a1c5627aa7468af13f28ea71ed2b6d92f3afbb13",
+   "manifest_sha256": "baccffe344e4b40b70ea26def9f26aacabe6f39798db11968c22b6061ce5c1e8"
+  },
+  "view_sha256": "881245bd5ce7693642022627dd40e7f6c77b4981c4090e5a55c2250ec8ae3574",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "row": 7,
+ "variant": "7_110",
+ "conventions": null,
+ "knock_factor": 1.1,
+ "form": "A+B+C+D",
+ "values": {
+  "cycle": {
+   "form": "A+B+C+D",
+   "ve_base": 0.7444151323834518,
+   "ve_amp": -0.08238753219070513,
+   "ve_rpm": 2018.3918620177717,
+   "ve_width": 1023.4159620348435,
+   "ve_map": 0.0006723907854062405,
+   "ve_cam": -0.004999999999999999,
+   "ce_rich_slope": 0.43470705817534516,
+   "burn_base": 12.445703638229,
+   "burn_rpm": 6.827550684419868e-05,
+   "delay_base": 7.582700663269618,
+   "delay_rpm": 0.0015544589914829356,
+   "fmep_0": -0.339252157698658,
+   "fmep_pmax": 0.016462307039596107,
+   "fmep_sp": -0.004176217878408093,
+   "fmep_sp2": 0.005043994713743015,
+   "ua_port": 21.82566464671676,
+   "exh_bp_ratio": 1.116931336159627,
+   "exh_bp_min_kpa": 104.99154559900494,
+   "knock_a": 0.014126077322322265
+  },
+  "ecu": {
+   "spark_a": 35.954999069293535,
+   "spark_b": -0.001459918173288171,
+   "spark_c": -0.028321168068907915,
+   "spark_min": -12.0,
+   "spark_max": 36.0,
+   "kl_a": 58.65590956202513,
+   "kl_b": 0.007485158786960206,
+   "kl_c": -0.6686876669373807,
+   "kl_d": 1.395628189597495,
+   "enr_load": 196.0,
+   "enr_rpm_lo": 800.0,
+   "enr_rpm_hi": 3000.0,
+   "enr_depth": 0.24452660323836126,
+   "cam_on": 1,
+   "cam_c0": -13.777895855953643,
+   "cam_c_rpm": 13.769855040084984,
+   "cam_c_map": -41.50362443336256,
+   "cam_c_rpm2": -2.8719155167649024,
+   "cam_c_rpm_map": 8.190631226582376,
+   "cam_c_map2": -2.4332753126460203,
+   "cam_rpm_lo": 1300.988847583643,
+   "cam_rpm_hi": 5001.0,
+   "cam_map_lo": 20.14,
+   "cam_map_hi": 239.9832111000991,
+   "cam_lo": -74.269,
+   "cam_hi": -0.298
+  },
+  "boost_ceiling": {
+   "envelope_flow": [
+    0.0,
+    0.06029521621081593,
+    0.07732254817884958,
+    0.1012295315748345,
+    0.11328502340242756,
+    0.13250044450942067,
+    0.13553328010100607,
+    0.15389947634399348,
+    0.19584587254008576
+   ],
+   "envelope_pr": [
+    1.0,
+    1.5928805230167593,
+    1.9822410069137195,
+    2.1619457322377733,
+    2.197293926887641,
+    1.817230821939137,
+    2.2180957034547633,
+    2.4167493564964664,
+    2.3035735393657197
+   ],
+   "pr_cap": 2.4167493564964664
+  }
+ },
+ "frozen_sections_sha256": "ed91e68919e585765f9a970bcc60db810323b3f0f18b6f18ab9004182d7a8460",
+ "fit": null
+}

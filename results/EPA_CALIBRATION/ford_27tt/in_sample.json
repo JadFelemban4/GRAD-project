@@ -1,0 +1,5608 @@
+{
+ "schema": "epa-in-sample/1",
+ "provenance": {
+  "engine": "ford_27tt",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "cec3e3faefe47172",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final_hd1.csv": "b10b3020475f41e8d966f4f0c479b4be40431eb2ac154e86c5e7632c21df59d0",
+    "epa_highload_initial_hd1.csv": "1425452fe85157182f51273206a881ed1022b551893903d0fb22461a4b659d1a",
+    "epa_steady_cell9.csv": "7f42d0e89ed63aba971f395e93325debb81c94b3e4b1db043c502ef16d2af91a",
+    "epa_steady_hd1.csv": "9b2abbe1dfc316b824072f7a8b8b2f5968d1e8fd111a357d0e9a4520eac116fd"
+   },
+   "epa_engine_sha256": "8d353903bd48af4d452392164b0fe44a07d11e898aa764dc53f9748aedbda64b",
+   "epa_channels_blob": "4d4c82c7c64a08b54cc4d5ed78324b8a87986dae",
+   "manifest_sha256": "f70b408bcaf5548f692d3f9f06a6559861f58e503fc5cd29b3c6ffce4acf258c"
+  },
+  "view_sha256": "cf819c7e7fcc7e7aff95a3e1f159af8ecb93408086fcb5a3323f6362d73b6762",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "criterion": "each engine's form is the first of A, A+B, A+B+C, A+B+C+D at which no in-sample statistic but E8 fails. A statistic fails a form only if |E_cal| - 2 u_stat > R, on its pooled value or on any of its deciding lines, u_stat the standard error the held-out rows compute (the standard error of the mean with one row or hold per cluster, the pooled u_stat for pooled rows, L0 at its maximising f, L1 from its two extreme lines); it passes if it does not fail and its pooled value or some deciding line has 2 u_stat <= R; otherwise (2 u_stat > R, or u_stat undefined) it neither blocks a form nor passes it, recorded per form, as a statistic with no calibration line that meets its population's line minimum neither blocks nor passes (contract section 2.4; JSON model_form.in_sample_rules: decisions 39(a), 49, 55; decision 77, 23 October 2026; L1 at its untightened R, decision 71)",
+ "forms": {
+  "A": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": -25.60249406436876,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "5500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -25.60249406436876,
+      "spark_sentinel": -25.60249406436876
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -22.582473380011493,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -22.466495756325834,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": -20.043998481847577,
+       "clusters": 7
+      },
+      "2750": {
+       "E": -19.097669540897407,
+       "clusters": 5
+      },
+      "3000": {
+       "E": -21.36366445142363,
+       "clusters": 9
+      },
+      "4000": {
+       "E": -22.984042048826257,
+       "clusters": 6
+      },
+      "4500": {
+       "E": -25.56408922727697,
+       "clusters": 3
+      },
+      "5500": {
+       "E": -25.60249406436876,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 0.40144029196942443,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R; 3000: |E_cal| - 2 u_stat > R; 4000: |E_cal| - 2 u_stat > R; 4500: |E_cal| - 2 u_stat > R; 5500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -22.582473380011493,
+       "u_stat": 0.370084528224131,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -22.466495756325834,
+       "u_stat": 0.5253929056804242,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": -20.043998481847577,
+       "u_stat": 1.1206857288333727,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": -19.097669540897407,
+       "u_stat": 1.3370529751786768,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3000": {
+       "E": -21.36366445142363,
+       "u_stat": 1.5913134714862187,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4000": {
+       "E": -22.984042048826257,
+       "u_stat": 1.914839015474757,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4500": {
+       "E": -25.56408922727697,
+       "u_stat": 1.1545751645556561,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "5500": {
+       "E": -25.60249406436876,
+       "u_stat": 0.40144029196942443,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": -24.42833428170056,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "1750/1800",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -24.42833428170056,
+      "spark_sentinel": -24.42833428170056
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -23.774610808882773,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -24.42833428170056,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": -21.40703164918022,
+       "clusters": 7
+      },
+      "2750": {
+       "E": -18.99064356898333,
+       "clusters": 5
+      },
+      "3000": {
+       "E": -20.623565058045155,
+       "clusters": 9
+      },
+      "4000": {
+       "E": -14.669665576877437,
+       "clusters": 6
+      },
+      "4500": {
+       "E": -14.243318801602788,
+       "clusters": 3
+      },
+      "5500": {
+       "E": -11.290632106991938,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 0.8608235991729852,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R; 3000: |E_cal| - 2 u_stat > R; 4000: |E_cal| - 2 u_stat > R; 4500: |E_cal| - 2 u_stat > R; 5500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -23.774610808882773,
+       "u_stat": 0.4238819901972665,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -24.42833428170056,
+       "u_stat": 0.8608235991729852,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": -21.40703164918022,
+       "u_stat": 1.685559103592539,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": -18.99064356898333,
+       "u_stat": 2.0986881849029126,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3000": {
+       "E": -20.623565058045155,
+       "u_stat": 1.5192921583841672,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4000": {
+       "E": -14.669665576877437,
+       "u_stat": 0.9784882146276224,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4500": {
+       "E": -14.243318801602788,
+       "u_stat": 0.2868619240501244,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "5500": {
+       "E": -11.290632106991938,
+       "u_stat": 2.4268545838520503,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 40.8453757595733,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "2200/2250",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 40.8453757595733,
+      "spark_sentinel": 40.8453757595733
+     },
+     "extra": {},
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 23.75511154560172,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 37.681771185530025,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 40.8453757595733,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 39.043928575404976,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 37.1219759265454,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 17.528088063662608,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 4.328276037278711,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R; 3000: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 23.75511154560172,
+       "u_stat": 1.338413941795204,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 37.681771185530025,
+       "u_stat": 2.608075809072124,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 40.8453757595733,
+       "u_stat": 4.328276037278711,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 39.043928575404976,
+       "u_stat": 4.797448637011981,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3000": {
+       "E": 37.1219759265454,
+       "u_stat": 6.6405400434130675,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": -57.84280242216952,
+     "deciding": [
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "5500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -57.84280242216952,
+      "spark_sentinel": -57.84280242216952
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 14,
+     "n_clusters": 14,
+     "lines": {
+      "2200/2250": {
+       "E": 34.3048776899052,
+       "clusters": 1
+      },
+      "2750": {
+       "E": 21.173902992862963,
+       "clusters": 1
+      },
+      "3000": {
+       "E": 16.53717174430716,
+       "clusters": 2
+      },
+      "4000": {
+       "E": -22.342211115600605,
+       "clusters": 4
+      },
+      "4500": {
+       "E": -33.176830218018345,
+       "clusters": 3
+      },
+      "5500": {
+       "E": -57.84280242216952,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 1.7168370419824124,
+     "outcome": "fails",
+     "why": "4000: |E_cal| - 2 u_stat > R; 4500: |E_cal| - 2 u_stat > R; 5500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "4000": {
+       "E": -22.342211115600605,
+       "u_stat": 3.58176612685168,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4500": {
+       "E": -33.176830218018345,
+       "u_stat": 2.19887671294352,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "5500": {
+       "E": -57.84280242216952,
+       "u_stat": 1.7168370419824124,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": 81.44183903517472,
+     "deciding": [
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 81.44183903517472,
+      "spark_sentinel": 81.44183903517472
+     },
+     "extra": {
+      "sum_L_S_k": 468.4925726520212,
+      "sum_data_lever_k": 258.2053704609983,
+      "extrapolation_kpa": {
+       "2200/2250": 16.19999999999999,
+       "2750": 21.600000000000023,
+       "3000": 24.7210249129877,
+       "4000": 52.8116455696202
+      },
+      "extrapolation_below_kpa": {
+       "2200/2250": 0.0,
+       "2750": 0.0,
+       "3000": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 8,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 34,
+     "n_clusters": 34,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 0
+      },
+      "1750/1800": {
+       "E": null,
+       "clusters": 0
+      },
+      "2200/2250": {
+       "E": null,
+       "clusters": 1
+      },
+      "2400": {
+       "E": null,
+       "clusters": 0
+      },
+      "2600": {
+       "E": null,
+       "clusters": 0
+      },
+      "2750": {
+       "E": null,
+       "clusters": 1
+      },
+      "3000": {
+       "E": null,
+       "clusters": 2
+      },
+      "4000": {
+       "E": null,
+       "clusters": 4
+      },
+      "4500": {
+       "E": null,
+       "clusters": 3
+      },
+      "5500": {
+       "E": null,
+       "clusters": 3
+      }
+     },
+     "passes": null,
+     "u_stat": 88.96507642976641,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": 81.44183903517472,
+       "u_stat": 88.96507642976641,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 40.74145053797541,
+     "deciding": [
+      "1000",
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2400",
+      "2600",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 40.74145053797541,
+      "spark_sentinel": 40.74145053797541,
+      "unreachable": 8.937455042720714
+     },
+     "extra": {
+      "unreachable": [
+       [
+        "epa_steady_cell9.csv",
+        14
+       ],
+       [
+        "epa_steady_cell9.csv",
+        39
+       ],
+       [
+        "epa_steady_cell9.csv",
+        40
+       ],
+       [
+        "epa_steady_cell9.csv",
+        41
+       ],
+       [
+        "epa_steady_cell9.csv",
+        42
+       ],
+       [
+        "epa_steady_cell9.csv",
+        43
+       ],
+       [
+        "epa_steady_cell9.csv",
+        55
+       ],
+       [
+        "epa_steady_cell9.csv",
+        56
+       ],
+       [
+        "epa_steady_cell9.csv",
+        57
+       ],
+       [
+        "epa_steady_cell9.csv",
+        58
+       ],
+       [
+        "epa_steady_cell9.csv",
+        59
+       ],
+       [
+        "epa_steady_cell9.csv",
+        60
+       ],
+       [
+        "epa_steady_cell9.csv",
+        93
+       ],
+       [
+        "epa_steady_cell9.csv",
+        94
+       ],
+       [
+        "epa_steady_cell9.csv",
+        95
+       ],
+       [
+        "epa_steady_cell9.csv",
+        96
+       ],
+       [
+        "epa_steady_cell9.csv",
+        97
+       ],
+       [
+        "epa_steady_cell9.csv",
+        127
+       ],
+       [
+        "epa_steady_cell9.csv",
+        128
+       ],
+       [
+        "epa_steady_cell9.csv",
+        129
+       ],
+       [
+        "epa_steady_cell9.csv",
+        130
+       ],
+       [
+        "epa_steady_cell9.csv",
+        131
+       ],
+       [
+        "epa_steady_cell9.csv",
+        144
+       ],
+       [
+        "epa_steady_cell9.csv",
+        145
+       ],
+       [
+        "epa_steady_cell9.csv",
+        146
+       ],
+       [
+        "epa_steady_cell9.csv",
+        172
+       ],
+       [
+        "epa_steady_cell9.csv",
+        185
+       ],
+       [
+        "epa_steady_hd1.csv",
+        9
+       ],
+       [
+        "epa_steady_hd1.csv",
+        10
+       ],
+       [
+        "epa_steady_hd1.csv",
+        11
+       ],
+       [
+        "epa_steady_hd1.csv",
+        15
+       ],
+       [
+        "epa_steady_hd1.csv",
+        16
+       ],
+       [
+        "epa_steady_hd1.csv",
+        17
+       ],
+       [
+        "epa_steady_hd1.csv",
+        21
+       ],
+       [
+        "epa_steady_hd1.csv",
+        22
+       ],
+       [
+        "epa_steady_hd1.csv",
+        28
+       ],
+       [
+        "epa_steady_hd1.csv",
+        29
+       ],
+       [
+        "epa_steady_hd1.csv",
+        55
+       ],
+       [
+        "epa_steady_hd1.csv",
+        56
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        6
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        7
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        8
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        13
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        14
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        15
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        16
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        17
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        18
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        22
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        23
+       ],
+       [
+        "epa_highload_final_hd1.csv",
+        24
+       ]
+      ],
+      "n_unreachable": 51,
+      "bounds_kpa": [
+       20.0,
+       400.0
+      ]
+     },
+     "n_rows": 143,
+     "n_clusters": 143,
+     "lines": {
+      "1000": {
+       "E": 39.09569586760009,
+       "clusters": 12
+      },
+      "1500": {
+       "E": 46.44356466023669,
+       "clusters": 19
+      },
+      "1750/1800": {
+       "E": 45.084919867668034,
+       "clusters": 18
+      },
+      "2200/2250": {
+       "E": 43.3935184845614,
+       "clusters": 17
+      },
+      "2400": {
+       "E": 9.156174986985528,
+       "clusters": 6
+      },
+      "2600": {
+       "E": 3.35059716291977,
+       "clusters": 5
+      },
+      "2750": {
+       "E": 46.197400100959186,
+       "clusters": 13
+      },
+      "3000": {
+       "E": 39.357489409214196,
+       "clusters": 20
+      },
+      "4000": {
+       "E": 34.02299682162967,
+       "clusters": 15
+      },
+      "4500": {
+       "E": 44.33698822337102,
+       "clusters": 13
+      },
+      "5500": {
+       "E": 75.82023033153672,
+       "clusters": 5
+      }
+     },
+     "passes": false,
+     "u_stat": 3.8735682734536727,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": 40.74145053797541,
+       "u_stat": 3.8735682734536727,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 646.1164418859324,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "2750",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 646.1164418859324,
+      "spark_sentinel": 646.1164418859324
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 25.645713495813613,
+        "deltabar": 0.05698184498381614,
+        "f_star": 0.7295633595608165,
+        "H_k": 29.73091311769474
+       },
+       "1750/1800": {
+        "ebar_k": 553.7594225093679,
+        "deltabar": 0.8804646157960062,
+        "f_star": 0.8207993756862136,
+        "H_k": 581.4758119969534
+       },
+       "2200/2250": {
+        "ebar_k": 554.8637882460073,
+        "deltabar": 1.0264149823945097,
+        "f_star": 0.7757323311019616,
+        "H_k": 605.4697907095385
+       },
+       "2750": {
+        "ebar_k": 562.8394523308292,
+        "deltabar": 1.2173366155425707,
+        "f_star": 0.7358295049012634,
+        "H_k": 646.1164418859324
+       },
+       "3000": {
+        "ebar_k": 461.37314644416676,
+        "deltabar": 0.8717281753382087,
+        "f_star": 0.7699575778501334,
+        "H_k": 506.59440638136084
+       },
+       "4000": {
+        "ebar_k": 141.41866798345495,
+        "deltabar": 0.1584460895468114,
+        "f_star": 0.9552495336957847,
+        "H_k": 141.72971236941413
+       }
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 29.73091311769474,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 581.4758119969534,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 605.4697907095385,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 646.1164418859324,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 506.59440638136084,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 141.72971236941413,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 40.329695349999824,
+     "outcome": "fails",
+     "why": "1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R; 3000: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 29.73091311769474,
+       "u_stat": 263.043423067575,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 581.4758119969534,
+       "u_stat": 19.660214619205266,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 605.4697907095385,
+       "u_stat": 27.644357827908134,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 646.1164418859324,
+       "u_stat": 40.329695349999824,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3000": {
+       "E": 506.59440638136084,
+       "u_stat": 96.72592901044835,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 616.3878296962931,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 616.3878296962931,
+      "spark_sentinel": 616.3878296962931
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 0.736137218138193,
+      "extreme_lines": [
+       "2750",
+       "1500"
+      ],
+      "H_at_f_star": {
+       "1500": 29.72849919736384,
+       "1750/1800": 575.2894364173874,
+       "2200/2250": 603.8923542766984,
+       "2750": 646.116328893657,
+       "3000": 505.6169818386598
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 29.72849919736384,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 575.2894364173874,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 603.8923542766984,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 646.116328893657,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 505.6169818386598,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 266.4328987396266,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 616.3878296962931,
+       "u_stat": 266.4328987396266,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "E4a",
+    "D1",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 157.28671191674715,
+    "deciding": [
+     "3000",
+     "4000",
+     "4500",
+     "5500"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 157.28671191674715,
+     "spark_sentinel": 157.28671191674715,
+     "censored": 157.28671191674715
+    },
+    "extra": {
+     "n_final": 13,
+     "n_dl": 13,
+     "n_ds": 13,
+     "dl": 0.021388499960565483,
+     "ds": -15.34176251775687,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.021388499960565483,
+       "P": -0.44251552543005124,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 13
+      },
+      "spark": {
+       "shift": -15.34176251775687,
+       "P": 1.1303515937374202,
+       "extrapolated": true,
+       "slope": -0.0755966030117392,
+       "rows": 13
+      }
+     },
+     "every_final_row": {
+      "dl": 0.021388499960565483,
+      "ds": -15.34176251775687,
+      "E_pct": 157.28671191674715
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.021388499960565483,
+     "snapped": {
+      "dl": 0.020412447710928358,
+      "E_pct": 156.01252976225328,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "3000": {
+       "model_kpa": null,
+       "epa_kpa": 183.24610169491527
+      },
+      "4000": {
+       "model_kpa": 165.99365853658537,
+       "epa_kpa": 165.99365853658537
+      },
+      "4500": {
+       "model_kpa": 154.76102040816335,
+       "epa_kpa": 154.76102040816335
+      },
+      "5500": {
+       "model_kpa": 145.41204301075263,
+       "epa_kpa": 145.41204301075263
+      }
+     }
+    },
+    "n_rows": 13,
+    "n_clusters": 13,
+    "lines": {
+     "3000": {
+      "E": null,
+      "clusters": 3
+     },
+     "4000": {
+      "E": null,
+      "clusters": 4
+     },
+     "4500": {
+      "E": null,
+      "clusters": 3
+     },
+     "5500": {
+      "E": null,
+      "clusters": 3
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 40.8453757595733,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "2200/2250",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 40.8453757595733,
+       "spark_sentinel": 40.8453757595733
+      },
+      "extra": {},
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 23.75511154560172,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 37.681771185530025,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 40.8453757595733,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 39.043928575404976,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 32.41863990687321,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 4.328276037278711,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R; 3000: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 23.75511154560172,
+        "u_stat": 1.338413941795204,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 37.681771185530025,
+        "u_stat": 2.608075809072124,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 40.8453757595733,
+        "u_stat": 4.328276037278711,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 39.043928575404976,
+        "u_stat": 4.797448637011981,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "3000": {
+        "E": 32.41863990687321,
+        "u_stat": 6.051914621867824,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 3,
+      "n_clusters": 3,
+      "lines": {
+       "2200/2250": {
+        "E": 34.3048776899052,
+        "clusters": 1
+       },
+       "2750": {
+        "E": 21.173902992862963,
+        "clusters": 1
+       },
+       "4000": {
+        "E": -21.84503228624999,
+        "clusters": 1
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 646.1164418859324,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "2750",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 646.1164418859324,
+       "spark_sentinel": 646.1164418859324
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 25.645713495813613,
+         "deltabar": 0.05698184498381614,
+         "f_star": 0.7295633595608165,
+         "H_k": 29.73091311769474
+        },
+        "1750/1800": {
+         "ebar_k": 553.7594225093679,
+         "deltabar": 0.8804646157960062,
+         "f_star": 0.8207993756862136,
+         "H_k": 581.4758119969534
+        },
+        "2200/2250": {
+         "ebar_k": 554.8637882460073,
+         "deltabar": 1.0264149823945097,
+         "f_star": 0.7757323311019616,
+         "H_k": 605.4697907095385
+        },
+        "2750": {
+         "ebar_k": 562.8394523308292,
+         "deltabar": 1.2173366155425707,
+         "f_star": 0.7358295049012634,
+         "H_k": 646.1164418859324
+        },
+        "3000": {
+         "ebar_k": 442.21290182072374,
+         "deltabar": 0.8856519328356209,
+         "f_star": 0.7546787015631068,
+         "H_k": 494.4620597856332
+        }
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 29.73091311769474,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 581.4758119969534,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 605.4697907095385,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 646.1164418859324,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 494.4620597856332,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 40.329695349999824,
+      "outcome": "fails",
+      "why": "1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R; 3000: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 29.73091311769474,
+        "u_stat": 263.043423067575,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 581.4758119969534,
+        "u_stat": 19.660214619205266,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 605.4697907095385,
+        "u_stat": 27.644357827908134,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 646.1164418859324,
+        "u_stat": 40.329695349999824,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "3000": {
+        "E": 494.4620597856332,
+        "u_stat": 124.43272449821471,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": 616.3878296962931,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 616.3878296962931,
+       "spark_sentinel": 616.3878296962931
+      },
+      "extra": {
+       "G_k": 980.27,
+       "f_star": 0.736137218138193,
+       "extreme_lines": [
+        "2750",
+        "1500"
+       ],
+       "H_at_f_star": {
+        "1500": 29.72849919736384,
+        "1750/1800": 575.2894364173874,
+        "2200/2250": 603.8923542766984,
+        "2750": 646.116328893657,
+        "3000": 494.1635918092786
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 29.72849919736384,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 575.2894364173874,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 603.8923542766984,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 646.116328893657,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 494.1635918092786,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 266.4328987396266,
+      "outcome": "fails",
+      "why": "|E_cal| - 2 u_stat > R",
+      "components": {
+       "L1": {
+        "E": 616.3878296962931,
+        "u_stat": 266.4328987396266,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": 37.18274142705484,
+      "deciding": [
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 37.18274142705484,
+       "spark_sentinel": 37.18274142705484
+      },
+      "extra": {
+       "sum_L_S_k": 183.73046753888002,
+       "sum_data_lever_k": 133.9311823248381,
+       "extrapolation_kpa": {
+        "2200/2250": 16.19999999999999,
+        "2750": 21.600000000000023,
+        "3000": 34.966213592232975
+       },
+       "extrapolation_below_kpa": {
+        "2200/2250": 0.0,
+        "2750": 0.0,
+        "3000": 0.0
+       },
+       "enriched_rows": 4,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 26,
+      "n_clusters": 26,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 0
+       },
+       "1750/1800": {
+        "E": null,
+        "clusters": 0
+       },
+       "2200/2250": {
+        "E": null,
+        "clusters": 1
+       },
+       "2400": {
+        "E": null,
+        "clusters": 0
+       },
+       "2600": {
+        "E": null,
+        "clusters": 0
+       },
+       "2750": {
+        "E": null,
+        "clusters": 1
+       },
+       "3000": {
+        "E": null,
+        "clusters": 2
+       },
+       "4000": {
+        "E": null,
+        "clusters": 4
+       },
+       "4500": {
+        "E": null,
+        "clusters": 3
+       },
+       "5500": {
+        "E": null,
+        "clusters": 3
+       }
+      },
+      "passes": null,
+      "u_stat": 41.09946713787323,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "pooled": {
+        "E": 37.18274142705484,
+        "u_stat": 41.09946713787323,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     }
+    }
+   }
+  },
+  "A+B": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": -5.769456146556357,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -5.769456146556357,
+      "spark_sentinel": -5.769456146556357
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -5.769456146556357,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -2.4442296980995124,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": -1.0439894219613,
+       "clusters": 7
+      },
+      "2750": {
+       "E": -0.08382214221826167,
+       "clusters": 5
+      },
+      "3000": {
+       "E": 1.3833598720749258,
+       "clusters": 9
+      },
+      "4000": {
+       "E": -1.9357197974566958,
+       "clusters": 6
+      },
+      "4500": {
+       "E": -2.0752075925573488,
+       "clusters": 3
+      },
+      "5500": {
+       "E": -3.516292938158731,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 0.23390797581217676,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -5.769456146556357,
+       "u_stat": 0.23390797581217676,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -2.4442296980995124,
+       "u_stat": 1.4432175262955418,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": -1.0439894219613,
+       "u_stat": 1.318566766857426,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2750": {
+       "E": -0.08382214221826167,
+       "u_stat": 1.8121219844995393,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 1.3833598720749258,
+       "u_stat": 0.7563803643050079,
+       "outcome": "passes",
+       "why": null
+      },
+      "4000": {
+       "E": -1.9357197974566958,
+       "u_stat": 1.2247131159421778,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4500": {
+       "E": -2.0752075925573488,
+       "u_stat": 3.3274462563045546,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": -3.516292938158731,
+       "u_stat": 5.503021982094948,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": 10.87878725138134,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "4500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 10.87878725138134,
+      "spark_sentinel": 10.87878725138134
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -7.834983457421941,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -5.312893400289505,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": -3.0662674279550957,
+       "clusters": 7
+      },
+      "2750": {
+       "E": -0.13272539482395374,
+       "clusters": 5
+      },
+      "3000": {
+       "E": 2.408697221304247,
+       "clusters": 9
+      },
+      "4000": {
+       "E": 7.973071028597492,
+       "clusters": 6
+      },
+      "4500": {
+       "E": 10.87878725138134,
+       "clusters": 3
+      },
+      "5500": {
+       "E": 9.659577973998706,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 5.338054269244,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -7.834983457421941,
+       "u_stat": 0.38315542470918756,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -5.312893400289505,
+       "u_stat": 0.9781576295837469,
+       "outcome": "passes",
+       "why": null
+      },
+      "2200/2250": {
+       "E": -3.0662674279550957,
+       "u_stat": 1.1598360010681488,
+       "outcome": "passes",
+       "why": null
+      },
+      "2750": {
+       "E": -0.13272539482395374,
+       "u_stat": 1.7533093715695345,
+       "outcome": "passes",
+       "why": null
+      },
+      "3000": {
+       "E": 2.408697221304247,
+       "u_stat": 1.048791792397713,
+       "outcome": "passes",
+       "why": null
+      },
+      "4000": {
+       "E": 7.973071028597492,
+       "u_stat": 2.8630396356582484,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4500": {
+       "E": 10.87878725138134,
+       "u_stat": 5.338054269244,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": 9.659577973998706,
+       "u_stat": 9.01653806890626,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 37.440874320399416,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 37.440874320399416,
+      "spark_sentinel": 37.440874320399416
+     },
+     "extra": {},
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 37.440874320399416,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 37.1460470652217,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 33.21503195252435,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 26.78291581245358,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 18.085754596432867,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 0.9296025962282783,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 1.108987378371492,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 37.440874320399416,
+       "u_stat": 1.108987378371492,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 37.1460470652217,
+       "u_stat": 1.5893713112657473,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 33.21503195252435,
+       "u_stat": 6.155592390710019,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 26.78291581245358,
+       "u_stat": 8.275685695065746,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3000": {
+       "E": 18.085754596432867,
+       "u_stat": 7.027000267261897,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": -94.05712093792367,
+     "deciding": [
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "5500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -94.05712093792367,
+      "spark_sentinel": -94.05712093792367
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 14,
+     "n_clusters": 14,
+     "lines": {
+      "2200/2250": {
+       "E": 6.453590862328156,
+       "clusters": 1
+      },
+      "2750": {
+       "E": -14.253086176273996,
+       "clusters": 1
+      },
+      "3000": {
+       "E": -25.43413791854033,
+       "clusters": 2
+      },
+      "4000": {
+       "E": -61.31368543834688,
+       "clusters": 4
+      },
+      "4500": {
+       "E": -72.30643668497835,
+       "clusters": 3
+      },
+      "5500": {
+       "E": -94.05712093792367,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 9.08481161714806,
+     "outcome": "fails",
+     "why": "4000: |E_cal| - 2 u_stat > R; 4500: |E_cal| - 2 u_stat > R; 5500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "4000": {
+       "E": -61.31368543834688,
+       "u_stat": 10.131144126498357,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4500": {
+       "E": -72.30643668497835,
+       "u_stat": 9.032260018693632,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "5500": {
+       "E": -94.05712093792367,
+       "u_stat": 9.08481161714806,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": 98.48017420716995,
+     "deciding": [
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 98.48017420716995,
+      "spark_sentinel": 98.48017420716995
+     },
+     "extra": {
+      "sum_L_S_k": 455.4326630216966,
+      "sum_data_lever_k": 229.46002785463318,
+      "extrapolation_kpa": {
+       "2200/2250": 16.19999999999999,
+       "2750": 21.600000000000023,
+       "3000": 24.7210249129877,
+       "4000": 52.8116455696202
+      },
+      "extrapolation_below_kpa": {
+       "2200/2250": 0.0,
+       "2750": 0.0,
+       "3000": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 8,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 34,
+     "n_clusters": 34,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 0
+      },
+      "1750/1800": {
+       "E": null,
+       "clusters": 0
+      },
+      "2200/2250": {
+       "E": null,
+       "clusters": 1
+      },
+      "2400": {
+       "E": null,
+       "clusters": 0
+      },
+      "2600": {
+       "E": null,
+       "clusters": 0
+      },
+      "2750": {
+       "E": null,
+       "clusters": 1
+      },
+      "3000": {
+       "E": null,
+       "clusters": 2
+      },
+      "4000": {
+       "E": null,
+       "clusters": 4
+      },
+      "4500": {
+       "E": null,
+       "clusters": 3
+      },
+      "5500": {
+       "E": null,
+       "clusters": 3
+      }
+     },
+     "passes": null,
+     "u_stat": 109.85548857055399,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": 98.48017420716995,
+       "u_stat": 109.85548857055399,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 4.917656007459852,
+     "deciding": [
+      "1000",
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2400",
+      "2600",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 4.917656007459852,
+      "spark_sentinel": 4.917656007459852,
+      "unreachable": 4.917656007459852
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 143,
+     "n_clusters": 143,
+     "lines": {
+      "1000": {
+       "E": 12.593332736266682,
+       "clusters": 12
+      },
+      "1500": {
+       "E": 3.73318981237873,
+       "clusters": 19
+      },
+      "1750/1800": {
+       "E": 3.938342843966327,
+       "clusters": 18
+      },
+      "2200/2250": {
+       "E": 2.738363386936249,
+       "clusters": 17
+      },
+      "2400": {
+       "E": 5.024641270899735,
+       "clusters": 6
+      },
+      "2600": {
+       "E": 2.4737931328603935,
+       "clusters": 5
+      },
+      "2750": {
+       "E": 1.9725906065961611,
+       "clusters": 13
+      },
+      "3000": {
+       "E": 2.797772808480242,
+       "clusters": 20
+      },
+      "4000": {
+       "E": 6.29985139527229,
+       "clusters": 15
+      },
+      "4500": {
+       "E": 7.569956985521535,
+       "clusters": 13
+      },
+      "5500": {
+       "E": 9.341740388226617,
+       "clusters": 5
+      }
+     },
+     "passes": true,
+     "u_stat": 0.5372549296345025,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "pooled": {
+       "E": 4.917656007459852,
+       "u_stat": 0.5372549296345025,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 62.054776132721805,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 62.054776132721805,
+      "spark_sentinel": 62.054776132721805
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 62.054776132721805,
+        "deltabar": 0.0012624037599261635,
+        "f_star": 1.0,
+        "H_k": 62.054776132721805
+       },
+       "1750/1800": {
+        "ebar_k": 46.21311455136489,
+        "deltabar": -0.021444303212555433,
+        "f_star": 1.0,
+        "H_k": 46.21311455136489
+       },
+       "2200/2250": {
+        "ebar_k": 38.86984023978393,
+        "deltabar": -0.016675018255243534,
+        "f_star": 1.0,
+        "H_k": 38.86984023978393
+       },
+       "2750": {
+        "ebar_k": 30.367054552757423,
+        "deltabar": 0.0001915195020887328,
+        "f_star": 1.0,
+        "H_k": 30.367054552757423
+       },
+       "3000": {
+        "ebar_k": 15.985398559869623,
+        "deltabar": -0.0020557044218609153,
+        "f_star": 1.0,
+        "H_k": 15.985398559869623
+       },
+       "4000": {
+        "ebar_k": 6.358402689653076,
+        "deltabar": 0.047077562487159996,
+        "f_star": 0.5688903439725872,
+        "H_k": 14.935398163851833
+       }
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 62.054776132721805,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 46.21311455136489,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 38.86984023978393,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 30.367054552757423,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 15.985398559869623,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 14.935398163851833,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 1.3492126538072147,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 62.054776132721805,
+       "u_stat": 1.3492126538072147,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 46.21311455136489,
+       "u_stat": 5.545595596483609,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 38.86984023978393,
+       "u_stat": 8.832141033142998,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 30.367054552757423,
+       "u_stat": 10.70985206707315,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 15.985398559869623,
+       "u_stat": 8.211203085123376,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 46.06937757285218,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 46.06937757285218,
+      "spark_sentinel": 46.06937757285218
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 1.0,
+      "extreme_lines": [
+       "1500",
+       "3000"
+      ],
+      "H_at_f_star": {
+       "1500": 62.054776132721805,
+       "1750/1800": 46.21311455136489,
+       "2200/2250": 38.86984023978393,
+       "2750": 30.367054552757423,
+       "3000": 15.985398559869623
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 62.054776132721805,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 46.21311455136489,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 38.86984023978393,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 30.367054552757423,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 15.985398559869623,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 8.321311849121697,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 46.06937757285218,
+       "u_stat": 8.321311849121697,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "E4a",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 157.28671191674715,
+    "deciding": [
+     "3000",
+     "4000",
+     "4500",
+     "5500"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 157.28671191674715,
+     "spark_sentinel": 157.28671191674715,
+     "censored": 157.28671191674715
+    },
+    "extra": {
+     "n_final": 13,
+     "n_dl": 13,
+     "n_ds": 13,
+     "dl": 0.021388499960565483,
+     "ds": -15.34176251775687,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.021388499960565483,
+       "P": -0.44251552543005124,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 13
+      },
+      "spark": {
+       "shift": -15.34176251775687,
+       "P": 1.1303515937374202,
+       "extrapolated": true,
+       "slope": -0.0755966030117392,
+       "rows": 13
+      }
+     },
+     "every_final_row": {
+      "dl": 0.021388499960565483,
+      "ds": -15.34176251775687,
+      "E_pct": 157.28671191674715
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.021388499960565483,
+     "snapped": {
+      "dl": 0.020412447710928358,
+      "E_pct": 156.01252976225328,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "3000": {
+       "model_kpa": null,
+       "epa_kpa": 183.24610169491527
+      },
+      "4000": {
+       "model_kpa": 165.99365853658537,
+       "epa_kpa": 165.99365853658537
+      },
+      "4500": {
+       "model_kpa": 154.76102040816335,
+       "epa_kpa": 154.76102040816335
+      },
+      "5500": {
+       "model_kpa": 145.41204301075263,
+       "epa_kpa": 145.41204301075263
+      }
+     }
+    },
+    "n_rows": 13,
+    "n_clusters": 13,
+    "lines": {
+     "3000": {
+      "E": null,
+      "clusters": 3
+     },
+     "4000": {
+      "E": null,
+      "clusters": 4
+     },
+     "4500": {
+      "E": null,
+      "clusters": 3
+     },
+     "5500": {
+      "E": null,
+      "clusters": 3
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 37.440874320399416,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "1500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 37.440874320399416,
+       "spark_sentinel": 37.440874320399416
+      },
+      "extra": {},
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 37.440874320399416,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 37.1460470652217,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 33.21503195252435,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 26.78291581245358,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 16.165292416789185,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 1.108987378371492,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 37.440874320399416,
+        "u_stat": 1.108987378371492,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 37.1460470652217,
+        "u_stat": 1.5893713112657473,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 33.21503195252435,
+        "u_stat": 6.155592390710019,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 26.78291581245358,
+        "u_stat": 8.275685695065746,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "3000": {
+        "E": 16.165292416789185,
+        "u_stat": 8.726450001065439,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 3,
+      "n_clusters": 3,
+      "lines": {
+       "2200/2250": {
+        "E": 6.453590862328156,
+        "clusters": 1
+       },
+       "2750": {
+        "E": -14.253086176273996,
+        "clusters": 1
+       },
+       "4000": {
+        "E": -42.482150613970134,
+        "clusters": 1
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 62.054776132721805,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "1500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 62.054776132721805,
+       "spark_sentinel": 62.054776132721805
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 62.054776132721805,
+         "deltabar": 0.0012624037599261635,
+         "f_star": 1.0,
+         "H_k": 62.054776132721805
+        },
+        "1750/1800": {
+         "ebar_k": 46.21311455136489,
+         "deltabar": -0.021444303212555433,
+         "f_star": 1.0,
+         "H_k": 46.21311455136489
+        },
+        "2200/2250": {
+         "ebar_k": 38.86984023978393,
+         "deltabar": -0.016675018255243534,
+         "f_star": 1.0,
+         "H_k": 38.86984023978393
+        },
+        "2750": {
+         "ebar_k": 30.367054552757423,
+         "deltabar": 0.0001915195020887328,
+         "f_star": 1.0,
+         "H_k": 30.367054552757423
+        },
+        "3000": {
+         "ebar_k": 15.28031604832293,
+         "deltabar": 0.004056199735253646,
+         "f_star": 1.0,
+         "H_k": 15.28031604832293
+        }
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 62.054776132721805,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 46.21311455136489,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 38.86984023978393,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 30.367054552757423,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 15.28031604832293,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 1.3492126538072147,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 62.054776132721805,
+        "u_stat": 1.3492126538072147,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 46.21311455136489,
+        "u_stat": 5.545595596483609,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 38.86984023978393,
+        "u_stat": 8.832141033142998,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 30.367054552757423,
+        "u_stat": 10.70985206707315,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       },
+       "3000": {
+        "E": 15.28031604832293,
+        "u_stat": 10.56146413122179,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": 46.774460084398875,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 46.774460084398875,
+       "spark_sentinel": 46.774460084398875
+      },
+      "extra": {
+       "G_k": 980.27,
+       "f_star": 1.0,
+       "extreme_lines": [
+        "1500",
+        "3000"
+       ],
+       "H_at_f_star": {
+        "1500": 62.054776132721805,
+        "1750/1800": 46.21311455136489,
+        "2200/2250": 38.86984023978393,
+        "2750": 30.367054552757423,
+        "3000": 15.28031604832293
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 62.054776132721805,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 46.21311455136489,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 38.86984023978393,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 30.367054552757423,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 15.28031604832293,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 10.647295402132785,
+      "outcome": "fails",
+      "why": "|E_cal| - 2 u_stat > R",
+      "components": {
+       "L1": {
+        "E": 46.774460084398875,
+        "u_stat": 10.647295402132785,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": 62.20539458933483,
+      "deciding": [
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 62.20539458933483,
+       "spark_sentinel": 62.20539458933483
+      },
+      "extra": {
+       "sum_L_S_k": 179.14080206860717,
+       "sum_data_lever_k": 110.44071778386208,
+       "extrapolation_kpa": {
+        "2200/2250": 16.19999999999999,
+        "2750": 21.600000000000023,
+        "3000": 34.966213592232975
+       },
+       "extrapolation_below_kpa": {
+        "2200/2250": 0.0,
+        "2750": 0.0,
+        "3000": 0.0
+       },
+       "enriched_rows": 4,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 26,
+      "n_clusters": 26,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 0
+       },
+       "1750/1800": {
+        "E": null,
+        "clusters": 0
+       },
+       "2200/2250": {
+        "E": null,
+        "clusters": 1
+       },
+       "2400": {
+        "E": null,
+        "clusters": 0
+       },
+       "2600": {
+        "E": null,
+        "clusters": 0
+       },
+       "2750": {
+        "E": null,
+        "clusters": 1
+       },
+       "3000": {
+        "E": null,
+        "clusters": 2
+       },
+       "4000": {
+        "E": null,
+        "clusters": 4
+       },
+       "4500": {
+        "E": null,
+        "clusters": 3
+       },
+       "5500": {
+        "E": null,
+        "clusters": 3
+       }
+      },
+      "passes": null,
+      "u_stat": 66.69509116486903,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "pooled": {
+        "E": 62.20539458933483,
+        "u_stat": 66.69509116486903,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     }
+    }
+   }
+  },
+  "A+B+C": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": 11.300131965410365,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "5500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 11.300131965410365,
+      "spark_sentinel": 11.300131965410365
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -5.769456146556357,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -2.4442296980995124,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": -0.6744785402429415,
+       "clusters": 7
+      },
+      "2750": {
+       "E": 0.5603500137742268,
+       "clusters": 5
+      },
+      "3000": {
+       "E": 3.185932946312911,
+       "clusters": 9
+      },
+      "4000": {
+       "E": 3.5138744664357424,
+       "clusters": 6
+      },
+      "4500": {
+       "E": 7.535445800390364,
+       "clusters": 3
+      },
+      "5500": {
+       "E": 11.300131965410365,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 8.391808468584122,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -5.769456146556357,
+       "u_stat": 0.23390797581217676,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -2.4442296980995124,
+       "u_stat": 1.4432175262955418,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": -0.6744785402429415,
+       "u_stat": 1.5935738506391677,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2750": {
+       "E": 0.5603500137742268,
+       "u_stat": 2.392895241479975,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 3.185932946312911,
+       "u_stat": 1.2186103417238703,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": 3.5138744664357424,
+       "u_stat": 3.2541009681006448,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4500": {
+       "E": 7.535445800390364,
+       "u_stat": 6.296236202679145,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": 11.300131965410365,
+       "u_stat": 8.391808468584122,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": 10.87878725138134,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "4500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 10.87878725138134,
+      "spark_sentinel": 10.87878725138134
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -7.834983457421941,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -5.312893400289505,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": -3.0662674279550957,
+       "clusters": 7
+      },
+      "2750": {
+       "E": -0.13272539482395374,
+       "clusters": 5
+      },
+      "3000": {
+       "E": 2.408697221304247,
+       "clusters": 9
+      },
+      "4000": {
+       "E": 7.973071028597492,
+       "clusters": 6
+      },
+      "4500": {
+       "E": 10.87878725138134,
+       "clusters": 3
+      },
+      "5500": {
+       "E": 9.659577973998706,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 5.338054269244,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -7.834983457421941,
+       "u_stat": 0.38315542470918756,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -5.312893400289505,
+       "u_stat": 0.9781576295837469,
+       "outcome": "passes",
+       "why": null
+      },
+      "2200/2250": {
+       "E": -3.0662674279550957,
+       "u_stat": 1.1598360010681488,
+       "outcome": "passes",
+       "why": null
+      },
+      "2750": {
+       "E": -0.13272539482395374,
+       "u_stat": 1.7533093715695345,
+       "outcome": "passes",
+       "why": null
+      },
+      "3000": {
+       "E": 2.408697221304247,
+       "u_stat": 1.048791792397713,
+       "outcome": "passes",
+       "why": null
+      },
+      "4000": {
+       "E": 7.973071028597492,
+       "u_stat": 2.8630396356582484,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4500": {
+       "E": 10.87878725138134,
+       "u_stat": 5.338054269244,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": 9.659577973998706,
+       "u_stat": 9.01653806890626,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 37.440874320399416,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 37.440874320399416,
+      "spark_sentinel": 37.440874320399416
+     },
+     "extra": {},
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 37.440874320399416,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 37.1460470652217,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 33.21503195252435,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 26.78291581245358,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 18.085754596432867,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 0.9296025962282783,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 1.108987378371492,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 37.440874320399416,
+       "u_stat": 1.108987378371492,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 37.1460470652217,
+       "u_stat": 1.5893713112657473,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 33.21503195252435,
+       "u_stat": 6.155592390710019,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 26.78291581245358,
+       "u_stat": 8.275685695065746,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3000": {
+       "E": 18.085754596432867,
+       "u_stat": 7.027000267261897,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": -8.54307465181364,
+     "deciding": [
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "4000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -8.54307465181364,
+      "spark_sentinel": -8.54307465181364
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 14,
+     "n_clusters": 14,
+     "lines": {
+      "2200/2250": {
+       "E": 24.54771337938132,
+       "clusters": 1
+      },
+      "2750": {
+       "E": 7.846227233426021,
+       "clusters": 1
+      },
+      "3000": {
+       "E": 18.858369505149255,
+       "clusters": 2
+      },
+      "4000": {
+       "E": -8.54307465181364,
+       "clusters": 4
+      },
+      "4500": {
+       "E": -8.085974457259605,
+       "clusters": 3
+      },
+      "5500": {
+       "E": 1.6863807715811465,
+       "clusters": 3
+      }
+     },
+     "passes": true,
+     "u_stat": 4.746299690815894,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "4000": {
+       "E": -8.54307465181364,
+       "u_stat": 4.746299690815894,
+       "outcome": "passes",
+       "why": null
+      },
+      "4500": {
+       "E": -8.085974457259605,
+       "u_stat": 8.755853596011205,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": 1.6863807715811465,
+       "u_stat": 4.064874622001868,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": -49.63315825331984,
+     "deciding": [
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -49.63315825331984,
+      "spark_sentinel": -49.63315825331984
+     },
+     "extra": {
+      "sum_L_S_k": 115.5717691014313,
+      "sum_data_lever_k": 229.46002785463318,
+      "extrapolation_kpa": {
+       "2200/2250": 16.19999999999999,
+       "2750": 21.600000000000023,
+       "3000": 24.7210249129877,
+       "4000": 52.8116455696202
+      },
+      "extrapolation_below_kpa": {
+       "2200/2250": 0.0,
+       "2750": 0.0,
+       "3000": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 8,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 34,
+     "n_clusters": 34,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 0
+      },
+      "1750/1800": {
+       "E": null,
+       "clusters": 0
+      },
+      "2200/2250": {
+       "E": null,
+       "clusters": 1
+      },
+      "2400": {
+       "E": null,
+       "clusters": 0
+      },
+      "2600": {
+       "E": null,
+       "clusters": 0
+      },
+      "2750": {
+       "E": null,
+       "clusters": 1
+      },
+      "3000": {
+       "E": null,
+       "clusters": 2
+      },
+      "4000": {
+       "E": null,
+       "clusters": 4
+      },
+      "4500": {
+       "E": null,
+       "clusters": 3
+      },
+      "5500": {
+       "E": null,
+       "clusters": 3
+      }
+     },
+     "passes": null,
+     "u_stat": 28.810080465821013,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": -49.63315825331984,
+       "u_stat": 28.810080465821013,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 4.171168961414652,
+     "deciding": [
+      "1000",
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2400",
+      "2600",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 4.171168961414652,
+      "spark_sentinel": 4.171168961414652,
+      "unreachable": 4.171168961414652
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 143,
+     "n_clusters": 143,
+     "lines": {
+      "1000": {
+       "E": 12.593332736266682,
+       "clusters": 12
+      },
+      "1500": {
+       "E": 3.73318981237873,
+       "clusters": 19
+      },
+      "1750/1800": {
+       "E": 3.938342843966327,
+       "clusters": 18
+      },
+      "2200/2250": {
+       "E": 2.9101821626162248,
+       "clusters": 17
+      },
+      "2400": {
+       "E": 5.024641270899735,
+       "clusters": 6
+      },
+      "2600": {
+       "E": 2.4737931328603935,
+       "clusters": 5
+      },
+      "2750": {
+       "E": 2.2241707895860126,
+       "clusters": 13
+      },
+      "3000": {
+       "E": 2.447954110144763,
+       "clusters": 20
+      },
+      "4000": {
+       "E": 4.009182883888299,
+       "clusters": 15
+      },
+      "4500": {
+       "E": 4.767406086291627,
+       "clusters": 13
+      },
+      "5500": {
+       "E": 2.3118312237400107,
+       "clusters": 5
+      }
+     },
+     "passes": true,
+     "u_stat": 0.502626323037486,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "pooled": {
+       "E": 4.171168961414652,
+       "u_stat": 0.502626323037486,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 62.054776132721805,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 62.054776132721805,
+      "spark_sentinel": 62.054776132721805
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 62.054776132721805,
+        "deltabar": 0.0012624037599261635,
+        "f_star": 1.0,
+        "H_k": 62.054776132721805
+       },
+       "1750/1800": {
+        "ebar_k": 46.21311455136489,
+        "deltabar": -0.021444303212555433,
+        "f_star": 1.0,
+        "H_k": 46.21311455136489
+       },
+       "2200/2250": {
+        "ebar_k": 38.86984023978393,
+        "deltabar": -0.016675018255243534,
+        "f_star": 1.0,
+        "H_k": 38.86984023978393
+       },
+       "2750": {
+        "ebar_k": 30.367054552757423,
+        "deltabar": 0.0001915195020887328,
+        "f_star": 1.0,
+        "H_k": 30.367054552757423
+       },
+       "3000": {
+        "ebar_k": 15.985398559869623,
+        "deltabar": -0.0020557044218609153,
+        "f_star": 1.0,
+        "H_k": 15.985398559869623
+       },
+       "4000": {
+        "ebar_k": 6.358402689653076,
+        "deltabar": 0.047077562487159996,
+        "f_star": 0.5688903439725872,
+        "H_k": 14.935398163851833
+       }
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 62.054776132721805,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 46.21311455136489,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 38.86984023978393,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 30.367054552757423,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 15.985398559869623,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 14.935398163851833,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 1.3492126538072147,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 62.054776132721805,
+       "u_stat": 1.3492126538072147,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 46.21311455136489,
+       "u_stat": 5.545595596483609,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 38.86984023978393,
+       "u_stat": 8.832141033142998,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 30.367054552757423,
+       "u_stat": 10.70985206707315,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 15.985398559869623,
+       "u_stat": 8.211203085123376,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 46.06937757285218,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 46.06937757285218,
+      "spark_sentinel": 46.06937757285218
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 1.0,
+      "extreme_lines": [
+       "1500",
+       "3000"
+      ],
+      "H_at_f_star": {
+       "1500": 62.054776132721805,
+       "1750/1800": 46.21311455136489,
+       "2200/2250": 38.86984023978393,
+       "2750": 30.367054552757423,
+       "3000": 15.985398559869623
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 62.054776132721805,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 46.21311455136489,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 38.86984023978393,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 30.367054552757423,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 15.985398559869623,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 8.321311849121697,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 46.06937757285218,
+       "u_stat": 8.321311849121697,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 157.28671191674715,
+    "deciding": [
+     "3000",
+     "4000",
+     "4500",
+     "5500"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 157.28671191674715,
+     "spark_sentinel": 157.28671191674715,
+     "censored": 157.28671191674715
+    },
+    "extra": {
+     "n_final": 13,
+     "n_dl": 13,
+     "n_ds": 13,
+     "dl": 0.021388499960565483,
+     "ds": -15.34176251775687,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.021388499960565483,
+       "P": -0.44251552543005124,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 13
+      },
+      "spark": {
+       "shift": -15.34176251775687,
+       "P": 1.1303515937374202,
+       "extrapolated": true,
+       "slope": -0.0755966030117392,
+       "rows": 13
+      }
+     },
+     "every_final_row": {
+      "dl": 0.021388499960565483,
+      "ds": -15.34176251775687,
+      "E_pct": 157.28671191674715
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.021388499960565483,
+     "snapped": {
+      "dl": 0.020412447710928358,
+      "E_pct": 156.01252976225328,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "3000": {
+       "model_kpa": null,
+       "epa_kpa": 183.24610169491527
+      },
+      "4000": {
+       "model_kpa": 165.99365853658537,
+       "epa_kpa": 165.99365853658537
+      },
+      "4500": {
+       "model_kpa": 154.76102040816335,
+       "epa_kpa": 154.76102040816335
+      },
+      "5500": {
+       "model_kpa": 145.41204301075263,
+       "epa_kpa": 145.41204301075263
+      }
+     }
+    },
+    "n_rows": 13,
+    "n_clusters": 13,
+    "lines": {
+     "3000": {
+      "E": null,
+      "clusters": 3
+     },
+     "4000": {
+      "E": null,
+      "clusters": 4
+     },
+     "4500": {
+      "E": null,
+      "clusters": 3
+     },
+     "5500": {
+      "E": null,
+      "clusters": 3
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 37.440874320399416,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "1500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 37.440874320399416,
+       "spark_sentinel": 37.440874320399416
+      },
+      "extra": {},
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 37.440874320399416,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 37.1460470652217,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 33.21503195252435,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 26.78291581245358,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 16.165292416789185,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 1.108987378371492,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R; 2750: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 37.440874320399416,
+        "u_stat": 1.108987378371492,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 37.1460470652217,
+        "u_stat": 1.5893713112657473,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 33.21503195252435,
+        "u_stat": 6.155592390710019,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 26.78291581245358,
+        "u_stat": 8.275685695065746,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "3000": {
+        "E": 16.165292416789185,
+        "u_stat": 8.726450001065439,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 3,
+      "n_clusters": 3,
+      "lines": {
+       "2200/2250": {
+        "E": 24.54771337938132,
+        "clusters": 1
+       },
+       "2750": {
+        "E": 7.846227233426021,
+        "clusters": 1
+       },
+       "4000": {
+        "E": -16.529491807314116,
+        "clusters": 1
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 62.054776132721805,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "1500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 62.054776132721805,
+       "spark_sentinel": 62.054776132721805
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 62.054776132721805,
+         "deltabar": 0.0012624037599261635,
+         "f_star": 1.0,
+         "H_k": 62.054776132721805
+        },
+        "1750/1800": {
+         "ebar_k": 46.21311455136489,
+         "deltabar": -0.021444303212555433,
+         "f_star": 1.0,
+         "H_k": 46.21311455136489
+        },
+        "2200/2250": {
+         "ebar_k": 38.86984023978393,
+         "deltabar": -0.016675018255243534,
+         "f_star": 1.0,
+         "H_k": 38.86984023978393
+        },
+        "2750": {
+         "ebar_k": 30.367054552757423,
+         "deltabar": 0.0001915195020887328,
+         "f_star": 1.0,
+         "H_k": 30.367054552757423
+        },
+        "3000": {
+         "ebar_k": 15.28031604832293,
+         "deltabar": 0.004056199735253646,
+         "f_star": 1.0,
+         "H_k": 15.28031604832293
+        }
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 62.054776132721805,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 46.21311455136489,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 38.86984023978393,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 30.367054552757423,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 15.28031604832293,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 1.3492126538072147,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 62.054776132721805,
+        "u_stat": 1.3492126538072147,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 46.21311455136489,
+        "u_stat": 5.545595596483609,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 38.86984023978393,
+        "u_stat": 8.832141033142998,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 30.367054552757423,
+        "u_stat": 10.70985206707315,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       },
+       "3000": {
+        "E": 15.28031604832293,
+        "u_stat": 10.56146413122179,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": 46.774460084398875,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 46.774460084398875,
+       "spark_sentinel": 46.774460084398875
+      },
+      "extra": {
+       "G_k": 980.27,
+       "f_star": 1.0,
+       "extreme_lines": [
+        "1500",
+        "3000"
+       ],
+       "H_at_f_star": {
+        "1500": 62.054776132721805,
+        "1750/1800": 46.21311455136489,
+        "2200/2250": 38.86984023978393,
+        "2750": 30.367054552757423,
+        "3000": 15.28031604832293
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 62.054776132721805,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 46.21311455136489,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 38.86984023978393,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 30.367054552757423,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 15.28031604832293,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 10.647295402132785,
+      "outcome": "fails",
+      "why": "|E_cal| - 2 u_stat > R",
+      "components": {
+       "L1": {
+        "E": 46.774460084398875,
+        "u_stat": 10.647295402132785,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": -54.39874685255449,
+      "deciding": [
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": -54.39874685255449,
+       "spark_sentinel": -54.39874685255449
+      },
+      "extra": {
+       "sum_L_S_k": 50.36235129447482,
+       "sum_data_lever_k": 110.44071778386208,
+       "extrapolation_kpa": {
+        "2200/2250": 16.19999999999999,
+        "2750": 21.600000000000023,
+        "3000": 34.966213592232975
+       },
+       "extrapolation_below_kpa": {
+        "2200/2250": 0.0,
+        "2750": 0.0,
+        "3000": 0.0
+       },
+       "enriched_rows": 4,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 26,
+      "n_clusters": 26,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 0
+       },
+       "1750/1800": {
+        "E": null,
+        "clusters": 0
+       },
+       "2200/2250": {
+        "E": null,
+        "clusters": 1
+       },
+       "2400": {
+        "E": null,
+        "clusters": 0
+       },
+       "2600": {
+        "E": null,
+        "clusters": 0
+       },
+       "2750": {
+        "E": null,
+        "clusters": 1
+       },
+       "3000": {
+        "E": null,
+        "clusters": 2
+       },
+       "4000": {
+        "E": null,
+        "clusters": 4
+       },
+       "4500": {
+        "E": null,
+        "clusters": 3
+       },
+       "5500": {
+        "E": null,
+        "clusters": 3
+       }
+      },
+      "passes": null,
+      "u_stat": 21.4181560106524,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "pooled": {
+        "E": -54.39874685255449,
+        "u_stat": 21.4181560106524,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     }
+    }
+   }
+  },
+  "A+B+C+D": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": 11.654533422372046,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "5500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 11.654533422372046,
+      "spark_sentinel": 11.654533422372046
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -5.1216404975537495,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -0.9529540630633634,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 1.5918094207453113,
+       "clusters": 7
+      },
+      "2750": {
+       "E": 1.6242619509307255,
+       "clusters": 5
+      },
+      "3000": {
+       "E": 4.075249615238662,
+       "clusters": 9
+      },
+      "4000": {
+       "E": 2.9417905886816897,
+       "clusters": 6
+      },
+      "4500": {
+       "E": 8.446268222583912,
+       "clusters": 3
+      },
+      "5500": {
+       "E": 11.654533422372046,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 7.884159228268587,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -5.1216404975537495,
+       "u_stat": 0.343793165070434,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -0.9529540630633634,
+       "u_stat": 1.6506286759963056,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 1.5918094207453113,
+       "u_stat": 1.692897334081371,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2750": {
+       "E": 1.6242619509307255,
+       "u_stat": 2.8683966408070964,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 4.075249615238662,
+       "u_stat": 1.5035135575733536,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": 2.9417905886816897,
+       "u_stat": 3.4378381172348633,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4500": {
+       "E": 8.446268222583912,
+       "u_stat": 5.599960361082511,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": 11.654533422372046,
+       "u_stat": 7.884159228268587,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": 11.92566302983762,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "4500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 11.92566302983762,
+      "spark_sentinel": 11.92566302983762
+     },
+     "extra": {},
+     "n_rows": 46,
+     "n_clusters": 46,
+     "lines": {
+      "1500": {
+       "E": -7.051880471820584,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": -3.708220053482436,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": -0.6999998214768218,
+       "clusters": 7
+      },
+      "2750": {
+       "E": 1.0060636028537995,
+       "clusters": 5
+      },
+      "3000": {
+       "E": 3.3554661265435604,
+       "clusters": 9
+      },
+      "4000": {
+       "E": 7.469027011613503,
+       "clusters": 6
+      },
+      "4500": {
+       "E": 11.92566302983762,
+       "clusters": 3
+      },
+      "5500": {
+       "E": 10.182963204433621,
+       "clusters": 3
+      }
+     },
+     "passes": false,
+     "u_stat": 4.714316165736676,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -7.051880471820584,
+       "u_stat": 0.47049502594893294,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": -3.708220053482436,
+       "u_stat": 1.189818294356805,
+       "outcome": "passes",
+       "why": null
+      },
+      "2200/2250": {
+       "E": -0.6999998214768218,
+       "u_stat": 1.0557550505320825,
+       "outcome": "passes",
+       "why": null
+      },
+      "2750": {
+       "E": 1.0060636028537995,
+       "u_stat": 2.0522762499653533,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 3.3554661265435604,
+       "u_stat": 1.123251433262271,
+       "outcome": "passes",
+       "why": null
+      },
+      "4000": {
+       "E": 7.469027011613503,
+       "u_stat": 3.0515516109471834,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4500": {
+       "E": 11.92566302983762,
+       "u_stat": 4.714316165736676,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": 10.182963204433621,
+       "u_stat": 8.501252598409332,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 37.49235561574418,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 37.49235561574418,
+      "spark_sentinel": 37.49235561574418
+     },
+     "extra": {},
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 37.49235561574418,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 36.518196546030204,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 31.453100178688924,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 26.31419386785589,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 17.99306691035174,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 3.0078119074039478,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 1.1102564192744087,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 37.49235561574418,
+       "u_stat": 1.1102564192744087,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 36.518196546030204,
+       "u_stat": 1.7240918596143329,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 31.453100178688924,
+       "u_stat": 6.58114781348047,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 26.31419386785589,
+       "u_stat": 8.770508087099813,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 17.99306691035174,
+       "u_stat": 7.207271007475154,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": -8.636800773231244,
+     "deciding": [
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": "4500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -8.636800773231244,
+      "spark_sentinel": -8.636800773231244
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 14,
+     "n_clusters": 14,
+     "lines": {
+      "2200/2250": {
+       "E": 23.90994566315203,
+       "clusters": 1
+      },
+      "2750": {
+       "E": 5.4575053010202055,
+       "clusters": 1
+      },
+      "3000": {
+       "E": 17.8831752544383,
+       "clusters": 2
+      },
+      "4000": {
+       "E": -7.629029903816331,
+       "clusters": 4
+      },
+      "4500": {
+       "E": -8.636800773231244,
+       "clusters": 3
+      },
+      "5500": {
+       "E": 2.1186495717653693,
+       "clusters": 3
+      }
+     },
+     "passes": true,
+     "u_stat": 10.05983039035857,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "4000": {
+       "E": -7.629029903816331,
+       "u_stat": 4.732038478714208,
+       "outcome": "passes",
+       "why": null
+      },
+      "4500": {
+       "E": -8.636800773231244,
+       "u_stat": 10.05983039035857,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5500": {
+       "E": 2.1186495717653693,
+       "u_stat": 4.891101312913718,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": -49.96633692384119,
+     "deciding": [
+      "2200/2250",
+      "2750",
+      "3000",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -49.96633692384119,
+      "spark_sentinel": -49.96633692384119
+     },
+     "extra": {
+      "sum_L_S_k": 113.81359721287981,
+      "sum_data_lever_k": 227.47404490380464,
+      "extrapolation_kpa": {
+       "2200/2250": 16.19999999999999,
+       "2750": 21.600000000000023,
+       "3000": 24.7210249129877,
+       "4000": 52.8116455696202
+      },
+      "extrapolation_below_kpa": {
+       "2200/2250": 0.0,
+       "2750": 0.0,
+       "3000": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 8,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 34,
+     "n_clusters": 34,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 0
+      },
+      "1750/1800": {
+       "E": null,
+       "clusters": 0
+      },
+      "2200/2250": {
+       "E": null,
+       "clusters": 1
+      },
+      "2400": {
+       "E": null,
+       "clusters": 0
+      },
+      "2600": {
+       "E": null,
+       "clusters": 0
+      },
+      "2750": {
+       "E": null,
+       "clusters": 1
+      },
+      "3000": {
+       "E": null,
+       "clusters": 2
+      },
+      "4000": {
+       "E": null,
+       "clusters": 4
+      },
+      "4500": {
+       "E": null,
+       "clusters": 3
+      },
+      "5500": {
+       "E": null,
+       "clusters": 3
+      }
+     },
+     "passes": null,
+     "u_stat": 29.282290117574565,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": -49.96633692384119,
+       "u_stat": 29.282290117574565,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 4.185311198472553,
+     "deciding": [
+      "1000",
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2400",
+      "2600",
+      "2750",
+      "3000",
+      "4000",
+      "4500",
+      "5500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 4.185311198472553,
+      "spark_sentinel": 4.185311198472553,
+      "unreachable": 4.185311198472553
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 143,
+     "n_clusters": 143,
+     "lines": {
+      "1000": {
+       "E": 12.791634418198228,
+       "clusters": 12
+      },
+      "1500": {
+       "E": 3.7078102031852684,
+       "clusters": 19
+      },
+      "1750/1800": {
+       "E": 4.038139838466809,
+       "clusters": 18
+      },
+      "2200/2250": {
+       "E": 2.8427550241081674,
+       "clusters": 17
+      },
+      "2400": {
+       "E": 5.201905215250801,
+       "clusters": 6
+      },
+      "2600": {
+       "E": 2.3315326912799073,
+       "clusters": 5
+      },
+      "2750": {
+       "E": 2.0974463672357255,
+       "clusters": 13
+      },
+      "3000": {
+       "E": 2.4294203119120015,
+       "clusters": 20
+      },
+      "4000": {
+       "E": 4.030975159877276,
+       "clusters": 15
+      },
+      "4500": {
+       "E": 4.800856384005107,
+       "clusters": 13
+      },
+      "5500": {
+       "E": 2.3876155700000834,
+       "clusters": 5
+      }
+     },
+     "passes": true,
+     "u_stat": 0.510973514557068,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "pooled": {
+       "E": 4.185311198472553,
+       "u_stat": 0.510973514557068,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 56.50311726150261,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 56.50311726150261,
+      "spark_sentinel": 56.50311726150261
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 56.50311726150261,
+        "deltabar": -0.002419656363555197,
+        "f_star": 1.0,
+        "H_k": 56.50311726150261
+       },
+       "1750/1800": {
+        "ebar_k": 37.65339198843848,
+        "deltabar": -0.02637360053679968,
+        "f_star": 1.0,
+        "H_k": 37.65339198843848
+       },
+       "2200/2250": {
+        "ebar_k": 30.065118633332247,
+        "deltabar": -0.020261766884898613,
+        "f_star": 1.0,
+        "H_k": 30.065118633332247
+       },
+       "2750": {
+        "ebar_k": 28.198405725815093,
+        "deltabar": 0.00042326862346969696,
+        "f_star": 1.0,
+        "H_k": 28.198405725815093
+       },
+       "3000": {
+        "ebar_k": 15.924325221272671,
+        "deltabar": -0.0014082149410971079,
+        "f_star": 1.0,
+        "H_k": 15.924325221272671
+       },
+       "4000": {
+        "ebar_k": 9.671821312627344,
+        "deltabar": 0.04790275592317883,
+        "f_star": 0.6029845455968726,
+        "H_k": 17.073343355004837
+       }
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 56.50311726150261,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 37.65339198843848,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 30.065118633332247,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 28.198405725815093,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 15.924325221272671,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 17.073343355004837,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 1.42290438523807,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 56.50311726150261,
+       "u_stat": 1.42290438523807,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1750/1800": {
+       "E": 37.65339198843848,
+       "u_stat": 6.535411599219485,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2200/2250": {
+       "E": 30.065118633332247,
+       "u_stat": 10.001056078740872,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2750": {
+       "E": 28.198405725815093,
+       "u_stat": 11.930760134230415,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3000": {
+       "E": 15.924325221272671,
+       "u_stat": 8.88685142322264,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 40.57879204022994,
+     "deciding": [
+      "1500",
+      "1750/1800",
+      "2200/2250",
+      "2750",
+      "3000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 40.57879204022994,
+      "spark_sentinel": 40.57879204022994
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 1.0,
+      "extreme_lines": [
+       "1500",
+       "3000"
+      ],
+      "H_at_f_star": {
+       "1500": 56.50311726150261,
+       "1750/1800": 37.65339198843848,
+       "2200/2250": 30.065118633332247,
+       "2750": 28.198405725815093,
+       "3000": 15.924325221272671
+      }
+     },
+     "n_rows": 29,
+     "n_clusters": 29,
+     "lines": {
+      "1500": {
+       "E": 56.50311726150261,
+       "clusters": 6
+      },
+      "1750/1800": {
+       "E": 37.65339198843848,
+       "clusters": 7
+      },
+      "2200/2250": {
+       "E": 30.065118633332247,
+       "clusters": 6
+      },
+      "2750": {
+       "E": 28.198405725815093,
+       "clusters": 4
+      },
+      "3000": {
+       "E": 15.924325221272671,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 1
+      }
+     },
+     "passes": false,
+     "u_stat": 9.000043617003419,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 40.57879204022994,
+       "u_stat": 9.000043617003419,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 157.28671191674715,
+    "deciding": [
+     "3000",
+     "4000",
+     "4500",
+     "5500"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 157.28671191674715,
+     "spark_sentinel": 157.28671191674715,
+     "censored": 157.28671191674715
+    },
+    "extra": {
+     "n_final": 13,
+     "n_dl": 13,
+     "n_ds": 13,
+     "dl": 0.021388499960565483,
+     "ds": -15.34176251775687,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.021388499960565483,
+       "P": -0.44251552543005124,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 13
+      },
+      "spark": {
+       "shift": -15.34176251775687,
+       "P": 1.1303515937374202,
+       "extrapolated": true,
+       "slope": -0.0755966030117392,
+       "rows": 13
+      }
+     },
+     "every_final_row": {
+      "dl": 0.021388499960565483,
+      "ds": -15.34176251775687,
+      "E_pct": 157.28671191674715
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.021388499960565483,
+     "snapped": {
+      "dl": 0.020412447710928358,
+      "E_pct": 156.01252976225328,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "3000": {
+       "model_kpa": null,
+       "epa_kpa": 183.24610169491527
+      },
+      "4000": {
+       "model_kpa": 165.99365853658537,
+       "epa_kpa": 165.99365853658537
+      },
+      "4500": {
+       "model_kpa": 154.76102040816335,
+       "epa_kpa": 154.76102040816335
+      },
+      "5500": {
+       "model_kpa": 145.41204301075263,
+       "epa_kpa": 145.41204301075263
+      }
+     }
+    },
+    "n_rows": 13,
+    "n_clusters": 13,
+    "lines": {
+     "3000": {
+      "E": null,
+      "clusters": 3
+     },
+     "4000": {
+      "E": null,
+      "clusters": 4
+     },
+     "4500": {
+      "E": null,
+      "clusters": 3
+     },
+     "5500": {
+      "E": null,
+      "clusters": 3
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 37.49235561574418,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "1500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 37.49235561574418,
+       "spark_sentinel": 37.49235561574418
+      },
+      "extra": {},
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 37.49235561574418,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 36.518196546030204,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 31.453100178688924,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 26.31419386785589,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 16.56754558705947,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 1.1102564192744087,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 37.49235561574418,
+        "u_stat": 1.1102564192744087,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 36.518196546030204,
+        "u_stat": 1.7240918596143329,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 31.453100178688924,
+        "u_stat": 6.58114781348047,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 26.31419386785589,
+        "u_stat": 8.770508087099813,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       },
+       "3000": {
+        "E": 16.56754558705947,
+        "u_stat": 9.12073136066319,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 3,
+      "n_clusters": 3,
+      "lines": {
+       "2200/2250": {
+        "E": 23.90994566315203,
+        "clusters": 1
+       },
+       "2750": {
+        "E": 5.4575053010202055,
+        "clusters": 1
+       },
+       "4000": {
+        "E": -14.75261152055873,
+        "clusters": 1
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 56.50311726150261,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": "1500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 56.50311726150261,
+       "spark_sentinel": 56.50311726150261
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 56.50311726150261,
+         "deltabar": -0.002419656363555197,
+         "f_star": 1.0,
+         "H_k": 56.50311726150261
+        },
+        "1750/1800": {
+         "ebar_k": 37.65339198843848,
+         "deltabar": -0.02637360053679968,
+         "f_star": 1.0,
+         "H_k": 37.65339198843848
+        },
+        "2200/2250": {
+         "ebar_k": 30.065118633332247,
+         "deltabar": -0.020261766884898613,
+         "f_star": 1.0,
+         "H_k": 30.065118633332247
+        },
+        "2750": {
+         "ebar_k": 28.198405725815093,
+         "deltabar": 0.00042326862346969696,
+         "f_star": 1.0,
+         "H_k": 28.198405725815093
+        },
+        "3000": {
+         "ebar_k": 16.12406709596874,
+         "deltabar": 0.004741686158173358,
+         "f_star": 1.0,
+         "H_k": 16.12406709596874
+        }
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 56.50311726150261,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 37.65339198843848,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 30.065118633332247,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 28.198405725815093,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 16.12406709596874,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 1.42290438523807,
+      "outcome": "fails",
+      "why": "1500: |E_cal| - 2 u_stat > R; 1750/1800: |E_cal| - 2 u_stat > R; 2200/2250: |E_cal| - 2 u_stat > R",
+      "components": {
+       "1500": {
+        "E": 56.50311726150261,
+        "u_stat": 1.42290438523807,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "1750/1800": {
+        "E": 37.65339198843848,
+        "u_stat": 6.535411599219485,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2200/2250": {
+        "E": 30.065118633332247,
+        "u_stat": 10.001056078740872,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       },
+       "2750": {
+        "E": 28.198405725815093,
+        "u_stat": 11.930760134230415,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       },
+       "3000": {
+        "E": 16.12406709596874,
+        "u_stat": 11.469977579310196,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": 40.37905016553387,
+      "deciding": [
+       "1500",
+       "1750/1800",
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 40.37905016553387,
+       "spark_sentinel": 40.37905016553387
+      },
+      "extra": {
+       "G_k": 980.27,
+       "f_star": 1.0,
+       "extreme_lines": [
+        "1500",
+        "3000"
+       ],
+       "H_at_f_star": {
+        "1500": 56.50311726150261,
+        "1750/1800": 37.65339198843848,
+        "2200/2250": 30.065118633332247,
+        "2750": 28.198405725815093,
+        "3000": 16.12406709596874
+       }
+      },
+      "n_rows": 27,
+      "n_clusters": 27,
+      "lines": {
+       "1500": {
+        "E": 56.50311726150261,
+        "clusters": 6
+       },
+       "1750/1800": {
+        "E": 37.65339198843848,
+        "clusters": 7
+       },
+       "2200/2250": {
+        "E": 30.065118633332247,
+        "clusters": 6
+       },
+       "2750": {
+        "E": 28.198405725815093,
+        "clusters": 4
+       },
+       "3000": {
+        "E": 16.12406709596874,
+        "clusters": 4
+       }
+      },
+      "passes": false,
+      "u_stat": 11.557899573858926,
+      "outcome": "fails",
+      "why": "|E_cal| - 2 u_stat > R",
+      "components": {
+       "L1": {
+        "E": 40.37905016553387,
+        "u_stat": 11.557899573858926,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": -54.911955582232196,
+      "deciding": [
+       "2200/2250",
+       "2750",
+       "3000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": -54.911955582232196,
+       "spark_sentinel": -54.911955582232196
+      },
+      "extra": {
+       "sum_L_S_k": 49.7789069590342,
+       "sum_data_lever_k": 110.40378353472761,
+       "extrapolation_kpa": {
+        "2200/2250": 16.19999999999999,
+        "2750": 21.600000000000023,
+        "3000": 34.966213592232975
+       },
+       "extrapolation_below_kpa": {
+        "2200/2250": 0.0,
+        "2750": 0.0,
+        "3000": 0.0
+       },
+       "enriched_rows": 4,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 26,
+      "n_clusters": 26,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 0
+       },
+       "1750/1800": {
+        "E": null,
+        "clusters": 0
+       },
+       "2200/2250": {
+        "E": null,
+        "clusters": 1
+       },
+       "2400": {
+        "E": null,
+        "clusters": 0
+       },
+       "2600": {
+        "E": null,
+        "clusters": 0
+       },
+       "2750": {
+        "E": null,
+        "clusters": 1
+       },
+       "3000": {
+        "E": null,
+        "clusters": 2
+       },
+       "4000": {
+        "E": null,
+        "clusters": 4
+       },
+       "4500": {
+        "E": null,
+        "clusters": 3
+       },
+       "5500": {
+        "E": null,
+        "clusters": 3
+       }
+      },
+      "passes": null,
+      "u_stat": 21.86370063998064,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "pooled": {
+        "E": -54.911955582232196,
+        "u_stat": 21.86370063998064,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "chosen_form": "A+B+C+D",
+ "reason": "A: fails E1a, E2a, E3a, E4a, D1, L0, L1 (noise exceeds R: E4b) (amendment D13: an E1a miss on stoichiometric hot rows at form A is read as a burn/FMEP residual that no form B-D can act on (mistake 20); it is reported, with S4's residuals per line and per population, and never used to justify a form. The ladder still moves by the contract's criterion (section 2.4).); A+B: fails E1a, E2a, E3a, E4a, L0, L1 (noise exceeds R: E4b); A+B+C: fails E1a, E2a, E3a, L0, L1 (noise exceeds R: E4b); A+B+C+D: fails E1a, E2a, E3a, L0, L1 (noise exceeds R: E4b); no form passes: A+B+C+D, its failing statistics reported (contract section 2.4)"
+}

@@ -1,0 +1,27 @@
+{
+ "engine": "honda_l15b7",
+ "first_subcommand": "t0",
+ "git_head": "0147f93a0ae9e4c8e579868d80082f5f2069b914",
+ "contract_commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+ "view_sha256": "8c6a700ccbf9e96599a5c3bfbc3817b88f2daefb7e36c1c9340c196723b2da58",
+ "code_sha_text": {
+  "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+  "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+  "epa_fit.py": "f6489f1b5e7b04833d8d68aaeace1b3241a3cdd8b1bbfc80d276ca0b6d4d3ee3",
+  "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+  "calibrate_epa.py": "55090f0ad7dee32042656ed727a85962cdea9008678ed95a4c88d12c1f66bd01",
+  "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+  "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+  "validate_epa.py": "9b6cb463c857597010dfbf64928c3dbf9b7e03a22a7abc32b40d73436ef8573b",
+  "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+  "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+  "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+  "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+  "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+  "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+ },
+ "run1_gate": {
+  "rule": "Jad's column of decisions 36-38 (results/VALIDATION_DECISIONS.md section G) and 39-77 (results/VALIDATION_DECISIONS.md section H, 66 dropped) is empty. Ghassan's column of 39-77 records his delegation of 21 October, under which decisions 73-76, raised on 23 October by the reviews of version 4, decision 77, raised the same day by T0 (version 5), and the readings the agents added the same day to decisions 54, 59 and 64 are adopted as 39-72 are; for 73-76 and those readings it records only the delegation, no answer of his, and their cells say so ('adopted by the agents 23 Oct, not yet seen'); decision 77's cell reads 'delegated 21 Oct: adopted', and version 5's two readings of it (model_form.in_sample_rules.sampling_noise.readings) have been seen by neither of them. Run 1, the first fit, no longer waits for these answers: on 23 October 2026 Ghassan ordered it to go ahead before Jad's column is filled ('go ahead without it'), as X1 went ahead on his order on 8 October (version_5.go_ahead; the sheet's notes at the top of sections G and H). His order is recorded as an order, not as an answer to any row. Jad's answers stay his to give. An answer of Jad's that differs from the adopted option, or a different answer of Ghassan's, given before the first fit, is applied before it: in the code, and, where the decision is a rule of this contract, through a new version written by this generator. Given after the first fit, it cannot change version 5 or the frozen calibration (rule 0): it becomes a new contract version and a new fit, reported beside this one. They answer from the team's dated copy of the sheet on the Desktop, C:/Users/badcl/Desktop/decisions_2026-10-22_H.md, which version 4's seventh review found holding section H as of 22 October, without decisions 73-76 and the readings of 23 October; the session that wrote version 5 did not open it, and the commit step brings it up to the sheet as committed, decision 77 and the go-ahead included, before either of them is asked. Once calibrate_epa.py exists, step 7's claims that it does not and that only the generator, epa_map.py and test_epa_map.py name the EPA tables stop the generator, so such a version also edits those claims; the edited claims must still prove that no fit has run, from what a fit leaves behind, as the claims that nothing a fit writes exists do now (no results/EPA_CALIBRATION/, no EPA engine's data/engines/<id>/derived_params.json, no results/EPA_VALIDATION/; docs/build_step_2/PLAN.md section 8.1). A fit that crashed before writing an output would leave none of these, so calibrate_epa.py writes a STARTED record under results/EPA_CALIBRATION/ before its first model evaluation, as the held-out run writes one (decision 60), and the edited claims require that record to be absent; today's claim, that nothing exists under results/EPA_CALIBRATION/, already does. That version's own section says which claims it edited, and why",
+  "switch": "honda_l15b7"
+ }
+}

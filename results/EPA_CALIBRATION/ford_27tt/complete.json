@@ -1,0 +1,2826 @@
+{
+ "schema": "epa-complete/1",
+ "provenance": {
+  "engine": "ford_27tt",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "cec3e3faefe47172",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final_hd1.csv": "b10b3020475f41e8d966f4f0c479b4be40431eb2ac154e86c5e7632c21df59d0",
+    "epa_highload_initial_hd1.csv": "1425452fe85157182f51273206a881ed1022b551893903d0fb22461a4b659d1a",
+    "epa_steady_cell9.csv": "7f42d0e89ed63aba971f395e93325debb81c94b3e4b1db043c502ef16d2af91a",
+    "epa_steady_hd1.csv": "9b2abbe1dfc316b824072f7a8b8b2f5968d1e8fd111a357d0e9a4520eac116fd"
+   },
+   "epa_engine_sha256": "8d353903bd48af4d452392164b0fe44a07d11e898aa764dc53f9748aedbda64b",
+   "epa_channels_blob": "4d4c82c7c64a08b54cc4d5ed78324b8a87986dae",
+   "manifest_sha256": "f70b408bcaf5548f692d3f9f06a6559861f58e503fc5cd29b3c6ffce4acf258c"
+  },
+  "view_sha256": "cf819c7e7fcc7e7aff95a3e1f159af8ecb93408086fcb5a3323f6362d73b6762",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "frozen_sections_sha256": "e63d3f1c66521fe56382275d3f9ecd93e7d9d90134c6c77f8ee2966df951a76f",
+ "deliverable_torque": {
+  "table": [
+   [
+    1000,
+    196.8
+   ],
+   [
+    1100,
+    199.6
+   ],
+   [
+    1200,
+    202.2
+   ],
+   [
+    1300,
+    204.6
+   ],
+   [
+    1400,
+    207.9
+   ],
+   [
+    1500,
+    210.1
+   ],
+   [
+    1600,
+    212.9
+   ],
+   [
+    1700,
+    216.5
+   ],
+   [
+    1800,
+    221.0
+   ],
+   [
+    1900,
+    226.7
+   ],
+   [
+    2000,
+    233.8
+   ],
+   [
+    2100,
+    242.4
+   ],
+   [
+    2200,
+    252.9
+   ],
+   [
+    2300,
+    265.5
+   ],
+   [
+    2400,
+    280.6
+   ],
+   [
+    2500,
+    298.9
+   ],
+   [
+    2600,
+    321.9
+   ],
+   [
+    2700,
+    355.5
+   ],
+   [
+    2800,
+    380.4
+   ],
+   [
+    2900,
+    393.0
+   ],
+   [
+    3000,
+    394.8
+   ],
+   [
+    3100,
+    396.9
+   ],
+   [
+    3200,
+    399.8
+   ],
+   [
+    3300,
+    402.2
+   ],
+   [
+    3400,
+    404.3
+   ],
+   [
+    3500,
+    405.9
+   ],
+   [
+    3600,
+    407.2
+   ],
+   [
+    3700,
+    408.3
+   ],
+   [
+    3800,
+    409.0
+   ],
+   [
+    3900,
+    409.5
+   ],
+   [
+    4000,
+    409.7
+   ],
+   [
+    4100,
+    409.7
+   ],
+   [
+    4200,
+    409.5
+   ],
+   [
+    4300,
+    409.1
+   ],
+   [
+    4400,
+    408.6
+   ],
+   [
+    4500,
+    407.9
+   ],
+   [
+    4600,
+    407.3
+   ],
+   [
+    4700,
+    406.5
+   ],
+   [
+    4800,
+    405.6
+   ],
+   [
+    4900,
+    404.5
+   ],
+   [
+    5000,
+    403.3
+   ],
+   [
+    5100,
+    401.9
+   ],
+   [
+    5200,
+    400.4
+   ],
+   [
+    5300,
+    398.7
+   ],
+   [
+    5400,
+    396.9
+   ],
+   [
+    5500,
+    394.9
+   ]
+  ],
+  "grid": {
+   "lo": 1000,
+   "hi": 5500,
+   "step": 100
+  },
+  "settle_steps": 30,
+  "remeasured_60_max_abs_diff_nm": 0.19408657980528687,
+  "knock_flag_duty": 0.011594202898550725,
+  "knock_flag_duty_60": 0.010869565217391304,
+  "wot_comparison": [
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     6
+    ],
+    "initial_torque_nm": 439.08444444444444,
+    "model_nm": 395.0216666666667,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     7
+    ],
+    "initial_torque_nm": 470.74,
+    "model_nm": 395.08445454545455,
+    "label": "transient"
+   },
+   {
+    "line": "3000",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     8
+    ],
+    "initial_torque_nm": 496.0288888888889,
+    "model_nm": 395.13366666666667,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     12
+    ],
+    "initial_torque_nm": 345.33384615384614,
+    "model_nm": 409.7,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     13
+    ],
+    "initial_torque_nm": 406.77473684210526,
+    "model_nm": 409.7,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     14
+    ],
+    "initial_torque_nm": 443.7057142857143,
+    "model_nm": 409.7,
+    "label": "transient"
+   },
+   {
+    "line": "4000",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     15
+    ],
+    "initial_torque_nm": 469.3591666666667,
+    "model_nm": 409.7,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     16
+    ],
+    "initial_torque_nm": 364.8435294117646,
+    "model_nm": 407.8396470588235,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     17
+    ],
+    "initial_torque_nm": 409.48699999999997,
+    "model_nm": 407.83279999999996,
+    "label": "transient"
+   },
+   {
+    "line": "4500",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     18
+    ],
+    "initial_torque_nm": 437.4705,
+    "model_nm": 407.82349999999997,
+    "label": "transient"
+   },
+   {
+    "line": "5500",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     22
+    ],
+    "initial_torque_nm": 315.20812499999994,
+    "model_nm": 394.95624999999995,
+    "label": "transient"
+   },
+   {
+    "line": "5500",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     23
+    ],
+    "initial_torque_nm": 346.0705,
+    "model_nm": 394.95799999999997,
+    "label": "transient"
+   },
+   {
+    "line": "5500",
+    "key": [
+     "epa_highload_initial_hd1.csv",
+     24
+    ],
+    "initial_torque_nm": 384.29076923076923,
+    "model_nm": 394.9938461538461,
+    "label": "transient"
+   }
+  ]
+ },
+ "torque_floor": {
+  "nm": 14.0,
+  "rpm": 1200.0,
+  "t_amb_k": 315.0,
+  "rule": "1.25 x the torque with the throttle shut (the load loop at a request of 0 Nm) at max(1200 rpm, rpm_min) and the car's table ambient, the B58's rule (engine_specs/b58.toml [loop] torque_floor_nm); an extrapolation below every fired calibration row",
+  "extrapolation": true,
+  "closed_nm": 11.23484855502243
+ },
+ "delivery": {
+  "t_from_s": 188.0,
+  "steps": 531,
+  "share_over_track_tol": 0.0,
+  "largest_shortfall_nm": -0.007419147734424314,
+  "held": {
+   "box": "stepped",
+   "counts": {
+    "3": 531
+   }
+  },
+  "rpm": {
+   "min": 4626.603822084823,
+   "median": 4626.603822084823,
+   "max": 4626.603822084823
+  },
+  "demand_nm": {
+   "min": 294.19519105405425,
+   "median": 294.19519105405425,
+   "max": 294.19519105405425
+  },
+  "margin_to_threshold": {
+   "threshold": "Vehicle.shift_ceiling_nm",
+   "held": {
+    "min": -0.22848982250359473,
+    "median": -0.22848982250359473,
+    "max": -0.22848982250359473
+   },
+   "held_lowest_steps": 0,
+   "rejected_higher": 0.028680236661873915,
+   "rejected_higher_steps": 1593
+  },
+  "bar_rpm_margin": {
+   "rpm": {
+    "min": 1622.534831367424,
+    "median": 1622.534831367424,
+    "max": 1622.534831367424
+   },
+   "fraction": {
+    "min": 0.2950063329758953,
+    "median": 0.2950063329758953,
+    "max": 0.2950063329758953
+   },
+   "barred_steps": 531,
+   "shift_rpm_max": 5500.0
+  },
+  "map_vs_ceiling_kpa": {
+   "min": 51.09306637782103,
+   "median": 51.17013671185717,
+   "max": 55.01803812098299,
+   "at_ceiling_steps": 0
+  },
+  "identity": {
+   "max_abs_dlam": 0.0,
+   "max_abs_dspark": 0.0,
+   "contacts_lam": 0,
+   "contacts_spark": 0,
+   "bounds_are_python_floats": true,
+   "steps": 719
+  },
+  "eta": {
+   "0.86": {
+    "t_from_s": 188.0,
+    "steps": 531,
+    "share_over_track_tol": 0.0,
+    "largest_shortfall_nm": 0.30465256448485434,
+    "held": {
+     "box": "stepped",
+     "counts": {
+      "3": 531
+     }
+    },
+    "rpm": {
+     "min": 4626.603822084823,
+     "median": 4626.603822084823,
+     "max": 4626.603822084823
+    },
+    "demand_nm": {
+     "min": 314.72043694154644,
+     "median": 314.72043694154644,
+     "max": 314.72043694154644
+    },
+    "margin_to_threshold": {
+     "threshold": "Vehicle.shift_ceiling_nm",
+     "held": {
+      "min": -0.17466353105035715,
+      "median": -0.17466353105035715,
+      "max": -0.17466353105035715
+     },
+     "held_lowest_steps": 0,
+     "rejected_higher": 0.1004486252661907,
+     "rejected_higher_steps": 1593
+    },
+    "bar_rpm_margin": {
+     "rpm": {
+      "min": 1622.534831367424,
+      "median": 1622.534831367424,
+      "max": 1622.534831367424
+     },
+     "fraction": {
+      "min": 0.2950063329758953,
+      "median": 0.2950063329758953,
+      "max": 0.2950063329758953
+     },
+     "barred_steps": 531,
+     "shift_rpm_max": 5500.0
+    },
+    "map_vs_ceiling_kpa": {
+     "min": 47.56456926433262,
+     "median": 48.17172640144116,
+     "max": 48.426314719559514,
+     "at_ceiling_steps": 0
+    },
+    "identity": {
+     "max_abs_dlam": 0.0,
+     "max_abs_dspark": 0.0,
+     "contacts_lam": 0,
+     "contacts_spark": 0,
+     "bounds_are_python_floats": true,
+     "steps": 719
+    }
+   },
+   "0.98": {
+    "t_from_s": 188.0,
+    "steps": 531,
+    "share_over_track_tol": 0.0,
+    "largest_shortfall_nm": 0.3329883979309898,
+    "held": {
+     "box": "stepped",
+     "counts": {
+      "4": 531
+     }
+    },
+    "rpm": {
+     "min": 3469.9528665636167,
+     "median": 3469.9528665636167,
+     "max": 3469.9528665636167
+    },
+    "demand_nm": {
+     "min": 368.2443207751428,
+     "median": 368.2443207751428,
+     "max": 368.2443207751428
+    },
+    "margin_to_threshold": {
+     "threshold": "Vehicle.shift_ceiling_nm",
+     "held": {
+      "min": -0.03430018599089402,
+      "median": -0.03430018599089402,
+      "max": -0.03430018599089402
+     },
+     "held_lowest_steps": 0,
+     "rejected_higher": 0.4889434909766921,
+     "rejected_higher_steps": 1062
+    },
+    "bar_rpm_margin": {
+     "rpm": {
+      "min": -873.3961779151768,
+      "median": -873.3961779151768,
+      "max": -873.3961779151768
+     },
+     "fraction": {
+      "min": -0.1587993050754867,
+      "median": -0.1587993050754867,
+      "max": -0.1587993050754867
+     },
+     "barred_steps": 0,
+     "shift_rpm_max": 5500.0
+    },
+    "map_vs_ceiling_kpa": {
+     "min": 20.657036869795007,
+     "median": 23.895408808815574,
+     "max": 23.91347736476078,
+     "at_ceiling_steps": 0
+    },
+    "identity": {
+     "max_abs_dlam": 0.0,
+     "max_abs_dspark": 0.0,
+     "contacts_lam": 0,
+     "contacts_spark": 0,
+     "bounds_are_python_floats": true,
+     "steps": 719
+    }
+   }
+  },
+  "provisional_knee_k": 1123.0
+ },
+ "k3": {
+  "seconds": 413,
+  "knee_k": 937.17255839153,
+  "time_above_knee_s": 413,
+  "trace_sha256": "05b22a37bc454ce96419f12dc953031115349db9cb6522a3e0d9e054b499a54d",
+  "second_knee_identical": true,
+  "provisional_knees_k": [
+   1123.0,
+   1173.0
+  ],
+  "knee_k_at_eta": {
+   "0.86": 952.8743339409433,
+   "0.98": 958.4409169119936
+  }
+ },
+ "f7_table_and_floor_identical_under_two_knees": true,
+ "coefficients": {
+  "episode_summary": {
+   "fuel": 6103.711793996025,
+   "fuel_base": 6103.72072482006,
+   "damage": 1281.9311547152256,
+   "damage_base": 1283.3874728478168,
+   "knock_events": 2,
+   "torque_viol": 0.23420122707421104,
+   "egt_viol": 0.3702585398385213,
+   "steps": 719
+  },
+  "peak_t_turb_c": 719.6004868237308,
+  "climb": {
+   "point": {
+    "rpm": 4626.603822084823,
+    "map": 142.40056224525242,
+    "iat": 330.07464599609375,
+    "ect": 366.2438659667969,
+    "spark": 4.535189151763916,
+    "lam": 1.0,
+    "egt": 889.4984430396013,
+    "mdot": 159.7143826680616,
+    "torque": 294.22064172635913,
+    "treq": 294.19519105405425,
+    "t_turb": 718.4810424388182
+   },
+   "base": {
+    "torque": 294.21630094159104,
+    "egt": 889.5004059383201,
+    "mdot": 159.71210358296224,
+    "fuel": 10.26493370929766,
+    "ki": 0.47904730973348186
+   },
+   "fixed_spark": {
+    "per_kpa": {
+     "torque": 3.7587871266164257,
+     "egt": 0.05031058144402323,
+     "mdot": 1.9645317670438303,
+     "fuel": 0.12626336956384288
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -0.7827426534964161,
+     "degt_k": -0.039380238018442294,
+     "dmdot_rel": -0.009628091883562994,
+     "dTh_ss_k": -1.3384594667932748
+    }
+   },
+   "ecu_schedule": {
+    "per_kpa": {
+     "torque": 3.1770335523085436,
+     "egt": 1.989440981372809,
+     "mdot": 1.9645317670438303,
+     "fuel": 0.12626336956384288
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -0.9260723756845539,
+     "degt_k": -1.8423663359041276,
+     "dmdot_rel": -0.011391112882493733,
+     "dTh_ss_k": -3.0196541511490076
+    },
+    "dspark_dmap_deg_per_kpa": -0.40150787675971245,
+    "base_spark": 9.648003017455856,
+    "knock_limited_spark": 16.49953184243919
+   },
+   "lambda": {
+    "-0.01": {
+     "egt": 887.5006343530141,
+     "degt": -1.9997715853060072,
+     "dtorque_rel": 0.0006760377894894365
+    },
+    "-0.02": {
+     "egt": 885.6261787898362,
+     "degt": -3.8742271484838966,
+     "dtorque_rel": 0.0011987951079728276
+    },
+    "-0.05": {
+     "egt": 880.6693415621534,
+     "degt": -8.83106437616675,
+     "dtorque_rel": 0.002157401203632725
+    },
+    "-0.10": {
+     "egt": 874.4211612728019,
+     "degt": -15.079244665518218,
+     "dtorque_rel": 0.002030580482146105
+    },
+    "-0.15": {
+     "egt": 870.5313146287887,
+     "degt": -18.96909130953145,
+     "dtorque_rel": 0.00021828671592571958
+    }
+   },
+   "spark": {
+    "-0.75": {
+     "degt": 3.6523174120304702,
+     "dtorque_rel": -0.003827054404755059
+    },
+    "+0.75": {
+     "degt": -3.5882446904540757,
+     "dtorque_rel": 0.0034964234407777184
+    }
+   },
+   "housing": {
+    "f": 0.79971397419843,
+    "tau_s": 66.76200860052332,
+    "dTh_per_unit_ln_mdot": 135.745125404745,
+    "ua_gas_turb": 0.9,
+    "ua_turb_amb": 18.0,
+    "c_turb": 6000.0
+   }
+  },
+  "flat": {
+   "point": {
+    "rpm": 2100.2346297621893,
+    "map": 117.19072826512513,
+    "iat": 330.03009033203125,
+    "ect": 365.50152587890625,
+    "spark": 8.813500881195068,
+    "lam": 1.0,
+    "egt": 721.6171675806041,
+    "mdot": 45.42409056154535,
+    "torque": 199.2953473857703,
+    "treq": 198.95877873200968,
+    "t_turb": 359.2774684162457
+   },
+   "base": {
+    "torque": 199.2933574650739,
+    "egt": 721.6160906613375,
+    "mdot": 45.42361060363767,
+    "fuel": 2.919442805041305,
+    "ki": 0.6417583487056056
+   },
+   "fixed_spark": {
+    "per_kpa": {
+     "torque": 2.8182734248477743,
+     "egt": 2.3232459413977438,
+     "mdot": 0.6796806741946355,
+     "fuel": 0.04368408472232388
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -0.7071469918708775,
+     "degt_k": -1.6428763788356393,
+     "dmdot_rel": -0.010581152352319077,
+     "dTh_ss_k": -2.6641312459029733
+    }
+   },
+   "ecu_schedule": {
+    "per_kpa": {
+     "torque": 2.7559777562363337,
+     "egt": 4.050776861913192,
+     "mdot": 0.6796806741946355,
+     "fuel": 0.04368408472232388
+    },
+    "torque_bias_1pct": {
+     "dmap_kpa": -0.7231312263464578,
+     "degt_k": -2.9292432398111425,
+     "dmdot_rel": -0.010820326982439244,
+     "dTh_ss_k": -3.3886272293106767
+    },
+    "dspark_dmap_deg_per_kpa": -0.40150787675971245,
+    "base_spark": 13.915881645338079,
+    "knock_limited_spark": 16.221591087586212
+   },
+   "lambda": {
+    "-0.01": {
+     "egt": 720.0115489326737,
+     "degt": -1.6045417286637758,
+     "dtorque_rel": -0.00027607968665133154
+    },
+    "-0.02": {
+     "egt": 718.529148075723,
+     "degt": -3.0869425856144517,
+     "dtorque_rel": -0.0005530055524146649
+    },
+    "-0.05": {
+     "egt": 714.6883102257871,
+     "degt": -6.927780435550403,
+     "dtorque_rel": -0.001455313366215405
+    },
+    "-0.10": {
+     "egt": 710.1969182354607,
+     "degt": -11.419172425876809,
+     "dtorque_rel": -0.0026755912124355463
+    },
+    "-0.15": {
+     "egt": 707.979325248878,
+     "degt": -13.636765412459454,
+     "dtorque_rel": -0.0031869537571421747
+    }
+   },
+   "spark": {
+    "-0.75": {
+     "degt": 3.2413297114527495,
+     "dtorque_rel": -0.0007963833991817548
+    },
+    "+0.75": {
+     "degt": -3.1871237109594404,
+     "dtorque_rel": 0.00042465144518621933
+    }
+   },
+   "housing": {
+    "f": 0.5317480146753067,
+    "tau_s": 156.08399510823108,
+    "dTh_per_unit_ln_mdot": 169.21928098953538,
+    "ua_gas_turb": 0.9,
+    "ua_turb_amb": 18.0,
+    "c_turb": 6000.0
+   }
+  },
+  "env_torque_bias": {
+   "+0.01": {
+    "dmap_kpa": -0.919105190235797,
+    "dspark_deg": 0.3691883087158203,
+    "degt_k": -1.801443045945689,
+    "dmdot_rel": -0.01126310445408174,
+    "dTh_median_k": -3.04747163514196,
+    "dpeak_k": -2.9886593646025403,
+    "damage": 1196.9403724776012,
+    "damage_unbiased": 1281.9311547152256
+   },
+   "-0.01": {
+    "dmap_kpa": 0.9335827891540873,
+    "dspark_deg": -0.37502527236938477,
+    "degt_k": 1.892566553816323,
+    "dmdot_rel": 0.011523112787620082,
+    "dTh_median_k": 3.1335321035403467,
+    "dpeak_k": 3.074029181475453,
+    "damage": 1375.680671919244,
+    "damage_unbiased": 1281.9311547152256
+   }
+  },
+  "env_coefficients": {
+   "housing_k_per_pct_central": 3.0905018693411535,
+   "housing_k_per_pct_larger": 3.1335321035403467,
+   "flow_pct_per_pct_central": 1.1393108620850911,
+   "flow_pct_per_pct_larger": 1.1523112787620082
+  }
+ },
+ "e6_probes": {
+  "d_rows": "+-10 % (d needs agents; the contract's E6, decision 59)",
+  "d_probe_rel": 0.1,
+  "probe_rel": 0.1,
+  "r1_housing_k": 10.0,
+  "climb_cell": {
+   "point": {
+    "rpm": 4626.603822084823,
+    "map": 142.40056224525242,
+    "iat": 330.07464599609375,
+    "ect": 366.2438659667969,
+    "spark": 4.535189151763916,
+    "lam": 1.0,
+    "egt": 889.4984430396013,
+    "mdot": 159.7143826680616,
+    "torque": 294.22064172635913,
+    "treq": 294.19519105405425,
+    "t_turb": 718.4810424388182
+   },
+   "housing": {
+    "f": 0.79971397419843,
+    "tau_s": 66.76200860052332,
+    "dTh_per_unit_ln_mdot": 135.745125404745,
+    "ua_gas_turb": 0.9,
+    "ua_turb_amb": 18.0,
+    "c_turb": 6000.0
+   }
+  },
+  "numerical_noise": {
+   "housing_k": 0.00020669112504825314,
+   "egt_resolution_k": 0.00011715259324773797,
+   "mdot_resolution_gps": 0.00013295603739038597,
+   "samples": 319,
+   "rule": "decision 85: the housing equivalent of the climb cell's median resolution over CLIMB_S at the frozen plant, |f| x the gas's + |dTh per unit ln mdot| x the flow's / the flow (epa_coefficients.climb_cell_resolution); a probe is visible when |h(+) - h(-)| / 2 exceeds it"
+  },
+  "not_visible_at_r1": [
+   "ce_rich_slope",
+   "exh_bp_min_kpa",
+   "flame_floor",
+   "fres_hi",
+   "fres_lo",
+   "fres_map_min"
+  ],
+  "beyond_range_at_r1": [
+   "burn_res",
+   "conrod",
+   "delay_res",
+   "exh_bp_ratio",
+   "fres_a",
+   "fres_b",
+   "port_pickup_k",
+   "t_head_k"
+  ],
+  "range_rule": "decision 88: a worth-R1 probe (rows 5, 6, 9) fails (a) bounds when v0 +- size leaves epa_fit.BOUNDS where the constant has an entry, (b) sign when v0 +- size is of the other sign than v0 or zero, (c) finite when the probed plant's cycle at the frozen climb cell's inputs (epa_coefficients.cyc) is not finite in torque, gas, flow and fuel on either side (the completion runs no climb at the probe size); any failure takes the +-10 % fallback, counted excluded for the level rows",
+  "range_cycle_inputs": {
+   "rpm": 4626.603822084823,
+   "map": 142.40056224525242,
+   "iat": 330.07464599609375,
+   "ect": 366.2438659667969,
+   "spark": 4.535189151763916,
+   "lam": 1.0
+  },
+  "row5": {
+   "sigma": {
+    "ratio": 0.013752325353791834,
+    "floor_kpa": 2.330049775745422
+   },
+   "probe": {
+    "exh_bp_ratio": 0.1,
+    "exh_bp_min_kpa": 10.330000000000002
+   },
+   "housing_change_k": {
+    "exh_bp_ratio": 2.909957054211712,
+    "exh_bp_min_kpa": 2.836859208509235e-07
+   },
+   "detail": {
+    "exh_bp_ratio": {
+     "record": "cycle",
+     "value": 1.0,
+     "method": "fallback",
+     "size": 0.1,
+     "size_why": null,
+     "bracket": null,
+     "values": {
+      "+": 1.1,
+      "-": 0.9
+     },
+     "why_not_bracket": "EPA publishes no channel that brackets it",
+     "housing_eq_k": {
+      "+": 20.51166075717848,
+      "-": -21.807830373961313
+     },
+     "slope_k_per_unit": 211.59745565569895,
+     "worth_r1": 0.04725954746956652,
+     "worth_b": null,
+     "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+     "band": {
+      "size": 0.013752325353791834,
+      "source": "the fit's standard uncertainty"
+     },
+     "housing_change_k": 2.909957054211712,
+     "probe_housing_change_k": 21.159745565569896,
+     "load_bearing": false,
+     "load_bearing_why": null,
+     "response_k": 21.159745565569896,
+     "numerical_noise_k": 0.00020669112504825314,
+     "visible_at_r1": true,
+     "not_visible_at_r1": null,
+     "within_range_at_r1": false,
+     "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails bounds: the probe 1.0 +- 0.0472595; BOUNDS [1.0, 2.5]; the cycles' torque 292.7732993581325 / 295.65930252504955 N m)",
+     "range_tests": {
+      "bounds": {
+       "entry": [
+        1.0,
+        2.5
+       ],
+       "plus": 1.0472595474695665,
+       "minus": 0.9527404525304335,
+       "outside": [
+        0.9527404525304335
+       ],
+       "fails": true
+      },
+      "sign": {
+       "value": 1.0,
+       "plus": 1.0472595474695665,
+       "minus": 0.9527404525304335,
+       "fails": false
+      },
+      "finite": {
+       "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+       "cycles": {
+        "+": {
+         "torque": 292.7732993581325,
+         "egt": 899.9304845362491,
+         "mdot": 159.71210358296224,
+         "fuel": 10.26493370929766,
+         "ki": 0.47904730973348186,
+         "value": 1.0472595474695665,
+         "finite": true,
+         "error": null
+        },
+        "-": {
+         "torque": 295.65930252504955,
+         "egt": 878.6682277282736,
+         "mdot": 159.71210358296224,
+         "fuel": 10.26493370929766,
+         "ki": 0.47904730973348186,
+         "value": 0.9527404525304335,
+         "finite": true,
+         "error": null
+        }
+       },
+       "fails": false
+      }
+     },
+     "range_tests_failed": [
+      "bounds"
+     ],
+     "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails bounds: the probe 1.0 +- 0.0472595; BOUNDS [1.0, 2.5]; the cycles' torque 292.7732993581325 / 295.65930252504955 N m)",
+     "counted_excluded": true,
+     "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails bounds: the probe 1.0 +- 0.0472595; BOUNDS [1.0, 2.5]; the cycles' torque 292.7732993581325 / 295.65930252504955 N m)"
+    },
+    "exh_bp_min_kpa": {
+     "record": "cycle",
+     "value": 103.30000000000001,
+     "method": "fallback",
+     "size": 10.330000000000002,
+     "size_why": null,
+     "bracket": null,
+     "values": {
+      "+": 113.63000000000001,
+      "-": 92.97000000000001
+     },
+     "why_not_bracket": "EPA publishes no channel that brackets it",
+     "housing_eq_k": {
+      "+": 9.415306877745841e-06,
+      "-": 1.1930682809105532e-05
+     },
+     "slope_k_per_unit": -1.2175101313454458e-07,
+     "worth_r1": null,
+     "worth_b": null,
+     "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+     "band": {
+      "size": 2.330049775745422,
+      "source": "the fit's standard uncertainty"
+     },
+     "housing_change_k": 2.836859208509235e-07,
+     "probe_housing_change_k": 1.2576879656798457e-06,
+     "load_bearing": false,
+     "load_bearing_why": null,
+     "response_k": 1.2576879656798457e-06,
+     "numerical_noise_k": 0.00020669112504825314,
+     "visible_at_r1": false,
+     "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 1.26e-06 K at +-10 %, the noise 0.000207 K)",
+     "within_range_at_r1": null,
+     "beyond_range_at_r1": null,
+     "range_tests": null,
+     "range_tests_failed": null,
+     "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 1.26e-06 K at +-10 %, the noise 0.000207 K)",
+     "counted_excluded": true,
+     "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 1.26e-06 K at +-10 %, the noise 0.000207 K)"
+    }
+   }
+  },
+  "row6": {
+   "sigma": {
+    "ua_port": 0.5013227844836619
+   },
+   "probe": {
+    "ua_port": 3.056513761455104
+   },
+   "housing_change_k": {
+    "ua_port": 1.6401783980354103
+   },
+   "detail": {
+    "ua_port": {
+     "record": "cycle",
+     "value": 18.050683610980357,
+     "method": "probe",
+     "size": 3.056513761455104,
+     "size_why": null,
+     "bracket": null,
+     "values": {
+      "+": 21.10719737243546,
+      "-": 14.994169849525253
+     },
+     "why_not_bracket": "EPA publishes no channel that brackets it",
+     "housing_eq_k": {
+      "+": -5.876625265364271,
+      "-": 5.9346636865212465
+     },
+     "slope_k_per_unit": -3.2717012846817135,
+     "worth_r1": 3.056513761455104,
+     "worth_b": null,
+     "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+     "band": {
+      "size": 0.5013227844836619,
+      "source": "the fit's standard uncertainty"
+     },
+     "housing_change_k": 1.6401783980354103,
+     "probe_housing_change_k": 10.0,
+     "load_bearing": false,
+     "load_bearing_why": null,
+     "response_k": 5.905644475942759,
+     "numerical_noise_k": 0.00020669112504825314,
+     "visible_at_r1": true,
+     "not_visible_at_r1": null,
+     "within_range_at_r1": true,
+     "beyond_range_at_r1": null,
+     "range_tests": {
+      "bounds": {
+       "entry": [
+        0.0,
+        1000.0
+       ],
+       "plus": 21.10719737243546,
+       "minus": 14.994169849525253,
+       "outside": [],
+       "fails": false
+      },
+      "sign": {
+       "value": 18.050683610980357,
+       "plus": 21.10719737243546,
+       "minus": 14.994169849525253,
+       "fails": false
+      },
+      "finite": {
+       "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+       "cycles": {
+        "+": {
+         "torque": 294.21630094159104,
+         "egt": 877.0993968345712,
+         "mdot": 159.71210358296224,
+         "fuel": 10.26493370929766,
+         "ki": 0.47904730973348186,
+         "value": 21.10719737243546,
+         "finite": true,
+         "error": null
+        },
+        "-": {
+         "torque": 294.21630094159104,
+         "egt": 902.1095123030067,
+         "mdot": 159.71210358296224,
+         "fuel": 10.26493370929766,
+         "ki": 0.47904730973348186,
+         "value": 14.994169849525253,
+         "finite": true,
+         "error": null
+        }
+       },
+       "fails": false
+      }
+     },
+     "range_tests_failed": [],
+     "worth_r1_why": null,
+     "counted_excluded": false,
+     "counted_excluded_why": null
+    }
+   }
+  },
+  "row9": {
+   "conrod": {
+    "record": "geometry",
+    "value": 0.12669344608879493,
+    "method": "fallback",
+    "size": 0.012669344608879494,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.13936279069767443,
+     "-": 0.11402410147991543
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -0.678281249459767,
+     "-": 0.8230170524729831
+    },
+    "slope_k_per_unit": -59.24924880804581,
+    "worth_r1": 0.16877851114024656,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.7506491509663751,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.7506491509663751,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": false,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign, finite: the probe 0.12669344608879493 +- 0.168779; BOUNDS None; the cycles' torque 292.25533978553324 / nan N m)",
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 0.2954719572290415,
+      "minus": -0.042085065051451626,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 0.12669344608879493,
+      "plus": 0.2954719572290415,
+      "minus": -0.042085065051451626,
+      "fails": true
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 292.25533978553324,
+        "egt": 881.5869444060862,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.5178854479018626,
+        "value": 0.2954719572290415,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": null,
+        "egt": null,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": null,
+        "value": -0.042085065051451626,
+        "finite": false,
+        "error": null
+       }
+      },
+      "fails": true
+     }
+    },
+    "range_tests_failed": [
+     "sign",
+     "finite"
+    ],
+    "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign, finite: the probe 0.12669344608879493 +- 0.168779; BOUNDS None; the cycles' torque 292.25533978553324 / nan N m)",
+    "counted_excluded": true,
+    "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign, finite: the probe 0.12669344608879493 +- 0.168779; BOUNDS None; the cycles' torque 292.25533978553324 / nan N m)"
+   },
+   "ivc_deg": {
+    "record": "geometry",
+    "value": -140.0,
+    "method": "probe",
+    "size": 25.45302315510227,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": -114.54697684489773,
+     "-": -165.45302315510227
+    },
+    "why_not_bracket": "a cam phase is a shift from a base timing EPA does not publish, and no Atkinson ratio or effective stroke is published to recover it: the phases bracket how far the event travels across the map, not where it is",
+    "housing_eq_k": {
+     "+": -6.5289313180053785,
+     "-": 4.4717265721703
+    },
+    "slope_k_per_unit": -0.39288063893484565,
+    "worth_r1": 25.45302315510227,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 5.500328945087839,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": -114.54697684489773,
+      "minus": -165.45302315510227,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": -140.0,
+      "plus": -114.54697684489773,
+      "minus": -165.45302315510227,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 302.31715084324446,
+        "egt": 882.5143143541435,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.3895345403864659,
+        "value": -114.54697684489773,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 290.433143474634,
+        "egt": 892.9155033479066,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.5162483912912735,
+        "value": -165.45302315510227,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "evo_deg": {
+    "record": "geometry",
+    "value": 140.0,
+    "method": "probe",
+    "size": 23.086134786591213,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 163.0861347865912,
+     "-": 116.91386521340878
+    },
+    "why_not_bracket": "a cam phase is a shift from a base timing EPA does not publish, and no Atkinson ratio or effective stroke is published to recover it: the phases bracket how far the event travels across the map, not where it is",
+    "housing_eq_k": {
+     "+": -10.478104999947245,
+     "-": 1.6503869537005498
+    },
+    "slope_k_per_unit": -0.4331604269159927,
+    "worth_r1": 23.086134786591213,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 6.064245976823898,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 163.0861347865912,
+      "minus": 116.91386521340878,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 140.0,
+      "plus": 163.0861347865912,
+      "minus": 116.91386521340878,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 305.7603409836703,
+        "egt": 884.5102056805532,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.47904730973348186,
+        "value": 163.0861347865912,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 270.5400269895191,
+        "egt": 893.1106823965303,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.47904730973348186,
+        "value": 116.91386521340878,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "t_head_k": {
+    "record": "cycle",
+    "value": 90.0,
+    "method": "fallback",
+    "size": 9.0,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 99.0,
+     "-": 81.0
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.49009157584536733,
+     "-": -0.49008168755363213
+    },
+    "slope_k_per_unit": 0.0544540701888333,
+    "worth_r1": 183.6410017712627,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.49008663169949973,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.49008663169949973,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": false,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 90.0 +- 183.641; BOUNDS None; the cycles' torque 294.731335290744 / 293.7114632293097 N m)",
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 273.6410017712627,
+      "minus": -93.6410017712627,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 90.0,
+      "plus": 273.6410017712627,
+      "minus": -93.6410017712627,
+      "fails": true
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 294.731335290744,
+        "egt": 902.6422105693854,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4843833391112,
+        "value": 273.6410017712627,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 293.7114632293097,
+        "egt": 876.3763564876164,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.47379891936022045,
+        "value": -93.6410017712627,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [
+     "sign"
+    ],
+    "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 90.0 +- 183.641; BOUNDS None; the cycles' torque 294.731335290744 / 293.7114632293097 N m)",
+    "counted_excluded": true,
+    "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 90.0 +- 183.641; BOUNDS None; the cycles' torque 294.731335290744 / 293.7114632293097 N m)"
+   },
+   "port_pickup_k": {
+    "record": "cycle",
+    "value": 12.0,
+    "method": "fallback",
+    "size": 1.2000000000000002,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 13.2,
+     "-": 10.8
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.46897331470398224,
+     "-": -0.47951992325951526
+    },
+    "slope_k_per_unit": 0.3952055158181239,
+    "worth_r1": 25.303290565919287,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.47424661898174875,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.47424661898174875,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": false,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 12.0 +- 25.3033; BOUNDS None; the cycles' torque 291.04950353422555 / 297.4391621187385 N m)",
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 37.30329056591928,
+      "minus": -13.303290565919287,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 12.0,
+      "plus": 37.30329056591928,
+      "minus": -13.303290565919287,
+      "fails": true
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 291.04950353422555,
+        "egt": 897.824404127599,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.6187984566332017,
+        "value": 37.30329056591928,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 297.4391621187385,
+        "egt": 881.1803426820519,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.3616694031015632,
+        "value": -13.303290565919287,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [
+     "sign"
+    ],
+    "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 12.0 +- 25.3033; BOUNDS None; the cycles' torque 291.04950353422555 / 297.4391621187385 N m)",
+    "counted_excluded": true,
+    "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 12.0 +- 25.3033; BOUNDS None; the cycles' torque 291.04950353422555 / 297.4391621187385 N m)"
+   },
+   "t_residual_k": {
+    "record": "cycle",
+    "value": 780.0,
+    "method": "probe",
+    "size": 290.41738230234347,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 1070.4173823023434,
+     "-": 489.58261769765653
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 2.6916504611110375,
+     "-": -2.679928841865869
+    },
+    "slope_k_per_unit": 0.034433200660108375,
+    "worth_r1": 290.41738230234347,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 2.685789651488453,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 1070.4173823023434,
+      "minus": 489.58261769765653,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 780.0,
+      "plus": 1070.4173823023434,
+      "minus": 489.58261769765653,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 291.0279257489306,
+        "egt": 897.8805296363097,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.6198289254754403,
+        "value": 1070.4173823023434,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 297.46111271384865,
+        "egt": 881.1232787935709,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.36094340982623185,
+        "value": 489.58261769765653,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "cp_exh": {
+    "record": "cycle",
+    "value": 1150.0,
+    "method": "probe",
+    "size": 192.97307491978918,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 1342.9730749197893,
+     "-": 957.0269250802108
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 5.392735491720556,
+     "-": -6.526025718650444
+    },
+    "slope_k_per_unit": 0.051820700914656515,
+    "worth_r1": 192.97307491978918,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 5.959380605185499,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 1342.9730749197893,
+      "minus": 957.0269250802108,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 1150.0,
+      "plus": 1342.9730749197893,
+      "minus": 957.0269250802108,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 294.21630094159104,
+        "egt": 900.186831521334,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.47904730973348186,
+        "value": 1342.9730749197893,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 294.21630094159104,
+        "egt": 874.7566040225951,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.47904730973348186,
+        "value": 957.0269250802108,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "burn_res": {
+    "record": "cycle",
+    "value": 2.0,
+    "method": "fallback",
+    "size": 0.2,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 2.2,
+     "-": 1.8
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.546285501048571,
+     "-": -0.5060057728463595
+    },
+    "slope_k_per_unit": 2.6307281847373263,
+    "worth_r1": 3.8012288985296605,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.5261456369474653,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.5261456369474653,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": false,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 2.0 +- 3.80123; BOUNDS None; the cycles' torque 291.9580221880049 / 295.3146052474012 N m)",
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 5.8012288985296605,
+      "minus": -1.8012288985296605,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 2.0,
+      "plus": 5.8012288985296605,
+      "minus": -1.8012288985296605,
+      "fails": true
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 291.9580221880049,
+        "egt": 900.2859262241471,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4684410481496073,
+        "value": 5.8012288985296605,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 295.3146052474012,
+        "egt": 879.8097135574661,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4566547995623709,
+        "value": -1.8012288985296605,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [
+     "sign"
+    ],
+    "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 2.0 +- 3.80123; BOUNDS None; the cycles' torque 291.9580221880049 / 295.3146052474012 N m)",
+    "counted_excluded": true,
+    "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 2.0 +- 3.80123; BOUNDS None; the cycles' torque 291.9580221880049 / 295.3146052474012 N m)"
+   },
+   "delay_res": {
+    "record": "cycle",
+    "value": 1.5,
+    "method": "fallback",
+    "size": 0.15000000000000002,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 1.65,
+     "-": 1.35
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.7714036631097476,
+     "-": -0.7431444582569714
+    },
+    "slope_k_per_unit": 5.048493737889062,
+    "worth_r1": 1.9807888291412086,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.7572740606833595,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.7572740606833595,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": false,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 1.5 +- 1.98079; BOUNDS None; the cycles' torque 291.23528087669536 / 296.60063284434375 N m)",
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 3.4807888291412086,
+      "minus": -0.4807888291412086,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 1.5,
+      "plus": 3.4807888291412086,
+      "minus": -0.4807888291412086,
+      "fails": true
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 291.23528087669536,
+        "egt": 898.7634527399051,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4228094012165707,
+        "value": 3.4807888291412086,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 296.60063284434375,
+        "egt": 880.6463510161253,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.5307706112763877,
+        "value": -0.4807888291412086,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [
+     "sign"
+    ],
+    "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 1.5 +- 1.98079; BOUNDS None; the cycles' torque 291.23528087669536 / 296.60063284434375 N m)",
+    "counted_excluded": true,
+    "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 1.5 +- 1.98079; BOUNDS None; the cycles' torque 291.23528087669536 / 296.60063284434375 N m)"
+   },
+   "flame_lam": {
+    "record": "cycle",
+    "value": 0.9,
+    "method": "probe",
+    "size": 0.07161420889023792,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.971614208890238,
+     "-": 0.8283857911097621
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -5.653409168235681,
+     "-": 19.481267705160136
+    },
+    "slope_k_per_unit": -139.63709374108785,
+    "worth_r1": 0.07161420889023792,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 12.56733843669791,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 0.971614208890238,
+      "minus": 0.8283857911097621,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 0.9,
+      "plus": 0.971614208890238,
+      "minus": 0.8283857911097621,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 295.3770652958545,
+        "egt": 884.3299078464748,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4989342970344308,
+        "value": 0.971614208890238,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 290.7011393016776,
+        "egt": 901.8194385588969,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4330855959535678,
+        "value": 0.8283857911097621,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "flame_width": {
+    "record": "cycle",
+    "value": 0.42,
+    "method": "probe",
+    "size": 0.3325303143429026,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.7525303143429025,
+     "-": 0.0874696856570974
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -1.0543294277728112,
+     "-": 1.4717560560721255
+    },
+    "slope_k_per_unit": -30.072446236249245,
+    "worth_r1": 0.3325303143429026,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 1.2630427419224683,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 0.7525303143429025,
+      "minus": 0.0874696856570974,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 0.42,
+      "plus": 0.7525303143429025,
+      "minus": 0.0874696856570974,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 295.12064083264266,
+        "egt": 885.621965241624,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4888890810046985,
+        "value": 0.7525303143429025,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 112.43822813482481,
+        "egt": 1134.1313549871402,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.1056282749969621,
+        "value": 0.0874696856570974,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "flame_floor": {
+    "record": "cycle",
+    "value": 0.25,
+    "method": "fallback",
+    "size": 0.025,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.275,
+     "-": 0.225
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "within_range_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests": null,
+    "range_tests_failed": null,
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)"
+   },
+   "wiebe_a": {
+    "record": "cycle",
+    "value": 5.0,
+    "method": "probe",
+    "size": 4.015599860956285,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 9.015599860956286,
+     "-": 0.9844001390437151
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -1.1362035452583144,
+     "-": 1.3540844182487308
+    },
+    "slope_k_per_unit": -2.490287963507045,
+    "worth_r1": 4.015599860956285,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 1.2451439817535226,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 9.015599860956286,
+      "minus": 0.9844001390437151,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 5.0,
+      "plus": 9.015599860956286,
+      "minus": 0.9844001390437151,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 295.06593141647994,
+        "egt": 882.8183070784931,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.4708227847273982,
+        "value": 9.015599860956286,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 284.1512075510022,
+        "egt": 924.9321672543562,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.1922825019373703,
+        "value": 0.9844001390437151,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "wiebe_m": {
+    "record": "cycle",
+    "value": 2.0,
+    "method": "probe",
+    "size": 0.9300159854913224,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 2.9300159854913224,
+     "-": 1.0699840145086776
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 2.1145290355754907,
+     "-": -2.186472304618486
+    },
+    "slope_k_per_unit": 10.752503350484943,
+    "worth_r1": 0.9300159854913224,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 2.1505006700969886,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 2.9300159854913224,
+      "minus": 1.0699840145086776,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 2.0,
+      "plus": 2.9300159854913224,
+      "minus": 1.0699840145086776,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 291.1349249902841,
+        "egt": 896.705701790777,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.3902292913247748,
+        "value": 2.9300159854913224,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 297.615948307529,
+        "egt": 880.0658840201651,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.6183221404407689,
+        "value": 1.0699840145086776,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   },
+   "ce_rich_slope": {
+    "record": "cycle",
+    "value": 0.05033241943706298,
+    "method": "fallback",
+    "size": 0.005033241943706298,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.055365661380769274,
+     "-": 0.045299177493356685
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -7.337619050390976e-06,
+     "-": 1.0348293667531891e-06
+    },
+    "slope_k_per_unit": -0.0008317152752425603,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": {
+     "size": 0.03432682223850587,
+     "source": "the fit's standard uncertainty"
+    },
+    "housing_change_k": 2.8550142406301347e-05,
+    "probe_housing_change_k": 4.186224208572083e-06,
+    "load_bearing": false,
+    "load_bearing_why": null,
+    "response_k": 4.186224208572083e-06,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 4.19e-06 K at +-10 %, the noise 0.000207 K)",
+    "within_range_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests": null,
+    "range_tests_failed": null,
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 4.19e-06 K at +-10 %, the noise 0.000207 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 4.19e-06 K at +-10 %, the noise 0.000207 K)",
+    "sigma": 0.03432682223850587,
+    "sigma_why": null
+   },
+   "fres_a": {
+    "record": "cycle",
+    "value": 0.035,
+    "method": "fallback",
+    "size": 0.0035000000000000005,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.038500000000000006,
+     "-": 0.0315
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -0.43112344310984174,
+     "-": 0.45593458108088386
+    },
+    "slope_k_per_unit": -126.72257488438935,
+    "worth_r1": 0.07891253795247713,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.4435290120953628,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.4435290120953628,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": false,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 0.035 +- 0.0789125; BOUNDS None; the cycles' torque 264.30755013571144 / 313.19682457859466 N m)",
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 0.11391253795247713,
+      "minus": -0.043912537952477126,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 0.035,
+      "plus": 0.11391253795247713,
+      "minus": -0.043912537952477126,
+      "fails": true
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 264.30755013571144,
+        "egt": 851.986692242912,
+        "mdot": 146.0032537939133,
+        "fuel": 9.383845606652951,
+        "ki": 0.5839724912260729,
+        "value": 0.11391253795247713,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 313.19682457859466,
+        "egt": 912.1904028790519,
+        "mdot": 168.51041216524558,
+        "fuel": 10.830414047512411,
+        "ki": 0.4052842625669551,
+        "value": -0.043912537952477126,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [
+     "sign"
+    ],
+    "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 0.035 +- 0.0789125; BOUNDS None; the cycles' torque 264.30755013571144 / 313.19682457859466 N m)",
+    "counted_excluded": true,
+    "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 0.035 +- 0.0789125; BOUNDS None; the cycles' torque 264.30755013571144 / 313.19682457859466 N m)"
+   },
+   "fres_b": {
+    "record": "cycle",
+    "value": 6.5,
+    "method": "fallback",
+    "size": 0.65,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 7.15,
+     "-": 5.85
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": -0.5548959977061365,
+     "-": 0.6088223707452092
+    },
+    "slope_k_per_unit": -0.8951679757318043,
+    "worth_r1": 11.171087741186172,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.5818591842256728,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.5818591842256728,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": false,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 6.5 +- 11.1711; BOUNDS None; the cycles' torque 264.4887944116882 / 313.19682457859466 N m)",
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 17.67108774118617,
+      "minus": -4.671087741186172,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 6.5,
+      "plus": 17.67108774118617,
+      "minus": -4.671087741186172,
+      "fails": true
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 264.4887944116882,
+        "egt": 852.2096847299505,
+        "mdot": 146.08389520321444,
+        "fuel": 9.389028549599232,
+        "ki": 0.5840598095013126,
+        "value": 17.67108774118617,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 313.19682457859466,
+        "egt": 912.1904028790519,
+        "mdot": 168.51041216524558,
+        "fuel": 10.830414047512411,
+        "ki": 0.4052842625669551,
+        "value": -4.671087741186172,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [
+     "sign"
+    ],
+    "worth_r1_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 6.5 +- 11.1711; BOUNDS None; the cycles' torque 264.4887944116882 / 313.19682457859466 N m)",
+    "counted_excluded": true,
+    "counted_excluded_why": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 6.5 +- 11.1711; BOUNDS None; the cycles' torque 264.4887944116882 / 313.19682457859466 N m)"
+   },
+   "fres_map_min": {
+    "record": "cycle",
+    "value": 25.0,
+    "method": "fallback",
+    "size": 2.5,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 27.5,
+     "-": 22.5
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "within_range_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests": null,
+    "range_tests_failed": null,
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)"
+   },
+   "fres_lo": {
+    "record": "cycle",
+    "value": 0.03,
+    "method": "fallback",
+    "size": 0.003,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.033,
+     "-": 0.027
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "within_range_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests": null,
+    "range_tests_failed": null,
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)"
+   },
+   "fres_hi": {
+    "record": "cycle",
+    "value": 0.18,
+    "method": "fallback",
+    "size": 0.018,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 0.19799999999999998,
+     "-": 0.162
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 0.0,
+     "-": 0.0
+    },
+    "slope_k_per_unit": 0.0,
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 0.0,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": false,
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "within_range_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests": null,
+    "range_tests_failed": null,
+    "worth_r1_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)",
+    "counted_excluded": true,
+    "counted_excluded_why": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000207 K)"
+   },
+   "n_poly": {
+    "record": "cycle",
+    "value": 1.32,
+    "method": "probe",
+    "size": 0.12058097045283168,
+    "size_why": null,
+    "bracket": null,
+    "values": {
+     "+": 1.4405809704528318,
+     "-": 1.1994190295471683
+    },
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "housing_eq_k": {
+     "+": 21.893927930864947,
+     "-": -7.400066456599915e-05
+    },
+    "slope_k_per_unit": 82.93182549821785,
+    "worth_r1": 0.12058097045283168,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "response_k": 10.947000965764756,
+    "numerical_noise_k": 0.00020669112504825314,
+    "visible_at_r1": true,
+    "not_visible_at_r1": null,
+    "within_range_at_r1": true,
+    "beyond_range_at_r1": null,
+    "range_tests": {
+     "bounds": {
+      "entry": null,
+      "plus": 1.4405809704528318,
+      "minus": 1.1994190295471683,
+      "outside": null,
+      "fails": false
+     },
+     "sign": {
+      "value": 1.32,
+      "plus": 1.4405809704528318,
+      "minus": 1.1994190295471683,
+      "fails": false
+     },
+     "finite": {
+      "source": "one cycle of the probed plant at the frozen climb cell's inputs (epa_coefficients.cyc)",
+      "cycles": {
+       "+": {
+        "torque": 294.21630094159104,
+        "egt": 889.5004059383201,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 1.1838570229641276,
+        "value": 1.4405809704528318,
+        "finite": true,
+        "error": null
+       },
+       "-": {
+        "torque": 294.21630094159104,
+        "egt": 889.5004059383201,
+        "mdot": 159.71210358296224,
+        "fuel": 10.26493370929766,
+        "ki": 0.11813069083725232,
+        "value": 1.1994190295471683,
+        "finite": true,
+        "error": null
+       }
+      },
+      "fails": false
+     }
+    },
+    "range_tests_failed": [],
+    "worth_r1_why": null,
+    "counted_excluded": false,
+    "counted_excluded_why": null
+   }
+  },
+  "row9_not_probed": {
+   "knock_on": "labelled CORRELATION, not ASSUMED: row 9 names the ASSUMED cycle constants; the knock scale knock_a is E6 row 7's",
+   "knock_p": "labelled CORRELATION, not ASSUMED: row 9 names the ASSUMED cycle constants; the knock scale knock_a is E6 row 7's",
+   "knock_b": "labelled CORRELATION, not ASSUMED: row 9 names the ASSUMED cycle constants; the knock scale knock_a is E6 row 7's"
+  },
+  "brackets": {
+   "ivc_deg": {
+    "bracket": null,
+    "rows": 0,
+    "rows_outside": 0,
+    "channel": null,
+    "method": null,
+    "why_not_bracket": "a cam phase is a shift from a base timing EPA does not publish, and no Atkinson ratio or effective stroke is published to recover it: the phases bracket how far the event travels across the map, not where it is"
+   },
+   "evo_deg": {
+    "bracket": null,
+    "rows": 0,
+    "rows_outside": 0,
+    "channel": null,
+    "method": null,
+    "why_not_bracket": "a cam phase is a shift from a base timing EPA does not publish, and no Atkinson ratio or effective stroke is published to recover it: the phases bracket how far the event travels across the map, not where it is"
+   }
+  }
+ },
+ "e6_row4": {
+  "frozen": {
+   "tau_s": 66.76200860052332,
+   "peak_c": 719.6004868237308
+  },
+  "c_turb": {
+   "x0.75": {
+    "tau_s": 50.071506450392484,
+    "peak_c": 719.705293033967
+   },
+   "x1.333": {
+    "tau_s": 88.99375746449758,
+    "peak_c": 718.8200755078404
+   }
+  },
+  "ua_gas_turb": {
+   "x0.75": {
+    "tau_s": 83.44505217629923,
+    "peak_c": 676.7207575531679
+   },
+   "x1.333": {
+    "tau_s": 52.72191265241875,
+    "peak_c": 755.4042373442338
+   }
+  },
+  "ua_turb_amb": {
+   "x0.75": {
+    "tau_s": 70.28108858073415,
+    "peak_c": 755.2714306704969
+   },
+   "x1.333": {
+    "tau_s": 62.58770610802575,
+    "peak_c": 677.264709617924
+   }
+  }
+ },
+ "e6_row7": {
+  "1.00": {
+   "total": 1281.9311547152256,
+   "thermal": 1257.007073030963,
+   "knock_share": 0.019442605472677902
+  },
+  "0.90": {
+   "total": 1271.8221881354061,
+   "thermal": 1256.3492570022727,
+   "knock_share": 0.012165954704578638
+  },
+  "1.10": {
+   "total": 1297.6374181093245,
+   "thermal": 1258.3729420640009,
+   "knock_share": 0.03025843390253995
+  }
+ },
+ "e6_row13": {
+  "dwell_0s": {
+   "ecu": {
+    "enr_dwell_lo": 0.0,
+    "enr_dwell_hi": 1.5
+   },
+   "builds": true
+  },
+  "dwell_30s": {
+   "ecu": {
+    "enr_dwell_lo": 30.0,
+    "enr_dwell_hi": 31.5
+   },
+   "builds": true
+  },
+  "rule": "the enrichment ramp moved whole so that it starts at the gate, its width the engine's (enr_dwell_hi - enr_dwell_lo), each variant built through engines.Engine's invariants"
+ },
+ "e6_in_use": {
+  "frozen": {
+   "hot_tit_at_lambda1_c": 889.5004059383201,
+   "egt_c": 889.5004059383201,
+   "air_gps": 149.4471698736646,
+   "exhaust_gps": 159.71210358296224,
+   "fuel_gps": 10.26493370929766,
+   "tau_s": 66.76277047872837,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 78556.35294806819,
+   "oil_heat_w": 1840.7430004729829,
+   "housing_eq_k": -0.00036730595773905956,
+   "knock_share": 0.019442605472677902
+  },
+  "1": {
+   "hot_tit_at_lambda1_c": 889.7921143481534,
+   "egt_c": 889.7921143481534,
+   "air_gps": 149.15945309500722,
+   "exhaust_gps": 159.40462467925116,
+   "fuel_gps": 10.245171584243922,
+   "tau_s": 66.8657176571528,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 78405.11568588119,
+   "oil_heat_w": 1837.1991886572093,
+   "housing_eq_k": -0.028673404960978893
+  },
+  "2": {
+   "hot_tit_at_lambda1_c": 884.8668945652076,
+   "egt_c": 884.8668945652076,
+   "air_gps": 150.8935090452549,
+   "exhaust_gps": 161.15837360615657,
+   "fuel_gps": 10.264864560901696,
+   "tau_s": 66.28276563539117,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 78555.82376337466,
+   "oil_heat_w": 1840.730600546255,
+   "housing_eq_k": -2.4821459039935063
+  },
+  "3": {
+   "hot_tit_at_lambda1_c": 900.9237741603275,
+   "egt_c": 900.9237741603275,
+   "air_gps": 149.4471698736646,
+   "exhaust_gps": 159.71210358296224,
+   "fuel_gps": 10.26493370929766,
+   "tau_s": 66.76277047872837,
+   "heat_per_gram_j": 44000.0,
+   "coolant_heat_w": 80555.59638563904,
+   "oil_heat_w": 1887.5895408970644,
+   "housing_eq_k": 9.135059893595862
+  },
+  "7_090": {
+   "hot_tit_at_lambda1_c": 889.5004059383201,
+   "egt_c": 889.5004059383201,
+   "air_gps": 149.4471698736646,
+   "exhaust_gps": 159.71210358296224,
+   "fuel_gps": 10.26493370929766,
+   "tau_s": 66.76277047872837,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 78556.35294806819,
+   "oil_heat_w": 1840.7430004729829,
+   "housing_eq_k": -0.00036730595773905956,
+   "knock_share": 0.012165954704578638
+  },
+  "7_110": {
+   "hot_tit_at_lambda1_c": 889.5004059383201,
+   "egt_c": 889.5004059383201,
+   "air_gps": 149.4471698736646,
+   "exhaust_gps": 159.71210358296224,
+   "fuel_gps": 10.26493370929766,
+   "tau_s": 66.76277047872837,
+   "heat_per_gram_j": 42908.0,
+   "coolant_heat_w": 78556.35294806819,
+   "oil_heat_w": 1840.7430004729829,
+   "housing_eq_k": -0.00036730595773905956,
+   "knock_share": 0.03025843390253995
+  }
+ },
+ "dump": {
+  "sha256": "20f10d7bca605263ba0e81abcae28d23e23a08d1e29c78924d37eb33474cc860",
+  "n_values": 24501,
+  "keys": [
+   "grid.rpm",
+   "grid.map_kpa",
+   "grid.lam",
+   "run_cycle.torque_nm",
+   "run_cycle.power_kw",
+   "run_cycle.bmep_bar",
+   "run_cycle.imep_bar",
+   "run_cycle.fmep_bar",
+   "run_cycle.bsfc_gpkwh",
+   "run_cycle.egt_c",
+   "run_cycle.p_max_bar",
+   "run_cycle.knock_integral",
+   "run_cycle.knock_prob",
+   "run_cycle.mfb50_deg",
+   "run_cycle.mdot_fuel_gps",
+   "run_cycle.t_max_k",
+   "run_cycle.mdot_air_gps",
+   "run_cycle.eta_v",
+   "run_cycle.f_res",
+   "exhaust_backpressure_kpa",
+   "ecu.base_spark",
+   "ecu.knock_limited_spark",
+   "ecu.base_lambda.dwell_0",
+   "ecu.base_lambda.dwell_3",
+   "ecu.base_lambda.dwell_30",
+   "ecu.iat_compensation",
+   "ecu.cam_deg",
+   "boost_ceiling_kpa",
+   "charge_temperature",
+   "vehicle.road_force_n",
+   "vehicle.demand.torque_nm",
+   "vehicle.demand.rpm",
+   "thermal.state"
+  ]
+ },
+ "derived": {
+  "path": "data/engines/ford_27tt/derived_params.json",
+  "sha_text": "ffd03978ba88217ee259a684ce6c515b06a80fd5f56c4c234dabd7057564b293",
+  "derived_sha": "61f84c7d02b6b816"
+ },
+ "engine_sha": "671b624ae11e0916",
+ "e6_files": {
+  "results/EPA_CALIBRATION/ford_27tt/e6/row1.json": "7f384001674a3810f19a3549766368728eee00c4bcbd2a5dc20a13d14d641ec4",
+  "results/EPA_CALIBRATION/ford_27tt/e6/row2.json": "a986a6a4daea34cba7659b4077a8eacef5602c36eb83db8ceda78e581cf7d03e",
+  "results/EPA_CALIBRATION/ford_27tt/e6/row3.json": "10fe01632b813200022d57069921aadd65c8ebec5cc2d75a914abab5c3288409",
+  "results/EPA_CALIBRATION/ford_27tt/e6/row7_090.json": "a761a6c9e9f3289ff401992ffe570f3da0560da629713e74c9e837f207eaf9f4",
+  "results/EPA_CALIBRATION/ford_27tt/e6/row7_110.json": "02acee62a87086650ec6ffd1d680766cdc656682d46b4503736b2868f50ccdb7"
+ },
+ "finiteness": {
+  "asserted_before": [
+   {
+    "step": "1 table",
+    "excluded": [
+     "car.deliverable_torque",
+     "engine.damage.turb_knee_k",
+     "engine.loop.torque_floor_nm"
+    ]
+   },
+   {
+    "step": "2 floor",
+    "excluded": [
+     "engine.damage.turb_knee_k",
+     "engine.loop.torque_floor_nm"
+    ]
+   },
+   {
+    "step": "3 delivery and 4 K3",
+    "excluded": [
+     "engine.damage.turb_knee_k"
+    ]
+   },
+   {
+    "step": "5-10 the coefficients, E6 and the dump",
+    "excluded": []
+   }
+  ],
+  "excluded_fields": {
+   "table": "car.deliverable_torque",
+   "knee": "engine.damage.turb_knee_k",
+   "floor": "engine.loop.torque_floor_nm"
+  }
+ }
+}

@@ -1,0 +1,395 @@
+{
+ "schema": "epa-stage0/1",
+ "provenance": {
+  "engine": "mazda_25t",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "0147f93a0ae9e4c8e579868d80082f5f2069b914",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "f6489f1b5e7b04833d8d68aaeace1b3241a3cdd8b1bbfc80d276ca0b6d4d3ee3",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "55090f0ad7dee32042656ed727a85962cdea9008678ed95a4c88d12c1f66bd01",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "9b6cb463c857597010dfbf64928c3dbf9b7e03a22a7abc32b40d73436ef8573b",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "f86baf59389dea29",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "ab057944b7fb4eeea0d789122a98c1c6d0b6d6fd2e5dae58df88627191d80449",
+    "epa_highload_initial.csv": "0540e533faddcada2cbbbc2917b33ace30114bf70b862196a9ec96f29d2dfeef",
+    "epa_steady.csv": "ab71a0087ee32fabfa21ae1a764015837b54ad531ad2017f38ccf59048286bfc"
+   },
+   "epa_engine_sha256": "cf5fc265d9a6324db9d7b8ceeaac5c75dd46db8dab06efa073fa67113bc1495e",
+   "epa_channels_blob": "a1c5627aa7468af13f28ea71ed2b6d92f3afbb13",
+   "manifest_sha256": "baccffe344e4b40b70ea26def9f26aacabe6f39798db11968c22b6061ce5c1e8"
+  },
+  "view_sha256": "881245bd5ce7693642022627dd40e7f6c77b4981c4090e5a55c2250ec8ae3574",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "yield": {
+  "tables": {
+   "epa_steady.csv": {
+    "role": "steady",
+    "rows": 210,
+    "calibration": 156,
+    "held_out_skipped": 54
+   },
+   "epa_highload_initial.csv": {
+    "role": "initial",
+    "rows": 61,
+    "calibration": 43,
+    "held_out_skipped": 18
+   },
+   "epa_highload_final.csv": {
+    "role": "final",
+    "rows": 61,
+    "calibration": 43,
+    "held_out_skipped": 18
+   }
+  },
+  "yield_sha256": "01c716cf927d5a4fc3fd71222ed0a739519a4de20c4caa056c23a4449b356af9",
+  "manifest_sha256": "baccffe344e4b40b70ea26def9f26aacabe6f39798db11968c22b6061ce5c1e8",
+  "initial_final_ids_identical": true
+ },
+ "checks": {
+  "lambda_missing": {
+   "fired": 0,
+   "fired_meter": 0,
+   "hot": 0,
+   "keys": [
+    [
+     "epa_steady.csv",
+     6
+    ],
+    [
+     "epa_steady.csv",
+     23
+    ],
+    [
+     "epa_steady.csv",
+     63
+    ],
+    [
+     "epa_steady.csv",
+     83
+    ],
+    [
+     "epa_steady.csv",
+     118
+    ],
+    [
+     "epa_steady.csv",
+     136
+    ],
+    [
+     "epa_steady.csv",
+     168
+    ],
+    [
+     "epa_steady.csv",
+     184
+    ],
+    [
+     "epa_steady.csv",
+     200
+    ]
+   ]
+  },
+  "spark_sentinel": {
+   "sentinel_value": 9,
+   "empty_cell": 0,
+   "total": 9,
+   "fired": 0,
+   "keys": [
+    [
+     "epa_steady.csv",
+     6
+    ],
+    [
+     "epa_steady.csv",
+     23
+    ],
+    [
+     "epa_steady.csv",
+     63
+    ],
+    [
+     "epa_steady.csv",
+     83
+    ],
+    [
+     "epa_steady.csv",
+     118
+    ],
+    [
+     "epa_steady.csv",
+     136
+    ],
+    [
+     "epa_steady.csv",
+     168
+    ],
+    [
+     "epa_steady.csv",
+     184
+    ],
+    [
+     "epa_steady.csv",
+     200
+    ]
+   ]
+  },
+  "censoring": {
+   "final_rows_with_lambda": 43,
+   "min_lambda_cellref": 0.7201652892562046,
+   "n_at_min_within_1e-9": 1,
+   "censored": false,
+   "value": null,
+   "documented_floor": null,
+   "rule": "fewer than 2 calibration Final rows at their own minimum, and no documented sensor floor (contract section 3)"
+  },
+  "tip_below_barometer": {
+   "fired_rows_with_barometer": 148,
+   "below": 15,
+   "largest_deficit_kpa": 2.700000000000003,
+   "keys": [
+    [
+     "epa_steady.csv",
+     11
+    ],
+    [
+     "epa_steady.csv",
+     12
+    ],
+    [
+     "epa_steady.csv",
+     13
+    ],
+    [
+     "epa_steady.csv",
+     14
+    ],
+    [
+     "epa_steady.csv",
+     15
+    ],
+    [
+     "epa_steady.csv",
+     16
+    ],
+    [
+     "epa_steady.csv",
+     28
+    ],
+    [
+     "epa_steady.csv",
+     29
+    ],
+    [
+     "epa_steady.csv",
+     30
+    ],
+    [
+     "epa_steady.csv",
+     31
+    ],
+    [
+     "epa_steady.csv",
+     32
+    ],
+    [
+     "epa_steady.csv",
+     69
+    ],
+    [
+     "epa_steady.csv",
+     70
+    ],
+    [
+     "epa_steady.csv",
+     88
+    ],
+    [
+     "epa_steady.csv",
+     89
+    ]
+   ],
+   "hd1_barometer": null
+  },
+  "coolant_vs_oil": {
+   "epa_highload_final.csv": {
+    "rows": 43,
+    "identical": 0,
+    "all_identical": false
+   },
+   "epa_steady.csv": {
+    "rows": 156,
+    "identical": 1,
+    "all_identical": false
+   }
+  },
+  "meter_vs_injector": {
+   "epa_highload_final.csv": {
+    "n": 40,
+    "median_ratio": 1.0107347741530388,
+    "p10": 0.9740225946015063,
+    "p90": 1.0723846110371575
+   },
+   "epa_steady.csv": {
+    "n": 147,
+    "median_ratio": 0.9884757684315787,
+    "p10": 0.9223681576137465,
+    "p90": 1.0069807351120008
+   }
+  },
+  "cam": {
+   "channel": "intake_cam_phase_cad_ret",
+   "direction": "ret",
+   "rows_with_cam": 199,
+   "rows_without": 0,
+   "rpm_range": [
+    1300.988847583643,
+    5001.0
+   ],
+   "map_range_kpa": [
+    17.33,
+    239.9832111000991
+   ],
+   "cam_range_cad": [
+    -74.269,
+    -0.298
+   ],
+   "median_cad": -19.26
+  },
+  "hot_floor_rounding": {
+   "printed_floor_rule": "round(floor, 2)",
+   "half_width_kpa": 0.005,
+   "rows_within": 0,
+   "keys": []
+  },
+  "bounds": {
+   "lowest_final_map_kpa": 112.97639624252787,
+   "s3a_start_map_kpa": 112.97639624252787,
+   "s3b_gate_lo_kpa": 100.0,
+   "s3b_depth_upper_c1": 0.2898347107437954,
+   "s3b_depth_upper_invariant": 0.31599999999999995,
+   "s3b_depth_upper": 0.2898347107437954,
+   "s3b_edge_active": "C1",
+   "s3b_depth_upper_invariant_source": "the contract's all-row lambda clip floor (lambda_clip_floor.floor: round(min(0.70, the deepest lambda over every row - 0.01), 3), held-out and Initial rows included; amendment C1, a C13 disclosure)",
+   "s3b_invariant_edge_active": false,
+   "s3b_c1_minus_invariant": -0.026165289256204538,
+   "s3d_domain": {
+    "rpm": [
+     1300.988847583643,
+     5001.0
+    ],
+    "map_kpa": [
+     17.33,
+     239.9832111000991
+    ]
+   },
+   "s3d_clamp_cad": [
+    -74.269,
+    -0.298
+   ]
+  }
+ },
+ "flags": [
+  "S0_tip_below_barometer"
+ ],
+ "seen_before_the_fit": [
+  "WP1 P2's implementer, 22 October 2026: results/ENGINE_THRESHOLDS.md:789-797, the lambda clip paragraph, which prints each EPA engine's floor and its deepest EPA lambda over all rows, held-out rows included (HANDOFFS.md WP3 item 2); none used",
+  "WP1 P7's implementer, 22 October 2026: printed results/ENGINE_THRESHOLDS.md:755 (E6 row 3, the tables' heating values), :789-797 (as above) and thresholds/contract.py:440-447 (E6 rows 1-3, each table's offset lambda_ref - 1) (HANDOFFS.md WP3 item 2, P7 item 3); none used",
+  "the plan's authors: PLAN.md's turbine-inlet-pressure-against-barometer boolean and its all-row channel ranges (Cell 9's top speed, the cam ranges, the Honda's Final lambda minimum, the HD1 barometer), from epa_channels.csv's minima and maxima over every row (amendments C1, C13; wrong claims 11 and 16); no fit input is taken from them (amendment C1: every bound comes from the yield or a DESIGN constant)",
+  "the amendments' authors: the contract's own all-row turbine-inlet-temperature ranges (the amendments' disclosure)",
+  "the end lines rpm_min and rpm_max: cited to the contract JSON's lines, never held out (thresholds/split.py, amendment C13)",
+  "WP3's interface author, 23 October 2026: the reads WP3_INTERFACES.md section 1.2 lists -- the contract's key paths and value types, its rule texts, version_4.plant_values, the first two points of ecu_strategy_b58 (B58 measurements), the keys (never the values) of engines.mazda_25t, its per_held_out_line and lambda_clip_floor, and of one held_out_rows record, results/ENGINE_THRESHOLDS/ecu/k3_nominal.json's keys and two B58 figures, and MANIFEST.csv's header and its anl-d3 rows' paths and byte counts; no EPA table",
+  "WP3's loader author, 23 October 2026: the first line (the header) of each of the ten EPA tables, read once to pin epa_rows.HEADERS; no other line of any table",
+  "WP3's loader author, 23 October 2026: the contract JSON's key paths and value types, its lines and held_out_lines (C4's allowlist), and the keys, never the values, of one held_out_rows record, one alpha_nodes_removed record and of engines.mazda_25t.lambda_clip_floor",
+  "WP3's loader author, 23 October 2026: the contract MD's section 2.2 (the published table counts, the held-out lines' structural counts) and section 3 (the lambda_ref values and decision 54's readings), as written there",
+  "WP3's D3 author, 23 October 2026: from the contract JSON c3_segments, perturbations_E6, the C rows of thresholds and conventions.populations, with no EPA value; no D3 file and no summary workbook",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): results/ENGINE_THRESHOLDS.md section 5 and appendix A (23 October 2026, d3_rows.py's channel pins)",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): GRAD-engine-data/CATALOGUE.md:260-282, 283-405, 406-521, 591-628, 652-683 (the D3 format, tests, channels and problems; no D3 file and no summary workbook opened)",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): GRAD-engine-data/anl-d3-documentation/aprf-dyno-testing-reference/ANL_APRF_DynoTestingReference_July2013.pdf (23 October 2026, through pdftotext into a scratch file: generic 2013 channel names, no summary header; the fuel's heating value 'at the top of the test summary result sheet')",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): engine_specs/cars/cx9_2016_25t.toml [gear_ratios] (six forward gears, NH519 Table 4): the gear codes",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): the D3 summary pins' author, 24 October 2026 (decision 78): the header row (row 7) of each summary workbook, GRAD-engine-data/anl-d3-2016-mazda-cx9/test-summary/2016_Mazda_CX9_Test_Summary_04052018.xlsx, sheet 'Extended Test Summary', and anl-d3-2018-honda-accord-lx/test-summary/2018_Honda_Accord_Test_Summary_20191125.xlsx, sheet 'G2_TestSummary' (each file's sha256 MANIFEST.csv's), and the labelled cells above it, through a scratch script run with -I -B (the scratchpad's d3pin_scripts/summary_header.py) that printed only those strings; no row below the header, no result value",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): the D3 summary pins' author, 24 October 2026 (decision 78 as amended): the identifier columns of every row below the header of both workbooks -- 'Test ID [#]', 'Cycle' and the Accord's 'Fuel Batch' -- through a scratch script that decoded no other column (d3pin3_scripts/summary_identifiers.py), and again through d3_rows.sum_row to check decision 80's row rule on them (d3pin5_scripts/summary_rows_check.py); no result value",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): the D3 summary pins' author, 24 October 2026 (decision 81): GRAD-engine-data/_catalogue/d3_accord_columns.csv in full and d3_cx9_columns.csv by grep, the catalogue's derived lists of every column name, its unit as written in the name and its file count (CATALOGUE.md:54); names and counts only, no value",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): the D3 summary pins' author, 24 October 2026 (decision 79): EPA NVFEL Fuel Analysis Reports 26781, 25206 and 25402 (GRAD-engine-data/epa-ncat-benchmarking/<engine>_tier3-test-data/unzipped/6- ... .pdf), the Tier 3 test fuels of the three engines' Tier 3 packages, printed whole through pdftotext, with the embedded images of their scanned pages viewed (d3pin5_scripts/pdf_page_images.py); and the field alpha_fuel.density_kgpL_15C alone of each EPA engine's epa_engine.json (d3pin5_scripts/tier2_density.py); fuel properties, no row value",
+  "WP3's D3 author, before the fit (d3_rows.SOURCES_READ): the D3 summary pins' author, 24 October 2026: results/ENGINE_THRESHOLDS.md section 5 (rule text); GRAD-engine-data/CATALOGUE.md:1-120, 255-312, 404-430, 495-505 and 588-705 (the layout, the EPA packages and fuels, the D3 format and batches, parts of the CX-9's and the Accord's test tables, which print per-test cell temperatures and channel maxima of D3 files, as the catalogue lines above do, the channels and the problems); MANIFEST.csv's rows of the summaries, the column lists and the test files (paths and sha256); the earlier attempts' scratch outputs of decision 78's reads; no D3 trace file and no summary result value; none used beyond the pins",
+  "WP3's validation author, 23 October 2026: the contract's E6 row 11 shift, the d rows' probe, E6 row 10's driveline efficiency, section 5's radius gap, and each engine's epa_engine.json alpha_fuel heating value, printed once to check their parsers (contract constants and fuel properties, no row value)",
+  "WP3's integrator, 23 October 2026: the contract JSON's open_for_the_team, order_of_work, status and the perturbations_E6 rows' text; the key names of engines.ford_27tt.fuel_by_table's records, of one per_held_out_line record and of engines.mazda_25t.pooled_counts; generators.sha256's and generator_inputs_sha256's key lists; results/ENGINE_THRESHOLDS.md:280-300 (the B58's climb cell), :870-960 (E6's rules) and :2340-2360 (what is open); no EPA row, no held-out value",
+  "WP3's isolation reviewer, 23 October 2026: results/ENGINE_THRESHOLDS.md:980-1010 (the lambda clip paragraph, as P2's and P7's entries: each engine's floor and its deepest EPA lambda over all rows, held-out rows included) and the key names of the contract's engines, coverage, lambda_clip_floor, conventions and thresholds blocks, with the text of conventions.held_out_counts; none used",
+  "WP3's contract and fit reviewers, 23 October 2026: the contract JSON's perturbations_E6 rule texts (rows 2, 3 and 9: constants, bands, must_show) and its thresholds' R and units for the three engines (rule texts and contract constants, no row value); none used as a fit input beyond the R the fit already reads through the calibration view",
+  "WP3's fixer, 23 October 2026: no contract text and no EPA file; the code, docs/build_step_2/AMENDMENTS.md section C and WP3_INTERFACES.md, and the reviews above",
+  "WP3's second isolation reviewer, 23 October 2026: key names of the contract's engine blocks, lambda_clip_floor, coverage and held_out_rows records; the top-level and conventions key lists; the numeric-leaf key paths of conventions, model_form and perturbations_E6; no value, no EPA table",
+  "WP3's second contract reviewer, 23 October 2026: the contract JSON's E6 band texts and the numbers its parsers take from them (rule text), and ecu_strategy_b58's k3_pair_change tables against the B58's k3 rows (B58 measurements); no EPA table, no row value",
+  "WP3's second fit reviewer, 23 October 2026: the calibration and held-out row counts per table of the three engines (the contract's tables block), for a run-time estimate; T0 and the fits ran on synthetic rows only; no EPA table, no row value",
+  "WP3's second test reviewer, 23 October 2026: every WP3 suite run, test_epa_rows.Structural among them (the real tables' structure, booleans and counts only) and Gate's probe of this tree's Run 1 rule text; no value printed",
+  "WP3's second fixer, 23 October 2026: the contract JSON's perturbations_E6 rows 5, 6 and 9 (constant, band and must_show texts) and the engine specs' labels; no EPA table, no row value",
+  "WP3's repinner to version 5, 23 October 2026: the contract JSON's diff from version 4 to version 5 (each changed line's first 400 characters, with its context lines: _generated, decisions 76-77, model_form's in-sample stage and rules, open_for_the_team, seen_before_writing, whose first entry prints the all-row turbine-inlet-temperature maxima the amendments' entry above discloses, version_5 and generators.sha256); version 5's open_for_the_team, version_5.go_ahead and version_5.schema in full; the .md's section headings at both versions and its section 14; and results/ENGINE_THRESHOLDS.md:449-452 at both versions and :467-470 at version 5 (two rows of a per-line counts table and a list of per-engine kPa figures, read while checking a line citation); no EPA table, no row value; none used",
+  "WP3's pin author, before the fit (epa_stats.SOURCES_READ): WP3's pin author, 23 October 2026 (decision 56): the four EPA test reports (logs/epa/<engine>/3- and 3a- ... Test Report.docx), every paragraph and table cell, through zipfile's word/document.xml into a scratch file: Table 2 (instrumentation), the setup and procedure sections and the section Uncertainty with its Table 8; the reports also print the rated power and torque, the fuel properties, the common-mode points and the BSFC and BTE uncertainty discussion; no EPA table, workbook or data file",
+  "WP3's pin author, before the fit (epa_stats.SOURCES_READ): WP3's pin author, 23 October 2026: the three ALPHA Generation Process pages (logs/epa/<engine>/3- ... .html) for any instrument accuracy (none stated); the Mazda's page whole, including the engine definition it prints (the full-throttle, closed-throttle and naturally aspirated curves and the fuel map), the Honda's and the Ford's prose and code lines (their WOT, idle and estimated fueling points), their curve and map arrays filtered out; none used",
+  "WP3's pin author, before the fit (epa_stats.SOURCES_READ): WP3's pin author, 23 October 2026: the four NVFEL Fuel Analysis Report PDFs (logs/epa/<engine>/6- ...), through pdftotext: fuel properties only, no instrument accuracy; none used",
+  "WP3's third isolation reviewer, 24 October 2026: the contract JSON's top-level keys and the key paths and types of model_form and conventions; the text of model_form.in_sample_rules and version_5 in full; thresholds/split.py's source and thresholds/contract.py:1312-1341 (rule text); through a grep, the lam_floor line of each EPA engine spec, which prints each engine's lambda clip floor, an all-row quantity (the deepest EPA lambda over every row less 0.01, held-out rows included); epa_stats' Table 8 pin rows; planted leaks run on synthetic repositories only; no EPA table opened, no row value printed; none used",
+  "WP3's third contract reviewer, 24 October 2026: the four EPA test reports (logs/epa/<engine>/3- and 3a- ... Test Report.docx) through zipfile in a scratch script, printing only each report's Table 8 (caption, header and rows), the table-of-contents lines that begin with 'Uncertainty', and as booleans whether each quoted Table 8 note occurs verbatim; nothing else printed; none used",
+  "WP3's Run 1 reviewer, 24 October 2026: the contract JSON's perturbations_E6 band texts, parsed through epa_stats.e6_band_values and row10_etas, printing only key names, one boolean and two counts; `git ls-files` of the engines' data folder (file names only); PLAN.md section 5.11 (its design-time row counts); epa_stats.SOURCES_READ's text; synthetic runs only; no EPA table, no row value; none used",
+  "WP3's third test reviewer, 24 October 2026: from the contract JSON, printed in full, model_form.in_sample_rules.sampling_noise and version_5 (rule text only); engine_facts(...).table_sources' test cells, compared as booleans with epa_stats.REPORT_CELLS (nothing printed); the scratchpad's pre_run1_result.json 'pins' summary, which quotes the Table 8 instrument rows; test_contract_pinned on the tree; no EPA table opened, no row value seen; none used",
+  "WP3's third fixer, 24 October 2026: no contract text and no EPA file; the code (epa_stats.U_D's Table 8 pin rows and SOURCES_READ among it), docs/build_step_2/WP3_INTERFACES.md and the four reviews of 24 October with their scratch prototypes (synthetic repositories only); none used",
+  "WP3's fourth isolation reviewer, 24 October 2026: the contract JSON for rule text and the R values of the three engines and the B58-based budget (contract constants, compared as equal; no EPA value); planted git leaks run on synthetic repositories only; no EPA table opened, no row value printed; none used",
+  "WP3's fourth contract reviewer, 24 October 2026: the four EPA test reports through zipfile in scratch scripts -- each report's Table 8 (its caption, the paragraph before it and its rows), the table-of-contents 'Uncertainty' lines, the HD1 paragraphs on its high-load windows and on the 'geometric sum', and the Mazda paragraph on the signals' uncertainties; from the contract JSON ecu_strategy_b58, budget, knee_shift, conventions, model_form.in_sample_rules, tests_lists, and the Mazda's per_held_out_line, deciding_lines and pooled_counts; no EPA table, workbook or data value; none used",
+  "WP3's fourth Run 1 reviewer, 24 October 2026: the contract JSON's thresholds, D1's R per engine compared as booleans with 0.6 % and 1.0 % (nothing else printed); synthetic runs only; no EPA table, no row value; none used",
+  "WP3's fourth test reviewer, 24 October 2026: docs/build_step_2/WP3_INTERFACES.md in full; results/ENGINE_THRESHOLDS.md lines 520-570 and 1000-1012 and the lines its greps for decision 77, version 5 and the snap printed; PLAN.md section 8.4 and AMENDMENTS.md's C12 line; mutations in scratch clones only; no EPA table, D3 file, workbook, test report or epa_engine.json content; none used",
+  "WP3's fourth fixer, 24 October 2026: no contract text and no EPA file; the code, docs/build_step_2/WP3_INTERFACES.md and the four reviews of 24 October with their scratch scripts; T0's synthetic seeds fitted on test_calibrate_epa's synthetic Mazda tables under synthetic R (test_epa_stats' synthetic view, whose E1a, E2a and E3a are PLAN.md 5.1's residual scales as epa_fit._scales' docstring quotes them); none used",
+  "THE DISCLOSURE (Ghassan's order of 29 October 2026; results/VALIDATION_DECISIONS.md section H): the defect hunt's code-path investigator, 24 October 2026, after the Mazda's first fit, while reading the Mazda's epa_engine.json, printed part of its ALPHA full-throttle curve (wot_torque_curve), whose measured_at_speed records cite High Load Initial rows 12, 18, 24 and 30; the node of row 18, at 1751 rpm, is a held-out row's (the contract, section 2.3), so that held-out row's Initial torque was seen; only E1i, descriptive, reads Initial torque; none used, and no later check opens epa_engine.json's curve fields",
+  "the defect hunt, 24 October 2026 (read-only, after the Mazda's first fit and the Honda's T0): the three engines' calibration steady and Final rows through epa_rows.calibration_rows (pickled in the scratchpad's defect_hunt/verdict/), the Mazda's frozen fits evaluated on them through epa_fit.evaluate_rows, the Mazda's Atkinson ratio and cam phases and the Honda's effective strokes, and the Mazda's and the Honda's Final and steady TIT at matched calibration points (finding F-1); calibration rows only, no held-out row",
+  "the implementer of defect D-1 and decisions 82-85, 29 October 2026: the defect hunt's verdict and the Run 1 log; the three engines' calibration steady and Final rows from the hunt's pickle, through calibrate_epa.valve_brackets (D-1's evidence: the Atkinson fit and the brackets); the Honda's first-pass t0.json (its d2_gate detail: the truth's and the fitted gates and the flat intervals of its T0 seeds); the Mazda's first-pass complete.json (its E6 probe records) and the frozen Mazda plant's locked climb (model outputs: decision 85's climb-cell resolution); no held-out row, no epa_engine.json field, no contract value beyond the code's own reads"
+ ],
+ "declarations": {
+  "ford_cell9_octane": null,
+  "hd1_barometer": null,
+  "spark_ref_kpa": {
+   "value": 40.0,
+   "label": "DESIGN"
+  },
+  "provisional_completion": {
+   "deliverable_torque": [],
+   "k3": {
+    "turb_knee_k": 1123.0
+   },
+   "loop": {
+    "torque_floor_nm": 0.0
+   }
+  },
+  "no_statistic_outcomes": [
+   "E4b: a line whose boosted lambda~1 rows share one MAP has no reference line and decides nothing; with no other deciding line E4b has no statistic",
+   "E4b: a data lever that sums to zero over the deciding lines leaves eps undefined: no statistic",
+   "E4b held out: with fewer than 2 enriched rows over the deciding lines the pooled u_stat is undefined (the enriched side has no variance of its own), so E4b is labelled but cannot certify, and reads untested unless it is off (WP3's second fix of 23 October 2026)",
+   "E4b in-sample: on the same fewer than 2 enriched rows the u_stat decision 77's rule needs is undefined, so the statistic can neither be shown to fail beyond its noise (|E_cal| - 2 u_stat > R) nor pass (2 u_stat <= R): it neither blocks a form nor passes it, recorded per form with its noise-exceeding statistics (epa_stats.NO_U_STAT; declared 23 October 2026, before Run 1, with decision 77)",
+   "C3b and C3d: a row whose u_val is incomplete (u_num, u_D or u_stat missing) has no statistic; the C3 chain's u-terms are read from the D3 files, which the arming hashes and the run first reads (C5), so this is a declared outcome of the one run, not an arm-time check"
+  ],
+  "d1_torque_target_u_d": "in u_val: EPA's torque reading moves D1's inversion target; each cluster re-evaluated at its torque reading + torque's u_D (torque_target_shift), random"
+ }
+}

@@ -1,0 +1,128 @@
+{
+ "schema": "epa-e6/1",
+ "provenance": {
+  "engine": "ford_27tt",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "cec3e3faefe47172",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final_hd1.csv": "b10b3020475f41e8d966f4f0c479b4be40431eb2ac154e86c5e7632c21df59d0",
+    "epa_highload_initial_hd1.csv": "1425452fe85157182f51273206a881ed1022b551893903d0fb22461a4b659d1a",
+    "epa_steady_cell9.csv": "7f42d0e89ed63aba971f395e93325debb81c94b3e4b1db043c502ef16d2af91a",
+    "epa_steady_hd1.csv": "9b2abbe1dfc316b824072f7a8b8b2f5968d1e8fd111a357d0e9a4520eac116fd"
+   },
+   "epa_engine_sha256": "8d353903bd48af4d452392164b0fe44a07d11e898aa764dc53f9748aedbda64b",
+   "epa_channels_blob": "4d4c82c7c64a08b54cc4d5ed78324b8a87986dae",
+   "manifest_sha256": "f70b408bcaf5548f692d3f9f06a6559861f58e503fc5cd29b3c6ffce4acf258c"
+  },
+  "view_sha256": "cf819c7e7fcc7e7aff95a3e1f159af8ecb93408086fcb5a3323f6362d73b6762",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "row": 7,
+ "variant": "7_110",
+ "conventions": null,
+ "knock_factor": 1.1,
+ "form": "A+B+C+D",
+ "values": {
+  "cycle": {
+   "form": "A+B+C+D",
+   "ve_base": 0.7737513632734259,
+   "ve_amp": -0.11101917322686017,
+   "ve_rpm": 1799.930053859372,
+   "ve_width": 1016.3068780812137,
+   "ve_map": 0.0024450181495977927,
+   "ve_cam": 0.004999999999999999,
+   "ce_rich_slope": 0.05033241943706298,
+   "burn_base": 14.150690977542585,
+   "burn_rpm": 1.7860842705501087e-09,
+   "delay_base": 11.087198123717593,
+   "delay_rpm": 6.806557994236476e-18,
+   "fmep_0": -0.4999983378847716,
+   "fmep_pmax": 0.0313170589206197,
+   "fmep_sp": -0.09998828161595949,
+   "fmep_sp2": 0.01305001291730229,
+   "ua_port": 18.050683610980357,
+   "exh_bp_ratio": 1.0,
+   "exh_bp_min_kpa": 103.30000000000001,
+   "knock_a": 0.017376376239597
+  },
+  "ecu": {
+   "spark_a": 40.04193197468751,
+   "spark_b": 0.002317186381441568,
+   "spark_c": 0.4015078767597129,
+   "spark_min": -21.0,
+   "spark_max": 45.0,
+   "kl_a": 90.2731348890117,
+   "kl_b": 0.0031325501960472214,
+   "kl_c": -1.0049777397343864,
+   "kl_d": 2.704553676122492,
+   "enr_load": 145.0,
+   "enr_rpm_lo": 2600.0,
+   "enr_rpm_hi": 5500.0,
+   "enr_depth": 0.2434360008510158,
+   "cam_on": 1,
+   "cam_c0": 21.743151431156313,
+   "cam_c_rpm": -19.319848691449554,
+   "cam_c_map": -6.293702556106699,
+   "cam_c_rpm2": 3.4298769246858516,
+   "cam_c_rpm_map": -1.660067944533128,
+   "cam_c_map2": 23.694649709011905,
+   "cam_rpm_lo": 999.0,
+   "cam_rpm_hi": 4501.0,
+   "cam_map_lo": 22.590000000000003,
+   "cam_map_hi": 193.89,
+   "cam_lo": -2.104,
+   "cam_hi": 51.57
+  },
+  "boost_ceiling": {
+   "envelope_flow": [
+    0.0,
+    0.16304496195163862,
+    0.204143475012497,
+    0.2245045252550972,
+    0.2539090605698372
+   ],
+   "envelope_pr": [
+    1.0,
+    1.987474457122185,
+    1.9749410429971828,
+    1.9684844544724471,
+    1.9490458207452168
+   ],
+   "pr_cap": 1.987474457122185
+  }
+ },
+ "frozen_sections_sha256": "5e8d2538d640a04256521c710938bf6370c8e68fb0a9bbed45fac18c283ac868",
+ "fit": null
+}

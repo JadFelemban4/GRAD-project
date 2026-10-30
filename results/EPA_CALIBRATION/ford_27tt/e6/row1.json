@@ -1,0 +1,4581 @@
+{
+ "schema": "epa-e6/1",
+ "provenance": {
+  "engine": "ford_27tt",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "891331cd74e4b2b0ca25e4210d90238626a0a755",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "cec3e3faefe47172",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final_hd1.csv": "b10b3020475f41e8d966f4f0c479b4be40431eb2ac154e86c5e7632c21df59d0",
+    "epa_highload_initial_hd1.csv": "1425452fe85157182f51273206a881ed1022b551893903d0fb22461a4b659d1a",
+    "epa_steady_cell9.csv": "7f42d0e89ed63aba971f395e93325debb81c94b3e4b1db043c502ef16d2af91a",
+    "epa_steady_hd1.csv": "9b2abbe1dfc316b824072f7a8b8b2f5968d1e8fd111a357d0e9a4520eac116fd"
+   },
+   "epa_engine_sha256": "8d353903bd48af4d452392164b0fe44a07d11e898aa764dc53f9748aedbda64b",
+   "epa_channels_blob": "4d4c82c7c64a08b54cc4d5ed78324b8a87986dae",
+   "manifest_sha256": "f70b408bcaf5548f692d3f9f06a6559861f58e503fc5cd29b3c6ffce4acf258c"
+  },
+  "view_sha256": "cf819c7e7fcc7e7aff95a3e1f159af8ecb93408086fcb5a3323f6362d73b6762",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "row": 1,
+ "variant": "1",
+ "conventions": {
+  "snap": true,
+  "cell_referenced": false,
+  "afr_st": null,
+  "lhv_j_per_kg": null
+ },
+ "knock_factor": null,
+ "form": "A+B+C+D",
+ "values": {
+  "cycle": {
+   "form": "A+B+C+D",
+   "ve_base": 0.7727922844727367,
+   "ve_amp": -0.11002177094372813,
+   "ve_rpm": 1802.9905945005826,
+   "ve_width": 1012.4419663603129,
+   "ve_map": 0.0024203157229281767,
+   "ve_cam": 0.004999999999999999,
+   "ce_rich_slope": 0.04703183002832513,
+   "burn_base": 14.131639949282299,
+   "burn_rpm": 9.633679810977488e-12,
+   "delay_base": 11.109340897621669,
+   "delay_rpm": 1.987844830719574e-10,
+   "fmep_0": -0.49999999997890826,
+   "fmep_pmax": 0.031315748854244256,
+   "fmep_sp": -0.09999999997379592,
+   "fmep_sp2": 0.013062890454301491,
+   "ua_port": 18.06167783648553,
+   "exh_bp_ratio": 1.0,
+   "exh_bp_min_kpa": 103.30000000000001,
+   "knock_a": 0.01901483695201471
+  },
+  "ecu": {
+   "spark_a": 40.04193197468751,
+   "spark_b": 0.002317186381441568,
+   "spark_c": 0.4015078767597129,
+   "spark_min": -21.0,
+   "spark_max": 45.0,
+   "kl_a": 90.2731348890117,
+   "kl_b": 0.0031325501960472214,
+   "kl_c": -1.0049777397343864,
+   "kl_d": 2.704553676122492,
+   "enr_load": 145.0,
+   "enr_rpm_lo": 2200.0,
+   "enr_rpm_hi": 5500.0,
+   "enr_depth": 0.23038858757498581,
+   "cam_on": 1,
+   "cam_c0": 21.743151431156313,
+   "cam_c_rpm": -19.319848691449554,
+   "cam_c_map": -6.293702556106699,
+   "cam_c_rpm2": 3.4298769246858516,
+   "cam_c_rpm_map": -1.660067944533128,
+   "cam_c_map2": 23.694649709011905,
+   "cam_rpm_lo": 999.0,
+   "cam_rpm_hi": 4501.0,
+   "cam_map_lo": 22.590000000000003,
+   "cam_map_hi": 193.89,
+   "cam_lo": -2.104,
+   "cam_hi": 51.57
+  },
+  "boost_ceiling": {
+   "envelope_flow": [
+    0.0,
+    0.16304496195163862,
+    0.204143475012497,
+    0.2245045252550972,
+    0.2539090605698372
+   ],
+   "envelope_pr": [
+    1.0,
+    1.987474457122185,
+    1.9749410429971828,
+    1.9684844544724471,
+    1.9490458207452168
+   ],
+   "pr_cap": 1.987474457122185
+  }
+ },
+ "frozen_sections_sha256": "22251bd193a4126955f2573a4d72529d8ff8b2d07af74af3df168cfca0972cec",
+ "fit": {
+  "S1": {
+   "values": {
+    "exh_bp_ratio": 1.0,
+    "exh_bp_min_kpa": 103.30000000000001
+   },
+   "rows_used": 143,
+   "rows_excluded": {
+    "not_fired_or_no_tip": [
+     [
+      "epa_steady_cell9.csv",
+      6
+     ],
+     [
+      "epa_steady_cell9.csv",
+      7
+     ],
+     [
+      "epa_steady_cell9.csv",
+      28
+     ],
+     [
+      "epa_steady_cell9.csv",
+      29
+     ],
+     [
+      "epa_steady_cell9.csv",
+      44
+     ],
+     [
+      "epa_steady_cell9.csv",
+      45
+     ],
+     [
+      "epa_steady_cell9.csv",
+      46
+     ],
+     [
+      "epa_steady_cell9.csv",
+      81
+     ],
+     [
+      "epa_steady_cell9.csv",
+      82
+     ],
+     [
+      "epa_steady_cell9.csv",
+      83
+     ],
+     [
+      "epa_steady_cell9.csv",
+      115
+     ],
+     [
+      "epa_steady_cell9.csv",
+      116
+     ],
+     [
+      "epa_steady_cell9.csv",
+      117
+     ],
+     [
+      "epa_steady_cell9.csv",
+      118
+     ],
+     [
+      "epa_steady_cell9.csv",
+      132
+     ],
+     [
+      "epa_steady_cell9.csv",
+      133
+     ],
+     [
+      "epa_steady_cell9.csv",
+      134
+     ],
+     [
+      "epa_steady_cell9.csv",
+      135
+     ],
+     [
+      "epa_steady_cell9.csv",
+      136
+     ],
+     [
+      "epa_steady_cell9.csv",
+      160
+     ],
+     [
+      "epa_steady_cell9.csv",
+      161
+     ],
+     [
+      "epa_steady_cell9.csv",
+      162
+     ],
+     [
+      "epa_steady_cell9.csv",
+      163
+     ],
+     [
+      "epa_steady_cell9.csv",
+      164
+     ],
+     [
+      "epa_steady_cell9.csv",
+      165
+     ],
+     [
+      "epa_steady_cell9.csv",
+      173
+     ],
+     [
+      "epa_steady_cell9.csv",
+      174
+     ],
+     [
+      "epa_steady_cell9.csv",
+      175
+     ],
+     [
+      "epa_steady_cell9.csv",
+      176
+     ],
+     [
+      "epa_steady_cell9.csv",
+      177
+     ],
+     [
+      "epa_steady_cell9.csv",
+      178
+     ],
+     [
+      "epa_steady_cell9.csv",
+      179
+     ],
+     [
+      "epa_steady_hd1.csv",
+      6
+     ],
+     [
+      "epa_steady_hd1.csv",
+      12
+     ],
+     [
+      "epa_steady_hd1.csv",
+      18
+     ],
+     [
+      "epa_steady_hd1.csv",
+      25
+     ],
+     [
+      "epa_steady_hd1.csv",
+      26
+     ],
+     [
+      "epa_steady_hd1.csv",
+      30
+     ],
+     [
+      "epa_steady_hd1.csv",
+      41
+     ],
+     [
+      "epa_steady_hd1.csv",
+      42
+     ],
+     [
+      "epa_steady_hd1.csv",
+      48
+     ],
+     [
+      "epa_steady_hd1.csv",
+      49
+     ],
+     [
+      "epa_steady_hd1.csv",
+      65
+     ],
+     [
+      "epa_steady_hd1.csv",
+      70
+     ],
+     [
+      "epa_steady_hd1.csv",
+      79
+     ]
+    ],
+    "sentinel": []
+   },
+   "flags": [
+    "S1_bound_active"
+   ],
+   "bounds_active": [
+    "exh_bp_ratio"
+   ],
+   "convergence": null,
+   "report": {
+    "hinge_kpa": 103.30000000000001,
+    "ratio": 1.0,
+    "floor_kpa": 103.30000000000001,
+    "sigma": {
+     "ratio": 0.013752325353791834,
+     "floor_kpa": 2.330049775745422
+    },
+    "residual_vs_rpm": {
+     "slope_k_per_krpm": 11.842748195932117,
+     "n": 143,
+     "unit": "kPa of TIP per 1000 rpm"
+    },
+    "without_tip_below_barometer": {
+     "values": {
+      "exh_bp_ratio": 1.0,
+      "exh_bp_min_kpa": 104.10000000000001
+     },
+     "rows_removed": 6
+    },
+    "sse_kpa2": 46695.96396603855,
+    "grid_step_kpa": 0.1,
+    "tie_rule": "the lowest hinge"
+   }
+  },
+  "S2": {
+   "values": {
+    "ve_base": 0.7727922844727367,
+    "ve_amp": -0.11002177094372813,
+    "ve_rpm": 1802.9905945005826,
+    "ve_width": 1012.4419663603129,
+    "ve_map": 0.0024203157229281767,
+    "ve_cam": 0.004999999999999999
+   },
+   "rows_used": 143,
+   "rows_excluded": {
+    "no_meter_or_not_fired": [
+     [
+      "epa_steady_cell9.csv",
+      6
+     ],
+     [
+      "epa_steady_cell9.csv",
+      7
+     ],
+     [
+      "epa_steady_cell9.csv",
+      28
+     ],
+     [
+      "epa_steady_cell9.csv",
+      29
+     ],
+     [
+      "epa_steady_cell9.csv",
+      44
+     ],
+     [
+      "epa_steady_cell9.csv",
+      45
+     ],
+     [
+      "epa_steady_cell9.csv",
+      46
+     ],
+     [
+      "epa_steady_cell9.csv",
+      81
+     ],
+     [
+      "epa_steady_cell9.csv",
+      82
+     ],
+     [
+      "epa_steady_cell9.csv",
+      83
+     ],
+     [
+      "epa_steady_cell9.csv",
+      115
+     ],
+     [
+      "epa_steady_cell9.csv",
+      116
+     ],
+     [
+      "epa_steady_cell9.csv",
+      117
+     ],
+     [
+      "epa_steady_cell9.csv",
+      118
+     ],
+     [
+      "epa_steady_cell9.csv",
+      132
+     ],
+     [
+      "epa_steady_cell9.csv",
+      133
+     ],
+     [
+      "epa_steady_cell9.csv",
+      134
+     ],
+     [
+      "epa_steady_cell9.csv",
+      135
+     ],
+     [
+      "epa_steady_cell9.csv",
+      136
+     ],
+     [
+      "epa_steady_cell9.csv",
+      160
+     ],
+     [
+      "epa_steady_cell9.csv",
+      161
+     ],
+     [
+      "epa_steady_cell9.csv",
+      162
+     ],
+     [
+      "epa_steady_cell9.csv",
+      163
+     ],
+     [
+      "epa_steady_cell9.csv",
+      164
+     ],
+     [
+      "epa_steady_cell9.csv",
+      165
+     ],
+     [
+      "epa_steady_cell9.csv",
+      173
+     ],
+     [
+      "epa_steady_cell9.csv",
+      174
+     ],
+     [
+      "epa_steady_cell9.csv",
+      175
+     ],
+     [
+      "epa_steady_cell9.csv",
+      176
+     ],
+     [
+      "epa_steady_cell9.csv",
+      177
+     ],
+     [
+      "epa_steady_cell9.csv",
+      178
+     ],
+     [
+      "epa_steady_cell9.csv",
+      179
+     ],
+     [
+      "epa_steady_hd1.csv",
+      6
+     ],
+     [
+      "epa_steady_hd1.csv",
+      12
+     ],
+     [
+      "epa_steady_hd1.csv",
+      18
+     ],
+     [
+      "epa_steady_hd1.csv",
+      25
+     ],
+     [
+      "epa_steady_hd1.csv",
+      26
+     ],
+     [
+      "epa_steady_hd1.csv",
+      30
+     ],
+     [
+      "epa_steady_hd1.csv",
+      41
+     ],
+     [
+      "epa_steady_hd1.csv",
+      42
+     ],
+     [
+      "epa_steady_hd1.csv",
+      48
+     ],
+     [
+      "epa_steady_hd1.csv",
+      49
+     ],
+     [
+      "epa_steady_hd1.csv",
+      65
+     ],
+     [
+      "epa_steady_hd1.csv",
+      70
+     ],
+     [
+      "epa_steady_hd1.csv",
+      79
+     ]
+    ],
+    "no_lambda": [],
+    "sentinel": []
+   },
+   "flags": [
+    "S2_bound_active"
+   ],
+   "bounds_active": [
+    "ve_cam"
+   ],
+   "convergence": {
+    "nfev": 9,
+    "njev": 9,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "cost": 1417.045413974863,
+    "grad_norm": 0.00025477006716407565,
+    "last_step_norm": 2.1897570248712773e-06,
+    "cost_change": 5.220499588176608e-10,
+    "second_attempt": false
+   },
+   "report": {
+    "grid": {
+     "ve_rpm": [
+      1000.0,
+      1500.0,
+      1750.0,
+      1800.0,
+      2200.0,
+      2250.0,
+      2400.0,
+      2600.0,
+      2750.0,
+      3000.0,
+      4000.0,
+      4500.0,
+      5500.0
+     ],
+     "ve_width": [
+      300.0,
+      333.21072631730885,
+      370.09796044302817,
+      411.0687006925863,
+      456.57500108029683,
+      507.11895909430575,
+      563.2582556303039,
+      625.612308209313,
+      694.8691053715767,
+      771.7927976544053,
+      857.2321289096401,
+      952.12980098838,
+      1057.5328751189757,
+      1174.6043247427508,
+      1304.6358672766132,
+      1449.062216382841,
+      1609.476911999652,
+      1787.6499027944772,
+      1985.5470750373781,
+      2205.351943368042,
+      2449.489742783179,
+      2720.654187665269,
+      3021.8371931005727,
+      3356.3618864189943,
+      3727.9192731913513,
+      4140.608962241279,
+      4598.984399014577,
+      5108.103106392068,
+      5673.582487282,
+      6301.6618046946605,
+      6999.271023161168,
+      7774.1072710640765,
+      8634.719767533114,
+      9590.604150953763,
+      10652.307249870342,
+      11831.543452281421,
+      13141.32395729829,
+      14596.100335274723,
+      16211.923980390662,
+      18006.623215023243,
+      20000.0
+     ]
+    },
+    "profile_min_cost": 1701.656750415011,
+    "start": {
+     "ve_base": 0.7093370342770756,
+     "ve_amp": -0.10658159576957149,
+     "ve_rpm": 1750.0,
+     "ve_width": 1057.5328751189757,
+     "ve_map": 0.0029426111275153294,
+     "ve_cam": 0.005
+    },
+    "declared_start": {
+     "ve_base": 0.86,
+     "ve_amp": 0.14,
+     "ve_rpm": 3800.0,
+     "ve_width": 2600.0,
+     "ve_map": 0.0,
+     "ve_cam": 0.0
+    },
+    "verify_max_rel": 4.230604369871311e-16,
+    "clip_rows": [],
+    "corr_ve_cam_ve_map": -0.9769988080568989,
+    "params": [
+     "ve_base",
+     "ve_amp",
+     "ve_rpm",
+     "ve_width",
+     "ve_map",
+     "ve_cam"
+    ],
+    "estimate": {
+     "ve_base": 0.7727922844727367,
+     "ve_amp": -0.11002177094372813,
+     "ve_rpm": 1802.9905945005826,
+     "ve_width": 1012.4419663603129,
+     "ve_map": 0.0024203157229281767,
+     "ve_cam": 0.004999999999999999
+    },
+    "covariance": [
+     [
+      0.004463127703856666,
+      -0.0006097531954484287,
+      14.368499198081269,
+      7.201926535990327,
+      0.00010165020900176742,
+      -0.000247445061720483
+     ],
+     [
+      -0.0006097531954483044,
+      0.001248510369916294,
+      -0.47075911310014523,
+      -1.4420355513390997,
+      3.3656224588769954e-06,
+      -8.96346328565155e-06
+     ],
+     [
+      14.368499198081597,
+      -0.47075911310073476,
+      108015.40938993417,
+      -37339.817115937825,
+      0.4085038911304984,
+      -0.9760365585534009
+     ],
+     [
+      7.201926535989764,
+      -1.4420355513391154,
+      -37339.81711593749,
+      191950.5148638699,
+      -0.005810877141660229,
+      -0.00039808572070291917
+     ],
+     [
+      0.00010165020900177082,
+      3.3656224588717464e-06,
+      0.4085038911304984,
+      -0.005810877141644699,
+      3.011303196737633e-06,
+      -6.954164317340864e-06
+     ],
+     [
+      -0.0002474450617204837,
+      -8.963463285651699e-06,
+      -0.9760365585534091,
+      -0.0003980857207237495,
+      -6.954164317340869e-06,
+      1.6824700560503367e-05
+     ]
+    ],
+    "residual_variance": 20.68406689632832,
+    "correlations": {
+     "ve_base": {
+      "ve_base": 1.0000000000000002,
+      "ve_amp": -0.25830829406749284,
+      "ve_rpm": 0.6544084421933224,
+      "ve_width": 0.2460562435758659,
+      "ve_map": 0.8768218759908486,
+      "ve_cam": -0.9029952429967751
+     },
+     "ve_amp": {
+      "ve_base": -0.2583082940674402,
+      "ve_amp": 1.0,
+      "ve_rpm": -0.04053776502922863,
+      "ve_width": -0.09315051274722061,
+      "ve_map": 0.054889854243788096,
+      "ve_cam": -0.06184521380130551
+     },
+     "ve_rpm": {
+      "ve_base": 0.6544084421933374,
+      "ve_amp": -0.040537765029279395,
+      "ve_rpm": 0.9999999999999999,
+      "ve_width": -0.2593192087815693,
+      "ve_map": 0.716268903871839,
+      "ve_cam": -0.7240183196553502
+     },
+     "ve_width": {
+      "ve_base": 0.24605624357584666,
+      "ve_amp": -0.09315051274722162,
+      "ve_rpm": -0.25931920878156695,
+      "ve_width": 1.0,
+      "ve_map": -0.007643104721038782,
+      "ve_cam": -0.00022151762542289513
+     },
+     "ve_map": {
+      "ve_base": 0.8768218759908779,
+      "ve_amp": 0.05488985424370249,
+      "ve_rpm": 0.716268903871839,
+      "ve_width": -0.0076431047210183565,
+      "ve_map": 1.0,
+      "ve_cam": -0.9769988080568982
+     },
+     "ve_cam": {
+      "ve_base": -0.9029952429967777,
+      "ve_amp": -0.06184521380130654,
+      "ve_rpm": -0.7240183196553563,
+      "ve_width": -0.0002215176254344863,
+      "ve_map": -0.9769988080568989,
+      "ve_cam": 1.0
+     }
+    },
+    "data_or_prior": {
+     "ve_base": "data-dominated",
+     "ve_amp": "data-dominated",
+     "ve_rpm": "data-dominated",
+     "ve_width": "data-dominated",
+     "ve_map": "data-dominated",
+     "ve_cam": "data-dominated"
+    },
+    "zero_columns_at_optimum": [],
+    "bounds": {
+     "ve_base": [
+      0.3,
+      1.3
+     ],
+     "ve_amp": [
+      -0.6,
+      0.6
+     ],
+     "ve_rpm": [
+      1000.0,
+      5500.0
+     ],
+     "ve_width": [
+      300.0,
+      20000.0
+     ],
+     "ve_map": [
+      -0.005,
+      0.005
+     ],
+     "ve_cam": [
+      -0.005,
+      0.005
+     ]
+    },
+    "x_scale": {
+     "ve_base": 0.1,
+     "ve_amp": 0.1,
+     "ve_rpm": 1000.0,
+     "ve_width": 1000.0,
+     "ve_map": 0.001,
+     "ve_cam": 0.001
+    }
+   }
+  },
+  "S3a": {
+   "values": {
+    "spark_a": 40.04193197468751,
+    "spark_b": 0.002317186381441568,
+    "spark_c": 0.4015078767597129,
+    "spark_min": -21.0,
+    "spark_max": 45.0,
+    "kl_a": 90.2731348890117,
+    "kl_b": 0.0031325501960472214,
+    "kl_c": -1.0049777397343864,
+    "kl_d": 2.704553676122492
+   },
+   "rows_used": 143,
+   "rows_excluded": {
+    "not_fired": [
+     [
+      "epa_steady_cell9.csv",
+      6
+     ],
+     [
+      "epa_steady_cell9.csv",
+      7
+     ],
+     [
+      "epa_steady_cell9.csv",
+      28
+     ],
+     [
+      "epa_steady_cell9.csv",
+      29
+     ],
+     [
+      "epa_steady_cell9.csv",
+      44
+     ],
+     [
+      "epa_steady_cell9.csv",
+      45
+     ],
+     [
+      "epa_steady_cell9.csv",
+      46
+     ],
+     [
+      "epa_steady_cell9.csv",
+      81
+     ],
+     [
+      "epa_steady_cell9.csv",
+      82
+     ],
+     [
+      "epa_steady_cell9.csv",
+      83
+     ],
+     [
+      "epa_steady_cell9.csv",
+      115
+     ],
+     [
+      "epa_steady_cell9.csv",
+      116
+     ],
+     [
+      "epa_steady_cell9.csv",
+      117
+     ],
+     [
+      "epa_steady_cell9.csv",
+      118
+     ],
+     [
+      "epa_steady_cell9.csv",
+      132
+     ],
+     [
+      "epa_steady_cell9.csv",
+      133
+     ],
+     [
+      "epa_steady_cell9.csv",
+      134
+     ],
+     [
+      "epa_steady_cell9.csv",
+      135
+     ],
+     [
+      "epa_steady_cell9.csv",
+      136
+     ],
+     [
+      "epa_steady_cell9.csv",
+      160
+     ],
+     [
+      "epa_steady_cell9.csv",
+      161
+     ],
+     [
+      "epa_steady_cell9.csv",
+      162
+     ],
+     [
+      "epa_steady_cell9.csv",
+      163
+     ],
+     [
+      "epa_steady_cell9.csv",
+      164
+     ],
+     [
+      "epa_steady_cell9.csv",
+      165
+     ],
+     [
+      "epa_steady_cell9.csv",
+      173
+     ],
+     [
+      "epa_steady_cell9.csv",
+      174
+     ],
+     [
+      "epa_steady_cell9.csv",
+      175
+     ],
+     [
+      "epa_steady_cell9.csv",
+      176
+     ],
+     [
+      "epa_steady_cell9.csv",
+      177
+     ],
+     [
+      "epa_steady_cell9.csv",
+      178
+     ],
+     [
+      "epa_steady_cell9.csv",
+      179
+     ],
+     [
+      "epa_steady_hd1.csv",
+      6
+     ],
+     [
+      "epa_steady_hd1.csv",
+      12
+     ],
+     [
+      "epa_steady_hd1.csv",
+      18
+     ],
+     [
+      "epa_steady_hd1.csv",
+      25
+     ],
+     [
+      "epa_steady_hd1.csv",
+      26
+     ],
+     [
+      "epa_steady_hd1.csv",
+      30
+     ],
+     [
+      "epa_steady_hd1.csv",
+      41
+     ],
+     [
+      "epa_steady_hd1.csv",
+      42
+     ],
+     [
+      "epa_steady_hd1.csv",
+      48
+     ],
+     [
+      "epa_steady_hd1.csv",
+      49
+     ],
+     [
+      "epa_steady_hd1.csv",
+      65
+     ],
+     [
+      "epa_steady_hd1.csv",
+      70
+     ],
+     [
+      "epa_steady_hd1.csv",
+      79
+     ]
+    ],
+    "sentinel": []
+   },
+   "flags": [
+    "S3a_empty_piece"
+   ],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "iterations": 5,
+    "converged": false,
+    "pieces": {
+     "part_load": {
+      "n": 91,
+      "rank": 3
+     },
+     "knock_limited": {
+      "n": 52,
+      "rank": 4
+     }
+    },
+    "start_map_kpa": 143.30000000000004,
+    "spark_min_rule": "floor(min over the rows of {EPA's spark, base, base + comp, base + comp - cold}) - 1 (amendment D3)",
+    "spark_max_rule": "ceil(max over the rows of {EPA's spark, base}) + 1",
+    "unclipped_at_every_row": true,
+    "cold_rows": 0,
+    "rms_deg": 8.92740292505409,
+    "sse_deg2": 11396.888787035798
+   }
+  },
+  "S3b": {
+   "values": {
+    "enr_load": 145.0,
+    "enr_rpm_lo": 2200.0,
+    "enr_rpm_hi": 5500.0,
+    "enr_depth": 0.23038858757498581
+   },
+   "rows_used": 188,
+   "rows_excluded": {
+    "no_lambda": [],
+    "sentinel": []
+   },
+   "flags": [
+    "S3b_flat_profile",
+    "S3b_rpm_hi_highest_edge"
+   ],
+   "bounds_active": [
+    "enr_rpm_hi"
+   ],
+   "convergence": null,
+   "report": {
+    "grid": {
+     "gate_lo_kpa": 100.0,
+     "gate_hi_kpa": 197.35621359223296,
+     "step_kpa": 1.0,
+     "rpm_breakpoints": {
+      "rpm_lo": [
+       -1000.0,
+       -500.0,
+       0.0,
+       500.0,
+       1000.0,
+       1500.0,
+       1750.0,
+       1800.0,
+       2200.0,
+       2250.0,
+       2400.0,
+       2600.0,
+       2750.0,
+       3000.0,
+       4000.0,
+       4500.0,
+       5500.0
+      ],
+      "rpm_hi": [
+       1000.0,
+       1500.0,
+       1750.0,
+       1800.0,
+       2200.0,
+       2250.0,
+       2400.0,
+       2600.0,
+       2750.0,
+       3000.0,
+       4000.0,
+       4500.0,
+       5500.0
+      ]
+     },
+     "dwell_s": 30.0,
+     "t": 1.0
+    },
+    "flat_width_kpa": 1.0,
+    "flat_gates_kpa": [
+     144.0,
+     145.0
+    ],
+    "tie_rule": "the highest gate (amendment D2), then the lowest rpm_lo, then the lowest rpm_hi",
+    "rows_behind": {
+     "enr_load": 43,
+     "enr_rpm_lo": 28,
+     "enr_rpm_hi": 28,
+     "enr_depth": 28
+    },
+    "censored_rows": [],
+    "steady_rows": 175,
+    "final_rows": 13,
+    "depth_edge": {
+     "c1": 0.30181249999999893,
+     "invariant": 0.3020000000000001,
+     "active": "C1",
+     "invariant_source": "the contract's all-row lambda clip floor (lambda_clip_floor.floor: round(min(0.70, the deepest lambda over every row - 0.01), 3), held-out and Initial rows included; amendment C1, a C13 disclosure)",
+     "invariant_active": false,
+     "c1_minus_invariant": -0.00018750000000117284,
+     "at_optimum": false,
+     "engine_invariant_checked": true
+    },
+    "bounds_active_on_grid": true,
+    "grid_edges": {
+     "gate_lo": {
+      "at_optimum": false,
+      "on_flat_interval": false
+     },
+     "gate_hi": {
+      "at_optimum": false,
+      "on_flat_interval": false
+     },
+     "rpm_lo_lowest": {
+      "at_optimum": false
+     },
+     "rpm_lo_highest": {
+      "at_optimum": false
+     },
+     "rpm_hi_lowest": {
+      "at_optimum": false
+     },
+     "rpm_hi_highest": {
+      "at_optimum": true
+     }
+    },
+    "steady_hot_rows_enriched": 16,
+    "sse": 0.16259889722789833
+   }
+  },
+  "S3c": {
+   "values": {
+    "envelope_flow": [
+     0.0,
+     0.16304496195163862,
+     0.204143475012497,
+     0.2245045252550972,
+     0.2539090605698372
+    ],
+    "envelope_pr": [
+     1.0,
+     1.987474457122185,
+     1.9749410429971828,
+     1.9684844544724471,
+     1.9490458207452168
+    ],
+    "pr_cap": 1.987474457122185
+   },
+   "rows_used": 4,
+   "rows_excluded": {
+    "lines_without_air": []
+   },
+   "flags": [
+    "S3c_lines_without_holds",
+    "S3c_pr_falls_with_flow"
+   ],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "points": [
+     {
+      "line": "3000",
+      "key": [
+       "epa_highload_final_hd1.csv",
+       8
+      ],
+      "corrected_flow": 0.16304496195163862,
+      "pr": 1.987474457122185
+     },
+     {
+      "line": "4000",
+      "key": [
+       "epa_highload_final_hd1.csv",
+       15
+      ],
+      "corrected_flow": 0.204143475012497,
+      "pr": 1.9749410429971828
+     },
+     {
+      "line": "4500",
+      "key": [
+       "epa_highload_final_hd1.csv",
+       18
+      ],
+      "corrected_flow": 0.2245045252550972,
+      "pr": 1.9684844544724471
+     },
+     {
+      "line": "5500",
+      "key": [
+       "epa_highload_final_hd1.csv",
+       24
+      ],
+      "corrected_flow": 0.2539090605698372,
+      "pr": 1.9490458207452168
+     }
+    ],
+    "lines_without_holds": [
+     "1000",
+     "1500",
+     "1750/1800",
+     "2200/2250",
+     "2400",
+     "2600",
+     "2750"
+    ],
+    "anchor": [
+     0.0,
+     1.0
+    ],
+    "pr_cap": 1.987474457122185,
+    "inlet_sea_kpa": 99.3,
+    "highest_map_rows_skipped": [],
+    "hd1_barometer": {
+     "median": 97.59,
+     "sweep": [
+      97.57,
+      97.6
+     ],
+     "from_rows": 117,
+     "envelope_at_sweep": {
+      "lo": {
+       "barometer_kpa": 97.57,
+       "envelope_flow": [
+        0.0,
+        0.16307908248359462,
+        0.2041861962587066,
+        0.2245515074723736,
+        0.25396219629455624
+       ],
+       "envelope_pr": [
+        1.0,
+        1.987474457122185,
+        1.9749410429971828,
+        1.9684844544724471,
+        1.9490458207452168
+       ]
+      },
+      "hi": {
+       "barometer_kpa": 97.6,
+       "envelope_flow": [
+        0.0,
+        0.1630279070393006,
+        0.20412212109251662,
+        0.22448104151814585,
+        0.253882501044673
+       ],
+       "envelope_pr": [
+        1.0,
+        1.987474457122185,
+        1.9749410429971828,
+        1.9684844544724471,
+        1.9490458207452168
+       ]
+      }
+     }
+    },
+    "cell_temperature_rule": null,
+    "pr_falls_with_flow": [
+     [
+      "3000",
+      "4000"
+     ],
+     [
+      "4000",
+      "4500"
+     ],
+     [
+      "4500",
+      "5500"
+     ]
+    ],
+    "filter_loss_kpa": 2.0
+   }
+  },
+  "S3d": {
+   "values": {
+    "cam_on": 1,
+    "cam_c0": 21.743151431156313,
+    "cam_c_rpm": -19.319848691449554,
+    "cam_c_map": -6.293702556106699,
+    "cam_c_rpm2": 3.4298769246858516,
+    "cam_c_rpm_map": -1.660067944533128,
+    "cam_c_map2": 23.694649709011905,
+    "cam_rpm_lo": 999.0,
+    "cam_rpm_hi": 4501.0,
+    "cam_map_lo": 22.590000000000003,
+    "cam_map_hi": 193.89,
+    "cam_lo": -2.104,
+    "cam_hi": 51.57
+   },
+   "rows_used": 117,
+   "rows_excluded": {
+    "no_cam_value": [
+     [
+      "epa_steady_hd1.csv",
+      6
+     ],
+     [
+      "epa_steady_hd1.csv",
+      7
+     ],
+     [
+      "epa_steady_hd1.csv",
+      8
+     ],
+     [
+      "epa_steady_hd1.csv",
+      9
+     ],
+     [
+      "epa_steady_hd1.csv",
+      10
+     ],
+     [
+      "epa_steady_hd1.csv",
+      11
+     ],
+     [
+      "epa_steady_hd1.csv",
+      12
+     ],
+     [
+      "epa_steady_hd1.csv",
+      13
+     ],
+     [
+      "epa_steady_hd1.csv",
+      14
+     ],
+     [
+      "epa_steady_hd1.csv",
+      15
+     ],
+     [
+      "epa_steady_hd1.csv",
+      16
+     ],
+     [
+      "epa_steady_hd1.csv",
+      17
+     ],
+     [
+      "epa_steady_hd1.csv",
+      18
+     ],
+     [
+      "epa_steady_hd1.csv",
+      19
+     ],
+     [
+      "epa_steady_hd1.csv",
+      20
+     ],
+     [
+      "epa_steady_hd1.csv",
+      21
+     ],
+     [
+      "epa_steady_hd1.csv",
+      22
+     ],
+     [
+      "epa_steady_hd1.csv",
+      25
+     ],
+     [
+      "epa_steady_hd1.csv",
+      26
+     ],
+     [
+      "epa_steady_hd1.csv",
+      27
+     ],
+     [
+      "epa_steady_hd1.csv",
+      28
+     ],
+     [
+      "epa_steady_hd1.csv",
+      29
+     ],
+     [
+      "epa_steady_hd1.csv",
+      30
+     ],
+     [
+      "epa_steady_hd1.csv",
+      31
+     ],
+     [
+      "epa_steady_hd1.csv",
+      32
+     ],
+     [
+      "epa_steady_hd1.csv",
+      33
+     ],
+     [
+      "epa_steady_hd1.csv",
+      34
+     ],
+     [
+      "epa_steady_hd1.csv",
+      35
+     ],
+     [
+      "epa_steady_hd1.csv",
+      36
+     ],
+     [
+      "epa_steady_hd1.csv",
+      41
+     ],
+     [
+      "epa_steady_hd1.csv",
+      42
+     ],
+     [
+      "epa_steady_hd1.csv",
+      43
+     ],
+     [
+      "epa_steady_hd1.csv",
+      44
+     ],
+     [
+      "epa_steady_hd1.csv",
+      45
+     ],
+     [
+      "epa_steady_hd1.csv",
+      46
+     ],
+     [
+      "epa_steady_hd1.csv",
+      47
+     ],
+     [
+      "epa_steady_hd1.csv",
+      48
+     ],
+     [
+      "epa_steady_hd1.csv",
+      49
+     ],
+     [
+      "epa_steady_hd1.csv",
+      50
+     ],
+     [
+      "epa_steady_hd1.csv",
+      51
+     ],
+     [
+      "epa_steady_hd1.csv",
+      52
+     ],
+     [
+      "epa_steady_hd1.csv",
+      53
+     ],
+     [
+      "epa_steady_hd1.csv",
+      54
+     ],
+     [
+      "epa_steady_hd1.csv",
+      55
+     ],
+     [
+      "epa_steady_hd1.csv",
+      56
+     ],
+     [
+      "epa_steady_hd1.csv",
+      65
+     ],
+     [
+      "epa_steady_hd1.csv",
+      66
+     ],
+     [
+      "epa_steady_hd1.csv",
+      67
+     ],
+     [
+      "epa_steady_hd1.csv",
+      68
+     ],
+     [
+      "epa_steady_hd1.csv",
+      69
+     ],
+     [
+      "epa_steady_hd1.csv",
+      70
+     ],
+     [
+      "epa_steady_hd1.csv",
+      71
+     ],
+     [
+      "epa_steady_hd1.csv",
+      72
+     ],
+     [
+      "epa_steady_hd1.csv",
+      73
+     ],
+     [
+      "epa_steady_hd1.csv",
+      74
+     ],
+     [
+      "epa_steady_hd1.csv",
+      79
+     ],
+     [
+      "epa_steady_hd1.csv",
+      80
+     ],
+     [
+      "epa_steady_hd1.csv",
+      81
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      6
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      7
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      8
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      12
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      13
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      14
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      15
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      16
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      17
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      18
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      22
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      23
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      24
+     ]
+    ]
+   },
+   "flags": [
+    "S3d_extrapolated_rows"
+   ],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "domain": {
+     "rpm": [
+      999.0,
+      4501.0
+     ],
+     "map_kpa": [
+      22.590000000000003,
+      193.89
+     ]
+    },
+    "clamp_cad": [
+     -2.104,
+     51.57
+    ],
+    "rows": 117,
+    "empty_cells": 71,
+    "extrapolated_rows": [
+     [
+      "epa_steady_hd1.csv",
+      79
+     ],
+     [
+      "epa_steady_hd1.csv",
+      80
+     ],
+     [
+      "epa_steady_hd1.csv",
+      81
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      8
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      15
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      18
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      22
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      23
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      24
+     ]
+    ],
+    "term_order": [
+     "cam_c0",
+     "cam_c_rpm",
+     "cam_c_map",
+     "cam_c_rpm2",
+     "cam_c_rpm_map",
+     "cam_c_map2"
+    ],
+    "rms_cad": 6.377032668817243,
+    "channels": [
+     "intake_cam_phase_cad_ret"
+    ]
+   }
+  },
+  "S4": {
+   "values": {
+    "burn_base": 14.131639949282299,
+    "burn_rpm": 9.633679810977488e-12,
+    "delay_base": 11.109340897621669,
+    "delay_rpm": 1.987844830719574e-10,
+    "fmep_0": -0.49999999997890826,
+    "fmep_pmax": 0.031315748854244256,
+    "fmep_sp": -0.09999999997379592,
+    "fmep_sp2": 0.013062890454301491,
+    "ua_port": 18.06167783648553
+   },
+   "rows_used": 123,
+   "rows_excluded": {
+    "not_fired_lambda1": [
+     [
+      "epa_steady_cell9.csv",
+      6
+     ],
+     [
+      "epa_steady_cell9.csv",
+      7
+     ],
+     [
+      "epa_steady_cell9.csv",
+      28
+     ],
+     [
+      "epa_steady_cell9.csv",
+      29
+     ],
+     [
+      "epa_steady_cell9.csv",
+      44
+     ],
+     [
+      "epa_steady_cell9.csv",
+      45
+     ],
+     [
+      "epa_steady_cell9.csv",
+      46
+     ],
+     [
+      "epa_steady_cell9.csv",
+      81
+     ],
+     [
+      "epa_steady_cell9.csv",
+      82
+     ],
+     [
+      "epa_steady_cell9.csv",
+      83
+     ],
+     [
+      "epa_steady_cell9.csv",
+      97
+     ],
+     [
+      "epa_steady_cell9.csv",
+      115
+     ],
+     [
+      "epa_steady_cell9.csv",
+      116
+     ],
+     [
+      "epa_steady_cell9.csv",
+      117
+     ],
+     [
+      "epa_steady_cell9.csv",
+      118
+     ],
+     [
+      "epa_steady_cell9.csv",
+      131
+     ],
+     [
+      "epa_steady_cell9.csv",
+      132
+     ],
+     [
+      "epa_steady_cell9.csv",
+      133
+     ],
+     [
+      "epa_steady_cell9.csv",
+      134
+     ],
+     [
+      "epa_steady_cell9.csv",
+      135
+     ],
+     [
+      "epa_steady_cell9.csv",
+      136
+     ],
+     [
+      "epa_steady_cell9.csv",
+      146
+     ],
+     [
+      "epa_steady_cell9.csv",
+      160
+     ],
+     [
+      "epa_steady_cell9.csv",
+      161
+     ],
+     [
+      "epa_steady_cell9.csv",
+      162
+     ],
+     [
+      "epa_steady_cell9.csv",
+      163
+     ],
+     [
+      "epa_steady_cell9.csv",
+      164
+     ],
+     [
+      "epa_steady_cell9.csv",
+      165
+     ],
+     [
+      "epa_steady_cell9.csv",
+      172
+     ],
+     [
+      "epa_steady_cell9.csv",
+      173
+     ],
+     [
+      "epa_steady_cell9.csv",
+      174
+     ],
+     [
+      "epa_steady_cell9.csv",
+      175
+     ],
+     [
+      "epa_steady_cell9.csv",
+      176
+     ],
+     [
+      "epa_steady_cell9.csv",
+      177
+     ],
+     [
+      "epa_steady_cell9.csv",
+      178
+     ],
+     [
+      "epa_steady_cell9.csv",
+      179
+     ],
+     [
+      "epa_steady_cell9.csv",
+      185
+     ],
+     [
+      "epa_steady_hd1.csv",
+      6
+     ],
+     [
+      "epa_steady_hd1.csv",
+      12
+     ],
+     [
+      "epa_steady_hd1.csv",
+      18
+     ],
+     [
+      "epa_steady_hd1.csv",
+      25
+     ],
+     [
+      "epa_steady_hd1.csv",
+      26
+     ],
+     [
+      "epa_steady_hd1.csv",
+      30
+     ],
+     [
+      "epa_steady_hd1.csv",
+      41
+     ],
+     [
+      "epa_steady_hd1.csv",
+      42
+     ],
+     [
+      "epa_steady_hd1.csv",
+      48
+     ],
+     [
+      "epa_steady_hd1.csv",
+      49
+     ],
+     [
+      "epa_steady_hd1.csv",
+      56
+     ],
+     [
+      "epa_steady_hd1.csv",
+      65
+     ],
+     [
+      "epa_steady_hd1.csv",
+      69
+     ],
+     [
+      "epa_steady_hd1.csv",
+      70
+     ],
+     [
+      "epa_steady_hd1.csv",
+      74
+     ],
+     [
+      "epa_steady_hd1.csv",
+      79
+     ],
+     [
+      "epa_steady_hd1.csv",
+      81
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      7
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      8
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      13
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      14
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      15
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      16
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      17
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      18
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      22
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      23
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      24
+     ]
+    ],
+    "sentinel": []
+   },
+   "flags": [
+    "S4_physical_check",
+    "S4_bound_active"
+   ],
+   "bounds_active": [
+    "burn_rpm",
+    "fmep_0",
+    "fmep_sp"
+   ],
+   "convergence": {
+    "nfev": 28,
+    "njev": 10,
+    "status": 3,
+    "message": "`xtol` termination condition is satisfied.",
+    "cost": 2002.1599151046512,
+    "grad_norm": 5.299936930788516,
+    "last_step_norm": 0.0006625032100747786,
+    "cost_change": 0.006120353973301462,
+    "second_attempt": false
+   },
+   "report": {
+    "starts": [
+     {
+      "from": "x1.0",
+      "x0": {
+       "burn_base": 13.468014000086386,
+       "burn_rpm": 5.273914802532706e-09,
+       "delay_base": 11.243574930412283,
+       "delay_rpm": 3.4171165042830324e-17,
+       "fmep_0": -0.49952782307328675,
+       "fmep_pmax": 0.031154316831424604,
+       "fmep_sp": -0.0999682044325045,
+       "fmep_sp2": 0.01289474919697767,
+       "ua_port": 17.94395609377862
+      },
+      "cost": 2002.9199537665163,
+      "nfev": 14,
+      "status": 2
+     },
+     {
+      "from": "x0.8",
+      "x0": {
+       "burn_base": 10.77441120006911,
+       "burn_rpm": 4.219131842026165e-09,
+       "delay_base": 8.994859944329827,
+       "delay_rpm": 2.733693203426426e-17,
+       "fmep_0": -0.3996222584586294,
+       "fmep_pmax": 0.024923453465139685,
+       "fmep_sp": -0.0799745635460036,
+       "fmep_sp2": 0.010315799357582138,
+       "ua_port": 14.355164875022897
+      },
+      "cost": 2002.372315988283,
+      "nfev": 33,
+      "status": 3
+     },
+     {
+      "from": "x1.2",
+      "x0": {
+       "burn_base": 16.161616800103662,
+       "burn_rpm": 6.328697763039247e-09,
+       "delay_base": 13.49228991649474,
+       "delay_rpm": 4.100539805139639e-17,
+       "fmep_0": -0.5,
+       "fmep_pmax": 0.037385180197709526,
+       "fmep_sp": -0.1,
+       "fmep_sp2": 0.015473699036373204,
+       "ua_port": 21.532747312534344
+      },
+      "cost": 2002.1599151046512,
+      "nfev": 28,
+      "status": 3
+     },
+     {
+      "from": "weakest+",
+      "x0": {
+       "burn_base": 34.231867786772526,
+       "burn_rpm": 0.0,
+       "delay_base": 1.6094403837507798,
+       "delay_rpm": 0.003493659415072477,
+       "fmep_0": -0.1888182002070219,
+       "fmep_pmax": 0.031752248113875225,
+       "fmep_sp": -0.1,
+       "fmep_sp2": 0.016587539666329497,
+       "ua_port": 18.172721357770175
+      },
+      "cost": 2002.1689202300283,
+      "nfev": 28,
+      "status": 3
+     },
+     {
+      "from": "weakest-",
+      "x0": {
+       "burn_base": 5.0,
+       "burn_rpm": 0.007230767013515583,
+       "delay_base": 20.609241411492558,
+       "delay_rpm": 0.0,
+       "fmep_0": -0.5,
+       "fmep_pmax": 0.030879249594613283,
+       "fmep_sp": -0.028871941628782163,
+       "fmep_sp2": 0.009538241242273487,
+       "ua_port": 17.950634315200883
+      },
+      "cost": 2002.2265282511653,
+      "nfev": 33,
+      "status": 3
+     }
+    ],
+    "best_start": "x1.2",
+    "resolution": {
+     "weakest_direction_projection": [
+      {
+       "from": "x1.0",
+       "scale_units": -0.13042032834207234,
+       "cost": 2002.9199537665163
+      },
+      {
+       "from": "x0.8",
+       "scale_units": -0.022665198822529264,
+       "cost": 2002.372315988283
+      },
+      {
+       "from": "x1.2",
+       "scale_units": 0.0,
+       "cost": 2002.1599151046512
+      },
+      {
+       "from": "weakest+",
+       "scale_units": -0.005457213749249193,
+       "cost": 2002.1689202300283
+      },
+      {
+       "from": "weakest-",
+       "scale_units": -0.018176852141616216,
+       "cost": 2002.2265282511653
+      }
+     ],
+     "spread_scale_units": 0.13042032834207234,
+     "sd_scale_units": 7.035724939161223,
+     "statement": "the five starts choose the basin at the declared tolerances; the one that stopped lowest is polished at TOLERANCES['S4_polish'] and the polished point is the frozen one (polish: its departure from that start); the in-sample stage is evaluated there"
+    },
+    "polish": {
+     "from": "x1.2",
+     "tolerances": {
+      "ftol": 1e-12,
+      "xtol": 1e-12,
+      "gtol": 1e-12
+     },
+     "cost_before": 2002.1599151046512,
+     "cost_after": 2002.159921336894,
+     "nfev": 20,
+     "status": 3,
+     "kept": false,
+     "departure_scale_units": {
+      "burn_base": 0.0,
+      "burn_rpm": 4.518316009451126e-08,
+      "delay_base": 0.0,
+      "delay_rpm": 0.0,
+      "fmep_0": 1.9727067201991133e-10,
+      "fmep_pmax": 0.0,
+      "fmep_sp": 8.199545980463402e-10,
+      "fmep_sp2": 0.0,
+      "ua_port": 0.0
+     },
+     "departure_norm_scale_units": 4.5191030054504526e-08,
+     "departure_along_weakest_scale_units": -2.3288148007799186e-08
+    },
+    "weakest_direction": {
+     "vector": {
+      "burn_base": 0.28568808489955705,
+      "burn_rpm": -0.5138608364033012,
+      "delay_base": -0.2700475244844759,
+      "delay_rpm": 0.4965599489033602,
+      "fmep_0": 0.11057204568921951,
+      "fmep_pmax": 0.012408081993126076,
+      "fmep_sp": -0.11232840485137846,
+      "fmep_sp2": 0.5566273463101337,
+      "ua_port": 0.00031565623228552164
+     },
+     "sd": 7.035724939161223,
+     "eigenvalue_scaled": 0.3411273538911725,
+     "ki_at_climb_cell": {
+      "fit": 1.5927333049092578,
+      "plus": 1.017249407072943,
+      "minus": 0.6894259755329146
+     },
+     "lambda_lever": {
+      "fit": 174.58200545429008,
+      "plus": 242.97857236441814,
+      "minus": 265.79282085838713
+     }
+    },
+    "condition_number": 1052.8238964627371,
+    "correlations": {
+     "burn_base": {
+      "burn_base": 1.0000000000000002,
+      "burn_rpm": -0.8006314637111064,
+      "delay_base": -0.9855858161130602,
+      "delay_rpm": 0.7928079609472268,
+      "fmep_0": 0.5389601408150414,
+      "fmep_pmax": 0.4306797028139983,
+      "fmep_sp": -0.5146485980304643,
+      "fmep_sp2": 0.34972303652550557,
+      "ua_port": 0.4738812769236683
+     },
+     "burn_rpm": {
+      "burn_base": -0.8006314637111156,
+      "burn_rpm": 0.9999999999999998,
+      "delay_base": 0.7880392067944375,
+      "delay_rpm": -0.9740446528144908,
+      "fmep_0": -0.6044375037662113,
+      "fmep_pmax": 0.08575193196607397,
+      "fmep_sp": 0.467603859482486,
+      "fmep_sp2": -0.2986780925168303,
+      "ua_port": -0.1395413560716188
+     },
+     "delay_base": {
+      "burn_base": -0.985585816113058,
+      "burn_rpm": 0.7880392067944264,
+      "delay_base": 1.0,
+      "delay_rpm": -0.8146582239102104,
+      "fmep_0": -0.5029244620249502,
+      "fmep_pmax": -0.43888442346614503,
+      "fmep_sp": 0.5045423707597407,
+      "fmep_sp2": -0.3746799719685609,
+      "ua_port": -0.4367145734163992
+     },
+     "delay_rpm": {
+      "burn_base": 0.7928079609472305,
+      "burn_rpm": -0.9740446528144855,
+      "delay_base": -0.8146582239102158,
+      "delay_rpm": 0.9999999999999998,
+      "fmep_0": 0.5535986703517659,
+      "fmep_pmax": -0.05402555167703476,
+      "fmep_sp": -0.44305320062506215,
+      "fmep_sp2": 0.3272607425123391,
+      "ua_port": 0.14834044766608723
+     },
+     "fmep_0": {
+      "burn_base": 0.5389601408151148,
+      "burn_rpm": -0.6044375037662757,
+      "delay_base": -0.5029244620250253,
+      "delay_rpm": 0.5535986703518341,
+      "fmep_0": 1.0,
+      "fmep_pmax": -0.1498427350331983,
+      "fmep_sp": -0.9027393110886861,
+      "fmep_sp2": 0.7847632648766495,
+      "ua_port": 0.15535578477150794
+     },
+     "fmep_pmax": {
+      "burn_base": 0.4306797028139724,
+      "burn_rpm": 0.08575193196610115,
+      "delay_base": -0.4388844234661201,
+      "delay_rpm": -0.054025551677060045,
+      "fmep_0": -0.14984273503323187,
+      "fmep_pmax": 1.0000000000000002,
+      "fmep_sp": -0.1389269128303987,
+      "fmep_sp2": 0.11432210767450443,
+      "ua_port": 0.4614749603816034
+     },
+     "fmep_sp": {
+      "burn_base": -0.5146485980305378,
+      "burn_rpm": 0.4676038594825513,
+      "delay_base": 0.5045423707598158,
+      "delay_rpm": -0.4430532006251311,
+      "fmep_0": -0.9027393110886904,
+      "fmep_pmax": -0.13892691283043057,
+      "fmep_sp": 1.0,
+      "fmep_sp2": -0.9435699500474889,
+      "ua_port": -0.15522590279621998
+     },
+     "fmep_sp2": {
+      "burn_base": 0.3497230365255792,
+      "burn_rpm": -0.2986780925168981,
+      "delay_base": -0.374679971968636,
+      "delay_rpm": 0.3272607425124099,
+      "fmep_0": 0.7847632648766649,
+      "fmep_pmax": 0.114322107674531,
+      "fmep_sp": -0.9435699500474994,
+      "fmep_sp2": 1.0,
+      "ua_port": 0.1069544055577825
+     },
+     "ua_port": {
+      "burn_base": 0.47388127692366144,
+      "burn_rpm": -0.13954135607160972,
+      "delay_base": -0.4367145734163933,
+      "delay_rpm": 0.14834044766607993,
+      "fmep_0": 0.15535578477147705,
+      "fmep_pmax": 0.4614749603816099,
+      "fmep_sp": -0.15522590279618884,
+      "fmep_sp2": 0.10695440555775249,
+      "ua_port": 1.0
+     }
+    },
+    "data_or_prior": {
+     "burn_base": "data-dominated",
+     "burn_rpm": "data-dominated",
+     "delay_base": "data-dominated",
+     "delay_rpm": "data-dominated",
+     "fmep_0": "data-dominated",
+     "fmep_pmax": "data-dominated",
+     "fmep_sp": "data-dominated",
+     "fmep_sp2": "data-dominated",
+     "ua_port": "data-dominated"
+    },
+    "residuals": {
+     "by_line": {
+      "1000": {
+       "n": 12,
+       "mean_eff_rel": 0.03865300813979478,
+       "mean_tit_k": -73.04251683395373
+      },
+      "1500": {
+       "n": 19,
+       "mean_eff_rel": 0.001292864370414052,
+       "mean_tit_k": -14.349197393793268
+      },
+      "1750/1800": {
+       "n": 18,
+       "mean_eff_rel": 0.002953221993309934,
+       "mean_tit_k": 6.274972142789642
+      },
+      "2200/2250": {
+       "n": 16,
+       "mean_eff_rel": -0.003067722161746979,
+       "mean_tit_k": 12.521326979806851
+      },
+      "2400": {
+       "n": 6,
+       "mean_eff_rel": 0.008417483888349009,
+       "mean_tit_k": 49.270000214368544
+      },
+      "2600": {
+       "n": 5,
+       "mean_eff_rel": -0.0238178001203867,
+       "mean_tit_k": 33.880849016876866
+      },
+      "2750": {
+       "n": 12,
+       "mean_eff_rel": -0.005684933705579033,
+       "mean_tit_k": 23.04678470328084
+      },
+      "3000": {
+       "n": 16,
+       "mean_eff_rel": -0.005786783938127385,
+       "mean_tit_k": 30.541763001484526
+      },
+      "4000": {
+       "n": 10,
+       "mean_eff_rel": -0.004830797137868293,
+       "mean_tit_k": 44.972862905896974
+      },
+      "4500": {
+       "n": 8,
+       "mean_eff_rel": -0.005227669172023802,
+       "mean_tit_k": 47.40635978815793
+      },
+      "5500": {
+       "n": 1,
+       "mean_eff_rel": 0.009136337888418167,
+       "mean_tit_k": 44.224739813512656
+      }
+     },
+     "by_population": {
+      "hot_lambda1": {
+       "n": 29,
+       "mean_eff_rel": 0.013778916553717603,
+       "mean_tit_k": 30.027785960202518
+      },
+      "part_load": {
+       "n": 94,
+       "mean_eff_rel": -0.0023138132943197887,
+       "mean_tit_k": 4.221256414076566
+      }
+     }
+    },
+    "physical_checks": {
+     "burn_cad": [
+      17.090936225672564,
+      19.916388433050606
+     ],
+     "burn_ok": false,
+     "delay_cad": [
+      13.016134024497523,
+      14.682018975923686
+     ],
+     "delay_ok": true,
+     "fmep_bar": [
+      0.0721297974755864,
+      3.435644176876065
+     ],
+     "fmep_positive": true
+    },
+    "params": [
+     "burn_base",
+     "burn_rpm",
+     "delay_base",
+     "delay_rpm",
+     "fmep_0",
+     "fmep_pmax",
+     "fmep_sp",
+     "fmep_sp2",
+     "ua_port"
+    ],
+    "estimate": {
+     "burn_base": 14.131639949282299,
+     "burn_rpm": 9.633679810977488e-12,
+     "delay_base": 11.109340897621669,
+     "delay_rpm": 1.987844830719574e-10,
+     "fmep_0": -0.49999999997890826,
+     "fmep_pmax": 0.031315748854244256,
+     "fmep_sp": -0.09999999997379592,
+     "fmep_sp2": 0.013062890454301491,
+     "ua_port": 18.06167783648553
+    },
+    "covariance": [
+     [
+      601.6126542652065,
+      -0.1631070784709815,
+      -276.1015041077037,
+      0.07695328228338649,
+      5.101228066986554,
+      0.050322899438746786,
+      -1.1203525000834094,
+      0.04247184597643685,
+      5.830527531279755
+     ],
+     [
+      -0.16310707847098338,
+      6.898637875927298e-05,
+      0.07475587787968224,
+      -3.2015567584101346e-05,
+      -0.0019372813117206297,
+      3.3929570128860865e-06,
+      0.0003447030876725264,
+      -1.2282971915390476e-05,
+      -0.0005813858164660668
+     ],
+     [
+      -276.1015041077031,
+      0.07475587787968119,
+      130.44627827931006,
+      -0.036820692929320956,
+      -2.21655349866556,
+      -0.023879145605754305,
+      0.5114449588813655,
+      -0.02118823304621722,
+      -2.5020348257403766
+     ],
+     [
+      0.07695328228338685,
+      -3.201556758410117e-05,
+      -0.0368206929293212,
+      1.5660345147855747e-05,
+      0.0008453865121058049,
+      -1.018480327683966e-06,
+      -0.0001556115953956231,
+      6.412287583008603e-06,
+      0.00029446933062009256
+     ],
+     [
+      5.1012280669872485,
+      -0.0019372813117208361,
+      -2.216553498665891,
+      0.0008453865121059091,
+      0.14890840877326358,
+      -0.00027545335896046307,
+      -0.03091771421854836,
+      0.0014993971887562528,
+      0.030072314843018696
+     ],
+     [
+      0.05032289943874376,
+      3.392957012887162e-06,
+      -0.02387914560575295,
+      -1.0184803276844426e-06,
+      -0.00027545335896052476,
+      2.2693712026140272e-05,
+      -5.8738732010338655e-05,
+      2.6965061052038202e-06,
+      0.0011027593025073213
+     ],
+     [
+      -1.1203525000835692,
+      0.0003447030876725745,
+      0.5114449588814416,
+      -0.0001556115953956473,
+      -0.030917714218548508,
+      -5.873873201035213e-05,
+      0.007877180998055199,
+      -0.00041464642872247474,
+      -0.006910817522602616
+     ],
+     [
+      0.042471845976445786,
+      -1.2282971915393263e-05,
+      -0.021188233046221465,
+      6.412287583009991e-06,
+      0.0014993971887562823,
+      2.696506105204447e-06,
+      -0.00041464642872247935,
+      2.4515278484212322e-05,
+      0.00026564210491265296
+     ],
+     [
+      5.830527531279671,
+      -0.0005813858164660289,
+      -2.502034825740343,
+      0.0002944693306200781,
+      0.030072314843012714,
+      0.001102759302507337,
+      -0.00691081752260123,
+      0.0002656421049125784,
+      0.25162838957387473
+     ]
+    ],
+    "residual_variance": 16.886290267207265,
+    "zero_columns_at_optimum": [],
+    "cycles": 36039,
+    "rows_efficiency": 123,
+    "rows_tit": 123,
+    "d13": "amendment D13: an E1a miss on stoichiometric hot rows at form A is read as a burn/FMEP residual that no form B-D can act on (mistake 20); it is reported, with S4's residuals per line and per population, and never used to justify a form. The ladder still moves by the contract's criterion (section 2.4).",
+    "shortcut": {
+     "epa_steady_cell9.csv#8": {
+      "torque_nm": 92.28673969527237,
+      "egt_c": 342.0486347302394,
+      "mdot_fuel_gps": 0.8420160517969685
+     },
+     "epa_steady_cell9.csv#9": {
+      "torque_nm": 126.2240772483783,
+      "egt_c": 393.20717938680525,
+      "mdot_fuel_gps": 1.0749077934143751
+     },
+     "epa_steady_cell9.csv#10": {
+      "torque_nm": 126.35423321561987,
+      "egt_c": 400.2951108133533,
+      "mdot_fuel_gps": 0.9297122091926363
+     },
+     "epa_steady_cell9.csv#11": {
+      "torque_nm": 146.0283056820739,
+      "egt_c": 444.0285701012642,
+      "mdot_fuel_gps": 1.0640681735674433
+     },
+     "epa_steady_cell9.csv#12": {
+      "torque_nm": 168.23484041359012,
+      "egt_c": 485.3401978746748,
+      "mdot_fuel_gps": 1.225116804725967
+     },
+     "epa_steady_cell9.csv#13": {
+      "torque_nm": 205.93358495387824,
+      "egt_c": 549.6717977409713,
+      "mdot_fuel_gps": 1.5349729627864652
+     },
+     "epa_steady_cell9.csv#14": {
+      "torque_nm": 221.7049154600013,
+      "egt_c": 569.3698192659648,
+      "mdot_fuel_gps": 1.6581449473249699
+     },
+     "epa_steady_cell9.csv#30": {
+      "torque_nm": 48.70427324758604,
+      "egt_c": 338.51177582471644,
+      "mdot_fuel_gps": 0.7145346557741975
+     },
+     "epa_steady_cell9.csv#31": {
+      "torque_nm": 69.6985222868274,
+      "egt_c": 405.66759625580846,
+      "mdot_fuel_gps": 0.9328250989902743
+     },
+     "epa_steady_cell9.csv#32": {
+      "torque_nm": 96.1290023726749,
+      "egt_c": 462.64578623000364,
+      "mdot_fuel_gps": 1.1840180444114419
+     },
+     "epa_steady_cell9.csv#33": {
+      "torque_nm": 133.26369584904026,
+      "egt_c": 519.6837097896349,
+      "mdot_fuel_gps": 1.4740061719960653
+     },
+     "epa_steady_cell9.csv#34": {
+      "torque_nm": 145.76200177062623,
+      "egt_c": 537.8294040453956,
+      "mdot_fuel_gps": 1.5762385518219886
+     },
+     "epa_steady_cell9.csv#35": {
+      "torque_nm": 152.19590091263606,
+      "egt_c": 551.9028471800478,
+      "mdot_fuel_gps": 1.6123945537826299
+     },
+     "epa_steady_cell9.csv#36": {
+      "torque_nm": 207.890069500165,
+      "egt_c": 640.6309161630721,
+      "mdot_fuel_gps": 2.2006569591160985
+     },
+     "epa_steady_cell9.csv#37": {
+      "torque_nm": 208.20139845587738,
+      "egt_c": 639.6217048584242,
+      "mdot_fuel_gps": 2.2036377061877883
+     },
+     "epa_steady_cell9.csv#38": {
+      "torque_nm": 207.77356839579045,
+      "egt_c": 640.6346759304007,
+      "mdot_fuel_gps": 2.2014841022152836
+     },
+     "epa_steady_cell9.csv#39": {
+      "torque_nm": 247.89953525058456,
+      "egt_c": 685.4081949800741,
+      "mdot_fuel_gps": 2.666056234706189
+     },
+     "epa_steady_cell9.csv#40": {
+      "torque_nm": 306.55146980453554,
+      "egt_c": 735.6038882381218,
+      "mdot_fuel_gps": 3.381373266692717
+     },
+     "epa_steady_cell9.csv#41": {
+      "torque_nm": 326.4961685692449,
+      "egt_c": 750.8115605295428,
+      "mdot_fuel_gps": 3.642736527628152
+     },
+     "epa_steady_cell9.csv#42": {
+      "torque_nm": 326.53397348439864,
+      "egt_c": 748.9707574702657,
+      "mdot_fuel_gps": 3.6326837321591645
+     },
+     "epa_steady_cell9.csv#43": {
+      "torque_nm": 332.9449214572132,
+      "egt_c": 753.955067118388,
+      "mdot_fuel_gps": 3.7184212652982978
+     },
+     "epa_steady_cell9.csv#47": {
+      "torque_nm": 53.932185782753734,
+      "egt_c": 404.4993872969634,
+      "mdot_fuel_gps": 0.8717341432544189
+     },
+     "epa_steady_cell9.csv#48": {
+      "torque_nm": 79.48645560689799,
+      "egt_c": 480.66661010810435,
+      "mdot_fuel_gps": 1.1817779674034536
+     },
+     "epa_steady_cell9.csv#49": {
+      "torque_nm": 117.30200321387427,
+      "egt_c": 543.5719482145618,
+      "mdot_fuel_gps": 1.566587170792811
+     },
+     "epa_steady_cell9.csv#50": {
+      "torque_nm": 139.68588647107453,
+      "egt_c": 572.1969323332181,
+      "mdot_fuel_gps": 1.7779552399745804
+     },
+     "epa_steady_cell9.csv#51": {
+      "torque_nm": 157.71350666761234,
+      "egt_c": 594.646469742039,
+      "mdot_fuel_gps": 1.9513179039174913
+     },
+     "epa_steady_cell9.csv#52": {
+      "torque_nm": 207.42490295860497,
+      "egt_c": 658.186288890617,
+      "mdot_fuel_gps": 2.538139906697074
+     },
+     "epa_steady_cell9.csv#53": {
+      "torque_nm": 207.97492692607509,
+      "egt_c": 661.6195321428519,
+      "mdot_fuel_gps": 2.543091659454442
+     },
+     "epa_steady_cell9.csv#54": {
+      "torque_nm": 208.25799792503994,
+      "egt_c": 659.4507072136113,
+      "mdot_fuel_gps": 2.5479908567434864
+     },
+     "epa_steady_cell9.csv#55": {
+      "torque_nm": 262.49010595394867,
+      "egt_c": 724.1312002254764,
+      "mdot_fuel_gps": 3.261167907534076
+     },
+     "epa_steady_cell9.csv#56": {
+      "torque_nm": 307.9978311491897,
+      "egt_c": 760.8587190071645,
+      "mdot_fuel_gps": 3.903930865062514
+     },
+     "epa_steady_cell9.csv#57": {
+      "torque_nm": 360.2742011616973,
+      "egt_c": 781.2034157900713,
+      "mdot_fuel_gps": 4.615654127511946
+     },
+     "epa_steady_cell9.csv#58": {
+      "torque_nm": 408.8969212043459,
+      "egt_c": 794.1651298061475,
+      "mdot_fuel_gps": 5.282490457653149
+     },
+     "epa_steady_cell9.csv#59": {
+      "torque_nm": 426.8141128252378,
+      "egt_c": 802.9945275997303,
+      "mdot_fuel_gps": 5.544265670783682
+     },
+     "epa_steady_cell9.csv#60": {
+      "torque_nm": 427.91380673420844,
+      "egt_c": 802.8225693512205,
+      "mdot_fuel_gps": 5.555807713130301
+     },
+     "epa_steady_cell9.csv#84": {
+      "torque_nm": 39.72306628239142,
+      "egt_c": 429.17416976504865,
+      "mdot_fuel_gps": 0.8733487323776347
+     },
+     "epa_steady_cell9.csv#85": {
+      "torque_nm": 59.29328662799867,
+      "egt_c": 513.7037812064206,
+      "mdot_fuel_gps": 1.186596086940494
+     },
+     "epa_steady_cell9.csv#86": {
+      "torque_nm": 93.52661919078581,
+      "egt_c": 590.9451736780306,
+      "mdot_fuel_gps": 1.6880512864594197
+     },
+     "epa_steady_cell9.csv#87": {
+      "torque_nm": 114.94000440255928,
+      "egt_c": 618.9773141512477,
+      "mdot_fuel_gps": 1.9916704787549473
+     },
+     "epa_steady_cell9.csv#88": {
+      "torque_nm": 142.32620767496957,
+      "egt_c": 644.1562387088576,
+      "mdot_fuel_gps": 2.349700222015733
+     },
+     "epa_steady_cell9.csv#89": {
+      "torque_nm": 190.46281226524655,
+      "egt_c": 687.1865913702318,
+      "mdot_fuel_gps": 3.02277010698486
+     },
+     "epa_steady_cell9.csv#90": {
+      "torque_nm": 190.29102858122494,
+      "egt_c": 686.2788643476798,
+      "mdot_fuel_gps": 3.022372743152035
+     },
+     "epa_steady_cell9.csv#91": {
+      "torque_nm": 189.6359270909124,
+      "egt_c": 686.8199103736102,
+      "mdot_fuel_gps": 3.0110424959554285
+     },
+     "epa_steady_cell9.csv#92": {
+      "torque_nm": 260.7559475252749,
+      "egt_c": 745.0449971808586,
+      "mdot_fuel_gps": 4.110293583823415
+     },
+     "epa_steady_cell9.csv#93": {
+      "torque_nm": 323.3179688045926,
+      "egt_c": 790.5731212448437,
+      "mdot_fuel_gps": 5.163798634501254
+     },
+     "epa_steady_cell9.csv#94": {
+      "torque_nm": 345.5655465789754,
+      "egt_c": 801.9538693690521,
+      "mdot_fuel_gps": 5.556667802493097
+     },
+     "epa_steady_cell9.csv#95": {
+      "torque_nm": 385.18463083422387,
+      "egt_c": 814.3580906884914,
+      "mdot_fuel_gps": 6.247479594422583
+     },
+     "epa_steady_cell9.csv#96": {
+      "torque_nm": 433.6440028961275,
+      "egt_c": 828.7992178849646,
+      "mdot_fuel_gps": 7.120105176844685
+     },
+     "epa_steady_cell9.csv#119": {
+      "torque_nm": 47.51077174954633,
+      "egt_c": 552.4565856673502,
+      "mdot_fuel_gps": 1.2624454125822988
+     },
+     "epa_steady_cell9.csv#120": {
+      "torque_nm": 77.97303322304765,
+      "egt_c": 632.6186090727442,
+      "mdot_fuel_gps": 1.8060781875682723
+     },
+     "epa_steady_cell9.csv#121": {
+      "torque_nm": 96.16442822138217,
+      "egt_c": 659.0858503035604,
+      "mdot_fuel_gps": 2.1313097148970974
+     },
+     "epa_steady_cell9.csv#122": {
+      "torque_nm": 124.23118612053358,
+      "egt_c": 684.2388596684181,
+      "mdot_fuel_gps": 2.633374151344123
+     },
+     "epa_steady_cell9.csv#123": {
+      "torque_nm": 163.5025800541896,
+      "egt_c": 707.2067964696254,
+      "mdot_fuel_gps": 3.2249024068163967
+     },
+     "epa_steady_cell9.csv#124": {
+      "torque_nm": 164.33644402196504,
+      "egt_c": 706.0812557227173,
+      "mdot_fuel_gps": 3.243860654102101
+     },
+     "epa_steady_cell9.csv#125": {
+      "torque_nm": 164.5515655323823,
+      "egt_c": 706.1312258530296,
+      "mdot_fuel_gps": 3.2481141573607664
+     },
+     "epa_steady_cell9.csv#126": {
+      "torque_nm": 233.60367789768583,
+      "egt_c": 759.302231143438,
+      "mdot_fuel_gps": 4.500919318082622
+     },
+     "epa_steady_cell9.csv#127": {
+      "torque_nm": 303.95316323787034,
+      "egt_c": 793.3970224787892,
+      "mdot_fuel_gps": 5.875157167994705
+     },
+     "epa_steady_cell9.csv#128": {
+      "torque_nm": 336.88736010606095,
+      "egt_c": 807.5969493477209,
+      "mdot_fuel_gps": 6.542074825292969
+     },
+     "epa_steady_cell9.csv#129": {
+      "torque_nm": 365.2847167528299,
+      "egt_c": 814.7416924073012,
+      "mdot_fuel_gps": 7.1184532647971235
+     },
+     "epa_steady_cell9.csv#130": {
+      "torque_nm": 406.2563307068456,
+      "egt_c": 822.5043383046756,
+      "mdot_fuel_gps": 7.955334078616712
+     },
+     "epa_steady_cell9.csv#137": {
+      "torque_nm": 66.47314574663594,
+      "egt_c": 643.6706412246774,
+      "mdot_fuel_gps": 1.7900825566132428
+     },
+     "epa_steady_cell9.csv#138": {
+      "torque_nm": 84.57445715399176,
+      "egt_c": 671.9437538574898,
+      "mdot_fuel_gps": 2.123697745393357
+     },
+     "epa_steady_cell9.csv#139": {
+      "torque_nm": 110.42037306656053,
+      "egt_c": 698.3362777782396,
+      "mdot_fuel_gps": 2.6358610925942076
+     },
+     "epa_steady_cell9.csv#140": {
+      "torque_nm": 151.61522156952026,
+      "egt_c": 720.9675357309555,
+      "mdot_fuel_gps": 3.32835332666974
+     },
+     "epa_steady_cell9.csv#141": {
+      "torque_nm": 154.23863436563533,
+      "egt_c": 721.0655858891813,
+      "mdot_fuel_gps": 3.3809382399029473
+     },
+     "epa_steady_cell9.csv#142": {
+      "torque_nm": 152.26616882851326,
+      "egt_c": 721.4777582752522,
+      "mdot_fuel_gps": 3.3376029866363868
+     },
+     "epa_steady_cell9.csv#143": {
+      "torque_nm": 196.48522400232497,
+      "egt_c": 741.7213151059865,
+      "mdot_fuel_gps": 4.203545455968729
+     },
+     "epa_steady_cell9.csv#144": {
+      "torque_nm": 334.44884305260797,
+      "egt_c": 811.59340497001,
+      "mdot_fuel_gps": 7.084945451816398
+     },
+     "epa_steady_cell9.csv#145": {
+      "torque_nm": 394.91389348540554,
+      "egt_c": 826.9931360412862,
+      "mdot_fuel_gps": 8.422282691525421
+     },
+     "epa_steady_cell9.csv#166": {
+      "torque_nm": 53.080271937520365,
+      "egt_c": 725.8059368563453,
+      "mdot_fuel_gps": 2.2342404552526025
+     },
+     "epa_steady_cell9.csv#167": {
+      "torque_nm": 65.47307458106508,
+      "egt_c": 737.8220338854911,
+      "mdot_fuel_gps": 2.454883434521669
+     },
+     "epa_steady_cell9.csv#168": {
+      "torque_nm": 114.5583466102691,
+      "egt_c": 773.4309437413366,
+      "mdot_fuel_gps": 3.683399990320927
+     },
+     "epa_steady_cell9.csv#169": {
+      "torque_nm": 114.16578731892793,
+      "egt_c": 774.3824690833545,
+      "mdot_fuel_gps": 3.671027178742949
+     },
+     "epa_steady_cell9.csv#170": {
+      "torque_nm": 140.34872133609238,
+      "egt_c": 781.826363985242,
+      "mdot_fuel_gps": 4.295309786465307
+     },
+     "epa_steady_cell9.csv#171": {
+      "torque_nm": 241.2468399903624,
+      "egt_c": 801.5015293114108,
+      "mdot_fuel_gps": 7.072032100984666
+     },
+     "epa_steady_cell9.csv#180": {
+      "torque_nm": 50.6456858671174,
+      "egt_c": 760.8849728562315,
+      "mdot_fuel_gps": 2.539828709537306
+     },
+     "epa_steady_cell9.csv#181": {
+      "torque_nm": 81.1951995306122,
+      "egt_c": 788.2364415920407,
+      "mdot_fuel_gps": 3.290874102032414
+     },
+     "epa_steady_cell9.csv#182": {
+      "torque_nm": 81.13149599646198,
+      "egt_c": 789.0625586655425,
+      "mdot_fuel_gps": 3.2856229865034012
+     },
+     "epa_steady_cell9.csv#183": {
+      "torque_nm": 113.35696459523415,
+      "egt_c": 801.6916254257591,
+      "mdot_fuel_gps": 4.216198003968843
+     },
+     "epa_steady_cell9.csv#184": {
+      "torque_nm": 202.37773888076887,
+      "egt_c": 806.4909536330932,
+      "mdot_fuel_gps": 6.865812740538015
+     },
+     "epa_steady_hd1.csv#7": {
+      "torque_nm": 127.04326016872255,
+      "egt_c": 398.2905585336822,
+      "mdot_fuel_gps": 1.1536026475810182
+     },
+     "epa_steady_hd1.csv#8": {
+      "torque_nm": 164.0270294251019,
+      "egt_c": 477.26327439023896,
+      "mdot_fuel_gps": 1.1928370763444949
+     },
+     "epa_steady_hd1.csv#9": {
+      "torque_nm": 218.69644901785762,
+      "egt_c": 569.4988460164794,
+      "mdot_fuel_gps": 1.6386324404995725
+     },
+     "epa_steady_hd1.csv#10": {
+      "torque_nm": 219.61337463245115,
+      "egt_c": 568.1406986628285,
+      "mdot_fuel_gps": 1.6430867069919746
+     },
+     "epa_steady_hd1.csv#11": {
+      "torque_nm": 218.9730444984711,
+      "egt_c": 568.7351104760531,
+      "mdot_fuel_gps": 1.6408402658567165
+     },
+     "epa_steady_hd1.csv#13": {
+      "torque_nm": 113.44266039023589,
+      "egt_c": 504.73755947588756,
+      "mdot_fuel_gps": 1.5495350626177187
+     },
+     "epa_steady_hd1.csv#14": {
+      "torque_nm": 151.02038764940522,
+      "egt_c": 546.3346944913582,
+      "mdot_fuel_gps": 1.6060449076125678
+     },
+     "epa_steady_hd1.csv#15": {
+      "torque_nm": 236.13433403967025,
+      "egt_c": 667.6221900349077,
+      "mdot_fuel_gps": 2.517352752746846
+     },
+     "epa_steady_hd1.csv#16": {
+      "torque_nm": 342.15052802770384,
+      "egt_c": 754.2755971177777,
+      "mdot_fuel_gps": 3.8066842196445547
+     },
+     "epa_steady_hd1.csv#17": {
+      "torque_nm": 339.75962018403857,
+      "egt_c": 751.0173237841005,
+      "mdot_fuel_gps": 3.768532179208648
+     },
+     "epa_steady_hd1.csv#19": {
+      "torque_nm": 105.42134169841185,
+      "egt_c": 558.9320572383862,
+      "mdot_fuel_gps": 1.779681922307547
+     },
+     "epa_steady_hd1.csv#20": {
+      "torque_nm": 159.10735270870177,
+      "egt_c": 599.3854674095853,
+      "mdot_fuel_gps": 2.038129659502817
+     },
+     "epa_steady_hd1.csv#21": {
+      "torque_nm": 332.88032230857505,
+      "egt_c": 769.3409355817663,
+      "mdot_fuel_gps": 4.319514117738291
+     },
+     "epa_steady_hd1.csv#22": {
+      "torque_nm": 415.8846664958254,
+      "egt_c": 794.7776006186986,
+      "mdot_fuel_gps": 5.478568403789194
+     },
+     "epa_steady_hd1.csv#27": {
+      "torque_nm": 138.71162902775828,
+      "egt_c": 632.694788611148,
+      "mdot_fuel_gps": 2.256214231670971
+     },
+     "epa_steady_hd1.csv#28": {
+      "torque_nm": 341.17513291704205,
+      "egt_c": 791.7168451859865,
+      "mdot_fuel_gps": 5.330523368058148
+     },
+     "epa_steady_hd1.csv#29": {
+      "torque_nm": 409.83993862430714,
+      "egt_c": 811.0582579104376,
+      "mdot_fuel_gps": 6.490261926659964
+     },
+     "epa_steady_hd1.csv#31": {
+      "torque_nm": 117.70176316887746,
+      "egt_c": 650.1269726210365,
+      "mdot_fuel_gps": 2.5228343242513485
+     },
+     "epa_steady_hd1.csv#32": {
+      "torque_nm": 143.8979113653463,
+      "egt_c": 657.2523051883895,
+      "mdot_fuel_gps": 2.547703864526482
+     },
+     "epa_steady_hd1.csv#33": {
+      "torque_nm": 180.85300017112237,
+      "egt_c": 687.2808401502738,
+      "mdot_fuel_gps": 3.071005957916509
+     },
+     "epa_steady_hd1.csv#34": {
+      "torque_nm": 218.37896249828316,
+      "egt_c": 719.072867238382,
+      "mdot_fuel_gps": 3.6919854442743856
+     },
+     "epa_steady_hd1.csv#35": {
+      "torque_nm": 228.7963474907577,
+      "egt_c": 726.6078097229037,
+      "mdot_fuel_gps": 3.8626402313441246
+     },
+     "epa_steady_hd1.csv#36": {
+      "torque_nm": 234.82176280751352,
+      "egt_c": 731.2792063652258,
+      "mdot_fuel_gps": 3.955955138023464
+     },
+     "epa_steady_hd1.csv#43": {
+      "torque_nm": 136.46535223689614,
+      "egt_c": 675.4961940052871,
+      "mdot_fuel_gps": 2.6771637259190935
+     },
+     "epa_steady_hd1.csv#44": {
+      "torque_nm": 176.78312659751884,
+      "egt_c": 698.218175560498,
+      "mdot_fuel_gps": 3.2735617073776107
+     },
+     "epa_steady_hd1.csv#45": {
+      "torque_nm": 220.51090367384174,
+      "egt_c": 732.512333657145,
+      "mdot_fuel_gps": 4.053372775496818
+     },
+     "epa_steady_hd1.csv#46": {
+      "torque_nm": 234.9303302290126,
+      "egt_c": 742.2949009795844,
+      "mdot_fuel_gps": 4.306468120616543
+     },
+     "epa_steady_hd1.csv#47": {
+      "torque_nm": 241.42813478406615,
+      "egt_c": 745.6826408818698,
+      "mdot_fuel_gps": 4.424416154394648
+     },
+     "epa_steady_hd1.csv#50": {
+      "torque_nm": 134.07585886667297,
+      "egt_c": 710.0903191898475,
+      "mdot_fuel_gps": 3.20719797597659
+     },
+     "epa_steady_hd1.csv#51": {
+      "torque_nm": 152.14376707893035,
+      "egt_c": 720.5810222784032,
+      "mdot_fuel_gps": 3.3268173519200523
+     },
+     "epa_steady_hd1.csv#52": {
+      "torque_nm": 188.96536690761633,
+      "egt_c": 735.9430194027012,
+      "mdot_fuel_gps": 4.035965855608624
+     },
+     "epa_steady_hd1.csv#53": {
+      "torque_nm": 208.21652601476907,
+      "egt_c": 747.1194303448596,
+      "mdot_fuel_gps": 4.457069790094485
+     },
+     "epa_steady_hd1.csv#54": {
+      "torque_nm": 310.87967654427183,
+      "egt_c": 792.590067863821,
+      "mdot_fuel_gps": 6.576829345176389
+     },
+     "epa_steady_hd1.csv#55": {
+      "torque_nm": 387.41562516342765,
+      "egt_c": 818.2014516751273,
+      "mdot_fuel_gps": 8.227615922336748
+     },
+     "epa_steady_hd1.csv#66": {
+      "torque_nm": 130.2605476969793,
+      "egt_c": 775.4228942526228,
+      "mdot_fuel_gps": 4.522873169757569
+     },
+     "epa_steady_hd1.csv#67": {
+      "torque_nm": 147.44377797732795,
+      "egt_c": 779.5171697641387,
+      "mdot_fuel_gps": 4.498407211203171
+     },
+     "epa_steady_hd1.csv#68": {
+      "torque_nm": 230.73557300879014,
+      "egt_c": 795.8615411145719,
+      "mdot_fuel_gps": 6.804820823100375
+     },
+     "epa_steady_hd1.csv#71": {
+      "torque_nm": 121.96139138088294,
+      "egt_c": 801.0481330741069,
+      "mdot_fuel_gps": 5.229353887642634
+     },
+     "epa_steady_hd1.csv#72": {
+      "torque_nm": 145.42438999271764,
+      "egt_c": 797.4938695944762,
+      "mdot_fuel_gps": 5.21176116681432
+     },
+     "epa_steady_hd1.csv#73": {
+      "torque_nm": 189.0052017991814,
+      "egt_c": 798.1423234640134,
+      "mdot_fuel_gps": 6.473031591339608
+     },
+     "epa_steady_hd1.csv#80": {
+      "torque_nm": 128.6503314643835,
+      "egt_c": 826.0247398135126,
+      "mdot_fuel_gps": 6.365659680261147
+     },
+     "epa_highload_final_hd1.csv#6": {
+      "torque_nm": 448.5361415465382,
+      "egt_c": 817.2348091506316,
+      "mdot_fuel_gps": 9.53828476848168
+     },
+     "epa_highload_final_hd1.csv#12": {
+      "torque_nm": 323.8231028369239,
+      "egt_c": 821.9360489512486,
+      "mdot_fuel_gps": 9.318746792237736
+     }
+    }
+   }
+  },
+  "S5": {
+   "values": {
+    "ce_rich_slope": 0.04703183002832513
+   },
+   "rows_used": 14,
+   "rows_excluded": {
+    "not_enriched_hot": [
+     [
+      "epa_steady_cell9.csv",
+      6
+     ],
+     [
+      "epa_steady_cell9.csv",
+      7
+     ],
+     [
+      "epa_steady_cell9.csv",
+      8
+     ],
+     [
+      "epa_steady_cell9.csv",
+      9
+     ],
+     [
+      "epa_steady_cell9.csv",
+      10
+     ],
+     [
+      "epa_steady_cell9.csv",
+      11
+     ],
+     [
+      "epa_steady_cell9.csv",
+      12
+     ],
+     [
+      "epa_steady_cell9.csv",
+      13
+     ],
+     [
+      "epa_steady_cell9.csv",
+      14
+     ],
+     [
+      "epa_steady_cell9.csv",
+      28
+     ],
+     [
+      "epa_steady_cell9.csv",
+      29
+     ],
+     [
+      "epa_steady_cell9.csv",
+      30
+     ],
+     [
+      "epa_steady_cell9.csv",
+      31
+     ],
+     [
+      "epa_steady_cell9.csv",
+      32
+     ],
+     [
+      "epa_steady_cell9.csv",
+      33
+     ],
+     [
+      "epa_steady_cell9.csv",
+      34
+     ],
+     [
+      "epa_steady_cell9.csv",
+      35
+     ],
+     [
+      "epa_steady_cell9.csv",
+      36
+     ],
+     [
+      "epa_steady_cell9.csv",
+      37
+     ],
+     [
+      "epa_steady_cell9.csv",
+      38
+     ],
+     [
+      "epa_steady_cell9.csv",
+      39
+     ],
+     [
+      "epa_steady_cell9.csv",
+      40
+     ],
+     [
+      "epa_steady_cell9.csv",
+      41
+     ],
+     [
+      "epa_steady_cell9.csv",
+      42
+     ],
+     [
+      "epa_steady_cell9.csv",
+      43
+     ],
+     [
+      "epa_steady_cell9.csv",
+      44
+     ],
+     [
+      "epa_steady_cell9.csv",
+      45
+     ],
+     [
+      "epa_steady_cell9.csv",
+      46
+     ],
+     [
+      "epa_steady_cell9.csv",
+      47
+     ],
+     [
+      "epa_steady_cell9.csv",
+      48
+     ],
+     [
+      "epa_steady_cell9.csv",
+      49
+     ],
+     [
+      "epa_steady_cell9.csv",
+      50
+     ],
+     [
+      "epa_steady_cell9.csv",
+      51
+     ],
+     [
+      "epa_steady_cell9.csv",
+      52
+     ],
+     [
+      "epa_steady_cell9.csv",
+      53
+     ],
+     [
+      "epa_steady_cell9.csv",
+      54
+     ],
+     [
+      "epa_steady_cell9.csv",
+      55
+     ],
+     [
+      "epa_steady_cell9.csv",
+      56
+     ],
+     [
+      "epa_steady_cell9.csv",
+      57
+     ],
+     [
+      "epa_steady_cell9.csv",
+      58
+     ],
+     [
+      "epa_steady_cell9.csv",
+      59
+     ],
+     [
+      "epa_steady_cell9.csv",
+      60
+     ],
+     [
+      "epa_steady_cell9.csv",
+      81
+     ],
+     [
+      "epa_steady_cell9.csv",
+      82
+     ],
+     [
+      "epa_steady_cell9.csv",
+      83
+     ],
+     [
+      "epa_steady_cell9.csv",
+      84
+     ],
+     [
+      "epa_steady_cell9.csv",
+      85
+     ],
+     [
+      "epa_steady_cell9.csv",
+      86
+     ],
+     [
+      "epa_steady_cell9.csv",
+      87
+     ],
+     [
+      "epa_steady_cell9.csv",
+      88
+     ],
+     [
+      "epa_steady_cell9.csv",
+      89
+     ],
+     [
+      "epa_steady_cell9.csv",
+      90
+     ],
+     [
+      "epa_steady_cell9.csv",
+      91
+     ],
+     [
+      "epa_steady_cell9.csv",
+      92
+     ],
+     [
+      "epa_steady_cell9.csv",
+      93
+     ],
+     [
+      "epa_steady_cell9.csv",
+      94
+     ],
+     [
+      "epa_steady_cell9.csv",
+      95
+     ],
+     [
+      "epa_steady_cell9.csv",
+      96
+     ],
+     [
+      "epa_steady_cell9.csv",
+      115
+     ],
+     [
+      "epa_steady_cell9.csv",
+      116
+     ],
+     [
+      "epa_steady_cell9.csv",
+      117
+     ],
+     [
+      "epa_steady_cell9.csv",
+      118
+     ],
+     [
+      "epa_steady_cell9.csv",
+      119
+     ],
+     [
+      "epa_steady_cell9.csv",
+      120
+     ],
+     [
+      "epa_steady_cell9.csv",
+      121
+     ],
+     [
+      "epa_steady_cell9.csv",
+      122
+     ],
+     [
+      "epa_steady_cell9.csv",
+      123
+     ],
+     [
+      "epa_steady_cell9.csv",
+      124
+     ],
+     [
+      "epa_steady_cell9.csv",
+      125
+     ],
+     [
+      "epa_steady_cell9.csv",
+      126
+     ],
+     [
+      "epa_steady_cell9.csv",
+      127
+     ],
+     [
+      "epa_steady_cell9.csv",
+      128
+     ],
+     [
+      "epa_steady_cell9.csv",
+      129
+     ],
+     [
+      "epa_steady_cell9.csv",
+      130
+     ],
+     [
+      "epa_steady_cell9.csv",
+      132
+     ],
+     [
+      "epa_steady_cell9.csv",
+      133
+     ],
+     [
+      "epa_steady_cell9.csv",
+      134
+     ],
+     [
+      "epa_steady_cell9.csv",
+      135
+     ],
+     [
+      "epa_steady_cell9.csv",
+      136
+     ],
+     [
+      "epa_steady_cell9.csv",
+      137
+     ],
+     [
+      "epa_steady_cell9.csv",
+      138
+     ],
+     [
+      "epa_steady_cell9.csv",
+      139
+     ],
+     [
+      "epa_steady_cell9.csv",
+      140
+     ],
+     [
+      "epa_steady_cell9.csv",
+      141
+     ],
+     [
+      "epa_steady_cell9.csv",
+      142
+     ],
+     [
+      "epa_steady_cell9.csv",
+      143
+     ],
+     [
+      "epa_steady_cell9.csv",
+      144
+     ],
+     [
+      "epa_steady_cell9.csv",
+      145
+     ],
+     [
+      "epa_steady_cell9.csv",
+      146
+     ],
+     [
+      "epa_steady_cell9.csv",
+      160
+     ],
+     [
+      "epa_steady_cell9.csv",
+      161
+     ],
+     [
+      "epa_steady_cell9.csv",
+      162
+     ],
+     [
+      "epa_steady_cell9.csv",
+      163
+     ],
+     [
+      "epa_steady_cell9.csv",
+      164
+     ],
+     [
+      "epa_steady_cell9.csv",
+      165
+     ],
+     [
+      "epa_steady_cell9.csv",
+      166
+     ],
+     [
+      "epa_steady_cell9.csv",
+      167
+     ],
+     [
+      "epa_steady_cell9.csv",
+      168
+     ],
+     [
+      "epa_steady_cell9.csv",
+      169
+     ],
+     [
+      "epa_steady_cell9.csv",
+      170
+     ],
+     [
+      "epa_steady_cell9.csv",
+      171
+     ],
+     [
+      "epa_steady_cell9.csv",
+      173
+     ],
+     [
+      "epa_steady_cell9.csv",
+      174
+     ],
+     [
+      "epa_steady_cell9.csv",
+      175
+     ],
+     [
+      "epa_steady_cell9.csv",
+      176
+     ],
+     [
+      "epa_steady_cell9.csv",
+      177
+     ],
+     [
+      "epa_steady_cell9.csv",
+      178
+     ],
+     [
+      "epa_steady_cell9.csv",
+      179
+     ],
+     [
+      "epa_steady_cell9.csv",
+      180
+     ],
+     [
+      "epa_steady_cell9.csv",
+      181
+     ],
+     [
+      "epa_steady_cell9.csv",
+      182
+     ],
+     [
+      "epa_steady_cell9.csv",
+      183
+     ],
+     [
+      "epa_steady_cell9.csv",
+      184
+     ],
+     [
+      "epa_steady_cell9.csv",
+      185
+     ],
+     [
+      "epa_steady_hd1.csv",
+      6
+     ],
+     [
+      "epa_steady_hd1.csv",
+      7
+     ],
+     [
+      "epa_steady_hd1.csv",
+      8
+     ],
+     [
+      "epa_steady_hd1.csv",
+      9
+     ],
+     [
+      "epa_steady_hd1.csv",
+      10
+     ],
+     [
+      "epa_steady_hd1.csv",
+      11
+     ],
+     [
+      "epa_steady_hd1.csv",
+      12
+     ],
+     [
+      "epa_steady_hd1.csv",
+      13
+     ],
+     [
+      "epa_steady_hd1.csv",
+      14
+     ],
+     [
+      "epa_steady_hd1.csv",
+      15
+     ],
+     [
+      "epa_steady_hd1.csv",
+      16
+     ],
+     [
+      "epa_steady_hd1.csv",
+      17
+     ],
+     [
+      "epa_steady_hd1.csv",
+      18
+     ],
+     [
+      "epa_steady_hd1.csv",
+      19
+     ],
+     [
+      "epa_steady_hd1.csv",
+      20
+     ],
+     [
+      "epa_steady_hd1.csv",
+      21
+     ],
+     [
+      "epa_steady_hd1.csv",
+      22
+     ],
+     [
+      "epa_steady_hd1.csv",
+      25
+     ],
+     [
+      "epa_steady_hd1.csv",
+      26
+     ],
+     [
+      "epa_steady_hd1.csv",
+      27
+     ],
+     [
+      "epa_steady_hd1.csv",
+      28
+     ],
+     [
+      "epa_steady_hd1.csv",
+      29
+     ],
+     [
+      "epa_steady_hd1.csv",
+      30
+     ],
+     [
+      "epa_steady_hd1.csv",
+      31
+     ],
+     [
+      "epa_steady_hd1.csv",
+      32
+     ],
+     [
+      "epa_steady_hd1.csv",
+      33
+     ],
+     [
+      "epa_steady_hd1.csv",
+      34
+     ],
+     [
+      "epa_steady_hd1.csv",
+      35
+     ],
+     [
+      "epa_steady_hd1.csv",
+      36
+     ],
+     [
+      "epa_steady_hd1.csv",
+      41
+     ],
+     [
+      "epa_steady_hd1.csv",
+      42
+     ],
+     [
+      "epa_steady_hd1.csv",
+      43
+     ],
+     [
+      "epa_steady_hd1.csv",
+      44
+     ],
+     [
+      "epa_steady_hd1.csv",
+      45
+     ],
+     [
+      "epa_steady_hd1.csv",
+      46
+     ],
+     [
+      "epa_steady_hd1.csv",
+      47
+     ],
+     [
+      "epa_steady_hd1.csv",
+      48
+     ],
+     [
+      "epa_steady_hd1.csv",
+      49
+     ],
+     [
+      "epa_steady_hd1.csv",
+      50
+     ],
+     [
+      "epa_steady_hd1.csv",
+      51
+     ],
+     [
+      "epa_steady_hd1.csv",
+      52
+     ],
+     [
+      "epa_steady_hd1.csv",
+      53
+     ],
+     [
+      "epa_steady_hd1.csv",
+      54
+     ],
+     [
+      "epa_steady_hd1.csv",
+      55
+     ],
+     [
+      "epa_steady_hd1.csv",
+      56
+     ],
+     [
+      "epa_steady_hd1.csv",
+      65
+     ],
+     [
+      "epa_steady_hd1.csv",
+      66
+     ],
+     [
+      "epa_steady_hd1.csv",
+      67
+     ],
+     [
+      "epa_steady_hd1.csv",
+      68
+     ],
+     [
+      "epa_steady_hd1.csv",
+      69
+     ],
+     [
+      "epa_steady_hd1.csv",
+      70
+     ],
+     [
+      "epa_steady_hd1.csv",
+      71
+     ],
+     [
+      "epa_steady_hd1.csv",
+      72
+     ],
+     [
+      "epa_steady_hd1.csv",
+      73
+     ],
+     [
+      "epa_steady_hd1.csv",
+      74
+     ],
+     [
+      "epa_steady_hd1.csv",
+      79
+     ],
+     [
+      "epa_steady_hd1.csv",
+      80
+     ],
+     [
+      "epa_steady_hd1.csv",
+      81
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      6
+     ],
+     [
+      "epa_highload_final_hd1.csv",
+      12
+     ]
+    ]
+   },
+   "flags": [],
+   "bounds_active": [],
+   "convergence": {
+    "nfev": 9,
+    "njev": 0,
+    "status": 0,
+    "message": "Solution found.",
+    "cost": 39.74636922648972,
+    "grad_norm": null,
+    "last_step_norm": null,
+    "cost_change": null,
+    "second_attempt": false
+   },
+   "report": {
+    "slope": 0.04703183002832513,
+    "bound_hit": false,
+    "eta_comb_at_deepest_lambda": 0.9862755240998594,
+    "sigma": 0.03439766030984474,
+    "sigma_fd_step": 0.001,
+    "deepest_lambda_fed": 0.7081875000000011,
+    "rows": 14,
+    "xatol": 0.0001,
+    "objective_at_shared_slope": 1040.8008739316565,
+    "objective_at_fit": 79.49273845297944,
+    "evaluations": 10
+   }
+  },
+  "S6": {
+   "values": {
+    "knock_a": 0.01901483695201471
+   },
+   "rows_used": 13,
+   "rows_excluded": {
+    "ki_zero": [],
+    "not_final_or_no_lambda": [
+     [
+      "epa_steady_cell9.csv",
+      6
+     ],
+     [
+      "epa_steady_cell9.csv",
+      7
+     ],
+     [
+      "epa_steady_cell9.csv",
+      8
+     ],
+     [
+      "epa_steady_cell9.csv",
+      9
+     ],
+     [
+      "epa_steady_cell9.csv",
+      10
+     ],
+     [
+      "epa_steady_cell9.csv",
+      11
+     ],
+     [
+      "epa_steady_cell9.csv",
+      12
+     ],
+     [
+      "epa_steady_cell9.csv",
+      13
+     ],
+     [
+      "epa_steady_cell9.csv",
+      14
+     ],
+     [
+      "epa_steady_cell9.csv",
+      28
+     ],
+     [
+      "epa_steady_cell9.csv",
+      29
+     ],
+     [
+      "epa_steady_cell9.csv",
+      30
+     ],
+     [
+      "epa_steady_cell9.csv",
+      31
+     ],
+     [
+      "epa_steady_cell9.csv",
+      32
+     ],
+     [
+      "epa_steady_cell9.csv",
+      33
+     ],
+     [
+      "epa_steady_cell9.csv",
+      34
+     ],
+     [
+      "epa_steady_cell9.csv",
+      35
+     ],
+     [
+      "epa_steady_cell9.csv",
+      36
+     ],
+     [
+      "epa_steady_cell9.csv",
+      37
+     ],
+     [
+      "epa_steady_cell9.csv",
+      38
+     ],
+     [
+      "epa_steady_cell9.csv",
+      39
+     ],
+     [
+      "epa_steady_cell9.csv",
+      40
+     ],
+     [
+      "epa_steady_cell9.csv",
+      41
+     ],
+     [
+      "epa_steady_cell9.csv",
+      42
+     ],
+     [
+      "epa_steady_cell9.csv",
+      43
+     ],
+     [
+      "epa_steady_cell9.csv",
+      44
+     ],
+     [
+      "epa_steady_cell9.csv",
+      45
+     ],
+     [
+      "epa_steady_cell9.csv",
+      46
+     ],
+     [
+      "epa_steady_cell9.csv",
+      47
+     ],
+     [
+      "epa_steady_cell9.csv",
+      48
+     ],
+     [
+      "epa_steady_cell9.csv",
+      49
+     ],
+     [
+      "epa_steady_cell9.csv",
+      50
+     ],
+     [
+      "epa_steady_cell9.csv",
+      51
+     ],
+     [
+      "epa_steady_cell9.csv",
+      52
+     ],
+     [
+      "epa_steady_cell9.csv",
+      53
+     ],
+     [
+      "epa_steady_cell9.csv",
+      54
+     ],
+     [
+      "epa_steady_cell9.csv",
+      55
+     ],
+     [
+      "epa_steady_cell9.csv",
+      56
+     ],
+     [
+      "epa_steady_cell9.csv",
+      57
+     ],
+     [
+      "epa_steady_cell9.csv",
+      58
+     ],
+     [
+      "epa_steady_cell9.csv",
+      59
+     ],
+     [
+      "epa_steady_cell9.csv",
+      60
+     ],
+     [
+      "epa_steady_cell9.csv",
+      81
+     ],
+     [
+      "epa_steady_cell9.csv",
+      82
+     ],
+     [
+      "epa_steady_cell9.csv",
+      83
+     ],
+     [
+      "epa_steady_cell9.csv",
+      84
+     ],
+     [
+      "epa_steady_cell9.csv",
+      85
+     ],
+     [
+      "epa_steady_cell9.csv",
+      86
+     ],
+     [
+      "epa_steady_cell9.csv",
+      87
+     ],
+     [
+      "epa_steady_cell9.csv",
+      88
+     ],
+     [
+      "epa_steady_cell9.csv",
+      89
+     ],
+     [
+      "epa_steady_cell9.csv",
+      90
+     ],
+     [
+      "epa_steady_cell9.csv",
+      91
+     ],
+     [
+      "epa_steady_cell9.csv",
+      92
+     ],
+     [
+      "epa_steady_cell9.csv",
+      93
+     ],
+     [
+      "epa_steady_cell9.csv",
+      94
+     ],
+     [
+      "epa_steady_cell9.csv",
+      95
+     ],
+     [
+      "epa_steady_cell9.csv",
+      96
+     ],
+     [
+      "epa_steady_cell9.csv",
+      97
+     ],
+     [
+      "epa_steady_cell9.csv",
+      115
+     ],
+     [
+      "epa_steady_cell9.csv",
+      116
+     ],
+     [
+      "epa_steady_cell9.csv",
+      117
+     ],
+     [
+      "epa_steady_cell9.csv",
+      118
+     ],
+     [
+      "epa_steady_cell9.csv",
+      119
+     ],
+     [
+      "epa_steady_cell9.csv",
+      120
+     ],
+     [
+      "epa_steady_cell9.csv",
+      121
+     ],
+     [
+      "epa_steady_cell9.csv",
+      122
+     ],
+     [
+      "epa_steady_cell9.csv",
+      123
+     ],
+     [
+      "epa_steady_cell9.csv",
+      124
+     ],
+     [
+      "epa_steady_cell9.csv",
+      125
+     ],
+     [
+      "epa_steady_cell9.csv",
+      126
+     ],
+     [
+      "epa_steady_cell9.csv",
+      127
+     ],
+     [
+      "epa_steady_cell9.csv",
+      128
+     ],
+     [
+      "epa_steady_cell9.csv",
+      129
+     ],
+     [
+      "epa_steady_cell9.csv",
+      130
+     ],
+     [
+      "epa_steady_cell9.csv",
+      131
+     ],
+     [
+      "epa_steady_cell9.csv",
+      132
+     ],
+     [
+      "epa_steady_cell9.csv",
+      133
+     ],
+     [
+      "epa_steady_cell9.csv",
+      134
+     ],
+     [
+      "epa_steady_cell9.csv",
+      135
+     ],
+     [
+      "epa_steady_cell9.csv",
+      136
+     ],
+     [
+      "epa_steady_cell9.csv",
+      137
+     ],
+     [
+      "epa_steady_cell9.csv",
+      138
+     ],
+     [
+      "epa_steady_cell9.csv",
+      139
+     ],
+     [
+      "epa_steady_cell9.csv",
+      140
+     ],
+     [
+      "epa_steady_cell9.csv",
+      141
+     ],
+     [
+      "epa_steady_cell9.csv",
+      142
+     ],
+     [
+      "epa_steady_cell9.csv",
+      143
+     ],
+     [
+      "epa_steady_cell9.csv",
+      144
+     ],
+     [
+      "epa_steady_cell9.csv",
+      145
+     ],
+     [
+      "epa_steady_cell9.csv",
+      146
+     ],
+     [
+      "epa_steady_cell9.csv",
+      160
+     ],
+     [
+      "epa_steady_cell9.csv",
+      161
+     ],
+     [
+      "epa_steady_cell9.csv",
+      162
+     ],
+     [
+      "epa_steady_cell9.csv",
+      163
+     ],
+     [
+      "epa_steady_cell9.csv",
+      164
+     ],
+     [
+      "epa_steady_cell9.csv",
+      165
+     ],
+     [
+      "epa_steady_cell9.csv",
+      166
+     ],
+     [
+      "epa_steady_cell9.csv",
+      167
+     ],
+     [
+      "epa_steady_cell9.csv",
+      168
+     ],
+     [
+      "epa_steady_cell9.csv",
+      169
+     ],
+     [
+      "epa_steady_cell9.csv",
+      170
+     ],
+     [
+      "epa_steady_cell9.csv",
+      171
+     ],
+     [
+      "epa_steady_cell9.csv",
+      172
+     ],
+     [
+      "epa_steady_cell9.csv",
+      173
+     ],
+     [
+      "epa_steady_cell9.csv",
+      174
+     ],
+     [
+      "epa_steady_cell9.csv",
+      175
+     ],
+     [
+      "epa_steady_cell9.csv",
+      176
+     ],
+     [
+      "epa_steady_cell9.csv",
+      177
+     ],
+     [
+      "epa_steady_cell9.csv",
+      178
+     ],
+     [
+      "epa_steady_cell9.csv",
+      179
+     ],
+     [
+      "epa_steady_cell9.csv",
+      180
+     ],
+     [
+      "epa_steady_cell9.csv",
+      181
+     ],
+     [
+      "epa_steady_cell9.csv",
+      182
+     ],
+     [
+      "epa_steady_cell9.csv",
+      183
+     ],
+     [
+      "epa_steady_cell9.csv",
+      184
+     ],
+     [
+      "epa_steady_cell9.csv",
+      185
+     ],
+     [
+      "epa_steady_hd1.csv",
+      6
+     ],
+     [
+      "epa_steady_hd1.csv",
+      7
+     ],
+     [
+      "epa_steady_hd1.csv",
+      8
+     ],
+     [
+      "epa_steady_hd1.csv",
+      9
+     ],
+     [
+      "epa_steady_hd1.csv",
+      10
+     ],
+     [
+      "epa_steady_hd1.csv",
+      11
+     ],
+     [
+      "epa_steady_hd1.csv",
+      12
+     ],
+     [
+      "epa_steady_hd1.csv",
+      13
+     ],
+     [
+      "epa_steady_hd1.csv",
+      14
+     ],
+     [
+      "epa_steady_hd1.csv",
+      15
+     ],
+     [
+      "epa_steady_hd1.csv",
+      16
+     ],
+     [
+      "epa_steady_hd1.csv",
+      17
+     ],
+     [
+      "epa_steady_hd1.csv",
+      18
+     ],
+     [
+      "epa_steady_hd1.csv",
+      19
+     ],
+     [
+      "epa_steady_hd1.csv",
+      20
+     ],
+     [
+      "epa_steady_hd1.csv",
+      21
+     ],
+     [
+      "epa_steady_hd1.csv",
+      22
+     ],
+     [
+      "epa_steady_hd1.csv",
+      25
+     ],
+     [
+      "epa_steady_hd1.csv",
+      26
+     ],
+     [
+      "epa_steady_hd1.csv",
+      27
+     ],
+     [
+      "epa_steady_hd1.csv",
+      28
+     ],
+     [
+      "epa_steady_hd1.csv",
+      29
+     ],
+     [
+      "epa_steady_hd1.csv",
+      30
+     ],
+     [
+      "epa_steady_hd1.csv",
+      31
+     ],
+     [
+      "epa_steady_hd1.csv",
+      32
+     ],
+     [
+      "epa_steady_hd1.csv",
+      33
+     ],
+     [
+      "epa_steady_hd1.csv",
+      34
+     ],
+     [
+      "epa_steady_hd1.csv",
+      35
+     ],
+     [
+      "epa_steady_hd1.csv",
+      36
+     ],
+     [
+      "epa_steady_hd1.csv",
+      41
+     ],
+     [
+      "epa_steady_hd1.csv",
+      42
+     ],
+     [
+      "epa_steady_hd1.csv",
+      43
+     ],
+     [
+      "epa_steady_hd1.csv",
+      44
+     ],
+     [
+      "epa_steady_hd1.csv",
+      45
+     ],
+     [
+      "epa_steady_hd1.csv",
+      46
+     ],
+     [
+      "epa_steady_hd1.csv",
+      47
+     ],
+     [
+      "epa_steady_hd1.csv",
+      48
+     ],
+     [
+      "epa_steady_hd1.csv",
+      49
+     ],
+     [
+      "epa_steady_hd1.csv",
+      50
+     ],
+     [
+      "epa_steady_hd1.csv",
+      51
+     ],
+     [
+      "epa_steady_hd1.csv",
+      52
+     ],
+     [
+      "epa_steady_hd1.csv",
+      53
+     ],
+     [
+      "epa_steady_hd1.csv",
+      54
+     ],
+     [
+      "epa_steady_hd1.csv",
+      55
+     ],
+     [
+      "epa_steady_hd1.csv",
+      56
+     ],
+     [
+      "epa_steady_hd1.csv",
+      65
+     ],
+     [
+      "epa_steady_hd1.csv",
+      66
+     ],
+     [
+      "epa_steady_hd1.csv",
+      67
+     ],
+     [
+      "epa_steady_hd1.csv",
+      68
+     ],
+     [
+      "epa_steady_hd1.csv",
+      69
+     ],
+     [
+      "epa_steady_hd1.csv",
+      70
+     ],
+     [
+      "epa_steady_hd1.csv",
+      71
+     ],
+     [
+      "epa_steady_hd1.csv",
+      72
+     ],
+     [
+      "epa_steady_hd1.csv",
+      73
+     ],
+     [
+      "epa_steady_hd1.csv",
+      74
+     ],
+     [
+      "epa_steady_hd1.csv",
+      79
+     ],
+     [
+      "epa_steady_hd1.csv",
+      80
+     ],
+     [
+      "epa_steady_hd1.csv",
+      81
+     ]
+    ]
+   },
+   "flags": [],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "knock_a": 0.01901483695201471,
+    "mean_ln_ki": 1.964240735875277e-16,
+    "knock_a_swept_at": 0.01768,
+    "ki_spread": {
+     "min": 0.5091779558134338,
+     "p50": 1.068124955369905,
+     "max": 1.564553126395174
+    },
+    "rows": 13
+   }
+  },
+  "verify": {
+   "values": {},
+   "rows_used": 143,
+   "rows_excluded": {},
+   "flags": [],
+   "bounds_active": [],
+   "convergence": null,
+   "report": {
+    "max_rel_shortcut": 4.684830896738223e-16,
+    "s2_verify_max_rel": 4.230604369871311e-16,
+    "max_rel_air_at_final": 4.230604369871311e-16,
+    "rows_s4_shortcut": 123,
+    "rows_air": 143,
+    "nonzero_columns_at_start": true,
+    "zero_columns_at_optimum": {},
+    "unmoved_from_start": {
+     "S2": [],
+     "S4": []
+    },
+    "ve_at_clip_rows": [],
+    "rows_ve_checked": 188,
+    "tolerances": {
+     "shortcut": 1e-09,
+     "s2_air": 1e-12
+    }
+   }
+  }
+ }
+}
