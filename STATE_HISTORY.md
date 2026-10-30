@@ -4195,3 +4195,15 @@ Last verified: 2026-10-15 — verify_docs.py 74/74 · the app suites below · dr
 # Part N — lines rotated out of CHECKPOINT.md, 19 October 2026 (Jad's session merged: the drive C check, the proposal's evaluation)
 
 - Stage A has not run on the 18–19 October files: they are not on this machine.
+
+# Part O — lines rotated out of CHECKPOINT.md, 30 October 2026 (Jad's learning-lab session: the first figure, its stage, the project map)
+
+Last verified: 2026-10-19 — verify_docs.py 74/74 · drift_test.py 16/16 (drive C's rule, proposed) · the app suites below as of 15 October
+
+- Ghassan's `GRA-2340394` (`c16b857`) was merged into Jad's work on 14 October
+  (`cc5468f`; every conflict, both sides, in `conflict_2026-10-14.md`). Every
+  simulation file is byte-identical to his last push, and his `check_premise`,
+  `validate` and `test_reward` print his figures on Jad's machine.
+
+- G-CTX passed: in a fresh session every memory file together is 5.8k tokens
+  (Jad's `/context`, 14 October).

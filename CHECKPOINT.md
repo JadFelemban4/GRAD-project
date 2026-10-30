@@ -1,6 +1,6 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-19 — verify_docs.py 74/74 · drift_test.py 16/16 (drive C's rule, proposed) · the app suites below as of 15 October
+Last verified: 2026-10-30 — verify_docs.py 74/74 · drift_test.py 16/16 (19 October) · the app suites below as of 15 October · the learning lab's on Jad's branch as of 30 October
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
@@ -24,16 +24,12 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   23 pairs, sign p 0.0173 (`python analyse_x1.py` -> `results/X1_RESULT.txt`).
 - The plant carries the four steps agreed on 30 September (`75ca65f`), and the
   premise reads baseline 848.1 at 883 °C (`python check_premise.py`).
-- Ghassan's `GRA-2340394` (`c16b857`) was merged into Jad's work on 14 October
-  (`cc5468f`; every conflict, both sides, in `conflict_2026-10-14.md`). Every
-  simulation file is byte-identical to his last push, and his `check_premise`,
-  `validate` and `test_reward` print his figures on Jad's machine.
 - `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
-- G-CTX passed: in a fresh session every memory file together is 5.8k tokens
-  (Jad's `/context`, 14 October).
 - The results tab names the plant of Phase D, D2 and C4: made on another plant,
   `sep17-before-merge`'s, each file read by its own fingerprint schema
   (`ca2cd73`, `2fd9aed`; `SESSION_REPORT_2026-10-15_results-schema.md`).
+- The learning lab on Jad's branch (below): its suites fail only as on `main`
+  (Python 4 of 35, Node 1 of 147; `SESSION_REPORT_2026-10-30_learning-lab-figures.md`).
 - App suites (15 October, Python 3.12.10): `python -m app.test_replay` 49 of 49,
   node 306 of 306, `app.test_results` 123 of 124 (the one needs `pwsh`);
   `app.test_agents` 22 failing, 19 of them the agents page refusing the old
@@ -47,6 +43,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
+
+- Jad · `JMF-2340550-anatomy-housing` (on `cf43fbb`) · the lab's first figure, its stage, the
+  project map; Ghassan's message of 21 October waits for Jad (the report, section 1).
 
 ## Blockers
 
@@ -80,6 +79,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. For Ghassan, before the next training: `train.py`'s `CLOSED` list has no
    `wideair_dt1`, though X2's result was published on 13 October (session
    report of 15 October, 2.3).
+8. Jad's next session (his choice, 30 October): a quality check of the whole
+   code with the `ponytail` skills, report only (`NEXT_SESSION_2026-10-30.md`).
 
 ## Files outside git (where · last backup · manifest)
 
