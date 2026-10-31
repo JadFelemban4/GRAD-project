@@ -3,8 +3,11 @@
     python -B test_epa_roads.py        about two minutes; exit code 0 when all pass
 
 Every check runs on a SYNTHETIC seed or on temporary copies; nothing here draws a road of the test,
-writes under results/EPA_ROADS/, or opens an EPA table, a held-out record, the real contract or any .csv:
-every class is test_epa_fixtures.Guarded (WP3_INTERFACES.md 9.1), and the module's own guard is
+writes under results/EPA_ROADS/, or opens an EPA table, a held-out record or any .csv, and only one test
+opens the real contract: every class is test_epa_fixtures.Guarded (WP3_INTERFACES.md 9.1) but
+Tightenings, whose tests run inside the same guard but test_the_tightenings_name_the_roads_record, which
+after a roads stop reads the contract's knee_shift.largest and ecu_strategy_b58 and
+results/car_spark_boost.json (never a table), and origin's GRA-test (row 129 (4)); the module's own guard is
 installed below as well.
 
   Generator    it imports and reads no vehicle (row 95 (1)); the frozen twenty are read as evaluate.py
@@ -29,7 +32,8 @@ installed below as well.
   Tightenings  after the real draw, roads.json's roads_seed is the reveal's and its hash lines the roads
                commit's (row 97; ORDER step 6), skipped while roads.json is absent; then
                results/EPA_TIGHTENINGS.json's roads_sha and roads_seed are the record's, skipped while
-               the tightenings are absent and failed if they exist without roads.json; the hash lines,
+               the tightenings are absent; without roads.json the tightenings must be row 129 (4)'s
+               no-roads record and no other (epa_tightenings.stopped_record_problems); the hash lines,
                once set, are 64 lowercase hex digits and differ
 """
 import contextlib
@@ -52,7 +56,7 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
 import epa_roads as R  # noqa: E402
-from test_epa_fixtures import Guarded  # noqa: E402  (WP3_INTERFACES.md 9.1)
+from test_epa_fixtures import Guarded, forbid_real_data  # noqa: E402  (WP3_INTERFACES.md 9.1)
 
 R.install_guard(())
 SYNTHETIC_SEED = 271828182          # SYNTHETIC: a test seed, never roads_seed
@@ -962,8 +966,47 @@ class RedrawLog(Guarded):
         self.assertFalse(os.path.exists(os.path.join(self.root, R.ATTEMPTS_REL)))     # nothing was written
 
 
-class Tightenings(Guarded):
-    """Row 97 and ORDER steps 6 and 8, on the real records once they exist."""
+def tightenings_problems(root):
+    """What results/EPA_TIGHTENINGS.json under `root` gets wrong as the roads step's tightenings, [] when nothing;
+    None while it is absent. With roads.json: its roads_sha and roads_seed are roads.json's (row 97; ORDER step 8).
+    Without roads.json: it is row 129 (4)'s no-roads record and no other (epa_tightenings.stopped_record_problems:
+    seed_kind NONE and the constant fields, L1 and E8 the contract's and the B58's band recomputed, the attempts
+    log as draw writes it ending in the one stop that is not a coding defect, provenance.commit an ancestor and
+    code_sha_text its blobs, origin's GRA-test holding the record and no roads.json), which reads the contract,
+    results/car_spark_boost.json and the remote (git ls-remote). test_epa_tightenings.StoppedRoute calls this on
+    its synthetic repository."""
+    roads = os.path.join(root, R.ROADS_REL)
+    tight = os.path.join(root, R.TIGHTENINGS_REL)
+    if not os.path.isfile(tight):
+        return None
+    with open(tight, encoding="utf-8") as fh:
+        t = json.load(fh)
+    if not os.path.isfile(roads):
+        import epa_tightenings                      # row 129 (4); here, so the other tests import no tightenings
+        return epa_tightenings.stopped_record_problems(t, root=root)
+    with open(roads, encoding="utf-8") as fh:
+        rec = json.load(fh)
+    out = []
+    if t.get("roads_sha") != R.roads_sha(roads):
+        out.append(f"the tightenings' roads_sha {t.get('roads_sha')!r} is not roads.json's")
+    if t.get("roads_seed") != rec["commit_reveal"]["roads_seed"]:
+        out.append(f"the tightenings' roads_seed {t.get('roads_seed')!r} is not roads.json's")
+    return out
+
+
+class Tightenings(unittest.TestCase):
+    """Row 97, ORDER steps 6 and 8 and row 129 (4), on the real records once they exist. Every test runs inside
+    test_epa_fixtures.forbid_real_data but test_the_tightenings_name_the_roads_record: after a roads stop it reads
+    the real contract's knee_shift.largest and ecu_strategy_b58 and results/car_spark_boost.json (never a table),
+    and origin's GRA-test, as test_epa_tightenings.LiveRecord does; epa_roads' guard, installed above, still
+    refuses every EPA table, logs/epa*, results/EPA_VALIDATION and any .csv."""
+
+    READS_THE_CONTRACT = ("test_the_tightenings_name_the_roads_record",)
+
+    def setUp(self):
+        super().setUp()
+        if self._testMethodName not in self.READS_THE_CONTRACT:
+            self.enterContext(forbid_real_data())
 
     def test_the_roads_record_names_its_reveal(self):
         roads = os.path.join(HERE, R.ROADS_REL)
@@ -985,17 +1028,10 @@ class Tightenings(Guarded):
         self.assertEqual(outs[0]["roads_sha"], R.roads_sha(roads))
 
     def test_the_tightenings_name_the_roads_record(self):
-        roads = os.path.join(HERE, R.ROADS_REL)
-        tight = os.path.join(HERE, R.TIGHTENINGS_REL)
-        if not os.path.isfile(tight):
+        probs = tightenings_problems(HERE)
+        if probs is None:
             self.skipTest("results/EPA_TIGHTENINGS.json is absent: the tightenings have not run (row 104)")
-        self.assertTrue(os.path.isfile(roads), "the tightenings exist and name a roads record that is not there")
-        with open(roads, encoding="utf-8") as fh:
-            rec = json.load(fh)
-        with open(tight, encoding="utf-8") as fh:
-            t = json.load(fh)
-        self.assertEqual(t["roads_sha"], R.roads_sha(roads))
-        self.assertEqual(t["roads_seed"], rec["commit_reveal"]["roads_seed"])
+        self.assertEqual(probs, [], "the tightenings are neither roads.json's nor row 129 (4)'s no-roads record")
 
     def test_the_hash_lines_once_set(self):
         """The integrity review: a malformed hash line could never be corrected after the roads commit, so

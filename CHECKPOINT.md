@@ -1,6 +1,6 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-30 (on `GRA-test`, section I of the decision sheet, after commit D `25437ba`) — verify_docs.py 74/74 · drift_test.py 18/18 · the app suites below as of 15 October on main (`GRA-test`'s at commit D, the same results as commit A's: `SESSION_REPORT_2026-10-30_run1.md`)
+Last verified: 2026-10-31 (on `GRA-test`, at R3a, after R0a, C1, N and K) — verify_docs.py 74/74 · drift_test.py 18/18 (R0a's gate) · the app suites at R0a: the known `?v=` asset checks and the `pwsh` launcher test fail, as on 15 October (`SESSION_REPORT_2026-10-31_build-step-2.md`)
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 GRA-test: build step 2's commits A (WP1, certified 23 October, `results/B58_IDENTITY.md`), C (the calibration and validation scripts, WP3) and D (`25437ba`, 30 October: Run 1, the three EPA engines calibrated and frozen), on contract version 5 (`c842d74`, unchanged since the first fit) · the B58: plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3, unchanged by Run 1 (decision 48's re-runs) · pending: L8 on the training device
 
@@ -114,7 +114,7 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
    October); `GRA-test`'s has it since C1 (ORDER step 7).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (sections I-L). Next: C1, R3a, step 8a (row 125's N); each of you sends the sha256
+   order (sections I-L). Done 31 October: R0a, C1, N, K, R3a. Next: each of you sends the sha256
    of a private 256-bit integer (row 96); then R0, the push and the reveal. Pause Windows
    updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
    else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
