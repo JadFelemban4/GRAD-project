@@ -1,0 +1,324 @@
+{
+ "schema": "epa-tit-cap/2",
+ "plant": "ford_27tt",
+ "rule": "The cap is the highest TIT on the Ford's calibration Final rows: decision 62's first option. Its second option, the 1223 K EGT limit (egt_limit_k), becomes a second sensitivity row. Both are reported, and neither decides a label. (results/VALIDATION_DECISIONS.md, row 105)",
+ "decisions": {
+  "62": "results/VALIDATION_DECISIONS.md, row 62",
+  "amendment_62": "docs/build_step_2/AMENDMENTS.md, amendment 62",
+  "105": "results/VALIDATION_DECISIONS.md, row 105",
+  "order_step": "docs/build_step_2/ORDER_TO_TRAINING.md, step 5"
+ },
+ "cap": {
+  "tit_k": 1129.4653061224485,
+  "tit_c": 856.3153061224486,
+  "row_key": {
+   "table": "epa_highload_final_hd1.csv",
+   "source_row": 16
+  },
+  "line": "4500",
+  "nominal_rpm": 4500,
+  "hold": 16,
+  "test_cell": "Test Cell HD1",
+  "rows_at_max": 1,
+  "unit": "K, tit_c + 273.15 (tit_c degC as published)"
+ },
+ "sensitivity_egt_limit": {
+  "tit_k": 1223.0,
+  "field": "engine.damage.egt_limit_k",
+  "spec": "engine_specs/ford_27tt.toml",
+  "label": "ASSUMED",
+  "unit": "K",
+  "source": "CARRIED FROM THE B58: engine_specs/b58.toml [damage] egt_limit_k (ASSUMED there: 950 C of gas, the EGT constraint cost's limit, no source recorded)",
+  "role": "the second sensitivity row (row 105); ASSUMED, carried from the B58"
+ },
+ "final_rows": {
+  "source": "epa_highload_final_hd1.csv",
+  "role": "final",
+  "rows": 13,
+  "tit_c_min": 778.9019417475727,
+  "tit_c_median": 836.4848101265821,
+  "tit_c_max": 856.3153061224486,
+  "how_known": "epa_rows.TABLES' one role-final TableSpec (split.ENG[engine]['hlf'], epa_rows.py:125-132) and the yield's rows of type exactly FinalRow (epa_rows.py:1181); held-out keys skipped before conversion (:1170-1172)"
+ },
+ "rows_read": {
+  "yield_rows": 201,
+  "yield_sha256": "11e4b28904e91a1fb3acd478a1a073a4661bfd34817e3d6ae7f1f376bede7890",
+  "manifest_sha256": "f70b408bcaf5548f692d3f9f06a6559861f58e503fc5cd29b3c6ffce4acf258c",
+  "by_source": [
+   {
+    "source": "epa_steady_cell9.csv",
+    "role": "steady",
+    "calibration_rows": 117
+   },
+   {
+    "source": "epa_steady_hd1.csv",
+    "role": "steady",
+    "calibration_rows": 58
+   },
+   {
+    "source": "epa_highload_initial_hd1.csv",
+    "role": "initial",
+    "calibration_rows": 13
+   },
+   {
+    "source": "epa_highload_final_hd1.csv",
+    "role": "final",
+    "calibration_rows": 13
+   }
+  ]
+ },
+ "beside_steady_max": {
+  "note": "reported beside the cap, deciding nothing: a Final TIT is not a steady TIT (row 83; mistake 23)",
+  "by_source": [
+   {
+    "row_key": {
+     "table": "epa_steady_cell9.csv",
+     "source_row": 172
+    },
+    "test_cell": "Test Cell 9",
+    "line": "4000",
+    "rows": 117,
+    "tit_c": 840.1,
+    "tit_k": 1113.25,
+    "rows_at_max": 1
+   },
+   {
+    "row_key": {
+     "table": "epa_steady_hd1.csv",
+     "source_row": 56
+    },
+    "test_cell": "Test Cell HD1",
+    "line": "3000",
+    "rows": 58,
+    "tit_c": 830.5,
+    "tit_k": 1103.65,
+    "rows_at_max": 1
+   }
+  ]
+ },
+ "audit": {
+  "subcommand": "tit-cap",
+  "window": "the command: on the command line every open and child process from before the first project import (before_the_audit, judged by the audit's rules), then calibrate_epa's audit from compute's start to the write, the engine's tables refused at once except inside epa_rows.calibration_rows, and sealed for everything after the git state but that call",
+  "opened": [
+   "<python>/Lib/encodings/__pycache__/cp1252.cpython-313.pyc",
+   "calibrate_epa.py",
+   "d3_rows.py",
+   "data/engines/ford_27tt/derived_params.json",
+   "data/engines/ford_27tt/epa_highload_final_hd1.csv",
+   "data/engines/ford_27tt/epa_highload_initial_hd1.csv",
+   "data/engines/ford_27tt/epa_steady_cell9.csv",
+   "data/engines/ford_27tt/epa_steady_hd1.csv",
+   "derived.py",
+   "engine_env.py",
+   "engine_specs/b58.toml",
+   "engine_specs/cars/f150_2015_27tt.toml",
+   "engine_specs/f150_2015.toml",
+   "engine_specs/ford_27tt.toml",
+   "engine_thresholds.py",
+   "engines.py",
+   "epa_coefficients.py",
+   "epa_fit.py",
+   "epa_freeze.py",
+   "epa_rows.py",
+   "epa_stats.py",
+   "evaluate.py",
+   "k3_knee.py",
+   "plant.py",
+   "requirements-lock.txt",
+   "results/ENGINE_THRESHOLDS.json",
+   "results/ENGINE_THRESHOLDS.md",
+   "results/EPA_CALIBRATION/ford_27tt/complete.json",
+   "results/EPA_CALIBRATION/ford_27tt/freeze.json",
+   "thermal.py",
+   "thresholds/__init__.py",
+   "thresholds/alpha_nodes.py",
+   "thresholds/b58_propagation.py",
+   "thresholds/common.py",
+   "thresholds/contract.py",
+   "thresholds/document.py",
+   "thresholds/document_template.md",
+   "thresholds/ecu_shift.py",
+   "thresholds/knee_shift.py",
+   "thresholds/split.py",
+   "tit_cap.py",
+   "tit_cap_ecu.py",
+   "validate_epa.py"
+  ],
+  "subprocesses": [
+   [
+    "git -C C:\\Users\\badcl\\Desktop\\GRAD-r2\\results rev-parse --show-toplevel"
+   ],
+   [
+    "git -C C:\\Users\\badcl\\Desktop\\GRAD-r2 rev-parse --show-toplevel"
+   ],
+   [
+    "git -C C:\\Users\\badcl\\Desktop\\GRAD-r2 rev-parse --show-toplevel"
+   ],
+   [
+    "git status --porcelain=v1 -z --no-renames --untracked-files=all -- tit_cap.py tit_cap_ecu.py epa_rows.py epa_stats.py epa_fit.py epa_freeze.py calibrate_epa.py k3_knee.py epa_coefficients.py validate_epa.py d3_rows.py thresholds/split.py thresholds/common.py evaluate.py engine_specs/b58.toml requirements-lock.txt"
+   ],
+   [
+    "git status --porcelain=v1 -z --no-renames --untracked-files=all -- ."
+   ],
+   [
+    "git status --porcelain=v1 -z --no-renames --untracked-files=all -- tit_cap.py tit_cap_ecu.py epa_rows.py epa_stats.py epa_fit.py epa_freeze.py calibrate_epa.py k3_knee.py epa_coefficients.py validate_epa.py d3_rows.py thresholds/split.py thresholds/common.py evaluate.py engine_specs/b58.toml requirements-lock.txt"
+   ],
+   [
+    "git rev-parse --verify HEAD"
+   ],
+   [
+    "git rev-parse --verify HEAD"
+   ],
+   [
+    "git -C C:\\Users\\badcl\\Desktop\\GRAD-r2 -c core.safecrlf=false show c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8:results/ENGINE_THRESHOLDS.json"
+   ],
+   [
+    "git -C C:\\Users\\badcl\\Desktop\\GRAD-r2 -c core.safecrlf=false show c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8:results/ENGINE_THRESHOLDS.md"
+   ],
+   [
+    "git -C C:\\Users\\badcl\\Desktop\\GRAD-r2 -c core.safecrlf=false merge-base --is-ancestor c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8 HEAD"
+   ]
+  ],
+  "refused_by_audit": [],
+  "outside_allowlist": [],
+  "before_the_audit": {
+   "watched": true,
+   "opened": [
+    "__pycache__/calibrate_epa.cpython-313.pyc",
+    "__pycache__/check_premise.cpython-313.pyc",
+    "__pycache__/d3_rows.cpython-313.pyc",
+    "__pycache__/derived.cpython-313.pyc",
+    "__pycache__/engine_env.cpython-313.pyc",
+    "__pycache__/engines.cpython-313.pyc",
+    "__pycache__/epa_coefficients.cpython-313.pyc",
+    "__pycache__/epa_fit.cpython-313.pyc",
+    "__pycache__/epa_freeze.cpython-313.pyc",
+    "__pycache__/epa_rows.cpython-313.pyc",
+    "__pycache__/epa_stats.cpython-313.pyc",
+    "__pycache__/evaluate.cpython-313.pyc",
+    "__pycache__/fingerprint.cpython-313.pyc",
+    "__pycache__/k3_knee.cpython-313.pyc",
+    "__pycache__/plant.cpython-313.pyc",
+    "__pycache__/random_road.cpython-313.pyc",
+    "__pycache__/thermal.cpython-313.pyc",
+    "calibrate_epa.py",
+    "check_premise.py",
+    "d3_rows.py",
+    "data/derived_params.json",
+    "engine_env.py",
+    "engine_specs/a90_supra.toml",
+    "engine_specs/b58.toml",
+    "epa_coefficients.py",
+    "epa_fit.py",
+    "epa_freeze.py",
+    "epa_rows.py",
+    "epa_stats.py",
+    "evaluate.py",
+    "fingerprint.py",
+    "k3_knee.py",
+    "random_road.py",
+    "thermal.py",
+    "thresholds/__init__.py",
+    "thresholds/__pycache__/__init__.cpython-313.pyc",
+    "thresholds/__pycache__/common.cpython-313.pyc",
+    "thresholds/__pycache__/contract.cpython-313.pyc",
+    "thresholds/__pycache__/ecu_shift.cpython-313.pyc",
+    "thresholds/__pycache__/split.cpython-313.pyc",
+    "thresholds/common.py",
+    "thresholds/contract.py",
+    "thresholds/ecu_shift.py",
+    "thresholds/split.py"
+   ],
+   "python_files_opened": 694,
+   "subprocesses": [],
+   "forbidden": [],
+   "outside_allowlist": []
+  }
+ },
+ "sha_text": {
+  "tit_cap.py": "6fc9fd5874dde1dfcc6ac6a338ed086ff49018b22d78c7c74f65b4ce67bb9321",
+  "tit_cap_ecu.py": "f63e7c1f26dc1eee776570e32bfa705353972485f9760d75a145785c87c90f2d",
+  "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016"
+ },
+ "provenance": {
+  "plant_sha": "cec3e3faefe47172",
+  "engine_sha": "671b624ae11e0916",
+  "freeze_json_plant_sha": "cec3e3faefe47172",
+  "complete_json_engine_sha": "671b624ae11e0916",
+  "equal": true,
+  "freeze_json_sha_text": "48064e75203761d08e099ca5ed7f6ea588ec7bb09ce3057acfca05c7ae43600e",
+  "complete_json_sha_text": "44336adb0c6d512ffa81f908fd91f863a39b268f564bb3f5f5ddd498ed966859",
+  "freeze_json_versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "3c5c0c3dd97354d46bd48338aaa3008eb9f4b5a2b523d53f1afce4449e99dad7",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "code_changes_since_freeze": [],
+  "contract": {
+   "freeze_json": {
+    "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+    "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+    "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7"
+   },
+   "source_contract_commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "equal": true
+  }
+ },
+ "versions": {
+  "python": "3.13.2",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "platform": "Windows-11-10.0.26200-SP0"
+ },
+ "versions_equal_freeze_json": true,
+ "git": {
+  "commit": "9e37551bf1d07e58c368783ed9085aaaa02ed068",
+  "code_commit": "9e37551bf1d07e58c368783ed9085aaaa02ed068",
+  "tree_clean": true,
+  "tree_dirty": [],
+  "code_clean": true,
+  "code_dirty": [],
+  "code_paths": [
+   "tit_cap.py",
+   "tit_cap_ecu.py",
+   "epa_rows.py",
+   "epa_stats.py",
+   "epa_fit.py",
+   "epa_freeze.py",
+   "calibrate_epa.py",
+   "k3_knee.py",
+   "epa_coefficients.py",
+   "validate_epa.py",
+   "d3_rows.py",
+   "thresholds/split.py",
+   "thresholds/common.py",
+   "evaluate.py",
+   "engine_specs/b58.toml",
+   "requirements-lock.txt"
+  ]
+ },
+ "argv": [
+  "compute",
+  "--engine",
+  "ford_27tt"
+ ],
+ "started_utc": "2026-10-31T04:27:17+00:00",
+ "written_utc": "2026-10-31T04:27:18+00:00"
+}
