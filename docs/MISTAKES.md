@@ -1135,3 +1135,28 @@ reads the plant, not the one the convention names.**
 
 ---
 
+### 26. AN ALLOWLIST THAT NEVER SAW THE SPELLING ITS OWN RECORDER WRITES
+
+Found 31 October 2026, from one failure in the gate of R2b (`2f8e4a5`, whose
+message records it). `test_calibrate_epa.Audit.test_dry_load_opens_only_its_allowlist`
+reported that the Ford's dry-load had opened "1 path(s) outside the allowlist".
+The `run.json` that named the path was deleted with the test's temporary folder,
+the test passed when run alone, and looped reproductions on a quiet laptop did
+not repeat it. Two agents then found it, one by reading the code and one by
+reproducing it under load. When a WMI query times out, Python's `platform`
+module stops using WMI for the rest of the process and runs `ver` with stdin on
+DEVNULL, which opens `nul`. `calibrate_epa.Audit.norm` records the device as
+`//./nul`, and the null clause of `Audit.allowed` tests its basename, which is
+empty for a device path. So the one path the clause was written to admit was
+refused under the only spelling the recorder produces. `validate_epa`'s audit
+had admitted that spelling all along (`validate_epa.py:1434`). Under load the
+fault was common in scratch runs; none of Run 1's real invocations hit it. Arm
+runs the same audit in its `check` child, so one timeout during Run 2 would have
+sent an engine back through its whole calibration (row 125). Commit N fixes the
+one line, with a test that fails on the old code.
+
+**A rule written for a value must be tested on the value as the recorder writes
+it. A failure seen once is evidence: make the test print what it saw before its
+fixture is deleted, and reproduce it under the conditions it failed in.**
+
+---

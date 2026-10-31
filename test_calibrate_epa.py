@@ -327,6 +327,14 @@ def _swallowed_open_task(path):
         return -1
 
 
+def _last_invocation(out):
+    """The last invocation of the scratch run.json in `out`, or {} when the child wrote none."""
+    try:
+        return read(os.path.join(out, C.RUN))["invocations"][-1]
+    except (OSError, ValueError, KeyError, IndexError):
+        return {}
+
+
 def _open_task(path):
     """A pool task that opens a file (the worker's audit must report it to the parent)."""
     with open(path, "rb") as fh:
@@ -665,8 +673,10 @@ class Audit(F.SyntheticRepoCase):
             p = subprocess.run([sys.executable, "-B", "-c", code, s0.root, s0.engine_dir, s0.contract_json,
                                 s0.contract_md, s0.contract_commit, out, eng], cwd=r.root,
                                env=ENV, capture_output=True, text=True, timeout=600)
-            self.assertEqual(p.returncode, C.EXIT_OK, p.stdout[-400:] + p.stderr[-1500:])
-            inv = read(os.path.join(out, C.RUN))["invocations"][-1]
+            inv = _last_invocation(out)
+            # the path and the children go in the message: R2b's gate lost them with the temporary folder (row 125)
+            self.assertEqual(p.returncode, C.EXIT_OK, (inv.get("outside_allowlist"), inv.get("subprocesses"),
+                                                        p.stdout[-400:] + p.stderr[-1500:]))
             self.assertEqual((inv["outcome"], inv["outside_allowlist"], inv["refused_by_audit"]), ("ok", [], []))
             paths = epa_rows.audit_paths(eng, source=F.synthetic_source(r))
             self.assertTrue(set(paths["table_files"]) <= set(inv["opened"]), "the engine's tables were read")
@@ -679,6 +689,40 @@ class Audit(F.SyntheticRepoCase):
             self.assertEqual(inv["result"]["rows"], sum(inv["result"]["by_type"].values()))
             self.assertFalse(os.path.exists(epa_freeze.calibration_dir(eng, root=r.root)),
                              "dry-load writes its scratch run.json only")
+
+    def test_the_null_device_is_on_every_allowlist(self):
+        """Row 125: Python's platform module opens os.devnull once a WMI query has timed out (it then runs `ver`
+        with stdin on DEVNULL), and norm() records the device as //./nul. Every subcommand admits it, under each
+        spelling; the control is another absolute path, which stays outside."""
+        r = self.fresh()
+        for sub in ("dry-load", "fit", "check", "e6"):
+            a = C.Audit(subcommand=sub, engine=MAZDA, root=r.root, scratch=None)
+            for p in (os.devnull, "nul", "NUL"):
+                self.assertTrue(a.allowed(a.norm(p)), (sub, p, a.norm(p)))
+            self.assertFalse(a.allowed(a.norm(os.path.join(os.path.dirname(r.root), "elsewhere.txt"))), sub)
+
+    def test_a_wmi_timeout_in_the_child_is_no_defect(self):
+        """Row 125's reproduction, made deterministic: the dry-load child with platform's WMI already disabled, as
+        a timeout leaves it, runs `ver` with the audit active and opens the null device. It must exit ok. The
+        `ver` child in its record shows that the fallback ran, so the test can fail (mistake 12)."""
+        r = self.fresh()
+        out = os.path.join(os.path.dirname(r.root), "scratch")
+        code = ("import platform; platform._wmi = None\n"
+                "import os, sys; root, edir, cj, cm, commit, out, eng = sys.argv[1:8]; sys.path.insert(0, root)\n"
+                "import calibrate_epa as C, epa_rows\n"
+                "src = epa_rows.Source(root=root, engine_dir=edir, contract_json=cj, contract_md=cm, "
+                "contract_commit=commit, allow_poisoned_tables=False)\n"
+                "sys.exit(C.invoke('dry-load', eng, source=src, argv=['dry-load', '--engine', eng], "
+                "body=lambda: C.dry_load(eng, source=src, out=out), scratch=out, audit=None))\n")
+        s0 = F.synthetic_source(r)
+        p = subprocess.run([sys.executable, "-B", "-c", code, s0.root, s0.engine_dir, s0.contract_json,
+                            s0.contract_md, s0.contract_commit, out, MAZDA], cwd=r.root,
+                           env=ENV, capture_output=True, text=True, timeout=600)
+        inv = _last_invocation(out)
+        children = [" ".join(x).lower() for x in inv.get("subprocesses", [])]
+        self.assertTrue(any("ver" in c.split() or c.endswith('"ver"') for c in children), children)
+        self.assertEqual((p.returncode, inv.get("outside_allowlist")), (C.EXIT_OK, []),
+                         (inv.get("subprocesses"), p.stdout[-400:] + p.stderr[-1500:]))
 
     def test_an_extra_open_is_a_defect(self):
         r = self.fresh()

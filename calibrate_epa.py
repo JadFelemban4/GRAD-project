@@ -367,7 +367,7 @@ class Audit:
         if rec.startswith("<code>/"):
             return self._is_code(rec[len("<code>/"):])
         low = rec.lower()
-        if os.path.basename(low) in ("nul", os.devnull.lower()) or low == os.devnull.lower():
+        if os.path.basename(low) in ("nul", os.devnull.lower()) or low in (os.devnull.lower(), "//./nul"):
             return True
         if os.path.isabs(rec) or rec.startswith("/") or ":" in rec[:3]:
             return False
