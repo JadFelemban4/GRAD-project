@@ -14,5 +14,13 @@
   "assertion": "Decision 86 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H; WP3_INTERFACES.md 17): T0's d2_gate case also passes when the truth's gate and the fitted flat interval's nearest gate are indistinguishable at T0's noise (epa_fit.d2_gate_case, d2_indistinguishable, D2_GATE_RULE: under the truth's ECU at every T0 row's inputs, with the truth's gate moved to the interval's nearest gate, sum_i (dlam_i / T0_NOISE[\"lam\"])^2 < 1 over every T0 row; the spark command asserted unchanged), a test fix logged by the defect route, written after the Honda's seed 1 failed d2_gate twice (truth 123.43 kPa, flat interval [125, 125]; the first pass on 2d107e6 and the second on 0147f93, decision 84's widening reaching only 124.677 kPa), and disclosed as such; the second T0 ran before the team chose a wording, against decision 84's own note. Fixed in 891331c, which also carries decisions 87 (the Ford's seed 5; no change for this engine), 88 (E6 probes beyond the constant's range) and 89 (procedure), on 21cc7d4 (defect D-2, E6 row 9's brackets applied as their two edges; the completion only). The Honda's T0 re-runs on the final code",
   "fix_commit": "891331cd74e4b2b0ca25e4210d90238626a0a755",
   "previous_run": "defect_2/"
+ },
+ {
+  "k": 3,
+  "run_invocation": 8,
+  "found_by": "calibrate_epa.py check --defect (amendment C11)",
+  "assertion": "row 125: calibrate_epa.Audit.allowed refused the null device under the spelling norm() records (//./nul), which platform opens after a WMI timeout; N admits it and changes no arithmetic",
+  "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450",
+  "previous_run": "in_sample.json"
  }
 ]

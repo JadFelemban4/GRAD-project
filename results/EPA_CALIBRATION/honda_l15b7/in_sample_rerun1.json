@@ -1,0 +1,5305 @@
+{
+ "schema": "epa-in-sample/1",
+ "provenance": {
+  "engine": "honda_l15b7",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "f48e5f0215b0a17e79ca28864daa77a906e70450",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+   "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "a4e6138b9d258b1f",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "7b3d8dbbbf0b58b5ff7613048890ce81bf92f269b920fd51eb2c63751d52757f",
+    "epa_highload_initial.csv": "f69e531f2cfe4c44b275ed222ff4f375f06fe751674eafaa7744503d603af2fc",
+    "epa_steady.csv": "ba8558ca2c35c9ede3583ecc091e58d090abc4bed54d6ffcc7b06b99bc2c018e"
+   },
+   "epa_engine_sha256": "6d3134cb686272e549942ed64a74cc4f60e50bc177f47d63675555c7b8d10d2c",
+   "epa_channels_blob": "3c7b296206a2682c580a6fd2e9017360e92e8924",
+   "manifest_sha256": "fdbcc949a39c343a30f3b88e425e96b0c937e3ff53d97e4cc2ec366988a2a9ed"
+  },
+  "view_sha256": "8c6a700ccbf9e96599a5c3bfbc3817b88f2daefb7e36c1c9340c196723b2da58",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  }
+ },
+ "criterion": "each engine's form is the first of A, A+B, A+B+C, A+B+C+D at which no in-sample statistic but E8 fails. A statistic fails a form only if |E_cal| - 2 u_stat > R, on its pooled value or on any of its deciding lines, u_stat the standard error the held-out rows compute (the standard error of the mean with one row or hold per cluster, the pooled u_stat for pooled rows, L0 at its maximising f, L1 from its two extreme lines); it passes if it does not fail and its pooled value or some deciding line has 2 u_stat <= R; otherwise (2 u_stat > R, or u_stat undefined) it neither blocks a form nor passes it, recorded per form, as a statistic with no calibration line that meets its population's line minimum neither blocks nor passes (contract section 2.4; JSON model_form.in_sample_rules: decisions 39(a), 49, 55; decision 77, 23 October 2026; L1 at its untightened R, decision 71)",
+ "forms": {
+  "A": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": -21.47350602498124,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "4000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -21.47350602498124,
+      "spark_sentinel": -21.47350602498124
+     },
+     "extra": {},
+     "n_rows": 60,
+     "n_clusters": 60,
+     "lines": {
+      "1500": {
+       "E": -11.764351766294057,
+       "clusters": 8
+      },
+      "1600": {
+       "E": -12.725875075745082,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -14.283507078944444,
+       "clusters": 12
+      },
+      "2250": {
+       "E": -14.867427225928623,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -14.814953454725579,
+       "clusters": 7
+      },
+      "3500": {
+       "E": -19.94728703025259,
+       "clusters": 8
+      },
+      "4000": {
+       "E": -21.47350602498124,
+       "clusters": 7
+      },
+      "5000": {
+       "E": -18.108874017615907,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 5.287267783002534,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R; 3500: |E_cal| - 2 u_stat > R; 4000: |E_cal| - 2 u_stat > R; 5000: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -11.764351766294057,
+       "u_stat": 0.4047736244062554,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": -12.725875075745082,
+       "u_stat": 0.25697175500457264,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": -14.283507078944444,
+       "u_stat": 1.452536237236152,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": -14.867427225928623,
+       "u_stat": 2.8319342700982157,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": -14.814953454725579,
+       "u_stat": 2.731700539784179,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -19.94728703025259,
+       "u_stat": 4.864764497038759,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4000": {
+       "E": -21.47350602498124,
+       "u_stat": 5.287267783002534,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "5000": {
+       "E": -18.108874017615907,
+       "u_stat": 0.7801945630806837,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": -21.917731634054004,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1600",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -21.917731634054004,
+      "spark_sentinel": -21.917731634054004
+     },
+     "extra": {},
+     "n_rows": 58,
+     "n_clusters": 58,
+     "lines": {
+      "1500": {
+       "E": -20.3260731760944,
+       "clusters": 8
+      },
+      "1600": {
+       "E": -21.917731634054004,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -15.37747671671283,
+       "clusters": 10
+      },
+      "2250": {
+       "E": -12.010939344843562,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -11.538744705898429,
+       "clusters": 7
+      },
+      "3500": {
+       "E": -11.514359230116131,
+       "clusters": 8
+      },
+      "4000": {
+       "E": -11.847808998050377,
+       "clusters": 7
+      },
+      "5000": {
+       "E": -1.9267605829189387,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 1.3605656796785641,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R; 3500: |E_cal| - 2 u_stat > R; 4000: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -20.3260731760944,
+       "u_stat": 1.899046681242818,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": -21.917731634054004,
+       "u_stat": 1.3605656796785641,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": -15.37747671671283,
+       "u_stat": 1.418927269813083,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": -12.010939344843562,
+       "u_stat": 1.0259725702817917,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": -11.538744705898429,
+       "u_stat": 0.8749521039607637,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -11.514359230116131,
+       "u_stat": 2.8688295076370447,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4000": {
+       "E": -11.847808998050377,
+       "u_stat": 3.358774687940333,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "5000": {
+       "E": -1.9267605829189387,
+       "u_stat": 0.5699137351087395,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 65.09248091092215,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 65.09248091092215,
+      "spark_sentinel": 65.09248091092215
+     },
+     "extra": {},
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 65.09248091092215,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 77.2821266066407,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 44.554561331742775,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 40.978558433960835,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 19.93525049260604,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 16.554351654432633,
+       "clusters": 3
+      },
+      "4000": {
+       "E": -3.425543602139328,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.39140950215263,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 65.09248091092215,
+       "u_stat": 16.39140950215263,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 44.554561331742775,
+       "u_stat": 10.619095124830837,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 40.978558433960835,
+       "u_stat": 1.847323117248591,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 19.93525049260604,
+       "u_stat": 5.965784553367231,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3500": {
+       "E": 16.554351654432633,
+       "u_stat": 5.258463772608889,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 58.63371794340469,
+     "deciding": [
+      "1600",
+      "1700/1750/1800",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1600",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 58.63371794340469,
+      "spark_sentinel": 58.63371794340469
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 30,
+     "n_clusters": 30,
+     "lines": {
+      "1500": {
+       "E": 79.48358042700545,
+       "clusters": 1
+      },
+      "1600": {
+       "E": 58.63371794340469,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": 56.32588578505401,
+       "clusters": 5
+      },
+      "2250": {
+       "E": 24.49650348609231,
+       "clusters": 2
+      },
+      "2500": {
+       "E": 11.857499671802486,
+       "clusters": 2
+      },
+      "3500": {
+       "E": 5.679890049184019,
+       "clusters": 5
+      },
+      "4000": {
+       "E": -8.39590208406221,
+       "clusters": 5
+      },
+      "5000": {
+       "E": -31.14353204067184,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 3.1801684211667527,
+     "outcome": "fails",
+     "why": "1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 5000: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1600": {
+       "E": 58.63371794340469,
+       "u_stat": 3.1801684211667527,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 56.32588578505401,
+       "u_stat": 3.8809462562972175,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 5.679890049184019,
+       "u_stat": 3.699031260458791,
+       "outcome": "passes",
+       "why": null
+      },
+      "4000": {
+       "E": -8.39590208406221,
+       "u_stat": 5.478080689687687,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5000": {
+       "E": -31.14353204067184,
+       "u_stat": 3.509612338670525,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": 20.260534742720026,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 20.260534742720026,
+      "spark_sentinel": 20.260534742720026
+     },
+     "extra": {
+      "sum_L_S_k": 2127.8561646968583,
+      "sum_data_lever_k": 1769.3719467064552,
+      "extrapolation_kpa": {
+       "1500": 6.234956105269788,
+       "1700/1750/1800": 27.638818501885055,
+       "2250": 12.372355698362838,
+       "2500": 16.815650672531376,
+       "3500": 37.168383658969844,
+       "4000": 43.49988764044943
+      },
+      "extrapolation_below_kpa": {
+       "1500": 0.0,
+       "1700/1750/1800": 0.0,
+       "2250": 0.0,
+       "2500": 0.0,
+       "3500": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 20,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 61,
+     "n_clusters": 61,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 1
+      },
+      "1600": {
+       "E": null,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": null,
+       "clusters": 5
+      },
+      "2250": {
+       "E": null,
+       "clusters": 2
+      },
+      "2500": {
+       "E": null,
+       "clusters": 2
+      },
+      "3500": {
+       "E": null,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 5
+      },
+      "5000": {
+       "E": null,
+       "clusters": 6
+      }
+     },
+     "passes": null,
+     "u_stat": 10.896141380226306,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": 20.260534742720026,
+       "u_stat": 10.896141380226306,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 9.252638825059268,
+     "deciding": [
+      "1000",
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 9.252638825059268,
+      "spark_sentinel": 9.252638825059268,
+      "unreachable": 6.050398445157112
+     },
+     "extra": {
+      "unreachable": [
+       [
+        "epa_highload_final.csv",
+        27
+       ],
+       [
+        "epa_highload_final.csv",
+        53
+       ],
+       [
+        "epa_highload_final.csv",
+        58
+       ],
+       [
+        "epa_highload_final.csv",
+        70
+       ]
+      ],
+      "n_unreachable": 4,
+      "bounds_kpa": [
+       400.0
+      ]
+     },
+     "n_rows": 127,
+     "n_clusters": 127,
+     "lines": {
+      "1000": {
+       "E": 3.524694028094749,
+       "clusters": 13
+      },
+      "1500": {
+       "E": 7.0441785852722605,
+       "clusters": 18
+      },
+      "1600": {
+       "E": 8.55417352148317,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": 9.79168206138673,
+       "clusters": 19
+      },
+      "2250": {
+       "E": 8.609978472294136,
+       "clusters": 6
+      },
+      "2500": {
+       "E": 3.909906028761765,
+       "clusters": 20
+      },
+      "3500": {
+       "E": 13.374177459041233,
+       "clusters": 16
+      },
+      "4000": {
+       "E": 12.393662804753253,
+       "clusters": 16
+      },
+      "5000": {
+       "E": 17.150650612110447,
+       "clusters": 13
+      }
+     },
+     "passes": true,
+     "u_stat": 1.7254241184634176,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "pooled": {
+       "E": 9.252638825059268,
+       "u_stat": 1.7254241184634176,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 97.15189436698658,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 97.15189436698658,
+      "spark_sentinel": 97.15189436698658
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 97.15189436698658,
+        "deltabar": -0.08142723029296876,
+        "f_star": 1.0,
+        "H_k": 97.15189436698658
+       },
+       "1600": {
+        "ebar_k": 112.1075635546207,
+        "deltabar": -0.07425085551006866,
+        "f_star": 1.0,
+        "H_k": 112.1075635546207
+       },
+       "1700/1750/1800": {
+        "ebar_k": 73.30990153276144,
+        "deltabar": -0.021311847006662665,
+        "f_star": 1.0,
+        "H_k": 73.30990153276144
+       },
+       "2250": {
+        "ebar_k": 69.32131570050642,
+        "deltabar": 0.006980093852437734,
+        "f_star": 1.0,
+        "H_k": 69.32131570050642
+       },
+       "2500": {
+        "ebar_k": 46.297645731678244,
+        "deltabar": 0.007507782199702362,
+        "f_star": 1.0,
+        "H_k": 46.297645731678244
+       },
+       "3500": {
+        "ebar_k": 24.86492218728036,
+        "deltabar": 0.007443615506193139,
+        "f_star": 1.0,
+        "H_k": 24.86492218728036
+       },
+       "4000": {
+        "ebar_k": 1.9352724489315278,
+        "deltabar": -1.5638525495631495e-05,
+        "f_star": 1.0,
+        "H_k": 1.9352724489315278
+       }
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 97.15189436698658,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 112.1075635546207,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 73.30990153276144,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 69.32131570050642,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 46.297645731678244,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 24.86492218728036,
+       "clusters": 3
+      },
+      "4000": {
+       "E": 1.9352724489315278,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 18.747473026120577,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R; 3500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 97.15189436698658,
+       "u_stat": 18.747473026120577,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 73.30990153276144,
+       "u_stat": 13.240308433868597,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 69.32131570050642,
+       "u_stat": 3.7962138466148834,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 46.297645731678244,
+       "u_stat": 7.657162206761425,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 24.86492218728036,
+       "u_stat": 3.1082012005072364,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 72.28697217970623,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 72.28697217970623,
+      "spark_sentinel": 72.28697217970623
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 1.0,
+      "extreme_lines": [
+       "1500",
+       "3500"
+      ],
+      "H_at_f_star": {
+       "1500": 97.15189436698658,
+       "1700/1750/1800": 73.30990153276144,
+       "2250": 69.32131570050642,
+       "2500": 46.297645731678244,
+       "3500": 24.86492218728036
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 97.15189436698658,
+       "clusters": 5
+      },
+      "1600": {
+       "E": null,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 73.30990153276144,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 69.32131570050642,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 46.297645731678244,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 24.86492218728036,
+       "clusters": 3
+      },
+      "4000": {
+       "E": null,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 19.0033854764869,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 72.28697217970623,
+       "u_stat": 19.0033854764869,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "E4a",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 55.13384099997369,
+    "deciding": [
+     "1500",
+     "1600",
+     "1700/1750/1800",
+     "2250",
+     "2500",
+     "3500",
+     "4000",
+     "5000"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 55.13384099997369,
+     "spark_sentinel": 55.13384099997369,
+     "censored": 55.13384099997369
+    },
+    "extra": {
+     "n_final": 49,
+     "n_dl": 49,
+     "n_ds": 49,
+     "dl": 0.02695560537976183,
+     "ds": 0.4664593402117613,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.02695560537976183,
+       "P": -0.5151910034074163,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 49
+      },
+      "spark": {
+       "shift": 0.4664593402117613,
+       "P": -0.03614740659232064,
+       "extrapolated": false,
+       "slope": -0.07749315637223726,
+       "rows": 49
+      }
+     },
+     "every_final_row": {
+      "dl": 0.02695560537976183,
+      "ds": 0.4664593402117613,
+      "E_pct": 55.13384099997369
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.02695560537976183,
+     "snapped": {
+      "dl": 0.025963634114624677,
+      "E_pct": 53.83887745239889,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "1500": {
+       "model_kpa": null,
+       "epa_kpa": 140.56064386317908
+      },
+      "1600": {
+       "model_kpa": null,
+       "epa_kpa": 140.14551102204405
+      },
+      "1700/1750/1800": {
+       "model_kpa": 132.62442677269757,
+       "epa_kpa": 146.5706044905009
+      },
+      "2250": {
+       "model_kpa": 138.4670270270265,
+       "epa_kpa": 150.20373906125664
+      },
+      "2500": {
+       "model_kpa": 139.413052362707,
+       "epa_kpa": 147.20794924554147
+      },
+      "3500": {
+       "model_kpa": 139.83554149085785,
+       "epa_kpa": 139.83554149085785
+      },
+      "4000": {
+       "model_kpa": 130.1448795180722,
+       "epa_kpa": 130.1448795180722
+      },
+      "5000": {
+       "model_kpa": 130.06906890130338,
+       "epa_kpa": 125.60961538461535
+      }
+     }
+    },
+    "n_rows": 49,
+    "n_clusters": 49,
+    "lines": {
+     "1500": {
+      "E": null,
+      "clusters": 6
+     },
+     "1600": {
+      "E": null,
+      "clusters": 6
+     },
+     "1700/1750/1800": {
+      "E": null,
+      "clusters": 10
+     },
+     "2250": {
+      "E": null,
+      "clusters": 6
+     },
+     "2500": {
+      "E": null,
+      "clusters": 5
+     },
+     "3500": {
+      "E": null,
+      "clusters": 5
+     },
+     "4000": {
+      "E": null,
+      "clusters": 5
+     },
+     "5000": {
+      "E": null,
+      "clusters": 6
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 16.554351654432633,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 16.554351654432633,
+       "spark_sentinel": 16.554351654432633
+      },
+      "extra": {},
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 8.10833156087267,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 12.427157640855967,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 5.472692268713615,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 16.554351654432633,
+        "clusters": 3
+       },
+       "4000": {
+        "E": -3.425543602139328,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": 5.258463772608889,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "3500": {
+        "E": 16.554351654432633,
+        "u_stat": 5.258463772608889,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 0,
+      "n_clusters": 0,
+      "lines": {},
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 24.86492218728036,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 24.86492218728036,
+       "spark_sentinel": 24.86492218728036
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 31.58627043904505,
+         "deltabar": 0.00232840164573056,
+         "f_star": 1.0,
+         "H_k": 31.58627043904505
+        },
+        "1700/1750/1800": {
+         "ebar_k": 33.48062079776486,
+         "deltabar": -0.005920049072942801,
+         "f_star": 1.0,
+         "H_k": 33.48062079776486
+        },
+        "2500": {
+         "ebar_k": 27.590759615221998,
+         "deltabar": 0.0075921837366274,
+         "f_star": 1.0,
+         "H_k": 27.590759615221998
+        },
+        "3500": {
+         "ebar_k": 24.86492218728036,
+         "deltabar": 0.007443615506193139,
+         "f_star": 1.0,
+         "H_k": 24.86492218728036
+        },
+        "4000": {
+         "ebar_k": 1.9352724489315278,
+         "deltabar": -1.5638525495631495e-05,
+         "f_star": 1.0,
+         "H_k": 1.9352724489315278
+        }
+       }
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 31.58627043904505,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 33.48062079776486,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 27.590759615221998,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 24.86492218728036,
+        "clusters": 3
+       },
+       "4000": {
+        "E": 1.9352724489315278,
+        "clusters": 2
+       }
+      },
+      "passes": false,
+      "u_stat": 3.1082012005072364,
+      "outcome": "fails",
+      "why": "|E_cal| - 2 u_stat > R",
+      "components": {
+       "3500": {
+        "E": 24.86492218728036,
+        "u_stat": 3.1082012005072364,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": null,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "L1 needs at least 2 deciding lines (L0's)",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "G_k": 980.27
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 3
+       },
+       "4000": {
+        "E": null,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": -7.199782650493935,
+      "deciding": [
+       "1500",
+       "1700/1750/1800",
+       "2500",
+       "3500",
+       "4000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": -7.199782650493935,
+       "spark_sentinel": -7.199782650493935
+      },
+      "extra": {
+       "sum_L_S_k": 1921.566258224418,
+       "sum_data_lever_k": 2070.6484457761303,
+       "extrapolation_kpa": {
+        "1500": 15.04064386317907,
+        "1700/1750/1800": 33.6680071428579,
+        "2500": 23.628692206077034,
+        "3500": 37.168383658969844,
+        "4000": 43.49988764044943
+       },
+       "extrapolation_below_kpa": {
+        "1500": 0.0,
+        "1700/1750/1800": 0.0,
+        "2500": 0.0,
+        "3500": 0.0,
+        "4000": 0.0
+       },
+       "enriched_rows": 18,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 45,
+      "n_clusters": 45,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1600": {
+        "E": null,
+        "clusters": 4
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 5
+       },
+       "2250": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 5
+       },
+       "4000": {
+        "E": null,
+        "clusters": 5
+       },
+       "5000": {
+        "E": null,
+        "clusters": 6
+       }
+      },
+      "passes": true,
+      "u_stat": 4.792235480636805,
+      "outcome": "passes",
+      "why": null,
+      "components": {
+       "pooled": {
+        "E": -7.199782650493935,
+        "u_stat": 4.792235480636805,
+        "outcome": "passes",
+        "why": null
+       }
+      }
+     }
+    }
+   }
+  },
+  "A+B": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": -11.077540869666654,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "4000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -11.077540869666654,
+      "spark_sentinel": -11.077540869666654
+     },
+     "extra": {},
+     "n_rows": 60,
+     "n_clusters": 60,
+     "lines": {
+      "1500": {
+       "E": -4.005078892877888,
+       "clusters": 8
+      },
+      "1600": {
+       "E": -2.661796678011745,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -5.151254512555113,
+       "clusters": 12
+      },
+      "2250": {
+       "E": -6.858502794078704,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -8.394242416154022,
+       "clusters": 7
+      },
+      "3500": {
+       "E": -9.610872826421918,
+       "clusters": 8
+      },
+      "4000": {
+       "E": -11.077540869666654,
+       "clusters": 7
+      },
+      "5000": {
+       "E": -6.804583731636928,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 4.991009098906189,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R; 5000: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -4.005078892877888,
+       "u_stat": 0.5466896481892736,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": -2.661796678011745,
+       "u_stat": 0.7742423789674174,
+       "outcome": "passes",
+       "why": null
+      },
+      "1700/1750/1800": {
+       "E": -5.151254512555113,
+       "u_stat": 0.6501124169893843,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": -6.858502794078704,
+       "u_stat": 2.456731805923016,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": -8.394242416154022,
+       "u_stat": 2.1233973629351706,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -9.610872826421918,
+       "u_stat": 4.263637021291957,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": -11.077540869666654,
+       "u_stat": 4.991009098906189,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5000": {
+       "E": -6.804583731636928,
+       "u_stat": 1.3382391840034413,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": -14.572795349092239,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -14.572795349092239,
+      "spark_sentinel": -14.572795349092239
+     },
+     "extra": {},
+     "n_rows": 58,
+     "n_clusters": 58,
+     "lines": {
+      "1500": {
+       "E": -14.572795349092239,
+       "clusters": 8
+      },
+      "1600": {
+       "E": -14.03363588455939,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -8.23495225650876,
+       "clusters": 10
+      },
+      "2250": {
+       "E": -4.488694452796065,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -5.430614033083044,
+       "clusters": 7
+      },
+      "3500": {
+       "E": -0.988923730020143,
+       "clusters": 8
+      },
+      "4000": {
+       "E": -1.455272392806417,
+       "clusters": 7
+      },
+      "5000": {
+       "E": 9.244680327291688,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 1.7579665227836296,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -14.572795349092239,
+       "u_stat": 1.7579665227836296,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": -14.03363588455939,
+       "u_stat": 0.8335975470611342,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": -8.23495225650876,
+       "u_stat": 0.8915958104984273,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": -4.488694452796065,
+       "u_stat": 0.4339213007257965,
+       "outcome": "passes",
+       "why": null
+      },
+      "2500": {
+       "E": -5.430614033083044,
+       "u_stat": 0.11922887204099789,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -0.988923730020143,
+       "u_stat": 2.4788976059681667,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": -1.455272392806417,
+       "u_stat": 3.757264462777238,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5000": {
+       "E": 9.244680327291688,
+       "u_stat": 2.907188173818904,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 75.51313203176326,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 75.51313203176326,
+      "spark_sentinel": 75.51313203176326
+     },
+     "extra": {},
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 75.51313203176326,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 85.79603810330627,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 51.1506348766819,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 41.56249169482222,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 20.57527996490014,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 13.518767372227595,
+       "clusters": 3
+      },
+      "4000": {
+       "E": -6.944250895834216,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.31939509674949,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 75.51313203176326,
+       "u_stat": 16.31939509674949,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 51.1506348766819,
+       "u_stat": 10.516549181068362,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 41.56249169482222,
+       "u_stat": 1.1998427329300838,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 20.57527996490014,
+       "u_stat": 5.540538409113325,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3500": {
+       "E": 13.518767372227595,
+       "u_stat": 6.265801798639842,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 63.64199259461779,
+     "deciding": [
+      "1600",
+      "1700/1750/1800",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1600",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 63.64199259461779,
+      "spark_sentinel": 63.64199259461779
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 30,
+     "n_clusters": 30,
+     "lines": {
+      "1500": {
+       "E": 88.02698165279355,
+       "clusters": 1
+      },
+      "1600": {
+       "E": 63.64199259461779,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": 54.83878056901547,
+       "clusters": 5
+      },
+      "2250": {
+       "E": 19.393105117359653,
+       "clusters": 2
+      },
+      "2500": {
+       "E": 5.420247092505065,
+       "clusters": 2
+      },
+      "3500": {
+       "E": -7.921792092686564,
+       "clusters": 5
+      },
+      "4000": {
+       "E": -23.161094479487975,
+       "clusters": 5
+      },
+      "5000": {
+       "E": -47.57764340635416,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 3.263397184745437,
+     "outcome": "fails",
+     "why": "1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 4000: |E_cal| - 2 u_stat > R; 5000: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1600": {
+       "E": 63.64199259461779,
+       "u_stat": 3.263397184745437,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 54.83878056901547,
+       "u_stat": 2.409972526362979,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -7.921792092686564,
+       "u_stat": 1.0832004327454277,
+       "outcome": "passes",
+       "why": null
+      },
+      "4000": {
+       "E": -23.161094479487975,
+       "u_stat": 1.7236336005504318,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "5000": {
+       "E": -47.57764340635416,
+       "u_stat": 1.0216687445418486,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": 26.699257257334953,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 26.699257257334953,
+      "spark_sentinel": 26.699257257334953
+     },
+     "extra": {
+      "sum_L_S_k": 2167.832003175106,
+      "sum_data_lever_k": 1711.0060864619666,
+      "extrapolation_kpa": {
+       "1500": 6.234956105269788,
+       "1700/1750/1800": 27.638818501885055,
+       "2250": 12.372355698362838,
+       "2500": 16.815650672531376,
+       "3500": 37.168383658969844,
+       "4000": 43.49988764044943
+      },
+      "extrapolation_below_kpa": {
+       "1500": 0.0,
+       "1700/1750/1800": 0.0,
+       "2250": 0.0,
+       "2500": 0.0,
+       "3500": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 20,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 61,
+     "n_clusters": 61,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 1
+      },
+      "1600": {
+       "E": null,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": null,
+       "clusters": 5
+      },
+      "2250": {
+       "E": null,
+       "clusters": 2
+      },
+      "2500": {
+       "E": null,
+       "clusters": 2
+      },
+      "3500": {
+       "E": null,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 5
+      },
+      "5000": {
+       "E": null,
+       "clusters": 6
+      }
+     },
+     "passes": null,
+     "u_stat": 12.369809604456423,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": 26.699257257334953,
+       "u_stat": 12.369809604456423,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 5.7904623468450485,
+     "deciding": [
+      "1000",
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 5.7904623468450485,
+      "spark_sentinel": 5.7904623468450485,
+      "unreachable": 5.7904623468450485
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 127,
+     "n_clusters": 127,
+     "lines": {
+      "1000": {
+       "E": 1.9591270993800671,
+       "clusters": 13
+      },
+      "1500": {
+       "E": 7.474032448176108,
+       "clusters": 18
+      },
+      "1600": {
+       "E": 11.512961107744063,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": 3.7612685371719907,
+       "clusters": 19
+      },
+      "2250": {
+       "E": 4.792675399624838,
+       "clusters": 6
+      },
+      "2500": {
+       "E": 2.9684270842728493,
+       "clusters": 20
+      },
+      "3500": {
+       "E": 7.300968591655628,
+       "clusters": 16
+      },
+      "4000": {
+       "E": 7.000049623999183,
+       "clusters": 16
+      },
+      "5000": {
+       "E": 9.069594407984242,
+       "clusters": 13
+      }
+     },
+     "passes": true,
+     "u_stat": 0.5438065688913093,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "pooled": {
+       "E": 5.7904623468450485,
+       "u_stat": 0.5438065688913093,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 83.93295042686603,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 83.93295042686603,
+      "spark_sentinel": 83.93295042686603
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 83.93295042686603,
+        "deltabar": -0.09574134524966067,
+        "f_star": 1.0,
+        "H_k": 83.93295042686603
+       },
+       "1600": {
+        "ebar_k": 94.42696406000556,
+        "deltabar": -0.08991659750812891,
+        "f_star": 1.0,
+        "H_k": 94.42696406000556
+       },
+       "1700/1750/1800": {
+        "ebar_k": 57.91414105865423,
+        "deltabar": -0.03520112166145151,
+        "f_star": 1.0,
+        "H_k": 57.91414105865423
+       },
+       "2250": {
+        "ebar_k": 46.0926321319134,
+        "deltabar": -0.007359660213480483,
+        "f_star": 1.0,
+        "H_k": 46.0926321319134
+       },
+       "2500": {
+        "ebar_k": 27.78363915043203,
+        "deltabar": -0.0009603188031012344,
+        "f_star": 1.0,
+        "H_k": 27.78363915043203
+       },
+       "3500": {
+        "ebar_k": 9.872448117551698,
+        "deltabar": 0.009505001739835631,
+        "f_star": 1.0,
+        "H_k": 9.872448117551698
+       },
+       "4000": {
+        "ebar_k": -10.357513721128043,
+        "deltabar": 0.004546420682976671,
+        "f_star": 1.0,
+        "H_k": -10.357513721128043
+       }
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 83.93295042686603,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 94.42696406000556,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 57.91414105865423,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 46.0926321319134,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 27.78363915043203,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 9.872448117551698,
+       "clusters": 3
+      },
+      "4000": {
+       "E": 10.357513721128043,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.85352083466799,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 83.93295042686603,
+       "u_stat": 16.85352083466799,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 57.91414105865423,
+       "u_stat": 11.088271545746574,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 46.0926321319134,
+       "u_stat": 0.6546295350663021,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 27.78363915043203,
+       "u_stat": 5.47291905874259,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 9.872448117551698,
+       "u_stat": 2.6548548681089246,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 74.06050230931433,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 74.06050230931433,
+      "spark_sentinel": 74.06050230931433
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 1.0,
+      "extreme_lines": [
+       "1500",
+       "3500"
+      ],
+      "H_at_f_star": {
+       "1500": 83.93295042686603,
+       "1700/1750/1800": 57.91414105865423,
+       "2250": 46.0926321319134,
+       "2500": 27.78363915043203,
+       "3500": 9.872448117551698
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 83.93295042686603,
+       "clusters": 5
+      },
+      "1600": {
+       "E": null,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 57.91414105865423,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 46.0926321319134,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 27.78363915043203,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 9.872448117551698,
+       "clusters": 3
+      },
+      "4000": {
+       "E": null,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 17.061342822161148,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 74.06050230931433,
+       "u_stat": 17.061342822161148,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "E4a",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 55.13384099997369,
+    "deciding": [
+     "1500",
+     "1600",
+     "1700/1750/1800",
+     "2250",
+     "2500",
+     "3500",
+     "4000",
+     "5000"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 55.13384099997369,
+     "spark_sentinel": 55.13384099997369,
+     "censored": 55.13384099997369
+    },
+    "extra": {
+     "n_final": 49,
+     "n_dl": 49,
+     "n_ds": 49,
+     "dl": 0.02695560537976183,
+     "ds": 0.4664593402117613,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.02695560537976183,
+       "P": -0.5151910034074163,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 49
+      },
+      "spark": {
+       "shift": 0.4664593402117613,
+       "P": -0.03614740659232064,
+       "extrapolated": false,
+       "slope": -0.07749315637223726,
+       "rows": 49
+      }
+     },
+     "every_final_row": {
+      "dl": 0.02695560537976183,
+      "ds": 0.4664593402117613,
+      "E_pct": 55.13384099997369
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.02695560537976183,
+     "snapped": {
+      "dl": 0.025963634114624677,
+      "E_pct": 53.83887745239889,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "1500": {
+       "model_kpa": null,
+       "epa_kpa": 140.56064386317908
+      },
+      "1600": {
+       "model_kpa": null,
+       "epa_kpa": 140.14551102204405
+      },
+      "1700/1750/1800": {
+       "model_kpa": 132.62442677269757,
+       "epa_kpa": 146.5706044905009
+      },
+      "2250": {
+       "model_kpa": 138.4670270270265,
+       "epa_kpa": 150.20373906125664
+      },
+      "2500": {
+       "model_kpa": 139.413052362707,
+       "epa_kpa": 147.20794924554147
+      },
+      "3500": {
+       "model_kpa": 139.83554149085785,
+       "epa_kpa": 139.83554149085785
+      },
+      "4000": {
+       "model_kpa": 130.1448795180722,
+       "epa_kpa": 130.1448795180722
+      },
+      "5000": {
+       "model_kpa": 130.06906890130338,
+       "epa_kpa": 125.60961538461535
+      }
+     }
+    },
+    "n_rows": 49,
+    "n_clusters": 49,
+    "lines": {
+     "1500": {
+      "E": null,
+      "clusters": 6
+     },
+     "1600": {
+      "E": null,
+      "clusters": 6
+     },
+     "1700/1750/1800": {
+      "E": null,
+      "clusters": 10
+     },
+     "2250": {
+      "E": null,
+      "clusters": 6
+     },
+     "2500": {
+      "E": null,
+      "clusters": 5
+     },
+     "3500": {
+      "E": null,
+      "clusters": 5
+     },
+     "4000": {
+      "E": null,
+      "clusters": 5
+     },
+     "5000": {
+      "E": null,
+      "clusters": 6
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 13.518767372227595,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 13.518767372227595,
+       "spark_sentinel": 13.518767372227595
+      },
+      "extra": {},
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 18.596060475061336,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 19.394539338873983,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 7.305076378268552,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 13.518767372227595,
+        "clusters": 3
+       },
+       "4000": {
+        "E": -6.944250895834216,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": 6.265801798639842,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "3500": {
+        "E": 13.518767372227595,
+        "u_stat": 6.265801798639842,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 0,
+      "n_clusters": 0,
+      "lines": {},
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 9.872448117551698,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 9.872448117551698,
+       "spark_sentinel": 9.872448117551698
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 23.49126139895941,
+         "deltabar": -0.011066989682825934,
+         "f_star": 1.0,
+         "H_k": 23.49126139895941
+        },
+        "1700/1750/1800": {
+         "ebar_k": 24.17503393891826,
+         "deltabar": -0.017172883261841243,
+         "f_star": 1.0,
+         "H_k": 24.17503393891826
+        },
+        "2500": {
+         "ebar_k": 14.771163719535991,
+         "deltabar": 0.001998983602882587,
+         "f_star": 1.0,
+         "H_k": 14.771163719535991
+        },
+        "3500": {
+         "ebar_k": 9.872448117551698,
+         "deltabar": 0.009505001739835631,
+         "f_star": 1.0,
+         "H_k": 9.872448117551698
+        },
+        "4000": {
+         "ebar_k": -10.357513721128043,
+         "deltabar": 0.004546420682976671,
+         "f_star": 1.0,
+         "H_k": -10.357513721128043
+        }
+       }
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 23.49126139895941,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 24.17503393891826,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 14.771163719535991,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 9.872448117551698,
+        "clusters": 3
+       },
+       "4000": {
+        "E": 10.357513721128043,
+        "clusters": 2
+       }
+      },
+      "passes": true,
+      "u_stat": 2.6548548681089246,
+      "outcome": "passes",
+      "why": null,
+      "components": {
+       "3500": {
+        "E": 9.872448117551698,
+        "u_stat": 2.6548548681089246,
+        "outcome": "passes",
+        "why": null
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": null,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "L1 needs at least 2 deciding lines (L0's)",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "G_k": 980.27
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 3
+       },
+       "4000": {
+        "E": null,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": -2.4149703746999096,
+      "deciding": [
+       "1500",
+       "1700/1750/1800",
+       "2500",
+       "3500",
+       "4000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": -2.4149703746999096,
+       "spark_sentinel": -2.4149703746999096
+      },
+      "extra": {
+       "sum_L_S_k": 1957.3269646513895,
+       "sum_data_lever_k": 2005.7656099167991,
+       "extrapolation_kpa": {
+        "1500": 15.04064386317907,
+        "1700/1750/1800": 33.6680071428579,
+        "2500": 23.628692206077034,
+        "3500": 37.168383658969844,
+        "4000": 43.49988764044943
+       },
+       "extrapolation_below_kpa": {
+        "1500": 0.0,
+        "1700/1750/1800": 0.0,
+        "2500": 0.0,
+        "3500": 0.0,
+        "4000": 0.0
+       },
+       "enriched_rows": 18,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 45,
+      "n_clusters": 45,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1600": {
+        "E": null,
+        "clusters": 4
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 5
+       },
+       "2250": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 5
+       },
+       "4000": {
+        "E": null,
+        "clusters": 5
+       },
+       "5000": {
+        "E": null,
+        "clusters": 6
+       }
+      },
+      "passes": true,
+      "u_stat": 5.14650068980842,
+      "outcome": "passes",
+      "why": null,
+      "components": {
+       "pooled": {
+        "E": -2.4149703746999096,
+        "u_stat": 5.14650068980842,
+        "outcome": "passes",
+        "why": null
+       }
+      }
+     }
+    }
+   }
+  },
+  "A+B+C": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": -7.787087077317563,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "4000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -7.787087077317563,
+      "spark_sentinel": -7.787087077317563
+     },
+     "extra": {},
+     "n_rows": 60,
+     "n_clusters": 60,
+     "lines": {
+      "1500": {
+       "E": -3.776155236963323,
+       "clusters": 8
+      },
+      "1600": {
+       "E": -2.019510846106032,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -3.772059172627958,
+       "clusters": 12
+      },
+      "2250": {
+       "E": -5.549358411919382,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -7.323304117412186,
+       "clusters": 7
+      },
+      "3500": {
+       "E": -6.92461418234548,
+       "clusters": 8
+      },
+      "4000": {
+       "E": -7.787087077317563,
+       "clusters": 7
+      },
+      "5000": {
+       "E": -0.9748144748471225,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 4.38761818948762,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -3.776155236963323,
+       "u_stat": 0.6109255433174157,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": -2.019510846106032,
+       "u_stat": 0.9647989485809613,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": -3.772059172627958,
+       "u_stat": 0.3061618314355712,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": -5.549358411919382,
+       "u_stat": 1.708645142996562,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": -7.323304117412186,
+       "u_stat": 1.4434057461251903,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -6.92461418234548,
+       "u_stat": 3.551112975835121,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": -7.787087077317563,
+       "u_stat": 4.38761818948762,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5000": {
+       "E": -0.9748144748471225,
+       "u_stat": 1.7336886826524527,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": -14.572795349092239,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -14.572795349092239,
+      "spark_sentinel": -14.572795349092239
+     },
+     "extra": {},
+     "n_rows": 58,
+     "n_clusters": 58,
+     "lines": {
+      "1500": {
+       "E": -14.572795349092239,
+       "clusters": 8
+      },
+      "1600": {
+       "E": -14.03363588455939,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -8.23495225650876,
+       "clusters": 10
+      },
+      "2250": {
+       "E": -4.488694452796065,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -5.430614033083044,
+       "clusters": 7
+      },
+      "3500": {
+       "E": -0.988923730020143,
+       "clusters": 8
+      },
+      "4000": {
+       "E": -1.455272392806417,
+       "clusters": 7
+      },
+      "5000": {
+       "E": 9.244680327291688,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 1.7579665227836296,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -14.572795349092239,
+       "u_stat": 1.7579665227836296,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": -14.03363588455939,
+       "u_stat": 0.8335975470611342,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": -8.23495225650876,
+       "u_stat": 0.8915958104984273,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": -4.488694452796065,
+       "u_stat": 0.4339213007257965,
+       "outcome": "passes",
+       "why": null
+      },
+      "2500": {
+       "E": -5.430614033083044,
+       "u_stat": 0.11922887204099789,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -0.988923730020143,
+       "u_stat": 2.4788976059681667,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": -1.455272392806417,
+       "u_stat": 3.757264462777238,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5000": {
+       "E": 9.244680327291688,
+       "u_stat": 2.907188173818904,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 75.51313203176326,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 75.51313203176326,
+      "spark_sentinel": 75.51313203176326
+     },
+     "extra": {},
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 75.51313203176326,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 85.79603810330627,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 51.1506348766819,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 41.56249169482222,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 20.57527996490014,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 13.518767372227595,
+       "clusters": 3
+      },
+      "4000": {
+       "E": -6.944250895834216,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.31939509674949,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 75.51313203176326,
+       "u_stat": 16.31939509674949,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 51.1506348766819,
+       "u_stat": 10.516549181068362,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 41.56249169482222,
+       "u_stat": 1.1998427329300838,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 20.57527996490014,
+       "u_stat": 5.540538409113325,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "3500": {
+       "E": 13.518767372227595,
+       "u_stat": 6.265801798639842,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 76.26231613995635,
+     "deciding": [
+      "1600",
+      "1700/1750/1800",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1700/1750/1800",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 76.26231613995635,
+      "spark_sentinel": 76.26231613995635
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 30,
+     "n_clusters": 30,
+     "lines": {
+      "1500": {
+       "E": 92.59948273881582,
+       "clusters": 1
+      },
+      "1600": {
+       "E": 69.81528768316775,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": 76.26231613995635,
+       "clusters": 5
+      },
+      "2250": {
+       "E": 46.270113872023785,
+       "clusters": 2
+      },
+      "2500": {
+       "E": 33.50599482521761,
+       "clusters": 2
+      },
+      "3500": {
+       "E": 25.16758078318012,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 11.604794228888569,
+       "clusters": 5
+      },
+      "5000": {
+       "E": -10.012608792110825,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 5.825864178601525,
+     "outcome": "fails",
+     "why": "1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 3500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1600": {
+       "E": 69.81528768316775,
+       "u_stat": 3.2658135634179737,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 76.26231613995635,
+       "u_stat": 5.825864178601525,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 25.16758078318012,
+       "u_stat": 2.631078519587311,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4000": {
+       "E": 11.604794228888569,
+       "u_stat": 3.5038373073146043,
+       "outcome": "passes",
+       "why": null
+      },
+      "5000": {
+       "E": -10.012608792110825,
+       "u_stat": 1.940839013427501,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": -6.082157389559351,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -6.082157389559351,
+      "spark_sentinel": -6.082157389559351
+     },
+     "extra": {
+      "sum_L_S_k": 1606.9400033384097,
+      "sum_data_lever_k": 1711.0060864619666,
+      "extrapolation_kpa": {
+       "1500": 6.234956105269788,
+       "1700/1750/1800": 27.638818501885055,
+       "2250": 12.372355698362838,
+       "2500": 16.815650672531376,
+       "3500": 37.168383658969844,
+       "4000": 43.49988764044943
+      },
+      "extrapolation_below_kpa": {
+       "1500": 0.0,
+       "1700/1750/1800": 0.0,
+       "2250": 0.0,
+       "2500": 0.0,
+       "3500": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 20,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 61,
+     "n_clusters": 61,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 1
+      },
+      "1600": {
+       "E": null,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": null,
+       "clusters": 5
+      },
+      "2250": {
+       "E": null,
+       "clusters": 2
+      },
+      "2500": {
+       "E": null,
+       "clusters": 2
+      },
+      "3500": {
+       "E": null,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 5
+      },
+      "5000": {
+       "E": null,
+       "clusters": 6
+      }
+     },
+     "passes": null,
+     "u_stat": 9.363220210747553,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": -6.082157389559351,
+       "u_stat": 9.363220210747553,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 4.792148136445041,
+     "deciding": [
+      "1000",
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 4.792148136445041,
+      "spark_sentinel": 4.792148136445041,
+      "unreachable": 4.792148136445041
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 127,
+     "n_clusters": 127,
+     "lines": {
+      "1000": {
+       "E": 1.926843550984004,
+       "clusters": 13
+      },
+      "1500": {
+       "E": 7.540363773462356,
+       "clusters": 18
+      },
+      "1600": {
+       "E": 12.140437373719928,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": 3.660343310127839,
+       "clusters": 19
+      },
+      "2250": {
+       "E": 3.0777152223505095,
+       "clusters": 6
+      },
+      "2500": {
+       "E": 2.400261327497018,
+       "clusters": 20
+      },
+      "3500": {
+       "E": 5.254887209424276,
+       "clusters": 16
+      },
+      "4000": {
+       "E": 4.92052641115123,
+       "clusters": 16
+      },
+      "5000": {
+       "E": 5.858462791954287,
+       "clusters": 13
+      }
+     },
+     "passes": true,
+     "u_stat": 0.402363805926323,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "pooled": {
+       "E": 4.792148136445041,
+       "u_stat": 0.402363805926323,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 83.93295042686603,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 83.93295042686603,
+      "spark_sentinel": 83.93295042686603
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 83.93295042686603,
+        "deltabar": -0.09574134524966067,
+        "f_star": 1.0,
+        "H_k": 83.93295042686603
+       },
+       "1600": {
+        "ebar_k": 94.42696406000556,
+        "deltabar": -0.08991659750812891,
+        "f_star": 1.0,
+        "H_k": 94.42696406000556
+       },
+       "1700/1750/1800": {
+        "ebar_k": 57.91414105865423,
+        "deltabar": -0.03520112166145151,
+        "f_star": 1.0,
+        "H_k": 57.91414105865423
+       },
+       "2250": {
+        "ebar_k": 46.0926321319134,
+        "deltabar": -0.007359660213480483,
+        "f_star": 1.0,
+        "H_k": 46.0926321319134
+       },
+       "2500": {
+        "ebar_k": 27.78363915043203,
+        "deltabar": -0.0009603188031012344,
+        "f_star": 1.0,
+        "H_k": 27.78363915043203
+       },
+       "3500": {
+        "ebar_k": 9.872448117551698,
+        "deltabar": 0.009505001739835631,
+        "f_star": 1.0,
+        "H_k": 9.872448117551698
+       },
+       "4000": {
+        "ebar_k": -10.357513721128043,
+        "deltabar": 0.004546420682976671,
+        "f_star": 1.0,
+        "H_k": -10.357513721128043
+       }
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 83.93295042686603,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 94.42696406000556,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 57.91414105865423,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 46.0926321319134,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 27.78363915043203,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 9.872448117551698,
+       "clusters": 3
+      },
+      "4000": {
+       "E": 10.357513721128043,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.85352083466799,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 83.93295042686603,
+       "u_stat": 16.85352083466799,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 57.91414105865423,
+       "u_stat": 11.088271545746574,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 46.0926321319134,
+       "u_stat": 0.6546295350663021,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 27.78363915043203,
+       "u_stat": 5.47291905874259,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 9.872448117551698,
+       "u_stat": 2.6548548681089246,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 74.06050230931433,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 74.06050230931433,
+      "spark_sentinel": 74.06050230931433
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 1.0,
+      "extreme_lines": [
+       "1500",
+       "3500"
+      ],
+      "H_at_f_star": {
+       "1500": 83.93295042686603,
+       "1700/1750/1800": 57.91414105865423,
+       "2250": 46.0926321319134,
+       "2500": 27.78363915043203,
+       "3500": 9.872448117551698
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 83.93295042686603,
+       "clusters": 5
+      },
+      "1600": {
+       "E": null,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 57.91414105865423,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 46.0926321319134,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 27.78363915043203,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 9.872448117551698,
+       "clusters": 3
+      },
+      "4000": {
+       "E": null,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 17.061342822161148,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 74.06050230931433,
+       "u_stat": 17.061342822161148,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "E4a",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 55.13384099997369,
+    "deciding": [
+     "1500",
+     "1600",
+     "1700/1750/1800",
+     "2250",
+     "2500",
+     "3500",
+     "4000",
+     "5000"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 55.13384099997369,
+     "spark_sentinel": 55.13384099997369,
+     "censored": 55.13384099997369
+    },
+    "extra": {
+     "n_final": 49,
+     "n_dl": 49,
+     "n_ds": 49,
+     "dl": 0.02695560537976183,
+     "ds": 0.4664593402117613,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.02695560537976183,
+       "P": -0.5151910034074163,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 49
+      },
+      "spark": {
+       "shift": 0.4664593402117613,
+       "P": -0.03614740659232064,
+       "extrapolated": false,
+       "slope": -0.07749315637223726,
+       "rows": 49
+      }
+     },
+     "every_final_row": {
+      "dl": 0.02695560537976183,
+      "ds": 0.4664593402117613,
+      "E_pct": 55.13384099997369
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.02695560537976183,
+     "snapped": {
+      "dl": 0.025963634114624677,
+      "E_pct": 53.83887745239889,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "1500": {
+       "model_kpa": null,
+       "epa_kpa": 140.56064386317908
+      },
+      "1600": {
+       "model_kpa": null,
+       "epa_kpa": 140.14551102204405
+      },
+      "1700/1750/1800": {
+       "model_kpa": 132.62442677269757,
+       "epa_kpa": 146.5706044905009
+      },
+      "2250": {
+       "model_kpa": 138.4670270270265,
+       "epa_kpa": 150.20373906125664
+      },
+      "2500": {
+       "model_kpa": 139.413052362707,
+       "epa_kpa": 147.20794924554147
+      },
+      "3500": {
+       "model_kpa": 139.83554149085785,
+       "epa_kpa": 139.83554149085785
+      },
+      "4000": {
+       "model_kpa": 130.1448795180722,
+       "epa_kpa": 130.1448795180722
+      },
+      "5000": {
+       "model_kpa": 130.06906890130338,
+       "epa_kpa": 125.60961538461535
+      }
+     }
+    },
+    "n_rows": 49,
+    "n_clusters": 49,
+    "lines": {
+     "1500": {
+      "E": null,
+      "clusters": 6
+     },
+     "1600": {
+      "E": null,
+      "clusters": 6
+     },
+     "1700/1750/1800": {
+      "E": null,
+      "clusters": 10
+     },
+     "2250": {
+      "E": null,
+      "clusters": 6
+     },
+     "2500": {
+      "E": null,
+      "clusters": 5
+     },
+     "3500": {
+      "E": null,
+      "clusters": 5
+     },
+     "4000": {
+      "E": null,
+      "clusters": 5
+     },
+     "5000": {
+      "E": null,
+      "clusters": 6
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 13.518767372227595,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 13.518767372227595,
+       "spark_sentinel": 13.518767372227595
+      },
+      "extra": {},
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 18.596060475061336,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 19.394539338873983,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 7.305076378268552,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 13.518767372227595,
+        "clusters": 3
+       },
+       "4000": {
+        "E": -6.944250895834216,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": 6.265801798639842,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "3500": {
+        "E": 13.518767372227595,
+        "u_stat": 6.265801798639842,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 0,
+      "n_clusters": 0,
+      "lines": {},
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 9.872448117551698,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 9.872448117551698,
+       "spark_sentinel": 9.872448117551698
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 23.49126139895941,
+         "deltabar": -0.011066989682825934,
+         "f_star": 1.0,
+         "H_k": 23.49126139895941
+        },
+        "1700/1750/1800": {
+         "ebar_k": 24.17503393891826,
+         "deltabar": -0.017172883261841243,
+         "f_star": 1.0,
+         "H_k": 24.17503393891826
+        },
+        "2500": {
+         "ebar_k": 14.771163719535991,
+         "deltabar": 0.001998983602882587,
+         "f_star": 1.0,
+         "H_k": 14.771163719535991
+        },
+        "3500": {
+         "ebar_k": 9.872448117551698,
+         "deltabar": 0.009505001739835631,
+         "f_star": 1.0,
+         "H_k": 9.872448117551698
+        },
+        "4000": {
+         "ebar_k": -10.357513721128043,
+         "deltabar": 0.004546420682976671,
+         "f_star": 1.0,
+         "H_k": -10.357513721128043
+        }
+       }
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 23.49126139895941,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 24.17503393891826,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 14.771163719535991,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 9.872448117551698,
+        "clusters": 3
+       },
+       "4000": {
+        "E": 10.357513721128043,
+        "clusters": 2
+       }
+      },
+      "passes": true,
+      "u_stat": 2.6548548681089246,
+      "outcome": "passes",
+      "why": null,
+      "components": {
+       "3500": {
+        "E": 9.872448117551698,
+        "u_stat": 2.6548548681089246,
+        "outcome": "passes",
+        "why": null
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": null,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "L1 needs at least 2 deciding lines (L0's)",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "G_k": 980.27
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 3
+       },
+       "4000": {
+        "E": null,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": -27.698980620962153,
+      "deciding": [
+       "1500",
+       "1700/1750/1800",
+       "2500",
+       "3500",
+       "4000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": -27.698980620962153,
+       "spark_sentinel": -27.698980620962153
+      },
+      "extra": {
+       "sum_L_S_k": 1450.1889823240215,
+       "sum_data_lever_k": 2005.7656099167991,
+       "extrapolation_kpa": {
+        "1500": 15.04064386317907,
+        "1700/1750/1800": 33.6680071428579,
+        "2500": 23.628692206077034,
+        "3500": 37.168383658969844,
+        "4000": 43.49988764044943
+       },
+       "extrapolation_below_kpa": {
+        "1500": 0.0,
+        "1700/1750/1800": 0.0,
+        "2500": 0.0,
+        "3500": 0.0,
+        "4000": 0.0
+       },
+       "enriched_rows": 18,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 45,
+      "n_clusters": 45,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1600": {
+        "E": null,
+        "clusters": 4
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 5
+       },
+       "2250": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 5
+       },
+       "4000": {
+        "E": null,
+        "clusters": 5
+       },
+       "5000": {
+        "E": null,
+        "clusters": 6
+       }
+      },
+      "passes": false,
+      "u_stat": 3.8498342971744393,
+      "outcome": "fails",
+      "why": "|E_cal| - 2 u_stat > R",
+      "components": {
+       "pooled": {
+        "E": -27.698980620962153,
+        "u_stat": 3.8498342971744393,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     }
+    }
+   }
+  },
+  "A+B+C+D": {
+   "statistics": {
+    "E1a": {
+     "R": 1.9,
+     "unit": "% of the measured torque",
+     "kind": "level",
+     "E": -6.264912504203844,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "4000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -6.264912504203844,
+      "spark_sentinel": -6.264912504203844
+     },
+     "extra": {},
+     "n_rows": 60,
+     "n_clusters": 60,
+     "lines": {
+      "1500": {
+       "E": -4.335100595672473,
+       "clusters": 8
+      },
+      "1600": {
+       "E": 0.6630210029082151,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -1.017671512042136,
+       "clusters": 12
+      },
+      "2250": {
+       "E": -2.0571511846116497,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -5.17045595300813,
+       "clusters": 7
+      },
+      "3500": {
+       "E": -3.9993775896683457,
+       "clusters": 8
+      },
+      "4000": {
+       "E": -6.264912504203844,
+       "clusters": 7
+      },
+      "5000": {
+       "E": 0.9166434491108802,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 4.992184233648033,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -4.335100595672473,
+       "u_stat": 1.100240070043453,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": 0.6630210029082151,
+       "u_stat": 2.1736059028754524,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": -1.017671512042136,
+       "u_stat": 1.1895863231172448,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2250": {
+       "E": -2.0571511846116497,
+       "u_stat": 1.3398948257019134,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "2500": {
+       "E": -5.17045595300813,
+       "u_stat": 1.0769485263465015,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": -3.9993775896683457,
+       "u_stat": 3.2633139187286906,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": -6.264912504203844,
+       "u_stat": 4.992184233648033,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5000": {
+       "E": 0.9166434491108802,
+       "u_stat": 2.3703857659424967,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E2a": {
+     "R": 4.0,
+     "unit": "% of the measured flow",
+     "kind": "level",
+     "E": -14.822112617936789,
+     "deciding": [
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -14.822112617936789,
+      "spark_sentinel": -14.822112617936789
+     },
+     "extra": {},
+     "n_rows": 58,
+     "n_clusters": 58,
+     "lines": {
+      "1500": {
+       "E": -14.822112617936789,
+       "clusters": 8
+      },
+      "1600": {
+       "E": -11.59365917297833,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": -6.360060140707942,
+       "clusters": 10
+      },
+      "2250": {
+       "E": -0.9378677095890131,
+       "clusters": 6
+      },
+      "2500": {
+       "E": -3.1994551903415966,
+       "clusters": 7
+      },
+      "3500": {
+       "E": 2.0041608191119566,
+       "clusters": 8
+      },
+      "4000": {
+       "E": 0.07844236480711185,
+       "clusters": 7
+      },
+      "5000": {
+       "E": 10.98856026570097,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 1.6285799090037536,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1600: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": -14.822112617936789,
+       "u_stat": 1.6285799090037536,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1600": {
+       "E": -11.59365917297833,
+       "u_stat": 1.0692390562817502,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": -6.360060140707942,
+       "u_stat": 1.2698281228898436,
+       "outcome": "passes",
+       "why": null
+      },
+      "2250": {
+       "E": -0.9378677095890131,
+       "u_stat": 0.5433924931789763,
+       "outcome": "passes",
+       "why": null
+      },
+      "2500": {
+       "E": -3.1994551903415966,
+       "u_stat": 1.1482666121634504,
+       "outcome": "passes",
+       "why": null
+      },
+      "3500": {
+       "E": 2.0041608191119566,
+       "u_stat": 2.71279733870595,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "4000": {
+       "E": 0.07844236480711185,
+       "u_stat": 4.931955773783147,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      },
+      "5000": {
+       "E": 10.98856026570097,
+       "u_stat": 3.595456526828569,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E3a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 75.47309010317633,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 75.47309010317633,
+      "spark_sentinel": 75.47309010317633
+     },
+     "extra": {},
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 75.47309010317633,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 86.16985605571534,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 51.74301575874921,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 41.51091095863713,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 21.039334935633065,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 14.390385752145638,
+       "clusters": 3
+      },
+      "4000": {
+       "E": -4.689350702944807,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.46593338878671,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 75.47309010317633,
+       "u_stat": 16.46593338878671,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 51.74301575874921,
+       "u_stat": 10.560080661606456,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 41.51091095863713,
+       "u_stat": 0.8258202048152542,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 21.039334935633065,
+       "u_stat": 5.313023814727117,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 14.390385752145638,
+       "u_stat": 6.34912066409623,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "E4a": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 74.92454226435284,
+     "deciding": [
+      "1600",
+      "1700/1750/1800",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": "1700/1750/1800",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 74.92454226435284,
+      "spark_sentinel": 74.92454226435284
+     },
+     "extra": {
+      "censored_rows": []
+     },
+     "n_rows": 30,
+     "n_clusters": 30,
+     "lines": {
+      "1500": {
+       "E": 93.40247026104748,
+       "clusters": 1
+      },
+      "1600": {
+       "E": 69.81227475667183,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": 74.92454226435284,
+       "clusters": 5
+      },
+      "2250": {
+       "E": 45.00298998602892,
+       "clusters": 2
+      },
+      "2500": {
+       "E": 31.78439277478168,
+       "clusters": 2
+      },
+      "3500": {
+       "E": 23.24921345396847,
+       "clusters": 5
+      },
+      "4000": {
+       "E": 11.748814352957151,
+       "clusters": 5
+      },
+      "5000": {
+       "E": -7.964344414947466,
+       "clusters": 6
+      }
+     },
+     "passes": false,
+     "u_stat": 5.337856666992147,
+     "outcome": "fails",
+     "why": "1600: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 3500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1600": {
+       "E": 69.81227475667183,
+       "u_stat": 3.3353130159677957,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 74.92454226435284,
+       "u_stat": 5.337856666992147,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 23.24921345396847,
+       "u_stat": 1.3071089615685607,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "4000": {
+       "E": 11.748814352957151,
+       "u_stat": 1.8822124921374292,
+       "outcome": "passes",
+       "why": null
+      },
+      "5000": {
+       "E": -7.964344414947466,
+       "u_stat": 1.80306725415951,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "E4b": {
+     "R": 16.6,
+     "unit": "% of the lever's effect",
+     "kind": "d",
+     "E": -3.0086952711991244,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": -3.0086952711991244,
+      "spark_sentinel": -3.0086952711991244
+     },
+     "extra": {
+      "sum_L_S_k": 1567.016684325718,
+      "sum_data_lever_k": 1615.6259457559431,
+      "extrapolation_kpa": {
+       "1500": 6.234956105269788,
+       "1700/1750/1800": 27.638818501885055,
+       "2250": 12.372355698362838,
+       "2500": 16.815650672531376,
+       "3500": 37.168383658969844,
+       "4000": 43.49988764044943
+      },
+      "extrapolation_below_kpa": {
+       "1500": 0.0,
+       "1700/1750/1800": 0.0,
+       "2250": 0.0,
+       "2500": 0.0,
+       "3500": 0.0,
+       "4000": 0.0
+      },
+      "enriched_rows": 20,
+      "censored_rows": [],
+      "pair_estimate": {
+       "value_pct": null,
+       "holds": 0,
+       "label": "descriptive"
+      },
+      "lines_one_map": []
+     },
+     "n_rows": 61,
+     "n_clusters": 61,
+     "lines": {
+      "1000": {
+       "E": null,
+       "clusters": 0
+      },
+      "1500": {
+       "E": null,
+       "clusters": 1
+      },
+      "1600": {
+       "E": null,
+       "clusters": 4
+      },
+      "1700/1750/1800": {
+       "E": null,
+       "clusters": 5
+      },
+      "2250": {
+       "E": null,
+       "clusters": 2
+      },
+      "2500": {
+       "E": null,
+       "clusters": 2
+      },
+      "3500": {
+       "E": null,
+       "clusters": 5
+      },
+      "4000": {
+       "E": null,
+       "clusters": 5
+      },
+      "5000": {
+       "E": null,
+       "clusters": 6
+      }
+     },
+     "passes": null,
+     "u_stat": 10.056603941514181,
+     "outcome": "neither",
+     "why": "noise exceeds R: 2 u_stat > R",
+     "components": {
+      "pooled": {
+       "E": -3.0086952711991244,
+       "u_stat": 10.056603941514181,
+       "outcome": "neither",
+       "why": "noise exceeds R: 2 u_stat > R"
+      }
+     }
+    },
+    "D1": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 4.558909756348985,
+     "deciding": [
+      "1000",
+      "1500",
+      "1600",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500",
+      "4000",
+      "5000"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 4.558909756348985,
+      "spark_sentinel": 4.558909756348985,
+      "unreachable": 4.558909756348985
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 127,
+     "n_clusters": 127,
+     "lines": {
+      "1000": {
+       "E": 1.9149887792264753,
+       "clusters": 13
+      },
+      "1500": {
+       "E": 7.402731807405595,
+       "clusters": 18
+      },
+      "1600": {
+       "E": 12.207861592198832,
+       "clusters": 6
+      },
+      "1700/1750/1800": {
+       "E": 3.726546211730812,
+       "clusters": 19
+      },
+      "2250": {
+       "E": 2.738709382791867,
+       "clusters": 6
+      },
+      "2500": {
+       "E": 2.147128291543199,
+       "clusters": 20
+      },
+      "3500": {
+       "E": 4.718250412318601,
+       "clusters": 16
+      },
+      "4000": {
+       "E": 4.406150594432088,
+       "clusters": 16
+      },
+      "5000": {
+       "E": 5.493902044720893,
+       "clusters": 13
+      }
+     },
+     "passes": true,
+     "u_stat": 0.38281876696450245,
+     "outcome": "passes",
+     "why": null,
+     "components": {
+      "pooled": {
+       "E": 4.558909756348985,
+       "u_stat": 0.38281876696450245,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L0": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 84.76943080728454,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": "1500",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 84.76943080728454,
+      "spark_sentinel": 84.76943080728454
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "1500": {
+        "ebar_k": 84.76943080728454,
+        "deltabar": -0.09269630155272804,
+        "f_star": 1.0,
+        "H_k": 84.76943080728454
+       },
+       "1600": {
+        "ebar_k": 93.95134616491862,
+        "deltabar": -0.08765751135467936,
+        "f_star": 1.0,
+        "H_k": 93.95134616491862
+       },
+       "1700/1750/1800": {
+        "ebar_k": 58.06801063597933,
+        "deltabar": -0.03317240764672134,
+        "f_star": 1.0,
+        "H_k": 58.06801063597933
+       },
+       "2250": {
+        "ebar_k": 42.36911951555843,
+        "deltabar": -0.008165826204067472,
+        "f_star": 1.0,
+        "H_k": 42.36911951555843
+       },
+       "2500": {
+        "ebar_k": 25.141395244776525,
+        "deltabar": -0.0018674019470159564,
+        "f_star": 1.0,
+        "H_k": 25.141395244776525
+       },
+       "3500": {
+        "ebar_k": 11.83683712742076,
+        "deltabar": 0.006455790643165593,
+        "f_star": 1.0,
+        "H_k": 11.83683712742076
+       },
+       "4000": {
+        "ebar_k": -6.300998469466208,
+        "deltabar": 0.0006313028210711558,
+        "f_star": 1.0,
+        "H_k": -6.300998469466208
+       }
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 84.76943080728454,
+       "clusters": 5
+      },
+      "1600": {
+       "E": 93.95134616491862,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 58.06801063597933,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 42.36911951555843,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 25.141395244776525,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 11.83683712742076,
+       "clusters": 3
+      },
+      "4000": {
+       "E": 6.300998469466208,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.318132080155333,
+     "outcome": "fails",
+     "why": "1500: |E_cal| - 2 u_stat > R; 1700/1750/1800: |E_cal| - 2 u_stat > R; 2250: |E_cal| - 2 u_stat > R; 2500: |E_cal| - 2 u_stat > R",
+     "components": {
+      "1500": {
+       "E": 84.76943080728454,
+       "u_stat": 16.318132080155333,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "1700/1750/1800": {
+       "E": 58.06801063597933,
+       "u_stat": 10.406563802680786,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2250": {
+       "E": 42.36911951555843,
+       "u_stat": 0.414776272446326,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "2500": {
+       "E": 25.141395244776525,
+       "u_stat": 4.806328361404035,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      },
+      "3500": {
+       "E": 11.83683712742076,
+       "u_stat": 4.0804163501819115,
+       "outcome": "passes",
+       "why": null
+      }
+     }
+    },
+    "L1": {
+     "R": 9.9,
+     "unit": "K of housing",
+     "kind": "d",
+     "E": 72.93259367986377,
+     "deciding": [
+      "1500",
+      "1700/1750/1800",
+      "2250",
+      "2500",
+      "3500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 72.93259367986377,
+      "spark_sentinel": 72.93259367986377
+     },
+     "extra": {
+      "G_k": 980.27,
+      "f_star": 1.0,
+      "extreme_lines": [
+       "1500",
+       "3500"
+      ],
+      "H_at_f_star": {
+       "1500": 84.76943080728454,
+       "1700/1750/1800": 58.06801063597933,
+       "2250": 42.36911951555843,
+       "2500": 25.141395244776525,
+       "3500": 11.83683712742076
+      }
+     },
+     "n_rows": 26,
+     "n_clusters": 26,
+     "lines": {
+      "1500": {
+       "E": 84.76943080728454,
+       "clusters": 5
+      },
+      "1600": {
+       "E": null,
+       "clusters": 2
+      },
+      "1700/1750/1800": {
+       "E": 58.06801063597933,
+       "clusters": 6
+      },
+      "2250": {
+       "E": 42.36911951555843,
+       "clusters": 3
+      },
+      "2500": {
+       "E": 25.141395244776525,
+       "clusters": 5
+      },
+      "3500": {
+       "E": 11.83683712742076,
+       "clusters": 3
+      },
+      "4000": {
+       "E": null,
+       "clusters": 2
+      }
+     },
+     "passes": false,
+     "u_stat": 16.82055980567313,
+     "outcome": "fails",
+     "why": "|E_cal| - 2 u_stat > R",
+     "components": {
+      "L1": {
+       "E": 72.93259367986377,
+       "u_stat": 16.82055980567313,
+       "outcome": "fails",
+       "why": "|E_cal| - 2 u_stat > R"
+      }
+     }
+    }
+   },
+   "passes": false,
+   "failing": [
+    "E1a",
+    "E2a",
+    "E3a",
+    "E4a",
+    "L0",
+    "L1"
+   ],
+   "noise": [
+    "E4b"
+   ],
+   "no_line": [],
+   "e8": {
+    "R": 16.6,
+    "unit": "% of the head-start pair",
+    "kind": "d",
+    "E": 55.13384099997369,
+    "deciding": [
+     "1500",
+     "1600",
+     "1700/1750/1800",
+     "2250",
+     "2500",
+     "3500",
+     "4000",
+     "5000"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 55.13384099997369,
+     "spark_sentinel": 55.13384099997369,
+     "censored": 55.13384099997369
+    },
+    "extra": {
+     "n_final": 49,
+     "n_dl": 49,
+     "n_ds": 49,
+     "dl": 0.02695560537976183,
+     "ds": 0.4664593402117613,
+     "worth_b": {
+      "lambda_rich": {
+       "shift": -0.0206,
+       "extrapolated": false
+      },
+      "lambda_lean": {
+       "shift": 0.0086,
+       "extrapolated": false
+      },
+      "spark_retard": {
+       "shift": -2.594,
+       "extrapolated": false
+      },
+      "spark_advance": {
+       "shift": 2.625,
+       "extrapolated": true,
+       "largest_measured": [
+        1.5,
+        -0.1015
+       ]
+      }
+     },
+     "terms": {
+      "lambda": {
+       "shift": 0.02695560537976183,
+       "P": -0.5151910034074163,
+       "extrapolated": false,
+       "slope": -13.054446162770219,
+       "rows": 49
+      },
+      "spark": {
+       "shift": 0.4664593402117613,
+       "P": -0.03614740659232064,
+       "extrapolated": false,
+       "slope": -0.07749315637223726,
+       "rows": 49
+      }
+     },
+     "every_final_row": {
+      "dl": 0.02695560537976183,
+      "ds": 0.4664593402117613,
+      "E_pct": 55.13384099997369
+     },
+     "censored_rows": [],
+     "dl_without_censored": 0.02695560537976183,
+     "snapped": {
+      "dl": 0.025963634114624677,
+      "E_pct": 53.83887745239889,
+      "label": "descriptive"
+     },
+     "enrichment_onset_kpa": {
+      "1500": {
+       "model_kpa": null,
+       "epa_kpa": 140.56064386317908
+      },
+      "1600": {
+       "model_kpa": null,
+       "epa_kpa": 140.14551102204405
+      },
+      "1700/1750/1800": {
+       "model_kpa": 132.62442677269757,
+       "epa_kpa": 146.5706044905009
+      },
+      "2250": {
+       "model_kpa": 138.4670270270265,
+       "epa_kpa": 150.20373906125664
+      },
+      "2500": {
+       "model_kpa": 139.413052362707,
+       "epa_kpa": 147.20794924554147
+      },
+      "3500": {
+       "model_kpa": 139.83554149085785,
+       "epa_kpa": 139.83554149085785
+      },
+      "4000": {
+       "model_kpa": 130.1448795180722,
+       "epa_kpa": 130.1448795180722
+      },
+      "5000": {
+       "model_kpa": 130.06906890130338,
+       "epa_kpa": 125.60961538461535
+      }
+     }
+    },
+    "n_rows": 49,
+    "n_clusters": 49,
+    "lines": {
+     "1500": {
+      "E": null,
+      "clusters": 6
+     },
+     "1600": {
+      "E": null,
+      "clusters": 6
+     },
+     "1700/1750/1800": {
+      "E": null,
+      "clusters": 10
+     },
+     "2250": {
+      "E": null,
+      "clusters": 6
+     },
+     "2500": {
+      "E": null,
+      "clusters": 5
+     },
+     "3500": {
+      "E": null,
+      "clusters": 5
+     },
+     "4000": {
+      "E": null,
+      "clusters": 5
+     },
+     "5000": {
+      "E": null,
+      "clusters": 6
+     }
+    },
+    "passes": false,
+    "u_stat": null,
+    "outcome": null,
+    "why": null,
+    "components": {}
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "rows": [
+     "E3a",
+     "E4a",
+     "L0",
+     "L1",
+     "E4b"
+    ],
+    "statistics": {
+     "E3a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": 14.390385752145638,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 14.390385752145638,
+       "spark_sentinel": 14.390385752145638
+      },
+      "extra": {},
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 18.25860896307165,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 19.847404881776754,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 8.41797053630961,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 14.390385752145638,
+        "clusters": 3
+       },
+       "4000": {
+        "E": -4.689350702944807,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": 6.34912066409623,
+      "outcome": "neither",
+      "why": "noise exceeds R: 2 u_stat > R",
+      "components": {
+       "3500": {
+        "E": 14.390385752145638,
+        "u_stat": 6.34912066409623,
+        "outcome": "neither",
+        "why": "noise exceeds R: 2 u_stat > R"
+       }
+      }
+     },
+     "E4a": {
+      "R": 10.0,
+      "unit": "K",
+      "kind": "level",
+      "E": null,
+      "deciding": [],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "no line with at least 3 clusters in hot_enr",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "censored_rows": []
+      },
+      "n_rows": 0,
+      "n_clusters": 0,
+      "lines": {},
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "L0": {
+      "R": 10.0,
+      "unit": "K of housing",
+      "kind": "level",
+      "E": 11.83683712742076,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": "3500",
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": 11.83683712742076,
+       "spark_sentinel": 11.83683712742076
+      },
+      "extra": {
+       "G_k": 980.27,
+       "per_line": {
+        "1500": {
+         "ebar_k": 25.915026030199783,
+         "deltabar": -0.00738562678987531,
+         "f_star": 1.0,
+         "H_k": 25.915026030199783
+        },
+        "1700/1750/1800": {
+         "ebar_k": 26.33695388393278,
+         "deltabar": -0.014568018529765803,
+         "f_star": 1.0,
+         "H_k": 26.33695388393278
+        },
+        "2500": {
+         "ebar_k": 14.228597641924182,
+         "deltabar": 0.0016866041452684444,
+         "f_star": 1.0,
+         "H_k": 14.228597641924182
+        },
+        "3500": {
+         "ebar_k": 11.83683712742076,
+         "deltabar": 0.006455790643165593,
+         "f_star": 1.0,
+         "H_k": 11.83683712742076
+        },
+        "4000": {
+         "ebar_k": -6.300998469466208,
+         "deltabar": 0.0006313028210711558,
+         "f_star": 1.0,
+         "H_k": -6.300998469466208
+        }
+       }
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": 25.915026030199783,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": 26.33695388393278,
+        "clusters": 2
+       },
+       "2500": {
+        "E": 14.228597641924182,
+        "clusters": 2
+       },
+       "3500": {
+        "E": 11.83683712742076,
+        "clusters": 3
+       },
+       "4000": {
+        "E": 6.300998469466208,
+        "clusters": 2
+       }
+      },
+      "passes": true,
+      "u_stat": 4.0804163501819115,
+      "outcome": "passes",
+      "why": null,
+      "components": {
+       "3500": {
+        "E": 11.83683712742076,
+        "u_stat": 4.0804163501819115,
+        "outcome": "passes",
+        "why": null
+       }
+      }
+     },
+     "L1": {
+      "R": 9.9,
+      "unit": "K of housing",
+      "kind": "d",
+      "E": null,
+      "deciding": [
+       "3500"
+      ],
+      "worst_line": null,
+      "no_statistic": true,
+      "reason": "L1 needs at least 2 deciding lines (L0's)",
+      "without": {
+       "lambda_missing": null,
+       "spark_sentinel": null
+      },
+      "extra": {
+       "G_k": 980.27
+      },
+      "n_rows": 10,
+      "n_clusters": 10,
+      "lines": {
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 3
+       },
+       "4000": {
+        "E": null,
+        "clusters": 2
+       }
+      },
+      "passes": null,
+      "u_stat": null,
+      "outcome": null,
+      "why": null,
+      "components": {}
+     },
+     "E4b": {
+      "R": 16.6,
+      "unit": "% of the lever's effect",
+      "kind": "d",
+      "E": -25.65137047135306,
+      "deciding": [
+       "1500",
+       "1700/1750/1800",
+       "2500",
+       "3500",
+       "4000"
+      ],
+      "worst_line": null,
+      "no_statistic": false,
+      "reason": null,
+      "without": {
+       "lambda_missing": -25.65137047135306,
+       "spark_sentinel": -25.65137047135306
+      },
+      "extra": {
+       "sum_L_S_k": 1413.5720554140798,
+       "sum_data_lever_k": 1901.2752008689317,
+       "extrapolation_kpa": {
+        "1500": 15.04064386317907,
+        "1700/1750/1800": 33.6680071428579,
+        "2500": 23.628692206077034,
+        "3500": 37.168383658969844,
+        "4000": 43.49988764044943
+       },
+       "extrapolation_below_kpa": {
+        "1500": 0.0,
+        "1700/1750/1800": 0.0,
+        "2500": 0.0,
+        "3500": 0.0,
+        "4000": 0.0
+       },
+       "enriched_rows": 18,
+       "censored_rows": [],
+       "pair_estimate": {
+        "value_pct": null,
+        "holds": 0,
+        "label": "descriptive"
+       },
+       "lines_one_map": []
+      },
+      "n_rows": 45,
+      "n_clusters": 45,
+      "lines": {
+       "1000": {
+        "E": null,
+        "clusters": 0
+       },
+       "1500": {
+        "E": null,
+        "clusters": 1
+       },
+       "1600": {
+        "E": null,
+        "clusters": 4
+       },
+       "1700/1750/1800": {
+        "E": null,
+        "clusters": 5
+       },
+       "2250": {
+        "E": null,
+        "clusters": 2
+       },
+       "2500": {
+        "E": null,
+        "clusters": 2
+       },
+       "3500": {
+        "E": null,
+        "clusters": 5
+       },
+       "4000": {
+        "E": null,
+        "clusters": 5
+       },
+       "5000": {
+        "E": null,
+        "clusters": 6
+       }
+      },
+      "passes": false,
+      "u_stat": 3.7162354304428242,
+      "outcome": "fails",
+      "why": "|E_cal| - 2 u_stat > R",
+      "components": {
+       "pooled": {
+        "E": -25.65137047135306,
+        "u_stat": 3.7162354304428242,
+        "outcome": "fails",
+        "why": "|E_cal| - 2 u_stat > R"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "chosen_form": "A+B+C+D",
+ "reason": "A: fails E1a, E2a, E3a, E4a, L0, L1 (noise exceeds R: E4b) (amendment D13: an E1a miss on stoichiometric hot rows at form A is read as a burn/FMEP residual that no form B-D can act on (mistake 20); it is reported, with S4's residuals per line and per population, and never used to justify a form. The ladder still moves by the contract's criterion (section 2.4).); A+B: fails E1a, E2a, E3a, E4a, L0, L1 (noise exceeds R: E4b); A+B+C: fails E1a, E2a, E3a, E4a, L0, L1 (noise exceeds R: E4b); A+B+C+D: fails E1a, E2a, E3a, E4a, L0, L1 (noise exceeds R: E4b); no form passes: A+B+C+D, its failing statistics reported (contract section 2.4)",
+ "rerun": {
+  "k": 1,
+  "reason": "row 125: calibrate_epa.Audit.allowed refused the null device under the spelling norm() records (//./nul), which platform opens after a WMI timeout; N admits it and changes no arithmetic",
+  "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450",
+  "replaces": "in_sample.json"
+ }
+}

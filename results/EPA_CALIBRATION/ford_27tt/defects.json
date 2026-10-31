@@ -6,5 +6,13 @@
   "assertion": "Decision 87 (Ghassan, 29 October 2026; results/VALIDATION_DECISIONS.md section H; WP3_INTERFACES.md 17): the Ford's T0 seed-1 failure of Run 1's second pass (on 0147f93: chi-square 42.40 on 13, above its 99 % band 3.57-29.82; every ladder at its truth's form; the four cases held) is ruled SAMPLING under epa_fit.T0_ON_SAMPLING_FAILURE, recorded in this entry, on the read-only diagnostics (docs/build_step_2/RUN1_DIAGNOSTICS.md, diagnostic B): S2 converged at an interior minimum (status xtol, gradient 2.4e-7, no bound active); the truth lies 4.36 linearised sd along S2's weak direction (ve_base, ve_amp, ve_width; corr(base, amp) -0.9965); S2's own objective is 15.60 s^2 worse at the truth (beyond chi2(4)'s 99.5 % point 14.86), the likelihood-ratio total 26.88 against the Wald 42.40; over 400 diagnostic S2 draws (rng [0x7D, k], not T0 seeds) the S2 Wald exceeds chi2(4)'s 0.99 and 0.995 points 4 and 1 times against 4 and 2 expected; 7 full diagnostic fits all lie inside the band (largest 18.9). T0_STREAM's next seed, 5, with seed 1's form-A truth, takes seed 1's place in the verdict, declared in code before it runs (epa_fit.T0_SEED_REPLACEMENTS, naming ford_27tt and decision 87): the Ford's T0 passes only if seed 5 passes as an in-form seed (its ladder chooses A and its chi-square lies inside its 99 % band) and seeds 2-4 and the four cases pass as before; if seed 5 fails, the Ford stops at T0 for good and is reported as failing T0. Seed 1 still runs; its failure stays in t0.json, marked replaced under decision 87, and is reported. No other seed for any engine. A sampling ruling, not a coding defect, logged by the defect route; the second pass's outputs move to defect_1/. Declared in 891331c, which also carries decisions 86 (T0's d2_gate case, indistinguishable at T0's noise), 88 (E6 probes beyond the constant's range) and 89 (procedure), on 21cc7d4 (defect D-2, E6 row 9's brackets applied as their two edges; the completion only). The Ford's T0 re-runs on the final code",
   "fix_commit": "891331cd74e4b2b0ca25e4210d90238626a0a755",
   "previous_run": "defect_1/"
+ },
+ {
+  "k": 2,
+  "run_invocation": 8,
+  "found_by": "calibrate_epa.py check --defect (amendment C11)",
+  "assertion": "row 125: calibrate_epa.Audit.allowed refused the null device under the spelling norm() records (//./nul), which platform opens after a WMI timeout; N admits it and changes no arithmetic",
+  "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450",
+  "previous_run": "in_sample.json"
  }
 ]
