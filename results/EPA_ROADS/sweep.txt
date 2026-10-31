@@ -1,0 +1,53 @@
+SWEEP BEFORE THE DRAW (row 101): every car at 130 km/h on make_grade_climb (720 s, grade from 180 s, 315 K), 10-12 % in 0.05 % steps; 164 current-grade runs at 14 jobs, wall 1427 s
+C5 at 1.9 % (thin share 0.5); delivery from 188 s: steps over TRACK_TOL 0.05, steps under 95 % of the request, the largest shortfall
+
+b58
+   C5 outcomes: passes 41 grades (10.00-12.00 %)
+   C5 over the design's slot extent, L67 (180 s to 180 + L + 8 s): passes 41 grades (10.00-12.00 %); smallest gated margin 0.0883 at 10.00 %
+   C5 over the design's slot extent, L85 (180 s to 180 + L + 8 s): passes 41 grades (10.00-12.00 %); smallest gated margin 0.0883 at 10.00 %
+   smallest held margin 0.1054 at 12.00 %; largest 0.2135
+   smallest rejected margin 0.0883 at 10.00 %; largest 0.2379
+   held: ['7', '8']; gated share 0.985-0.985
+   delivery, whole_climb (531 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall 0.23 Nm
+   delivery, first_77s (77 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall 0.23 Nm
+   baseline peak minus knee -24.6 to +33.2 K
+
+mazda_25t
+   C5 outcomes: passes 41 grades (10.00-12.00 %)
+   C5 over the design's slot extent, L67 (180 s to 180 + L + 8 s): passes 41 grades (10.00-12.00 %); smallest gated margin 0.2280 at 10.00 %
+   C5 over the design's slot extent, L85 (180 s to 180 + L + 8 s): passes 41 grades (10.00-12.00 %); smallest gated margin 0.2280 at 10.00 %
+   smallest held margin 0.5137 at 10.00 %; largest 0.5137
+   smallest held (ungated) margin 0.0181 at 12.00 %; largest 0.1318
+   smallest rejected margin 0.2280 at 10.00 %; largest 0.3888
+   held: ['4', '6']; gated share 0.985-0.985
+   delivery, whole_climb (531 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall -0.01 Nm
+   delivery, first_77s (77 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall -0.13 Nm
+   baseline peak minus knee -14.8 to +19.7 K
+
+honda_l15b7
+   C5 outcomes: passes 41 grades (10.00-12.00 %)
+   C5 over the design's slot extent, L67 (180 s to 180 + L + 8 s): passes 41 grades (10.00-12.00 %); smallest gated margin 0.2358 at 10.00 %
+   C5 over the design's slot extent, L85 (180 s to 180 + L + 8 s): passes 41 grades (10.00-12.00 %); smallest gated margin 0.2358 at 10.00 %
+   smallest kickdown margin 0.2358 at 10.00 %; largest 0.2358
+   held: ['economy', 'power-limited']; gated share 0.985-0.985
+   delivery, whole_climb (531 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall 1.89 Nm
+   delivery, first_77s (77 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall 1.89 Nm
+   baseline peak minus knee -2.0 to +16.9 K
+
+ford_27tt
+   C5 outcomes: passes 28 grades (10.00-12.00 %); fails 13 grades (11.20-11.80 %)
+   C5 over the design's slot extent, L67 (180 s to 180 + L + 8 s): passes 28 grades (10.00-12.00 %); fails 13 grades (11.20-11.80 %); smallest gated margin 0.0006 at 11.50 %
+   C5 over the design's slot extent, L85 (180 s to 180 + L + 8 s): passes 28 grades (10.00-12.00 %); fails 13 grades (11.20-11.80 %); smallest gated margin 0.0006 at 11.50 %
+   smallest held margin 0.0006 at 11.50 %; largest 0.1793
+   smallest held (ungated) margin 0.2285 at 12.00 %; largest 0.2483
+   smallest rejected margin 0.0023 at 11.55 %; largest 0.5409
+   held: ['3', '4', '6']; gated share 0.985-0.985
+   delivery, whole_climb (531 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall 0.66 Nm
+   delivery, first_77s (77 steps): over tolerance 0-0 steps; under 95 % 0-0; largest shortfall 0.66 Nm
+   baseline peak minus knee +47.9 to +100.6 K
+
+per grade (C5 outcome, smallest gated margin, delivery over tolerance whole/first 77 s):
+  b58: 10.00:p/0.088/0/0 10.05:p/0.092/0/0 10.10:p/0.096/0/0 10.15:p/0.100/0/0 10.20:p/0.103/0/0 10.25:p/0.107/0/0 10.30:p/0.111/0/0 10.35:p/0.115/0/0 10.40:p/0.118/0/0 10.45:p/0.122/0/0 10.50:p/0.126/0/0 10.55:p/0.130/0/0 10.60:p/0.133/0/0 10.65:p/0.137/0/0 10.70:p/0.141/0/0 10.75:p/0.145/0/0 10.80:p/0.148/0/0 10.85:p/0.152/0/0 10.90:p/0.156/0/0 10.95:p/0.159/0/0 11.00:p/0.159/0/0 11.05:p/0.157/0/0 11.10:p/0.154/0/0 11.15:p/0.151/0/0 11.20:p/0.149/0/0 11.25:p/0.146/0/0 11.30:p/0.143/0/0 11.35:p/0.140/0/0 11.40:p/0.138/0/0 11.45:p/0.135/0/0 11.50:p/0.132/0/0 11.55:p/0.130/0/0 11.60:p/0.127/0/0 11.65:p/0.124/0/0 11.70:p/0.122/0/0 11.75:p/0.119/0/0 11.80:p/0.116/0/0 11.85:p/0.113/0/0 11.90:p/0.111/0/0 11.95:p/0.108/0/0 12.00:p/0.105/0/0
+  mazda_25t: 10.00:p/0.228/0/0 10.05:p/0.232/0/0 10.10:p/0.236/0/0 10.15:p/0.240/0/0 10.20:p/0.244/0/0 10.25:p/0.248/0/0 10.30:p/0.252/0/0 10.35:p/0.256/0/0 10.40:p/0.260/0/0 10.45:p/0.264/0/0 10.50:p/0.268/0/0 10.55:p/0.272/0/0 10.60:p/0.276/0/0 10.65:p/0.280/0/0 10.70:p/0.284/0/0 10.75:p/0.288/0/0 10.80:p/0.292/0/0 10.85:p/0.296/0/0 10.90:p/0.300/0/0 10.95:p/0.305/0/0 11.00:p/0.309/0/0 11.05:p/0.313/0/0 11.10:p/0.317/0/0 11.15:p/0.321/0/0 11.20:p/0.325/0/0 11.25:p/0.329/0/0 11.30:p/0.333/0/0 11.35:p/0.337/0/0 11.40:p/0.341/0/0 11.45:p/0.345/0/0 11.50:p/0.349/0/0 11.55:p/0.353/0/0 11.60:p/0.357/0/0 11.65:p/0.361/0/0 11.70:p/0.365/0/0 11.75:p/0.369/0/0 11.80:p/0.373/0/0 11.85:p/0.377/0/0 11.90:p/0.381/0/0 11.95:p/0.385/0/0 12.00:p/0.389/0/0
+  honda_l15b7: 10.00:p/0.236/0/0 10.05:p/0.236/0/0 10.10:p/0.236/0/0 10.15:p/0.236/0/0 10.20:p/0.236/0/0 10.25:p/0.236/0/0 10.30:p/0.236/0/0 10.35:p/0.236/0/0 10.40:p/0.236/0/0 10.45:p/0.236/0/0 10.50:p/0.236/0/0 10.55:p/0.236/0/0 10.60:p/0.236/0/0 10.65:p/0.236/0/0 10.70:p/0.236/0/0 10.75:p/0.236/0/0 10.80:p/0.236/0/0 10.85:p/0.236/0/0 10.90:p/0.236/0/0 10.95:p/0.236/0/0 11.00:p/0.236/0/0 11.05:p/0.236/0/0 11.10:p/0.236/0/0 11.15:p/0.236/0/0 11.20:p/0.236/0/0 11.25:p/0.236/0/0 11.30:p/0.236/0/0 11.35:p/0.236/0/0 11.40:p/0.236/0/0 11.45:p/0.236/0/0 11.50:p/0.236/0/0 11.55:p/0.236/0/0 11.60:p/0.236/0/0 11.65:p/0.236/0/0 11.70:p/0.236/0/0 11.75:p/0.236/0/0 11.80:p/0.236/0/0 11.85:p/0.236/0/0 11.90:p/0.236/0/0 11.95:p/0.236/0/0 12.00:p/0.236/0/0
+  ford_27tt: 10.00:p/0.089/0/0 10.05:p/0.086/0/0 10.10:p/0.083/0/0 10.15:p/0.080/0/0 10.20:p/0.077/0/0 10.25:p/0.074/0/0 10.30:p/0.071/0/0 10.35:p/0.068/0/0 10.40:p/0.065/0/0 10.45:p/0.062/0/0 10.50:p/0.059/0/0 10.55:p/0.056/0/0 10.60:p/0.053/0/0 10.65:p/0.051/0/0 10.70:p/0.048/0/0 10.75:p/0.045/0/0 10.80:p/0.042/0/0 10.85:p/0.039/0/0 10.90:p/0.036/0/0 10.95:p/0.033/0/0 11.00:p/0.030/0/0 11.05:p/0.027/0/0 11.10:p/0.024/0/0 11.15:p/0.021/0/0 11.20:f/0.018/0/0 11.25:f/0.015/0/0 11.30:f/0.012/0/0 11.35:f/0.009/0/0 11.40:f/0.006/0/0 11.45:f/0.004/0/0 11.50:f/0.001/0/0 11.55:f/0.002/0/0 11.60:f/0.005/0/0 11.65:f/0.008/0/0 11.70:f/0.011/0/0 11.75:f/0.014/0/0 11.80:f/0.017/0/0 11.85:p/0.020/0/0 11.90:p/0.023/0/0 11.95:p/0.026/0/0 12.00:p/0.029/0/0

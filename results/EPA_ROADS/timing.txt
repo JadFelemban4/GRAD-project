@@ -1,0 +1,20 @@
+TIMING: one 900 s road (SYNTHETIC (seed 101, not roads_seed); 4 climbs, 900 samples), 14 closed-loop runs at once at 14 jobs; wall 155.9 s
+per run: min 151.5 s, median 153.9 s, max 155.3 s
+per step: min 0.1685 s, median 0.1712 s, max 0.1727 s
+cpu_count 20; python.exe processes running before the wave (this one included): 2; other work on the machine is not controlled
+
+
+   b58          cg         155.3 s  899 steps  0.1727 s/step
+   mazda_25t    cg         151.5 s  899 steps  0.1685 s/step
+   honda_l15b7  cg         154.5 s  899 steps  0.1718 s/step
+   ford_27tt    cg         152.4 s  899 steps  0.1695 s/step
+   b58          b          154.6 s  899 steps  0.1720 s/step
+   mazda_25t    b          153.8 s  899 steps  0.1711 s/step
+   honda_l15b7  b          154.1 s  899 steps  0.1714 s/step
+   ford_27tt    b          153.8 s  899 steps  0.1710 s/step
+   b58          a_b        154.0 s  899 steps  0.1713 s/step
+   mazda_25t    a_b        152.9 s  899 steps  0.1701 s/step
+   honda_l15b7  a_b        154.8 s  899 steps  0.1722 s/step
+   ford_27tt    a_b        152.2 s  899 steps  0.1693 s/step
+   b58          neutral    154.4 s  899 steps  0.1718 s/step
+   mazda_25t    neutral    152.6 s  899 steps  0.1698 s/step

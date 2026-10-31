@@ -4620,3 +4620,27 @@ Last verified: 2026-10-30 (on `GRA-test`, commit D `25437ba`) — verify_docs.py
    (PLAN.md 8.5); schema 4 (decisions 27, 28) before any EPA engine trains; the
    preregistration; L8 and the dump comparison on the training device. First:
    decisions 94 onward (the roads' design, the rules for Run 2's outcomes).
+
+# Part X — lines rotated out of CHECKPOINT.md, 30 October 2026 (GRA-test: 0.13 and 0.42 retired by the roads step's control)
+
+<!-- RETIRED-OK: 0.13, 0.42 -- decision 34's section G figures, retired 30 October 2026 by the direct runs of `python roads_ceiling.py control` (results/EPA_ROADS/control.txt) -->
+- On the locked climb no use of the preview can save more than 0.13 points of cut
+  with the agent's own levers (0.42 with unlimited preview) against the MEI of
+  5.43 (`python preview_ceiling.py` -> `results/preview_ceiling.txt`): the climb
+  that X1 and X2 were scored on cannot show a preview effect (decision 34). Direct
+  runs give about half of both (`results/EPA_ROADS/probe_2026-10-30/repro.txt`).
+
+# Part Y — lines rotated out of CHECKPOINT.md, 31 October 2026 (GRA-test: sections J and K answered, the roads code and the Ford's cap built)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `22561da`:
+
+  answered decisions 1-120 (`results/VALIDATION_DECISIONS.md`; section I, 30
+  October: A+G, the reward without knock). Next: `docs/build_step_2/ORDER_TO_TRAINING.md`
+  steps 3 and 4. Training runs on another device, not this laptop (21 October).
+
+From "Next actions", item 8, as committed at `22561da`:
+
+   order (section I's rows govern it). Next: the device benchmark (step 3) and the
+   roads code (step 4), in which each of you records the sha256 of a private integer
+   (row 96). Nothing in PLANT_CODE or `epa_freeze.CODE_HASHED` changes before the last
+   commit F; `test_epa_rows` fails once until commit G, disclosed (row 120).

@@ -1,0 +1,312 @@
+{
+ "what": "the control (row 103, 'To implement'): the B58's locked climb against results/premise.json, and the direct-run lambda rows that replace section G's open-loop ones",
+ "points_of": 848.8852294186156,
+ "rows": {
+  "pred": {
+   "windows": [
+    [
+     150.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 24.977676098573113,
+   "dT_179_K": 2.2705348137982355,
+   "open_loop_pts": 0.03168744768667301,
+   "closed_knock_pts": -0.009439037180864383,
+   "closed_noknock_pts": 0.035946481038751275,
+   "d_turb": 0.30724664029128235,
+   "d_oil": -0.0021022722576446995,
+   "d_knockterm": -0.38527093126299494,
+   "fuel_extra_pct": 0.09990897994915926,
+   "seconds": 122.08404039987363
+  },
+  "lam_H14": {
+   "windows": [
+    [
+     166.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24117916799594,
+   "dT_179_K": 2.0873531142631236,
+   "open_loop_pts": 0.0291329743569138,
+   "closed_knock_pts": 0.011658647670602427,
+   "closed_noknock_pts": 0.035195281045727445,
+   "d_turb": 0.30183659505388505,
+   "d_oil": -0.0030690528042924825,
+   "d_knockterm": -0.1997990203877631,
+   "fuel_extra_pct": 0.14452379586564756,
+   "seconds": 121.83301860000938
+  },
+  "lam_H15": {
+   "windows": [
+    [
+     165.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24117126172712,
+   "dT_179_K": 2.243656000077067,
+   "open_loop_pts": 0.031309135559722,
+   "closed_knock_pts": 0.013837015992129793,
+   "closed_noknock_pts": 0.03736948737838669,
+   "d_turb": 0.3205056257493766,
+   "d_oil": -0.00328156708480698,
+   "d_knockterm": -0.19976364095786447,
+   "fuel_extra_pct": 0.15523103895185297,
+   "seconds": 122.01948769995943
+  },
+  "lam_H30": {
+   "windows": [
+    [
+     150.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24180074869315,
+   "dT_179_K": 4.4300199382995515,
+   "open_loop_pts": 0.06167217274600284,
+   "closed_knock_pts": 0.04418990185510548,
+   "closed_noknock_pts": 0.06766832865100972,
+   "d_turb": 0.5810359994608802,
+   "d_oil": -0.006609552548084707,
+   "d_knockterm": -0.1993049027665994,
+   "fuel_extra_pct": 0.3158445268240051,
+   "seconds": 121.1893702999223
+  },
+  "lam_H45": {
+   "windows": [
+    [
+     135.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24237839334455,
+   "dT_179_K": 6.343690016505661,
+   "open_loop_pts": 0.08813144965023255,
+   "closed_knock_pts": 0.0706052355739848,
+   "closed_noknock_pts": 0.09403509579719146,
+   "d_turb": 0.808092081368045,
+   "d_oil": -0.009842042676050156,
+   "d_knockterm": -0.1988926207105175,
+   "fuel_extra_pct": 0.47646211154046547,
+   "seconds": 122.23714759992436
+  },
+  "lam_H47": {
+   "windows": [
+    [
+     133.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.242462795809615,
+   "dT_179_K": 6.579985962193746,
+   "open_loop_pts": 0.09139111999109611,
+   "closed_knock_pts": 0.07385547910593217,
+   "closed_noknock_pts": 0.09727934278316935,
+   "d_turb": 0.8360665136993362,
+   "d_oil": -0.010276541537526995,
+   "d_knockterm": -0.19884170909408727,
+   "fuel_extra_pct": 0.4978778097832981,
+   "seconds": 121.63486150000244
+  },
+  "lam_H60": {
+   "windows": [
+    [
+     120.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24289099155055,
+   "dT_179_K": 8.01626109564097,
+   "open_loop_pts": 0.11116941995098625,
+   "closed_knock_pts": 0.09356228951157117,
+   "closed_noknock_pts": 0.11695018756563356,
+   "d_turb": 1.0058169152264895,
+   "d_oil": -0.013044047204569864,
+   "d_knockterm": -0.19853639904892617,
+   "fuel_extra_pct": 0.6370819744520029,
+   "seconds": 121.34355490002781
+  },
+  "lam_H90": {
+   "windows": [
+    [
+     90.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24376108682361,
+   "dT_179_K": 10.746660128580174,
+   "open_loop_pts": 0.14860544975503254,
+   "closed_knock_pts": 0.13074324935272708,
+   "closed_noknock_pts": 0.15406126658014588,
+   "d_turb": 1.327023273316911,
+   "d_oil": -0.019219937062832315,
+   "d_knockterm": -0.1979431754254639,
+   "fuel_extra_pct": 0.9583270065744998,
+   "seconds": 121.83702019997872
+  },
+  "lam_H100": {
+   "windows": [
+    [
+     80.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24399970422394,
+   "dT_179_K": 11.500196336003114,
+   "open_loop_pts": 0.15890002278852544,
+   "closed_knock_pts": 0.1409360889670809,
+   "closed_noknock_pts": 0.16423457573223055,
+   "d_turb": 1.4154131086215784,
+   "d_oil": -0.02125005363232546,
+   "d_knockterm": -0.19777736844704652,
+   "fuel_extra_pct": 1.0654092044766639,
+   "seconds": 121.22161759994924
+  },
+  "lam_H130": {
+   "windows": [
+    [
+     50.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24453902833312,
+   "dT_179_K": 13.373086481429596,
+   "open_loop_pts": 0.18441858677773326,
+   "closed_knock_pts": 0.16610496077824632,
+   "closed_noknock_pts": 0.18935343947251554,
+   "d_turb": 1.634561039211178,
+   "d_oil": -0.027167660132917604,
+   "d_knockterm": -0.19735290444279396,
+   "fuel_extra_pct": 1.386652984819503,
+   "seconds": 122.15100409998558
+  },
+  "lam_H150": {
+   "windows": [
+    [
+     30.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.24467430776281,
+   "dT_179_K": 14.347323835209295,
+   "open_loop_pts": 0.19765458416307655,
+   "closed_knock_pts": 0.1790836337811248,
+   "closed_noknock_pts": 0.2023054940422957,
+   "d_turb": 1.7482904952348122,
+   "d_oil": -0.03094903800745996,
+   "d_knockterm": -0.19712692268074328,
+   "fuel_extra_pct": 1.6008100636039746,
+   "seconds": 121.47426559985615
+  },
+  "lam_all": {
+   "windows": [
+    [
+     20.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": 55.244766895374255,
+   "dT_179_K": 14.765629845314834,
+   "open_loop_pts": 0.2033296791629798,
+   "closed_knock_pts": 0.18462396728576344,
+   "closed_noknock_pts": 0.20783382344841403,
+   "d_turb": 1.7970633207492597,
+   "d_oil": -0.03279269175967947,
+   "d_knockterm": -0.1970250087558414,
+   "fuel_extra_pct": 1.707868458335482,
+   "seconds": 121.8901312998496
+  },
+  "egt_H30": {
+   "windows": [
+    [
+     150.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": null,
+   "dT_179_K": 90.61225777472612,
+   "open_loop_pts": 1.1506112654342415,
+   "closed_knock_pts": 1.1506112654342415,
+   "closed_noknock_pts": 1.1506112654342415,
+   "d_turb": 9.767369080297897,
+   "d_oil": 0.0,
+   "d_knockterm": 0.0,
+   "fuel_extra_pct": 0.0,
+   "seconds": 53.326911200070754
+  },
+  "egt_all": {
+   "windows": [
+    [
+     20.0,
+     180.0
+    ]
+   ],
+   "dEGT_K": null,
+   "dT_179_K": 309.28517375461195,
+   "open_loop_pts": 3.261593450904385,
+   "closed_knock_pts": 3.2615934509043583,
+   "closed_noknock_pts": 3.261593450904385,
+   "d_turb": 27.687185048412232,
+   "d_oil": 0.0,
+   "d_knockterm": 0.0,
+   "fuel_extra_pct": 0.0,
+   "seconds": 53.35127320000902
+  }
+ },
+ "checks": {
+  "neutral_damage": 848.0516173749937,
+  "neutral_damage_base": 848.8852294186156,
+  "cg_damage": 449.6249661202416,
+  "premise_neutral_damage": 848.0516173749937,
+  "premise_damage_base": 848.8852294186156,
+  "premise_cg_damage": 449.6249661202416,
+  "neutral_matches": true,
+  "base_matches": true,
+  "cg_matches": true,
+  "replay_self_max_abs_k": 0.0
+ },
+ "section_g_replay": {
+  "egt_drop_k": 68.11749795881693,
+  "dT_179_K": 8.781591877294318,
+  "points": 0.12164471404766913,
+  "what": "section G's method (results/preview_ceiling.py's assumed drop, cg's flow), replayed on today's sub-stepped housing, lambda bound for 30 s",
+  "drop_source": "preview_ceiling.py's own drop, from the 30 September traces it reads, unrounded; row 103's 68.2 K is the probe's 25.0 K x 0.15 / 0.055 (probe_2026-10-30/repro_an.py.txt), which gives 8.79 K there"
+ },
+ "tau_cg_flat_median_s": 127.88837940065243,
+ "tau_cg_climb_median_s": 46.93335468875419,
+ "retired": {
+  "lam_H30": {
+   "direct_open": 0.06167217274600284,
+   "direct_closed_knock": 0.04418990185510548,
+   "direct_closed_noknock": 0.06766832865100972
+  },
+  "lam_all": {
+   "direct_open": 0.2033296791629798,
+   "direct_closed_knock": 0.18462396728576344,
+   "direct_closed_noknock": 0.20783382344841403
+  }
+ },
+ "runs": 16,
+ "jobs": 14,
+ "wall_s": 175.04837729991414,
+ "provenance": {
+  "git_head": "22561da15dc1efd7ef77ff5aa9561280efde361b",
+  "tree_changes": 17,
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "cpu_count": 20,
+  "plants": {
+   "b58": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "engine_sha": "023f5589215ee68e"
+   }
+  },
+  "module_sha256": "5e4beccea9b1ff8d1f2257d5f60e9e3d711ac9677902610779292ad44f3cc5f5"
+ }
+}

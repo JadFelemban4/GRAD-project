@@ -38,11 +38,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   and Ford 2.7 TT are in `logs/epa/`, read by `epa_map.py` into `data/engines/`
   (`python test_epa_map.py`); the four cars' published values in
   `engine_specs/cars/`.
-- On the locked climb no use of the preview can save more than 0.13 points of cut
-  with the agent's own levers (0.42 with unlimited preview) against the MEI of
-  5.43 (`python preview_ceiling.py` -> `results/preview_ceiling.txt`): the climb
-  that X1 and X2 were scored on cannot show a preview effect (decision 34). Direct
-  runs give about half of both (`results/EPA_ROADS/probe_2026-10-30/repro.txt`).
+- On the locked climb the λ trim at its bound saves 0.068 points of cut in the
+  30 s before the climb (0.062 open loop, 0.044 with knock), and 0.208 over the
+  whole flat with unlimited preview (0.203, 0.185), against the MEI of 5.43
+  (`python roads_ceiling.py control` -> `results/EPA_ROADS/control.txt`): the climb
+  that X1 and X2 were scored on cannot show a preview effect (decision 34).
 - No road the ceiling probe tried reaches decision 34's 2 MEI on all four engines:
   λ is the only lever that cools the housing, and the Ford's best is 4.24 points,
   0.78 MEI (`results/EPA_ROADS/probe_2026-10-30/summary.txt`; section I, row 103).
@@ -78,9 +78,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
   made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Both have
-  answered decisions 1-120 (`results/VALIDATION_DECISIONS.md`; section I, 30
-  October: A+G, the reward without knock). Next: `docs/build_step_2/ORDER_TO_TRAINING.md`
-  steps 3 and 4. Training runs on another device, not this laptop (21 October).
+  answered decisions 1-132 (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no
+  knock term; J-L, 31 October, L under Ghassan's standing approval). Roads code: R0a; R0
+  waits for the two sha256 lines. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+  Training runs on another device, not this laptop (21 October).
 
 ## Blockers
 
@@ -114,10 +115,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    `wideair_dt1`, though X2's result was published on 13 October (session
    report of 15 October, 2.3).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (section I's rows govern it). Next: the device benchmark (step 3) and the
-   roads code (step 4), in which each of you records the sha256 of a private integer
-   (row 96). Nothing in PLANT_CODE or `epa_freeze.CODE_HASHED` changes before the last
-   commit F; `test_epa_rows` fails once until commit G, disclosed (row 120).
+   order (sections I-L). Next: C1, R3a, step 8a (row 125's N); each of you sends the sha256
+   of a private 256-bit integer (row 96); then R0, the push and the reveal. Pause Windows
+   updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
+   else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device, before any training: install from

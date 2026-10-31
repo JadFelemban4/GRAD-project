@@ -1,0 +1,174 @@
+{
+ "what": "one 900 s SYNTHETIC road timed closed loop, all runs at once",
+ "label": "SYNTHETIC (seed 101, not roads_seed)",
+ "road": {
+  "k": 0,
+  "climbs": [
+   {
+    "onset_s": 168.0,
+    "L_s": 84.0,
+    "grade": 0.10718842066683147
+   },
+   {
+    "onset_s": 315.0,
+    "L_s": 81.0,
+    "grade": 0.11182556370458824
+   },
+   {
+    "onset_s": 508.0,
+    "L_s": 72.0,
+    "grade": 0.11845451372845828
+   },
+   {
+    "onset_s": 708.0,
+    "L_s": 83.0,
+    "grade": 0.10728276852581047
+   }
+  ],
+  "steps": 900
+ },
+ "jobs": 14,
+ "concurrent_runs": 14,
+ "wall_s": 155.89349060016684,
+ "runs": [
+  {
+   "engine": "b58",
+   "policy": "cg",
+   "seconds": 155.26584140001796,
+   "steps": 899,
+   "s_per_step": 0.17270950100113233
+  },
+  {
+   "engine": "mazda_25t",
+   "policy": "cg",
+   "seconds": 151.47586590005085,
+   "steps": 899,
+   "s_per_step": 0.1684937329255293
+  },
+  {
+   "engine": "honda_l15b7",
+   "policy": "cg",
+   "seconds": 154.46595740015619,
+   "steps": 899,
+   "s_per_step": 0.1718197523917199
+  },
+  {
+   "engine": "ford_27tt",
+   "policy": "cg",
+   "seconds": 152.36371730011888,
+   "steps": 899,
+   "s_per_step": 0.16948133181325792
+  },
+  {
+   "engine": "b58",
+   "policy": "b",
+   "seconds": 154.6041256999597,
+   "steps": 899,
+   "s_per_step": 0.17197344349272492
+  },
+  {
+   "engine": "mazda_25t",
+   "policy": "b",
+   "seconds": 153.80912779993378,
+   "steps": 899,
+   "s_per_step": 0.17108912992206204
+  },
+  {
+   "engine": "honda_l15b7",
+   "policy": "b",
+   "seconds": 154.07372620003298,
+   "steps": 899,
+   "s_per_step": 0.1713834551724505
+  },
+  {
+   "engine": "ford_27tt",
+   "policy": "b",
+   "seconds": 153.75163189996965,
+   "steps": 899,
+   "s_per_step": 0.17102517452721874
+  },
+  {
+   "engine": "b58",
+   "policy": "a_b",
+   "seconds": 153.99685509991832,
+   "steps": 899,
+   "s_per_step": 0.17129794783083238
+  },
+  {
+   "engine": "mazda_25t",
+   "policy": "a_b",
+   "seconds": 152.89792219991796,
+   "steps": 899,
+   "s_per_step": 0.17007555305886313
+  },
+  {
+   "engine": "honda_l15b7",
+   "policy": "a_b",
+   "seconds": 154.76602280000225,
+   "steps": 899,
+   "s_per_step": 0.17215352925473
+  },
+  {
+   "engine": "ford_27tt",
+   "policy": "a_b",
+   "seconds": 152.23533609998412,
+   "steps": 899,
+   "s_per_step": 0.16933852736371982
+  },
+  {
+   "engine": "b58",
+   "policy": "neutral",
+   "seconds": 154.4198100999929,
+   "steps": 899,
+   "s_per_step": 0.17176842057841257
+  },
+  {
+   "engine": "mazda_25t",
+   "policy": "neutral",
+   "seconds": 152.63569089979865,
+   "steps": 899,
+   "s_per_step": 0.16978386084515978
+  }
+ ],
+ "python_processes_before": 2,
+ "seconds": {
+  "min": 151.47586590005085,
+  "median": 153.90299144992605,
+  "max": 155.26584140001796
+ },
+ "s_per_step": {
+  "min": 0.1684937329255293,
+  "median": 0.17119353887644723,
+  "max": 0.17270950100113233
+ },
+ "provenance": {
+  "git_head": "22561da15dc1efd7ef77ff5aa9561280efde361b",
+  "tree_changes": 17,
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "cpu_count": 20,
+  "plants": {
+   "b58": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "engine_sha": "023f5589215ee68e"
+   },
+   "mazda_25t": {
+    "plant_sha": "f86baf59389dea29",
+    "engine_sha": "2558cb2bcad4f2c6"
+   },
+   "honda_l15b7": {
+    "plant_sha": "a4e6138b9d258b1f",
+    "engine_sha": "ae07dfb4edb9ceb3"
+   },
+   "ford_27tt": {
+    "plant_sha": "cec3e3faefe47172",
+    "engine_sha": "671b624ae11e0916"
+   }
+  },
+  "module_sha256": "5e4beccea9b1ff8d1f2257d5f60e9e3d711ac9677902610779292ad44f3cc5f5"
+ }
+}
