@@ -4657,3 +4657,21 @@ From "Next actions", item 10, as committed at `780e518`:
 
    torch in a second environment); run `python benchmark_training.py` there, which
    decides CPU or GPU and checks that seed 0 trains identically twice; then
+
+# Part AA — lines rotated out of CHECKPOINT.md, 31 October 2026 (GRA-test: Ghassan works alone, row 133)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `1715c83`:
+
+- Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
+  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Both have
+  answered decisions 1-132 (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no
+  knock term; J-L, 31 October, L under Ghassan's standing approval). Roads code: R0a; R0
+  waits for the two sha256 lines. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+
+From "Next actions", item 8, as committed at `1715c83`:
+
+8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
+   order (sections I-L). Done 31 October: R0a, C1, N, K, R3a. Next: each of you sends the sha256
+   of a private 256-bit integer (row 96); then R0, the push and the reveal. Pause Windows
+   updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
+   else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).

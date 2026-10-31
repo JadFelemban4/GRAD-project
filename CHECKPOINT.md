@@ -77,10 +77,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
-  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Both have
-  answered decisions 1-132 (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no
-  knock term; J-L, 31 October, L under Ghassan's standing approval). Roads code: R0a; R0
-  waits for the two sha256 lines. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
+  1-133 are answered (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no
+  knock term; J-L, 31 October, L under Ghassan's standing approval; M: he works alone, row 133).
+  Roads code: R0a; then R0, the draw, R3b. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 
 ## Blockers
@@ -114,8 +114,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
    October); `GRA-test`'s has it since C1 (ORDER step 7).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (sections I-L). Done 31 October: R0a, C1, N, K, R3a. Next: each of you sends the sha256
-   of a private 256-bit integer (row 96); then R0, the push and the reveal. Pause Windows
+   order (sections I-M). Done 31 October: R0a, C1, N, K, R3a. Next: R0 with the hash lines the
+   agents make (row 133); the reveal and the draw; R3b. Ghassan: pause Windows
    updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
    else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new

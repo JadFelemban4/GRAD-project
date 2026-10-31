@@ -79,3 +79,19 @@ the step it governs. The Desktop copy is `decisions_2026-10-31_L.md`.
   committed; each row says so where it relies on one.
 - Steps 12a and 14-16 change files that stay frozen until step 12 or the last commit F, so
   none of their code was written; rows 127 and 128 and ORDER say what each must carry.
+
+## 6. Later the same day: Ghassan works alone (row 133)
+
+Ghassan then wrote: "mate image me working alone no one else and honestly i dont want to do
+things myself do all the steps approve what you recommend and i am with you". Row 133 records
+what follows. Jad's column is no longer filled. The agents answer new rows with their
+recommendation and do every step that needs no other machine. Row 96's two integers are made
+together, by one command that writes them to two files outside the repository and prints only
+their hash lines. Row 111's statements are recorded as Ghassan's signature of both. The
+thesis discloses that one person, with the agents, held both integers.
+
+Two things remain Ghassan's, because the agents may not do them. CLAUDE.md is the agents'
+own instruction file, and the permission check refuses the agents' edits to it: gate item 6's
+bracket (the waiver of row 111 (ii)) and mistake 26's one-line rule are his edits. Pausing
+Windows updates needs the Settings switch, since the agents' shell is not elevated. The
+training device's steps (3, 18, 21 and 22) need someone, or an agent session, on that device.
