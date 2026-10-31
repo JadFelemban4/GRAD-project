@@ -11,6 +11,11 @@ reward, and commit the output with the change.
     python test_reward.py --duration 900 # the full scenario, slower
     python test_reward.py --road random  # PHASE D2: the four ORIGINAL checks on
                                          # the corners of the randomised climb
+    python test_reward.py --engine E --train-road R --roads FILE
+                                         # ROW 119: engine E's own gate, in its own
+                                         # car, on training road R and decision 34's
+                                         # roads (engine_gate.py); --synthetic-seed N
+                                         # in place of --roads tests it, SYNTHETIC
 
 PHASE D2 -- `--road random`
 ---------------------------
@@ -107,7 +112,30 @@ on the B58 in its Supra, passed explicitly (PLANT): the band grade and the D2
 notch below are that car's, measured on its gearbox, so this gate is the B58's.
 The step of the fixed-road rollouts, 0.2 s, is passed explicitly too; it was
 the default of both the environment and make_grade_climb. Another engine gets
-its own gate (test_reward.py --engine, a later step), with its own band and notch.
+its own gate (test_reward.py --engine, below), with its own band and notch.
+
+THE PER-ENGINE GATE (31 October 2026, row 119; ORDER_TO_TRAINING.md step 7).
+`--engine E` runs engine_gate.py's gate on E in its own car: its band grade and
+gearbox notches (the CVT: decision 40's kickdown threshold) from a 0.05 % grade
+sweep, then row 116's training road (--train-road, train.py's name for it) and
+decision 34's roads (--roads, a roads record; or --synthetic-seed, a test of the
+code that says SYNTHETIC), and the blind-arm check per H. Any of the four engines,
+the B58 among them: the four-engine test trains every engine on those roads, and
+this file's own checks below do not cover them. What waits for the plant commit
+(H as an environment parameter, row 117) is printed NOT RUN and keeps the gate
+from passing. So does the reward the test trains on: the team chose it without
+the knock term (row 113 (5)), behind an environment option of the plant commit
+whose default is X1's, knock in (row 118). Until that commit the per-engine gate
+runs the reward with the knock term; after it, the gate passes the option
+(engine_gate.py's docstring, WHAT WAITS).
+
+NO DEFAULT ENGINE (CLAUDE.md mistake 1; test_engine_threading.py). The run without
+--engine is not a default engine: it is the B58's committed gate, whose constants
+below (BAND_GRADE, D2_ROADS) are that car's, and it names its plant in PLANT; it
+prints what it printed before --engine existed, byte for byte. Every per-engine
+run names its engine, and every function of engine_gate.py takes the plant as a
+required argument, which test_engine_threading.py's scan checks. The per-engine
+options are refused without --engine, and --road and --duration with it.
 """
 import argparse
 from concurrent.futures import ProcessPoolExecutor
@@ -340,18 +368,49 @@ def road_roll(job):
     return kind, policy, float(np.mean(rs)), float(np.percentile(errs, 95))
 
 
+def main_engine(a, ap):
+    """Row 119's gate on one engine in its own car (engine_gate.py's docstring says what it runs)."""
+    if a.road is not None or a.duration is not None:
+        ap.error("--road and --duration belong to the B58's committed gate; the per-engine gate's roads "
+                 "and lengths are engine_gate.py's")
+    if not a.train_road:
+        ap.error("--train-road is required with --engine: the training road row 116 names, as train.py "
+                 "calls it")
+    if a.roads is None and a.synthetic_seed is None:
+        ap.error("decision 34's roads: give --roads FILE (a roads record) or --synthetic-seed N")
+    import engine_gate as G
+    return G.print_gate(G.run_gate(a.engine, train_road=a.train_road, roads_file=a.roads,
+                                   synthetic_seed=a.synthetic_seed, jobs=a.jobs))
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--duration", type=float, default=300.0)
-    ap.add_argument("--road", choices=("fixed", "random"), default="fixed",
+    # --duration and --road default to None so that the per-engine gate can refuse them; without
+    # --engine they are 300 s and "fixed", as they always were
+    ap.add_argument("--duration", type=float, default=None)
+    ap.add_argument("--road", choices=("fixed", "random"), default=None,
                     help="'random' runs the four checks on the Phase D2 roads "
                          "listed in D2_ROADS instead of the fixed climb")
     ap.add_argument("--jobs", type=int, default=10,
-                    help="parallel rollouts for --road random")
+                    help="parallel rollouts for --road random and for --engine")
+    ap.add_argument("--engine", choices=engines.known(), default=None,
+                    help="ROW 119: this engine's own gate, in its own car (engine_gate.py). No "
+                         "default engine: without it this file runs the B58's committed gate")
+    ap.add_argument("--train-road", help="with --engine: the training road, as train.py names it "
+                                         "(row 116's)")
+    src = ap.add_mutually_exclusive_group()
+    src.add_argument("--roads", metavar="FILE", help="with --engine: decision 34's roads, a roads record "
+                                                     "(results/EPA_ROADS/roads.json's form)")
+    src.add_argument("--synthetic-seed", type=int, help="with --engine: decision 34's generator on a "
+                                                        "SYNTHETIC seed, a test of the code (no roads_seed)")
     a = ap.parse_args()
+    if a.engine is not None:
+        raise SystemExit(main_engine(a, ap))
+    if a.train_road is not None or a.roads is not None or a.synthetic_seed is not None:
+        ap.error("--train-road, --roads and --synthetic-seed belong to the per-engine gate: give --engine")
     if a.road == "random":
         raise SystemExit(main_random_road(a.jobs))
-    dur = a.duration
+    dur = a.duration if a.duration is not None else 300.0
 
     # The training-road rollouts are independent; run them while the rest runs.
     roads = [("band", 0, "neutral", 300.0)] + [

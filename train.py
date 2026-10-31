@@ -4,12 +4,24 @@ Trains a SAC agent on the engine environment and saves everything Phase D needs.
 
     pip install "stable-baselines3[extra]"      # once; also uncomment it in requirements.txt
 
-A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Five designs exist:
+A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Six designs exist:
+
+    --road four_engine  dt 1.0   the four-engine test (31 Oct; row 116 of results/
+                              VALIDATION_DECISIONS.md): one generator for all four engines,
+                              its arrays the same for every car -- ambient 25-45 C; from rest,
+                              a speed target 60-150 km/h changing mid-run, every speed change
+                              at 0.8 m/s^2 at most (the launch included), slowing on a hill too
+                              steep for its speed and coasting no faster than the road allows
+                              (four_engine_roads' notional car, which reads no car); hills
+                              0-18 % with every change an 8 s ramp, 900 s -- and the housing's
+                              heat capacity drawn per episode
+                              (four_engine_roads.FourEngineRoads) -> runs/four_engine_dt1/
 
     --road wideair   dt 1.0   X2 (11 Oct, results/PREREGISTRATION_X2.md): the extremes
                               roads in wider air, ambient 0-45 C and pressure 80-101.3 kPa
                               drawn per episode, the compressor inlet following the
-                              pressure (wide_air.WideAirTrainingEnv) -> runs/wideair_dt1/
+                              pressure (wide_air.WideAirTrainingEnv) -> runs/wideair_dt1/,
+                              CLOSED since 31 October (its result was published 13 October)
 
     --road extremes  dt 1.0   decision 12 of results/VALIDATION_DECISIONS.md (8 Oct):
                               the terrain roads with ambient 25-45 C, a speed target
@@ -62,6 +74,36 @@ Part 3 is about. Both pass --engine, --road and --device explicitly, and
 train_all.py --dt; run_phase_d.py's fixed and random roads train at their
 design step, DESIGN_DT.)
 
+DECISION 29'S RECIPE, BEHIND FLAGS WHOSE DEFAULTS ARE X1'S (31 October 2026; row
+118). With none of them given, train.py trains what it trained before, so L8 and
+check_training_device.py --identity stay valid for the B58 by construction (the
+check: --identity on the laptop before and after the change, then --compare):
+
+    --lr-schedule last-third    the learning rate falls linearly to 0 over the last
+                                third (training_recipe.LastThird); default constant,
+                                the float --lr, as X1
+    --scored-share --roads-record PATH
+                                one episode in ten (0, 10, 20, ...) is a road of
+                                row 101's generator, from roads_seed in the
+                                committed roads record (--road four_engine only);
+                                default none
+    --checkpoint-average N      the model saved at five steps of the last N
+                                (decision 29: 50000) into OUT/<tag>/average/, and a
+                                manifest written for the action average
+                                (training_recipe.AveragedPolicy); default none
+
+A run trained with any of them records them in meta.json (advisory train_recipe),
+a four_engine run records its generator's code (train_road_sha), and a resume that
+changes either is refused, as a changed road is. The roads, the recipe and H are
+training_recipe.py's and four_engine_roads.py's, new modules that no hashed module
+imports (row 121).
+
+H (rows 102 and 117). --horizon-ratio R --roads-record PATH trains a sighted agent
+at H = R x tau, tau the engine's frozen time constant read from the roads record,
+in a run directory sighted_r<R>_seed<S>. Until row 94's plant commit makes H an
+environment parameter, every H but today's 30 s (engine_env.PREVIEW_S) is refused
+(four_engine_roads.preview_h_problem), and so, today, is every R.
+
 THE DEVICE ASKED FOR IS THE DEVICE TRAINED ON (21 October 2026, the review of
 benchmark_training.py). An explicit --device that torch cannot give is refused:
 stable-baselines3 would fall back to the CPU without a word. On CUDA a run
@@ -85,8 +127,10 @@ import numpy as np
 
 import engines
 import fingerprint as FP
+import four_engine_roads as FER
 import random_road as RR
 import step_record
+import training_recipe as TR
 from engine_env import (ExtremesTrainingEnv, SupervisoryTunerEnv, TerrainTrainingEnv,
                         damage_rate, locked_climb)
 
@@ -111,11 +155,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CLOSED = {"runs": "Phase D", "runs_d2": "Phase D2",
           "runs_c4": "C4",           # closed 24 Sep 2026, after its result
           "terrain_dt1": "the 29 September retrain",   # closed 8 Oct 2026
-          "extremes_dt1": "X1"}      # closed 9 Oct 2026, after its result (PREREGISTRATION_X1.md §12)
+          "extremes_dt1": "X1",      # closed 9 Oct 2026, after its result (PREREGISTRATION_X1.md §12)
+          # X2's --out was runs/wideair_dt1 (PREREGISTRATION_X2.md, its command; analyse_x2.py,
+          # check_x2_convergence.py); its result was published on 13 October (results/X2_RESULT.txt),
+          # closed 31 Oct 2026 (CHECKPOINT.md, the session report of 15 October, 2.3)
+          "wideair_dt1": "X2"}
 
 # Each road's own step. fixed and random are the designs Phase D, D2 and C4 ran
-# at 0.2 s; terrain is the 27 September design at evaluate.py's 1.0 s.
-DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0, "extremes": 1.0, "wideair": 1.0}
+# at 0.2 s; terrain is the 27 September design at evaluate.py's 1.0 s; four_engine
+# is row 101's 1.0 s (four_engine_roads.DT, which refuses any other).
+DESIGN_DT = {"fixed": 0.2, "random": 0.2, "terrain": 1.0, "extremes": 1.0, "wideair": 1.0,
+             "four_engine": FER.DT}
 # The training episode, s: --duration's default, "the standard scenario". A
 # module constant since 21 October 2026, so verify_docs.py can check the 900 s
 # the documents quote against the live value: it read make_grade_climb's
@@ -234,13 +284,17 @@ class _StepState(gym.Wrapper):
         return obs, r, term, trunc, info
 
 
-def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant):
+def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant, **road_options):
     """The training environment. dt is passed EXPLICITLY, to the cycle and the env,
     and so is the plant (required, 20 October 2026).
 
     terrain  TerrainTrainingEnv: a new road every episode.
     extremes ExtremesTrainingEnv: the same roads, plus ambient, speed, steeper
              hills and the housing's heat capacity drawn per episode.
+    four_engine  the plant's environment, its cycle set at every reset by
+             four_engine_roads.FourEngineRoads (row 116); `road_options` are its
+             scored_share and roads_record, both required for this road and
+             refused for any other.
     fixed    make_grade_climb, Phase D's road.
     random   the same, rebuilt at every reset by random_road.RandomClimb (D2).
 
@@ -249,7 +303,20 @@ def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant):
     SupervisoryTunerEnv for `dt` and the fingerprint. At dt 0.2 the fixed and
     random builds are the objects Phase D and D2 trained on.
     """
-    if road == "terrain":
+    if road_options and road != "four_engine":
+        raise ValueError(f"build_env: {sorted(road_options)} are the four_engine road's options, not {road!r}'s")
+    if road == "four_engine" and set(road_options) != {"scored_share", "roads_record"}:
+        # both named by every caller, so a new one (evaluate.py's, an analysis script's) cannot
+        # build the share's road by omission (the review of 31 October 2026, F4)
+        raise ValueError(f"build_env: --road four_engine needs both of its options, scored_share and "
+                         f"roads_record (row 116), and only them; got {sorted(road_options)}")
+    if road == "four_engine":
+        # The cycle given here is replaced at the first reset, as random_road.RandomClimb's is
+        env = FER.wrap(SupervisoryTunerEnv(locked_climb(plant, duration=duration, dt=dt), plant=plant, dt=dt,
+                                           use_preview=use_preview, seed=seed),
+                       seed=seed, scored_share=road_options["scored_share"],
+                       roads_record=road_options["roads_record"])
+    elif road == "terrain":
         env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed,
                                  plant=plant)
     elif road == "wideair":
@@ -392,6 +459,26 @@ class BufferKeeper(BaseCallback):
         return True
 
 
+class AverageSnapshots(BaseCallback):
+    """--checkpoint-average N: the model saved at each step of
+    training_recipe.snapshot_steps(--steps, N) into OUT/<tag>/average/, for decision
+    29's action average (training_recipe.AveragedPolicy; the manifest is written when
+    the run finishes). Keyed on num_timesteps, not on this session's calls, so a
+    resumed run saves every snapshot it passes. It only reads the model, as
+    CheckpointCallback does; without the flag it is not in the callback list."""
+
+    def __init__(self, outdir, steps):
+        super().__init__()
+        self.dir = os.path.join(outdir, TR.SNAPSHOT_DIR)
+        self.steps = frozenset(int(s) for s in steps)
+
+    def _on_step(self):
+        if self.num_timesteps in self.steps:
+            os.makedirs(self.dir, exist_ok=True)
+            _save_atomic(self.model, os.path.join(self.dir, TR.snapshot_name(self.num_timesteps)))
+        return True
+
+
 def load_buffer(model, outdir, done_steps):
     """Put the saved replay buffer back into a resumed model; say what it was."""
     path = os.path.join(outdir, BUFFER_FILE)
@@ -446,8 +533,80 @@ ROADS_TEXT = {"terrain": "a new road every episode (TerrainTrainingEnv)",
               "wideair": "the extremes roads (decision 12) in wider air: ambient 0-45 C and "
                          "pressure 80-101.3 kPa drawn per episode, the compressor inlet "
                          "following the pressure (wide_air.WideAirTrainingEnv, X2)",
+              "four_engine": "one generator for the four engines (four_engine_roads, row 116): ambient "
+                             "25-45 C, from rest a speed target 60-150 km/h changing mid-run, every "
+                             "change at 0.8 m/s^2 at most and inside the notional car's climb and coast, "
+                             "hills 0-18 % ramped over 8 s, housing capacity x0.75-1.33",
               "fixed": "the locked climb only",
               "random": "a new climb every episode (random_road.RandomClimb, Phase D2)"}
+
+
+def check_recipe(a):
+    """Every refusal of the four-engine roads, decision 29's recipe and H, before any
+    directory is made or anything is built (rows 116-118). Reads the roads record
+    when a flag needs it. Returns (build_env's road options, the recipe meta.json
+    records -- None at X1's defaults -- and H in seconds, None for today's preview).
+    A function so test_four_engine_training.py can show each refusal."""
+    uses_record = a.scored_share or a.horizon_ratio is not None
+    if a.roads_record is not None and not uses_record:
+        raise SystemExit("\nREFUSING: --roads-record without --scored-share or --horizon-ratio: nothing "
+                         "would read it.")
+    if uses_record and a.road != "four_engine":
+        raise SystemExit(f"\nREFUSING: --scored-share and --horizon-ratio belong to the four-engine roads "
+                         f"(--road four_engine; rows 116, 117), not to --road {a.road}.")
+    if a.road == "four_engine" and (a.dt != FER.DT or a.duration != FER.DURATION_S):
+        raise SystemExit(f"\nREFUSING: the four-engine roads are {FER.DURATION_S:g} s at dt {FER.DT:g} (row "
+                         f"101's episode, row 116); this call asks {a.duration:g} s at dt {a.dt:g}.")
+    if a.road == "four_engine":
+        problem = FER.reserved_seed_problem([a.seed])
+        if problem:
+            raise SystemExit(f"\nREFUSING --seed {a.seed} on the four-engine roads: {problem}.")
+    record = None
+    if uses_record:
+        try:
+            record = FER.read_roads_record(a.roads_record)
+        except FER.Refused as exc:
+            raise SystemExit(f"\nREFUSING: {exc}.")
+        if record["seed_kind"] != "REAL" and FER.inside_repository(a.out):
+            raise SystemExit(f"\nREFUSING: {record['path']} is a {record['seed_kind']} roads record and "
+                             f"{a.out} lies inside the repository. An agent trained on a SYNTHETIC share "
+                             "is a test: train it into a temporary folder outside the repository.")
+        if record["seed_kind"] == "REAL":
+            problem = FER.real_record_problem(record["path"])
+            if problem:
+                raise SystemExit(f"\nREFUSING: {problem}.")
+    h_s = None
+    if a.horizon_ratio is not None:
+        if a.no_preview:
+            raise SystemExit("\nREFUSING: --horizon-ratio with --no-preview: a blinded agent sees no grade "
+                             "ahead at any H, and one blinded arm serves both ratios (row 117).")
+        try:
+            h_s = FER.horizon_s(record, a.engine, a.horizon_ratio)
+        except FER.Refused as exc:
+            raise SystemExit(f"\nREFUSING: {exc}.")
+        problem = FER.preview_h_problem(h_s)
+        if problem:
+            raise SystemExit(f"\nREFUSING --horizon-ratio {a.horizon_ratio:g} on {a.engine} (tau "
+                             f"{h_s / a.horizon_ratio:.4f} s from {record['path']}): {problem}.")
+    if a.checkpoint_average is not None:
+        try:
+            TR.snapshot_steps(a.steps, a.checkpoint_average)
+        except ValueError as exc:
+            raise SystemExit(f"\nREFUSING: {exc}.")
+    recipe = {}
+    if a.lr_schedule != "constant":
+        recipe["lr_schedule"] = a.lr_schedule
+    if a.scored_share:
+        recipe["scored_share"] = dict(every=FER.SHARE_EVERY, roads_sha=record["roads_sha"],
+                                      seed_kind=record["seed_kind"])
+    if a.checkpoint_average is not None:
+        recipe["checkpoint_average"] = int(a.checkpoint_average)
+    if h_s is not None:
+        recipe.update(horizon_ratio=float(a.horizon_ratio), preview_h_s=h_s)
+    road_options = (dict(scored_share=bool(a.scored_share),
+                         roads_record=record["path"] if a.scored_share else None)
+                    if a.road == "four_engine" else {})
+    return road_options, (recipe or None), h_s
 
 
 def run_config(a, tag, model, outdir, live, plant_obj):
@@ -496,12 +655,30 @@ def main():
                     help="episode length in seconds; 900 is the standard scenario")
     ap.add_argument("--lr", type=float, default=3e-4,
                     help="divide by 3 if the reward curve climbs then collapses")
-    ap.add_argument("--road", choices=("terrain", "extremes", "wideair", "fixed", "random"), default="terrain",
+    ap.add_argument("--road", choices=("terrain", "extremes", "wideair", "four_engine", "fixed", "random"),
+                    default="terrain",
                     help="terrain: a new road every episode (27 Sep). extremes: the same, "
                          "with ambient, speed, steeper hills and the housing capacity drawn "
-                         "per episode (decision 12, 8 Oct). fixed: Phase D's "
+                         "per episode (decision 12, 8 Oct). four_engine: the four engines' "
+                         "one generator (row 116, 31 Oct). fixed: Phase D's "
                          "climb, 12 %% from 180 s. random: Phase D2 / C4, start 120-300 s, "
                          "grade 12-16 %%.")
+    # decision 29's recipe (row 118): every default is X1's -- see the docstring
+    ap.add_argument("--lr-schedule", choices=TR.LR_SCHEDULES, default="constant",
+                    help="constant: the float --lr, as X1 (default). last-third: --lr until two "
+                         "thirds of the run, then linearly to 0 (decision 29)")
+    ap.add_argument("--scored-share", action="store_true",
+                    help="one episode in ten a road of row 101's generator (decision 29's share; "
+                         "--road four_engine and --roads-record). Default: none, as X1")
+    ap.add_argument("--checkpoint-average", type=int, default=None, metavar="N",
+                    help="save the model at five steps of the last N and write the manifest of "
+                         "their action average (decision 29: 50000). Default: none, as X1")
+    ap.add_argument("--horizon-ratio", type=float, default=None, metavar="R",
+                    help="a sighted agent at H = R x tau, tau from --roads-record (rows 102, 117). "
+                         "Refused until row 94's plant commit makes H an environment parameter")
+    ap.add_argument("--roads-record", default=None, metavar="PATH",
+                    help="the committed roads record (results/EPA_ROADS/roads.json, written at the "
+                         "draw): roads_seed for --scored-share, tau for --horizon-ratio")
     ap.add_argument("--fixed-road", action="store_true",
                     help="the same as --road fixed --dt 1.0 (the 27 Sep spelling)")
     ap.add_argument("--dt", type=float, default=None,
@@ -558,14 +735,18 @@ def main():
         else:
             a.out = os.path.join("runs", {"fixed": "locked", "random": "random",
                                           "terrain": "terrain", "extremes": "extremes",
-                                          "wideair": "wideair"}[a.road]
+                                          "wideair": "wideair", "four_engine": "four_engine"}[a.road]
                                  + f"_dt{a.dt:g}".replace(".", "p"))
+    # The four-engine roads, the recipe and H: refused here, before any directory (row 118)
+    road_options, recipe, h_s = check_recipe(a)
+    # four_engine records the plant's locked climb as its FATAL scenario, as terrain and extremes do:
+    # decision 34's protocol (its scenario and episodes_sha) is fingerprint schema 4's (row 117)
     protocol = "d2" if a.road == "random" else "phase-d"
     device = get_device(a.device)
     check_device(a.device, device)      # before any directory, and before anything runs on CUDA
     plant = engines.get(a.engine)
 
-    tag = f"{'blind' if a.no_preview else 'sighted'}_seed{a.seed}"
+    tag = FER.run_tag(a.seed, use_preview=not a.no_preview, ratio=a.horizon_ratio)
     outdir = os.path.join(a.out, tag)
     # No directory is created until every refusal below has had its say: a
     # refused call must leave nothing behind, not even an empty folder.
@@ -582,6 +763,8 @@ def main():
     print(f"step          : dt = {a.dt:g} s, {a.duration / a.dt:.0f} steps per episode, "
           f"{a.steps / (a.duration / a.dt):.0f} episodes")
     print(f"seed          : {a.seed}")
+    if recipe:
+        print("recipe        : " + "; ".join(f"{k} {v}" for k, v in recipe.items()))
     print(f"steps         : {a.steps:,}")
     print(f"device        : {device}")
     # MEASURED, and the two figures are two machines and two devices:
@@ -597,7 +780,7 @@ def main():
           f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on {device.type}")
     print(f"output        : {outdir}/\n")
 
-    env = build_env(not a.no_preview, a.seed, a.duration, a.road, a.dt, plant=plant)
+    env = build_env(not a.no_preview, a.seed, a.duration, a.road, a.dt, plant=plant, **road_options)
 
     ckpt_path = os.path.join(outdir, "checkpoint.zip")
     periodic = sorted(glob.glob(os.path.join(glob.escape(outdir), "ckpt_*_steps.zip")),
@@ -620,6 +803,13 @@ def main():
             "experiment into its own --out instead.")
 
     meta_path = os.path.join(outdir, "meta.json")
+    # Advisory, and only where they apply, so that a run at X1's defaults writes the
+    # meta.json it wrote before: the four-engine generator's code, and the recipe
+    road_fields = {}
+    if a.road == "four_engine":
+        road_fields["train_road_sha"] = FER.code_sha()
+    if recipe:
+        road_fields["train_recipe"] = recipe
     # backend: read from the environment this run trains in (an engine_model
     # there would be refused, not recorded as the cycle model)
     live = FP.plant_fingerprint(protocol=protocol, plant=plant,
@@ -628,7 +818,7 @@ def main():
                                 train_duration=a.duration,
                                 steps_requested=a.steps, seed=a.seed,
                                 use_preview=not a.no_preview, tag=tag,
-                                train_road=a.road, train_device=str(device))
+                                train_road=a.road, train_device=str(device), **road_fields)
     stored = FP.read(meta_path)
     refuse_old_schema(stored, outdir, a.force_plant_mismatch)
 
@@ -663,11 +853,11 @@ def main():
                 )
             print("\n  --force-plant-mismatch given; continuing anyway.")
         # The advisory fields are not refused over, except the ones that change
-        # WHAT IS LEARNED: the episode length, the step, the road design, the
-        # device, and the derived plant constants.
+        # WHAT IS LEARNED: the episode length, the step, the road design and its
+        # generator's code, the recipe, the device, and the derived plant constants.
         adv = FP.advisory_diff(stored, live)
-        learned = [t for t in adv if t[0] in ("train_duration", "train_dt", "train_road",
-                                              "train_device", "derived_sha")]
+        learned = [t for t in adv if t[0] in ("train_duration", "train_dt", "train_road", "train_road_sha",
+                                              "train_recipe", "train_device", "derived_sha")]
         if adv:
             print("\nadvisory fields that moved since this run started:")
             for k, was, now in adv:
@@ -726,7 +916,8 @@ def main():
         FP.write(meta_path, live)
         print(FP.format_block(live, "PLANT FINGERPRINT (written to meta.json)"))
         print()
-        model = SAC("MlpPolicy", env, seed=a.seed, learning_rate=a.lr,
+        # the float --lr itself at the default schedule, as X1 (training_recipe.learning_rate)
+        model = SAC("MlpPolicy", env, seed=a.seed, learning_rate=TR.learning_rate(a.lr_schedule, a.lr),
                     buffer_size=buffer_size(a), verbose=1, tensorboard_log=None,
                     device=a.device)
 
@@ -749,6 +940,8 @@ def main():
     cb = CallbackList([CheckpointCallback(save_freq=CHUNK, save_path=outdir,
                                           name_prefix="ckpt", verbose=0)]
                       + ([BufferKeeper(outdir)] if a.keep_buffer else [])
+                      + ([AverageSnapshots(outdir, TR.snapshot_steps(a.steps, a.checkpoint_average))]
+                         if a.checkpoint_average is not None else [])
                       + [ActionRecorder(outdir)])
 
     cfg_path = os.path.join(outdir, "config.json")
@@ -763,6 +956,10 @@ def main():
     if cuda_block is not None:
         cfg["machine"]["cuda"] = cuda_block
     cfg.update(keep_buffer=bool(a.keep_buffer), resumed_buffer=buffer_restored)
+    # decision 29's recipe as this run trains it, X1's defaults included (row 118)
+    cfg["recipe"] = dict(lr_schedule=a.lr_schedule, scored_share=(recipe or {}).get("scored_share"),
+                         checkpoint_average=a.checkpoint_average, horizon_ratio=a.horizon_ratio,
+                         preview_h_s=h_s)
     cfg.update(started=datetime.now().isoformat(timespec="seconds"), resumed_from=resume_from,
                status="running")
     if isinstance(prev, dict):
@@ -818,6 +1015,14 @@ def _train_and_save(a, model, env, cb, outdir, ckpt_path, remaining,
     _save_atomic(model, os.path.join(outdir, "final.zip"))
     _save_atomic(model, ckpt_path)
     merged = merge_records(outdir)
+    # The recipe's checks (decision 29's pilot, ORDER step 21): the learning rate the
+    # last update used -- 0 under last-third -- and the average's manifest
+    cfg["recipe"]["learning_rate_at_end"] = float(model.lr_schedule(model._current_progress_remaining))
+    if a.checkpoint_average is not None:
+        man = TR.write_manifest(outdir, total_steps=a.steps, window=a.checkpoint_average)
+        cfg["recipe"]["checkpoint_average_manifest"] = TR.MANIFEST
+        print(f"  checkpoint average: {len(man['snapshots'])} snapshots at steps "
+              f"{', '.join(str(s['step']) for s in man['snapshots'])} -> {os.path.join(outdir, TR.MANIFEST)}")
 
     if resume_from and extending:
         stored.setdefault("steps_requested_original", was_steps)
@@ -887,6 +1092,10 @@ def _train_and_save(a, model, env, cb, outdir, ckpt_path, remaining,
     if a.road == "terrain":
         print("\nnext: every seed of both arms through train_all.py (the same --steps and "
               f"--out), then\n      python record_agents.py {a.out}")
+    elif a.road == "four_engine":
+        print("\nnext: every seed and arm through train_all.py --road four_engine, the third arm "
+              "with --third-arm;\n      decision 34's scoring is evaluate.py's protocol of ORDER step 16, "
+              "after the last redraw.")
     else:
         print("\nnext: an experiment's other seeds and arms go through "
               "run_phase_d.py, with the\nsame --steps, --road, --dt and --out -- "

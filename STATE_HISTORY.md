@@ -4644,3 +4644,16 @@ From "Next actions", item 8, as committed at `22561da`:
    roads code (step 4), in which each of you records the sha256 of a private integer
    (row 96). Nothing in PLANT_CODE or `epa_freeze.CODE_HASHED` changes before the last
    commit F; `test_epa_rows` fails once until commit G, disclosed (row 120).
+
+# Part Z — lines rotated out of CHECKPOINT.md, 31 October 2026 (GRA-test: C1, the training code outside the plant)
+
+From "Next actions", item 7, as committed at `780e518`:
+
+7. For Ghassan, before the next training: `train.py`'s `CLOSED` list has no
+   `wideair_dt1`, though X2's result was published on 13 October (session
+   report of 15 October, 2.3).
+
+From "Next actions", item 10, as committed at `780e518`:
+
+   torch in a second environment); run `python benchmark_training.py` there, which
+   decides CPU or GPU and checks that seed 0 trains identically twice; then

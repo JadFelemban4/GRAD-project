@@ -174,7 +174,10 @@ def describe_machine():
 
 def run_identity(out_json):
     tmp = tempfile.mkdtemp(prefix="device_check_")
-    env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", PYTHONIOENCODING="utf-8")
+    # PYTHONDONTWRITEBYTECODE: the child writes no __pycache__ into the repository, whether or not this
+    # process runs with -B (the review of 31 October 2026, R0-4); it changes no trained bit
+    env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", PYTHONIOENCODING="utf-8",
+               PYTHONDONTWRITEBYTECODE="1")
     try:
         cmd = [sys.executable, os.path.join(HERE, "train.py"), *IDENTITY_CMD, "--out", tmp]
         print("running:", " ".join(cmd))

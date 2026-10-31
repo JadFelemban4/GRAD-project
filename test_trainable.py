@@ -35,6 +35,9 @@ stands too: refused, and through once trainable() is known().
               record named; since P7 a plant whose calibration has written one of
               its files is skipped by name, never failed (with its control)
   Source      each parser's --engine choices are engines.trainable(), by AST
+  BenchmarkEntryPoint  (added 31 October 2026, ORDER step 7) benchmark_training.py's
+              --engine, which starts train.py: the B58 through, the three EPA plants
+              refused, the control, and its choices engines.trainable() by AST
 """
 import ast
 import os
@@ -303,6 +306,46 @@ class FingerprintCliRegistered(unittest.TestCase):
                     if patched:
                         self.assertTrue(any(r.startswith(f"mazda_25t: its calibration has written {written}")
                                             for r in reasons), reasons)
+
+
+class BenchmarkEntryPoint(unittest.TestCase):
+    """Added 31 October 2026 (ORDER step 7, rows 114 and 118): benchmark_training.py's --engine, which
+    starts train.py, takes engines.trainable() as the four entry points do. B58 through the parser; each
+    of the three EPA plants refused as registered; the control (mistake 12): with trainable() made
+    known() the Mazda passes the same parser. Every run ends at --help or at the parser's refusal."""
+
+    @classmethod
+    def setUpClass(cls):
+        cases = {"b58": dict(argv=["--engine", "b58", "--help"]),
+                 **{n: dict(argv=["--engine", n, "--help"]) for n in EPA_PLANTS},
+                 "control": dict(argv=["--engine", "mazda_25t", "--help"], control=True)}
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            out = pool.map(lambda k: run("benchmark_training.py", **cases[k]), list(cases))
+        cls.result = dict(zip(cases, out))
+
+    def test_the_b58_passes_and_each_epa_plant_is_refused(self):
+        rc, out = self.result["b58"]
+        self.assertEqual(rc, 0, out[-2000:])
+        self.assertIn("--engine", out)
+        for n in EPA_PLANTS:
+            with self.subTest(plant=n):
+                rc, out = self.result[n]
+                self.assertEqual(rc, 2, out[-2000:])
+                self.assertIn(f"invalid choice: '{n}'", out)
+
+    def test_the_control_trainable_as_known_lets_it_through(self):
+        rc, out = self.result["control"]
+        self.assertEqual(rc, 0, out[-2000:])
+
+    def test_its_engine_argument_takes_trainable(self):
+        with open(os.path.join(HERE, "benchmark_training.py"), encoding="utf-8") as fh:
+            tree = ast.parse(fh.read(), filename="benchmark_training.py")
+        found = [ast.unparse({k.arg: k.value for k in node.keywords}.get("choices"))
+                 for node in ast.walk(tree)
+                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                 and node.func.attr == "add_argument" and node.args and isinstance(node.args[0], ast.Constant)
+                 and node.args[0].value == "--engine"]
+        self.assertEqual(found, ["engines.trainable()"])
 
 
 class Source(unittest.TestCase):

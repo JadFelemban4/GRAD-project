@@ -1,15 +1,30 @@
 """benchmark_training.py -- CPU or GPU on the training device? Measured there, before any training.
 
-    python benchmark_training.py --device cpu      in the CPU environment (requirements-lock.txt)
-    python benchmark_training.py --device cuda     in the CUDA environment: the GPU only
+    python benchmark_training.py --engine b58 --road extremes --device cpu
+                                                   in the CPU environment (requirements-lock.txt)
+    python benchmark_training.py --engine b58 --road extremes --device cuda
+                                                   in the CUDA environment: the GPU only
     python benchmark_training.py --merge CPU.json CUDA.json [--window-days D]
                                                    the two environments' files, one decision
-    python benchmark_training.py --quick           a SMOKE TEST of the harness on this machine (1 and
+    python benchmark_training.py --engine E --road R --quick
+                                                   a SMOKE TEST of the harness on this machine (1 and
                                                    every usable CPU, 1 500 steps, one repeat): its
                                                    numbers are not for decisions 30 and 32
-    python benchmark_training.py --dry-run         the machine, the plan and every command; nothing
+    python benchmark_training.py --engine E --road R --dry-run
+                                                   the machine, the plan and every command; nothing
                                                    is trained or timed (CUDA is probed, in a child)
     python benchmark_training.py --selftest        the harness on dummy work (seconds; no SAC, no plant)
+
+--engine AND --road ARE REQUIRED (31 October 2026, rows 114 and 118): every run that measures names
+the plant and the road it times, as train.py's own --engine (CLAUDE.md mistake 1: there is no
+default engine) and as the launchers pass --road (a default that selects an experiment is the trap
+train.py's docstring names). --engine takes engines.trainable(), as train.py does, so an engine that
+may not train is refused by the parser; --road is any road train.DESIGN_DT holds, checked by the
+probe, whose design step must be this script's DT. Until 31 October the script hard-coded the B58
+and the extremes roads; "--engine b58 --road extremes" runs exactly what it ran then. --merge reads
+both from the two files' plans and refuses two files that differ in either, as before; --selftest
+takes neither. Row 114's protocol, once per engine after the plant commit, is
+docs/build_step_2/DEVICE_RUNBOOK.md's.
 
 Asked by Ghassan, 21 October 2026: the four-engine test trains on a new device, and before it
 does, measure whether training there is faster on its CPU or its GPU. RUN IT ON THE TRAINING
@@ -44,7 +59,7 @@ WHAT IT MEASURES, in the order it runs (1, 2, 4, 3)
      build, the versions check_training_device.CRITICAL names, and whether CUDA RUNS here (a
      kernel and a cuBLAS product in a child process, not torch.cuda.is_available()).
   2. The parts of one step, each in a child process with one thread, so this process never holds
-     a CUDA context: the plant step (the extremes roads, the B58, the neutral action), and on
+     a CUDA context: the plant step (the --road roads, the --engine plant, the neutral action), and on
      each device SAC's gradient update as training makes it (train() with gradient_steps=1, batch
      256) and the choice of one action (predict: on CUDA a round trip to the GPU every step).
      They say WHY section 3 comes out as it does; section 3 is the measurement.
@@ -52,8 +67,8 @@ WHAT IT MEASURES, in the order it runs (1, 2, 4, 3)
      finished extremes episodes of 899 steps, so the curve holds something), compared by
      check_training_device.fingerprint_dir: every tensor, the counters, every recorded step and
      the curve. A device that fails it is not timed in section 3.
-  3. Training as train_all.py runs it: N copies of train.py at once (one thread each, the extremes
-     roads, the B58, --dt and --device passed explicitly, --buffer 450000 so each run allocates
+  3. Training as train_all.py runs it: N copies of train.py at once (one thread each, --engine,
+     --road, --dt and --device passed explicitly, --buffer 450000 so each run allocates
      what a 450 000-step run does), for each device and each N, every N measured --repeats times,
      the repeats interleaved. In the two-environment workflow below each run of this script
      measures one device, so the CPU's rows and the GPU's are hours apart, never interleaved,
@@ -93,10 +108,13 @@ concurrency that trains the experiment soonest, waves counted, which need not be
 The launcher's command is printed; train_all.py trains two arms a seed today (blinded and one
 sighted horizon), not decision 27's three, so its runs are not the ones the days count.
 
-VALID FOR THE CYCLE BACKEND AND THE B58 ONLY. Decision 28 trains on each engine's table if it
-passes its gates, a plant 6-8 times cheaper, which can reverse the answer; section 2 prints that
-case, as arithmetic. Re-run this on the table backend, and on each engine once it exists, before
-the device type is written into the preregistration.
+VALID FOR THE CYCLE BACKEND AND THE ENGINE MEASURED ONLY. Decision 28 trains on each engine's table
+if it passes its gates, a plant 6-8 times cheaper, which can reverse the answer; section 2 prints
+that case, as arithmetic. Re-run this on the table backend, and on each engine once it exists, before
+the device type is written into the preregistration. Row 114 (30 October 2026) fixes how: the device
+is chosen once, on the B58 and the extremes roads, before the first arming; after the plant commit
+each engine's many-run rate is measured once, with --engine and --road, at the training's
+concurrency, on row 116's training road (the runbook's commands).
 
 THE GPU NEEDS ITS OWN TORCH. requirements-lock.txt pins the CPU build (torch 2.14.0+cpu). Run this
 script in that environment with --device cpu. Install the CUDA build of the same torch version in
@@ -132,9 +150,11 @@ from datetime import datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TRAIN = os.path.join(HERE, "train.py")
-ENGINE = "b58"                       # the one engine that may train (engines.trainable(), decision 47, 22 October)
-ROAD = "extremes"                    # X1's design, the B58 -- what build step 1 certified
-DT = 1.0                             # train.DESIGN_DT["extremes"], passed explicitly; the probe refuses a mismatch
+# The engine and the road are the run's --engine and --road (rows 114 and 118): they were the
+# constants ENGINE = "b58" and ROAD = "extremes" until 31 October 2026. They travel in the run's
+# `plan` (the JSON's "plan" block: plan["engine"], plan["road"], plan["dt"]) to every command.
+DT = 1.0                             # the step every road is benchmarked at, passed explicitly; the probe
+                                     # refuses a --road whose train.DESIGN_DT differs
 # The experiment the day counts are for: 4 engines x 3 arms x seeds x 450 000 steps (decisions
 # 24, 27, 29), seeds per arm fixed from this rate and the window, target at least 20 (decision 30).
 ENGINES, ARMS, SEEDS_TARGET, PROD_STEPS = 4, 3, 20, 450_000
@@ -152,12 +172,23 @@ BATCH_SLACK_S = 600                  # a batch's timeout: this, plus three times
 SAVE_TRIES, SAVE_WAIT_S = 5, 1.0     # the JSON's write retried this often, this far apart: on Windows a reader holding it open refuses os.replace
 # What a run timed, from its config.json: --merge refuses two files whose rows timed different plants
 PLANT_KEYS = ("plant_sha", "derived_sha", "engine", "engine_sha", "backend")
+# PYTHONDONTWRITEBYTECODE: no child leaves a __pycache__ in the repository (the review of 31 October
+# 2026, R0-4); it changes no trained bit
 ONE_THREAD = dict(OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", PYTHONUNBUFFERED="1",
-                  PYTHONIOENCODING="utf-8")
+                  PYTHONIOENCODING="utf-8", PYTHONDONTWRITEBYTECODE="1")
 PART_TAG = "BENCHMARK_PART "         # the line a --part child prints its result on
-VALIDITY = ("Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table "
-            "if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the "
-            "table backend, and on each engine once it exists, before the device type is written "
+# The options train.build_env takes for a road beside its name, as train.py passes them for a run with
+# neither --scored-share nor --roads-record (train.py, road_options): section 2 builds the environment
+# that section 3's train.py runs build. Row 116's road takes two; every other road takes none.
+ROAD_OPTIONS = {"four_engine": dict(scored_share=False, roads_record=None)}
+
+
+def validity(engine_id):
+    """The recommendation's last line, naming the engine measured (the B58's words, as they were
+    printed before --engine existed, for engine_id "b58")."""
+    return (f"Valid for the cycle backend and the {engine_id.upper()} only. Decision 28 trains on each "
+            "engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run "
+            "on the table backend, and on each engine once it exists, before the device type is written "
             "into the preregistration.")
 
 
@@ -392,30 +423,34 @@ def child_result(cmd, env, timeout_s, label):
     raise RuntimeError(f"{label} {ended}: " + (se or so)[-800:].strip())
 
 
-def run_part(name, device=None, timeout_s=900):
+def run_part(name, plan, device=None, timeout_s=900):
     """One part run in a child process (--part), its result read off the line it prints. A child,
     so this process never holds a CUDA context: torch keeps one until its process exits, a GPU in
     EXCLUSIVE_PROCESS mode then refuses every train.py, and in the default mode it takes video
     memory the rows would have had (the review of 21 October 2026). The plant is timed there too,
-    under the one thread train_all.py gives a run."""
-    cmd = [sys.executable, os.path.abspath(__file__), "--part", name]
+    under the one thread train_all.py gives a run. The child is given the run's --engine and
+    --road (`plan`), as every train.py is."""
+    cmd = [sys.executable, os.path.abspath(__file__), "--part", name,
+           "--engine", plan["engine"], "--road", plan["road"]]
     if device:
         cmd += ["--device", device]
     return child_result(cmd, child_env(device), timeout_s, f"--part {name} {device or ''}".strip())
 
 
-def part_probe():
-    """--part probe: this environment's torch, the design step train.py holds for the road, and
-    whether CUDA RUNS here: an element-wise kernel and a cuBLAS product under the deterministic
-    settings train.py trains CUDA with. torch.cuda.is_available() alone says yes to a GPU the
-    wheel has no kernels for ('no kernel image is available'), to one that is busy and to one
-    with no memory left (the review of 21 October 2026)."""
+def part_probe(road):
+    """--part probe: this environment's torch, the design step train.py holds for the road (None
+    when train.py has no such road, with the roads it has), and whether CUDA RUNS here: an
+    element-wise kernel and a cuBLAS product under the deterministic settings train.py trains CUDA
+    with. torch.cuda.is_available() alone says yes to a GPU the wheel has no kernels for ('no
+    kernel image is available'), to one that is busy and to one with no memory left (the review of
+    21 October 2026)."""
     import torch
     import engines
     from train import DESIGN_DT
     # the plants that may train beside the ones registered (decision 47, amendment B7, 22 October
     # 2026): an EPA engine is registered and refused by train.py until schema 4 and its validation
-    out = dict(torch=torch.__version__, torch_cuda=torch.version.cuda, design_dt=DESIGN_DT[ROAD],
+    out = dict(torch=torch.__version__, torch_cuda=torch.version.cuda, design_dt=DESIGN_DT.get(road),
+               roads_known=sorted(DESIGN_DT),
                engines_known=engines.known(), engines_trainable=list(engines.trainable()))
     if torch.version.cuda is None:
         out["cuda"] = dict(ok=False, why=f"this torch ({torch.__version__}) is a CPU build")
@@ -438,15 +473,15 @@ def part_probe():
     return out
 
 
-def part_plant(n_steps=200):
-    """--part plant: seconds per environment step, the plant alone (the extremes roads, the B58,
-    the neutral action), and the backend it was computed on."""
+def part_plant(engine_id, road, n_steps=200):
+    """--part plant: seconds per environment step, the plant alone (the --road roads, the --engine
+    plant, the neutral action), and the backend it was computed on."""
     import numpy as np
     import engines
     import fingerprint as FP
     from engine_env import neutral_action
     from train import DURATION_S, build_env
-    env = build_env(True, 0, DURATION_S, ROAD, DT, plant=engines.get(ENGINE))
+    env = build_env(True, 0, DURATION_S, road, DT, plant=engines.get(engine_id), **ROAD_OPTIONS.get(road, {}))
     env.reset(seed=0)
     a = np.asarray(neutral_action(), dtype=np.float32)
     for _ in range(10):                              # warm-up
@@ -457,10 +492,10 @@ def part_plant(n_steps=200):
         if term or trunc:
             env.reset()
     return dict(plant_s=(time.perf_counter() - t0) / n_steps, steps=n_steps,
-                backend=FP.backend_of(env.unwrapped), engines_timed=[ENGINE])
+                backend=FP.backend_of(env.unwrapped), engines_timed=[engine_id])
 
 
-def part_sac(device, n_updates=200, warm=20, n_predict=500):
+def part_sac(device, engine_id, road, n_updates=200, warm=20, n_predict=500):
     """--part sac: on one device, seconds per SAC gradient update as training makes it (train()
     with gradient_steps=1 and batch 256 after every environment step, the [256, 256] network
     train.py uses, its per-call learning-rate update and logging included), on random transitions
@@ -476,7 +511,7 @@ def part_sac(device, n_updates=200, warm=20, n_predict=500):
     torch.set_num_threads(1)                         # what train_all.py's OMP_NUM_THREADS=1 gives
     if device == "cuda":
         torch.use_deterministic_algorithms(True)     # as train.check_device sets it for CUDA
-    env = T.build_env(True, 0, T.DURATION_S, ROAD, DT, plant=engines.get(ENGINE))
+    env = T.build_env(True, 0, T.DURATION_S, road, DT, plant=engines.get(engine_id), **ROAD_OPTIONS.get(road, {}))
     model = SAC("MlpPolicy", env, seed=0, device=device, buffer_size=5000, learning_starts=0,
                 verbose=0)
     if model.device.type != device:
@@ -748,10 +783,11 @@ def _tail(out, i, n=600):
         return ""
 
 
-def train_cmd(device, seed, steps, out, buffer=None):
+def train_cmd(device, seed, steps, out, plan, buffer=None):
     """One train.py run as train_all.py starts it: --engine, --road and --dt explicit (a default
-    that selects an experiment is the trap train.py's docstring names), --device always given."""
-    cmd = [sys.executable, TRAIN, "--engine", ENGINE, "--road", ROAD, "--dt", f"{DT:g}",
+    that selects an experiment is the trap train.py's docstring names), --device always given;
+    the engine, the road and the step are the run's plan's."""
+    cmd = [sys.executable, TRAIN, "--engine", plan["engine"], "--road", plan["road"], "--dt", f"{plan['dt']:g}",
            "--steps", str(steps), "--seed", str(seed), "--device", device, "--out", out]
     if buffer is not None:
         cmd += ["--buffer", str(buffer)]
@@ -767,7 +803,7 @@ def batch_deadline(part, plant_s, n, steps, physical):
 
 
 # ---------------------------------------------------------------- 4. determinism
-def determinism(device, root, deadline):
+def determinism(device, root, deadline, plan):
     """Section 4 on one device: seed 0 trained twice, one run at a time, DET_STEPS steps each
     with the default buffer (check_training_device's identity command, longer), and the two
     compared: every tensor of final.zip, the counters, every recorded step, the curve. Each run
@@ -777,7 +813,7 @@ def determinism(device, root, deadline):
     for k in (0, 1):
         out = tempfile.mkdtemp(prefix=f"det_{device}_{k}_", dir=root)
         try:
-            b = run_batch([train_cmd(device, 0, DET_STEPS, out)], out, deadline_s=deadline, device=device)
+            b = run_batch([train_cmd(device, 0, DET_STEPS, out, plan)], out, deadline_s=deadline, device=device)
             runs = [r for r in read_runs(out) if r["rate"]]
             why = row_verdict(device, 1, b, runs, deadline)
             if why:
@@ -794,7 +830,7 @@ def determinism(device, root, deadline):
 
 
 # ------------------------------------------------- 3. training as train_all.py runs it
-def benchmark_concurrency(device, n, steps, root, deadline):
+def benchmark_concurrency(device, n, steps, root, deadline, plan):
     """Section 3, one row: n copies of train.py at once on `device`, each with the production
     replay buffer (--buffer PROD_BUFFER: the allocation a 450 000-step run makes; samples come
     from the filled part only, so the timing is the default buffer's). On CUDA with n >= 2 seed 0
@@ -804,7 +840,7 @@ def benchmark_concurrency(device, n, steps, root, deadline):
     out = tempfile.mkdtemp(prefix=f"{device}_{n}_", dir=root)
     try:
         seeds = [0, 0] + list(range(1, n - 1)) if device == "cuda" and n >= 2 else list(range(n))
-        cmds = [train_cmd(device, s, steps, os.path.join(out, f"r{i}"), buffer=PROD_BUFFER)
+        cmds = [train_cmd(device, s, steps, os.path.join(out, f"r{i}"), plan, buffer=PROD_BUFFER)
                 for i, s in enumerate(seeds)]
         load = psutil.cpu_percent(interval=5)        # the machine's own load, before the batch
         b = run_batch(cmds, out, deadline_s=deadline, device=device)
@@ -959,9 +995,10 @@ def _packing_lines(confs, window_days):
     return out
 
 
-def launcher_command(device, n, seeds):
-    return (f"python train_all.py --engine {ENGINE} --road {ROAD} --dt {DT:g} --device {device} "
-            f"--jobs {n} --seeds 0-{seeds - 1} --steps {PROD_STEPS} --out runs/<the experiment's own>")
+def launcher_command(device, n, seeds, plan):
+    return (f"python train_all.py --engine {plan['engine']} --road {plan['road']} --dt {plan['dt']:g} "
+            f"--device {device} --jobs {n} --seeds 0-{seeds - 1} --steps {PROD_STEPS} "
+            "--out runs/<the experiment's own>")
 
 
 def _schedule_lines(c, window_days):
@@ -977,7 +1014,7 @@ def _schedule_lines(c, window_days):
     return out
 
 
-def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=False):
+def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=False, *, plan):
     """THE RULE (the docstring), applied to section 3's rows and section 4's verdicts, from one
     environment's file or, by --merge, from both. `device` is None unless a device may be named:
     seed 0 trained twice to the end on every device measured, both device types measured (or
@@ -985,9 +1022,11 @@ def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=
     and not a smoke test. The margin compares one device's lowest lower bound, at its best
     concurrency, with the other's highest upper bound at ANY of its usable concurrencies: the
     other's throughput could be that high wherever it peaks (the review of 21 October 2026).
-    Every number it gives is the lower bound's."""
+    Every number it gives is the lower bound's. `plan` is the run's (its engine, road and step:
+    the launcher's command and the validity line name them)."""
     confs = configurations(rows)
-    res = dict(device=None, runs=None, clear=None, smoke_test=smoke, validity=VALIDITY,
+    validity_line = validity(plan["engine"])
+    res = dict(device=None, runs=None, clear=None, smoke_test=smoke, validity=validity_line,
                configurations=confs)
     if not measured:
         res["text"] = "no device was measured"
@@ -1050,7 +1089,7 @@ def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=
             res["text"] = "\n".join(
                 [head] + lines
                 + _schedule_lines(pick_runs(usable_by[d], window_days), window_days)
-                + _packing_lines(usable_by[d], window_days) + [VALIDITY])
+                + _packing_lines(usable_by[d], window_days) + [validity_line])
             return res
         chosen, clear, how = "cpu", True, "the only device here: nvidia-smi ran and lists no GPU"
     else:
@@ -1080,7 +1119,7 @@ def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=
     s = schedule(b["lower_min"], b["runs"], SEEDS_TARGET)
     k = seeds_in_window(b["lower_min"], b["runs"], window_days) if window_days else None
     seeds = k if k is not None else SEEDS_TARGET
-    cmd = launcher_command(chosen, b["runs"], seeds) if seeds >= 1 else None
+    cmd = launcher_command(chosen, b["runs"], seeds, plan) if seeds >= 1 else None
     caution = []
     if not b["steady"]:
         caution.append(f"its rows were not steady (overlap under {STEADY_OVERLAP}): re-run with more --steps")
@@ -1099,7 +1138,7 @@ def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=
             + ([f"  the launcher, for each engine (--engine and --road are what was measured, --out is the "
                 "experiment's own; train_all.py trains two arms a seed today, the days count three, "
                 f"decision 27):\n    {cmd}"] if cmd else ["  not even one seed per arm fits the window"])
-            + [f"  CAUTION: {x}" for x in caution] + [VALIDITY])
+            + [f"  CAUTION: {x}" for x in caution] + [validity_line])
     if smoke:
         text = ["SMOKE TEST (--quick): NOT FOR DECISIONS 30 AND 32, no device is named. The rule "
                 "would say:"] + text
@@ -1150,7 +1189,17 @@ def plan_grid(usable, physical, runs_arg, quick):
 def check_args(a):
     """What is wrong with the command line, or None (the review of 21 October 2026: --runs 0 ran
     nothing and counted as ok, --steps 0 became 3000, and under about 1000 steps SAC makes so few
-    updates that the CPU and CUDA rows time almost none)."""
+    updates that the CPU and CUDA rows time almost none). Every run that measures names its engine
+    and its road (31 October 2026, rows 114 and 118; mistake 1); --merge takes them from its files."""
+    if a.merge is not None:
+        if a.engine is not None or a.road is not None:
+            return ("--merge takes no --engine or --road: each file names the engine and the road it "
+                    "measured (its plan), and two files that differ in either are refused")
+    elif a.engine is None:
+        return "--engine is required: there is no default engine (CLAUDE.md mistake 1)"
+    elif a.road is None:
+        return ("--road is required: the road names the design whose training is timed (a default that "
+                "selects an experiment is the trap train.py's docstring names)")
     if a.runs is not None and min(a.runs) < 1:
         return "--runs must be 1 or more"
     if a.steps is not None and a.steps < 1000:
@@ -1275,7 +1324,9 @@ def merge_docs(docs, window_days=None):
         builds = {"cpu": ma["torch"], "cuda": mb["torch"]}
         gpu_present = True
         machines = dict(cpu=ma, cuda=mb)
-    rec = recommend(rows, det, measured, gpu_present, builds, window_days)
+    # the engine, road and step the rows timed: one file's, or the two files' (refused above unless
+    # they agree)
+    rec = recommend(rows, det, measured, gpu_present, builds, window_days, plan=docs[0]["plan"])
     if caution:
         rec["caution"] = list(rec.get("caution") or []) + caution
         rec["text"] += "".join(f"\n  CAUTION: {x}" for x in caution)
@@ -1304,9 +1355,10 @@ def selftest():
     """The harness on dummy work, with no SAC, no plant and no CUDA (seconds): the batch launcher,
     its deadline and its kill, a part's result line, nvidia-smi giving no answer, the run reader
     and the bounds, the device and plant checks, the fingerprint comparison, the grid and the
-    input checks, a recorded step's bytes (train imported, nothing built), the memory estimate
-    and its caps, the rule and its margins, the days and the window, --merge and its refusals,
-    and the output file's refusal to overwrite, its whole-file writes and their retries."""
+    input checks (--engine and --road required to measure, refused with --merge), the engine and
+    the road in every command, a recorded step's bytes (train imported, nothing built), the memory
+    estimate and its caps, the rule and its margins, the days and the window, --merge and its
+    refusals, and the output file's refusal to overwrite, its whole-file writes and their retries."""
     global nvidia_smi                                # stubbed below, restored before the end
     import psutil
     import check_training_device as CTD
@@ -1427,15 +1479,33 @@ def selftest():
         assert plan_grid(8, 16, None, False) == [1, 4, 8]
         assert plan_grid(1, 1, None, True) == [1]
         assert plan_grid(20, 14, [12, 6, 6], False) == [6, 12]
-        base = dict(runs=None, steps=None, repeats=None, window_days=None, merge=None)
+        # every run that measures names its engine and its road (rows 114 and 118; mistake 1), and
+        # --merge takes both from its files
+        base = dict(runs=None, steps=None, repeats=None, window_days=None, merge=None, engine="b58",
+                    road="extremes")
         for wrong in (dict(runs=[0]), dict(runs=[-1, 2]), dict(steps=999), dict(repeats=0),
-                      dict(window_days=0.0), dict(merge=["a", "b", "c"])):
+                      dict(window_days=0.0), dict(merge=["a", "b", "c"], engine=None, road=None),
+                      dict(engine=None), dict(road=None), dict(merge=["a", "b"]),
+                      dict(merge=["a", "b"], engine=None)):
             assert check_args(argparse.Namespace(**dict(base, **wrong))), wrong
+        assert "mistake 1" in check_args(argparse.Namespace(**dict(base, engine=None)))
         assert check_args(argparse.Namespace(**dict(base, runs=[1], steps=1000, repeats=1))) is None
-        c = train_cmd("cuda", 3, 3000, "OUT", buffer=PROD_BUFFER)
+        assert check_args(argparse.Namespace(**dict(base, merge=["a", "b"], engine=None, road=None))) is None
+        P58 = dict(engine="b58", road="extremes", dt=DT)      # what this script measured before --engine
+        c = train_cmd("cuda", 3, 3000, "OUT", P58, buffer=PROD_BUFFER)
         assert (c[c.index("--dt") + 1], c[c.index("--device") + 1], c[c.index("--buffer") + 1]) == \
             ("1", "cuda", "450000"), c
-        assert "--buffer" not in train_cmd("cpu", 0, DET_STEPS, "OUT"), "section 4 keeps the default buffer"
+        assert (c[c.index("--engine") + 1], c[c.index("--road") + 1]) == ("b58", "extremes"), c
+        assert "--buffer" not in train_cmd("cpu", 0, DET_STEPS, "OUT", P58), "section 4 keeps the default buffer"
+        # another engine and road reach every train.py, the launcher's command and the validity line
+        PX = dict(engine="mazda_25t", road="four_engine", dt=DT)
+        c = train_cmd("cpu", 0, DET_STEPS, "OUT", PX)
+        assert (c[c.index("--engine") + 1], c[c.index("--road") + 1]) == ("mazda_25t", "four_engine"), c
+        assert launcher_command("cpu", 14, 20, PX).startswith(
+            "python train_all.py --engine mazda_25t --road four_engine --dt 1 --device cpu --jobs 14"), \
+            launcher_command("cpu", 14, 20, PX)
+        assert validity("b58").startswith("Valid for the cycle backend and the B58 only. ")
+        assert validity("mazda_25t").startswith("Valid for the cycle backend and the MAZDA_25T only. ")
         assert 1 <= usable_cpus() <= (os.cpu_count() or 1)
 
         # the memory at production size, and the cap it sets
@@ -1478,23 +1548,23 @@ def selftest():
         det = {"cpu": dict(identical=True), "cuda": dict(identical=True)}
         both = {"cpu", "cuda"}
         builds = {"cpu": "2.14.0+cpu", "cuda": "2.14.0+cu126"}
-        r = recommend(rows, det, both, True, builds)
+        r = recommend(rows, det, both, True, builds, plan=P58)
         assert (r["device"], r["clear"]) == ("cpu", False), r["text"]          # 105 does not beat 112
         assert "NO CLEAR WINNER" in r["text"], r["text"]
-        r = recommend(fast, det, both, True, builds)
+        r = recommend(fast, det, both, True, builds, plan=P58)
         assert (r["device"], r["clear"], r["runs"]) == ("cuda", True, 2), r["text"]
         # the spread of the repeats counts: CUDA's 120 beats one CPU repeat's upper bound (110) but
         # not the other's (125), so there is no clear winner
         spread = [row("cpu", 2, 100.0, 110.0), row("cpu", 2, 104.0, 125.0, 1),
                   row("cuda", 2, 120.0, 130.0, **same), row("cuda", 2, 121.0, 131.0, 1, **same)]
-        assert recommend(spread, det, both, True, builds)["clear"] is False
+        assert recommend(spread, det, both, True, builds, plan=P58)["clear"] is False
         assert "--device cuda --jobs 2 --seeds 0-19" in r["command"], r["command"]
         # the other side is the other device's highest upper bound at ANY usable concurrency:
         # CUDA's 115 beats CPU x14's 110 but not CPU x20's 130 (the review of 21 October 2026)
         peak = [row("cpu", 14, 100.0, 110.0), row("cpu", 14, 101.0, 109.0, 1),
                 row("cpu", 20, 95.0, 130.0), row("cpu", 20, 96.0, 128.0, 1),
                 row("cuda", 14, 115.0, 120.0, **same), row("cuda", 14, 116.0, 121.0, 1, **same)]
-        r = recommend(peak, det, both, True, builds)
+        r = recommend(peak, det, both, True, builds, plan=P58)
         assert (r["device"], r["clear"]) == ("cpu", False) and "130.0" in r["text"], r["text"]
         assert (r["best"]["cpu"]["runs"], r["best"]["cpu"]["highest_upper"]) == (14, 130.0), r["best"]
         # and the mirror: CPU's 115 beats CUDA x7's 110 but not CUDA x14's 130, so CPU is kept,
@@ -1502,16 +1572,17 @@ def selftest():
         mirror = [row("cuda", 7, 100.0, 110.0, **same), row("cuda", 7, 101.0, 109.0, 1, **same),
                   row("cuda", 14, 95.0, 130.0, **same), row("cuda", 14, 96.0, 128.0, 1, **same),
                   row("cpu", 14, 115.0, 120.0), row("cpu", 14, 116.0, 121.0, 1)]
-        r = recommend(mirror, det, both, True, builds)
+        r = recommend(mirror, det, both, True, builds, plan=P58)
         assert (r["device"], r["clear"]) == ("cpu", False) and "130.0" in r["text"], r["text"]
-        assert recommend(fast, dict(det, cuda=dict(identical=False)), both, True, builds)["device"] == "cpu", \
-            "a device that is not deterministic must never be chosen"
+        assert recommend(fast, dict(det, cuda=dict(identical=False)), both, True, builds,
+                         plan=P58)["device"] == "cpu", "a device that is not deterministic must never be chosen"
         # unchecked is not failed: a pair that timed out, or a device missing from the verdicts,
         # names no device, where a pair that differed hands the other device the win
         for unchecked in (dict(det, cpu=dict(identical=None, why="timed out")), {"cuda": det["cuda"]}):
-            r = recommend(fast, unchecked, both, True, builds)
+            r = recommend(fast, unchecked, both, True, builds, plan=P58)
             assert r["device"] is None and "not known" in r["text"], r["text"]
-        r = recommend(fast, dict(det, cpu=dict(identical=False, first=["weights x"])), both, True, builds)
+        r = recommend(fast, dict(det, cpu=dict(identical=False, first=["weights x"])), both, True, builds,
+                      plan=P58)
         assert r["device"] == "cuda" and "the only usable device (CPU:" in r["text"], r["text"]
         # a concurrency measured in fewer repeats than planned is not clean: x7 failed in repeat 2,
         # which then skipped x14, so x14 has one clean repeat of two (the review of 21 October 2026)
@@ -1520,24 +1591,26 @@ def selftest():
                    row("cpu", 1, 14.1, 14.4, 1, repeats_planned=2),
                    row("cpu", 7, 0.0, 0.0, 1, ok=False, repeats_planned=2)]
         assert [c["ok"] for c in configurations(skipped)] == [True, False, False]
-        assert recommend(skipped, {"cpu": det["cpu"]}, {"cpu"}, False, builds)["runs"] == 1
+        assert recommend(skipped, {"cpu": det["cpu"]}, {"cpu"}, False, builds, plan=P58)["runs"] == 1
         differ = rows[:2] + [row("cuda", 2, 130.0, 140.0, seed0_twice=dict(identical=False))]
-        assert recommend(differ, det, both, True, builds)["device"] == "cpu", "seed 0 twice under contention"
+        assert recommend(differ, det, both, True, builds, plan=P58)["device"] == "cpu", \
+            "seed 0 twice under contention"
         cpu_only = {"cpu": det["cpu"]}
-        assert recommend(rows[:2], cpu_only, {"cpu"}, True, builds)["device"] is None, "a GPU here, unmeasured"
-        assert recommend(rows[:2], cpu_only, {"cpu"}, False, builds)["device"] == "cpu", "no GPU at all"
-        r = recommend(rows[:2], cpu_only, {"cpu"}, None, builds)
+        assert recommend(rows[:2], cpu_only, {"cpu"}, True, builds, plan=P58)["device"] is None, \
+            "a GPU here, unmeasured"
+        assert recommend(rows[:2], cpu_only, {"cpu"}, False, builds, plan=P58)["device"] == "cpu", "no GPU at all"
+        r = recommend(rows[:2], cpu_only, {"cpu"}, None, builds, plan=P58)
         assert r["device"] is None and "nvidia-smi gave no answer" in r["text"], "not knowing is not 'no GPU'"
-        assert recommend(rows, {}, both, True, builds)["device"] is None
-        assert recommend([], {}, set(), True, builds)["text"] == "no device was measured"
+        assert recommend(rows, {}, both, True, builds, plan=P58)["device"] is None
+        assert recommend([], {}, set(), True, builds, plan=P58)["text"] == "no device was measured"
         too_big = [dict(x, fits=False) for x in rows[:2]] + fast[2:]
-        assert recommend(too_big, det, both, True, builds)["device"] == "cuda", "a row that does not fit"
+        assert recommend(too_big, det, both, True, builds, plan=P58)["device"] == "cuda", "a row that does not fit"
         one_failed = [rows[0], dict(rows[1], ok=False)] + fast[2:]
-        assert recommend(one_failed, det, both, True, builds)["device"] == "cuda", "a repeat that failed"
-        assert recommend(fast, det, both, True, builds, smoke=True)["device"] is None, "--quick names none"
-        r = recommend(fast, det, both, True, dict(builds, cpu="2.14.0+cu126"))
+        assert recommend(one_failed, det, both, True, builds, plan=P58)["device"] == "cuda", "a repeat that failed"
+        assert recommend(fast, det, both, True, builds, smoke=True, plan=P58)["device"] is None, "--quick names none"
+        r = recommend(fast, det, both, True, dict(builds, cpu="2.14.0+cu126"), plan=P58)
         assert r["device"] == "cuda"
-        r = recommend(rows, det, both, True, dict(builds, cpu="2.14.0+cu126"))
+        r = recommend(rows, det, both, True, dict(builds, cpu="2.14.0+cu126"), plan=P58)
         assert any("not requirements-lock.txt's" in x for x in r["caution"]), r["caution"]
 
         # the days and the window: lower 100 at 20 runs is 5 steps/s a run, 1.04 days a run,
@@ -1548,13 +1621,13 @@ def selftest():
         assert seeds_in_window(100.0, 20, 12.4) == 13         # 13 seeds: 39 runs, 2 waves; 14: 42 runs, 3 waves, 12.5 days
         assert seeds_in_window(100.0, 20, 1.0) == 0
         # 130 steps/s at 2 runs: one seed is 3 runs, 2 waves, x 4 engines, 0.64 days
-        assert recommend(fast, det, both, True, builds, window_days=0.1)["command"] is None
+        assert recommend(fast, det, both, True, builds, window_days=0.1, plan=P58)["command"] is None
         # the concurrency is picked by days: 16 at once is the faster (100 against 97 steps/s),
         # but 60 runs take 4 waves either way, so 15 at once finishes first (12.9 days, not 13.3)
         pack = [row("cpu", 16, 100.0, 105.0), row("cpu", 15, 97.0, 101.0)]
-        r = recommend(pack, cpu_only, {"cpu"}, False, builds)
+        r = recommend(pack, cpu_only, {"cpu"}, False, builds, plan=P58)
         assert (r["device"], r["runs"]) == ("cpu", 15), r["text"]
-        r = recommend(pack, cpu_only, {"cpu"}, False, builds, window_days=13.0)
+        r = recommend(pack, cpu_only, {"cpu"}, False, builds, window_days=13.0, plan=P58)
         assert (r["runs"], r["seeds_in_window"]) == (15, 20), r["text"]       # 16 at once fits 16 seeds
 
         # --merge: the CPU from the first file, the GPU from the second (dummy versions and hashes)
@@ -1564,7 +1637,7 @@ def selftest():
                         machine=dict(dict(host=host, torch=torch, torch_cuda=torch_cuda, gpus=[dict(name="GPU")],
                                           python="P1", packages=dict(numpy="N1", torch="T"), power="plan A"),
                                      **(machine or {})),
-                        plan=dict(dict(road=ROAD, engine=ENGINE, dt=DT, steps_per_run=3000,
+                        plan=dict(dict(road="extremes", engine="b58", dt=DT, steps_per_run=3000,
                                        det_steps=DET_STEPS, smoke_test=False), **plan),
                         code=dict(dict(benchmark_sha="x", train_sha="t1", git_head="h1"), **(code or {})))
         cuda_env = dict(torch="2.14.0+cu126", torch_cuda="12.6")
@@ -1576,7 +1649,17 @@ def selftest():
             "the CUDA environment's CPU rows must be left out"
         assert merged["recommendation"]["device"] == "cuda", merged["recommendation"]["text"]
         assert not merged["recommendation"]["caution"], merged["recommendation"]["caution"]
+        assert "--engine b58 --road extremes" in merged["recommendation"]["command"], merged["recommendation"]
+        # the engine and the road come from the files: two Mazda files give the Mazda's command and line
+        mz = merge_docs([doc(["cpu"], rows[:2], cpu_only, engine="mazda_25t", road="four_engine"),
+                         doc(["cpu", "cuda"], [row("cpu", 2, 1.0, 2.0)] + fast[2:], det, engine="mazda_25t",
+                             road="four_engine", machine=dict(packages=dict(numpy="N1", torch="T+cu")), **cuda_env)])
+        assert "--engine mazda_25t --road four_engine" in mz["recommendation"]["command"], mz["recommendation"]
+        assert mz["recommendation"]["text"].endswith(validity("mazda_25t")), mz["recommendation"]["text"]
         for wrong in ([cuda_doc, cpu_doc], [cpu_doc, dict(cuda_doc, machine=dict(cuda_doc["machine"], host="dev2"))],
+                      # two engines, or two roads, are two measurements
+                      [cpu_doc, doc(["cuda"], fast[2:], det, engine="mazda_25t", **cuda_env)],
+                      [cpu_doc, doc(["cuda"], fast[2:], det, road="four_engine", **cuda_env)],
                       [cpu_doc, doc(["cuda"], fast[2:], det, torch_cuda="12.6", steps_per_run=1500)],
                       [cpu_doc, dict(cuda_doc, status="interrupted (Ctrl+C)")],
                       [doc(["cpu"], rows[:2], cpu_only, smoke_test=True), cuda_doc],
@@ -1649,7 +1732,8 @@ def selftest():
         print(f"SELFTEST PASSES (three runs at once, an exit code, a hung run killed by its deadline "
               f"with its child, a part's result line kept when its child dies, hangs or cuts its "
               f"last line short, nvidia-smi's silence not read as no GPU, the bounds, a CPU fallback "
-              f"and a second plant refused, the counters compared, the grid and the input checks, a "
+              f"and a second plant refused, the counters compared, the grid and the input checks, the "
+              f"engine and the road in every command, a "
               f"recorded step's bytes, the production memory and its caps, the rule's margins "
               f"against the other device's peak, unchecked determinism and "
               f"skipped repeats, the days and the window, --merge and its refusals and cautions, the "
@@ -1673,7 +1757,15 @@ def selftest():
 
 # -------------------------------------------------------------------------- main
 def main():
+    import engines                                   # numpy and the specs only: no torch in this process
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    # engines.trainable(), not known(), as train.py (decision 47): an engine that may not train is
+    # refused here, before anything runs. REQUIRED for every run that measures (check_args)
+    ap.add_argument("--engine", choices=engines.trainable(),
+                    help="the plant to time (engines.get), one that may train (engines.trainable()). "
+                         "Required to measure: there is no default engine (CLAUDE.md mistake 1)")
+    ap.add_argument("--road", help="the training road to time, a road train.DESIGN_DT holds whose design "
+                                   "step is DT (the probe checks both). Required to measure")
     ap.add_argument("--device", nargs="+", choices=("cpu", "cuda"),
                     help="the devices to measure (default: cpu in a CPU build of torch, cuda in a "
                          "CUDA build: the docstring's two environments)")
@@ -1698,8 +1790,8 @@ def main():
     ap.add_argument("--part", choices=("probe", "plant", "sac"), help=argparse.SUPPRESS)
     a = ap.parse_args()
     if a.part:
-        res = (part_probe() if a.part == "probe" else part_plant() if a.part == "plant"
-               else part_sac(a.device[0]))
+        res = (part_probe(a.road) if a.part == "probe" else part_plant(a.engine, a.road) if a.part == "plant"
+               else part_sac(a.device[0], a.engine, a.road))
         print(PART_TAG + json.dumps(res), flush=True)
         return
     if a.selftest:
@@ -1712,16 +1804,20 @@ def main():
         merge(a.merge, a.out, a.window_days)
         return
 
+    # what is measured, the JSON's "plan" block (its engine, road and step travel to every command)
+    plan = dict(road=a.road, engine=a.engine, dt=DT)
     try:
-        probe = run_part("probe", "cuda", timeout_s=600)
+        probe = run_part("probe", plan, "cuda", timeout_s=600)
     except RuntimeError as e:
         sys.exit(f"the probe printed no result: torch, train.py or engines.py does not import here, "
                  f"or the probe could not be stopped ({e})")
     if probe.get("child_exit"):                     # it died or hung after its first line: in the CUDA test
         if not (probe.get("cuda") or {}).get("ok"):
             probe["cuda"]["why"] += f" ({probe['child_exit']})"
+    if probe["design_dt"] is None:
+        sys.exit(f"train.py has no road {a.road!r}: train.DESIGN_DT holds {', '.join(probe['roads_known'])}")
     if probe["design_dt"] != DT:
-        sys.exit(f"train.DESIGN_DT[{ROAD!r}] is {probe['design_dt']} and this benchmark passes "
+        sys.exit(f"train.DESIGN_DT[{a.road!r}] is {probe['design_dt']} and this benchmark passes "
                  f"--dt {DT:g}: change DT here, and say why, before measuring")
     m = machine(probe)
     asked = a.device or (["cuda"] if m["torch_cuda"] else ["cpu"])
@@ -1732,6 +1828,9 @@ def main():
     steps = a.steps if a.steps is not None else (1500 if a.quick else 3000)
     repeats = a.repeats if a.repeats is not None else (1 if a.quick else REPEATS)
     physical = max(1, min(m["physical_cpus"] or m["usable_cpus"], m["usable_cpus"]))
+    # the whole plan, in the key order the JSON has always had (road, engine, dt first)
+    plan.update(steps_per_run=steps, det_steps=DET_STEPS, runs_grid=runs, repeats=repeats, buffer=PROD_BUFFER,
+                smoke_test=a.quick, window_days=a.window_days, no_determinism=a.no_determinism)
     now = datetime.now()
     out_path = a.out or default_out(m["host"], m["torch"], now)
     print("THE MACHINE")
@@ -1744,15 +1843,16 @@ def main():
     print(f"\nPLAN: devices {devices}; first seed 0 twice per device ({DET_STEPS} steps each); then "
           f"concurrencies {runs} (each device's capped after its single-run row by what fits at "
           f"{PROD_STEPS:,} steps), {steps} steps per run with --buffer {PROD_BUFFER}, {repeats} "
-          f"repeat(s) interleaved; the {ROAD} roads, the {ENGINE.upper()}, one thread per run"
+          f"repeat(s) interleaved; the {a.road} roads, the {a.engine.upper()}, one thread per run"
           + ("\n  --quick: A SMOKE TEST, its numbers are not for decisions 30 and 32" if a.quick else ""))
     if a.dry_run:
         for d in devices:
-            print(f"  section 4, {d} (twice, one at a time):", " ".join(train_cmd(d, 0, DET_STEPS, f"<tmp>/det_{d}")))
+            print(f"  section 4, {d} (twice, one at a time):",
+                  " ".join(train_cmd(d, 0, DET_STEPS, f"<tmp>/det_{d}", plan)))
             for n in runs:
                 seeds = [0, 0] + list(range(1, n - 1)) if d == "cuda" and n >= 2 else list(range(n))
                 print(f"  section 3, {d} x{n}: "
-                      + " ".join(train_cmd(d, seeds[0], steps, f"<tmp>/{d}_{n}/r0", buffer=PROD_BUFFER))
+                      + " ".join(train_cmd(d, seeds[0], steps, f"<tmp>/{d}_{n}/r0", plan, buffer=PROD_BUFFER))
                       + (f" (seeds {seeds})" if n > 1 else ""))
         print(f"  the JSON: {os.path.abspath(out_path)}"
               + ("  -- EXISTS: a real run would refuse it" if os.path.exists(out_path) else ""))
@@ -1762,10 +1862,7 @@ def main():
     out = resolve_out(out_path)
     result = dict(benchmark="benchmark_training.py", asked_by="Ghassan, 21 October 2026", status="running",
                   date=now.isoformat(timespec="seconds"), code=code_info(), machine=m,
-                  devices_asked=asked, devices=list(devices), notes=notes,
-                  plan=dict(road=ROAD, engine=ENGINE, dt=DT, steps_per_run=steps, det_steps=DET_STEPS,
-                            runs_grid=runs, repeats=repeats, buffer=PROD_BUFFER, smoke_test=a.quick,
-                            window_days=a.window_days, no_determinism=a.no_determinism),
+                  devices_asked=asked, devices=list(devices), notes=notes, plan=plan,
                   parts={}, determinism={}, concurrency=[], recommendation=None)
     save(result, out)
     print(f"  the JSON: {out} (written after every section)")
@@ -1774,7 +1871,7 @@ def main():
         print("\n2. THE PARTS OF ONE STEP (each in a child process, one thread)")
         parts = result["parts"]
         try:
-            parts["plant"] = run_part("plant")
+            parts["plant"] = run_part("plant", plan)
         except Exception as e:
             parts["plant"] = dict(error=repr(e))
             result["status"] = "failed: the plant step"
@@ -1784,7 +1881,7 @@ def main():
         print(f"  plant step (CPU, numpy, backend {parts['plant']['backend']})   {1000 * plant_s:.2f} ms")
         for d in list(devices):
             try:
-                parts[d] = run_part("sac", d)
+                parts[d] = run_part("sac", plan, d)
             except Exception as e:
                 parts[d] = dict(error=repr(e))
                 devices.remove(d)
@@ -1813,7 +1910,7 @@ def main():
                   "tensor, counter, recorded step and the curve compared)")
             for d in devices:
                 try:
-                    v = determinism(d, root, batch_deadline(parts[d], plant_s, 1, DET_STEPS, physical))
+                    v = determinism(d, root, batch_deadline(parts[d], plant_s, 1, DET_STEPS, physical), plan)
                 except Exception as e:
                     v = dict(device=d, identical=None, why=f"error: {e!r}")
                 result["determinism"][d] = v
@@ -1842,7 +1939,7 @@ def main():
                     print(f"  repeat {rep + 1}, {d} x{n} ...", flush=True)
                     dl = batch_deadline(parts[d], plant_s, n, steps, physical)
                     try:
-                        row = benchmark_concurrency(d, n, steps, root, dl)
+                        row = benchmark_concurrency(d, n, steps, root, dl, plan)
                     except Exception as e:
                         row = dict(device=d, runs=n, steps_per_run=steps, ok=False, why=[f"error: {e!r}"])
                     row["repeat"] = rep
@@ -1879,7 +1976,7 @@ def main():
     print_table(result["concurrency"])
     rec = recommend(result["concurrency"], {} if a.no_determinism else result["determinism"],
                     set(result["devices"]), gpu_presence(m), {d: m["torch"] for d in result["devices"]},
-                    a.window_days, smoke=a.quick)
+                    a.window_days, smoke=a.quick, plan=plan)
     result["recommendation"] = rec
     save(result, out)
     print("\nRECOMMENDATION:", rec["text"])

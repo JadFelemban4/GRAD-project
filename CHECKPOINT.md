@@ -111,9 +111,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    side and never pooled, the battery of Phase E) and the app's backlog are
    `STATE_HISTORY.md` part E, verbatim. X1 and X2 came after them: check an item
    before taking it up.
-7. For Ghassan, before the next training: `train.py`'s `CLOSED` list has no
-   `wideair_dt1`, though X2's result was published on 13 October (session
-   report of 15 October, 2.3).
+7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
+   October); `GRA-test`'s has it since C1 (ORDER step 7).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
    order (sections I-L). Next: C1, R3a, step 8a (row 125's N); each of you sends the sha256
    of a private 256-bit integer (row 96); then R0, the push and the reveal. Pause Windows
@@ -123,8 +122,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device, before any training: install from
    `requirements-lock.txt` (and, to measure its GPU, the CUDA build of the same
-   torch in a second environment); run `python benchmark_training.py` there, which
-   decides CPU or GPU and checks that seed 0 trains identically twice; then
+   torch in a second environment); run `python benchmark_training.py --engine b58 --road
+   extremes --device cpu` there (C1 made both options required), which decides CPU or GPU
+   and checks that seed 0 trains identically twice; then
    `python check_training_device.py --identity device.json` there and on this
    laptop, and `--compare` the two (recorded, not required; decision 32).
 11. The literature (`docs/literature/READING_LIST.md`, 183 sources): one person does
