@@ -166,8 +166,8 @@ SMOKE_N_ROADS = 2
 # which they were set in two commits or changed. None until Ghassan and Jad supply them. The integer is
 # at least 2**128 (MIN_PRIVATE_INT), so that its hash cannot be searched: `python epa_roads.py
 # commitment` draws one of 256 bits with the secrets module and prints it with its line.
-COMMITMENT_G = None
-COMMITMENT_J = None
+COMMITMENT_G = '8984e45fefb8755e5d00076b6de5371d412244c33f9bf58f8b3740ed7ad1cf0d'
+COMMITMENT_J = '86db8cfc8a41c1a3c8b32f98b4e57412f122a829a1f5ab9a069d54e02a8cbce2'
 MIN_PRIVATE_INT = 2 ** 128
 REMOTE_NAME = "origin"
 REMOTE_BRANCH = "GRA-test"
