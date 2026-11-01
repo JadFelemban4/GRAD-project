@@ -17,7 +17,11 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `55f5fa2` | 8a, K | each engine's `check` and `check --defect` records on N |
 | `1715c83` | 8, R3a | the tightenings code, with row 129 (4)'s `stopped` route; this report |
 | `7f7a7c0` | Team | section M (row 133); row 111's statements signed |
-| this one | 4 | the two test fixtures that assumed the hash lines were None (section 7) |
+| `c6dfba5` | 4 | the two test fixtures that assumed the hash lines were None (section 7) |
+| `bb91848` | 4, R0 | the two hash lines and nothing else (row 132 (2)) |
+| `fb20ab2` | 6, R1 | the roads: attempt 1's log, its printed outputs and `roads.json` (section 8) |
+| `4da4a31` | 8, R3b | `results/EPA_TIGHTENINGS.json` alone (section 8) |
+| this one | docs | sections 8 and 9; ORDER's status and step 6; CHECKPOINT |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -110,3 +114,101 @@ its own commit before R0, because R0 sets both lines and nothing else (row 132 (
 test file is in any hashed list (the roads' row 97 files, the tightenings' `code_files`,
 `epa_freeze.CODE_HASHED`). The 27 tests of those three classes passed with the lines `None`
 and again with R0's two lines in place.
+
+## 8. 1 November: the roads drawn (R0, R1) and the tightenings written (R3b)
+
+**R0, `bb91848`**, sets the two hash lines and nothing else (row 132 (2)), on top of section 7's fix.
+Its gate passed with the known failures only.
+
+**The reveal and the draw (ORDER step 6)** ran on R0 itself, clean and pushed, at 14 jobs, from 06:13
+to 16:53 (+03:00): 10 h 40 min. It ran as a background job of the agents' session, because the
+agents' permission check refused a Windows scheduled task for it as persistence. A launcher outside
+the tree refused before it read the integer file unless the tree was clean (untracked files
+included), HEAD was origin's `GRA-test` and the roads commit `find_roads_commit` finds, and the
+platform string read `Windows-11-10.0.26200-SP0`; it then checked both reveals against R0's lines
+before it called the draw. It had been tried first in a throwaway clone: one good case, five refused.
+Attempt 1's outcome is `roads` (`results/EPA_ROADS/attempt_1_printed.txt`):
+
+- roads_seed 838780772281073261, from both reveals and R0's sha.
+- 20 roads, 75 climbs. C5 at 1.9 % and row 98's checks on every car replaced 25 slots, every one for
+  C5 case (1) on the Ford, from the 0x1D stream; 0 flat.
+- T passes: T = MEI/4 = 1.36 points of cut (row 103 (2)). C, the mean of (a) at r = 1.5 in points of
+  cut, in the no-knock reading: B58 5.232, Mazda 2.603, Honda 5.152, Ford 2.398.
+- Identity held on the B58's locked climb and on every engine's generated and final arrays (80 runs
+  each).
+- τ by row 102: B58 47.34 s, Mazda 42.74 s, Honda 47.67 s, Ford 66.76 s, the last three equal to
+  their `complete.json`.
+- Coverage: none of the 75 climbs lies inside `calibration_fired` on the Mazda or the Honda, all 75
+  do on the Ford; none lies inside `calibration_hot` on any of the three.
+
+**R1, `fb20ab2`**, commits the attempts log, the printed outputs and `roads.json`. The outcome line
+records the printed file's sha_text, so it is committed with the record; ORDER step 6 named only the
+log and the record, and now names it too. `epa_roads.verify_record` printed `[]` before R1 and again on
+R1 before the tightenings.
+
+**One deviation: Windows updates were not paused before the reveal** (ORDER step 6, row 126). The
+agents' shell is not elevated, and the Settings switch is Ghassan's. No restart was pending;
+`LastBootUpTime` read 14 October 18:15:56 before the draw and again after it, and the platform string
+did not change. The draw saw no restart. ORDER step 20's list of disclosures now names it, so the
+preregistration states it.
+
+**R3b, `4da4a31`: the tightenings (ORDER step 8)**, `results/EPA_TIGHTENINGS.json` alone. Every
+`__pycache__` outside `.venv` was deleted first. `epa_tightenings.py timing`, outside the tree, took
+876 s for one SYNTHETIC road and predicted the real run at 11,573 s. The run, on R1 at 14 jobs, took
+11,737 s (19:07 to 22:23). It printed:
+
+- L1: slope 0.0611 points per K, at H 1.5 = 71.00 s, the knock reading, shift +57 K. The contract's
+  basis, `knee_shift.largest`, is 0.0905 (terrain_dt1, knock, 57 K).
+- E8, the K3 head-start pair's relative change (a fraction of the nominal pair, not points; of the two
+  readings, the larger |change| with its sign) against each λ shift on the roads, as printed: -0.1: -0.5305,
+  -0.05: -0.2602, -0.02: -0.1123, -0.01: -0.0584, -0.005: -0.0295, +0.005: -0.0424, +0.01:
+  -0.0863, +0.02: -0.1761, +0.05: -0.4568; against each spark shift (deg): -3: +0.1099, -1.5:
+  +0.0850, -0.75: +0.0534, +0.75: -0.0889, +1.5: -0.1572.
+- The nominal pair: 26.89 points with knock, 30.84 without; above0 413 s, as pinned; the knees equal
+  the pinned ones.
+- On all 300 (shift, road) runs of each reading, reactive's damage equals neutral's bit for bit: the
+  reactive policy never acted, so each head-start pair is current-grade's cut alone. The record keeps
+  this as a value; no rule reads it.
+- The B58's E8 band (row 107 (4)): E 25.80 %, u_val 15.51 %, R 16.6 %, the label untested (no row
+  defines a u_stat for this reading), κ 3.423 by row 107 (3)'s formula, its floor not binding; the
+  locked climb alone gives κ 3.443, and model minus car (descriptive) 4.486. E is read at -3.81°, the
+  car-minus-model median, beyond the spark grid's -3° end: the record marks that end extrapolated.
+  The descriptive reading's ends, +3.81° and +1.78°, both lie beyond the grid's +1.5° end, and the
+  record marks both extrapolated.
+
+R3b's gate: every suite of `epa_freeze.STEP2_TESTS` passed but `test_epa_rows`' known row-120 failure;
+`test_epa_tightenings`' LiveRecord failed with "results/EPA_TIGHTENINGS.json is not committed", by
+design before the commit; `verify_docs.py` 74 of 74, `drift_test.py` 18 of 18, `app.test_replay --full`
+59 of 59; the app's two other suites only the known `?v=20261009` asset checks and the `pwsh`
+launcher test; the frozen diff against N empty. After the commit, `test_epa_tightenings.LiveRecord`
+and `test_epa_roads.Tightenings` ran 4 tests, all OK and none skipped, and `verify_record` printed
+`[]`.
+
+## 9. What waits, from here
+
+The agents' steps stop at the rehearsal (step 9), because Run 2 (step 10) needs row 114's schedule row
+committed before the first arming (row 106 (7); `docs/build_step_2/RUN2_CHECKLIST.md`):
+
+1. **Step 3, on the training device**: Part A of `docs/build_step_2/DEVICE_RUNBOOK.md` (the lock
+   install, `check_training_device.py`, the CPU benchmark, and the CUDA one if the device has a GPU,
+   then `--merge`). It fixes the device and its torch build. An agent session on that device can run
+   it.
+2. **W, the training window's first and last day and hours** (row 114: "the team's dates"). It sets n,
+   the seeds per arm, by row 114's rule after Run 2, and it never moves after the first arming. W's
+   own dates are not written, but its bound is: the team's end, 23 November
+   (`docs/build_step_2/PLAN.md:1164`; rows 111 and 126 (2)), with G5 on 11 November (row 111). At the
+   laptop's rates, 20 seeds × 3 arms × 4 engines on the exact plant take about 15-17 days (row 111),
+   so a window that ends on 23 November holds them only if training starts by about 6-8 November. With
+   less, row 114's rule takes engines off the exact cycle, the Ford first, then the Honda, then the
+   Mazda; each then needs its table, and no table code is in the tree (row 114); an engine whose table
+   fails, after the remedies, drops. The device's own rates (step 3, then step 18 after the plant
+   commit) decide. W's first day and hours depend on when the training device is free, so they are
+   Ghassan's (rows 114, 133 (1)).
+3. **Pause Windows updates now** (Settings, Windows Update, Pause updates, for the longest period
+   offered; row 126 (2)), and keep Windows on its build until training starts (step 22) or Run 2's
+   defect route is recorded closed, whichever comes first (row 126 (1), which replaced row 106 (1)'s
+   end at the redraws).
+
+With those three, the agents write the schedule row (W, the device, the protocol's concurrency,
+steps and repeats), run the rehearsal and then Run 2, Mazda, Honda, Ford, with nothing else running
+on the laptop.

@@ -1,6 +1,6 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-10-31 (on `GRA-test`, at R3a, after R0a, C1, N and K) — verify_docs.py 74/74 · drift_test.py 18/18 (R0a's gate) · the app suites at R0a: the known `?v=` asset checks and the `pwsh` launcher test fail, as on 15 October (`SESSION_REPORT_2026-10-31_build-step-2.md`)
+Last verified: 2026-11-02 (on `GRA-test`, at R3b `4da4a31`, after R0 and R1: the roads drawn, the tightenings written) — verify_docs.py 74/74 · drift_test.py 18/18 (R3b's gate) · the app suites at R3b: the known `?v=` asset checks and the `pwsh` launcher test fail, as on 15 October (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 8)
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
 GRA-test: build step 2's commits A (WP1, certified 23 October, `results/B58_IDENTITY.md`), C (the calibration and validation scripts, WP3) and D (`25437ba`, 30 October: Run 1, the three EPA engines calibrated and frozen), on contract version 5 (`c842d74`, unchanged since the first fit) · the B58: plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3, unchanged by Run 1 (decision 48's re-runs) · pending: L8 on the training device
 
@@ -80,7 +80,7 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
   1-133 are answered (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no
   knock term; J-L, 31 October, L under Ghassan's standing approval; M: he works alone, row 133).
-  Roads code: R0a; then R0, the draw, R3b. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+  Roads: R0 `bb91848`, then R1 `fb20ab2` (the draw of 1 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 
 ## Blockers
@@ -114,9 +114,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
    October); `GRA-test`'s has it since C1 (ORDER step 7).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (sections I-M). Done 31 October: R0a, C1, N, K, R3a. Next: R0 with the hash lines the
-   agents make (row 133); the reveal and the draw; R3b. Ghassan: pause Windows
-   updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
+   order (sections I-M). Done: R0a, C1, N, K, R3a (31 October); R0, R1 (the roads, T passes), R3b (1-2
+   November). Next: step 3 on the training device and W's dates, then row 114's schedule row, the rehearsal
+   and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Ghassan: pause Windows updates now (row 126). Nothing
    else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.

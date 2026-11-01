@@ -3,8 +3,10 @@
 Row 106 of `results/VALIDATION_DECISIONS.md` asks for this checklist in `CHECKPOINT.md`. It
 lives here instead because `CHECKPOINT.md` stays within 150 lines (ORDER step 7's test), and
 `CHECKPOINT.md` points here. Every item is a refusal or a deadlock that the code already
-contains (row 106's Why). Written by the AI agents on 31 October 2026, before the first
-arming. Tick each box in the copy you work from, not in this file.
+contains (row 106's Why), but for row 114's schedule row, which is a written rule only: arm does
+not check it (`validate_epa.py`'s arm steps hold no schedule step; corrected 2 November 2026).
+Written by the AI agents on 31 October 2026, before the first arming. Tick each box in the copy
+you work from, not in this file.
 
 **Who and where.** One operator, this laptop only, on AC power, one engine at a time, in the
 order **Mazda (`mazda_25t`), Honda (`honda_l15b7`), Ford (`ford_27tt`)**. Run 2 never runs on
@@ -18,8 +20,9 @@ the training device, because the platform is pinned (decision 61).
 - [ ] Row 114's schedule row is committed: the window W, the device and its torch build, and the
       benchmark protocol (row 106 (7)).
 - [ ] Windows feature and quality updates are paused, and the venv has not been touched since the
-      fit. From now until the commit that records the last redraw (ORDER step 12), neither
-      changes (row 106 (1)). Check that the platform string reads
+      fit. From now until training starts (ORDER step 22) or Run 2's defect route is recorded
+      closed, whichever comes first, neither changes (row 126 (1), which replaced row 106 (1)'s end,
+      the commit that records the last redraw). Check that the platform string reads
       `Windows-11-10.0.26200-SP0`:
       `python -I -c "import platform; print(platform.platform())"`. All three freeze.json files
       record that string, and `epa_freeze.py:511-517` compares it.
@@ -97,4 +100,5 @@ gives the restore set.
 
 - [ ] ORDER step 11, the labels: a person records each engine's labels, section 7's
       consequences, any drops, and κ (row 107 (3)-(4)).
-- [ ] Windows updates stay paused until the commit that records the last redraw (ORDER step 12).
+- [ ] Windows updates stay paused until training starts (ORDER step 22) or Run 2's defect route is
+      recorded closed, whichever comes first (row 126 (1)).

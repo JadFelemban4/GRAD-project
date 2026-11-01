@@ -4675,3 +4675,17 @@ From "Next actions", item 8, as committed at `1715c83`:
    of a private 256-bit integer (row 96); then R0, the push and the reveal. Pause Windows
    updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
    else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
+
+# Part AB — lines rotated out of CHECKPOINT.md, 2 November 2026 (GRA-test: R0, R1 and R3b, the roads drawn and the tightenings written)
+
+Last verified: 2026-10-31 (on `GRA-test`, at R3a, after R0a, C1, N and K) — verify_docs.py 74/74 · drift_test.py 18/18 (R0a's gate) · the app suites at R0a: the known `?v=` asset checks and the `pwsh` launcher test fail, as on 15 October (`SESSION_REPORT_2026-10-31_build-step-2.md`)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `7f7a7c0`:
+
+  Roads code: R0a; then R0, the draw, R3b. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+
+From "Next actions", item 8, as committed at `7f7a7c0`:
+
+   order (sections I-M). Done 31 October: R0a, C1, N, K, R3a. Next: R0 with the hash lines the
+   agents make (row 133); the reveal and the draw; R3b. Ghassan: pause Windows
+   updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
