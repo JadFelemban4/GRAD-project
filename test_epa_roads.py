@@ -41,6 +41,7 @@ import copy
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -422,12 +423,17 @@ def git(root, *args):
     return r.stdout.strip()
 
 
+HASH_LINE = re.compile(r"^(COMMITMENT_[GJ]) = (?:None|'[0-9a-f]{64}'|\"[0-9a-f]{64}\")(?=\r?$)", re.M)
+
+
 def module_with(g, j):
+    """The live roads module's source with its two hash lines set to g and j, whatever the tree holds: None
+    until the roads commit R0, both lines from it on (row 132 (2))."""
     with open(os.path.join(HERE, "epa_roads.py"), encoding="utf-8") as fh:
         src = fh.read().replace("\r\n", "\n")
-    assert "\nCOMMITMENT_G = None\n" in src and "\nCOMMITMENT_J = None\n" in src
-    return (src.replace("\nCOMMITMENT_G = None\n", f"\nCOMMITMENT_G = {g!r}\n")
-            .replace("\nCOMMITMENT_J = None\n", f"\nCOMMITMENT_J = {j!r}\n"))
+    assert sorted(m.group(1) for m in HASH_LINE.finditer(src)) == ["COMMITMENT_G", "COMMITMENT_J"]
+    vals = {"COMMITMENT_G": g, "COMMITMENT_J": j}
+    return HASH_LINE.sub(lambda m: f"{m.group(1)} = {vals[m.group(1)]!r}", src)
 
 
 class Reveal(Guarded):

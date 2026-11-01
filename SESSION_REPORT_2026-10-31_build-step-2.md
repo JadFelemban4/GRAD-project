@@ -15,7 +15,9 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `523a75a` | 7, C1 | the training code outside the plant (16 files) |
 | `f48e5f0` | 8a, N | one line of `calibrate_epa.Audit.allowed` (row 125) and its two tests |
 | `55f5fa2` | 8a, K | each engine's `check` and `check --defect` records on N |
-| this one | 8, R3a | the tightenings code, with row 129 (4)'s `stopped` route; this report |
+| `1715c83` | 8, R3a | the tightenings code, with row 129 (4)'s `stopped` route; this report |
+| `7f7a7c0` | Team | section M (row 133); row 111's statements signed |
+| this one | 4 | the two test fixtures that assumed the hash lines were None (section 7) |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -95,3 +97,16 @@ own instruction file, and the permission check refuses the agents' edits to it: 
 bracket (the waiver of row 111 (ii)) and mistake 26's one-line rule are his edits. Pausing
 Windows updates needs the Settings switch, since the agents' shell is not elevated. The
 training device's steps (3, 18, 21 and 22) need someone, or an agent session, on that device.
+
+## 7. 1 November: the roads commit's gate failed on two test fixtures
+
+R0's gate ran every suite with both hash lines set. Two suites failed on their own fixtures,
+not on the code: `test_epa_roads.Reveal`, 11 failures, and `test_epa_tightenings`' `RealGates` and
+`StoppedRoute`, 2 errors in setUpClass. Each fixture builds a scratch repository from the live
+`epa_roads.py` and assumed its two lines still read `None`, which is true only before R0.
+They would have failed at every commit from R0 on. Each fixture now sets the lines back to
+`None` in its copy, whatever the tree holds, and then sets its own test integers. The fix is
+its own commit before R0, because R0 sets both lines and nothing else (row 132 (2)). Neither
+test file is in any hashed list (the roads' row 97 files, the tightenings' `code_files`,
+`epa_freeze.CODE_HASHED`). The 27 tests of those three classes passed with the lines `None`
+and again with R0's two lines in place.

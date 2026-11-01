@@ -68,6 +68,7 @@ import io
 import json
 import math
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -1167,6 +1168,9 @@ def canned_compute(record, *, roads_ref, strategy, r_e8_pct, spark, pinned, seco
     return l1, e8, T.timing_of({}, wall=0.0, jobs=jobs, n_roads=len(roads), n_shifts=len(shifts)), []
 
 
+HASH_LINE = re.compile(r"^(COMMITMENT_[GJ]) = (?:None|'[0-9a-f]{64}'|\"[0-9a-f]{64}\")(?=\r?$)", re.M)
+
+
 def gates_repository(root):
     """The synthetic git repository RealGates and StoppedRoute run in, at `root` (a new folder): a copy of the code
     (code_files, the roads module's hashed files) and the data inputs (the contract, results/car_spark_boost.json,
@@ -1180,6 +1184,13 @@ def gates_repository(root):
         dst = os.path.join(root, *rel.split("/"))
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copyfile(os.path.join(HERE, *rel.split("/")), dst)
+    mod = os.path.join(root, R.MODULE_REL)             # the copy's roads module as R0a committed it: both hash
+    with open(mod, encoding="utf-8", newline="") as fh:   # lines None, whatever the tree holds (row 132 (2))
+        src = fh.read()
+    src, n = HASH_LINE.subn(r"\1 = None", src)
+    assert n == 2
+    with open(mod, "w", encoding="utf-8", newline="") as fh:
+        fh.write(src)
     with open(os.path.join(root, ".gitignore"), "wb") as fh:
         fh.write(b"__pycache__/\n")
     fx.git(root, "init", "-q", "-b", "main")
