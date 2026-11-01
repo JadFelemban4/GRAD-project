@@ -1,0 +1,343 @@
+[2026-11-01T03:14:41+00:00] attempt 1: roads_seed 838780772281073261 from the reveal and the roads commit bb91848ac65fb0be014d59813f9d5adf31ede509
+[2026-11-01T03:14:41+00:00] check_engine_env: the road shape is make_grade_climb's, ramp 8.0 s (REAL seed)
+[2026-11-01T03:14:43+00:00] provenance: 35 files hashed; plant_sha b58 865f8e7b7e5c2dbe, mazda_25t f86baf59389dea29, honda_l15b7 a4e6138b9d258b1f, ford_27tt cec3e3faefe47172
+[2026-11-01T03:16:00+00:00] step 1, identity on the B58's locked climb: holds True {'max_abs_dlam': 0.0, 'max_abs_dspark': 0.0, 'contacts_lam': 0, 'contacts_spark': 0, 'bounds_are_python_floats': True, 'steps': 719}
+[2026-11-01T03:16:00+00:00] step 2, arrays generated: 20 roads, 75 slots, climbs per road [4, 3, 4, 4, 4, 4, 3, 4, 4, 4, 3, 4, 4, 4, 4, 4, 3, 4, 3, 4], arrays sha256 ca1be74d532ba6795763409e529bbe1404166b0d20454fee81f14c168430c691
+[2026-11-01T03:31:40+00:00] step 3, identity on every engine's generated arrays: 80 runs, all hold
+[2026-11-01T03:31:41+00:00] slot 0 (road 0): grade 0.118232 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.101369
+[2026-11-01T03:31:43+00:00] slot 1 (road 0): grade 0.117172 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.106179
+[2026-11-01T03:31:47+00:00] slot 6 (road 1): grade 0.118033 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.118602
+[2026-11-01T03:31:49+00:00] slot 7 (road 2): grade 0.118000 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.109089
+[2026-11-01T03:31:50+00:00] slot 8 (road 2): grade 0.112323 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.103049
+[2026-11-01T03:31:55+00:00] slot 14 (road 3): grade 0.118315 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.106571
+[2026-11-01T03:31:59+00:00] slot 18 (road 4): grade 0.116741 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.101311
+[2026-11-01T03:32:03+00:00] slot 23 (road 6): grade 0.116773 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.108740
+[2026-11-01T03:32:04+00:00] slot 24 (road 6): grade 0.114463 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.110371
+[2026-11-01T03:32:06+00:00] slot 25 (road 6): grade 0.116663 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 2, grade 0.102358
+[2026-11-01T03:32:07+00:00] slot 26 (road 7): grade 0.115815 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.101022
+[2026-11-01T03:32:10+00:00] slot 30 (road 8): grade 0.113694 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.106356
+[2026-11-01T03:32:19+00:00] slot 41 (road 11): grade 0.113001 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.119310
+[2026-11-01T03:32:20+00:00] slot 42 (road 11): grade 0.117282 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.109141
+[2026-11-01T03:32:23+00:00] slot 44 (road 11): grade 0.115119 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 2, grade 0.118484
+[2026-11-01T03:32:25+00:00] slot 46 (road 12): grade 0.111952 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.108348
+[2026-11-01T03:32:30+00:00] slot 53 (road 14): grade 0.115930 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.119596
+[2026-11-01T03:32:34+00:00] slot 57 (road 15): grade 0.114200 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 2, grade 0.107595
+[2026-11-01T03:32:36+00:00] slot 58 (road 15): grade 0.115310 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.103315
+[2026-11-01T03:32:40+00:00] slot 63 (road 16): grade 0.116700 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.104814
+[2026-11-01T03:32:42+00:00] slot 64 (road 17): grade 0.113570 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 2, grade 0.103786
+[2026-11-01T03:32:45+00:00] slot 68 (road 18): grade 0.113825 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 1, grade 0.110362
+[2026-11-01T03:32:47+00:00] slot 69 (road 18): grade 0.115996 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 2, grade 0.111676
+[2026-11-01T03:32:51+00:00] slot 71 (road 19): grade 0.115919 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 3, grade 0.110750
+[2026-11-01T03:32:53+00:00] slot 72 (road 19): grade 0.114976 failed ['C5 case (1) at 1.9 % on ford_27tt']; replaced by 0x1D draw 2, grade 0.108229
+[2026-11-01T03:32:54+00:00] step 4a, C5 at 1.9 % and row 98's checks on every car: 75 slots, 25 replaced, 0 flat; final arrays sha256 a9bb169843cf532305548b127fec2e2121f83a1b4facfc4182f84d78fa5e3b82
+[roads_ceiling] 10/480 runs, 160 s
+[roads_ceiling] 20/480 runs, 318 s
+[roads_ceiling] 30/480 runs, 477 s
+[roads_ceiling] 40/480 runs, 485 s
+[roads_ceiling] 50/480 runs, 642 s
+[roads_ceiling] 60/480 runs, 796 s
+[roads_ceiling] 70/480 runs, 808 s
+[roads_ceiling] 80/480 runs, 966 s
+[roads_ceiling] 90/480 runs, 1122 s
+[roads_ceiling] 100/480 runs, 1278 s
+[roads_ceiling] 110/480 runs, 1290 s
+[roads_ceiling] 120/480 runs, 1442 s
+[roads_ceiling] 130/480 runs, 1601 s
+[roads_ceiling] 140/480 runs, 1619 s
+[roads_ceiling] 150/480 runs, 1776 s
+[roads_ceiling] 160/480 runs, 1927 s
+[roads_ceiling] 170/480 runs, 2083 s
+[roads_ceiling] 180/480 runs, 2101 s
+[roads_ceiling] 190/480 runs, 2251 s
+[roads_ceiling] 200/480 runs, 2409 s
+[roads_ceiling] 210/480 runs, 2435 s
+[roads_ceiling] 220/480 runs, 2587 s
+[roads_ceiling] 230/480 runs, 2734 s
+[roads_ceiling] 240/480 runs, 2887 s
+[roads_ceiling] 250/480 runs, 2916 s
+[roads_ceiling] 260/480 runs, 3061 s
+[roads_ceiling] 270/480 runs, 3214 s
+[roads_ceiling] 280/480 runs, 3244 s
+[roads_ceiling] 290/480 runs, 3393 s
+[roads_ceiling] 300/480 runs, 3534 s
+[roads_ceiling] 310/480 runs, 3687 s
+[roads_ceiling] 320/480 runs, 3723 s
+[roads_ceiling] 330/480 runs, 3870 s
+[roads_ceiling] 340/480 runs, 4013 s
+[roads_ceiling] 350/480 runs, 4052 s
+[roads_ceiling] 360/480 runs, 4198 s
+[roads_ceiling] 370/480 runs, 4341 s
+[roads_ceiling] 380/480 runs, 4493 s
+[roads_ceiling] 390/480 runs, 4534 s
+[roads_ceiling] 400/480 runs, 4681 s
+[roads_ceiling] 410/480 runs, 4817 s
+[roads_ceiling] 420/480 runs, 4864 s
+[roads_ceiling] 430/480 runs, 5014 s
+[roads_ceiling] 440/480 runs, 5149 s
+[roads_ceiling] 450/480 runs, 5297 s
+[roads_ceiling] 460/480 runs, 5344 s
+[roads_ceiling] 470/480 runs, 5490 s
+[roads_ceiling] 480/480 runs, 5577 s
+[2026-11-01T05:06:51+00:00] step 4b, ceilings: passes T True; C at r = 1.5 b58 5.231875095015777, mazda_25t 2.603158188140579, honda_l15b7 5.151699432654749, ford_27tt 2.398203169586618
+[roads_ceiling] 1/1 runs, 69 s
+[roads_ceiling] 10/2480 runs, 316 s
+[roads_ceiling] 20/2480 runs, 631 s
+[roads_ceiling] 30/2480 runs, 943 s
+[roads_ceiling] 40/2480 runs, 955 s
+[roads_ceiling] 50/2480 runs, 1273 s
+[roads_ceiling] 60/2480 runs, 1586 s
+[roads_ceiling] 70/2480 runs, 1600 s
+[roads_ceiling] 80/2480 runs, 1918 s
+[roads_ceiling] 90/2480 runs, 2231 s
+[roads_ceiling] 100/2480 runs, 2535 s
+[roads_ceiling] 110/2480 runs, 2564 s
+[roads_ceiling] 120/2480 runs, 2879 s
+[roads_ceiling] 130/2480 runs, 3193 s
+[roads_ceiling] 140/2480 runs, 3212 s
+[roads_ceiling] 150/2480 runs, 3525 s
+[roads_ceiling] 160/2480 runs, 3691 s
+[roads_ceiling] 170/2480 runs, 3851 s
+[roads_ceiling] 180/2480 runs, 3997 s
+[roads_ceiling] 190/2480 runs, 4036 s
+[roads_ceiling] 200/2480 runs, 4184 s
+[roads_ceiling] 210/2480 runs, 4323 s
+[roads_ceiling] 220/2480 runs, 4456 s
+[roads_ceiling] 230/2480 runs, 4514 s
+[roads_ceiling] 240/2480 runs, 4661 s
+[roads_ceiling] 250/2480 runs, 4804 s
+[roads_ceiling] 260/2480 runs, 4850 s
+[roads_ceiling] 270/2480 runs, 4993 s
+[roads_ceiling] 280/2480 runs, 5128 s
+[roads_ceiling] 290/2480 runs, 5258 s
+[roads_ceiling] 300/2480 runs, 5320 s
+[roads_ceiling] 310/2480 runs, 5468 s
+[roads_ceiling] 320/2480 runs, 5612 s
+[roads_ceiling] 330/2480 runs, 5657 s
+[roads_ceiling] 340/2480 runs, 5801 s
+[roads_ceiling] 350/2480 runs, 5938 s
+[roads_ceiling] 360/2480 runs, 6063 s
+[roads_ceiling] 370/2480 runs, 6126 s
+[roads_ceiling] 380/2480 runs, 6274 s
+[roads_ceiling] 390/2480 runs, 6415 s
+[roads_ceiling] 400/2480 runs, 6462 s
+[roads_ceiling] 410/2480 runs, 6599 s
+[roads_ceiling] 420/2480 runs, 6737 s
+[roads_ceiling] 430/2480 runs, 6857 s
+[roads_ceiling] 440/2480 runs, 6923 s
+[roads_ceiling] 450/2480 runs, 7071 s
+[roads_ceiling] 460/2480 runs, 7211 s
+[roads_ceiling] 470/2480 runs, 7262 s
+[roads_ceiling] 480/2480 runs, 7399 s
+[roads_ceiling] 490/2480 runs, 7539 s
+[roads_ceiling] 500/2480 runs, 7652 s
+[roads_ceiling] 510/2480 runs, 7726 s
+[roads_ceiling] 520/2480 runs, 7872 s
+[roads_ceiling] 530/2480 runs, 8013 s
+[roads_ceiling] 540/2480 runs, 8065 s
+[roads_ceiling] 550/2480 runs, 8205 s
+[roads_ceiling] 560/2480 runs, 8345 s
+[roads_ceiling] 570/2480 runs, 8452 s
+[roads_ceiling] 580/2480 runs, 8533 s
+[roads_ceiling] 590/2480 runs, 8680 s
+[roads_ceiling] 600/2480 runs, 8821 s
+[roads_ceiling] 610/2480 runs, 8882 s
+[roads_ceiling] 620/2480 runs, 9016 s
+[roads_ceiling] 630/2480 runs, 9158 s
+[roads_ceiling] 640/2480 runs, 9257 s
+[roads_ceiling] 650/2480 runs, 9345 s
+[roads_ceiling] 660/2480 runs, 9490 s
+[roads_ceiling] 670/2480 runs, 9630 s
+[roads_ceiling] 680/2480 runs, 9692 s
+[roads_ceiling] 690/2480 runs, 9827 s
+[roads_ceiling] 700/2480 runs, 9969 s
+[roads_ceiling] 710/2480 runs, 10065 s
+[roads_ceiling] 720/2480 runs, 10161 s
+[roads_ceiling] 730/2480 runs, 10298 s
+[roads_ceiling] 740/2480 runs, 10439 s
+[roads_ceiling] 750/2480 runs, 10505 s
+[roads_ceiling] 760/2480 runs, 10636 s
+[roads_ceiling] 770/2480 runs, 10778 s
+[roads_ceiling] 780/2480 runs, 10864 s
+[roads_ceiling] 790/2480 runs, 10969 s
+[roads_ceiling] 800/2480 runs, 11102 s
+[roads_ceiling] 810/2480 runs, 11237 s
+[roads_ceiling] 820/2480 runs, 11306 s
+[roads_ceiling] 830/2480 runs, 11441 s
+[roads_ceiling] 840/2480 runs, 11579 s
+[roads_ceiling] 850/2480 runs, 11660 s
+[roads_ceiling] 860/2480 runs, 11769 s
+[roads_ceiling] 870/2480 runs, 11905 s
+[roads_ceiling] 880/2480 runs, 12035 s
+[roads_ceiling] 890/2480 runs, 12114 s
+[roads_ceiling] 900/2480 runs, 12246 s
+[roads_ceiling] 910/2480 runs, 12379 s
+[roads_ceiling] 920/2480 runs, 12451 s
+[roads_ceiling] 930/2480 runs, 12573 s
+[roads_ceiling] 940/2480 runs, 12699 s
+[roads_ceiling] 950/2480 runs, 12823 s
+[roads_ceiling] 960/2480 runs, 12911 s
+[roads_ceiling] 970/2480 runs, 13040 s
+[roads_ceiling] 980/2480 runs, 13171 s
+[roads_ceiling] 990/2480 runs, 13235 s
+[roads_ceiling] 1000/2480 runs, 13360 s
+[roads_ceiling] 1010/2480 runs, 13489 s
+[roads_ceiling] 1020/2480 runs, 13612 s
+[roads_ceiling] 1030/2480 runs, 13701 s
+[roads_ceiling] 1040/2480 runs, 13831 s
+[roads_ceiling] 1050/2480 runs, 13959 s
+[roads_ceiling] 1060/2480 runs, 14028 s
+[roads_ceiling] 1070/2480 runs, 14151 s
+[roads_ceiling] 1080/2480 runs, 14285 s
+[roads_ceiling] 1090/2480 runs, 14403 s
+[roads_ceiling] 1100/2480 runs, 14497 s
+[roads_ceiling] 1110/2480 runs, 14625 s
+[roads_ceiling] 1120/2480 runs, 14751 s
+[roads_ceiling] 1130/2480 runs, 14824 s
+[roads_ceiling] 1140/2480 runs, 14947 s
+[roads_ceiling] 1150/2480 runs, 15082 s
+[roads_ceiling] 1160/2480 runs, 15198 s
+[roads_ceiling] 1170/2480 runs, 15290 s
+[roads_ceiling] 1180/2480 runs, 15420 s
+[roads_ceiling] 1190/2480 runs, 15549 s
+[roads_ceiling] 1200/2480 runs, 15625 s
+[roads_ceiling] 1210/2480 runs, 15744 s
+[roads_ceiling] 1220/2480 runs, 15883 s
+[roads_ceiling] 1230/2480 runs, 15996 s
+[roads_ceiling] 1240/2480 runs, 16082 s
+[roads_ceiling] 1250/2480 runs, 16220 s
+[roads_ceiling] 1260/2480 runs, 16342 s
+[roads_ceiling] 1270/2480 runs, 16427 s
+[roads_ceiling] 1280/2480 runs, 16542 s
+[roads_ceiling] 1290/2480 runs, 16680 s
+[roads_ceiling] 1300/2480 runs, 16786 s
+[roads_ceiling] 1310/2480 runs, 16870 s
+[roads_ceiling] 1320/2480 runs, 17015 s
+[roads_ceiling] 1330/2480 runs, 17135 s
+[roads_ceiling] 1340/2480 runs, 17226 s
+[roads_ceiling] 1350/2480 runs, 17336 s
+[roads_ceiling] 1360/2480 runs, 17476 s
+[roads_ceiling] 1370/2480 runs, 17581 s
+[roads_ceiling] 1380/2480 runs, 17662 s
+[roads_ceiling] 1390/2480 runs, 17812 s
+[roads_ceiling] 1400/2480 runs, 17933 s
+[roads_ceiling] 1410/2480 runs, 18031 s
+[roads_ceiling] 1420/2480 runs, 18135 s
+[roads_ceiling] 1430/2480 runs, 18280 s
+[roads_ceiling] 1440/2480 runs, 18381 s
+[roads_ceiling] 1450/2480 runs, 18460 s
+[roads_ceiling] 1460/2480 runs, 18610 s
+[roads_ceiling] 1470/2480 runs, 18735 s
+[roads_ceiling] 1480/2480 runs, 18840 s
+[roads_ceiling] 1490/2480 runs, 18936 s
+[roads_ceiling] 1500/2480 runs, 19083 s
+[roads_ceiling] 1510/2480 runs, 19180 s
+[roads_ceiling] 1520/2480 runs, 19258 s
+[roads_ceiling] 1530/2480 runs, 19411 s
+[roads_ceiling] 1540/2480 runs, 19536 s
+[roads_ceiling] 1550/2480 runs, 19647 s
+[roads_ceiling] 1560/2480 runs, 19734 s
+[roads_ceiling] 1570/2480 runs, 19885 s
+[roads_ceiling] 1580/2480 runs, 19982 s
+[roads_ceiling] 1590/2480 runs, 20062 s
+[roads_ceiling] 1600/2480 runs, 20211 s
+[roads_ceiling] 1610/2480 runs, 20335 s
+[roads_ceiling] 1620/2480 runs, 20448 s
+[roads_ceiling] 1630/2480 runs, 20534 s
+[roads_ceiling] 1640/2480 runs, 20684 s
+[roads_ceiling] 1650/2480 runs, 20785 s
+[roads_ceiling] 1660/2480 runs, 20869 s
+[roads_ceiling] 1670/2480 runs, 21018 s
+[roads_ceiling] 1680/2480 runs, 21145 s
+[roads_ceiling] 1690/2480 runs, 21261 s
+[roads_ceiling] 1700/2480 runs, 21353 s
+[roads_ceiling] 1710/2480 runs, 21501 s
+[roads_ceiling] 1720/2480 runs, 21602 s
+[roads_ceiling] 1730/2480 runs, 21687 s
+[roads_ceiling] 1740/2480 runs, 21830 s
+[roads_ceiling] 1750/2480 runs, 21957 s
+[roads_ceiling] 1760/2480 runs, 22074 s
+[roads_ceiling] 1770/2480 runs, 22167 s
+[roads_ceiling] 1780/2480 runs, 22313 s
+[roads_ceiling] 1790/2480 runs, 22422 s
+[roads_ceiling] 1800/2480 runs, 22499 s
+[roads_ceiling] 1810/2480 runs, 22638 s
+[roads_ceiling] 1820/2480 runs, 22770 s
+[roads_ceiling] 1830/2480 runs, 22891 s
+[roads_ceiling] 1840/2480 runs, 22981 s
+[roads_ceiling] 1850/2480 runs, 23120 s
+[roads_ceiling] 1860/2480 runs, 23242 s
+[roads_ceiling] 1870/2480 runs, 23316 s
+[roads_ceiling] 1880/2480 runs, 23453 s
+[roads_ceiling] 1890/2480 runs, 23581 s
+[roads_ceiling] 1900/2480 runs, 23708 s
+[roads_ceiling] 1910/2480 runs, 23798 s
+[roads_ceiling] 1920/2480 runs, 23931 s
+[roads_ceiling] 1930/2480 runs, 24064 s
+[roads_ceiling] 1940/2480 runs, 24130 s
+[roads_ceiling] 1950/2480 runs, 24269 s
+[roads_ceiling] 1960/2480 runs, 24397 s
+[roads_ceiling] 1970/2480 runs, 24514 s
+[roads_ceiling] 1980/2480 runs, 24609 s
+[roads_ceiling] 1990/2480 runs, 24733 s
+[roads_ceiling] 2000/2480 runs, 24870 s
+[roads_ceiling] 2010/2480 runs, 24938 s
+[roads_ceiling] 2020/2480 runs, 25082 s
+[roads_ceiling] 2030/2480 runs, 25198 s
+[roads_ceiling] 2040/2480 runs, 25323 s
+[roads_ceiling] 2050/2480 runs, 25415 s
+[roads_ceiling] 2060/2480 runs, 25534 s
+[roads_ceiling] 2070/2480 runs, 25674 s
+[roads_ceiling] 2080/2480 runs, 25739 s
+[roads_ceiling] 2090/2480 runs, 25883 s
+[roads_ceiling] 2100/2480 runs, 26005 s
+[roads_ceiling] 2110/2480 runs, 26122 s
+[roads_ceiling] 2120/2480 runs, 26216 s
+[roads_ceiling] 2130/2480 runs, 26330 s
+[roads_ceiling] 2140/2480 runs, 26476 s
+[roads_ceiling] 2150/2480 runs, 26541 s
+[roads_ceiling] 2160/2480 runs, 26684 s
+[roads_ceiling] 2170/2480 runs, 26804 s
+[roads_ceiling] 2180/2480 runs, 26920 s
+[roads_ceiling] 2190/2480 runs, 27017 s
+[roads_ceiling] 2200/2480 runs, 27129 s
+[roads_ceiling] 2210/2480 runs, 27278 s
+[roads_ceiling] 2220/2480 runs, 27346 s
+[roads_ceiling] 2230/2480 runs, 27484 s
+[roads_ceiling] 2240/2480 runs, 27605 s
+[roads_ceiling] 2250/2480 runs, 27723 s
+[roads_ceiling] 2260/2480 runs, 27822 s
+[roads_ceiling] 2270/2480 runs, 27926 s
+[roads_ceiling] 2280/2480 runs, 28082 s
+[roads_ceiling] 2290/2480 runs, 28150 s
+[roads_ceiling] 2300/2480 runs, 28291 s
+[roads_ceiling] 2310/2480 runs, 28405 s
+[roads_ceiling] 2320/2480 runs, 28527 s
+[roads_ceiling] 2330/2480 runs, 28626 s
+[roads_ceiling] 2340/2480 runs, 28730 s
+[roads_ceiling] 2350/2480 runs, 28879 s
+[roads_ceiling] 2360/2480 runs, 28956 s
+[roads_ceiling] 2370/2480 runs, 29094 s
+[roads_ceiling] 2380/2480 runs, 29206 s
+[roads_ceiling] 2390/2480 runs, 29333 s
+[roads_ceiling] 2400/2480 runs, 29434 s
+[roads_ceiling] 2410/2480 runs, 29542 s
+[roads_ceiling] 2420/2480 runs, 29685 s
+[roads_ceiling] 2430/2480 runs, 29768 s
+[roads_ceiling] 2440/2480 runs, 29901 s
+[roads_ceiling] 2450/2480 runs, 30012 s
+[roads_ceiling] 2460/2480 runs, 30142 s
+[roads_ceiling] 2470/2480 runs, 30239 s
+[roads_ceiling] 2480/2480 runs, 30325 s
+[2026-11-01T13:34:30+00:00] step 4c, companions: computed (roads_ceiling.report)
+[2026-11-01T13:50:14+00:00] step 5, identity on every engine's final arrays: 80 runs, all hold
+[2026-11-01T13:53:35+00:00] decision 40's diagnostic on honda_l15b7: 5106 gated steps on the kickdown and power-limited branches, 0 not one interval, 0 leaving the branch (5181 gated steps on every branch, 0 and 0)
+[2026-11-01T13:53:35+00:00] coverage on mazda_25t: 0/75 climbs inside calibration_fired, 0/75 inside calibration_hot
+[2026-11-01T13:53:35+00:00] coverage on honda_l15b7: 0/75 climbs inside calibration_fired, 0/75 inside calibration_hot
+[2026-11-01T13:53:35+00:00] coverage on ford_27tt: 75/75 climbs inside calibration_fired, 0/75 inside calibration_hot
+[2026-11-01T13:53:35+00:00] episode length: [899] steps on 900-sample roads (the environment truncates at k >= n - 1 (engine_env.py, step), so a road of n = 900 samples is an episode of 899 steps; row 101 writes 900)
+[2026-11-01T13:53:35+00:00] practice set: 10 roads, climbs per road [4, 4, 4, 3, 4, 3, 4, 4, 4, 4]
+[2026-11-01T13:53:35+00:00] tau of b58 by row 102's definition: 47.33506914379 s on plant_sha 865f8e7b7e5c2dbe
+[2026-11-01T13:53:35+00:00] tau of mazda_25t by row 102's definition: 42.74181271696412 s on plant_sha f86baf59389dea29 (complete.json: equal True)
+[2026-11-01T13:53:35+00:00] tau of honda_l15b7 by row 102's definition: 47.67174074702707 s on plant_sha a4e6138b9d258b1f (complete.json: equal True)
+[2026-11-01T13:53:35+00:00] tau of ford_27tt by row 102's definition: 66.76200860052332 s on plant_sha cec3e3faefe47172 (complete.json: equal True)
+roads.json written: roads_sha 27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498
