@@ -56,6 +56,7 @@ audit hook that would refuse this file's reads of a run's curve.csv.
 """
 import argparse
 import ast
+import contextlib
 import json
 import os
 import shutil
@@ -138,6 +139,18 @@ def episodes(w, n, *, seed):
 def same_cycle(a, b):
     return all(np.array_equal(np.asarray(a[k]), np.asarray(b[k])) for k in ("t", "v_mps", "grade")) and \
         all(float(a[k]) == float(b[k]) for k in ("t_amb", "p_baro", "humidity"))
+
+
+@contextlib.contextmanager
+def hash_lines(committed, live):
+    """read_roads_record's two sources of the hash lines set for a test, whatever this tree holds: the roads
+    commit's (committed_hash_lines, git show at the record's commit) and this tree's epa_roads.COMMITMENT_G
+    and COMMITMENT_J (`live`). The tree's lines read None until the roads commit R0 and both lines from it on
+    (row 132 (2)); a made-up reveal has neither, so both are set here (c6dfba5 fixed two other fixtures the
+    same way)."""
+    with mock.patch.object(F, "committed_hash_lines", return_value=tuple(committed)), \
+            mock.patch.object(ER, "COMMITMENT_G", live[0]), mock.patch.object(ER, "COMMITMENT_J", live[1]):
+        yield
 
 
 # =====================================================================================================
@@ -404,10 +417,12 @@ class ScoredShareSYNTHETIC(unittest.TestCase):
     def test_a_REAL_record_needs_its_reveal_checked_as_the_draw_checks_it_SYNTHETIC_reveal(self):
         """A REAL record is read only when its reveal holds as epa_roads.draw holds it (row 96; the review
         of 31 October 2026, R0-2): each integer at least 2**128 and matching its hash line, the two lines
-        the roads commit's COMMITMENT_G and COMMITMENT_J (git show; mocked here, since no roads commit
-        exists), and roads_seed the one the reveal gives. The reveal is two made-up integers and a made-up
-        commit: SYNTHETIC, so the seed is never roads_seed. The control (mistake 12): the record that holds
-        all of it is read, and each change of one part is refused."""
+        the roads commit's COMMITMENT_G and COMMITMENT_J (git show; mocked here, since the made-up commit
+        is not the roads commit), this tree's two lines None or the roads commit's (set here: the tree
+        holds R0's), and roads_seed the one the reveal gives. The reveal is two made-up integers and a
+        made-up commit: SYNTHETIC, so the seed is never roads_seed. The control (mistake 12): the record
+        that holds all of it is read, with the tree's lines None or the roads commit's, and each change of
+        one part is refused."""
         a_g, a_j, commit = 2 ** 200 + 1, 2 ** 201 + 3, "0123456789abcdef0123456789abcdef01234567"
         lines = {"ghassan": ER.commitment_hash(a_g), "jad": ER.commitment_hash(a_j)}
         seed = ER.roads_seed_from(a_g, a_j, commit)
@@ -416,12 +431,17 @@ class ScoredShareSYNTHETIC(unittest.TestCase):
                                   "roads_commit": commit, "roads_seed": seed}}
         path = os.path.join(STATE["tmp"], "real_kind.SYNTHETIC_reveal.json")
 
-        def read(rec, committed=(lines["ghassan"], lines["jad"])):
+        def read(rec, committed=(lines["ghassan"], lines["jad"]), live=(lines["ghassan"], lines["jad"])):
             with open(path, "w", encoding="utf-8") as fh:
                 json.dump(rec, fh)
-            with mock.patch.object(F, "committed_hash_lines", return_value=committed):
+            with hash_lines(committed, live):
                 return F.read_roads_record(path)
         self.assertEqual(read(good)["roads_seed"], seed)
+        with self.subTest(tree="the lines None, as before the roads commit"):
+            self.assertEqual(read(good, live=(None, None))["roads_seed"], seed)
+        with self.subTest(change="this tree's lines are not the roads commit's"):
+            with self.assertRaisesRegex(F.Refused, "other commitment lines than the roads commit's"):
+                read(good, live=(lines["ghassan"], "e" * 64))
         bad_cases = {
             "seed + 1": lambda r: r["commit_reveal"].update(roads_seed=seed + 1),
             "no hash lines": lambda r: r["commit_reveal"].pop("hash_lines"),
@@ -446,7 +466,8 @@ class ScoredShareSYNTHETIC(unittest.TestCase):
     def test_a_REAL_record_trains_only_from_the_committed_roads_json(self):
         """train.check_recipe and train_all.check_four_engine refuse a REAL record anywhere but the
         committed, unmodified results/EPA_ROADS/roads.json (R0-2); the record here passes read_roads_record
-        with the roads commit's lines mocked, so only the path refuses it."""
+        with the roads commit's lines mocked and this tree's set to them (hash_lines), so only the path
+        refuses it."""
         import train
         import train_all as TA
         a_g, a_j, commit = 2 ** 200 + 5, 2 ** 201 + 7, "89abcdef0123456789abcdef0123456789abcdef"
@@ -462,7 +483,8 @@ class ScoredShareSYNTHETIC(unittest.TestCase):
                                horizon_ratio=None, roads_record=path, out=os.path.join(HERE, "runs", "x"),
                                no_preview=False, checkpoint_average=None, lr_schedule="constant", steps=600,
                                engine="b58")
-        with mock.patch.object(F, "committed_hash_lines", return_value=(lines["ghassan"], lines["jad"])):
+        both = (lines["ghassan"], lines["jad"])
+        with hash_lines(both, both):
             with self.assertRaisesRegex(SystemExit, "REAL roads record is read only from"):
                 train.check_recipe(a)
             with self.assertRaisesRegex(SystemExit, "REAL roads record is read only from"):
