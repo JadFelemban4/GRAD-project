@@ -25,12 +25,21 @@ mkdir -p "$OUT" && cd "$REPO"
 - A benchmark file is never overwritten (BUILT, `resolve_out`): a second attempt needs a new `--out`.
 - Never write into `runs*/`, never commit from the device except the records each step names.
 - Git Bash on Windows and bash on Linux both run these commands (DESIGN); `tools/run_l8.sh` uses no
-  `cygpath`.
+  `cygpath`. Part A has a route on Windows only (A1's note), and `tools/device_step3.sh` refuses Linux.
 
 ## Part A: now, before the first arming (ORDER step 3; rows 32, 114, 118)
 
 This fixes the device type and its torch build on the B58, once, for every seed, arm and engine
 (decision 32, rule 3). It needs only the commit that carries C1 (ORDER step 7).
+
+**In one command** (row 134 (4)): `bash tools/device_step3.sh --python <python 3.13.2>` runs A0-A6
+below, with `--window-days 10` (row 134's W), into a new `$OUT`, and packs it into `$OUT.tar.gz`, the
+one file to bring back. Before its first long step it checks the interpreter (3.13.2, 64-bit, not
+free-threaded), the clone (clean, pushed, carrying C1), the GPU's compute capability, the driver's CUDA
+version, the CUDA index and the free disk (BUILT, `tools/device_step3.sh`). Before you run it: AC power,
+sleep set to Never (the script also asks Windows to stay awake while it runs), Windows Update paused,
+nothing else running, and on an NVIDIA card the driver's "CUDA - Sysmem Fallback Policy" set to "Prefer
+No Sysmem Fallback" (A4).
 
 **A0. The commit.**
 
@@ -40,13 +49,21 @@ git -C "$REPO" rev-parse HEAD > "$OUT/A0_commit.txt"
 git -C "$REPO" status --porcelain > "$OUT/A0_status.txt"     # must be empty
 ```
 
-**A1. The lock install** (the lock's own header, `requirements-lock.txt:1-11`). Python 3.13.2, 64-bit.
+**A1. The lock install** (`requirements-lock.txt`, but not its header's `/whl/cpu` line, which A2 refuses;
+the lock is frozen until step 12, ORDER's rule, so the header stays as it is). Python 3.13.2, 64-bit.
 
 ```bash
 <python 3.13.2> -m venv .venv
-$PY -m pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
-$PY -m pip install -r requirements-lock.txt
+$PY -m pip install -r requirements-lock.txt       # Windows: torch 2.14.0 from PyPI, as the laptop's
 ```
+
+On Windows, install torch from PyPI with the rest, not from the `/whl/cpu` index the lock's header
+names. PyPI's Windows torch 2.14.0 is the CPU build and is the team laptop's own (its metadata reads
+`2.14.0`, `torch.__version__` `2.14.0+cpu`). The `/whl/cpu` wheel carries the same binaries but its
+metadata reads `2.14.0+cpu`, and `check_training_device.py`'s package check then fails with "torch
+2.14.0+cpu (lock: 2.14.0) <-- DIFFERENT, critical" (MEASURED on the team laptop, 2 November 2026, in a
+fresh clone: `torch_cpu.dll` and `c10.dll` equal by sha256 and the two file lists equal). On Linux,
+PyPI's torch is a CUDA build, so neither route passes A2 there yet; bring that back to the team.
 
 The lock was captured on the team laptop, Windows (its header). On another operating system a pinned
 package with no wheel there stops `pip`; stop, and bring the message back (ASSUMED: not tried on
@@ -81,7 +98,7 @@ October 2026: `--dry-run`, 28 lines, and `--quick --runs 1 --steps 1000 --repeat
 43 lines, in a git archive of 22561da and in the step-7 tree, printed the same lines once every number,
 folder and live reading was masked; the one masked difference was a column's width, the CPU load before
 the batch reading 100 % against 90 %). Section 4 must print `cpu: IDENTICAL` (seed 0 trained twice,
-decision 32). `--window-days` is row 114's W once the schedule row fixes it.
+decision 32). `--window-days` is row 114's W: 10 days (row 134).
 
 **A4. The CUDA benchmark, in its own environment** (only if `nvidia-smi` lists a GPU).
 
@@ -94,7 +111,12 @@ $PYC -B benchmark_training.py --engine b58 --road extremes --device cuda --out "
     [--window-days D] 2>&1 | tee "$OUT/A4_bench_cuda.txt"
 ```
 
-- Which CUDA build of torch 2.14.0 is the team's choice (ASSUMED: one the driver supports). The lock's
+- Of the nine indexes queried (cu118, cu124, cu126, cu128-cu133), torch 2.14.0 is on cu126, cu130
+  and cu132 only (MEASURED on the team laptop, 2 November 2026: `pip index versions torch
+  --index-url https://download.pytorch.org/whl/<index>`). A card of compute capability 10 or more
+  (Blackwell, the RTX 50 series among them) needs a CUDA 12.8 or newer build (ASSUMED), so cu130,
+  which needs a driver for CUDA 13.0 (NVIDIA 580 or newer, ASSUMED), or cu132; `tools/device_step3.sh` takes the first of cu130, cu132, cu126 that the driver
+  supports, never cu126 on such a card. The lock's
   `torch==2.14.0` is met by the CUDA build, so every other package is the lock's version; `--merge`
   refuses two files whose Python or packages differ beyond torch (BUILT, `merge_docs`).
 - On Windows, set the NVIDIA driver's "CUDA - Sysmem Fallback Policy" to "Prefer No Sysmem Fallback"
@@ -124,6 +146,10 @@ $PY -B benchmark_training.py --merge "$OUT/A3_bench_cpu.json" --out "$OUT/A5_ben
   else runs on CUDA.
 - No device named: the text says why (determinism not checked, a GPU not measured, no clear winner,
   which keeps the CPU). Fix the cause and repeat into a new `--out`.
+- CUDA cannot run on the card with torch 2.14.0 (the build the card needs is installed, the driver
+  supports it, and the CUDA dry run still finds CUDA unusable): the device is the CPU, recorded with the
+  probe's text (row 134 (3)). The CPU file is merged alone, and its "no device is named" is expected.
+  An old driver is not this case: update it and run Part A again.
 
 **A7. Where Part A's outputs go.** `$OUT`, outside the repository. B0, optional: the three JSON
 files committed under `results/benchmarks/` (`benchmark_training.py`'s docstring, OUTPUT: they carry
@@ -151,8 +177,9 @@ for E in b58 mazda_25t honda_l15b7 ford_27tt; do
 done
 ```
 
-- `<N_e>` (the concurrency the engine trains at), `<S>` and `<R>` are the protocol's, fixed in the
-  committed schedule row before the first arming (row 114). They are placeholders here.
+- `<N_e>` (the concurrency the engine trains at), `<S>` and `<R>` are the protocol's, fixed in row
+  135, part 2 of row 114's schedule row, before the first arming (row 134 (2)). They are placeholders
+  here.
 - The road timed is the one the engines will train on: the commit carries row 116's generator as it
   passed ORDER step 17's gates (`check_roads.py --engine`, `test_reward.py --engine`).
 - `--road four_engine` is row 116's training road, `train.py`'s name for it (C1). The benchmark's

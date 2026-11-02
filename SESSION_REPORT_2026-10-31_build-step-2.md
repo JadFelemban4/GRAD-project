@@ -21,7 +21,8 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `bb91848` | 4, R0 | the two hash lines and nothing else (row 132 (2)) |
 | `fb20ab2` | 6, R1 | the roads: attempt 1's log, its printed outputs and `roads.json` (section 8) |
 | `4da4a31` | 8, R3b | `results/EPA_TIGHTENINGS.json` alone (section 8) |
-| this one | docs | sections 8 and 9; ORDER's status and step 6; CHECKPOINT |
+| `f0ecf92` | docs | sections 8 and 9; ORDER's status and step 6; CHECKPOINT |
+| this one | 2, 3 | section N (row 134: W); `tools/device_step3.sh`; the runbook, ORDER, the Run 2 checklist, CHECKPOINT; section 10 |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -212,3 +213,100 @@ committed before the first arming (row 106 (7); `docs/build_step_2/RUN2_CHECKLIS
 With those three, the agents write the schedule row (W, the device, the protocol's concurrency,
 steps and repeats), run the rehearsal and then Run 2, Mazda, Honda, Ford, with nothing else running
 on the laptop.
+
+## 10. 2 November: W fixed (row 134), and step 3 made one command
+
+**Ghassan's inputs.** The training device "has 5070 12gb ram", read as an RTX 5070 with 12 GB of video
+memory; then "Memory: 32 GB DDR5; CPU: Ryzen 5 9600X or stronger"; and "training wind is hard to
+give". He ended the three processes left hung since 31 October (PIDs 2640, 25540 and 17196; no
+python.exe was running afterwards). The agents removed the empty `GRAD-step7` folder from the Desktop.
+Section 9's item 2 is answered by row 134; items 1 and 3 still wait.
+
+**W (row 134, section N).** 10 November 2026, 00:00 AST, to 20 November, 00:00: 240 hours of the
+device's time, 24 hours a day. The agents set it under row 133 (2). The calendar chose it, not any rate:
+the likely start is about 8 November, 10:00, with about 38 h of margin (the chain is in the row), and
+W's end leaves 72 h before the team's end on 23 November. W falls after G5, the analysis freeze of 11
+November. No four-engine result can exist by then under any start the steps allow, so moving G5 in
+Notion is Ghassan's. Row 114's schedule row is now committed in two parts: W now, and the device, its
+torch build and the protocol in row 135 after step 3. If CUDA cannot run on the card, the device is the
+CPU (row 134 (3)).
+
+**What W affords, for planning.** Four engines on the exact cycle at 20 seeds per arm need at least 125
+steps/s across all runs at once in 240 h: 125 at a concurrency that divides 60 (12 or 6 at once on a
+9600X, whose 6 cores and 12 threads are ASSUMED from its specification), more at one that does not (133
+at 16, 144 at 23). The laptop's best many-run total is 82.4 steps/s (X1): 0.66 of 125. The plant runs on one CPU core
+per run and was 84 % of a step on the laptop, so the device's CPU sets the rate, not its GPU. If step 3
+shows the rule binds, it takes the Ford off the exact cycle first, and row 107 (6) says the agent study
+then does not test H/τ against H. No table code exists, and changing the order or dropping without a
+table is new contract text outside section I's list. Row 134's Why leaves that to a row of its own,
+before the rehearsal, once the rate is known.
+
+**Two findings on the way to the device.**
+
+- *The CUDA build.* Of the nine PyTorch indexes queried, torch 2.14.0 is on cu126, cu130 and cu132 only,
+  not on cu128 or cu129 (MEASURED, `pip index versions`). A plan drafted earlier in this session named
+  cu128 for the RTX 5070, and it would have failed on the device. The card needs cu130 (a driver for
+  CUDA 13.0) or cu132.
+- *The lock's own install fails its own check.* The lock's header installs torch from `/whl/cpu`. A
+  fresh install made that way reads `2.14.0+cpu` in its metadata, and `check_training_device.py` stops on
+  it: "torch 2.14.0+cpu (lock: 2.14.0) <-- DIFFERENT, critical" (MEASURED in a throwaway clone). The
+  laptop's own torch came from PyPI. Its metadata reads `2.14.0`, and its binaries are the same:
+  `torch_cpu.dll` and `c10.dll` equal by sha256, the file lists equal. On Windows the device now takes
+  torch from PyPI with the rest of the lock (`DEVICE_RUNBOOK.md`, A1). The lock is frozen until step 12,
+  so its header stays as it is.
+
+**`tools/device_step3.sh`.** Part A in one command:
+`bash tools/device_step3.sh --python <python 3.13.2>`, from a clean clone at a pushed `GRA-test`
+commit. Before its first long step it checks:
+
+- the interpreter (3.13.2, 64-bit, not free-threaded);
+- the clone (clean, pushed, carrying C1);
+- nvidia-smi, the card's compute capability and the driver's CUDA version;
+- the CUDA index;
+- the free disk;
+- the lock's environment against the lock (A2);
+- the CUDA environment's exact build, and the CUDA probe.
+
+Then it runs the selftest, the CPU benchmark, the CUDA benchmark and the merge, each with
+`--window-days 10`, and packs everything into one `.tar.gz` to bring back. It asks Windows to keep the
+machine awake while it runs and logs that request. It refuses Linux, where A1 has no route yet.
+
+*The smoke tests* (`--smoke`: the benchmark's `--quick` at one concurrency, one repeat, no merge) ran on
+the team laptop on 2 November, each in a throwaway clone that pushed to a throwaway bare repository, so
+the script's own checks for a clean, pushed clone carrying C1 ran for real. The CUDA path ran on the
+laptop's RTX 3050 Ti, compute capability 8.6, with a driver for CUDA 13.0. The first run stopped at A2
+on the lock-install defect above. The second stopped on the smoke-only `--steps 300`, which is below the
+benchmark's 1000-step minimum. The third ran to the end on the first version of the script. The fourth,
+on the version committed here, also ran to the end, exit 0:
+
+- the checks;
+- A0-A2 ("VERSIONS: match the lock");
+- the CUDA environment, torch `2.14.0+cu130` with CUDA 13.0, and its probe, before any long step;
+- the selftest;
+- the CPU benchmark, "cpu: IDENTICAL";
+- the CUDA benchmark, "cuda: IDENTICAL";
+- A6;
+- the archive;
+- the keep-awake request, which returned a non-zero state, and the loop, which ended with the script.
+
+A negative test, `--cuda-index cu132` on that card's CUDA 13.0 driver, stopped in the checks as it
+should. The smoke numbers decide nothing: `--quick`, and the laptop had 3.6-4.9 GB of memory free
+(Windows Explorer held 8.1 GB), so no concurrency "fitted at 450 000-step size". One reading is still
+worth keeping, the third run's section 2 on the CUDA build: the plant step took 64.39 ms against the
+SAC update's 10.67 ms, "the plant is 85 % of a step". That is the current plant, against the 84 % of
+29 September.
+
+**The reviews.** The plan behind row 134 came from four read-only reports and three adversarial
+reviews. The drafted row, script and documents had three more reviews: 40 findings, one blocking (the
+smoke steps below the benchmark's 1000-step minimum, which the smoke test hit too). The material ones:
+
+- an outcome that ignored row 114's table branch;
+- a pointer to a crash rule that exists nowhere (ORDER step 20 now lists one, since X1's and X2's
+  disagree);
+- G5 not mentioned;
+- a CUDA verdict read from any failure, not from the probe's own;
+- the CUDA probe placed after the multi-hour CPU benchmark;
+- a missing nvidia-smi read as "no GPU";
+- a later row that would change the order of leaving without saying it is a contract change.
+
+All were applied.

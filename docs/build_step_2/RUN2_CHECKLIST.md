@@ -17,8 +17,9 @@ the training device, because the platform is pinned (decision 61).
 - [ ] The tightenings are committed (R3a, the code, and R3b, `results/EPA_TIGHTENINGS.json`; ORDER
       step 8), and so is the roads record (R1). Arm checks the tightenings' plant is the B58
       (decision 71); `test_epa_tightenings.py`'s LiveRecord checks the rest of the record.
-- [ ] Row 114's schedule row is committed: the window W, the device and its torch build, and the
-      benchmark protocol (row 106 (7)).
+- [ ] Row 114's schedule row is committed, in its two parts (row 106 (7); row 134 (2)): the window W
+      (row 134), and the device, its torch build and the benchmark protocol (row 135). If step 3's
+      rate shows row 114's rule binds, the row on the table route is committed too (row 134's Why).
 - [ ] Windows feature and quality updates are paused, and the venv has not been touched since the
       fit. From now until training starts (ORDER step 22) or Run 2's defect route is recorded
       closed, whichever comes first, neither changes (row 126 (1), which replaced row 106 (1)'s end,

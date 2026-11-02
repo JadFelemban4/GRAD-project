@@ -4689,3 +4689,26 @@ From "Next actions", item 8, as committed at `7f7a7c0`:
    order (sections I-M). Done 31 October: R0a, C1, N, K, R3a. Next: R0 with the hash lines the
    agents make (row 133); the reveal and the draw; R3b. Ghassan: pause Windows
    updates now (row 126). Run 2's checklist: `docs/build_step_2/RUN2_CHECKLIST.md`. Nothing
+
+# Part AC — lines rotated out of CHECKPOINT.md, 2 November 2026 (GRA-test: W fixed, row 134, before step 3)
+
+From "Next actions", item 8, as committed at `f0ecf92`:
+
+   order (sections I-M). Done: R0a, C1, N, K, R3a (31 October); R0, R1 (the roads, T passes), R3b (1-2
+   November). Next: step 3 on the training device and W's dates, then row 114's schedule row, the rehearsal
+   and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Ghassan: pause Windows updates now (row 126). Nothing
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `f0ecf92`:
+
+  1-133 are answered (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no
+  knock term; J-L, 31 October, L under Ghassan's standing approval; M: he works alone, row 133).
+
+From "Next actions", item 10, as committed at `f0ecf92`:
+
+10. On the training device, before any training: install from
+   `requirements-lock.txt` (and, to measure its GPU, the CUDA build of the same
+   torch in a second environment); run `python benchmark_training.py --engine b58 --road
+   extremes --device cpu` there (C1 made both options required), which decides CPU or GPU
+   and checks that seed 0 trains identically twice; then
+   `python check_training_device.py --identity device.json` there and on this
+   laptop, and `--compare` the two (recorded, not required; decision 32).

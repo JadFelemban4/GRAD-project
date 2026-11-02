@@ -78,8 +78,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
   made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
-  1-133 are answered (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no
-  knock term; J-L, 31 October, L under Ghassan's standing approval; M: he works alone, row 133).
+  1-134 are answered (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no knock term; J-L,
+  31 October, L under his standing approval; M: he works alone, row 133; N: W, row 134, 2 November).
   Roads: R0 `bb91848`, then R1 `fb20ab2` (the draw of 1 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 
@@ -114,19 +114,16 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
    October); `GRA-test`'s has it since C1 (ORDER step 7).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (sections I-M). Done: R0a, C1, N, K, R3a (31 October); R0, R1 (the roads, T passes), R3b (1-2
-   November). Next: step 3 on the training device and W's dates, then row 114's schedule row, the rehearsal
-   and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Ghassan: pause Windows updates now (row 126). Nothing
+   order (sections I-N). Done: R0a, C1, N, K, R3a (31 October); R0, R1 (the roads, T passes), R3b (1-2
+   November); W, 10-20 November, 240 h (row 134, 2 November). Next: step 3 on the device (`tools/device_step3.sh`),
+   then row 135 (and the table-route row if the rule binds), the rehearsal and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Ghassan: pause Windows updates now (row 126). Nothing
    else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
-10. On the training device, before any training: install from
-   `requirements-lock.txt` (and, to measure its GPU, the CUDA build of the same
-   torch in a second environment); run `python benchmark_training.py --engine b58 --road
-   extremes --device cpu` there (C1 made both options required), which decides CPU or GPU
-   and checks that seed 0 trains identically twice; then
-   `python check_training_device.py --identity device.json` there and on this
-   laptop, and `--compare` the two (recorded, not required; decision 32).
+10. On the training device: step 3 is item 8's `tools/device_step3.sh` (the lock, the CPU and CUDA
+   benchmarks, the merge; `docs/build_step_2/DEVICE_RUNBOOK.md` Part A). The identity check against
+   this laptop (`check_training_device.py --identity`, then `--compare`; recorded, not required,
+   decision 32) is Part B's B2, at ORDER step 18.
 11. The literature (`docs/literature/READING_LIST.md`, 183 sources): one person does
    its ten-minute SDL login check and asks the librarian about interlibrary loan,
    then buy what remains ($392.00 whatever the login shows). Each source is read
