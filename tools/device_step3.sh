@@ -31,7 +31,8 @@
 # cu128-cu133), torch 2.14.0 is on cu126, cu130 and cu132 only. A card of compute capability 10 or more
 # (Blackwell: the RTX 50 series among them) needs a CUDA 12.8 or newer build (ASSUMED), so cu130 or
 # cu132; the probe checks it on the card. The default is the first of cu130, cu132, cu126 whose CUDA
-# version the driver supports ("CUDA Version" in nvidia-smi's header), never cu126 on such a card.
+# version the driver supports ("CUDA Version", or "CUDA UMD Version" in newer drivers, in nvidia-smi's
+# header), never cu126 on such a card.
 #
 # THE DECISION (A6) is the merge's RECOMMENDATION line. CPU, or "NO CLEAR WINNER, KEEP CPU": step 3 is
 # done. CUDA: stop there (row 118: the CUDA lock file and the CUDA path of check_training_device.py are
@@ -119,7 +120,7 @@ run_all() {
     echo "date: $(date '+%Y-%m-%d %H:%M:%S %z')"; uname -a
     echo "$smi"
     nvidia-smi --query-gpu=name,memory.total,driver_version,compute_cap --format=csv
-    nvidia-smi | grep -o "CUDA Version: [0-9.]*"
+    nvidia-smi | grep -oE "CUDA (UMD )?Version: [0-9.]+"
     powershell.exe -NoProfile -Command "Get-CimInstance Win32_Processor | Format-List Name,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed; 'RAM_GB ' + [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory/1GB,1); \$o = Get-CimInstance Win32_OperatingSystem; \$o.Caption + ' ' + \$o.Version"
     df -h "$HOME" | tail -1
   } > "$OUT/A_machine.txt" 2>&1
@@ -129,7 +130,8 @@ run_all() {
   if echo "$smi" | grep -q "^GPU "; then
     gpu=1
     cap=$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader 2>/dev/null | head -1 | tr -d ' \r')
-    drv=$(nvidia-smi 2>/dev/null | grep -o "CUDA Version: [0-9.]*" | head -1 | awk '{print $3}')
+    # driver 617.42 (2 November 2026) prints "CUDA UMD Version: 13.4" where older ones print "CUDA Version: 13.0"
+    drv=$(nvidia-smi 2>/dev/null | grep -oE "CUDA (UMD )?Version: [0-9.]+" | head -1 | awk '{print $NF}')
     [ -n "$drv" ] || die "nvidia-smi lists a GPU but prints no CUDA Version: update the NVIDIA driver"
     local new=0; case "$cap" in 1[0-9].*|[2-9][0-9].*) new=1 ;; esac   # capability 10 or more: CUDA 12.8+
     allowed() {   # is the index $1 usable with this driver and card?
