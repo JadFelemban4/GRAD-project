@@ -15,6 +15,8 @@ Each claim is labelled as section I labels them: MEASURED (a run printed it, and
 REPO=~/GRAD-project            # the clone, at the pushed commit named in the step
 OUT=~/grad_device/2026-11-01   # a NEW folder outside the repository, one per session
 PY=$REPO/.venv/Scripts/python.exe      # Windows (Git Bash); on Linux: $REPO/.venv/bin/python
+PYC=~/grad_venv_cuda_lock/Scripts/python.exe   # on CUDA (Part B): the CUDA lock's python, installed by B0;
+                                               # on Linux: ~/grad_venv_cuda_lock/bin/python
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONIOENCODING=utf-8
 mkdir -p "$OUT" && cd "$REPO"
 ```
@@ -22,6 +24,10 @@ mkdir -p "$OUT" && cd "$REPO"
 - Every command runs from `$REPO` with `$PY`, the lock's interpreter, and writes only into `$OUT`
   unless the step says otherwise. `benchmark_training.py` writes its JSON into the current folder when
   `--out` is not given (BUILT, `default_out`), so `--out` is always given here, outside the repository.
+- On CUDA, `$PYC` is Part B's interpreter: the python of the environment B0 installs from CU's CUDA
+  lock (row 118), which runs B0's record lines and B1. It is set here, where every session sets it, so
+  a later session of B1 has it too (the review of 2 November 2026); on the CPU nothing uses it. A4
+  sets its own `PYC`, its own environment's (`~/grad_venv_cuda`), for Part A only.
 - A benchmark file is never overwritten (BUILT, `resolve_out`): a second attempt needs a new `--out`.
 - Never write into `runs*/`, never commit from the device except the records each step names.
 - Git Bash on Windows and bash on Linux both run these commands (DESIGN); `tools/run_l8.sh` uses no
@@ -155,43 +161,169 @@ $PY -B benchmark_training.py --merge "$OUT/A3_bench_cpu.json" --out "$OUT/A5_ben
 files committed under `results/benchmarks/` (`benchmark_training.py`'s docstring, OUTPUT: they carry
 no agent and no result), with `A0_commit.txt` and `A2_versions.txt` beside them.
 
-## Part B: after the plant commit (ORDER step 18; rows 114, 118; decision 61)
+## Part B: after the plant commit (ORDER step 18; rows 114, 118, 135; decision 61)
 
-It needs the pushed commit after P (ORDER step 14, which opens `trainable()` to the EPA engines and
-makes H an environment parameter), with C1 and C2 in its history.
+It needs ORDER step 18's pushed commit: the one holding V, Q, CU (if any) and Ta, on top of P (ORDER
+step 14, which opens `trainable()` to the EPA engines and makes H an environment parameter), with C1,
+C1b and C2 in its history. B0 checks it out and records its sha.
 
-**B0. The commit and the versions.**
+**B0. The commit, the environment, the versions and B0's record.**
 
 ```bash
-git -C "$REPO" fetch && git -C "$REPO" checkout <the pushed commit after P>
+git -C "$REPO" fetch && git -C "$REPO" checkout <the pushed commit holding V, Q, CU (if any) and Ta>
 git -C "$REPO" rev-parse HEAD > "$OUT/B0_commit.txt"
+git -C "$REPO" status --porcelain > "$OUT/B0_status.txt"     # must be empty
 $PY check_training_device.py | tee "$OUT/B0_versions.txt"          # VERSIONS: match the lock
 ```
 
-**B1. Each engine's many-run rate, by row 114's protocol, once.**
+On CUDA (row 135 names it), first the environment of CU's CUDA lock (ORDER step 17a; row 118), installed
+outside the repository, then its versions, checked with that environment's python, `$PYC` as Before you
+start sets it:
 
 ```bash
-for E in b58 mazda_25t honda_l15b7 ford_27tt; do
-  $PY -B benchmark_training.py --engine $E --road four_engine --device <A6's device> \
-      --runs <N_e> --steps <S> --repeats <R> --out "$OUT/B1_bench_$E.json" 2>&1 | tee "$OUT/B1_bench_$E.txt"
+<python 3.13.2> -m venv ~/grad_venv_cuda_lock          # a new environment, not A4's ~/grad_venv_cuda;
+                                                       # $PYC, as Before you start sets it, is its python
+$PYC -m pip install -r <CU's CUDA lock>
+$PYC check_training_device.py <CU's CUDA path> | tee "$OUT/B0_versions_cuda.txt"   # VERSIONS: match the CUDA lock
+```
+
+Then B0's record, with row 135's interpreter. Every session that runs any of B1 runs these lines first,
+unchanged:
+
+```bash
+PYB=<row 135's interpreter>    # row 135's device's: $PY for cpu; for cuda, $PYC, the CUDA lock's (Before you start)
+B1OUT=~/grad_device/B1         # B1's one folder, outside the repository: this same path in every session
+mkdir -p "$B1OUT"
+$PYB -B - "$B1OUT" <<'EOF'
+import json, os, platform, sys
+import benchmark_training as B
+rec = dict(B.code_info(os.getcwd()), host=platform.node())
+if rec["git_head"] is None or rec["git_dirty"] is not False:
+    sys.exit(f"REFUSING: B0's record needs a clean git work tree at a commit: {rec}")
+path = os.path.join(sys.argv[1], f"B0_{rec['git_head']}.json")
+text = json.dumps(rec, indent=1, sort_keys=True) + "\n"
+if os.path.exists(path):
+    with open(path, encoding="utf-8") as fh:
+        if fh.read() != text:
+            sys.exit(f"REFUSING: {path} exists and differs from {rec}: a B0 record is never overwritten")
+    print(f"{path}: already written, the same; not rewritten")
+else:
+    with open(path, "x", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)
+    print(f"wrote {path}")
+EOF
+```
+
+- The commit is ORDER step 18's, pushed: it holds V (step 16), Q (step 17), CU (step 17a, only if row
+  135 names CUDA) and Ta (step 17b). `B0_commit.txt` records its sha, and `B0_status.txt` must be
+  empty, as A0's: an attempt run from a dirty tree is an operator fault (row 135 (4)(b)).
+- `$PY` is A1's environment, the lock's. Its versions are checked on either device, since on CUDA B1's
+  CPU series runs in it (row 135 (4)(c)). A critical difference stops Part B.
+- On CUDA, `<row 135's interpreter>` is `$PYC`, as Before you start sets it, the python of the
+  environment installed here from CU's CUDA lock: a new environment (DESIGN), so nothing A4 installed
+  in `~/grad_venv_cuda` is carried over, and never `$PY`. CU commits the CUDA lock and
+  `check_training_device.py`'s CUDA path, only if row 135 names CUDA (row 118). Neither exists yet:
+  `<CU's CUDA lock>` and `<CU's CUDA path>` are placeholders here, and CU says how its lock installs
+  (ASSUMED: `pip install -r`, as A1, with its CUDA index in the lock). Its VERSIONS check must match the
+  CUDA lock; a critical difference stops Part B.
+- `$B1OUT` is B1's output folder, fixed here once for the whole of B1 (DESIGN; the review of 2
+  November 2026). `$OUT` is new each session; `$B1OUT` is not. Every session that runs any of B1 (an
+  engine on another day, a crash repeated later) sets `REPO`, `OUT`, `PY` and, on CUDA, `PYC` as Before
+  you start does (on CUDA, `$PYC` is the interpreter of the record's lines and of B1), then runs the
+  record's lines above again, with the `B1OUT=` line unchanged, and never a new path, so B1's k counts
+  every earlier attempt and B5 copies all of them (the interface sheet
+  (`docs/build_step_2/INTERFACES.md`, added in O1), 12.8: every attempt is committed, and the last is
+  the measurement). Nothing but B1's attempts and B0's records is written there.
+- B0's record, `$B1OUT/B0_<git_head>.json`, holds `benchmark_training.code_info()` of the work tree it
+  runs in (`$REPO`, so `code_info()`'s own: git_head, git_dirty, benchmark_sha, train_sha) and `host`
+  (`platform.node()`, as the benchmark's `machine` records it), written by row 135's interpreter. It is
+  written once for each commit B1 runs from and never overwritten: a later session on the same commit
+  and host finds it the same and leaves it, one that differs is refused, and a tree that is dirty or at
+  no commit writes none (DESIGN). B5 commits it, and Ta's `classify` reads it: an attempt with no record
+  for its git_head, or whose host, benchmark_sha or train_sha differs from its record's, is an operator
+  fault (row 135 (4)(b)). BUILT: `test_device_gate.py`'s RunbookB1 runs these lines on a scratch work
+  tree, with their controls (a record that differs, a dirty tree, a tree at no commit).
+
+**B1. Each engine's many-run rate, by row 114's protocol, once** (row 135's protocol, commit C1b).
+
+```bash
+PYB=<row 135's interpreter>    # row 135's device's: $PY for cpu; for cuda, $PYC, the CUDA lock's (Before you start)
+for E in $($PYB -B -c "import engines; print(' '.join(engines.trainable()))"); do
+  k=1
+  while [ -e "$B1OUT/B1_bench_$E.attempt$k.json" ] || [ -e "$B1OUT/B1_bench_$E.attempt$k.txt" ] \
+     || [ -e "results/benchmarks/B1_bench_$E.attempt$k.json" ] \
+     || [ -e "results/benchmarks/B1_bench_$E.attempt$k.txt" ]; do k=$((k+1)); done
+  $PYB -B benchmark_training.py --engine $E --road four_engine --roads-record results/EPA_ROADS/roads.json \
+      --reward-knock out --device <row 135> --runs <N> --steps <S> --repeats <R> \
+      --out "$B1OUT/B1_bench_$E.attempt$k.json" 2>&1 | tee "$B1OUT/B1_bench_$E.attempt$k.txt"
 done
 ```
 
-- `<N_e>` (the concurrency the engine trains at), `<S>` and `<R>` are the protocol's, fixed in row
-  135, part 2 of row 114's schedule row, before the first arming (row 134 (2)). They are placeholders
-  here.
-- The road timed is the one the engines will train on: the commit carries row 116's generator as it
-  passed ORDER step 17's gates (`check_roads.py --engine`, `test_reward.py --engine`).
-- `--road four_engine` is row 116's training road, `train.py`'s name for it (C1). The benchmark's
-  runs train it with its general episodes, as `train.py` does with neither `--scored-share` nor
-  `--roads-record` (BUILT, `benchmark_training.py`'s `ROAD_OPTIONS`); the share's step is the same
-  plant step (ASSUMED: its rate is not separately measured).
-- r_e, the rate statistic, is the per-run lower rate in the benchmark's waves: the
-  `steps/s per run` the recommendation prints at `<N_e>`, which is `lower_min / runs` of that row in
-  the JSON's `recommendation.configurations` (BUILT, `schedule`). Keep section 4 on (no
-  `--no-determinism`): without it the recommendation prints no schedule line.
-- Before P, `--engine` refuses the three EPA engines at the parser (BUILT: `engines.trainable()`,
-  decision 47). A crash is logged and the run repeated; nothing else is repeated (row 114).
+On CUDA only, at the same visit, for every engine: the CPU series (row 135 (4)(c)), in the lock's
+environment.
+
+```bash
+PYB=$PY                        # the lock's CPU environment (A1), on CUDA too
+for E in $($PYB -B -c "import engines; print(' '.join(engines.trainable()))"); do
+  k=1
+  while [ -e "$B1OUT/B1_bench_$E.cpu.attempt$k.json" ] || [ -e "$B1OUT/B1_bench_$E.cpu.attempt$k.txt" ] \
+     || [ -e "results/benchmarks/B1_bench_$E.cpu.attempt$k.json" ] \
+     || [ -e "results/benchmarks/B1_bench_$E.cpu.attempt$k.txt" ]; do k=$((k+1)); done
+  $PYB -B benchmark_training.py --engine $E --road four_engine --roads-record results/EPA_ROADS/roads.json \
+      --reward-knock out --device cpu --runs <row 135's CPU N> --steps <S> --repeats <R> \
+      --out "$B1OUT/B1_bench_$E.cpu.attempt$k.json" 2>&1 | tee "$B1OUT/B1_bench_$E.cpu.attempt$k.txt"
+done
+```
+
+- The engines are `engines.trainable()` on B0's commit: the B58 and the engines the committed records
+  keep (row 107 (5)), in `engines.known()` order (BUILT, P).
+- `<row 135>`, `<N>`, `<S>` and `<R>` are row 135's device, concurrency, steps per run and repeats,
+  part 2 of row 114's schedule row, fixed before the first arming (row 134 (2)). `<row 135's CPU N>`
+  is the CPU series' own concurrency on CUDA, the CPU's pick in step 3's merged file (`pick_runs` on
+  its CPU rows; row 135 (2)). They are placeholders here.
+- `<row 135's interpreter>` is the interpreter of row 135's device: `$PY`, the lock's, for cpu; for
+  cuda, `$PYC` (Before you start), the python of the environment B0 installs from CU's CUDA lock (row
+  118; CU exists only if row 135 names CUDA, and neither its lock nor that environment is built yet).
+  It is a placeholder here. `$PY` holds the lock's CPU build of torch: given `--device cuda` the
+  benchmark finds no usable device and exits before it writes its JSON (BUILT, `main`'s "no requested
+  device is usable here"; the selftest's `--device cuda --dry-run` on a CPU build), so with `$PY` every
+  CUDA attempt would be a crash, and its repeat the same (the review of 2 November 2026).
+- On CUDA, the CPU series always runs at the same visit, for every engine (row 135 (4)(c)): the second
+  block, with `PYB=$PY`, `--device cpu`, `--runs <row 135's CPU N>` and the names
+  `B1_bench_$E.cpu.attempt$k`, whose k counts the CPU series alone, over `$B1OUT` and
+  `results/benchmarks/` alike. It is read only after a fallback: an engine's CUDA row reading identical
+  False, fits False at N or seed0_twice False, when every engine takes its CPU row. Ta classifies only
+  after the visit, so a CPU series begun only once a CUDA failure was seen would not exist when it is
+  needed. On the CPU there is no second series: the first block is the CPU's.
+- Every attempt is written into `$B1OUT`, outside the repository, and numbered there: k counts the
+  attempts already in `$B1OUT` and in the committed `results/benchmarks/`, a `.json` or a `.txt`
+  alike, so a crash that left only its `.txt` is never overwritten, and an attempt of an earlier
+  session is counted (B0's `$B1OUT`). The benchmark records `git_dirty` from
+  `git status --porcelain` when it starts (BUILT, `code_info`), and that lists an untracked file too:
+  an attempt written inside the clone made every run record a dirty tree, the first included, since
+  `tee` makes its `.txt` before the benchmark starts (the review of 2 November 2026). BUILT: the
+  selftest's two engines in a row on a scratch work tree, and `test_device_gate.py`'s RunbookB1, which
+  runs both blocks' own text with a stand-in interpreter. Never give `--out` inside the repository here.
+- The road timed is the one the engines will train on, as step 22 trains it: row 116's generator as it
+  passed ORDER step 17's gates, with decision 29's share on (`--roads-record`, row 130 (5)) and the
+  reward without the knock term (`--reward-knock out`, row 113 (5)). Each `train.py` run is given
+  `--lr-schedule last-third --scored-share --roads-record results/EPA_ROADS/roads.json --reward-knock
+  out` (BUILT, `train_cmd`): decision 29's recipe as `train_all.py --recipe29` gives it, but
+  `--checkpoint-average`, which `train.py` refuses at `--steps <S>` under its 50 000-step window, so the
+  average's snapshots are not timed. The selftest passes that command line through `train.py`'s own
+  parser and `check_recipe`, and compares its recipe flags with `train_all.py`'s.
+  `--roads-record` must be the committed, unchanged `roads.json` (BUILT, `real_record_problem`).
+- r_e = lower_min / N exactly (row 135 (3)): `lower_min` of the row at runs N in the JSON's
+  `recommendation.configurations`, the lowest lower bound over the R repeats (BUILT,
+  `configurations`). Keep section 4 on (no `--no-determinism`).
+- A crash is defined as in row 135 (4), an operator fault among them ((b)). A crash's attempt is kept
+  and that engine alone runs again into its next k, in the same series: the same block with its `for`
+  line `for E in <the engine>; do` (the second block for a CPU attempt), into B0's `$B1OUT` whichever
+  session repeats it, so no other engine gains an attempt. An engine whose last attempt in a series is
+  a measurement is never run again in it; after a coding defect's fix, B1 is repeated for every engine
+  (row 135 (4)(c)). The last attempt of each series is the measurement, or row 135 (4)(c)'s outcome,
+  and every earlier one classifies as a crash (the interface sheet (`docs/build_step_2/INTERFACES.md`,
+  added in O1), 12.8).
 
 **B2. The identity against the team laptop** (recorded, not required: row 32).
 
@@ -243,10 +375,21 @@ its `results/EPA_CALIBRATION/<id>/complete.json`'s `dump.sha256`, with the engin
 deliverable-torque table (BUILT, `test_epa_plants.py:47-67`, `:86-112`). It must pass; a dump that
 differs is the device's result to report, never a reason to re-freeze.
 
-**B5. Where Part B's outputs go.** `$OUT`, outside the repository. Commit B1 (ORDER step 18): the
-four `B1_bench_*.json` under `results/benchmarks/`, `B2_compare.txt`, `B4_test_epa_plants.txt`, and
-L8's record from `$OUT/B3_L8/L8/` (`provenance.txt`, `_status.txt`, `_verdicts.txt`,
-`compare_*.txt`, `cmp/*.json`, `run_identities.json`). How L8's record enters
+**B5. Where Part B's outputs go.** `$OUT`, outside the repository, and B1's attempts and B0's records
+in B0's `$B1OUT`. Commit B1 (ORDER step 18), once every engine of B1 is done: every B1 attempt of every
+session (on CUDA the CPU series' too) and every B0 record, copied from `$B1OUT` into
+`results/benchmarks/` only now and never renamed or deleted,
+
+```bash
+mkdir -p results/benchmarks
+cp -n "$B1OUT"/B1_bench_*.attempt*.json "$B1OUT"/B1_bench_*.attempt*.txt "$B1OUT"/B0_*.json results/benchmarks/
+```
+
+then `B2_compare.txt`, `B4_test_epa_plants.txt`, and L8's record from `$OUT/B3_L8/L8/`
+(`provenance.txt`, `_status.txt`, `_verdicts.txt`, `compare_*.txt`, `cmp/*.json`,
+`run_identities.json`). Ta's `classify` reads every committed attempt, with its commit's B0 record.
+The last attempt of each series has `code.git_dirty` False, and a dirty one is an operator fault, kept
+and repeated (row 135 (4)(b)). How L8's record enters
 `results/B58_IDENTITY.md`, which `make_md.py` writes from `results/B58_IDENTITY.json` (never by hand),
 is a question for the team: a new record through the certificate's tools, or a record of its own beside
 the certificate.
@@ -256,5 +399,6 @@ the certificate.
 - The per-engine gates (ORDER step 17: `test_reward.py --engine`, `check_roads.py --engine`) run on
   the team laptop or the device, after P and the redraws, on `roads.json`'s roads: they are not
   device steps. Their code is `engine_gate.py`.
-- The CUDA build's lock file and the CUDA path of `check_training_device.py`: only if A6 names CUDA.
+- The CUDA build's lock file and the CUDA path of `check_training_device.py`: CU's (ORDER step 17a),
+  only if row 135 names CUDA; B0 installs and checks them.
 - Training (ORDER step 22).

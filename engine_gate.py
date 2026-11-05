@@ -5,6 +5,7 @@ check_roads.py --engine run, on the engine in its own car.
     python test_reward.py --engine E --train-road R --roads FILE [--jobs J]
     python check_roads.py --engine E --train-road R --synthetic-seed N --out FILE [--n 40]
     python check_roads.py --engine E --train-road R --roads FILE [--out FILE] [--n 40]
+    ... --train-road four_engine --roads-record PATH          the training check with decision 29's share on
 
 WHY EACH ENGINE GETS ITS OWN GATE (row 119 of results/VALIDATION_DECISIONS.md; ORDER_TO_TRAINING.md
 steps 7 and 17). test_reward.py's gate is the B58's: its band grade and its D2 notch are that car's
@@ -41,7 +42,10 @@ imported, so the two gates share one definition.
                 zero and inside TRACK_TOL; the starver punished on the first seed's road. Each road's
                 share of steps asking less than the engine's torque floor (engine.loop.torque_floor_nm)
                 or more than its deliverable torque at the step's engine speed is reported, not judged
-                (row 116: "measured on drawn episodes and reported before training").
+                (row 116: "measured on drawn episodes and reported before training"). With
+                --roads-record (--train-road four_engine only; C1b) decision 29's share is on, as the
+                experiment trains (row 130 (5)), and each seed's first episode is then the share's road,
+                row 101's family; without it the road runs its general episodes (FOUR_ENGINE_OPTIONS).
   the blind arm check_random_road.py B on decision 34's roads, per H (decision 27; row 119): the set's
                 first road with a climb, and its twin with that climb's onset BLIND_SHIFT_S later, both
                 neutral; a blinded agent's observations must not differ before the two grades do, and a
@@ -55,8 +59,9 @@ WHAT WAITS, refused rather than approximated:
     not run does not pass.
   * Row 116's training road is train.py's mode "four_engine" (four_engine_roads.py, written beside this
     file on 31 October 2026), passed by name, --train-road, and driven on its general episodes
-    (FOUR_ENGINE_OPTIONS). X1's extremes builders refuse every EPA car (engine_env.py:1827-1832;
-    amendment B15), so an EPA engine's training checks fail with that refusal on any other road.
+    (FOUR_ENGINE_OPTIONS), or with --roads-record on the share's too (share_record). X1's extremes
+    builders refuse every EPA car (engine_env.py:1827-1832; amendment B15), so an EPA engine's training
+    checks fail with that refusal on any other road.
   * The Accord's training road: train.build_env's _StepState records step_record.env_state at every
     step, and step_record refuses a CVT (step_record.py:88-91) until its CVT branch, ORDER step 12a
     (C2, row 118). Until then the Honda's training checks fail with that refusal (MEASURED, 31 October
@@ -103,10 +108,11 @@ BAND_DURATION_S, BAND_START_S = 300.0, 30.0   # test_reward.py's band road (road
 NOTCH_DURATION_S = 480.0         # test_reward.py's D2_DURATION
 NOTCH_SAMPLE_S = 10.0            # the preview check samples this long after the climb starts (the D2 gate's)
 TRAIN_SEEDS = tuple(range(11, 21))   # ten training roads (test_reward.py's extremes check drives ten)
-# Row 116's road, as train.py names it, built with its general episodes only: decision 29's scored share
-# is row 101's generator's road (epa_roads.training_share_road), the kind the decision-34 checks drive,
-# and a fresh environment's first episode would be a share episode (0, 10, 20, ...), so with the share on
-# the gate would drive nothing else. The two options are train.build_env's for that road (DESIGN).
+# Row 116's road, as train.py names it, built with its general episodes only when no roads record is given:
+# decision 29's scored share is row 101's generator's road (epa_roads.training_share_road), the kind the
+# decision-34 checks drive, and a fresh environment's first episode would be a share episode (0, 10, 20,
+# ...), so with the share on the gate drives nothing else. The two options are train.build_env's for that
+# road (DESIGN). --roads-record turns the share on (training_env; row 130 (5), C1b).
 FOUR_ENGINE_ROAD = "four_engine"
 FOUR_ENGINE_OPTIONS = dict(scored_share=False, roads_record=None)
 BLIND_SHIFT_S = 20.0             # DESIGN: under every gap's G - RAMP_S (G >= 50 s, row 101), so the
@@ -258,14 +264,60 @@ def d34_env(road, *, plant, use_preview):
     return env
 
 
-def training_env(train_road, seed, *, plant):
+def share_record(train_road, roads_record):
+    """The roads record --roads-record names, read as train.py reads it (four_engine_roads.read_roads_record:
+    its path, roads_sha and seed_kind; never printed whole), or None when none is given (the share off).
+    ValueError when it is given for a road other than row 116's, whose share it turns on (row 130 (5)),
+    when train.py would refuse it, or when it is REAL and not the committed results/EPA_ROADS/roads.json
+    (four_engine_roads.real_record_problem, as train.check_recipe asks)."""
+    if roads_record is None:
+        return None
+    if train_road != FOUR_ENGINE_ROAD:
+        raise ValueError(f"--roads-record turns decision 29's share on (row 130 (5)), which is --train-road "
+                         f"{FOUR_ENGINE_ROAD}'s alone, not {train_road}'s")
+    import four_engine_roads as FER
+    try:
+        rec = FER.read_roads_record(roads_record)
+    except FER.Refused as exc:
+        raise ValueError(str(exc)) from None
+    problem = FER.real_record_problem(rec["path"]) if rec["seed_kind"] == "REAL" else None
+    if problem:
+        raise ValueError(problem)
+    return rec
+
+
+def record_name(share):
+    """share_record's record as the gate prints it and check_roads.py records it (the review of 2 November
+    2026): repository-relative with '/' separators, never this machine's absolute path, which stays internal
+    (the training tasks read the record by it). A REAL record is the committed one (share_record refuses any
+    other), so its name is epa_roads.ROADS_REL. A SYNTHETIC record inside the repository is named relative to
+    it; one outside it (write_synthetic_record writes there only) keeps its path, and every table that names
+    it is written outside the repository too (check_roads.py's --out rule). None when the share is off."""
+    if share is None:
+        return None
+    if share["seed_kind"] == "REAL":
+        return ER.ROADS_REL
+    import four_engine_roads as FER
+    path = share["path"]
+    return os.path.relpath(path, HERE).replace(os.sep, "/") if FER.inside_repository(path) else path
+
+
+def training_env(train_road, seed, *, plant, roads_record):
     """The training road as train.py builds it (build_env: its wrappers, its design step, 900 s), reset at
     `seed`. A road train.py does not have is refused by name. Row 116's road is built with its general
-    episodes only (FOUR_ENGINE_OPTIONS)."""
+    episodes only (FOUR_ENGINE_OPTIONS) when `roads_record` is None, and with decision 29's share on from
+    that record otherwise, as train.py builds it with --scored-share --roads-record (row 130 (5)); a record
+    for any other road is refused. `roads_record` is required: None says the share is off."""
     import train as T
     if train_road not in T.DESIGN_DT:
         raise ValueError(f"train.py has no road {train_road!r} (train.DESIGN_DT: {sorted(T.DESIGN_DT)})")
-    opts = FOUR_ENGINE_OPTIONS if train_road == FOUR_ENGINE_ROAD else {}
+    if roads_record is not None and train_road != FOUR_ENGINE_ROAD:
+        raise ValueError(f"a roads record turns decision 29's share on, which is {FOUR_ENGINE_ROAD}'s alone, "
+                         f"not {train_road!r}'s (row 130 (5))")
+    opts = {}
+    if train_road == FOUR_ENGINE_ROAD:
+        opts = (FOUR_ENGINE_OPTIONS if roads_record is None
+                else dict(scored_share=True, roads_record=os.path.abspath(roads_record)))
     env = T.build_env(True, seed, T.DURATION_S, train_road, T.DESIGN_DT[train_road], plant=plant, **opts)
     env.reset(seed=seed)
     return env
@@ -400,7 +452,7 @@ def job(task):
             return dict(task, k=road["k"], climbs=len(road["climbs"]),
                         grade_max=max(road["cycle"]["grade"]), **rollout(env, task["policy"], plant=plant))
         if kind == "train":
-            env = training_env(task["train_road"], task["seed"], plant=plant)
+            env = training_env(task["train_road"], task["seed"], plant=plant, roads_record=task["roads_record"])
             c = env.unwrapped.cycle
             g, v = np.asarray(c["grade"], dtype=float), np.asarray(c["v_mps"], dtype=float)
             road = {"family": c.get("family"), "grade_min": float(g.min()), "grade_max": float(g.max()),
@@ -454,10 +506,13 @@ def _road_checks(what, neutral, starver, key, label):
              f"starver {starver['mean_r']:+.5f}  vs  neutral {n0['mean_r']:+.5f}   ({label}, {key} {n0[key]})")]
 
 
-def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs):
+def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs, roads_record):
     """Every unit of the gate in the module docstring, run in `jobs` processes. Returns the sweep, every
-    unit's result and the checks, each (name, True, False or None when it did not run, detail)."""
+    unit's result and the checks, each (name, True, False or None when it did not run, detail).
+    `roads_record` is required: None is the training check with the share off, a path turns it on
+    (share_record; a SYNTHETIC record makes the run a test of the code, as a SYNTHETIC seed does)."""
     import engines
+    share = share_record(train_road, roads_record)
     plant = engines.get(engine_id)
     rows = sweep(plant)
     cuts = notches(rows)
@@ -472,10 +527,13 @@ def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs):
         tasks.append(dict(base, kind="notch-preview", grade=c["grade"]))
     tasks += [dict(base, kind="d34", road=r, policy="neutral") for r in roads]
     tasks.append(dict(base, kind="d34", road=roads[0], policy="starver"))
-    tasks += [dict(base, kind="train", train_road=train_road, seed=s, policy="neutral") for s in TRAIN_SEEDS]
-    tasks.append(dict(base, kind="train", train_road=train_road, seed=TRAIN_SEEDS[0], policy="starver"))
+    train = dict(base, kind="train", train_road=train_road, roads_record=None if share is None else share["path"])
+    tasks += [dict(train, seed=s, policy="neutral") for s in TRAIN_SEEDS]
+    tasks.append(dict(train, seed=TRAIN_SEEDS[0], policy="starver"))
     tasks += [dict(base, kind="blind", road=blind_road, H_s=h) for h in hs if blind_road is not None]
-    res = pool_map(tasks, jobs=jobs)
+    # the tasks read the record by its absolute path; what the gate returns and prints names it (record_name)
+    name = record_name(share)
+    res = [dict(r, roads_record=name) if r["kind"] == "train" else r for r in pool_map(tasks, jobs=jobs)]
 
     def of(kind, policy=None):
         return [r for r in res if r["kind"] == kind and (policy is None or r.get("policy") == policy)]
@@ -518,7 +576,9 @@ def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs):
                            f"SIGHTED at {r['sighted_first']} (want {r['sighted_want']})"))
     return dict(engine=engine_id, plant_id=plant.id, cvt=isinstance(plant.car, engines.CvtCar), sweep=rows,
                 notches=cuts, band=band, kickdown=kickdown_threshold(cuts), label=label,
-                synthetic=synthetic_seed is not None, horizons=hs, train_road=train_road, results=res, checks=checks)
+                synthetic=synthetic_seed is not None or (share is not None and share["seed_kind"] != "REAL"),
+                horizons=hs, train_road=train_road, roads_record=name,
+                share_kind=None if share is None else share["seed_kind"], results=res, checks=checks)
 
 
 def print_gate(g):
@@ -530,6 +590,11 @@ def print_gate(g):
     if g["synthetic"]:
         print("                      SYNTHETIC: a test of this code, not row 119's gate (no roads_seed exists)")
     print(f"training road       : {g['train_road']} (train.build_env), seeds {TRAIN_SEEDS[0]}-{TRAIN_SEEDS[-1]}")
+    if g["train_road"] == FOUR_ENGINE_ROAD:
+        print("decision 29's share : "
+              + ("off (no --roads-record): the general episodes only" if g["roads_record"] is None
+                 else f"on, {g['share_kind']} record {g['roads_record']} (row 130 (5)): each seed's first "
+                      "episode is the share's road"))
     print(f"preview horizons    : {', '.join(f'{h:g}' for h in g['horizons'])} s")
     print(f"neutral action      : {np.round(E.neutral_action(), 3)}\n")
     print(f"THE SWEEP: {len(rows)} grades, {100 * SWEEP_STEP:g} % apart over {100 * SWEEP_GRADES[0]:g}-"
@@ -575,12 +640,18 @@ def print_gate(g):
 
 
 # ------------------------------------------------------------------ check_roads.py --engine
-def road_table(engine_id, *, train_road, roads_file, synthetic_seed, n, first_seed, jobs):
+def road_table(engine_id, *, train_road, roads_file, synthetic_seed, n, first_seed, jobs, roads_record):
     """check_roads.py's table on one engine: the neutral action on n training roads (seeds from first_seed)
-    and on every road of decision 34's set. Returns (training rows, decision-34 rows, the set's label)."""
+    and on every road of decision 34's set. Returns (training rows, decision-34 rows, the set's label).
+    `roads_record` as run_gate's: required, None for the share off. The training rows name the record
+    as record_name does; only the tasks read it by its absolute path."""
+    share = share_record(train_road, roads_record)
     roads, _, label = d34_roads(roads_file=roads_file, synthetic_seed=synthetic_seed)
     base = dict(engine=engine_id, policy="neutral")
-    tasks = ([dict(base, kind="train", train_road=train_road, seed=s) for s in range(first_seed, first_seed + n)]
+    train = dict(base, kind="train", train_road=train_road, roads_record=None if share is None else share["path"])
+    tasks = ([dict(train, seed=s) for s in range(first_seed, first_seed + n)]
              + [dict(base, kind="d34", road=r) for r in roads])
     res = pool_map(tasks, jobs=jobs)
-    return [r for r in res if r["kind"] == "train"], [r for r in res if r["kind"] == "d34"], label
+    name = record_name(share)
+    return ([dict(r, roads_record=name) for r in res if r["kind"] == "train"], [r for r in res if r["kind"] == "d34"],
+            label)

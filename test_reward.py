@@ -15,7 +15,9 @@ reward, and commit the output with the change.
                                          # ROW 119: engine E's own gate, in its own
                                          # car, on training road R and decision 34's
                                          # roads (engine_gate.py); --synthetic-seed N
-                                         # in place of --roads tests it, SYNTHETIC
+                                         # in place of --roads tests it, SYNTHETIC;
+                                         # --roads-record PATH (four_engine only)
+                                         # turns decision 29's share on
 
 PHASE D2 -- `--road random`
 ---------------------------
@@ -127,7 +129,9 @@ from passing. So does the reward the test trains on: the team chose it without
 the knock term (row 113 (5)), behind an environment option of the plant commit
 whose default is X1's, knock in (row 118). Until that commit the per-engine gate
 runs the reward with the knock term; after it, the gate passes the option
-(engine_gate.py's docstring, WHAT WAITS).
+(engine_gate.py's docstring, WHAT WAITS). --roads-record PATH (with --train-road
+four_engine only; C1b, 2 November 2026) runs the training check with decision 29's
+share on, as the experiment trains (row 130 (5)); without it the share is off.
 
 NO DEFAULT ENGINE (CLAUDE.md mistake 1; test_engine_threading.py). The run without
 --engine is not a default engine: it is the B58's committed gate, whose constants
@@ -379,8 +383,13 @@ def main_engine(a, ap):
     if a.roads is None and a.synthetic_seed is None:
         ap.error("decision 34's roads: give --roads FILE (a roads record) or --synthetic-seed N")
     import engine_gate as G
+    try:
+        G.share_record(a.train_road, a.roads_record)
+    except ValueError as exc:
+        ap.error(f"--roads-record {a.roads_record}: {exc}")
     return G.print_gate(G.run_gate(a.engine, train_road=a.train_road, roads_file=a.roads,
-                                   synthetic_seed=a.synthetic_seed, jobs=a.jobs))
+                                   synthetic_seed=a.synthetic_seed, jobs=a.jobs,
+                                   roads_record=a.roads_record))
 
 
 def main():
@@ -403,11 +412,15 @@ def main():
                                                      "(results/EPA_ROADS/roads.json's form)")
     src.add_argument("--synthetic-seed", type=int, help="with --engine: decision 34's generator on a "
                                                         "SYNTHETIC seed, a test of the code (no roads_seed)")
+    ap.add_argument("--roads-record", metavar="PATH",
+                    help="with --engine and --train-road four_engine: the roads record whose share "
+                         "the training check turns on (decision 29's, row 130 (5)); without it, off")
     a = ap.parse_args()
     if a.engine is not None:
         raise SystemExit(main_engine(a, ap))
-    if a.train_road is not None or a.roads is not None or a.synthetic_seed is not None:
-        ap.error("--train-road, --roads and --synthetic-seed belong to the per-engine gate: give --engine")
+    if any(x is not None for x in (a.train_road, a.roads, a.synthetic_seed, a.roads_record)):
+        ap.error("--train-road, --roads, --synthetic-seed and --roads-record belong to the per-engine "
+                 "gate: give --engine")
     if a.road == "random":
         raise SystemExit(main_random_road(a.jobs))
     dur = a.duration if a.duration is not None else 300.0

@@ -15,18 +15,32 @@ neutral, on decision 34's generator at SYNTHETIC seeds (no roads_seed exists; ro
                34's refused
   Roads        one source of decision 34's roads; a roads record's roads and horizons; the onset twin;
                H other than 30 s refused until the plant commit (row 117); the starver is
-               test_reward's; row 116's road built with the options train.py gives it
+               test_reward's; row 116's road built with the options train.py gives it; with a
+               SYNTHETIC roads record the share on (C1b, row 130 (5)), the record required of every
+               training check, named repository-relative in what is printed and recorded (the tasks
+               alone read its absolute path), and check_roads.py's default file named for the share
   BlindArm     check_random_road.py B at H = 30 s on the B58 (SYNTHETIC road): the blinded traces do
                not differ before the grades, the sighted ones differ 30 steps before, and that sighted
                pair is the control that the blind criterion can fail (mistake 12)
   Verdict      the gate's exit code: 0 only when every check ran and passed; NOT COMPLETE when one
-               waits; SYNTHETIC said
+               waits; SYNTHETIC said; the share named on row 116's road
   Cli          the refusals of test_reward.py, check_roads.py and benchmark_training.py (no default
                engine, CLAUDE.md mistake 1; the per-engine options only with --engine; a SYNTHETIC
                table only outside the repository); a road train.py does not have refused by the
-               benchmark's probe. (benchmark_training.py --selftest is its own command: its hung-run case
-               kills its child at a 2 s deadline, which a loaded machine can miss.)
+               benchmark's probe; C1b's options (--roads-record on row 116's road only, the benchmark's
+               --reward-knock required there and refused before the plant commit P, neither with
+               --merge), and no --table-record (row 136: no table is built). (benchmark_training.py
+               --selftest is its own command: its hung-run case kills its child at a 2 s deadline, which
+               a loaded machine can miss.)
   Scans        test_engine_threading's call, default and name scans on the new and changed files
+  RunbookB1    the runbook's B0 record, B1 blocks and B5's copy, their own text, on a scratch git work
+               tree with a stand-in for row 135's interpreter ($PY a refusing one): two engines in a row
+               record a clean tree, their attempts numbered in B0's $B1OUT; B0's record lands there,
+               written once; a later session's repeat continues the count there, on cuda the CPU
+               series runs with $PY under its own names, and B5 copies both sessions' attempts, the CPU
+               series' and the B0 record; the controls, the attempts written inside the tree record it
+               dirty, the loop and the CPU series run with that $PY run nothing, and B0's record refuses
+               a record that differs, a dirty tree and a tree at no commit (C1b)
   RunL8        tools/run_l8.sh: its refusals, and a dry run into a temporary folder (ref/ is git
                archive cf43fbb, tools/ the tarball's two files byte for byte, eleven --help runs exit 0);
                its comparison's judgement (cmp8) on a stand-in tool: a verdict printed AND its exit
@@ -216,11 +230,80 @@ class Roads(unittest.TestCase):
         self.assertEqual(B.ROAD_OPTIONS, {G.FOUR_ENGINE_ROAD: G.FOUR_ENGINE_OPTIONS})
         if G.FOUR_ENGINE_ROAD not in T.DESIGN_DT:
             self.skipTest("train.py has no four_engine road in this tree")
-        env = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=engines.get("mazda_25t"))
+        env = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=engines.get("mazda_25t"), roads_record=None)
         self.assertEqual(len(env.unwrapped.cycle["grade"]), int(T.DURATION_S / T.DESIGN_DT[G.FOUR_ENGINE_ROAD]))
         self.assertIsNotNone(G.wrapper_attr(env, "c_turb_scale"))
         with self.assertRaises(ValueError):
-            G.training_env("no_such_road", 11, plant=engines.get("b58"))
+            G.training_env("no_such_road", 11, plant=engines.get("b58"), roads_record=None)
+
+    def test_the_share_on_the_training_road_SYNTHETIC(self):
+        """C1b (row 130 (5)): a roads record turns decision 29's share on in the training check, as train.py
+        builds the road with --scored-share --roads-record, so each seed's first episode is the share's
+        road; None keeps it off. The control (mistake 12): the same seed without the record starts on a
+        general road. share_record refuses a record for another road and one train.py would refuse, and
+        the record is required of training_env, run_gate, road_table and every training task."""
+        import inspect
+        import four_engine_roads as F
+        d = tempfile.mkdtemp(prefix="gate_share_")
+        try:
+            rec = F.write_synthetic_record(os.path.join(d, "roads.SYNTHETIC.json"), 4242)
+            p = engines.get("b58")
+            on = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=p, roads_record=rec)
+            off = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=p, roads_record=None)
+            self.assertEqual(G.wrapper_attr(on, "road_log")[0].split()[:2], ["scored", "SYNTHETIC"])
+            self.assertEqual(G.wrapper_attr(off, "road_log")[0].split()[0], "general")
+            self.assertEqual(G.share_record(G.FOUR_ENGINE_ROAD, rec)["seed_kind"], "SYNTHETIC")
+            self.assertIsNone(G.share_record(G.FOUR_ENGINE_ROAD, None))
+            for road, path in (("extremes", rec), (G.FOUR_ENGINE_ROAD, os.path.join(d, "no_such_roads.json"))):
+                with self.subTest(road=road, path=path), self.assertRaises(ValueError):
+                    G.share_record(road, path)
+            with self.assertRaises(ValueError):
+                G.training_env("extremes", 11, plant=p, roads_record=rec)
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
+        for fn in (G.training_env, G.run_gate, G.road_table):
+            with self.subTest(fn=fn.__name__):
+                self.assertIs(inspect.signature(fn).parameters["roads_record"].default, inspect.Parameter.empty)
+        bare = G.job(dict(engine="b58", kind="train", train_road=G.FOUR_ENGINE_ROAD, seed=11, policy="neutral"))
+        self.assertIn("KeyError: 'roads_record'", bare["error"])
+
+    def test_the_record_is_named_relative_to_the_repository(self):
+        """C1b (the review of 2 November 2026): the gate and check_roads.py print and record the roads record
+        repository-relative, epa_roads.ROADS_REL for a REAL record, and the training tasks alone read it by
+        its absolute path; check_roads.py's default file says whether the share is on, so the two runs do
+        not overwrite each other. The REAL record is a stand-in here (share_record's dict, no record read).
+        The control (mistake 12): the tasks road_table hands its pool do carry the absolute path."""
+        from unittest import mock
+        import check_roads as CR
+        real_abs = os.path.join(HERE, *ER.ROADS_REL.split("/"))
+        real = dict(seed_kind="REAL", path=real_abs)
+        self.assertIsNone(G.record_name(None))
+        self.assertEqual(G.record_name(real), ER.ROADS_REL)
+        self.assertEqual(G.record_name(dict(real, path=real_abs.upper() if os.name == "nt" else real_abs)),
+                         ER.ROADS_REL)
+        inside = os.path.join(HERE, "results", "x.SYNTHETIC.json")
+        self.assertEqual(G.record_name(dict(seed_kind="SYNTHETIC", path=inside)), "results/x.SYNTHETIC.json")
+        outside = os.path.join(tempfile.gettempdir(), "x.SYNTHETIC.json")
+        self.assertEqual(G.record_name(dict(seed_kind="SYNTHETIC", path=outside)), outside)
+        handed = []
+
+        def pool(tasks, *, jobs):
+            handed.extend(tasks)
+            return [dict(t) for t in tasks]
+        with mock.patch.object(G, "share_record", return_value=real), mock.patch.object(G, "pool_map", pool), \
+                mock.patch.object(G, "d34_roads", return_value=([], None, "stand-in")):
+            train, d34, label = G.road_table("b58", train_road=G.FOUR_ENGINE_ROAD, roads_file=None,
+                                             synthetic_seed=1, n=3, first_seed=100, jobs=1,
+                                             roads_record=ER.ROADS_REL)
+        self.assertEqual([t["roads_record"] for t in handed], [real_abs] * 3)
+        self.assertEqual([r["roads_record"] for r in train], [ER.ROADS_REL] * 3)
+        self.assertEqual((d34, label), ([], "stand-in"))
+        gates = os.path.join(HERE, "results", "ENGINE_GATES", "b58")
+        self.assertEqual(CR.default_table("b58", G.FOUR_ENGINE_ROAD, True),
+                         os.path.join(gates, "check_roads_four_engine_share_on.json"))
+        self.assertEqual(CR.default_table("b58", G.FOUR_ENGINE_ROAD, False),
+                         os.path.join(gates, "check_roads_four_engine_share_off.json"))
+        self.assertEqual(CR.default_table("b58", "extremes", False), os.path.join(gates, "check_roads_extremes.json"))
 
 
 class BlindArm(unittest.TestCase):
@@ -259,6 +342,15 @@ class Verdict(unittest.TestCase):
         self.assertEqual(rc, 1)
         self.assertIn("STOP.", out)
 
+    def test_the_share_is_named_on_the_four_engine_road(self):
+        """C1b: on row 116's road the gate's header says whether decision 29's share was on, and from which
+        record; on any other road it says nothing of it, as before."""
+        g = dict(self.gate([True]), train_road=G.FOUR_ENGINE_ROAD, roads_record=None, share_kind=None)
+        self.assertIn("decision 29's share : off (no --roads-record)", self.code(g)[1])
+        _, out = self.code(dict(g, roads_record="R.json", share_kind="REAL"))
+        self.assertIn("decision 29's share : on, REAL record R.json (row 130 (5))", out)
+        self.assertNotIn("decision 29's share", self.code(self.gate([True]))[1])
+
 
 class Cli(unittest.TestCase):
     def refused(self, *argv, want):
@@ -278,6 +370,12 @@ class Cli(unittest.TestCase):
         self.refused("test_reward.py", "--engine", "no_such_engine", want="invalid choice")
         self.refused("test_reward.py", "--engine", "b58", "--train-road", "extremes", "--roads", "x.json",
                      "--synthetic-seed", "1", want="not allowed with argument")
+        # C1b: the share's record is the per-engine gate's, on row 116's road only, and one train.py reads
+        self.refused("test_reward.py", "--roads-record", "x.json", want="give --engine")
+        self.refused("test_reward.py", "--engine", "b58", "--train-road", "extremes", "--synthetic-seed", "1",
+                     "--roads-record", "x.json", want="four_engine's alone")
+        self.refused("test_reward.py", "--engine", "b58", "--train-road", "four_engine", "--synthetic-seed", "1",
+                     "--roads-record", os.path.join(HERE, "no_such_roads.json"), want="no roads record there")
 
     def test_check_roads_refusals(self):
         self.refused("check_roads.py", "--engine", "b58", "--train-road", "extremes", "--synthetic-seed", "1",
@@ -288,6 +386,18 @@ class Cli(unittest.TestCase):
         self.refused("check_roads.py", "--engine", "b58", want="--train-road is required")
         self.refused("check_roads.py", "--jobs", "4", want="give --engine")
         self.refused("check_roads.py", "--out", "x.json", want="give --engine")
+        # C1b: as test_reward.py's, and a SYNTHETIC share record makes the table a test, written outside only
+        self.refused("check_roads.py", "--roads-record", "x.json", want="give --engine")
+        self.refused("check_roads.py", "--engine", "b58", "--train-road", "extremes", "--roads", "x.json",
+                     "--roads-record", "x.json", want="four_engine's alone")
+        import four_engine_roads as F
+        d = tempfile.mkdtemp(prefix="gate_share_cli_")
+        try:
+            rec = F.write_synthetic_record(os.path.join(d, "roads.SYNTHETIC.json"), 4242)
+            self.refused("check_roads.py", "--engine", "b58", "--train-road", "four_engine", "--roads", "x.json",
+                         "--roads-record", rec, want="outside the repository")
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
 
     def test_benchmark_refusals(self):
         self.refused("benchmark_training.py", "--dry-run", want="mistake 1")
@@ -296,6 +406,54 @@ class Cli(unittest.TestCase):
                      want="--merge takes no --engine or --road")
         self.refused("benchmark_training.py", "--engine", "no_such_engine", "--road", "extremes", "--dry-run",
                      want="invalid choice")
+        # C1b, row 135's protocol: the knock option required on row 116's road, the share's record that
+        # road's alone and repository-relative, and neither option with --merge; row 136 builds no table,
+        # so the benchmark has no --table-record
+        rr = "results/EPA_ROADS/roads.json"
+        self.refused("benchmark_training.py", "--engine", "b58", "--road", "four_engine", "--dry-run",
+                     want="--reward-knock is required with --road four_engine")
+        self.refused("benchmark_training.py", "--engine", "b58", "--road", "extremes", "--roads-record", rr,
+                     "--dry-run", want="--roads-record belongs to --road four_engine")
+        for path, why in ((HERE.replace(os.sep, "/") + "/" + rr, "it is absolute"),
+                          (rr.replace("/", "\\"), "'/' separators")):
+            with self.subTest(path=path):
+                self.refused("benchmark_training.py", "--engine", "b58", "--road", "four_engine", "--reward-knock",
+                             "out", "--roads-record", path, "--dry-run", want=why)
+        for opt in (["--reward-knock", "out"], ["--roads-record", rr]):
+            with self.subTest(option=opt[0]):
+                self.refused("benchmark_training.py", "--merge", "a.json", "b.json", *opt,
+                             want="--merge takes no --roads-record or --reward-knock")
+        self.refused("benchmark_training.py", "--engine", "b58", "--road", "four_engine", "--reward-knock", "out",
+                     "--table-record", "t.json", "--dry-run", want="unrecognized arguments: --table-record")
+
+    def test_the_benchmarks_four_engine_road_waits_for_the_plant_commit(self):
+        """C1b: the record must be the committed roads.json (real_record_problem), refused before the probe
+        runs; then --reward-knock is refused while train.build_env takes no reward_knock (before P, row 127
+        (4)), so four_engine is not benchmarked before P. From P on the same dry run passes, and every
+        command it prints carries the share and the knock option."""
+        import inspect
+        import train as T
+        argv = ["benchmark_training.py", "--engine", "b58", "--road", "four_engine", "--reward-knock", "out",
+                "--device", "cpu", "--dry-run"]
+        d = tempfile.mkdtemp(prefix="bench_f4_")
+        try:
+            rc, out = run(*argv, "--roads-record", "results/EPA_ROADS/other_roads.json",
+                          "--out", os.path.join(d, "a.json"))
+            self.assertEqual(rc, 1, out[-2000:])
+            self.assertIn("a REAL roads record is read only from results/EPA_ROADS/roads.json", out)
+            rc, out = run(*argv, "--roads-record", "results/EPA_ROADS/roads.json",
+                          "--out", os.path.join(d, "b.json"))
+            if "reward_knock" not in inspect.signature(T.build_env).parameters:
+                self.assertEqual(rc, 1, out[-2000:])
+                self.assertIn("REFUSING: --reward-knock needs the plant commit P (row 127 (4))", out)
+            else:
+                self.assertEqual(rc, 0, out[-2000:])
+                self.assertEqual(out.count("--scored-share --roads-record results/EPA_ROADS/roads.json "
+                                           "--reward-knock out"), out.count("  section "), out[-3000:])
+            self.assertNotIn("Traceback", out)
+            self.assertEqual(os.listdir(d), [])
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
 
     def test_the_benchmark_probe_refuses_a_road_train_py_does_not_have(self):
         rc, out = run("benchmark_training.py", "--engine", "b58", "--road", "no_such_road", "--dry-run")
@@ -319,6 +477,358 @@ class Scans(unittest.TestCase):
         # the control: a per-engine function with a default engine is flagged
         bad = "import engine_gate as G\ndef gate(engine='b58'):\n    return engine\n"
         self.assertTrue(TET.scan_source(bad, "scratch.py"))
+
+
+@unittest.skipIf(bash() is None, "no bash here")
+class RunbookB1(unittest.TestCase):
+    """C1b (the reviews of 2 November 2026): docs/build_step_2/DEVICE_RUNBOOK.md's B0 record, its B1 blocks and B5's
+    copy, their own text, run by bash on a scratch git work tree outside the repository (one empty commit), with a
+    stand-in for row 135's interpreter (the blocks' <row 135's interpreter>). The stand-in answers the loop's engine
+    list with two engines; for each benchmark run it records benchmark_training.code_info of the work tree when it
+    starts and writes its --out, which it refuses to overwrite, as the benchmark does; and it runs B0's record lines
+    (python reading its script from stdin) with the real interpreter and this tree's benchmark_training. $PY is a
+    second stand-in that refuses, since for cuda row 135's interpreter is not the lock's CPU build, and $OUT a
+    session folder that must stay empty. B0's record lands in $B1OUT as B0_<git_head>.json, code_info and the host;
+    every attempt lands in B0's $B1OUT and records git_dirty False; k counts the attempts in $B1OUT and in
+    results/benchmarks/, a .txt alone included; a later session's repeat into the same $B1OUT continues the count,
+    on cuda the CPU series runs with $PY as B1_bench_<e>.cpu.attempt<k>, counted on its own, and B5 copies every
+    attempt of both sessions, the CPU series' and the B0 record. The controls (mistake 12): the same loop writing
+    its attempts into results/benchmarks/, as the sheet first drafted it, records the second engine's run dirty;
+    the loop with $PY runs nothing, and the CPU series with that $PY runs nothing either; B0's record lines refuse
+    a record that differs, a dirty tree and a tree at no commit. On cuda a later session gets $PYC from 'Before you
+    start', which every session runs first; without its PYC line the record lines and the loop run nothing."""
+    RUNBOOK = os.path.join(HERE, "docs", "build_step_2", "DEVICE_RUNBOOK.md")
+    STAND_IN = ("#!/usr/bin/env bash\n"
+                "if [ \"$2\" = \"-c\" ]; then echo \"b58 mazda_25t\"; exit 0; fi\n"
+                "if [ \"$2\" = \"-\" ]; then PYTHONPATH=\"$BENCH_HERE\" exec \"$REAL_PY\" \"$@\"; fi\n"
+                "out=\"\"; prev=\"\"\n"
+                "for x in \"$@\"; do [ \"$prev\" = \"--out\" ] && out=\"$x\"; prev=\"$x\"; done\n"
+                "if [ -z \"$out\" ] || [ -e \"$out\" ]; then echo \"refused: --out '$out'\"; exit 1; fi\n"
+                "\"$REAL_PY\" -B -c 'import json, os, sys; sys.path.insert(0, os.environ[\"BENCH_HERE\"]); "
+                "import benchmark_training as B; "
+                "json.dump(dict(argv=sys.argv[2:], code=B.code_info(os.getcwd())), open(sys.argv[1], \"w\"))' "
+                "\"$out\" \"$@\"\n"
+                "echo \"ran $out\"\n")
+    WRONG_PY = ("#!/usr/bin/env bash\n"
+                "touch \"$WRONG_PY_MARK\"\n"
+                "echo \"the lock's CPU interpreter PY ran, not row 135's\" >&2\n"
+                "exit 7\n")
+    FIRST = ["B1_bench_b58.attempt1.txt", "B1_bench_b58.attempt2.json", "B1_bench_b58.attempt2.txt",
+             "B1_bench_mazda_25t.attempt2.json", "B1_bench_mazda_25t.attempt2.txt"]
+    B0_KEYS = {"git_head", "git_dirty", "benchmark_sha", "train_sha", "host"}
+
+    def block(self, step, needle=None):
+        """A bash block of the runbook's `step`, as the runbook holds it: the step's first, or the one block of the
+        step that holds `needle`."""
+        with open(self.RUNBOOK, encoding="utf-8") as fh:
+            text = fh.read()
+        start = text.index(f"**{step}.")
+        end = min(i for i in (text.find("\n**B", start + 1), text.find("\n## ", start + 1), len(text)) if i != -1)
+        blocks, at = [], start
+        while True:
+            first = text.find("```bash\n", at, end)
+            if first == -1:
+                break
+            first += len("```bash\n")
+            last = text.index("\n```", first)
+            blocks.append(text[first:last])
+            at = last + len("\n```")
+        self.assertTrue(blocks, step)
+        if needle is None:
+            return blocks[0]
+        held = [b for b in blocks if needle in b]
+        self.assertEqual(len(held), 1, (step, needle))
+        return held[0]
+
+    def fill(self, body, values):
+        for placeholder, value in values:
+            self.assertIn(placeholder, body)
+            body = body.replace(placeholder, value)
+        self.assertNotRegex(body, r"<[a-z][^>]*>")        # every placeholder filled
+        return body
+
+    def loop(self, interpreter, device="cpu"):
+        """B1's first block, row 135's device's series."""
+        return self.fill(self.block("B1"), (("<row 135's interpreter>", interpreter), ("<row 135>", device),
+                                            ("<N>", "2"), ("<S>", "1000"), ("<R>", "1")))
+
+    def cpu_loop(self):
+        """B1's second block: on cuda, the CPU series, with $PY."""
+        body = self.block("B1", needle="--device cpu")
+        self.assertTrue(body.startswith("PYB=$PY "), body)
+        self.assertIn('--out "$B1OUT/B1_bench_$E.cpu.attempt$k.json"', body)
+        return self.fill(body, (("<row 135's CPU N>", "3"), ("<S>", "1000"), ("<R>", "1")))
+
+    def b0_record(self, interpreter):
+        """B0's record lines, as the runbook holds them, row 135's interpreter given and its B1OUT line keeping the
+        scratch $B1OUT bash is given."""
+        body = self.block("B0", needle="B1OUT=~/grad_device/B1 ")
+        self.assertTrue(body.startswith("PYB=<row 135's interpreter> "), body)
+        self.assertIn('$PYB -B - "$B1OUT" <<', body)
+        return self.fill(body, (("<row 135's interpreter>", interpreter),
+                                ("B1OUT=~/grad_device/B1 ", 'B1OUT="$B1OUT" '))) + "\n"
+
+    def before_you_start(self, repo, out, pyc):
+        """'Before you start''s bash block, as the runbook holds it, what every session runs first: its REPO, OUT
+        and PYC lines given the scratch tree, a session folder and a stand-in. Its PYC line must name the python
+        of the environment B0's CUDA block makes."""
+        with open(self.RUNBOOK, encoding="utf-8") as fh:
+            text = fh.read()
+        first = text.index("```bash\n", text.index("## Before you start")) + len("```bash\n")
+        body = text[first:text.index("\n```", first)] + "\n"
+        return self.fill(body, (("REPO=~/GRAD-project ", f'REPO="{repo.replace(os.sep, "/")}" '),
+                                ("OUT=~/grad_device/2026-11-01 ", f'OUT="{out.replace(os.sep, "/")}" '),
+                                ("PYC=~/grad_venv_cuda_lock/Scripts/python.exe ", f'PYC="{pyc}" ')))
+
+    def scratch(self, root):
+        """A scratch git work tree under `root`, at one empty commit, B0's $B1OUT and a session's $OUT beside it,
+        as a first session finds them: an attempt already committed (excluded, so the tree is as clean as a
+        committed file leaves it) and a crash in $B1OUT that left only its .txt. Returns (tree, $B1OUT, $OUT,
+        bash's environment, the stand-in for row 135's interpreter)."""
+        tree, b1out, out = os.path.join(root, "tree"), os.path.join(root, "B1OUT"), os.path.join(root, "OUT")
+        os.makedirs(os.path.join(tree, "results", "benchmarks"))
+        os.makedirs(b1out)
+        os.makedirs(out)
+        self.git_init(tree, commit=True)
+        for path in (os.path.join(tree, "results", "benchmarks", "B1_bench_mazda_25t.attempt1.json"),
+                     os.path.join(b1out, "B1_bench_b58.attempt1.txt")):
+            open(path, "w").close()
+        with open(os.path.join(tree, ".git", "info", "exclude"), "a", encoding="utf-8") as fh:
+            fh.write("results/benchmarks/B1_bench_mazda_25t.attempt1.json\n")
+        paths = {}
+        for name, text in (("py_stand_in.sh", self.STAND_IN), ("wrong_py.sh", self.WRONG_PY)):
+            paths[name] = os.path.join(root, name)
+            with open(paths[name], "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(text)
+        fwd = {k: v.replace(os.sep, "/") for k, v in paths.items()}
+        env = dict(ENV, PY=fwd["wrong_py.sh"], B1OUT=b1out.replace(os.sep, "/"), OUT=out.replace(os.sep, "/"),
+                   REAL_PY=PY_FWD, BENCH_HERE=HERE,
+                   WRONG_PY_MARK=os.path.join(root, "wrong_py_ran").replace(os.sep, "/"))
+        return tree, b1out, out, env, fwd["py_stand_in.sh"]
+
+    def git_init(self, tree, commit):
+        os.makedirs(tree, exist_ok=True)
+        self.assertEqual(subprocess.run(["git", "init", "-q"], cwd=tree, capture_output=True).returncode, 0)
+        if commit:
+            p = subprocess.run(["git", "-c", "user.name=scratch", "-c", "user.email=scratch@example.invalid",
+                                "-c", "commit.gpgsign=false", "commit", "-q", "--allow-empty", "-m", "scratch"],
+                               cwd=tree, capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+
+    def git_head(self, tree):
+        p = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=tree, capture_output=True, text=True)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        return p.stdout.strip()
+
+    def bash_in(self, tree, body, env, ok=True):
+        """One session: `body` run by a new bash in `tree`. bash's exit code and output; the code must be 0 when
+        `ok`."""
+        p = subprocess.run([bash(), "-c", body], cwd=tree, capture_output=True, text=True, env=env, timeout=600)
+        if ok:
+            self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+            return p.stdout + p.stderr
+        return p.returncode, p.stdout + p.stderr
+
+    def record(self, path):
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+
+    def test_two_engines_in_a_row_record_a_clean_tree(self):
+        root = tempfile.mkdtemp(prefix="runbook_b1_")
+        try:
+            tree, b1out, out, env, interpreter = self.scratch(root)
+            body = self.loop(interpreter)
+            self.assertIn('--out "$B1OUT/B1_bench_$E.attempt$k.json"', body)
+            text = self.bash_in(tree, body, env)
+            self.assertEqual(sorted(os.listdir(b1out)), self.FIRST, text)
+            for e in ("b58", "mazda_25t"):
+                with self.subTest(engine=e):
+                    rec = self.record(os.path.join(b1out, f"B1_bench_{e}.attempt2.json"))
+                    self.assertIs(rec["code"]["git_dirty"], False, rec)
+                    a = rec["argv"]
+                    self.assertEqual(a[a.index("--engine") + 1], e)
+                    for flag, value in (("--road", "four_engine"), ("--roads-record", ER.ROADS_REL),
+                                        ("--reward-knock", "out"), ("--device", "cpu"), ("--runs", "2")):
+                        self.assertEqual(a[a.index(flag) + 1], value, a)
+                    with open(os.path.join(b1out, f"B1_bench_{e}.attempt2.txt"), encoding="utf-8") as fh:
+                        self.assertIn("ran ", fh.read())
+            self.assertEqual(os.listdir(os.path.join(tree, "results", "benchmarks")),
+                             ["B1_bench_mazda_25t.attempt1.json"])
+            self.assertEqual(os.listdir(out), [], "B1 writes into B0's $B1OUT, not the session's $OUT")
+            self.assertFalse(os.path.exists(env["WRONG_PY_MARK"]), "the loop ran $PY, not row 135's interpreter")
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_a_later_session_continues_the_count_and_B5_copies_every_attempt(self):
+        """The reviews of 2 November 2026: B1 may span sessions, each with its own $OUT, and each first runs B0's
+        record lines. The first session's write $B1OUT/B0_<git_head>.json, code_info of the tree and the host; a
+        later session's, on the same commit and host, leave it as it is. A crash repeated in the later session, for
+        its engine alone (the runbook's `for E in <the engine>; do`) and here on cuda, goes into the same $B1OUT as
+        attempt 3, and on cuda the CPU series runs at the same visit for every engine, with $PY, as
+        B1_bench_<e>.cpu.attempt1. B5's copy, run once at the end, commits every attempt of both sessions, the CPU
+        series' and the B0 record, beside the one already committed."""
+        import platform
+        import benchmark_training as B
+        root = tempfile.mkdtemp(prefix="runbook_b1_sessions_")
+        try:
+            tree, b1out, out, env, interpreter = self.scratch(root)
+            head = self.git_head(tree)
+            b0 = f"B0_{head}.json"
+            text = self.bash_in(tree, self.b0_record(interpreter), env)
+            self.assertIn("wrote ", text)
+            self.assertEqual(sorted(os.listdir(b1out)), sorted(["B1_bench_b58.attempt1.txt", b0]), text)
+            rec = self.record(os.path.join(b1out, b0))
+            self.assertEqual(set(rec), self.B0_KEYS, rec)
+            mine = B.code_info()
+            self.assertEqual((rec["git_head"], rec["git_dirty"], rec["host"], rec["benchmark_sha"], rec["train_sha"]),
+                             (head, False, platform.node(), mine["benchmark_sha"], mine["train_sha"]), rec)
+            with open(os.path.join(b1out, b0), "rb") as fh:
+                written = fh.read()
+            self.bash_in(tree, self.loop(interpreter), env)
+            later = os.path.join(root, "OUT2")
+            os.makedirs(later)
+            env2 = dict(env, OUT=later.replace(os.sep, "/"))
+            text = self.bash_in(tree, self.b0_record(interpreter), env2)
+            self.assertIn("not rewritten", text)
+            with open(os.path.join(b1out, b0), "rb") as fh:
+                self.assertEqual(fh.read(), written)
+            lines = self.loop(interpreter, device="cuda").split("\n")
+            (i,) = [n for n, line in enumerate(lines) if line.startswith("for E in ")]
+            lines[i] = "for E in b58; do"
+            text = self.bash_in(tree, "\n".join(lines), env2)
+            # on cuda, the CPU series at the same visit: $PY is the lock's CPU interpreter here, so its stand-in
+            # is the one that runs
+            text += self.bash_in(tree, self.cpu_loop(), dict(env2, PY=interpreter))
+            cpu = [f"B1_bench_{e}.cpu.attempt1.{x}" for e in ("b58", "mazda_25t") for x in ("json", "txt")]
+            want = sorted(self.FIRST + [b0, "B1_bench_b58.attempt3.json", "B1_bench_b58.attempt3.txt"] + cpu)
+            self.assertEqual(sorted(os.listdir(b1out)), want, text)
+            rec = self.record(os.path.join(b1out, "B1_bench_b58.attempt3.json"))
+            self.assertIs(rec["code"]["git_dirty"], False, rec)
+            self.assertEqual(rec["code"]["git_head"], head)
+            self.assertEqual(rec["argv"][rec["argv"].index("--device") + 1], "cuda")
+            for e in ("b58", "mazda_25t"):
+                with self.subTest(engine=e, series="cpu"):
+                    rec = self.record(os.path.join(b1out, f"B1_bench_{e}.cpu.attempt1.json"))
+                    self.assertIs(rec["code"]["git_dirty"], False, rec)
+                    self.assertEqual(rec["code"]["git_head"], head)
+                    a = rec["argv"]
+                    for flag, value in (("--engine", e), ("--road", "four_engine"), ("--roads-record", ER.ROADS_REL),
+                                        ("--reward-knock", "out"), ("--device", "cpu"), ("--runs", "3")):
+                        self.assertEqual(a[a.index(flag) + 1], value, a)
+            copy = self.block("B5")
+            self.assertIn('"$B1OUT"/B1_bench_', copy)
+            self.assertIn('"$B1OUT"/B0_*.json', copy)
+            self.bash_in(tree, copy, env)
+            bench = os.path.join(tree, "results", "benchmarks")
+            self.assertEqual(sorted(os.listdir(bench)), sorted(want + ["B1_bench_mazda_25t.attempt1.json"]))
+            for name in want:
+                with open(os.path.join(b1out, name), "rb") as a, open(os.path.join(bench, name), "rb") as b:
+                    self.assertEqual(a.read(), b.read(), name)
+            self.assertEqual((os.listdir(out), os.listdir(later)), ([], []))
+            self.assertFalse(os.path.exists(env["WRONG_PY_MARK"]), "a block ran the refusing $PY")
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_the_control_attempts_inside_the_tree_record_it_dirty(self):
+        root = tempfile.mkdtemp(prefix="runbook_b1_control_")
+        try:
+            tree, _, _, env, interpreter = self.scratch(root)
+            body = self.loop(interpreter).replace('"$B1OUT/B1_bench_$E.attempt$k',
+                                                  '"results/benchmarks/B1_bench_$E.attempt$k')
+            self.assertNotIn('"$B1OUT/', body)
+            text = self.bash_in(tree, body, env)
+            second = self.record(os.path.join(tree, "results", "benchmarks", "B1_bench_mazda_25t.attempt2.json"))
+            self.assertIs(second["code"]["git_dirty"], True, text)
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_the_control_PY_is_refused(self):
+        """The stand-in for $PY does refuse (mistake 12): the B1 loop with its interpreter line set to $PY, as
+        the draft wrote it, runs no benchmark and leaves the mark; so does the CPU series' block, whose
+        interpreter is $PY, so the block that ran in the test above ran $PY."""
+        root = tempfile.mkdtemp(prefix="runbook_b1_py_")
+        try:
+            tree, b1out, _, env, _ = self.scratch(root)
+            for body in (self.loop("$PY"), self.cpu_loop()):
+                with self.subTest(block=body.split("\n")[0]):
+                    if os.path.exists(env["WRONG_PY_MARK"]):
+                        os.remove(env["WRONG_PY_MARK"])
+                    self.bash_in(tree, body, env, ok=False)
+                    self.assertTrue(os.path.exists(env["WRONG_PY_MARK"]))
+                    self.assertEqual(sorted(os.listdir(b1out)), ["B1_bench_b58.attempt1.txt"])
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_the_control_B0s_record_refuses(self):
+        """B0's record lines refuse (mistake 12), and exit non-zero: a record already there that differs (here its
+        host) is left as it is; a dirty work tree (an untracked file) and a tree at no commit write no record."""
+        root = tempfile.mkdtemp(prefix="runbook_b0_")
+        try:
+            tree, b1out, _, env, interpreter = self.scratch(root)
+            body = self.b0_record(interpreter)
+            self.bash_in(tree, body, env)
+            path = os.path.join(b1out, f"B0_{self.git_head(tree)}.json")
+            rec = dict(self.record(path), host="another host")
+            with open(path, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(json.dumps(rec, indent=1, sort_keys=True) + "\n")
+            with open(path, "rb") as fh:
+                before = fh.read()
+            rc, text = self.bash_in(tree, body, env, ok=False)
+            self.assertNotEqual(rc, 0, text)
+            self.assertIn("exists and differs", text)
+            with open(path, "rb") as fh:
+                self.assertEqual(fh.read(), before)
+            os.remove(path)
+            with open(os.path.join(tree, "stray.txt"), "w") as fh:
+                fh.write("untracked\n")
+            rc, text = self.bash_in(tree, body, env, ok=False)
+            self.assertNotEqual(rc, 0, text)
+            self.assertIn("needs a clean git work tree at a commit", text)
+            bare = os.path.join(root, "no_commit")
+            self.git_init(bare, commit=False)
+            rc, text = self.bash_in(bare, body, env, ok=False)
+            self.assertNotEqual(rc, 0, text)
+            self.assertIn("needs a clean git work tree at a commit", text)
+            self.assertEqual([x for x in os.listdir(b1out) if x.startswith("B0_")], [])
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_a_later_cuda_session_has_PYC(self):
+        """On CUDA, $PYC is row 135's interpreter, of B0's record lines and of B1, and a later session of B1 runs
+        only 'Before you start', the record lines and B1 (the review of 2 November 2026): so 'Before you start'
+        sets PYC, to the python of the environment B0's CUDA block makes, and no line of B0 or B1 sets it. A first
+        session and a later one, each run as the runbook holds it with the interpreter read as $PYC, write B0's
+        record once, find it the same, and run both engines on cuda in $B1OUT. The control (mistake 12): the same
+        later session without the PYC line, as B0 alone set it before, writes no record and runs no engine, and
+        still exits 0."""
+        with open(self.RUNBOOK, encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertNotRegex(text[text.index("**B0."):text.index("**B2.")], r"(?m)^\s*PYC=")
+        install = self.block("B0", needle="<CU's CUDA lock>")
+        self.assertIn("-m venv ~/grad_venv_cuda_lock ", install)
+        self.assertIn("$PYC -m pip install -r <CU's CUDA lock>", install)
+        for later in (True, False):
+            root = tempfile.mkdtemp(prefix="runbook_pyc_")
+            try:
+                tree, b1out, out, env, interpreter = self.scratch(root)
+                env = {k: v for k, v in env.items() if k != "PYC"}
+                before = self.before_you_start(tree, out, interpreter)
+                session = self.b0_record("$PYC") + self.loop("$PYC", device="cuda")
+                if later:
+                    self.assertIn("wrote ", self.bash_in(tree, before + self.b0_record("$PYC"), env))
+                    text = self.bash_in(tree, before + session, env)
+                    self.assertIn("already written, the same; not rewritten", text)
+                    self.assertEqual(len([x for x in os.listdir(b1out) if x.startswith("B0_")]), 1, text)
+                    for e in ("b58", "mazda_25t"):
+                        a = self.record(os.path.join(b1out, f"B1_bench_{e}.attempt2.json"))["argv"]
+                        self.assertEqual((a[a.index("--engine") + 1], a[a.index("--device") + 1]), (e, "cuda"), a)
+                else:
+                    bare = "".join(x for x in before.splitlines(True) if not x.startswith("PYC="))
+                    self.assertNotEqual(bare, before)
+                    text = self.bash_in(tree, bare + session, env)
+                    self.assertEqual(sorted(os.listdir(b1out)), ["B1_bench_b58.attempt1.txt"], text)
+            finally:
+                shutil.rmtree(root, ignore_errors=True)
 
 
 @unittest.skipIf(bash() is None, "no bash here")

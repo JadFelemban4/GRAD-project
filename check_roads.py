@@ -37,6 +37,7 @@ roads are a later step (check_roads.py --engine, writing results/<id>/).
 
     python check_roads.py --engine E --train-road R --roads FILE [--n 40] [--out FILE]
     python check_roads.py --engine E --train-road R --synthetic-seed N --out FILE
+    ... --train-road four_engine --roads-record PATH    decision 29's share on (row 130 (5))
 
 THE PER-ENGINE TABLE (31 October 2026, row 119; ORDER_TO_TRAINING.md step 7).
 `--engine E` drives the neutral action on n roads of training road R as train.py
@@ -44,9 +45,17 @@ builds it (train.build_env; R is row 116's road, by train.py's name for it) and 
 every road of decision 34's set, in E's own car (engine_gate.py), and prints this
 table with E's own turbine knee, the shares of steps asking under E's torque
 floor or over its deliverable torque (row 116), and the same PASS rule. It
-writes results/ENGINE_GATES/<E>/check_roads_<R>.json, or --out; a SYNTHETIC
-seed's run is a test of the code, and its --out is required and must lie
-outside the repository. Without --engine this file is the B58's, as above, and
+writes results/ENGINE_GATES/<E>/check_roads_<R>.json, or --out; on row 116's
+road the default name says whether decision 29's share was on,
+check_roads_four_engine_share_on.json or _share_off.json, so the two runs never
+overwrite each other (default_table). A SYNTHETIC seed's run is a test of the
+code, and its --out is required and must lie outside the repository.
+--roads-record PATH (--train-road four_engine only; C1b) drives the training
+roads with decision 29's share on (row 130 (5)); the table records and prints
+the record repository-relative (engine_gate.record_name: results/EPA_ROADS/
+roads.json for the REAL one), never this machine's absolute path. A SYNTHETIC
+record makes the run a test of the code too, with the same rule for --out.
+Without --engine this file is the B58's, as above, and
 prints and writes what it did before --engine existed (no default engine,
 CLAUDE.md mistake 1: the run without --engine names its plant in PLANT_NAME).
 """
@@ -66,6 +75,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FIRST_SEED = 100
 PLANT_NAME = "b58"
 GATES_DIR = os.path.join("results", "ENGINE_GATES")      # the per-engine tables, one folder per engine
+
+
+def default_table(engine_id, train_road, share_on):
+    """The per-engine table's default file: results/ENGINE_GATES/<E>/check_roads_<R>.json, and on row 116's
+    road, the one decision 29's share is on or off on, check_roads_<R>_share_on.json or _share_off.json (the
+    review of 2 November 2026: one name for both runs let the second overwrite the first)."""
+    import engine_gate as G
+    tail = ("_share_on" if share_on else "_share_off") if train_road == G.FOUR_ENGINE_ROAD else ""
+    return os.path.join(HERE, GATES_DIR, engine_id, f"check_roads_{train_road}{tail}.json")
 
 
 def drive(job):
@@ -117,17 +135,26 @@ def main_engine(a, ap):
         ap.error("--train-road is required with --engine: the training road row 116 names, as train.py calls it")
     if a.roads is None and a.synthetic_seed is None:
         ap.error("decision 34's roads: give --roads FILE (a roads record) or --synthetic-seed N")
-    if a.synthetic_seed is not None and (a.out is None or not ER.outside_repo(a.out)):
+    try:
+        share = G.share_record(a.train_road, a.roads_record)
+    except ValueError as exc:
+        ap.error(f"--roads-record {a.roads_record}: {exc}")
+    synthetic = a.synthetic_seed is not None or (share is not None and share["seed_kind"] != "REAL")
+    if synthetic and (a.out is None or not ER.outside_repo(a.out)):
         ap.error("a SYNTHETIC run writes only outside the repository: give --out outside it")
-    out = a.out or os.path.join(HERE, GATES_DIR, a.engine, f"check_roads_{a.train_road}.json")
+    out = a.out or default_table(a.engine, a.train_road, share is not None)
+    name = G.record_name(share)              # what the table records and prints; the tasks read share["path"]
     plant = engines.get(a.engine)
     knee_c = float(plant.engine.damage.turb_knee_k) - 273.15
     train, d34, label = G.road_table(a.engine, train_road=a.train_road, roads_file=a.roads,
                                      synthetic_seed=a.synthetic_seed, n=a.n, first_seed=FIRST_SEED,
-                                     jobs=a.jobs if a.jobs is not None else 18)
+                                     jobs=a.jobs if a.jobs is not None else 18, roads_record=a.roads_record)
     print(f"PER-ENGINE ROADS (row 119): {a.engine} in its own car ({plant.id}); training road {a.train_road} "
           f"(train.build_env), seeds {FIRST_SEED}-{FIRST_SEED + a.n - 1}; decision 34's roads: {label}")
-    if a.synthetic_seed is not None:
+    if a.train_road == G.FOUR_ENGINE_ROAD:
+        print("decision 29's share: " + ("off (no --roads-record)" if share is None else
+                                         f"on, {share['seed_kind']} record {name} (row 130 (5))"))
+    if synthetic:
         print("SYNTHETIC: a test of this code, not row 119's gate (no roads_seed exists)")
     print(f"\n{'road':>9} {'family':<8}{'grade %':>15}{'peak C':>8}{f'>{knee_c:.0f} C':>8}{'neutral r':>11}"
           f"{'p95 err':>9}{'<floor':>8}{'>deliv':>8}")
@@ -166,7 +193,9 @@ def main_engine(a, ap):
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     with open(out, "w", encoding="utf-8") as fh:
         json.dump(dict(engine=a.engine, plant=plant.id, train_road=a.train_road, roads=label,
-                       synthetic=a.synthetic_seed is not None, first_seed=FIRST_SEED, n=a.n,
+                       roads_record=name,
+                       share_seed_kind=None if share is None else share["seed_kind"],
+                       synthetic=synthetic, first_seed=FIRST_SEED, n=a.n,
                        training=train, decision_34=d34, knee_c=knee_c, tolerance=G.TRACK_TOL,
                        neutral_band=G.NEUTRAL_BAND, passed=ok), fh)
     print(f"wrote {os.path.relpath(out, HERE) if not ER.outside_repo(out) else out}")
@@ -187,14 +216,18 @@ def main():
     src.add_argument("--synthetic-seed", type=int, help="with --engine: decision 34's generator on a SYNTHETIC "
                                                         "seed, a test of the code (no roads_seed)")
     ap.add_argument("--out", help="with --engine: the JSON (default results/ENGINE_GATES/<engine>/"
-                                  "check_roads_<road>.json)")
+                                  "check_roads_<road>.json; on four_engine check_roads_four_engine_share_on.json "
+                                  "or _share_off.json)")
     ap.add_argument("--jobs", type=int, default=None, help="with --engine: processes (default 18, the B58 table's)")
+    ap.add_argument("--roads-record", metavar="PATH", help="with --engine and --train-road four_engine: the roads "
+                                                           "record whose share the training roads turn on "
+                                                           "(decision 29's, row 130 (5)); without it, off")
     a = ap.parse_args()
     if a.engine is not None:
         raise SystemExit(main_engine(a, ap))
-    if any(x is not None for x in (a.train_road, a.roads, a.synthetic_seed, a.out, a.jobs)):
-        ap.error("--train-road, --roads, --synthetic-seed, --out and --jobs belong to the per-engine table: "
-                 "give --engine")
+    if any(x is not None for x in (a.train_road, a.roads, a.synthetic_seed, a.out, a.jobs, a.roads_record)):
+        ap.error("--train-road, --roads, --synthetic-seed, --out, --jobs and --roads-record belong to the "
+                 "per-engine table: give --engine")
     a.road = a.road or "terrain"
     from engine_env import TRACK_TOL
 

@@ -14,6 +14,10 @@
                                                    the machine, the plan and every command; nothing
                                                    is trained or timed (CUDA is probed, in a child)
     python benchmark_training.py --selftest        the harness on dummy work (seconds; no SAC, no plant)
+    python benchmark_training.py --engine E --road four_engine --roads-record results/EPA_ROADS/roads.json
+                                 --reward-knock out --device D --runs N --steps S --repeats R --out FILE
+                                                   row 114's rate of one engine, by row 135's protocol
+                                                   (step 18, B1; from the plant commit P on)
 
 --engine AND --road ARE REQUIRED (31 October 2026, rows 114 and 118): every run that measures names
 the plant and the road it times, as train.py's own --engine (CLAUDE.md mistake 1: there is no
@@ -25,6 +29,36 @@ and the extremes roads; "--engine b58 --road extremes" runs exactly what it ran 
 both from the two files' plans and refuses two files that differ in either, as before; --selftest
 takes neither. Row 114's protocol, once per engine after the plant commit, is
 docs/build_step_2/DEVICE_RUNBOOK.md's.
+
+THE BENCHMARK PROTOCOL (commit C1b, 2 November 2026; row 135 names this commit). From C1b to commit T
+this file does not change: T checks `git diff --quiet <C1b> <B1's git_head> -- benchmark_training.py`.
+Two options, each passed only when given, in this order, after the existing arguments of every
+train.py run, every --part child and the launcher's command:
+  --roads-record PATH  --road four_engine only. It turns decision 29's recipe on but its checkpoint
+                       average: train.py is given --lr-schedule last-third --scored-share --roads-record
+                       PATH, the recipe flags train_all.py --recipe29 gives every run but
+                       --checkpoint-average (the selftest compares the two), so step 18 times what step 22
+                       trains, the share (row 130 (5)) and the schedule included. --scored-share goes
+                       with the record because train.py refuses a record that nothing reads (the review
+                       of 2 November 2026). --checkpoint-average is never given: train.py refuses a
+                       50 000-step window in a 3 000-step run, so the snapshots the average saves are not
+                       timed. PATH is repository-relative with '/' separators and must pass
+                       four_engine_roads.real_record_problem: the committed results/EPA_ROADS/roads.json.
+                       The launcher's command gets --third-arm --recipe29 with it.
+  --reward-knock V     in or out. Required with --road four_engine, refused with --merge. Refused before
+                       the plant commit P: the probe reports whether train.build_env takes reward_knock
+                       (row 127 (4)), so four_engine cannot be benchmarked before P.
+The plan holds roads_record and scored_share with --road four_engine only, and reward_knock only when
+given, so a run without them (step 3's --road extremes) builds every plan and command exactly as the
+script before C1b did. The selftest pins this against that script's own blob (PRE_C1B_BLOB), so step
+3's files stay valid and still --merge. --merge compares the plans on PLAN_KEYS and the rows' plants on
+PLANT_KEYS (reward_knock among them, None before P), each with .get. B1's attempt files are written
+outside the repository (the runbook): code_info records git_dirty from `git status --porcelain`, which
+lists an untracked file too. On --road four_engine, the recommendation's validity line and section 2's
+line under each device's parts give row 136's words (no table is built for any engine: every surviving
+engine trains and is scored on the exact cycle) in place of the sentences on decision 28's table below,
+which every other road prints as before C1b; the selftest compares both with the script before C1b's on
+--road extremes.
 
 Asked by Ghassan, 21 October 2026: the four-engine test trains on a new device, and before it
 does, measure whether training there is faster on its CPU or its GPU. RUN IT ON THE TRAINING
@@ -106,7 +140,8 @@ ceil(3 arms x seeds / N) waves of 450 000-step runs at the per-run lower rate (d
 29, 30); --window-days gives the most seeds per arm that fit. On the device named, N is the
 concurrency that trains the experiment soonest, waves counted, which need not be the fastest.
 The launcher's command is printed; train_all.py trains two arms a seed today (blinded and one
-sighted horizon), not decision 27's three, so its runs are not the ones the days count.
+sighted horizon), not decision 27's three, so its runs are not the ones the days count. With
+--roads-record the command carries --third-arm, which trains the three.
 
 VALID FOR THE CYCLE BACKEND AND THE ENGINE MEASURED ONLY. Decision 28 trains on each engine's table
 if it passes its gates, a plant 6-8 times cheaper, which can reverse the answer; section 2 prints
@@ -114,7 +149,8 @@ that case, as arithmetic. Re-run this on the table backend, and on each engine o
 the device type is written into the preregistration. Row 114 (30 October 2026) fixes how: the device
 is chosen once, on the B58 and the extremes roads, before the first arming; after the plant commit
 each engine's many-run rate is measured once, with --engine and --road, at the training's
-concurrency, on row 116's training road (the runbook's commands).
+concurrency, on row 116's training road (the runbook's commands). On that road the validity line and
+section 2 give row 136's words instead (THE BENCHMARK PROTOCOL, above).
 
 THE GPU NEEDS ITS OWN TORCH. requirements-lock.txt pins the CPU build (torch 2.14.0+cpu). Run this
 script in that environment with --device cpu. Install the CUDA build of the same torch version in
@@ -134,8 +170,12 @@ overwritten). Commit it under results/benchmarks/ if it should be kept; it carri
 no result.
 """
 import argparse
+import contextlib
 import glob
 import hashlib
+import importlib.util
+import inspect
+import io
 import json
 import math
 import os
@@ -170,8 +210,16 @@ STEADY_OVERLAP = 0.9                 # all N together for less than this share o
 RECORDER_LISTS_GB = 0.02             # ActionRecorder's lists at their fullest (CHUNK = 10 000 steps of 47 fields as Python objects): the review's estimate
 BATCH_SLACK_S = 600                  # a batch's timeout: this, plus three times its expected training time
 SAVE_TRIES, SAVE_WAIT_S = 5, 1.0     # the JSON's write retried this often, this far apart: on Windows a reader holding it open refuses os.replace
-# What a run timed, from its config.json: --merge refuses two files whose rows timed different plants
-PLANT_KEYS = ("plant_sha", "derived_sha", "engine", "engine_sha", "backend")
+# What a run timed, from its config.json, each read with .get (reward_knock is None before the plant
+# commit P, row 127 (4)): --merge refuses two files whose rows timed different plants
+PLANT_KEYS = ("plant_sha", "derived_sha", "engine", "engine_sha", "backend", "reward_knock")
+# What a measurement is, from the plan: --merge refuses two files whose plans differ in one, each read with
+# .get, so a plan written before C1b (without the last three) still merges with one written after
+PLAN_KEYS = ("road", "engine", "dt", "steps_per_run", "det_steps", "roads_record", "scored_share",
+             "reward_knock")
+# benchmark_training.py before C1b, as git holds it (C1's, 523a75a, unchanged to 91c6ece): the selftest
+# builds --road extremes' plans and commands with it and with this file, and requires them byte-identical
+PRE_C1B_BLOB = "4bcda10438d5613ecf0d579e8ce4acddf4f791f4"
 # PYTHONDONTWRITEBYTECODE: no child leaves a __pycache__ in the repository (the review of 31 October
 # 2026, R0-4); it changes no trained bit
 ONE_THREAD = dict(OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", PYTHONUNBUFFERED="1",
@@ -179,17 +227,79 @@ ONE_THREAD = dict(OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", PYTHONUNBUFFERED="1"
 PART_TAG = "BENCHMARK_PART "         # the line a --part child prints its result on
 # The options train.build_env takes for a road beside its name, as train.py passes them for a run with
 # neither --scored-share nor --roads-record (train.py, road_options): section 2 builds the environment
-# that section 3's train.py runs build. Row 116's road takes two; every other road takes none.
+# that section 3's train.py runs build. Row 116's road takes two; every other road takes none. The default
+# when no --roads-record is given (env_options).
 ROAD_OPTIONS = {"four_engine": dict(scored_share=False, roads_record=None)}
+# What every train.py run is given with a roads record, before --roads-record PATH (C1b; the review of
+# 2 November 2026): train_all.py --recipe29's recipe flags without --checkpoint-average, which train.py
+# refuses at --steps 3000 (train_all.commands; the selftest compares the two)
+RECIPE29_TIMED = ("--lr-schedule", "last-third", "--scored-share")
 
 
-def validity(engine_id):
-    """The recommendation's last line, naming the engine measured (the B58's words, as they were
-    printed before --engine existed, for engine_id "b58")."""
+def make_plan(a):
+    """What is measured, the JSON's "plan" block as main() starts it: the road, the engine and the step, and,
+    each only where it applies, roads_record and scored_share (--road four_engine only: PATH or None, and
+    whether decision 29's share is on, row 130 (5)), and reward_knock (only when given). A run without
+    them gets the plan the script made before C1b, key for key."""
+    plan = dict(road=a.road, engine=a.engine, dt=DT)
+    if a.road == "four_engine":
+        plan.update(roads_record=a.roads_record, scored_share=a.roads_record is not None)
+    if a.reward_knock is not None:
+        plan["reward_knock"] = a.reward_knock
+    return plan
+
+
+def option_args(plan):
+    """--roads-record and --reward-knock as `plan` holds them, each only when given, in that order: what
+    every command appends after its existing arguments (train_cmd, run_part, launcher_command)."""
+    out = []
+    for key, flag in (("roads_record", "--roads-record"), ("reward_knock", "--reward-knock")):
+        if plan.get(key) is not None:
+            out += [flag, str(plan[key])]
+    return out
+
+
+def env_options(plan):
+    """What train.build_env takes beside the road's name for the runs `plan` times, as train.py passes it:
+    the four-engine road's two options (ROAD_OPTIONS, or with a roads record the share on: scored_share=True
+    and the record's path, row 130 (5)), then reward_knock=(V == 'in') when --reward-knock is given (from the
+    plant commit P on)."""
+    opts = dict(ROAD_OPTIONS.get(plan["road"], {}))
+    if plan.get("roads_record") is not None:
+        opts.update(scored_share=True, roads_record=os.path.join(HERE, plan["roads_record"]))
+    if plan.get("reward_knock") is not None:
+        opts["reward_knock"] = plan["reward_knock"] == "in"
+    return opts
+
+
+def validity(engine_id, road):
+    """The recommendation's last line, naming the engine measured. On --road four_engine (B1), row 136's
+    words: no table is built for any engine, so every surviving engine trains and is scored on the exact
+    cycle, the backend timed. On every other road, the words printed before C1b (the B58's, as they were
+    printed before --engine existed, for engine_id "b58"; the selftest compares them with the script
+    before C1b's)."""
+    if road == "four_engine":
+        return (f"Valid for the cycle backend and the {engine_id.upper()} only. Row 136 builds no table for "
+                "any engine: every surviving engine trains and is scored on the exact cycle, the backend "
+                "timed here.")
     return (f"Valid for the cycle backend and the {engine_id.upper()} only. Decision 28 trains on each "
             "engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run "
             "on the table backend, and on each engine once it exists, before the device type is written "
             "into the preregistration.")
+
+
+def backend_line(road, plant_s, part):
+    """Section 2's line under each device's parts (`part`: that device's update_s and predict_s). On --road
+    four_engine (B1), row 136's: no table is built for any engine. On every other road, the arithmetic line
+    on decision 28's table backend that the script printed before C1b, word for word (the selftest runs
+    both scripts' section 2 on --road extremes)."""
+    if road == "four_engine":
+        return ("     no table backend (row 136 builds no table for any engine): every surviving engine "
+                "trains on the exact cycle, the plant timed above")
+    fast_plant = [plant_s / k for k in (8, 6)]
+    share_table = [100 * x / (x + part["update_s"] + part["predict_s"]) for x in fast_plant]
+    return (f"     on the table backend (arithmetic, not a measurement: a plant 6-8x cheaper, "
+            f"decision 28) it would be {share_table[0]:.0f}-{share_table[1]:.0f} %")
 
 
 # ------------------------------------------------------------------------- the machine
@@ -355,9 +465,12 @@ def devices_available(asked, m):
     return out, notes
 
 
-def code_info():
+def code_info(root=HERE):
     """Which code measured this: the commit, whether the tree was dirty, and the bytes of this
-    file and of train.py (sha256, 16 characters), so two files from two versions are told apart."""
+    file and of train.py (sha256, 16 characters), so two files from two versions are told apart.
+    `root` is the work tree git is asked about: this file's, unless the selftest names a scratch
+    one. git_dirty is `git status --porcelain` non-empty, an untracked file included: B1's attempt
+    files are written outside the repository for that reason (the runbook)."""
     def sha(path):
         try:
             with open(path, "rb") as fh:
@@ -367,7 +480,7 @@ def code_info():
 
     def git(*args):
         try:
-            r = subprocess.run(["git", *args], cwd=HERE, capture_output=True, text=True, timeout=30)
+            r = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, timeout=30)
             return r.stdout.strip() if r.returncode == 0 else None
         except (OSError, subprocess.SubprocessError):
             return None
@@ -429,11 +542,13 @@ def run_part(name, plan, device=None, timeout_s=900):
     EXCLUSIVE_PROCESS mode then refuses every train.py, and in the default mode it takes video
     memory the rows would have had (the review of 21 October 2026). The plant is timed there too,
     under the one thread train_all.py gives a run. The child is given the run's --engine and
-    --road (`plan`), as every train.py is."""
+    --road (`plan`), as every train.py is, and its --roads-record and --reward-knock when the
+    plan holds them (option_args), so its environment is the runs' own."""
     cmd = [sys.executable, os.path.abspath(__file__), "--part", name,
            "--engine", plan["engine"], "--road", plan["road"]]
     if device:
         cmd += ["--device", device]
+    cmd += option_args(plan)
     return child_result(cmd, child_env(device), timeout_s, f"--part {name} {device or ''}".strip())
 
 
@@ -443,15 +558,19 @@ def part_probe(road):
     element-wise kernel and a cuBLAS product under the deterministic settings train.py trains CUDA
     with. torch.cuda.is_available() alone says yes to a GPU the wheel has no kernels for ('no
     kernel image is available'), to one that is busy and to one with no memory left (the review of
-    21 October 2026)."""
+    21 October 2026). And what this tree's train.py takes (C1b): whether train.build_env takes
+    reward_knock, which the plant commit P adds (row 127 (4)); the parent refuses --reward-knock
+    without it."""
     import torch
     import engines
+    import train as T
     from train import DESIGN_DT
-    # the plants that may train beside the ones registered (decision 47, amendment B7, 22 October
-    # 2026): an EPA engine is registered and refused by train.py until schema 4 and its validation
+    # the plants that may train (`engines.trainable()`: the B58 alone until the plant commit, then the
+    # engines the committed records keep, row 107 (5))
     out = dict(torch=torch.__version__, torch_cuda=torch.version.cuda, design_dt=DESIGN_DT.get(road),
                roads_known=sorted(DESIGN_DT),
-               engines_known=engines.known(), engines_trainable=list(engines.trainable()))
+               engines_known=engines.known(), engines_trainable=list(engines.trainable()),
+               build_env_takes_reward_knock="reward_knock" in inspect.signature(T.build_env).parameters)
     if torch.version.cuda is None:
         out["cuda"] = dict(ok=False, why=f"this torch ({torch.__version__}) is a CPU build")
         return out
@@ -473,15 +592,17 @@ def part_probe(road):
     return out
 
 
-def part_plant(engine_id, road, n_steps=200):
+def part_plant(engine_id, road, n_steps=200, *, options):
     """--part plant: seconds per environment step, the plant alone (the --road roads, the --engine
-    plant, the neutral action), and the backend it was computed on."""
+    plant, the neutral action), and the backend it was computed on. `options` are build_env's
+    beside the road's name, env_options' of the plan: the share on with a roads record, the knock
+    option when given."""
     import numpy as np
     import engines
     import fingerprint as FP
     from engine_env import neutral_action
     from train import DURATION_S, build_env
-    env = build_env(True, 0, DURATION_S, road, DT, plant=engines.get(engine_id), **ROAD_OPTIONS.get(road, {}))
+    env = build_env(True, 0, DURATION_S, road, DT, plant=engines.get(engine_id), **options)
     env.reset(seed=0)
     a = np.asarray(neutral_action(), dtype=np.float32)
     for _ in range(10):                              # warm-up
@@ -495,13 +616,14 @@ def part_plant(engine_id, road, n_steps=200):
                 backend=FP.backend_of(env.unwrapped), engines_timed=[engine_id])
 
 
-def part_sac(device, engine_id, road, n_updates=200, warm=20, n_predict=500):
+def part_sac(device, engine_id, road, n_updates=200, warm=20, n_predict=500, *, options):
     """--part sac: on one device, seconds per SAC gradient update as training makes it (train()
     with gradient_steps=1 and batch 256 after every environment step, the [256, 256] network
     train.py uses, its per-call learning-rate update and logging included), on random transitions
     in the replay buffer; seconds per action chosen (predict: the observation to the device, the
     actor, the action back); and the bytes one replay-buffer transition and one recorded step
-    take, for the production memory estimate. Nothing learned is kept."""
+    take, for the production memory estimate. Nothing learned is kept. `options` as part_plant's,
+    so the environment is the one the runs train in."""
     import numpy as np
     import torch
     from stable_baselines3 import SAC
@@ -511,7 +633,7 @@ def part_sac(device, engine_id, road, n_updates=200, warm=20, n_predict=500):
     torch.set_num_threads(1)                         # what train_all.py's OMP_NUM_THREADS=1 gives
     if device == "cuda":
         torch.use_deterministic_algorithms(True)     # as train.check_device sets it for CUDA
-    env = T.build_env(True, 0, T.DURATION_S, road, DT, plant=engines.get(engine_id), **ROAD_OPTIONS.get(road, {}))
+    env = T.build_env(True, 0, T.DURATION_S, road, DT, plant=engines.get(engine_id), **options)
     model = SAC("MlpPolicy", env, seed=0, device=device, buffer_size=5000, learning_starts=0,
                 verbose=0)
     if model.device.type != device:
@@ -707,7 +829,9 @@ def read_runs(out):
 
 
 def _plant_id(plant):
-    return json.dumps(plant, sort_keys=True)
+    # every PLANT_KEYS key read with .get: a row written before C1b has no reward_knock, a row of C1b's
+    # holds None there before P, and the two timed one plant
+    return json.dumps(plant if plant is None else {k: plant.get(k) for k in PLANT_KEYS}, sort_keys=True)
 
 
 def bounds(runs, steps):
@@ -786,12 +910,19 @@ def _tail(out, i, n=600):
 def train_cmd(device, seed, steps, out, plan, buffer=None):
     """One train.py run as train_all.py starts it: --engine, --road and --dt explicit (a default
     that selects an experiment is the trap train.py's docstring names), --device always given;
-    the engine, the road and the step are the run's plan's."""
+    the engine, the road and the step are the run's plan's. Then, each only when the plan holds it
+    (C1b): with a roads record decision 29's recipe but its average, --lr-schedule last-third
+    --scored-share --roads-record PATH (RECIPE29_TIMED: train_all.py --recipe29's flags but
+    --checkpoint-average; --scored-share because train.py refuses a record that nothing reads, the
+    review of 2 November 2026), then --reward-knock V. Never --checkpoint-average: train.py
+    refuses decision 29's 50 000-step window in a shorter run."""
     cmd = [sys.executable, TRAIN, "--engine", plan["engine"], "--road", plan["road"], "--dt", f"{plan['dt']:g}",
            "--steps", str(steps), "--seed", str(seed), "--device", device, "--out", out]
     if buffer is not None:
         cmd += ["--buffer", str(buffer)]
-    return cmd
+    if plan.get("roads_record") is not None:
+        cmd += list(RECIPE29_TIMED)
+    return cmd + option_args(plan)
 
 
 def batch_deadline(part, plant_s, n, steps, physical):
@@ -996,9 +1127,13 @@ def _packing_lines(confs, window_days):
 
 
 def launcher_command(device, n, seeds, plan):
+    """train_all.py's command for the experiment the rows timed. With a roads record (C1b) it trains
+    decision 27's third arm with decision 29's recipe (--third-arm --recipe29, both of which read
+    the record), then the plan's --roads-record and --reward-knock, each only when given."""
+    extra = (["--third-arm", "--recipe29"] if plan.get("roads_record") is not None else []) + option_args(plan)
     return (f"python train_all.py --engine {plan['engine']} --road {plan['road']} --dt {plan['dt']:g} "
             f"--device {device} --jobs {n} --seeds 0-{seeds - 1} --steps {PROD_STEPS} "
-            "--out runs/<the experiment's own>")
+            "--out runs/<the experiment's own>" + "".join(f" {x}" for x in extra))
 
 
 def _schedule_lines(c, window_days):
@@ -1023,9 +1158,9 @@ def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=
     concurrency, with the other's highest upper bound at ANY of its usable concurrencies: the
     other's throughput could be that high wherever it peaks (the review of 21 October 2026).
     Every number it gives is the lower bound's. `plan` is the run's (its engine, road and step:
-    the launcher's command and the validity line name them)."""
+    the launcher's command and the validity line name them; the validity line's words follow the road)."""
     confs = configurations(rows)
-    validity_line = validity(plan["engine"])
+    validity_line = validity(plan["engine"], plan["road"])
     res = dict(device=None, runs=None, clear=None, smoke_test=smoke, validity=validity_line,
                configurations=confs)
     if not measured:
@@ -1133,11 +1268,16 @@ def recommend(rows, det, measured, gpu_present, builds, window_days=None, smoke=
     if chosen == "cpu" and not str(builds.get("cpu", "")).endswith("+cpu"):
         caution.append(f"the CPU rows were measured with torch {builds.get('cpu')}, not "
                        "requirements-lock.txt's CPU build")
+    # the arms the printed command trains (C1b): launcher_command gives --third-arm with a roads record only
+    arms_said = ("with --third-arm train_all.py trains a sighted arm at each of the roads record's ratios and "
+                 "the blinded arm, a seed, decision 27's three, which the days count"
+                 if plan.get("roads_record") is not None else
+                 "train_all.py trains two arms a seed today, the days count three, decision 27")
     text = ([f"{chosen.upper()} with {b['runs']} runs at once (torch {builds.get(chosen)}): {how}."]
             + lines + _schedule_lines(b, window_days) + _packing_lines(usable_by[chosen], window_days)
             + ([f"  the launcher, for each engine (--engine and --road are what was measured, --out is the "
-                "experiment's own; train_all.py trains two arms a seed today, the days count three, "
-                f"decision 27):\n    {cmd}"] if cmd else ["  not even one seed per arm fits the window"])
+                f"experiment's own; {arms_said}):\n    {cmd}"] if cmd
+               else ["  not even one seed per arm fits the window"])
             + [f"  CAUTION: {x}" for x in caution] + [validity_line])
     if smoke:
         text = ["SMOKE TEST (--quick): NOT FOR DECISIONS 30 AND 32, no device is named. The rule "
@@ -1186,20 +1326,48 @@ def plan_grid(usable, physical, runs_arg, quick):
     return sorted({1, L}) if quick else sorted({1, max(1, P // 2), P, L})
 
 
+def relative_path_problem(path):
+    """Why `path` is not repository-relative with '/' separators, or None: the plan names the roads
+    record as commit T compares it, results/EPA_ROADS/roads.json (row 135)."""
+    if "\\" in path:
+        return "write it with '/' separators"
+    if os.path.isabs(path) or path.startswith("/") or ":" in path:
+        return "it is absolute: give it relative to the repository"
+    if any(part in ("", ".", "..") for part in path.split("/")):
+        return "it holds an empty, '.' or '..' part"
+    return None
+
+
 def check_args(a):
     """What is wrong with the command line, or None (the review of 21 October 2026: --runs 0 ran
     nothing and counted as ok, --steps 0 became 3000, and under about 1000 steps SAC makes so few
     updates that the CPU and CUDA rows time almost none). Every run that measures names its engine
-    and its road (31 October 2026, rows 114 and 118; mistake 1); --merge takes them from its files."""
+    and its road (31 October 2026, rows 114 and 118; mistake 1); --merge takes them from its files.
+    C1b: --reward-knock is required with --road four_engine; --roads-record belongs to that road
+    and is repository-relative (main() then asks four_engine_roads.real_record_problem); --merge
+    takes neither, since its files' plans name them."""
     if a.merge is not None:
         if a.engine is not None or a.road is not None:
             return ("--merge takes no --engine or --road: each file names the engine and the road it "
                     "measured (its plan), and two files that differ in either are refused")
+        if any(x is not None for x in (a.roads_record, a.reward_knock)):
+            return ("--merge takes no --roads-record or --reward-knock: each file's plan names what it "
+                    "measured, and two files whose plans differ are refused (PLAN_KEYS)")
     elif a.engine is None:
         return "--engine is required: there is no default engine (CLAUDE.md mistake 1)"
     elif a.road is None:
         return ("--road is required: the road names the design whose training is timed (a default that "
                 "selects an experiment is the trap train.py's docstring names)")
+    elif a.road == "four_engine" and a.reward_knock is None:
+        return ("--reward-knock is required with --road four_engine: in or out, passed explicitly "
+                "(row 127 (4))")
+    if a.roads_record is not None:
+        if a.road != "four_engine":
+            return (f"--roads-record belongs to --road four_engine, not --road {a.road}: it turns decision "
+                    "29's share on (row 130 (5)), which only that road has")
+        problem = relative_path_problem(a.roads_record)
+        if problem:
+            return f"--roads-record {a.roads_record}: {problem}"
     if a.runs is not None and min(a.runs) < 1:
         return "--runs must be 1 or more"
     if a.steps is not None and a.steps < 1000:
@@ -1288,7 +1456,7 @@ def merge_docs(docs, window_days=None):
         problems = []
         if ma["host"] != mb["host"]:
             problems.append(f"two machines ({ma['host']}, {mb['host']})")
-        for k in ("road", "engine", "dt", "steps_per_run", "det_steps"):
+        for k in PLAN_KEYS:
             if a["plan"].get(k) != b["plan"].get(k):
                 problems.append(f"{k} {a['plan'].get(k)!r} against {b['plan'].get(k)!r}")
         if ma.get("torch_cuda"):
@@ -1350,6 +1518,96 @@ def merge(paths, out_arg, window_days):
     print(f"\nwritten to {out}")
 
 
+# ------------------------------------------------------ the selftest's references (C1b)
+def pre_c1b_module(folder):
+    """This script as it stood before C1b (PRE_C1B_BLOB, read from git), written into `folder`, outside
+    the repository, and loaded there under another name with this tree's HERE and TRAIN, so its commands
+    name the same train.py. AssertionError when git or the blob is missing: the check it serves fails,
+    it never skips."""
+    try:
+        p = subprocess.run(["git", "cat-file", "blob", PRE_C1B_BLOB], cwd=HERE, capture_output=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as e:
+        raise AssertionError(f"git cannot read benchmark_training.py before C1b ({PRE_C1B_BLOB}): {e!r}") from None
+    assert p.returncode == 0 and p.stdout, (f"{HERE} holds no blob {PRE_C1B_BLOB} (benchmark_training.py before "
+                                            f"C1b): {p.stderr.decode('utf-8', 'replace')[-300:]}")
+    path = os.path.join(folder, "benchmark_training_pre_c1b.py")
+    with open(path, "wb") as fh:
+        fh.write(p.stdout)
+    spec = importlib.util.spec_from_file_location("benchmark_training_pre_c1b", path)
+    old = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(old)
+    old.HERE, old.TRAIN = HERE, TRAIN
+    return old
+
+
+def main_as(mod, argv, probe, machine_dict, saves=1):
+    """mod.main() on `argv`, its probe child and this machine's readings stood in by `probe` and
+    `machine_dict`, stopped at its `saves`-th save (the first comes before section 2, the second after
+    it): (what it printed, how it ended -- None when it returned, "saved", or "exit <its code>" -- the
+    plan at each save, the parts it asked for). Every part is answered with `probe`. Nothing is trained,
+    timed or written (section 2's temporary folder is main's own, removed by it), and every stand-in is
+    put back."""
+    class Saved(Exception):
+        pass
+    parts, saved = [], []
+
+    def part(name, plan, device=None, timeout_s=900):
+        parts.append([name, json.dumps(plan), device, timeout_s])
+        return json.loads(json.dumps(probe))
+
+    def nth_save(result, out, *args, **kw):
+        saved.append(json.dumps(result["plan"]))
+        if len(saved) == saves:
+            raise Saved
+    stand_ins = dict(run_part=part, machine=lambda p: json.loads(json.dumps(machine_dict)), save=nth_save,
+                     code_info=lambda *args, **kw: {})
+    real = {k: getattr(mod, k) for k in stand_ins}
+    argv0, buf, ended = sys.argv, io.StringIO(), None
+    try:
+        for k, v in stand_ins.items():
+            setattr(mod, k, v)
+        sys.argv = ["benchmark_training.py", *argv]
+        with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+            mod.main()
+    except Saved:
+        ended = "saved"
+    except SystemExit as e:
+        ended = f"exit {e.code}"
+    finally:
+        sys.argv = argv0
+        for k, v in real.items():
+            setattr(mod, k, v)
+    return buf.getvalue(), ended, saved, parts
+
+
+def train_check(cmd):
+    """train.py's own main() on a train_cmd command line (cmd[1:] is its argv), stopped once its
+    check_recipe has returned: ("passed", build_env's road options, the recipe), or ("refused", what
+    it printed). The real parser and the real check_recipe, nothing after them: no directory, no
+    environment, no SAC."""
+    import train as T
+
+    class Passed(Exception):
+        pass
+    real = T.check_recipe
+
+    def check(a):
+        raise Passed(real(a))
+    argv0, err = sys.argv, io.StringIO()
+    T.check_recipe, sys.argv = check, list(cmd[1:])
+    try:
+        with contextlib.redirect_stderr(err):
+            T.main()
+    except Passed as p:
+        opts, recipe, _ = p.args[0]
+        return "passed", opts, recipe
+    except SystemExit as e:
+        return "refused", f"{e.code} {err.getvalue()}"
+    finally:
+        T.check_recipe, sys.argv = real, argv0
+    raise AssertionError("train.main() returned before check_recipe")
+
+
 # ---------------------------------------------------------------------- the selftest
 def selftest():
     """The harness on dummy work, with no SAC, no plant and no CUDA (seconds): the batch launcher,
@@ -1358,7 +1616,14 @@ def selftest():
     input checks (--engine and --road required to measure, refused with --merge), the engine and
     the road in every command, a recorded step's bytes (train imported, nothing built), the memory
     estimate and its caps, the rule and its margins, the days and the window, --merge and its
-    refusals, and the output file's refusal to overwrite, its whole-file writes and their retries."""
+    refusals, and the output file's refusal to overwrite, its whole-file writes and their retries.
+    C1b's protocol: its options' refusals, the plan and every command they reach; --road extremes
+    against the script before C1b (git's blob, PRE_C1B_BLOB: it fails without git, never skips);
+    the four-engine road through main() (its probe stood in), refused before P; its train.py
+    command through train.py's own parser and check_recipe on a SYNTHETIC record outside the
+    repository (train imported, nothing built), its recipe flags train_all.py --recipe29's but
+    --checkpoint-average; the launcher's caption, two arms or three; and code_info on a scratch git
+    work tree (git init), for B1's attempt files written outside it and, the control, inside it."""
     global nvidia_smi                                # stubbed below, restored before the end
     import psutil
     import check_training_device as CTD
@@ -1482,15 +1747,30 @@ def selftest():
         # every run that measures names its engine and its road (rows 114 and 118; mistake 1), and
         # --merge takes both from its files
         base = dict(runs=None, steps=None, repeats=None, window_days=None, merge=None, engine="b58",
-                    road="extremes")
+                    road="extremes", roads_record=None, reward_knock=None)
+        RR = "results/EPA_ROADS/roads.json"
+        f4 = dict(road="four_engine", reward_knock="out")
         for wrong in (dict(runs=[0]), dict(runs=[-1, 2]), dict(steps=999), dict(repeats=0),
                       dict(window_days=0.0), dict(merge=["a", "b", "c"], engine=None, road=None),
                       dict(engine=None), dict(road=None), dict(merge=["a", "b"]),
-                      dict(merge=["a", "b"], engine=None)):
+                      dict(merge=["a", "b"], engine=None),
+                      # C1b: the knock option is required on the four-engine road; the share is that road's
+                      # alone and its record repository-relative; --merge takes neither option
+                      dict(road="four_engine"), dict(road="four_engine", roads_record=RR),
+                      dict(roads_record=RR), dict(roads_record=RR, reward_knock="out"),
+                      dict(f4, roads_record=os.path.join(HERE, "results", "EPA_ROADS", "roads.json")),
+                      dict(f4, roads_record=RR.replace("/", "\\")), dict(f4, roads_record="/" + RR),
+                      dict(f4, roads_record="results/../results/EPA_ROADS/roads.json"),
+                      *(dict(base, merge=["a", "b"], engine=None, road=None, **{k: v})
+                        for k, v in (("roads_record", RR), ("reward_knock", "out")))):
             assert check_args(argparse.Namespace(**dict(base, **wrong))), wrong
         assert "mistake 1" in check_args(argparse.Namespace(**dict(base, engine=None)))
+        assert "row 127 (4)" in check_args(argparse.Namespace(**dict(base, road="four_engine")))
+        assert "row 130 (5)" in check_args(argparse.Namespace(**dict(base, roads_record=RR)))
         assert check_args(argparse.Namespace(**dict(base, runs=[1], steps=1000, repeats=1))) is None
         assert check_args(argparse.Namespace(**dict(base, merge=["a", "b"], engine=None, road=None))) is None
+        for right in (f4, dict(f4, roads_record=RR), dict(f4, reward_knock="in"), dict(reward_knock="in")):
+            assert check_args(argparse.Namespace(**dict(base, **right))) is None, right
         P58 = dict(engine="b58", road="extremes", dt=DT)      # what this script measured before --engine
         c = train_cmd("cuda", 3, 3000, "OUT", P58, buffer=PROD_BUFFER)
         assert (c[c.index("--dt") + 1], c[c.index("--device") + 1], c[c.index("--buffer") + 1]) == \
@@ -1504,9 +1784,58 @@ def selftest():
         assert launcher_command("cpu", 14, 20, PX).startswith(
             "python train_all.py --engine mazda_25t --road four_engine --dt 1 --device cpu --jobs 14"), \
             launcher_command("cpu", 14, 20, PX)
-        assert validity("b58").startswith("Valid for the cycle backend and the B58 only. ")
-        assert validity("mazda_25t").startswith("Valid for the cycle backend and the MAZDA_25T only. ")
+        assert validity("b58", "extremes").startswith("Valid for the cycle backend and the B58 only. Decision 28 ")
+        assert validity("mazda_25t", "extremes").startswith("Valid for the cycle backend and the MAZDA_25T only. ")
+        # on the four-engine road, row 136's words (no table is built for any engine), never decision 28's
+        # table; every other road keeps the pre-C1b words (compared with that script's below)
+        f4v = validity("mazda_25t", "four_engine")
+        assert f4v.startswith("Valid for the cycle backend and the MAZDA_25T only. Row 136 builds no table for "
+                              "any engine: ") and "Decision 28" not in f4v and "table backend" not in f4v, f4v
+        f4b = backend_line("four_engine", 0.0616, dict(update_s=0.0115, predict_s=0.0009))
+        assert "row 136 builds no table" in f4b and "6-8x" not in f4b and "decision 28" not in f4b, f4b
+        assert backend_line("extremes", 0.0616, dict(update_s=0.0115, predict_s=0.0009)) == (
+            "     on the table backend (arithmetic, not a measurement: a plant 6-8x cheaper, decision 28) it "
+            "would be 38-45 %"), backend_line("extremes", 0.0616, dict(update_s=0.0115, predict_s=0.0009))
         assert 1 <= usable_cpus() <= (os.cpu_count() or 1)
+
+        # C1b: the plan holds the share's two keys on the four-engine road only, the knock option only when
+        # given; each reaches train.py, the parts and the launcher in that order,
+        # after the existing arguments (train.py gets decision 29's --lr-schedule last-third --scored-share
+        # with the record, never --checkpoint-average), and nothing else
+        def plan_of(**kw):
+            return make_plan(argparse.Namespace(**dict(base, **kw)))
+        assert list(plan_of()) == ["road", "engine", "dt"]
+        assert plan_of(road="four_engine", reward_knock="out") == dict(
+            road="four_engine", engine="b58", dt=DT, roads_record=None, scored_share=False, reward_knock="out")
+        PF = plan_of(road="four_engine", roads_record=RR, reward_knock="out")
+        assert list(PF.items()) == [("road", "four_engine"), ("engine", "b58"), ("dt", DT), ("roads_record", RR),
+                                    ("scored_share", True), ("reward_knock", "out")]
+        assert set(PF) <= set(PLAN_KEYS) | {"road", "engine", "dt"}
+        tail = ["--roads-record", RR, "--reward-knock", "out"]
+        c = train_cmd("cpu", 2, 3000, "OUT", PF, buffer=PROD_BUFFER)
+        assert c == [sys.executable, TRAIN, "--engine", "b58", "--road", "four_engine", "--dt", "1", "--steps", "3000",
+                     "--seed", "2", "--device", "cpu", "--out", "OUT", "--buffer", "450000",
+                     "--lr-schedule", "last-third", "--scored-share"] + tail, c
+        assert "--checkpoint-average" not in c and c.count("--lr-schedule") == 1
+        assert train_cmd("cpu", 0, DET_STEPS, "OUT", dict(PF, roads_record=None, scored_share=False))[-4:] == \
+            ["--out", "OUT"] + tail[2:]
+        assert not {"--scored-share", "--lr-schedule"} & set(train_cmd("cpu", 0, DET_STEPS, "OUT", PX))
+        assert launcher_command("cpu", 14, 20, PF) == (
+            "python train_all.py --engine b58 --road four_engine --dt 1 --device cpu --jobs 14 --seeds 0-19 "
+            "--steps 450000 --out runs/<the experiment's own> --third-arm --recipe29 " + " ".join(tail))
+        assert env_options(PX) == ROAD_OPTIONS["four_engine"] and env_options(P58) == {}
+        assert env_options(PF) == dict(scored_share=True, roads_record=os.path.join(HERE, RR), reward_knock=False)
+        assert env_options(dict(PF, reward_knock="in"))["reward_knock"] is True
+        seen = []
+        real_child = child_result
+        try:
+            globals()["child_result"] = lambda cmd, env, timeout_s, label: seen.append(cmd) or {}
+            run_part("sac", PF, "cpu")
+            run_part("plant", P58)
+        finally:
+            globals()["child_result"] = real_child
+        assert seen[0][2:] == ["--part", "sac", "--engine", "b58", "--road", "four_engine", "--device", "cpu"] + tail
+        assert seen[1][2:] == ["--part", "plant", "--engine", "b58", "--road", "extremes"], seen
 
         # the memory at production size, and the cap it sets
         # a recorded step's bytes (an import of train, nothing built): 274, as in X1's records;
@@ -1655,7 +1984,9 @@ def selftest():
                          doc(["cpu", "cuda"], [row("cpu", 2, 1.0, 2.0)] + fast[2:], det, engine="mazda_25t",
                              road="four_engine", machine=dict(packages=dict(numpy="N1", torch="T+cu")), **cuda_env)])
         assert "--engine mazda_25t --road four_engine" in mz["recommendation"]["command"], mz["recommendation"]
-        assert mz["recommendation"]["text"].endswith(validity("mazda_25t")), mz["recommendation"]["text"]
+        assert mz["recommendation"]["text"].endswith(validity("mazda_25t", "four_engine")), mz["recommendation"]["text"]
+        assert mz["recommendation"]["validity"] == validity("mazda_25t", "four_engine") != \
+            merged["recommendation"]["validity"] == validity("b58", "extremes"), (mz["recommendation"], merged)
         for wrong in ([cuda_doc, cpu_doc], [cpu_doc, dict(cuda_doc, machine=dict(cuda_doc["machine"], host="dev2"))],
                       # two engines, or two roads, are two measurements
                       [cpu_doc, doc(["cuda"], fast[2:], det, engine="mazda_25t", **cuda_env)],
@@ -1682,6 +2013,35 @@ def selftest():
         rc = warned["recommendation"]
         assert rc["device"] == "cuda" and len([x for x in rc["caution"] if "differs between" in x]) == 3, rc["caution"]
         assert rc["text"].count("CAUTION: ") == 3, rc["text"]
+        # C1b's keys, each read with .get: a file written before C1b (its plan without the new keys, its rows'
+        # plants without reward_knock) merges with one written after (reward_knock None before P); two
+        # four-engine files that differ in the share or the knock option are two
+        # measurements; a plant that read reward_knock False is not one that read None
+        p1 = dict(plant_sha="p1", derived_sha="d1", engine="b58", engine_sha="e1", backend="cycle")
+        assert _plant_id(p1) == _plant_id(dict(p1, reward_knock=None)) != _plant_id(dict(p1, reward_knock=False))
+        mixed = merge_docs([doc(["cpu"], [dict(x, plant=p1) for x in rows[:2]], cpu_only),
+                            doc(["cuda"], [dict(x, plant=dict(p1, reward_knock=None)) for x in fast[2:]], det,
+                                **cuda_env)])
+        assert mixed["recommendation"]["device"] == "cuda", mixed["recommendation"]["text"]
+        F4 = dict(road="four_engine", roads_record=RR, scored_share=True, reward_knock="out")
+        m4 = merge_docs([doc(["cpu"], rows[:2], cpu_only, **F4), doc(["cuda"], fast[2:], det, **F4, **cuda_env)])
+        assert m4["recommendation"]["command"].endswith(
+            f"--third-arm --recipe29 --roads-record {RR} --reward-knock out"), m4["recommendation"]["command"]
+        # the launcher's caption names the arms its command trains: three with --third-arm (a roads record),
+        # two without, in the words the script printed before C1b
+        assert "with --third-arm train_all.py trains a sighted arm at each of the roads record's ratios and the " \
+               "blinded arm, a seed, decision 27's three" in m4["recommendation"]["text"] and \
+               "two arms a seed today" not in m4["recommendation"]["text"], m4["recommendation"]["text"]
+        assert "train_all.py trains two arms a seed today, the days count three, decision 27):" in \
+            mixed["recommendation"]["text"] and "--third-arm" not in mixed["recommendation"]["text"]
+        for k, v in (("roads_record", None), ("scored_share", False), ("reward_knock", "in")):
+            try:
+                merge_docs([doc(["cpu"], rows[:2], cpu_only, **F4),
+                            doc(["cuda"], fast[2:], det, **dict(F4, **{k: v}), **cuda_env)])
+            except SystemExit as e:
+                assert k in str(e), e
+            else:
+                raise AssertionError(f"two four-engine files that differ in {k} must not merge")
         assert merge_docs([cpu_doc])["recommendation"]["device"] is None      # one environment, a GPU here
         assert merge_docs([doc(["cpu"], rows[:2], cpu_only, machine=dict(gpus=None))])["recommendation"]["device"] \
             is None, "nvidia-smi's silence is not 'no GPU'"
@@ -1729,6 +2089,187 @@ def selftest():
             assert json.load(fh) == dict(a=3)
         assert default_out("dev1", "2.14.0+cpu", datetime(2026, 10, 21, 9, 5, 7)) == \
             "benchmark_dev1_torch2.14.0_cpu_20261021_090507.json"
+
+        # C1b, --road extremes: every plan and command exactly as the script before C1b built them (the
+        # review of 2 November 2026), so step 3's files stay valid and still --merge whichever commit step
+        # 3 ran on. Both scripts' main() run on the same command lines with the probe and the machine stood
+        # in, to their first save (a dry run to its end): the same output, the same exit, the same saved
+        # plan, the same parts asked for; then each command function on the plans they saved
+        assert not os.path.normcase(os.path.abspath(root)).startswith(os.path.normcase(HERE) + os.sep), root
+        old = pre_c1b_module(root)
+        me = sys.modules[__name__]
+        probe = dict(torch="2.14.0+cpu", torch_cuda=None, design_dt=DT, roads_known=["extremes", "four_engine"],
+                     engines_known=["b58"], engines_trainable=["b58"],
+                     cuda=dict(ok=False, why="this torch (2.14.0+cpu) is a CPU build"),
+                     build_env_takes_reward_knock=False)
+        mach = dict(host="dev1", platform="P", cpu="C", logical_cpus=20, usable_cpus=20, physical_cpus=14,
+                    ram_gb=32.0, available_gb=20.0, python="3.13.2", torch="2.14.0+cpu", torch_cuda=None,
+                    packages=dict(numpy="N1"), power="plan A", gpus=[], cuda=probe["cuda"], engines_known=["b58"],
+                    engines_trainable=["b58"])
+        J = os.path.join(root, "pinned", "bench.json")
+        x58 = ["--engine", "b58", "--road", "extremes"]
+        plans = []
+        for argv in (x58 + ["--device", "cpu", "--dry-run", "--out", J], x58 + ["--device", "cpu", "--out", J],
+                     x58 + ["--quick", "--out", J],
+                     x58 + ["--device", "cpu", "--runs", "3", "1", "--steps", "1500", "--repeats", "1",
+                            "--window-days", "10", "--no-determinism", "--out", J],
+                     x58 + ["--device", "cuda", "--dry-run", "--out", J]):
+            was, now = main_as(old, argv, probe, mach), main_as(me, argv, probe, mach)
+            assert was == now, (argv, was, now)
+            assert (now[1] in (None, "saved") if "cuda" not in argv
+                    else str(now[1]).startswith("exit no requested device is usable here")), now[1]
+            plans += [json.loads(s) for s in now[2]]
+        assert len(plans) == 3 and all(list(p) == ["road", "engine", "dt", "steps_per_run", "det_steps", "runs_grid",
+                                                   "repeats", "buffer", "smoke_test", "window_days",
+                                                   "no_determinism"] for p in plans), plans
+        old_seen, real_old_child = [], old.child_result
+        try:
+            old.child_result = lambda cmd, env, timeout_s, label: old_seen.append(cmd) or {}
+            globals()["child_result"] = lambda cmd, env, timeout_s, label: seen.append(cmd) or {}
+            seen.clear()
+            for p in plans:
+                for args in (("cpu", 0, DET_STEPS, "OUT", p), ("cuda", 3, 3000, "OUT", p, PROD_BUFFER)):
+                    assert train_cmd(*args) == old.train_cmd(*args), args
+                for args in (("cpu", 14, 20, p), ("cuda", 2, 7, p)):
+                    assert launcher_command(*args) == old.launcher_command(*args), args
+                for args in (("probe", p, "cuda", 600), ("plant", p), ("sac", p, "cpu")):
+                    run_part(*args)
+                    old.run_part(*args)
+        finally:
+            old.child_result = real_old_child
+            globals()["child_result"] = real_child
+        assert len(seen) == len(old_seen) == 9 and [[c[0]] + c[2:] for c in seen] == [[c[0]] + c[2:] for c in old_seen]
+        # C1b words the validity line and section 2's table line for --road four_engine alone (the review of 2
+        # November 2026; row 136 builds no table). On --road extremes both are the script before C1b's: both
+        # scripts' main() run to their second save, after section 2, every part answered with one stand-in's
+        # readings, give the same output, decision 28's arithmetic line among it (the first save, where the runs
+        # above stop, comes before section 2); then validity and recommend on the saved plans
+        readings = dict(probe, plant_s=0.0616, backend="cycle", update_s=0.0115, predict_s=0.0009)
+        S2 = x58 + ["--device", "cpu", "--out", J]
+        was, now = main_as(old, S2, readings, mach, saves=2), main_as(me, S2, readings, mach, saves=2)
+        assert was == now and now[1] == "saved" and [x[0] for x in now[3]] == ["probe", "plant", "sac"], (was, now)
+        assert "\n2. THE PARTS OF ONE STEP" in now[0] and backend_line("extremes", 0.0616, readings) + "\n" in now[0], \
+            now[0]
+        for e in ("b58", "mazda_25t", "ford_27tt"):
+            assert validity(e, "extremes") == old.validity(e), e
+        for p in plans:
+            for args, kw in (((fast, det, both, True, builds), {}),
+                             ((rows[:2], cpu_only, {"cpu"}, False, builds), dict(window_days=13.0)),
+                             ((rows, {}, both, True, builds), {})):
+                assert recommend(*args, plan=p, **kw) == old.recommend(*args, plan=p, **kw), (args, kw, p)
+
+        # C1b, --road four_engine through main(): the record checked first (real_record_problem, a stand-in
+        # here), then refused before the plant commit P, when train.build_env takes no reward_knock (the
+        # probe); from P on (the probe's stand-in says so) the dry run's every command carries the share and
+        # the knock option
+        import four_engine_roads as FER
+        asked, real_problem = [], FER.real_record_problem
+        F4 = ["--engine", "b58", "--road", "four_engine", "--roads-record", RR, "--reward-knock", "out",
+              "--device", "cpu", "--dry-run", "--out", J]
+        try:
+            FER.real_record_problem = lambda path: asked.append(path)
+            text, ended, _, parts_ = main_as(me, F4, probe, mach)
+            assert str(ended).startswith("exit REFUSING: --reward-knock needs the plant commit P (row 127 (4))"), ended
+            assert asked == [os.path.join(HERE, RR)], asked
+            assert [x[0] for x in parts_] == ["probe"] and json.loads(parts_[0][1]) == dict(
+                road="four_engine", engine="b58", dt=DT, roads_record=RR, scored_share=True, reward_knock="out")
+            at_p = dict(probe, build_env_takes_reward_knock=True)
+            text, ended, _, _ = main_as(me, F4, at_p, mach)
+            # section 4's command and section 3's at each of the grid's four concurrencies
+            assert ended is None and text.count(f"--scored-share --roads-record {RR} --reward-knock out") == 5, text
+            assert f"decision 29's share on ({RR}); the reward without the knock term (--reward-knock out)" in text
+            # section 2 on the four-engine road gives row 136's line, never decision 28's table (main() to its
+            # second save, after section 2; the record passes the stand-in above)
+            at_p_timed = dict(at_p, **{k: readings[k] for k in ("plant_s", "backend", "update_s", "predict_s")})
+            text, ended, _, parts_ = main_as(me, [x for x in F4 if x != "--dry-run"], at_p_timed, mach, saves=2)
+            assert ended == "saved" and [x[0] for x in parts_] == ["probe", "plant", "sac"], (ended, parts_)
+            assert (backend_line("four_engine", 0.0616, readings) + "\n" in text
+                    and "table backend (arith" not in text), text
+            FER.real_record_problem = lambda path: "a stand-in's problem"
+            text, ended, _, parts_ = main_as(me, F4, at_p, mach)
+            assert ended == f"exit REFUSING --roads-record {RR}: a stand-in's problem" and parts_ == [], ended
+        finally:
+            FER.real_record_problem = real_problem
+
+        # C1b, the four-engine train.py command line passes train.py's own parser and check_recipe (the
+        # review of 2 November 2026: train.py refuses --roads-record without --scored-share, so a command
+        # carrying the record alone would have made every B1 run a crash), on a SYNTHETIC record outside
+        # the repository: before P without --reward-knock (this train.py has no such option), from P on
+        # with --reward-knock out. The controls (mistake 12): the record alone, decision 29's 50 000-step
+        # average at S = 3000, and the knock option on the wrong side of P, each refused
+        import train as T
+        syn = FER.write_synthetic_record(os.path.join(root, "roads.SYNTHETIC.json"), 4242)
+        knock = "reward_knock" in inspect.signature(T.build_env).parameters
+        PS = dict(road="four_engine", engine="b58", dt=DT, roads_record=syn, scored_share=True,
+                  **(dict(reward_knock="out") if knock else {}))
+        runs_out = os.path.join(root, "f4")
+        cmd = train_cmd("cpu", 19, 3000, os.path.join(runs_out, "r19"), PS, buffer=PROD_BUFFER)
+        got = train_check(cmd)
+        assert got[0] == "passed" and got[1] == dict(scored_share=True, roads_record=syn), got
+        assert set(got[2]) == {"lr_schedule", "scored_share"} and got[2]["lr_schedule"] == "last-third" and \
+            got[2]["scored_share"]["seed_kind"] == "SYNTHETIC", got
+        # step 18 times step 22's recipe (the review of 2 November 2026): the recipe flags are the ones
+        # train_all.py --recipe29 gives the same run, its --checkpoint-average W alone left out. Compared
+        # after --out, without the options each side adds for its own reasons (--buffer here, the knock
+        # option, train_all's --no-resume and --keep-buffer)
+        import train_all as TA
+        import training_recipe as TR
+
+        def recipe_flags(argv, drop_pairs):
+            rest, out_ = argv[argv.index("--out") + 2:], []
+            while rest:
+                if rest[0] in drop_pairs:
+                    rest = rest[2:]
+                elif rest[0] in ("--no-resume", "--keep-buffer"):
+                    rest = rest[1:]
+                else:
+                    out_, rest = out_ + [rest[0]], rest[1:]
+            return out_
+        ta = argparse.Namespace(engine="b58", road="four_engine", dt=DT, steps=3000, seeds=[19], device="cpu",
+                                out=os.path.join(runs_out, "r19"), third_arm=False, recipe29=True,
+                                no_resume=False, keep_buffer=False, ratios=None, roads_record=syn)
+        (tag, ta_cmd), = [x for x in TA.commands(ta, FER.read_roads_record(syn)) if "--no-preview" not in x[1]]
+        assert "--checkpoint-average" in ta_cmd and str(TR.DECISION_29_WINDOW) in ta_cmd, ta_cmd
+        mine = recipe_flags(cmd, ("--buffer", "--reward-knock"))
+        assert mine == ["--lr-schedule", "last-third", "--scored-share", "--roads-record", syn], mine
+        assert recipe_flags(ta_cmd, ("--checkpoint-average", "--reward-knock")) == mine, \
+            (ta_cmd, mine)
+        assert train_check(train_cmd("cpu", 0, DET_STEPS, os.path.join(runs_out, "d0"), PS))[0] == "passed"
+        assert not os.path.exists(runs_out), "check_recipe makes no directory"
+        r = train_check([x for x in cmd if x != "--scored-share"])
+        assert r[0] == "refused" and "nothing would read it" in r[1], r
+        r = train_check(cmd + ["--checkpoint-average", "50000"])
+        assert r[0] == "refused" and "--checkpoint-average 50000" in r[1], r
+        if knock:
+            i = cmd.index("--reward-knock")
+            r = train_check(cmd[:i] + cmd[i + 2:])
+            assert r[0] == "refused" and "--reward-knock" in r[1], r
+        else:
+            r = train_check(cmd + ["--reward-knock", "out"])
+            assert r[0] == "refused" and "unrecognized arguments: --reward-knock out" in r[1], r
+
+        # C1b, B1's attempt files (the review of 2 November 2026): each benchmark records git_dirty when it
+        # starts (code_info), and `git status --porcelain` lists an untracked file, so attempts written into
+        # the work tree recorded every run dirty, the first too, since tee makes its .txt before the
+        # benchmark starts. Two engines in a row on a scratch git work tree, as the runbook's loop runs them:
+        # written into a folder outside it (the runbook's $B1OUT), both record a clean tree; the control,
+        # written into its results/benchmarks/, both dirty
+        tree = os.path.join(root, "tree")
+        os.makedirs(tree)
+        p = subprocess.run(["git", "init", "-q"], cwd=tree, capture_output=True, text=True, timeout=60)
+        assert p.returncode == 0, p.stderr
+        assert code_info(tree)["git_dirty"] is False
+        for where, want in ((os.path.join(root, "OUT"), [False, False]),
+                            (os.path.join(tree, "results", "benchmarks"), [True, True])):
+            dirty = []
+            for e in ("b58", "mazda_25t"):
+                os.makedirs(where, exist_ok=True)
+                with open(os.path.join(where, f"B1_bench_{e}.attempt1.txt"), "w", encoding="utf-8"):
+                    pass
+                info = code_info(tree)
+                dirty.append(info["git_dirty"])
+                save(dict(code=info), resolve_out(os.path.join(where, f"B1_bench_{e}.attempt1.json")))
+            assert dirty == want, (where, dirty)
         print(f"SELFTEST PASSES (three runs at once, an exit code, a hung run killed by its deadline "
               f"with its child, a part's result line kept when its child dies, hangs or cuts its "
               f"last line short, nvidia-smi's silence not read as no GPU, the bounds, a CPU fallback "
@@ -1737,7 +2278,12 @@ def selftest():
               f"recorded step's bytes, the production memory and its caps, the rule's margins "
               f"against the other device's peak, unchecked determinism and "
               f"skipped repeats, the days and the window, --merge and its refusals and cautions, the "
-              f"output file and its retries)")
+              f"output file and its retries; C1b: the protocol's options checked, planned and forwarded, "
+              f"--road extremes byte-identical to the script before C1b (section 2 and the recommendation "
+              f"included), the four-engine road refused before P, its validity line and section 2 in row "
+              f"136's words, its train.py command through train.py's parser and check_recipe on a "
+              f"SYNTHETIC record, with train_all.py --recipe29's recipe flags but the average, the "
+              f"launcher's caption naming its arms, and B1's attempts outside the work tree recorded clean)")
     finally:
         stray = psutil.Process().children(recursive=True)         # nothing outlives a failed test
         try:
@@ -1787,11 +2333,19 @@ def main():
                     help="CPU.json CUDA.json: the two environments' files, one decision")
     ap.add_argument("--out", help="the JSON file (default benchmark_<host>_torch<build>_<date>_<time>"
                     ".json; never overwritten)")
+    # row 135's protocol (C1b): each reaches every train.py, every part and the launcher only when given
+    ap.add_argument("--roads-record", metavar="PATH",
+                    help="--road four_engine only: decision 29's share on (row 130 (5)), from the committed "
+                         "roads record, repository-relative (results/EPA_ROADS/roads.json)")
+    ap.add_argument("--reward-knock", choices=("in", "out"),
+                    help="the reward with (in) or without (out) the knock term (row 113 (5)). Required with "
+                         "--road four_engine; refused before the plant commit P (row 127 (4))")
     ap.add_argument("--part", choices=("probe", "plant", "sac"), help=argparse.SUPPRESS)
     a = ap.parse_args()
     if a.part:
-        res = (part_probe(a.road) if a.part == "probe" else part_plant(a.engine, a.road) if a.part == "plant"
-               else part_sac(a.device[0], a.engine, a.road))
+        opts = env_options(make_plan(a)) if a.part != "probe" else None
+        res = (part_probe(a.road) if a.part == "probe" else part_plant(a.engine, a.road, options=opts)
+               if a.part == "plant" else part_sac(a.device[0], a.engine, a.road, options=opts))
         print(PART_TAG + json.dumps(res), flush=True)
         return
     if a.selftest:
@@ -1804,8 +2358,18 @@ def main():
         merge(a.merge, a.out, a.window_days)
         return
 
-    # what is measured, the JSON's "plan" block (its engine, road and step travel to every command)
-    plan = dict(road=a.road, engine=a.engine, dt=DT)
+    if a.roads_record is not None:
+        # the committed roads record, tracked and unchanged since HEAD (row 97), and spelt as the plan and
+        # commit T name it (a case-insensitive file system would take another spelling)
+        import epa_roads as ER
+        import four_engine_roads as FER
+        problem = FER.real_record_problem(os.path.join(HERE, a.roads_record)) or (
+            None if a.roads_record == ER.ROADS_REL else f"write it {ER.ROADS_REL}, as the plan records it")
+        if problem:
+            sys.exit(f"REFUSING --roads-record {a.roads_record}: {problem}")
+    # what is measured, the JSON's "plan" block (its engine, road and step, and C1b's options where they
+    # apply, travel to every command)
+    plan = make_plan(a)
     try:
         probe = run_part("probe", plan, "cuda", timeout_s=600)
     except RuntimeError as e:
@@ -1819,6 +2383,9 @@ def main():
     if probe["design_dt"] != DT:
         sys.exit(f"train.DESIGN_DT[{a.road!r}] is {probe['design_dt']} and this benchmark passes "
                  f"--dt {DT:g}: change DT here, and say why, before measuring")
+    if a.reward_knock is not None and not probe.get("build_env_takes_reward_knock"):
+        sys.exit("REFUSING: --reward-knock needs the plant commit P (row 127 (4)): this tree's train.build_env "
+                 "takes no reward_knock, so no train.py here can be given the option")
     m = machine(probe)
     asked = a.device or (["cuda"] if m["torch_cuda"] else ["cpu"])
     devices, notes = devices_available(asked, m)
@@ -1844,6 +2411,11 @@ def main():
           f"concurrencies {runs} (each device's capped after its single-run row by what fits at "
           f"{PROD_STEPS:,} steps), {steps} steps per run with --buffer {PROD_BUFFER}, {repeats} "
           f"repeat(s) interleaved; the {a.road} roads, the {a.engine.upper()}, one thread per run"
+          + ("" if a.road != "four_engine" else
+             f"; decision 29's share {'on (' + a.roads_record + ')' if a.roads_record else 'off'}")
+          + ("" if a.reward_knock is None else
+             f"; the reward {'with' if a.reward_knock == 'in' else 'without'} the knock term (--reward-knock "
+             f"{a.reward_knock})")
           + ("\n  --quick: A SMOKE TEST, its numbers are not for decisions 30 and 32" if a.quick else ""))
     if a.dry_run:
         for d in devices:
@@ -1890,12 +2462,9 @@ def main():
                 continue
             p = parts[d]
             step = plant_s + p["update_s"] + p["predict_s"]
-            fast_plant = [plant_s / k for k in (8, 6)]
-            share_table = [100 * x / (x + p["update_s"] + p["predict_s"]) for x in fast_plant]
             print(f"  on {d}: SAC update {1000 * p['update_s']:.2f} ms, choosing an action "
                   f"{1000 * p['predict_s']:.2f} ms -> the plant is {100 * plant_s / step:.0f} % of a step")
-            print(f"     on the table backend (arithmetic, not a measurement: a plant 6-8x cheaper, "
-                  f"decision 28) it would be {share_table[0]:.0f}-{share_table[1]:.0f} %")
+            print(backend_line(plan["road"], plant_s, p))
         result["devices"] = list(devices)
         print("  Section 3 is the measurement; these say why it comes out as it does.")
         save(result, out)
