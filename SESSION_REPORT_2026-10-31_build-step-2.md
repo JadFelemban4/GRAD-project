@@ -27,7 +27,8 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `0fbc744` | 3 | Jad's: the record of step 3 on his PC (section 11) |
 | `fefb7af` | (C0) | two `ScoredShareSYNTHETIC` fixtures that failed from R0 on (section 11) |
 | `008f69f` | 7's rule, C1b | the benchmark protocol (row 135 names it): `--roads-record`, `--reward-knock`, B0/B1/B5 |
-| this one | O1 | section O (rows 136-143), `docs/build_step_2/INTERFACES.md`, ORDER steps 12a-22, the cap README, CHECKPOINT; section 11 |
+| `fcaf7b7` | O1 | section O (rows 136-143), `docs/build_step_2/INTERFACES.md`, ORDER steps 12a-22, the cap README, CHECKPOINT; section 11 |
+| this one | O2 | row 135 (the device), step 3's files in `results/benchmarks/step3_2026-11-02/`, ORDER's status, CHECKPOINT; section 12 |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -384,3 +385,31 @@ step 3 ran.
   CODE_HASHED, kept; the schedule's order is `epa_backend.DROP_ORDER`);
 - `results/training_roads.json` (`cbb8d09`) differs from what both `91c6ece` and C1b regenerate: an older
   drift, not C1b's.
+
+## 12. 5 November: row 135, the device (O2)
+
+**Row 135 is answered, 5 November, under row 133 (2)**; Jad's column is not filled. It was written from
+files only: step 3's merged benchmark file and the two measurements of section 11, before the rehearsal.
+It fixes the device as the CPU, torch `2.14.0+cpu`, the lock's environment, 12 runs at once, from the
+merge's RECOMMENDATION line; the benchmark protocol as C1b (`008f69f`), with B1 at N, S, R = 12, 3000, 2
+on the four-engine road; the rate statistic r_e = lower_min / N; a consequence for every B1 outcome
+(its part (4) replaces two phrases of row 114, under the sheet's rule that a later decision governs an
+earlier one); three arms (row 117's test passed); and the Honda's SYNTHETIC gate lines, all PASS. n is
+not in it: n comes from B1 at ORDER step 18 (row 114).
+
+**Step 3's files** are committed as they came, in `results/benchmarks/step3_2026-11-02/`, with a README
+that gives the archive's sha256 (`950fedd4...`). The archive was extracted into its own directory and
+nothing in it was run. One thing to keep in mind for rule 3 (one environment): Jad's PC reports
+Windows 11 10.0.26300, so its platform string differs from this laptop's frozen 10.0.26200. That is
+expected, since training and Run 2 are on different machines, and every seed and arm trains on his PC.
+
+**One fix in O2's first gate.** `verify_docs.py` failed 1 of 74: its retired-figure scan matched pip's
+"uvicorn-0.52.4" in step 3's session log as the retired -0.52 enrichment correlation, six times. The
+files are the device's printed output, so they are not edited. Instead, `results/benchmarks/step3_<date>/*.txt`
+joins `RETIRED_EXEMPT_RESULT_TABLES`, the same call and the same cost as the draw's printed log (31
+October): a retired figure in them would pass. The folder's README.md is still checked. Then the whole
+gate ran again on the final tree, with drift_test (mistake 11).
+
+**What waits, from here:** the rehearsal (ORDER step 9, O2's own gate), then Run 2 (step 10) on this
+laptop with nothing else running; then L, R4, and the commits C2 to Ta, each with its gate; then step
+18 (B1) on Jad's PC, Tb, the preregistration, the pilot, and training.

@@ -1,0 +1,1095 @@
+{
+ "benchmark": "benchmark_training.py --merge",
+ "machines": {
+  "cpu": {
+   "host": "DESKTOP-VF1MO3H",
+   "platform": "Windows-11-10.0.26300-SP0",
+   "cpu": "AMD Ryzen 5 9600X 6-Core Processor",
+   "logical_cpus": 12,
+   "usable_cpus": 12,
+   "physical_cpus": 6,
+   "ram_gb": 31.2,
+   "available_gb": 16.5,
+   "python": "3.13.2",
+   "torch": "2.14.0+cpu",
+   "torch_cuda": null,
+   "packages": {
+    "numpy": "2.5.3",
+    "torch": "2.14.0",
+    "stable_baselines3": "2.9.0",
+    "gymnasium": "1.3.0",
+    "scipy": "1.18.1",
+    "pandas": "3.0.5"
+   },
+   "power": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)",
+   "gpus": [
+    {
+     "index": "0",
+     "name": "NVIDIA GeForce RTX 5070",
+     "memory_total_mib": 12227.0,
+     "driver": "617.42",
+     "driver_model": "WDDM"
+    }
+   ],
+   "cuda": {
+    "ok": false,
+    "why": "this torch (2.14.0+cpu) is a CPU build"
+   },
+   "engines_known": [
+    "b58",
+    "ford_27tt",
+    "honda_l15b7",
+    "mazda_25t"
+   ],
+   "engines_trainable": [
+    "b58"
+   ]
+  },
+  "cuda": {
+   "host": "DESKTOP-VF1MO3H",
+   "platform": "Windows-11-10.0.26300-SP0",
+   "cpu": "AMD Ryzen 5 9600X 6-Core Processor",
+   "logical_cpus": 12,
+   "usable_cpus": 12,
+   "physical_cpus": 6,
+   "ram_gb": 31.2,
+   "available_gb": 20.2,
+   "python": "3.13.2",
+   "torch": "2.14.0+cu130",
+   "torch_cuda": "13.0",
+   "packages": {
+    "numpy": "2.5.3",
+    "torch": "2.14.0+cu130",
+    "stable_baselines3": "2.9.0",
+    "gymnasium": "1.3.0",
+    "scipy": "1.18.1",
+    "pandas": "3.0.5"
+   },
+   "power": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)",
+   "gpus": [
+    {
+     "index": "0",
+     "name": "NVIDIA GeForce RTX 5070",
+     "memory_total_mib": 12227.0,
+     "driver": "617.42",
+     "driver_model": "WDDM"
+    }
+   ],
+   "cuda": {
+    "ok": true,
+    "gpu": "NVIDIA GeForce RTX 5070",
+    "gpu_memory_gb": 11.9,
+    "gpu_count": 1,
+    "capability": "12.0"
+   },
+   "engines_known": [
+    "b58",
+    "ford_27tt",
+    "honda_l15b7",
+    "mazda_25t"
+   ],
+   "engines_trainable": [
+    "b58"
+   ]
+  }
+ },
+ "devices": [
+  "cpu",
+  "cuda"
+ ],
+ "code": [
+  {
+   "git_head": "b2151af",
+   "git_dirty": false,
+   "benchmark_sha": "02616f151384f789",
+   "train_sha": "05867ed3d0c54af6"
+  },
+  {
+   "git_head": "b2151af",
+   "git_dirty": false,
+   "benchmark_sha": "02616f151384f789",
+   "train_sha": "05867ed3d0c54af6"
+  }
+ ],
+ "concurrency": [
+  {
+   "device": "cpu",
+   "runs": 1,
+   "seeds": [
+    0
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 12.8,
+   "loaded": true,
+   "wall_s": 160.5,
+   "exit_codes": [
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 18.69,
+   "ram": {
+    "avail_before_gb": 16.75,
+    "avail_min_gb": 16.47,
+    "used_gb": 0.28,
+    "peak_rss_sum_gb": 0.31,
+    "peak_private_sum_gb": 0.39
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 19.26,
+   "lower_steps_per_s": 19.11,
+   "overlap": 1.0,
+   "stagger_s": 0.0,
+   "per_run_min": 19.26,
+   "per_run_max": 19.26,
+   "steady": true,
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 0.73,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 3,
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 9.7,
+   "loaded": true,
+   "wall_s": 176.5,
+   "exit_codes": [
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 50.99,
+   "ram": {
+    "avail_before_gb": 18.17,
+    "avail_min_gb": 17.41,
+    "used_gb": 0.76,
+    "peak_rss_sum_gb": 0.92,
+    "peak_private_sum_gb": 1.16
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 52.5,
+   "lower_steps_per_s": 52.02,
+   "overlap": 0.998,
+   "stagger_s": 0.0,
+   "per_run_min": 17.41,
+   "per_run_max": 17.56,
+   "steady": true,
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 2.12,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 6,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 5.2,
+   "loaded": true,
+   "wall_s": 214.7,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 83.84,
+   "ram": {
+    "avail_before_gb": 18.19,
+    "avail_min_gb": 16.7,
+    "used_gb": 1.49,
+    "peak_rss_sum_gb": 1.85,
+    "peak_private_sum_gb": 2.32
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 86.1,
+   "lower_steps_per_s": 85.31,
+   "overlap": 0.996,
+   "stagger_s": 0.0,
+   "per_run_min": 14.29,
+   "per_run_max": 14.4,
+   "steady": true,
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 4.22,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 12,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 7.2,
+   "loaded": true,
+   "wall_s": 344.9,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 104.38,
+   "ram": {
+    "avail_before_gb": 18.24,
+    "avail_min_gb": 13.8,
+    "used_gb": 4.44,
+    "peak_rss_sum_gb": 3.74,
+    "peak_private_sum_gb": 4.62
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 107.21,
+   "lower_steps_per_s": 106.19,
+   "overlap": 0.993,
+   "stagger_s": 0.0,
+   "per_run_min": 8.87,
+   "per_run_max": 9.01,
+   "steady": true,
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 9.89,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 1,
+   "seeds": [
+    0
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 10.0,
+   "loaded": true,
+   "wall_s": 168.6,
+   "exit_codes": [
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 17.79,
+   "ram": {
+    "avail_before_gb": 19.68,
+    "avail_min_gb": 17.9,
+    "used_gb": 1.78,
+    "peak_rss_sum_gb": 0.31,
+    "peak_private_sum_gb": 0.39
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 18.19,
+   "lower_steps_per_s": 18.07,
+   "overlap": 1.0,
+   "stagger_s": 0.0,
+   "per_run_min": 18.19,
+   "per_run_max": 18.19,
+   "steady": true,
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 2.23,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 3,
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 5.8,
+   "loaded": true,
+   "wall_s": 224.8,
+   "exit_codes": [
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 40.04,
+   "ram": {
+    "avail_before_gb": 18.65,
+    "avail_min_gb": 17.78,
+    "used_gb": 0.87,
+    "peak_rss_sum_gb": 0.92,
+    "peak_private_sum_gb": 1.16
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 40.74,
+   "lower_steps_per_s": 40.54,
+   "overlap": 1.0,
+   "stagger_s": 0.0,
+   "per_run_min": 13.58,
+   "per_run_max": 13.58,
+   "steady": true,
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 2.23,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 6,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 5.6,
+   "loaded": true,
+   "wall_s": 254.9,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 70.62,
+   "ram": {
+    "avail_before_gb": 20.07,
+    "avail_min_gb": 18.56,
+    "used_gb": 1.51,
+    "peak_rss_sum_gb": 1.85,
+    "peak_private_sum_gb": 2.32
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 72.41,
+   "lower_steps_per_s": 71.43,
+   "overlap": 0.993,
+   "stagger_s": 0.0,
+   "per_run_min": 11.97,
+   "per_run_max": 12.14,
+   "steady": true,
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 4.24,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 12,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 4.3,
+   "loaded": false,
+   "wall_s": 332.2,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 108.37,
+   "ram": {
+    "avail_before_gb": 20.1,
+    "avail_min_gb": 16.91,
+    "used_gb": 3.18,
+    "peak_rss_sum_gb": 3.7,
+    "peak_private_sum_gb": 4.63
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "upper_steps_per_s": 111.09,
+   "lower_steps_per_s": 110.09,
+   "overlap": 0.995,
+   "stagger_s": 0.0,
+   "per_run_min": 9.21,
+   "per_run_max": 9.32,
+   "steady": true,
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 8.63,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 1,
+   "seeds": [
+    0
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 7.4,
+   "loaded": true,
+   "wall_s": 163.2,
+   "exit_codes": [
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 18.38,
+   "ram": {
+    "avail_before_gb": 18.86,
+    "avail_min_gb": 17.23,
+    "used_gb": 1.63,
+    "peak_rss_sum_gb": 1.78,
+    "peak_private_sum_gb": 2.78
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1007.0,
+    "peak_mib": 1313.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 306.0,
+    "util_peak_pct": 4.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 18.96,
+   "lower_steps_per_s": 18.87,
+   "overlap": 1.0,
+   "stagger_s": 0.0,
+   "per_run_min": 18.96,
+   "per_run_max": 18.96,
+   "steady": true,
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 2.08,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 3,
+   "seeds": [
+    0,
+    0,
+    1
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 4.7,
+   "loaded": false,
+   "wall_s": 221.7,
+   "exit_codes": [
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 40.6,
+   "ram": {
+    "avail_before_gb": 19.04,
+    "avail_min_gb": 14.25,
+    "used_gb": 4.79,
+    "peak_rss_sum_gb": 5.35,
+    "peak_private_sum_gb": 8.32
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1007.0,
+    "peak_mib": 1952.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 315.0,
+    "util_peak_pct": 14.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 41.47,
+   "lower_steps_per_s": 41.1,
+   "overlap": 0.997,
+   "stagger_s": 0.0,
+   "per_run_min": 13.79,
+   "per_run_max": 13.88,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 6.15,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 6,
+   "seeds": [
+    0,
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 10.6,
+   "loaded": true,
+   "wall_s": 260.1,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 69.2,
+   "ram": {
+    "avail_before_gb": 19.13,
+    "avail_min_gb": 9.56,
+    "used_gb": 9.57,
+    "peak_rss_sum_gb": 10.7,
+    "peak_private_sum_gb": 16.64
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1005.0,
+    "peak_mib": 2909.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 317.3,
+    "util_peak_pct": 26.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 70.77,
+   "lower_steps_per_s": 70.31,
+   "overlap": 0.995,
+   "stagger_s": 0.0,
+   "per_run_min": 11.76,
+   "per_run_max": 11.85,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 12.3,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 1,
+   "seeds": [
+    0
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 9.6,
+   "loaded": true,
+   "wall_s": 163.2,
+   "exit_codes": [
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 18.38,
+   "ram": {
+    "avail_before_gb": 19.29,
+    "avail_min_gb": 17.56,
+    "used_gb": 1.73,
+    "peak_rss_sum_gb": 1.79,
+    "peak_private_sum_gb": 2.79
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1006.0,
+    "peak_mib": 1327.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 321.0,
+    "util_peak_pct": 4.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 18.9,
+   "lower_steps_per_s": 18.75,
+   "overlap": 1.0,
+   "stagger_s": 0.0,
+   "per_run_min": 18.9,
+   "per_run_max": 18.9,
+   "steady": true,
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 2.18,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 3,
+   "seeds": [
+    0,
+    0,
+    1
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 7.8,
+   "loaded": true,
+   "wall_s": 221.6,
+   "exit_codes": [
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 40.61,
+   "ram": {
+    "avail_before_gb": 19.26,
+    "avail_min_gb": 14.43,
+    "used_gb": 4.83,
+    "peak_rss_sum_gb": 5.35,
+    "peak_private_sum_gb": 8.32
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1006.0,
+    "peak_mib": 1952.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 315.3,
+    "util_peak_pct": 16.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 41.49,
+   "lower_steps_per_s": 41.1,
+   "overlap": 0.992,
+   "stagger_s": 0.0,
+   "per_run_min": 13.75,
+   "per_run_max": 13.91,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 6.19,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 6,
+   "seeds": [
+    0,
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 7.4,
+   "loaded": true,
+   "wall_s": 260.2,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 69.18,
+   "ram": {
+    "avail_before_gb": 19.29,
+    "avail_min_gb": 9.66,
+    "used_gb": 9.63,
+    "peak_rss_sum_gb": 10.7,
+    "peak_private_sum_gb": 16.65
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1007.0,
+    "peak_mib": 2909.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 317.0,
+    "util_peak_pct": 28.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 70.87,
+   "lower_steps_per_s": 70.31,
+   "overlap": 0.996,
+   "stagger_s": 0.0,
+   "per_run_min": 11.77,
+   "per_run_max": 11.86,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 12.36,
+   "fits": true
+  }
+ ],
+ "determinism": {
+  "cpu": {
+   "device": "cpu",
+   "identical": true,
+   "steps": 1800,
+   "n_differences": 0,
+   "first": [],
+   "compared": {
+    "tensors": 96,
+    "record_fields": 47,
+    "counters": 8
+   }
+  },
+  "cuda": {
+   "device": "cuda",
+   "identical": true,
+   "steps": 1800,
+   "n_differences": 0,
+   "first": [],
+   "compared": {
+    "tensors": 96,
+    "record_fields": 47,
+    "counters": 8
+   }
+  }
+ },
+ "window_days": 10.0,
+ "recommendation": {
+  "device": "cpu",
+  "runs": 12,
+  "clear": true,
+  "smoke_test": false,
+  "validity": "Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration.",
+  "configurations": [
+   {
+    "device": "cpu",
+    "runs": 1,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 18.07,
+    "lower_max": 19.11,
+    "lower_median": 18.59,
+    "upper_min": 18.19,
+    "upper_max": 19.26,
+    "seed0_twice": []
+   },
+   {
+    "device": "cpu",
+    "runs": 3,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 40.54,
+    "lower_max": 52.02,
+    "lower_median": 46.28,
+    "upper_min": 40.74,
+    "upper_max": 52.5,
+    "seed0_twice": []
+   },
+   {
+    "device": "cpu",
+    "runs": 6,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 71.43,
+    "lower_max": 85.31,
+    "lower_median": 78.37,
+    "upper_min": 72.41,
+    "upper_max": 86.1,
+    "seed0_twice": []
+   },
+   {
+    "device": "cpu",
+    "runs": 12,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 106.19,
+    "lower_max": 110.09,
+    "lower_median": 108.14,
+    "upper_min": 107.21,
+    "upper_max": 111.09,
+    "seed0_twice": []
+   },
+   {
+    "device": "cuda",
+    "runs": 1,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 18.75,
+    "lower_max": 18.87,
+    "lower_median": 18.810000000000002,
+    "upper_min": 18.9,
+    "upper_max": 18.96,
+    "seed0_twice": []
+   },
+   {
+    "device": "cuda",
+    "runs": 3,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 41.1,
+    "lower_max": 41.1,
+    "lower_median": 41.1,
+    "upper_min": 41.47,
+    "upper_max": 41.49,
+    "seed0_twice": [
+     true,
+     true
+    ]
+   },
+   {
+    "device": "cuda",
+    "runs": 6,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 70.31,
+    "lower_max": 70.31,
+    "lower_median": 70.31,
+    "upper_min": 70.77,
+    "upper_max": 70.87,
+    "seed0_twice": [
+     true,
+     true
+    ]
+   }
+  ],
+  "best": {
+   "cpu": {
+    "runs": 12,
+    "lower_min": 106.19,
+    "upper_max": 111.09,
+    "highest_upper": 111.09,
+    "highest_upper_runs": 12
+   },
+   "cuda": {
+    "runs": 6,
+    "lower_min": 70.31,
+    "upper_max": 70.87,
+    "highest_upper": 70.87,
+    "highest_upper_runs": 6
+   }
+  },
+  "not_usable": {},
+  "schedule": {
+   "seeds": 20,
+   "per_run_steps_per_s": 8.85,
+   "per_run_days": 0.59,
+   "waves_per_engine": 5,
+   "idle_slots_last_wave": 0,
+   "days": 11.8
+  },
+  "seeds_in_window": 16,
+  "command": "python train_all.py --engine b58 --road extremes --dt 1 --device cpu --jobs 12 --seeds 0-15 --steps 450000 --out runs/<the experiment's own>",
+  "caution": [
+   "a repeat started with the CPU more than 5 % busy"
+  ],
+  "text": "CPU with 12 runs at once (torch 2.14.0+cpu): its lowest lower bound, 106.19 (12 at once), beats CUDA's highest upper bound, 70.87 (6 at once).\n  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)\n  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)\n  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring\n  in a 10-day window: at most 16 seeds per arm (decision 30)\n  every usable concurrency, at its lowest lower bound (20 seeds per arm; seeds that fit 10 days):\n       1 at once     18.07 steps/s   18.07 a run   60 waves    69.2 days     2 seeds\n       3 at once     40.54 steps/s   13.51 a run   20 waves    30.8 days     6 seeds\n       6 at once     71.43 steps/s   11.91 a run   10 waves    17.5 days    10 seeds\n      12 at once    106.19 steps/s    8.85 a run    5 waves    11.8 days    16 seeds\n  the launcher, for each engine (--engine and --road are what was measured, --out is the experiment's own; train_all.py trains two arms a seed today, the days count three, decision 27):\n    python train_all.py --engine b58 --road extremes --dt 1 --device cpu --jobs 12 --seeds 0-15 --steps 450000 --out runs/<the experiment's own>\n  CAUTION: a repeat started with the CPU more than 5 % busy\nValid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration."
+ },
+ "merged_from": [
+  "C:\\Users\\admin\\grad_device\\2026-11-02_step3\\A3_bench_cpu.json",
+  "C:\\Users\\admin\\grad_device\\2026-11-02_step3\\A4_bench_cuda.json"
+ ]
+}

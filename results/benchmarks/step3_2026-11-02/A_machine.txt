@@ -1,0 +1,18 @@
+date: 2026-11-02 13:37:09 +0300
+MINGW64_NT-10.0-26300 DESKTOP-VF1MO3H 3.6.9-b4195d69.x86_64 2026-06-06 17:49 UTC x86_64 Msys
+GPU 0: NVIDIA GeForce RTX 5070 (UUID: GPU-8d2d9941-71cb-cc28-1294-23d7a295e007)
+name, memory.total [MiB], driver_version, compute_cap
+NVIDIA GeForce RTX 5070, 12227 MiB, 617.42, 12.0
+CUDA UMD Version: 13.4
+
+
+Name                      : AMD Ryzen 5 9600X 6-Core Processor             
+NumberOfCores             : 6
+NumberOfLogicalProcessors : 12
+MaxClockSpeed             : 3900
+
+
+
+RAM_GB 31.2
+Microsoft Windows 11 Pro 10.0.26300
+C:              931G  758G  174G  82% /c

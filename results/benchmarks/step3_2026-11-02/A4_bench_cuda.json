@@ -1,0 +1,557 @@
+{
+ "benchmark": "benchmark_training.py",
+ "asked_by": "Ghassan, 21 October 2026",
+ "status": "finished",
+ "date": "2026-11-02T14:20:09",
+ "code": {
+  "git_head": "b2151af",
+  "git_dirty": false,
+  "benchmark_sha": "02616f151384f789",
+  "train_sha": "05867ed3d0c54af6"
+ },
+ "machine": {
+  "host": "DESKTOP-VF1MO3H",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "cpu": "AMD Ryzen 5 9600X 6-Core Processor",
+  "logical_cpus": 12,
+  "usable_cpus": 12,
+  "physical_cpus": 6,
+  "ram_gb": 31.2,
+  "available_gb": 20.2,
+  "python": "3.13.2",
+  "torch": "2.14.0+cu130",
+  "torch_cuda": "13.0",
+  "packages": {
+   "numpy": "2.5.3",
+   "torch": "2.14.0+cu130",
+   "stable_baselines3": "2.9.0",
+   "gymnasium": "1.3.0",
+   "scipy": "1.18.1",
+   "pandas": "3.0.5"
+  },
+  "power": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)",
+  "gpus": [
+   {
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5070",
+    "memory_total_mib": 12227.0,
+    "driver": "617.42",
+    "driver_model": "WDDM"
+   }
+  ],
+  "cuda": {
+   "ok": true,
+   "gpu": "NVIDIA GeForce RTX 5070",
+   "gpu_memory_gb": 11.9,
+   "gpu_count": 1,
+   "capability": "12.0"
+  },
+  "engines_known": [
+   "b58",
+   "ford_27tt",
+   "honda_l15b7",
+   "mazda_25t"
+  ],
+  "engines_trainable": [
+   "b58"
+  ]
+ },
+ "devices_asked": [
+  "cuda"
+ ],
+ "devices": [
+  "cuda"
+ ],
+ "notes": [],
+ "plan": {
+  "road": "extremes",
+  "engine": "b58",
+  "dt": 1.0,
+  "steps_per_run": 3000,
+  "det_steps": 1800,
+  "runs_grid": [
+   1,
+   3,
+   6,
+   12
+  ],
+  "repeats": 2,
+  "buffer": 450000,
+  "smoke_test": false,
+  "window_days": 10.0,
+  "no_determinism": false
+ },
+ "parts": {
+  "plant": {
+   "plant_s": 0.045892138000001526,
+   "steps": 200,
+   "backend": "cycle",
+   "engines_timed": [
+    "b58"
+   ]
+  },
+  "cuda": {
+   "device": "cuda",
+   "update_s": 0.006665106499999638,
+   "predict_s": 0.00047997320000013133,
+   "bytes_per_transition": 216,
+   "record_bytes_per_step": 274
+  }
+ },
+ "determinism": {
+  "cuda": {
+   "device": "cuda",
+   "identical": true,
+   "steps": 1800,
+   "n_differences": 0,
+   "first": [],
+   "compared": {
+    "tensors": 96,
+    "record_fields": 47,
+    "counters": 8
+   }
+  }
+ },
+ "concurrency": [
+  {
+   "device": "cuda",
+   "runs": 1,
+   "seeds": [
+    0
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 7.4,
+   "loaded": true,
+   "wall_s": 163.2,
+   "exit_codes": [
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 18.38,
+   "ram": {
+    "avail_before_gb": 18.86,
+    "avail_min_gb": 17.23,
+    "used_gb": 1.63,
+    "peak_rss_sum_gb": 1.78,
+    "peak_private_sum_gb": 2.78
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1007.0,
+    "peak_mib": 1313.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 306.0,
+    "util_peak_pct": 4.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 18.96,
+   "lower_steps_per_s": 18.87,
+   "overlap": 1.0,
+   "stagger_s": 0.0,
+   "per_run_min": 18.96,
+   "per_run_max": 18.96,
+   "steady": true,
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 2.08,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 3,
+   "seeds": [
+    0,
+    0,
+    1
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 4.7,
+   "loaded": false,
+   "wall_s": 221.7,
+   "exit_codes": [
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 40.6,
+   "ram": {
+    "avail_before_gb": 19.04,
+    "avail_min_gb": 14.25,
+    "used_gb": 4.79,
+    "peak_rss_sum_gb": 5.35,
+    "peak_private_sum_gb": 8.32
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1007.0,
+    "peak_mib": 1952.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 315.0,
+    "util_peak_pct": 14.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 41.47,
+   "lower_steps_per_s": 41.1,
+   "overlap": 0.997,
+   "stagger_s": 0.0,
+   "per_run_min": 13.79,
+   "per_run_max": 13.88,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 6.15,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 6,
+   "seeds": [
+    0,
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 10.6,
+   "loaded": true,
+   "wall_s": 260.1,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 69.2,
+   "ram": {
+    "avail_before_gb": 19.13,
+    "avail_min_gb": 9.56,
+    "used_gb": 9.57,
+    "peak_rss_sum_gb": 10.7,
+    "peak_private_sum_gb": 16.64
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1005.0,
+    "peak_mib": 2909.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 317.3,
+    "util_peak_pct": 26.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 70.77,
+   "lower_steps_per_s": 70.31,
+   "overlap": 0.995,
+   "stagger_s": 0.0,
+   "per_run_min": 11.76,
+   "per_run_max": 11.85,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 12.3,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 1,
+   "seeds": [
+    0
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 9.6,
+   "loaded": true,
+   "wall_s": 163.2,
+   "exit_codes": [
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 18.38,
+   "ram": {
+    "avail_before_gb": 19.29,
+    "avail_min_gb": 17.56,
+    "used_gb": 1.73,
+    "peak_rss_sum_gb": 1.79,
+    "peak_private_sum_gb": 2.79
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1006.0,
+    "peak_mib": 1327.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 321.0,
+    "util_peak_pct": 4.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 18.9,
+   "lower_steps_per_s": 18.75,
+   "overlap": 1.0,
+   "stagger_s": 0.0,
+   "per_run_min": 18.9,
+   "per_run_max": 18.9,
+   "steady": true,
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 2.18,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 3,
+   "seeds": [
+    0,
+    0,
+    1
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 7.8,
+   "loaded": true,
+   "wall_s": 221.6,
+   "exit_codes": [
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 40.61,
+   "ram": {
+    "avail_before_gb": 19.26,
+    "avail_min_gb": 14.43,
+    "used_gb": 4.83,
+    "peak_rss_sum_gb": 5.35,
+    "peak_private_sum_gb": 8.32
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1006.0,
+    "peak_mib": 1952.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 315.3,
+    "util_peak_pct": 16.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 41.49,
+   "lower_steps_per_s": 41.1,
+   "overlap": 0.992,
+   "stagger_s": 0.0,
+   "per_run_min": 13.75,
+   "per_run_max": 13.91,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 6.19,
+   "fits": true
+  },
+  {
+   "device": "cuda",
+   "runs": 6,
+   "seeds": [
+    0,
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 7.4,
+   "loaded": true,
+   "wall_s": 260.2,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 69.18,
+   "ram": {
+    "avail_before_gb": 19.29,
+    "avail_min_gb": 9.66,
+    "used_gb": 9.63,
+    "peak_rss_sum_gb": 10.7,
+    "peak_private_sum_gb": 16.65
+   },
+   "plant": {
+    "plant_sha": "865f8e7b7e5c2dbe",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle"
+   },
+   "vram": {
+    "gpu_index": 0,
+    "before_mib": 1007.0,
+    "peak_mib": 2909.0,
+    "total_mib": 12227.0,
+    "per_run_mib": 317.0,
+    "util_peak_pct": 28.0,
+    "near_full": false
+   },
+   "upper_steps_per_s": 70.87,
+   "lower_steps_per_s": 70.31,
+   "overlap": 0.996,
+   "stagger_s": 0.0,
+   "per_run_min": 11.77,
+   "per_run_max": 11.86,
+   "steady": true,
+   "seed0_twice": {
+    "identical": true,
+    "n_differences": 0,
+    "first": []
+   },
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 12.36,
+   "fits": true
+  }
+ ],
+ "recommendation": {
+  "device": null,
+  "runs": null,
+  "clear": null,
+  "smoke_test": false,
+  "validity": "Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration.",
+  "configurations": [
+   {
+    "device": "cuda",
+    "runs": 1,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 18.75,
+    "lower_max": 18.87,
+    "lower_median": 18.810000000000002,
+    "upper_min": 18.9,
+    "upper_max": 18.96,
+    "seed0_twice": []
+   },
+   {
+    "device": "cuda",
+    "runs": 3,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 41.1,
+    "lower_max": 41.1,
+    "lower_median": 41.1,
+    "upper_min": 41.47,
+    "upper_max": 41.49,
+    "seed0_twice": [
+     true,
+     true
+    ]
+   },
+   {
+    "device": "cuda",
+    "runs": 6,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 70.31,
+    "lower_max": 70.31,
+    "lower_median": 70.31,
+    "upper_min": 70.77,
+    "upper_max": 70.87,
+    "seed0_twice": [
+     true,
+     true
+    ]
+   }
+  ],
+  "best": {
+   "cuda": {
+    "runs": 6,
+    "lower_min": 70.31,
+    "upper_max": 70.87,
+    "highest_upper": 70.87,
+    "highest_upper_runs": 6
+   }
+  },
+  "not_usable": {},
+  "text": "only cuda measured in this environment, so no device is named: measure cpu in its own environment (--device cpu) and combine the two files with --merge CPU.json CUDA.json\n  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)\n  6 at once: 11.72 steps/s per run, so a 450,000-step run takes 0.44 days; 20 seeds per arm are 3 x 20 runs per engine in 10 waves (0 slots idle in the last), x 4 engines: 17.8 days of training, before scoring\n  in a 10-day window: at most 10 seeds per arm (decision 30)\n  every usable concurrency, at its lowest lower bound (20 seeds per arm; seeds that fit 10 days):\n       1 at once     18.75 steps/s   18.75 a run   60 waves    66.7 days     3 seeds\n       3 at once      41.1 steps/s    13.7 a run   20 waves    30.4 days     6 seeds\n       6 at once     70.31 steps/s   11.72 a run   10 waves    17.8 days    10 seeds\nValid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration."
+ }
+}

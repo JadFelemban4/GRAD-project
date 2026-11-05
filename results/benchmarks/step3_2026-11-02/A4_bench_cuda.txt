@@ -1,0 +1,68 @@
+THE MACHINE
+  host           DESKTOP-VF1MO3H
+  platform       Windows-11-10.0.26300-SP0
+  cpu            AMD Ryzen 5 9600X 6-Core Processor
+  logical_cpus   12
+  usable_cpus    12
+  physical_cpus  6
+  ram_gb         31.2
+  available_gb   20.2
+  python         3.13.2
+  torch          2.14.0+cu130
+  torch_cuda     13.0
+  packages       {'numpy': '2.5.3', 'torch': '2.14.0+cu130', 'stable_baselines3': '2.9.0', 'gymnasium': '1.3.0', 'scipy': '1.18.1', 'pandas': '3.0.5'}
+  power          Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+  gpus           [{'index': '0', 'name': 'NVIDIA GeForce RTX 5070', 'memory_total_mib': 12227.0, 'driver': '617.42', 'driver_model': 'WDDM'}]
+  cuda           {'ok': True, 'gpu': 'NVIDIA GeForce RTX 5070', 'gpu_memory_gb': 11.9, 'gpu_count': 1, 'capability': '12.0'}
+  engines_known  ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t']
+  engines_trainable ['b58']
+
+PLAN: devices ['cuda']; first seed 0 twice per device (1800 steps each); then concurrencies [1, 3, 6, 12] (each device's capped after its single-run row by what fits at 450,000 steps), 3000 steps per run with --buffer 450000, 2 repeat(s) interleaved; the extremes roads, the B58, one thread per run
+  the JSON: C:\Users\admin\grad_device\2026-11-02_step3\A4_bench_cuda.json (written after every section)
+
+2. THE PARTS OF ONE STEP (each in a child process, one thread)
+  plant step (CPU, numpy, backend cycle)   45.89 ms
+  on cuda: SAC update 6.67 ms, choosing an action 0.48 ms -> the plant is 87 % of a step
+     on the table backend (arithmetic, not a measurement: a plant 6-8x cheaper, decision 28) it would be 45-52 %
+  Section 3 is the measurement; these say why it comes out as it does.
+
+4. DETERMINISM, BEFORE SECTION 3 (seed 0 twice, 1800 steps each; every tensor, counter, recorded step and the curve compared)
+  cuda: IDENTICAL 
+
+3. TRAINING AS train_all.py RUNS IT (N copies of train.py at once, 2 repeat(s))
+  repeat 1, cuda x1 ...
+     lower 18.9, upper 19.0 steps/s in all, overlap 1.00, RAM 1.6 GB (2.1 GB at 450,000 steps), ok True
+     cuda: at most 6 runs fit at 450,000-step size; its concurrencies are now [1, 3, 6]
+  repeat 1, cuda x3 ...
+     lower 41.1, upper 41.5 steps/s in all, overlap 1.00, RAM 4.8 GB (6.2 GB at 450,000 steps), ok True
+  repeat 1, cuda x6 ...
+     lower 70.3, upper 70.8 steps/s in all, overlap 0.99, RAM 9.6 GB (12.3 GB at 450,000 steps), ok True
+  repeat 2, cuda x1 ...
+     lower 18.8, upper 18.9 steps/s in all, overlap 1.00, RAM 1.7 GB (2.2 GB at 450,000 steps), ok True
+  repeat 2, cuda x3 ...
+     lower 41.1, upper 41.5 steps/s in all, overlap 0.99, RAM 4.8 GB (6.2 GB at 450,000 steps), ok True
+  repeat 2, cuda x6 ...
+     lower 70.3, upper 70.9 steps/s in all, overlap 1.00, RAM 9.6 GB (12.4 GB at 450,000 steps), ok True
+
+device  runs rep    lower    upper overlap  wall s  RAM GB  at 450k VRAM/run load%  ok
+cuda       1   1     18.9     19.0    1.00     163     1.6      2.1      306     7  yes, loaded
+cuda       3   1     41.1     41.5    1.00     222     4.8      6.2      315     5  yes, seed 0 twice IDENTICAL
+cuda       6   1     70.3     70.8    0.99     260     9.6     12.3      317    11  yes, loaded, seed 0 twice IDENTICAL
+cuda       1   2     18.8     18.9    1.00     163     1.7      2.2      321    10  yes, loaded
+cuda       3   2     41.1     41.5    0.99     222     4.8      6.2      315     8  yes, loaded, seed 0 twice IDENTICAL
+cuda       6   2     70.3     70.9    1.00     260     9.6     12.4      317     7  yes, loaded, seed 0 twice IDENTICAL
+  lower, upper: steps/s of all the runs together (the docstring); RAM GB: the machine's available memory, its drop;
+  at 450k: the production estimate; VRAM/run: MiB; load%: the CPU's load before the batch
+
+RECOMMENDATION: only cuda measured in this environment, so no device is named: measure cpu in its own environment (--device cpu) and combine the two files with --merge CPU.json CUDA.json
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  6 at once: 11.72 steps/s per run, so a 450,000-step run takes 0.44 days; 20 seeds per arm are 3 x 20 runs per engine in 10 waves (0 slots idle in the last), x 4 engines: 17.8 days of training, before scoring
+  in a 10-day window: at most 10 seeds per arm (decision 30)
+  every usable concurrency, at its lowest lower bound (20 seeds per arm; seeds that fit 10 days):
+       1 at once     18.75 steps/s   18.75 a run   60 waves    66.7 days     3 seeds
+       3 at once      41.1 steps/s    13.7 a run   20 waves    30.4 days     6 seeds
+       6 at once     70.31 steps/s   11.72 a run   10 waves    17.8 days    10 seeds
+Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration.
+  The device type is chosen ONCE, for every seed, arm and engine, and goes into the preregistration (decision 32). CPU and CUDA train different agents.
+
+written to C:\Users\admin\grad_device\2026-11-02_step3\A4_bench_cuda.json

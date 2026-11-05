@@ -1,0 +1,28 @@
+THE MACHINE
+  host           DESKTOP-VF1MO3H
+  platform       Windows-11-10.0.26300-SP0
+  cpu            AMD Ryzen 5 9600X 6-Core Processor
+  logical_cpus   12
+  usable_cpus    12
+  physical_cpus  6
+  ram_gb         31.2
+  available_gb   16.5
+  python         3.13.2
+  torch          2.14.0+cpu
+  torch_cuda     None
+  packages       {'numpy': '2.5.3', 'torch': '2.14.0', 'stable_baselines3': '2.9.0', 'gymnasium': '1.3.0', 'scipy': '1.18.1', 'pandas': '3.0.5'}
+  power          Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+  gpus           [{'index': '0', 'name': 'NVIDIA GeForce RTX 5070', 'memory_total_mib': 12227.0, 'driver': '617.42', 'driver_model': 'WDDM'}]
+  cuda           {'ok': False, 'why': 'this torch (2.14.0+cpu) is a CPU build'}
+  engines_known  ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t']
+  engines_trainable ['b58']
+  NOTE: a GPU is here (NVIDIA GeForce RTX 5070, nvidia-smi) and this torch cannot use it: measure it in a CUDA environment with --device cuda, then --merge the two files; until then no device is named
+
+PLAN: devices ['cpu']; first seed 0 twice per device (1800 steps each); then concurrencies [1, 3, 6, 12] (each device's capped after its single-run row by what fits at 450,000 steps), 3000 steps per run with --buffer 450000, 2 repeat(s) interleaved; the extremes roads, the B58, one thread per run
+  section 4, cpu (twice, one at a time): C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 1800 --seed 0 --device cpu --out <tmp>/det_cpu
+  section 3, cpu x1: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_1/r0 --buffer 450000
+  section 3, cpu x3: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_3/r0 --buffer 450000 (seeds [0, 1, 2])
+  section 3, cpu x6: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_6/r0 --buffer 450000 (seeds [0, 1, 2, 3, 4, 5])
+  section 3, cpu x12: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_12/r0 --buffer 450000 (seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+  the JSON: C:\Users\admin\grad_device\2026-11-02_step3\A3_bench_cpu.json
+dry run: only the probe ran, in a child process; nothing was trained or timed

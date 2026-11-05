@@ -1,0 +1,738 @@
+device_step3.sh, 2026-11-02 13:37:08 +0300, repository /c/Users/admin/Documents/graduation project/GRAD-project-step3, out /c/Users/admin/grad_device/2026-11-02_step3
+
+== Checks before any long step
+  python: 3.13.2 64 cpython gil
+From https://github.com/JadFelemban4/GRAD-project
+ * branch            GRA-test   -> FETCH_HEAD
+  commit: b2151af9746981ef86e22f704c982da8587f0436 (clean, pushed, carries C1)
+  date: 2026-11-02 13:37:09 +0300
+  MINGW64_NT-10.0-26300 DESKTOP-VF1MO3H 3.6.9-b4195d69.x86_64 2026-06-06 17:49 UTC x86_64 Msys
+  GPU 0: NVIDIA GeForce RTX 5070 (UUID: GPU-8d2d9941-71cb-cc28-1294-23d7a295e007)
+  name, memory.total [MiB], driver_version, compute_cap
+  NVIDIA GeForce RTX 5070, 12227 MiB, 617.42, 12.0
+  CUDA UMD Version: 13.4
+  
+  
+  Name                      : AMD Ryzen 5 9600X 6-Core Processor             
+  NumberOfCores             : 6
+  NumberOfLogicalProcessors : 12
+  MaxClockSpeed             : 3900
+  
+  
+  
+  RAM_GB 31.2
+  Microsoft Windows 11 Pro 10.0.26300
+  C:              931G  758G  174G  82% /c
+  GPU: compute capability 12.0, driver for CUDA 13.4; the CUDA build will be torch 2.14.0+cu130
+
+== A0. The commit
+b2151af9746981ef86e22f704c982da8587f0436
+
+== A1. The lock's environment (/c/Users/admin/Documents/graduation project/GRAD-project-step3/.venv)
+Collecting absl-py==2.5.0 (from -r requirements-lock.txt (line 12))
+  Using cached absl_py-2.5.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting ale-py==0.12.1 (from -r requirements-lock.txt (line 13))
+  Downloading ale_py-0.12.1-cp313-cp313-win_amd64.whl.metadata (9.7 kB)
+Collecting annotated-doc==0.0.5 (from -r requirements-lock.txt (line 14))
+  Using cached annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+Collecting annotated-types==0.8.0 (from -r requirements-lock.txt (line 15))
+  Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting anyio==4.15.1 (from -r requirements-lock.txt (line 16))
+  Using cached anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi==2026.7.22 (from -r requirements-lock.txt (line 17))
+  Using cached certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting click==8.5.0 (from -r requirements-lock.txt (line 18))
+  Using cached click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting cloudpickle==3.1.2 (from -r requirements-lock.txt (line 19))
+  Using cached cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+Collecting colorama==0.4.6 (from -r requirements-lock.txt (line 20))
+  Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+Collecting contourpy==1.4.0 (from -r requirements-lock.txt (line 21))
+  Downloading contourpy-1.4.0-cp313-cp313-win_amd64.whl.metadata (3.8 kB)
+Collecting cycler==0.12.1 (from -r requirements-lock.txt (line 22))
+  Using cached cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting Farama-Notifications==0.0.6 (from -r requirements-lock.txt (line 23))
+  Using cached farama_notifications-0.0.6-py3-none-any.whl.metadata (729 bytes)
+Collecting fastapi==0.141.1 (from -r requirements-lock.txt (line 24))
+  Using cached fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+Collecting filelock==4.0.1 (from -r requirements-lock.txt (line 25))
+  Downloading filelock-4.0.1-py3-none-any.whl.metadata (2.0 kB)
+Collecting fonttools==4.65.0 (from -r requirements-lock.txt (line 26))
+  Downloading fonttools-4.65.0-cp313-cp313-win_amd64.whl.metadata (127 kB)
+Collecting fsspec==2026.9.0 (from -r requirements-lock.txt (line 27))
+  Downloading fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting grpcio==1.84.0 (from -r requirements-lock.txt (line 28))
+  Downloading grpcio-1.84.0-cp313-cp313-win_amd64.whl.metadata (3.9 kB)
+Collecting gymnasium==1.3.0 (from -r requirements-lock.txt (line 29))
+  Using cached gymnasium-1.3.0-py3-none-any.whl.metadata (10 kB)
+Collecting h11==0.16.0 (from -r requirements-lock.txt (line 30))
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting httpcore==1.0.9 (from -r requirements-lock.txt (line 31))
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting httptools==0.8.0 (from -r requirements-lock.txt (line 32))
+  Downloading httptools-0.8.0-cp313-cp313-win_amd64.whl.metadata (3.7 kB)
+Collecting httpx==0.28.1 (from -r requirements-lock.txt (line 33))
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting idna==3.19 (from -r requirements-lock.txt (line 34))
+  Using cached idna-3.19-py3-none-any.whl.metadata (9.2 kB)
+Collecting Jinja2==3.1.6 (from -r requirements-lock.txt (line 35))
+  Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting kiwisolver==1.5.1 (from -r requirements-lock.txt (line 36))
+  Downloading kiwisolver-1.5.1-cp313-cp313-win_amd64.whl.metadata (5.2 kB)
+Collecting Markdown==3.10.3 (from -r requirements-lock.txt (line 37))
+  Using cached markdown-3.10.3-py3-none-any.whl.metadata (5.1 kB)
+Collecting markdown-it-py==4.2.0 (from -r requirements-lock.txt (line 38))
+  Using cached markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting MarkupSafe==3.0.3 (from -r requirements-lock.txt (line 39))
+  Downloading markupsafe-3.0.3-cp313-cp313-win_amd64.whl.metadata (2.8 kB)
+Collecting matplotlib==3.11.2 (from -r requirements-lock.txt (line 40))
+  Downloading matplotlib-3.11.2-cp313-cp313-win_amd64.whl.metadata (80 kB)
+Collecting mdurl==0.1.2 (from -r requirements-lock.txt (line 41))
+  Using cached mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting mpmath==1.3.0 (from -r requirements-lock.txt (line 42))
+  Using cached mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+Collecting networkx==3.6.1 (from -r requirements-lock.txt (line 43))
+  Using cached networkx-3.6.1-py3-none-any.whl.metadata (6.8 kB)
+Collecting numpy==2.5.3 (from -r requirements-lock.txt (line 44))
+  Using cached numpy-2.5.3-cp313-cp313-win_amd64.whl.metadata (6.6 kB)
+Collecting opencv-python==5.0.0.93 (from -r requirements-lock.txt (line 45))
+  Using cached opencv_python-5.0.0.93-cp37-abi3-win_amd64.whl.metadata (20 kB)
+Collecting packaging==26.3 (from -r requirements-lock.txt (line 46))
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pandas==3.0.5 (from -r requirements-lock.txt (line 47))
+  Downloading pandas-3.0.5-cp313-cp313-win_amd64.whl.metadata (19 kB)
+Collecting pillow==12.3.0 (from -r requirements-lock.txt (line 48))
+  Using cached pillow-12.3.0-cp313-cp313-win_amd64.whl.metadata (9.3 kB)
+Collecting protobuf==7.36.2 (from -r requirements-lock.txt (line 49))
+  Using cached protobuf-7.36.2-cp310-abi3-win_amd64.whl.metadata (595 bytes)
+Collecting psutil==7.2.2 (from -r requirements-lock.txt (line 50))
+  Using cached psutil-7.2.2-cp37-abi3-win_amd64.whl.metadata (22 kB)
+Collecting pydantic==2.13.5 (from -r requirements-lock.txt (line 51))
+  Using cached pydantic-2.13.5-py3-none-any.whl.metadata (110 kB)
+Collecting pydantic_core==2.46.5 (from -r requirements-lock.txt (line 52))
+  Downloading pydantic_core-2.46.5-cp313-cp313-win_amd64.whl.metadata (6.7 kB)
+Collecting pygame-ce==2.5.8 (from -r requirements-lock.txt (line 53))
+  Downloading pygame_ce-2.5.8-cp313-cp313-win_amd64.whl.metadata (11 kB)
+Collecting Pygments==2.21.0 (from -r requirements-lock.txt (line 54))
+  Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting pyparsing==3.3.2 (from -r requirements-lock.txt (line 55))
+  Using cached pyparsing-3.3.2-py3-none-any.whl.metadata (5.8 kB)
+Collecting pypdf==6.19.0 (from -r requirements-lock.txt (line 56))
+  Using cached pypdf-6.19.0-py3-none-any.whl.metadata (7.5 kB)
+Collecting python-dateutil==2.9.0.post0 (from -r requirements-lock.txt (line 57))
+  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting python-dotenv==1.2.3 (from -r requirements-lock.txt (line 58))
+  Downloading python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+Collecting PyYAML==6.0.3 (from -r requirements-lock.txt (line 59))
+  Using cached pyyaml-6.0.3-cp313-cp313-win_amd64.whl.metadata (2.4 kB)
+Collecting rich==15.0.0 (from -r requirements-lock.txt (line 60))
+  Using cached rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+Collecting scipy==1.18.1 (from -r requirements-lock.txt (line 61))
+  Using cached scipy-1.18.1-cp313-cp313-win_amd64.whl.metadata (61 kB)
+Collecting setuptools==84.0.0 (from -r requirements-lock.txt (line 62))
+  Using cached setuptools-84.0.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting six==1.17.0 (from -r requirements-lock.txt (line 63))
+  Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting stable_baselines3==2.9.0 (from -r requirements-lock.txt (line 64))
+  Using cached stable_baselines3-2.9.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting starlette==1.6.0 (from -r requirements-lock.txt (line 65))
+  Using cached starlette-1.6.0-py3-none-any.whl.metadata (6.4 kB)
+Collecting sympy==1.14.0 (from -r requirements-lock.txt (line 66))
+  Using cached sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+Collecting tensorboard==2.21.0 (from -r requirements-lock.txt (line 67))
+  Using cached tensorboard-2.21.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting tensorboard-data-server==0.7.2 (from -r requirements-lock.txt (line 68))
+  Using cached tensorboard_data_server-0.7.2-py3-none-any.whl.metadata (1.1 kB)
+Collecting torch==2.14.0 (from -r requirements-lock.txt (line 69))
+  Downloading torch-2.14.0-cp313-cp313-win_amd64.whl.metadata (38 kB)
+Collecting tqdm==4.70.1 (from -r requirements-lock.txt (line 70))
+  Using cached tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+Collecting typing-inspection==0.4.4 (from -r requirements-lock.txt (line 71))
+  Using cached typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Collecting typing_extensions==4.16.0 (from -r requirements-lock.txt (line 72))
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting tzdata==2026.4 (from -r requirements-lock.txt (line 73))
+  Using cached tzdata-2026.4-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting uvicorn==0.52.4 (from -r requirements-lock.txt (line 74))
+  Downloading uvicorn-0.52.4-py3-none-any.whl.metadata (6.6 kB)
+Collecting watchfiles==1.2.0 (from -r requirements-lock.txt (line 75))
+  Downloading watchfiles-1.2.0-cp313-cp313-win_amd64.whl.metadata (5.0 kB)
+Collecting websockets==17.1 (from -r requirements-lock.txt (line 76))
+  Downloading websockets-17.1-cp313-cp313-win_amd64.whl.metadata (6.5 kB)
+Collecting Werkzeug==3.1.8 (from -r requirements-lock.txt (line 77))
+  Using cached werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+Using cached absl_py-2.5.0-py3-none-any.whl (137 kB)
+Downloading ale_py-0.12.1-cp313-cp313-win_amd64.whl (2.1 MB)
+   ---------------------------------------- 2.1/2.1 MB 8.8 MB/s eta 0:00:00
+Using cached annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+Using cached annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Using cached anyio-4.15.1-py3-none-any.whl (132 kB)
+Using cached certifi-2026.7.22-py3-none-any.whl (136 kB)
+Using cached click-8.5.0-py3-none-any.whl (125 kB)
+Using cached cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+Using cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Downloading contourpy-1.4.0-cp313-cp313-win_amd64.whl (234 kB)
+Using cached cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Using cached farama_notifications-0.0.6-py3-none-any.whl (2.9 kB)
+Using cached fastapi-0.141.1-py3-none-any.whl (131 kB)
+Downloading filelock-4.0.1-py3-none-any.whl (106 kB)
+Downloading fonttools-4.65.0-cp313-cp313-win_amd64.whl (2.5 MB)
+   ---------------------------------------- 2.5/2.5 MB 15.5 MB/s eta 0:00:00
+Downloading fsspec-2026.9.0-py3-none-any.whl (221 kB)
+Downloading grpcio-1.84.0-cp313-cp313-win_amd64.whl (5.3 MB)
+   ---------------------------------------- 5.3/5.3 MB 14.4 MB/s eta 0:00:00
+Using cached gymnasium-1.3.0-py3-none-any.whl (953 kB)
+Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Downloading httptools-0.8.0-cp313-cp313-win_amd64.whl (90 kB)
+Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Using cached idna-3.19-py3-none-any.whl (68 kB)
+Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading kiwisolver-1.5.1-cp313-cp313-win_amd64.whl (70 kB)
+Using cached markdown-3.10.3-py3-none-any.whl (110 kB)
+Using cached markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+Downloading markupsafe-3.0.3-cp313-cp313-win_amd64.whl (15 kB)
+Downloading matplotlib-3.11.2-cp313-cp313-win_amd64.whl (9.3 MB)
+   ---------------------------------------- 9.3/9.3 MB 15.5 MB/s eta 0:00:00
+Using cached mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Using cached mpmath-1.3.0-py3-none-any.whl (536 kB)
+Using cached networkx-3.6.1-py3-none-any.whl (2.1 MB)
+Using cached numpy-2.5.3-cp313-cp313-win_amd64.whl (12.6 MB)
+Using cached opencv_python-5.0.0.93-cp37-abi3-win_amd64.whl (44.0 MB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Downloading pandas-3.0.5-cp313-cp313-win_amd64.whl (9.8 MB)
+   ---------------------------------------- 9.8/9.8 MB 11.4 MB/s eta 0:00:00
+Using cached pillow-12.3.0-cp313-cp313-win_amd64.whl (7.2 MB)
+Using cached protobuf-7.36.2-cp310-abi3-win_amd64.whl (456 kB)
+Using cached psutil-7.2.2-cp37-abi3-win_amd64.whl (137 kB)
+Using cached pydantic-2.13.5-py3-none-any.whl (472 kB)
+Downloading pydantic_core-2.46.5-cp313-cp313-win_amd64.whl (2.0 MB)
+   ---------------------------------------- 2.0/2.0 MB 12.8 MB/s eta 0:00:00
+Downloading pygame_ce-2.5.8-cp313-cp313-win_amd64.whl (9.7 MB)
+   ---------------------------------------- 9.7/9.7 MB 13.1 MB/s eta 0:00:00
+Using cached pygments-2.21.0-py3-none-any.whl (1.3 MB)
+Using cached pyparsing-3.3.2-py3-none-any.whl (122 kB)
+Using cached pypdf-6.19.0-py3-none-any.whl (395 kB)
+Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading python_dotenv-1.2.3-py3-none-any.whl (22 kB)
+Using cached pyyaml-6.0.3-cp313-cp313-win_amd64.whl (154 kB)
+Using cached rich-15.0.0-py3-none-any.whl (310 kB)
+Using cached scipy-1.18.1-cp313-cp313-win_amd64.whl (36.6 MB)
+Using cached setuptools-84.0.0-py3-none-any.whl (818 kB)
+Using cached six-1.17.0-py2.py3-none-any.whl (11 kB)
+Using cached stable_baselines3-2.9.0-py3-none-any.whl (187 kB)
+Using cached starlette-1.6.0-py3-none-any.whl (75 kB)
+Using cached sympy-1.14.0-py3-none-any.whl (6.3 MB)
+Using cached tensorboard-2.21.0-py3-none-any.whl (5.5 MB)
+Using cached tensorboard_data_server-0.7.2-py3-none-any.whl (2.4 kB)
+Downloading torch-2.14.0-cp313-cp313-win_amd64.whl (124.1 MB)
+   --------------------------------------- 124.1/124.1 MB 11.3 MB/s eta 0:00:00
+Using cached tqdm-4.70.1-py3-none-any.whl (80 kB)
+Using cached typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached tzdata-2026.4-py2.py3-none-any.whl (347 kB)
+Downloading uvicorn-0.52.4-py3-none-any.whl (79 kB)
+Downloading watchfiles-1.2.0-cp313-cp313-win_amd64.whl (288 kB)
+Downloading websockets-17.1-cp313-cp313-win_amd64.whl (217 kB)
+Using cached werkzeug-3.1.8-py3-none-any.whl (226 kB)
+Installing collected packages: mpmath, Farama-Notifications, websockets, tzdata, typing_extensions, tensorboard-data-server, sympy, six, setuptools, PyYAML, python-dotenv, pypdf, pyparsing, Pygments, pygame-ce, psutil, protobuf, pillow, packaging, numpy, networkx, mdurl, MarkupSafe, Markdown, kiwisolver, idna, httptools, h11, fsspec, fonttools, filelock, cycler, colorama, cloudpickle, click, certifi, annotated-types, annotated-doc, absl-py, Werkzeug, uvicorn, typing-inspection, tqdm, scipy, python-dateutil, pydantic_core, opencv-python, markdown-it-py, Jinja2, httpcore, gymnasium, grpcio, contourpy, anyio, ale-py, watchfiles, torch, tensorboard, starlette, rich, pydantic, pandas, matplotlib, httpx, stable_baselines3, fastapi
+Successfully installed Farama-Notifications-0.0.6 Jinja2-3.1.6 Markdown-3.10.3 MarkupSafe-3.0.3 PyYAML-6.0.3 Pygments-2.21.0 Werkzeug-3.1.8 absl-py-2.5.0 ale-py-0.12.1 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.7.22 click-8.5.0 cloudpickle-3.1.2 colorama-0.4.6 contourpy-1.4.0 cycler-0.12.1 fastapi-0.141.1 filelock-4.0.1 fonttools-4.65.0 fsspec-2026.9.0 grpcio-1.84.0 gymnasium-1.3.0 h11-0.16.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 idna-3.19 kiwisolver-1.5.1 markdown-it-py-4.2.0 matplotlib-3.11.2 mdurl-0.1.2 mpmath-1.3.0 networkx-3.6.1 numpy-2.5.3 opencv-python-5.0.0.93 packaging-26.3 pandas-3.0.5 pillow-12.3.0 protobuf-7.36.2 psutil-7.2.2 pydantic-2.13.5 pydantic_core-2.46.5 pygame-ce-2.5.8 pyparsing-3.3.2 pypdf-6.19.0 python-dateutil-2.9.0.post0 python-dotenv-1.2.3 rich-15.0.0 scipy-1.18.1 setuptools-84.0.0 six-1.17.0 stable_baselines3-2.9.0 starlette-1.6.0 sympy-1.14.0 tensorboard-2.21.0 tensorboard-data-server-0.7.2 torch-2.14.0 tqdm-4.70.1 typing-inspection-0.4.4 typing_extensions-4.16.0 tzdata-2026.4 uvicorn-0.52.4 watchfiles-1.2.0 websockets-17.1
+
+== A2. The versions
+python   3.13.2   (lock: 3.13.2) 
+torch    2.14.0+cpu   (lock: 2.14.0, CPU build) 
+VERSIONS: match the lock
+
+== A4, first part: the CUDA environment and its probe (/c/Users/admin/grad_venv_cuda, torch 2.14.0+cu130), before the long steps
+Looking in indexes: https://download.pytorch.org/whl/cu130
+Collecting torch==2.14.0+cu130
+  Downloading https://download-r2.pytorch.org/whl/cu130/torch-2.14.0%2Bcu130-cp313-cp313-win_amd64.whl.metadata (37 kB)
+Collecting filelock (from torch==2.14.0+cu130)
+  Downloading filelock-4.2.4-py3-none-any.whl.metadata (2.0 kB)
+Collecting typing-extensions>=4.10.0 (from torch==2.14.0+cu130)
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting setuptools>=77.0.3 (from torch==2.14.0+cu130)
+  Using cached https://download.pytorch.org/whl/setuptools-78.1.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting sympy>=1.13.3 (from torch==2.14.0+cu130)
+  Using cached sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+Collecting networkx>=2.5.1 (from torch==2.14.0+cu130)
+  Using cached networkx-3.7-py3-none-any.whl.metadata (6.7 kB)
+Collecting jinja2 (from torch==2.14.0+cu130)
+  Using cached https://download.pytorch.org/whl/jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting fsspec>=0.8.5 (from torch==2.14.0+cu130)
+  Using cached fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting mpmath<1.4,>=1.1.0 (from sympy>=1.13.3->torch==2.14.0+cu130)
+  Using cached mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+Collecting MarkupSafe>=2.0 (from jinja2->torch==2.14.0+cu130)
+  Downloading https://download.pytorch.org/whl/markupsafe-3.0.3-cp313-cp313-win_amd64.whl.metadata (2.8 kB)
+Downloading https://download-r2.pytorch.org/whl/cu130/torch-2.14.0%2Bcu130-cp313-cp313-win_amd64.whl (1990.6 MB)
+   ---------------------------------------- 2.0/2.0 GB 12.0 MB/s eta 0:00:00
+Using cached fsspec-2026.9.0-py3-none-any.whl (221 kB)
+Using cached networkx-3.7-py3-none-any.whl (2.1 MB)
+Using cached https://download.pytorch.org/whl/setuptools-78.1.0-py3-none-any.whl (1.3 MB)
+Using cached sympy-1.14.0-py3-none-any.whl (6.3 MB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Downloading filelock-4.2.4-py3-none-any.whl (162 kB)
+Using cached https://download.pytorch.org/whl/jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading https://download.pytorch.org/whl/markupsafe-3.0.3-cp313-cp313-win_amd64.whl (15 kB)
+Using cached mpmath-1.3.0-py3-none-any.whl (536 kB)
+Installing collected packages: mpmath, typing-extensions, sympy, setuptools, networkx, MarkupSafe, fsspec, filelock, jinja2, torch
+Successfully installed MarkupSafe-3.0.3 filelock-4.2.4 fsspec-2026.9.0 jinja2-3.1.6 mpmath-1.3.0 networkx-3.7 setuptools-78.1.0 sympy-1.14.0 torch-2.14.0+cu130 typing-extensions-4.16.0
+Collecting absl-py==2.5.0 (from -r requirements-lock.txt (line 12))
+  Using cached absl_py-2.5.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting ale-py==0.12.1 (from -r requirements-lock.txt (line 13))
+  Using cached ale_py-0.12.1-cp313-cp313-win_amd64.whl.metadata (9.7 kB)
+Collecting annotated-doc==0.0.5 (from -r requirements-lock.txt (line 14))
+  Using cached annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+Collecting annotated-types==0.8.0 (from -r requirements-lock.txt (line 15))
+  Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting anyio==4.15.1 (from -r requirements-lock.txt (line 16))
+  Using cached anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi==2026.7.22 (from -r requirements-lock.txt (line 17))
+  Using cached certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting click==8.5.0 (from -r requirements-lock.txt (line 18))
+  Using cached click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting cloudpickle==3.1.2 (from -r requirements-lock.txt (line 19))
+  Using cached cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+Collecting colorama==0.4.6 (from -r requirements-lock.txt (line 20))
+  Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+Collecting contourpy==1.4.0 (from -r requirements-lock.txt (line 21))
+  Using cached contourpy-1.4.0-cp313-cp313-win_amd64.whl.metadata (3.8 kB)
+Collecting cycler==0.12.1 (from -r requirements-lock.txt (line 22))
+  Using cached cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting Farama-Notifications==0.0.6 (from -r requirements-lock.txt (line 23))
+  Using cached farama_notifications-0.0.6-py3-none-any.whl.metadata (729 bytes)
+Collecting fastapi==0.141.1 (from -r requirements-lock.txt (line 24))
+  Using cached fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+Collecting filelock==4.0.1 (from -r requirements-lock.txt (line 25))
+  Using cached filelock-4.0.1-py3-none-any.whl.metadata (2.0 kB)
+Collecting fonttools==4.65.0 (from -r requirements-lock.txt (line 26))
+  Using cached fonttools-4.65.0-cp313-cp313-win_amd64.whl.metadata (127 kB)
+Requirement already satisfied: fsspec==2026.9.0 in c:\users\admin\grad_venv_cuda\lib\site-packages (from -r requirements-lock.txt (line 27)) (2026.9.0)
+Collecting grpcio==1.84.0 (from -r requirements-lock.txt (line 28))
+  Using cached grpcio-1.84.0-cp313-cp313-win_amd64.whl.metadata (3.9 kB)
+Collecting gymnasium==1.3.0 (from -r requirements-lock.txt (line 29))
+  Using cached gymnasium-1.3.0-py3-none-any.whl.metadata (10 kB)
+Collecting h11==0.16.0 (from -r requirements-lock.txt (line 30))
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting httpcore==1.0.9 (from -r requirements-lock.txt (line 31))
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting httptools==0.8.0 (from -r requirements-lock.txt (line 32))
+  Using cached httptools-0.8.0-cp313-cp313-win_amd64.whl.metadata (3.7 kB)
+Collecting httpx==0.28.1 (from -r requirements-lock.txt (line 33))
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting idna==3.19 (from -r requirements-lock.txt (line 34))
+  Using cached idna-3.19-py3-none-any.whl.metadata (9.2 kB)
+Requirement already satisfied: Jinja2==3.1.6 in c:\users\admin\grad_venv_cuda\lib\site-packages (from -r requirements-lock.txt (line 35)) (3.1.6)
+Collecting kiwisolver==1.5.1 (from -r requirements-lock.txt (line 36))
+  Using cached kiwisolver-1.5.1-cp313-cp313-win_amd64.whl.metadata (5.2 kB)
+Collecting Markdown==3.10.3 (from -r requirements-lock.txt (line 37))
+  Using cached markdown-3.10.3-py3-none-any.whl.metadata (5.1 kB)
+Collecting markdown-it-py==4.2.0 (from -r requirements-lock.txt (line 38))
+  Using cached markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+Requirement already satisfied: MarkupSafe==3.0.3 in c:\users\admin\grad_venv_cuda\lib\site-packages (from -r requirements-lock.txt (line 39)) (3.0.3)
+Collecting matplotlib==3.11.2 (from -r requirements-lock.txt (line 40))
+  Using cached matplotlib-3.11.2-cp313-cp313-win_amd64.whl.metadata (80 kB)
+Collecting mdurl==0.1.2 (from -r requirements-lock.txt (line 41))
+  Using cached mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Requirement already satisfied: mpmath==1.3.0 in c:\users\admin\grad_venv_cuda\lib\site-packages (from -r requirements-lock.txt (line 42)) (1.3.0)
+Collecting networkx==3.6.1 (from -r requirements-lock.txt (line 43))
+  Using cached networkx-3.6.1-py3-none-any.whl.metadata (6.8 kB)
+Collecting numpy==2.5.3 (from -r requirements-lock.txt (line 44))
+  Using cached numpy-2.5.3-cp313-cp313-win_amd64.whl.metadata (6.6 kB)
+Collecting opencv-python==5.0.0.93 (from -r requirements-lock.txt (line 45))
+  Using cached opencv_python-5.0.0.93-cp37-abi3-win_amd64.whl.metadata (20 kB)
+Collecting packaging==26.3 (from -r requirements-lock.txt (line 46))
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pandas==3.0.5 (from -r requirements-lock.txt (line 47))
+  Using cached pandas-3.0.5-cp313-cp313-win_amd64.whl.metadata (19 kB)
+Collecting pillow==12.3.0 (from -r requirements-lock.txt (line 48))
+  Using cached pillow-12.3.0-cp313-cp313-win_amd64.whl.metadata (9.3 kB)
+Collecting protobuf==7.36.2 (from -r requirements-lock.txt (line 49))
+  Using cached protobuf-7.36.2-cp310-abi3-win_amd64.whl.metadata (595 bytes)
+Collecting psutil==7.2.2 (from -r requirements-lock.txt (line 50))
+  Using cached psutil-7.2.2-cp37-abi3-win_amd64.whl.metadata (22 kB)
+Collecting pydantic==2.13.5 (from -r requirements-lock.txt (line 51))
+  Using cached pydantic-2.13.5-py3-none-any.whl.metadata (110 kB)
+Collecting pydantic_core==2.46.5 (from -r requirements-lock.txt (line 52))
+  Using cached pydantic_core-2.46.5-cp313-cp313-win_amd64.whl.metadata (6.7 kB)
+Collecting pygame-ce==2.5.8 (from -r requirements-lock.txt (line 53))
+  Using cached pygame_ce-2.5.8-cp313-cp313-win_amd64.whl.metadata (11 kB)
+Collecting Pygments==2.21.0 (from -r requirements-lock.txt (line 54))
+  Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting pyparsing==3.3.2 (from -r requirements-lock.txt (line 55))
+  Using cached pyparsing-3.3.2-py3-none-any.whl.metadata (5.8 kB)
+Collecting pypdf==6.19.0 (from -r requirements-lock.txt (line 56))
+  Using cached pypdf-6.19.0-py3-none-any.whl.metadata (7.5 kB)
+Collecting python-dateutil==2.9.0.post0 (from -r requirements-lock.txt (line 57))
+  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting python-dotenv==1.2.3 (from -r requirements-lock.txt (line 58))
+  Using cached python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+Collecting PyYAML==6.0.3 (from -r requirements-lock.txt (line 59))
+  Using cached pyyaml-6.0.3-cp313-cp313-win_amd64.whl.metadata (2.4 kB)
+Collecting rich==15.0.0 (from -r requirements-lock.txt (line 60))
+  Using cached rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+Collecting scipy==1.18.1 (from -r requirements-lock.txt (line 61))
+  Using cached scipy-1.18.1-cp313-cp313-win_amd64.whl.metadata (61 kB)
+Collecting setuptools==84.0.0 (from -r requirements-lock.txt (line 62))
+  Using cached setuptools-84.0.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting six==1.17.0 (from -r requirements-lock.txt (line 63))
+  Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting stable_baselines3==2.9.0 (from -r requirements-lock.txt (line 64))
+  Using cached stable_baselines3-2.9.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting starlette==1.6.0 (from -r requirements-lock.txt (line 65))
+  Using cached starlette-1.6.0-py3-none-any.whl.metadata (6.4 kB)
+Requirement already satisfied: sympy==1.14.0 in c:\users\admin\grad_venv_cuda\lib\site-packages (from -r requirements-lock.txt (line 66)) (1.14.0)
+Collecting tensorboard==2.21.0 (from -r requirements-lock.txt (line 67))
+  Using cached tensorboard-2.21.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting tensorboard-data-server==0.7.2 (from -r requirements-lock.txt (line 68))
+  Using cached tensorboard_data_server-0.7.2-py3-none-any.whl.metadata (1.1 kB)
+Requirement already satisfied: torch==2.14.0 in c:\users\admin\grad_venv_cuda\lib\site-packages (from -r requirements-lock.txt (line 69)) (2.14.0+cu130)
+Collecting tqdm==4.70.1 (from -r requirements-lock.txt (line 70))
+  Using cached tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+Collecting typing-inspection==0.4.4 (from -r requirements-lock.txt (line 71))
+  Using cached typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Requirement already satisfied: typing_extensions==4.16.0 in c:\users\admin\grad_venv_cuda\lib\site-packages (from -r requirements-lock.txt (line 72)) (4.16.0)
+Collecting tzdata==2026.4 (from -r requirements-lock.txt (line 73))
+  Using cached tzdata-2026.4-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting uvicorn==0.52.4 (from -r requirements-lock.txt (line 74))
+  Using cached uvicorn-0.52.4-py3-none-any.whl.metadata (6.6 kB)
+Collecting watchfiles==1.2.0 (from -r requirements-lock.txt (line 75))
+  Using cached watchfiles-1.2.0-cp313-cp313-win_amd64.whl.metadata (5.0 kB)
+Collecting websockets==17.1 (from -r requirements-lock.txt (line 76))
+  Using cached websockets-17.1-cp313-cp313-win_amd64.whl.metadata (6.5 kB)
+Collecting Werkzeug==3.1.8 (from -r requirements-lock.txt (line 77))
+  Using cached werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+Using cached absl_py-2.5.0-py3-none-any.whl (137 kB)
+Using cached ale_py-0.12.1-cp313-cp313-win_amd64.whl (2.1 MB)
+Using cached annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+Using cached annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Using cached anyio-4.15.1-py3-none-any.whl (132 kB)
+Using cached certifi-2026.7.22-py3-none-any.whl (136 kB)
+Using cached click-8.5.0-py3-none-any.whl (125 kB)
+Using cached cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+Using cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Using cached contourpy-1.4.0-cp313-cp313-win_amd64.whl (234 kB)
+Using cached cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Using cached farama_notifications-0.0.6-py3-none-any.whl (2.9 kB)
+Using cached fastapi-0.141.1-py3-none-any.whl (131 kB)
+Using cached filelock-4.0.1-py3-none-any.whl (106 kB)
+Using cached fonttools-4.65.0-cp313-cp313-win_amd64.whl (2.5 MB)
+Using cached grpcio-1.84.0-cp313-cp313-win_amd64.whl (5.3 MB)
+Using cached gymnasium-1.3.0-py3-none-any.whl (953 kB)
+Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Using cached httptools-0.8.0-cp313-cp313-win_amd64.whl (90 kB)
+Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Using cached idna-3.19-py3-none-any.whl (68 kB)
+Using cached kiwisolver-1.5.1-cp313-cp313-win_amd64.whl (70 kB)
+Using cached markdown-3.10.3-py3-none-any.whl (110 kB)
+Using cached markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+Using cached matplotlib-3.11.2-cp313-cp313-win_amd64.whl (9.3 MB)
+Using cached mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Using cached networkx-3.6.1-py3-none-any.whl (2.1 MB)
+Using cached numpy-2.5.3-cp313-cp313-win_amd64.whl (12.6 MB)
+Using cached opencv_python-5.0.0.93-cp37-abi3-win_amd64.whl (44.0 MB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Using cached pandas-3.0.5-cp313-cp313-win_amd64.whl (9.8 MB)
+Using cached pillow-12.3.0-cp313-cp313-win_amd64.whl (7.2 MB)
+Using cached protobuf-7.36.2-cp310-abi3-win_amd64.whl (456 kB)
+Using cached psutil-7.2.2-cp37-abi3-win_amd64.whl (137 kB)
+Using cached pydantic-2.13.5-py3-none-any.whl (472 kB)
+Using cached pydantic_core-2.46.5-cp313-cp313-win_amd64.whl (2.0 MB)
+Using cached pygame_ce-2.5.8-cp313-cp313-win_amd64.whl (9.7 MB)
+Using cached pygments-2.21.0-py3-none-any.whl (1.3 MB)
+Using cached pyparsing-3.3.2-py3-none-any.whl (122 kB)
+Using cached pypdf-6.19.0-py3-none-any.whl (395 kB)
+Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Using cached python_dotenv-1.2.3-py3-none-any.whl (22 kB)
+Using cached pyyaml-6.0.3-cp313-cp313-win_amd64.whl (154 kB)
+Using cached rich-15.0.0-py3-none-any.whl (310 kB)
+Using cached scipy-1.18.1-cp313-cp313-win_amd64.whl (36.6 MB)
+Using cached setuptools-84.0.0-py3-none-any.whl (818 kB)
+Using cached six-1.17.0-py2.py3-none-any.whl (11 kB)
+Using cached stable_baselines3-2.9.0-py3-none-any.whl (187 kB)
+Using cached starlette-1.6.0-py3-none-any.whl (75 kB)
+Using cached tensorboard-2.21.0-py3-none-any.whl (5.5 MB)
+Using cached tensorboard_data_server-0.7.2-py3-none-any.whl (2.4 kB)
+Using cached tqdm-4.70.1-py3-none-any.whl (80 kB)
+Using cached typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Using cached tzdata-2026.4-py2.py3-none-any.whl (347 kB)
+Using cached uvicorn-0.52.4-py3-none-any.whl (79 kB)
+Using cached watchfiles-1.2.0-cp313-cp313-win_amd64.whl (288 kB)
+Using cached websockets-17.1-cp313-cp313-win_amd64.whl (217 kB)
+Using cached werkzeug-3.1.8-py3-none-any.whl (226 kB)
+Installing collected packages: Farama-Notifications, Werkzeug, websockets, tzdata, typing-inspection, tensorboard-data-server, six, setuptools, PyYAML, python-dotenv, pypdf, pyparsing, Pygments, pygame-ce, pydantic_core, psutil, protobuf, pillow, packaging, numpy, networkx, mdurl, Markdown, kiwisolver, idna, httptools, h11, grpcio, fonttools, filelock, cycler, colorama, cloudpickle, click, certifi, annotated-types, annotated-doc, absl-py, uvicorn, tqdm, tensorboard, scipy, python-dateutil, pydantic, opencv-python, markdown-it-py, httpcore, gymnasium, contourpy, anyio, ale-py, watchfiles, starlette, stable_baselines3, rich, pandas, matplotlib, httpx, fastapi
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 78.1.0
+    Uninstalling setuptools-78.1.0:
+      Successfully uninstalled setuptools-78.1.0
+  Attempting uninstall: networkx
+    Found existing installation: networkx 3.7
+    Uninstalling networkx-3.7:
+      Successfully uninstalled networkx-3.7
+  Attempting uninstall: filelock
+    Found existing installation: filelock 4.2.4
+    Uninstalling filelock-4.2.4:
+      Successfully uninstalled filelock-4.2.4
+Successfully installed Farama-Notifications-0.0.6 Markdown-3.10.3 PyYAML-6.0.3 Pygments-2.21.0 Werkzeug-3.1.8 absl-py-2.5.0 ale-py-0.12.1 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.7.22 click-8.5.0 cloudpickle-3.1.2 colorama-0.4.6 contourpy-1.4.0 cycler-0.12.1 fastapi-0.141.1 filelock-4.0.1 fonttools-4.65.0 grpcio-1.84.0 gymnasium-1.3.0 h11-0.16.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 idna-3.19 kiwisolver-1.5.1 markdown-it-py-4.2.0 matplotlib-3.11.2 mdurl-0.1.2 networkx-3.6.1 numpy-2.5.3 opencv-python-5.0.0.93 packaging-26.3 pandas-3.0.5 pillow-12.3.0 protobuf-7.36.2 psutil-7.2.2 pydantic-2.13.5 pydantic_core-2.46.5 pygame-ce-2.5.8 pyparsing-3.3.2 pypdf-6.19.0 python-dateutil-2.9.0.post0 python-dotenv-1.2.3 rich-15.0.0 scipy-1.18.1 setuptools-84.0.0 six-1.17.0 stable_baselines3-2.9.0 starlette-1.6.0 tensorboard-2.21.0 tensorboard-data-server-0.7.2 tqdm-4.70.1 typing-inspection-0.4.4 tzdata-2026.4 uvicorn-0.52.4 watchfiles-1.2.0 websockets-17.1
+  torch 2.14.0+cu130 13.0
+THE MACHINE
+  host           DESKTOP-VF1MO3H
+  platform       Windows-11-10.0.26300-SP0
+  cpu            AMD Ryzen 5 9600X 6-Core Processor
+  logical_cpus   12
+  usable_cpus    12
+  physical_cpus  6
+  ram_gb         31.2
+  available_gb   16.6
+  python         3.13.2
+  torch          2.14.0+cu130
+  torch_cuda     13.0
+  packages       {'numpy': '2.5.3', 'torch': '2.14.0+cu130', 'stable_baselines3': '2.9.0', 'gymnasium': '1.3.0', 'scipy': '1.18.1', 'pandas': '3.0.5'}
+  power          Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+  gpus           [{'index': '0', 'name': 'NVIDIA GeForce RTX 5070', 'memory_total_mib': 12227.0, 'driver': '617.42', 'driver_model': 'WDDM'}]
+  cuda           {'ok': True, 'gpu': 'NVIDIA GeForce RTX 5070', 'gpu_memory_gb': 11.9, 'gpu_count': 1, 'capability': '12.0'}
+  engines_known  ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t']
+  engines_trainable ['b58']
+
+PLAN: devices ['cuda']; first seed 0 twice per device (1800 steps each); then concurrencies [1, 3, 6, 12] (each device's capped after its single-run row by what fits at 450,000 steps), 3000 steps per run with --buffer 450000, 2 repeat(s) interleaved; the extremes roads, the B58, one thread per run
+  section 4, cuda (twice, one at a time): C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 1800 --seed 0 --device cuda --out <tmp>/det_cuda
+  section 3, cuda x1: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_1/r0 --buffer 450000
+  section 3, cuda x3: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_3/r0 --buffer 450000 (seeds [0, 0, 1])
+  section 3, cuda x6: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_6/r0 --buffer 450000 (seeds [0, 0, 1, 2, 3, 4])
+  section 3, cuda x12: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_12/r0 --buffer 450000 (seeds [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  the JSON: C:\Users\admin\grad_device\2026-11-02_step3\A4_bench_cuda.json
+dry run: only the probe ran, in a child process; nothing was trained or timed
+
+== A3. The CPU benchmark
+  selftest: passed
+THE MACHINE
+  host           DESKTOP-VF1MO3H
+  platform       Windows-11-10.0.26300-SP0
+  cpu            AMD Ryzen 5 9600X 6-Core Processor
+  logical_cpus   12
+  usable_cpus    12
+  physical_cpus  6
+  ram_gb         31.2
+  available_gb   16.5
+  python         3.13.2
+  torch          2.14.0+cpu
+  torch_cuda     None
+  packages       {'numpy': '2.5.3', 'torch': '2.14.0', 'stable_baselines3': '2.9.0', 'gymnasium': '1.3.0', 'scipy': '1.18.1', 'pandas': '3.0.5'}
+  power          Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+  gpus           [{'index': '0', 'name': 'NVIDIA GeForce RTX 5070', 'memory_total_mib': 12227.0, 'driver': '617.42', 'driver_model': 'WDDM'}]
+  cuda           {'ok': False, 'why': 'this torch (2.14.0+cpu) is a CPU build'}
+  engines_known  ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t']
+  engines_trainable ['b58']
+  NOTE: a GPU is here (NVIDIA GeForce RTX 5070, nvidia-smi) and this torch cannot use it: measure it in a CUDA environment with --device cuda, then --merge the two files; until then no device is named
+
+PLAN: devices ['cpu']; first seed 0 twice per device (1800 steps each); then concurrencies [1, 3, 6, 12] (each device's capped after its single-run row by what fits at 450,000 steps), 3000 steps per run with --buffer 450000, 2 repeat(s) interleaved; the extremes roads, the B58, one thread per run
+  section 4, cpu (twice, one at a time): C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 1800 --seed 0 --device cpu --out <tmp>/det_cpu
+  section 3, cpu x1: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_1/r0 --buffer 450000
+  section 3, cpu x3: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_3/r0 --buffer 450000 (seeds [0, 1, 2])
+  section 3, cpu x6: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_6/r0 --buffer 450000 (seeds [0, 1, 2, 3, 4, 5])
+  section 3, cpu x12: C:\Users\admin\Documents\graduation project\GRAD-project-step3\.venv\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cpu --out <tmp>/cpu_12/r0 --buffer 450000 (seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+  the JSON: C:\Users\admin\grad_device\2026-11-02_step3\A3_bench_cpu.json
+dry run: only the probe ran, in a child process; nothing was trained or timed
+THE MACHINE
+  host           DESKTOP-VF1MO3H
+  platform       Windows-11-10.0.26300-SP0
+  cpu            AMD Ryzen 5 9600X 6-Core Processor
+  logical_cpus   12
+  usable_cpus    12
+  physical_cpus  6
+  ram_gb         31.2
+  available_gb   16.5
+  python         3.13.2
+  torch          2.14.0+cpu
+  torch_cuda     None
+  packages       {'numpy': '2.5.3', 'torch': '2.14.0', 'stable_baselines3': '2.9.0', 'gymnasium': '1.3.0', 'scipy': '1.18.1', 'pandas': '3.0.5'}
+  power          Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+  gpus           [{'index': '0', 'name': 'NVIDIA GeForce RTX 5070', 'memory_total_mib': 12227.0, 'driver': '617.42', 'driver_model': 'WDDM'}]
+  cuda           {'ok': False, 'why': 'this torch (2.14.0+cpu) is a CPU build'}
+  engines_known  ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t']
+  engines_trainable ['b58']
+  NOTE: a GPU is here (NVIDIA GeForce RTX 5070, nvidia-smi) and this torch cannot use it: measure it in a CUDA environment with --device cuda, then --merge the two files; until then no device is named
+
+PLAN: devices ['cpu']; first seed 0 twice per device (1800 steps each); then concurrencies [1, 3, 6, 12] (each device's capped after its single-run row by what fits at 450,000 steps), 3000 steps per run with --buffer 450000, 2 repeat(s) interleaved; the extremes roads, the B58, one thread per run
+  the JSON: C:\Users\admin\grad_device\2026-11-02_step3\A3_bench_cpu.json (written after every section)
+
+2. THE PARTS OF ONE STEP (each in a child process, one thread)
+  plant step (CPU, numpy, backend cycle)   46.98 ms
+  on cpu: SAC update 8.27 ms, choosing an action 0.14 ms -> the plant is 85 % of a step
+     on the table backend (arithmetic, not a measurement: a plant 6-8x cheaper, decision 28) it would be 41-48 %
+  Section 3 is the measurement; these say why it comes out as it does.
+
+4. DETERMINISM, BEFORE SECTION 3 (seed 0 twice, 1800 steps each; every tensor, counter, recorded step and the curve compared)
+  cpu: IDENTICAL 
+
+3. TRAINING AS train_all.py RUNS IT (N copies of train.py at once, 2 repeat(s))
+  repeat 1, cpu x1 ...
+     lower 19.1, upper 19.3 steps/s in all, overlap 1.00, RAM 0.3 GB (0.7 GB at 450,000 steps), ok True
+  repeat 1, cpu x3 ...
+     lower 52.0, upper 52.5 steps/s in all, overlap 1.00, RAM 0.8 GB (2.1 GB at 450,000 steps), ok True
+  repeat 1, cpu x6 ...
+     lower 85.3, upper 86.1 steps/s in all, overlap 1.00, RAM 1.5 GB (4.2 GB at 450,000 steps), ok True
+  repeat 1, cpu x12 ...
+     lower 106.2, upper 107.2 steps/s in all, overlap 0.99, RAM 4.4 GB (9.9 GB at 450,000 steps), ok True
+  repeat 2, cpu x1 ...
+     lower 18.1, upper 18.2 steps/s in all, overlap 1.00, RAM 1.8 GB (2.2 GB at 450,000 steps), ok True
+  repeat 2, cpu x3 ...
+     lower 40.5, upper 40.7 steps/s in all, overlap 1.00, RAM 0.9 GB (2.2 GB at 450,000 steps), ok True
+  repeat 2, cpu x6 ...
+     lower 71.4, upper 72.4 steps/s in all, overlap 0.99, RAM 1.5 GB (4.2 GB at 450,000 steps), ok True
+  repeat 2, cpu x12 ...
+     lower 110.1, upper 111.1 steps/s in all, overlap 0.99, RAM 3.2 GB (8.6 GB at 450,000 steps), ok True
+
+device  runs rep    lower    upper overlap  wall s  RAM GB  at 450k VRAM/run load%  ok
+cpu        1   1     19.1     19.3    1.00     160     0.3      0.7        -    13  yes, loaded
+cpu        3   1     52.0     52.5    1.00     176     0.8      2.1        -    10  yes, loaded
+cpu        6   1     85.3     86.1    1.00     215     1.5      4.2        -     5  yes, loaded
+cpu       12   1    106.2    107.2    0.99     345     4.4      9.9        -     7  yes, loaded
+cpu        1   2     18.1     18.2    1.00     169     1.8      2.2        -    10  yes, loaded
+cpu        3   2     40.5     40.7    1.00     225     0.9      2.2        -     6  yes, loaded
+cpu        6   2     71.4     72.4    0.99     255     1.5      4.2        -     6  yes, loaded
+cpu       12   2    110.1    111.1    0.99     332     3.2      8.6        -     4  yes
+  lower, upper: steps/s of all the runs together (the docstring); RAM GB: the machine's available memory, its drop;
+  at 450k: the production estimate; VRAM/run: MiB; load%: the CPU's load before the batch
+
+RECOMMENDATION: only cpu measured in this environment, so no device is named: measure cuda in its own environment (--device cuda) and combine the two files with --merge CPU.json CUDA.json
+  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)
+  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring
+  in a 10-day window: at most 16 seeds per arm (decision 30)
+  every usable concurrency, at its lowest lower bound (20 seeds per arm; seeds that fit 10 days):
+       1 at once     18.07 steps/s   18.07 a run   60 waves    69.2 days     2 seeds
+       3 at once     40.54 steps/s   13.51 a run   20 waves    30.8 days     6 seeds
+       6 at once     71.43 steps/s   11.91 a run   10 waves    17.5 days    10 seeds
+      12 at once    106.19 steps/s    8.85 a run    5 waves    11.8 days    16 seeds
+Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration.
+  The device type is chosen ONCE, for every seed, arm and engine, and goes into the preregistration (decision 32). CPU and CUDA train different agents.
+
+written to C:\Users\admin\grad_device\2026-11-02_step3\A3_bench_cpu.json
+
+== A4, second part: the CUDA benchmark
+THE MACHINE
+  host           DESKTOP-VF1MO3H
+  platform       Windows-11-10.0.26300-SP0
+  cpu            AMD Ryzen 5 9600X 6-Core Processor
+  logical_cpus   12
+  usable_cpus    12
+  physical_cpus  6
+  ram_gb         31.2
+  available_gb   20.2
+  python         3.13.2
+  torch          2.14.0+cu130
+  torch_cuda     13.0
+  packages       {'numpy': '2.5.3', 'torch': '2.14.0+cu130', 'stable_baselines3': '2.9.0', 'gymnasium': '1.3.0', 'scipy': '1.18.1', 'pandas': '3.0.5'}
+  power          Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+  gpus           [{'index': '0', 'name': 'NVIDIA GeForce RTX 5070', 'memory_total_mib': 12227.0, 'driver': '617.42', 'driver_model': 'WDDM'}]
+  cuda           {'ok': True, 'gpu': 'NVIDIA GeForce RTX 5070', 'gpu_memory_gb': 11.9, 'gpu_count': 1, 'capability': '12.0'}
+  engines_known  ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t']
+  engines_trainable ['b58']
+
+PLAN: devices ['cuda']; first seed 0 twice per device (1800 steps each); then concurrencies [1, 3, 6, 12] (each device's capped after its single-run row by what fits at 450,000 steps), 3000 steps per run with --buffer 450000, 2 repeat(s) interleaved; the extremes roads, the B58, one thread per run
+  the JSON: C:\Users\admin\grad_device\2026-11-02_step3\A4_bench_cuda.json (written after every section)
+
+2. THE PARTS OF ONE STEP (each in a child process, one thread)
+  plant step (CPU, numpy, backend cycle)   45.89 ms
+  on cuda: SAC update 6.67 ms, choosing an action 0.48 ms -> the plant is 87 % of a step
+     on the table backend (arithmetic, not a measurement: a plant 6-8x cheaper, decision 28) it would be 45-52 %
+  Section 3 is the measurement; these say why it comes out as it does.
+
+4. DETERMINISM, BEFORE SECTION 3 (seed 0 twice, 1800 steps each; every tensor, counter, recorded step and the curve compared)
+  cuda: IDENTICAL 
+
+3. TRAINING AS train_all.py RUNS IT (N copies of train.py at once, 2 repeat(s))
+  repeat 1, cuda x1 ...
+     lower 18.9, upper 19.0 steps/s in all, overlap 1.00, RAM 1.6 GB (2.1 GB at 450,000 steps), ok True
+     cuda: at most 6 runs fit at 450,000-step size; its concurrencies are now [1, 3, 6]
+  repeat 1, cuda x3 ...
+     lower 41.1, upper 41.5 steps/s in all, overlap 1.00, RAM 4.8 GB (6.2 GB at 450,000 steps), ok True
+  repeat 1, cuda x6 ...
+     lower 70.3, upper 70.8 steps/s in all, overlap 0.99, RAM 9.6 GB (12.3 GB at 450,000 steps), ok True
+  repeat 2, cuda x1 ...
+     lower 18.8, upper 18.9 steps/s in all, overlap 1.00, RAM 1.7 GB (2.2 GB at 450,000 steps), ok True
+  repeat 2, cuda x3 ...
+     lower 41.1, upper 41.5 steps/s in all, overlap 0.99, RAM 4.8 GB (6.2 GB at 450,000 steps), ok True
+  repeat 2, cuda x6 ...
+     lower 70.3, upper 70.9 steps/s in all, overlap 1.00, RAM 9.6 GB (12.4 GB at 450,000 steps), ok True
+
+device  runs rep    lower    upper overlap  wall s  RAM GB  at 450k VRAM/run load%  ok
+cuda       1   1     18.9     19.0    1.00     163     1.6      2.1      306     7  yes, loaded
+cuda       3   1     41.1     41.5    1.00     222     4.8      6.2      315     5  yes, seed 0 twice IDENTICAL
+cuda       6   1     70.3     70.8    0.99     260     9.6     12.3      317    11  yes, loaded, seed 0 twice IDENTICAL
+cuda       1   2     18.8     18.9    1.00     163     1.7      2.2      321    10  yes, loaded
+cuda       3   2     41.1     41.5    0.99     222     4.8      6.2      315     8  yes, loaded, seed 0 twice IDENTICAL
+cuda       6   2     70.3     70.9    1.00     260     9.6     12.4      317     7  yes, loaded, seed 0 twice IDENTICAL
+  lower, upper: steps/s of all the runs together (the docstring); RAM GB: the machine's available memory, its drop;
+  at 450k: the production estimate; VRAM/run: MiB; load%: the CPU's load before the batch
+
+RECOMMENDATION: only cuda measured in this environment, so no device is named: measure cpu in its own environment (--device cpu) and combine the two files with --merge CPU.json CUDA.json
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  6 at once: 11.72 steps/s per run, so a 450,000-step run takes 0.44 days; 20 seeds per arm are 3 x 20 runs per engine in 10 waves (0 slots idle in the last), x 4 engines: 17.8 days of training, before scoring
+  in a 10-day window: at most 10 seeds per arm (decision 30)
+  every usable concurrency, at its lowest lower bound (20 seeds per arm; seeds that fit 10 days):
+       1 at once     18.75 steps/s   18.75 a run   60 waves    66.7 days     3 seeds
+       3 at once      41.1 steps/s    13.7 a run   20 waves    30.4 days     6 seeds
+       6 at once     70.31 steps/s   11.72 a run   10 waves    17.8 days    10 seeds
+Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration.
+  The device type is chosen ONCE, for every seed, arm and engine, and goes into the preregistration (decision 32). CPU and CUDA train different agents.
+
+written to C:\Users\admin\grad_device\2026-11-02_step3\A4_bench_cuda.json
+
+== A5. One decision
+
+device  runs rep    lower    upper overlap  wall s  RAM GB  at 450k VRAM/run load%  ok
+cpu        1   1     19.1     19.3    1.00     160     0.3      0.7        -    13  yes, loaded
+cpu        3   1     52.0     52.5    1.00     176     0.8      2.1        -    10  yes, loaded
+cpu        6   1     85.3     86.1    1.00     215     1.5      4.2        -     5  yes, loaded
+cpu       12   1    106.2    107.2    0.99     345     4.4      9.9        -     7  yes, loaded
+cpu        1   2     18.1     18.2    1.00     169     1.8      2.2        -    10  yes, loaded
+cpu        3   2     40.5     40.7    1.00     225     0.9      2.2        -     6  yes, loaded
+cpu        6   2     71.4     72.4    0.99     255     1.5      4.2        -     6  yes, loaded
+cpu       12   2    110.1    111.1    0.99     332     3.2      8.6        -     4  yes
+cuda       1   1     18.9     19.0    1.00     163     1.6      2.1      306     7  yes, loaded
+cuda       3   1     41.1     41.5    1.00     222     4.8      6.2      315     5  yes, seed 0 twice IDENTICAL
+cuda       6   1     70.3     70.8    0.99     260     9.6     12.3      317    11  yes, loaded, seed 0 twice IDENTICAL
+cuda       1   2     18.8     18.9    1.00     163     1.7      2.2      321    10  yes, loaded
+cuda       3   2     41.1     41.5    0.99     222     4.8      6.2      315     8  yes, loaded, seed 0 twice IDENTICAL
+cuda       6   2     70.3     70.9    1.00     260     9.6     12.4      317     7  yes, loaded, seed 0 twice IDENTICAL
+  lower, upper: steps/s of all the runs together (the docstring); RAM GB: the machine's available memory, its drop;
+  at 450k: the production estimate; VRAM/run: MiB; load%: the CPU's load before the batch
+
+RECOMMENDATION: CPU with 12 runs at once (torch 2.14.0+cpu): its lowest lower bound, 106.19 (12 at once), beats CUDA's highest upper bound, 70.87 (6 at once).
+  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring
+  in a 10-day window: at most 16 seeds per arm (decision 30)
+  every usable concurrency, at its lowest lower bound (20 seeds per arm; seeds that fit 10 days):
+       1 at once     18.07 steps/s   18.07 a run   60 waves    69.2 days     2 seeds
+       3 at once     40.54 steps/s   13.51 a run   20 waves    30.8 days     6 seeds
+       6 at once     71.43 steps/s   11.91 a run   10 waves    17.5 days    10 seeds
+      12 at once    106.19 steps/s    8.85 a run    5 waves    11.8 days    16 seeds
+  the launcher, for each engine (--engine and --road are what was measured, --out is the experiment's own; train_all.py trains two arms a seed today, the days count three, decision 27):
+    python train_all.py --engine b58 --road extremes --dt 1 --device cpu --jobs 12 --seeds 0-15 --steps 450000 --out runs/<the experiment's own>
+  CAUTION: a repeat started with the CPU more than 5 % busy
+Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration.
+
+written to C:\Users\admin\grad_device\2026-11-02_step3\A5_bench_merged.json
+
+== A6. The device type
+commit b2151af9746981ef86e22f704c982da8587f0436
+cuda: measured (torch 2.14.0+cu130)
+RECOMMENDATION: CPU with 12 runs at once (torch 2.14.0+cpu): its lowest lower bound, 106.19 (12 at once), beats CUDA's highest upper bound, 70.87 (6 at once).
+  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring
+--
+RECOMMENDATION: only cpu measured in this environment, so no device is named: measure cuda in its own environment (--device cuda) and combine the two files with --merge CPU.json CUDA.json
+  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)
+  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring
+  in a 10-day window: at most 16 seeds per arm (decision 30)
+--
+RECOMMENDATION: only cuda measured in this environment, so no device is named: measure cpu in its own environment (--device cpu) and combine the two files with --merge CPU.json CUDA.json
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  6 at once: 11.72 steps/s per run, so a 450,000-step run takes 0.44 days; 20 seeds per arm are 3 x 20 runs per engine in 10 waves (0 slots idle in the last), x 4 engines: 17.8 days of training, before scoring
+  in a 10-day window: at most 10 seeds per arm (decision 30)
+READ: the RECOMMENDATION line names the device: CPU or 'NO CLEAR WINNER, KEEP CPU' ends step 3; CUDA stops it (row 118)

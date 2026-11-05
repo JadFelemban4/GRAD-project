@@ -4725,3 +4725,16 @@ From "Next actions", item 8, as committed at `91c6ece`:
    order (sections I-N). Done: R0a, C1, N, K, R3a (31 October); R0, R1 (the roads, T passes), R3b (1-2
    November); W, 10-20 November, 240 h (row 134, 2 November). Next: step 3 on the device (`tools/device_step3.sh`),
    then row 135 (and the table-route row if the rule binds), the rehearsal and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Ghassan: pause Windows updates now (row 126). Nothing
+
+# Part AE — lines rotated out of CHECKPOINT.md, 5 November 2026 (GRA-test: row 135, the device, O2)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `fcaf7b7`:
+
+  1-134 and 136-143 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
+  row 133; N: W, row 134; O: rows 136-143, 136 his own answer, 2 November). Row 135 is O2's.
+
+From "Next actions", item 8, as committed at `fcaf7b7`:
+
+   order (sections I-O; `docs/build_step_2/INTERFACES.md`). Done: R0, R1, R3b (1-2 November); W (row 134); step 3 on
+   Jad's PC, the CPU at 12 at once; C0, C1b; rows 136-143, row 136 the Honda-Mazda-Ford order (2-5 November). Next:
+   row 135 (O2), the rehearsal and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates are paused to 30 November. Nothing

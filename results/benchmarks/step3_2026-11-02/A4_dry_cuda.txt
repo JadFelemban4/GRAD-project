@@ -1,0 +1,27 @@
+THE MACHINE
+  host           DESKTOP-VF1MO3H
+  platform       Windows-11-10.0.26300-SP0
+  cpu            AMD Ryzen 5 9600X 6-Core Processor
+  logical_cpus   12
+  usable_cpus    12
+  physical_cpus  6
+  ram_gb         31.2
+  available_gb   16.6
+  python         3.13.2
+  torch          2.14.0+cu130
+  torch_cuda     13.0
+  packages       {'numpy': '2.5.3', 'torch': '2.14.0+cu130', 'stable_baselines3': '2.9.0', 'gymnasium': '1.3.0', 'scipy': '1.18.1', 'pandas': '3.0.5'}
+  power          Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+  gpus           [{'index': '0', 'name': 'NVIDIA GeForce RTX 5070', 'memory_total_mib': 12227.0, 'driver': '617.42', 'driver_model': 'WDDM'}]
+  cuda           {'ok': True, 'gpu': 'NVIDIA GeForce RTX 5070', 'gpu_memory_gb': 11.9, 'gpu_count': 1, 'capability': '12.0'}
+  engines_known  ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t']
+  engines_trainable ['b58']
+
+PLAN: devices ['cuda']; first seed 0 twice per device (1800 steps each); then concurrencies [1, 3, 6, 12] (each device's capped after its single-run row by what fits at 450,000 steps), 3000 steps per run with --buffer 450000, 2 repeat(s) interleaved; the extremes roads, the B58, one thread per run
+  section 4, cuda (twice, one at a time): C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 1800 --seed 0 --device cuda --out <tmp>/det_cuda
+  section 3, cuda x1: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_1/r0 --buffer 450000
+  section 3, cuda x3: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_3/r0 --buffer 450000 (seeds [0, 0, 1])
+  section 3, cuda x6: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_6/r0 --buffer 450000 (seeds [0, 0, 1, 2, 3, 4])
+  section 3, cuda x12: C:\Users\admin\grad_venv_cuda\Scripts\python.exe C:\Users\admin\Documents\graduation project\GRAD-project-step3\train.py --engine b58 --road extremes --dt 1 --steps 3000 --seed 0 --device cuda --out <tmp>/cuda_12/r0 --buffer 450000 (seeds [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  the JSON: C:\Users\admin\grad_device\2026-11-02_step3\A4_bench_cuda.json
+dry run: only the probe ran, in a child process; nothing was trained or timed

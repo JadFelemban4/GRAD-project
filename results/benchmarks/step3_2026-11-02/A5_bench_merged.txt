@@ -1,0 +1,35 @@
+
+device  runs rep    lower    upper overlap  wall s  RAM GB  at 450k VRAM/run load%  ok
+cpu        1   1     19.1     19.3    1.00     160     0.3      0.7        -    13  yes, loaded
+cpu        3   1     52.0     52.5    1.00     176     0.8      2.1        -    10  yes, loaded
+cpu        6   1     85.3     86.1    1.00     215     1.5      4.2        -     5  yes, loaded
+cpu       12   1    106.2    107.2    0.99     345     4.4      9.9        -     7  yes, loaded
+cpu        1   2     18.1     18.2    1.00     169     1.8      2.2        -    10  yes, loaded
+cpu        3   2     40.5     40.7    1.00     225     0.9      2.2        -     6  yes, loaded
+cpu        6   2     71.4     72.4    0.99     255     1.5      4.2        -     6  yes, loaded
+cpu       12   2    110.1    111.1    0.99     332     3.2      8.6        -     4  yes
+cuda       1   1     18.9     19.0    1.00     163     1.6      2.1      306     7  yes, loaded
+cuda       3   1     41.1     41.5    1.00     222     4.8      6.2      315     5  yes, seed 0 twice IDENTICAL
+cuda       6   1     70.3     70.8    0.99     260     9.6     12.3      317    11  yes, loaded, seed 0 twice IDENTICAL
+cuda       1   2     18.8     18.9    1.00     163     1.7      2.2      321    10  yes, loaded
+cuda       3   2     41.1     41.5    0.99     222     4.8      6.2      315     8  yes, loaded, seed 0 twice IDENTICAL
+cuda       6   2     70.3     70.9    1.00     260     9.6     12.4      317     7  yes, loaded, seed 0 twice IDENTICAL
+  lower, upper: steps/s of all the runs together (the docstring); RAM GB: the machine's available memory, its drop;
+  at 450k: the production estimate; VRAM/run: MiB; load%: the CPU's load before the batch
+
+RECOMMENDATION: CPU with 12 runs at once (torch 2.14.0+cpu): its lowest lower bound, 106.19 (12 at once), beats CUDA's highest upper bound, 70.87 (6 at once).
+  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring
+  in a 10-day window: at most 16 seeds per arm (decision 30)
+  every usable concurrency, at its lowest lower bound (20 seeds per arm; seeds that fit 10 days):
+       1 at once     18.07 steps/s   18.07 a run   60 waves    69.2 days     2 seeds
+       3 at once     40.54 steps/s   13.51 a run   20 waves    30.8 days     6 seeds
+       6 at once     71.43 steps/s   11.91 a run   10 waves    17.5 days    10 seeds
+      12 at once    106.19 steps/s    8.85 a run    5 waves    11.8 days    16 seeds
+  the launcher, for each engine (--engine and --road are what was measured, --out is the experiment's own; train_all.py trains two arms a seed today, the days count three, decision 27):
+    python train_all.py --engine b58 --road extremes --dt 1 --device cpu --jobs 12 --seeds 0-15 --steps 450000 --out runs/<the experiment's own>
+  CAUTION: a repeat started with the CPU more than 5 % busy
+Valid for the cycle backend and the B58 only. Decision 28 trains on each engine's table if it passes its gates (a 6-8x cheaper plant), which can reverse this. Re-run on the table backend, and on each engine once it exists, before the device type is written into the preregistration.
+
+written to C:\Users\admin\grad_device\2026-11-02_step3\A5_bench_merged.json

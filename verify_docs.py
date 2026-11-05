@@ -975,10 +975,16 @@ RETIRED_EXEMPT_AGENT_DIRS = ("results/agents/",)
 # run counts and seconds, tau, shas and roads_seed. On the synthetic printed logs no retired pattern fired,
 # but an unbounded retired pattern can match such a number by chance, and the file is written once by the
 # draw and never edited. Same cost.
+# 5 November 2026: step 3's printed outputs from the training device, results/benchmarks/step3_<date>/
+# (tools/device_step3.sh, copied from the archive the device's operator sent, O2). Its session log holds
+# pip's install lines, and "uvicorn-0.52.4" matched the retired -0.52 enrichment correlation six times.
+# The files are the device's own output, committed verbatim and never edited. Same cost: a retired
+# figure in them would pass. The folder's README.md is still checked.
 RETIRED_EXEMPT_RESULT_TABLES = re.compile(
     r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT|DRIVE_C_RULE_NUMBERS"
     r"|EPA_ROADS/(?:control|sweep|timing|attempt_\d+_printed)"
-    r"|EPA_ROADS/probe_\d{4}-\d{2}-\d{2}/(?:calc/|review/)?\w+)\.txt$")
+    r"|EPA_ROADS/probe_\d{4}-\d{2}-\d{2}/(?:calc/|review/)?\w+"
+    r"|benchmarks/step3_\d{4}-\d{2}-\d{2}/\w+)\.txt$")
 
 
 def _generated_agent_report(rel):

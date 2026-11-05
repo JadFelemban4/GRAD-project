@@ -1,0 +1,17 @@
+commit b2151af9746981ef86e22f704c982da8587f0436
+cuda: measured (torch 2.14.0+cu130)
+RECOMMENDATION: CPU with 12 runs at once (torch 2.14.0+cpu): its lowest lower bound, 106.19 (12 at once), beats CUDA's highest upper bound, 70.87 (6 at once).
+  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring
+--
+RECOMMENDATION: only cpu measured in this environment, so no device is named: measure cuda in its own environment (--device cuda) and combine the two files with --merge CPU.json CUDA.json
+  CPU (torch 2.14.0+cpu): best 12 runs at once, 106.19 to 111.09 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.09 (12 at once)
+  12 at once: 8.85 steps/s per run, so a 450,000-step run takes 0.59 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.8 days of training, before scoring
+  in a 10-day window: at most 16 seeds per arm (decision 30)
+--
+RECOMMENDATION: only cuda measured in this environment, so no device is named: measure cpu in its own environment (--device cpu) and combine the two files with --merge CPU.json CUDA.json
+  CUDA (torch 2.14.0+cu130): best 6 runs at once, 70.31 to 70.87 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 70.87 (6 at once)
+  6 at once: 11.72 steps/s per run, so a 450,000-step run takes 0.44 days; 20 seeds per arm are 3 x 20 runs per engine in 10 waves (0 slots idle in the last), x 4 engines: 17.8 days of training, before scoring
+  in a 10-day window: at most 10 seeds per arm (decision 30)
+READ: the RECOMMENDATION line names the device: CPU or 'NO CLEAR WINNER, KEEP CPU' ends step 3; CUDA stops it (row 118)
