@@ -31,7 +31,8 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `9c788c3` | O2 | row 135 (the device), step 3's files in `results/benchmarks/step3_2026-11-02/`, ORDER's status, CHECKPOINT; section 12 |
 | `c3ff39e` | E | Run 2, the Mazda's arming: ARMED.json and the calibration run.json; section 13 |
 | `768a90f` | F | the Mazda's first run's records: STARTED, crash_1.txt, run.json, the invocation log (a crash, TraceDefect); section 13 |
-| this one | V | row 144 (section P), the defect route; ORDER's status and rule, CHECKPOINT; section 13 |
+| `115300b` | V | row 144 (section P), the defect route; ORDER's status and rule, CHECKPOINT; section 13 |
+| this one | V2 | row 145, row 144 made exact before X; CHECKPOINT; section 13 |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -448,6 +449,9 @@ A second round of four reviews checked the row and the fix as drafted, and its p
 Then a synthetic end-to-end Mazda run through the held-out computation was built and verified (no test had
 ever run the D3 chain's composition); its review found that a model output that is not a finite number
 would also crash the run, so (1) reads such an output the same way, and c3.json goes through json_ready.
+A final review of X before its commit found that E6 row 10 compared a base without the half step's failures
+against variants that keep them; row 145 (committed before X) fixes row 10's base and makes row 144's
+statements exact (the versions' agreement, the stops that stay, what the tests cover).
 
 **What waits, from here:** X (the fix with its tests), K2 (each engine's `check --defect` on X), the
 Mazda's re-arming and capped re-run, then the Honda and the Ford, then the labels (step 11).

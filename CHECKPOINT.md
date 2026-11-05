@@ -78,8 +78,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
   made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
-  1-144 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
-  row 133; N: W, row 134; O: rows 135-143, 136 his own answer; P: row 144, the Mazda's defect route, 5 November).
+  1-145 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
+  row 133; N: W, row 134; O: rows 135-143, 136 his own answer; P: rows 144-145, the Mazda's defect route).
   Roads: R0 `bb91848`, then R1 `fb20ab2` (the draw of 1 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 

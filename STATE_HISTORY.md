@@ -4753,3 +4753,8 @@ From "Next actions", item 8, as committed at `9c788c3`:
    step 3's files in `results/benchmarks/step3_2026-11-02/` (2-5 November). Next: the rehearsal and Run 2
    (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates are paused to 30 November. Nothing
    else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `115300b` (row 145 added the same day):
+
+  1-144 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
+  row 133; N: W, row 134; O: rows 135-143, 136 his own answer; P: row 144, the Mazda's defect route, 5 November).
