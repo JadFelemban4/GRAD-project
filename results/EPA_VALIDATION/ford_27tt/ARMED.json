@@ -1,0 +1,140 @@
+{
+ "schema": "epa-armed/1",
+ "engine": "ford_27tt",
+ "repo_path": "C:\\Users\\badcl\\Desktop\\GRAD-project",
+ "armed_at_head": "580d39d1e7159eebdec86befedbe8ac749d827ea",
+ "fit_flags": [
+  "S1_bound_active",
+  "S2_bound_active",
+  "S3a_empty_piece",
+  "S3b_flat_profile",
+  "S3b_rpm_hi_highest_edge",
+  "S3c_lines_without_holds",
+  "S3c_pr_falls_with_flow",
+  "S3d_extrapolated_rows",
+  "S4_physical_check",
+  "S4_bound_active"
+ ],
+ "all_row_depth_edge": {
+  "active": false,
+  "flag": "S3b_depth_set_by_the_all_row_floor",
+  "why": "S3b's depth bound is min(C1's, 1 - lam_floor); lam_floor is an all-row quantity, which can be the tighter edge only within the printed rounding of the calibration Final minimum; when active it is named in the C13 disclosure of the results"
+ },
+ "freeze": {
+  "path": "results/EPA_CALIBRATION/ford_27tt/freeze.json",
+  "sha_text": "48064e75203761d08e099ca5ed7f6ea588ec7bb09ce3057acfca05c7ae43600e",
+  "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+ },
+ "complete": {
+  "path": "results/EPA_CALIBRATION/ford_27tt/complete.json",
+  "sha_text": "44336adb0c6d512ffa81f908fd91f863a39b268f564bb3f5f5ddd498ed966859",
+  "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+ },
+ "derived": {
+  "path": "data/engines/ford_27tt/derived_params.json",
+  "sha_text": "ffd03978ba88217ee259a684ce6c515b06a80fd5f56c4c234dabd7057564b293",
+  "derived_sha": "61f84c7d02b6b816"
+ },
+ "specs": {
+  "engine_specs/ford_27tt.toml": "a5ee54427b85cedb9fbc2f4e1ded0f1f92a3814435e535650c049c0c3c4c8e9e",
+  "engine_specs/f150_2015.toml": "ac2b97c697ebe7828de6b88c5a4be367fd2488f5b04324e7223439dd7abfae0f",
+  "engine_specs/cars/f150_2015_27tt.toml": "586da19109eae6f36e46f13ae8902dc70b31c4c661d7526d57df60bcf4d2673a"
+ },
+ "contract": {
+  "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+  "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+  "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+  "schema": 4
+ },
+ "code": {
+  "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+  "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+  "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+  "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+  "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
+  "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+  "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+  "validate_epa.py": "288c3c06d7bf6464899333a7e4e39a4d45ed15c70a98f3c6f13f106240a5d89b",
+  "d3_rows.py": "bb4c69d780ca7b5cd2eb4104721ec1c734f5eb3f1c3fd606abdcea96215c9795",
+  "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+  "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+  "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+  "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+  "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+ },
+ "code_changes_since_fit": [
+  {
+   "path": "calibrate_epa.py",
+   "defect_k": 2,
+   "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450"
+  },
+  {
+   "path": "d3_rows.py",
+   "defect_k": 3,
+   "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
+  },
+  {
+   "path": "validate_epa.py",
+   "defect_k": 3,
+   "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
+  }
+ ],
+ "pins": {
+  "u_D": "every term a gating row reads is pinned",
+  "d3_summary": "no D3 chain"
+ },
+ "tightenings": {
+  "path": "results/EPA_TIGHTENINGS.json",
+  "sha_text": "50c073e84555522b2f7593dba50dc94be1e74d04e599e7fe6db921054595d5ba",
+  "commit": "4da4a319351ff18b8ee0097e50f0b2cb865a5959",
+  "plant": "b58"
+ },
+ "data": {
+  "tables_sha256": {
+   "epa_highload_final_hd1.csv": "b10b3020475f41e8d966f4f0c479b4be40431eb2ac154e86c5e7632c21df59d0",
+   "epa_highload_initial_hd1.csv": "1425452fe85157182f51273206a881ed1022b551893903d0fb22461a4b659d1a",
+   "epa_steady_cell9.csv": "7f42d0e89ed63aba971f395e93325debb81c94b3e4b1db043c502ef16d2af91a",
+   "epa_steady_hd1.csv": "9b2abbe1dfc316b824072f7a8b8b2f5968d1e8fd111a357d0e9a4520eac116fd"
+  },
+  "epa_engine_sha256": "8d353903bd48af4d452392164b0fe44a07d11e898aa764dc53f9748aedbda64b",
+  "epa_channels_blob": "4d4c82c7c64a08b54cc4d5ed78324b8a87986dae",
+  "manifest_sha256": "f70b408bcaf5548f692d3f9f06a6559861f58e503fc5cd29b3c6ffce4acf258c"
+ },
+ "engine_sha": "671b624ae11e0916",
+ "plant_sha": "cec3e3faefe47172",
+ "dump_sha256": "20f10d7bca605263ba0e81abcae28d23e23a08d1e29c78924d37eb33474cc860",
+ "in_sample_check": {
+  "in_sample_sha_text": "4791d92ea113c3db32324d98170031c36e1ef05db3141e452f05036effd654a6",
+  "check_exit": 0,
+  "in_sample_reruns": {
+   "in_sample_rerun1.json": "f1e87b7c1443c25bcc71fddbe6ee9f8d185c25644ecfc1f33c7a611a8577325d",
+   "in_sample_rerun2.json": "6669f18de5057675ece98d71db34ee69c1c7799c45191a9211f30b8ecbc2b0bb"
+  }
+ },
+ "d3": {
+  "data_folder": "C:\\Users\\badcl\\Desktop\\GRAD-engine-data",
+  "c3_files": [],
+  "summary": null,
+  "accord": []
+ },
+ "held_out_structure": {
+  "per_held_out_line_equal": true,
+  "deciding_lines_equal": true,
+  "pooled_counts_equal": true
+ },
+ "held_out_counts": {
+  "fired_lambda_missing": 0,
+  "fired_spark_sentinel": 0,
+  "final_rows": 6,
+  "final_lambda_published": 6,
+  "final_spark_published": 6,
+  "e8_subsets_enough": true
+ },
+ "versions": {
+  "python": "3.13.2",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "platform": "Windows-11-10.0.26200-SP0"
+ },
+ "run_once_nonce_sha256": "8421e5dbd49bef76714337be150ec89e8204970f8c38c6055d9f26a2a5feb7df"
+}
