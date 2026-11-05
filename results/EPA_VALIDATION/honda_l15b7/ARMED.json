@@ -1,0 +1,364 @@
+{
+ "schema": "epa-armed/1",
+ "engine": "honda_l15b7",
+ "repo_path": "C:\\Users\\badcl\\Desktop\\GRAD-project",
+ "armed_at_head": "4181eb60deacd0305ac4ac3e679b1f078291e198",
+ "fit_flags": [
+  "S2_bound_active",
+  "S3a_empty_piece",
+  "S3b_rpm_hi_highest_edge",
+  "S3c_lines_without_holds",
+  "S3c_pr_falls_with_flow",
+  "S4_physical_check",
+  "S4_bound_active"
+ ],
+ "all_row_depth_edge": {
+  "active": false,
+  "flag": "S3b_depth_set_by_the_all_row_floor",
+  "why": "S3b's depth bound is min(C1's, 1 - lam_floor); lam_floor is an all-row quantity, which can be the tighter edge only within the printed rounding of the calibration Final minimum; when active it is named in the C13 disclosure of the results"
+ },
+ "freeze": {
+  "path": "results/EPA_CALIBRATION/honda_l15b7/freeze.json",
+  "sha_text": "641d6a7cdc99f69a2ae1239cc5f52486e771561223edae902028b520efe8a034",
+  "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+ },
+ "complete": {
+  "path": "results/EPA_CALIBRATION/honda_l15b7/complete.json",
+  "sha_text": "f147e8efcc405d467aa43ca3d1a0ce026d28e881c5e4e7f3f1b2f15388d340ea",
+  "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+ },
+ "derived": {
+  "path": "data/engines/honda_l15b7/derived_params.json",
+  "sha_text": "24def1c1a2a487a2afae14396ea3b45baf312f9c23b4f981b1c1dede8262b52a",
+  "derived_sha": "2970c3ff3768a61d"
+ },
+ "specs": {
+  "engine_specs/honda_l15b7.toml": "2d76feda30f08076bbda45726c03287cfbffc7a655bfe9a592151a5be5cf4719",
+  "engine_specs/accord_2018.toml": "99e7b2dbfb14e2c4b08d6e9b7577a6f8b11e38f416a6ec303998dc9f274d103e",
+  "engine_specs/cars/accord_2018_15t.toml": "c5f826301b7ce2e6479c0792a8a20a3b1da1aded2f3a2cbf1362949d78d28f19"
+ },
+ "contract": {
+  "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+  "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+  "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+  "schema": 4
+ },
+ "code": {
+  "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+  "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+  "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+  "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+  "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
+  "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+  "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+  "validate_epa.py": "288c3c06d7bf6464899333a7e4e39a4d45ed15c70a98f3c6f13f106240a5d89b",
+  "d3_rows.py": "bb4c69d780ca7b5cd2eb4104721ec1c734f5eb3f1c3fd606abdcea96215c9795",
+  "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+  "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+  "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+  "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+  "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+ },
+ "code_changes_since_fit": [
+  {
+   "path": "calibrate_epa.py",
+   "defect_k": 3,
+   "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450"
+  },
+  {
+   "path": "d3_rows.py",
+   "defect_k": 4,
+   "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
+  },
+  {
+   "path": "validate_epa.py",
+   "defect_k": 4,
+   "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
+  }
+ ],
+ "pins": {
+  "u_D": "every term a gating row reads is pinned",
+  "d3_summary": "pinned"
+ },
+ "tightenings": {
+  "path": "results/EPA_TIGHTENINGS.json",
+  "sha_text": "50c073e84555522b2f7593dba50dc94be1e74d04e599e7fe6db921054595d5ba",
+  "commit": "4da4a319351ff18b8ee0097e50f0b2cb865a5959",
+  "plant": "b58"
+ },
+ "data": {
+  "tables_sha256": {
+   "epa_highload_final.csv": "7b3d8dbbbf0b58b5ff7613048890ce81bf92f269b920fd51eb2c63751d52757f",
+   "epa_highload_initial.csv": "f69e531f2cfe4c44b275ed222ff4f375f06fe751674eafaa7744503d603af2fc",
+   "epa_steady.csv": "ba8558ca2c35c9ede3583ecc091e58d090abc4bed54d6ffcc7b06b99bc2c018e"
+  },
+  "epa_engine_sha256": "6d3134cb686272e549942ed64a74cc4f60e50bc177f47d63675555c7b8d10d2c",
+  "epa_channels_blob": "3c7b296206a2682c580a6fd2e9017360e92e8924",
+  "manifest_sha256": "fdbcc949a39c343a30f3b88e425e96b0c937e3ff53d97e4cc2ec366988a2a9ed"
+ },
+ "engine_sha": "ae07dfb4edb9ceb3",
+ "plant_sha": "a4e6138b9d258b1f",
+ "dump_sha256": "a7514c0116b52e56c0538056b7ddbbdd9c13f5f3bfcfc63f158f290cd681857b",
+ "in_sample_check": {
+  "in_sample_sha_text": "6102c62b439a984a170102379cb99995067fd788da3a77c217b30edf40aaba9d",
+  "check_exit": 0,
+  "in_sample_reruns": {
+   "in_sample_rerun1.json": "82f2c75ed2cad5f0cf21b8cb51009d47ceab9cecf8783cf49640d8d17e6941c0",
+   "in_sample_rerun2.json": "6284f1ad12476ba1f1921ab66d83aa39073870186e722ea3cc2454b5c247e9a0"
+  }
+ },
+ "d3": {
+  "data_folder": "C:\\Users\\badcl\\Desktop\\GRAD-engine-data",
+  "c3_files": [],
+  "summary": {
+   "file": "anl-d3-2018-honda-accord-lx/test-summary/2018_Honda_Accord_Test_Summary_20191125.xlsx",
+   "sha256": "99260167e25a1757128df9d371b014ecdf53c47dd1e59dc86a580c62a21a89dc"
+  },
+  "accord": [
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809025 Test Data.txt",
+    "sha256": "9c5fcf7453bef4039f5cd1850153922c98d30357c4ebfdea31817e6c2c1b6d41"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809026 Test Data.txt",
+    "sha256": "0b0101bd0dae98600bccabb1838ad2b2f85894de7b7253596f15923dfbf6017a"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809027 Test Data.txt",
+    "sha256": "1d3412a7e1d4de2983dc82f5b0c984781854ff3c58eb7c6da38f0ba2c9a25636"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809028 Test Data.txt",
+    "sha256": "3ea5e1686cbf4dde46505728447602bf457b4f01cc2280b19e1a69f53be0166a"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809029 Test Data.txt",
+    "sha256": "595ea20ae1d8b86d839feccbbbec5adaf3ab9020b09d2b102e4e4fb20a4f4b42"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809030 Test Data.txt",
+    "sha256": "7463fc757f8e9eb1bf0cb43b57bcaac35dc1b6e8c56c42fb9d92d55367018b9c"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809031 Test Data.txt",
+    "sha256": "7658ea8420698d730d0a3b6dd0619268d7ad187500d33d708f1968ebeba7eef2"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809032 Test Data.txt",
+    "sha256": "0ccd59c3cc380dfcb3dec0d66e5fb0307e0289dfa716fcc563adb09afc66ac93"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809033 Test Data.txt",
+    "sha256": "d9a5335a9094b1e297760c05af129d52bc0475bdca679a50bfc9d1d588a6373a"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809034 Test Data.txt",
+    "sha256": "bc7b1358948569d7e6c796bf2f2183c7e109a8c4ae111d81ab2b4e705cb1178d"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809035 Test Data.txt",
+    "sha256": "e80fbc88b1a7409cf73df20c2056287ea2f1b72442d33d8347a4af0812f4e2df"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809036 Test Data.txt",
+    "sha256": "3305fce22e223c9faeadb3d9140ef75dd1ab047476a0c718b9bf4988d07bc4de"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809037 Test Data.txt",
+    "sha256": "a81bca615cda56e3b2108637531d392c6dd3c0811ae59dcaa1214397f1390552"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809038 Test Data.txt",
+    "sha256": "8094e1c635c690087d107296fe35ae23a7774f031cb3ba58d98b5ed27ed5703e"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809039 Test Data.txt",
+    "sha256": "e02dad2895803ac39a8bf7a1759cad3d1045b20e7dcecdc19a7bc1da58fd952e"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809040 Test Data.txt",
+    "sha256": "72b067b5005e8149777dc97078690b26e791edcdd479ea269b5d3da1299939c2"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809041 Test Data.txt",
+    "sha256": "b61b38537cd529c2c668f788acd02c79274f53b180a38c1432c1c49fbcc856a0"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809042 Test Data.txt",
+    "sha256": "10f3481d447db9db95d06de1bcbaf914f0e34e8b636ccc65a70fd2fb0a48884f"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809043 Test Data.txt",
+    "sha256": "9d431566b6637bc4cd9507dd62687ee2956f63fa91f03f8f6eb8a2a28b9b460d"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809044 Test Data.txt",
+    "sha256": "41b7c4f61122cc089c4239faa874081a9d27de1ad350fd7141acd2de32a26c85"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809045 Test Data.txt",
+    "sha256": "2043a488653aa4958fc198965c8cc724c7d1c467475bdca9e8e7cc347029f7e2"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809046 Test Data.txt",
+    "sha256": "64cc9368ec6dac6a99bf60fb3bf0f5c2cfc1f5f0d3e185c3b4bd26e2a9c1f152"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809047 Test Data.txt",
+    "sha256": "72188db4f366a6817ffee40f1d7d57d933f166c53c5ede869588532250b09531"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809048 Test Data.txt",
+    "sha256": "83b81507905e9c9fdbb6bbe2c1ea1a4e08ccc99da869459a114df91c18e20f54"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809049 Test Data.txt",
+    "sha256": "ac5f46d5857d25c43f05e62567d50eaff5caf759a7710fd95506b703537d3cf7"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809050 Test Data.txt",
+    "sha256": "a509f31f7cdfb910867c70943314b14196bc05a24b309284b6baf3f6e2e20716"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809051 Test Data.txt",
+    "sha256": "1c8853b060d4f4e44d2bb47ced02300165d5971a149ed352869c35e5e39b9264"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809052 Test Data.txt",
+    "sha256": "6f74ea15b5a16e11395eeeb54a3910b4624afaf9ff40748d43b8f22c0ca62af7"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809053 Test Data.txt",
+    "sha256": "471db9ea530ee222686cdbe5ae36527be54de5aa4ed5b62ab3348a198ce5c581"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809054 Test Data.txt",
+    "sha256": "ac3d8c6cefc2b314b976f8cd3df44a8073af7345747f1506b4876e5c6288f485"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809055 Test Data.txt",
+    "sha256": "73213dfb0edc67dd6acba99a44568602239b94ce201df3dc618fbfbadb05fffd"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809056 Test Data.txt",
+    "sha256": "82f6d45bd04850db60337b0c78b5f1e1188c8e8d48d466f45ca9dc98af45b18e"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809057 Test Data.txt",
+    "sha256": "73f98a760a30375ee1e8a9a3416c725aab1b5ac774d95c8729babb777e4dc68f"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809058 Test Data.txt",
+    "sha256": "734de969c67e7b040e7b3a84bb6cc64c6f6198c80d11ac05da8c65107db672e9"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809059 Test Data.txt",
+    "sha256": "8dd13ab27e99e517a4da1cc31981adb16aa512d04dcb76744a454ec4751b0c48"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809060 Test Data.txt",
+    "sha256": "90530c596ed9e022d8d5c8323ef7b62adc69e3683d11f9a8b9dcda38836c0567"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809061 Test Data.txt",
+    "sha256": "360fe5b127d07b3a87782d77ea285916b7ba61d2abac0beff3a2cb859e59d877"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809062 Test Data.txt",
+    "sha256": "11de823253dfb73640f12e8c4d03e032d53f44a4bcf9135e27e768bfef5f6bc6"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809063 Test Data.txt",
+    "sha256": "f434c88cdb3d480a96738aa6688e9d1fd3f0de738a9296cdb2a7841d80773e76"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809067 Test Data.txt",
+    "sha256": "d97b3603f22c852e01f6e34bd23eacd42d2d3631702ef52a556bd5175cabd179"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809068 Test Data.txt",
+    "sha256": "7e0580710d823cd1b8516db8ea06a1974c216932fa6fadbe6d25e39d420ba47b"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809069 Test Data.txt",
+    "sha256": "2936cc826da41802b45588b5196eb1159e83cfb86f5f85b3e4fd62390a8abb62"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809070 Test Data.txt",
+    "sha256": "a9b6a74bb6eae441567c0b2b2655a41b97e8faa02be2d4d051c0fc5f904bd9c3"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809071 Test Data.txt",
+    "sha256": "0daa6a5151d0bfbc966745013f3f153fe637c5aaab9ccc60693637c461891c39"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809072 Test Data.txt",
+    "sha256": "84a39f12ab455a08f9ee3762eed00a8ac2c1c173130c9b4be8e1667021e5319c"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809073 Test Data.txt",
+    "sha256": "d9098e9410ffe10166935b1df3354a918d867fc0c13782381b54ff283344d287"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809074 Test Data.txt",
+    "sha256": "e348b2fa8c15c0c09564aa6228b09888d121916ec8a68a1e9101e95c9439db01"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809075 Test Data.txt",
+    "sha256": "8cf42ef1bfaa24613fdc3899bcaf12cd2196013c34217369830a52f66518b994"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809076 Test Data.txt",
+    "sha256": "793a21ead785c14ef91c1dd897ac3393d576bf0647972e77c4b7b6b4cfd98a30"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809077 Test Data.txt",
+    "sha256": "5bd378c510b8934c0435dfef6ca068052366f213bf2fa6c688057569275dce81"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809078 Test Data.txt",
+    "sha256": "0548be9ec1242d59659f89128e1c5c49739e28ff04039bb75ac6a5becebc3942"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809079 Test Data.txt",
+    "sha256": "3bfef7b0f84fef4f8f1daa314d9c1491affc8c423c6315a37ccc0d75c389d705"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809080 Test Data.txt",
+    "sha256": "9ca99d3658da7ced4ee91c4668158428c431447c1c33d1f4effb6d892f346d0e"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810001 Test Data.txt",
+    "sha256": "c94a1390a5772df92969e00ee23a6834caf1a06d523f0466ed45e8d5b43e3791"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810002 Test Data.txt",
+    "sha256": "15f5fbe08d02c987fbdbc115ef270a33c49a87ae6719c6739dcf69918a2c5b05"
+   },
+   {
+    "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810003 Test Data.txt",
+    "sha256": "c3fa15085620c24213b63908003a067834d793a490ffebba3959a62b60ef74ab"
+   }
+  ]
+ },
+ "held_out_structure": {
+  "per_held_out_line_equal": true,
+  "deciding_lines_equal": true,
+  "pooled_counts_equal": true
+ },
+ "held_out_counts": {
+  "fired_lambda_missing": 0,
+  "fired_spark_sentinel": 0,
+  "final_rows": 16,
+  "final_lambda_published": 16,
+  "final_spark_published": 16,
+  "e8_subsets_enough": true
+ },
+ "versions": {
+  "python": "3.13.2",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "platform": "Windows-11-10.0.26200-SP0"
+ },
+ "run_once_nonce_sha256": "a423c79ac7cbc88a05af877baec730a4dc4d597bc6f10e34ce6d853ad643c1b2"
+}
