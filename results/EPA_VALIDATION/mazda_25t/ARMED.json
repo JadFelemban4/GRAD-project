@@ -2,7 +2,14 @@
  "schema": "epa-armed/1",
  "engine": "mazda_25t",
  "repo_path": "C:\\Users\\badcl\\Desktop\\GRAD-project",
- "armed_at_head": "9c788c319269e00acc7d42888f1ce0fcd958ad60",
+ "armed_at_head": "cc9f9060aa98ebcefd8626a99dc93fa1de659050",
+ "rearm": {
+  "k": 1,
+  "reason": "row 144: the first run crashed (crash_1.txt, TraceDefect in d3_rows.read_summary at a summary cell that is not a finite number) before writing any output; the fix leaves such a cell unread and its test out of only what reads it. Labels limited at best.",
+  "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a",
+  "previous_armed_blob": "0b799b7aa9d49298d2c825bcbfac9ab9b712fcb9",
+  "first_armed_commit": "c3ff39e8c2ff41c7d4a93a8462fb9cb6c5608d92"
+ },
  "fit_flags": [
   "S2_bound_active",
   "S3c_lines_without_holds",
@@ -49,8 +56,8 @@
   "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
-  "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
-  "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+  "validate_epa.py": "288c3c06d7bf6464899333a7e4e39a4d45ed15c70a98f3c6f13f106240a5d89b",
+  "d3_rows.py": "bb4c69d780ca7b5cd2eb4104721ec1c734f5eb3f1c3fd606abdcea96215c9795",
   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
@@ -62,6 +69,16 @@
    "path": "calibrate_epa.py",
    "defect_k": 3,
    "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450"
+  },
+  {
+   "path": "d3_rows.py",
+   "defect_k": 4,
+   "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
+  },
+  {
+   "path": "validate_epa.py",
+   "defect_k": 4,
+   "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
   }
  ],
  "pins": {
@@ -91,7 +108,8 @@
   "in_sample_sha_text": "d606b55047f90afc1bdefa6e4686aad925fa08c0d9b2124d75b1ca979c50ef96",
   "check_exit": 0,
   "in_sample_reruns": {
-   "in_sample_rerun1.json": "e70377cd698af0f2083286ff3fa61252d0c868b2042d7e583d9ef62db5a8e57f"
+   "in_sample_rerun1.json": "e70377cd698af0f2083286ff3fa61252d0c868b2042d7e583d9ef62db5a8e57f",
+   "in_sample_rerun2.json": "20c0340fd7f1e5ebf832e33bbcbc3514a95b45421f03ba2e6e28c571e7a89d45"
   }
  },
  "d3": {
@@ -295,5 +313,5 @@
   "scipy": "1.18.1",
   "platform": "Windows-11-10.0.26200-SP0"
  },
- "run_once_nonce_sha256": "e7ad39bb1b2e91028fdd6e674337003c97a8115032223fef97b1ba3b17ec5098"
+ "run_once_nonce_sha256": "c3c7c922b5c4a619ea110fb35a47b87045b96083ae5a64ea6c52fd91dd3d1e4d"
 }
