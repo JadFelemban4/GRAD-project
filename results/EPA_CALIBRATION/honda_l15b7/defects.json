@@ -22,5 +22,13 @@
   "assertion": "row 125: calibrate_epa.Audit.allowed refused the null device under the spelling norm() records (//./nul), which platform opens after a WMI timeout; N admits it and changes no arithmetic",
   "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450",
   "previous_run": "in_sample.json"
+ },
+ {
+  "k": 4,
+  "run_invocation": 10,
+  "found_by": "calibrate_epa.py check --defect (amendment C11)",
+  "assertion": "row 144: Run 2's first Mazda run (results/EPA_VALIDATION/mazda_25t/crash_1.txt) stopped in d3_rows.read_summary at a summary cell that is not a finite number; such a cell now leaves only what reads it, and validate_epa.summary's top-level entry is the governing one. Fixed after the Mazda's held-out statistics were computed in memory, none written or seen. Nothing refitted.",
+  "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a",
+  "previous_run": "in_sample_rerun1.json"
  }
 ]
