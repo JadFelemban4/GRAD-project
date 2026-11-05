@@ -1,0 +1,299 @@
+{
+ "schema": "epa-armed/1",
+ "engine": "mazda_25t",
+ "repo_path": "C:\\Users\\badcl\\Desktop\\GRAD-project",
+ "armed_at_head": "9c788c319269e00acc7d42888f1ce0fcd958ad60",
+ "fit_flags": [
+  "S2_bound_active",
+  "S3c_lines_without_holds",
+  "S3c_pr_falls_with_flow",
+  "S3d_extrapolated_rows",
+  "S4_physical_check"
+ ],
+ "all_row_depth_edge": {
+  "active": false,
+  "flag": "S3b_depth_set_by_the_all_row_floor",
+  "why": "S3b's depth bound is min(C1's, 1 - lam_floor); lam_floor is an all-row quantity, which can be the tighter edge only within the printed rounding of the calibration Final minimum; when active it is named in the C13 disclosure of the results"
+ },
+ "freeze": {
+  "path": "results/EPA_CALIBRATION/mazda_25t/freeze.json",
+  "sha_text": "5e505f3d523ed75e24d7c7d0981215d8edbcaf52a2de1d62f51a370f97689d39",
+  "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+ },
+ "complete": {
+  "path": "results/EPA_CALIBRATION/mazda_25t/complete.json",
+  "sha_text": "39dcce262cd68c4bab774d7870db22e94e2d98fdc5540b921a6a4963465715b0",
+  "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+ },
+ "derived": {
+  "path": "data/engines/mazda_25t/derived_params.json",
+  "sha_text": "04539bffebf732559171459ac1ef2aae424eeafe973186ce41ade0279752c7bb",
+  "derived_sha": "e8318dd80c3375f2"
+ },
+ "specs": {
+  "engine_specs/mazda_25t.toml": "a6477b4b0f8c0d3e4ab3d8f60939581b7a339024cacadb0e04c87aaa05d64ccc",
+  "engine_specs/cx9_2016.toml": "49004287e9a78ab0ee34ba8d7c16288c054a052c139e2f2bd37196a2f35ec536",
+  "engine_specs/cars/cx9_2016_25t.toml": "101a39544ef28387cab33483dbbe96caf4edf18c9d399fdf3db4d2a964b02aa4"
+ },
+ "contract": {
+  "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+  "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+  "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+  "schema": 4
+ },
+ "code": {
+  "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+  "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+  "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+  "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+  "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
+  "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+  "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+  "validate_epa.py": "978a1a00aa53515e8173a4c15a0e1d76af7a2264cb83de1448aeb73c1660acdd",
+  "d3_rows.py": "6fa5eb64b5e294bac307b8ab030b590f4cefa91d84b0496e46b30da40aa8de4b",
+  "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+  "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+  "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+  "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+  "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+ },
+ "code_changes_since_fit": [
+  {
+   "path": "calibrate_epa.py",
+   "defect_k": 3,
+   "fix_commit": "f48e5f0215b0a17e79ca28864daa77a906e70450"
+  }
+ ],
+ "pins": {
+  "u_D": "every term a gating row reads is pinned",
+  "d3_summary": "pinned"
+ },
+ "tightenings": {
+  "path": "results/EPA_TIGHTENINGS.json",
+  "sha_text": "50c073e84555522b2f7593dba50dc94be1e74d04e599e7fe6db921054595d5ba",
+  "commit": "4da4a319351ff18b8ee0097e50f0b2cb865a5959",
+  "plant": "b58"
+ },
+ "data": {
+  "tables_sha256": {
+   "epa_highload_final.csv": "ab057944b7fb4eeea0d789122a98c1c6d0b6d6fd2e5dae58df88627191d80449",
+   "epa_highload_initial.csv": "0540e533faddcada2cbbbc2917b33ace30114bf70b862196a9ec96f29d2dfeef",
+   "epa_steady.csv": "ab71a0087ee32fabfa21ae1a764015837b54ad531ad2017f38ccf59048286bfc"
+  },
+  "epa_engine_sha256": "cf5fc265d9a6324db9d7b8ceeaac5c75dd46db8dab06efa073fa67113bc1495e",
+  "epa_channels_blob": "a1c5627aa7468af13f28ea71ed2b6d92f3afbb13",
+  "manifest_sha256": "baccffe344e4b40b70ea26def9f26aacabe6f39798db11968c22b6061ce5c1e8"
+ },
+ "engine_sha": "2558cb2bcad4f2c6",
+ "plant_sha": "f86baf59389dea29",
+ "dump_sha256": "b2fc42faa5209160fb94714a6f441b91ab29cdb1c9a8b02986a010878d86189d",
+ "in_sample_check": {
+  "in_sample_sha_text": "d606b55047f90afc1bdefa6e4686aad925fa08c0d9b2124d75b1ca979c50ef96",
+  "check_exit": 0,
+  "in_sample_reruns": {
+   "in_sample_rerun1.json": "e70377cd698af0f2083286ff3fa61252d0c868b2042d7e583d9ef62db5a8e57f"
+  }
+ },
+ "d3": {
+  "data_folder": "C:\\Users\\badcl\\Desktop\\GRAD-engine-data",
+  "c3_files": [
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704001 Test Data.txt",
+    "sha256": "ff32b17a3c10aaf750a65b4a7c0f8f0326ca9147b69cba5faa1cb4ad071a4fbc"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704002 Test Data.txt",
+    "sha256": "957747f5edd1a5deabadf92dc7801e2dd5b75318e03e607612624eb38289abba"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704003 Test Data.txt",
+    "sha256": "7fb01a71d104ef6e98c3372d4eff9a367c10ca3bc37107bed0a847c882337a1a"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704004 Test Data.txt",
+    "sha256": "92f4b0e80a09e0cf53ba56b16350e728cf96a73ae123ae915c9c87946308d1f1"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704005 Test Data.txt",
+    "sha256": "2f9c799e66e63504e580e8abc4c770d99fe5bd2332e01129e0a4a6490296ac00"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704006 Test Data.txt",
+    "sha256": "a435c1aa7f7245dc5de7d216d435c680360c36d2be4ac2506e19b0f7ff1ca7e9"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704007 Test Data.txt",
+    "sha256": "4075d22d6e6b193eb8372c46008b48260c919849eddd376867406b2649e42e0a"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704008 Test Data.txt",
+    "sha256": "2b84538c501db4eb4429589051bdd4a7682b5d35f763fbba6d03691ac3ea86cb"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704009 Test Data.txt",
+    "sha256": "64f2cdd7bba7d6b6e62000cf07c5087ad0d1570802016901a02c8cc051643646"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704010 Test Data.txt",
+    "sha256": "b9f5f1f148f652ffd90225242be9e24de8853ae9e5d0a12c399b96e71e45ce47"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704011 Test Data.txt",
+    "sha256": "d60f9f8f2ecefdb9bf244d534ce69d683cf056e4993846fff2ff32d4cd191f16"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704012 Test Data.txt",
+    "sha256": "982ce7b1fc01ceb6cef13b859745d30245c0ee3d8e6eccd4a315abeeaaf7a0e7"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704013 Test Data.txt",
+    "sha256": "a1a22c0359a8f115fa848ca956b4ec5e18939ded7fd820bb38bcd4d8afd0acb6"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704014 Test Data.txt",
+    "sha256": "a00eaa5e3ef51462f6eb8b2211a4bd4153d46ddefb7d21c5d2a2dabe5d70ff66"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704015 Test Data.txt",
+    "sha256": "bc8d0177632d6db2eb440cd528891aa6682779492c0a5f23e88f28f035524399"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704016 Test Data.txt",
+    "sha256": "783535ce61602758f26b7fcd185ccb057686502b1a73f6a496d99685f1f915a6"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704017 Test Data.txt",
+    "sha256": "8b49ad788e692059809a7a04acf154dbb72c6e4e8bcb528f7c69e198b1a85b4e"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704018 Test Data.txt",
+    "sha256": "fd9499c5aecf0f58c423e584312cffd2de1ebbdddd3cfad289a9e193f6780051"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704019 Test Data.txt",
+    "sha256": "2d65fc192737bdeee478af13957007dd9fe63dad218abb2541913ea9f5fbafdd"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704020 Test Data.txt",
+    "sha256": "ae68b28d63d8606293a5e9ab4d1642141972cf6ab267f26d55b275048a254a3d"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704021 Test Data.txt",
+    "sha256": "bddc16cb7b6dcb032874649f745330334dae765e7f07f0705851087f4e1cdb26"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704022 Test Data.txt",
+    "sha256": "4b49c401d43fb283240117a6726dd589e8e493ddef90da400dc83557ed1fca84"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704023 Test Data.txt",
+    "sha256": "51f06a12c92b25281c116ed146eeaa3a5568dd2c00e0aec1d719e88fd6dc1b89"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704024 Test Data.txt",
+    "sha256": "d559931e4dbb73e3a2ba9a11243b92c04e57f01254dc06d2dd93ae409f043b9a"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704025 Test Data.txt",
+    "sha256": "e50e31a8ee988cee7efb88550c86a0575c1b80adb7856652a05f04d11075910a"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704026 Test Data.txt",
+    "sha256": "8984e2460f6548b270baa07fe461d4bb6afd5d3ce603aa858a6f8fbf6a462999"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704027 Test Data.txt",
+    "sha256": "f3c51a82a43be5a1dbc14ed5171ee0083e50b7ef7501b6e5d5fd26aaafa68133"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704028 Test Data.txt",
+    "sha256": "75f13d421a9a2f2c72f5fd0fe61611e797c5300c610c8ce01dc93fc1e13c259d"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704029 Test Data.txt",
+    "sha256": "76427e10a4e6218f78e60af9a29e00e0eaa7b395bc3409a3f038a8d20a3755f3"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704030 Test Data.txt",
+    "sha256": "ff200dca662afc3a0763512dfe5af94a58f7f1e33f44c5cc8d539a6278fefa2d"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704031 Test Data.txt",
+    "sha256": "06938dc3ad83c33c03efa58e7c54313f5b84a92f432b96e597c0192a3301421f"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704032 Test Data.txt",
+    "sha256": "27134cf8699e4f4d7c12f83bb9f48b972fb9e5c84eb1661b0f388079b4769859"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704033 Test Data.txt",
+    "sha256": "7bdbd9a8c4872e7aa953e6eec831d62dc4f5a55c443a89e358b4ac2253c93e61"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704034 Test Data.txt",
+    "sha256": "d2796aae4794ab98e6b95a7d55618a2c4bb305ca3a96b2d9c87f584fed8c384c"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704035 Test Data.txt",
+    "sha256": "c7aa5168beeb7e03898ad53b60717bfc36eecf5f087cfdd5f67d7fc5ec84e7c0"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704036 Test Data.txt",
+    "sha256": "a056ade3f7e507c27b45119678fbe113ce7b0111a40e5d096ddeb718ab5f8aea"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704037 Test Data.txt",
+    "sha256": "2db2d1abe363f9632dc89352f923478a523d08a4ccfe161cc03a629b77028ffa"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704039 Test Data.txt",
+    "sha256": "1242ec797a6a79df0ad8f0747226025cc8161fdd7cde6d23c12a9fed4ed7d97e"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704040 Test Data.txt",
+    "sha256": "23d07e964d46a26dac089b3010aef6b8d2299b6953bfdbc4e2c692d984a9a906"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704041 Test Data.txt",
+    "sha256": "8c42599b28c76ba6bb765cc65073aeff00adc4dae76d307f842ba3f91ae96a97"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704042 Test Data.txt",
+    "sha256": "bbd93d4c9483c5e0037404b73c06c4a3ad2d060534c1f9f18ea0b2ea40a81f1f"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704043 Test Data.txt",
+    "sha256": "1fcb18a2e1a6e6f49669571f06a0f8efbc7518f839dcd2780a2891d5d31b80c6"
+   },
+   {
+    "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704044 Test Data.txt",
+    "sha256": "46128aa1bf9644172643c303d1b1ce6f35197aaedbda4b29906c3d3b59431ba5"
+   }
+  ],
+  "summary": {
+   "file": "anl-d3-2016-mazda-cx9/test-summary/2016_Mazda_CX9_Test_Summary_04052018.xlsx",
+   "sha256": "9667a2dc5a3f4cbdc3f5f3942c366aa2e253a1dbf549f3e00857bf522efcd8d7"
+  },
+  "accord": []
+ },
+ "held_out_structure": {
+  "per_held_out_line_equal": true,
+  "deciding_lines_equal": true,
+  "pooled_counts_equal": true
+ },
+ "held_out_counts": {
+  "fired_lambda_missing": 0,
+  "fired_spark_sentinel": 0,
+  "final_rows": 18,
+  "final_lambda_published": 18,
+  "final_spark_published": 18,
+  "e8_subsets_enough": true
+ },
+ "versions": {
+  "python": "3.13.2",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "platform": "Windows-11-10.0.26200-SP0"
+ },
+ "run_once_nonce_sha256": "e7ad39bb1b2e91028fdd6e674337003c97a8115032223fef97b1ba3b17ec5098"
+}
