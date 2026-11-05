@@ -1,0 +1,4525 @@
+{
+ "schema": "epa-e6-held-out/1",
+ "provenance": {
+  "engine": "honda_l15b7",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "30f640078c00d570fbc6c9457026d578302c31b7",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "288c3c06d7bf6464899333a7e4e39a4d45ed15c70a98f3c6f13f106240a5d89b",
+   "d3_rows.py": "bb4c69d780ca7b5cd2eb4104721ec1c734f5eb3f1c3fd606abdcea96215c9795",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "a4e6138b9d258b1f",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "7b3d8dbbbf0b58b5ff7613048890ce81bf92f269b920fd51eb2c63751d52757f",
+    "epa_highload_initial.csv": "f69e531f2cfe4c44b275ed222ff4f375f06fe751674eafaa7744503d603af2fc",
+    "epa_steady.csv": "ba8558ca2c35c9ede3583ecc091e58d090abc4bed54d6ffcc7b06b99bc2c018e"
+   },
+   "epa_engine_sha256": "6d3134cb686272e549942ed64a74cc4f60e50bc177f47d63675555c7b8d10d2c",
+   "epa_channels_blob": "3c7b296206a2682c580a6fd2e9017360e92e8924",
+   "manifest_sha256": "fdbcc949a39c343a30f3b88e425e96b0c937e3ff53d97e4cc2ec366988a2a9ed"
+  },
+  "view_sha256": "8c6a700ccbf9e96599a5c3bfbc3817b88f2daefb7e36c1c9340c196723b2da58",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "freeze": {
+   "sha_text": "641d6a7cdc99f69a2ae1239cc5f52486e771561223edae902028b520efe8a034",
+   "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+  },
+  "complete": {
+   "sha_text": "f147e8efcc405d467aa43ca3d1a0ce026d28e881c5e4e7f3f1b2f15388d340ea",
+   "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+  },
+  "derived_sha": "2970c3ff3768a61d",
+  "engine_sha": "ae07dfb4edb9ceb3",
+  "dump_sha256": "a7514c0116b52e56c0538056b7ddbbdd9c13f5f3bfcfc63f158f290cd681857b",
+  "tightenings": {
+   "sha_text": "50c073e84555522b2f7593dba50dc94be1e74d04e599e7fe6db921054595d5ba",
+   "commit": "4da4a319351ff18b8ee0097e50f0b2cb865a5959",
+   "plant": "b58"
+  },
+  "d3": {
+   "data_folder": "C:\\Users\\badcl\\Desktop\\GRAD-engine-data",
+   "c3_files": [],
+   "summary": {
+    "file": "anl-d3-2018-honda-accord-lx/test-summary/2018_Honda_Accord_Test_Summary_20191125.xlsx",
+    "sha256": "99260167e25a1757128df9d371b014ecdf53c47dd1e59dc86a580c62a21a89dc"
+   },
+   "accord": [
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809025 Test Data.txt",
+     "sha256": "9c5fcf7453bef4039f5cd1850153922c98d30357c4ebfdea31817e6c2c1b6d41"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809026 Test Data.txt",
+     "sha256": "0b0101bd0dae98600bccabb1838ad2b2f85894de7b7253596f15923dfbf6017a"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809027 Test Data.txt",
+     "sha256": "1d3412a7e1d4de2983dc82f5b0c984781854ff3c58eb7c6da38f0ba2c9a25636"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809028 Test Data.txt",
+     "sha256": "3ea5e1686cbf4dde46505728447602bf457b4f01cc2280b19e1a69f53be0166a"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809029 Test Data.txt",
+     "sha256": "595ea20ae1d8b86d839feccbbbec5adaf3ab9020b09d2b102e4e4fb20a4f4b42"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809030 Test Data.txt",
+     "sha256": "7463fc757f8e9eb1bf0cb43b57bcaac35dc1b6e8c56c42fb9d92d55367018b9c"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809031 Test Data.txt",
+     "sha256": "7658ea8420698d730d0a3b6dd0619268d7ad187500d33d708f1968ebeba7eef2"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809032 Test Data.txt",
+     "sha256": "0ccd59c3cc380dfcb3dec0d66e5fb0307e0289dfa716fcc563adb09afc66ac93"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809033 Test Data.txt",
+     "sha256": "d9a5335a9094b1e297760c05af129d52bc0475bdca679a50bfc9d1d588a6373a"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809034 Test Data.txt",
+     "sha256": "bc7b1358948569d7e6c796bf2f2183c7e109a8c4ae111d81ab2b4e705cb1178d"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809035 Test Data.txt",
+     "sha256": "e80fbc88b1a7409cf73df20c2056287ea2f1b72442d33d8347a4af0812f4e2df"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809036 Test Data.txt",
+     "sha256": "3305fce22e223c9faeadb3d9140ef75dd1ab047476a0c718b9bf4988d07bc4de"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809037 Test Data.txt",
+     "sha256": "a81bca615cda56e3b2108637531d392c6dd3c0811ae59dcaa1214397f1390552"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809038 Test Data.txt",
+     "sha256": "8094e1c635c690087d107296fe35ae23a7774f031cb3ba58d98b5ed27ed5703e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809039 Test Data.txt",
+     "sha256": "e02dad2895803ac39a8bf7a1759cad3d1045b20e7dcecdc19a7bc1da58fd952e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809040 Test Data.txt",
+     "sha256": "72b067b5005e8149777dc97078690b26e791edcdd479ea269b5d3da1299939c2"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809041 Test Data.txt",
+     "sha256": "b61b38537cd529c2c668f788acd02c79274f53b180a38c1432c1c49fbcc856a0"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809042 Test Data.txt",
+     "sha256": "10f3481d447db9db95d06de1bcbaf914f0e34e8b636ccc65a70fd2fb0a48884f"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809043 Test Data.txt",
+     "sha256": "9d431566b6637bc4cd9507dd62687ee2956f63fa91f03f8f6eb8a2a28b9b460d"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809044 Test Data.txt",
+     "sha256": "41b7c4f61122cc089c4239faa874081a9d27de1ad350fd7141acd2de32a26c85"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809045 Test Data.txt",
+     "sha256": "2043a488653aa4958fc198965c8cc724c7d1c467475bdca9e8e7cc347029f7e2"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809046 Test Data.txt",
+     "sha256": "64cc9368ec6dac6a99bf60fb3bf0f5c2cfc1f5f0d3e185c3b4bd26e2a9c1f152"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809047 Test Data.txt",
+     "sha256": "72188db4f366a6817ffee40f1d7d57d933f166c53c5ede869588532250b09531"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809048 Test Data.txt",
+     "sha256": "83b81507905e9c9fdbb6bbe2c1ea1a4e08ccc99da869459a114df91c18e20f54"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809049 Test Data.txt",
+     "sha256": "ac5f46d5857d25c43f05e62567d50eaff5caf759a7710fd95506b703537d3cf7"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809050 Test Data.txt",
+     "sha256": "a509f31f7cdfb910867c70943314b14196bc05a24b309284b6baf3f6e2e20716"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809051 Test Data.txt",
+     "sha256": "1c8853b060d4f4e44d2bb47ced02300165d5971a149ed352869c35e5e39b9264"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809052 Test Data.txt",
+     "sha256": "6f74ea15b5a16e11395eeeb54a3910b4624afaf9ff40748d43b8f22c0ca62af7"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809053 Test Data.txt",
+     "sha256": "471db9ea530ee222686cdbe5ae36527be54de5aa4ed5b62ab3348a198ce5c581"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809054 Test Data.txt",
+     "sha256": "ac3d8c6cefc2b314b976f8cd3df44a8073af7345747f1506b4876e5c6288f485"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809055 Test Data.txt",
+     "sha256": "73213dfb0edc67dd6acba99a44568602239b94ce201df3dc618fbfbadb05fffd"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809056 Test Data.txt",
+     "sha256": "82f6d45bd04850db60337b0c78b5f1e1188c8e8d48d466f45ca9dc98af45b18e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809057 Test Data.txt",
+     "sha256": "73f98a760a30375ee1e8a9a3416c725aab1b5ac774d95c8729babb777e4dc68f"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809058 Test Data.txt",
+     "sha256": "734de969c67e7b040e7b3a84bb6cc64c6f6198c80d11ac05da8c65107db672e9"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809059 Test Data.txt",
+     "sha256": "8dd13ab27e99e517a4da1cc31981adb16aa512d04dcb76744a454ec4751b0c48"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809060 Test Data.txt",
+     "sha256": "90530c596ed9e022d8d5c8323ef7b62adc69e3683d11f9a8b9dcda38836c0567"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809061 Test Data.txt",
+     "sha256": "360fe5b127d07b3a87782d77ea285916b7ba61d2abac0beff3a2cb859e59d877"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809062 Test Data.txt",
+     "sha256": "11de823253dfb73640f12e8c4d03e032d53f44a4bcf9135e27e768bfef5f6bc6"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809063 Test Data.txt",
+     "sha256": "f434c88cdb3d480a96738aa6688e9d1fd3f0de738a9296cdb2a7841d80773e76"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809067 Test Data.txt",
+     "sha256": "d97b3603f22c852e01f6e34bd23eacd42d2d3631702ef52a556bd5175cabd179"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809068 Test Data.txt",
+     "sha256": "7e0580710d823cd1b8516db8ea06a1974c216932fa6fadbe6d25e39d420ba47b"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809069 Test Data.txt",
+     "sha256": "2936cc826da41802b45588b5196eb1159e83cfb86f5f85b3e4fd62390a8abb62"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809070 Test Data.txt",
+     "sha256": "a9b6a74bb6eae441567c0b2b2655a41b97e8faa02be2d4d051c0fc5f904bd9c3"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809071 Test Data.txt",
+     "sha256": "0daa6a5151d0bfbc966745013f3f153fe637c5aaab9ccc60693637c461891c39"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809072 Test Data.txt",
+     "sha256": "84a39f12ab455a08f9ee3762eed00a8ac2c1c173130c9b4be8e1667021e5319c"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809073 Test Data.txt",
+     "sha256": "d9098e9410ffe10166935b1df3354a918d867fc0c13782381b54ff283344d287"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809074 Test Data.txt",
+     "sha256": "e348b2fa8c15c0c09564aa6228b09888d121916ec8a68a1e9101e95c9439db01"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809075 Test Data.txt",
+     "sha256": "8cf42ef1bfaa24613fdc3899bcaf12cd2196013c34217369830a52f66518b994"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809076 Test Data.txt",
+     "sha256": "793a21ead785c14ef91c1dd897ac3393d576bf0647972e77c4b7b6b4cfd98a30"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809077 Test Data.txt",
+     "sha256": "5bd378c510b8934c0435dfef6ca068052366f213bf2fa6c688057569275dce81"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809078 Test Data.txt",
+     "sha256": "0548be9ec1242d59659f89128e1c5c49739e28ff04039bb75ac6a5becebc3942"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809079 Test Data.txt",
+     "sha256": "3bfef7b0f84fef4f8f1daa314d9c1491affc8c423c6315a37ccc0d75c389d705"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809080 Test Data.txt",
+     "sha256": "9ca99d3658da7ced4ee91c4668158428c431447c1c33d1f4effb6d892f346d0e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810001 Test Data.txt",
+     "sha256": "c94a1390a5772df92969e00ee23a6834caf1a06d523f0466ed45e8d5b43e3791"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810002 Test Data.txt",
+     "sha256": "15f5fbe08d02c987fbdbc115ef270a33c49a87ae6719c6739dcf69918a2c5b05"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810003 Test Data.txt",
+     "sha256": "c3fa15085620c24213b63908003a067834d793a490ffebba3959a62b60ef74ab"
+    }
+   ]
+  },
+  "armed_blob": "b54cdc6ef7d197df23e2506cc2739f4f72f7900f"
+ },
+ "rows": {
+  "1": {
+   "variants": {
+    "1": {
+     "delta_E": {
+      "E1a": -0.8688396020857923,
+      "E2a": 0.6201820933388111,
+      "E3a": 0.1470461281212927,
+      "E4a": 2.570969175731726,
+      "E1b": 0.09584498851302392,
+      "E2b": 0.005871226280628861,
+      "E3b": -0.06661926849140087,
+      "E1i": -0.6516276439428537,
+      "E4b": -2.7270490327669705,
+      "E5": null,
+      "D1": 0.32044962793737586,
+      "L0": 0.7363686795088604,
+      "L1": -0.09795642700405693,
+      "E8": null
+     },
+     "in_use": {
+      "hot_tit_at_lambda1_c": 863.6776631837023,
+      "egt_c": 764.6023835152131,
+      "air_gps": 107.89994385617453,
+      "exhaust_gps": 118.72590960397318,
+      "fuel_gps": 10.825965747798648,
+      "tau_s": 48.05639181388889,
+      "heat_per_gram_j": 42898.0,
+      "coolant_heat_w": 82830.55766462874,
+      "oil_heat_w": 1940.8967387683258,
+      "housing_eq_k": 4.931113698406809
+     }
+    }
+   },
+   "not_applicable": {
+    "E8": "not applicable: the row-1 variant's ECU is refitted to EPA's lambda as published, and E8 compares the model ECU's lambda with EPA's lambda cell-referenced (contract section 4, E8), so its delta would be mostly the table's offset lambda_ref - 1, not how far the model moves"
+   }
+  },
+  "3": {
+   "variants": {
+    "3": {
+     "delta_E": {
+      "E1a": -0.7088845299775084,
+      "E2a": 0.0,
+      "E3a": 5.501882710032305,
+      "E4a": 1.1327885762254937,
+      "E1b": 0.018456438461452507,
+      "E2b": 0.0,
+      "E3b": 3.0838769541522524,
+      "E1i": 0.44500240058219287,
+      "E4b": 7.740527605879686,
+      "E5": null,
+      "D1": 0.2503218968152603,
+      "L0": 4.912852924591878,
+      "L1": -3.371244763544521,
+      "E8": 0.0
+     },
+     "in_use": {
+      "hot_tit_at_lambda1_c": 875.0323144954513,
+      "egt_c": 760.5975036073338,
+      "air_gps": 108.91720803741545,
+      "exhaust_gps": 119.84523933584363,
+      "fuel_gps": 10.928031298428182,
+      "tau_s": 47.67174555478728,
+      "heat_per_gram_j": 44000.0,
+      "coolant_heat_w": 85759.35349377371,
+      "oil_heat_w": 2009.5246755295582,
+      "housing_eq_k": 2.3223217897831048
+     }
+    }
+   }
+  },
+  "7": {
+   "variants": {
+    "7_090": {
+     "delta_E": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "in_use": {
+      "hot_tit_at_lambda1_c": 862.1563720626503,
+      "egt_c": 757.8876083690672,
+      "air_gps": 108.91720803741545,
+      "exhaust_gps": 119.84523933584363,
+      "fuel_gps": 10.928031298428182,
+      "tau_s": 47.67174555478728,
+      "heat_per_gram_j": 42898.0,
+      "coolant_heat_w": 83611.47150399783,
+      "oil_heat_w": 1959.1952166106134,
+      "housing_eq_k": -1.717873279600789e-05,
+      "knock_share": 0.007447108091212863
+     }
+    },
+    "7_110": {
+     "delta_E": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "in_use": {
+      "hot_tit_at_lambda1_c": 862.1563720626503,
+      "egt_c": 757.8876083690672,
+      "air_gps": 108.91720803741545,
+      "exhaust_gps": 119.84523933584363,
+      "fuel_gps": 10.928031298428182,
+      "tau_s": 47.67174555478728,
+      "heat_per_gram_j": 42898.0,
+      "coolant_heat_w": 83611.47150399783,
+      "oil_heat_w": 1959.1952166106134,
+      "housing_eq_k": -1.717873279600789e-05,
+      "knock_share": 0.19270332780674537
+     }
+    }
+   }
+  },
+  "2": {
+   "delta_E": {
+    "E1a": 0.26885889211825376,
+    "E2a": -0.013753157720359344,
+    "E3a": -2.070206353256573,
+    "E4a": -0.3383807975036106,
+    "E1b": -0.0071840612304434615,
+    "E2b": 0.006039648617663929,
+    "E3b": -1.0230263251396252,
+    "E1i": -0.14780985517823808,
+    "E4b": -3.197737847905959,
+    "E5": null,
+    "D1": -0.0693599675291563,
+    "L0": -1.9633687499183452,
+    "L1": 1.4800717725870527,
+    "E8": 0.0
+   },
+   "must_not_move": {
+    "E2a": {
+     "dE": -0.013753157720359344,
+     "u_val": 0.1855102043437498,
+     "ok": true
+    },
+    "D1": {
+     "dE": -0.0693599675291563,
+     "u_val": 0.1305008689129984,
+     "ok": true
+    },
+    "L0": {
+     "dE": -1.9633687499183452,
+     "u_val": 3.2166164755718243,
+     "ok": true
+    }
+   },
+   "findings": [],
+   "e2_reading": "the contract's \"E2\" among row 2's rows that must not move is read as E2a, the gating row; E2b is descriptive, has no u_val, and its dE is reported in delta_E, not judged"
+  },
+  "4": {
+   "completion": {
+    "frozen": {
+     "tau_s": 47.67174074702707,
+     "peak_c": 655.4699174865558
+    },
+    "c_turb": {
+     "x0.75": {
+      "tau_s": 35.75380556027031,
+      "peak_c": 655.4830559622465
+     },
+     "x1.333": {
+      "tau_s": 63.54643041578709,
+      "peak_c": 655.4199254818484
+     }
+    },
+    "ua_gas_turb": {
+     "x0.75": {
+      "tau_s": 60.67007300465499,
+      "peak_c": 627.5150145656245
+     },
+     "x1.333": {
+      "tau_s": 37.08778077878914,
+      "peak_c": 678.2168616294737
+     }
+    },
+    "ua_turb_amb": {
+     "x0.75": {
+      "tau_s": 49.43938697598542,
+      "peak_c": 678.2228047139354
+     },
+     "x1.333": {
+      "tau_s": 45.504625330196866,
+      "peak_c": 627.5757021861007
+     }
+    }
+   },
+   "ceiling_below_2_mei": null
+  },
+  "5": {
+   "constants": {
+    "exh_bp_ratio": {
+     "sigma": {
+      "+": {
+       "E1a": -0.13538218586227302,
+       "E2a": 0.0,
+       "E3a": 2.4406888540100695,
+       "E4a": 2.362327438398893,
+       "E1b": 0.018982261769725284,
+       "E2b": 0.0,
+       "E3b": 0.30174309331196625,
+       "E1i": -0.12384072784301203,
+       "E4b": 0.22980920594868337,
+       "E5": null,
+       "D1": 0.036301061282246305,
+       "L0": 2.6028275040961013,
+       "L1": -0.09931537329230622,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.1353821858622526,
+       "E2a": 0.0,
+       "E3a": -2.4659803782731373,
+       "E4a": -2.386806946152433,
+       "E1b": -0.01828614055827238,
+       "E2b": 0.0,
+       "E3b": -0.14839442405502723,
+       "E1i": 0.12384072784300759,
+       "E4b": -0.2320187283511359,
+       "E5": null,
+       "D1": -0.03024723819985642,
+       "L0": -2.6256467693922794,
+       "L1": 0.10336330886288891,
+       "E8": 0.0
+      }
+     },
+     "probe": {
+      "+": {
+       "E1a": -0.5548152961398962,
+       "E2a": 0.0,
+       "E3a": 9.84783263932222,
+       "E4a": 9.53165546456652,
+       "E1b": 0.08067557161444583,
+       "E2b": 0.0,
+       "E3b": 2.104479744590531,
+       "E1i": -0.5075167730140189,
+       "E4b": 0.9282855127264007,
+       "E5": null,
+       "D1": 0.18206552487430772,
+       "L0": 10.517782641736037,
+       "L1": -0.39428579289810983,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.5548152961398829,
+       "E2a": 0.0,
+       "E3a": -10.273066422572265,
+       "E4a": -9.943236577109744,
+       "E1b": -0.07717981019156639,
+       "E2b": 0.0,
+       "E3b": -0.15413197280107482,
+       "E1i": 0.5075167730140162,
+       "E4b": -0.9654334512831184,
+       "E5": null,
+       "D1": -0.0747022372794004,
+       "L0": -10.924762388822,
+       "L1": 0.4331409694858408,
+       "E8": 0.0
+      }
+     },
+     "d_probe": {
+      "+": {
+       "E1a": -1.050621472644334,
+       "E2a": 0.0,
+       "E3a": 18.319320540547054,
+       "E4a": 17.731155486966934,
+       "E1b": 0.15485705240989311,
+       "E2b": 0.0,
+       "E3b": 5.9890222763150724,
+       "E1i": -0.9610550090552095,
+       "E4b": 1.7290464978389792,
+       "E5": null,
+       "D1": 0.41809470146728334,
+       "L0": 19.598020262944598,
+       "L1": -0.7214406700665705,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 1.0506214726443242,
+       "E2a": 0.0,
+       "E3a": -37.37791963636596,
+       "E4a": -19.21153556374047,
+       "E1b": -0.12942106789912522,
+       "E2b": 0.0,
+       "E3b": 0.8793151286373195,
+       "E1i": 0.9610550090552064,
+       "E4b": -5.535168700554507,
+       "E5": null,
+       "D1": -0.06722381955185286,
+       "L0": -14.397916497479303,
+       "L1": 0.8462964767452128,
+       "E8": 0.0
+      }
+     }
+    },
+    "exh_bp_min_kpa": {
+     "sigma": {
+      "+": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 0.0,
+       "E4a": 0.0,
+       "E1b": 0.044923422193877016,
+       "E2b": 0.0,
+       "E3b": 0.21762655569298062,
+       "E1i": 0.0,
+       "E4b": 0.0,
+       "E5": null,
+       "D1": 0.013435313971897678,
+       "L0": 0.0,
+       "L1": 0.0,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 0.0,
+       "E4a": 0.0,
+       "E1b": -0.05223684554459673,
+       "E2b": 0.0,
+       "E3b": -0.031156649370668532,
+       "E1i": 0.0,
+       "E4b": 0.0,
+       "E5": null,
+       "D1": -0.01601848720375365,
+       "L0": 0.0,
+       "L1": 0.0,
+       "E8": 0.0
+      }
+     },
+     "probe": {
+      "+": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 0.0,
+       "E4a": 0.0,
+       "E1b": 0.20280035578437605,
+       "E2b": 0.0,
+       "E3b": 0.5602882526289754,
+       "E1i": 0.0,
+       "E4b": -2.8090728909591647,
+       "E5": null,
+       "D1": 0.10569405693914646,
+       "L0": 0.0,
+       "L1": 0.0,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 0.0,
+       "E4a": 0.0,
+       "E1b": -0.18804203213834114,
+       "E2b": 0.0,
+       "E3b": -0.12195102959629267,
+       "E1i": 0.0,
+       "E4b": 0.0,
+       "E5": null,
+       "D1": -0.026637437154503285,
+       "L0": 0.0,
+       "L1": 0.0,
+       "E8": 0.0
+      }
+     },
+     "d_probe": {
+      "+": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 0.0,
+       "E4a": 0.0,
+       "E1b": 0.20280035578437605,
+       "E2b": 0.0,
+       "E3b": 0.5602882526289754,
+       "E1i": 0.0,
+       "E4b": -2.8090728909591647,
+       "E5": null,
+       "D1": 0.10569405693914646,
+       "L0": 0.0,
+       "L1": 0.0,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 0.0,
+       "E4a": 0.0,
+       "E1b": -0.18804203213834114,
+       "E2b": 0.0,
+       "E3b": -0.12195102959629267,
+       "E1i": 0.0,
+       "E4b": 0.0,
+       "E5": null,
+       "D1": -0.026637437154503285,
+       "L0": 0.0,
+       "L1": 0.0,
+       "E8": 0.0
+      }
+     }
+    }
+   },
+   "sigma": {
+    "exh_bp_ratio": 0.014469588396927992,
+    "exh_bp_min_kpa": 2.843764785388861
+   },
+   "probe": {
+    "exh_bp_ratio": 0.05929841448734845,
+    "exh_bp_min_kpa": 10.499111284138776
+   },
+   "must_move": [
+    "E1a",
+    "E3a",
+    "L0"
+   ],
+   "must_move_moved": {
+    "E1a": {
+     "exh_bp_ratio +": true,
+     "exh_bp_ratio -": true,
+     "exh_bp_min_kpa +": false,
+     "exh_bp_min_kpa -": false
+    },
+    "E3a": {
+     "exh_bp_ratio +": true,
+     "exh_bp_ratio -": true,
+     "exh_bp_min_kpa +": false,
+     "exh_bp_min_kpa -": false
+    },
+    "L0": {
+     "exh_bp_ratio +": true,
+     "exh_bp_ratio -": true,
+     "exh_bp_min_kpa +": false,
+     "exh_bp_min_kpa -": false
+    }
+   },
+   "findings": [
+    "E1a",
+    "E3a",
+    "L0"
+   ],
+   "descriptive_must_move": {},
+   "excluded_for": {
+    "E1a": false,
+    "E2a": true,
+    "E3a": false,
+    "E4a": false,
+    "L0": false,
+    "E4b": false,
+    "D1": false,
+    "L1": false,
+    "E8": true
+   },
+   "exclusion_reading": "a constant's exclusion is judged under the probe at both signs (rows 5 and 9) and, for the back-pressure law, at both of its fields: the law is one constant, so a row is excluded for it only when it moves by less than its u_val under every probe given, and a move at either sign of either field shows the row tests it (validate_epa._excluded)",
+   "not_visible_at_r1": {
+    "exh_bp_min_kpa": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 2.24e-06 K at +-10 %, the noise 0.000132 K)"
+   },
+   "beyond_range_at_r1": {}
+  },
+  "6": {
+   "constants": {
+    "ua_port": {
+     "sigma": {
+      "+": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": -7.6565753503886995,
+       "E4a": -5.484643689223773,
+       "E1b": 0.0,
+       "E2b": 0.0,
+       "E3b": 1.8975353841100144,
+       "E1i": 0.0,
+       "E4b": -0.48124235894077216,
+       "E5": null,
+       "D1": 0.0,
+       "L0": -7.595111508197011,
+       "L1": -1.7014582179601128,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 7.751599145038881,
+       "E4a": 5.537192106877079,
+       "E1b": 0.0,
+       "E2b": 0.0,
+       "E3b": 0.45297465461472086,
+       "E1i": 0.0,
+       "E4b": 0.47559774419665146,
+       "E5": null,
+       "D1": 0.0,
+       "L0": 7.688150761213816,
+       "L1": 1.7420112169184847,
+       "E8": 0.0
+      }
+     },
+     "probe": {
+      "+": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": -42.93084428198258,
+       "E4a": -24.826753176831446,
+       "E1b": 0.0,
+       "E2b": 0.0,
+       "E3b": 22.880062160564936,
+       "E1i": 0.0,
+       "E4b": -2.2580988903286894,
+       "E5": null,
+       "D1": 0.0,
+       "L0": -9.724819775988273,
+       "L1": -7.508354983845678,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 36.500961994525596,
+       "E4a": 25.941124284362978,
+       "E1b": 0.0,
+       "E2b": 0.0,
+       "E3b": 22.489471635150874,
+       "E1i": 0.0,
+       "E4b": 2.138297085378312,
+       "E5": null,
+       "D1": 0.0,
+       "L0": 36.19164821921876,
+       "L1": 8.368558897841737,
+       "E8": 0.0
+      }
+     },
+     "d_probe": {
+      "+": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": -14.628161518415528,
+       "E4a": -10.492055083571437,
+       "E1b": 0.0,
+       "E2b": 0.0,
+       "E3b": 5.8727795554741,
+       "E1i": 0.0,
+       "E4b": -0.9293857463317821,
+       "E5": null,
+       "D1": 0.0,
+       "L0": -14.511785392211596,
+       "L1": -3.2338408093298785,
+       "E8": 0.0
+      },
+      "-": {
+       "E1a": 0.0,
+       "E2a": 0.0,
+       "E3a": 14.978976629971385,
+       "E4a": 10.6860540852064,
+       "E1b": 0.0,
+       "E2b": 0.0,
+       "E3b": 2.5364964994107773,
+       "E1i": 0.0,
+       "E4b": 0.9085445719343639,
+       "E5": null,
+       "D1": 0.0,
+       "L0": 14.855273425680071,
+       "L1": 3.38355992413117,
+       "E8": 0.0
+      }
+     }
+    }
+   },
+   "sigma": {
+    "ua_port": 0.5635671076263004
+   },
+   "probe": {
+    "ua_port": 2.595055855564662
+   },
+   "must_move": [
+    "E3a",
+    "E3b",
+    "E4a",
+    "L0"
+   ],
+   "must_move_moved": {
+    "E3a": {
+     "ua_port +": true,
+     "ua_port -": true
+    },
+    "E3b": null,
+    "E4a": {
+     "ua_port +": true,
+     "ua_port -": true
+    },
+    "L0": {
+     "ua_port +": true,
+     "ua_port -": true
+    }
+   },
+   "findings": [],
+   "descriptive_must_move": {
+    "E3b": {
+     "why": "descriptive: no u_val, so the move is reported and not judged",
+     "dE": {
+      "ua_port +": 22.880062160564936,
+      "ua_port -": 22.489471635150874
+     }
+    }
+   },
+   "excluded_for": {
+    "E1a": true,
+    "E2a": true,
+    "E3a": false,
+    "E4a": false,
+    "L0": false,
+    "E4b": true,
+    "D1": true,
+    "L1": false,
+    "E8": true
+   },
+   "exclusion_reading": "a constant's exclusion is judged under the probe at both signs (rows 5 and 9) and, for the back-pressure law, at both of its fields: the law is one constant, so a row is excluded for it only when it moves by less than its u_val under every probe given, and a move at either sign of either field shows the row tests it (validate_epa._excluded)",
+   "not_visible_at_r1": {},
+   "beyond_range_at_r1": {}
+  },
+  "8": {
+   "u_num": {
+    "E1a": 0.028997698330707967,
+    "E2a": 0.0,
+    "E3a": 0.33560822923939293,
+    "E4a": 0.6787084684189694,
+    "E4b": 1.6845170244732923,
+    "D1": 0.048084206100223556,
+    "L0": 0.3235506824757425,
+    "L1": 0.4695422541406868,
+    "E8": 0.0
+   }
+  },
+  "9": {
+   "burn_res": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.2,
+    "bracket": null,
+    "values": {
+     "+": 2.2,
+     "-": 1.8
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -0.07321243510219233,
+      "E2a": 0.0,
+      "E3a": 0.6174668788664803,
+      "E4a": 0.6077349690494458,
+      "E1b": -0.0035852407841705514,
+      "E2b": 0.0,
+      "E3b": -0.004942871090548806,
+      "E1i": -0.08220352015266918,
+      "E4b": -0.04608407250865909,
+      "E5": null,
+      "D1": 0.005107331332571352,
+      "L0": 0.7167973907193286,
+      "L1": 0.1406913524826905,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.07180029458427395,
+      "E2a": 0.0,
+      "E3a": -0.624230471318107,
+      "E4a": -0.6119590697280728,
+      "E1b": 0.005721060419295654,
+      "E2b": 0.0,
+      "E3b": 0.015456468319197114,
+      "E1i": 0.08514474600241506,
+      "E4b": 0.026954056466653498,
+      "E5": null,
+      "D1": -0.0037684461461369168,
+      "L0": -0.7256540164431513,
+      "L1": -0.14534467202961565,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.2,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.07321243510219233,
+      "E2a": 0.0,
+      "E3a": 0.6174668788664803,
+      "E4a": 0.6077349690494458,
+      "E1b": -0.0035852407841705514,
+      "E2b": 0.0,
+      "E3b": -0.004942871090548806,
+      "E1i": -0.08220352015266918,
+      "E4b": -0.04608407250865909,
+      "E5": null,
+      "D1": 0.005107331332571352,
+      "L0": 0.7167973907193286,
+      "L1": 0.1406913524826905,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.07180029458427395,
+      "E2a": 0.0,
+      "E3a": -0.624230471318107,
+      "E4a": -0.6119590697280728,
+      "E1b": 0.005721060419295654,
+      "E2b": 0.0,
+      "E3b": 0.015456468319197114,
+      "E1i": 0.08514474600241506,
+      "E4b": 0.026954056466653498,
+      "E5": null,
+      "D1": -0.0037684461461369168,
+      "L0": -0.7256540164431513,
+      "L1": -0.14534467202961565,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 3.2143896664363076,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.6222020997900162,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 2.0 +- 3.21439; BOUNDS None; the cycles' torque 189.86507808003591 / 193.8209647144727 N m)",
+    "range_tests_failed": [
+     "sign"
+    ]
+   },
+   "ce_rich_slope": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.07638598454221239,
+    "bracket": null,
+    "values": {
+     "+": 0.5408974568475295,
+     "-": 0.38812548776310474
+    },
+    "retag_identity": true,
+    "delta_E": {
+     "+": {
+      "E1a": -2.3274966596480002,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": -11.60996267350557,
+      "E1b": 0.2371801842509278,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": -0.2077361229268293,
+      "E4b": 12.639550237940554,
+      "E5": null,
+      "D1": 0.4732910673669597,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 2.304314869540727,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 11.49393183497633,
+      "E1b": -0.22551161178576073,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.2071914244802464,
+      "E4b": -12.505174209350749,
+      "E5": null,
+      "D1": -0.36069753805178006,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.04645114723053172,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -1.412229806615839,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": -7.051919338284549,
+      "E1b": 0.14400150583904292,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": -0.1262235182751903,
+      "E4b": 7.670758618002214,
+      "E5": null,
+      "D1": 0.2796236556070242,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 1.4039923042194786,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 6.998593994942404,
+      "E1b": -0.1432273647241349,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.12591212971015509,
+      "E4b": -7.6187327714633675,
+      "E5": null,
+      "D1": -0.22892609391449836,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "sigma": 0.04529599072767454,
+    "sigma_why": null,
+    "delta_E_sigma": {
+     "+": {
+      "E1a": -1.3770091038463068,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": -6.876256451465679,
+      "E1b": 0.14041756893108825,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": -0.12308124420674638,
+      "E4b": 7.479539867597605,
+      "E5": null,
+      "D1": 0.272244733254134,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 1.3691551965215423,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 6.824473624127258,
+      "E1b": -0.13966598490395654,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.12278490384022955,
+      "E4b": -7.429562500052256,
+      "E5": null,
+      "D1": -0.22379811609164557,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": true,
+     "E4a": false,
+     "L0": true,
+     "E4b": false,
+     "D1": false,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 0.07638598454221239,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": {
+     "size": 0.04529599072767454,
+     "source": "the fit's standard uncertainty"
+    },
+    "housing_change_k": 5.9298824253084135,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": false,
+    "load_bearing_why": null,
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "conrod": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "geometry",
+    "size": 0.013646257928118391,
+    "bracket": null,
+    "values": {
+     "+": 0.1501088372093023,
+     "-": 0.12281632135306551
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -0.04291933867811437,
+      "E2a": 0.0,
+      "E3a": -1.4827377154798782,
+      "E4a": -1.5561851508685294,
+      "E1b": -0.00039633919583792476,
+      "E2b": 0.0,
+      "E3b": -0.03743152958346485,
+      "E1i": 0.0019657741342626878,
+      "E4b": 0.11322722031598076,
+      "E5": null,
+      "D1": 0.0488459073753722,
+      "L0": -1.445545632982114,
+      "L1": -0.5111552099603642,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.05115646111768246,
+      "E2a": 0.0,
+      "E3a": 1.7913702956403093,
+      "E4a": 1.8819857534272515,
+      "E1b": 0.0004994153767547971,
+      "E2b": 0.0,
+      "E3b": 0.10905606941379276,
+      "E1i": -0.0043205873397011985,
+      "E4b": -0.13951258394289212,
+      "E5": null,
+      "D1": -0.05386873955491511,
+      "L0": 1.748753171195812,
+      "L1": 0.6241813540713785,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.013646257928118391,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.04291933867811437,
+      "E2a": 0.0,
+      "E3a": -1.4827377154798782,
+      "E4a": -1.5561851508685294,
+      "E1b": -0.00039633919583792476,
+      "E2b": 0.0,
+      "E3b": -0.03743152958346485,
+      "E1i": 0.0019657741342626878,
+      "E4b": 0.11322722031598076,
+      "E5": null,
+      "D1": 0.0488459073753722,
+      "L0": -1.445545632982114,
+      "L1": -0.5111552099603642,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.05115646111768246,
+      "E2a": 0.0,
+      "E3a": 1.7913702956403093,
+      "E4a": 1.8819857534272515,
+      "E1b": 0.0004994153767547971,
+      "E2b": 0.0,
+      "E3b": 0.10905606941379276,
+      "E1i": -0.0043205873397011985,
+      "E4b": -0.13951258394289212,
+      "E5": null,
+      "D1": -0.05386873955491511,
+      "L0": 1.748753171195812,
+      "L1": 0.6241813540713785,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": false,
+     "E8": true
+    },
+    "worth_r1": 0.1893995950852029,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.7205009029707542,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign, finite: the probe 0.1364625792811839 +- 0.1894; BOUNDS None; the cycles' torque 191.16576604163618 / nan N m)",
+    "range_tests_failed": [
+     "sign",
+     "finite"
+    ]
+   },
+   "cp_exh": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 273.0632687131357,
+    "bracket": null,
+    "values": {
+     "+": 1423.0632687131356,
+     "-": 876.9367312868643
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 29.05880787337164,
+      "E4a": 20.67896369824465,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 14.476805889950068,
+      "E1i": 0.0,
+      "E4b": 1.723085102475551,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 28.81471499914578,
+      "L1": 6.628632026822697,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": -50.71575121103842,
+      "E4a": -32.04795823061606,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 34.02932533181492,
+      "E1i": 0.0,
+      "E4b": -2.952833901432218,
+      "E5": null,
+      "D1": 0.0,
+      "L0": -1.9402138152604032,
+      "L1": -9.597886025442381,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 115.0,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 13.602533618760752,
+      "E4a": 9.706483539503473,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 1.9878565962807997,
+      "E1i": 0.0,
+      "E4b": 0.8268686528033342,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 13.490387037684012,
+      "L1": 3.0696510584823926,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": -16.232218816732164,
+      "E4a": -11.646018536460133,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 6.985446131846917,
+      "E1i": 0.0,
+      "E4b": -1.033842777448502,
+      "E5": null,
+      "D1": 0.0,
+      "L0": -16.103351151265976,
+      "L1": -3.5841193711260786,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": false,
+     "E4a": false,
+     "L0": false,
+     "E4b": true,
+     "D1": true,
+     "L1": false,
+     "E8": true
+    },
+    "worth_r1": 273.0632687131357,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "delay_res": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.15000000000000002,
+    "bracket": null,
+    "values": {
+     "+": 1.65,
+     "-": 1.35
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -0.0773260694743767,
+      "E2a": 0.0,
+      "E3a": 0.6133374493649164,
+      "E4a": 0.601680651632094,
+      "E1b": -0.004196125115068838,
+      "E2b": 0.0,
+      "E3b": -0.004041019169992666,
+      "E1i": -0.08789670303635866,
+      "E4b": -0.05373152692144245,
+      "E5": null,
+      "D1": 0.00841603631764043,
+      "L0": 0.7097901464147078,
+      "L1": 0.14329805665738604,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.07542237086550063,
+      "E2a": 0.0,
+      "E3a": -0.6211270835154217,
+      "E4a": -0.6195298306219428,
+      "E1b": 0.007013255286462794,
+      "E2b": 0.0,
+      "E3b": 0.011878337767807778,
+      "E1i": 0.09190721135401869,
+      "E4b": 0.03386769438034065,
+      "E5": null,
+      "D1": -0.006331180114906854,
+      "L0": -0.7294218903108707,
+      "L1": -0.1569437747062281,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.15000000000000002,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.0773260694743767,
+      "E2a": 0.0,
+      "E3a": 0.6133374493649164,
+      "E4a": 0.601680651632094,
+      "E1b": -0.004196125115068838,
+      "E2b": 0.0,
+      "E3b": -0.004041019169992666,
+      "E1i": -0.08789670303635866,
+      "E4b": -0.05373152692144245,
+      "E5": null,
+      "D1": 0.00841603631764043,
+      "L0": 0.7097901464147078,
+      "L1": 0.14329805665738604,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.07542237086550063,
+      "E2a": 0.0,
+      "E3a": -0.6211270835154217,
+      "E4a": -0.6195298306219428,
+      "E1b": 0.007013255286462794,
+      "E2b": 0.0,
+      "E3b": 0.011878337767807778,
+      "E1i": 0.09190721135401869,
+      "E4b": 0.03386769438034065,
+      "E5": null,
+      "D1": -0.006331180114906854,
+      "L0": -0.7294218903108707,
+      "L1": -0.1569437747062281,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 2.4575290375224697,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.6103691867308345,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 1.5 +- 2.45753; BOUNDS None; the cycles' torque 189.76056329453075 / 194.0019337397345 N m)",
+    "range_tests_failed": [
+     "sign"
+    ]
+   },
+   "evo_deg": {
+    "method": "bracket",
+    "why_not_bracket": null,
+    "record": "geometry",
+    "size": null,
+    "bracket": [
+     145.25162985139534,
+     174.30388367374826
+    ],
+    "values": {
+     "+": 174.30388367374826,
+     "-": 145.25162985139534
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 3.876470561088388,
+      "E2a": 0.0,
+      "E3a": -10.821623002210345,
+      "E4a": -10.543537197369005,
+      "E1b": 0.23364954397640858,
+      "E2b": 0.0,
+      "E3b": 0.6383905314043865,
+      "E1i": 4.3828817212421,
+      "E4b": -0.130754421472691,
+      "E5": null,
+      "D1": 0.9128431872174936,
+      "L0": -14.670906857918208,
+      "L1": -2.618793373984751,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 1.0579980886376603,
+      "E2a": 0.0,
+      "E3a": -1.6750826433698869,
+      "E4a": -1.7138752583108143,
+      "E1b": -0.10485418703645522,
+      "E2b": 0.0,
+      "E3b": -0.04909141796444416,
+      "E1i": 1.1966091856556416,
+      "E4b": 0.0854136239442731,
+      "E5": null,
+      "D1": -0.07488174654724844,
+      "L0": -3.0557552922437026,
+      "L1": -0.6475348695972585,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 10.0,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 1.7876879174308504,
+      "E2a": 0.0,
+      "E3a": -3.065454750891945,
+      "E4a": -3.110088905785993,
+      "E1b": -0.1104354306197255,
+      "E2b": 0.0,
+      "E3b": -0.053801158630250256,
+      "E1i": 2.021817379056489,
+      "E4b": 0.12199810478450246,
+      "E5": null,
+      "D1": 0.06762581946080815,
+      "L0": -5.410887010867761,
+      "L1": -1.1109903935446965,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -2.4403260508791256,
+      "E2a": 0.0,
+      "E3a": 2.950997105105671,
+      "E4a": 3.1203348799109207,
+      "E1b": 0.6668350858568903,
+      "E2b": 0.0,
+      "E3b": 0.3816403520495548,
+      "E1i": -6.971984624104309,
+      "E4b": -0.28327112740214133,
+      "E5": null,
+      "D1": 1.6196544621512023,
+      "L0": 6.094915629497198,
+      "L1": 1.4686242175230255,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": false,
+     "E4a": false,
+     "L0": false,
+     "E4b": true,
+     "D1": false,
+     "L1": false,
+     "E8": true
+    },
+    "worth_r1": 16.148508321681685,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": {
+     "edges": [
+      145.25162985139534,
+      174.30388367374826
+     ],
+     "housing_change_k_at_edges": {
+      "lo": -3.252083565108159,
+      "hi": -21.242756910054894
+     },
+     "source": "the bracket EPA's valve channels give, judged at its two edges (defect D-2)"
+    },
+    "housing_change_k": 21.242756910054894,
+    "probe_housing_change_k": 21.242756910054894,
+    "load_bearing": true,
+    "load_bearing_why": null,
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": null
+   },
+   "flame_floor": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.025,
+    "bracket": null,
+    "values": {
+     "+": 0.275,
+     "-": 0.225
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.025,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000132 K)",
+    "beyond_range_at_r1": null,
+    "range_tests_failed": null
+   },
+   "flame_lam": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.039305496295335744,
+    "bracket": null,
+    "values": {
+     "+": 0.9393054962953358,
+     "-": 0.8606945037046643
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -1.6916408551262752,
+      "E2a": 0.0,
+      "E3a": -3.518201093561835,
+      "E4a": 8.38463912953754,
+      "E1b": 0.1276232860223363,
+      "E2b": 0.0,
+      "E3b": 0.057128133833181494,
+      "E1i": 0.31680719322303386,
+      "E4b": -12.117394705741269,
+      "E5": null,
+      "D1": 0.4256396947886967,
+      "L0": -4.064866142174697,
+      "L1": -0.8350416132980172,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 1.0493640911704896,
+      "E2a": 0.0,
+      "E3a": 5.513905351832637,
+      "E4a": -5.9870739945782105,
+      "E1b": -0.0689742150300301,
+      "E2b": 0.0,
+      "E3b": 0.4209667113358435,
+      "E1i": -0.6222643323687356,
+      "E4b": 11.253366252193562,
+      "E5": null,
+      "D1": -0.18309045580615724,
+      "L0": 6.449225121172002,
+      "L1": 1.2468097977480284,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.09000000000000001,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -5.377750815818983,
+      "E2a": 0.0,
+      "E3a": -5.444563872194294,
+      "E4a": 23.602324451882048,
+      "E1b": 0.5549364305726403,
+      "E2b": 0.0,
+      "E3b": 0.12571223839550072,
+      "E1i": 0.33308078713676537,
+      "E4b": -30.728329070032558,
+      "E5": null,
+      "D1": 1.3563741596766743,
+      "L0": -6.280908257433566,
+      "L1": -1.3220199445438112,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 1.821139330813403,
+      "E2a": 0.0,
+      "E3a": 16.176933548622493,
+      "E4a": -10.76500643960636,
+      "E1b": 0.054258650852561985,
+      "E2b": 0.0,
+      "E3b": 2.963367706238536,
+      "E1i": -2.0142007831722397,
+      "E4b": 26.092797497626115,
+      "E5": null,
+      "D1": 0.10143884366176303,
+      "L0": 19.11383125691486,
+      "L1": 3.3906846937089483,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": false,
+     "E4a": false,
+     "L0": false,
+     "E4b": false,
+     "D1": false,
+     "L1": false,
+     "E8": true
+    },
+    "worth_r1": 0.039305496295335744,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "flame_width": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.07279100767719685,
+    "bracket": null,
+    "values": {
+     "+": 0.49279100767719686,
+     "-": 0.3472089923228031
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.9712588121071555,
+      "E2a": 0.0,
+      "E3a": -1.5468629094254993,
+      "E4a": -3.6865037240118426,
+      "E1b": -0.023772131395483953,
+      "E2b": 0.0,
+      "E3b": -0.0026300476999807643,
+      "E1i": 0.1382155220354191,
+      "E4b": 3.820262318251199,
+      "E5": null,
+      "D1": -0.11428033260127668,
+      "L0": -1.7934047905549058,
+      "L1": -0.36609067239860593,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -2.2829989699953916,
+      "E2a": 0.0,
+      "E3a": 2.6717246282975786,
+      "E4a": 6.573324729687748,
+      "E1b": 0.06361146514862703,
+      "E2b": 0.0,
+      "E3b": 0.1583393845246306,
+      "E1i": -0.24355618915592459,
+      "E4b": -7.616257163168385,
+      "E5": null,
+      "D1": 0.3718997769704937,
+      "L0": 3.107289825280578,
+      "L1": 0.6100068380646917,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.042,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.6455668354939545,
+      "E2a": 0.0,
+      "E3a": -0.9803801185741108,
+      "E4a": -2.356292991656119,
+      "E1b": -0.01655553409048416,
+      "E2b": 0.0,
+      "E3b": -0.01573150638088805,
+      "E1i": 0.08746170513899632,
+      "E4b": 2.4620340375745116,
+      "E5": null,
+      "D1": -0.0793614791727757,
+      "L0": -1.1401661303518722,
+      "L1": -0.23643365234247682,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -1.0489331612980113,
+      "E2a": 0.0,
+      "E3a": 1.3386273310018169,
+      "E4a": 3.2729672600774293,
+      "E1b": 0.029345008601325162,
+      "E2b": 0.0,
+      "E3b": 0.049220461102880364,
+      "E1i": -0.12153483236522611,
+      "E4b": -3.6775969522358736,
+      "E5": null,
+      "D1": 0.15293790234746796,
+      "L0": 1.556032182445822,
+      "L1": 0.30160709417564036,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": true,
+     "E4a": false,
+     "L0": true,
+     "E4b": false,
+     "D1": false,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 0.07279100767719685,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "fres_a": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.0035000000000000005,
+    "bracket": null,
+    "values": {
+     "+": 0.038500000000000006,
+     "-": 0.0315
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -0.4505319018508507,
+      "E2a": -4.449183196657465,
+      "E3a": -1.5888266387557906,
+      "E4a": -1.3013055470992967,
+      "E1b": 0.04182364252086046,
+      "E2b": 0.004905864552821271,
+      "E3b": -0.059237431017098885,
+      "E1i": -0.4736912956074306,
+      "E4b": -0.30285090820461136,
+      "E5": null,
+      "D1": 0.005589925205249369,
+      "L0": -1.0281903615998083,
+      "L1": 0.27216608510170914,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.450226426558582,
+      "E2a": 0.38900542519765047,
+      "E3a": 1.5763327352151926,
+      "E4a": 1.285098426355603,
+      "E1b": -0.024731343838517716,
+      "E2b": 0.010140305752388556,
+      "E3b": 0.20043422528232213,
+      "E1i": 0.47780013846377933,
+      "E4b": 0.2815536100802092,
+      "E5": null,
+      "D1": -0.004549582327197932,
+      "L0": 1.0060018978862892,
+      "L1": -0.28182139063187606,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.0035000000000000005,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.4505319018508507,
+      "E2a": -4.449183196657465,
+      "E3a": -1.5888266387557906,
+      "E4a": -1.3013055470992967,
+      "E1b": 0.04182364252086046,
+      "E2b": 0.004905864552821271,
+      "E3b": -0.059237431017098885,
+      "E1i": -0.4736912956074306,
+      "E4b": -0.30285090820461136,
+      "E5": null,
+      "D1": 0.005589925205249369,
+      "L0": -1.0281903615998083,
+      "L1": 0.27216608510170914,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.450226426558582,
+      "E2a": 0.38900542519765047,
+      "E3a": 1.5763327352151926,
+      "E4a": 1.285098426355603,
+      "E1b": -0.024731343838517716,
+      "E2b": 0.010140305752388556,
+      "E3b": 0.20043422528232213,
+      "E1i": 0.47780013846377933,
+      "E4b": 0.2815536100802092,
+      "E5": null,
+      "D1": -0.004549582327197932,
+      "L0": 1.0060018978862892,
+      "L1": -0.28182139063187606,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 0.06020802638912226,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.5813178424716381,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 0.035 +- 0.060208; BOUNDS None; the cycles' torque 176.38033401313388 / 204.34388069732827 N m)",
+    "range_tests_failed": [
+     "sign"
+    ]
+   },
+   "fres_b": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.65,
+    "bracket": null,
+    "values": {
+     "+": 7.15,
+     "-": 5.85
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -0.5872265515728703,
+      "E2a": -4.564807283475398,
+      "E3a": -2.151580377446635,
+      "E4a": -1.5465411341547224,
+      "E1b": 0.05281014117363547,
+      "E2b": -0.009718067098306804,
+      "E3b": 0.07908625633017863,
+      "E1i": -0.5703846165425057,
+      "E4b": -0.2199830872416051,
+      "E5": null,
+      "D1": -0.0058153832397205285,
+      "L0": -1.3754974038030916,
+      "L1": 0.36910053953688404,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.5868404855785245,
+      "E2a": 0.5108679492153061,
+      "E3a": 2.132032492245024,
+      "E4a": 1.5344076911217854,
+      "E1b": -0.052163206516478766,
+      "E2b": 0.05722662980123072,
+      "E3b": 0.41043544186246095,
+      "E1i": 0.5739756027204574,
+      "E4b": 0.21012509534742208,
+      "E5": null,
+      "D1": 0.006032546543425887,
+      "L0": 1.3750389200478814,
+      "L1": -0.37166759917631964,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.65,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.5872265515728703,
+      "E2a": -4.564807283475398,
+      "E3a": -2.151580377446635,
+      "E4a": -1.5465411341547224,
+      "E1b": 0.05281014117363547,
+      "E2b": -0.009718067098306804,
+      "E3b": 0.07908625633017863,
+      "E1i": -0.5703846165425057,
+      "E4b": -0.2199830872416051,
+      "E5": null,
+      "D1": -0.0058153832397205285,
+      "L0": -1.3754974038030916,
+      "L1": 0.36910053953688404,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.5868404855785245,
+      "E2a": 0.5108679492153061,
+      "E3a": 2.132032492245024,
+      "E4a": 1.5344076911217854,
+      "E1b": -0.052163206516478766,
+      "E2b": 0.05722662980123072,
+      "E3b": 0.41043544186246095,
+      "E1i": 0.5739756027204574,
+      "E4b": 0.21012509534742208,
+      "E5": null,
+      "D1": 0.006032546543425887,
+      "L0": 1.3750389200478814,
+      "L1": -0.37166759917631964,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 9.269989327286874,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.701187430806073,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 6.5 +- 9.26999; BOUNDS None; the cycles' torque 176.45760086661653 / 204.34388069732827 N m)",
+    "range_tests_failed": [
+     "sign"
+    ]
+   },
+   "fres_hi": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.018,
+    "bracket": null,
+    "values": {
+     "+": 0.19799999999999998,
+     "-": 0.162
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.09810704000620696,
+      "E2b": 0.08906279479465873,
+      "E3b": 0.4544482419488993,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.011404232330252118,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": -0.13091252337140702,
+      "E2b": -0.10188971852316175,
+      "E3b": -0.34627479096728564,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": -0.017044001079534965,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.018,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.09810704000620696,
+      "E2b": 0.08906279479465873,
+      "E3b": 0.4544482419488993,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.011404232330252118,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": -0.13091252337140702,
+      "E2b": -0.10188971852316175,
+      "E3b": -0.34627479096728564,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": -0.017044001079534965,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000132 K)",
+    "beyond_range_at_r1": null,
+    "range_tests_failed": null
+   },
+   "fres_lo": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.003,
+    "bracket": null,
+    "values": {
+     "+": 0.033,
+     "-": 0.027
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.003,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000132 K)",
+    "beyond_range_at_r1": null,
+    "range_tests_failed": null
+   },
+   "fres_map_min": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 2.5,
+    "bracket": null,
+    "values": {
+     "+": 27.5,
+     "-": 22.5
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 2.5,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": null,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": "not visible at R1: the probe's response slope is below the climb cell's numerical noise, so the change worth R1 is not computable and the probe is the contract's +-10 % fallback (decision 85); counted as excluded for this row's level rows, with this reason (|h(+) - h(-)|/2 = 0 K at +-10 %, the noise 0.000132 K)",
+    "beyond_range_at_r1": null,
+    "range_tests_failed": null
+   },
+   "ivc_deg": {
+    "method": "bracket",
+    "why_not_bracket": null,
+    "record": "geometry",
+    "size": null,
+    "bracket": [
+     -178.7265675558617,
+     -124.66908675950667
+    ],
+    "values": {
+     "+": -124.66908675950667,
+     "-": -178.7265675558617
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 1.314811032974613,
+      "E2a": 0.0,
+      "E3a": -3.1484355777297637,
+      "E4a": -3.343612485614699,
+      "E1b": -0.1257164459508786,
+      "E2b": 0.0,
+      "E3b": -0.19861874258256051,
+      "E1i": 1.3492202939991493,
+      "E4b": 0.07755938727416023,
+      "E5": null,
+      "D1": -0.051743882636686944,
+      "L0": -4.7361066950597,
+      "L1": -0.18779554078428617,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -1.3624194844577584,
+      "E2a": 0.0,
+      "E3a": 3.3853375206429526,
+      "E4a": 3.613518154657747,
+      "E1b": 0.26305046518040065,
+      "E2b": 0.0,
+      "E3b": 0.664169789037814,
+      "E1i": -1.393950257806451,
+      "E4b": -0.10010870151888795,
+      "E5": null,
+      "D1": 0.7174874371310658,
+      "L0": 5.030052023454026,
+      "L1": 0.19167375952724797,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 10.0,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.7919884672075783,
+      "E2a": 0.0,
+      "E3a": -1.906285642758256,
+      "E4a": -2.0253960246288187,
+      "E1b": -0.09341649342079172,
+      "E2b": 0.0,
+      "E3b": -0.14198951225680645,
+      "E1i": 0.8124988847941577,
+      "E4b": 0.03693386937031207,
+      "E5": null,
+      "D1": -0.10411779621371631,
+      "L0": -2.8580393706525236,
+      "L1": -0.10707445468974797,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -0.5999090802395735,
+      "E2a": 0.0,
+      "E3a": 1.4495648260668084,
+      "E4a": 1.5425009772845115,
+      "E1b": 0.09848476939188444,
+      "E2b": 0.0,
+      "E3b": 0.22729431132021816,
+      "E1i": -0.6156129939257999,
+      "E4b": -0.03229884418751894,
+      "E5": null,
+      "D1": 0.2407324887288631,
+      "L0": 2.1741785802583316,
+      "L1": 0.08639026839928121,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": false,
+     "E4a": false,
+     "L0": false,
+     "E4b": true,
+     "D1": false,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 31.105309506492503,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": {
+     "edges": [
+      -178.7265675558617,
+      -124.66908675950667
+     ],
+     "housing_change_k_at_edges": {
+      "lo": 12.450146991071872,
+      "hi": -4.928712648653556
+     },
+     "source": "the bracket EPA's valve channels give, judged at its two edges (defect D-2)"
+    },
+    "housing_change_k": 12.450146991071872,
+    "probe_housing_change_k": 12.450146991071872,
+    "load_bearing": true,
+    "load_bearing_why": null,
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": null
+   },
+   "n_poly": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.03618831210431524,
+    "bracket": null,
+    "values": {
+     "+": 1.3561883121043152,
+     "-": 1.283811687895685
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.132,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 0.03618831210431524,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "octane": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 6.62095943945436,
+    "bracket": null,
+    "values": {
+     "+": 102.72095943945436,
+     "-": 89.47904056054563
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 9.61,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.0,
+      "E2a": 0.0,
+      "E3a": 0.0,
+      "E4a": 0.0,
+      "E1b": 0.0,
+      "E2b": 0.0,
+      "E3b": 0.0,
+      "E1i": 0.0,
+      "E4b": 0.0,
+      "E5": null,
+      "D1": 0.0,
+      "L0": 0.0,
+      "L1": 0.0,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 6.62095943945436,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "port_pickup_k": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 1.2000000000000002,
+    "bracket": null,
+    "values": {
+     "+": 13.2,
+     "-": 10.8
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -0.04574277389431103,
+      "E2a": 0.0,
+      "E3a": 0.3382926106277395,
+      "E4a": 0.36733050136535894,
+      "E1b": 0.004946312059050939,
+      "E2b": 0.0,
+      "E3b": 0.041361220090305295,
+      "E1i": -0.047137930405193984,
+      "E4b": -0.010839731944358277,
+      "E5": null,
+      "D1": 0.015111783094575948,
+      "L0": 0.39521802486628843,
+      "L1": -0.026839922959972284,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.04577230783123554,
+      "E2a": 0.0,
+      "E3a": -0.3385381484822574,
+      "E4a": -0.367803756625527,
+      "E1b": -0.004825004626376028,
+      "E2b": 0.0,
+      "E3b": -0.04046900364090433,
+      "E1i": 0.047140600675281696,
+      "E4b": 0.010518089414965459,
+      "E5": null,
+      "D1": -0.014667600472050513,
+      "L0": -0.3953563543806915,
+      "L1": 0.02694820977967538,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 1.2000000000000002,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.04574277389431103,
+      "E2a": 0.0,
+      "E3a": 0.3382926106277395,
+      "E4a": 0.36733050136535894,
+      "E1b": 0.004946312059050939,
+      "E2b": 0.0,
+      "E3b": 0.041361220090305295,
+      "E1i": -0.047137930405193984,
+      "E4b": -0.010839731944358277,
+      "E5": null,
+      "D1": 0.015111783094575948,
+      "L0": 0.39521802486628843,
+      "L1": -0.026839922959972284,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.04577230783123554,
+      "E2a": 0.0,
+      "E3a": -0.3385381484822574,
+      "E4a": -0.367803756625527,
+      "E1b": -0.004825004626376028,
+      "E2b": 0.0,
+      "E3b": -0.04046900364090433,
+      "E1i": 0.047140600675281696,
+      "E4b": 0.010518089414965459,
+      "E5": null,
+      "D1": -0.014667600472050513,
+      "L0": -0.3953563543806915,
+      "L1": 0.02694820977967538,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 25.537095276575062,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.4699046571286237,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 12.0 +- 25.5371; BOUNDS None; the cycles' torque 190.12253826993725 / 194.22090914993376 N m)",
+    "range_tests_failed": [
+     "sign"
+    ]
+   },
+   "t_head_k": {
+    "method": "fallback",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 9.0,
+    "bracket": null,
+    "values": {
+     "+": 99.0,
+     "-": 81.0
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.010812898837879281,
+      "E2a": 0.0,
+      "E3a": 1.2281784555377726,
+      "E4a": 1.0264600240878963,
+      "E1b": -0.0005531384441415099,
+      "E2b": 0.0,
+      "E3b": -0.23685626898103251,
+      "E1i": 0.013388895012251822,
+      "E4b": -0.023860402072706677,
+      "E5": null,
+      "D1": -0.005424271178608109,
+      "L0": 1.2040761536604805,
+      "L1": 0.22187045066725375,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -0.010807275964983099,
+      "E2a": 0.0,
+      "E3a": -1.228163093747206,
+      "E4a": -1.0265607616665875,
+      "E1b": 0.0005546845817807622,
+      "E2b": 0.0,
+      "E3b": 0.35372861099221353,
+      "E1i": -0.013385204980242982,
+      "E4b": 0.023849781581528617,
+      "E5": null,
+      "D1": 0.00526341901307692,
+      "L0": -1.2036592131152268,
+      "L1": -0.22160507688641218,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 9.0,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.010812898837879281,
+      "E2a": 0.0,
+      "E3a": 1.2281784555377726,
+      "E4a": 1.0264600240878963,
+      "E1b": -0.0005531384441415099,
+      "E2b": 0.0,
+      "E3b": -0.23685626898103251,
+      "E1i": 0.013388895012251822,
+      "E4b": -0.023860402072706677,
+      "E5": null,
+      "D1": -0.005424271178608109,
+      "L0": 1.2040761536604805,
+      "L1": 0.22187045066725375,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -0.010807275964983099,
+      "E2a": 0.0,
+      "E3a": -1.228163093747206,
+      "E4a": -1.0265607616665875,
+      "E1b": 0.0005546845817807622,
+      "E2b": 0.0,
+      "E3b": 0.35372861099221353,
+      "E1i": -0.013385204980242982,
+      "E4b": 0.023849781581528617,
+      "E5": null,
+      "D1": 0.00526341901307692,
+      "L0": -1.2036592131152268,
+      "L1": -0.22160507688641218,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": true,
+     "E2a": true,
+     "E3a": true,
+     "E4a": true,
+     "L0": true,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 182.7762651701532,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 0.4924052907866109,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": "worth R1 beyond the constant's range: the probe sized by R1 fails decision 88's range test(s), so the probe is the contract's +-10 % fallback (+-10 crank degrees for IVC and EVO), its worth R1 reported beside it; counted as excluded for this row's level rows, with this reason (fails sign: the probe 90.0 +- 182.776; BOUNDS None; the cycles' torque 192.58745371019086 / 191.73971346587143 N m)",
+    "range_tests_failed": [
+     "sign"
+    ]
+   },
+   "t_residual_k": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 140.60920463008839,
+    "bracket": null,
+    "values": {
+     "+": 920.6092046300884,
+     "-": 639.3907953699116
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -0.47342133978989676,
+      "E2a": 0.0,
+      "E3a": 3.5473527075324007,
+      "E4a": 3.5675544772658796,
+      "E1b": 0.11571933456429662,
+      "E2b": 0.0,
+      "E3b": 0.7559116608644985,
+      "E1i": -0.45910717331243056,
+      "E4b": -0.23019879076421645,
+      "E5": null,
+      "D1": 0.20380313259849636,
+      "L0": 4.125036865135506,
+      "L1": -0.28600548492677547,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.47494172607268315,
+      "E2a": 0.0,
+      "E3a": -3.5709371957921334,
+      "E4a": -3.5894553319564793,
+      "E1b": -0.0973060827090535,
+      "E2b": 0.0,
+      "E3b": -0.13413639821923695,
+      "E1i": 0.46250260866702586,
+      "E4b": 0.21395058449460436,
+      "E5": null,
+      "D1": -0.09215722209379607,
+      "L0": -4.154735512463596,
+      "L1": 0.2899576051288477,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 78.0,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.2625920933044048,
+      "E2a": 0.0,
+      "E3a": 1.9692003541596925,
+      "E4a": 1.979329480471506,
+      "E1b": 0.06057821670873231,
+      "E2b": 0.0,
+      "E3b": 0.3344798456268947,
+      "E1i": -0.2558974614476517,
+      "E4b": -0.12207948484475395,
+      "E5": null,
+      "D1": 0.10779655019876477,
+      "L0": 2.2923554327531726,
+      "L1": -0.15685050719303462,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.2632630591565679,
+      "E2a": 0.0,
+      "E3a": -1.9786103103923338,
+      "E4a": -1.9878261336347904,
+      "E1b": -0.054012201119489234,
+      "E2b": 0.0,
+      "E3b": -0.09641790921601867,
+      "E1i": 0.25628915930812557,
+      "E4b": 0.11954283328508808,
+      "E5": null,
+      "D1": -0.06970453217784511,
+      "L0": -2.2995468652931343,
+      "L1": 0.16125385365644007,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": false,
+     "E4a": false,
+     "L0": false,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 140.60920463008839,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "wiebe_a": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 3.2564075322278763,
+    "bracket": null,
+    "values": {
+     "+": 8.256407532227875,
+     "-": 1.7435924677721237
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": 0.7520922342715748,
+      "E2a": 0.0,
+      "E3a": -6.641107538521624,
+      "E4a": -6.965437483814036,
+      "E1b": -0.010386809011224685,
+      "E2b": 0.0,
+      "E3b": 0.24050380717714148,
+      "E1i": 0.9175472557447133,
+      "E4b": 0.710964454566664,
+      "E5": null,
+      "D1": 0.07797426631750026,
+      "L0": -7.599368849926009,
+      "L1": -1.5840359730188318,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -2.707684193428765,
+      "E2a": 0.0,
+      "E3a": 16.794757848915694,
+      "E4a": 18.524763016837902,
+      "E1b": 0.5680880713682139,
+      "E2b": 0.0,
+      "E3b": 3.146011597455267,
+      "E1i": -6.873437519597367,
+      "E4b": -3.2362475165794393,
+      "E5": null,
+      "D1": 1.2529370329560239,
+      "L0": 20.50736375098172,
+      "L1": 3.6699649354940895,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.5,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": 0.16319242925986632,
+      "E2a": 0.0,
+      "E3a": -1.3637610901991586,
+      "E4a": -1.4221958506779373,
+      "E1b": -0.002857259869323059,
+      "E2b": 0.0,
+      "E3b": -0.0022375829050282903,
+      "E1i": 0.19301106655611733,
+      "E4b": 0.14694170835520737,
+      "E5": null,
+      "D1": -0.004017403954721388,
+      "L0": -1.5701734529068752,
+      "L1": -0.3102532352336773,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": -0.19167533465608955,
+      "E2a": 0.0,
+      "E3a": 1.5482486243216513,
+      "E4a": 1.6226153179851082,
+      "E1b": 0.009909039897339156,
+      "E2b": 0.0,
+      "E3b": 0.06426551677729009,
+      "E1i": -0.21924381248779135,
+      "E4b": -0.16879089974460015,
+      "E5": null,
+      "D1": 0.013535140074166563,
+      "L0": 1.7901096404919379,
+      "L1": 0.34593446462817923,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": false,
+     "E4a": false,
+     "L0": false,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 3.2564075322278763,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   },
+   "wiebe_m": {
+    "method": "probe",
+    "why_not_bracket": "EPA publishes no channel that brackets it",
+    "record": "cycle",
+    "size": 0.9853752420020433,
+    "bracket": null,
+    "values": {
+     "+": 2.985375242002043,
+     "-": 1.0146247579979568
+    },
+    "retag_identity": null,
+    "delta_E": {
+     "+": {
+      "E1a": -1.201861252018979,
+      "E2a": 0.0,
+      "E3a": 8.05035044322208,
+      "E4a": 8.551095961413004,
+      "E1b": 0.1004487954210802,
+      "E2b": 0.0,
+      "E3b": 0.736297871216177,
+      "E1i": -1.3901049010117128,
+      "E4b": -0.8013936419473566,
+      "E5": null,
+      "D1": 0.3737484143511738,
+      "L0": 9.630982753050919,
+      "L1": 1.9652738289708829,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 1.3767224995936536,
+      "E2a": 0.0,
+      "E3a": -11.206253584037153,
+      "E4a": -11.991370591573968,
+      "E1b": 0.05845098071578292,
+      "E2b": 0.0,
+      "E3b": 0.8365165042538969,
+      "E1i": 1.790628583193996,
+      "E4b": 1.287799650178254,
+      "E5": null,
+      "D1": 0.21278169121264456,
+      "L0": -13.114557403598338,
+      "L1": -3.1225259936774385,
+      "E8": 0.0
+     }
+    },
+    "d_probe_size": 0.2,
+    "delta_E_d_probe": {
+     "+": {
+      "E1a": -0.26170049525352024,
+      "E2a": 0.0,
+      "E3a": 1.8460905702976547,
+      "E4a": 1.9655091878945115,
+      "E1b": 0.012454029874785277,
+      "E2b": 0.0,
+      "E3b": 0.08774543920673139,
+      "E1i": -0.311194836032163,
+      "E4b": -0.20984598418996114,
+      "E5": null,
+      "D1": 0.04053775767010359,
+      "L0": 2.1854201307327905,
+      "L1": 0.4647776437804154,
+      "E8": 0.0
+     },
+     "-": {
+      "E1a": 0.2695261079617417,
+      "E2a": 0.0,
+      "E3a": -1.9790953155326392,
+      "E4a": -2.1123367691639814,
+      "E1b": -0.0039048449048362244,
+      "E2b": 0.0,
+      "E3b": 0.006363612973721899,
+      "E1i": 0.33137265419726436,
+      "E4b": 0.19603786346006302,
+      "E5": null,
+      "D1": -0.012964806836396559,
+      "L0": -2.347621228213576,
+      "L1": -0.5204206303744741,
+      "E8": 0.0
+     }
+    },
+    "sigma": null,
+    "sigma_why": null,
+    "delta_E_sigma": null,
+    "excluded_for": {
+     "E1a": false,
+     "E2a": true,
+     "E3a": false,
+     "E4a": false,
+     "L0": false,
+     "E4b": true,
+     "D1": true,
+     "L1": true,
+     "E8": true
+    },
+    "worth_r1": 0.9853752420020433,
+    "worth_b": null,
+    "worth_b_why": "d needs agents, and no EPA engine has one when the validation runs (the contract's E6, decision 59): worth b on d is computable for no d row",
+    "band": null,
+    "housing_change_k": null,
+    "probe_housing_change_k": 10.0,
+    "load_bearing": null,
+    "load_bearing_why": "no band (ASSUMED): worth R1 reported",
+    "not_visible_at_r1": null,
+    "beyond_range_at_r1": null,
+    "range_tests_failed": []
+   }
+  },
+  "11": {
+   "plus": {
+    "hot_tit": {
+     "E3a": {
+      "E": 28.073997036710352,
+      "dE": 2.2977912031221877
+     },
+     "E3b": {
+      "E": 28.41671862723534,
+      "dE": 1.082659937703351
+     },
+     "E4a": {
+      "E": 64.68675839144025,
+      "dE": 3.2245485193069143
+     },
+     "L0": {
+      "E": 32.11985278833972,
+      "dE": 5.181563063020892
+     }
+    }
+   },
+   "minus": {
+    "hot_tit": {
+     "E3a": {
+      "E": 23.386828319019468,
+      "dE": -2.3893775145686966
+     },
+     "E3b": {
+      "E": 26.450902332244777,
+      "dE": -0.8831563572872128
+     },
+     "E4a": {
+      "E": 58.15346786969959,
+      "dE": -3.308742002433746
+     },
+     "L0": {
+      "E": 21.674171485150715,
+      "dE": -5.264118240168113
+     }
+    }
+   }
+  },
+  "12": {
+   "E3a": {
+    "snapped": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 25.776205833588165,
+     "deciding": [
+      "2000",
+      "3000"
+     ],
+     "worst_line": "2000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 25.776205833588165,
+      "spark_sentinel": 25.776205833588165
+     },
+     "extra": {},
+     "n_rows": 10,
+     "n_clusters": 10,
+     "lines": {
+      "2000": {
+       "E": 25.776205833588165,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.33560822923939293,
+        "u_input": 0.06920781346675711,
+        "u_D": 3.199055592277386,
+        "u_val": 3.2173559466523542,
+        "u_stat": 10.94518964709187,
+        "u_num_sd_undivided": 0.7504428143876152,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "off",
+       "certifies": false
+      },
+      "3000": {
+       "E": 9.55781335958036,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.35613418226361,
+        "u_input": 0.06058077677870973,
+        "u_D": 3.4458673484081146,
+        "u_val": 3.4647515595085387,
+        "u_stat": 6.843714929674974,
+        "u_num_sd_undivided": 0.7963402406527319,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "limited",
+       "certifies": false
+      }
+     },
+     "u": {
+      "u_num": 0.33560822923939293,
+      "u_input": 0.06920781346675711,
+      "u_D": 3.199055592277386,
+      "u_val": 3.2173559466523542,
+      "u_stat": 10.94518964709187,
+      "u_num_sd_undivided": 0.7504428143876152,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "certifying": [],
+     "label": "off",
+     "kappa": 3.221091772689287,
+     "coverage_restricted": 25.776205833588165
+    },
+    "unsnapped": {
+     "R": 10.0,
+     "unit": "K",
+     "kind": "level",
+     "E": 25.73966548624089,
+     "deciding": [
+      "2000",
+      "3000"
+     ],
+     "worst_line": "2000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 25.73966548624089,
+      "spark_sentinel": 25.73966548624089
+     },
+     "extra": {},
+     "n_rows": 10,
+     "n_clusters": 10,
+     "lines": {
+      "2000": {
+       "E": 25.73966548624089,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.3354718548212587,
+        "u_input": 0.0827681097519971,
+        "u_D": 3.199055592277386,
+        "u_val": 3.217661978494688,
+        "u_stat": 10.920144073510878,
+        "u_num_sd_undivided": 0.750137871918275,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "off",
+       "certifies": false
+      },
+      "3000": {
+       "E": 9.514080961216177,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.35603288379805,
+        "u_input": 0.07730905508111444,
+        "u_D": 3.4458673484081137,
+        "u_val": 3.465074008902011,
+        "u_stat": 6.813906296669792,
+        "u_num_sd_undivided": 0.7961137303977233,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "limited",
+       "certifies": false
+      }
+     },
+     "u": {
+      "u_num": 0.3354718548212587,
+      "u_input": 0.0827681097519971,
+      "u_D": 3.199055592277386,
+      "u_val": 3.217661978494688,
+      "u_stat": 10.920144073510878,
+      "u_num_sd_undivided": 0.750137871918275,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "certifying": [],
+     "label": "off",
+     "kappa": 3.217498944323027,
+     "coverage_restricted": 25.73966548624089
+    },
+    "label_worse": "off"
+   },
+   "E5": {
+    "snapped": {
+     "R": null,
+     "unit": "%",
+     "kind": "descriptive",
+     "E": null,
+     "deciding": [],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {},
+     "extra": {
+      "windows": {
+       "A": {
+        "value_pct": 55.829455523380744,
+        "lines": {
+         "1250": {
+          "cov_map_S": 2049.6495715350843,
+          "cov_map_D": 1283.9100555555553,
+          "n": 9
+         },
+         "2000": {
+          "cov_map_S": 2098.8213843593867,
+          "cov_map_D": 1287.2654047619048,
+          "n": 7
+         },
+         "3000": {
+          "cov_map_S": 1632.1084987275583,
+          "cov_map_D": 618.8200000000002,
+          "n": 4
+         },
+         "4500": {
+          "cov_map_S": 635.2735236203307,
+          "cov_map_D": 927.2318999999997,
+          "n": 6
+         }
+        }
+       },
+       "B": {
+        "value_pct": 10.907742860007374,
+        "lines": {
+         "1250": {
+          "cov_map_S": 164.9777780744324,
+          "cov_map_D": 78.06550000000004,
+          "n": 5
+         },
+         "2000": {
+          "cov_map_S": 727.1189107213893,
+          "cov_map_D": 418.91038339138896,
+          "n": 10
+         },
+         "3000": {
+          "cov_map_S": 572.905861018416,
+          "cov_map_D": 777.0181256612173,
+          "n": 11
+         },
+         "4500": {
+          "cov_map_S": 147.60047772002554,
+          "cov_map_D": 180.01000000000028,
+          "n": 3
+         }
+        }
+       }
+      },
+      "boost_lever": "untested",
+      "without": {
+       "lambda_missing": {
+        "A": {
+         "value_pct": 55.829455523380744,
+         "lines": {
+          "1250": {
+           "cov_map_S": 2049.6495715350843,
+           "cov_map_D": 1283.9100555555553,
+           "n": 9
+          },
+          "2000": {
+           "cov_map_S": 2098.8213843593867,
+           "cov_map_D": 1287.2654047619048,
+           "n": 7
+          },
+          "3000": {
+           "cov_map_S": 1632.1084987275583,
+           "cov_map_D": 618.8200000000002,
+           "n": 4
+          },
+          "4500": {
+           "cov_map_S": 635.2735236203307,
+           "cov_map_D": 927.2318999999997,
+           "n": 6
+          }
+         }
+        },
+        "B": {
+         "value_pct": 10.907742860007374,
+         "lines": {
+          "1250": {
+           "cov_map_S": 164.9777780744324,
+           "cov_map_D": 78.06550000000004,
+           "n": 5
+          },
+          "2000": {
+           "cov_map_S": 727.1189107213893,
+           "cov_map_D": 418.91038339138896,
+           "n": 10
+          },
+          "3000": {
+           "cov_map_S": 572.905861018416,
+           "cov_map_D": 777.0181256612173,
+           "n": 11
+          },
+          "4500": {
+           "cov_map_S": 147.60047772002554,
+           "cov_map_D": 180.01000000000028,
+           "n": 3
+          }
+         }
+        }
+       },
+       "spark_sentinel": {
+        "A": {
+         "value_pct": 55.829455523380744,
+         "lines": {
+          "1250": {
+           "cov_map_S": 2049.6495715350843,
+           "cov_map_D": 1283.9100555555553,
+           "n": 9
+          },
+          "2000": {
+           "cov_map_S": 2098.8213843593867,
+           "cov_map_D": 1287.2654047619048,
+           "n": 7
+          },
+          "3000": {
+           "cov_map_S": 1632.1084987275583,
+           "cov_map_D": 618.8200000000002,
+           "n": 4
+          },
+          "4500": {
+           "cov_map_S": 635.2735236203307,
+           "cov_map_D": 927.2318999999997,
+           "n": 6
+          }
+         }
+        },
+        "B": {
+         "value_pct": 10.907742860007374,
+         "lines": {
+          "1250": {
+           "cov_map_S": 164.9777780744324,
+           "cov_map_D": 78.06550000000004,
+           "n": 5
+          },
+          "2000": {
+           "cov_map_S": 727.1189107213893,
+           "cov_map_D": 418.91038339138896,
+           "n": 10
+          },
+          "3000": {
+           "cov_map_S": 572.905861018416,
+           "cov_map_D": 777.0181256612173,
+           "n": 11
+          },
+          "4500": {
+           "cov_map_S": 147.60047772002554,
+           "cov_map_D": 180.01000000000028,
+           "n": 3
+          }
+         }
+        }
+       }
+      },
+      "coverage_restricted": {
+       "A": {
+        "value_pct": 55.829455523380744,
+        "lines": {
+         "1250": {
+          "cov_map_S": 2049.6495715350843,
+          "cov_map_D": 1283.9100555555553,
+          "n": 9
+         },
+         "2000": {
+          "cov_map_S": 2098.8213843593867,
+          "cov_map_D": 1287.2654047619048,
+          "n": 7
+         },
+         "3000": {
+          "cov_map_S": 1632.1084987275583,
+          "cov_map_D": 618.8200000000002,
+          "n": 4
+         },
+         "4500": {
+          "cov_map_S": 635.2735236203307,
+          "cov_map_D": 927.2318999999997,
+          "n": 6
+         }
+        }
+       },
+       "B": {
+        "value_pct": 10.907742860007374,
+        "lines": {
+         "1250": {
+          "cov_map_S": 164.9777780744324,
+          "cov_map_D": 78.06550000000004,
+          "n": 5
+         },
+         "2000": {
+          "cov_map_S": 727.1189107213893,
+          "cov_map_D": 418.91038339138896,
+          "n": 10
+         },
+         "3000": {
+          "cov_map_S": 572.905861018416,
+          "cov_map_D": 777.0181256612173,
+          "n": 11
+         },
+         "4500": {
+          "cov_map_S": 147.60047772002554,
+          "cov_map_D": 180.01000000000028,
+          "n": 3
+         }
+        }
+       }
+      }
+     },
+     "n_rows": 0,
+     "n_clusters": 0,
+     "lines": {},
+     "u": null,
+     "certifying": [],
+     "label": null,
+     "kappa": null,
+     "coverage_restricted": null
+    },
+    "unsnapped": {
+     "R": null,
+     "unit": "%",
+     "kind": "descriptive",
+     "E": null,
+     "deciding": [],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {},
+     "extra": {
+      "windows": {
+       "A": {
+        "value_pct": 55.81559006434027,
+        "lines": {
+         "1250": {
+          "cov_map_S": 2040.7991373792431,
+          "cov_map_D": 1283.9100555555553,
+          "n": 9
+         },
+         "2000": {
+          "cov_map_S": 2104.3877849697938,
+          "cov_map_D": 1287.2654047619048,
+          "n": 7
+         },
+         "3000": {
+          "cov_map_S": 1601.538862879764,
+          "cov_map_D": 618.8200000000002,
+          "n": 4
+         },
+         "4500": {
+          "cov_map_S": 668.5563205403108,
+          "cov_map_D": 927.2318999999997,
+          "n": 6
+         }
+        }
+       },
+       "B": {
+        "value_pct": 12.83489955426711,
+        "lines": {
+         "1250": {
+          "cov_map_S": 163.4468499312601,
+          "cov_map_D": 78.06550000000004,
+          "n": 5
+         },
+         "2000": {
+          "cov_map_S": 741.3089865883505,
+          "cov_map_D": 418.91038339138896,
+          "n": 10
+         },
+         "3000": {
+          "cov_map_S": 588.2676488898893,
+          "cov_map_D": 777.0181256612173,
+          "n": 11
+         },
+         "4500": {
+          "cov_map_S": 147.60047772002554,
+          "cov_map_D": 180.01000000000028,
+          "n": 3
+         }
+        }
+       }
+      },
+      "boost_lever": "untested",
+      "without": {
+       "lambda_missing": {
+        "A": {
+         "value_pct": 55.81559006434027,
+         "lines": {
+          "1250": {
+           "cov_map_S": 2040.7991373792431,
+           "cov_map_D": 1283.9100555555553,
+           "n": 9
+          },
+          "2000": {
+           "cov_map_S": 2104.3877849697938,
+           "cov_map_D": 1287.2654047619048,
+           "n": 7
+          },
+          "3000": {
+           "cov_map_S": 1601.538862879764,
+           "cov_map_D": 618.8200000000002,
+           "n": 4
+          },
+          "4500": {
+           "cov_map_S": 668.5563205403108,
+           "cov_map_D": 927.2318999999997,
+           "n": 6
+          }
+         }
+        },
+        "B": {
+         "value_pct": 12.83489955426711,
+         "lines": {
+          "1250": {
+           "cov_map_S": 163.4468499312601,
+           "cov_map_D": 78.06550000000004,
+           "n": 5
+          },
+          "2000": {
+           "cov_map_S": 741.3089865883505,
+           "cov_map_D": 418.91038339138896,
+           "n": 10
+          },
+          "3000": {
+           "cov_map_S": 588.2676488898893,
+           "cov_map_D": 777.0181256612173,
+           "n": 11
+          },
+          "4500": {
+           "cov_map_S": 147.60047772002554,
+           "cov_map_D": 180.01000000000028,
+           "n": 3
+          }
+         }
+        }
+       },
+       "spark_sentinel": {
+        "A": {
+         "value_pct": 55.81559006434027,
+         "lines": {
+          "1250": {
+           "cov_map_S": 2040.7991373792431,
+           "cov_map_D": 1283.9100555555553,
+           "n": 9
+          },
+          "2000": {
+           "cov_map_S": 2104.3877849697938,
+           "cov_map_D": 1287.2654047619048,
+           "n": 7
+          },
+          "3000": {
+           "cov_map_S": 1601.538862879764,
+           "cov_map_D": 618.8200000000002,
+           "n": 4
+          },
+          "4500": {
+           "cov_map_S": 668.5563205403108,
+           "cov_map_D": 927.2318999999997,
+           "n": 6
+          }
+         }
+        },
+        "B": {
+         "value_pct": 12.83489955426711,
+         "lines": {
+          "1250": {
+           "cov_map_S": 163.4468499312601,
+           "cov_map_D": 78.06550000000004,
+           "n": 5
+          },
+          "2000": {
+           "cov_map_S": 741.3089865883505,
+           "cov_map_D": 418.91038339138896,
+           "n": 10
+          },
+          "3000": {
+           "cov_map_S": 588.2676488898893,
+           "cov_map_D": 777.0181256612173,
+           "n": 11
+          },
+          "4500": {
+           "cov_map_S": 147.60047772002554,
+           "cov_map_D": 180.01000000000028,
+           "n": 3
+          }
+         }
+        }
+       }
+      },
+      "coverage_restricted": {
+       "A": {
+        "value_pct": 55.81559006434027,
+        "lines": {
+         "1250": {
+          "cov_map_S": 2040.7991373792431,
+          "cov_map_D": 1283.9100555555553,
+          "n": 9
+         },
+         "2000": {
+          "cov_map_S": 2104.3877849697938,
+          "cov_map_D": 1287.2654047619048,
+          "n": 7
+         },
+         "3000": {
+          "cov_map_S": 1601.538862879764,
+          "cov_map_D": 618.8200000000002,
+          "n": 4
+         },
+         "4500": {
+          "cov_map_S": 668.5563205403108,
+          "cov_map_D": 927.2318999999997,
+          "n": 6
+         }
+        }
+       },
+       "B": {
+        "value_pct": 12.83489955426711,
+        "lines": {
+         "1250": {
+          "cov_map_S": 163.4468499312601,
+          "cov_map_D": 78.06550000000004,
+          "n": 5
+         },
+         "2000": {
+          "cov_map_S": 741.3089865883505,
+          "cov_map_D": 418.91038339138896,
+          "n": 10
+         },
+         "3000": {
+          "cov_map_S": 588.2676488898893,
+          "cov_map_D": 777.0181256612173,
+          "n": 11
+         },
+         "4500": {
+          "cov_map_S": 147.60047772002554,
+          "cov_map_D": 180.01000000000028,
+          "n": 3
+         }
+        }
+       }
+      }
+     },
+     "n_rows": 0,
+     "n_clusters": 0,
+     "lines": {},
+     "u": null,
+     "certifying": [],
+     "label": null,
+     "kappa": null,
+     "coverage_restricted": null
+    },
+    "label_worse": null
+   },
+   "D1": {
+    "snapped": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 2.962267486751272,
+     "deciding": [
+      "1250",
+      "2000",
+      "3000",
+      "4500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 2.962267486751272,
+      "spark_sentinel": 2.962267486751272,
+      "unreachable": 2.962267486751272
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 69,
+     "n_clusters": 69,
+     "lines": {
+      "1250": {
+       "E": 1.3673586089304826,
+       "clusters": 14,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "2000": {
+       "E": 2.216803389938284,
+       "clusters": 21,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "3000": {
+       "E": 3.4140332860646425,
+       "clusters": 19,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "4500": {
+       "E": 4.922262162458589,
+       "clusters": 15,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "pooled": {
+       "E": 2.962267486751272,
+       "clusters": 69,
+       "u": {
+        "u_num": 0.048084206100223556,
+        "u_input": 0.0709527854378784,
+        "u_D": 0.09840776468025887,
+        "u_val": 0.1305008689129984,
+        "u_stat": 0.3959051954918336,
+        "u_num_sd_undivided": 0.39941741382158785,
+        "unsourced": [
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "validated",
+       "certifies": true
+      }
+     },
+     "u": {
+      "u_num": 0.048084206100223556,
+      "u_input": 0.0709527854378784,
+      "u_D": 0.09840776468025887,
+      "u_val": 0.1305008689129984,
+      "u_stat": 0.3959051954918336,
+      "u_num_sd_undivided": 0.39941741382158785,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "certifying": [
+      "pooled"
+     ],
+     "label": "validated",
+     "kappa": 1.0,
+     "coverage_restricted": 2.863062812591349,
+     "condition": "both arms' cuts in 0-0.865"
+    },
+    "unsnapped": {
+     "R": 16.6,
+     "unit": "% of the measured flow",
+     "kind": "d",
+     "E": 2.9106187485751365,
+     "deciding": [
+      "1250",
+      "2000",
+      "3000",
+      "4500"
+     ],
+     "worst_line": null,
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 2.9106187485751365,
+      "spark_sentinel": 2.9106187485751365,
+      "unreachable": 2.9106187485751365
+     },
+     "extra": {
+      "unreachable": [],
+      "n_unreachable": 0,
+      "bounds_kpa": []
+     },
+     "n_rows": 69,
+     "n_clusters": 69,
+     "lines": {
+      "1250": {
+       "E": 0.9111479074109347,
+       "clusters": 14,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "2000": {
+       "E": 2.4436739464056756,
+       "clusters": 21,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "3000": {
+       "E": 3.4562850536665075,
+       "clusters": 19,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "4500": {
+       "E": 4.739336936916567,
+       "clusters": 15,
+       "u": null,
+       "label": null,
+       "certifies": null
+      },
+      "pooled": {
+       "E": 2.9106187485751365,
+       "clusters": 69,
+       "u": {
+        "u_num": 0.04346916428183571,
+        "u_input": 0.046218682149150675,
+        "u_D": 0.09432183788194579,
+        "u_val": 0.1136764880016686,
+        "u_stat": 0.40848600985659783,
+        "u_num_sd_undivided": 0.36108199732460255,
+        "unsourced": [
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "validated",
+       "certifies": true
+      }
+     },
+     "u": {
+      "u_num": 0.04346916428183571,
+      "u_input": 0.046218682149150675,
+      "u_D": 0.09432183788194579,
+      "u_val": 0.1136764880016686,
+      "u_stat": 0.40848600985659783,
+      "u_num_sd_undivided": 0.36108199732460255,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "certifying": [
+      "pooled"
+     ],
+     "label": "validated",
+     "kappa": 1.0,
+     "coverage_restricted": 2.810654534147918,
+     "condition": "both arms' cuts in 0-0.865"
+    },
+    "label_worse": "validated"
+   },
+   "L0": {
+    "snapped": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 26.93828972531883,
+     "deciding": [
+      "2000",
+      "3000"
+     ],
+     "worst_line": "2000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 26.93828972531883,
+      "spark_sentinel": 26.93828972531883
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "2000": {
+        "ebar_k": 26.93828972531883,
+        "deltabar": -0.00853666617354285,
+        "f_star": 1.0,
+        "H_k": 26.93828972531883
+       },
+       "3000": {
+        "ebar_k": 9.496591826833491,
+        "deltabar": -0.005236821495621613,
+        "f_star": 1.0,
+        "H_k": 9.496591826833491
+       }
+      }
+     },
+     "n_rows": 10,
+     "n_clusters": 10,
+     "lines": {
+      "2000": {
+       "E": 26.93828972531883,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.3235506824757425,
+        "u_input": 0.08004200718426809,
+        "u_D": 3.199301452485448,
+        "u_val": 3.2166164755718243,
+        "u_stat": 10.301355662218931,
+        "u_num_sd_undivided": 0.7234813201822101,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "off",
+       "certifies": false
+      },
+      "3000": {
+       "E": 9.496591826833491,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.3402717800420681,
+        "u_input": 0.06534536665523337,
+        "u_D": 3.445961730802938,
+        "u_val": 3.463337573987654,
+        "u_stat": 7.0602182402502525,
+        "u_num_sd_undivided": 0.7608708309989205,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "limited",
+       "certifies": false
+      }
+     },
+     "u": {
+      "u_num": 0.3235506824757425,
+      "u_input": 0.08004200718426809,
+      "u_D": 3.199301452485448,
+      "u_val": 3.2166164755718243,
+      "u_stat": 10.301355662218931,
+      "u_num_sd_undivided": 0.7234813201822101,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "certifying": [],
+     "label": "off",
+     "kappa": 3.3371522676462475,
+     "coverage_restricted": 26.93828972531883
+    },
+    "unsnapped": {
+     "R": 10.0,
+     "unit": "K of housing",
+     "kind": "level",
+     "E": 26.905449485562123,
+     "deciding": [
+      "2000",
+      "3000"
+     ],
+     "worst_line": "2000",
+     "no_statistic": false,
+     "reason": null,
+     "without": {
+      "lambda_missing": 26.905449485562123,
+      "spark_sentinel": 26.905449485562123
+     },
+     "extra": {
+      "G_k": 980.27,
+      "per_line": {
+       "2000": {
+        "ebar_k": 26.905449485562123,
+        "deltabar": -0.008435405183537581,
+        "f_star": 1.0,
+        "H_k": 26.905449485562123
+       },
+       "3000": {
+        "ebar_k": 9.459889190492277,
+        "deltabar": -0.0052418703138844116,
+        "f_star": 1.0,
+        "H_k": 9.459889190492277
+       }
+      }
+     },
+     "n_rows": 10,
+     "n_clusters": 10,
+     "lines": {
+      "2000": {
+       "E": 26.905449485562123,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.3239142462668516,
+        "u_input": 0.12055889168998453,
+        "u_D": 3.1992985860889642,
+        "u_val": 3.2179133500221826,
+        "u_stat": 10.278930145662319,
+        "u_num_sd_undivided": 0.7242942735332877,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "off",
+       "certifies": false
+      },
+      "3000": {
+       "E": 9.459889190492277,
+       "clusters": 5,
+       "u": {
+        "u_num": 0.3405804330367054,
+        "u_input": 0.07385850121373788,
+        "u_D": 3.4459614459431345,
+        "u_val": 3.463538710119393,
+        "u_stat": 7.036131652359615,
+        "u_num_sd_undivided": 0.7615610000763884,
+        "unsourced": [
+         "u_D tit",
+         "u_input map",
+         "u_input imt",
+         "u_input ect",
+         "u_input spark",
+         "u_input lam"
+        ]
+       },
+       "label": "limited",
+       "certifies": false
+      }
+     },
+     "u": {
+      "u_num": 0.3239142462668516,
+      "u_input": 0.12055889168998453,
+      "u_D": 3.1992985860889642,
+      "u_val": 3.2179133500221826,
+      "u_stat": 10.278930145662319,
+      "u_num_sd_undivided": 0.7242942735332877,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "certifying": [],
+     "label": "off",
+     "kappa": 3.334127618560649,
+     "coverage_restricted": 26.905449485562123
+    },
+    "label_worse": "off"
+   },
+   "d1_kappa": 1.0
+  },
+  "13": {
+   "handed_on": true,
+   "variants": {
+    "dwell_0s": {
+     "ecu": {
+      "enr_dwell_lo": 0.0,
+      "enr_dwell_hi": 1.5
+     },
+     "builds": true
+    },
+    "dwell_30s": {
+     "ecu": {
+      "enr_dwell_lo": 30.0,
+      "enr_dwell_hi": 31.5
+     },
+     "builds": true
+    },
+    "rule": "the enrichment ramp moved whole so that it starts at the gate, its width the engine's (enr_dwell_hi - enr_dwell_lo), each variant built through engines.Engine's invariants"
+   }
+  },
+  "10": {
+   "0.86": {
+    "C3b": -2.5491510090596705,
+    "C3d": -2.302409357318007
+   },
+   "0.98": {
+    "C3b": 3.1223171103721103,
+    "C3d": 2.8787026782131857
+   }
+  }
+ },
+ "exclusions": {
+  "E1a": [],
+  "E2a": [],
+  "E3a": [],
+  "E4a": [],
+  "E4b": [],
+  "D1": [],
+  "L0": [],
+  "L1": [],
+  "E8": [],
+  "C3b": null,
+  "C3d": null
+ },
+ "excluded_for_every_listed_constant": {
+  "E1a": false,
+  "E2a": false,
+  "E3a": false,
+  "E4a": false,
+  "E4b": false,
+  "D1": false,
+  "L0": false,
+  "L1": false,
+  "E8": false,
+  "C3b": null,
+  "C3d": null
+ },
+ "sizes_from_the_contract": {
+  "row11_imt_k": 6.3,
+  "d_rows_probe_relative": 0.1,
+  "d_rows_probe_ivc_evo_cad": 10.0
+ }
+}

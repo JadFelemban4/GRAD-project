@@ -1,0 +1,2981 @@
+{
+ "schema": "epa-rows/1",
+ "provenance": {
+  "engine": "honda_l15b7",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "30f640078c00d570fbc6c9457026d578302c31b7",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "288c3c06d7bf6464899333a7e4e39a4d45ed15c70a98f3c6f13f106240a5d89b",
+   "d3_rows.py": "bb4c69d780ca7b5cd2eb4104721ec1c734f5eb3f1c3fd606abdcea96215c9795",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "a4e6138b9d258b1f",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "7b3d8dbbbf0b58b5ff7613048890ce81bf92f269b920fd51eb2c63751d52757f",
+    "epa_highload_initial.csv": "f69e531f2cfe4c44b275ed222ff4f375f06fe751674eafaa7744503d603af2fc",
+    "epa_steady.csv": "ba8558ca2c35c9ede3583ecc091e58d090abc4bed54d6ffcc7b06b99bc2c018e"
+   },
+   "epa_engine_sha256": "6d3134cb686272e549942ed64a74cc4f60e50bc177f47d63675555c7b8d10d2c",
+   "epa_channels_blob": "3c7b296206a2682c580a6fd2e9017360e92e8924",
+   "manifest_sha256": "fdbcc949a39c343a30f3b88e425e96b0c937e3ff53d97e4cc2ec366988a2a9ed"
+  },
+  "view_sha256": "8c6a700ccbf9e96599a5c3bfbc3817b88f2daefb7e36c1c9340c196723b2da58",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "freeze": {
+   "sha_text": "641d6a7cdc99f69a2ae1239cc5f52486e771561223edae902028b520efe8a034",
+   "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+  },
+  "complete": {
+   "sha_text": "f147e8efcc405d467aa43ca3d1a0ce026d28e881c5e4e7f3f1b2f15388d340ea",
+   "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+  },
+  "derived_sha": "2970c3ff3768a61d",
+  "engine_sha": "ae07dfb4edb9ceb3",
+  "dump_sha256": "a7514c0116b52e56c0538056b7ddbbdd9c13f5f3bfcfc63f158f290cd681857b",
+  "tightenings": {
+   "sha_text": "50c073e84555522b2f7593dba50dc94be1e74d04e599e7fe6db921054595d5ba",
+   "commit": "4da4a319351ff18b8ee0097e50f0b2cb865a5959",
+   "plant": "b58"
+  },
+  "d3": {
+   "data_folder": "C:\\Users\\badcl\\Desktop\\GRAD-engine-data",
+   "c3_files": [],
+   "summary": {
+    "file": "anl-d3-2018-honda-accord-lx/test-summary/2018_Honda_Accord_Test_Summary_20191125.xlsx",
+    "sha256": "99260167e25a1757128df9d371b014ecdf53c47dd1e59dc86a580c62a21a89dc"
+   },
+   "accord": [
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809025 Test Data.txt",
+     "sha256": "9c5fcf7453bef4039f5cd1850153922c98d30357c4ebfdea31817e6c2c1b6d41"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809026 Test Data.txt",
+     "sha256": "0b0101bd0dae98600bccabb1838ad2b2f85894de7b7253596f15923dfbf6017a"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809027 Test Data.txt",
+     "sha256": "1d3412a7e1d4de2983dc82f5b0c984781854ff3c58eb7c6da38f0ba2c9a25636"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809028 Test Data.txt",
+     "sha256": "3ea5e1686cbf4dde46505728447602bf457b4f01cc2280b19e1a69f53be0166a"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809029 Test Data.txt",
+     "sha256": "595ea20ae1d8b86d839feccbbbec5adaf3ab9020b09d2b102e4e4fb20a4f4b42"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809030 Test Data.txt",
+     "sha256": "7463fc757f8e9eb1bf0cb43b57bcaac35dc1b6e8c56c42fb9d92d55367018b9c"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809031 Test Data.txt",
+     "sha256": "7658ea8420698d730d0a3b6dd0619268d7ad187500d33d708f1968ebeba7eef2"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809032 Test Data.txt",
+     "sha256": "0ccd59c3cc380dfcb3dec0d66e5fb0307e0289dfa716fcc563adb09afc66ac93"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809033 Test Data.txt",
+     "sha256": "d9a5335a9094b1e297760c05af129d52bc0475bdca679a50bfc9d1d588a6373a"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809034 Test Data.txt",
+     "sha256": "bc7b1358948569d7e6c796bf2f2183c7e109a8c4ae111d81ab2b4e705cb1178d"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809035 Test Data.txt",
+     "sha256": "e80fbc88b1a7409cf73df20c2056287ea2f1b72442d33d8347a4af0812f4e2df"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809036 Test Data.txt",
+     "sha256": "3305fce22e223c9faeadb3d9140ef75dd1ab047476a0c718b9bf4988d07bc4de"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809037 Test Data.txt",
+     "sha256": "a81bca615cda56e3b2108637531d392c6dd3c0811ae59dcaa1214397f1390552"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809038 Test Data.txt",
+     "sha256": "8094e1c635c690087d107296fe35ae23a7774f031cb3ba58d98b5ed27ed5703e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809039 Test Data.txt",
+     "sha256": "e02dad2895803ac39a8bf7a1759cad3d1045b20e7dcecdc19a7bc1da58fd952e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809040 Test Data.txt",
+     "sha256": "72b067b5005e8149777dc97078690b26e791edcdd479ea269b5d3da1299939c2"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809041 Test Data.txt",
+     "sha256": "b61b38537cd529c2c668f788acd02c79274f53b180a38c1432c1c49fbcc856a0"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809042 Test Data.txt",
+     "sha256": "10f3481d447db9db95d06de1bcbaf914f0e34e8b636ccc65a70fd2fb0a48884f"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809043 Test Data.txt",
+     "sha256": "9d431566b6637bc4cd9507dd62687ee2956f63fa91f03f8f6eb8a2a28b9b460d"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809044 Test Data.txt",
+     "sha256": "41b7c4f61122cc089c4239faa874081a9d27de1ad350fd7141acd2de32a26c85"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809045 Test Data.txt",
+     "sha256": "2043a488653aa4958fc198965c8cc724c7d1c467475bdca9e8e7cc347029f7e2"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809046 Test Data.txt",
+     "sha256": "64cc9368ec6dac6a99bf60fb3bf0f5c2cfc1f5f0d3e185c3b4bd26e2a9c1f152"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809047 Test Data.txt",
+     "sha256": "72188db4f366a6817ffee40f1d7d57d933f166c53c5ede869588532250b09531"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809048 Test Data.txt",
+     "sha256": "83b81507905e9c9fdbb6bbe2c1ea1a4e08ccc99da869459a114df91c18e20f54"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809049 Test Data.txt",
+     "sha256": "ac5f46d5857d25c43f05e62567d50eaff5caf759a7710fd95506b703537d3cf7"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809050 Test Data.txt",
+     "sha256": "a509f31f7cdfb910867c70943314b14196bc05a24b309284b6baf3f6e2e20716"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809051 Test Data.txt",
+     "sha256": "1c8853b060d4f4e44d2bb47ced02300165d5971a149ed352869c35e5e39b9264"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809052 Test Data.txt",
+     "sha256": "6f74ea15b5a16e11395eeeb54a3910b4624afaf9ff40748d43b8f22c0ca62af7"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809053 Test Data.txt",
+     "sha256": "471db9ea530ee222686cdbe5ae36527be54de5aa4ed5b62ab3348a198ce5c581"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809054 Test Data.txt",
+     "sha256": "ac3d8c6cefc2b314b976f8cd3df44a8073af7345747f1506b4876e5c6288f485"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809055 Test Data.txt",
+     "sha256": "73213dfb0edc67dd6acba99a44568602239b94ce201df3dc618fbfbadb05fffd"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809056 Test Data.txt",
+     "sha256": "82f6d45bd04850db60337b0c78b5f1e1188c8e8d48d466f45ca9dc98af45b18e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809057 Test Data.txt",
+     "sha256": "73f98a760a30375ee1e8a9a3416c725aab1b5ac774d95c8729babb777e4dc68f"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809058 Test Data.txt",
+     "sha256": "734de969c67e7b040e7b3a84bb6cc64c6f6198c80d11ac05da8c65107db672e9"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809059 Test Data.txt",
+     "sha256": "8dd13ab27e99e517a4da1cc31981adb16aa512d04dcb76744a454ec4751b0c48"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809060 Test Data.txt",
+     "sha256": "90530c596ed9e022d8d5c8323ef7b62adc69e3683d11f9a8b9dcda38836c0567"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809061 Test Data.txt",
+     "sha256": "360fe5b127d07b3a87782d77ea285916b7ba61d2abac0beff3a2cb859e59d877"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809062 Test Data.txt",
+     "sha256": "11de823253dfb73640f12e8c4d03e032d53f44a4bcf9135e27e768bfef5f6bc6"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809063 Test Data.txt",
+     "sha256": "f434c88cdb3d480a96738aa6688e9d1fd3f0de738a9296cdb2a7841d80773e76"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809067 Test Data.txt",
+     "sha256": "d97b3603f22c852e01f6e34bd23eacd42d2d3631702ef52a556bd5175cabd179"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809068 Test Data.txt",
+     "sha256": "7e0580710d823cd1b8516db8ea06a1974c216932fa6fadbe6d25e39d420ba47b"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809069 Test Data.txt",
+     "sha256": "2936cc826da41802b45588b5196eb1159e83cfb86f5f85b3e4fd62390a8abb62"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809070 Test Data.txt",
+     "sha256": "a9b6a74bb6eae441567c0b2b2655a41b97e8faa02be2d4d051c0fc5f904bd9c3"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809071 Test Data.txt",
+     "sha256": "0daa6a5151d0bfbc966745013f3f153fe637c5aaab9ccc60693637c461891c39"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809072 Test Data.txt",
+     "sha256": "84a39f12ab455a08f9ee3762eed00a8ac2c1c173130c9b4be8e1667021e5319c"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809073 Test Data.txt",
+     "sha256": "d9098e9410ffe10166935b1df3354a918d867fc0c13782381b54ff283344d287"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809074 Test Data.txt",
+     "sha256": "e348b2fa8c15c0c09564aa6228b09888d121916ec8a68a1e9101e95c9439db01"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809075 Test Data.txt",
+     "sha256": "8cf42ef1bfaa24613fdc3899bcaf12cd2196013c34217369830a52f66518b994"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809076 Test Data.txt",
+     "sha256": "793a21ead785c14ef91c1dd897ac3393d576bf0647972e77c4b7b6b4cfd98a30"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809077 Test Data.txt",
+     "sha256": "5bd378c510b8934c0435dfef6ca068052366f213bf2fa6c688057569275dce81"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809078 Test Data.txt",
+     "sha256": "0548be9ec1242d59659f89128e1c5c49739e28ff04039bb75ac6a5becebc3942"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809079 Test Data.txt",
+     "sha256": "3bfef7b0f84fef4f8f1daa314d9c1491affc8c423c6315a37ccc0d75c389d705"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61809080 Test Data.txt",
+     "sha256": "9ca99d3658da7ced4ee91c4668158428c431447c1c33d1f4effb6d892f346d0e"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810001 Test Data.txt",
+     "sha256": "c94a1390a5772df92969e00ee23a6834caf1a06d523f0466ed45e8d5b43e3791"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810002 Test Data.txt",
+     "sha256": "15f5fbe08d02c987fbdbc115ef270a33c49a87ae6719c6739dcf69918a2c5b05"
+    },
+    {
+     "file": "anl-d3-2018-honda-accord-lx/extended-datasets/61810003 Test Data.txt",
+     "sha256": "c3fa15085620c24213b63908003a067834d793a490ffebba3959a62b60ef74ab"
+    }
+   ]
+  },
+  "armed_blob": "b54cdc6ef7d197df23e2506cc2739f4f72f7900f"
+ },
+ "counts": {
+  "held_out_rows": 107,
+  "by_table": {
+   "epa_steady.csv": 75,
+   "epa_highload_initial.csv": 16,
+   "epa_highload_final.csv": 16
+  },
+  "fired_lambda_missing": 0,
+  "fired_spark_sentinel": 0
+ },
+ "rows": {
+  "E1a": {
+   "R": 1.9,
+   "unit": "% of the measured torque",
+   "kind": "level",
+   "E": -7.5158169595398405,
+   "deciding": [
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": "4500",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": -7.5158169595398405,
+    "spark_sentinel": -7.5158169595398405
+   },
+   "extra": {},
+   "n_rows": 23,
+   "n_clusters": 23,
+   "lines": {
+    "2000": {
+     "E": -1.4429900175950419,
+     "clusters": 8,
+     "u": {
+      "u_num": 0.023989284566998892,
+      "u_input": 0.04390596965367671,
+      "u_D": 0.02399054204643912,
+      "u_val": 0.055486629497095916,
+      "u_stat": 1.1661789591898128,
+      "u_num_sd_undivided": 0.06785194317255483,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "validated",
+     "certifies": false
+    },
+    "3000": {
+     "E": -5.501770507138908,
+     "clusters": 9,
+     "u": {
+      "u_num": 0.008697219305090332,
+      "u_input": 0.03896947880742038,
+      "u_D": 0.022853018450922323,
+      "u_val": 0.04600567741573879,
+      "u_stat": 2.4720965472551972,
+      "u_num_sd_undivided": 0.026091657915270995,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "4500": {
+     "E": -7.5158169595398405,
+     "clusters": 6,
+     "u": {
+      "u_num": 0.028997698330707967,
+      "u_input": 0.09599705449900514,
+      "u_D": 0.028284897449634725,
+      "u_val": 0.10419374455647545,
+      "u_stat": 3.7735152535443026,
+      "u_num_sd_undivided": 0.07102956462539005,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.028997698330707967,
+    "u_input": 0.09599705449900514,
+    "u_D": 0.028284897449634725,
+    "u_val": 0.10419374455647545,
+    "u_stat": 3.7735152535443026,
+    "u_num_sd_undivided": 0.07102956462539005,
+    "unsourced": [
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 4.065370762448838,
+   "coverage_restricted": -10.880497277700488
+  },
+  "E2a": {
+   "R": 4.0,
+   "unit": "% of the measured flow",
+   "kind": "level",
+   "E": 2.1456734552003405,
+   "deciding": [
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": "4500",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 2.1456734552003405,
+    "spark_sentinel": 2.1456734552003405
+   },
+   "extra": {},
+   "n_rows": 23,
+   "n_clusters": 23,
+   "lines": {
+    "2000": {
+     "E": -1.3418288527516407,
+     "clusters": 8,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.083184526963334,
+      "u_D": 0.11555654630475237,
+      "u_val": 0.14238321853363203,
+      "u_stat": 0.6846608796998602,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "validated",
+     "certifies": true
+    },
+    "3000": {
+     "E": -1.9300779455115906,
+     "clusters": 9,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.08498846043507988,
+      "u_D": 0.07866288739845922,
+      "u_val": 0.11580538960250432,
+      "u_stat": 1.2170357075563514,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "validated",
+     "certifies": true
+    },
+    "4500": {
+     "E": 2.1456734552003405,
+     "clusters": 6,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.1785932966504301,
+      "u_D": 0.050184363174113025,
+      "u_val": 0.1855102043437498,
+      "u_stat": 4.7068322631901935,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "validated",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.0,
+    "u_input": 0.1785932966504301,
+    "u_D": 0.050184363174113025,
+    "u_val": 0.1855102043437498,
+    "u_stat": 4.7068322631901935,
+    "u_num_sd_undivided": 0.0,
+    "unsourced": [
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "2000",
+    "3000"
+   ],
+   "label": "validated",
+   "kappa": 1.0,
+   "coverage_restricted": -2.075682552609641
+  },
+  "E3a": {
+   "R": 10.0,
+   "unit": "K",
+   "kind": "level",
+   "E": 25.776205833588165,
+   "deciding": [
+    "2000",
+    "3000"
+   ],
+   "worst_line": "2000",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 25.776205833588165,
+    "spark_sentinel": 25.776205833588165
+   },
+   "extra": {},
+   "n_rows": 10,
+   "n_clusters": 10,
+   "lines": {
+    "2000": {
+     "E": 25.776205833588165,
+     "clusters": 5,
+     "u": {
+      "u_num": 0.33560822923939293,
+      "u_input": 0.06920781346675711,
+      "u_D": 3.199055592277386,
+      "u_val": 3.2173559466523542,
+      "u_stat": 10.94518964709187,
+      "u_num_sd_undivided": 0.7504428143876152,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "3000": {
+     "E": 9.55781335958036,
+     "clusters": 5,
+     "u": {
+      "u_num": 0.35613418226361,
+      "u_input": 0.06058077677870973,
+      "u_D": 3.4458673484081146,
+      "u_val": 3.4647515595085387,
+      "u_stat": 6.843714929674974,
+      "u_num_sd_undivided": 0.7963402406527319,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.33560822923939293,
+    "u_input": 0.06920781346675711,
+    "u_D": 3.199055592277386,
+    "u_val": 3.2173559466523542,
+    "u_stat": 10.94518964709187,
+    "u_num_sd_undivided": 0.7504428143876152,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 3.221091772689287,
+   "coverage_restricted": 25.776205833588165
+  },
+  "E4a": {
+   "R": 10.0,
+   "unit": "K",
+   "kind": "level",
+   "E": 61.462209872133336,
+   "deciding": [
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": "2000",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 61.462209872133336,
+    "spark_sentinel": 61.462209872133336
+   },
+   "extra": {
+    "censored_rows": []
+   },
+   "n_rows": 13,
+   "n_clusters": 13,
+   "lines": {
+    "2000": {
+     "E": 61.462209872133336,
+     "clusters": 3,
+     "u": {
+      "u_num": 0.6787084684189694,
+      "u_input": 0.3073212129548628,
+      "u_D": 2.833344690860642,
+      "u_val": 2.9296644262208353,
+      "u_stat": 6.787107323078073,
+      "u_num_sd_undivided": 1.1755575508289118,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "3000": {
+     "E": 24.04828526838807,
+     "clusters": 4,
+     "u": {
+      "u_num": 0.1353435203831218,
+      "u_input": 0.2749634812976437,
+      "u_D": 3.0888905179966173,
+      "u_val": 3.1040566065596207,
+      "u_stat": 3.5626673629862684,
+      "u_num_sd_undivided": 0.2706870407662436,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": true
+    },
+    "4500": {
+     "E": 2.299965532689536,
+     "clusters": 6,
+     "u": {
+      "u_num": 0.3446138310008318,
+      "u_input": 0.21065111076299695,
+      "u_D": 3.224714845590294,
+      "u_val": 3.2499105246688234,
+      "u_stat": 1.1447515579680692,
+      "u_num_sd_undivided": 0.844128044257753,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "validated",
+     "certifies": true
+    }
+   },
+   "u": {
+    "u_num": 0.6787084684189694,
+    "u_input": 0.3073212129548628,
+    "u_D": 2.833344690860642,
+    "u_val": 2.9296644262208353,
+    "u_stat": 6.787107323078073,
+    "u_num_sd_undivided": 1.1755575508289118,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "3000",
+    "4500"
+   ],
+   "label": "off",
+   "kappa": 6.7321538724575,
+   "coverage_restricted": 61.462209872133336
+  },
+  "E1b": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": 8.322499912755772,
+   "deciding": [
+    "1250",
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 8.322499912755772,
+    "spark_sentinel": 8.322499912755772
+   },
+   "extra": {
+    "worth_b_pct": 12.318305001231831
+   },
+   "n_rows": 69,
+   "n_clusters": 69,
+   "lines": {
+    "1250": {
+     "E": 5.8843800689998265,
+     "clusters": 14,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2000": {
+     "E": 8.094358521207495,
+     "clusters": 21,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": 8.788152753648532,
+     "clusters": 19,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "4500": {
+     "E": 10.327649449964753,
+     "clusters": 15,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": 8.30801337277772
+  },
+  "E2b": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": 7.718895933831867,
+   "deciding": [
+    "1250",
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 7.718895933831867,
+    "spark_sentinel": 7.718895933831867
+   },
+   "extra": {
+    "worth_b_pct": 16.666666666666668
+   },
+   "n_rows": 69,
+   "n_clusters": 69,
+   "lines": {
+    "1250": {
+     "E": 6.46099056981815,
+     "clusters": 14,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2000": {
+     "E": 8.03654158727704,
+     "clusters": 21,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": 7.006746831792452,
+     "clusters": 19,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "4500": {
+     "E": 9.350292554671357,
+     "clusters": 15,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": 7.490461263825715
+  },
+  "E3b": {
+   "R": null,
+   "unit": "K",
+   "kind": "descriptive",
+   "E": 27.33405868953199,
+   "deciding": [
+    "1250",
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 27.33405868953199,
+    "spark_sentinel": 27.33405868953199
+   },
+   "extra": {},
+   "n_rows": 55,
+   "n_clusters": 55,
+   "lines": {
+    "1250": {
+     "E": 41.08264023679049,
+     "clusters": 14,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2000": {
+     "E": 20.71193583440335,
+     "clusters": 17,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": 26.749594287399592,
+     "clusters": 15,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "4500": {
+     "E": 19.42993790148243,
+     "clusters": 9,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": 27.33405868953199
+  },
+  "E1i": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": 4.46420378145401,
+   "deciding": [
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": "2000",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 4.46420378145401,
+    "spark_sentinel": 4.46420378145401
+   },
+   "extra": {
+    "label": "transient"
+   },
+   "n_rows": 16,
+   "n_clusters": 16,
+   "lines": {
+    "2000": {
+     "E": 4.46420378145401,
+     "clusters": 5,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": -0.0078550480535311,
+     "clusters": 5,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "4500": {
+     "E": 0.0532623074279408,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": 4.46420378145401
+  },
+  "E4b": {
+   "R": 16.6,
+   "unit": "% of the lever's effect",
+   "kind": "d",
+   "E": -20.73848328657388,
+   "deciding": [
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": -20.73848328657388,
+    "spark_sentinel": -20.73848328657388
+   },
+   "extra": {
+    "sum_L_S_k": 1163.5405540497038,
+    "sum_data_lever_k": 1467.9766452824028,
+    "extrapolation_kpa": {
+     "2000": 19.221516507522153,
+     "3000": 16.39872759856621,
+     "4500": 62.571267281106
+    },
+    "extrapolation_below_kpa": {
+     "2000": 0.0,
+     "3000": 0.0,
+     "4500": 0.0
+    },
+    "enriched_rows": 13,
+    "censored_rows": [],
+    "pair_estimate": {
+     "value_pct": -566.3194892981434,
+     "holds": 12,
+     "label": "descriptive"
+    },
+    "lines_one_map": []
+   },
+   "n_rows": 37,
+   "n_clusters": 37,
+   "lines": {
+    "1250": {
+     "E": null,
+     "clusters": 0,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2000": {
+     "E": null,
+     "clusters": 3,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": null,
+     "clusters": 4,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "4500": {
+     "E": null,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": -20.73848328657388,
+     "clusters": 37,
+     "u": {
+      "u_num": 1.6845170244732923,
+      "u_input": 0.1426939989439005,
+      "u_D": 1.4551348096906254,
+      "u_val": 2.2305551993726422,
+      "u_stat": 3.363202834943533,
+      "u_num_sd_undivided": 10.246517038115591,
+      "unsourced": [
+       "u_D tit",
+       "u_D lam",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": true
+    }
+   },
+   "u": {
+    "u_num": 1.6845170244732923,
+    "u_input": 0.1426939989439005,
+    "u_D": 1.4551348096906254,
+    "u_val": 2.2305551993726422,
+    "u_stat": 3.363202834943533,
+    "u_num_sd_undivided": 10.246517038115591,
+    "unsourced": [
+     "u_D tit",
+     "u_D lam",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "pooled"
+   ],
+   "label": "limited",
+   "kappa": 1.5180478123686243,
+   "coverage_restricted": -20.075195172989947,
+   "condition": "both arms' cuts in 0-0.865"
+  },
+  "E5": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": null,
+   "deciding": [],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {},
+   "extra": {
+    "windows": {
+     "A": {
+      "value_pct": 55.829455523380744,
+      "lines": {
+       "1250": {
+        "cov_map_S": 2049.6495715350843,
+        "cov_map_D": 1283.9100555555553,
+        "n": 9
+       },
+       "2000": {
+        "cov_map_S": 2098.8213843593867,
+        "cov_map_D": 1287.2654047619048,
+        "n": 7
+       },
+       "3000": {
+        "cov_map_S": 1632.1084987275583,
+        "cov_map_D": 618.8200000000002,
+        "n": 4
+       },
+       "4500": {
+        "cov_map_S": 635.2735236203307,
+        "cov_map_D": 927.2318999999997,
+        "n": 6
+       }
+      }
+     },
+     "B": {
+      "value_pct": 10.907742860007374,
+      "lines": {
+       "1250": {
+        "cov_map_S": 164.9777780744324,
+        "cov_map_D": 78.06550000000004,
+        "n": 5
+       },
+       "2000": {
+        "cov_map_S": 727.1189107213893,
+        "cov_map_D": 418.91038339138896,
+        "n": 10
+       },
+       "3000": {
+        "cov_map_S": 572.905861018416,
+        "cov_map_D": 777.0181256612173,
+        "n": 11
+       },
+       "4500": {
+        "cov_map_S": 147.60047772002554,
+        "cov_map_D": 180.01000000000028,
+        "n": 3
+       }
+      }
+     }
+    },
+    "boost_lever": "untested",
+    "without": {
+     "lambda_missing": {
+      "A": {
+       "value_pct": 55.829455523380744,
+       "lines": {
+        "1250": {
+         "cov_map_S": 2049.6495715350843,
+         "cov_map_D": 1283.9100555555553,
+         "n": 9
+        },
+        "2000": {
+         "cov_map_S": 2098.8213843593867,
+         "cov_map_D": 1287.2654047619048,
+         "n": 7
+        },
+        "3000": {
+         "cov_map_S": 1632.1084987275583,
+         "cov_map_D": 618.8200000000002,
+         "n": 4
+        },
+        "4500": {
+         "cov_map_S": 635.2735236203307,
+         "cov_map_D": 927.2318999999997,
+         "n": 6
+        }
+       }
+      },
+      "B": {
+       "value_pct": 10.907742860007374,
+       "lines": {
+        "1250": {
+         "cov_map_S": 164.9777780744324,
+         "cov_map_D": 78.06550000000004,
+         "n": 5
+        },
+        "2000": {
+         "cov_map_S": 727.1189107213893,
+         "cov_map_D": 418.91038339138896,
+         "n": 10
+        },
+        "3000": {
+         "cov_map_S": 572.905861018416,
+         "cov_map_D": 777.0181256612173,
+         "n": 11
+        },
+        "4500": {
+         "cov_map_S": 147.60047772002554,
+         "cov_map_D": 180.01000000000028,
+         "n": 3
+        }
+       }
+      }
+     },
+     "spark_sentinel": {
+      "A": {
+       "value_pct": 55.829455523380744,
+       "lines": {
+        "1250": {
+         "cov_map_S": 2049.6495715350843,
+         "cov_map_D": 1283.9100555555553,
+         "n": 9
+        },
+        "2000": {
+         "cov_map_S": 2098.8213843593867,
+         "cov_map_D": 1287.2654047619048,
+         "n": 7
+        },
+        "3000": {
+         "cov_map_S": 1632.1084987275583,
+         "cov_map_D": 618.8200000000002,
+         "n": 4
+        },
+        "4500": {
+         "cov_map_S": 635.2735236203307,
+         "cov_map_D": 927.2318999999997,
+         "n": 6
+        }
+       }
+      },
+      "B": {
+       "value_pct": 10.907742860007374,
+       "lines": {
+        "1250": {
+         "cov_map_S": 164.9777780744324,
+         "cov_map_D": 78.06550000000004,
+         "n": 5
+        },
+        "2000": {
+         "cov_map_S": 727.1189107213893,
+         "cov_map_D": 418.91038339138896,
+         "n": 10
+        },
+        "3000": {
+         "cov_map_S": 572.905861018416,
+         "cov_map_D": 777.0181256612173,
+         "n": 11
+        },
+        "4500": {
+         "cov_map_S": 147.60047772002554,
+         "cov_map_D": 180.01000000000028,
+         "n": 3
+        }
+       }
+      }
+     }
+    },
+    "coverage_restricted": {
+     "A": {
+      "value_pct": 55.829455523380744,
+      "lines": {
+       "1250": {
+        "cov_map_S": 2049.6495715350843,
+        "cov_map_D": 1283.9100555555553,
+        "n": 9
+       },
+       "2000": {
+        "cov_map_S": 2098.8213843593867,
+        "cov_map_D": 1287.2654047619048,
+        "n": 7
+       },
+       "3000": {
+        "cov_map_S": 1632.1084987275583,
+        "cov_map_D": 618.8200000000002,
+        "n": 4
+       },
+       "4500": {
+        "cov_map_S": 635.2735236203307,
+        "cov_map_D": 927.2318999999997,
+        "n": 6
+       }
+      }
+     },
+     "B": {
+      "value_pct": 10.907742860007374,
+      "lines": {
+       "1250": {
+        "cov_map_S": 164.9777780744324,
+        "cov_map_D": 78.06550000000004,
+        "n": 5
+       },
+       "2000": {
+        "cov_map_S": 727.1189107213893,
+        "cov_map_D": 418.91038339138896,
+        "n": 10
+       },
+       "3000": {
+        "cov_map_S": 572.905861018416,
+        "cov_map_D": 777.0181256612173,
+        "n": 11
+       },
+       "4500": {
+        "cov_map_S": 147.60047772002554,
+        "cov_map_D": 180.01000000000028,
+        "n": 3
+       }
+      }
+     }
+    }
+   },
+   "n_rows": 0,
+   "n_clusters": 0,
+   "lines": {},
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": null
+  },
+  "D1": {
+   "R": 16.6,
+   "unit": "% of the measured flow",
+   "kind": "d",
+   "E": 2.962267486751272,
+   "deciding": [
+    "1250",
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 2.962267486751272,
+    "spark_sentinel": 2.962267486751272,
+    "unreachable": 2.962267486751272
+   },
+   "extra": {
+    "unreachable": [],
+    "n_unreachable": 0,
+    "bounds_kpa": []
+   },
+   "n_rows": 69,
+   "n_clusters": 69,
+   "lines": {
+    "1250": {
+     "E": 1.3673586089304826,
+     "clusters": 14,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2000": {
+     "E": 2.216803389938284,
+     "clusters": 21,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": 3.4140332860646425,
+     "clusters": 19,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "4500": {
+     "E": 4.922262162458589,
+     "clusters": 15,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": 2.962267486751272,
+     "clusters": 69,
+     "u": {
+      "u_num": 0.048084206100223556,
+      "u_input": 0.0709527854378784,
+      "u_D": 0.09840776468025887,
+      "u_val": 0.1305008689129984,
+      "u_stat": 0.3959051954918336,
+      "u_num_sd_undivided": 0.39941741382158785,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "validated",
+     "certifies": true
+    }
+   },
+   "u": {
+    "u_num": 0.048084206100223556,
+    "u_input": 0.0709527854378784,
+    "u_D": 0.09840776468025887,
+    "u_val": 0.1305008689129984,
+    "u_stat": 0.3959051954918336,
+    "u_num_sd_undivided": 0.39941741382158785,
+    "unsourced": [
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "pooled"
+   ],
+   "label": "validated",
+   "kappa": 1.0,
+   "coverage_restricted": 2.863062812591349,
+   "condition": "both arms' cuts in 0-0.865"
+  },
+  "L0": {
+   "R": 10.0,
+   "unit": "K of housing",
+   "kind": "level",
+   "E": 26.93828972531883,
+   "deciding": [
+    "2000",
+    "3000"
+   ],
+   "worst_line": "2000",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 26.93828972531883,
+    "spark_sentinel": 26.93828972531883
+   },
+   "extra": {
+    "G_k": 980.27,
+    "per_line": {
+     "2000": {
+      "ebar_k": 26.93828972531883,
+      "deltabar": -0.00853666617354285,
+      "f_star": 1.0,
+      "H_k": 26.93828972531883
+     },
+     "3000": {
+      "ebar_k": 9.496591826833491,
+      "deltabar": -0.005236821495621613,
+      "f_star": 1.0,
+      "H_k": 9.496591826833491
+     }
+    }
+   },
+   "n_rows": 10,
+   "n_clusters": 10,
+   "lines": {
+    "2000": {
+     "E": 26.93828972531883,
+     "clusters": 5,
+     "u": {
+      "u_num": 0.3235506824757425,
+      "u_input": 0.08004200718426809,
+      "u_D": 3.199301452485448,
+      "u_val": 3.2166164755718243,
+      "u_stat": 10.301355662218931,
+      "u_num_sd_undivided": 0.7234813201822101,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "3000": {
+     "E": 9.496591826833491,
+     "clusters": 5,
+     "u": {
+      "u_num": 0.3402717800420681,
+      "u_input": 0.06534536665523337,
+      "u_D": 3.445961730802938,
+      "u_val": 3.463337573987654,
+      "u_stat": 7.0602182402502525,
+      "u_num_sd_undivided": 0.7608708309989205,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.3235506824757425,
+    "u_input": 0.08004200718426809,
+    "u_D": 3.199301452485448,
+    "u_val": 3.2166164755718243,
+    "u_stat": 10.301355662218931,
+    "u_num_sd_undivided": 0.7234813201822101,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 3.3371522676462475,
+   "coverage_restricted": 26.93828972531883
+  },
+  "L1": {
+   "R": 9.9,
+   "unit": "K of housing",
+   "kind": "d",
+   "E": 17.441697898485337,
+   "deciding": [
+    "2000",
+    "3000"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 17.441697898485337,
+    "spark_sentinel": 17.441697898485337
+   },
+   "extra": {
+    "G_k": 980.27,
+    "f_star": 1.0,
+    "extreme_lines": [
+     "2000",
+     "3000"
+    ],
+    "H_at_f_star": {
+     "2000": 26.93828972531883,
+     "3000": 9.496591826833491
+    }
+   },
+   "n_rows": 10,
+   "n_clusters": 10,
+   "lines": {
+    "2000": {
+     "E": 26.93828972531883,
+     "clusters": 5,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": 9.496591826833491,
+     "clusters": 5,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": 17.441697898485337,
+     "clusters": 10,
+     "u": {
+      "u_num": 0.4695422541406868,
+      "u_input": 0.10332831101587486,
+      "u_D": 0.25127596719908124,
+      "u_val": 0.5424815941326898,
+      "u_stat": 12.488579185779798,
+      "u_num_sd_undivided": 1.4848229807741977,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.4695422541406868,
+    "u_input": 0.10332831101587486,
+    "u_D": 0.25127596719908124,
+    "u_val": 0.5424815941326898,
+    "u_stat": 12.488579185779798,
+    "u_num_sd_undivided": 1.4848229807741977,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 1.8713799077525977,
+   "coverage_restricted": 17.441697898485337,
+   "condition": "both arms' cuts in 0-0.865"
+  },
+  "E8": {
+   "R": 16.6,
+   "unit": "% of the head-start pair",
+   "kind": "d",
+   "E": 158.8072440920685,
+   "deciding": [
+    "2000",
+    "3000",
+    "4500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 158.8072440920685,
+    "spark_sentinel": 158.8072440920685,
+    "censored": 158.8072440920685
+   },
+   "extra": {
+    "n_final": 16,
+    "n_dl": 16,
+    "n_ds": 16,
+    "dl": 0.10659410819091364,
+    "ds": 0.2805780814965008,
+    "worth_b": {
+     "lambda_rich": {
+      "shift": -0.0206,
+      "extrapolated": false
+     },
+     "lambda_lean": {
+      "shift": 0.0086,
+      "extrapolated": false
+     },
+     "spark_retard": {
+      "shift": -2.594,
+      "extrapolated": false
+     },
+     "spark_advance": {
+      "shift": 2.625,
+      "extrapolated": true,
+      "largest_measured": [
+       1.5,
+       -0.1015
+      ]
+     }
+    },
+    "terms": {
+     "lambda": {
+      "shift": 0.10659410819091364,
+      "P": -1.5548275508392224,
+      "extrapolated": true,
+      "slope": -13.054446162770219,
+      "rows": 16
+     },
+     "spark": {
+      "shift": 0.2805780814965008,
+      "P": -0.033244890081462336,
+      "extrapolated": false,
+      "slope": -0.11848712452571582,
+      "rows": 16
+     }
+    },
+    "every_final_row": {
+     "dl": 0.10659410819091364,
+     "ds": 0.2805780814965008,
+     "E_pct": 158.8072440920685
+    },
+    "censored_rows": [],
+    "dl_without_censored": 0.10659410819091364,
+    "snapped": {
+     "dl": 0.106597617895262,
+     "E_pct": 158.81182581671476,
+     "label": "descriptive"
+    },
+    "enrichment_onset_kpa": {
+     "2000": {
+      "model_kpa": 141.94430728824707,
+      "epa_kpa": 147.30596309963096
+     },
+     "3000": {
+      "model_kpa": 138.353426573426,
+      "epa_kpa": 140.63163934426254
+     },
+     "4500": {
+      "model_kpa": 135.29102902374672,
+      "epa_kpa": 127.21773913043478
+     }
+    },
+    "u_dl": {
+     "u_num": 0.0,
+     "u_input": 0.0007217077591580538,
+     "u_D": 0.01200000000000001,
+     "u_val": 0.012021682997385565,
+     "u_stat": 0.03284238234407528,
+     "u_num_sd_undivided": 0.0,
+     "unsourced": [
+      "u_D lam",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "u_ds": {
+     "u_num": 0.0,
+     "u_input": 0.0073186861136564,
+     "u_D": 0.0,
+     "u_val": 0.0073186861136564,
+     "u_stat": 0.4660655649129784,
+     "u_num_sd_undivided": 0.0,
+     "unsourced": [
+      "u_D lam",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    }
+   },
+   "n_rows": 16,
+   "n_clusters": 16,
+   "lines": {
+    "2000": {
+     "E": null,
+     "clusters": 5,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3000": {
+     "E": null,
+     "clusters": 5,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "4500": {
+     "E": null,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": 158.8072440920685,
+     "clusters": 16,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.9461318809402727,
+      "u_D": 15.665335395324275,
+      "u_val": 15.693880928060183,
+      "u_stat": 43.22809045948052,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_D lam",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.0,
+    "u_input": 0.9461318809402727,
+    "u_D": 15.665335395324275,
+    "u_val": 15.693880928060183,
+    "u_stat": 43.22809045948052,
+    "u_num_sd_undivided": 0.0,
+    "unsourced": [
+     "u_D lam",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 11.457530478806556,
+   "coverage_restricted": 159.2643325303215,
+   "condition": "both arms' cuts in 0-0.865"
+  }
+ },
+ "reported": {
+  "E1a": {
+   "label": "off",
+   "kappa": 4.065370762448838,
+   "how": "as computed"
+  },
+  "E2a": {
+   "label": "validated",
+   "kappa": 1.0,
+   "how": "as computed"
+  },
+  "E3a": {
+   "label": "off",
+   "kappa": 3.221091772689287,
+   "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "E4a": {
+   "label": "off",
+   "kappa": 6.7321538724575,
+   "how": "as computed"
+  },
+  "E4b": {
+   "label": "limited",
+   "kappa": 1.5180478123686243,
+   "how": "as computed"
+  },
+  "D1": {
+   "label": "validated",
+   "kappa": 1.0,
+   "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "L0": {
+   "label": "off",
+   "kappa": 3.3371522676462475,
+   "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "L1": {
+   "label": "off",
+   "kappa": 1.8713799077525977,
+   "how": "as computed"
+  },
+  "E8": {
+   "label": "off",
+   "kappa": 11.457530478806556,
+   "how": "as computed"
+  }
+ },
+ "coverage_flags": {
+  "engine": {
+   "contract_coverage": {
+    "fired_steady_and_final": {
+     "20-40 kPa": {
+      "n": 6,
+      "speed_rpm": [
+       1001.0,
+       3000.0
+      ],
+      "intake_manifold_temp_c": [
+       42.1,
+       47.5
+      ],
+      "coolant_temp_c": [
+       84.9,
+       91.4
+      ]
+     },
+     "40-60 kPa": {
+      "n": 19,
+      "speed_rpm": [
+       1001.0,
+       4999.0
+      ],
+      "intake_manifold_temp_c": [
+       37.6,
+       51.1
+      ],
+      "coolant_temp_c": [
+       85.9,
+       91.8
+      ]
+     },
+     "60-80 kPa": {
+      "n": 16,
+      "speed_rpm": [
+       1001.0,
+       4999.0
+      ],
+      "intake_manifold_temp_c": [
+       36.5,
+       48.0
+      ],
+      "coolant_temp_c": [
+       84.3,
+       92.0
+      ]
+     },
+     "80-100 kPa": {
+      "n": 35,
+      "speed_rpm": [
+       1001.0,
+       5000.0
+      ],
+      "intake_manifold_temp_c": [
+       33.0,
+       46.0
+      ],
+      "coolant_temp_c": [
+       83.7,
+       93.6
+      ]
+     },
+     "100-120 kPa": {
+      "n": 34,
+      "speed_rpm": [
+       1001.0,
+       4500.0
+      ],
+      "intake_manifold_temp_c": [
+       31.5,
+       37.6
+      ],
+      "coolant_temp_c": [
+       85.3,
+       94.3
+      ]
+     },
+     "120-140 kPa": {
+      "n": 45,
+      "speed_rpm": [
+       1500.7,
+       4999.8
+      ],
+      "intake_manifold_temp_c": [
+       33.3,
+       40.4
+      ],
+      "coolant_temp_c": [
+       85.1,
+       93.6
+      ]
+     },
+     "140-160 kPa": {
+      "n": 33,
+      "speed_rpm": [
+       1500.9,
+       4999.9
+      ],
+      "intake_manifold_temp_c": [
+       36.3,
+       40.2
+      ],
+      "coolant_temp_c": [
+       87.4,
+       94.6
+      ]
+     },
+     "160-180 kPa": {
+      "n": 9,
+      "speed_rpm": [
+       1703.3,
+       5000.9
+      ],
+      "intake_manifold_temp_c": [
+       38.6,
+       40.4
+      ],
+      "coolant_temp_c": [
+       86.7,
+       93.6
+      ]
+     },
+     "180-200 kPa": {
+      "n": 1,
+      "speed_rpm": [
+       4500.7,
+       4500.7
+      ],
+      "intake_manifold_temp_c": [
+       39.5,
+       39.5
+      ],
+      "coolant_temp_c": [
+       88.9,
+       88.9
+      ]
+     }
+    },
+    "hot": {
+     "120-140 kPa": {
+      "n": 40,
+      "speed_rpm": [
+       1500.7,
+       4999.8
+      ],
+      "intake_manifold_temp_c": [
+       33.3,
+       40.4
+      ],
+      "coolant_temp_c": [
+       85.1,
+       93.6
+      ]
+     },
+     "140-160 kPa": {
+      "n": 33,
+      "speed_rpm": [
+       1500.9,
+       4999.9
+      ],
+      "intake_manifold_temp_c": [
+       36.3,
+       40.2
+      ],
+      "coolant_temp_c": [
+       87.4,
+       94.6
+      ]
+     },
+     "160-180 kPa": {
+      "n": 9,
+      "speed_rpm": [
+       1703.3,
+       5000.9
+      ],
+      "intake_manifold_temp_c": [
+       38.6,
+       40.4
+      ],
+      "coolant_temp_c": [
+       86.7,
+       93.6
+      ]
+     },
+     "180-200 kPa": {
+      "n": 1,
+      "speed_rpm": [
+       4500.7,
+       4500.7
+      ],
+      "intake_manifold_temp_c": [
+       39.5,
+       39.5
+      ],
+      "coolant_temp_c": [
+       88.9,
+       88.9
+      ]
+     }
+    },
+    "calibration_fired": {
+     "20-40 kPa": {
+      "n": 3,
+      "speed_rpm": [
+       1001.0,
+       2500.0
+      ],
+      "intake_manifold_temp_c": [
+       42.4,
+       47.5
+      ],
+      "coolant_temp_c": [
+       86.2,
+       91.3
+      ]
+     },
+     "40-60 kPa": {
+      "n": 13,
+      "speed_rpm": [
+       1001.0,
+       4999.0
+      ],
+      "intake_manifold_temp_c": [
+       37.6,
+       51.1
+      ],
+      "coolant_temp_c": [
+       85.9,
+       91.4
+      ]
+     },
+     "60-80 kPa": {
+      "n": 11,
+      "speed_rpm": [
+       1001.0,
+       4999.0
+      ],
+      "intake_manifold_temp_c": [
+       36.5,
+       48.0
+      ],
+      "coolant_temp_c": [
+       84.3,
+       92.0
+      ]
+     },
+     "80-100 kPa": {
+      "n": 22,
+      "speed_rpm": [
+       1001.0,
+       5000.0
+      ],
+      "intake_manifold_temp_c": [
+       33.5,
+       46.0
+      ],
+      "coolant_temp_c": [
+       84.5,
+       93.2
+      ]
+     },
+     "100-120 kPa": {
+      "n": 16,
+      "speed_rpm": [
+       1001.0,
+       4000.0
+      ],
+      "intake_manifold_temp_c": [
+       32.1,
+       37.6
+      ],
+      "coolant_temp_c": [
+       85.3,
+       94.3
+      ]
+     },
+     "120-140 kPa": {
+      "n": 35,
+      "speed_rpm": [
+       1500.7,
+       4999.8
+      ],
+      "intake_manifold_temp_c": [
+       33.3,
+       40.4
+      ],
+      "coolant_temp_c": [
+       85.1,
+       93.6
+      ]
+     },
+     "140-160 kPa": {
+      "n": 22,
+      "speed_rpm": [
+       1500.9,
+       4999.9
+      ],
+      "intake_manifold_temp_c": [
+       36.3,
+       40.2
+      ],
+      "coolant_temp_c": [
+       87.4,
+       94.6
+      ]
+     },
+     "160-180 kPa": {
+      "n": 7,
+      "speed_rpm": [
+       1703.3,
+       5000.9
+      ],
+      "intake_manifold_temp_c": [
+       38.6,
+       40.4
+      ],
+      "coolant_temp_c": [
+       86.9,
+       93.6
+      ]
+     }
+    },
+    "calibration_hot": {
+     "120-140 kPa": {
+      "n": 31,
+      "speed_rpm": [
+       1500.7,
+       4999.8
+      ],
+      "intake_manifold_temp_c": [
+       33.3,
+       40.4
+      ],
+      "coolant_temp_c": [
+       85.1,
+       93.6
+      ]
+     },
+     "140-160 kPa": {
+      "n": 22,
+      "speed_rpm": [
+       1500.9,
+       4999.9
+      ],
+      "intake_manifold_temp_c": [
+       36.3,
+       40.2
+      ],
+      "coolant_temp_c": [
+       87.4,
+       94.6
+      ]
+     },
+     "160-180 kPa": {
+      "n": 7,
+      "speed_rpm": [
+       1703.3,
+       5000.9
+      ],
+      "intake_manifold_temp_c": [
+       38.6,
+       40.4
+      ],
+      "coolant_temp_c": [
+       86.9,
+       93.6
+      ]
+     }
+    },
+    "fired_intake_temp_c": [
+     31.5,
+     51.1
+    ],
+    "hot_intake_temp_c": [
+     33.3,
+     40.4
+    ]
+   },
+   "statements": [
+    "the scored roads' ambient: the charge above every EPA map's intake temperature",
+    "holds longer than EPA's: an extrapolation in duration",
+    "road speeds above C1's range: the road load not covered",
+    "the cells' barometer against the road's"
+   ],
+   "contract_rule": "every E and C row is labelled on its own comparison's domain (the EPA held-out rows, or the D3 segments), in decision 4's order with 'not covered' read on that domain: excluded, not covered, off, untested, validated, limited. Coverage of the SCORED context (decision 34's roads at 42 C, holds longer than EPA's 30 s) is a separate per-engine flag, reported beside every result and in the preregistration, never instead of a label"
+  },
+  "per_row": {
+   "epa_steady.csv/24": [
+    "lambda_missing"
+   ],
+   "epa_steady.csv/25": [
+    "snapped"
+   ],
+   "epa_steady.csv/26": [
+    "snapped"
+   ],
+   "epa_steady.csv/27": [
+    "snapped"
+   ],
+   "epa_steady.csv/29": [
+    "snapped"
+   ],
+   "epa_steady.csv/30": [
+    "snapped"
+   ],
+   "epa_steady.csv/31": [
+    "snapped"
+   ],
+   "epa_steady.csv/32": [
+    "snapped"
+   ],
+   "epa_steady.csv/33": [
+    "snapped"
+   ],
+   "epa_steady.csv/34": [
+    "snapped"
+   ],
+   "epa_steady.csv/35": [
+    "snapped"
+   ],
+   "epa_steady.csv/36": [
+    "snapped"
+   ],
+   "epa_steady.csv/37": [
+    "snapped"
+   ],
+   "epa_steady.csv/38": [
+    "snapped"
+   ],
+   "epa_steady.csv/39": [
+    "snapped"
+   ],
+   "epa_steady.csv/40": [
+    "snapped"
+   ],
+   "epa_steady.csv/41": [
+    "snapped"
+   ],
+   "epa_steady.csv/42": [
+    "snapped"
+   ],
+   "epa_steady.csv/43": [
+    "snapped"
+   ],
+   "epa_steady.csv/76": [
+    "lambda_missing"
+   ],
+   "epa_steady.csv/77": [
+    "snapped"
+   ],
+   "epa_steady.csv/78": [
+    "snapped"
+   ],
+   "epa_steady.csv/81": [
+    "snapped"
+   ],
+   "epa_steady.csv/83": [
+    "snapped"
+   ],
+   "epa_steady.csv/84": [
+    "snapped"
+   ],
+   "epa_steady.csv/85": [
+    "snapped"
+   ],
+   "epa_steady.csv/86": [
+    "snapped"
+   ],
+   "epa_steady.csv/87": [
+    "snapped"
+   ],
+   "epa_steady.csv/88": [
+    "snapped"
+   ],
+   "epa_steady.csv/89": [
+    "snapped"
+   ],
+   "epa_steady.csv/90": [
+    "snapped"
+   ],
+   "epa_steady.csv/91": [
+    "snapped"
+   ],
+   "epa_steady.csv/92": [
+    "snapped"
+   ],
+   "epa_steady.csv/93": [
+    "snapped"
+   ],
+   "epa_steady.csv/94": [
+    "snapped"
+   ],
+   "epa_steady.csv/95": [
+    "snapped"
+   ],
+   "epa_steady.csv/96": [
+    "snapped"
+   ],
+   "epa_steady.csv/117": [
+    "lambda_missing"
+   ],
+   "epa_steady.csv/118": [
+    "snapped"
+   ],
+   "epa_steady.csv/119": [
+    "snapped"
+   ],
+   "epa_steady.csv/121": [
+    "snapped"
+   ],
+   "epa_steady.csv/122": [
+    "snapped"
+   ],
+   "epa_steady.csv/123": [
+    "snapped"
+   ],
+   "epa_steady.csv/124": [
+    "snapped"
+   ],
+   "epa_steady.csv/125": [
+    "snapped"
+   ],
+   "epa_steady.csv/126": [
+    "snapped"
+   ],
+   "epa_steady.csv/127": [
+    "snapped"
+   ],
+   "epa_steady.csv/128": [
+    "snapped"
+   ],
+   "epa_steady.csv/129": [
+    "snapped"
+   ],
+   "epa_steady.csv/130": [
+    "snapped"
+   ],
+   "epa_steady.csv/131": [
+    "snapped"
+   ],
+   "epa_steady.csv/132": [
+    "snapped"
+   ],
+   "epa_steady.csv/133": [
+    "snapped"
+   ],
+   "epa_steady.csv/134": [
+    "snapped"
+   ],
+   "epa_steady.csv/135": [
+    "snapped"
+   ],
+   "epa_steady.csv/168": [
+    "lambda_missing"
+   ],
+   "epa_steady.csv/169": [
+    "snapped"
+   ],
+   "epa_steady.csv/170": [
+    "snapped"
+   ],
+   "epa_steady.csv/171": [
+    "snapped"
+   ],
+   "epa_steady.csv/172": [
+    "snapped"
+   ],
+   "epa_steady.csv/173": [
+    "snapped"
+   ],
+   "epa_steady.csv/174": [
+    "snapped"
+   ],
+   "epa_steady.csv/175": [
+    "snapped"
+   ],
+   "epa_steady.csv/176": [
+    "snapped"
+   ],
+   "epa_steady.csv/177": [
+    "snapped"
+   ],
+   "epa_steady.csv/178": [
+    "snapped"
+   ],
+   "epa_steady.csv/179": [
+    "snapped"
+   ],
+   "epa_steady.csv/180": [
+    "snapped"
+   ],
+   "epa_steady.csv/181": [
+    "snapped"
+   ],
+   "epa_steady.csv/182": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/28": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/29": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/44": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/64": [
+    "outside_calibration_map_coverage"
+   ],
+   "epa_highload_initial.csv/28": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/29": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/30": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/44": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/45": [
+    "snapped"
+   ]
+  }
+ },
+ "section7": {
+  "engine": "honda_l15b7",
+  "level": {
+   "E1a": "off",
+   "E2a": "validated",
+   "E3a": "off",
+   "E4a": "off",
+   "L0": "off"
+  },
+  "level_how": {
+   "E1a": "as computed",
+   "E2a": "as computed",
+   "E3a": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)",
+   "E4a": "as computed",
+   "L0": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "level_850c_label": "off",
+  "level_rows_without_statistic": [],
+  "d": {
+   "D1": {
+    "label": "validated",
+    "kappa": 1.0,
+    "drop": false,
+    "reason": null,
+    "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)",
+    "kappa_below_1_not_validated": false
+   },
+   "E4b": {
+    "label": "limited",
+    "kappa": 1.5180478123686243,
+    "drop": false,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   },
+   "L1": {
+    "label": "off",
+    "kappa": 1.8713799077525977,
+    "drop": true,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   },
+   "E8": {
+    "label": "off",
+    "kappa": 11.457530478806556,
+    "drop": true,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   }
+  },
+  "parts": {
+   "P1": 1.0,
+   "P2": 1.5180478123686243,
+   "P3": "DROP",
+   "P4": "DROP",
+   "P5": "NO_ROW: this engine computes no row of the part (no D3 drive, contract section 5)"
+  },
+  "drop": true,
+  "drop_rows": [
+   "L1",
+   "E8"
+  ],
+  "kappa_below_1_not_validated": []
+ },
+ "c5_recheck_margin": {
+  "worst_line": "4500",
+  "E": -7.5158169595398405,
+  "u_val": 0.10419374455647545,
+  "R": 1.9,
+  "margin": 7.724204448652792,
+  "margin_unit": "percent",
+  "margin_fraction": 0.07724204448652792,
+  "lines": {
+   "2000": 1.5539632765892337,
+   "3000": 5.593781861970386,
+   "4500": 7.724204448652792
+  },
+  "no_deciding_line": false
+ },
+ "steady_only_tit": {
+  "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+  "decides": false,
+  "rows": [
+   "E3a",
+   "E4a",
+   "L0",
+   "L1",
+   "E4b"
+  ],
+  "statistics": {
+   "E3a": {
+    "R": 10.0,
+    "unit": "K",
+    "kind": "level",
+    "E": 8.05311564916686,
+    "deciding": [
+     "2000",
+     "3000"
+    ],
+    "worst_line": "2000",
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 8.05311564916686,
+     "spark_sentinel": 8.05311564916686
+    },
+    "extra": {},
+    "n_rows": 7,
+    "n_clusters": 7,
+    "lines": {
+     "2000": {
+      "E": 8.05311564916686,
+      "clusters": 3,
+      "u": {
+       "u_num": 0.5019173836720773,
+       "u_input": 0.08810559049844317,
+       "u_D": 3.2448528504130163,
+       "u_val": 3.2846238256370817,
+       "u_stat": 1.481605770145334,
+       "u_num_sd_undivided": 0.8693464097220794,
+       "unsourced": [
+        "u_D tit",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "limited",
+      "certifies": true
+     },
+     "3000": {
+      "E": 4.88133142826257,
+      "clusters": 4,
+      "u": {
+       "u_num": 0.3607152827005767,
+       "u_input": 0.068748771460356,
+       "u_D": 3.4635603492603764,
+       "u_val": 3.4829717486249763,
+       "u_stat": 6.450704197309828,
+       "u_num_sd_undivided": 0.7214305654011534,
+       "unsourced": [
+        "u_D tit",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "limited",
+      "certifies": false
+     }
+    },
+    "u": {
+     "u_num": 0.5019173836720773,
+     "u_input": 0.08810559049844317,
+     "u_D": 3.2448528504130163,
+     "u_val": 3.2846238256370817,
+     "u_stat": 1.481605770145334,
+     "u_num_sd_undivided": 0.8693464097220794,
+     "unsourced": [
+      "u_D tit",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "certifying": [
+     "2000"
+    ],
+    "label": "limited",
+    "kappa": 1.4622363300441024,
+    "coverage_restricted": 8.05311564916686
+   },
+   "E4a": {
+    "R": 10.0,
+    "unit": "K",
+    "kind": "level",
+    "E": null,
+    "deciding": [],
+    "worst_line": null,
+    "no_statistic": true,
+    "reason": "no line with at least 3 clusters in hot_enr",
+    "without": {
+     "lambda_missing": null,
+     "spark_sentinel": null
+    },
+    "extra": {
+     "censored_rows": []
+    },
+    "n_rows": 0,
+    "n_clusters": 0,
+    "lines": {},
+    "u": null,
+    "certifying": [],
+    "label": null,
+    "kappa": null,
+    "coverage_restricted": null
+   },
+   "L0": {
+    "R": 10.0,
+    "unit": "K of housing",
+    "kind": "level",
+    "E": 10.243129466665627,
+    "deciding": [
+     "2000",
+     "3000"
+    ],
+    "worst_line": "2000",
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 10.243129466665627,
+     "spark_sentinel": 10.243129466665627
+    },
+    "extra": {
+     "G_k": 980.27,
+     "per_line": {
+      "2000": {
+       "ebar_k": 10.243129466665627,
+       "deltabar": -0.002627113168358767,
+       "f_star": 1.0,
+       "H_k": 10.243129466665627
+      },
+      "3000": {
+       "ebar_k": 4.852782987451462,
+       "deltabar": -0.004850932514810974,
+       "f_star": 1.0,
+       "H_k": 4.852782987451462
+      }
+     }
+    },
+    "n_rows": 7,
+    "n_clusters": 7,
+    "lines": {
+     "2000": {
+      "E": 10.243129466665627,
+      "clusters": 3,
+      "u": {
+       "u_num": 0.4868611142173331,
+       "u_input": 0.10295758721359426,
+       "u_D": 3.245280042727474,
+       "u_val": 3.283211318972177,
+       "u_stat": 1.2618348368312409,
+       "u_num_sd_undivided": 0.8432681860540151,
+       "unsourced": [
+        "u_D tit",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "limited",
+      "certifies": true
+     },
+     "3000": {
+      "E": 4.852782987451462,
+      "clusters": 4,
+      "u": {
+       "u_num": 0.3441555125735465,
+       "u_input": 0.07396403223218319,
+       "u_D": 3.4636792484471135,
+       "u_val": 3.4815208790156587,
+       "u_stat": 6.865580949349165,
+       "u_num_sd_undivided": 0.688311025147093,
+       "unsourced": [
+        "u_D tit",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "limited",
+      "certifies": false
+     }
+    },
+    "u": {
+     "u_num": 0.4868611142173331,
+     "u_input": 0.10295758721359426,
+     "u_D": 3.245280042727474,
+     "u_val": 3.283211318972177,
+     "u_stat": 1.2618348368312409,
+     "u_num_sd_undivided": 0.8432681860540151,
+     "unsourced": [
+      "u_D tit",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "certifying": [
+     "2000"
+    ],
+    "label": "limited",
+    "kappa": 1.6809552104609982,
+    "coverage_restricted": 10.243129466665627
+   },
+   "L1": {
+    "R": 9.9,
+    "unit": "K of housing",
+    "kind": "d",
+    "E": 5.390346479214164,
+    "deciding": [
+     "2000",
+     "3000"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 5.390346479214164,
+     "spark_sentinel": 5.390346479214164
+    },
+    "extra": {
+     "G_k": 980.27,
+     "f_star": 1.0,
+     "extreme_lines": [
+      "2000",
+      "3000"
+     ],
+     "H_at_f_star": {
+      "2000": 10.243129466665627,
+      "3000": 4.852782987451462
+     }
+    },
+    "n_rows": 7,
+    "n_clusters": 7,
+    "lines": {
+     "2000": {
+      "E": 10.243129466665627,
+      "clusters": 3,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "3000": {
+      "E": 4.852782987451462,
+      "clusters": 4,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "pooled": {
+      "E": 5.390346479214164,
+      "clusters": 7,
+      "u": {
+       "u_num": 0.5962187194073192,
+       "u_input": 0.12677122240038668,
+       "u_D": 0.22677995523927671,
+       "u_val": 0.6503667060197041,
+       "u_stat": 6.980575114380412,
+       "u_num_sd_undivided": 1.577446458553166,
+       "unsourced": [
+        "u_D tit",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "validated",
+      "certifies": false
+     }
+    },
+    "u": {
+     "u_num": 0.5962187194073192,
+     "u_input": 0.12677122240038668,
+     "u_D": 0.22677995523927671,
+     "u_val": 0.6503667060197041,
+     "u_stat": 6.980575114380412,
+     "u_num_sd_undivided": 1.577446458553166,
+     "unsourced": [
+      "u_D tit",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "certifying": [],
+    "label": "untested",
+    "kappa": 0.675866655682179,
+    "coverage_restricted": 5.390346479214164,
+    "condition": "both arms' cuts in 0-0.865"
+   },
+   "E4b": {
+    "R": 16.6,
+    "unit": "% of the lever's effect",
+    "kind": "d",
+    "E": -26.519061098216913,
+    "deciding": [
+     "2000",
+     "3000",
+     "4500"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": -26.519061098216913,
+     "spark_sentinel": -26.519061098216913
+    },
+    "extra": {
+     "sum_L_S_k": 1163.5405540497038,
+     "sum_data_lever_k": 1583.4590186782023,
+     "extrapolation_kpa": {
+      "2000": 22.739454787233058,
+      "3000": 16.39872759856621,
+      "4500": 62.571267281106
+     },
+     "extrapolation_below_kpa": {
+      "2000": 0.0,
+      "3000": 0.0,
+      "4500": 0.0
+     },
+     "enriched_rows": 13,
+     "censored_rows": [],
+     "pair_estimate": {
+      "value_pct": -566.3194892981434,
+      "holds": 12,
+      "label": "descriptive"
+     },
+     "lines_one_map": []
+    },
+    "n_rows": 34,
+    "n_clusters": 34,
+    "lines": {
+     "1250": {
+      "E": null,
+      "clusters": 0,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "2000": {
+      "E": null,
+      "clusters": 3,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "3000": {
+      "E": null,
+      "clusters": 4,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "4500": {
+      "E": null,
+      "clusters": 6,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "pooled": {
+      "E": -26.519061098216913,
+      "clusters": 34,
+      "u": {
+       "u_num": 1.4060450451486104,
+       "u_input": 0.13128892271573958,
+       "u_D": 1.2221508770111655,
+       "u_val": 1.867579239655972,
+       "u_stat": 3.050245807990616,
+       "u_num_sd_undivided": 8.198581020247136,
+       "unsourced": [
+        "u_D tit",
+        "u_D lam",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "off",
+      "certifies": true
+     }
+    },
+    "u": {
+     "u_num": 1.4060450451486104,
+     "u_input": 0.13128892271573958,
+     "u_D": 1.2221508770111655,
+     "u_val": 1.867579239655972,
+     "u_stat": 3.050245807990616,
+     "u_num_sd_undivided": 8.198581020247136,
+     "unsourced": [
+      "u_D tit",
+      "u_D lam",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "certifying": [
+     "pooled"
+    ],
+    "label": "off",
+    "kappa": 1.8225433480439068,
+    "coverage_restricted": -26.50672179065616,
+    "condition": "both arms' cuts in 0-0.865"
+   }
+  }
+ }
+}
