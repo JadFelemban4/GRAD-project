@@ -1,0 +1,48 @@
+{
+ "engine": "mazda_25t",
+ "invocations": [
+  {
+   "subcommand": "arm",
+   "argv": [
+    "arm",
+    "--engine",
+    "mazda_25t",
+    "--jobs",
+    "16"
+   ],
+   "started_utc": "2026-11-05T16:30:38+00:00",
+   "versions": {
+    "python": "3.13.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "platform": "Windows-11-10.0.26200-SP0"
+   },
+   "ended_utc": "2026-11-05T16:32:01+00:00",
+   "outcome": "ok",
+   "k": 1
+  },
+  {
+   "subcommand": "run",
+   "event": "started",
+   "armed_blob": "0b799b7aa9d49298d2c825bcbfac9ab9b712fcb9",
+   "defect_rerun_k": null,
+   "reexecution": false,
+   "started_utc": "2026-11-05T16:32:03+00:00",
+   "k": 2
+  },
+  {
+   "subcommand": "run",
+   "event": "ended",
+   "armed_blob": "0b799b7aa9d49298d2c825bcbfac9ab9b712fcb9",
+   "defect_rerun_k": null,
+   "outcome": "crash: TraceDefect",
+   "outputs": {
+    "results/EPA_VALIDATION/mazda_25t/STARTED": "a9ae702ce2fed893892f6aa8404b717bbaa7cc6074a4e6978d14d3920573a77d",
+    "results/EPA_VALIDATION/mazda_25t/crash_1.txt": "5cf7b8ee0cb902e5b26042f970056a5d3cd3e3181f6fd525203f079cd34d4b76",
+    "results/EPA_VALIDATION/mazda_25t/run.json": "d69270d70f77a97eb5fbab7812bcd1d940e339c71ac614f48b01911e1690192f"
+   },
+   "ended_utc": "2026-11-05T16:45:39+00:00",
+   "k": 3
+  }
+ ]
+}

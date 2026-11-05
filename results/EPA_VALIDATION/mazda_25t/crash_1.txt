@@ -1,0 +1,21 @@
+attempt: first
+exception: TraceDefect
+Traceback (most recent call last):
+  File "C:\Users\badcl\Desktop\GRAD-project\validate_epa.py", line 1557, in run
+    outputs = _compute(name, source=source, token=token, jobs=jobs, armed=armed)
+  File "C:\Users\badcl\Desktop\GRAD-project\validate_epa.py", line 1641, in _compute
+    return held_out_outputs(name, source=source, token=token, jobs=jobs, armed=armed)
+  File "C:\Users\badcl\Desktop\GRAD-project\validate_epa.py", line 2091, in held_out_outputs
+    d3_out, c3_results, eta = _d3_chain(name, source=source, armed=armed, view=view, contract=contract,
+                              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        frozen=frozen, jobs=jobs)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\badcl\Desktop\GRAD-project\validate_epa.py", line 2437, in _d3_chain
+    summary = d3_rows.read_summary(os.path.join(folder, *d3["summary"]["file"].split("/")), spec=sspec,
+                                   tests=tuple(t for t, _ in files))
+  File "C:\Users\badcl\Desktop\GRAD-project\d3_rows.py", line 1014, in read_summary
+    fuel = [num(rn, r, spec.modal_fuel) for rn, r in base]
+            ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\badcl\Desktop\GRAD-project\d3_rows.py", line 1010, in num
+    raise TraceDefect(f"{name}: test {test}, sheet row {rn}, column {header!r} is not a finite number")
+d3_rows.TraceDefect: 2016_Mazda_CX9_Test_Summary_04052018.xlsx: test 61704014, sheet row 56, column 'Fuel used modal [gal]' is not a finite number
