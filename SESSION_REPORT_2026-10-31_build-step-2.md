@@ -22,7 +22,12 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `fb20ab2` | 6, R1 | the roads: attempt 1's log, its printed outputs and `roads.json` (section 8) |
 | `4da4a31` | 8, R3b | `results/EPA_TIGHTENINGS.json` alone (section 8) |
 | `f0ecf92` | docs | sections 8 and 9; ORDER's status and step 6; CHECKPOINT |
-| this one | 2, 3 | section N (row 134: W); `tools/device_step3.sh`; the runbook, ORDER, the Run 2 checklist, CHECKPOINT; section 10 |
+| `91c6ece` | 2, 3 | section N (row 134: W); `tools/device_step3.sh`; the runbook, ORDER, the Run 2 checklist, CHECKPOINT; section 10 |
+| `b2151af` | 3 | Jad's: `tools/device_step3.sh` reads a newer driver's "CUDA UMD Version" line; his audit of step 3's path |
+| `0fbc744` | 3 | Jad's: the record of step 3 on his PC (section 11) |
+| `fefb7af` | (C0) | two `ScoredShareSYNTHETIC` fixtures that failed from R0 on (section 11) |
+| `008f69f` | 7's rule, C1b | the benchmark protocol (row 135 names it): `--roads-record`, `--reward-knock`, B0/B1/B5 |
+| this one | O1 | section O (rows 136-143), `docs/build_step_2/INTERFACES.md`, ORDER steps 12a-22, the cap README, CHECKPOINT; section 11 |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -310,3 +315,72 @@ smoke steps below the benchmark's 1000-step minimum, which the smoke test hit to
 - a later row that would change the order of leaving without saying it is a contract change.
 
 All were applied.
+
+## 11. 2-5 November: step 3 on Jad's PC, the order of leaving (row 136), and the interfaces of the code still to write
+
+**Step 3 ran on Jad's PC on 2 November**, by `tools/device_step3.sh` at `b2151af`, 13:37-14:46 AST
+(Jad's record, `docs/build_step_2/STEP3_RUN_2026-11-02_JAD_PC.md`, `0fbc744`). His agent first fixed the
+script: driver 617.42 prints "CUDA UMD Version: 13.4", which the pre-check did not read (`b2151af`,
+with his audit). The PC had Python 3.13.15, and he installed 3.13.2 from python.org's NuGet package
+beside it; `check_training_device.py` printed "VERSIONS: match the lock". The machine: a Ryzen 5 9600X
+(6 cores, 12 logical), 31.2 GB of RAM, an RTX 5070 (12 227 MiB, compute capability 12.0), Windows 11 Pro
+10.0.26300. The merge: "CPU with 12 runs at once (torch 2.14.0+cpu): its lowest lower bound, 106.19 (12
+at once), beats CUDA's highest upper bound, 70.87 (6 at once)"; seed 0 trained identically twice on
+both devices. 12 of the 14 rows started with the CPU 4-13 % busy (the IDE stayed open), the merge's one
+caution. As a planning figure (the B58's rate on the extremes road, times four engines): 20 seeds per
+arm take 11.8 days on four engines, and at most 16 fit W. With row 136, the Honda leaves, and three
+engines at n = 20 take 15 waves of 450 000 / 8.85 s, about 212 h of W's 240 (arithmetic). The binding n
+comes from each engine's rate at step 18.
+
+**Row 136 is Ghassan's own answer, 2 November**, to "If the new device is too slow to train all 4 engines
+x 20 seeds x 3 arms by 20 November, which engines give way?": "Keep the Ford (Recommended)". The Honda
+leaves first, then the Mazda, each dropped with no table; "B58 + Ford is the minimum", which he
+confirmed the same day reads: if even those two cannot reach 20 seeds per arm, the four-engine test does
+not run and that is reported (MD:1611-1612). The agents proposed both readings as the recommended
+options. It is contract version 6 for the order of leaving and the table route only, written before
+step 3's rate was known. No table code is ever written.
+
+**Section O and the interface sheet.** Eight read-only specs of the code still to write (C2, P in four
+parts, G, V, T), a critic of them as a set, eight resolutions of their 88 open questions, one
+consolidation, then five rounds of adversarial checks of the sheet, the rows and C1b, every blocking and
+material finding applied (each round's findings are in the sheet's section 16). The three blocking conflicts the critic found first:
+P's own re-verification would have refused P (P must edit `evaluate.py`); P's reader and T's writer
+disagreed on `results/EPA_BACKEND.json`; and the benchmark protocol had to be frozen before Run 2 while
+P edited it. The sheet, `docs/build_step_2/INTERFACES.md`, now fixes one definition of every shared name
+and one owner of every shared edit, and ORDER's steps 12a-22 follow its commit order.
+
+**C0 and C1b.** C0 (`fefb7af`) fixes two `test_four_engine_training` fixtures that had failed since R0
+(`bb91848`): they mocked the commitment lines one way only, as `c6dfba5` had fixed for two others. That
+suite is not in `epa_freeze.STEP2_TESTS`, which is why no gate showed it. C1b (`008f69f`) is the benchmark
+protocol: `--roads-record` with the share on and decision 29's recipe but its average, `--reward-knock`
+from P on, B1's attempts written outside the repository (inside it, every attempt would have recorded a
+dirty tree), the CPU series on CUDA, B0's record. `--road extremes` stays byte-identical to the script
+step 3 ran.
+
+**The two measurements of the interface sheet's S** (for row 135, on scratch drafts, never pushed):
+- the blinded arm bit for bit (row 117): on a minimal draft of P1's H parameter, 9 values of H gave one
+  trajectory bit for bit on decision 34's road, the extremes road and the four-engine road, and a short
+  training blinded at two H gave identical parameters (368 399 values) and replay buffer; the sighted
+  control differed; the four engines' defaults equal their pinned digests (`test_preview_horizon.py`,
+  14 tests OK). So three arms stay three;
+- the SYNTHETIC part of the Honda's row-119 gate, on a scratch draft of C2: all 9 check lines PASS, and
+  `check_training_device.py --compare` of the B58 before and after the draft read "VERDICT: IDENTICAL
+  TRAINING" (96 tensors, 47 record fields).
+
+**A stop.** The agents' usage limit stopped the work from the evening of 2 November to 5 November.
+
+**Conventions and stale citations, recorded here and in no row** (the interface sheet's request):
+- a line of `results/VALIDATION_DECISIONS.md` is cited as it stands in the commit that lands the citation,
+  or by row number: O1's provenance line moves every VD line from :69 on by 4, O2's by 3 more (section I's
+  note: :343 at `91c6ece`, :347 from O1, :350 from O2); a step of ORDER is cited by its number;
+- code that C0 or C1b moved is cited by name from that commit on (`benchmark_training.py` throughout;
+  `engine_gate.py`'s WHAT WAITS bullets; `test_device_gate.py`'s classes);
+- stale, not edited: row 134's "(VD:340)" (the note is :343 at `91c6ece`) and its
+  `benchmark_training.py:36-38` (moved by C1b; the paragraph "A training step is two jobs"); row 114's
+  `benchmark_training.py:89-90` (now `bounds`); row 107 (5)'s and row 114's `train.py:487` and
+  `benchmark_training.py:752-753` (row 139 (5) records where they point);
+- read through row 136 and not edited: row 114's order of leaving and table route, row 134's "Not this
+  row" passage, row 107 (5)'s S2b pilots, and `validate_epa.DROP_ORDER` (`validate_epa.py:165-167`,
+  CODE_HASHED, kept; the schedule's order is `epa_backend.DROP_ORDER`);
+- `results/training_roads.json` (`cbb8d09`) differs from what both `91c6ece` and C1b regenerate: an older
+  drift, not C1b's.

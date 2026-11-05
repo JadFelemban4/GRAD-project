@@ -17,8 +17,8 @@ by `python -B tit_cap.py compute --engine ford_27tt`, from committed, clean code
   returns the λ of least model TIT in [lam_floor, λ_ECU] (row 124 (1)). The cap holds the model
   TIT at the ECU's own operating point, not the realised one (row 124 (2)).
 - `tit_cap_ecu.cap_from_record(..., committed=True)` refuses a stale, spoiled or uncommitted record.
-  It compares every CODE_HASHED file with the tree, so it refuses this record once commit G (ORDER
-  step 15) or step 16 changes one. Row 115 (d) therefore reads the cap through the reader of row 128,
+  It compares every CODE_HASHED file with the tree, so it has refused this record since commit N
+  (`f48e5f0`) changed calibrate_epa.py (row 138 (3)). Row 115 (d) therefore reads the cap through the reader of row 128,
   written with step 16. The patch is per process: a pool worker enters `capped()` itself.
 
 The numbers belong to the record, not to this file.

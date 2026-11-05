@@ -78,8 +78,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
   made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
-  1-134 are answered (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no knock term; J-L,
-  31 October, L under his standing approval; M: he works alone, row 133; N: W, row 134, 2 November).
+  1-134 and 136-143 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
+  row 133; N: W, row 134; O: rows 136-143, 136 his own answer, 2 November). Row 135 is O2's.
   Roads: R0 `bb91848`, then R1 `fb20ab2` (the draw of 1 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 
@@ -114,9 +114,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
    October); `GRA-test`'s has it since C1 (ORDER step 7).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (sections I-N). Done: R0a, C1, N, K, R3a (31 October); R0, R1 (the roads, T passes), R3b (1-2
-   November); W, 10-20 November, 240 h (row 134, 2 November). Next: step 3 on the device (`tools/device_step3.sh`),
-   then row 135 (and the table-route row if the rule binds), the rehearsal and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Ghassan: pause Windows updates now (row 126). Nothing
+   order (sections I-O; `docs/build_step_2/INTERFACES.md`). Done: R0, R1, R3b (1-2 November); W (row 134); step 3 on
+   Jad's PC, the CPU at 12 at once; C0, C1b; rows 136-143, row 136 the Honda-Mazda-Ford order (2-5 November). Next:
+   row 135 (O2), the rehearsal and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates are paused to 30 November. Nothing
    else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.

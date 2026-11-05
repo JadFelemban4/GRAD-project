@@ -4712,3 +4712,16 @@ From "Next actions", item 10, as committed at `f0ecf92`:
    and checks that seed 0 trains identically twice; then
    `python check_training_device.py --identity device.json` there and on this
    laptop, and `--compare` the two (recorded, not required; decision 32).
+
+# Part AD — lines rotated out of CHECKPOINT.md, 5 November 2026 (GRA-test: step 3 on Jad's PC, C0, C1b, section O)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `91c6ece`:
+
+  1-134 are answered (`results/VALIDATION_DECISIONS.md`; I, 30 October: A+G, no knock term; J-L,
+  31 October, L under his standing approval; M: he works alone, row 133; N: W, row 134, 2 November).
+
+From "Next actions", item 8, as committed at `91c6ece`:
+
+   order (sections I-N). Done: R0a, C1, N, K, R3a (31 October); R0, R1 (the roads, T passes), R3b (1-2
+   November); W, 10-20 November, 240 h (row 134, 2 November). Next: step 3 on the device (`tools/device_step3.sh`),
+   then row 135 (and the table-route row if the rule binds), the rehearsal and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Ghassan: pause Windows updates now (row 126). Nothing
