@@ -28,7 +28,10 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `fefb7af` | (C0) | two `ScoredShareSYNTHETIC` fixtures that failed from R0 on (section 11) |
 | `008f69f` | 7's rule, C1b | the benchmark protocol (row 135 names it): `--roads-record`, `--reward-knock`, B0/B1/B5 |
 | `fcaf7b7` | O1 | section O (rows 136-143), `docs/build_step_2/INTERFACES.md`, ORDER steps 12a-22, the cap README, CHECKPOINT; section 11 |
-| this one | O2 | row 135 (the device), step 3's files in `results/benchmarks/step3_2026-11-02/`, ORDER's status, CHECKPOINT; section 12 |
+| `9c788c3` | O2 | row 135 (the device), step 3's files in `results/benchmarks/step3_2026-11-02/`, ORDER's status, CHECKPOINT; section 12 |
+| `c3ff39e` | E | Run 2, the Mazda's arming: ARMED.json and the calibration run.json; section 13 |
+| `768a90f` | F | the Mazda's first run's records: STARTED, crash_1.txt, run.json, the invocation log (a crash, TraceDefect); section 13 |
+| this one | V | row 144 (section P), the defect route; ORDER's status and rule, CHECKPOINT; section 13 |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -413,3 +416,38 @@ gate ran again on the final tree, with drift_test (mistake 11).
 **What waits, from here:** the rehearsal (ORDER step 9, O2's own gate), then Run 2 (step 10) on this
 laptop with nothing else running; then L, R4, and the commits C2 to Ta, each with its gate; then step
 18 (B1) on Jad's PC, Tb, the preregistration, the pilot, and training.
+
+## 13. 5 November: Run 2 starts, and the Mazda's first run crashes (row 144)
+
+**The Mazda armed cleanly** (`c3ff39e`): the two record checks with no skip, the WMI check 20 of 20, and
+arm's 17 steps. **Its held-out run then crashed** after about 13 minutes, in `d3_rows.read_summary`:
+"test 61704014, sheet row 56, column 'Fuel used modal [gal]' is not a finite number"
+(`results/EPA_VALIDATION/mazda_25t/crash_1.txt`, committed and pushed at once in `768a90f`). The reader
+stopped on one cell of ANL's CX-9 summary sheet. Nobody has read that cell's value. The run had already
+computed the E rows and most of E6 in memory; nothing was written, printed or seen. `768a90f`'s message
+says "No statistic exists"; row 144 corrects it: statistics were computed and never seen.
+
+**What it costs.** Re-execution is closed once a crash record exists (C6), so the contract's defect
+route is the only way on: a fix, then a re-arming and a re-run whose every label reads limited at best
+(MD:1602-1604). The Mazda can therefore be labelled limited at best, whatever its numbers. The Honda and
+the Ford are not affected: they take the fix before their own first runs, uncapped.
+
+**Row 144 (section P)**, answered under row 133 (2), written after a read-only map of the route, a plan
+and three adversarial reviews (whose blocking finding was applied: the first draft gave the crashed
+engine's summary entry no drop and no margin, which the frozen roads code refuses). It fixes:
+(1) a summary cell that is not a finite number never stops the read and never takes a value; the test
+leaves only what reads that value (no modal fuel: the Direct2 check; no first-phase cell temperature: the
+chain; no heating value: the fuel rows), each named and counted, decided from finiteness only, contract
+version 6 for that reading; (2) it is a coding defect, on row 94's route; (3) the cap, with kappa as the
+code keeps it; (4) the Honda and the Ford uncapped; (5) summary.json's top-level entry is the governing
+one, which the roads code reads, and an unfinished or defective latest attempt never governs; (6) X is the
+second named exception to ORDER's rule, and the commits' names; (7) version 6 governs (a C3b or C3d with no
+statistic still drops the Mazda by section 7's code as written before Run 2), version 5 reported beside it.
+Its disclosures say what was computed in memory and what was known of the data when the rule was chosen.
+A second round of four reviews checked the row and the fix as drafted, and its points are applied.
+Then a synthetic end-to-end Mazda run through the held-out computation was built and verified (no test had
+ever run the D3 chain's composition); its review found that a model output that is not a finite number
+would also crash the run, so (1) reads such an output the same way, and c3.json goes through json_ready.
+
+**What waits, from here:** X (the fix with its tests), K2 (each engine's `check --defect` on X), the
+Mazda's re-arming and capped re-run, then the Honda and the Ford, then the labels (step 11).

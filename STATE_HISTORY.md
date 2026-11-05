@@ -4738,3 +4738,18 @@ From "Next actions", item 8, as committed at `fcaf7b7`:
    order (sections I-O; `docs/build_step_2/INTERFACES.md`). Done: R0, R1, R3b (1-2 November); W (row 134); step 3 on
    Jad's PC, the CPU at 12 at once; C0, C1b; rows 136-143, row 136 the Honda-Mazda-Ford order (2-5 November). Next:
    row 135 (O2), the rehearsal and Run 2 (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates are paused to 30 November. Nothing
+
+# Part AF — lines rotated out of CHECKPOINT.md, 5 November 2026 (GRA-test: Run 2's first Mazda run crashed; row 144)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `9c788c3`:
+
+  1-143 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
+  row 133; N: W, row 134; O: rows 136-143, 136 his own answer, 2 November; row 135, the device, 5 November).
+
+From "Next actions", item 8, as committed at `9c788c3`:
+
+   order (sections I-O; `docs/build_step_2/INTERFACES.md`). Done: R0, R1, R3b (1-2 November); W (row 134); step 3 on
+   Jad's PC, the CPU at 12 at once; C0, C1b; rows 136-143, row 136 the Honda-Mazda-Ford order; row 135 (O2), with
+   step 3's files in `results/benchmarks/step3_2026-11-02/` (2-5 November). Next: the rehearsal and Run 2
+   (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates are paused to 30 November. Nothing
+   else in CODE_HASHED or PLANT_CODE changes before the last commit F; `test_epa_rows` fails once until commit G (row 120).
