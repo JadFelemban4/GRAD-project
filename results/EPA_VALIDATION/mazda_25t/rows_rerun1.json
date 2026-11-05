@@ -1,0 +1,3019 @@
+{
+ "schema": "epa-rows/1",
+ "provenance": {
+  "engine": "mazda_25t",
+  "contract": {
+   "commit": "c842d746ab8d50606dc5a3ae70c24bcc16f5f6c8",
+   "json_sha_text": "07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1",
+   "md_sha_text": "72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7",
+   "schema": 4
+  },
+  "git": {
+   "head": "1e5a54d96069f9402caf3e21c852cb44f15d36e0",
+   "step2_clean": true,
+   "dirty": []
+  },
+  "code_sha_text": {
+   "epa_rows.py": "4577f5fdc3fe9ef7073473bb9f175a58e53885f361d0740d5c838ac6b899f016",
+   "epa_stats.py": "4b5a8c50c21fd94c89b78aaa1097773c14ef20a628cc56714110bd270aa95ce0",
+   "epa_fit.py": "cf75f5a3c44874e6d4f961c8b393588319008604d1965c39f2c6e98587cf0d06",
+   "epa_freeze.py": "c6d1079f56d6d96d1100c5e0f12826f0ac8debcb008f774fbaeaf5d8488ca936",
+   "calibrate_epa.py": "ffadb5164bb456faf4d328921a724f1f9cafa12f559ef962678345c58453605a",
+   "k3_knee.py": "f773d567832343ae04dd5a73b0519b08db225e151769445ac80a599a8933eb72",
+   "epa_coefficients.py": "926cfd6af28d6f70d76e73d2e78f1b13ada6466e36457dcc035f486f7cfd0831",
+   "validate_epa.py": "288c3c06d7bf6464899333a7e4e39a4d45ed15c70a98f3c6f13f106240a5d89b",
+   "d3_rows.py": "bb4c69d780ca7b5cd2eb4104721ec1c734f5eb3f1c3fd606abdcea96215c9795",
+   "thresholds/split.py": "d4558e91d2c7b0247dbb47c63cecc1d30906ca087157c877330e55732d05f62c",
+   "thresholds/common.py": "9fa2ad740d831ca2b2be31bdd3a3034c7060af11e7b46be4933ada8c8826a040",
+   "evaluate.py": "deae96db5964bcdb2f66a18a7b0f6ce0352fac58c6b27024400c0edb5a34a503",
+   "engine_specs/b58.toml": "1be4e8e1e39bb144703ffe8f569e76e5270e82f4a1d0d98deae6f41df9dfa3b2",
+   "requirements-lock.txt": "8c041c500284adfa3d219a56b773b47c14701757cbb84814d37f7c969e6e0f41"
+  },
+  "plant_sha": "f86baf59389dea29",
+  "data": {
+   "tables_sha256": {
+    "epa_highload_final.csv": "ab057944b7fb4eeea0d789122a98c1c6d0b6d6fd2e5dae58df88627191d80449",
+    "epa_highload_initial.csv": "0540e533faddcada2cbbbc2917b33ace30114bf70b862196a9ec96f29d2dfeef",
+    "epa_steady.csv": "ab71a0087ee32fabfa21ae1a764015837b54ad531ad2017f38ccf59048286bfc"
+   },
+   "epa_engine_sha256": "cf5fc265d9a6324db9d7b8ceeaac5c75dd46db8dab06efa073fa67113bc1495e",
+   "epa_channels_blob": "a1c5627aa7468af13f28ea71ed2b6d92f3afbb13",
+   "manifest_sha256": "baccffe344e4b40b70ea26def9f26aacabe6f39798db11968c22b6061ce5c1e8"
+  },
+  "view_sha256": "881245bd5ce7693642022627dd40e7f6c77b4981c4090e5a55c2250ec8ae3574",
+  "versions": {
+   "python": "3.13.2",
+   "numpy": "2.5.3",
+   "scipy": "1.18.1",
+   "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "freeze": {
+   "sha_text": "5e505f3d523ed75e24d7c7d0981215d8edbcaf52a2de1d62f51a370f97689d39",
+   "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+  },
+  "complete": {
+   "sha_text": "39dcce262cd68c4bab774d7870db22e94e2d98fdc5540b921a6a4963465715b0",
+   "commit": "25437baafa48d944659b9e65668d4f75adeeece1"
+  },
+  "derived_sha": "e8318dd80c3375f2",
+  "engine_sha": "2558cb2bcad4f2c6",
+  "dump_sha256": "b2fc42faa5209160fb94714a6f441b91ab29cdb1c9a8b02986a010878d86189d",
+  "tightenings": {
+   "sha_text": "50c073e84555522b2f7593dba50dc94be1e74d04e599e7fe6db921054595d5ba",
+   "commit": "4da4a319351ff18b8ee0097e50f0b2cb865a5959",
+   "plant": "b58"
+  },
+  "d3": {
+   "data_folder": "C:\\Users\\badcl\\Desktop\\GRAD-engine-data",
+   "c3_files": [
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704001 Test Data.txt",
+     "sha256": "ff32b17a3c10aaf750a65b4a7c0f8f0326ca9147b69cba5faa1cb4ad071a4fbc"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704002 Test Data.txt",
+     "sha256": "957747f5edd1a5deabadf92dc7801e2dd5b75318e03e607612624eb38289abba"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704003 Test Data.txt",
+     "sha256": "7fb01a71d104ef6e98c3372d4eff9a367c10ca3bc37107bed0a847c882337a1a"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704004 Test Data.txt",
+     "sha256": "92f4b0e80a09e0cf53ba56b16350e728cf96a73ae123ae915c9c87946308d1f1"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704005 Test Data.txt",
+     "sha256": "2f9c799e66e63504e580e8abc4c770d99fe5bd2332e01129e0a4a6490296ac00"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704006 Test Data.txt",
+     "sha256": "a435c1aa7f7245dc5de7d216d435c680360c36d2be4ac2506e19b0f7ff1ca7e9"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704007 Test Data.txt",
+     "sha256": "4075d22d6e6b193eb8372c46008b48260c919849eddd376867406b2649e42e0a"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704008 Test Data.txt",
+     "sha256": "2b84538c501db4eb4429589051bdd4a7682b5d35f763fbba6d03691ac3ea86cb"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704009 Test Data.txt",
+     "sha256": "64f2cdd7bba7d6b6e62000cf07c5087ad0d1570802016901a02c8cc051643646"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704010 Test Data.txt",
+     "sha256": "b9f5f1f148f652ffd90225242be9e24de8853ae9e5d0a12c399b96e71e45ce47"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704011 Test Data.txt",
+     "sha256": "d60f9f8f2ecefdb9bf244d534ce69d683cf056e4993846fff2ff32d4cd191f16"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704012 Test Data.txt",
+     "sha256": "982ce7b1fc01ceb6cef13b859745d30245c0ee3d8e6eccd4a315abeeaaf7a0e7"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704013 Test Data.txt",
+     "sha256": "a1a22c0359a8f115fa848ca956b4ec5e18939ded7fd820bb38bcd4d8afd0acb6"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704014 Test Data.txt",
+     "sha256": "a00eaa5e3ef51462f6eb8b2211a4bd4153d46ddefb7d21c5d2a2dabe5d70ff66"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704015 Test Data.txt",
+     "sha256": "bc8d0177632d6db2eb440cd528891aa6682779492c0a5f23e88f28f035524399"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704016 Test Data.txt",
+     "sha256": "783535ce61602758f26b7fcd185ccb057686502b1a73f6a496d99685f1f915a6"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704017 Test Data.txt",
+     "sha256": "8b49ad788e692059809a7a04acf154dbb72c6e4e8bcb528f7c69e198b1a85b4e"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704018 Test Data.txt",
+     "sha256": "fd9499c5aecf0f58c423e584312cffd2de1ebbdddd3cfad289a9e193f6780051"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704019 Test Data.txt",
+     "sha256": "2d65fc192737bdeee478af13957007dd9fe63dad218abb2541913ea9f5fbafdd"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704020 Test Data.txt",
+     "sha256": "ae68b28d63d8606293a5e9ab4d1642141972cf6ab267f26d55b275048a254a3d"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704021 Test Data.txt",
+     "sha256": "bddc16cb7b6dcb032874649f745330334dae765e7f07f0705851087f4e1cdb26"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704022 Test Data.txt",
+     "sha256": "4b49c401d43fb283240117a6726dd589e8e493ddef90da400dc83557ed1fca84"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704023 Test Data.txt",
+     "sha256": "51f06a12c92b25281c116ed146eeaa3a5568dd2c00e0aec1d719e88fd6dc1b89"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704024 Test Data.txt",
+     "sha256": "d559931e4dbb73e3a2ba9a11243b92c04e57f01254dc06d2dd93ae409f043b9a"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704025 Test Data.txt",
+     "sha256": "e50e31a8ee988cee7efb88550c86a0575c1b80adb7856652a05f04d11075910a"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704026 Test Data.txt",
+     "sha256": "8984e2460f6548b270baa07fe461d4bb6afd5d3ce603aa858a6f8fbf6a462999"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704027 Test Data.txt",
+     "sha256": "f3c51a82a43be5a1dbc14ed5171ee0083e50b7ef7501b6e5d5fd26aaafa68133"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704028 Test Data.txt",
+     "sha256": "75f13d421a9a2f2c72f5fd0fe61611e797c5300c610c8ce01dc93fc1e13c259d"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704029 Test Data.txt",
+     "sha256": "76427e10a4e6218f78e60af9a29e00e0eaa7b395bc3409a3f038a8d20a3755f3"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704030 Test Data.txt",
+     "sha256": "ff200dca662afc3a0763512dfe5af94a58f7f1e33f44c5cc8d539a6278fefa2d"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704031 Test Data.txt",
+     "sha256": "06938dc3ad83c33c03efa58e7c54313f5b84a92f432b96e597c0192a3301421f"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704032 Test Data.txt",
+     "sha256": "27134cf8699e4f4d7c12f83bb9f48b972fb9e5c84eb1661b0f388079b4769859"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704033 Test Data.txt",
+     "sha256": "7bdbd9a8c4872e7aa953e6eec831d62dc4f5a55c443a89e358b4ac2253c93e61"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704034 Test Data.txt",
+     "sha256": "d2796aae4794ab98e6b95a7d55618a2c4bb305ca3a96b2d9c87f584fed8c384c"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704035 Test Data.txt",
+     "sha256": "c7aa5168beeb7e03898ad53b60717bfc36eecf5f087cfdd5f67d7fc5ec84e7c0"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704036 Test Data.txt",
+     "sha256": "a056ade3f7e507c27b45119678fbe113ce7b0111a40e5d096ddeb718ab5f8aea"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704037 Test Data.txt",
+     "sha256": "2db2d1abe363f9632dc89352f923478a523d08a4ccfe161cc03a629b77028ffa"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704039 Test Data.txt",
+     "sha256": "1242ec797a6a79df0ad8f0747226025cc8161fdd7cde6d23c12a9fed4ed7d97e"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704040 Test Data.txt",
+     "sha256": "23d07e964d46a26dac089b3010aef6b8d2299b6953bfdbc4e2c692d984a9a906"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704041 Test Data.txt",
+     "sha256": "8c42599b28c76ba6bb765cc65073aeff00adc4dae76d307f842ba3f91ae96a97"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704042 Test Data.txt",
+     "sha256": "bbd93d4c9483c5e0037404b73c06c4a3ad2d060534c1f9f18ea0b2ea40a81f1f"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704043 Test Data.txt",
+     "sha256": "1fcb18a2e1a6e6f49669571f06a0f8efbc7518f839dcd2780a2891d5d31b80c6"
+    },
+    {
+     "file": "anl-d3-2016-mazda-cx9/extended-data-set/61704044 Test Data.txt",
+     "sha256": "46128aa1bf9644172643c303d1b1ce6f35197aaedbda4b29906c3d3b59431ba5"
+    }
+   ],
+   "summary": {
+    "file": "anl-d3-2016-mazda-cx9/test-summary/2016_Mazda_CX9_Test_Summary_04052018.xlsx",
+    "sha256": "9667a2dc5a3f4cbdc3f5f3942c366aa2e253a1dbf549f3e00857bf522efcd8d7"
+   },
+   "accord": []
+  },
+  "armed_blob": "9fbcf46042bf3d3ad986d4a0b46811f220896149"
+ },
+ "counts": {
+  "held_out_rows": 90,
+  "by_table": {
+   "epa_steady.csv": 54,
+   "epa_highload_initial.csv": 18,
+   "epa_highload_final.csv": 18
+  },
+  "fired_lambda_missing": 0,
+  "fired_spark_sentinel": 0
+ },
+ "rows": {
+  "E1a": {
+   "R": 1.9,
+   "unit": "% of the measured torque",
+   "kind": "level",
+   "E": 5.393953481930868,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": "3500",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 5.393953481930868,
+    "spark_sentinel": 5.393953481930868
+   },
+   "extra": {},
+   "n_rows": 27,
+   "n_clusters": 27,
+   "lines": {
+    "1750": {
+     "E": 3.124611992474698,
+     "clusters": 11,
+     "u": {
+      "u_num": 0.025580111564107746,
+      "u_input": 0.01508596451566772,
+      "u_D": 0.012131110439524353,
+      "u_val": 0.03207946809870951,
+      "u_stat": 2.6924946867603627,
+      "u_num_sd_undivided": 0.0848396321535766,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "2500": {
+     "E": -0.9535064415855693,
+     "clusters": 8,
+     "u": {
+      "u_num": 0.0347948962955801,
+      "u_input": 0.043270491701894356,
+      "u_D": 0.015109286542041874,
+      "u_val": 0.0575439901306245,
+      "u_stat": 2.1494766351496795,
+      "u_num_sd_undivided": 0.09841482848514949,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": false
+    },
+    "3500": {
+     "E": 5.393953481930868,
+     "clusters": 8,
+     "u": {
+      "u_num": 0.08940147967836015,
+      "u_input": 0.05966665750064746,
+      "u_D": 0.018790650691939546,
+      "u_val": 0.10911380819770843,
+      "u_stat": 1.5236547961458247,
+      "u_num_sd_undivided": 0.25286557011471916,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.08940147967836015,
+    "u_input": 0.05966665750064746,
+    "u_D": 0.018790650691939546,
+    "u_val": 0.10911380819770843,
+    "u_stat": 1.5236547961458247,
+    "u_num_sd_undivided": 0.25286557011471916,
+    "unsourced": [
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 2.953779525434887,
+   "coverage_restricted": 5.393953481930868
+  },
+  "E2a": {
+   "R": 4.0,
+   "unit": "% of the measured flow",
+   "kind": "level",
+   "E": 6.673547260321096,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": "3500",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 6.673547260321096,
+    "spark_sentinel": 6.673547260321096
+   },
+   "extra": {},
+   "n_rows": 25,
+   "n_clusters": 25,
+   "lines": {
+    "1750": {
+     "E": -1.4182190255560878,
+     "clusters": 11,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.03426201181881925,
+      "u_D": 0.017426591540527742,
+      "u_val": 0.03843919284523679,
+      "u_stat": 1.6370811436972073,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": true
+    },
+    "2500": {
+     "E": -2.619721762866177,
+     "clusters": 8,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.15339537859865304,
+      "u_D": 0.01601103033333847,
+      "u_val": 0.1542287109061059,
+      "u_stat": 1.8766104973206967,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": true
+    },
+    "3500": {
+     "E": 6.673547260321096,
+     "clusters": 6,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.013356967816096662,
+      "u_D": 0.01966835126140427,
+      "u_val": 0.023775042178347968,
+      "u_stat": 0.6611153895566564,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": true
+    }
+   },
+   "u": {
+    "u_num": 0.0,
+    "u_input": 0.013356967816096662,
+    "u_D": 0.01966835126140427,
+    "u_val": 0.023775042178347968,
+    "u_stat": 0.6611153895566564,
+    "u_num_sd_undivided": 0.0,
+    "unsourced": [
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "label": "off",
+   "kappa": 1.680274336169448,
+   "coverage_restricted": 6.673547260321096
+  },
+  "E3a": {
+   "R": 10.0,
+   "unit": "K",
+   "kind": "level",
+   "E": 37.53815970441205,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": "1750",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 37.53815970441205,
+    "spark_sentinel": 37.53815970441205
+   },
+   "extra": {},
+   "n_rows": 21,
+   "n_clusters": 21,
+   "lines": {
+    "1750": {
+     "E": 37.53815970441205,
+     "clusters": 10,
+     "u": {
+      "u_num": 0.4315790025860947,
+      "u_input": 0.06189922924093859,
+      "u_D": 3.0930547992428146,
+      "u_val": 3.1236324913748796,
+      "u_stat": 11.354822839608348,
+      "u_num_sd_undivided": 1.3647726384757586,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "2500": {
+     "E": 19.781743188429914,
+     "clusters": 5,
+     "u": {
+      "u_num": 0.27606530037940413,
+      "u_input": 0.8898366178953546,
+      "u_D": 3.163683148065047,
+      "u_val": 3.2980164217256074,
+      "u_stat": 5.762125042926432,
+      "u_num_sd_undivided": 0.6173007778772461,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "3500": {
+     "E": 30.016418586665868,
+     "clusters": 6,
+     "u": {
+      "u_num": 0.8455306645321705,
+      "u_input": 0.040655535801564426,
+      "u_D": 3.2859304962200895,
+      "u_val": 3.3932159087279916,
+      "u_stat": 5.62927992560159,
+      "u_num_sd_undivided": 2.071118689980196,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.4315790025860947,
+    "u_input": 0.06189922924093859,
+    "u_D": 3.0930547992428146,
+    "u_val": 3.1236324913748796,
+    "u_stat": 11.354822839608348,
+    "u_num_sd_undivided": 1.3647726384757586,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 4.378542468716182,
+   "coverage_restricted": 37.53815970441205
+  },
+  "E4a": {
+   "R": 10.0,
+   "unit": "K",
+   "kind": "level",
+   "E": 4.305828311892507,
+   "deciding": [
+    "2500"
+   ],
+   "worst_line": "2500",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 4.305828311892507,
+    "spark_sentinel": 4.305828311892507
+   },
+   "extra": {
+    "censored_rows": []
+   },
+   "n_rows": 6,
+   "n_clusters": 6,
+   "lines": {
+    "1750": {
+     "E": 50.18827925298103,
+     "clusters": 1,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": 4.305828311892507,
+     "clusters": 3,
+     "u": {
+      "u_num": 0.21874004527953603,
+      "u_input": 0.5018368121227093,
+      "u_D": 3.566490720238032,
+      "u_val": 3.6082604466632353,
+      "u_stat": 1.6039948246686002,
+      "u_num_sd_undivided": 0.37886887207407316,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": true
+    },
+    "3500": {
+     "E": -11.51218590803262,
+     "clusters": 2,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": {
+    "u_num": 0.21874004527953603,
+    "u_input": 0.5018368121227093,
+    "u_D": 3.566490720238032,
+    "u_val": 3.6082604466632353,
+    "u_stat": 1.6039948246686002,
+    "u_num_sd_undivided": 0.37886887207407316,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "2500"
+   ],
+   "label": "limited",
+   "kappa": 1.1522349205218978,
+   "coverage_restricted": 4.305828311892507
+  },
+  "E1b": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": 6.354622299934082,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 6.354622299934082,
+    "spark_sentinel": 6.354622299934082
+   },
+   "extra": {
+    "worth_b_pct": 12.318305001231831
+   },
+   "n_rows": 54,
+   "n_clusters": 54,
+   "lines": {
+    "1750": {
+     "E": 8.674578174208584,
+     "clusters": 20,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": 6.182235413537394,
+     "clusters": 18,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": 3.648612704287229,
+     "clusters": 16,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": 6.354622299934082
+  },
+  "E2b": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": 6.117224068105724,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 6.117224068105724,
+    "spark_sentinel": 6.117224068105724
+   },
+   "extra": {
+    "worth_b_pct": 16.666666666666668
+   },
+   "n_rows": 52,
+   "n_clusters": 52,
+   "lines": {
+    "1750": {
+     "E": 7.3729904913484905,
+     "clusters": 20,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": 4.681550250550393,
+     "clusters": 18,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": 6.169138371758628,
+     "clusters": 14,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": 6.117224068105724
+  },
+  "E3b": {
+   "R": null,
+   "unit": "K",
+   "kind": "descriptive",
+   "E": 31.057066885141694,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 31.057066885141694,
+    "spark_sentinel": 31.057066885141694
+   },
+   "extra": {},
+   "n_rows": 48,
+   "n_clusters": 48,
+   "lines": {
+    "1750": {
+     "E": 39.260430126794155,
+     "clusters": 19,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": 22.408895419319613,
+     "clusters": 15,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": 29.189829056279866,
+     "clusters": 14,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": 31.057066885141694
+  },
+  "E1i": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": -2.451712306502374,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": "2500",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": -2.451712306502374,
+    "spark_sentinel": -2.451712306502374
+   },
+   "extra": {
+    "label": "transient"
+   },
+   "n_rows": 18,
+   "n_clusters": 18,
+   "lines": {
+    "1750": {
+     "E": -1.4242628002533857,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": -2.451712306502374,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": -1.1551534770932366,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    }
+   },
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": -2.451712306502374
+  },
+  "E4b": {
+   "R": 16.6,
+   "unit": "% of the lever's effect",
+   "kind": "d",
+   "E": 74.13921927444298,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 74.13921927444298,
+    "spark_sentinel": 74.13921927444298
+   },
+   "extra": {
+    "sum_L_S_k": 385.0192896215706,
+    "sum_data_lever_k": 221.09855047344683,
+    "extrapolation_kpa": {
+     "1750": 0.0,
+     "2500": 56.68543305449475,
+     "3500": 66.55554047347022
+    },
+    "extrapolation_below_kpa": {
+     "1750": 0.0,
+     "2500": 0.0,
+     "3500": 0.0
+    },
+    "enriched_rows": 6,
+    "censored_rows": [],
+    "pair_estimate": {
+     "value_pct": -92.42905647902442,
+     "holds": 1,
+     "label": "descriptive"
+    },
+    "lines_one_map": []
+   },
+   "n_rows": 31,
+   "n_clusters": 31,
+   "lines": {
+    "1750": {
+     "E": null,
+     "clusters": 1,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": null,
+     "clusters": 3,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": null,
+     "clusters": 2,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": 74.13921927444298,
+     "clusters": 31,
+     "u": {
+      "u_num": 5.8516121048199015,
+      "u_input": 10.092932882138747,
+      "u_D": 8.049122088849238,
+      "u_val": 14.173814757849529,
+      "u_stat": 65.07513024627755,
+      "u_num_sd_undivided": 32.58039734232102,
+      "unsourced": [
+       "u_D tit",
+       "u_D lam",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 5.8516121048199015,
+    "u_input": 10.092932882138747,
+    "u_D": 8.049122088849238,
+    "u_val": 14.173814757849529,
+    "u_stat": 65.07513024627755,
+    "u_num_sd_undivided": 32.58039734232102,
+    "unsourced": [
+     "u_D tit",
+     "u_D lam",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 6.173906553623014,
+   "coverage_restricted": 74.13921927444298,
+   "condition": "both arms' cuts in 0-0.865"
+  },
+  "E5": {
+   "R": null,
+   "unit": "%",
+   "kind": "descriptive",
+   "E": null,
+   "deciding": [],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {},
+   "extra": {
+    "windows": {
+     "A": {
+      "value_pct": 116.08943715175614,
+      "lines": {
+       "1750": {
+        "cov_map_S": 463.167540190598,
+        "cov_map_D": 219.61678571428575,
+        "n": 7
+       },
+       "2500": {
+        "cov_map_S": 886.8087049289577,
+        "cov_map_D": 447.32393055555565,
+        "n": 9
+       },
+       "3500": {
+        "cov_map_S": 912.2180805294738,
+        "cov_map_D": 379.93799999999953,
+        "n": 7
+       }
+      }
+     },
+     "B": {
+      "value_pct": 17.199723804028523,
+      "lines": {
+       "1750": {
+        "cov_map_S": 3688.1389745674223,
+        "cov_map_D": 2786.3004127201757,
+        "n": 12
+       },
+       "2500": {
+        "cov_map_S": 1455.0457242429486,
+        "cov_map_D": 1311.1805924609318,
+        "n": 6
+       },
+       "3500": {
+        "cov_map_S": 1107.1834309230403,
+        "cov_map_D": 1235.610171880666,
+        "n": 7
+       }
+      }
+     }
+    },
+    "boost_lever": "untested",
+    "without": {
+     "lambda_missing": {
+      "A": {
+       "value_pct": 116.08943715175614,
+       "lines": {
+        "1750": {
+         "cov_map_S": 463.167540190598,
+         "cov_map_D": 219.61678571428575,
+         "n": 7
+        },
+        "2500": {
+         "cov_map_S": 886.8087049289577,
+         "cov_map_D": 447.32393055555565,
+         "n": 9
+        },
+        "3500": {
+         "cov_map_S": 912.2180805294738,
+         "cov_map_D": 379.93799999999953,
+         "n": 7
+        }
+       }
+      },
+      "B": {
+       "value_pct": 17.199723804028523,
+       "lines": {
+        "1750": {
+         "cov_map_S": 3688.1389745674223,
+         "cov_map_D": 2786.3004127201757,
+         "n": 12
+        },
+        "2500": {
+         "cov_map_S": 1455.0457242429486,
+         "cov_map_D": 1311.1805924609318,
+         "n": 6
+        },
+        "3500": {
+         "cov_map_S": 1107.1834309230403,
+         "cov_map_D": 1235.610171880666,
+         "n": 7
+        }
+       }
+      }
+     },
+     "spark_sentinel": {
+      "A": {
+       "value_pct": 116.08943715175614,
+       "lines": {
+        "1750": {
+         "cov_map_S": 463.167540190598,
+         "cov_map_D": 219.61678571428575,
+         "n": 7
+        },
+        "2500": {
+         "cov_map_S": 886.8087049289577,
+         "cov_map_D": 447.32393055555565,
+         "n": 9
+        },
+        "3500": {
+         "cov_map_S": 912.2180805294738,
+         "cov_map_D": 379.93799999999953,
+         "n": 7
+        }
+       }
+      },
+      "B": {
+       "value_pct": 17.199723804028523,
+       "lines": {
+        "1750": {
+         "cov_map_S": 3688.1389745674223,
+         "cov_map_D": 2786.3004127201757,
+         "n": 12
+        },
+        "2500": {
+         "cov_map_S": 1455.0457242429486,
+         "cov_map_D": 1311.1805924609318,
+         "n": 6
+        },
+        "3500": {
+         "cov_map_S": 1107.1834309230403,
+         "cov_map_D": 1235.610171880666,
+         "n": 7
+        }
+       }
+      }
+     }
+    },
+    "coverage_restricted": {
+     "A": {
+      "value_pct": 116.08943715175614,
+      "lines": {
+       "1750": {
+        "cov_map_S": 463.167540190598,
+        "cov_map_D": 219.61678571428575,
+        "n": 7
+       },
+       "2500": {
+        "cov_map_S": 886.8087049289577,
+        "cov_map_D": 447.32393055555565,
+        "n": 9
+       },
+       "3500": {
+        "cov_map_S": 912.2180805294738,
+        "cov_map_D": 379.93799999999953,
+        "n": 7
+       }
+      }
+     },
+     "B": {
+      "value_pct": 17.199723804028523,
+      "lines": {
+       "1750": {
+        "cov_map_S": 3688.1389745674223,
+        "cov_map_D": 2786.3004127201757,
+        "n": 12
+       },
+       "2500": {
+        "cov_map_S": 1455.0457242429486,
+        "cov_map_D": 1311.1805924609318,
+        "n": 6
+       },
+       "3500": {
+        "cov_map_S": 1107.1834309230403,
+        "cov_map_D": 1235.610171880666,
+        "n": 7
+       }
+      }
+     }
+    }
+   },
+   "n_rows": 0,
+   "n_clusters": 0,
+   "lines": {},
+   "u": null,
+   "certifying": [],
+   "label": null,
+   "kappa": null,
+   "coverage_restricted": null
+  },
+  "D1": {
+   "R": 16.6,
+   "unit": "% of the measured flow",
+   "kind": "d",
+   "E": 4.065883551882672,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 4.065883551882672,
+    "spark_sentinel": 4.065883551882672,
+    "unreachable": 4.065883551882672
+   },
+   "extra": {
+    "unreachable": [],
+    "n_unreachable": 0,
+    "bounds_kpa": []
+   },
+   "n_rows": 52,
+   "n_clusters": 52,
+   "lines": {
+    "1750": {
+     "E": 3.8812394125112397,
+     "clusters": 20,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": 3.7564213730921696,
+     "clusters": 18,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": 4.72754083800108,
+     "clusters": 14,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": 4.065883551882672,
+     "clusters": 52,
+     "u": {
+      "u_num": 0.023525122902345246,
+      "u_input": 0.032025309155028776,
+      "u_D": 0.020195176434104248,
+      "u_val": 0.04457462265965039,
+      "u_stat": 0.4013619981758149,
+      "u_num_sd_undivided": 0.169642073771996,
+      "unsourced": [
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "limited",
+     "certifies": true
+    }
+   },
+   "u": {
+    "u_num": 0.023525122902345246,
+    "u_input": 0.032025309155028776,
+    "u_D": 0.020195176434104248,
+    "u_val": 0.04457462265965039,
+    "u_stat": 0.4013619981758149,
+    "u_num_sd_undivided": 0.169642073771996,
+    "unsourced": [
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "pooled"
+   ],
+   "label": "limited",
+   "kappa": 1.0,
+   "coverage_restricted": 4.065883551882672,
+   "condition": "both arms' cuts in 0-0.865"
+  },
+  "L0": {
+   "R": 10.0,
+   "unit": "K of housing",
+   "kind": "level",
+   "E": 36.970034451133,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": "1750",
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 36.970034451133,
+    "spark_sentinel": 36.970034451133
+   },
+   "extra": {
+    "G_k": 980.27,
+    "per_line": {
+     "1750": {
+      "ebar_k": 36.970034451133,
+      "deltabar": -0.04479109182656271,
+      "f_star": 1.0,
+      "H_k": 36.970034451133
+     },
+     "2500": {
+      "ebar_k": 31.851962508246128,
+      "deltabar": -0.015558531970737666,
+      "f_star": 1.0,
+      "H_k": 31.851962508246128
+     },
+     "3500": {
+      "ebar_k": 21.672381751751743,
+      "deltabar": 0.021017976455102134,
+      "f_star": 1.0,
+      "H_k": 21.672381751751743
+     }
+    }
+   },
+   "n_rows": 21,
+   "n_clusters": 21,
+   "lines": {
+    "1750": {
+     "E": 36.970034451133,
+     "clusters": 10,
+     "u": {
+      "u_num": 0.3431311260127497,
+      "u_input": 0.08545637185437058,
+      "u_D": 3.0933699012313576,
+      "u_val": 3.1135155543169186,
+      "u_stat": 10.553255618618005,
+      "u_num_sd_undivided": 1.0850758942985395,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    },
+    "2500": {
+     "E": 31.851962508246128,
+     "clusters": 5,
+     "u": {
+      "u_num": 0.12730903526975995,
+      "u_input": 0.766123999614295,
+      "u_D": 3.164321838456731,
+      "u_val": 3.258233612032831,
+      "u_stat": 3.19034583158168,
+      "u_num_sd_undivided": 0.28467165701310154,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": true
+    },
+    "3500": {
+     "E": 21.672381751751743,
+     "clusters": 6,
+     "u": {
+      "u_num": 0.7444501001544565,
+      "u_input": 0.03727809880536607,
+      "u_D": 3.2265045613183942,
+      "u_val": 3.3114841525332603,
+      "u_stat": 7.082530893136821,
+      "u_num_sd_undivided": 1.8235228843422506,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.3431311260127497,
+    "u_input": 0.08545637185437058,
+    "u_D": 3.0933699012313576,
+    "u_val": 3.1135155543169186,
+    "u_stat": 10.553255618618005,
+    "u_num_sd_undivided": 1.0850758942985395,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [
+    "2500"
+   ],
+   "label": "off",
+   "kappa": 4.319706555976684,
+   "coverage_restricted": 36.970034451133
+  },
+  "L1": {
+   "R": 9.9,
+   "unit": "K of housing",
+   "kind": "d",
+   "E": 15.29765269938126,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 15.29765269938126,
+    "spark_sentinel": 15.29765269938126
+   },
+   "extra": {
+    "G_k": 980.27,
+    "f_star": 1.0,
+    "extreme_lines": [
+     "1750",
+     "3500"
+    ],
+    "H_at_f_star": {
+     "1750": 36.970034451133,
+     "2500": 31.851962508246128,
+     "3500": 21.672381751751743
+    }
+   },
+   "n_rows": 21,
+   "n_clusters": 21,
+   "lines": {
+    "1750": {
+     "E": 36.970034451133,
+     "clusters": 10,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": 31.851962508246128,
+     "clusters": 5,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": 21.672381751751743,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": 15.29765269938126,
+     "clusters": 21,
+     "u": {
+      "u_num": 0.8197224659961184,
+      "u_input": 0.093233299528951,
+      "u_D": 0.20118105624040172,
+      "u_val": 0.849182658083534,
+      "u_stat": 12.709580953128626,
+      "u_num_sd_undivided": 3.7564402492830773,
+      "unsourced": [
+       "u_D tit",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "off",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.8197224659961184,
+    "u_input": 0.093233299528951,
+    "u_D": 0.20118105624040172,
+    "u_val": 0.849182658083534,
+    "u_stat": 12.709580953128626,
+    "u_num_sd_undivided": 3.7564402492830773,
+    "unsourced": [
+     "u_D tit",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "off",
+   "kappa": 1.7167694965200329,
+   "coverage_restricted": 15.29765269938126,
+   "condition": "both arms' cuts in 0-0.865"
+  },
+  "E8": {
+   "R": 16.6,
+   "unit": "% of the head-start pair",
+   "kind": "d",
+   "E": 8.21350905661609,
+   "deciding": [
+    "1750",
+    "2500",
+    "3500"
+   ],
+   "worst_line": null,
+   "no_statistic": false,
+   "reason": null,
+   "without": {
+    "lambda_missing": 8.21350905661609,
+    "spark_sentinel": 8.21350905661609,
+    "censored": 8.21350905661609
+   },
+   "extra": {
+    "n_final": 18,
+    "n_dl": 18,
+    "n_ds": 18,
+    "dl": -0.0005291530054396408,
+    "ds": -1.3036974985609573,
+    "worth_b": {
+     "lambda_rich": {
+      "shift": -0.0206,
+      "extrapolated": false
+     },
+     "lambda_lean": {
+      "shift": 0.0086,
+      "extrapolated": false
+     },
+     "spark_retard": {
+      "shift": -2.594,
+      "extrapolated": false
+     },
+     "spark_advance": {
+      "shift": 2.625,
+      "extrapolated": true,
+      "largest_measured": [
+       1.5,
+       -0.1015
+      ]
+     }
+    },
+    "terms": {
+     "lambda": {
+      "shift": -0.0005291530054396408,
+      "P": -0.005415541104422411,
+      "extrapolated": false,
+      "slope": 10.234357640892489,
+      "rows": 18
+     },
+     "spark": {
+      "shift": -1.3036974985609573,
+      "P": 0.07671954946173848,
+      "extrapolated": false,
+      "slope": -0.042158386168287564,
+      "rows": 18
+     }
+    },
+    "every_final_row": {
+     "dl": -0.0005291530054396408,
+     "ds": -1.3036974985609573,
+     "E_pct": 8.21350905661609
+    },
+    "censored_rows": [],
+    "dl_without_censored": -0.0005291530054396408,
+    "snapped": {
+     "dl": -0.0020197051982512007,
+     "E_pct": 9.738993478981094,
+     "label": "descriptive"
+    },
+    "enrichment_onset_kpa": {
+     "1750": {
+      "model_kpa": 208.87570519618237,
+      "epa_kpa": 209.52477083333264
+     },
+     "2500": {
+      "model_kpa": 219.8605968688851,
+      "epa_kpa": 177.3560469483571
+     },
+     "3500": {
+      "model_kpa": 233.95096774193595,
+      "epa_kpa": 233.95096774193595
+     }
+    },
+    "u_dl": {
+     "u_num": 0.0,
+     "u_input": 0.0006805538999897725,
+     "u_D": 0.012000000000000004,
+     "u_val": 0.01201928257471266,
+     "u_stat": 0.010701208757220635,
+     "u_num_sd_undivided": 0.0,
+     "unsourced": [
+      "u_D lam",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "u_ds": {
+     "u_num": 0.0,
+     "u_input": 0.007114186479158906,
+     "u_D": 0.0,
+     "u_val": 0.007114186479158906,
+     "u_stat": 0.5869807784878924,
+     "u_num_sd_undivided": 0.0,
+     "unsourced": [
+      "u_D lam",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    }
+   },
+   "n_rows": 18,
+   "n_clusters": 18,
+   "lines": {
+    "1750": {
+     "E": null,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "2500": {
+     "E": null,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "3500": {
+     "E": null,
+     "clusters": 6,
+     "u": null,
+     "label": null,
+     "certifies": null
+    },
+    "pooled": {
+     "E": 8.21350905661609,
+     "clusters": 18,
+     "u": {
+      "u_num": 0.0,
+      "u_input": 0.6971486529333186,
+      "u_D": 12.28122916907099,
+      "u_val": 12.301000209232047,
+      "u_stat": 11.22809085596098,
+      "u_num_sd_undivided": 0.0,
+      "unsourced": [
+       "u_D lam",
+       "u_input map",
+       "u_input imt",
+       "u_input ect",
+       "u_input spark",
+       "u_input lam"
+      ]
+     },
+     "label": "untested",
+     "certifies": false
+    }
+   },
+   "u": {
+    "u_num": 0.0,
+    "u_input": 0.6971486529333186,
+    "u_D": 12.28122916907099,
+    "u_val": 12.301000209232047,
+    "u_stat": 11.22809085596098,
+    "u_num_sd_undivided": 0.0,
+    "unsourced": [
+     "u_D lam",
+     "u_input map",
+     "u_input imt",
+     "u_input ect",
+     "u_input spark",
+     "u_input lam"
+    ]
+   },
+   "certifying": [],
+   "label": "untested",
+   "kappa": 1.976837920185553,
+   "coverage_restricted": 8.21350905661609,
+   "condition": "both arms' cuts in 0-0.865"
+  }
+ },
+ "reported": {
+  "E1a": {
+   "label": "off",
+   "kappa": 2.953779525434887,
+   "how": "as computed"
+  },
+  "E2a": {
+   "label": "off",
+   "kappa": 1.680274336169448,
+   "how": "as computed"
+  },
+  "E3a": {
+   "label": "off",
+   "kappa": 4.378542468716182,
+   "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "E4a": {
+   "label": "limited",
+   "kappa": 1.1522349205218978,
+   "how": "as computed"
+  },
+  "E4b": {
+   "label": "off",
+   "kappa": 6.173906553623014,
+   "how": "as computed"
+  },
+  "D1": {
+   "label": "limited",
+   "kappa": 1.0,
+   "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "L0": {
+   "label": "off",
+   "kappa": 4.319706555976684,
+   "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "L1": {
+   "label": "off",
+   "kappa": 1.7167694965200329,
+   "how": "as computed"
+  },
+  "E8": {
+   "label": "untested",
+   "kappa": 1.976837920185553,
+   "how": "as computed"
+  },
+  "C3b": {
+   "label": "limited",
+   "kappa": 1.4160968695908576,
+   "how": "as computed"
+  },
+  "C3d": {
+   "label": "limited",
+   "kappa": 1.3563475785113621,
+   "how": "as computed"
+  }
+ },
+ "coverage_flags": {
+  "engine": {
+   "contract_coverage": {
+    "fired_steady_and_final": {
+     "40-60 kPa": {
+      "n": 26,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.8,
+       48.6
+      ],
+      "coolant_temp_c": [
+       84.3,
+       95.8
+      ]
+     },
+     "60-80 kPa": {
+      "n": 36,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.5,
+       49.4
+      ],
+      "coolant_temp_c": [
+       86.8,
+       95.8
+      ]
+     },
+     "80-100 kPa": {
+      "n": 31,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       38.2,
+       45.2
+      ],
+      "coolant_temp_c": [
+       85.8,
+       97.5
+      ]
+     },
+     "100-120 kPa": {
+      "n": 34,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.6,
+       47.1
+      ],
+      "coolant_temp_c": [
+       86.3,
+       97.6
+      ]
+     },
+     "120-140 kPa": {
+      "n": 19,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.3,
+       48.2
+      ],
+      "coolant_temp_c": [
+       86.7,
+       97.2
+      ]
+     },
+     "140-160 kPa": {
+      "n": 12,
+      "speed_rpm": [
+       1301.0,
+       3500.8
+      ],
+      "intake_manifold_temp_c": [
+       39.2,
+       44.2
+      ],
+      "coolant_temp_c": [
+       89.8,
+       93.9
+      ]
+     },
+     "160-180 kPa": {
+      "n": 14,
+      "speed_rpm": [
+       1500.0,
+       4501.4
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       45.6
+      ],
+      "coolant_temp_c": [
+       89.1,
+       94.2
+      ]
+     },
+     "180-200 kPa": {
+      "n": 10,
+      "speed_rpm": [
+       1500.6,
+       4501.1
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       47.9
+      ],
+      "coolant_temp_c": [
+       91.9,
+       94.7
+      ]
+     },
+     "200-220 kPa": {
+      "n": 10,
+      "speed_rpm": [
+       1750.8,
+       2750.8
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       40.9
+      ],
+      "coolant_temp_c": [
+       91.5,
+       96.9
+      ]
+     },
+     "220-240 kPa": {
+      "n": 10,
+      "speed_rpm": [
+       2500.5,
+       4500.7
+      ],
+      "intake_manifold_temp_c": [
+       40.7,
+       55.0
+      ],
+      "coolant_temp_c": [
+       91.1,
+       98.7
+      ]
+     }
+    },
+    "hot": {
+     "100-120 kPa": {
+      "n": 15,
+      "speed_rpm": [
+       1301.0,
+       4501.9
+      ],
+      "intake_manifold_temp_c": [
+       38.3,
+       46.7
+      ],
+      "coolant_temp_c": [
+       88.0,
+       95.5
+      ]
+     },
+     "120-140 kPa": {
+      "n": 19,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.3,
+       48.2
+      ],
+      "coolant_temp_c": [
+       86.7,
+       97.2
+      ]
+     },
+     "140-160 kPa": {
+      "n": 12,
+      "speed_rpm": [
+       1301.0,
+       3500.8
+      ],
+      "intake_manifold_temp_c": [
+       39.2,
+       44.2
+      ],
+      "coolant_temp_c": [
+       89.8,
+       93.9
+      ]
+     },
+     "160-180 kPa": {
+      "n": 14,
+      "speed_rpm": [
+       1500.0,
+       4501.4
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       45.6
+      ],
+      "coolant_temp_c": [
+       89.1,
+       94.2
+      ]
+     },
+     "180-200 kPa": {
+      "n": 10,
+      "speed_rpm": [
+       1500.6,
+       4501.1
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       47.9
+      ],
+      "coolant_temp_c": [
+       91.9,
+       94.7
+      ]
+     },
+     "200-220 kPa": {
+      "n": 10,
+      "speed_rpm": [
+       1750.8,
+       2750.8
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       40.9
+      ],
+      "coolant_temp_c": [
+       91.5,
+       96.9
+      ]
+     },
+     "220-240 kPa": {
+      "n": 10,
+      "speed_rpm": [
+       2500.5,
+       4500.7
+      ],
+      "intake_manifold_temp_c": [
+       40.7,
+       55.0
+      ],
+      "coolant_temp_c": [
+       91.1,
+       98.7
+      ]
+     }
+    },
+    "calibration_fired": {
+     "40-60 kPa": {
+      "n": 21,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.8,
+       48.6
+      ],
+      "coolant_temp_c": [
+       84.3,
+       95.8
+      ]
+     },
+     "60-80 kPa": {
+      "n": 26,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.5,
+       48.1
+      ],
+      "coolant_temp_c": [
+       87.1,
+       94.6
+      ]
+     },
+     "80-100 kPa": {
+      "n": 23,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       38.2,
+       45.2
+      ],
+      "coolant_temp_c": [
+       85.8,
+       97.5
+      ]
+     },
+     "100-120 kPa": {
+      "n": 25,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.6,
+       47.1
+      ],
+      "coolant_temp_c": [
+       86.3,
+       97.6
+      ]
+     },
+     "120-140 kPa": {
+      "n": 15,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.3,
+       48.2
+      ],
+      "coolant_temp_c": [
+       86.7,
+       97.2
+      ]
+     },
+     "140-160 kPa": {
+      "n": 8,
+      "speed_rpm": [
+       1301.0,
+       3001.0
+      ],
+      "intake_manifold_temp_c": [
+       39.2,
+       44.2
+      ],
+      "coolant_temp_c": [
+       89.8,
+       93.9
+      ]
+     },
+     "160-180 kPa": {
+      "n": 9,
+      "speed_rpm": [
+       1500.0,
+       4501.4
+      ],
+      "intake_manifold_temp_c": [
+       38.5,
+       45.6
+      ],
+      "coolant_temp_c": [
+       89.1,
+       94.2
+      ]
+     },
+     "180-200 kPa": {
+      "n": 9,
+      "speed_rpm": [
+       1500.6,
+       4501.1
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       47.9
+      ],
+      "coolant_temp_c": [
+       91.9,
+       94.7
+      ]
+     },
+     "200-220 kPa": {
+      "n": 5,
+      "speed_rpm": [
+       2000.6,
+       2750.8
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       40.5
+      ],
+      "coolant_temp_c": [
+       91.5,
+       96.9
+      ]
+     },
+     "220-240 kPa": {
+      "n": 7,
+      "speed_rpm": [
+       2750.6,
+       4500.7
+      ],
+      "intake_manifold_temp_c": [
+       41.5,
+       55.0
+      ],
+      "coolant_temp_c": [
+       91.1,
+       98.7
+      ]
+     }
+    },
+    "calibration_hot": {
+     "100-120 kPa": {
+      "n": 10,
+      "speed_rpm": [
+       1301.0,
+       4501.9
+      ],
+      "intake_manifold_temp_c": [
+       38.3,
+       46.7
+      ],
+      "coolant_temp_c": [
+       89.3,
+       95.5
+      ]
+     },
+     "120-140 kPa": {
+      "n": 15,
+      "speed_rpm": [
+       1301.0,
+       5001.0
+      ],
+      "intake_manifold_temp_c": [
+       37.3,
+       48.2
+      ],
+      "coolant_temp_c": [
+       86.7,
+       97.2
+      ]
+     },
+     "140-160 kPa": {
+      "n": 8,
+      "speed_rpm": [
+       1301.0,
+       3001.0
+      ],
+      "intake_manifold_temp_c": [
+       39.2,
+       44.2
+      ],
+      "coolant_temp_c": [
+       89.8,
+       93.9
+      ]
+     },
+     "160-180 kPa": {
+      "n": 9,
+      "speed_rpm": [
+       1500.0,
+       4501.4
+      ],
+      "intake_manifold_temp_c": [
+       38.5,
+       45.6
+      ],
+      "coolant_temp_c": [
+       89.1,
+       94.2
+      ]
+     },
+     "180-200 kPa": {
+      "n": 9,
+      "speed_rpm": [
+       1500.6,
+       4501.1
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       47.9
+      ],
+      "coolant_temp_c": [
+       91.9,
+       94.7
+      ]
+     },
+     "200-220 kPa": {
+      "n": 5,
+      "speed_rpm": [
+       2000.6,
+       2750.8
+      ],
+      "intake_manifold_temp_c": [
+       38.1,
+       40.5
+      ],
+      "coolant_temp_c": [
+       91.5,
+       96.9
+      ]
+     },
+     "220-240 kPa": {
+      "n": 7,
+      "speed_rpm": [
+       2750.6,
+       4500.7
+      ],
+      "intake_manifold_temp_c": [
+       41.5,
+       55.0
+      ],
+      "coolant_temp_c": [
+       91.1,
+       98.7
+      ]
+     }
+    },
+    "fired_intake_temp_c": [
+     37.3,
+     55.0
+    ],
+    "hot_intake_temp_c": [
+     37.3,
+     55.0
+    ]
+   },
+   "statements": [
+    "the scored roads' ambient: the charge above every EPA map's intake temperature",
+    "holds longer than EPA's: an extrapolation in duration",
+    "road speeds above C1's range: the road load not covered",
+    "the cells' barometer against the road's"
+   ],
+   "contract_rule": "every E and C row is labelled on its own comparison's domain (the EPA held-out rows, or the D3 segments), in decision 4's order with 'not covered' read on that domain: excluded, not covered, off, untested, validated, limited. Coverage of the SCORED context (decision 34's roads at 42 C, holds longer than EPA's 30 s) is a separate per-engine flag, reported beside every result and in the preregistration, never instead of a label"
+  },
+  "per_row": {
+   "epa_steady.csv/43": [
+    "lambda_missing",
+    "outside_calibration_map_coverage",
+    "spark_sentinel"
+   ],
+   "epa_steady.csv/44": [
+    "outside_calibration_map_coverage"
+   ],
+   "epa_steady.csv/45": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/46": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/47": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/48": [
+    "snapped"
+   ],
+   "epa_steady.csv/49": [
+    "snapped"
+   ],
+   "epa_steady.csv/50": [
+    "snapped"
+   ],
+   "epa_steady.csv/51": [
+    "snapped"
+   ],
+   "epa_steady.csv/52": [
+    "snapped"
+   ],
+   "epa_steady.csv/53": [
+    "snapped"
+   ],
+   "epa_steady.csv/54": [
+    "snapped"
+   ],
+   "epa_steady.csv/55": [
+    "snapped"
+   ],
+   "epa_steady.csv/56": [
+    "snapped"
+   ],
+   "epa_steady.csv/57": [
+    "snapped"
+   ],
+   "epa_steady.csv/58": [
+    "snapped"
+   ],
+   "epa_steady.csv/59": [
+    "snapped"
+   ],
+   "epa_steady.csv/60": [
+    "snapped"
+   ],
+   "epa_steady.csv/61": [
+    "snapped"
+   ],
+   "epa_steady.csv/62": [
+    "snapped"
+   ],
+   "epa_steady.csv/100": [
+    "lambda_missing",
+    "outside_calibration_map_coverage",
+    "spark_sentinel"
+   ],
+   "epa_steady.csv/101": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/102": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/103": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/104": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/105": [
+    "snapped"
+   ],
+   "epa_steady.csv/106": [
+    "snapped"
+   ],
+   "epa_steady.csv/107": [
+    "snapped"
+   ],
+   "epa_steady.csv/108": [
+    "snapped"
+   ],
+   "epa_steady.csv/109": [
+    "snapped"
+   ],
+   "epa_steady.csv/110": [
+    "snapped"
+   ],
+   "epa_steady.csv/111": [
+    "snapped"
+   ],
+   "epa_steady.csv/112": [
+    "snapped"
+   ],
+   "epa_steady.csv/113": [
+    "snapped"
+   ],
+   "epa_steady.csv/114": [
+    "snapped"
+   ],
+   "epa_steady.csv/115": [
+    "snapped"
+   ],
+   "epa_steady.csv/116": [
+    "snapped"
+   ],
+   "epa_steady.csv/117": [
+    "snapped"
+   ],
+   "epa_steady.csv/152": [
+    "lambda_missing",
+    "outside_calibration_map_coverage",
+    "spark_sentinel"
+   ],
+   "epa_steady.csv/153": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/154": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/155": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/156": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/157": [
+    "outside_calibration_map_coverage",
+    "snapped"
+   ],
+   "epa_steady.csv/158": [
+    "snapped"
+   ],
+   "epa_steady.csv/159": [
+    "snapped"
+   ],
+   "epa_steady.csv/160": [
+    "snapped"
+   ],
+   "epa_steady.csv/161": [
+    "snapped"
+   ],
+   "epa_steady.csv/162": [
+    "snapped"
+   ],
+   "epa_steady.csv/163": [
+    "snapped"
+   ],
+   "epa_steady.csv/164": [
+    "snapped"
+   ],
+   "epa_steady.csv/165": [
+    "snapped"
+   ],
+   "epa_steady.csv/166": [
+    "snapped"
+   ],
+   "epa_steady.csv/167": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/13": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/14": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/15": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/16": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/17": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/31": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/32": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/33": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/49": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/50": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/51": [
+    "snapped"
+   ],
+   "epa_highload_final.csv/52": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/13": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/14": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/15": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/16": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/17": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/31": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/32": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/33": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/49": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/50": [
+    "snapped"
+   ],
+   "epa_highload_initial.csv/51": [
+    "snapped"
+   ]
+  }
+ },
+ "section7": {
+  "engine": "mazda_25t",
+  "level": {
+   "E1a": "off",
+   "E2a": "off",
+   "E3a": "off",
+   "E4a": "limited",
+   "L0": "off"
+  },
+  "level_how": {
+   "E1a": "as computed",
+   "E2a": "as computed",
+   "E3a": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)",
+   "E4a": "as computed",
+   "L0": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)"
+  },
+  "level_850c_label": "off",
+  "level_rows_without_statistic": [],
+  "d": {
+   "D1": {
+    "label": "limited",
+    "kappa": 1.0,
+    "drop": false,
+    "reason": null,
+    "how": "the worse label and the larger kappa of the snapped and unsnapped readings (E6 row 12)",
+    "kappa_below_1_not_validated": false
+   },
+   "E4b": {
+    "label": "off",
+    "kappa": 6.173906553623014,
+    "drop": true,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   },
+   "L1": {
+    "label": "off",
+    "kappa": 1.7167694965200329,
+    "drop": true,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   },
+   "E8": {
+    "label": "untested",
+    "kappa": 1.976837920185553,
+    "drop": false,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   },
+   "C3b": {
+    "label": "limited",
+    "kappa": 1.4160968695908576,
+    "drop": false,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   },
+   "C3d": {
+    "label": "limited",
+    "kappa": 1.3563475785113621,
+    "drop": false,
+    "reason": null,
+    "how": "as computed",
+    "kappa_below_1_not_validated": false
+   }
+  },
+  "parts": {
+   "P1": 1.0,
+   "P2": "DROP",
+   "P3": "DROP",
+   "P4": 1.976837920185553,
+   "P5": 1.4160968695908576
+  },
+  "drop": true,
+  "drop_rows": [
+   "E4b",
+   "L1"
+  ],
+  "kappa_below_1_not_validated": []
+ },
+ "c5_recheck_margin": {
+  "worst_line": "3500",
+  "E": 5.393953481930868,
+  "u_val": 0.10911380819770843,
+  "R": 1.9,
+  "margin": 5.612181098326285,
+  "margin_unit": "percent",
+  "margin_fraction": 0.056121810983262854,
+  "lines": {
+   "1750": 3.188770928672117,
+   "2500": 1.0685944218468184,
+   "3500": 5.612181098326285
+  },
+  "no_deciding_line": false
+ },
+ "steady_only_tit": {
+  "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+  "decides": false,
+  "rows": [
+   "E3a",
+   "E4a",
+   "L0",
+   "L1",
+   "E4b"
+  ],
+  "statistics": {
+   "E3a": {
+    "R": 10.0,
+    "unit": "K",
+    "kind": "level",
+    "E": 4.409015341602753,
+    "deciding": [
+     "1750"
+    ],
+    "worst_line": "1750",
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 4.409015341602753,
+     "spark_sentinel": 4.409015341602753
+    },
+    "extra": {},
+    "n_rows": 9,
+    "n_clusters": 9,
+    "lines": {
+     "1750": {
+      "E": 4.409015341602753,
+      "clusters": 5,
+      "u": {
+       "u_num": 0.20997381969317727,
+       "u_input": 0.0891026119677164,
+       "u_D": 3.0930963321564833,
+       "u_val": 3.101495316845715,
+       "u_stat": 2.901216620867749,
+       "u_num_sd_undivided": 0.46951573432922844,
+       "unsourced": [
+        "u_D tit",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "limited",
+      "certifies": true
+     },
+     "2500": {
+      "E": 17.13630393249275,
+      "clusters": 2,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "3500": {
+      "E": 44.507874174981055,
+      "clusters": 2,
+      "u": null,
+      "label": null,
+      "certifies": null
+     }
+    },
+    "u": {
+     "u_num": 0.20997381969317727,
+     "u_input": 0.0891026119677164,
+     "u_D": 3.0930963321564833,
+     "u_val": 3.101495316845715,
+     "u_stat": 2.901216620867749,
+     "u_num_sd_undivided": 0.46951573432922844,
+     "unsourced": [
+      "u_D tit",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "certifying": [
+     "1750"
+    ],
+    "label": "limited",
+    "kappa": 1.0612005975294183,
+    "coverage_restricted": 4.409015341602753
+   },
+   "E4a": {
+    "R": 10.0,
+    "unit": "K",
+    "kind": "level",
+    "E": null,
+    "deciding": [],
+    "worst_line": null,
+    "no_statistic": true,
+    "reason": "no line with at least 3 clusters in hot_enr",
+    "without": {
+     "lambda_missing": null,
+     "spark_sentinel": null
+    },
+    "extra": {
+     "censored_rows": []
+    },
+    "n_rows": 0,
+    "n_clusters": 0,
+    "lines": {},
+    "u": null,
+    "certifying": [],
+    "label": null,
+    "kappa": null,
+    "coverage_restricted": null
+   },
+   "L0": {
+    "R": 10.0,
+    "unit": "K of housing",
+    "kind": "level",
+    "E": 12.650049360623916,
+    "deciding": [
+     "1750"
+    ],
+    "worst_line": "1750",
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": 12.650049360623916,
+     "spark_sentinel": 12.650049360623916
+    },
+    "extra": {
+     "G_k": 980.27,
+     "per_line": {
+      "1750": {
+       "ebar_k": 12.650049360623916,
+       "deltabar": -0.025788861035093792,
+       "f_star": 1.0,
+       "H_k": 12.650049360623916
+      },
+      "2500": {
+       "ebar_k": 38.703526837143045,
+       "deltabar": 0.014431882656540496,
+       "f_star": 1.0,
+       "H_k": 38.703526837143045
+      },
+      "3500": {
+       "ebar_k": 43.84779569934955,
+       "deltabar": 0.05716024655179841,
+       "f_star": 0.891271274270122,
+       "H_k": 44.510208020117865
+      }
+     }
+    },
+    "n_rows": 9,
+    "n_clusters": 9,
+    "lines": {
+     "1750": {
+      "E": 12.650049360623916,
+      "clusters": 5,
+      "u": {
+       "u_num": 0.07947789618192673,
+       "u_input": 0.12319369854365386,
+       "u_D": 3.0939856579868086,
+       "u_val": 3.0974571304814593,
+       "u_stat": 11.424833259203657,
+       "u_num_sd_undivided": 0.17771797857145916,
+       "unsourced": [
+        "u_D tit",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "limited",
+      "certifies": false
+     },
+     "2500": {
+      "E": 38.703526837143045,
+      "clusters": 2,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "3500": {
+      "E": 44.510208020117865,
+      "clusters": 2,
+      "u": null,
+      "label": null,
+      "certifies": null
+     }
+    },
+    "u": {
+     "u_num": 0.07947789618192673,
+     "u_input": 0.12319369854365386,
+     "u_D": 3.0939856579868086,
+     "u_val": 3.0974571304814593,
+     "u_stat": 11.424833259203657,
+     "u_num_sd_undivided": 0.17771797857145916,
+     "unsourced": [
+      "u_D tit",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "certifying": [],
+    "label": "untested",
+    "kappa": 1.8844963621586834,
+    "coverage_restricted": 12.650049360623916
+   },
+   "L1": {
+    "R": 9.9,
+    "unit": "K of housing",
+    "kind": "d",
+    "E": null,
+    "deciding": [
+     "1750"
+    ],
+    "worst_line": null,
+    "no_statistic": true,
+    "reason": "L1 needs at least 2 deciding lines (L0's)",
+    "without": {
+     "lambda_missing": null,
+     "spark_sentinel": null
+    },
+    "extra": {
+     "G_k": 980.27
+    },
+    "n_rows": 9,
+    "n_clusters": 9,
+    "lines": {
+     "1750": {
+      "E": null,
+      "clusters": 5,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "2500": {
+      "E": null,
+      "clusters": 2,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "3500": {
+      "E": null,
+      "clusters": 2,
+      "u": null,
+      "label": null,
+      "certifies": null
+     }
+    },
+    "u": null,
+    "certifying": [],
+    "label": null,
+    "kappa": null,
+    "coverage_restricted": null,
+    "condition": "both arms' cuts in 0-0.865"
+   },
+   "E4b": {
+    "R": 16.6,
+    "unit": "% of the lever's effect",
+    "kind": "d",
+    "E": -24.261028350979565,
+    "deciding": [
+     "1750",
+     "2500",
+     "3500"
+    ],
+    "worst_line": null,
+    "no_statistic": false,
+    "reason": null,
+    "without": {
+     "lambda_missing": -24.261028350979565,
+     "spark_sentinel": -24.261028350979565
+    },
+    "extra": {
+     "sum_L_S_k": 385.0192896215706,
+     "sum_data_lever_k": 508.3503000354642,
+     "extrapolation_kpa": {
+      "1750": 0.164770833332625,
+      "2500": 96.02204926108433,
+      "3500": 115.5499342825847
+     },
+     "extrapolation_below_kpa": {
+      "1750": 0.0,
+      "2500": 0.0,
+      "3500": 0.0
+     },
+     "enriched_rows": 6,
+     "censored_rows": [],
+     "pair_estimate": {
+      "value_pct": -92.42905647902442,
+      "holds": 1,
+      "label": "descriptive"
+     },
+     "lines_one_map": []
+    },
+    "n_rows": 19,
+    "n_clusters": 19,
+    "lines": {
+     "1750": {
+      "E": null,
+      "clusters": 1,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "2500": {
+      "E": null,
+      "clusters": 3,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "3500": {
+      "E": null,
+      "clusters": 2,
+      "u": null,
+      "label": null,
+      "certifies": null
+     },
+     "pooled": {
+      "E": -24.261028350979565,
+      "clusters": 19,
+      "u": {
+       "u_num": 11.311630583987775,
+       "u_input": 0.605416554200525,
+       "u_D": 3.507310390403708,
+       "u_val": 11.858361684791936,
+       "u_stat": 15.904487829292032,
+       "u_num_sd_undivided": 49.30625460226669,
+       "unsourced": [
+        "u_D tit",
+        "u_D lam",
+        "u_input map",
+        "u_input imt",
+        "u_input ect",
+        "u_input spark",
+        "u_input lam"
+       ]
+      },
+      "label": "untested",
+      "certifies": false
+     }
+    },
+    "u": {
+     "u_num": 11.311630583987775,
+     "u_input": 0.605416554200525,
+     "u_D": 3.507310390403708,
+     "u_val": 11.858361684791936,
+     "u_stat": 15.904487829292032,
+     "u_num_sd_undivided": 49.30625460226669,
+     "unsourced": [
+      "u_D tit",
+      "u_D lam",
+      "u_input map",
+      "u_input imt",
+      "u_input ect",
+      "u_input spark",
+      "u_input lam"
+     ]
+    },
+    "certifying": [],
+    "label": "untested",
+    "kappa": 2.890226007262857,
+    "coverage_restricted": -24.261028350979565,
+    "condition": "both arms' cuts in 0-0.865"
+   }
+  }
+ },
+ "defect_rerun": {
+  "k": 1,
+  "reason": "row 144: the first run crashed (crash_1.txt, TraceDefect in d3_rows.read_summary at a summary cell that is not a finite number) before writing any output; the fix leaves such a cell unread and its test out of only what reads it. Labels limited at best.",
+  "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a",
+  "capped_at": "limited",
+  "capped": [
+   "/rows/E1a/lines/2500/label",
+   "/rows/E2a/lines/1750/label",
+   "/rows/E2a/lines/2500/label",
+   "/rows/D1/lines/pooled/label",
+   "/rows/D1/label",
+   "/reported/D1/label",
+   "/section7/d/D1/label"
+  ]
+ }
+}

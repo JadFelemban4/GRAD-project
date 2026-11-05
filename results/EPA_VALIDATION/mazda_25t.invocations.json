@@ -43,6 +43,67 @@
    },
    "ended_utc": "2026-11-05T16:45:39+00:00",
    "k": 3
+  },
+  {
+   "subcommand": "arm",
+   "argv": [
+    "arm",
+    "--engine",
+    "mazda_25t",
+    "--jobs",
+    "16",
+    "--defect-rerun",
+    "row 144: the first run crashed (crash_1.txt, TraceDefect in d3_rows.read_summary at a summary cell that is not a finite number) before writing any output; the fix leaves such a cell unread and its test out of only what reads it. Labels limited at best.",
+    "--fix-commit",
+    "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
+   ],
+   "started_utc": "2026-11-05T22:19:54+00:00",
+   "versions": {
+    "python": "3.13.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "platform": "Windows-11-10.0.26200-SP0"
+   },
+   "ended_utc": "2026-11-05T22:21:15+00:00",
+   "outcome": "ok",
+   "k": 4
+  },
+  {
+   "subcommand": "run",
+   "event": "started",
+   "armed_blob": "9fbcf46042bf3d3ad986d4a0b46811f220896149",
+   "defect_rerun_k": 1,
+   "reexecution": false,
+   "started_utc": "2026-11-05T22:21:17+00:00",
+   "k": 5
+  },
+  {
+   "subcommand": "run",
+   "event": "writing",
+   "armed_blob": "9fbcf46042bf3d3ad986d4a0b46811f220896149",
+   "defect_rerun_k": 1,
+   "outputs": [
+    "rows_rerun1.json",
+    "e6_rerun1.json",
+    "c3_rerun1.json"
+   ],
+   "k": 6
+  },
+  {
+   "subcommand": "run",
+   "event": "ended",
+   "armed_blob": "9fbcf46042bf3d3ad986d4a0b46811f220896149",
+   "defect_rerun_k": 1,
+   "outcome": "ok",
+   "outputs": {
+    "results/EPA_VALIDATION/mazda_25t/STARTED_rerun1": "01985a0e58afaba56d1cdec5ecd4c9e52c13517b5e9d5e8c75e301d9ec0e53b1",
+    "results/EPA_VALIDATION/mazda_25t/rows_rerun1.json": "e14accbf3b135566f89dfb92197a6caead4eaec1d519dc0de148aaa4530d68bd",
+    "results/EPA_VALIDATION/mazda_25t/e6_rerun1.json": "38e83b3937fc4b566439bd5e16cbd4c0a364e74d2ab9544e1bd962a772827075",
+    "results/EPA_VALIDATION/mazda_25t/c3_rerun1.json": "57e603aac251692d9373ae643370badd8be2f80357feff05cdadaf604ce1e12d",
+    "results/EPA_VALIDATION/mazda_25t/run_rerun1.json": "40598e19170bc3fd58f3ff92801bb0294d6518317ec340a0833803aaa2e78e16"
+   },
+   "ended_utc": "2026-11-05T22:45:07+00:00",
+   "k": 7
   }
  ]
 }

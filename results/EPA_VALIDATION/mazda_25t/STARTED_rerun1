@@ -1,0 +1,10 @@
+{
+ "engine": "mazda_25t",
+ "head": "1e5a54d96069f9402caf3e21c852cb44f15d36e0",
+ "armed_blob": "9fbcf46042bf3d3ad986d4a0b46811f220896149",
+ "defect_rerun": {
+  "k": 1,
+  "reason": "row 144: the first run crashed (crash_1.txt, TraceDefect in d3_rows.read_summary at a summary cell that is not a finite number) before writing any output; the fix leaves such a cell unread and its test out of only what reads it. Labels limited at best.",
+  "fix_commit": "3879805e55b03b3a53717d3833ffcb25c5bdda9a"
+ }
+}
