@@ -55,6 +55,15 @@ heating value "at the top of the test summary result sheet" (its slide 50). So, 
   * the sheets hold one row per phase, with sum rows ("Ph 1+2", "p3+4") and no row for the whole
     test in about half the tests: by decision 80 a test's summary values come from its base phase
     rows, the sum rows excluded (read_summary), told apart from the identifier column alone.
+  * by decision 144 (5 November 2026: the defect route of Run 2's first Mazda run, whose read stopped at a
+    modal fuel cell that is not a finite number, results/EPA_VALIDATION/mazda_25t/crash_1.txt) a base
+    phase row's cell of the cell temperature, the modal fuel or the heating value that is not a finite
+    number never stops the read and never takes a value: the value that reads it is None for its test (no
+    sum over the other phases, no other row's value, no substitute), and the test leaves exactly the
+    computations that read that value, each named and counted (read_summary, channel_checks, run_chain),
+    decided from whether each cell decodes to a finite number, never from a number. A heating value not
+    above 0 leaves the fuel rows as an unread one does, named apart, as a modal fuel not above 0 leaves the
+    Direct2 check. The barometric pressure, where pinned, still stops the read on such a cell.
   * by decision 81 the Accord's chain applies the converter-lock and A/C rules with its own channels,
     and its time and road-speed headers are pinned from the catalogue's column list.
 A column pinned after the first fit is a change to this file, which only the defect route admits
@@ -844,20 +853,29 @@ class SummaryRow:
     barometric pressure of its first base row (kPa) or None; modal_fuel_u_rel, the modal fuel's relative
     standard uncertainty from its conversion to grams (decision 79's density); base_rows and sum_rows, how
     many rows of each kind the test has; cell_temp_spread_c, the largest minus the smallest cell
-    temperature over its base rows, reported (0 for one row)."""
+    temperature over its base rows, reported (0 for one row).
+
+    Decision 144: cell_temp_c is None when its first base row's cell is not a finite number, and
+    cell_temp_spread_c when any base row's is; modal_fuel_g and fuel_lhv_btu_per_lbm are None when any base
+    row's cell of theirs is not (a sum over the other phases, or a value from another row, never stands in
+    its place). unread names each such column, ((column, base rows without a finite number, ((kind,
+    count), ...)), ...), the kinds those of _cell_kind, never the cell's content."""
     test: str
-    cell_temp_c: float
-    modal_fuel_g: float
-    fuel_lhv_btu_per_lbm: float
+    cell_temp_c: Optional[float]
+    modal_fuel_g: Optional[float]
+    fuel_lhv_btu_per_lbm: Optional[float]
     baro_kpa: Optional[float]
     modal_fuel_u_rel: float
     base_rows: int
     sum_rows: int
-    cell_temp_spread_c: float
+    cell_temp_spread_c: Optional[float]
+    unread: tuple = ()
 
     def as_json(self):
+        opt = lambda x: None if x is None else float(x)                      # noqa: E731
         return {"base_rows": self.base_rows, "sum_rows_excluded": self.sum_rows,
-                "cell_temp_c": float(self.cell_temp_c), "cell_temp_spread_c": float(self.cell_temp_spread_c)}
+                "cell_temp_c": opt(self.cell_temp_c), "cell_temp_spread_c": opt(self.cell_temp_spread_c),
+                "unread": {col: {"base_rows": n, "kinds": dict(kinds)} for col, n, kinds in self.unread}}
 
 
 _NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
@@ -945,6 +963,25 @@ def _summary_test_id(text):
     return str(int(x)) if math.isfinite(x) and x == int(x) else None
 
 
+# Decision 144's kinds of a pinned value cell that is not a finite number, told from the text _sheet_rows
+# decodes (stripped), never printed: "empty" (no cell, a cell with no cached value -- a blank, a formula
+# saved without its result, a formula whose result is "" -- or blanks only), "not a number" (a text cell or
+# an error value such as #DIV/0! or #N/A, which float() cannot read), "not finite" (NaN or an infinity).
+CELL_KINDS = ("empty", "not a number", "not finite")
+
+
+def _cell_kind(text):
+    """None for a cell that reads as a finite number (float(), as before decision 144: what it accepts is
+    unchanged), else its kind from CELL_KINDS. Decided from the cell's decoding alone, never from a number."""
+    if not text:
+        return "empty"
+    try:
+        x = float(text)
+    except ValueError:
+        return "not a number"
+    return None if math.isfinite(x) else "not finite"
+
+
 def read_summary(path, *, spec, tests):
     """{test: SummaryRow} for each of `tests` (the test IDs the chain reads: C3's 43, C4's Accord files) that
     the D3 test-summary workbook at `path` lists (decision 63: hashed at the arming against MANIFEST.csv; the
@@ -958,9 +995,20 @@ def read_summary(path, *, spec, tests):
     sum rows, told apart by the cycle label alone (sum_row); only its base rows' pinned cells are converted:
     the modal fuel is their sum, the cell temperature the first's (the spread over them reported), the
     heating value their common value (a test whose rows disagree is refused by name), the barometric
-    pressure, where pinned, the first's. A test with one row is that row. A cell that is not a finite
-    number stops the read naming the test, the row and the column, never the value (TraceDefect). A test of
-    `tests` that the sheet does not list is absent from the result (run_chain refuses it by name)."""
+    pressure, where pinned, the first's. A test with one row is that row. A test of `tests` that the sheet
+    does not list is absent from the result (run_chain refuses it by name).
+
+    Decision 144: a base row's cell of the cell temperature, the modal fuel or the heating value that is
+    not a finite number (_cell_kind) never stops the read and never takes a value. The cell temperature is
+    None when its first base row's cell is such a cell, and its spread when any base row's is; the modal
+    fuel and the heating value are None when any base row's is (never a sum over the other phases, never
+    another row's value). SummaryRow.unread names each such column with how many base rows lack it and of
+    which kind, never the content; the callers leave the test out of exactly what reads that value
+    (channel_checks, run_chain). Two finite heating values that disagree still refuse the test by stopping
+    the read (decision 80), whether or not another of its cells is unread. The barometric pressure, pinned
+    on neither sheet, still stops the read on such a cell (TraceDefect, naming the test, the row and the
+    column, never the value): a None there would fall back to the declared pressure (channel_checks), a
+    substitute decision 144 does not admit."""
     miss = spec.unpinned()
     if miss:
         raise SummaryNotPinned(f"{spec.car} summary: {', '.join(miss)} not pinned from a source "
@@ -1010,17 +1058,32 @@ def read_summary(path, *, spec, tests):
                 raise TraceDefect(f"{name}: test {test}, sheet row {rn}, column {header!r} is not a finite number")
             return x
 
-        temps = [num(rn, r, spec.cell_temp_c) for rn, r in base]
-        fuel = [num(rn, r, spec.modal_fuel) for rn, r in base]
-        lhv = [num(rn, r, spec.fuel_lhv) for rn, r in base]
-        if len(set(lhv)) != 1:
+        def column(header):
+            """Decision 144: (each base row's value in their order, None where its cell is not a finite
+            number; ((kind, count), ...) of those cells, in CELL_KINDS' order)."""
+            vals, kinds = [], {}
+            for _, r in base:
+                text = cell(r, header)
+                kind = _cell_kind(text)
+                vals.append(float(text) if kind is None else None)
+                if kind is not None:
+                    kinds[kind] = kinds.get(kind, 0) + 1
+            return vals, tuple((k, kinds[k]) for k in CELL_KINDS if k in kinds)
+
+        temps, k_temp = column(spec.cell_temp_c)
+        fuel, k_fuel = column(spec.modal_fuel)
+        lhv, k_lhv = column(spec.fuel_lhv)
+        if len({x for x in lhv if x is not None}) > 1:
             raise TraceDefect(f"{name}: test {test}: its base rows' heating values disagree (decision 80)")
+        unread = tuple((col, sum(n for _, n in kinds), kinds) for col, kinds in
+                       (("cell_temp_c", k_temp), ("modal_fuel", k_fuel), ("fuel_lhv", k_lhv)) if kinds)
         out[test] = SummaryRow(
-            test=test, cell_temp_c=temps[0], modal_fuel_g=math.fsum(fuel) * spec.modal_fuel_to_g,
-            fuel_lhv_btu_per_lbm=lhv[0] * spec.fuel_lhv_to_btu_per_lbm,
+            test=test, cell_temp_c=temps[0],
+            modal_fuel_g=None if k_fuel else math.fsum(fuel) * spec.modal_fuel_to_g,
+            fuel_lhv_btu_per_lbm=None if k_lhv else lhv[0] * spec.fuel_lhv_to_btu_per_lbm,
             baro_kpa=num(*base[0], spec.baro) * spec.baro_to_kpa if spec.baro else None,
             modal_fuel_u_rel=float(spec.modal_fuel_u_rel), base_rows=len(base), sum_rows=len(entries) - len(base),
-            cell_temp_spread_c=max(temps) - min(temps))
+            cell_temp_spread_c=None if k_temp else max(temps) - min(temps), unread=unread)
     return out
 
 
@@ -1118,7 +1181,10 @@ class ChannelChecks:
     WOT; clipped at 1.999 on fuel cut), reported and gating nothing (mistake 13). flat_maxima: {role:
     value}; flat_maxima_dropped: segments dropped for holding one. closed_throttle: the PCM MAP at idle.
     unsourced: the air's u_D notes (decision 63's AFR_st); assumed_fuel: the fuel's (decision 79's density),
-    each recorded with its own rows' u (c3_rows)."""
+    each recorded with its own rows' u (c3_rows). direct2_left_out: the tests whose Direct2 integral has no
+    ratio, by name, under why: "modal_fuel_not_a_finite_number" (decision 144: the summary's modal fuel is
+    None, its modal_g None in direct2_vs_summary) and "modal_fuel_not_positive" (the rule before it, now
+    named); each such test's segments stay in every other check and in the chain."""
     direct2_vs_summary: tuple
     u_d_fuel: Optional[float]
     u_modal_fuel: Optional[float]
@@ -1132,11 +1198,14 @@ class ChannelChecks:
     closed_throttle: Mapping
     unsourced: tuple
     assumed_fuel: tuple
+    direct2_left_out: Mapping = field(default_factory=dict)
 
     def as_json(self):
         return {
             "direct2_vs_summary": [dict(test=t, integral_g=i, modal_g=m, ratio=r, preroll_g=p, nan_intervals=k)
                                    for (t, i, m, r, p, k) in self.direct2_vs_summary],
+            "direct2_compared_n": sum(1 for x in self.direct2_vs_summary if x[3] is not None),
+            "direct2_left_out": {k: list(v) for k, v in self.direct2_left_out.items()},
             "u_D_fuel": self.u_d_fuel,
             "u_modal_fuel": self.u_modal_fuel,
             "maf_vs_direct2": {"median_ratio": self.maf_ratio_median, "n": self.maf_ratio_n,
@@ -1177,18 +1246,26 @@ def channel_checks(traces, summary, *, segs, afr_st, baro_kpa, rules, u_afr_st):
     judged against (the summary's per test where it has one, else this); u_afr_st: decision 63's
     unsourced relative uncertainty of the D3 fuel's AFR_st, or None when not sized (then reported so). The
     modal fuel's own u (SummaryRow.modal_fuel_u_rel, decision 79) is the tests' common value; tests whose
-    rows carry different ones are refused (ValueError), since one u_D term cannot carry two."""
+    rows carry different ones are refused (ValueError), since one u_D term cannot carry two. Decision 144: a
+    test whose summary has no modal fuel (None) has its Direct2 integral reported without a ratio and is
+    named in direct2_left_out; it stays in the flat maxima, the MAF check and the closed-throttle check,
+    none of which reads the summary's fuel. With no ratio at all u_D's fuel term is None, as it was when no
+    modal fuel was above 0."""
     flats = flat_maxima(traces, roles=("direct2", "maf"), rules=rules)
     # Direct2 against the summary's modal fuel, per test.
-    d2 = []
+    d2, no_modal, not_positive = [], [], []
     for tr in traces:
         s = summary.get(tr.test)
         if s is None:
             raise TraceDefect(f"{tr.test}: no summary row")
         g, nan_k = _integral(tr.t_s, tr.direct2_gps, rules.integrate_from_s)
         total, _ = _integral(tr.t_s, tr.direct2_gps, -math.inf)
-        d2.append((tr.test, g, float(s.modal_fuel_g), g / s.modal_fuel_g if s.modal_fuel_g > 0 else None,
-                   total - g, nan_k))
+        m = None if s.modal_fuel_g is None else float(s.modal_fuel_g)
+        if m is None:
+            no_modal.append(tr.test)
+        elif not m > 0:
+            not_positive.append(tr.test)
+        d2.append((tr.test, g, m, g / m if m is not None and m > 0 else None, total - g, nan_k))
     ratios = [r for (_, _, _, r, _, _) in d2 if r is not None]
     u_mf = {float(summary[tr.test].modal_fuel_u_rel) for tr in traces}
     if len(u_mf) > 1:
@@ -1262,7 +1339,8 @@ def channel_checks(traces, summary, *, segs, afr_st, baro_kpa, rules, u_afr_st):
                         "open_loop_median_nominal": _median(open_inv), "open_loop_median_if_channel": _median(open_chan),
                         "open_loop_n": len(open_inv)},
         flat_maxima=flats, flat_maxima_dropped=dropped, closed_throttle=closed, unsourced=tuple(unsourced),
-        assumed_fuel=assumed_fuel)
+        assumed_fuel=assumed_fuel, direct2_left_out={"modal_fuel_not_a_finite_number": tuple(no_modal),
+                                                     "modal_fuel_not_positive": tuple(not_positive)})
 
 
 # ============================================================================ the chain
@@ -1353,7 +1431,7 @@ class C3Task:
     lam: float
     lam_min: float
     lam_max: float
-    d3_lhv_btu_per_lbm: float
+    d3_lhv_btu_per_lbm: Optional[float]          # None: the summary's heating value unread (decision 144)
 
 
 def c3_task(seg, *, car, eta, engine_name, table, fuel, ecu, t_cell_k, ect_k_if_absent, d3_lhv_btu_per_lbm):
@@ -1370,7 +1448,8 @@ def c3_task(seg, *, car, eta, engine_name, table, fuel, ecu, t_cell_k, ect_k_if_
     return C3Task(engine=str(engine_name), table=str(table), fuel=fuel, seg=seg, eta=float(eta),
                   demand_nm=demand_torque(seg, car=car, eta=eta), rpm=float(seg.rpm_mean), ect_k=float(ect_k),
                   t_cell_k=float(t_cell_k), block_k=block, lam=float(np.mean(lam)), lam_min=float(np.min(lam)),
-                  lam_max=float(np.max(lam)), d3_lhv_btu_per_lbm=float(d3_lhv_btu_per_lbm))
+                  lam_max=float(np.max(lam)),
+                  d3_lhv_btu_per_lbm=None if d3_lhv_btu_per_lbm is None else float(d3_lhv_btu_per_lbm))
 
 
 # D1's inversion (JSON conventions.statistic_details.d1): a pre-scan of 20-400 kPa every 10 kPa, the first
@@ -1440,7 +1519,7 @@ class C3Eval:
     model_torque_nm: float
     model_fuel_gps: float
     model_air_gps: float
-    d3_lhv_btu_per_lbm: float
+    d3_lhv_btu_per_lbm: Optional[float]          # None: no fuel comparison for this segment (decision 144)
     direct2_gps: float
     maf_gps: float
     pcm_map_kpa: float
@@ -1566,9 +1645,10 @@ C3_ROWS = (("C3a", "fuel", "hot", "signed"), ("C3b", "fuel", "fired", "absolute"
 
 
 def _err(ev, what, ctx):
-    """The segment's relative error of the model, or None when the car's measurement cannot be compared."""
+    """The segment's relative error of the model, or None when the car's measurement cannot be compared: for
+    the fuel also when its test's summary gives no heating value to scale the model's fuel by (decision 144)."""
     if what == "fuel":
-        if not ev.direct2_gps > 0.0:
+        if ev.d3_lhv_btu_per_lbm is None or not ev.direct2_gps > 0.0:
             return None
         return ev.model_fuel_gps * (ctx.epa_lhv_btu_per_lbm / ev.d3_lhv_btu_per_lbm) / ev.direct2_gps - 1.0
     if not ev.maf_gps > 0.0:
@@ -1603,10 +1683,13 @@ def _stats():
 
 
 def _values(evals, half, *, row, ctx, flats, covered):
-    """(keys, values in %, values at half dtheta in % or None) of one row over its population."""
+    """(keys, values in %, values at half dtheta in % or None, segments left out because the model's output gave
+    an error that is not a finite number) of one row over its population. Decision 144: such a segment, at the
+    nominal step or at half of it, takes no value in the row (a NaN torque brackets nothing, and a segment with
+    no finite end of its MAP scan is evaluated at 20 kPa, invert_map): counted, never a substitute."""
     _, what, pop, form = next(r for r in C3_ROWS if r[0] == row)
     hk = {e.key(): e for e in half} if half is not None else None
-    keys, vals, hv = [], [], []
+    keys, vals, hv, not_finite = [], [], [], 0
     for ev in evals:
         p = populations(ev, ctx=ctx, flats=flats)
         if not p[pop] or p["covered"] != covered or not p[f"{what}_ok"]:
@@ -1614,12 +1697,15 @@ def _values(evals, half, *, row, ctx, flats, covered):
         e = _err(ev, what, ctx)
         if e is None:
             continue
+        h = _err(hk[ev.key()], what, ctx) if hk is not None else None
+        if not math.isfinite(e) or (hk is not None and (h is None or not math.isfinite(h))):
+            not_finite += 1
+            continue
         keys.append(ev.key())
         vals.append(100.0 * (abs(e) if form == "absolute" else e))
         if hk is not None:
-            h = _err(hk[ev.key()], what, ctx)
             hv.append(100.0 * (abs(h) if form == "absolute" else h))
-    return keys, vals, (hv if hk is not None else None)
+    return keys, vals, (hv if hk is not None else None), not_finite
 
 
 def _one_row(evals, half, *, row, ctx, checks, es, unreachable_keys):
@@ -1629,9 +1715,13 @@ def _one_row(evals, half, *, row, ctx, checks, es, unreachable_keys):
     for the air), u_stat the standard error with each segment one cluster. A d row decides with at least
     min_segments segments and certifies only with 2 u_stat <= R (MD section 3: "a pooled statistic (D1,
     E4b, E8, C3) follows the same rule with its pooled u_stat"); C3a and C3c, and every row of C4, are
-    descriptive and never labelled."""
+    descriptive and never labelled. A fuel row counts its segments whose test is outside the Direct2 check
+    (checks.direct2_left_out, decision 144), whose u_D comes from the other tests' ratios, and reports its E
+    without them (without.tests_outside_direct2_check, descriptive, gating nothing). Every row counts the
+    segments of its population left out because the model's output gave an error that is not a finite
+    number (_values; extra.segments_model_output_not_finite)."""
     _, what, pop, form = next(r for r in C3_ROWS if r[0] == row)
-    keys, vals, hv = _values(evals, half, row=row, ctx=ctx, flats=checks.flat_maxima, covered=True)
+    keys, vals, hv, not_finite = _values(evals, half, row=row, ctx=ctx, flats=checks.flat_maxima, covered=True)
     R = None if ctx.descriptive_only else ctx.R.get(row)
     kind = "descriptive" if R is None else "d"
     n = len(vals)
@@ -1662,19 +1752,26 @@ def _one_row(evals, half, *, row, ctx, checks, es, unreachable_keys):
         label = es.row_label((line,))
         kappa = float(es.kappa(E, u.u_val, R, label))
     reach = [v for k, v in zip(keys, vals) if k not in unreachable_keys]
-    ok, okv, _ = _values(evals, None, row=row, ctx=ctx, flats=checks.flat_maxima, covered=False)
+    outside_d2 = {t for v in checks.direct2_left_out.values() for t in v}
+    checked = [v for k, v in zip(keys, vals) if k[0] not in outside_d2]
+    ok, okv, _, _ = _values(evals, None, row=row, ctx=ctx, flats=checks.flat_maxima, covered=False)
     return es.StatResult(
         row=row, stage="held_out", R=R, unit="%", kind=kind, E=E, lines=(line,),
         deciding=("pooled",) if n >= ctx.min_segments else (),
         certifying=("pooled",) if certifies else (),
         worst_line="pooled" if n >= ctx.min_segments else None, u=u, label=label, kappa=kappa, passes=None,
         no_statistic=bool(no_stat and kind == "d"), reason=reason,
-        without={"unreachable": float(np.mean(reach)) if reach else None},
+        without={"unreachable": float(np.mean(reach)) if reach else None,
+                 "tests_outside_direct2_check": (float(np.mean(checked)) if checked else None) if what == "fuel"
+                 else None},
         coverage_restricted=None,
         extra={"population": f"{pop} segments, {'mean |error|' if form == 'absolute' else 'mean signed error'} "
                              f"of the model's {what}",
                "outside_charge_range": {"n": len(okv), "E": float(np.mean(okv)) if okv else None},
-               "unreachable": [list(k) for k in keys if k in unreachable_keys]},
+               "unreachable": [list(k) for k in keys if k in unreachable_keys],
+               "segments_from_tests_outside_direct2_check":
+                   sum(k[0] in outside_d2 for k in keys) if what == "fuel" else None,
+               "segments_model_output_not_finite": not_finite},
         n_rows=n, n_clusters=n)
 
 
@@ -1704,13 +1801,15 @@ def c4_accord(evals, *, context, checks, evals_half):
 
 def segment_counts(evals, *, context, flats):
     """The segment counts c3.json reports (WP3_INTERFACES.md 7.9): every segment evaluated, hot, fired,
-    outside the charge range, unreachable, and dropped for a flat maximum, fuel and air apart."""
+    outside the charge range, unreachable, and dropped for a flat maximum, fuel and air apart; and those whose
+    test's summary gives no heating value, which no fuel row compares (decision 144)."""
     pops = [populations(e, ctx=context, flats=flats) for e in evals]
     return {"n": len(evals), "hot": sum(p["hot"] for p in pops), "fired": sum(p["fired"] for p in pops),
             "outside_charge_range": sum(not p["covered"] for p in pops),
             "unreachable": sum(not e.bracketed for e in evals),
             "fuel_dropped_flat_maximum": sum(not p["fuel_ok"] for p in pops),
-            "air_dropped_flat_maximum": sum(not p["air_ok"] for p in pops)}
+            "air_dropped_flat_maximum": sum(not p["air_ok"] for p in pops),
+            "fuel_no_heating_value": sum(e.d3_lhv_btu_per_lbm is None for e in evals)}
 
 
 def fuel_scaling(evals, *, context):
@@ -1719,8 +1818,10 @@ def fuel_scaling(evals, *, context):
     D3 heating value, as the CX-9's first batch does (18,447/18,659). When the summary gives several,
     {BTU/lbm: factor}, one per value: every segment was still scaled by its own test's (_err), and the
     record shows the contract's one-batch premise did not hold, rather than a crash in the one run
-    (amendment C5's run-once). None with no segment."""
-    by = {repr(float(v)): context.epa_lhv_btu_per_lbm / v for v in sorted({e.d3_lhv_btu_per_lbm for e in evals})}
+    (amendment C5's run-once). None with no segment. A segment whose test's heating value is unread (decision
+    144) is scaled by none and counted by none (run_chain's left_out names its test)."""
+    by = {repr(float(v)): context.epa_lhv_btu_per_lbm / v
+          for v in sorted({e.d3_lhv_btu_per_lbm for e in evals if e.d3_lhv_btu_per_lbm is not None})}
     if not by:
         return None
     return next(iter(by.values())) if len(by) == 1 else by
@@ -1743,7 +1844,9 @@ def check_channels_against_car(channels, car):
 
 def eta_rows(evals_by_eta, *, context, checks, base):
     """E6 row 10 (MD section 4; PLAN.md 6.4): C3b and C3d re-run at each efficiency of the band, and their
-    change from the nominal, {eta: {C3b: dE, C3d: dE}} in % (None where either E is missing)."""
+    change from the nominal, {eta: {C3b: dE, C3d: dE}} in % (None where either E is missing). base: the
+    nominal rows computed as the variants are, with no half step (run_chain), so that a segment whose model
+    output is not finite at half the step only leaves neither side (decision 144): dE is the efficiency's."""
     out = {}
     for eta, evs in sorted(evals_by_eta.items()):
         rows = c3_rows(evs, context=context, checks=checks, evals_half=None)
@@ -1772,7 +1875,16 @@ def run_chain(files, *, summary, channels, car, model, context, rules, channel_r
     an epa_rows.TableFuel); ect_k_if_absent: the declared coolant of a car with none live (None on the
     CX-9); mapper: mapper(fn, items) -> [fn(item) ...] in order, epa_fit.ordered_map with its jobs and
     worker initializer bound, or the built-in map. Every evaluation goes through mapper; nothing here
-    prints."""
+    prints.
+
+    Decision 144: a test whose summary row gives no cell temperature (None: its first base row's cell not a
+    finite number) is left out of the chain, its segments cut and checked but never evaluated, since the
+    charge is modelled at that temperature; one with no heating value is evaluated and left out of the fuel
+    rows alone (_err), since only the fuel's scaling reads it, and so is one whose heating value is not above
+    0, which the scaling cannot divide by (the modal fuel's reading in channel_checks, named apart); one with
+    no modal fuel stays in, out of the Direct2 check alone (channel_checks). Each is named under left_out,
+    with the segments not evaluated counted; every test's trace stays in the channel checks, the flat maxima
+    among them, and in the census. No test leaves anything else, and nothing else is decided from a value."""
     import functools
     bad = check_channels_against_car(channels, car)
     if bad:
@@ -1785,13 +1897,22 @@ def run_chain(files, *, summary, channels, car, model, context, rules, channel_r
     all_segs = tuple(s for tr in traces for s in seg_by[tr.test])
     checks = channel_checks(traces, summary, segs=all_segs, afr_st=afr_st, baro_kpa=baro_kpa, rules=channel_rules,
                             u_afr_st=u_afr_st)
+    no_cell_temp = [tr.test for tr in traces if summary[tr.test].cell_temp_c is None]
+    chained = tuple(tr for tr in traces if tr.test not in no_cell_temp)
+    chain_segs = tuple(s for s in all_segs if s.test not in no_cell_temp)
+    no_lhv = [tr.test for tr in chained if summary[tr.test].fuel_lhv_btu_per_lbm is None]
+    lhv_not_positive = [tr.test for tr in chained if tr.test not in no_lhv
+                        and not summary[tr.test].fuel_lhv_btu_per_lbm > 0]
+
+    def lhv_of(test):
+        return None if test in lhv_not_positive else summary[test].fuel_lhv_btu_per_lbm
     ecus = {tr.test: ecu_along(tr, model=model, t_cell_k=summary[tr.test].cell_temp_c + 273.15,
-                               ect_k_if_absent=ect_k_if_absent) for tr in traces}
+                               ect_k_if_absent=ect_k_if_absent) for tr in chained}
 
     def tasks(at_eta):
         return [c3_task(s, car=car, eta=at_eta, engine_name=engine_name, table=table, fuel=fuel, ecu=ecus[s.test],
                         t_cell_k=summary[s.test].cell_temp_c + 273.15, ect_k_if_absent=ect_k_if_absent,
-                        d3_lhv_btu_per_lbm=summary[s.test].fuel_lhv_btu_per_lbm) for s in all_segs]
+                        d3_lhv_btu_per_lbm=lhv_of(s.test)) for s in chain_segs]
 
     def evaluate(ts, at_dtheta):
         return list(mapper(functools.partial(c3_evaluate, model=model, dtheta=at_dtheta), ts))
@@ -1802,17 +1923,34 @@ def run_chain(files, *, summary, channels, car, model, context, rules, channel_r
     by_eta = {float(e): evaluate(tasks(e), dtheta) for e in etas_row10}
     rows = (c4_accord if context.descriptive_only else c3_rows)(evals, context=context, checks=checks,
                                                                 evals_half=half)
+    # E6 row 10's base, by its variants' own rule (no half step; decision 144): E as rows' wherever every output is
+    # finite, since E does not read the half step
+    eta_base = c3_rows(evals, context=context, checks=checks, evals_half=None)
     return {
         "files": len(traces),
+        "tests_in_chain": len(chained),
+        "left_out": {"rule": "decision 144: a summary value whose cell is not a finite number (a first base row's "
+                             "cell temperature, any base row's modal fuel or heating value) leaves its test out of "
+                             "exactly what reads it",
+                     "chain_no_cell_temperature": list(no_cell_temp),
+                     "segments_not_evaluated": len(all_segs) - len(chain_segs),
+                     "fuel_rows_no_heating_value": list(no_lhv),
+                     "fuel_rows_heating_value_not_positive": list(lhv_not_positive),
+                     "direct2_check_no_modal_fuel": list(checks.direct2_left_out["modal_fuel_not_a_finite_number"])},
         "segments": segment_counts(evals, context=context, flats=checks.flat_maxima),
         "census": {tr.test: segment_census(tr, rules=rules) for tr in traces},
         "summary_rows": {tr.test: summary[tr.test].as_json() for tr in traces},
         "channel_checks": checks.as_json(),
         "ecu": {tr.test: {"dt_s": ecus[tr.test].dt_s, "nonuniform_steps": ecus[tr.test].nonuniform_steps}
-                for tr in traces},
+                for tr in chained},
         "fuel_scaling": fuel_scaling(evals, context=context),
         "rows": {r: v.as_json() for r, v in rows.items()},
-        "eta": eta_rows(by_eta, context=context, checks=checks, base=rows),
+        "eta": eta_rows(by_eta, context=context, checks=checks, base=eta_base),
+        "eta_segments_model_output_not_finite": {
+            k: {r: v[r].extra["segments_model_output_not_finite"] for r in ("C3b", "C3d")}
+            for k, v in [("nominal", eta_base)] + [(repr(float(e)), c3_rows(evs, context=context, checks=checks,
+                                                                            evals_half=None))
+                                                   for e, evs in sorted(by_eta.items())]},
         "declarations": {
             "lambda": "1/channel (MD section 5)" if channels.lam_form == "inverse" else "AFR/AFR_st",
             "block_temperature": "the car's coolant (ecu_along)" if channels.has("coolant") else

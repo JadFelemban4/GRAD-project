@@ -2124,7 +2124,9 @@ def held_out_outputs(name, *, source, token, jobs, armed):
     out = [(ROWS, rows_out), (E6, e6_out)]
     if d3_out is not None:
         d3_out["provenance"] = prov
-        out.append((D3_OUTPUT[name], d3_out))
+        # decision 144: through json_ready, as rows.json and e6.json are, so that a value that is not a finite
+        # number in the D3 record is written as None, never a crash at the write after the other outputs
+        out.append((D3_OUTPUT[name], json_ready(d3_out)))
     return out
 
 
@@ -2544,21 +2546,66 @@ def c3_eta_and_radius_gap(contract, contract_md_text):
 def summary(*, source):
     """results/EPA_VALIDATION/summary.json from the three rows.json (WP3_INTERFACES 7.11), each defect
     re-run's beside its first (both are reported, section 7). section7's level_850c_label, drop and
-    drop_rows are read as rows.json holds them (epa_stats.section7)."""
+    drop_rows are read as rows.json holds them (epa_stats.section7).
+
+    Decision 144: an engine's top-level entry is the one that governs it, the entry the C5 re-check and the
+    redraws read (epa_roads.margins_from_summary, dropped_problems): its highest-k defect re-run's once one
+    has its rows (row 139 (1): "the entry of the highest k governs that engine's drop"), else its first's.
+    governed_by names that rows file; first holds the first attempt, its entry, or {"crashed": [its crash
+    records]} for a first run that crashed before writing its rows (each record naming the first attempt);
+    reruns holds every re-run's entry, as before. An engine with no rows.json is refused unless its first
+    run so crashed and a re-run has its rows. And the governing attempt must be the engine's latest, complete
+    and clean: an engine whose latest attempt (its highest-k re-run, else its first run) has no rows, has a
+    crash record, or whose run record's outcome is not "ok" (a re-run still open, crashed, or "defect: a file
+    outside the allowlist was opened") is refused, naming it: its outputs never govern, and a row of its own
+    decides the route (decision 144 (5))."""
     root = source.root
-    missing = [n for n in common.EPA_ENGINES if not os.path.isfile(_p(root, f"{val_dir(n)}/{ROWS}"))]
+    recs = {n: read_records(root, n) for n in common.EPA_ENGINES}
+    first = {n: os.path.isfile(_p(root, f"{val_dir(n)}/{ROWS}")) for n in common.EPA_ENGINES}
+    reruns = {n: [rerun_name(ROWS, k) for k, fs in recs[n].reruns.items() if rerun_name(ROWS, k) in fs]
+              for n in common.EPA_ENGINES}
+    crashed = {n: [f"crash_{j}.txt" for j, a in recs[n].crashes.items() if a == "first"] for n in common.EPA_ENGINES}
+    missing = [n for n in common.EPA_ENGINES if not first[n] and not (crashed[n] and reruns[n])]
     if missing:
         raise Refused([f"no {val_dir(n)}/{ROWS}: run the engine's validation first" for n in missing])
+    unfinished = [p for n in common.EPA_ENGINES for p in _latest_attempt_problems(root, n, recs[n])]
+    if unfinished:
+        raise Refused(unfinished)
     out = {"schema": SUMMARY_SCHEMA, "engines": {}, "drop_order": DROP_ORDER, "inputs": {}}
     for n in common.EPA_ENGINES:
-        rec = read_records(root, n)
-        files = [ROWS] + [rerun_name(ROWS, k) for k, fs in rec.reruns.items() if rerun_name(ROWS, k) in fs]
-        entry = _summary_entry(root, n, ROWS)
-        entry["reruns"] = {f: _summary_entry(root, n, f) for f in files[1:]}
+        files = ([ROWS] if first[n] else []) + reruns[n]
+        entries = {f: _summary_entry(root, n, f) for f in files}
+        governing = files[-1]
+        entry = dict(entries[governing], governed_by=governing,
+                     first=entries[ROWS] if first[n] else {"crashed": crashed[n]})
+        entry["reruns"] = {f: entries[f] for f in reruns[n]}
         out["engines"][n] = entry
         for f in files:
             out["inputs"][f"{val_dir(n)}/{f}"] = common.sha_text(_p(root, f"{val_dir(n)}/{f}"))
     epa_freeze.write_json_atomic(_p(root, f"{VAL_REL}/{SUMMARY}"), out)
+    return out
+
+
+def _latest_attempt_problems(root, name, rec):
+    """Decision 144 (5): why the engine's latest attempt cannot govern, as strings ([] when it can): its
+    highest-k re-run's (else its first run's) rows file missing, a crash record naming that attempt, or its
+    run record missing or its outcome not "ok"."""
+    k = max(rec.reruns) if rec.reruns else None
+    attempt = "first" if k is None else f"rerun {k}"
+    rows_f, run_f = output_name(ROWS, k), output_name(RUN, k)
+    out = []
+    if not os.path.isfile(_p(root, f"{val_dir(name)}/{rows_f}")):
+        out.append(f"{name}: its latest attempt ({attempt}) has no {rows_f}: open or crashed, it cannot govern "
+                   "(decision 144 (5): a row of its own decides the route)")
+    if any(a == attempt for a in rec.crashes.values()):
+        out.append(f"{name}: its latest attempt ({attempt}) has a crash record (decision 144 (5))")
+    try:
+        outcome = _load(_p(root, f"{val_dir(name)}/{run_f}"))["invocations"][-1]["outcome"]
+    except (OSError, ValueError, KeyError, IndexError, TypeError):
+        outcome = None
+    if outcome != "ok":
+        out.append(f"{name}: its latest attempt's {run_f} gives the outcome {outcome!r}, not 'ok': its outputs "
+                   "never govern (decision 144 (5); PLAN.md 5.6)")
     return out
 
 

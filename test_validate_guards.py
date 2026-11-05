@@ -39,6 +39,9 @@ the allowlist -- never a statistic's value, which is epa_stats' and test_epa_sta
     each probe reaching the rows its constant reaches and no other, section 7 and the C5 margin written,
     ARMED.json's hashes in every output, counts and paths printed only, the same rows from a second copy;
     a retag that is not the plant stops the run (HANDOFFS.md WP3 item 3);
+  * the whole run on the Mazda, its D3 chain included (HeldOutRunD3, decision 144): c3.json beside rows.json and
+    e6.json, E6 row 10, section 7's P5, the D3 files read inside the allowlist, a test whose summary modal fuel
+    cell is empty left out of the Direct2 check alone, and the control with every summary value present;
   * neither this file nor validate_epa.py passes the real ENGINE_DIR or contract (C5's AST check).
 
 Each check is shown able to fail (mistake 12): a control beside it trips it. Nothing here opens a real
@@ -94,6 +97,7 @@ def _warn_task(x):
 # arming needs no data folder), the Mazda for the held-out counts and the D3 hashes (its synthetic
 # design carries decision 54's special rows on its held-out lines). A test's choice, never a default.
 FORD, MAZDA = "ford_27tt", "mazda_25t"
+HONDA = "honda_l15b7"
 CHECK_STUB = "import sys\nsys.exit(0)\n"        # calibrate_epa.py check, synthetic: gives the stage back
 SYNTHETIC_SHA = {"frozen": "f" * 64, "dump": "d" * 64, "engine": "synthetic-engine-sha", "plant": "synthetic-plant-sha"}
 
@@ -122,6 +126,11 @@ def read_json(path):
 
 def write_json(path, obj):
     write(path, json.dumps(obj, indent=1, ensure_ascii=True) + "\n")
+
+
+def write_run(root, engine, fname, *, outcome):
+    """An attempt's run record as validate_epa.run writes it last (its one invocation's outcome), synthetic."""
+    write_json(val_path(root, engine, fname), {"engine": engine, "invocations": [{"k": 1, "outcome": outcome}]})
 
 
 def cal_path(root, engine, rel):
@@ -680,6 +689,48 @@ class RunOnce(Armed):
         e6 = read_json(val_path(r.root, FORD, "e6_rerun1.json"))
         self.assertEqual(e6["rows"]["12"]["E3a"]["label_worse"], "limited")
         self.assertRefused(src, "re-arm for re-run 2", engine=FORD, defect=d)         # and the re-run itself runs once
+
+    def test_the_defect_route_after_a_first_run_that_crashed(self):
+        """Decision 144, on the Mazda (its D3 files hashed again at the re-arming): a first run that crashed
+        before writing any output (STARTED, crash_1.txt and run.json) takes the defect route: the records
+        committed, the fix and its defects.json entry, arm --defect-rerun, run --defect-rerun, which writes the
+        re-run's records beside no rows.json, capped, nothing opened outside the allowlist. The crash's own
+        run.json names exactly one open outside it, '<unknown>' (relative to the working directory, which is not
+        the synthetic root here): formatting a raise statement's traceback parses its segment, and CPython opens
+        ast.parse's default filename on the SyntaxError (measured on 3.13.2, as in 5 November's crash record);
+        the successful re-run, which formats no traceback, names nothing.
+        Controls: the normal route refused, and the defect route before the re-arming."""
+        r, src = self.armed(engine=MAZDA)
+        res, out = self.run_(src, FakeCompute(raise_=d3_rows.TraceDefect(
+            "x.xlsx: test 1, sheet row 2, column 'c' is not a finite number")), engine=MAZDA, defect=None)
+        self.assertIsInstance(res, SystemExit)
+        self.assertIn("crash: TraceDefect", out)
+        self.assertEqual(set(os.listdir(val_path(r.root, MAZDA, ""))), {V.ARMED, V.STARTED, "crash_1.txt", V.RUN})
+        crashed_outside = read_json(val_path(r.root, MAZDA, V.RUN))["invocations"][0]["outside_allowlist"]
+        self.assertEqual([x.rsplit("/", 1)[-1] for x in crashed_outside], ["<unknown>"])
+        fx.commit_all(r.root, "commit F: the crashed first run's records")
+        armed_commit = V.armed_commits(r.root, MAZDA)[0]
+        with open(os.path.join(r.root, "d3_rows.py"), "a", encoding="utf-8") as fh:
+            fh.write("\n# the fix of a defect found by a crashed first run\n")
+        fix = fx.commit_all(r.root, "fix")
+        write_json(cal_path(r.root, MAZDA, "defects.json"), [defect_entry(fix)])
+        fx.commit_all(r.root, "defects.json")
+        d = V.Defect(reason="a synthetic defect found by a crashed first run", fix_commit=fix)
+        self.assertRefused(src, "only the defect route", engine=MAZDA, defect=None)
+        self.assertRefused(src, "not re-made", engine=MAZDA, defect=d)
+        rec = self.arm(src, engine=MAZDA, defect=d, data_folder=self.data)
+        self.assertEqual((rec["rearm"]["k"], rec["rearm"]["first_armed_commit"]), (1, armed_commit))
+        self.assertIn("d3_rows.py", [c["path"] for c in rec["code_changes_since_fit"]])
+        commit_file(r.root, f"{V.val_dir(MAZDA)}/{V.ARMED}", "re-arming")
+        self.assertRuns(src, engine=MAZDA, defect=d)
+        res, _ = self.run_(src, FakeCompute(), engine=MAZDA, defect=d)
+        self.assertEqual(res["outcome"], "ok")
+        self.assertEqual(set(os.listdir(val_path(r.root, MAZDA, ""))),
+                         {V.ARMED, V.STARTED, "crash_1.txt", V.RUN, "STARTED_rerun1", "rows_rerun1.json",
+                          "e6_rerun1.json", V.rerun_name(V.D3_OUTPUT[MAZDA], 1), "run_rerun1.json"})
+        self.assertEqual(read_json(val_path(r.root, MAZDA, "run_rerun1.json"))["invocations"][0]["outside_allowlist"], [])
+        self.assertEqual(read_json(val_path(r.root, MAZDA, "rows_rerun1.json"))["rows"]["E1a"]["label"], "limited")
+        self.assertRefused(src, "re-arm for re-run 2", engine=MAZDA, defect=d)
 
 
 class ArmGuards(Armed):
@@ -1766,6 +1817,417 @@ class HeldOutRun(Armed):
         self.assertIn("retag", read_text(val_path(r.root, FORD, "crash_1.txt")))
 
 
+# ------------------------------------------------------------------------------------------ the Mazda's D3 chain
+# HeldOutRunD3's synthetic D3 data (decision 144, 5 November 2026): four CX-9 tests in d3_rows.CHANNELS' dialect and
+# a summary workbook in d3_rows.SUMMARY_CX9's pinned layout, one test's modal fuel cell empty. Every number here is
+# made up, none a D3 file's or the contract's, and the test IDs are no test's; the contract's segment rules are its
+# wording (test_d3_rows.Contract.WORDING), which d3_rows.check_rules_against_contract reads.
+D3_TESTS = ("61709001", "61709002", "61709003", "61709004")
+D3_GAP = "61709003"                            # its summary modal fuel cell is empty (decision 144's case)
+D3_TRACE_DIR = "anl-d3-2016-mazda-cx9/extended-data-set"
+D3_AFR = 14.5                                   # the traces' MAF over Direct2 x lambda, synthetic
+D3_LHV = 18300.0                                # the summary's heating value, BTU/lbm, synthetic
+D3_EPA_LHV = 18000.0                            # the synthetic Mazda epa_engine.json's alpha_fuel heating value
+D3_CELL_C, D3_COOLANT_C = 25.0, 90.0           # the charge PlantToy models there is inside the synthetic coverage
+D3_ETA, D3_ETAS, D3_GAP_PCT = 0.90, (0.85, 0.95), 2.0
+D3_ROW10_CONSTANT = f"the driveline efficiency, {D3_ETA:.2f}"
+D3_ROW10_BAND = f"{D3_ETAS[0]:.2f}-{D3_ETAS[1]:.2f} (synthetic)"
+D3_MD_RADIUS = (f"\n- **Input uncertainty that no calibration absorbs.** Synthetic: the N/V-to-D3 radius gap, "
+                f"{D3_GAP_PCT:.1f} % uniform, on the torque demand.\n")
+C3_SEGMENTS_WORDING = (
+    "C3 segments: at least 3 s; engine speed within +-25 rpm; the PCM MAP channel refreshed at least twice; the torque "
+    "converter locked throughout (Eng_speed_CAN within 1 % of Trans_turbine_shaft_speed_TCM); the A/C compressor off "
+    "throughout (HVAC_ACComp_cycling_switch_PCM); one gear (Trans_gear_actual_CAN); coolant at or above the map's "
+    "lowest (83.8 C); padding rows dropped")
+C3_R_SYNTHETIC = 20.0
+
+
+def d3_trace_bytes(k):
+    """Test k's synthetic D3 file, as d3_rows.read_trace reads the CX-9's (tab-delimited latin-1, one header row, each
+    role under the first header d3_rows.CHANNELS accepts for it, a value written in that header's unit): 5 s of idle
+    (standing, out of gear, the PCM MAP near a third of an atmosphere: the closed-throttle check's), then 25 s of
+    cruise in 4th inside every segment rule, the PCM MAP stepping 0.5 kPa every 0.5 s. Direct2 and the MAF differ
+    from test to test (one value the maximum of several tests would be a flat maximum, mistake 7)."""
+    chans = d3_rows.CHANNELS.channels
+    out = ["\t".join(c.headers[0][0] for c in chans)]
+    for i in range(301):
+        idle = i < 51
+        rpm = 700.0 if idle else 1900.0 + 100.0 * k
+        d2 = 0.06 if idle else 0.20 + 0.02 * k
+        v = {"time": round(0.1 * i, 6), "force": 0.0 if idle else 1800.0 + 150.0 * k, "gear": 0.0 if idle else 4.0,
+             "rpm": rpm, "turbine_rpm": 0.0 if idle else rpm * 0.998, "ac": 0.0,
+             "map": (33.0 if idle else 124.0 + 4.0 * k) + 0.5 * ((i // 5) % 2), "direct2": d2,
+             "maf": d2 * D3_AFR * (1.0 + 0.01 * k), "lam": 1.0, "coolant": D3_COOLANT_C,
+             "speed": 0.0 if idle else 60.0}
+        out.append("\t".join(repr(float(v[c.role]) / c.headers[0][1]) for c in chans))
+    return ("\r\n".join(out) + "\r\n").encode("latin-1")
+
+
+def xlsx_bytes(sheet, rows):
+    """A minimal workbook, as test_d3_rows.write_xlsx writes one: a cover sheet, then `sheet` holding `rows`, strings
+    shared, numbers inline, a None left out (no cell: decision 144's "empty"); every entry dated alike, so the bytes
+    are the same on every call."""
+    from xml.sax.saxutils import escape
+    import zipfile
+    strings, idx = [], {}
+
+    def sid(s):
+        if s not in idx:
+            idx[s] = len(strings)
+            strings.append(s)
+        return idx[s]
+
+    def col(k):
+        s = ""
+        k += 1
+        while k:
+            k, r = divmod(k - 1, 26)
+            s = chr(65 + r) + s
+        return s
+    xr = []
+    for i, row in enumerate(rows, start=1):
+        cells = []
+        for k, v in enumerate(row):
+            if isinstance(v, str):
+                cells.append(f'<c r="{col(k)}{i}" t="s"><v>{sid(v)}</v></c>')
+            elif v is not None:
+                cells.append(f'<c r="{col(k)}{i}"><v>{v!r}</v></c>')
+        xr.append(f'<row r="{i}">{"".join(cells)}</row>')
+    m = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+    r_ = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+    parts = {
+        "xl/workbook.xml": f'<workbook xmlns="{m}" xmlns:r="{r_}"><sheets><sheet name="Cover" sheetId="1" r:id="rId1"/>'
+                           f'<sheet name="{escape(sheet)}" sheetId="2" r:id="rId2"/></sheets></workbook>',
+        "xl/_rels/workbook.xml.rels": (
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Id="rId1" Type="ws" Target="worksheets/sheet1.xml"/>'
+            '<Relationship Id="rId2" Type="ws" Target="worksheets/sheet2.xml"/></Relationships>'),
+        "xl/worksheets/sheet1.xml": f'<worksheet xmlns="{m}"><sheetData/></worksheet>',
+        "xl/worksheets/sheet2.xml": f'<worksheet xmlns="{m}"><sheetData>{"".join(xr)}</sheetData></worksheet>',
+        "xl/sharedStrings.xml": (f'<sst xmlns="{m}">' + "".join(f"<si><t>{escape(s)}</t></si>" for s in strings)
+                                 + "</sst>")}
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for name, text in parts.items():
+            z.writestr(zipfile.ZipInfo(name, date_time=(2026, 10, 23, 12, 0, 0)), text)
+    return buf.getvalue()
+
+
+def d3_summary_bytes(modal_gal, *, gap):
+    """The synthetic summary workbook in SUMMARY_CX9's pinned layout (its sheet and its five headers as the spec holds
+    them, the heating value's with its line break; a title above the header row and a column no pin names): a
+    section heading row; the first test in two base phase rows and their sum row (decision 80: the sum row is never
+    read); every other test in one row. modal_gal {test: gallons}; with gap, D3_GAP's modal fuel cell is left
+    empty (decision 144)."""
+    s = d3_rows.SUMMARY_CX9
+    rows = [["A synthetic CX-9 test summary (test_validate_guards.HeldOutRunD3): no D3 value"], [],
+            [s.test_id, s.cycle, "Test Time [s]", s.cell_temp_c, s.modal_fuel, s.fuel_lhv], ["Day 1 Standard Cycles"]]
+    for k, t in enumerate(D3_TESTS):
+        g = None if (gap and t == D3_GAP) else round(modal_gal[t], 9)
+        if k == 0:
+            rows += [[float(t), "UDDS #1, Ph 1", 30.0, D3_CELL_C, round(0.4 * g, 9), D3_LHV],
+                     [float(t), "UDDS #1, Ph 2", 30.0, D3_CELL_C + 0.5, round(g - round(0.4 * g, 9), 9), D3_LHV],
+                     [float(t), "UDDS #1, Ph 1+2", 60.0, D3_CELL_C + 0.2, g, D3_LHV]]
+        else:
+            rows.append([float(t), "HWY", 30.0, D3_CELL_C, g, D3_LHV])
+    return xlsx_bytes(s.sheet, rows)
+
+
+def d3_contract(c, *, files):
+    """e2e_contract's whole-run contract, made the Mazda's C3 one: the segment rules' wording (c3_segments), the D3
+    files as the contract's d3_files_c3 lists them ({test, file, sha256}), an R for C3b and C3d in percent (C3a and C3c
+    descriptive), E6 row 10's constant and band, and C3b's and C3d's Tests lists as the contract's (VE, which no E6 row
+    perturbs, and the driveline efficiency, row 10's). Synthetic numbers."""
+    e2e_contract(c)
+    c["c3_segments"] = C3_SEGMENTS_WORDING
+    c["d3_files_c3"] = [dict(test=t, file=rel, sha256=sha) for t, rel, sha in files]
+    for row, R in (("C3a", None), ("C3b", C3_R_SYNTHETIC), ("C3c", None), ("C3d", C3_R_SYNTHETIC)):
+        c["thresholds"].append(dict(engine=MAZDA, row=row, R=R, unit="%", kind="synthetic", on_fail="synthetic",
+                                    part="synthetic", quantity="synthetic", rows="synthetic", statistic="synthetic"))
+    for p in c["perturbations_E6"]:
+        if p["n"] == 10:
+            p["constant"], p["band"] = D3_ROW10_CONSTANT, D3_ROW10_BAND
+    for row in ("C3b", "C3d"):
+        c["tests_lists"]["lists"][row] = [{"member": "VE (fitted)", "perturbed_by_E6_row": None},
+                                          {"member": "the driveline efficiency", "perturbed_by_E6_row": 10}]
+
+
+class HeldOutRunD3(Armed):
+    """validate_epa.run with its real computation end to end on the Mazda (decision 144, 5 November 2026): before it,
+    validate_epa._d3_chain and held_out_outputs on an engine with a D3 chain ran in no test (HeldOutRun runs the
+    Ford, which has none; FakeCompute stands in elsewhere), so the Mazda's defect re-run would have been their first
+    execution anywhere. Here they run in a temporary repository on synthetic data alone: the Mazda's synthetic
+    held-out rows, its calibration records as HeldOutRun builds them (a frozen candidate from the B58's values, no EPA
+    value), PlantToy in the place of RowModel (it answers what d3_rows.c3_evaluate and ecu_along call: charge, ecu_at,
+    ecu_trace, cycle), a synthetic data folder (the summary workbook in SUMMARY_CX9's layout and four D3 traces, each
+    listed in its MANIFEST.csv and in the synthetic contract's d3_files_c3, so the arming hashes them as it hashes the
+    real ones), and the run's own warnings-as-errors (C6) at --jobs 1. One test's summary modal fuel cell is empty
+    (decision 144's case): it leaves the Direct2 check alone and stays in the chain. What is tested is the assembly --
+    c3.json beside rows.json and e6.json, E6 row 10, section 7's P5, the allowlist -- never a statistic's value. The
+    control: the same run on a summary with every value present."""
+    ENGINES = (MAZDA,)
+    contract_edit = None                                  # setUpClass edits the contract itself (d3_contract)
+    _memo = {}
+
+    @classmethod
+    def records(cls, engine, root):
+        return HeldOutRun.records.__func__(cls, engine, root)
+
+    @classmethod
+    def setUpClass(cls):
+        super(Armed, cls).setUpClass()                     # the synthetic repository; the arming set-up is below
+        root = cls.base.root
+        # the D3 traces, and the summary's modal fuel from each trace's own Direct2 integral (d3_rows._integral, the
+        # check's), 0.5 % apart per test, in gallons at decision 79's assumed density
+        traces = {f"{D3_TRACE_DIR}/{t} Test Data.txt": d3_trace_bytes(k) for k, t in enumerate(D3_TESTS)}
+        scratch = os.path.join(cls._tmp.name, "d3_scratch")
+        os.makedirs(scratch)
+        modal = {}
+        for k, t in enumerate(D3_TESTS):
+            p = os.path.join(scratch, f"{t} Test Data.txt")
+            with open(p, "wb") as fh:
+                fh.write(traces[f"{D3_TRACE_DIR}/{t} Test Data.txt"])
+            tr = d3_rows.read_trace(p, test=t, channels=d3_rows.CHANNELS)
+            g, _ = d3_rows._integral(tr.t_s, tr.direct2_gps, 0.0)
+            modal[t] = g * (1.0 + 0.005 * k) / d3_rows.D3_FUEL_DENSITY.g_per_us_gal
+        cls.summary_rel = V.D3_SOURCES[MAZDA]["summary"] + "/synthetic_summary.xlsx"
+        cls.data_gap = os.path.join(cls._tmp.name, "data_folder_gap")
+        cls.data_full = os.path.join(cls._tmp.name, "data_folder_full")
+        synthetic_data_folder(cls.data_gap, {cls.summary_rel: d3_summary_bytes(modal, gap=True), **traces})
+        synthetic_data_folder(cls.data_full, {cls.summary_rel: d3_summary_bytes(modal, gap=False), **traces})
+        cls.data = cls.data_gap
+        # the synthetic Mazda's epa_engine.json gives the EPA map fuel's heating value where _d3_chain reads it
+        # (alpha_fuel's energy_density_BTUplbm; the fixture's file carries none)
+        ej = os.path.join(fx.engine_folder(root, MAZDA), "epa_engine.json")
+        j = read_json(ej)
+        j["alpha_fuel"][V.EPA_MAP_LHV_KEY] = D3_EPA_LHV
+        write_json(ej, j)
+        fx.commit_all(root, "synthetic: the Mazda's epa_engine.json with its map fuel's heating value")
+        # the contract, JSON and MD together at the contract commit (guard 1 reads both at that commit)
+        c = fx.read_contract(cls.base)
+        rels = {t: f"{D3_TRACE_DIR}/{t} Test Data.txt" for t in D3_TESTS}
+        d3_contract(c, files=[(t, rels[t], common.sha_raw(os.path.join(cls.data_gap, *rels[t].split("/"))))
+                              for t in D3_TESTS])
+        fx.write_contract(root, c)
+        with open(fx.synthetic_source(cls.base).contract_md, "ab") as fh:
+            fh.write(D3_MD_RADIUS.encode("ascii"))
+        head = fx.commit_all(root, "synthetic contract, the Mazda's C3 made complete")
+        cls.base = fx.Repo(root=root, contract_commit=head, head=head)
+        cls.fit_head = prepare(cls.base, cls.ENGINES, cls.data, records=cls.records)
+        cls.split, _ = fx.split_of(cls.base.root)
+        cls.base = fx.Repo(root=cls.base.root, contract_commit=cls.base.contract_commit,
+                           head=git(cls.base.root, "rev-parse", "HEAD"))
+        cls._memo = {}
+
+    def setUp(self):
+        super().setUp()
+        import engines
+        real_get = engines.get
+        self.enterContext(mock.patch.object(engines, "get", lambda n: self.frozen if n == MAZDA else real_get(n)))
+        self.enterContext(mock.patch.object(epa_fit, "RowModel", PlantToy))
+
+    def armed(self, *, engine, data_folder):
+        """A fresh copy, armed in place on `data_folder` (no default beside the engine: test_engine_threading's
+        rule) and ARMED.json committed alone."""
+        r, src = self.repo()
+        self.arm(src, engine=engine, defect=None, data_folder=data_folder)
+        commit_file(r.root, f"{V.val_dir(engine)}/{V.ARMED}", "arming")
+        return r, src
+
+    def outputs(self, which):
+        """One whole run on the gap or the full data folder, in a fresh armed copy: (root, result, printout, {output
+        file: its JSON}); each kind is run once for the class and kept."""
+        if which not in self._memo:
+            r, src = self.armed(engine=MAZDA, data_folder={"gap": self.data_gap, "full": self.data_full}[which])
+            res, out = quiet(V.run, MAZDA, source=src, jobs=1, defect=None)
+            files = set(os.listdir(val_path(r.root, MAZDA, "")))
+            crash = sorted(f for f in files if f.startswith("crash_"))
+            got = {f: read_json(val_path(r.root, MAZDA, f)) for f in files if f.endswith(".json")}
+            type(self)._memo[which] = (r.root, res, out, files, crash, got)
+        root, res, out, files, crash, got = self._memo[which]
+        self.assertEqual(crash, [], read_text(val_path(root, MAZDA, crash[0])) if crash else "")
+        return root, res, out, files, got
+
+    def test_the_mazda_run_writes_c3_and_leaves_the_test_without_a_modal_fuel_out_of_the_direct2_check(self):
+        import epa_stats
+        import re
+        root, res, out, files, got = self.outputs("gap")
+        inv = got[V.RUN]["invocations"][0]
+        self.assertEqual(inv["outside_allowlist"], [], inv["outside_allowlist"])
+        self.assertIsInstance(res, dict, out)
+        self.assertEqual(res["outcome"], "ok", out)
+        self.assertEqual(files, {V.ARMED, V.STARTED, V.ROWS, V.E6, V.D3_OUTPUT[MAZDA], V.RUN})
+        self.assertIsNone(re.search(r"\d\.\d", out), out)                       # counts and paths only
+        # the D3 files the arming hashed were read, inside the allowlist (C3)
+        for t in D3_TESTS:
+            self.assertIn(f"<data>/{D3_TRACE_DIR}/{t} Test Data.txt", inv["opened"])
+        self.assertIn(f"<data>/{self.summary_rel}", inv["opened"])
+        rows, e6, c3 = got[V.ROWS], got[V.E6], got[V.D3_OUTPUT[MAZDA]]
+        # c3.json: its schema, the provenance every output carries, the inputs read from the contract's own text
+        self.assertEqual(c3["schema"], V.C3_SCHEMA)
+        self.assertEqual(c3["provenance"], rows["provenance"])
+        self.assertEqual(e6["provenance"], rows["provenance"])
+        self.assertEqual(c3["provenance"]["d3"]["summary"]["file"], self.summary_rel)
+        self.assertEqual([e["file"] for e in c3["provenance"]["d3"]["c3_files"]],
+                         [f"{D3_TRACE_DIR}/{t} Test Data.txt" for t in D3_TESTS])
+        self.assertEqual((c3["inputs"]["eta"], c3["inputs"]["eta_row10"], c3["inputs"]["radius_gap"],
+                          c3["inputs"]["epa_map_lhv_btu_per_lbm"]),
+                         (D3_ETA, list(D3_ETAS), D3_GAP_PCT / 100.0, D3_EPA_LHV))
+        self.assertEqual(c3["fuel_scaling"], D3_EPA_LHV / D3_LHV)
+        # decision 144: the test without a modal fuel leaves the Direct2 check alone, named; it stays in the chain
+        lo = c3["left_out"]
+        self.assertEqual(lo["direct2_check_no_modal_fuel"], [D3_GAP])
+        self.assertEqual((lo["chain_no_cell_temperature"], lo["fuel_rows_no_heating_value"],
+                          lo["fuel_rows_heating_value_not_positive"], lo["segments_not_evaluated"]), ([], [], [], 0))
+        cc = c3["channel_checks"]
+        self.assertEqual(cc["direct2_compared_n"], len(D3_TESTS) - 1)
+        self.assertEqual(cc["direct2_left_out"], {"modal_fuel_not_a_finite_number": [D3_GAP],
+                                                  "modal_fuel_not_positive": []})
+        gap = next(x for x in cc["direct2_vs_summary"] if x["test"] == D3_GAP)
+        self.assertEqual((gap["modal_g"], gap["ratio"]), (None, None))
+        self.assertEqual(c3["summary_rows"][D3_GAP]["unread"], {"modal_fuel": {"base_rows": 1, "kinds": {"empty": 1}}})
+        self.assertEqual((c3["summary_rows"][D3_TESTS[0]]["base_rows"],
+                          c3["summary_rows"][D3_TESTS[0]]["sum_rows_excluded"]), (2, 1))          # decision 80
+        self.assertEqual((c3["files"], c3["tests_in_chain"], c3["segments"]["n"]), (4, 4, 4))
+        self.assertEqual(cc["pcm_map_closed_throttle"]["n"], len(D3_TESTS))
+        # C3a-C3d: C3b and C3d labelled (they reach _RowRead, section 7's P5 and E6 row 10's exclusion with values)
+        self.assertEqual(set(c3["rows"]), {"C3a", "C3b", "C3c", "C3d"})
+        for r in ("C3b", "C3d"):
+            v = c3["rows"][r]
+            self.assertEqual((v["kind"], v["no_statistic"], v["R"]), ("d", False, C3_R_SYNTHETIC), r)
+            self.assertIn(v["label"], epa_stats.LABEL_ORDER, r)
+            self.assertEqual(v["n_rows"], len(D3_TESTS), r)
+        self.assertEqual((c3["rows"]["C3b"]["extra"]["segments_from_tests_outside_direct2_check"],
+                          c3["rows"]["C3d"]["extra"]["segments_from_tests_outside_direct2_check"]), (1, None))
+        self.assertEqual(c3["rows"]["C3a"]["kind"], "descriptive")
+        # E6 row 10: C3b and C3d at each efficiency of the band, beside every other E6 row
+        self.assertEqual(set(e6["rows"]), {str(n) for n in range(1, 14)})
+        self.assertEqual(set(e6["rows"]["10"]), {repr(x) for x in D3_ETAS})
+        for eta, d in e6["rows"]["10"].items():
+            self.assertEqual(set(d), {"C3b", "C3d"}, eta)
+            self.assertTrue(all(x is not None for x in d.values()), d)
+        self.assertEqual(e6["rows"]["10"], c3["eta"])
+        # the Tests lists' counting rule read row 10's exclusion: VE is perturbed by no E6 row, so C3b and C3d are
+        # never excluded for every constant they claim to test
+        self.assertEqual((e6["excluded_for_every_listed_constant"]["C3b"],
+                          e6["excluded_for_every_listed_constant"]["C3d"]), (False, False))
+        # and row 10's own verdict: on these segments the efficiency moves C3b and C3d by more than u_val, so each is
+        # excluded for eta, and its Tests list still keeps VE (perturbed by no E6 row): the verifier's two mutants of
+        # row 10 (variants not moved by dE; dE taken at the nominal eta) fail here
+        for r in ("C3b", "C3d"):
+            self.assertTrue(all(abs(d[r]) > c3["rows"][r]["u"]["u_val"] for d in c3["eta"].values()), (r, c3["eta"]))
+        self.assertEqual((e6["exclusions"]["C3b"], e6["exclusions"]["C3d"]), ([], []))
+        self.assertEqual([c3["rows"][r]["extra"]["segments_model_output_not_finite"] for r in ("C3a", "C3b", "C3c", "C3d")],
+                         [0, 0, 0, 0])
+        # section 7 with the C3 rows: the boolean drop, P5 read from C3b and C3d (never PART_WITHOUT_ROW), and the
+        # reported labels carrying them
+        s7 = rows["section7"]
+        self.assertIsInstance(s7["drop"], bool)
+        self.assertIn("P5", s7["parts"])
+        self.assertNotEqual(s7["parts"]["P5"], epa_stats.PART_WITHOUT_ROW)
+        self.assertEqual(sorted(r for r in s7["d"] if r.startswith("C3")), ["C3b", "C3d"])
+        for r in ("C3b", "C3d"):
+            self.assertEqual(rows["reported"][r]["label"], c3["rows"][r]["label"], r)
+        self.assertEqual(rows["counts"]["held_out_rows"],
+                         fx.read_contract(self.base)["engines"][MAZDA]["n_held_out_rows"])
+
+    def test_the_control_with_every_summary_value_present(self):
+        """The control (mistake 12): the same run on a summary whose every value is present compares one more test
+        with the summary's modal fuel and leaves nothing out."""
+        _, _, _, _, gap = self.outputs("gap")
+        root, res, out, files, got = self.outputs("full")
+        self.assertIsInstance(res, dict, out)
+        self.assertEqual(res["outcome"], "ok", out)
+        self.assertEqual(got[V.RUN]["invocations"][0]["outside_allowlist"], [])
+        self.assertEqual(files, {V.ARMED, V.STARTED, V.ROWS, V.E6, V.D3_OUTPUT[MAZDA], V.RUN})
+        c3, c3_gap = got[V.D3_OUTPUT[MAZDA]], gap[V.D3_OUTPUT[MAZDA]]
+        cc = c3["channel_checks"]
+        self.assertEqual(cc["direct2_compared_n"], c3_gap["channel_checks"]["direct2_compared_n"] + 1)
+        self.assertEqual(cc["direct2_compared_n"], len(D3_TESTS))
+        self.assertEqual(cc["direct2_left_out"], {"modal_fuel_not_a_finite_number": [], "modal_fuel_not_positive": []})
+        lo = c3["left_out"]
+        self.assertEqual((lo["direct2_check_no_modal_fuel"], lo["chain_no_cell_temperature"],
+                          lo["fuel_rows_no_heating_value"], lo["fuel_rows_heating_value_not_positive"],
+                          lo["segments_not_evaluated"]), ([], [], [], [], 0))
+        self.assertEqual(c3["summary_rows"][D3_GAP]["unread"], {})
+        self.assertEqual(c3["rows"]["C3b"]["extra"]["segments_from_tests_outside_direct2_check"], 0)
+        # the gap moves only what reads the modal fuel: the chain's segments, the model's evaluations and the air
+        # rows are the same
+        self.assertEqual((c3["tests_in_chain"], c3["segments"]), (c3_gap["tests_in_chain"], c3_gap["segments"]))
+        self.assertEqual(c3["rows"]["C3d"], c3_gap["rows"]["C3d"])
+        self.assertEqual(c3["rows"]["C3c"], c3_gap["rows"]["C3c"])
+        self.assertEqual(got[V.ROWS]["rows"], gap[V.ROWS]["rows"])
+
+    def test_the_mazdas_route_a_crashed_first_run_then_the_real_rerun_capped(self):
+        """The route the Mazda's re-run takes (decision 144 (2)): a first run that crashed, its records committed, the
+        fix and its defects.json entry, the re-arming, then the real computation on the defect route: c3_rerun1.json
+        beside rows_rerun1.json and e6_rerun1.json, cap_labels over the real bodies (no "validated" left outside the
+        provenance, the capped paths recorded), the test without a modal fuel still named, nothing opened outside the
+        allowlist."""
+        r, src = self.armed(engine=MAZDA, data_folder=self.data_gap)
+        res, _ = self.run_(src, FakeCompute(raise_=d3_rows.TraceDefect("x.xlsx: synthetic crash")), engine=MAZDA,
+                           defect=None)
+        self.assertIsInstance(res, SystemExit)
+        fx.commit_all(r.root, "commit F: the crashed first run's records")
+        with open(os.path.join(r.root, "d3_rows.py"), "a", encoding="utf-8") as fh:
+            fh.write("\n# the fix of a defect found by a crashed first run\n")
+        fix = fx.commit_all(r.root, "fix")
+        write_json(cal_path(r.root, MAZDA, "defects.json"), [defect_entry(fix)])
+        fx.commit_all(r.root, "defects.json")
+        d = V.Defect(reason="a synthetic defect found by a crashed first run", fix_commit=fix)
+        self.arm(src, engine=MAZDA, defect=d, data_folder=self.data)
+        commit_file(r.root, f"{V.val_dir(MAZDA)}/{V.ARMED}", "re-arming")
+        res, out = quiet(V.run, MAZDA, source=src, jobs=1, defect=d)
+        self.assertIsInstance(res, dict, out)
+        self.assertEqual(res["outcome"], "ok", out)
+        c3_name = V.rerun_name(V.D3_OUTPUT[MAZDA], 1)
+        self.assertEqual(set(os.listdir(val_path(r.root, MAZDA, ""))),
+                         {V.ARMED, V.STARTED, "crash_1.txt", V.RUN, "STARTED_rerun1", "rows_rerun1.json",
+                          "e6_rerun1.json", c3_name, "run_rerun1.json"})
+        self.assertEqual(read_json(val_path(r.root, MAZDA, "run_rerun1.json"))["invocations"][0]["outside_allowlist"], [])
+        for f in ("rows_rerun1.json", "e6_rerun1.json", c3_name):
+            body = read_json(val_path(r.root, MAZDA, f))
+            self.assertNotIn('"validated"', json.dumps({k: v for k, v in body.items() if k != "provenance"}), f)
+            self.assertEqual(body["defect_rerun"]["capped_at"], "limited", f)
+        c3 = read_json(val_path(r.root, MAZDA, c3_name))
+        self.assertTrue(c3["defect_rerun"]["capped"])
+        self.assertEqual(c3["left_out"]["direct2_check_no_modal_fuel"], [D3_GAP])
+
+    def test_a_value_that_is_not_finite_in_the_d3_record_is_written_as_none(self):
+        """Decision 144: c3.json goes through json_ready, as rows.json and e6.json do, so a value of the D3 record that
+        is not a finite number is written as None, never a crash at the write after the other outputs. Here one is put
+        in the record run_chain returns (its channel checks' u_D, which nothing downstream reads). The control is the
+        verifier's of 5 November: without json_ready the same run crashed at that write, rows.json and e6.json written."""
+        real = d3_rows.run_chain
+
+        def with_nan(*a, **kw):
+            body = real(*a, **kw)
+            body["channel_checks"]["u_D_fuel"] = float("nan")
+            return body
+        r, src = self.armed(engine=MAZDA, data_folder=self.data_gap)
+        with mock.patch.object(d3_rows, "run_chain", with_nan):
+            res, out = quiet(V.run, MAZDA, source=src, jobs=1, defect=None)
+        self.assertIsInstance(res, dict, out)
+        self.assertEqual(res["outcome"], "ok", out)
+        c3 = read_json(val_path(r.root, MAZDA, V.D3_OUTPUT[MAZDA]))
+        self.assertIsNone(c3["channel_checks"]["u_D_fuel"])
+
+    def test_a_pool_of_two_gives_the_records_of_one_process(self):
+        """Run 2 runs at --jobs 16: the D3 chain's evaluations go through epa_fit.ordered_map's spawn pool, which
+        pickles c3_evaluate and the C3Task items, its workers' opens audited (validate_epa.worker_audit). Here at
+        --jobs 2 against the --jobs 1 run: every key of c3.json but the provenance the same, and nothing opened
+        outside the allowlist."""
+        _, _, _, _, one = self.outputs("gap")
+        r, src = self.armed(engine=MAZDA, data_folder=self.data_gap)
+        res, out = quiet(V.run, MAZDA, source=src, jobs=2, defect=None)
+        self.assertIsInstance(res, dict, out)
+        self.assertEqual(res["outcome"], "ok", out)
+        self.assertEqual(read_json(val_path(r.root, MAZDA, V.RUN))["invocations"][0]["outside_allowlist"], [])
+        c3, c31 = read_json(val_path(r.root, MAZDA, V.D3_OUTPUT[MAZDA])), one[V.D3_OUTPUT[MAZDA]]
+        self.assertEqual({k: v for k, v in c3.items() if k != "provenance"},
+                         {k: v for k, v in c31.items() if k != "provenance"})
+
+
 class NotVisibleAtR1(fx.Guarded):
     """Decision 85 (29 October 2026): a constant the completion found not visible at R1 (complete.json's
     counted_excluded) is counted as excluded for its E6 row's level rows, with its reason, never judged by its +-10 %
@@ -1865,14 +2327,17 @@ class SummaryOfThree(fx.Guarded):
                         "c5_recheck_margin": {"margin": 1.9}}
             for eng in common.EPA_ENGINES[:2]:
                 write_json(val_path(root, eng, V.ROWS), rows("validated"))
+                write_run(root, eng, V.RUN, outcome="ok")
             with self.assertRaises(V.Refused):                       # the control: the Ford's is missing
                 V.summary(source=src)
             # decision 83: the Ford's rows.json carries the steady-only TIT reading, the others do not
             ford = dict(rows("off"), steady_only_tit={"reading": "decision 83", "decides": False, "rows": ["E3a"],
                                                       "statistics": {"E3a": {"label": "validated", "E": 2.0}}})
             write_json(val_path(root, FORD, V.ROWS), ford)
+            write_run(root, FORD, V.RUN, outcome="ok")
             write_json(val_path(root, MAZDA, "rows_rerun1.json"), rows("limited"))
             write_json(val_path(root, MAZDA, "STARTED_rerun1"), {})
+            write_run(root, MAZDA, "run_rerun1.json", outcome="ok")
             out = V.summary(source=src)
             self.assertEqual(out["engines"][FORD]["labels"], {"E1a": "off"})
             self.assertEqual(out["engines"][FORD]["steady_only_tit"],
@@ -1894,6 +2359,113 @@ class SummaryOfThree(fx.Guarded):
             write_json(val_path(root, FORD, V.ROWS), bad)
             with self.assertRaises(KeyError):
                 V.summary(source=src)
+
+    def test_the_top_level_entry_is_the_governing_one_and_a_crashed_first_run_enters_by_its_reruns(self):
+        """Decision 144: each engine's top-level entry is the one that governs it (row 139 (1)): the highest-k
+        re-run's once one has its rows, else the first's, named by governed_by, with the first attempt under
+        first; an engine whose first run crashed before writing its rows enters by its re-run, first naming
+        the crash records. The C5 re-check and the redraws read the top-level entry (epa_roads, frozen from
+        the draw to step 12): its margin and its boolean drop are the governing re-run's. Controls: a crash
+        record without a re-run's rows, re-run rows without a first-run crash, and a re-run's own crash are
+        refused; the layout with no value at the top (None drop and margin) is refused by epa_roads."""
+        import epa_roads
+        with tempfile.TemporaryDirectory(prefix="summary_") as root:
+            git(root, "init", "-q", "-b", "main")
+            src = types.SimpleNamespace(root=root)
+
+            def rows(label, drop, fraction):
+                return {"schema": V.ROWS_SCHEMA, "rows": {"E1a": {"label": label, "kappa": 1.0}},
+                        "reported": {"E1a": {"label": label, "kappa": 1.0}},
+                        "section7": {"level_850c_label": label, "drop": drop, "drop_rows": ["L1"] if drop else []},
+                        "c5_recheck_margin": {"margin": 100.0 * fraction, "margin_fraction": fraction}}
+            write_json(val_path(root, FORD, V.ROWS), rows("validated", False, 0.020))
+            write_run(root, FORD, V.RUN, outcome="ok")
+            # the Honda: a normal first run and a defect re-run whose drop and margin differ from the first's
+            write_json(val_path(root, HONDA, V.ROWS), rows("validated", False, 0.021))
+            write_run(root, HONDA, V.RUN, outcome="ok")
+            write_json(val_path(root, HONDA, "STARTED_rerun1"), {})
+            write_json(val_path(root, HONDA, "rows_rerun1.json"), rows("limited", True, 0.030))
+            write_run(root, HONDA, "run_rerun1.json", outcome="ok")
+            crash = val_path(root, MAZDA, "crash_1.txt")
+            write(crash, "attempt: first\nexception: TraceDefect\n")
+            write_run(root, MAZDA, V.RUN, outcome="crash: TraceDefect")
+            with self.assertRaises(V.Refused):                             # the control: no re-run's rows yet
+                V.summary(source=src)
+            write_json(val_path(root, MAZDA, "STARTED_rerun1"), {})
+            with self.assertRaises(V.Refused):                             # the control: the re-run still open
+                V.summary(source=src)
+            write_json(val_path(root, MAZDA, "rows_rerun1.json"), rows("limited", False, 0.025))
+            write_run(root, MAZDA, "run_rerun1.json", outcome="defect: a file outside the allowlist was opened")
+            with self.assertRaises(V.Refused) as cm:                       # the control: a re-run that is a defect
+                V.summary(source=src)
+            self.assertTrue(any("never govern" in x for x in cm.exception.problems), cm.exception.problems)
+            write_run(root, MAZDA, "run_rerun1.json", outcome="ok")
+            out = V.summary(source=src)
+            m, h, f = (out["engines"][e] for e in (MAZDA, HONDA, FORD))
+            self.assertEqual((m["governed_by"], m["first"], m["labels"], m["drop"],
+                              m["c5_recheck_margin"]["margin_fraction"]),
+                             ("rows_rerun1.json", {"crashed": ["crash_1.txt"]}, {"E1a": "limited"}, False, 0.025))
+            self.assertEqual(m["reruns"]["rows_rerun1.json"]["labels"], {"E1a": "limited"})
+            self.assertEqual((h["governed_by"], h["drop"], h["labels"], h["first"]["drop"], h["first"]["labels"]),
+                             ("rows_rerun1.json", True, {"E1a": "limited"}, False, {"E1a": "validated"}))
+            self.assertEqual((f["governed_by"], f["reruns"], f["first"]["labels"]), (V.ROWS, {}, {"E1a": "validated"}))
+            self.assertEqual(sorted(out["inputs"]),
+                             sorted([f"{V.val_dir(FORD)}/{V.ROWS}", f"{V.val_dir(HONDA)}/{V.ROWS}",
+                                     f"{V.val_dir(HONDA)}/rows_rerun1.json", f"{V.val_dir(MAZDA)}/rows_rerun1.json"]))
+            self.assertEqual(read_json(os.path.join(root, *V.VAL_REL.split("/"), V.SUMMARY)), out)
+            # the frozen roads code reads the governing entries
+            margins = epa_roads.margins_from_summary(out, engines=epa_roads.ENGINES)
+            self.assertEqual([margins[e] for e in (MAZDA, HONDA, FORD)], [0.025, 0.030, 0.020])
+            self.assertEqual(epa_roads.dropped_problems(out, {HONDA}), [])
+            self.assertNotEqual(epa_roads.dropped_problems(out, set()), [])      # the Honda's re-run drops it
+            # the control: the crashed engine's top level without values is refused by the same code
+            hollow = json.loads(json.dumps(out))
+            hollow["engines"][MAZDA].update(drop=None, c5_recheck_margin=None)
+            with self.assertRaises(TypeError):
+                epa_roads.margins_from_summary(hollow, engines=epa_roads.ENGINES)
+            self.assertNotEqual(epa_roads.dropped_problems(hollow, {HONDA}), [])
+            # the controls: re-run rows without a first-run crash, and a crash that is the re-run's
+            os.remove(crash)
+            with self.assertRaises(V.Refused):
+                V.summary(source=src)
+            write(crash, "attempt: rerun 1\nexception: TraceDefect\n")
+            with self.assertRaises(V.Refused):
+                V.summary(source=src)
+            write(crash, "attempt: first\nexception: TraceDefect\n")
+            self.assertEqual(V.summary(source=src)["engines"][MAZDA]["governed_by"], "rows_rerun1.json")
+            # the controls: a later re-run open (STARTED alone), then crashed, never lets the earlier one govern
+            write_json(val_path(root, HONDA, "STARTED_rerun2"), {})
+            with self.assertRaises(V.Refused) as cm:
+                V.summary(source=src)
+            self.assertTrue(any(x.startswith(f"{HONDA}: its latest attempt (rerun 2)") for x in cm.exception.problems))
+            write(val_path(root, HONDA, "crash_1.txt"), "attempt: rerun 2\nexception: TraceDefect\n")
+            write_run(root, HONDA, "run_rerun2.json", outcome="crash: TraceDefect")
+            with self.assertRaises(V.Refused):
+                V.summary(source=src)
+            # and a first run whose outcome is a defect never governs either
+            os.remove(val_path(root, HONDA, "STARTED_rerun2"))
+            os.remove(val_path(root, HONDA, "crash_1.txt"))
+            os.remove(val_path(root, HONDA, "run_rerun2.json"))
+            write_run(root, FORD, V.RUN, outcome="defect: a file outside the allowlist was opened")
+            with self.assertRaises(V.Refused):
+                V.summary(source=src)
+            write_run(root, FORD, V.RUN, outcome="ok")
+            self.assertEqual(V.summary(source=src)["engines"][FORD]["governed_by"], V.ROWS)
+            # a crash record naming the latest attempt refuses it, whatever its rows and outcome say
+            ford_crash = val_path(root, FORD, "crash_1.txt")
+            write(ford_crash, "attempt: first\nexception: TraceDefect\n")
+            with self.assertRaises(V.Refused):
+                V.summary(source=src)
+            os.remove(ford_crash)
+            # only a crash record naming the first attempt lets an engine without rows.json in: one naming re-run 1,
+            # with re-run 2 complete, is refused (the first attempt left no record of its own)
+            for f in ("STARTED_rerun1", "rows_rerun1.json", "run_rerun1.json"):
+                os.rename(val_path(root, MAZDA, f), val_path(root, MAZDA, f.replace("rerun1", "rerun2")))
+            write(crash, "attempt: rerun 1\nexception: TraceDefect\n")
+            with self.assertRaises(V.Refused):
+                V.summary(source=src)
+            write(crash, "attempt: first\nexception: TraceDefect\n")             # the control: then it enters
+            self.assertEqual(V.summary(source=src)["engines"][MAZDA]["governed_by"], "rows_rerun2.json")
 
 
 # ------------------------------------------------------------------------------------------ no repo

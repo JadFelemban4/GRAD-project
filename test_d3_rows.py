@@ -22,11 +22,14 @@ What each class proves:
   Demand       demand_torque against a hand value, for a stepped box and for the CVT's power balance
   Checks       Direct2 against the summary, the MAF against Direct2 x AFR_st x lambda on closed-loop
                segments, flat maxima found and dropped (and a scan-tool hold not taken for one), the
-               lambda reading's diagnostic, the PCM MAP at closed throttle
+               lambda reading's diagnostic, the PCM MAP at closed throttle; a test without a modal fuel
+               out of the Direct2 check alone (decision 144)
   Summary      the workbook read through zipfile; the real specs pinned, each pin with its source, and a pin
                without one refused; decision 80's rows (the base phase rows summed, the sum rows left out, a
                test with one row, the section headings and another test's cells never read, disagreeing
-               heating values refused); decision 79's assumed density and its u in the Direct2 check
+               heating values refused); decision 79's assumed density and its u in the Direct2 check;
+               decision 144's cells that are not a finite number (each kind: empty, a formula without its
+               value, text, an error value, NaN), their column unread, never summed over the other phases
   Contract     the rules against the contract's wording, u_input 5.25 %, E6 row 10's two efficiencies,
                the gear codes against the CX-9's published ratios
   Chain        D1's inversion by hand, the ECU's dwell run on the car's own PCM MAP, a segment end to end
@@ -42,6 +45,7 @@ import sys
 import tempfile
 import types
 import unittest
+import warnings
 import zipfile
 from unittest import mock
 from dataclasses import dataclass, replace
@@ -557,6 +561,62 @@ class Checks(Guarded):
             _checks([tr, t2], {"T1": srow("T1", 25.0, 45.0, u=u), "T2": srow("T2", 25.0, 62.0, u=2 * u)})
         _checks([tr, t2], {"T1": srow("T1", 25.0, 45.0, u=u), "T2": srow("T2", 25.0, 62.0, u=u)})
 
+    def test_a_test_without_a_modal_fuel_leaves_the_direct2_check_alone(self):
+        """Decision 144: a test whose summary has no modal fuel (None) keeps its Direct2 integral, reported
+        without a ratio, and is named in direct2_left_out; the fuel's u_D comes from the other tests' ratios
+        alone; its segments stay in the MAF check. Controls: the same test with its modal fuel gives two
+        ratios and another u_D, and the MAF check is the same either way; a modal fuel of 0 is named apart and
+        has no ratio, as before."""
+        import json
+        t1 = trace(base_arrays(seconds=20.0, t0=-5.0, direct2=3.0), "T1")
+        t2 = trace(base_arrays(seconds=20.0, t0=-5.0, direct2=3.1), "T2")
+        full = {"T1": srow("T1", 25.0, 45.0 * 1.04), "T2": srow("T2", 25.0, 3.1 * 15.0)}
+        gap = dict(full, T2=replace(full["T2"], modal_fuel_g=None, unread=(("modal_fuel", 1, (("empty", 1),)),)))
+        c, _ = _checks([t1, t2], gap)
+        c_full, _ = _checks([t1, t2], full)
+        rows = {x[0]: x for x in c.direct2_vs_summary}
+        self.assertAlmostEqual(rows["T2"][1], 3.1 * 15.0, places=9)                  # integrated all the same
+        self.assertEqual(rows["T2"][2:4], (None, None))
+        self.assertAlmostEqual(c.u_d_fuel, 1.0 - 1.0 / 1.04, places=12)              # T1's ratio alone
+        self.assertAlmostEqual(c_full.u_d_fuel, (1.0 - 1.0 / 1.04) / 2.0, places=12)  # the median of two
+        self.assertEqual(c.direct2_left_out, {"modal_fuel_not_a_finite_number": ("T2",), "modal_fuel_not_positive": ()})
+        self.assertEqual(c_full.direct2_left_out, {"modal_fuel_not_a_finite_number": (), "modal_fuel_not_positive": ()})
+        j = c.as_json()
+        json.dumps(j, allow_nan=False)
+        self.assertEqual((j["direct2_compared_n"], j["direct2_left_out"]["modal_fuel_not_a_finite_number"]), (1, ["T2"]))
+        self.assertEqual(c_full.as_json()["direct2_compared_n"], 2)
+        self.assertEqual(c.maf_ratio_n, c_full.maf_ratio_n)
+        self.assertEqual(c.maf_ratio_n, 2)                                           # T2's segment kept
+        # A zero modal fuel: no ratio, as before decision 144, now named.
+        zero = dict(full, T2=replace(full["T2"], modal_fuel_g=0.0))
+        cz, _ = _checks([t1, t2], zero)
+        self.assertEqual(cz.direct2_left_out["modal_fuel_not_positive"], ("T2",))
+        self.assertAlmostEqual(cz.u_d_fuel, c.u_d_fuel, places=15)
+
+    def test_with_no_modal_fuel_read_the_fuels_u_D_has_no_term(self):
+        """Decision 144 keeps the reading before it: with no test's modal fuel read (as with none above 0) the
+        Direct2 check has no ratio, u_D's fuel term is None and C3b has no statistic, "u_val incomplete: u_D";
+        one ratio gives u_D from that one test, its count reported. Controls: one ratio; and C3b with a u_D."""
+        t1 = trace(base_arrays(seconds=20.0, t0=-5.0, direct2=3.0), "T1")
+        t2 = trace(base_arrays(seconds=20.0, t0=-5.0, direct2=3.1), "T2")
+        none = {"T1": replace(srow("T1", 25.0, 45.0), modal_fuel_g=None),
+                "T2": replace(srow("T2", 25.0, 46.5), modal_fuel_g=None)}
+        c, _ = _checks([t1, t2], none)
+        self.assertIsNone(c.u_d_fuel)
+        self.assertEqual(c.as_json()["direct2_compared_n"], 0)
+        self.assertEqual(c.direct2_left_out["modal_fuel_not_a_finite_number"], ("T1", "T2"))
+        c1, _ = _checks([t1, t2], dict(none, T1=srow("T1", 25.0, 45.0 * 1.04)))
+        self.assertEqual(c1.as_json()["direct2_compared_n"], 1)
+        self.assertAlmostEqual(c1.u_d_fuel, 1.0 - 1.0 / 1.04, places=12)
+        ev = [_ev(i, fuel_err=e) for i, e in enumerate(Rows.ERRS)]
+        half = [_ev(i, fuel_err=e + 0.001 * (i % 2)) for i, e in enumerate(Rows.ERRS)]
+        rows = d3_rows.c3_rows(ev, context=CTX, checks=_fake_checks(u_d_fuel=c.u_d_fuel), evals_half=half)
+        self.assertTrue(rows["C3b"].no_statistic)
+        self.assertEqual(rows["C3b"].reason, "u_val incomplete: u_D")
+        self.assertFalse(rows["C3d"].no_statistic)                        # the air's u_D is the MAF check's
+        ok = d3_rows.c3_rows(ev, context=CTX, checks=_fake_checks(u_d_fuel=c1.u_d_fuel), evals_half=half)
+        self.assertFalse(ok["C3b"].no_statistic)
+
     def test_the_maf_against_direct2(self):
         tr = trace(base_arrays(seconds=20.0))
         c, _ = _checks([tr])
@@ -638,8 +698,23 @@ class Checks(Guarded):
         self.assertFalse(c.closed_throttle["below_baro"])
 
 
+@dataclass(frozen=True)
+class XlCell:
+    """A cell write_xlsx writes as given, inside <c r="..."{attrs}>{inner}</c>: the cell kinds a workbook
+    can hold that the plain str/number cells do not cover (decision 144's test)."""
+    attrs: str
+    inner: str
+
+
+XL_ERROR = XlCell(' t="e"', "<v>#DIV/0!</v>")              # an error value, as Excel caches one
+XL_UNCACHED = XlCell("", "<f>A1/0</f>")                    # a formula saved without its value
+XL_STYLED_BLANK = XlCell(' s="3"', "")                      # a formatted cell with no value
+XL_EMPTY_RESULT = XlCell(' t="str"', "<f>IF(1,\"\",1)</f><v></v>")   # a formula whose cached result is ""
+
+
 def write_xlsx(path, sheet, rows):
-    """A minimal workbook: one sheet, strings shared, numbers inline, a title row above the header."""
+    """A minimal workbook: one sheet, strings shared, numbers inline, a title row above the header; an XlCell
+    is written as it says."""
     strings, idx = [], {}
 
     def sid(s):
@@ -661,7 +736,9 @@ def write_xlsx(path, sheet, rows):
         cells = []
         for k, v in enumerate(r):
             ref = f"{col(k)}{i}"
-            if isinstance(v, str):
+            if isinstance(v, XlCell):
+                cells.append(f'<c r="{ref}"{v.attrs}>{v.inner}</c>')
+            elif isinstance(v, str):
                 cells.append(f'<c r="{ref}" t="s"><v>{sid(v)}</v></c>')
             elif v is not None:
                 cells.append(f'<c r="{ref}"><v>{v!r}</v></c>')
@@ -797,7 +874,7 @@ class Summary(Guarded):
         self.assertAlmostEqual(r.modal_fuel_g, 1000.0 * (0.10 + 0.20 + 0.15 + 0.25), places=9)
         self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c, r.base_rows, r.sum_rows), (24.0, 2.0, 4, 2))
         self.assertEqual(r.as_json(), {"base_rows": 4, "sum_rows_excluded": 2, "cell_temp_c": 24.0,
-                                       "cell_temp_spread_c": 2.0})
+                                       "cell_temp_spread_c": 2.0, "unread": {}})
         r2 = out["61700002"]
         self.assertAlmostEqual(r2.modal_fuel_g, 1100.0, places=9)
         self.assertEqual((r2.cell_temp_c, r2.base_rows, r2.sum_rows), (23.0, 2, 1))
@@ -835,25 +912,120 @@ class Summary(Guarded):
     def test_headings_and_other_tests_rows_are_never_converted(self):
         """Decision 80's code: a row whose test ID cell is not a whole number (a day's heading, the disclaimer
         at the foot, an empty cell) is skipped, and so is every row of a test the chain does not read, so its
-        empty or odd cells never stop the read; a test the sheet does not list is absent. Controls: the same
-        odd test asked for stops, naming the test and the column but not the cell; a cycle label that holds
-        "+" in another form is refused, never guessed."""
+        empty or odd cells are never converted; a test the sheet does not list is absent. Controls: the same
+        odd test asked for reads with the two columns it lacks unread and named, never the cell's content
+        (decision 144; before it, the read stopped); a cycle label that holds "+" in another form is refused,
+        never guessed."""
         rows = ([HEAD, ["Day 1 Standard Cycles"]] + UDDS + [["Day 2, Standard Cycles Repeat 1", None, None]]
                 + [[61700009.0, "HWY, Ph 1", "n/a?", None, 18300.0]] + WOT
                 + [["-This publication is distributed by ..."], [None, None]])
         out = read(rows, ("61700001", "61700003", "61700005"))
         self.assertEqual(sorted(out), ["61700001", "61700003"])
-        with self.assertRaises(d3_rows.TraceDefect) as cm:
-            read(rows, ("61700009",))
-        self.assertIn("61700009", str(cm.exception))
-        self.assertIn("Cell C", str(cm.exception))
-        self.assertNotIn("n/a?", str(cm.exception))
+        self.assertTrue(all(r.unread == () for r in out.values()))
+        odd = read(rows, ("61700009",))["61700009"]
+        self.assertEqual((odd.cell_temp_c, odd.cell_temp_spread_c, odd.modal_fuel_g, odd.fuel_lhv_btu_per_lbm),
+                         (None, None, None, 18300.0))
+        self.assertEqual(odd.unread, (("cell_temp_c", 1, (("not a number", 1),)), ("modal_fuel", 1, (("empty", 1),))))
+        self.assertNotIn("n/a?", repr(odd))
         with self.assertRaises(d3_rows.TraceDefect):
             read([HEAD, [61700006.0, "UDDS + HWY", 23.0, 1.0, 18300.0]], ("61700006",))
         with self.assertRaises(ValueError):
             d3_rows.sum_row("UDDS + HWY")
         with self.assertRaises(ValueError):
             read([HEAD] + WOT, ())
+
+    def test_a_cell_that_is_not_a_finite_number_leaves_its_column_unread(self):
+        """Decision 144, from Run 2's first Mazda run (a modal fuel cell of a base row that is not a finite
+        number stopped the read): every kind of such a cell -- no cell, a formatted blank, a formula saved
+        without its value, a formula whose result is "", blanks, text, an error value, NaN, an infinity --
+        leaves that column of its test unread (None) and the test read, its other columns as before; the
+        record names the column, the count and the kind, never the content. A test with phases one of whose
+        phases lacks the fuel has no fuel, never the other phases' sum. Controls: the same rows with the cell
+        filled read as before; a number stored as text still reads, and so does a zero (what float() accepts
+        is unchanged, and no value decides); the cell temperature and the heating value are named the same
+        way, and an unread heating value is not taken for a disagreement."""
+        import json
+        kinds = ((None, "empty"), (XL_STYLED_BLANK, "empty"), (XL_UNCACHED, "empty"), (XL_EMPTY_RESULT, "empty"),
+                 ("   ", "empty"), ("N/A", "not a number"), ("-", "not a number"), ("0,5", "not a number"),
+                 (XL_ERROR, "not a number"), (math.nan, "not finite"), (math.inf, "not finite"),
+                 ("NaN", "not finite"))
+        for v, kind in kinds:
+            r = read([HEAD, [61700021.0, "HWY", 22.0, v, 18300.0]], ("61700021",))["61700021"]
+            self.assertIsNone(r.modal_fuel_g, msg=repr(v))
+            self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c, r.fuel_lhv_btu_per_lbm, r.base_rows, r.sum_rows),
+                             (22.0, 0.0, 18300.0, 1, 0), msg=repr(v))
+            self.assertEqual(r.unread, (("modal_fuel", 1, ((kind, 1),)),), msg=repr(v))
+            j = json.dumps(r.as_json(), allow_nan=False)
+            self.assertEqual(r.as_json()["unread"], {"modal_fuel": {"base_rows": 1, "kinds": {kind: 1}}})
+            for content in ("N/A", "0,5", "#DIV/0!", "A1/0"):
+                self.assertNotIn(content, j + repr(r))
+        # Controls: the cell filled, a number stored as text, a zero.
+        for v, g in ((0.05, 50.0), ("0.05", 50.0), (0.0, 0.0)):
+            r = read([HEAD, [61700021.0, "HWY", 22.0, v, 18300.0]], ("61700021",))["61700021"]
+            self.assertEqual((r.modal_fuel_g, r.unread), (g, ()), msg=repr(v))
+        # A test with phases: one phase's fuel blank, another's text, leaves the whole test's fuel unread.
+        gaps = [list(x) for x in UDDS]
+        gaps[1][3], gaps[4][3] = None, "N/A"
+        r = read([HEAD] + gaps, ("61700001",))["61700001"]
+        self.assertIsNone(r.modal_fuel_g)                                 # never 0.10 + 0.15 = 250 g
+        self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c, r.base_rows, r.sum_rows), (24.0, 2.0, 4, 2))
+        self.assertEqual(r.unread, (("modal_fuel", 2, (("empty", 1), ("not a number", 1))),))
+        self.assertAlmostEqual(read([HEAD] + UDDS, ("61700001",))["61700001"].modal_fuel_g, 700.0, places=9)
+        # The cell temperature and the heating value, unread the same way; an unread heating value in one phase
+        # is not a disagreement (the read does not stop), while two finite ones that differ still are.
+        r = read([HEAD, [61700003.0, "WOTs x3", XL_ERROR, 0.05, None]], ("61700003",))["61700003"]
+        self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c, r.modal_fuel_g, r.fuel_lhv_btu_per_lbm),
+                         (None, None, 50.0, None))
+        self.assertEqual(r.unread, (("cell_temp_c", 1, (("not a number", 1),)), ("fuel_lhv", 1, (("empty", 1),))))
+        half = [list(x) for x in US06]
+        half[1][4] = None
+        r = read([HEAD] + half, ("61700002",))["61700002"]
+        self.assertIsNone(r.fuel_lhv_btu_per_lbm)
+        self.assertAlmostEqual(r.modal_fuel_g, 1100.0, places=9)
+        half[1][4] = 18301.0
+        with self.assertRaises(d3_rows.TraceDefect):
+            read([HEAD] + half, ("61700002",))
+        # Two finite heating values that differ stop the read beside an unread third (decision 80 unchanged).
+        three = [list(x) for x in UDDS]
+        three[0][4], three[1][4] = None, 18301.0
+        with self.assertRaises(d3_rows.TraceDefect):
+            read([HEAD] + three, ("61700001",))
+        three[1][4] = 18300.0                                             # the control: one unread, the rest agree
+        self.assertIsNone(read([HEAD] + three, ("61700001",))["61700001"].fuel_lhv_btu_per_lbm)
+
+    def test_a_pinned_barometric_cell_that_is_not_a_finite_number_still_stops(self):
+        """Decision 144 leaves the barometric pressure's stop as it was: pinned on neither real sheet, a None
+        there would fall back to the declared pressure, a substitute. Its cell that is not a finite number stops
+        the read naming the test and the column, never the content. Control: the cell read gives the pressure."""
+        spec = replace(SPEC, baro="Baro kPa", baro_to_kpa=1.0,
+                       sources=SPEC.sources + (("baro", "synthetic"), ("baro_to_kpa", "synthetic")))
+        head = HEAD + ["Baro kPa"]
+        with self.assertRaises(d3_rows.TraceDefect) as cm:
+            read([head, [61700003.0, "WOTs x3", 22.0, 0.05, 18300.0, "n/a?"]], ("61700003",), spec=spec)
+        self.assertIn("Baro kPa", str(cm.exception))
+        self.assertNotIn("n/a?", str(cm.exception))
+        r = read([head, [61700003.0, "WOTs x3", 22.0, 0.05, 18300.0, 99.5]], ("61700003",), spec=spec)["61700003"]
+        self.assertEqual((r.baro_kpa, r.unread), (99.5, ()))
+
+    def test_the_cell_temperature_is_the_first_base_rows_and_unread_only_when_that_cell_is(self):
+        """Decision 80 unchanged by decision 144: the cell temperature is the first base row's. A later phase's
+        cell that is not a finite number leaves the temperature as the first's and the spread unread (None),
+        named; the first's leaves the temperature unread. Control: a sum row's cell is never read."""
+        later = [list(x) for x in UDDS]
+        later[3][2] = "n/a"                                               # Ph 3's cell (a base row)
+        r = read([HEAD] + later, ("61700001",))["61700001"]
+        self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c), (24.0, None))
+        self.assertEqual(r.unread, (("cell_temp_c", 1, (("not a number", 1),)),))
+        self.assertAlmostEqual(r.modal_fuel_g, 700.0, places=9)
+        first = [list(x) for x in UDDS]
+        first[0][2] = None                                                # Ph 1's cell
+        r = read([HEAD] + first, ("61700001",))["61700001"]
+        self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c), (None, None))
+        self.assertEqual(r.unread, (("cell_temp_c", 1, (("empty", 1),)),))
+        sums = [list(x) for x in UDDS]
+        sums[2][2] = "n/a"                                                # a sum row's cell is never read
+        r = read([HEAD] + sums, ("61700001",))["61700001"]
+        self.assertEqual((r.cell_temp_c, r.cell_temp_spread_c, r.unread), (24.0, 2.0, ()))
 
     def test_the_assumed_density(self):
         """Decision 79: the six NVFEL densities (three Tier 2, three Tier 3), their union 0.74227-0.74776 kg/L,
@@ -1118,6 +1290,73 @@ class Rows(Guarded):
         self.assertAlmostEqual(e2["C3a"].E, 0.0, places=10)
         self.assertIsNone(d3_rows.fuel_scaling([], context=CTX))
 
+    def test_a_segment_without_a_heating_value_leaves_the_fuel_rows_alone(self):
+        """Decision 144: a segment whose test's summary gives no heating value has no fuel comparison (C3a and
+        C3b leave it out) and keeps its air comparison (C3c and C3d, which read no heating value); fuel_scaling
+        reports the other segments' factor, and segment_counts counts it. Control: the same segments, each with
+        its heating value."""
+        ev = [replace(e, d3_lhv_btu_per_lbm=None) if e.i0 == 0 else e for e in self.evals()]
+        rows = d3_rows.c3_rows(ev, context=CTX, checks=_fake_checks(), evals_half=None)
+        full = d3_rows.c3_rows(self.evals(), context=CTX, checks=_fake_checks(), evals_half=None)
+        self.assertEqual([rows[r].n_rows for r in ("C3a", "C3b", "C3c", "C3d")], [4, 4, 5, 5])
+        self.assertEqual([full[r].n_rows for r in ("C3a", "C3b", "C3c", "C3d")], [5, 5, 5, 5])
+        self.assertAlmostEqual(rows["C3b"].E, 100.0 * np.mean(np.abs(self.ERRS[1:])), places=10)
+        self.assertEqual(rows["C3d"].E, full["C3d"].E)
+        self.assertEqual(d3_rows.fuel_scaling(ev, context=CTX), EPA_LHV / D3_LHV)
+        self.assertEqual(d3_rows.segment_counts(ev, context=CTX, flats={})["fuel_no_heating_value"], 1)
+        self.assertEqual(d3_rows.segment_counts(self.evals(), context=CTX, flats={})["fuel_no_heating_value"], 0)
+
+    def test_a_segment_whose_model_output_is_not_finite_takes_no_value(self):
+        """Decision 144: a segment whose model output gives an error that is not a finite number, at the nominal
+        step or at half of it, leaves the row that reads that output, counted (extra.segments_model_output_not_finite):
+        never a NaN in E or u_val, and never a label for a NaN (here the fuel's, so C3a and C3b lose two segments and
+        the air rows none). E6 row 10's rows read the same way. Control: the same segments with every output finite."""
+        ev, half = self.evals(), self.evals(half=True)
+        ev[0] = replace(ev[0], model_fuel_gps=math.nan)
+        half[1] = replace(half[1], model_fuel_gps=math.inf)
+        rows = d3_rows.c3_rows(ev, context=CTX, checks=_fake_checks(), evals_half=half)
+        full = d3_rows.c3_rows(self.evals(), context=CTX, checks=_fake_checks(), evals_half=self.evals(half=True))
+        self.assertEqual([rows[r].n_rows for r in ("C3a", "C3b", "C3c", "C3d")], [3, 3, 5, 5])
+        self.assertEqual([rows[r].extra["segments_model_output_not_finite"] for r in ("C3a", "C3b", "C3c", "C3d")],
+                         [2, 2, 0, 0])
+        self.assertEqual([full[r].extra["segments_model_output_not_finite"] for r in ("C3a", "C3b", "C3c", "C3d")],
+                         [0, 0, 0, 0])
+        self.assertTrue(math.isfinite(rows["C3b"].E) and math.isfinite(rows["C3b"].u.u_val))
+        self.assertAlmostEqual(rows["C3b"].E, 100.0 * float(np.mean(np.abs(self.ERRS[2:]))), places=10)
+        self.assertFalse(rows["C3b"].no_statistic)
+        self.assertEqual(rows["C3d"].E, full["C3d"].E)
+        # E6 row 10 on the base run_chain gives it (no half step): a variant identical to the nominal moves nothing,
+        # though the half step's failure is out of rows (the final review's control: base=rows gave -0.083 here)
+        base = d3_rows.c3_rows(ev, context=CTX, checks=_fake_checks(), evals_half=None)
+        eta = d3_rows.eta_rows({0.86: ev}, context=CTX, checks=_fake_checks(), base=base)
+        self.assertEqual(eta["0.86"], {"C3b": 0.0, "C3d": 0.0})
+        self.assertNotEqual(d3_rows.eta_rows({0.86: ev}, context=CTX, checks=_fake_checks(), base=rows)["0.86"]["C3b"],
+                            0.0)
+
+    def test_a_fuel_row_counts_its_segments_from_tests_outside_the_direct2_check(self):
+        """Decision 144: each fuel row counts its segments whose test is outside the Direct2 check (both of
+        direct2_left_out's reasons), a count beside n, never a value; the air rows carry None. Control: no test
+        left out counts 0."""
+        ev = [_ev(i, fuel_err=e, test="T2" if i < 2 else "T1") for i, e in enumerate(self.ERRS)]
+        out = replace(_fake_checks(), direct2_left_out={"modal_fuel_not_a_finite_number": ("T2",),
+                                                         "modal_fuel_not_positive": ()})
+        rows = d3_rows.c3_rows(ev, context=CTX, checks=out, evals_half=None)
+        self.assertEqual([rows[r].extra["segments_from_tests_outside_direct2_check"] for r in ("C3a", "C3b")], [2, 2])
+        self.assertEqual([rows[r].extra["segments_from_tests_outside_direct2_check"] for r in ("C3c", "C3d")],
+                         [None, None])
+        zero = replace(out, direct2_left_out={"modal_fuel_not_a_finite_number": (), "modal_fuel_not_positive": ("T1",)})
+        self.assertEqual(d3_rows.c3_rows(ev, context=CTX, checks=zero, evals_half=None)["C3b"]
+                         .extra["segments_from_tests_outside_direct2_check"], 3)
+        none = d3_rows.c3_rows(ev, context=CTX, checks=_fake_checks(), evals_half=None)
+        self.assertEqual(none["C3b"].extra["segments_from_tests_outside_direct2_check"], 0)
+        # each fuel row's E without the segments of tests outside the check, descriptive: T1's three alone
+        self.assertAlmostEqual(rows["C3b"].without["tests_outside_direct2_check"],
+                               100.0 * float(np.mean(np.abs(self.ERRS[2:]))), places=10)
+        self.assertAlmostEqual(rows["C3a"].without["tests_outside_direct2_check"],
+                               100.0 * float(np.mean(self.ERRS[2:])), places=10)
+        self.assertIsNone(rows["C3d"].without["tests_outside_direct2_check"])
+        self.assertAlmostEqual(none["C3b"].without["tests_outside_direct2_check"], none["C3b"].E, places=12)
+
     def test_unreachable_and_flat_maxima(self):
         ev = self.evals()
         ev[0] = replace(ev[0], bracketed=False, bound_kpa=400.0)
@@ -1238,10 +1477,13 @@ class WholeChain(Guarded):
                   "u_modal_fuel"):
             self.assertIn(k, body["channel_checks"])
         self.assertEqual(body["summary_rows"]["61700000"], {"base_rows": 1, "sum_rows_excluded": 0, "cell_temp_c": 25.0,
-                                                            "cell_temp_spread_c": 0.0})
+                                                            "cell_temp_spread_c": 0.0, "unread": {}})
         self.assertEqual(body["fuel_scaling"], EPA_LHV / D3_LHV)
         self.assertEqual(body["rows"]["C3b"]["n_rows"], 4)
         self.assertIsNotNone(body["rows"]["C3b"]["label"])                 # labelled: u_num from half dtheta
+        self.assertEqual((body["tests_in_chain"], body["left_out"]["chain_no_cell_temperature"],
+                          body["left_out"]["fuel_rows_no_heating_value"], body["left_out"]["direct2_check_no_modal_fuel"],
+                          body["left_out"]["segments_not_evaluated"]), (4, [], [], [], 0))
         # Control: a missing summary row stops before any model call.
         with tempfile.TemporaryDirectory() as d:
             p = os.path.join(d, "x.txt")
@@ -1263,6 +1505,94 @@ class WholeChain(Guarded):
                               eta=0.92, etas_row10=(0.86, 0.98), afr_st=AFR, baro_kpa=99.0, u_afr_st=None,
                               engine_name="toy", table="t", fuel=None, ect_k_if_absent=None,
                               mapper=lambda fn, items: [fn(i) for i in items])
+
+    def test_an_unread_summary_value_leaves_exactly_what_reads_it(self):
+        """Decision 144 through run_chain, on the four tests above: 61700001 without a modal fuel stays in the
+        chain and leaves the Direct2 check; 61700002 without a cell temperature is left out of the chain (its
+        segment cut and checked, never evaluated) and stays in the Direct2 check; 61700003 without a heating
+        value is evaluated and left out of the fuel rows alone. Each is named under left_out and its summary
+        row says which column was unread. Control: the same files with every value give 4 segments and 4
+        fuel rows (test_files_to_a_json_body)."""
+        import functools
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            files, summ = [], {}
+            for k, d2 in enumerate((3.0, 3.1, 3.2, 3.3)):
+                a = base_arrays(seconds=12.0, map_kpa=115.0 + 5 * k, direct2=d2, force=1500.0 + 300.0 * k)
+                t = f"6170000{k}"
+                p = os.path.join(d, f"{t} Test Data.txt")
+                write_d3(p, d3_rows.CHANNELS, a)
+                files.append((t, p))
+                g, _ = d3_rows._integral(a["time"], a["direct2"], 0.0)
+                summ[t] = srow(t, 25.0, g)
+            body_summ = dict(summ)
+            body_summ["61700001"] = replace(summ["61700001"], modal_fuel_g=None, unread=(("modal_fuel", 1, (("empty", 1),)),))
+            body_summ["61700002"] = replace(summ["61700002"], cell_temp_c=None, cell_temp_spread_c=None,
+                                            unread=(("cell_temp_c", 1, (("not a number", 1),)),))
+            body_summ["61700003"] = replace(summ["61700003"], fuel_lhv_btu_per_lbm=None,
+                                            unread=(("fuel_lhv", 1, (("empty", 1),)),))
+            def chain(summary):
+                with warnings.catch_warnings():
+                    warnings.simplefilter("error")                        # C6: warnings are errors in run
+                    return d3_rows.run_chain(
+                        tuple(files), summary=summary, channels=d3_rows.CHANNELS, car=CX9, model=ToyModel(),
+                        context=CTX, rules=d3_rows.CONTRACT_SEGMENTS, channel_rules=d3_rows.CHANNEL_RULES,
+                        dtheta=0.25, eta=0.92, etas_row10=(0.86, 0.98), afr_st=AFR, baro_kpa=99.0, u_afr_st=None,
+                        engine_name="toy", table="t", fuel=None, ect_k_if_absent=None,
+                        mapper=functools.partial(epa_fit.ordered_map, jobs=1, initializer=None))
+            full = chain(dict(summ))
+            zero = chain(dict(summ, **{"61700003": replace(summ["61700003"], fuel_lhv_btu_per_lbm=0.0)}))
+            body = chain(body_summ)
+            # E6 row 10's base is the nominal rows with no half step, as its variants are (decision 144): run_chain
+            # hands eta_rows rows without u_num, never the labelled rows
+            seen, real_eta = [], d3_rows.eta_rows
+
+            def spy(*a, **kw):
+                seen.append(kw["base"])
+                return real_eta(*a, **kw)
+            with mock.patch.object(d3_rows, "eta_rows", spy):
+                chain(body_summ)
+        json.dumps(body, allow_nan=False)
+        self.assertEqual((body["files"], body["tests_in_chain"]), (4, 3))
+        self.assertEqual((body["rows"]["C3b"]["extra"]["segments_from_tests_outside_direct2_check"],
+                          body["rows"]["C3d"]["extra"]["segments_from_tests_outside_direct2_check"]), (1, None))
+        lo = body["left_out"]
+        self.assertEqual((lo["chain_no_cell_temperature"], lo["fuel_rows_no_heating_value"],
+                          lo["direct2_check_no_modal_fuel"], lo["segments_not_evaluated"]),
+                         (["61700002"], ["61700003"], ["61700001"], 1))
+        self.assertEqual(body["segments"]["n"], 3)
+        self.assertEqual(body["segments"]["fuel_no_heating_value"], 1)
+        self.assertEqual((body["rows"]["C3b"]["n_rows"], body["rows"]["C3d"]["n_rows"]), (2, 3))
+        self.assertEqual(sorted(body["ecu"]), ["61700000", "61700001", "61700003"])
+        self.assertEqual(sorted(body["summary_rows"]), ["61700000", "61700001", "61700002", "61700003"])
+        self.assertEqual(body["summary_rows"]["61700002"]["unread"],
+                         {"cell_temp_c": {"base_rows": 1, "kinds": {"not a number": 1}}})
+        self.assertIsNone(body["summary_rows"]["61700002"]["cell_temp_c"])
+        cc = body["channel_checks"]
+        self.assertEqual(cc["direct2_compared_n"], 3)                     # 61700002 is still checked
+        self.assertEqual(cc["direct2_left_out"]["modal_fuel_not_a_finite_number"], ["61700001"])
+        self.assertEqual(body["fuel_scaling"], EPA_LHV / D3_LHV)
+        # every trace stays in the census and in the MAF check (the same as with every value read), and E6
+        # row 10 is computed on the chain's segments
+        self.assertEqual(sorted(body["census"]), ["61700000", "61700001", "61700002", "61700003"])
+        self.assertEqual(cc["maf_vs_direct2"]["n"], full["channel_checks"]["maf_vs_direct2"]["n"])
+        self.assertEqual(cc["maf_vs_direct2"]["n"], 4)
+        self.assertEqual(sorted(body["eta"]), ["0.86", "0.98"])
+        self.assertTrue(all(v["C3d"] is not None for v in body["eta"].values()))
+        self.assertEqual(body["eta_segments_model_output_not_finite"],
+                         {k: {"C3b": 0, "C3d": 0} for k in ("nominal", "0.86", "0.98")})
+        self.assertEqual(len(seen), 1)
+        self.assertIsNone(seen[0]["C3b"].u)
+        self.assertEqual(seen[0]["C3b"].E, body["rows"]["C3b"]["E"])
+        self.assertEqual(full["tests_in_chain"], 4)
+        self.assertEqual(full["left_out"]["fuel_rows_heating_value_not_positive"], [])
+        # a heating value not above 0: out of the fuel rows, named apart, never a division by it
+        self.assertEqual(zero["left_out"]["fuel_rows_heating_value_not_positive"], ["61700003"])
+        self.assertEqual(zero["left_out"]["fuel_rows_no_heating_value"], [])
+        self.assertEqual(zero["segments"]["fuel_no_heating_value"], 1)
+        self.assertEqual((zero["rows"]["C3b"]["n_rows"], zero["rows"]["C3d"]["n_rows"]),
+                         (full["rows"]["C3b"]["n_rows"] - 1, full["rows"]["C3d"]["n_rows"]))
+        self.assertEqual(zero["fuel_scaling"], EPA_LHV / D3_LHV)
 
 
 class Imports(Guarded):
