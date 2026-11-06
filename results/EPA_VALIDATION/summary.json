@@ -1,0 +1,419 @@
+{
+ "schema": "epa-summary/1",
+ "engines": {
+  "mazda_25t": {
+   "rows_sha_text": "e14accbf3b135566f89dfb92197a6caead4eaec1d519dc0de148aaa4530d68bd",
+   "labels": {
+    "C3b": "limited",
+    "C3d": "limited",
+    "D1": "limited",
+    "E1a": "off",
+    "E2a": "off",
+    "E3a": "off",
+    "E4a": "limited",
+    "E4b": "off",
+    "E8": "untested",
+    "L0": "off",
+    "L1": "off"
+   },
+   "kappa": {
+    "C3b": 1.4160968695908576,
+    "C3d": 1.3563475785113621,
+    "D1": 1.0,
+    "E1a": 2.953779525434887,
+    "E2a": 1.680274336169448,
+    "E3a": 4.378542468716182,
+    "E4a": 1.1522349205218978,
+    "E4b": 6.173906553623014,
+    "E8": 1.976837920185553,
+    "L0": 4.319706555976684,
+    "L1": 1.7167694965200329
+   },
+   "level_850c_label": "off",
+   "drop": true,
+   "drop_rows": [
+    "E4b",
+    "L1"
+   ],
+   "c5_recheck_margin": {
+    "worst_line": "3500",
+    "E": 5.393953481930868,
+    "u_val": 0.10911380819770843,
+    "R": 1.9,
+    "margin": 5.612181098326285,
+    "margin_unit": "percent",
+    "margin_fraction": 0.056121810983262854,
+    "lines": {
+     "1750": 3.188770928672117,
+     "2500": 1.0685944218468184,
+     "3500": 5.612181098326285
+    },
+    "no_deciding_line": false
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "labels": {
+     "E3a": "limited",
+     "E4a": null,
+     "E4b": "untested",
+     "L0": "untested",
+     "L1": null
+    },
+    "E": {
+     "E3a": 4.409015341602753,
+     "E4a": null,
+     "E4b": -24.261028350979565,
+     "L0": 12.650049360623916,
+     "L1": null
+    }
+   },
+   "governed_by": "rows_rerun1.json",
+   "first": {
+    "crashed": [
+     "crash_1.txt"
+    ]
+   },
+   "reruns": {
+    "rows_rerun1.json": {
+     "rows_sha_text": "e14accbf3b135566f89dfb92197a6caead4eaec1d519dc0de148aaa4530d68bd",
+     "labels": {
+      "C3b": "limited",
+      "C3d": "limited",
+      "D1": "limited",
+      "E1a": "off",
+      "E2a": "off",
+      "E3a": "off",
+      "E4a": "limited",
+      "E4b": "off",
+      "E8": "untested",
+      "L0": "off",
+      "L1": "off"
+     },
+     "kappa": {
+      "C3b": 1.4160968695908576,
+      "C3d": 1.3563475785113621,
+      "D1": 1.0,
+      "E1a": 2.953779525434887,
+      "E2a": 1.680274336169448,
+      "E3a": 4.378542468716182,
+      "E4a": 1.1522349205218978,
+      "E4b": 6.173906553623014,
+      "E8": 1.976837920185553,
+      "L0": 4.319706555976684,
+      "L1": 1.7167694965200329
+     },
+     "level_850c_label": "off",
+     "drop": true,
+     "drop_rows": [
+      "E4b",
+      "L1"
+     ],
+     "c5_recheck_margin": {
+      "worst_line": "3500",
+      "E": 5.393953481930868,
+      "u_val": 0.10911380819770843,
+      "R": 1.9,
+      "margin": 5.612181098326285,
+      "margin_unit": "percent",
+      "margin_fraction": 0.056121810983262854,
+      "lines": {
+       "1750": 3.188770928672117,
+       "2500": 1.0685944218468184,
+       "3500": 5.612181098326285
+      },
+      "no_deciding_line": false
+     },
+     "steady_only_tit": {
+      "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+      "decides": false,
+      "labels": {
+       "E3a": "limited",
+       "E4a": null,
+       "E4b": "untested",
+       "L0": "untested",
+       "L1": null
+      },
+      "E": {
+       "E3a": 4.409015341602753,
+       "E4a": null,
+       "E4b": -24.261028350979565,
+       "L0": 12.650049360623916,
+       "L1": null
+      }
+     }
+    }
+   }
+  },
+  "honda_l15b7": {
+   "rows_sha_text": "33f0445bdb2a43a107620c72421c1613295d347c77cbfcb8e27696a0c9f179c4",
+   "labels": {
+    "D1": "validated",
+    "E1a": "off",
+    "E2a": "validated",
+    "E3a": "off",
+    "E4a": "off",
+    "E4b": "limited",
+    "E8": "off",
+    "L0": "off",
+    "L1": "off"
+   },
+   "kappa": {
+    "D1": 1.0,
+    "E1a": 4.065370762448838,
+    "E2a": 1.0,
+    "E3a": 3.221091772689287,
+    "E4a": 6.7321538724575,
+    "E4b": 1.5180478123686243,
+    "E8": 11.457530478806556,
+    "L0": 3.3371522676462475,
+    "L1": 1.8713799077525977
+   },
+   "level_850c_label": "off",
+   "drop": true,
+   "drop_rows": [
+    "L1",
+    "E8"
+   ],
+   "c5_recheck_margin": {
+    "worst_line": "4500",
+    "E": -7.5158169595398405,
+    "u_val": 0.10419374455647545,
+    "R": 1.9,
+    "margin": 7.724204448652792,
+    "margin_unit": "percent",
+    "margin_fraction": 0.07724204448652792,
+    "lines": {
+     "2000": 1.5539632765892337,
+     "3000": 5.593781861970386,
+     "4500": 7.724204448652792
+    },
+    "no_deciding_line": false
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "labels": {
+     "E3a": "limited",
+     "E4a": null,
+     "E4b": "off",
+     "L0": "limited",
+     "L1": "untested"
+    },
+    "E": {
+     "E3a": 8.05311564916686,
+     "E4a": null,
+     "E4b": -26.519061098216913,
+     "L0": 10.243129466665627,
+     "L1": 5.390346479214164
+    }
+   },
+   "governed_by": "rows.json",
+   "first": {
+    "rows_sha_text": "33f0445bdb2a43a107620c72421c1613295d347c77cbfcb8e27696a0c9f179c4",
+    "labels": {
+     "D1": "validated",
+     "E1a": "off",
+     "E2a": "validated",
+     "E3a": "off",
+     "E4a": "off",
+     "E4b": "limited",
+     "E8": "off",
+     "L0": "off",
+     "L1": "off"
+    },
+    "kappa": {
+     "D1": 1.0,
+     "E1a": 4.065370762448838,
+     "E2a": 1.0,
+     "E3a": 3.221091772689287,
+     "E4a": 6.7321538724575,
+     "E4b": 1.5180478123686243,
+     "E8": 11.457530478806556,
+     "L0": 3.3371522676462475,
+     "L1": 1.8713799077525977
+    },
+    "level_850c_label": "off",
+    "drop": true,
+    "drop_rows": [
+     "L1",
+     "E8"
+    ],
+    "c5_recheck_margin": {
+     "worst_line": "4500",
+     "E": -7.5158169595398405,
+     "u_val": 0.10419374455647545,
+     "R": 1.9,
+     "margin": 7.724204448652792,
+     "margin_unit": "percent",
+     "margin_fraction": 0.07724204448652792,
+     "lines": {
+      "2000": 1.5539632765892337,
+      "3000": 5.593781861970386,
+      "4500": 7.724204448652792
+     },
+     "no_deciding_line": false
+    },
+    "steady_only_tit": {
+     "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+     "decides": false,
+     "labels": {
+      "E3a": "limited",
+      "E4a": null,
+      "E4b": "off",
+      "L0": "limited",
+      "L1": "untested"
+     },
+     "E": {
+      "E3a": 8.05311564916686,
+      "E4a": null,
+      "E4b": -26.519061098216913,
+      "L0": 10.243129466665627,
+      "L1": 5.390346479214164
+     }
+    }
+   },
+   "reruns": {}
+  },
+  "ford_27tt": {
+   "rows_sha_text": "f380687dc16829520d6516b0f363a717a7ae57012b4908e213bb1a790f9f4cd1",
+   "labels": {
+    "D1": "validated",
+    "E1a": "off",
+    "E2a": "off",
+    "E3a": "off",
+    "E4a": "untested",
+    "E4b": "untested",
+    "E8": "off",
+    "L0": "off",
+    "L1": "off"
+   },
+   "kappa": {
+    "D1": 1.0,
+    "E1a": 3.738116019924229,
+    "E2a": 3.360814193681047,
+    "E3a": 4.625164863354029,
+    "E4a": 1.0522867572116,
+    "E4b": 26.035955330451113,
+    "E8": 11.405591049787509,
+    "L0": 3.8120023949165764,
+    "L1": 3.732788117301832
+   },
+   "level_850c_label": "off",
+   "drop": true,
+   "drop_rows": [
+    "L1",
+    "E8"
+   ],
+   "c5_recheck_margin": {
+    "worst_line": "3500",
+    "E": 6.7327005560813316,
+    "u_val": 0.18485994088735175,
+    "R": 1.9,
+    "margin": 7.102420437856035,
+    "margin_unit": "percent",
+    "margin_fraction": 0.07102420437856036,
+    "lines": {
+     "1250": 3.2181673937027058,
+     "2000": 1.9511539695064006,
+     "2500": 3.278928373582077,
+     "3500": 7.102420437856035,
+     "5000": 6.523054030300864
+    },
+    "no_deciding_line": false
+   },
+   "steady_only_tit": {
+    "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+    "decides": false,
+    "labels": {
+     "E3a": "off",
+     "E4a": null,
+     "E4b": "untested",
+     "L0": "off",
+     "L1": "off"
+    },
+    "E": {
+     "E3a": 39.65635877632798,
+     "E4a": null,
+     "E4b": 223.99560207085455,
+     "L0": 31.454579439208562,
+     "L1": 34.913732978432364
+    }
+   },
+   "governed_by": "rows.json",
+   "first": {
+    "rows_sha_text": "f380687dc16829520d6516b0f363a717a7ae57012b4908e213bb1a790f9f4cd1",
+    "labels": {
+     "D1": "validated",
+     "E1a": "off",
+     "E2a": "off",
+     "E3a": "off",
+     "E4a": "untested",
+     "E4b": "untested",
+     "E8": "off",
+     "L0": "off",
+     "L1": "off"
+    },
+    "kappa": {
+     "D1": 1.0,
+     "E1a": 3.738116019924229,
+     "E2a": 3.360814193681047,
+     "E3a": 4.625164863354029,
+     "E4a": 1.0522867572116,
+     "E4b": 26.035955330451113,
+     "E8": 11.405591049787509,
+     "L0": 3.8120023949165764,
+     "L1": 3.732788117301832
+    },
+    "level_850c_label": "off",
+    "drop": true,
+    "drop_rows": [
+     "L1",
+     "E8"
+    ],
+    "c5_recheck_margin": {
+     "worst_line": "3500",
+     "E": 6.7327005560813316,
+     "u_val": 0.18485994088735175,
+     "R": 1.9,
+     "margin": 7.102420437856035,
+     "margin_unit": "percent",
+     "margin_fraction": 0.07102420437856036,
+     "lines": {
+      "1250": 3.2181673937027058,
+      "2000": 1.9511539695064006,
+      "2500": 3.278928373582077,
+      "3500": 7.102420437856035,
+      "5000": 6.523054030300864
+     },
+     "no_deciding_line": false
+    },
+    "steady_only_tit": {
+     "reading": "decision 83 (29 October 2026), declared before any held-out statistic: E3a, E4a, L0 and L1 with the High Load Final rows left out, and E4b with the Final rows left out of its reference line (its enriched rows kept); a sensitivity reported beside the primary reading (the contract's pooled hot population), never replacing it and never deciding",
+     "decides": false,
+     "labels": {
+      "E3a": "off",
+      "E4a": null,
+      "E4b": "untested",
+      "L0": "off",
+      "L1": "off"
+     },
+     "E": {
+      "E3a": 39.65635877632798,
+      "E4a": null,
+      "E4b": 223.99560207085455,
+      "L0": 31.454579439208562,
+      "L1": 34.913732978432364
+     }
+    }
+   },
+   "reruns": {}
+  }
+ },
+ "drop_order": "an engine with an off d row, a d row without a statistic, or a failing table whose schedule cannot carry the exact cycle is dropped; when the schedule forces a choice, the Ford first, then the Honda, the Mazda last; the B58 is never dropped (results/ENGINE_THRESHOLDS.md section 7)",
+ "inputs": {
+  "results/EPA_VALIDATION/mazda_25t/rows_rerun1.json": "e14accbf3b135566f89dfb92197a6caead4eaec1d519dc0de148aaa4530d68bd",
+  "results/EPA_VALIDATION/honda_l15b7/rows.json": "33f0445bdb2a43a107620c72421c1613295d347c77cbfcb8e27696a0c9f179c4",
+  "results/EPA_VALIDATION/ford_27tt/rows.json": "f380687dc16829520d6516b0f363a717a7ae57012b4908e213bb1a790f9f4cd1"
+ }
+}

@@ -1,0 +1,60 @@
+{
+ "engine": "ford_27tt",
+ "invocations": [
+  {
+   "subcommand": "arm",
+   "argv": [
+    "arm",
+    "--engine",
+    "ford_27tt",
+    "--jobs",
+    "16"
+   ],
+   "started_utc": "2026-11-05T23:42:56+00:00",
+   "versions": {
+    "python": "3.13.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "platform": "Windows-11-10.0.26200-SP0"
+   },
+   "ended_utc": "2026-11-05T23:44:20+00:00",
+   "outcome": "ok",
+   "k": 1
+  },
+  {
+   "subcommand": "run",
+   "event": "started",
+   "armed_blob": "5e5f2628e1380cdacdabc84f46785a564680d62b",
+   "defect_rerun_k": null,
+   "reexecution": false,
+   "started_utc": "2026-11-05T23:44:22+00:00",
+   "k": 2
+  },
+  {
+   "subcommand": "run",
+   "event": "writing",
+   "armed_blob": "5e5f2628e1380cdacdabc84f46785a564680d62b",
+   "defect_rerun_k": null,
+   "outputs": [
+    "rows.json",
+    "e6.json"
+   ],
+   "k": 3
+  },
+  {
+   "subcommand": "run",
+   "event": "ended",
+   "armed_blob": "5e5f2628e1380cdacdabc84f46785a564680d62b",
+   "defect_rerun_k": null,
+   "outcome": "ok",
+   "outputs": {
+    "results/EPA_VALIDATION/ford_27tt/STARTED": "34b0cc82c405a5d4c2da8d4273fbcf5f60a66ab76f28e88fe22e35091313a3b3",
+    "results/EPA_VALIDATION/ford_27tt/rows.json": "f380687dc16829520d6516b0f363a717a7ae57012b4908e213bb1a790f9f4cd1",
+    "results/EPA_VALIDATION/ford_27tt/e6.json": "018ac5e883f66b13e95c8c1eea097139e074f0797b81fc64d2925457ea9620c5",
+    "results/EPA_VALIDATION/ford_27tt/run.json": "e91397e361ef3e7ab905186a4b115412180f98da392036dcbe58449477be7871"
+   },
+   "ended_utc": "2026-11-06T00:01:10+00:00",
+   "k": 4
+  }
+ ]
+}
