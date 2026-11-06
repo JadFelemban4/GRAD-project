@@ -4773,3 +4773,29 @@ From "Next actions", item 8, as committed at `3c5fa47`:
    not a finite number (`768a90f`; no statistic seen). Row 144 takes the defect route: X, K2, the Mazda's re-run
    (its labels capped at limited), then the Honda and the Ford (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates
    paused to 30 November. Nothing else in CODE_HASHED or PLANT_CODE changes but X (row 144 (6)); `test_epa_rows` fails once until G.
+
+# Part AH — lines rotated out of CHECKPOINT.md, 6 November 2026 (GRA-test: R4 done; section R, rows 146-147)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `34cca5b`:
+
+- Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
+  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
+  1-145 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
+  row 133; N: W, row 134; O: rows 135-143; P: rows 144-145, the Mazda's defect route); Q: Run 2's labels.
+  Roads: R0 `bb91848`, then R1 `fb20ab2` (the draw of 1 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+  Training runs on another device, not this laptop (21 October).
+
+From "Next actions", item 3, as committed at `34cca5b`:
+
+3. The four-engine preregistration, once build step 2, the test roads (decision
+   34), the training recipe (29) and the device benchmark (32) are in: every one
+   of decisions 1-35 is answered (21 October), so nothing else waits for them.
+
+From "Next actions", item 8, as committed at `34cca5b`:
+
+8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
+   order (sections I-Q). Run 2 is done (5-6 November; the Mazda by row 144's defect route, capped). Section Q:
+   **section 7 drops all three EPA engines** (L1 off on all three), so the four-engine test does not run, and a
+   B58 study across H follows, exploratory, preregistered, never a test of the criterion (row 107 (2)). Next: R4
+   (step 12) with every EPA engine dropped, then the row that fixes what of steps 12a-22 the B58 study needs.
+   Updates paused to 30 November. Nothing else in CODE_HASHED or PLANT_CODE changes before R4; `test_epa_rows` fails once until G.

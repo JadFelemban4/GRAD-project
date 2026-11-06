@@ -487,3 +487,86 @@ called a test of the H/τ criterion: one plant gives one point per H and no coll
 dropped, so the B58 alone gates them); then a row that fixes which of steps 12a-22 the B58 study needs
 (several were for the EPA engines alone: the Honda's CVT record, the Ford's cap, the per-engine backends),
 its preregistration, and the training on Jad's PC.
+
+## 15. 6 November: R4, and the B58 study's route and design (rows 146 and 147)
+
+**R4 ran and was committed** (`34cca5b`, pushed). The C5 re-check and the redraws ran on `52aab23`, clean
+and pushed, from 02:03 to 09:05 UTC (25 312 s), with the WMI check 20 of 20, the platform string
+unchanged and `verify_record` []; exit 0. Version 6, where the B58 alone gates at 1.9 %, fails no slot,
+so decision 34's twenty roads stand exactly as drawn in R1 (redraws.json's version-6 roads equal
+roads.json's). This was predicted from the committed margins before R4 ran (the B58's smallest gated C5
+margin 0.0930), in the agents' scratch files rather than the tree, and held. Version 5, every engine
+gating at its re-check margin, fails 58 of the 75 slots, every one for "C5 case (1) at 7.102 % on
+ford_27tt", and redraws them: 129 redraws and 60 discards, and the 22 slots ending at the cap are exactly
+the 22 flagged gear-sensitive. Version 5 is reported and never scored. R4's commit carries the K gate's
+output, and it ends the freeze of the hashed files (ORDER:5).
+
+**How rows 146 and 147 were made.** A read-only route plan from `52aab23` to "ready for training", three
+read-only maps (R4, the study, ORDER's steps) and a planner's draft row were checked by three adversarial
+reviews: rule 0's integrity (2 blocking, 6 material), feasibility (5 material) and the science (2
+blocking, 9 material). The blocking points were these. The draft had the agents sign two new statements
+for Ghassan under a standing instruction written for the four-engine test. It settled any uncovered
+outcome by a row written after it, which rule 1.11 forbids. It quoted pre-draw planning power at the
+hand-written ceiling as if it bounded d. And it declared no statistic across H for a study defined
+"across H". Ghassan then answered four questions himself, quoted in full in section R's note: his
+standing instruction covers the study ("Yes, it covers it (Recommended)"); he signs both statements
+("Sign both (Recommended)"); "20 seeds (Recommended)" per arm, from three options shown (20, 40 and 64);
+and the knock term "Out of the reward (Recommended)". The drafts of the two rows were then checked by two
+more reviews (integrity and science: 2 blocking, 6 material; feasibility and documents: 9 material and
+their minor points). Their blocking points: the drafts credited both rows wholesale to his four answers,
+and they presented n = 20 as the output of a declared rule that, on the route's own machine time, gives
+28-44. Every blocking and material point of the first three reviews, and every point of the last two,
+is applied in the two rows and in this commit's documents; the science review's registration of Run 2's
+figures with `verify_docs.py` is code, so it is applied by assigning it to commit G (ORDER step 15).
+
+**Who decided what.** Four items are Ghassan's own answers: the standing instruction's extension to this
+study (Q1), the two statements (Q2), n = 20 (Q3) and the reward without the knock term (Q4). Everything
+else in the two rows, the whole route of row 146 and every other item of row 147 among it, is the
+agents' recommendation, adopted under row 133 (2) as his answer Q1 extends it. The Ghassan cells say so:
+row 146's "standing instruction", row 147's naming the three items that are his answers.
+
+**What they fix.** Row 146 (procedure): the route from R4's commit (step 13, RV, P, Qa, G, V, Q, Ta, B1,
+the laptop's pull of B1, Tb, AB, PR-B, PL-B, training); C2, RS and CU dropped; RV in full; P without the
+surrogate path; V without the Ford's cap re-scorer and the declared sensitivity route, with a new module
+for the descriptive rows' readers and X1's two checkers left as they are; Q on the B58 only; a check in
+Ta of the preregistration's commands; the device route on Jad's PC in full, with B1's commit lines and B4
+read as recorded only; `T*`, the commit the pilot and the training run from, fixed as the preregistration's
+own commit; every foreseeable outcome mapped to the consequence already written; the times and the latest
+training start; every sentence of an earlier row or document it replaces. Row 147 (new contract text
+under rule 0, for this study only): one plant, three arms at H = 0.5 τ and 1.5 τ, decision 29's recipe
+on the four-engine road, n = 20 by Ghassan's answer (an amendment of decision 30's rule and of row 114
+for this study, with what a rate-and-window rule would have given disclosed as information only),
+version 6's twenty roads, the paired t and sign tests of d with two-sided intervals, the across-H
+contrast Δ with its prediction and its precision, the power and a dated prediction, the B58's band and a
+companion reading at the EPA engines' measured L1 κ, row 102's four-engine grids reported with their
+label, the sensitivity rows given up by name, decision 12's checks declared as descriptive rows, the
+analysis code committed before scoring, and the two statements.
+
+**What the numbers say before any agent trains** (MEASURED: `results/B58H_DESIGN/power_b58.txt`, the
+committed `four_engine_analysis` functions on roads.json's values). At 20 pairs and the measured spreads
+(20.51-24.78 points), the power at α is 0.23-0.31 at the hand-written ceiling (5.23 points, 5.45 in
+evaluate's form) and 0.11-0.17 at the part only preview buys (2.55-3.22 points); the smallest d
+detectable at 80 % is 11.8-14.3 points. At 32 seeds the power at that part would be 0.18-0.22. The
+across-H contrast is predicted at 3.40 points in evaluate's form, and with spreads like d's its 95 %
+interval at 20 seeds would be about ±10-12 points. On these roads a blind hand-written strategy saves
+more than the sighted one at both H, and by episode reward preview helps on 3 of the 20 roads at r = 1.5
+and none at r = 0.5. A null d is the expected outcome, and it says nothing against the criterion; the
+study is exploratory, never a test of H/τ.
+
+**What was found on the way.** `logged_check.py` and `conditions_test.py`, decision 12's check and its
+transfer battery, cannot score the study's agents as committed: they look only for `sighted_seed*` and
+`blind_seed*` folders, load `final.zip` rather than the checkpoint average, and build the environment at
+the default H. X1's and X2's published results, `make_page.py` and `record_extracts.py` rest on them, so V
+writes the study's readers in a new module and leaves both files as they are, with a before/after run of
+both on X1's agents in its gates (row 147 (11)). `redraws.json` is 36 465 779 bytes, larger than the
+15-25 MB estimated, and under GitHub's limit. A rule fixing n from the rate and the window, evaluated
+now, would give 28-32 with a 5-day defect cycle and 40-44 with a 3-day one on the route's machine time,
+and 24-28 and 36-40 with P's drafting counted at row 134's 33 h; it would give 20 only inside a
+readiness window that is that rule inverted, not an estimate. n = 20 is Ghassan's answer, and row 147 (4)
+says so (`results/B58H_DESIGN/budget.txt`).
+
+**What waits, from here:** step 13 (the defect-route test and the review of the F records), then RV and
+P (about 10.5 h and 20 h of machine time with R4's readings in them), Qa, G, V, Q, Ta, B1 on Jad's PC,
+Tb, AB, the preregistration `results/PREREGISTRATION_B58H.md` (whose own commit is `T*`), the pilot, and the
+training. At step 3's rate the latest training start that ends inside W is 17 November 01:22 AST.
+`CLAUDE.md`'s brackets on gate items 5 and 6 are Ghassan's edit.

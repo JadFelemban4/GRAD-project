@@ -1,0 +1,34 @@
+R4: 25312 s = 7:01:52; ended 06 Nov 12:04 AST; its commit 34cca5b at 06 Nov 13:37 AST
+one wave of 12 runs of 450000 steps at 106.19/12 steps/s per run: 50852.2 s = 14.13 h
+  n 20: 5 waves, 70.63 h; latest start that ends at W's end 17 Nov 01:22 AST
+  n 24: 6 waves, 84.75 h; latest start that ends at W's end 16 Nov 11:14 AST
+  n 28: 7 waves, 98.88 h; latest start that ends at W's end 15 Nov 21:07 AST
+  n 32: 8 waves, 113.00 h; latest start that ends at W's end 15 Nov 06:59 AST
+  n 36: 9 waves, 127.13 h; latest start that ends at W's end 14 Nov 16:52 AST
+  n 40: 10 waves, 141.26 h; latest start that ends at W's end 14 Nov 02:44 AST
+  n 44: 11 waves, 155.38 h; latest start that ends at W's end 13 Nov 12:37 AST
+  n 64: 16 waves, 226.01 h; latest start that ends at W's end 10 Nov 13:59 AST
+the route's machine time after R4's commit (h; ASSUMED but R4's):
+  D146                         1.00   2.00
+  step 13                      1.00   1.00
+  RV: 3.5 h + R4's time       10.53  10.53
+  P: 13 h + R4's time         20.03  20.03
+  Qa                           0.50   1.00
+  G (Q's runs beside it)       3.00   3.00
+  V                            3.00   3.00
+  Q's commit                   0.10   0.20
+  Ta                           0.50   1.00
+  B1 (Jad's PC)                3.00   5.00
+  Tb                           1.50   1.50
+  AB (analysis code)           0.50   1.00
+  PR-B                         1.00  16.00
+  PL-B: one wave + 1-2 h      15.13  16.13
+  total 60.8-81.4 h: ready at the earliest 09 Nov 02:24 to 09 Nov 23:00 AST
+  not counted in the total: the agents' drafting time and Jad's availability (UNKNOWN); V's after-run of X1's logged_check.py and conditions_test.py (row 147 (11): conditions_test about 2.5 h on 18 workers by its docstring, ASSUMED; logged_check UNKNOWN); the descriptive rows' scoring (UNKNOWN)
+INFORMATION ONLY, deciding nothing (n = 20 is Ghassan's answer Q3, row 147 (4)): what a rule 'the largest n in whole waves leaving a defect cycle and the scoring, 10.0 h x n/20, before W ends' would give:
+  machine time, low              ready 09 Nov 02:24: 5-day cycle n 32, 3-day cycle n 44
+  machine time, high             ready 09 Nov 23:00: 5-day cycle n 28, 3-day cycle n 40
+  low + P's drafting 12.97 h     ready 09 Nov 15:23: 5-day cycle n 28, 3-day cycle n 40
+  high + P's drafting 12.97 h    ready 10 Nov 11:59: 5-day cycle n 24, 3-day cycle n 36
+  the rule inverted, not an estimate of readiness: the 5-day rule gives exactly 20 only when ready between 10 Nov 23:14 and 11 Nov 15:22 AST, 24.2-40.4 h after the high estimate
+  n = 20: latest start with the scoring inside W 16 Nov 15:22 AST

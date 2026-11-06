@@ -1,0 +1,9 @@
+schema epa-redraws/1 seed_kind REAL started 2026-11-06T02:02:56+00:00 finished 2026-11-06T09:04:43+00:00
+dropped ['ford_27tt', 'honda_l15b7', 'mazda_25t'] changed_during_run []
+version 6: gating ['b58'] failing [] its 20 roads equal roads.json's roads: True
+version 5: gating ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t'] failing slots 58 of 75 on 20 roads
+  redraws 129 discarded 60 gear_sensitive 22
+  stopped_at {'cap': 22, 'None': 36} kept {'redraw 3': 29, 'redraw 2': 13, 'redraw 1': 16}
+  the re-check's failure reasons over its 75 slots: {'C5 case (1) at 7.102 % on ford_27tt': 58} ; the slots with a failure are exactly the failing list: True
+  slots stopped at the cap 22 ; gear-sensitive 22 ; the same slots: True
+roads.json c5.b58: the B58's smallest gated C5 margin over its 75 slots 0.0930 (slot 28), every slot's outcome {'passes': 75}

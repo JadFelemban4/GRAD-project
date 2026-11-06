@@ -1,0 +1,42 @@
+"""r4_counts.py -- row 146 (1): R4's two readings, counted from results/EPA_ROADS/redraws.json (6 November 2026).
+
+    PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B results/B58H_DESIGN/r4_counts.py.txt .
+
+from the repository root (Python runs a file whatever its extension). Standard library only. It reads
+redraws.json and roads.json, writes nothing, and never accesses roads.json's commit_reveal key.
+Committed as r4_counts.py.txt, so no scan of committed .py files runs it.
+"""
+import collections
+import json
+import sys
+
+REPO = sys.argv[1] if len(sys.argv) > 1 else "."
+d = json.load(open(REPO + "/results/EPA_ROADS/redraws.json", encoding="utf-8"))
+R = json.load(open(REPO + "/results/EPA_ROADS/roads.json", encoding="utf-8"))
+print("schema", d["schema"], "seed_kind", d["seed_kind"], "started", d["started"], "finished", d["finished"])
+print("dropped", d["dropped"], "changed_during_run", d["changed_during_run"])
+v6 = d["readings"]["version 6"]
+print("version 6: gating", v6["gating"], "failing", v6["failing"],
+      "its 20 roads equal roads.json's roads:", v6["roads"] == R["roads"])
+v5 = d["readings"]["version 5 (every engine gating)"]
+slots = v5["slots"]
+print("version 5: gating", v5["gating"], "failing slots", len(v5["failing"]), "of", len(R["slots"]),
+      "on", len({s["road"] for s in slots}), "roads")
+print("  redraws", sum(s["redraws"] for s in slots), "discarded", sum(s["discarded"] for s in slots),
+      "gear_sensitive", sum(1 for s in slots if s["gear_sensitive"]))
+print("  stopped_at", dict(collections.Counter(str(s["stopped_at"]) for s in slots)),
+      "kept", dict(collections.Counter(str(s["kept"]) for s in slots)))
+# Added after the drafts' review (6 November 2026): the two facts the review measured.
+rc = v5["recheck"]
+with_fails = sorted(int(k) for k, x in rc.items() if x["fails"])
+reasons = collections.Counter(f for k, x in rc.items() for f in x["fails"])
+print("  the re-check's failure reasons over its", len(rc), "slots:", dict(reasons),
+      "; the slots with a failure are exactly the failing list:", with_fails == sorted(v5["failing"]))
+cap = {s["slot"] for s in slots if s["stopped_at"] == "cap"}
+gs = {s["slot"] for s in slots if s["gear_sensitive"]}
+print("  slots stopped at the cap", len(cap), "; gear-sensitive", len(gs), "; the same slots:", cap == gs)
+c5 = R["c5"]["b58"]
+worst = min(c5, key=lambda k: c5[k]["smallest_gated_margin"])
+print("roads.json c5.b58: the B58's smallest gated C5 margin over its", len(c5), "slots",
+      f"{c5[worst]['smallest_gated_margin']:.4f}", "(slot", worst + "), every slot's outcome",
+      dict(collections.Counter(x["outcome"] for x in c5.values())))

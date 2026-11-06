@@ -76,11 +76,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
-- Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
-  made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
-  1-145 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
-  row 133; N: W, row 134; O: rows 135-143; P: rows 144-145, the Mazda's defect route); Q: Run 2's labels.
-  Roads: R0 `bb91848`, then R1 `fb20ab2` (the draw of 1 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+- Ghassan · `GRA-test` · build step 2 (decision 24): commits A, C and D made (Run 1 frozen, 30 October;
+  `SESSION_REPORT_2026-10-30_run1.md`). Decisions 1-147 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G,
+  no knock term; J-L; M: he works alone, row 133; N: W; O: rows 135-143; P: rows 144-145; Q: Run 2's labels, all
+  three EPA engines dropped; R: rows 146-147, the B58 study, under row 133 (2) as his answer Q1 extends it; n, the reward and the two statements his own answers Q3, Q4, Q2).
+  Roads: R0 `bb91848`, R1 `fb20ab2`, R4 `34cca5b` (the redraws); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 
 ## Blockers
@@ -98,9 +98,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    and D on one trip.
 2. The proposal's corrections, and the two-plant claim in `CLAUDE.md`
    (`docs/supervisor/2026-10-19_proposal-evaluation.md`, sections 4 to 6).
-3. The four-engine preregistration, once build step 2, the test roads (decision
-   34), the training recipe (29) and the device benchmark (32) are in: every one
-   of decisions 1-35 is answered (21 October), so nothing else waits for them.
+3. The four-engine preregistration is never written: Run 2 dropped all three EPA engines (section Q). The B58
+   study's is `results/PREREGISTRATION_B58H.md`, ORDER step 20 (rows 146-147); Run 2's failed validations are
+   in `results/README.md` and `thesis/LIMITATIONS.md`.
 4. The learning lab's pins move to the live plant (`team/jad.md`). The agents
    page reads each agent's own fingerprint schema and its tests stop copying
    `runs_c4`'s `meta.json`; `test_simulation`'s asset check learns the `?v=`
@@ -113,12 +113,12 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    before taking it up.
 7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
    October); `GRA-test`'s has it since C1 (ORDER step 7).
-8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (sections I-Q). Run 2 is done (5-6 November; the Mazda by row 144's defect route, capped). Section Q:
-   **section 7 drops all three EPA engines** (L1 off on all three), so the four-engine test does not run, and a
-   B58 study across H follows, exploratory, preregistered, never a test of the criterion (row 107 (2)). Next: R4
-   (step 12) with every EPA engine dropped, then the row that fixes what of steps 12a-22 the B58 study needs.
-   Updates paused to 30 November. Nothing else in CODE_HASHED or PLANT_CODE changes before R4; `test_epa_rows` fails once until G.
+8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 13-22 for the B58 study (sections I-R).
+   Run 2 is done (5-6 November): **section 7 drops all three EPA engines**, so the four-engine test does not run.
+   R4 is done (`34cca5b`: version 6, the B58 alone gating, redraws nothing; version 5, 58 Ford slots, reported, never
+   scored). Rows 146-147 (D146) fix the B58 study across H: three arms, n = 20 (Ghassan's answer Q3), knock out of the reward,
+   exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Next: step 13, RV, P.
+   Updates paused to 30 November; the laptop stays frozen until the study's last scoring; `test_epa_rows` fails once until G.
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device: step 3 is item 8's `tools/device_step3.sh` (the lock, the CPU and CUDA

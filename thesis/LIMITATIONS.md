@@ -508,6 +508,61 @@ temperature-matched and should not be quoted as though it were.)*
   not a fix.**
 
 
+### THE THREE EPA ENGINES FAILED THEIR HELD-OUT VALIDATION, AND THE B58 NEVER TOOK ONE. Run 2, 5-6 November 2026
+
+The four-engine test of the H/τ criterion needed three more plants, the Mazda 2.5 T, the Honda L15B7 and
+the Ford 2.7 TT, each calibrated on EPA's test-cell data (Run 1) and then held out against rows the fit
+never saw (Run 2), by a contract committed before any fit. **All three failed, and the four-engine test
+did not run** (`results/VALIDATION_DECISIONS.md` section Q; `results/README.md`, Run 2). The housing-
+temperature row L1 read off on every one; E4b read off on the Mazda and E8 on the Honda and the Ford. An
+off d row drops the engine, by a rule written before Run 2, so the drops are not a choice made after the
+labels. Under version 5 of the contract the result is the same.
+
+What it means for the thesis:
+
+- **The falsifiable version of the claim was not tested.** "Preview value collapses onto one curve
+  against H/τ whatever plant produced the point" needs two plants or more. The project has one that may
+  train, the B58, and on one plant H/τ and H differ by a constant factor. No collapse and no test of H/τ
+  against H is claimed or computed. The criterion is neither supported nor refuted by anything after Run
+  2.
+- **The failure is the models', not the engines'.** Run 2 tested each engine's frozen model against EPA's
+  rows. "Dropped" means that model, as Run 1 calibrated it, missed the contract's held-out bound. L1 is the
+  only held-out test of the housing model the four engines share, and every EPA housing carries the
+  B58's turbine-housing constants (c_turb 6000 J/K, ua_gas_turb 0.90, ua_turb_amb 18.0; decision 45 and
+  row 102). The shared housing model therefore failed its only held-out test on all three engines it
+  was tested on (κ 1.7168, 1.8714 and 3.7328).
+- **The B58 is kept by rule, not by validation.** The contract never drops the B58, and no row of it
+  computes the B58's parts P1, P2, P3 or P5, so each enters the B58's model band at the base band b,
+  labelled "no row: assumed at b", never "validated"; its E8 part takes κ 3.4226 (row 107 (4)). τ is
+  not validated on any engine (the contract, "τ is not validated"), and the B58's c_turb is assumed (the
+  entry on `c_turb` above). The B58 study across H (rows 146 and 147) runs on that plant: every verdict of
+  it is reported with the B58's band and MODEL-LIMITED where the band decides it, and beside it with P3 at
+  the EPA engines' measured κ range, 1.7168-3.7328 (P3 = κ·b, 1.55-3.38 points against b's 0.905), to
+  show whether any verdict rests on the assumed b. That companion reading decides nothing.
+- **The B58 study cannot test the criterion, and is not expected to show a preview effect.** It is
+  exploratory by a rule written before Run 2 (row 107 (2)). On its roads the hand-written saving that
+  only preview buys is negative at H = 0.5 τ and about 2.5-3.2 points at H = 1.5 τ, while a blind
+  hand-written strategy saves more than the sighted one at both H, and the smallest d its 20 seeds per
+  arm can detect at 80 % power is 11.8-14.3 points at the measured spreads (row 147 (7), dated before any
+  of its agents trained). A null d is the expected outcome and says nothing against the criterion. Its
+  across-H contrast, the one statistic that compares the two H, is predicted at about 3.4 points, and at
+  20 seeds its 95 % interval would be about ±10-12 points if its unmeasured spread is like d's (row 147
+  (6)): an interval covering 0 would say nothing about preview value across H.
+- **The hand-written four-engine comparison describes models that failed.** Row 102's curves on the H/τ
+  and H axes were computed on the drawn roads before Run 2 and are reported as computed, labelled
+  "hand-written savings on plants dropped by Run 2's validation; describes the models, not the engines;
+  never evidence for or against the criterion".
+- **The Mazda's result is capped.** Its first held-out run crashed at a summary cell that is not a finite
+  number, before writing anything; the contract's defect route re-ran it after a fix, and a re-run's
+  labels are limited at best. The cap does not move its drop, which off rows decide (section Q.3).
+- **The Honda's C4 is the Accord's engine**, not EPA's L15B7, so its C4 numbers are descriptive only.
+
+What would change it: a held-out validation that the shared housing model passes (a measured c_turb and
+housing heat transfer, decision 24's assumption replaced by measurement), and then plants with τ far
+enough apart to separate H/τ from H, each validated before any agent trains. None of that is in this
+project's time.
+
+
 ### THE KNOCK MODEL IS NOT VALIDATED AGAINST THIS CAR, AND THE DATA SAYS SO
 
 Added 16 September 2026, from AUDIT.md H5. This is a negative result and it is

@@ -1329,3 +1329,221 @@ One check of this sheet and the rows, on the version that applied row 136. It fo
 | w9 | minor | row 136 (2) names the never-written code TC, TD and B1t, which the sheet never defines | row 136 (2), by what each is; 10's opening line |
 
 **C1b's final draft, `4a77e38`** (round 4's review of it; a scratch clone on C0 `e7259ae`, not pushed). It is committed as badcloor, without "(DRAFT)", and takes items 1-5 and 7 of the list above, and item 8 for C1b. Items 6 and 8 for C0 are closed: C0 landed as `fefb7af`, as badcloor, its message carrying verify_docs and ORDER:5's two checks. Item 9 (CU 17a, Ta 17b) is taken in C1b's final draft, `d9a96fa`, with round 4's other C1b findings (PYC set in every session; the four-engine wording of `validity()` and `backend_line()`). The review's other runbook findings are C1b's to settle before its commit; this sheet changes nothing for them.
+
+## 17. Rows 146-147: the B58 study across H (6 November 2026)
+
+*Written by the AI agents on 6 November 2026 with rows 146 and 147 of `results/VALIDATION_DECISIONS.md`
+(section R), after R4 (`34cca5b`) and before ORDER step 13. Run 2 dropped all three EPA engines (section
+Q), so the four-engine test does not run and the B58 study of row 107 (2) follows. This section lists
+every change those two rows make to this sheet, and, under "Words replaced", the sentences beside it that
+they replace. **Where rows 146-147 and this sheet differ, the rows govern** (this sheet's "How it
+binds"); where this section and an earlier section differ, this section governs for the B58 study.
+Everything not named here stands as written.*
+
+**0. The commits, in order.** R4 is done (`34cca5b`, pushed). Then: D146 (rows 146-147, section R, the
+statements, ORDER's rows 12a-22, this section, the README's Run 2 section, the limitation, CHECKPOINT,
+the session report, `results/B58H_DESIGN/`); step 13 (no commit unless its test fails); RV; P; Qa; G; V;
+Q; Ta; B1 (committed and pushed on Jad's PC; the laptop then runs `git pull --ff-only`); Tb; AB (step
+19a, new: the study's analysis code); PR-B (`results/PREREGISTRATION_B58H.md`, whose own commit is `T*`,
+the commit the pilot and the training run from); PL-B (trained on Jad's PC from `T*`, scored and committed
+on the laptop). C2, RS and CU are not made. PR (`results/PREREGISTRATION_4E.md`) is never written.
+Section 0's "It stops at Tb when Tb's record holds n null" (`INTERFACES.md:42`) holds for the four-engine
+test; for this study the order goes on past Tb, as listed here. The order's rule ("Commits that edit the
+same file land in this table's order") is unchanged.
+
+**0.1 The drafting order.** C2's drafts (2c, 4a) are dropped. P's golden digests are measured on step
+13's tree, not on C2's.
+
+**0.2 Times** (row 146 (7); MEASURED: R4's 25 312 s, the rest ASSUMED; `results/B58H_DESIGN/budget.txt`,
+printed by `PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B results/B58H_DESIGN/budget.py.txt`
+from the repository root):
+
+| part | time |
+|---|---|
+| step 13 | about 1 h |
+| RV | about 10.5 h: 3.5 h plus R4's 7.0 h, since RV's sections include every reading of redraws.json (row 140 (1); section 5's `redraws.<reading name>`); its control about 9.2 h of it (2.2 h plus R4's 7.0 h) |
+| P | about 20 h once drafted: the full roads check about 10.7 + 7.0 = 17.7 h |
+| Qa | 0.5-1 h |
+| G | about 3 h, with Q's runs (the B58 only) beside G and V |
+| V | about 3 h, plus its after-run of X1's two checkers (8 below; `conditions_test.py` about 2.5 h on 18 workers by its docstring, ASSUMED; `logged_check.py` UNKNOWN), not in the total |
+| Ta | 0.5-1 h |
+| B1 | 3-5 h on Jad's PC |
+| Tb | about 1.5 h |
+| AB | 0.5-1 h |
+| PR-B | 1-2 h if drafted during the steps before it; up to 16 h from scratch (row 134) |
+| PL-B | one wave of 10 runs, 14.13 h at step 3's rate (450 000 / (106.19/12) s), plus 1-2 h of transfer and reading; row 112's 21 h was the laptop's rate |
+| training | 5 waves, 70.63 h; latest start ending inside W 17 November 01:22 AST (16 November 15:22 AST with the primary scoring inside W) |
+
+The machine time from R4's commit to "ready for training" is 60.8-81.4 h. Not in it, each UNKNOWN: the
+agents' drafting time, Jad's availability, V's after-run of X1's two checkers and the descriptive rows'
+scoring (row 147 (11)).
+
+**1. Rules.** Rule 1.11 stands: row 146 (4) maps every foreseeable outcome of the study's route to the
+consequence already written, and any other outcome stops the step and is reported. Its heading, "Nothing
+waits for a row written after Run 2" (`INTERFACES.md:116`), is read for the outcomes of steps: rows
+146-147 are the design row that Q.5 (VD:622) and row 107 (2) call for, written before anything of the
+study trains, and they settle no step's outcome, so step 13's waiting for D146 does not breach it (row
+146 (9)). Rule 1.5's window is closed at `T*` for this study: PR-B's gate runs `epa_backend.py check` and
+`git diff --quiet <B1's git_head> <T*> -- <the paths of epa_backend.cost_files>` (row 146 (6)). Rule
+1.4's two checks end with R4's commit (ORDER:5's freeze of the hashed files); its rule on the laptop's
+venv and Windows continues until the study's last scoring (row 143 (2); row 146 (8)). Rule 1.10: every
+`__pycache__` folder is deleted before RV's and P's roads checks.
+
+**2. Who edits which file.** Void: C2's lines (`step_record.py`; `train.py`'s recorder; the docstring
+at `four_engine_roads.py:124-127`; `engine_gate.py`'s WHAT WAITS Accord bullet; `test_cars.StepRecord`);
+RS's (`rescore_rows.py` and its test); V's `tit_cap_rescore.py`, `test_tit_cap_rescore.py` and the
+declared sensitivity route (`check_declared`, `Variant`, `score_declared`; row 147 (10)). Added: V writes
+the readers of the descriptive rows for schema-4 agents in a new module, `b58h_descriptive.py`, with
+`test_b58h_descriptive.py`, and adds a declared transfer route in `evaluate.py` (row 147 (11)); V edits
+neither `logged_check.py` nor `conditions_test.py` (P's edit of `conditions_test.py:374`, in section 2's
+"every other `plant_fingerprint` caller" row, stands); G registers Run 2's figures with `verify_docs.py`
+(7 below); AB writes `b58h_analysis.py` and `test_b58h_analysis.py` (row 147 (12)); Ta adds
+`test_epa_backend.PreregistrationB58H` (row 146 (5)); B1 writes `results/benchmarks/B1_device/` and
+`results/B58_IDENTITY/L8_device/` (row 146 (6)).
+
+**3. The runbook.** Part B's header (`DEVICE_RUNBOOK.md:166-168`) reads "with C1 and C1b in its history"
+(its "and C2" replaced). Every session of B1, of PL-B and of the training runs the runbook's "Before you
+start" block (`DEVICE_RUNBOOK.md:14-22`) first, with a new `OUT`, since B1's loop
+(`DEVICE_RUNBOOK.md:250-259`) uses paths relative to `$REPO`. The placeholders are device `cpu`, N 12,
+S 3000, R 2, `PYB=$PY`, `B1OUT=~/grad_device/B1`; the loop runs `b58` alone, and there is no CUDA series.
+B4 (`DEVICE_RUNBOOK.md:367-376`) runs and is recorded, and for this study it decides nothing: it re-makes
+only the frozen dumps of the calibrated EPA plants, all three dropped, and the B58's identity on the
+device is covered by L8 and B2 (its "It must pass", `:375`, is among the words replaced). B5's open
+question is settled: L8's record goes to `results/B58_IDENTITY/L8_device/`, a record of its own beside the
+certificate, never an edit of `results/B58_IDENTITY.md`; `B2_identity_device.json`, `B2_compare.txt` and
+`B4_test_epa_plants.txt` go to `results/benchmarks/B1_device/`. B1 is committed on Jad's PC from the
+detached HEAD B0's checkout leaves at Ta, in `$REPO`:
+
+```bash
+git add results/benchmarks/B1_bench_b58.attempt*.json results/benchmarks/B1_bench_b58.attempt*.txt \
+        results/benchmarks/B0_*.json results/benchmarks/B1_device/ results/B58_IDENTITY/L8_device/
+git status --porcelain            # those paths, and nothing else
+git commit -m "build step 2, ORDER step 18 (B1): the B58's benchmark on Jad's PC, with B2, B4 and L8"
+git push origin HEAD:GRA-test
+```
+
+Nothing is pushed from the laptop between Ta's push and B1's, and the laptop takes B1 with
+`git pull --ff-only` before Tb. For PL-B and the training, Jad checks out `T*` (`git -C "$REPO" fetch &&
+git -C "$REPO" checkout <T*>`), checks that `git status --porcelain` prints nothing and that
+`git -C "$REPO" log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md` prints `T*`. After
+the pilot he returns `runs/b58h_pilot_dt1` and its logs zipped with SHA256SUMS; the practice route scores
+them on the laptop (row 143 (1)), and PL-B is committed from the laptop. After training he returns the
+run folders and their logs the same way.
+
+**4. C2.** Not built (row 146 (3)).
+
+**5. RV.** Unchanged, but it follows step 13, not C2: row 140 (3)'s "after C2 and step 13", and the same
+words in row 140's To-implement (VD:535), read "after step 13". Its control and its check include both
+readings of redraws.json (0.2's times).
+
+**6.1.** The cam-aware surrogate path is not built: row 94's "and the cam-aware surrogate path, off at
+its defaults, whether or not a table is later built" and row 136 (3)'s "Row 94's cam-aware surrogate path
+stays in P, off at its defaults, as row 94 fixes it" are replaced by row 146 (9). The CvtVehicle
+docstring at `engine_env.py:777-778` stays as it is, since C2 is not built.
+
+**6.7.** "Pinned from C2's tree, with the control re-run there before P's edits; both commits are
+recorded" reads: pinned on step 13's tree (D146's, since step 13 waits for D146), with the control re-run
+there before P's edits; both commits are recorded. `test_step_record` is not written and leaves P's list
+(6.7, 14).
+
+**6.9.** Not built: row 135 (5) measured the blinded arm bit for bit at every H.
+
+**7. G.** Besides section 7's contents, G registers Run 2's figures in `results/README.md` (its Run 2
+section, from D146) with `verify_docs.py`, so that they are recomputed from the committed records and
+checked like every published figure (the science review's M1 of rows 146-147, which D146, a documents-only
+commit, assigns here; section R's note), and runs `drift_test.py`, since the guard is touched (CLAUDE.md
+mistake 11). G keeps its place before B1 (row 146 (3)).
+
+**8. V.** Without `tit_cap_rescore`, `test_tit_cap_rescore` and the declared sensitivity route (row 147
+(10)). With: the transfer route in `evaluate.py`, and the descriptive rows' readers in
+`b58h_descriptive.py` (the averaged policy, H and the arm from each agent's meta.json through
+`evaluate.arm_of`, this sheet's section 8), each with a control that fails (row 147 (11)); each arm's
+fuel, the baseline ECU's fuel and the share of demand steps short of the tracking tolerance, per road, in
+the scores' provenance (12.7), which `four_engine_analysis` copies untouched (row 147 (5)). Its
+`train_backend` is read from Tb's record, where `engines.b58.backend` is 'cycle' beside n null. V's gate
+compares with `tools/l7_diff.py`, inside `results/B58_IDENTITY/certificate_tools.tar.gz`, extracted
+outside the repository. V's gate adds a run of `logged_check.py --set /c/Users/badcl/Desktop/GRAD-project/runs/extremes_dt1` and
+`conditions_test.py --set /c/Users/badcl/Desktop/GRAD-project/runs/extremes_dt1 --resume-all` on G's tree before and on V's after
+(the laptop's set by its absolute path: `runs/` is in no clone, and both scripts keep an absolute path,
+`logged_check.py:252-253`, `conditions_test.py:209-211`), each in a scratch clone outside the repository
+with `results/logged_check_extremes_dt1.json` and `results/conditions_extremes_dt1/` removed from the clone,
+so that every part is recomputed. Each run first finds the set's agents, as many as the set holds; then
+the JSON outputs are compared field by field and the records by their arrays, never their bytes, leaving
+out only the records' `commit` (`conditions_test.py:190-196`) and logged_check's elapsed minutes
+(`logged_check.py:290-293`). A refusal counts only when both trees print it after the agents were found. X1's and
+X2's published results, `make_page.py:1383`'s anchor in `conditions_test.py` and `record_extracts.py:55`'s
+import of it rest on those two files, which V leaves as they are.
+
+**8, RS.** Not built (row 147 (10)).
+
+**9. Q.** The B58 only: row 119's gate is "Before any agent of an EPA engine trains", and none trains.
+Two commands, each with `--reward-knock out`: `test_reward.py --engine b58 --train-road four_engine
+--roads results/EPA_ROADS/roads.json`, which prints the band and notch sweep, the blind-arm check at each
+H of the record's H_table (`engine_gate.horizons`, never typed) and each road's share below the torque
+floor (`engine_gate.run_gate`, `engine_gate.py:509-528`, `:410`, `:347-369`); and `check_roads.py` with
+the same options, share off, then with `--roads-record results/EPA_ROADS/roads.json`, share on. Its
+outputs go to `results/ENGINE_GATES/b58/`. "On every engine" (ORDER step 17, this section) reads "on the
+B58".
+
+**10.1.** Unchanged (n null, in_test ['b58']). `Preregistration` keeps requiring
+`results/PREREGISTRATION_4E.md` to be absent. Added, `PreregistrationB58H` (row 146 (5)): unguarded,
+skipped until `results/PREREGISTRATION_B58H.md` is committed, a failure if skipped after; every
+`train_all.py` line carries this section's flag list (`--jobs` = PROTOCOL's runs, `--device` = PROTOCOL's
+device, `--road four_engine`, `--dt 1`, `--third-arm`, `--recipe29`, `--roads-record
+PROTOCOL['roads_record']`, `--reward-knock out`, `--steps 450000`, `--no-resume`, never `--blind-per-h`)
+and `--engine b58`; the training line `--seeds 0-19 --out runs/b58h_dt1`, with no `--ratios`; the pilot
+line `--seeds 2000-2004 --ratios 1.5 --out runs/b58h_pilot_dt1`. Each line runs through
+`train_all.main()` in-process, with `sys.argv` patched to the line's arguments and `train_all.commands`
+replaced by a stub that raises a sentinel, so that `main()` runs its own `parse_args`, `seeds()` and
+`check_four_engine` and stops before any directory or run exists (`train_all.py:271-280`); the sentinel
+carries the parsed arguments and the record `check_four_engine` returned, and the test checks them.
+`train_all.py` is not edited for it. The control, one flag changed, fails.
+
+**10.2.** "ORDER steps 20-22 do not run, and `four_engine_analysis` is not run" holds for the four-engine
+test. For the B58 study, `four_engine_analysis` runs on its scores with the context AB assembles; the
+context's "`seeds_per_arm = record['n']`" (`INTERFACES.md:972`) reads 20 (row 147 (4)), and
+`engines_in_test` is ['b58']. Run 2's drops leave `apply_rule` no schedule drop (`INTERFACES.md:957`), so
+Tb writes no drop line, and its session report gives the failed validations as the result (MD:1611-1612),
+not a failed schedule: `INTERFACES.md:973`'s "with the drop lines (the last EPA engine's among them)" and
+"The session report gives the failed schedule as the result" read so. `validate_context` requires the
+recorded status to equal row 103 (4)'s rule (`four_engine_analysis.py:425-429`), so the context may read
+'confirmatory' while the analysis prints exploratory with one engine (`:668-669`); the report's first
+line, "FOUR-ENGINE TEST (row 113)" (`:860`), is the committed script's fixed header (row 147 (12)). The
+context's model band is computed by AB's code after scoring, per ratio and reading, from the d the
+analysis reads and both arms' realised median cuts (`four_engine_analysis.py:44-56`; MD:1569-1586).
+
+**11. PR → PR-B.** File `results/PREREGISTRATION_B58H.md`. `T*` is its own commit, the one that adds it,
+found by `git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md` (X1's precedent,
+`results/PREREGISTRATION_X1.md:355`); AB's commit is its parent, and `git diff --stat <AB> <T*>` lists
+that file, the session report and CHECKPOINT (rule 1.10), none in `epa_backend.cost_files` or a hashed module. Folders: `runs/b58h_dt1` (training) and `runs/b58h_pilot_dt1` (the pilot), in place of
+`runs/four_engine_dt1_<engine>` and of `INTERFACES.md:980`'s "The pilot uses seeds 2000-2004 in
+`runs/four_engine_pilot_dt1_b58`". Neither is in `train.CLOSED`. The commands are row 147 (3)'s; the
+crash rule is X1's. PR-B copies rows 146 and 147 and adds no choice.
+
+**12.7.** The scores keep `four-engine-scores/1` (arms blind, sighted_r0.5, sighted_r1.5); the delivery
+figures ride in its provenance.
+
+**13. Values read, never typed.** H 23.667534571895 s and 71.002603715685 s (roads.json `H_table.b58`);
+C(0.5) 1.8191 and C(1.5) 5.2319 (roads.json `ceilings.per_engine.b58.by[r].C`); E8's κ 3.4226
+(`results/EPA_TIGHTENINGS.json`, `E8.b58_u_val_kappa.with_roads.kappa`, Q.2); the companion's κ 1.7168
+and 3.7328 (summary.json, each engine's `kappa.L1`); s* from `four_engine_analysis.status_star`.
+
+**14. Gates.** P without `test_step_record`. G with `verify_docs.py` checking Run 2's figures, and
+`drift_test.py`. V without `test_tit_cap_rescore` and `test_step_record`, with `test_scoring_protocol`'s
+transfer-route test, `test_b58h_descriptive` and the before/after run of X1's two checkers (8). Ta with
+`PreregistrationB58H`. AB: `test_b58h_analysis`, `test_four_engine_analysis`, `test_engine_threading`
+(alone), `verify_docs`. PR-B: on its staged tree, `epa_backend.py check` and `git diff --cached --quiet <B1's
+git_head> -- <the paths of epa_backend.cost_files>`; at `T*`, the same two, `git diff --stat <AB> <T*>`,
+`verify_docs`, `Preregistration` (4E absent), `PreregistrationB58H`; push.
+
+**Words replaced** beside this sheet (row 146 (9) lists them all): `DEVICE_RUNBOOK.md:166-168`'s "and
+C2"; B4's "It must pass" (`DEVICE_RUNBOOK.md:375`) and ORDER step 18's `test_epa_plants` gate
+(`ORDER_TO_TRAINING.md:33` at `34cca5b`), read as recorded only for this study; ORDER step 19's "then the
+drop lines" and "A person records any drop" (`ORDER_TO_TRAINING.md:34` at `34cca5b`); and, in this sheet,
+`INTERFACES.md:42`, `:116`'s heading, `:972`, `:973` and `:980`, read as 0, 1, 10.2 and 11 above say.
+
+**Citations corrected** (from the route plan): the WMI check is `docs/build_step_2/RUN2_CHECKLIST.md:65-68`;
+`epa_roads.py`'s exit codes 2 and 3 are at `:2088-2094`; the runbook's B1 loop is
+`DEVICE_RUNBOOK.md:250-259`, and Part B ends at its line 395 (`:397-404` is "What is not here");
+`l7_diff.py` and `make_meta.py` are `tools/l7_diff.py` and `tools/make_meta.py` inside
+`results/B58_IDENTITY/certificate_tools.tar.gz`.

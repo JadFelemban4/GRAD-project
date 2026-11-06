@@ -1,0 +1,50 @@
+four_engine_analysis: ALPHA 0.05, s_star_level(1) 0.05, MEI 5.43, spreads (20.51, 24.78), n 20
+
+POWER of the paired one-sided t at level alpha (four_engine_analysis.power_t), n = 20:
+  d = 5.2319  C_a r=1.5, no-knock mean (roads.json ceilings.per_engine.b58.by['1.5'].a.noknock.mean): power 0.2930 (spread 20.51), 0.2314 (spread 24.78); false-negative risk 0.7070, 0.7686
+  d = 5.4455  C_a r=1.5, no-knock, evaluate's form (.a.noknock.evaluate_form): power 0.3086 (spread 20.51), 0.2429 (spread 24.78); false-negative risk 0.6914, 0.7571
+  d = 2.5494  C_u r=1.5, no-knock mean (.C_u.noknock.mean): power 0.1338 (spread 20.51), 0.1149 (spread 24.78); false-negative risk 0.8662, 0.8851
+  d = 3.2216  C_u r=1.5, no-knock, evaluate's form (.C_u.noknock.evaluate_form): power 0.1667 (spread 20.51), 0.1392 (spread 24.78); false-negative risk 0.8333, 0.8608
+  d = 3.2000  row 113 (6)'s d_obs (A.ROW_113_6['d_obs']): power 0.1656 (spread 20.51), 0.1384 (spread 24.78); false-negative risk 0.8344, 0.8616
+
+MEI comparison (decision 37, 5.43 points):
+  5.2319 < MEI 5.43: C_a r=1.5, no-knock mean (roads.json ceilings.per_engine.b58.by['1.5'].a.noknock.mean)
+  5.4455 >= MEI 5.43: C_a r=1.5, no-knock, evaluate's form (.a.noknock.evaluate_form)
+  2.5494 < MEI 5.43: C_u r=1.5, no-knock mean (.C_u.noknock.mean)
+  3.2216 < MEI 5.43: C_u r=1.5, no-knock, evaluate's form (.C_u.noknock.evaluate_form)
+
+s* (four_engine_analysis.status_star, power 0.8 at alpha/k, k = 1):
+  status_star({'b58': C_a mean}, 20) = {'b58': 9.068679000408256}
+  status_star({'b58': C_a evaluate form}, 20) = {'b58': 9.438985830359869} (beside it; the context's ceiling is the mean form)
+  pilot_factor() = 1.55757542255663 -> the rule reads confirmatory only if s_p <= s*/factor = 5.8223048907145545
+
+SMALLEST d DETECTABLE at power 0.8, level alpha, n = 20 (brentq on four_engine_analysis.power_t):
+  spread 20.51: d = 11.8326 points (2.179 MEI)
+  spread 24.78: d = 14.2960 points (2.633 MEI)
+
+Intermediate n: power at C_u and at C_a, both in evaluate's form, and the smallest d at 80 % (level alpha):
+  n 20: power at C_u(ev) 0.167/0.139; at C_a(ev) 0.309/0.243; smallest d at 80 % 11.83/14.30
+  n 28: power at C_u(ev) 0.202/0.165; at C_a(ev) 0.392/0.305; smallest d at 80 % 9.89/11.95
+  n 32: power at C_u(ev) 0.219/0.177; at C_a(ev) 0.430/0.334; smallest d at 80 % 9.22/11.14
+  n 40: power at C_u(ev) 0.252/0.201; at C_a(ev) 0.502/0.390; smallest d at 80 % 8.21/9.92
+  n 44: power at C_u(ev) 0.268/0.213; at C_a(ev) 0.535/0.417; smallest d at 80 % 7.81/9.44
+  n 64: power at C_u(ev) 0.344/0.269; at C_a(ev) 0.676/0.538; smallest d at 80 % 6.44/7.79
+
+TWO-SIDED 95 % interval half-width for a mean of 20 paired d (t_0.975,19 x s / sqrt(20); scipy.stats.t):
+  spread 20.51: t 2.0930 -> +-9.599 points
+  spread 24.78: t 2.0930 -> +-11.597 points
+
+THE PREDICTION's inputs (roads.json ceilings.per_engine.b58):
+  r = 0.5: H 23.667534571895 s; C (a, mean) 1.8191; C_u mean -0.8634, evaluate form -0.1754; (b) mean 7.3479; (a)'s extra fuel 1.2720 %; best sighted by reward {'cg': 16, 'a@0.5': 0, 'a_b': 0, 'b': 4}
+           roads where the best sighted variant is not the best blind one: []
+  r = 1.5: H 71.002603715685 s; C (a, mean) 5.2319; C_u mean 2.5494, evaluate form 3.2216; (b) mean 7.3479; (a)'s extra fuel 3.9551 %; best sighted by reward {'cg': 16, 'a@1.5': 3, 'a_b': 0, 'b': 1}
+           roads where the best sighted variant is not the best blind one: [0, 4, 18]
+  best blind by reward: {'cg': 16, 'a_b': 0, 'b': 4}
+  dt 0.5 s repeat, the B58's (a) at r = 1.5 moved: no knock -0.0035, knock 1.1735 (report.dt_repeat)
+  row 102's mean spread, four_engines: H/tau axis 0.1566, H axis 0.0603
+  row 102's mean spread, with_one_housing_ford: H/tau axis 0.1699, H axis 0.1790
+  row 102's mean spread, without_ford: H/tau axis 0.0881, H axis 0.0592
+
+THE ACROSS-H CONTRAST's prediction (row 147 (6)): Delta = d(1.5) - d(0.5), from the hand-written C_u:
+  evaluate's form 3.2216 - (-0.1754) = 3.3970; mean form 2.5494 - (-0.8634) = 3.4128
+  its spread is not measured (no spread of a sighted-minus-sighted difference exists); with spreads like a paired d's, its two-sided 95 % half-width at n = 20 is the one printed above

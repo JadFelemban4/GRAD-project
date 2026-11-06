@@ -1,0 +1,77 @@
+"""budget.py -- rows 146 (7) and 147 (4): the route's times from R4's commit, the latest training start, and,
+as information only, what a rate-and-window rule for n would give (n = 20 is Ghassan's answer Q3).
+
+    PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B results/B58H_DESIGN/budget.py.txt
+
+from the repository root (Python runs a file whatever its extension). Arithmetic only (6 November 2026).
+MEASURED inputs: R4's 25 312 s (its wrapper's clock; attempts.jsonl 02:02:55-09:04:43 UTC) and step 3's
+lower_min 106.19 steps/s at 12 at once (results/benchmarks/step3_2026-11-02/A5_bench_merged.json). Every
+other part is ASSUMED (INTERFACES 0.2, row 134), as each line says. It reads nothing and writes nothing.
+Committed as budget.py.txt, so no scan of committed .py files runs it.
+"""
+import math
+from datetime import datetime, timedelta, timezone
+from fractions import Fraction
+
+AST = timezone(timedelta(hours=3))
+R4_S = 25312
+R4H = R4_S / 3600
+lower_min = Fraction("106.19")
+N = 12
+PROD = 450000
+wave = Fraction(PROD) * N / lower_min
+W_end = datetime(2026, 11, 20, 0, 0, tzinfo=AST)
+r4_end = datetime(2026, 11, 6, 9, 4, 43, tzinfo=timezone.utc).astimezone(AST)
+t0 = datetime(2026, 11, 6, 13, 37, 37, tzinfo=AST)     # R4's commit 34cca5b, pushed (its committer date)
+print(f"R4: {R4_S} s = {timedelta(seconds=R4_S)}; ended {r4_end:%d %b %H:%M AST}; its commit 34cca5b at {t0:%d %b %H:%M AST}")
+print(f"one wave of 12 runs of {PROD} steps at {float(lower_min)}/12 steps/s per run: "
+      f"{float(wave):.1f} s = {float(wave) / 3600:.2f} h")
+for n in (20, 24, 28, 32, 36, 40, 44, 64):
+    waves = math.ceil(3 * n / N)
+    t = waves * float(wave)
+    print(f"  n {n}: {waves} waves, {t / 3600:.2f} h; latest start that ends at W's end "
+          f"{(W_end - timedelta(seconds=t)):%d %b %H:%M AST}")
+parts = [("D146", 1, 2), ("step 13", 1, 1),
+         ("RV: 3.5 h + R4's time", 3.5 + R4H, 3.5 + R4H), ("P: 13 h + R4's time", 13 + R4H, 13 + R4H),
+         ("Qa", 0.5, 1), ("G (Q's runs beside it)", 3, 3), ("V", 3, 3), ("Q's commit", 0.1, 0.2), ("Ta", 0.5, 1),
+         ("B1 (Jad's PC)", 3, 5), ("Tb", 1.5, 1.5), ("AB (analysis code)", 0.5, 1), ("PR-B", 1, 16),
+         ("PL-B: one wave + 1-2 h", float(wave) / 3600 + 1, float(wave) / 3600 + 2)]
+lo = sum(p[1] for p in parts)
+hi = sum(p[2] for p in parts)
+print("the route's machine time after R4's commit (h; ASSUMED but R4's):")
+for p in parts:
+    print(f"  {p[0]:<26} {p[1]:6.2f} {p[2]:6.2f}")
+print(f"  total {lo:.1f}-{hi:.1f} h: ready at the earliest {(t0 + timedelta(hours=lo)):%d %b %H:%M}"
+      f" to {(t0 + timedelta(hours=hi)):%d %b %H:%M AST}")
+print("  not counted in the total: the agents' drafting time and Jad's availability (UNKNOWN); V's after-run of"
+      " X1's logged_check.py and conditions_test.py (row 147 (11): conditions_test about 2.5 h on 18 workers by"
+      " its docstring, ASSUMED; logged_check UNKNOWN); the descriptive rows' scoring (UNKNOWN)")
+SCORE20 = 10.0      # ASSUMED: the primary scoring (about 3.9 h), the folders' transfer and their reading, at n = 20
+
+
+def rule(ready, cycle_h):
+    best = None
+    for n in range(4, 400, 4):
+        t = math.ceil(3 * n / N) * float(wave) / 3600 + SCORE20 * n / 20
+        if ready + timedelta(hours=cycle_h + t) <= W_end:
+            best = n
+    return best
+
+
+print("INFORMATION ONLY, deciding nothing (n = 20 is Ghassan's answer Q3, row 147 (4)): what a rule 'the largest n"
+      f" in whole waves leaving a defect cycle and the scoring, {SCORE20} h x n/20, before W ends' would give:")
+extra_P = 33 - (13 + R4H)      # row 134's P, about 33 h with its drafting (VD:515 at 34cca5b), less P's machine time above
+for label, rdy in (("machine time, low", t0 + timedelta(hours=lo)),
+                   ("machine time, high", t0 + timedelta(hours=hi)),
+                   (f"low + P's drafting {extra_P:.2f} h", t0 + timedelta(hours=lo + extra_P)),
+                   (f"high + P's drafting {extra_P:.2f} h", t0 + timedelta(hours=hi + extra_P))):
+    print(f"  {label:<30} ready {rdy:%d %b %H:%M}: 5-day cycle n {rule(rdy, 120)}, 3-day cycle n {rule(rdy, 72)}")
+need20 = 5 * float(wave) / 3600 + SCORE20
+need24 = 6 * float(wave) / 3600 + SCORE20 * 24 / 20
+a = W_end - timedelta(hours=120 + need24)
+b = W_end - timedelta(hours=120 + need20)
+hi_ready = t0 + timedelta(hours=hi)
+print(f"  the rule inverted, not an estimate of readiness: the 5-day rule gives exactly 20 only when ready between"
+      f" {a:%d %b %H:%M} and {b:%d %b %H:%M AST}, {(a - hi_ready).total_seconds() / 3600:.1f}-"
+      f"{(b - hi_ready).total_seconds() / 3600:.1f} h after the high estimate")
+print(f"  n = 20: latest start with the scoring inside W {(W_end - timedelta(hours=need20)):%d %b %H:%M AST}")

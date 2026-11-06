@@ -1,0 +1,104 @@
+"""power_b58.py -- row 147 (7): the B58 study's power, s* and smallest detectable d (6 November 2026).
+
+    PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B results/B58H_DESIGN/power_b58.py.txt .
+
+from the repository root (Python runs a file whatever its extension).
+
+Written by the AI agents for rows 146-147 (results/VALIDATION_DECISIONS.md section R), before any agent of
+the study trains. It imports the COMMITTED four_engine_analysis (read-only: that module reads two JSON
+files and nothing else, and no plant) and calls its power_t, status_star, s_star_level and pilot_factor on
+the B58's hand-written ceilings as results/EPA_ROADS/roads.json holds them; scipy.optimize.brentq on
+power_t gives the smallest d at power 0.8. It reads roads.json and nothing else, writes nothing, and never
+accesses roads.json's commit_reveal key. Committed as power_b58.py.txt, so no scan of committed .py files runs it.
+"""
+import json
+import math
+import sys
+
+REPO = sys.argv[1] if len(sys.argv) > 1 else "."
+sys.path.insert(0, REPO)
+import four_engine_analysis as A          # noqa: E402
+from scipy import stats                   # noqa: E402
+from scipy.optimize import brentq         # noqa: E402
+
+R = json.load(open(REPO + "/results/EPA_ROADS/roads.json", encoding="utf-8"))
+pe = R["ceilings"]["per_engine"]["b58"]
+by = pe["by"]
+C = {
+    "C_a r=1.5, no-knock mean (roads.json ceilings.per_engine.b58.by['1.5'].a.noknock.mean)": by["1.5"]["a"]["noknock"]["mean"],
+    "C_a r=1.5, no-knock, evaluate's form (.a.noknock.evaluate_form)": by["1.5"]["a"]["noknock"]["evaluate_form"],
+    "C_u r=1.5, no-knock mean (.C_u.noknock.mean)": by["1.5"]["C_u"]["noknock"]["mean"],
+    "C_u r=1.5, no-knock, evaluate's form (.C_u.noknock.evaluate_form)": by["1.5"]["C_u"]["noknock"]["evaluate_form"],
+    "row 113 (6)'s d_obs (A.ROW_113_6['d_obs'])": A.ROW_113_6["d_obs"],
+}
+SPREADS = A.ROW_113_6["spreads"]          # (20.51, 24.78): X2's and X1's measured spreads of a paired d
+N = 20
+LEVEL = A.s_star_level(1)                 # one engine in the test: alpha / 1
+NAMES = list(C)
+
+print(f"four_engine_analysis: ALPHA {A.ALPHA}, s_star_level(1) {LEVEL}, MEI {A.MEI}, spreads {SPREADS}, n {N}")
+print()
+print("POWER of the paired one-sided t at level alpha (four_engine_analysis.power_t), n = 20:")
+for name, d in C.items():
+    p = [A.power_t(d, s, N, LEVEL) for s in SPREADS]
+    print(f"  d = {d:.4f}  {name}: power {p[0]:.4f} (spread {SPREADS[0]}), {p[1]:.4f} (spread {SPREADS[1]});"
+          f" false-negative risk {1 - p[0]:.4f}, {1 - p[1]:.4f}")
+print()
+print("MEI comparison (decision 37, 5.43 points):")
+for name in NAMES[:4]:
+    d = C[name]
+    print(f"  {d:.4f} {'<' if d < A.MEI else '>='} MEI {A.MEI}: {name}")
+print()
+c15 = by["1.5"]["a"]["noknock"]["mean"]
+s_star = A.status_star({"b58": c15}, N)
+print("s* (four_engine_analysis.status_star, power 0.8 at alpha/k, k = 1):")
+print("  status_star({'b58': C_a mean}, 20) =", s_star)
+print("  status_star({'b58': C_a evaluate form}, 20) =",
+      A.status_star({"b58": by["1.5"]["a"]["noknock"]["evaluate_form"]}, N),
+      "(beside it; the context's ceiling is the mean form)")
+print("  pilot_factor() =", A.pilot_factor(), "-> the rule reads confirmatory only if s_p <= s*/factor =",
+      s_star["b58"] / A.pilot_factor())
+print()
+print("SMALLEST d DETECTABLE at power 0.8, level alpha, n = 20 (brentq on four_engine_analysis.power_t):")
+for s in SPREADS:
+    dmin = brentq(lambda d: A.power_t(d, s, N, LEVEL) - 0.8, 1e-6, 200.0, xtol=1e-10)
+    print(f"  spread {s}: d = {dmin:.4f} points ({dmin / A.MEI:.3f} MEI)")
+print()
+print("Intermediate n: power at C_u and at C_a, both in evaluate's form, and the smallest d at 80 % (level alpha):")
+for n in (20, 28, 32, 40, 44, 64):
+    pu = [A.power_t(C[NAMES[3]], s, n, LEVEL) for s in SPREADS]
+    pa = [A.power_t(C[NAMES[1]], s, n, LEVEL) for s in SPREADS]
+    dm = [brentq(lambda d: A.power_t(d, s, n, LEVEL) - 0.8, 1e-6, 200.0, xtol=1e-10) for s in SPREADS]
+    print(f"  n {n:>2}: power at C_u(ev) {pu[0]:.3f}/{pu[1]:.3f}; at C_a(ev) {pa[0]:.3f}/{pa[1]:.3f}; "
+          f"smallest d at 80 % {dm[0]:.2f}/{dm[1]:.2f}")
+print()
+print("TWO-SIDED 95 % interval half-width for a mean of 20 paired d (t_0.975,19 x s / sqrt(20); scipy.stats.t):")
+t975 = float(stats.t.ppf(0.975, N - 1))
+for s in SPREADS:
+    print(f"  spread {s}: t {t975:.4f} -> +-{t975 * s / math.sqrt(N):.3f} points")
+print()
+print("THE PREDICTION's inputs (roads.json ceilings.per_engine.b58):")
+for r in ("0.5", "1.5"):
+    b = by[r]
+    print(f"  r = {r}: H {b['H_s']} s; C (a, mean) {b['a']['noknock']['mean']:.4f}; C_u mean "
+          f"{b['C_u']['noknock']['mean']:.4f}, evaluate form {b['C_u']['noknock']['evaluate_form']:.4f}; "
+          f"(b) mean {b['b']['noknock']['mean']:.4f}; (a)'s extra fuel {b['fuel_extra_pct']['a']['mean']:.4f} %; "
+          f"best sighted by reward {b['best_sighted']['counts']}")
+    diff = [i for i, (x, y) in enumerate(zip(b["best_sighted"]["per_road"], pe["best_blind"]["per_road"])) if x != y]
+    print(f"           roads where the best sighted variant is not the best blind one: {diff}")
+print(f"  best blind by reward: {pe['best_blind']['counts']}")
+dr = R["report"]["dt_repeat"]["engines"]["b58"]["moved"]
+print(f"  dt 0.5 s repeat, the B58's (a) at r = 1.5 moved: no knock {dr['noknock']:.4f}, knock {dr['knock']:.4f}"
+      " (report.dt_repeat)")
+sp = R["report"]["grids"]["spreads"]
+for k in ("four_engines", "with_one_housing_ford", "without_ford"):
+    print(f"  row 102's mean spread, {k}: H/tau axis {sp[k]['H_over_tau_axis']['mean_spread']:.4f}, "
+          f"H axis {sp[k]['H_axis']['mean_spread']:.4f}")
+print()
+print("THE ACROSS-H CONTRAST's prediction (row 147 (6)): Delta = d(1.5) - d(0.5), from the hand-written C_u:")
+cu5, cu15 = by["0.5"]["C_u"]["noknock"], by["1.5"]["C_u"]["noknock"]
+print(f"  evaluate's form {cu15['evaluate_form']:.4f} - ({cu5['evaluate_form']:.4f}) = "
+      f"{cu15['evaluate_form'] - cu5['evaluate_form']:.4f}; mean form {cu15['mean']:.4f} - ({cu5['mean']:.4f}) = "
+      f"{cu15['mean'] - cu5['mean']:.4f}")
+print("  its spread is not measured (no spread of a sighted-minus-sighted difference exists); with spreads like a"
+      " paired d's, its two-sided 95 % half-width at n = 20 is the one printed above")

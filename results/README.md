@@ -1,4 +1,87 @@
-# `results/` — Phase D, Phase D2, C4, the 29 September retrain, X1 and X2
+# `results/` — Phase D, Phase D2, C4, the 29 September retrain, X1, X2 and Run 2
+
+## Run 2 — the held-out validation of the three EPA engines: ALL THREE DROPPED (5–6 November 2026)
+
+```bash
+python -c "import json; d = json.load(open('results/EPA_VALIDATION/summary.json', encoding='utf-8')); [print(e, v['drop'], v['drop_rows'], v['governed_by'], v['labels']) for e, v in d['engines'].items()]"
+# each engine: dropped or not, the rows that dropped it, the entry that governs it, its labels.
+# Every row with its E, u_val and κ: results/VALIDATION_DECISIONS.md section Q (one script extracted it
+# from the committed records, a second recomputed it: 3,423 comparisons, no discrepancy).
+```
+
+Its own experiment, with no agent in it. The four-engine test (decision 24) needed the Mazda
+2.5 T, the Honda L15B7 and the Ford 2.7 TT to pass a held-out validation against EPA's test-cell data
+before any of them could train. Run 2 is that validation: each engine's plant as Run 1 froze it
+(`25437ba`, form A+B+C+D, no form passing in-sample, decisions 82 and 93) against the held-out rows, by
+the contract committed before any fit (`ENGINE_THRESHOLDS.md`, version 5, with section I's version-6
+rows), on the team laptop, one engine at a time, in the order Mazda, Honda, Ford (row 106). The runs of
+F2, F3 and F4 each have outcome "ok", and their run records list nothing outside the allowlist; F1, the
+Mazda's first run, crashed before writing any output (below). Commits: the Mazda's E1 `c3ff39e` and
+F1 `768a90f` (the crash), the defect route of rows 144-145 (V `115300b`, V2 `3c5fa47`, X `3879805`,
+K2 `cc9f906`), its E2 `1e5a54d` and F2 `4181eb6`; the Honda's E3 `30f6400` and F3 `580d39d`; the Ford's
+E4 `d7b5fcb` and F4 `9140941`, with summary.json; the labels, L `52aab23`.
+
+Section 7 drops an engine for an off d row (the contract, section 7). The rows that decided it, each E in
+its row's unit against R:
+
+| engine | dropped by | L1, housing temperature (K; R 9.9) | E4b (%; R 16.6) | E8 (%; R 16.6) | D1 (%; R 16.6) | governing entry |
+|---|---|---|---|---|---|---|
+| Mazda 2.5 T | E4b off, L1 off | 15.2977, **off**, κ 1.7168 | 74.1392, **off**, κ 6.1739 | 8.2135, untested, κ 1.9768 | 4.0659, limited (validated as computed; the cap) | `rows_rerun1.json`, the defect re-run |
+| Honda L15B7 | L1 off, E8 off | 17.4417, **off**, κ 1.8714 | −20.7385, limited, κ 1.5180 | 158.8072, **off**, κ 11.4575 | 2.9623, validated | `rows.json` |
+| Ford 2.7 TT | L1 off, E8 off | 34.9137, **off**, κ 3.7328 | 223.9956, untested, κ 26.0360 | 157.8508, **off**, κ 11.4056 | 3.7770, validated | `rows.json` |
+
+- **L1 reads off on all three.** It is the only held-out test of the housing model the four engines
+  share: every EPA housing carries the B58's c_turb, ua_gas_turb and ua_turb_amb (row 102's Disclosed).
+  It had failed in-sample beyond its noise on all three as well (section I's note).
+- **The level rows bind but never drop an engine.** E1a reads off on all three; the 850 °C level label
+  reads off on all three (section Q.2).
+- **Version 5 beside version 6** (section Q.4): version 5 has no reading of a summary cell that is not a
+  finite number, so the Mazda's C3 is absent there, and E4b and L1 lie outside it: the Mazda is dropped
+  under version 5 too. The Honda's and the Ford's records agree under both versions. No EPA engine
+  survives under either.
+- **The Mazda's two attempts** (section Q.3; row 144). Attempt 1 crashed in `d3_rows.read_summary` at a
+  modal-fuel cell that is not a finite number (`EPA_VALIDATION/mazda_25t/crash_1.txt`), before writing
+  any output: statistics were computed in memory and never written or seen. Attempt 2, the defect re-run
+  on the fix X, reads every label limited at best by the contract's cap; the cap changed 7 label paths in
+  `rows_rerun1.json`, 5 in `e6_rerun1.json` and none in `c3_rerun1.json`, and it changes nothing in
+  section 7, whose drop is decided by off rows. 7 of C3's 43 tests had an empty modal fuel cell, each
+  left out of the Direct2 check alone (`direct2_compared_n` 36).
+- **The descriptive rows** (section Q.6), reported and gating nothing:
+
+| engine | E1b | E1i (transient) | E2b | E3b | C3a / C4's fuel, hot | C3c / C4's air, hot |
+|---|---|---|---|---|---|---|
+| Mazda 2.5 T | 6.3546 % | −2.4517 % | 6.1172 % | 31.0571 K | −13.5443 % (C3a) | −8.4737 % (C3c) |
+| Honda L15B7 | 8.3225 % | 4.4642 % | 7.7189 % | 27.3341 K | −7.0440 % (C4) | −8.9357 % (C4) |
+| Ford 2.7 TT | 7.1232 % | 12.0202 % | 6.9588 % | 36.5898 K | — | — |
+
+  The Honda's C4 on the Accord's fired segments reads fuel 12.3278 % and air 13.4586 %, descriptive, C4
+  being the Accord's engine and not EPA's L15B7.
+- **What follows, by rules written before Run 2** (the contract: "If no EPA engine survives, the
+  four-engine test does not run, and the failed validations are reported as results"; row 107 (2)): the
+  four-engine test does not run. No collapse on H/τ and no test of H/τ against H is claimed or
+  computed. A B58 study across H follows, a declared exploratory study, never a test of the criterion
+  (rows 146 and 147, section R): three arms, 20 seeds per arm, expected to read null (row 147 (7)), its
+  across-H contrast predicted at about 3.4 points with an interval of about ±10-12 points (row 147 (6)).
+- **The roads after Run 2** (R4, `34cca5b`, 6 November): with every EPA engine dropped the B58 alone
+  gates version 6, and no slot fails, so decision 34's twenty stand as drawn; version 5, every engine
+  gating, fails 58 of the 75 slots on the Ford at 7.102 % and redraws them (129 redraws, 22 slots at the
+  cap). Version 5's set is reported and never scored (row 146 (1); `EPA_ROADS/redraws.json`).
+- **Row 102's hand-written four-engine comparison**, computed on the drawn roads before Run 2
+  (`EPA_ROADS/roads.json`, `report.grids`), is reported as computed and labelled "hand-written savings on
+  plants dropped by Run 2's validation; describes the models, not the engines; never evidence for or
+  against the criterion" (row 147 (9)). Its mean spread is 0.1566 on the H/τ axis and 0.0603 on the H
+  axis for the four engines, 0.1699 and 0.1790 with the one-housing Ford beside them, and 0.0881 and
+  0.0592 without the Ford (`B58H_DESIGN/power_b58.txt`).
+
+**The sentence that may be said:** *"The three EPA engines' models, calibrated on EPA's test-cell data,
+failed the held-out validation fixed before their fit: the housing-temperature row L1 read off on all
+three, so the four-engine test of the H/τ criterion did not run."* Never "the H/τ criterion fails":
+nothing about the criterion was tested. And never "the B58 is validated": it was never held out (section
+I; `thesis/LIMITATIONS.md`, Run 2).
+
+The full record: `results/VALIDATION_DECISIONS.md` section Q (labels, κ, drops, both versions) and
+section P (the Mazda's defect route); `EPA_VALIDATION/summary.json` and each engine's records;
+`SESSION_REPORT_2026-10-31_build-step-2.md` sections 13 and 14.
 
 ## X2 — wider air, 5 seeds a side, 1200 episodes: INCONCLUSIVE, not converged (11–13 October 2026)
 
