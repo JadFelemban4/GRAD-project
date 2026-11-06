@@ -4758,3 +4758,18 @@ From "In progress", Ghassan's `GRA-test` item, as committed at `115300b` (row 14
 
   1-144 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
   row 133; N: W, row 134; O: rows 135-143, 136 his own answer; P: row 144, the Mazda's defect route, 5 November).
+
+# Part AG — lines rotated out of CHECKPOINT.md, 6 November 2026 (GRA-test: Run 2 done; section Q, the labels)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `3c5fa47`:
+
+  1-145 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
+  row 133; N: W, row 134; O: rows 135-143, 136 his own answer; P: rows 144-145, the Mazda's defect route).
+
+From "Next actions", item 8, as committed at `3c5fa47`:
+
+   order (sections I-P; `docs/build_step_2/INTERFACES.md`). Done: R0, R1, R3b; W; step 3 on Jad's PC; C0, C1b;
+   rows 135-143; the rehearsal. Run 2 (5 November): the Mazda's first run crashed at a D3 summary cell that is
+   not a finite number (`768a90f`; no statistic seen). Row 144 takes the defect route: X, K2, the Mazda's re-run
+   (its labels capped at limited), then the Honda and the Ford (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates
+   paused to 30 November. Nothing else in CODE_HASHED or PLANT_CODE changes but X (row 144 (6)); `test_epa_rows` fails once until G.

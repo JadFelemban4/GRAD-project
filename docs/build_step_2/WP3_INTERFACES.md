@@ -638,7 +638,16 @@ In-sample: {`R`, `unit`, `kind`, `E`, `lines` ({line: {`E`, `clusters`}}), `deci
 
 ### 7.9 `c3.json` and `c4_accord.json`
 
-`c3.json`: `schema` `"epa-c3/1"`; `provenance`; `files` (int); `segments` ({`n`, `hot`, `fired`, `outside_charge_range`}); `channel_checks` ({`direct2_vs_summary` ([{`test`, `ratio`}]), `maf_vs_direct2` ({`median_ratio`, `u_D`}), `pcm_map_closed_throttle` ({`below_baro`: bool, `n`}), `flat_maxima_dropped` (int)}); `fuel_scaling` (float); `rows` ({`C3a`, `C3b`, `C3c`, `C3d`: StatResult}); `eta` ({`0.86`, `0.98`: {`C3b`, `C3d`}}). `c4_accord.json`: the same keys, every row descriptive.
+`c3.json`: `schema` `"epa-c3/1"`; `provenance`; `files` (int); `segments` ({`n`, `hot`, `fired`, `outside_charge_range`}); `channel_checks` ({`direct2_vs_summary` ([{`test`, `ratio`}]), `maf_vs_direct2` ({`median_ratio`, `u_D`}), `pcm_map_closed_throttle` ({`below_baro`: bool, `n`}), `flat_maxima_dropped` (int)}); `fuel_scaling` (float); `rows` ({`C3a`, `C3b`, `C3c`, `C3d`: StatResult}); `eta` ({`0.86`, `0.98`: {`C3b`, `C3d`}}). `c4_accord.json`: the same keys, every row descriptive. Decisions 144
+and 145 (5 November 2026, before the Mazda's re-run) add: `tests_in_chain` (int); `left_out` ({`rule`,
+`chain_no_cell_temperature`, `segments_not_evaluated`, `fuel_rows_no_heating_value`,
+`fuel_rows_heating_value_not_positive`, `direct2_check_no_modal_fuel`}); `summary_rows`' `unread` ({column:
+{`base_rows`, `kinds`}}), its `cell_temp_c` and `cell_temp_spread_c` null where unread; `channel_checks`'
+`direct2_compared_n` and `direct2_left_out` ({`modal_fuel_not_a_finite_number`, `modal_fuel_not_positive`}), and
+`direct2_vs_summary`'s `modal_g` and `ratio` null without a modal fuel; `segments`' `fuel_no_heating_value`; each
+row's `extra.segments_model_output_not_finite`, and each fuel row's `extra.segments_from_tests_outside_direct2_check`
+and `without.tests_outside_direct2_check`; `eta_segments_model_output_not_finite` ({`nominal`, `0.86`, `0.98`:
+{`C3b`, `C3d`}}). The record is written through `validate_epa.json_ready`.
 
 ### 7.10 `STARTED` and `crash_<k>.txt` (validation)
 
@@ -646,7 +655,7 @@ In-sample: {`R`, `unit`, `kind`, `E`, `lines` ({line: {`E`, `clusters`}}), `deci
 
 ### 7.11 `results/EPA_VALIDATION/summary.json`
 
-`schema` `"epa-summary/1"`; `engines`: {id: {`rows_sha_text`, `labels` ({row: label}), `kappa` ({row: float}), `level_850c_label`, `drop` (bool), `drop_rows`, `c5_recheck_margin`}}; `drop_order` (MD §7's, as text); `inputs` ({path: sha_text}).
+`schema` `"epa-summary/1"`; `engines`: {id: {`rows_sha_text`, `labels` ({row: label}), `kappa` ({row: float}), `level_850c_label`, `drop` (bool), `drop_rows`, `c5_recheck_margin`}}; `drop_order` (MD §7's, as text); `inputs` ({path: sha_text}). Decision 144 (5): each engine's top-level entry is the governing one, its highest-k defect re-run's once one has its rows, else its first's, with `governed_by` (that rows file), `first` (the first attempt's entry, or {`crashed`: [its crash records]}), `reruns` ({`rows_rerun<k>.json`: entry}) and `steady_only_tit`; an engine whose latest attempt is open, crashed or not "ok" is refused.
 
 ## 8. Each contract row, and the function that computes it
 

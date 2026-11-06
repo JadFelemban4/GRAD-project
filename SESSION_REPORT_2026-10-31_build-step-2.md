@@ -32,7 +32,13 @@ figure below names the run that printed it; the commit messages hold each gate's
 | `c3ff39e` | E | Run 2, the Mazda's arming: ARMED.json and the calibration run.json; section 13 |
 | `768a90f` | F | the Mazda's first run's records: STARTED, crash_1.txt, run.json, the invocation log (a crash, TraceDefect); section 13 |
 | `115300b` | V | row 144 (section P), the defect route; ORDER's status and rule, CHECKPOINT; section 13 |
-| this one | V2 | row 145, row 144 made exact before X; CHECKPOINT; section 13 |
+| `3c5fa47` | V2 | row 145, row 144 made exact before X; CHECKPOINT; section 13 |
+| `3879805` | X | the fix with its tests (d3_rows.py, validate_epa.py; 20 + 6 mutants); section 13 |
+| `cc9f906` | K2 | the three engines' calibration checks on X, their defects.json entries; section 13 |
+| `1e5a54d`, `4181eb6` | E2, F2 | the Mazda's re-arming and defect re-run, every label limited at best; section 14 |
+| `30f6400`, `580d39d` | E3, F3 | the Honda's arming and run; section 14 |
+| `d7b5fcb`, `9140941` | E4, F4 | the Ford's arming and run, and summary.json; section 14 |
+| this one | L | section Q: the labels, section 7 and the drops; WP3 7.9 and 7.11; ORDER, CHECKPOINT; section 14 |
 
 Every commit was gated first by every suite of `epa_freeze.STEP2_TESTS` (row 120) and the
 step's own tests, with `test_epa_rows`' one known row-120 failure each time. All are pushed.
@@ -455,3 +461,29 @@ statements exact (the versions' agreement, the stops that stay, what the tests c
 
 **What waits, from here:** X (the fix with its tests), K2 (each engine's `check --defect` on X), the
 Mazda's re-arming and capped re-run, then the Honda and the Ford, then the labels (step 11).
+
+## 14. 5-6 November: Run 2 finished, and section 7 drops all three EPA engines
+
+**Run 2 ran to the end.** After row 144's route (V, V2, X, K2), the Mazda re-armed and its defect re-run
+finished in 24 minutes, outcome "ok" (`1e5a54d`, `4181eb6`; every label limited at best). Seven of C3's 43
+tests had an empty modal fuel cell, each left out of the Direct2 check alone, so without the fix the run
+would have stopped at the first of them again. The Honda (54 minutes, the Accord's D3 chain) and the Ford
+(17 minutes) ran on the normal route, uncapped, outcome "ok"; summary.json was written with the Ford's F.
+Nothing was opened outside any run's allowlist.
+
+**The labels (section Q of the decision sheet), recorded from the committed records, extracted by one script
+and recomputed by a second.** Section 7 drops all three EPA engines: L1 is off on all three (it failed
+in-sample on all three too), E4b on the Mazda and E8 on the Honda and the Ford. D1 is the one d row that
+holds everywhere (validated on the Honda and the Ford; on the Mazda validated as computed, limited by the
+cap). Under version 5 the Mazda is dropped as well (its C3 absent there), and the Honda and the Ford read
+the same under both versions.
+
+**What it means, by rules written before Run 2 (MD section 7; row 107 (2)):** the four-engine test does not
+run, and the failed validations are reported as results. A B58 study across H follows, at r = 0.5 and
+r = 1.5 and on row 102's curve, as a declared exploratory study, preregistered before it trains, and never
+called a test of the H/τ criterion: one plant gives one point per H and no collapse.
+
+**What waits, from here:** R4 (ORDER step 12: the C5 re-check and the redraws, with every EPA engine
+dropped, so the B58 alone gates them); then a row that fixes which of steps 12a-22 the B58 study needs
+(several were for the EPA engines alone: the Honda's CVT record, the Ford's cap, the per-engine backends),
+its preregistration, and the training on Jad's PC.

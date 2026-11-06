@@ -79,7 +79,7 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - Ghassan · `GRA-test` · the four-engine test (decision 24): commits A, C and D
   made (Run 1 frozen, 30 October; `SESSION_REPORT_2026-10-30_run1.md`). Decisions
   1-145 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G, no knock term; J-L; M: he works alone,
-  row 133; N: W, row 134; O: rows 135-143, 136 his own answer; P: rows 144-145, the Mazda's defect route).
+  row 133; N: W, row 134; O: rows 135-143; P: rows 144-145, the Mazda's defect route); Q: Run 2's labels.
   Roads: R0 `bb91848`, then R1 `fb20ab2` (the draw of 1 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 
@@ -114,11 +114,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 7. `main`'s `train.py` `CLOSED` list still has no `wideair_dt1` (X2, published 13
    October); `GRA-test`'s has it since C1 (ORDER step 7).
 8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 3-22 in
-   order (sections I-P; `docs/build_step_2/INTERFACES.md`). Done: R0, R1, R3b; W; step 3 on Jad's PC; C0, C1b;
-   rows 135-143; the rehearsal. Run 2 (5 November): the Mazda's first run crashed at a D3 summary cell that is
-   not a finite number (`768a90f`; no statistic seen). Row 144 takes the defect route: X, K2, the Mazda's re-run
-   (its labels capped at limited), then the Honda and the Ford (`docs/build_step_2/RUN2_CHECKLIST.md`). Updates
-   paused to 30 November. Nothing else in CODE_HASHED or PLANT_CODE changes but X (row 144 (6)); `test_epa_rows` fails once until G.
+   order (sections I-Q). Run 2 is done (5-6 November; the Mazda by row 144's defect route, capped). Section Q:
+   **section 7 drops all three EPA engines** (L1 off on all three), so the four-engine test does not run, and a
+   B58 study across H follows, exploratory, preregistered, never a test of the criterion (row 107 (2)). Next: R4
+   (step 12) with every EPA engine dropped, then the row that fixes what of steps 12a-22 the B58 study needs.
+   Updates paused to 30 November. Nothing else in CODE_HASHED or PLANT_CODE changes before R4; `test_epa_rows` fails once until G.
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.
 10. On the training device: step 3 is item 8's `tools/device_step3.sh` (the lock, the CPU and CUDA
