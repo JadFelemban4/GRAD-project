@@ -4799,3 +4799,17 @@ From "Next actions", item 8, as committed at `34cca5b`:
    B58 study across H follows, exploratory, preregistered, never a test of the criterion (row 107 (2)). Next: R4
    (step 12) with every EPA engine dropped, then the row that fixes what of steps 12a-22 the B58 study needs.
    Updates paused to 30 November. Nothing else in CODE_HASHED or PLANT_CODE changes before R4; `test_epa_rows` fails once until G.
+
+# Part AI — lines rotated out of CHECKPOINT.md, 7 November 2026 (GRA-test: step 13 passed; RV, the roads re-verifier)
+
+From the header, as committed at `a3cd3a3`:
+
+Last verified: 2026-11-02 (on `GRA-test`, at R3b `4da4a31`, after R0 and R1: the roads drawn, the tightenings written) — verify_docs.py 74/74 · drift_test.py 18/18 (R3b's gate) · the app suites at R3b: the known `?v=` asset checks and the `pwsh` launcher test fail, as on 15 October (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 8)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `a3cd3a3`:
+
+  Roads: R0 `bb91848`, R1 `fb20ab2`, R4 `34cca5b` (the redraws); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+
+From "Next actions", item 8, as committed at `a3cd3a3`:
+
+   exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Next: step 13, RV, P.

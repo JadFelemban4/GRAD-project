@@ -570,3 +570,104 @@ P (about 10.5 h and 20 h of machine time with R4's readings in them), Qa, G, V, 
 Tb, AB, the preregistration `results/PREREGISTRATION_B58H.md` (whose own commit is `T*`), the pilot, and the
 training. At step 3's rate the latest training start that ends inside W is 17 November 01:22 AST.
 `CLAUDE.md`'s brackets on gate items 5 and 6 are Ghassan's edit.
+
+## 16. 6-7 November: step 13 and RV, the roads re-verifier (ORDER step 14)
+
+**Step 13** (the defect-route test and the review of the F records) passed on `a3cd3a3` and needed no
+commit.
+
+**RV was ported, not written again.** Its draft (`0108420`, on `d9a96fa`) was cherry-picked onto
+`a3cd3a3` without a conflict: between the two trees only five `.py` files differ, none in RV's import
+closure or among roads.json's 35 hashed files. What changed is the data, and the port follows it: R4's
+`redraws.json` exists, so every check recomputes both of its readings (version 6, and version 5 with every
+engine gating) under scripted streams, never roads_seed; Run 2 dropped all three EPA engines, so RV checks
+redraws.json's `dropped` and margins against Run 2's `summary.json`, bit for bit. To do that RV opens
+`summary.json` through epa_roads' guard's one exception, as R4's own re-check did. That goes beyond
+INTERFACES section 5's precondition and "consumed" lists; the review accepted it, since it applies row
+140 (2)'s "every data input unchanged" to redraws.json's one data input, and Run 2's labels are already
+published. `adopt` is stricter than the sheet: it also needs every section of the tree's records, each
+equal, no refusal and an equal reconstruction, and it re-runs the records' checks before it writes.
+
+**Three reviews.** The first found the port sound and listed eight material points: five refusals with no
+test that could fail (an input changed during the run, a file the draw never opened, `adopt`'s three added
+refusals, `--skip-companions`, an EPA engine's complete.json naming another engine_sha), `Live` skipping
+whenever the record was not listed, an entry appended to `evaluate.EPISODES` not refused, the version-5
+reading never run in a test, and gate commands that would have deleted the caches inside the frozen
+`.venv` (row 146 (8)). Each was fixed with a test shown to fail under the mutation it exists to catch; `Live`
+now skips only before P (no record ever committed, none on disk, and HEAD's committed `engine_env.py`
+without P's `REWARD_KNOCK_DEFAULT`), and fails in every other case with the reason. Two verifiers, one by
+mutation in its own copy and one reading the result against the sheet, found five more material points
+(the shorter `EPISODES`, the "each section equal" half of `adopt`, the superseded gate notes, "prints
+nothing" stated for P's uncommitted tree, and two figures in the commit message with no run behind
+them); all five were fixed. Every mutation of the three reviews fails its test on the ported tree, which
+held 58 tests in 16 classes in `test_roads_reverify.py` (61 in 17 after the gate's fix, below).
+
+**The gate's first run found a defect in RV (7 November).** On the main tree after `git am`, the K gate
+passed (every STEP2 suite and the rest; `test_epa_rows` with its known N1 failure only; verify_docs 74 of 74),
+and then `test_roads_reverify.py`, run whole for the first time, failed: 1 failure and 5 errors in 58 tests,
+each a `PermissionError: roads_ceiling guard: refused to open ...results/EPA_VALIDATION/summary.json`.
+roads_ceiling has an audit guard of its own, which refuses that file with no exception and stays installed for
+the rest of the process once one of its runs goes in-process; `summary_opened` opened only epa_roads' guard's
+one exception. Run class by class, as the port's reviews ran it, no earlier class had installed that guard, so
+nothing failed. The same could have stopped the control itself after about 9 hours: the check reads
+summary.json a second time after the recomputation (`_provenance_now`), to see that it did not change during
+the run. The gate stopped before the control, as written.
+
+**The fix** (in RV's commit): inside `summary_opened`, roads_ceiling's guard gets the same one exception,
+exactly that path, put back after (an error inside included), and the read is not left in
+`roads_ceiling.OPENED`. roads_ceiling.py itself is unchanged (roads.json hashes it): its hook looks up its
+`_forbidden` at each open, and that one name is rebound for the block. Three tests: the check's second read on
+the tree's records with that guard installed, and two SYNTHETIC ones (the one path inside and nothing else;
+put back after an error). With roads_ceiling's guard installed first, the old code gives the gate's six
+failures exactly, and the fix passes all six; each of five mutations of the fix (the old code, never put back,
+no `finally`, every path let through, the read kept in `OPENED`) makes at least one new test fail.
+
+Two reviewers read the fix, one tracing every open of the real runs, one the tests and their text. Both
+found it correct and safe: epa_roads' guard, installed first in every process, refuses exactly what
+roads_ceiling's refuses, so summary.json inside `summary_opened` is the only open the second guard can add a
+refusal to. They corrected what was said about it. The control (`check --skip-companions`) would not have
+crashed: the one call proven to install roads_ceiling's guard in the main process is section `report`, which
+`--skip-companions` leaves out. `roads_ceiling.report` asks for the one-housing Ford's tau, the one tau the
+record does not hold, as a single task. What would have crashed, after the whole run, is `record` and a check
+with the companions: P's gate's check, about 17.7 h. Their other points were applied: docstrings saying what
+the gate saw and what was found by reading; the after-block control opened with epa_roads' guard letting the
+file through, so only roads_ceiling's refusal can pass it; and one refusal more in `out_problems`, an `--out`
+whose path the guards would refuse, which would otherwise have been refused only at the result's write after
+the run. Its test fails without it. The suite now holds 61 tests in 17 classes. The fix is in RV's
+commit, which carries this section.
+
+**The gate, again**, on the fixed commit, nothing else running beside it (rule 1.3), from 01:36 to 12:28 UTC
+on 7 November. The K gate passed in 1713 s, as before: every STEP2 suite, `test_epa_rows` with its known N1
+failure only, and verify_docs 74 of 74. `test_roads_reverify.py`, run whole, gave 61 tests OK (skipped=1:
+Live, before P) in 5806 s, and no cache was left outside `.git` and `.venv`. The control
+`roads_reverify.py check --jobs 14 --out C:/Users/badcl/grad_rv/control --skip-companions` ran 31 407 s
+(8.7 h; the sheet assumed about 9.2 h). It printed "VERDICT: EQUAL (partial: not adoptable)": 0 differences
+in 16 sections, both readings of redraws.json among them (version 6: 184 278 values; version 5, every engine
+gating: 1 470 984 values), and "not run: ['report']", as `--skip-companions` gives. `test_engine_threading`
+alone then gave 33 tests OK (skipped=6), verify_docs 74 of 74 again, and the tree was clean at the end.
+
+**What was disclosed on the way.**
+- The no-print rule was broken once. While the port's agent read the timestamps in
+  `results/EPA_ROADS/attempt_1_printed.txt`, its filter masked only integers of 20 digits or more, and
+  the file's first line, which holds roads_seed's value, was printed once into that agent's own tool
+  output. The value is already in that committed file and in roads.json; it was copied into no file, patch
+  or note (each checked: no run of 12 or more digits). From then on every agent masked runs of 12 digits
+  or more and did not open that file.
+- It happened once more, while RV's gate ran: the agent drafting AB grepped the top-level keys of
+  `results/EPA_TIGHTENINGS.json`, and the line holding roads_seed was printed once into that agent's tool
+  output. It disclosed this itself; the value was copied into no file (its notes, its message and its one
+  masked extract were checked, and the extract was deleted). The fix round's rule is stricter since: a
+  results JSON is read only with `grep -o` on a pattern that can match nothing but the key, through the
+  digit mask.
+- Two full checkouts of `a3cd3a3` wrote the tracked files under `logs/epa/` to disk: the fixer's
+  temporary copy for `git apply --check`, and the agents' clean clone that ran `check_roads.py` at the B58
+  defaults. Neither opened or read any of them, and both copies were deleted.
+- `check_roads.py` at the B58 defaults on `a3cd3a3` PASSes (worst neutral reward -0.0020, worst p95
+  tracking 0.016), and its `results/training_roads.json` differs from the committed one as build step 1's
+  finding 13 says: the committed file is `cbb8d09`'s (29 September), older than the plant fixes of
+  `75ca65f`. P's gate compares P's output with this one, byte for byte, and keeps the committed file, as
+  the certificate does (`results/B58_IDENTITY.md`, 3.6.5).
+
+**What waits, from here:** P (about 20 h of machine time, its roads check about 17.7 h of it), then Qa,
+G, V, Q, Ta, B1 on Jad's PC, Tb, AB, PR-B, PL-B and the training. The latest training start that ends
+inside W stays 17 November 01:22 AST.

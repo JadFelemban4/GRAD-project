@@ -85,6 +85,75 @@ a change to a hashed module before the last redraw is not built: these commands 
 git work tree. Row 132 replaces it: both run on `GRA-test` from a commit that restores every hashed file
 changed since the roads commit to its R1 version, committed and pushed; the fix is re-applied after R4.
 
+## After the plant commit: the re-verification (rows 94, 97, 127 (1), 140)
+
+The plant commit P changes `engine_env.py`, `engines.py`, `evaluate.py` and `fingerprint.py` (row 138 (1)),
+so every engine's plant_sha moves and the re-check's refusal (`verify_record`) refuses `roads.json` on P's
+tree. (Row 140 (2) lets `step_record.py` differ too, for step 12a; C2 is not built, row 146 (3).)
+`roads_reverify.py` recomputes, on the code as it stands, every number of `roads.json` that the draw's
+code computed, from the record's own arrays and recorded draws, and requires each to be equal: the same
+type and the same float bits. Every engine is recomputed, the three Run 2 dropped among them (row 140 (6):
+"The full check cannot be cut"; row 146).
+- **What it recomputes**, in row 98's order: the generated roads, rebuilt from their recorded draws to the
+  steps_log's arrays hash; every neutral-action identity; the replacement loop, every candidate's climb
+  tests and C5, and the final C5; the ceilings and passes_T; everything `roads_ceiling.report` returns but
+  its `provenance` and `wall_s`; decision 40's diagnostic, the coverage flags, the episode length, row 102's
+  table of H, the design and the streams; then each reading of `redraws.json` (R4), the re-check and every
+  redraw replayed: `version 6` (the B58 alone gating, since Run 2 dropped the three EPA engines) and
+  `version 5 (every engine gating)`, reported and never scored.
+- **What it does not**: the practice set (it would use roads_seed, row 96), τ (read from the record through
+  `roads_ceiling.use_recorded_taus`, row 102), the draw's provenance (hashes, attempts, steps_log,
+  printed, files_opened, data_inputs, frozen_check, commit_reveal, the times), and the redraws' top-level
+  keys, which are read and checked instead: `margins` and `dropped` against `summary.json`
+  (`epa_roads.margins_from_summary`, bit for bit, and `epa_roads.dropped_problems`) and against the
+  attempts log's redraw start line, `margins_source` against `summary.json`'s sha_text now, the taus
+  against `roads.json`'s.
+- **No roads_seed.** The 0x1D and 0xC5 streams are swapped for scripted ones holding the recorded grades;
+  a draw the record does not hold makes that section DIFFERENT. It never calls `verify_record`,
+  `frozen_problems` or `fingerprint.plant_fingerprint`, writes nothing to `attempts.jsonl`, and is not an
+  attempt.
+- **Refused before it runs** (exit 2): other versions than `hashes.versions`; threads not at 1, no `-B`, or a
+  bytecode cache beside a hashed file or the module's own closure (only there: the caches inside `.venv`
+  are never looked at); an engine_sha that moved, or an EPA engine's that is not its `complete.json`'s
+  (row 94); any of the 35 hashed files changed but `engine_env.py`, `engines.py`, `evaluate.py`,
+  `fingerprint.py` and `step_record.py`; a changed import closure, contract or data input; an
+  `evaluate.EPISODES` that is not the whole tuple the draw read, its length and every entry (when P has
+  edited `evaluate.py`, the draw's version is read from HEAD's history by its sha_text); a missing τ; from
+  P on, `REWARD_KNOCK_DEFAULT` not True or `preview_samples(PREVIEW_H_S)` not `PREVIEW_S`; a
+  `redraws.json` not committed once, naming another roads_sha, seed_kind or τ, holding other readings than
+  `epa_roads.redraw` writes for its `dropped`, or not named by the attempts log's one redraws outcome; a
+  `summary.json` (its one data input, opened through the guard's one exception) whose sha_text, margins or
+  drops are not the redraws'; and, once the log holds a redraws outcome, no `redraws.json`.
+- **Exit codes**: 0 EQUAL, 1 DIFFERENT, 2 REFUSED, 3 a crash (no verdict, nothing written).
+
+The route (row 140 (3)-(5); `docs/build_step_2/INTERFACES.md` sections 5 and 17), each command as rule 1.1
+runs it (`OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/Scripts/python.exe -B`), after every `__pycache__`
+folder outside `.git` and `.venv` is deleted (INTERFACES 17, rule 1.10; the venv stays as it is, row 146 (8)).
+Before each of the two checks, from the repository's root:
+
+```bash
+find . -path ./.git -prune -o -path ./.venv -prune -o -name __pycache__ -type d -exec rm -rf {} +
+find . -path ./.git -prune -o -path ./.venv -prune -o -name __pycache__ -type d -print   # prints nothing
+git status --porcelain      # RV's control: prints nothing; P's gate: P's candidate files, and nothing else
+```
+
+1. RV's control, on RV's clean tree (`git status --porcelain` prints nothing): `roads_reverify.py check
+   --jobs 14 --out <a folder outside every git work tree> --skip-companions`. It must print EQUAL (partial:
+   not adoptable). It computes both readings of `redraws.json`, so about 9.2 h: 2.2 h (ASSUMED from
+   `attempt_1_printed.txt`'s step times) plus R4's 7.0 h (INTERFACES 17, 0.2).
+2. P's gate, on P's uncommitted candidate tree (`git status --porcelain` lists P's candidate files and
+   nothing else; `check` asks for no clean tree, `record` does): `roads_reverify.py check --jobs 14 --out
+   <outside>`, fail-fast by section. About 17.7 h: 10.7 h (ASSUMED, ibid.) plus R4's 7.0 h.
+3. Once it prints EQUAL and every other gate of P has passed: `roads_reverify.py adopt <outside>/reverify_CHECK.json`.
+   It re-hashes every input against that result and writes `reverify.json` here once; P carries it.
+4. A P re-made after G or V: `roads_reverify.py record --jobs 14 --supersede <row>` on a restore commit
+   (row 132's route), clean and pushed; it writes `reverify_2.json`, then `_3`, naming the record it
+   supersedes.
+
+A DIFFERENT or REFUSED result never enters this folder (row 140 (4)). The current record is the one
+`four_engine_roads.current_reverify` returns, the highest n whose roads_sha and redraws_sha are the live
+ones; every consumer reads it through that function. Its layout is the interface sheet's 12.4.
+
 ## SYNTHETIC runs
 
 Nothing SYNTHETIC is written here. `python epa_roads.py smoke --synthetic-seed N --out DIR --jobs J`
@@ -120,7 +189,11 @@ the ones that are the team's (rows 121-123); none changes a design value of sect
    document. `drift_test.py` copies the tree, EPA's tables among its bytes. Neither parses an EPA table. Both
    run at the roads commit, as at every earlier commit of `GRA-test` (ORDER step 4).
 
-**Checked by** `python -B test_epa_roads.py` and `python -B test_roads_ceiling.py`. Once `roads.json`
+**Checked by** `python -B test_epa_roads.py`, `python -B test_roads_ceiling.py` and `python -B
+test_roads_reverify.py` (the re-verification; its SYNTHETIC full-shape test is part of RV's gate, and from P on
+its Live test checks the current `reverify*.json` against the commit that added it: it skips only while no
+`reverify*.json` was ever committed or exists and HEAD's `engine_env.py` does not define
+`REWARD_KNOCK_DEFAULT`, and fails, naming why, in every other case without a current record). Once `roads.json`
 exists, `test_epa_roads.py` checks that its roads_seed is the reveal's and that its hash lines are the
 roads commit's (ORDER step 6). Once `results/EPA_TIGHTENINGS.json` exists, it checks that the
 tightenings name roads_sha and roads_seed (row 97, ORDER step 8). It fails when the tightenings exist

@@ -1020,5 +1020,65 @@ def main(argv=None):
     return 0
 
 
+# =====================================================================================================
+# The roads re-verification's records: the one reader (row 140 (5); the interface sheet, section 5)
+# =====================================================================================================
+# Written once by roads_reverify.py adopt and committed in the plant commit P (row 140 (3)); a P re-made
+# after G or V writes reverify_<n>.json, n >= 2, naming the record it supersedes (row 140 (5))
+REVERIFY_REL = f"{ER.ROADS_DIR_REL}/reverify.json"
+REVERIFY_SUCCESSOR = ("reverify_", ".json")
+
+
+def reverify_paths(*, root):
+    """Every re-verification record tracked and unmodified at HEAD in `root`, [(n, rel)] by n: n 1 for
+    results/EPA_ROADS/reverify.json, n >= 2 for reverify_<n>.json with n written without a leading zero.
+    A file git does not track, or one that is not HEAD's blob (`git diff --quiet HEAD`, as
+    real_record_problem asks of roads.json), is not listed; outside a git work tree nothing is."""
+    import subprocess
+    p = subprocess.run(["git", "ls-files", "-z", "--", ER.ROADS_DIR_REL + "/"], cwd=root, capture_output=True,
+                       text=True, encoding="utf-8")
+    if p.returncode != 0:
+        return []
+    out = []
+    head, tail = REVERIFY_SUCCESSOR
+    for rel in sorted(x for x in p.stdout.split("\0") if x):
+        folder, _, name = rel.rpartition("/")
+        mid = name[len(head):-len(tail)] if name.startswith(head) and name.endswith(tail) else ""
+        if folder != ER.ROADS_DIR_REL:
+            continue
+        if rel == REVERIFY_REL:
+            n = 1
+        elif mid.isascii() and mid.isdigit() and str(int(mid)) == mid and int(mid) >= 2:
+            n = int(mid)
+        else:
+            continue
+        unchanged = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", rel], cwd=root, capture_output=True,
+                                   text=True)
+        if unchanged.returncode == 0 and os.path.isfile(os.path.join(root, *rel.split("/"))):
+            out.append((n, rel))
+    return sorted(out)
+
+
+def current_reverify(*, root):
+    """The current re-verification record (row 140 (5)): (rel, record) for the highest n of reverify_paths
+    whose roads_sha is roads.json's and whose redraws_sha is redraws.json's sha_text (None while
+    redraws.json does not exist), each record read as plain JSON; None when no record matches. Its callers
+    are roads_reverify (the next free n), test_roads_reverify.Live and, from V on, evaluate.decision34_roads;
+    no other module reads a re-verification record, so none reads a superseded one. It lives here, not in
+    roads_reverify.py, because evaluate.py is hashed and no hashed module may import that one. Both shas
+    are epa_roads.roads_sha, thresholds.common.sha_text (epa_roads.py:1223-1226), so this adds no import."""
+    roads = os.path.join(root, *ER.ROADS_REL.split("/"))
+    if not os.path.isfile(roads):
+        return None
+    red = os.path.join(root, *ER.REDRAWS_REL.split("/"))
+    live = (ER.roads_sha(roads), ER.roads_sha(red) if os.path.isfile(red) else None)
+    for _, rel in reversed(reverify_paths(root=root)):
+        with open(os.path.join(root, *rel.split("/")), encoding="utf-8") as fh:
+            rec = json.load(fh)
+        if isinstance(rec, dict) and (rec.get("roads_sha"), rec.get("redraws_sha")) == live:
+            return rel, rec
+    return None
+
+
 if __name__ == "__main__":
     raise SystemExit(main())
