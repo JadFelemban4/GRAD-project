@@ -65,13 +65,15 @@ WHAT WAITS, refused rather than approximated:
     step, and step_record refuses a CVT (step_record.py:88-91) until its CVT branch, ORDER step 12a
     (C2, row 118). Until then the Honda's training checks fail with that refusal (MEASURED, 31 October
     2026: test_reward.py --engine honda_l15b7 --train-road four_engine --synthetic-seed 101).
-  * Decision 34's roads exist once roads.json is drawn (ORDER step 6) and redrawn (step 12). --roads reads
-    a roads record's "roads" and "H_table" (epa_roads.first_draw writes both); until then a SYNTHETIC seed
-    draws the generator's roads (epa_roads.generate, SMOKE_N_ROADS of them) at H = 30 s, and every
-    output says SYNTHETIC: such a run is a test of this code, not row 119's gate. After the redraws the
-    scored set is roads.json's with redraws.json's accepted candidates in their slots; the code that
-    applies them is evaluate.py's decision-34 protocol (ORDER step 16), not written yet, and --roads
-    reads one record's roads as they stand.
+  * Decision 34's roads: roads.json, drawn at ORDER step 6, and the redraws R4 committed in redraws.json
+    (step 12). --roads reads a REAL record only as the repository's results/EPA_ROADS/roads.json
+    (epa_roads.REPO), and refuses any other REAL file; its roads are then the scored set as
+    fingerprint.d34_roads reads it, redraws.json's version-6 reading (row 95 (2); the redrawn twenty,
+    row 146 (1)), with that record's own H_table (ORDER step 14a, Qa; interface sheet 9). Any other
+    roads file (a SYNTHETIC record) is read as it stands, its "roads" and "H_table" (epa_roads.first_draw
+    writes both); a SYNTHETIC seed draws the generator's roads (epa_roads.generate, SMOKE_N_ROADS of
+    them) at H = 30 s, and every output says SYNTHETIC: such a run is a test of this code, not row 119's
+    gate.
   * The reward's knock option. The team chose the reward without the knock term for this test (row
     113 (5); ORDER's status line, "A+G, the reward without the knock term"), and row 119 says "If row
     113 (5)'s reward option is chosen, the gate runs with it". The option is the environment's
@@ -193,14 +195,37 @@ def notch_cycle(plant, grade):
 
 
 def d34_roads(*, roads_file, synthetic_seed):
-    """Decision 34's roads: (roads, H_table or None, label). From a roads record (`roads_file`: its "roads"
-    and "H_table", as epa_roads.first_draw writes them), or SYNTHETIC: epa_roads.generate on a seed below
-    2**32 (never roads_seed), SYNTHETIC_ROADS roads."""
+    """Decision 34's roads: (roads, H_table or None, label), from exactly one of a roads record and a
+    SYNTHETIC seed.
+
+    A REAL record (its seed_kind, the field four_engine_roads.read_roads_record reads) is read only as the
+    repository's own roads record, epa_roads.ROADS_REL under epa_roads.REPO, and any other REAL file is
+    refused (ORDER step 14a, Qa; interface sheet 9). Its roads are then decision 34's scored set as
+    fingerprint.d34_roads, the one reader of that set, reads it: roads.json's twenty under redraws.json's
+    version-6 reading (row 95 (2); the redrawn twenty, row 146 (1)), with redraws.json's roads_sha
+    checked against roads.json's and each road's seed and weights against evaluate.EPISODES. Its H_table
+    is that same roads.json's (row 102), read by key, so a record without one fails rather than falling
+    back to engine_env.PREVIEW_H_S (mistake 19). The label names the reading.
+
+    Any other roads file (a SYNTHETIC record) is read as it stands: its "roads" and "H_table", as
+    epa_roads.first_draw writes them. A SYNTHETIC seed draws epa_roads.generate on a seed below 2**32
+    (never roads_seed), SYNTHETIC_ROADS roads."""
     if (roads_file is None) == (synthetic_seed is None):
         raise ValueError("decision 34's roads: give exactly one of a roads record and a SYNTHETIC seed")
     if roads_file is not None:
         with open(roads_file, encoding="utf-8") as fh:
             rec = json.load(fh)
+        if rec.get("seed_kind") == "REAL":
+            own = os.path.join(ER.REPO, *ER.ROADS_REL.split("/"))
+            if os.path.normcase(os.path.abspath(roads_file)) != os.path.normcase(os.path.abspath(own)):
+                raise ValueError(f"decision 34's roads: a REAL roads record is read only as {ER.ROADS_REL} in "
+                                 f"this repository ({ER.REPO}), whose scored set fingerprint.d34_roads reads "
+                                 f"with {ER.REDRAWS_REL} (row 146 (1); ORDER step 14a), not from {roads_file}")
+            import fingerprint as FP
+            scenario, roads = FP.d34_roads(root=ER.REPO)
+            return (roads, rec["H_table"],
+                    f"{ER.ROADS_REL}, REAL, through fingerprint.d34_roads: {ER.REDRAWS_REL}'s "
+                    f"{scenario['reading']} reading ({len(roads)} roads)")
         return rec["roads"], rec.get("H_table"), f"{os.path.basename(roads_file)} ({len(rec['roads'])} roads)"
     s = int(synthetic_seed)
     if not 0 <= s < ER.SYNTHETIC_SEED_LIMIT:

@@ -5,7 +5,10 @@
     python -B test_device_gate.py        a few minutes; exit code 0 when all pass
 
 Nothing here trains: every train.py below is run with --help, and the rollouts are the gate's own,
-neutral, on decision 34's generator at SYNTHETIC seeds (no roads_seed exists; row 96).
+neutral, on decision 34's generator at SYNTHETIC seeds (no roads_seed exists; row 96). Roads' REAL-record
+test (Qa) reads the committed results/EPA_ROADS/roads.json and redraws.json, prints nothing of them and
+rolls nothing out on them; its control writes roads.json's seed_kind, roads and H_table alone (never its
+commit_reveal) to a temporary folder outside the repository, removed when the test ends.
 
   Sweep        the 0.05 % sweep's grades; notches, band and kickdown on hand-made rows; on the plants,
                the B58's kickdown to 6th where test_reward.py measured it (13.96-13.97 % in 0.01 %
@@ -13,7 +16,11 @@ neutral, on decision 34's generator at SYNTHETIC seeds (no roads_seed exists; ro
                sweep (results/EPA_ROADS/sweep.txt: 11.20-11.80 %), the Accord's branches by its law
                (CvtVehicle.ratio_for), each box's top gear at 0 %; a scenario that is not decision
                34's refused
-  Roads        one source of decision 34's roads; a roads record's roads and horizons; the onset twin;
+  Roads        one source of decision 34's roads; a roads record's roads and horizons; the repository's
+               REAL roads.json read as decision 34's scored set through fingerprint.d34_roads, version
+               6's redrawn twenty with that record's own H_table, by its absolute path and by Q's
+               relative one, the same REAL record anywhere else refused by its text and a SYNTHETIC
+               record there read as it stands (Qa, ORDER step 14a, row 146 (1)); the onset twin;
                an H other than 30 s admitted since the plant commit P, each H's preview samples
                engine_env.preview_samples' (row 117), 0 s and -1 s refused; the starver is
                test_reward's; row 116's road built with the options train.py gives it; with a
@@ -195,6 +202,73 @@ class Roads(unittest.TestCase):
         self.assertEqual([r["cycle"]["grade"] for r in got], [r["cycle"]["grade"] for r in roads])
         self.assertEqual((G.horizons(h, "b58"), G.horizons(h, "ford_27tt")), ([40.0, 120.0], [100.0]))
         self.assertNotIn("SYNTHETIC", label)
+
+    def test_the_real_record_gives_the_redrawn_twenty_and_its_H_table(self):
+        """Qa (ORDER step 14a; interface sheet 9; row 146 (1)): --roads on the repository's REAL roads.json
+        gives decision 34's scored set as fingerprint.d34_roads reads it at epa_roads.REPO, redraws.json's
+        version-6 reading (the redrawn twenty: k = 0..19 with evaluate.EPISODES' seeds and weights, and
+        equal to roads.json's own, since R4's version 6 failed no slot), with roads.json's own H_table, so
+        the blind arm runs at the record's H for each of its ratios; the label names the reading. The set
+        is fingerprint.d34_roads' own object (a spy wraps it). It is so for the path as Q's commands give
+        it (ORDER step 17; interface sheet 9), results/EPA_ROADS/roads.json relative to the repository as
+        the working folder, and for the absolute path given from a working folder outside the repository.
+        The record is read, never printed, and nothing is rolled out. The controls (mistake 12): the same
+        REAL record, its seed_kind, roads and H_table alone (never its commit_reveal), written outside the
+        repository under the same file name, is refused by its text before the set is read; and a
+        SYNTHETIC record at that path keeps today's path, its own roads and H_table as they stand, so the
+        refusal is the REAL record's alone."""
+        import re
+        from unittest import mock
+        import fingerprint as FP
+        path = os.path.join(ER.REPO, *ER.ROADS_REL.split("/"))
+        rec = ER.load_record(path)
+        self.assertEqual(rec["seed_kind"], "REAL")
+        real, seen = FP.d34_roads, []
+
+        def spy(*, root):
+            seen.append((root, real(root=root)))
+            return seen[-1][1]
+        refusal = f"decision 34's roads: a REAL roads record is read only as {ER.ROADS_REL} in this repository"
+        d = tempfile.mkdtemp(prefix="gate_real_elsewhere_")
+        try:
+            with mock.patch.object(FP, "d34_roads", spy):
+                with contextlib.chdir(d):            # the absolute path, from a folder outside the repository
+                    roads, h, label = G.d34_roads(roads_file=path, synthetic_seed=None)
+                with contextlib.chdir(ER.REPO):      # Q's form: the relative path, as its command line gives it
+                    roads_q, h_q, label_q = G.d34_roads(roads_file=ER.ROADS_REL, synthetic_seed=None)
+                self.assertEqual([root for root, _ in seen], [ER.REPO, ER.REPO])
+                other = os.path.join(d, os.path.basename(path))
+                with open(other, "w", encoding="utf-8") as fh:       # the REAL record, never its commit_reveal
+                    json.dump({key: rec[key] for key in ("seed_kind", "roads", "H_table")}, fh)
+                with self.assertRaisesRegex(ValueError, re.escape(refusal)):
+                    G.d34_roads(roads_file=other, synthetic_seed=None)
+                synthetic = ER.generate(7, n_roads=2)
+                h_synthetic = {"b58": {"1.5": {"H_s": 120.0}, "0.5": {"H_s": 40.0}}}
+                with open(other, "w", encoding="utf-8") as fh:
+                    json.dump({"seed_kind": "SYNTHETIC", "roads": synthetic, "H_table": h_synthetic}, fh)
+                got, h2, label2 = G.d34_roads(roads_file=other, synthetic_seed=None)
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
+        self.assertEqual(len(seen), 2)                       # neither control read the scored set
+        scenario, want = seen[0][1]
+        # assertTrue, not assertIs/assertEqual: a failure would print (and diff) twenty 900-sample roads
+        self.assertTrue(roads is want, "d34_roads did not return fingerprint.d34_roads' own roads")
+        self.assertTrue(roads_q is seen[1][1][1], "Q's relative path did not give fingerprint.d34_roads' roads")
+        self.assertEqual((scenario["seed_kind"], scenario["reading"]), ("REAL", "version 6"))
+        episodes = ER.frozen_episodes(root=ER.REPO)
+        self.assertEqual([(r["k"], r["episode_seed"], tuple(r["weights"])) for r in roads],
+                         [(k, s, w) for k, (s, w) in enumerate(episodes)])
+        self.assertTrue(roads == rec["roads"], "row 146 (1): version 6's twenty are not roads.json's")
+        self.assertEqual(h, rec["H_table"])
+        self.assertEqual(h_q, h)
+        self.assertEqual(G.horizons(h, "b58"),
+                         sorted(float(rec["H_table"]["b58"][f"{float(r):g}"]["H_s"]) for r in rec["ratios"]))
+        self.assertIn(f"{ER.ROADS_REL}, REAL, through fingerprint.d34_roads: {ER.REDRAWS_REL}'s version 6 "
+                      f"reading ({len(episodes)} roads)", label)
+        self.assertEqual(label_q, label)                    # repository-relative: no machine path in either
+        self.assertEqual([r["cycle"]["grade"] for r in got], [r["cycle"]["grade"] for r in synthetic])
+        self.assertEqual((h2, G.horizons(h2, "b58")), (h_synthetic, [40.0, 120.0]))
+        self.assertNotIn("version 6", label2)
 
     def test_the_onset_twin(self):
         road = next(r for r in ER.generate(101, n_roads=2) if r["climbs"])

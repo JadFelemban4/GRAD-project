@@ -983,3 +983,41 @@ still RV.
 
 **What waits, from here:** Qa, G, V, Q, Ta, B1 on Jad's PC, Tb, AB, PR-B, PL-B and the training. The latest
 training start that ends inside W stays 17 November 01:22 AST.
+
+## 18. 8 November: P pushed, and Qa (ORDER step 14a)
+
+**P was pushed** to GRA-test after its gate's last phases (commit-prep, commit and push), as section 17 says
+they would run. Two edits were made to p_gate.sh after its reviewed state and after P's documents were frozen at
+precommit, by the orchestrator, with no independent review; both are disclosed here, as P's own documents could
+not hold them:
+- precommit's scratch commit stopped, because a fresh clone has no git identity of its own (the repository sets
+  it locally, a clone does not inherit it). The scratch commit now passes the repository's own user.name and
+  user.email by `-c`, one line; nothing global was set.
+- reverify.json's sha_text holds a run of 12 or more digits, so P's message quotes its first 8 characters, as the
+  orchestrator's rule for P (OD 9, an exception to OD 8 decided beforehand) says for that case: a helper,
+  `reverify_quoted`, at the three places the gate reads that value, and message_check's pattern widened to
+  accept 8 characters. The record itself keeps the full value. A stray carriage return written by the first
+  attempt at that edit was removed before any phase ran from the file.
+
+Copies of the gate before each edit are kept beside it (`p_gate/hand/`). The full clones with `logs/epa/` on
+disk that P's gate made (its certificate's clone and S's trees, precommit's scratch clone) are deleted by its
+hand step H8; commit A's own scratch copies stay until the B58 study's last scoring, because the kit reads
+their reference dumps. No file of `logs/epa/` was opened or read.
+
+**Qa** (ORDER step 14a; INTERFACES 9, 17 item 9; rows 116, 119, 130 (5), 146 (1) and (3)): engine_gate.py's
+road table now takes the REAL roads record (`results/EPA_ROADS/roads.json`, by its path, absolute or relative to
+the repository) through `fingerprint.d34_roads`, so Q's `test_reward.py` and `check_roads.py` on the B58 score
+version 6's twenty roads, labelled with the record's reading; any other file, or a SYNTHETIC record, keeps
+today's path. test_device_gate's Roads class gains the test of both forms of the path, its control writing only
+the record's seed_kind, roads and H_table to a temporary file (never commit_reveal). The draft was written while
+RV's gate ran, reviewed adversarially, fixed, and re-reviewed before it was committed; it applied to P unchanged
+(both files at the draft's base are P's, byte for byte). Its gates (test_device_gate whole, test_engine_threading
+alone, verify_docs) ran in a fresh clone of the pushed P; their printed results are in Qa's commit message.
+engine_gate.py's lines as of Qa, for the sheets' stale citations (INTERFACES 17 item 9, row 146 (3)): d34_roads
+:197-235, run_gate :547 (its d34_roads call :561), road_table :687 (its call :696), print_gate :627. One open item
+of its own, not Qa's to fix (sheet 9 keeps today's path): a SYNTHETIC record passed as `--roads` leaves
+run_gate's synthetic flag False, so print_gate can call the reward safe to train against on a hand-made file; Q
+passes the REAL record, so Q is unaffected.
+
+**What waits:** G, V, Q's commit, Ta, then B1 on Jad's PC. Q's runs start in a clone of the pushed Qa beside G's
+gates.
