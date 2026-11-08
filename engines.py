@@ -83,7 +83,9 @@ A calibration evaluates its candidates with build_candidate, which builds a plan
 by _build itself from an in-memory DERIVED dict, so that what is fitted is what
 get() later builds from the file (mistake 10); an EPA plant built from its file
 is refused unless the file's frozen sections are the ones its freeze record
-hashed. trainable() names the plants that may train or be scored (decision 47).
+hashed. trainable() names the plants that may train or be scored, read from the
+committed Run 2 summary and backend record when called (decision 47; rows 107 (5)
+and 139).
 
 THE THREE ARE REGISTERED, AND NOT CALIBRATED (22 October 2026, build step 2 P6).
 PLANTS names mazda_25t, honda_l15b7 and ford_27tt beside the B58, each with its
@@ -1341,7 +1343,8 @@ def published_car(path, kind):
 # (build step 2 P6; docs/build_step_2/PLAN.md WP1 P6): their six specs are typed
 # values only, and each stays NOT CALIBRATED until calibrate_epa.py has written its
 # derived file and its freeze record (calibrated(); get() refuses it until then,
-# naming the command). trainable() still names the B58 alone (decision 47).
+# naming the command). trainable() names the B58 and the EPA engines the committed
+# records keep (decision 47; rows 107 (5) and 139).
 PLANTS = {"b58": ("b58", "a90_supra"),
           "mazda_25t": ("mazda_25t", "cx9_2016"),
           "honda_l15b7": ("honda_l15b7", "accord_2018"),
@@ -1353,14 +1356,235 @@ def known():
     return sorted(PLANTS)
 
 
-# THE PLANTS THAT MAY TRAIN OR BE SCORED (22 October 2026, decision 47). The EPA
-# engines are refused by train.py, train_all.py, run_phase_d.py and evaluate.py
-# (their --engine choices) until fingerprint schema 4 can record them and their
-# validation is committed (results/VALIDATION_DECISIONS.md section H): schema 3's
-# FATAL gears and final_drive cannot record the Accord's CVT, and an engine whose
-# held-out validation has not run is not yet a plant a result may be quoted on.
+# THE PLANTS THAT MAY TRAIN OR BE SCORED (22 October 2026, decision 47; read from the
+# committed records since the plant commit P, rows 107 (5) and 139). The five entry
+# points that train or score (train.py, train_all.py, run_phase_d.py, evaluate.py and
+# benchmark_training.py) take --engine from trainable(): the B58, never dropped
+# (results/ENGINE_THRESHOLDS.md:1590), and every EPA engine that Run 2's committed
+# results/EPA_VALIDATION/summary.json does not drop and, once it is committed,
+# results/EPA_BACKEND.json does not drop either. Until summary.json exists it is the
+# B58 alone. A typed tuple was rejected, since a later drop would then need a second
+# plant commit; the B58 alone until the backend record, since the per-engine
+# benchmark that record needs trains through train.py (row 107, Why). The records
+# are read at every call, never at import and never cached: calibrate_epa.py's audit
+# refuses opens under results/EPA_VALIDATION/ in its audited subcommands
+# (calibrate_epa.py:337-338), which import this module. A record present but not
+# committed at HEAD is refused, never read and never taken for absent (row 139 (2));
+# so is a defect re-run still open, or one whose rows the committed summary does not
+# list (row 139 (1)). The backend record's layout is docs/build_step_2/INTERFACES.md
+# 12.5; this reader checks its schema and its drops only, and T validates its record
+# through trainable_from before writing it (row 139 (3)).
+RECORDS_ROOT = HERE                     # the work tree trainable() reads; only tests patch it
+VALIDATION_DIR_REL = "results/EPA_VALIDATION"
+# validate_epa.VAL_REL + "/" + validate_epa.SUMMARY and epa_roads.SUMMARY_REL, and
+# validate_epa.SUMMARY_SCHEMA: both modules are hashed and import this one, so the
+# names are typed here and pinned equal by test_trainable.OneDefinition (mistake 10)
+VALIDATION_SUMMARY_REL = "results/EPA_VALIDATION/summary.json"
+VALIDATION_SUMMARY_SCHEMA = "epa-summary/1"
+# validate_epa.rerun_name(STARTED, k) and rerun_name(ROWS, k) (validate_epa.py:385-388),
+# pinned by test_trainable.RerunNames
+RERUN_STARTED = "STARTED_rerun{k}"
+RERUN_ROWS = "rows_rerun{k}.json"
+BACKEND_REL = "results/EPA_BACKEND.json"
+BACKEND_SCHEMA = "epa-backend/1"
+NEVER_DROPPED = "b58"                   # "The B58 is never dropped" (results/ENGINE_THRESHOLDS.md:1590)
+
+
 def trainable():
-    return ("b58",)
+    """The plants that may train or be scored, as a tuple in known() order, the B58
+    first: trainable_in(RECORDS_ROOT). Called bare by the five parsers."""
+    return trainable_in(RECORDS_ROOT)
+
+
+def trainable_in(root):
+    """trainable() on the git work tree `root` (row 139): refused while a defect re-run
+    is open or listed by no committed summary; otherwise trainable_from the committed
+    summary.json and backend record, each None when absent from HEAD and the tree."""
+    from thresholds import common
+    epa = common.EPA_ENGINES
+    still_open = open_reruns(root, epa=epa)
+    if still_open:
+        raise ValueError(
+            "engines.trainable: a defect re-run of Run 2 is open: "
+            + "; ".join(f"{e}: {VALIDATION_DIR_REL}/{e}/{RERUN_STARTED.format(k=k)} without "
+                        f"{RERUN_ROWS.format(k=k)}" for e, k in still_open)
+            + ". No training starts while such a re-run is open (row 94; row 139 (1))")
+    summary = committed_record(root, VALIDATION_SUMMARY_REL)
+    if summary is not None:
+        unlisted = unlisted_reruns(root, summary, epa=epa)
+        if unlisted:
+            raise ValueError(
+                "engines.trainable: "
+                + "; ".join(f"{VALIDATION_DIR_REL}/{e}/{RERUN_ROWS.format(k=k)}" for e, k in unlisted)
+                + f" exists, and the committed {VALIDATION_SUMMARY_REL} does not list it in its engine's "
+                  "reruns: run `validate_epa.py summary` and commit summary.json (row 139 (1))")
+    return trainable_from(summary, committed_record(root, BACKEND_REL))
+
+
+def _present(root, rel):
+    """Whether `rel` exists at HEAD in `root` or in its work tree (row 139 (1))."""
+    import epa_freeze
+    return epa_freeze.head_blob(rel, root=root) is not None or os.path.exists(os.path.join(root, rel))
+
+
+def _rerun_walk(root, e):
+    """(k, STARTED_rerun<k> present, rows_rerun<k>.json present) for k = 1, 2, ...
+    until neither name exists at HEAD or in the work tree, for the EPA engine `e`."""
+    out, k = [], 1
+    while True:
+        started = _present(root, f"{VALIDATION_DIR_REL}/{e}/{RERUN_STARTED.format(k=k)}")
+        rows = _present(root, f"{VALIDATION_DIR_REL}/{e}/{RERUN_ROWS.format(k=k)}")
+        if not (started or rows):
+            return out
+        out.append((k, started, rows))
+        k += 1
+
+
+def _git_tree(root, fn):
+    """fn() with epa_freeze's GitError and its TypeError for a root that is no folder
+    re-raised as a ValueError naming `root` as not a git work tree (row 139 (2))."""
+    import epa_freeze
+    try:
+        return fn()
+    except (epa_freeze.GitError, TypeError) as exc:
+        raise ValueError(f"engines.trainable: {root!r} is not a git work tree ({exc}); the entry points read "
+                         "the committed records, so they run in the repository or a git clone (row 139 (2))") from exc
+
+
+def open_reruns(root, *, epa):
+    """[(engine, k)] for each defect re-run whose STARTED_rerun<k> exists, at HEAD or in
+    the work tree, and whose rows_rerun<k>.json does not (row 139 (1)). Opens no file."""
+    return _git_tree(root, lambda: [(e, k) for e in epa for k, started, rows in _rerun_walk(root, e)
+                                    if started and not rows])
+
+
+def unlisted_reruns(root, summary, *, epa):
+    """[(engine, k)] for each rows_rerun<k>.json that exists, at HEAD or in the work tree,
+    and that `summary`'s entry for its engine does not list in "reruns" (row 139 (1)):
+    only `validate_epa.py summary` writes that entry. Opens no file but `summary`."""
+    def listed(e):
+        engs = summary.get("engines") if isinstance(summary, dict) else None
+        entry = engs.get(e) if isinstance(engs, dict) else None
+        reruns = entry.get("reruns") if isinstance(entry, dict) else None
+        return reruns if isinstance(reruns, dict) else {}
+    return _git_tree(root, lambda: [(e, k) for e in epa for k, _, rows in _rerun_walk(root, e)
+                                    if rows and RERUN_ROWS.format(k=k) not in listed(e)])
+
+
+def committed_record(root, rel):
+    """The JSON record `rel` of the git work tree `root`: None when it is absent from
+    HEAD and from the work tree; its contents when the working file is HEAD's blob
+    (epa_freeze.committed_at_head: git hash-object, so a CRLF checkout of an LF blob
+    counts); refused otherwise, untracked, staged, modified or deleted alike, never
+    read and never taken for absent (rows 107 (5), 139 (2)). Asks git only through
+    `cat-file --batch-check` and `hash-object`, never `git status`."""
+    import epa_freeze
+    if not _git_tree(root, lambda: _present(root, rel)):
+        return None
+    if not _git_tree(root, lambda: epa_freeze.committed_at_head(rel, root=root)):
+        raise ValueError(f"engines.trainable: {rel} is not committed at HEAD in {root} (untracked, staged, modified "
+                         "or deleted); commit it or restore it (rows 107 (5), 139)")
+    with open(os.path.join(root, rel), encoding="utf-8") as fh:
+        try:
+            return json.load(fh)
+        except ValueError as exc:
+            raise ValueError(f"engines.trainable: {rel} in {root} is not JSON: {exc} (row 139)") from exc
+
+
+def _rerun_k(name):
+    """k when `name` is RERUN_ROWS for some k >= 1, written as rerun_name writes it; else None."""
+    head, _, tail = RERUN_ROWS.partition("{k}")
+    mid = name[len(head):len(name) - len(tail)] if name.startswith(head) and name.endswith(tail) else ""
+    if not (mid.isascii() and mid.isdigit()) or RERUN_ROWS.format(k=int(mid)) != name or int(mid) < 1:
+        return None
+    return int(mid)
+
+
+def summary_survivors(summary, *, epa):
+    """The frozenset of the EPA engines Run 2's summary.json does not drop. Each
+    engine's drop is its governing entry's (row 139 (1)): the "reruns" entry of the
+    highest k when there is one, otherwise the engine's own, read as validate_epa
+    recorded it, never recomputed, never the first entry once a re-run's exists, never
+    a union. Refused, naming the field, unless the schema is VALIDATION_SUMMARY_SCHEMA,
+    the engines are exactly `epa`, and every drop is a bool."""
+    where = f"engines.trainable: {VALIDATION_SUMMARY_REL}"
+    if not isinstance(summary, dict) or summary.get("schema") != VALIDATION_SUMMARY_SCHEMA:
+        got = summary.get("schema") if isinstance(summary, dict) else summary
+        raise ValueError(f"{where}: schema is {got!r}, not {VALIDATION_SUMMARY_SCHEMA!r} (row 139)")
+    engs = summary.get("engines")
+    if not isinstance(engs, dict) or set(engs) != set(epa):
+        raise ValueError(f"{where}: engines is {sorted(engs) if isinstance(engs, dict) else engs!r}, not exactly "
+                         f"{sorted(epa)} (row 139)")
+    kept = set()
+    for e in epa:
+        entry = engs[e]
+        if not isinstance(entry, dict) or not isinstance(entry.get("drop"), bool):
+            got = entry.get("drop") if isinstance(entry, dict) else entry
+            raise ValueError(f"{where}: engines.{e}.drop is {got!r}, not a bool (row 139)")
+        reruns = entry.get("reruns")
+        if not isinstance(reruns, dict):
+            raise ValueError(f"{where}: engines.{e}.reruns is {reruns!r}, not a dict (row 139 (1))")
+        by_k = {}
+        for name, r in reruns.items():
+            k = _rerun_k(name)
+            if k is None:
+                raise ValueError(f"{where}: engines.{e}.reruns has the key {name!r}, not {RERUN_ROWS} for a k >= 1 "
+                                 "(row 139 (1))")
+            if not isinstance(r, dict) or not isinstance(r.get("drop"), bool):
+                got = r.get("drop") if isinstance(r, dict) else r
+                raise ValueError(f"{where}: engines.{e}.reruns.{name}.drop is {got!r}, not a bool (row 139 (1))")
+            by_k[k] = r
+        governing = by_k[max(by_k)] if by_k else entry
+        if not governing["drop"]:
+            kept.add(e)
+    return frozenset(kept)
+
+
+def backend_survivors(record, kept, *, epa):
+    """The frozenset of `kept` that the backend record does not drop (rows 114, 136 and
+    139 (3)). It reads the schema and engines[*].drop only, and refuses, naming the
+    field, unless the schema is BACKEND_SCHEMA, engines is keyed by exactly the B58 and
+    `epa`, each drop is a bool, the B58's is False, and every engine of `epa` not in
+    `kept` reads True (a backend record never readmits an engine summary.json dropped)."""
+    where = f"engines.trainable: {BACKEND_REL}"
+    if not isinstance(record, dict) or record.get("schema") != BACKEND_SCHEMA:
+        got = record.get("schema") if isinstance(record, dict) else record
+        raise ValueError(f"{where}: schema is {got!r}, not {BACKEND_SCHEMA!r} (row 139 (3))")
+    engs, want = record.get("engines"), {NEVER_DROPPED} | set(epa)
+    if not isinstance(engs, dict) or set(engs) != want:
+        raise ValueError(f"{where}: engines is {sorted(engs) if isinstance(engs, dict) else engs!r}, not exactly "
+                         f"{sorted(want)} (row 139 (3))")
+    for e in sorted(want):
+        if not isinstance(engs[e], dict) or not isinstance(engs[e].get("drop"), bool):
+            got = engs[e].get("drop") if isinstance(engs[e], dict) else engs[e]
+            raise ValueError(f"{where}: engines.{e}.drop is {got!r}, not a bool (row 139 (3))")
+    if engs[NEVER_DROPPED]["drop"]:
+        raise ValueError(f"{where}: engines.{NEVER_DROPPED}.drop is True; the B58 is never dropped "
+                         "(results/ENGINE_THRESHOLDS.md:1590; row 139 (3))")
+    readmitted = sorted(e for e in epa if e not in kept and not engs[e]["drop"])
+    if readmitted:
+        raise ValueError(f"{where}: engines.<id>.drop is False for {readmitted}, which "
+                         f"{VALIDATION_SUMMARY_REL} drops; every Run 2 drop is repeated as True (row 139 (3))")
+    return frozenset(e for e in kept if not engs[e]["drop"])
+
+
+def trainable_from(summary, backend):
+    """trainable() from the two records as dicts, None for one that does not exist:
+    pure, so that T validates its backend record through it before writing (row 139
+    (3)). (None, None) gives ("b58",); a backend record without a summary is refused."""
+    from thresholds import common
+    if summary is None:
+        if backend is not None:
+            raise ValueError(f"engines.trainable: {BACKEND_REL} exists without {VALIDATION_SUMMARY_REL}; the "
+                             "backend record is written after Run 2 (row 114; row 139 (3))")
+        return (NEVER_DROPPED,)
+    kept = summary_survivors(summary, epa=common.EPA_ENGINES)
+    if backend is not None:
+        kept = backend_survivors(backend, kept, epa=common.EPA_ENGINES)
+    unknown = sorted(kept - set(PLANTS))
+    if unknown:
+        raise ValueError(f"engines.trainable: the records keep {unknown}, which PLANTS does not register (row 139)")
+    return tuple(n for n in known() if n == NEVER_DROPPED or n in kept)
 
 
 def calibrated(name):

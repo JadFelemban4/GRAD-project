@@ -117,9 +117,10 @@ SYNTHETIC in every road log line, and train.py refuses to train on one into the 
 
 H (rows 102, 117). horizon_s(record, engine_id, r) is H = r x tau_e with tau_e read from the roads
 record's `tau` (row 102: the draw computes it once by roads_ceiling's one definition and writes it there;
-the re-check and the redraws read it from there), cross-checked against the record's H_table. Until
-row 94's plant commit makes H an environment parameter (row 117), preview_h_problem refuses every H but
-today's 30 s, whose samples H x (1/15, 1/6, 1/2, 1) are engine_env.PREVIEW_S exactly.
+the re-check and the redraws read it from there), cross-checked against the record's H_table. Since
+row 94's plant commit P, H is an environment parameter (row 117): its samples are H x (1/15, 1/6, 1/2,
+1) (engine_env.preview_samples), engine_env.PREVIEW_S exactly at 30 s, and preview_h_problem refuses
+only an H the environment does not take.
 
 WHAT WAITS FOR LATER STEPS, stated: the EPA engines train through train.py only once trainable() opens
 (decision 47; the plant commit, ORDER step 14); the Honda's training also needs step_record's CVT branch
@@ -169,8 +170,9 @@ SHARE_EVERY = 10                        # decision 29's fixed 10 %: episodes 0, 
 # counts its steps_above_115_kmh
 COVERAGE_KMH = 115.0
 
-# H (rows 102, 117): a sighted agent at horizon H sees the grade H/15, H/6, H/2 and H ahead
-PREVIEW_DIVISORS = (15.0, 6.0, 2.0, 1.0)
+# H (rows 102, 117): a sighted agent at horizon H sees the grade H/15, H/6, H/2 and H ahead; the
+# environment's own divisors, the same object (the plant commit P; interface sheet 6.6)
+PREVIEW_DIVISORS = E.PREVIEW_DIVISORS
 
 # THE NOTIONAL CAR (31 October 2026, the review of ORDER step 7, findings S1 and F1; the module docstring
 # says why). The speed profile's two limits, four numbers that read no car at run time, each the largest
@@ -502,19 +504,17 @@ def preview_steps(h_s, *, dt):
 
 
 def preview_h_problem(h_s):
-    """Why the environment cannot train at H = h_s seconds today, or None. Today's preview is
-    engine_env.PREVIEW_S = (2, 5, 15, 30) s, which is H = 30 s at row 117's samples H x (1/15, 1/6,
-    1/2, 1) exactly; no other H exists until row 94's plant commit makes H an environment parameter
-    (row 117), and engine_env.py may not change before the commit that records the last redraw."""
+    """Why the environment cannot train at H = h_s seconds, or None. H is an environment parameter
+    since the plant commit P (row 117; interface sheet 6.6): None (today's preview, H = 30 s) and every
+    H that engine_env.preview_samples accepts, a finite real above 0 s, are trained at; anything else is
+    refused with preview_samples' own reason, never approximated."""
     if h_s is None:
         return None
-    if tuple(float(h_s) / d for d in PREVIEW_DIVISORS) == tuple(float(x) for x in E.PREVIEW_S):
-        return None
-    return (f"H = {float(h_s):.4f} s: the environment previews at engine_env.PREVIEW_S = "
-            f"{tuple(E.PREVIEW_S)} s, which is H = 30 s, and at no other H. H becomes an environment "
-            "parameter in row 94's plant commit (row 117; ORDER step 14), which changes engine_env.py and "
-            "may not land before the commit that records the last redraw (ORDER step 12). Until then "
-            "nothing trains at any other H")
+    try:
+        E.preview_samples(h_s)
+    except (TypeError, ValueError) as exc:
+        return f"H = {h_s!r} s: {exc}"
+    return None
 
 
 def run_tag(seed, *, use_preview, ratio):

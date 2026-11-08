@@ -370,8 +370,11 @@ def calibrate(workers, harness=True):
     out = {"harness_check": harness_check(workers) if harness else None,
            "speed_steps": SPEED_STEPS, "accel_max": ACCEL_MAX, "target_peak_c": TARGET_PEAK_C}
     if not harness:
+        import engine_env as EE
         import fingerprint as FP
-        live = FP.plant_fingerprint(plant=_plant(), backend=FP.BACKEND_CYCLE)   # its envs run the cycle model
+        # its envs run the cycle model, at the default H with X1's reward (fingerprint schema 4)
+        live = FP.plant_fingerprint(plant=_plant(), train_backend=FP.BACKEND_CYCLE, score_backend=FP.BACKEND_CYCLE,
+                                    preview_h_s=EE.PREVIEW_H_S, reward_knock=EE.REWARD_KNOCK_DEFAULT)
         out["fixed_before_training"] = dict(set=SET, plant_sha=live["plant_sha"],
                                             derived_sha=live["derived_sha"], engine=live["engine"],
                                             engine_sha=live["engine_sha"])

@@ -11,7 +11,9 @@ engines). It names the plant the episodes run on (engines.get), and the
 fingerprint's FATAL `engine` and `engine_sha` fields then refuse a model trained
 on another. A meta.json of fingerprint schema 2 -- every agent trained before the
 four-engine build, X1's and X2's among them -- names no engine and is refused
-with a message that says so: those agents are scored on main.
+with a message that says so: those agents are scored on main. A meta.json of
+schema 3, written before the plant commit (ORDER step 14), is refused with its
+own message: it records no transmission, backend pair, H or knock option.
 
 EVERY RESULT CARRIES THE PLANT THAT PRODUCED IT   (AUDIT2.md C2-1)
 ------------------------------------------------------------------
@@ -67,6 +69,16 @@ block BELOW the policy table, never as a sixth column of it:
 `analyse_phase_d.parse`, which analyse_phase_d2.py and analyse_c4.py import,
 reads the LAST FIVE fields of each policy row, and a sixth column makes it read
 the IQR as the damage median without an error.
+
+THE REWARD'S KNOCK OPTION   (rows 113 (5), 117; the plant commit P)
+--------------------------------------------------------------------
+`--reward-knock in|out` is the environment's knock option, the reward an agent
+trained with: 'in', X1's, keeps the knock term in r_life, and 'out' is row 113
+(5)'s primary reading. It is a FATAL field of fingerprint schema 4, so an agent
+trained 'out' is refused unless the flag says 'out'. Absent, it reads 'in' on
+phase-d and d2, X1's agents' reward. It moves `ret` alone: every score
+`run_episode` returns comes from the episode's damage bookkeeping and info,
+which the option does not touch.
 
 RECORDING   (JMF-2340550, 74de99a)
 ----------------------------------
@@ -132,7 +144,7 @@ import check_premise as C
 import engines
 import fingerprint as FP
 import random_road as RR
-from engine_env import SupervisoryTunerEnv, damage_rate, locked_climb
+from engine_env import PREVIEW_H_S, REWARD_KNOCK_DEFAULT, SupervisoryTunerEnv, damage_rate, locked_climb
 
 DT = 1.0
 DURATION = 720.0
@@ -257,7 +269,8 @@ def episode_cycle(road=None, *, plant):
     return RR.climb(road[0], road[1], duration=DURATION, dt=DT)
 
 
-def run_episode(policy, seed, weights, use_preview=True, road=None, record=None, *, plant):
+def run_episode(policy, seed, weights, use_preview=True, road=None, record=None, *, plant,
+                reward_knock=REWARD_KNOCK_DEFAULT):
     """One episode with the weights PINNED after reset, so every policy sees
     the same ruler on the same episode.
 
@@ -265,9 +278,12 @@ def run_episode(policy, seed, weights, use_preview=True, road=None, record=None,
     every step: the action, what the actuators did, the observation and the
     engine's state. It only reads; the scores are identical with or without it
     (record_agents.py checks). `plant` (engines.get) is required.
+    `reward_knock` is the environment's knock option (rows 113 (5), 117): only
+    `ret` depends on it; damage, damage_thermal, fuel, torque_viol, peak_turb and
+    knock are the same in both modes.
     """
     env = SupervisoryTunerEnv(episode_cycle(road, plant=plant), plant=plant, dt=DT, seed=seed,
-                              use_preview=use_preview)
+                              use_preview=use_preview, reward_knock=reward_knock)
     obs, _ = env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)   # override the fresh draw
     obs = env._obs()
@@ -419,8 +435,8 @@ def main():
     ap.add_argument("models", nargs="*",
                     help="runs/<tag> directories; 'blind' in the name means "
                          "the preview channel was zeroed during training")
-    # engines.trainable(), not known() (22 October 2026, decision 47): an EPA engine is
-    # not scored until fingerprint schema 4 and its validation exist
+    # engines.trainable(), not known() (22 October 2026, decision 47): the B58 and the EPA
+    # engines the committed records keep (rows 107 (5) and 139); any other is not scored
     ap.add_argument("--engine", required=True, choices=engines.trainable(),
                     help="the plant the episodes run on (engines.get), one that may be "
                          "scored (engines.trainable(), decision 47). REQUIRED: "
@@ -448,7 +464,13 @@ def main():
                          "this its result files would open 'PHASE D2 "
                          "EVALUATION'. run_phase_d.py passes it for any "
                          "non-default result prefix.")
+    ap.add_argument("--reward-knock", choices=("in", "out"), default=None,
+                    help="the reward the agents trained with (row 113 (5)): 'in', "
+                         "X1's, the knock term in r_life, or 'out'. A FATAL "
+                         "fingerprint field (row 117), so an agent trained the "
+                         "other way is refused. Absent: 'in' on phase-d and d2")
     a = ap.parse_args()
+    knock = (a.reward_knock or "in") == "in"     # REWARD_KNOCK_DEFAULT when absent (row 118)
     episodes, header, _ = PROTOCOLS[a.protocol]
     if a.out and os.path.exists(a.out) and not a.overwrite:
         raise SystemExit(f"\n{a.out} exists. Result files are evidence and are "
@@ -467,9 +489,13 @@ def main():
 
     plant = engines.get(a.engine)
     # backend: run_episode's SupervisoryTunerEnv has no engine_model, so every
-    # episode below runs the 0-D cycle model (fingerprint.backend_of)
-    live = FP.plant_fingerprint(plant=plant, protocol=a.protocol, backend=FP.BACKEND_CYCLE,
-                                eval_dt=DT, eval_duration=DURATION)
+    # episode below runs the 0-D cycle model (fingerprint.backend_of), at the
+    # default H with the reward --reward-knock names, X1's when absent (fingerprint
+    # schema 4); a blinded model is compared with the blinded arm's block, whose H
+    # is None (FP.for_arm)
+    live = FP.plant_fingerprint(plant=plant, protocol=a.protocol, train_backend=FP.BACKEND_CYCLE,
+                                score_backend=FP.BACKEND_CYCLE, preview_h_s=PREVIEW_H_S,
+                                reward_knock=knock, eval_dt=DT, eval_duration=DURATION)
 
     policies = [
         ("baseline ECU",  C.p_neutral,     True),
@@ -484,7 +510,8 @@ def main():
         except ImportError:
             raise SystemExit('stable-baselines3 is not installed.\n'
                              '    pip install "stable-baselines3[extra]"')
-        provenance += check_model_fingerprint(path, live, a.force_plant_mismatch)
+        blind = "blind" in path
+        provenance += check_model_fingerprint(path, FP.for_arm(live, sighted=not blind), a.force_plant_mismatch)
         # HOW LONG THIS AGENT WAS TRAINED, from the zip. The fingerprint cannot
         # tell a C4 agent from a Phase D2 one -- same plant, scenario and
         # episodes -- and meta.json's steps_requested is advisory and is not
@@ -494,7 +521,6 @@ def main():
         mdir = path.rstrip("/\\")
         provenance.append(f"model {mdir}: "
                           f"{FP.format_budget(FP.model_budget(mdir + '/final.zip'))}")
-        blind = "blind" in path
         model = SAC.load(path.rstrip("/\\") + "/final")
         policies.append((("agent (blind)" if blind else "agent") + " " + path,
                          agent_policy(model), not blind))
@@ -519,9 +545,9 @@ def main():
     out = {}
     for name, pol, prev in policies:
         if a.protocol == "phase-d":
-            rows = [run_episode(pol, s, w, prev, plant=plant) for s, w in episodes]
+            rows = [run_episode(pol, s, w, prev, plant=plant, reward_knock=knock) for s, w in episodes]
         else:
-            rows = [run_episode(pol, s, w, prev, road=(st, g), plant=plant)
+            rows = [run_episode(pol, s, w, prev, road=(st, g), plant=plant, reward_knock=knock)
                     for s, w, st, g in episodes]
         out[name] = rows
         dm, di, dw, _ = summarise(rows, "damage")

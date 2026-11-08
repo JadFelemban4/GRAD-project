@@ -30,7 +30,8 @@ THE FOUR-ENGINE TEST (31 October 2026; rows 102, 116-118 of results/
 VALIDATION_DECISIONS.md), on --road four_engine:
 
     python train_all.py --engine E --device D --road four_engine --third-arm --recipe29
-                        --roads-record results/EPA_ROADS/roads.json --seeds ... --steps 450000 --out ...
+                        --roads-record results/EPA_ROADS/roads.json --reward-knock out
+                        --seeds ... --steps 450000 --out ...
 
 --third-arm trains THREE arms per seed instead of the pair: a sighted agent at H = r x
 tau for each ratio the roads record holds (row 102: r = 0.5 and 1.5, the same on every
@@ -38,28 +39,30 @@ engine), tau the engine's frozen time constant as the record holds it (written o
 the draw by roads_ceiling's one definition), and one blinded agent, which serves both
 ratios (row 117). Their run directories are sighted_r0.5_seed<S>, sighted_r1.5_seed<S>
 and blind_seed<S>; each sighted run gets --horizon-ratio r and --roads-record, and
-train.py computes H itself (four_engine_roads.horizon_s, one definition). H BECOMES AN
-ENVIRONMENT PARAMETER ONLY WITH ROW 94'S PLANT COMMIT (row 117; ORDER step 14): until
-then every H but today's 30 s is refused, so --third-arm prints each engine's H and the
-step each preview sample falls on, and stops before it makes a directory or starts a
-run. The H refusal it prints is train.py's (four_engine_roads.preview_h_problem), and
-lifting it there opens both. --ratios R [R ...] trains the third arm at some of the
-record's ratios only (decision 29's pilot under A+G is the blinded arm and r = 1.5, row
-112), each refused unless the record holds it.
+train.py computes H itself (four_engine_roads.horizon_s, one definition). H IS AN
+ENVIRONMENT PARAMETER SINCE ROW 94'S PLANT COMMIT P (row 117; ORDER step 14): --third-arm
+prints each engine's H and the step each preview sample falls on, and refuses, before it
+makes a directory or starts a run, only an H the environment does not take; the refusal
+is train.py's (four_engine_roads.preview_h_problem). --ratios R [R ...] trains the
+third arm at some of the record's ratios only (decision 29's pilot under A+G is the
+blinded arm and r = 1.5, row 112), each refused unless the record holds it.
 --recipe29 passes decision 29's recipe to every run (row 118): --lr-schedule last-third,
 --scored-share and --checkpoint-average 50000 (training_recipe.DECISION_29_WINDOW).
-Without --third-arm and --recipe29 every command is the one this file built before.
+Without --third-arm, --recipe29 and --reward-knock every command is the one this file
+built before.
 
-WHAT THE PLANT COMMIT ADDS HERE (row 94's commit, ORDER step 14; rows 113 (5), 117). The
-team chose the reward without the knock term for this test (row 113 (5); ORDER's status
-line: "A+G, the reward without the knock term"), and row 118 puts it behind an
-environment option whose default is X1's, knock in. That option does not exist before
-the plant commit (engine_env.py is frozen until the last redraw is recorded), so nothing
-here can pass it yet. When it lands, every four-engine command must pass it explicitly,
-as --recipe29 passes the recipe, with a test that the commands carry it; the
-preregistration's commands name it, and so do schema 4's FATAL fields (with preview_h_s
-and the train and score backends, row 117). Until then a four-engine run trains on the
-reward with the knock term, which is X1's and not the test's.
+THE REWARD'S KNOCK OPTION (row 94's plant commit P, ORDER step 14; rows 113 (5), 117,
+127 (4)). The team chose the reward without the knock term for this test (row 113 (5);
+ORDER's status line: "A+G, the reward without the knock term"), and row 118 puts it
+behind an environment option whose default is X1's, knock in. --reward-knock in|out is
+that option, forwarded to every run of the call, last (after --keep-buffer): one value
+for every arm, so the sighted arms and the blinded arm of a seed agree on schema 4's
+FATAL reward_knock, as row 117's pairing rule needs. --road four_engine refuses a call
+without it (check_four_engine, after every other refusal), so no four-engine run trains
+on the knock-in reward by omission; train.py makes the same refusal of its own. Without
+the flag every other road's commands are the ones this file built before, argument for
+argument (test_four_engine_training.py holds them equal), and the preregistration's
+commands name it.
 
 CRASHES. Without --no-resume, re-running resumes every run from its last
 checkpoint, so a closed laptop costs at most the 10 000 steps since the last
@@ -144,9 +147,9 @@ def arms(a, record):
 
 
 def commands(a, record):
-    """[(tag, train.py command)] for every run. Without --third-arm and --recipe29
-    each command is the one this file built before 31 October 2026, argument for
-    argument (test_four_engine_training.py holds them equal)."""
+    """[(tag, train.py command)] for every run. Without --third-arm, --recipe29 and
+    --reward-knock each command is the one this file built before 31 October 2026,
+    argument for argument (test_four_engine_training.py holds them equal)."""
     out = []
     for s, sighted, ratio in arms(a, record):
         tag = FER.run_tag(s, use_preview=sighted, ratio=ratio)
@@ -165,6 +168,8 @@ def commands(a, record):
             cmd.append("--no-resume")
         if a.keep_buffer:
             cmd.append("--keep-buffer")
+        if getattr(a, "reward_knock", None) is not None:
+            cmd += ["--reward-knock", a.reward_knock]       # last, one value for every arm (row 117)
         out.append((tag, cmd))
     return out
 
@@ -185,9 +190,19 @@ def third_arm_problems(a, record):
     return lines, problems
 
 
+def reward_knock_problem(a):
+    """None, or why a four-engine call without --reward-knock is refused (row 127 (4))."""
+    if a.road == "four_engine" and getattr(a, "reward_knock", None) is None:
+        return ("REFUSING: --road four_engine needs --reward-knock in or out, passed explicitly "
+                "(row 127 (4)); the four-engine test trains with out (row 113 (5)).")
+    return None
+
+
 def check_four_engine(a):
-    """--third-arm, --recipe29 and --roads-record, refused before any directory or run
-    exists. Returns the roads record read_roads_record reads, or None."""
+    """--third-arm, --recipe29, --roads-record and --reward-knock, refused before any
+    directory or run exists. The knock option is required on --road four_engine at
+    both exits, after every other refusal. Returns the roads record read_roads_record
+    reads, or None."""
     needs = a.third_arm or a.recipe29
     if a.road == "four_engine":
         problem = FER.reserved_seed_problem(a.seeds)
@@ -198,6 +213,8 @@ def check_four_engine(a):
     if getattr(a, "ratios", None) and not a.third_arm:
         raise SystemExit("REFUSING: --ratios without --third-arm: only the third arm trains at r x tau.")
     if not needs:
+        if reward_knock_problem(a):
+            raise SystemExit(reward_knock_problem(a))
         return None
     if a.road != "four_engine":
         raise SystemExit(f"REFUSING: --third-arm and --recipe29 are the four-engine test's (--road four_engine; "
@@ -232,6 +249,8 @@ def check_four_engine(a):
         print("\n".join(lines))
         if problems:
             raise SystemExit("REFUSING the third arm, before any run starts: " + " | ".join(problems) + ".")
+    if reward_knock_problem(a):
+        raise SystemExit(reward_knock_problem(a))
     return record
 
 
@@ -257,8 +276,9 @@ def main():
                          "crashed run resumes with it (see the docstring)")
     ap.add_argument("--third-arm", action="store_true",
                     help="three arms per seed: sighted at H = r x tau for each ratio of --roads-record, "
-                         "and one blinded (rows 102, 117; --road four_engine). Refused until row 94's "
-                         "plant commit makes H an environment parameter")
+                         "and one blinded (rows 102, 117; --road four_engine). H is an environment parameter "
+                         "since row 94's plant commit P; only an H the environment does not take is "
+                         "refused (four_engine_roads.preview_h_problem)")
     ap.add_argument("--ratios", nargs="+", type=float, default=None, metavar="R",
                     help="with --third-arm: train the sighted arm at these of the record's ratios only "
                          "(decision 29's pilot under A+G: 1.5, row 112). Default: every ratio it holds")
@@ -268,6 +288,9 @@ def main():
     ap.add_argument("--roads-record", default=None, metavar="PATH",
                     help="the committed roads record (results/EPA_ROADS/roads.json): tau for "
                          "--third-arm, roads_seed for --recipe29")
+    ap.add_argument("--reward-knock", choices=("in", "out"), default=None,
+                    help="the reward's knock term for every run (row 113 (5)): in is X1's, out the "
+                         "four-engine test's. Required with --road four_engine (row 127 (4))")
     a = ap.parse_args()
     if a.keep_buffer and a.no_resume:
         raise SystemExit("--keep-buffer exists for resuming; --no-resume forbids it. Pick one.")
@@ -287,7 +310,9 @@ def main():
     queue, live, done = list(runs), {}, []
     t0 = time.time()
     print(f"{len(runs)} runs ({a.engine}, {a.road}, dt {a.dt:g}, {a.device}), {a.steps:,} steps each, "
-          f"at most {a.jobs} at once -> {a.out}/")
+          f"at most {a.jobs} at once -> {a.out}/"
+          + (f"; reward {'with' if a.reward_knock == 'in' else 'without'} the knock term "
+             f"(--reward-knock {a.reward_knock})" if a.reward_knock is not None else ""))
     while queue or live:
         while queue and len(live) < a.jobs:
             tag, cmd = queue.pop(0)

@@ -50,7 +50,8 @@ This file holds the line, five ways, and each can fail:
                 are its freeze record's; a spec's top-level keys are required and
                 no others, and each of B13's says its label and source in the
                 comment above it; calibrated() and trainable() (decision 47,
-                amendment B7). Since P6 (22 October 2026): the three EPA plants
+                amendment B7; since the plant commit trainable() reads the
+                committed records, row 107 (5)). Since P6 (22 October 2026): the three EPA plants
                 are registered with their six specs and not calibrated -- get()
                 and typed_engine refuse them, a candidate holds every value their
                 specs type, and `python engines.py` lists each as "not
@@ -105,7 +106,7 @@ PROTOCOL_DEFAULTS = {
     "duration": "the episode's length (train.DURATION_S, evaluate.DURATION)",
     "use_preview": "the agent's arm, sighted or blind",
     "uncertainty_beta": "the reward's price on a surrogate's uncertainty, 0 from the cycle model",
-    "protocol": "the experiment, 'phase-d' or 'd2'; a mismatch is refused on the FATAL scenario",
+    "protocol": "the experiment, 'phase-d', 'd2' or 'd34'; a mismatch is refused on the FATAL scenario",
     "road": "the road design (train.build_env) or the locked climb when None (evaluate)",
     "families": "the training roads' families (engine_env.TERRAIN_FAMILIES)",
     "weights": "their shares (engine_env.TERRAIN_WEIGHTS)",
@@ -113,6 +114,12 @@ PROTOCOL_DEFAULTS = {
     "enrichment_map": "a mode of the ECU model, off unless asked",
     "pin_block": "a mode of the replay (car_thermal.thermal_replay)",
     "dtheta": "the crank-angle step, every engine's (plant.DTHETA_DEG, the FATAL dtheta_deg)",
+    # the plant commit P (interface sheet 6.7; P1): H as an environment parameter
+    "preview_h_s": "the preview horizon H, s (row 117): 30 s gives PREVIEW_S on every engine; the four-engine "
+                   "arms pass r x tau",
+    # the plant commit P (interface sheet 6.7; P3): the reward's knock option
+    "reward_knock": "the reward's knock term: True (X1's, knock in) unless a command passes --reward-knock "
+                    "(rows 113 (5), 118, 127 (4))",
 }
 # ... or when it defaults to None, and only None, because the function then reads
 # the plant's own value (engines.py: a default read from the plant is not a
@@ -182,7 +189,9 @@ CALLS = {
     "measure_deliverable_torque": [("kw", "plant"), ("pos_or_kw", 0, "rpms")],
     "min_tractive_force": [("pos_or_kw", 2, "floor_nm")],
     "extreme_speed_profile": [("pos_or_kw", 6, "floor_nm")],
-    "plant_fingerprint": [("kw", "plant"), ("kw", "backend")],
+    # schema 4 (the plant commit P; interface sheet rule 1.7): every FATAL input a caller knows, passed
+    "plant_fingerprint": [("kw", "plant"), ("kw", "train_backend"), ("kw", "score_backend"),
+                          ("kw", "preview_h_s"), ("kw", "reward_knock")],
     "run_episode": [("kw", "plant")],
     "episode_cycle": [("kw", "plant")],
     "scenario_line": [("kw", "plant")],
@@ -642,7 +651,8 @@ class Calls(unittest.TestCase):
         beside = sorted(m.split("'")[1] for _, _, c, m in hits if c == "def measure")
         self.assertEqual(beside, ["rpms", "settle", "t_amb", "t_block"],
                          "seed, dt and v_kmh=None are the experiment's or the plant's own")
-        self.assertEqual([m for _, _, c, m in hits if c == "FP.plant_fingerprint"], ["backend"])
+        self.assertEqual([m for _, _, c, m in hits if c == "FP.plant_fingerprint"],
+                         ["train_backend, score_backend, preview_h_s, reward_knock"])
         self.assertEqual([m for _, _, c, m in hits if c == "E.measure_deliverable_torque"], ["rpms"])
         self.assertEqual(sorted(m for _, _, c, m in hits if c == "engines.with_fuel"),
                          ["engine (None)", "fuel"])
@@ -753,8 +763,12 @@ class Signatures(unittest.TestCase):
             (W.WideAirTrainingEnv, "plant"), (W.ThinAirVehicle, "plant"), (W.deliverable_torque, "plant"),
             (W.thin_air_ratios, "plant"), (W.inlet_kpa, "engine"), (W.grade_floor, "floor_nm"),
             (W.speed_profile, "floor_nm"),
-            (FP.plant_fingerprint, "plant"), (FP.plant_fingerprint, "backend"), (FP.derived_sha, "path"),
-            (FP.plant_files, "name"),
+            (FP.plant_fingerprint, "plant"), (FP.derived_sha, "path"), (FP.plant_files, "name"),
+            # schema 4 (the plant commit P): the four FATAL inputs a caller knows, none with a default
+            # (interface sheet rule 1.7), and the car whose box transmission records
+            (FP.plant_fingerprint, "train_backend"), (FP.plant_fingerprint, "score_backend"),
+            (FP.plant_fingerprint, "preview_h_s"), (FP.plant_fingerprint, "reward_knock"),
+            (FP.transmission_of, "car"),
             (V.run_episode, "plant"), (V.episode_cycle, "plant"), (V.scenario_line, "plant"),
             (C.rollout, "plant"), (derived.get, "path"), (derived.all_params, "path"),
             (engines.get, "name"), (engines.typed_engine, "name"), (engines.spec_files, "name"),
@@ -1361,12 +1375,19 @@ class Registry(unittest.TestCase):
                     engines.build_candidate("_p5_epa", vals)
 
     def test_calibrated_and_trainable(self):
-        """Decision 47: only the B58 may train or be scored. Amendment B7: whether a
-        plant can be built from its files, and fingerprint.py's refusal by name."""
+        """Decision 47 and row 107 (5): the B58 always, and the EPA engines the
+        committed records keep, as a tuple in known() order, the B58 first; the
+        exact set on synthetic records is test_trainable's (row 127 (3): the pin
+        of ("b58",) went with the plant commit). Amendment B7: whether a plant can
+        be built from its files, and fingerprint.py's refusal by name."""
         import engines
         import fingerprint as FP
-        self.assertEqual(engines.trainable(), ("b58",))
-        self.assertTrue(set(engines.trainable()) <= set(engines.known()))
+        t = engines.trainable()
+        self.assertIs(type(t), tuple)
+        self.assertEqual(t[0], "b58")
+        self.assertTrue(set(t) <= set(engines.known()))
+        self.assertEqual(list(t), [n for n in engines.known() if n in t])
+        self.assertEqual(t, engines.trainable_in(engines.HERE))
         self.assertTrue(engines.calibrated("b58"))
         FP.refuse_uncalibrated("b58")                       # the control: no exit
         spec, _ = _epa_probe(engines.get("b58"))
@@ -1392,8 +1413,8 @@ class Registry(unittest.TestCase):
         spec and its car spec, and none is calibrated: calibrated() says no and
         names the derived file, then the freeze record, as missing; get() refuses
         each with the command that makes its file, and caches nothing; typed_engine
-        refuses each by its DERIVED cycle fields; trainable() is still the B58
-        alone (decision 47). Built as a candidate from the B58's values for the EPA
+        refuses each by its DERIVED cycle fields; trainable() is read from the
+        records (row 107 (5); test_trainable). Built as a candidate from the B58's values for the EPA
         set's DERIVED fields (numbers that only let the records build; nothing is
         run, no EPA row is read), each plant holds every value its specs type, by
         the record field of that name (mistake 25), and name_of names it by its
@@ -1407,7 +1428,7 @@ class Registry(unittest.TestCase):
         epa = {"mazda_25t": "cx9_2016", "honda_l15b7": "accord_2018", "ford_27tt": "f150_2015"}
         self.assertEqual(engines.known(), sorted(["b58"] + list(epa)))
         self.assertEqual({n: engines.PLANTS[n] for n in epa}, {n: (n, c) for n, c in epa.items()})
-        self.assertEqual(engines.trainable(), ("b58",))
+        self.assertIn("b58", engines.trainable())
         self.assertEqual(engines._missing_files("b58"), [])
         p = engines.get("b58")
         vals = {}

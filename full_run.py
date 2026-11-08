@@ -83,7 +83,7 @@ STEPS = [
      "neutral near zero, the starver punished"),
     ("test_plant_guards.py — the sub-stepping and the derived fingerprint",
      ["test_plant_guards.py"], False,
-     "19 tests OK, 9 of them skipped until the EPA plants are calibrated: a step equals "
+     "47 tests OK, 0 skipped: a step equals "
      "its sub-steps, the coolant settles at 2 s, one changed constant moves derived_sha "
      "and a timestamp does not; the schema-3 guards (21 Oct); git_dirty_plant_files (22 Oct)"),
     ("test_fuel_forms.py — build step 2: the fuel, the clip and the forms are the engine's",
@@ -96,9 +96,9 @@ STEPS = [
     ("test_carried.py — build step 2: every value an EPA spec carries from the B58",
      ["test_carried.py"], False,
      "16 tests OK: each CARRIED marker against the B58's value, bit for bit"),
-    ("test_trainable.py — build step 2: no EPA engine trains or is scored yet",
+    ("test_trainable.py — decision 47 and row 107 (5): the entry points take the engines the committed records keep",
      ["test_trainable.py"], False,
-     "10 tests OK: every entry point refuses an EPA engine by name (decision 47)"),
+     "23 tests OK: each of the five entry points refuses a dropped engine, each with its control (row 139)"),
     ("check_premise.py — the premise table, five policies",
      ["check_premise.py"], True,
      "THE BASELINE ROW AND WHETHER THE CONSTRAINT BINDS. This is the block "

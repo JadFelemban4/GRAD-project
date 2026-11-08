@@ -1,7 +1,9 @@
 """fingerprint.py — what plant produced this result, written down beside it.
 
     from fingerprint import plant_fingerprint, compare, format_block, BACKEND_CYCLE
-    live = plant_fingerprint(plant=engines.get("b58"), backend=BACKEND_CYCLE)
+    live = plant_fingerprint(plant=engines.get("b58"), train_backend=BACKEND_CYCLE,
+                             score_backend=BACKEND_CYCLE, preview_h_s=engine_env.PREVIEW_H_S,
+                             reward_knock=engine_env.REWARD_KNOCK_DEFAULT)
 
 WHY THIS FILE EXISTS
 --------------------
@@ -62,19 +64,28 @@ their numbers is meaningless.
     derived_sha        the plant's derived file (data/derived_params.json for the B58)
     engine             the plant's id, engine and car ("b58b30o1/a90-supra-zf8hp51")
     engine_sha         every value of the plant as built, from the live objects
-    backend            what computes the engine: "cycle", the 0-D cycle model;
+    train_backend      what computes the engine in training, and in scoring:
+    score_backend      "cycle", the 0-D cycle model, the only one (row 136);
                        every caller says which (backend_of), none is assumed
-    gears, final_drive the transmission
+    backend_contract   the contract's two files, MD and JSON, by sha_text
+    transmission       the car's box: stepped (gears, final_drive) or the
+                       CVT's ratio range, final drive and law (transmission_of)
     dtheta_deg         the crank-angle integration step (AUDIT.md H1)
     turb_protect_k     the protection trigger; the damage knee
     oil_protect_k      the same for the oil node
     scenario           grade / v_kmh / t_amb of the plant's locked climb
+                       (phase-d), random_road.spec() (d2), or decision 34's
+                       roads record (d34; d34_roads)
     episodes_sha       the twenty frozen evaluation episodes
+    preview_h_s        H, the preview horizon the agent saw, s; null for the
+                       blinded arm (row 117)
+    reward_knock       the reward's knock option, True for X1's knock term
 
 Advisory means: worth knowing, not worth refusing over.
 
-    git_head, git_dirty, git_dirty_plant_files, python, numpy, dt, duration,
-    steps, seed, use_preview, created (a caller-supplied stamp)
+    plant_text_sha, preview_samples_s, git_head, git_dirty,
+    git_dirty_plant_files, n_episodes, python, eval_dt, eval_duration, and the
+    caller's own: dt, duration, steps, seed, use_preview, created (a stamp)
 
 `episodes_sha` is fatal on purpose. `evaluate.py`'s own docstring says THE
 TWENTY EPISODES ARE FROZEN and that changing the test set after seeing a result
@@ -90,6 +101,19 @@ the derived file the B58's by default. Three FATAL fields join: `engine`,
 with a message that says so (schema_problem), never matched to one implicitly:
 X1's and X2's agents are scored on main, and B58 agents trained on GRA-test are
 a new experiment (CLAUDE.md rule 5).
+
+SCHEMA 4, THE PLANT COMMIT (ORDER step 14; rows 94, 117, 127 and 136; decisions
+27, 28, 34 and 91; interface sheet 6.2). `backend` becomes train_backend and
+score_backend, each 'cycle' only (row 136 builds no table; the scoring stays on
+the exact cycle permanently, MD:1462), beside the contract they are judged under
+(backend_contract). `gears` and `final_drive` become `transmission`, which a CVT
+can fill: schema 3 refused the Accord by name (amendment B17). Decision 34's
+protocol, d34, reads its scenario and its twenty roads from the roads record
+(d34_roads). preview_h_s and reward_knock are FATAL and have no default
+(mistake 19): the blinded arm records preview_h_s null, and pair_problems is row
+117's rule for pairing a sighted agent with a blinded one. plant_sha's files and
+rule are unchanged. git_dirty_plant_files matches whole paths (row 127 (5)). A
+schema-3 record is refused by schema_problem with its own message.
 """
 import ast
 import hashlib
@@ -122,22 +146,26 @@ def plant_files(name):
 
 # Fields whose disagreement makes two numbers incomparable. Everything else in
 # the block is printed for the reader and never refused over.
-FATAL = ("plant_sha", "derived_sha", "engine", "engine_sha", "backend", "gears", "final_drive",
-         "dtheta_deg", "turb_protect_k", "oil_protect_k", "scenario", "episodes_sha")
+FATAL = ("plant_sha", "derived_sha", "engine", "engine_sha", "train_backend", "score_backend",
+         "backend_contract", "transmission", "dtheta_deg", "turb_protect_k", "oil_protect_k", "scenario",
+         "episodes_sha", "preview_h_s", "reward_knock")
 
 # 2 since 8 October 2026 (conflict.md decision 2, agreed by Jad and Ghassan):
 # the derived constants are fatal (derived_sha), derived.py is a plant file, and
 # the code hash no longer depends on the Python version (_code_only).
 # 3 since 20 October 2026 (the four-engine build): the plant is passed, and
 # engine, engine_sha and backend are fatal. See the module docstring.
-SCHEMA_VERSION = 3
+# 4 since the plant commit (ORDER step 14; rows 117 and 127 (3)): transmission,
+# train_backend and score_backend with the contract, decision 34's protocol,
+# preview_h_s and reward_knock. See the module docstring.
+SCHEMA_VERSION = 4
 
-# What computes the engine. Only the 0-D cycle model exists; decision 28 would
-# add a tabulated backend ("table:<sha>"), recorded separately for training and
-# for scoring. plant_fingerprint has no default for it (21 October 2026, the
-# review of build step 1): a FATAL field filled from a keyword default would
-# record "cycle" for a table-trained agent whose caller forgot to say so, and the
-# comparison would then pass it (mistake 19).
+# What computes the engine, in training (train_backend) and in scoring
+# (score_backend). Only the 0-D cycle model exists, and row 136 builds no table,
+# so no other backend string exists. plant_fingerprint has no default for either
+# (21 October 2026, the review of build step 1): a FATAL field filled from a
+# keyword default would record "cycle" for an agent whose caller forgot to say
+# what computed its engine, and the comparison would then pass it (mistake 19).
 BACKEND_CYCLE = "cycle"
 
 
@@ -145,16 +173,159 @@ def backend_of(env):
     """The backend of a SupervisoryTunerEnv (or anything with its `engine`
     attribute): the 0-D cycle model when it was given no engine_model, which is
     every environment this project builds. An engine_model has no backend name
-    yet (decision 28 would give it one), so it is refused, never called "cycle";
-    so is an object with no `engine` at all (a wrapper: pass env.unwrapped)."""
+    (row 136 builds no table), so it is refused, never called "cycle"; so is an
+    object with no `engine` at all (a wrapper: pass env.unwrapped). train.py
+    records it as train_backend (schema 4)."""
     if not hasattr(env, "engine"):
         raise TypeError(f"backend_of needs the SupervisoryTunerEnv itself (env.unwrapped), "
                         f"not a {type(env).__name__}")
     if env.engine is None:
         return BACKEND_CYCLE
     raise ValueError(f"the environment computes its engine with {type(env.engine).__name__}, which "
-                     "has no backend name (decision 28); fingerprint.py records only "
+                     "has no backend name (row 136 builds no table); fingerprint.py records only "
                      f"{BACKEND_CYCLE!r}, the 0-D cycle model")
+
+
+def preview_of(env):
+    """H, s, as an environment holds it (row 117): None for the blinded arm, which sees no grade ahead at
+    any H, else float(env.preview_h_s). TypeError for an object without use_preview and preview_h_s (a
+    wrapper: pass env.unwrapped)."""
+    if not (hasattr(env, "use_preview") and hasattr(env, "preview_h_s")):
+        raise TypeError(f"preview_of needs the SupervisoryTunerEnv itself (env.unwrapped), "
+                        f"not a {type(env).__name__}")
+    return float(env.preview_h_s) if env.use_preview else None
+
+
+def reward_knock_of(env):
+    """The reward's knock option an environment computes (row 113 (5)): env.reward_knock, a bool. TypeError
+    when it is missing (a wrapper: pass env.unwrapped) or not a bool."""
+    v = getattr(env, "reward_knock", None)
+    if type(v) is not bool:
+        raise TypeError(f"reward_knock_of needs the SupervisoryTunerEnv itself (env.unwrapped), whose "
+                        f"reward_knock is a bool; a {type(env).__name__} gives {v!r}")
+    return v
+
+
+def transmission_of(car):
+    """The car's box as schema 4 records it, read from the car record (dispatched on its type, so a new
+    kind of car is a TypeError until it has a form here):
+
+        engines.Car, engines.EpaCar   {"kind": "stepped", "gears": [...], "final_drive": ...}
+        engines.CvtCar                {"kind": "cvt", "ratio_low_gear", "ratio_top_gear", "final_drive",
+                                       "kickdown_load", "target_load", "cvt_rpm_min"}: the published
+                                       range and decision 40's law (engines.py, CvtCar)"""
+    import engines
+    if type(car) in (engines.Car, engines.EpaCar):
+        return {"kind": "stepped", "gears": [float(g) for g in car.gears], "final_drive": float(car.final_drive)}
+    if type(car) is engines.CvtCar:
+        return {"kind": "cvt", **{k: float(getattr(car, k)) for k in (
+            "ratio_low_gear", "ratio_top_gear", "final_drive", "kickdown_load", "target_load", "cvt_rpm_min")}}
+    raise TypeError(f"transmission_of: {type(car).__name__} is not an engines.Car, EpaCar or CvtCar")
+
+
+def backend_contract():
+    """The contract a backend is judged under (MD:1466-1467; row 117): the sha_text of both of its files,
+    results/ENGINE_THRESHOLDS.md and .json (thresholds.common). The files are hashed, never parsed. Read
+    at every call, never at import, so a guarded test patches this function (interface sheet 1.8)."""
+    from thresholds import common
+    return {"md_sha_text": common.sha_text(common.CONTRACT_MD),
+            "json_sha_text": common.sha_text(common.CONTRACT_JSON)}
+
+
+def for_arm(fp, *, sighted):
+    """A copy of a live block for one arm: the blinded arm's H is None (row 117), so its preview_h_s and
+    preview_samples_s are None. The live side of a comparison; it never writes a meta.json."""
+    out = dict(fp)
+    if not sighted:
+        out.update(preview_h_s=None, preview_samples_s=None)
+    return out
+
+
+def pair_problems(sighted, blind):
+    """Row 117's pairing rule, as (field, a, b) triples, [] for a pair: every FATAL field but preview_h_s
+    agrees; the sighted agent's H is a positive finite float and the blinded agent's is None; and neither
+    block is of another schema (schema_problem)."""
+    import math
+    out = [(k, sighted.get(k), blind.get(k)) for k in FATAL
+           if k != "preview_h_s" and sighted.get(k) != blind.get(k)]
+    h = sighted.get("preview_h_s")
+    if not (type(h) is float and math.isfinite(h) and h > 0.0):
+        out.append(("preview_h_s", h, "the sighted agent's H is not a positive finite float"))
+    if blind.get("preview_h_s") is not None:
+        out.append(("preview_h_s", blind.get("preview_h_s"), "the blinded agent's H is not None"))
+    for side, block in (("sighted", sighted), ("blind", blind)):
+        why = schema_problem(block)
+        if why:
+            out.append(("schema", side, why))
+    return out
+
+
+def _d34(root):
+    """(scenario, roads, design) of decision 34's scored set; d34_roads says what is read and refused."""
+    import epa_roads as ER
+    from thresholds import common
+    path = os.path.join(root, ER.ROADS_REL)
+    record = ER.load_record(path)
+    roads_sha = ER.roads_sha(path)
+    rpath = os.path.join(root, ER.REDRAWS_REL)
+    if os.path.exists(rpath):
+        redraws = ER.load_record(rpath)
+        if redraws.get("roads_sha") != roads_sha:
+            raise ValueError(f"decision 34: {ER.REDRAWS_REL} was redrawn from another roads.json "
+                             f"(its roads_sha is not {ER.ROADS_REL}'s)")
+        roads, reading, redraws_sha = redraws["readings"]["version 6"]["roads"], "version 6", common.sha_text(rpath)
+    elif record["seed_kind"] == "REAL":
+        raise ValueError(f"decision 34: a REAL {ER.ROADS_REL} without {ER.REDRAWS_REL}: the decision-34 set "
+                         "is final only once R4 commits the redraws (ORDER step 12; row 95 (2))")
+    else:
+        roads, reading, redraws_sha = record["roads"], "first draw", None
+    episodes = ER.frozen_episodes(root=root)
+    if [r.get("k") for r in roads] != list(range(len(episodes))):
+        raise ValueError(f"decision 34: the roads are not k = 0..{len(episodes) - 1} in order")
+    for r in roads:
+        w = r["weights"]
+        if (type(r["episode_seed"]) is not int or not all(type(x) is float for x in w)
+                or (r["episode_seed"], tuple(w)) != episodes[r["k"]]):
+            raise ValueError(f"decision 34: road {r['k']}'s (episode_seed, weights) is not evaluate.EPISODES"
+                             f"[{r['k']}]")
+    scenario = {"protocol": "decision-34", "seed_kind": record["seed_kind"], "roads_sha": roads_sha,
+                "redraws_sha": redraws_sha, "reading": reading,
+                "design_sha": hashlib.sha256(json.dumps(record["design"], sort_keys=True).encode()).hexdigest()[:16]}
+    return scenario, roads, record["design"]
+
+
+def d34_roads(*, root):
+    """(scenario, roads): decision 34's scored set, the one reader of it (interface sheet 6.2 and 12.10).
+    roads.json's twenty roads as R4's redraws.json reads them under version 6 (row 95 (2)), whose
+    roads_sha must be roads.json's; a SYNTHETIC record without redraws.json is its first draw, and a REAL
+    one without it is refused. The roads must be k = 0..19 in order, each with evaluate.EPISODES[k]'s
+    seed and float weights. Nothing of commit_reveal (roads_seed and the revealed integers) is read into
+    the scenario. Imports only epa_roads and thresholds.common, lazily."""
+    scenario, roads, _ = _d34(root)
+    return scenario, roads
+
+
+def d34_set(*, root):
+    """(scenario, entries): one entry (k, episode_seed, weights, the arrays' sha256) per road of
+    d34_roads, which episodes_sha('d34') hashes."""
+    scenario, roads = d34_roads(root=root)
+    return scenario, _d34_entries(roads)
+
+
+def _d34_entries(roads):
+    import epa_roads as ER
+    return tuple((r["k"], r["episode_seed"], tuple(r["weights"]), ER.arrays_sha256([r])) for r in roads)
+
+
+def _porcelain_paths(z):
+    """The paths of `git status --porcelain=v1 -z --no-renames`: NUL-separated, never quoted, whole."""
+    return {e[3:] for e in z.split("\0") if e}
+
+
+def _dirty_plant(files, paths, prefix):
+    """The plant files among git's paths, matched whole (row 127 (5)): git names a path from the
+    repository's root, and `prefix` (rev-parse --show-prefix) is this directory's path there."""
+    return sorted(n for n in files if prefix + n in paths)
 
 
 def _code_only(src):
@@ -334,12 +505,14 @@ def _git(*args):
 
 def _episode_set(protocol):
     """The frozen evaluation set a protocol is scored on."""
+    if protocol == "d34":
+        return d34_set(root=HERE)[1]
     import evaluate
     if protocol == "phase-d":
         return evaluate.EPISODES
     if protocol == "d2":
         return evaluate.EPISODES_D2
-    raise ValueError(f"unknown protocol {protocol!r}; expected 'phase-d' or 'd2'")
+    raise ValueError(f"unknown protocol {protocol!r}; expected 'phase-d', 'd2' or 'd34'")
 
 
 def episodes_sha(protocol="phase-d"):
@@ -347,7 +520,8 @@ def episodes_sha(protocol="phase-d"):
 
     Phase D: `evaluate.EPISODES`, twenty (seed, weights) pairs -- UNCHANGED, so
     every Phase D `meta.json` still matches. Phase D2: `evaluate.EPISODES_D2`,
-    the same twenty plus a pinned (start, grade) road each.
+    the same twenty plus a pinned (start, grade) road each. Decision 34 (schema
+    4): d34_set's twenty entries, each road's k, seed, weights and arrays.
 
     Imported lazily. `evaluate` imports `check_premise`, which imports
     `engine_env`, and `train.py` should not pay for that import graph twice.
@@ -376,16 +550,21 @@ def derived_sha(path):
     return hashlib.sha256(json.dumps(vals, sort_keys=True).encode()).hexdigest()[:16]
 
 
-def plant_fingerprint(protocol="phase-d", *, plant, backend, **advisory):
+def plant_fingerprint(protocol="phase-d", *, plant, train_backend, score_backend, preview_h_s, reward_knock,
+                      **advisory):
     """The block, built from the LIVE objects. Never from a literal.
 
     Every value here is read out of the plant passed in and the imported
     modules at the moment of the call, which is the point: a fingerprint typed
     as a constant would drift the same way the header string did. `plant` (an
-    engines.Plant) is REQUIRED (schema 3, 20 October 2026), and so is `backend`,
-    what computes its engine (backend_of(env), or BACKEND_CYCLE from a caller
-    whose episodes run the 0-D cycle model): it was a keyword default until 21
-    October 2026. plant_sha hashes the code and the passed plant's own specs
+    engines.Plant) is REQUIRED (schema 3, 20 October 2026), and so is every
+    FATAL input a caller knows and the plant does not (schema 4; mistake 19):
+    `train_backend` and `score_backend`, what computes the engine in training
+    and in scoring (backend_of(env), or BACKEND_CYCLE from a caller whose
+    episodes run the 0-D cycle model; 'cycle' only, row 136); `preview_h_s`,
+    the agent's H (preview_of(env); None for the blinded arm, row 117); and
+    `reward_knock`, the reward's knock option (reward_knock_of(env)). None has
+    a default. plant_sha hashes the code and the passed plant's own specs
     (plant_files, by engines.name_of).
 
     `protocol` selects the experiment, and it changes two FATAL fields:
@@ -396,28 +575,48 @@ def plant_fingerprint(protocol="phase-d", *, plant, backend, **advisory):
         d2        scenario = random_road.spec(): the two ranges, speed,
                   ambient and a hash of random_road.py's own code
                   episodes_sha = evaluate.EPISODES_D2
+        d34       scenario = decision 34's roads record (d34_roads; interface
+                  sheet 12.10), eval_dt and eval_duration its design's
+                  episodes_sha = d34_set's twenty roads
 
     So a Phase D agent scored under D2, or the reverse, is REFUSED on
     `scenario` -- which is correct: neither number would belong to either
     experiment.
+
+    Refused: an advisory `use_preview` that contradicts preview_h_s; an
+    advisory transmission or backend_contract (both FATAL, read here, never
+    passed); and under d34 an advisory eval_dt, eval_duration, scenario,
+    episodes_sha or n_episodes that differs from the value read here.
     """
     import engines
+    import engine_env as E
     import evaluate as V
     from plant import DTHETA_DEG
 
     if plant is None:
         raise TypeError("plant_fingerprint(plant=engines.get(name)): there is no default engine")
-    if backend != BACKEND_CYCLE:
-        raise ValueError(f"backend {backend!r}: only {BACKEND_CYCLE!r}, the 0-D cycle model, exists "
-                         "(decision 28 would add a table)")
-    # A CVT HAS NO GEARS (22 October 2026, build step 2 P5; amendment B17). The
-    # FATAL gears and final_drive below record a stepped box; the Accord's CVT
-    # (engines.CvtCar) has a ratio range and a law instead, and schema 3 has no
-    # field for them. Refused by name here, not as an AttributeError at `gears`;
-    # what schema 4 records is still open (CHECKPOINT.md: "fingerprint schema 4
-    # (decisions 27, 28) before any new engine trains").
-    if isinstance(plant.car, engines.CvtCar):
-        raise ValueError(f"{plant.id}: this car has no gears; fingerprint schema 3 cannot record it")
+    # BOTH BACKENDS ARE THE CYCLE (row 136: every engine trains on the exact cycle, and no table is
+    # built; the scoring stays on it permanently, MD:1462). Both stay FATAL, as row 117 lists them.
+    for name, value in (("train_backend", train_backend), ("score_backend", score_backend)):
+        if value != BACKEND_CYCLE:
+            raise ValueError(f"{name} {value!r}: only {BACKEND_CYCLE!r}, the 0-D cycle model, exists "
+                             "(row 136 builds no table)")
+    if preview_h_s is not None:
+        try:
+            samples = list(E.preview_samples(preview_h_s))
+        except (TypeError, ValueError) as exc:
+            raise type(exc)(f"plant_fingerprint: preview_h_s {preview_h_s!r} is neither None (the blinded "
+                            f"arm) nor an H the environment takes: {exc}") from None
+    if type(reward_knock) is not bool:
+        raise TypeError(f"plant_fingerprint: reward_knock is a bool, the reward's knock option "
+                        f"(row 113 (5)), not {reward_knock!r}")
+    if "use_preview" in advisory and bool(advisory["use_preview"]) != (preview_h_s is not None):
+        raise ValueError(f"plant_fingerprint: use_preview {advisory['use_preview']!r} contradicts "
+                         f"preview_h_s {preview_h_s!r}: the blinded arm's H is None, a sighted arm's a number")
+    passed = sorted(k for k in ("transmission", "backend_contract") if k in advisory)
+    if passed:
+        raise ValueError(f"plant_fingerprint: {passed} are FATAL and read here (transmission_of, "
+                         "backend_contract), never passed")
     # A CANDIDATE IS NEVER FINGERPRINTED (22 October 2026, the review of build step
     # 2 P5): engines.build_candidate builds it from a calibration's in-memory
     # values, and derived_sha below would hash the file on disk its engine.derived
@@ -427,23 +626,38 @@ def plant_fingerprint(protocol="phase-d", *, plant, backend, **advisory):
                          f"values, not from {plant.engine.derived}: a fingerprint would record that file's "
                          "derived_sha for it. Fingerprint the plant engines.get builds from the file")
     files = plant_files(engines.name_of(plant))
+    eval_dt, eval_duration = float(V.DT), float(V.DURATION)
     if protocol == "phase-d":
         sc = plant.scenario
         scenario = {"grade": float(sc.grade), "v_kmh": float(sc.v_kmh), "t_amb": float(sc.t_amb)}
+        episodes = _episode_set(protocol)
     elif protocol == "d2":
         import random_road as RR
         scenario = RR.spec()
+        episodes = _episode_set(protocol)
+    elif protocol == "d34":
+        scenario, roads, design = _d34(HERE)
+        episodes = _d34_entries(roads)
+        eval_dt, eval_duration = float(design["dt"]), float(design["duration_s"])
     else:
-        raise ValueError(f"unknown protocol {protocol!r}; expected 'phase-d' or 'd2'")
+        raise ValueError(f"unknown protocol {protocol!r}; expected 'phase-d', 'd2' or 'd34'")
+    ep_sha = hashlib.sha256(repr(episodes).encode()).hexdigest()[:16]
+    if protocol == "d34":
+        own = {"eval_dt": eval_dt, "eval_duration": eval_duration, "scenario": scenario, "episodes_sha": ep_sha,
+               "n_episodes": len(episodes)}
+        differ = sorted(k for k, v in own.items() if k in advisory and advisory[k] != v)
+        if differ:
+            raise ValueError(f"plant_fingerprint: under d34, {differ} are the roads record's, and the "
+                             "caller's differ")
 
-    # --untracked-files=all (20 October 2026): without it git folds a new
-    # directory into one line ("?? engine_specs/"), and the typed specs, plant
-    # files since schema 3, were missing from git_dirty_plant_files while untracked
-    dirty = _git("status", "--porcelain", "--untracked-files=all")
-    dirty_plant = sorted(
-        n for n in files
-        if dirty and any(line[3:].strip().endswith(n) for line in dirty.splitlines())
-    )
+    # the exact match (row 127 (5)): -z keeps every path whole and unquoted, --no-renames lists a
+    # rename as its two paths, and --untracked-files=all names each new file (20 October 2026: without
+    # it git folds a new directory into one line, "?? engine_specs/"). The paths are the repository's,
+    # so this directory's prefix is added to each plant file's name; the suffix match this replaces
+    # named thermal.py for a dirty car_thermal.py.
+    status = _git("status", "--porcelain=v1", "-z", "--no-renames", "--untracked-files=all")
+    prefix = _git("rev-parse", "--show-prefix")
+    paths = None if status is None or prefix is None else _porcelain_paths(status)
 
     fp = {
         "schema": SCHEMA_VERSION,
@@ -460,26 +674,32 @@ def plant_fingerprint(protocol="phase-d", *, plant, backend, **advisory):
         # which plant, and every value it was built with (schema 3)
         "engine": plant.id,
         "engine_sha": engines.engine_sha(plant),
-        "backend": backend,
-        "gears": [float(g) for g in plant.car.gears],
-        "final_drive": float(plant.car.final_drive),
+        # what computed the engine, and the contract it is judged under (schema 4)
+        "train_backend": train_backend,
+        "score_backend": score_backend,
+        "backend_contract": backend_contract(),
+        "transmission": transmission_of(plant.car),
         "dtheta_deg": float(DTHETA_DEG),
         "turb_protect_k": float(plant.engine.damage.turb_knee_k),
         "oil_protect_k": float(plant.engine.damage.oil_knee_k),
         "scenario": scenario,
-        "episodes_sha": episodes_sha(protocol),
+        "episodes_sha": ep_sha,
+        # the agent's H and the reward's knock option (schema 4; rows 113 (5) and 117)
+        "preview_h_s": None if preview_h_s is None else float(preview_h_s),
+        "reward_knock": reward_knock,
         # --- advisory --------------------------------------------------------
+        "preview_samples_s": None if preview_h_s is None else samples,
         "git_head": _git("rev-parse", "HEAD"),
         # None, not False, when git could not be asked. `bool(None)` is False,
         # which would print "git_dirty False" into a result file produced from
         # an exported zip with no .git -- indistinguishable from a genuinely
         # clean tree. Unknown is not clean.
-        "git_dirty": None if dirty is None else bool(dirty),
-        "git_dirty_plant_files": None if dirty is None else dirty_plant,
-        "eval_dt": float(V.DT),
-        "eval_duration": float(V.DURATION),
-        "n_episodes": len(_episode_set(protocol)),
+        "git_dirty": None if paths is None else bool(paths),
+        "git_dirty_plant_files": None if paths is None else _dirty_plant(files, paths, prefix),
+        "n_episodes": len(episodes),
         "python": platform.python_version(),
+        "eval_dt": eval_dt,
+        "eval_duration": eval_duration,
     }
     fp.update(advisory)
     return fp
@@ -491,10 +711,16 @@ def schema_problem(stored):
     A record of an older schema names no engine (schema 3, 20 October 2026):
     comparing it field by field would list engine, engine_sha and backend as
     "mismatches" and hide the reason, so the callers ask this first and refuse
-    with its message."""
+    with its message. A schema-3 record has its own (schema 4, the plant
+    commit): it names its engine but not what schema 4 adds."""
     s = stored.get("schema")
     if s == SCHEMA_VERSION:
         return None
+    if s == 3:
+        return ("its meta.json is fingerprint schema 3, written before the plant commit (ORDER step 14): "
+                "it records no transmission, train/score backend, decision-34 protocol, preview_h_s or "
+                f"reward knock option, and none is assumed. This tree writes schema {SCHEMA_VERSION}; an "
+                "agent trained on it is a new experiment (CLAUDE.md rule 5).")
     return (f"its meta.json is fingerprint schema {s}, written before the four-engine "
             f"build; this tree writes schema {SCHEMA_VERSION}. A schema-{s} record names no "
             "engine (no engine, engine_sha or backend), and none is assumed for it. Agents "
@@ -507,8 +733,9 @@ def compare(a, b):
 
     FATAL fields only. `a` is conventionally the stored one (meta.json) and `b`
     the live one, and the caller decides what to do about a non-empty list.
-    A stored record of an older schema lacks the schema-3 fields, so they show
-    here as disagreements; ask schema_problem first for the reason.
+    A stored record of an older schema lacks the schema-3 or schema-4 fields, so
+    they show here as disagreements; ask schema_problem first for the reason. A
+    blinded agent is compared with for_arm(live, sighted=False).
     """
     out = []
     for k in FATAL:
@@ -730,13 +957,23 @@ def refuse_uncalibrated(name):
 
 if __name__ == "__main__":
     import argparse
+    import engine_env
     import engines
     ap = argparse.ArgumentParser()
     ap.add_argument("--engine", required=True, choices=engines.known())
-    ap.add_argument("--protocol", default="phase-d", choices=("phase-d", "d2"))
+    ap.add_argument("--protocol", default="phase-d", choices=("phase-d", "d2", "d34"))
+    ap.add_argument("--preview-h-s", type=float, default=engine_env.PREVIEW_H_S,
+                    help="the sighted agent's H, s (row 117; default %(default)s)")
+    ap.add_argument("--blind", action="store_true", help="the blinded arm's block: preview_h_s null")
+    ap.add_argument("--reward-knock", choices=("in", "out"), default="in",
+                    help="the reward's knock option (row 113 (5)); default 'in', X1's")
     a = ap.parse_args()
     refuse_uncalibrated(a.engine)
-    # every environment this tree builds runs the 0-D cycle model (backend_of)
-    print(format_block(plant_fingerprint(a.protocol, plant=engines.get(a.engine), backend=BACKEND_CYCLE),
+    # every environment this tree builds runs the 0-D cycle model (backend_of), in training and in
+    # scoring (row 136)
+    print(format_block(plant_fingerprint(a.protocol, plant=engines.get(a.engine), train_backend=BACKEND_CYCLE,
+                                         score_backend=BACKEND_CYCLE,
+                                         preview_h_s=None if a.blind else a.preview_h_s,
+                                         reward_knock=a.reward_knock == "in"),
                        "PLANT FINGERPRINT (live)"))
     sys.exit(0)

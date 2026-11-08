@@ -36,19 +36,27 @@ engines.get, which reads their specs, derived files and freeze records.
                  refusals; the manifest refuses a changed or missing snapshot
   TrainRefusals  train.py refuses each inconsistent flag before it makes a directory: the share without
                  a record, a record with no flag, the share off the four-engine road, another step, a
-                 SYNTHETIC share into the repository, every H but 30 s (row 117), H on the blinded arm,
-                 a ratio the record does not hold, a bad average window, a training seed row 96 reserves;
+                 SYNTHETIC share into the repository, an H the environment does not take (row 117; any
+                 other H is admitted since the plant commit P, and refused by the knock check), H on the
+                 blinded arm,
+                 a ratio the record does not hold, a bad average window, a training seed row 96 reserves,
+                 the four-engine road without --reward-knock (row 127 (4), the last refusal);
                  X2's runs/wideair_dt1 is CLOSED; build_env names the four-engine road's two options
-  TrainSmoke     train.py --road four_engine at X1's defaults (600 steps): no recipe recorded, no
-                 snapshot; with every recipe flag on (1000 steps, SYNTHETIC share): the first episode is
-                 the share's road, the second the general stream's first, the learning rate ends at 0 in
-                 the saved optimizer, five snapshots and the manifest, and AveragedPolicy is their mean
+  TrainSmoke     train.py --road four_engine at X1's defaults with --reward-knock in (600 steps): no
+                 recipe recorded, no snapshot, meta.json's and config.json's reward_knock True; with
+                 every recipe flag on and --reward-knock out (1000 steps, SYNTHETIC share): the first
+                 episode is the share's road, the second the general stream's first, the learning rate
+                 ends at 0 in the saved optimizer, five snapshots and the manifest, AveragedPolicy is
+                 their mean, and reward_knock is False in both files, never inside the recipe
   TrainAll       the pair's commands are the ones train_all.py built before, argument for argument; the
-                 third arm's runs and commands; --recipe29; the third arm refused before any run, with
-                 every engine's H and its preview steps, which are row 102's
+                 third arm's runs and commands; --recipe29; every engine's H and its preview steps, which
+                 are row 102's, admitted since the plant commit P, and the third arm without --reward-knock
+                 refused before any run (its control: check_four_engine with it); --reward-knock forwarded
+                 once, last, to every arm, and required on the four-engine road after every other
+                 refusal (row 127 (4))
   Isolation      roads.json's 35 files are the list the roads commit hashes, their import closure lies
-                 inside it, and no file of this commit is among them (row 121); no new file's name ends
-                 in a plant file's (fingerprint's git_dirty_plant_files matches by suffix)
+                 inside it, and no file of this commit is among them (row 121); fingerprint's
+                 git_dirty_plant_files matches whole paths on the real tree (row 127 (5))
 
 The roads code's own tau (roads_ceiling.tau_table, row 102's one definition) is computed once, in a
 subprocess, for the third arm's SYNTHETIC record (about 1.5 min at 4 jobs): roads_ceiling installs an
@@ -680,6 +688,8 @@ class TrainRefusals(unittest.TestCase):
             "window_not_five_snapshots": base + ["--road", "four_engine", "--checkpoint-average", "501"],
             "x2_is_closed": base + ["--road", "wideair"],
             "a_frozen_twenty_seed": [x if x != "0" else "1007" for x in base] + ["--road", "four_engine"],
+            # the plant commit P (row 127 (4)): the four-engine reward named on the command, the last check
+            "four_engine_without_reward_knock": base + ["--road", "four_engine"],
         }
         for name in cases:
             out = os.path.join(tmp, "refused", name, "wideair_dt1" if name == "x2_is_closed" else "out")
@@ -712,12 +722,20 @@ class TrainRefusals(unittest.TestCase):
     def test_a_SYNTHETIC_share_never_trains_into_the_repository(self):
         self.check("SYNTHETIC_into_the_repository", "REFUSING", "SYNTHETIC roads record", "inside the repository")
 
-    def test_every_H_but_30_s_waits_for_the_plant_commit(self):
-        self.check("H_before_the_plant_commit", "REFUSING --horizon-ratio 1.5 on b58", "engine_env.PREVIEW_S",
-                   "row 94's plant commit")
+    def test_an_H_other_than_30_s_is_admitted_and_the_knock_option_required(self):
+        """The plant commit P (row 117; interface sheet 6.7, finding 28): H is an environment parameter, so
+        --horizon-ratio 1.5 on the B58 (H = 71.0026 s) passes the H check and the call is refused by the
+        knock check that follows it, the last; preview_h_problem admits every H the environment takes. The
+        control (mistake 12): 0 s, -1 s, NaN and True are refused."""
+        self.check("H_before_the_plant_commit", "REFUSING: --road four_engine needs --reward-knock in or out")
+        rc, out = self.result["H_before_the_plant_commit"]
+        self.assertNotIn("REFUSING --horizon-ratio", out)
         self.assertIsNone(F.preview_h_problem(30.0))
         self.assertIsNone(F.preview_h_problem(None))
-        self.assertIsNotNone(F.preview_h_problem(30.000001))
+        self.assertIsNone(F.preview_h_problem(30.000001))
+        for bad in (0.0, -1.0, float("nan"), True):
+            with self.subTest(H=bad):
+                self.assertIsNotNone(F.preview_h_problem(bad))
 
     def test_the_blinded_arm_takes_no_H(self):
         self.check("H_on_the_blinded_arm", "REFUSING", "blinded agent sees no grade ahead")
@@ -748,6 +766,13 @@ class TrainRefusals(unittest.TestCase):
                     TA.check_four_engine(namespace(road="four_engine", seeds=[0, s]))
         self.assertIsNone(TA.check_four_engine(namespace(road="extremes", seeds=[1000])))
 
+    def test_the_four_engine_road_without_the_knock_option(self):
+        """The plant commit P (row 127 (4)): --road four_engine without --reward-knock is refused, after
+        every other refusal, before a directory exists; the control is the same road with it (TrainSmoke
+        trains both values)."""
+        self.check("four_engine_without_reward_knock", "REFUSING", "--road four_engine needs --reward-knock in or "
+                   "out", "row 127 (4)")
+
 
 # =====================================================================================================
 class TrainSmoke(unittest.TestCase):
@@ -757,11 +782,13 @@ class TrainSmoke(unittest.TestCase):
     def setUpClass(cls):
         tmp = STATE["tmp"]
         cls.plain, cls.full = os.path.join(tmp, "smoke_plain"), os.path.join(tmp, "smoke_full")
+        # the knock option is required on the four-engine road from the plant commit P on (row 127 (4)):
+        # X1's reward on the plain run, the four-engine test's on the full one
         runs = [["--engine", "b58", "--road", "four_engine", "--steps", "600", "--seed", "0", "--device", "cpu",
-                 "--out", cls.plain],
+                 "--out", cls.plain, "--reward-knock", "in"],
                 ["--engine", "b58", "--road", "four_engine", "--steps", "1000", "--seed", "0", "--device", "cpu",
                  "--lr-schedule", "last-third", "--scored-share", "--roads-record", STATE["record"],
-                 "--checkpoint-average", "500", "--out", cls.full]]
+                 "--checkpoint-average", "500", "--out", cls.full, "--reward-knock", "out"]]
         with ThreadPoolExecutor(max_workers=2) as pool:
             cls.result = list(pool.map(run_train, runs))
 
@@ -779,6 +806,9 @@ class TrainSmoke(unittest.TestCase):
         self.assertNotIn("train_recipe", meta)
         self.assertEqual(cfg["recipe"], dict(lr_schedule="constant", scored_share=None, checkpoint_average=None,
                                              horizon_ratio=None, preview_h_s=None, learning_rate_at_end=3e-4))
+        self.assertIs(meta["reward_knock"], True)      # schema 4's FATAL field (row 117)
+        self.assertIs(cfg["reward_knock"], True)
+        self.assertIn("reward        : with the knock term (X1's)", out)
         self.assertFalse(os.path.exists(os.path.join(run, TR.SNAPSHOT_DIR)))
         self.assertFalse(os.path.exists(os.path.join(run, TR.MANIFEST)))
         rec = np.load(os.path.join(run, "train_record.npz"))
@@ -798,6 +828,11 @@ class TrainSmoke(unittest.TestCase):
                                                     scored_share=dict(every=10, roads_sha=rr["roads_sha"],
                                                                       seed_kind="SYNTHETIC")))
         self.assertEqual(cfg["recipe"]["learning_rate_at_end"], 0.0)
+        self.assertIs(meta["reward_knock"], False)     # row 113 (5)'s primary reading
+        self.assertIs(cfg["reward_knock"], False)
+        self.assertNotIn("reward_knock", cfg["recipe"])
+        self.assertNotIn("reward_knock", meta["train_recipe"])
+        self.assertIn("reward        : without the knock term (row 113 (5))", out)
         # the first episode (steps 1-899) is the share's road, the second the general stream's first
         rec = np.load(os.path.join(run, "train_record.npz"))
         share_c, share_scale, _ = F.share_episode(F.share_rng(SYNTHETIC_ROADS_SEED, 0), seed=0)
@@ -842,7 +877,8 @@ class TrainSmoke(unittest.TestCase):
 # =====================================================================================================
 def namespace(**kw):
     d = dict(engine="b58", road="extremes", dt=1.0, steps=50_000, seeds=[0, 1], device="cpu", out="runs/x",
-             no_resume=False, keep_buffer=False, third_arm=False, recipe29=False, roads_record=None, ratios=None)
+             no_resume=False, keep_buffer=False, third_arm=False, recipe29=False, roads_record=None, ratios=None,
+             reward_knock=None)
     d.update(kw)
     return argparse.Namespace(**d)
 
@@ -908,7 +944,7 @@ class TrainAll(unittest.TestCase):
         self.assertEqual([t for t, _ in TA.commands(a, rec)],
                          ["sighted_r1.5_seed0", "sighted_r1.5_seed1", "blind_seed0", "blind_seed1"])
         lines, problems = TA.third_arm_problems(a, rec)
-        self.assertEqual(len(problems), 1)
+        self.assertEqual(problems, [])                  # H is admitted since the plant commit P (row 117)
         self.assertTrue(any("r = 1.5" in x for x in lines) and not any("r = 0.5" in x for x in lines))
         for bad in ([0.75], [1.5, 1.5]):
             with self.subTest(ratios=bad):
@@ -919,9 +955,10 @@ class TrainAll(unittest.TestCase):
             TA.check_four_engine(namespace(road="four_engine", recipe29=True, roads_record=rec["path"],
                                            ratios=[1.5]))
 
-    def test_every_engines_H_is_row_102s_and_waits_for_the_plant_commit_SYNTHETIC(self):
+    def test_every_engines_H_is_row_102s_and_is_admitted_SYNTHETIC(self):
         """H = r tau from the SYNTHETIC record whose tau is the roads code's, on every engine: the preview
-        steps are row 102's (the decision's text, pinned here), and every H is refused today."""
+        steps are row 102's (the decision's text, pinned here), and every H is admitted since the plant
+        commit P (row 117), each giving the environment its own samples (engine_env.preview_samples)."""
         import train_all as TA
         rec = F.read_roads_record(STATE["tau_record"])
         row_102 = {"b58": ([1, 3, 11, 23], [4, 11, 35, 71]), "mazda_25t": ([1, 3, 10, 21], [4, 10, 32, 64]),
@@ -931,13 +968,21 @@ class TrainAll(unittest.TestCase):
             lines, problems = TA.third_arm_problems(namespace(engine=e, road="four_engine"), rec)
             table += lines
             with self.subTest(engine=e):
-                self.assertEqual(len(problems), 2)
+                self.assertEqual(problems, [])
+                for r in (0.5, 1.5):
+                    h = F.horizon_s(rec, e, r)
+                    self.assertEqual(E.preview_samples(h), tuple(h / d for d in F.PREVIEW_DIVISORS))
                 self.assertEqual([F.preview_steps(F.horizon_s(rec, e, r), dt=1.0) for r in (0.5, 1.5)],
                                  list(row_102[e]))
                 self.assertEqual(F.horizon_s(rec, e, 1.5), 1.5 * STATE["taus"][e])
         print("\n" + "\n".join(table))
 
     def test_the_third_arm_is_refused_before_any_run_SYNTHETIC(self):
+        """The plant commit P (interface sheet 6.7, finding 28): the third arm prints the B58's H, which is
+        admitted, and is then refused for the missing --reward-knock before any run or directory exists.
+        The control (mistake 12): check_four_engine in process with reward_knock 'out' is not refused at
+        that check, and returns the record."""
+        import train_all as TA
         out = os.path.join(STATE["tmp"], "third_arm")
         p = subprocess.run([sys.executable, "-B", "train_all.py", "--engine", "b58", "--road", "four_engine",
                             "--device", "cpu", "--third-arm", "--roads-record", STATE["tau_record"], "--seeds", "0",
@@ -945,20 +990,85 @@ class TrainAll(unittest.TestCase):
                            timeout=600)
         text = p.stdout + p.stderr
         self.assertNotEqual(p.returncode, 0, text[-3000:])
-        self.assertIn("REFUSING the third arm, before any run starts", text)
         self.assertIn("r = 1.5: tau 47.3351 s, H = 71.0026 s", text)
+        self.assertIn("REFUSING: --road four_engine needs --reward-knock in or out", text)
+        self.assertLess(text.index("H = 71.0026 s"), text.index("REFUSING"))
+        self.assertNotIn("REFUSING the third arm", text)
         self.assertNotIn("Traceback", text)
         self.assertFalse(os.path.exists(out))
+        with contextlib.redirect_stdout(__import__("io").StringIO()):
+            rec = TA.check_four_engine(namespace(road="four_engine", seeds=[0], steps=600, third_arm=True,
+                                                 roads_record=STATE["tau_record"], out=out, reward_knock="out"))
+        self.assertEqual(rec["seed_kind"], "SYNTHETIC")
+        self.assertFalse(os.path.exists(out))
+
+    def test_every_four_engine_command_carries_the_reward_knock_SYNTHETIC(self):
+        """The plant commit P (row 127 (4)): --reward-knock is forwarded to every arm of the call once, last,
+        with its value, so the sighted arms and the blinded arm of a seed agree on the FATAL field (row
+        117); without it every command is the pre-P one, argument for argument."""
+        import train_all as TA
+        rec = F.read_roads_record(STATE["tau_record"])
+        calls = (("the pair", dict(road="four_engine"), None),
+                 ("the third arm", dict(road="four_engine", third_arm=True, roads_record=rec["path"]), rec),
+                 ("the third arm, --recipe29", dict(road="four_engine", third_arm=True, recipe29=True,
+                                                    roads_record=rec["path"]), rec),
+                 ("--ratios 1.5", dict(road="four_engine", third_arm=True, roads_record=rec["path"],
+                                       ratios=[1.5]), rec))
+        for rk in ("in", "out"):
+            for name, kw, record in calls:
+                with self.subTest(name, reward_knock=rk):
+                    with_it = TA.commands(namespace(reward_knock=rk, **kw), record)
+                    without = TA.commands(namespace(**kw), record)
+                    self.assertEqual([t for t, _ in with_it], [t for t, _ in without])
+                    for (_, cmd), (_, bare) in zip(with_it, without):
+                        self.assertEqual(cmd.count("--reward-knock"), 1)
+                        self.assertEqual(cmd[-2:], ["--reward-knock", rk])
+                        self.assertEqual(cmd[:-2], bare)
+                    if name == "the pair":
+                        self.assertEqual(without, old_commands(namespace(**kw)))
+
+    def test_the_four_engine_roads_need_the_reward_knock(self):
+        """check_four_engine requires --reward-knock on --road four_engine at both of its exits, after every
+        other refusal; X1's roads do not need it (the control)."""
+        import train_all as TA
+        with self.assertRaisesRegex(SystemExit, r"--road four_engine needs --reward-knock in or out.*row 127 \(4\)"):
+            TA.check_four_engine(namespace(road="four_engine"))
+        self.assertIsNone(TA.check_four_engine(namespace(road="four_engine", reward_knock="out")))
+        self.assertIsNone(TA.check_four_engine(namespace(road="extremes")))
+        self.assertIsNone(TA.check_four_engine(namespace(road="extremes", reward_knock="out")))
+        # the second exit, with the share's SYNTHETIC record (outside the repository, a 50 000-step run)
+        r29 = dict(road="four_engine", recipe29=True, roads_record=STATE["record"],
+                   out=os.path.join(STATE["tmp"], "r29_knock"))
+        with self.assertRaisesRegex(SystemExit, "--reward-knock"):
+            TA.check_four_engine(namespace(**r29))
+        self.assertEqual(TA.check_four_engine(namespace(reward_knock="in", **r29))["seed_kind"], "SYNTHETIC")
+        # every existing refusal still wins without the flag
+        rec = F.read_roads_record(STATE["tau_record"])
+        with self.assertRaisesRegex(SystemExit, "REFUSING --ratios"):
+            TA.check_four_engine(namespace(road="four_engine", third_arm=True, roads_record=rec["path"],
+                                           ratios=[0.75], out=os.path.join(STATE["tmp"], "ratios")))
+        with self.assertRaisesRegex(SystemExit, "--roads-record without --third-arm"):
+            TA.check_four_engine(namespace(road="four_engine", roads_record=STATE["record"]))
+        with self.assertRaisesRegex(SystemExit, "REFUSING --seeds"):
+            TA.check_four_engine(namespace(road="four_engine", seeds=[0, 1000]))
+        # a record that cannot be read is refused as before, not for the knock option
+        real = os.path.join(HERE, "results", "EPA_ROADS", "other_roads.json")
+        with self.assertRaises(SystemExit) as cm:
+            TA.check_four_engine(namespace(road="four_engine", recipe29=True, roads_record=real))
+        self.assertNotIn("--reward-knock", str(cm.exception))
+        self.assertFalse(os.path.exists(r29["out"]))
 
     def test_train_all_refusals(self):
         import train_all as TA
-        with self.assertRaises(SystemExit):
-            TA.check_four_engine(namespace(road="four_engine", roads_record=STATE["record"]))
+        # each four-engine call passes the knock option, and each refusal is matched by its
+        # text, so that P's knock refusal cannot stand in for the one the call tests (mistake 12)
+        with self.assertRaisesRegex(SystemExit, "--roads-record without --third-arm"):
+            TA.check_four_engine(namespace(road="four_engine", roads_record=STATE["record"], reward_knock="out"))
         with self.assertRaises(SystemExit):
             TA.check_four_engine(namespace(road="extremes", third_arm=True, roads_record=STATE["tau_record"]))
-        with self.assertRaises(SystemExit):
+        with self.assertRaisesRegex(SystemExit, "REFUSING --recipe29"):
             TA.check_four_engine(namespace(road="four_engine", recipe29=True, roads_record=STATE["record"],
-                                           out=os.path.join(STATE["tmp"], "r29"), steps=600))
+                                           out=os.path.join(STATE["tmp"], "r29"), steps=600, reward_knock="out"))
         self.assertIsNone(TA.check_four_engine(namespace()))
 
 
@@ -979,9 +1089,6 @@ class Isolation(unittest.TestCase):
         "fingerprint.py k3_knee.py plant.py preview_ceiling.py random_road.py roads_ceiling.py step_record.py "
         "thermal.py thresholds/__init__.py thresholds/common.py thresholds/contract.py thresholds/ecu_shift.py "
         "thresholds/split.py").split()
-    # tracked before this commit, and already ending in a plant file's name (thermal.py): fingerprint's
-    # suffix match lists thermal.py dirty whenever either is modified; known, and not this commit's
-    SUFFIX_KNOWN = ("calibrate_thermal.py", "car_thermal.py")
 
     def test_the_hashed_list_is_the_35_and_closed_under_import(self):
         """R0-5: epa_roads.hashed_files is the 35 files; every hashed module's import closure (any depth,
@@ -996,10 +1103,12 @@ class Isolation(unittest.TestCase):
         for name in self.NEW + self.TESTS:
             self.assertNotIn(f"{name}.py", files)
 
-    def test_no_new_file_ends_in_a_plant_files_name(self):
-        """R0-1 (S8): fingerprint.py lists a plant file in git_dirty_plant_files when any dirty path ENDS
-        with its name, so a file named like analyse_four_engines.py marked engines.py dirty. No path in
-        the tree ends with a plant file's name unless it is that file, or one of the two known before."""
+    def test_the_dirty_plant_match_is_exact_on_the_real_tree(self):
+        """R0-1 (S8), lifted at the plant commit P (row 127 (5); interface sheet 6.7): fingerprint listed a
+        plant file in git_dirty_plant_files when any dirty path ENDED with its name, so car_thermal.py
+        marked thermal.py dirty. It matches whole paths now (fingerprint._dirty_plant): every path of
+        this tree that ends with a plant file's name without being it is not listed when dirty, and the
+        plant file itself is (the control)."""
         import fingerprint as FP
         names = set()
         for e in engines.PLANTS:
@@ -1007,13 +1116,17 @@ class Isolation(unittest.TestCase):
         p = subprocess.run(["git", "ls-files", "-co", "--exclude-standard"], cwd=HERE, capture_output=True,
                            text=True)
         self.assertEqual(p.returncode, 0, p.stderr)
-        paths = p.stdout.split()
+        paths = p.stdout.splitlines()
         self.assertGreater(len(paths), 100)
-        bad = sorted({q for q in paths for n in names if q.endswith(n) and q != n} - set(self.SUFFIX_KNOWN))
-        self.assertEqual(bad, [])
-        for name in self.NEW + self.TESTS:
-            with self.subTest(file=name):
-                self.assertFalse(any(f"{name}.py".endswith(n) for n in names))
+        prefix = subprocess.run(["git", "rev-parse", "--show-prefix"], cwd=HERE, capture_output=True,
+                                text=True).stdout.rstrip("\r\n")
+        suffixed = {q for q in paths for n in names if q.endswith(n) and q != prefix + n}
+        self.assertLessEqual({prefix + "calibrate_thermal.py", prefix + "car_thermal.py"}, suffixed)
+        for e in engines.PLANTS:
+            with self.subTest(plant=e):
+                self.assertEqual(FP._dirty_plant(FP.plant_files(e), suffixed, prefix), [])
+        self.assertEqual(FP._dirty_plant(FP.plant_files("b58"), suffixed | {prefix + "thermal.py"}, prefix),
+                         ["thermal.py"])
 
     def test_no_hashed_module_imports_the_training_code(self):
         """Row 121: the new code imports the frozen code, never the other way round, and none of it is in

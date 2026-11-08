@@ -40,12 +40,14 @@ copy them into a temporary repository), never a table. Each check has its contro
   Gates            the roads record's refusals; the out path's; the writer leaves nothing on a refusal; the real
                    run refuses before anything when a gate fails, refuses in this tree while roads.json is absent,
                    and refuses a Python that writes bytecode; the no-roads route refuses in this tree while no stop
-                   is committed
+                   is committed; unmocked, this tree's B58 as built, off the draw's plant since the plant commit
+                   (ORDER step 14), is refused by its text
   RealGates        every gate of real_problems in a synthetic git repository with a REAL-kind roads.json (a test
-                   commit and reveal), the control first: uncommitted code, compiled files, uncommitted data inputs,
-                   the roads step's outputs, the attempts log, the seed and the reveal, another plant; run_real
-                   (compute stood in) writes once, and the committed record passes committed_record_problems while
-                   each spoiled copy, a SYNTHETIC one among them, is refused
+                   commit and reveal), the B58 as built stood in at the draw's plant (the_draws_b58), the control
+                   first: uncommitted code, compiled files, uncommitted data inputs, the roads step's outputs, the
+                   attempts log, the seed and the reveal, another plant; run_real (compute stood in) writes once,
+                   and the committed record passes committed_record_problems while each spoiled copy, a SYNTHETIC
+                   one among them, is refused
   StoppedRoute     row 129 (4) in a synthetic git repository built as RealGates builds one, after a real
                    epa_roads.draw() stop (Jad's integer withheld, entered as 2**128; the plant work stood in for as
                    test_epa_roads.Reveal stands it in): the draw logged a stop that is not a coding defect and refuses
@@ -57,7 +59,8 @@ copy them into a temporary repository), never a table. Each check has its contro
                    committed, pushed record passes validate_epa._arm_tightenings, tightening_problems,
                    stopped_record_problems, test_epa_roads' check and LiveRecord's, each spoiled copy is refused, and
                    so is the record once a roads.json stands beside it or the shared branch holds one; the held-out R
-                   is the contract's 9.9 K and P the contract's, each with a control that moves it
+                   is the contract's 9.9 K and P the contract's, each with a control that moves it; the B58 as built
+                   stood in at the draw's plant, as in RealGates
   LiveRecord       once results/EPA_TIGHTENINGS.json exists: with roads.json, the committed record is the real run's;
                    without it, row 129 (4)'s no-roads record (epa_tightenings.stopped_record_problems); no other
 """
@@ -1097,6 +1100,17 @@ class Gates(Guarded):
                 T.run_stopped(log=QUIET)
         self.assertFalse(os.path.exists(os.path.join(HERE, *T.OUT_REL.split("/"))))
 
+    def test_the_b58_as_built_in_this_tree_is_not_the_draws_plant(self):
+        """Unmocked, in this tree: the plant commit (ORDER step 14) moved the B58's plant_sha off the plant row 102
+        computed roads.json's tau on (epa_roads.B58_PLANT_SHA), so b58_problems, the last gate of real_problems and
+        of stopped_problems, refuses the B58 as built, by its text. The live plant_sha is read here from
+        epa_freeze, not through validate_epa.b58_identity, which the guard reads. On a tree whose B58 is the draw's
+        plant (RV's) the guard finds nothing and this fails; RealGates and StoppedRoute stand that plant in
+        (the_draws_b58) and refuse another one inside it."""
+        live = epa_freeze.plant_sha("b58")
+        self.assertNotEqual(live, R.B58_PLANT_SHA, "the B58 as built is the draw's plant: no plant commit here")
+        self.assertEqual(T.b58_problems(), [f"the B58 as built is plant_sha {live}, not {R.B58_PLANT_SHA} (row 102)"])
+
 
 # =====================================================================================================
 def committed_record_problems(t, *, root):
@@ -1166,6 +1180,19 @@ def canned_compute(record, *, roads_ref, strategy, r_e8_pct, spark, pinned, seco
     e8["b58_u_val_kappa"] = T.b58_band({T.ROADS_KEYS[x]: e8[T.ROADS_KEYS[x]] for x in T.ROADS_KEYS},
                                        strategy=strategy, r_pct=r_e8_pct, spark=spark)
     return l1, e8, T.timing_of({}, wall=0.0, jobs=jobs, n_roads=len(roads), n_shifts=len(shifts)), []
+
+
+def the_draws_b58(cls):
+    """For the class `cls`, from its setUpClass to its class cleanup: validate_epa.b58_identity stood in at the
+    draw's plant, this tree's identity with plant_sha epa_roads.B58_PLANT_SHA (row 102: the plant roads.json's tau
+    is computed on), as each class's refusal case stands in another plant_sha. The plant commit (ORDER step 14)
+    moved the B58 as built off that plant, and b58_problems rightly refuses it
+    (Gates.test_the_b58_as_built_in_this_tree_is_not_the_draws_plant, unmocked); RealGates and StoppedRoute test
+    every other gate from a control that holds, so they run on the draw's plant. engine_sha is this tree's, which
+    the plant commit leaves at roads.json's; no gate here compares it with the draw's (verify_record compares the
+    live plants with the copy's own roads.json, written live)."""
+    drawn = dict(VE.b58_identity(), plant_sha=R.B58_PLANT_SHA)
+    cls.enterClassContext(mock.patch.object(VE, "b58_identity", lambda: dict(drawn)))
 
 
 HASH_LINE = re.compile(r"^(COMMITMENT_[GJ]) = (?:None|'[0-9a-f]{64}'|\"[0-9a-f]{64}\")(?=\r?$)", re.M)
@@ -1246,14 +1273,16 @@ class RealGates(unittest.TestCase):
     two fresh private integers (a TEST commit and reveal: its roads_seed is never the test's, which needs the
     team's two integers); a REAL-kind roads.json of twenty roads from epa_roads.generate, its hashes taken in the
     copy, and its attempts log, committed. The control is real_problems == []; each refusal is a spoiled copy,
-    restored to the control after. The B58 as built is this tree's (validate_epa.b58_identity), so a plant other
-    than the B58 is stood in for. Not Guarded: the copy reads the real contract (no table; epa_roads' guard is
-    installed). The methods run in name order; test_z commits a record and runs last."""
+    restored to the control after. The B58 as built (validate_epa.b58_identity) is stood in at the draw's plant for
+    the class (the_draws_b58; this tree's own is refused in Gates), so a plant other than the B58 is stood in for
+    inside it. Not Guarded: the copy reads the real contract (no table; epa_roads' guard is installed). The methods
+    run in name order; test_z commits a record and runs last."""
 
     @classmethod
     def setUpClass(cls):
         cls.tmp = tempfile.mkdtemp(prefix="epa_tightenings_gates_")
         cls.addClassCleanup(rmtree_writable, cls.tmp)
+        the_draws_b58(cls)
         root = cls.root = os.path.join(cls.tmp, "repo")
         gates_repository(root)
         commit, a_g, a_j, h_g, h_j = roads_commit_in(root)
@@ -1411,7 +1440,8 @@ class RealGates(unittest.TestCase):
     def test_h_a_plant_other_than_the_b58(self):
         """A value edit of the copy's b58.toml (a comment would not move plant_sha: fingerprint hashes code only)
         is refused as code not committed and, committed, as a file roads.json hashed differently. The B58 as built
-        is this tree's, so another plant_sha is stood in for; and a roads record whose tau is on another plant."""
+        is the class's (the draw's plant, the_draws_b58), so another plant_sha is stood in for inside it; and a roads
+        record whose tau is on another plant."""
         rel = "engine_specs/b58.toml"
         with self.spoiled(rel) as p:
             with open(p, "rb") as fh:
@@ -1526,14 +1556,16 @@ class StoppedRoute(unittest.TestCase):
     untightened (test_b, in a copy; mistake 12); each gate is made on the control and undone to it (test_c, the
     re-check before the write among them), or made in a copy of its own when it needs a commit (test_d, test_e:
     the log as draw writes it), or an origin of its own (test_f: the shared branch, the fork at the roads commit
-    among it); test_z writes, commits and pushes the record here and calls the arming. Not Guarded: the copy is
-    made from the real contract (no table; epa_roads' guard is installed). The methods run in name order; test_z
-    runs last."""
+    among it); test_z writes, commits and pushes the record here and calls the arming. The B58 as built is stood in
+    at the draw's plant for the class, as in RealGates (the_draws_b58), and another plant inside it (test_c). Not
+    Guarded: the copy is made from the real contract (no table; epa_roads' guard is installed). The methods run in
+    name order; test_z runs last."""
 
     @classmethod
     def setUpClass(cls):
         cls.tmp = tempfile.mkdtemp(prefix="epa_tightenings_stopped_")
         cls.addClassCleanup(rmtree_writable, cls.tmp)
+        the_draws_b58(cls)
         root = cls.root = os.path.join(cls.tmp, "repo")
         gates_repository(root)
         fx.git(cls.tmp, "init", "-q", "--bare", "origin.git")

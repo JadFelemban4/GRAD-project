@@ -245,9 +245,14 @@ def certificate(cfg, evidence, budget, device, derived):
     the block that says it was not written then. What describes this moment
     (the head, the dirty flag, the interpreter) goes inside the block, so no
     top-level field can be read as a record of the training session."""
+    import engine_env as EE
     import engines
+    # H from the arm (its advisory use_preview is checked against it); X1-era agents trained with the
+    # knock term in their reward (fingerprint schema 4)
     fp = FP.plant_fingerprint(
-        protocol="phase-d", plant=engines.get("b58"), backend=FP.BACKEND_CYCLE, train_dt=float(cfg["dt"]),
+        protocol="phase-d", plant=engines.get("b58"), train_backend=FP.BACKEND_CYCLE,
+        score_backend=FP.BACKEND_CYCLE, preview_h_s=EE.PREVIEW_H_S if cfg["preview"] else None,
+        reward_knock=True, train_dt=float(cfg["dt"]),
         train_duration=float(cfg["duration_s"]),
         steps_requested=int(cfg["steps"]), seed=int(cfg["seed"]),
         use_preview=bool(cfg["preview"]), tag=cfg["tag"], train_road=cfg["road"],

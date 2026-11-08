@@ -14,22 +14,31 @@ neutral, on decision 34's generator at SYNTHETIC seeds (no roads_seed exists; ro
                (CvtVehicle.ratio_for), each box's top gear at 0 %; a scenario that is not decision
                34's refused
   Roads        one source of decision 34's roads; a roads record's roads and horizons; the onset twin;
-               H other than 30 s refused until the plant commit (row 117); the starver is
+               an H other than 30 s admitted since the plant commit P, each H's preview samples
+               engine_env.preview_samples' (row 117), 0 s and -1 s refused; the starver is
                test_reward's; row 116's road built with the options train.py gives it; with a
                SYNTHETIC roads record the share on (C1b, row 130 (5)), the record required of every
                training check, named repository-relative in what is printed and recorded (the tasks
                alone read its absolute path), and check_roads.py's default file named for the share
+               and the knock option
+  Knock        the plant commit P (row 127 (4)): every environment the gate builds takes the task's
+               reward_knock, the band and notch jobs' own SupervisoryTunerEnv among them (a knock-out
+               task builds False, the knock-in control True); an AST scan finds every builder call and
+               every task base passing it, with its control; the gate's header names it
   BlindArm     check_random_road.py B at H = 30 s on the B58 (SYNTHETIC road): the blinded traces do
                not differ before the grades, the sighted ones differ 30 steps before, and that sighted
                pair is the control that the blind criterion can fail (mistake 12)
   Verdict      the gate's exit code: 0 only when every check ran and passed; NOT COMPLETE when one
-               waits; SYNTHETIC said; the share named on row 116's road
+               did not run; SYNTHETIC said; the share named on row 116's road, and run_gate returning
+               the record it ran with, not its last check's name (P)
   Cli          the refusals of test_reward.py, check_roads.py and benchmark_training.py (no default
                engine, CLAUDE.md mistake 1; the per-engine options only with --engine; a SYNTHETIC
                table only outside the repository); a road train.py does not have refused by the
                benchmark's probe; C1b's options (--roads-record on row 116's road only, the benchmark's
                --reward-knock required there and refused before the plant commit P, neither with
-               --merge), and no --table-record (row 136: no table is built). (benchmark_training.py
+               --merge), and no --table-record (row 136: no table is built); test_reward.py's and
+               check_roads.py's --reward-knock, required with --engine as the last check and refused
+               without it (P). (benchmark_training.py
                --selftest is its own command: its hung-run case kills its child at a 2 s deadline, which
                a loaded machine can miss.)
   Scans        test_engine_threading's call, default and name scans on the new and changed files
@@ -205,14 +214,23 @@ class Roads(unittest.TestCase):
         with self.assertRaises(ValueError):
             G.onset_twin(flat)
 
-    def test_an_H_other_than_30_s_waits_for_the_plant_commit(self):
+    def test_an_H_other_than_30_s_is_admitted(self):
+        """The plant commit P (row 117; interface sheet 6.6): preview_env builds the environment at any H that
+        engine_env.preview_samples accepts, with no refusal, its samples H x (1/15, 1/6, 1/2, 1). The control
+        (mistake 12): H = 0 and H = -1 are refused, by the environment itself."""
         p = engines.get("b58")
         c = G.notch_cycle(p, 0.10)
-        env = G.preview_env(c, plant=p, dt=1.0, use_preview=True, horizon_s=30.0, seed=0)
-        self.assertEqual(env.use_preview, True)
+        env = G.preview_env(c, plant=p, dt=1.0, use_preview=True, horizon_s=30.0, seed=0, reward_knock=False)
+        self.assertEqual((env.use_preview, env.preview_s), (True, E.PREVIEW_S))
+        self.assertFalse(hasattr(G, "WaitsForPlantCommit"))
         for h in (29.0, 31.0, 60.0, 130.0):
-            with self.subTest(H=h), self.assertRaises(G.WaitsForPlantCommit):
-                G.preview_env(c, plant=p, dt=1.0, use_preview=False, horizon_s=h, seed=0)
+            with self.subTest(H=h):
+                env = G.preview_env(c, plant=p, dt=1.0, use_preview=False, horizon_s=h, seed=0, reward_knock=False)
+                self.assertEqual(env.preview_s, E.preview_samples(h))
+                self.assertEqual(env.preview_h_s, h)
+        for h in (0.0, -1.0):
+            with self.subTest(H=h), self.assertRaises(ValueError):
+                G.preview_env(c, plant=p, dt=1.0, use_preview=False, horizon_s=h, seed=0, reward_knock=False)
 
     def test_the_policies_are_the_gates_own(self):
         import test_reward as TR
@@ -230,11 +248,13 @@ class Roads(unittest.TestCase):
         self.assertEqual(B.ROAD_OPTIONS, {G.FOUR_ENGINE_ROAD: G.FOUR_ENGINE_OPTIONS})
         if G.FOUR_ENGINE_ROAD not in T.DESIGN_DT:
             self.skipTest("train.py has no four_engine road in this tree")
-        env = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=engines.get("mazda_25t"), roads_record=None)
+        env = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=engines.get("mazda_25t"), roads_record=None,
+                             reward_knock=False)
         self.assertEqual(len(env.unwrapped.cycle["grade"]), int(T.DURATION_S / T.DESIGN_DT[G.FOUR_ENGINE_ROAD]))
         self.assertIsNotNone(G.wrapper_attr(env, "c_turb_scale"))
+        self.assertIs(env.unwrapped.reward_knock, False)
         with self.assertRaises(ValueError):
-            G.training_env("no_such_road", 11, plant=engines.get("b58"), roads_record=None)
+            G.training_env("no_such_road", 11, plant=engines.get("b58"), roads_record=None, reward_knock=False)
 
     def test_the_share_on_the_training_road_SYNTHETIC(self):
         """C1b (row 130 (5)): a roads record turns decision 29's share on in the training check, as train.py
@@ -248,8 +268,8 @@ class Roads(unittest.TestCase):
         try:
             rec = F.write_synthetic_record(os.path.join(d, "roads.SYNTHETIC.json"), 4242)
             p = engines.get("b58")
-            on = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=p, roads_record=rec)
-            off = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=p, roads_record=None)
+            on = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=p, roads_record=rec, reward_knock=False)
+            off = G.training_env(G.FOUR_ENGINE_ROAD, 11, plant=p, roads_record=None, reward_knock=False)
             self.assertEqual(G.wrapper_attr(on, "road_log")[0].split()[:2], ["scored", "SYNTHETIC"])
             self.assertEqual(G.wrapper_attr(off, "road_log")[0].split()[0], "general")
             self.assertEqual(G.share_record(G.FOUR_ENGINE_ROAD, rec)["seed_kind"], "SYNTHETIC")
@@ -258,14 +278,19 @@ class Roads(unittest.TestCase):
                 with self.subTest(road=road, path=path), self.assertRaises(ValueError):
                     G.share_record(road, path)
             with self.assertRaises(ValueError):
-                G.training_env("extremes", 11, plant=p, roads_record=rec)
+                G.training_env("extremes", 11, plant=p, roads_record=rec, reward_knock=False)
         finally:
             shutil.rmtree(d, ignore_errors=True)
         for fn in (G.training_env, G.run_gate, G.road_table):
             with self.subTest(fn=fn.__name__):
                 self.assertIs(inspect.signature(fn).parameters["roads_record"].default, inspect.Parameter.empty)
-        bare = G.job(dict(engine="b58", kind="train", train_road=G.FOUR_ENGINE_ROAD, seed=11, policy="neutral"))
+        bare = G.job(dict(engine="b58", kind="train", train_road=G.FOUR_ENGINE_ROAD, seed=11, policy="neutral",
+                          reward_knock=False))
         self.assertIn("KeyError: 'roads_record'", bare["error"])
+        # the plant commit P: a task without the knock option is refused the same way (row 127 (4))
+        bare = G.job(dict(engine="b58", kind="train", train_road=G.FOUR_ENGINE_ROAD, seed=11, policy="neutral",
+                          roads_record=None))
+        self.assertIn("KeyError: 'reward_knock'", bare["error"])
 
     def test_the_record_is_named_relative_to_the_repository(self):
         """C1b (the review of 2 November 2026): the gate and check_roads.py print and record the roads record
@@ -294,22 +319,31 @@ class Roads(unittest.TestCase):
                 mock.patch.object(G, "d34_roads", return_value=([], None, "stand-in")):
             train, d34, label = G.road_table("b58", train_road=G.FOUR_ENGINE_ROAD, roads_file=None,
                                              synthetic_seed=1, n=3, first_seed=100, jobs=1,
-                                             roads_record=ER.ROADS_REL)
+                                             roads_record=ER.ROADS_REL, reward_knock=False)
         self.assertEqual([t["roads_record"] for t in handed], [real_abs] * 3)
+        self.assertEqual([t["reward_knock"] for t in handed], [False] * 3)
         self.assertEqual([r["roads_record"] for r in train], [ER.ROADS_REL] * 3)
         self.assertEqual((d34, label), ([], "stand-in"))
         gates = os.path.join(HERE, "results", "ENGINE_GATES", "b58")
-        self.assertEqual(CR.default_table("b58", G.FOUR_ENGINE_ROAD, True),
-                         os.path.join(gates, "check_roads_four_engine_share_on.json"))
-        self.assertEqual(CR.default_table("b58", G.FOUR_ENGINE_ROAD, False),
-                         os.path.join(gates, "check_roads_four_engine_share_off.json"))
-        self.assertEqual(CR.default_table("b58", "extremes", False), os.path.join(gates, "check_roads_extremes.json"))
+        # the plant commit P (interface sheet 12.9): the knock option names the file too, so a run with the
+        # knock term never overwrites the gate's own
+        self.assertEqual(CR.default_table("b58", G.FOUR_ENGINE_ROAD, True, False),
+                         os.path.join(gates, "check_roads_four_engine_share_on_knock_out.json"))
+        self.assertEqual(CR.default_table("b58", G.FOUR_ENGINE_ROAD, False, False),
+                         os.path.join(gates, "check_roads_four_engine_share_off_knock_out.json"))
+        self.assertEqual(CR.default_table("b58", G.FOUR_ENGINE_ROAD, False, True),
+                         os.path.join(gates, "check_roads_four_engine_share_off_knock_in.json"))
+        self.assertEqual(CR.default_table("b58", "extremes", False, True),
+                         os.path.join(gates, "check_roads_extremes_knock_in.json"))
+        for bad in ("out", None, 0):
+            with self.subTest(reward_knock=bad), self.assertRaises(TypeError):
+                CR.default_table("b58", "extremes", False, bad)
 
 
 class BlindArm(unittest.TestCase):
     def test_the_blind_arm_check_at_30_s(self):
         road = next(r for r in ER.generate(101, n_roads=2) if r["climbs"])
-        r = G.blind_check(engines.get("b58"), road, horizon_s=30.0)
+        r = G.blind_check(engines.get("b58"), road, horizon_s=30.0, reward_knock=False)
         d = r["grades_differ_at"]
         self.assertEqual((r["blind_first"], r["sighted_first"], r["sighted_want"]), (d, d - 30, d - 30), r)
         self.assertTrue(r["blind_ok"] and r["sighted_ok"])
@@ -322,7 +356,8 @@ class Verdict(unittest.TestCase):
         rows = [dict(grade=0.0, held="8", margin=0.1), dict(grade=0.0005, held="8", margin=0.1)]
         return dict(engine="b58", plant_id="p", cvt=False, sweep=rows, notches=[], band=0.0005, kickdown=None,
                     label="SYNTHETIC seed 1", synthetic=synthetic, horizons=[30.0], train_road="extremes",
-                    results=[], checks=[(f"check {i}", ok, "detail") for i, ok in enumerate(oks)])
+                    reward_knock=False, results=[],
+                    checks=[(f"check {i}", ok, "detail") for i, ok in enumerate(oks)])
 
     def code(self, g):
         buf = io.StringIO()
@@ -351,6 +386,133 @@ class Verdict(unittest.TestCase):
         self.assertIn("decision 29's share : on, REAL record R.json (row 130 (5))", out)
         self.assertNotIn("decision 29's share", self.code(self.gate([True]))[1])
 
+    def test_the_gate_returns_the_record_it_ran_with(self):
+        """run_gate returns, and print_gate prints, the roads record the training check ran with (C1b's
+        record_name), not the name of the last check: the notch and blind-arm loops rebind `name`, and until
+        the plant commit P the gate returned that (found by C2's drafter, 5 November 2026). Every unit is a
+        stand-in here (pool_map returns each task with an error, the sweep is hand-made with two notches), so
+        nothing is rolled out. The control (mistake 12): the gate holds a notch check and a blind-arm check,
+        the loops that rebound the name, and reward_knock comes back beside the record."""
+        from unittest import mock
+        rows = [dict(grade=x / 100, held=h, margin=0.1) for x, h in ((1, "8"), (2, "8"), (3, "7"), (4, "6"))]
+        road = next(r for r in ER.generate(101, n_roads=2) if r["climbs"])
+        real_abs = os.path.join(HERE, *ER.ROADS_REL.split("/"))
+
+        def pool(tasks, *, jobs):
+            return [dict({k: v for k, v in t.items() if k != "road"}, error="stand-in") for t in tasks]
+        for share, want, line in ((None, None, "decision 29's share : off (no --roads-record)"),
+                                  (dict(seed_kind="REAL", path=real_abs), ER.ROADS_REL,
+                                   f"decision 29's share : on, REAL record {ER.ROADS_REL} (row 130 (5))")):
+            with self.subTest(share=want), mock.patch.object(G, "pool_map", pool), \
+                    mock.patch.object(G, "sweep", return_value=rows), \
+                    mock.patch.object(G, "share_record", return_value=share), \
+                    mock.patch.object(G, "d34_roads", return_value=([road], None, "stand-in")):
+                g = G.run_gate("b58", train_road=G.FOUR_ENGINE_ROAD, roads_file=None, synthetic_seed=1, jobs=1,
+                               roads_record=None if share is None else ER.ROADS_REL, reward_knock=False)
+                names = [c[0] for c in g["checks"]]
+                self.assertTrue(any(n.startswith("the notch at") for n in names), names)
+                self.assertTrue(any(n.startswith("the blind arm is blind at H =") for n in names), names)
+                self.assertEqual((g["roads_record"], g["reward_knock"]), (want, False))
+                self.assertEqual({r["roads_record"] for r in g["results"] if r["kind"] == "train"}, {want})
+                self.assertIn(line, self.code(g)[1])
+
+    def test_the_reward_is_named(self):
+        """The plant commit P (row 119): the header says which reward every environment of the gate ran."""
+        want = "reward              : {} the knock term (--reward-knock {}; row 113 (5))"
+        self.assertIn(want.format("without", "out"), self.code(self.gate([True]))[1])
+        _, out = self.code(dict(self.gate([True]), reward_knock=True))
+        self.assertIn(want.format("with", "in"), out)
+        self.assertNotIn("without", out)
+
+
+class Knock(unittest.TestCase):
+    """The plant commit P (rows 119, 127 (4); interface sheet 6.6): the gate's environments take the task's
+    reward_knock, every one of them."""
+
+    BUILDERS = ("SupervisoryTunerEnv", "build_env", "preview_env", "d34_env", "training_env", "preview_delta",
+                "obs_trace", "blind_check")
+
+    @staticmethod
+    def problems(src):
+        """Every call in engine_gate's source `src` to an environment builder that does not pass
+        reward_knock=, and every task base in run_gate and road_table that does not carry it."""
+        import ast
+        tree, out = ast.parse(src), []
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Call):
+                f = n.func
+                name = f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", None)
+                if name in Knock.BUILDERS and "reward_knock" not in [k.arg for k in n.keywords]:
+                    out.append(f"line {n.lineno}: {name}(...) without reward_knock=")
+        for fn in (n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in ("run_gate", "road_table")):
+            bases = [a for a in ast.walk(fn) if isinstance(a, ast.Assign) and getattr(a.targets[0], "id", None)
+                     == "base"]
+            if not any(k.arg == "reward_knock" for a in bases if isinstance(a.value, ast.Call)
+                       for k in a.value.keywords):
+                out.append(f"{fn.name}: its task base carries no reward_knock")
+        return out
+
+    def test_every_environment_the_gate_builds_carries_the_reward_knock(self):
+        with open(os.path.join(HERE, "engine_gate.py"), encoding="utf-8") as fh:
+            src = fh.read()
+        self.assertEqual(self.problems(src), [])
+        # the controls (mistake 12): one call without it, and a base without it, are each flagged
+        import re
+        drop_call = re.sub(r"seed=0,\s*reward_knock=rk\)", "seed=0)", src, count=1)     # the band's own env
+        self.assertNotEqual(drop_call, src)
+        self.assertEqual(len(self.problems(drop_call)), 1)
+        drop_base = src.replace("base = dict(engine=engine_id, reward_knock=reward_knock)", "base = dict(engine=engine_id)")
+        self.assertEqual(self.problems(drop_base), ["run_gate: its task base carries no reward_knock"])
+        # the builders themselves, directly
+        p = engines.get("b58")
+        c = G.notch_cycle(p, 0.10)
+        for rk in (False, True):
+            with self.subTest(reward_knock=rk):
+                self.assertIs(G.preview_env(c, plant=p, dt=1.0, use_preview=True, horizon_s=30.0, seed=0,
+                                            reward_knock=rk).reward_knock, rk)
+                road = next(r for r in ER.generate(101, n_roads=2) if r["climbs"])
+                self.assertIs(G.d34_env(road, plant=p, use_preview=True, reward_knock=rk).reward_knock, rk)
+                self.assertIs(G.training_env("extremes", 11, plant=p, roads_record=None,
+                                             reward_knock=rk).unwrapped.reward_knock, rk)
+        import inspect
+        for fn in (G.preview_env, G.d34_env, G.training_env, G.preview_delta, G.obs_trace, G.blind_check,
+                   G.run_gate, G.road_table):
+            with self.subTest(fn=fn.__name__):
+                self.assertIs(inspect.signature(fn).parameters["reward_knock"].default, inspect.Parameter.empty)
+        for bad in ("out", 0, None):
+            with self.subTest(bad=bad), self.assertRaises(TypeError):
+                G.run_gate("b58", train_road="extremes", roads_file=None, synthetic_seed=1, jobs=1,
+                           roads_record=None, reward_knock=bad)
+
+    def test_the_band_and_notch_jobs_build_with_the_tasks_reward_knock(self):
+        """Interface sheet 6.6: a band job and a notch job (and the notch's preview check, decision 34's
+        roads and the blind arm) build their SupervisoryTunerEnv with the task's reward_knock, read by
+        wrapping the constructor; each job stops right after it, so nothing is rolled out. The control is
+        the knock-in task, whose environments read True."""
+        from unittest import mock
+        seen = []
+
+        class Stop(Exception):
+            pass
+
+        class Recording(E.SupervisoryTunerEnv):
+            def __init__(self, *a, **kw):
+                super().__init__(*a, **kw)
+                seen.append(self.reward_knock)
+                raise Stop("built")
+        road = next(r for r in ER.generate(101, n_roads=2) if r["climbs"])
+        kinds = (dict(kind="band", grade=0.05, policy="neutral"), dict(kind="notch", grade=0.10, policy="neutral"),
+                 dict(kind="notch-preview", grade=0.10), dict(kind="d34", road=road, policy="neutral"),
+                 dict(kind="blind", road=road, H_s=30.0))
+        with mock.patch.object(E, "SupervisoryTunerEnv", Recording):
+            for rk in (False, True):
+                for t in kinds:
+                    with self.subTest(kind=t["kind"], reward_knock=rk):
+                        seen.clear()
+                        res = G.job(dict(t, engine="b58", reward_knock=rk))
+                        self.assertIn("Stop: built", res.get("error", ""), res)
+                        self.assertEqual(seen, [rk])
+
 
 class Cli(unittest.TestCase):
     def refused(self, *argv, want):
@@ -376,6 +538,30 @@ class Cli(unittest.TestCase):
                      "--roads-record", "x.json", want="four_engine's alone")
         self.refused("test_reward.py", "--engine", "b58", "--train-road", "four_engine", "--synthetic-seed", "1",
                      "--roads-record", os.path.join(HERE, "no_such_roads.json"), want="no roads record there")
+
+    def test_the_reward_knock_is_required_on_every_four_engine_command(self):
+        """The plant commit P (rows 119, 127 (4)): engine_gate's two command lines need --reward-knock with
+        --engine, as their last check, so every refusal before it keeps its text (test_test_reward_refusals,
+        test_check_roads_refusals); without --engine it is refused as the other per-engine options are (the
+        control). The benchmark's own requirement is C1b's (test_benchmark_refusals)."""
+        self.refused("test_reward.py", "--engine", "b58", "--train-road", "four_engine", "--synthetic-seed", "1",
+                     want="--reward-knock in|out is required with --engine")
+        tmp = tempfile.mkdtemp(prefix="gate_knock_cli_")
+        try:
+            self.refused("check_roads.py", "--engine", "b58", "--train-road", "four_engine", "--synthetic-seed", "1",
+                         "--out", os.path.join(tmp, "t.json"), want="--reward-knock in|out is required with --engine")
+            self.assertEqual(os.listdir(tmp), [])
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.refused("benchmark_training.py", "--engine", "b58", "--road", "four_engine", "--dry-run",
+                     want="--reward-knock")
+        self.refused("test_reward.py", "--reward-knock", "out", want="give --engine")
+        self.refused("check_roads.py", "--reward-knock", "out", want="give --engine")
+        self.refused("test_reward.py", "--engine", "b58", "--train-road", "four_engine", "--synthetic-seed", "1",
+                     "--reward-knock", "maybe", want="invalid choice")
+        # an earlier refusal still wins without the flag
+        self.refused("check_roads.py", "--engine", "b58", "--train-road", "extremes", "--synthetic-seed", "1",
+                     want="outside the repository")
 
     def test_check_roads_refusals(self):
         self.refused("check_roads.py", "--engine", "b58", "--train-road", "extremes", "--synthetic-seed", "1",

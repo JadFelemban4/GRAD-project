@@ -47,6 +47,10 @@ REAL_SEEDS = range(8)
 # The FATAL fields fingerprint schema 3 added (20 October 2026, the four-engine
 # build): which plant, every value it was built with, what computes the engine.
 SCHEMA_3_FIELDS = {"engine", "engine_sha", "backend"}
+# The FATAL fields fingerprint schema 4 added (the plant commit P, ORDER step 14):
+# the backend pair and its contract, the transmission, H and the knock option.
+SCHEMA_4_FIELDS = {"train_backend", "score_backend", "backend_contract", "transmission", "preview_h_s",
+                   "reward_knock"}
 # analyse_phase_d.parse names the policies by label prefix; the tab, by role
 APD_NAMES = {"blind": "agent (blind)", "sighted": "agent", "baseline": "baseline ECU",
              "reactive": "reactive", "current_grade": "current-grade"}
@@ -175,9 +179,10 @@ class EvalParserTests(unittest.TestCase):
                 self.assertEqual(EV.protocol_from_fingerprint(got["fingerprint"]), block_protocol)
                 # Written in September under fingerprint schema 1: every fatal field
                 # of that schema, and no derived_sha, which schema 2 made fatal, nor
-                # engine, engine_sha and backend, which schema 3 did (20 October 2026).
+                # engine, engine_sha and backend, which schema 3 did (20 October 2026),
+                # nor schema 4's (the plant commit P).
                 self.assertEqual(RP.schema_of(got["fingerprint"]), 1)
-                later = {"derived_sha"} | SCHEMA_3_FIELDS
+                later = {"derived_sha"} | SCHEMA_3_FIELDS | SCHEMA_4_FIELDS
                 self.assertTrue(set(FP.FATAL) - later <= set(got["fingerprint"]))
                 for field in sorted(later):
                     self.assertNotIn(field, got["fingerprint"])
@@ -294,7 +299,10 @@ class EvalParserTests(unittest.TestCase):
         rendered = FP.format_block(SYN_FP, EV.BLOCK_TITLE).splitlines()
         got = EV.parse_fingerprint_block(rendered)
         self.assertEqual(got, SYN_BLOCK)
-        self.assertEqual(list(got), list(SYN_BLOCK))
+        # in the order format_block prints: this schema's FATAL fields first, then the rest sorted (since
+        # schema 4, the plant commit P, a schema-1 block's gears and final_drive are among the rest)
+        self.assertEqual(list(got), [k for k in FP.FATAL if k in SYN_BLOCK]
+                         + sorted(k for k in SYN_BLOCK if k not in FP.FATAL))
         # the live side renders with format_block's own title; the same reader
         self.assertEqual(EV.parse_fingerprint_block(FP.format_block(SYN_FP).splitlines()),
                          SYN_BLOCK)
@@ -859,6 +867,9 @@ class ProvenanceLiveTests(unittest.TestCase):
         modules_before = set(sys.modules)
         live = RP.live_side(ROOT)
         self.assertEqual(set(live), LIVE_KEYS)
+        # live_side catches every exception of its fingerprint calls, so a call that no longer fits
+        # plant_fingerprint's signature would only drop a block (the plant commit P; interface sheet 6.6)
+        self.assertEqual(live["import_errors"], [])
         self.assertEqual(live["python"], platform.python_version())
         self.assertEqual(live["minor"], RP.minor(platform.python_version()))
         self.assertEqual(live["plant_sha"], FP._sha_files(RP.PLANT_FILES))
@@ -1126,9 +1137,9 @@ class ProvenanceStateTests(unittest.TestCase):
             h.update((ROOT / name).read_bytes().replace(b"\r\n", b"\n"))
         fp = dict(self.live["blocks"]["d2"], plant_text_sha=h.hexdigest()[:16],
                   git_head=self.git.resolve("HEAD"), git_dirty_plant_files="")
-        # nor the fields schema 3 added (20 October 2026)
-        for field in ["derived_sha", *sorted(SCHEMA_3_FIELDS)]:
-            del fp[field]
+        # nor the fields schema 3 added (20 October 2026), nor schema 4's (the plant commit P)
+        for field in ["derived_sha", *sorted(SCHEMA_3_FIELDS | SCHEMA_4_FIELDS)]:
+            fp.pop(field, None)
         live = dict(self.live, restart_needed=False, derived_loaded_differs=False)
         cases = {
             # under another Python: the commit's files, read by schema 1's rule here
@@ -1158,9 +1169,13 @@ class ProvenanceStateTests(unittest.TestCase):
         self.assertEqual(RP.schema_of(dict(parsed["fingerprint"], derived_sha="None",
                                            engine="b58b30o1/a90-supra-zf8hp51")), 3,
                          "schema 3 writes engine into every block")
+        self.assertEqual(RP.schema_of(dict(parsed["fingerprint"], derived_sha="None",
+                                           engine="b58b30o1/a90-supra-zf8hp51", train_backend="cycle")), 4,
+                         "schema 4 writes train_backend into every block")
         self.assertEqual(RP._plant_files(2), ("plant.py", "thermal.py", "engine_env.py", "derived.py"),
                          "schema 2's plant files, as fingerprint.py had them at cf43fbb")
         self.assertEqual(RP._plant_files(3), FP.plant_files(RP.RESULTS_PLANT))
+        self.assertEqual(RP._plant_files(4), FP.plant_files(RP.RESULTS_PLANT))
         for protocol, block in self.live["blocks"].items():
             self.assertEqual(RP.schema_of(block), FP.SCHEMA_VERSION,
                              f"a {protocol} block this fingerprint.py writes is read as its own schema")

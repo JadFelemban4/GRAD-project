@@ -197,13 +197,18 @@ def phase_d(pool, agent_set=AGENT_SET):
     # function loads final.zip and scores it on whatever plant the tree holds,
     # so re-running it on an older set would overwrite that set's published
     # record with scores from a plant its agents never trained on.
+    import engine_env as EE
     import engines
     import fingerprint as FP
-    # backend: the episodes run through evaluate.run_episode, the 0-D cycle model
-    live = FP.plant_fingerprint(protocol="phase-d", plant=engines.get("b58"), backend=FP.BACKEND_CYCLE)
+    # backend: the episodes run through evaluate.run_episode, the 0-D cycle model, at the default H
+    # with X1's reward (fingerprint schema 4); a blinded agent against the blinded arm's block
+    live = FP.plant_fingerprint(protocol="phase-d", plant=engines.get("b58"), train_backend=FP.BACKEND_CYCLE,
+                                score_backend=FP.BACKEND_CYCLE, preview_h_s=EE.PREVIEW_H_S,
+                                reward_knock=EE.REWARD_KNOCK_DEFAULT)
     for a in agents:
         stored = FP.read(os.path.join(HERE, a, "meta.json"))
-        bad = FP.compare(stored, live) if stored else [("meta.json", "missing", "")]
+        bad = (FP.compare(stored, FP.for_arm(live, sighted="blind" not in a)) if stored
+               else [("meta.json", "missing", "")])
         if bad:
             raise SystemExit(f"REFUSING to score {a}: its plant differs from this tree's "
                              f"({', '.join(t[0] for t in bad)}). Score it from the tag it trained on.")

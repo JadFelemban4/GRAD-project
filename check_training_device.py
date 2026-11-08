@@ -157,8 +157,11 @@ def fingerprint_dir(run):
         with open(os.path.join(run, "meta.json"), encoding="utf-8") as fh:
             m = json.load(fh)
         fp = m.get("fingerprint", m)
+        # recorded, never compared: schema 4's train_backend, score_backend, preview_h_s and
+        # reward_knock when present, schema 3's backend when that is
         meta = {k: fp.get(k) for k in ("plant_sha", "derived_sha", "engine", "engine_sha",
-                                       "backend", "python") if k in fp}
+                                       "backend", "train_backend", "score_backend", "preview_h_s",
+                                       "reward_knock", "python") if k in fp}
     return dict(weights=weights, counters={k: data.get(k) for k in COUNTERS},
                 record=record, curve=curve, meta=meta)
 

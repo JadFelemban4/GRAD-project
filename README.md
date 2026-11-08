@@ -827,7 +827,7 @@ python -m app.test_simulation   16 of 16 (9 Oct). The replay lab. SEPARATE from
 python -m app.test_agents  135 tests OK, 14 skipped without runs_c4/ (9 Oct).
                            The agent replay pages; they read the plant's roads,
                            so run it after a plant or road change (mistake 25)
-python test_plant_guards.py  19 tests (9 skip until the EPA plants are calibrated):
+python test_plant_guards.py  47 tests OK, 0 skipped (6 Nov, the plant commit):
                            a 1 s step equals ten 0.1 s steps, the
                            coolant settles at the sweep's 2 s step, and one
                            changed derived constant moves derived_sha while
@@ -1069,8 +1069,10 @@ test_cars.py          The three EPA cars: road load and gearing as identities
                       (C1, C2), the Accord's kickdown law, the Supra unchanged.
 test_carried.py       Every value an EPA engine spec carries from the B58,
                       checked against the B58's own, bit for bit.
-test_trainable.py     No EPA engine trains or is scored until it is validated
-                      and schema 4 exists (decision 47).
+test_trainable.py     The entry points take engines.trainable(): the B58 and
+                      the EPA engines Run 2's committed summary and the backend
+                      record keep (decision 47, rows 107 (5) and 139), each
+                      refusal with its control.
 epa_map.py            logs/epa/ -> data/engines/<engine>/: EPA's benchmarking
                       tables for the three new engines (never edit those).
 test_epa_map.py       Its tests: hashes, row counts, units, ranges, a

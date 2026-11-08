@@ -7,6 +7,7 @@ import unittest
 import zipfile
 from unittest.mock import patch
 
+import fingerprint as FP
 from app import agent_catalog as C
 from app.artifact_catalog import ArtifactCatalog
 
@@ -21,7 +22,8 @@ class SourceTests(unittest.TestCase):
         for arm in C.ARMS:
             directory = self.root / 'runs' / 'fixture' / f'{arm}_seed0'
             directory.mkdir(parents=True)
-            meta = copy.deepcopy(C.live_fingerprint('d2'))
+            # the blinded arm's block records H as None (fingerprint schema 4, FP.for_arm)
+            meta = FP.for_arm(copy.deepcopy(C.live_fingerprint('d2')), sighted=arm == 'sighted')
             meta['use_preview'] = arm == 'sighted'
             (directory / 'meta.json').write_text(json.dumps(meta), encoding='utf-8')
             with zipfile.ZipFile(directory / 'final.zip', 'w') as archive:
@@ -76,7 +78,8 @@ class SourceTests(unittest.TestCase):
         for arm in C.ARMS:
             directory = unrelated / f'{arm}_seed0'
             directory.mkdir(parents=True)
-            meta = copy.deepcopy(C.live_fingerprint('d2'))
+            # the blinded arm's block records H as None (fingerprint schema 4, FP.for_arm)
+            meta = FP.for_arm(copy.deepcopy(C.live_fingerprint('d2')), sighted=arm == 'sighted')
             meta['use_preview'] = arm == 'sighted'
             (directory / 'meta.json').write_text(json.dumps(meta), encoding='utf-8')
             with zipfile.ZipFile(directory / 'final.zip', 'w') as archive:

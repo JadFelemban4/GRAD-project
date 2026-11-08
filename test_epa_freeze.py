@@ -980,11 +980,12 @@ class Git(Guarded):
         self.assertEqual(len(epa_freeze.CODE_HASHED), 14)
 
     def test_plant_sha_is_the_fingerprints(self):
+        # what plant_fingerprint records as plant_sha is _sha_files over plant_files, by construction; the
+        # block itself is not built here (the plant commit P, interface sheet 6.7): schema 4 opens the real
+        # contract (fingerprint.backend_contract), which this guarded class refuses
         for name in ("b58", ENGINE):
             with self.subTest(plant=name):
                 self.assertEqual(epa_freeze.plant_sha(name), fingerprint._sha_files(fingerprint.plant_files(name)))
-        self.assertEqual(epa_freeze.plant_sha("b58"), fingerprint.plant_fingerprint(
-            plant=engines.get("b58"), backend=fingerprint.BACKEND_CYCLE)["plant_sha"])
 
 
 def stub_rows(root, engine, *, refuse):

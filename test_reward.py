@@ -11,13 +11,15 @@ reward, and commit the output with the change.
     python test_reward.py --duration 900 # the full scenario, slower
     python test_reward.py --road random  # PHASE D2: the four ORIGINAL checks on
                                          # the corners of the randomised climb
-    python test_reward.py --engine E --train-road R --roads FILE
+    python test_reward.py --engine E --train-road R --roads FILE --reward-knock out
                                          # ROW 119: engine E's own gate, in its own
                                          # car, on training road R and decision 34's
                                          # roads (engine_gate.py); --synthetic-seed N
                                          # in place of --roads tests it, SYNTHETIC;
                                          # --roads-record PATH (four_engine only)
-                                         # turns decision 29's share on
+                                         # turns decision 29's share on;
+                                         # --reward-knock in|out (required) is the
+                                         # reward the engine trains on
 
 PHASE D2 -- `--road random`
 ---------------------------
@@ -123,15 +125,17 @@ sweep, then row 116's training road (--train-road, train.py's name for it) and
 decision 34's roads (--roads, a roads record; or --synthetic-seed, a test of the
 code that says SYNTHETIC), and the blind-arm check per H. Any of the four engines,
 the B58 among them: the four-engine test trains every engine on those roads, and
-this file's own checks below do not cover them. What waits for the plant commit
-(H as an environment parameter, row 117) is printed NOT RUN and keeps the gate
-from passing. So does the reward the test trains on: the team chose it without
-the knock term (row 113 (5)), behind an environment option of the plant commit
-whose default is X1's, knock in (row 118). Until that commit the per-engine gate
-runs the reward with the knock term; after it, the gate passes the option
-(engine_gate.py's docstring, WHAT WAITS). --roads-record PATH (with --train-road
-four_engine only; C1b, 2 November 2026) runs the training check with decision 29's
-share on, as the experiment trains (row 130 (5)); without it the share is off.
+this file's own checks below do not cover them. H is an environment parameter
+since the plant commit P (row 117), so the blind-arm check runs at every H of the
+roads record; a check that does not run is printed NOT RUN and keeps the gate
+from passing. The reward the test trains on is the team's choice without the
+knock term (row 113 (5)), the environment's knock option whose default is X1's,
+knock in (row 118): --reward-knock in|out is required with --engine, as the last
+check, and the gate passes it to every environment it builds and prints it in its
+header (rows 119, 127 (4); engine_gate.py's docstring, WHAT WAITS); the
+four-engine gate runs with out. --roads-record PATH (with --train-road four_engine
+only; C1b, 2 November 2026) runs the training check with decision 29's share on,
+as the experiment trains (row 130 (5)); without it the share is off.
 
 NO DEFAULT ENGINE (CLAUDE.md mistake 1; test_engine_threading.py). The run without
 --engine is not a default engine: it is the B58's committed gate, whose constants
@@ -387,9 +391,14 @@ def main_engine(a, ap):
         G.share_record(a.train_road, a.roads_record)
     except ValueError as exc:
         ap.error(f"--roads-record {a.roads_record}: {exc}")
+    # the last check, after C1b's share_record (rows 119, 127 (4)): the gate runs with the reward
+    # the engine trains on, named on the command
+    if a.reward_knock is None:
+        ap.error("--reward-knock in|out is required with --engine: row 119's gate runs with the reward the "
+                 "engine trains on (row 113 (5); row 127 (4))")
     return G.print_gate(G.run_gate(a.engine, train_road=a.train_road, roads_file=a.roads,
                                    synthetic_seed=a.synthetic_seed, jobs=a.jobs,
-                                   roads_record=a.roads_record))
+                                   roads_record=a.roads_record, reward_knock=(a.reward_knock == "in")))
 
 
 def main():
@@ -415,12 +424,15 @@ def main():
     ap.add_argument("--roads-record", metavar="PATH",
                     help="with --engine and --train-road four_engine: the roads record whose share "
                          "the training check turns on (decision 29's, row 130 (5)); without it, off")
+    ap.add_argument("--reward-knock", choices=("in", "out"), default=None,
+                    help="with --engine, required: the reward's knock term the gate's environments "
+                         "use (row 113 (5)): in is X1's, out the four-engine test's (rows 119, 127 (4))")
     a = ap.parse_args()
     if a.engine is not None:
         raise SystemExit(main_engine(a, ap))
-    if any(x is not None for x in (a.train_road, a.roads, a.synthetic_seed, a.roads_record)):
-        ap.error("--train-road, --roads, --synthetic-seed and --roads-record belong to the per-engine "
-                 "gate: give --engine")
+    if any(x is not None for x in (a.train_road, a.roads, a.synthetic_seed, a.roads_record, a.reward_knock)):
+        ap.error("--train-road, --roads, --synthetic-seed, --roads-record and --reward-knock belong to the "
+                 "per-engine gate: give --engine")
     if a.road == "random":
         raise SystemExit(main_random_road(a.jobs))
     dur = a.duration if a.duration is not None else 300.0

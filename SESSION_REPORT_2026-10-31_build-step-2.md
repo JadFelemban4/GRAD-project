@@ -671,3 +671,315 @@ alone then gave 33 tests OK (skipped=6), verify_docs 74 of 74 again, and the tre
 **What waits, from here:** P (about 20 h of machine time, its roads check about 17.7 h of it), then Qa,
 G, V, Q, Ta, B1 on Jad's PC, Tb, AB, PR-B, PL-B and the training. The latest training start that ends
 inside W stays 17 November 01:22 AST.
+
+## 17. 7-8 November: P, the plant commit (ORDER step 14)
+
+**The route was shortened, and only the survey was dropped (7 November).** Ghassan's message of 7 November,
+"Don't mind the timeline; we need this ready for training as soon as possible", was read as: ready for
+training as soon as possible, no correctness lost, nothing added that costs laptop time. The survey, which
+judged nothing, was dropped: about 6.5 h of every suite on the candidate as it stood and about 1.7 h on the
+drafts' stack. Its four-suite run on the fixed P, kept for the stated counts, was not needed either, since
+pre measures them. In its place `pre` runs every one of its 46 steps even after one fails, and passes only if
+every step did, so that every failure of the candidate is found in one run and fixed in one re-make. Every
+gate phase stayed, in its order.
+
+**P's two fixes were made by reading; no Python ran for either.** The first is decision 2 of 7 November
+(`test_epa_tightenings.py`, MODE ok). On P's tree the B58 as built has a new plant_sha, 36655cab94800e30,
+and `epa_tightenings.b58_problems` rightly refuses it against the draw's plant (row 102), so, by reading (the
+gate plan's prediction, its section 7 item 5, never run), the controls of RealGates and StoppedRoute would
+have failed on P. A helper, `the_draws_b58`, now stands the draw's plant in for `validate_epa.b58_identity`
+in both classes, from setUpClass to the class cleanup. A new unmocked check,
+`Gates.test_the_b58_as_built_in_this_tree_is_not_the_draws_plant`, reads the live plant_sha, asserts that it
+is not the draw's, and asserts that `b58_problems` refuses it, by its text. The suite goes from 68 tests to
+69. The second fix is HP7.6's counts. README.md:830 and full_run.py:86 stated test_plant_guards as 19 tests
+with 9 skipped; they now state 47 tests OK, 0 skipped, as the port measured them on 6 November.
+README.md:827 and full_run.py:130 (app.test_agents, 135 tests, 14 skipped) were left for pre to measure.
+
+**Two reviews read the fixed P (`df54a4d`) and the no-stop pre**, by reading only (git, grep, diff,
+`bash -n`). Both found the work sound, with nothing blocking. Their three material items were fixed by the
+same means. The fixed P's message headed its new section "Fixed after the survey", though no survey had run;
+only the message changed (`c9f975f`, the same tree). A failing step that left the tree changed did not stop
+pre, so the later steps could have run on a tree that is not P's; such a step now writes one STOP line, and
+every later step is recorded NOT RUN. A step that hung was named by nothing until it ended; every step now
+writes a "started" line first.
+
+**RV was amended, pushed, and P re-made on it.** RV's commit took its documents (`fc98309` became
+`a443607`: CHECKPOINT.md, section 16 of this report and STATE_HISTORY part AI) and was pushed. origin's
+`GRA-test` tip was `a443607` when the gate began. P was re-made on it as `3e4b53f` (34 files, 2 of them
+added), and `apply` found its diff on RV byte-identical to the reviewed `c9f975f`'s on `fc98309`.
+
+**base and apply** (7 November, 12:33-12:59 UTC, on RV's clean tree, nothing beside them). `--identity` on
+RV wrote 96 tensors and 47 record fields. test_reward, validate and check_premise exited 0, and their
+printouts became the reference that pre compares P's with. Every engine's plant_sha was a3cd3a3's, and RV's
+fingerprint.py refused the Honda, as expected ("this car has no gears; fingerprint schema 3 cannot record
+it"). The app suites on RV: app.test_replay --full 59 of 59; app.test_simulation 16 tests, 1 failure;
+app.test_agents 135, 1 failure, 1 error, 14 skipped; app.test_results 125, 7 failures, 1 error, 1 skipped;
+app.test_agent_sources 15 OK; the node tests 306 of 306. `apply` then read P's tree onto RV's, uncommitted,
+with HEAD left at RV. Of roads.json's hashed files P changes engine_env.py, engines.py, evaluate.py and
+fingerprint.py, and none outside MAY_DIFFER. Every engine's plant_sha moved: b58 36655cab94800e30, ford_27tt
+a8dd5aeadf909e67, honda_l15b7 e5f59cf2cff3d1a5, mazda_25t a1c89b974124e1cc. Every derived_sha RV printed is
+unchanged (326c0835548975e2, 61f84c7d02b6b816, e8318dd80c3375f2), and P's fingerprint.py prints the
+Honda's, 2970c3ff3768a61d.
+
+**pre: all 46 steps passed on the first run** (12:59-16:02 UTC, nothing beside it).
+- The frozen diff named exactly engine_env.py, engines.py and evaluate.py. verify_record named P's four
+  hashed files and the four plant_sha, and nothing else. `epa_freeze.STEP2_TESTS` is the K gate's list.
+- test_engine_threading alone, early: 33 tests OK (skipped=6), the tree unchanged after it.
+- test_cars 41 OK; test_carried 16 OK; test_trainable 23 OK, printing "RealTree: the expectation ('b58',);
+  engines.trainable() ('b58',)"; test_plant_guards 47 OK; test_fuel_forms 44 OK; test_device_gate 39 OK
+  and test_four_engine_training 51 OK, both whole; `benchmark_training.py --selftest` "SELFTEST PASSES";
+  the lab's pins 10 OK.
+- check_premise, validate and test_reward at the defaults: each exited 0 and printed what RV printed, byte
+  for byte, results/premise.json included. validate.py: "8 of 11 quantities inside their band", and
+  validation_table.md did not move, so decision 68 asks for no table update. test_reward.py: "All checks
+  pass. The reward is safe to train against."
+- check_roads.py: PASS, worst p95 tracking 0.016, stderr empty. Its results/training_roads.json is a3cd3a3's
+  output byte for byte (sha256 57e742c0), and the committed file was put back (section 16; build step 1's
+  finding 13).
+- `--identity` on P's tree, then `--compare` with RV's: "compared 96 tensors, 47 record fields, 8 counters
+  and the curve", "VERDICT: IDENTICAL TRAINING".
+- The K gate's suites, both batches in 1676 s, each at or above its floor: test_validate_guards 75,
+  test_epa_plants 7, test_calibrate_epa 90 (skipped=3), test_epa_fit 61 (skipped=1), test_tit_cap 38,
+  test_k3_knee 28, test_epa_coefficients 12, test_epa_freeze 37, test_epa_stats 102, test_contract_pinned
+  19, test_d3_rows 72, test_epa_fixtures 10, test_epa_roads with test_roads_ceiling 62, test_defect_route 5;
+  test_epa_rows 54 with its one known failure (N1, calibrate_epa.py:1002), the same lines as RV's.
+  test_epa_tightenings: 69 OK (skipped=2), and the new check printed "... ok": the first run of both fixes.
+- test_preview_horizon whole: 15 OK in 564 s (BlindBitForBit among them).
+- The app suites, each judged against RV's run: app.test_replay --full 59 of 59; app.test_simulation 16,
+  its one failure RV's (the `?v=` asset check); app.test_agents 135, 1 failure and 1 error, RV's two (the
+  `?v=` asset check, and "pwsh is required for launcher behavior tests"), skipped=14; app.test_results 125,
+  5 failures and 1 error, skipped=4, every failure one RV's run had (five provenance tests and the same
+  launcher error; RV's two others do not fail here: ProvenanceStateTests' git-route test and the
+  `route='git'` case of its schema-1 test; P edits app/test_results.py); app.test_agent_sources 15 OK; the
+  node tests 306 of 306.
+- HP7.6 on pre's own runs: 8 of 11 stated counts equal their runs, README.md:827 and full_run.py:130 among
+  them (135 tests, 14 skipped); the 3 not tied are test_wide_air's, which pre does not run.
+- verify_docs.py: "All 74 checks pass (979 figure mentions scanned in the documents)."
+- test_roads_reverify.py whole: 61 tests OK (skipped=1: Live, "before P"), in 5895 s.
+- At the end no cache was left, the status was pre's start's, and the index was P's tree.
+
+**cert-prep and cert-kit, the first install** (16:03-16:07 UTC). The tools archive was extracted and checked
+member by member; S holds 219 of its files and the other 1810 stay in the extraction. Commit A's 34 reference
+dumps and the lab's were copied from commit A's S. The certificate's clone was made at P's candidate (`3e4b53f`,
+committed and clean, its tree REPO's index), with its four copies and the start manifest. The ignored local
+data the suites read went into it, each equal to REPO's: app/node_modules (1118 files), app/static/vendor (4)
+and runs/extremes_dt1/sighted_seed0/meta.json. Six G0-prepare records, each PASS. cert-kit installed the
+reviewed kit (its first install), and its smoke step passed: the 8 edited shell tools 0 lines apart, by text
+and by an argv run, and both replays (compare_all.sh, check_l6.sh) equal to commit A's reports.
+
+**The roads check** (16:07 UTC on 7 November to 09:49 UTC on 8 November). `roads_reverify.py check --jobs 14
+--out C:/Users/badcl/grad_p/check` ran on P's uncommitted tree, HEAD at RV, `git status` listing exactly P's 34
+files, no cache left. Beside it ran only the certificate's first run, one group at a time (decision 4 of 7
+November), and, once that had ended at 03:00 UTC, text work on the kit and the gate (editor and shell text tools,
+no Python). It ran 63677 s (17.7 h) and printed "VERDICT: EQUAL": 0 differences in 17 sections, both readings of
+redraws.json among them (version 6: 184278 values; version 5, every engine gating: 1470984 values), and section
+`report` (12392 values), which RV's control left out. Its result's sha_text begins 421ec60f.
+
+**The certificate's first run: 101 PASS, 5 FAIL.** It ran in the clean clone at `3e4b53f`, beside the check. The
+gate recorded G1.0 first (G1-harness records 1 and 2; "G1.0's plant_sha 36655cab94800e30, engine_sha
+023f5589215ee68e") and G7.3 (G7-suites record 1). The driver then ran the groups one at a time from 16:08 to 03:00
+UTC: g1 5105 s, g2 6667 s, g3 6932 s, g4 189 s, g5 1848 s, g6 13823 s and g7 4569 s. It ended "after 39139 s;
+records: 101 PASS, 5 FAIL; driver refusals: none". So the certificate did not pass at its first run. Each FAIL
+record's evidence was read (`hand/cert_fails_plan.md`). All five are defects of the kit's driver,
+`tools/cert_driver_P.sh`, and in none is P's code at fault. Commit A's own run had met each of the five and written
+it down, and the kit did not carry them over.
+- G1-harness record 29 (control, B9, "commit A's certificate route (--config) is unchanged by P's edits"; got
+  "differs: an exit"). G1.7(b) ran commit A's make_cert.py, P's make_cert_P.py and the control under `-I -B`
+  without `-X utf8`. `-I` ignores PYTHONIOENCODING, so printing commit A's re-checked FAIL record G5-app-lab 22
+  (Arabic text) to a cp1252 stdout raised UnicodeEncodeError after each JSON was written, and three of the five
+  makes exited 1. Commit A's unedited make_cert.py failed the same way. The two JSONs and the two pages were
+  byte-identical, which is what B9 asks.
+- G3-roads record 2 (L4, 3.6.4; got "differs:_random last line"). The driver asked the `--road random` run of
+  test_reward.py for the default run's last line. That run ends, on cf43fbb as on P, with the D2 line. Both stdouts
+  were byte-identical to cf43fbb's, stderr empty, exit 0 twice.
+- G5-app-lab record 10 (L5, 3.6.12 and HA.3; got "differs: --check"). The driver waited for "is ready", which
+  launch.py prints to block-buffered stdout, so the line reached the file only at the launcher's exit, at its 300 s
+  timeout, and `launch.py --check` ran as the server stopped. The launcher itself reached "is ready" and exit 124.
+  launch.py is cf43fbb's, byte for byte.
+- G7-suites record 12 (suite, 3.6.15, HP7.1, B8 and HP7.6; got "differs: RealTree; Ran 23 tests ... OK"). The
+  driver's `tests_ok` read a test's result only on its header line or the next. RealTree prints its expectation to
+  stderr by design, so its "ok" stands alone two lines later. test_trainable ran 23 tests, OK.
+- G7-suites record 16 (docs, HA.4; got "differs: no line"). The driver turned CERT_PLAN_A G7.4's one-line grep
+  into a check of at least one line, and CLAUDE.md's rule names engines.py and engine_specs/ across lines 137-138.
+
+None of the five touches the roads check, which depends on pre alone.
+
+**The decision: the five re-checked on the same S (8 November).** The synthesis recommended a new S, about 11 h
+after the check. The orchestrator, under Ghassan's standing instruction, took its route 2 instead: correct the kit,
+install it again on the same S, and re-run g1, g3, g5 and g7 with cert-recheck. The five FAIL records stay in the
+certificate beside the PASS records that re-check them, as commit A re-checked its FAILs (`hand/RECHECK_RUN.md`).
+The decisions are `decisions/cert_kit_reinstall.txt` (MODE reinstall, its WHY, the six EDITED kit files) and
+`decisions/cert_recheck_g1.txt`, `_g3`, `_g5` and `_g7` (MODE recheck, the REASON read in the FAIL's evidence, one
+FAIL line per record), each DECIDED 8 November. The kit was corrected beside the check, by editor only:
+- E1: G1.7(b)'s five makes run with `-X utf8`, as commit A's F.3 ran every make.
+- E2: G3.1 expects each run's own last line, the D2 line for `--road random`.
+- E3: G5.2 runs `--check` once the server has logged the launcher's own `"GET / HTTP/1.1" 200` (commit A's
+  second-cycle trigger), and removes the first run's launcher log before the launcher starts.
+- E4: `tests_ok` keeps a result pending until the next test header, so a bare "ok" after a test's stderr line counts.
+- E5: HA.4 reads the rule's line and its continuation (`grep -n -A1 "engines\.py" CLAUDE.md | grep -B1
+  "engine_specs/"`).
+- E6, hardening with no FAIL record behind it: the final driver's four makes run with `-X utf8`.
+
+With them INTEGRATION.md section 7, reproduce_P.json, cert_P.json's `first_run` note and TOOL_EDITS_commit_P.md
+changed: six kit files in all. Every record keeps the first run's `--what` and `--command` texts, so that a re-run
+is the same check (recheck_prep pairs the records of one check by them). The `--expected` of the B9, G5.2 launcher
+and HA.4 records says what now runs. E2, E4 and E5 were replayed by text on the first run's files, each with a
+negative control. E1 and E3 cannot be replayed without Python; they rest on commit A's own runs. Two independent,
+read-only reviews read the corrected kit, and the second also read the gate patch below. Both found the work sound,
+with nothing blocking, and their five material items were fixed. A third reader, who wrote none of it, verified
+those fixes, ran the patch's two sandbox tests on it as it then stood, and re-signed `decisions/cert_kit_reviewed.txt`
+over the kit's 24 files.
+
+**The patch to p_gate.sh, applied after the check ended.** As written, the gate could not re-check on this S with a
+corrected kit: cert_ready refuses a kit other than the one installed and smoked, and cert-kit refused an S that
+holds records. The patch (`hand/p_gate_reinstall.patch`, 6 hunks) adds one route, cert-kit's second install. When
+`decisions/cert_kit_reinstall.txt` says MODE reinstall, with a WHY line and EDITED lines that are exactly the kit
+files that differ from the first install, the second install keeps the first install's state, installs and smokes
+the kit again, never touches S/cert_results, and records itself in S/TOOL_EDITS.md. It was written and tested on
+sandbox copies beside the check (no Python, the smoke step stubbed), and p_gate.sh was not touched while check and
+cert ran from it (bash reads a script as it runs). After "PHASE check PASSED" (09:49 UTC) the decision's six EDITED
+lines were checked against the kit's changes (`hand/kit_changed_now.txt`). The gate as check and cert ran it was
+kept (`hand/p_gate.sh.as_run`, sha256 9f1d1650), and the patch was applied at 09:51 UTC (p_gate.sh sha256
+fdbc8633, equal to `hand/p_gate.sh.new`).
+
+**The second install** (09:52-09:53 UTC). cert-kit kept the first install's state in `out/cert_kit_reinstall/before`
+(351 files: the kit files as S held them, TOOL_EDITS.md, CERT_PLAN_P.md, the install list, the smoke pin and its
+step, cert-kit's logs, S/cert_results' sha256). It named the six changed kit files, installed the kit, and passed its
+smoke step again: "kit smoke: PASS (text and argv: 8 tools, 0 lines apart; both replays equal to commit A's
+reports)". It recorded the install in S/TOOL_EDITS.md's section "commit P, second install (2026-11-08)": each
+changed file's sha256 before and after and its diff, and the diff of the first install's TOOL_EDITS.md (770 lines),
+which carries TOOL_EDITS_commit_P.md's first text. S/cert_results was unchanged (8 files, sha256 -c). No G0-prepare
+record was written for the install, because the route never writes S/cert_results; each re-check's G0-prepare
+record and its decision copy name it.
+
+**The four re-checks** (09:53-12:33 UTC, one after another, nothing beside them). Before g1, its dumps (`out/P_G1_*`
+and cmp's P_G1 folders) were copied aside to `p_gate/cert_recheck_aside/g1` (61 MB). Before g5, S/lab went to
+`p_gate/cert_recheck_aside/g5` (4.7 MB). Those re-runs delete them, and recheck_prep also copied every file the
+earlier records cite under S/recheck/. Each re-check wrote one G0-prepare record (records 8 to 11, PASS), re-ran its
+group in the clone, and paired the re-run's PASS record with the FAIL it re-checks:
+- g1, 09:53:44-10:33:01, driver 2350 s (5105 s in the first run): G1-harness record 57 re-checks record 29; "open
+  FAIL records now: 4".
+- g3, 10:33:01-11:40:02, driver 4016 s (6932 s first): G3-roads record 9 re-checks record 2; 3 open.
+- g5, 11:40:03-11:55:28, driver 920 s (1848 s first): G5-app-lab record 25 re-checks record 10; 2 open.
+- g7, 11:55:29-12:33:45, driver 2290 s (4569 s first): G7-suites records 32 and 36 re-check records 12 and 16; 0
+  open, "5 FAIL records, 0 not re-checked".
+
+The driver then counted 175 PASS and 5 FAIL records. The five FAIL records stay in the certificate, each with its
+re-check named (rechecked_by).
+
+**post, cert-final and cert-docs.** post (12:54 UTC) listed the FAIL records again ("5 FAIL records, 0 not
+re-checked") and read the check's result: "EQUAL", partial false, mode "check", head `a443607`, 17 sections
+printed (want 17). test_engine_threading then ran alone in REPO (the certificate's G7.0, G7-suites record 42, PASS):
+"Ran 33 tests in 18.111s OK (skipped=6)", the tree unchanged after it. drift_test.py did not run: verify_docs.py and
+drift_test.py are RV's. The sweep (decision 67) listed 3 files outside the stay rows: CHECKPOINT.md,
+`Explanatory Simulation/tests/test_catalog.py` and docs/build_step_2/CERT_PLAN_P.md. plant_sha was apply's, and
+every derived_sha was unchanged. cert-final (12:55-12:57 UTC, the final driver 150 s) wrote the draft certificate,
+naming `3e4b53f`, with every one of make_cert's checks ok and each of the five FAIL lines naming its re-check. The
+draft's verdict reads "BIT-IDENTICAL at every level run on this machine (pending: L8 on the training device at
+ORDER step 18, and app.test_results on P itself after the commit)", 180 of 185 recorded checks PASS and 5 FAIL,
+all 5 re-checked. The final driver's pre-check, which writes no record, ran verify_docs.py with the draft in a copy
+of the clone, and it exited 1 with "1 of 74 checks failed". The draft page's HP7.6 row (its line 315, "HP7.6: 11 of
+11 stated counts equal their runs") is read as the figure "validate.py rows inside their band" (data gives 8), and
+no RETIRED-OK marker of the page covers that row. cert-docs (F.3), in REPO: the certificate into results/, drift_test's
+control with the certificate's files in the tree (3.6.18, recorded), the new tools archive and the certificate made
+from it, the control again on the final files, then verify_docs.py: All 74 checks pass (986 figure mentions scanned in the documents). The certificate: "Verdict: BIT-IDENTICAL at every level run on this machine (pending: L8 on the training device at ORDER step 18, and app.test_results on P itself after the commit). 185 of 190 recorded checks PASS, 5 FAIL (5 of them re-checked by a later PASS record, section 6); 41 of 41 items of the re-run list answered."
+
+**The page fix, and what the certificate page cannot say (15:34-16:04 UTC).** cert-docs was not started on that draft. An independent reader of the hand steps found that cert-docs, which first removes S/refw, S/candw, S/candt and S/pre, would then fail at drift_control_1 on the same line and write an F-certificate FAIL record that nothing can re-check; a reviewer of the fix then found that make_archive.py (commit A's, MAX_BYTES 400 000) would have left S/TOOL_EDITS.md (643 913 bytes) out of the archive, which archive_ok requires. The route, decided by the orchestrator under Ghassan's standing instruction and recorded in `decisions/cert_kit_page.txt`: a third install on the same S of exactly two kit files, cert_P.json (a page marker, `RETIRED-OK: 11`, over the page's docs table, with its reason: the figure is HP7.6's tally of stated test counts, not validate.py's rows; and its `_what` note) and tools/make_archive.py (commit A's, with its MAX_BYTES line alone changed so that TOOL_EDITS.md is exempt), through a second patch to p_gate.sh that admits exactly that install, read by two reviewers and an independent verifier and applied with `patch -p1`; then cert-final again. Before the install, verify_docs.py in a scratch copy of the repository with the page as the marker makes it printed "All 74 checks pass (986 figure mentions scanned in the documents)", 3 mentions excused. The third install (15:51): kit smoke PASS, the records untouched (sha256), its section "commit P, third install" in S/TOOL_EDITS.md. cert-final again (15:52-15:54, the final driver 141 s): its pre-check "All 74 checks pass (968 figure mentions scanned in the documents)", exactly 3 excused; verify_docs.py over the repository's documents with the real draft: "All 74 checks pass (986 figure mentions scanned in the documents)"; the guard: GO. cert-docs (15:57-16:04): the four trees removed, drift_control_1 exit 0, make_archive, make_cert and make_md exit 0, drift_control_2 exit 0, verify_docs.py "All 74 checks pass (986 figure mentions scanned in the documents).", the archive 1023 members (sha256 ae43d628). What the page cannot say: cert_P.json's not_covered says the config "was reviewed before the run and not edited after it"; it was edited twice after records were written (the second install's `first_run` note; the third install's marker and `_what`), both recorded in S/TOOL_EDITS.md's sections "commit P, second install" and "commit P, third install". The page's tools note lists section "commit P"'s edits only; tools/make_archive.py's edit is in the third install's section. The second cert-final added F-certificate records 4-6 and G7-suites record 44, repeats of the first run's checks, so the page shows four duplicate rows (F.1 identity, F.1 manifest, HP7.6 and 3.6.19); it rewrote the first run's evidence in place, and the first run's 16 files are quoted and hashed in S/TOOL_EDITS.md and kept outside S. The recorded totals moved from 180 of 185 PASS (the first cert-final) to 184 of 189 (the second) and 185 of 190 (after cert-docs). The page fix's designer ran make_cert.py, make_md.py and a JSON check on scratch copies, beyond the verify_docs-only rule the orchestrator had given its agents; the orchestrator approved those runs afterwards (no gate phase ran then, and nothing real was written).
+
+**The documents of P's commit.** CHECKPOINT.md's lines 3, 5, 36, 79, 83 and 120 were rewritten, one line each (148
+lines, within 150). Line 5 names the B58's plant_sha on P, 36655cab94800e30, and fingerprint schema 4, so the sweep
+no longer lists CHECKPOINT.md. Line 36 names commit A's certificate as part AK and P's as `results/B58_IDENTITY.md`,
+and line 120 says that the five FAIL records were re-checked. The lines they replace are STATE_HISTORY part AJ,
+verbatim. Commit A's certificate page is part AK, verbatim, and P's replaces it in results/ (decision 67). The two other files the
+sweep lists stay, each acknowledged with its reason in `decisions/sweep_ack.txt`. In CERT_PLAN_P.md, lines 23, 118
+and 125 give a3cd3a3's values as the values before P: in its record of the port, in the sweep's own instructions
+and in its table. `Explanatory Simulation/tests/test_catalog.py:98` is the lab pin's comment ("It read ..."),
+naming commit A's plant as history, and it is a .py, which cannot change after the check. No other file is on the
+sweep's list.
+
+**What comes after these documents.** precommit fixes the bytes of this section, CHECKPOINT.md,
+STATE_HISTORY.md and the certificate before adopt runs, and only then runs P's would-be tree committed in a
+scratch clone (fingerprint.py, test_plant_guards, test_device_gate with RunL8, app.test_results). So what
+precommit's scratch clone, adopt, the commit and the push print is not here. adopt's sha_text is in P's
+commit message. adopt writes results/EPA_ROADS/reverify.json with HEAD still at RV. P is then committed on
+RV by explicit paths: its 34 files, these documents, the certificate and its archive, and reverify.json. So
+P is the commit that adds the record, and the one Live reads it at. The
+committed tree's checks follow: Live must run and pass, current_reverify must name the record, RunL8 reads
+the new archive, and app.test_results is judged against RV's run. P is pushed only if origin's `GRA-test` is
+still RV.
+
+**What was disclosed on the way.**
+- Full checkouts of P's tree wrote the tracked files under `logs/epa/` to disk: the certificate's clone
+  (`p_gate/cert/candg`, 22 such files), copy_tree's four copies of it in the certificate's S (cand, candd,
+  candw, candt; cert-docs removes candw and candt), and the kit's two full-tree copies outside S,
+  `p_gate/cert/preRV` (G2.3) and `p_gate/cert/vdcheck_P` (the final driver's check), which the drivers remove
+  (neither folder exists after cert-final). precommit's scratch clone (`p_gate/precommit`), made after these
+  documents are fixed, writes them once more. S/tcl holds a copy of commit A's EPA Test Car Lists and NCAT folder
+  (G7.1). No survey ran, so no survey tree was made. No agent or person opened or read any of these files
+  (copy_tree.py and manifest.py copy and hash them as bytes). After the push, candg, the scratch clone, S/tcl and
+  whatever is left of preRV and vdcheck_P are deleted (H8), and so are S/cand and S/candd, once the new archive
+  is committed. Commit A's own copies stay in its S (`scratchpad/cert2`) until the B58 study's last scoring,
+  because the kit reads its reference dumps.
+- cert-recheck ran four times on this S, after the second install (above): g1, g3, g5 and g7, each with its
+  decision file in `decisions/` naming the FAIL records it re-checks (g1: G1-harness record 29; g3: G3-roads
+  record 2; g5: G5-app-lab record 10; g7: G7-suites records 12 and 16). The first run's evidence the re-runs
+  replaced is kept, under S/recheck/ (recheck_prep's copies, which the earlier records now cite) and in
+  `p_gate/cert_recheck_aside` (g1's dumps, S/lab); the first install's state is in `out/cert_kit_reinstall`.
+  None of these is a full-tree copy, and none holds a file under logs/epa/ or an epa_*.csv (checked by name
+  only). H8 deletes neither `out/cert_kit_reinstall` nor `p_gate/cert_recheck_aside`; they are kept with the
+  session's records.
+- CERT_PLAN_P's section 3, the sweep's stay rows, leaves out results/EPA_VALIDATION/. Eleven records there
+  (ARMED.json, e6.json, rows.json, c4_accord.json and the rerun1 records, by the gate plan's names-only count
+  at the unfixed candidate) still name the plant_sha from before P. The sweep never searches that folder
+  (epa_roads' guard refuses it), the gate treats it as a stay row, and it refuses any edit there.
+- The certificate certifies P's candidate tree (`3e4b53f`'s, `37ab66cc`), which is P's code: P's commit is
+  that tree plus these documents, the certificate and its archive, and reverify.json, and the commit phase
+  checks that it differs from `3e4b53f` by those paths alone. The certificate ran in a clean clone at
+  `3e4b53f` (git_dirty False; decision 1 of 7 November), never in REPO, and so did the four re-checks. G7.0,
+  test_engine_threading alone, ran in REPO, with HEAD at RV and P's candidate applied uncommitted (the index
+  P's tree), as its record says.
+- Earlier in this session, beside section 16's two prints of roads_seed's line (the port's agent, and AB's
+  drafter):
+  - G's drafter, in its first round: a `git grep` listed data/engines/mazda_25t/epa_steady.csv among
+    matching file names (no line of it printed); a `git grep -P` printed lines 7-31 of
+    results/EPA_ROADS/attempt_1_printed.txt, which hold no run of 12 digits and not roads_seed's line
+    (nothing of it used); and a `sed` range over results/EPA_VALIDATION/mazda_25t/c3_rerun1.json printed
+    one 16-digit value, copied nowhere.
+  - AB's re-reviewer and PR-B's drafter read committed document text without the mask
+    (docs/build_step_2/INTERFACES.md, results/VALIDATION_DECISIONS.md section R,
+    docs/build_step_2/ORDER_TO_TRAINING.md, docs/build_step_2/ROW146_STATEMENTS.md), so the two H values of
+    row 147 (2), whose decimals run to 12 digits or more, reached their tool output. They are committed
+    document text, not roads.json's seed material, and neither copied them (PR-B's two files hold no such
+    run).
+  - The drafters and fixers of Qa, Ta, V, G and AB used read-only shell commands beyond their briefs, or,
+    in some of AB's and PR-B's commands, put the mask before a last filter. Each printed counts, line
+    numbers or masked text only. Two masked outputs, one of Ta's fixer and one of G's fixer (a `git diff`),
+    were saved by the harness to tool-results files in this machine's Claude settings folder.
+  - The reviewer of this section's first draft, the CHECKPOINT lines and P's message used read-only shell
+    commands beyond its brief's Read, Grep and read-only git (ls, cat, sed, grep, diff, cmp, od, wc, find,
+    file), each through the 12-digit mask; two of its masked outputs were saved by the harness to tool-results
+    files the same way. It tested that the copies' `logs/epa/` folders exist and counted the tracked files there
+    with `git ls-tree` (no name printed); nothing under them was opened.
+  - The agent that wrote these documents, P's message, extra_paths.txt and sweep_ack.txt (hand steps H1-H7, 8
+    November) used text tools and read-only git only, no Python and no test (ls, cat, sed, grep, awk, diff, cmp,
+    od, wc, find, du, sha256sum; git show, diff, log, status). It read the gate's logs, the decision files and the
+    certificate's driver logs through the 12-digit mask, and parts of verify_docs.py's source without it (no run
+    of 12 or more digits among them). Some of its tool outputs quoted 40- and 64-character hex values whole
+    (`out/cert_started`, the kit and check lines of `out/summary.txt`); none was copied into a file. It tested
+    that the copies' `logs/epa/` folders exist and counted candg's tracked files there with `git ls-files` (no
+    name printed); nothing under them was opened. Two of its masked outputs (the summary, and the FAILs'
+    synthesis) were saved by the harness to tool-results files the same way.
+  - The verifier of those documents and files (8 November, a Claude subagent that wrote none of them) used text
+    tools and read-only git only, no Python and no test (ls, cat, sed, grep, awk, cut, diff, cmp, od, wc, du, stat,
+    sha256sum, and perl as a regex tool; git status, show, diff, log, grep, ls-files, rev-parse, cat-file). It read
+    the gate's logs, the decision files, the records and the draft certificate through the 12-digit mask, and
+    parts of verify_docs.py's and drift_test.py's source. Two of its tool outputs quoted 64-character hex values
+    whole (the two kit-installed lines of `out/summary.txt`, and the check's sha_text line); none was copied into
+    a file. It counted candg's tracked files under `logs/epa/` with `git ls-files` (no name printed); nothing under
+    them was opened. Its scratch copies (commit A's page from `git show`, verify_docs.py's pattern list) were
+    deleted after use.
+- While pre ran, 2.4 GB of the laptop's 31.7 GB was free (13:26 UTC); Q's runs will start only with 6 GB
+  free, and wait otherwise.
+
+**What waits, from here:** Qa, G, V, Q, Ta, B1 on Jad's PC, Tb, AB, PR-B, PL-B and the training. The latest
+training start that ends inside W stays 17 November 01:22 AST.

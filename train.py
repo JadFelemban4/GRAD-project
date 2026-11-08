@@ -49,10 +49,12 @@ A ROAD NAMES A DESIGN, AND A DESIGN INCLUDES ITS STEP. Six designs exist:
 
 --engine IS REQUIRED (20 October 2026, decision 24: the H/tau test runs four
 engines). It names the plant every environment is built on (engines.get), and
-meta.json's fingerprint -- schema 3 -- records it in three FATAL fields: engine,
-engine_sha and backend. A run directory holding a schema-2 meta.json (every
-agent trained before the four-engine build) is not resumed: its record names no
-engine. NOTHING TRAINS ON GRA-test until decision 25 says so.
+meta.json's fingerprint -- schema 4 since the plant commit -- records it in two
+FATAL fields, engine and engine_sha, beside train_backend, score_backend,
+transmission, preview_h_s and reward_knock (fingerprint.py). A run directory
+holding a meta.json of an older schema (schema 2: every agent trained before the
+four-engine build; schema 3: before the plant commit) is not resumed: its record
+lacks those fields. NOTHING TRAINS ON GRA-test until decision 25 says so.
 
 --keep-buffer (11 October 2026) saves the replay buffer beside every checkpoint
 (OUT/<tag>/replay_buffer.pkl, overwritten each time) and loads it when the run
@@ -100,9 +102,21 @@ imports (row 121).
 
 H (rows 102 and 117). --horizon-ratio R --roads-record PATH trains a sighted agent
 at H = R x tau, tau the engine's frozen time constant read from the roads record,
-in a run directory sighted_r<R>_seed<S>. Until row 94's plant commit makes H an
-environment parameter, every H but today's 30 s (engine_env.PREVIEW_S) is refused
-(four_engine_roads.preview_h_problem), and so, today, is every R.
+in a run directory sighted_r<R>_seed<S>. H is an environment parameter since row
+94's plant commit P (engine_env.preview_samples; row 117): build_env passes it to the
+environment, 30 s (engine_env.PREVIEW_H_S, today's PREVIEW_S) when no ratio is given,
+and four_engine_roads.preview_h_problem refuses only an H the environment does not
+take. meta.json records it as the FATAL preview_h_s, null for a blinded agent.
+
+THE REWARD'S KNOCK OPTION (rows 113 (5), 117, 118, 127 (4); the plant commit P).
+--reward-knock in|out is the environment's knock option: 'in', X1's, keeps the
+knock term in r_life, and 'out' is row 113 (5)'s primary reading, which the
+four-engine test trains with. --road four_engine needs it, passed explicitly
+(check_recipe's last check); every other road accepts and records it, and without
+it trains X1's reward with X1's stdout. meta.json's FATAL reward_knock is read
+from the environment this run trains in (fingerprint.reward_knock_of), and
+config.json carries the same bool top-level, never inside its recipe. A resume
+that changes it is refused, as every FATAL field is.
 
 THE DEVICE ASKED FOR IS THE DEVICE TRAINED ON (21 October 2026, the review of
 benchmark_training.py). An explicit --device that torch cannot give is refused:
@@ -131,8 +145,8 @@ import four_engine_roads as FER
 import random_road as RR
 import step_record
 import training_recipe as TR
-from engine_env import (ExtremesTrainingEnv, SupervisoryTunerEnv, TerrainTrainingEnv,
-                        damage_rate, locked_climb)
+from engine_env import (PREVIEW_H_S, REWARD_KNOCK_DEFAULT, ExtremesTrainingEnv, SupervisoryTunerEnv,
+                        TerrainTrainingEnv, damage_rate, locked_climb)
 
 try:
     import gymnasium as gym
@@ -284,7 +298,8 @@ class _StepState(gym.Wrapper):
         return obs, r, term, trunc, info
 
 
-def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant, **road_options):
+def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant,
+              preview_h_s=PREVIEW_H_S, reward_knock=REWARD_KNOCK_DEFAULT, **road_options):
     """The training environment. dt is passed EXPLICITLY, to the cycle and the env,
     and so is the plant (required, 20 October 2026).
 
@@ -297,6 +312,10 @@ def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant, **r
              refused for any other.
     fixed    make_grade_climb, Phase D's road.
     random   the same, rebuilt at every reset by random_road.RandomClimb (D2).
+
+    `preview_h_s` is H, the preview horizon (row 117), and `reward_knock` the
+    environment's knock option (rows 113 (5), 118), each passed to every branch:
+    30 s and X1's True by default. Neither is one of `road_options`.
 
     The wrappers sit INSIDE Monitor, so Monitor's episode returns are the
     returns of the drawn roads, and `env.unwrapped` still reaches the
@@ -313,25 +332,27 @@ def build_env(use_preview, seed, duration, road="terrain", dt=1.0, *, plant, **r
     if road == "four_engine":
         # The cycle given here is replaced at the first reset, as random_road.RandomClimb's is
         env = FER.wrap(SupervisoryTunerEnv(locked_climb(plant, duration=duration, dt=dt), plant=plant, dt=dt,
-                                           use_preview=use_preview, seed=seed),
+                                           use_preview=use_preview, seed=seed, preview_h_s=preview_h_s,
+                                           reward_knock=reward_knock),
                        seed=seed, scored_share=road_options["scored_share"],
                        roads_record=road_options["roads_record"])
     elif road == "terrain":
         env = TerrainTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed,
-                                 plant=plant)
+                                 plant=plant, preview_h_s=preview_h_s, reward_knock=reward_knock)
     elif road == "wideair":
         # Imported here, not at the top, as before. It used to matter more:
         # importing wide_air swapped engine_env's boost ceiling for the whole
         # process until 20 October 2026; the inlet is each environment's own now.
         from wide_air import WideAirTrainingEnv
         env = WideAirTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed,
-                                 plant=plant)
+                                 plant=plant, preview_h_s=preview_h_s, reward_knock=reward_knock)
     elif road == "extremes":
         env = ExtremesTrainingEnv(duration=duration, dt=dt, use_preview=use_preview, seed=seed,
-                                  plant=plant)
+                                  plant=plant, preview_h_s=preview_h_s, reward_knock=reward_knock)
     else:
         env = SupervisoryTunerEnv(locked_climb(plant, duration=duration, dt=dt), plant=plant, dt=dt,
-                                  use_preview=use_preview, seed=seed)
+                                  use_preview=use_preview, seed=seed, preview_h_s=preview_h_s,
+                                  reward_knock=reward_knock)
         if road == "random":
             env = _RoadLog(RR.RandomClimb(env, seed=seed, duration=duration))
     return Monitor(_StepState(env))
@@ -542,11 +563,12 @@ ROADS_TEXT = {"terrain": "a new road every episode (TerrainTrainingEnv)",
 
 
 def check_recipe(a):
-    """Every refusal of the four-engine roads, decision 29's recipe and H, before any
-    directory is made or anything is built (rows 116-118). Reads the roads record
-    when a flag needs it. Returns (build_env's road options, the recipe meta.json
-    records -- None at X1's defaults -- and H in seconds, None for today's preview).
-    A function so test_four_engine_training.py can show each refusal."""
+    """Every refusal of the four-engine roads, decision 29's recipe, H and the knock
+    option, before any directory is made or anything is built (rows 116-118, 127
+    (4)). Reads the roads record when a flag needs it. Returns (build_env's road
+    options, the recipe meta.json records -- None at X1's defaults -- and H in
+    seconds, None for today's preview). A function so test_four_engine_training.py
+    can show each refusal."""
     uses_record = a.scored_share or a.horizon_ratio is not None
     if a.roads_record is not None and not uses_record:
         raise SystemExit("\nREFUSING: --roads-record without --scored-share or --horizon-ratio: nothing "
@@ -593,6 +615,11 @@ def check_recipe(a):
             TR.snapshot_steps(a.steps, a.checkpoint_average)
         except ValueError as exc:
             raise SystemExit(f"\nREFUSING: {exc}.")
+    # the last check, so every refusal above keeps its place (row 127 (4)): the four-engine
+    # test's reward is named on its command, never left to the default
+    if a.road == "four_engine" and getattr(a, "reward_knock", None) is None:
+        raise SystemExit("\nREFUSING: --road four_engine needs --reward-knock in or out, passed explicitly "
+                         "(row 127 (4)); the four-engine test trains with out (row 113 (5)).")
     recipe = {}
     if a.lr_schedule != "constant":
         recipe["lr_schedule"] = a.lr_schedule
@@ -633,7 +660,12 @@ def run_config(a, tag, model, outdir, live, plant_obj):
                       torch=torch.__version__, gymnasium=gym.__version__, numpy=np.__version__),
         git_head=live.get("git_head"), git_dirty=live.get("git_dirty"),
         plant_sha=live.get("plant_sha"), derived_sha=live.get("derived_sha"),
-        engine=live.get("engine"), engine_sha=live.get("engine_sha"), backend=live.get("backend"),
+        engine=live.get("engine"), engine_sha=live.get("engine_sha"),
+        # fingerprint schema 4's (interface sheet 12.2): `backend` stays, the training's, for the
+        # readers of config.json (benchmark_training.PLANT_KEYS)
+        backend=live.get("train_backend"), train_backend=live.get("train_backend"),
+        score_backend=live.get("score_backend"), preview_h_s=live.get("preview_h_s"),
+        reward_knock=live.get("reward_knock"),
         plant_inputs=plant, output=outdir.replace(os.sep, "/"),
         machine=dict(system=platform.system(), processor=platform.processor(), cpus=os.cpu_count(),
                      omp_threads=os.environ.get("OMP_NUM_THREADS")))
@@ -641,8 +673,8 @@ def run_config(a, tag, model, outdir, live, plant_obj):
 
 def main():
     ap = argparse.ArgumentParser()
-    # engines.trainable(), not known() (22 October 2026, decision 47): an EPA engine is
-    # registered and refused here until fingerprint schema 4 and its validation exist
+    # engines.trainable(), not known() (22 October 2026, decision 47): the B58 and the EPA
+    # engines the committed records keep (rows 107 (5) and 139); any other is refused here
     ap.add_argument("--engine", required=True, choices=engines.trainable(),
                     help="the plant to train on (engines.get), one that may train "
                          "(engines.trainable(), decision 47). REQUIRED: there is no "
@@ -674,11 +706,15 @@ def main():
                     help="save the model at five steps of the last N and write the manifest of "
                          "their action average (decision 29: 50000). Default: none, as X1")
     ap.add_argument("--horizon-ratio", type=float, default=None, metavar="R",
-                    help="a sighted agent at H = R x tau, tau from --roads-record (rows 102, 117). "
-                         "Refused until row 94's plant commit makes H an environment parameter")
+                    help="a sighted agent at H = R x tau, tau from --roads-record (rows 102, 117); "
+                         "H is an environment parameter since row 94's plant commit P")
     ap.add_argument("--roads-record", default=None, metavar="PATH",
                     help="the committed roads record (results/EPA_ROADS/roads.json, written at the "
                          "draw): roads_seed for --scored-share, tau for --horizon-ratio")
+    ap.add_argument("--reward-knock", choices=("in", "out"), default=None,
+                    help="the reward's knock term (row 113 (5)): in is X1's, out the primary "
+                         "reading the four-engine test trains with. Required with --road "
+                         "four_engine (row 127 (4)); default in on every other road, as X1")
     ap.add_argument("--fixed-road", action="store_true",
                     help="the same as --road fixed --dt 1.0 (the 27 Sep spelling)")
     ap.add_argument("--dt", type=float, default=None,
@@ -739,9 +775,10 @@ def main():
                                  + f"_dt{a.dt:g}".replace(".", "p"))
     # The four-engine roads, the recipe and H: refused here, before any directory (row 118)
     road_options, recipe, h_s = check_recipe(a)
-    # four_engine records the plant's locked climb as its FATAL scenario, as terrain and extremes do:
-    # decision 34's protocol (its scenario and episodes_sha) is fingerprint schema 4's (row 117)
-    protocol = "d2" if a.road == "random" else "phase-d"
+    # the protocol the agent is scored under (fingerprint schema 4; interface sheet 6.4): D2's on the
+    # random road, decision 34's on the four-engine roads (its scenario and episodes_sha read from the
+    # roads record and redraws.json, fingerprint.d34_roads; row 117), Phase D's on every other road
+    protocol = {"random": "d2", "four_engine": "d34"}.get(a.road, "phase-d")
     device = get_device(a.device)
     check_device(a.device, device)      # before any directory, and before anything runs on CUDA
     plant = engines.get(a.engine)
@@ -765,6 +802,10 @@ def main():
     print(f"seed          : {a.seed}")
     if recipe:
         print("recipe        : " + "; ".join(f"{k} {v}" for k, v in recipe.items()))
+    knock = (a.reward_knock or "in") == "in"         # REWARD_KNOCK_DEFAULT when absent (row 118)
+    if a.reward_knock is not None:                   # X1's stdout is unchanged without the flag
+        print("reward        : " + ("with the knock term (X1's)" if knock
+                                    else "without the knock term (row 113 (5))"))
     print(f"steps         : {a.steps:,}")
     print(f"device        : {device}")
     # MEASURED, and the two figures are two machines and two devices:
@@ -780,7 +821,8 @@ def main():
           f"({mins_est / 60:.1f} h) at a measured {STEPS_PER_S:.1f} steps/s on {device.type}")
     print(f"output        : {outdir}/\n")
 
-    env = build_env(not a.no_preview, a.seed, a.duration, a.road, a.dt, plant=plant, **road_options)
+    env = build_env(not a.no_preview, a.seed, a.duration, a.road, a.dt, plant=plant,
+                    preview_h_s=PREVIEW_H_S if h_s is None else h_s, reward_knock=knock, **road_options)
 
     ckpt_path = os.path.join(outdir, "checkpoint.zip")
     periodic = sorted(glob.glob(os.path.join(glob.escape(outdir), "ckpt_*_steps.zip")),
@@ -810,10 +852,14 @@ def main():
         road_fields["train_road_sha"] = FER.code_sha()
     if recipe:
         road_fields["train_recipe"] = recipe
-    # backend: read from the environment this run trains in (an engine_model
-    # there would be refused, not recorded as the cycle model)
+    # train_backend, H and the knock option: read from the environment this run trains in (an
+    # engine_model there would be refused, not recorded as the cycle model); it is scored on the
+    # exact cycle (fingerprint schema 4, row 136)
     live = FP.plant_fingerprint(protocol=protocol, plant=plant,
-                                backend=FP.backend_of(env.unwrapped),
+                                train_backend=FP.backend_of(env.unwrapped),
+                                score_backend=FP.BACKEND_CYCLE,
+                                preview_h_s=FP.preview_of(env.unwrapped),
+                                reward_knock=FP.reward_knock_of(env.unwrapped),
                                 train_dt=float(env.unwrapped.dt),
                                 train_duration=a.duration,
                                 steps_requested=a.steps, seed=a.seed,

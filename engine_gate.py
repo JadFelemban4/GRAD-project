@@ -53,10 +53,9 @@ imported, so the two gates share one definition.
                 sample). Both are printed.
 
 WHAT WAITS, refused rather than approximated:
-  * H as an environment parameter (row 117) comes with row 94's plant commit. Until then the
-    environment previews PREVIEW_S, whose furthest sample is 30 s, so the blind-arm check runs at
-    H = 30 s only; any other H is refused by preview_env and printed NOT RUN, and a gate with a check
-    not run does not pass.
+  * H is an environment parameter since row 94's plant commit P (row 117): preview_env's horizon_s,
+    any H that engine_env.preview_samples accepts, built with no refusal, so the blind-arm check runs
+    at every H of the roads record's H_table, and at engine_env.PREVIEW_H_S (30 s) without a record.
   * Row 116's training road is train.py's mode "four_engine" (four_engine_roads.py, written beside this
     file on 31 October 2026), passed by name, --train-road, and driven on its general episodes
     (FOUR_ENGINE_OPTIONS), or with --roads-record on the share's too (share_record). X1's extremes
@@ -75,12 +74,14 @@ WHAT WAITS, refused rather than approximated:
     reads one record's roads as they stand.
   * The reward's knock option. The team chose the reward without the knock term for this test (row
     113 (5); ORDER's status line, "A+G, the reward without the knock term"), and row 119 says "If row
-    113 (5)'s reward option is chosen, the gate runs with it". The option is an environment option of
-    row 94's plant commit (row 118: default knock in, X1's), so it cannot be passed before that commit,
-    and until then this gate runs the environment's reward as it stands, WITH the knock term. Once the
-    plant commit lands, run_gate must pass the option to every environment it builds (the training
-    road through train.build_env included), and the gate's output names it; a gate run without it is
-    not row 119's gate for this test.
+    113 (5)'s reward option is chosen, the gate runs with it". The option is the environment's
+    reward_knock (row 94's plant commit P; row 118: default knock in, X1's). --reward-knock in|out is
+    required on this gate's two command lines, test_reward.py --engine and check_roads.py --engine
+    (row 127 (4)); run_gate and road_table take it as a required bool and put it in every task, and
+    job passes it to every environment it builds: through preview_env, d34_env and training_env (the
+    training road through train.build_env), and directly to SupervisoryTunerEnv in the band and notch
+    branches, which would otherwise keep the default and judge those checks on the knock-in reward.
+    The gate's header names it. The four-engine gate runs with out.
 
 THE B58 AT ITS DEFAULTS IS NOT TOUCHED (row 118): nothing here is imported by train.py, by the
 environment or by any module roads.json hashes (row 121), and test_reward.py and check_roads.py run
@@ -118,10 +119,6 @@ FOUR_ENGINE_OPTIONS = dict(scored_share=False, roads_record=None)
 BLIND_SHIFT_S = 20.0             # DESIGN: under every gap's G - RAMP_S (G >= 50 s, row 101), so the
                                  # moved climb never meets the next one
 SYNTHETIC_ROADS = ER.SMOKE_N_ROADS
-
-
-class WaitsForPlantCommit(NotImplementedError):
-    """What this gate cannot run until row 94's plant commit: H as an environment parameter (row 117)."""
 
 
 # ------------------------------------------------------------------ the sweep
@@ -214,9 +211,9 @@ def d34_roads(*, roads_file, synthetic_seed):
 
 def horizons(h_table, engine_id):
     """The arms' horizons for one engine, s: every H of the roads record's H_table (row 102), or the
-    environment's own furthest preview sample when there is no record (a SYNTHETIC run)."""
+    environment's default H, engine_env.PREVIEW_H_S, when there is no record (a SYNTHETIC run)."""
     if h_table is None:
-        return [float(max(E.PREVIEW_S))]
+        return [E.PREVIEW_H_S]
     return sorted({float(v["H_s"]) for v in h_table[engine_id].values()})
 
 
@@ -243,22 +240,22 @@ def onset_twin(road):
 
 
 # ------------------------------------------------------------------ the environments
-def preview_env(cycle, *, plant, dt, use_preview, horizon_s, seed):
-    """The environment at preview horizon `horizon_s`. H is not an environment parameter until row 94's
-    plant commit (row 117, its default 30 s giving today's PREVIEW_S exactly), so until then only the
-    horizon the environment has is built, and any other is refused, never approximated."""
-    if float(horizon_s) != float(max(E.PREVIEW_S)):
-        raise WaitsForPlantCommit(f"H = {float(horizon_s):g} s: the environment previews {E.PREVIEW_S} s; H as an "
-                                  "environment parameter comes with row 94's plant commit (row 117)")
-    return E.SupervisoryTunerEnv(cycle, plant=plant, dt=dt, use_preview=use_preview, seed=seed)
+def preview_env(cycle, *, plant, dt, use_preview, horizon_s, seed, reward_knock):
+    """The environment at preview horizon `horizon_s`, the environment's own parameter since row 94's
+    plant commit P (row 117; engine_env.preview_samples, which refuses an H it does not take, never
+    approximated). `reward_knock`, the environment's knock option (row 113 (5)), is required: every
+    environment of the gate is built with the reward the engine trains on (row 119)."""
+    return E.SupervisoryTunerEnv(cycle, plant=plant, dt=dt, use_preview=use_preview, seed=seed,
+                                 preview_h_s=float(horizon_s), reward_knock=reward_knock)
 
 
-def d34_env(road, *, plant, use_preview):
+def d34_env(road, *, plant, use_preview, reward_knock):
     """One road of decision 34's set as evaluate.py's decision-34 protocol will score it (row 101): its
-    frozen episode's seed at reset, and its weights pinned after it (k3_knee.neutral_run's order)."""
+    frozen episode's seed at reset, and its weights pinned after it (k3_knee.neutral_run's order), with the
+    knock option `reward_knock` (required, as preview_env's)."""
     seed = int(road["episode_seed"])
     env = E.SupervisoryTunerEnv(ER.env_cycle(road), plant=plant, dt=float(road["dt"]), use_preview=use_preview,
-                                seed=seed)
+                                seed=seed, reward_knock=reward_knock)
     env.reset(seed=seed)
     env.w = np.asarray(road["weights"], dtype=np.float32)
     return env
@@ -302,12 +299,13 @@ def record_name(share):
     return os.path.relpath(path, HERE).replace(os.sep, "/") if FER.inside_repository(path) else path
 
 
-def training_env(train_road, seed, *, plant, roads_record):
+def training_env(train_road, seed, *, plant, roads_record, reward_knock):
     """The training road as train.py builds it (build_env: its wrappers, its design step, 900 s), reset at
     `seed`. A road train.py does not have is refused by name. Row 116's road is built with its general
     episodes only (FOUR_ENGINE_OPTIONS) when `roads_record` is None, and with decision 29's share on from
     that record otherwise, as train.py builds it with --scored-share --roads-record (row 130 (5)); a record
-    for any other road is refused. `roads_record` is required: None says the share is off."""
+    for any other road is refused. `roads_record` is required: None says the share is off. `reward_knock`
+    is required too, and passed to build_env, as train.py passes --reward-knock (row 127 (4))."""
     import train as T
     if train_road not in T.DESIGN_DT:
         raise ValueError(f"train.py has no road {train_road!r} (train.DESIGN_DT: {sorted(T.DESIGN_DT)})")
@@ -318,7 +316,8 @@ def training_env(train_road, seed, *, plant, roads_record):
     if train_road == FOUR_ENGINE_ROAD:
         opts = (FOUR_ENGINE_OPTIONS if roads_record is None
                 else dict(scored_share=True, roads_record=os.path.abspath(roads_record)))
-    env = T.build_env(True, seed, T.DURATION_S, train_road, T.DESIGN_DT[train_road], plant=plant, **opts)
+    env = T.build_env(True, seed, T.DURATION_S, train_road, T.DESIGN_DT[train_road], plant=plant,
+                      reward_knock=reward_knock, **opts)
     env.reset(seed=seed)
     return env
 
@@ -370,13 +369,14 @@ def rollout(env, policy, *, plant):
             "finite": bool(np.all(np.isfinite(rs)))}
 
 
-def preview_delta(plant, cycle, *, start_s):
+def preview_delta(plant, cycle, *, start_s, reward_knock):
     """test_reward.obs_differs_without_preview on `cycle`: the largest difference between the sighted and
     the blinded observation NOTCH_SAMPLE_S after the climb begins, neutral, both arms."""
     seen = []
     n = int(min(len(cycle["t"]) * DT - 5.0, start_s + NOTCH_SAMPLE_S) / DT)
     for use_preview in (True, False):
-        env = preview_env(cycle, plant=plant, dt=DT, use_preview=use_preview, horizon_s=max(E.PREVIEW_S), seed=0)
+        env = preview_env(cycle, plant=plant, dt=DT, use_preview=use_preview, horizon_s=max(E.PREVIEW_S), seed=0,
+                          reward_knock=reward_knock)
         obs, _ = env.reset(seed=1)
         for _ in range(n):
             obs, *_ = env.step(E.neutral_action())
@@ -384,12 +384,12 @@ def preview_delta(plant, cycle, *, start_s):
     return float(np.max(np.abs(seen[0] - seen[1])))
 
 
-def obs_trace(road, *, plant, use_preview, horizon_s, n):
+def obs_trace(road, *, plant, use_preview, horizon_s, n, reward_knock):
     """(env.k, observation) after reset and each of n neutral steps on a decision-34 road (check_random_road
     obs_trace's form), keyed on the environment's own step counter."""
     seed = int(road["episode_seed"])
     env = preview_env(ER.env_cycle(road), plant=plant, dt=float(road["dt"]), use_preview=use_preview,
-                      horizon_s=horizon_s, seed=seed)
+                      horizon_s=horizon_s, seed=seed, reward_knock=reward_knock)
     env.reset(seed=seed)
     env.w = np.asarray(road["weights"], dtype=np.float32)
     out = [(env.k, np.asarray(env._obs(), dtype=float))]
@@ -407,14 +407,16 @@ def first_difference(a, b):
     return None
 
 
-def blind_check(plant, road, *, horizon_s):
+def blind_check(plant, road, *, horizon_s, reward_knock):
     """check_random_road.py B at H = horizon_s on one decision-34 road and its onset twin."""
     twin, slot, d = onset_twin(road)
     lead = int(horizon_s / DT)
     n = d + 5
-    blind = first_difference(*(obs_trace(r, plant=plant, use_preview=False, horizon_s=horizon_s, n=n)
+    blind = first_difference(*(obs_trace(r, plant=plant, use_preview=False, horizon_s=horizon_s, n=n,
+                                         reward_knock=reward_knock)
                                for r in (road, twin)))
-    sight = first_difference(*(obs_trace(r, plant=plant, use_preview=True, horizon_s=horizon_s, n=n)
+    sight = first_difference(*(obs_trace(r, plant=plant, use_preview=True, horizon_s=horizon_s, n=n,
+                                         reward_knock=reward_knock)
                                for r in (road, twin)))
     want_sight = max(0, d - lead)
     return {"H_s": float(horizon_s), "road": road["k"], "slot": slot, "grades_differ_at": d,
@@ -425,11 +427,13 @@ def blind_check(plant, road, *, horizon_s):
 # ------------------------------------------------------------------ the jobs (one process each)
 def job(task):
     """One unit of the gate, by kind, in its own process; the plant built there by name (engines.get).
-    An error is returned as text with the task, never raised: a refusal is a result."""
+    Every environment it builds takes the task's knock option, task["reward_knock"] (row 119); the table
+    kind builds none. An error is returned as text with the task, never raised: a refusal is a result."""
     import engines
     kind, engine_id = task["kind"], task["engine"]
     try:
         plant = engines.get(engine_id)
+        rk = task["reward_knock"]
         if kind == "table":
             rpms = [int(r) for r, _ in plant.car.deliverable_torque]
             fresh = dict(E.measure_deliverable_torque(rpms, plant=plant))
@@ -437,22 +441,26 @@ def job(task):
             worst = max(rpms, key=lambda r: abs(fresh[r] - table[r]) / table[r])
             return dict(task, drift=abs(fresh[worst] - table[worst]) / table[worst], worst_rpm=worst, rpms=len(rpms))
         if kind == "band":
-            env = E.SupervisoryTunerEnv(band_cycle(plant, task["grade"]), plant=plant, dt=DT, seed=0)
+            env = E.SupervisoryTunerEnv(band_cycle(plant, task["grade"]), plant=plant, dt=DT, seed=0,
+                                        reward_knock=rk)
             env.reset(seed=0)
             return dict(task, **rollout(env, task["policy"], plant=plant))
         if kind == "notch":
-            env = E.SupervisoryTunerEnv(notch_cycle(plant, task["grade"]), plant=plant, dt=DT, seed=0)
+            env = E.SupervisoryTunerEnv(notch_cycle(plant, task["grade"]), plant=plant, dt=DT, seed=0,
+                                        reward_knock=rk)
             env.reset(seed=1)
             return dict(task, **rollout(env, task["policy"], plant=plant))
         if kind == "notch-preview":
-            return dict(task, delta=preview_delta(plant, notch_cycle(plant, task["grade"]), start_s=180.0))
+            return dict(task, delta=preview_delta(plant, notch_cycle(plant, task["grade"]), start_s=180.0,
+                                                  reward_knock=rk))
         if kind == "d34":
-            env = d34_env(task["road"], plant=plant, use_preview=True)
+            env = d34_env(task["road"], plant=plant, use_preview=True, reward_knock=rk)
             road = task.pop("road")
             return dict(task, k=road["k"], climbs=len(road["climbs"]),
                         grade_max=max(road["cycle"]["grade"]), **rollout(env, task["policy"], plant=plant))
         if kind == "train":
-            env = training_env(task["train_road"], task["seed"], plant=plant, roads_record=task["roads_record"])
+            env = training_env(task["train_road"], task["seed"], plant=plant, roads_record=task["roads_record"],
+                               reward_knock=rk)
             c = env.unwrapped.cycle
             g, v = np.asarray(c["grade"], dtype=float), np.asarray(c["v_mps"], dtype=float)
             road = {"family": c.get("family"), "grade_min": float(g.min()), "grade_max": float(g.max()),
@@ -461,14 +469,19 @@ def job(task):
             return dict(task, **road, **rollout(env, task["policy"], plant=plant))
         if kind == "blind":
             road = task.pop("road")
-            return dict(task, **blind_check(plant, road, horizon_s=task["H_s"]))
+            return dict(task, **blind_check(plant, road, horizon_s=task["H_s"], reward_knock=rk))
         raise ValueError(f"no job kind {kind!r}")
-    except WaitsForPlantCommit as exc:
-        task.pop("road", None)
-        return dict(task, waits=str(exc))
     except Exception as exc:                                  # noqa: BLE001 -- a refusal is a result
         task.pop("road", None)
         return dict(task, error=f"{type(exc).__name__}: {exc}")
+
+
+def _need_knock(reward_knock):
+    """The knock option, refused before any task when it is not a bool (the environment refuses it too,
+    but inside each job, where a refusal is a result)."""
+    if type(reward_knock) is not bool:
+        raise TypeError(f"reward_knock is True (the knock term in r_life, X1's) or False (row 113 (5)), "
+                        f"not {reward_knock!r}")
 
 
 def pool_map(tasks, *, jobs):
@@ -506,12 +519,15 @@ def _road_checks(what, neutral, starver, key, label):
              f"starver {starver['mean_r']:+.5f}  vs  neutral {n0['mean_r']:+.5f}   ({label}, {key} {n0[key]})")]
 
 
-def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs, roads_record):
+def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs, roads_record, reward_knock):
     """Every unit of the gate in the module docstring, run in `jobs` processes. Returns the sweep, every
     unit's result and the checks, each (name, True, False or None when it did not run, detail).
     `roads_record` is required: None is the training check with the share off, a path turns it on
-    (share_record; a SYNTHETIC record makes the run a test of the code, as a SYNTHETIC seed does)."""
+    (share_record; a SYNTHETIC record makes the run a test of the code, as a SYNTHETIC seed does).
+    `reward_knock` is required, a bool: the knock option every task's environment is built with (row 119),
+    returned with the gate."""
     import engines
+    _need_knock(reward_knock)
     share = share_record(train_road, roads_record)
     plant = engines.get(engine_id)
     rows = sweep(plant)
@@ -520,7 +536,7 @@ def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs, roads_r
     roads, h_table, label = d34_roads(roads_file=roads_file, synthetic_seed=synthetic_seed)
     hs = horizons(h_table, engine_id)
     blind_road = next((r for r in roads if r["climbs"]), None)
-    base = dict(engine=engine_id)
+    base = dict(engine=engine_id, reward_knock=reward_knock)
     tasks = [dict(base, kind="table"), dict(base, kind="band", grade=band, policy="neutral")]
     for c in cuts:
         tasks += [dict(base, kind="notch", grade=c["grade"], policy=p) for p in ("neutral", "starver", "random")]
@@ -531,9 +547,12 @@ def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs, roads_r
     tasks += [dict(train, seed=s, policy="neutral") for s in TRAIN_SEEDS]
     tasks.append(dict(train, seed=TRAIN_SEEDS[0], policy="starver"))
     tasks += [dict(base, kind="blind", road=blind_road, H_s=h) for h in hs if blind_road is not None]
-    # the tasks read the record by its absolute path; what the gate returns and prints names it (record_name)
-    name = record_name(share)
-    res = [dict(r, roads_record=name) if r["kind"] == "train" else r for r in pool_map(tasks, jobs=jobs)]
+    # the tasks read the record by its absolute path; what the gate returns and prints names it (record_name).
+    # Its own variable: the check loops below rebind `name` to each check's name, and the gate returned the
+    # last of them as its roads_record (found by C2's drafter, 5 November 2026; fixed in P, which edits this
+    # return; test_device_gate.Verdict.test_the_gate_returns_the_record_it_ran_with)
+    rec_name = record_name(share)
+    res = [dict(r, roads_record=rec_name) if r["kind"] == "train" else r for r in pool_map(tasks, jobs=jobs)]
 
     def of(kind, policy=None):
         return [r for r in res if r["kind"] == kind and (policy is None or r.get("policy") == policy)]
@@ -565,9 +584,7 @@ def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs, roads_r
         checks.append(("the blind arm is blind", False, "no road of the set has a climb"))
     for r in sorted(of("blind"), key=lambda r: r["H_s"]):
         name = f"the blind arm is blind at H = {r['H_s']:g} s"
-        if "waits" in r:
-            checks.append((name, None, "NOT RUN: " + r["waits"]))
-        elif "error" in r:
+        if "error" in r:
             checks.append((name, False, r["error"]))
         else:
             checks.append((name, r["blind_ok"] and r["sighted_ok"],
@@ -577,8 +594,9 @@ def run_gate(engine_id, *, train_road, roads_file, synthetic_seed, jobs, roads_r
     return dict(engine=engine_id, plant_id=plant.id, cvt=isinstance(plant.car, engines.CvtCar), sweep=rows,
                 notches=cuts, band=band, kickdown=kickdown_threshold(cuts), label=label,
                 synthetic=synthetic_seed is not None or (share is not None and share["seed_kind"] != "REAL"),
-                horizons=hs, train_road=train_road, roads_record=name,
-                share_kind=None if share is None else share["seed_kind"], results=res, checks=checks)
+                horizons=hs, train_road=train_road, roads_record=rec_name,
+                share_kind=None if share is None else share["seed_kind"], reward_knock=reward_knock,
+                results=res, checks=checks)
 
 
 def print_gate(g):
@@ -595,6 +613,8 @@ def print_gate(g):
               + ("off (no --roads-record): the general episodes only" if g["roads_record"] is None
                  else f"on, {g['share_kind']} record {g['roads_record']} (row 130 (5)): each seed's first "
                       "episode is the share's road"))
+    print(f"reward              : {'with' if g['reward_knock'] else 'without'} the knock term (--reward-knock "
+          f"{'in' if g['reward_knock'] else 'out'}; row 113 (5))")
     print(f"preview horizons    : {', '.join(f'{h:g}' for h in g['horizons'])} s")
     print(f"neutral action      : {np.round(E.neutral_action(), 3)}\n")
     print(f"THE SWEEP: {len(rows)} grades, {100 * SWEEP_STEP:g} % apart over {100 * SWEEP_GRADES[0]:g}-"
@@ -631,8 +651,7 @@ def print_gate(g):
                                                         " The reward is safe to train this engine against."))
         return 0
     if False not in oks:
-        print(f"\nNOT COMPLETE: {oks.count(None)} check(s) did not run; each waits for the plant commit. Do not "
-              "train this engine yet.")
+        print(f"\nNOT COMPLETE: {oks.count(None)} check(s) did not run. Do not train this engine yet.")
         return 1
     print("\nSTOP. Do not train this engine until this passes. Diagnose WHICH check failed on WHICH road before\n"
           "changing anything -- mistake 17 was a scenario failure that looked like a weight problem.")
@@ -640,14 +659,17 @@ def print_gate(g):
 
 
 # ------------------------------------------------------------------ check_roads.py --engine
-def road_table(engine_id, *, train_road, roads_file, synthetic_seed, n, first_seed, jobs, roads_record):
+def road_table(engine_id, *, train_road, roads_file, synthetic_seed, n, first_seed, jobs, roads_record,
+               reward_knock):
     """check_roads.py's table on one engine: the neutral action on n training roads (seeds from first_seed)
     and on every road of decision 34's set. Returns (training rows, decision-34 rows, the set's label).
     `roads_record` as run_gate's: required, None for the share off. The training rows name the record
-    as record_name does; only the tasks read it by its absolute path."""
+    as record_name does; only the tasks read it by its absolute path. `reward_knock` as run_gate's:
+    required, in every task."""
+    _need_knock(reward_knock)
     share = share_record(train_road, roads_record)
     roads, _, label = d34_roads(roads_file=roads_file, synthetic_seed=synthetic_seed)
-    base = dict(engine=engine_id, policy="neutral")
+    base = dict(engine=engine_id, policy="neutral", reward_knock=reward_knock)
     train = dict(base, kind="train", train_road=train_road, roads_record=None if share is None else share["path"])
     tasks = ([dict(train, seed=s) for s in range(first_seed, first_seed + n)]
              + [dict(base, kind="d34", road=r) for r in roads])

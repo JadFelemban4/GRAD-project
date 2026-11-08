@@ -71,10 +71,12 @@ as the plants will hold them. Nothing here reads an EPA engine table.
               Vehicle, so only the car record's type stops it
   StepRecord  step_record.gear refuses a CVT (amendment B16's second option: a
               CVT is never recorded), and gives the Supra's gear for the Supra
-  Fingerprint fingerprint.plant_fingerprint refuses a CVT car by name, "this car
-              has no gears" (amendment B17), and a candidate (build_candidate);
-              the Supra's plant fingerprints; an EPA plant's files include its
-              published car file, the Supra's are its two specs
+  Fingerprint fingerprint.transmission_of records a CVT car's ratio range, final
+              drive and law (schema 4, the plant commit; B17's refusal is
+              gone), and the CVT on the B58's engine stops at name_of; a
+              candidate (build_candidate) is refused; the Supra's plant
+              fingerprints; an EPA plant's files include its published car
+              file, the Supra's are its two specs
   Supra       the Supra's Car has build step 1's fields, vehicle_for(car) is a
               Vehicle, and its demand, and the environment's vehicle's, are
               cf43fbb's doubles, bit for bit: those of cf43fbb's Vehicle, copied
@@ -893,20 +895,28 @@ class StepRecord(unittest.TestCase):
 
 
 class Fingerprint(unittest.TestCase):
-    def test_a_cvt_car_is_refused_by_name(self):
+    def test_a_cvt_car_is_recorded_by_its_transmission(self):
+        """Schema 4 (the plant commit; decision 91): a CVT's box is its ratio range, final drive and
+        law, read from the car record; the CVT on the B58's engine is no registered plant, so it stops
+        at name_of, as the stepped CX9 car does (the control)."""
         import fingerprint as FP
+        kw = dict(train_backend=FP.BACKEND_CYCLE, score_backend=FP.BACKEND_CYCLE, preview_h_s=30.0,
+                  reward_knock=True)
         p = engines.get("b58")
-        cvt = replace(p, car=epa_car(ACCORD, "three_term_cvt", TYPED_ACCORD))
-        with self.assertRaises(ValueError) as cm:
-            FP.plant_fingerprint(plant=cvt, backend=FP.BACKEND_CYCLE)
-        self.assertIn("this car has no gears; fingerprint schema 3 cannot record it", str(cm.exception))
-        # the controls: a stepped EPA car is not refused for its gears (it stops later, at
-        # name_of, since no registered pair of specs describes it), and the Supra fingerprints
-        with self.assertRaises(LookupError):
-            FP.plant_fingerprint(plant=replace(p, car=epa_car(CX9, "three_term_stepped", TYPED_CX9)),
-                                 backend=FP.BACKEND_CYCLE)
-        fp = FP.plant_fingerprint(plant=p, backend=FP.BACKEND_CYCLE)
-        self.assertEqual(fp["gears"], [5.25, 3.36, 2.172, 1.72, 1.316, 1.0, 0.822, 0.64])
+        car = epa_car(ACCORD, "three_term_cvt", TYPED_ACCORD)
+        t = FP.transmission_of(car)
+        self.assertEqual(list(t), ["kind", "ratio_low_gear", "ratio_top_gear", "final_drive", "kickdown_load",
+                                   "target_load", "cvt_rpm_min"])
+        self.assertEqual(t["kind"], "cvt")
+        for k in list(t)[1:]:
+            self.assertIs(type(t[k]), float, k)
+            self.assertEqual(t[k], getattr(car, k), k)
+        for c in (car, epa_car(CX9, "three_term_stepped", TYPED_CX9)):
+            with self.assertRaises(LookupError):
+                FP.plant_fingerprint(plant=replace(p, car=c), **kw)
+        fp = FP.plant_fingerprint(plant=p, **kw)
+        self.assertEqual(fp["transmission"]["kind"], "stepped")
+        self.assertEqual(fp["transmission"]["gears"], [5.25, 3.36, 2.172, 1.72, 1.316, 1.0, 0.822, 0.64])
 
     def test_a_candidate_is_refused(self):
         """A candidate is built from in-memory values, and derived_sha would hash
@@ -923,7 +933,8 @@ class Fingerprint(unittest.TestCase):
         self.assertFalse(engines.is_candidate(p))
         self.assertTrue(engines.is_candidate(pickle.loads(pickle.dumps(cand))))
         with self.assertRaises(ValueError) as cm:
-            FP.plant_fingerprint(plant=cand, backend=FP.BACKEND_CYCLE)
+            FP.plant_fingerprint(plant=cand, train_backend=FP.BACKEND_CYCLE, score_backend=FP.BACKEND_CYCLE,
+                                 preview_h_s=30.0, reward_knock=True)
         self.assertIn("a candidate (engines.build_candidate)", str(cm.exception))
         with self.assertRaises(TypeError):
             engines.is_candidate(None)

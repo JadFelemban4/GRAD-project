@@ -3628,8 +3628,9 @@ def _rebuilt_agent(root, runs_path, name, meta_changes=None, **block_changes):
     d = Path(root) / runs_path / name
     d.mkdir(parents=True)
     _zip_like_sb3(d / "final.zip")
-    meta = dict(AC.live_fingerprint("phase-d"), train_dt=1.0, train_road="terrain",
-                use_preview="blind" not in name, tag=name)
+    # the blinded arm's block records H as None (fingerprint schema 4, FP.for_arm)
+    meta = dict(FP.for_arm(AC.live_fingerprint("phase-d"), sighted="blind" not in name), train_dt=1.0,
+                train_road="terrain", use_preview="blind" not in name, tag=name)
     meta.update(meta_changes or {})
     block = {"written": "2026-09-30T17:20:00", "reproduced_device": "cpu",
              "zip_sha": FP.model_budget(str(d / "final.zip"))["sha"],

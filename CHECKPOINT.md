@@ -1,8 +1,8 @@
 # CHECKPOINT — Current Project State
 
-Last verified: 2026-11-07 (on `GRA-test`, at RV, ORDER step 14: the roads re-verifier, its control EQUAL in 16 sections) — verify_docs.py 74/74 (RV's gate) · drift_test.py 18/18 (R3b's gate) · the app suites at R3b: the known `?v=` asset checks and the `pwsh` launcher test fail, as on 15 October (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 8)
+Last verified: 2026-11-08 (on `GRA-test`, at P, ORDER step 14: the plant commit, its full roads check EQUAL in 17 sections, the B58 certified against cf43fbb) — verify_docs.py 74/74 (P's gate) · drift_test.py 18/18 (R3b's gate) · the app suites on P's tree: every failure one RV's own run had, the known `?v=` asset checks, the `pwsh` launcher tests and five provenance tests of app.test_results (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 17)
 main: the merge and the documentation restructure (14 October), the results tab's schema fix (15 October, on Jad's go) · sim-v1 not tagged yet (plan v3 phase 3) · plant_sha 3c48890dd15bc116 (Python 3.12.10) · derived_sha 326c0835548975e2 · fingerprint schema 2
-GRA-test: build step 2's commits A (WP1, certified 23 October, `results/B58_IDENTITY.md`), C (the calibration and validation scripts, WP3) and D (`25437ba`, 30 October: Run 1, the three EPA engines calibrated and frozen), on contract version 5 (`c842d74`, unchanged since the first fit) · the B58: plant_sha 865f8e7b7e5c2dbe (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 3, unchanged by Run 1 (decision 48's re-runs) · pending: L8 on the training device
+GRA-test: build step 2's commits A (WP1, certified 23 October), C (the calibration and validation scripts, WP3), D (`25437ba`, 30 October: Run 1, the three EPA engines calibrated and frozen) and P (ORDER step 14, the plant commit: H as a parameter, fingerprint schema 4, the knock option; certified 8 November, `results/B58_IDENTITY.md`), on contract version 5 (`c842d74`, unchanged since the first fit) · the B58: plant_sha 36655cab94800e30 (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 4 · pending: L8 on the training device
 
 The previous CHECKPOINT.md, every session from 9 September to 14 October, is
 `STATE_HISTORY.md` part B, verbatim. This file holds the current state only: the
@@ -33,7 +33,7 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - `GRA-test` (21 October): no default engine anywhere
   (`python test_engine_threading.py`), and the B58 through `engines.get("b58")`
   is cf43fbb's plant to the bit at every level L1–L8, after the review's fixes
-  (build step 1's certificate, `STATE_HISTORY.md` part S; commit A's is
+  (build step 1's certificate, `STATE_HISTORY.md` part S; commit A's, part AK; P's is
   `results/B58_IDENTITY.md`). The EPA maps of the Mazda 2.5 T, Honda L15B7
   and Ford 2.7 TT are in `logs/epa/`, read by `epa_map.py` into `data/engines/`
   (`python test_epa_map.py`); the four cars' published values in
@@ -76,11 +76,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
 - Jad · the drive C check and the proposal's evaluation: both accept, four
   corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
-- Ghassan · `GRA-test` · build step 2 (decision 24): commits A, C and D made (Run 1 frozen, 30 October;
+- Ghassan · `GRA-test` · build step 2 (decision 24): commits A, C, D and P made (Run 1 frozen, 30 October;
   `SESSION_REPORT_2026-10-30_run1.md`). Decisions 1-147 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G,
   no knock term; J-L; M: he works alone, row 133; N: W; O: rows 135-143; P: rows 144-145; Q: Run 2's labels, all
   three EPA engines dropped; R: rows 146-147, the B58 study, under row 133 (2) as his answer Q1 extends it; n, the reward and the two statements his own answers Q3, Q4, Q2).
-  Roads: R0 `bb91848`, R1 `fb20ab2`, R4 `34cca5b` (the redraws), RV (the re-verifier, 7 November); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
+  Roads: R0 `bb91848`, R1 `fb20ab2`, R4 `34cca5b` (the redraws), RV `a443607` (the re-verifier, 7 November; its full check EQUAL on P's tree, `results/EPA_ROADS/reverify.json`, which P carries); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
 
 ## Blockers
@@ -117,7 +117,7 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    Run 2 is done (5-6 November): **section 7 drops all three EPA engines**, so the four-engine test does not run.
    R4 is done (`34cca5b`: version 6, the B58 alone gating, redraws nothing; version 5, 58 Ford slots, reported, never
    scored). Rows 146-147 (D146) fix the B58 study across H: three arms, n = 20 (Ghassan's answer Q3), knock out of the reward,
-   exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Step 13 passed (no commit) and RV is committed (7 November: its control EQUAL, 0 differences in 16 sections; session report, section 16). Next: P (its full roads check about 17.7 h), then Qa, G, V, Q, Ta, B1.
+   exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Step 13 passed (no commit), RV is committed (7 November: its control EQUAL, 0 differences in 16 sections; session report, section 16), and P is committed (8 November: its full roads check EQUAL, 0 differences in 17 sections, `results/EPA_ROADS/reverify.json`; the B58 certified, its five FAIL records, defects of the kit's driver, each re-checked by a PASS record on the same S, `results/B58_IDENTITY.md`; session report, section 17). Next: Qa, G, V, Q, Ta, B1.
    Updates paused to 30 November; the laptop stays frozen until the study's last scoring; `test_epa_rows` fails once until G.
 9. `main`, its own commit: re-run `python check_roads.py`, commit the new
    `results/training_roads.json` (stale since `75ca65f`), grep its old figures.

@@ -217,10 +217,13 @@ def live_fingerprint(protocol):
     os.environ.setdefault("GIT_OPTIONAL_LOCKS", "0")
     with _FINGERPRINT_LOCK:
         if protocol not in _FINGERPRINTS:
+            import engine_env as E
             import engines
-            # the replay runs evaluate.run_episode: the 0-D cycle model
+            # the replay runs evaluate.run_episode: the 0-D cycle model, at the default H with X1's
+            # reward (fingerprint schema 4); a blinded agent is compared with FP.for_arm's block
             _FINGERPRINTS[protocol] = FP.plant_fingerprint(
-                protocol=protocol, plant=engines.get("b58"), backend=FP.BACKEND_CYCLE,
+                protocol=protocol, plant=engines.get("b58"), train_backend=FP.BACKEND_CYCLE,
+                score_backend=FP.BACKEND_CYCLE, preview_h_s=E.PREVIEW_H_S, reward_knock=E.REWARD_KNOCK_DEFAULT,
                 eval_dt=DT, eval_duration=DURATION)
             FINGERPRINT_TAKEN[protocol] = time.strftime("%H:%M")
         return _FINGERPRINTS[protocol]
@@ -359,7 +362,7 @@ def read_agent(runs, name, root=ROOT):
     if old:
         return dict(out, status="incompatible", protocol=protocol, reason="plant mismatch: " + old,
                     problems=[old])
-    bad = FP.compare(meta, live_fingerprint(protocol))
+    bad = FP.compare(meta, FP.for_arm(live_fingerprint(protocol), sighted=arm != "blind"))
     if bad:
         return dict(out, status="incompatible", protocol=protocol,
                     reason="plant mismatch: " + ", ".join(f for f, _, _ in bad),

@@ -35,8 +35,8 @@ THE PLANT IS NAMED (20 October 2026): the roads are the B58 Supra's, and the
 committed results/training_roads*.json are its (PLANT_NAME). Another engine's
 roads are a later step (check_roads.py --engine, writing results/<id>/).
 
-    python check_roads.py --engine E --train-road R --roads FILE [--n 40] [--out FILE]
-    python check_roads.py --engine E --train-road R --synthetic-seed N --out FILE
+    python check_roads.py --engine E --train-road R --roads FILE --reward-knock out [--n 40] [--out FILE]
+    python check_roads.py --engine E --train-road R --synthetic-seed N --reward-knock out --out FILE
     ... --train-road four_engine --roads-record PATH    decision 29's share on (row 130 (5))
 
 THE PER-ENGINE TABLE (31 October 2026, row 119; ORDER_TO_TRAINING.md step 7).
@@ -45,11 +45,16 @@ builds it (train.build_env; R is row 116's road, by train.py's name for it) and 
 every road of decision 34's set, in E's own car (engine_gate.py), and prints this
 table with E's own turbine knee, the shares of steps asking under E's torque
 floor or over its deliverable torque (row 116), and the same PASS rule. It
-writes results/ENGINE_GATES/<E>/check_roads_<R>.json, or --out; on row 116's
-road the default name says whether decision 29's share was on,
-check_roads_four_engine_share_on.json or _share_off.json, so the two runs never
-overwrite each other (default_table). A SYNTHETIC seed's run is a test of the
-code, and its --out is required and must lie outside the repository.
+writes results/ENGINE_GATES/<E>/check_roads_<R>_knock_<in|out>.json, or --out;
+on row 116's road the default name also says whether decision 29's share was on,
+check_roads_four_engine_share_on_knock_<k>.json or _share_off_knock_<k>.json, so
+no two runs overwrite each other (default_table; interface sheet 12.9).
+--reward-knock in|out is required with --engine, as the last check (rows 119,
+127 (4)): the training roads are driven in the environment the engine trains in,
+the header prints it and the JSON records it as reward_knock (a bool), so a run
+with the knock term never stands in for the gate's own. A SYNTHETIC seed's run
+is a test of the code, and its --out is required and must lie outside the
+repository.
 --roads-record PATH (--train-road four_engine only; C1b) drives the training
 roads with decision 29's share on (row 130 (5)); the table records and prints
 the record repository-relative (engine_gate.record_name: results/EPA_ROADS/
@@ -77,12 +82,16 @@ PLANT_NAME = "b58"
 GATES_DIR = os.path.join("results", "ENGINE_GATES")      # the per-engine tables, one folder per engine
 
 
-def default_table(engine_id, train_road, share_on):
-    """The per-engine table's default file: results/ENGINE_GATES/<E>/check_roads_<R>.json, and on row 116's
-    road, the one decision 29's share is on or off on, check_roads_<R>_share_on.json or _share_off.json (the
-    review of 2 November 2026: one name for both runs let the second overwrite the first)."""
+def default_table(engine_id, train_road, share_on, reward_knock):
+    """The per-engine table's default file: results/ENGINE_GATES/<E>/check_roads_<R>_knock_in.json or
+    _knock_out.json, by the reward's knock option (P3, interface sheet 12.9), and on row 116's road, the one
+    decision 29's share is on or off on, check_roads_<R>_share_on_knock_<k>.json or _share_off_knock_<k>.json
+    (the review of 2 November 2026: one name for both runs let the second overwrite the first)."""
     import engine_gate as G
+    if type(reward_knock) is not bool:
+        raise TypeError(f"default_table: reward_knock is a bool (row 113 (5)), not {reward_knock!r}")
     tail = ("_share_on" if share_on else "_share_off") if train_road == G.FOUR_ENGINE_ROAD else ""
+    tail += "_knock_in" if reward_knock else "_knock_out"
     return os.path.join(HERE, GATES_DIR, engine_id, f"check_roads_{train_road}{tail}.json")
 
 
@@ -142,15 +151,23 @@ def main_engine(a, ap):
     synthetic = a.synthetic_seed is not None or (share is not None and share["seed_kind"] != "REAL")
     if synthetic and (a.out is None or not ER.outside_repo(a.out)):
         ap.error("a SYNTHETIC run writes only outside the repository: give --out outside it")
-    out = a.out or default_table(a.engine, a.train_road, share is not None)
+    # the last check (rows 119, 127 (4)), after the SYNTHETIC --out rule
+    if a.reward_knock is None:
+        ap.error("--reward-knock in|out is required with --engine: row 119's table drives the roads in the "
+                 "environment the engine trains in (row 113 (5); row 127 (4))")
+    knock = a.reward_knock == "in"
+    out = a.out or default_table(a.engine, a.train_road, share is not None, knock)
     name = G.record_name(share)              # what the table records and prints; the tasks read share["path"]
     plant = engines.get(a.engine)
     knee_c = float(plant.engine.damage.turb_knee_k) - 273.15
     train, d34, label = G.road_table(a.engine, train_road=a.train_road, roads_file=a.roads,
                                      synthetic_seed=a.synthetic_seed, n=a.n, first_seed=FIRST_SEED,
-                                     jobs=a.jobs if a.jobs is not None else 18, roads_record=a.roads_record)
+                                     jobs=a.jobs if a.jobs is not None else 18, roads_record=a.roads_record,
+                                     reward_knock=knock)
     print(f"PER-ENGINE ROADS (row 119): {a.engine} in its own car ({plant.id}); training road {a.train_road} "
           f"(train.build_env), seeds {FIRST_SEED}-{FIRST_SEED + a.n - 1}; decision 34's roads: {label}")
+    print(f"reward: {'with' if knock else 'without'} the knock term (--reward-knock {a.reward_knock}; "
+          f"row 113 (5))")
     if a.train_road == G.FOUR_ENGINE_ROAD:
         print("decision 29's share: " + ("off (no --roads-record)" if share is None else
                                          f"on, {share['seed_kind']} record {name} (row 130 (5))"))
@@ -194,7 +211,7 @@ def main_engine(a, ap):
     with open(out, "w", encoding="utf-8") as fh:
         json.dump(dict(engine=a.engine, plant=plant.id, train_road=a.train_road, roads=label,
                        roads_record=name,
-                       share_seed_kind=None if share is None else share["seed_kind"],
+                       share_seed_kind=None if share is None else share["seed_kind"], reward_knock=knock,
                        synthetic=synthetic, first_seed=FIRST_SEED, n=a.n,
                        training=train, decision_34=d34, knee_c=knee_c, tolerance=G.TRACK_TOL,
                        neutral_band=G.NEUTRAL_BAND, passed=ok), fh)
@@ -216,18 +233,22 @@ def main():
     src.add_argument("--synthetic-seed", type=int, help="with --engine: decision 34's generator on a SYNTHETIC "
                                                         "seed, a test of the code (no roads_seed)")
     ap.add_argument("--out", help="with --engine: the JSON (default results/ENGINE_GATES/<engine>/"
-                                  "check_roads_<road>.json; on four_engine check_roads_four_engine_share_on.json "
-                                  "or _share_off.json)")
+                                  "check_roads_<road>_knock_<in|out>.json; on four_engine "
+                                  "check_roads_four_engine_share_<on|off>_knock_<in|out>.json)")
     ap.add_argument("--jobs", type=int, default=None, help="with --engine: processes (default 18, the B58 table's)")
     ap.add_argument("--roads-record", metavar="PATH", help="with --engine and --train-road four_engine: the roads "
                                                            "record whose share the training roads turn on "
                                                            "(decision 29's, row 130 (5)); without it, off")
+    ap.add_argument("--reward-knock", choices=("in", "out"), default=None,
+                    help="with --engine, required: the reward's knock term of the training roads' "
+                         "environment (row 113 (5)): in is X1's, out the four-engine test's (rows 119, 127 (4))")
     a = ap.parse_args()
     if a.engine is not None:
         raise SystemExit(main_engine(a, ap))
-    if any(x is not None for x in (a.train_road, a.roads, a.synthetic_seed, a.out, a.jobs, a.roads_record)):
-        ap.error("--train-road, --roads, --synthetic-seed, --out, --jobs and --roads-record belong to the "
-                 "per-engine table: give --engine")
+    if any(x is not None for x in (a.train_road, a.roads, a.synthetic_seed, a.out, a.jobs, a.roads_record,
+                                   a.reward_knock)):
+        ap.error("--train-road, --roads, --synthetic-seed, --out, --jobs, --roads-record and --reward-knock "
+                 "belong to the per-engine table: give --engine")
     a.road = a.road or "terrain"
     from engine_env import TRACK_TOL
 

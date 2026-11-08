@@ -993,24 +993,69 @@ SPARK_TRIM_MAX = 0.0
 PREVIEW_S = (2.0, 5.0, 15.0, 30.0)
 OBS_DIM = 23
 
+# H, THE PREVIEW HORIZON, AN ENVIRONMENT PARAMETER (row 117; the plant commit P, ORDER step 14). A
+# sighted agent at H sees the grade at H x (1/15, 1/6, 1/2, 1), each sample at step int(h / dt). The
+# default H gives PREVIEW_S above exactly, checked at import: divided, not multiplied, so 30/15, 30/6,
+# 30/2 and 30/1 are exactly 2.0, 5.0, 15.0 and 30.0 (epa_roads.h_table computes the steps the same way).
+PREVIEW_H_S = 30.0
+PREVIEW_DIVISORS = (15.0, 6.0, 2.0, 1.0)
+
+
+def preview_samples(h_s):
+    """The four preview times, s, at horizon h_s: tuple(float(h_s) / d for d in PREVIEW_DIVISORS).
+    Refused: a bool or a non-real (TypeError); a non-finite H or one <= 0 (ValueError)."""
+    import numbers
+    if isinstance(h_s, (bool, np.bool_)) or not isinstance(h_s, numbers.Real):
+        raise TypeError(f"preview_samples: H is a real number of seconds, not {h_s!r} (row 117)")
+    h = float(h_s)
+    if not np.isfinite(h) or h <= 0.0:
+        raise ValueError(f"preview_samples: H must be finite and above 0 s, not {h_s!r} (row 117)")
+    return tuple(h / d for d in PREVIEW_DIVISORS)
+
+
+if preview_samples(PREVIEW_H_S) != PREVIEW_S:
+    raise RuntimeError(f"preview_samples({PREVIEW_H_S}) is not PREVIEW_S {PREVIEW_S} (row 117)")
+
+# THE REWARD'S KNOCK OPTION, as fingerprint schema 4 records it (rows 113 (5) and 117; FATAL
+# reward_knock). True is X1's reward, the knock term in r_life (row 118: the default is X1's, so the
+# B58 at its defaults and L8 are unchanged); False is row 113 (5)'s primary reading, r_life on the
+# damage rate without the knock term, which the four-engine test trains with. SupervisoryTunerEnv's
+# keyword, train.build_env's and evaluate.run_episode's default to this one constant;
+# fingerprint.reward_knock_of reads every environment's own `reward_knock`.
+REWARD_KNOCK_DEFAULT = True
+
 
 class SupervisoryTunerEnv(gym.Env):
     metadata = {"render_modes": []}
 
     def __init__(self, cycle, *, plant, engine_model=None, dt=0.2,
-                 use_preview=True, uncertainty_beta=1.0, seed=None, inlet_kpa=None):
+                 use_preview=True, uncertainty_beta=1.0, seed=None, inlet_kpa=None,
+                 preview_h_s=PREVIEW_H_S, reward_knock=REWARD_KNOCK_DEFAULT):
         """`plant`, an engines.Plant, is REQUIRED (20 October 2026): the car, its
         ECU and both thermal networks are built from it. `inlet_kpa` is the
         compressor's inlet pressure; None means the engine's sea-level inlet
         (plant.engine.boost.inlet_sea_kpa, 99.3 kPa on the B58). wide_air.py and
         conditions_test.py set it for thinner air, where they used to swap
-        plant.boost_ceiling_kpa for the whole process."""
+        plant.boost_ceiling_kpa for the whole process. `preview_h_s` is H, the
+        preview horizon (row 117): the default gives PREVIEW_S, and with
+        use_preview off every sample is 0.0 whatever H is. `reward_knock` is the
+        reward's knock option (rows 113 (5), 118): True, X1's, keeps the knock term
+        in r_life; False takes it out. It changes r_life alone: the episode's damage
+        (both readings stay available), info's other values and the trajectory are
+        the same in both modes. Only a bool is taken, since the string "out" is
+        truthy."""
         super().__init__()
         self.plant = _need(plant, "SupervisoryTunerEnv(plant=engines.get(name))")
         self.cycle = cycle                      # dict: t, v_mps, grade, t_amb
         self.engine = engine_model              # None -> use the physics plant
         self.dt = dt
         self.use_preview = use_preview
+        self.preview_s = preview_samples(preview_h_s)
+        self.preview_h_s = float(preview_h_s)
+        if type(reward_knock) is not bool:
+            raise TypeError(f"reward_knock must be True (the knock term in r_life, X1's) or False "
+                            f"(row 113 (5): the primary reading), not {reward_knock!r}")
+        self.reward_knock = reward_knock
         self.beta = uncertainty_beta
         self.rng = np.random.default_rng(seed)
         self.inlet_kpa = plant.engine.boost.inlet_sea_kpa if inlet_kpa is None else inlet_kpa
@@ -1161,7 +1206,7 @@ class SupervisoryTunerEnv(gym.Env):
 
     def _preview(self):
         out = []
-        for h in PREVIEW_S:
+        for h in self.preview_s:
             j = min(self.k + int(h / self.dt), len(self.cycle["grade"]) - 1)
             out.append(self.cycle["grade"][j] if self.use_preview else 0.0)
         return out
@@ -1328,7 +1373,16 @@ class SupervisoryTunerEnv(gym.Env):
         # --- reward: every term baseline-relative and dimensionless ---------
         eps = 1e-6
         r_fuel = (base["mdot_fuel"] - out["mdot_fuel"]) / (base["mdot_fuel"] + eps)
-        r_life = (d_b - d_a) / (d_b + 0.05)
+        # The knock option (row 113 (5)): r_life reads the primary reading, the
+        # thermal damage rate without the knock term (evaluate.run_episode's
+        # damage_thermal), when reward_knock is False. d_a and d_b above keep the
+        # knock term in both modes, so the episode's damage still carries it.
+        if self.reward_knock:
+            r_life = (d_b - d_a) / (d_b + 0.05)
+        else:
+            l_a = damage_rate(self.thermal.t_turb, self.thermal.t_oil, cal=eng.damage)
+            l_b = damage_rate(self.thermal_base.t_turb, self.thermal_base.t_oil, cal=eng.damage)
+            r_life = (l_b - l_a) / (l_b + 0.05)
         t_ref = max(self.torque_req, 40.0)
         e_track = abs(self.torque_req - out["torque"]) / t_ref
         r_resp = -(e_track + TRACK_HINGE * max(0.0, e_track - TRACK_TOL))

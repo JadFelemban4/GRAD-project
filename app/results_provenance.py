@@ -286,10 +286,15 @@ def _code_only_schema_1(src):
 
 
 def schema_of(fp: dict) -> int:
-    """The fingerprint schema a block was written under: 3 when it carries
-    `engine`, which fingerprint.py has written into every block since schema 3;
-    2 when it carries derived_sha, which it has written into every block since
-    schema 2, even as "None"; 1 otherwise."""
+    """The fingerprint schema a block was written under: 4 when it carries
+    `train_backend`, which fingerprint.py has written into every block since
+    schema 4 (the plant commit); 3 when it carries `engine`, which it has
+    written into every block since schema 3; 2 when it carries derived_sha,
+    which it has written into every block since schema 2, even as "None"; 1
+    otherwise. Schema 4's plant_sha is schema 3's files and rule
+    (_plant_files and _file_rule take schema 3's branch for it)."""
+    if "train_backend" in fp:
+        return 4
     if "engine" in fp:
         return 3
     return SCHEMA_2 if "derived_sha" in fp else SCHEMA_1
@@ -471,8 +476,13 @@ def live_side(root, protocols=("phase-d", "d2")) -> dict:
     for protocol in protocols:
         try:
             import engines      # numpy and derived.py; inside the try, as the fingerprint
+            import engine_env as E
+            # evaluate.py's block: the cycle model, the default H, X1's reward (schema 4)
             text = FP.format_block(FP.plant_fingerprint(protocol, plant=engines.get(RESULTS_PLANT),
-                                                        backend=FP.BACKEND_CYCLE))
+                                                        train_backend=FP.BACKEND_CYCLE,
+                                                        score_backend=FP.BACKEND_CYCLE,
+                                                        preview_h_s=E.PREVIEW_H_S,
+                                                        reward_knock=E.REWARD_KNOCK_DEFAULT))
         except (Exception, SystemExit) as exc:
             errors.append({"module": f"fingerprint.plant_fingerprint({protocol})",
                            "type": type(exc).__name__})

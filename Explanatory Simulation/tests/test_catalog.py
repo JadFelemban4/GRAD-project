@@ -87,16 +87,23 @@ class CatalogTests(unittest.TestCase):
         self.assertAlmostEqual(data["premise"]["_preview_over_current_grade_pts"], -0.01, places=1)
         self.assertTrue(data["caveats"])
         self.assertTrue(data["sources"])
-        # plant_sha of the B58, the lab's plant, on commit A's code (GRA-test,
-        # build step 2's WP1, 22 October 2026, certified by commit A's B58
-        # identity certificate): fingerprint.plant_files("b58"), engines.py and
-        # the B58's two spec files among them. It read ded8da308863d394, build
+        # plant_sha of the B58, the lab's plant, on the plant commit P's code
+        # (GRA-test, build step 2's ORDER step 14: H as a parameter, schema 4,
+        # trainable() read from the records, the knock option; rows 94, 117 and
+        # 138 (6)): fingerprint.plant_files("b58"), PLANT_CODE (engine_env.py and
+        # engines.py, which P edits, among it) and the B58's two spec files; the
+        # value is epa_freeze.plant_sha("b58") on P's tree (6 November 2026), and
+        # P's certificate checks that the B58 at its defaults is unchanged (row
+        # 94; docs/build_step_2/CERT_PLAN_P.md). It read
+        # 865f8e7b7e5c2dbe, commit A's code (WP1, 22 October 2026, certified by
+        # commit A's B58 identity certificate), the plant roads.json and row 111
+        # name; and before that ded8da308863d394, build
         # step 1's plant (GRA-test, 21 October 2026), which WP1's plant edits
         # moved; before that c236a8db3e201090, which is not even cf43fbb's
         # (3c48890dd15bc116, X1's plant), and then c276354cff16132c (build step 1
         # before its review); the premise pin above failed first and hid the
         # first. Move it whenever a plant file changes.
-        self.assertEqual(data["freshness"]["current_plant_sha"], "865f8e7b7e5c2dbe")
+        self.assertEqual(data["freshness"]["current_plant_sha"], "36655cab94800e30")
         self.assertEqual(data["freshness"]["replay_status"], "UNVERIFIED")
         self.assertIn("41.6 %", data["knock_margin"])
         self.assertEqual(data["verdict_evidence"]["n"], 10)

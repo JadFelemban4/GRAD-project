@@ -8,8 +8,9 @@ Build step 2 of decision 24, WP3 (23 October 2026): written in WP3, run at commi
 whose derived file and freeze record exist in this tree (engines.calibrated), five checks, each run in
 a fresh process in the tree (so engines reads the tree's own files, and the cache of no earlier build
 answers): `python engines.py` lists it with its engine_sha and its derived file; engines.get builds it,
-and its engine_sha is complete.json's; `fingerprint.py --engine <id>` no longer refuses it (a CVT car:
-refuses it by amendment B17's words until fingerprint schema 4, decision 91); a fresh
+and its engine_sha is complete.json's; `fingerprint.py --engine <id>` no longer refuses it, and its
+transmission line names the car's kind (kind=cvt for a CVT car, kind=stepped otherwise: fingerprint schema
+4, the plant commit, ended decision 91's B17 refusal); a fresh
 engine_env.measure_deliverable_torque at the car's own grid, rounded as the completion rounds it, is
 the table the plant carries and complete.json's; and epa_freeze.frozen_plant_dump of the plant get()
 builds is complete.json's dump. Until a plant is calibrated its checks skip by name (the pattern of
@@ -64,14 +65,18 @@ except Exception as exc:
 fp = subprocess.run([sys.executable, "-B", "fingerprint.py", "--engine", name], capture_output=True, text=True)
 out["fingerprint_exit"] = fp.returncode
 out["fingerprint_output"] = (fp.stdout + fp.stderr)[-2000:]
+# the block's transmission line, kept whole: the 2000-character tail above can lose it
+out["fingerprint_transmission"] = next((l.strip() for l in fp.stdout.splitlines()
+                                        if l.strip().startswith("transmission ")), None)
 print(json.dumps(out))
 '''
 
-# DECISION 91 (Ghassan, 30 October 2026): fingerprint schema 3 cannot record a car without gears (amendment
-# B17; test_cars.Fingerprint pins the refusal), so until schema 4 (decisions 27 and 28, before any EPA engine
-# trains) a CVT plant's check is that fingerprint.py refuses it in B17's words; a stepped plant's is exit 0
-# (WP3_INTERFACES.md 9.12, "no longer refusing it"). The words are fingerprint.py's own, as test_cars pins them.
-B17_REFUSAL = "this car has no gears; fingerprint schema 3 cannot record it"
+# DECISION 91 (Ghassan, 30 October 2026) held until fingerprint schema 4: schema 3 could not record a car
+# without gears (amendment B17), so a CVT plant's check was that fingerprint.py refused it in B17's words.
+# Schema 4 (the plant commit P; rows 117 and 138 (2)) records a CVT's ratio range, final drive and law, so
+# every plant's check is now WP3_INTERFACES.md 9.12's, "no longer refusing it": exit 0, and the block's
+# transmission line naming the car's kind (fingerprint.transmission_of; test_cars.Fingerprint pins the block).
+B17_REFUSAL = "this car has no gears; fingerprint schema 3 cannot record it"     # the old words, now a failure
 
 
 def report(name, *, root):
@@ -103,12 +108,13 @@ def problems(name, rep, complete):
             out.append("the plant's table is not complete.json's")
         if rep["dump_sha256"] != (complete.get("dump") or {}).get("sha256"):
             out.append("the frozen-plant dump is not complete.json's")
-    if rep.get("cvt"):
-        if rep.get("fingerprint_exit") == 0 or B17_REFUSAL not in (rep.get("fingerprint_output") or ""):
-            out.append(f"fingerprint.py --engine {name} does not refuse its CVT car in amendment B17's words "
-                       f"(exits {rep.get('fingerprint_exit')}; decision 91)")
-    elif rep.get("fingerprint_exit") != 0:
+    if rep.get("fingerprint_exit") != 0:
         out.append(f"fingerprint.py --engine {name} exits {rep.get('fingerprint_exit')}")
+    else:
+        kind = "kind=cvt" if rep.get("cvt") else "kind=stepped"
+        if kind not in (rep.get("fingerprint_transmission") or "").split():
+            out.append(f"fingerprint.py --engine {name}'s transmission line does not name {kind}: "
+                       f"{rep.get('fingerprint_transmission')!r}")
     return out
 
 
@@ -217,24 +223,29 @@ class SyntheticPlant(F.SyntheticRepoCase):
         self.assertEqual(problems(self.NAME, dict(self.rep, fingerprint_exit=2), self.comp),
                          [f"fingerprint.py --engine {self.NAME} exits 2"])
 
-    def test_a_cvt_car_is_checked_for_b17s_refusal(self):
-        """Decision 91: a CVT plant passes the fingerprint check only when fingerprint.py refuses it in
-        amendment B17's words; one that fingerprints (exit 0), or refuses for another reason, fails it alone.
-        The synthetic Mazda is stepped (its record says so, and it fingerprints), so the CVT cases are its
-        record with the car's kind and the fingerprint's outcome changed; the control is the record as it
-        is, which passes on the stepped reading."""
+    def test_a_cvt_car_is_checked_like_a_stepped_one(self):
+        """Schema 4 (the plant commit; decision 91 flipped): a CVT plant passes the fingerprint check as a
+        stepped one does, exit 0, and only with its transmission line naming kind=cvt. The synthetic Mazda is
+        stepped (its record says so, and it fingerprints kind=stepped), so the CVT cases are its record with
+        the car's kind, the fingerprint's outcome and its transmission line changed: a CVT refused in B17's
+        old words (exit 1) fails with "exits 1" alone; a CVT whose line reads kind=stepped fails on its line
+        alone, and so does a stepped car whose line reads kind=cvt; a CVT whose line reads kind=cvt passes.
+        The control is the record as it is, which passes on the stepped reading."""
         self.assertIs(self.rep.get("cvt"), False, self.rep)
         self.assertEqual(self.rep["fingerprint_exit"], 0)
-        msg = f"fingerprint.py --engine {self.NAME} does not refuse its CVT car in amendment B17's words"
-        refused = dict(self.rep, cvt=True, fingerprint_exit=1,
+        self.assertIn("kind=stepped", (self.rep.get("fingerprint_transmission") or "").split(), self.rep)
+        line = self.rep["fingerprint_transmission"].replace("kind=stepped", "kind=cvt")
+        self.assertEqual(problems(self.NAME, dict(self.rep, cvt=True, fingerprint_transmission=line), self.comp), [])
+        refused = dict(self.rep, cvt=True, fingerprint_exit=1, fingerprint_transmission=None,
                        fingerprint_output=f"ValueError: {self.NAME}: {B17_REFUSAL}\n")
-        self.assertEqual(problems(self.NAME, refused, self.comp), [])
+        self.assertEqual(problems(self.NAME, refused, self.comp), [f"fingerprint.py --engine {self.NAME} exits 1"])
         got = problems(self.NAME, dict(self.rep, cvt=True), self.comp)
         self.assertEqual(len(got), 1, got)
-        self.assertTrue(got[0].startswith(msg) and "exits 0" in got[0], got)
-        got = problems(self.NAME, dict(refused, fingerprint_output="LookupError: no registered pair\n"), self.comp)
+        self.assertTrue(got[0].startswith(f"fingerprint.py --engine {self.NAME}'s transmission line does not "
+                                          "name kind=cvt"), got)
+        got = problems(self.NAME, dict(self.rep, fingerprint_transmission=line), self.comp)
         self.assertEqual(len(got), 1, got)
-        self.assertTrue(got[0].startswith(msg) and "exits 1" in got[0], got)
+        self.assertIn("does not name kind=stepped", got[0])
         self.assertEqual(problems(self.NAME, self.rep, self.comp), [])
 
 
