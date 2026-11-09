@@ -30,10 +30,10 @@ edited) -> a defect fix, check --defect's records -> arm --defect-rerun, then ru
                      HEAD's history (it stays in `git log --all`). arm --defect-rerun PASSES, plant_sha is
                      freeze.json's, and run --defect-rerun runs, its labels capped at limited.
   RestoredDescendant row 94's other form: a later descendant of the plant commit, after a later commit to hashed
-                     step-2 code that is no defect fix (as commit G's `epa_fit.py` and step 16's `evaluate.py`;
-                     ORDER_TO_TRAINING.md). PLANT_CODE restored to commit F's alone is REFUSED at arm/code,
-                     naming both files (C10: every change to epa_freeze.CODE_HASHED since the first fit needs its
-                     defects.json entry); with those two restored as well it PASSES, and run --defect-rerun runs.
+                     step-2 code that is no defect fix (commit G's epa_fit.py, calibrate_epa.py and validate_epa.py,
+                     step 16's evaluate.py: LATER_HASHED). PLANT_CODE restored to commit F's alone is REFUSED at
+                     arm/code, naming all four (C10: each change to epa_freeze.CODE_HASHED since the first fit needs
+                     its defects.json entry); the four restored to F's too (row 141 (5)), it PASSES and re-runs.
 
 WHAT IT FOUND, in the words the run prints (tearDownModule): the route as row 94 writes it passes arm after the
 plant commit, made on a branch from commit F or on a later descendant with every hashed file restored, so row
@@ -101,8 +101,8 @@ if (REAL_ARM_PLANT.__module__, REAL_ARM_PLANT.__name__) != ("validate_epa", "_ar
 # code, so plant_sha moves; the control is the comment, which plant_sha's code-only hash does not see.
 PLANT_COMMIT_LINE = "\nSYNTHETIC_PLANT_COMMIT_OF_TEST_DEFECT_ROUTE = True\n"
 PLANT_COMMIT_COMMENT = "\n# test_defect_route: a comment, which plant_sha's code-only hash does not see\n"
-# The later commit to hashed step-2 code that is no defect fix (commit G's epa_fit.py; step 16's evaluate.py).
-LATER_HASHED = ("epa_fit.py", "evaluate.py")
+# The later commits to hashed step-2 code that are no defect fix (commit G's three; step 16's; row 141 (5)).
+LATER_HASHED = ("epa_fit.py", "calibrate_epa.py", "validate_epa.py", "evaluate.py")
 REFUSED_BRANCH = "the route is refused after the plant commit: row 94's version-6 row is needed before the plant commit"
 PASSES_BRANCH = ("the route passes arm after the plant commit when it is made on a branch from the third commit F, "
                  "or on a later descendant with every hashed file restored: row 94's first branch applies, and no "
@@ -469,7 +469,7 @@ class RestoredDescendant(DefectRoute):
         for rel in LATER_HASHED:
             self.assertIn(rel, epa_freeze.CODE_HASHED)
             _append(r.root, rel, "\n# test_defect_route: a later commit that is no defect fix (as commits G and V)\n")
-        fx.commit_all(r.root, "a later commit to hashed code (synthetic: as commit G's epa_fit.py, step 16's evaluate.py)")
+        fx.commit_all(r.root, "a later commit to hashed code (synthetic: as commit G's three files, step 16's evaluate.py)")
         d = self.defect_fix(r.root, "on a later descendant of the plant commit")
         fx.git(r.root, "checkout", p["F"], "--", *fingerprint.PLANT_CODE)
         fx.commit_all(r.root, "PLANT_CODE restored to commit F's (freeze.json's)")
@@ -493,7 +493,7 @@ class RestoredDescendant(DefectRoute):
         self.assertNotIsInstance(rec, V.Refused, getattr(rec, "problems", None))
         self.assertTheReRunRan(p, rec, res)
         _say("on a later descendant of the plant commit, arm --defect-rerun is REFUSED with PLANT_CODE restored "
-             "alone (" + "; ".join(problems) + "), and PASSES with " + " and ".join(LATER_HASHED)
+             "alone (" + "; ".join(problems) + "), and PASSES with " + ", ".join(LATER_HASHED)
              + " restored as well; run --defect-rerun then runs")
 
 

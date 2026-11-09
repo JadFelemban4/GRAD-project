@@ -1,0 +1,992 @@
+{
+ "schema": "epa-bounds-active-corrected/1",
+ "decisions": [
+  "decision 92",
+  "row 109",
+  "row 141"
+ ],
+ "rule": "A parameter of S2 or S4 is at its bound when scipy's active_mask marked it (the recorded list) or when min(x - lb, ub - x) <= epa_fit.BOUND_TOL_SCALE_UNITS x its epa_fit.X_SCALE, both bounds finite (epa_fit.bounds_at; rows 109 and 141 (1)-(2)). x is the frozen vector, values.cycle of the frozen form's fit record; lb and ub are its settings.bounds: epa_fit.BOUNDS bit for bit, and ve_rpm's end lines, which BOUNDS holds as None, from settings.bounds (row 141 (3)). S1, S3b and S5 keep their own rules and are copied. Only the frozen form is corrected (row 141 (4)). Nothing is refitted and no frozen record is rewritten (row 109).",
+ "tolerance": {
+  "value": 0.001,
+  "unit": "epa_fit.X_SCALE units",
+  "constant": "epa_fit.BOUND_TOL_SCALE_UNITS",
+  "chosen_after": "the distances were read (disclosed)"
+ },
+ "bounds": {
+  "exh_bp_ratio": [
+   1.0,
+   2.5
+  ],
+  "exh_bp_min_kpa": [
+   80.0,
+   140.0
+  ],
+  "ve_base": [
+   0.3,
+   1.3
+  ],
+  "ve_amp": [
+   -0.6,
+   0.6
+  ],
+  "ve_rpm": null,
+  "ve_width": [
+   300.0,
+   20000.0
+  ],
+  "ve_map": [
+   -0.005,
+   0.005
+  ],
+  "ve_cam": [
+   -0.005,
+   0.005
+  ],
+  "burn_base": [
+   5.0,
+   90.0
+  ],
+  "burn_rpm": [
+   0.0,
+   0.012
+  ],
+  "delay_base": [
+   0.0,
+   30.0
+  ],
+  "delay_rpm": [
+   0.0,
+   0.006
+  ],
+  "fmep_0": [
+   -0.5,
+   2.0
+  ],
+  "fmep_pmax": [
+   -0.05,
+   0.05
+  ],
+  "fmep_sp": [
+   -0.1,
+   0.4
+  ],
+  "fmep_sp2": [
+   -0.01,
+   0.02
+  ],
+  "ua_port": [
+   0.0,
+   1000.0
+  ],
+  "ce_rich_slope": [
+   0.0,
+   1.5
+  ]
+ },
+ "x_scale": {
+  "burn_base": 10.0,
+  "burn_rpm": 0.002,
+  "delay_base": 5.0,
+  "delay_rpm": 0.001,
+  "fmep_0": 0.4,
+  "fmep_pmax": 0.005,
+  "fmep_sp": 0.09,
+  "fmep_sp2": 0.0009,
+  "ua_port": 50.0,
+  "ve_rpm": 1000.0,
+  "ve_width": 1000.0,
+  "ve_map": 0.001,
+  "ve_cam": 0.001,
+  "ce_rich_slope": 0.65,
+  "ve_base": 0.1,
+  "ve_amp": 0.1
+ },
+ "engines": {
+  "mazda_25t": {
+   "form": "A+B+C+D",
+   "inputs": {
+    "results/EPA_CALIBRATION/mazda_25t/freeze.json": "5e505f3d523ed75e24d7c7d0981215d8edbcaf52a2de1d62f51a370f97689d39",
+    "results/EPA_CALIBRATION/mazda_25t/fit_A+B+C+D.json": "ba41e234101401ad00fed493a825364977d4e72f614a2f993c23ac8134168e50"
+   },
+   "frozen_sections_sha256": "21b534e0e98b63308d389dc95bc815dcc9e4ebf550b1564b9766fad2ba5f89a1",
+   "ve_rpm_bounds_from": "results/EPA_CALIBRATION/mazda_25t/fit_A+B+C+D.json settings.bounds (bit-equal to stages.S2.report.bounds)",
+   "distances": {
+    "exh_bp_ratio": {
+     "value": 1.116931336159627,
+     "lower": 1.0,
+     "upper": 2.5,
+     "to_lower": 0.11693133615962692,
+     "to_upper": 1.383068663840373,
+     "nearer": "lower",
+     "distance": 0.11693133615962692,
+     "x_scale": null,
+     "distance_x_scale_units": null,
+     "stage": "S1"
+    },
+    "exh_bp_min_kpa": {
+     "value": 104.99154559900494,
+     "lower": 80.0,
+     "upper": 140.0,
+     "to_lower": 24.991545599004937,
+     "to_upper": 35.00845440099506,
+     "nearer": "lower",
+     "distance": 24.991545599004937,
+     "x_scale": null,
+     "distance_x_scale_units": null,
+     "stage": "S1"
+    },
+    "ve_base": {
+     "value": 0.7444151323834518,
+     "lower": 0.3,
+     "upper": 1.3,
+     "to_lower": 0.4444151323834518,
+     "to_upper": 0.5555848676165482,
+     "nearer": "lower",
+     "distance": 0.4444151323834518,
+     "x_scale": 0.1,
+     "distance_x_scale_units": 4.444151323834518,
+     "stage": "S2"
+    },
+    "ve_amp": {
+     "value": -0.08238753219070513,
+     "lower": -0.6,
+     "upper": 0.6,
+     "to_lower": 0.5176124678092948,
+     "to_upper": 0.6823875321907051,
+     "nearer": "lower",
+     "distance": 0.5176124678092948,
+     "x_scale": 0.1,
+     "distance_x_scale_units": 5.176124678092948,
+     "stage": "S2"
+    },
+    "ve_rpm": {
+     "value": 2018.3918620177717,
+     "lower": 1300.0,
+     "upper": 5000.0,
+     "to_lower": 718.3918620177717,
+     "to_upper": 2981.608137982228,
+     "nearer": "lower",
+     "distance": 718.3918620177717,
+     "x_scale": 1000.0,
+     "distance_x_scale_units": 0.7183918620177717,
+     "stage": "S2"
+    },
+    "ve_width": {
+     "value": 1023.4159620348435,
+     "lower": 300.0,
+     "upper": 20000.0,
+     "to_lower": 723.4159620348435,
+     "to_upper": 18976.584037965156,
+     "nearer": "lower",
+     "distance": 723.4159620348435,
+     "x_scale": 1000.0,
+     "distance_x_scale_units": 0.7234159620348435,
+     "stage": "S2"
+    },
+    "ve_map": {
+     "value": 0.0006723907854062405,
+     "lower": -0.005,
+     "upper": 0.005,
+     "to_lower": 0.00567239078540624,
+     "to_upper": 0.00432760921459376,
+     "nearer": "upper",
+     "distance": 0.00432760921459376,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 4.3276092145937595,
+     "stage": "S2"
+    },
+    "ve_cam": {
+     "value": -0.004999999999999999,
+     "lower": -0.005,
+     "upper": 0.005,
+     "to_lower": 8.673617379884035e-19,
+     "to_upper": 0.009999999999999998,
+     "nearer": "lower",
+     "distance": 8.673617379884035e-19,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 8.673617379884035e-16,
+     "stage": "S2"
+    },
+    "burn_base": {
+     "value": 12.445703638229,
+     "lower": 5.0,
+     "upper": 90.0,
+     "to_lower": 7.445703638229,
+     "to_upper": 77.554296361771,
+     "nearer": "lower",
+     "distance": 7.445703638229,
+     "x_scale": 10.0,
+     "distance_x_scale_units": 0.7445703638229,
+     "stage": "S4"
+    },
+    "burn_rpm": {
+     "value": 6.827550684419868e-05,
+     "lower": 0.0,
+     "upper": 0.012,
+     "to_lower": 6.827550684419868e-05,
+     "to_upper": 0.011931724493155802,
+     "nearer": "lower",
+     "distance": 6.827550684419868e-05,
+     "x_scale": 0.002,
+     "distance_x_scale_units": 0.03413775342209934,
+     "stage": "S4"
+    },
+    "delay_base": {
+     "value": 7.582700663269618,
+     "lower": 0.0,
+     "upper": 30.0,
+     "to_lower": 7.582700663269618,
+     "to_upper": 22.41729933673038,
+     "nearer": "lower",
+     "distance": 7.582700663269618,
+     "x_scale": 5.0,
+     "distance_x_scale_units": 1.5165401326539236,
+     "stage": "S4"
+    },
+    "delay_rpm": {
+     "value": 0.0015544589914829356,
+     "lower": 0.0,
+     "upper": 0.006,
+     "to_lower": 0.0015544589914829356,
+     "to_upper": 0.0044455410085170646,
+     "nearer": "lower",
+     "distance": 0.0015544589914829356,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 1.5544589914829354,
+     "stage": "S4"
+    },
+    "fmep_0": {
+     "value": -0.339252157698658,
+     "lower": -0.5,
+     "upper": 2.0,
+     "to_lower": 0.16074784230134198,
+     "to_upper": 2.339252157698658,
+     "nearer": "lower",
+     "distance": 0.16074784230134198,
+     "x_scale": 0.4,
+     "distance_x_scale_units": 0.40186960575335495,
+     "stage": "S4"
+    },
+    "fmep_pmax": {
+     "value": 0.016462307039596107,
+     "lower": -0.05,
+     "upper": 0.05,
+     "to_lower": 0.0664623070395961,
+     "to_upper": 0.033537692960403896,
+     "nearer": "upper",
+     "distance": 0.033537692960403896,
+     "x_scale": 0.005,
+     "distance_x_scale_units": 6.7075385920807795,
+     "stage": "S4"
+    },
+    "fmep_sp": {
+     "value": -0.004176217878408093,
+     "lower": -0.1,
+     "upper": 0.4,
+     "to_lower": 0.09582378212159191,
+     "to_upper": 0.40417621787840813,
+     "nearer": "lower",
+     "distance": 0.09582378212159191,
+     "x_scale": 0.09,
+     "distance_x_scale_units": 1.06470869023991,
+     "stage": "S4"
+    },
+    "fmep_sp2": {
+     "value": 0.005043994713743015,
+     "lower": -0.01,
+     "upper": 0.02,
+     "to_lower": 0.015043994713743014,
+     "to_upper": 0.014956005286256985,
+     "nearer": "upper",
+     "distance": 0.014956005286256985,
+     "x_scale": 0.0009,
+     "distance_x_scale_units": 16.61778365139665,
+     "stage": "S4"
+    },
+    "ua_port": {
+     "value": 21.82566464671676,
+     "lower": 0.0,
+     "upper": 1000.0,
+     "to_lower": 21.82566464671676,
+     "to_upper": 978.1743353532833,
+     "nearer": "lower",
+     "distance": 21.82566464671676,
+     "x_scale": 50.0,
+     "distance_x_scale_units": 0.4365132929343352,
+     "stage": "S4"
+    },
+    "ce_rich_slope": {
+     "value": 0.43470705817534516,
+     "lower": 0.0,
+     "upper": 1.5,
+     "to_lower": 0.43470705817534516,
+     "to_upper": 1.0652929418246548,
+     "nearer": "lower",
+     "distance": 0.43470705817534516,
+     "x_scale": 0.65,
+     "distance_x_scale_units": 0.668780089500531,
+     "stage": "S5"
+    }
+   },
+   "stages": {
+    "S1": {
+     "recorded": [],
+     "rule": "exact membership (epa_fit.s1_backpressure): exh_bp_ratio when the ratio is an end of epa_fit.BOUNDS['exh_bp_ratio'], exh_bp_min_kpa when the hinge is an end of its grid"
+    },
+    "S2": {
+     "params": [
+      "ve_base",
+      "ve_amp",
+      "ve_rpm",
+      "ve_width",
+      "ve_map",
+      "ve_cam"
+     ],
+     "recorded": [
+      "ve_cam"
+     ],
+     "corrected": [
+      "ve_cam"
+     ],
+     "added": [],
+     "flag_recorded": true,
+     "flag_corrected": true
+    },
+    "S3b": {
+     "recorded": [],
+     "rule": "the grid's edges (epa_fit.s3b_lambda, amendment C1): the gate or an rpm breakpoint at an extreme of S3b's grid, at the optimum or over the flat interval"
+    },
+    "S4": {
+     "params": [
+      "burn_base",
+      "burn_rpm",
+      "delay_base",
+      "delay_rpm",
+      "fmep_0",
+      "fmep_pmax",
+      "fmep_sp",
+      "fmep_sp2",
+      "ua_port"
+     ],
+     "recorded": [],
+     "corrected": [],
+     "added": [],
+     "flag_recorded": false,
+     "flag_corrected": false
+    },
+    "S5": {
+     "recorded": [],
+     "rule": "Brent within epa_fit.S5_XATOL (epa_fit.s5_rich_slope): ce_rich_slope when the slope lies within S5_XATOL of an end of epa_fit.BOUNDS['ce_rich_slope']"
+    }
+   },
+   "other_forms": {
+    "results/EPA_CALIBRATION/mazda_25t/fit_A+B+C.json": "not corrected",
+    "results/EPA_CALIBRATION/mazda_25t/fit_A+B.json": "not corrected",
+    "results/EPA_CALIBRATION/mazda_25t/fit_A.json": "not corrected"
+   }
+  },
+  "honda_l15b7": {
+   "form": "A+B+C+D",
+   "inputs": {
+    "results/EPA_CALIBRATION/honda_l15b7/freeze.json": "641d6a7cdc99f69a2ae1239cc5f52486e771561223edae902028b520efe8a034",
+    "results/EPA_CALIBRATION/honda_l15b7/fit_A+B+C+D.json": "728dde195e1ddd23fd88a7e1af74c961d06b2c905c03f2461781d5bc890b2726"
+   },
+   "frozen_sections_sha256": "93f0bc13cfb72d3446aa7f1de779a2b6ab6c9e78e636f175ea797d6d51f9c5e0",
+   "ve_rpm_bounds_from": "results/EPA_CALIBRATION/honda_l15b7/fit_A+B+C+D.json settings.bounds (bit-equal to stages.S2.report.bounds)",
+   "distances": {
+    "exh_bp_ratio": {
+     "value": 1.122899602581687,
+     "lower": 1.0,
+     "upper": 2.5,
+     "to_lower": 0.12289960258168708,
+     "to_upper": 1.377100397418313,
+     "nearer": "lower",
+     "distance": 0.12289960258168708,
+     "x_scale": null,
+     "distance_x_scale_units": null,
+     "stage": "S1"
+    },
+    "exh_bp_min_kpa": {
+     "value": 104.99111284138775,
+     "lower": 80.0,
+     "upper": 140.0,
+     "to_lower": 24.991112841387746,
+     "to_upper": 35.008887158612254,
+     "nearer": "lower",
+     "distance": 24.991112841387746,
+     "x_scale": null,
+     "distance_x_scale_units": null,
+     "stage": "S1"
+    },
+    "ve_base": {
+     "value": 0.9974732860729811,
+     "lower": 0.3,
+     "upper": 1.3,
+     "to_lower": 0.6974732860729811,
+     "to_upper": 0.3025267139270189,
+     "nearer": "upper",
+     "distance": 0.3025267139270189,
+     "x_scale": 0.1,
+     "distance_x_scale_units": 3.025267139270189,
+     "stage": "S2"
+    },
+    "ve_amp": {
+     "value": 0.14125707583417726,
+     "lower": -0.6,
+     "upper": 0.6,
+     "to_lower": 0.7412570758341772,
+     "to_upper": 0.45874292416582274,
+     "nearer": "upper",
+     "distance": 0.45874292416582274,
+     "x_scale": 0.1,
+     "distance_x_scale_units": 4.587429241658227,
+     "stage": "S2"
+    },
+    "ve_rpm": {
+     "value": 1498.184266002519,
+     "lower": 1000.0,
+     "upper": 5000.0,
+     "to_lower": 498.18426600251905,
+     "to_upper": 3501.815733997481,
+     "nearer": "lower",
+     "distance": 498.18426600251905,
+     "x_scale": 1000.0,
+     "distance_x_scale_units": 0.498184266002519,
+     "stage": "S2"
+    },
+    "ve_width": {
+     "value": 1706.9313961928137,
+     "lower": 300.0,
+     "upper": 20000.0,
+     "to_lower": 1406.9313961928137,
+     "to_upper": 18293.068603807187,
+     "nearer": "lower",
+     "distance": 1406.9313961928137,
+     "x_scale": 1000.0,
+     "distance_x_scale_units": 1.4069313961928138,
+     "stage": "S2"
+    },
+    "ve_map": {
+     "value": 0.002841694329954672,
+     "lower": -0.005,
+     "upper": 0.005,
+     "to_lower": 0.007841694329954673,
+     "to_upper": 0.002158305670045328,
+     "nearer": "upper",
+     "distance": 0.002158305670045328,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 2.158305670045328,
+     "stage": "S2"
+    },
+    "ve_cam": {
+     "value": -0.004999999999999999,
+     "lower": -0.005,
+     "upper": 0.005,
+     "to_lower": 8.673617379884035e-19,
+     "to_upper": 0.009999999999999998,
+     "nearer": "lower",
+     "distance": 8.673617379884035e-19,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 8.673617379884035e-16,
+     "stage": "S2"
+    },
+    "burn_base": {
+     "value": 14.2824100507996,
+     "lower": 5.0,
+     "upper": 90.0,
+     "to_lower": 9.2824100507996,
+     "to_upper": 75.7175899492004,
+     "nearer": "lower",
+     "distance": 9.2824100507996,
+     "x_scale": 10.0,
+     "distance_x_scale_units": 0.92824100507996,
+     "stage": "S4"
+    },
+    "burn_rpm": {
+     "value": 2.024986962722835e-10,
+     "lower": 0.0,
+     "upper": 0.012,
+     "to_lower": 2.024986962722835e-10,
+     "to_upper": 0.011999999797501304,
+     "nearer": "lower",
+     "distance": 2.024986962722835e-10,
+     "x_scale": 0.002,
+     "distance_x_scale_units": 1.0124934813614175e-07,
+     "stage": "S4"
+    },
+    "delay_base": {
+     "value": 9.055709052634134,
+     "lower": 0.0,
+     "upper": 30.0,
+     "to_lower": 9.055709052634134,
+     "to_upper": 20.944290947365864,
+     "nearer": "lower",
+     "distance": 9.055709052634134,
+     "x_scale": 5.0,
+     "distance_x_scale_units": 1.8111418105268267,
+     "stage": "S4"
+    },
+    "delay_rpm": {
+     "value": 5.021488158686176e-11,
+     "lower": 0.0,
+     "upper": 0.006,
+     "to_lower": 5.021488158686176e-11,
+     "to_upper": 0.005999999949785118,
+     "nearer": "lower",
+     "distance": 5.021488158686176e-11,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 5.021488158686176e-08,
+     "stage": "S4"
+    },
+    "fmep_0": {
+     "value": 0.2538706627759477,
+     "lower": -0.5,
+     "upper": 2.0,
+     "to_lower": 0.7538706627759477,
+     "to_upper": 1.7461293372240523,
+     "nearer": "lower",
+     "distance": 0.7538706627759477,
+     "x_scale": 0.4,
+     "distance_x_scale_units": 1.8846766569398692,
+     "stage": "S4"
+    },
+    "fmep_pmax": {
+     "value": 0.015128748845028782,
+     "lower": -0.05,
+     "upper": 0.05,
+     "to_lower": 0.06512874884502878,
+     "to_upper": 0.03487125115497122,
+     "nearer": "upper",
+     "distance": 0.03487125115497122,
+     "x_scale": 0.005,
+     "distance_x_scale_units": 6.974250230994245,
+     "stage": "S4"
+    },
+    "fmep_sp": {
+     "value": -0.09956790572981782,
+     "lower": -0.1,
+     "upper": 0.4,
+     "to_lower": 0.00043209427018219004,
+     "to_upper": 0.49956790572981785,
+     "nearer": "lower",
+     "distance": 0.00043209427018219004,
+     "x_scale": 0.09,
+     "distance_x_scale_units": 0.004801047446468779,
+     "stage": "S4"
+    },
+    "fmep_sp2": {
+     "value": 0.00850925321022108,
+     "lower": -0.01,
+     "upper": 0.02,
+     "to_lower": 0.01850925321022108,
+     "to_upper": 0.01149074678977892,
+     "nearer": "upper",
+     "distance": 0.01149074678977892,
+     "x_scale": 0.0009,
+     "distance_x_scale_units": 12.76749643308769,
+     "stage": "S4"
+    },
+    "ua_port": {
+     "value": 10.828318713183512,
+     "lower": 0.0,
+     "upper": 1000.0,
+     "to_lower": 10.828318713183512,
+     "to_upper": 989.1716812868165,
+     "nearer": "lower",
+     "distance": 10.828318713183512,
+     "x_scale": 50.0,
+     "distance_x_scale_units": 0.21656637426367023,
+     "stage": "S4"
+    },
+    "ce_rich_slope": {
+     "value": 0.46451147230531714,
+     "lower": 0.0,
+     "upper": 1.5,
+     "to_lower": 0.46451147230531714,
+     "to_upper": 1.0354885276946828,
+     "nearer": "lower",
+     "distance": 0.46451147230531714,
+     "x_scale": 0.65,
+     "distance_x_scale_units": 0.7146330343158726,
+     "stage": "S5"
+    }
+   },
+   "stages": {
+    "S1": {
+     "recorded": [],
+     "rule": "exact membership (epa_fit.s1_backpressure): exh_bp_ratio when the ratio is an end of epa_fit.BOUNDS['exh_bp_ratio'], exh_bp_min_kpa when the hinge is an end of its grid"
+    },
+    "S2": {
+     "params": [
+      "ve_base",
+      "ve_amp",
+      "ve_rpm",
+      "ve_width",
+      "ve_map",
+      "ve_cam"
+     ],
+     "recorded": [
+      "ve_cam"
+     ],
+     "corrected": [
+      "ve_cam"
+     ],
+     "added": [],
+     "flag_recorded": true,
+     "flag_corrected": true
+    },
+    "S3b": {
+     "recorded": [
+      "enr_rpm_hi"
+     ],
+     "rule": "the grid's edges (epa_fit.s3b_lambda, amendment C1): the gate or an rpm breakpoint at an extreme of S3b's grid, at the optimum or over the flat interval"
+    },
+    "S4": {
+     "params": [
+      "burn_base",
+      "burn_rpm",
+      "delay_base",
+      "delay_rpm",
+      "fmep_0",
+      "fmep_pmax",
+      "fmep_sp",
+      "fmep_sp2",
+      "ua_port"
+     ],
+     "recorded": [
+      "delay_rpm"
+     ],
+     "corrected": [
+      "burn_rpm",
+      "delay_rpm"
+     ],
+     "added": [
+      "burn_rpm"
+     ],
+     "flag_recorded": true,
+     "flag_corrected": true
+    },
+    "S5": {
+     "recorded": [],
+     "rule": "Brent within epa_fit.S5_XATOL (epa_fit.s5_rich_slope): ce_rich_slope when the slope lies within S5_XATOL of an end of epa_fit.BOUNDS['ce_rich_slope']"
+    }
+   },
+   "other_forms": {
+    "results/EPA_CALIBRATION/honda_l15b7/fit_A+B+C.json": "not corrected",
+    "results/EPA_CALIBRATION/honda_l15b7/fit_A+B.json": "not corrected",
+    "results/EPA_CALIBRATION/honda_l15b7/fit_A.json": "not corrected"
+   }
+  },
+  "ford_27tt": {
+   "form": "A+B+C+D",
+   "inputs": {
+    "results/EPA_CALIBRATION/ford_27tt/freeze.json": "48064e75203761d08e099ca5ed7f6ea588ec7bb09ce3057acfca05c7ae43600e",
+    "results/EPA_CALIBRATION/ford_27tt/fit_A+B+C+D.json": "0af119dafd2d7fbd0539d08cd2fbc2df7ee39b43ba5d4a68a984cb53165d8ed5"
+   },
+   "frozen_sections_sha256": "e63d3f1c66521fe56382275d3f9ecd93e7d9d90134c6c77f8ee2966df951a76f",
+   "ve_rpm_bounds_from": "results/EPA_CALIBRATION/ford_27tt/fit_A+B+C+D.json settings.bounds (bit-equal to stages.S2.report.bounds)",
+   "distances": {
+    "exh_bp_ratio": {
+     "value": 1.0,
+     "lower": 1.0,
+     "upper": 2.5,
+     "to_lower": 0.0,
+     "to_upper": 1.5,
+     "nearer": "lower",
+     "distance": 0.0,
+     "x_scale": null,
+     "distance_x_scale_units": null,
+     "stage": "S1"
+    },
+    "exh_bp_min_kpa": {
+     "value": 103.30000000000001,
+     "lower": 80.0,
+     "upper": 140.0,
+     "to_lower": 23.30000000000001,
+     "to_upper": 36.69999999999999,
+     "nearer": "lower",
+     "distance": 23.30000000000001,
+     "x_scale": null,
+     "distance_x_scale_units": null,
+     "stage": "S1"
+    },
+    "ve_base": {
+     "value": 0.7737513632734259,
+     "lower": 0.3,
+     "upper": 1.3,
+     "to_lower": 0.4737513632734259,
+     "to_upper": 0.5262486367265742,
+     "nearer": "lower",
+     "distance": 0.4737513632734259,
+     "x_scale": 0.1,
+     "distance_x_scale_units": 4.737513632734259,
+     "stage": "S2"
+    },
+    "ve_amp": {
+     "value": -0.11101917322686017,
+     "lower": -0.6,
+     "upper": 0.6,
+     "to_lower": 0.4889808267731398,
+     "to_upper": 0.7110191732268601,
+     "nearer": "lower",
+     "distance": 0.4889808267731398,
+     "x_scale": 0.1,
+     "distance_x_scale_units": 4.889808267731397,
+     "stage": "S2"
+    },
+    "ve_rpm": {
+     "value": 1799.930053859372,
+     "lower": 1000.0,
+     "upper": 5500.0,
+     "to_lower": 799.930053859372,
+     "to_upper": 3700.069946140628,
+     "nearer": "lower",
+     "distance": 799.930053859372,
+     "x_scale": 1000.0,
+     "distance_x_scale_units": 0.799930053859372,
+     "stage": "S2"
+    },
+    "ve_width": {
+     "value": 1016.3068780812137,
+     "lower": 300.0,
+     "upper": 20000.0,
+     "to_lower": 716.3068780812137,
+     "to_upper": 18983.693121918786,
+     "nearer": "lower",
+     "distance": 716.3068780812137,
+     "x_scale": 1000.0,
+     "distance_x_scale_units": 0.7163068780812136,
+     "stage": "S2"
+    },
+    "ve_map": {
+     "value": 0.0024450181495977927,
+     "lower": -0.005,
+     "upper": 0.005,
+     "to_lower": 0.007445018149597793,
+     "to_upper": 0.0025549818504022074,
+     "nearer": "upper",
+     "distance": 0.0025549818504022074,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 2.5549818504022075,
+     "stage": "S2"
+    },
+    "ve_cam": {
+     "value": 0.004999999999999999,
+     "lower": -0.005,
+     "upper": 0.005,
+     "to_lower": 0.009999999999999998,
+     "to_upper": 8.673617379884035e-19,
+     "nearer": "upper",
+     "distance": 8.673617379884035e-19,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 8.673617379884035e-16,
+     "stage": "S2"
+    },
+    "burn_base": {
+     "value": 14.150690977542585,
+     "lower": 5.0,
+     "upper": 90.0,
+     "to_lower": 9.150690977542585,
+     "to_upper": 75.84930902245742,
+     "nearer": "lower",
+     "distance": 9.150690977542585,
+     "x_scale": 10.0,
+     "distance_x_scale_units": 0.9150690977542585,
+     "stage": "S4"
+    },
+    "burn_rpm": {
+     "value": 1.7860842705501087e-09,
+     "lower": 0.0,
+     "upper": 0.012,
+     "to_lower": 1.7860842705501087e-09,
+     "to_upper": 0.01199999821391573,
+     "nearer": "lower",
+     "distance": 1.7860842705501087e-09,
+     "x_scale": 0.002,
+     "distance_x_scale_units": 8.930421352750544e-07,
+     "stage": "S4"
+    },
+    "delay_base": {
+     "value": 11.087198123717593,
+     "lower": 0.0,
+     "upper": 30.0,
+     "to_lower": 11.087198123717593,
+     "to_upper": 18.91280187628241,
+     "nearer": "lower",
+     "distance": 11.087198123717593,
+     "x_scale": 5.0,
+     "distance_x_scale_units": 2.217439624743519,
+     "stage": "S4"
+    },
+    "delay_rpm": {
+     "value": 6.806557994236476e-18,
+     "lower": 0.0,
+     "upper": 0.006,
+     "to_lower": 6.806557994236476e-18,
+     "to_upper": 0.005999999999999993,
+     "nearer": "lower",
+     "distance": 6.806557994236476e-18,
+     "x_scale": 0.001,
+     "distance_x_scale_units": 6.806557994236476e-15,
+     "stage": "S4"
+    },
+    "fmep_0": {
+     "value": -0.4999983378847716,
+     "lower": -0.5,
+     "upper": 2.0,
+     "to_lower": 1.6621152283957663e-06,
+     "to_upper": 2.4999983378847714,
+     "nearer": "lower",
+     "distance": 1.6621152283957663e-06,
+     "x_scale": 0.4,
+     "distance_x_scale_units": 4.155288070989416e-06,
+     "stage": "S4"
+    },
+    "fmep_pmax": {
+     "value": 0.0313170589206197,
+     "lower": -0.05,
+     "upper": 0.05,
+     "to_lower": 0.0813170589206197,
+     "to_upper": 0.018682941079380302,
+     "nearer": "upper",
+     "distance": 0.018682941079380302,
+     "x_scale": 0.005,
+     "distance_x_scale_units": 3.7365882158760604,
+     "stage": "S4"
+    },
+    "fmep_sp": {
+     "value": -0.09998828161595949,
+     "lower": -0.1,
+     "upper": 0.4,
+     "to_lower": 1.1718384040515506e-05,
+     "to_upper": 0.49998828161595954,
+     "nearer": "lower",
+     "distance": 1.1718384040515506e-05,
+     "x_scale": 0.09,
+     "distance_x_scale_units": 0.00013020426711683896,
+     "stage": "S4"
+    },
+    "fmep_sp2": {
+     "value": 0.01305001291730229,
+     "lower": -0.01,
+     "upper": 0.02,
+     "to_lower": 0.02305001291730229,
+     "to_upper": 0.006949987082697711,
+     "nearer": "upper",
+     "distance": 0.006949987082697711,
+     "x_scale": 0.0009,
+     "distance_x_scale_units": 7.722207869664124,
+     "stage": "S4"
+    },
+    "ua_port": {
+     "value": 18.050683610980357,
+     "lower": 0.0,
+     "upper": 1000.0,
+     "to_lower": 18.050683610980357,
+     "to_upper": 981.9493163890196,
+     "nearer": "lower",
+     "distance": 18.050683610980357,
+     "x_scale": 50.0,
+     "distance_x_scale_units": 0.3610136722196071,
+     "stage": "S4"
+    },
+    "ce_rich_slope": {
+     "value": 0.05033241943706298,
+     "lower": 0.0,
+     "upper": 1.5,
+     "to_lower": 0.05033241943706298,
+     "to_upper": 1.449667580562937,
+     "nearer": "lower",
+     "distance": 0.05033241943706298,
+     "x_scale": 0.65,
+     "distance_x_scale_units": 0.07743449144163535,
+     "stage": "S5"
+    }
+   },
+   "stages": {
+    "S1": {
+     "recorded": [
+      "exh_bp_ratio"
+     ],
+     "rule": "exact membership (epa_fit.s1_backpressure): exh_bp_ratio when the ratio is an end of epa_fit.BOUNDS['exh_bp_ratio'], exh_bp_min_kpa when the hinge is an end of its grid"
+    },
+    "S2": {
+     "params": [
+      "ve_base",
+      "ve_amp",
+      "ve_rpm",
+      "ve_width",
+      "ve_map",
+      "ve_cam"
+     ],
+     "recorded": [
+      "ve_cam"
+     ],
+     "corrected": [
+      "ve_cam"
+     ],
+     "added": [],
+     "flag_recorded": true,
+     "flag_corrected": true
+    },
+    "S3b": {
+     "recorded": [
+      "enr_rpm_hi"
+     ],
+     "rule": "the grid's edges (epa_fit.s3b_lambda, amendment C1): the gate or an rpm breakpoint at an extreme of S3b's grid, at the optimum or over the flat interval"
+    },
+    "S4": {
+     "params": [
+      "burn_base",
+      "burn_rpm",
+      "delay_base",
+      "delay_rpm",
+      "fmep_0",
+      "fmep_pmax",
+      "fmep_sp",
+      "fmep_sp2",
+      "ua_port"
+     ],
+     "recorded": [
+      "delay_rpm"
+     ],
+     "corrected": [
+      "burn_rpm",
+      "delay_rpm",
+      "fmep_0",
+      "fmep_sp"
+     ],
+     "added": [
+      "burn_rpm",
+      "fmep_0",
+      "fmep_sp"
+     ],
+     "flag_recorded": true,
+     "flag_corrected": true
+    },
+    "S5": {
+     "recorded": [],
+     "rule": "Brent within epa_fit.S5_XATOL (epa_fit.s5_rich_slope): ce_rich_slope when the slope lies within S5_XATOL of an end of epa_fit.BOUNDS['ce_rich_slope']"
+    }
+   },
+   "other_forms": {
+    "results/EPA_CALIBRATION/ford_27tt/fit_A+B+C.json": "not corrected",
+    "results/EPA_CALIBRATION/ford_27tt/fit_A+B.json": "not corrected",
+    "results/EPA_CALIBRATION/ford_27tt/fit_A.json": "not corrected"
+   }
+  }
+ },
+ "code_sha_text": {
+  "epa_fit.py": "aeae2c4adc0e9e1d0a741c3f6ddaac9d30911c85f4038b9902e753fad524e8ff",
+  "bounds_active_corrected.py": "224072dea487da1a886a8266cdabc7577603658dcd184aa21ddd0dbf3ffa387f"
+ },
+ "versions": {
+  "python": "3.13.2",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "platform": "Windows-11-10.0.26200-SP0"
+ },
+ "fit_run": false,
+ "frozen_records_rewritten": false,
+ "not_rewritten_note": "No frozen record is rewritten (row 109): every fit_<form>.json keeps its recorded bounds_active and flags, and the three stage0.json files keep calibrate_epa.SEEN_BEFORE_THE_FIT's diagnostic-C entry as the fit wrote it, with the Mazda's derived file named by its path, while from commit G on the code's entry reads \"the Mazda's derived file\" (row 120; row 141 (7)). test_epa_rows' rule N1 scans .py files only, and no code compares the JSON copies with the code's tuple. On row 94's restored branch calibrate_epa.py is the third commit F's again, with the old label."
+}

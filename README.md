@@ -800,10 +800,15 @@ python analyse_phase_d.py  Phase D, the first of the four ablations (the box at
                            SIGNIFICANT at alpha 0.05. Also prints the agent's
                            +29 to +34 points over current-grade, which is a
                            DIFFERENT claim -- see the box at the top of this file
-python drift_test.py       18 of 18 injected drifts CAUGHT. The guard's own
+python drift_test.py       22 of 22 injected drifts CAUGHT. The guard's own
                            acceptance test; every row AUDIT2 Part 4a marked
                            MISSED is now caught (rows 17 and 18, the training
-                           step and episode, added 21 Oct on GRA-test)
+                           step and episode, added 21 Oct on GRA-test; rows
+                           19-22, Run 2's figures and its summary record, 7 Nov)
+python bounds_active_corrected.py check   decision 92's corrected bound
+                           lists (rows 109, 141) recomputed from the frozen
+                           calibration records; prints [] when the committed
+                           record is what they give
 python power_analysis.py   At Phase D's spread (sd 214.4) eight seeds have power
                            0.10 against the minimum effect of interest (50
                            damage units) and reach 80 % only near 269. Read it
@@ -927,8 +932,11 @@ python compare_log.py data/master_points.csv   PASS, 1.4 % load residual,
                            model — mistake 12
 python verify_docs.py      recomputes the published figures from the shipped
                            data, checks the derived constants and the premise
-                           are FRESH, then greps every tracked document and .py
-                           file both for those figures and for retired ones. It
+                           are FRESH, reads Run 2's figures (results/README.md's
+                           Run 2 section, section Q of the decision sheet) from
+                           results/EPA_VALIDATION/, then greps every tracked
+                           document and .py file both for those figures and
+                           for retired ones. It
                            prints its own total; read that, do not quote a
                            count from here
 python check_map.py        spark falls with load in every row, rises with speed
@@ -1085,6 +1093,56 @@ logs/epa/             EPA's files, byte for byte as published (MANIFEST.csv);
 results/B58_IDENTITY.md  Commit A's certificate (build step 2): the B58 through
                       engines.get is cf43fbb's plant, bit for bit (and the .json);
                       build step 1's is STATE_HISTORY.md part S.
+engine_thresholds.py  The validation contract of decision 35, with
+                      thresholds/: results/ENGINE_THRESHOLDS.md and .json,
+                      generated from the EPA tables' structure; never edit them.
+epa_rows.py           The leak-proof loader: an EPA engine's calibration rows,
+                      and nothing of a held-out row, by construction (Run 2
+                      reads those through validate_epa's armed token).
+epa_stats.py          Every statistic of the contract, one definition for Run
+                      1's in-sample stage and Run 2's held-out run.
+epa_fit.py            Run 1's fitting procedure, stage by stage, and the
+                      in-sample stage that picks each engine's form. Since
+                      commit G, bounds_at names a parameter at its bound
+                      (decision 92, rows 109 and 141).
+epa_freeze.py         The calibration's hashes, derived files, freeze records
+                      and frozen-plant dumps.
+calibrate_epa.py      Run 1: each EPA engine fitted on its calibration rows,
+                      its form frozen, its plant completed ->
+                      results/EPA_CALIBRATION/<engine>/.
+bounds_active_corrected.py  Decision 92's corrected bound lists, from the
+                      frozen records -> results/EPA_CALIBRATION/
+                      bounds_active_corrected.json, written once; `check`
+                      recomputes it.
+k3_knee.py            An engine's K3 knee, its neutral run on the locked climb
+                      and the delivery check.
+epa_coefficients.py   An engine's own propagation coefficients on its locked
+                      climb, descriptive.
+d3_rows.py            C3 and C4: the Mazda against Argonne's CX-9 drives, and
+                      the same chain on the Accord, descriptive.
+validate_epa.py       Run 2: the held-out validation of the three EPA engines,
+                      computed once from an armed commit ->
+                      results/EPA_VALIDATION/ (each engine's records and
+                      summary.json). Run 2 dropped all three (results/README.md).
+epa_roads.py          Decision 34's test roads: the draw, then the C5 re-check
+                      and the redraws -> results/EPA_ROADS/roads.json and
+                      redraws.json, with the attempts log.
+roads_ceiling.py      Decision 34's ceiling on a road set, and what row 103 (1)
+                      reports beside it.
+roads_reverify.py     roads.json re-verified on the code as it stands (row 140)
+                      -> results/EPA_ROADS/reverify.json, carried by P.
+epa_tightenings.py    Row 104's tightenings of L1 and E8, measured on the B58 on
+                      the roads as first drawn -> results/EPA_TIGHTENINGS.json.
+tit_cap.py, tit_cap_ecu.py  The Ford's TIT cap (row 105) and its ECU, outside
+                      the plant code -> results/EPA_TIT_CAP/.
+four_engine_roads.py  The training roads of row 116, a wrapper (train.py --road
+                      four_engine); holds the one reader of reverify.json.
+training_recipe.py    Decision 29's recipe, behind train.py's flags.
+engine_gate.py        Each engine's own reward and road gate (row 119), run by
+                      test_reward.py --engine and check_roads.py --engine.
+four_engine_analysis.py  The four-engine test's statistics (row 113), committed
+                      before any scoring; the B58 study across H (rows 146 and
+                      147) reads them.
 calibrate_thermal.py  The thermal block + oil fit (and its structure), with
                       leave-one-drive-out scores. derive_params.py calls it.
 car_thermal.py        thermal.py replayed over a logged drive, on measured fuel;
@@ -1202,7 +1260,7 @@ check_random_road.py  Does every D2 road bind, and is the blind arm blind.
                       Run before training; about 38 minutes.
 prove_buffer.py       Proves the replay-buffer size changes nothing learned.
 drift_test.py         The guard's own acceptance test: inject AUDIT2 Part 4a's
-                      drifts and check each is CAUGHT. Currently 18 of 18.
+                      drifts and check each is CAUGHT. Currently 22 of 22.
 full_run.py           Every script that prints a published figure, in one pass,
                       each block opening with its EXIT CODE -> FULL_RUN.txt.
                       Sweep the documents from that, not from memory.

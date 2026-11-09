@@ -1724,7 +1724,7 @@ def s2_breathing(rows, *, plant, view, form, conventions, dtheta, jobs):
     if worst > S2_VERIFY_REL:
         raise FitDefect(f"S2: run_cycle's air departs from VE x unit air by {worst!r} relative (mistake 10)")
     flags = ["S2_" + f for f in sflags]
-    act = [n for n, a in zip(names, active) if a != 0]
+    act = bounds_at(names, x, active, lb=lb, ub=ub, x_scale=[X_SCALE[n] for n in names])
     if act:
         flags.append("S2_bound_active")
     if clip_rows:
@@ -1999,7 +1999,7 @@ def s4_burn(rows, *, name, values, view, form, jobs, conventions, dtheta, start)
     flags = ["S4_" + f for f in flags_kept]
     if not (checks["burn_ok"] and checks["delay_ok"] and checks["fmep_positive"]):
         flags.append("S4_physical_check")                # PLAN.md 5.6: flagged
-    act = [n for n, a in zip(S4_PARAMS, act_kept) if a != 0]
+    act = bounds_at(S4_PARAMS, x, act_kept, lb=lb, ub=ub, x_scale=xsc)
     if act:
         flags.append("S4_bound_active")
     cons = _weakest_consequence(rows, cand, vals, v * S, sd, view=view, conventions=conventions, dtheta=dtheta)
@@ -3398,4 +3398,70 @@ def run_t0(name, yield_, *, view, jobs, dtheta):
                                      "in_sample": {f: form_record(lad.in_sample[f]) for f in lad.in_sample}}
                       for tr, lad in zip(truths, ladders)}
     out["schema"] = "epa-t0/1"
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Decision 92's correction (commit G; decision 92, VALIDATION_DECISIONS rows 109 and 141)
+# ---------------------------------------------------------------------------
+# Appended after run_t0, so that no line at or above :2776 moves: the frozen tit_cap.py:62 and tit_cap_ecu.py:30
+# cite epa_fit.py:2067, and VALIDATION_DECISIONS rows 100 and 102 cite :2756-2776. S2 and S4 name their bounds
+# through bounds_at, defined below them (call-time name resolution).
+#
+# THE DEFECT (decision 92). S2 and S4 took bounds_active from scipy's active_mask alone (_solve returns it). trf
+# computes it as find_active_constraints(x, lb, ub, rtol=xtol) (.venv scipy 1.18.1, optimize/_lsq/trf.py:408),
+# which marks a bound only within xtol * max(1, |bound|) of it (_lsq/common.py:426-427): 1e-10 in S4's starts and
+# 1e-12 in S2 and S4's polish (TOLERANCES), while trf keeps its iterates strictly inside the bounds. A parameter
+# whose optimum lies on its bound therefore stops a little further inside than that and goes unmarked (MEASURED on
+# a one-parameter problem: test_epa_fit.BoundsActive). Decision 92 found four such parameters in the frozen
+# records, the Ford's burn_rpm, fmep_0 and fmep_sp and the Honda's burn_rpm; nothing reads either list.
+#
+# THE TOLERANCE (row 141 (1), DESIGN; fixed in O1, before Run 2): a parameter is at its bound when the mask marks
+# it, or when its distance to a finite bound is at most BOUND_TOL_SCALE_UNITS times its X_SCALE, the solver's own
+# per-axis unit (amendment D5), the unit S4's polish already reports its departure in. Disclosed: the value was
+# chosen after the frozen records' distances were read by hand (row 141). No distance is typed here: every one is
+# in results/EPA_CALIBRATION/bounds_active_corrected.json, from bounds_active_corrected.py's own run, and the
+# separation G quotes comes from that run's printout (mistake 22). If that run names other lists than row 109's,
+# they are committed as found and disclosed; the tolerance never moves to fit them (row 141 (1)).
+BOUND_TOL_SCALE_UNITS = 1e-3
+
+
+def bound_distances(names, x, *, lb, ub, x_scale):
+    """Every parameter's distance to its bounds (row 109: "Every parameter's distance to
+    its bound is listed"), for `names` in order, `x`, `lb`, `ub` and `x_scale` aligned
+    with them: {name: {value, lower, upper, to_lower = x - lb, to_upper = ub - x,
+    nearer ('lower', or 'upper' when strictly nearer), distance (the smaller of the
+    two), x_scale (a float, or None for a parameter the solver does not scale: S1's
+    and S5's), distance_x_scale_units (distance / x_scale, or None)}}, Python floats.
+    The record's writer (bounds_active_corrected.py) calls it on the frozen vectors."""
+    if not len(names) == len(x) == len(lb) == len(ub) == len(x_scale):
+        raise FitDefect("bound_distances: names, x, lb, ub and x_scale must be aligned")
+    out = {}
+    for i, n in enumerate(names):
+        v, lo, hi = float(x[i]), float(lb[i]), float(ub[i])
+        to_lo, to_hi = v - lo, hi - v
+        s = None if x_scale[i] is None else float(x_scale[i])
+        d = min(to_lo, to_hi)
+        out[n] = {"value": v, "lower": lo, "upper": hi, "to_lower": to_lo, "to_upper": to_hi,
+                  "nearer": "lower" if to_lo <= to_hi else "upper", "distance": d, "x_scale": s,
+                  "distance_x_scale_units": None if s is None else d / s}
+    return out
+
+
+def bounds_at(names, x, active_mask, *, lb, ub, x_scale, tol=BOUND_TOL_SCALE_UNITS):
+    """The parameters at a bound (decision 92 as rows 109 and 141 correct it): the names,
+    in `names` order, where active_mask is non-zero (scipy's own marking, kept), or where
+    both bounds are finite and min(x - lb, ub - x) <= tol * x_scale, `tol` in X_SCALE
+    units. The one definition: s2_breathing's and s4_burn's bounds_active and the
+    record's corrected lists (bounds_active_corrected.py) all come from it (mistake 10).
+    S1 (exact membership), S3b (the grid's edges) and S5 (Brent within S5_XATOL) keep
+    their own rules (row 141 (2))."""
+    if not len(names) == len(x) == len(active_mask) == len(lb) == len(ub) == len(x_scale):
+        raise FitDefect("bounds_at: names, x, active_mask, lb, ub and x_scale must be aligned")
+    out = []
+    for i, n in enumerate(names):
+        lo, hi, v = float(lb[i]), float(ub[i]), float(x[i])
+        near = math.isfinite(lo) and math.isfinite(hi) and min(v - lo, hi - v) <= tol * float(x_scale[i])
+        if active_mask[i] != 0 or near:
+            out.append(n)
     return out

@@ -1901,5 +1901,141 @@ class Scan(fx.Guarded):
         self.assertEqual(len(self.problems(bad)), 4)
 
 
+# ===========================================================================================
+class BoundsActive(fx.Guarded):
+    """Decision 92's correction (commit G; VALIDATION_DECISIONS rows 109 and 141): epa_fit.bounds_at names a
+    parameter scipy's active_mask marks, or one within BOUND_TOL_SCALE_UNITS times its X_SCALE of a finite bound,
+    and s2_breathing and s4_burn take their bounds_active from it. Each tolerance test has its control at twice the
+    tolerance (mistake 12). No frozen value is read or typed here: the frozen records' corrected lists are
+    test_bounds_active_corrected's."""
+
+    def test_the_tolerance_names_what_the_mask_misses(self):
+        tol = epa_fit.BOUND_TOL_SCALE_UNITS
+        self.assertIsInstance(tol, float)
+        names = ("a", "b", "c", "d")
+        lb, ub, sc = [0.0, -1.0, 10.0, 0.0], [1.0, 1.0, 20.0, 5.0], [0.002, 0.1, 1000.0, 1.0]
+        mid = [0.5, 0.0, 15.0, 2.5]
+        none = np.zeros(4, dtype=int)
+
+        def at(x, mask=none, **kw):
+            return epa_fit.bounds_at(names, x, mask, lb=lb, ub=ub, x_scale=sc, **kw)
+
+        def moved(i, value):
+            x = list(mid)
+            x[i] = value
+            return x
+        self.assertEqual(at(mid), [])
+        self.assertEqual(at(moved(0, lb[0] + 0.5 * tol * sc[0])), ["a"])           # the lower side
+        self.assertEqual(at(moved(0, lb[0] + 2.0 * tol * sc[0])), [])              # its control
+        self.assertEqual(at(moved(2, ub[2] - 0.5 * tol * sc[2])), ["c"])           # the upper side
+        self.assertEqual(at(moved(2, ub[2] - 2.0 * tol * sc[2])), [])
+        # the mask's own marks stay, however far from a bound (the union), and the order is `names`'
+        x = moved(3, ub[3] - 0.5 * tol * sc[3])
+        self.assertEqual(at(x, np.array([0, -1, 0, 0])), ["b", "d"])
+        self.assertEqual(epa_fit.bounds_at(names[::-1], x[::-1], [0, 0, -1, 0], lb=lb[::-1], ub=ub[::-1],
+                                           x_scale=sc[::-1]), ["d", "b"])
+        # the boundary is inclusive and `tol` is the caller's: tol 0.25 on scale 1, both exact in binary
+        for value, want in ((0.25, ["d"]), (0.25 + 2.0 ** -10, [])):
+            self.assertEqual(epa_fit.bounds_at(("d",), [value], [0], lb=[0.0], ub=[5.0], x_scale=[1.0], tol=0.25),
+                             want)
+        # with one bound infinite no distance names a parameter; the mask still does
+        lb_inf = lb[:3] + [-math.inf]
+        self.assertEqual(epa_fit.bounds_at(names, x, none, lb=lb_inf, ub=ub, x_scale=sc), [])
+        self.assertEqual(epa_fit.bounds_at(names, x, [0, 0, 0, 1], lb=lb_inf, ub=ub, x_scale=sc), ["d"])
+        with self.assertRaises(epa_fit.FitDefect) as cm:                            # unaligned inputs: a defect
+            epa_fit.bounds_at(names, mid[:3], none, lb=lb, ub=ub, x_scale=sc)
+        self.assertEqual(str(cm.exception), "bounds_at: names, x, active_mask, lb, ub and x_scale must be aligned")
+        with self.assertRaises(epa_fit.FitDefect) as cm:                            # bound_distances' own, too
+            epa_fit.bound_distances(names, mid, lb=lb, ub=ub, x_scale=sc[:3])
+        self.assertEqual(str(cm.exception), "bound_distances: names, x, lb, ub and x_scale must be aligned")
+        # bound_distances gives what its inputs imply, Python floats, None where the solver has no scale
+        d = epa_fit.bound_distances(names, x, lb=lb, ub=ub, x_scale=[0.002, None, 1000.0, 1.0])
+        self.assertEqual(list(d), list(names))
+        for i, n in enumerate(names):
+            e = d[n]
+            self.assertEqual((e["value"], e["lower"], e["upper"]), (x[i], lb[i], ub[i]))
+            self.assertEqual((e["to_lower"], e["to_upper"]), (x[i] - lb[i], ub[i] - x[i]))
+            self.assertEqual(e["distance"], min(x[i] - lb[i], ub[i] - x[i]))
+            self.assertEqual(e["nearer"], "lower" if x[i] - lb[i] <= ub[i] - x[i] else "upper")
+            self.assertTrue(all(type(e[k]) is float for k in ("value", "lower", "upper", "to_lower", "to_upper",
+                                                               "distance")))
+        self.assertEqual((d["d"]["nearer"], d["d"]["distance_x_scale_units"]), ("upper", d["d"]["distance"] / 1.0))
+        self.assertEqual(d["a"]["distance_x_scale_units"], d["a"]["distance"] / 0.002)
+        self.assertEqual((d["b"]["x_scale"], d["b"]["distance_x_scale_units"]), (None, None))
+
+    def test_scipys_mask_misses_a_point_on_its_bound(self):
+        """Decision 92's mechanism, MEASURED through epa_fit._solve itself: trf at S4's declared tolerances (xtol
+        1e-10), on bounds [0, 1] at x_scale 1, minimising (x - m)^2. trf keeps its iterates strictly inside the
+        bounds, and active_mask marks a bound only within xtol * max(1, |bound|) of it (.venv scipy 1.18.1,
+        optimize/_lsq/trf.py:408 and _lsq/common.py:426-427). A minimum far outside the bound (m = -5) is marked.
+        One a hair outside (m = -1e-6), whose constrained optimum is the bound itself, stops strictly inside and
+        further than 1e-10 from it, unmarked: the defect, which the tolerance corrects. Inside at half the tolerance
+        it is unmarked and named; at twice it (the control) neither."""
+        tol = epa_fit.BOUND_TOL_SCALE_UNITS
+        lb, ub = np.array([0.0]), np.array([1.0])
+
+        def solve(m):
+            x, act, _conv, _flags = epa_fit._solve(lambda th: np.array([th[0] - m]), lambda th: np.array([[1.0]]),
+                                                   np.array([0.5]), lb=lb, ub=ub, x_scale=[1.0],
+                                                   tol=epa_fit.TOLERANCES["S4"])
+            return float(x[0]), int(act[0]), epa_fit.bounds_at(("p",), x, act, lb=lb, ub=ub, x_scale=[1.0])
+        x, act, named = solve(-5.0)
+        self.assertGreater(x, 0.0)
+        self.assertEqual((act, named), (-1, ["p"]))
+        x, act, named = solve(-1e-6)
+        self.assertGreater(x, epa_fit.TOLERANCES["S4"]["xtol"])     # strictly inside, beyond the mask's reach ...
+        self.assertEqual((act, named), (0, ["p"]))                  # ... unmarked, and named by the tolerance
+        x, act, named = solve(0.5 * tol)
+        self.assertEqual((act, named), (0, ["p"]))
+        x, act, named = solve(2.0 * tol)
+        self.assertEqual((act, named), (0, []))
+
+    @staticmethod
+    def _missed(index, value):
+        """_solve as it is, then its mask zeroed and parameter `index` moved to `value`: a point the mask missed,
+        placed where the test wants it (every call of the stage, its starts and S4's polish alike)."""
+        real = epa_fit._solve
+
+        def spy(fun, jac, x0, *, lb, ub, x_scale, tol):
+            x, act, conv, flags = real(fun, jac, x0, lb=lb, ub=ub, x_scale=x_scale, tol=tol)
+            x = np.array(x, dtype=float)
+            x[index] = value
+            return x, np.zeros_like(act), conv, flags
+        return mock.patch.object(epa_fit, "_solve", spy)
+
+    def test_s4_names_a_parameter_its_mask_missed(self):
+        v, view, rows = dataset()
+        lo = epa_fit.BOUNDS["burn_rpm"][0]
+        step = epa_fit.BOUND_TOL_SCALE_UNITS * epa_fit.X_SCALE["burn_rpm"]
+        got = {}
+        for k in (0.5, 2.0):
+            with self._missed(epa_fit.S4_PARAMS.index("burn_rpm"), lo + k * step):
+                st = epa_fit.s4_burn(epa_fit.cal_rows(rows), name=NAME, values=v, view=view, form="A", jobs=JOBS,
+                                     conventions=epa_stats.NOMINAL, dtheta=DTH,
+                                     start={n: v["cycle"][n] for n in epa_fit.S4_PARAMS})
+            self.assertEqual(st.values["burn_rpm"], lo + k * step)
+            got[k] = (st.bounds_active, "S4_bound_active" in st.flags)
+        self.assertEqual(got[0.5], (("burn_rpm",), True))
+        self.assertEqual(got[2.0], ((), False))                     # the control, at twice the tolerance
+
+    def test_s2_names_a_parameter_its_mask_missed(self):
+        """ve_rpm, whose bounds epa_fit.BOUNDS holds as None: S2 reads them from the view's end lines (amendment
+        D9), and the tolerance applies to them as to every other bound (row 141 (3))."""
+        v, view, rows = dataset()
+        names = epa_fit.s2_names("A")
+        lo = epa_fit._rpm_ends(view)[0]
+        step = epa_fit.BOUND_TOL_SCALE_UNITS * epa_fit.X_SCALE["ve_rpm"]
+        got = {}
+        for k in (0.5, 2.0):
+            with self._missed(names.index("ve_rpm"), lo + k * step):
+                st = epa_fit.s2_breathing(rows, plant=epa_fit.candidate(NAME, v), view=view, form="A",
+                                          conventions=epa_stats.NOMINAL, dtheta=DTH, jobs=JOBS)
+            self.assertEqual(st.values["ve_rpm"], lo + k * step)
+            self.assertEqual(st.report["bounds"]["ve_rpm"][0], lo)
+            got[k] = (st.bounds_active, "S2_bound_active" in st.flags)
+        self.assertEqual(got[0.5], (("ve_rpm",), True))
+        self.assertEqual(got[2.0], ((), False))                     # the control, at twice the tolerance
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -28,8 +28,8 @@ decision 60). Everything else here serves that sentence.
            check's exit read by name (only its mismatch is C11's "repeat Run 1 from S0"); and on the
            defect route the calibration the previous arming recorded, unchanged (C11: nothing is
            refitted). It prints counts only, writes the arming's nonce into the work tree's own git
-           directory and results/EPA_VALIDATION/<id>/ARMED.json. The person commits ARMED.json ALONE:
-           that commit is the arming.
+           directory and results/EPA_VALIDATION/<id>/ARMED.json. The person commits ARMED.json, alone of
+           the validation folder's files, with the calibration's run.json (row 106): that commit is the arming.
   run      refuses (C6) in a linked worktree, without .git, outside the path ARMED.json records,
            unless the output folder holds ARMED.json alone (tracked, untracked and ignored files
            all counted), if `git log --all` holds any other path under that folder, and unless

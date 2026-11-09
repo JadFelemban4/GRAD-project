@@ -3147,7 +3147,9 @@ class Pieces(F.Guarded):
         ALPHA full-throttle curve, whose node at 1751 rpm is held-out High Load Initial row 18's torque, and that
         read is recorded where the code records what was seen before the fit (stage0.json carries the tuple), with
         the hunt's and the fixer's own reads, naming what was seen and where and repeating no torque. The control:
-        the tuple without the entry fails the check."""
+        the tuple without the entry fails the check. Since commit G (rows 120 and 141): diagnostic C's entry still
+        discloses the Mazda's derived file, by those words, and no entry names the tables' folder (rule N1's string,
+        built from parts here; the control is test_epa_rows' own N1 scan, which flagged the old label)."""
         def disclosed(seen):
             return any("wot_torque_curve" in s and "rows 12, 18, 24 and 30" in s and "1751 rpm" in s
                        and "held-out row" in s and "E1i" in s for s in seen)
@@ -3155,6 +3157,11 @@ class Pieces(F.Guarded):
         self.assertFalse(disclosed(tuple(s for s in C.SEEN_BEFORE_THE_FIT if not s.startswith("THE DISCLOSURE"))))
         self.assertTrue(any(s.startswith("the defect hunt, 24 October 2026") for s in C.SEEN_BEFORE_THE_FIT))
         self.assertTrue(any(s.startswith("the implementer of defect D-1") for s in C.SEEN_BEFORE_THE_FIT))
+        diagnostic_c = [s for s in C.SEEN_BEFORE_THE_FIT if s.startswith("diagnostic C and its checker, 29 October 2026")]
+        self.assertEqual(len(diagnostic_c), 1)
+        self.assertIn("the Mazda's derived file", diagnostic_c[0])
+        folder = "data" + "/" + "engines"
+        self.assertEqual([s for s in C.SEEN_BEFORE_THE_FIT if folder in s or folder.replace("/", "\\") in s], [])
 
     def test_seen_before_the_fit_carries_the_pin_authors_reads(self):
         """epa_stats.SOURCES_READ, the u_D pins' author's reads (decision 56; the Mazda's ALPHA page read whole

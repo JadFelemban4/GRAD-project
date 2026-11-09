@@ -765,8 +765,20 @@ National Laboratory. Every file is listed with its URL, size and SHA-256 in
 packages and papers, 9 its Test Car Lists, and 71 and 57 Argonne's D3 files for
 the CX-9 and the Accord. The files this repository holds are in
 `logs/epa/MANIFEST.csv`; `python fetch_engine_data.py --verify-only` re-checks
-the chain from EPA's URL to the file `epa_map.py` reads. None of it sets a plant
-constant yet: the new engines are calibrated in a later build step.
+the chain from EPA's URL to the file `epa_map.py` reads. Since build step 2,
+EPA's calibration rows set each new engine's fitted constants (Run 1, frozen at
+`25437ba`; `results/EPA_CALIBRATION/`), and its held-out rows tested them (Run 2,
+`results/EPA_VALIDATION/`): all three engines were dropped (`results/README.md`,
+Run 2; `results/VALIDATION_DECISIONS.md` section Q).
+
+**What EPA's rigs cannot set is the B58's, carried** (decision 45): the thermal
+network, the turbine housing, the ECU's compensations, its knock feedback, the
+fan, and the constants the validation contract shares between engines. Each
+such value in an EPA engine's spec says "CARRIED FROM THE B58" and names the B58
+field it comes from, and `test_carried.py` checks each one against the B58's,
+bit for bit. Its status is therefore the B58's entry above, never EPA's: section
+4 for the thermal network and the housing (the B58's `c_turb` is ASSUMED), and
+section 4b for the ECU's and every other carried constant.
 
 | source | what it gives | status |
 |---|---|---|

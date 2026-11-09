@@ -1827,6 +1827,299 @@ def check_derived(here):
            files=ALL, dtol=0.05)
 
 
+# ---------------------------------------------------------------------------
+# RUN 2   (7 November 2026, commit G, ORDER step 15)
+# ---------------------------------------------------------------------------
+# D146 (a3cd3a3) reported Run 2 as a result: results/README.md's Run 2 section, every figure read off Run 2's
+# committed records in results/EPA_VALIDATION/. Nothing checked those figures. The science review of rows
+# 146-147 (its M1) asked that they be checked like every published figure, and D146, a documents-only commit,
+# assigned the code to commit G (docs/build_step_2/INTERFACES.md section 17, item 7; VALIDATION_DECISIONS.md
+# section R's note). The expected values below are the README's: each is a record value rounded to the four
+# decimals the documents print, read off the records by narrow searches before it was typed here, and the run
+# of this file is what confirms each one (mistake 22).
+RUN2_DIR = "results/EPA_VALIDATION"
+# Section Q's note names summary.json by its sha_text's first eight hex digits. A pin, like EPISODES' hash in
+# check_scenario: an edit of the record fails here before any figure is read from it.
+RUN2_SUMMARY_SHA8 = "37af2dcd"
+# The name each engine's table rows open with: the README's, or VALIDATION_DECISIONS section Q's.
+RUN2_NAME = {"mazda_25t": r"(?:Mazda 2\.5 T|mazda_25t)", "honda_l15b7": r"(?:Honda L15B7|honda_l15b7)",
+             "ford_27tt": r"(?:Ford 2\.7 TT|ford_27tt)"}
+RUN2_ANY = r"(?:" + "|".join(RUN2_NAME.values()) + r")"
+# The D3 record whose C3a and C3c the descriptive table quotes: the Mazda's C3 (its defect re-run's), the
+# Honda's C4 on the Accord. The Ford has no D3 drive.
+RUN2_D3 = {"mazda_25t": "c3_rerun1.json", "honda_l15b7": "c4_accord.json"}
+# Each engine as the Run 2 section states it: the governing rows file and the rows that drop the engine (as
+# summary.json lists them); per section-7 row (E, kappa, the reported label), kappa None where the README's
+# table prints none; the descriptive rows; the C5 re-check margin (E1a's worst line, |E| + 2 u_val, in %).
+RUN2_EXPECT = {
+    "mazda_25t": {"governed_by": "rows_rerun1.json", "drop_rows": ["E4b", "L1"],
+                  "rows": {"L1": (15.2977, 1.7168, "off"), "E4b": (74.1392, 6.1739, "off"),
+                           "E8": (8.2135, 1.9768, "untested"), "D1": (4.0659, None, "limited")},
+                  "desc": {"E1b": 6.3546, "E1i": -2.4517, "E2b": 6.1172, "E3b": 31.0571,
+                           "C3a": -13.5443, "C3c": -8.4737},
+                  "margin": 5.6122},
+    "honda_l15b7": {"governed_by": "rows.json", "drop_rows": ["L1", "E8"],
+                    "rows": {"L1": (17.4417, 1.8714, "off"), "E4b": (-20.7385, 1.5180, "limited"),
+                             "E8": (158.8072, 11.4575, "off"), "D1": (2.9623, None, "validated")},
+                    "desc": {"E1b": 8.3225, "E1i": 4.4642, "E2b": 7.7189, "E3b": 27.3341,
+                             "C3a": -7.0440, "C3c": -8.9357},
+                    "margin": 7.7242},
+    "ford_27tt": {"governed_by": "rows.json", "drop_rows": ["L1", "E8"],
+                  "rows": {"L1": (34.9137, 3.7328, "off"), "E4b": (223.9956, 26.0360, "untested"),
+                           "E8": (157.8508, 11.4056, "off"), "D1": (3.7770, None, "validated")},
+                  "desc": {"E1b": 7.1232, "E1i": 12.0202, "E2b": 6.9588, "E3b": 36.5898},
+                  "margin": 7.1024},
+}
+# Each section-7 row's R and unit, as the README's header and section Q.1's R column print them.
+RUN2_R = {"L1": (9.9, "K"), "E4b": (16.6, "%"), "E8": (16.6, "%"), "D1": (16.6, "%")}
+# The README's section-7 table: the cell, counted after the engine's own, that holds each row.
+RUN2_COL = {"L1": 2, "E4b": 3, "E8": 4, "D1": 5}
+# The descriptive table (README; section Q.6), in its column order, with each cell's unit.
+RUN2_DESC = (("E1b", "%"), ("E1i", "%"), ("E2b", "%"), ("E3b", "K"), ("C3a", "%"), ("C3c", "%"))
+# The documents print these rounded, and the comparison is then exact but for float noise.
+RUN2_DTOL = 1e-9
+# A number inside a prose pattern that is not the one the pattern compares (the triad's other two, the range's
+# other end): no capture group, so scan_documents reads only NUM's.
+RUN2_PLAIN = r"[-−+]?\d[\d.]*"
+# L1's kappa as prose writes it beside the tables (the fix round of commit G, its review's M2): the lowest and the
+# highest of the three engines' values, as "κ 1.7168 and 3.7328", "κ 1.7168 and at 3.7328" and "κ range,
+# 1.7168-3.7328" write them.
+RUN2_KAPPA_RANGE = {"lowest": (min, 1.7168), "highest": (max, 3.7328)}
+
+
+def _dig(obj, *keys):
+    """obj[k0][k1]..., or None where a key is missing or a level is not a mapping."""
+    for k in keys:
+        if not isinstance(obj, dict):
+            return None
+        obj = obj.get(k)
+    return obj
+
+
+def _run2_figure(label, value, expect, patterns, ndigits):
+    """figure() on a record's number rounded to the decimals the documents print. A value the record does not
+    hold fails as a check of its own, never as a TypeError inside chk."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        chk(f"{label}: the record holds a number", value, "a number")
+        return
+    figure(label, round(float(value), ndigits), expect, RUN2_DTOL, "", patterns=patterns, files=ALL,
+           dtol=RUN2_DTOL)
+
+
+def _run2_cells(name, skip):
+    """A Markdown table row opening with the engine's name, then `skip` whole cells."""
+    return r"^\|\s*" + name + r"\s*\|(?:[^|\n]*\|){" + str(skip) + r"}"
+
+
+def _run2_q1(name, row, skip):
+    """Section Q.1's table, | engine | row | kind | R | E | u_val | label | kappa |: the number in the cell
+    `skip` cells after the kind (1: E, 4: kappa)."""
+    return (r"^\|\s*" + name + r"\s*\|\s*" + row + r"\s*\|\s*(?:d|level)\s*\|(?:[^|\n]*\|){" + str(skip)
+            + r"}\s*" + NUM + r"\s*\|")
+
+
+def _run2_desc_pattern(name, row):
+    """The descriptive table: a row opening with the engine's name whose first four cells are shaped as E1b,
+    E1i, E2b and E3b are ("6.3546 %", "31.0571 K"), the number of `row`'s cell captured. The shape keeps section
+    Q.1's rows out: their R cells ("1.9 %", "10.0 K") read like a descriptive cell."""
+    idx = [r for r, _u in RUN2_DESC].index(row)
+    out = r"^\|\s*" + name + r"\s*\|"
+    for i, (_r, unit) in enumerate(RUN2_DESC[:max(4, idx + 1)]):
+        num = NUM if i == idx else r"[-−+]?\d[\d.]*"
+        out += r"\s*" + num + r"\s*" + unit + (r"\s*\((?:C3a|C3c|C4)\)" if i >= 4 else "") + r"\s*\|"
+    return out
+
+
+def _run2_kappa_triad(pos):
+    """L1's kappa on the three EPA engines as prose writes them, "κ 1.7168, 1.8714 and 3.7328" (row 147,
+    thesis/LIMITATIONS.md), in thresholds.common.EPA_ENGINES' order: the number at position `pos` (0, 1, 2)
+    captured. The comma after the first number keeps out the two-number range, "κ 1.7168 and 3.7328"."""
+    n = [NUM if i == pos else RUN2_PLAIN for i in range(3)]
+    return r"κ\s*" + n[0] + r",\s*" + n[1] + r",?\s+and\s+" + n[2]
+
+
+def _run2_kappa_range(end):
+    """L1's kappa range as prose writes it, its `end` ("lowest" or "highest") captured: "κ 1.7168 and 3.7328"
+    (ORDER step 19a; INTERFACES 17.13, which wraps it over two lines, read through scan_documents' joined
+    window), "κ 1.7168 and at 3.7328" (row 147) and "κ range, 1.7168-3.7328" (thesis/LIMITATIONS.md). The pair
+    form needs a space before "and", so the triad's "κ 1.7168, 1.8714 and" stays out of it."""
+    lo, hi = (NUM, RUN2_PLAIN) if end == "lowest" else (RUN2_PLAIN, NUM)
+    return [r"κ\s*" + lo + r"\s+and\s+(?:at\s+)?" + hi, r"κ range,\s*" + lo + r"\s*[-–−]\s*" + hi]
+
+
+def _run2_load(here, rel):
+    """A Run 2 record as plain JSON, or None (and a failed check) when the file is absent."""
+    from thresholds import common
+    path = os.path.join(here, *rel.split("/"))
+    if not os.path.isfile(path):
+        chk(f"{rel} exists (Run 2's record)", False, True)
+        return None
+    return common.load_json(path)
+
+
+def check_run2(here):
+    """Run 2's figures, recomputed from its committed records (ORDER step 15, commit G).
+
+    WHAT IS READ. results/EPA_VALIDATION/summary.json, pinned by its sha_text; each engine's governing rows
+    file as summary.json names it (governed_by: the Mazda's defect re-run, rows_rerun1.json; the Honda's and
+    the Ford's rows.json), each first checked to be the file summary.json was written from (its sha_text
+    against summary.json's `inputs`); the Mazda's e6_rerun1.json and c3_rerun1.json, and the Honda's
+    c4_accord.json. Plain JSON through thresholds.common, as the README's own command reads summary.json: no
+    EPA table, no held-out row, no validate_epa code, and nothing is written.
+
+    WHAT IS CHECKED, off one number each, three ways as everywhere in this file (figure()):
+      - the section-7 table: per engine L1's, E4b's, E8's and D1's E (the rows file's `rows`), their kappa
+        (summary.json's `kappa`, the reported reading; D1's is not printed in the README and is not scanned)
+        and each row's R; L1's kappa also where prose writes it (the fix round): the three engines' triad
+        ("κ 1.7168, 1.8714 and 3.7328", row 147 and thesis/LIMITATIONS.md) as each engine's own figure, and
+        the lowest and the highest of the three as the range ("κ 1.7168 and 3.7328", ORDER step 19a and
+        INTERFACES 17.13; "κ 1.7168 and at 3.7328", row 147; "κ range, 1.7168-3.7328", the thesis);
+      - the descriptive table: E1b, E1i, E2b and E3b (the rows file), and C3a and C3c (the Mazda's C3, the
+        Honda's C4 on the Accord), and the Honda's C4 on the Accord's fired segments (c4_accord.json's C3b
+        and C3d, fuel and air);
+      - the defect re-run's cap: the label paths it changed in rows_rerun1.json and e6_rerun1.json
+        (defect_rerun.capped), and C3's tests, those with an empty modal fuel cell and direct2_compared_n;
+      - each engine's C5 re-check margin (summary.json's c5_recheck_margin), to the four decimals the decision
+        sheet prints, and the Ford's again to the three R4's reading quotes ("on the Ford at 7.102 %");
+      - as values only, since a document writes them in words: each engine's governing file, its drop, the
+        rows that drop it and its 850 C label; its E1a label (the README's "E1a reads off on all three");
+        each row's reported label; the cap's "none" in c3_rerun1.json; and that the Mazda's D1 read validated
+        before the cap.
+    Each document pattern reads the README's tables and section Q's (Q.1 and Q.6), so a figure is compared
+    wherever either form appears in a tracked document. Last, one check that no pattern above matched nothing:
+    report_documents prints DOC_UNMATCHED as a note and counts it nowhere, so a Run 2 pattern that rotted would
+    otherwise pass green (the fix round, its review's smaller point (a)).
+
+    NOT REGISTERED, each from another record or none: the 3,423 comparisons (section Q's two scratch scripts;
+    no record holds the count); R4's counts (58 of 75 slots, 129 redraws, 22 at the cap: redraws.json, printed
+    by results/B58H_DESIGN/r4_counts.txt); row 102's spreads (roads.json's report.grids); row 147's design
+    figures (results/B58H_DESIGN/power_b58.txt), the companion's P3 = κ·b ("1.55-3.38 points", b = 0.905)
+    among them; and section Q.1's rows and u_val that the README does not state."""
+    from thresholds import common
+
+    print("\nRUN 2  (results/README.md's Run 2 section and VALIDATION_DECISIONS section Q, from "
+          "results/EPA_VALIDATION/)")
+    spath = os.path.join(here, *f"{RUN2_DIR}/summary.json".split("/"))
+    if not os.path.isfile(spath):
+        chk(f"{RUN2_DIR}/summary.json exists (Run 2's record)", False, True)
+        return
+    chk("summary.json is section Q's record (its sha_text's first 8 hex digits)", common.sha_text(spath)[:8],
+        RUN2_SUMMARY_SHA8)
+    summ = common.load_json(spath)
+    entries = summ.get("engines") or {}
+    inputs = summ.get("inputs") or {}
+    chk("summary.json: the three EPA engines, in order", list(entries), list(common.EPA_ENGINES))
+    records = {}
+    for e in common.EPA_ENGINES:
+        want, got = RUN2_EXPECT[e], entries.get(e) or {}
+        chk(f"Run 2: {e}'s governing rows file", got.get("governed_by"), want["governed_by"])
+        chk(f"Run 2: {e} is dropped by section 7", got.get("drop") is True, True)
+        chk(f"Run 2: the rows that drop {e}", got.get("drop_rows"), want["drop_rows"])
+        chk(f"Run 2: {e}'s 850 C level label", got.get("level_850c_label"), "off")
+        chk(f"Run 2: {e}'s E1a label (the README's 'E1a reads off on all three')", _dig(got, "labels", "E1a"),
+            "off")
+        rel = f"{RUN2_DIR}/{e}/{got.get('governed_by')}"
+        rec = _run2_load(here, rel)
+        if rec is None:
+            continue
+        chk(f"Run 2: {rel} is the file summary.json was written from (sha_text, its inputs)",
+            common.sha_text(os.path.join(here, *rel.split("/"))) == inputs.get(rel), True)
+        records[e] = rec
+
+    # the section-7 table: R, then E, kappa and label per engine
+    for row, (want_r, unit) in RUN2_R.items():
+        seen = [_dig(records.get(e), "rows", row, "R") for e in common.EPA_ENGINES]
+        chk(f"Run 2: {row}'s R is one value on every engine", len(set(map(repr, seen))) == 1, True)
+        head = (r"\bL1, housing temperature \(K; R\s+" + NUM + r"\)" if row == "L1"
+                else r"\|\s*" + row + r" \(%; R\s+" + NUM + r"\)")
+        q1 = r"^\|\s*" + RUN2_ANY + r"\s*\|\s*" + row + r"\s*\|\s*d\s*\|\s*" + NUM + r"\s*" + unit + r"\s*\|"
+        _run2_figure(f"Run 2: {row}'s R ({unit})", seen[0], want_r, [head, q1], 4)
+    for e in common.EPA_ENGINES:
+        want, name = RUN2_EXPECT[e], RUN2_NAME[e]
+        for row, (want_e, want_k, want_label) in want["rows"].items():
+            cells = _run2_cells(name, RUN2_COL[row] - 1)
+            _run2_figure(f"Run 2: {e} {row}, E ({want['governed_by']})", _dig(records.get(e), "rows", row, "E"),
+                         want_e, [cells + r"\s*" + NUM + r",\s", _run2_q1(name, row, 1)], 4)
+            chk(f"Run 2: {e} {row}, the reported label (summary.json)", _dig(entries, e, "labels", row),
+                want_label)
+            if want_k is not None:
+                pats = [cells + r"[^|\n]*?κ\s*" + NUM + r"\s*\|", _run2_q1(name, row, 4)]
+                if row == "L1":                         # and in prose, the engine's place in the triad
+                    pats.append(_run2_kappa_triad(list(common.EPA_ENGINES).index(e)))
+                _run2_figure(f"Run 2: {e} {row}, kappa (summary.json)", _dig(entries, e, "kappa", row), want_k,
+                             pats, 4)
+    # L1's kappa range in prose: the lowest and the highest of the three engines' summary.json kappa.L1
+    ks = [_dig(entries, e, "kappa", "L1") for e in common.EPA_ENGINES]
+    numeric = all(isinstance(k, (int, float)) and not isinstance(k, bool) for k in ks)
+    for end, (pick, want_end) in RUN2_KAPPA_RANGE.items():
+        _run2_figure(f"Run 2: L1's kappa, the {end} of the three engines (summary.json)",
+                     pick(ks) if numeric else None, want_end, _run2_kappa_range(end), 4)
+    capped = _dig(records.get("mazda_25t"), "defect_rerun", "capped")
+    chk("Run 2: the Mazda's D1 read validated before the cap (rows_rerun1.json, defect_rerun.capped)",
+        isinstance(capped, list) and "/reported/D1/label" in capped, True)
+
+    # the descriptive table, and the Honda's C4 on the Accord's fired segments
+    d3 = {e: _run2_load(here, f"{RUN2_DIR}/{e}/{f}") for e, f in RUN2_D3.items()}
+    for e in common.EPA_ENGINES:
+        for row, want_v in RUN2_EXPECT[e]["desc"].items():
+            from_d3 = row in ("C3a", "C3c")
+            src = d3.get(e) if from_d3 else records.get(e)
+            what = RUN2_D3.get(e) if from_d3 else RUN2_EXPECT[e]["governed_by"]
+            _run2_figure(f"Run 2: {e} {row}, descriptive ({what})", _dig(src, "rows", row, "E"), want_v,
+                         [_run2_desc_pattern(RUN2_NAME[e], row)], 4)
+    fired = r"C4 on the Accord['’]s fired segments\W"
+    _run2_figure("Run 2: the Honda's C4, fuel on the Accord's fired segments (c4_accord.json C3b)",
+                 _dig(d3.get("honda_l15b7"), "rows", "C3b", "E"), 12.3278,
+                 [fired + r"[^.\n]{0,12}?\bfuel\s+" + NUM + r"\s*%"], 4)
+    _run2_figure("Run 2: the Honda's C4, air on the Accord's fired segments (c4_accord.json C3d)",
+                 _dig(d3.get("honda_l15b7"), "rows", "C3d", "E"), 13.4586,
+                 [fired + r"[^\n]{0,40}?\bair\s+" + NUM + r"\s*%"], 4)
+
+    # the Mazda's defect re-run: the cap's counts, and C3's tests
+    e6 = _run2_load(here, f"{RUN2_DIR}/mazda_25t/e6_rerun1.json")
+    n_cap = {}
+    for f, rec in (("rows_rerun1.json", records.get("mazda_25t")), ("e6_rerun1.json", e6),
+                   ("c3_rerun1.json", d3.get("mazda_25t"))):
+        c = _dig(rec, "defect_rerun", "capped")
+        n_cap[f] = len(c) if isinstance(c, list) else None
+    _run2_figure("Run 2: label paths the cap changed in the Mazda's rows_rerun1.json", n_cap["rows_rerun1.json"],
+                 7, [r"\bcap changed\s+" + NUM + r"\s+label\s+paths\s+in\s+`?rows_rerun1\.json"], 0)
+    _run2_figure("Run 2: label paths the cap changed in the Mazda's e6_rerun1.json", n_cap["e6_rerun1.json"],
+                 5, [r"\b" + NUM + r"\s+in\s+`?e6_rerun1\.json"], 0)
+    chk("Run 2: the cap changed no label path in the Mazda's c3_rerun1.json (the README's 'none')",
+        n_cap["c3_rerun1.json"] == 0, True)
+    c3 = d3.get("mazda_25t")
+    empty = _dig(c3, "left_out", "direct2_check_no_modal_fuel")
+    tail = r"\s+tests\s+(?:had|with)\s+an\s+empty\s+modal\s+fuel"
+    _run2_figure("Run 2: C3's tests (the Mazda's c3_rerun1.json, tests_in_chain)", _dig(c3, "tests_in_chain"), 43,
+                 [r"\bof\s+C3['’]s\s+" + NUM + tail], 0)
+    _run2_figure("Run 2: C3's tests with an empty modal fuel cell (c3_rerun1.json, left_out)",
+                 len(empty) if isinstance(empty, list) else None, 7,
+                 [r"\b" + NUM + r"\s+of\s+C3['’]s\s+\d+" + tail], 0)
+    _run2_figure("Run 2: direct2_compared_n (the Mazda's c3_rerun1.json, channel_checks)",
+                 _dig(c3, "channel_checks", "direct2_compared_n"), 36,
+                 [r"Direct2 check alone[^\n]{0,8}?`?direct2_compared_n`?\s+" + NUM], 0)
+
+    # each engine's C5 re-check margin (summary.json), which R4's version-5 reading gated with
+    margin4 = {"mazda_25t": r"\(Mazda\s+" + NUM + r"\s*%,\s*Honda\s+\d",
+               "honda_l15b7": r"\(Mazda\s+\d[\d.]*\s*%,\s*Honda\s+" + NUM + r"\s*%,\s*Ford\s+\d",
+               "ford_27tt": r"\(Mazda\s+\d[\d.]*\s*%,\s*Honda\s+\d[\d.]*\s*%,\s*Ford\s+" + NUM + r"\s*%"}
+    for e in common.EPA_ENGINES:
+        chk(f"Run 2: {e}'s C5 re-check margin is in percent", _dig(entries, e, "c5_recheck_margin", "margin_unit"),
+            "percent")
+        _run2_figure(f"Run 2: {e}'s C5 re-check margin (summary.json, %)",
+                     _dig(entries, e, "c5_recheck_margin", "margin"), RUN2_EXPECT[e]["margin"], [margin4[e]], 4)
+    _run2_figure("Run 2: the Ford's C5 re-check margin, to the three decimals R4's reading quotes",
+                 _dig(entries, "ford_27tt", "c5_recheck_margin", "margin"), 7.102,
+                 [r"\bon the Ford at\s+" + NUM + r"\s*%"], 3)
+
+    # Every Run 2 pattern above matched a line: DOC_UNMATCHED is otherwise a printed note that fails nothing,
+    # and a pattern that matches nothing compares nothing (mistake 12). Its entries are the figure's label, or
+    # the label and "[pattern i of n matched nothing]".
+    chk("Run 2: no pattern above matched nothing (DOC_UNMATCHED)",
+        [lab for lab in DOC_UNMATCHED if lab.startswith("Run 2:")], [])
+
+
 def check_retired(here):
     """Fail if any document still quotes a figure this project has retired.
 
@@ -2272,6 +2565,8 @@ def main():
     # watching it pass with the drift injected.
     check_simulation(here)
     check_scenario(here)
+    # Run 2's figures (commit G), before report_documents for the same reason as the two above
+    check_run2(here)
     report_documents()
     check_retired(here)
     check_pinned_history(here)

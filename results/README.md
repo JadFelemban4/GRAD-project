@@ -415,6 +415,9 @@ question an examiner will ask.
 | `PHASE_D_RESULT.txt` | the output of `analyse_phase_d.py`, captured |
 | `curve_*.csv` | learning curves |
 | `void/` | result files that are **not** results. Read its README before quoting anything from it |
+| `EPA_CALIBRATION/<engine>/` | Run 1's records of each EPA engine (build step 2; frozen at `25437ba`): its freeze record and fit records, the in-sample stage, E6's refit variants, T0 and the poison proof, the completion, and the check records. Written by `calibrate_epa.py`, never edited |
+| `EPA_CALIBRATION/bounds_active_corrected.json` | decision 92's corrected bound lists beside the frozen ones, every fitted parameter's distance to its bound (rows 109 and 141), written once by `bounds_active_corrected.py write` in commit G; `bounds_active_corrected.py check` recomputes it. The frozen records keep their own lists |
+| `EPA_VALIDATION/` | Run 2's records (its section above): each engine's `ARMED.json`, rows, E6 and D3 records and run record, the invocation logs, and `summary.json`. Written by `validate_epa.py`, never edited; `verify_docs.py` recomputes the Run 2 section's figures from them |
 
 ## How it was produced
 

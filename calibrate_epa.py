@@ -1000,7 +1000,7 @@ SEEN_BEFORE_THE_FIT = (
     "(numpy.random.default_rng([0x7D, k]), k 1-400 through S2 and 1-7 through the whole form-A fit; never T0 seeds); "
     "the three engines' t0.json; no held-out row, no epa_engine.json, nothing under logs/",
     "diagnostic C and its checker, 29 October 2026 (read-only, the Mazda's E6 probes): the frozen Mazda's records "
-    "(complete.json, freeze.json, fit_A+B+C+D.json, e6/*.json, data/engines/mazda_25t/derived_params.json), the frozen "
+    "(complete.json, freeze.json, fit_A+B+C+D.json, e6/*.json, the Mazda's derived file), the frozen "
     "plant's locked climbs at its E6 probe sizes and its single cycles at the climb point and at epa_fit.synthetic_grid "
     "(model outputs); no loader call, no EPA table, no held-out row",
     "the implementer of defect D-2 and decisions 86-89, 29 October 2026: the three diagnostics' reports and outputs and "

@@ -105,6 +105,22 @@ DRIFTS = [
      "train.py", '"fixed": 0.2,', '"fixed": 0.5,', "not in the audit table"),
     (18, "the training episode: train.DURATION_S 900.0 -> 600.0",
      "train.py", "DURATION_S = 900.0", "DURATION_S = 600.0", "not in the audit table"),
+    # Rows 19-22, 7 November 2026 (commit G, ORDER step 15): Run 2's figures, which D146 reported in
+    # results/README.md's Run 2 section, are recomputed from results/EPA_VALIDATION/ by verify_docs.check_run2
+    # (the science review's M1 of rows 146-147). Four rows: a figure in the README's section-7 table, one in the
+    # decision sheet's section Q.1, one in the descriptive table, and the record itself edited (mistake 12: a
+    # new check shown able to fail). Not every check it adds has a row: the prose kappa triad, its range, E1a's
+    # label and the no-pattern-unmatched check have none (the count stays 22); G's message names their mutations.
+    (19, "results/README.md: the Mazda's L1 E 15.2977 -> 15.2988 (Run 2's section-7 table)",
+     "results/README.md", "| 15.2977, **off**, κ 1.7168 |", "| 15.2988, **off**, κ 1.7168 |",
+     "not in the audit table"),
+    (20, "results/VALIDATION_DECISIONS.md: the Honda's E8 kappa 11.4575 -> 11.4757 (section Q.1)",
+     "results/VALIDATION_DECISIONS.md", "| 15.6939 | **off** | 11.4575 |", "| 15.6939 | **off** | 11.4757 |",
+     "not in the audit table"),
+    (21, "results/README.md: the Ford's E3b 36.5898 K -> 36.5998 K (Run 2's descriptive table)",
+     "results/README.md", "| 36.5898 K | — | — |", "| 36.5998 K | — | — |", "not in the audit table"),
+    (22, 'results/EPA_VALIDATION/summary.json: every "drop": true -> false (Run 2\'s record itself)',
+     "results/EPA_VALIDATION/summary.json", '"drop": true', '"drop": false', "not in the audit table"),
 ]
 
 

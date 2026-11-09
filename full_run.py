@@ -136,7 +136,7 @@ STEPS = [
      "the check total, and the known-stale ledger, which is the size of fix 3"),
     ("drift_test.py — the guard's own acceptance test",
      ["drift_test.py"], True,
-     "N of 18 drifts CAUGHT"),
+     "N of 22 drifts CAUGHT"),
     # Added 22 September 2026 with Phase D2. Each prints figures that
     # results/PREREGISTRATION_D2.md quotes, so each belongs in the transcript
     # the documents are swept from.

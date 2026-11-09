@@ -1021,3 +1021,33 @@ passes the REAL record, so Q is unaffected.
 
 **What waits:** G, V, Q's commit, Ta, then B1 on Jad's PC. Q's runs start in a clone of the pushed Qa beside G's
 gates.
+
+## 19. 8 November: G, the bounds record and Run 2's figures (ORDER step 15)
+
+**What G builds** (ORDER step 15; row 141, row 109; INTERFACES 17.7 and M1): `bounds_active_corrected.py` writes
+the record of which bounds each fit reached, by every parameter's distance from its bound at the fit's own
+tolerance (`results/EPA_CALIBRATION/bounds_active_corrected.json`, written once on G's own tree by the gate, never
+by hand), with its test and its refusals; `epa_fit.py` gives the distances (`bounds_at`, `bound_distances`) and
+`calibrate_epa.py` and `validate_epa.py` read them; the label that `test_epa_rows`' known failure (N1) tested is
+corrected; `verify_docs.py` registers Run 2's figures (`check_run2`: each value and figure read from Run 2's
+records, the L1 kappa triad and its range and E1a's label among them, wherever they are written, the thesis
+included); `drift_test.py` gains rows 19-22 so that the new checks are shown to fail; `README.md`,
+`results/README.md`, `REFERENCES.md` and `ORDER_TO_TRAINING.md`'s status sentence follow. G was drafted on an
+earlier tree, ported to P's, reviewed adversarially twice with its fixes re-read, and applied on Qa as a diff;
+its gates ran in a fresh clone of the pushed Qa, and their printed results are in G's commit message.
+
+**Deviations, accepted under Ghassan's standing instruction and recorded here:** `drift_test.py` is edited
+(interface sheet 17.7 says G runs it; without its new rows nothing shows that the new checks can fail, mistake
+12), and `full_run.py`'s expected drift count follows it (sheet section 2 gives full_run.py to no step;
+mistake 11). Four older tests of `test_bounds_active_corrected.py` match a fragment of a refusal rather than the
+whole list; they are disclosed, not changed. `tit_cap_ecu.record_problems` reads the Ford's cap record as stale
+(its hashed code moved after X and moves again with G); nothing reads it live, and PR-B discloses it.
+
+**Disclosed from the drafting.** G's drafting agent, reading files with shell commands beyond its brief, printed
+lines 7-31 of `results/EPA_ROADS/attempt_1_printed.txt` (no roads_seed line among them), listed the file name of
+one EPA table without opening it, and printed one 16-digit value of `c3_rerun1.json`; its reviewer printed the
+draft's message, with its long separation floats, and one commit sha of `c3_rerun1.json`. None of these was
+copied into any file. No file of `logs/epa/` was opened or read.
+
+**What waits:** V (its X1 checkers dominate its gate), Q's commit, Ta, then B1 on Jad's PC. Q's four runs go
+beside V's gates.
