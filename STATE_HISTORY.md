@@ -5427,3 +5427,13 @@ From "Next actions", item 11, as committed at `a597017`:
    `docs/literature/READING_METHOD.md` (11 November), and the tracker built on it is in the team's Notion, a page per paper,
    notes in its columns (the workspace is at Notion's free block limit; the file's last section). Next: Jad splits the 40
    among the five; each source is read in full by its named reader before it is cited.
+
+# Part AS — lines rotated out of CHECKPOINT.md, 11 November 2026 (Jad's close: the reading method, the tracker of 50 papers, Jad's ten)
+
+From "Next actions", item 11, as committed at `9efa19f`:
+
+11. The literature: the tracker in the team's Notion holds 50 papers, `docs/literature/TOP40.md`'s 40 and 10 added on
+   11 November, 42 with a file (`docs/literature/READING_METHOD.md`, last section, names the 8 without and why). That file
+   is Dr. Hammam's method; notes go in the columns (the workspace is at Notion's free block limit). Paid, still missing:
+   D01, A03 (the zip has the thesis A06) and C36. Next: Jad splits the 50 among the five; each source is read in full by
+   its named reader before it is cited.

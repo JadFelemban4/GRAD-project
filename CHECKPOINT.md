@@ -124,10 +124,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    this laptop (`check_training_device.py --identity`, then `--compare`; recorded, not required,
    decision 32) is Part B's B2, at ORDER step 18.
 11. The literature: the tracker in the team's Notion holds 50 papers, `docs/literature/TOP40.md`'s 40 and 10 added on
-   11 November, 42 with a file (`docs/literature/READING_METHOD.md`, last section, names the 8 without and why). That file
-   is Dr. Hammam's method; notes go in the columns (the workspace is at Notion's free block limit). Paid, still missing:
-   D01, A03 (the zip has the thesis A06) and C36. Next: Jad splits the 50 among the five; each source is read in full by
-   its named reader before it is cited.
+   11 November, 42 with a file (`docs/literature/READING_METHOD.md`, Dr. Hammam's method; its last section names the 8
+   without). Notes go in the columns (Notion's free block limit). Jad reads B37, B40, B19, B18, B06, B31, A25, B49, C20
+   and C18 next (`NEXT_SESSION_2026-11-11_reading.md`); the other 40 wait for readers (Jad's split). Each source is read
+   in full by its named reader before it is cited. Paid, still missing: D01, A03 (the zip has the thesis A06) and C36.
 
 ## Files outside git (where · last backup · manifest)
 

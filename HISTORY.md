@@ -69,6 +69,8 @@ the title is the file's own first line.
 | 2026-11-11 | `conflict_2026-11-11.md` | Conflicts of the merge of 11 November 2026 |
 | 2026-11-11 | `SESSION_REPORT_2026-11-11_literature-and-merge.md` | Session report — 10 to 11 November 2026: the top 40 sources, the paid sources, every branch merged |
 | 2026-11-11 | `NEXT_SESSION_2026-11-11.md` | Next session — prompt (written 11 November 2026) |
+| 2026-11-11 | `SESSION_REPORT_2026-11-11_reading-method-and-tracker.md` | Session report — 11 November 2026: Dr. Hammam's reading method, and the paper tracker in Notion |
+| 2026-11-11 | `NEXT_SESSION_2026-11-11_reading.md` | Next session — reading prompt (written 11 November 2026) |
 | ? | `conflict.md` | conflict.md — Ghassan's branch merged into Jad's: every conflict, and a recommendation for each |
 | ? | `conflict_ar.md` | ملف التعارض: دمج برانش غسان مع برانش جاد |
 
