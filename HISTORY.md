@@ -66,6 +66,9 @@ the title is the file's own first line.
 | 2026-10-19 | `SESSION_REPORT_2026-10-19_driveC-and-evaluation.md` | Session report — 19 October 2026: drive C's first attempt, and the proposal's evaluation |
 | 2026-10-19 | `NEXT_SESSION_2026-10-19.md` | Prompt for the next session — written 19 October 2026, after drive C's first attempt and the proposal's evaluation |
 | 2026-10-20 | `SESSION_REPORT_2026-10-20_four-engines.md` | Session report — 20 October 2026: four engines, their data, and how much to train (branch `GRA-test`) |
+| 2026-11-11 | `conflict_2026-11-11.md` | Conflicts of the merge of 11 November 2026 |
+| 2026-11-11 | `SESSION_REPORT_2026-11-11_literature-and-merge.md` | Session report — 10 to 11 November 2026: the top 40 sources, the paid sources, every branch merged |
+| 2026-11-11 | `NEXT_SESSION_2026-11-11.md` | Next session — prompt (written 11 November 2026) |
 | ? | `conflict.md` | conflict.md — Ghassan's branch merged into Jad's: every conflict, and a recommendation for each |
 | ? | `conflict_ar.md` | ملف التعارض: دمج برانش غسان مع برانش جاد |
 

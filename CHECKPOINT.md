@@ -25,7 +25,7 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   23 pairs, sign p 0.0173 (`python analyse_x1.py` -> `results/X1_RESULT.txt`).
 - The plant carries the four steps agreed on 30 September (`75ca65f`), and the
   premise reads baseline 848.1 at 883 °C (`python check_premise.py`).
-- `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
+- `python verify_docs.py`: 170 of 170 checks pass on the merged tree (11 November), the SIZE check among them.
 - `GRA-test` (21 October): no default engine anywhere
   (`python test_engine_threading.py`), and the B58 through `engines.get("b58")`
   is cf43fbb's plant to the bit at every level L1–L8, after the review's fixes
@@ -57,8 +57,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - The results tab names the plant of Phase D, D2 and C4: made on another plant,
   `sep17-before-merge`'s, each file read by its own fingerprint schema
   (`ca2cd73`, `2fd9aed`; `SESSION_REPORT_2026-10-15_results-schema.md`).
-- The learning lab on Jad's branch (below): its suites fail only as on `main`
-  (Python 4 of 35, Node 1 of 147; `SESSION_REPORT_2026-10-30_learning-lab-figures.md`).
+- The learning lab on the merged tree (11 November): Python 3 failing of 35 as on `GRA-test`, and 1 error, the
+  housing-lag exporter (item 4); Node 146 of 147, the one as on `main` (`conflict_2026-11-11.md`, last section).
 - App suites (15 October, Python 3.12.10): `python -m app.test_replay` 49 of 49,
   node 306 of 306, `app.test_results` 123 of 124 (the one needs `pwsh`);
   `app.test_agents` 22 failing, 19 of them the agents page refusing the old
@@ -70,17 +70,15 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   `results/DRIVE_C_RULE.md`) and its analysis script committed
   (`drive_c_analysis.py`, `python -m unittest test_drive_c_analysis` 105 of 105;
   `SESSION_REPORT_2026-10-19_driveC-rule.md`). The repeat drive is next.
-- Jad · the drive C check and the proposal's evaluation: both accept, four
-  corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
 - Ghassan · `GRA-test` · build step 2 (decision 24): commits A, C, D and P made (Run 1 frozen, 30 October;
   `SESSION_REPORT_2026-10-30_run1.md`). Decisions 1-147 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G,
   no knock term; J-L; M: he works alone, row 133; N: W; O: rows 135-143; P: rows 144-145; Q: Run 2's labels, all
   three EPA engines dropped; R: rows 146-147, the B58 study, under row 133 (2) as his answer Q1 extends it; n, the reward and the two statements his own answers Q3, Q4, Q2).
   Roads: R0 `bb91848`, R1 `fb20ab2`, R4 `34cca5b` (the redraws), RV `a443607` (the re-verifier, 7 November; its full check EQUAL on P's tree, `results/EPA_ROADS/reverify.json`, which P carries); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
-
-- Jad · `JMF-2340550-anatomy-housing` (on `cf43fbb`) · the lab's first figure, its stage, the
-  project map; Ghassan's message of 21 October waits for Jad (the report, section 1).
+- Jad · `JMF-2340550-merge-2026-11-11`, `GRAD-project`'s branch since 11 November (`GRA-test`, `khaled` and his
+  branches merged; `conflict_2026-11-11.md`) · the literature (item 11). Open from before: the proposal's four
+  corrections (item 2) and Ghassan's message of 21 October (`SESSION_REPORT_2026-10-30_learning-lab-figures.md`, section 1).
 
 ## Blockers
 
@@ -100,10 +98,10 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 3. The four-engine preregistration is never written: Run 2 dropped all three EPA engines (section Q). The B58
    study's is `results/PREREGISTRATION_B58H.md`, ORDER step 20 (rows 146-147); Run 2's failed validations are
    in `results/README.md` and `thesis/LIMITATIONS.md`.
-4. The learning lab's pins move to the live plant (`team/jad.md`). The agents
-   page reads each agent's own fingerprint schema and its tests stop copying
-   `runs_c4`'s `meta.json`; `test_simulation`'s asset check learns the `?v=`
-   suffix (`SESSION_REPORT_2026-10-15_results-schema.md`, section 2).
+4. The learning lab's pins move to the live plant (`team/jad.md`), the housing-lag exporter with them: it calls
+   the plant without an engine since the merge of 11 November (`conflict_2026-11-11.md`, last section). The agents
+   page reads each agent's own fingerprint schema and its tests stop copying `runs_c4`'s `meta.json`;
+   `test_simulation`'s asset check learns the `?v=` suffix (`SESSION_REPORT_2026-10-15_results-schema.md`, section 2).
 5. Plan v3 phase 3: tag `sim-v1`, write `CHANGELOG.md` and the results index.
 6. The parallel items of 30 September (Ghassan's twenty on multi-climb roads,
    the spark-capped rescoring of Jad's 48, Chapter 4 with both branches side by
@@ -125,10 +123,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    benchmarks, the merge; `docs/build_step_2/DEVICE_RUNBOOK.md` Part A). The identity check against
    this laptop (`check_training_device.py --identity`, then `--compare`; recorded, not required,
    decision 32) is Part B's B2, at ORDER step 18.
-11. The literature (`docs/literature/READING_LIST.md`, 183 sources): one person does
-   its ten-minute SDL login check and asks the librarian about interlibrary loan,
-   then buy what remains ($392.00 whatever the login shows). Each source is read
-   in full by a named team member before it is cited.
+11. The literature: `docs/literature/TOP40.md` picks 40 of `READING_LIST.md`'s 183 sources (19 for the methodology,
+   21 for the review). Ghassan supplied 9 of its 12 paid ones (`docs/literature/PAID_SOURCES_CHECK.md`); missing D01
+   ($72), A03 ($25; the zip has the thesis A06) and C36 (the textbook). Next, Jad's plan: a shared tracker, a row per
+   paper and every member's notes on it, built on Dr. Hammam's lecture on reading and classifying papers. Each source
+   is read in full by a named team member before it is cited.
 
 ## Files outside git (where · last backup · manifest)
 
@@ -139,6 +138,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   Checked 15 October: its 978 agent files are unchanged on disk, and `C:` is
   still the only disk (session report of 15 October, 2.4).
 - `GRAD-agent-backups/2026-09-23` and `2026-09-24` (`runs_c4`, sha-checked).
+- Jad's PC: the lock's environment (3.13.2, torch 2.14.0+cpu, sb3 2.9.0) is `grad-venv-lock-3.13.2` in his user
+  folder since 11 November; `tools/device_step3.sh` wants it at `$REPO/.venv` (`SESSION_REPORT_2026-11-11_literature-and-merge.md`).
 - Drive C's six CSVs and the evaluation workbook: Jad's Downloads, one copy
   (SHA-256 in `logs/DRIVE_C_CHECK_2026-10-19.md` and the evaluation file).
 

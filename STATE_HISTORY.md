@@ -5381,3 +5381,29 @@ From "Next actions", item 8, as committed at `dff4cd3`; done on the same branch 
 
 8. Jad's next session (his choice, 30 October): a quality check of the whole
    code with the `ponytail` skills, report only (`NEXT_SESSION_2026-10-30.md`).
+
+# Part AP — lines rotated out of CHECKPOINT.md, 11 November 2026 (Jad's close: the top 40 sources, the paid sources checked, every branch merged, one project folder)
+
+From "Verified current state":
+
+- `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
+- The learning lab on Jad's branch (below): its suites fail only as on `main`
+  (Python 4 of 35, Node 1 of 147; `SESSION_REPORT_2026-10-30_learning-lab-figures.md`).
+
+From "In progress":
+
+- Jad · the drive C check and the proposal's evaluation: both accept, four
+  corrections asked (`SESSION_REPORT_2026-10-19_driveC-and-evaluation.md`).
+- Jad · `JMF-2340550-anatomy-housing` (on `cf43fbb`) · the lab's first figure, its stage, the
+  project map; Ghassan's message of 21 October waits for Jad (the report, section 1).
+
+From "Next actions", items 4 and 11:
+
+4. The learning lab's pins move to the live plant (`team/jad.md`). The agents
+   page reads each agent's own fingerprint schema and its tests stop copying
+   `runs_c4`'s `meta.json`; `test_simulation`'s asset check learns the `?v=`
+   suffix (`SESSION_REPORT_2026-10-15_results-schema.md`, section 2).
+11. The literature (`docs/literature/READING_LIST.md`, 183 sources): one person does
+   its ten-minute SDL login check and asks the librarian about interlibrary loan,
+   then buy what remains ($392.00 whatever the login shows). Each source is read
+   in full by a named team member before it is cited.
