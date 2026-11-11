@@ -5417,3 +5417,13 @@ From "Next actions", item 11, as committed at `0fb89d3`:
    ($72), A03 ($25; the zip has the thesis A06) and C36 (the textbook). Next, Jad's plan: a shared tracker, a row per
    paper and every member's notes on it, built on Dr. Hammam's lecture on reading and classifying papers. Each source
    is read in full by a named team member before it is cited.
+
+# Part AR — lines rotated out of CHECKPOINT.md, 11 November 2026 (Jad's session: the tracker grows to 50 papers)
+
+From "Next actions", item 11, as committed at `a597017`:
+
+11. The literature: `docs/literature/TOP40.md` picks 40 of `READING_LIST.md`'s 183 sources; Ghassan supplied 9 of its 12
+   paid ones (`PAID_SOURCES_CHECK.md`; missing D01, A03, whose zip copy is the thesis A06, and C36). Dr. Hammam's method is
+   `docs/literature/READING_METHOD.md` (11 November), and the tracker built on it is in the team's Notion, a page per paper,
+   notes in its columns (the workspace is at Notion's free block limit; the file's last section). Next: Jad splits the 40
+   among the five; each source is read in full by its named reader before it is cited.

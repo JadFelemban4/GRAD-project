@@ -232,7 +232,7 @@ the team's GRAD Project Dashboard: one page per paper, the 40 of `TOP40.md`, all
   its title on the first page, or by eye for the scanned patents B19 and B40;
   D24 is in 2 parts, B22 is the Italian `.doc` itself. With the zip's, 28 of the
   40 pages carry a file (counted from the table, 11 November).
-- **The 12 without a file, and why.** D01 and C36 have no free copy (to buy, or a
+- **The 12 then without a file, and why.** D01 and C36 have no free copy (to buy, or a
   library copy). C62 (HAL) and C28 (AAAI) answer an automated download with a
   bot check, and C49 (Bath) and A25, C20, C18 (MDPI) with 403: they were not
   forced. Each opens from its "Free full text" link in a browser, and whoever
@@ -241,6 +241,18 @@ the team's GRAD Project Dashboard: one page per paper, the 40 of `TOP40.md`, all
   Sutton and Barto book, is 73 MB: its link, the authors' own copy, stays the
   way in. A30 is a web page and D27 a set of data packages, so their links are
   the source.
+- **Jad's six, and ten more to reach 50** (the same day). Jad added the PDFs of
+  C62, C28, C49, A25, C20 and C18 from his browser; each was downloaded back and
+  checked against its title (C18's is MDPI's version 2, compressed). Then 10
+  papers were added, for the 50 Dr. Hammam aims for (part 2, 15:04): the seven
+  free ones of `TOP40.md`'s next ten (C48, D26, C61, C31, A31, B16, A18; D28 and
+  D31 are data, B09 is to buy), D20 (the free V&V 20 text, standing in for D01),
+  and two MUST papers of the reading list on preview's value, B06 (a horizon
+  sweep) and A19 (preview for safety). Their column "Added to reach 50" is
+  ticked. 8 of the 10 have their PDF (C31 re-saved whole without its unused
+  objects, all 17 pages; B16 in 5 parts); C48 (Bath) and C61 (MDPI) answer 403
+  and wait for a browser download. Of the 50, 42 have a file (counted from the
+  table, 11 November); the 8 without: D01, C36, B02, C01, A30, D27, C48, C61.
 - **Filled by the reader:** every column of the table above, grouped on each page
   as Reading, What we learned, Our claim, Classify, The source and Thesis.
   The views: All papers, What we learned, By theme (grouped by theme, oldest
