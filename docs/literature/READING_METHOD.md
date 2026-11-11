@@ -204,3 +204,33 @@ spreadsheet; in a spreadsheet the long fields become cells too narrow to read.
 **One rule the tracker cannot replace.** A row filled from an abstract, a summary
 or an AI's reading is not a read paper (`READING_LIST.md` rule 4). The status
 "read in full" is set by the person who read it.
+
+## The tracker as built (11 November 2026)
+
+Jad chose Notion. The database "Literature Tracker · متتبع الأوراق" sits under
+the team's GRAD Project Dashboard: one page per paper, the 40 of `TOP40.md`, all
+"Not started", with no reader yet (splitting the papers is Jad's decision).
+
+- **Filled in advance** from `TOP40.md` and `READING_LIST.md`: ID, citation, link
+  and free full text, year, access route, chapter, theme (the `TOP40.md`
+  section), "Read it for", and the source type, read off the citation. The PDF
+  column follows `PAID_SOURCES_CHECK.md`: 9 in Ghassan's zip, D01, A03 and C36
+  missing (each of those three pages carries a note), the rest free online. Each
+  page's body holds "Why it is in the 40": what the list expects the source to
+  support, not yet checked against its text.
+- **Filled by the reader:** every column of the table above, grouped on each page
+  as Reading, What we learned, Our claim, Classify, The source and Thesis.
+  The views: All papers, What we learned, By theme (grouped by theme, oldest
+  first, as stage II orders a theme), Reading board (by status) and By reader.
+  The database's description repeats the reading order in English and Arabic.
+- **Notes go in the columns, never in the page body.** The workspace is on
+  Notion's free plan. When the 40 pages went in, Notion reported the workspace out
+  of free blocks, with three days of grace (to 14 November) before an upgrade is
+  needed to add content. Every paragraph and heading in a page body is a block;
+  the pages first held 12 each, about 480 in all. Jad chose to slim them rather
+  than pay or move to Google Sheets: the reading fields became columns, which are
+  stored on the page itself and, by Notion's account of what a block is, add no
+  block (not measured here); and the 9 empty template blocks per page were
+  removed, about 360 in all, leaving a heading and a paragraph per page.
+  Whether the workspace is back under the limit was not measured: Notion shows
+  no block count through the connector.

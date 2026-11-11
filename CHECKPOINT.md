@@ -123,11 +123,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    benchmarks, the merge; `docs/build_step_2/DEVICE_RUNBOOK.md` Part A). The identity check against
    this laptop (`check_training_device.py --identity`, then `--compare`; recorded, not required,
    decision 32) is Part B's B2, at ORDER step 18.
-11. The literature: `docs/literature/TOP40.md` picks 40 of `READING_LIST.md`'s 183 sources (19 for the methodology,
-   21 for the review). Ghassan supplied 9 of its 12 paid ones (`docs/literature/PAID_SOURCES_CHECK.md`); missing D01
-   ($72), A03 ($25; the zip has the thesis A06) and C36 (the textbook). Next, Jad's plan: a shared tracker, a row per
-   paper and every member's notes on it, built on Dr. Hammam's lecture on reading and classifying papers. Each source
-   is read in full by a named team member before it is cited.
+11. The literature: `docs/literature/TOP40.md` picks 40 of `READING_LIST.md`'s 183 sources; Ghassan supplied 9 of its 12
+   paid ones (`PAID_SOURCES_CHECK.md`; missing D01, A03, whose zip copy is the thesis A06, and C36). Dr. Hammam's method is
+   `docs/literature/READING_METHOD.md` (11 November), and the tracker built on it is in the team's Notion, a page per paper,
+   notes in its columns (the workspace is at Notion's free block limit; the file's last section). Next: Jad splits the 40
+   among the five; each source is read in full by its named reader before it is cited.
 
 ## Files outside git (where · last backup · manifest)
 

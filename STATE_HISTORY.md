@@ -5407,3 +5407,13 @@ From "Next actions", items 4 and 11:
    its ten-minute SDL login check and asks the librarian about interlibrary loan,
    then buy what remains ($392.00 whatever the login shows). Each source is read
    in full by a named team member before it is cited.
+
+# Part AQ — lines rotated out of CHECKPOINT.md, 11 November 2026 (Jad's session: Dr. Hammam's reading method, the tracker in Notion)
+
+From "Next actions", item 11, as committed at `0fb89d3`:
+
+11. The literature: `docs/literature/TOP40.md` picks 40 of `READING_LIST.md`'s 183 sources (19 for the methodology,
+   21 for the review). Ghassan supplied 9 of its 12 paid ones (`docs/literature/PAID_SOURCES_CHECK.md`); missing D01
+   ($72), A03 ($25; the zip has the thesis A06) and C36 (the textbook). Next, Jad's plan: a shared tracker, a row per
+   paper and every member's notes on it, built on Dr. Hammam's lecture on reading and classifying papers. Each source
+   is read in full by a named team member before it is cited.
