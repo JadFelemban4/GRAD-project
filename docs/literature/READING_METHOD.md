@@ -226,6 +226,21 @@ the team's GRAD Project Dashboard: one page per paper, the 40 of `TOP40.md`, all
   C08 in 3 parts, A06 in 4, none over 4.0 MiB. The files live in the team's
   private workspace only; `READING_LIST.md` rule 5 still holds: never in this
   repository, never shared outside the team.
+- **The free ones** (Jad's request, the same day): 18 more pages got their file,
+  each downloaded from the list's free full-text link (the patents B19 from
+  USPTO's public download, B37 and B40 from Google Patents) and checked against
+  its title on the first page, or by eye for the scanned patents B19 and B40;
+  D24 is in 2 parts, B22 is the Italian `.doc` itself. With the zip's, 28 of the
+  40 pages carry a file (counted from the table, 11 November).
+- **The 12 without a file, and why.** D01 and C36 have no free copy (to buy, or a
+  library copy). C62 (HAL) and C28 (AAAI) answer an automated download with a
+  bot check, and C49 (Bath) and A25, C20, C18 (MDPI) with 403: they were not
+  forced. Each opens from its "Free full text" link in a browser, and whoever
+  downloads one drops it into its PDF file cell (5 MiB at most; split a larger
+  one by page range). B02's server (DiVA) did not answer from this PC. C01, the
+  Sutton and Barto book, is 73 MB: its link, the authors' own copy, stays the
+  way in. A30 is a web page and D27 a set of data packages, so their links are
+  the source.
 - **Filled by the reader:** every column of the table above, grouped on each page
   as Reading, What we learned, Our claim, Classify, The source and Thesis.
   The views: All papers, What we learned, By theme (grouped by theme, oldest
