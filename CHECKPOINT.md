@@ -25,10 +25,6 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   23 pairs, sign p 0.0173 (`python analyse_x1.py` -> `results/X1_RESULT.txt`).
 - The plant carries the four steps agreed on 30 September (`75ca65f`), and the
   premise reads baseline 848.1 at 883 °C (`python check_premise.py`).
-- Ghassan's `GRA-2340394` (`c16b857`) was merged into Jad's work on 14 October
-  (`cc5468f`; every conflict, both sides, in `conflict_2026-10-14.md`). Every
-  simulation file is byte-identical to his last push, and his `check_premise`,
-  `validate` and `test_reward` print his figures on Jad's machine.
 - `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
 - `GRA-test` (21 October): no default engine anywhere
   (`python test_engine_threading.py`), and the B58 through `engines.get("b58")`
@@ -58,11 +54,11 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
 - `python check_training_device.py`: this laptop matches `requirements-lock.txt`;
   its `--identity`/`--compare` modes decide whether a second machine trains
   identical agents (decision 32). Not yet run on the training device.
-- G-CTX passed: in a fresh session every memory file together is 5.8k tokens
-  (Jad's `/context`, 14 October).
 - The results tab names the plant of Phase D, D2 and C4: made on another plant,
   `sep17-before-merge`'s, each file read by its own fingerprint schema
   (`ca2cd73`, `2fd9aed`; `SESSION_REPORT_2026-10-15_results-schema.md`).
+- The learning lab on Jad's branch (below): its suites fail only as on `main`
+  (Python 4 of 35, Node 1 of 147; `SESSION_REPORT_2026-10-30_learning-lab-figures.md`).
 - App suites (15 October, Python 3.12.10): `python -m app.test_replay` 49 of 49,
   node 306 of 306, `app.test_results` 123 of 124 (the one needs `pwsh`);
   `app.test_agents` 22 failing, 19 of them the agents page refusing the old
@@ -82,6 +78,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   three EPA engines dropped; R: rows 146-147, the B58 study, under row 133 (2) as his answer Q1 extends it; n, the reward and the two statements his own answers Q3, Q4, Q2).
   Roads: R0 `bb91848`, R1 `fb20ab2`, R4 `34cca5b` (the redraws), RV `a443607` (the re-verifier, 7 November; its full check EQUAL on P's tree, `results/EPA_ROADS/reverify.json`, which P carries); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
+
+- Jad · `JMF-2340550-anatomy-housing` (on `cf43fbb`) · the lab's first figure, its stage, the
+  project map; Ghassan's message of 21 October waits for Jad (the report, section 1).
 
 ## Blockers
 

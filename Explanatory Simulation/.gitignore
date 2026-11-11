@@ -7,3 +7,5 @@ __pycache__/
 # Local screenshots, validation logs and source snapshots move with the app.
 qa/
 tsconfig.tsbuildinfo
+# Figure pages are built by `npm run figures` (also part of `npm run build`).
+public/figures/

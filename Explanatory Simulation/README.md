@@ -14,6 +14,10 @@
 
 **السيارة وفكرة المشروع:** النموذج المكبّر نفسه مركّب داخل السيارة. الأسهم الزرقاء تتبع الهواء من الخارج عبر الفلتر والضاغط والمبرد إلى المحرك؛ البرتقالية تتبع العادم عبر التوربين إلى الخلف. صفحة الرؤية تربط معاينة الطريق بالحالة الحالية ثم أوامر ECU المطبّقة. المثال يفتح الطريق المقفل عند 170 ثانية بسياسة يدوية استباقية؛ يمكنك اختيار SAC بصورة منفصلة. الرؤية هنا بيانات مسار التجربة، وليست كاميرا. الفحص: `docs/VEHICLE_PROJECT_VALIDATION.md`؛ نجح البناء و51 اختبارًا.
 
+**الشكل التفاعلي الأول:** درس «هيكل التوربين يتأخر عن الغاز» يفتح شكلًا مرسومًا بأداة Anatomy: موقد يقوم مقام المحرك، ومجرى، وهيكل توربين، ومسجّل بقلمين يرسم حرارة الغاز وحرارة المعدن. كل رقم فيه من `plant.py` و`thermal.py`. التفاصيل: `figures/README.md`.
+
+**خريطة المشروع:** زر في الشريط العلوي يعرض كل براميتر كنقطة، وكل علاقة سهمًا من السبب إلى الأثر، ملوّنة حسب جزء المشروع، مع بحث وزر يفتح مكان البراميتر في الشيفرة.
+
 ## حدود مختبر الشرح
 
 `Explanatory Simulation` بيئة تعليمية داخل `GRAD-project` لفهم المشروع: دخول الهواء وخروج العادم → الاحتراق والعزم → التيربو → الذاكرة الحرارية → الرؤية وقرار المشرف. خارطة الشرح تفتح المشاهد الموجودة وتوضح في كل جزء ما يدخل ويخرج وصلته بهدف المشروع، مع سؤال قصير لاختبار الفهم.
@@ -30,7 +34,7 @@
 
 # Supra Lab
 
-An interactive learning environment for the **local** GRAD project: nine guided lessons, a live physics sandbox, searchable source inspector, and fourteen viva questions. All learning code lives in this folder. The parent `GRAD-project` working tree supplies physics, derived parameters, recordings and current results. Historical reports call this folder `ex`; it was renamed and moved inside the project on 7 October 2026.
+An interactive learning environment for the **local** GRAD project: ten guided lessons, a live physics sandbox, searchable source inspector, and fourteen viva questions. All learning code lives in this folder. The parent `GRAD-project` working tree supplies physics, derived parameters, recordings and current results. Historical reports call this folder `ex`; it was renamed and moved inside the project on 7 October 2026.
 
 ## Launch
 
@@ -72,6 +76,14 @@ npm run dev
 ```
 
 Vite uses port 5173 and proxies `/api` to loopback port 8765. The built frontend and API share port 8765. If an older API process is running, stop its own terminal and restart after backend changes.
+
+## Interactive figures
+
+`figures/` builds interactive figures drawn with the Anatomy kit (MIT, vendored in `figures/kit`). `npm run figures` writes them into `public/figures/`, and `npm run build` and `npm run dev` run it first. The first, *Housing lag*, opens from the lesson `housing_lag`: every number it shows comes from `plant.py` and `thermal.py` through `figures/housing-lag/params.json`. See `figures/README.md` and `docs/HOUSING_LAG_VALIDATION.md`.
+
+## Project map
+
+The **Project map** button in the top bar shows every concept as a node and every upstream/downstream link as an arrow from cause to effect, coloured by part of the project, with search and a button to each concept's line in the code. The links are the content files' own; `src/model/concept-map.mjs` adds only the grouping. See `docs/CONCEPT_MAP_VALIDATION.md`.
 
 ## Evidence and limits
 

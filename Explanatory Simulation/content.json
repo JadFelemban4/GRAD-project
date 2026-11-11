@@ -1946,6 +1946,22 @@
       ]
     },
     {
+      "id": "housing_lag",
+      "title": "The housing lags the gas",
+      "subtitle": "τ: how long the metal takes to follow",
+      "body": "Hot gas reaches the turbine housing at once; the metal takes time to heat. τ is the time it takes to cover 63 % of the way to where it settles. The project's question compares this τ with how far ahead the supervisor can see the road (H/τ). Here τ rests on an assumed heat capacity: no sensor on the car measures the housing.",
+      "experiment": "Light the burner and watch the two pens: the gas jumps, the housing follows slowly. Find the dot where τ ends, then turn the burner off and compare how long the housing takes to cool.",
+      "layer": "thermal",
+      "figure": "housing-lag",
+      "focus": "t_turb",
+      "concepts": [
+        "egt",
+        "t_turb",
+        "thermal_time_constant",
+        "h_over_tau"
+      ]
+    },
+    {
       "id": "thermal_memory",
       "title": "Three nodes remember heat",
       "subtitle": "Block, oil and turbine respond at different rates",

@@ -5358,3 +5358,26 @@ From "Next actions", item 8, as committed at `742239a`:
 
    exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Step 13 passed (no commit), RV is committed (7 November: its control EQUAL, 0 differences in 16 sections; session report, section 16), and P is committed (8 November: its full roads check EQUAL, 0 differences in 17 sections, `results/EPA_ROADS/reverify.json`; the B58 certified, its five FAIL records, defects of the kit's driver, each re-checked by a PASS record on the same S, `results/B58_IDENTITY.md`; session report, section 17). Qa is committed (8 November: engine_gate reads the REAL roads record through fingerprint.d34_roads; session report, section 18). Next: G, V, Q, Ta, B1.
    Updates paused to 30 November; the laptop stays frozen until the study's last scoring; `test_epa_rows` fails once until G.
+
+# Part AN — lines rotated out of CHECKPOINT.md, 30 October 2026 (Jad's learning-lab session: the first figure, its stage, the project map; Part O on `JMF-2340550-anatomy-housing`, renamed at the merge of 11 November 2026 because `GRA-test` had used O)
+
+Last verified: 2026-10-19 — verify_docs.py 74/74 · drift_test.py 16/16 (drive C's rule, proposed) · the app suites below as of 15 October
+
+- Ghassan's `GRA-2340394` (`c16b857`) was merged into Jad's work on 14 October
+  (`cc5468f`; every conflict, both sides, in `conflict_2026-10-14.md`). Every
+  simulation file is byte-identical to his last push, and his `check_premise`,
+  `validate` and `test_reward` print his figures on Jad's machine.
+
+- G-CTX passed: in a fresh session every memory file together is 5.8k tokens
+  (Jad's `/context`, 14 October).
+
+# Part AO — lines rotated out of CHECKPOINT.md, 11 November 2026 (the local merge `JMF-2340550-merge-2026-11-11`: Jad's side of two conflicts, `conflict_2026-11-11.md`)
+
+The header line of Jad's CHECKPOINT.md on `JMF-2340550-anatomy-housing` (`dff4cd3`), replaced by `GRA-test`'s of 8 November:
+
+Last verified: 2026-10-30 — verify_docs.py 74/74 · drift_test.py 16/16 (19 October) · the app suites below as of 15 October · the learning lab's on Jad's branch as of 30 October
+
+From "Next actions", item 8, as committed at `dff4cd3`; done on the same branch by `f199312` (`AUDIT_PONYTAIL_2026-10-30.md`):
+
+8. Jad's next session (his choice, 30 October): a quality check of the whole
+   code with the `ponytail` skills, report only (`NEXT_SESSION_2026-10-30.md`).

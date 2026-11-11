@@ -9,3 +9,6 @@
 .ecu-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}.ecu-flow>div{flex:1;min-width:130px;background:var(--paper,#f5f8f8);padding:12px;border:1px solid #dce4e6;border-radius:8px}.ecu-flow small,.ecu-flow strong{display:block;margin-bottom:5px}.ecu-flow strong{font-size:12px;font-family:"IBM Plex Mono",monospace}
 .reading-context { font-size: .82rem; color: var(--muted); line-height: 1.65; margin: 12px 0 6px; }
 .reading-context bdi { color: var(--ink); }
+.figure-frame{display:block;width:100%;border:0;background:transparent}
+.scene-figure{padding:10px 12px 4px}
+.map-open{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}.map-open.active,.map-open:hover{border-color:var(--accent);color:var(--accent)}

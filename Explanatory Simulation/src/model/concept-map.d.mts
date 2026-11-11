@@ -1,0 +1,12 @@
+export type MapGroup = { id: string; ar: string; en: string };
+export type MapNode = { id: string; name: string; group: string; degree: number; evidence: string };
+export type MapEdge = { from: string; to: string };
+export type MapGraph = { nodes: MapNode[]; edges: MapEdge[] };
+export const GROUPS: MapGroup[];
+export const GROUP_OF: Record<string, string>;
+export function buildGraph(concepts: { id: string; name: string; upstream?: string[]; downstream?: string[]; evidence?: string; evidence_class?: string }[]): MapGraph;
+export function causesOf(graph: MapGraph, id: string): string[];
+export function effectsOf(graph: MapGraph, id: string): string[];
+export function radiusOf(node: MapNode): number;
+export function layout(graph: MapGraph, options?: { width?: number; height?: number; iterations?: number; pad?: number }): Record<string, { x: number; y: number }>;
+export function searchNodes(graph: MapGraph, query: string, limit?: number): MapNode[];
