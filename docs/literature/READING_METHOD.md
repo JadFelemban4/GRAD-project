@@ -218,6 +218,14 @@ the team's GRAD Project Dashboard: one page per paper, the 40 of `TOP40.md`, all
   missing (each of those three pages carries a note), the rest free online. Each
   page's body holds "Why it is in the 40": what the list expects the source to
   support, not yet checked against its text.
+- **The PDFs themselves** (Jad's request, 11 November): the column "PDF file"
+  holds the 9 papers of Ghassan's `sources.zip` that are among the 40, each on
+  its own page, and the thesis A06 on A03's page, where the note says so.
+  Notion's free plan refuses a file over 5 MiB (its message, for C08 at 8.9 MiB
+  and A06 at 13.6 MiB), so those two were split by page range, every page kept:
+  C08 in 3 parts, A06 in 4, none over 4.0 MiB. The files live in the team's
+  private workspace only; `READING_LIST.md` rule 5 still holds: never in this
+  repository, never shared outside the team.
 - **Filled by the reader:** every column of the table above, grouped on each page
   as Reading, What we learned, Our claim, Classify, The source and Thesis.
   The views: All papers, What we learned, By theme (grouped by theme, oldest
