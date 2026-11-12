@@ -5437,3 +5437,19 @@ From "Next actions", item 11, as committed at `9efa19f`:
    is Dr. Hammam's method; notes go in the columns (the workspace is at Notion's free block limit). Paid, still missing:
    D01, A03 (the zip has the thesis A06) and C36. Next: Jad splits the 50 among the five; each source is read in full by
    its named reader before it is cited.
+
+# Part AT — lines rotated out of CHECKPOINT.md, 12 November 2026 (Jad's close: B37 and B40 read, the literature branch)
+
+From "In progress", Jad's line, as committed at `8075e8b`:
+
+- Jad · `JMF-2340550-merge-2026-11-11`, `GRAD-project`'s branch since 11 November (`GRA-test`, `khaled` and his
+  branches merged; `conflict_2026-11-11.md`) · the literature (item 11). Open from before: the proposal's four
+  corrections (item 2) and Ghassan's message of 21 October (`SESSION_REPORT_2026-10-30_learning-lab-figures.md`, section 1).
+
+From "Next actions", item 11, as committed at `8075e8b`:
+
+11. The literature: the tracker in the team's Notion holds 50 papers, `docs/literature/TOP40.md`'s 40 and 10 added on
+   11 November, 42 with a file (`docs/literature/READING_METHOD.md`, Dr. Hammam's method; its last section names the 8
+   without). Notes go in the columns (Notion's free block limit). Jad reads B37, B40, B19, B18, B06, B31, A25, B49, C20
+   and C18 next (`NEXT_SESSION_2026-11-11_reading.md`); the other 40 wait for readers (Jad's split). Each source is read
+   in full by its named reader before it is cited. Paid, still missing: D01, A03 (the zip has the thesis A06) and C36.

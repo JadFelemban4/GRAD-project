@@ -76,8 +76,8 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
   three EPA engines dropped; R: rows 146-147, the B58 study, under row 133 (2) as his answer Q1 extends it; n, the reward and the two statements his own answers Q3, Q4, Q2).
   Roads: R0 `bb91848`, R1 `fb20ab2`, R4 `34cca5b` (the redraws), RV `a443607` (the re-verifier, 7 November; its full check EQUAL on P's tree, `results/EPA_ROADS/reverify.json`, which P carries); the tightenings: R3b `4da4a31`. The Ford's cap: R2a `9e37551`, R2b `2f8e4a5`.
   Training runs on another device, not this laptop (21 October).
-- Jad · `JMF-2340550-merge-2026-11-11`, `GRAD-project`'s branch since 11 November (`GRA-test`, `khaled` and his
-  branches merged; `conflict_2026-11-11.md`) · the literature (item 11). Open from before: the proposal's four
+- Jad · `JMF-2340550-Literature-review` since 12 November, from the local merge `JMF-2340550-merge-2026-11-11` (`GRA-test`,
+  `khaled` and his branches; `conflict_2026-11-11.md`) · the literature (item 11). Open from before: the proposal's four
   corrections (item 2) and Ghassan's message of 21 October (`SESSION_REPORT_2026-10-30_learning-lab-figures.md`, section 1).
 
 ## Blockers
@@ -125,9 +125,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    decision 32) is Part B's B2, at ORDER step 18.
 11. The literature: the tracker in the team's Notion holds 50 papers, `docs/literature/TOP40.md`'s 40 and 10 added on
    11 November, 42 with a file (`docs/literature/READING_METHOD.md`, Dr. Hammam's method; its last section names the 8
-   without). Notes go in the columns (Notion's free block limit). Jad reads B37, B40, B19, B18, B06, B31, A25, B49, C20
-   and C18 next (`NEXT_SESSION_2026-11-11_reading.md`); the other 40 wait for readers (Jad's split). Each source is read
-   in full by its named reader before it is cited. Paid, still missing: D01, A03 (the zip has the thesis A06) and C36.
+   without). Notes go in the columns (Notion's free block limit). Jad has read B37 and B40 (Annotated; `SESSION_REPORT_2026-11-12_reading-B37-B40.md`);
+   next B19 from the start, then B18, B06, B31, A25, B49, C20, C18 (`NEXT_SESSION_2026-11-12_reading.md`). The other 40 wait
+   for readers; each is read in full by its named reader before it is cited. Paid, still missing: D01, A03 (A06 in the zip), C36.
 
 ## Files outside git (where · last backup · manifest)
 

@@ -2,7 +2,7 @@
 name: Jad Felemban
 student_number: 2340550
 email: endo.felemban@gmail.com
-updated: 2026-10-15
+updated: 2026-11-12
 ---
 
 # Jad
@@ -72,6 +72,9 @@ says "Five items ranked beats ten unranked", it is the old one — update it.**
 - Let me explain it back **in my own words**. Several of my answers have been
   right in substance and needed only a small correction. Do not ask me to recite
   a definition.
+- **When we read papers, no check questions** (11 November 2026): I write back what
+  I understood, unprompted; confirm or correct that. Setting a tracker field is my
+  decision, not a quiz.
 - If a car term is load-bearing for a decision, define it in one clause the
   first time — "manifold pressure, how hard air is being pushed into the
   engine". Do not append a glossary to every message.
@@ -193,6 +196,41 @@ And "there are no similar solutions" is a trap in front of an evaluator when we
 cite Mercedes ourselves (`docs/supervisor/2026-10-19_proposal-evaluation.md`,
 section 8).
 
+11 to 12 November, the first two of my ten papers with Claude (B37, Scania's
+patent; B40, GM's), abstract and claim 1 first, then the description
+(`SESSION_REPORT_2026-11-12_reading-B37-B40.md`). What landed:
+
+- **Thermal shock**, through a cold glass cup that cracks under boiling tea: the
+  radiator is the cup, and the thermostat opens early and slowly. I first wrote
+  that the radiator is what the truck adjusts; the correction: it is what is
+  protected, and the thermostat is what is adjusted.
+- **One look-ahead for every part**, through "we leave in ten minutes" said to the
+  whole family, then guests arriving in five minutes (the tea is ready in time, the
+  kabsa is not, and a two-day warning helps neither). My first reading was that the
+  distance does not matter; my second invented a horizon per part (turbo 1 km, oil
+  0.5 km) and gave it to Scania. The correction: that horizon per part is our
+  question, and the patent never asks it.
+- **Pre-cooling**, through drinking water in the morning before noon at Arafat: the
+  buffer lets the truck push LESS water into the radiator on the climb (I first
+  wrote more).
+- **A patent is not evidence**, through registering a kabsa recipe: it protects the
+  idea and proves nothing, and its "tests have shown" is about what damages the
+  radiator, not about the invention.
+- **GM's rule**, through phoning the kabsa restaurant on the way: compare the drive
+  with the cooking time, and call later when the drive is longer. I wrote it back
+  right, then the claim's shape through three restaurants (two minutes, two days,
+  about an hour: calling ahead helps only the last).
+
+What did NOT land: B37's turbo limit of about 125 °C against the side we protect,
+told with the dashboard gauge, the exhaust pipe and four numbers in one message
+("ما فهمت"). A kettle did, whose handle and base are both "the kettle" at very
+different temperatures, with two numbers.
+
+How it ran: after the first check question I asked for none; I write back what I
+understood and Claude confirms or corrects. I set B37 to Prior art and B40 to
+Background only (Claude had suggested Prior art for B40), both Annotated. When I
+ask Claude to complete my notes, the added words are in my style, listed for me.
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing beyond the
@@ -208,6 +246,11 @@ the battery specifics.
   that does not exist yet — I will repeat it to a supervisor.
 - I have twice been handed the project's own **void** figures as if current. See
   below.
+- **"They work on trucks (or batteries, or one region), we work on cars" is not the
+  difference**, twice: Mercedes on 19 October, Scania on 11 November. The difference
+  is that they use preview at a fixed or assumed value, and we test when it is worth
+  acquiring. The same day "we are trying to prove it in simulation" needed the old
+  correction: we test when preview helps, and the answer can go against us (C4).
 
 ## Anything else
 
