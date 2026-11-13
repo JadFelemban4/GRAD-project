@@ -193,6 +193,12 @@ CALLS = {
     "plant_fingerprint": [("kw", "plant"), ("kw", "train_backend"), ("kw", "score_backend"),
                           ("kw", "preview_h_s"), ("kw", "reward_knock")],
     "run_episode": [("kw", "plant")],
+    # V (ORDER step 16; interface sheet section 2): decision 34's episodes and their scoring, each given
+    # its plant (evaluate.run_cycle_episode and score_practice are V's too, under the same rule)
+    "run_road_episode": [("kw", "plant")],
+    "run_cycle_episode": [("kw", "plant")],
+    "score_set": [("kw", "plant")],
+    "score_practice": [("kw", "plant")],
     "episode_cycle": [("kw", "plant")],
     "scenario_line": [("kw", "plant")],
     "deliverable_torque": [("kw", "plant")],

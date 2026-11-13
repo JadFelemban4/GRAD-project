@@ -33,7 +33,8 @@ copy them into a temporary repository), never a table. Each check has its contro
                    refused; it names its roads record's sha_text and seed
   TimingPath       `timing` on one SYNTHETIC road of the design, the plant runs stood in for: its record, once,
                    with the real run's counts and prediction
-  Isolation        the import closure of the 35 files roads.json hashes holds no epa_tightenings (row 121 (2)), with
+  Isolation        the import closure of the hashed files (roads.json's 35, and from V the two of
+                   test_four_engine_training.Isolation.AFTER_V) holds no epa_tightenings (row 121 (2)), with
                    a control; this module imports the roads module; code_sha_text covers the closure
   Audit            the guard refuses an EPA table, logs/epa and results/EPA_VALIDATION; a run opens none, writes
                    nothing under the pinned folder and calls no epa_rows reader
@@ -946,10 +947,12 @@ class TimingPath(unittest.TestCase):
 # =====================================================================================================
 class Isolation(Guarded):
     def test_no_hashed_module_imports_this_one(self):
-        """Row 121 (2): the 35 files roads.json hashes (epa_roads.hashed_files) hold no epa_tightenings, and none of
-        them imports it at any nesting."""
+        """Row 121 (2): the hashed files (epa_roads.hashed_files: roads.json's 35, and since V, ORDER step 16, the
+        two of test_four_engine_training.Isolation.AFTER_V that evaluate.py imports) hold no epa_tightenings, and
+        none of them imports it at any nesting."""
+        import test_four_engine_training as TFT
         files = R.hashed_files(root=HERE, engines=R.ENGINES)
-        self.assertEqual(len(files), 35)
+        self.assertEqual(len(files), 35 + len(TFT.Isolation.AFTER_V))
         self.assertNotIn(T.MODULE_REL, files)
         for f in files:
             if f.endswith(".py"):

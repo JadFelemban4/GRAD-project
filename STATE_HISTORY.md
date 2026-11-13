@@ -5358,3 +5358,10 @@ From "Next actions", item 8, as committed at `742239a`:
 
    exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Step 13 passed (no commit), RV is committed (7 November: its control EQUAL, 0 differences in 16 sections; session report, section 16), and P is committed (8 November: its full roads check EQUAL, 0 differences in 17 sections, `results/EPA_ROADS/reverify.json`; the B58 certified, its five FAIL records, defects of the kit's driver, each re-checked by a PASS record on the same S, `results/B58_IDENTITY.md`; session report, section 17). Qa is committed (8 November: engine_gate reads the REAL roads record through fingerprint.d34_roads; session report, section 18). Next: G, V, Q, Ta, B1.
    Updates paused to 30 November; the laptop stays frozen until the study's last scoring; `test_epa_rows` fails once until G.
+
+# Part AN — lines rotated out of CHECKPOINT.md, 13 November 2026 (GRA-test: V, decision 34's scoring protocol)
+
+From "Next actions", item 8, as committed at `a60dcae`:
+
+   exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Step 13 passed (no commit), RV is committed (7 November: its control EQUAL, 0 differences in 16 sections; session report, section 16), and P is committed (8 November: its full roads check EQUAL, 0 differences in 17 sections, `results/EPA_ROADS/reverify.json`; the B58 certified, its five FAIL records, defects of the kit's driver, each re-checked by a PASS record on the same S, `results/B58_IDENTITY.md`; session report, section 17). Qa is committed (8 November: engine_gate reads the REAL roads record through fingerprint.d34_roads; session report, section 18). G is committed (8 November: row 141's record of the bounds each fit reached, and Run 2's figures registered with verify_docs.py; session report, section 19). Next: V, Q, Ta, B1.
+   Updates paused to 30 November; the laptop stays frozen until the study's last scoring; `test_epa_rows`' known failure (N1) tests the label G corrects; G's commit message gives its run.

@@ -1051,3 +1051,79 @@ copied into any file. No file of `logs/epa/` was opened or read.
 
 **What waits:** V (its X1 checkers dominate its gate), Q's commit, Ta, then B1 on Jad's PC. Q's four runs go
 beside V's gates.
+
+## 20. 8-13 November: G's gate as it ran, and V, the scoring protocol (ORDER step 16)
+
+**G's gate, after G's documents were frozen.** Three things happened in G's gate that section 19 could not hold.
+- Its first clone stopped: after the line-ending mirror (the clone's tracked files made byte-equal to the
+  repository's working copy, each checked to hash to its blob), git status still listed the 270 mirrored files
+  as modified, though git diff showed nothing (core.autocrlf=true and LF files). The mirror now stages exactly
+  the mirrored files and stops if that stages any change against G's parent; a second clone got past the mirror.
+- That second clone then hung for about 21 hours at a bare `wait` after its control of test_epa_rows had
+  ended, with no child process left (Git Bash). The background task was stopped with the task tool; the
+  orphaned gate script survived it and Ghassan ended it by hand (the agent may not end processes); its stale
+  lock, whose process was confirmed dead, was removed. The `wait` now names each control's process and checks
+  that each left its exit record; the third clone passed. No other gate holds a bare `wait`.
+- Both are edits to g_gate.sh made by the orchestrator after the gate's reviews, without an independent
+  review; the copies before each are kept beside the gate.
+
+**What V builds** (ORDER step 16; rows 117, 118, 143, 146 (3), 147 (5) and (11); interface sheet 8, 12.7, 13, 14):
+`evaluate.py` scores decision 34's protocol, `d34`, on the redrawn twenty (through `fingerprint.d34_roads`, the
+current re-verification record required), with the scores' provenance (the machine that scored, the backends,
+the agents, the delivery block) and the practice route that PL-B uses; `b58h_descriptive.py` is the study's
+reader of decision 12's three checks for schema-4 agents (the locked climb, the battery on the hills Q fixed,
+the logged drives), each labelled descriptive and deciding nothing; `test_scoring_protocol.py` and
+`test_b58h_descriptive.py` test them; the docstrings of `train.py` and `four_engine_roads.py` follow (both are
+cost files: docstrings only, before B1), and `test_roads_reverify.py`'s import probe moves to a module outside
+every closure roads.json hashes, since evaluate.py now imports four_engine_roads (a deviation from sheet
+section 2, recorded). V was drafted while RV's gate ran, reviewed adversarially twice with each round's fixes
+re-read, and re-made on the pushed G by cherry-pick: its change on G differs from the reviewed one only in one
+hunk's position and the blob ids of test_epa_tightenings.py, because P's own fix to that file added three lines
+above it; every added and removed line is the reviewed one. Its gates ran in fresh clones of the pushed G
+(before) and of G with V (after); their printed results are in V's commit message.
+
+**V's gate, 9-13 November.** setup, threading, the scoring comparison (phase-d and d2, before and after) and X1's
+before side passed. The first suites run (10 November) stopped with four of the fifteen suites failed: three not
+V's, and one a comment in V's new test file.
+- drift_test 15: verify_docs joins a line that matches nothing to the next one, and it read the words of the
+  comment that ends line 429 of `test_b58h_descriptive.py` with the number that opens line 430 (test data, not
+  the comment) as one of check_premise's published figures, so the drift test's control (the undrifted copy must
+  pass verify_docs) failed. The comment was reworded ("the reference's turbine above", which is what line 429's
+  test row sets) and nothing else changed: the amended candidate differs from the first by that one line, and neither was
+  pushed.
+- test_epa_tightenings' LiveRecord: the gate's tree was a fresh clone, and with core.autocrlf=true that checkout
+  writes `results/ENGINE_THRESHOLDS/ecu/` with CRLF line ends, while `epa_tightenings.ecu_folder_state` hashes
+  those files' raw bytes (`common.sha_raw`, not `sha_text`), so the folder no longer matched its committed record.
+  V's gate now makes tree v's tracked files byte-equal to the repository's working copy before threading, the
+  suites and verify_docs (G's gate's line-ending mirror, each file checked to hash to its blob).
+- app.test_results and app.test_agents: they fail on RV's own clean tree with the same test ids (P's gate's base
+  run of RV), and V's gate had expected them to pass. They are now judged as P's gate judged them (the orchestrator's
+  decision of 13 November): the floor, the skip ceiling, no more failures and errors than RV's base run, every failing test id in
+  its list; and, beyond P's gate, each failing test's exception lines must be RV's, but for one tuple of the
+  provenance tests that carries the fingerprint schema's number, which P's commit raised. A new way of failing
+  inside a known failing test is a failure.
+
+The gate's amendment route kept the results of the scoring comparison and of X1's two sides, because the changed
+file is a .py file outside the import closure of evaluate.py, logged_check.py, conditions_test.py and
+b58h_descriptive.py, and no file of that closure writes its file name (b58h_descriptive.py names the test only
+by its stem, in its docstring and a comment, which read nothing). The rule is static and not complete in general:
+relative imports, importlib, module names given to `-m`, a module named by its stem rather than its file name,
+readers that list .py files (glob, os.walk) and a root .py file shadowing a standard-library module are not
+followed (v_gate.sh's header); it is fit for a change to a test file's comment. So the after sides of the scoring comparison
+and of X1 ran on the first candidate's scratch commit; threading and the suites ran again on the amended one. These
+changes to v_gate.sh were drafted by a subagent, reviewed twice independently with every finding fixed, and applied
+after X1's after side had ended (bash reads a script while it runs it).
+
+**Open, from V's gate:** on any fresh clone with core.autocrlf=true, test_epa_tightenings' LiveRecord fails. The
+defect is the tree's, not V's: hashing the ecu folder with sha_text, or a `.gitattributes` line
+`results/ENGINE_THRESHOLDS/ecu/** text eol=lf`, would end it, and that is the team's choice. The app suites' known
+failures stay open: pwsh is absent, so the launcher tests cannot run; the provenance tests' git route; a page asset
+the page names and the static folder lacks.
+
+**Open, from V's reviews:** the battery's hills file is checked by its engine_sha alone, so a plant-code change
+that keeps every value would pass it (refusing on its plant_sha and derived_sha too is left for the decision
+sheet); a score_set that never used its pool would not be seen by ScoreSet; provenance paths are written as
+given (the commands pass paths relative to the repository).
+
+**What waits:** Q's commit (its runs passed beside G's gate: test_reward and check_roads on the B58 through the
+REAL roads record, and the battery's hills), Ta, then B1 on Jad's PC.

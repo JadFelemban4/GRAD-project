@@ -54,9 +54,11 @@ engines.get, which reads their specs, derived files and freeze records.
                  refused before any run (its control: check_four_engine with it); --reward-knock forwarded
                  once, last, to every arm, and required on the four-engine road after every other
                  refusal (row 127 (4))
-  Isolation      roads.json's 35 files are the list the roads commit hashes, their import closure lies
-                 inside it, and no file of this commit is among them (row 121); fingerprint's
-                 git_dirty_plant_files matches whole paths on the real tree (row 127 (5))
+  Isolation      roads.json's 35 files are the list the roads commit hashes, and since V (ORDER step 16)
+                 the live list is those 35 and AFTER_V, the two of this commit's modules evaluate.py
+                 alone imports; their import closure lies inside it, and no other file of this commit is
+                 among them (row 121); fingerprint's git_dirty_plant_files matches whole paths on the
+                 real tree (row 127 (5))
 
 The roads code's own tau (roads_ceiling.tau_table, row 102's one definition) is computed once, in a
 subprocess, for the third arm's SYNTHETIC record (about 1.5 min at 4 jobs): roads_ceiling installs an
@@ -1089,19 +1091,30 @@ class Isolation(unittest.TestCase):
         "fingerprint.py k3_knee.py plant.py preview_ceiling.py random_road.py roads_ceiling.py step_record.py "
         "thermal.py thresholds/__init__.py thresholds/common.py thresholds/contract.py thresholds/ecu_shift.py "
         "thresholds/split.py").split()
+    # V, the scoring protocol (ORDER step 16; interface sheet section 8): evaluate.py's decision-34 protocol
+    # imports these two of this commit's modules (the checkpoint average; current_reverify, horizon_s and
+    # run_tag), so from V on the live hashed list is roads.json's 35 plus them, and evaluate.py alone imports
+    # them. test_epa_tightenings' pin reads 35 + len(AFTER_V) from here, never retyped
+    AFTER_V = ("training_recipe.py", "four_engine_roads.py")
 
     def test_the_hashed_list_is_the_35_and_closed_under_import(self):
-        """R0-5: epa_roads.hashed_files is the 35 files; every hashed module's import closure (any depth,
-        any nesting: epa_roads.import_closure) lies inside it; none of this commit's files is in it."""
+        """R0-5: epa_roads.hashed_files is the 35 files, and since V the 35 plus AFTER_V; every hashed
+        module's import closure (any depth, any nesting: epa_roads.import_closure) lies inside it; none of
+        this commit's other files is in it. roads.json's own record hashes the 35 (the control: the live
+        list is the record's plus V's two, nothing else)."""
         files = ER.hashed_files(root=HERE, engines=ER.ENGINES)
-        self.assertEqual(sorted(files), sorted(self.ROADS_JSON_35))
+        self.assertEqual(sorted(files), sorted(self.ROADS_JSON_35 + list(self.AFTER_V)))
         closure = set()
         for rel in files:
             if rel.endswith(".py"):
                 closure.update(ER.import_closure(rel, root=HERE))
         self.assertLessEqual(closure, set(files), sorted(closure - set(files)))
         for name in self.NEW + self.TESTS:
-            self.assertNotIn(f"{name}.py", files)
+            if f"{name}.py" not in self.AFTER_V:
+                self.assertNotIn(f"{name}.py", files)
+        record = os.path.join(HERE, *ER.ROADS_REL.split("/"))
+        if os.path.isfile(record):
+            self.assertEqual(sorted(ER.load_record(record)["hashes"]["files"]), sorted(self.ROADS_JSON_35))
 
     def test_the_dirty_plant_match_is_exact_on_the_real_tree(self):
         """R0-1 (S8), lifted at the plant commit P (row 127 (5); interface sheet 6.7): fingerprint listed a
@@ -1130,10 +1143,14 @@ class Isolation(unittest.TestCase):
 
     def test_no_hashed_module_imports_the_training_code(self):
         """Row 121: the new code imports the frozen code, never the other way round, and none of it is in
-        roads.json's list (epa_roads.hashed_files)."""
+        roads.json's list (epa_roads.hashed_files) but V's AFTER_V, which evaluate.py alone imports, both
+        of them (interface sheet 8); every other hashed module, AFTER_V's two among them, imports none of
+        this commit's modules."""
         files = ER.hashed_files(root=HERE, engines=ER.ENGINES)
         for new in self.NEW:
-            self.assertNotIn(f"{new}.py", files)
+            if f"{new}.py" not in self.AFTER_V:
+                self.assertNotIn(f"{new}.py", files)
+        after_v = {rel[:-len(".py")] for rel in self.AFTER_V}
         py = [rel for rel in files if rel.endswith(".py")]          # the engine specs (.toml) import nothing
         self.assertGreater(len(py), 20)
         for rel in py:
@@ -1146,7 +1163,7 @@ class Isolation(unittest.TestCase):
                 elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
                     names.add(node.module.split(".")[0])
             with self.subTest(file=rel):
-                self.assertEqual(names & set(self.NEW), set())
+                self.assertEqual(names & set(self.NEW), after_v if rel == "evaluate.py" else set())
 
 
 if __name__ == "__main__":

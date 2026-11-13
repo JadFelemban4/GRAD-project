@@ -1129,9 +1129,16 @@ class Refusals(Guarded):
             probs, ctx = self.problems()
             self.assertEqual(probs, want)
             self.assertEqual(ctx["hashed_files"]["changed_since_draw"], ["evaluate.py"])
+        # The probe imports this module, which no hashed module's closure reaches (Isolation) and which
+        # tree_copy copies: from V (ORDER step 16) on, evaluate.py itself imports four_engine_roads, the probe's
+        # module until then, so that one is hashed in the copy's record and an import of it adds nothing.
+        # Every import roads_reverify makes is hashed from V on, so the probe adds this one file alone; the two
+        # assertions first say so, so that a stale probe fails here and not as a silent []
+        self.assertTrue(os.path.isfile(os.path.join(self.root, RV.MODULE_REL)))
+        self.assertNotIn(RV.MODULE_REL, self.rec["hashes"]["files"])
         with open(p, "w", encoding="utf-8", newline="") as fh:
-            fh.write(text + "\nimport four_engine_roads  # noqa: SYNTHETIC\n")
-        self.assertEqual(self.problems()[0], ["four_engine_roads.py: reached by the code as it stands, not hashed "
+            fh.write(text + "\nimport roads_reverify  # noqa: SYNTHETIC\n")
+        self.assertEqual(self.problems()[0], ["roads_reverify.py: reached by the code as it stands, not hashed "
                                               "by roads.json"])
         with open(p, "w", encoding="utf-8", newline="") as fh:
             fh.write(text)

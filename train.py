@@ -97,8 +97,13 @@ check: --identity on the laptop before and after the change, then --compare):
 A run trained with any of them records them in meta.json (advisory train_recipe),
 a four_engine run records its generator's code (train_road_sha), and a resume that
 changes either is refused, as a changed road is. The roads, the recipe and H are
-training_recipe.py's and four_engine_roads.py's, new modules that no hashed module
-imports (row 121).
+training_recipe.py's and four_engine_roads.py's, new modules (row 121) that no hashed
+module imported until V, the scoring protocol (ORDER step 16): from V on, evaluate.py's
+decision-34 protocol imports both (the checkpoint average; the re-verification record,
+H and the run's name), so both are hashed beside roads.json's 35
+(test_four_engine_training.Isolation.AFTER_V). This file stays outside roads.json's
+hashed list; it is one of epa_backend.COST_ENTRIES, whose import closures a backend
+rate is checked against (epa_backend.cost_files, Ta).
 
 H (rows 102 and 117). --horizon-ratio R --roads-record PATH trains a sighted agent
 at H = R x tau, tau the engine's frozen time constant read from the roads record,

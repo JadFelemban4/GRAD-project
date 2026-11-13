@@ -17,8 +17,11 @@ Section I of results/VALIDATION_DECISIONS.md governs this file: row 116 (the tra
 (decision 29's recipe behind flags whose defaults are X1's), rows 96 and 101 (the share's stream and
 its generator), row 98 (every grade change a ramp), rows 102 and 117 (H = r tau, and what waits for the
 plant commit), row 121 (3) (a new module: random_road.py, engine_env.py and the 35 files roads.json
-hashes are left alone; no hashed module imports this one). docs/build_step_2/ORDER_TO_TRAINING.md step
-7 builds it. train.py's road mode `four_engine` trains on it.
+hashes are left alone; no hashed module imported this one until V, the scoring protocol, ORDER step 16,
+from which evaluate.py's decision-34 protocol imports it for read_roads_record, real_record_problem,
+current_reverify, horizon_s, run_tag, inside_repository and Refused, so it is hashed beside the 35 from V
+on: test_four_engine_training.Isolation.AFTER_V).
+docs/build_step_2/ORDER_TO_TRAINING.md step 7 builds it. train.py's road mode `four_engine` trains on it.
 
 WHY A WRAPPER. The extremes builders (engine_env.extreme_speed_profile, grade_floor) read the Supra's
 two-term road load and gears and refuse every EPA car (BUILT, engine_env._two_term_car; amendment B15),

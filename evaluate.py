@@ -5,6 +5,11 @@
     python evaluate.py --engine b58 runs/sighted_seed0 runs/blind_seed0    sighted vs blinded
     python evaluate.py --engine b58 --out results/<new file>.txt runs/... runs/...
                                                (an existing --out is refused)
+    python evaluate.py --engine b58 --protocol d34 --reward-knock out --scores-out <outside>/S.json
+                       [--records-out <outside>/DIR] [--out <report>.txt] [--jobs N] runs/b58h_dt1/<each run>
+    python evaluate.py --engine b58 --protocol d34 --practice --reward-knock out
+                       --scores-out <outside>/P.json [--jobs N] runs/b58h_pilot_dt1/<each run>
+                                               (DECISION 34'S PROTOCOL, below)
 
 --engine IS REQUIRED (20 October 2026, decision 24: the H/tau test runs four
 engines). It names the plant the episodes run on (engines.get), and the
@@ -88,6 +93,43 @@ the actuators applied, the observation, the reward terms and the engine state
 each step and writes nothing into it; the scores are identical with or
 without it.
 
+DECISION 34'S PROTOCOL   (ORDER step 16, commit V; rows 95, 103 (4), 112, 117, 118, 143, 146 (3), 147)
+--------------------------------------------------------------------------------------------------------
+`--protocol d34` scores the B58 study's agents (row 147) on decision 34's twenty roads, as R4's
+redraws.json reads them under version 6 (row 95 (2); fingerprint.d34_roads), road k with EPISODES[k]'s
+seed and weights, which are read and never edited. Scores are computed on the version-6 set only: the
+version-5 reading and the drop list are reported in the scores' provenance, never scored (row 95). The
+current re-verification record (four_engine_roads.current_reverify, row 140) must be EQUAL, name the live
+roads.json and redraws.json, have run on an ancestor of HEAD and keep every plant_sha (decision34_roads).
+
+Each agent is scored as decision 29 reports it, the action average of its checkpoints
+(training_recipe.AveragedPolicy, load_agent; row 118), at its own H: read from its meta.json and checked
+against r x tau from the roads record (arm_of; row 117). Each is checked against the decision-34
+fingerprint it trained under (live_decision34), its train_backend read from the committed
+results/EPA_BACKEND.json (Tb's record; committed_train_backend), paired with its seed's blinded agent by
+row 117's rule (pairing_problems), and every agent of the engine must have trained on one environment
+(environment_problems; row 143 (5)). --force-plant-mismatch is refused here, and --reward-knock is
+required, never read from meta.json. The baseline ECU, reactive and current-grade run once per road
+(score_set), in a spawn pool that gives the same numbers at any --jobs.
+
+The scores follow four-engine-scores/1 (scores_document): no knock is damage_thermal, the primary
+reading; with knock is damage, "not converged in dt on these roads" (with_knock_label). Each policy's
+fuel, the baseline ECU's fuel and the share of demand steps short of the tracking tolerance, road by
+road, ride in the provenance (row 147 (5); delivery_block), with the version-5 slots, the re-verification
+record, every agent's H, r and manifest, the versions, the platform and the device (interface sheet
+12.7). --records-out keeps the baseline ECU's and each agent's per-step t_turb, t_oil and ki
+(write_records). --practice
+scores row 96's ten practice roads instead, read from roads.json and regenerated from nothing
+(practice_set), in the same form, for decision 29's pilot (rows 103 (4), 112): pilot_spread reads s_p
+from that document, the report prints it, and the recipe checks (the learning rate at 0, the average
+taken) ride beside it; its provenance keeps the decision-34 set's episodes_sha under trained_under only.
+
+THE DECLARED TRANSFER ROUTE (row 147 (11)). check_transfer lets a decision-34 agent be scored off its own
+roads -- the locked climb, the logged drives, the conditions battery, b58h_descriptive.py's three
+descriptive rows -- when every FATAL field but scenario and episodes_sha is the live one. It prints both
+of those, the trained and the scored, and it takes no force. The phase-d and d2 body of main() below is
+unchanged; run_episode's loop became _drive, step for step, the one loop every route runs.
+
 ================================================================================
 THE TWENTY EPISODES ARE FROZEN. DO NOT EDIT `EPISODES`.
 Changing the test set after seeing a result is the one mistake this project
@@ -136,6 +178,7 @@ supervision helps; only beating `current-grade` proves the PREVIEW helped. See
 AUDIT.md C3.
 """
 import argparse
+import json
 import os
 
 import numpy as np
@@ -144,7 +187,10 @@ import check_premise as C
 import engines
 import fingerprint as FP
 import random_road as RR
-from engine_env import PREVIEW_H_S, REWARD_KNOCK_DEFAULT, SupervisoryTunerEnv, damage_rate, locked_climb
+from engine_env import (PREVIEW_H_S, REWARD_KNOCK_DEFAULT, TRACK_TOL, SupervisoryTunerEnv, damage_rate,
+                        locked_climb)
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 DT = 1.0
 DURATION = 720.0
@@ -230,6 +276,51 @@ PROTOCOLS = {
     "d2": (EPISODES_D2, "PHASE D2 EVALUATION (randomised climb)", "d2"),
 }
 
+# ==============================================================================
+# DECISION 34'S PROTOCOL (ORDER step 16, commit V; interface sheet sections 8, 12.7 and 17). A protocol
+# of its own, beside PROTOCOLS, which keeps its two entries (app/results_data.py reads them): --protocol
+# takes sorted(PROTOCOLS) + [DECISION_34]. The name is fingerprint.plant_fingerprint's (schema 4).
+# ==============================================================================
+DECISION_34 = "d34"
+D34_HEADER = "DECISION 34 EVALUATION"
+PRACTICE_HEADER = "PRACTICE EPISODES (row 96) -- NOT THE TEST"
+# the study's analysis reads this schema; a test pins the two strings equal (mistake 10), and this file
+# never imports the analysis (row 121)
+SCORES_SCHEMA = "four-engine-scores/1"
+PRACTICE_SCHEMA = "four-engine-practice/1"
+N_D34_ROADS = 20                     # decision 34's twenty, road k with EPISODES[k] (row 101)
+N_PRACTICE = 10                      # row 96's practice roads
+REDRAW_READING = "version 6"         # the reading that is scored (row 95 (2))
+VERSION_5_READING = "version 5 (every engine gating)"     # epa_roads.redraw's name for the other one
+# each reading's damage, as run_episode names them: no knock (the primary reading) and with knock
+READING_KEYS = {"no_knock": "damage_thermal", "with_knock": "damage"}
+# run_episode's dict, its keys in their order: app/agent_trace.py and app.test_agents compare whole dicts
+EPISODE_KEYS = ("ret", "damage", "damage_thermal", "fuel", "torque_viol", "peak_turb", "knock")
+# the hand-written policies, as main() runs them, each once per road; the baseline ECU gives D_base
+HAND_POLICIES = (("baseline ECU", "p_neutral"), ("reactive", "p_reactive"), ("current-grade", "p_grade_now"))
+BASELINE = "baseline ECU"
+# TORQUE DELIVERY (row 147 (5)): a demand step asks for more than DEMAND_NM, the floor of the reward's
+# reference torque t_ref (engine_env.SupervisoryTunerEnv.step, max(torque_req, 40)); it is short when the
+# torque delivered falls more than the reward's tolerance TRACK_TOL below the request. logged_check.py's
+# T criterion counts the same steps (logged_check.DEMAND_NM; a test pins the two equal, since this file
+# may not import that one, row 121)
+DEMAND_NM = 40.0
+# THE DECLARED TRANSFER ROUTE (row 147 (11)): the two FATAL fields an agent scored off its own roads may
+# differ in, each printed, trained and scored (check_transfer)
+TRANSFER_EXEMPT = ("scenario", "episodes_sha")
+# ONE ENVIRONMENT (row 143 (5); CLAUDE.md rules 3 and 5): what every agent of an engine must share,
+# config.json's versions, device and machine (train.run_config) and meta.json's advisory python and
+# numpy (fingerprint.plant_fingerprint; a key that no meta.json holds reads None for every agent)
+ENV_KEYS = (("config.json", ("versions", "python")), ("config.json", ("versions", "stable_baselines3")),
+            ("config.json", ("versions", "torch")), ("config.json", ("versions", "gymnasium")),
+            ("config.json", ("versions", "numpy")), ("config.json", ("device",)),
+            ("config.json", ("machine", "system")), ("config.json", ("machine", "processor")),
+            ("config.json", ("machine", "cpus")), ("meta.json", ("python",)), ("meta.json", ("numpy",)))
+# the one ENV_KEYS entry no schema-4 meta.json records: fingerprint.plant_fingerprint writes python and never
+# numpy, whose version config.json's versions.numpy carries (train.run_config). It reads None for every
+# agent, so its absence is not refused; every other value must be recorded (environment_problems)
+ENV_UNRECORDED = ("meta.json numpy",)
+
 
 # What record_agents.py keeps of every evaluation step (29 September 2026), read
 # off the environment AFTER the step, so the episode itself is untouched. Since
@@ -281,19 +372,47 @@ def run_episode(policy, seed, weights, use_preview=True, road=None, record=None,
     `reward_knock` is the environment's knock option (rows 113 (5), 117): only
     `ret` depends on it; damage, damage_thermal, fuel, torque_viol, peak_turb and
     knock are the same in both modes.
+
+    THE LOOP IS _drive's SINCE COMMIT V (ORDER step 16; interface sheet 8): moved
+    there step for step, so decision 34's episodes run the one loop this one
+    runs. The dict returned here keeps exactly its seven keys, in their order
+    (EPISODE_KEYS): app/agent_trace.py and app.test_agents compare whole dicts.
     """
     env = SupervisoryTunerEnv(episode_cycle(road, plant=plant), plant=plant, dt=DT, seed=seed,
                               use_preview=use_preview, reward_knock=reward_knock)
-    obs, _ = env.reset(seed=seed)
+    env.reset(seed=seed)
     env.w = np.asarray(weights, dtype=np.float32)   # override the fresh draw
+    out = _drive(env, policy, plant=plant, record=record, observe=None)
+    return {k: out[k] for k in EPISODE_KEYS}
+
+
+def _drive(env, policy, *, plant, record, observe):
+    """The step loop of every scored episode (run_episode's until commit V, moved
+    here step for step; interface sheet 8). `env` has been reset and its weights
+    pinned by the caller; the first observation is read here, after the pin, as
+    run_episode read it. `record` (new_record(), or None) receives every step, as
+    before; `observe` (a callable observe(env, action, info), or None) is called
+    after each step and only reads: b58h_descriptive.py counts logged_check's and
+    conditions_test's quantities through it. Neither moves a score.
+
+    Returns run_episode's seven values and, beside them, what decision 34's
+    scores carry (row 147 (5); interface sheet 12.7): `steps`; `demand_steps`
+    and `short_steps`, the steps asking more than DEMAND_NM and those of them
+    delivered more than TRACK_TOL short; `fuel_base` and `damage_base`, the
+    parallel baseline network's; and `trace`, each step's t_turb, t_oil and ki
+    as the environment reported them (write_records keeps them)."""
     obs = env._obs()
     ret, peak, thermal = 0.0, 0.0, 0.0
+    steps = demand = short = 0
+    trace = {"t_turb": [], "t_oil": [], "ki": []}
     while True:
         a = policy(env, obs)
         obs_before = obs
         obs, r, term, trunc, info = env.step(a)
         if record is not None:
             _record_step(record, env, a, obs_before, r, info)
+        if observe is not None:
+            observe(env, a, info)
         ret += r
         peak = max(peak, info["t_turb"])
         # DAMAGE TWO WAYS (JMF-2340550, 28 September): the same damage model
@@ -301,12 +420,70 @@ def run_episode(policy, seed, weights, use_preview=True, road=None, record=None,
         # this car. A REPORTING column only -- the episode, the policy and the
         # reward are untouched.
         thermal += damage_rate(info["t_turb"], info["t_oil"], cal=plant.engine.damage) * env.dt
+        # TORQUE DELIVERY (row 147 (5)): counted from info, after the step; nothing is written back
+        steps += 1
+        req = info["torque_req"]
+        if req > DEMAND_NM:
+            demand += 1
+            short += int(info["torque"] < (1.0 - TRACK_TOL) * req)
+        for key in trace:
+            trace[key].append(info[key])
         if term or trunc:
             break
     s = info["episode_summary"]
     return dict(ret=ret, damage=s["damage"], damage_thermal=thermal, fuel=s["fuel"],
                 torque_viol=s["torque_viol"], peak_turb=peak - 273.15,
-                knock=s["knock_events"])
+                knock=s["knock_events"], steps=steps, demand_steps=demand, short_steps=short,
+                fuel_base=s["fuel_base"], damage_base=s["damage_base"], trace=trace)
+
+
+def _env_horizon(use_preview, preview_h_s):
+    """The H an environment is built at for one arm (row 117): a sighted arm's own H, a positive finite
+    float; for the blinded arm, whose preview_h_s is None, the environment's default, since its four
+    samples are 0 whatever H is (row 135 (5) measured the blinded arm bit for bit at every H). Anything else
+    is refused (ValueError), never approximated."""
+    if use_preview is True:
+        if not (type(preview_h_s) is float and np.isfinite(preview_h_s) and preview_h_s > 0.0):
+            raise ValueError(f"a sighted arm's H is a positive finite float, not {preview_h_s!r} (row 117)")
+        return preview_h_s
+    if use_preview is False:
+        if preview_h_s is not None:
+            raise ValueError(f"the blinded arm's H is None (row 117), not {preview_h_s!r}")
+        return PREVIEW_H_S
+    raise ValueError(f"use_preview is True or False, not {use_preview!r}")
+
+
+def run_cycle_episode(policy, cycle, seed, weights, *, plant, dt, use_preview, preview_h_s, reward_knock,
+                      inlet_kpa, record, observe):
+    """One episode on `cycle` (the environment's form: arrays, t_amb one number), at the arm's own H
+    (_env_horizon) and the reward's knock option, the weights pinned after the seeded reset as run_episode
+    pins them, through _drive. `inlet_kpa` is the compressor's inlet (None: the engine's sea-level one).
+    Every argument is passed: the arm's H and the knock option are FATAL (interface sheet rule 1.7), and the
+    plant is the record (mistake 1). Returns _drive's dict."""
+    env = SupervisoryTunerEnv(cycle, plant=plant, dt=dt, seed=seed, use_preview=use_preview,
+                              preview_h_s=_env_horizon(use_preview, preview_h_s), reward_knock=reward_knock,
+                              inlet_kpa=inlet_kpa)
+    env.reset(seed=seed)
+    env.w = np.asarray(weights, dtype=np.float32)   # override the fresh draw
+    return _drive(env, policy, plant=plant, record=record, observe=observe)
+
+
+def run_road_episode(policy, road, *, plant, use_preview, preview_h_s, reward_knock, record=None):
+    """One episode of a road of the roads step -- one of decision 34's twenty or of row 96's practice roads:
+    SupervisoryTunerEnv(epa_roads.env_cycle(road), plant=plant, dt=road['dt'], seed=road['episode_seed'], ...)
+    at the arm's H, reset with that seed, the road's weights pinned as float32 (interface sheet 8). Refused
+    (ValueError) unless the episode ran len(t) - 1 steps, 899 on decision 34's roads (the environment
+    truncates at k >= n - 1; epa_roads.EPISODE_STEPS_NOTE). Returns _drive's dict."""
+    import epa_roads as ER
+    cycle = ER.env_cycle(road)
+    out = run_cycle_episode(policy, cycle, int(road["episode_seed"]), road["weights"], plant=plant,
+                            dt=float(road["dt"]), use_preview=use_preview, preview_h_s=preview_h_s,
+                            reward_knock=reward_knock, inlet_kpa=None, record=record, observe=None)
+    want = len(cycle["t"]) - 1
+    if out["steps"] != want:
+        raise ValueError(f"road {road.get('k')}: the episode ran {out['steps']} steps, and a road of "
+                         f"{len(cycle['t'])} samples runs {want} (epa_roads.EPISODE_STEPS_NOTE)")
+    return out
 
 
 def agent_policy(model, use_preview=True):
@@ -430,6 +607,731 @@ def check_model_fingerprint(path, live, force):
     return lines
 
 
+# ==============================================================================
+# DECISION 34'S PROTOCOL: the roads, the agents, the fingerprints (commit V; interface sheet 8). Every
+# refusal raises SystemExit with its reason, before anything is scored; nothing here takes a force.
+# ==============================================================================
+def with_knock_label():
+    """The with-knock reading's label, roads_ceiling.KNOCK_LABEL, imported here and nowhere at the top: a
+    test pins it to the study's analysis's own label (rows 101, 113 (5))."""
+    import roads_ceiling
+    return roads_ceiling.KNOCK_LABEL
+
+
+def _slot_summary(slot):
+    """A redrawn slot as the scores' provenance carries it: what was kept, never its candidates."""
+    return {k: slot.get(k) for k in ("slot", "road", "redraws", "discarded", "stopped_at", "kept", "kept_grade",
+                                     "gear_sensitive", "thin_on")}
+
+
+def decision34_roads(*, root):
+    """(roads, provenance): decision 34's twenty as they are scored (rows 95, 140; interface sheet 8).
+
+    The roads are fingerprint.d34_roads': R4's redraws.json read under version 6, whose roads_sha is
+    roads.json's, k = 0..19 in order with EPISODES[k]'s seed and weights. Refused unless that reading is
+    version 6 (the scores are computed on it only, row 95); unless each road is roads.json's road k with
+    every slot that reading redrew rebuilt by epa_roads.with_grade(road, slot, kept_grade), and no other
+    change, at the design's sample count; unless a REAL roads.json is the committed one
+    (four_engine_roads.real_record_problem); and unless the current re-verification record
+    (four_engine_roads.current_reverify, row 140) exists, reads EQUAL, names the live roads_sha and
+    redraws_sha, ran on an ancestor of HEAD (epa_freeze.is_ancestor) and holds every plant's plant_sha_now
+    equal to epa_freeze.plant_sha. The provenance (interface sheet 12.7) names the record, the arrays'
+    sha256, the slots redrawn under version 6, the drop list and version 5's reading, reported and never
+    scored. Nothing is regenerated and no stream of roads_seed is drawn."""
+    import epa_freeze as EF
+    import epa_roads as ER
+    import four_engine_roads as FER
+    from thresholds import common
+
+    def refuse(why):
+        raise SystemExit(f"\nREFUSING decision 34's roads: {why}")
+    try:
+        scenario, roads = FP.d34_roads(root=root)
+    except (OSError, KeyError, ValueError) as exc:
+        refuse(str(exc))
+    if scenario["reading"] != REDRAW_READING:
+        refuse(f"they are the {scenario['reading']!r} reading, and the scores are computed on the "
+               f"{REDRAW_READING} set only (row 95), which R4's redraws.json gives")
+    rec_path = os.path.join(root, *ER.ROADS_REL.split("/"))
+    record = ER.load_record(rec_path)
+    if record.get("seed_kind") == "REAL":
+        problem = FER.real_record_problem(rec_path)
+        if problem:
+            refuse(problem)
+    redraws = ER.load_record(os.path.join(root, *ER.REDRAWS_REL.split("/")))
+    v6 = redraws["readings"][REDRAW_READING]
+    original = record["roads"]
+    if len(roads) != N_D34_ROADS or len(original) != N_D34_ROADS:
+        refuse(f"{len(roads)} roads in the reading and {len(original)} in roads.json, not decision 34's "
+               f"{N_D34_ROADS}")
+    design = record["design"]
+    samples = int(round(float(design["duration_s"]) / float(design["dt"])))
+    redrawn = {}
+    for slot in v6.get("slots") or []:
+        redrawn.setdefault(int(slot["road"]), []).append(slot)
+    for road in roads:
+        k = int(road["k"])
+        want = original[k]
+        for slot in redrawn.get(k, []):
+            want = ER.with_grade(want, slot["slot"], slot["kept_grade"])
+        if road != want:
+            refuse(f"road {k} of the {REDRAW_READING} reading is not roads.json's road {k} with the slots that "
+                   "reading redrew (epa_roads.with_grade at each kept grade) and nothing else changed (row 95 (2))")
+        if len(road["cycle"]["t"]) != samples or float(road["dt"]) != float(design["dt"]):
+            refuse(f"road {k} holds {len(road['cycle']['t'])} samples at dt {road['dt']}, and the design "
+                   f"{samples} at dt {design['dt']}")
+    cur = FER.current_reverify(root=root)
+    if cur is None:
+        refuse("no current re-verification record: four_engine_roads.current_reverify finds none naming this "
+               "roads.json and redraws.json, tracked and unmodified at HEAD (row 140; the plant commit P "
+               "carries results/EPA_ROADS/reverify.json)")
+    rel, rv = cur
+    probs = []
+    if rv.get("verdict") != "EQUAL":
+        probs.append(f"its verdict is {rv.get('verdict')!r}, not 'EQUAL' (row 140)")
+    if (rv.get("roads_sha"), rv.get("redraws_sha")) != (scenario["roads_sha"], scenario["redraws_sha"]):
+        probs.append("its roads_sha and redraws_sha are not the live roads.json's and redraws.json's")
+    try:
+        if not EF.is_ancestor(str(rv.get("head")), "HEAD", root=root):
+            probs.append(f"its head {rv.get('head')} is not an ancestor of HEAD")
+    except EF.GitError as exc:
+        probs.append(f"its head {rv.get('head')!r} cannot be placed in HEAD's history ({exc})")
+    plants = rv.get("plants") if isinstance(rv.get("plants"), dict) else {}
+    if not plants:
+        probs.append("it names no plant")
+    for e, p in sorted(plants.items()):
+        now = EF.plant_sha(e)
+        got = p.get("plant_sha_now") if isinstance(p, dict) else None
+        if got != now:
+            probs.append(f"{e}: its plant_sha_now {got!r} is not this tree's plant_sha {now}")
+    if probs:
+        refuse(f"the current re-verification record {rel}: " + "; ".join(probs))
+    v5 = redraws["readings"].get(VERSION_5_READING)
+    prov = {"protocol": DECISION_34, "scenario": scenario, "roads_sha": scenario["roads_sha"],
+            "redraws_sha": scenario["redraws_sha"],
+            "reverify": {"path": rel, "sha_text": common.sha_text(os.path.join(root, *rel.split("/")))},
+            "arrays_sha256": ER.arrays_sha256(roads), "reading": REDRAW_READING,
+            "redrawn_version_6": [_slot_summary(s) for s in v6.get("slots") or []],
+            "dropped": list(redraws.get("dropped") or []),
+            "version_5_reading": None if v5 is None else {
+                "name": VERSION_5_READING, "scored": False, "gating": list(v5.get("gating") or []),
+                "failing": list(v5.get("failing") or []), "slots": [_slot_summary(s) for s in v5.get("slots") or []]}}
+    return roads, prov
+
+
+def practice_set(record):
+    """Row 96's ten practice roads, record['practice'] of the roads record, as written at the draw; nothing
+    is regenerated (interface sheet 8). Refused unless there are N_PRACTICE, road i with k == i and
+    episode_seed == epa_roads.PRACTICE_SEEDS[i], three float weights each, and none of their seeds one of
+    EPISODES'."""
+    import epa_roads as ER
+
+    def refuse(why):
+        raise SystemExit(f"\nREFUSING the practice roads: {why}")
+    roads = record.get("practice") if isinstance(record, dict) else None
+    if not isinstance(roads, list) or len(roads) != N_PRACTICE:
+        refuse(f"the roads record holds {len(roads) if isinstance(roads, list) else roads!r} practice roads, not "
+               f"row 96's {N_PRACTICE}")
+    for i, road in enumerate(roads):
+        if road.get("k") != i:
+            refuse(f"practice road {i} has k {road.get('k')!r}")
+        if road.get("episode_seed") != ER.PRACTICE_SEEDS[i]:
+            refuse(f"practice road {i} has episode seed {road.get('episode_seed')!r}, not "
+                   f"epa_roads.PRACTICE_SEEDS[{i}] {ER.PRACTICE_SEEDS[i]}")
+        w = road.get("weights")
+        if not (isinstance(w, list) and len(w) == 3 and all(type(x) is float for x in w)):
+            refuse(f"practice road {i}'s weights {w!r} are not three floats")
+    clash = sorted({r["episode_seed"] for r in roads} & {s for s, _ in EPISODES})
+    if clash:
+        refuse(f"seeds {clash} are the frozen twenty's (row 96 keeps them apart)")
+    return roads
+
+
+def arm_of(path, meta, roads_rec, engine):
+    """(arm, H_s) of one decision-34 agent, read from its meta.json (row 117; interface sheet 8).
+
+    Blind: use_preview False and preview_h_s None; the arm is 'blind' and H is None. Sighted: preview_h_s
+    equal to four_engine_roads.horizon_s(roads_rec, engine, train_recipe.horizon_ratio), r x tau with tau
+    from the roads record ({ratios, tau, H_table}, four_engine_roads.read_roads_record's), exactly; the arm
+    is 'sighted_r<r>'. Refused otherwise, when the run's folder is not four_engine_roads.run_tag(seed,
+    use_preview, ratio), and when its training share was not drawn from a REAL roads record
+    (train_recipe.scored_share.seed_kind)."""
+    import four_engine_roads as FER
+
+    def refuse(why):
+        raise SystemExit(f"\nREFUSING {path}: {why}")
+    recipe = meta.get("train_recipe") if isinstance(meta.get("train_recipe"), dict) else {}
+    share = recipe.get("scored_share") if isinstance(recipe.get("scored_share"), dict) else {}
+    if share.get("seed_kind") != "REAL":
+        refuse(f"its training share's roads record is {share.get('seed_kind')!r}, not 'REAL': an agent trained "
+               "on a SYNTHETIC share is a test, never scored (train.py's refusal)")
+    seed = meta.get("seed")
+    if type(seed) is not int:
+        refuse(f"its meta.json records seed {seed!r}, not an int")
+    use_preview, h = meta.get("use_preview"), meta.get("preview_h_s")
+    if use_preview is False:
+        if h is not None:
+            refuse(f"a blinded agent's preview_h_s is None (row 117); this one records {h!r}")
+        arm, ratio = "blind", None
+    elif use_preview is True:
+        ratio = recipe.get("horizon_ratio")
+        if ratio is None:
+            refuse("a sighted agent of decision 34 trains at H = r x tau (train.py --horizon-ratio), and this "
+                   "one records no horizon_ratio")
+        try:
+            want = FER.horizon_s(roads_rec, engine, ratio)
+        except FER.Refused as exc:
+            refuse(str(exc))
+        if h != want:
+            refuse(f"its preview_h_s {h!r} is not r x tau = {want!r} s from the roads record (r = {float(ratio):g})")
+        arm = f"sighted_r{float(ratio):g}"
+    else:
+        refuse(f"its meta.json records use_preview {use_preview!r}, not a bool")
+    tag = FER.run_tag(seed, use_preview=use_preview, ratio=ratio)
+    run = os.path.basename(os.path.normpath(path))
+    if run != tag:
+        refuse(f"its folder is {run!r}, and its meta.json makes it {tag!r} (four_engine_roads.run_tag)")
+    return arm, h
+
+
+def _read_json(path):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            got = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    return got if isinstance(got, dict) else None
+
+
+def read_agents(paths, *, roads_rec, engine):
+    """[{path, meta, config, arm, H_s, r, seed}] of decision-34 agents: meta.json of fingerprint schema 4
+    (refused otherwise, with fingerprint.schema_problem's reason), config.json, and the arm and H through
+    arm_of. Refused: a folder without meta.json or config.json, and one arm and seed held twice."""
+    out, seen = [], {}
+    for path in paths:
+        run = path.rstrip("/\\")
+        meta = FP.read(os.path.join(run, "meta.json"))
+        if meta is None:
+            raise SystemExit(f"\nREFUSING {run}: it has no meta.json, so nothing records which plant it trained on")
+        old = FP.schema_problem(meta)
+        if old:
+            raise SystemExit(f"\nREFUSING {run}: {old}")
+        config = _read_json(os.path.join(run, "config.json"))
+        if config is None:
+            raise SystemExit(f"\nREFUSING {run}: it has no config.json, so its training environment is unknown "
+                             "(row 143 (5))")
+        arm, h = arm_of(run, meta, roads_rec, engine)
+        r = None if h is None else float(meta["train_recipe"]["horizon_ratio"])
+        key = (arm, meta["seed"])
+        if key in seen:
+            raise SystemExit(f"\nREFUSING {run}: {seen[key]} is the same arm and seed ({arm}, seed {meta['seed']})")
+        seen[key] = run
+        out.append(dict(path=run, meta=meta, config=config, arm=arm, H_s=h, r=r, seed=meta["seed"]))
+    return out
+
+
+def env_of(meta, config):
+    """ENV_KEYS' values of one agent, {'config.json versions.torch': ..., ...}; a missing key reads None."""
+    out = {}
+    for source, keys in ENV_KEYS:
+        v = config if source == "config.json" else meta
+        for k in keys:
+            v = v.get(k) if isinstance(v, dict) else None
+        out[f"{source} {'.'.join(keys)}"] = v
+    return out
+
+
+def environment_problems(agents):
+    """[str]: why the agents (path, meta, config) of one engine did not train on one environment (row 143
+    (5); CLAUDE.md rules 3 and 5): every ENV_KEYS value equal across them, and every one present but
+    ENV_UNRECORDED's. [] when they did. The preregistration declares no environment ablation, so any
+    difference is refused on decision 34's protocol and its practice route."""
+    out, first = [], None
+    for path, meta, config in agents:
+        if not isinstance(config, dict):
+            out.append(f"{path}: no config.json, so its training environment is unknown")
+            continue
+        env = env_of(meta, config)
+        out += [f"{path}: its {k} is not recorded" for k, v in env.items() if v is None and k not in ENV_UNRECORDED]
+        if first is None:
+            first = (path, env)
+            continue
+        p0, e0 = first
+        out += [f"{k}: {path} {env[k]!r}, {p0} {e0[k]!r}" for k in e0 if env[k] != e0[k]]
+    return out
+
+
+def pairing_problems(agents):
+    """[str]: why the agents (read_agents') are not row 117's pairs. Every seed holds every arm the set
+    scores, a blinded one among them and at least one sighted, and each sighted agent pairs with its seed's
+    blinded agent (fingerprint.pair_problems: every FATAL field but preview_h_s agrees, H a positive float
+    on the first and None on the second). An unpaired seed is refused, never scored alone."""
+    arms = sorted({x["arm"] for x in agents})
+    out = []
+    if "blind" not in arms:
+        out.append("no blinded agent: d is the sighted cut minus the blinded cut of one seed (row 117)")
+    if not [a for a in arms if a != "blind"]:
+        out.append("no sighted agent")
+    if out:
+        return out
+    by_seed = {}
+    for x in agents:
+        by_seed.setdefault(x["seed"], {})[x["arm"]] = x
+    for seed, got in sorted(by_seed.items()):
+        missing = [a for a in arms if a not in got]
+        if missing:
+            out.append(f"seed {seed} is unpaired: it holds no {', '.join(missing)}")
+            continue
+        for a in arms:
+            if a != "blind":
+                out += [f"seed {seed}, {a} with blind: {k} {x!r} / {y!r} (row 117's pairing rule)"
+                        for k, x, y in FP.pair_problems(got[a]["meta"], got["blind"]["meta"])]
+    return out
+
+
+def committed_train_backend(engine, *, root):
+    """`engine`'s train_backend as the committed backend record names it: results/EPA_BACKEND.json's
+    engines[engine].backend, read through engines.committed_record (Tb's record, ORDER step 19; 'cycle'
+    beside n null for the B58). A REAL scoring without the record, a record not committed at HEAD, and an
+    engine it drops or names no backend for are refused (interface sheet 8, "train_backend")."""
+    try:
+        rec = engines.committed_record(root, engines.BACKEND_REL)
+    except ValueError as exc:
+        raise SystemExit(f"\nREFUSING: {exc}")
+    if rec is None:
+        raise SystemExit(f"\nREFUSING: no {engines.BACKEND_REL}: the train_backend every agent is checked against "
+                         "is the committed backend record's (Tb, ORDER step 19), and a scoring without it is refused")
+    if rec.get("schema") != engines.BACKEND_SCHEMA:
+        raise SystemExit(f"\nREFUSING: {engines.BACKEND_REL} is schema {rec.get('schema')!r}, not "
+                         f"{engines.BACKEND_SCHEMA!r}")
+    entry = (rec.get("engines") or {}).get(engine)
+    if not isinstance(entry, dict) or entry.get("drop") is not False or entry.get("backend") is None:
+        raise SystemExit(f"\nREFUSING: {engines.BACKEND_REL} keeps no backend for {engine}: {entry!r}")
+    return entry["backend"]
+
+
+def backend_problems(agents, train_backend):
+    """[str]: the agents whose meta.json train_backend is not the backend record's (interface sheet 8)."""
+    return [f"{x['path']}: its train_backend {x['meta'].get('train_backend')!r} is not the backend record's "
+            f"{train_backend!r}" for x in agents if x["meta"].get("train_backend") != train_backend]
+
+
+def live_decision34(plant, *, preview_h_s, reward_knock, train_backend):
+    """The decision-34 fingerprint an agent at H = preview_h_s is checked against (interface sheet 8):
+    fingerprint.plant_fingerprint('d34', ...), its scenario and episodes_sha read from the roads records,
+    its eval_dt and eval_duration the design's, the cycle model scoring. Every FATAL input is passed; the
+    blinded arm's block is fingerprint.for_arm(live, sighted=False)."""
+    return FP.plant_fingerprint(DECISION_34, plant=plant, train_backend=train_backend,
+                                score_backend=FP.BACKEND_CYCLE, preview_h_s=preview_h_s, reward_knock=reward_knock)
+
+
+def _fmt(v):
+    return json.dumps(v, sort_keys=True) if isinstance(v, (dict, list)) else str(v)
+
+
+def check_transfer(path, stored, live, *, route):
+    """THE DECLARED TRANSFER ROUTE (row 147 (11)): scoring an agent off the roads it trained for.
+
+    `stored` is the agent's meta.json, `live` the block of what it is scored on, built at the agent's own H
+    and the reward's knock option. Every FATAL field but TRANSFER_EXEMPT (scenario and episodes_sha) must
+    be the live one, or the transfer is refused with each field named; a meta.json that is missing or of
+    another schema is refused too. There is no force. Prints, and returns, the declaration: the route, and
+    both exempt fields as trained and as scored."""
+    if stored is None:
+        raise SystemExit(f"\nREFUSING the declared transfer {route} of {path}: it has no meta.json, so nothing "
+                         "records which plant it trained on")
+    old = FP.schema_problem(stored)
+    if old:
+        raise SystemExit(f"\nREFUSING the declared transfer {route} of {path}: {old}")
+    bad = [(k, a, b) for k, a, b in FP.compare(stored, live) if k not in TRANSFER_EXEMPT]
+    if bad:
+        raise SystemExit(f"\nREFUSING the declared transfer {route} of {path}: a transfer lets only "
+                         f"{' and '.join(TRANSFER_EXEMPT)} differ (row 147 (11)), and "
+                         + "; ".join(f"{k} is {a!r} in its meta.json and {b!r} live" for k, a, b in bad))
+    lines = [f"DECLARED TRANSFER {route}: {path}: every FATAL field but {' and '.join(TRANSFER_EXEMPT)} is the "
+             "live one (row 147 (11))"]
+    lines += [f"  {k:<14} trained {_fmt(stored.get(k))}   scored {_fmt(live.get(k))}" for k in TRANSFER_EXEMPT]
+    for line in lines:
+        print(line)
+    return lines
+
+
+def average_lines(path, meta):
+    """(manifest, lines): decision 29's checkpoint average of one run, every check made and nothing loaded
+    (row 118; interface sheet 8). Refused unless meta.json's train_recipe.checkpoint_average is
+    training_recipe.DECISION_29_WINDOW, the manifest exists and reads (training_recipe.read_manifest checks
+    each snapshot's sha256 and the rule's steps), its window is that window, and its total_steps is
+    final.zip's own num_timesteps (fingerprint.model_budget). The manifest gains its file's sha256."""
+    import hashlib
+    import training_recipe as TR
+    run = path.rstrip("/\\")
+    recipe = (meta or {}).get("train_recipe")
+    n = recipe.get("checkpoint_average") if isinstance(recipe, dict) else None
+    if n != TR.DECISION_29_WINDOW:
+        raise SystemExit(f"\nREFUSING {run}: its meta.json records checkpoint_average {n!r}, not decision 29's "
+                         f"{TR.DECISION_29_WINDOW}: decision 34 scores the checkpoint average (row 118)")
+    man_path = os.path.join(run, TR.MANIFEST)
+    if not os.path.isfile(man_path):
+        raise SystemExit(f"\nREFUSING {run}: no {TR.MANIFEST}: its checkpoint average was never written "
+                         "(train.py writes it when the run ends)")
+    try:
+        man = TR.read_manifest(run)
+    except (OSError, KeyError, TypeError, ValueError) as exc:
+        raise SystemExit(f"\nREFUSING {run}: its checkpoint average does not read: {exc}")
+    if man.get("window") != TR.DECISION_29_WINDOW:
+        raise SystemExit(f"\nREFUSING {run}: its manifest's window is {man.get('window')!r}, not "
+                         f"{TR.DECISION_29_WINDOW}")
+    budget = FP.model_budget(os.path.join(run, "final.zip"))
+    if budget is None or budget["num_timesteps"] != man.get("total_steps"):
+        raise SystemExit(f"\nREFUSING {run}: its manifest's total_steps {man.get('total_steps')!r} is not "
+                         f"final.zip's num_timesteps {None if budget is None else budget['num_timesteps']!r}")
+    with open(man_path, "rb") as fh:
+        sha = hashlib.sha256(fh.read()).hexdigest()
+    lines = [f"model {run}: the checkpoint average, {man['rule']}; manifest sha256 {sha}",
+             f"  final.zip: {FP.format_budget(budget)}"]
+    lines += [f"  snapshot at step {s['step']}: sha256 {s['sha256']}" for s in man["snapshots"]]
+    return dict(man, sha256=sha), lines
+
+
+def load_agent(path, meta, *, device):
+    """(policy, lines): the agent as decision 34 and its practice route score it, decision 29's
+    checkpoint average, training_recipe.AveragedPolicy.load(run, device=device), after average_lines'
+    checks. Wrap it with agent_policy, as one model is wrapped."""
+    import training_recipe as TR
+    _, lines = average_lines(path, meta)
+    return TR.AveragedPolicy.load(path.rstrip("/\\"), device=device), lines
+
+
+# ------------------------------------------------------------------------------ scoring
+_TASK = {"key": None, "policy": None}
+
+
+def _one_thread():
+    """torch on one thread, as every gate runs (OMP_NUM_THREADS=1), so that a worker and this process
+    give the same actions. Nothing when torch is not installed (hand-written policies only)."""
+    try:
+        import torch
+    except ImportError:
+        return
+    torch.set_num_threads(1)
+
+
+def _worker_init():
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
+    _one_thread()
+
+
+def _policy_of(kind, ref):
+    """The policy of a task, kept while the next task is the same policy's (a task list runs each policy's
+    roads one after another): a hand-written policy by its name, or an agent's checkpoint average."""
+    if _TASK["key"] != (kind, ref):
+        _TASK.update(key=None, policy=None)
+        if kind == "hand":
+            pol = getattr(C, dict(HAND_POLICIES)[ref])
+        else:
+            avg, _ = load_agent(ref, FP.read(os.path.join(ref, "meta.json")), device="cpu")
+            pol = agent_policy(avg)
+        _TASK.update(key=(kind, ref), policy=pol)
+    return _TASK["policy"]
+
+
+def _score_task(task):
+    """One policy on one road, in this process or in a spawn worker: run_road_episode's dict, its per-step
+    trace dropped unless the records are kept. A refusal becomes a RuntimeError, which a pool carries back."""
+    engine, kind, ref, use_preview, h_s, reward_knock, road, keep = task
+    try:
+        out = run_road_episode(_policy_of(kind, ref), road, plant=engines.get(engine), use_preview=use_preview,
+                               preview_h_s=h_s, reward_knock=reward_knock, record=None)
+    except SystemExit as exc:
+        raise RuntimeError(f"{ref} on road {road.get('k')}: {exc}") from None
+    if not keep:
+        out.pop("trace")
+    return out
+
+
+def score_set(engine, models, roads, *, plant, reward_knock, train_backend, jobs, keep_records):
+    """Every policy on every road (interface sheet 8): the baseline ECU, reactive and current-grade once per
+    road, at the default H as main() runs them, then each agent of `models` (read_agents' dicts) at its own
+    H, every episode with the reward's knock option. In this process at jobs 1, else in a spawn pool of
+    `jobs` workers, each building its plant (engines.get) and loading each agent itself; every episode is
+    deterministic and the results come back in task order, so the numbers are the same at any jobs. With
+    keep_records the per-step trace stays in each row. Returns {'hand': {name: [row per road]}, 'agents':
+    {(arm, seed): [row per road]}}. Refused (ValueError): another backend than the cycle model (row 136), a
+    plant that is not engines.get(engine) itself, as every worker builds it (a variant or a candidate)."""
+    if train_backend != FP.BACKEND_CYCLE:
+        raise ValueError(f"train_backend {train_backend!r}: only {FP.BACKEND_CYCLE!r} exists (row 136)")
+    if engines.is_candidate(plant) or plant != engines.get(engine):
+        raise ValueError(f"the plant passed is not {engine}'s as engines.get({engine!r}) builds it, which every "
+                         "worker scores on")
+    import evaluate as _self            # the tasks are pickled by this module's name, as a script too
+    n = len(roads)
+    tasks, keys = [], []
+    for name, _ in HAND_POLICIES:
+        tasks += [(engine, "hand", name, True, PREVIEW_H_S, reward_knock, road, keep_records) for road in roads]
+        keys.append(("hand", name))
+    for x in models:
+        tasks += [(engine, "agent", x["path"], x["H_s"] is not None, x["H_s"], reward_knock, road, keep_records)
+                  for road in roads]
+        keys.append(("agents", (x["arm"], x["seed"])))
+    if jobs <= 1:
+        if models:
+            _one_thread()
+        res = [_self._score_task(t) for t in tasks]
+    else:
+        import multiprocessing as mp
+        with mp.get_context("spawn").Pool(min(int(jobs), len(tasks)), initializer=_self._worker_init) as pool:
+            res = pool.map(_self._score_task, tasks, chunksize=max(1, n))
+    out = {"hand": {}, "agents": {}}
+    for i, (group, key) in enumerate(keys):
+        out[group][key] = res[i * n:(i + 1) * n]
+    return out
+
+
+def median_cut(D, D_base):
+    """evaluate.py's form of a cut, the one main() prints for each policy: 100 x (1 - median D / median
+    D_base) over the roads or episodes (row 113 (1))."""
+    return float(100.0 * (1.0 - np.median(D) / np.median(D_base)))
+
+
+def delivery_block(rows):
+    """Torque delivery and fuel, road by road, for every policy scored (row 147 (5); interface sheet 17.8):
+    each one's fuel (the baseline ECU's among them), its demand steps, the steps of them short of the
+    tracking tolerance and their share (None on a road with no demand step)."""
+    def per(rs):
+        return {"fuel": [float(x["fuel"]) for x in rs], "demand_steps": [int(x["demand_steps"]) for x in rs],
+                "short_steps": [int(x["short_steps"]) for x in rs],
+                "short_share": [(int(x["short_steps"]) / int(x["demand_steps"]) if x["demand_steps"] else None)
+                                for x in rs]}
+    arms = {}
+    for (arm, seed), rs in sorted(rows["agents"].items(), key=lambda kv: (kv[0][0], int(kv[0][1]))):
+        arms.setdefault(arm, {})[str(int(seed))] = per(rs)
+    return {"rule": {"demand_step": f"torque_req > {DEMAND_NM:g} Nm (the reward's t_ref floor; logged_check.DEMAND_NM)",
+                     "short_step": f"torque < (1 - {TRACK_TOL:g}) x torque_req (engine_env.TRACK_TOL)",
+                     "fuel": "g over the road (the episode's own count)"},
+            "hand": {name: per(rs) for name, rs in rows["hand"].items()}, "arms": arms}
+
+
+def _arms_of(rows, ratios):
+    """The scores' arms: {'blind': {'seeds': ...}, 'sighted_r<r>': ...}, each seed's D and D_base per reading,
+    D_base the baseline ECU's on the same road."""
+    base = rows["hand"][BASELINE]
+    arms = {"blind": {"seeds": {}}}
+    for r in ratios:
+        arms[f"sighted_r{r}"] = {"seeds": {}}
+    for (arm, seed), rs in sorted(rows["agents"].items(), key=lambda kv: (kv[0][0], int(kv[0][1]))):
+        if arm not in arms:
+            raise ValueError(f"the arm {arm!r} is not one of {sorted(arms)} (the ratios {ratios})")
+        if len(rs) != len(base):
+            raise ValueError(f"{arm} seed {seed}: {len(rs)} roads, the baseline ECU {len(base)}")
+        arms[arm]["seeds"][str(int(seed))] = {
+            reading: {"D": [float(x[key]) for x in rs], "D_base": [float(b[key]) for b in base]}
+            for reading, key in READING_KEYS.items()}
+    return arms
+
+
+def scores_document(engine, rows, *, ratios, provenance):
+    """A four-engine-scores/1 document of one engine (interface sheet 12.7): arms blind and sighted_r<r> for
+    each r of `ratios` (strings, '0.5' and '1.5'), seeds as decimal strings, D and D_base per road and
+    reading, variant null (the declared sensitivity route is not built, row 147 (10)), and the provenance
+    with delivery_block's figures beside it (row 147 (5)), which the analysis copies untouched."""
+    base = rows["hand"][BASELINE]
+    return {"schema": SCORES_SCHEMA, "ratios": list(ratios), "n_roads": len(base), "variant": None,
+            "provenance": dict(provenance, delivery=delivery_block(rows)),
+            "engines": {engine: {"arms": _arms_of(rows, ratios)}}}
+
+
+def practice_document(engine, rows, *, roads, ratios, provenance):
+    """A four-engine-practice/1 document (interface sheet 12.7): the practice roads by k, seed and weights,
+    and the arms in the scores' layout, on N_PRACTICE roads; labelled PRACTICE_HEADER, never the test."""
+    return {"schema": PRACTICE_SCHEMA, "label": PRACTICE_HEADER, "engine": engine, "ratios": list(ratios),
+            "n_roads": len(roads),
+            "roads": [{"k": r["k"], "episode_seed": r["episode_seed"], "weights": r["weights"]} for r in roads],
+            "provenance": dict(provenance, delivery=delivery_block(rows)), "arms": _arms_of(rows, ratios)}
+
+
+def score_practice(engine, models, record, *, plant, reward_knock, train_backend, jobs, provenance):
+    """Decision 29's pilot on row 96's practice roads (rows 103 (4), 112; interface sheet 8): practice_set
+    of the roads record, every agent and the hand-written policies by score_set, as a practice document."""
+    roads = practice_set(record)
+    rows = score_set(engine, models, roads, plant=plant, reward_knock=reward_knock, train_backend=train_backend,
+                     jobs=jobs, keep_records=False)
+    ratios = sorted({f"{x['r']:g}" for x in models if x["r"] is not None}, key=float)
+    return practice_document(engine, rows, roads=roads, ratios=ratios, provenance=provenance), rows
+
+
+def pilot_spread(practice_doc, *, engine, ratio):
+    """s_p (row 103 (4); row 112): the spread of the paired d on the practice roads at r = `ratio`, in the
+    no-knock reading and evaluate.py's form, d = cut(sighted_r, seed) - cut(blind, seed), s_p their
+    standard deviation with ddof = 1. Returns {engine, ratio, reading, seeds, d, s_p, pairs}. Refused
+    (ValueError): another schema or engine, an unpaired seed, fewer than two pairs."""
+    if practice_doc.get("schema") != PRACTICE_SCHEMA or practice_doc.get("engine") != engine:
+        raise ValueError(f"not a {PRACTICE_SCHEMA} document of {engine}")
+    r = f"{float(ratio):g}"
+    sig = practice_doc["arms"][f"sighted_r{r}"]["seeds"]
+    blind = practice_doc["arms"]["blind"]["seeds"]
+    if set(sig) != set(blind):
+        raise ValueError(f"unpaired seeds: sighted_r{r} {sorted(sig, key=int)}, blind {sorted(blind, key=int)}")
+    seeds = sorted(sig, key=int)
+    if len(seeds) < 2:
+        raise ValueError(f"{len(seeds)} pair(s): a spread needs at least 2")
+    d = [median_cut(sig[s]["no_knock"]["D"], sig[s]["no_knock"]["D_base"])
+         - median_cut(blind[s]["no_knock"]["D"], blind[s]["no_knock"]["D_base"]) for s in seeds]
+    return {"engine": engine, "ratio": r, "reading": "no_knock", "seeds": [int(s) for s in seeds], "d": d,
+            "s_p": float(np.std(d, ddof=1)), "pairs": len(d)}
+
+
+def write_once_json(path, obj):
+    """Write `obj` as JSON once: refused (SystemExit) if `path` exists. LF, no NaN. Returns its sha256."""
+    import hashlib
+    text = json.dumps(obj, indent=1, allow_nan=False) + "\n"
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    try:
+        with open(path, "x", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
+    except FileExistsError:
+        raise SystemExit(f"\n{path} exists: a scores document is written once, never overwritten") from None
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def write_records(records_dir, engine, rows, *, dt):
+    """Per-step records (interface sheet 12.7): <records_dir>/<engine>/baseline.npz and <arm>_seed<S>.npz,
+    float64 t_turb, t_oil and ki of shape (roads, steps) in road k order, and dt. Refused (SystemExit) if a
+    file exists. Returns {path relative to records_dir: sha256}."""
+    import hashlib
+    folder = os.path.join(records_dir, engine)
+    os.makedirs(folder, exist_ok=True)
+    files = {}
+
+    def save(name, rs):
+        path = os.path.join(folder, name + ".npz")
+        if os.path.exists(path):
+            raise SystemExit(f"\n{path} exists: a record is written once")
+        arrays = {k: np.asarray([r["trace"][k] for r in rs], dtype=np.float64) for k in ("t_turb", "t_oil", "ki")}
+        np.savez(path, dt=np.float64(dt), **arrays)
+        with open(path, "rb") as fh:
+            files[f"{engine}/{name}.npz"] = hashlib.sha256(fh.read()).hexdigest()
+    save("baseline", rows["hand"][BASELINE])
+    for (arm, seed), rs in sorted(rows["agents"].items(), key=lambda kv: (kv[0][0], int(kv[0][1]))):
+        save(f"{arm}_seed{int(seed)}", rs)
+    return files
+
+
+def rescore_from_records(records, *, cal):
+    """{'no_knock': [D per road], 'with_knock': [D per road]} from a per-step record (write_records'
+    arrays): a sequential Python sum of engine_env.damage_rate(...) * dt, the one damage definition, at
+    the damage record `cal`."""
+    tt, to, ki = (np.asarray(records[k], dtype=np.float64) for k in ("t_turb", "t_oil", "ki"))
+    dt = float(records["dt"])
+    out = {"no_knock": [], "with_knock": []}
+    for i in range(tt.shape[0]):
+        nk = wk = 0.0
+        for j in range(tt.shape[1]):
+            nk += damage_rate(tt[i, j], to[i, j], cal=cal) * dt
+            wk += damage_rate(tt[i, j], to[i, j], ki[i, j], cal=cal) * dt
+        out["no_knock"].append(nk)
+        out["with_knock"].append(wk)
+    return out
+
+
+def merge_scores(paths):
+    """One four-engine-scores/1 document from several, one engine each (interface sheet 8; row 143 (1),
+    (4)). Refused (SystemExit): another schema, n_roads not N_D34_ROADS, mixed ratios or variants, an
+    engine in two documents, and documents whose versions, platform or device differ (one engine's
+    documents never differ; two engines' may only once cross-machine stability is measured, row 143 (4),
+    which no record holds). The merged provenance names every source by path and sha256."""
+    import hashlib
+    docs = []
+    for path in paths:
+        with open(path, "rb") as fh:
+            raw = fh.read()
+        doc = json.loads(raw)
+        if doc.get("schema") != SCORES_SCHEMA:
+            raise SystemExit(f"\nREFUSING {path}: schema {doc.get('schema')!r}, not {SCORES_SCHEMA!r}")
+        if doc.get("n_roads") != N_D34_ROADS:
+            raise SystemExit(f"\nREFUSING {path}: n_roads {doc.get('n_roads')!r}, not {N_D34_ROADS}")
+        docs.append((path, hashlib.sha256(raw).hexdigest(), doc))
+    if len({json.dumps(d["ratios"]) for _, _, d in docs}) > 1:
+        raise SystemExit("\nREFUSING to merge: the documents hold different ratios")
+    if len({json.dumps(d.get("variant")) for _, _, d in docs}) > 1:
+        raise SystemExit("\nREFUSING to merge: the documents hold different variants")
+    where, merged = {}, {}
+    for path, _, d in docs:
+        for e, entry in d["engines"].items():
+            if e in where:
+                raise SystemExit(f"\nREFUSING to merge: {e} is in {where[e]} and in {path}")
+            where[e] = path
+            merged[e] = entry
+    envs = {json.dumps([(d.get("provenance") or {}).get(k) for k in ("versions", "platform", "device")],
+                       sort_keys=True) for _, _, d in docs}
+    if len(envs) > 1:
+        raise SystemExit("\nREFUSING to merge: the documents' versions, platform or device differ, and no record "
+                         "measures cross-machine stability (row 143 (4))")
+    first = docs[0][2]
+    return {"schema": SCORES_SCHEMA, "ratios": first["ratios"], "n_roads": first["n_roads"],
+            "variant": first.get("variant"),
+            "provenance": {"copied_from": [{"path": p, "sha256": s, "engines": sorted(d["engines"])}
+                                           for p, s, d in docs],
+                           "per_document": [d.get("provenance") for _, _, d in docs]},
+            "engines": merged}
+
+
+def agents_provenance(agents, manifests):
+    """{arm: {seed: {path, H_s, r, manifest_sha256}}} (interface sheet 12.7)."""
+    out = {}
+    for x in agents:
+        out.setdefault(x["arm"], {})[str(int(x["seed"]))] = {
+            "path": x["path"].replace(os.sep, "/"), "H_s": x["H_s"], "r": x["r"],
+            "manifest_sha256": manifests[x["path"]]["sha256"]}
+    return out
+
+
+def d34_report(engine, rows, *, header, reading, ratios, lines):
+    """The text report of a decision-34 or practice scoring: the provenance lines, each policy's medians,
+    each agent's cut in evaluate.py's form in both readings, and each seed's sighted minus blinded cut per
+    ratio. Never written as results/*_seed*.txt (the app reads only those)."""
+    base = rows["hand"][BASELINE]
+    say = [f"{header} -- {engine}, {len(base)} roads ({reading}), each with its own seed and weights",
+           f"reading: no knock (damage_thermal) is primary; with knock (damage) is beside it, "
+           f"\"{with_knock_label()}\", and decides nothing", ""]
+    say += lines
+    say.append("")
+    say.append(f"{'policy':<30}{'D no knock':>12}{'D knock':>10}{'fuel med':>10}{'short med':>11}{'peak C':>9}")
+    say.append("-" * 82)
+
+    def med(rs, k):
+        return float(np.median([float(x[k]) for x in rs]))
+
+    def share(rs):
+        v = [x["short_steps"] / x["demand_steps"] for x in rs if x["demand_steps"]]
+        return float(np.median(v)) if v else float("nan")
+    named = [(name, rs) for name, rs in rows["hand"].items()]
+    named += [(f"{arm} seed {seed}", rs) for (arm, seed), rs in
+              sorted(rows["agents"].items(), key=lambda kv: (kv[0][0], int(kv[0][1])))]
+    for name, rs in named:
+        say.append(f"{name:<30}{med(rs, 'damage_thermal'):>12.1f}{med(rs, 'damage'):>10.1f}{med(rs, 'fuel'):>10.0f}"
+                   f"{share(rs):>11.4f}{max(float(x['peak_turb']) for x in rs):>9.0f}")
+    say.append("-" * 82)
+    say.append("  cut against the baseline ECU, 100 x (1 - median D / median D_base): no knock [with knock]")
+    cut = {}
+    for name, rs in named:
+        if name == BASELINE:
+            continue
+        c = {reading_: median_cut([x[key] for x in rs], [b[key] for b in base])
+             for reading_, key in READING_KEYS.items()}
+        cut[name] = c
+        say.append(f"    {name:<28} {c['no_knock']:+8.2f} [{c['with_knock']:+8.2f}]")
+    for r in ratios:
+        say.append(f"  d at r = {r}, sighted_r{r} minus blind, per seed: no knock [with knock]")
+        for (arm, seed), _ in sorted(rows["agents"].items(), key=lambda kv: (kv[0][0], int(kv[0][1]))):
+            if arm != f"sighted_r{r}" or f"blind seed {seed}" not in cut:
+                continue
+            s, b = cut[f"{arm} seed {seed}"], cut[f"blind seed {seed}"]
+            say.append(f"    seed {seed:<6} {s['no_knock'] - b['no_knock']:+8.2f} "
+                       f"[{s['with_knock'] - b['with_knock']:+8.2f}]")
+    return say
+
+
 def main():
     ap = argparse.ArgumentParser(description="Phase D evaluation protocol.")
     ap.add_argument("models", nargs="*",
@@ -448,11 +1350,13 @@ def main():
                     help="evaluate a model whose meta.json disagrees with this "
                          "tree, or has none. The mismatch is stamped into the "
                          "output; it is never silent.")
-    ap.add_argument("--protocol", choices=sorted(PROTOCOLS), default="phase-d",
+    ap.add_argument("--protocol", choices=sorted(PROTOCOLS) + [DECISION_34], default="phase-d",
                     help="which frozen episode set: 'phase-d' (the fixed climb, "
-                         "the default and unchanged) or 'd2' (the randomised "
-                         "climb). Each has its own fingerprint, so an agent "
-                         "trained under one is refused by the other.")
+                         "the default and unchanged), 'd2' (the randomised "
+                         "climb) or 'd34' (decision 34's twenty roads, ORDER "
+                         "step 16; see the docstring). Each has its own "
+                         "fingerprint, so an agent trained under one is refused "
+                         "by the other.")
     ap.add_argument("--overwrite", action="store_true",
                     help="replace an existing --out file. Without it an "
                          "existing file is refused: results/*.txt are "
@@ -468,8 +1372,28 @@ def main():
                     help="the reward the agents trained with (row 113 (5)): 'in', "
                          "X1's, the knock term in r_life, or 'out'. A FATAL "
                          "fingerprint field (row 117), so an agent trained the "
-                         "other way is refused. Absent: 'in' on phase-d and d2")
+                         "other way is refused. Absent: 'in' on phase-d and d2; "
+                         "required on d34")
+    # decision 34's protocol only (ORDER step 16; interface sheet 8), each refused on phase-d and d2
+    ap.add_argument("--practice", action="store_true",
+                    help="with --protocol d34: score row 96's ten practice roads (decision 29's pilot), "
+                         "not the test set")
+    ap.add_argument("--scores-out", default=None, metavar="PATH",
+                    help="with --protocol d34: the four-engine-scores/1 (or, with --practice, "
+                         "four-engine-practice/1) document, written once, outside the repository")
+    ap.add_argument("--records-out", default=None, metavar="DIR",
+                    help="with --protocol d34: a new folder outside the repository for the baseline ECU's "
+                         "and every agent's per-step t_turb, t_oil and ki")
+    ap.add_argument("--jobs", type=int, default=None, metavar="N",
+                    help="with --protocol d34: spawn workers (default 1); the scores are the same at any N")
     a = ap.parse_args()
+    if a.protocol == DECISION_34:
+        return main_decision34(a)
+    for flag, given in (("--practice", a.practice), ("--scores-out", a.scores_out is not None),
+                        ("--records-out", a.records_out is not None), ("--jobs", a.jobs is not None)):
+        if given:
+            raise SystemExit(f"\nREFUSING {flag} on --protocol {a.protocol}: it belongs to decision 34's "
+                             f"protocol (--protocol {DECISION_34}); the {a.protocol} route is unchanged")
     knock = (a.reward_knock or "in") == "in"     # REWARD_KNOCK_DEFAULT when absent (row 118)
     episodes, header, _ = PROTOCOLS[a.protocol]
     if a.out and os.path.exists(a.out) and not a.overwrite:
@@ -612,6 +1536,156 @@ def main():
         with open(a.out, "w", encoding="utf-8") as fh:
             fh.write("\n".join(captured) + "\n")
         print(f"\nwritten to {a.out}")
+
+
+def recipe_checks(agents, manifests):
+    """Decision 29's recipe as each agent's own files record it (ORDER step 21's checks: the learning rate
+    reaches 0, the average is taken): config.json's recipe.learning_rate_at_end and the manifest scored.
+    Reported, never refused here: a broken recipe is a coding defect, handled by row 112."""
+    out = {}
+    for x in agents:
+        lr = (x["config"].get("recipe") or {}).get("learning_rate_at_end")
+        man = manifests[x["path"]]
+        out[x["path"].replace(os.sep, "/")] = {"learning_rate_at_end": lr, "learning_rate_reaches_0": lr == 0.0,
+                                               "average_taken": len(man["snapshots"]), "manifest_sha256": man["sha256"]}
+    return out
+
+
+def records_index_path(scores_out):
+    """<scores>.records.json, beside the scores document (interface sheet 12.7)."""
+    return os.path.splitext(scores_out)[0] + ".records.json"
+
+
+def main_decision34(a):
+    """--protocol d34, and --practice (DECISION 34'S PROTOCOL, in the docstring): every refusal of the
+    command line first, then the roads, the agents and their checks (the arm and H, one environment, the
+    backend record, row 117's pairs, each agent's decision-34 fingerprint, its checkpoint average), the
+    scoring, the document written once, the records and the report."""
+    import fnmatch
+    import platform
+    import sys
+    import epa_freeze as EF
+    import epa_roads as ER
+    import four_engine_roads as FER
+
+    def refuse(why):
+        raise SystemExit(f"\nREFUSING --protocol {DECISION_34}{' --practice' if a.practice else ''}: {why}")
+    if a.force_plant_mismatch:
+        refuse("--force-plant-mismatch: every agent is scored on the plant, H and reward it trained on, or not "
+               "at all (interface sheet 8)")
+    if a.label is not None:
+        refuse(f"--label: the report is headed {D34_HEADER!r}, or {PRACTICE_HEADER!r} on the practice roads")
+    if a.overwrite:
+        refuse("--overwrite: decision 34's documents and reports are written once")
+    if a.reward_knock is None:
+        refuse("--reward-knock in|out is required: the reward the agents trained with is a FATAL field, passed "
+               "on the command line and never read from meta.json (interface sheet 8)")
+    if a.scores_out is None:
+        refuse("--scores-out PATH is required: the scores document is the scoring's result")
+    if a.practice and a.records_out is not None:
+        refuse("--records-out: the per-step records are the test set's, not the practice roads'")
+    for flag, path in (("--scores-out", a.scores_out), ("--records-out", a.records_out)):
+        if path is not None and FER.inside_repository(path):
+            refuse(f"{flag} {path} lies inside the repository: it is written outside it, and its own step "
+                   "commits it")
+    if a.out and fnmatch.fnmatch(os.path.basename(a.out), "*_seed*.txt"):
+        refuse(f"--out {a.out}: the report is never written as results/*_seed*.txt, which the app reads as "
+               "Phase D's")
+    index = records_index_path(a.scores_out) if a.records_out else None
+    for flag, path in (("--scores-out", a.scores_out), ("--out", a.out), ("--records-out", a.records_out),
+                       ("the records' index", index)):
+        if path is not None and os.path.exists(path):
+            refuse(f"{flag} {path} exists: it is written once")
+    if not a.models:
+        refuse("no agents given: decision 34 scores runs/<set>/<run> folders")
+    jobs = 1 if a.jobs is None else int(a.jobs)
+    if jobs < 1:
+        refuse(f"--jobs {jobs}: at least 1")
+    knock = a.reward_knock == "in"
+    plant = engines.get(a.engine)
+    rec_path = os.path.join(HERE, *ER.ROADS_REL.split("/"))
+    try:
+        roads_rec = FER.read_roads_record(rec_path)
+    except FER.Refused as exc:
+        refuse(str(exc))
+    if roads_rec["seed_kind"] == "REAL":
+        problem = FER.real_record_problem(rec_path)
+        if problem:
+            refuse(problem)
+    train_backend = committed_train_backend(a.engine, root=HERE)
+    record = None
+    if a.practice:
+        record = ER.load_record(rec_path)
+        roads = practice_set(record)
+        prov = {"protocol": f"{DECISION_34} practice", "label": PRACTICE_HEADER, "roads_sha": roads_rec["roads_sha"],
+                "practice_arrays_sha256": ER.arrays_sha256(roads), "reading": "row 96's practice roads"}
+    else:
+        roads, prov = decision34_roads(root=HERE)
+    agents = read_agents(a.models, roads_rec=roads_rec, engine=a.engine)
+    for check, problems in (("one environment (row 143 (5); CLAUDE.md rules 3 and 5)",
+                             environment_problems([(x["path"], x["meta"], x["config"]) for x in agents])),
+                            ("the backend record's train_backend", backend_problems(agents, train_backend)),
+                            ("row 117's pairs", pairing_problems(agents))):
+        if problems:
+            refuse(f"{check}: " + "; ".join(problems))
+    lives = {}
+    for x in agents:
+        if x["H_s"] is not None and x["H_s"] not in lives:
+            lives[x["H_s"]] = live_decision34(plant, preview_h_s=x["H_s"], reward_knock=knock,
+                                              train_backend=train_backend)
+    blind_live = FP.for_arm(next(iter(lives.values())), sighted=False)
+    lines, manifests = [], {}
+    for h, live in sorted(lives.items()):
+        lines.append(FP.format_block(live, f"DECISION 34 FINGERPRINT (sighted at H {h:g} s)"))
+    lines.append(FP.format_block(blind_live, "DECISION 34 FINGERPRINT (blinded)"))
+    for x in agents:
+        lines += check_model_fingerprint(x["path"], blind_live if x["H_s"] is None else lives[x["H_s"]], False)
+        manifests[x["path"]], more = average_lines(x["path"], x["meta"])
+        lines.append(f"{x['path']}: {x['arm']}, seed {x['seed']}, H {x['H_s']} s, r {x['r']}")
+        lines += more
+    ratios = sorted({f"{x['r']:g}" for x in agents if x["r"] is not None}, key=float)
+    # the scored set's episodes_sha is the decision-34 twenty's on the test set; the practice roads are not
+    # that set, so there it is kept under trained_under alone
+    scored_sha = {} if a.practice else {"episodes_sha": blind_live["episodes_sha"]}
+    prov.update(trained_under={"scenario": blind_live["scenario"], "episodes_sha": blind_live["episodes_sha"]},
+                **scored_sha, reward_knock=knock, train_backend={a.engine: train_backend},
+                score_backend=FP.BACKEND_CYCLE, versions=EF.versions(), platform=platform.platform(), device="cpu",
+                environment=env_of(agents[0]["meta"], agents[0]["config"]),
+                agents=agents_provenance(agents, manifests), recipe_checks=recipe_checks(agents, manifests),
+                variant_lines=[], rescored_engines=[a.engine], copied_from=None)
+    if a.practice:
+        doc, rows = score_practice(a.engine, agents, record, plant=plant, reward_knock=knock,
+                                   train_backend=train_backend, jobs=jobs, provenance=prov)
+    else:
+        rows = score_set(a.engine, agents, roads, plant=plant, reward_knock=knock, train_backend=train_backend,
+                         jobs=jobs, keep_records=a.records_out is not None)
+        doc = scores_document(a.engine, rows, ratios=ratios, provenance=prov)
+    sha = write_once_json(a.scores_out, doc)
+    say = d34_report(a.engine, rows, header=PRACTICE_HEADER if a.practice else D34_HEADER, reading=prov["reading"],
+                     ratios=ratios, lines=lines)
+    if a.practice:
+        # decision 29's pilot reads s_p from this document (row 103 (4)); printed beside the scores, never its
+        # bound, which is the analysis's (pilot_spread)
+        for r in ratios:
+            try:
+                sp = pilot_spread(doc, engine=a.engine, ratio=r)
+            except ValueError as exc:
+                say.append(f"s_p at r = {r}: not computed ({exc})")
+            else:
+                say.append(f"s_p at r = {r} (row 103 (4); no knock, ddof 1, {sp['pairs']} pairs): {sp['s_p']:.4f}")
+    say.append("")
+    say.append(f"scores document {a.scores_out}: sha256 {sha}")
+    if a.records_out:
+        files = write_records(a.records_out, a.engine, rows, dt=float(roads[0]["dt"]))
+        isha = write_once_json(index, {"files": files, "scores_sha256": sha, "command": " ".join(sys.argv)})
+        say.append(f"per-step records under {a.records_out}: {len(files)} files; index {index}, sha256 {isha}")
+    print("\n".join(say))
+    if a.out:
+        os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+        with open(a.out, "x", encoding="utf-8", newline="\n") as fh:
+            fh.write("\n".join(say) + "\n")
+        print(f"\nwritten to {a.out}")
+    return 0
 
 
 if __name__ == "__main__":
