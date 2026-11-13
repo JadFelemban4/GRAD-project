@@ -1127,3 +1127,52 @@ given (the commands pass paths relative to the repository).
 
 **What waits:** Q's commit (its runs passed beside G's gate: test_reward and check_roads on the B58 through the
 REAL roads record, and the battery's hills), Ta, then B1 on Jad's PC.
+
+## 21. 13 November: Q, the B58's gates (ORDER step 17)
+
+**What Q carries.** The outputs of the B58's gates (ORDER step 17; INTERFACES 9 and 17 item 9), each run on
+9 November in its own fresh clone of the pushed Qa, outside the repository, beside G's gate and never beside a
+threading test or a roads check (rule 1.3):
+- `test_reward.py --engine b58 --train-road four_engine --roads results/EPA_ROADS/roads.json --reward-knock out`:
+  row 119's gate through the REAL roads record, with decision 29's share off (the share on is not run,
+  INTERFACES 9). Its printout, with the sweep, the band, the check table, the blind-arm check at each H of the
+  record and the two lines given for information (row 116), is
+  `results/ENGINE_GATES/b58/test_reward_four_engine_share_off_knock_out.txt`.
+- `check_roads.py` with the same options, once as it is and once with `--roads-record results/EPA_ROADS/roads.json`:
+  the roads table with the share off and with it on, two JSON tables (`check_roads_four_engine_share_off_knock_out.json`
+  and `..._share_on_knock_out.json`) and their printouts, in the same folder.
+- `conditions_test.py --set runs/b58h_dt1 --hills-only`: the battery's hills, fixed on Qa's B58 before any agent of
+  the study trains, in `results/conditions_b58h_dt1/conditions_grades.json`, which V's `b58h_descriptive.py` reads
+  (refusing a file whose engine_sha is not the plant's) and PR-B names. It takes no `--reward-knock`: the hills
+  are the baseline ECU's peaks.
+- `results/ENGINE_GATES/b58/provenance.txt`: Qa's sha beside them, each run's command, clone, interpreter and
+  times, and each file's sha_text.
+
+Each run started once and passed, by its own verdict and by Q's judge of its printout and outputs; none was run or
+judged again. The four went side by side, each starting only once enough memory was free (the orchestrator's rule
+for Q's runs). Their figures are in Q's commit message, not here.
+
+**What Q changes besides its outputs: `verify_docs.py`.** Q's printouts join the tracked files verify_docs.py
+reads, and its first run on Q's tree failed on them, not on a document: `provenance.txt` quotes the hills
+printout, whose seven result lines each put a condition's peak temperature a few words after the word
+check_premise's damage pattern anchors on, so the figure scan read them as that figure; and the share-off roads
+table prints a bare percentage equal to a retired figure. As for the probe's tables and step 3's files, Q's
+printouts (`test_reward_*`, `check_roads_*` and `provenance` under `results/ENGINE_GATES/<engine>/`) are now
+exempt by their paths in `RETIRED_EXEMPT_RESULT_TABLES`, with its dated reason. The cost is wider than theirs: the
+entry drops the files from both of verify_docs.py's scans, so a misquoted live figure in them would pass as well as a
+retired one. They are the gate's own output, written once and never edited, and the commit message quotes their
+summary lines from the runs. Q's gate had expected verify_docs to pass by reading; the change is the orchestrator's decision, Q's and
+Ta's gates were amended to let verify_docs.py stand beside Q's documents, and drift_test.py ran on Q's tree before
+the commit (mistake 11: after touching the guard), its result in the commit message.
+
+**Why the commit waited.** Q's runs ended on 9 November, and Q is committed after V and before B1 (INTERFACES 9).
+Before the commit, Q's gate checked in a fresh clone of the pushed V that no FATAL fingerprint field of the B58
+moved from Qa to V (G and V change no plant-code file), so the outputs made on Qa's tree stand for V's B58, and it
+ran verify_docs.py on Q's tree with these documents.
+
+**Open, from Q:** a repeat of Q after a re-made P (row 140 (5); ORDER step 17's last sentence) is not built into
+Q's gate: its commit would modify Q's committed paths, which the gate refuses. The orchestrator's decision: P is
+final once pushed; a re-made P after its push is a follow-up commit, and Q is then run again by hand. The battery's
+hills file is still checked by its engine_sha alone (section 20).
+
+**What waits:** Ta, then B1 on Jad's PC.

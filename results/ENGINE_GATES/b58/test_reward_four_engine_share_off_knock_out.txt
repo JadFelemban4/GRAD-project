@@ -1,0 +1,31 @@
+PER-ENGINE REWARD GATE (row 119): b58 in its own car (b58b30o1/a90-supra-zf8hp51)
+decision 34's roads : results/EPA_ROADS/roads.json, REAL, through fingerprint.d34_roads: results/EPA_ROADS/redraws.json's version 6 reading (20 roads)
+training road       : four_engine (train.build_env), seeds 11-20
+decision 29's share : off (no --roads-record): the general episodes only
+reward              : without the knock term (--reward-knock out; row 113 (5))
+preview horizons    : 23.6675, 71.0026 s
+neutral action      : [0.333 0.429 0.455 1.    1.   ]
+
+THE SWEEP: 361 grades, 0.05 % apart over 0-18 %, at 130 km/h and 315 K (epa_stats.c5_steps)
+  held at 0 %: 8. Each notch, with the grade 0.05 % below it and C5's smallest margin at it:
+      8.85 %  (below: 8.80 %)  8 -> 7  margin 0.0019
+     14.00 %  (below: 13.95 %)  7 -> 6  margin 0.0019
+  band grade: 8.80 % (the last grade before the first notch)
+
+check                                           result   detail
+------------------------------------------------------------------------------------------------
+gearbox table still matches the plant             PASS   worst drift 0.02 % at 1200 rpm, 29 speeds of the car's table   (want < 1.5 %)
+baseline delivers torque on the band, 8.80 %      PASS   p95 tracking error 0.003, neutral -0.00108
+the notch at 8.85 % (8 -> 7)                      PASS   neutral -0.00017  starver -0.10795  random -0.00686  |d obs| 1.062
+the notch at 14.00 % (7 -> 6)                     PASS   neutral -0.00030  starver -0.11046  random +0.01554  |d obs| 1.68
+neutral scores about zero on every decision-34 road    PASS   worst k 14 -0.00137, 20 roads (the record); worst p95 err 0.004
+refusing torque is punished on a decision-34 road    PASS   starver -0.28683  vs  neutral -0.00102   (the record, k 0)
+neutral scores about zero on every training road    PASS   worst seed 19 -0.00140, 10 roads (four_engine); worst p95 err 0.012
+refusing torque is punished on a training road    PASS   starver -0.20931  vs  neutral -0.00020   (four_engine, seed 11)
+the blind arm is blind at H = 23.6675 s           PASS   road 0 slot 0: the grades differ from step 197; BLIND first differs at 197 (want >= 197), SIGHTED at 174 (want 174)
+the blind arm is blind at H = 71.0026 s           PASS   road 0 slot 0: the grades differ from step 197; BLIND first differs at 197 (want >= 197), SIGHTED at 126 (want 126)
+------------------------------------------------------------------------------------------------
+FOR INFORMATION, NOT A PASS/FAIL (row 116): on the four_engine roads, neutral, steps asking under the torque floor 0.00 % (worst road 0.00 %), over the deliverable torque 0.00 % (worst road 0.00 %), 10 roads
+FOR INFORMATION, NOT A PASS/FAIL (row 116): on decision 34's roads, neutral, steps asking under the torque floor 0.00 % (worst road 0.00 %), over the deliverable torque 0.00 % (worst road 0.00 %), 20 roads
+
+All checks pass on b58. The reward is safe to train this engine against.

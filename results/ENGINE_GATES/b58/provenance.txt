@@ -1,0 +1,76 @@
+Q, ORDER step 17: the B58's gates and their outputs (rows 116, 119, 130 (5), 146 (3); interface sheet sections 9 and 17)
+qa_sha 742239aad40a7877c02168c86c3332a730e0c963
+qa_subject build step 2, ORDER step 14a (Qa): engine_gate reads decision 34's redrawn twenty from the repository's roads.json
+where each run in its own fresh git clone of the repository at qa_sha, outside it: detached, clean, the clone as the working folder
+interpreter the repository's .venv/Scripts/python.exe -B, Python 3.13.2, Windows-11-10.0.26200-SP0
+environment OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+not run test_reward.py with the share on (interface sheet 9: the share's own roads are row 101's, which decision 34's checks gate)
+the B58 on qa_sha (fingerprint.py --engine b58 --protocol d34 --reward-knock out):
+  --- PLANT FINGERPRINT (live) ----------------------------------
+    plant_sha                36655cab94800e30
+    derived_sha              326c0835548975e2
+    engine                   b58b30o1/a90-supra-zf8hp51
+    engine_sha               023f5589215ee68e
+    train_backend            cycle
+    score_backend            cycle
+    backend_contract         json_sha_text=07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1 md_sha_text=72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7
+    transmission             final_drive=3.15 gears=5.25 3.36 2.172 1.72 1.316 1 0.822 0.64 kind=stepped
+    dtheta_deg               0.25
+    turb_protect_k           1123
+    oil_protect_k            408
+    scenario                 design_sha=67ba4fb20caf55a5 protocol=decision-34 reading=version 6 redraws_sha=82fa42525c0c3ad977b794a67f0c6433a4a2a2795daabf43725826d10c68534e roads_sha=27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498 seed_kind=REAL
+    episodes_sha             4a34364bd32aa8a2
+    preview_h_s              30
+    reward_knock             False
+    eval_dt                  1
+    eval_duration            900
+    git_dirty                False
+    git_dirty_plant_files    
+    git_head                 742239aad40a7877c02168c86c3332a730e0c963
+    n_episodes               20
+    plant_text_sha           af6d4f5d8318a9c8
+    preview_samples_s        2 5 15 30
+    python                   3.13.2
+  --------------------------------------------------------------
+
+run reward
+  command $PY -B test_reward.py --engine b58 --train-road four_engine --roads results/EPA_ROADS/roads.json --reward-knock out
+  started 2026-11-09T14:21:21Z ended 2026-11-09T14:41:06Z wall_s 1185 exit 0 stderr_bytes 0
+  starts 1 (each earlier start is kept with the gate's logs, with its decision); judged by reward
+  printout results/ENGINE_GATES/b58/test_reward_four_engine_share_off_knock_out.txt sha_text ea4417823ae08da4d141a5e6d7864c7a404181b62a81e8dbfaf2451088789372
+
+run roads-off
+  command $PY -B check_roads.py --engine b58 --train-road four_engine --roads results/EPA_ROADS/roads.json --reward-knock out
+  started 2026-11-09T14:04:51Z ended 2026-11-09T14:26:04Z wall_s 1273 exit 0 stderr_bytes 0
+  starts 1 (each earlier start is kept with the gate's logs, with its decision); judged by roads-off
+  printout results/ENGINE_GATES/b58/check_roads_four_engine_share_off_knock_out.txt sha_text d8e301bc3374e3b3e0ea572b10a4eb4e26b5ea8729ff0510cd5db23cb35b3542
+  output results/ENGINE_GATES/b58/check_roads_four_engine_share_off_knock_out.json sha_text 1d8884bd579b2edd5de9ff0ab4b14e3b1bba76e6b8ab158a74aa5d47b0d19e9d
+
+run roads-on
+  command $PY -B check_roads.py --engine b58 --train-road four_engine --roads results/EPA_ROADS/roads.json --roads-record results/EPA_ROADS/roads.json --reward-knock out
+  started 2026-11-09T13:50:25Z ended 2026-11-09T14:10:46Z wall_s 1221 exit 0 stderr_bytes 0
+  starts 1 (each earlier start is kept with the gate's logs, with its decision); judged by roads-on
+  printout results/ENGINE_GATES/b58/check_roads_four_engine_share_on_knock_out.txt sha_text 89291bc6f5ded4f578ff37d63e5e3314db70307947f6719aa317d2e0df4ada46
+  output results/ENGINE_GATES/b58/check_roads_four_engine_share_on_knock_out.json sha_text a25e5c779030f95e0eebb660ef2c95993ec0c3bf16d63aaaefbb1161eecaca74
+
+run hills
+  command $PY -B conditions_test.py --set runs/b58h_dt1 --hills-only
+  started 2026-11-09T13:52:36Z ended 2026-11-09T15:04:34Z wall_s 4318 exit 0 stderr_bytes 0
+  starts 1 (each earlier start is kept with the gate's logs, with its decision); judged by hills
+  output results/conditions_b58h_dt1/conditions_grades.json sha_text 1cdb7bdfb43e1fc5987285dc914955285d6572bf150469b5862f6983945e4020
+  printout (verbatim; no file of its own):
+    hill for 42 C, 101.3 kPa (trained air): coarse grid
+       grade 8.25 %, baseline peak 882.7 C
+    hill for 25 C: coarse grid
+       grade 21.75 %, baseline peak 882.8 C
+    hill for 35 C: coarse grid
+       grade 12.00 %, baseline peak 883.0 C
+    hill for 50 C: coarse grid
+       grade 7.50 %, baseline peak 882.6 C
+    hill for 90 kPa: coarse grid
+       grade 8.75 %, baseline peak 885.4 C
+    hill for 82 kPa, about Taif: coarse grid
+       grade 12.00 %, baseline peak 886.6 C
+    hill for 76 kPa, the climb's top: coarse grid
+       grade 12.25 %, baseline peak 888.1 C
+    wrote results\conditions_b58h_dt1\conditions_grades.json

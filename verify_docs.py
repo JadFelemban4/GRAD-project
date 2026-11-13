@@ -980,11 +980,22 @@ RETIRED_EXEMPT_AGENT_DIRS = ("results/agents/",)
 # pip's install lines, and "uvicorn-0.52.4" matched the retired -0.52 enrichment correlation six times.
 # The files are the device's own output, committed verbatim and never edited. Same cost: a retired
 # figure in them would pass. The folder's README.md is still checked.
+# 13 November 2026: the B58's gates of ORDER step 17, which Q commits in results/ENGINE_GATES/<engine>/: the
+# printouts of test_reward.py and check_roads.py, each written whole from its run's stdout, and provenance.txt,
+# which Q's gate writes once and which quotes the hills run's printout verbatim. Each of that printout's seven
+# result lines prints a condition's peak housing temperature a few words after the word check_premise's damage
+# pattern anchors on, so the figure scan read all seven as that figure; the roads table prints bare percentages,
+# and one equals the retired pre-correction load residual. The files are the gate's own output, written once and
+# never edited; Q's commit message quotes their summary lines from the runs. The cost is wider than the entries
+# above state for theirs: _generated_agent_report also drops these files from ALL, which the figure scan reads,
+# so a misquoted live figure in them would pass as well as a retired one. The hills file itself,
+# results/conditions_b58h_dt1/conditions_grades.json, is JSON and outside SCAN_EXT.
 RETIRED_EXEMPT_RESULT_TABLES = re.compile(
     r"results/(phase_d_[a-z0-9]+_dt1|X\d+_RESULT|DRIVE_C_RULE_NUMBERS"
     r"|EPA_ROADS/(?:control|sweep|timing|attempt_\d+_printed)"
     r"|EPA_ROADS/probe_\d{4}-\d{2}-\d{2}/(?:calc/|review/)?\w+"
-    r"|benchmarks/step3_\d{4}-\d{2}-\d{2}/\w+)\.txt$")
+    r"|benchmarks/step3_\d{4}-\d{2}-\d{2}/\w+"
+    r"|ENGINE_GATES/[a-z0-9_]+/(?:(?:test_reward|check_roads)_\w+|provenance))\.txt$")
 
 
 def _generated_agent_report(rel):
