@@ -1176,3 +1176,28 @@ final once pushed; a re-made P after its push is a follow-up commit, and Q is th
 hills file is still checked by its engine_sha alone (section 20).
 
 **What waits:** Ta, then B1 on Jad's PC.
+
+## 22. 13 November: Ta, the backend's code (ORDER step 17b)
+
+**What Ta carries.** `epa_backend.py` and `test_epa_backend.py` (interface sheet 10.1, 12.5 and 17), the
+draft of 5 November ported to P's tree and to rows 146-147, reviewed and fixed. The code types row 135's protocol,
+the drop order of row 136, and the rule that leaves n null whenever no EPA engine is left, which is Run 2's
+outcome: B1 times the B58 alone, and that null n is not the B58 study's n (row 147 (4)). Its checks refuse only a
+change that can move the backend record, each path named with why, so that PR-B's gate can run them on its staged
+tree. It holds PR-B's commands for the study (row 146 (5), row 147 (3)) and `cost_files`: the files whose change
+after an attempt's commit makes that attempt's rate stale, so that it is superseded (sheet 10.1), a narrower list
+than the paths its checks refuse. The test covers each of these with a control. Its three live tests skip only while
+the file each reads, the backend record or PR-B's `results/PREREGISTRATION_B58H.md`, is absent and was never
+committed; a file present and not yet committed fails at once (a deviation from the sheet that Ta's message names),
+and so does one removed after its commit.
+
+**Its gate.** In a fresh clone of the pushed Q, outside the repository, with Ta's two files checked out from the
+candidate and staged: the backend's test, the benchmark's self-test and the `cost_files` count side by side, then
+the threading test alone, then these documents staged on that tree and verify_docs.py run on it. Their results are
+in Ta's commit message, not here.
+
+**What it starts.** Ta is B1's tree (ORDER step 18): Jad's PC checks it out, times the B58 on the CPU and pushes
+B1's commit; nothing is pushed from the laptop in between (row 146 (6)). Right after Ta's push the laptop makes its
+B2 identity file at Ta's commit, in a clean clone outside the repository, for B2's comparison on the training
+device; it is recorded and decides nothing (decision 32). A commit cannot name itself, and B1's commit on Jad's PC
+carries only its records, so Tb's session report (ORDER step 19) names Ta's commit.
