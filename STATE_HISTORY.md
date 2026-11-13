@@ -5453,3 +5453,13 @@ From "Next actions", item 11, as committed at `8075e8b`:
    without). Notes go in the columns (Notion's free block limit). Jad reads B37, B40, B19, B18, B06, B31, A25, B49, C20
    and C18 next (`NEXT_SESSION_2026-11-11_reading.md`); the other 40 wait for readers (Jad's split). Each source is read
    in full by its named reader before it is cited. Paid, still missing: D01, A03 (the zip has the thesis A06) and C36.
+
+# Part AU — lines rotated out of CHECKPOINT.md, 13 November 2026 (Jad's close: B19, B18 and B06 read)
+
+From "Next actions", item 11, as committed at `59dac76`:
+
+11. The literature: the tracker in the team's Notion holds 50 papers, `docs/literature/TOP40.md`'s 40 and 10 added on
+   11 November, 42 with a file (`docs/literature/READING_METHOD.md`, Dr. Hammam's method; its last section names the 8
+   without). Notes go in the columns (Notion's free block limit). Jad has read B37 and B40 (Annotated; `SESSION_REPORT_2026-11-12_reading-B37-B40.md`);
+   next B19 from the start, then B18, B06, B31, A25, B49, C20, C18 (`NEXT_SESSION_2026-11-12_reading.md`). The other 40 wait
+   for readers; each is read in full by its named reader before it is cited. Paid, still missing: D01, A03 (A06 in the zip), C36.

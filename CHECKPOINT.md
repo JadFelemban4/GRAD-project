@@ -125,9 +125,9 @@ the project is on the research track; the team plans in Notion (gates G0–G9).
    decision 32) is Part B's B2, at ORDER step 18.
 11. The literature: the tracker in the team's Notion holds 50 papers, `docs/literature/TOP40.md`'s 40 and 10 added on
    11 November, 42 with a file (`docs/literature/READING_METHOD.md`, Dr. Hammam's method; its last section names the 8
-   without). Notes go in the columns (Notion's free block limit). Jad has read B37 and B40 (Annotated; `SESSION_REPORT_2026-11-12_reading-B37-B40.md`);
-   next B19 from the start, then B18, B06, B31, A25, B49, C20, C18 (`NEXT_SESSION_2026-11-12_reading.md`). The other 40 wait
-   for readers; each is read in full by its named reader before it is cited. Paid, still missing: D01, A03 (A06 in the zip), C36.
+   without). Notes go in the columns (Notion's free block limit). Jad has read B37, B40, B19, B18 (Annotated) and B06 (its
+   synopsis unconfirmed in Notion, its Status open; `SESSION_REPORT_2026-11-13_reading-B19-B18-B06.md`); next B31, A25, B49,
+   C20, C18 (`NEXT_SESSION_2026-11-13_reading.md`). The other 40 wait for readers; each is read in full by its named reader before it is cited. Paid, still missing: D01, A03 (A06 in the zip), C36.
 
 ## Files outside git (where · last backup · manifest)
 

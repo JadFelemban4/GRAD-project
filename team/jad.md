@@ -2,7 +2,7 @@
 name: Jad Felemban
 student_number: 2340550
 email: endo.felemban@gmail.com
-updated: 2026-11-12
+updated: 2026-11-13
 ---
 
 # Jad
@@ -231,6 +231,39 @@ understood and Claude confirms or corrects. I set B37 to Prior art and B40 to
 Background only (Claude had suggested Prior art for B40), both Annotated. When I
 ask Claude to complete my notes, the added words are in my style, listed for me.
 
+12 to 13 November, three more of my ten (B19, Bosch's patent; B18, Hyundai-Kia's SAE paper;
+B06, Prakash et al.), in the same order (`SESSION_REPORT_2026-11-13_reading-B19-B18-B06.md`).
+What landed:
+
+- **Bosch's inverted map**, through a restaurant menu read backwards with 50 riyals, then a
+  charcoal grill, then my own frame: a locked Excel sheet looked up with VLOOKUP. Every case is
+  written at the factory; the computer looks up the engine's state now (the air requested), and
+  the row gives the temperature, computed, never measured. The cap moves with the turbo's
+  computed temperature: a phone dimming its screen in Jeddah's summer made that clear after a
+  speed limiter had not. The order of the three measures as a queue was my picture, and right.
+- **A test bench is not a simulation**: a treadmill stress test in a hospital, a real heart in a
+  room. And "can be established by test bench measurements" is advice, not evidence: a cookbook
+  that says "find the time by trying" against one that says "we tried, here is the result".
+- **B18's timing**, through switching the AC on before guests: GPS saw the hill 4 minutes ahead
+  and they used about a minute and a half, set by how fast the radiator heats; "4 minutes
+  over-cools" is stated, not shown.
+- **B06's horizon sweep**, through driving behind a car in traffic, and the official test cycle as
+  the same exam for everyone: 20 s of preview reaches the full-knowledge result in fuel (the
+  speed only close: two students, different wording, the same mark), and every run assumes a
+  perfect prediction (the forecast for tomorrow against two weeks ahead).
+- **The roles in B06**, after I twice put the Ford Escape on the road: a race, with a pacer in
+  front, me running behind, and a smartwatch that counts the calories after the race. Then my own
+  frame, a family trip on the Haramain road following the first car without Google Maps, with one
+  correction: the follower's average speed stays the same; it is smoother, not slower.
+
+What did NOT land at first: "two tables" read as "the part's name, then its maximum
+temperature"; the lookup made by the temperature ("row 377"); the cap read as the table's
+largest value, twice.
+
+How it ran: I asked to see completed notes before they go in. B19: Unsure (Claude suggested
+Yes), Prior art. B18: Yes, Prior art. B06: Yes, Background only (Claude suggested Prior art,
+since it sweeps H; I kept mine: it does not touch our project's ideas).
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing beyond the
@@ -251,6 +284,11 @@ the battery specifics.
   is that they use preview at a fixed or assumed value, and we test when it is worth
   acquiring. The same day "we are trying to prove it in simulation" needed the old
   correction: we test when preview helps, and the answer can go against us (C4).
+- **Late spark heats the turbo; it does not cool it.** Learned on 7 October; on 13 November I
+  listed spark retard among our ways to cut heat and needed it again (B19's own text lists late
+  ignition among the effects that raise the temperature). The same day, twice: the project did
+  not drop spark, it caps the trim at 0 (retard only) and reports every result with and without
+  the knock term until drive C.
 
 ## Anything else
 
