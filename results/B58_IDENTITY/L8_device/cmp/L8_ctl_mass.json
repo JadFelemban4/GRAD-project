@@ -1,0 +1,66 @@
+{
+ "a": "C:/Users/admin/grad_device/2026-11-14_B1/B3_L8/L8/cand_extremes/sighted_seed0",
+ "b": "C:/Users/admin/grad_device/2026-11-14_B1/B3_L8/L8/ctl_mass/sighted_seed0",
+ "weights": {
+  "members": [
+   "actor.optimizer.pth",
+   "critic.optimizer.pth",
+   "ent_coef_optimizer.pth",
+   "policy.pth",
+   "pytorch_variables.pth"
+  ],
+  "tensors": 96,
+  "values": 811326,
+  "largest_abs_difference": 0.0,
+  "differing": []
+ },
+ "data": {
+  "num_timesteps": {
+   "a": 600,
+   "b": 600,
+   "equal": true
+  },
+  "_total_timesteps": {
+   "a": 600,
+   "b": 600,
+   "equal": true
+  },
+  "_n_updates": {
+   "a": 500,
+   "b": 500,
+   "equal": true
+  },
+  "_episode_num": {
+   "a": 0,
+   "b": 0,
+   "equal": true
+  },
+  "seed": {
+   "a": 0,
+   "b": 0,
+   "equal": true
+  },
+  "learning_starts": {
+   "a": 100,
+   "b": 100,
+   "equal": true
+  },
+  "buffer_size": {
+   "a": 10000,
+   "b": 10000,
+   "equal": true
+  },
+  "batch_size": {
+   "a": 256,
+   "b": 256,
+   "equal": true
+  }
+ },
+ "train_record": {
+  "fields": 47,
+  "values": 47400,
+  "differing": []
+ },
+ "curve_identical": true,
+ "identical": true
+}

@@ -1,0 +1,16 @@
+final.zip: 96 tensors, 811326 values in ['actor.optimizer.pth', 'critic.optimizer.pth', 'ent_coef_optimizer.pth', 'policy.pth', 'pytorch_variables.pth']
+  LARGEST WEIGHT DIFFERENCE 0.09434237517416477; tensors not byte-identical: 75
+    {'tensor': 'actor.optimizer.pth:state.0.exp_avg', 'max_abs': 0.0002686114457901567, 'n_differ': 4835, 'first_flat': 23, 'first_a': '2.8956870664842427e-05', 'first_b': '1.8017315596807748e-05'}
+    {'tensor': 'actor.optimizer.pth:state.0.exp_avg_sq', 'max_abs': 3.0027285902178846e-07, 'n_differ': 4835, 'first_flat': 23, 'first_a': '3.2989575515784963e-08', 'first_b': '3.360366207516563e-08'}
+    {'tensor': 'actor.optimizer.pth:state.1.exp_avg', 'max_abs': 0.0004046187750645913, 'n_differ': 222, 'first_flat': 1, 'first_a': '-2.959662197099533e-05', 'first_b': '3.578950054361485e-05'}
+    {'tensor': 'actor.optimizer.pth:state.1.exp_avg_sq', 'max_abs': 5.738702384405769e-07, 'n_differ': 222, 'first_flat': 1, 'first_a': '7.928209697638522e-07', 'first_b': '8.293506539303053e-07'}
+    {'tensor': 'actor.optimizer.pth:state.2.exp_avg', 'max_abs': 0.0017542606219649315, 'n_differ': 41537, 'first_flat': 1, 'first_a': '3.8050674788792094e-07', 'first_b': '-3.597282329792506e-06'}
+    {'tensor': 'actor.optimizer.pth:state.2.exp_avg_sq', 'max_abs': 8.772086289354775e-06, 'n_differ': 43013, 'first_flat': 1, 'first_a': '2.1753155010628689e-07', 'first_b': '2.2217777484456747e-07'}
+    {'tensor': 'actor.optimizer.pth:state.3.exp_avg', 'max_abs': 0.0024873189395293593, 'n_differ': 202, 'first_flat': 0, 'first_a': '-4.33012428402435e-06', 'first_b': '-0.00036959044518880546'}
+    {'tensor': 'actor.optimizer.pth:state.3.exp_avg_sq', 'max_abs': 2.0639715785364388e-05, 'n_differ': 209, 'first_flat': 0, 'first_a': '1.8249120330438018e-05', 'first_b': '1.877849172160495e-05'}
+    {'tensor': 'actor.optimizer.pth:state.4.exp_avg', 'max_abs': 0.0011153101804666221, 'n_differ': 1073, 'first_flat': 0, 'first_a': '-1.3501708053809125e-06', 'first_b': '-6.825719538028352e-06'}
+    {'tensor': 'actor.optimizer.pth:state.4.exp_avg_sq', 'max_abs': 7.218269672648603e-06, 'n_differ': 1085, 'first_flat': 0, 'first_a': '3.150369366267114e-06', 'first_b': '3.2564303182880394e-06'}
+  data: num_timesteps 600, _total_timesteps 600, _n_updates 500, _episode_num 0, seed 0, learning_starts 100, buffer_size 10000, batch_size 256
+  train_record.npz: 47 fields, 47400 values, 31 DIFFERENT: [{'field': 'action', 'first_flat': 505, 'a': '0.2895991802215576', 'b': '0.28959906101226807'}, {'field': 'applied', 'first_flat': 543, 'a': '0.576306939125061', 'b': '0.5763068795204163'}, {'field': 'cost_torque', 'first_flat': 114, 'a': '0.0061908685602247715', 'b': '0.00619101244956255'}]
+  curve.csv: identical (0 episodes)
+VERDICT: NOT IDENTICAL

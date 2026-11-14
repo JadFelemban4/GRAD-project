@@ -1,0 +1,286 @@
+{
+ "benchmark": "benchmark_training.py",
+ "asked_by": "Ghassan, 21 October 2026",
+ "status": "finished",
+ "date": "2026-11-14T19:53:38",
+ "code": {
+  "git_head": "0329456",
+  "git_dirty": false,
+  "benchmark_sha": "f5cb19ba238dbf0f",
+  "train_sha": "54a4265c355af961"
+ },
+ "machine": {
+  "host": "DESKTOP-VF1MO3H",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "cpu": "AMD Ryzen 5 9600X 6-Core Processor",
+  "logical_cpus": 12,
+  "usable_cpus": 12,
+  "physical_cpus": 6,
+  "ram_gb": 31.2,
+  "available_gb": 22.1,
+  "python": "3.13.2",
+  "torch": "2.14.0+cpu",
+  "torch_cuda": null,
+  "packages": {
+   "numpy": "2.5.3",
+   "torch": "2.14.0",
+   "stable_baselines3": "2.9.0",
+   "gymnasium": "1.3.0",
+   "scipy": "1.18.1",
+   "pandas": "3.0.5"
+  },
+  "power": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)",
+  "gpus": [
+   {
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5070",
+    "memory_total_mib": 12227.0,
+    "driver": "621.24",
+    "driver_model": "WDDM"
+   }
+  ],
+  "cuda": {
+   "ok": false,
+   "why": "this torch (2.14.0+cpu) is a CPU build"
+  },
+  "engines_known": [
+   "b58",
+   "ford_27tt",
+   "honda_l15b7",
+   "mazda_25t"
+  ],
+  "engines_trainable": [
+   "b58"
+  ]
+ },
+ "devices_asked": [
+  "cpu"
+ ],
+ "devices": [
+  "cpu"
+ ],
+ "notes": [
+  "a GPU is here (NVIDIA GeForce RTX 5070, nvidia-smi) and this torch cannot use it: measure it in a CUDA environment with --device cuda, then --merge the two files; until then no device is named"
+ ],
+ "plan": {
+  "road": "four_engine",
+  "engine": "b58",
+  "dt": 1.0,
+  "roads_record": "results/EPA_ROADS/roads.json",
+  "scored_share": true,
+  "reward_knock": "out",
+  "steps_per_run": 3000,
+  "det_steps": 1800,
+  "runs_grid": [
+   12
+  ],
+  "repeats": 2,
+  "buffer": 450000,
+  "smoke_test": false,
+  "window_days": null,
+  "no_determinism": false
+ },
+ "parts": {
+  "plant": {
+   "plant_s": 0.0437566419999996,
+   "steps": 200,
+   "backend": "cycle",
+   "engines_timed": [
+    "b58"
+   ]
+  },
+  "cpu": {
+   "device": "cpu",
+   "update_s": 0.00756229200000007,
+   "predict_s": 0.00010815080000020317,
+   "bytes_per_transition": 216,
+   "record_bytes_per_step": 274
+  }
+ },
+ "determinism": {
+  "cpu": {
+   "device": "cpu",
+   "identical": true,
+   "steps": 1800,
+   "n_differences": 0,
+   "first": [],
+   "compared": {
+    "tensors": 96,
+    "record_fields": 47,
+    "counters": 8
+   }
+  }
+ },
+ "concurrency": [
+  {
+   "device": "cpu",
+   "runs": 12,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 2.6,
+   "loaded": false,
+   "wall_s": 342.0,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 105.26,
+   "ram": {
+    "avail_before_gb": 21.95,
+    "avail_min_gb": 18.84,
+    "used_gb": 3.11,
+    "peak_rss_sum_gb": 3.73,
+    "peak_private_sum_gb": 4.64
+   },
+   "plant": {
+    "plant_sha": "36655cab94800e30",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle",
+    "reward_knock": false
+   },
+   "upper_steps_per_s": 108.32,
+   "lower_steps_per_s": 107.46,
+   "overlap": 0.996,
+   "stagger_s": 0.0,
+   "per_run_min": 8.98,
+   "per_run_max": 9.07,
+   "steady": true,
+   "repeat": 0,
+   "repeats_planned": 2,
+   "production_gb": 8.56,
+   "fits": true
+  },
+  {
+   "device": "cpu",
+   "runs": 12,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "steps_per_run": 3000,
+   "buffer": 450000,
+   "background_cpu_pct": 6.5,
+   "loaded": true,
+   "wall_s": 332.2,
+   "exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ok": true,
+   "why": [],
+   "launcher_steps_per_s": 108.37,
+   "ram": {
+    "avail_before_gb": 21.92,
+    "avail_min_gb": 18.9,
+    "used_gb": 3.02,
+    "peak_rss_sum_gb": 3.7,
+    "peak_private_sum_gb": 4.64
+   },
+   "plant": {
+    "plant_sha": "36655cab94800e30",
+    "derived_sha": "326c0835548975e2",
+    "engine": "b58b30o1/a90-supra-zf8hp51",
+    "engine_sha": "023f5589215ee68e",
+    "backend": "cycle",
+    "reward_knock": false
+   },
+   "upper_steps_per_s": 111.89,
+   "lower_steps_per_s": 110.77,
+   "overlap": 0.997,
+   "stagger_s": 0.0,
+   "per_run_min": 9.28,
+   "per_run_max": 9.36,
+   "steady": true,
+   "repeat": 1,
+   "repeats_planned": 2,
+   "production_gb": 8.47,
+   "fits": true
+  }
+ ],
+ "recommendation": {
+  "device": null,
+  "runs": null,
+  "clear": null,
+  "smoke_test": false,
+  "validity": "Valid for the cycle backend and the B58 only. Row 136 builds no table for any engine: every surviving engine trains and is scored on the exact cycle, the backend timed here.",
+  "configurations": [
+   {
+    "device": "cpu",
+    "runs": 12,
+    "repeats": 2,
+    "repeats_planned": 2,
+    "ok": true,
+    "fits": true,
+    "fits_known": true,
+    "vram_unknown": false,
+    "steady": true,
+    "loaded": true,
+    "lower_min": 107.46,
+    "lower_max": 110.77,
+    "lower_median": 109.115,
+    "upper_min": 108.32,
+    "upper_max": 111.89,
+    "seed0_twice": []
+   }
+  ],
+  "best": {
+   "cpu": {
+    "runs": 12,
+    "lower_min": 107.46,
+    "upper_max": 111.89,
+    "highest_upper": 111.89,
+    "highest_upper_runs": 12
+   }
+  },
+  "not_usable": {},
+  "text": "only cpu measured in this environment, so no device is named: measure cuda in its own environment (--device cuda) and combine the two files with --merge CPU.json CUDA.json\n  CPU (torch 2.14.0+cpu): best 12 runs at once, 107.46 to 111.89 steps/s in all (the lowest lower bound to the highest upper bound of 2 repeat(s)); its highest upper bound at any usable concurrency 111.89 (12 at once)\n  12 at once: 8.96 steps/s per run, so a 450,000-step run takes 0.58 days; 20 seeds per arm are 3 x 20 runs per engine in 5 waves (0 slots idle in the last), x 4 engines: 11.6 days of training, before scoring\n  every usable concurrency, at its lowest lower bound (20 seeds per arm):\n      12 at once    107.46 steps/s    8.96 a run    5 waves    11.6 days\nValid for the cycle backend and the B58 only. Row 136 builds no table for any engine: every surviving engine trains and is scored on the exact cycle, the backend timed here."
+ }
+}

@@ -1,0 +1,9 @@
+candidate      C:/Users/admin/grad_device/GRAD-project-device
+commit         032945667253fe2321790711a156ff06867c7076
+dirty files    0
+reference      cf43fbb (cf43fbb0442125d48cee2316bb96fdeb52b4e145), OUT/ref
+interpreter    /c/Users/admin/grad-venv-lock-3.13.2/Scripts/python.exe (3.13.2 Windows-11-10.0.26300-SP0)
+tarball        ae43d62892dc9f0767af596482dcd79be5ccd9aa0de1cca69ee824597ca0ada8 *results/B58_IDENTITY/certificate_tools.tar.gz
+tool           d5b6eabc85d1b23f87b827a98d8c308392547c6dacf6ab2a1d06c3c1b4dd4c80 *tools/l8_compare.py
+tool           809edf4c30f2638c74afd9def443af5f6ffcbabfbcc34c64fecec38d7ee9c5a3 *tools/l8_perturbed.py
+dry run        0

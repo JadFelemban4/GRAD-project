@@ -1,0 +1,8 @@
+extremes_sighted_seed0 IDENTICAL IDENTICAL
+extremes_blind_seed0 IDENTICAL IDENTICAL
+wideair_sighted_seed0 IDENTICAL IDENTICAL
+ctl_none IDENTICAL IDENTICAL
+ctl_mass INFO IDENTICAL
+ctl_cturb INFO IDENTICAL
+ctl_mass1e-9 DIFFERENT DIFFERENT
+ctl_mass1e-6 DIFFERENT DIFFERENT

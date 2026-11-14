@@ -1,0 +1,6 @@
+final.zip: 96 tensors, 811326 values in ['actor.optimizer.pth', 'critic.optimizer.pth', 'ent_coef_optimizer.pth', 'policy.pth', 'pytorch_variables.pth']
+  LARGEST WEIGHT DIFFERENCE 0.0; tensors not byte-identical: 0
+  data: num_timesteps 600, _total_timesteps 600, _n_updates 500, _episode_num 0, seed 0, learning_starts 100, buffer_size 10000, batch_size 256
+  train_record.npz: 47 fields, 47400 values, all identical
+  curve.csv: identical (0 episodes)
+VERDICT: IDENTICAL TRAINING

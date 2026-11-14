@@ -1,0 +1,90 @@
+{
+ "cand_extremes/blind_seed0": {
+  "engine_sha": "023f5589215ee68e",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "0c5e275e68c4ef29"
+ },
+ "cand_extremes/sighted_seed0": {
+  "engine_sha": "023f5589215ee68e",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "6d648f6c68013799"
+ },
+ "cand_wideair/sighted_seed0": {
+  "engine_sha": "023f5589215ee68e",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "wideair",
+  "final_zip_sha256": "65745126635b761e"
+ },
+ "ctl_cturb/sighted_seed0": {
+  "engine_sha": "207bdd67f909f71e",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "c2f10581132f65c5"
+ },
+ "ctl_mass1e-6/sighted_seed0": {
+  "engine_sha": "4d6fbbd97b49874c",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "a6f3b4a68203f70a"
+ },
+ "ctl_mass1e-9/sighted_seed0": {
+  "engine_sha": "995cff652149873f",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "99fa20e8e422bcb3"
+ },
+ "ctl_mass/sighted_seed0": {
+  "engine_sha": "f4da871e3bb3d6df",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "914c22cfe3bb8ee0"
+ },
+ "ctl_none/sighted_seed0": {
+  "engine_sha": "023f5589215ee68e",
+  "plant_sha": "36655cab94800e30",
+  "schema": 4,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "1faf506783bbb225"
+ },
+ "ref_extremes/blind_seed0": {
+  "engine_sha": null,
+  "plant_sha": "3c48890dd15bc116",
+  "schema": 2,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "14da873c70e49a87"
+ },
+ "ref_extremes/sighted_seed0": {
+  "engine_sha": null,
+  "plant_sha": "3c48890dd15bc116",
+  "schema": 2,
+  "backend": null,
+  "train_road": "extremes",
+  "final_zip_sha256": "d97a76838a36cbbe"
+ },
+ "ref_wideair/sighted_seed0": {
+  "engine_sha": null,
+  "plant_sha": "3c48890dd15bc116",
+  "schema": 2,
+  "backend": null,
+  "train_road": "wideair",
+  "final_zip_sha256": "b6732ff6eaadbca9"
+ }
+}

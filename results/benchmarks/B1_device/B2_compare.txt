@@ -1,0 +1,23 @@
+A: Windows-11-10.0.26200-SP0  |  B: Windows-11-10.0.26300-SP0
+compared 96 tensors, 47 record fields, 8 counters and the curve
+  DIFFERENT: weights actor.optimizer.pth:state.0.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.0.exp_avg_sq
+  DIFFERENT: weights actor.optimizer.pth:state.1.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.1.exp_avg_sq
+  DIFFERENT: weights actor.optimizer.pth:state.2.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.2.exp_avg_sq
+  DIFFERENT: weights actor.optimizer.pth:state.3.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.3.exp_avg_sq
+  DIFFERENT: weights actor.optimizer.pth:state.4.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.4.exp_avg_sq
+  DIFFERENT: weights actor.optimizer.pth:state.5.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.5.exp_avg_sq
+  DIFFERENT: weights actor.optimizer.pth:state.6.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.6.exp_avg_sq
+  DIFFERENT: weights actor.optimizer.pth:state.7.exp_avg
+  DIFFERENT: weights actor.optimizer.pth:state.7.exp_avg_sq
+  DIFFERENT: weights critic.optimizer.pth:state.0.exp_avg
+  DIFFERENT: weights critic.optimizer.pth:state.0.exp_avg_sq
+  DIFFERENT: weights critic.optimizer.pth:state.1.exp_avg
+  DIFFERENT: weights critic.optimizer.pth:state.1.exp_avg_sq
+VERDICT: NOT IDENTICAL (100 differences)

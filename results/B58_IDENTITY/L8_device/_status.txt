@@ -1,0 +1,11 @@
+0 37 cand_extremes_sighted
+0 37 ref_extremes_blind
+0 37 ref_extremes_sighted
+0 37 cand_extremes_blind
+0 39 ctl_none
+0 39 ctl_mass
+0 39 ctl_cturb
+0 114 cand_wideair_sighted
+0 116 ref_wideair_sighted
+0 33 ctl_mass1e-9
+0 33 ctl_mass1e-6

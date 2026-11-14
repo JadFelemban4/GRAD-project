@@ -1,0 +1,14 @@
+test_each_calibrated_plant (__main__.RealPlants.test_each_calibrated_plant) ... ok
+test_a_cvt_car_is_checked_like_a_stepped_one (__main__.SyntheticPlant.test_a_cvt_car_is_checked_like_a_stepped_one)
+Schema 4 (the plant commit; decision 91 flipped): a CVT plant passes the fingerprint check as a ... ok
+test_a_dump_that_is_not_the_plants_is_seen (__main__.SyntheticPlant.test_a_dump_that_is_not_the_plants_is_seen) ... ok
+test_a_table_entry_changed_is_seen (__main__.SyntheticPlant.test_a_table_entry_changed_is_seen) ... ok
+test_another_engine_sha_and_a_listing_without_the_derived_file_are_seen (__main__.SyntheticPlant.test_another_engine_sha_and_a_listing_without_the_derived_file_are_seen)
+Each check alone (WP3's fix of 23 October 2026, the test review's finding that the one-ulp case ... ok
+test_one_ulp_of_a_frozen_constant_is_refused (__main__.SyntheticPlant.test_one_ulp_of_a_frozen_constant_is_refused) ... ok
+test_the_checks_pass_on_a_frozen_candidate (__main__.SyntheticPlant.test_the_checks_pass_on_a_frozen_candidate) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 205.508s
+
+OK
