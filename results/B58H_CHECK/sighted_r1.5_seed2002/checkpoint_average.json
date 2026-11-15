@@ -1,0 +1,33 @@
+{
+ "schema": "checkpoint-average/1",
+ "total_steps": 50000,
+ "window": 50000,
+ "rule": "the action average of the 5 snapshots in (0, 50000] steps (decision 29), each the deterministic action of one saved model",
+ "snapshots": [
+  {
+   "step": 10000,
+   "path": "average/snap_0010000_steps.zip",
+   "sha256": "725a8d01b398e35181a00d11cdf9a2260efab30e2aa4fb81e7f467d3e5735e7c"
+  },
+  {
+   "step": 20000,
+   "path": "average/snap_0020000_steps.zip",
+   "sha256": "298d8e2dbddd06981994658f206f6bbcfe76eef54632ab0f68e9bd933844177a"
+  },
+  {
+   "step": 30000,
+   "path": "average/snap_0030000_steps.zip",
+   "sha256": "314403edfddf626887895510f8e2dd9726f29802d37dc44d64cd940cca921b16"
+  },
+  {
+   "step": 40000,
+   "path": "average/snap_0040000_steps.zip",
+   "sha256": "256261ded95b736ebb411c6c6d0a0778752e44d12f1af27e2423d923ed3b0b11"
+  },
+  {
+   "step": 50000,
+   "path": "average/snap_0050000_steps.zip",
+   "sha256": "d5d1b12228b6461c84194d990f96fda94ad2c7fe02a67ecc4488f2fa81e0bbcd"
+  }
+ ]
+}

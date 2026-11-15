@@ -16,7 +16,8 @@ study's training ends" by the visit's checkout of `T*` in that clone (ORDER step
 | `31dc7ad` | 18a, Tc | `epa_backend.py`'s check-run line (row 148 (5)) and its test; section 1's table, sections 10 and 11; ORDER step 18a; CHECKPOINT, `STATE_HISTORY.md` part AR |
 | `5d801be` | 19, Tb | `results/EPA_BACKEND.json`, written by `epa_backend.py write`: n null, in_test ['b58']; no drop line written; section 1's table and section 12; ORDER step 19 and the status line; CHECKPOINT, `STATE_HISTORY.md` part AS |
 | `720587d`, `T*` | 20, PR-B | `results/PREREGISTRATION_B58H.md`; sections 1 and 13; CHECKPOINT, `STATE_HISTORY.md` part AT |
-| `T*`'s record | 20, after `T*` | `results/PREREGISTRATION_B58H.md` section 15 (PR-B's gate); section 14; CHECKPOINT, `STATE_HISTORY.md` part AU |
+| `47e5854`, `T*`'s record | 20, after `T*` | `results/PREREGISTRATION_B58H.md` section 15 (PR-B's gate); section 14; CHECKPOINT, `STATE_HISTORY.md` part AU |
+| CK's record | 21, after `T*` | `results/B58H_CHECK/`; `results/PREREGISTRATION_B58H.md` section 15 (CK); section 15; CHECKPOINT, `STATE_HISTORY.md` part AV |
 
 B1 measured Ta's tree: its git_head is `0329456`, and its commit `891e29a` adds only results files on top of
 it. So "B1's git_head" is `0329456` and "B1's commit" is `891e29a`. Every gate that diffs the cost files reads
@@ -684,3 +685,52 @@ USB drive formatted exFAT or NTFS, or a cloud link; about 20 GB, the sheet's est
 Done notes for steps 20-22 wait until after the last scoring: after `T*`, row 149 (3)'s check lets only
 CHECKPOINT, `STATE_HISTORY.md`, this report and `results/PREREGISTRATION_B58H.md` change among the paths present at
 `T*`.
+
+## 15. 15 November: CK passed; its record (ORDER step 21)
+
+**The sheet, as sent.** Before it went to Jad, its first box was filled in ("the visit starts on 15 November 2026, as
+soon as you receive this sheet"; Step 4 records the exact time) and one line was added to it: Jad runs every step
+himself in Git Bash and gives the sheet to no AI agent (rule 3). Jad's own Claude Code, asked where the sheet's files
+were before they reached him, searched his PC for them by name and offered to run the sheet for him; the added line
+rules that out. Nothing else in the sheet changed after section 14.
+
+**CK.** In session `b58h_training_1`, at `T*`: the 10 runs started at 18:28:04 and finished between 19:42:32 and
+19:43:02 (the device's clock, each run's `config.json`), each at 11.12-11.19 steps/s, and the launch log holds "all
+done in 75 min; every run finished". The printed check ends "CHECK RUN: OK"; `results/PREREGISTRATION_B58H.md` section
+15 quotes it. The record came as `ck_record.zip` (68,661 bytes, sha256 beginning `be45289c`); unpacked outside the
+repository, `sha256sum -c SHA256SUMS` printed OK for each of its 42 files. Checked here beyond the printed check:
+every run's `meta.json` and `config.json` read `git_head` `T*` and `git_dirty` false; `plant_sha`, `derived_sha` and
+`engine_sha` are PR-B section 3's and B1's; each `config.json` records the lock's versions (Python 3.13.2, numpy
+2.5.3, torch 2.14.0+cpu, stable_baselines3 2.9.0, gymnasium 1.3.0). The record is committed under
+`results/B58H_CHECK/` with a `.gitattributes` of `* -text`, so its files keep the device's CRLF bytes and `SHA256SUMS`
+checks in any clone (a review checked it in fresh clones with `core.autocrlf` true and false). PR-B section 14's step
+2 gate ran on that commit before its push (its message; PR-B section 15 by a later commit).
+
+**The review before the push.** Four reviewers (CK's verdict re-derived from the record, the environment against PR-B
+and B1, every claim of the text, the rules for a commit after `T*`) and one skeptic. They confirmed the verdict, the
+FATAL fingerprint against a clone at `T*` (`FATAL diffs: []` for all 10 runs) and row 117's pairing, and found: the
+launch log does not end with its "all done" line (a `next:` hint follows); `meta.json` records Python's version only;
+CHECKPOINT item 10 still placed the clone at `891e29a`; PR-B section 15 lacked `47e5854`'s check; and the commit's
+message lacked row 149 (3)'s statement that no command here has loaded an agent or checkpoint of the device's folders.
+Each is fixed in the commit as pushed.
+
+**The training, and an agent on the PC.** The training started at 19:43:23 AST on 15 November, as Jad's agent
+reported. Jad's own Claude Code, in Antigravity, ran on the PC during CK and runs there during the training: its
+message to Jad, which Ghassan relayed on 15 November, reports CK's result, sends `ck_record.zip` and the training's
+start to Jad's phone, keeps a watcher on the training window (titled "B58H training - Visit 2 (do not close)"), and
+says it wrote `README.txt` and a report on the PC; it asks Jad to keep Antigravity open. This is against the sheet's
+rule 3 ("No AI agent on this PC") and section 14 step 1's "The PC stays idle". Which of the sheet's blocks it typed,
+and where its two files are, are asked of Jad. What it can change, and where that is checked: the runs are seeded and
+train identically on this PC (B2, `cpu: IDENTICAL`), so an agent's load moves the wall clock, not the agents; a file
+it writes inside the clone makes `git_dirty` true for every run that starts after it (`fingerprint.py:658` counts
+untracked files), which section 15's check of every run's `meta.json` reads at the return; an install or update shows
+in section 11's two environment records. Asked of Jad, through Ghassan: the full paths of `README.txt` and of the
+report (if either is inside `GRAD-project-device`, it must leave the clone before the second wave starts, about 14 h
+after the first); which blocks the agent typed; and that from now on it only reads, and on a `FAILED` line, a closed
+window or the end it tells Jad and does nothing more. Antigravity is not closed now: whether the training's window
+would survive it is not known here.
+
+**Open.** The two paths and the answers above; the environment record before CK (`env_before_ck.txt`, in the return;
+the sheet's Step 3 stops unless `check_training_device.py` prints `VERSIONS: match the lock`); the guard's
+`RUN COMMIT: OK`, printed to the screen only; how the return comes back. Next on this laptop: AB (ORDER step 22a) and
+the routes (step 22b).

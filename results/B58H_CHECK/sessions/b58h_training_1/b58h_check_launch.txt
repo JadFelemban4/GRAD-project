@@ -1,0 +1,27 @@
+the third arm on b58 (rows 102, 117), tau from C:\Users\admin\grad_device\GRAD-project-device\results\EPA_ROADS\roads.json (REAL):
+  r = 1.5: tau 47.3351 s, H = 71.0026 s, preview samples at steps [4, 11, 35, 71] (dt 1 s)
+  blinded: one arm for both ratios, no H (row 117)
+10 runs (b58, four_engine, dt 1, cpu), 50,000 steps each, at most 12 at once -> runs/b58h_check_dt1/; reward without the knock term (--reward-knock out)
+  started sighted_r1.5_seed2000
+  started sighted_r1.5_seed2001
+  started sighted_r1.5_seed2002
+  started sighted_r1.5_seed2003
+  started sighted_r1.5_seed2004
+  started blind_seed2000
+  started blind_seed2001
+  started blind_seed2002
+  started blind_seed2003
+  started blind_seed2004
+  finished sighted_r1.5_seed2000  after 75 min
+  finished sighted_r1.5_seed2002  after 75 min
+  finished sighted_r1.5_seed2003  after 75 min
+  finished sighted_r1.5_seed2004  after 75 min
+  finished blind_seed2000  after 75 min
+  finished blind_seed2001  after 75 min
+  finished blind_seed2002  after 75 min
+  finished blind_seed2004  after 75 min
+  finished sighted_r1.5_seed2001  after 75 min
+  finished blind_seed2003  after 75 min
+
+all done in 75 min; every run finished
+next: python record_agents.py runs/b58h_check_dt1

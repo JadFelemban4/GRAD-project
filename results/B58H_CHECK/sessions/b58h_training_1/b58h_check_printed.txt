@@ -1,0 +1,14 @@
+launch logs of this check run read: 1 | this session's launcher ended: True
+crashed in this session: none | crashes over this check run: none
+blind_seed2000 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+blind_seed2001 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+blind_seed2002 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+blind_seed2003 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+blind_seed2004 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+sighted_r1.5_seed2000 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+sighted_r1.5_seed2001 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+sighted_r1.5_seed2002 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+sighted_r1.5_seed2003 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+sighted_r1.5_seed2004 lr at end 0.0 snapshots [10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok
+crashed folders, kept: none
+CHECK RUN: OK

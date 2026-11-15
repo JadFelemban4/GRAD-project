@@ -1,0 +1,93 @@
+{
+ "tag": "sighted_r1.5_seed2002",
+ "seed": 2002,
+ "preview": true,
+ "steps": 50000,
+ "dt": 1.0,
+ "duration_s": 900.0,
+ "steps_per_episode": 900,
+ "road": "four_engine",
+ "roads": "one generator for the four engines (four_engine_roads, row 116): ambient 25-45 C, from rest a speed target 60-150 km/h changing mid-run, every change at 0.8 m/s^2 at most and inside the notional car's climb and coast, hills 0-18 % ramped over 8 s, housing capacity x0.75-1.33",
+ "device": "cpu",
+ "algorithm": "SAC",
+ "sac": {
+  "learning_rate": 0.0003,
+  "buffer_size": 50000,
+  "batch_size": 256,
+  "learning_starts": 100,
+  "gamma": 0.99,
+  "tau": 0.005,
+  "train_freq": "TrainFreq(frequency=1, unit=<TrainFrequencyUnit.STEP: 'step'>)",
+  "gradient_steps": 1,
+  "ent_coef": "auto",
+  "target_entropy": -5.0,
+  "policy": "MlpPolicy",
+  "net_arch": "[256, 256]"
+ },
+ "versions": {
+  "python": "3.13.2",
+  "stable_baselines3": "2.9.0",
+  "torch": "2.14.0+cpu",
+  "gymnasium": "1.3.0",
+  "numpy": "2.5.3"
+ },
+ "git_head": "720587d34a6e5e4f352c61731ccbb5db203a0b76",
+ "git_dirty": false,
+ "plant_sha": "36655cab94800e30",
+ "derived_sha": "326c0835548975e2",
+ "engine": "b58b30o1/a90-supra-zf8hp51",
+ "engine_sha": "023f5589215ee68e",
+ "backend": "cycle",
+ "train_backend": "cycle",
+ "score_backend": "cycle",
+ "preview_h_s": 71.002603715685,
+ "reward_knock": false,
+ "plant_inputs": {
+  "data_sha1": "c4fdd4babfb3752a",
+  "raw_logs": [
+   "3aca2ec1-20260907_072817.csv",
+   "3f64372e-20260907_070041.csv",
+   "670063b2-20260907_142018.csv",
+   "683640a0-20260907_070212.csv",
+   "7475b5d7-20260908_142743.csv",
+   "cb67b01f-20260908_084142.csv",
+   "drive10-20260918_233912.csv",
+   "driveB_rollons-20260928_140513.csv",
+   "f51686d7-20260906_154426.csv",
+   "fb988991-20260906_143515.csv",
+   "pull01-20260913_093527.csv"
+  ]
+ },
+ "output": "runs/b58h_check_dt1/sighted_r1.5_seed2002",
+ "machine": {
+  "system": "Windows",
+  "processor": "AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD",
+  "cpus": 12,
+  "omp_threads": "1"
+ },
+ "keep_buffer": false,
+ "resumed_buffer": null,
+ "recipe": {
+  "lr_schedule": "last-third",
+  "scored_share": {
+   "every": 10,
+   "roads_sha": "27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498",
+   "seed_kind": "REAL"
+  },
+  "checkpoint_average": 50000,
+  "horizon_ratio": 1.5,
+  "preview_h_s": 71.002603715685,
+  "learning_rate_at_end": 0.0,
+  "checkpoint_average_manifest": "checkpoint_average.json"
+ },
+ "started": "2026-11-15T18:28:04",
+ "resumed_from": null,
+ "status": "finished",
+ "finished": "2026-11-15T19:42:32",
+ "wall_min_this_session": 74.5,
+ "steps_per_s_this_session": 11.19,
+ "episodes_this_session": 55,
+ "episodes": 55,
+ "total_timesteps": 50000,
+ "recorded_steps": 50000
+}

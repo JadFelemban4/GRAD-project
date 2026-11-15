@@ -1850,6 +1850,43 @@ insertions(+), 6 deletions(-)"; both prints reproduced, exit 0; "placeholders le
 exit 0, all 170 checks pass (1172 figure mentions); `test_epa_backend.Preregistration` and `PreregistrationB58H`:
 "Ran 7 tests in 20.597s", "OK", none skipped. `T*` was pushed to `GRA-test` the same day, `5d801be..720587d`.
 
+**15 November 2026, `47e5854`** (`T*`'s record, the first commit after `T*` that touches this file; section 14 step
+0's check for a later commit, before its push): "ABOVE SECTION 15: UNCHANGED SINCE T*"; row 149 (3)'s name-status
+filter printed no STOP; "cost files unchanged since B1: exit 0"; `epa_backend.py check` printed `[]`;
+`test_epa_backend.PreregistrationB58H`: "Ran 6 tests", "OK"; `verify_docs.py`: "All 170 checks pass (1172 figure
+mentions scanned in the documents)." (its message).
+
+**15 November 2026, CK** (the check line, at `T*`, in session `b58h_training_1` on Jad's PC; row 148). Every run's
+`config.json` reads `started` 2026-11-15T18:28:04 and `finished` between 19:42:32 and 19:43:02 (the device's clock);
+the launch log holds "all done in 75 min; every run finished", then only the launcher's `next:` hint (not run), and no
+`FAILED` line. The printed check: "launch logs of this check run read: 1 | this session's launcher ended: True",
+"crashed in this session: none | crashes over this check run: none", for each of the 10 runs "lr at end 0.0 snapshots
+[10000, 20000, 30000, 40000, 50000] git_head is RUNAT True ok", "crashed folders, kept: none", and the last line
+"CHECK RUN: OK". Its record (row 148 (8)), the record block's `ck_record` zipped by the sheet (the zip's sha256 begins
+`be45289c`), checks on this laptop: `sha256sum -c SHA256SUMS` printed OK for each of the 42 files it lists. Every
+run's `meta.json` and `config.json` read `git_head` `T*` and `git_dirty` false, `plant_sha` 36655cab94800e30,
+`derived_sha` 326c0835548975e2 and `engine_sha` 023f5589215ee68e (section 3's and B1's); each `config.json` records
+the lock's versions (Python 3.13.2, numpy 2.5.3, torch 2.14.0+cpu, stable_baselines3 2.9.0, gymnasium 1.3.0), 12 CPUs
+and one OMP thread, and each `meta.json` Python 3.13.2. The record is committed under `results/B58H_CHECK/`, byte for
+byte (its `.gitattributes` reads `* -text`), by the commit that adds this entry. Not in the record: the guard's
+`RUN COMMIT: OK` line, which the guard prints to the screen only, and the environment record before CK, which comes
+back with the return (the sessions' folders).
+
+**15 November 2026, the training** (the training line, session `b58h_training_1`). It started at 19:43:23 AST on 15
+November, by the message of Jad's agent (below), relayed by Ghassan; the sheet's `training_start.txt`, in the return,
+is the record. That is inside W and before both latest starts (`results/B58H_DESIGN/d148_figures.txt:140-141`).
+
+**15 November 2026, a deviation: an AI agent on the device.** Jad's own Claude Code, in Antigravity, ran on the PC
+during CK and runs there during the training: its message to Jad, which Ghassan relayed on 15 November, reports CK's
+result, sends `ck_record.zip` and the training's start to Jad's phone, keeps a watcher on the training window (titled
+"B58H training - Visit 2 (do not close)"), and says it wrote `README.txt` and a report on the PC; it asks Jad to keep
+Antigravity open. This is against the sheet's rule 3 ("No AI agent on this PC") and section 14 step 1's "The PC stays
+idle". Which of the sheet's blocks it typed, and where its two files are, are asked of Jad. What it can change, and
+where that is checked: the runs are seeded and train identically on this PC (B2, `cpu: IDENTICAL`), so an agent's load
+moves the wall clock, not the agents; a file it writes inside the clone makes `git_dirty` true for every run that
+starts after it (`fingerprint.py:658` counts untracked files), which section 15's check of every run's `meta.json`
+reads at the return; an install or update shows in section 11's two environment records.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

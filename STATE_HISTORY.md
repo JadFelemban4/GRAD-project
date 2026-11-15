@@ -5501,3 +5501,21 @@ From "Blockers", as committed at `720587d`:
 From "Next actions", item 8, its sixth line, as committed at `720587d`:
 
    Tc, Tb and PR-B are done (15 November; `SESSION_REPORT_2026-11-15_D148.md`, sections 10, 12 and 13): step 18a, `epa_backend.py`'s check-run line, row 148 (1)'s in place of the pilot's; step 19, the backend record, n null; step 20, `results/PREREGISTRATION_B58H.md`, whose own commit is `T*` (`git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md`), with Tb's commit its parent. Next: ONE visit to Jad's PC from `T*`, by the sheet Ghassan writes from PR-B's section 14: CK (step 21) and, on its "CHECK RUN: OK", the training (step 22). On this laptop during training: CK's record, AB (step 22a) and the routes (step 22b). Then the scoring, in row 149 (5)'s order (a)-(f), with (d)-(f) run only if started by 23 November 2026 00:00 AST. Latest starts (`results/B58H_DESIGN/d148_figures.txt`): the training by 17 November 02:12 AST to end inside W (`:140`), and by 16 November 16:12 for the primary scoring to end inside W too (`:141`); step 3's 01:22 and 15:22 are superseded (`:149`).
+
+# Part AV — lines rotated out of CHECKPOINT.md, 15 November 2026 (GRA-test: CK's record)
+
+From the header, as committed at `47e5854`:
+
+Last verified: 2026-11-15 (on `GRA-test`, at `T*` `720587d`, PR-B pushed, with its section 15's gate record) — verify_docs.py: all 170 checks pass (PR-B's gate at `T*`, its section 15) · drift_test.py 18/18 (R3b's gate) · the app suites on P's tree: every failure one RV's own run had, the known `?v=` asset checks, the `pwsh` launcher tests and five provenance tests of app.test_results (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 17)
+
+From "Blockers", as committed at `47e5854`:
+
+- Decision 1 of the 14 November sheet (the literature review's step 14, its A25 bullet; `decisions_2026-11-14.md`, on the Desktop) is still unanswered; the sheet asks for it before `T*`, the agents' deadline, which no row sets (section S's note), and PR-B does not wait for it. The one visit to Jad's PC, from `T*` (`720587d`), waits for a time agreed with Jad and for how the return comes back, both still open (`SESSION_REPORT_2026-11-15_D148.md`, sections 11 and 14).
+
+From "Next actions", item 8, its sixth line, as committed at `47e5854`:
+
+   Tc, Tb and PR-B are done (15 November; `SESSION_REPORT_2026-11-15_D148.md`, sections 10, 12 and 13): step 18a, `epa_backend.py`'s check-run line, row 148 (1)'s in place of the pilot's; step 19, the backend record, n null; step 20, `results/PREREGISTRATION_B58H.md`, whose own commit is `T*` (`git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md`), with Tb's commit its parent; `T*` is `720587d`, pushed. Next: ONE visit to Jad's PC from `T*`, by the sheet `VISIT2_SHEET.md` (`For Jad - Visit 2` on Ghassan's Desktop; session report section 14), from PR-B's section 14: CK (step 21) and, on its "CHECK RUN: OK", the training (step 22). On this laptop during training: CK's record, AB (step 22a) and the routes (step 22b). Then the scoring, in row 149 (5)'s order (a)-(f), with (d)-(f) run only if started by 23 November 2026 00:00 AST. Latest starts (`results/B58H_DESIGN/d148_figures.txt`): the training by 17 November 02:12 AST to end inside W (`:140`), and by 16 November 16:12 for the primary scoring to end inside W too (`:141`); step 3's 01:22 and 15:22 are superseded (`:149`).
+
+From "Next actions", item 10, its first line, as committed at `47e5854`:
+
+10. The training device, Jad's PC (`DESKTOP-VF1MO3H`; `SESSION_REPORT_2026-11-14_B1-visit.md`, sections 1, 3 and 4): the clone is `C:\Users\admin\grad_device\GRAD-project-device`, fresh from GitHub (step 3's worktree was removed on 11 November at Jad's request), at `891e29a`, detached and clean, until the visit checks out `T*` there for CK and the training; the interpreter is step 3's lock venv, moved to `C:\Users\admin\grad-venv-lock-3.13.2` (its newest `site-packages` entries 2 November). `core.autocrlf=true` gives a CRLF work tree, as at step 3: keep it (every FATAL fingerprint field is independent of line ends; section S's note).

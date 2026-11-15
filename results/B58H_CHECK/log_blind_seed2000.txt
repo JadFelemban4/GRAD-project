@@ -1,0 +1,286 @@
+plant         : b58b30o1/a90-supra-zf8hp51   (--engine b58)
+configuration : BLINDED (no preview)
+road          : four_engine   (one generator for the four engines (four_engine_roads, row 116): ambient 25-45 C, from rest a speed target 60-150 km/h changing mid-run, every change at 0.8 m/s^2 at most and inside the notional car's climb and coast, hills 0-18 % ramped over 8 s, housing capacity x0.75-1.33)
+step          : dt = 1 s, 900 steps per episode, 56 episodes
+seed          : 2000
+recipe        : lr_schedule last-third; scored_share {'every': 10, 'roads_sha': '27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498', 'seed_kind': 'REAL'}; checkpoint_average 50000
+reward        : without the knock term (row 113 (5))
+steps         : 50,000
+device        : cpu
+estimate      : about 61 minutes (1.0 h) at a measured 13.7 steps/s on cpu
+output        : runs/b58h_check_dt1\blind_seed2000/
+
+--- PLANT FINGERPRINT (written to meta.json) ------------------
+  plant_sha                36655cab94800e30
+  derived_sha              326c0835548975e2
+  engine                   b58b30o1/a90-supra-zf8hp51
+  engine_sha               023f5589215ee68e
+  train_backend            cycle
+  score_backend            cycle
+  backend_contract         json_sha_text=07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1 md_sha_text=72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7
+  transmission             final_drive=3.15 gears=5.25 3.36 2.172 1.72 1.316 1 0.822 0.64 kind=stepped
+  dtheta_deg               0.25
+  turb_protect_k           1123
+  oil_protect_k            408
+  scenario                 design_sha=67ba4fb20caf55a5 protocol=decision-34 reading=version 6 redraws_sha=82fa42525c0c3ad977b794a67f0c6433a4a2a2795daabf43725826d10c68534e roads_sha=27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498 seed_kind=REAL
+  episodes_sha             4a34364bd32aa8a2
+  preview_h_s              None
+  reward_knock             False
+  eval_dt                  1
+  eval_duration            900
+  git_dirty                False
+  git_dirty_plant_files    
+  git_head                 720587d34a6e5e4f352c61731ccbb5db203a0b76
+  n_episodes               20
+  plant_text_sha           af6d4f5d8318a9c8
+  preview_samples_s        None
+  python                   3.13.2
+  resume_allowed           False
+  seed                     2000
+  steps_requested          50000
+  tag                      blind_seed2000
+  train_device             cpu
+  train_dt                 1
+  train_duration           900
+  train_recipe             checkpoint_average=50000 lr_schedule=last-third scored_share=every=10 roads_sha=27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498 seed_kind=REAL
+  train_road               four_engine
+  train_road_sha           58d8dab602507cca
+  use_preview              False
+--------------------------------------------------------------
+
+Using cpu device
+Wrapping the env in a DummyVecEnv.
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -36.1    |
+| time/              |          |
+|    episodes        | 4        |
+|    fps             | 11       |
+|    time_elapsed    | 323      |
+|    total_timesteps | 3596     |
+| train/             |          |
+|    actor_loss      | -29.7    |
+|    critic_loss     | 0.0413   |
+|    ent_coef        | 0.351    |
+|    ent_coef_loss   | -8.79    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 3495     |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -43.3    |
+| time/              |          |
+|    episodes        | 8        |
+|    fps             | 11       |
+|    time_elapsed    | 645      |
+|    total_timesteps | 7192     |
+| train/             |          |
+|    actor_loss      | -32.6    |
+|    critic_loss     | 0.0583   |
+|    ent_coef        | 0.12     |
+|    ent_coef_loss   | -17.5    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 7091     |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -42.3    |
+| time/              |          |
+|    episodes        | 12       |
+|    fps             | 11       |
+|    time_elapsed    | 968      |
+|    total_timesteps | 10788    |
+| train/             |          |
+|    actor_loss      | -29.6    |
+|    critic_loss     | 0.0197   |
+|    ent_coef        | 0.0411   |
+|    ent_coef_loss   | -24.6    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 10687    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -36.5    |
+| time/              |          |
+|    episodes        | 16       |
+|    fps             | 11       |
+|    time_elapsed    | 1291     |
+|    total_timesteps | 14384    |
+| train/             |          |
+|    actor_loss      | -25.2    |
+|    critic_loss     | 0.023    |
+|    ent_coef        | 0.0146   |
+|    ent_coef_loss   | -26.5    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 14283    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -31.5    |
+| time/              |          |
+|    episodes        | 20       |
+|    fps             | 11       |
+|    time_elapsed    | 1616     |
+|    total_timesteps | 17980    |
+| train/             |          |
+|    actor_loss      | -21      |
+|    critic_loss     | 0.0105   |
+|    ent_coef        | 0.00578  |
+|    ent_coef_loss   | -20.1    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 17879    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -28.7    |
+| time/              |          |
+|    episodes        | 24       |
+|    fps             | 11       |
+|    time_elapsed    | 1940     |
+|    total_timesteps | 21576    |
+| train/             |          |
+|    actor_loss      | -17.3    |
+|    critic_loss     | 0.00849  |
+|    ent_coef        | 0.00264  |
+|    ent_coef_loss   | -7.07    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 21475    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -25.5    |
+| time/              |          |
+|    episodes        | 28       |
+|    fps             | 11       |
+|    time_elapsed    | 2262     |
+|    total_timesteps | 25172    |
+| train/             |          |
+|    actor_loss      | -14.6    |
+|    critic_loss     | 0.00918  |
+|    ent_coef        | 0.00189  |
+|    ent_coef_loss   | 2.55     |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 25071    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -21.3    |
+| time/              |          |
+|    episodes        | 32       |
+|    fps             | 11       |
+|    time_elapsed    | 2584     |
+|    total_timesteps | 28768    |
+| train/             |          |
+|    actor_loss      | -12.2    |
+|    critic_loss     | 0.00585  |
+|    ent_coef        | 0.00175  |
+|    ent_coef_loss   | 0.176    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 28667    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -19.4    |
+| time/              |          |
+|    episodes        | 36       |
+|    fps             | 11       |
+|    time_elapsed    | 2908     |
+|    total_timesteps | 32364    |
+| train/             |          |
+|    actor_loss      | -10.4    |
+|    critic_loss     | 0.012    |
+|    ent_coef        | 0.0021   |
+|    ent_coef_loss   | 2.92     |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 32263    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -18.4    |
+| time/              |          |
+|    episodes        | 40       |
+|    fps             | 11       |
+|    time_elapsed    | 3232     |
+|    total_timesteps | 35960    |
+| train/             |          |
+|    actor_loss      | -8.9     |
+|    critic_loss     | 0.0104   |
+|    ent_coef        | 0.00231  |
+|    ent_coef_loss   | 2.01     |
+|    learning_rate   | 0.000253 |
+|    n_updates       | 35859    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -18.3    |
+| time/              |          |
+|    episodes        | 44       |
+|    fps             | 11       |
+|    time_elapsed    | 3555     |
+|    total_timesteps | 39556    |
+| train/             |          |
+|    actor_loss      | -7.73    |
+|    critic_loss     | 0.00846  |
+|    ent_coef        | 0.00223  |
+|    ent_coef_loss   | 0.079    |
+|    learning_rate   | 0.000188 |
+|    n_updates       | 39455    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -17.3    |
+| time/              |          |
+|    episodes        | 48       |
+|    fps             | 11       |
+|    time_elapsed    | 3879     |
+|    total_timesteps | 43152    |
+| train/             |          |
+|    actor_loss      | -6.51    |
+|    critic_loss     | 0.0145   |
+|    ent_coef        | 0.00224  |
+|    ent_coef_loss   | -4.01    |
+|    learning_rate   | 0.000123 |
+|    n_updates       | 43051    |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 899      |
+|    ep_rew_mean     | -13.6    |
+| time/              |          |
+|    episodes        | 52       |
+|    fps             | 11       |
+|    time_elapsed    | 4200     |
+|    total_timesteps | 46748    |
+| train/             |          |
+|    actor_loss      | -6.04    |
+|    critic_loss     | 0.0121   |
+|    ent_coef        | 0.00231  |
+|    ent_coef_loss   | -0.845   |
+|    learning_rate   | 5.86e-05 |
+|    n_updates       | 46647    |
+---------------------------------
+  checkpoint average: 5 snapshots at steps 10000, 20000, 30000, 40000, 50000 -> runs/b58h_check_dt1\blind_seed2000\checkpoint_average.json
+
+trained in 75 min | 55 episodes (55 this session) | 50,000 steps recorded in runs/b58h_check_dt1\blind_seed2000\train_record.npz
+
+  Episode returns vary with the road and the preference weights, so this
+  curve cannot show learning. Score the run on the frozen episodes:
+      python evaluate.py --engine b58 runs/b58h_check_dt1\blind_seed2000
+  If the agent does not beat the baseline there, re-run test_reward.py
+  before changing anything else -- a broken reward trains normally.
+  curve written to runs/b58h_check_dt1\blind_seed2000\curve.png
+
+next: every seed and arm through train_all.py --road four_engine, the third arm with --third-arm;
+      decision 34's scoring is evaluate.py's protocol of ORDER step 16, after the last redraw.
