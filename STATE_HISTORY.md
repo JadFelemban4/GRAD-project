@@ -5421,3 +5421,25 @@ From "Next actions", item 10, as committed at `0329456`:
    benchmarks, the merge; `docs/build_step_2/DEVICE_RUNBOOK.md` Part A). The identity check against
    this laptop (`check_training_device.py --identity`, then `--compare`; recorded, not required,
    decision 32) is Part B's B2, at ORDER step 18.
+
+# Part AR — lines rotated out of CHECKPOINT.md, 15 November 2026 (GRA-test: Tc)
+
+From "Next actions", item 8, as committed at `c5890f2`:
+
+   Next, on this laptop: Tc (step 18a: `epa_backend.py`'s check-run line), Tb (step 19: the backend record), then PR-B (step 20), whose own commit is `T*`, with Tb's commit its parent. Then ONE visit to Jad's PC from `T*`: CK (step 21) and, on its "CHECK RUN: OK", the training (step 22). On this laptop during training: CK's record, AB (step 22a) and the routes (step 22b). Then the scoring, in row 149 (5)'s order (a)-(f), with (d)-(f) run only if started by 23 November 2026 00:00 AST. Latest starts (`results/B58H_DESIGN/d148_figures.txt`): the training by 17 November 02:12 AST to end inside W (`:140`), and by 16 November 16:12 for the primary scoring to end inside W too (`:141`); step 3's 01:22 and 15:22 are superseded (`:149`).
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `c5890f2`:
+
+  three EPA engines dropped; R: rows 146-147, the B58 study, under row 133 (2) as his answer Q1 extends it; n, the reward and the two statements his own answers Q3, Q4, Q2; S: rows 148-153, the decisions of 14 November, his and Jad's together, with his answers to points P1-P13 of 15 November and his words re-confirming Q3, "I confirm the n= 20", of 15 November).
+
+From "Blockers", as committed at `c5890f2`:
+
+- Decision 1 of the 14 November sheet (the literature review's step 14, its A25 bullet; `decisions_2026-11-14.md`, on the Desktop) is still unanswered; the sheet asks for it before `T*`, the agents' deadline, which no row sets (section S's note). The one visit to Jad's PC waits for `T*` and for a time agreed with Jad.
+
+From "Next actions", item 10, as committed at `c5890f2`:
+
+   Windows Update was not paused there from 1 October to 14 November: KB5132061 (build 26300.9974) and KB5132688 on 11 November, Windows App Runtime updates on 11-12 November, and the NVIDIA driver 617.42 -> 621.24 on 13 November (torch is a CPU build there, so the driver enters no training). Jad paused updates at 19:52 on 14 November, before the benchmark, until 28 November. Not yet answered: whether NVIDIA's own updater is off, and whether anything was installed after the pause.
+
+From the header, as committed at `c5890f2`:
+
+Last verified: 2026-11-15 (on `GRA-test`, at B1 `891e29a`, pulled with `git pull --ff-only`, with this file rewritten for D148) — verify_docs.py: all 170 checks pass (D148's gate runs it again on its staged tree) · drift_test.py 18/18 (R3b's gate) · the app suites on P's tree: every failure one RV's own run had, the known `?v=` asset checks, the `pwsh` launcher tests and five provenance tests of app.test_results (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 17)

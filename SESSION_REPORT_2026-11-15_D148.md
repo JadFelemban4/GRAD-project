@@ -12,7 +12,8 @@ study's training ends" by the visit's checkout of `T*` in that clone (ORDER step
 | commit | ORDER step | what |
 |---|---|---|
 | `891e29a` | 18, B1 | Jad's: the B58's benchmark on his PC, with B2, B4 and L8; 26 result files and nothing else, pushed from his PC on 14 November (his report, section 2) |
-| this one | D148 | section S of `results/VALIDATION_DECISIONS.md` (rows 148-153); ORDER's edits; INTERFACES section 18; in `results/B58H_DESIGN/`, `d148_figures`, `grids_b58` and `hw_opt/`; CHECKPOINT, `STATE_HISTORY.md` part AQ, this report and Jad's; section 23 of the 31 October report, pointing here |
+| `c5890f2` | D148 | section S of `results/VALIDATION_DECISIONS.md` (rows 148-153); ORDER's edits; INTERFACES section 18; in `results/B58H_DESIGN/`, `d148_figures`, `grids_b58` and `hw_opt/`; CHECKPOINT, `STATE_HISTORY.md` part AQ, this report and Jad's; section 23 of the 31 October report, pointing here |
+| Tc's | 18a, Tc | `epa_backend.py`'s check-run line (row 148 (5)) and its test; section 1's table, sections 10 and 11; ORDER step 18a; CHECKPOINT, `STATE_HISTORY.md` part AR |
 
 B1 measured Ta's tree: its git_head is `0329456`, and its commit `891e29a` adds only results files on top of
 it. So "B1's git_head" is `0329456` and "B1's commit" is `891e29a`. Every gate that diffs the cost files reads
@@ -264,3 +265,119 @@ Every time is AST and printed by `results/B58H_DESIGN/d148_figures.txt`. W ends 
   `d148_figures.txt:123-137` depend on it.
 - **The four-engine test does not run**, and Tb's session report gives Run 2's failed validations as the result
   (row 146 (3), (9)). That is Tb's, not D148's.
+
+## 10. 15 November: Tc, PR-B's check-run line (ORDER step 18a)
+
+Tc is ORDER step 18a and row 148 (5). Ta's check of PR-B's commands accepted the training line and the pilot line
+only, so PR-B could not state CK's line, row 147 (3)'s pilot command at `--steps 50000 --out runs/b58h_check_dt1`
+(row 148 (1)). Tc teaches the check that line. It changes two code files, `epa_backend.py` and
+`test_epa_backend.py`, and four documents (rule 1.10): this report (this section, section 11 and section 1's
+table), ORDER step 18a's row and the status line above ORDER's table, CHECKPOINT, and `STATE_HISTORY.md` part AR,
+which holds the CHECKPOINT lines it changed, verbatim.
+
+**`epa_backend.py`.** `B58H_LINES`' "pilot" entry is now "check": `--seeds 2000-2004`, `--ratios 1.5`,
+`--out runs/b58h_check_dt1`, and `--steps` `str(TR.DECISION_29_WINDOW)` for that line alone
+(`epa_backend.py:213-217`). `DECISION_29_WINDOW` is 50 000 (`training_recipe.py:46`). `b58h_line` lays the entry
+over `b58h_flags` (`epa_backend.py:1344`), whose `--steps` stays `PROD_STEPS`, 450 000, for the training line
+(`:1312`, `:197`). The docstrings and comments that named the pilot now name the check line or CK (`:118-120`,
+`:204-206`, `:213-215`, `:1316`, `:1365-1368`); `b58h_flags`' and `b58h_line`'s docstrings now say that the entry
+is laid over the flags (`:1308-1309`, `:1322-1325`); and the module docstring's header names
+the sheet 18's 10.1 and 11 and rows 146-148 (`:113`, `:116`). The word "pilot" is no longer in the file. Tc moves
+the file's lines from `:119` on: section 2's `epa_backend.py:898-899` reads `:903-904` at Tc, and row 148 (5)'s
+line numbers are Ta's, at `891e29a`.
+
+**The scope of the diff.** `epa_backend.py` is the same at B1's commit `891e29a` and at D148
+(`git diff 891e29a HEAD -- epa_backend.py` is empty). Against it, Tc changes `B58H_LINES`, docstrings and comments,
+and two lines besides: one forced by the check entry's `--steps`, read from `training_recipe` (the import), and one
+by the renamed key (the refusal):
+- `import training_recipe as TR` (`:152`), which the check entry reads. `training_recipe.py` was already in this
+  module's import closure, through `benchmark_training.py`'s import inside a function (`benchmark_training.py:2216`),
+  so the closure's file list does not move; only this module's own text does. `training_recipe.py` imports NumPy at
+  module level and stable-baselines3 only inside a function (`training_recipe.py:44`, `:150`), and Hygiene's import
+  test, unchanged, still finds no torch and no file opened; `training_recipe`, not in that test's preload list
+  (`test_epa_backend.py:1478-1479`), is imported under its audit hook.
+- The text of `b58h_line`'s refusal of a line whose `--out` names neither entry (`epa_backend.py:1341-1343`): its
+  middle line read `B58H_LINES['pilot']` as "the pilot line's" and now reads `B58H_LINES['check']` as "the check
+  line's" (`:1342`).
+
+ORDER step 18a's gate, and row 148 (5), which governs it and which PR-B copies, read "changes only `B58H_LINES`,
+docstrings and comments"; INTERFACES section 18's 2 gives Tc `B58H_LINES`' entry, its docstrings and comments, and
+`test_epa_backend.PreregistrationB58H`. Outside that wording are the two lines above and, in the test file, the
+module-level lines that `PreregistrationB58H` reads (the comment above the typed lines, `CHECK_148`, `b58h_text`,
+`parsed_problems` and `b58h_all_problems`' docstring; `test_epa_backend.py:227-342`) and the module docstring
+(`:55-61`). They are
+disclosed here and in step 18a's row, and PR-B discloses them beside row 148 (5). No other logic changes. For the
+check line, three refusal texts still cite only row 147 (3) and the sheet 17's 10.1, where its sources are row 148
+(1) and the sheet 18's 10.1: `epa_backend.py:1343`, `:1349` and `:1376` (which now prints "no fenced check line").
+They are kept so that no more code changes, and from `T*` on the file is frozen (INTERFACES section 18's 1).
+
+**`test_epa_backend.py`.** The test file types three lines from their rows, at module level, and
+`PreregistrationB58H` reads them (`test_epa_backend.py:232-240`):
+row 147 (3)'s training line, row 148 (1)'s check line as `CHECK_148`, and the pilot's line as row 147 (3) gave it,
+kept as `PILOT_147` for the control. The SYNTHETIC PR-B states the training line and the check line (`:243`).
+`parsed_problems` takes a line's `--steps` from its entry where the entry gives one (`:314`). `train_all.main()`
+parses the check line into 10 runs (`:1592-1610`). The control (mistake 12) is a test of its own (`:1690-1712`):
+- the old pilot line fails with "--out ['runs/b58h_pilot_dt1'] is neither the training line's 'runs/b58h_dt1' nor
+  the check line's 'runs/b58h_check_dt1' (row 147 (3))" and "no fenced check line". Read as the check line,
+  `train_all.main()`'s parse gives exactly "steps 450000, not 50000" and "out 'runs/b58h_pilot_dt1', not
+  'runs/b58h_check_dt1'";
+- the check line at `--steps 450000` fails with "--steps '450000', not '50000'" and "no fenced check line". Read as
+  the check line, its parse gives exactly "steps 450000, not 50000".
+
+Three more controls are the agents' own. The check line at 40 000 steps is refused by `train_all.py`'s own
+`--recipe29` check, with a refusal that begins "REFUSING --recipe29: --checkpoint-average 50000: the window must be
+positive, at most --steps (40000)" (the text the test matches, `test_epa_backend.py:1666-1668`), so row 148 (1)'s
+50 000 is the shortest run of the exact command (point P1). The check line read as the training line names "steps
+50000, not 450000" among its differences (`:1681-1687`). And, added after the review of Tc, the training line at
+the check line's 50 000 steps fails with "--steps '50000', not '450000'" (`:1627-1628`), so the check entry's
+`--steps` cannot leak into the training line. The committed-PR-B test is renamed
+`test_the_committed_preregistration_states_row_147s_and_148s_commands`. The test file names the pilot only in the
+control and in the comments that explain it.
+
+**The runs, on the work tree before the commit.** None of their output is committed; Tc's commit message carries
+it.
+- `python -B -m unittest test_epa_backend`: "Ran 67 tests", "OK (skipped=3)". The three skips are the two
+  preregistrations' committed-file tests and LiveRecord, which wait for PR-B and Tb. Ta's file had 66 tests (Ta's
+  commit message); Tc adds one.
+- The review's mutation runner changed `epa_backend.py`'s source in memory eleven ways, writing no file, and ran
+  `PreregistrationB58H` on each; every one is caught. One of them, the training line accepting the check line's
+  50 000 steps, was caught only after the case at `:1627-1628` was added. The runner is outside the repository.
+- `test_engine_threading.py`, alone; `epa_backend.cost_files`, run read-only (51 paths at HEAD and at B1's git_head
+  `0329456`, neither `epa_backend.py` nor `test_epa_backend.py` among them), and `git diff --quiet 0329456 -- <those
+  paths>`; `verify_docs.py`. Their printed lines are in Tc's commit message.
+- `epa_backend.py compute` refuses a work tree with a changed `.py` file (`record_moving_paths`; the module
+  docstring's "THE WORK TREE"). So the gate's comparison of its record at B1's commit and at Tc ran on a scratch
+  commit of this same tree, outside the repository, and runs again on Tc's commit before the push. The two records
+  differ in the module's own sha_text (now `epa_backend.py:916-917`) and in `provenance.commit`, which names the
+  commit and so differs by nature.
+
+**The grep.** `git grep -n -i "pilot" -- '*.py'` finds the word in nine other files. None is edited:
+- `evaluate.py:11`, the usage line `runs/b58h_pilot_dt1/<each run>`. `evaluate.py` is a cost file, frozen from B1's
+  git_head, and row 148 (9) reads its words as replaced. `evaluate.py:123`, `:1154`, `:1163`, `:1379` and
+  `:1667-1671` name decision 29's pilot and `pilot_spread`, which row 148 (4) keeps for the training's own spread,
+  printed beside.
+- `four_engine_analysis.py:52`, `:198-199`, `:342`, `:402-411`, `:428`, `:675-677`, `:806-807`: row 103 (4)'s
+  `pilot_pairs` and its factor, which row 148 (4) fills with X2's five pairs.
+- `train.py:1069`, `train_all.py:47`, `:284` and `training_recipe.py:37`: comments and help text that name decision
+  29's pilot. All three are cost files.
+- `thresholds/contract.py:807`, `:809`, `:1369`: contract version 5's S2b table pilots, unrelated to this study; a
+  cost file.
+- `test_four_engine_analysis.py:22`, `:125-131`, `:275`, `:287`, `:982-984`; `test_four_engine_training.py:940`;
+  `test_scoring_protocol.py:15`, `:41`, `:273`, `:907-939`, `:1161`: the tests of those names.
+
+`b58h_descriptive.py:75`'s "before PL-B and T*" does not contain the word; row 148 (9) reads it as replaced too.
+
+## 11. 15 November: Jad's answers, relayed by Ghassan
+
+After D148's push, Ghassan relayed Jad's answers to four questions; the words below are Ghassan's message,
+verbatim. They decide nothing new: Jad's column is no longer filled (row 133 (1)), and B1's figures stand.
+- Was anything installed on Jad's PC after the update pause of 14 November 19:52? "No". So B1's measurements
+  describe the PC as it stands. The visit's sheet still prints the hotfix list and the driver's version at CK's
+  start, as it measures the pause rather than states it.
+- Is the NVIDIA app's own auto-update off? "Yes".
+- When is the visit for CK and the training? "Nov 14 ended at 9 pm": that is when B1's visit ended, not the next
+  visit's time, which is still open. CK, about 1.55 h (`results/B58H_DESIGN/d148_figures.txt:54`), must end by the
+  training's latest start, 16 November 16:12 AST for the primary scoring to end inside W, or 17 November 02:12 AST
+  for the training alone (`:140-141`).
+- Points P1-P13: "No objections". Section S's note says Jad was not asked, which was true when D148 was written;
+  PR-B records this answer beside it.

@@ -110,13 +110,14 @@ cost file of HEAD (a spec, a derived or freeze file, the lock, the roads record)
 untracked alike. Any other change moves nothing and is allowed, so that PR-B's gate runs `check` on its staged
 tree (the preregistration, the session report and CHECKPOINT staged) as well as at T*.
 
-THE PREREGISTRATIONS' COMMANDS (the sheet 10.1, 11 and 17's 10.1 and 11). The four-engine test's,
+THE PREREGISTRATIONS' COMMANDS (the sheet 10.1, 11, 17's and 18's 10.1 and 11). The four-engine test's,
 results/PREREGISTRATION_4E.md (PREREGISTRATION_REL), is never written once the record's n is null (row 136 (1)),
 and Run 2 left no EPA engine: preregistration_problems is its check, kept for that reading. The B58 study across H
-(rows 146-147) is preregistered in results/PREREGISTRATION_B58H.md (B58H_PREREGISTRATION_REL; PR-B, ORDER step
+(rows 146-148) is preregistered in results/PREREGISTRATION_B58H.md (B58H_PREREGISTRATION_REL; PR-B, ORDER step
 20, whose own commit is T*). Every train_all.py command PR-B states is one of B58H_LINES: row 147 (3)'s training
-line (--seeds 0-19, --out runs/b58h_dt1, no --ratios) or its pilot line (--seeds 2000-2004 --ratios 1.5, --out
-runs/b58h_pilot_dt1), each carrying b58h_flags(PROTOCOL) and the flags B58H_ALONE, never --blind-per-h, and each
+line (--seeds 0-19, --out runs/b58h_dt1, no --ratios) or row 148 (1)'s check-run line, CK's (--seeds 2000-2004
+--ratios 1.5, --out runs/b58h_check_dt1, and --steps training_recipe.DECISION_29_WINDOW for that line alone; Tc,
+row 148 (5)), each carrying b58h_flags(PROTOCOL) and the flags B58H_ALONE, never --blind-per-h, and each
 stated in a fenced block (b58h_problems). A command is a simple command of a fenced line whose program is
 train_all.py (after VAR=value words, an interpreter and its -B), or in which --engine follows train_all.py, and an
 inline code span in which --engine follows it; a `| tee` or a redirection ends it, and any other naming of
@@ -148,6 +149,7 @@ from fractions import Fraction
 import benchmark_training as B
 import epa_roads as ER
 import fingerprint as FP
+import training_recipe as TR
 from thresholds import common
 
 REPO = os.path.dirname(os.path.abspath(__file__))
@@ -199,17 +201,20 @@ BENCH_REL = "results/benchmarks"
 ATTEMPT = "B1_bench_{engine}.attempt{k}.json"
 CPU_ATTEMPT = "B1_bench_{engine}.cpu.attempt{k}.json"
 B0_RECORD = "B0_{git_head}.json"
-# ------------------------------------------------------------------ rows 146 (5), 147 (3): PR-B's two commands
-# The sheet 17's 10.1 and 11. PR-B, ORDER step 20: its own commit is T*, the commit the pilot and the training
-# run from (git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md)
+# ------------------------------------------------------------------ rows 146 (5), 147 (3), 148 (1): PR-B's two commands
+# The sheet 17's 10.1 and 11, and 18's 10.1 and 11 (row 148). PR-B, ORDER step 20: its own commit is T*, the commit
+# the check run and the training run from (git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md)
 B58H_PREREGISTRATION_REL = "results/PREREGISTRATION_B58H.md"
 B58H_ENGINE = ER.NEVER_DROPPED            # --engine b58: the study's one plant (row 147 (1))
 B58H_N = 20                               # row 147 (4), Ghassan's answer Q3: fixed, never this record's n
 B58H_LINES = {
     # row 147 (3)'s training command: three arms at every ratio the roads record holds, so no --ratios
     "training": {"--seeds": f"0-{B58H_N - 1}", "--out": "runs/b58h_dt1"},
-    # the pilot, PL-B (row 146 (3), ORDER step 21): five pairs, blinded and sighted at r = 1.5 (row 112)
-    "pilot": {"--seeds": "2000-2004", "--ratios": "1.5", "--out": "runs/b58h_pilot_dt1"},
+    # the check run, CK (row 148 (1), ORDER step 21): five pairs, blinded and sighted at r = 1.5, at decision 29's
+    # window, the shortest run train_all.py --recipe29 takes (train_all.py:239-243); its --steps, for this line
+    # alone, is laid over b58h_flags' PROD_STEPS by b58h_line (row 148 (5))
+    "check": {"--seeds": "2000-2004", "--ratios": "1.5", "--steps": str(TR.DECISION_29_WINDOW),
+              "--out": "runs/b58h_check_dt1"},
 }
 B58H_ALONE = ("--third-arm", "--recipe29", "--no-resume")    # and never --blind-per-h (row 135 (5): three arms)
 B58H_WITH_VALUE = ("--engine", "--device", "--road", "--dt", "--roads-record", "--reward-knock", "--steps",
@@ -1300,22 +1305,24 @@ def b58h_flags(protocol):
     """The flags every train_all.py line of PR-B carries with their values (the sheet 17's 10.1): --engine b58,
     --jobs PROTOCOL's runs typed as a number, --device PROTOCOL's device, --road four_engine, --dt 1,
     --roads-record PROTOCOL['roads_record'], --reward-knock out and --steps 450000, each read from `protocol` or
-    from its owner, never typed here; besides them B58H_ALONE, and the line's own B58H_LINES entry."""
+    from its owner, never typed here; besides them B58H_ALONE, and the line's own B58H_LINES entry, which b58h_line
+    lays over them: so the check line's --steps is its entry's, training_recipe.DECISION_29_WINDOW (row 148 (5))."""
     return {"--engine": B58H_ENGINE, "--jobs": str(protocol["runs"]), "--device": protocol["device"],
             "--road": protocol["road"], "--dt": protocol["dt"], "--roads-record": protocol["roads_record"],
             "--reward-knock": protocol["reward_knock"], "--steps": str(PROD_STEPS)}
 
 
 def b58h_kind(tokens):
-    """'training' or 'pilot', the B58H_LINES entry whose --out the line names once; None for any other line."""
+    """'training' or 'check', the B58H_LINES entry whose --out the line names once; None for any other line."""
     outs = [tokens[i + 1] for i, t in enumerate(tokens[:-1]) if t == "--out"]
     return next((k for k, spec in B58H_LINES.items() if outs == [spec["--out"]]), None)
 
 
 def b58h_line(tokens, *, protocol):
-    """(b58h_kind of the line, why it is not that line of row 147 (3) under `protocol`, or []): exactly
-    b58h_flags(protocol), the line's B58H_LINES values and B58H_ALONE, each once, no other flag and no stray
-    token; --dt compared as a number, every other value as its text."""
+    """(b58h_kind of the line, why it is not that line of row 147 (3) or 148 (1) under `protocol`, or []): exactly
+    b58h_flags(protocol) with the line's B58H_LINES values laid over them (the check line's --steps), and
+    B58H_ALONE, each once, no other flag and no stray token; --dt compared as a number, every other value as its
+    text."""
     flags, stray, i = {}, [], 0
     while i < len(tokens):
         t = tokens[i]
@@ -1332,7 +1339,7 @@ def b58h_line(tokens, *, protocol):
     kind = b58h_kind(tokens)
     if kind is None:
         return None, [f"--out {flags.get('--out')!r} is neither the training line's "
-                      f"{B58H_LINES['training']['--out']!r} nor the pilot line's {B58H_LINES['pilot']['--out']!r} "
+                      f"{B58H_LINES['training']['--out']!r} nor the check line's {B58H_LINES['check']['--out']!r} "
                       "(row 147 (3))"]
     want = dict(b58h_flags(protocol), **B58H_LINES[kind])
     probs = [f"{t!r} follows no flag that takes a value" for t in stray]
@@ -1355,9 +1362,10 @@ def b58h_line(tokens, *, protocol):
 
 
 def b58h_problems(text, *, protocol):
-    """Why PR-B's text does not state row 147 (3)'s two commands as the sheet 17's 10.1 fixes them, or []: every
-    command b58h_commands finds is the training line or the pilot line (b58h_line), and each of the two is
-    stated in a fenced block. The run of each through train_all.main() is test_epa_backend's."""
+    """Why PR-B's text does not state row 147 (3)'s training command and row 148 (1)'s check command as the sheet
+    17's 10.1 and 18's 10.1 fix them, or []: every command b58h_commands finds is the training line or the check
+    line (b58h_line), and each of the two is stated in a fenced block. The run of each through train_all.main()
+    is test_epa_backend's."""
     commands, out = b58h_commands(text)
     fenced = set()
     for where, tokens in commands:

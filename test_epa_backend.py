@@ -52,11 +52,13 @@ for it (mistake 12).
                 fail when present uncommitted, removed after it, or (PR-B) added by more than one commit
   Preregistration   unguarded: skipped until results/PREREGISTRATION_4E.md is committed, a failure if skipped
                 after; absent when the committed record's n is null, and Run 2 left no EPA engine
-  PreregistrationB58H   unguarded (row 146 (5); the sheet 17's 10.1): row 147 (3)'s two commands, as SYNTHETIC
-                text, pass b58h_problems and train_all.main() in-process (sys.argv patched, train_all.commands a
-                stub raising a sentinel with the parsed arguments and check_four_engine's record); one flag
-                changed fails (the control), and so do the lines train_all.main() refuses, by their text; what
-                a command is (its program, or --engine after it; a pipe ends it; a mention is not one); the
+  PreregistrationB58H   unguarded (row 146 (5); the sheet 17's 10.1 and 18's 10.1): row 147 (3)'s training
+                command and row 148 (1)'s check command, as SYNTHETIC text, pass b58h_problems and train_all.main()
+                in-process (sys.argv patched, train_all.commands a stub raising a sentinel with the parsed
+                arguments and check_four_engine's record); one flag changed fails (the control), and so do the old
+                pilot line and the check line at --steps 450000 (row 148 (5)), and the lines train_all.main()
+                refuses, by their text; what a command is (its program, or --engine after it; a pipe ends it; a
+                mention is not one); the
                 committed results/PREREGISTRATION_B58H.md is checked the same way, skipped until it is committed
                 and a failure if skipped after
   LiveRecord    unguarded: skipped until results/EPA_BACKEND.json is committed, a failure if removed after; then
@@ -222,18 +224,23 @@ def preregistration_verdict(pr, rec, load_record, load_text):
 
 
 # ----------------------------------------------------------------------------------------- PR-B's commands
-# Row 147 (3)'s two commands, word for word: the training command as the row quotes it, and the pilot's, "the
-# same with `--ratios 1.5 --seeds 2000-2004 --out runs/b58h_pilot_dt1`". Typed here from the row, so that
-# EB.B58H_LINES and EB.b58h_flags are checked against the row and not against themselves (mistake 12)
+# PR-B's two commands, word for word: row 147 (3)'s training command as that row quotes it, and row 148 (1)'s
+# check command, CK's, as that row quotes it (in place of the pilot's: row 148 (5), Tc). Typed here from the rows,
+# so that EB.B58H_LINES and EB.b58h_flags are checked against the rows and not against themselves (mistake 12).
+# PILOT_147 is the pilot's line as row 147 (3) gave it, "the same with `--ratios 1.5 --seeds 2000-2004 --out
+# runs/b58h_pilot_dt1`": row 148 replaced it, so it is kept as a control that must fail (PreregistrationB58H)
 TRAINING_147 = ("train_all.py --engine b58 --device cpu --road four_engine --dt 1 --third-arm --recipe29 "
                 "--roads-record results/EPA_ROADS/roads.json --reward-knock out --seeds 0-19 --steps 450000 "
                 "--jobs 12 --no-resume --out runs/b58h_dt1")
+CHECK_148 = ("train_all.py --engine b58 --device cpu --road four_engine --dt 1 --third-arm --recipe29 "
+             "--roads-record results/EPA_ROADS/roads.json --reward-knock out --ratios 1.5 --seeds 2000-2004 "
+             "--steps 50000 --jobs 12 --no-resume --out runs/b58h_check_dt1")
 PILOT_147 = ("train_all.py --engine b58 --device cpu --road four_engine --dt 1 --third-arm --recipe29 "
              "--roads-record results/EPA_ROADS/roads.json --reward-knock out --ratios 1.5 --seeds 2000-2004 "
              "--steps 450000 --jobs 12 --no-resume --out runs/b58h_pilot_dt1")
 
 
-def b58h_text(training=TRAINING_147, pilot=PILOT_147, *, prose=""):
+def b58h_text(training=TRAINING_147, check=CHECK_148, *, prose=""):
     """A SYNTHETIC PR-B: a sentence quoting row 147 (3)'s training command in a code span, beside a mention of
     `train_all.py --recipe29` (no engine: not a command), then each command in a fenced block of its own, split
     over two lines by a backslash as a shell block would be (a command given as None is left out), then `prose`."""
@@ -243,7 +250,7 @@ def b58h_text(training=TRAINING_147, pilot=PILOT_147, *, prose=""):
     return ("# PREREGISTRATION_B58H (SYNTHETIC)\n\n"
             "Decision 29's recipe (`train_all.py --recipe29`) on row 116's training road. The training command is "
             f"`{TRAINING_147}`.\n\n"
-            + (fence(training) if training else "") + "\n" + (fence(pilot) if pilot else "") + prose)
+            + (fence(training) if training else "") + "\n" + (fence(check) if check else "") + prose)
 
 
 class Sentinel(Exception):
@@ -294,15 +301,17 @@ def run_train_all(tokens):
 
 def parsed_problems(a, record, kind):
     """Why what train_all.main() parsed from a PR-B line (`a`), with the record check_four_engine returned, is not
-    row 147 (3)'s `kind` line, or []: the flag list's values (EB.PROTOCOL, EB.B58H_ENGINE, EB.PROD_STEPS), the
-    line's seeds, folder and ratios (EB.B58H_LINES), the three flags set and --keep-buffer off; the REAL committed
-    roads record; and the runs train_all would start (train_all.arms): one sighted arm at each ratio the record
-    holds and the blinded arm (EB.ARMS) for the training, the blinded arm and r = 1.5 for the pilot. The record is
-    never printed: it holds roads_seed."""
+    row 147 (3)'s or row 148 (1)'s `kind` line, or []: the flag list's values (EB.PROTOCOL, EB.B58H_ENGINE,
+    EB.PROD_STEPS), the line's seeds, folder and ratios, and its steps where its entry gives them (EB.B58H_LINES:
+    the check line's), the three flags set and --keep-buffer off; the REAL committed roads record; and the runs
+    train_all would start (train_all.arms): one sighted arm at each ratio the record holds and the blinded arm
+    (EB.ARMS) for the training, the blinded arm and r = 1.5 for the check run. The record is never printed: it
+    holds roads_seed."""
     import train_all
     p, spec = EB.PROTOCOL, EB.B58H_LINES[kind]
     want = dict(engine=EB.B58H_ENGINE, device=p["device"], road=p["road"], dt=p["dt"],
-                roads_record=p["roads_record"], reward_knock=p["reward_knock"], steps=EB.PROD_STEPS, jobs=p["runs"],
+                roads_record=p["roads_record"], reward_knock=p["reward_knock"],
+                steps=int(spec.get("--steps", EB.PROD_STEPS)), jobs=p["runs"],
                 third_arm=True, recipe29=True, no_resume=True, keep_buffer=False,
                 seeds=train_all.seeds([spec["--seeds"]]), out=spec["--out"],
                 ratios=[float(spec["--ratios"])] if "--ratios" in spec else None)
@@ -318,8 +327,8 @@ def parsed_problems(a, record, kind):
     if kind == "training" and (ratios != held or len(held) + 1 != EB.ARMS):
         out.append(f"the training's sighted ratios are {ratios}, not every ratio the record holds, {held}, "
                    f"with the blinded arm {EB.ARMS} arms")
-    if kind == "pilot" and ratios != want["ratios"]:
-        out.append(f"the pilot's sighted ratios are {ratios}, not {want['ratios']}")
+    if kind == "check" and ratios != want["ratios"]:
+        out.append(f"the check line's sighted ratios are {ratios}, not {want['ratios']}")
     runs = train_all.arms(a, record)
     blinded = [s for s, sighted, _ in runs if not sighted]
     if len(runs) != (len(ratios) + 1) * len(want["seeds"]) or blinded != want["seeds"]:
@@ -329,8 +338,8 @@ def parsed_problems(a, record, kind):
 
 def b58h_all_problems(text):
     """EB.b58h_problems on `text`, then every distinct command it finds through train_all.main() in-process
-    (run_train_all), what it parsed checked by parsed_problems: [] when PR-B states row 147 (3)'s two commands and
-    train_all.py takes each as the row means it."""
+    (run_train_all), what it parsed checked by parsed_problems: [] when PR-B states row 147 (3)'s training command
+    and row 148 (1)'s check command and train_all.py takes each as its row means it."""
     probs = EB.b58h_problems(text, protocol=EB.PROTOCOL)
     commands, _ = EB.b58h_commands(text)
     for tokens in sorted({tuple(t) for _, t in commands}):
@@ -1534,13 +1543,15 @@ class Preregistration(unittest.TestCase):
 
 
 class PreregistrationB58H(unittest.TestCase):
-    """Unguarded (row 146 (5); the sheet 17's 10.1): PR-B's train_all.py commands, each read by b58h_problems and
-    run through train_all.main() in-process (run_train_all, parsed_problems), train_all.py not edited for it. The
-    first test reads the committed results/PREREGISTRATION_B58H.md: skipped until it is committed, a failure if
-    skipped after (present and not committed, or removed after its commit). The others run from Ta on, on row 147
-    (3)'s two commands as SYNTHETIC text, so that the check is seen to pass and to fail before PR-B exists."""
+    """Unguarded (row 146 (5); the sheet 17's 10.1 and 18's 10.1): PR-B's train_all.py commands, each read by
+    b58h_problems and run through train_all.main() in-process (run_train_all, parsed_problems), train_all.py not
+    edited for it. The first test reads the committed results/PREREGISTRATION_B58H.md: skipped until it is
+    committed, a failure if skipped after (present and not committed, or removed after its commit). The others run
+    from Ta on (from Tc, row 148 (5), on the check line in place of the pilot's), on row 147 (3)'s training command
+    and row 148 (1)'s check command as SYNTHETIC text, so that the check is seen to pass and to fail before PR-B
+    exists."""
 
-    def test_the_committed_preregistration_states_row_147s_commands(self):
+    def test_the_committed_preregistration_states_row_147s_and_148s_commands(self):
         """b58h_verdict in this repository (LiveStates is its test): skipped until PR-B is committed, a failure if
         skipped after."""
         verdict, why = b58h_verdict()
@@ -1563,7 +1574,7 @@ class PreregistrationB58H(unittest.TestCase):
         commands, problems = EB.b58h_commands(text)
         self.assertEqual(problems, [])
         self.assertEqual(sorted((where, EB.b58h_kind(tokens)) for where, tokens in commands),
-                         [("fenced", "pilot"), ("fenced", "training"), ("fenced", "training"), ("prose", "training")])
+                         [("fenced", "check"), ("fenced", "training"), ("fenced", "training"), ("prose", "training")])
         self.assertEqual([t for w, t in commands if w == "fenced" and EB.b58h_kind(t) == "training"][-1],
                          T.split()[1:])
         self.assertEqual(EB.b58h_problems(text, protocol=EB.PROTOCOL), [])
@@ -1578,20 +1589,20 @@ class PreregistrationB58H(unittest.TestCase):
                 probs = EB.b58h_problems(b58h_text(prose=f"\n```bash\n{line}\n```\n"), protocol=EB.PROTOCOL)
                 self.assertTrue(any(words in p for p in probs), probs)
 
-    def test_row_147s_two_commands_pass(self):
-        """Row 147 (3)'s commands, in their fences and the training one in prose, pass; train_all.main() parses
-        each as the row means it: the training line, seeds 0-19 at both ratios and blinded, 60 runs (row 147 (4):
-        n = 20 an arm, three arms); the pilot line, seeds 2000-2004 blinded and at r = 1.5, 10 runs (row 146 (3):
-        five pairs)."""
+    def test_row_147s_and_148s_commands_pass(self):
+        """Row 147 (3)'s training command and row 148 (1)'s check command, in their fences and the training one in
+        prose, pass; train_all.main() parses each as its row means it: the training line, seeds 0-19 at both ratios
+        and blinded, 60 runs (row 147 (4): n = 20 an arm, three arms); the check line, seeds 2000-2004 blinded and
+        at r = 1.5, at decision 29's window, 10 runs in one wave (row 148 (1): five pairs)."""
         import train_all
         text = b58h_text()
         commands, problems = EB.b58h_commands(text)
         self.assertEqual(problems, [])
         self.assertEqual(sorted((where, EB.b58h_kind(tokens)) for where, tokens in commands),
-                         [("fenced", "pilot"), ("fenced", "training"), ("prose", "training")])
+                         [("fenced", "check"), ("fenced", "training"), ("prose", "training")])
         self.assertEqual(EB.b58h_problems(text, protocol=EB.PROTOCOL), [])
         self.assertEqual(b58h_all_problems(text), [])
-        for line, kind, n_runs in ((TRAINING_147, "training", 60), (PILOT_147, "pilot", 10)):
+        for line, kind, n_runs in ((TRAINING_147, "training", 60), (CHECK_148, "check", 10)):
             with self.subTest(kind):
                 res = run_train_all(line.split()[1:])
                 self.assertEqual(res[0], "passed", res[1] if res[0] == "refused" else "")
@@ -1599,9 +1610,9 @@ class PreregistrationB58H(unittest.TestCase):
                 self.assertEqual(len(train_all.arms(res[1], res[2])), n_runs)
 
     def test_the_control_one_flag_changed_fails(self):
-        """Mistake 12: row 147 (3)'s text with one flag changed fails, each with its own problem, by
-        b58h_problems or by train_all.main() (run_train_all)."""
-        T, P = TRAINING_147, PILOT_147
+        """Mistake 12: row 147 (3)'s and row 148 (1)'s text with one flag changed fails, each with its own problem,
+        by b58h_problems or by train_all.main() (run_train_all)."""
+        T, C = TRAINING_147, CHECK_148
         cases = (("--jobs", dict(training=T.replace("--jobs 12", "--jobs 14")), "--jobs '14', not '12'"),
                  ("--device", dict(training=T.replace("--device cpu", "--device cuda")),
                   "--device 'cuda', not 'cpu'"),
@@ -1613,6 +1624,8 @@ class PreregistrationB58H(unittest.TestCase):
                   "--reward-knock 'in', not 'out'"),
                  ("--steps", dict(training=T.replace("--steps 450000", "--steps 3000")),
                   "--steps '3000', not '450000'"),
+                 ("the training line at the check line's --steps",
+                  dict(training=T.replace("--steps 450000", "--steps 50000")), "--steps '50000', not '450000'"),
                  ("--dt", dict(training=T.replace("--dt 1 ", "--dt 0.5 ")), "--dt '0.5', not 1.0"),
                  ("--roads-record", dict(training=T.replace("roads.json", "roads_copy.json")),
                   "--roads-record 'results/EPA_ROADS/roads_copy.json', not 'results/EPA_ROADS/roads.json'"),
@@ -1625,13 +1638,13 @@ class PreregistrationB58H(unittest.TestCase):
                   "--engine 'ford_27tt', not 'b58'"),
                  ("--out", dict(training=T.replace("runs/b58h_dt1", "runs/b58h_dt2")),
                   "is neither the training line's 'runs/b58h_dt1'"),
-                 ("the pilot's --ratios", dict(pilot=P.replace("--ratios 1.5", "--ratios 0.5")),
+                 ("the check line's --ratios", dict(check=C.replace("--ratios 1.5", "--ratios 0.5")),
                   "--ratios '0.5', not '1.5'"),
-                 ("the pilot's two ratios", dict(pilot=P.replace("--ratios 1.5", "--ratios 0.5 1.5")),
+                 ("the check line's two ratios", dict(check=C.replace("--ratios 1.5", "--ratios 0.5 1.5")),
                   "'1.5' follows no flag that takes a value"),
-                 ("the pilot's --seeds", dict(pilot=P.replace("--seeds 2000-2004", "--seeds 2000-2009")),
+                 ("the check line's --seeds", dict(check=C.replace("--seeds 2000-2004", "--seeds 2000-2009")),
                   "--seeds '2000-2009', not '2000-2004'"),
-                 ("no pilot line", dict(pilot=None), "no fenced pilot line"),
+                 ("no check line", dict(check=None), "no fenced check line"),
                  ("a prose command", dict(prose="\nThen `train_all.py --engine b58 --jobs 6 --out runs/b58h_dt1`.\n"),
                   "the prose command"),
                  ("a bare command", dict(prose="\nThen run train_all.py --engine b58 --jobs 6.\n"),
@@ -1643,11 +1656,16 @@ class PreregistrationB58H(unittest.TestCase):
 
     def test_the_control_train_all_main_runs_its_own_checks(self):
         """main() runs its own parser and check_four_engine before the stand-in, each refusal matched by its text;
-        and a line it takes with one value changed is caught by parsed_problems (the control of that check)."""
-        T, P = TRAINING_147, PILOT_147
+        and a line it takes with one value changed is caught by parsed_problems (the control of that check). The
+        check line at 40 000 steps, one checkpoint interval shorter, is refused by --recipe29's own check: decision
+        29's window is the shortest run of the exact command (row 148 (1), point P1)."""
+        T, C = TRAINING_147, CHECK_148
         for line, words in (
                 (T.replace(" --reward-knock out", ""), "REFUSING: --road four_engine needs --reward-knock"),
-                (P.replace("--ratios 1.5", "--ratios 0.7"), "REFUSING --ratios [0.7]: each must be one of"),
+                (C.replace("--ratios 1.5", "--ratios 0.7"), "REFUSING --ratios [0.7]: each must be one of"),
+                (C.replace("--steps 50000", "--steps 40000"),
+                 "REFUSING --recipe29: --checkpoint-average 50000: the window must be positive, at most --steps "
+                 "(40000)"),
                 (T.replace("--engine b58", "--engine ford_27tt"), "invalid choice: 'ford_27tt'"),
                 (T.replace("--seeds 0-19", "--seeds 1000-1019"), "REFUSING --seeds on the four-engine roads"),
                 (T + " --keep-buffer", "--keep-buffer exists for resuming; --no-resume forbids it"),
@@ -1660,14 +1678,38 @@ class PreregistrationB58H(unittest.TestCase):
         res = run_train_all(T.replace("--jobs 12", "--jobs 14").split()[1:])
         self.assertEqual(res[0], "passed", res[1] if res[0] == "refused" else "")
         self.assertEqual(parsed_problems(res[1], res[2], "training"), ["jobs 14, not 12"])
-        res = run_train_all(P.split()[1:])                    # the pilot line read as the training line
+        res = run_train_all(C.split()[1:])                    # the check line read as the training line
         self.assertEqual(res[0], "passed", res[1] if res[0] == "refused" else "")
         probs = parsed_problems(res[1], res[2], "training")
-        for words in ("seeds [2000, 2001, 2002, 2003, 2004], not [0, 1, 2,", "out 'runs/b58h_pilot_dt1', not",
-                      "ratios [1.5], not None", "the training's sighted ratios are [1.5], not every ratio",
-                      "train_all would start 10 runs"):
+        for words in ("steps 50000, not 450000", "seeds [2000, 2001, 2002, 2003, 2004], not [0, 1, 2,",
+                      "out 'runs/b58h_check_dt1', not", "ratios [1.5], not None",
+                      "the training's sighted ratios are [1.5], not every ratio", "train_all would start 10 runs"):
             self.assertTrue(any(p.startswith(words) for p in probs), (words, probs))
-        self.assertEqual(parsed_problems(res[1], res[2], "pilot"), [])
+        self.assertEqual(parsed_problems(res[1], res[2], "check"), [])
+
+    def test_the_control_the_old_pilot_line_and_the_check_line_at_450000_steps_fail(self):
+        """Mistake 12 (row 148 (5)): in place of the check line, the pilot's line as row 147 (3) gave it (PILOT_147)
+        and the check line at the training's --steps 450000 each fail by their own words. b58h_problems names the
+        pilot's folder as neither line's, and the 450 000 steps as not the check line's, and finds no fenced check
+        line in either text; train_all.main() takes both (each is a valid train_all.py command), and
+        parsed_problems, reading each as the check line, names exactly the values that differ."""
+        at_450000 = CHECK_148.replace("--steps 50000", "--steps 450000")
+        self.assertNotEqual(at_450000, CHECK_148)
+        for name, line, words, parsed in (
+                ("the old pilot line", PILOT_147,
+                 ("--out ['runs/b58h_pilot_dt1'] is neither the training line's 'runs/b58h_dt1' nor the check line's "
+                  "'runs/b58h_check_dt1' (row 147 (3))", "no fenced check line"),
+                 ["steps 450000, not 50000", "out 'runs/b58h_pilot_dt1', not 'runs/b58h_check_dt1'"]),
+                ("the check line at --steps 450000", at_450000,
+                 ("--steps '450000', not '50000'", "no fenced check line"),
+                 ["steps 450000, not 50000"])):
+            with self.subTest(name):
+                probs = EB.b58h_problems(b58h_text(check=line), protocol=EB.PROTOCOL)
+                for w in words:
+                    self.assertTrue(any(w in p for p in probs), (w, probs))
+                res = run_train_all(line.split()[1:])
+                self.assertEqual(res[0], "passed", res[1] if res[0] == "refused" else "")
+                self.assertEqual(parsed_problems(res[1], res[2], "check"), parsed)
 
 
 class LiveRecord(unittest.TestCase):
