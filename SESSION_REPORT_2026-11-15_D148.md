@@ -15,7 +15,8 @@ study's training ends" by the visit's checkout of `T*` in that clone (ORDER step
 | `c5890f2` | D148 | section S of `results/VALIDATION_DECISIONS.md` (rows 148-153); ORDER's edits; INTERFACES section 18; in `results/B58H_DESIGN/`, `d148_figures`, `grids_b58` and `hw_opt/`; CHECKPOINT, `STATE_HISTORY.md` part AQ, this report and Jad's; section 23 of the 31 October report, pointing here |
 | `31dc7ad` | 18a, Tc | `epa_backend.py`'s check-run line (row 148 (5)) and its test; section 1's table, sections 10 and 11; ORDER step 18a; CHECKPOINT, `STATE_HISTORY.md` part AR |
 | `5d801be` | 19, Tb | `results/EPA_BACKEND.json`, written by `epa_backend.py write`: n null, in_test ['b58']; no drop line written; section 1's table and section 12; ORDER step 19 and the status line; CHECKPOINT, `STATE_HISTORY.md` part AS |
-| `T*` | 20, PR-B | `results/PREREGISTRATION_B58H.md`; sections 1 and 13; CHECKPOINT, `STATE_HISTORY.md` part AT |
+| `720587d`, `T*` | 20, PR-B | `results/PREREGISTRATION_B58H.md`; sections 1 and 13; CHECKPOINT, `STATE_HISTORY.md` part AT |
+| `T*`'s record | 20, after `T*` | `results/PREREGISTRATION_B58H.md` section 15 (PR-B's gate); section 14; CHECKPOINT, `STATE_HISTORY.md` part AU |
 
 B1 measured Ta's tree: its git_head is `0329456`, and its commit `891e29a` adds only results files on top of
 it. So "B1's git_head" is `0329456` and "B1's commit" is `891e29a`. Every gate that diffs the cost files reads
@@ -654,3 +655,32 @@ print appended rather than overwritten, and this section's account of the second
 and the push. The visit's sheet, which Ghassan writes after `T*` from the file's section 14 and section 8 above.
 Section 8's item 7 was not checked beyond the file's own text, which states no comparison of numbers the device
 wrote with numbers this laptop recomputes.
+
+## 14. 15 November: T* pushed; the visit's sheet
+
+**T*.** PR-B's commit `720587d` adds `results/PREREGISTRATION_B58H.md`; its parent is Tb's `5d801be`. Its gate
+at `T*` passed before the push (the file's section 15 holds the lines), and it was pushed to `GRA-test` after a
+fetch, a fast-forward (`5d801be..720587d`). Section 13's "Not done by this step" is done: the gate, the commit and
+the push.
+
+**The visit's sheet** (section 8, item 4), written after `T*`: `VISIT2_SHEET.md` with `tstar_pushed.txt` (T*'s
+ID and title), in `For Jad - Visit 2` on Ghassan's Desktop, outside the repository, as B1's sheet was. A script
+copies its PR-B blocks from the file at `T*`: the check line, the training line, CK's check block, the record
+block, the stale-lock step and the `SHA256SUMS` line verbatim, and the guard with two values set by the sheet's
+Step 1: `TSTAR`, read from git after a fetch and compared with `tstar_pushed.txt`, and the session's folder number,
+the first unused one. The sheet adds the environment record before CK and after the last run (the fields of the
+file's section 11), the `date` lines for the first and last hour of training (row 134 (1)), a gate around PR-B's
+training line that starts it only after a `CHECK RUN: OK` of the same `RUNAT`, the zips of CK's record and of the
+return, and the crash routes. Three reviews read it: one for fidelity to PR-B, and two walks in interactive Git
+Bash with the real launcher and a stub `train.py`, in scratch clones outside the repository. They found that Git
+Bash's `ls` alias (`ls -F`) would have dropped every session folder from the return zip; that the sheet allowed
+light use of the PC, against PR-B's "The PC stays idle"; that a re-run in the same window would overwrite the
+launch log; and that nothing stopped the training without a passed CK. All are fixed and walked. One reviewer's
+harness started the real `train.py` for one 50,000-step run inside its own scratch clone, outside the repository;
+it was left to end by itself, and nothing in the repository, its `runs/` or the venv changed.
+
+**Open.** The visit's date and time (the sheet's first box, for Ghassan to fill), and how the return comes back (a
+USB drive formatted exFAT or NTFS, or a cloud link; about 20 GB, the sheet's estimate). ORDER's and INTERFACES'
+Done notes for steps 20-22 wait until after the last scoring: after `T*`, row 149 (3)'s check lets only
+CHECKPOINT, `STATE_HISTORY.md`, this report and `results/PREREGISTRATION_B58H.md` change among the paths present at
+`T*`.

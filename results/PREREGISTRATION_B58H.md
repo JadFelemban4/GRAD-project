@@ -1838,6 +1838,18 @@ and, at every commit after `T*` that touches this file, the output of section 14
 heading changed. Runs are named by section 4's lines ("the check line", "the training line"), never by quoting a
 command.
 
+**15 November 2026, PR-B's gate** (section 14, step 0). On the staged tree, before the commit: the cost-file list
+held 51 paths; "cost files unchanged since B1: exit 0"; `epa_backend.py check` printed `[]`, exit 0;
+`test_epa_backend.b58h_all_problems` on this file printed `[]`; the grids print and D148's figures print
+reproduced, exit 0 each; "placeholders left: exit 1" (none); `verify_docs.py` exit 0, "All 170 checks pass (1172
+figure mentions scanned in the documents).", CHECKPOINT.md 148 lines. At `T*`, `720587d`, before its push: the
+commit that adds this file is HEAD (the two `git log` lines printed the same sha); "parent is Tb's commit"; "at
+T*: exit 0" (the cost files); `epa_backend.py check` printed `[]`, exit 0; `git diff --stat 5d801be HEAD` listed
+CHECKPOINT.md, SESSION_REPORT_2026-11-15_D148.md, STATE_HISTORY.md and this file, "4 files changed, 2043
+insertions(+), 6 deletions(-)"; both prints reproduced, exit 0; "placeholders left: exit 1"; `verify_docs.py`
+exit 0, all 170 checks pass (1172 figure mentions); `test_epa_backend.Preregistration` and `PreregistrationB58H`:
+"Ran 7 tests in 20.597s", "OK", none skipped. `T*` was pushed to `GRA-test` the same day, `5d801be..720587d`.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

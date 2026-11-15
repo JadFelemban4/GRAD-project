@@ -5487,3 +5487,17 @@ From "Next actions", item 3, its second line, as committed at `5d801be`:
 From "Next actions", item 8, its sixth line, as committed at `5d801be`:
 
    Tc and Tb are done (15 November; `SESSION_REPORT_2026-11-15_D148.md`, sections 10 and 12): step 18a, `epa_backend.py`'s check-run line, row 148 (1)'s in place of the pilot's; step 19, the backend record, n null (its `check`, `test_trainable` and `test_engine_threading` run on its commit, before the push). Next, on this laptop: PR-B (step 20), whose own commit is `T*`, with Tb's commit its parent. Then ONE visit to Jad's PC from `T*`: CK (step 21) and, on its "CHECK RUN: OK", the training (step 22). On this laptop during training: CK's record, AB (step 22a) and the routes (step 22b). Then the scoring, in row 149 (5)'s order (a)-(f), with (d)-(f) run only if started by 23 November 2026 00:00 AST. Latest starts (`results/B58H_DESIGN/d148_figures.txt`): the training by 17 November 02:12 AST to end inside W (`:140`), and by 16 November 16:12 for the primary scoring to end inside W too (`:141`); step 3's 01:22 and 15:22 are superseded (`:149`).
+
+# Part AU — lines rotated out of CHECKPOINT.md, 15 November 2026 (GRA-test: T*'s record, after PR-B)
+
+From the header, as committed at `720587d`:
+
+Last verified: 2026-11-15 (on `GRA-test`, at Tb `5d801be`, with PR-B's tree: ORDER step 20, `results/PREREGISTRATION_B58H.md` written) — verify_docs.py: all 170 checks pass (PR-B's work tree, before its gate) · drift_test.py 18/18 (R3b's gate) · the app suites on P's tree: every failure one RV's own run had, the known `?v=` asset checks, the `pwsh` launcher tests and five provenance tests of app.test_results (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 17)
+
+From "Blockers", as committed at `720587d`:
+
+- Decision 1 of the 14 November sheet (the literature review's step 14, its A25 bullet; `decisions_2026-11-14.md`, on the Desktop) is still unanswered; the sheet asks for it before `T*`, the agents' deadline, which no row sets (section S's note), and PR-B does not wait for it. The one visit to Jad's PC, from `T*`, waits for a time agreed with Jad, still open (`SESSION_REPORT_2026-11-15_D148.md`, section 11).
+
+From "Next actions", item 8, its sixth line, as committed at `720587d`:
+
+   Tc, Tb and PR-B are done (15 November; `SESSION_REPORT_2026-11-15_D148.md`, sections 10, 12 and 13): step 18a, `epa_backend.py`'s check-run line, row 148 (1)'s in place of the pilot's; step 19, the backend record, n null; step 20, `results/PREREGISTRATION_B58H.md`, whose own commit is `T*` (`git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md`), with Tb's commit its parent. Next: ONE visit to Jad's PC from `T*`, by the sheet Ghassan writes from PR-B's section 14: CK (step 21) and, on its "CHECK RUN: OK", the training (step 22). On this laptop during training: CK's record, AB (step 22a) and the routes (step 22b). Then the scoring, in row 149 (5)'s order (a)-(f), with (d)-(f) run only if started by 23 November 2026 00:00 AST. Latest starts (`results/B58H_DESIGN/d148_figures.txt`): the training by 17 November 02:12 AST to end inside W (`:140`), and by 16 November 16:12 for the primary scoring to end inside W too (`:141`); step 3's 01:22 and 15:22 are superseded (`:149`).
