@@ -14,7 +14,8 @@ study's training ends" by the visit's checkout of `T*` in that clone (ORDER step
 | `891e29a` | 18, B1 | Jad's: the B58's benchmark on his PC, with B2, B4 and L8; 26 result files and nothing else, pushed from his PC on 14 November (his report, section 2) |
 | `c5890f2` | D148 | section S of `results/VALIDATION_DECISIONS.md` (rows 148-153); ORDER's edits; INTERFACES section 18; in `results/B58H_DESIGN/`, `d148_figures`, `grids_b58` and `hw_opt/`; CHECKPOINT, `STATE_HISTORY.md` part AQ, this report and Jad's; section 23 of the 31 October report, pointing here |
 | `31dc7ad` | 18a, Tc | `epa_backend.py`'s check-run line (row 148 (5)) and its test; section 1's table, sections 10 and 11; ORDER step 18a; CHECKPOINT, `STATE_HISTORY.md` part AR |
-| Tb's | 19, Tb | `results/EPA_BACKEND.json`, written by `epa_backend.py write`: n null, in_test ['b58']; no drop line written; section 1's table and section 12; ORDER step 19 and the status line; CHECKPOINT, `STATE_HISTORY.md` part AS |
+| `5d801be` | 19, Tb | `results/EPA_BACKEND.json`, written by `epa_backend.py write`: n null, in_test ['b58']; no drop line written; section 1's table and section 12; ORDER step 19 and the status line; CHECKPOINT, `STATE_HISTORY.md` part AS |
+| `T*` | 20, PR-B | `results/PREREGISTRATION_B58H.md`; sections 1 and 13; CHECKPOINT, `STATE_HISTORY.md` part AT |
 
 B1 measured Ta's tree: its git_head is `0329456`, and its commit `891e29a` adds only results files on top of
 it. So "B1's git_head" is `0329456` and "B1's commit" is `891e29a`. Every gate that diffs the cost files reads
@@ -482,3 +483,174 @@ for the failed validations:
 printed lines are not in it. From the commit on, `test_epa_backend.LiveRecord` no longer skips: it requires the
 committed record to equal its recomputation (`test_epa_backend.py:1715-1718`). Before the commit it fails, and so does
 `test_epa_backend.Preregistration`, since the record is present and not committed (the same lines).
+
+## 13. 15 November: PR-B, the preregistration (ORDER step 20); T*
+
+**Tb's gates after its commit.** On Tb's commit `5d801be`, before its push, in ORDER step 19's order:
+- `PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -B epa_backend.py check`: `[]`, exit 0.
+- `test_trainable`: "Ran 23 tests in 43.527s", "OK".
+- `test_engine_threading`, alone: "Ran 33 tests in 22.460s", "OK (skipped=6)".
+- `test_epa_backend`: "Ran 67 tests in 83.446s", "OK (skipped=1)".
+Then Tb was pushed to `GRA-test`. Its record is the formal record that the four-engine test does not run, and
+Run 2's failed validations are the result (section 12).
+
+**What PR-B is.** `results/PREREGISTRATION_B58H.md`, ORDER step 20 and gate item 5 for the B58 study (row 147
+(13)). Its own commit is `T*`, the one commit that adds the file, found by
+`git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md` (row 146 (6)). A commit cannot hold its
+own sha, so neither the file nor this report names `T*`. Its parent is Tb's commit, `5d801be` (row 149 (1)). The
+check run CK and the training run from `T*`, in one visit to Jad's PC (rows 148 and 149 (1)).
+
+**What it copies.** Rows 146 and 147 (section R, D146 `a3cd3a3`) and rows 148-153 with section S's note (D148
+`c5890f2`), item by item, each beside the row that fixes it: row 149 (8)'s copy rule. It was built from the PR-B
+draft of 7 November and the additions of 14 November (both outside the repository), every block of the additions
+applied, and then brought to the committed rows and to the facts of sections 2-3, 10-12 and this one, which win
+where a draft differs. It states the whole analysis in words (its section 6; row 149 (2)): d and its two tests
+under the graph, each d's interval, Delta, the band with both readings of "at b", the companion and version 5's
+readings, the context and the status, and the order after training with its cut-off. Decision 12's three rows and
+rows 150-153 are its section 9.
+
+**What it adds.** Only what row 149 (2) leaves to it, listed in its section 12.3: file, folder, subcommand and figure
+names, the launcher logs, and the run procedures of its sections 4, 5.2, 6.8 and 14 (the device guard, CK's check
+block and record block, the gate blocks of PR-B and of each commit after `T*`, the scoring's start check, and, after
+the second review, the stale-lock step); four details of form; and which fields of the device's two environment
+records its section 11 compares. One procedure goes past both drafts: CK's check block also reads the launch log's
+FAILED lines, because row 148 (2) asks that every run exit 0 and the drafts' block did not read it. After the reviews
+it reads the launch logs of every session of its check run and counts each run's crashes over them, so that a first
+crash prints CHECK RUN: CRASHED and a second crash of the same run CHECK RUN: FAIL, as row 148 (3) reads them. The
+device guard uses the clone and the interpreter B1 ran with (INTERFACES section 18's 3), where the drafts had the
+runbook's paths.
+
+**Its two commands.** The file holds exactly two fenced `train_all.py` commands: row 148 (1)'s check line and row
+147 (3)'s training line, each as its row gives it, run as `$PY -B` and the line, piped to `tee`. Section 14 of the
+file names them and never quotes them. `test_epa_backend.b58h_all_problems` on the file printed `[]`.
+
+**The placeholders filled**, each from the committed record named beside it in the file:
+- the commits: RV `a443607`, P `8b5366f`, Qa `742239a`, G `a60dcae`, V `cadac38`, Q `ce452df`, Ta `0329456`,
+  B1 `891e29a` with git_head `0329456` (`results/B58H_DESIGN/d148_figures.txt:7`), D148 `c5890f2`, Tc `31dc7ad`
+  and Tb `5d801be` (this branch's log; each commit's message);
+- the B58's fingerprint at P: plant_sha `36655cab94800e30`, derived_sha `326c0835548975e2`, engine_sha
+  `023f5589215ee68e` (P's commit message, its MEASURED lines; `results/ENGINE_GATES/b58/provenance.txt:10-13`);
+- the hills: the commit that adds the file, Q's `ce452df` (`git log --diff-filter=A`); its sha_text by its first
+  8 characters, `1cdb7bdf` (`provenance.txt:60` holds it whole); the seven hills (`provenance.txt:62-75`);
+- the gates of step 13, RV, P, Q, G, V and Ta: those commits' messages and Q's committed outputs;
+- B1's attempt, its rate, B2, B4 and L8: B1's committed files, `d148_figures.txt:6-10` and Tb's record;
+- Tb's record: Tb's commit message, `results/EPA_BACKEND.json` and the gate lines above;
+- the date Q3 was re-confirmed, 15 November 2026 (section S's note); hw_opt's control, "CONTROL: largest
+  difference from roads.json 0.000e+00 -> PASS" (`results/B58H_DESIGN/hw_opt/control_record.txt:15`).
+Three placeholders had no value to take: AB's commit and AB's gates (AB comes after `T*`, row 149 (1); the grids
+print it was to carry is D148's), and the commit of row 152 (5)'s anchors (D148 did not carry them; they are
+computed during training, or reported "not computed"). Each was replaced by the words the rows give.
+
+**Disclosed in it, as the facts since the drafts give them.**
+- Q3: Ghassan re-confirmed n = 20 on 15 November 2026 at 01:30 AST, after the figures of `power_b58.txt` were
+  explained to him in the session, "I confirm the n= 20" (section S's note); not "with power_b58.txt in front of
+  him", as the additions had it.
+- P1-P13: "I do D 148" (01:23 AST), then "I confirm the p1-13" (01:28 AST); Jad's "No objections", relayed by
+  Ghassan after D148's push (section 11), beside section S's note's "Jad was not asked".
+- Decisions 1, 2, 5, 6 and 11 are left for later; the sheet's "before T*" for decision 1 is the agents' deadline,
+  which no row sets, and `T*` does not wait for it.
+- B1 (sections 2-3): the rate, 107.46 steps/s at 12 runs at once, repeat 1's lower bound, with repeat 2's loaded
+  flag deciding nothing; the training 69.79 h and CK 1.55 h; the latest starts, 17 November 02:12 and 16 November
+  16:12 AST; determinism IDENTICAL; L8 PASS, its verdict line not committed; B4 recorded only; B2 NOT IDENTICAL,
+  100 differences, cause not attributed; Jad's departures (the clone and the venv moved, Windows Update unpaused
+  from 1 October and paused to 28 November, the driver, the IDE open, autocrlf kept) and his answers of 15
+  November. The device's clone stays at `891e29a` until the visit checks out `T*` there.
+- Tc's departure from its gate's wording, beside row 148 (5) (section 10); Tb's record (section 12); hw_opt's
+  committed script against the script as run (section 4); what of hw_opt's output was read before the rows.
+
+**Figures taken out for lack of a committed print** (rule 1.9). From the draft of 7 November: "94 % of W" (row
+114's n = 64), "at row 134's 33 h" (P's drafting), "within 12 %" (the tau span), "(10.86 points)" for 2 MEI,
+"P3 = 1.55-3.38 points" (both marked arithmetic), "0.27-0.35 at alpha" (row 103 (4)'s planning powers) and "the
+transfer of 10-20 GB". From the additions: "about 0.43 MB" a record file; CK's "about 1.6 h" at step 3's rate and
+"835.4 C", replaced by the printed 1.55 h and 835.37 C (`d148_figures.txt:54`, `:79`); and "about 0.5 h for the
+rest" at item (c), replaced by the printed 2.96 h (`:99`).
+
+**The review, and what it changed.** Four reviewers read the built file: the rows item by item; every number against
+its committed print (rule 1.9); its consistency with the committed rows, records and this report; and its gate, run on
+a scratch commit of the four files outside the repository, where it passed. They found two faults that had to be fixed
+before `T*`, and both were:
+- CK's check block called a first crash a coding defect and passed a run that had crashed twice, against row 148 (3).
+  It now prints CHECK RUN: CRASHED for a first crash and CHECK RUN: FAIL for a second, and the file's section 11 reads
+  so. That first fix counted `.crashed` folders; the reviews after it replaced the count (below), and the folders are
+  now listed, not counted.
+- The practice route's report, `practice_b58h_seeds0-4.txt`, is a name `evaluate.py` refuses for `--out`
+  (`*_seed*.txt`, `evaluate.py:1591-1593`). It is now `practice_b58h_s0-4.txt` and `.json`.
+
+These were also fixed:
+
+- Section 8's item 4 above says that PR-B states what a difference between the device's environment records before CK
+  and after the last run means; the built file did not. Its section 11 now does: a difference in the interpreter, the
+  Windows build or revision, the installed updates, the driver or the sha256 of `pip freeze` is an outcome no row
+  covers, so the scoring does not start and it is reported (rule 1.11; CLAUDE.md's rule 3). The pause's end is
+  recorded only.
+- The device guard now stops unless `core.autocrlf` prints `true` (section 8, item 4).
+- The file's row for Tc quoted `git diff --quiet 891e29a HEAD -- epa_backend.py`: exit 0 without Tc's own qualifier,
+  that it ran with HEAD at D148.
+- Row 146 (1)'s disclosure, that R4's outcomes were predicted before it ran in a plan that is not in the tree, is
+  copied (12.2, item 5).
+- Row 147 (4)'s rule is quoted verbatim again, with "at step 3's rate", and its figures are labelled superseded for
+  timing by B1's rate.
+- Decision 34 is cited at VD:200, in the file's D146 numbering, not at VD:159.
+
+Minor points, fixed: five citations (`calibrate_thermal.py:198-200`; the lines that print derived_sha and engine_sha;
+778 and 804 °C at VD:113; the six ratios and six H at `grids_b58.txt:13-18` and `:21-26`; B2's two sources); 9.1
+computed by `analyse` at item (b), where rows 147 (12) and 149 (5) place it, and `core`'s refusal limited to 9.6; row
+100 (3)'s shortfall beside every margin over current-grade; Jad's answer "relayed", not "asked"; the amend after a
+failed gate named as the file's procedure; step 2's filter pinned to this report; where the returned folders go;
+`--list` and four details of form listed in 12.3; the status box's account of the three placeholders; section 3.2's
+row for PR-B's own gate; and step 0's rule asking for no skipped test.
+
+**The second review, and what it changed.** Two reviewers read the fixes and the parts of the file that run. The first
+found the reflowed paragraphs whole and every new citation printing what it is cited for, with one fault and five
+smaller points. The fault: section 11's new environment row said that a difference between two identity files decides
+nothing, "as B2", a reading no row gives (decision 32 and row 146 (4) give it for B2 alone, the laptop against the
+device). The smaller points: step 3 did not state the environment comparison before the scoring; the copy of row 146
+(1) and the label of the step-3 figures did not follow the rows' words; CK's check could print CHECK RUN: CRASHED over
+another run's failed check; and this section left out two fixes. The second reviewer ran the file's blocks in scratch
+clones outside the repository and on made-up run folders. It found that CK's check called a restart or a killed
+launcher a coding defect, and never counted a second crash of a run that died before its folder existed; that a
+restart can leave a run's `RUNNING` file, which a reused pid makes the launcher refuse; that the failed-check route's
+files were neither collected nor returned; that F's cost-file condition had no command; that a reused `OUT` would
+overwrite a session's logs; that CK's record commit dropped `test_four_engine_analysis`; and that step 3 ran decision
+12's locked and logged rows in one loop. The first reviewer's six points were fixed as it asked. The second's were
+fixed too, but the restart was counted only after the third review's fix (below): the check read every session's
+launch log; a stale-lock step removes a stale `RUNNING` file, only when no python process runs; the guard stops on an
+existing `OUT`; the record block runs on FAIL too, and the return holds any `runs/b58h_check_dt1.broken<N>` and every
+session's printed checks; and the rest as the findings asked.
+
+**The third review, and what it changed.** Two reviewers read the second fix set, one as text and one by walking the
+whole visit with the real launcher in scratch clones. They found three faults in the new crash count, each shown on
+made-up run folders. It counted the sessions of a failed first check run against the second check run from F. It read
+CHECK RUN: OK for a run with a FAILED line whose folder was complete, so it no longer asked that every run exit 0. And
+the launcher's own lines reach its launch log only when it exits (its output is block-buffered into `tee`), so a
+restart left an empty log and was never counted as a crash. Now the guard writes `RUNAT` to the session's `runat.txt`,
+and the check reads only the sessions of its own check run; a run that crashed in the session reads CHECK RUN: CRASHED
+whatever its folder holds; and the guard exports `PYTHONUNBUFFERED=1`, which `train_all.py` already gives every run
+(`train_all.py:304`), so each start reaches the log as it is printed. The environment row named identity files that
+nothing in the file makes; it now names `check_training_device.py`'s version lines, run with no flag, among the
+sheet's records, and no identity comparison. The stale-lock step's print is kept and returned, the record block copies
+the logs of every session of the check run, and step 3 unpacks any `.broken<N>` folder with the rest, so that the
+`SHA256SUMS` check reads it.
+
+**The fourth review.** One reviewer read the third fix set, re-ran the earlier reviews' walks with the real launcher
+in scratch clones (32 made-up scenarios and the 18 above) and passed all nine of the third review's findings. It found
+one more case: a run that writes `final.zip` and then exits non-zero reads CHECK RUN: CRASHED, but the crash rule's
+re-run does not move a folder that holds `final.zip` (`train_all.py:114-115`), so the next session would have read OK
+on the same agent. No row covers that case, so the check now prints CHECK RUN: STOP for it (rule 1.11). Also fixed: a
+print label ("over this check run"), section 11's "second crash of the same run within one check run", the stale-lock
+print appended rather than overwritten, and this section's account of the second review.
+
+**Checks on the work tree, before PR-B's gate** (nothing staged, nothing committed):
+- `test_epa_backend.b58h_all_problems` on the file: `[]`; two commands found, both fenced, the check and the
+  training line.
+- `epa_backend.py check`: `[]`, exit 0.
+- `verify_docs.py` in this repository, where the file is not yet tracked: "All 170 checks pass (1153 figure
+  mentions scanned in the documents)."
+- `verify_docs.py` in a scratch clone of this tree outside the repository, with the four documents staged there,
+  so that its scan reads the new file: "All 170 checks pass (1172 figure mentions scanned in the documents).",
+  its data check and its retired-figure check over 446 tracked files, the new file among them.
+
+**Not done by this step.** PR-B's gate (the file's section 14, step 0) on the staged tree and at `T*`, the commit
+and the push. The visit's sheet, which Ghassan writes after `T*` from the file's section 14 and section 8 above.
+Section 8's item 7 was not checked beyond the file's own text, which states no comparison of numbers the device
+wrote with numbers this laptop recomputes.
