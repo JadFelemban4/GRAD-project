@@ -1887,6 +1887,30 @@ moves the wall clock, not the agents; a file it writes inside the clone makes `g
 starts after it (`fingerprint.py:658` counts untracked files), which section 15's check of every run's `meta.json`
 reads at the return; an install or update shows in section 11's two environment records.
 
+**15 November 2026, `59cb6f6`** (CK's record; section 14 step 2's gate, after the commit and before its push, as its
+message gives it): the cost-file list 51 paths and no line printed STOP; "cost files unchanged since B1: exit 0";
+`epa_backend.py check` printed `[]`; `test_four_engine_analysis`: "Ran 50 tests", "OK"; `test_engine_threading`,
+alone: "Ran 33 tests", "OK (skipped=6)", the three EPA plants' uncalibrated checks;
+`test_epa_backend.PreregistrationB58H`: "Ran 6 tests", "OK"; `verify_docs.py`: "All 170 checks pass (1172 figure
+mentions scanned in the documents)."; "ABOVE SECTION 15: UNCHANGED SINCE T*"; in `results/B58H_CHECK/`, 42 lines OK.
+Pushed the same day, `47e5854..59cb6f6`.
+
+**15 November 2026, the agent's answers** (relayed by Ghassan the same evening). `README.txt` is
+`C:\Users\admin\grad_device\visit2_claude\README.txt`, and the report is a file in Jad's own clone
+(`C:\Users\admin\Documents\graduation project\GRAD-project`), untracked there: neither is inside the device clone,
+which at 20:34 was at `T*` with `git status --porcelain` printing nothing. Jad typed none of the sheet's blocks. The
+agent copied them, it says byte for byte, into `C:\Users\admin\grad_device\visit2_claude\blocks\`, and one script
+there, `visit2_driver.sh`, runs them in the sheet's order in one Git Bash window, opened at 18:27:35, and stops where
+the sheet says stop; nothing has been typed in that window since. CK ran from 18:27:56 to 19:43:17 by the agent's
+account (the runs' `config.json`: 18:28:04 to 19:43:02). Before Step 1 the agent closed Brave, Chrome, Steam and
+Discord, stopped other python processes on the PC ("SENAD's", with Jad's OK) and copied `tstar_pushed.txt` unchanged;
+no browser or WhatsApp was opened on the PC (the record went to Jad's phone). The script runs Step 8's blocks itself
+when the training's "all done" line says every run finished, and stops on a `FAILED` line or without an "all done"
+line; sending the return stays with Jad. The answer sent back: Step 8 stays automatic (this laptop's recommendation,
+under Ghassan's standing approval). From now on the agent only reads, about once a minute (the session's status file,
+the launch logs, the process list). At B1 the agent ran the sheet too, at Ghassan's request then. The agent's copies
+of the blocks and its scripts are asked for, to be compared with the sheet before Step 8 runs.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

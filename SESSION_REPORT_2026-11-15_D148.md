@@ -730,7 +730,24 @@ after the first); which blocks the agent typed; and that from now on it only rea
 window or the end it tells Jad and does nothing more. Antigravity is not closed now: whether the training's window
 would survive it is not known here.
 
-**Open.** The two paths and the answers above; the environment record before CK (`env_before_ck.txt`, in the return;
-the sheet's Step 3 stops unless `check_training_device.py` prints `VERSIONS: match the lock`); the guard's
-`RUN COMMIT: OK`, printed to the screen only; how the return comes back. Next on this laptop: AB (ORDER step 22a) and
-the routes (step 22b).
+**The agent's answers** (relayed by Ghassan the same evening; PR-B section 15). `README.txt` is
+`C:\Users\admin\grad_device\visit2_claude\README.txt`, and the report is a file in Jad's own clone
+(`C:\Users\admin\Documents\graduation project\GRAD-project`), untracked there: neither is inside the device clone,
+which at 20:34 was at `T*` with `git status --porcelain` printing nothing. Jad typed none of the sheet's blocks. The
+agent copied them, it says byte for byte, into `C:\Users\admin\grad_device\visit2_claude\blocks\`, and one script
+there, `visit2_driver.sh`, runs them in the sheet's order in one Git Bash window, opened at 18:27:35, and stops where
+the sheet says stop; nothing has been typed in that window since. CK ran from 18:27:56 to 19:43:17 by the agent's
+account (the runs' `config.json`: 18:28:04 to 19:43:02). Before Step 1 the agent closed Brave, Chrome, Steam and
+Discord, stopped other python processes on the PC ("SENAD's", with Jad's OK) and copied `tstar_pushed.txt` unchanged;
+no browser or WhatsApp was opened on the PC (the record went to Jad's phone). The script runs Step 8's blocks itself
+when the training's "all done" line says every run finished, and stops on a `FAILED` line or without an "all done"
+line; sending the return stays with Jad. The answer sent back: Step 8 stays automatic (this laptop's recommendation,
+under Ghassan's standing approval). From now on the agent only reads, about once a minute (the session's status file,
+the launch logs, the process list). At B1 the agent ran the sheet too, at Ghassan's request then. The agent's copies
+of the blocks and its scripts are asked for, to be compared with the sheet before Step 8 runs. Pushed: `59cb6f6` (CK's
+record, `47e5854..59cb6f6`).
+
+**Open.** The agent's copies of the blocks and its scripts, to compare with the sheet; the environment record before
+CK (`env_before_ck.txt`, in the return; the sheet's Step 3 stops unless `check_training_device.py` prints
+`VERSIONS: match the lock`); the guard's `RUN COMMIT: OK`, printed to the screen only; how the return comes back. Next
+on this laptop: AB (ORDER step 22a) and the routes (step 22b).

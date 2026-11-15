@@ -5519,3 +5519,9 @@ From "Next actions", item 8, its sixth line, as committed at `47e5854`:
 From "Next actions", item 10, its first line, as committed at `47e5854`:
 
 10. The training device, Jad's PC (`DESKTOP-VF1MO3H`; `SESSION_REPORT_2026-11-14_B1-visit.md`, sections 1, 3 and 4): the clone is `C:\Users\admin\grad_device\GRAD-project-device`, fresh from GitHub (step 3's worktree was removed on 11 November at Jad's request), at `891e29a`, detached and clean, until the visit checks out `T*` there for CK and the training; the interpreter is step 3's lock venv, moved to `C:\Users\admin\grad-venv-lock-3.13.2` (its newest `site-packages` entries 2 November). `core.autocrlf=true` gives a CRLF work tree, as at step 3: keep it (every FATAL fingerprint field is independent of line ends; section S's note).
+
+# Part AW — lines rotated out of CHECKPOINT.md, 15 November 2026 (GRA-test: the agent's answers, after CK's record)
+
+From "Blockers", as committed at `59cb6f6`:
+
+- Decision 1 of the 14 November sheet (the literature review's step 14, its A25 bullet; `decisions_2026-11-14.md`, on the Desktop) is still unanswered; the sheet asks for it before `T*`, the agents' deadline, which no row sets (section S's note), and PR-B does not wait for it. The visit to Jad's PC, from `T*` (`720587d`), began on 15 November: CK printed "CHECK RUN: OK" and the training started at 19:43:23; Jad's own AI agent runs on that PC, against the sheet's rule 3: the paths of the two files it wrote there (if inside the clone, they must leave it before the second wave, about 14 h after the first) and how the return comes back are still open (`SESSION_REPORT_2026-11-15_D148.md`, sections 14 and 15).
