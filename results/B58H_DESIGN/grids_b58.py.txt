@@ -1,0 +1,217 @@
+"""grids_b58.py -- rows 147 (2) and (9): row 102's curve on the B58, and row 102's four-engine grids and spreads
+with and without the one-housing Ford, as results/EPA_ROADS/roads.json holds them (report.grids), with decision
+13's count (report.decision13). Written 13 November 2026 for AB's commit (ORDER step 19a) and decision row 148 (8);
+results/PREREGISTRATION_B58H.md section 10 names this run.
+
+    PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B results/B58H_DESIGN/grids_b58.py.txt .
+
+from the repository root (Python runs a file whatever its extension). Its printed output is committed beside it
+as results/B58H_DESIGN/grids_b58.txt, made by AB's gate; PR-B's gate runs it again and compares.
+
+Standard library only (json, re, sys). It opens results/EPA_ROADS/roads.json and nothing else, and writes no file.
+json.load parses the whole record; the script keeps four narrow keys, report.grids, report.decision13,
+ceilings.per_engine.b58.by (each ratio's C) and ratios, and drops the rest at once: it never looks up or prints the
+record's commit and reveal block, its attempts, its steps log or roads_seed. Every number is printed at a fixed
+number of decimals. The whole output is built first and checked before any of it is written: ASCII only, no run
+of 12 or more digits, no 40- or 64-character hex value, no line naming a guarded field of roads.json; a failed
+check writes nothing to stdout, names the failure on stderr and exits 2. It writes LF line ends itself
+(sys.stdout.buffer), so its bytes do not depend on the platform; -I ignores PYTHONIOENCODING, and the text is ASCII
+by the check above.
+
+The numbers are R1's, as the draw computed them on 1 November 2026 (roads_ceiling.report: _grids and
+_decision13, at roads_ceiling.GRID_RATIOS and GRID_H_S). RV re-verified the whole report section on P's plant
+(results/EPA_ROADS/reverify.json, carried by P); this script does not open that record. It checks that the
+record's abscissas are row 102's (VD:426: r = 0.5, 2/3, 1, 1.25, 1.5 and 1.947; H = 20, 30, 45, 65, 100 and
+130 s), typed here from the row as the control, and refuses otherwise.
+
+What it prints:
+  1. Row 102's curve on the B58 (row 147 (2)): the hand-written (a)'s C_e (no knock, mean of the road points,
+     points of cut over current-grade) at the six ratios (report.grids.H_over_tau.b58) with each ratio's H, and at
+     the six H (report.grids.H_s.b58) with each H's ratio H/tau (this script's division), the with-knock value
+     (detail.knock) beside each; then the grid's entries at the study's two ratios beside the study's ceilings
+     (ceilings.per_engine.b58.by[r].C, row 147 (12)), their difference printed.
+  2. Row 102's four-engine grids (row 147 (9)): every curve report.grids holds, the Ford's one-housing plant beside
+     the Ford, on both axes, with each curve's detail entry (tau, the plant variant, the horizons, the with-knock
+     values).
+  3. The spreads (report.grids.spreads): each group's members, the normalised curves, the spread at each abscissa
+     and their mean, on both axes; then the three mean-spread lines in the form results/B58H_DESIGN/power_b58.txt
+     prints them, so that the two committed prints can be compared line for line.
+  4. Decision 13's count (report.decision13; row 100 (3)) for every car: its totals and each road's count.
+
+The label of row 147 (9), printed with the grids: "hand-written savings on plants dropped by Run 2's validation;
+describes the models, not the engines; never evidence for or against the criterion".
+
+Committed as grids_b58.py.txt, so no scan of committed .py files runs it.
+"""
+import json
+import re
+import sys
+
+REPO = sys.argv[1] if len(sys.argv) > 1 else "."
+ROW102_RATIOS = (0.5, 2 / 3, 1.0, 1.25, 1.5, 1.947)    # row 102 (VD:426), the H/tau axis; the control
+ROW102_H_S = (20.0, 30.0, 45.0, 65.0, 100.0, 130.0)     # row 102, the H axis in s; the control
+STUDY_RATIOS = (0.5, 1.5)                               # row 147 (2): the study's two ratios; checked against ratios
+LABEL = ("hand-written savings on plants dropped by Run 2's validation; describes the models, not the engines; "
+         "never evidence for or against the criterion")
+GROUPS = ("four_engines", "with_one_housing_ford", "without_ford")   # power_b58.py.txt's order
+GUARDED = ("commit_reveal", "steps_log", "roads_seed", "attempts")   # words no output line may hold
+HEX = re.compile(r"(?<![0-9a-fA-F])(?:[0-9a-fA-F]{64}|[0-9a-fA-F]{40})(?![0-9a-fA-F])")
+DIGITS = re.compile(r"[0-9]{12,}")
+
+
+class Refused(Exception):
+    pass
+
+
+def key(x):
+    """roads_ceiling._rkey: a ratio or an H as the record keys it."""
+    return f"{x:g}"
+
+
+def f4(x):
+    return "nan" if x != x else f"{x:.4f}"
+
+
+def load():
+    """The four narrow keys of roads.json; everything else is dropped before anything is read from it."""
+    with open(REPO + "/results/EPA_ROADS/roads.json", encoding="utf-8") as fh:
+        record = json.load(fh)
+    kept = dict(grids=record["report"]["grids"], decision13=record["report"]["decision13"],
+                by=record["ceilings"]["per_engine"]["b58"]["by"], ratios=record["ratios"])
+    del record
+    return kept
+
+
+def check_shape(grids, ratios):
+    rk, hk = [key(r) for r in ROW102_RATIOS], [key(h) for h in ROW102_H_S]
+    if [key(r) for r in ratios] != [key(r) for r in STUDY_RATIOS]:
+        raise Refused(f"roads.json ratios {ratios} are not the study's {list(STUDY_RATIOS)} (row 147 (2))")
+    for part in ("what", "H_over_tau", "H_s", "detail", "spreads"):
+        if part not in grids:
+            raise Refused(f"report.grids holds no {part!r}")
+    names = list(grids["H_over_tau"])
+    if "b58" not in names or list(grids["H_s"]) != names or list(grids["detail"]) != names:
+        raise Refused(f"report.grids' curves differ between its parts, or hold no b58: H_over_tau {names}, "
+                      f"H_s {list(grids['H_s'])}, detail {list(grids['detail'])}")
+    for name in names:
+        det = grids["detail"][name]
+        if sorted(grids["H_over_tau"][name]) != sorted(rk):
+            raise Refused(f"{name}'s H/tau abscissas {sorted(grids['H_over_tau'][name])} are not row 102's {rk}")
+        if sorted(grids["H_s"][name]) != sorted(hk):
+            raise Refused(f"{name}'s H abscissas {sorted(grids['H_s'][name])} are not row 102's {hk}")
+        labels = sorted(["r" + k for k in rk] + ["H" + k for k in hk])
+        if sorted(det["knock"]) != labels or sorted(det["H_s"]) != labels:
+            raise Refused(f"{name}'s detail does not hold row 102's twelve horizons")
+    for g in GROUPS:
+        if g not in grids["spreads"]:
+            raise Refused(f"report.grids.spreads holds no {g!r}")
+    return names, rk, hk
+
+
+def build(kept):
+    grids, d13, by = kept["grids"], kept["decision13"], kept["by"]
+    names, rk, hk = check_shape(grids, kept["ratios"])
+    hot, hs, det, sp = grids["H_over_tau"], grids["H_s"], grids["detail"], grids["spreads"]
+    out = []
+    p = out.append
+    p("grids_b58.py: rows 147 (2) and (9), from results/EPA_ROADS/roads.json report.grids, report.decision13 and")
+    p("  ceilings.per_engine.b58.by[r].C, as R1 computed them (RV's re-verification of report on P's plant is")
+    p("  results/EPA_ROADS/reverify.json, carried by P and not opened here)")
+    p(f"  report.grids.what: {grids['what']}")
+    p(f"  label (row 147 (9)): {LABEL}")
+    p("  C_e: the hand-written (a)'s cut over current-grade in points, no knock, the mean of the road points (row")
+    p("  103 (1)); 'with knock' is report.grids.detail[...].knock, not converged in dt on these roads")
+    p("")
+    b = det["b58"]
+    tau = b["tau_s"]
+    p("1. ROW 102's CURVE ON THE B58 (row 147 (2)), reported beside the agents' d at r = 0.5 and 1.5")
+    p(f"  tau {f4(tau)} s (report.grids.detail.b58.tau_s; plant variant {b['plant_variant']})")
+    p("  H/tau axis (report.grids.H_over_tau.b58):")
+    p(f"    {'r':>9} {'H s':>10} {'C_e':>9} {'with knock':>11}")
+    for r in rk:
+        p(f"    {r:>9} {f4(b['H_s']['r' + r]):>10} {f4(hot['b58'][r]):>9} {f4(b['knock']['r' + r]):>11}")
+    p("  H axis (report.grids.H_s.b58); H/tau is H divided by tau, this script's arithmetic:")
+    p(f"    {'H s':>9} {'H/tau':>10} {'C_e':>9} {'with knock':>11}")
+    for h in hk:
+        p(f"    {h:>9} {f4(b['H_s']['H' + h] / tau):>10} {f4(hs['b58'][h]):>9} {f4(b['knock']['H' + h]):>11}")
+    p("  the grid's entries at the study's ratios beside the study's ceilings (ceilings.per_engine.b58.by[r].C,")
+    p("  row 147 (12)):")
+    for r in (key(x) for x in STUDY_RATIOS):
+        g, c = hot["b58"][r], by[r]["C"]
+        p(f"    r = {r}: grid {f4(g)}, ceiling C {f4(c)}, grid minus C {g - c:+.4f}, equal {g == c}")
+    p("")
+    p("2. ROW 102's FOUR-ENGINE GRIDS (row 147 (9)): every curve of report.grids, the one-housing Ford beside the Ford")
+    p("  H/tau axis (report.grids.H_over_tau), C_e at r = " + " ".join(rk))
+    for name in names:
+        p(f"    {name:<24}" + "".join(f"{f4(hot[name][r]):>9}" for r in rk))
+    p("  H axis (report.grids.H_s), C_e at H = " + " ".join(hk) + " s")
+    for name in names:
+        p(f"    {name:<24}" + "".join(f"{f4(hs[name][h]):>9}" for h in hk))
+    p("  with knock (report.grids.detail[...].knock), the H/tau axis, then the H axis:")
+    for name in names:
+        k = det[name]["knock"]
+        p(f"    {name:<24}" + "".join(f"{f4(k['r' + r]):>9}" for r in rk) + "  |"
+          + "".join(f"{f4(k['H' + h]):>9}" for h in hk))
+    p("  detail (report.grids.detail[...]): tau, the plant variant, and the horizon in s at each ratio:")
+    for name in names:
+        d = det[name]
+        p(f"    {name:<24} tau {f4(d['tau_s'])} s, variant {d['plant_variant']}, H "
+          + " ".join(f4(d["H_s"]["r" + r]) for r in rk))
+    p("")
+    p("3. THE SPREADS (report.grids.spreads; row 102's statistic: each curve normalised by its value at the largest")
+    p("  abscissa; at each abscissa the largest normalised value minus the smallest; their mean over the six)")
+    for g, v in sp.items():
+        p(f"  {g}: members {v['members']}")
+        for axis, lab, keys in (("H_over_tau_axis", "H/tau axis", rk), ("H_axis", "H axis", hk)):
+            a = v[axis]
+            p(f"    {lab}: spread at " + " ".join(keys) + ": " + " ".join(f4(a["spread"][x]) for x in keys)
+              + f"; mean {f4(a['mean_spread'])}")
+            for m, n in a["normalised"].items():
+                p(f"      normalised {m:<24}" + "".join(f"{f4(n[x]):>9}" for x in keys))
+    p("  the three mean spreads, in results/B58H_DESIGN/power_b58.txt's form:")
+    for g in GROUPS:
+        p(f"  row 102's mean spread, {g}: H/tau axis {sp[g]['H_over_tau_axis']['mean_spread']:.4f}, "
+          f"H axis {sp[g]['H_axis']['mean_spread']:.4f}")
+    p("")
+    p("4. DECISION 13's COUNT (report.decision13; row 100 (3)): current-grade on the roads as first drawn, per car")
+    rules = sorted({v["rule"] for v in d13.values()})
+    for rule in rules:
+        p(f"  rule: {rule}")
+    for e, v in d13.items():
+        t = v["total"]
+        p(f"  {e}: steps {t['steps']}, under95 {t['under95']}, over_tol {t['over_tol']}, climb_steps "
+          f"{t['climb_steps']}, climb_under95 {t['climb_under95']}, climb_over_tol {t['climb_over_tol']}")
+        p(f"    largest shortfall {t['largest_shortfall_nm']:.3f} Nm, on the climbs "
+          f"{t['climb_largest_shortfall_nm']:.3f} Nm")
+        p("    per road, k: under95 = " + ", ".join(f"{x['k']}: {x['under95']}" for x in v["per_road"]))
+    return out
+
+
+def checked(lines):
+    """The output as text, refused unless every line is ASCII, holds no run of 12 or more digits, no 40- or
+    64-character hex value and no guarded field's name."""
+    for i, line in enumerate(lines, 1):
+        if not line.isascii():
+            raise Refused(f"output line {i} is not ASCII")
+        if DIGITS.search(line):
+            raise Refused(f"output line {i} holds a run of 12 or more digits")
+        if HEX.search(line):
+            raise Refused(f"output line {i} holds a 40- or 64-character hex value")
+        if any(w in line for w in GUARDED):
+            raise Refused(f"output line {i} names a guarded field of roads.json")
+    return "".join(line + "\n" for line in lines)
+
+
+def main():
+    try:
+        text = checked(build(load()))
+    except (Refused, OSError, KeyError, IndexError, TypeError, ValueError, AttributeError, ZeroDivisionError) as e:
+        sys.stderr.write(f"REFUSED: grids_b58.py: {type(e).__name__}: {e}\n")
+        return 2
+    sys.stdout.buffer.write(text.encode("ascii"))
+    sys.stdout.buffer.flush()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

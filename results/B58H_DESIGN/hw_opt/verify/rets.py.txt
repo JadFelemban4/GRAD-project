@@ -1,0 +1,20 @@
+import json, numpy as np, os
+RUNS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "runs.jsonl")
+done = {}
+for line in open(RUNS, encoding="utf-8"):
+    if line.strip():
+        r = json.loads(line); done[json.dumps(r["spec"], sort_keys=True)] = r["res"]
+cg = {k: done[json.dumps({"k": k, "fam": "cg"}, sort_keys=True)] for k in range(20)}
+rows = {}
+for s, res in ((json.loads(k), v) for k, v in done.items()):
+    if s["fam"] in ("cg", "neutral"): continue
+    lab = (s["fam"], s.get("r"), s.get("frac"), s.get("D"), s["delta"])
+    rows.setdefault(lab, {})[s["k"]] = res
+print("setting  dret(mean)  knock-term increase vs cg (mean, damage units)  #roads ret>cg")
+for lab, rr in sorted(rows.items(), key=lambda kv: str(kv[0])):
+    dret = np.mean([rr[k]["ret"] - cg[k]["ret"] for k in range(20)])
+    kt = np.mean([(rr[k]["D_knock"] - rr[k]["D_noknock"]) - (cg[k]["D_knock"] - cg[k]["D_noknock"]) for k in range(20)])
+    nb = sum(rr[k]["ret"] > cg[k]["ret"] for k in range(20))
+    print(f"{str(lab):45s} {dret:+8.3f}  {kt:+8.3f}  {nb}")
+print("cg knock term mean", np.mean([cg[k]["D_knock"] - cg[k]["D_noknock"] for k in range(20)]))
+print("cg ret range", min(c["ret"] for c in cg.values()), max(c["ret"] for c in cg.values()))

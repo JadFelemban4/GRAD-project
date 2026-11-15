@@ -1,0 +1,31 @@
+import os, numpy as np
+src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "skeptic.py"), encoding="utf-8").read().split('print("=== reproduce')[0]
+g = {"__file__": os.path.join(os.path.dirname(os.path.abspath(__file__)), "skeptic.py")}
+exec(src, g)
+S, hull, interp, cg, N = g["S"], g["hull"], g["interp"], g["cg"], g["N"]
+# (i) sighted set includes the blind rules: hull(sighted U blind) - hull(blind), mean form
+for form in ("mean", "ev"):
+    bp = [(v["noknock"]["fuel"], v["noknock"][form]) for (f, l), v in S.items() if f == "blind"]
+    fb = hull(bp)
+    for r in ("0.5", "1.5"):
+        sp = bp + [(v["noknock"]["fuel"], v["noknock"][form]) for (f, l), v in S.items() if f == f"s{r}"]
+        fu = hull(sp)
+        xs = np.linspace(1e-3, 6.5, 6000)
+        best = max(((x, interp(fu, x, "lin") - interp(fb, x, "lin")) for x in xs), key=lambda t: t[1])
+        print(f"{form} r={r}: hull(sighted U blind) - hull(blind): max {best[1]:+.3f} at {best[0]:.2f}%")
+# (ii) per-road selection (an oracle on the road; the Lagrangian traces the per-road-tuned hull), mean form
+pts = {kk: (np.array(v["noknock"]["pts"]), np.array(v["noknock"]["fx"])) for kk, v in S.items()}
+zero = (np.zeros(N), np.zeros(N))
+def lagr(cands, lam):
+    P = np.stack([c[0] for c in cands]); F = np.stack([c[1] for c in cands])
+    i = np.argmax(P - lam * F, axis=0)
+    return float(np.mean(F[i, np.arange(N)])), float(np.mean(P[i, np.arange(N)]))
+lams = np.concatenate([np.linspace(0, 3, 601), [5, 10, 100]])
+blind_c = [zero] + [p for kk, p in pts.items() if kk[0] == "blind"]
+fb = hull([lagr(blind_c, l) for l in lams])
+for r in ("0.5", "1.5"):
+    sc = blind_c + [p for kk, p in pts.items() if kk[0] == f"s{r}"]
+    fs = hull([lagr(sc, l) for l in lams])
+    xs = np.linspace(1e-3, 6.5, 6000)
+    best = max(((x, interp(fs, x, "lin") - interp(fb, x, "lin")) for x in xs), key=lambda t: t[1])
+    print(f"per-road tuned (oracle), mean form, r={r}: max gap {best[1]:+.3f} at {best[0]:.2f}%")

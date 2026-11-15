@@ -1,0 +1,224 @@
+"""Independent recompute of hw_opt's report from runs.jsonl (does not import hw_opt.py).
+Reads runs.jsonl, roads.json's ceilings block (only per-road D/fuel/ret/D_base and the by[] summaries),
+and hw_opt_result.json for comparison. Prints no seed or reveal value."""
+import json
+import math
+import os
+import statistics as st
+from collections import Counter, defaultdict
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+OPT = os.path.dirname(HERE)
+RUNS = os.path.join(OPT, "runs.jsonl")
+ROADS = r"C:/Users/badcl/grad_hw/results/EPA_ROADS/roads.json"
+
+# ---------------------------------------------------------------- load + integrity
+recs = [json.loads(l) for l in open(RUNS, encoding="utf-8") if l.strip()]
+print("lines", len(recs))
+
+
+def skey(s):
+    fam = s["fam"]
+    if fam in ("cg", "neutral"):
+        return (s["k"], fam)
+    if fam == "sighted":
+        return (s["k"], fam, s["r"], float(s["frac"]), round(float(s["delta"]), 6))
+    return (s["k"], fam, int(s["D"]), round(float(s["delta"]), 6))
+
+
+cnt = Counter(skey(r["spec"]) for r in recs)
+dups = [k for k, c in cnt.items() if c > 1]
+print("duplicated keys", len(dups), dups[:5])
+by = {skey(r["spec"]): r["res"] for r in recs}
+# expected grid
+FR = (0.25, 0.5, 0.75, 1.0)
+DL = (round(1 / 3, 6), round(2 / 3, 6), 1.0)
+DY = (0, 25, 50, 75, 100)
+exp = set()
+for k in range(20):
+    exp.add((k, "cg")); exp.add((k, "neutral"))
+    for r in ("0.5", "1.5"):
+        for f in FR:
+            for d in DL:
+                exp.add((k, "sighted", r, f, d))
+    for D in DY:
+        for d in DL:
+            exp.add((k, "blind", D, d))
+print("expected", len(exp), "present", len(set(by)), "missing", len(exp - set(by)), "unexpected", len(set(by) - exp))
+print("distinct delta values in file:", sorted({r["spec"].get("delta") for r in recs if "delta" in r["spec"]}))
+# all keys present, finite
+bad = [k for k, v in by.items() if any(not math.isfinite(float(v[x])) for x in
+                                        ("D_noknock", "D_knock", "base_noknock", "base_knock", "fuel"))]
+print("non-finite results", len(bad))
+print("steps values", Counter(v["steps"] for v in by.values()))
+# base constant per road?
+for rd in ("base_noknock", "base_knock", "fuel_base"):
+    spread = max(max(v[rd] for kk, v in by.items() if kk[0] == k) - min(v[rd] for kk, v in by.items() if kk[0] == k)
+                 for k in range(20))
+    print(f"largest within-road spread of {rd}: {spread:.3e}")
+
+# ---------------------------------------------------------------- per-setting summaries
+READ = {"noknock": ("D_noknock", "base_noknock"), "knock": ("D_knock", "base_knock")}
+cg = [by[(k, "cg")] for k in range(20)]
+nt = [by[(k, "neutral")] for k in range(20)]
+
+
+def summ(keys, reading):
+    Dk, Bk = READ[reading]
+    rs = [by[kk] for kk in keys]
+    mean = sum(100.0 * (c[Dk] - v[Dk]) / v[Bk] for c, v in zip(cg, rs)) / 20
+    mean_cgbase = sum(100.0 * (c[Dk] - v[Dk]) / c[Bk] for c, v in zip(cg, rs)) / 20
+    ev = 100.0 * (st.median([c[Dk] for c in cg]) - st.median([v[Dk] for v in rs])) / st.median([n[Dk] for n in nt])
+    fx = sum(100.0 * (v["fuel"] / c["fuel"] - 1.0) for c, v in zip(cg, rs)) / 20
+    return dict(mean=mean, mean_cgbase=mean_cgbase, ev=ev, fuel=fx)
+
+
+fams = {"blind": {f"D={D} delta={d:.2f}": [(k, "blind", D, d) for k in range(20)] for D in DY for d in DL}}
+for r in ("0.5", "1.5"):
+    fams[f"sighted r={r}"] = {f"lead={f:.2f}H delta={d:.2f}": [(k, "sighted", r, f, d) for k in range(20)]
+                              for f in FR for d in DL}
+S = {rd: {fam: {lab: summ(keys, rd) for lab, keys in items.items()} for fam, items in fams.items()}
+     for rd in READ}
+print("largest |mean(var base) - mean(cg base)|:",
+      max(abs(s["mean"] - s["mean_cgbase"]) for rd in S for f in S[rd] for s in S[rd][f].values()))
+
+# compare with hw_opt_result.json
+ref = json.load(open(os.path.join(OPT, "hw_opt_result.json"), encoding="utf-8"))
+worst = 0.0
+for rd in READ:
+    for fam in fams:
+        for lab, s in S[rd][fam].items():
+            rr = ref["families"][fam][rd][lab]
+            for a, b in (("mean", "mean"), ("ev", "evaluate_form"), ("fuel", "fuel_extra_pct")):
+                worst = max(worst, abs(s[a] - rr[b]))
+print(f"largest difference from hw_opt_result.json per-setting numbers: {worst:.3e}")
+
+# print my own tables (3 dp, as the report)
+for rd in READ:
+    print(f"\n=== {rd}")
+    for fam in fams:
+        print(f"{fam}")
+        for lab, s in sorted(S[rd][fam].items(), key=lambda x: x[1]["fuel"]):
+            print(f"  {lab:24s} {s['mean']:8.3f} {s['ev']:8.3f} {s['fuel']:+8.3f}")
+
+
+# ---------------------------------------------------------------- frontiers (own construction)
+def pareto(points):
+    """Non-dominated points: no other point has <= fuel and >= saving with one strict. cg (0,0) included."""
+    pts = [(0.0, 0.0)] + list(points)
+    nd = []
+    for x, y in pts:
+        dom = any((x2 <= x and y2 >= y) and (x2 < x or y2 > y) for x2, y2 in pts)
+        if not dom:
+            nd.append((x, y))
+    return sorted(set(nd))
+
+
+def interp(front, x):
+    """Linear between frontier points; None beyond the last point (no extrapolation)."""
+    if x > front[-1][0] + 1e-12:
+        return None
+    for (x0, y0), (x1, y1) in zip(front, front[1:]):
+        if x0 <= x <= x1:
+            return y0 if x1 == x0 else y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    return front[0][1]
+
+
+def step(front, x):
+    """Best blind point at or below this fuel."""
+    return max(y for xx, y in front if xx <= x + 1e-12)
+
+
+def hull(front):
+    """Upper concave hull (mixtures of settings across roads)."""
+    h = []
+    for p in sorted(front):
+        while len(h) >= 2:
+            (x1, y1), (x2, y2) = h[-2], h[-1]
+            if (x2 - x1) * (p[1] - y1) - (y2 - y1) * (p[0] - x1) >= 0:
+                h.pop()
+            else:
+                break
+        h.append(p)
+    return h
+
+
+out = {}
+for rd in READ:
+    for form in ("mean", "ev"):
+        bpts = [(s["fuel"], s[form]) for s in S[rd]["blind"].values()]
+        fb = pareto(bpts)
+        hb = hull(fb)
+        print(f"\nfrontier {form} {rd}: blind {[(round(a, 2), round(b, 2)) for a, b in fb]}")
+        for r in ("0.5", "1.5"):
+            spts = [(s["fuel"], s[form]) for s in S[rd][f"sighted r={r}"].values()]
+            fs = pareto(spts)
+            g_lin = [(x, y - interp(fb, x)) for x, y in fs if x > 0 and interp(fb, x) is not None]
+            g_stp = [(x, y - step(fb, x)) for x, y in fs if x > 0]
+            g_hul = [(x, y - interp(hb, x)) for x, y in fs if x > 0 and interp(hb, x) is not None]
+            # symmetric: also evaluate at blind vertices with sighted interpolated (inside sighted's range)
+            g_sym = [(x, interp(fs, x) - y) for x, y in fb if x > 0 and interp(fs, x) is not None]
+            # all non-frontier sighted points too (should not exceed frontier max)
+            g_all = [(x, y - interp(fb, x)) for x, y in spts if interp(fb, x) is not None]
+            mx = lambda g: max(g, key=lambda t: t[1])
+            out[(rd, form, r)] = dict(lin=mx(g_lin), step=mx(g_stp), hull=mx(g_hul), sym=mx(g_sym + g_lin),
+                                      allpts=mx(g_all))
+            print(f"  r={r} sighted {[(round(a, 2), round(b, 2)) for a, b in fs]}")
+            print(f"  r={r} max gap linear {mx(g_lin)[1]:+.4f} at {mx(g_lin)[0]:+.3f}%  | step {mx(g_stp)[1]:+.4f} at "
+                  f"{mx(g_stp)[0]:+.3f}%  | concave hull {mx(g_hul)[1]:+.4f} at {mx(g_hul)[0]:+.3f}%  | "
+                  f"incl. blind vertices {mx(g_sym + g_lin)[1]:+.4f} at {mx(g_sym + g_lin)[0]:+.3f}%  | "
+                  f"all sighted pts {mx(g_all)[1]:+.4f}")
+            print(f"       gaps at each sighted frontier point (linear): "
+                  f"{[(round(a, 3), round(b, 3)) for a, b in g_lin]}")
+            pv = ref["preview_value"][rd]["evaluate_form" if form == "ev" else "mean"][r]
+            print(f"       hw_opt_result.json: max_gap {pv['max_gap']:+.4f} at {pv['at_fuel_extra_pct']:+.3f}%  "
+                  f"diff {mx(g_lin)[1] - pv['max_gap']:+.2e}")
+
+# ---------------------------------------------------------------- roads.json checks
+rj = json.load(open(ROADS, encoding="utf-8"))["ceilings"]["per_engine"]["b58"]
+B = rj["by"]
+print("\nroads.json C (b58) vs this recompute, full depth:")
+full = {"a@0.5": ("sighted r=0.5", "lead=1.00H delta=1.00", "0.5", "a"),
+        "a@1.5": ("sighted r=1.5", "lead=1.00H delta=1.00", "1.5", "a"),
+        "b": ("blind", "D=0 delta=1.00", "0.5", "b"),
+        "a_b": ("blind", "D=50 delta=1.00", "0.5", "a_b")}
+for nm, (fam, lab, r, var) in full.items():
+    for rd in READ:
+        blk = B[r].get(var, {}).get(rd)
+        if blk is None:
+            print("  missing", r, var, rd, list(B[r].keys()))
+            continue
+        s = S[rd][fam][lab]
+        print(f"  {nm:6s} {rd:8s} mean {s['mean']:.4f} vs {blk['mean']:.4f} (d {s['mean'] - blk['mean']:+.1e})   "
+              f"ev {s['ev']:.4f} vs {blk['evaluate_form']:.4f} (d {s['ev'] - blk['evaluate_form']:+.1e})")
+print("  by['1.5'] b / a_b also:", {v: round(B['1.5'][v]['noknock']['mean'], 4) for v in ('b', 'a_b') if v in B['1.5']})
+
+# per-road, all 20 roads, the six policies roads.json carries
+PR = rj["per_road"]
+names = {"cg": lambda k: (k, "cg"), "neutral": lambda k: (k, "neutral"),
+         "a@0.5": lambda k: (k, "sighted", "0.5", 1.0, 1.0), "a@1.5": lambda k: (k, "sighted", "1.5", 1.0, 1.0),
+         "b": lambda k: (k, "blind", 0, 1.0), "a_b": lambda k: (k, "blind", 50, 1.0)}
+w = defaultdict(float)
+for row in PR:
+    k = int(row["k"])
+    for nm, f in names.items():
+        v = by[f(k)]
+        w["D_noknock"] = max(w["D_noknock"], abs(v["D_noknock"] - row["D"][nm]["noknock"]))
+        w["D_knock"] = max(w["D_knock"], abs(v["D_knock"] - row["D"][nm]["knock"]))
+        w["fuel"] = max(w["fuel"], abs(v["fuel"] - row["fuel"][nm]))
+        w["ret"] = max(w["ret"], abs(v["ret"] - row["ret"][nm]))
+        w["base_noknock"] = max(w["base_noknock"], abs(v["base_noknock"] - row["D_base"]["noknock"]))
+        w["base_knock"] = max(w["base_knock"], abs(v["base_knock"] - row["D_base"]["knock"]))
+print("all 20 roads x 6 policies vs roads.json per_road, largest |diff|:", {k: f"{v:.2e}" for k, v in w.items()})
+
+# earlier straight-line estimate (cg -> a_b -> b), at (a)'s fuel
+print("\nstraight line cg-(a_b)-(b) at (a)'s fuel:")
+for rd in READ:
+    for form in ("mean", "ev"):
+        pts = [(0.0, 0.0), (S[rd]["blind"]["D=50 delta=1.00"]["fuel"], S[rd]["blind"]["D=50 delta=1.00"][form]),
+               (S[rd]["blind"]["D=0 delta=1.00"]["fuel"], S[rd]["blind"]["D=0 delta=1.00"][form])]
+        res = []
+        for r in ("0.5", "1.5"):
+            a = S[rd][f"sighted r={r}"]["lead=1.00H delta=1.00"]
+            res.append(round(a[form] - interp(pts, a["fuel"]), 4))
+        print(f"  {rd} {form}: {res}")

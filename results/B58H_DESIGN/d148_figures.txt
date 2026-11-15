@@ -1,0 +1,154 @@
+d148_figures.py: D148's figures, each beside its inputs (rows 148-153 and section S's note, ORDER steps
+  18a-22b, INTERFACES section 18, the schedule of 14 November), with B1's rate in place of step 3's
+  times AST (UTC+3), to the minute, seconds dropped; '+h:mm' is the margin to W's end, '-' after it
+
+1. INPUTS
+  B1's rate (MEASURED): results/benchmarks/B1_bench_b58.attempt1.json recommendation.best.cpu: lower_min 107.46 steps/s in all at 12 runs at once
+    B1 ran 2026-11-14T19:53:38 on Jad's PC from git_head 0329456 (git_dirty False); its plant_sha 36655cab94800e30
+    repeat 1 at 12: lower 107.46, upper 108.32 steps/s; loaded False (2.6 % CPU before it)
+    repeat 2 at 12: lower 110.77, upper 111.89 steps/s; loaded True (6.5 % CPU before it)
+    the lowest lower bound over the repeats equals lower_min: True; it is repeat [1]'s
+  step 3's rate, SUPERSEDED by B1's: results/benchmarks/step3_2026-11-02/A5_bench_merged.json recommendation.best.cpu: lower_min 106.19 steps/s at 12 runs at once
+  a production run: 450000 steps (benchmark_training.py:200 PROD_STEPS); arms 3 (ARMS); n 20 seeds per arm (epa_backend.B58H_N, row 147 (4)); ENGINES 4 (the same line)
+    the arms are the blinded one and one sighted arm at each of roads.json's ratios ['0.5', '1.5']: True
+  W's end: epa_backend.W_LAST 2026-11-20T00:00:00+03:00 (row 134 (1))
+  the team's end after W: 72 h (row 134 (1), read by row 147 (10): W's end leaves 72 h before the team's end, 23 November)
+  a closed-loop run on the laptop: median 153.9 s a run (results/EPA_ROADS/timing.txt:2), measured 14 at once at 14 jobs (timing.txt:1)
+    so N runs take N x 153.9/14 s (ASSUMED: runs pack 14 at once; measured on hand-written policies, ASSUMED equal for agents)
+  roads.json: 20 roads (ceilings.n_roads); ratios ['0.5', '1.5']; dt 1.0 s (ceilings.dt); an episode of 899 steps (episode_steps.measured)
+    tau 47.3351 s (ceilings.per_engine.b58.tau_s); H 23.6675 s at r = 0.5, 71.0026 s at r = 1.5 (by[r].H_s)
+  stable-baselines3 2.9.0 (installed; version.txt): SAC's default gamma 0.99 (stable_baselines3/sac/sac.py:100)
+    train.py's one SAC(...) call (train.py:971) passes ['seed', 'learning_rate', 'buffer_size', 'verbose', 'tensorboard_log', 'device']: gamma among them False
+  engine_env.py: ACT_LO [-8.0, -0.15, -40.0, 0.0, 0.3] (:980), ACT_HI [4.0, 0.06, 15.0, 1.0, 1.0] (:981), SLEW [1.5, 0.03, 10.0, 0.25, 0.2] (:982); index 1 is the lambda trim
+    SPARK_TRIM_MAX 0.0 (:991); PREVIEW_DIVISORS (15.0, 6.0, 2.0, 1.0) (:1001); EXTREME_C_TURB (0.75, 1.333) (:1852)
+  training_recipe.py: DECISION_29_WINDOW 50000 (:46), AVERAGE_SNAPSHOTS 5 (:47), snapshot_steps (:77), LastThird (:54)
+  train.py: CHUNK 10000 (:387), the checkpoint interval
+  evaluate.py: HAND_POLICIES, 3 of them (:300), each once per road in a scoring; N_PRACTICE 10 (:292)
+  step times, ASSUMED as results/B58H_DESIGN/budget.txt prints them (low, high):
+    budget.txt:12 D146: 1.00-2.00 h (D148's, as D146's line)
+    budget.txt:20 Ta: 0.50-1.00 h (Tc's, as Ta's line)
+    budget.txt:21 B1 (Jad's PC): 3.00-5.00 h (B1's)
+    budget.txt:22 Tb: 1.50-1.50 h (Tb's)
+    budget.txt:23 AB (analysis code): 0.50-1.00 h (AB's, off the route now (row 149))
+    budget.txt:24 PR-B: 1.00-16.00 h (PR-B's)
+    budget.txt:25 PL-B: one wave + 1-2 h: 15.13-16.13 h (PL-B's, at step 3's rate; not made now)
+  (a) transfer, reading, primary scoring: 10.0 h (results/B58H_DESIGN/budget.py.txt SCORE20, line 49; ASSUMED there; row 146 (7))
+  (b) the analysis: 0.5 h (ASSUMED: the schedule of 14 November, outside the repository)
+  decision 12's rows (row 147 (11)): at least 2.5 h (budget.txt:27: conditions_test by its docstring, ASSUMED; the rest UNKNOWN)
+  the start of the forecast: 15 Nov 00:41 AST (ASSUMED: the forecast's start, two minutes after B1's pull to this laptop with git pull --ff-only (00:39:46 AST by the reflog))
+
+2. THE TRAINING AT B1's RATE (row 147 (3); the schedule)
+  per run at 12 at once: 107.46/12 = 8.9550 steps/s
+  one wave: 450000 steps / 8.9550 steps/s = 50251.3 s = 13.96 h = 0.58 days
+  3 arms x 20 seeds = 60 runs in waves of 12: 5 waves, 0 slots idle in the last
+  the training: 5 x 50251.3 s = 251256.3 s = 69.79 h = 2.91 days
+  benchmark_training.py's 'x 4 engines' line: 2.91 days x ENGINES 4 = 11.63 days; the B58 study trains one engine, so its training is 2.91 days
+  SUPERSEDED, step 3's rate 106.19: per run 8.8492 steps/s, one wave 14.13 h, the training 70.63 h
+  B1's training is 0.83 h shorter than step 3's
+  a sixth wave (a crash or a restart re-trains a run from step 0): up to 13.96 h more, 83.75 h in all
+
+3. THE CHECK RUN, CK (row 148)
+  its length: --steps 50000, training_recipe.DECISION_29_WINDOW, the shortest run --recipe29 accepts
+  450000 / 50000 = 9: CK runs 1/9 of a training run's steps
+  10 runs (DEFINED by row 148 (1): seeds 2000-2004, blinded and sighted at r = 1.5): 1 wave at 12 at once
+  CK: 50000 steps / 8.9550 steps/s = 5583.5 s = 1.55 h (ASSUMED: the per-run rate at 10 at once equals B1's at 12)
+  SUPERSEDED, at step 3's rate: 1.57 h
+  CK's snapshots: training_recipe.snapshot_steps(50000, 50000) = [10000, 20000, 30000, 40000, 50000]
+  the training's: snapshot_steps(450000, 50000) = [410000, 420000, 430000, 440000, 450000]
+  the training: LastThird(1.0) holds 1.0 until two thirds of the run, 300000.0 steps (1.0000 there), and gives 0.0 at its end
+  CK: LastThird(1.0) holds 1.0 until two thirds of the run, 33333.3 steps (1.0000 there), and gives 0.0 at its end
+
+4. THE SETTLING LABEL's THREE MODELS (row 150 (ii))
+  train.py saves a checkpoint every CHUNK = 10000 steps
+  two thirds of 450000: 300000 steps, a multiple of 10000: True -> ckpt_300000_steps.zip
+  five sixths of 450000: 375000 steps, a multiple of 10000: False; the first saved at or after it: 380000 -> ckpt_380000_steps.zip
+  final.zip at 450000 steps; the scored average's snapshots fall at 410000-450000 steps
+
+5. DECISION 10 (1) AND (3)'s SENTENCES (section S's note)
+  the weights gamma^k, k = 0, 1, ..., sum to 1/(1 - gamma) = 1/(1 - 0.99) = 100.00 steps = 100.00 s at dt 1.0 s
+  100.00 s / tau 47.3351 s = 2.1126 tau
+  the r = 1.5 preview's last sample is 71 steps ahead (71 s); gamma^71 = 0.4899
+  the lambda trim moves at most SLEW[1] = 0.03 a step (0.03 per s), so it reaches ACT_LO[1] = -0.15 from 0 in 5.00 steps = 5.00 s
+  5.00 s / tau 47.3351 s = 0.1056 tau
+  the preview's samples at r = 0.5 (H 23.6675 s; step int(H/divisor/dt), as engine_env._preview): [1, 3, 11, 23] steps = [1.0, 3.0, 11.0, 23.0] s ahead
+  the preview's samples at r = 1.5 (H 71.0026 s; step int(H/divisor/dt), as engine_env._preview): [4, 11, 35, 71] steps = [4.0, 11.0, 35.0, 71.0] s ahead
+  the r = 0.5 samples are a subset of the r = 1.5 samples: False
+
+6. ROW 151 (3) AND (6)
+  roads.json report.knee_shares.b58: turb_knee_k 1123.0 K = 849.85 C; share_turb 0.0 over 75 slots; the largest slots[].turb_peak_minus_knee_k -14.48 K
+  the baseline's highest climb-slot housing peak: 1123.0 -14.48 - 273.15 = 835.37 C
+  the records (evaluate.write_records, evaluate.py:1197): 61 files (the baseline ECU's and 60 agents'), each 3 float64 arrays ('t_turb', 't_oil', 'ki') of 20 roads x 899 steps
+  61 x 20 x 899 x 3 x 8 bytes = 26322720 bytes = 26.3 MB (25.1 MiB), before each file's small overhead
+
+7. RUN COUNTS AND THEIR HOURS ON THE LAPTOP (N x 153.9/14 s)
+  the primary scoring (row 149 (5)(a)): (3 hand-written + 60 agents) x 20 roads = 1260 runs, 3.85 h
+  row 150 (i): current-grade x 20 roads = 20 runs, 0.06 h
+  row 148 (4)'s practice spread: (3 hand-written + 5 seeds x 2 arms) x 10 practice roads = 130 runs, 0.40 h (DEFINED by row 148 (4): seeds 0-4, blinded and sighted at r = 1.5)
+  row 150 (iii): 40 sighted agents (20 seeds x 2 sighted arms) x 20 roads = 800 runs, + seed 0's 3 agents x 20 roads = 60 control runs: 860 runs, 2.63 h
+  row 150 (iv): (60 agents + current-grade + the baseline ECU) on road 0 = 62 runs, 0.19 h
+  row 150 (ii): 60 agents x 3 models x 10 practice roads + the baseline ECU x 10 = 1810 runs, 5.53 h
+  row 152: per variant (3 hand-written + 60 agents) x 20 roads = 1260 runs; controls at 1.0 (seed 0's 3 agents + the baseline ECU) x 20 = 80; 2 x 1260 + 80 = 2600 runs, 7.94 h
+    row 147 (10)'s four variants of 1260 runs: 5040 runs, 15.39 h at the same rate; row 152 is 0.52 of it
+  row 152 (5)'s anchors: 6 policies x 20 roads x 2 variants = 240 runs, 0.73 h
+  row 153 (2): 60 + 40 + 40-120 + 20 = 160-240 runs, 0.49-0.73 h (the counts ASSUMED by the row: surrogate runs, re-runs of (1)'s members, optimum runs, control runs)
+  during training, on the laptop: 240 + 160-240 = 400-480 runs, 1.22-1.47 h
+
+8. AFTER TRAINING, ON THE LAPTOP (row 149 (5)'s order (a)-(f))
+  (a) transfer, reading, primary scoring: 10.00 h
+  (b) the analysis: 0.50 h
+  (c) decision 12's rows (2.5 h at least), + 20 + 130 runs: 2.96 h
+  (d) rows 150 (iii) and (iv): 860 + 62 runs: 2.82 h
+  (e) row 150 (ii): 1810 runs: 5.53 h
+  (f) row 152: 2600 runs: 7.94 h
+  (a)-(f): 29.74 h
+
+9. THE ROUTE TO TRAINING (rows 148 (6), 149 (1); INTERFACES 18's 0.2)
+  after B1's pull: D148 1.0-2.0 + Tc 0.5-1.0 + Tb 1.5 + PR-B 1.0-16.0 + CK 1.55 = 5.55-22.05 h
+  from B1's start: B1 3.0-5.0 + the above = 8.55-27.05 h
+  the old route from B1's start (budget.txt:21-25: B1, Tb, AB, PR-B, PL-B at step 3's rate): 21.13-39.63 h
+  the new route is 12.58 h shorter at the high end and 12.58 h at the low end (AB and PL-B leave it; D148, Tc and CK join it)
+  the code written during training (ASSUMED: the schedule of 14 November, outside the repository; h's 16-24 h from the decision sheet of 14 November, decision 12, option A):
+    a  AB: port the 7 November draft: 4-8 h
+    b  AB: row 151: 1-2 h
+    c  AB: row 150 (i) and (v): 1-2 h
+    d  row 150 (iii), flat ahead: 3-5 h
+    e  row 150 (iv), road 0: 1-2 h
+    f  row 150 (ii), settling: 3-5 h
+    g  row 152, the c_turb route: 4-6 h
+    g' row 152 (5)'s anchors, which D148 did not carry: 1-2 h
+    h  row 153 (2), the reduced lambda-only optimum: 16-24 h
+    in all 34-56 h, against the training's 69.79 h
+
+10. THE FORECAST FROM 15 Nov 00:41 AST, HIGH ESTIMATES (low ones after it)
+  D148 ends (2.00 h): 15 Nov 02:41
+  Tc ends (1.00 h): 15 Nov 03:41
+  Tb ends (1.50 h): 15 Nov 05:11
+  PR-B (T*) ends (16.00 h): 15 Nov 21:11
+  CK ends (1.55 h): 15 Nov 22:44
+  the training starts 15 Nov 22:44 and ends 18 Nov 20:31 (+27:28)
+  (a) ends 19 Nov 06:31 (+17:28)
+  (b) ends 19 Nov 07:01 (+16:58)
+  (c) ends 19 Nov 09:59 (+14:00)
+  (d) ends 19 Nov 12:48 (+11:11)
+  (e) ends 19 Nov 18:19 (+5:40)
+  (f) ends 20 Nov 02:16 (-2:16)
+  the cut-off on starting (d)-(f), row 149 (5): W's end + 72 h = 23 Nov 2026 00:00 AST; (d), (e) and (f) start by it: True
+  with a sixth wave: the training ends 19 Nov 10:29 (+13:30), (a) ends 19 Nov 20:29 (+3:30)
+  low estimates (D148 1.0, Tc 0.5, PR-B 1.0 h): the training starts 15 Nov 06:14 and ends 18 Nov 04:01; (a) ends 18 Nov 14:01
+
+11. LATEST STARTS (W's end minus the time after; D148's latest start also minus the high route after B1's pull)
+  the training to end inside W: start it by 17 Nov 02:12; D148 by 16 Nov 04:09
+  (a) to end inside W: the training by 16 Nov 16:12; D148 by 15 Nov 18:09
+  (b) to end inside W: the training by 16 Nov 15:42; D148 by 15 Nov 17:39
+  (c) to end inside W: the training by 16 Nov 12:44; D148 by 15 Nov 14:41
+  (d) to end inside W: the training by 16 Nov 09:55; D148 by 15 Nov 11:52
+  (e) to end inside W: the training by 16 Nov 04:24; D148 by 15 Nov 06:21
+  (f) to end inside W: the training by 15 Nov 20:28; D148 by 14 Nov 22:24
+  the slack of the forecast's training start 15 Nov 22:44 against the latest start with (a) inside W 16 Nov 16:12: +17:28
+  every item starts before the cut-off if the training starts by 19 Nov 04:24, D148 by 18 Nov 06:21
+  SUPERSEDED, at step 3's rate: the training by 17 Nov 01:22; with (a) inside W by 16 Nov 15:22
+
+12. ROW 153 (1)'s RECORD (results/B58H_DESIGN/hw_opt/)
+  settings: current-grade and the baseline ECU, 2; sighted, 2 ratios x 4 leads x 3 depths = 24 (12 at each r); blind, 5 delays x 3 depths = 15; in all 41 (hw_opt.py.txt's FRACS, DELTAS, DELAYS, RATIOS)
+  20 roads x 41 settings = 820 runs; runs.jsonl holds 820 records: blind 300, cg 20, neutral 20, sighted 480
+  control_record.txt:15 prints PASS; its plant_sha (:20) equals B1's: True

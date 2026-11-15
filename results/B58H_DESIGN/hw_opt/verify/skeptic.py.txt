@@ -1,0 +1,228 @@
+"""Methodology skeptic's re-analysis of hw_opt's runs.jsonl (read only; prints, writes nothing)."""
+import json
+import os
+import statistics
+import sys
+
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+RUNS = os.path.join(os.path.dirname(HERE), "runs.jsonl")
+CLONE = r"C:\Users\badcl\grad_hw"
+
+FRACS = (0.25, 0.5, 0.75, 1.0)
+DELTAS = (1 / 3, 2 / 3, 1.0)
+DELAYS = (0, 25, 50, 75, 100)
+RATIOS = ("0.5", "1.5")
+
+
+def key(spec):
+    return json.dumps(spec, sort_keys=True)
+
+
+done = {}
+with open(RUNS, encoding="utf-8") as fh:
+    for line in fh:
+        if line.strip():
+            rec = json.loads(line)
+            done[key(rec["spec"])] = rec["res"]
+N = 20
+get = lambda s: done[key(s)]
+cg = [get({"k": k, "fam": "cg"}) for k in range(N)]
+nt = [get({"k": k, "fam": "neutral"}) for k in range(N)]
+
+settings = {}
+for D in DELAYS:
+    for d in DELTAS:
+        settings[("blind", f"D={D} d={d:.2f}")] = lambda k, D=D, d=d: {"k": k, "fam": "blind", "D": D, "delta": round(d, 6)}
+for r in RATIOS:
+    for f in FRACS:
+        for d in DELTAS:
+            settings[(f"s{r}", f"lead={f:.2f}H d={d:.2f}")] = lambda k, f=f, d=d, r=r: {"k": k, "fam": "sighted", "r": r, "frac": f, "delta": round(d, 6)}
+
+
+def summ(rs, reading="noknock"):
+    Dk = "D_noknock" if reading == "noknock" else "D_knock"
+    Bk = "base_noknock" if reading == "noknock" else "base_knock"
+    pts = [100.0 * (c[Dk] - r[Dk]) / r[Bk] for c, r in zip(cg, rs)]
+    ev = 100.0 * (statistics.median(c[Dk] for c in cg) - statistics.median(r[Dk] for r in rs)) / statistics.median(x[Dk] for x in nt)
+    fx = [100.0 * (r["fuel"] / c["fuel"] - 1.0) for c, r in zip(cg, rs)]
+    return dict(mean=float(np.mean(pts)), ev=float(ev), fuel=float(np.mean(fx)), pts=pts, fx=fx,
+                ret=float(np.mean([r["ret"] for r in rs])), rets=[r["ret"] for r in rs])
+
+
+S = {}
+for (fam, lab), sf in settings.items():
+    rs = [get(sf(k)) for k in range(N)]
+    S[(fam, lab)] = dict(noknock=summ(rs, "noknock"), knock=summ(rs, "knock"), rs=rs)
+
+
+# ---------------------------------------------------------------- frontiers
+def stair(pts):
+    pts = sorted(pts)
+    front, best = [(0.0, 0.0)], 0.0
+    for x, y in pts:
+        if y > best:
+            front.append((x, y)); best = y
+    return front
+
+
+def hull(pts):
+    """upper concave hull through (0,0), monotone part."""
+    P = sorted(set([(0.0, 0.0)] + list(pts)))
+    H = []
+    for p in P:
+        while len(H) >= 2:
+            (x1, y1), (x2, y2) = H[-2], H[-1]
+            # remove H[-1] if it lies on or below the chord H[-2] -> p
+            if (y2 - y1) * (p[0] - x1) <= (p[1] - y1) * (x2 - x1):
+                H.pop()
+            else:
+                break
+        H.append(p)
+    # keep the increasing part
+    out = [H[0]]
+    for p in H[1:]:
+        if p[1] > out[-1][1]:
+            out.append(p)
+    return out
+
+
+def interp(front, x, mode):
+    if x >= front[-1][0]:
+        return front[-1][1]
+    if mode == "step":
+        return max(y for xx, y in front if xx <= x + 1e-12)
+    for (x0, y0), (x1, y1) in zip(front, front[1:]):
+        if x0 <= x <= x1:
+            return y0 + (y1 - y0) * (x - x0) / (x1 - x0) if x1 > x0 else max(y0, y1)
+    return 0.0
+
+
+def fam_pts(fam, reading, form):
+    return [(v[reading]["fuel"], v[reading][form]) for (f, l), v in S.items() if f == fam]
+
+
+print("=== reproduce the headline (staircase + linear interpolation, gap at sighted's own points)")
+for reading in ("noknock", "knock"):
+    for form in ("mean", "ev"):
+        fb = stair(fam_pts("blind", reading, form))
+        out = []
+        for r in RATIOS:
+            fs = stair(fam_pts(f"s{r}", reading, form))
+            gaps = [(x, y - interp(fb, x, "lin")) for x, y in fs if x > 0]
+            g = max(gaps, key=lambda t: t[1])
+            out.append(f"r={r}: {g[1]:+.3f} at {g[0]:.3f}%")
+        print(f"  {reading:8s} {form:5s} " + "   ".join(out))
+
+print("\n=== mixing assumption: blind frontier as step (no mixing), linear-between-staircase (as hw_opt), concave hull (random mixing)")
+print("    and both sides hulled (sighted hull minus blind hull, max over x in (0, sighted's last x])")
+for reading in ("noknock", "knock"):
+    for form in ("mean", "ev"):
+        bp = fam_pts("blind", reading, form)
+        fb_s, fb_h = stair(bp), hull(bp)
+        for r in RATIOS:
+            sp = fam_pts(f"s{r}", reading, form)
+            fs = stair(sp)
+            fh = hull(sp)
+            res = {}
+            for mode, fb, m in (("step", fb_s, "step"), ("lin", fb_s, "lin"), ("hull", fb_h, "lin")):
+                gaps = [(x, y - interp(fb, x, m)) for x, y in fs if x > 0]
+                res[mode] = max(gaps, key=lambda t: t[1])
+            xs = np.linspace(1e-3, fh[-1][0], 4000)
+            hh = max(((x, interp(fh, x, "lin") - interp(fb_h, x, "lin")) for x in xs), key=lambda t: t[1])
+            print(f"  {reading:8s} {form:5s} r={r}: step {res['step'][1]:+.3f}@{res['step'][0]:.2f}  "
+                  f"lin {res['lin'][1]:+.3f}@{res['lin'][0]:.2f}  blind-hull {res['hull'][1]:+.3f}@{res['hull'][0]:.2f}  "
+                  f"hull-vs-hull {hh[1]:+.3f}@{hh[0]:.2f}")
+        print(f"     blind hull vertices ({reading},{form}): {[(round(a, 3), round(b, 3)) for a, b in fb_h]}")
+
+print("\n=== the r=0.5 headline point and its blind neighbours (noknock, mean)")
+for (f, l), v in sorted(S.items(), key=lambda kv: kv[1]["noknock"]["fuel"]):
+    if f == "blind" and v["noknock"]["fuel"] < 0.7:
+        print(f"  blind {l:16s} fuel {v['noknock']['fuel']:.3f} mean {v['noknock']['mean']:.3f} ev {v['noknock']['ev']:.3f}")
+
+print("\n=== saving per percent of extra fuel (noknock, mean form), by depth")
+for (f, l), v in sorted(S.items()):
+    x, y = v["noknock"]["fuel"], v["noknock"]["mean"]
+    print(f"  {f:6s} {l:22s} fuel {x:6.3f}  mean {y:6.3f}  ratio {y / x:5.2f}  ev {v['noknock']['ev']:6.3f}")
+
+print("\n=== damage only (no fuel matching): best saving in each family")
+for reading in ("noknock", "knock"):
+    for form in ("mean", "ev"):
+        for fam in ("blind", "s0.5", "s1.5"):
+            best = max(((l, v[reading][form], v[reading]["fuel"]) for (f, l), v in S.items() if f == fam), key=lambda t: t[1])
+            print(f"  {reading:8s} {form:5s} {fam:6s} best {best[1]:7.3f} ({best[0]}, fuel {best[2]:+.2f}%)")
+
+print("\n=== episode return (knock term ON, the env default; the study trains with it OFF)")
+cg_ret = [c["ret"] for c in cg]
+nt_ret = [x["ret"] for x in nt]
+print(f"  cg mean ret {np.mean(cg_ret):.4f}   neutral mean ret {np.mean(nt_ret):.4f}")
+for fam in ("blind", "s0.5", "s1.5"):
+    best = max(((l, v["noknock"]["ret"]) for (f, l), v in S.items() if f == fam), key=lambda t: t[1])
+    v = S[(fam, best[0])]
+    print(f"  {fam:6s} global setting with best mean ret: {best[0]:20s} ret {best[1]:.4f} (cg {np.mean(cg_ret):.4f}); "
+          f"its saving mean {v['noknock']['mean']:.3f} ev {v['noknock']['ev']:.3f} fuel {v['noknock']['fuel']:+.3f}%")
+# all settings ranked by mean ret
+rows = sorted(((v["noknock"]["ret"] - np.mean(cg_ret), f, l, v["noknock"]["mean"], v["noknock"]["fuel"]) for (f, l), v in S.items()), reverse=True)
+print("  top 10 settings by mean ret minus cg's:")
+for r_, f, l, m, x in rows[:10]:
+    print(f"    {f:6s} {l:22s} dret {r_:+.4f}  saving {m:.3f}  fuel {x:+.3f}")
+print("  settings with mean ret above cg's:", sum(1 for r_ in rows if r_[0] > 0), "of", len(rows))
+
+# per road: best by ret in {cg} U family
+print("\n  per road, best by ret: blind set {cg}+blind; sighted set {cg}+blind+sighted(r)")
+for r in RATIOS:
+    nb_cg, ns_cg, ns_use, gain_ret, dsave_mean, dsave_fuel = 0, 0, 0, [], [], []
+    for k in range(N):
+        cand_b = [("cg", cg[k])] + [(l, v["rs"][k]) for (f, l), v in S.items() if f == "blind"]
+        cand_s = cand_b + [(l, v["rs"][k]) for (f, l), v in S.items() if f == f"s{r}"]
+        bb = max(cand_b, key=lambda t: t[1]["ret"])
+        bs = max(cand_s, key=lambda t: t[1]["ret"])
+        nb_cg += bb[0] == "cg"
+        ns_cg += bs[0] == "cg"
+        ns_use += bs[0].startswith("lead")
+        gain_ret.append(bs[1]["ret"] - bb[1]["ret"])
+        base = cg[k]["base_noknock"]
+        dsave_mean.append(100.0 * (bb[1]["D_noknock"] - bs[1]["D_noknock"]) / base)
+        dsave_fuel.append(100.0 * (bs[1]["fuel"] - bb[1]["fuel"]) / cg[k]["fuel"])
+    print(f"   r={r}: blind set picks cg on {nb_cg}/20; sighted set picks cg on {ns_cg}/20, a sighted setting on {ns_use}/20; "
+          f"mean ret gain {np.mean(gain_ret):+.4f}; mean damage-saving gain {np.mean(dsave_mean):+.3f} pts at {np.mean(dsave_fuel):+.3f}% fuel")
+    # evaluate form of the reward-chosen sets
+# evaluate form for reward-chosen per-road selection
+for r in RATIOS:
+    Db, Ds = [], []
+    for k in range(N):
+        cand_b = [("cg", cg[k])] + [(l, v["rs"][k]) for (f, l), v in S.items() if f == "blind"]
+        cand_s = cand_b + [(l, v["rs"][k]) for (f, l), v in S.items() if f == f"s{r}"]
+        Db.append(max(cand_b, key=lambda t: t[1]["ret"])[1]["D_noknock"])
+        Ds.append(max(cand_s, key=lambda t: t[1]["ret"])[1]["D_noknock"])
+    ev = 100.0 * (statistics.median(Db) - statistics.median(Ds)) / statistics.median(x["D_noknock"] for x in nt)
+    print(f"   r={r}: reward-chosen sighted-minus-blind in evaluate's form {ev:+.3f}")
+
+print("\n=== weights")
+W = [None] * N
+with open(os.path.join(CLONE, "results", "EPA_ROADS", "roads.json"), encoding="utf-8") as fh:
+    RJ = json.load(fh)
+for k, road in enumerate(RJ["roads"]):
+    W[k] = road["weights"]
+print("  w_track range", min(w[0] for w in W), max(w[0] for w in W))
+print("  w_fuel  range", min(w[1] for w in W), max(w[1] for w in W))
+print("  w_life  range", min(w[2] for w in W), max(w[2] for w in W))
+
+print("\n=== climbs")
+ons, Ls, gs, firsts, gaps, ncl, dur = [], [], [], [], [], [], []
+for road in RJ["roads"]:
+    cl = sorted([(float(c["onset_s"]), float(c["L_s"]), float(c["grade"])) for c in road["climbs"] if float(c["grade"]) > 0])
+    ncl.append(len(cl))
+    dur.append(len(road["cycle"]["t"]) * float(road["dt"]))
+    if cl:
+        firsts.append(cl[0][0])
+    for i, (s, L, g) in enumerate(cl):
+        Ls.append(L); gs.append(g)
+        if i:
+            gaps.append(s - (cl[i - 1][0] + cl[i - 1][1]))
+print(f"  roads {len(RJ['roads'])}, duration {min(dur)}-{max(dur)} s, climbs per road {min(ncl)}-{max(ncl)} (total {sum(ncl)})")
+print(f"  first onset {min(firsts):.0f}-{max(firsts):.0f} s (median {statistics.median(firsts):.0f})")
+print(f"  L {min(Ls):.0f}-{max(Ls):.0f} s; grade {min(gs):.4f}-{max(gs):.4f}")
+print(f"  gaps (full-grade end to next onset) {min(gaps):.0f}-{max(gaps):.0f} s (median {statistics.median(gaps):.0f})")
+print("  integer onsets:", all(abs(float(c['onset_s']) - round(float(c['onset_s']))) < 1e-9 for road in RJ['roads'] for c in road['climbs']))

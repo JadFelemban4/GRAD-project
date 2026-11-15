@@ -1,0 +1,61 @@
+import json
+import os
+import statistics
+
+import numpy as np
+
+V = os.path.dirname(os.path.abspath(__file__))
+on, off = {}, {}
+for line in open(os.path.join(V, "..", "runs.jsonl"), encoding="utf-8"):
+    if line.strip():
+        r = json.loads(line)
+        on[json.dumps(r["spec"], sort_keys=True)] = r["res"]
+ctrl = []
+for line in open(os.path.join(V, "knockoff.jsonl"), encoding="utf-8"):
+    if line.strip():
+        r = json.loads(line)
+        k = json.dumps(r["spec"], sort_keys=True)
+        if r["rk"] == "off":
+            off[k] = r["res"]
+        else:
+            ctrl.append((k, r["res"]))
+for k, res in ctrl:
+    ref = on[k]
+    print("CONTROL knock on", k, "max |diff|", max(abs(res[x] - ref[x]) for x in ("D_noknock", "D_knock", "fuel", "ret")))
+worst = 0.0
+for k, res in off.items():
+    ref = on[k]
+    worst = max(worst, max(abs(res[x] - ref[x]) for x in ("D_noknock", "D_knock", "fuel", "base_noknock")))
+print(f"{len(off)} knock-off runs; largest |diff| in D_noknock, D_knock, fuel, base vs runs.jsonl: {worst:.3e} (must be 0: the reward moved nothing else)")
+lab = lambda s: s["fam"] + ("" if s["fam"] == "cg" else (f" D={s['D']} d={s['delta']:.2f}" if s["fam"] == "blind" else f" r={s['r']} lead={s['frac']}H d={s['delta']:.2f}"))
+by = {}
+for k, res in off.items():
+    s = json.loads(k)
+    by.setdefault(lab(s), {})[s["k"]] = (res, on[k])
+ks = sorted({json.loads(k)["k"] for k in off})
+print("roads complete:", len(ks))
+cg = by["cg"]
+print("\nsetting                         mean dret vs cg: knock ON   knock OFF   roads ret>cg ON / OFF")
+for name, d in sorted(by.items()):
+    if name == "cg":
+        continue
+    kk = [k for k in ks if k in d and k in cg]
+    d_on = np.mean([d[k][1]["ret"] - cg[k][1]["ret"] for k in kk])
+    d_off = np.mean([d[k][0]["ret"] - cg[k][0]["ret"] for k in kk])
+    n_on = sum(d[k][1]["ret"] > cg[k][1]["ret"] for k in kk)
+    n_off = sum(d[k][0]["ret"] > cg[k][0]["ret"] for k in kk)
+    print(f"  {name:32s} {d_on:+9.3f} {d_off:+11.3f}      {n_on:2d} / {n_off:2d}   (n={len(kk)})")
+print("  cg mean ret ON", np.mean([cg[k][1]["ret"] for k in ks]), "OFF", np.mean([cg[k][0]["ret"] for k in ks]))
+# per road best by ret within this subset: blind set {cg + blind subset}, sighted r=1.5 set {blind set + s1.5 subset}
+for rk, idx in (("ON", 1), ("OFF", 0)):
+    for r in ("1.5", "0.5"):
+        nb, ns, gain_mean, Db, Ds = 0, 0, [], [], []
+        for k in ks:
+            cb = [(n, d[k][idx]) for n, d in by.items() if (n == "cg" or n.startswith("blind")) and k in d]
+            cs = cb + [(n, d[k][idx]) for n, d in by.items() if n.startswith(f"sighted r={r}") and k in d]
+            bb = max(cb, key=lambda t: t[1]["ret"]); bs = max(cs, key=lambda t: t[1]["ret"])
+            nb += bb[0] != "cg"; ns += bs[0].startswith("sighted")
+            gain_mean.append(100 * (bb[1]["D_noknock"] - bs[1]["D_noknock"]) / bb[1]["base_noknock"])
+            Db.append(bb[1]["D_noknock"]); Ds.append(bs[1]["D_noknock"])
+        print(f"reward {rk:3s} r={r}: blind set picks a trim on {nb}/{len(ks)}; sighted set picks a sighted setting on {ns}/{len(ks)}; "
+              f"damage gain of the sighted choice {np.mean(gain_mean):+.3f} pts (mean form)")

@@ -1,0 +1,57 @@
+"""Extra checks: r=1.5 frontier with r=0.5's settings added (a 71 s preview can run any 23.7 s rule);
+road-bootstrap spread of the headline gap (mean form, fixed argmax settings, noknock); the full
+interpolation-sensitivity grid. Own code; reads runs.jsonl only."""
+import json, os, random, statistics as st
+OPT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+recs = [json.loads(l) for l in open(os.path.join(OPT, "runs.jsonl"), encoding="utf-8") if l.strip()]
+def key(s):
+    if s["fam"] in ("cg", "neutral"): return (s["fam"],)
+    if s["fam"] == "sighted": return ("s", s["r"], float(s["frac"]), round(s["delta"], 6))
+    return ("b", int(s["D"]), round(s["delta"], 6))
+R = {}
+for r in recs: R.setdefault(key(r["spec"]), [None]*20)[r["spec"]["k"]] = r["res"]
+cg, nt = R[("cg",)], R[("neutral",)]
+def stats(rs, roads, rd="D_noknock", bk="base_noknock"):
+    m = sum(100*(cg[k][rd]-rs[k][rd])/rs[k][bk] for k in roads)/len(roads)
+    e = 100*(st.median([cg[k][rd] for k in roads])-st.median([rs[k][rd] for k in roads]))/st.median([nt[k][rd] for k in roads])
+    f = sum(100*(rs[k]["fuel"]/cg[k]["fuel"]-1) for k in roads)/len(roads)
+    return f, m, e
+def pareto(pts):
+    pts = [(0.0,0.0)]+pts
+    return sorted({p for p in pts if not any(q[0]<=p[0] and q[1]>=p[1] and q!=p for q in pts)})
+def lin(fr, x):
+    if x > fr[-1][0]: return None
+    for (a,b),(c,d) in zip(fr, fr[1:]):
+        if a<=x<=c: return b if c==a else b+(d-b)*(x-a)/(c-a)
+def gapmax(sp, bp, how="lin"):
+    fb, fs = pareto(bp), pareto(sp)
+    g = []
+    for x,y in fs:
+        if x<=0: continue
+        if how=="lin":
+            v = lin(fb,x)
+            if v is None: continue
+        else:
+            v = max(b for a,b in fb if a<=x)
+        g.append((y-v, x))
+    return max(g)
+roads = list(range(20))
+for rd, bk in (("D_noknock","base_noknock"),("D_knock","base_knock")):
+    for fi, form in ((1,"mean"),(2,"ev")):
+        b = [ (stats(v,roads,rd,bk)[0], stats(v,roads,rd,bk)[fi]) for k,v in R.items() if k[0]=="b"]
+        s05 = [ (stats(v,roads,rd,bk)[0], stats(v,roads,rd,bk)[fi]) for k,v in R.items() if k[0]=="s" and k[1]=="0.5"]
+        s15 = [ (stats(v,roads,rd,bk)[0], stats(v,roads,rd,bk)[fi]) for k,v in R.items() if k[0]=="s" and k[1]=="1.5"]
+        print(rd, form, "r=1.5 alone", tuple(round(x,4) for x in gapmax(s15,b)), " r=1.5 with r=0.5's rules added",
+              tuple(round(x,4) for x in gapmax(s15+s05,b)))
+# bootstrap over roads: whole tuning re-done in each resample (max-gap statistic), noknock, mean and ev
+random.seed(1)
+for fi, form in ((1,"mean"),(2,"ev")):
+    for r in ("0.5","1.5"):
+        vals = []
+        for _ in range(400):
+            rs_ = [random.randrange(20) for _ in range(20)]
+            b = [(stats(v,rs_)[0], stats(v,rs_)[fi]) for k,v in R.items() if k[0]=="b"]
+            s = [(stats(v,rs_)[0], stats(v,rs_)[fi]) for k,v in R.items() if k[0]=="s" and k[1]==r]
+            vals.append(gapmax(s,b)[0])
+        vals.sort()
+        print(f"bootstrap noknock {form} r={r}: max-gap median {vals[200]:+.3f}, 2.5-97.5 % [{vals[10]:+.3f}, {vals[389]:+.3f}]")

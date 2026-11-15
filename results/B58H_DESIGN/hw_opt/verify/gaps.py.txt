@@ -1,0 +1,55 @@
+import sys, os, numpy as np, statistics
+sys.argv = ["x"]
+import importlib.util
+spec = importlib.util.spec_from_file_location("sk", os.path.join(os.path.dirname(os.path.abspath(__file__)), "skeptic.py"))
+# reuse skeptic's data structures without its prints: exec only the top part
+src = open(spec.origin, encoding="utf-8").read().split('print("=== reproduce')[0]
+g = {"__file__": spec.origin}
+exec(src, g)
+S, stair, hull, interp, fam_pts, cg, nt, N = g["S"], g["stair"], g["hull"], g["interp"], g["fam_pts"], g["cg"], g["nt"], g["N"]
+for form in ("mean", "ev"):
+    bp = fam_pts("blind", "noknock", form)
+    fb, fh = stair(bp), hull(bp)
+    for r in ("0.5", "1.5"):
+        print(f"--- {form} r={r}: sighted point -> gap (lin as hw_opt) / gap (blind hull)")
+        for (f, l), v in sorted(S.items(), key=lambda kv: kv[1]["noknock"]["fuel"]):
+            if f != f"s{r}": continue
+            x, y = v["noknock"]["fuel"], v["noknock"][form]
+            print(f"   {l:22s} fuel {x:5.3f} saving {y:6.3f}  lin {y - interp(fb, x, 'lin'):+6.3f}  hull {y - interp(fh, x, 'lin'):+6.3f}")
+# timer-free blind: only D=0 settings (whole gap; no clock needed beyond the 20 s lead-in)
+print("--- timer-free blind hull (cg + D=0 settings only), noknock")
+for form in ("mean", "ev"):
+    bp = [(v["noknock"]["fuel"], v["noknock"][form]) for (f, l), v in S.items() if f == "blind" and l.startswith("D=0 ")]
+    fh = hull(bp)
+    for r in ("0.5", "1.5"):
+        best = max(((v["noknock"]["fuel"], v["noknock"][form] - interp(fh, v["noknock"]["fuel"], "lin")) for (f, l), v in S.items() if f == f"s{r}"), key=lambda t: t[1])
+        print(f"   {form} r={r}: max gap {best[1]:+.3f} at {best[0]:.3f}%  (hull {[(round(a,3), round(b,3)) for a,b in fh]})")
+# bootstrap over roads of hw_opt's statistic (lin) and the hull version, mean and ev
+rng = np.random.default_rng(12345)
+keys = list(S.keys())
+D = {kk: np.array([S[kk]["rs"][k]["D_noknock"] for k in range(N)]) for kk in keys}
+F = {kk: np.array([S[kk]["rs"][k]["fuel"] for k in range(N)]) for kk in keys}
+cgD = np.array([c["D_noknock"] for c in cg]); cgF = np.array([c["fuel"] for c in cg])
+B = np.array([c["base_noknock"] for c in cg]); ntD = np.array([x["D_noknock"] for x in nt])
+def stat(idx, form, mode):
+    pts = {}
+    for kk in keys:
+        x = float(np.mean(100 * (F[kk][idx] / cgF[idx] - 1)))
+        if form == "mean":
+            y = float(np.mean(100 * (cgD[idx] - D[kk][idx]) / B[idx]))
+        else:
+            y = float(100 * (np.median(cgD[idx]) - np.median(D[kk][idx])) / np.median(ntD[idx]))
+        pts[kk] = (x, y)
+    bp = [p for kk, p in pts.items() if kk[0] == "blind"]
+    fb = stair(bp) if mode == "lin" else hull(bp)
+    out = []
+    for r in ("0.5", "1.5"):
+        fs = stair([p for kk, p in pts.items() if kk[0] == f"s{r}"])
+        out.append(max(y - interp(fb, x, "lin") for x, y in fs if x > 0))
+    return out
+for form in ("mean", "ev"):
+    for mode in ("lin", "hull"):
+        bs = np.array([stat(rng.integers(0, N, N), form, mode) for _ in range(400)])
+        full = stat(np.arange(N), form, mode)
+        q = np.percentile(bs, [2.5, 50, 97.5], axis=0)
+        print(f"bootstrap {form:4s} {mode:4s}: r=0.5 {full[0]:+.3f} [{q[0,0]:+.3f}, {q[2,0]:+.3f}]   r=1.5 {full[1]:+.3f} [{q[0,1]:+.3f}, {q[2,1]:+.3f}]")

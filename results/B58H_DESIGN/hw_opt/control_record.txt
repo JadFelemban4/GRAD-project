@@ -1,0 +1,21 @@
+== hw_opt control record, 2026-11-15 01:20 AST
+12 runs asked, 12 cached, 0 to run at 12 jobs
+  road 0 cg       D 40.4292455942 vs 40.4292455942   fuel 3454.859040 vs 3454.859040   max |diff| 0.000e+00
+  road 0 neutral  D 58.4645497545 vs 58.4645497545   fuel 3321.680018 vs 3321.680018   max |diff| 0.000e+00
+  road 0 a@0.5    D 39.2097120026 vs 39.2097120026   fuel 3501.270288 vs 3501.270288   max |diff| 0.000e+00
+  road 0 a@1.5    D 36.7721727608 vs 36.7721727608   fuel 3598.826836 vs 3598.826836   max |diff| 0.000e+00
+  road 0 b        D 36.0369336256 vs 36.0369336256   fuel 3671.650991 vs 3671.650991   max |diff| 0.000e+00
+  road 0 a_b      D 39.0701343810 vs 39.0701343810   fuel 3518.269415 vs 3518.269415   max |diff| 0.000e+00
+  road 1 cg       D 39.4901217241 vs 39.4901217241   fuel 3245.548917 vs 3245.548917   max |diff| 0.000e+00
+  road 1 neutral  D 57.3471336256 vs 57.3471336256   fuel 3132.904544 vs 3132.904544   max |diff| 0.000e+00
+  road 1 a@0.5    D 38.7126325184 vs 38.7126325184   fuel 3280.343234 vs 3280.343234   max |diff| 0.000e+00
+  road 1 a@1.5    D 37.4433764927 vs 37.4433764927   fuel 3354.563215 vs 3354.563215   max |diff| 0.000e+00
+  road 1 b        D 35.7370307553 vs 35.7370307553   fuel 3457.091407 vs 3457.091407   max |diff| 0.000e+00
+  road 1 a_b      D 37.5044043414 vs 37.5044043414   fuel 3332.416634 vs 3332.416634   max |diff| 0.000e+00
+CONTROL: largest difference from roads.json 0.000e+00 -> PASS
+exit 0
+== clone
+HEAD 0329456
+status lines: 0
+plant (b58): {'plant_sha': '36655cab94800e30', 'derived_sha': '326c0835548975e2', 'engine': 'b58b30o1/a90-supra-zf8hp51', 'engine_sha': '023f5589215ee68e', 'backend': 'cycle', 'reward_knock': False}
+python 3.13.2 | numpy 2.5.3 | Windows-11-10.0.26200-SP0 | Intel64 Family 6 Model 154 Stepping 3, GenuineIntel

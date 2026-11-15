@@ -1547,3 +1547,127 @@ drop lines" and "A person records any drop" (`ORDER_TO_TRAINING.md:34` at `34cca
 `DEVICE_RUNBOOK.md:250-259`, and Part B ends at its line 395 (`:397-404` is "What is not here");
 `l7_diff.py` and `make_meta.py` are `tools/l7_diff.py` and `tools/make_meta.py` inside
 `results/B58_IDENTITY/certificate_tools.tar.gz`.
+
+## 18. Rows 148-153: the B58 study after the 14 November decisions (14 November 2026)
+
+*Written by the AI agents on 14 November 2026 with rows 148-153 of `results/VALIDATION_DECISIONS.md` (section S),
+from Ta `0329456` and before B1, and brought up to date on 15 November 2026, after B1's commit `891e29a` was pulled,
+with B1's rate in place of step 3's; committed in D148. This section lists every change those rows make to this
+sheet, and, under "Words replaced", the sentences of section 17 and earlier that they replace. **Where rows 148-153
+and this sheet differ, the rows govern**; where this section and an earlier one differ, this section governs for
+the B58 study. Everything not named here stands as written. Its figures are printed by
+`results/B58H_DESIGN/d148_figures.py.txt` into `results/B58H_DESIGN/d148_figures.txt`, cited below as
+`d148_figures.txt:N`, or they cite their own files (rule 1.9).*
+
+**0. The commits, in order.** ... Q; Ta; B1 (`891e29a`, committed and pushed on Jad's PC on 14 November, result
+files only; the laptop took it with `git pull --ff-only` on 15 November; ORDER step 18); D148 (section S with rows
+148-153, ORDER's edits, this section; in `results/B58H_DESIGN/`: row 153 (1)'s record `hw_opt/`,
+`d148_figures.py.txt` and its print, `grids_b58.py.txt` and its print (row 152 (5)'s `cturb_hw/` is not in it: step 22b);
+CHECKPOINT, STATE_HISTORY.md, the session report and Jad's report of B1, `SESSION_REPORT_2026-11-14_B1-visit.md`, and
+section 23 of `SESSION_REPORT_2026-10-31_build-step-2.md`, which points at both); Tc (ORDER step 18a, row 148 (5)); Tb; PR-B
+(`results/PREREGISTRATION_B58H.md`, whose own commit is `T*`, the commit the check run and the training run from;
+its parent is Tb's commit, row 149 (1)); on Jad's PC from `T*`, in one visit, CK (step 21) and the training (step
+22); on this laptop during training, CK's record (`results/B58H_CHECK/`), AB (step 22a) and the other routes and
+row 153 (2)'s optimum (step 22b), each before the first scoring command or "not computed (code)"; then the
+scoring, in row 149 (5)'s order. PL-B is not made. Step 19a is empty.
+
+**0.2 Times.** B1's rate is MEASURED: 107.46 steps/s in all at 12 runs at once, its lowest lower bound
+(`results/benchmarks/B1_bench_b58.attempt1.txt:46`; `d148_figures.txt:6-10`), in place of step 3's 106.19
+(`d148_figures.txt:11`). Every step time is ASSUMED, as `results/B58H_DESIGN/budget.txt` prints it
+(`d148_figures.txt:27-34`), and the laptop's runs go at `results/EPA_ROADS/timing.txt`'s rate
+(`d148_figures.txt:16-17`).
+
+| part | time |
+|---|---|
+| B1 | done, 14 November (ORDER step 18; `d148_figures.txt:7`) |
+| D148 | 1-2 h, as D146's line (`budget.txt:12`; `d148_figures.txt:28`) |
+| Tc | 0.5-1 h, as Ta's line (`budget.txt:20`; `d148_figures.txt:29`) |
+| Tb | 1.5 h (`budget.txt:22`; `d148_figures.txt:31`) |
+| PR-B | 1-16 h (`budget.txt:24`; `d148_figures.txt:33`) |
+| CK | about 1.55 h: 10 runs of 50 000 steps in one wave at B1's 8.9550 steps/s per run (`d148_figures.txt:41`, `:53-54`; ASSUMED there: the per-run rate at 10 at once equals B1's at 12); 1.57 h at step 3's rate, superseded (`:55`) |
+| AB and PL-B | off the route to training |
+| the route to training | 5.55-22.05 h after B1's pull: D148 1-2, Tc 0.5-1, Tb 1.5, PR-B 1-16, CK 1.55 (`d148_figures.txt:106`); 8.55-27.05 h from B1's start, with B1's 3-5 h (`:107`), against 21.13-39.63 h on the old route (`:108`) |
+| training | 5 waves, 69.79 h at B1's rate (`d148_figures.txt:41-44`), in place of 70.63 h at step 3's (`:46`); a sixth wave, after a crash, adds up to 13.96 h (`:48`); latest start ending inside W 17 November 02:12 AST, and 16 November 16:12 AST with the primary scoring inside W (`:140-141`, with (a)'s 10 h ASSUMED, `:35`). B1's printed "x 4 engines: 11.6 days" counts `benchmark_training.py`'s ENGINES = 4 and is not this schedule (`B1_bench_b58.attempt1.txt:47`; `d148_figures.txt:45`) |
+| during training, on this laptop | the code of AB and the routes, 34-56 h (`d148_figures.txt:110-120`; ASSUMED there, from the schedule of 14 November); runs of row 152 (5) (240) and row 153 (2) (160-240), 1.22-1.47 h (`:92-94`) |
+| after training, on this laptop | row 149 (5)'s (a)-(f), 29.74 h (`d148_figures.txt:96-103`), row 147 (11)'s part at its 2.5 h lower bound (`:37`, `:99`) |
+
+**1. Rules.** Rule 1.5's freeze of `epa_backend.cost_files` from B1's git_head, `0329456` (`d148_figures.txt:7`),
+is carried past `T*` to the scoring: every commit after `T*` changes no `.py` file present at `T*` and no cost file
+(row 149 (3)-(4)). Rule 1.11 stands: rows 148 (3) and 149 (4)-(6) fix the consequence of every outcome the new
+steps can meet; any other outcome stops the step, and it is reported.
+
+**2. Who edits which file.** Tc: `epa_backend.py` (`B58H_LINES`' check entry; its docstrings and comments) and
+`test_epa_backend.PreregistrationB58H`. D148: the documents of 0, and `results/B58H_DESIGN/`'s new files. After
+`T*`: AB writes `b58h_analysis.py`, `test_b58h_analysis.py`, `b58h_beside.py` and `test_b58h_beside.py`; step 22b
+extends `b58h_beside.py` and writes `b58h_lambda_opt.py`, `test_b58h_lambda_opt.py` and `results/B58H_LAMBDA_OPT/`;
+the laptop commits `results/B58H_CHECK/`. `evaluate.py`, `b58h_descriptive.py` and `four_engine_analysis.py` are not
+edited.
+
+**3. The runbook.** CK and the training are one visit to Jad's PC, run from the paths B1 ran from, which for this
+study replace the runbook's `REPO` and `PY` (`DEVICE_RUNBOOK.md:15`, `:17`): `REPO` is
+`C:\Users\admin\grad_device\GRAD-project-device` (in Git Bash `/c/Users/admin/grad_device/GRAD-project-device`),
+the clone B1 ran in (`results/B58_IDENTITY/L8_device/provenance.txt:1`), and `PY` is
+`C:\Users\admin\grad-venv-lock-3.13.2\Scripts\python.exe` (in Git Bash
+`/c/Users/admin/grad-venv-lock-3.13.2/Scripts/python.exe`), step 3's lock venv (`provenance.txt:5`). B1's visit
+departed from its sheet as follows, from Jad's report of 14 November, `SESSION_REPORT_2026-11-14_B1-visit.md` (committed in D148), unless cited; none
+moves a figure. Step 3's clone, the worktree `GRAD-project-step3`, was removed on 11 November at Jad's request, so
+B1 ran in a fresh clone; the lock venv was moved out of the worktree unchanged (its newest site-packages entries
+are dated 2 November 13:38, and the device check printed "VERSIONS: match the lock"). Windows updates had not been
+paused since 1 October: KB5132061 (build 26300.9974) and KB5132688 were installed on 11 November, Windows App
+Runtime updates on 11 and 12 November, and the NVIDIA driver moved from 617.42 to 621.24
+(`results/benchmarks/step3_2026-11-02/A3_bench_cpu.txt:15`; `results/benchmarks/B1_bench_b58.attempt1.txt:15`).
+Jad paused them at 19:52 AST on 14 November, before the benchmark began at 19:53, until 28 November 2026; if the
+training runs past that date, the pause is extended before it ends. The IDE (Antigravity, with Claude Code) stayed
+open; Claude made three small edits in the benchmark's first minute and was then idle. The rate is the lower
+bound of repeat 1, the lower of the two; repeat 2, flagged loaded (6.5 % CPU before it), read higher, and the
+flag decides nothing (row 135 (4); `d148_figures.txt:8-10`). The clone keeps
+`core.autocrlf=true`, a CRLF work tree as at step 3: every FATAL fingerprint field is independent of line ends (the review
+of B1 of 15 November, outside the repository; `fingerprint.py:477` and `thresholds/common.py:37-43` at `891e29a`), and B0's two raw hashes are never compared with this laptop's
+(`INTERFACES.md:928`). Jad runs the guard (`RUN COMMIT: OK`), then CK's line, then CK's check block; only on
+"CHECK RUN: OK" does he send CK's record (row 148 (8)) and start the training. After training he returns
+`runs/b58h_check_dt1`, `runs/b58h_dt1`, every launch log and `SHA256SUMS`, zipped, every file of the run folders
+included (the checkpoints row 150 (ii) reads among them).
+
+**10.1.** `PreregistrationB58H` reads the training line (`--seeds 0-19 --out runs/b58h_dt1`, no `--ratios`,
+`--steps 450000`) and the check line (`--seeds 2000-2004 --ratios 1.5 --out runs/b58h_check_dt1`, `--steps` at
+`training_recipe.DECISION_29_WINDOW`). Every other flag of this sheet's list holds for both. Its control: the old
+pilot line, and the check line at `--steps 450000`, each fail.
+
+**11. PR → PR-B.** File `results/PREREGISTRATION_B58H.md`. `T*` is its own commit, the one that adds it, found by
+`git log --diff-filter=A --format=%H -- results/PREREGISTRATION_B58H.md`. Tb's commit is its parent (row 149 (1));
+`git diff --stat <Tb> <T*>` lists that file, the session report (from D148 on, `SESSION_REPORT_2026-11-15_D148.md`),
+CHECKPOINT and `STATE_HISTORY.md` (rule 1.10; CLAUDE.md's "Where things go"), none in
+`epa_backend.cost_files` or a hashed module. Folders: `runs/b58h_dt1` (training) and `runs/b58h_check_dt1` (the
+check run). Neither is in `train.CLOSED`. The commands are row 147 (3)'s training line and row 148 (1)'s check line;
+the crash rule is X1's for both. PR-B copies rows 146-153, with section S's note, and adds no choice beyond them; it
+states the whole analysis in words (row 149 (2)).
+
+**12.7.** The per-step records of the primary scoring are written outside the repository with `--records-out`; their
+index, `<scores>.records.json`, is committed with the scores (row 151 (1)).
+
+**13. Values read, never typed.** Added: `engine_env.EXTREME_C_TURB`; `training_recipe.DECISION_29_WINDOW`;
+`four_engine_roads.SHARE_EVERY`; X2's no-knock spread (`results/X2_RESULT.txt:24`); `check_x2_convergence.SETTLE_BAND`;
+roads.json `ceilings.per_engine.b58.by[r].fuel_extra_pct.a.per_road` and `by[r].<policy>.<reading>.evaluate_form`.
+
+**14. Gates.** Tc: `test_epa_backend`, its two diff checks (row 148 (5)), `test_engine_threading` (alone), the
+cost-files diff against B1's git_head, `verify_docs`; push. PR-B: on its staged tree, `epa_backend.py check` and
+`git diff --cached --quiet <B1's git_head> -- <the paths of epa_backend.cost_files>`; at `T*`, the same two,
+`git diff --stat <Tb> <T*>`, the grids print and D148's figures print reproduced (line ends ignored: with
+`core.autocrlf=true` a checkout writes both prints with CRLF), `verify_docs`, `Preregistration` (4E absent),
+`PreregistrationB58H`; push. AB, and each commit after `T*` before the first scoring command (row 149 (3)): its
+tests, `test_four_engine_analysis`, `test_engine_threading` (alone), `epa_backend.py check`, the cost-files diff
+against B1's git_head, `git diff --name-status <T*> HEAD` as row 149 (3) reads it, `verify_docs`; push. The first
+scoring command: AB committed and an ancestor of HEAD, a clean tree, no `.py` file present at `T*` changed, the cost
+files unchanged since B1's git_head, and the folders' `sha256sum -c` (row 149 (4)).
+
+**Words replaced** (rows 148 (9) and 149 (7)-(9) list those the rows replace; the rest are this sheet's own). In section 17: its 0 from "Tb; AB (step 19a, new: the
+study's analysis code)" to "scored and committed on the laptop)."; its 0.2's AB, PL-B and training lines and the
+total after its table (the training's "5 waves, 70.63 h" and its latest starts, 17 November 01:22 and 16 November
+15:22 AST, are step 3's rate; 0.2 above gives B1's); its 2's "AB writes `b58h_analysis.py` and
+`test_b58h_analysis.py` (row 147 (12))" (after `T*` now); its 3 from "For PL-B and the training" to "PL-B is
+committed from the laptop."; its 10.1's "the pilot line `--seeds 2000-2004 --ratios 1.5 --out runs/b58h_pilot_dt1`"
+and its "`--steps 450000`" for that line; its 11 whole; and its 14's "AB: ..." and "`git diff --stat <AB> <T*>`".
+`INTERFACES.md:980`, as section 17's 11 already read it, now reads `runs/b58h_check_dt1`. In
+`results/B58H_DESIGN/budget.txt`, the training at step 3's rate (`:2-3`) reads as `d148_figures.txt:40-48` prints
+it at B1's, and the AB and PL-B lines (`budget.txt:23`, `:25`) and the route's total (`budget.txt:26`) as `d148_figures.txt:105-109`
+prints the new route; that committed output is not edited.

@@ -1,0 +1,111 @@
+grids_b58.py: rows 147 (2) and (9), from results/EPA_ROADS/roads.json report.grids, report.decision13 and
+  ceilings.per_engine.b58.by[r].C, as R1 computed them (RV's re-verification of report on P's plant is
+  results/EPA_ROADS/reverify.json, carried by P and not opened here)
+  report.grids.what: row 102: C_e (no knock, mean of road points) on the H/tau axis and the H axis; descriptive
+  label (row 147 (9)): hand-written savings on plants dropped by Run 2's validation; describes the models, not the engines; never evidence for or against the criterion
+  C_e: the hand-written (a)'s cut over current-grade in points, no knock, the mean of the road points (row
+  103 (1)); 'with knock' is report.grids.detail[...].knock, not converged in dt on these roads
+
+1. ROW 102's CURVE ON THE B58 (row 147 (2)), reported beside the agents' d at r = 0.5 and 1.5
+  tau 47.3351 s (report.grids.detail.b58.tau_s; plant variant ['frozen'])
+  H/tau axis (report.grids.H_over_tau.b58):
+            r        H s       C_e  with knock
+          0.5    23.6675    1.8191      0.7314
+     0.666667    31.5567    2.3934      1.2804
+            1    47.3351    3.5372      2.3738
+         1.25    59.1688    4.4715      3.2603
+          1.5    71.0026    5.2319      3.9758
+        1.947    92.1614    6.1577      4.8438
+  H axis (report.grids.H_s.b58); H/tau is H divided by tau, this script's arithmetic:
+          H s      H/tau       C_e  with knock
+           20     0.4225    1.6001      0.5221
+           30     0.6338    2.3222      1.2123
+           45     0.9507    3.3891      2.2322
+           65     1.3732    4.8848      3.6498
+          100     2.1126    6.3974      5.0693
+          130     2.7464    7.0312      5.6629
+  the grid's entries at the study's ratios beside the study's ceilings (ceilings.per_engine.b58.by[r].C,
+  row 147 (12)):
+    r = 0.5: grid 1.8191, ceiling C 1.8191, grid minus C +0.0000, equal True
+    r = 1.5: grid 5.2319, ceiling C 5.2319, grid minus C +0.0000, equal True
+
+2. ROW 102's FOUR-ENGINE GRIDS (row 147 (9)): every curve of report.grids, the one-housing Ford beside the Ford
+  H/tau axis (report.grids.H_over_tau), C_e at r = 0.5 0.666667 1 1.25 1.5 1.947
+    b58                        1.8191   2.3934   3.5372   4.4715   5.2319   6.1577
+    mazda_25t                  0.7865   1.0389   1.5616   2.0617   2.6032   3.3083
+    honda_l15b7                1.8043   2.4091   3.6599   4.5053   5.1517   5.9172
+    ford_27tt                  1.0003   1.3163   1.9109   2.2075   2.3982   2.6184
+    ford_27tt (one housing)    0.5235   0.6482   0.8657   0.9801   1.0812   1.2151
+  H axis (report.grids.H_s), C_e at H = 20 30 45 65 100 130 s
+    b58                        1.6001   2.3222   3.3891   4.8848   6.3974   7.0312
+    mazda_25t                  0.7506   1.1116   1.6802   2.6458   3.6905   4.1426
+    honda_l15b7                1.5791   2.3331   3.4978   4.8495   6.1371   6.7138
+    ford_27tt                  0.6297   0.9149   1.3454   1.8890   2.3982   2.6235
+    ford_27tt (one housing)    0.5669   0.7574   0.9681   1.1684   1.3343   1.3864
+  with knock (report.grids.detail[...].knock), the H/tau axis, then the H axis:
+    b58                        0.7314   1.2804   2.3738   3.2603   3.9758   4.8438  |   0.5221   1.2123   2.2322   3.6498   5.0693   5.6629
+    mazda_25t                  3.7387   4.4200   5.7903   6.8889   7.9381   9.6058  |   3.6409   4.6160   6.0788   8.0249  10.6799  12.0718
+    honda_l15b7                1.6630   2.2229   3.3811   4.1655   4.7639   5.4681  |   1.4545   2.1525   3.2310   4.4844   5.6685   6.1954
+    ford_27tt                  0.9069   1.1936   1.7327   1.9998   2.1701   2.3657  |   0.5708   0.8294   1.2200   1.7129   2.1701   2.3702
+    ford_27tt (one housing)    0.5191   0.6426   0.8583   0.9716   1.0718   1.2045  |   0.5621   0.7509   0.9597   1.1582   1.3226   1.3742
+  detail (report.grids.detail[...]): tau, the plant variant, and the horizon in s at each ratio:
+    b58                      tau 47.3351 s, variant ['frozen'], H 23.6675 31.5567 47.3351 59.1688 71.0026 92.1614
+    mazda_25t                tau 42.7418 s, variant ['frozen'], H 21.3709 28.4945 42.7418 53.4273 64.1127 83.2183
+    honda_l15b7              tau 47.6717 s, variant ['frozen'], H 23.8359 31.7812 47.6717 59.5897 71.5076 92.8169
+    ford_27tt                tau 66.7620 s, variant ['frozen'], H 33.3810 44.5080 66.7620 83.4525 100.1430 129.9856
+    ford_27tt (one housing)  tau 37.0959 s, variant ['one_housing'], H 18.5479 24.7306 37.0959 46.3699 55.6438 72.2257
+
+3. THE SPREADS (report.grids.spreads; row 102's statistic: each curve normalised by its value at the largest
+  abscissa; at each abscissa the largest normalised value minus the smallest; their mean over the six)
+  four_engines: members ['b58', 'mazda_25t', 'honda_l15b7', 'ford_27tt']
+    H/tau axis: spread at 0.5 0.666667 1 1.25 1.5 1.947: 0.1443 0.1887 0.2578 0.2199 0.1290 0.0000; mean 0.1566
+      normalised b58                        0.2954   0.3887   0.5744   0.7262   0.8497   1.0000
+      normalised mazda_25t                  0.2377   0.3140   0.4720   0.6232   0.7869   1.0000
+      normalised honda_l15b7                0.3049   0.4071   0.6185   0.7614   0.8706   1.0000
+      normalised ford_27tt                  0.3820   0.5027   0.7298   0.8431   0.9159   1.0000
+    H axis: spread at 20 30 45 65 100 130: 0.0588 0.0804 0.1154 0.0836 0.0233 0.0000; mean 0.0603
+      normalised b58                        0.2276   0.3303   0.4820   0.6947   0.9099   1.0000
+      normalised mazda_25t                  0.1812   0.2683   0.4056   0.6387   0.8908   1.0000
+      normalised honda_l15b7                0.2352   0.3475   0.5210   0.7223   0.9141   1.0000
+      normalised ford_27tt                  0.2400   0.3487   0.5128   0.7201   0.9141   1.0000
+  with_one_housing_ford: members ['b58', 'mazda_25t', 'honda_l15b7', 'ford_27tt', 'ford_27tt (one housing)']
+    H/tau axis: spread at 0.5 0.666667 1 1.25 1.5 1.947: 0.1931 0.2194 0.2578 0.2199 0.1290 0.0000; mean 0.1699
+      normalised b58                        0.2954   0.3887   0.5744   0.7262   0.8497   1.0000
+      normalised mazda_25t                  0.2377   0.3140   0.4720   0.6232   0.7869   1.0000
+      normalised honda_l15b7                0.3049   0.4071   0.6185   0.7614   0.8706   1.0000
+      normalised ford_27tt                  0.3820   0.5027   0.7298   0.8431   0.9159   1.0000
+      normalised ford_27tt (one housing)    0.4308   0.5334   0.7125   0.8066   0.8898   1.0000
+    H axis: spread at 20 30 45 65 100 130: 0.2277 0.2780 0.2927 0.2041 0.0716 0.0000; mean 0.1790
+      normalised b58                        0.2276   0.3303   0.4820   0.6947   0.9099   1.0000
+      normalised mazda_25t                  0.1812   0.2683   0.4056   0.6387   0.8908   1.0000
+      normalised honda_l15b7                0.2352   0.3475   0.5210   0.7223   0.9141   1.0000
+      normalised ford_27tt                  0.2400   0.3487   0.5128   0.7201   0.9141   1.0000
+      normalised ford_27tt (one housing)    0.4089   0.5463   0.6983   0.8427   0.9624   1.0000
+  without_ford: members ['b58', 'mazda_25t', 'honda_l15b7']
+    H/tau axis: spread at 0.5 0.666667 1 1.25 1.5 1.947: 0.0672 0.0931 0.1465 0.1382 0.0838 0.0000; mean 0.0881
+      normalised b58                        0.2954   0.3887   0.5744   0.7262   0.8497   1.0000
+      normalised mazda_25t                  0.2377   0.3140   0.4720   0.6232   0.7869   1.0000
+      normalised honda_l15b7                0.3049   0.4071   0.6185   0.7614   0.8706   1.0000
+    H axis: spread at 20 30 45 65 100 130: 0.0540 0.0792 0.1154 0.0836 0.0233 0.0000; mean 0.0592
+      normalised b58                        0.2276   0.3303   0.4820   0.6947   0.9099   1.0000
+      normalised mazda_25t                  0.1812   0.2683   0.4056   0.6387   0.8908   1.0000
+      normalised honda_l15b7                0.2352   0.3475   0.5210   0.7223   0.9141   1.0000
+  the three mean spreads, in results/B58H_DESIGN/power_b58.txt's form:
+  row 102's mean spread, four_engines: H/tau axis 0.1566, H axis 0.0603
+  row 102's mean spread, with_one_housing_ford: H/tau axis 0.1699, H axis 0.1790
+  row 102's mean spread, without_ford: H/tau axis 0.0881, H axis 0.0592
+
+4. DECISION 13's COUNT (report.decision13; row 100 (3)): current-grade on the roads as first drawn, per car
+  rule: torque < 0.95 x torque_req, after the 20 s speed ramp; e_track > engine_env.TRACK_TOL beside it
+  b58: steps 17580, under95 152, over_tol 152, climb_steps 5106, climb_under95 0, climb_over_tol 0
+    largest shortfall 66.436 Nm, on the climbs 0.233 Nm
+    per road, k: under95 = 0: 8, 1: 6, 2: 8, 3: 8, 4: 8, 5: 8, 6: 6, 7: 10, 8: 8, 9: 8, 10: 6, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 6, 17: 8, 18: 6, 19: 8
+  mazda_25t: steps 17580, under95 0, over_tol 0, climb_steps 5106, climb_under95 0, climb_over_tol 0
+    largest shortfall 2.156 Nm, on the climbs 0.001 Nm
+    per road, k: under95 = 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0
+  honda_l15b7: steps 17580, under95 0, over_tol 0, climb_steps 5106, climb_under95 0, climb_over_tol 0
+    largest shortfall 1.983 Nm, on the climbs 1.946 Nm
+    per road, k: under95 = 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0
+  ford_27tt: steps 17580, under95 208, over_tol 208, climb_steps 5106, climb_under95 0, climb_over_tol 0
+    largest shortfall 100.382 Nm, on the climbs 0.550 Nm
+    per road, k: under95 = 0: 9, 1: 7, 2: 14, 3: 17, 4: 9, 5: 9, 6: 7, 7: 9, 8: 11, 9: 9, 10: 8, 11: 9, 12: 9, 13: 21, 14: 10, 15: 8, 16: 7, 17: 15, 18: 10, 19: 10

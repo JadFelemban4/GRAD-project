@@ -1,0 +1,286 @@
+"""hw_opt.py -- the hand-written lambda strategies, tuned over two settings each, on decision 34's twenty roads.
+
+    python hw_opt.py control --jobs 12    roads 0-1: cg, neutral, (a)@0.5, (a)@1.5, (b), (a_b) re-run and
+                                          compared with results/EPA_ROADS/roads.json's per-road D, fuel and ret
+    python hw_opt.py run --jobs 14        every road and every setting (cached in runs.jsonl; resumable)
+    python hw_opt.py report               the frontiers and the preview value at matched fuel
+
+Runs in a clone of the pushed Ta (0329456) outside the repository; reads that clone, writes only beside this
+file. Reuses roads_ceiling.py's runner unchanged (run_episode_record, env_cycle, plant_for, the window helpers,
+its open-file guard). Reads the twenty roads through fingerprint.d34_roads, which reads nothing of
+commit_reveal. Reads no agent. Every number it prints is from these runs or from roads.json.
+
+Families (each setting is one rule, the same on every road):
+  sighted at r: cg, plus the lambda trim at depth delta (a fraction of its -0.15 bound, never leaner than cg)
+                for the lead L = frac x H seconds before each climb (windows as (a)'s, with H -> L)
+  blind:        cg, plus the trim at depth delta from D s after each ramp-down starts until the next onset;
+                on the lead-in from 20 + 2.6 D s (D = 0 is (b), D = 50 is (a_b))
+"""
+import json
+import os
+import statistics
+import sys
+import time
+
+CLONE = r"C:\Users\badcl\grad_hw"
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, CLONE)
+os.chdir(CLONE)
+
+import numpy as np  # noqa: E402
+
+FRACS = (0.25, 0.5, 0.75, 1.0)
+DELTAS = (1 / 3, 2 / 3, 1.0)
+DELAYS = (0, 25, 50, 75, 100)
+RATIOS = ("0.5", "1.5")
+CACHE = os.path.join(HERE, "runs.jsonl")
+
+_ROADS = None
+_H = None
+
+
+def _load():
+    global _ROADS, _H
+    if _ROADS is None:
+        import fingerprint as FP
+        _scenario, roads = FP.d34_roads(root=CLONE)
+        _ROADS = list(roads)
+        with open(os.path.join(CLONE, "results", "EPA_ROADS", "roads.json"), encoding="utf-8") as fh:
+            by = json.load(fh)["ceilings"]["per_engine"]["b58"]["by"]
+        _H = {r: float(by[r]["H_s"]) for r in RATIOS}
+    return _ROADS, _H
+
+
+def key_of(spec):
+    return json.dumps(spec, sort_keys=True)
+
+
+def specs_for(k):
+    out = [{"k": k, "fam": "cg"}, {"k": k, "fam": "neutral"}]
+    for r in RATIOS:
+        for f in FRACS:
+            for d in DELTAS:
+                out.append({"k": k, "fam": "sighted", "r": r, "frac": f, "delta": round(d, 6)})
+    for D in DELAYS:
+        for d in DELTAS:
+            out.append({"k": k, "fam": "blind", "D": D, "delta": round(d, 6)})
+    return out
+
+
+def _norm_lam(phys):
+    import engine_env as E
+    lo, hi = float(E.ACT_LO[1]), float(E.ACT_HI[1])
+    return 2.0 * (phys - lo) / (hi - lo) - 1.0
+
+
+def _windows_blind(road, D):
+    import roads_ceiling as RC
+    out, start = [], 20.0 + 2.6 * D
+    for s, L, _g, _c in RC.climbs_of(road):
+        if start < s:
+            out.append((float(start), float(s)))
+        start = s + L + D
+    return tuple(out)
+
+
+def _windows_sighted(road, lead):
+    import roads_ceiling as RC
+    return RC._windows_before([(s, L) for s, L, _g, _c in RC.climbs_of(road)], H=float(lead),
+                              first_from=RC.FIRST_WINDOW_FROM_S)
+
+
+def _policy(spec, road, H):
+    import check_premise as CP
+    import roads_ceiling as RC
+    if spec["fam"] == "cg":
+        return CP.p_grade_now
+    if spec["fam"] == "neutral":
+        return CP.p_neutral
+    if spec["fam"] == "sighted":
+        wins = _windows_sighted(road, spec["frac"] * H[spec["r"]])
+    else:
+        wins = _windows_blind(road, spec["D"])
+    target = _norm_lam(spec["delta"] * RC.LAM_BOUND)
+    full = abs(spec["delta"] - 1.0) < 1e-9
+
+    def p(env, obs):
+        a = CP.p_grade_now(env, obs)
+        if RC.in_windows(float(env.cycle["t"][env.k]), wins):
+            a = np.array(a, dtype=np.float32).copy()
+            # full depth is exactly roads_ceiling's (a)/(b)/(a_b) command; partial depth never leans past cg
+            a[RC.LAM_INDEX] = RC.LAM_BOUND_NORM if full else min(float(a[RC.LAM_INDEX]), target)
+        return a
+    return p
+
+
+def _init():
+    import roads_ceiling as RC
+    RC._worker_init()
+    _load()
+
+
+def run_one(spec):
+    import roads_ceiling as RC
+    roads, H = _load()
+    road = roads[spec["k"]]
+    plant = RC.plant_for("b58", ("frozen",))
+    cyc = RC.env_cycle(road, dt=1.0)
+    out = RC.run_episode_record(plant, cyc, _policy(spec, road, H), seed=int(road["episode_seed"]),
+                                weights=tuple(float(w) for w in road["weights"]), dt=1.0,
+                                egt_ambient_windows=(), detail="light")
+    keep = ("D_noknock", "D_knock", "base_noknock", "base_knock", "fuel", "fuel_base", "torque_viol", "ret",
+            "peak_turb_k", "seconds", "steps")
+    return spec, {k: out[k] for k in keep}
+
+
+def _cached():
+    done = {}
+    if os.path.exists(CACHE):
+        with open(CACHE, encoding="utf-8") as fh:
+            for line in fh:
+                if line.strip():
+                    rec = json.loads(line)
+                    done[key_of(rec["spec"])] = rec["res"]
+    return done
+
+
+def execute(specs, jobs):
+    done = _cached()
+    todo = [s for s in specs if key_of(s) not in done]
+    print(f"{len(specs)} runs asked, {len(specs) - len(todo)} cached, {len(todo)} to run at {jobs} jobs", flush=True)
+    if todo:
+        import multiprocessing as mp
+        t0 = time.time()
+        with mp.get_context("spawn").Pool(min(jobs, len(todo)), initializer=_init) as pool, \
+                open(CACHE, "a", encoding="utf-8") as fh:
+            for i, (spec, res) in enumerate(pool.imap_unordered(run_one, todo), 1):
+                fh.write(json.dumps({"spec": spec, "res": res}) + "\n")
+                fh.flush()
+                done[key_of(spec)] = res
+                if i % 14 == 0 or i == len(todo):
+                    el = time.time() - t0
+                    print(f"  {i}/{len(todo)} done, {el / 60:.1f} min, about {el / i * (len(todo) - i) / 60:.0f} min left",
+                          flush=True)
+    return done
+
+
+def control(jobs):
+    roads, H = _load()
+    with open(os.path.join(CLONE, "results", "EPA_ROADS", "roads.json"), encoding="utf-8") as fh:
+        pr = json.load(fh)["ceilings"]["per_engine"]["b58"]["per_road"]
+    pairs = []
+    for k in (0, 1):
+        pairs += [({"k": k, "fam": "cg"}, "cg"), ({"k": k, "fam": "neutral"}, "neutral"),
+                  ({"k": k, "fam": "sighted", "r": "0.5", "frac": 1.0, "delta": 1.0}, "a@0.5"),
+                  ({"k": k, "fam": "sighted", "r": "1.5", "frac": 1.0, "delta": 1.0}, "a@1.5"),
+                  ({"k": k, "fam": "blind", "D": 0, "delta": 1.0}, "b"),
+                  ({"k": k, "fam": "blind", "D": 50, "delta": 1.0}, "a_b")]
+    done = execute([s for s, _ in pairs], jobs)
+    worst = 0.0
+    for s, name in pairs:
+        res, ref = done[key_of(s)], pr[s["k"]]
+        assert int(ref["k"]) == s["k"]
+        diffs = (abs(res["D_noknock"] - ref["D"][name]["noknock"]), abs(res["D_knock"] - ref["D"][name]["knock"]),
+                 abs(res["fuel"] - ref["fuel"][name]), abs(res["ret"] - ref["ret"][name]),
+                 abs(res["base_noknock"] - ref["D_base"]["noknock"]))
+        worst = max(worst, max(diffs))
+        print(f"  road {s['k']} {name:8s} D {res['D_noknock']:.10f} vs {ref['D'][name]['noknock']:.10f}   "
+              f"fuel {res['fuel']:.6f} vs {ref['fuel'][name]:.6f}   max |diff| {max(diffs):.3e}")
+    print(f"CONTROL: largest difference from roads.json {worst:.3e} -> {'PASS' if worst < 1e-6 else 'FAIL'}")
+    return worst < 1e-6
+
+
+def report():
+    roads, H = _load()
+    done = _cached()
+    n = len(roads)
+    get = lambda spec: done.get(key_of(spec))
+    cg = [get({"k": k, "fam": "cg"}) for k in range(n)]
+    nt = [get({"k": k, "fam": "neutral"}) for k in range(n)]
+    if any(x is None for x in cg + nt):
+        raise SystemExit("report: cg or neutral runs missing")
+    out = {"what": "hand-written lambda strategies tuned over two settings; savings over current-grade on decision "
+                   "34's twenty roads, B58 frozen plant; describes the model, never a bound on d", "H_s": H,
+           "families": {}}
+
+    def summary(spec_of_k, reading):
+        rs = [get(spec_of_k(k)) for k in range(n)]
+        if any(r is None for r in rs):
+            return None
+        Dk = "D_noknock" if reading == "noknock" else "D_knock"
+        Bk = "base_noknock" if reading == "noknock" else "base_knock"
+        pts = [100.0 * (c[Dk] - r[Dk]) / r[Bk] for c, r in zip(cg, rs)]
+        ev = 100.0 * (statistics.median(c[Dk] for c in cg) - statistics.median(r[Dk] for r in rs)) / \
+            statistics.median(x[Dk] for x in nt)
+        fx = [100.0 * (r["fuel"] / c["fuel"] - 1.0) for c, r in zip(cg, rs)]
+        return dict(mean=float(np.mean(pts)), evaluate_form=float(ev), fuel_extra_pct=float(np.mean(fx)),
+                    ret_mean=float(np.mean([r["ret"] for r in rs])), peak_c_max=float(max(r["peak_turb_k"] for r in rs) - 273.15))
+
+    fams = {"blind": [(f"D={D} delta={d:.2f}", (lambda D, d: lambda k: {"k": k, "fam": "blind", "D": D, "delta": round(d, 6)})(D, d))
+                      for D in DELAYS for d in DELTAS]}
+    for r in RATIOS:
+        fams[f"sighted r={r}"] = [(f"lead={f:.2f}H delta={d:.2f}", (lambda f, d, r: lambda k: {"k": k, "fam": "sighted", "r": r, "frac": f, "delta": round(d, 6)})(f, d, r))
+                                  for f in FRACS for d in DELTAS]
+    lines = []
+    for reading in ("noknock", "knock"):
+        lines.append(f"\n=== reading: {reading} ({'primary' if reading == 'noknock' else 'beside it, not converged in dt on these roads'})")
+        for fam, items in fams.items():
+            pts = []
+            for label, sf in items:
+                s = summary(sf, reading)
+                if s is None:
+                    continue
+                pts.append((label, s))
+                out["families"].setdefault(fam, {}).setdefault(reading, {})[label] = s
+            lines.append(f"\n{fam}: setting, saving (mean form), saving (evaluate.py's form), extra fuel %, peak C")
+            for label, s in sorted(pts, key=lambda x: x[1]["fuel_extra_pct"]):
+                lines.append(f"  {label:24s} {s['mean']:8.3f} {s['evaluate_form']:8.3f} {s['fuel_extra_pct']:+8.3f} {s['peak_c_max']:7.1f}")
+        # frontiers and the preview value at matched fuel
+        for form in ("mean", "evaluate_form"):
+            def frontier(fam):
+                pts = sorted(((s["fuel_extra_pct"], s[form]) for s in out["families"][fam][reading].values()))
+                front, best = [(0.0, 0.0)], 0.0          # current-grade itself: no extra fuel, no saving
+                for x, y in pts:
+                    if y > best:
+                        front.append((x, y))
+                        best = y
+                return front
+            fb = frontier("blind")
+            def blind_at(x):
+                if x > fb[-1][0]:
+                    return None                          # past the blind frontier's end: not compared (no extrapolation)
+                for (x0, y0), (x1, y1) in zip(fb, fb[1:]):
+                    if x0 <= x <= x1:
+                        return y0 + (y1 - y0) * (x - x0) / (x1 - x0) if x1 > x0 else max(y0, y1)
+                return 0.0
+            lines.append(f"\nfrontier, {form}, {reading}: blind {[(round(a, 2), round(b, 2)) for a, b in fb]}")
+            for r in RATIOS:
+                fs = frontier(f"sighted r={r}")
+                gaps = [(x, y - blind_at(x)) for x, y in fs if x > 0 and blind_at(x) is not None]
+                best = max(gaps, key=lambda g: g[1]) if gaps else (0.0, 0.0)
+                out.setdefault("preview_value", {}).setdefault(reading, {}).setdefault(form, {})[r] = dict(
+                    max_gap=best[1], at_fuel_extra_pct=best[0], sighted_frontier=fs, blind_frontier=fb)
+                lines.append(f"  r={r}: sighted frontier {[(round(a, 2), round(b, 2)) for a, b in fs]}")
+                lines.append(f"  r={r}: largest sighted-minus-blind saving at equal extra fuel: {best[1]:+.3f} points "
+                             f"(at {best[0]:+.2f} % fuel; blind interpolated between its own tuned points)")
+    with open(os.path.join(HERE, "hw_opt_result.json"), "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=1)
+    txt = "\n".join(lines)
+    with open(os.path.join(HERE, "hw_opt_report.txt"), "w", encoding="utf-8") as fh:
+        fh.write(txt + "\n")
+    print(txt)
+
+
+if __name__ == "__main__":
+    import roads_ceiling as _RC
+    _RC.install_guard()
+    cmd = sys.argv[1]
+    jobs = int(sys.argv[sys.argv.index("--jobs") + 1]) if "--jobs" in sys.argv else 14
+    if cmd == "control":
+        sys.exit(0 if control(jobs) else 1)
+    if cmd == "run":
+        roads, _ = _load()
+        execute([s for k in range(len(roads)) for s in specs_for(k)], jobs)
+        report()
+    elif cmd == "report":
+        report()

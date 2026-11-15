@@ -1,0 +1,91 @@
+"""Re-run a subset of hw_opt's settings with the study's reward (reward_knock False, row 147 (3)).
+
+Only the reward changes: the damage, fuel and every other total must equal runs.jsonl's (control: cg
+on roads 0-1 with the knock term ON reproduces runs.jsonl's ret exactly). Writes only knockoff.jsonl
+beside this file.
+"""
+import json
+import os
+import sys
+import time
+
+VERIFY = os.path.dirname(os.path.abspath(__file__))
+HWOPT = os.path.dirname(VERIFY)
+sys.path.insert(0, HWOPT)
+import hw_opt as HO  # noqa: E402  (chdirs into the clone, puts it on sys.path)
+
+OUT = os.path.join(VERIFY, "knockoff.jsonl")
+_ORIG = None
+
+
+def _patch():
+    global _ORIG
+    import engine_env as E
+    if _ORIG is None:
+        _ORIG = E.SupervisoryTunerEnv
+
+        class Env(_ORIG):
+            RK = True
+
+            def __init__(self, *a, **kw):
+                kw["reward_knock"] = Env.RK
+                super().__init__(*a, **kw)
+        E.SupervisoryTunerEnv = Env
+    return E.SupervisoryTunerEnv
+
+
+def _init():
+    HO._init()
+    _patch()
+
+
+def run_one(item):
+    rk, spec = item
+    Env = _patch()
+    Env.RK = (rk == "on")
+    s, res = HO.run_one(spec)
+    return rk, s, res
+
+
+def specs():
+    out = []
+    base = [{"fam": "cg"},
+            {"fam": "blind", "D": 0, "delta": 1.0}, {"fam": "blind", "D": 25, "delta": 1.0},
+            {"fam": "blind", "D": 50, "delta": 1.0}, {"fam": "blind", "D": 0, "delta": round(1 / 3, 6)},
+            {"fam": "sighted", "r": "1.5", "frac": 0.5, "delta": 1.0},
+            {"fam": "sighted", "r": "1.5", "frac": 0.75, "delta": 1.0},
+            {"fam": "sighted", "r": "1.5", "frac": 1.0, "delta": 1.0},
+            {"fam": "sighted", "r": "1.5", "frac": 1.0, "delta": round(1 / 3, 6)},
+            {"fam": "sighted", "r": "0.5", "frac": 1.0, "delta": 1.0}]
+    for k in range(20):
+        for b in base:
+            out.append(("off", dict(b, k=k)))
+    out = [("on", {"k": 0, "fam": "cg"}), ("on", {"k": 1, "fam": "cg"})] + out
+    return out
+
+
+def main(jobs):
+    done = set()
+    if os.path.exists(OUT):
+        for line in open(OUT, encoding="utf-8"):
+            if line.strip():
+                r = json.loads(line)
+                done.add((r["rk"], json.dumps(r["spec"], sort_keys=True)))
+    todo = [it for it in specs() if (it[0], json.dumps(it[1], sort_keys=True)) not in done]
+    print(f"{len(todo)} to run at {jobs} jobs", flush=True)
+    import multiprocessing as mp
+    t0 = time.time()
+    with mp.get_context("spawn").Pool(min(jobs, len(todo)), initializer=_init) as pool, \
+            open(OUT, "a", encoding="utf-8") as fh:
+        for i, (rk, s, res) in enumerate(pool.imap(run_one, todo), 1):
+            fh.write(json.dumps({"rk": rk, "spec": s, "res": res}) + "\n")
+            fh.flush()
+            if i % 16 == 0 or i == len(todo):
+                el = time.time() - t0
+                print(f"  {i}/{len(todo)} {el / 60:.1f} min", flush=True)
+
+
+if __name__ == "__main__":
+    import roads_ceiling as RC
+    RC.install_guard()
+    main(int(sys.argv[1]) if len(sys.argv) > 1 else 16)

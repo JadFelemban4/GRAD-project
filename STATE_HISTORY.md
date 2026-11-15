@@ -5378,3 +5378,46 @@ From "Next actions", item 8, as committed at `cadac38`:
 From "Next actions", item 8, as committed at `ce452df`:
 
    exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Step 13 passed (no commit), RV is committed (7 November: its control EQUAL, 0 differences in 16 sections; session report, section 16), and P is committed (8 November: its full roads check EQUAL, 0 differences in 17 sections, `results/EPA_ROADS/reverify.json`; the B58 certified, its five FAIL records, defects of the kit's driver, each re-checked by a PASS record on the same S, `results/B58_IDENTITY.md`; session report, section 17). Qa is committed (8 November: engine_gate reads the REAL roads record through fingerprint.d34_roads; session report, section 18). G is committed (9 November: row 141's record of the bounds each fit reached, and Run 2's figures registered with verify_docs.py; session report, section 19). V is committed (13 November: decision 34's scoring protocol in evaluate.py, and the study's descriptive rows in b58h_descriptive.py; session report, section 20). Q is committed (13 November: the B58's gates on Qa's B58, row 119's gate, the roads table with the share off and on, and the battery's hills, in `results/ENGINE_GATES/b58/` and `results/conditions_b58h_dt1/`, with verify_docs.py's exemption for their printouts; session report, section 21). Next: Ta, B1.
+
+# Part AQ — lines rotated out of CHECKPOINT.md, 15 November 2026 (GRA-test: B1 pulled; D148, rows 148-153)
+
+From the header, as committed at `0329456` (B1's commit `891e29a` left CHECKPOINT.md as it was):
+
+Last verified: 2026-11-08 (on `GRA-test`, at P, ORDER step 14: the plant commit, its full roads check EQUAL in 17 sections, the B58 certified against cf43fbb) — verify_docs.py 74/74 (P's gate) · drift_test.py 18/18 (R3b's gate) · the app suites on P's tree: every failure one RV's own run had, the known `?v=` asset checks, the `pwsh` launcher tests and five provenance tests of app.test_results (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 17)
+
+GRA-test: build step 2's commits A (WP1, certified 23 October), C (the calibration and validation scripts, WP3), D (`25437ba`, 30 October: Run 1, the three EPA engines calibrated and frozen) and P (ORDER step 14, the plant commit: H as a parameter, fingerprint schema 4, the knock option; certified 8 November, `results/B58_IDENTITY.md`), on contract version 5 (`c842d74`, unchanged since the first fit) · the B58: plant_sha 36655cab94800e30 (Python 3.13.2) · derived_sha 326c0835548975e2 · engine_sha 023f5589215ee68e · fingerprint schema 4 · pending: L8 on the training device
+
+From "Verified current state", as committed at `0329456`:
+
+- Ghassan's `GRA-2340394` (`c16b857`) was merged into Jad's work on 14 October
+  (`cc5468f`; every conflict, both sides, in `conflict_2026-10-14.md`). Every
+  simulation file is byte-identical to his last push, and his `check_premise`,
+  `validate` and `test_reward` print his figures on Jad's machine.
+- `python verify_docs.py`: 74 of 74 checks pass, the SIZE check among them.
+
+- `python check_training_device.py`: this laptop matches `requirements-lock.txt`;
+  its `--identity`/`--compare` modes decide whether a second machine trains
+  identical agents (decision 32). Not yet run on the training device.
+- G-CTX passed: in a fresh session every memory file together is 5.8k tokens
+  (Jad's `/context`, 14 October).
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `0329456`:
+
+- Ghassan · `GRA-test` · build step 2 (decision 24): commits A, C, D and P made (Run 1 frozen, 30 October;
+  `SESSION_REPORT_2026-10-30_run1.md`). Decisions 1-147 are answered (`results/VALIDATION_DECISIONS.md`; I: A+G,
+
+  three EPA engines dropped; R: rows 146-147, the B58 study, under row 133 (2) as his answer Q1 extends it; n, the reward and the two statements his own answers Q3, Q4, Q2).
+
+From "Next actions", item 8, as committed at `0329456`:
+
+8. `GRA-test`, build step 2: `docs/build_step_2/ORDER_TO_TRAINING.md`, steps 13-22 for the B58 study (sections I-R).
+
+   exploratory, never a test of the criterion, from `T*` (PR-B's own commit), before drive C (`docs/build_step_2/ROW146_STATEMENTS.md`). Step 13 passed (no commit), RV is committed (7 November: its control EQUAL, 0 differences in 16 sections; session report, section 16), and P is committed (8 November: its full roads check EQUAL, 0 differences in 17 sections, `results/EPA_ROADS/reverify.json`; the B58 certified, its five FAIL records, defects of the kit's driver, each re-checked by a PASS record on the same S, `results/B58_IDENTITY.md`; session report, section 17). Qa is committed (8 November: engine_gate reads the REAL roads record through fingerprint.d34_roads; session report, section 18). G is committed (9 November: row 141's record of the bounds each fit reached, and Run 2's figures registered with verify_docs.py; session report, section 19). V is committed (13 November: decision 34's scoring protocol in evaluate.py, and the study's descriptive rows in b58h_descriptive.py; session report, section 20). Q is committed (13 November: the B58's gates on Qa's B58, row 119's gate, the roads table with the share off and on, and the battery's hills, in `results/ENGINE_GATES/b58/` and `results/conditions_b58h_dt1/`, with verify_docs.py's exemption for their printouts; session report, section 21). Ta is committed (13 November: the backend's code, `epa_backend.py` and `test_epa_backend.py`; B1's tree; session report, section 22). Next: B1 on Jad's PC (ORDER step 18), from Ta's commit; nothing is pushed from the laptop until B1's commit, pushed from Jad's PC, is taken here with `git pull --ff-only` (row 146 (6)). The laptop's B2 identity file is made at Ta's commit beside B1, recorded only (decision 32).
+   Updates paused to 30 November; the laptop stays frozen until the study's last scoring; `test_epa_rows` passes from G (G's commit message); the battery's hills file is checked by its engine_sha alone (an open item for the decision sheet). On a fresh clone with core.autocrlf=true, test_epa_tightenings' LiveRecord fails: the ecu folder is hashed by its raw bytes (session report, section 20).
+
+From "Next actions", item 10, as committed at `0329456`:
+
+10. On the training device: step 3 is item 8's `tools/device_step3.sh` (the lock, the CPU and CUDA
+   benchmarks, the merge; `docs/build_step_2/DEVICE_RUNBOOK.md` Part A). The identity check against
+   this laptop (`check_training_device.py --identity`, then `--compare`; recorded, not required,
+   decision 32) is Part B's B2, at ORDER step 18.

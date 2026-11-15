@@ -1201,3 +1201,10 @@ B1's commit; nothing is pushed from the laptop in between (row 146 (6)). Right a
 B2 identity file at Ta's commit, in a clean clone outside the repository, for B2's comparison on the training
 device; it is recorded and decides nothing (decision 32). A commit cannot name itself, and B1's commit on Jad's PC
 carries only its records, so Tb's session report (ORDER step 19) names Ta's commit.
+
+## 23. 15 November: B1 pulled, and D148 (rows 148-153)
+
+B1's commit, `891e29a`, was taken here with `git pull --ff-only` on 15 November. D148, which records it and adds
+rows 148-153, has its own report, `SESSION_REPORT_2026-11-15_D148.md`, with Jad's report of B1 beside it
+(`SESSION_REPORT_2026-11-14_B1-visit.md`). From D148 on, "the session report" is that file (INTERFACES section 18's
+11), and each later commit of the route adds a section to it.

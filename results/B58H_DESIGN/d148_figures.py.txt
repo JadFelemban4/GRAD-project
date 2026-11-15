@@ -1,0 +1,631 @@
+"""d148_figures.py -- D148's figures: every number that rows 148-153 of results/VALIDATION_DECISIONS.md (section
+S and its note), ORDER steps 18a-22b, INTERFACES section 18 and the schedule of 14 November work out by hand,
+printed beside its inputs (rule 1.9: no committed document quotes a hand-worked number), with B1's measured rate in
+place of step 3's. Written 15 November 2026 by the AI agents, after B1 (891e29a, git_head 0329456) was pulled.
+
+    PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B results/B58H_DESIGN/d148_figures.py.txt .
+
+from the repository root (Python runs a file whatever its extension). Its printed output is committed beside it as
+results/B58H_DESIGN/d148_figures.txt; PR-B's gate at T* runs it again and compares.
+
+Standard library only. It writes no file and imports no module of the repository: the constants it needs are read
+from the source by ast, by name, and training_recipe.snapshot_steps and training_recipe.LastThird are compiled
+from their own source (they use int and float arithmetic only). It reads:
+  results/benchmarks/B1_bench_b58.attempt1.json            B1's rate, MEASURED on Jad's PC on 14 November
+  results/benchmarks/step3_2026-11-02/A5_bench_merged.json step 3's rate, printed beside it as SUPERSEDED
+  results/B58H_DESIGN/budget.txt and budget.py.txt          the ASSUMED step times (by their labels), the scoring's
+                                                            10 h (SCORE20) and decision 12's rows' 2.5 h
+  results/EPA_ROADS/timing.txt                              a closed-loop run's time on the laptop
+  results/EPA_ROADS/roads.json                              tau, H, dt, the roads, the episode's steps and the knee
+                                                            record; json.load parses it, four narrow keys are kept
+                                                            and the rest is dropped before anything is read
+  results/B58H_DESIGN/hw_opt/hw_opt.py.txt, runs.jsonl and control_record.txt   row 153 (1)'s settings and runs
+  engine_env.py, train.py, training_recipe.py, evaluate.py, benchmark_training.py, epa_backend.py   constants
+  stable_baselines3/sac/sac.py, as installed in the interpreter that runs this    SAC's default gamma
+It never looks up or prints roads.json's commit and reveal block, its attempts, its steps log or roads_seed.
+
+Inputs no committed file holds are typed once, below, each printed with its label: ASSUMED (a planning estimate,
+with its source) or DEFINED (a count the rows fix by their own words). Every other number is read or computed.
+
+The whole output is built first and checked before any of it is written: ASCII only, no run of 12 or more digits,
+no 40- or 64-character hex value, no line naming a guarded field of roads.json. A failed check or a missing input
+writes nothing to stdout, names the failure on stderr and exits 2. It writes LF line ends itself
+(sys.stdout.buffer), so its bytes do not depend on the platform. Times are AST (UTC+3), printed to the minute with
+the seconds dropped; "+h:mm" is the margin left to W's end, and a minus sign means after it. W is the plan, never
+a stop rule (row 146 (7)).
+
+Committed as d148_figures.py.txt, so no scan of committed .py files runs it.
+"""
+import ast
+import importlib.util
+import json
+import math
+import os
+import re
+import sys
+from datetime import datetime, timedelta, timezone
+from fractions import Fraction
+
+REPO = sys.argv[1] if len(sys.argv) > 1 else "."
+AST_TZ = timezone(timedelta(hours=3))
+GUARDED = ("commit_reveal", "steps_log", "roads_seed", "attempts")     # words no output line may hold
+HEX = re.compile(r"(?<![0-9a-fA-F])(?:[0-9a-fA-F]{64}|[0-9a-fA-F]{40})(?![0-9a-fA-F])")
+DIGITS = re.compile(r"[0-9]{12,}")
+
+# ---------------------------------------------------------------- typed inputs, each printed with its label
+START = datetime(2026, 11, 15, 0, 41, tzinfo=AST_TZ)
+START_SRC = ("ASSUMED: the forecast's start, two minutes after B1's pull to this laptop with git pull --ff-only"
+             " (00:39:46 AST by the reflog)")
+TEAM_AFTER_W_H = 72
+TEAM_AFTER_W_SRC = "row 134 (1), read by row 147 (10): W's end leaves 72 h before the team's end, 23 November"
+ANALYSIS_H = Fraction(1, 2)
+ANALYSIS_SRC = "ASSUMED: the schedule of 14 November, outside the repository"
+CK_SEEDS, CK_ARMS = 5, 2                      # DEFINED by row 148 (1): seeds 2000-2004, blinded and sighted at 1.5
+CK_SRC = "DEFINED by row 148 (1): seeds 2000-2004, blinded and sighted at r = 1.5"
+PRACTICE_SEEDS, PRACTICE_ARMS = 5, 2          # DEFINED by row 148 (4): seeds 0-4, the paired d at r = 1.5
+CHECKPOINTS_150 = 3                           # DEFINED by row 150 (ii): two thirds, five sixths, final.zip
+SEED0_AGENTS = 3                              # DEFINED by rows 150 (iii) and 152 (4): seed 0's three agents
+ANCHOR_POLICIES = 6                           # DEFINED by row 152 (5): cg, (a) at each r, (b), (a_b), baseline
+OPT_RUNS = (("surrogate runs", 60, 60), ("re-runs of (1)'s members", 40, 40), ("optimum runs", 40, 120),
+            ("control runs", 20, 20))         # ASSUMED by row 153 (2)'s own words
+CODE_H = (("a", "AB: port the 7 November draft", 4, 8), ("b", "AB: row 151", 1, 2),
+          ("c", "AB: row 150 (i) and (v)", 1, 2), ("d", "row 150 (iii), flat ahead", 3, 5),
+          ("e", "row 150 (iv), road 0", 1, 2), ("f", "row 150 (ii), settling", 3, 5),
+          ("g", "row 152, the c_turb route", 4, 6), ("g'", "row 152 (5)'s anchors, which D148 did not carry", 1, 2),
+          ("h", "row 153 (2), the reduced lambda-only optimum", 16, 24))
+CODE_SRC = ("ASSUMED: the schedule of 14 November, outside the repository; h's 16-24 h from the decision sheet of"
+            " 14 November, decision 12, option A")
+BYTES_FLOAT64 = 8
+
+
+class Refused(Exception):
+    pass
+
+
+def path(rel):
+    return os.path.join(REPO, *rel.split("/"))
+
+
+def text(rel):
+    with open(path(rel), encoding="utf-8") as fh:
+        return fh.read()
+
+
+def jload(rel):
+    with open(path(rel), encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _value(node):
+    """A literal, or the first argument of a call such as np.array([...], dtype=...)."""
+    if isinstance(node, ast.Call) and node.args:
+        return ast.literal_eval(node.args[0])
+    return ast.literal_eval(node)
+
+
+def consts(rel, names, count_only=(), source=None):
+    """{name: (value, line)} of module-level assignments in rel, read by ast and never imported. A name in
+    count_only gives the number of elements of its tuple. Refused if a name is missing or assigned twice."""
+    tree = ast.parse(source if source is not None else text(rel))
+    found = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        for t in node.targets:
+            pairs = []
+            if isinstance(t, ast.Name):
+                pairs = [(t, node.value)]
+            elif isinstance(t, ast.Tuple) and isinstance(node.value, ast.Tuple) and len(t.elts) == len(node.value.elts):
+                pairs = list(zip(t.elts, node.value.elts))
+            for el, v in pairs:
+                if isinstance(el, ast.Name) and el.id in names:
+                    if el.id in found:
+                        raise Refused(f"{rel}: {el.id} is assigned twice at module level")
+                    found[el.id] = (len(v.elts) if el.id in count_only else _value(v), node.lineno)
+    missing = [n for n in names if n not in found]
+    if missing:
+        raise Refused(f"{rel}: no module-level {missing}")
+    return found
+
+
+def compiled(rel, name, env):
+    """A module-level function or class of rel, compiled from its own source into a namespace holding env."""
+    tree = ast.parse(text(rel))
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name == name:
+            ns = dict(env)
+            exec(compile(ast.Module(body=[node], type_ignores=[]), rel, "exec"), ns)
+            return ns[name], node.lineno
+    raise Refused(f"{rel}: no module-level {name}")
+
+
+def budget_lines():
+    """{label: (lo, hi, line)} of budget.txt's route table."""
+    out = {}
+    for i, line in enumerate(text("results/B58H_DESIGN/budget.txt").splitlines(), 1):
+        m = re.match(r"^  (\S.*?)\s+(-?\d+\.\d\d)\s+(-?\d+\.\d\d)$", line)
+        if m:
+            out[m.group(1)] = (Fraction(m.group(2)), Fraction(m.group(3)), i)
+    return out
+
+
+def h(x):
+    return f"{float(x):.2f} h"
+
+
+def hr(lo, hi):
+    return f"{float(lo):.2f}-{float(hi):.2f} h"
+
+
+def tm(t):
+    return t.strftime("%d %b %H:%M")
+
+
+def hm(seconds):
+    m = int(math.floor(abs(seconds) / 60))
+    return f"{'-' if seconds < 0 else '+'}{m // 60}:{m % 60:02d}"
+
+
+def build():
+    out = []
+    p = out.append
+
+    # ------------------------------------------------------------ the inputs
+    b1 = jload("results/benchmarks/B1_bench_b58.attempt1.json")
+    best = b1["recommendation"]["best"]["cpu"]
+    rows12 = [c for c in b1["concurrency"] if c["device"] == "cpu" and c["runs"] == best["runs"]]
+    s3 = jload("results/benchmarks/step3_2026-11-02/A5_bench_merged.json")["recommendation"]["best"]["cpu"]
+    if best["runs"] != s3["runs"]:
+        raise Refused(f"B1's best concurrency {best['runs']} is not step 3's {s3['runs']}")
+    N = best["runs"]
+    rate = Fraction(str(best["lower_min"]))
+    rate3 = Fraction(str(s3["lower_min"]))
+    bt = consts("benchmark_training.py", ("ENGINES", "ARMS", "SEEDS_TARGET", "PROD_STEPS"))
+    ENGINES, ARMS, PROD = bt["ENGINES"][0], bt["ARMS"][0], bt["PROD_STEPS"][0]
+    eb = consts("epa_backend.py", ("W_LAST", "B58H_N"))
+    W_end = datetime.fromisoformat(eb["W_LAST"][0])
+    n = eb["B58H_N"][0]
+    tr = consts("training_recipe.py", ("DECISION_29_WINDOW", "AVERAGE_SNAPSHOTS"))
+    WINDOW, SNAPS = tr["DECISION_29_WINDOW"][0], tr["AVERAGE_SNAPSHOTS"][0]
+    snapshot_steps, ss_line = compiled("training_recipe.py", "snapshot_steps",
+                                       {"DECISION_29_WINDOW": WINDOW, "AVERAGE_SNAPSHOTS": SNAPS})
+    LastThird, lt_line = compiled("training_recipe.py", "LastThird", {})
+    CHUNK, chunk_line = consts("train.py", ("CHUNK",))["CHUNK"]
+    ee = consts("engine_env.py", ("ACT_LO", "ACT_HI", "SLEW", "SPARK_TRIM_MAX", "PREVIEW_DIVISORS", "EXTREME_C_TURB"))
+    ev = consts("evaluate.py", ("HAND_POLICIES", "N_PRACTICE"))
+    HAND, N_PRACTICE = len(ev["HAND_POLICIES"][0]), ev["N_PRACTICE"][0]
+    bp = consts("results/B58H_DESIGN/budget.py.txt", ("SCORE20",))
+    SCORE20 = Fraction(str(bp["SCORE20"][0]))
+    bl = budget_lines()
+    need = ("D146", "Ta", "B1 (Jad's PC)", "Tb", "AB (analysis code)", "PR-B", "PL-B: one wave + 1-2 h")
+    if any(k not in bl for k in need):
+        raise Refused(f"budget.txt: no line labelled {[k for k in need if k not in bl]}")
+    btxt = text("results/B58H_DESIGN/budget.txt").splitlines()
+    c12 = [(i, re.search(r"conditions_test about ([0-9.]+) h", x)) for i, x in enumerate(btxt, 1)]
+    c12 = [(i, m) for i, m in c12 if m]
+    if len(c12) != 1:
+        raise Refused("budget.txt: not exactly one 'conditions_test about ... h'")
+    D12_H, d12_line = Fraction(c12[0][1].group(1)), c12[0][0]
+    tl = text("results/EPA_ROADS/timing.txt").splitlines()
+    m1 = re.search(r"(\d+) closed-loop runs at once at (\d+) jobs", tl[0])
+    m2 = re.search(r"median ([0-9.]+) s", tl[1])
+    if not (m1 and m2 and tl[1].startswith("per run:")):
+        raise Refused("timing.txt: lines 1-2 are not the run count and the per-run times")
+    RUN_S, JOBS = Fraction(m2.group(1)), int(m1.group(2))
+
+    with open(path("results/EPA_ROADS/roads.json"), encoding="utf-8") as fh:
+        record = json.load(fh)
+    kept = dict(b58=record["ceilings"]["per_engine"]["b58"], dt=record["ceilings"]["dt"],
+                n_roads=record["ceilings"]["n_roads"], ratios=record["ratios"],
+                steps=record["episode_steps"]["measured"], knee=record["report"]["knee_shares"]["b58"])
+    del record
+    tau = kept["b58"]["tau_s"]
+    rk = [f"{r:g}" for r in kept["ratios"]]
+    H = {r: kept["b58"]["by"][r]["H_s"] for r in rk}
+    dt = kept["dt"]
+    roads = kept["n_roads"]
+    if len(set(kept["steps"])) != 1:
+        raise Refused(f"roads.json episode_steps.measured {kept['steps']} is not one value")
+    steps = kept["steps"][0]
+
+    spec = importlib.util.find_spec("stable_baselines3")
+    if spec is None or not spec.submodule_search_locations:
+        raise Refused("stable_baselines3 is not installed in this interpreter")
+    sb3 = list(spec.submodule_search_locations)[0]
+    with open(os.path.join(sb3, "sac", "sac.py"), encoding="utf-8") as fh:
+        sac_tree = ast.parse(fh.read())
+    with open(os.path.join(sb3, "version.txt"), encoding="utf-8") as fh:
+        sb3_version = fh.read().strip()
+    gamma = None
+    for node in ast.walk(sac_tree):
+        if isinstance(node, ast.ClassDef) and node.name == "SAC":
+            for f in node.body:
+                if isinstance(f, ast.FunctionDef) and f.name == "__init__":
+                    names = [a.arg for a in f.args.args]
+                    defaults = dict(zip(names[len(names) - len(f.args.defaults):], f.args.defaults))
+                    if "gamma" in defaults:
+                        gamma = (ast.literal_eval(defaults["gamma"]), defaults["gamma"].lineno)
+    if gamma is None:
+        raise Refused("stable_baselines3/sac/sac.py: no default gamma in SAC.__init__")
+    sac_calls = [node for node in ast.walk(ast.parse(text("train.py")))
+                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "SAC"]
+    if len(sac_calls) != 1:
+        raise Refused(f"train.py: {len(sac_calls)} calls of SAC(...), not one")
+    sac_kw = [k.arg for k in sac_calls[0].keywords]
+
+    hw = consts("results/B58H_DESIGN/hw_opt/hw_opt.py.txt", ("FRACS", "DELTAS", "DELAYS", "RATIOS"),
+                count_only=("FRACS", "DELTAS", "DELAYS", "RATIOS"))
+    fam = {}
+    with open(path("results/B58H_DESIGN/hw_opt/runs.jsonl"), encoding="utf-8") as fh:
+        for line in fh:
+            if line.strip():
+                s = json.loads(line)["spec"]
+                fam[s["fam"]] = fam.get(s["fam"], 0) + 1
+    cr = text("results/B58H_DESIGN/hw_opt/control_record.txt").splitlines()
+    cr_pass = [i for i, x in enumerate(cr, 1) if x.startswith("CONTROL:") and x.endswith("-> PASS")]
+    cr_sha = [(i, re.search(r"'plant_sha': '([0-9a-f]{16})'", x)) for i, x in enumerate(cr, 1)]
+    cr_sha = [(i, m.group(1)) for i, m in cr_sha if m]
+    if len(cr_pass) != 1 or len(cr_sha) != 1:
+        raise Refused("hw_opt/control_record.txt: not exactly one PASS line and one plant_sha")
+    b1_shas = sorted({c["plant"]["plant_sha"] for c in b1["concurrency"]})
+
+    # ------------------------------------------------------------ 0. what was read
+    p("d148_figures.py: D148's figures, each beside its inputs (rows 148-153 and section S's note, ORDER steps")
+    p("  18a-22b, INTERFACES section 18, the schedule of 14 November), with B1's rate in place of step 3's")
+    p("  times AST (UTC+3), to the minute, seconds dropped; '+h:mm' is the margin to W's end, '-' after it")
+    p("")
+    p("1. INPUTS")
+    p(f"  B1's rate (MEASURED): results/benchmarks/B1_bench_b58.attempt1.json recommendation.best.cpu: lower_min "
+      f"{float(rate)} steps/s in all at {N} runs at once")
+    p(f"    B1 ran {b1['date']} on Jad's PC from git_head {b1['code']['git_head']} (git_dirty "
+      f"{b1['code']['git_dirty']}); its plant_sha {', '.join(b1_shas)}")
+    for c in rows12:
+        p(f"    repeat {c['repeat'] + 1} at {N}: lower {c['lower_steps_per_s']}, upper {c['upper_steps_per_s']} "
+          f"steps/s; loaded {c['loaded']} ({c['background_cpu_pct']} % CPU before it)")
+    lows = [Fraction(str(c["lower_steps_per_s"])) for c in rows12]
+    p(f"    the lowest lower bound over the repeats equals lower_min: {min(lows) == rate}; it is repeat "
+      f"{[c['repeat'] + 1 for c in rows12 if Fraction(str(c['lower_steps_per_s'])) == rate]}'s")
+    p(f"  step 3's rate, SUPERSEDED by B1's: results/benchmarks/step3_2026-11-02/A5_bench_merged.json "
+      f"recommendation.best.cpu: lower_min {float(rate3)} steps/s at {s3['runs']} runs at once")
+    p(f"  a production run: {PROD} steps (benchmark_training.py:{bt['PROD_STEPS'][1]} PROD_STEPS); arms {ARMS} "
+      f"(ARMS); n {n} seeds per arm (epa_backend.B58H_N, row 147 (4)); ENGINES {ENGINES} (the same line)")
+    p(f"    the arms are the blinded one and one sighted arm at each of roads.json's ratios {rk}: "
+      f"{ARMS == 1 + len(rk)}")
+    p(f"  W's end: epa_backend.W_LAST {eb['W_LAST'][0]} (row 134 (1))")
+    p(f"  the team's end after W: {TEAM_AFTER_W_H} h ({TEAM_AFTER_W_SRC})")
+    p(f"  a closed-loop run on the laptop: median {float(RUN_S)} s a run (results/EPA_ROADS/timing.txt:2), measured "
+      f"{m1.group(1)} at once at {JOBS} jobs (timing.txt:1)")
+    p(f"    so N runs take N x {float(RUN_S)}/{JOBS} s (ASSUMED: runs pack {JOBS} at once; measured on hand-written "
+      f"policies, ASSUMED equal for agents)")
+    p(f"  roads.json: {roads} roads (ceilings.n_roads); ratios {rk}; dt {dt} s (ceilings.dt); an episode of {steps} "
+      f"steps (episode_steps.measured)")
+    p(f"    tau {tau:.4f} s (ceilings.per_engine.b58.tau_s); H " +
+      ", ".join(f"{H[r]:.4f} s at r = {r}" for r in rk) + " (by[r].H_s)")
+    p(f"  stable-baselines3 {sb3_version} (installed; version.txt): SAC's default gamma {gamma[0]} "
+      f"(stable_baselines3/sac/sac.py:{gamma[1]})")
+    p(f"    train.py's one SAC(...) call (train.py:{sac_calls[0].lineno}) passes {sac_kw}: gamma among them "
+      f"{'gamma' in sac_kw}")
+    p(f"  engine_env.py: ACT_LO {ee['ACT_LO'][0]} (:{ee['ACT_LO'][1]}), ACT_HI {ee['ACT_HI'][0]} "
+      f"(:{ee['ACT_HI'][1]}), SLEW {ee['SLEW'][0]} (:{ee['SLEW'][1]}); index 1 is the lambda trim")
+    p(f"    SPARK_TRIM_MAX {ee['SPARK_TRIM_MAX'][0]} (:{ee['SPARK_TRIM_MAX'][1]}); PREVIEW_DIVISORS "
+      f"{ee['PREVIEW_DIVISORS'][0]} (:{ee['PREVIEW_DIVISORS'][1]}); EXTREME_C_TURB {ee['EXTREME_C_TURB'][0]} "
+      f"(:{ee['EXTREME_C_TURB'][1]})")
+    p(f"  training_recipe.py: DECISION_29_WINDOW {WINDOW} (:{tr['DECISION_29_WINDOW'][1]}), AVERAGE_SNAPSHOTS "
+      f"{SNAPS} (:{tr['AVERAGE_SNAPSHOTS'][1]}), snapshot_steps (:{ss_line}), LastThird (:{lt_line})")
+    p(f"  train.py: CHUNK {CHUNK} (:{chunk_line}), the checkpoint interval")
+    p(f"  evaluate.py: HAND_POLICIES, {HAND} of them (:{ev['HAND_POLICIES'][1]}), each once per road in a scoring; "
+      f"N_PRACTICE {N_PRACTICE} (:{ev['N_PRACTICE'][1]})")
+    p("  step times, ASSUMED as results/B58H_DESIGN/budget.txt prints them (low, high):")
+    for label, why in (("D146", "D148's, as D146's line"), ("Ta", "Tc's, as Ta's line"), ("B1 (Jad's PC)", "B1's"),
+                       ("Tb", "Tb's"), ("AB (analysis code)", "AB's, off the route now (row 149)"),
+                       ("PR-B", "PR-B's"), ("PL-B: one wave + 1-2 h", "PL-B's, at step 3's rate; not made now")):
+        lo, hi, i = bl[label]
+        p(f"    budget.txt:{i} {label}: {float(lo):.2f}-{float(hi):.2f} h ({why})")
+    p(f"  (a) transfer, reading, primary scoring: {float(SCORE20)} h (results/B58H_DESIGN/budget.py.txt "
+      f"SCORE20, line {bp['SCORE20'][1]}; ASSUMED there; row 146 (7))")
+    p(f"  (b) the analysis: {float(ANALYSIS_H)} h ({ANALYSIS_SRC})")
+    p(f"  decision 12's rows (row 147 (11)): at least {float(D12_H)} h (budget.txt:{d12_line}: conditions_test "
+      f"by its docstring, ASSUMED; the rest UNKNOWN)")
+    p(f"  the start of the forecast: {tm(START)} AST ({START_SRC})")
+    p("")
+
+    # ------------------------------------------------------------ 2. the training
+    per_run = rate / N
+    wave = Fraction(PROD) / per_run
+    runs_tr = ARMS * n
+    waves = math.ceil(runs_tr / N)
+    train_s = waves * wave
+    per_run3 = rate3 / N
+    wave3 = Fraction(PROD) / per_run3
+    train3_s = waves * wave3
+    p("2. THE TRAINING AT B1's RATE (row 147 (3); the schedule)")
+    p(f"  per run at {N} at once: {float(rate)}/{N} = {float(per_run):.4f} steps/s")
+    p(f"  one wave: {PROD} steps / {float(per_run):.4f} steps/s = {float(wave):.1f} s = {h(wave / 3600)} "
+      f"= {float(wave) / 86400:.2f} days")
+    p(f"  {ARMS} arms x {n} seeds = {runs_tr} runs in waves of {N}: {waves} waves, {N * waves - runs_tr} slots idle "
+      f"in the last")
+    p(f"  the training: {waves} x {float(wave):.1f} s = {float(train_s):.1f} s = {h(train_s / 3600)} "
+      f"= {float(train_s) / 86400:.2f} days")
+    p(f"  benchmark_training.py's 'x {ENGINES} engines' line: {float(train_s) / 86400:.2f} days x ENGINES {ENGINES} = "
+      f"{ENGINES * float(train_s) / 86400:.2f} days; the B58 study trains one engine, so its training is "
+      f"{float(train_s) / 86400:.2f} days")
+    p(f"  SUPERSEDED, step 3's rate {float(rate3)}: per run {float(per_run3):.4f} steps/s, one wave "
+      f"{h(wave3 / 3600)}, the training {h(train3_s / 3600)}")
+    p(f"  B1's training is {h((train3_s - train_s) / 3600)} shorter than step 3's")
+    p(f"  a sixth wave (a crash or a restart re-trains a run from step 0): up to {h(wave / 3600)} more, "
+      f"{h((train_s + wave) / 3600)} in all")
+    p("")
+
+    # ------------------------------------------------------------ 3. CK
+    ck_runs = CK_SEEDS * CK_ARMS
+    ck_waves = math.ceil(ck_runs / N)
+    ck_s = ck_waves * Fraction(WINDOW) / per_run
+    ck3_s = ck_waves * Fraction(WINDOW) / per_run3
+    p("3. THE CHECK RUN, CK (row 148)")
+    p(f"  its length: --steps {WINDOW}, training_recipe.DECISION_29_WINDOW, the shortest run --recipe29 accepts")
+    p(f"  {PROD} / {WINDOW} = {Fraction(PROD, WINDOW)}: CK runs 1/{Fraction(PROD, WINDOW)} of a training run's steps")
+    p(f"  {ck_runs} runs ({CK_SRC}): {ck_waves} wave at {N} at once")
+    p(f"  CK: {WINDOW} steps / {float(per_run):.4f} steps/s = {float(ck_s):.1f} s = {h(ck_s / 3600)} (ASSUMED: "
+      f"the per-run rate at {ck_runs} at once equals B1's at {N})")
+    p(f"  SUPERSEDED, at step 3's rate: {h(ck3_s / 3600)}")
+    p(f"  CK's snapshots: training_recipe.snapshot_steps({WINDOW}, {WINDOW}) = {snapshot_steps(WINDOW, WINDOW)}")
+    p(f"  the training's: snapshot_steps({PROD}, {WINDOW}) = {snapshot_steps(PROD, WINDOW)}")
+    for total, who in ((PROD, "the training"), (WINDOW, "CK")):
+        f = LastThird(1.0)
+        at = Fraction(2 * total, 3)
+        p(f"  {who}: LastThird(1.0) holds 1.0 until two thirds of the run, {float(at):.1f} steps "
+          f"({f(1.0 - float(at) / total):.4f} there), and gives {f(0.0)} at its end")
+    p("")
+
+    # ------------------------------------------------------------ 4. checkpoints
+    two3 = Fraction(2 * PROD, 3)
+    five6 = Fraction(5 * PROD, 6)
+    first = math.ceil(five6 / CHUNK) * CHUNK
+    p("4. THE SETTLING LABEL's THREE MODELS (row 150 (ii))")
+    p(f"  train.py saves a checkpoint every CHUNK = {CHUNK} steps")
+    p(f"  two thirds of {PROD}: {float(two3):.0f} steps, a multiple of {CHUNK}: {two3 % CHUNK == 0} -> "
+      f"ckpt_{int(two3)}_steps.zip")
+    p(f"  five sixths of {PROD}: {float(five6):.0f} steps, a multiple of {CHUNK}: {five6 % CHUNK == 0}; the first "
+      f"saved at or after it: {first} -> ckpt_{first}_steps.zip")
+    p(f"  final.zip at {PROD} steps; the scored average's snapshots fall at {snapshot_steps(PROD, WINDOW)[0]}-"
+      f"{snapshot_steps(PROD, WINDOW)[-1]} steps")
+    p("")
+
+    # ------------------------------------------------------------ 5. decision 10 (1) and (3)
+    lam_slew = Fraction(str(ee["SLEW"][0][1]))
+    lam_lo = Fraction(str(ee["ACT_LO"][0][1]))
+    g = Fraction(str(gamma[0]))
+    horizon_steps = 1 / (1 - g)
+    samples = {r: [int((H[r] / d) / dt) for d in ee["PREVIEW_DIVISORS"][0]] for r in rk}
+    last = samples[rk[-1]][-1]
+    p("5. DECISION 10 (1) AND (3)'s SENTENCES (section S's note)")
+    p(f"  the weights gamma^k, k = 0, 1, ..., sum to 1/(1 - gamma) = 1/(1 - {gamma[0]}) = {float(horizon_steps):.2f} "
+      f"steps = {float(horizon_steps) * dt:.2f} s at dt {dt} s")
+    p(f"  {float(horizon_steps) * dt:.2f} s / tau {tau:.4f} s = {float(horizon_steps) * dt / tau:.4f} tau")
+    p(f"  the r = {rk[-1]} preview's last sample is {last} steps ahead ({last * dt:.0f} s); gamma^{last} = "
+      f"{gamma[0] ** last:.4f}")
+    p(f"  the lambda trim moves at most SLEW[1] = {float(lam_slew)} a step ({float(lam_slew) / dt:.2f} per s), so "
+      f"it reaches ACT_LO[1] = {float(lam_lo)} from 0 in {float(-lam_lo / lam_slew):.2f} steps = "
+      f"{float(-lam_lo / lam_slew) * dt:.2f} s")
+    p(f"  {float(-lam_lo / lam_slew) * dt:.2f} s / tau {tau:.4f} s = {float(-lam_lo / lam_slew) * dt / tau:.4f} tau")
+    for r in rk:
+        p(f"  the preview's samples at r = {r} (H {H[r]:.4f} s; step int(H/divisor/dt), as engine_env._preview): "
+          f"{samples[r]} steps = {[x * dt for x in samples[r]]} s ahead")
+    nested = set(samples[rk[0]]) <= set(samples[rk[-1]])
+    p(f"  the r = {rk[0]} samples are a subset of the r = {rk[-1]} samples: {nested}")
+    p("")
+
+    # ------------------------------------------------------------ 6. the knee and the records
+    kn = kept["knee"]
+    worst = max(s["turb_peak_minus_knee_k"] for s in kn["slots"])
+    knee_c = kn["turb_knee_k"] - 273.15
+    p("6. ROW 151 (3) AND (6)")
+    p(f"  roads.json report.knee_shares.b58: turb_knee_k {kn['turb_knee_k']} K = {knee_c:.2f} C; share_turb "
+      f"{kn['share_turb']} over {len(kn['slots'])} slots; the largest slots[].turb_peak_minus_knee_k {worst:.2f} K")
+    p(f"  the baseline's highest climb-slot housing peak: {kn['turb_knee_k']} {worst:+.2f} - 273.15 = "
+      f"{kn['turb_knee_k'] + worst - 273.15:.2f} C")
+    files = 1 + runs_tr
+    arrays = None
+    tree = ast.parse(text("evaluate.py"))
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef) and node.name == "write_records":
+            for sub in ast.walk(node):
+                if isinstance(sub, ast.comprehension) and isinstance(sub.iter, ast.Tuple):
+                    arrays = (ast.literal_eval(sub.iter), node.lineno)
+    if arrays is None:
+        raise Refused("evaluate.py: write_records names no tuple of arrays")
+    size = files * roads * steps * len(arrays[0]) * BYTES_FLOAT64
+    p(f"  the records (evaluate.write_records, evaluate.py:{arrays[1]}): {files} files (the baseline ECU's and "
+      f"{runs_tr} agents'), each {len(arrays[0])} float64 arrays {arrays[0]} of {roads} roads x {steps} steps")
+    p(f"  {files} x {roads} x {steps} x {len(arrays[0])} x {BYTES_FLOAT64} bytes = {size} bytes = "
+      f"{size / 1e6:.1f} MB ({size / 2 ** 20:.1f} MiB), before each file's small overhead")
+    p("")
+
+    # ------------------------------------------------------------ 7. run counts
+    def rh(runs):
+        return Fraction(runs) * RUN_S / JOBS / 3600
+
+    agents = runs_tr
+    sighted = n * (ARMS - 1)
+    primary = (HAND + agents) * roads
+    practice = (HAND + PRACTICE_SEEDS * PRACTICE_ARMS) * N_PRACTICE
+    cg_runs = roads
+    flat = sighted * roads
+    flat_ctl = SEED0_AGENTS * roads
+    road0 = agents + 2
+    settle = agents * CHECKPOINTS_150 * N_PRACTICE + N_PRACTICE
+    variant = (HAND + agents) * roads
+    v_ctl = (SEED0_AGENTS + 1) * roads
+    cturb = 2 * variant + v_ctl
+    anchors = ANCHOR_POLICIES * roads * 2
+    opt_lo = sum(x[1] for x in OPT_RUNS)
+    opt_hi = sum(x[2] for x in OPT_RUNS)
+    p(f"7. RUN COUNTS AND THEIR HOURS ON THE LAPTOP (N x {float(RUN_S)}/{JOBS} s)")
+    p(f"  the primary scoring (row 149 (5)(a)): ({HAND} hand-written + {agents} agents) x {roads} roads = {primary} "
+      f"runs, {h(rh(primary))}")
+    p(f"  row 150 (i): current-grade x {roads} roads = {cg_runs} runs, {h(rh(cg_runs))}")
+    p(f"  row 148 (4)'s practice spread: ({HAND} hand-written + {PRACTICE_SEEDS} seeds x {PRACTICE_ARMS} arms) x "
+      f"{N_PRACTICE} practice roads = {practice} runs, {h(rh(practice))} (DEFINED by row 148 (4): seeds 0-4, "
+      f"blinded and sighted at r = 1.5)")
+    p(f"  row 150 (iii): {sighted} sighted agents ({n} seeds x {ARMS - 1} sighted arms) x {roads} roads = {flat} runs"
+      f", + seed 0's {SEED0_AGENTS} agents x {roads} roads = {flat_ctl} control runs: {flat + flat_ctl} runs, "
+      f"{h(rh(flat + flat_ctl))}")
+    p(f"  row 150 (iv): ({agents} agents + current-grade + the baseline ECU) on road 0 = {road0} runs, "
+      f"{h(rh(road0))}")
+    p(f"  row 150 (ii): {agents} agents x {CHECKPOINTS_150} models x {N_PRACTICE} practice roads + the baseline ECU "
+      f"x {N_PRACTICE} = {settle} runs, {h(rh(settle))}")
+    p(f"  row 152: per variant ({HAND} hand-written + {agents} agents) x {roads} roads = {variant} runs; controls at "
+      f"1.0 (seed 0's {SEED0_AGENTS} agents + the baseline ECU) x {roads} = {v_ctl}; 2 x {variant} + {v_ctl} = "
+      f"{cturb} runs, {h(rh(cturb))}")
+    old4 = 4 * variant
+    p(f"    row 147 (10)'s four variants of {variant} runs: {old4} runs, {h(rh(old4))} at the same rate; row 152 is "
+      f"{float(rh(cturb) / rh(old4)):.2f} of it")
+    p(f"  row 152 (5)'s anchors: {ANCHOR_POLICIES} policies x {roads} roads x 2 variants = {anchors} runs, "
+      f"{h(rh(anchors))}")
+    p(f"  row 153 (2): " + " + ".join(f"{lo}" if lo == hi else f"{lo}-{hi}" for _, lo, hi in OPT_RUNS) +
+      f" = {opt_lo}-{opt_hi} runs, {hr(rh(opt_lo), rh(opt_hi))} (the counts ASSUMED by the row: " +
+      ", ".join(x[0] for x in OPT_RUNS) + ")")
+    p(f"  during training, on the laptop: {anchors} + {opt_lo}-{opt_hi} = {anchors + opt_lo}-{anchors + opt_hi} "
+      f"runs, {hr(rh(anchors + opt_lo), rh(anchors + opt_hi))}")
+    p("")
+
+    # ------------------------------------------------------------ 8. after training
+    items = [("a", "transfer, reading, primary scoring", SCORE20),
+             ("b", "the analysis", ANALYSIS_H),
+             ("c", f"decision 12's rows ({float(D12_H)} h at least), + {cg_runs} + {practice} runs",
+              D12_H + rh(cg_runs + practice)),
+             ("d", f"rows 150 (iii) and (iv): {flat + flat_ctl} + {road0} runs", rh(flat + flat_ctl + road0)),
+             ("e", f"row 150 (ii): {settle} runs", rh(settle)),
+             ("f", f"row 152: {cturb} runs", rh(cturb))]
+    after = sum(x[2] for x in items)
+    p("8. AFTER TRAINING, ON THE LAPTOP (row 149 (5)'s order (a)-(f))")
+    for k, what, hours in items:
+        p(f"  ({k}) {what}: {h(hours)}")
+    p(f"  (a)-(f): {h(after)}")
+    p("")
+
+    # ------------------------------------------------------------ 9. the route
+    D148, TC, B1, TB, AB, PRB, PLB = (bl[k] for k in need)
+    ck_h = ck_s / 3600
+    lo_after = D148[0] + TC[0] + TB[0] + PRB[0] + ck_h
+    hi_after = D148[1] + TC[1] + TB[1] + PRB[1] + ck_h
+    old_lo = B1[0] + TB[0] + AB[0] + PRB[0] + PLB[0]
+    old_hi = B1[1] + TB[1] + AB[1] + PRB[1] + PLB[1]
+    p("9. THE ROUTE TO TRAINING (rows 148 (6), 149 (1); INTERFACES 18's 0.2)")
+    p(f"  after B1's pull: D148 {float(D148[0])}-{float(D148[1])} + Tc {float(TC[0])}-{float(TC[1])} + Tb "
+      f"{float(TB[0])} + PR-B {float(PRB[0])}-{float(PRB[1])} + CK {float(ck_h):.2f} = {hr(lo_after, hi_after)}")
+    p(f"  from B1's start: B1 {float(B1[0])}-{float(B1[1])} + the above = {hr(B1[0] + lo_after, B1[1] + hi_after)}")
+    p(f"  the old route from B1's start (budget.txt:{B1[2]}-{PLB[2]}: B1, Tb, AB, PR-B, PL-B at step 3's rate): "
+      f"{hr(old_lo, old_hi)}")
+    p(f"  the new route is {h(old_hi - B1[1] - hi_after)} shorter at the high end and {h(old_lo - B1[0] - lo_after)} "
+      f"at the low end (AB and PL-B leave it; D148, Tc and CK join it)")
+    code_lo = sum(x[2] for x in CODE_H)
+    code_hi = sum(x[3] for x in CODE_H)
+    p(f"  the code written during training ({CODE_SRC}):")
+    for k, what, lo, hi in CODE_H:
+        p(f"    {k:<2} {what}: {lo}-{hi} h")
+    p(f"    in all {code_lo}-{code_hi} h, against the training's {h(train_s / 3600)}")
+    p("")
+
+    # ------------------------------------------------------------ 10. the forecast
+    def at(t0, hours):
+        return t0 + timedelta(seconds=float(hours * 3600))
+
+    def margin(t):
+        return hm((W_end - t).total_seconds())
+
+    p(f"10. THE FORECAST FROM {tm(START)} AST, HIGH ESTIMATES (low ones after it)")
+    t = START
+    for label, hours in (("D148", D148[1]), ("Tc", TC[1]), ("Tb", TB[1]), ("PR-B (T*)", PRB[1]), ("CK", ck_h)):
+        t = at(t, hours)
+        p(f"  {label} ends ({h(hours)}): {tm(t)}")
+    t_start = t
+    t_end = at(t_start, train_s / 3600)
+    p(f"  the training starts {tm(t_start)} and ends {tm(t_end)} ({margin(t_end)})")
+    t = t_end
+    ends = {}
+    for k, what, hours in items:
+        t = at(t, hours)
+        ends[k] = t
+        p(f"  ({k}) ends {tm(t)} ({margin(t)})")
+    cutoff = W_end + timedelta(hours=TEAM_AFTER_W_H)
+    p(f"  the cut-off on starting (d)-(f), row 149 (5): W's end + {TEAM_AFTER_W_H} h = {cutoff.strftime('%d %b %Y %H:%M')}"
+      f" AST; (d), (e) and (f) start by it: {all(s <= cutoff for s in (ends['c'], ends['d'], ends['e']))}")
+    t6 = at(t_start, (train_s + wave) / 3600)
+    p(f"  with a sixth wave: the training ends {tm(t6)} ({margin(t6)}), (a) ends {tm(at(t6, SCORE20))} "
+      f"({margin(at(t6, SCORE20))})")
+    lo_start = at(START, lo_after)
+    p(f"  low estimates (D148 {float(D148[0])}, Tc {float(TC[0])}, PR-B {float(PRB[0])} h): the training starts "
+      f"{tm(lo_start)} and ends {tm(at(lo_start, train_s / 3600))}; (a) ends "
+      f"{tm(at(lo_start, train_s / 3600 + SCORE20))}")
+    p("")
+
+    # ------------------------------------------------------------ 11. latest starts
+    p("11. LATEST STARTS (W's end minus the time after; D148's latest start also minus the high route after B1's"
+      " pull)")
+    lat_train = W_end - timedelta(seconds=float(train_s))
+    p(f"  the training to end inside W: start it by {tm(lat_train)}; D148 by {tm(at(lat_train, -hi_after))}")
+    cum = Fraction(0)
+    slack_line = None
+    for k, what, hours in items:
+        cum += hours
+        lt = W_end - timedelta(seconds=float(train_s + cum * 3600))
+        p(f"  ({k}) to end inside W: the training by {tm(lt)}; D148 by {tm(at(lt, -hi_after))}")
+        if k == "a":
+            slack_line = lt
+    p(f"  the slack of the forecast's training start {tm(t_start)} against the latest start with (a) inside W "
+      f"{tm(slack_line)}: {hm((slack_line - t_start).total_seconds())}")
+    cum_e = sum(x[2] for x in items[:5])
+    lt_cut = cutoff - timedelta(seconds=float(train_s + cum_e * 3600))
+    p(f"  every item starts before the cut-off if the training starts by {tm(lt_cut)}, D148 by "
+      f"{tm(at(lt_cut, -hi_after))}")
+    lat3_train = W_end - timedelta(seconds=float(train3_s))
+    lat3_a = W_end - timedelta(seconds=float(train3_s + SCORE20 * 3600))
+    p(f"  SUPERSEDED, at step 3's rate: the training by {tm(lat3_train)}; with (a) inside W by {tm(lat3_a)}")
+    p("")
+
+    # ------------------------------------------------------------ 12. hw_opt
+    settings = 2 + hw["RATIOS"][0] * hw["FRACS"][0] * hw["DELTAS"][0] + hw["DELAYS"][0] * hw["DELTAS"][0]
+    nruns = sum(fam.values())
+    p("12. ROW 153 (1)'s RECORD (results/B58H_DESIGN/hw_opt/)")
+    p(f"  settings: current-grade and the baseline ECU, 2; sighted, {hw['RATIOS'][0]} ratios x {hw['FRACS'][0]} leads "
+      f"x {hw['DELTAS'][0]} depths = {hw['RATIOS'][0] * hw['FRACS'][0] * hw['DELTAS'][0]} ({hw['FRACS'][0] * hw['DELTAS'][0]} "
+      f"at each r); blind, {hw['DELAYS'][0]} "
+      f"delays x {hw['DELTAS'][0]} depths = {hw['DELAYS'][0] * hw['DELTAS'][0]}; in all {settings} (hw_opt.py.txt's "
+      f"FRACS, DELTAS, DELAYS, RATIOS)")
+    p(f"  {roads} roads x {settings} settings = {roads * settings} runs; runs.jsonl holds {nruns} records: "
+      + ", ".join(f"{k} {v}" for k, v in sorted(fam.items())))
+    p(f"  control_record.txt:{cr_pass[0]} prints PASS; its plant_sha (:{cr_sha[0][0]}) equals B1's: "
+      f"{[cr_sha[0][1]] == b1_shas}")
+    return out
+
+
+def checked(lines):
+    """The output as text, refused unless every line is ASCII, holds no run of 12 or more digits, no 40- or
+    64-character hex value and no guarded field's name."""
+    for i, line in enumerate(lines, 1):
+        if not line.isascii():
+            raise Refused(f"output line {i} is not ASCII")
+        if DIGITS.search(line):
+            raise Refused(f"output line {i} holds a run of 12 or more digits")
+        if HEX.search(line):
+            raise Refused(f"output line {i} holds a 40- or 64-character hex value")
+        if any(w in line for w in GUARDED):
+            raise Refused(f"output line {i} names a guarded field of roads.json")
+    return "".join(line + "\n" for line in lines)
+
+
+def main():
+    try:
+        out = checked(build())
+    except (Refused, OSError, KeyError, IndexError, TypeError, ValueError, AttributeError, ZeroDivisionError,
+            SyntaxError) as e:
+        sys.stderr.write(f"REFUSED: d148_figures.py: {type(e).__name__}: {e}\n")
+        return 2
+    sys.stdout.buffer.write(out.encode("ascii"))
+    sys.stdout.buffer.flush()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
