@@ -1911,6 +1911,48 @@ under Ghassan's standing approval). From now on the agent only reads, about once
 the launch logs, the process list). At B1 the agent ran the sheet too, at Ghassan's request then. The agent's copies
 of the blocks and its scripts are asked for, to be compared with the sheet before Step 8 runs.
 
+**15 November 2026, `864aa5a`** (the agent's answers; section 14 step 2's gate, after the commit and before its push,
+as its message gives it): the cost-file list 51 paths and no line printed STOP; "cost files unchanged since B1: exit
+0"; `epa_backend.py check` printed `[]`; `test_four_engine_analysis`: "Ran 50 tests", "OK"; `test_engine_threading`,
+alone: "Ran 33 tests", "OK (skipped=6)"; `test_epa_backend.PreregistrationB58H`: "Ran 6 tests", "OK";
+`verify_docs.py`: "All 170 checks pass (1172 figure mentions scanned in the documents)."; "ABOVE SECTION 15: UNCHANGED
+SINCE T*". Pushed the same day, `59cb6f6..864aa5a`.
+
+**15 November 2026, the agent's folder** (`visit2_claude_for_ghassan.zip`, sha256 beginning `ab7611ee`, as Jad's
+message gave it; a copy of `C:\Users\admin\grad_device\visit2_claude\` taken at 20:47:49, with the agent's watcher and
+a `MANIFEST.txt`). On this laptop, unpacked outside the repository and run nowhere: the 19 sha256 lines of its
+`MANIFEST.txt` verify; its copy of the sheet is byte-identical to the sheet sent; its `blocks/01.sh` to `12.sh` are
+byte-identical, in order, to the sheet's 12 bash blocks, of which the driver runs 01 to 11 (12 is the stale-lock
+step). The window's log (`window.log`, the driver's `tee`) holds the guard's output, so the line above that called
+`RUN COMMIT: OK` screen-only is superseded: Step 1 printed the fetch (`891e29a..47e5854`), "MATCH: T* read from git"
+and 146G free; the guard printed `true`, "HEAD is now at 720587d", nothing from `git status --porcelain`, `T*`'s sha
+and "RUN COMMIT: OK" (18:27:49). It also holds the environment record before CK (section 11's first record, 18:27:49):
+"VERSIONS: match the lock"; Python 3.13.2 [MSC v.1942 64 bit]; build 26300.9974 (26H2); updates KB5054156, KB5121794,
+KB5127694, KB5132061 and KB5132688; driver NVIDIA GeForce RTX 5070, 621.24; the sha256 of pip freeze beginning
+298e94bf; the update pause ending 2026-11-28T16:52:09Z. The build, the two November updates, the driver and the pause
+are B1's. The agent's `README.txt` adds: before Step 1, another Claude Code session's work ran on the PC ("SENAD":
+`factory_sim live`, about 9 of 12 threads, from 18:24; `serve_final.py`; a headless Chrome), stopped at 18:26 with
+Jad's yes, before Step 1 (18:27:35); Discord was closed by force; the NVIDIA app's auto-update setting was not found,
+so "off" rests on Jad's word; the training's window was created through WMI, not as a child of Antigravity. The
+watcher writes nothing: it reads `status.txt` and the launch logs every minute, the process list every 5 minutes
+(`tasklist`) and every 10 minutes (`Get-CimInstance`).
+
+**15 November 2026, the driver's review** (three reviewers and their skeptics, reading only). The driver reaches Step
+8 exactly when the sheet would (`train_all.py:335-340` at `T*` prints "every run finished" only when no run failed);
+nothing it or the watcher does moves the launch log's time, so the end time is the same; its Step 8 runs the sheet's
+three blocks in the sheet's order, as Jad would. Found, none changing a result: (i) Step 8 stops only on a `tar.exe:`
+line, so an error in its first block (the end time, `SHA256SUMS`) would not stop the zip; (ii) bash reads the driver,
+and `source` the blocks, only when it reaches them, so any edit to `visit2_driver.sh` or `blocks/09.sh` to `11.sh`
+before the end would change Step 8; (iii) after STOPPED or ALL DONE the window has lost the sheet's variables, so any
+further step starts in a new window; (iv) a restart kills the watcher with the training, and the photographs stay the
+only check; (v) `window.log` is outside the return's zip. So, asked of the agent: edit none of those files; check
+their sha256 against `MANIFEST.txt`, reading only, before 18 November 17:00; after ALL DONE and before the return is
+sent, check that `window.log` from Step 8 on holds no error line, that `SHA256SUMS` has one line per file of
+`runs/b58h_check_dt1` and `runs/b58h_dt1`, and that `training_end.txt` is not empty; send `visit2_claude\` again
+beside the return. A gap of section 14 itself, found by the same review: a run killed after `train.py` writes
+`final.zip` but before its manifest is written would count as finished in a later session (`train_all.py:115`); at the
+return, every run's `config.json` is checked for `learning_rate_at_end` and its manifest before the scoring.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

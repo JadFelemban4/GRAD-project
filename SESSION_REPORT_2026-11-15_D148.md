@@ -747,7 +747,16 @@ the launch logs, the process list). At B1 the agent ran the sheet too, at Ghassa
 of the blocks and its scripts are asked for, to be compared with the sheet before Step 8 runs. Pushed: `59cb6f6` (CK's
 record, `47e5854..59cb6f6`).
 
-**Open.** The agent's copies of the blocks and its scripts, to compare with the sheet; the environment record before
-CK (`env_before_ck.txt`, in the return; the sheet's Step 3 stops unless `check_training_device.py` prints
-`VERSIONS: match the lock`); the guard's `RUN COMMIT: OK`, printed to the screen only; how the return comes back. Next
-on this laptop: AB (ORDER step 22a) and the routes (step 22b).
+**The agent's folder, and its review** (PR-B section 15). Its copy of the sheet and its 12 blocks are byte-identical
+to the sheet's; its window's log holds the guard's "RUN COMMIT: OK" and the environment record before CK, whose build,
+November updates, driver and pause are B1's. Three reviewers read the driver and the watcher and found nothing that
+changes a result; their five points became five requests to the agent (no edit of the driver or Step 8's blocks; a
+read-only sha256 check against its manifest before 18 November 17:00; a read-only check of Step 8's output before the
+return is sent; nothing typed in the window after it stops; its folder sent again beside the return). Before Step 1
+another Claude Code session's work ("SENAD", about 9 of 12 threads) had run on the PC from 18:24 and was stopped at
+18:26; its sessions could not be told, so it may start again, which the watcher reports.
+
+**Open.** The agent's checks before the return is sent; the environment record after the training (section 11's
+comparison); how the return comes back; at the return, every run's `meta.json` (`git_head` `T*`, `git_dirty` false)
+and `config.json` (`learning_rate_at_end`, the manifest). Next on this laptop: AB (ORDER step 22a) and the routes
+(step 22b).
