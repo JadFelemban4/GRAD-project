@@ -13,7 +13,8 @@ study's training ends" by the visit's checkout of `T*` in that clone (ORDER step
 |---|---|---|
 | `891e29a` | 18, B1 | Jad's: the B58's benchmark on his PC, with B2, B4 and L8; 26 result files and nothing else, pushed from his PC on 14 November (his report, section 2) |
 | `c5890f2` | D148 | section S of `results/VALIDATION_DECISIONS.md` (rows 148-153); ORDER's edits; INTERFACES section 18; in `results/B58H_DESIGN/`, `d148_figures`, `grids_b58` and `hw_opt/`; CHECKPOINT, `STATE_HISTORY.md` part AQ, this report and Jad's; section 23 of the 31 October report, pointing here |
-| Tc's | 18a, Tc | `epa_backend.py`'s check-run line (row 148 (5)) and its test; section 1's table, sections 10 and 11; ORDER step 18a; CHECKPOINT, `STATE_HISTORY.md` part AR |
+| `31dc7ad` | 18a, Tc | `epa_backend.py`'s check-run line (row 148 (5)) and its test; section 1's table, sections 10 and 11; ORDER step 18a; CHECKPOINT, `STATE_HISTORY.md` part AR |
+| Tb's | 19, Tb | `results/EPA_BACKEND.json`, written by `epa_backend.py write`: n null, in_test ['b58']; no drop line written; section 1's table and section 12; ORDER step 19 and the status line; CHECKPOINT, `STATE_HISTORY.md` part AS |
 
 B1 measured Ta's tree: its git_head is `0329456`, and its commit `891e29a` adds only results files on top of
 it. So "B1's git_head" is `0329456` and "B1's commit" is `891e29a`. Every gate that diffs the cost files reads
@@ -381,3 +382,103 @@ verbatim. They decide nothing new: Jad's column is no longer filled (row 133 (1)
   for the training alone (`:140-141`).
 - Points P1-P13: "No objections". Section S's note says Jad was not asked, which was true when D148 was written;
   PR-B records this answer beside it.
+
+## 12. 15 November: Tb, the backend record (ORDER step 19)
+
+Tb is ORDER step 19: rows 114, 135 and 136, applied mechanically. It writes one results file,
+`results/EPA_BACKEND.json`, by `epa_backend.py write`, and four documents (rule 1.10): this report (this section and
+section 1's table), ORDER step 19's row and the status line above ORDER's table, CHECKPOINT, and `STATE_HISTORY.md`
+part AS, which holds the CHECKPOINT lines it changed, verbatim. No `.py` file and no cost file changes. The record
+is one line of JSON, so a figure read from it names its key path, as `EPA_BACKEND.json` `<path>`.
+
+**The run.** On Tc's tree (`31dc7ad`, pushed), clean by `git status --porcelain`, with the record absent from the
+tree and from HEAD's history (`write`'s two refusals, `epa_backend.py:996`, `:998`):
+`PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -B epa_backend.py write`, on 15 November, exit 0. It printed
+one trace step, "end: no EPA engine is left, so the four-engine test does not run (row 136
+(1); MD:1611-1612)", then "n = None; in the test: ['b58']; total None s of W = 864000 s; slack None s", and the
+record's sha_text; Tb's commit message carries the print. The file is 6985 bytes (`wc -c`), one line, LF and
+ASCII, written through `epa_roads.write_once` (`epa_backend.py:1003`) and never edited.
+
+**What the record holds.**
+- Its keys: schema, rule, window, constants, protocol, drop_order, inputs, trace, engines, in_test, n,
+  seconds_at_n, total_s, slack_s, notes and provenance (the sheet's 12.5; the module docstring's THE RECORD).
+- `n` null and `in_test` ['b58']; `seconds_at_n`, `total_s` and `slack_s` null. `trace` holds one step: the B58
+  alone, n null, and the event above (`trace.0`).
+- `engines`: the B58 kept, on the 'cycle' backend (`engines.b58`). The Ford, the Honda and the Mazda are dropped,
+  backend null, each with Run 2's reason, "Run 2: results/EPA_VALIDATION/summary.json <its sha_text> (row 107 (1))"
+  (`engines.<engine>.reason`). No engine carries the schedule's reason, "rows 114 and 136: the schedule (n <before>
+  -> <after>)" (`epa_backend.schedule_reason`): Run 2's drops left `apply_rule` no schedule drop
+  (INTERFACES.md:957), so Tb writes no drop line (row 146 (3), (9); INTERFACES section 17's 10.2).
+- The rate it used is B1's, from the one attempt it read, `results/benchmarks/B1_bench_b58.attempt1.json`
+  (`inputs.benchmarks.b58.path`): git_head `0329456`, host `DESKTOP-VF1MO3H`, the CPU, torch 2.14.0+cpu, Python
+  3.13.2, 12 runs at once. The repeats' lower bounds are 107.46 and 110.77 steps/s
+  (`inputs.benchmarks.b58.lower_by_repeat`); lower_min is 107.46, so r_e = lower_min / 12 = 1791/200, 8.955 steps/s
+  per run (the same object's `lower_min`, `r_e`, `r_e_steps_per_s`). The attempt is steady, loaded (repeat 2's
+  flag), fits at 12, trains identically (1800 steps, 0 differences) and ran on a clean tree (its `steady`, `loaded`,
+  `fits`, `determinism`, `git_dirty`). These are B1's figures (section 2).
+- `inputs`: trainable_before ['b58']; fallback null; superseded and crashes empty; one B0 record,
+  `results/benchmarks/B0_0329456.json` (`inputs.b0`).
+- `protocol.PROTOCOL` is row 135's: the CPU, torch 2.14.0+cpu, Python 3.13.2, 12 runs, 3000 steps, 2 repeats, the
+  four-engine road at dt 1.0, the roads record with the share on, the reward without the knock term, and C1b's
+  commit `008f69f`; `CPU_PROTOCOL` is null. `window`: W = 864000 s, 10 November 00:00 to 20 November 00:00 AST
+  (row 134 (1)). `constants`: 3 arms, 450000 steps, n_min 20, seed limit 1000, the B58 never dropped.
+  `drop_order`: the Honda, the Mazda, the Ford (row 136 (1)).
+- `notes`, five: every engine on the exact cycle, with no table; summary.json's drop_order text is version 5's;
+  the attempts' own "x 4 engines" lines are not this schedule; "No EPA engine survives: Run 2 dropped every one
+  (inputs.summary) and the schedule dropped none, so the four-engine test does not run, and the failed
+  validations are reported as the results (row 136 (1); MD:1611-1612; INTERFACES 17's 10.2)" (`notes.3`); and
+  this null n is the four-engine test's, not the B58 study's n = 20, row 147 (4)'s (`notes.4`).
+- `provenance`: the commit, Tc's; the sha_text of `epa_backend.py` and its import closure, 32 files
+  (`provenance.code_sha_text`); and the versions, Python 3.13.2, NumPy 2.5.3, SciPy 1.18.1, Windows-11-10.0.26200-SP0.
+
+**The result: Run 2's failed validations.** B1's rate decides nothing here: with no EPA engine left, n is null
+whatever the B58's rate gives (row 136 (1)). The result is therefore Run 2's, recorded on 6 November in section Q
+of `results/VALIDATION_DECISIONS.md` (ORDER step 11), and not a failed schedule (row 146 (3), (9)). MD:1611-1612:
+"If no EPA engine survives, the four-engine test does not run, and the failed validations are reported as
+results." Section 7 dropped all three EPA engines by their own d rows (VD:558; VD:600-602):
+- the Mazda: E4b off and L1 off (`results/EPA_VALIDATION/summary.json:14`, `:17`; its drop rows, `:34-37`);
+- the Honda: L1 off and E8 off (`:157`, `:159`; `:174-177`);
+- the Ford: L1 off and E8 off (`:287`, `:289`; `:304-307`).
+L1 reads off on all three, and so does the 850 C level label (`:32`, `:172`, `:302`). Each row's statistic, label
+and kappa are section Q.1's table (VD:562-592); the drops and P1-P5 are Q.2's (VD:598-604). No collapse on H/tau,
+and no test of H/tau against H, is claimed or computed (VD:620).
+
+Row 136 (4) gives three disclosures that "the report of the failed schedule carries"; this report carries them
+for the failed validations:
+- Row 136 is contract version 6 for the order of leaving and the table route only: the Honda, the Mazda, the Ford
+  leave in that order, and no engine trains on a table (row 136 (1); `drop_order`). The order chose nothing: each
+  EPA engine was dropped by its own d rows before the schedule ran (VD:604).
+- Row 107 (6): only the Ford's tau separates H/tau from H, so with the Ford dropped no study here tests H/tau
+  against H (VD:444; VD:620).
+- The version-5 reading beside it: under version 5 the Ford would have left first, "and trained on its table had
+  it read validated (S1, S2a, S2b), and otherwise taken the remedies, then the exact cycle or the drop order"
+  (row 136's Disclosed sentence). That case does not arise: the Mazda is dropped under version 5 too, and the Honda's
+  and the Ford's records agree under both versions (VD:614-616), so no EPA engine survives under either
+  (VD:558).
+
+**What the record is for.**
+- It is the formal record that the four-engine test does not run (row 146 (3)). `engines.trainable()` reads it
+  beside Run 2's summary (`engines.py:1421`, `:1571-1587`) and gives ['b58'], its in_test, as `write` checked
+  before writing (`epa_backend.py:952-956`); its `engines.b58.backend`, 'cycle', is the `train_backend` the B58
+  study reads (INTERFACES.md:1463).
+- PR-B's gate runs `epa_backend.py check` on its staged tree and again at `T*`: the committed record against a
+  recomputation from the committed inputs, [] when they agree, with only `provenance.commit` and
+  `provenance.versions` ignored (`epa_backend.py:1030`, `:1033-1046`; row 146 (6); INTERFACES section 18's 14).
+  The record holds this module's own sha_text, which is why Tc landed before it (ORDER step 18a).
+- `T*`'s parent is Tb's commit (row 149 (1)), and `git diff --stat <Tb> <T*>` lists the preregistration, this
+  report, CHECKPOINT and `STATE_HISTORY.md` (INTERFACES section 18's 11).
+
+**Not done by Tb, and why.**
+- No drop line (above). No four-engine preregistration: `results/PREREGISTRATION_4E.md` is never written with n
+  null (row 136 (1); `test_epa_backend.Preregistration`).
+- No entry-point parser is built between `write` and the commit (ORDER step 19). `compute` refuses the work tree
+  from `write` to the commit, since the uncommitted record moves what it computes (`record_moving_paths`,
+  `epa_backend.py:786-807`), so no recomputation runs before the commit; `check` is the first, on the commit.
+- Section 8's item 5 (the laptop's B2 identity file; the `REFERENCES.md` corrections) was not done before Tb, so
+  by its own words it waits until after the last scoring.
+
+**After the commit**, by ORDER step 19's order: `epa_backend.py check`, `test_trainable` and
+`test_engine_threading` (alone), then the push. They run on the commit, after this section was written, so their
+printed lines are not in it. From the commit on, `test_epa_backend.LiveRecord` no longer skips: it requires the
+committed record to equal its recomputation (`test_epa_backend.py:1715-1718`). Before the commit it fails, and so does
+`test_epa_backend.Preregistration`, since the record is present and not committed (the same lines).

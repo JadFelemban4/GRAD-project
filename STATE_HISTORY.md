@@ -5443,3 +5443,25 @@ From "Next actions", item 10, as committed at `c5890f2`:
 From the header, as committed at `c5890f2`:
 
 Last verified: 2026-11-15 (on `GRA-test`, at B1 `891e29a`, pulled with `git pull --ff-only`, with this file rewritten for D148) — verify_docs.py: all 170 checks pass (D148's gate runs it again on its staged tree) · drift_test.py 18/18 (R3b's gate) · the app suites on P's tree: every failure one RV's own run had, the known `?v=` asset checks, the `pwsh` launcher tests and five provenance tests of app.test_results (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 17)
+
+# Part AS — lines rotated out of CHECKPOINT.md, 15 November 2026 (GRA-test: Tb)
+
+From "Next actions", item 8, its second line, as committed at `31dc7ad`:
+
+   Run 2 is done (5-6 November): **section 7 drops all three EPA engines**, so the four-engine test does not run.
+
+From "Next actions", item 8, its sixth line, as committed at `31dc7ad`:
+
+   Tc is done (step 18a, 15 November: `epa_backend.py`'s check-run line, row 148 (1)'s in place of the pilot's; `SESSION_REPORT_2026-11-15_D148.md`, section 10). Next, on this laptop: Tb (step 19: the backend record), then PR-B (step 20), whose own commit is `T*`, with Tb's commit its parent. Then ONE visit to Jad's PC from `T*`: CK (step 21) and, on its "CHECK RUN: OK", the training (step 22). On this laptop during training: CK's record, AB (step 22a) and the routes (step 22b). Then the scoring, in row 149 (5)'s order (a)-(f), with (d)-(f) run only if started by 23 November 2026 00:00 AST. Latest starts (`results/B58H_DESIGN/d148_figures.txt`): the training by 17 November 02:12 AST to end inside W (`:140`), and by 16 November 16:12 for the primary scoring to end inside W too (`:141`); step 3's 01:22 and 15:22 are superseded (`:149`).
+
+From the header, as committed at `31dc7ad`:
+
+Last verified: 2026-11-15 (on `GRA-test`, at D148 `c5890f2`, with Tc's tree: ORDER step 18a) — verify_docs.py: all 170 checks pass (Tc's gate; its commit message) · drift_test.py 18/18 (R3b's gate) · the app suites on P's tree: every failure one RV's own run had, the known `?v=` asset checks, the `pwsh` launcher tests and five provenance tests of app.test_results (`SESSION_REPORT_2026-10-31_build-step-2.md`, section 17)
+
+From "In progress", Ghassan's `GRA-test` item, as committed at `31dc7ad`:
+
+- Ghassan · `GRA-test` · build step 2 (decision 24): commits A, C, D, P, Qa, G, V, Q and Ta made, and B1 from Jad's PC (Run 1 frozen, 30 October;
+
+From "Next actions", item 13, as committed at `31dc7ad`:
+
+13. After the last scoring: `benchmark_training.py`'s "x 4 engines" line multiplies by `ENGINES = 4`, not by the engines that train (`results/B58H_DESIGN/d148_figures.txt:45`), so it is no schedule. The source corrections from the reading of 14 November (Heywood 2018's pages, Chen & Flynn 1965, Landerl 2015, the MY23 eBrochure, the car's non-stock tyres) go into `engine_specs/b58.toml`, `engine_specs/a90_supra.toml` and `REFERENCES.md`, with verify_docs.py's retirements of Heywood's old figures. `REFERENCES.md` and verify_docs.py are no cost files and are hashed nowhere, so their half could go in before Tb instead.
