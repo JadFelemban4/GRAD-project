@@ -760,3 +760,28 @@ another Claude Code session's work ("SENAD", about 9 of 12 threads) had run on t
 comparison); how the return comes back; at the return, every run's `meta.json` (`git_head` `T*`, `git_dirty` false)
 and `config.json` (`learning_rate_at_end`, the manifest). Next on this laptop: AB (ORDER step 22a) and the routes
 (step 22b).
+
+## 16. 16 November: the return by a cloud link
+
+**The route.** Ghassan chose a cloud link for the return (PR-B section 15, "16 November 2026, the return's route",
+which gives the message for Jad, given to Ghassan to send). It was set by a study of four agents, reading only (the
+services' limits, the device, this laptop, and a skeptic of the three), and a review of the commit and the message by
+two reviewers, each finding checked by a skeptic. About 18-20 GB is expected (a snapshot every 10,000 steps,
+`train.py:387`; a 50,000-step run of `runs/extremes_dt1` takes about 36 MB), so the uploading account needs at least
+25 GB free: a free Google Drive (15 GB), a free OneDrive (5 GB) or Dropbox Basic (2 GB) cannot hold it; a paid Google
+One plan, or a university OneDrive showing enough free space, can. In a personal Google Drive a file counts against
+its uploader's space, so the space has to be on Jad's account. A browser upload that is cut starts again from zero;
+the PC's sleep is off (the sheet). The skeptic's main corrections, all taken: nothing on the PC before ALL DONE (no
+speed test, no sign-in); no sync app on either computer (the sheet's rule 2; this laptop stays frozen until the last
+scoring); "arrived whole" waits for the checks on this laptop, since it frees the PC; and Step 8 is never run again
+after ALL DONE. The review's, all taken before the push: the message was not yet sent, so the record says given to
+Ghassan to send; Step 8 has not run, so its session folder is named as the window's; and the message now says that the
+driver runs Step 8 itself, so nothing is typed in the window, what to do on a STOPPED line, a closed window or a
+restart before ALL DONE, that the upload waits for the agent's checks (one more: `env_after_training.txt` holds
+"VERSIONS: match the lock"), and that the rule against running Step 8 again starts at ALL DONE.
+
+**Open.** The message's sending; the agent's checks before the return is sent; the service, and Jad's free space on
+it; at the return, the zip's sha256 against Jad's WhatsApp line, its folder list, `sha256sum -c` of Step 8's
+`SHA256SUMS` outside the repository, the placement under step 3's paths (PR-B section 15), every run's `meta.json` and
+`config.json`, and section 11's comparison. Next on this laptop: AB (ORDER step 22a) and the routes (step 22b); step 3
+needs AB committed.

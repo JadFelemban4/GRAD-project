@@ -1953,6 +1953,43 @@ beside the return. A gap of section 14 itself, found by the same review: a run k
 `final.zip` but before its manifest is written would count as finished in a later session (`train_all.py:115`); at the
 return, every run's `config.json` is checked for `learning_rate_at_end` and its manifest before the scoring.
 
+**15 November 2026, `ef93b8d`** (the agent's folder and the driver's review; section 14 step 2's gate, after the
+commit and before its push, as its message gives it): the cost-file list 51 paths and no line printed STOP; "cost
+files unchanged since B1: exit 0"; `epa_backend.py check` printed `[]`; `test_four_engine_analysis`: "Ran 50 tests",
+"OK"; `test_engine_threading`, alone: "Ran 33 tests", "OK (skipped=6)"; `test_epa_backend.PreregistrationB58H`: "Ran 6
+tests", "OK"; `verify_docs.py`: "All 170 checks pass (1172 figure mentions scanned in the documents)."; "ABOVE SECTION
+15: UNCHANGED SINCE T*". Pushed the same day, `864aa5a..ef93b8d`.
+
+**16 November 2026, the return's route.** Ghassan chose a cloud link, one of the two routes the sheet's Step 8 gives
+("a USB drive formatted exFAT or NTFS, or a cloud link, not WhatsApp"). The message for Jad and his agent, given to
+Ghassan the same day to send through him (its sending is recorded here when it is made), under the sheet's line that a
+new sheet "replaces this one where it says so": the agent's driver runs Step 8 itself after "all done in" and prints
+ALL DONE, so nothing is typed or pasted in the training window; nothing on the PC before ALL DONE, so the space is
+checked, or bought, from Jad's phone (about 18-20 GB is expected: `train.py:387` writes a snapshot every 10,000 steps,
+and a 50,000-step run of `runs/extremes_dt1` takes about 36 MB, so the account needs at least 25 GB free, more than a
+free Google Drive's 15 GB); before ALL DONE, a STOPPED line, a closed window or a restart is told to Ghassan and the
+sheet's sections for it hold, and the upload then waits for his word; after ALL DONE the agent, reading only, checks
+`window.log` from Step 8 on for error lines, `SHA256SUMS` for one line per file of `runs/b58h_check_dt1` and
+`runs/b58h_dt1`, `training_end.txt` for content and `env_after_training.txt` for "VERSIONS: match the lock", and sends
+Jad's phone as text the `.sha256` line, the zip's byte count, the `training started: ... ended: ...` line and that
+VERSIONS line, or the failing line, which Jad forwards by WhatsApp, a channel apart from the cloud; Jad uploads only
+after the checks pass, in a browser already on the PC, and installs nothing (rule 2 holds until Step 8 is done, and
+the sheet counts Step 8 done only when the zip and its `.sha256` are sent); `b58h_return.zip`,
+`b58h_return.zip.sha256` and the agent's `visit2_claude` go up as they are, never re-zipped, renamed or split, shared
+with Ghassan's account only; once ALL DONE has printed, no block of Step 8 runs again, even if the window closes,
+which replaces from then on the sheet's section for a window closed before Step 8 is done (it would make a second
+session folder, a second environment record and a different zip); if the upload fails twice, the sheet's USB drive;
+everything on the PC, and the cloud copy, stays until Ghassan says otherwise. A browser opened after ALL DONE is
+outside section 11's comparison: Step 8's second block makes the record after the training before its third block
+makes the zip, which holds it. The PC is free when Ghassan writes that the zip arrived whole, after this laptop has
+downloaded each file on its own and checked the zip's sha256, its folder list, `sha256sum -c` of its `SHA256SUMS` and
+the two environment records. A layout to place at the return: Step 8 writes `SHA256SUMS`, `training_end.txt` and
+`env_after_training.txt` into the session folder of the window it runs in (`$OUT`: `~/grad_device/b58h_training_1/`,
+unless a restart or a closed window makes a later one), which the zip holds at its top level beside `runs/` and any
+other `b58h_training_N` folder, while step 3 reads `$OUT/training/SHA256SUMS`; the zip is unpacked outside the
+repository, `sha256sum -c` runs there first, and the placement under `$OUT/training` (Step 8's `SHA256SUMS` at
+`$OUT/training/SHA256SUMS`, byte for byte) is recorded in this section when it is made.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*
