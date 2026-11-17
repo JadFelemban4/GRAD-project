@@ -785,3 +785,60 @@ it; at the return, the zip's sha256 against Jad's WhatsApp line, its folder list
 `SHA256SUMS` outside the repository, the placement under step 3's paths (PR-B section 15), every run's `meta.json` and
 `config.json`, and section 11's comparison. Next on this laptop: AB (ORDER step 22a) and the routes (step 22b); step 3
 needs AB committed.
+
+## 17. 17 November: three post hoc analyses, chosen before any score
+
+**What and when.** Ghassan chose these three on 17 November 2026, during training, before any agent of the study was
+loaded or scored and before AB existed. They come from a review of the methodology's weak steps against the sources
+(16-17 November: four finders and four skeptics, reading the repository only, no agent and no score), which ranked
+them as the cheap ones that bear on the claim. PR-B names none of them, so each is **post hoc** (VD:394; PR-B:1157-1158):
+reported under a post hoc heading beside the preregistered readings, deciding nothing (no verdict, band, status, test
+or Δ reads it), and describing the model, never the engine or the criterion. None starts before AB and the routes of
+step 22b are committed, and none delays row 149 (5)'s items (a)-(f). Their scripts and outputs stay outside the
+repository until the first scoring command and are committed after it (row 149 (3)); each script's docstring repeats
+its rule below. The prints of PH1 and PH2 go into a session report section before the first scoring command.
+
+**PH1. Long-gap preview sweep** (hand-written; before the first scoring). *Question:* on roads where the gap no longer
+caps the look-ahead, where does hand-written (a)'s saving over current-grade level off, and does that knee sit near
+the climb's τ or the flat approach's (46.9 s and 127.9 s on the locked climb, `results/EPA_ROADS/control.txt:5`)?
+*Roads:* `roads_ceiling.family_road`, one climb per road after a 640 s flat lead-in, on a 900 s road at 130 km/h,
+315 K, 101.3 kPa and humidity 0.012 (640 s is about five flat τ, so the start-up transient has settled, and (a)'s window
+runs uncapped to 620 s behind `FIRST_WINDOW_FROM_S`, `roads_ceiling.py:129`); three climbs inside row 101's ranges,
+(L, grade) = (67 s, 10 %), (76 s, 11 %) and (85 s, 12 %), each with `evaluate.EPISODES[0]`'s seed and weights (the
+hand-written damage does not depend on the weights, VD:428). *Look-ahead:* (a) at H = 5, 10, 15, 20, 25, 30, 40, 50,
+60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 240, 280, 320, 360, 400, 450, 500, 560 and 620 s, with current-grade
+and (b) once per road. *Plants:* `T*`'s B58 for all three climbs; on the 76 s climb also `plant_for("b58", ("thermal",
+f, k))` with c_turb and ua_turb_amb each at k = 0.75 and 1.333 (c_turb moves the climb and flat τ together; ua_turb_amb
+moves them in different proportions). *Printed:* each plant's τ by `tau_of_plant` (row 102's definition) and the flat τ by
+the same formula at the lead-in's median exhaust flow; S(H) = cut(a at H) − cut(current-grade), in both forms and
+both readings, with (a)'s extra fuel; a least-squares fit S(H) = S∞ (1 − exp(−H/τ_eff)) with τ_eff printed beside both
+τ; and (a) at 620 s beside (b), which on a one-climb road it approaches by construction. *Control* (mistake 12):
+`tau_of_plant` on `T*`'s B58 prints 47.3351 s, roads.json's τ. *Cost:* 7 plant-climb pairs × 29 runs = 203 runs, about
+0.6 h at `timing.txt:1-2`'s rate (ASSUMED for these roads), plus five τ runs; code 2-4 h (ASSUMED). *Label:* "post hoc;
+hand-written λ strategies on hand-made one-climb roads; describes the model, never the engine or the criterion; the
+housing constants are assumed, and D_base moves with each variant".
+
+**PH2. The oil share of the damage** (hand-written; before the first scoring). *Question:* how much of the no-knock
+damage D is the oil term, whose node's time constant (55 s at 130 km/h, 57 s at rest, `REFERENCES.md:367`) is close to τ? *Runs:* the
+baseline ECU, current-grade and (a) at r = 0.5 and 1.5 on decision 34's twenty roads (read through
+`fingerprint.d34_roads`; no forbidden field printed), on `T*`'s B58 at dt 1 s: 80 runs, about 0.25 h (ASSUMED rate).
+*Printed:* `run_episode_record`'s turb, oil, base_turb and base_oil; the oil share of D per policy, per road and
+pooled. *Control:* turb + oil equals D_noknock in every run. *Label:* "post hoc; hand-written policies; describes the
+model's damage index, never wear".
+
+**PH3. Each agent's saving per climb against the gap** (after the primary scoring, from item (a)'s records). *Inputs:*
+the per-step records section 9.6 reads (t_turb and t_oil per road and step, for the baseline ECU and the 60 agents),
+each checked against the committed sha256 index first (PR-B:921-924). *Damage:* per step, `engine_env.damage_rate`'s
+two thermal terms (no knock term) at dt 1 s. *Control:* each road's per-slot sums equal its scored no-knock D. *Slots,
+two rules, both printed:* (A) the climb, from its onset to its `last_step`, plus the gap after it up to the next onset
+(the last climb: to the road's end); (B) the gap before the climb (from the previous climb's `last_step`, or step 0 for
+the first) plus the climb. Bounds from `fingerprint.d34_roads`' climbs. *Printed:* per slot, the cut against the
+baseline ECU's same slot, 100 × (1 − D_slot / D_base,slot), and d = sighted − blinded per seed at each r; the median
+and IQR over seeds; plotted against the gap before the climb (G and G/τ) and the climb's length. *No test and no p:*
+slots on one road share thermal carry-over. *Cost:* minutes of compute; code 3-6 h (ASSUMED). *Label:* "post hoc;
+describes how the agents' damage cut varies with the road design on one plant; never a test of the criterion".
+
+**Not chosen** (the same review): a finer refinement of the crank angle or the step (a paragraph on the checks already
+made covers the objection), the agents re-scored outside their training band, a fourth arm or more seeds (n = 20
+cannot resolve differences of a few points), the partial-preview probe and the closed-loop time (only if the laptop is
+idle after (f)).
