@@ -82,10 +82,10 @@ knock_p = { value = -1.7, label = "CORRELATION", source = "Douaud & Eyzat's pres
 knock_b = { value = 3800.0, unit = "K", label = "CORRELATION", source = "Douaud & Eyzat's activation temperature, as knock_a" }
 n_poly = { value = 1.32, label = "ASSUMED", source = "polytropic, not isentropic: the end gas loses heat (plant.run_cycle)" }
 # friction: FMEP = a + b Pmax + c Sp + d Sp^2, bar
-fmep_0 = { value = 0.40, unit = "bar", label = "CORRELATION", source = "the Chen-Flynn FMEP form (REFERENCES.md section 1: the record CONFIRMED, the page carrying the correlation NOT checked). These coefficients: UNVERIFIED" }
-fmep_pmax = { value = 0.005, label = "CORRELATION", source = "Chen-Flynn, per bar of peak pressure, as fmep_0" }
-fmep_sp = { value = 0.090, unit = "bar s/m", label = "CORRELATION", source = "Chen-Flynn, per m/s of mean piston speed, as fmep_0" }
-fmep_sp2 = { value = 0.0009, unit = "bar s2/m2", label = "CORRELATION", source = "Chen-Flynn, the square term, as fmep_0" }
+fmep_0 = { value = 0.40, unit = "bar", label = "CORRELATION", source = "the Chen-Flynn FMEP form, SAE 650733 printed p. 11 (PDF p. 12), read off the page 14 November 2026 (REFERENCES.md section 1): RAMEP = 2 psi + 0.005 Pmax + 0.012 psi per ft/min of mean piston speed (0.138 bar + 0.005 Pmax + 0.163 bar per m/s), rubbing and accessory MEP only (NIMEP - BMEP; plant.run_cycle takes pumping separately). This constant is not the paper's (0.138 bar there) and has no source: UNVERIFIED" }
+fmep_pmax = { value = 0.005, label = "CORRELATION", source = "Chen-Flynn, per bar of peak pressure: 0.005 is the paper's own coefficient for its ER-2-1 engine (p. 11; 0.010 for its ER-1-1A), as fmep_0" }
+fmep_sp = { value = 0.090, unit = "bar s/m", label = "CORRELATION", source = "Chen-Flynn, per m/s of mean piston speed: the form's term, not the paper's value (0.163 bar s/m there); UNVERIFIED, as fmep_0" }
+fmep_sp2 = { value = 0.0009, unit = "bar s2/m2", label = "ASSUMED", source = "the square term in mean piston speed: not in Chen & Flynn, whose correlation is linear in speed (p. 11); no source recorded" }
 # the exhaust port and the backpressure
 ua_port = { value = 15.0, unit = "W/K", label = "ASSUMED", source = "'the one openly empirical constant' of plant.py. REFERENCES.md section 4b: CANNOT -- no exhaust temperature before the catalyst" }
 cp_exh = { value = 1150.0, unit = "J/kg/K", label = "ASSUMED", source = "exhaust specific heat. REFERENCES.md section 4b: CANNOT" }
