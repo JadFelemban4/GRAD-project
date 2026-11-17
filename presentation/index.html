@@ -3225,9 +3225,9 @@ It also shows that how quickly you reach that ceiling depends on how slow the sy
 It is theory on paper, illustrated on a single numerical example, not measured across a range of cases.
 
 Most of all: it says the benefit stops growing, but not when or by how much. It never yields a usable rule — nothing of the form &quot;preview is worth buying once the horizon passes this fraction of the time constant&quot;. That rule is exactly what we are building.</td></tr>
-          <tr><td>The common rule of thumb for choosing the prediction horizon in Model Predictive Control (MPC)</td><td>A rule passed round among engineers: make the horizon long enough to cover the time the system takes to settle by itself after an upset.</td><td>High</td><td>This is advice for tuning a controller you have already decided to build, not for deciding whether information about the future is worth its price.
+          <tr><td>The common rule of thumb for choosing the prediction horizon in Model Predictive Control (MPC)</td><td>A published tuning rule that engineers also pass round: make the horizon long enough to cover the time the system takes to settle by itself after an upset.</td><td>High</td><td>This is advice for tuning a controller you have already decided to build, not for deciding whether information about the future is worth its price.
 It does not say how much performance you gain, nor when you gain nothing.
-It is a rule of thumb handed down by experience; nobody has ever measured it and put a number on it.
+It is published as a formula (Shridhar &amp; Cooper 1997: horizon = the plant's open-loop settling time, about 5 time constants plus the dead time), chosen for stability, and a longer horizon was found not to help much; but nobody has measured what information about the future is worth against it.
 
 Someone will say: just run MPC, measure it, and be done. That is exactly what our planned MPC oracle baseline will do, and it is the right way to measure one system.
 
@@ -4434,7 +4434,7 @@ And say it in full. Phase F was designed around one protocol, which we call H2b:
         <div class="term" data-g="g4">
           <div class="th"><b>Prediction horizon</b></div>
           <p class="def">How far ahead in time an MPC controller plans at each step.</p>
-          <p class="why"><span class="star">Why it matters here · </span>Industrial practice sets it to cover roughly the settling time of the plant — the thing being controlled — running open loop, with no controller. That is the popular, unmeasured version of the criterion we are trying to measure properly. Do not confuse it with the preview horizon H. The prediction horizon is the span MPC simulates inside its own head with its model; the preview horizon is the span over which real information about the future arrives. The first is a design choice, the second is the independent variable of this whole thesis.</p>
+          <p class="why"><span class="star">Why it matters here · </span>Industrial practice sets it to cover roughly the settling time of the plant — the thing being controlled — running open loop, with no controller. That is the published tuning version (Shridhar &amp; Cooper 1997) of the criterion we are trying to measure properly; it is justified by stability, not by the value of information. Do not confuse it with the preview horizon H. The prediction horizon is the span MPC simulates inside its own head with its model; the preview horizon is the span over which real information about the future arrives. The first is a design choice, the second is the independent variable of this whole thesis.</p>
         </div>
         <div class="term" data-g="g4">
           <div class="th"><b>Setpoint</b></div>
