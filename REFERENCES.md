@@ -683,7 +683,7 @@ session's scratch directory, not in the repository.
 - **Chen, Y.-M., Lee, J., Holmer, J., Ha, J.**, "Model Predictive Control for
   Engine Thermal Management System", SAE 2021-01-0225, DOI 10.4271/2021-01-0225.
   **Full text read 17 November 2026** (Literature Tracker B18): a 240 s preview
-  on one simulated climb; fan energy −4.8 % and alternator energy −2.3 % (Table 2,
+  on one simulated climb; fan energy −4.8 % and alternator energy −2.33 % (Table 2,
   p. 7); knock is not modelled (p. 8). Not a validation source — **prior art on the
   premise**: it schedules the coolant target from road-grade preview. It
   belongs in the literature review, and the H/τ criterion should be positioned
