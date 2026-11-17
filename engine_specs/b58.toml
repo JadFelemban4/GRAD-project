@@ -76,8 +76,8 @@ delay_res = { value = 1.5, label = "ASSUMED", source = "ignition delay's residua
 wiebe_a = { value = 5.0, label = "CORRELATION", source = "the Wiebe function (REFERENCES.md section 1: Vibe 1970; Ghojel 2010, both records CONFIRMED). The value was not read off either page: UNVERIFIED" }
 wiebe_m = { value = 2.0, label = "CORRELATION", source = "the Wiebe shape exponent, as wiebe_a" }
 # knock: tau = a (ON/100)^b p^c exp(B / T_unburned), integrated over the end gas
-knock_a = { value = 0.01768, label = "CORRELATION", source = "Douaud & Eyzat 1978, SAE 780080 (REFERENCES.md section 1: the record CONFIRMED; the constants were not read off its page, UNVERIFIED). Section 4b: CANNOT (yet) -- drive C would test it" }
-knock_on = { value = 3.402, label = "CORRELATION", source = "Douaud & Eyzat's octane exponent, as knock_a" }
+knock_a = { value = 0.01768, label = "CORRELATION", source = "Douaud & Eyzat 1978, SAE 780080, p. 297, read off the page 17 November 2026 (REFERENCES.md section 1): the PRF delay tau = A p^-n exp(B/T), A = 0.01869 (OCTN/100)^3.4017 s with p in kgf/cm2 absolute; 0.01768 is that A with p in atm (0.01869 x 1.033227^-1.7), as plant.run_cycle passes P / 101325. The paper's scope is primary reference fuels, 80 <= OCTN <= 100; this engine's octane is a pump fuel's RON. Section 4b: CANNOT (yet) -- drive C would test it" }
+knock_on = { value = 3.402, label = "CORRELATION", source = "Douaud & Eyzat's octane exponent, 3.4017 on p. 297, rounded; as knock_a" }
 knock_p = { value = -1.7, label = "CORRELATION", source = "Douaud & Eyzat's pressure exponent, as knock_a" }
 knock_b = { value = 3800.0, unit = "K", label = "CORRELATION", source = "Douaud & Eyzat's activation temperature, as knock_a" }
 n_poly = { value = 1.32, label = "ASSUMED", source = "polytropic, not isentropic: the end gas loses heat (plant.run_cycle)" }
