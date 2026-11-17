@@ -44,7 +44,7 @@ for each half of the question.
 | layer | standard | question | what it gives each comparison |
 |---|---|---|---|
 | top | **ASME V&V 40-2018**, or **NASA-STD-7009B** (pick one) | How accurate must the model be, for this use? | a context of use, a risk, a required accuracy |
-| bottom | **ASME V&V 20-2009** | How accurate is it, against the car? | E, u_val, and the interval E ± u_val (± k·u_val only with an assumed error distribution) |
+| bottom | **ASME V&V 20-2009** | How accurate is it, against the car? | E, u_val, and the interval E ± k·u_val |
 
 **V&V 20** (verification and validation in computational fluid dynamics and
 heat transfer; our thermal model is heat transfer) defines the comparison:
@@ -52,11 +52,8 @@ heat transfer; our thermal model is heat transfer) defines the comparison:
 - the comparison error **E = S − D**, simulation minus data;
 - the validation uncertainty **u_val = √(u_num² + u_input² + u_D²)**: the
   numerical error, the error carried in from the model's inputs, and the
-  measurement's own uncertainty; this root-sum-square form holds when the three
-  are independent (D20 slide 9; D24 gives the fuller statement);
-- the model's real error lies in **E ± u_val**; stating it as **E ± k·u_val**
-  at a confidence level needs an assumed error distribution (D20 slides 17
-  and 31). When |E| is well above
+  measurement's own uncertainty;
+- the model's real error lies in **E ± k·u_val**. When |E| is well above
   u_val, the model error is about E; when |E| ≤ u_val, the model error is
   inside the noise of the comparison.
 
@@ -65,10 +62,8 @@ model gets a *context of use*: the question the model answers. Its *risk*
 combines how much the decision rests on the model (model influence) with how
 bad a wrong decision would be (decision consequence). The required evidence
 grows with the risk. V&V 40 was written for medical devices and is sold by
-ASME; NASA-STD-7009B (March 2024) does the same job for any model, scores
-credibility factors on illustrative 0–4 levels in separate capability and
-results assessments whose scores are not to be combined (its p. 63), and is
-free. **Use one of the two,
+ASME; NASA-STD-7009B (March 2024) does the same job for any model, grades
+credibility on a five-level scale (0 to 4), and is free. **Use one of the two,
 not both.**
 
 The sources are listed in section 11. This plan was written from summaries of
@@ -519,9 +514,8 @@ Read from summaries on 7 October 2026; open the documents themselves before
 citing them.
 
 - ASME V&V 20-2009, *Standard for Verification and Validation in
-  Computational Fluid Dynamics and Heat Transfer*. Overview by committee
-  member K. J. Dowding (the chair was H. W. Coleman, slide 3):
-  <https://www.osti.gov/servlets/purl/1368927>; on interpreting its
+  Computational Fluid Dynamics and Heat Transfer*. Overview by its committee
+  chair: <https://www.osti.gov/servlets/purl/1368927>; on interpreting its
   results: <https://asmedigitalcollection.asme.org/verification/article-abstract/2/2/024501/447645/Interpretation-of-Validation-Results-Following>
 - ASME V&V 40-2018, *Assessing Credibility of Computational Modeling through
   Verification and Validation: Application to Medical Devices*. The FDA

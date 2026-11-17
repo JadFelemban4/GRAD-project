@@ -63,8 +63,8 @@ that produced are noted in each row.
 | **Wiebe function** | A formula describing how fast the fuel burns once the spark fires — burning is not instant, it takes a few thousandths of a second, and this curve is its shape | Vibe (Wiebe), I. I., *Brennverlauf und Kreisprozess von Verbrennungsmotoren*, Verlag Technik, Berlin, 1970, 286 pp. German translation from the Russian (translator Joachim Heinrich; German editing Franz Meissner). [Open Library OL5771526M](https://openlibrary.org/books/OL5771526M); LCCN 71509128; OCLC 17395956 | **CONFIRMED** (record). The catalogue prints the publisher as "Verlag Technik", without the "VEB" prefix this file used to carry; no catalogue that could be opened shows "VEB", so it was dropped |
 | Wiebe — easier modern citation | A 2010 review article; cite this if the 1970 German book is hard to obtain | Ghojel, J. I., "Review of the development and applications of the Wiebe function: A tribute to the contribution of Ivan Wiebe to engine research", *International Journal of Engine Research* **11**(4), 2010, pp. 297–312, SAGE — [DOI 10.1243/14680874JER06510](https://doi.org/10.1243/14680874JER06510) | **CONFIRMED** (record, via Crossref; the SAGE page blocks automated readers but the DOI resolves). Full title and volume/issue/pages added 14 Sep |
 | **Woschni correlation** | A formula for how fast heat leaks from the burning gas into the metal walls of the cylinder. Without it the model would predict the engine runs far hotter than it does | Woschni, G., "A Universally Applicable Equation for the Instantaneous Heat Transfer Coefficient in the Internal Combustion Engine", SAE Technical Paper **670931**, 1967 (presented 30 Oct 1967, Pittsburgh) — [SAE Mobilus](https://saemobilus.sae.org/content/670931), doi:10.4271/670931 | **CONFIRMED** (record, SAE Mobilus and Crossref) |
-| **Chen–Flynn FMEP model** | FMEP = the engine's internal friction, expressed as pressure. Some of the power made inside the cylinder is eaten by the engine rubbing against itself before it reaches the wheels; this estimates how much | Chen, S. K. and Flynn, P. F., "Development of a Single Cylinder Compression Ignition Research Engine", SAE Technical Paper **650733**, 1965 (presented 18 Oct 1965, Cleveland) — [SAE Mobilus](https://saemobilus.sae.org/content/650733), doi:10.4271/650733 | **CONFIRMED (record and page).** The paper is about building a single-cylinder DI diesel research engine; the friction correlation is printed p. 11 (PDF p. 12), Fig. 22, read off the page 14 November 2026 (Literature Tracker C42) and rechecked 17 November: rubbing and accessory MEP, RAMEP = NIMEP − BMEP (pumping excluded, as `plant.run_cycle` takes it separately), = 2 + 0.005 P_max + 0.012 C_m (psi, P_max in psig, C_m in ft/min) for the 1.17 L ER-2-1 engine over 1050–2400 ft/min (5.3–12.2 m/s) and up to about 2400 psig; the same page gives 17 + 0.010 P_max + 0.012 C_m for the ER-1-1A, whose pumps were engine-driven. Linear in C_m: there is no square term. `b58.toml` cites the form; of its four constants only `fmep_pmax` (0.005) is the paper's, and `fmep_sp2` is labelled ASSUMED |
-| **Douaud & Eyzat knock integral** | "Knock" is uncontrolled detonation — the fuel exploding instead of burning smoothly. It destroys engines. This formula predicts when it will happen | Douaud, A. M. and Eyzat, P., "Four-Octane-Number Method for Predicting the Anti-Knock Behavior of Fuels and Engines", SAE Technical Paper **780080**, 1978 (Institut Français du Pétrole; presented 27 Feb 1978, Detroit) — [SAE Mobilus](https://saemobilus.sae.org/papers/four-octane-number-method-predicting-anti-knock-behavior-fuels-engines-780080), doi:10.4271/780080 | **CONFIRMED** (record; the abstract confirms it is the autoignition-delay paper). **Constants read off p. 297, 17 November 2026 (Ghassan):** the delay of a primary reference fuel, τ = A p^−n exp(B/T) with A = 0.01869 (OCTN/100)^3.4017 s, n = 1.7, B = 3800 K, p in kgf/cm² absolute, T in K (the units are defined on p. 296; p. 298's PRF 90 case, 3 ms at 22 kgf/cm² and 1010 K, confirms them), OCTN the volume % of isooctane, its stated scope 80 ≤ OCTN ≤ 100. `b58.toml`'s `knock_a` = 0.01768 is that A with p in atm (0.01869 × 1.033227^−1.7), which is what `plant.run_cycle` passes; the exponents and B match. The paper fits PRF only and gives each commercial fuel its own A, n and B from its four octane numbers (pp. 297–301); feeding a pump fuel's RON in place of OCTN is this model's assumption, not the paper's |
+| **Chen–Flynn FMEP model** | FMEP = the engine's internal friction, expressed as pressure. Some of the power made inside the cylinder is eaten by the engine rubbing against itself before it reaches the wheels; this estimates how much | Chen, S. K. and Flynn, P. F., "Development of a Single Cylinder Compression Ignition Research Engine", SAE Technical Paper **650733**, 1965 (presented 18 Oct 1965, Cleveland) — [SAE Mobilus](https://saemobilus.sae.org/content/650733), doi:10.4271/650733 | **CONFIRMED (record only).** The paper exists with these authors, number and year, but its title and abstract are about building a research engine and say nothing about friction. That the FMEP correlation in `plant.py` comes from a page of this paper has **not** been checked; friction-model papers do cite it. Before the thesis is frozen, cite the page that carries the correlation, or a secondary source that quotes it |
+| **Douaud & Eyzat knock integral** | "Knock" is uncontrolled detonation — the fuel exploding instead of burning smoothly. It destroys engines. This formula predicts when it will happen | Douaud, A. M. and Eyzat, P., "Four-Octane-Number Method for Predicting the Anti-Knock Behavior of Fuels and Engines", SAE Technical Paper **780080**, 1978 (Institut Français du Pétrole; presented 27 Feb 1978, Detroit) — [SAE Mobilus](https://saemobilus.sae.org/papers/four-octane-number-method-predicting-anti-knock-behavior-fuels-engines-780080), doi:10.4271/780080 | **CONFIRMED** (record; the abstract confirms it is the autoignition-delay paper) |
 | **General reference** | The standard graduate textbook on petrol and diesel engines | Heywood, J. B., *Internal Combustion Engine Fundamentals*, 2nd ed., McGraw-Hill Education, May 2018, 1056 pp., ISBN 9781260116106 (1st ed., McGraw-Hill, 1988) | **CONFIRMED** (record, Open Library and Google Books). The 2018 publisher is "McGraw-Hill Education"; plain "McGraw-Hill" is the 1988 edition's string. The page references used in section 3 come from a scanned copy whose edition is not stated on the scan — see section 7 |
 | **Bosch relative air charge** | Defines what BMW's "relative air filling" channel actually means — the reference air density it is measured against. This is what our constant k converts between | Robert Bosch GmbH, US Patent **6,588,261 B1** (Wild, Reuschenbach, Benninger, Hess, Zhang, Mallebrein, von Hofmann; granted 8 Jul 2003; priority DE 197 13 379, 1 Apr 1997), **column 3 line 55 to column 4 line 2**: *"Definition of rl as the relative air filling in the combustion chamber: rl = ma/m_norm = (ps − pirg)·Tn/(Pn·Ts) under the standard conditions: Tn=273 K, Pn=1013 hPa"*; also column 3 lines 8–10: *"This standardization also applies to an air temperature of 273° K. and a pressure of 1013 hPa upstream from the throttle valve."* Same family as [EP 1 015 746 B1](https://patents.google.com/patent/EP1015746B1/de) (German original, grant published 10 Sep 2003), description paragraph reported as [0021] by the EPO server's rendering — verify the paragraph number on the EPO PDF. Corroborated by US 6,754,577 B2 (Bosch, 2004): "a standard pressure p₀ of 1013.25 hPa, a standard temperature T₀ of 273 Kelvin" | **CONFIRMED** — page located 14 Sep, read off the patent's page image. Two caveats. (a) Bosch writes 273 K and 1013 hPa; "0 °C" is our gloss, not their wording. (b) That BMW's OBD channel uses this definition is **not** in any source; it rests on our own inversion (CLAUDE.md mistake 12: implied reference 276.9 K, consistent with 273 K, excludes 20 °C). The Bosch handbook page (*Gasoline-Engine Management*) is still not located; Google Books shows the passage exists but no page number |
 
@@ -83,7 +83,7 @@ recorded about its own car.
 | **Displacement** — total swept volume of all six cylinders | 2997.5 cc | Toyota Australia, *GR Supra Mechanical Specifications*, document GTP-009045, version July 2025, p. 1, block ENGINE: "Displacement (cm³) 2998". BMW, *The new BMW 3 Series Sedan / Touring, Specifications*, 05/2015, p. 7 (340i): "Effective capacity cc 2998". Toyota Motor Corporation global newsroom, 28 Nov 2024, release 41894560, specification table: "Displacement [liters] 2.997". Our 2997.5 is π/4 × 82.0² × 94.6 × 6 and sits between the two published roundings; say so rather than treating either as a discrepancy | **CONFIRMED** |
 | **Bore** — cylinder diameter | 82.0 mm | Identical in every manufacturer document opened: Toyota Australia GTP-009045 p. 1 "Bore (mm) 82"; BMW Canada, *BMW Z4 2020MY Product Guide*, p. 2, "Motor data", Z4 M40i column: "Bore, mm 82"; BMW 3 Series 05/2015 p. 7 "Stroke/bore mm 94.6/82.0"; Toyota global newsroom 28 Nov 2024 "Bore x stroke [mm] 82.0 x 94.6"; Toyota UK technical specifications (Feb 2021 ref. 210223M, June 2022 ref. 220605M, Feb 2024) p. 1 "Bore x stroke (mm) 82 x 94.6" | **CONFIRMED** |
 | **Stroke** — how far the piston travels | 94.6 mm | Same documents and pages as the bore | **CONFIRMED** |
-| **Compression ratio** — how much the piston squeezes the air before ignition | 10.2:1 | **The engine code B58B30O1 goes with 10.2:1 in four manufacturer documents:** BMW Canada Z4 2020MY Product Guide p. 2 ("Engine type B58B30O1 … Compression rate, :1 10.2 … 285 kW / 382 bHP at 5800–6500 rpm"); Toyota Australia GTP-009045 p. 1 ("Engine model code B58B30O1 … Compression ratio 10.2:1 … 285 kW @ 5800–6500"); BMW, *M340i xDrive Specifications*, 10/2019, p. 1 ("2998 … 94.6/82.0 … Compression ratio :1 10.2 … 275/374 kW/hp"); Toyota Canada press release, Toronto, 14 Feb 2020, *Toyota GR Supra Races Into 2021 with More Power…*: "A new piston design reduces the engine's compression ratio from 11:1 to 10.2:1" as output rose from 335 hp to 382 hp. Toyota Canada, 28 Apr 2022, *…Enhanced Drive Dynamics for 2023*: the 2023 GR Supra 3.0 is the 382 hp car. **But the ratio follows the engine version, not the model year:** the 340 PS / 250 kW GR Supra 3.0 sold in the UK and Europe is printed at **11.0:1** on Toyota UK's own specification sheets of Feb 2021, June 2022 and Feb 2024 (p. 1: "Compression ratio 10.2:1 11.0:1", the first figure being the 2.0-litre), and every 2015–2021 BMW sheet for the original B58 (code B58B30M0 on the 2018 US 5 Series sheet) prints 11.0:1 | **CONFIRMED, and SETTLED for our car.** B58B30O1 = 10.2:1 in four manufacturer documents, and the team confirmed on 19 September 2026 that our car is the 285 kW / 382 hp version (CLAUDE.md); section 2c's Toyota Saudi Arabia page confirms the GCC car is the 382 hp engine. The 2023 model year: Toyota Motor Sales, U.S.A., *2023 GR Supra* eBrochure, p. 15 (3.0, 3.0 Premium and A91-MT: "Compression ratio 10.2:1", 382 hp at 5800–6500 rpm), opened 14 November 2026 (Literature Tracker REF-Toyota-2023; section 7, item 4). It is the US market's brochure, not the GCC car's. *(This cell said "OPEN: which version our car is" until 28 September -- a week after it was settled.)* |
+| **Compression ratio** — how much the piston squeezes the air before ignition | 10.2:1 | **The engine code B58B30O1 goes with 10.2:1 in four manufacturer documents:** BMW Canada Z4 2020MY Product Guide p. 2 ("Engine type B58B30O1 … Compression rate, :1 10.2 … 285 kW / 382 bHP at 5800–6500 rpm"); Toyota Australia GTP-009045 p. 1 ("Engine model code B58B30O1 … Compression ratio 10.2:1 … 285 kW @ 5800–6500"); BMW, *M340i xDrive Specifications*, 10/2019, p. 1 ("2998 … 94.6/82.0 … Compression ratio :1 10.2 … 275/374 kW/hp"); Toyota Canada press release, Toronto, 14 Feb 2020, *Toyota GR Supra Races Into 2021 with More Power…*: "A new piston design reduces the engine's compression ratio from 11:1 to 10.2:1" as output rose from 335 hp to 382 hp. Toyota Canada, 28 Apr 2022, *…Enhanced Drive Dynamics for 2023*: the 2023 GR Supra 3.0 is the 382 hp car. **But the ratio follows the engine version, not the model year:** the 340 PS / 250 kW GR Supra 3.0 sold in the UK and Europe is printed at **11.0:1** on Toyota UK's own specification sheets of Feb 2021, June 2022 and Feb 2024 (p. 1: "Compression ratio 10.2:1 11.0:1", the first figure being the 2.0-litre), and every 2015–2021 BMW sheet for the original B58 (code B58B30M0 on the 2018 US 5 Series sheet) prints 11.0:1 | **CONFIRMED, and SETTLED for our car.** B58B30O1 = 10.2:1 in four manufacturer documents, and the team confirmed on 19 September 2026 that our car is the 285 kW / 382 hp version (CLAUDE.md); section 2c's Toyota Saudi Arabia page confirms the GCC car is the 382 hp engine. *(This cell said "OPEN: which version our car is" until 28 September -- a week after it was settled.)* |
 | **Thermostat opening temperature** — the valve that lets coolant reach the radiator | 88 °C | **The B58 has no thermostat.** BMW Group University Technical Training, *Technical training. Product information. B58 Engine*, course ST1505, information status April 2015, section 4.2 p. 38: *"The conventional thermostat in the B58 engine is replaced by a so-called heat management module."* Section 4.2 p. 39: *"In contrast to a map controlled thermostat with expansion element, there is no direct, physical connection to the coolant temperature"* — the module is a motor-driven rotary valve positioned by the engine computer from the coolant temperature and a cylinder-head metal temperature. No opening temperature is printed anywhere in its cooling chapter. (Unofficial copy on archive.org; page numbers taken from the OCR text and to be checked against the PDF) | **MODELLING EQUIVALENT.** Our 88 °C is the point at which `thermal.py`'s stand-in thermostat cracks, identified from the car's own coolant channel. It must not be cited to BMW |
 | **Coolant operating band** | 88–108 °C | BMW publishes no setpoint. ST1505 section 4.2.2 pp. 43–45 lists five control phases (cold start, warm-up, operating temperature, transfer, maximum cooling) with no temperature for any of them. Our logs sit at 88–97 °C throughout | **MEASURED (ours)** for the lower part; the 108 °C upper edge is engineering judgement and is not observed in any log |
 | **Oil operating band, sustained load** | 115–140 °C | Searched SAE, MTZ, patents and handbooks; nothing admissible states a sustained-load oil band for this or any modern engine. ST1505 section 4.1 p. 37 confirms only the structure: *"the engine oil as well as the transmission fluid are cooled using coolant"* through an oil/coolant heat exchanger in the filter module, which is what our `ua_block_oil` term models. **Since 28 September `validate.py` no longer scores against this band**: row 8 uses the car's own oil over drive10's hottest ten minutes, 103–111 °C (section 3). drive10's oil reached 117 °C, inside this band's low end; the model's synthetic climb settles at 110.2 °C | **UNVERIFIED** as a published band, and no longer needed. The only numbers found were on owner forums, which cannot be cited |
@@ -103,9 +103,7 @@ recorded about its own car.
 > archive.org copy. It is the only BMW document opened that describes the
 > cooling system. Quote it as what it is and let the supervisor decide whether
 > it may be cited; the official alternative is the BMW-authored MTZ article in
-> section 7 (Landerl et al. 2015, now opened), which confirms the heat-management
-> module in place of a thermostat, the ball valve and the oil-to-water exchanger
-> (pp. 24–27), for the 2015 launch engine.
+> section 7, which nobody has opened past its abstract.
 
 
 ---
@@ -210,8 +208,6 @@ Toyota Saudi Arabia (Abdul Latif Jameel), *Toyota Supra 2026 — full specs*,
 MT and AT. That is the 285 kW B58B30O1 whose compression ratio section 2 settles
 at 10.2:1 — the pairing `plant.py` runs. **Caveat:** the page is the 2026 model
 year; our car is a 2023. It supports the pairing; it does not document our car.
-Toyota's US 2023 eBrochure prints the same pairing for the 2023 model year
-(section 2; section 7, item 4), for the US market.
 
 ### NOT FOUND — any market-specific cooling hardware
 
@@ -309,12 +305,12 @@ needs BMW-specific data.
 | # | quantity | plain English | band | kind | status | what was found (14 Sep) |
 |---|---|---|---|---|---|---|
 | 1 | Displacement | engine size | 2990–3000 cc | **B58** | **CONFIRMED** | section 2 |
-| 2 | MFB50 at MBT | The crank angle by which half the fuel has burned, at the spark timing that makes the most torque. If burning finishes too early or too late you lose power | 8–10° after top-dead-centre | general | **CONFIRMED** (as the common rule; it is engine-dependent) | Zhu, Haskara & Winkelman 2007, p. 417: "between 8 and 10 [°] after TDC when MBT timing is achieved"; Heywood, 2nd ed. 2018, printed p. 403 (photographed 14 Nov 2026, Literature Tracker C36): with optimum spark timing "half the charge is burned at about 8° after TC", and peak pressure falls 13–15° after TC (a single value, not a band; the 1st-edition scan read "about 10°"); Machado et al. 2015, abstract as rendered: the industry adopts 8°–10° for CA50. Caveat: Klimstra 1985 (abstract) puts the optimum at 7–8°, so the thesis should say "commonly 8–10°, engine-dependent" |
-| 3 | Best BSFC | Fuel used per unit of work done — the engine's best-case efficiency | 235–260 g/kWh | general | **PARTIAL** — the lower end is printed; nothing opened states the upper | Heywood, 2nd ed. 2018 (photographed 14 Nov 2026, Literature Tracker C36): printed p. 66, "For SI engines, typical best values of brake-specific fuel consumption are about 65 μg/J = 235 g/kW·h", the band's lower end; printed p. 75, Table 2.1, best bsfc 240 g/kW·h for naturally aspirated and 230 for turbocharged, charge-air-cooled SI passenger cars. The 1st-edition scan read "about 75 μg/J = 270 g/kW·h" (eq. 2.22 context); the thesis cites the 2nd edition, so that figure is not Heywood's for it. Conway et al. 2018, p. 5: "The best BSFC of 233 g/kWh (35.8% brake thermal efficiency or BTE) was achieved at 2500 rpm 12 bar BMEP" on a 1.6 L turbo GDI engine run by a prototype controller mimicking the OEM's (Euro V) calibration (pp. 1, 4), in its baseline configuration. Our 239.9 g/kWh sits inside Table 2.1's 230–240. Do not change the band; cite p. 66 for its lower end and state the upper end as judgement. The MTZ article of section 7 (Landerl et al. 2015, opened through the Literature Tracker) has no BSFC map: its Fig. 6 (p. 27) is specific fuel consumption indexed against the predecessor engine, with no absolute values, for the 2015 launch engine (240 kW, compression ratio 11) |
+| 2 | MFB50 at MBT | The crank angle by which half the fuel has burned, at the spark timing that makes the most torque. If burning finishes too early or too late you lose power | 8–10° after top-dead-centre | general | **CONFIRMED** (as the common rule; it is engine-dependent) | Zhu, Haskara & Winkelman 2007, p. 417: "between 8 and 10 [°] after TDC when MBT timing is achieved"; Heywood scan: "half the charge is burned at about 10° after TC" (a single value, not a band); Machado et al. 2015, abstract as rendered: the industry adopts 8°–10° for CA50. Caveat: Klimstra 1985 (abstract) puts the optimum at 7–8°, so the thesis should say "commonly 8–10°, engine-dependent" |
+| 3 | Best BSFC | Fuel used per unit of work done — the engine's best-case efficiency | 235–260 g/kWh | general | **UNVERIFIED** — opened sources bracket the band but none states it | Heywood scan, eq. 2.22 context: "For SI engines typical best values of brake specific fuel consumption are about 75 μg/J = 270 g/kW·h" — *above* the band. Conway et al. 2018, p. 5: "The best BSFC of 233 g/kWh (35.8% brake thermal efficiency or BTE) was achieved at 2500 rpm 12 bar BMEP" on a production-like 1.6 L turbo GDI calibration — *below* the band. Our 239.9 g/kWh sits between them. Do not change the band; state it as judgement bracketed by 233 and 270, or cite both. The B58's own fuel-consumption map is in the MTZ article of section 7, unopened |
 | 4 | Knock-limited spark | How far the spark can be advanced at high load before detonation starts | 8–14° | **B58-ish** | **UNVERIFIED — expected, and confirmed by searching** | SAE knock-limit papers, MIT and MTU theses and knock-model papers were searched; not one admissible page states a knock-limited spark value near 3000 rpm and 200 kPa. Douaud & Eyzat gives the knock *model*, not this band. **Weakest of the eleven.** Drop the row from the thesis, or keep it labelled as an internal consistency check |
-| 5 | EGT cruise, min | Exhaust gas temperature at steady cruise | 600–750 °C | general | **UNVERIFIED** (one typical value printed inside the band; no cruise range) | No opened source states a part-load cruise range. Heywood, 2nd ed. 2018, printed p. 250 (photographed 14 Nov 2026, Literature Tracker C36): "Gasoline engines with stoichiometric operation have exhaust gas temperatures of about 650°C (925 K)", usually "time-average measurements made close to the exhaust port exit"; pp. 249–250: mass-averaged port-exit temperatures are "about 100 K higher" than time-averaged thermocouple ones. 650 °C sits inside the band but is one stoichiometric value, not a cruise minimum or maximum. The 1st-edition scan's load-and-speed figure (its Fig. 6-22) has not been located in the 2nd edition, whose Sec. 6.5 figures are 6.27 and 6.28; his chapter 11 remarks that a conventional engine's manifold temperature "is not sufficient" for thermal-reactor oxidation at about 600–700 °C, which leans against the band. The only measured figures found are full-load exhaust-gas temperature limits beyond which enrichment was required on a modern turbo GDI: 900 °C at the exhaust port, 930 °C pre-turbine (Conway et al. 2018, p. 10). State which temperature the band means: thermocouple readings sit roughly 100 K below mass-averaged port temperature (Heywood, 2nd ed., pp. 249–250) or about 20 K below the time-averaged value (Caton 1982, abstract) |
+| 5 | EGT cruise, min | Exhaust gas temperature at steady cruise | 600–750 °C | general | **UNVERIFIED** | No opened source states a part-load cruise range. Heywood presents port-exit temperature against load and speed in Fig. 6-22 (Sec. 6.5), but the numbers are in the figure, which nobody has opened; his chapter 11 remarks that a conventional engine's manifold temperature "is not sufficient" for thermal-reactor oxidation at about 600–700 °C, which leans against the band. The only measured figures found are full-load protection limits on a modern turbo GDI: 900 °C at the exhaust port, 930 °C pre-turbine (Conway et al. 2018, p. 10). State which temperature the band means: thermocouple readings sit roughly 100 K below mass-averaged port temperature (Heywood, Sec. 6.5) or about 20 K below the time-averaged value (Caton 1982, abstract) |
 | 6 | EGT cruise, max | as above | 600–750 °C | general | **UNVERIFIED** | as above |
-| 7 | **Turbine housing time constant** | How long the turbocharger takes to heat up — technically, to reach 63 % of the way to its final temperature after a step change in load | 40–120 s | **B58** | **PARTIAL** (basis corrected 17 November 2026; the grade is the team's to confirm) | Burke, Vagg, Chalet & Chesse 2015, section 5.3 (p. 194): after a load step on a 2.2-litre diesel with a variable-geometry turbocharger, the gas-to-housing heat flow "peaks at the beginning of the transient (in this case at around 7kW) before slowly falling to a value of around 3.6kW three minutes later. This spike in heat flow is accounted for by the accumulation of heat in the turbine housing as it warms up"; their protocol holds each step three minutes because "this allows for the system to stabilise" (section 4.3, p. 190). The three minutes is that hold time, not a measured settling: Fig. 17(a) (read 17 November 2026) shows the housing still absorbing heat three minutes after the step, and its heat flows are calculated from measured gas temperature, pressures and speed. It reports no time constant and bounds none (an earlier version of this row read it as bounding τ at 45–60 s; it does not). Burke 2014 (section 7 entry; p. 7), on a 2.2-litre diesel turbocharger, gives settling times from first-order fits to measured wall temperatures: 150 s for the compressor housing and **240 s for the turbine housing**, the settling criterion not stated. 240 s is 5τ at τ = 48 s, 4τ at 60 s and 3τ at 80 s, so it sits inside the band but does not single out 48.0 s. **What neither does:** report a housing time constant, support the 40 s floor or the 120 s ceiling, or describe a B58. **No opened source publishes a turbine-housing heat capacity in J/K** (Burke 2014 used the true housing mass but prints no value, p. 7), so `c_turb` cannot be cross-checked; see section 4 |
+| 7 | **Turbine housing time constant** | How long the turbocharger takes to heat up — technically, to reach 63 % of the way to its final temperature after a step change in load | 40–120 s | **B58** | **PARTIAL** | Burke, Vagg, Chalet & Chesse 2015, section 5.3: after a load step on a 2.2-litre diesel with a variable-geometry turbocharger, the gas-to-housing heat flow "peaks at the beginning of the transient (in this case at around 7kW) before slowly falling to a value of around 3.6kW three minutes later. This spike in heat flow is accounted for by the accumulation of heat in the turbine housing as it warms up"; their protocol holds each step three minutes because "this allows for the system to stabilise". Settling within about three minutes bounds the housing time constant from above at roughly 45–60 s, consistent with our 48.0 s on the climb and inside the band. **What it does not do:** it reports no time constant, supports neither the 40 s floor nor the 120 s ceiling, and is a diesel turbocharger, not a B58. **No opened source publishes a turbine-housing heat capacity in J/K**, so `c_turb` cannot be cross-checked; see section 4 |
 | 8 | Oil, sustained load (drive10, hottest 10 min) | how hot the oil runs when the car is worked hard for ten minutes | 103–111 °C | **our car** | **MEASURED (ours)** | The car's interquartile range over the 10 minutes of drive10 where its rolling-median oil is highest. The model, with the derived oil node, sits at 97.0 °C (it was 96.4 before): **still outside**, and now IN-SAMPLE, because drive10 is in the fit. Of the 12.0 K miss, 4.6 K is the coolant (over that stretch the car's heat-management valve let it rise to 97–99 °C where the model regulates near 93; pinning the block to the measured coolant recovers 4.6 K) and 7.3 K is the oil node itself, which runs 4.4 K over its coolant where the car's oil runs 11.7 K (`model_vs_data.row8_split`; corrected 29 September from an unmeasured "about 6 K"). Replaces the 115–140 °C band, which no source supported (section 2, oil row) |
 | 9 | Oil apparent time constant (identified) | how long the oil takes to follow a change in load | 70–100 s | **our car** | **MEASURED (ours)** | One first-order fit (`car_thermal.identify_tau`) applied to the car's oil and to the model's; the car's range over the four drives that excite the oil enough to say. The model's was 14.0 s; with the derived oil node it is 60.0 s: **closer, still outside**. The old 20–400 s band contained the car's value — the band was right, and the model was not. Jarrier et al. 2000 (abstract) still supports the ordering, oil lagging coolant |
 | 10 | Coolant, regulated (synthetic climb) | steady coolant temperature once warm, under load | 83.6–95.5 °C | **our car** | **MEASURED (ours)** | Warm coolant on every drive, 5th–95th percentile (83.5–95.6 until drive B's coolant joined the pool, by the same rule). The model's settled 93.0 °C on the synthetic climb is inside (was 94.5). Was 88–108 °C, whose upper half was judgement |
@@ -334,11 +330,11 @@ the car's; that is the direction a stricter test should move it.*
 constant of the part being protected. **τ for the turbine is row 7.**
 
 If that band is wrong, every point on the H/τ curve sits in the wrong place.
-No other row can move the headline result. It is PARTIAL: Burke 2014 gives a
-turbine-housing settling time of 240 s on a diesel turbocharger (τ ≈ 48–80 s for
-a 5τ-to-3τ criterion), and Burke et al. 2015's three minutes is a test hold time,
-not a measured settling (corrected 17 November 2026). Nobody has published the
-housing time constant itself, and neither Burke paper prints a heat capacity.
+No other row can move the headline result. It is now PARTIAL: the one measured
+load-step transient that could be opened settles within three minutes, which is
+consistent with our 48 s on the climb, but nobody has published the housing time
+constant itself. The two documents most likely to contain it are listed first in
+section 7.
 
 ### Why row 4 is the weakest
 
@@ -429,7 +425,7 @@ ONCE** (from our data, but not re-derived automatically, for the reason given),
 | `UPSHIFT_MIN_RPM` | `Vehicle` | **DERIVED ONCE** (19 Sep) | Swept against the car's inferred gear. Not re-derived automatically: drive B was driven in manual mode (held gears), and no channel marks manual mode, so an automatic re-derivation would learn the shift schedule from a drive where the driver chose the gears |
 | `ENR_LOAD`, charge-temperature gate 200 kPa, MAF ceiling 1019.9 kg/h | several | **definitions / measured limits** | the 200 kPa gate restated on the corrected scale (mistake 13); 15 psi gauge in absolute terms; the sensor's own range limit (mistake 7) |
 | vehicle mass, `cd_a`, `crr` | `Vehicle` | **CANNOT (yet)** | Tried on 28 September from 7475b5d7's `Coordinated target torque on the wheel`: drag area 0.66 m² (90 % bootstrap 0.36–1.02) and mass 2 846 kg (2 181–3 432) -- not identified. 537 torque readings in 55 min, paired with speed readings a median 3.4 s away, and a TARGET torque that leads the actual. Needs Toyota's specification sheet for the kerb weight (not opened; do not quote one from memory) or a coast-down drive logging wheel torque with few channels |
-| `wheel_r` | `Vehicle` | **CANNOT separately** | The data fixes only the product of the speed channel's scale and the radius: measured overall ratios run 1.2–1.5 % below the published ones (drive B: 8th 1.992 against 2.016), i.e. r = 0.335 m OR a speed channel reading ~1.5 % high. The tyre size is now opened: 275/35 ZR19 at the rear on the 3.0 trims (Toyota's US 2023 eBrochure, p. 16; section 7, item 4), an unloaded radius of 0.3376 m. A loaded rolling radius is smaller, so this bounds r from above and does not separate the two |
+| `wheel_r` | `Vehicle` | **CANNOT separately** | The data fixes only the product of the speed channel's scale and the radius: measured overall ratios run 1.2–1.5 % below the published ones (drive B: 8th 1.992 against 2.016), i.e. r = 0.335 m OR a speed channel reading ~1.5 % high. The tyre size has not been opened from a source |
 | driveline efficiency 0.92, `SHIFT_LOAD` 0.75 | `Vehicle` | **CANNOT** | no engine- or wheel-torque channel at a usable refresh; the efficiency is inseparable from road load |
 | `charge_temperature` (+12 K, 0.06) | `plant` | **CANNOT** | no post-intercooler sensor (`Temperature after the intercooler` reads zero). The boost comparison fixes only the RATIO of charge temperature to volumetric efficiency |
 | `volumetric_efficiency`, residual fraction | `plant` | **CANNOT** | the same ratio; and both pressure channels sit before the throttle, so there is no part-load test at all (mistake 12) |
@@ -531,14 +527,12 @@ impression this file exists to prevent.
 
 1. ~~Settle which engine version the car is~~ -- **settled 19 September 2026**:
    the 285 kW / 382 hp car, so 10.2:1 is right (section 2).
-2. **Row 7**: DONE 17 November 2026. Burke 2014 prints no housing heat
-   capacity, only settling times (p. 7), and Burke et al. 2015's Fig. 17(a)
-   shows no settling at three minutes (row 7).
-3. **The MTZ article** (section 7): OPENED through the Literature Tracker. It has
-   no fuel-consumption map (Fig. 6 is indexed; row 3). Its cooling description
-   (pp. 24–27: a heat-management module instead of a thermostat, an electrically
-   actuated ball valve, the oil-to-water exchanger) can replace the grey ST1505
-   for those points, for the 2015 launch engine (240 kW, compression ratio 11).
+2. **Row 7 next**: open Burke 2014 (section 7, first item) for the housing heat
+   capacity, and Burke et al. 2015 for the temperature traces behind the
+   three-minute settling.
+3. **Get the MTZ article** (section 7) through the library. It is the only
+   BMW-authored document on this engine and may carry the fuel-consumption map
+   for row 3 and the cooling description that would replace the grey ST1505.
 4. `validation_table.md` carries a `source` column pointing at the row numbers
    here; keep the two files' row numbers aligned.
 5. Anything still UNVERIFIED at submission gets said plainly in Chapter 3:
@@ -620,32 +614,26 @@ session's scratch directory, not in the repository.
   *International Journal of Heat and Fluid Flow* **52** (2015) 185–197,
   DOI 10.1016/j.ijheatfluidflow.2015.01.004. Accepted manuscript, University of
   Bath research portal (file 119302957/Accepted_version.pdf): section 5.3,
-  manuscript lines 419–421 (quoted in row 7); section 4.3, lines 244–246
-  (three-minute hold). Figure 17(a), read 17 November 2026: the housing is
-  still absorbing heat three minutes after the step; the flows are calculated,
-  not measured.
+  manuscript lines 418–420 (quoted in row 7); section 4.3, lines 244–246
+  (three-minute hold). Figure 17(a) holds the actual trace and has not been
+  read.
 - **Burke, R. D., Olmeda, P., Arnau, F., Reyes-Belmonte, M.**, "Modelling of
   Turbocharger heat transfer under stationary and transient conditions", 11th
   International Conference on Turbochargers and Turbocharging, London, 13–14
   May 2014. **Abstract only** (Bath portal), quoted in section 4.
 - **Burke, R. D.**, "Analysis and modeling of the transient thermal behavior of
   automotive turbochargers", *Journal of Engineering for Gas Turbines and
-  Power* **136**(10), 101511 (2014), DOI 10.1115/1.4027290. **Opened 17
-  November 2026** (Literature Tracker C47). A two-mass lumped model with a
-  turbine node (eqs. 13–14, p. 4), but it prints no housing mass, heat capacity
-  or UA (Table 2 holds only Nusselt constants), so no τ = C/UA follows. Housing
-  settling times from first-order fits to measured wall temperatures: 150 s
-  compressor, 240 s turbine (p. 7). Turbine heat flow into the structure up to
-  6.6 kW, about 0.6 kW after about 100 s (p. 8).
+  Power* **136**(10), 101511 (2014), DOI 10.1115/1.4027290. **Abstract only.**
+  Its lumped model has a turbine node, so its parameter table should give the
+  housing C and UA from which τ = C/UA follows. **First document to open for
+  row 7.**
 - **Romagnoli, A., Manivannan, A., Rajoo, S., Chiong, M. S., Feneley, A.,
   Pesiridis, A., Martinez-Botas, R. F.**, "A review of heat transfer in
   turbochargers", accepted manuscript in the Brunel University repository
   (handle 2438/15655; journal version ScienceDirect S1364032117306172, year and
   venue not printed on the manuscript). Section 6.8 paraphrases Burke et al.
   2015 as "6.6 kW to 0.6 kW in 100 s" and "half the initial value within three
-  minutes"; **neither figure appears in the Burke et al. 2015 text**. The first is
-  Burke 2014's (p. 8); the second matches Burke et al. 2015's 7 → 3.6 kW sentence
-  (p. 194). Cite the primaries.
+  minutes"; **neither figure appears in the Burke text**, so cite the primary.
 - **Zhu, G. G., Haskara, I., Winkelman, J.**, "Closed-Loop Ignition Timing
   Control for SI Engines Using Ionization Current Feedback", *IEEE Transactions
   on Control Systems Technology* **15**(3), May 2007, pp. 416–427. Author-hosted
@@ -680,11 +668,9 @@ session's scratch directory, not in the repository.
 - **Jarrier, L., Champoussin, J., Yu, R., Gentile, D.**, "Warm-Up of a D.I.
   Diesel Engine: Experiment and Modeling", SAE 2000-01-0299,
   DOI 10.4271/2000-01-0299. **Abstract.**
-- **Chen, Y.-M., Lee, J., Holmer, J., Ha, J.**, "Model Predictive Control for
+- **Chen, Y., Lee, J., Holmer, J., Ha, J.**, "Model Predictive Control for
   Engine Thermal Management System", SAE 2021-01-0225, DOI 10.4271/2021-01-0225.
-  **Full text read 17 November 2026** (Literature Tracker B18): a 240 s preview
-  on one simulated climb; fan energy −4.8 % and alternator energy −2.33 % (Table 2,
-  p. 7); knock is not modelled (p. 8). Not a validation source — **prior art on the
+  **Abstract, as rendered.** Not a validation source — **prior art on the
   premise**: it schedules the coolant target from road-grade preview. It
   belongs in the literature review, and the H/τ criterion should be positioned
   as the thing that paper does not state.
@@ -700,10 +686,8 @@ session's scratch directory, not in the repository.
   see section 1. The US grant was read from page images of the USPTO PDF.
 - **Landerl, C., Mattes, W., Rülicke, M., Durst, B.**, "The New BMW Inline
   Six-cylinder Gasoline Engine", *MTZ worldwide* **76**(10), Oct 2015,
-  pp. 22–29, DOI 10.1007/s38313-015-0041-7. **Full text opened** (Literature
-  Tracker). The BMW-authored design paper for the 2015 launch version of this
-  engine (240 kW, compression ratio 11; 'internally B58', p. 29): cooling
-  description pp. 24–27; no BSFC map (Fig. 6 is indexed against the predecessor).
+  pp. 22–29, DOI 10.1007/s38313-015-0041-7. **Record confirmed via Crossref;
+  full text not opened.** The BMW-authored design paper for this engine.
 - **Steinparzer, F., Nefischer, P., Hiemesch, D., Rechberger, E.**, "The New
   BMW Six-cylinder Top Engine with Innovative Turbocharging Concept", *MTZ
   worldwide* **77**(10), 2016, pp. 38–45, DOI 10.1007/s38313-016-0104-4.
@@ -751,38 +735,21 @@ session's scratch directory, not in the repository.
    car (section 2). Listed as open here until 28 September.
 2. **Burke 2014**, *J. Eng. Gas Turbines Power* 136(10) 101511: the turbine-node
    capacitance and conductances, hence a published C/UA to set against our
-   48.0 s and 6000 J/K (row 7, section 4). OPENED 17 November 2026: it publishes
-   no capacitance or conductances, only housing settling times (150 s
-   compressor, 240 s turbine, p. 7; row 7).
+   48.0 s and 6000 J/K (row 7, section 4).
 3. **Landerl et al. 2015**, MTZ worldwide 76(10): the BMW description of the
    engine, its cooling system and, probably, its fuel-consumption map (rows 3
-   and 10, section 2). OPENED: no fuel-consumption map (Fig. 6 is indexed);
-   the cooling description is on pp. 24–27.
+   and 10, section 2). Library access.
 4. **Toyota USA 2023 GR Supra** pressroom specification page and MY23 brochure:
    the one document that would print "2023" and the compression ratio together.
-   Both refuse automated readers; open them in a browser. FOUND, 14 November
-   2026: the brochure (Toyota Motor Sales, U.S.A., *2023 GR Supra* eBrochure,
-   Literature Tracker REF-Toyota-2023). For the 3.0, 3.0 Premium and A91-MT:
-   p. 15, compression ratio 10.2:1, bore × stroke 82.0 × 94.6 mm, 2998 cc,
-   382 hp at 5800–6500 rpm, the 8-speed ratios `a90_supra.toml` carries and a
-   rear axle ratio of 3.154; p. 16, curb weight 3,400 lb (1542.2 kg) and tyres
-   F 255/35 ZR19, R 275/35 ZR19. US market: it does not document the GCC car.
+   Both refuse automated readers; open them in a browser.
 5. **Heywood printed page numbers** for scan leaves 403, 80, 261–262, 688, and
-   the values in Fig. 6-22 (rows 2, 3, 5, 6). DONE for rows 2, 3, 5 and 6 on
-   14 November 2026, from the printed 2nd edition (Literature Tracker C36):
-   pp. 403, 66, 75 (Table 2.1) and 249–250. Two of its figures differ from the
-   1st-edition scan (MFB50 about 8° not 10°; best bsfc 235 not 270 g/kW·h).
-   Still open: the chapter-11 remark (scan leaf 688) and the load-and-speed
-   figure (the scan's Fig. 6-22).
-6. **Savaripour, H., Alaviyoun, S., & Rosen, M. A. (2022)**, "Thermal
-   Investigation of a Turbocharger Using IR Thermography", *Clean Technologies*
-   4(2), 329–344 (open access; the first author was misnamed 'Basir' here):
-   measured (IR) casing warm-up and cool-down curves on a 1.7 L turbo gasoline
-   engine. OPENED (Literature Tracker C61): it gives no settling time or time
-   constant (the warm-up is still rising at about 820 s; the cool-down is
-   engine-off), so it does not check row 7.
-7. **Chen & Flynn 650733**: FOUND, 14 November 2026: printed p. 11 (PDF p. 12),
-   Fig. 22 (section 1).
+   the values in Fig. 6-22 (rows 2, 3, 5, 6).
+6. **Basir, Alaviyoun & Rosen 2022**, "Thermal Investigation of a Turbocharger
+   Using IR Thermography", *Clean Technologies* 4(2) 19 (open access): measured
+   casing warm-up and cool-down curves, which would give a directly measured
+   settling time for row 7. The site refuses automated readers.
+7. **Chen & Flynn 650733**: the page that carries the FMEP correlation, or a
+   secondary source that quotes it (section 1).
 8. **The Bosch handbook page** for the relative-air-charge definition; the
    Springer/Reif edition of *Gasoline Engine Management* shows a search hit near
    page 12 but no text (section 1).
