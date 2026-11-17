@@ -103,7 +103,9 @@ recorded about its own car.
 > archive.org copy. It is the only BMW document opened that describes the
 > cooling system. Quote it as what it is and let the supervisor decide whether
 > it may be cited; the official alternative is the BMW-authored MTZ article in
-> section 7, which nobody has opened past its abstract.
+> section 7 (Landerl et al. 2015, now opened), which confirms the heat-management
+> module in place of a thermostat, the ball valve and the oil-to-water exchanger
+> (pp. 24–27), for the 2015 launch engine.
 
 
 ---
@@ -308,11 +310,11 @@ needs BMW-specific data.
 |---|---|---|---|---|---|---|
 | 1 | Displacement | engine size | 2990–3000 cc | **B58** | **CONFIRMED** | section 2 |
 | 2 | MFB50 at MBT | The crank angle by which half the fuel has burned, at the spark timing that makes the most torque. If burning finishes too early or too late you lose power | 8–10° after top-dead-centre | general | **CONFIRMED** (as the common rule; it is engine-dependent) | Zhu, Haskara & Winkelman 2007, p. 417: "between 8 and 10 [°] after TDC when MBT timing is achieved"; Heywood, 2nd ed. 2018, printed p. 403 (photographed 14 Nov 2026, Literature Tracker C36): with optimum spark timing "half the charge is burned at about 8° after TC", and peak pressure falls 13–15° after TC (a single value, not a band; the 1st-edition scan read "about 10°"); Machado et al. 2015, abstract as rendered: the industry adopts 8°–10° for CA50. Caveat: Klimstra 1985 (abstract) puts the optimum at 7–8°, so the thesis should say "commonly 8–10°, engine-dependent" |
-| 3 | Best BSFC | Fuel used per unit of work done — the engine's best-case efficiency | 235–260 g/kWh | general | **PARTIAL** — the lower end is printed; nothing opened states the upper | Heywood, 2nd ed. 2018 (photographed 14 Nov 2026, Literature Tracker C36): printed p. 66, "For SI engines, typical best values of brake-specific fuel consumption are about 65 μg/J = 235 g/kW·h", the band's lower end; printed p. 75, Table 2.1, best bsfc 240 g/kW·h for naturally aspirated and 230 for turbocharged, charge-air-cooled SI passenger cars. The 1st-edition scan read "about 75 μg/J = 270 g/kW·h" (eq. 2.22 context); the thesis cites the 2nd edition, so that figure is not Heywood's for it. Conway et al. 2018, p. 5: "The best BSFC of 233 g/kWh (35.8% brake thermal efficiency or BTE) was achieved at 2500 rpm 12 bar BMEP" on a production-like 1.6 L turbo GDI calibration. Our 239.9 g/kWh sits inside Table 2.1's 230–240. Do not change the band; cite p. 66 for its lower end and state the upper end as judgement. The MTZ article of section 7 (Landerl et al. 2015, opened through the Literature Tracker) has no BSFC map: its Fig. 6 (p. 27) is specific fuel consumption indexed against the predecessor engine, with no absolute values, for the 2015 launch engine (240 kW, compression ratio 11) |
+| 3 | Best BSFC | Fuel used per unit of work done — the engine's best-case efficiency | 235–260 g/kWh | general | **PARTIAL** — the lower end is printed; nothing opened states the upper | Heywood, 2nd ed. 2018 (photographed 14 Nov 2026, Literature Tracker C36): printed p. 66, "For SI engines, typical best values of brake-specific fuel consumption are about 65 μg/J = 235 g/kW·h", the band's lower end; printed p. 75, Table 2.1, best bsfc 240 g/kW·h for naturally aspirated and 230 for turbocharged, charge-air-cooled SI passenger cars. The 1st-edition scan read "about 75 μg/J = 270 g/kW·h" (eq. 2.22 context); the thesis cites the 2nd edition, so that figure is not Heywood's for it. Conway et al. 2018, p. 5: "The best BSFC of 233 g/kWh (35.8% brake thermal efficiency or BTE) was achieved at 2500 rpm 12 bar BMEP" on a 1.6 L turbo GDI engine run by a prototype controller mimicking the OEM's (Euro V) calibration (pp. 1, 4), in its baseline configuration. Our 239.9 g/kWh sits inside Table 2.1's 230–240. Do not change the band; cite p. 66 for its lower end and state the upper end as judgement. The MTZ article of section 7 (Landerl et al. 2015, opened through the Literature Tracker) has no BSFC map: its Fig. 6 (p. 27) is specific fuel consumption indexed against the predecessor engine, with no absolute values, for the 2015 launch engine (240 kW, compression ratio 11) |
 | 4 | Knock-limited spark | How far the spark can be advanced at high load before detonation starts | 8–14° | **B58-ish** | **UNVERIFIED — expected, and confirmed by searching** | SAE knock-limit papers, MIT and MTU theses and knock-model papers were searched; not one admissible page states a knock-limited spark value near 3000 rpm and 200 kPa. Douaud & Eyzat gives the knock *model*, not this band. **Weakest of the eleven.** Drop the row from the thesis, or keep it labelled as an internal consistency check |
-| 5 | EGT cruise, min | Exhaust gas temperature at steady cruise | 600–750 °C | general | **UNVERIFIED** (one typical value printed inside the band; no cruise range) | No opened source states a part-load cruise range. Heywood, 2nd ed. 2018, printed p. 250 (photographed 14 Nov 2026, Literature Tracker C36): "Gasoline engines with stoichiometric operation have exhaust gas temperatures of about 650°C (925 K)", usually "time-average measurements made close to the exhaust port exit"; pp. 249–250: mass-averaged port-exit temperatures are "about 100 K higher" than time-averaged thermocouple ones. 650 °C sits inside the band but is one stoichiometric value, not a cruise minimum or maximum. The 1st-edition scan's load-and-speed figure (its Fig. 6-22) has not been located in the 2nd edition, whose Sec. 6.5 figures are 6.27 and 6.28; his chapter 11 remarks that a conventional engine's manifold temperature "is not sufficient" for thermal-reactor oxidation at about 600–700 °C, which leans against the band. The only measured figures found are full-load protection limits on a modern turbo GDI: 900 °C at the exhaust port, 930 °C pre-turbine (Conway et al. 2018, p. 10). State which temperature the band means: thermocouple readings sit roughly 100 K below mass-averaged port temperature (Heywood, 2nd ed., pp. 249–250) or about 20 K below the time-averaged value (Caton 1982, abstract) |
+| 5 | EGT cruise, min | Exhaust gas temperature at steady cruise | 600–750 °C | general | **UNVERIFIED** (one typical value printed inside the band; no cruise range) | No opened source states a part-load cruise range. Heywood, 2nd ed. 2018, printed p. 250 (photographed 14 Nov 2026, Literature Tracker C36): "Gasoline engines with stoichiometric operation have exhaust gas temperatures of about 650°C (925 K)", usually "time-average measurements made close to the exhaust port exit"; pp. 249–250: mass-averaged port-exit temperatures are "about 100 K higher" than time-averaged thermocouple ones. 650 °C sits inside the band but is one stoichiometric value, not a cruise minimum or maximum. The 1st-edition scan's load-and-speed figure (its Fig. 6-22) has not been located in the 2nd edition, whose Sec. 6.5 figures are 6.27 and 6.28; his chapter 11 remarks that a conventional engine's manifold temperature "is not sufficient" for thermal-reactor oxidation at about 600–700 °C, which leans against the band. The only measured figures found are full-load exhaust-gas temperature limits beyond which enrichment was required on a modern turbo GDI: 900 °C at the exhaust port, 930 °C pre-turbine (Conway et al. 2018, p. 10). State which temperature the band means: thermocouple readings sit roughly 100 K below mass-averaged port temperature (Heywood, 2nd ed., pp. 249–250) or about 20 K below the time-averaged value (Caton 1982, abstract) |
 | 6 | EGT cruise, max | as above | 600–750 °C | general | **UNVERIFIED** | as above |
-| 7 | **Turbine housing time constant** | How long the turbocharger takes to heat up — technically, to reach 63 % of the way to its final temperature after a step change in load | 40–120 s | **B58** | **PARTIAL** | Burke, Vagg, Chalet & Chesse 2015, section 5.3: after a load step on a 2.2-litre diesel with a variable-geometry turbocharger, the gas-to-housing heat flow "peaks at the beginning of the transient (in this case at around 7kW) before slowly falling to a value of around 3.6kW three minutes later. This spike in heat flow is accounted for by the accumulation of heat in the turbine housing as it warms up"; their protocol holds each step three minutes because "this allows for the system to stabilise". Settling within about three minutes bounds the housing time constant from above at roughly 45–60 s, consistent with our 48.0 s on the climb and inside the band. **What it does not do:** it reports no time constant, supports neither the 40 s floor nor the 120 s ceiling, and is a diesel turbocharger, not a B58. **No opened source publishes a turbine-housing heat capacity in J/K**, so `c_turb` cannot be cross-checked; see section 4 |
+| 7 | **Turbine housing time constant** | How long the turbocharger takes to heat up — technically, to reach 63 % of the way to its final temperature after a step change in load | 40–120 s | **B58** | **PARTIAL** (basis corrected 17 November 2026; the grade is the team's to confirm) | Burke, Vagg, Chalet & Chesse 2015, section 5.3 (p. 194): after a load step on a 2.2-litre diesel with a variable-geometry turbocharger, the gas-to-housing heat flow "peaks at the beginning of the transient (in this case at around 7kW) before slowly falling to a value of around 3.6kW three minutes later. This spike in heat flow is accounted for by the accumulation of heat in the turbine housing as it warms up"; their protocol holds each step three minutes because "this allows for the system to stabilise" (section 4.3, p. 190). The three minutes is that hold time, not a measured settling: Fig. 17(a) (read 17 November 2026) shows the housing still absorbing heat three minutes after the step, and its heat flows are calculated from measured gas temperature, pressures and speed. It reports no time constant and bounds none (an earlier version of this row read it as bounding τ at 45–60 s; it does not). Burke 2014 (section 7 entry; p. 7), on a 2.2-litre diesel turbocharger, gives settling times from first-order fits to measured wall temperatures: 150 s for the compressor housing and **240 s for the turbine housing**, the settling criterion not stated. 240 s is 5τ at τ = 48 s, 4τ at 60 s and 3τ at 80 s, so it sits inside the band but does not single out 48.0 s. **What neither does:** report a housing time constant, support the 40 s floor or the 120 s ceiling, or describe a B58. **No opened source publishes a turbine-housing heat capacity in J/K** (Burke 2014 used the true housing mass but prints no value, p. 7), so `c_turb` cannot be cross-checked; see section 4 |
 | 8 | Oil, sustained load (drive10, hottest 10 min) | how hot the oil runs when the car is worked hard for ten minutes | 103–111 °C | **our car** | **MEASURED (ours)** | The car's interquartile range over the 10 minutes of drive10 where its rolling-median oil is highest. The model, with the derived oil node, sits at 97.0 °C (it was 96.4 before): **still outside**, and now IN-SAMPLE, because drive10 is in the fit. Of the 12.0 K miss, 4.6 K is the coolant (over that stretch the car's heat-management valve let it rise to 97–99 °C where the model regulates near 93; pinning the block to the measured coolant recovers 4.6 K) and 7.3 K is the oil node itself, which runs 4.4 K over its coolant where the car's oil runs 11.7 K (`model_vs_data.row8_split`; corrected 29 September from an unmeasured "about 6 K"). Replaces the 115–140 °C band, which no source supported (section 2, oil row) |
 | 9 | Oil apparent time constant (identified) | how long the oil takes to follow a change in load | 70–100 s | **our car** | **MEASURED (ours)** | One first-order fit (`car_thermal.identify_tau`) applied to the car's oil and to the model's; the car's range over the four drives that excite the oil enough to say. The model's was 14.0 s; with the derived oil node it is 60.0 s: **closer, still outside**. The old 20–400 s band contained the car's value — the band was right, and the model was not. Jarrier et al. 2000 (abstract) still supports the ordering, oil lagging coolant |
 | 10 | Coolant, regulated (synthetic climb) | steady coolant temperature once warm, under load | 83.6–95.5 °C | **our car** | **MEASURED (ours)** | Warm coolant on every drive, 5th–95th percentile (83.5–95.6 until drive B's coolant joined the pool, by the same rule). The model's settled 93.0 °C on the synthetic climb is inside (was 94.5). Was 88–108 °C, whose upper half was judgement |
@@ -332,11 +334,11 @@ the car's; that is the direction a stricter test should move it.*
 constant of the part being protected. **τ for the turbine is row 7.**
 
 If that band is wrong, every point on the H/τ curve sits in the wrong place.
-No other row can move the headline result. It is now PARTIAL: the one measured
-load-step transient that could be opened settles within three minutes, which is
-consistent with our 48 s on the climb, but nobody has published the housing time
-constant itself. The two documents most likely to contain it are listed first in
-section 7.
+No other row can move the headline result. It is PARTIAL: Burke 2014 gives a
+turbine-housing settling time of 240 s on a diesel turbocharger (τ ≈ 48–80 s for
+a 5τ-to-3τ criterion), and Burke et al. 2015's three minutes is a test hold time,
+not a measured settling (corrected 17 November 2026). Nobody has published the
+housing time constant itself, and neither Burke paper prints a heat capacity.
 
 ### Why row 4 is the weakest
 
@@ -529,12 +531,14 @@ impression this file exists to prevent.
 
 1. ~~Settle which engine version the car is~~ -- **settled 19 September 2026**:
    the 285 kW / 382 hp car, so 10.2:1 is right (section 2).
-2. **Row 7 next**: open Burke 2014 (section 7, first item) for the housing heat
-   capacity, and Burke et al. 2015 for the temperature traces behind the
-   three-minute settling.
-3. **Get the MTZ article** (section 7) through the library. It is the only
-   BMW-authored document on this engine and may carry the fuel-consumption map
-   for row 3 and the cooling description that would replace the grey ST1505.
+2. **Row 7**: DONE 17 November 2026. Burke 2014 prints no housing heat
+   capacity, only settling times (p. 7), and Burke et al. 2015's Fig. 17(a)
+   shows no settling at three minutes (row 7).
+3. **The MTZ article** (section 7): OPENED through the Literature Tracker. It has
+   no fuel-consumption map (Fig. 6 is indexed; row 3). Its cooling description
+   (pp. 24–27: a heat-management module instead of a thermostat, an electrically
+   actuated ball valve, the oil-to-water exchanger) can replace the grey ST1505
+   for those points, for the 2015 launch engine (240 kW, compression ratio 11).
 4. `validation_table.md` carries a `source` column pointing at the row numbers
    here; keep the two files' row numbers aligned.
 5. Anything still UNVERIFIED at submission gets said plainly in Chapter 3:
@@ -616,26 +620,32 @@ session's scratch directory, not in the repository.
   *International Journal of Heat and Fluid Flow* **52** (2015) 185–197,
   DOI 10.1016/j.ijheatfluidflow.2015.01.004. Accepted manuscript, University of
   Bath research portal (file 119302957/Accepted_version.pdf): section 5.3,
-  manuscript lines 418–420 (quoted in row 7); section 4.3, lines 244–246
-  (three-minute hold). Figure 17(a) holds the actual trace and has not been
-  read.
+  manuscript lines 419–421 (quoted in row 7); section 4.3, lines 244–246
+  (three-minute hold). Figure 17(a), read 17 November 2026: the housing is
+  still absorbing heat three minutes after the step; the flows are calculated,
+  not measured.
 - **Burke, R. D., Olmeda, P., Arnau, F., Reyes-Belmonte, M.**, "Modelling of
   Turbocharger heat transfer under stationary and transient conditions", 11th
   International Conference on Turbochargers and Turbocharging, London, 13–14
   May 2014. **Abstract only** (Bath portal), quoted in section 4.
 - **Burke, R. D.**, "Analysis and modeling of the transient thermal behavior of
   automotive turbochargers", *Journal of Engineering for Gas Turbines and
-  Power* **136**(10), 101511 (2014), DOI 10.1115/1.4027290. **Abstract only.**
-  Its lumped model has a turbine node, so its parameter table should give the
-  housing C and UA from which τ = C/UA follows. **First document to open for
-  row 7.**
+  Power* **136**(10), 101511 (2014), DOI 10.1115/1.4027290. **Opened 17
+  November 2026** (Literature Tracker C47). A two-mass lumped model with a
+  turbine node (eqs. 13–14, p. 4), but it prints no housing mass, heat capacity
+  or UA (Table 2 holds only Nusselt constants), so no τ = C/UA follows. Housing
+  settling times from first-order fits to measured wall temperatures: 150 s
+  compressor, 240 s turbine (p. 7). Turbine heat flow into the structure up to
+  6.6 kW, about 0.6 kW after about 100 s (p. 8).
 - **Romagnoli, A., Manivannan, A., Rajoo, S., Chiong, M. S., Feneley, A.,
   Pesiridis, A., Martinez-Botas, R. F.**, "A review of heat transfer in
   turbochargers", accepted manuscript in the Brunel University repository
   (handle 2438/15655; journal version ScienceDirect S1364032117306172, year and
   venue not printed on the manuscript). Section 6.8 paraphrases Burke et al.
   2015 as "6.6 kW to 0.6 kW in 100 s" and "half the initial value within three
-  minutes"; **neither figure appears in the Burke text**, so cite the primary.
+  minutes"; **neither figure appears in the Burke et al. 2015 text**. The first is
+  Burke 2014's (p. 8); the second matches Burke et al. 2015's 7 → 3.6 kW sentence
+  (p. 194). Cite the primaries.
 - **Zhu, G. G., Haskara, I., Winkelman, J.**, "Closed-Loop Ignition Timing
   Control for SI Engines Using Ionization Current Feedback", *IEEE Transactions
   on Control Systems Technology* **15**(3), May 2007, pp. 416–427. Author-hosted
@@ -670,9 +680,11 @@ session's scratch directory, not in the repository.
 - **Jarrier, L., Champoussin, J., Yu, R., Gentile, D.**, "Warm-Up of a D.I.
   Diesel Engine: Experiment and Modeling", SAE 2000-01-0299,
   DOI 10.4271/2000-01-0299. **Abstract.**
-- **Chen, Y., Lee, J., Holmer, J., Ha, J.**, "Model Predictive Control for
+- **Chen, Y.-M., Lee, J., Holmer, J., Ha, J.**, "Model Predictive Control for
   Engine Thermal Management System", SAE 2021-01-0225, DOI 10.4271/2021-01-0225.
-  **Abstract, as rendered.** Not a validation source — **prior art on the
+  **Full text read 17 November 2026** (Literature Tracker B18): a 240 s preview
+  on one simulated climb; fan energy −4.8 % and alternator energy −2.3 % (Table 2,
+  p. 7); knock is not modelled (p. 8). Not a validation source — **prior art on the
   premise**: it schedules the coolant target from road-grade preview. It
   belongs in the literature review, and the H/τ criterion should be positioned
   as the thing that paper does not state.
@@ -688,8 +700,10 @@ session's scratch directory, not in the repository.
   see section 1. The US grant was read from page images of the USPTO PDF.
 - **Landerl, C., Mattes, W., Rülicke, M., Durst, B.**, "The New BMW Inline
   Six-cylinder Gasoline Engine", *MTZ worldwide* **76**(10), Oct 2015,
-  pp. 22–29, DOI 10.1007/s38313-015-0041-7. **Record confirmed via Crossref;
-  full text not opened.** The BMW-authored design paper for this engine.
+  pp. 22–29, DOI 10.1007/s38313-015-0041-7. **Full text opened** (Literature
+  Tracker). The BMW-authored design paper for the 2015 launch version of this
+  engine (240 kW, compression ratio 11; 'internally B58', p. 29): cooling
+  description pp. 24–27; no BSFC map (Fig. 6 is indexed against the predecessor).
 - **Steinparzer, F., Nefischer, P., Hiemesch, D., Rechberger, E.**, "The New
   BMW Six-cylinder Top Engine with Innovative Turbocharging Concept", *MTZ
   worldwide* **77**(10), 2016, pp. 38–45, DOI 10.1007/s38313-016-0104-4.
@@ -737,10 +751,13 @@ session's scratch directory, not in the repository.
    car (section 2). Listed as open here until 28 September.
 2. **Burke 2014**, *J. Eng. Gas Turbines Power* 136(10) 101511: the turbine-node
    capacitance and conductances, hence a published C/UA to set against our
-   48.0 s and 6000 J/K (row 7, section 4).
+   48.0 s and 6000 J/K (row 7, section 4). OPENED 17 November 2026: it publishes
+   no capacitance or conductances, only housing settling times (150 s
+   compressor, 240 s turbine, p. 7; row 7).
 3. **Landerl et al. 2015**, MTZ worldwide 76(10): the BMW description of the
    engine, its cooling system and, probably, its fuel-consumption map (rows 3
-   and 10, section 2). Library access.
+   and 10, section 2). OPENED: no fuel-consumption map (Fig. 6 is indexed);
+   the cooling description is on pp. 24–27.
 4. **Toyota USA 2023 GR Supra** pressroom specification page and MY23 brochure:
    the one document that would print "2023" and the compression ratio together.
    Both refuse automated readers; open them in a browser. FOUND, 14 November
@@ -757,10 +774,13 @@ session's scratch directory, not in the repository.
    1st-edition scan (MFB50 about 8° not 10°; best bsfc 235 not 270 g/kW·h).
    Still open: the chapter-11 remark (scan leaf 688) and the load-and-speed
    figure (the scan's Fig. 6-22).
-6. **Basir, Alaviyoun & Rosen 2022**, "Thermal Investigation of a Turbocharger
-   Using IR Thermography", *Clean Technologies* 4(2) 19 (open access): measured
-   casing warm-up and cool-down curves, which would give a directly measured
-   settling time for row 7. The site refuses automated readers.
+6. **Savaripour, H., Alaviyoun, S., & Rosen, M. A. (2022)**, "Thermal
+   Investigation of a Turbocharger Using IR Thermography", *Clean Technologies*
+   4(2), 329–344 (open access; the first author was misnamed 'Basir' here):
+   measured (IR) casing warm-up and cool-down curves on a 1.7 L turbo gasoline
+   engine. OPENED (Literature Tracker C61): it gives no settling time or time
+   constant (the warm-up is still rising at about 820 s; the cool-down is
+   engine-off), so it does not check row 7.
 7. **Chen & Flynn 650733**: FOUND, 14 November 2026: printed p. 11 (PDF p. 12),
    Fig. 22 (section 1).
 8. **The Bosch handbook page** for the relative-air-charge definition; the
