@@ -264,6 +264,50 @@ How it ran: I asked to see completed notes before they go in. B19: Unsure (Claud
 Yes), Prior art. B18: Yes, Prior art. B06: Yes, Background only (Claude suggested Prior art,
 since it sweeps H; I kept mine: it does not touch our project's ideas).
 
+16 to 18 November, B31 (Liu et al.'s look-ahead controller for a diesel air path) and A25 (Wei et al.'s
+broiler house), on the PC and then my laptop (`SESSION_REPORT_2026-11-16_reading-B31-A25.md`). I asked to
+start B31 again from the beginning, to check what I had. What landed:
+
+- **The two EGR loops**, after the car's A/C with two recirculation openings had not ("ما فهمت الصمامين"): a
+  wedding hall, where guests who step out come back either by a side door straight in or round through the
+  main entrance with the new guests. I wrote back right that one shortcuts to the engine without the turbo
+  and the other goes through the whole stage. For their two speeds I brought my own frame: exam grading, a
+  fast machine for one kind of paper and essays graded by hand.
+- **The 2 s**, through a mother planning meals, then the car's A/C in summer for the turbo's lag. In my words:
+  it sees 2 s; when you press, the turbo takes 1.4 s, and 8 s is how long the press's effect lasts. The
+  corrections I needed first: 1.4 and 8 s are the turbo's own speed, not how far it sees; and 2 s was chosen
+  for the computer, not because it gave excellent results.
+- **The comparison**, through a student who studies past exams against a twin who does not: they compared 2 s
+  against 0 s. When the twin turned out to differ in more than preview, I said the test felt unfair; a new
+  spice that needs a new pot made it "not cheating, but not the spice alone". My own conclusion: our two
+  agents differ only in preview, and copying them would lose our clean test.
+- **A25's forecasting question**, through my own frame, food in a thermos: asked about a minute ahead, "the
+  same as now" is nearly right; asked about tomorrow, it is badly wrong. The correction: "now" is the last
+  reading, every 15 minutes, not the moment the food went in. A weather app that issues two forecasts every
+  15 minutes (in 15 minutes, and tomorrow at the same time) settled what is fixed and what changes.
+- **Two scales at once**, after I put them one after the other: a room in summer with the A/C off, where the
+  air warms within the hour while the walls start too and take days.
+- **Where the 0.7-1.5 comes from**, through cooking kabsa rice at five times and keeping the two best: 4 h and
+  8 h are both divided by the same fast scale, 5.5 h; the slow scale never enters (I had divided one by each).
+  Two drivers aiming at 120 km/h, one between 110 and 130 and one between 119 and 121, showed what "steady"
+  means. The point in my words is A25's "Answer to Read it for".
+- **The plan's pieces** are pieces of time (the first hour in detail, the rest one move), not parts of the
+  house: planning a day.
+
+What did NOT land: the A/C with two openings; the last two lines on asking every 15 minutes over 35 days
+("ما فهمت اخر سطرين"; my thermos did it); A25's robustness tests through a rice recipe tried with other rice
+and a stronger fire ("ما فهمت اعطيني ايش صار بشكل مختصر": the short version did it); and A25 restarted
+without examples ("ما فهمت حطهم في مثال").
+
+How it ran: I ask to see a text before it goes in, I keep my own words when I prefer them (A25's synopsis,
+its last line from before the correction included), and I turn down additions I do not want (B31's weights).
+B31: Unsure, Background only ("شالت اهم شي عندنا وهي الحرارة"). A25: Unsure, Background only ("مجالين
+مختلفين"). Then I wrote: my own review in English (a Claude Doc), my section of the team's review
+(`docs/literature/review/computer-simulations.md`), and the team's draft under one IEEE numbering. For the
+supervisor I asked what to say, what each of my papers protects, and the gap. **The format I liked most**
+(17 November): for each paper, what the section says, then what is in my notes beside it. A line Claude
+wrote and I approved is "in my notes", not "I wrote" (it was mislabelled once, and corrected).
+
 **Not covered yet:** the thermal detail of the turbo (exhaust-gas temperature
 against housing-metal temperature); how thermal damage is computed; reward
 hacking; the learning algorithm; uncertainty models; spark timing beyond the

@@ -75,6 +75,9 @@ the title is the file's own first line.
 | 2026-11-12 | `NEXT_SESSION_2026-11-12_reading.md` | Next session — reading prompt, from B19 (written 12 November 2026) |
 | 2026-11-13 | `SESSION_REPORT_2026-11-13_reading-B19-B18-B06.md` | Session report — 12 to 13 November 2026: Jad reads B19, B18 and B06 of his ten |
 | 2026-11-13 | `NEXT_SESSION_2026-11-13_reading.md` | Next session — reading prompt, from B31 (written 13 November 2026) |
+| 2026-11-16 | `NEXT_SESSION_2026-11-16_reading.md` | Next session — on the laptop, from B31's methodology (written 16 November 2026) |
+| 2026-11-16 | `SESSION_REPORT_2026-11-16_reading-B31-A25.md` | Session report — 16 to 18 November 2026: Jad reads B31 and A25, and writes his part of the literature review |
+| 2026-11-18 | `NEXT_SESSION_2026-11-18_reading.md` | Next session — on the PC, B49, Jad's last paper (written 18 November 2026) |
 | ? | `conflict.md` | conflict.md — Ghassan's branch merged into Jad's: every conflict, and a recommendation for each |
 | ? | `conflict_ar.md` | ملف التعارض: دمج برانش غسان مع برانش جاد |
 
