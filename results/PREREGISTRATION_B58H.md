@@ -1990,6 +1990,147 @@ other `b58h_training_N` folder, while step 3 reads `$OUT/training/SHA256SUMS`; t
 repository, `sha256sum -c` runs there first, and the placement under `$OUT/training` (Step 8's `SHA256SUMS` at
 `$OUT/training/SHA256SUMS`, byte for byte) is recorded in this section when it is made.
 
+**16 November 2026, `b65b579`** (the return's route; section 14 step 2's gate, after the commit and before its push,
+as its message gives it): the cost-file list 51 paths and no line printed STOP; "cost files unchanged since B1: exit
+0"; `epa_backend.py check` printed `[]`; `test_four_engine_analysis`: "Ran 50 tests", "OK"; `test_engine_threading`,
+alone: "Ran 33 tests", "OK (skipped=6)"; `test_epa_backend.PreregistrationB58H`: "Ran 6 tests", "OK";
+`verify_docs.py`: "All 170 checks pass (1172 figure mentions scanned in the documents)."; "ABOVE SECTION 15:
+UNCHANGED SINCE T*". Pushed the same day.
+
+**17 November 2026, a break of row 149 (3), undone the same day by `588de29`.** Eleven commits of 17 November (`9b19be4`
+to `8800572`, pushed) changed paths present at `T*` that row 149 (3) does not name: `REFERENCES.md`,
+`docs/literature/READING_LIST.md` and `docs/literature/references.bib`, `results/VALIDATION_PLAN.md`, the presentation,
+the supervisor note, and the source strings of five `engine_specs/*.toml`, which are cost files, frozen from B1's
+git_head `0329456`. They changed references and source notes only, and every engine value was unchanged (the B58's
+engine_sha at `8800572` was `023f5589215ee68e`, as at `b65b579`), but at `8800572` `epa_backend.py check` refused and
+the name-status check of section 14 step 2 would have printed STOP. Ghassan chose to revert them: `588de29` returns
+every path they touched to its content at `b65b579` (pushed 17 November). No command had loaded an agent or a checkpoint
+of this study. They are re-applied by reverting `588de29`, the documentation paths after the first scoring command and
+the `engine_specs` paths after the last scoring. The same day, `d05e27d` recorded in the session report (section 17)
+three analyses chosen during training, before any score: each is post hoc (VD:394), reported under a post hoc heading
+beside the preregistered readings, deciding nothing.
+
+**18 November 2026, the training's end.** The launch log's last line: "all done in 3921 min; every run finished"
+(`train_all.py`'s print when no run failed). The sheet's records in the return: `training_start.txt` 2026-11-15 19:43:23
++0300 and `training_end.txt` 2026-11-18 13:04:24 +0300, both inside W, whose end is 20 November 00:00 AST
+(`epa_backend.W_LAST`, `results/B58H_DESIGN/d148_figures.txt:14`). One session folder, `b58h_training_1`: no crash, no
+restart and no second session. Every run's `meta.json` reads `git_head` `720587d` (`T*`) and `git_dirty` false (60 of
+`runs/b58h_dt1`, 10 of `runs/b58h_check_dt1`). The agent's driver ran Step 8 itself and printed ALL DONE at 13:11:33;
+nothing was typed in the training window. Its checks, reading only (`checks/endcheck_after_all_done.txt`): no error line
+in `window.log` from Step 8 on; `SHA256SUMS` 6480 lines for the 6480 files of the two folders; no broken folder;
+`training_end.txt` not empty; `env_after_training.txt` "VERSIONS: match the lock"; "END CHECKS: OK". Its hash checks of
+the driver and blocks 09-11 against `MANIFEST.txt` show them unchanged throughout. Its folder came back as
+`visit2_claude_for_ghassan_2.zip`, unpacked on this laptop outside the repository and run nowhere: the 27 sha256 lines
+of its `MANIFEST.txt` all match, and its `VISIT2_SHEET.md` is byte-identical to the sheet sent.
+
+**19 November 2026, the return, checked on this laptop.** Jad's agent asked which route; Ghassan answered the cloud
+link (Jad's university OneDrive). Jad uploaded `b58h_return.zip` and `b58h_return.zip.sha256` in a browser; this
+laptop downloaded each file on its own. Checks, reading bytes and JSON only (none loads an agent or a checkpoint):
+- the zip is 16,819,651,277 bytes, as the agent's line gives it, and its sha256 (beginning `fd63d23a`) equals the
+  `.sha256` file's, `MANIFEST.txt`'s and `window.log`'s;
+- its folder list: `b58h_training_1/` (Step 8's session folder) and `runs/`, with `runs/b58h_dt1` (60 runs, 6240
+  files) and `runs/b58h_check_dt1` (10 runs, 240 files); no `.crashed<N>` or `.broken<N>` folder; no path outside the
+  zip's root;
+- unpacked outside the repository (`/c/Users/badcl/grad_b58h/unpack`), `sha256sum -c b58h_training_1/SHA256SUMS`:
+  6480 OK, none failed;
+- the two environment records, `env_before_ck.txt` (15 November 18:27:49 +0300) and `env_after_training.txt`
+  (18 November 13:05:02 +0300), are identical but their first line, in every field section 11 names:
+  `check_training_device.py`'s version lines (python 3.13.2, torch 2.14.0+cpu, "VERSIONS: match the lock"), the
+  interpreter, the Windows build and revision (26300.9974), the five installed updates, the driver (621.24) and the
+  sha256 of `pip freeze`. Section 11's row for differing records does not apply;
+- the gap of 15 November (a run killed between `final.zip` and its manifest): every run's `config.json` holds
+  `learning_rate_at_end` (0.0 in all 70) and names `checkpoint_average.json`; every manifest has schema
+  `checkpoint-average/1` and five snapshots whose sha256 match their files; every run has `final.zip`; the training's
+  runs read 450 000 steps and the check run's 50 000.
+Placement: `runs/b58h_dt1` and `runs/b58h_check_dt1` moved into this repository's `runs/`, which git ignores; the
+session folder moved to `/c/Users/badcl/grad_b58h/training`, so Step 8's `SHA256SUMS` is `$OUT/training/SHA256SUMS`,
+byte for byte equal to the zip's copy; from the repository root, `sha256sum -c "$OUT/training/SHA256SUMS"` printed
+6480 OK. The message that the zip arrived whole, which frees the PC (the zip there and the cloud copy are kept until
+the scores are committed), was given to Ghassan to send.
+
+**19 November 2026, AB (ORDER step 22a)**, committed with this entry. Its commit and its gate's output (section 14's
+step 2 check, run after the commit and before its push) are in its message, and are recorded here at the next commit
+that touches this file. AB is four new files at the repository's root: `b58h_analysis.py` with `test_b58h_analysis.py`,
+and `b58h_beside.py` with `test_b58h_beside.py`, whose one route is `core` (rows 150 (i), 150 (v) and 151). The
+commands are section 6.8's: `context --scores --out`; `analyse --scores --context --out --report`; `core --scores
+--records --out --jobs`. `b58h_beside.py --list` prints `core`. No score of this study existed while AB was written,
+and no command loaded an agent or a checkpoint. AB ran only on synthetic documents in temporary folders. Its tests
+patch `evaluate.load_agent` and `read_agents` to raise, and an audit hook refuses any open or listing under
+`runs/b58h_dt1` and `runs/b58h_check_dt1`. `core` loads no agent at all.
+
+How it was checked, by agents on this laptop, in three rounds:
+- Round 1: two writers. Per module, a reviewer recomputed every printed number with code of their own, and a mutation
+  tester ran single edits against the tests: `b58h_analysis.py` 64 mutants, 24 surviving; `b58h_beside.py` 87, 21
+  surviving. Every review finding (5 and 6) was fixed, and every survivor was killed by a new test.
+- Round 2: the 45 survivors were re-applied, and all were killed. Fresh mutants on the fixed code (26 and 36; 20 and 16
+  survived) and a second review found two defects, both on failure paths, and both were fixed with the rest:
+  - an output that could not be created left the other one written;
+  - a run that failed after the roads check passed was printed as a failed roads check.
+  One reading was added (G11 below).
+- Round 3, on round 2's changes only. An independent recomputation of section 7's sentences on 83 synthetic
+  documents found 0 mismatches. Fresh mutants (31 and 30; 15 and 13 survived) and a review found more defects,
+  all on failure paths, each fixed with the rest:
+  - a write that failed after the files were open kept the output already written in full; now every file the
+    command opened is removed;
+  - a record's dt of another type, or an index nested too deep for JSON, crashed `core` instead of reading "not
+    computed";
+  - a refusal's text over several lines split a printed line.
+
+The choices AB's docstrings fix before any score (section 6.0). None can move d, Δ, the band, the status or a verdict.
+The docstrings' own text governs; in short:
+- `b58h_analysis.py`:
+  - C1: the CLI is section 6.8's options. A refusal prints "REFUSED: <reason>", nothing written.
+  - C2: each output is written once. All are created before any is written, and a refused command leaves none.
+  - C3: paths are repository-relative. git_head is 7 hex digits.
+  - C4: `context` also requires the scores committed at HEAD.
+  - C5: `analyse` rebuilds the context and refuses one that differs (floats to 1e-12). The raw sha256 is not compared.
+  - C6: `X2_RESULT.txt:24` must sit under its no-knock section, with n = `FEA.PILOT_PAIRS`.
+  - C7: the companion's smallest and largest κ_L1 are taken by value; a tie goes to the first name.
+  - C8: the report's order.
+  - C9: the number formats.
+  - C10: 9.1's validator of the scores' delivery block.
+  - C11: 9.1's worst road and the seeds without a demand step.
+  - C12: section 10 prints "not read: <reason>" for an absent, uncommitted or unparsed line.
+  - C13: the forbidden-phrase check on AB's own text.
+- `b58h_beside.py`:
+  - core takes no engine or knock option: they are the scores'.
+  - The derived paths: the records index, and the text report beside the scores.
+  - The refusals of the whole command. Inside a row, a failure makes that row read "not computed" and the rest runs.
+  - Current-grade's run and its parallel run, and the roads check against the scores' `arrays_sha256`.
+  - The trace `current_grade.npz`.
+  - Control 1: exact equality.
+  - Control 2: the one line after `evaluate.py`'s cut header, compared whole.
+  - Control 3: absolute 1e-6 per road in both readings, roads in order.
+  - s in both forms and both readings, with its per-arm statistics.
+  - The hand-written savings, their mean form recomputed over the neutral run.
+  - Row 153 (1)'s tuned bests: each family's largest evaluate-form lines and the two frontier lines, verbatim.
+  - Decision 13's count: `grids_b58.txt` lines 99-100, verbatim.
+  - 9.5 (v)'s three figures per seed, the seeds without demand dropped and named.
+  - 9.6's integrity checks.
+  - 9.6's limits, 778 and 804 °C, typed with their citations.
+  - 850 °C in both readings PR-B's words allow (the knee and 850.0), each with its own trigger.
+  - The figures, and the printed decimals.
+  - The with-knock label on every with-knock line.
+  - LF outputs, so each file's raw sha256 equals its sha_text.
+
+The gaps of the primary analysis (section 6.0): every reading the words allow is printed, and none is called primary.
+In `b58h_analysis.py`:
+- G1: a MODEL-LIMITED flag that differs between the companions, or between either companion and the primary run, is
+  printed by name. Every run's flag is in the flags block.
+- G2: Δ's mean form, with its own interval and two-sided sign test, deciding nothing.
+- G3: Δ's prediction. The no-knock C_u is printed beside both readings, and C_u.knock beside the with-knock Δ.
+- G4: section 7's sentences are rendered beside the verbatim verdict lines.
+- G5: section 10's values, each with its file and line.
+- G6: 9.1's worst road, per seed and as the arm's largest.
+- G7: "wholly below 0" for the verdict's interval, and in their brackets for the with-knock and mean-form intervals.
+- G8: "MODEL-LIMITED under the other reading of 'at b'" on every verdict of either test, in both readings.
+- G9: another reading of "at b" is detected both by the context's label and by the band recomputed.
+- G10: φ at a median cut of 100 % or more is refused.
+- G11: the ceiling's with-knock reading (`roads.json` `by[r].a.knock.mean`) is printed in the bracket beside C. C is the
+  no-knock reading's and stays the context's.
+
+`b58h_beside.py` has no gap: it computes descriptive rows only.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

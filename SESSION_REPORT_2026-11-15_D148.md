@@ -842,3 +842,61 @@ describes how the agents' damage cut varies with the road design on one plant; n
 made covers the objection), the agents re-scored outside their training band, a fourth arm or more seeds (n = 20
 cannot resolve differences of a few points), the partial-preview probe and the closed-loop time (only if the laptop is
 idle after (f)).
+
+## 18. 19 November: the return checked; AB (ORDER step 22a)
+
+**The return.** Jad's agent uploaded `b58h_return.zip` and its `.sha256` to Jad's university OneDrive after ALL DONE,
+and this laptop downloaded both. Every check of PR-B section 15 passed:
+- the size and sha256;
+- the folder list;
+- `sha256sum -c`, 6480 OK, outside the repository and again after placement;
+- the two environment records, identical but their first line;
+- the meta and config of every run, git_head `720587d`, git_dirty false, `learning_rate_at_end`, the manifests.
+
+The entries are in PR-B section 15 under 18 and 19 November. `runs/b58h_dt1` and `runs/b58h_check_dt1` are in
+`runs/` (git-ignored), and Step 8's session folder is `$OUT/training`. Since the folders arrived, nothing may load an
+agent or a checkpoint of them before AB is committed and pushed. The first such command is the first scoring command.
+
+**AB.** It is written and committed: `b58h_analysis.py`, `b58h_beside.py` (route `core`) and their tests. PR-B
+section 15 holds what it is, its docstrings' choices and the primary analysis's gaps. It was built by agents:
+- a design note fixed before any code (map readers for four_engine_analysis, evaluate, the data, the plant and the
+  gate, a requirements list and a critic);
+- two writers;
+- three rounds of adversarial checks, per module: a reviewer recomputing every printed number with code of their own,
+  and a mutation tester, then a fixer.
+
+The counts are in section 15. The design note is a scratch file, not in the repository. Where it and PR-B differed,
+PR-B governed, and the docstrings list each departure: 850 °C in both readings, VD:116 for the limits, the sign test
+carrying the other reading's MODEL-LIMITED words, and the with-knock bracket carrying its own mean form, band and
+ceiling.
+
+Two defects turned up in round 2, both on failure paths. One was an output that could not be created, which left the
+other written and refused every rerun. The other was a run that failed after the roads check passed, printed as a
+failed roads check. The rest were test gaps: correct code that no test pinned.
+
+One reading was added after round 2. PR-B:676-678 asks for "the ceiling at that ratio, with the with-knock reading
+beside it in brackets". C is `roads.json` `by[r].C`, which `roads_ceiling.py` sets to `by[r].a.noknock.mean`. It
+stays the context's ceiling (PR-B 6.7). The with-knock bracket now also prints `by[r].a.knock.mean`, labelled (G11).
+
+**Slips on the way, each fixed:**
+- **Two leftover worktrees.** The mutation testers' git worktrees stayed in `.claude/worktrees/`. They hold copies of
+  AB's files, not git-ignored, so step 3's clean-tree check would have printed STOP. Both were removed with their
+  local branches; they held nothing that was not in the main tree. Later rounds used worktrees outside the
+  repository.
+- **A truncated test file.** A script of the orchestrator's truncated `test_b58h_beside.py` to 0 bytes: it opened the
+  file for writing before an ASCII encode that raised. The file was rebuilt by replaying the round-1 fixer's 26
+  logged edits onto the copy the reviewers had tested (sha256 `175d44bf1d4c`). It matched every fingerprint the
+  hygiene check had recorded of the lost file: 1392 lines, 41 tests, the one run of 12 zeros at line 1088, the one
+  τ at line 92, and the longest line at 120. Its tests pass. The rule since: encode a file's full content before
+  opening it for writing.
+- **Leaked test folders.** `test_b58h_beside.py` left about 395 MB of synthetic temporary repositories in the user
+  temp folder: `shutil.rmtree(ignore_errors=True)` cannot remove git's read-only objects on Windows. Its
+  `tearDownModule` now clears the read-only bit and retries. The old folders were deleted.
+
+**Open.**
+- The routes of step 22b, each in its own commit before the first scoring command: flat, road0, settle and cturb in
+  `b58h_beside.py`, row 152 (5)'s anchors, and `b58h_lambda_opt.py`.
+- PH1 and PH2 (section 17), their prints into a session report before the first scoring command.
+- The scoring (PR-B section 14, step 3), whose items (d)-(f) run only if started by 23 November 2026 00:00 AST
+  (PR-B:661).
+- The sending of "arrived whole" to Jad, which frees the PC.
