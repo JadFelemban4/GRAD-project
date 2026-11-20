@@ -1,0 +1,192 @@
+{
+ "ceiling": {
+  "b58": {
+   "0.5": 1.8191063409126298,
+   "1.5": 5.231875095015777
+  }
+ },
+ "engines_in_test": [
+  "b58"
+ ],
+ "model_band": {
+  "b58": {
+   "0.5": {
+    "no_knock": 4.118512885826682,
+    "with_knock": 4.31836786892759
+   },
+   "1.5": {
+    "no_knock": 1.4949969103675216,
+    "with_knock": 1.8329421376947186
+   }
+  }
+ },
+ "provenance": {
+  "at_b": "kappa 1 in the contract's form",
+  "band": {
+   "labels": {
+    "P1": "D1: no row: assumed at b",
+    "P2": "E4b: no row: assumed at b",
+    "P3": "L1: b (additive; kappa 1), kappa_L1 x b in the companion",
+    "P4": "E8: kappa_E8 x b x (|d| / MEI) x phi",
+    "P5": "C3b/C3d: no row: assumed at b",
+    "P6": "the table: nothing (the exact cycle)"
+   },
+   "parts": {
+    "0.5": {
+     "no_knock": {
+      "delta_e": 4.118512885826682,
+      "linear_sum": 7.632246269906852,
+      "multiplicative": 1.047437676888093,
+      "parts": {
+       "P1": 1.047437676888093,
+       "P2": 1.047437676888093,
+       "P3": 0.9049999999999999,
+       "P4": 3.584933239242573,
+       "P5": 1.047437676888093,
+       "P6": 0.0
+      }
+     },
+     "with_knock": {
+      "delta_e": 4.31836786892759,
+      "linear_sum": 7.974853230926477,
+      "multiplicative": 1.100781857394964,
+      "parts": {
+       "P1": 1.100781857394964,
+       "P2": 1.100781857394964,
+       "P3": 0.9049999999999999,
+       "P4": 3.7675076587415846,
+       "P5": 1.100781857394964,
+       "P6": 0.0
+      }
+     }
+    },
+    "1.5": {
+     "no_knock": {
+      "delta_e": 1.4949969103675216,
+      "linear_sum": 2.897387247836232,
+      "multiplicative": 0.3102163034628938,
+      "parts": {
+       "P1": 0.3102163034628938,
+       "P2": 0.3102163034628938,
+       "P3": 0.9049999999999999,
+       "P4": 1.0617383374475506,
+       "P5": 0.3102163034628938,
+       "P6": 0.0
+      }
+     },
+     "with_knock": {
+      "delta_e": 1.8329421376947186,
+      "linear_sum": 3.5738005868724483,
+      "multiplicative": 0.41553440659605334,
+      "parts": {
+       "P1": 0.41553440659605334,
+       "P2": 0.41553440659605334,
+       "P3": 0.9049999999999999,
+       "P4": 1.4221973670842885,
+       "P5": 0.41553440659605334,
+       "P6": 0.0
+      }
+     }
+    }
+   },
+   "points": {
+    "0.5": {
+     "no_knock": {
+      "d": -6.284626061328558,
+      "median_cut": {
+       "blind": 0.25794988426385956,
+       "sighted_r0.5": 0.1851373092632469
+      },
+      "phi": 1.0,
+      "phi_arm": {
+       "blind": 1.0,
+       "sighted_r0.5": 1.0
+      }
+     },
+     "with_knock": {
+      "d": -6.6046911443697836,
+      "median_cut": {
+       "blind": 0.2621923738095826,
+       "sighted_r0.5": 0.18525029298279438
+      },
+      "phi": 1.0,
+      "phi_arm": {
+       "blind": 1.0,
+       "sighted_r0.5": 1.0
+      }
+     }
+    },
+    "1.5": {
+     "no_knock": {
+      "d": -1.861297820777363,
+      "median_cut": {
+       "blind": 0.25794988426385956,
+       "sighted_r1.5": 0.22142318693908408
+      },
+      "phi": 1.0,
+      "phi_arm": {
+       "blind": 1.0,
+       "sighted_r1.5": 1.0
+      }
+     },
+     "with_knock": {
+      "d": -2.49320643957632,
+      "median_cut": {
+       "blind": 0.2621923738095826,
+       "sighted_r1.5": 0.2235379480730485
+      },
+      "phi": 1.0,
+      "phi_arm": {
+       "blind": 1.0,
+       "sighted_r1.5": 1.0
+      }
+     }
+    }
+   }
+  },
+  "git_head": "5318b13",
+  "inputs": {
+   "MEI": 5.43,
+   "N_SHARES": 6,
+   "b": 0.9049999999999999,
+   "ceiling": {
+    "0.5": 1.8191063409126298,
+    "1.5": 5.231875095015777
+   },
+   "kappa_E8": 3.4225742670373527,
+   "kappa_L1": {
+    "ford_27tt": 3.732788117301832,
+    "honda_l15b7": 1.8713799077525977,
+    "mazda_25t": 1.7167694965200329
+   },
+   "pilot_pairs": 5,
+   "s_p": 20.56,
+   "s_p_line": "results/X2_RESULT.txt:24"
+  },
+  "records": {
+   "results/EPA_BACKEND.json": "d0aa37c586ad6f8db37be1a84754af56bda5b4c14a6391186972f98c3a5bf311",
+   "results/EPA_ROADS/roads.json": "27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498",
+   "results/EPA_TIGHTENINGS.json": "50c073e84555522b2f7593dba50dc94be1e74d04e599e7fe6db921054595d5ba",
+   "results/EPA_VALIDATION/summary.json": "37af2dcd87ce76fef24c96d635e980ca19bc5ec40993de94cee598fc7494f256",
+   "results/X2_RESULT.txt": "043a36f31d832d817d262a84f26c278a50f3fead96f096f6c9bfb41bda2ff3bf"
+  },
+  "s_p_label": "X2's spread: another plant, road and budget; not a pilot of this study",
+  "scores": {
+   "path": "results/B58H_RESULT/scores_b58h.json",
+   "sha256": "04d5472bbdebecf88f152c222d5bc9d64ff1437391703cea43edb66925253570",
+   "sha_text": "04d5472bbdebecf88f152c222d5bc9d64ff1437391703cea43edb66925253570"
+  }
+ },
+ "schema": "four-engine-context/1",
+ "seeds_per_arm": 20,
+ "status": {
+  "b58": "exploratory"
+ },
+ "status_basis": {
+  "pilot_pairs": 5,
+  "s_p": 20.56,
+  "s_star": {
+   "b58": 9.068679000408256
+  }
+ }
+}

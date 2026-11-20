@@ -2155,6 +2155,16 @@ git_head `dd49844` and git_dirty false. The records are 61 files, 26 MB, under `
 `04d5472b`, the index's `cee8d1cc`. The scores, the index and the text report are copied to `results/B58H_RESULT/`, byte
 for byte, and committed with this entry.
 
+**20 November 2026, item (b): the analysis.** At `5318b13` (item (a)'s commit, pushed), on a clean tree, section 6.8's
+`context` then `analyse` ran from 09:19:07 to 09:19:19 +0300, each exit 0, each output written once:
+`results/B58H_RESULT/context_b58h.json` (sha_text beginning `fe1487e0`), `analysis_b58h.json` (`a36c1f9d`) and
+`analysis_b58h.txt` (`af941cbf`), committed with this entry. The context was made for the scores' sha_text (beginning
+`04d5472b`) and the reading of 'at b' "kappa 1 in the contract's form"; its status is the rule's output, exploratory
+(1.5576 x s_p 20.56 = 32.024 against s* 9.06868); every record it read was committed at HEAD. `analyse` re-read the
+records at HEAD, rebuilt the context and found it equal, ran four_engine_analysis five times, and found every d > 0
+verdict the same under every band. Its verdicts, intervals, Delta, band, flags, section 9.1 and section 10 are in the
+report as written; section 16 states the outcome after item (c).
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

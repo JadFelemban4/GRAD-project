@@ -923,3 +923,12 @@ text report are in `results/B58H_RESULT/`; the 61 per-step records stay under `$
 
 **Next.** Item (b), the analysis (`b58h_analysis.py context`, then `analyse`), committed; then item (c)'s five commands,
 each alone and committed before the next; then PH1 and PH2.
+
+**Item (b).** At `5318b13`, `context` and `analyse` ran from 09:19:07 to 09:19:19 +0300, exit 0 each; the three outputs
+are in `results/B58H_RESULT/` (PR-B section 15). The verdicts, as `analysis_b58h.txt` prints them, no knock,
+evaluate.py's form, the graph's t-test: at r = 1.5, d > 0 not shown (d -1.86 points, 95 % -6.17 to +2.44); at r = 0.5, d
+> 0 not shown (d -6.28 points, 95 % -12.01 to -0.56, wholly below 0, which section 7 reads as the sighted agents at r =
+0.5 taking more simulated damage than their blinded twins on these roads, a finding about this learner and recipe at
+this budget). The sign test and the with-knock reading say the same; no verdict is MODEL-LIMITED under any band; the
+status is exploratory. Delta, exploratory: +4.42 points (95 % +0.29 to +8.56) beside the prediction +3.40. Section 16 of
+PR-B is written after item (c).

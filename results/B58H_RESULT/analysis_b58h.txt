@@ -1,0 +1,192 @@
+B58 PREVIEW STUDY: THE ANALYSIS (b58h_analysis.py analyse; PR-B sections 6, 7, 9.1 and 10); exploratory for every number
+scores  results/B58H_RESULT/scores_b58h.json: sha_text 04d5472bbdebecf88f152c222d5bc9d64ff1437391703cea43edb66925253570 (raw sha256 04d5472bbdebecf88f152c222d5bc9d64ff1437391703cea43edb66925253570, a record that binds nothing)
+context results/B58H_RESULT/context_b58h.json: sha_text fe1487e0415cc3d01af0d784e8b13e93114ecf799537927d4e1b346b6ee3fb8d, made for these scores and the reading of 'at b' "kappa 1 in the contract's form"
+records committed at HEAD 5318b13: results/EPA_ROADS/roads.json, results/EPA_TIGHTENINGS.json, results/EPA_VALIDATION/summary.json, results/EPA_BACKEND.json, results/X2_RESULT.txt
+NOTE (PR-B 6.7): below, four_engine_analysis's report verbatim. Its first line, 'FOUR-ENGINE TEST (row 113)', is the committed script's fixed header, followed by its line 'ONE ENGINE: the four-engine test does not run (row 107 (2))': with one engine the four-engine test does not run, and the analysis is exploratory.
+
+FOUR-ENGINE TEST (row 113) -- primary scoring
+engines in the test (row 107): b58
+ratios: 0.5, 1.5; seeds per arm: b58 20
+MEI 5.43 points; family-wise alpha 0.05; reading: no knock (primary), [with knock: not converged in dt on these roads; decides nothing]
+ONE ENGINE: the four-engine test does not run (row 107 (2)); everything below is the B58's exploratory study, never a test of the criterion
+THE FORD IS NOT IN THE TEST: the agent study does not test H/tau against H (row 107 (6))
+status (row 103 (4)): 1.5576 x s_p 20.56 = 32.024 against s*: b58 9.06868 -> exploratory
+  the factor is sqrt(4 / chi2_0.20,4), exact (row 103 (4) prints 1.56); s* at power 0.8 and the graph's first level for an r = 1.5 test, alpha/1 = 0.05
+graph (row 113 (2), Bretz et al. 2009): weights b58@r1.5 1; edges b58@r0.5->b58@r1.5 1, b58@r1.5->b58@r0.5 1
+
+(1)-(2) d > 0 per engine and ratio: d = sighted cut - blind cut, paired by seed, evaluate.py's form; the mean form decides nothing
+  b58@r0.5             d -6.28 [-6.60]  sd 12.24 [11.31]  mean form -5.34 [-5.05]  band 4.12 [4.32]  C 1.82  n 20; exploratory
+                       t:    p 0.9834 [0.9914], graph p 0.9834 [0.9914]: d > 0 not shown [d > 0 not shown]
+                       sign: 8 of 20 [7 of 20] above 0, p 0.8684 [0.9423], graph p 0.8684 [0.9423]: d > 0 not shown [d > 0 not shown]
+  b58@r1.5             d -1.86 [-2.49]  sd 9.20 [7.95]  mean form -2.09 [-1.78]  band 1.49 [1.83]  C 5.23  n 20; exploratory
+                       t:    p 0.8115 [0.9115], graph p 0.8115 [0.9115]: d > 0 not shown [d > 0 not shown]
+                       sign: 9 of 20 [8 of 20] above 0, p 0.7483 [0.8684], graph p 0.7483 [0.8684]: d > 0 not shown [d > 0 not shown]
+  the graph's rejections in order, t, no_knock: none
+  the graph's rejections in order, sign, no_knock: none
+  the graph's rejections in order, t, with_knock: none
+  the graph's rejections in order, sign, with_knock: none
+
+SECTION 7: THE VERDICTS (PR-B 7), the no-knock t-test under the graph (primary), the r = 1.5 test first; each with its d, its two-sided 95 % interval, its mean form, its band and the ceiling, the MEI for scale, the with-knock reading in brackets; exploratory for every number
+  r = 1.5: d > 0 not shown
+    The study does not show a preview effect at H = 1.5 x tau in the simulated turbine and oil damage (the no-knock reading) of the B58 model, which is not validated, on these roads (d = -1.86 points, two-sided 95 % t interval -6.17 to +2.44, against an MEI of 5.43 points). A null was the expected outcome (row 147 (7)) and says nothing against the criterion.
+    beside it: the mean form -2.09 points (95 % -5.49 to +1.30; decides nothing); the band Delta_e 1.49 points under the primary reading of 'at b' (2.10 under the other, 0 under version 5's); the ceiling C(1.5) 5.23 points (roads.json, the mean form); the MEI 5.43 points
+    [with knock, not converged in dt on these roads: d -2.49 points, 95 % -6.22 to +1.23, adjusted p 0.9115: d > 0 not shown; its mean form -1.78 points (95 % -4.94 to +1.39; decides nothing); its band Delta_e 1.83 points under the primary reading of 'at b' (2.30 under the other, 0 under version 5's); the ceiling's with-knock reading 3.98 points (roads.json a.knock.mean, beside C, the no-knock reading's); the MEI as above]
+    the sign test, the declared secondary, in its own words: 9 of 20 differences above 0 (0 zero, dropped), one-sided p 0.7483, graph p 0.7483: it does not show d > 0 under its own graph [with knock, not converged in dt on these roads: 8 of 20 differences above 0 (0 zero, dropped), one-sided p 0.8684, graph p 0.8684: it does not show d > 0 under its own graph]
+    companion (P3 at kappa_L1 x b): no verdict at r = 1.5 has a MODEL-LIMITED flag that depends on the assumed b
+  r = 0.5: d > 0 not shown at r = 0.5 (the r = 1.5 test did not reject, so the graph gives this test no alpha; its unadjusted p 0.9834)
+    The study does not show a preview effect at H = 0.5 x tau in the simulated turbine and oil damage (the no-knock reading) of the B58 model, which is not validated, on these roads (d = -6.28 points, two-sided 95 % t interval -12.01 to -0.56, against an MEI of 5.43 points). A null was the expected outcome (row 147 (7)) and says nothing against the criterion.
+    The sighted agents at r = 0.5 took more simulated turbine and oil damage (the no-knock reading) on the B58 model, which is not validated (its band assumed at b; section 12.1), than their blinded twins on these roads (d = -6.28 points, two-sided 95 % t interval -12.01 to -0.56, against an MEI of 5.43 points): a finding about this learner and recipe at this budget, never evidence that preview is worthless, and never read as a result about the criterion.
+    beside it: the mean form -5.34 points (95 % -9.93 to -0.75; wholly below 0; decides nothing); the band Delta_e 4.12 points under the primary reading of 'at b' (4.02 under the other, 0 under version 5's); the ceiling C(0.5) 1.82 points (roads.json, the mean form); the MEI 5.43 points
+    [with knock, not converged in dt on these roads: d -6.60 points, 95 % -11.90 to -1.31; wholly below 0, adjusted p 0.9914: d > 0 not shown; its mean form -5.05 points (95 % -9.46 to -0.63; wholly below 0; decides nothing); its band Delta_e 4.32 points under the primary reading of 'at b' (4.18 under the other, 0 under version 5's); the ceiling's with-knock reading 0.73 points (roads.json a.knock.mean, beside C, the no-knock reading's); the MEI as above]
+    the sign test, the declared secondary, in its own words: 8 of 20 differences above 0 (0 zero, dropped), one-sided p 0.8684, graph p 0.8684: it does not show d > 0 under its own graph [with knock, not converged in dt on these roads: 7 of 20 differences above 0 (0 zero, dropped), one-sided p 0.9423, graph p 0.9423: it does not show d > 0 under its own graph]
+    companion (P3 at kappa_L1 x b): no verdict at r = 0.5 has a MODEL-LIMITED flag that depends on the assumed b
+
+INTERVALS (PR-B 6.3): each d's two-sided 95 % t interval, mean +- t x sd / sqrt(n), sd at ddof 1, t_0.975,19 = 2.0930 (scipy.stats.t); not adjusted for the graph
+  r = 0.5, no knock, evaluate.py's form: d -6.28  sd 12.24  n 20  95 % -12.01 to -0.56
+  r = 0.5, no knock, the mean form (decides nothing): d -5.34  sd 9.81  n 20  95 % -9.93 to -0.75
+  r = 0.5, with knock [not converged in dt on these roads], evaluate.py's form: d -6.60  sd 11.31  n 20  95 % -11.90 to -1.31
+  r = 0.5, with knock [not converged in dt on these roads], the mean form (decides nothing): d -5.05  sd 9.44  n 20  95 % -9.46 to -0.63
+  r = 1.5, no knock, evaluate.py's form: d -1.86  sd 9.20  n 20  95 % -6.17 to +2.44
+  r = 1.5, no knock, the mean form (decides nothing): d -2.09  sd 7.26  n 20  95 % -5.49 to +1.30
+  r = 1.5, with knock [not converged in dt on these roads], evaluate.py's form: d -2.49  sd 7.95  n 20  95 % -6.22 to +1.23
+  r = 1.5, with knock [not converged in dt on these roads], the mean form (decides nothing): d -1.78  sd 6.76  n 20  95 % -4.94 to +1.39
+
+DELTA, THE ACROSS-H CONTRAST (PR-B 6.4), exploratory, deciding nothing: Delta(s) = cut(sighted r = 1.5, s) - cut(sighted r = 0.5, s), paired by seed; no blind cut
+  no knock, evaluate.py's form: mean +4.42  sd 8.83  n 20  95 % +0.29 to +8.56 (excludes 0: the sighted cut differed between the two H on these roads, in that direction, and nothing about the criterion); exact two-sided sign test: 12 positive, 8 negative, 0 zero, p 0.5034
+  no knock, the mean form, beside, deciding nothing: mean +3.25  sd 7.38  n 20  95 % -0.21 to +6.71 (covers 0); exact two-sided sign test: 12 positive, 8 negative, 0 zero, p 0.5034
+  with knock [not converged in dt on these roads], evaluate.py's form: mean +4.11  sd 7.75  n 20  95 % +0.49 to +7.74 (excludes 0: the sighted cut differed between the two H on these roads, in that direction, and nothing about the criterion); exact two-sided sign test: 12 positive, 8 negative, 0 zero, p 0.5034
+  with knock [not converged in dt on these roads], the mean form, beside, deciding nothing: mean +3.27  sd 6.91  n 20  95 % +0.03 to +6.50 (excludes 0: the sighted cut differed between the two H on these roads, in that direction, and nothing about the criterion); exact two-sided sign test: 13 positive, 7 negative, 0 zero, p 0.2632
+  the prediction beside both forms (row 147 (7); results/EPA_ROADS/roads.json ceilings.per_engine.b58.by[r].C_u.<reading>.<evaluate_form|mean>, C_u(1.5) - C_u(0.5)), no knock: +3.3970 in evaluate.py's form, +3.4128 in the mean form
+  beside the with-knock Delta (roads.json C_u.knock; PR-B names the no-knock prediction, G3): +3.3155 in evaluate.py's form, +3.2443 in the mean form
+  Delta's spread is UNKNOWN: no spread of a difference between two sighted arms has been measured.
+  a Delta interval covering 0 says nothing about preview value across H.
+  Delta decides nothing about the criterion; it is exploratory.
+
+THE B58'S MODEL BAND Delta_e (PR-B 6.5, 6.6): b = MEI / 6 = 0.9050 points (MEI 5.43); kappa_E8 3.4226 (results/EPA_TIGHTENINGS.json E8.b58_u_val_kappa.with_roads.kappa); the companion's kappa_L1 1.7168 (mazda_25t, the smallest) and 3.7328 (ford_27tt, the largest) of results/EPA_VALIDATION/summary.json engines.<id>.kappa.L1
+  the parts: P1 D1: no row: assumed at b; P2 E4b: no row: assumed at b; P3 L1: b (additive; kappa 1), kappa_L1 x b in the companion; P4 E8: kappa_E8 x b x (|d| / MEI) x phi; P5 C3b/C3d: no row: assumed at b; P6 the table: nothing (the exact cycle)
+  primary: PRIMARY: the reading of 'at b' "kappa 1 in the contract's form", the context's band
+  other_at_b: OTHER reading of 'at b': 'b itself', deciding nothing
+  version_5: VERSION 5's reading: the B58's band left out (0), deciding nothing
+  companion_min: COMPANION: P3 at kappa_L1 x b, the smallest kappa_L1, 1.7168 (mazda_25t); every other part as PRIMARY; deciding nothing
+  companion_max: COMPANION: P3 at kappa_L1 x b, the largest kappa_L1, 3.7328 (ford_27tt); every other part as PRIMARY; deciding nothing
+  r = 0.5, no knock: d (t_greater's mean) -6.28; median cuts sighted_r0.5 +18.51 % (phi 1.0000), blind +25.79 % (phi 1.0000); phi 1.0000
+    primary        P1 1.0474  P2 1.0474  P3 0.9050  P4 3.5849  P5 1.0474  P6 0.0000  Delta_e 4.1185 (RSS)  linear sum 7.6322
+    other_at_b     P1 0.9050  P2 0.9050  P3 0.9050  P4 3.5849  P5 0.9050  P6 0.0000  Delta_e 4.0159 (RSS)  linear sum 7.2049
+    version_5      the band left out: Delta_e 0
+    companion_min  P1 1.0474  P2 1.0474  P3 1.5537  P4 3.5849  P5 1.0474  P6 0.0000  Delta_e 4.3078 (RSS)  linear sum 8.2809
+    companion_max  P1 1.0474  P2 1.0474  P3 3.3782  P4 3.5849  P5 1.0474  P6 0.0000  Delta_e 5.2493 (RSS)  linear sum 10.1054
+  r = 0.5, with knock [not converged in dt on these roads]: d (t_greater's mean) -6.60; median cuts sighted_r0.5 +18.53 % (phi 1.0000), blind +26.22 % (phi 1.0000); phi 1.0000
+    primary        P1 1.1008  P2 1.1008  P3 0.9050  P4 3.7675  P5 1.1008  P6 0.0000  Delta_e 4.3184 (RSS)  linear sum 7.9749
+    other_at_b     P1 0.9050  P2 0.9050  P3 0.9050  P4 3.7675  P5 0.9050  P6 0.0000  Delta_e 4.1797 (RSS)  linear sum 7.3875
+    version_5      the band left out: Delta_e 0
+    companion_min  P1 1.1008  P2 1.1008  P3 1.5537  P4 3.7675  P5 1.1008  P6 0.0000  Delta_e 4.4992 (RSS)  linear sum 8.6235
+    companion_max  P1 1.1008  P2 1.1008  P3 3.3782  P4 3.7675  P5 1.1008  P6 0.0000  Delta_e 5.4075 (RSS)  linear sum 10.4480
+  r = 1.5, no knock: d (t_greater's mean) -1.86; median cuts sighted_r1.5 +22.14 % (phi 1.0000), blind +25.79 % (phi 1.0000); phi 1.0000
+    primary        P1 0.3102  P2 0.3102  P3 0.9050  P4 1.0617  P5 0.3102  P6 0.0000  Delta_e 1.4950 (RSS)  linear sum 2.8974
+    other_at_b     P1 0.9050  P2 0.9050  P3 0.9050  P4 1.0617  P5 0.9050  P6 0.0000  Delta_e 2.0984 (RSS)  linear sum 4.6817
+    version_5      the band left out: Delta_e 0
+    companion_min  P1 0.3102  P2 0.3102  P3 1.5537  P4 1.0617  P5 0.3102  P6 0.0000  Delta_e 1.9570 (RSS)  linear sum 3.5461
+    companion_max  P1 0.3102  P2 0.3102  P3 3.3782  P4 1.0617  P5 0.3102  P6 0.0000  Delta_e 3.5816 (RSS)  linear sum 5.3706
+  r = 1.5, with knock [not converged in dt on these roads]: d (t_greater's mean) -2.49; median cuts sighted_r1.5 +22.35 % (phi 1.0000), blind +26.22 % (phi 1.0000); phi 1.0000
+    primary        P1 0.4155  P2 0.4155  P3 0.9050  P4 1.4222  P5 0.4155  P6 0.0000  Delta_e 1.8329 (RSS)  linear sum 3.5738
+    other_at_b     P1 0.9050  P2 0.9050  P3 0.9050  P4 1.4222  P5 0.9050  P6 0.0000  Delta_e 2.3019 (RSS)  linear sum 5.0422
+    version_5      the band left out: Delta_e 0
+    companion_min  P1 0.4155  P2 0.4155  P3 1.5537  P4 1.4222  P5 0.4155  P6 0.0000  Delta_e 2.2259 (RSS)  linear sum 4.2225
+    companion_max  P1 0.4155  P2 0.4155  P3 3.3782  P4 1.4222  P5 0.4155  P6 0.0000  Delta_e 3.7353 (RSS)  linear sum 6.0470
+FLAGS: each verdict under each band (four_engine_analysis's corners: d moved by -Delta_e and +Delta_e, the graph re-run); verdict / MODEL-LIMITED per run
+  no_knock d>0 (t) b58@r0.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  no_knock d>0 (sign) b58@r0.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  no_knock d>0 (t) b58@r1.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  no_knock d>0 (sign) b58@r1.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  with_knock d>0 (t) b58@r0.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  with_knock d>0 (sign) b58@r0.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  with_knock d>0 (t) b58@r1.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  with_knock d>0 (sign) b58@r1.5: d > 0 not shown; MODEL-LIMITED primary no, other_at_b no, version_5 no, companion_min no, companion_max no
+  every d > 0 verdict is the same under every band (PR-B 6.5: a verdict that moves is refused as a defect); the band only flags
+
+SECTION 9.1: FUEL AND TORQUE DELIVERY (PR-B 9.1), no reading: fuel and torque hold no damage; descriptive, deciding nothing
+  the rule (the scores' delivery block): demand_step: torque_req > 40 Nm (the reward's t_ref floor; logged_check.DEMAND_NM); fuel: g over the road (the episode's own count); short_step: torque < (1 - 0.05) x torque_req (engine_env.TRACK_TOL)
+  blind: the fuel figure (mean over the roads of 100 x (fuel / the baseline ECU's on the road - 1), %): median +6.3830, mean +6.3218, range +3.3687 to +9.7603 over 20 seeds
+    the mean short share over the roads with a demand step: median 0.0006, mean 0.0008, range 0.0000 to 0.0032 over 20 seeds
+    no demand step on any road: none
+    the worst road over every seed: seed 10 road 10 (short share 0.0122)
+    seed 0: fuel figure +5.8521 %, mean short share 0.0019 over 20 roads with a demand step, worst road 0 (0.0078), pooled 0.0019 (35 of 17980 demand steps short)
+    seed 1: fuel figure +7.6982 %, mean short share 0.0001 over 20 roads with a demand step, worst road 3 (0.0011), pooled 0.0001 (1 of 17980 demand steps short)
+    seed 2: fuel figure +6.9245 %, mean short share 0.0015 over 20 roads with a demand step, worst road 0, 3, 18 (0.0044), pooled 0.0015 (27 of 17980 demand steps short)
+    seed 3: fuel figure +3.8622 %, mean short share 0.0014 over 20 roads with a demand step, worst road 3, 4 (0.0056), pooled 0.0014 (26 of 17980 demand steps short)
+    seed 4: fuel figure +7.5095 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 5: fuel figure +5.3642 %, mean short share 0.0002 over 20 roads with a demand step, worst road 3 (0.0022), pooled 0.0002 (3 of 17980 demand steps short)
+    seed 6: fuel figure +5.6391 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 7: fuel figure +8.1873 %, mean short share 0.0008 over 20 roads with a demand step, worst road 17 (0.0044), pooled 0.0008 (15 of 17980 demand steps short)
+    seed 8: fuel figure +3.8975 %, mean short share 0.0001 over 20 roads with a demand step, worst road 3, 9 (0.0011), pooled 0.0001 (2 of 17980 demand steps short)
+    seed 9: fuel figure +4.2434 %, mean short share 0.0012 over 20 roads with a demand step, worst road 13, 17 (0.0033), pooled 0.0012 (21 of 17980 demand steps short)
+    seed 10: fuel figure +5.3904 %, mean short share 0.0032 over 20 roads with a demand step, worst road 10 (0.0122), pooled 0.0032 (57 of 17980 demand steps short)
+    seed 11: fuel figure +8.3010 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 12: fuel figure +5.2034 %, mean short share 0.0010 over 20 roads with a demand step, worst road 17 (0.0033), pooled 0.0010 (18 of 17980 demand steps short)
+    seed 13: fuel figure +7.6847 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 14: fuel figure +6.9138 %, mean short share 0.0021 over 20 roads with a demand step, worst road 3 (0.0078), pooled 0.0021 (38 of 17980 demand steps short)
+    seed 15: fuel figure +3.3687 %, mean short share 0.0004 over 20 roads with a demand step, worst road 7 (0.0033), pooled 0.0004 (8 of 17980 demand steps short)
+    seed 16: fuel figure +9.7603 %, mean short share 0.0013 over 20 roads with a demand step, worst road 9 (0.0044), pooled 0.0013 (23 of 17980 demand steps short)
+    seed 17: fuel figure +5.6101 %, mean short share 0.0004 over 20 roads with a demand step, worst road 0, 2, 3, 4, 6, 8, 18 (0.0011), pooled 0.0004 (7 of 17980 demand steps short)
+    seed 18: fuel figure +7.3264 %, mean short share 0.0004 over 20 roads with a demand step, worst road 12 (0.0044), pooled 0.0004 (7 of 17980 demand steps short)
+    seed 19: fuel figure +7.6998 %, mean short share 0.0009 over 20 roads with a demand step, worst road 2 (0.0044), pooled 0.0009 (17 of 17980 demand steps short)
+  sighted_r0.5: the fuel figure (mean over the roads of 100 x (fuel / the baseline ECU's on the road - 1), %): median +5.6216, mean +5.8493, range +4.0771 to +8.9406 over 20 seeds
+    the mean short share over the roads with a demand step: median 0.0001, mean 0.0002, range 0.0000 to 0.0012 over 20 seeds
+    no demand step on any road: none
+    the worst road over every seed: seed 16 road 3 (short share 0.0211)
+    seed 0: fuel figure +4.5112 %, mean short share 0.0005 over 20 roads with a demand step, worst road 3 (0.0033), pooled 0.0005 (9 of 17980 demand steps short)
+    seed 1: fuel figure +5.8833 %, mean short share 0.0012 over 20 roads with a demand step, worst road 3 (0.0189), pooled 0.0012 (22 of 17980 demand steps short)
+    seed 2: fuel figure +5.9517 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 3: fuel figure +4.8417 %, mean short share 0.0002 over 20 roads with a demand step, worst road 12 (0.0033), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 4: fuel figure +7.6732 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 5: fuel figure +4.4767 %, mean short share 0.0004 over 20 roads with a demand step, worst road 3 (0.0078), pooled 0.0004 (8 of 17980 demand steps short)
+    seed 6: fuel figure +4.2437 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 7: fuel figure +4.5371 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 8: fuel figure +4.9652 %, mean short share 0.0001 over 20 roads with a demand step, worst road 11 (0.0011), pooled 0.0001 (1 of 17980 demand steps short)
+    seed 9: fuel figure +8.5467 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 10: fuel figure +8.0786 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 11: fuel figure +8.9406 %, mean short share 0.0002 over 20 roads with a demand step, worst road 3, 5, 6, 17 (0.0011), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 12: fuel figure +6.0943 %, mean short share 0.0002 over 20 roads with a demand step, worst road 10 (0.0022), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 13: fuel figure +4.9308 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 14: fuel figure +5.3600 %, mean short share 0.0001 over 20 roads with a demand step, worst road 7 (0.0011), pooled 0.0001 (1 of 17980 demand steps short)
+    seed 15: fuel figure +6.6497 %, mean short share 0.0002 over 20 roads with a demand step, worst road 3 (0.0033), pooled 0.0002 (3 of 17980 demand steps short)
+    seed 16: fuel figure +5.9389 %, mean short share 0.0011 over 20 roads with a demand step, worst road 3 (0.0211), pooled 0.0011 (19 of 17980 demand steps short)
+    seed 17: fuel figure +4.0771 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 18: fuel figure +6.7432 %, mean short share 0.0003 over 20 roads with a demand step, worst road 12, 15 (0.0033), pooled 0.0003 (6 of 17980 demand steps short)
+    seed 19: fuel figure +4.5416 %, mean short share 0.0004 over 20 roads with a demand step, worst road 5, 11, 17 (0.0022), pooled 0.0004 (8 of 17980 demand steps short)
+  sighted_r1.5: the fuel figure (mean over the roads of 100 x (fuel / the baseline ECU's on the road - 1), %): median +6.1500, mean +6.3070, range +4.5779 to +8.6703 over 20 seeds
+    the mean short share over the roads with a demand step: median 0.0002, mean 0.0004, range 0.0000 to 0.0014 over 20 seeds
+    no demand step on any road: none
+    the worst road over every seed: seed 11 road 15 (short share 0.0100)
+    seed 0: fuel figure +6.7433 %, mean short share 0.0001 over 20 roads with a demand step, worst road 2, 3 (0.0011), pooled 0.0001 (2 of 17980 demand steps short)
+    seed 1: fuel figure +5.7349 %, mean short share 0.0011 over 20 roads with a demand step, worst road 4 (0.0078), pooled 0.0011 (20 of 17980 demand steps short)
+    seed 2: fuel figure +6.6032 %, mean short share 0.0002 over 20 roads with a demand step, worst road 3 (0.0044), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 3: fuel figure +5.1244 %, mean short share 0.0004 over 20 roads with a demand step, worst road 10 (0.0044), pooled 0.0004 (8 of 17980 demand steps short)
+    seed 4: fuel figure +7.7483 %, mean short share 0.0002 over 20 roads with a demand step, worst road 1, 9, 12, 19 (0.0011), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 5: fuel figure +5.6093 %, mean short share 0.0014 over 20 roads with a demand step, worst road 6, 19 (0.0056), pooled 0.0014 (26 of 17980 demand steps short)
+    seed 6: fuel figure +5.6713 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 7: fuel figure +4.5779 %, mean short share 0.0001 over 20 roads with a demand step, worst road 3 (0.0022), pooled 0.0001 (2 of 17980 demand steps short)
+    seed 8: fuel figure +6.4862 %, mean short share 0.0002 over 20 roads with a demand step, worst road 5, 11, 19 (0.0011), pooled 0.0002 (3 of 17980 demand steps short)
+    seed 9: fuel figure +6.1426 %, mean short share 0.0000 over 20 roads with a demand step, worst road 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 (0.0000), pooled 0.0000 (0 of 17980 demand steps short)
+    seed 10: fuel figure +6.1491 %, mean short share 0.0002 over 20 roads with a demand step, worst road 3 (0.0033), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 11: fuel figure +6.3309 %, mean short share 0.0014 over 20 roads with a demand step, worst road 15 (0.0100), pooled 0.0014 (26 of 17980 demand steps short)
+    seed 12: fuel figure +6.1395 %, mean short share 0.0001 over 20 roads with a demand step, worst road 12 (0.0011), pooled 0.0001 (1 of 17980 demand steps short)
+    seed 13: fuel figure +5.1525 %, mean short share 0.0002 over 20 roads with a demand step, worst road 0, 2, 6, 12 (0.0011), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 14: fuel figure +8.6703 %, mean short share 0.0002 over 20 roads with a demand step, worst road 12 (0.0033), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 15: fuel figure +6.1510 %, mean short share 0.0004 over 20 roads with a demand step, worst road 0 (0.0044), pooled 0.0004 (8 of 17980 demand steps short)
+    seed 16: fuel figure +6.9041 %, mean short share 0.0013 over 20 roads with a demand step, worst road 12, 14 (0.0078), pooled 0.0013 (24 of 17980 demand steps short)
+    seed 17: fuel figure +7.7877 %, mean short share 0.0002 over 20 roads with a demand step, worst road 3 (0.0033), pooled 0.0002 (3 of 17980 demand steps short)
+    seed 18: fuel figure +5.0120 %, mean short share 0.0002 over 20 roads with a demand step, worst road 18 (0.0022), pooled 0.0002 (4 of 17980 demand steps short)
+    seed 19: fuel figure +7.4005 %, mean short share 0.0004 over 20 roads with a demand step, worst road 3 (0.0078), pooled 0.0004 (8 of 17980 demand steps short)
+  beside, baseline ECU's own: fuel figure +0.0000 % (0 by its definition), mean short share 0.0001 over 20 roads with a demand step, worst road 7 (0.0011), pooled 0.0001 (1 of 17980 demand steps short)
+  beside, current-grade's own: fuel figure +3.8909 %, mean short share 0.0085 over 20 roads with a demand step, worst road 7 (0.0111), pooled 0.0085 (152 of 17980 demand steps short)
+
+SECTION 10: THE BESIDE VALUES THE ANALYSIS COVERS (PR-B 10), each deciding nothing
+  the B58's plant_sha: P's 36655cab94800e30 (results/EPA_ROADS/reverify.json plants.b58.plant_sha_now) | beside it 865f8e7b7e5c2dbe, the frozen plant's before P (results/EPA_ROADS/reverify.json plants.b58.plant_sha_at_draw)
+  the status: the analysis's exploratory | beside it the context's recorded rule output, exploratory
+  s_p: 20.56 over 5 pairs (results/X2_RESULT.txt:24; X2's spread: another plant, road and budget; not a pilot of this study) | beside it:
+    20.51 over 5 pairs (results/X2_RESULT.txt:11, under 'TOTAL DAMAGE (primary)'), another experiment's spread, never pooled with this study
+    24.78 over 23 pairs (results/X1_RESULT.txt:29, under 'TOTAL DAMAGE (primary)'), another experiment's spread, never pooled with this study
+    24.88 over 23 pairs (results/X1_RESULT.txt:60, under 'THERMAL-ONLY DAMAGE (no knock term; the second reading)'), another experiment's spread, never pooled with this study
+    the training's own seeds 0-4 on the practice roads: computed at item (c), after this analysis
+  printed in the blocks above: the damage reading (no knock | with knock, in brackets); the band (version 6's | version 5's); 'at b' (kappa 1 in the contract's form | b itself); P3's kappa (1 | the companion); the form (evaluate.py's | the mean form); the test (paired t | exact sign test)
