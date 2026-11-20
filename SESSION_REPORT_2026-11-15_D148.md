@@ -900,3 +900,26 @@ stays the context's ceiling (PR-B 6.7). The with-knock bracket now also prints `
 - The scoring (PR-B section 14, step 3), whose items (d)-(f) run only if started by 23 November 2026 00:00 AST
   (PR-B:661).
 - The sending of "arrived whole" to Jad, which frees the PC.
+
+## 19. 20 November: the scoring started; item (a)
+
+**AB pushed.** `dd49844`, 04:52 AST, after its gate (PR-B section 15).
+
+**When the scoring starts.** The agents' plan had been to hold the scoring until the routes of step 22b were committed.
+The critic of the routes' designs (20 November) showed that this contradicts PR-B:476-478 and :1177: "The scoring waits
+for AB ... It waits for no route". Asked, Ghassan chose to start at once. No route had been written, so items (d)-(f),
+row 152 (5)'s anchors and row 153 (2) read "not computed (code)". The routes' maps and designs (about 3,500 lines, by
+agents) stay outside the repository; no code is written for them after the first scoring command.
+
+**PH1 and PH2 started too early.** Section 17 says none of them "starts before AB and the routes of step 22b are
+committed". Agents started their scripts on 19 November at 19:48, before AB's commit, and again on 20 November at 04:54,
+after AB but before any route. The first attempt was cut off by a usage limit, and the second was stopped by the
+orchestrator at about 05:15 on reading the rule; no print exists, and nothing they ran loaded an agent. They run after
+item (c), outside the repository, under section 17's post hoc label, and this paragraph records the early start.
+
+**Item (a).** Step 3's check passed (PR-B section 15), and the primary scoring ran from 05:23:16 to 09:13:37 +0300 (3 h
+50 min, at 14 jobs; d148 assumed 3.85 h of runs), exit 0, no warning or refusal printed. Its scores, records index and
+text report are in `results/B58H_RESULT/`; the 61 per-step records stay under `$OUT/records`.
+
+**Next.** Item (b), the analysis (`b58h_analysis.py context`, then `analyse`), committed; then item (c)'s five commands,
+each alone and committed before the next; then PH1 and PH2.

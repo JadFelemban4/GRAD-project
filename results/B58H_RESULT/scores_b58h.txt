@@ -1,0 +1,736 @@
+DECISION 34 EVALUATION -- b58, 20 roads (version 6), each with its own seed and weights
+reading: no knock (damage_thermal) is primary; with knock (damage) is beside it, "not converged in dt on these roads", and decides nothing
+
+--- DECISION 34 FINGERPRINT (sighted at H 23.6675 s) ----------
+  plant_sha                36655cab94800e30
+  derived_sha              326c0835548975e2
+  engine                   b58b30o1/a90-supra-zf8hp51
+  engine_sha               023f5589215ee68e
+  train_backend            cycle
+  score_backend            cycle
+  backend_contract         json_sha_text=07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1 md_sha_text=72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7
+  transmission             final_drive=3.15 gears=5.25 3.36 2.172 1.72 1.316 1 0.822 0.64 kind=stepped
+  dtheta_deg               0.25
+  turb_protect_k           1123
+  oil_protect_k            408
+  scenario                 design_sha=67ba4fb20caf55a5 protocol=decision-34 reading=version 6 redraws_sha=82fa42525c0c3ad977b794a67f0c6433a4a2a2795daabf43725826d10c68534e roads_sha=27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498 seed_kind=REAL
+  episodes_sha             4a34364bd32aa8a2
+  preview_h_s              23.6675
+  reward_knock             False
+  eval_dt                  1
+  eval_duration            900
+  git_dirty                False
+  git_dirty_plant_files    
+  git_head                 dd49844db28c0fa54ab6240fb06f818249100060
+  n_episodes               20
+  plant_text_sha           af6d4f5d8318a9c8
+  preview_samples_s        1.57784 3.94459 11.8338 23.6675
+  python                   3.13.2
+--------------------------------------------------------------
+--- DECISION 34 FINGERPRINT (sighted at H 71.0026 s) ----------
+  plant_sha                36655cab94800e30
+  derived_sha              326c0835548975e2
+  engine                   b58b30o1/a90-supra-zf8hp51
+  engine_sha               023f5589215ee68e
+  train_backend            cycle
+  score_backend            cycle
+  backend_contract         json_sha_text=07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1 md_sha_text=72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7
+  transmission             final_drive=3.15 gears=5.25 3.36 2.172 1.72 1.316 1 0.822 0.64 kind=stepped
+  dtheta_deg               0.25
+  turb_protect_k           1123
+  oil_protect_k            408
+  scenario                 design_sha=67ba4fb20caf55a5 protocol=decision-34 reading=version 6 redraws_sha=82fa42525c0c3ad977b794a67f0c6433a4a2a2795daabf43725826d10c68534e roads_sha=27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498 seed_kind=REAL
+  episodes_sha             4a34364bd32aa8a2
+  preview_h_s              71.0026
+  reward_knock             False
+  eval_dt                  1
+  eval_duration            900
+  git_dirty                False
+  git_dirty_plant_files    
+  git_head                 dd49844db28c0fa54ab6240fb06f818249100060
+  n_episodes               20
+  plant_text_sha           af6d4f5d8318a9c8
+  preview_samples_s        4.73351 11.8338 35.5013 71.0026
+  python                   3.13.2
+--------------------------------------------------------------
+--- DECISION 34 FINGERPRINT (blinded) -------------------------
+  plant_sha                36655cab94800e30
+  derived_sha              326c0835548975e2
+  engine                   b58b30o1/a90-supra-zf8hp51
+  engine_sha               023f5589215ee68e
+  train_backend            cycle
+  score_backend            cycle
+  backend_contract         json_sha_text=07c63f89b6d7d192fa6f9f9883766f2f898e1c196afaa61f2b8d3692b1b0e7c1 md_sha_text=72019ff26b5a4370804904cb0c95eef695b33ef665b47f72277877407caaf2b7
+  transmission             final_drive=3.15 gears=5.25 3.36 2.172 1.72 1.316 1 0.822 0.64 kind=stepped
+  dtheta_deg               0.25
+  turb_protect_k           1123
+  oil_protect_k            408
+  scenario                 design_sha=67ba4fb20caf55a5 protocol=decision-34 reading=version 6 redraws_sha=82fa42525c0c3ad977b794a67f0c6433a4a2a2795daabf43725826d10c68534e roads_sha=27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498 seed_kind=REAL
+  episodes_sha             4a34364bd32aa8a2
+  preview_h_s              None
+  reward_knock             False
+  eval_dt                  1
+  eval_duration            900
+  git_dirty                False
+  git_dirty_plant_files    
+  git_head                 dd49844db28c0fa54ab6240fb06f818249100060
+  n_episodes               20
+  plant_text_sha           af6d4f5d8318a9c8
+  preview_samples_s        None
+  python                   3.13.2
+--------------------------------------------------------------
+runs/b58h_dt1/blind_seed0: blind, seed 0, H None s, r None
+model runs/b58h_dt1/blind_seed0: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 d708526281e161923122647a718b88a03c3d24a1485a2223f3495278c365ec0f
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha c9bf822b5115f8cc
+  snapshot at step 410000: sha256 ad0d100964dc5eeebc8c7067e4d66df2a7d77bef8c98fb259cba0c46c1af215f
+  snapshot at step 420000: sha256 6b934534eba3b0288ca9a7b7abef89fb86c0a2bcebc46c5f2a1471ddbb7a5c47
+  snapshot at step 430000: sha256 0174b78037045ee607711026291e3d21cdb3179548640cdd4e48112c29bccd55
+  snapshot at step 440000: sha256 87ff608c4657ef70a833cb551e1f02526eaf816bde90a21df9c93f3c72efc6bf
+  snapshot at step 450000: sha256 9a4a3a9eb3f425f9c5ba721af62502028eb7039818e105f73687c64adb8a65ae
+runs/b58h_dt1/sighted_r0.5_seed0: sighted_r0.5, seed 0, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed0: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 0ccc50acfb7fbbddddf5591de5f7b5cfddb4774ea7442ed17014c00494c5901b
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 37a458b65cb0e3d3
+  snapshot at step 410000: sha256 40fff1c03995413c12cdcd430a1670835eea1a903c915b6ce741af3064da2f3b
+  snapshot at step 420000: sha256 a415b80354944f21778d451d7b3cabe5851c646ea093ffabbdce0f4147416bfb
+  snapshot at step 430000: sha256 3eb21e486a8ad279243828d9d5d55938654458f767e9faf87db9f0084fc529ce
+  snapshot at step 440000: sha256 0077c0a56b8e8a3fef95b6afc8f43a2f7a16687a5a010f34cb6dee7e200ce7bb
+  snapshot at step 450000: sha256 86e5ea65542765d86174b99e9d3440f0281b0a7b6f2e52ee241c6d3c5b49f2dc
+runs/b58h_dt1/sighted_r1.5_seed0: sighted_r1.5, seed 0, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed0: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 baf9acb71ba9a712ac46423ec3c14632ef6038226fb37379e9872d9c03511c48
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 4924630e3ce1511d
+  snapshot at step 410000: sha256 8ae075cb3b74d8a49f7b3dd93a0fe13d2899e6b98a4e401fbdf6a11f63ea0e98
+  snapshot at step 420000: sha256 c80797300411087ff80d1f2de40ae28ef776a53a94ef59875c86a5a55fb0e8c1
+  snapshot at step 430000: sha256 236c08709627c1fe89ee3923128a3a93a3aeeeba514ffe9e23313432d3e64c10
+  snapshot at step 440000: sha256 d90d7e8de7620bbdcf34e81d1b14f7f3350837bb2e55370f346980e7a2aedcf3
+  snapshot at step 450000: sha256 e849e8971df0c50fd07b52de0191d31b5fd127a48e47038b51bbe2f18686c290
+runs/b58h_dt1/blind_seed1: blind, seed 1, H None s, r None
+model runs/b58h_dt1/blind_seed1: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 574b27af261cab3bcd7e4e8d144df5f9b39840f13b0a5ca74ba64e27e1402123
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 7a090f0f391a1e6e
+  snapshot at step 410000: sha256 87dd2bb480cb93f3e42fa44bc2770539dd94100d8a5e03c969aa1984edd4869c
+  snapshot at step 420000: sha256 819ce79bf80bbd6251f43acec2c8d8aff653b67c13bea56ed5fe60f38b5988b5
+  snapshot at step 430000: sha256 49bac14aabc0cf469d0528d1a037513adb43d5ede967ba31605db1e0b176d548
+  snapshot at step 440000: sha256 ba97002408184737c922b186581925daa91c363cd1089c43b6a3289a3a06abc0
+  snapshot at step 450000: sha256 a9c159c8d57555eaed057b613957426645716ca4dd873e12bc1169ffe33d4d01
+runs/b58h_dt1/sighted_r0.5_seed1: sighted_r0.5, seed 1, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed1: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 9dd2082204799c971fff58b111fa38bb32bc6b5349321a7a2bbfe9658d2a6c22
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 04d39a411047d992
+  snapshot at step 410000: sha256 b5185f52a8fa284b53d088d92deb63095eac414b1d6313690c03a04dc60a2558
+  snapshot at step 420000: sha256 23b633145d28cd97db92bb0279e228f451fbcc409e9d052a7e4bcb27f07b248d
+  snapshot at step 430000: sha256 a11dbb7a46788fcf65003ba5d7ee8aec370e1b9e00a168ff249bc2e901451113
+  snapshot at step 440000: sha256 4b2be84c2aa667fea5c3c2d31793133d48313812f2bdbb7530da0299bdc58df7
+  snapshot at step 450000: sha256 320cbe30d2c2bf67ebae413e1aad57ec82557af03e8d76f672ba1079656f3474
+runs/b58h_dt1/sighted_r1.5_seed1: sighted_r1.5, seed 1, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed1: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 8d9d90cd868c86c9aefcd459b4747645e8ddeb9827fd0f19ceb61d8da123a6b3
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 47ccf7a16ba565f2
+  snapshot at step 410000: sha256 a1f871c366af47569d3cf9d75261d12a7d146e1beafe38c10ab06e8341806791
+  snapshot at step 420000: sha256 1ecf617d4bcd03ac74efc67cb963fc7dbdd3ba3eacf60015ea25ca87f71dde2b
+  snapshot at step 430000: sha256 367d9f1ccfff9fdb4fee2f728de77239dfca201441606d135d1c267d0d91807a
+  snapshot at step 440000: sha256 5299446e5d9c21b5bbfaebfab3da9ab29d20b1a21e05a37ec8e08fc3a52b1284
+  snapshot at step 450000: sha256 1670b79b84b3599850938d15efe20e6d5aa86f10f35b1fa628597253a8c586d9
+runs/b58h_dt1/blind_seed2: blind, seed 2, H None s, r None
+model runs/b58h_dt1/blind_seed2: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 e0ba5bc1d0f9d5e93067fff616ac259ec5123ef01c500a8fd8059ecdeac82146
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 389c8fd394aaeff1
+  snapshot at step 410000: sha256 ee91277702e413f2f5d0c709582c7323bcda6472f1e794e9bdbcaae3898f14b2
+  snapshot at step 420000: sha256 556bab1846b62d2dd28e585b7c9311c28a968e51c0a4e0bdf874bee7c002a9ea
+  snapshot at step 430000: sha256 1aa11376bc7a7179c5bfb736b6eac13dcc6c7fbfd37026fd4a68f35a8e3bf544
+  snapshot at step 440000: sha256 6ee994dd92fbf9f6a59ae0df403b3f4b26b35330a42c90f7d3ec33f2f2a959a7
+  snapshot at step 450000: sha256 146b650ad8747db948ab8a83d980b7cbcbe31597ebf216a904acbc46b71caa10
+runs/b58h_dt1/sighted_r0.5_seed2: sighted_r0.5, seed 2, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed2: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 c8039babf1101ec5da0b1a716b499d7e852d2122ed28a6dd7aad3ec6c579ed15
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha e9a96ecf78164dd1
+  snapshot at step 410000: sha256 acb12a4be8ca89acb0411333f5440b7be6bb31f0228223b7938081158a481f0a
+  snapshot at step 420000: sha256 f782ff89f713f5de35a1a93c9b4a70add331a6c5721be4c846c1b35d2a2cf015
+  snapshot at step 430000: sha256 6827aa7da5baaef8e19251e328e077d75957c82374eefdb0d158fc024bddb0ae
+  snapshot at step 440000: sha256 2f20dbfecd987d79812d31623d772256af413fbe23a0926eefeae81a59791304
+  snapshot at step 450000: sha256 c711c4a856c3e4a6c1c5eb2fbe05e15693518b3dfdc324acf5851f90105c475f
+runs/b58h_dt1/sighted_r1.5_seed2: sighted_r1.5, seed 2, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed2: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 19d1a018866388cd5c868e2f52abd15d3d1b407cb2cac9a489f143d0cbbfa0c0
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 7990a4077fdf71d9
+  snapshot at step 410000: sha256 d1fa5fce5d22b4d022b060960a2035fccd78f3cd71addc6de17a7be6660006b3
+  snapshot at step 420000: sha256 e2f4ce763c867cfd6f5a40dc215e71a8de70d1bfa4c30f1f229d502ee11af0ea
+  snapshot at step 430000: sha256 032508e23d80db056c44b0d31cdb0ff598d5982c6752d7b0d19761de58f6c488
+  snapshot at step 440000: sha256 227b7ad78c79c735214406787983c96384da32a7dd5decef8e6b925bbe5238ce
+  snapshot at step 450000: sha256 8ec345055eaaef8b85a6349b7185c0ad91ace22b491e0277024c094e21753cc9
+runs/b58h_dt1/blind_seed3: blind, seed 3, H None s, r None
+model runs/b58h_dt1/blind_seed3: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 77d25d7e79b35ee68e364445e28b4c9eed1dff618f51c296fb2879f8f62c4291
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha ea8920226091a8fa
+  snapshot at step 410000: sha256 ddf27983cadf5a90ce24b570506846c74fcbb7aea0d362bfcdd2090b1e041249
+  snapshot at step 420000: sha256 a36d81ca17403e50bbf8454b16860b6c33b402e11cf39f51e0317d10e948586c
+  snapshot at step 430000: sha256 73182274ba3e380feafd995ccb4080f6440953d674e7a6f86dbcdced992211cd
+  snapshot at step 440000: sha256 c563380abb94915bd4fb6369bfb4f4fb7113ff475f21b279e3ab0c1d02cfce73
+  snapshot at step 450000: sha256 2215681d6f1d208e9708f8c9b2c989008d98d9decfe481b7f156ae2a12ae58a0
+runs/b58h_dt1/sighted_r0.5_seed3: sighted_r0.5, seed 3, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed3: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 028d60d4d8324148fff63f4da7cac51152523e776d2d64d1e5ac1a5861cb5151
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 4812954cac0b7398
+  snapshot at step 410000: sha256 3f937d1a1d4d1d636d433908debf948360c69f33e5af69ab8fd5fb51da3b945a
+  snapshot at step 420000: sha256 5d378ea02a09e236b118bbb8b3342518ae5ea0e93057201e1f39224705afb9e0
+  snapshot at step 430000: sha256 a12f3829abdc6f7f8e3ccb4ec75446b032e4e7e92db02581558019f9adb8bc1d
+  snapshot at step 440000: sha256 8d025153f4caecaeffb052ffece43fcf2d7a5ec9d6db060b6241e84a2e297cb3
+  snapshot at step 450000: sha256 a60bfc17d8afaf657df5542e3cf955379916c6335afbc75e33065a207b628f5b
+runs/b58h_dt1/sighted_r1.5_seed3: sighted_r1.5, seed 3, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed3: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 2cb5d86bedc77cef2083ded2d29ba21010abd8215b6526b819711a6181e6c8ea
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha df4248f2c00a1729
+  snapshot at step 410000: sha256 95bdb07abcaf21bd11a873634cc799f52a4ff4d69320ff1741c690abad46512a
+  snapshot at step 420000: sha256 f5684381150c59d06f1f6390862103c9f594233ed84257f2f80ff2c5bf9088f5
+  snapshot at step 430000: sha256 815e6640247a53c8fdb75e4ad88873d16637fe10e339f916ee8f4033dbeba1a3
+  snapshot at step 440000: sha256 6e5417b1f9358eaefec0aa4fae18753ab9c747dac9d91d75b52a47b4038cdf3f
+  snapshot at step 450000: sha256 dbe3d70f64bd8b247382d2c20e38562efdb7ee2bd0ededf8b1334af42254108c
+runs/b58h_dt1/blind_seed4: blind, seed 4, H None s, r None
+model runs/b58h_dt1/blind_seed4: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 dba581ec75a6e1837d13484854da78e8a328ceda58912d7e21c3e71f27ee3092
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 38f472ce93e8e3b4
+  snapshot at step 410000: sha256 779b2f8d927879512e11535e22dc9768529fd5a3102981f8cd86b561c05c4b37
+  snapshot at step 420000: sha256 8b2d95e756d49f4de0add7f7a544d50e3db1ca12312b5b7b562bab9601912cf0
+  snapshot at step 430000: sha256 1ca4ca837872c8827c1c8c54a9ae4c43eef9068304f41a2b5ee1cbd8fac891fb
+  snapshot at step 440000: sha256 9af4f3da3f7c48da111e544a34c38a0829e61ef4372a0c8908cc431e8def6244
+  snapshot at step 450000: sha256 d206e403e7b9b6b6bd3e4fc589ae8c065d771b37db3284a45f143ccfb8b5e581
+runs/b58h_dt1/sighted_r0.5_seed4: sighted_r0.5, seed 4, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed4: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 45741ce820ab704fe3bf2e999714cbe35e4dbb27a20dc6ab71f2a826a9b634cd
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha fbe5b518ee9071c1
+  snapshot at step 410000: sha256 682c971039f20b51becdb33b7d4d577f1383f0162d33c2381e048623aa40387c
+  snapshot at step 420000: sha256 c9e8eb3daa27e1a806f6875026b1a45ffd3857b6e25eee2b3e2677ed751dca6b
+  snapshot at step 430000: sha256 ae2d08fb9872686e2dce6dce4707a5ffec45a3870e7e0a987893cd4fc68c20f0
+  snapshot at step 440000: sha256 de3df8cb1a020ee6fd3980415ac042d68ca1cc1f0bbc4b652b34b265617fe221
+  snapshot at step 450000: sha256 52c4b3596043eec83dd1ceb8a24df97629fbb9b479828d94960b112e53ece56b
+runs/b58h_dt1/sighted_r1.5_seed4: sighted_r1.5, seed 4, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed4: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 61db8bfd333e382703db913902fee7122ff34e215576049890731fb0ae2aeadd
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 9379ebe0a3036426
+  snapshot at step 410000: sha256 85cf77a1d6fa03fc78a61f7e6c1f9ddada2713cf350ff803ae78da896207642d
+  snapshot at step 420000: sha256 de68d4e21ca8cff64a9096ec7b15f82ea1f486d17eef5f3c64e97d29c81f81ea
+  snapshot at step 430000: sha256 f71eacbc068d06f63a5a97e69d1faa68e8a86f8eff816db14a9af5b8648dbcde
+  snapshot at step 440000: sha256 e9463c64cac71ea1eb7dc047e332d8228469cd0604388be5dbc5d9f4016dd9b5
+  snapshot at step 450000: sha256 291b963bf52ea83e03a0d51d63fa469304a15680a476a6b96dc374c7e3ac5acc
+runs/b58h_dt1/blind_seed5: blind, seed 5, H None s, r None
+model runs/b58h_dt1/blind_seed5: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 fd3b792078af37d2a94c17dbd4b28778f349032856b7d4d3518799b44ee8d9aa
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha eab34fc13465b717
+  snapshot at step 410000: sha256 664b82a04c0ff23591044b428f76fe0dad51330026989f6ddb0366e02ff68cd4
+  snapshot at step 420000: sha256 3e8c492eb861b61c33f7780c316c506d799d60df365a839f7e6eabfbf4fc5978
+  snapshot at step 430000: sha256 e7c3c764ef595023830e6699e48516cadd80da0e6e5d1180cda2bd50a45e8276
+  snapshot at step 440000: sha256 1881ace8a3c2560af82592c689fdd3da7386bff0d4c7da379c7295ac33182055
+  snapshot at step 450000: sha256 864a50ee1cc3ddc36f960b672af6e37ba5a7298ab18118159258ef30991ceaed
+runs/b58h_dt1/sighted_r0.5_seed5: sighted_r0.5, seed 5, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed5: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 cf5b02b0a122e9eceae53e486086c306c9867e63226fe2996ef1f099dcefefad
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 2380bc32c682fc7f
+  snapshot at step 410000: sha256 4907f04befa4e4423f5f717d7a5cfd567540145477d46ac5026e40c9bfeed317
+  snapshot at step 420000: sha256 9966310ddb94f11f66addf985f2375b8cf920b1d62dadf9358a483bdd7c9c768
+  snapshot at step 430000: sha256 e1e887c8a3738ff1d03fd020fbe36982b78fd7b07f33eaffc3a95378c835ab06
+  snapshot at step 440000: sha256 81b670638c8f6660399ae0edec2294ce3567e5f107c60d02a78fab8fc1793805
+  snapshot at step 450000: sha256 728e948b193f791d0540f76a3181f9f730177f8c10a8fd8a7664a6a83f14d778
+runs/b58h_dt1/sighted_r1.5_seed5: sighted_r1.5, seed 5, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed5: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 5b05964423347dba0a708c2b1ef7fbe89bba12ac7e70d30337f07f6e20315059
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 8333301ebff8a4f3
+  snapshot at step 410000: sha256 4a13dba0763546990e22f6504e077980c71bea75d5046d34a75d3aee740b55ef
+  snapshot at step 420000: sha256 d983b14797adf3f4db190a66a633840d7c51abace7df6431b3163e6f3d8d6a5f
+  snapshot at step 430000: sha256 95096e575fff6e61d881ef502215c32646bb4c27ff20170053089a78ddddc2ec
+  snapshot at step 440000: sha256 b042b8daeb9925ec88e9bb3f85eb6fcd6f96d339abf60e62f0627832f1204204
+  snapshot at step 450000: sha256 488136eabbbfbb5b8305857efdfa5c1ad2b3baf21cc1fde60b68f57a022b7b49
+runs/b58h_dt1/blind_seed6: blind, seed 6, H None s, r None
+model runs/b58h_dt1/blind_seed6: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 8851eb925be392a9cd837cb3bdbdc449881308a1cea9232b34d74fddc41b1b1a
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha fd424b5de8dd124f
+  snapshot at step 410000: sha256 5f91feb7d2b7c03dd3dfb9fab39d4a2b7438a1fb075101feeba9790135e3f3e8
+  snapshot at step 420000: sha256 d92ce50da2444b69340505f873d280b1f46508ce36671c7e0031844f40108604
+  snapshot at step 430000: sha256 537b1959ba5b6dfca5fc9a8887d72c4ea1c0f24b835348eb08ff8663a529076a
+  snapshot at step 440000: sha256 cc757a5c705226111a278874a99e6f4efc1912414ed593416d441a1dc9b977fd
+  snapshot at step 450000: sha256 99e02b70fe6414461ebe5bc27fefb2275341ed8e3e8345e6679aa2ea7e08e698
+runs/b58h_dt1/sighted_r0.5_seed6: sighted_r0.5, seed 6, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed6: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 6c50682c86eb106401f84f0ce4ab28ca5ccab60b298ed58645b23bd2d88a0706
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 2bba5b98d85c5ffd
+  snapshot at step 410000: sha256 badf6fc1a3816074e2c626e49152c7691307d66cef5e99f5eec5af2bbf57e8fb
+  snapshot at step 420000: sha256 8f04bbaa78e6ce5e7eabd8caa75be085d2a4b546424a8482fda2d20387e4915f
+  snapshot at step 430000: sha256 16036c0d79faf72bf05bf99eddaee80586c80d0d0416d23d43fdbbd0d5366646
+  snapshot at step 440000: sha256 1815528deb406e9eb6cbf4b6b319bbf260b93aac367d6bce8b16163ed753a078
+  snapshot at step 450000: sha256 89b2375b35002b34acd99b5e14f380febc74904f471fbb266548dc12143898d2
+runs/b58h_dt1/sighted_r1.5_seed6: sighted_r1.5, seed 6, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed6: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 621397275340f4508f826fd78e0bd26f3156fe03d93073847a99293bf2c61e97
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 7560c3fd15ff73dd
+  snapshot at step 410000: sha256 c19cb5c4956b6b2b74b758a1919fc29e6dcbbb24fd2e388f654614cc303fdabe
+  snapshot at step 420000: sha256 16001a81718b56e1819e6f3c76bf5d23098620584e4a30eca5299e319aa77f72
+  snapshot at step 430000: sha256 09e55a1ec98a465407df7a1bab7293c33a1c0a0d8147a9982245538abda73191
+  snapshot at step 440000: sha256 53c38df91d47332295b3ddb7f8b4bc4d84797e7e7a5f9baeacc154fcbf4dea4c
+  snapshot at step 450000: sha256 9d5b33809ba501de74fc04eb6de3cfde17ccae94d4a1220f6406164ff10b6d7f
+runs/b58h_dt1/blind_seed7: blind, seed 7, H None s, r None
+model runs/b58h_dt1/blind_seed7: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 827bcf795adfe95101248b81a8a88954c5328116cc8b07b5f3d4bf0c4a7f9984
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha d40e129fd3df6936
+  snapshot at step 410000: sha256 cbffdb786c37ad23199610269cd9166763df3bf6429e439fb95bc74fbf585c00
+  snapshot at step 420000: sha256 5a1989c5ce5f9948a839b12b7703a5aaa7954c74e24108ba6bf01696476dee88
+  snapshot at step 430000: sha256 d3f006a7a7ce7eb1ea459a053c3508634698783aa46a7aba9688c1d7fbf53179
+  snapshot at step 440000: sha256 a57414824b73be805f2c90b47dc48cfa7920d7f69da80cd8987d0de377ee9c2e
+  snapshot at step 450000: sha256 12aceb4d4a4e5a7cfc369f8da198f26a51fe07324bfd666951beac976aea7d0f
+runs/b58h_dt1/sighted_r0.5_seed7: sighted_r0.5, seed 7, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed7: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 e4df0d659998e6a20bff584dcd11cd3deff976488ec9163873d2c395c5e31d6d
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 605549f9e318d503
+  snapshot at step 410000: sha256 254cdf5b734acf9d37ef5ae4ec0ce15a3e29d9ab6c44a165548986509872c342
+  snapshot at step 420000: sha256 71b87c3ff850b598985aba63002430bd97157e9d9fde4864f12ed9a62db368a7
+  snapshot at step 430000: sha256 0b547f8f0260e77dfe8735848ee8b784240572f023838354ba37bc6d3fd2efcc
+  snapshot at step 440000: sha256 824f2cf28d938335c5c26da935c78a094c8d447fff2347d98781a9f6753cb249
+  snapshot at step 450000: sha256 61901491fd7dc62464649cf9659734e148b1c854d64c613044ae0c126b61a73c
+runs/b58h_dt1/sighted_r1.5_seed7: sighted_r1.5, seed 7, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed7: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 22c0762e591139f25b3faf2f18a54cf90f2a06f9c17d3d30e23e9b15574b6fc7
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha def7a45f322d3769
+  snapshot at step 410000: sha256 6bedf40dfa4741d6d64b1e91fb5bf5c18811fca7ed81a15b028004e326d436ff
+  snapshot at step 420000: sha256 da240b7f3f9263b4dcbc8f371f0219000dc1ad70e1385f98cf22ce119bd81b6c
+  snapshot at step 430000: sha256 eb5c3cf6fe11ed487e49c6ab45ac5c45205bd08bc29c6d17a819fa3884a72840
+  snapshot at step 440000: sha256 c12800120e0805869015a152aec0c88d21a168b7cdacb9879bb33fc6bd75c941
+  snapshot at step 450000: sha256 5c8d9e55842c6722ee9deabd66842ce4ef7ff27f6e1bc741917df71aa3c5c355
+runs/b58h_dt1/blind_seed8: blind, seed 8, H None s, r None
+model runs/b58h_dt1/blind_seed8: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 3962c9836a963f99a1068da0cd2659a4fcc6b490b734b1f506a46d38754493c2
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha ae4a6392ec61d11a
+  snapshot at step 410000: sha256 5ee01df96c7b3ccef720d0b6716a423bb2147edd33ed6d460918ce91f0f5a04c
+  snapshot at step 420000: sha256 b8dc16c6a15c6bd2765f80305f4a78add12a18ccf560edf8392bbfc6d092aace
+  snapshot at step 430000: sha256 bd05d814a9d1cc1fdf39ac35d2930b7c91343ac0c02221f277814b46bae93681
+  snapshot at step 440000: sha256 623b5d525c8944ee423f30f704cc6b588f4cfe2995280dc54b15d83dfc137f11
+  snapshot at step 450000: sha256 9bdb56b79272c7c4533c4fe2933fe04361547a07bc497521e9cef2da1e9ccb8c
+runs/b58h_dt1/sighted_r0.5_seed8: sighted_r0.5, seed 8, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed8: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 6f4c985656393e937580bd07a5c61114d7f1dba73d3a859becc2e2b200f15a9c
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 25088bc366e26b1f
+  snapshot at step 410000: sha256 e0dd39bc05bcc2c1042da8d0aa3d3458febd853096a9db3372e605a17fed3ec4
+  snapshot at step 420000: sha256 3cb17f55f9c059149cfc72c6407cfd0f1f5c1538fc2498116acd85ffe18b6acf
+  snapshot at step 430000: sha256 f94b9703b75f8cff79dc1f265c525feb787b336c2180b2a055e73ef21093cc8c
+  snapshot at step 440000: sha256 b6f975cd2d75f6cdbe0285feac98c4ba7994c011d019aa82cdd498b1366ce449
+  snapshot at step 450000: sha256 7c67137aa98b34eaa94377187d397fad758d6e39c432dae692d147e1040d43a9
+runs/b58h_dt1/sighted_r1.5_seed8: sighted_r1.5, seed 8, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed8: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 685f1fa4706bf36df79068999f990ef0a47ca82ddf05e69c5865dfb358066ec9
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha bb10a0d1ff2529e0
+  snapshot at step 410000: sha256 68b93f3381eeb114baa528a3d5f10f89a87d4878230331375d987d37e52f3f87
+  snapshot at step 420000: sha256 ec9f705074847548a5ad70260cec4d735b1d4d24716e4317bd29c4a51e4e69e3
+  snapshot at step 430000: sha256 3636603f9ce9f42d15f46d4104a63cc384018eaa747ec69ad413fcc6be6871ae
+  snapshot at step 440000: sha256 507a5781ad020ed2067920c3ed3c84a497b336d54882600cf5496416a96580a7
+  snapshot at step 450000: sha256 bd90fa460bbc735b1057d054f486417e20f48155fb48b567f99e2231096296dc
+runs/b58h_dt1/blind_seed9: blind, seed 9, H None s, r None
+model runs/b58h_dt1/blind_seed9: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 70132ddbe12ed506015fb7e4b9e13d5a4513708d60a9006b05078089caa9e75b
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 2a5093c61ff0f290
+  snapshot at step 410000: sha256 89cda96f27294a9817fe194058ea3b546f2b648216dc05a2ff7e0dd976b027fc
+  snapshot at step 420000: sha256 3023467a1eafcb2e8434a7e6d6e523580d7e09b3450a8a8161e180e532179d8c
+  snapshot at step 430000: sha256 e689fa023b1104695626f42d103e0e2a57ebfcab2f585d843a24e29f3d64f832
+  snapshot at step 440000: sha256 00153eb9357c01bc7b428df6a5cb52c3a02dbbfe2586dca0e6a37b965558a577
+  snapshot at step 450000: sha256 70e55ed0fed8f5a9137286022dce26858a4157e36ffe121c245563f1ab066fd7
+runs/b58h_dt1/sighted_r0.5_seed9: sighted_r0.5, seed 9, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed9: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 fbe8d9b9d61a234a593550773b1eb2ab6f231d223276b0cd124ad3242fb137e5
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 8184390a956ea97c
+  snapshot at step 410000: sha256 876c322e569cb5cf1f0e1238b81a02272d6d8769ce42656056d767402a44f08e
+  snapshot at step 420000: sha256 62213d2b4a5432106160fc15d2589a486d7a66b7d5748e620803d2cc0becc807
+  snapshot at step 430000: sha256 be28da88b4df45f3af7c77d277927885aa6db6157a40d44d7e6be005ffd8e5c0
+  snapshot at step 440000: sha256 ca0fe838c7bdeefbe62b13a710a3ca7ae834b20cf8783c01b6ab47de665ffd99
+  snapshot at step 450000: sha256 a7b775bd5508fc83dde7fe43fa68c8be4136ea819de878c2a6d21ba515705ce2
+runs/b58h_dt1/sighted_r1.5_seed9: sighted_r1.5, seed 9, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed9: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 22bbdc9844ac6ac28f0ed35afb02ce3c59d35bf47c8d553e863165d1fccbd969
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 7812cd2d444d05b9
+  snapshot at step 410000: sha256 f60bfc5d969cf0f9a06186ce6004b17be7cbb6c6245e139986be5c6cd33113b2
+  snapshot at step 420000: sha256 3ed211491f87d3d14bf3436e2e8108d1fa7f433c103f0c2947ec0530a1fa1dee
+  snapshot at step 430000: sha256 5b061423cd349679bcece3a928d8aa8253eb74f84931685c35bab771a4febb74
+  snapshot at step 440000: sha256 35fc17c5380b4d96d68dbe5f9c622571bc48b146353568dbb7b34a335965de42
+  snapshot at step 450000: sha256 64e166dcee866607277d5cc71443b2df171329a3748a5d6fbc44fe96d33a5149
+runs/b58h_dt1/blind_seed10: blind, seed 10, H None s, r None
+model runs/b58h_dt1/blind_seed10: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 342129bab7da71ccaa49b641ac0f2e549618055066583a50ce16bc41c4436433
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 6605f0cb8f9cfc9f
+  snapshot at step 410000: sha256 a4136610608d94bc52b77fb151b675d8f0df2121e7072002d258036ab9182bf9
+  snapshot at step 420000: sha256 db6eb7e3a54f6ba717cd814f5746335b5d1014926ddfd5b082c58fe3efed64d4
+  snapshot at step 430000: sha256 dc42c1d7350a82ab0f40d42ccf4ccd012979e4bc4a04c3f77a6c8a4f8a0109f4
+  snapshot at step 440000: sha256 250f51b0ff00b249a3379ee8e1d4d67922e2fea420853e4a6de07c09d424421a
+  snapshot at step 450000: sha256 bccd8d1c510032ecfcd983d7217293ec76f275b24446a9a8cfeef5c8c572c6b0
+runs/b58h_dt1/sighted_r0.5_seed10: sighted_r0.5, seed 10, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed10: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 ccd58a05e8272f8a99be87779bf77601da1dca6ec4f1362f9505d11a047736f4
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 79094d3b84428e11
+  snapshot at step 410000: sha256 1826343fb604a80a32dabf45c2fd4c896985ff403b6adc238174ca639b410b3d
+  snapshot at step 420000: sha256 81bbe3c654e0fecf199d95b6a82a2ec59a8b2b5390f4c7bac4ad9780767df455
+  snapshot at step 430000: sha256 22ad9fbb5cf63ef3cba9ded83e744e88066dd8c7c76d0aad158e2a83ea96131a
+  snapshot at step 440000: sha256 55e22052b84a9d509d9e07dc630576c55921b33dc0fd60472f8e424d7eb53802
+  snapshot at step 450000: sha256 072e606f64ddca44a1afb321febbd5bb3522d479ee2b4b64548ec33b612dfab5
+runs/b58h_dt1/sighted_r1.5_seed10: sighted_r1.5, seed 10, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed10: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 5d6a230354f6ecd5b6e19eb19e59aad9f8e8eb5c25b089d4a5c87ed83d628a1a
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha d375f7ded7023b99
+  snapshot at step 410000: sha256 4dfa683bce20bca4e92c891216ccc959617cb0b97d8dfd79e1dbae03d4d49f0e
+  snapshot at step 420000: sha256 3cf4137b7cf26e3f32aafc96c08b707f08d19f2b8b8687cca5a623928ec6e73d
+  snapshot at step 430000: sha256 1eeabf45f36248a618e936856cce29489161cfb3c7e92d39fb87fd0c9ad5aadd
+  snapshot at step 440000: sha256 c10ad2a21989dd53ea33673cfa4cb976e24bacb3b7f6936334cdce5237b1b4ad
+  snapshot at step 450000: sha256 572d86d4e2cebebdd8b09ab966417729178bf9d9da1ea6b397b230a19dc8d6fe
+runs/b58h_dt1/blind_seed11: blind, seed 11, H None s, r None
+model runs/b58h_dt1/blind_seed11: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 28020478d8970252122c833d448c90fc55b29a6a87671de5f23c868eb499aee3
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha f70d96fe392d22a0
+  snapshot at step 410000: sha256 9da454339daed4eb3caebb0c92703cf49064368d65ba0897d1f0ffc3445494be
+  snapshot at step 420000: sha256 031b63d2a2e254fd1a3fafdbe75bdacf43994384c34aabe7aef63a2cf77c7e91
+  snapshot at step 430000: sha256 e00e564ab961b07d05f98c9738b35229dcbc4e3a86af0096d28106d1c2adef45
+  snapshot at step 440000: sha256 4d781b9ea69f2877c09ca6726b7542f50c088dad7af28702dc0bf9fb7169fcb6
+  snapshot at step 450000: sha256 24c204a314b0df0ac28e8cc1252204596eba87d96912da5c86d03a9d04527aed
+runs/b58h_dt1/sighted_r0.5_seed11: sighted_r0.5, seed 11, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed11: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 975673003df655dedab968b3274eeb15658723be0e97b37fedcf3f8182fe72b7
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 89761460c7a0c702
+  snapshot at step 410000: sha256 b1a842b34048e95e70140c515a27ec2c6d962168bb259225e300e6731bf49d6f
+  snapshot at step 420000: sha256 6152b6460de1ec2440c4f78707a9adc05c505bda3619a4a5226ac596560acc64
+  snapshot at step 430000: sha256 a9ac7f420f5dbe00e13c90c32b1a0639cd2dea2fc6e70236ed75c328801a4b79
+  snapshot at step 440000: sha256 ef7325e0177deaf56e7d9bd63d37302d01066a30c5af4ca7add6ae72c9b5cf0a
+  snapshot at step 450000: sha256 4435b79f5bb5046ece44efc56f1edd6d1b8c2f58e9d66693406b173f61d6d48f
+runs/b58h_dt1/sighted_r1.5_seed11: sighted_r1.5, seed 11, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed11: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 ef5f2eb4ce8da5380eb68e7ff489d0f97a7413fd8d15272955f27e293f92bc58
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha f8dcb2d4a4381f0f
+  snapshot at step 410000: sha256 0a1a6feffdb07dc64278ad27fba8649e6cbcde1be4b2697b1ff0bcbf718c959e
+  snapshot at step 420000: sha256 538a4309a01837811d31141985a64a348edaed925455d3089c4484aad335a3e7
+  snapshot at step 430000: sha256 3feef70d80f2a8f8b502be66febc06a90dcb436119279632fbc7976bb18c6b6e
+  snapshot at step 440000: sha256 19a9c1c80bc89e932172cd64a909324dca17c5d7e450be8485a382b55b54e3e0
+  snapshot at step 450000: sha256 3360104a19f74d518bbbf513d0bc3f48d21bbdc2a401512267a5071150c6287b
+runs/b58h_dt1/blind_seed12: blind, seed 12, H None s, r None
+model runs/b58h_dt1/blind_seed12: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 ffa73a2b4f80a10cdced0cc042a1509fe6bcfa9b4fafa974ed0b2b03790afd56
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha da8182b07acbd451
+  snapshot at step 410000: sha256 92fff86ab4594e7093fec77a1473fcb5308e1ae437b7db51ddf94a6f93810eaf
+  snapshot at step 420000: sha256 8a73b869648026e2217c55ab534dd8b9adbb4d48e3371af71eb5e2c037b1f6f6
+  snapshot at step 430000: sha256 e27a5045eb2e36d3f67749a394fc863c80482d83d961fa48aa6b86a461eadac7
+  snapshot at step 440000: sha256 17ea6eecbdcbaf519770cf4b41da00da4e1f9e7e43273a54d4199bbed17487b3
+  snapshot at step 450000: sha256 ebb2afd04ffd48e7e05b3efd6873e7eec7aaa3e4ce5c502b4e4c177953f1b8fc
+runs/b58h_dt1/sighted_r0.5_seed12: sighted_r0.5, seed 12, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed12: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 f9ea64de8c85e523c3dbbdbf3c28a7a4c92bebc38b0ac91f997f1b1a1f3a7506
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha c0690780e7ba5b81
+  snapshot at step 410000: sha256 7db4bc79209f0f6440e09b81e660a59217f334982814e93cd17de04e8fa0f4fc
+  snapshot at step 420000: sha256 0a57449d2c4bf365929ce1e696ba7f3d26aba9a6b375c5aa7513ce251544ecaf
+  snapshot at step 430000: sha256 48cdc12b48496f8d4644db01bffe017259a11f22a0a0ed2ddeaa18d8d4ffd19a
+  snapshot at step 440000: sha256 920f2fedbb8072765ea86e642c5e05a20131824a896eabb94e13d39ba4bcfc9e
+  snapshot at step 450000: sha256 7730bf3ee2ec32a6a58afa32f1f4a5042e10ed6725ce7989ce62cbebcadb6b0b
+runs/b58h_dt1/sighted_r1.5_seed12: sighted_r1.5, seed 12, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed12: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 6dbc6a58eb3014a8131956053ce7a67f93f5e33270dbe301d7bb14fe584b2cdf
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 05496eb7c38f28c4
+  snapshot at step 410000: sha256 207ee28dfa39924192ff1eb731090e3a4e3f95e2f8f759fb1b93a6a6bb03efd1
+  snapshot at step 420000: sha256 dcda17bf02195dd1bada89fb60cb27bbed8ef05e7ba1235203b29b0665494f23
+  snapshot at step 430000: sha256 b19b66aa36129766efd0aab0d2fd00dba857271c489b1613fc40d3c9bfe16c14
+  snapshot at step 440000: sha256 5159e7029aa8d7d5e8e821ffc436b43c9f3f2bff7bf0f1c0001dd45602c191b2
+  snapshot at step 450000: sha256 431b820c1f0701b29825e3d31f195382a066141066f4a83afeaf191024f9f531
+runs/b58h_dt1/blind_seed13: blind, seed 13, H None s, r None
+model runs/b58h_dt1/blind_seed13: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 9c38f374c5d2a08d66f6ac5013f41832d0b7d23eafc7da6b52f25f3a4906ac03
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 900e8213e1b14535
+  snapshot at step 410000: sha256 2eb6e2c649a01f51e33c8a19f086981a6565980f9eabdbb594c4184ae88d3749
+  snapshot at step 420000: sha256 bc56d8fd777fa5dd472fad5d052d715c9e7513c9c6da89d785ad4d94aba1b486
+  snapshot at step 430000: sha256 537c29b8c1adc035a02e152ce605246e36a2bb5b64f5ba2193eb5b33a020e5dc
+  snapshot at step 440000: sha256 58026b5722e710ca94a93bc2e667b011e387d267d3ebc7ab2b236f3294e9ed57
+  snapshot at step 450000: sha256 80c8bc0651704f7b4419ddd1672e133378cc52d6f63fe09005e500b11b63fe0d
+runs/b58h_dt1/sighted_r0.5_seed13: sighted_r0.5, seed 13, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed13: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 30e43c762d05990624d0b07c88f32627941e52face4908ab2bab40e89e9a4526
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 6de251965122bf4e
+  snapshot at step 410000: sha256 1d8cbb8a48125f58b5fb2cab7f92c0b3b594c952a2db7854811c071c8ef304d2
+  snapshot at step 420000: sha256 56cb38f9c47e183bee95b3ad8a4f6068ba8fda64a6fe07251ebf60c2b43e2a12
+  snapshot at step 430000: sha256 6a01d93e735d58fe0d8384a0a85ad449d114738760db350a6c95ad389e67b503
+  snapshot at step 440000: sha256 1fc353eef857b5cbf718b0b49afdb094398888d584e9c191da25d9bb9802782e
+  snapshot at step 450000: sha256 ec72353d2b632a1ec7d49f0f45c9c98d4947357057d4c552ef282402939b89a6
+runs/b58h_dt1/sighted_r1.5_seed13: sighted_r1.5, seed 13, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed13: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 93aaf6700bca14bd9fbe3d2a2e44c1c3eec7fdc6ebad2138a0eb849ea26fa2d4
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 340a25179ed53077
+  snapshot at step 410000: sha256 54d784f5b883164e62949a1e7b614d9a6b9fc65acfce7bc0aa89f27ff5b9afd8
+  snapshot at step 420000: sha256 d00c380c05da56aa8eedca6e165292838fe2afdfb70c88eba7ddb407c50379d1
+  snapshot at step 430000: sha256 d01e5c4268b5d22d03298383009c13e4503b15aa4d3f711212398d58b8c56a16
+  snapshot at step 440000: sha256 d8f35ad0dded8cd52a624d415656b2e299c121f4db2e463f7c92124cb0beed3c
+  snapshot at step 450000: sha256 a5a7d2bd4b7e056d216b444633f184e558ca8d5a0bdd79135393681613f0aa5d
+runs/b58h_dt1/blind_seed14: blind, seed 14, H None s, r None
+model runs/b58h_dt1/blind_seed14: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 9350bdcc5dbd751d91c017ec785efe5f552e754151110789f4d1a6fd547c1bbb
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 199cb36e070fb44b
+  snapshot at step 410000: sha256 015340bbfdeb0ab76d97f2cad637dd6330d79dc5768ef8a5901f13a4770bf6ca
+  snapshot at step 420000: sha256 4a6cd456f589d5f4572100afa36dbb0691b4ec3a7e931c0bfd72592b97a95693
+  snapshot at step 430000: sha256 f5213ee6d561627c57e064797c03465f4fb3dd5f4b3091648e7bd18b0f9e9d6a
+  snapshot at step 440000: sha256 92a03dd8c3224c940575b8938712aba1219fb30dddd23c9147ca62c04184b821
+  snapshot at step 450000: sha256 8631c81e265d0fd86be48e67b5998a6d79d28a41dd796cb903caf05b75a6eb4d
+runs/b58h_dt1/sighted_r0.5_seed14: sighted_r0.5, seed 14, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed14: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 ce47296d3ea716489b16de300f729b84cb3616cecb4d58a008dd8ed1414c655c
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha f4855919afec6f40
+  snapshot at step 410000: sha256 f2dd10525aa8d050b26561f9493dd508c5cbccc471220c0e6d819c74e28dc12c
+  snapshot at step 420000: sha256 bd44ef058c06f4d3fc829959c111cd6e544ec4ba0a38c66a66f9037a2a7b0c5f
+  snapshot at step 430000: sha256 a7477b1b0352685c62ca31fa8ef969ed0c305eebc7faba14920fd80a1559ab6c
+  snapshot at step 440000: sha256 d20686272ee7f708cf7d48dea0253d6a6d247638c73e0fff97c9a7bbe2332186
+  snapshot at step 450000: sha256 7bdcad683b1fd706207fd86788979fc045539fe48738e7b650afbe6be988be59
+runs/b58h_dt1/sighted_r1.5_seed14: sighted_r1.5, seed 14, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed14: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 122cfd976be7cf51a9eb50d820941279ce7e9190cd66e72c6fe3f51647b4bba8
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 5cb655f751da5d3b
+  snapshot at step 410000: sha256 a0dced3841e93b528bafbe1339f1dfb59e3d1a16574a2411403f26d716863c1f
+  snapshot at step 420000: sha256 fbd44c5bd5b392e15af80549f8b54b47a3b988efdbe91922d82ed64b2145f31d
+  snapshot at step 430000: sha256 5dc02da30aede6c29f9dab132592a297c6bba2f47dd6e31575b76d32675eefca
+  snapshot at step 440000: sha256 b278747f720883f1ff20a12c2fd1619c4975300f3349505221d9c3311326cd43
+  snapshot at step 450000: sha256 acae8c1c67e83b32fd8da6506a42651199ddd42a3f799c5d3d68cb1b9f31c084
+runs/b58h_dt1/blind_seed15: blind, seed 15, H None s, r None
+model runs/b58h_dt1/blind_seed15: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 a8dbaa2cd8ff9efacb12eddebfe11f82ce06ee4ae9b0f08d9a22ecfbd59a4706
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha a6f7d9347c45a335
+  snapshot at step 410000: sha256 f4ff81aad17b30f464fdc8069e54411d45fcac7c497bb5bd1f5e3d05a6f8d874
+  snapshot at step 420000: sha256 d40374cdac37dffaea27f9dff99a61231e112b310462270d900a800eca7fe360
+  snapshot at step 430000: sha256 3e60e675b0b52b5a761618a2713943e0a2ae73e75ef73c683b5c782198833042
+  snapshot at step 440000: sha256 dae81c1ea5f53c125532952958e5e13409b7759c44fa7ea90ee784ac62b6749c
+  snapshot at step 450000: sha256 24e7a3134ca37aeb966bcce5f43e541aa8a16a1226b13c3dfacf8a813ded97a2
+runs/b58h_dt1/sighted_r0.5_seed15: sighted_r0.5, seed 15, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed15: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 78bf1d6092b4dd81f757c74e5528fa3dd7f743c9dd82493c364183f791bbcd12
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha a0bb003d53582731
+  snapshot at step 410000: sha256 46e4abd486a30743181b88cc1fba2c8122f78a622c08e3d5fa9f683dfb943957
+  snapshot at step 420000: sha256 ad683989e3aeba6d4d7244d83947583ff4ada777c1167c6a9f55d2000d6daf68
+  snapshot at step 430000: sha256 0ddfac16d4a728455da6a1771d3888f552dd425ee95251a2dc304ed413d13b2d
+  snapshot at step 440000: sha256 b055e7328f30ff73ab9653e3b87c3884844cd66d6c1f10575334a28d819bad40
+  snapshot at step 450000: sha256 34b62c33262b524bc46a48c18d586e30d4aeb907865f96408c4e74cf49f2474d
+runs/b58h_dt1/sighted_r1.5_seed15: sighted_r1.5, seed 15, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed15: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 178d2ca5596cdf90441426f9af80cac142f961f09d2588eaaf5ab3f3d7b72f88
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 249233eb0b19fdc5
+  snapshot at step 410000: sha256 578de20e87d47343a8a1416d15c4902fa69173d1bab376275c9c9be5494fbc90
+  snapshot at step 420000: sha256 1f23080b3313afa031ec661ccf69b024f3633b1c1b2033a6f169fd8e4c0f713a
+  snapshot at step 430000: sha256 5e823e1cc01f1f903ef7da5d65d028c85364c786d26fb8292b58b60e693d8b1f
+  snapshot at step 440000: sha256 c06227580b42717af19a0bd88efe27413d555f4f64506456a42edc01aea4708a
+  snapshot at step 450000: sha256 bea52d51bd62a9da1f5c4b8c2a433355c5b4781bcf788aaa6ee657799939b41d
+runs/b58h_dt1/blind_seed16: blind, seed 16, H None s, r None
+model runs/b58h_dt1/blind_seed16: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 fb9cc746e9156342e45c0065f59a4598514e17706741f46f00977a1d5ad830a0
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 99cc0a76dcf09ba1
+  snapshot at step 410000: sha256 efd680c086c54523d437e5fccf8aa71bf5740107f71ee478c36f8c617b11431c
+  snapshot at step 420000: sha256 d7c83f0d188014dc05a91c8dead555757c4e4a95dd0a96b335da0cc140f26ed0
+  snapshot at step 430000: sha256 32ae283ac6f0f063580ca0b7b03df3daee27ca6da74ca8d418d3abae48d9c446
+  snapshot at step 440000: sha256 4d4e33e8f012436fbea0237ec258904fc41902a815803c7749f1ebcbcea1cfad
+  snapshot at step 450000: sha256 fb0a3eb4c50b6f07c5c7eee563874d04faeefa9b81a831cdd1fa4464a8e933aa
+runs/b58h_dt1/sighted_r0.5_seed16: sighted_r0.5, seed 16, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed16: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 779382bfe452b48de4876148c78bfb166f98313e44ce73d1540d59f5ae7e42f7
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 4e4a304eeac1d895
+  snapshot at step 410000: sha256 792b8a483e529ddffc0a7b61e9ab63251a7d38a977dade902e64c658e39e64c6
+  snapshot at step 420000: sha256 6d61d6a1f4be620931528de616913f146652400da6161ebff0b37239eabda11c
+  snapshot at step 430000: sha256 e36af99e2ec7711b33bc080c56b5fadd84bb51169c877424420b63877109ce74
+  snapshot at step 440000: sha256 a5b474a944a0988a384daee906704dacecc3b7fec2d0a62884798da8c94be153
+  snapshot at step 450000: sha256 b2b0de234b59829c88063f5c82343926694e1950498cf2612f8295cf15e2675c
+runs/b58h_dt1/sighted_r1.5_seed16: sighted_r1.5, seed 16, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed16: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 8412f190705e59ead00541291686510a94e3553203dc6a5e82584aa2c8be00f0
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha c1ca1b82495867d9
+  snapshot at step 410000: sha256 c3e2763ecac56d6f3cb0ecc66998bb1f8394a2669b4a7c689c6127363d614beb
+  snapshot at step 420000: sha256 4ff1baf56cb29084dcf0d519db04ad35679e62eb7c5f065e68d79d1511e6b39b
+  snapshot at step 430000: sha256 dfb0f19cdd711cc8f0f2c5f9947debcfe5629208180416da33361f3c952b9f2c
+  snapshot at step 440000: sha256 7a554af44ba3e1a26101276d1c18857232e379f51a4b707be6c8181466399091
+  snapshot at step 450000: sha256 669093836be46f16acdc767d4f91d6e6ad7209c5850e1035e8038c1245a9878e
+runs/b58h_dt1/blind_seed17: blind, seed 17, H None s, r None
+model runs/b58h_dt1/blind_seed17: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 3edf206904ad3b2b700f667cd183068ead4bb746b2f7be513c92442c69689c30
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 50ce9258ccc60486
+  snapshot at step 410000: sha256 c6671e0896ac52435f8ea464ce4e5a873664816e0d1853a0d49cbad0c953cfa8
+  snapshot at step 420000: sha256 a94dec8e49514b172b10ecb23011aa3e39115f9f4876631aa080d45b7b392d90
+  snapshot at step 430000: sha256 3f7ccaa160638dedeac07c0fd5bc26227aae5fa078be5edbfb2c1fb8fa44b243
+  snapshot at step 440000: sha256 8a906b73964fe1416b25a14d06a8a1cdde678baff5a51af8ac8441887db8785a
+  snapshot at step 450000: sha256 59c089772a58073f57ea45db9d0a15da4262c2fe3646823d634b02dc9a29c582
+runs/b58h_dt1/sighted_r0.5_seed17: sighted_r0.5, seed 17, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed17: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 1d871131529c559ed7af4269ce166975622d92b6026aa451959de84a901dd856
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha bd7ba254fe2a80e9
+  snapshot at step 410000: sha256 2e38102c26f0dcd77e54e0146eb04558822d1e61e54c48205f6cf272bdba1cb0
+  snapshot at step 420000: sha256 7bcc2c5ac18262f10a97da7031ccf46fe2773444719b906ef962acbfe3b2534f
+  snapshot at step 430000: sha256 638c96549d583569e4d29b4d31825dc0156b6ae3137b0f086486bbafb17637a1
+  snapshot at step 440000: sha256 03185b69e039524bb187f245b316b84d8387959b712ca6e58a6664d794631fdc
+  snapshot at step 450000: sha256 ee5e0a08d983ef650a83b3085cc7e92b8467154778ae213c1a0fac33b05f02b9
+runs/b58h_dt1/sighted_r1.5_seed17: sighted_r1.5, seed 17, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed17: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 84fb3e850c53c9fa2846fbcb9881ec99c53653770d0b834f9742e0ee26a53221
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha d3311cc2890edf8f
+  snapshot at step 410000: sha256 162231d2650def448585eba48c88d75aabe0173d31d4e9f19a075e1b71c7e5c6
+  snapshot at step 420000: sha256 d20545994f936d00fd182f8409da57129f40e19320368ab1884ce20423304a5f
+  snapshot at step 430000: sha256 58c246bf984ec17a4466bc4684b13b0c41d2f670f8c4e4893c879e4ac5080930
+  snapshot at step 440000: sha256 8b7927da33ee158b033cfd32c033f5bf74853be32db5e76fb94fb99a00e89eec
+  snapshot at step 450000: sha256 47e4d258057ca0ad93f97dba6b7ad544816d178807c032a8d886a05272c5dc28
+runs/b58h_dt1/blind_seed18: blind, seed 18, H None s, r None
+model runs/b58h_dt1/blind_seed18: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 05a6f9e4760e07f40c903e5912c33555c54eba80d05001af97bb74a6ccabedf6
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 87f1cfe49a7868ad
+  snapshot at step 410000: sha256 e0dac93898b1522737dc760758676451ce2693edf419d2572a42f7962003fdef
+  snapshot at step 420000: sha256 f71474d3c687bd8fb646e14dce3e0002fbecd87b525c61d6a5c7602a4fdb8a33
+  snapshot at step 430000: sha256 b4041d91163111cace894c07b1dffc9bdd0450df072c7da0503e77a46d943910
+  snapshot at step 440000: sha256 95edc8d939fb4badc26250cbd41eb3fbadc4c2df6acc3703b3d05010176ead37
+  snapshot at step 450000: sha256 1017cc2574c81fe348fd6e4dad22a88b075615ff63c220fa67e27226b0907c97
+runs/b58h_dt1/sighted_r0.5_seed18: sighted_r0.5, seed 18, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed18: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 a30694b4cbadcd62d32fda2fb2f94630836ec652fa092c13b0a5a4f599ec95fe
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha e815b99c14b830f4
+  snapshot at step 410000: sha256 22ab09c3131558ea70a99ea75c4684606cd6a9b4a0d8a72e4ab73b37ae679833
+  snapshot at step 420000: sha256 62a8a030e748fdc15a3934852429fba924ee934a53f8401dc7203b445c98c67b
+  snapshot at step 430000: sha256 b3f896822b094904c29e59c85228aa8fa52acdc5773fd73fe686115f15415e81
+  snapshot at step 440000: sha256 01514a99a74e1237fb070fd6b79cf56908c130122e2b497f9c20e6a5127bdaae
+  snapshot at step 450000: sha256 819729a08d3783ce453f5be4d32ae2070790ba1bb77ecf37242231071086f29e
+runs/b58h_dt1/sighted_r1.5_seed18: sighted_r1.5, seed 18, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed18: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 d207c5f1034e0250531213d4bf8ab78cc5d7e1c5f734b53772cc5cd34e1d248a
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha bd418c02ab08a344
+  snapshot at step 410000: sha256 49eb9784301db7abbb23acf6ae5a74dd28aa39e0256a183b9851804758a22244
+  snapshot at step 420000: sha256 3feabcfed6ccacc3c11fa7fcd8621288632ac0576e960b6d8a216bb2e684532e
+  snapshot at step 430000: sha256 08852fe977527a8fc15da66bd2ad07ced9199b43d4b8fdaf8960e21f67d07593
+  snapshot at step 440000: sha256 4dcd0d2b94010cefb3c9ddbf740212f256df38570b9e640def7cd5d8194b969f
+  snapshot at step 450000: sha256 42ae03280c8c4419f52cbdd180fb8f30c84adc890c1bd4bd42ddcfa215ba12ff
+runs/b58h_dt1/blind_seed19: blind, seed 19, H None s, r None
+model runs/b58h_dt1/blind_seed19: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 7bfae4d23e30d22376ff77aebe4348f065cb3bc11ce52a382a80e39b40f8dd84
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 1b8faec35cd19310
+  snapshot at step 410000: sha256 23168bd69f546767dd352ae41eed9444f87bdd9818f3f465e86df5444bf2e77e
+  snapshot at step 420000: sha256 d8690ddfc72d47dbb17d96c034efc91ccbc7727a79b81e1d20a0859351084867
+  snapshot at step 430000: sha256 06e9f871070f6eea615937c219172cbacc293856e0370e247cc38be9e9a4b256
+  snapshot at step 440000: sha256 00946e897c94e877a7226ee5aeb20d9451d9adb66126820bd6597a813c190eb4
+  snapshot at step 450000: sha256 2c5a196156abde67cd3870a961d98b17b13f6e81376882b547c0718329bdd7c0
+runs/b58h_dt1/sighted_r0.5_seed19: sighted_r0.5, seed 19, H 23.667534571895 s, r 0.5
+model runs/b58h_dt1/sighted_r0.5_seed19: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 87b86a386a5192e2db145d7c0ac5ee6c43bb4cac086b687101b8b6c317ee0f26
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha c9fb0f6212af5343
+  snapshot at step 410000: sha256 a690885ef0e3516bde9d66a87a84e3624def9243fc5a000a5be020c3d41aca10
+  snapshot at step 420000: sha256 e4b7834d09b4fc3c57948cb67a8155958a110203a459d9c83d072913a507190f
+  snapshot at step 430000: sha256 db0324c4c073b99b8e62eb81b4fc58a2ed273d4f55ef617ef683c33cf7afdc4b
+  snapshot at step 440000: sha256 daf189df0d11afda152ec4de69120ccb0e2bd98580aea102678a48328cd56156
+  snapshot at step 450000: sha256 e47b91d956e47a78f80b44e201788df5aa7d59de7a60ff83d9ca7ab5763d8cb4
+runs/b58h_dt1/sighted_r1.5_seed19: sighted_r1.5, seed 19, H 71.002603715685 s, r 1.5
+model runs/b58h_dt1/sighted_r1.5_seed19: the checkpoint average, the action average of the 5 snapshots in (400000, 450000] steps (decision 29), each the deterministic action of one saved model; manifest sha256 319388bb66b2ff9ff105fc4b665c45695d87dfa7aa4adc3289b31c4f6532d885
+  final.zip: trained 450000 steps of 450000 requested, from step 0, buffer 450000, zip sha 40f75f4c672de426
+  snapshot at step 410000: sha256 04dfc6f9765d81a16ea5e9ef2d59955f111a72fd63a258db364c90345450114d
+  snapshot at step 420000: sha256 ff81e07bc5dd34d92ac6c311342657df17d8642cbd6b1e72eca8c74ffc8726be
+  snapshot at step 430000: sha256 eac901f566b7d7df824b052f7bdce096c14e92d463f70050583403bebaf040e7
+  snapshot at step 440000: sha256 c71d01faff40e0daba9a1a119a741b3d47bb3e156feaf214f132af0b13cd0eaa
+  snapshot at step 450000: sha256 dca2325154209405a86a9e7e0de1581d03e7fd2cf1e2648e60f18e7c02798fe5
+
+policy                          D no knock   D knock  fuel med  short med   peak C
+----------------------------------------------------------------------------------
+baseline ECU                          58.3      61.0      3344     0.0000      835
+reactive                              58.3      61.0      3344     0.0000      835
+current-grade                         40.3      44.6      3480     0.0089      810
+blind seed 0                          43.2      43.4      3551     0.0006      827
+blind seed 1                          50.7      51.2      3537     0.0000      809
+blind seed 2                          49.5      50.8      3529     0.0000      814
+blind seed 3                          50.0      53.1      3486     0.0011      826
+blind seed 4                          45.4      47.1      3522     0.0000      799
+blind seed 5                          43.1      44.2      3540     0.0000      801
+blind seed 6                          39.3      41.8      3552     0.0000      818
+blind seed 7                          37.8      40.8      3553     0.0000      797
+blind seed 8                          42.4      43.8      3508     0.0000      808
+blind seed 9                          47.9      48.4      3499     0.0011      811
+blind seed 10                         50.5      53.3      3514     0.0011      807
+blind seed 11                         43.8      46.1      3516     0.0000      817
+blind seed 12                         44.2      46.0      3516     0.0011      831
+blind seed 13                         39.9      41.5      3518     0.0000      817
+blind seed 14                         42.8      45.1      3501     0.0011      800
+blind seed 15                         54.9      55.7      3446     0.0000      828
+blind seed 16                         37.0      38.2      3586     0.0011      810
+blind seed 17                         43.3      44.9      3506     0.0000      802
+blind seed 18                         40.5      40.6      3531     0.0000      797
+blind seed 19                         38.8      43.1      3595     0.0006      819
+sighted_r0.5 seed 0                   50.6      54.6      3469     0.0000      825
+sighted_r0.5 seed 1                   48.1      52.4      3486     0.0000      808
+sighted_r0.5 seed 2                   42.9      46.6      3546     0.0000      827
+sighted_r0.5 seed 3                   46.8      49.2      3481     0.0000      817
+sighted_r0.5 seed 4                   45.4      45.4      3519     0.0000      811
+sighted_r0.5 seed 5                   51.0      52.8      3512     0.0000      818
+sighted_r0.5 seed 6                   54.4      56.8      3498     0.0000      821
+sighted_r0.5 seed 7                   48.3      48.3      3491     0.0000      804
+sighted_r0.5 seed 8                   45.6      47.6      3483     0.0000      809
+sighted_r0.5 seed 9                   39.4      41.1      3569     0.0000      813
+sighted_r0.5 seed 10                  44.5      45.8      3504     0.0000      804
+sighted_r0.5 seed 11                  52.3      53.4      3562     0.0000      814
+sighted_r0.5 seed 12                  43.1      44.5      3516     0.0000      810
+sighted_r0.5 seed 13                  51.5      52.8      3473     0.0000      810
+sighted_r0.5 seed 14                  47.4      50.1      3518     0.0000      811
+sighted_r0.5 seed 15                  51.1      54.1      3519     0.0000      804
+sighted_r0.5 seed 16                  45.3      48.4      3525     0.0000      807
+sighted_r0.5 seed 17                  56.7      58.1      3489     0.0000      822
+sighted_r0.5 seed 18                  46.1      46.9      3512     0.0000      804
+sighted_r0.5 seed 19                  47.6      50.8      3457     0.0000      813
+sighted_r1.5 seed 0                   46.7      49.0      3525     0.0000      813
+sighted_r1.5 seed 1                   49.3      51.4      3505     0.0000      809
+sighted_r1.5 seed 2                   43.0      46.2      3554     0.0000      822
+sighted_r1.5 seed 3                   49.7      50.9      3478     0.0000      813
+sighted_r1.5 seed 4                   46.0      47.4      3556     0.0000      810
+sighted_r1.5 seed 5                   42.8      45.2      3485     0.0000      817
+sighted_r1.5 seed 6                   45.4      46.5      3507     0.0000      802
+sighted_r1.5 seed 7                   47.2      50.4      3515     0.0000      813
+sighted_r1.5 seed 8                   38.7      41.1      3523     0.0000      813
+sighted_r1.5 seed 9                   45.1      46.0      3490     0.0000      820
+sighted_r1.5 seed 10                  48.2      48.2      3526     0.0000      810
+sighted_r1.5 seed 11                  47.3      49.4      3539     0.0000      807
+sighted_r1.5 seed 12                  44.5      45.3      3549     0.0000      820
+sighted_r1.5 seed 13                  49.2      50.2      3503     0.0000      810
+sighted_r1.5 seed 14                  45.3      47.3      3567     0.0000      803
+sighted_r1.5 seed 15                  44.0      48.4      3505     0.0000      814
+sighted_r1.5 seed 16                  38.2      43.6      3537     0.0000      807
+sighted_r1.5 seed 17                  41.6      44.6      3524     0.0000      810
+sighted_r1.5 seed 18                  45.2      47.0      3500     0.0000      813
+sighted_r1.5 seed 19                  49.2      51.4      3521     0.0000      812
+----------------------------------------------------------------------------------
+  cut against the baseline ECU, 100 x (1 - median D / median D_base): no knock [with knock]
+    reactive                        +0.00 [   +0.00]
+    current-grade                  +30.84 [  +26.89]
+    blind seed 0                   +25.80 [  +28.86]
+    blind seed 1                   +12.99 [  +15.97]
+    blind seed 2                   +15.11 [  +16.71]
+    blind seed 3                   +14.18 [  +12.86]
+    blind seed 4                   +22.09 [  +22.76]
+    blind seed 5                   +25.99 [  +27.41]
+    blind seed 6                   +32.60 [  +31.35]
+    blind seed 7                   +35.14 [  +33.10]
+    blind seed 8                   +27.30 [  +28.23]
+    blind seed 9                   +17.85 [  +20.57]
+    blind seed 10                  +13.41 [  +12.61]
+    blind seed 11                  +24.90 [  +24.30]
+    blind seed 12                  +24.23 [  +24.47]
+    blind seed 13                  +31.56 [  +31.93]
+    blind seed 14                  +26.64 [  +26.03]
+    blind seed 15                   +5.73 [   +8.70]
+    blind seed 16                  +36.48 [  +37.29]
+    blind seed 17                  +25.79 [  +26.41]
+    blind seed 18                  +30.53 [  +33.41]
+    blind seed 19                  +33.37 [  +29.28]
+    sighted_r0.5 seed 0            +13.17 [  +10.41]
+    sighted_r0.5 seed 1            +17.39 [  +14.04]
+    sighted_r0.5 seed 2            +26.32 [  +23.49]
+    sighted_r0.5 seed 3            +19.78 [  +19.27]
+    sighted_r0.5 seed 4            +22.11 [  +25.53]
+    sighted_r0.5 seed 5            +12.50 [  +13.36]
+    sighted_r0.5 seed 6             +6.73 [   +6.83]
+    sighted_r0.5 seed 7            +17.18 [  +20.80]
+    sighted_r0.5 seed 8            +21.70 [  +21.93]
+    sighted_r0.5 seed 9            +32.47 [  +32.57]
+    sighted_r0.5 seed 10           +23.57 [  +24.90]
+    sighted_r0.5 seed 11           +10.20 [  +12.43]
+    sighted_r0.5 seed 12           +26.12 [  +27.01]
+    sighted_r0.5 seed 13           +11.58 [  +13.39]
+    sighted_r0.5 seed 14           +18.74 [  +17.78]
+    sighted_r0.5 seed 15           +12.27 [  +11.28]
+    sighted_r0.5 seed 16           +22.35 [  +20.62]
+    sighted_r0.5 seed 17            +2.71 [   +4.69]
+    sighted_r0.5 seed 18           +20.82 [  +23.12]
+    sighted_r0.5 seed 19           +18.29 [  +16.74]
+    sighted_r1.5 seed 0            +19.94 [  +19.64]
+    sighted_r1.5 seed 1            +15.35 [  +15.72]
+    sighted_r1.5 seed 2            +26.29 [  +24.19]
+    sighted_r1.5 seed 3            +14.71 [  +16.43]
+    sighted_r1.5 seed 4            +21.04 [  +22.27]
+    sighted_r1.5 seed 5            +26.57 [  +25.81]
+    sighted_r1.5 seed 6            +22.10 [  +23.80]
+    sighted_r1.5 seed 7            +19.05 [  +17.34]
+    sighted_r1.5 seed 8            +33.63 [  +32.57]
+    sighted_r1.5 seed 9            +22.65 [  +24.51]
+    sighted_r1.5 seed 10           +17.37 [  +21.00]
+    sighted_r1.5 seed 11           +18.80 [  +18.92]
+    sighted_r1.5 seed 12           +23.72 [  +25.61]
+    sighted_r1.5 seed 13           +15.66 [  +17.61]
+    sighted_r1.5 seed 14           +22.19 [  +22.43]
+    sighted_r1.5 seed 15           +24.58 [  +20.54]
+    sighted_r1.5 seed 16           +34.38 [  +28.56]
+    sighted_r1.5 seed 17           +28.55 [  +26.82]
+    sighted_r1.5 seed 18           +22.38 [  +22.92]
+    sighted_r1.5 seed 19           +15.51 [  +15.69]
+  d at r = 0.5, sighted_r0.5 minus blind, per seed: no knock [with knock]
+    seed 0        -12.64 [  -18.45]
+    seed 1         +4.41 [   -1.93]
+    seed 2        +11.21 [   +6.77]
+    seed 3         +5.60 [   +6.41]
+    seed 4         +0.01 [   +2.77]
+    seed 5        -13.49 [  -14.05]
+    seed 6        -25.87 [  -24.53]
+    seed 7        -17.96 [  -12.31]
+    seed 8         -5.60 [   -6.31]
+    seed 9        +14.62 [  +12.00]
+    seed 10       +10.16 [  +12.29]
+    seed 11       -14.70 [  -11.87]
+    seed 12        +1.89 [   +2.53]
+    seed 13       -19.97 [  -18.54]
+    seed 14        -7.90 [   -8.26]
+    seed 15        +6.54 [   +2.58]
+    seed 16       -14.13 [  -16.67]
+    seed 17       -23.08 [  -21.71]
+    seed 18        -9.71 [  -10.29]
+    seed 19       -15.08 [  -12.54]
+  d at r = 1.5, sighted_r1.5 minus blind, per seed: no knock [with knock]
+    seed 0         -5.86 [   -9.22]
+    seed 1         +2.36 [   -0.25]
+    seed 2        +11.18 [   +7.48]
+    seed 3         +0.54 [   +3.57]
+    seed 4         -1.06 [   -0.49]
+    seed 5         +0.58 [   -1.60]
+    seed 6        -10.51 [   -7.56]
+    seed 7        -16.09 [  -15.77]
+    seed 8         +6.32 [   +4.34]
+    seed 9         +4.80 [   +3.94]
+    seed 10        +3.96 [   +8.39]
+    seed 11        -6.10 [   -5.38]
+    seed 12        -0.50 [   +1.14]
+    seed 13       -15.90 [  -14.32]
+    seed 14        -4.46 [   -3.60]
+    seed 15       +18.85 [  +11.84]
+    seed 16        -2.10 [   -8.73]
+    seed 17        +2.76 [   +0.42]
+    seed 18        -8.15 [  -10.49]
+    seed 19       -17.86 [  -13.58]
+
+scores document C:/Users/badcl/grad_b58h/scores_b58h.json: sha256 04d5472bbdebecf88f152c222d5bc9d64ff1437391703cea43edb66925253570
+per-step records under C:/Users/badcl/grad_b58h/records: 61 files; index C:/Users/badcl/grad_b58h/scores_b58h.records.json, sha256 cee8d1ccbcf7443b825f56b45413a7a17736894366602284a08d50f499f1e2f1

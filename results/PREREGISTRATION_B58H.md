@@ -2131,6 +2131,30 @@ In `b58h_analysis.py`:
 
 `b58h_beside.py` has no gap: it computes descriptive rows only.
 
+**20 November 2026, AB's gate** (`dd49844`, committed 04:52:22 +0300; section 14 step 2, after the commit and before its
+push, as its message gives it): the cost-file list 51 paths and no line printed STOP; "cost files unchanged since B1:
+exit 0"; `epa_backend.py check` printed `[]`; the unittest line (`test_b58h_analysis`, `test_b58h_beside`,
+`test_four_engine_analysis`): "Ran 183 tests", "OK"; `test_engine_threading`, alone: "Ran 33 tests", "OK (skipped=6)";
+`test_epa_backend.PreregistrationB58H`: "Ran 6 tests", "OK"; `verify_docs.py`: "All 170 checks pass (1172 figure
+mentions scanned in the documents)."; "ABOVE SECTION 15: UNCHANGED SINCE T*". Pushed the same morning. AB was committed
+after the training had ended (18 November) and after its folders were back (19 November).
+
+**20 November 2026, the first scoring command: item (a).** Ghassan chose to start the scoring once AB was pushed, as
+section 6.0 and section 11's table say ("The scoring waits for AB ... It waits for no route"; the row "AB is not
+committed when the training's folders are back"). No route of step 22b had been written: their maps and designs, written
+by agents on 19-20 November, stay outside the repository, and no code is written for them after this command. So items
+(d), (e) and (f) read "not computed (code)", row 152 (5)'s anchors read "not computed", and row 153 (2) reads "not
+computed (code)" (sections 6.0, 6.9, 9.7 and 9.8). Section 14 step 3's check, run at 05:20:40 +0300 (its print kept as
+`$OUT/b58h_scoring_check.txt`): "AB committed: `dd49844`"; "clean tree"; "no .py file of T* changed: exit 0"; "cost
+files unchanged since B1: exit 0"; HEAD at the first scoring command `dd49844`; `b58h_beside.py --list` printed `core`,
+the only route present; the optimum's and the anchors' commits: none; `sha256sum -c "$OUT/training/SHA256SUMS"`: 6480
+OK. No python process ran before it. Item (a), the primary scoring of the training line's 60 agents with the per-step
+records, ran from 05:23:16 to 09:13:37 +0300 (3 h 50 min) at 14 jobs and exited 0, with no warning or refusal printed.
+Its fingerprint reads plant_sha `36655cab94800e30`, derived_sha `326c0835548975e2`, engine_sha `023f5589215ee68e`,
+git_head `dd49844` and git_dirty false. The records are 61 files, 26 MB, under `$OUT/records`; the scores' sha256 begins
+`04d5472b`, the index's `cee8d1cc`. The scores, the index and the text report are copied to `results/B58H_RESULT/`, byte
+for byte, and committed with this entry.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*
