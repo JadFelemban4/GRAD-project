@@ -938,3 +938,7 @@ PR-B is written after item (c).
 
 **Item (c), the logged states.** Ran alone at `b6083d9` from 12:28:40 to 19:02:17 +0300, exit 0 (6 h 34 min; d148 had it
 UNKNOWN); outputs in `results/B58H_RESULT/` (PR-B section 15).
+
+**Item (c), the conditions battery.** Ran alone at `c8972e4` from 19:05:49 (20 November) to 00:27:03 (21 November)
++0300, exit 0 (5 h 21 min; d148 assumed 2.5 h); outputs in `results/B58H_RESULT/` (PR-B section 15). Decision 12's three
+rows took 14 h 56 min together, against d148's "at least 2.5 h".

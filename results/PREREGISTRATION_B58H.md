@@ -2177,6 +2177,13 @@ jobs: 60 agents, 12 cases each, each a declared transfer (row 147 (11)); no refu
 `b58h_logged.json` (sha256 beginning `cfd5737f`) and its printed `b58h_logged.txt` are copied to `results/B58H_RESULT/`
 and committed with this entry.
 
+**20-21 November 2026, item (c), third command: decision 12's conditions battery** (V's `b58h_descriptive.py battery`,
+sections 9.2-9.4). At `c8972e4`, alone, from 19:05:49 on 20 November to 00:27:03 on 21 November +0300 (5 h 21 min,
+against the 2.5 h d148 assumed from `conditions_test`'s docstring, `d148_figures.txt:37`), exit 0, at 14 jobs: 60
+agents, 35 cases each, each a declared transfer (row 147 (11)); no refusal or failure printed. Its `b58h_battery.json`
+(sha256 beginning `00743e99`) and its printed `b58h_battery.txt` are copied to `results/B58H_RESULT/` and committed with
+this entry.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*
