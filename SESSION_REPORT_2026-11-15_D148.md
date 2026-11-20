@@ -932,3 +932,6 @@ evaluate.py's form, the graph's t-test: at r = 1.5, d > 0 not shown (d -1.86 poi
 this budget). The sign test and the with-knock reading say the same; no verdict is MODEL-LIMITED under any band; the
 status is exploratory. Delta, exploratory: +4.42 points (95 % +0.29 to +8.56) beside the prediction +3.40. Section 16 of
 PR-B is written after item (c).
+
+**Item (c), the locked climb.** Ran alone at `ea18150` from 09:23:33 to 12:24:48 +0300, exit 0 (3 h 01 min; d148 assumed
+2.5 h as the lower bound for all three of decision 12's rows); outputs in `results/B58H_RESULT/` (PR-B section 15).

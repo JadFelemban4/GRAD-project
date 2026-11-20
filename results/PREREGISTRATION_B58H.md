@@ -2165,6 +2165,12 @@ records at HEAD, rebuilt the context and found it equal, ran four_engine_analysi
 verdict the same under every band. Its verdicts, intervals, Delta, band, flags, section 9.1 and section 10 are in the
 report as written; section 16 states the outcome after item (c).
 
+**20 November 2026, item (c), first command: decision 12's locked climb** (V's `b58h_descriptive.py locked`, sections
+9.2-9.4). At `ea18150`, alone, from 09:23:33 to 12:24:48 +0300 (3 h 01 min), exit 0, at 14 jobs: 60 agents, 20 cases
+each, each a declared transfer (every FATAL field but scenario and episodes_sha the live one, row 147 (11)); no refusal
+or failure printed. Its `b58h_locked.json` (sha256 beginning `ed4bba4f`) and its printed `b58h_locked.txt` are copied to
+`results/B58H_RESULT/` and committed with this entry.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*
