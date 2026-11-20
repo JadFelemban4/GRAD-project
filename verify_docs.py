@@ -696,6 +696,7 @@ _PC_042 = "decision 34's 0.42 with unlimited preview (section G, the whole flat)
 _PC_PAIR = "the preview ceiling 0.13 / 0.42 (section G, as decision 34 quotes it)"
 _PC_88K = "section G's 8.8 K head start at the lambda bound (30 s)"
 _PC_ROWS = "section G's printed lambda rows (8.8 K, 30.0 K)"
+_ENR7 = "enrichment correlations from 7 drives"
 RETIRED = [
     # --- dataset size, before the eighth drive -----------------------------
     (r"seven drives|drives,\s*113|\b113(?:\.0)?\s*min",
@@ -716,7 +717,7 @@ RETIRED = [
     (r"corr\([^)]{0,24}\)\s*[-−+]0\.0[25]|\+0\.02\s*[—-]\s*none at all",
      "corr(lambda, MAP) = +0.02 or -0.05", "+0.23"),
     (r"[-−]0\.60|[-−]0\.52|[-−]0\.38",
-     "enrichment correlations from 7 drives", "-0.56 / -0.49 / -0.47"),
+     _ENR7, "-0.56 / -0.49 / -0.47"),
     (r"\bn\s*=\s*29\b", "3500-4500 rpm cell at 29 samples", "n=47"),
     # --- the charge-temperature correction, 10 September --------------------
     (r"31\.4\s*[-–]\s*81\.6|31\s*[-–]\s*82 kPa|31\s*[-–]\s*79 kPa",
@@ -1075,6 +1076,10 @@ RETIRED_EXEMPT_DIRS = ("results/void/",
 # compares, validate_epa.py:997-998; thresholds/ is pinned by test_contract_pinned), the decision sheet
 # as answered, the probe's committed scripts -- and for results/preview_ceiling.txt's two section G
 # rows, a generated output, so that the rest of that file is still scanned (30 October, the fixer).
+# 21 November 2026: results/B58H_RESULT/b58h_core.txt (b58h_beside.py core, item (c) of PR-B section 14 step 3,
+# written once by its run and committed byte for byte): its section 9.6 line for r = 0.5's seconds above
+# 804 deg C prints the interval [-0.52, +1.03], which the retired enrichment correlations' bare -0.52 matches
+# by chance. That one line is excused; the rest of the file is still scanned.
 _MD1738 = "- The preview ceiling: 0.13, 0.42 and 1.19 points on the locked climb"
 _VD34 = "| 34 | The test roads (revised 21 October"
 _VD103 = "| 103 (added 30 Oct, after commit D) | The ceiling:"
@@ -1100,6 +1105,8 @@ RETIRED_EXEMPT_LINES = [
      "section G's printed row (preview_ceiling.py's output, regenerated, never edited), which decision 34 quoted"),
     ("results/preview_ceiling.txt", _PC_ROWS, "over the whole flat, 20-179 s (unlimited preview)",
      "section G's printed row (preview_ceiling.py's output, regenerated, never edited), which decision 34 quoted"),
+    ("results/B58H_RESULT/b58h_core.txt", _ENR7, "above_804: n 20, mean +0.25, 95 % t interval [-0.52, +1.03]",
+     "b58h_beside.py core's section 9.6 row (r = 0.5, seconds above 804 deg C), a generated output written once"),
 ]
 LINE_EXEMPTED = {}     # index into RETIRED_EXEMPT_LINES -> how many lines it excused
 

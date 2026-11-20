@@ -942,3 +942,17 @@ UNKNOWN); outputs in `results/B58H_RESULT/` (PR-B section 15).
 **Item (c), the conditions battery.** Ran alone at `c8972e4` from 19:05:49 (20 November) to 00:27:03 (21 November)
 +0300, exit 0 (5 h 21 min; d148 assumed 2.5 h); outputs in `results/B58H_RESULT/` (PR-B section 15). Decision 12's three
 rows took 14 h 56 min together, against d148's "at least 2.5 h".
+
+**Item (c), the core rows.** Ran alone at `8c98bfa` from 00:31:00 to 00:35:09 +0300, exit 0; the roads check and its
+three controls passed; the report, its JSON and its three figures are in `results/B58H_RESULT/` (PR-B section 15). What
+it shows, descriptive: current-grade, the hand-written policy that reads only the grade under the car, beats most agents
+(evaluate.py's form, no knock: s < 0 for 15 of 20 blind agents, 19 of 20 at r = 0.5, 18 of 20 at r = 1.5; medians -5.04,
+-12.32 and -8.69 points).
+
+**Two slips at the core commit.** (1) The gates of the five commits after AB's ran the cost-file check, `verify_docs.py`
+and the check above section 15, but not Ta's live test that PR-B section 14 also asks for, and put their output in the
+commit messages instead of section 15. The test was run afterwards at each of the five commits and passed (PR-B section
+15). (2) The core commit's first gate failed: `verify_docs.py` read a line of the generated report as a retired figure,
+and the first wording of the fix quoted that figure in PR-B section 15 itself, so the second gate failed too (and
+`drift_test.py`'s control with it). Nothing was pushed; the wording was changed and the commit amended before its push,
+as section 14 says.

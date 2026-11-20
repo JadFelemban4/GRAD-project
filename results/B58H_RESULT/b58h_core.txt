@@ -1,0 +1,167 @@
+B58H CORE -- PR-B 9.5 (i), 9.5 (v) and 9.6 (rows 150 (i), 150 (v), 151; b58h_beside.py core)
+  descriptive: it decides nothing; no verdict, band, status, test or Delta reads it, and it is reported beside d at each H (PR-B 9.5, 9.6)
+
+INPUTS
+  scores         C:\Users\badcl\Desktop\GRAD-project\results\B58H_RESULT\scores_b58h.json: sha_text 04d5472bbdebecf88f152c222d5bc9d64ff1437391703cea43edb66925253570 (binds); raw sha256 04d5472bbdebecf88f152c222d5bc9d64ff1437391703cea43edb66925253570 (binds nothing, PR-B 5.2)
+  text report    C:\Users\badcl\Desktop\GRAD-project\results\B58H_RESULT\scores_b58h.txt: sha_text 4dab6bcbee52bbdf918ead38a6f63bc257c63a31aeec867a58b0966987b067ae
+  records index  C:\Users\badcl\Desktop\GRAD-project\results\B58H_RESULT\scores_b58h.records.json: sha_text cee8d1ccbcf7443b825f56b45413a7a17736894366602284a08d50f499f1e2f1
+  roads.json     results/EPA_ROADS/roads.json: sha_text 27a8c0456d164b981e245fcb9c9b489ee83caa0738eafbe4b92215284e320498
+  hw_opt report  results/B58H_DESIGN/hw_opt/hw_opt_report.txt: sha_text 872f38ae638ca833c0259d66bee479f194af639a44901558d2d3516728ee252b
+  grids print    results/B58H_DESIGN/grids_b58.txt: sha_text 7608452f34ac1b2778ae9132dbbecd13d59998ec1983f2220f2d87f5ff53aca1
+  records        C:/Users/badcl/grad_b58h/records
+  HEAD 8c98bfa; reward without the knock term (provenance.reward_knock False); core loads no agent
+  delivery block: checked
+
+CURRENT-GRADE'S RUN (PR-B 9.5 (i)): check_premise.p_grade_now through evaluate.run_road_episode, use_preview True, H = engine_env.PREVIEW_H_S, as score_set runs the hand-written policies (evaluate.py:1070-1071), on evaluate.decision34_roads' roads
+  20 roads, 899 steps each at dt 1 s; H 30 s; plant engines.get('b58'); jobs 14
+  trace kept for 9.6: C:/Users/badcl/grad_b58h/beside\current_grade.npz, sha256 aac95ea9bd75e3bb4c93e7161e0d7ad31bf913696a51fe8673ae55fa12522376
+  the roads check (epa_roads.arrays_sha256 against the scores' provenance.arrays_sha256): PASS: arrays_sha256 equal
+  control 1 (its fuel equals the scores' delivery block, road by road, exactly): PASS: equal on all 20 roads
+  control 2 (its cut equals the text report's to two decimals, both readings, no knock [with knock, not converged in dt on these roads]): PASS: equal at the report's two decimals, both readings
+    expected '    current-grade                  +30.84 [  +26.89]'
+    found    '    current-grade                  +30.84 [  +26.89]'
+  control 3 (roads.json per_road[k].D.neutral equals the scores' D_base, both readings, to 1e-6 absolute): PASS: equal to 1e-6 on every road, both readings
+    no knock: largest absolute difference 1.486e-07 (road 4), largest relative 3.024e-09
+    with knock (not converged in dt on these roads): largest absolute difference 0.000e+00 (road 0), largest relative 0.000e+00
+
+9.5 (i) EACH AGENT'S SAVING OVER CURRENT-GRADE, s = cut(agent) - cut(current-grade) (row 150 (i))
+  current-grade's cut against the baseline ECU: evaluate.py's form +30.8354 [with knock +26.8925, not converged in dt on these roads]; mean form +30.3389 [with knock +26.2965, not converged in dt on these roads]
+  blind:
+    evaluate.py's form, no knock: 15 of 20 agents with s < 0; median -5.0404, sd 8.4447 (ddof 1), range -25.1091 to +5.6462
+    mean form, no knock: 19 of 20 agents with s < 0; median -8.0359, sd 6.4219 (ddof 1), range -22.0846 to +2.7233
+    evaluate.py's form, with knock (not converged in dt on these roads): 11 of 20 agents with s < 0; median -0.6733, sd 7.8383 (ddof 1), range -18.1925 to +10.3946
+    mean form, with knock (not converged in dt on these roads): 14 of 20 agents with s < 0; median -3.6871, sd 6.5176 (ddof 1), range -17.2930 to +6.0743
+    per seed, s no knock [with knock, not converged in dt on these roads], evaluate.py's form: 0 -5.0331 [+1.9690], 1 -17.8504 [-10.9264], 2 -15.7287 [-10.1791], 3 -16.6596 [-14.0279], 4 -8.7423 [-4.1312], 5 -4.8439 [+0.5222], 6 +1.7671 [+4.4605], 7 +4.3054 [+6.2100], 8 -3.5344 [+1.3412], 9 -12.9841 [-6.3177], 10 -17.4238 [-14.2816], 11 -5.9362 [-2.5916], 12 -6.6057 [-2.4218], 13 +0.7213 [+5.0367], 14 -4.1910 [-0.8605], 15 -25.1091 [-18.1925], 16 +5.6462 [+10.3946], 17 -5.0478 [-0.4861], 18 -0.3057 [+6.5155], 19 +2.5373 [+2.3844]
+    beside, hand-written savings over current-grade, evaluate.py's form, no knock: (a) at r = 0.5 +2.0485 [mean form +1.8226]; (b) at r = 0.5 +7.2682 [mean form +7.3620]; (a_b) at r = 0.5 +2.2239 [mean form +2.6877]; (a) at r = 1.5 +5.4455 [mean form +5.2418]; (b) at r = 1.5 +7.2682 [mean form +7.3620]; (a_b) at r = 1.5 +2.2239 [mean form +2.6877]
+    beside, hand-written savings over current-grade, evaluate.py's form, with knock (not converged in dt on these roads): (a) at r = 0.5 +1.0294 [mean form +0.7328]; (b) at r = 0.5 +5.9658 [mean form +5.9686]; (a_b) at r = 0.5 +1.1988 [mean form +1.5716]; (a) at r = 1.5 +4.3449 [mean form +3.9832]; (b) at r = 1.5 +5.9658 [mean form +5.9686]; (a_b) at r = 1.5 +1.1988 [mean form +1.5716]
+  sighted_r0.5:
+    evaluate.py's form, no knock: 19 of 20 agents with s < 0; median -12.3217, sd 7.2047 (ddof 1), range -28.1265 to +1.6350
+    mean form, no knock: 20 of 20 agents with s < 0; median -11.8694, sd 6.5042 (ddof 1), range -31.0528 to -4.5497
+    evaluate.py's form, with knock (not converged in dt on these roads): 18 of 20 agents with s < 0; median -8.3675, sd 7.1876 (ddof 1), range -22.1998 to +5.6784
+    mean form, with knock (not converged in dt on these roads): 19 of 20 agents with s < 0; median -8.8778, sd 6.6835 (ddof 1), range -23.5186 to +1.3057
+    per seed, s no knock [with knock, not converged in dt on these roads], evaluate.py's form: 0 -17.6684 [-16.4832], 1 -13.4437 [-12.8574], 2 -4.5202 [-3.4063], 3 -11.0567 [-7.6177], 4 -8.7294 [-1.3619], 5 -18.3367 [-13.5287], 6 -24.1029 [-20.0659], 7 -13.6534 [-6.0951], 8 -9.1375 [-4.9647], 9 +1.6350 [+5.6784], 10 -7.2615 [-1.9937], 11 -20.6344 [-14.4650], 12 -4.7169 [+0.1128], 13 -19.2505 [-13.5011], 14 -12.0958 [-9.1172], 15 -18.5687 [-15.6086], 16 -8.4808 [-6.2720], 17 -28.1265 [-22.1998], 18 -10.0145 [-3.7728], 19 -12.5476 [-10.1557]
+    beside, hand-written savings over current-grade, evaluate.py's form, no knock: (a) at r = 0.5 +2.0485 [mean form +1.8226]; (b) at r = 0.5 +7.2682 [mean form +7.3620]; (a_b) at r = 0.5 +2.2239 [mean form +2.6877]
+    beside, hand-written savings over current-grade, evaluate.py's form, with knock (not converged in dt on these roads): (a) at r = 0.5 +1.0294 [mean form +0.7328]; (b) at r = 0.5 +5.9658 [mean form +5.9686]; (a_b) at r = 0.5 +1.1988 [mean form +1.5716]
+  sighted_r1.5:
+    evaluate.py's form, no knock: 18 of 20 agents with s < 0; median -8.6931, sd 5.6431 (ddof 1), range -16.1242 to +3.5430
+    mean form, no knock: 20 of 20 agents with s < 0; median -11.0758, sd 3.7043 (ddof 1), range -16.7361 to -3.3872
+    evaluate.py's form, with knock (not converged in dt on these roads): 18 of 20 agents with s < 0; median -4.5387, sd 4.5315 (ddof 1), range -11.1982 to +5.6768
+    mean form, with knock (not converged in dt on these roads): 19 of 20 agents with s < 0; median -5.4094, sd 3.1093 (ddof 1), range -11.4389 to +0.8073
+    per seed, s no knock [with knock, not converged in dt on these roads], evaluate.py's form: 0 -10.8957 [-7.2485], 1 -15.4863 [-11.1723], 2 -4.5446 [-2.6976], 3 -16.1242 [-10.4616], 4 -9.7988 [-4.6182], 5 -4.2660 [-1.0820], 6 -8.7387 [-3.0971], 7 -11.7807 [-9.5551], 8 +2.7904 [+5.6768], 9 -8.1872 [-2.3820], 10 -13.4681 [-5.8894], 11 -12.0331 [-7.9742], 12 -7.1106 [-1.2802], 13 -15.1746 [-9.2856], 14 -8.6475 [-4.4592], 15 -6.2562 [-6.3481], 16 +3.5430 [+1.6673], 17 -2.2844 [-0.0693], 18 -8.4546 [-3.9717], 19 -15.3264 [-11.1982]
+    beside, hand-written savings over current-grade, evaluate.py's form, no knock: (a) at r = 1.5 +5.4455 [mean form +5.2418]; (b) at r = 1.5 +7.2682 [mean form +7.3620]; (a_b) at r = 1.5 +2.2239 [mean form +2.6877]
+    beside, hand-written savings over current-grade, evaluate.py's form, with knock (not converged in dt on these roads): (a) at r = 1.5 +4.3449 [mean form +3.9832]; (b) at r = 1.5 +5.9658 [mean form +5.9686]; (a_b) at r = 1.5 +1.1988 [mean form +1.5716]
+  row 153 (1)'s tuned bests, as its committed report prints them (hand-written lambda strategies tuned over two settings; savings over current-grade on decision 34's twenty roads, B58 frozen plant; describes the model, never a bound on d):
+    reading noknock:
+      blind, largest saving in evaluate.py's form: D=0 delta=1.00              7.348    7.268   +6.546   806.3
+      sighted r=0.5, largest saving in evaluate.py's form: lead=1.00H delta=1.00       1.819    2.049   +1.272   808.4
+      sighted r=1.5, largest saving in evaluate.py's form: lead=1.00H delta=1.00       5.232    5.446   +3.955   806.3
+      frontier, evaluate_form: r=0.5: largest sighted-minus-blind saving at equal extra fuel: +0.573 points (at +0.35 % fuel; blind interpolated between its own tuned points)
+      frontier, evaluate_form: r=1.5: largest sighted-minus-blind saving at equal extra fuel: +1.104 points (at +2.36 % fuel; blind interpolated between its own tuned points)
+    reading knock (not converged in dt on these roads):
+      blind, largest saving in evaluate.py's form, with knock (not converged in dt on these roads): D=0 delta=1.00              5.957    5.966   +6.546   806.3
+      sighted r=0.5, largest saving in evaluate.py's form, with knock (not converged in dt on these roads): lead=1.00H delta=0.67       1.303    1.464   +0.768   808.7
+      sighted r=1.5, largest saving in evaluate.py's form, with knock (not converged in dt on these roads): lead=1.00H delta=1.00       3.976    4.345   +3.955   806.3
+      frontier, evaluate_form, with knock (not converged in dt on these roads): r=0.5: largest sighted-minus-blind saving at equal extra fuel: +0.551 points (at +0.35 % fuel; blind interpolated between its own tuned points)
+      frontier, evaluate_form, with knock (not converged in dt on these roads): r=1.5: largest sighted-minus-blind saving at equal extra fuel: +1.083 points (at +2.36 % fuel; blind interpolated between its own tuned points)
+  decision 13's count (torque < 0.95 x torque_req after the 20 s ramp), a different rule from 9.1's short step, grids_b58.txt:99-100:
+      rule: torque < 0.95 x torque_req, after the 20 s speed ramp; e_track > engine_env.TRACK_TOL beside it
+      b58: steps 17580, under95 152, over_tol 152, climb_steps 5106, climb_under95 0, climb_over_tol 0
+
+9.5 (v) FUEL AND TORQUE PER SEED, sighted minus blinded at each r (row 150 (v); 9.1's definitions)
+  the knock term cannot change them: the knock option changes only the return (evaluate.py:372-374); no reading (fuel and torque hold no damage)
+  r = 0.5:
+      fuel figure, % points: n 20, mean -0.4726, 95 % t interval [-1.5176, +0.5725] (t 2.0930, sd 2.2329, unadjusted); sign count positive 8 / negative 12 / zero 0
+      mean short share (roads with a demand step): n 20, mean -0.000601, 95 % t interval [-0.001051, -0.000150] (t 2.0930, sd 0.000963, unadjusted); sign count positive 3 / negative 14 / zero 3
+      pooled short share: n 20, mean -0.000601, 95 % t interval [-0.001051, -0.000150] (t 2.0930, sd 0.000963, unadjusted); sign count positive 3 / negative 14 / zero 3
+  r = 1.5:
+      fuel figure, % points: n 20, mean -0.0149, 95 % t interval [-0.9177, +0.8880] (t 2.0930, sd 1.9292, unadjusted); sign count positive 12 / negative 8 / zero 0
+      mean short share (roads with a demand step): n 20, mean -0.000417, 95 % t interval [-0.000930, +0.000096] (t 2.0930, sd 0.001097, unadjusted); sign count positive 7 / negative 11 / zero 2
+      pooled short share: n 20, mean -0.000417, 95 % t interval [-0.000930, +0.000096] (t 2.0930, sd 0.001097, unadjusted); sign count positive 7 / negative 11 / zero 2
+  beside, baseline ECU's own: fuel figure +0.0000 %, mean short share 0.000056, pooled 0.000056
+  beside, current-grade's own: fuel figure +3.8909 %, mean short share 0.008454, pooled 0.008454
+
+9.6 THE TEMPERATURE ROWS, the modelled housing (row 151)
+  these numbers are the same in both readings: the knock option changes only the return, and the trace is the same run (evaluate.py:372-374); modelled temperatures of the unvalidated housing, never a measurement on the car
+  records C:/Users/badcl/grad_b58h/records: 61 files, t_turb (20, 899); index C:\Users\badcl\Desktop\GRAD-project\results\B58H_RESULT\scores_b58h.records.json, sha_text cee8d1ccbcf7443b825f56b45413a7a17736894366602284a08d50f499f1e2f1, command 'evaluate.py --engine b58 --protocol d34 --reward-knock out --jobs 14 --scores-out C:/Users/badcl/grad_b58h/scores_b58h.json --records-out C:/Users/badcl/grad_b58h/records --out C:/Users/badcl/grad_b58h/scores_b58h.txt runs/b58h_dt1/blind_seed0 runs/b58h_dt1/sighted_r0.5_seed0 runs/b58h_dt1/sighted_r1.5_seed0 runs/b58h_dt1/blind_seed1 runs/b58h_dt1/sighted_r0.5_seed1 runs/b58h_dt1/sighted_r1.5_seed1 runs/b58h_dt1/blind_seed2 runs/b58h_dt1/sighted_r0.5_seed2 runs/b58h_dt1/sighted_r1.5_seed2 runs/b58h_dt1/blind_seed3 runs/b58h_dt1/sighted_r0.5_seed3 runs/b58h_dt1/sighted_r1.5_seed3 runs/b58h_dt1/blind_seed4 runs/b58h_dt1/sighted_r0.5_seed4 runs/b58h_dt1/sighted_r1.5_seed4 runs/b58h_dt1/blind_seed5 runs/b58h_dt1/sighted_r0.5_seed5 runs/b58h_dt1/sighted_r1.5_seed5 runs/b58h_dt1/blind_seed6 runs/b58h_dt1/sighted_r0.5_seed6 runs/b58h_dt1/sighted_r1.5_seed6 runs/b58h_dt1/blind_seed7 runs/b58h_dt1/sighted_r0.5_seed7 runs/b58h_dt1/sighted_r1.5_seed7 runs/b58h_dt1/blind_seed8 runs/b58h_dt1/sighted_r0.5_seed8 runs/b58h_dt1/sighted_r1.5_seed8 runs/b58h_dt1/blind_seed9 runs/b58h_dt1/sighted_r0.5_seed9 runs/b58h_dt1/sighted_r1.5_seed9 runs/b58h_dt1/blind_seed10 runs/b58h_dt1/sighted_r0.5_seed10 runs/b58h_dt1/sighted_r1.5_seed10 runs/b58h_dt1/blind_seed11 runs/b58h_dt1/sighted_r0.5_seed11 runs/b58h_dt1/sighted_r1.5_seed11 runs/b58h_dt1/blind_seed12 runs/b58h_dt1/sighted_r0.5_seed12 runs/b58h_dt1/sighted_r1.5_seed12 runs/b58h_dt1/blind_seed13 runs/b58h_dt1/sighted_r0.5_seed13 runs/b58h_dt1/sighted_r1.5_seed13 runs/b58h_dt1/blind_seed14 runs/b58h_dt1/sighted_r0.5_seed14 runs/b58h_dt1/sighted_r1.5_seed14 runs/b58h_dt1/blind_seed15 runs/b58h_dt1/sighted_r0.5_seed15 runs/b58h_dt1/sighted_r1.5_seed15 runs/b58h_dt1/blind_seed16 runs/b58h_dt1/sighted_r0.5_seed16 runs/b58h_dt1/sighted_r1.5_seed16 runs/b58h_dt1/blind_seed17 runs/b58h_dt1/sighted_r0.5_seed17 runs/b58h_dt1/sighted_r1.5_seed17 runs/b58h_dt1/blind_seed18 runs/b58h_dt1/sighted_r0.5_seed18 runs/b58h_dt1/sighted_r1.5_seed18 runs/b58h_dt1/blind_seed19 runs/b58h_dt1/sighted_r0.5_seed19 runs/b58h_dt1/sighted_r1.5_seed19'
+  limits, deg C (seconds strictly above, dt x steps): 778 = 778.00, 804 = 804.00
+  850 deg C, both readings (PR-B 9.6): the knee, turb_knee_k 1123.00 K = 849.85 deg C (roads.json report.knee_shares), and 850.00 deg C; highest recorded peak 835.34 deg C: no recorded peak reaches either
+  blind: mean over its seeds of each agent's peak mean 783.61, highest peak 812.02 deg C; s above 778 24.34, s above 804 1.20; the arm's highest single peak 831.19 deg C
+    beside, baseline ECU: peak mean 804.34, highest 835.34 deg C; s above 778 64.80, s above 804 8.95
+    beside, current-grade: peak mean 780.11, highest 809.68 deg C; s above 778 10.65, s above 804 0.60
+    seed 0: peak mean 781.80, highest 827.38 deg C; s above 778 22.65, s above 804 2.60
+    seed 1: peak mean 788.37, highest 809.11 deg C; s above 778 32.15, s above 804 0.95
+    seed 2: peak mean 789.79, highest 814.00 deg C; s above 778 38.90, s above 804 2.20
+    seed 3: peak mean 793.90, highest 826.28 deg C; s above 778 43.15, s above 804 3.10
+    seed 4: peak mean 781.94, highest 799.26 deg C; s above 778 17.50, s above 804 0.00
+    seed 5: peak mean 778.90, highest 801.41 deg C; s above 778 10.80, s above 804 0.00
+    seed 6: peak mean 784.43, highest 817.82 deg C; s above 778 25.40, s above 804 3.00
+    seed 7: peak mean 774.00, highest 797.33 deg C; s above 778 7.50, s above 804 0.00
+    seed 8: peak mean 781.86, highest 807.86 deg C; s above 778 20.35, s above 804 0.50
+    seed 9: peak mean 787.36, highest 810.73 deg C; s above 778 26.40, s above 804 1.20
+    seed 10: peak mean 788.53, highest 807.41 deg C; s above 778 31.50, s above 804 0.80
+    seed 11: peak mean 780.71, highest 817.16 deg C; s above 778 21.90, s above 804 0.90
+    seed 12: peak mean 785.31, highest 831.19 deg C; s above 778 24.85, s above 804 1.65
+    seed 13: peak mean 776.99, highest 817.30 deg C; s above 778 19.00, s above 804 1.00
+    seed 14: peak mean 781.75, highest 800.27 deg C; s above 778 21.80, s above 804 0.00
+    seed 15: peak mean 797.77, highest 827.62 deg C; s above 778 48.05, s above 804 4.45
+    seed 16: peak mean 779.76, highest 810.28 deg C; s above 778 20.40, s above 804 0.55
+    seed 17: peak mean 779.09, highest 802.07 deg C; s above 778 16.20, s above 804 0.00
+    seed 18: peak mean 777.47, highest 797.35 deg C; s above 778 13.95, s above 804 0.00
+    seed 19: peak mean 782.45, highest 818.60 deg C; s above 778 24.45, s above 804 1.05
+  sighted_r0.5: mean over its seeds of each agent's peak mean 788.72, highest peak 812.67 deg C; s above 778 32.55, s above 804 1.45; the arm's highest single peak 826.83 deg C
+    beside, baseline ECU: peak mean 804.34, highest 835.34 deg C; s above 778 64.80, s above 804 8.95
+    beside, current-grade: peak mean 780.11, highest 809.68 deg C; s above 778 10.65, s above 804 0.60
+    seed 0: peak mean 792.12, highest 825.37 deg C; s above 778 31.90, s above 804 2.80
+    seed 1: peak mean 789.76, highest 808.19 deg C; s above 778 28.85, s above 804 0.80
+    seed 2: peak mean 785.83, highest 826.83 deg C; s above 778 33.35, s above 804 2.35
+    seed 3: peak mean 788.15, highest 817.37 deg C; s above 778 31.50, s above 804 2.35
+    seed 4: peak mean 787.95, highest 810.55 deg C; s above 778 30.90, s above 804 0.80
+    seed 5: peak mean 793.37, highest 817.81 deg C; s above 778 42.55, s above 804 3.30
+    seed 6: peak mean 796.08, highest 821.21 deg C; s above 778 47.25, s above 804 2.25
+    seed 7: peak mean 784.54, highest 803.95 deg C; s above 778 25.95, s above 804 0.00
+    seed 8: peak mean 789.29, highest 808.67 deg C; s above 778 31.10, s above 804 0.70
+    seed 9: peak mean 778.72, highest 812.91 deg C; s above 778 21.90, s above 804 1.65
+    seed 10: peak mean 785.32, highest 804.28 deg C; s above 778 19.75, s above 804 0.05
+    seed 11: peak mean 795.47, highest 813.95 deg C; s above 778 47.25, s above 804 2.45
+    seed 12: peak mean 781.27, highest 810.13 deg C; s above 778 22.85, s above 804 0.75
+    seed 13: peak mean 792.50, highest 810.41 deg C; s above 778 38.80, s above 804 1.35
+    seed 14: peak mean 789.93, highest 811.07 deg C; s above 778 31.60, s above 804 1.40
+    seed 15: peak mean 788.41, highest 803.98 deg C; s above 778 31.10, s above 804 0.00
+    seed 16: peak mean 786.96, highest 807.07 deg C; s above 778 29.60, s above 804 0.60
+    seed 17: peak mean 799.88, highest 822.26 deg C; s above 778 60.25, s above 804 3.85
+    seed 18: peak mean 782.74, highest 804.15 deg C; s above 778 18.80, s above 804 0.05
+    seed 19: peak mean 786.05, highest 813.15 deg C; s above 778 25.85, s above 804 1.50
+  sighted_r1.5: mean over its seeds of each agent's peak mean 785.40, highest peak 811.94 deg C; s above 778 26.55, s above 804 0.98; the arm's highest single peak 822.31 deg C
+    beside, baseline ECU: peak mean 804.34, highest 835.34 deg C; s above 778 64.80, s above 804 8.95
+    beside, current-grade: peak mean 780.11, highest 809.68 deg C; s above 778 10.65, s above 804 0.60
+    seed 0: peak mean 782.35, highest 812.77 deg C; s above 778 16.90, s above 804 0.85
+    seed 1: peak mean 790.47, highest 809.04 deg C; s above 778 33.60, s above 804 1.05
+    seed 2: peak mean 785.75, highest 822.31 deg C; s above 778 23.50, s above 804 1.35
+    seed 3: peak mean 789.56, highest 813.11 deg C; s above 778 31.95, s above 804 2.25
+    seed 4: peak mean 784.34, highest 810.36 deg C; s above 778 20.20, s above 804 0.55
+    seed 5: peak mean 784.61, highest 817.04 deg C; s above 778 27.90, s above 804 1.35
+    seed 6: peak mean 785.52, highest 802.28 deg C; s above 778 25.80, s above 804 0.00
+    seed 7: peak mean 789.31, highest 812.79 deg C; s above 778 30.50, s above 804 1.45
+    seed 8: peak mean 781.11, highest 813.06 deg C; s above 778 18.30, s above 804 0.80
+    seed 9: peak mean 783.76, highest 819.80 deg C; s above 778 24.05, s above 804 1.15
+    seed 10: peak mean 785.37, highest 810.01 deg C; s above 778 34.95, s above 804 1.15
+    seed 11: peak mean 787.44, highest 806.60 deg C; s above 778 28.15, s above 804 0.40
+    seed 12: peak mean 782.76, highest 820.16 deg C; s above 778 20.40, s above 804 1.05
+    seed 13: peak mean 788.21, highest 809.94 deg C; s above 778 32.30, s above 804 0.50
+    seed 14: peak mean 784.13, highest 802.78 deg C; s above 778 20.95, s above 804 0.00
+    seed 15: peak mean 783.63, highest 814.42 deg C; s above 778 26.10, s above 804 0.90
+    seed 16: peak mean 778.40, highest 807.14 deg C; s above 778 19.15, s above 804 0.40
+    seed 17: peak mean 784.92, highest 810.17 deg C; s above 778 22.95, s above 804 0.80
+    seed 18: peak mean 785.89, highest 812.60 deg C; s above 778 31.55, s above 804 0.85
+    seed 19: peak mean 790.55, highest 812.35 deg C; s above 778 41.80, s above 804 2.70
+  r = 0.5, sighted minus blinded per seed:
+      peak_mean: n 20, mean +5.11, 95 % t interval [+1.06, +9.16] (t 2.0930, sd 8.65, unadjusted); sign count positive 14 / negative 6 / zero 0
+      peak_max: n 20, mean +0.65, 95 % t interval [-4.59, +5.88] (t 2.0930, sd 11.19, unadjusted); sign count positive 10 / negative 10 / zero 0
+      above_778: n 20, mean +8.21, 95 % t interval [+0.88, +15.54] (t 2.0930, sd 15.67, unadjusted); sign count positive 13 / negative 7 / zero 0
+      above_804: n 20, mean +0.25, 95 % t interval [-0.52, +1.03] (t 2.0930, sd 1.66, unadjusted); sign count positive 13 / negative 6 / zero 1
+  r = 1.5, sighted minus blinded per seed:
+      peak_mean: n 20, mean +1.80, 95 % t interval [-1.29, +4.89] (t 2.0930, sd 6.60, unadjusted); sign count positive 12 / negative 8 / zero 0
+      peak_max: n 20, mean -0.08, 95 % t interval [-5.16, +4.99] (t 2.0930, sd 10.84, unadjusted); sign count positive 10 / negative 10 / zero 0
+      above_778: n 20, mean +2.21, 95 % t interval [-3.19, +7.60] (t 2.0930, sd 11.53, unadjusted); sign count positive 11 / negative 9 / zero 0
+      above_804: n 20, mean -0.22, 95 % t interval [-0.85, +0.41] (t 2.0930, sd 1.35, unadjusted); sign count positive 9 / negative 10 / zero 1
+

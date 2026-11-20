@@ -2184,6 +2184,35 @@ agents, 35 cases each, each a declared transfer (row 147 (11)); no refusal or fa
 (sha256 beginning `00743e99`) and its printed `b58h_battery.txt` are copied to `results/B58H_RESULT/` and committed with
 this entry.
 
+**21 November 2026, item (c), fourth command: the core rows** (AB's `b58h_beside.py core`, sections 9.5 (i) and (v), and
+9.6). At `8c98bfa`, alone, from 00:31:00 to 00:35:09 +0300 (4 min 09 s), exit 0, at 14 jobs, loading no agent; no
+warning or refusal printed. Current-grade's 20 roads ran, the roads check passed (arrays_sha256 equal), and its three
+controls passed: its fuel equals the scores' delivery block on all 20 roads, its cut equals the text report's +30.84
+[+26.89] at two decimals, and roads.json's neutral D equals the scores' D_base to 1e-6 on every road in both readings
+(largest absolute difference 1.486e-07, road 4). Its `b58h_core.json` (sha256 beginning `be63d99c`), `b58h_core.txt` and
+the three figures `b58h_core_s.png`, `b58h_core_delivery.png` and `b58h_core_temps.png` are copied from `$OUT/beside` to
+`results/B58H_RESULT/` and committed with this entry. The command's console (`$OUT/b58h_core.txt`, the tee of section
+14) is that report plus one closing line naming the files written, and stays outside the repository. Current-grade's
+trace, `current_grade.npz` (sha256 beginning `aac95ea9`, printed in the report), is not among the files section 5.2's
+table names (line 457) and also stays under `$OUT/beside`. `verify_docs.py`'s retired-figure scan read one line of the
+report, section 9.6's seconds above 804 deg C at r = 0.5, as a retired enrichment correlation: the lower end of its
+interval matches that bare pattern by chance, as X1's paired difference did before it. That one line is excused in its
+`RETIRED_EXEMPT_LINES`, as `results/preview_ceiling.txt`'s rows are, and the rest of the file is still scanned
+(committed with this entry).
+
+**21 November 2026, the gates of the five commits before this one, and a slip.** Section 14 asks every commit that
+touches this file to run, after the commit and before its push, the check above section 15, Ta's live test and
+`verify_docs.py`, and to put their output here. The five commits after AB's, `5318b13` (item (a)), `ea18150` (item (b)),
+`b6083d9`, `c8972e4` and `8c98bfa` (item (c)'s first three commands), each ran before its push the cost-file check (51
+paths; "cost files unchanged since B1: exit 0"), `verify_docs.py` ("All 170 checks pass (1172 figure mentions scanned in
+the documents).") and the check above section 15 ("ABOVE SECTION 15: UNCHANGED SINCE T*"), and quoted them in its
+message, not here; none ran Ta's live test or the `git diff --stat` of this file. Both were run on 21 November, after
+the five pushes, at each of the five commits in a detached worktree outside the repository:
+`test_epa_backend.PreregistrationB58H` printed "Ran 6 tests", "OK" at each, and the diff stat printed one file changed
+with insertions only (317, 327, 333, 339 and 346). No `.py` file changed between AB's commit and `8c98bfa`. From this
+commit on, the gate runs all of section 14's lines before the push; each gate's output is in its commit's message and in
+the next entry of this section.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*
