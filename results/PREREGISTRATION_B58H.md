@@ -2171,6 +2171,12 @@ each, each a declared transfer (every FATAL field but scenario and episodes_sha 
 or failure printed. Its `b58h_locked.json` (sha256 beginning `ed4bba4f`) and its printed `b58h_locked.txt` are copied to
 `results/B58H_RESULT/` and committed with this entry.
 
+**20 November 2026, item (c), second command: decision 12's check on logged states** (V's `b58h_descriptive.py logged`,
+sections 9.2-9.4). At `b6083d9`, alone, from 12:28:40 to 19:02:17 +0300 (6 h 34 min, UNKNOWN in d148), exit 0, at 14
+jobs: 60 agents, 12 cases each, each a declared transfer (row 147 (11)); no refusal or failure printed. Its
+`b58h_logged.json` (sha256 beginning `cfd5737f`) and its printed `b58h_logged.txt` are copied to `results/B58H_RESULT/`
+and committed with this entry.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

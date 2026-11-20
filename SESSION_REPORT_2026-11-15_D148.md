@@ -935,3 +935,6 @@ PR-B is written after item (c).
 
 **Item (c), the locked climb.** Ran alone at `ea18150` from 09:23:33 to 12:24:48 +0300, exit 0 (3 h 01 min; d148 assumed
 2.5 h as the lower bound for all three of decision 12's rows); outputs in `results/B58H_RESULT/` (PR-B section 15).
+
+**Item (c), the logged states.** Ran alone at `b6083d9` from 12:28:40 to 19:02:17 +0300, exit 0 (6 h 34 min; d148 had it
+UNKNOWN); outputs in `results/B58H_RESULT/` (PR-B section 15).
