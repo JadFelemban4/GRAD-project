@@ -2213,6 +2213,26 @@ with insertions only (317, 327, 333, 339 and 346). No `.py` file changed between
 commit on, the gate runs all of section 14's lines before the push; each gate's output is in its commit's message and in
 the next entry of this section.
 
+**21 November 2026, the core commit's gate** (section 14's lines, run after the commit and before its push; with
+`drift_test.py` too, since the commit changed `verify_docs.py`, mistake 11). Its output, also in the commit's message,
+which was amended with it, the tree unchanged: "cost paths: 51"; "cost files unchanged since B1: exit 0";
+`verify_docs.py` "All 170 checks pass (1172 figure mentions scanned in the documents).", exit 0; `drift_test.py` "22 of
+22 drifts CAUGHT", exit 0; "ABOVE SECTION 15: UNCHANGED SINCE T*"; `git diff --stat` of this file from `T*` "1 file
+changed, 375 insertions(+)"; `test_epa_backend.PreregistrationB58H` "Ran 6 tests", "OK", exit 0; the commit "8 files
+changed, 3020 insertions(+), 1 deletion(-)". It was pushed as `a6032e8`.
+
+**21 November 2026, item (c), fifth command: the practice spread of seeds 0-4** (section 5.2's practice route,
+`evaluate.py --practice`). At `a6032e8`, alone, from 02:07:20 to 02:39:00 +0300 (31 min 40 s), exit 0, at 10 jobs: the
+blinded and r = 1.5 agents of seeds 0-4 on row 96's ten practice roads, beside the baseline ECU, reactive and
+current-grade; both fingerprints read train_backend and score_backend `cycle`; no warning or refusal printed. It writes
+schema `four-engine-practice/1` and prints "s_p at r = 1.5 (row 103 (4); no knock, ddof 1, 5 pairs): 8.8248"
+(`practice_b58h_s0-4.txt:172`). That spread is section 10's beside-row "the training's own seeds 0-4 on the practice
+roads": it decides nothing, the context's s_p stays X2's 20.56 (section 6.7), and the status stays exploratory. Its
+`practice_b58h_s0-4.json` (sha256 beginning `fc1063ce`) and `practice_b58h_s0-4.txt` are copied to
+`results/B58H_RESULT/` and committed with this entry. The console (`$OUT/b58h_practice_console.txt`) is that report plus
+one closing line naming the file written, and stays outside the repository. Item (c) has ended; section 16 is written
+next, last.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*

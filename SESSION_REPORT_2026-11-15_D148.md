@@ -956,3 +956,10 @@ commit messages instead of section 15. The test was run afterwards at each of th
 and the first wording of the fix quoted that figure in PR-B section 15 itself, so the second gate failed too (and
 `drift_test.py`'s control with it). Nothing was pushed; the wording was changed and the commit amended before its push,
 as section 14 says.
+
+**Item (c), the practice spread.** The core commit's gate passed before its push (with `drift_test.py`, 22 of 22 drifts
+caught; Ta's live test "Ran 6 tests", OK), and it was pushed as `a6032e8`. The practice route then ran alone at
+`a6032e8` from 02:07:20 to 02:39:00 +0300, exit 0: seeds 0-4's blinded and r = 1.5 agents on row 96's ten practice
+roads. It prints s_p at r = 1.5, no knock, 5 pairs: 8.8248, beside the context's 20.56 (X2's); it decides nothing, and
+the status stays exploratory. Both files are in `results/B58H_RESULT/` (PR-B section 15). Item (c) has ended; PR-B
+section 16 is next.
