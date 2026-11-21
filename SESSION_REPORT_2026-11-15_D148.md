@@ -993,3 +993,87 @@ verdict MODEL-LIMITED; the status exploratory; the descriptive blocks, each deci
 cut larger than most agents' and no agent passing the logged check; items (d)-(f), the anchors and the λ-only optimum
 "not computed (code)" or "not computed"; the deviation of `a6032e8`; and the earlier looks one line each, never pooled.
 A gap stays recorded: 9.2's per-episode damages are held in the JSON and printed by no committed output.
+
+## 20. 21 November: section 16's gate; PH1 and PH2, post hoc
+
+**Section 16's commit and its gate.** PR-B section 16, the outcome, is committed in `6f433f4` and pushed. Its gate, run
+after the commit and before its push, printed: "cost paths: 51"; "cost files unchanged since B1: exit 0";
+`verify_docs.py` "All 170 checks pass (1176 figure mentions scanned in the documents).", exit 0; "ABOVE SECTION 15:
+UNCHANGED SINCE T*"; `git diff --stat` of PR-B from `T*` "1 file changed, 1245 insertions(+), 1 deletion(-)", the
+deletion being section 16's "*(empty at writing.)*"; "name-status from T*, paths present at T* beyond the four documents
+(section 6.0, PR-B:1756): M verify_docs.py;", the one line the gate expects; `test_epa_backend.PreregistrationB58H` "Ran
+6 tests", "OK", exit 0; the commit "4 files changed, 828 insertions(+), 2 deletions(-)". PR-B section 15's last entry
+points here for it.
+
+**POST HOC: PH1 and PH2 (section 17).** PR-B names neither, so each is post hoc (VD:394; PR-B:1157-1158): reported under
+this heading, beside the preregistered readings of PR-B section 16, deciding nothing (no verdict, band, status, test or
+Δ reads it), and describing the model, never the engine or the criterion. Section 17 put their prints in a session
+report section before the first scoring command; their first attempts started too early and were stopped before it, with
+no print (section 19), so the prints come here, after item (c) and after section 16. Their scripts and outputs are not
+committed yet. `verify_docs.py` reads chance matches in their generated numbers as figures: a printed S value whose
+first digits match the bare pattern of a retired correlation, and "900 samples" as an unrelated known figure. Its line
+exemptions live in `verify_docs.py`, a file present at `T*` that PR-B section 6.0 does not let a commit change. So the
+files are kept, with a README, in the Desktop folder "B58H post hoc PH1 PH2 (21 Nov 2026)" on this laptop, until the
+team decides when section 6.0's rule ends. The line numbers below are of the files there.
+
+**How they ran.** Hand-written policies only, outside the repository, on this laptop; no agent was loaded, listed or
+scored. The first complete runs started at 02:47:33 on 21 November from HEAD `12c0765` and exited 0 (PH2 at 03:16:43,
+PH1 at 03:55:42). A review of the two scripts against section 17 (four reviewers and a skeptic, reading the code only)
+confirmed three defects, none in a number. PH1's label printed "lambda" for section 17's λ. Both scripts' captions said
+the λ trim was at −0.15 over the window, where it is commanded there and reaches it at 0.03 per step
+(`engine_env.SLEW[1]`), so at H = 5-15 s less than the nominal dose falls inside the window. PH2's recomputation of
+evaluate's damage_thermal cast the oil temperature to float64, so it re-summed damage_split's own arithmetic instead of
+evaluate's float32 oil term. The v2 scripts fix those, and add beside PH1's control a check that each variant reached
+the plant, and a flag on any fit whose τ_eff lies past the 620 s sweep. Both re-ran in full and exited 0: PH2 from
+03:17:00 to 03:45:35, PH1 from 03:56:12 to 04:47:52. PH1's v1 and v2 JSON each lost four small values to the scripts'
+own mask of 12-digit runs and do not parse; they are kept byte for byte, named `.json.masked`. PH1's v3 writes such
+numbers in exponent form, with the same ten significant digits. Its first run, from 04:51:45 to 05:41:16, matched only
+three zeros after the point, missed the four, and wrote nothing, as its own check requires. The v3 kept ran from
+05:44:51 to 06:34:30 and exited 0.
+
+**The runs agree.** PH2's v1 and v2 records are identical in every number but the timings and the corrected check:
+5.88e-09 relative under v2, evaluate's float32 route, against 2.65e-15 under v1. PH1's v1 and v2 prints agree line for
+line once the label, the caption, the timings and v2's added lines are set aside. PH1's v3 print equals v2's line for
+line but for the timings, and its JSON equals v2's but for its version line and the four values the mask had hidden, now
+in exponent form. The prints quoted below are v3's for PH1 and v2's for PH2.
+
+**PH1, the long-gap preview sweep.** Label: "post hoc; hand-written λ strategies on hand-made one-climb roads; describes
+the model, never the engine or the criterion; the housing constants are assumed, and D_base moves with each variant"
+(`ph1_out.txt:1`). The control prints `tau_of_plant` on T*'s B58 at 47.3351 s, MATCH (`:12`). Each variant's τ and
+D_base differ from the frozen plant's (`:14-19`), and the cross-check through evaluate agrees (`:21`). The summary, no
+knock, mean form, the primary, as printed (`ph1_out.txt:317-325`):
+
+| plant | L s | grade | τ s | flat τ s | τ_eff s | S_inf | rms | S(5) | S(30) | S(100) | S(620) | S(b) | fuel a620 % |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| frozen | 67 | 10% | 47.34 | 127.88 | 81.85 | 1.6196 | 0.0544 | 0.1066 | 0.4755 | 1.1322 | 1.4345 | 1.4345 | 14.3765 |
+| frozen | 76 | 11% | 47.34 | 127.88 | 98.03 | 2.8025 | 0.0346 | 0.1587 | 0.7315 | 1.7771 | 2.6802 | 2.6802 | 13.8159 |
+| frozen | 85 | 12% | 47.34 | 127.88 | 106.59 | 3.5568 | 0.0196 | 0.1886 | 0.8773 | 2.1521 | 3.4849 | 3.4849 | 13.2261 |
+| c_turb ×0.75 | 76 | 11% | 35.50 | 95.91 | 77.82 | 2.6854 | 0.0287 | 0.1903 | 0.8536 | 1.9335 | 2.5903 | 2.5903 | 13.8159 |
+| c_turb ×1.333 | 76 | 11% | 63.10 | 170.47 | 115.39 | 2.2816 | 0.0399 | 0.1090 | 0.5095 | 1.3035 | 2.1361 | 2.1361 | 13.8159 |
+| ua_turb_amb ×0.75 | 76 | 11% | 49.08 | 141.45 | 123.23 | 5.4691 | 0.0204 | 0.2527 | 1.2062 | 3.0294 | 5.3986 | 5.3986 | 13.8159 |
+| ua_turb_amb ×1.333 | 76 | 11% | 45.20 | 113.40 | 50.22 | 0.8098 | 0.0940 | 0.0750 | 0.3238 | 0.7305 | 0.5157 | 0.5157 | 13.8159 |
+
+Each no-knock fit reaches at least 99.3 % of its S_inf at 620 s, and none is flagged past the sweep or at the bound
+(`:60-61`, `:102-103`, `:144-145`, `:186-187`, `:228-229`, `:270-271`, `:312-313`). With knock ("not converged in dt on
+these roads"), two fits are flagged. The c_turb ×1.333 pair's lies past the sweep, τ_eff 20851.98 s (`:230-231`). The
+ua_turb_amb ×1.333 pair's lies at the bound, τ_eff 0.10 s (`:314-315`). On the ua_turb_amb ×1.333 pair, S(620) is below
+S(100) (the summary). (a)'s extra fuel at 620 s over current-grade's is 13.2261 to 14.3765 % across the pairs (the
+summary). It decides nothing.
+
+**PH2, the oil share of the damage.** Label: "post hoc; hand-written policies; describes the model's damage index, never
+wear" (`ph2_out.txt:1`). The control, section 17's turb + oil = D_noknock, passes on 80 of 80 runs (`:32-33`). The
+checks beside it pass: evaluate's damage_thermal recomputed with the oil term in float32, D_knock, the step count, and
+road 0's baseline ECU through the scoring route (`:34-42`). The oil share of the no-knock damage, pooled over decision
+34's twenty roads, as printed (`:49-53`):
+
+| policy | sum turb | sum oil | sum D | pooled % | mean % | median % | min % | max % |
+|---|---|---|---|---|---|---|---|---|
+| baseline ECU | 953.659 | 193.388 | 1147.047 | 16.86 | 17.57 | 16.64 | 11.71 | 28.30 |
+| current-grade | 599.864 | 194.519 | 794.383 | 24.49 | 25.23 | 24.21 | 17.92 | 37.60 |
+| (a) r=0.5 | 578.196 | 194.896 | 773.092 | 25.21 | 25.94 | 24.94 | 18.53 | 38.38 |
+| (a) r=1.5 | 537.238 | 195.678 | 732.916 | 26.70 | 27.40 | 26.51 | 19.98 | 39.77 |
+
+The parallel baseline network's own share is 16.96 % pooled in every policy's runs (`:55-61`). With knock ("not
+converged in dt on these roads"), the pooled shares are 16.08, 22.08, 22.36 and 23.53 % (`:63-69`). Across the four
+policies, the sum of the oil term moves from 193.388 to 195.678, while the sum of the turbine term moves from 953.659 to
+537.238 (`:50-53`). It decides nothing.
