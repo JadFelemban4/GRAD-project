@@ -2276,6 +2276,812 @@ results/B58H_RESULT/b58h_descriptive_print.py.txt .`, and its output is committe
 are additions that neither section 5.2's table nor row 149 (3) names (this file's procedure, section 12.3); they change
 no file present at `T*`, load no agent and score nothing. The print decides nothing.
 
+**21 November 2026, the gate of the commit of the deviation and the print** (`d4cd9c2`; section 14's lines, run after
+the commit and before its push, and section 6.0's name-status check from this commit on). Its output, also in the
+commit's message, which was amended with it, the tree unchanged: "cost paths: 51"; "cost files unchanged since B1: exit
+0"; `verify_docs.py` "All 170 checks pass (1172 figure mentions scanned in the documents).", exit 0; "ABOVE SECTION 15:
+UNCHANGED SINCE T*"; `git diff --stat` of this file from `T*` "1 file changed, 438 insertions(+)"; "name-status from T*,
+paths present at T* beyond the four documents (section 6.0, PR-B:1756): M verify_docs.py;", the one line the gate
+expects; `test_epa_backend.PreregistrationB58H` "Ran 6 tests", "OK", exit 0; the commit "4 files changed, 999
+insertions(+)". It was pushed as `d4cd9c2`. Section 16 is written below, last; its own gate's output is in its commit's
+message and in the session report.
+
 ## 16. Outcome — added after the result, never above this line
 
-*(empty at writing.)*
+**21 November 2026.** Items (a)-(c) of section 6.9 have run, each alone, and are committed: AB in `dd49844`; item (a),
+the primary scoring, in `5318b13`; item (b), the analysis (`context`, then `analyse`), in `ea18150`; item (c)'s five
+commands, each committed in its own commit: the locked climb in `b6083d9`, the logged states in `c8972e4`, the
+conditions battery in `8c98bfa`, the core rows (`b58h_beside.py core`) in `a6032e8` and the practice spread of seeds 0-4
+in `12c0765`; and, after item (c), a print of decision 12's three rows from their committed JSON in `d4cd9c2` (section
+15, lines 2142-2277; each item ran at the commit before the one that holds its output, as section 15 records; the fifth,
+the practice route, ran at `a6032e8`, at which `verify_docs.py`, a file present at `T*`, differs from `T*`'s, against
+section 5.2: a deviation section 15 records at lines 2243-2260; see 16.5 and 16.13). No route of ORDER step 22b was
+committed before the first scoring command, so items (d), (e) and (f) of section 6.9 read "not computed (code)": 9.5
+(ii) the settling label, 9.5 (iii) flat ahead, 9.5 (iv) road 0, and 9.7 the c_turb re-scores; row 152 (5)'s anchors read
+"not computed"; and row 153 (2), the λ-only optimum of 9.8 item 2, reads "not computed (code)" (section 15, lines
+2142-2147; sections 6.0, 6.9, 9.5 (vi), 9.7, 9.8). Row 153 (1), 9.8 item 1, was committed in D148 (`c5890f2`,
+`results/B58H_DESIGN/hw_opt/`) and is reported beside d. Every number below is copied from a committed output and cited
+by file and line, or by file and JSON key; none is computed, rounded or averaged here (mistake 22). Unless a path is
+given, `analysis_b58h.txt`, `context_b58h.json`, `scores_b58h.txt`, `b58h_core.txt`, `b58h_locked.txt`,
+`b58h_logged.txt`, `b58h_battery.txt`, `practice_b58h_s0-4.txt` (with their `.json`) and `b58h_descriptive_print.txt`
+are in `results/B58H_RESULT/`; `grids_b58.txt`, `power_b58.txt`, `r4_counts.txt` and `d148_figures.txt` are in
+`results/B58H_DESIGN/`; `hw_opt_report.txt`, `hw_opt.py.txt` and `control_record.txt` are in
+`results/B58H_DESIGN/hw_opt/`; "line n" is this file's. Everything is exploratory, on one plant, the B58 model, which is
+not validated (section 12.1); the status is exploratory for every number (`analysis_b58h.txt:1`, `:13`).
+
+### 16.1 The verdicts (section 7)
+
+Every verdict is the no-knock reading's paired t-test under row 113 (2)'s graph, the r = 1.5 test first, at a
+family-wise α of 0.05 (`analysis_b58h.txt:10`, `:15`, `:29`). The sentences are section 7's, as `analysis_b58h.txt`'s
+"SECTION 7: THE VERDICTS" block prints them (`:29-42`). The MEI is 5.43 points (`:10`); n is 20 seeds per arm (`:9`). A
+cut is 100 × (1 − median D / median D_base) against the baseline ECU (`scores_b58h.txt:629`), the median being
+`evaluate.py`'s form and the mean of the road points the mean form (section 10, line 1106); d = sighted cut − blind cut,
+paired by seed, in `evaluate.py`'s form (`analysis_b58h.txt:17`), so d < 0 means the sighted agents' cut was the
+smaller.
+
+**r = 1.5 (H 71.0026 s, `grids_b58.txt:17`): d > 0 not shown** (`analysis_b58h.txt:30`).
+
+"The study does not show a preview effect at H = 1.5 x tau in the simulated turbine and oil damage (the no-knock
+reading) of the B58 model, which is not validated, on these roads (d = -1.86 points, two-sided 95 % t interval -6.17 to
++2.44, against an MEI of 5.43 points). A null was the expected outcome (row 147 (7)) and says nothing against the
+criterion." (`analysis_b58h.txt:31`)
+
+- d -1.86 points in `evaluate.py`'s form, two-sided 95 % t interval -6.17 to +2.44, unadjusted for the graph
+  (`analysis_b58h.txt:49`).
+- Beside it, as printed: "the mean form -2.09 points (95 % -5.49 to +1.30; decides nothing); the band Delta_e 1.49
+  points under the primary reading of 'at b' (2.10 under the other, 0 under version 5's); the ceiling C(1.5) 5.23 points
+  (roads.json, the mean form); the MEI 5.43 points" (`:32`).
+- With knock, as printed: "[with knock, not converged in dt on these roads: d -2.49 points, 95 % -6.22 to +1.23,
+  adjusted p 0.9115: d > 0 not shown; its mean form -1.78 points (95 % -4.94 to +1.39; decides nothing); its band
+  Delta_e 1.83 points under the primary reading of 'at b' (2.30 under the other, 0 under version 5's); the ceiling's
+  with-knock reading 3.98 points (roads.json a.knock.mean, beside C, the no-knock reading's); the MEI as above]"
+  (`:33`).
+- The graph: the t-test's adjusted p 0.8115 (unadjusted 0.8115) (`:22`); its rejections in order: none, in both readings
+  and both tests (`:24-27`).
+- The sign test, the declared secondary, in its own words: "9 of 20 differences above 0 (0 zero, dropped), one-sided p
+  0.7483, graph p 0.7483: it does not show d > 0 under its own graph" [with knock, not converged in dt on these roads:
+  "8 of 20 differences above 0 (0 zero, dropped), one-sided p 0.8684, graph p 0.8684: it does not show d > 0 under its
+  own graph"] (`:34`). It and the t-test read the same (`:22-23`).
+- MODEL-LIMITED: none. The verdict is the same under the primary band, the other reading of 'at b', version 5's and both
+  companions, in both readings and both tests (`:99-100`, `:103-104`, `:105`). The companion's line: "companion (P3 at
+  kappa_L1 x b): no verdict at r = 1.5 has a MODEL-LIMITED flag that depends on the assumed b" (`:35`).
+
+**r = 0.5 (H 23.6675 s, `grids_b58.txt:13`), read only through the graph:** "d > 0 not shown at r = 0.5 (the r = 1.5
+test did not reject, so the graph gives this test no alpha; its unadjusted p 0.9834)" (`analysis_b58h.txt:36`).
+
+"The study does not show a preview effect at H = 0.5 x tau in the simulated turbine and oil damage (the no-knock
+reading) of the B58 model, which is not validated, on these roads (d = -6.28 points, two-sided 95 % t interval -12.01 to
+-0.56, against an MEI of 5.43 points). A null was the expected outcome (row 147 (7)) and says nothing against the
+criterion." (`analysis_b58h.txt:37`)
+
+The two-sided interval, unadjusted for the graph (`analysis_b58h.txt:44`), lies wholly below 0, and section 7's row for
+that case is printed beside it. The analysis prints that sentence under the r = 0.5 verdict line, which reads "d > 0 not
+shown at r = 0.5" (`:36`): "The sighted agents at r = 0.5 took more simulated turbine and oil damage (the no-knock
+reading) on the B58 model, which is not validated (its band assumed at b; section 12.1), than their blinded twins on
+these roads (d = -6.28 points, two-sided 95 % t interval -12.01 to -0.56, against an MEI of 5.43 points): a finding
+about this learner and recipe at this budget, never evidence that preview is worthless, and never read as a result about
+the criterion." (`analysis_b58h.txt:38`)
+
+- d -6.28 points in `evaluate.py`'s form, two-sided 95 % t interval -12.01 to -0.56, unadjusted for the graph
+  (`analysis_b58h.txt:45`).
+- Beside it, as printed: "the mean form -5.34 points (95 % -9.93 to -0.75; wholly below 0; decides nothing); the band
+  Delta_e 4.12 points under the primary reading of 'at b' (4.02 under the other, 0 under version 5's); the ceiling
+  C(0.5) 1.82 points (roads.json, the mean form); the MEI 5.43 points" (`:39`).
+- With knock, as printed: "[with knock, not converged in dt on these roads: d -6.60 points, 95 % -11.90 to -1.31; wholly
+  below 0, adjusted p 0.9914: d > 0 not shown; its mean form -5.05 points (95 % -9.46 to -0.63; wholly below 0; decides
+  nothing); its band Delta_e 4.32 points under the primary reading of 'at b' (4.18 under the other, 0 under version
+  5's); the ceiling's with-knock reading 0.73 points (roads.json a.knock.mean, beside C, the no-knock reading's); the
+  MEI as above]" (`:40`).
+- The graph: the t-test's graph p 0.9834, its unadjusted p 0.9834 (`:19`); the test holds no α, since the r = 1.5 test
+  did not reject (`:36`); rejections in order: none (`:24-27`).
+- The sign test, the declared secondary, in its own words: "8 of 20 differences above 0 (0 zero, dropped), one-sided p
+  0.8684, graph p 0.8684: it does not show d > 0 under its own graph" [with knock, not converged in dt on these roads:
+  "7 of 20 differences above 0 (0 zero, dropped), one-sided p 0.9423, graph p 0.9423: it does not show d > 0 under its
+  own graph"] (`:41`). It and the t-test read the same (`:19-20`).
+- MODEL-LIMITED: none, under every band, in both readings and both tests (`:97-98`, `:101-102`, `:105`). The companion's
+  line: "companion (P3 at kappa_L1 x b): no verdict at r = 0.5 has a MODEL-LIMITED flag that depends on the assumed b"
+  (`:42`).
+
+The with-knock verdict is the no-knock one at both ratios (`:19-23`), so no with-knock verdict differs. The status is
+exploratory (`:13`; 16.5). Section 12.1's limits apply to every verdict, among them item 3, the power is low by
+construction (lines 1232-1233; section 8, lines 719-725), and item 14, learned policies, not optimal ones (lines
+1275-1277). Beside the verdicts, descriptive and deciding nothing (section 7, lines 707-708): in `evaluate.py`'s form,
+no knock, current-grade's cut is larger than that of 15 of 20 blind, 19 of 20 sighted_r0.5 and 18 of 20 sighted_r1.5
+agents (`b58h_core.txt:30`, `:38`, `:46`; 16.8); on the logged drives every agent's row reads "no" and current-grade's
+reads "pass" (`b58h_descriptive_print.txt:688-748`; 16.7).
+
+### 16.2 Every test, both readings and both forms (sections 6.1-6.3)
+
+d = cut(sighted at r, s) − cut(blinded, s), paired by seed, in `evaluate.py`'s form (primary) and the mean form (beside,
+deciding nothing) (`analysis_b58h.txt:17`). Each interval is the two-sided 95 % t interval, mean ± t × sd / √n, sd at
+ddof 1, t₀.₉₇₅,₁₉ = 2.0930, unadjusted for the graph (`:44`). Every d is printed against an MEI of 5.43 points (`:10`),
+with the ceiling C(0.5) 1.82 and C(1.5) 5.23 points beside it (`:18`, `:21`), in the mean form (`:32`, `:39`), while d
+is in `evaluate.py`'s form: the two are in different forms, and both forms of d are printed below (section 6.1).
+
+| r | reading | form | d | sd | n | 95 % interval | source |
+|---|---|---|---|---|---|---|---|
+| 0.5 | no knock | `evaluate.py`'s | -6.28 | 12.24 | 20 | -12.01 to -0.56 | `analysis_b58h.txt:45` |
+| 0.5 | no knock | mean (decides nothing) | -5.34 | 9.81 | 20 | -9.93 to -0.75 | `:46` |
+| 0.5 | with knock (not converged in dt on these roads) | `evaluate.py`'s | -6.60 | 11.31 | 20 | -11.90 to -1.31 | `:47` |
+| 0.5 | with knock (not converged in dt on these roads) | mean (decides nothing) | -5.05 | 9.44 | 20 | -9.46 to -0.63 | `:48` |
+| 1.5 | no knock | `evaluate.py`'s | -1.86 | 9.20 | 20 | -6.17 to +2.44 | `:49` |
+| 1.5 | no knock | mean (decides nothing) | -2.09 | 7.26 | 20 | -5.49 to +1.30 | `:50` |
+| 1.5 | with knock (not converged in dt on these roads) | `evaluate.py`'s | -2.49 | 7.95 | 20 | -6.22 to +1.23 | `:51` |
+| 1.5 | with knock (not converged in dt on these roads) | mean (decides nothing) | -1.78 | 6.76 | 20 | -4.94 to +1.39 | `:52` |
+
+The tests, in `evaluate.py`'s form, each under its own run of the graph (`analysis_b58h.txt:19-23`):
+
+| r | reading | t: p | t: graph p | sign: above 0 | sign: p | sign: graph p | verdict, both tests |
+|---|---|---|---|---|---|---|---|
+| 0.5 | no knock | 0.9834 | 0.9834 | 8 of 20 | 0.8684 | 0.8684 | d > 0 not shown |
+| 0.5 | with knock (not converged in dt on these roads) | 0.9914 | 0.9914 | 7 of 20 | 0.9423 | 0.9423 | d > 0 not shown |
+| 1.5 | no knock | 0.8115 | 0.8115 | 9 of 20 | 0.7483 | 0.7483 | d > 0 not shown |
+| 1.5 | with knock (not converged in dt on these roads) | 0.9115 | 0.9115 | 8 of 20 | 0.8684 | 0.8684 | d > 0 not shown |
+
+The graph's rejections in order: none for the t-test and none for the sign test, in both readings
+(`analysis_b58h.txt:24-27`). Per seed, d in both readings is printed at `scores_b58h.txt:692-733`.
+
+### 16.3 The band and MODEL-LIMITED (sections 6.5-6.6)
+
+Δ_e is the root sum of squares of six parts, with b = MEI / 6 = 0.9050 points, κ_E8 3.4226
+(`results/EPA_TIGHTENINGS.json` `E8.b58_u_val_kappa.with_roads.kappa`), and the companion's κ_L1 1.7168 (mazda_25t, the
+smallest) and 3.7328 (ford_27tt, the largest) (`analysis_b58h.txt:65`); the parts' labels are at `:66`, and the five
+readings at `:67-71`. Only the primary enters the context (`context_b58h.json:11-22`, `:24`). The band never enters a
+test; it only flags. Each d below is printed against an MEI of 5.43 points (`analysis_b58h.txt:10`).
+
+| r | reading | d (t_greater's mean) | median cuts (φ each) | φ | primary Δ_e (linear sum) | other reading of 'at b' | version 5's | companion min, κ 1.7168 | companion max, κ 3.7328 | source |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0.5 | no knock | -6.28 | sighted_r0.5 +18.51 % (1.0000), blind +25.79 % (1.0000) | 1.0000 | 4.1185 (7.6322) | 4.0159 (7.2049) | 0 | 4.3078 (8.2809) | 5.2493 (10.1054) | `analysis_b58h.txt:72-77` |
+| 0.5 | with knock (not converged in dt on these roads) | -6.60 | sighted_r0.5 +18.53 % (1.0000), blind +26.22 % (1.0000) | 1.0000 | 4.3184 (7.9749) | 4.1797 (7.3875) | 0 | 4.4992 (8.6235) | 5.4075 (10.4480) | `:78-83` |
+| 1.5 | no knock | -1.86 | sighted_r1.5 +22.14 % (1.0000), blind +25.79 % (1.0000) | 1.0000 | 1.4950 (2.8974) | 2.0984 (4.6817) | 0 | 1.9570 (3.5461) | 3.5816 (5.3706) | `:84-89` |
+| 1.5 | with knock (not converged in dt on these roads) | -2.49 | sighted_r1.5 +22.35 % (1.0000), blind +26.22 % (1.0000) | 1.0000 | 1.8329 (3.5738) | 2.3019 (5.0422) | 0 | 2.2259 (4.2225) | 3.7353 (6.0470) | `:90-95` |
+
+In the table, d is the paired mean of section 6.2, printed as "d (t_greater's mean)" (`analysis_b58h.txt:72`); in every
+band column the first number is Δ_e (the root sum of squares) and the bracket its linear sum, as printed (`:74-77`,
+`:80-83`, `:86-89`, `:92-95`). φ = max(1, |1 + ln(1 − c)|) at each arm's median cut c, and the column φ is the larger of
+the two arms' (section 6.5, lines 562-563); it scales P4 (`analysis_b58h.txt:66`).
+
+The primary's parts, as printed:
+
+| r | reading | P1 | P2 | P3 | P4 | P5 | P6 | source |
+|---|---|---|---|---|---|---|---|---|
+| 0.5 | no knock | 1.0474 | 1.0474 | 0.9050 | 3.5849 | 1.0474 | 0.0000 | `analysis_b58h.txt:73` |
+| 0.5 | with knock (not converged in dt on these roads) | 1.1008 | 1.1008 | 0.9050 | 3.7675 | 1.1008 | 0.0000 | `:79` |
+| 1.5 | no knock | 0.3102 | 0.3102 | 0.9050 | 1.0617 | 0.3102 | 0.0000 | `:85` |
+| 1.5 | with knock (not converged in dt on these roads) | 0.4155 | 0.4155 | 0.9050 | 1.4222 | 0.4155 | 0.0000 | `:91` |
+
+MODEL-LIMITED, per verdict and band (four_engine_analysis's corners, d moved by −Δ_e and +Δ_e, the graph re-run): every
+verdict, at both ratios, under both tests and in both readings, reads "d > 0 not shown" with MODEL-LIMITED "no" under
+the primary, the other reading of 'at b', version 5's, companion_min and companion_max (`analysis_b58h.txt:96-104`).
+"every d > 0 verdict is the same under every band (PR-B 6.5: a verdict that moves is refused as a defect); the band only
+flags" (`:105`). So no verdict carries "MODEL-LIMITED" or "MODEL-LIMITED under the other reading of 'at b'", and, as
+printed, no verdict at either ratio "has a MODEL-LIMITED flag that depends on the assumed b" (`:35`, `:42`). Each
+reading beside the primary decides nothing (section 6.6).
+
+### 16.4 Δ, the across-H contrast (section 6.4)
+
+Δ(s) = cut(sighted r = 1.5, s) − cut(sighted r = 0.5, s), paired by seed, with no blind cut; exploratory, deciding
+nothing (`analysis_b58h.txt:54`).
+
+| reading | form | mean | sd | n | 95 % interval | exact two-sided sign test | source |
+|---|---|---|---|---|---|---|---|
+| no knock | `evaluate.py`'s | +4.42 | 8.83 | 20 | +0.29 to +8.56 (excludes 0) | 12 positive, 8 negative, 0 zero, p 0.5034 | `analysis_b58h.txt:55` |
+| no knock | mean (beside, deciding nothing) | +3.25 | 7.38 | 20 | -0.21 to +6.71 (covers 0) | 12 positive, 8 negative, 0 zero, p 0.5034 | `:56` |
+| with knock (not converged in dt on these roads) | `evaluate.py`'s | +4.11 | 7.75 | 20 | +0.49 to +7.74 (excludes 0) | 12 positive, 8 negative, 0 zero, p 0.5034 | `:57` |
+| with knock (not converged in dt on these roads) | mean (beside, deciding nothing) | +3.27 | 6.91 | 20 | +0.03 to +6.50 (excludes 0) | 13 positive, 7 negative, 0 zero, p 0.2632 | `:58` |
+
+The no-knock interval in `evaluate.py`'s form, as section 7's rule for Δ words it and as printed: "excludes 0: the
+sighted cut differed between the two H on these roads, in that direction, and nothing about the criterion"
+(`analysis_b58h.txt:55`). The same words are printed beside the with-knock intervals that exclude 0 (`:57`, `:58`).
+
+The prediction beside both forms is from the hand-written strategies, not from any agent, dated 6 November 2026 and
+written before any agent of the study existed (row 147 (7); section 8, lines 710 and 733; section 6.4, lines 545-547):
+C_u(1.5) − C_u(0.5), where C_u = 100 (D_ab − D_a)/D_base is the hand-written preview-only part (section 8, line 723), no
+knock, +3.3970 in `evaluate.py`'s form and +3.4128 in the mean form (`analysis_b58h.txt:59`; `power_b58.txt:49`, where
+the design print names it row 147 (6)'s, `:48`). Beside the with-knock Δ (with knock, not converged in dt on these
+roads), roads.json's C_u.knock: +3.3155 in `evaluate.py`'s form and +3.2443 in the mean form (`analysis_b58h.txt:60`).
+It decides nothing, and Δ's agreement or disagreement with it is not read. Section 12.1 item 12 bounds Δ (lines
+1268-1271): the two H's sample points are not nested, and any effect of H may be a gap effect.
+
+As printed: "Delta's spread is UNKNOWN: no spread of a difference between two sighted arms has been measured." "a Delta
+interval covering 0 says nothing about preview value across H." "Delta decides nothing about the criterion; it is
+exploratory." (`analysis_b58h.txt:61-63`)
+
+### 16.5 The context, the status and s_p (section 6.7; section 10's s_p row)
+
+The context (`context_b58h.json`, made at `5318b13`, `:147`), every value read, none typed:
+
+- engines_in_test ['b58'] (`context_b58h.json:8-10`); seeds_per_arm 20 (`:181`).
+- model_band per ratio and reading: Δ_e under the primary reading of "at b", "kappa 1 in the contract's form" (`:11-22`,
+  `:24`); its printed values are in 16.3.
+- ceiling per ratio, the mean form, from roads.json: C(0.5) 1.8191 and C(1.5) 5.2319 points (section 6.7, lines 610-611;
+  `grids_b58.txt:29-30`; `analysis_b58h.txt:32`, `:39` print them as 1.82 and 5.23).
+- status_basis: s_p 20.56, X2's no-knock spread over its 5 pairs, read from `results/X2_RESULT.txt:24`
+  (`context_b58h.json:163-164`, `:187`); pilot_pairs 5 (`:186`); s_p's label "X2's spread: another plant, road and
+  budget; not a pilot of this study" (`:173`); s* for the B58 9.06868 as the analysis prints it
+  (`analysis_b58h.txt:13`), 9.0687 as section 6.7 recorded it at `T*` (line 613).
+- status 'exploratory' (`context_b58h.json:182-184`), the rule's output, as printed: "status (row 103 (4)): 1.5576 x s_p
+  20.56 = 32.024 against s*: b58 9.06868 -> exploratory" (`analysis_b58h.txt:13`). With the exact factor 1.5576 the rule
+  reads confirmatory only if s_p is at most 5.822 (section 6.7, line 617; `power_b58.txt:19`). As printed, with one
+  engine the four-engine test does not run, and the analysis is exploratory (`analysis_b58h.txt:5`).
+
+Section 10's s_p row, each beside value deciding nothing, never pooled with this study:
+
+| s_p | pairs | what it is | where printed |
+|---|---|---|---|
+| 20.56 (the context's) | 5 | X2's no-knock spread; "another plant, road and budget; not a pilot of this study" | `analysis_b58h.txt:187`; `results/X2_RESULT.txt:24` |
+| 20.51 | 5 | X2's with-knock spread (its 'TOTAL DAMAGE (primary)'), another experiment's spread | `analysis_b58h.txt:188`; `results/X2_RESULT.txt:11` |
+| 24.78 | 23 | X1's 'TOTAL DAMAGE (primary)' spread, another experiment's spread | `analysis_b58h.txt:189`; `results/X1_RESULT.txt:29` |
+| 24.88 | 23 | X1's thermal-only (no knock) spread, another experiment's spread | `analysis_b58h.txt:190`; `results/X1_RESULT.txt:60` |
+| 8.8248 | 5 | the training's own seeds 0-4 on the practice roads: s_p at r = 1.5, no knock, ddof 1 | `practice_b58h_s0-4.txt:172` |
+
+The analysis printed the last row as "computed at item (c), after this analysis" (`analysis_b58h.txt:191`); the practice
+route printed it at item (c) (section 15, lines 2224-2230). It ran at `a6032e8`, a commit at which `verify_docs.py`, a
+file present at `T*`, differs from `T*`'s, against section 5.2; section 15 records that deviation and that no module the
+scoring loads imports `verify_docs.py` (lines 2243-2260). The practice roads are row 96's ten, "NOT THE TEST"
+(`practice_b58h_s0-4.txt:1`). The five per-seed differences behind it are printed at `practice_b58h_s0-4.txt:166-171`,
+on row 96's ten practice roads, not the test; section 10 names the spread alone as the beside value. It decides nothing:
+the context's s_p stays X2's 20.56, and the status stays exploratory (section 15, lines 2229-2230).
+
+### 16.6 Fuel and torque delivery (section 9.1)
+
+Descriptive; it decides nothing. Fuel and torque hold no damage, so this row has no reading (`analysis_b58h.txt:107`).
+The rule, from the scores' delivery block: a demand step asks torque above 40 Nm; fuel is the episode's own count; a
+short step delivers torque below (1 − 0.05) × the request (`:108`). The fuel figure is the mean over the roads of 100 ×
+(fuel / the baseline ECU's on the road − 1), in %.
+
+| arm | fuel figure, %: median, mean, range over 20 seeds | mean short share over the roads with a demand step: median, mean, range | worst road over every seed | no demand step on any road | source |
+|---|---|---|---|---|---|
+| blind | +6.3830, +6.3218, +3.3687 to +9.7603 | 0.0006, 0.0008, 0.0000 to 0.0032 | seed 10 road 10 (short share 0.0122) | none | `analysis_b58h.txt:109-112` |
+| sighted_r0.5 | +5.6216, +5.8493, +4.0771 to +8.9406 | 0.0001, 0.0002, 0.0000 to 0.0012 | seed 16 road 3 (short share 0.0211) | none | `:133-136` |
+| sighted_r1.5 | +6.1500, +6.3070, +4.5779 to +8.6703 | 0.0002, 0.0004, 0.0000 to 0.0014 | seed 11 road 15 (short share 0.0100) | none | `:157-160` |
+
+Beside them, each policy's own: the baseline ECU, fuel figure +0.0000 % (0 by its definition), mean short share 0.0001
+over 20 roads with a demand step, worst road 7 (0.0011), pooled 0.0001 (1 of 17980 demand steps short)
+(`analysis_b58h.txt:181`); current-grade, fuel figure +3.8909 %, mean short share 0.0085 over 20 roads with a demand
+step, worst road 7 (0.0111), pooled 0.0085 (152 of 17980 demand steps short) (`:182`). Each seed's fuel figure, mean
+short share, worst road and pooled share are printed at `:113-132` (blind), `:137-156` (sighted_r0.5) and `:161-180`
+(sighted_r1.5). The block was not refused (`b58h_core.txt:13`, "delivery block: checked"). The per-seed
+sighted-minus-blinded figures of 9.5 (v) are in 16.8.
+
+### 16.7 Decision 12's three checks (sections 9.2-9.4)
+
+Descriptive; they decide nothing, and none enters a verdict, the band, the status, Δ or the context. Each ran through
+V's `b58h_descriptive.py`, every agent as a declared transfer: "every FATAL field but scenario and episodes_sha is the
+live one (row 147 (11))" (`b58h_locked.txt:1`; the same line for every agent in each file), with no refusal or failure
+printed (section 15, lines 2168-2185). Run times, against d148's lower bound of at least 2.5 h for the three, the rest
+UNKNOWN (section 9, line 814): the locked climb 3 h 01 min, the logged drives 6 h 34 min, the conditions battery 5 h 21
+min, each at 14 jobs (section 15, lines 2169, 2175, 2181-2182). Each report's label: "descriptive (row 147 (11)):
+reported per arm and seed, deciding nothing" (`b58h_locked.txt:181`, `b58h_logged.txt:181`, `b58h_battery.txt:181`). V's
+printed reports carry the transfer lines and two closing lines only; the numbers below are as
+`b58h_descriptive_print.txt` prints them from the committed JSON, computing nothing, every control PASS
+(`b58h_descriptive_print.txt:751`; section 15, lines 2262-2277). A cut is `evaluate.py`'s form against the case's own
+baseline ECU; d = sighted cut − blinded cut, per seed; no knock first, [with knock, not converged in dt on these roads]
+(`b58h_descriptive_print.txt:3-4`).
+
+**9.2, the locked climb.** "the locked climb (decision 34's transfer row): 60 agents, 20 cases each"
+(`b58h_locked.txt:182`), scored on the scenario `{"grade": 0.12, "t_amb": 315.0, "v_kmh": 130.0}` (`b58h_locked.txt:2`),
+the reward without the knock term (`b58h_descriptive_print.txt:6`, "reward_knock False"), 20 frozen episodes per policy
+(`:7`). The hand-written policies' cuts, no knock [with knock, not converged in dt on these roads]:
+
+| policy | cut | source |
+|---|---|---|
+| baseline ECU | +0.00 [+0.00] | `b58h_descriptive_print.txt:9` |
+| reactive | +34.10 [+34.00] | `b58h_descriptive_print.txt:10` |
+| current-grade | +47.18 [+46.98] | `b58h_descriptive_print.txt:11` |
+
+Each agent's cut and, per seed, d at each ratio, no knock [with knock, not converged in dt on these roads]
+(`b58h_descriptive_print.txt:12-33`), the MEI of 5.43 points (`analysis_b58h.txt:10`) beside them for scale only:
+
+| seed | blind | sighted_r0.5 | sighted_r1.5 | d at r = 0.5 | d at r = 1.5 |
+|---|---|---|---|---|---|
+| 0 | +53.54 [+53.52] | +63.14 [+62.75] | +68.98 [+68.72] | +9.60 [+9.22] | +15.44 [+15.19] |
+| 1 | +71.43 [+71.16] | +59.89 [+59.60] | +62.59 [+62.55] | -11.55 [-11.56] | -8.85 [-8.62] |
+| 2 | +67.24 [+67.34] | +57.24 [+57.03] | +64.12 [+64.09] | -10.00 [-10.30] | -3.12 [-3.25] |
+| 3 | +44.56 [+44.51] | +66.99 [+66.87] | +7.34 [+7.47] | +22.44 [+22.36] | -37.22 [-37.04] |
+| 4 | +66.71 [+66.68] | +70.23 [+70.31] | +70.23 [+70.22] | +3.52 [+3.63] | +3.52 [+3.54] |
+| 5 | +66.40 [+66.38] | +70.52 [+70.41] | +68.83 [+68.87] | +4.12 [+4.03] | +2.43 [+2.49] |
+| 6 | +47.47 [+47.35] | +62.81 [+62.69] | +59.05 [+59.14] | +15.34 [+15.34] | +11.58 [+11.79] |
+| 7 | +52.87 [+52.83] | +69.07 [+69.16] | +18.98 [+19.01] | +16.20 [+16.33] | -33.89 [-33.82] |
+| 8 | +53.25 [+53.12] | +69.95 [+69.90] | +71.80 [+71.69] | +16.70 [+16.78] | +18.55 [+18.57] |
+| 9 | +65.73 [+65.79] | +48.44 [+48.55] | +67.61 [+67.71] | -17.28 [-17.24] | +1.89 [+1.92] |
+| 10 | +59.83 [+59.59] | +64.83 [+64.88] | +57.04 [+57.16] | +5.00 [+5.28] | -2.79 [-2.43] |
+| 11 | +65.62 [+65.70] | +65.16 [+65.19] | +67.14 [+67.12] | -0.46 [-0.51] | +1.52 [+1.42] |
+| 12 | +62.71 [+62.58] | +67.65 [+67.61] | +68.98 [+68.86] | +4.94 [+5.04] | +6.28 [+6.28] |
+| 13 | +65.16 [+65.10] | +55.85 [+55.78] | +62.97 [+62.95] | -9.31 [-9.32] | -2.19 [-2.15] |
+| 14 | +69.26 [+69.25] | +70.31 [+70.23] | +61.97 [+62.04] | +1.05 [+0.97] | -7.29 [-7.21] |
+| 15 | +33.88 [+34.05] | +70.83 [+70.49] | +63.03 [+62.79] | +36.95 [+36.44] | +29.15 [+28.73] |
+| 16 | +56.49 [+56.57] | +68.42 [+68.34] | +68.81 [+68.54] | +11.92 [+11.76] | +12.32 [+11.97] |
+| 17 | +68.61 [+68.58] | +70.18 [+70.26] | +64.07 [+63.88] | +1.58 [+1.68] | -4.53 [-4.70] |
+| 18 | +62.61 [+62.72] | +70.67 [+70.75] | +57.18 [+57.30] | +8.05 [+8.04] | -5.43 [-5.41] |
+| 19 | +64.44 [+64.09] | +69.56 [+69.65] | +63.59 [+63.61] | +5.12 [+5.56] | -0.85 [-0.48] |
+
+Its control: V's stored differences equal its stored cuts' differences on all 80 values, PASS
+(`b58h_descriptive_print.txt:34`). Each policy's damage per episode in both readings, its fuel and its peak per episode
+are held in `b58h_locked.json` (`results.hand`, `results.agents`) and not printed (`:35`).
+
+**9.3, the conditions battery.** "the conditions battery (decision 12's transfer secondary): 60 agents, 35 cases each"
+(`b58h_battery.txt:182`): `conditions_test.py`'s seven conditions, each on its own hill, over frozen episodes 1, 5, 9,
+13 and 17. Per policy, as printed (`b58h_descriptive_print.txt:39`): its cut against the condition's own baseline ECU
+and its margin over the condition's current-grade, no knock [with knock, not converged in dt on these roads]; the
+medians over the five episodes of the short steps (torque under 95 % of the request) and of the seconds with the housing
+above 850 °C; and the highest peak of the housing, °C. The hand-written policies, per condition:
+
+| condition | hill, ambient, pressure | policy | cut | margin over current-grade | short | s above 850 °C | peak, °C | source |
+|---|---|---|---|---|---|---|---|---|
+| 42 C, 101.3 kPa (trained air) | 8.25 %, 315.00 K, 101.3 kPa | baseline ECU | +0.00 [+0.00] | -47.05 [-36.28] | 2 | 73 | 882.7 | `b58h_descriptive_print.txt:41`, `:43` |
+|  |  | current-grade | +47.05 [+36.28] | +0.00 [+0.00] | 115 | 14 | 853.9 | `b58h_descriptive_print.txt:41`, `:44` |
+|  |  | reactive | +13.26 [+11.26] | -33.79 [-25.02] | 2 | 66 | 864.4 | `b58h_descriptive_print.txt:41`, `:45` |
+|  |  | predictive (hand) | +47.09 [+36.27] | +0.04 [-0.01] | 115 | 14 | 853.9 | `b58h_descriptive_print.txt:41`, `:46` |
+| 25 C | 21.75 %, 298.15 K, 101.3 kPa | baseline ECU | +0.00 [+0.00] | -48.61 [-46.27] | 1 | 277 | 882.8 | `b58h_descriptive_print.txt:131`, `:133` |
+|  |  | current-grade | +48.61 [+46.27] | +0.00 [+0.00] | 2 | 14 | 850.4 | `b58h_descriptive_print.txt:131`, `:134` |
+|  |  | reactive | +18.92 [+18.09] | -29.69 [-28.18] | 1 | 214 | 859.6 | `b58h_descriptive_print.txt:131`, `:135` |
+|  |  | predictive (hand) | +48.64 [+46.16] | +0.02 [-0.11] | 2 | 14 | 850.4 | `b58h_descriptive_print.txt:131`, `:136` |
+| 35 C | 12.00 %, 308.15 K, 101.3 kPa | baseline ECU | +0.00 [+0.00] | -46.20 [-39.59] | 1 | 202 | 883.0 | `b58h_descriptive_print.txt:221`, `:223` |
+|  |  | current-grade | +46.20 [+39.59] | +0.00 [+0.00] | 1 | 22 | 852.7 | `b58h_descriptive_print.txt:221`, `:224` |
+|  |  | reactive | +15.83 [+14.12] | -30.37 [-25.47] | 1 | 153 | 861.4 | `b58h_descriptive_print.txt:221`, `:225` |
+|  |  | predictive (hand) | +46.23 [+39.51] | +0.04 [-0.07] | 2 | 22 | 852.7 | `b58h_descriptive_print.txt:221`, `:226` |
+| 50 C | 7.50 %, 323.15 K, 101.3 kPa | baseline ECU | +0.00 [+0.00] | -45.15 [-36.03] | 3 | 72 | 882.6 | `b58h_descriptive_print.txt:311`, `:313` |
+|  |  | current-grade | +45.15 [+36.03] | +0.00 [+0.00] | 115 | 19 | 855.5 | `b58h_descriptive_print.txt:311`, `:314` |
+|  |  | reactive | +13.06 [+11.33] | -32.10 [-24.70] | 3 | 65 | 864.7 | `b58h_descriptive_print.txt:311`, `:315` |
+|  |  | predictive (hand) | +45.20 [+36.07] | +0.04 [+0.04] | 116 | 19 | 855.5 | `b58h_descriptive_print.txt:311`, `:316` |
+| 90 kPa | 8.75 %, 315.00 K, 90 kPa | baseline ECU | +0.00 [+0.00] | -63.26 [-51.53] | 4 | 83 | 885.4 | `b58h_descriptive_print.txt:401`, `:403` |
+|  |  | current-grade | +63.26 [+51.53] | +0.00 [+0.00] | 297 | 0 | 836.8 | `b58h_descriptive_print.txt:401`, `:404` |
+|  |  | reactive | +17.44 [+14.71] | -45.82 [-36.82] | 48 | 69 | 860.7 | `b58h_descriptive_print.txt:401`, `:405` |
+|  |  | predictive (hand) | +63.28 [+51.51] | +0.02 [-0.02] | 297 | 0 | 836.8 | `b58h_descriptive_print.txt:401`, `:406` |
+| 82 kPa, about Taif | 12.00 %, 315.00 K, 82 kPa | baseline ECU | +0.00 [+0.00] | -46.44 [-45.13] | 8 | 279 | 886.6 | `b58h_descriptive_print.txt:491`, `:493` |
+|  |  | current-grade | +46.44 [+45.13] | +0.00 [+0.00] | 16 | 47 | 857.1 | `b58h_descriptive_print.txt:491`, `:494` |
+|  |  | reactive | +19.26 [+17.88] | -27.18 [-27.25] | 8 | 181 | 862.5 | `b58h_descriptive_print.txt:491`, `:495` |
+|  |  | predictive (hand) | +46.47 [+45.12] | +0.03 [-0.02] | 16 | 47 | 857.1 | `b58h_descriptive_print.txt:491`, `:496` |
+| 76 kPa, the climb's top | 12.25 %, 315.00 K, 76 kPa | baseline ECU | +0.00 [+0.00] | -58.27 [-56.80] | 15 | 281 | 888.1 | `b58h_descriptive_print.txt:581`, `:583` |
+|  |  | current-grade | +58.27 [+56.80] | +0.00 [+0.00] | 222 | 0 | 850.0 | `b58h_descriptive_print.txt:581`, `:584` |
+|  |  | reactive | +21.00 [+19.79] | -37.27 [-37.01] | 15 | 185 | 861.6 | `b58h_descriptive_print.txt:581`, `:585` |
+|  |  | predictive (hand) | +58.30 [+56.85] | +0.03 [+0.06] | 222 | 0 | 850.0 | `b58h_descriptive_print.txt:581`, `:586` |
+
+Each agent's row, per condition (blind, then sighted_r0.5, then sighted_r1.5, seeds 0-19 each), is printed at
+`b58h_descriptive_print.txt` 42 C, 101.3 kPa (trained air) `:47-106`; 25 C `:137-196`; 35 C `:227-286`; 50 C `:317-376`;
+90 kPa `:407-466`; 82 kPa, about Taif `:497-556`; 76 kPa, the climb's top `:587-646`. The sighted-minus-blinded d per
+seed at r = 0.5 and r = 1.5, no knock [with knock, not converged in dt on these roads], the MEI of 5.43 points beside
+them for scale only, is printed at 42 C, 101.3 kPa (trained air) `:108-127`; 25 C `:198-217`; 35 C `:288-307`; 50 C
+`:378-397`; 90 kPa `:468-487`; 82 kPa, about Taif `:558-577`; 76 kPa, the climb's top `:648-667`. Each condition's two
+controls (V's stored differences and margins against its stored cuts) print PASS (`:128-129`, `:218-219`, `:308-309`,
+`:398-399`, `:488-489`, `:578-579`, `:668-669`). Held out of training, as section 9.3 says (lines 792-793): 50 °C and
+the 21.75 % hill; the three pressure rows are dimensions the training never drew, reported as such.
+
+**9.4, the logged drives.** "the logged drives (decision 12's check on logged states): 60 agents, 12 cases each"
+(`b58h_logged.txt:182`), each case a drive of `results/logged_cycles.json` at one of two weightings, the frozen episodes
+4 and 15 (`logged_check.py:39-41`), listed at `b58h_descriptive_print.txt:674-686`. The criteria, as the row holds them
+(`:673`): demand_nm 40.0, track_tol 0.05, t_limit 0.01, f_limit 1.01, cold_c 750.0. `logged_check.py` defines them
+(`logged_check.py:13-18`, `logged_check.py:67-70`, `logged_check.py:247-248`; track_tol is `engine_env.TRACK_TOL`,
+`logged_check.py:225-226`, the reward's 5 %, `logged_check.py:14`): T, the demand steps (torque asked above demand_nm)
+on which the agent falls short by more than track_tol of the request and the baseline ECU in the same run does not are
+at most t_limit of the demand steps; F, the agent's fuel over the drive is at most f_limit times the baseline ECU's; an
+agent passes when it meets T and F on every drive at both weightings. Per policy, as `b58h_descriptive_print.txt` prints
+it (`:687`): T met / F met / of n cases, and whether it passes; current-grade: 12 / 12 / 12, pass (`:688`).
+
+| seed | blind | sighted_r0.5 | sighted_r1.5 |
+|---|---|---|---|
+| 0 | 11 / 4 / 12, no (`:689`) | 12 / 3 / 12, no (`:709`) | 10 / 3 / 12, no (`:729`) |
+| 1 | 12 / 1 / 12, no (`:690`) | 12 / 4 / 12, no (`:710`) | 8 / 4 / 12, no (`:730`) |
+| 2 | 11 / 3 / 12, no (`:691`) | 12 / 2 / 12, no (`:711`) | 12 / 4 / 12, no (`:731`) |
+| 3 | 11 / 3 / 12, no (`:692`) | 12 / 3 / 12, no (`:712`) | 12 / 3 / 12, no (`:732`) |
+| 4 | 12 / 2 / 12, no (`:693`) | 12 / 5 / 12, no (`:713`) | 12 / 3 / 12, no (`:733`) |
+| 5 | 12 / 8 / 12, no (`:694`) | 11 / 5 / 12, no (`:714`) | 11 / 6 / 12, no (`:734`) |
+| 6 | 12 / 5 / 12, no (`:695`) | 12 / 4 / 12, no (`:715`) | 10 / 5 / 12, no (`:735`) |
+| 7 | 12 / 3 / 12, no (`:696`) | 10 / 6 / 12, no (`:716`) | 12 / 4 / 12, no (`:736`) |
+| 8 | 12 / 2 / 12, no (`:697`) | 12 / 4 / 12, no (`:717`) | 12 / 3 / 12, no (`:737`) |
+| 9 | 12 / 3 / 12, no (`:698`) | 12 / 6 / 12, no (`:718`) | 12 / 3 / 12, no (`:738`) |
+| 10 | 10 / 3 / 12, no (`:699`) | 12 / 6 / 12, no (`:719`) | 11 / 3 / 12, no (`:739`) |
+| 11 | 10 / 3 / 12, no (`:700`) | 11 / 2 / 12, no (`:720`) | 11 / 3 / 12, no (`:740`) |
+| 12 | 12 / 6 / 12, no (`:701`) | 12 / 4 / 12, no (`:721`) | 11 / 5 / 12, no (`:741`) |
+| 13 | 12 / 3 / 12, no (`:702`) | 12 / 4 / 12, no (`:722`) | 12 / 3 / 12, no (`:742`) |
+| 14 | 12 / 3 / 12, no (`:703`) | 12 / 1 / 12, no (`:723`) | 11 / 2 / 12, no (`:743`) |
+| 15 | 11 / 1 / 12, no (`:704`) | 12 / 4 / 12, no (`:724`) | 12 / 5 / 12, no (`:744`) |
+| 16 | 12 / 3 / 12, no (`:705`) | 12 / 2 / 12, no (`:725`) | 12 / 5 / 12, no (`:745`) |
+| 17 | 12 / 3 / 12, no (`:706`) | 10 / 5 / 12, no (`:726`) | 12 / 3 / 12, no (`:746`) |
+| 18 | 11 / 2 / 12, no (`:707`) | 12 / 5 / 12, no (`:727`) | 12 / 8 / 12, no (`:747`) |
+| 19 | 11 / 4 / 12, no (`:708`) | 12 / 2 / 12, no (`:728`) | 12 / 5 / 12, no (`:748`) |
+
+Each policy's per-case T and F flags are printed on the same lines. Its control: every stored count and pass flag equals
+its per-case flags, PASS (`:749`). As printed, every agent row reads "no" (`b58h_descriptive_print.txt:689-748`; 60
+agents, `b58h_logged.txt:182`), and current-grade's reads "pass" (`:688`). Section 9.4 stated the check's scope before
+any result: "What it can say: no harm on states the simulator is validated on. What it cannot: that the agent protects
+correctly; no drive reaches the trigger" (lines 809-810). It decides nothing. The per-run rows (steps, demand steps,
+short steps, fuel, damage, peaks) are held in `b58h_logged.json` `results.agents.<arm>.<seed>.runs` and not printed.
+
+### 16.8 Decision 7 (A)'s block (section 9.5)
+
+Descriptive; it decides nothing: no verdict, band, status, test or Δ reads it (`b58h_core.txt:2`).
+
+**(i) Against current-grade and the hand-written strategies** (`b58h_beside.py core`). Current-grade's run:
+`check_premise.p_grade_now` through `evaluate.run_road_episode`, 20 roads of 899 steps at dt 1 s, H 30 s
+(`b58h_core.txt:15-16`). The roads check passed, arrays_sha256 equal (`:18`). Its three controls passed: its fuel equals
+the scores' delivery block on all 20 roads (`:19`); its cut equals the text report's at two decimals in both readings,
+"+30.84 [ +26.89]", the bracket with knock, not converged in dt on these roads (`:20-22`; `scores_b58h.txt:631`);
+roads.json's neutral D equals the scores' D_base to 1e-6 on every road in both readings, the largest absolute difference
+1.486e-07 (road 4) without knock and 0.000e+00 with knock (not converged in dt on these roads) (`b58h_core.txt:23-25`).
+Current-grade's cut against the baseline ECU: `evaluate.py`'s form +30.8354 [with knock +26.8925, not converged in dt on
+these roads]; mean form +30.3389 [with knock +26.2965, not converged in dt on these roads] (`:28`).
+
+In `evaluate.py`'s form, no knock, current-grade's cut (+30.8354, `b58h_core.txt:28`) is larger than the cut of 15 of 20
+blind agents, 19 of 20 sighted_r0.5 agents and 18 of 20 sighted_r1.5 agents, the counts of s < 0 (`:30`, `:38`, `:46`)
+[with knock, not converged in dt on these roads: 11, 18 and 18 of 20, `:32`, `:40`, `:48`]. It decides nothing.
+
+s = cut(agent) − cut(current-grade), per arm:
+
+| arm | form, reading | agents with s < 0 | median | sd (ddof 1) | range | source |
+|---|---|---|---|---|---|---|
+| blind | `evaluate.py`'s, no knock | 15 of 20 | -5.0404 | 8.4447 | -25.1091 to +5.6462 | `b58h_core.txt:30` |
+| blind | mean, no knock | 19 of 20 | -8.0359 | 6.4219 | -22.0846 to +2.7233 | `:31` |
+| blind | `evaluate.py`'s, with knock (not converged in dt on these roads) | 11 of 20 | -0.6733 | 7.8383 | -18.1925 to +10.3946 | `:32` |
+| blind | mean, with knock (not converged in dt on these roads) | 14 of 20 | -3.6871 | 6.5176 | -17.2930 to +6.0743 | `:33` |
+| sighted_r0.5 | `evaluate.py`'s, no knock | 19 of 20 | -12.3217 | 7.2047 | -28.1265 to +1.6350 | `:38` |
+| sighted_r0.5 | mean, no knock | 20 of 20 | -11.8694 | 6.5042 | -31.0528 to -4.5497 | `:39` |
+| sighted_r0.5 | `evaluate.py`'s, with knock (not converged in dt on these roads) | 18 of 20 | -8.3675 | 7.1876 | -22.1998 to +5.6784 | `:40` |
+| sighted_r0.5 | mean, with knock (not converged in dt on these roads) | 19 of 20 | -8.8778 | 6.6835 | -23.5186 to +1.3057 | `:41` |
+| sighted_r1.5 | `evaluate.py`'s, no knock | 18 of 20 | -8.6931 | 5.6431 | -16.1242 to +3.5430 | `:46` |
+| sighted_r1.5 | mean, no knock | 20 of 20 | -11.0758 | 3.7043 | -16.7361 to -3.3872 | `:47` |
+| sighted_r1.5 | `evaluate.py`'s, with knock (not converged in dt on these roads) | 18 of 20 | -4.5387 | 4.5315 | -11.1982 to +5.6768 | `:48` |
+| sighted_r1.5 | mean, with knock (not converged in dt on these roads) | 19 of 20 | -5.4094 | 3.1093 | -11.4389 to +0.8073 | `:49` |
+
+Each agent's s per seed, in both readings, is printed at `b58h_core.txt:34` (blind), `:42` (sighted_r0.5) and `:50`
+(sighted_r1.5).
+
+Beside them, in the same form, the hand-written savings over current-grade from roads.json, `evaluate.py`'s form [mean
+form] (`b58h_core.txt:35-36`, repeated per arm at `:43-44`, `:51-52`):
+
+| policy | no knock | with knock (not converged in dt on these roads) |
+|---|---|---|
+| (a) at r = 0.5 | +2.0485 [+1.8226] | +1.0294 [+0.7328] |
+| (a) at r = 1.5 | +5.4455 [+5.2418] | +4.3449 [+3.9832] |
+| (b) | +7.2682 [+7.3620] | +5.9658 [+5.9686] |
+| (a_b) | +2.2239 [+2.6877] | +1.1988 [+1.5716] |
+
+Row 153 (1)'s tuned bests, as its committed report prints them, with their own label (`b58h_core.txt:53-65`; 16.11).
+Current-grade, the base of every margin above, is short on 152 steps by decision 13's count: "b58: steps 17580, under95
+152, over_tol 152, climb_steps 5106, climb_under95 0, climb_over_tol 0" (`grids_b58.txt:100`, as `b58h_core.txt:66-68`
+prints it beside), a rule different from 9.1's short step (`b58h_core.txt:66`). Figure:
+`results/B58H_RESULT/b58h_core_s.png`.
+
+**(ii) The settling label:** not computed (code). Its route, `b58h_beside.py settle`, was not committed before the first
+scoring command; only `core` was present (section 15, lines 2144-2149). No figure `b58h_settle.png` exists.
+
+**(iii) Flat ahead:** not computed (code), for the same reason (lines 2144-2149). No `b58h_flat.png`.
+
+**(iv) The behaviour figure on road 0:** not computed (code), for the same reason (lines 2144-2149). No `b58h_road0.png`
+or `b58h_road0.json`.
+
+**(v) Fuel and torque, per seed, sighted minus blinded at each r** (`b58h_core.txt:70-81`). The knock term cannot change
+them; no reading (`:71`). Each with the mean over seeds, its two-sided 95 % t interval (t 2.0930, unadjusted) and the
+sign count:
+
+| r | figure | n | mean | 95 % t interval | sd | sign count +/−/0 | source |
+|---|---|---|---|---|---|---|---|
+| 0.5 | fuel figure, % points | 20 | -0.4726 | -1.5176 to +0.5725 | 2.2329 | 8 / 12 / 0 | `b58h_core.txt:73` |
+| 0.5 | mean short share (roads with a demand step) | 20 | -0.000601 | -0.001051 to -0.000150 | 0.000963 | 3 / 14 / 3 | `:74` |
+| 0.5 | pooled short share | 20 | -0.000601 | -0.001051 to -0.000150 | 0.000963 | 3 / 14 / 3 | `:75` |
+| 1.5 | fuel figure, % points | 20 | -0.0149 | -0.9177 to +0.8880 | 1.9292 | 12 / 8 / 0 | `:77` |
+| 1.5 | mean short share (roads with a demand step) | 20 | -0.000417 | -0.000930 to +0.000096 | 0.001097 | 7 / 11 / 2 | `:78` |
+| 1.5 | pooled short share | 20 | -0.000417 | -0.000930 to +0.000096 | 0.001097 | 7 / 11 / 2 | `:79` |
+
+No seed was dropped for want of a demand step (`b58h_core.json` `part_9_5_v.no_demand_seeds`, empty for every arm; n 20
+at `b58h_core.txt:73-79`). The per-seed differences are held in `b58h_core.json` `part_9_5_v.per_seed` and
+`.differences` and drawn in `b58h_core_delivery.png`; `b58h_core.txt` does not print them.
+
+Beside them: the baseline ECU's own fuel figure +0.0000 %, mean short share 0.000056, pooled 0.000056
+(`b58h_core.txt:80`); current-grade's own fuel figure +3.8909 %, mean short share 0.008454, pooled 0.008454 (`:81`). The
+episode return is not kept in the scores and is not recomputed (section 9.5 (v)). Figure:
+`results/B58H_RESULT/b58h_core_delivery.png`.
+
+**(vi) Cost, time and fallback, as run.** (i) and (v) ran in item (c)'s fourth command with 9.6, at HEAD `8c98bfa`
+(`b58h_core.txt:12`), and were committed in `a6032e8`; alone, from 00:31:00 to 00:35:09 +0300 on 21 November (4 min 09
+s), exit 0, at 14 jobs, loading no agent (section 15, lines 2187-2189), against d148's 20 runs, 0.06 h
+(`d148_figures.txt:85`). (ii), (iii) and (iv) read "not computed (code)", not "not run (time)": they could not start,
+since no code is written for a route after the first scoring command (lines 2145-2146). No control failed.
+
+### 16.9 The temperature rows (section 9.6)
+
+Descriptive; it decides nothing. As printed: "these numbers are the same in both readings: the knock option changes only
+the return, and the trace is the same run (evaluate.py:372-374); modelled temperatures of the unvalidated housing, never
+a measurement on the car" (`b58h_core.txt:84`). The source is the 61 per-step records of item (a), t_turb (20, 899),
+each checked against the committed index (`:85`); the limits are 778 and 804 °C, seconds strictly above, dt × steps
+(`:86`). "850 deg C, both readings (PR-B 9.6): the knee, turb_knee_k 1123.00 K = 849.85 deg C (roads.json
+report.knee_shares), and 850.00 deg C; highest recorded peak 835.34 deg C: no recorded peak reaches either" (`:87`), so
+no seconds above 850 °C are reported.
+
+Per arm, the mean over its seeds of each agent's mean over the twenty roads, in °C and seconds:
+
+| policy | peak (mean of the road peaks) | highest peak (mean over seeds of each agent's highest) | s above 778 | s above 804 | the arm's highest single peak | source |
+|---|---|---|---|---|---|---|
+| blind | 783.61 | 812.02 | 24.34 | 1.20 | 831.19 | `b58h_core.txt:88` |
+| sighted_r0.5 | 788.72 | 812.67 | 32.55 | 1.45 | 826.83 | `:111` |
+| sighted_r1.5 | 785.40 | 811.94 | 26.55 | 0.98 | 822.31 | `:134` |
+| baseline ECU, beside | 804.34 | 835.34 | 64.80 | 8.95 | | `:89` |
+| current-grade, beside | 780.11 | 809.68 | 10.65 | 0.60 | | `:90` |
+
+Each agent's row is printed at `b58h_core.txt:91-110`, `:114-133` and `:137-156`. Sighted minus blinded per seed, with
+the mean, the two-sided 95 % t interval (t 2.0930, unadjusted) and the sign count:
+
+| r | figure | n | mean | 95 % t interval | sd | sign count +/−/0 | source |
+|---|---|---|---|---|---|---|---|
+| 0.5 | peak_mean, °C | 20 | +5.11 | +1.06 to +9.16 | 8.65 | 14 / 6 / 0 | `b58h_core.txt:158` |
+| 0.5 | peak_max, °C | 20 | +0.65 | -4.59 to +5.88 | 11.19 | 10 / 10 / 0 | `:159` |
+| 0.5 | above_778, s | 20 | +8.21 | +0.88 to +15.54 | 15.67 | 13 / 7 / 0 | `:160` |
+| 0.5 | above_804, s | 20 | +0.25 | as printed at `:161`, cited, not quoted: its lower end matches a retired figure's bare pattern by chance (section 15's core-rows entry) | 1.66 | 13 / 6 / 1 | `:161` |
+| 1.5 | peak_mean, °C | 20 | +1.80 | -1.29 to +4.89 | 6.60 | 12 / 8 / 0 | `:163` |
+| 1.5 | peak_max, °C | 20 | -0.08 | -5.16 to +4.99 | 10.84 | 10 / 10 / 0 | `:164` |
+| 1.5 | above_778, s | 20 | +2.21 | -3.19 to +7.60 | 11.53 | 11 / 9 / 0 | `:165` |
+| 1.5 | above_804, s | 20 | -0.22 | -0.85 to +0.41 | 1.35 | 9 / 10 / 1 | `:166` |
+
+Figure: `results/B58H_RESULT/b58h_core_temps.png`. The October alternatives stay named and not run (section 12.1, item
+15).
+
+### 16.10 The c_turb re-scores (section 9.7)
+
+Descriptive; it would decide nothing. Not computed (code). The route `b58h_beside.py cturb` was not committed before the
+first scoring command, where `core` was the only route present (section 15, lines 2144-2149), so neither variant, ×0.75
+nor ×1.333 (section 9.7, line 963), was run, and no `b58h_cturb.json` or `b58h_cturb.png` exists. Row 152 (5)'s anchors
+(current-grade, (a) at each r, (b), (a_b) and the baseline ECU at the two variants, with no agent) read "not computed":
+D148 did not carry them, and they were not committed in `results/B58H_DESIGN/cturb_hw/` before the first scoring command
+("the optimum's and the anchors' commits: none", lines 2149-2150). Item (f) of section 6.9 reads "not computed (code)",
+not "not run (time)", because its route was not committed before the first scoring command (section 6.9, line 665).
+
+### 16.11 The references beside d (section 9.8)
+
+Descriptive; they decide nothing. Nothing of them enters the scores, the context's ceiling slot, the band, the status, Δ
+or any verdict; row 147 (7)'s prediction of 6 November stands (section 9.8).
+
+**Item 1, the tuned hand-written λ strategies** (row 153 (1); D148, `c5890f2`). Its own label, verbatim: "hand-written
+lambda strategies tuned over two settings; savings over current-grade on decision 34's twenty roads, B58 frozen plant;
+describes the model, never a bound on d" (`hw_opt.py.txt:202-203`). Its control: "CONTROL: largest difference from
+roads.json 0.000e+00 -> PASS" (`control_record.txt:15`), exit 0 (`:16`). 820 runs, the twenty roads × 41 settings
+(`d148_figures.txt:152-153`). The report gives, per setting, the saving over current-grade in the mean form and in
+`evaluate.py`'s form, the extra fuel in % and the highest peak in °C (`hw_opt_report.txt:4`). Each family's largest
+saving in `evaluate.py`'s form, as the committed report prints it (`b58h_core.txt:55-57`, `:61-63`):
+
+| reading | family | setting | saving, mean form | saving, `evaluate.py`'s form | extra fuel, % | peak, °C | source |
+|---|---|---|---|---|---|---|---|
+| no knock | blind | D=0 delta=1.00 | 7.348 | 7.268 | +6.546 | 806.3 | `hw_opt_report.txt:19` |
+| no knock | sighted r = 0.5 | lead=1.00H delta=1.00 | 1.819 | 2.049 | +1.272 | 808.4 | `:33` |
+| no knock | sighted r = 1.5 | lead=1.00H delta=1.00 | 5.232 | 5.446 | +3.955 | 806.3 | `:47` |
+| with knock (not converged in dt on these roads) | blind | D=0 delta=1.00 | 5.957 | 5.966 | +6.546 | 806.3 | `:78` |
+| with knock (not converged in dt on these roads) | sighted r = 0.5 | lead=1.00H delta=0.67 | 1.303 | 1.464 | +0.768 | 808.7 | `:90` |
+| with knock (not converged in dt on these roads) | sighted r = 1.5 | lead=1.00H delta=1.00 | 3.976 | 4.345 | +3.955 | 806.3 | `:106` |
+
+At each r, the largest sighted-minus-blind saving at equal extra fuel, the blind front interpolated between its own
+tuned points, in points of cut over current-grade:
+
+| reading, form | r = 0.5 | r = 1.5 | source |
+|---|---|---|---|
+| no knock, mean form | +0.258 (at +0.35 % fuel) | +0.577 (at +2.36 % fuel) | `hw_opt_report.txt:51`, `:53` |
+| no knock, `evaluate.py`'s form | +0.573 (at +0.35 % fuel) | +1.104 (at +2.36 % fuel) | `:57`, `:59` |
+| with knock (not converged in dt on these roads), mean form | +0.134 (at +0.35 % fuel) | +0.551 (at +2.36 % fuel) | `:110`, `:112` |
+| with knock (not converged in dt on these roads), `evaluate.py`'s form | +0.551 (at +0.35 % fuel) | +1.083 (at +2.36 % fuel) | `:116`, `:118` |
+
+Every setting's row and each family's front, in both readings, are printed in the committed report
+(`hw_opt_report.txt:2-118`: no knock at `:2-59`; with knock, not converged in dt on these roads, at `:61-118`), under
+item 1's own label above, describing the model, never a bound on d, deciding nothing.
+
+Current-grade, the base of every margin here, is short on 152 steps by decision 13's count (`grids_b58.txt:100`). The
+committed script is not the script as run, byte for byte, and the report equals the one the run printed, line ends aside
+(section 9.8, lines 1041-1047; `hw_opt/README.md`).
+
+**Item 2, the reduced λ-only optimum** ("what the simulator predicts, not a bound"; row 153 (2)): not computed (code).
+`b58h_lambda_opt.py` was not committed before the first scoring command (section 15, lines 2146-2150), so
+`results/B58H_LAMBDA_OPT/` and its `front.png` do not exist.
+
+### 16.12 Row 102's curve and grids, decision 13's count, and section 10's other rows
+
+Descriptive; it decides nothing. Label, verbatim, for everything of row 102 below: "hand-written savings on plants
+dropped by Run 2's validation; describes the models, not the engines; never evidence for or against the criterion"
+(`grids_b58.txt:5`; row 147 (9)). Every number of row 102 and of decision 13's count is copied from `grids_b58.txt`, as
+section 10 requires (lines 1139-1140). C_e is the hand-written (a)'s cut over current-grade in points, no knock, the
+mean of the road points; 'with knock' is not converged in dt on these roads (`grids_b58.txt:6-7`).
+
+**Row 102's curve on the B58**, reported beside the agents' d at r = 0.5 (d -6.28 points) and r = 1.5 (d -1.86 points),
+no knock, `evaluate.py`'s form, against an MEI of 5.43 points [with knock, not converged in dt on these roads: d -6.60
+and -2.49 points] (`analysis_b58h.txt:45`, `:49`, `:47`, `:51`); the ceiling C(0.5) 1.82 and C(1.5) 5.23 points, the
+band Δ_e 4.12 and 1.49 points (`analysis_b58h.txt:39`, `:32`); τ 47.3351 s (`grids_b58.txt:10`):
+
+| r | H, s | C_e | with knock (not converged in dt on these roads) | source |
+|---|---|---|---|---|
+| 0.5 | 23.6675 | 1.8191 | 0.7314 | `grids_b58.txt:13` |
+| 0.666667 | 31.5567 | 2.3934 | 1.2804 | `:14` |
+| 1 | 47.3351 | 3.5372 | 2.3738 | `:15` |
+| 1.25 | 59.1688 | 4.4715 | 3.2603 | `:16` |
+| 1.5 | 71.0026 | 5.2319 | 3.9758 | `:17` |
+| 1.947 | 92.1614 | 6.1577 | 4.8438 | `:18` |
+
+| H, s | H/τ | C_e | with knock (not converged in dt on these roads) | source |
+|---|---|---|---|---|
+| 20 | 0.4225 | 1.6001 | 0.5221 | `grids_b58.txt:21` |
+| 30 | 0.6338 | 2.3222 | 1.2123 | `:22` |
+| 45 | 0.9507 | 3.3891 | 2.2322 | `:23` |
+| 65 | 1.3732 | 4.8848 | 3.6498 | `:24` |
+| 100 | 2.1126 | 6.3974 | 5.0693 | `:25` |
+| 130 | 2.7464 | 7.0312 | 5.6629 | `:26` |
+
+The grid equals the study's ceiling C at both ratios: 1.8191 at r = 0.5 and 5.2319 at r = 1.5, "equal True"
+(`grids_b58.txt:29-30`).
+
+**Row 102's four-engine grids and spreads**, as R1 computed them, with and without the one-housing Ford. Each engine's
+C_e on both axes, no knock, with its τ (`grids_b58.txt:33-44`, `:52-56`):
+
+| engine | τ, s | C_e at r = 0.5, 0.666667, 1, 1.25, 1.5, 1.947 | C_e at H = 20, 30, 45, 65, 100, 130 s | source |
+|---|---|---|---|---|
+| `b58` | 47.3351 | 1.8191, 2.3934, 3.5372, 4.4715, 5.2319, 6.1577 | 1.6001, 2.3222, 3.3891, 4.8848, 6.3974, 7.0312 | `grids_b58.txt:34`, `:40`, `:52` |
+| `mazda_25t` | 42.7418 | 0.7865, 1.0389, 1.5616, 2.0617, 2.6032, 3.3083 | 0.7506, 1.1116, 1.6802, 2.6458, 3.6905, 4.1426 | `:35`, `:41`, `:53` |
+| `honda_l15b7` | 47.6717 | 1.8043, 2.4091, 3.6599, 4.5053, 5.1517, 5.9172 | 1.5791, 2.3331, 3.4978, 4.8495, 6.1371, 6.7138 | `:36`, `:42`, `:54` |
+| `ford_27tt` | 66.7620 | 1.0003, 1.3163, 1.9109, 2.2075, 2.3982, 2.6184 | 0.6297, 0.9149, 1.3454, 1.8890, 2.3982, 2.6235 | `:37`, `:43`, `:55` |
+| `ford_27tt (one housing)` | 37.0959 | 0.5235, 0.6482, 0.8657, 0.9801, 1.0812, 1.2151 | 0.5669, 0.7574, 0.9681, 1.1684, 1.3343, 1.3864 | `:38`, `:44`, `:56` |
+
+With knock, not converged in dt on these roads (`grids_b58.txt:45-50`):
+
+| engine | C_e at r = 0.5, 0.666667, 1, 1.25, 1.5, 1.947 | C_e at H = 20, 30, 45, 65, 100, 130 s | source |
+|---|---|---|---|
+| `b58` | 0.7314, 1.2804, 2.3738, 3.2603, 3.9758, 4.8438 | 0.5221, 1.2123, 2.2322, 3.6498, 5.0693, 5.6629 | `grids_b58.txt:46` |
+| `mazda_25t` | 3.7387, 4.4200, 5.7903, 6.8889, 7.9381, 9.6058 | 3.6409, 4.6160, 6.0788, 8.0249, 10.6799, 12.0718 | `:47` |
+| `honda_l15b7` | 1.6630, 2.2229, 3.3811, 4.1655, 4.7639, 5.4681 | 1.4545, 2.1525, 3.2310, 4.4844, 5.6685, 6.1954 | `:48` |
+| `ford_27tt` | 0.9069, 1.1936, 1.7327, 1.9998, 2.1701, 2.3657 | 0.5708, 0.8294, 1.2200, 1.7129, 2.1701, 2.3702 | `:49` |
+| `ford_27tt (one housing)` | 0.5191, 0.6426, 0.8583, 0.9716, 1.0718, 1.2045 | 0.5621, 0.7509, 0.9597, 1.1582, 1.3226, 1.3742 | `:50` |
+
+The spread at each abscissa and its mean (row 102's statistic: each curve normalised by its value at the largest
+abscissa; at each abscissa the largest normalised value minus the smallest; their mean over the six,
+`grids_b58.txt:58-59`):
+
+| members | H/τ axis, at r = 0.5, 0.666667, 1, 1.25, 1.5, 1.947 | H axis, at H = 20, 30, 45, 65, 100, 130 s | source |
+|---|---|---|---|
+| the four engines | 0.1443, 0.1887, 0.2578, 0.2199, 0.1290, 0.0000 | 0.0588, 0.0804, 0.1154, 0.0836, 0.0233, 0.0000 | `grids_b58.txt:61`, `:66` |
+| the four engines and the one-housing Ford (five curves) | 0.1931, 0.2194, 0.2578, 0.2199, 0.1290, 0.0000 | 0.2277, 0.2780, 0.2927, 0.2041, 0.0716, 0.0000 | `:72`, `:78` |
+| without the Ford | 0.0672, 0.0931, 0.1465, 0.1382, 0.0838, 0.0000 | 0.0540, 0.0792, 0.1154, 0.0836, 0.0233, 0.0000 | `:85`, `:89` |
+
+The mean spreads:
+
+| members | H/τ axis | H axis | source |
+|---|---|---|---|
+| the four engines (b58, mazda_25t, honda_l15b7, ford_27tt) | 0.1566 | 0.0603 | `grids_b58.txt:94` |
+| the four engines and the one-housing Ford (five curves) | 0.1699 | 0.1790 | `:72`, `:78`, `:95` |
+| without the Ford (b58, mazda_25t, honda_l15b7) | 0.0881 | 0.0592 | `:85`, `:89`, `:96` |
+
+Each curve's normalised values are at `grids_b58.txt:62-65`, `:67-70`, `:73-77`, `:79-83`, `:86-88` and `:90-92`. All of
+this describes the models of plants Run 2's validation dropped, and is never evidence for or against the criterion.
+
+**Decision 13's count** (current-grade's steps under 95 % of the requested torque, after the 20 s ramp, on the test
+roads; row 100 (3)): for the B58, "steps 17580, under95 152, over_tol 152, climb_steps 5106, climb_under95 0,
+climb_over_tol 0", largest shortfall 66.436 Nm, on the climbs 0.233 Nm (`grids_b58.txt:99-101`; per road at `:102`).
+Beside it, the other cars' counts as roads.json records them, for the dropped plants and deciding nothing: mazda_25t
+"steps 17580, under95 0, over_tol 0, climb_steps 5106, climb_under95 0, climb_over_tol 0", largest shortfall 2.156 Nm,
+on the climbs 0.001 Nm; honda_l15b7 "steps 17580, under95 0, over_tol 0, climb_steps 5106, climb_under95 0,
+climb_over_tol 0", largest shortfall 1.983 Nm, on the climbs 1.946 Nm; ford_27tt "steps 17580, under95 208, over_tol
+208, climb_steps 5106, climb_under95 0, climb_over_tol 0", largest shortfall 100.382 Nm, on the climbs 0.550 Nm
+(`grids_b58.txt:103-111`, per road at `:105`, `:108`, `:111`). It stands beside the hand-written rows the scores
+document holds (current-grade's at `scores_b58h.txt:567` and its cut at `:631`), beside 9.5 (i)'s margins (16.8;
+`b58h_core.txt:66-68`) and beside 9.8's margins (16.11).
+
+**Section 10's table, row by row** (lines 1099-1113), each beside reading deciding nothing:
+
+| row | primary, where reported | beside, where reported |
+|---|---|---|
+| the damage reading | no knock, every block above | with knock, labelled "not converged in dt on these roads", beside every number (`analysis_b58h.txt:10`, `:33`, `:40`, `:47-48`, `:51-52`, `:57-58`; `b58h_core.txt:28-52`); the label rests on the dt 0.5 s repeat, which moved the B58's (a) at r = 1.5 by "no knock -0.0035, knock 1.1735" (`power_b58.txt:43`) |
+| the B58's band | version 6's, the primary Δ_e (16.3; `analysis_b58h.txt:67`) | version 5's, the band left out: 0 at every ratio and reading (`:69`, `:75`, `:81`, `:87`, `:93`), no verdict MODEL-LIMITED under it (`:97-104`) |
+| "at b" | κ 1 in the contract's form (`:67`) | b itself (`:68`; 16.3) |
+| P3's κ | 1 (`:66`) | the companion at κ 1.7168 and 3.7328 (`:65`, `:70-71`; 16.3) |
+| the road set | version 6's twenty, scored ("20 roads (version 6)", `scores_b58h.txt:1`) | version 5's reading, reported and never scored: the scores' provenance holds `version_5_reading` with `scored` false and gating ['b58', 'ford_27tt', 'honda_l15b7', 'mazda_25t'] (`scores_b58h.json` `provenance.version_5_reading`); R4's counts, "failing slots 58 of 75 on 20 roads", "redraws 129 discarded 60 gear_sensitive 22" (`r4_counts.txt:4-5`); no d on its set exists (section 5.1, line 408) |
+| the form of a cut | `evaluate.py`'s (median) | the mean form, for d (16.2; `analysis_b58h.txt:46`, `:48`, `:50`, `:52`) and for Δ (16.4; `:56`, `:58`) |
+| the test | paired t | exact sign test (16.2; `analysis_b58h.txt:20`, `:23`) |
+| the B58's plant_sha | P's `36655cab94800e30` (`analysis_b58h.txt:185`; `scores_b58h.txt:5`) | `865f8e7b7e5c2dbe`, the frozen plant's before P (`analysis_b58h.txt:185`, from `results/EPA_ROADS/reverify.json` `plants.b58.plant_sha_at_draw`) |
+| the status | the analysis's exploratory (`analysis_b58h.txt:13`, `:186`) | the context's recorded rule output, exploratory (`:186`; `context_b58h.json:182-184`) |
+| s_p | X2's no-knock 20.56, 5 pairs (`analysis_b58h.txt:187`) | X2's 20.51 with knock (`:188`); X1's 24.78 and 24.88, 23 pairs (`:189-190`); the training's own seeds 0-4 on the practice roads, 8.8248 at r = 1.5, no knock, ddof 1, 5 pairs (`practice_b58h_s0-4.txt:172`); 16.5 |
+| every descriptive cut (9.5, 9.7, 9.8) | `evaluate.py`'s form, no knock | the mean form; with knock, labelled (`b58h_core.txt:28-52`; `hw_opt_report.txt:4`, `:61-118`; 16.11); 9.7 not computed (code) |
+| the temperatures (9.6), the fuel and torque rows (9.1, 9.5 (v)) | no reading (`b58h_core.txt:71`, `:84`; `analysis_b58h.txt:107`) | none |
+| the hand-written and optimum references (9.8) | labelled, beside d (16.11) | never in the scores, the ceiling slot, the band or the status: the context's ceiling slot holds roads.json's C (`context_b58h.json:2-7`; `grids_b58.txt:29-30`); the optimum is not computed (code) |
+
+The analysis prints the beside values it covers, each with its file, at `analysis_b58h.txt:184-192`. Every beside value
+section 10 names is printed in a committed output cited above.
+
+### 16.13 Everything reported (section 11)
+
+- **All 60 runs of the training and all 10 of the check run are reported.** The training's 60 runs, of `runs/b58h_dt1`,
+  and the check run's 10, of `runs/b58h_check_dt1`, read `git_head` `720587d` (`T*`) and `git_dirty` false (section 15,
+  lines 2017-2018); the training's runs read 450 000 steps and the check run's 50 000 (line 2044). All 60 were scored
+  (`scores_b58h.txt:563-627`). The check run is never scored (section 4); its record is in `results/B58H_CHECK/` (lines
+  1865-1871).
+- **Crashed folders: none.** "crashed folders, kept: none" at CK (line 1864); one session folder, "no crash, no restart
+  and no second session" in training (lines 2016-2017); no `.crashed<N>` or `.broken<N>` folder in the return (line
+  2032).
+- **No seed was added and no run was extended**: seeds 0-19 per arm, 20 per arm (`analysis_b58h.txt:9`;
+  `context_b58h.json:181`), every run at 450 000 steps (line 2044).
+- **Every number the analysis prints is reported**: both tests at both ratios in both readings, every interval, Δ, the
+  band under both readings of "at b", version 5's reading, the companion and the delivery block (16.1-16.6), decision
+  12's three rows as `b58h_descriptive_print.txt` prints them from the committed JSON (16.7); 9.2's "every policy's
+  damage in both readings" (line 777) is held per episode in `b58h_locked.json` and printed by no committed output
+  (`b58h_descriptive_print.txt:35`), so it is not reported here: a gap against sections 9.2 and 11 (line 1156), recorded
+  and not filled by a computation; rows 150-153's items as run or "not computed (code)" / "not computed" (16.8-16.11),
+  and row 102's curve and grids from section 10's print (16.12). No item reads "not run (time)": items (d)-(f) never had
+  code (16.8, 16.10).
+- **Every document is kept.** The scores, the records' index and the text report (item (a)), the context and the
+  analysis (item (b)), and the five documents of item (c) were each written once and committed as written (section 15,
+  lines 2154-2161, 2171-2172, 2177-2178, 2183-2185, 2192-2194, 2231-2232). Section 15 records no re-score and no
+  re-analysis after a defect fix, and no change to a reading, the band, the tests or the decision rule after the first
+  score.
+- **B1's attempt**: one attempt, `B1_bench_b58.attempt1`, started 14 November 2026 at 19:53:38 AST from git_head
+  `0329456` with git_dirty false; no superseded attempt, no crash, no fallback (section 3.2, line 243;
+  `d148_figures.txt:7`).
+- **Section 11's table.** Section 15 records every item of (a)-(c) exiting 0 with no refusal, warning or failed control
+  printed (lines 2151-2152, 2158-2159, 2168-2188, 2224-2227). Two outcomes are recorded there. (1) One commit after
+  `T*`, `a6032e8`, changed a path present at `T*` against section 6.0 and was pushed; section 11's row for it (line
+  1179) asks that it not be pushed and be amended, which a pushed commit cannot be, so section 15 discloses it. Section
+  6.0's name-status check diffs `T*` against HEAD (line 1756), so it prints that path at every later commit too; from
+  `d4cd9c2` on, the gate prints it and stops on any other line (section 15, lines 2259-2260). (2) The practice route
+  then ran at `a6032e8`, against section 5.2, an outcome no named row covers, so the table's last row applies (line
+  1187: "the step stops, and it is reported"); it was found after item (c) had ended, and it is reported in section 15
+  (lines 2243-2260) and in 16.5. The device's two environment records, before CK and after the last run, are identical
+  but for their first line in every field section 11 names, so section 11's row for differing records does not apply
+  (lines 2036-2040).
+- **The deviations recorded in section 15 stay there**: an AI agent on the training device (lines 1879-1912); the break
+  of row 149 (3) on 17 November, undone by `588de29` the same day (lines 2000-2011); the gates of the five commits after
+  AB's, which ran Ta's live test only afterwards (lines 2203-2214); and `verify_docs.py`, a file present at `T*`,
+  changed in the core rows' commit `a6032e8` against section 6.0, its gate lacking section 6.0's name-status check (line
+  1756), and the practice route then run at that commit against section 5.2, found while this section was written and
+  disclosed with what it could move: `verify_docs.py` is no cost file, and no module the scoring loads imports it (lines
+  2243-2260). Every other scoring command of items (a)-(c) ran at `8c98bfa` or before, where no `.py` file present at
+  `T*` differed from `T*`'s. Section 15 also records, under this file's procedure (section 12.3), the print of decision
+  12's rows: two added paths that neither section 5.2's table nor row 149 (3) names, changing no file present at `T*`
+  and scoring nothing (lines 2262-2277); the numbers it prints are V's, computed by the code of `cadac38`.
+- **The post hoc analyses are not here.** The three analyses chosen on 17 November during training, before any score,
+  PH1 (a long-gap preview sweep), PH2 (the oil share of the damage) and PH3 (each agent's saving per climb against the
+  gap), are named by `SESSION_REPORT_2026-11-15_D148.md`, section 17 (`:789-844`; section 15, lines 2009-2011). PR-B
+  names none of them, so each is post hoc (VD:394), reported under a post hoc heading beside the preregistered readings
+  and deciding nothing. PH1 and PH2 were started early, on 19 and 20 November, and stopped before the first scoring
+  command, with no print and no agent loaded (`SESSION_REPORT_2026-11-15_D148.md:914-918`); by that record they run
+  after item (c), outside the repository (`:917-918`), and their prints go to a session report under a post hoc heading,
+  not before the first scoring command as section 17 put them (`:799`). PH3 reads item (a)'s records (`:829`); no run of
+  it is recorded. Section 17's condition that none starts before AB and the routes of step 22b are committed
+  (`:796-797`) cannot now be met, since no route was committed and no code is written for them after the first scoring
+  command (section 15, lines 2144-2146); their running after item (c) departs from it, and is disclosed as such. None of
+  their numbers is reported in this section.
+- **Beside X1, X2 and every earlier set, one line each, never pooled**: 16.14.
+
+### 16.14 Beside the earlier looks at the preview question, one line each, never pooled
+
+This is the seventh preregistered look at the preview question (section 2, lines 180-182). Descriptive; it decides
+nothing. This study is a new experiment, never compared with X1 or X2 as one: it differs from X1 in the plant code, the
+scored roads, the training road, the recipe, the steps, the horizons, the reward, the device and the seed count, all at
+once, so anything said about it against X1, X2 or any earlier set attributes nothing to any single change (section 2,
+lines 174-178). The looks differ from one another in plant, road set or design, or several at once (section 2, lines
+180-182: "on different plants, roads and designs"); each measured its effect in its own units and its own direction, and
+is quoted only as its own record prints it. Every p is unadjusted across them. No number is combined across them, and no
+reading is drawn across them. In the quotes below, each run of spaces is printed as one space.
+
+- **Phase D** (eight seeds per arm, 50 000 steps each, on the ZF 8HP51 plant of its day; `results/README.md:266-267`),
+  blind − sighted in damage units: 5 of 8 differences positive (the record's 'positive' line), "mean difference : +4.8
+  damage units", "RESULT: NOT SIGNIFICANT at alpha 0.05." (`results/PHASE_D_RESULT.txt:19-20`, `:26`;
+  `results/README.md:189-190`); its blinded arm was "not blind (a memorisable road)" (`results/README.md:215-216`,
+  `:225`).
+- **Phase D2** (the same ablation on a randomised climb, its blind arm checked; `results/README.md:216-217`, `:225`),
+  blind − sighted in damage units: 4 of 8 differences positive (the record's 'positive' line), "mean difference : +6.4
+  damage units", "RESULT: INCONCLUSIVE" (`results/PHASE_D2_RESULT.txt:18-19`, `:30`; `results/README.md:189-190`).
+- **C4** (D2's design at 300 000 steps; `results/README.md:182`), blind − sighted in damage units: 3 of 8 differences
+  positive (the record's 'positive' line), "mean difference : +30.2 damage units", "RESULT: SMALLER THAN THE MEI"
+  (`results/C4_RESULT.txt:20-21`, `:42`; `results/README.md:189-190`, `:192`).
+- **29 September** (ten seeds a side on varied roads, the plant before the agreed fixes; `results/README.md:170-171`),
+  sighted − blinded damage cut in points: "10 pairs: mean +1.17 points (median +1.79, sd 7.84), 95 % CI -4.44 to +6.78;
+  paired t-test p = 0.648"; thermal-only damage (no knock term): "mean -1.50 points, t-test p = 0.559"
+  (`results/agents/terrain_dt1/README.md:58`). X1's re-reading of that set under X1's rule, not the look's own record:
+  "6 of 10 positive, mean +1.17, sd 7.84, sign p 0.3770, INCONCLUSIVE" (`results/PREREGISTRATION_X1.md:157-158`).
+- **X1** (the extremes design, 23 seeds a side; `results/README.md:130`, `:137-140`), sighted − blinded cut in points on
+  the locked climb (`results/PREREGISTRATION_X1.md:37`): total damage "n 23 (non-zero) positive 10 mean -10.35 sd 24.78
+  points", "CELL: SMALLER THAN THE MEI" (`results/X1_RESULT.txt:29`, `:33`); thermal-only "mean -10.43 sd 24.88 points",
+  the same cell (`:60`, `:64`).
+- **X2** (X1's plant and roads with the air widened, five seeds a side; `results/README.md:94-96`), sighted − blinded
+  cut in points on the locked climb (`results/PREREGISTRATION_X2.md:32`): total damage "n 5 (non-zero) positive 1 mean
+  -4.40 sd 20.51 points", "CELL: INCONCLUSIVE" (`results/X2_RESULT.txt:11`, `:15`); thermal-only "n 5 (non-zero)
+  positive 1 mean -4.40 sd 20.56 points", the same cell (`:24`, `:28`).
+- **This study** (the B58 model, which is not validated, on decision 34's twenty roads, 20 seeds per arm at 450 000
+  steps; `analysis_b58h.txt:9`; section 15, line 2044), sighted − blinded cut in points, no knock, `evaluate.py`'s form,
+  the t-test under the graph: at r = 1.5, d > 0 not shown, d -1.86 points, two-sided 95 % t interval -6.17 to +2.44
+  (band Δ_e 1.49 points, ceiling C(1.5) 5.23 points, `analysis_b58h.txt:32`); at r = 0.5, d > 0 not shown, d -6.28
+  points, two-sided 95 % t interval -12.01 to -0.56, wholly below 0 (band Δ_e 4.12 points, ceiling C(0.5) 1.82 points,
+  `analysis_b58h.txt:39`); against an MEI of 5.43 points (`analysis_b58h.txt:30-38`) [with knock, not converged in dt on
+  these roads: d -2.49 points, 95 % -6.22 to +1.23, at r = 1.5; d -6.60 points, 95 % -11.90 to -1.31, at r = 0.5 (`:33`,
+  `:40`)]. Exploratory, on one plant.

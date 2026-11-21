@@ -979,3 +979,17 @@ numbers; the numbers are in the committed JSON only. `results/B58H_RESULT/b58h_d
 print written after item (c), prints them at stated decimals, computing nothing, with controls that re-derive V's stored
 differences, margins and flags (ALL CONTROLS: PASS). Its output, `b58h_descriptive_print.txt`, is what PR-B section 16
 cites for sections 9.2-9.4. Both paths are additions PR-B does not name, disclosed in its section 15.
+
+**PR-B section 16, the outcome, written last.** After item (c), the deviation's disclosure and the print (`d4cd9c2`),
+section 16 was drafted by one agent from the committed outputs only, then checked by five independent agents (numbers in
+two parts, wording and the forbidden phrases, completeness against PR-B, a skeptical examiner), corrected by a fixer
+whose every change and rejection was checked by a final agent, and checked again after the print by four more (the new
+16.7 cell by cell against the print and all 3,902 printed values against the JSON; the changed passages; the wording;
+the examiner). Every number in it is cited to a committed output by file and line. What it reports: at r = 1.5 and r =
+0.5, d > 0 not shown (no knock, the t-test under the graph); at r = 0.5 the two-sided interval lies wholly below 0,
+which section 7 reads as the sighted agents taking more simulated damage than their blinded twins on these roads, a
+finding about this learner and recipe at this budget; Δ, exploratory, +4.42 points with an interval that excludes 0; no
+verdict MODEL-LIMITED; the status exploratory; the descriptive blocks, each deciding nothing, among them current-grade's
+cut larger than most agents' and no agent passing the logged check; items (d)-(f), the anchors and the λ-only optimum
+"not computed (code)" or "not computed"; the deviation of `a6032e8`; and the earlier looks one line each, never pooled.
+A gap stays recorded: 9.2's per-episode damages are held in the JSON and printed by no committed output.
