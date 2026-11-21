@@ -1,0 +1,188 @@
+"""b58h_descriptive_print: a print of decision 12's three descriptive rows (PR-B sections 9.2-9.4), as V's
+b58h_descriptive.py wrote them to the committed results/B58H_RESULT/b58h_locked.json, b58h_battery.json and
+b58h_logged.json. Written on 21 November 2026, after item (c) of PR-B section 14 step 3, because V's printed
+reports (b58h_<row>.txt) carry the transfer lines and two closing lines only, so no committed output printed
+the rows' numbers that section 16 must report (mistake 22: a sentence that carries a number needs the run that
+printed it).
+
+It computes nothing. Every number it prints is the JSON's own value at the stated decimals: cuts, margins and
+sighted-minus-blinded differences at 2 decimals (scores_b58h.txt's precision), peaks at 1 decimal in deg C,
+counts as the integers they hold. The only arithmetic is in its CONTROLS, which re-derive V's stored
+differences from V's stored cuts and V's stored counts from V's stored per-run flags, and print PASS or FAIL
+(mistake 12). Descriptive (row 147 (11)): reported per arm and seed, deciding nothing; no verdict, band, status,
+test or delta reads it. The no-knock reading is primary; the with-knock reading is in brackets, "not converged
+in dt on these roads".
+
+Run from the repository root, standard library only, read-only, ASCII to standard output:
+    PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B results/B58H_RESULT/b58h_descriptive_print.py.txt .
+"""
+import hashlib
+import json
+import os
+import re
+import sys
+
+ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
+D = os.path.join(ROOT, "results", "B58H_RESULT")
+SHA8 = {"locked": "ed4bba4f", "battery": "00743e99", "logged": "cfd5737f"}   # PR-B section 15's records
+ARMS = ("blind", "sighted_r0.5", "sighted_r1.5")
+RATIOS = ("0.5", "1.5")
+RD = ("no_knock", "with_knock")
+KNOCK = "not converged in dt on these roads"
+TOL = 1e-9
+out = []
+
+
+def say(s=""):
+    out.append(s)
+
+
+def load(row):
+    p = os.path.join(D, f"b58h_{row}.json")
+    raw = open(p, "rb").read()
+    sha = hashlib.sha256(raw).hexdigest()
+    doc = json.loads(raw.decode("utf-8"))
+    ok = sha.startswith(SHA8[row]) and doc.get("row") == row and doc.get("schema") == "b58h-descriptive/1"
+    say(f"{row}: results/B58H_RESULT/b58h_{row}.json, sha256 begins {sha[:8]} (section 15's {SHA8[row]}): "
+        f"{'MATCH' if ok else 'DIFFER'}; route: {doc['route']}; reward_knock {doc['reward_knock']}; "
+        f"train_backend {doc['train_backend']}")
+    if not ok:
+        raise SystemExit(f"STOP: b58h_{row}.json is not the committed record section 15 names")
+    return doc["results"]
+
+
+def c2(x):
+    return f"{x:+.2f}"
+
+
+def pair(d):
+    return f"{c2(d['no_knock']):>7} [{c2(d['with_knock']):>7}]"
+
+
+def integer(x):
+    if float(x) != int(x):
+        raise SystemExit(f"STOP: a count is not integer-valued: {x!r}")
+    return int(x)
+
+
+def seeds(arm_map):
+    return sorted(arm_map, key=int)
+
+
+def control_d(cuts_of, d, label):
+    """V's d against cut(sighted) - cut(blinded), both readings: PASS when every difference is within TOL."""
+    worst, n = 0.0, 0
+    for r in RATIOS:
+        for s in seeds(d[r]):
+            for rd in RD:
+                v = cuts_of(f"sighted_r{r}", s)[rd] - cuts_of("blind", s)[rd]
+                worst = max(worst, abs(v - d[r][s][rd]))
+                n += 1
+    say(f"  CONTROL ({label}): V's stored sighted-minus-blinded differences equal its stored cuts' differences, "
+        f"{n} values: {'PASS' if worst <= TOL else 'FAIL'} (largest absolute difference {worst:.1e})")
+    return worst <= TOL
+
+
+say("B58H, DECISION 12'S THREE DESCRIPTIVE ROWS, PRINTED (PR-B sections 9.2-9.4; b58h_descriptive_print.py.txt)")
+say("A print of the committed JSON that V's b58h_descriptive.py wrote at item (c); it computes nothing (the "
+    "controls aside).")
+say("descriptive (row 147 (11)): reported per arm and seed, deciding nothing. No knock is primary; [with knock: "
+    f"{KNOCK}].")
+say("A cut is evaluate.py's form against the case's own baseline ECU, 100 x (1 - median D / median D_base), in "
+    "points; d = sighted cut - blinded cut, per seed.")
+say()
+ok_all = True
+
+# ---------------------------------------------------------------- 9.2 the locked climb
+L = load("locked")
+say(f"9.2 THE LOCKED CLIMB (decision 34's transfer row): {L['episodes']} frozen episodes per policy")
+say("  hand-written policies, cut no knock [with knock]:")
+for name, h in L["hand"].items():
+    say(f"    {name:<16} {pair(h['cut'])}")
+say("  agents, cut no knock [with knock], and d per ratio:")
+say(f"    {'seed':>4}  {'blind':>17}  {'sighted_r0.5':>17}  {'sighted_r1.5':>17}  {'d r = 0.5':>17}  {'d r = 1.5':>17}")
+for s in seeds(L["agents"]["blind"]):
+    row = [pair(L["agents"][a][s]["cut"]) for a in ARMS] + [pair(L["d"][r][s]) for r in RATIOS]
+    say(f"    {s:>4}  " + "  ".join(f"{x:>17}" for x in row))
+ok_all &= control_d(lambda a, s: L["agents"][a][s]["cut"], L["d"], "the locked climb")
+say("  each policy's damage per episode, both readings, its fuel and its peak per episode are held in "
+    "b58h_locked.json (results.hand, results.agents) and not printed here")
+say()
+
+# ---------------------------------------------------------------- 9.3 the conditions battery
+B = load("battery")
+say("9.3 THE CONDITIONS BATTERY (decision 12's transfer secondary): seven conditions, each on its own hill")
+say("  per policy: cut against the condition's own baseline ECU, no knock [with knock]; margin over the condition's "
+    "current-grade, no knock [with knock]; the medians over the condition's five episodes of the short steps (torque "
+    "under 95 % of the request, b58h_descriptive.BATTERY_SHORT) and of the seconds with the housing above 850 deg C "
+    "(conditions_test.TRIGGER_C), as V's row holds them; the highest peak of the housing, deg C")
+for cond, c in B.items():
+    say()
+    if c.get("grade") is None:
+        say(f"  CONDITION {cond}: {c.get('note')}")
+        continue
+    say(f"  CONDITION {cond}: hill {100 * c['grade']:.2f} %, ambient {c['t_amb_k']:.2f} K, {c['p_kpa']:g} kPa, "
+        f"episodes {c['episodes']}")
+    hdr = f"    {'':<18} {'cut':>17}  {'margin over cg':>17}  {'short':>5} {'s above':>7} {'peak C':>7}"
+
+    def line(lbl, e):
+        return (f"    {lbl:<18} {pair(e['cut']):>17}  {pair(e['margin_over_current_grade']):>17}  "
+                f"{integer(e['short_steps_median']):>5} {integer(e['s_above_median']):>7} {e['peak_turb_max']:>7.1f}")
+    say(hdr)
+    for name, h in c["hand"].items():
+        say(line(name, h))
+    for a in ARMS:
+        for s in seeds(c["agents"][a]):
+            say(line(f"{a} {s}", c["agents"][a][s]))
+    say(f"    d per seed, no knock [with knock]:  {'r = 0.5':>17}  {'r = 1.5':>17}")
+    for s in seeds(c["d"]["0.5"]):
+        say(f"    {s:>4}  {pair(c['d']['0.5'][s]):>17}  {pair(c['d']['1.5'][s]):>17}")
+    ok_all &= control_d(lambda a, s, c=c: c["agents"][a][s]["cut"], c["d"], cond)
+    cg = c["hand"]["current-grade"]["cut"]
+    worst = max(abs((e["cut"][rd] - cg[rd]) - e["margin_over_current_grade"][rd])
+                for e in list(c["hand"].values()) + [c["agents"][a][s] for a in ARMS for s in c["agents"][a]]
+                for rd in RD)
+    say(f"  CONTROL ({cond}): every stored margin equals its stored cut minus current-grade's: "
+        f"{'PASS' if worst <= TOL else 'FAIL'} (largest absolute difference {worst:.1e})")
+    ok_all &= worst <= TOL
+say()
+
+# ---------------------------------------------------------------- 9.4 the logged drives
+G = load("logged")
+say("9.4 THE LOGGED DRIVES (decision 12's check on logged states): every drive at two weightings")
+say(f"  criteria as the row holds them: {json.dumps(G['criteria'], sort_keys=True)}")
+first = G["agents"]["blind"][seeds(G["agents"]["blind"])[0]]["runs"]
+order = [(r["drive"], r["episode"]) for r in first]
+say("  the cases, in the order of the flags below:")
+for i, (dr, ep) in enumerate(order, 1):
+    say(f"    {i:>2}  {dr}, episode {ep}")
+say("  per policy: T met / F met / of n cases; passes (meets T and F on every case); per case T and F (1 met, 0 not)")
+
+
+def lg(lbl, e):
+    flags = " ".join(f"{int(bool(r['T']))}{int(bool(r['F']))}" for r in e["runs"])
+    if [(r["drive"], r["episode"]) for r in e["runs"]] != order:
+        raise SystemExit(f"STOP: {lbl}'s cases are in another order")
+    return f"    {lbl:<18} {e['T_ok']:>2} / {e['F_ok']:>2} / {e['n']:>2}  {'pass' if e['pass'] else 'no':<4}  TF: {flags}"
+
+
+worst_n = 0
+for name, h in G["hand"].items():
+    say(lg(name, h))
+for a in ARMS:
+    for s in seeds(G["agents"][a]):
+        say(lg(f"{a} {s}", G["agents"][a][s]))
+for e in list(G["hand"].values()) + [G["agents"][a][s] for a in ARMS for s in G["agents"][a]]:
+    t = sum(bool(r["T"]) for r in e["runs"])
+    f = sum(bool(r["F"]) for r in e["runs"])
+    p = all(bool(r["T"]) and bool(r["F"]) for r in e["runs"])
+    worst_n += (t != e["T_ok"]) + (f != e["F_ok"]) + (len(e["runs"]) != e["n"]) + (p != e["pass"])
+say(f"  CONTROL (the logged drives): every stored count and pass flag equals its per-case flags: "
+    f"{'PASS' if worst_n == 0 else 'FAIL'} ({worst_n} mismatches)")
+ok_all &= worst_n == 0
+say()
+say(f"ALL CONTROLS: {'PASS' if ok_all else 'FAIL'}")
+text = "\n".join(out) + "\n"
+text, n = re.subn(r"\d{12,}", "<integer>", text)
+text += f"(runs of 12 or more digits masked: {n})\n"
+sys.stdout.write(text.encode("ascii").decode("ascii"))

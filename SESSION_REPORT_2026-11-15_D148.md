@@ -963,3 +963,19 @@ caught; Ta's live test "Ran 6 tests", OK), and it was pushed as `a6032e8`. The p
 roads. It prints s_p at r = 1.5, no knock, 5 pairs: 8.8248, beside the context's 20.56 (X2's); it decides nothing, and
 the status stays exploratory. Both files are in `results/B58H_RESULT/` (PR-B section 15). Item (c) has ended; PR-B
 section 16 is next.
+
+**A deviation found while writing PR-B section 16.** The core commit `a6032e8` changed `verify_docs.py`, a file present
+at `T*`, to excuse one line of the generated `b58h_core.txt`. PR-B section 6.0 (row 149 (3)) lets the commits after `T*`
+change only the four documents among the paths present at `T*`, and section 5.2 lets scoring run only from a commit at
+which no `.py` file present at `T*` has changed. Item (c)'s gates ran section 14's lines for a commit touching PR-B,
+which do not include section 6.0's name-status check, so the change was pushed unnoticed, and the practice route then
+ran at `a6032e8`. It cannot have moved a number: `verify_docs.py` is no cost file, and nothing the scoring loads imports
+it (checked: not in `sys.modules` after importing `evaluate`, `fingerprint`, `epa_backend` and `four_engine_analysis`).
+Every other scoring command ran at `8c98bfa` or before. A pushed commit is never rewritten, so it is disclosed in PR-B
+section 15 and here, and the gate now prints the name-status check too.
+
+**A print of decision 12's three rows.** V's reports of the locked climb, the logged drives and the battery print no
+numbers; the numbers are in the committed JSON only. `results/B58H_RESULT/b58h_descriptive_print.py.txt`, a read-only
+print written after item (c), prints them at stated decimals, computing nothing, with controls that re-derive V's stored
+differences, margins and flags (ALL CONTROLS: PASS). Its output, `b58h_descriptive_print.txt`, is what PR-B section 16
+cites for sections 9.2-9.4. Both paths are additions PR-B does not name, disclosed in its section 15.

@@ -2233,6 +2233,49 @@ roads": it decides nothing, the context's s_p stays X2's 20.56 (section 6.7), an
 one closing line naming the file written, and stays outside the repository. Item (c) has ended; section 16 is written
 next, last.
 
+**21 November 2026, the practice commit's gate** (section 14's lines, run after the commit and before its push). Its
+output, also in the commit's message, which was amended with it, the tree unchanged: "cost paths: 51"; "cost files
+unchanged since B1: exit 0"; `verify_docs.py` "All 170 checks pass (1172 figure mentions scanned in the documents).",
+exit 0; "ABOVE SECTION 15: UNCHANGED SINCE T*"; `git diff --stat` of this file from `T*` "1 file changed, 395
+insertions(+)"; `test_epa_backend.PreregistrationB58H` "Ran 6 tests", "OK", exit 0; the commit "6 files changed, 1701
+insertions(+), 1 deletion(-)". It was pushed as `12c0765`.
+
+**21 November 2026, a deviation found while section 16 was written: `verify_docs.py` changed at `a6032e8`, and the
+practice route ran there.** Section 6.0 (row 149 (3)) lets the commits after `T*` change, of the paths present at `T*`,
+only CHECKPOINT.md, STATE_HISTORY.md, the session report and this file; section 5.2 lets scoring run only from a commit
+at which no `.py` file present at `T*` differs from `T*`'s. The core commit `a6032e8` changed `verify_docs.py`, a file
+present at `T*`: one label constant, a dated comment and one `RETIRED_EXEMPT_LINES` entry for a line of `b58h_core.txt`
+(the core rows' entry above), so that `verify_docs.py` passes on that generated report. Its gate ran section 14's lines
+for a commit that touches this file (line 1581), which do not include section 6.0's name-status check (line 1756), so
+nothing printed the change, and it was pushed. The practice route, a scoring command by section 6.0's definition, then
+ran at `a6032e8`, against section 5.2. Section 11's row for a commit after `T*` that fails a check of section 6.0 says
+that it is not pushed and is fixed by amending it (line 1179); a pushed commit is never rewritten, so it is reported
+here and in the session report instead. What it could move: `verify_docs.py` is not in `epa_backend.cost_files` (the
+cost-file check at `a6032e8` printed "cost files unchanged since B1: exit 0"), and no module the scoring loads imports
+it: on this laptop, after `import evaluate, fingerprint, epa_backend, four_engine_analysis`, `verify_docs` is not in
+`sys.modules`. Every scoring command of items (a)-(c) but the practice route ran at a commit at which no `.py` file
+present at `T*` differed from `T*`'s (`8c98bfa` and before; the five gates' entry above). The practice spread ran at
+`a6032e8`, and section 16 reports it with this entry beside it; it decides nothing. `verify_docs.py` stays as `a6032e8`
+left it, since its earlier text fails on the committed report. From this commit on, the gate also prints `git diff
+--name-status` from `T*` for the paths present at `T*`, line 1756's check, and stops on any line but `verify_docs.py`'s.
+
+**21 November 2026, a print of decision 12's three rows.** V's printed reports of item (c)'s first three commands,
+`b58h_locked.txt`, `b58h_logged.txt` and `b58h_battery.txt`, carry the transfer lines and two closing lines only. The
+numbers sections 9.2-9.4 ask for, which V's `b58h_descriptive.py` (`cadac38`, before `T*`) computed and wrote, are in
+the committed JSON alone, at full precision, so no committed output printed them and section 16 could not quote them
+(mistake 22). `results/B58H_RESULT/b58h_descriptive_print.py.txt` is a read-only standard-library script in the form of
+`results/B58H_DESIGN/grids_b58.py.txt`, written on 21 November after item (c). It prints the three rows from the
+committed `b58h_locked.json`, `b58h_battery.json` and `b58h_logged.json`: every cut, margin and sighted-minus-blinded
+difference at 2 decimals, each peak at 1 decimal, the counts and flags as held. It computes nothing. Its controls
+re-derive V's stored differences, margins, counts and pass flags from V's own stored cuts and per-case flags, and it
+checks each file's sha256 against this section's records (`ed4bba4f`, `00743e99`, `cfd5737f`): every control prints
+PASS, and it ends "ALL CONTROLS: PASS". It ran once on this laptop on 21 November, HEAD `12c0765`, the script as
+committed here, as `PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -I -B
+results/B58H_RESULT/b58h_descriptive_print.py.txt .`, and its output is committed as
+`results/B58H_RESULT/b58h_descriptive_print.txt` (752 lines, sha256 beginning `bbfcd75d`) with this entry. The two paths
+are additions that neither section 5.2's table nor row 149 (3) names (this file's procedure, section 12.3); they change
+no file present at `T*`, load no agent and score nothing. The print decides nothing.
+
 ## 16. Outcome — added after the result, never above this line
 
 *(empty at writing.)*
